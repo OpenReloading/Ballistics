@@ -1,14 +1,11 @@
 import { z } from 'zod'
+import type { Exact } from './exact.ts'
 import { recordId, ref } from './ids.ts'
 import { provenance } from './provenance.ts'
 import { text } from './shared.ts'
-import { quantity } from './units.ts'
+import { type QuantitySchema, quantity } from './units.ts'
 
-/**
- * One chronograph shot: velocity in m/s, with optional cold-bore mark and exclusion reason.
- * Inferred type: {@link ChronoShot}.
- */
-export const chronoShot = z.object({
+const chronoShotParser = z.object({
   velocity: quantity('velocity').describe('Velocity of the shot, m/s.'),
   coldBore: z.boolean().describe('First shot from a cold or clean barrel.').optional(),
   excluded: z
@@ -19,11 +16,16 @@ export const chronoShot = z.object({
 })
 
 /**
- * What a shot string varies against its load: the charge (g) or the length the bullet is seated
- * by (mm). A temperature ladder is the string's `propellantTemperature`.
- * Inferred type: {@link StringVariation}.
+ * One chronograph shot: velocity in m/s, with optional cold-bore mark and exclusion reason.
+ * Inferred type: {@link ChronoShot}.
  */
-export const stringVariation = z.discriminatedUnion('kind', [
+export const chronoShot: z.ZodObject<{
+  velocity: QuantitySchema
+  coldBore: z.ZodOptional<z.ZodBoolean>
+  excluded: z.ZodOptional<z.ZodString>
+}> = chronoShotParser satisfies Exact<typeof chronoShot, typeof chronoShotParser>
+
+const stringVariationParser = z.discriminatedUnion('kind', [
   z.object({
     kind: z.literal('charge').describe('The string varies the charge.'),
     value: quantity('mass', z.number().positive()).describe('The charge of the string.'),
@@ -36,8 +38,20 @@ export const stringVariation = z.discriminatedUnion('kind', [
   }),
 ])
 
-/** All shots of one load in one session. */
-export const shotString = z.object({
+/**
+ * What a shot string varies against its load: the charge (g) or the length the bullet is seated
+ * by (mm). A temperature ladder is the string's `propellantTemperature`.
+ * Inferred type: {@link StringVariation}.
+ */
+export const stringVariation: z.ZodDiscriminatedUnion<
+  [
+    z.ZodObject<{ kind: z.ZodLiteral<'charge'>; value: QuantitySchema }>,
+    z.ZodObject<{ kind: z.ZodLiteral<'seating'>; value: QuantitySchema }>,
+  ],
+  'kind'
+> = stringVariationParser satisfies Exact<typeof stringVariation, typeof stringVariationParser>
+
+const shotStringParser = z.object({
   load: ref('load')
     .describe(
       'The `Load` the string was fired with. Absent on a session not yet attached to a load, such as a file just read.',
@@ -68,15 +82,24 @@ export const shotString = z.object({
   shots: z.array(chronoShot).min(1).max(5000).describe('Shots of the string in file order.'),
 })
 
-/**
- * One chronograph session, for every origin: one device, one place, one day, one or more strings
- * (shots of a load). A catalogue session carries its `id` (the file name), the device's maker (a
- * `catalogue:` reference) and model, the date, the air temperature and the load of every string
- * (a `catalogue:` reference); a user session keeps what the file gave and takes its name from
- * its record. Lengths in mm, masses in g.
- * Inferred type: {@link ChronoSession}.
- */
-export const chronoSession = z
+/** All shots of one load in one session. */
+export const shotString: z.ZodObject<{
+  load: z.ZodOptional<z.ZodString>
+  label: z.ZodOptional<z.ZodString>
+  variation: z.ZodOptional<typeof stringVariation>
+  propellantTemperature: z.ZodOptional<QuantitySchema>
+  conditions: z.ZodOptional<
+    z.ZodObject<{
+      airTemperature: z.ZodOptional<QuantitySchema>
+      stationPressure: z.ZodOptional<QuantitySchema>
+      windSpeed: z.ZodOptional<QuantitySchema>
+    }>
+  >
+  note: z.ZodOptional<z.ZodString>
+  shots: z.ZodArray<typeof chronoShot>
+}> = shotStringParser satisfies Exact<typeof shotString, typeof shotStringParser>
+
+const chronoSessionParser = z
   .object({
     id: recordId.describe('Id of a catalogue session, the file name without `.json`.').optional(),
     origin: z
@@ -133,6 +156,37 @@ export const chronoSession = z
         issue(['strings', i, 'load'], 'A catalogue session names catalogue records only')
     })
   })
+
+/**
+ * One chronograph session, for every origin: one device, one place, one day, one or more strings
+ * (shots of a load). A catalogue session carries its `id` (the file name), the device's maker (a
+ * `catalogue:` reference) and model, the date, the air temperature and the load of every string
+ * (a `catalogue:` reference); a user session keeps what the file gave and takes its name from
+ * its record. Lengths in mm, masses in g.
+ * Inferred type: {@link ChronoSession}.
+ */
+export const chronoSession: z.ZodObject<{
+  id: z.ZodOptional<typeof recordId>
+  origin: z.ZodEnum<z.core.util.ToEnum<'catalogue' | 'user' | 'shared'>>
+  date: z.ZodOptional<z.ZodISODate>
+  device: z.ZodObject<{
+    kind: z.ZodEnum<z.core.util.ToEnum<'doppler-radar' | 'optical' | 'magnetic' | 'other'>>
+    manufacturer: z.ZodOptional<z.ZodString>
+    model: z.ZodOptional<z.ZodString>
+    firmware: z.ZodOptional<z.ZodString>
+  }>
+  muzzleDistance: z.ZodOptional<QuantitySchema>
+  conditions: z.ZodOptional<
+    z.ZodObject<{
+      airTemperature: z.ZodOptional<QuantitySchema>
+      stationPressure: z.ZodOptional<QuantitySchema>
+      relativeHumidity: z.ZodOptional<QuantitySchema>
+    }>
+  >
+  strings: z.ZodArray<typeof shotString>
+  note: z.ZodOptional<z.ZodString>
+  provenance: typeof provenance
+}> = chronoSessionParser satisfies Exact<typeof chronoSession, typeof chronoSessionParser>
 
 /** A session of the catalogue (`records/chrono`): {@link chronoSession} with `origin` `catalogue`. */
 export const catalogueSession: z.ZodType<CatalogueSession> = chronoSession.refine(

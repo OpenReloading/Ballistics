@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { cartridgeCase } from './case.ts'
 import { caseCapacity } from './case-capacity.ts'
 import { chronoSession } from './chrono-session.ts'
+import type { Exact } from './exact.ts'
 import { firearm } from './firearm.ts'
 import { catalogueRef, parseRef, ref, userIdRegex } from './ids.ts'
 import { load } from './load.ts'
@@ -10,7 +11,7 @@ import { provenanceKind } from './provenance.ts'
 import { isPlain, text } from './shared.ts'
 import { faceColour } from './target-face.ts'
 import { targetSheet } from './target-sheet.ts'
-import { quantity } from './units.ts'
+import { type QuantitySchema, quantity } from './units.ts'
 
 /** Value of `format` in every user data file. */
 export const userDataFormat = 'openreloading-user-data'
@@ -32,12 +33,7 @@ const basedOnRevision = z
     'The `revision` of the base record when saved. A different revision on opening means the base changed.',
   )
 
-/**
- * A bullet of the user: the catalogue bullet it is based on and the fields it overrides, or the
- * fields it gives alone. Lengths in mm, mass in g, angles in degrees.
- * Inferred type: {@link UserBullet}.
- */
-export const userBullet = z.strictObject({
+const userBulletParser = z.strictObject({
   origin: z.literal('user').describe('Where the record lives: `user`.'),
   manufacturer: ref('manufacturer').optional(),
   basedOn: basedOnRef('bullet').optional(),
@@ -50,11 +46,22 @@ export const userBullet = z.strictObject({
 })
 
 /**
- * A cartridge of the user: the catalogue cartridge it is based on and the fields and spec values
- * it overrides, or the ones it gives alone, in stored units.
- * Inferred type: {@link UserCartridge}.
+ * A bullet of the user: the catalogue bullet it is based on and the fields it overrides, or the
+ * fields it gives alone. Lengths in mm, mass in g, angles in degrees.
+ * Inferred type: {@link UserBullet}.
  */
-export const userCartridge = z.object({
+export const userBullet: z.ZodObject<
+  {
+    origin: z.ZodLiteral<'user'>
+    manufacturer: z.ZodOptional<z.ZodString>
+    basedOn: z.ZodOptional<z.ZodString>
+    basedOnRevision: z.ZodOptional<z.ZodString>
+    overrides: z.ZodOptional<typeof bulletOverrides>
+  },
+  z.core.$strict
+> = userBulletParser satisfies Exact<typeof userBullet, typeof userBulletParser>
+
+const userCartridgeParser = z.object({
   origin: z.literal('user').describe('Where the record lives: `user`.'),
   basedOn: basedOnRef('cartridge').optional(),
   basedOnRevision: basedOnRevision.optional(),
@@ -64,6 +71,18 @@ export const userCartridge = z.object({
     )
     .optional(),
 })
+
+/**
+ * A cartridge of the user: the catalogue cartridge it is based on and the fields and spec values
+ * it overrides, or the ones it gives alone, in stored units.
+ * Inferred type: {@link UserCartridge}.
+ */
+export const userCartridge: z.ZodObject<{
+  origin: z.ZodLiteral<'user'>
+  basedOn: z.ZodOptional<z.ZodString>
+  basedOnRevision: z.ZodOptional<z.ZodString>
+  overrides: z.ZodOptional<typeof cartridgeOverrides>
+}> = userCartridgeParser satisfies Exact<typeof userCartridge, typeof userCartridgeParser>
 
 /** A reference `user:<UUID>` to a record of the user's library. */
 const userRef = (kind: string) =>
@@ -94,12 +113,7 @@ const fitPoint = z.strictObject({
   bulletMass: quantity('mass', z.number().positive()).describe('Bullet mass, g.'),
 })
 
-/**
- * What a fitted user powder was fitted to and how: a copy of the points, so that deleting or
- * editing a session never changes it. Stored units of `units.ts`.
- * Inferred type: {@link UserPowderFit}.
- */
-export const userPowderFit = z.strictObject({
+const userPowderFitParser = z.strictObject({
   input: z.array(fitPoint).min(1).max(40).describe('The points of the fit, at most 40.'),
   parameters: z
     .array(fitParameter)
@@ -156,12 +170,68 @@ export const userPowderFit = z.strictObject({
 })
 
 /**
- * A powder of the user in the powder designer: the powder fields entered so far in stored units,
- * each optional while the draft is unfinished, and the provenance kind the designer builds the
- * record's provenance with. The record's `name` is the powder's name.
- * Inferred type: {@link UserPowder}.
+ * What a fitted user powder was fitted to and how: a copy of the points, so that deleting or
+ * editing a session never changes it. Stored units of `units.ts`.
+ * Inferred type: {@link UserPowderFit}.
  */
-export const userPowder = z.object({
+export const userPowderFit: z.ZodObject<
+  {
+    input: z.ZodArray<
+      z.ZodObject<
+        {
+          charge: QuantitySchema
+          muzzleVelocity: QuantitySchema
+          shots: z.ZodInt
+          barrelLength: QuantitySchema
+          temperature: QuantitySchema
+          caseCapacity: QuantitySchema
+          bulletMass: QuantitySchema
+        },
+        z.core.$strict
+      >
+    >
+    parameters: z.ZodArray<
+      z.ZodEnum<
+        z.core.util.ToEnum<
+          'burnRate' | 'startPressure' | 'volumeFactor' | 'energy' | 'temperatureFactor'
+        >
+      >
+    >
+    options: z.ZodObject<
+      {
+        prior: z.ZodOptional<
+          z.ZodRecord<
+            z.ZodEnum<
+              z.core.util.ToEnum<
+                'burnRate' | 'startPressure' | 'volumeFactor' | 'energy' | 'temperatureFactor'
+              >
+            > &
+              z.core.$partial,
+            z.ZodObject<{ value: z.ZodNumber; sigma: z.ZodNumber }, z.core.$strict>
+          >
+        >
+        loss: z.ZodDiscriminatedUnion<
+          [
+            z.ZodObject<{ kind: z.ZodLiteral<'quadratic'> }, z.core.$strict>,
+            z.ZodObject<{ kind: z.ZodLiteral<'huber'>; threshold: z.ZodNumber }, z.core.$strict>,
+          ],
+          'kind'
+        >
+      },
+      z.core.$strict
+    >
+    date: z.ZodISODateTime
+    model: z.ZodString
+    modelVersion: z.ZodString
+    confidence: z.ZodEnum<z.core.util.ToEnum<'tight' | 'moderate' | 'loose'>>
+    reasons: z.ZodArray<z.ZodString>
+    sessions: z.ZodArray<z.ZodString>
+    previous: z.ZodOptional<z.ZodString>
+  },
+  z.core.$strict
+> = userPowderFitParser satisfies Exact<typeof userPowderFit, typeof userPowderFitParser>
+
+const userPowderParser = z.object({
   origin: z.literal('user').describe('Where the record lives: `user`.'),
   provenanceKind: provenanceKind
     .describe(
@@ -175,23 +245,33 @@ export const userPowder = z.object({
 })
 
 /**
+ * A powder of the user in the powder designer: the powder fields entered so far in stored units,
+ * each optional while the draft is unfinished, and the provenance kind the designer builds the
+ * record's provenance with. The record's `name` is the powder's name.
+ * Inferred type: {@link UserPowder}.
+ */
+export const userPowder: z.ZodObject<{
+  origin: z.ZodLiteral<'user'>
+  provenanceKind: z.ZodOptional<typeof provenanceKind>
+  draft: z.ZodOptional<typeof powderDraft>
+  fit: z.ZodOptional<typeof userPowderFit>
+}> = userPowderParser satisfies Exact<typeof userPowder, typeof userPowderParser>
+
+const userManufacturerParser = z.object({
+  origin: z.literal('user').describe('Where the record lives: `user`.'),
+})
+
+/**
  * A manufacturer of the user: a company typed where no catalogue manufacturer matched. The name is
  * the record's `name`; bullets and firearms of the user name it by `user:<id>`.
  * Inferred type: {@link UserManufacturer}.
  */
-export const userManufacturer = z.object({
-  origin: z.literal('user').describe('Where the record lives: `user`.'),
-})
+export const userManufacturer: z.ZodObject<{ origin: z.ZodLiteral<'user'> }> =
+  userManufacturerParser satisfies Exact<typeof userManufacturer, typeof userManufacturerParser>
 
 const designLength = z.number().positive()
 
-/**
- * A target face in the face designer: the face fields a rule book gives, without id, name and
- * provenance, and each of them optional (a draft). The face designer builds the face from it and
- * checks it against `TargetFace`. Lengths in mm.
- * Inferred type: {@link TargetFaceDesign}.
- */
-export const targetFaceDesign = z.object({
+const targetFaceDesignParser = z.object({
   rings: z
     .array(
       z.object({
@@ -229,6 +309,41 @@ export const targetFaceDesign = z.object({
     .max(40)
     .describe('Events shot on the face.'),
 })
+
+/**
+ * A target face in the face designer: the face fields a rule book gives, without id, name and
+ * provenance, and each of them optional (a draft). The face designer builds the face from it and
+ * checks it against `TargetFace`. Lengths in mm.
+ * Inferred type: {@link TargetFaceDesign}.
+ */
+export const targetFaceDesign: z.ZodObject<{
+  rings: z.ZodArray<
+    z.ZodObject<{
+      value: z.ZodOptional<z.ZodInt>
+      diameter: z.ZodOptional<z.ZodNumber>
+      height: z.ZodOptional<z.ZodNumber>
+      fill: z.ZodOptional<typeof faceColour>
+      line: z.ZodOptional<typeof faceColour>
+    }>
+  >
+  innerTen: z.ZodOptional<
+    z.ZodObject<{
+      diameter: z.ZodOptional<z.ZodNumber>
+      height: z.ZodOptional<z.ZodNumber>
+      rule: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'touch' | 'cover'>>>
+    }>
+  >
+  blackDiameter: z.ZodOptional<z.ZodNumber>
+  blackHeight: z.ZodOptional<z.ZodNumber>
+  decimal: z.ZodOptional<z.ZodBoolean>
+  events: z.ZodArray<
+    z.ZodObject<{
+      name: z.ZodString
+      distance: z.ZodOptional<z.ZodNumber>
+      gauge: z.ZodOptional<z.ZodNumber>
+    }>
+  >
+}> = targetFaceDesignParser satisfies Exact<typeof targetFaceDesign, typeof targetFaceDesignParser>
 
 const hitCount = z.int().nonnegative().max(10000).describe('A count from the score sheet.')
 
@@ -276,12 +391,7 @@ const ringSeries = z
 
 const method = 'Scoring method of the event type.'
 
-/**
- * A competition event the person shot, with their own results: ring series or practical stages,
- * by the scoring method of its event type. Never an official result.
- * Inferred type: {@link CompetitionEvent}.
- */
-export const competitionEvent = z.strictObject({
+const competitionEventParser = z.strictObject({
   date: z.iso.date().describe('Day, ISO 8601.'),
   place: text(200).describe('Place.').optional(),
   eventType: catalogueRef('event type'),
@@ -314,15 +424,77 @@ export const competitionEvent = z.strictObject({
     .describe('Results, by the scoring method of the event type.'),
 })
 
+/**
+ * A competition event the person shot, with their own results: ring series or practical stages,
+ * by the scoring method of its event type. Never an official result.
+ * Inferred type: {@link CompetitionEvent}.
+ */
+export const competitionEvent: z.ZodObject<
+  {
+    date: z.ZodISODate
+    place: z.ZodOptional<z.ZodString>
+    eventType: z.ZodString
+    level: z.ZodString
+    discipline: z.ZodOptional<z.ZodString>
+    division: z.ZodOptional<z.ZodString>
+    firearm: z.ZodOptional<z.ZodString>
+    load: z.ZodOptional<z.ZodString>
+    rounds: z.ZodOptional<z.ZodInt>
+    notes: z.ZodOptional<z.ZodString>
+    state: z.ZodEnum<z.core.util.ToEnum<'completed' | 'did-not-finish' | 'disqualified'>>
+    results: z.ZodDiscriminatedUnion<
+      [
+        z.ZodObject<
+          {
+            method: z.ZodLiteral<'rings'>
+            series: z.ZodArray<
+              z.ZodObject<
+                {
+                  shots: z.ZodOptional<z.ZodArray<z.ZodNumber>>
+                  total: z.ZodOptional<z.ZodNumber>
+                  targetSheet: z.ZodOptional<z.ZodString>
+                },
+                z.core.$strict
+              >
+            >
+          },
+          z.core.$strict
+        >,
+        z.ZodObject<
+          {
+            method: z.ZodLiteral<'hit-factor'>
+            stages: z.ZodArray<
+              z.ZodObject<
+                {
+                  name: z.ZodString
+                  hits: z.ZodObject<
+                    { A: z.ZodInt; C: z.ZodInt; D: z.ZodInt; metal: z.ZodOptional<z.ZodInt> },
+                    z.core.$strict
+                  >
+                  misses: z.ZodInt
+                  noShoots: z.ZodInt
+                  procedurals: z.ZodInt
+                  time: z.ZodNumber
+                  powerFactor: z.ZodEnum<z.core.util.ToEnum<'major' | 'minor'>>
+                  stagePoints: z.ZodOptional<z.ZodNumber>
+                },
+                z.core.$strict
+              >
+            >
+          },
+          z.core.$strict
+        >,
+      ],
+      'method'
+    >
+  },
+  z.core.$strict
+> = competitionEventParser satisfies Exact<typeof competitionEvent, typeof competitionEventParser>
+
 /** A competition event of the user with their own results. */
 export interface CompetitionEvent extends z.infer<typeof competitionEvent> {}
 
-/**
- * One entry of the shooting log (Schiessbuch): a range day of the person, as their own record.
- * Whether a club or an authority accepts it is up to them; the record claims no such standing.
- * Inferred type: {@link ShootingLogEntry}.
- */
-export const shootingLogEntry = z
+const shootingLogEntryParser = z
   .strictObject({
     date: z.iso.date().describe('Day, ISO 8601.'),
     place: text(200).describe('Place, such as the range or club.').optional(),
@@ -355,6 +527,30 @@ export const shootingLogEntry = z
     'Give a load or factory ammunition, not both.',
   )
 
+/**
+ * One entry of the shooting log (Schiessbuch): a range day of the person, as their own record.
+ * Whether a club or an authority accepts it is up to them; the record claims no such standing.
+ * Inferred type: {@link ShootingLogEntry}.
+ */
+export const shootingLogEntry: z.ZodObject<
+  {
+    date: z.ZodISODate
+    place: z.ZodOptional<z.ZodString>
+    discipline: z.ZodOptional<z.ZodString>
+    firearm: z.ZodOptional<z.ZodString>
+    load: z.ZodOptional<z.ZodString>
+    ammunition: z.ZodOptional<z.ZodString>
+    rounds: z.ZodInt
+    result: z.ZodOptional<z.ZodString>
+    event: z.ZodOptional<z.ZodString>
+    notes: z.ZodOptional<z.ZodString>
+    confirmation: z.ZodOptional<
+      z.ZodObject<{ by: z.ZodString; date: z.ZodOptional<z.ZodISODate> }, z.core.$strict>
+    >
+  },
+  z.core.$strict
+> = shootingLogEntryParser satisfies Exact<typeof shootingLogEntry, typeof shootingLogEntryParser>
+
 const base = {
   id: z.string().min(1).max(64).describe('Id of the record in the browser library.'),
   name: z.string().min(1).max(200).describe('Name of the record. Save names the file after it.'),
@@ -376,6 +572,18 @@ const base = {
 /** Why an id of a bullet, cartridge, powder or case group that is no UUID is refused: a load refers to it by `user:<UUID>`. */
 export const designIdProblem: string =
   'The id of a bullet, cartridge, powder or case group must be a UUID, so that a load can refer to it.'
+
+/** The schema of a user record of `kind` K whose `data` has the schema D: one member of {@link userRecord}. */
+export type UserRecordSchema<K extends string, D extends z.ZodType> = z.ZodObject<{
+  name: z.ZodString
+  saved: z.ZodISODateTime
+  imported: z.ZodOptional<
+    z.ZodObject<{ source: z.ZodString; file: z.ZodString; day: z.ZodISODate }>
+  >
+  kind: z.ZodLiteral<K>
+  id: z.ZodType<string>
+  data: D
+}>
 
 const record = <K extends string, D extends z.ZodType>(
   kind: K,
@@ -400,11 +608,7 @@ const designId = z
 export const legacyLoadProblem: string =
   'A record of kind "workbenchState" is a load in the format of an earlier version, which this app no longer reads. Kind "load" replaces it.'
 
-/**
- * One record of a user data file: its `kind`, id, name, save time and the `data` of that kind.
- * Inferred type: {@link UserRecord}.
- */
-export const userRecord = z.discriminatedUnion(
+const userRecordParser = z.discriminatedUnion(
   'kind',
   [
     record('manufacturer', 'A manufacturer typed by the user.', userManufacturer),
@@ -438,6 +642,29 @@ export const userRecord = z.discriminatedUnion(
         : undefined,
   },
 )
+
+/**
+ * One record of a user data file: its `kind`, id, name, save time and the `data` of that kind.
+ * Inferred type: {@link UserRecord}.
+ */
+export const userRecord: z.ZodDiscriminatedUnion<
+  [
+    UserRecordSchema<'manufacturer', typeof userManufacturer>,
+    UserRecordSchema<'bullet', typeof userBullet>,
+    UserRecordSchema<'cartridge', typeof userCartridge>,
+    UserRecordSchema<'powder', typeof userPowder>,
+    UserRecordSchema<'caseCapacity', typeof caseCapacity>,
+    UserRecordSchema<'load', typeof load>,
+    UserRecordSchema<'firearm', typeof firearm>,
+    UserRecordSchema<'session', typeof chronoSession>,
+    UserRecordSchema<'targetSheet', typeof targetSheet>,
+    UserRecordSchema<'targetFaceDesign', typeof targetFaceDesign>,
+    UserRecordSchema<'case', typeof cartridgeCase>,
+    UserRecordSchema<'event', typeof competitionEvent>,
+    UserRecordSchema<'shootingLogEntry', typeof shootingLogEntry>,
+  ],
+  'kind'
+> = userRecordParser satisfies Exact<typeof userRecord, typeof userRecordParser>
 
 /** The record kinds this version reads. */
 const knownKinds: ReadonlySet<string> = new Set(userRecord.options.map((o) => o.shape.kind.value))
@@ -490,21 +717,23 @@ export const photoTypes: readonly PhotoType[] = [
   'image/bmp',
 ]
 
-/**
- * A user file a record points at (a target photo), base64 in the file.
- * Inferred type: {@link EmbeddedFile}.
- */
-export const embeddedFile = z.object({
+const embeddedFileParser = z.object({
   id: z.string().min(1).max(64).describe('Id the target sheet names in `photo`.'),
   type: z.enum(photoTypes).describe('Media type of the photo.'),
   data: z.base64().describe('The photo, base64.'),
 })
 
 /**
- * One file holds one record (Save) or every record of the browser (Export all), with the photos of
- * its target sheets in the optional `files`.
+ * A user file a record points at (a target photo), base64 in the file.
+ * Inferred type: {@link EmbeddedFile}.
  */
-export const userDataFile = z.object({
+export const embeddedFile: z.ZodObject<{
+  id: z.ZodString
+  type: z.ZodEnum<z.core.util.ToEnum<PhotoType>>
+  data: z.ZodBase64
+}> = embeddedFileParser satisfies Exact<typeof embeddedFile, typeof embeddedFileParser>
+
+const userDataFileParser = z.object({
   format: z.literal(userDataFormat).describe('Format of the file.'),
   version: z.literal(userDataVersion).describe('Format version of the file.'),
   records: z
@@ -519,6 +748,17 @@ export const userDataFile = z.object({
     .describe('Photos of the target sheets, base64.')
     .optional(),
 })
+
+/**
+ * One file holds one record (Save) or every record of the browser (Export all), with the photos of
+ * its target sheets in the optional `files`.
+ */
+export const userDataFile: z.ZodObject<{
+  format: z.ZodLiteral<typeof userDataFormat>
+  version: z.ZodLiteral<typeof userDataVersion>
+  records: z.ZodArray<typeof userRecord>
+  files: z.ZodOptional<z.ZodArray<typeof embeddedFile>>
+}> = userDataFileParser satisfies Exact<typeof userDataFile, typeof userDataFileParser>
 
 /** Records of a user data file. */
 export type UserRecords = UserRecord[]
