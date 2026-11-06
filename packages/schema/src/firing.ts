@@ -1,16 +1,11 @@
 import { z } from 'zod'
+import type { Exact } from './exact.ts'
 import { recordId } from './ids.ts'
 import { provenance } from './provenance.ts'
 import { pressureMethod } from './standards.ts'
-import { quantity } from './units.ts'
+import { type QuantitySchema, quantity } from './units.ts'
 
-/**
- * Rounds of one ammunition fired from one barrel, measured and published by others (a paper, a
- * report). Fields hold what the publication states; descriptions are worded as printed, and what it
- * does not state is left out, never filled in from elsewhere.
- * Inferred type: {@link FiringSeries}.
- */
-export const firingSeries = z
+const firingSeriesParser = z
   .object({
     id: recordId,
     cartridge: recordId,
@@ -56,6 +51,38 @@ export const firingSeries = z
     message: 'one velocity per round',
     path: ['velocity', 'shots'],
   })
+
+/**
+ * Rounds of one ammunition fired from one barrel, measured and published by others (a paper, a
+ * report). Fields hold what the publication states; descriptions are worded as printed, and what it
+ * does not state is left out, never filled in from elsewhere.
+ * Inferred type: {@link FiringSeries}.
+ */
+export const firingSeries: z.ZodObject<{
+  id: typeof recordId
+  cartridge: typeof recordId
+  ammunition: z.ZodString
+  bulletMass: z.ZodOptional<QuantitySchema>
+  firearm: z.ZodOptional<z.ZodString>
+  barrelLength: z.ZodOptional<QuantitySchema>
+  roundCount: z.ZodInt
+  velocity: z.ZodObject<{
+    point: z.ZodString
+    instrument: z.ZodOptional<z.ZodString>
+    mean: z.ZodOptional<QuantitySchema>
+    shots: z.ZodOptional<z.ZodArray<QuantitySchema>>
+  }>
+  pressure: z.ZodOptional<
+    z.ZodObject<{
+      method: typeof pressureMethod
+      instrument: z.ZodOptional<z.ZodString>
+      position: z.ZodString
+      meanPeak: QuantitySchema
+    }>
+  >
+  note: z.ZodOptional<z.ZodString>
+  provenance: typeof provenance
+}> = firingSeriesParser satisfies Exact<typeof firingSeries, typeof firingSeriesParser>
 
 /** A record of rounds fired and measured by others, as a publication reports them. */
 export interface FiringSeries extends z.infer<typeof firingSeries> {}

@@ -1,17 +1,11 @@
 import { z } from 'zod'
+import type { Exact } from './exact.ts'
 import { recordId } from './ids.ts'
 import { provenance } from './provenance.ts'
 import { positiveLength } from './shared.ts'
+import type { QuantitySchema } from './units.ts'
 
-/**
- * A caliber class: a group of cartridges whose bullets have the same diameter, so a hole size
- * separates .22, 9 mm and .45 and cannot separate classes of one diameter (9 mm Luger and
- * .357 Magnum). A caliber range of a rule book names more than one class per discipline
- * (`Discipline.caliberClasses` with basis `derived`). Membership is checked against the C.I.P.
- * records by `data:validate`. Model: `apps/docs/docs/data/federations.md`.
- * Inferred type: {@link CaliberClass}.
- */
-export const caliberClass = z.strictObject({
+const caliberClassParser = z.strictObject({
   /** Id used in the `caliberClasses` of a `Discipline`. */
   id: recordId,
   /** Name as a shooter says it. */
@@ -27,6 +21,25 @@ export const caliberClass = z.strictObject({
   cartridges: z.array(recordId),
   provenance,
 })
+
+/**
+ * A caliber class: a group of cartridges whose bullets have the same diameter, so a hole size
+ * separates .22, 9 mm and .45 and cannot separate classes of one diameter (9 mm Luger and
+ * .357 Magnum). A caliber range of a rule book names more than one class per discipline
+ * (`Discipline.caliberClasses` with basis `derived`). Membership is checked against the C.I.P.
+ * records by `data:validate`. Model: `apps/docs/docs/data/federations.md`.
+ * Inferred type: {@link CaliberClass}.
+ */
+export const caliberClass: z.ZodObject<
+  {
+    id: typeof recordId
+    name: z.ZodString
+    diameter: QuantitySchema
+    cartridges: z.ZodArray<typeof recordId>
+    provenance: typeof provenance
+  },
+  z.core.$strict
+> = caliberClassParser satisfies Exact<typeof caliberClass, typeof caliberClassParser>
 
 /** A caliber class record. */
 export interface CaliberClass extends z.infer<typeof caliberClass> {}

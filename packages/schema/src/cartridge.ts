@@ -1,23 +1,24 @@
 import { z } from 'zod'
+import type { Exact } from './exact.ts'
 import { recordId } from './ids.ts'
 import { provenance } from './provenance.ts'
 import { plausibilityException, pressureMethod, specValue } from './standards.ts'
+
+const caseTypesParser = z.enum(['rimless', 'semi-rimmed', 'rimmed', 'rebated', 'belted'])
 
 /**
  * The case head of a cartridge, derived from the sheet's R1 (rim), P1 (body at the head) and R3 (belt):
  * the API answers it as `caseType`, the web app lists it as a filter.
  * Inferred type: {@link CaseType}.
  */
-export const caseTypes = z.enum(['rimless', 'semi-rimmed', 'rimmed', 'rebated', 'belted'])
+export const caseTypes: z.ZodEnum<
+  z.core.util.ToEnum<'rimless' | 'semi-rimmed' | 'rimmed' | 'rebated' | 'belted'>
+> = caseTypesParser satisfies Exact<typeof caseTypes, typeof caseTypesParser>
 
 /** The case head of a cartridge. */
 export type CaseType = z.infer<typeof caseTypes>
 
-/**
- * A cartridge as its C.I.P. sheet defines it: the names, the table, the dates and the values the
- * sheet prints. Inferred type: {@link Cartridge}.
- */
-export const cartridge = z.object({
+const cartridgeParser = z.object({
   id: recordId,
   /** The name as printed on the sheet. */
   name: z.string().min(1),
@@ -37,9 +38,28 @@ export const cartridge = z.object({
   provenance,
 })
 
+/**
+ * A cartridge as its C.I.P. sheet defines it: the names, the table, the dates and the values the
+ * sheet prints. Inferred type: {@link Cartridge}.
+ */
+export const cartridge: z.ZodObject<{
+  id: typeof recordId
+  name: z.ZodString
+  aliases: z.ZodOptional<z.ZodArray<z.ZodString>>
+  table: z.ZodString
+  country: z.ZodOptional<z.ZodString>
+  published: z.ZodISODate
+  revised: z.ZodOptional<z.ZodISODate>
+  pressureMethod: z.ZodOptional<typeof pressureMethod>
+  verification: z.ZodEnum<z.core.util.ToEnum<'verified' | 'unverified'>>
+  values: z.ZodArray<typeof specValue>
+  exceptions: z.ZodOptional<z.ZodArray<typeof plausibilityException>>
+  provenance: typeof provenance
+}> = cartridgeParser satisfies Exact<typeof cartridge, typeof cartridgeParser>
+
 /** A cartridge record: the values of its C.I.P. sheet. */
 export interface Cartridge extends z.infer<typeof cartridge> {}
 
 /** Id of a cartridge's sheet revision, `cip-<id>-<revised or published>`, as figure ids use it. */
-export const sheetId = (c: Pick<Cartridge, 'id' | 'published' | 'revised'>) =>
+export const sheetId = (c: Pick<Cartridge, 'id' | 'published' | 'revised'>): string =>
   `cip-${c.id}-${c.revised ?? c.published}`

@@ -1,12 +1,19 @@
 import { z } from 'zod'
+import type { Exact } from './exact.ts'
 import { recordId } from './ids.ts'
 import { sha256 } from './shared.ts'
+
+const provenanceKindParser = z.enum(['published', 'measured', 'derived', 'fitted', 'computed'])
 
 /**
  * How a value came about: read from a publication, measured, derived from other values, fitted to
  * data or computed by a model. A source may state its own kind.
  */
-export const provenanceKind = z.enum(['published', 'measured', 'derived', 'fitted', 'computed'])
+export const provenanceKind: z.ZodEnum<
+  z.core.util.ToEnum<'published' | 'measured' | 'derived' | 'fitted' | 'computed'>
+> = provenanceKindParser satisfies Exact<typeof provenanceKind, typeof provenanceKindParser>
+
+const sourceOriginParser = z.enum(['manufacturer', 'public', 'community'])
 
 /**
  * Who stands behind a source: the `manufacturer` (data it supplied or published; terms it states
@@ -14,10 +21,11 @@ export const provenanceKind = z.enum(['published', 'measured', 'derived', 'fitte
  * manufacturer too), or `community` contributions.
  * Inferred type: {@link SourceOrigin}.
  */
-export const sourceOrigin = z.enum(['manufacturer', 'public', 'community'])
+export const sourceOrigin: z.ZodEnum<z.core.util.ToEnum<'manufacturer' | 'public' | 'community'>> =
+  sourceOriginParser satisfies Exact<typeof sourceOrigin, typeof sourceOriginParser>
 
 /** Whether a source's `terms` is a link: it starts with http:// or https://. Any other text is a note. */
-export const isWebLink = (text: string) => /^https?:\/\//.test(text)
+export const isWebLink = (text: string): boolean => /^https?:\/\//.test(text)
 
 // `new URL` instead of `URL.canParse`, which the oldest supported browsers lack.
 const parsesAsUrl = (text: string) => {
@@ -30,12 +38,7 @@ const parsesAsUrl = (text: string) => {
   }
 }
 
-/**
- * One cited source: title, publisher, page, URL, retrieval date, SHA-256 of the file and the terms
- * its data is used under.
- * Inferred type: {@link Source}.
- */
-export const source = z.object({
+const sourceParser = z.object({
   title: z.string().min(1).describe('Title of the source: the document, or the site and table.'),
   /** Who issued the data: a maker, a standards body or the authors ("Example Bullets Inc."). */
   publisher: z
@@ -116,23 +119,55 @@ export const source = z.object({
 })
 
 /**
- * A source that several records cite, stored once (`records/sources/<id>.json`). Records name it
- * by id in a {@link sourceReference}.
- * Inferred type: {@link SourceRecord}.
+ * One cited source: title, publisher, page, URL, retrieval date, SHA-256 of the file and the terms
+ * its data is used under.
+ * Inferred type: {@link Source}.
  */
-export const sourceRecord = source
+export const source: z.ZodObject<{
+  title: z.ZodString
+  publisher: z.ZodOptional<z.ZodString>
+  edition: z.ZodOptional<z.ZodString>
+  page: z.ZodOptional<z.ZodString>
+  url: z.ZodOptional<z.ZodURL>
+  retrieved: z.ZodOptional<z.ZodISODate>
+  sha256: z.ZodOptional<typeof sha256>
+  fields: z.ZodOptional<z.ZodArray<z.ZodString>>
+  kind: z.ZodOptional<typeof provenanceKind>
+  license: z.ZodOptional<z.ZodString>
+  terms: z.ZodOptional<z.ZodString>
+  origin: z.ZodOptional<typeof sourceOrigin>
+  run: z.ZodOptional<z.ZodObject<{ version: z.ZodString; report: z.ZodString }>>
+  note: z.ZodOptional<z.ZodString>
+}> = sourceParser satisfies Exact<typeof source, typeof sourceParser>
+
+const sourceRecordParser = source
   .omit({ page: true, fields: true, kind: true, run: true })
   .extend({ id: recordId })
   .strict()
 
 /**
- * A record's citation of a {@link sourceRecord}: its id and the parts of this record (page, fields,
- * kind, note, and the URL, SHA-256 and retrieval date of a file of its own). Resolved on reading,
- * each part set here replaces the one of the source record, a note goes before the source
- * record's note.
- * Inferred type: {@link SourceReference}.
+ * A source that several records cite, stored once (`records/sources/<id>.json`). Records name it
+ * by id in a {@link sourceReference}.
+ * Inferred type: {@link SourceRecord}.
  */
-export const sourceReference = source
+export const sourceRecord: z.ZodObject<
+  {
+    title: z.ZodString
+    publisher: z.ZodOptional<z.ZodString>
+    edition: z.ZodOptional<z.ZodString>
+    url: z.ZodOptional<z.ZodURL>
+    retrieved: z.ZodOptional<z.ZodISODate>
+    sha256: z.ZodOptional<typeof sha256>
+    license: z.ZodOptional<z.ZodString>
+    terms: z.ZodOptional<z.ZodString>
+    origin: z.ZodOptional<typeof sourceOrigin>
+    note: z.ZodOptional<z.ZodString>
+    id: typeof recordId
+  },
+  z.core.$strict
+> = sourceRecordParser satisfies Exact<typeof sourceRecord, typeof sourceRecordParser>
+
+const sourceReferenceParser = source
   .pick({
     page: true,
     url: true,
@@ -147,14 +182,42 @@ export const sourceReference = source
   .strict()
 
 /**
- * Where the values of a record come from: a kind and at least one source.
- * Inferred type: {@link Provenance}.
+ * A record's citation of a {@link sourceRecord}: its id and the parts of this record (page, fields,
+ * kind, note, and the URL, SHA-256 and retrieval date of a file of its own). Resolved on reading,
+ * each part set here replaces the one of the source record, a note goes before the source
+ * record's note.
+ * Inferred type: {@link SourceReference}.
  */
-export const provenance = z.object({
+export const sourceReference: z.ZodObject<
+  {
+    page: z.ZodOptional<z.ZodString>
+    url: z.ZodOptional<z.ZodURL>
+    retrieved: z.ZodOptional<z.ZodISODate>
+    sha256: z.ZodOptional<typeof sha256>
+    fields: z.ZodOptional<z.ZodArray<z.ZodString>>
+    kind: z.ZodOptional<typeof provenanceKind>
+    run: z.ZodOptional<z.ZodObject<{ version: z.ZodString; report: z.ZodString }>>
+    note: z.ZodOptional<z.ZodString>
+    source: typeof recordId
+  },
+  z.core.$strict
+> = sourceReferenceParser satisfies Exact<typeof sourceReference, typeof sourceReferenceParser>
+
+const provenanceParser = z.object({
   kind: provenanceKind.describe('How the values came about.'),
   sources: z.array(source).min(1).describe('The sources of the values, at least one.'),
   note: z.string().min(1).describe('Note on the provenance.').optional(),
 })
+
+/**
+ * Where the values of a record come from: a kind and at least one source.
+ * Inferred type: {@link Provenance}.
+ */
+export const provenance: z.ZodObject<{
+  kind: typeof provenanceKind
+  sources: z.ZodArray<typeof source>
+  note: z.ZodOptional<z.ZodString>
+}> = provenanceParser satisfies Exact<typeof provenance, typeof provenanceParser>
 
 /** One cited source of a record's values, with the terms of use. */
 export interface Source extends z.infer<typeof source> {}

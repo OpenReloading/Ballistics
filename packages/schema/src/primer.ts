@@ -1,13 +1,10 @@
 import { z } from 'zod'
+import type { Exact } from './exact.ts'
 import { recordId } from './ids.ts'
 import { provenance } from './provenance.ts'
-import { quantity } from './units.ts'
+import { type QuantitySchema, quantity } from './units.ts'
 
-/**
- * Sizes of a primer.
- * Inferred type: {@link PrimerSize}.
- */
-export const primerSizes = z.enum([
+const primerSizesParser = z.enum([
   'small-rifle',
   'large-rifle',
   'small-pistol',
@@ -15,14 +12,32 @@ export const primerSizes = z.enum([
   'shotshell',
 ])
 
+/**
+ * Sizes of a primer.
+ * Inferred type: {@link PrimerSize}.
+ */
+export const primerSizes: z.ZodEnum<
+  z.core.util.ToEnum<'small-rifle' | 'large-rifle' | 'small-pistol' | 'large-pistol' | 'shotshell'>
+> = primerSizesParser satisfies Exact<typeof primerSizes, typeof primerSizesParser>
+
 /** A size of {@link primerSizes}. */
 export type PrimerSize = z.infer<typeof primerSizes>
 
+const primerCupMaterialsParser = z.enum(['brass', 'nickel-plated-brass', 'copper', 'steel'])
+
 /** Cup metals of a primer. */
-export const primerCupMaterials = z.enum(['brass', 'nickel-plated-brass', 'copper', 'steel'])
+export const primerCupMaterials: z.ZodEnum<
+  z.core.util.ToEnum<'brass' | 'nickel-plated-brass' | 'copper' | 'steel'>
+> = primerCupMaterialsParser satisfies Exact<
+  typeof primerCupMaterials,
+  typeof primerCupMaterialsParser
+>
+
+const primerCompoundsParser = z.enum(['lead-styphnate', 'lead-free'])
 
 /** Priming compounds of a primer. */
-export const primerCompounds = z.enum(['lead-styphnate', 'lead-free'])
+export const primerCompounds: z.ZodEnum<z.core.util.ToEnum<'lead-styphnate' | 'lead-free'>> =
+  primerCompoundsParser satisfies Exact<typeof primerCompounds, typeof primerCompoundsParser>
 
 /** A compound of {@link primerCompounds}. */
 export type PrimerCompound = z.infer<typeof primerCompounds>
@@ -44,11 +59,7 @@ const primerFigure = z.strictObject({
   value: z.string().min(1).describe('The figure as the source prints it, with its unit.'),
 })
 
-/**
- * A primer as its manufacturer sells it. No primer value enters a solver.
- * Inferred type: {@link Primer}.
- */
-export const primer = z.strictObject({
+const primerParser = z.strictObject({
   id: recordId,
   /** Id of the manufacturer record. */
   manufacturer: recordId,
@@ -74,6 +85,38 @@ export const primer = z.strictObject({
   note: z.string().min(1).describe('Notes on the product.').optional(),
   provenance,
 })
+
+/**
+ * A primer as its manufacturer sells it. No primer value enters a solver.
+ * Inferred type: {@link Primer}.
+ */
+export const primer: z.ZodObject<
+  {
+    id: typeof recordId
+    manufacturer: typeof recordId
+    name: z.ZodString
+    productNumber: z.ZodOptional<z.ZodString>
+    size: typeof primerSizes
+    magnum: z.ZodOptional<z.ZodBoolean>
+    cup: z.ZodOptional<
+      z.ZodObject<
+        {
+          material: z.ZodOptional<typeof primerCupMaterials>
+          thickness: z.ZodOptional<QuantitySchema>
+        },
+        z.core.$strict
+      >
+    >
+    compound: z.ZodOptional<typeof primerCompounds>
+    intendedUse: z.ZodOptional<z.ZodString>
+    performance: z.ZodOptional<
+      z.ZodArray<z.ZodObject<{ property: z.ZodString; value: z.ZodString }, z.core.$strict>>
+    >
+    note: z.ZodOptional<z.ZodString>
+    provenance: typeof provenance
+  },
+  z.core.$strict
+> = primerParser satisfies Exact<typeof primer, typeof primerParser>
 
 /** A primer record. */
 export interface Primer extends z.infer<typeof primer> {}
