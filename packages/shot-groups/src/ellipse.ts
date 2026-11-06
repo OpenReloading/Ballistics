@@ -3,6 +3,7 @@
  * least-squares ellipse fit, a robust fit by random samples, and the conic pencil of two concentric
  * circles seen in perspective.
  */
+import { nth, seededUniforms } from '@open-reloading/statistics'
 import {
   apply3,
   det3,
@@ -16,7 +17,6 @@ import {
   transpose3,
   type Vector3,
 } from './geometry.ts'
-import { nth } from './nth.ts'
 
 /** a x^2 + b x y + c y^2 + d x + e y + f = 0. */
 export type Conic = readonly [number, number, number, number, number, number]
@@ -280,21 +280,6 @@ export type RobustOptions = {
 type Candidate = { conic: Conic; ellipse: Ellipse; inliers: number[] }
 
 /**
- * A small deterministic generator (mulberry32), so a fit repeats.
- * shortcut: the same generator as `seededUniforms` of `@open-reloading/statistics`; take that one once the package is on main (#1013).
- */
-export function seededRandom(seed: number): () => number {
-  let s = seed >>> 0
-  return () => {
-    s = (s + 0x6d2b79f5) >>> 0
-    let t = s
-    t = Math.imul(t ^ (t >>> 15), t | 1)
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
-}
-
-/**
  * Robust ellipse fit: random samples of 6 points fitted directly, the one with the most points
  * within `tolerance` (Sampson distance, px) refitted on its inliers until the set settles. Undefined when
  * no sample gives an ellipse with `minPoints` inliers.
@@ -302,7 +287,7 @@ export function seededRandom(seed: number): () => number {
 export function ransacEllipse(
   pts: readonly Point[],
   o: RobustOptions,
-  rnd: () => number = seededRandom(1),
+  rnd: () => number = seededUniforms(1),
 ): RobustFit | undefined {
   if (pts.length < Math.max(6, o.minPoints)) return undefined
   const sampled = bestSample(pts, o, rnd)
