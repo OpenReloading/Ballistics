@@ -290,12 +290,14 @@ jobs:
           for _ in $(seq 1 30); do curl --silent --fail http://localhost:3003/ > /dev/null && exit 0; sleep 1; done
           exit 1
       # As the runner's user, so the results stay writable for the later steps; the checkout keeps its path, so the
-      # workspace's pnpm and node_modules resolve as on the runner
+      # workspace's pnpm (first on the image's PATH) and node_modules resolve as on the runner
       - name: End-to-end tests in the Playwright image
         run: |
+          pnpm_dir=$(dirname "$(readlink -f "$(command -v pnpm)")")
           docker run --rm --init --ipc=host --network=host --user "$(id -u):$(id -g)" --env HOME=/tmp \
+            --env PATH="$pnpm_dir:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" \
             --env CI --env GITHUB_ACTIONS --env API_URL --env WEB_URL --volume "$PWD:$PWD" --workdir "$PWD" \
-            "$PLAYWRIGHT_IMAGE" "$(readlink -f "$(command -v pnpm)")" run test:e2e
+            "$PLAYWRIGHT_IMAGE" pnpm run test:e2e
       - name: Drawing baseline in the Playwright image
         run: pnpm --filter @open-reloading/e2e run drawing-baseline
       - name: Paired contact sheet of the baseline drawings when drawing code changed
