@@ -1,8 +1,7 @@
-/** A typed diagnostic: a code and the values its message needs, empty when it needs none. */
-export type Diagnostic<C extends string, P extends object = Record<string, never>> = {
-  code: C
-  params: P
-}
+import type { Diagnostic } from '@open-reloading/statistics'
+
+// The typed refusals of this package, raised as the `InputError` of `@open-reloading/statistics`
+// with the issue: a code and the values its message needs, no text.
 
 /** Why a photo calibration or a matrix operation refuses its input. */
 export type GeometryIssue =
@@ -38,20 +37,21 @@ export type ScoringIssue =
   /** A series with neither its shots nor its total. */
   | Diagnostic<'series-total'>
 
+/** Why the hit probability refuses a dispersion, a zone or a probability. */
+export type HitIssue =
+  | Diagnostic<'distances'>
+  | Diagnostic<'group-dispersion'>
+  | Diagnostic<'speed-spread'>
+  /** The height spread from the muzzle speed exceeds the vertical spread of the group. */
+  | Diagnostic<'speed-height'>
+  | Diagnostic<'wind'>
+  | Diagnostic<'range-uncertainty'>
+  | Diagnostic<'semi-axes'>
+  | Diagnostic<'standard-deviations'>
+  | Diagnostic<'offset'>
+  | Diagnostic<'hit-probability'>
+  | Diagnostic<'wanted-probability'>
+  | Diagnostic<'zones'>
+
 /** Why a function of this package refuses its input. */
-export type Issue = GeometryIssue | RingFitIssue | ScoringIssue
-
-/**
- * The refusal of a function of this package. It carries no text: the caller words `issue` in its
- * language. A deliberate refusal is a RangeError, as the `InputError` of `@open-reloading/statistics`.
- * shortcut: a class of this package; throw the shared `InputError` with the issue once statistics is on main (#1013).
- */
-export class ShotGroupsError extends RangeError {
-  readonly issue: Issue
-
-  constructor(issue: Issue) {
-    super(issue.code)
-    this.name = 'ShotGroupsError'
-    this.issue = issue
-  }
-}
+export type Issue = GeometryIssue | RingFitIssue | ScoringIssue | HitIssue

@@ -79,9 +79,10 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/pnpm
-      - run: pnpm run lint
+      # build first: the typed lint of the packages reads the declarations of the workspaces they import
       - run: pnpm run build
       - run: pnpm run typecheck
+      - run: pnpm run lint
       - run: pnpm run knip
       - run: pnpm run docs:check
       - run: pnpm run data:validate

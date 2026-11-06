@@ -1,13 +1,9 @@
 'use client'
 
 import { NativeSelect } from '@mantine/core'
-import {
-  type HitResult,
-  hitProbability,
-  pointDispersion,
-  type TrajectoryPoint,
-} from '@open-reloading/core'
+import type { TrajectoryPoint } from '@open-reloading/core'
 import type { TargetFace } from '@open-reloading/schema'
+import { type HitResult, hitProbability, pointDispersion } from '@open-reloading/shot-groups'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
@@ -16,7 +12,7 @@ import { translateMessage } from '../lib/core-messages.ts'
 import { errorText } from '../lib/error-text.ts'
 import { type FaceSummary, fetchFace, fetchFaceSummaries } from '../lib/face-records.ts'
 import { type FieldSpec, type Fields, fieldError, initialFields } from '../lib/field-spec.ts'
-import { faceZones, impactSensitivity } from '../lib/hit-probability.ts'
+import { faceZones, hitFailureText, impactSensitivity } from '../lib/hit-probability.ts'
 import { nth } from '../lib/nth.ts'
 import { formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
 import { NumberField } from './number-field.tsx'
@@ -167,7 +163,7 @@ export function HitProbability({
         range: d.parts.range,
       }
     } catch (e) {
-      failure = errorText(e)
+      failure = hitFailureText(e, t)
     }
   const length = (m: number) => `${formatQuantity('length', system, m)} ${system.length.symbol}`
   const percent = (p: number) => `${formatNumber(100 * p, p < 0.1 ? 2 : 1)} %`
@@ -217,7 +213,7 @@ export function HitProbability({
           })}
         </p>
       )}
-      {failure && <p role="alert">{translateMessage(failure, t)}</p>}
+      {failure && <p role="alert">{failure}</p>}
       {outcome && point && (
         <>
           <dl className="readouts">

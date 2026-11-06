@@ -45,8 +45,8 @@ Analytic: a closed form compared with the model, no measured data.
 
 ## Where in the app
 
-- `packages/core/src/groups/hit-probability.ts`, `ellipseProbability`.
-- `packages/core/test/hit-probability.test.ts`, the test "reduces to the closed form for a circular zone and a circular dispersion".
+- `packages/shot-groups/src/hit-probability.ts`, `ellipseProbability`.
+- `packages/shot-groups/test/hit-probability.test.ts`, the test "reduces to the closed form for a circular zone and a circular dispersion".
 - Model page: [hit probability](../models/hit-probability.md).
 
 ## Confidence

@@ -1,12 +1,7 @@
+import { InputError, normalsFrom, seededUniforms } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import {
-  ellipseProbability,
-  hitProbability,
-  InputError,
-  type PointOffset,
-  shotsToHit,
-} from '../src/index.ts'
-import { normals } from './normals.ts'
+import { ellipseProbability, hitProbability, type PointOffset, shotsToHit } from '../src/index.ts'
+import { issueOf } from './issue.ts'
 
 /**
  * 1 - Q1(d / s, r / s), the probability of a circle of radius r for a circular normal of standard
@@ -52,7 +47,7 @@ describe('ellipse probability with an offset', () => {
   })
 
   it('agrees with a seeded Monte Carlo within 0.5 percentage points, ellipses and both axes', () => {
-    const draw = normals(369)
+    const draw = normalsFrom(seededUniforms(369))
     const n = 200_000
     const cases: { a: number; b: number; sx: number; sy: number; o: PointOffset }[] = [
       { a: 0.02, b: 0.02, sx: 0.01, sy: 0.01, o: { dx: 0.03, dy: 0.01 } },
@@ -72,7 +67,9 @@ describe('ellipse probability with an offset', () => {
       expect(Math.abs(model - hits / n)).toBeLessThan(0.005)
     }
   })
+})
 
+describe('ellipse probability with an offset, at its limits', () => {
   it('is the centred result for a zero offset, bit for bit', () => {
     const sigma = { horizontal: 0.012, vertical: 0.007 }
     expect(ellipseProbability(0.03, 0.02, sigma, { dx: 0, dy: 0 })).toBe(
@@ -85,7 +82,9 @@ describe('ellipse probability with an offset', () => {
     expect(ellipseProbability(0.01, 0.01, sigma, { dx: 0.1, dy: 0 })).toBe(0)
     expect(ellipseProbability(0.01, 0.01, sigma, { dx: 0, dy: 0.1 })).toBeLessThan(1e-12)
   })
+})
 
+describe('ellipse probability with an offset, over the dispersion', () => {
   it('rises and then falls with the dispersion when the offset exceeds the zone radius', () => {
     const r = 0.05
     const offset = { dx: 2 * r, dy: 0 }
@@ -115,8 +114,11 @@ describe('ellipse probability with an offset', () => {
 
   it('refuses a non-finite offset', () => {
     const sigma = { horizontal: 0.01, vertical: 0.01 }
-    expect(() => ellipseProbability(0.01, 0.01, sigma, { dx: Number.NaN, dy: 0 })).toThrow(
-      InputError,
+    expect(issueOf(() => ellipseProbability(0.01, 0.01, sigma, { dx: Number.NaN, dy: 0 }))).toEqual(
+      {
+        code: 'offset',
+        params: {},
+      },
     )
   })
 })
