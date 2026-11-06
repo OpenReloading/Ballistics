@@ -31,7 +31,9 @@ const groups = new Map<string, { stem: string; files: [string, string] }[]>()
 for (const [key, file] of a) {
   const other = b.get(key)
   if (!other) continue
-  const [table, rest = ''] = key.split('/')
+  const [table, rest] = key.split('/')
+  if (rest === undefined) throw new Error(`shot key without its table: ${key}`)
+  // split gives at least one part
   const [stem = '', theme, width] = rest.split('__')
   const group = `${table}__${theme}__${width}`
   groups.set(group, [...(groups.get(group) ?? []), { stem, files: [file, other] }])
