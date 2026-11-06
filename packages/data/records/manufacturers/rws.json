@@ -13,12 +13,10 @@
         "fields": ["name"]
       },
       {
-        "title": "RWS, Impressum",
-        "publisher": "RWS GmbH",
+        "source": "rws-impressum",
         "url": "https://rws-ammunition.com/de/impressum",
         "retrieved": "2026-11-06",
         "fields": ["country", "website"],
-        "origin": "manufacturer",
         "note": "Anschrift: RWS GmbH, Kronacher Straße 63, 90765 Fürth, Deutschland."
       }
     ]

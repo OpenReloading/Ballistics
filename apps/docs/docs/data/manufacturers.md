@@ -28,7 +28,7 @@ Schema: `packages/schema/src/manufacturer.ts`. Records: `packages/data/records/m
 | `aliases`    | Former names and other names the products are sold under                |
 | `provenance` | Sources of the name, the country, the website and the aliases           |
 
-`country` is the country of the address the manufacturer's own contact page, imprint or safety data sheet names: for a brand, its owner's (IMR, Ramshot, Winchester and Accurate: Hodgdon, United States); for a site whose legal notice names a different company than the brand, that company's (Rottweil: HEXAGON Ammunition Zrt., Hungary). A source with `fields: ["country"]` must support it, and every other field needs a source too. The invented `demo-` manufacturers have neither field; Western has no website, because its former domain now serves unrelated content.
+`country` is the country of the address the manufacturer's own contact page, imprint or safety data sheet names: for a brand, its owner's (IMR, Ramshot, Winchester and Accurate: Hodgdon, United States; Rottweil, whose reloading powders RWS GmbH sells: Germany). A source with `fields: ["country"]` must support it, and every other field needs a source too. The invented `demo-` manufacturers have neither field; Western has no website, because its former domain now serves unrelated content.
 
 ## Id
 
