@@ -103,8 +103,9 @@ function withoutFormatOptions(options: ParseChronoOptions): ChronoParserOptions 
 const anyRow = (book: Workbook, test: (cells: string[]) => boolean) =>
   book.worksheets.some((s) => s.rows.some(test))
 
-// the literal list: `ChronoFormatId` and `WorkbookFormat` read its ids; a format registers here only, with
-// its id and what it reads in the type
+// the literal list, with each id and what it reads in the type: `detectFormat` and `detectWorkbookFormat`
+// fail to compile on an id that `ChronoFormatId` or `WorkbookFormatId` lacks, and formats.test.ts on one
+// they have and the list does not
 const formats: readonly [
   TextChronoFormat & { id: 'openreloading-json' },
   TextChronoFormat & { id: 'shotview-csv' },
@@ -178,9 +179,15 @@ const formats: readonly [
 export const chronoFormats: readonly ChronoFormat[] = formats
 
 /** A chronograph format id, one per entry of `chronoFormats`. */
-export type ChronoFormatId = (typeof formats)[number]['id']
+export type ChronoFormatId =
+  | 'openreloading-json'
+  | 'shotview-csv'
+  | 'shotview-xlsx'
+  | 'openreloading-csv'
+  | 'delimited'
 
-type WorkbookFormat = Extract<(typeof formats)[number], { reads: 'workbook' }>['id']
+/** The id of a chronograph format that reads a workbook. */
+export type WorkbookFormatId = 'shotview-xlsx'
 
 /**
  * The format of a chronograph export, told by its shape, or null when none matches.
@@ -195,7 +202,7 @@ export function detectFormat(text: string): ChronoFormatId | null {
  * The format of a workbook read by `readWorkbook`, told by its cells alone (never by file or
  * worksheet names), or null when none matches.
  */
-export function detectWorkbookFormat(book: Workbook): WorkbookFormat | null {
+export function detectWorkbookFormat(book: Workbook): WorkbookFormatId | null {
   for (const f of formats) if (f.reads === 'workbook' && f.detect(book)) return f.id
   return null
 }

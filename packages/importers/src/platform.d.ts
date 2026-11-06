@@ -1,11 +1,11 @@
 // The parts of the web platform this package uses, which every runtime it targets has and the ES library of
-// this package lacks: only what the package calls, so the types merge with the DOM and Node declarations;
-// test/tsconfig.json has Node's and leaves this file out. URL is named by zod's declarations.
-// oxlint-disable-next-line typescript/no-empty-interface, no-redeclare -- an interface and a `var` of one name are one declaration, merging with the DOM and Node ones
+// this package lacks: only what the package calls. The file stays in this package's compile: it is not
+// emitted, and test/tsconfig.json leaves it out because its `var`s would conflict with Node's. The type URL
+// is named by zod's declarations.
+// oxlint-disable-next-line typescript/no-empty-interface -- zod's declarations need the name only
 interface URL {}
-declare var URL: new (url: string) => URL
 
-// oxlint-disable-next-line no-redeclare -- an interface and a `var` of one name are one declaration, merging with the DOM and Node ones
+// oxlint-disable-next-line no-redeclare -- an interface and a `var` of one name are one declaration
 interface TextDecoder {
   decode(input: Uint8Array): string
 }
@@ -14,7 +14,7 @@ declare var TextDecoder: new (
   options: { fatal: boolean; ignoreBOM: boolean },
 ) => TextDecoder
 
-// oxlint-disable-next-line typescript/no-empty-interface, no-redeclare -- an interface and a `var` of one name are one declaration, merging with the DOM and Node ones
+// oxlint-disable-next-line typescript/no-empty-interface, no-redeclare -- an interface and a `var` of one name are one declaration
 interface DecompressionStream {}
 declare var DecompressionStream: new (format: 'deflate-raw') => DecompressionStream
 
@@ -29,13 +29,13 @@ interface ByteStream {
   getReader(): ByteStreamReader
 }
 
-// oxlint-disable-next-line no-redeclare -- an interface and a `var` of one name are one declaration, merging with the DOM and Node ones
+// oxlint-disable-next-line no-redeclare -- an interface and a `var` of one name are one declaration
 interface Blob {
   stream(): ByteStream
 }
 declare var Blob: new (parts: Uint8Array[]) => Blob
 
-// oxlint-disable-next-line no-redeclare -- an interface and a `var` of one name are one declaration, merging with the DOM and Node ones
+// oxlint-disable-next-line no-redeclare -- an interface and a `var` of one name are one declaration
 interface Response {
   text(): Promise<string>
 }

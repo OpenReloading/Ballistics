@@ -43,10 +43,8 @@ export interface BuiltRecords {
 // @public
 export type ChronoFormat = TextChronoFormat | WorkbookChronoFormat;
 
-// Warning: (ae-forgotten-export) The symbol "formats" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type ChronoFormatId = (typeof formats)[number]['id'];
+export type ChronoFormatId = 'openreloading-json' | 'shotview-csv' | 'shotview-xlsx' | 'openreloading-csv' | 'delimited';
 
 // @public
 export const chronoFormats: readonly ChronoFormat[];
@@ -116,10 +114,8 @@ export type Delimiter = ',' | ';' | '\t' | 'none';
 // @public
 export function detectFormat(text: string): ChronoFormatId | null;
 
-// Warning: (ae-forgotten-export) The symbol "WorkbookFormat" needs to be exported by the entry point index.d.ts
-//
 // @public
-export function detectWorkbookFormat(book: Workbook): WorkbookFormat | null;
+export function detectWorkbookFormat(book: Workbook): WorkbookFormatId | null;
 
 // @public
 export interface FieldSpec {
@@ -418,6 +414,9 @@ export interface WorkbookChronoFormat {
     // (undocumented)
     reads: 'workbook';
 }
+
+// @public
+export type WorkbookFormatId = 'shotview-xlsx';
 
 // @public
 export interface WorkbookOptions extends ChronoParserOptions {
