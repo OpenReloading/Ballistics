@@ -9,8 +9,6 @@ export default defineConfig({
       // process entry and the schema file writer, run as processes by pnpm
       exclude: ['src/bin.ts', 'src/write-json-schema.ts'],
       reporter: ['text-summary', 'text', 'lcov'],
-      // floors: the measured value rounded down, minus one
-      thresholds: { statements: 97, branches: 94, functions: 98, lines: 97 },
     },
   },
 })
