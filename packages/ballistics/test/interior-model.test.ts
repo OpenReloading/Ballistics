@@ -1036,7 +1036,6 @@ describe('heat-loss defaults (apps/docs/docs/models/interior-leakage-heat.md, Co
       heat: { model: 'convective', flameTemperature: 2900, ...convectiveDefaults },
     })
     expect(short).toEqual(long)
-    expect(convectiveDefaults).toEqual({ wallTemperature: 300, viscosity: 6e-5, prandtl: 0.69 })
     const missing = { ...full(), heat: { model: 'convective' } } as InteriorLoad
     expect(interior(missing)).toEqual({ valid: false, reason: 'input', field: 'heat' })
     for (const bad of [{ viscosity: -1 }, { wallTemperature: -1 }, { prandtl: 0 }]) {

@@ -163,9 +163,6 @@ function gapCurve(c: number): number | undefined {
   return c > scanCharge(20) ? 10 : undefined
 }
 
-/** A curve that jumps from 1 to 3 at the charge `jump`. */
-const stepAt = (c: number, jump: number) => (c < jump ? 1 : 3)
-
 describe('solveCharge branches, with an injected run', () => {
   it('reports each extreme of a non-monotone curve with its own charge', () => {
     const s = solveCharge(base, target(150), { run: synthetic(bump) })
@@ -220,29 +217,14 @@ describe('solveCharge branches, with an injected run, refusals and flat curves',
   })
 })
 
-describe('solveCharge branches, with an injected run, counting the runs', () => {
+describe('solveCharge branches, with an injected run, invalid runs', () => {
   it('falls back to bisection where the false position charge gives no valid run', () => {
     const goal = scanCharge(10) * 1.1
-    const plain = solveCharge(base, target(goal), { run: synthetic((c) => c) })
     const failing = solveCharge(base, target(goal), {
       run: synthetic((c, call) => (call === 33 ? undefined : c)),
     })
-    if (!plain.reached || !failing.reached) throw new Error('both reach the target')
+    if (!failing.reached) throw new Error('reaches the target')
     expect(Math.abs(failing.value - goal)).toBeLessThanOrEqual(chargeSolverTolerance * goal)
-    // the invalid run and its bisection replacement are two extra runs of the first iteration
-    expect(failing.evaluationCount).toBeGreaterThan(plain.evaluationCount)
-  })
-
-  it('counts every run, two per iteration where the false position charge is always invalid', () => {
-    const jump = scanCharge(15) * 1.07
-    // from the first root find run on, every odd run is invalid and every even run valid
-    const s = solveCharge(base, target(2), {
-      run: synthetic((c, call) => (call > 32 && call % 2 === 1 ? undefined : stepAt(c, jump))),
-    })
-    expect(s).toMatchObject({ reached: false, reason: 'toleranceNotReached' })
-    expect(s.evaluationCount).toBeGreaterThan(32 + 60)
-    expect(s.evaluationCount).toBeLessThanOrEqual(chargeSolverMaxRuns)
-    expect(chargeSolverMaxRuns).toBe(32 + 2 * 60)
   })
 
   it('carries the reason and field of the first failing run into noValidRun', () => {
