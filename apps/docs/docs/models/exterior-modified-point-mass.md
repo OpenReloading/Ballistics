@@ -18,7 +18,7 @@ $$
 p_0 = \pm \frac{2 \pi v_0}{T}
 $$
 
-Code: `packages/core/src/exterior/trajectory.ts`, `resolveAero` (`spin0`).
+Code: `packages/ballistics/src/exterior/trajectory.ts`, `resolveAero` (`spin0`).
 
 ### Yaw of repose
 
@@ -28,7 +28,7 @@ $$
 \vec\alpha_R = -\frac{2 I_x p \, (\vec v_a \times \vec a_\text{PM})}{\rho A d \, C_{M\alpha}(M) \, V^4}, \qquad A = \frac{\pi d^2}{4}, \qquad M = \frac{V}{a}
 $$
 
-Code: `packages/core/src/exterior/modified.ts`, `yawOfRepose`, `packages/core/src/exterior/trajectory.ts`, `modifiedPointMassRhs`.
+Code: `packages/ballistics/src/exterior/modified.ts`, `yawOfRepose`, `packages/ballistics/src/exterior/trajectory.ts`, `modifiedPointMassRhs`.
 
 The vector is perpendicular to $\vec v_a$, its length is the yaw angle. At $V = 0$ it is zero. For a right-hand twist in level fire it points to the right.
 
@@ -40,7 +40,7 @@ $$
 \dot{\vec v} = \vec a_\text{PM} + \frac{\rho A}{2 m} C_{L\alpha}(M) \, V^2 \, \vec\alpha_R - \frac{\rho A d}{2 m} \, p \, C_{N_{p\alpha}}(M) \, (\vec\alpha_R \times \vec v_a)
 $$
 
-Code: `packages/core/src/exterior/trajectory.ts`, `modifiedPointMassRhs`.
+Code: `packages/ballistics/src/exterior/trajectory.ts`, `modifiedPointMassRhs`.
 
 The spin decays by the spin-damping moment:
 
@@ -48,7 +48,7 @@ $$
 \dot p = \frac{\rho A d^2}{2 I_x} \, C_{l_p}(M) \, V \, p
 $$
 
-Code: `packages/core/src/exterior/trajectory.ts`, `modifiedPointMassRhs`.
+Code: `packages/ballistics/src/exterior/trajectory.ts`, `modifiedPointMassRhs`.
 
 Without `magnusForceSlope` the Magnus term is zero, without `spinDamping` the spin stays $p_0$. Both are then listed in `omitted` (`magnus`, `spinDecay`).
 
@@ -60,7 +60,7 @@ $$
 C(M) = C_k + (C_{k+1} - C_k) \frac{M - M_k}{M_{k+1} - M_k}, \qquad M_k \le M \lt M_{k+1}
 $$
 
-Code: `packages/core/src/exterior/modified.ts`, `coefficientAt`, `packages/core/src/exterior/trajectory.ts`, `modifiedPointMassRhs` (`coefficient`), `machGrid` (`grid`).
+Code: `packages/ballistics/src/exterior/modified.ts`, `coefficientAt`, `packages/ballistics/src/exterior/trajectory.ts`, `modifiedPointMassRhs` (`coefficient`), `machGrid` (`grid`).
 
 The integrator runs on the union of the Mach nodes of the drag table and every coefficient table and restarts at each node, so no step crosses a kink.
 
@@ -72,7 +72,7 @@ $$
 I_x = \frac{m d^2}{8}, \qquad I_y = m \left( \frac{d^2}{16} + \frac{l^2}{12} \right)
 $$
 
-Code: `packages/core/src/exterior/modified.ts`, `cylinderInertia`, `packages/core/src/exterior/trajectory.ts`, `estimateInertias`.
+Code: `packages/ballistics/src/exterior/modified.ts`, `cylinderInertia`, `packages/ballistics/src/exterior/trajectory.ts`, `estimateInertias`.
 
 ### Gyroscopic stability and the overturning-moment estimate
 
@@ -82,7 +82,7 @@ $$
 S_g = \frac{2 I_x^2 p^2}{\pi I_y \rho V^2 d^3 C_{M\alpha}}
 $$
 
-Code: `packages/core/src/exterior/modified.ts`, `gyroscopicStability`, `packages/core/src/exterior/trajectory.ts`, `trajectory`.
+Code: `packages/ballistics/src/exterior/modified.ts`, `gyroscopicStability`, `packages/ballistics/src/exterior/trajectory.ts`, `trajectory`.
 
 The run reports it at the muzzle ($p = p_0$, $V = v_0$, station air, coefficients at $M_0 = v_0 / a$).
 
@@ -92,7 +92,7 @@ $$
 C_{M\alpha} = \frac{2 I_x^2 p_0^2}{\pi I_y \rho v_0^2 d^3 S_{g,\text{Miller}}}
 $$
 
-Code: `packages/core/src/exterior/modified.ts`, `momentSlopeFromStability`, `packages/core/src/exterior/trajectory.ts`, `estimateMomentSlope` (`millerStability`).
+Code: `packages/ballistics/src/exterior/modified.ts`, `momentSlopeFromStability`, `packages/ballistics/src/exterior/trajectory.ts`, `estimateMomentSlope` (`millerStability`).
 
 The estimated inputs are listed in `estimated` of the result (`axialInertia`, `transverseInertia`, `momentSlope`).
 
@@ -104,7 +104,7 @@ $$
 s(R) = z_\text{MPM}(R) - z_\text{PM}(R)
 $$
 
-Code: `packages/core/src/exterior/trajectory.ts`, `trajectory` (`twin`), `correct`.
+Code: `packages/ballistics/src/exterior/trajectory.ts`, `trajectory` (`twin`), `correct`.
 
 The empirical spin-drift fit of the point mass is not applied.
 
@@ -116,7 +116,7 @@ $$
 \delta_J = -\frac{I_x p_0}{m d v_0} \, \frac{C_{L\alpha}(M_0)}{C_{M\alpha}(M_0)} \, \frac{W_\perp}{v_0}, \qquad W_\perp = -w \sin \phi_w
 $$
 
-Code: `packages/core/src/exterior/modified.ts`, `linearJump`, `packages/core/src/exterior/trajectory.ts`, `correct` (`crosswind`).
+Code: `packages/ballistics/src/exterior/modified.ts`, `linearJump`, `packages/ballistics/src/exterior/trajectory.ts`, `correct` (`crosswind`).
 
 $W_\perp$ is the component of the first wind segment toward the right ($w$ its speed, $\phi_w$ the direction it blows from, clockwise from the line of fire). A right-hand twist with wind from the left gives a downward jump. The jump adds to the height at each range:
 
@@ -124,7 +124,7 @@ $$
 h_J(R) = R \tan \delta_J
 $$
 
-Code: `packages/core/src/exterior/trajectory.ts`, `correct` (`jumpAngle`).
+Code: `packages/ballistics/src/exterior/trajectory.ts`, `correct` (`jumpAngle`).
 
 ### Yaw limit
 
@@ -134,7 +134,7 @@ $$
 \lvert \vec\alpha_R \rvert \ge \alpha_\text{max}, \qquad \alpha_\text{max} = 0.1 \ \text{rad by default}
 $$
 
-Code: `packages/core/src/exterior/trajectory.ts`, `fly` (`yawAt`), `trajectoryDefaults` (`maxYaw`).
+Code: `packages/ballistics/src/exterior/trajectory.ts`, `fly` (`yawAt`), `trajectoryDefaults` (`maxYaw`).
 
 ## Symbols
 

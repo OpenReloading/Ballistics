@@ -18,7 +18,7 @@ $$
 \vec a_D = -\frac{\pi}{8}\,\frac{\rho\,C_D(M)}{S}\,\lvert\vec v_a\rvert\,\vec v_a, \qquad M = \frac{\lvert\vec v_a\rvert}{a}
 $$
 
-Code: `packages/core/src/exterior/trajectory.ts`, `pointMassRhs`.
+Code: `packages/ballistics/src/exterior/trajectory.ts`, `pointMassRhs`.
 
 $\rho$ and $a$ are the density and speed of sound of the air at the bullet's height ([atmosphere](exterior-atmosphere.md)).
 
@@ -30,7 +30,7 @@ $$
 \frac{\rho\,C_D}{m/d^2} = \frac{\rho\,i\,C_G(M)}{m/d^2} = \frac{\rho\,C_G(M)}{C}, \qquad S = \begin{cases} C & \text{BC against a standard function} \\ m/d^2 & \text{own drag curve} \end{cases}
 $$
 
-Code: `packages/core/src/exterior/trajectory.ts`, `dragBandTable` (`bands`), `packages/core/src/exterior/drag.ts`, `dragTableOf`.
+Code: `packages/ballistics/src/exterior/trajectory.ts`, `dragBandTable` (`bands`), `packages/ballistics/src/exterior/drag.ts`, `dragTableOf`.
 
 A published BC in lb/in² converts exactly to kg/m²:
 
@@ -38,7 +38,7 @@ $$
 C_{\mathrm{SI}} = C_{\mathrm{lb/in^2}} \cdot \frac{0.45359237}{0.0254^2}\ \mathrm{kg/m^2}
 $$
 
-Code: `packages/core/src/exterior/drag.ts`, `lbPerSqInToKgPerSqM`.
+Code: `packages/ballistics/src/exterior/drag.ts`, `lbPerSqInToKgPerSqM`.
 
 A BC names the reference atmosphere it was reduced to (`reference`: `icao` or `metro`). The model stores and checks it but does not scale the drag by it: the standard functions are dimensionless and carry no air density, so every BC is used as given.
 
@@ -52,7 +52,7 @@ $$
 k = \max\{\,j : v_j \le \lvert\vec v_a\rvert\,\}, \qquad k = 0 \ \text{when no } v_j \le \lvert\vec v_a\rvert
 $$
 
-Code: `packages/core/src/exterior/trajectory.ts`, `dragBandTable` (`bandFor`).
+Code: `packages/ballistics/src/exterior/trajectory.ts`, `dragBandTable` (`bandFor`).
 
 The integrator holds the band within a step and restarts at each threshold crossing ([point-mass model](exterior-point-mass.md#numerical-method)).
 
@@ -60,7 +60,7 @@ The integrator holds the band within a step and restarts at each threshold cross
 
 `dragTables` holds the BRL standard drag functions G1, G2, G5, G6, G7, G8, GI and the 9/16 in sphere (GS) as pairs of Mach number and drag coefficient, Mach rising from 0, with the values as printed. The tables end at Mach 5, GS at Mach 4.
 
-Code: `packages/core/src/drag-tables.ts`, `dragTables`, `packages/core/src/exterior/drag.ts`, `dragModels`.
+Code: `packages/ballistics/src/drag-tables.ts`, `dragTables`, `packages/ballistics/src/exterior/drag.ts`, `dragModels`.
 
 ### Linear interpolation
 
@@ -70,7 +70,7 @@ $$
 C(M) = c_k + (c_{k+1} - c_k)\,\frac{M - M_k}{M_{k+1} - M_k}
 $$
 
-Code: `packages/core/src/exterior/drag.ts`, `onSegment`, `dragCoefficient`.
+Code: `packages/ballistics/src/exterior/drag.ts`, `onSegment`, `dragCoefficient`.
 
 ### Monotone cubic interpolation
 
@@ -80,7 +80,7 @@ $$
 p_j = \frac{\Delta_{j-1} h_j + \Delta_j h_{j-1}}{h_{j-1} + h_j}, \qquad d_j = \bigl(\operatorname{sgn}\Delta_{j-1} + \operatorname{sgn}\Delta_j\bigr)\,\min\!\left(\lvert\Delta_{j-1}\rvert,\ \lvert\Delta_j\rvert,\ \tfrac12\lvert p_j\rvert\right)
 $$
 
-Code: `packages/core/src/exterior/drag.ts`, `nodeSlope`.
+Code: `packages/ballistics/src/exterior/drag.ts`, `nodeSlope`.
 
 The end nodes take the end secants, $d_0 = \Delta_0$ and $d_n = \Delta_{n-1}$. On segment $k$, with $t = (M - M_k)/h_k$, the cubic Hermite form:
 
@@ -88,7 +88,7 @@ $$
 C(M) = c_k\,(1 + 2t)(1 - t)^2 + h_k d_k\,t(1 - t)^2 + c_{k+1}\,t^2(3 - 2t) + h_k d_{k+1}\,t^2(t - 1)
 $$
 
-Code: `packages/core/src/exterior/drag.ts`, `onSegment`.
+Code: `packages/ballistics/src/exterior/drag.ts`, `onSegment`.
 
 A segment with $c_k = c_{k+1}$ returns $c_k$. The slope limit keeps $\lvert d_j\rvert \le 2\min(\lvert\Delta_{j-1}\rvert, \lvert\Delta_j\rvert)$, inside the monotonicity region of the cubic Hermite form. So:
 - the cubic stays within its two node values,
@@ -103,7 +103,7 @@ $$
 C(M) = c_0 \ \text{for}\ M \le M_0, \qquad C(M) = c_n \ \text{for}\ M \ge M_n
 $$
 
-Code: `packages/core/src/exterior/drag.ts`, `dragCoefficient`, `segmentCoefficient`, `inDragTable`.
+Code: `packages/ballistics/src/exterior/drag.ts`, `dragCoefficient`, `segmentCoefficient`, `inDragTable`.
 
 A trajectory point whose Mach number lies outside the table is flagged `dragClamped`.
 
@@ -115,7 +115,7 @@ $$
 M_{k+1} - M_k \lt 10^{-6} \quad \text{or} \quad \lvert c_{k+1} - c_k\rvert \gt 100\,(M_{k+1} - M_k)\,\max(\lvert c_k\rvert, \lvert c_{k+1}\rvert)
 $$
 
-Code: `packages/core/src/exterior/drag.ts`, `heldSegment` (`narrowSegment`, `steepSegment`), `segmentCoefficient`.
+Code: `packages/ballistics/src/exterior/drag.ts`, `heldSegment` (`narrowSegment`, `steepSegment`), `segmentCoefficient`.
 
 The extension of such a segment can reach zero or negative drag within one trial step. No segment of the standard tables meets either condition.
 
@@ -127,7 +127,7 @@ $$
 \frac{\mathrm{d}v}{\mathrm{d}s} = -\frac{\pi}{8}\,\frac{\rho\,C_D(M)\,d^2}{m}\,v
 $$
 
-Code: `packages/core/src/exterior/muzzle-velocity.ts`, `muzzleVelocityFromDownrange`.
+Code: `packages/ballistics/src/exterior/muzzle-velocity.ts`, `muzzleVelocityFromDownrange`.
 
 The equation is the point-mass equation of motion ([McCoy 1999](../bibliography.md#mccoy-1999), chapter unverified). For a constant $C_D$ this is $v(s) = v_0\,e^{-ks}$ with $k = \pi\rho C_D d^2/(8m)$, a cross-check only: a constant coefficient is wrong near Mach 1. The muzzle velocity is the $v_0$ whose flown speed at $s$, over the bullet's own drag law, equals the measured one. That speed rises with $v_0$ at a slope near one, so the search moves the guess by the miss until the miss is below $10^{-6}$ m/s (four to five passes).
 

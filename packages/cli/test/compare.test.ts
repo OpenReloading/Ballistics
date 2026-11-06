@@ -159,4 +159,15 @@ describe('compare', () => {
     const labels = (await loadModel('m3')).files.map((f) => f.label)
     expect(labels).toEqual(expect.arrayContaining(['statistics/errors.js', 'statistics/bisect.js']))
   })
+
+  it('includes the integrator, the standard atmosphere and the options bag the core model takes from ballistics', async () => {
+    const labels = (await loadModel('m3')).files.map((f) => f.label)
+    expect(labels).toEqual(
+      expect.arrayContaining([
+        'ballistics/exterior/rk45.js',
+        'ballistics/exterior/atmosphere.js',
+        'ballistics/settings.js',
+      ]),
+    )
+  })
 })

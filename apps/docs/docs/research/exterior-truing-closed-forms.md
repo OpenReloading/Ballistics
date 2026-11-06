@@ -42,8 +42,8 @@ Analytic: closed forms and synthetic observations from the solver.
 
 ## Where in the app
 
-- `packages/core/test/exterior-truing.test.ts`.
-- `packages/core/src/exterior/truing.ts`.
+- `packages/ballistics/test/exterior-truing.test.ts`.
+- `packages/ballistics/src/exterior/truing.ts`.
 - Model pages: [truing](../models/exterior-truing.md), [least squares on log parameters](../models/least-squares.md).
 
 ## Confidence

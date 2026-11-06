@@ -18,7 +18,7 @@ $$
 \hat u = (\cos\theta, \sin\theta, 0), \quad \hat n = (-\sin\theta, \cos\theta, 0), \quad \hat z = (0, 0, 1), \qquad s = \vec r\cdot\hat u, \quad h = \vec r\cdot\hat n, \quad w = \vec r\cdot\hat z
 $$
 
-Code: `packages/core/src/exterior/trajectory.ts`, `fly` (`slant`), `trajectoryPointAt`.
+Code: `packages/ballistics/src/exterior/trajectory.ts`, `fly` (`slant`), `trajectoryPointAt`.
 
 Drop is $-h$. The line of sight is an output projection only. Gravity stays on one axis and wind stays horizontal at any look angle.
 
@@ -30,7 +30,7 @@ $$
 \hat b = \cos\delta_e\cos\delta_w\,\hat u + \sin\delta_e\,\hat n + \cos\delta_e\sin\delta_w\,\hat z, \qquad \vec r_0 = -h_s\,\hat n - o_s\,\hat z, \qquad \vec v_0 = v_0\,\hat b
 $$
 
-Code: `packages/core/src/exterior/trajectory.ts`, `fly` (`y0`).
+Code: `packages/ballistics/src/exterior/trajectory.ts`, `fly` (`y0`).
 
 ### Equations of motion
 
@@ -38,7 +38,7 @@ $$
 \dot{\vec r} = \vec v, \qquad \dot{\vec v} = \vec a_D + \vec g + \vec a_C, \qquad \vec g = (0, -g, 0)
 $$
 
-Code: `packages/core/src/exterior/trajectory.ts`, `pointMassRhs`.
+Code: `packages/ballistics/src/exterior/trajectory.ts`, `pointMassRhs`.
 
 $\vec a_D$ is the [drag acceleration](exterior-drag.md#drag-acceleration) with the air at height $y$. Gravity is constant along the path, the `gravity` option (default the standard gravity $g_0$).
 
@@ -48,7 +48,7 @@ $$
 g(\varphi) = \frac{9.7803253359\,(1 + 0.00193185265241\,\sin^2\varphi)}{\sqrt{1 - 0.00669437999013\,\sin^2\varphi}}\ \mathrm{m/s^2}
 $$
 
-Code: `packages/core/src/exterior/trajectory.ts`, `normalGravity`.
+Code: `packages/ballistics/src/exterior/trajectory.ts`, `normalGravity`.
 
 ### Wind
 
@@ -58,7 +58,7 @@ $$
 \vec w_k = \left(-W_k\cos\beta_k,\ W_{v,k},\ -W_k\sin\beta_k\right)
 $$
 
-Code: `packages/core/src/exterior/trajectory.ts`, `windTable` (`wv`, `segmentFor`).
+Code: `packages/ballistics/src/exterior/trajectory.ts`, `windTable` (`wv`, `segmentFor`).
 
 Wind enters only the air-relative velocity $\vec v_a = \vec v - \vec w_k$ of the drag term.
 
@@ -70,7 +70,7 @@ $$
 \vec\Omega = \Omega_E\,(\cos\varphi\cos\alpha,\ \sin\varphi,\ -\cos\varphi\sin\alpha), \qquad \vec a_C = -2\,\vec\Omega\times\vec v
 $$
 
-Code: `packages/core/src/exterior/trajectory.ts`, `earthRotation`, `earthRotationRate`, `pointMassRhs`.
+Code: `packages/ballistics/src/exterior/trajectory.ts`, `earthRotation`, `earthRotationRate`, `pointMassRhs`.
 - The vertical component $\Omega_E\sin\varphi$ deflects the bullet sideways (right in the northern hemisphere).
 - The horizontal component gives the Eotvos effect: fire to the east rises, fire to the west drops.
 - The acceleration is integrated with the other terms, so the air turning with the Earth also damps the deflection through the drag.
@@ -84,7 +84,7 @@ $$
 M = \frac{\lvert\vec v - \vec w_k\rvert}{a(y)}, \qquad E = \tfrac12 m\,\lvert\vec v\rvert^2, \qquad \gamma = \operatorname{atan2}\!\left(v_y,\ \sqrt{v_x^2 + v_z^2}\right)
 $$
 
-Code: `packages/core/src/exterior/trajectory.ts`, `trajectoryPointAt`, `machOf`.
+Code: `packages/ballistics/src/exterior/trajectory.ts`, `trajectoryPointAt`, `machOf`.
 
 Spin drift $D_s$ and the jump angle $\delta_J$ ([stability](exterior-stability.md)) are added after integration. The holds are the angles that move the impact back onto the line of sight:
 
@@ -92,7 +92,7 @@ $$
 h' = h + s\tan\delta_J, \qquad w' = w + D_s, \qquad \text{hold}_e = -\operatorname{atan2}(h', s), \qquad \text{hold}_w = -\operatorname{atan2}(w', s)
 $$
 
-Code: `packages/core/src/exterior/trajectory.ts`, `correct`.
+Code: `packages/ballistics/src/exterior/trajectory.ts`, `correct`.
 
 The holds are 0 at $s = 0$. A point is flagged `transonic` for $0.8 \le M \le 1.2$ and `subsonic` for $M \lt 1$.
 
@@ -104,7 +104,7 @@ $$
 \delta_e^{(0)} = \arctan\frac{h_s + g\,s_z^2\cos\theta / (2 v_0^2)}{s_z}, \qquad \delta_w^{(0)} = 0
 $$
 
-Code: `packages/core/src/exterior/trajectory.ts`, `zeroWith`, `zeroAngles`.
+Code: `packages/ballistics/src/exterior/trajectory.ts`, `zeroWith`, `zeroAngles`.
 
 One linear step follows, then a secant step on the elevation and a linear step on the windage per iteration:
 
@@ -112,7 +112,7 @@ $$
 \delta_e \leftarrow \delta_e - h'(s_z)\,\frac{\delta_e - \delta_e^{\mathrm{prev}}}{h'(s_z) - h'^{\,\mathrm{prev}}(s_z)}, \qquad \delta_w \leftarrow \delta_w - \frac{w'(s_z)}{s_z}
 $$
 
-Code: `packages/core/src/exterior/trajectory.ts`, `zeroWith`.
+Code: `packages/ballistics/src/exterior/trajectory.ts`, `zeroWith`.
 
 The search stops when both misses are below `zeroTolerance` (default $10^{-6}$ m) and fails after 30 iterations. Only the low solution is sought.
 
@@ -124,7 +124,7 @@ $$
 \mathrm{err} = \sqrt{\frac{1}{n}\sum_{i=1}^{n}\left(\frac{e_i}{\mathrm{atol} + \mathrm{rtol}\,\max(\lvert y_i\rvert, \lvert\hat y_i\rvert)}\right)^2} \le 1
 $$
 
-Code: `packages/core/src/exterior/rk45.ts`, `rk45` (`dormandPrinceStep`, `rms`).
+Code: `packages/ballistics/src/exterior/rk45.ts`, `rk45` (`dormandPrinceStep`, `rms`).
 
 The next step size, with the growth limited to 1 directly after a rejected step:
 
@@ -132,7 +132,7 @@ $$
 \Delta t_{\mathrm{new}} = \Delta t\,\min\!\left(5,\ \max\!\left(0.2,\ 0.9\,\mathrm{err}^{-1/5}\right)\right)
 $$
 
-Code: `packages/core/src/exterior/rk45.ts`, `rk45`.
+Code: `packages/ballistics/src/exterior/rk45.ts`, `rk45`.
 
 Each accepted step has a fourth-order continuous extension in $\sigma \in [0, 1]$ from the stages already computed, with coefficients $r_2$ to $r_5$ per component:
 
@@ -140,7 +140,7 @@ $$
 y_i(t + \sigma\,\Delta t) = y_i + \sigma\left(r_2 + (1 - \sigma)\left(r_3 + \sigma\left(r_4 + (1 - \sigma)\,r_5\right)\right)\right)
 $$
 
-Code: `packages/core/src/exterior/rk45.ts`, `rk45` (`denseOutput`).
+Code: `packages/ballistics/src/exterior/rk45.ts`, `rk45` (`denseOutput`).
 
 An event is a scalar function $g(t, \vec y)$ with a direction. When it changes sign over a step, its root is found on the continuous extension by the Illinois variant of regula falsi to $10^{-12}$ s (`root`). At a terminal event the step is repeated from its start with the step size that ends at the root, which gives a fifth-order state there.
 
