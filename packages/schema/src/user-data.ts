@@ -604,44 +604,31 @@ const designId = z
   .regex(userIdRegex, designIdProblem)
   .describe('Id of the record in the browser library: a UUID.')
 
-/** Why a record of kind `workbenchState`, the load of the format before kind `load`, is refused. */
-export const legacyLoadProblem: string =
-  'A record of kind "workbenchState" is a load in the format of an earlier version, which this app no longer reads. Kind "load" replaces it.'
-
-const userRecordParser = z.discriminatedUnion(
-  'kind',
-  [
-    record('manufacturer', 'A manufacturer typed by the user.', userManufacturer),
-    record('bullet', 'A bullet of the bullet designer.', userBullet, designId),
-    record('cartridge', 'A cartridge of the cartridge designer.', userCartridge, designId),
-    record('powder', 'A powder of the powder designer.', userPowder, designId),
-    record('caseCapacity', 'A case capacity the user measured, in g.', caseCapacity),
-    record('load', 'A load of the workbench, in stored units.', load),
-    record('firearm', 'A firearm of the library, in stored units.', firearm),
-    record('session', 'A chronograph session, in stored units.', chronoSession),
-    record('targetSheet', 'A target sheet with its calibration and shot groups.', targetSheet),
-    record('targetFaceDesign', 'A target face of the face designer.', targetFaceDesign),
-    record(
-      'case',
-      'A group of cases of the user with their measured values.',
-      cartridgeCase,
-      designId,
-    ),
-    record('event', 'A competition event; never an official result.', competitionEvent, designId),
-    record(
-      'shootingLogEntry',
-      "An entry of the shooting log, the person's own record.",
-      shootingLogEntry,
-      designId,
-    ),
-  ],
-  {
-    error: (issue) =>
-      isPlain(issue.input) && issue.input['kind'] === 'workbenchState'
-        ? legacyLoadProblem
-        : undefined,
-  },
-)
+const userRecordParser = z.discriminatedUnion('kind', [
+  record('manufacturer', 'A manufacturer typed by the user.', userManufacturer),
+  record('bullet', 'A bullet of the bullet designer.', userBullet, designId),
+  record('cartridge', 'A cartridge of the cartridge designer.', userCartridge, designId),
+  record('powder', 'A powder of the powder designer.', userPowder, designId),
+  record('caseCapacity', 'A case capacity the user measured, in g.', caseCapacity),
+  record('load', 'A load of the workbench, in stored units.', load),
+  record('firearm', 'A firearm of the library, in stored units.', firearm),
+  record('session', 'A chronograph session, in stored units.', chronoSession),
+  record('targetSheet', 'A target sheet with its calibration and shot groups.', targetSheet),
+  record('targetFaceDesign', 'A target face of the face designer.', targetFaceDesign),
+  record(
+    'case',
+    'A group of cases of the user with their measured values.',
+    cartridgeCase,
+    designId,
+  ),
+  record('event', 'A competition event; never an official result.', competitionEvent, designId),
+  record(
+    'shootingLogEntry',
+    "An entry of the shooting log, the person's own record.",
+    shootingLogEntry,
+    designId,
+  ),
+])
 
 /**
  * One record of a user data file: its `kind`, id, name, save time and the `data` of that kind.
@@ -680,14 +667,14 @@ export interface SkippedKind {
 /**
  * `json` without its records of a kind this version does not know, and those kinds with their
  * counts, so that a file of a later version that adds kinds still opens. A record without a text
- * `kind` or of kind `workbenchState` stays, for the schema to refuse as before.
+ * `kind` stays, for the schema to refuse.
  */
 export function withoutUnknownKinds(json: unknown): { json: unknown; skipped: SkippedKind[] } {
   if (!isPlain(json) || !Array.isArray(json['records'])) return { json, skipped: [] }
   const counts = new Map<string, number>()
   const kept = json['records'].filter((r) => {
     const kind = isPlain(r) ? r['kind'] : undefined
-    if (typeof kind !== 'string' || knownKinds.has(kind) || kind === 'workbenchState') return true
+    if (typeof kind !== 'string' || knownKinds.has(kind)) return true
     counts.set(kind, (counts.get(kind) ?? 0) + 1)
     return false
   })
