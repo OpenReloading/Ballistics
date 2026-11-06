@@ -9,6 +9,7 @@ import {
   Paper,
   Popover,
   Switch,
+  Text,
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { boreArea } from '@open-reloading/core'
@@ -82,7 +83,7 @@ import { LotField } from './load-notes.tsx'
 import { NavIcon } from './nav-icons.tsx'
 import { NumberField } from './number-field.tsx'
 import { PrimerChoice } from './primer-choice.tsx'
-import { RecordSearch, useChooser } from './record-search.tsx'
+import { RecordSearch, searchRecords, useChooser } from './record-search.tsx'
 import { SegmentedRow } from './segmented-row.tsx'
 import { RecordSourcesLink } from './sources.tsx'
 import { useCompleteOnly } from './use-complete-only.ts'
@@ -1463,6 +1464,31 @@ const missingValueMark = (
 const missingMark = (name: string, incomplete: boolean, t: Translator['t']) =>
   incomplete ? t('{name} (values missing)', { name }) : name
 
+/** True once the API answers that the catalogue holds no powder; false while it asks or cannot tell. */
+function useNoCataloguePowders(): boolean {
+  const [none, setNone] = useState(false)
+  useEffect(() => {
+    const ask = new AbortController()
+    searchRecords('powders', '', 1, '', ask.signal)
+      .then((list) => setNone(list.total === 0))
+      .catch(() => setNone(false))
+    return () => ask.abort()
+  }, [])
+  return none
+}
+
+/** What the powder field says when the catalogue has no powder: where a powder comes from instead. */
+export function NoCataloguePowders() {
+  const { t } = useTranslation()
+  return (
+    <Text size="xs" c="dimmed">
+      {t(
+        'The catalogue has no powders. Choose one of your powder designs, make one in the powder designer, import a table of your powders with Import, or type the model values of your powder.',
+      )}
+    </Text>
+  )
+}
+
 /** The powder search, with the chosen powder, the link's name or the typed parameters as its text. */
 function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames> }) {
   const {
@@ -1478,6 +1504,7 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
   } = useLoad()
   const { t } = useTranslation()
   const dialog = useChooser()
+  const noCatalogue = useNoCataloguePowders()
   const [completeOnly] = useCompleteOnly()
   const chosen = (() => {
     if (powderDesign) return t('{name} (your design)', { name: powderDesign.name })
@@ -1514,6 +1541,7 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
           },
         }}
       />
+      {noCatalogue && <NoCataloguePowders />}
       <PowderChooser
         opened={dialog.opened}
         onClose={dialog.close}
