@@ -7,6 +7,51 @@ const saved = '2026-10-30T00:00:00.000Z'
 
 type Field = [name: string, value: string, unit?: string]
 
+/** The sections of an invented load file. */
+const defaultSections: Record<string, Field[]> = {
+  caliber: [
+    ['CaliberName', '9.1%20x%2040%20Testcal'],
+    ['oal', '58.2', 'mm'],
+    ['caselen', '40', 'mm'],
+    ['Dz', '9.3', 'mm'],
+    ['Aeff', '66.5', 'mm2'],
+    ['pMaxZul', '3600', 'bar'],
+    ['ps', '200', 'bar'],
+    ['sebert', '0.4'],
+    ['shotshell', 'false'],
+    ['casevol', '2.9', 'cm3'],
+  ],
+  gun: [
+    ['GunName', ''],
+    ['xe', '500', 'mm'],
+    ['twistlen', '300', 'mm'],
+    ['mgun', '4.2', 'kg'],
+  ],
+  projectile: [
+    ['ProjectileName', 'Inventa%20Arms%2C%20RN%20120'],
+    ['mname', 'Inventa%20Arms'],
+    ['pname', 'RN%20120'],
+    ['Dbul', '9.3', 'mm'],
+    ['mp', '7.8', 'g'],
+    ['glen', '16.1', 'mm'],
+    ['g1bc', '0.21'],
+    ['g7bc', '0'],
+    ['gTailType', '1'],
+  ],
+  propellant: [
+    ['mname', 'Testpowder%20Co'],
+    ['pname', 'TP%2010'],
+    ['lotid', 'L-77'],
+    ['k', '1.23'],
+    ['pc', '1600', 'kg/m3'],
+    ['pcd', '950', 'kg/m3'],
+    ['pt', '20', 'Cel'],
+    ['mc', '0.45', 'g'],
+    ['Ba', '0.9'],
+    ['eta', '1', 'cm3/kg'],
+  ],
+}
+
 /** An invented load file of the layout the reader takes: sections of `input` fields and an appendix. */
 function grtFile(o: {
   title?: string
@@ -15,49 +60,7 @@ function grtFile(o: {
   appendix?: string
   eol?: string
 }) {
-  const sections: Record<string, Field[]> = o.sections ?? {
-    caliber: [
-      ['CaliberName', '9.1%20x%2040%20Testcal'],
-      ['oal', '58.2', 'mm'],
-      ['caselen', '40', 'mm'],
-      ['Dz', '9.3', 'mm'],
-      ['Aeff', '66.5', 'mm2'],
-      ['pMaxZul', '3600', 'bar'],
-      ['ps', '200', 'bar'],
-      ['sebert', '0.4'],
-      ['shotshell', 'false'],
-      ['casevol', '2.9', 'cm3'],
-    ],
-    gun: [
-      ['GunName', ''],
-      ['xe', '500', 'mm'],
-      ['twistlen', '300', 'mm'],
-      ['mgun', '4.2', 'kg'],
-    ],
-    projectile: [
-      ['ProjectileName', 'Inventa%20Arms%2C%20RN%20120'],
-      ['mname', 'Inventa%20Arms'],
-      ['pname', 'RN%20120'],
-      ['Dbul', '9.3', 'mm'],
-      ['mp', '7.8', 'g'],
-      ['glen', '16.1', 'mm'],
-      ['g1bc', '0.21'],
-      ['g7bc', '0'],
-      ['gTailType', '1'],
-    ],
-    propellant: [
-      ['mname', 'Testpowder%20Co'],
-      ['pname', 'TP%2010'],
-      ['lotid', 'L-77'],
-      ['k', '1.23'],
-      ['pc', '1600', 'kg/m3'],
-      ['pcd', '950', 'kg/m3'],
-      ['pt', '20', 'Cel'],
-      ['mc', '0.45', 'g'],
-      ['Ba', '0.9'],
-      ['eta', '1', 'cm3/kg'],
-    ],
-  }
+  const sections = o.sections ?? defaultSections
   const eol = o.eol ?? '\n'
   const body = Object.entries(sections).map(
     ([name, fields]) =>
@@ -85,7 +88,7 @@ function grtFile(o: {
 const ofKind = <K extends UserRecord['kind']>(records: UserRecord[], kind: K) =>
   defined(records.find((r): r is Extract<UserRecord, { kind: K }> => r.kind === kind))
 
-describe('readGrtLoad', () => {
+describe('readGrtLoad: the component records', () => {
   it('reads a load with its cartridge, bullet, maker and powder, each a valid user record', () => {
     const { records, unmapped, warnings } = readGrtLoad(grtFile({}), saved)
     for (const r of records) expect(userRecord.safeParse(r).success, r.kind).toBe(true)
@@ -99,7 +102,6 @@ describe('readGrtLoad', () => {
     const cartridge = ofKind(records, 'cartridge')
     const bullet = ofKind(records, 'bullet')
     const powder = ofKind(records, 'powder')
-    const load = ofKind(records, 'load')
     expect(cartridge.name).toBe('9.1 x 40 Testcal')
     expect(cartridge.data.overrides?.values).toEqual([
       { side: 'cartridge', symbol: 'L3', quantity: 'length', value: 40 },
@@ -118,12 +120,28 @@ describe('readGrtLoad', () => {
     })
     expect(powder.name).toBe('Testpowder Co TP 10')
     expect(powder.data.draft).toEqual({ bulkDensity: { value: 0.95 } })
+    expect(unmapped).toEqual([
+      'config.CurveFocusIdx',
+      'caliber.casevol',
+      'gun.xe',
+      'projectile.gTailType',
+      'propellant.Ba',
+      'propellant.eta',
+    ])
+    expect(warnings).toEqual([])
+  })
+})
+
+describe('readGrtLoad: the load', () => {
+  it('reads the load naming its components, with the charge, seating, note and analysis values', () => {
+    const { records } = readGrtLoad(grtFile({}), saved)
+    const load = ofKind(records, 'load')
     expect(load.name).toBe('Testcal load')
     expect(load.data).toEqual({
       origin: 'user',
-      cartridge: `user:${cartridge.id}`,
-      bullet: `user:${bullet.id}`,
-      powder: `user:${powder.id}`,
+      cartridge: `user:${ofKind(records, 'cartridge').id}`,
+      bullet: `user:${ofKind(records, 'bullet').id}`,
+      powder: `user:${ofKind(records, 'powder').id}`,
       powderLot: 'L-77',
       charge: { value: 0.45 },
       seating: { by: 'overallLength', value: { value: 58.2 } },
@@ -140,17 +158,10 @@ describe('readGrtLoad', () => {
         },
       },
     })
-    expect(unmapped).toEqual([
-      'config.CurveFocusIdx',
-      'caliber.casevol',
-      'gun.xe',
-      'projectile.gTailType',
-      'propellant.Ba',
-      'propellant.eta',
-    ])
-    expect(warnings).toEqual([])
   })
+})
 
+describe('readGrtLoad: fields, overflows and ids', () => {
   it('accounts for every field with a value: read, not read, or warned about', () => {
     const extra = [['odd', '1', 'furlong'] as Field]
     const text = grtFile({
@@ -193,7 +204,9 @@ describe('readGrtLoad', () => {
     expect(ofKind(b.records, 'powder').id).toBe(ofKind(a.records, 'powder').id)
     expect(ofKind(b.records, 'load').id).not.toBe(ofKind(a.records, 'load').id)
   })
+})
 
+describe('readGrtLoad: units', () => {
   it('converts each value from the unit its field declares', () => {
     const { records } = readGrtLoad(
       grtFile({
@@ -222,7 +235,9 @@ describe('readGrtLoad', () => {
     expect(load.data.analysis?.overrides?.propellantTemperature).toBe(20.5)
     expect(ofKind(records, 'powder').data.draft).toEqual({ bulkDensity: { value: 0.95 } })
   })
+})
 
+describe('readGrtLoad: line ends, warnings, names and refused files', () => {
   it('reads CRLF lines, a byte order mark and a large appendix; measurements and pictures are not read', () => {
     const picture = `<gallery title="p"><picture name="a.jpg" data="${'A'.repeat(80_000)}" /></gallery>`
     const measured =
@@ -260,6 +275,6 @@ describe('readGrtLoad', () => {
   it('refuses XML of another root, a file without load and text that is no XML', () => {
     expect(() => readGrtLoad('<other/>', saved)).toThrow('root element')
     expect(() => readGrtLoad('<GordonsReloadingTool/>', saved)).toThrow('no load')
-    expect(() => readGrtLoad('<GordonsReloadingTool>', saved)).toThrow()
+    expect(() => readGrtLoad('<GordonsReloadingTool>', saved)).toThrow('unclosed element')
   })
 })

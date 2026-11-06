@@ -36,7 +36,58 @@ const rows = [
   ['', 'c'],
 ]
 
-describe('readWorkbook on .xls', () => {
+/** One record of each cell type, and the texts the reader gives them. */
+const cellRecords = [
+  label(0, 0, ' Speed﻿ '),
+  label(0, 1, 'Δv'),
+  numberCell(0, 2, 2800.5),
+  rkCell(0, 3, rkInt(2800)),
+  rkCell(0, 4, rkInt(281230, true)),
+  rkCell(0, 5, rkInt(35, true)),
+  rkCell(0, 6, rkFloat(280050, true)),
+  rkCell(0, 7, rkInt(-12)),
+  mulRk(0, 8, [rkInt(1), rkInt(2), rkInt(3)]),
+  formula(0, 11, formulaNumber(0.5)),
+  formula(0, 12, formulaOther(1, 0)),
+  formula(0, 13, formulaOther(1, 1)),
+  formula(0, 14, formulaOther(2, 0x2a)),
+  formula(0, 15, formulaOther(3)),
+  formula(0, 16, formulaOther(0)),
+  record(0x0221, Buffer.alloc(14)),
+  stringRecord(0x0207, Buffer.alloc(0), ' ok '),
+  boolErr(0, 17, 1, false),
+  boolErr(0, 18, 0, false),
+  boolErr(0, 19, 0x07, true),
+  blank(0, 20),
+  mulBlank(0, 21, 2),
+]
+const cellRecordTexts = [
+  'Speed',
+  'Δv',
+  '2800.5',
+  '2800',
+  '2812.3',
+  '0.35',
+  '2800.5',
+  '-12',
+  '1',
+  '2',
+  '3',
+  '0.5',
+  '',
+  '1',
+  '#N/A',
+  '',
+  'ok',
+  '1',
+  '',
+  '#DIV/0!',
+  '',
+  '',
+  '',
+]
+
+describe('readWorkbook on .xls: the XLSX twin and sector layouts', () => {
   it('reads the same workbook and session as the XLSX twin', async () => {
     const fromXls = await readWorkbook(xls(sheets))
     const fromXlsx = await readWorkbook(xlsx(sheets))
@@ -76,7 +127,9 @@ describe('readWorkbook on .xls', () => {
     expect(far.readUInt32LE(0x48)).toBe(1)
     expect(await readWorkbook(new Uint8Array(far))).toEqual(expected)
   })
+})
 
+describe('readWorkbook on .xls: short sectors, empty texts and cell records', () => {
   it('reads a file whose last sector is short', async () => {
     // [MS-CFB] 2.3 asks the file to reach only the start of its last sector
     const big = [{ name: 'S', rows, records: [record(0x0000, Buffer.alloc(5000))] }]
@@ -105,60 +158,12 @@ describe('readWorkbook on .xls', () => {
   })
 
   it('reads each cell record', async () => {
-    const cells = [
-      label(0, 0, ' Speed﻿ '),
-      label(0, 1, 'Δv'),
-      numberCell(0, 2, 2800.5),
-      rkCell(0, 3, rkInt(2800)),
-      rkCell(0, 4, rkInt(281230, true)),
-      rkCell(0, 5, rkInt(35, true)),
-      rkCell(0, 6, rkFloat(280050, true)),
-      rkCell(0, 7, rkInt(-12)),
-      mulRk(0, 8, [rkInt(1), rkInt(2), rkInt(3)]),
-      formula(0, 11, formulaNumber(0.5)),
-      formula(0, 12, formulaOther(1, 0)),
-      formula(0, 13, formulaOther(1, 1)),
-      formula(0, 14, formulaOther(2, 0x2a)),
-      formula(0, 15, formulaOther(3)),
-      formula(0, 16, formulaOther(0)),
-      record(0x0221, Buffer.alloc(14)),
-      stringRecord(0x0207, Buffer.alloc(0), ' ok '),
-      boolErr(0, 17, 1, false),
-      boolErr(0, 18, 0, false),
-      boolErr(0, 19, 0x07, true),
-      blank(0, 20),
-      mulBlank(0, 21, 2),
-    ]
-    const r = await readWorkbook(xls([{ name: 'S', records: cells }]))
-    expect(r.worksheets[0]?.rows).toEqual([
-      [
-        'Speed',
-        'Δv',
-        '2800.5',
-        '2800',
-        '2812.3',
-        '0.35',
-        '2800.5',
-        '-12',
-        '1',
-        '2',
-        '3',
-        '0.5',
-        '',
-        '1',
-        '#N/A',
-        '',
-        'ok',
-        '1',
-        '',
-        '#DIV/0!',
-        '',
-        '',
-        '',
-      ],
-    ])
+    const r = await readWorkbook(xls([{ name: 'S', records: cellRecords }]))
+    expect(r.worksheets[0]?.rows).toEqual([cellRecordTexts])
   })
+})
 
+describe('readWorkbook on .xls: strings across Continue records', () => {
   it('reads strings across Continue records', async () => {
     const long = `${'a'.repeat(30)}Δ${'b'.repeat(10)}`
     const strings = [
@@ -193,7 +198,9 @@ describe('readWorkbook on .xls', () => {
     // the header's flag is 0, the Continue record's flag byte 1
     expect(r.worksheets[0]?.rows).toEqual([['\u0394bc']])
   })
+})
 
+describe('readWorkbook on .xls: charts and hidden worksheets', () => {
   it('leaves out embedded charts and chart sheets and reads hidden worksheets', async () => {
     const chart = [
       record(0x005d, Buffer.alloc(4)),
@@ -218,23 +225,31 @@ describe('readWorkbook on .xls', () => {
   })
 })
 
-describe('readWorkbook .xls refusals', () => {
-  const fail = (bytes: Uint8Array) => readWorkbook(bytes)
-  const one = [{ name: 'S', rows, records: [record(0, Buffer.alloc(5000))] }]
+const fail = (bytes: Uint8Array) => readWorkbook(bytes)
+const one = [{ name: 'S', rows, records: [record(0, Buffer.alloc(5000))] }]
+/** The one-worksheet file with `patch` applied to its bytes. */
+const patched = (patch: (file: Buffer, layout: Layout) => void) => xls(one, { patch })
+/** The first sector of the Workbook stream. */
+const start = (l: Layout) => l.starts[0] as number
+/** A file whose Workbook stream lies in the mini stream, with `patch` applied to its bytes. */
+const miniPatched = (patch: (file: Buffer, layout: Layout) => void) =>
+  xls([{ name: 'S', rows }], { patch })
+/** A file of one worksheet with `records`, read. */
+const readCells = (records: Buffer[], strings?: string[]) =>
+  fail(xls([{ name: 'S', records }], { strings }))
 
+describe('readWorkbook .xls refusals: compound files', () => {
   it('refuses malformed compound files', async () => {
     const short = new Uint8Array([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1, 0, 0])
     await expect(fail(short)).rejects.toThrow(
       'not an XLS workbook: the file is shorter than its 512-byte header',
     )
-    const patched = (patch: (file: Buffer, layout: Layout) => void) => xls(one, { patch })
     await expect(fail(patched((f) => f.writeUInt16LE(0xfeff, 0x1c)))).rejects.toThrow(
       'not an XLS workbook: byte order mark is not FFFE',
     )
     await expect(fail(patched((f) => f.writeUInt16LE(12, 0x1e)))).rejects.toThrow(
       'not an XLS workbook: version 3 with sector shift 12 is not read',
     )
-    const start = (l: Layout) => l.starts[0] as number
     await expect(
       fail(patched((f, l) => f.writeUInt32LE(start(l), l.fatEntry(start(l))))),
     ).rejects.toThrow(/not an XLS workbook: sector chain loops at sector \d+/)
@@ -253,11 +268,10 @@ describe('readWorkbook .xls refusals', () => {
       'not an XLS workbook: the Workbook stream holds 9437184 bytes; the limit is 8388608',
     )
   })
+})
 
+describe('readWorkbook .xls refusals: the mini stream, FAT and directory', () => {
   it('refuses a mini stream layout, FAT, directory or mini stream it cannot follow', async () => {
-    const patched = (patch: (file: Buffer, layout: Layout) => void) => xls(one, { patch })
-    const mini = (patch: (file: Buffer, layout: Layout) => void) =>
-      xls([{ name: 'S', rows }], { patch })
     await expect(fail(patched((f) => f.writeUInt16LE(7, 0x20)))).rejects.toThrow(
       'not an XLS workbook: mini stream layout is not the standard one',
     )
@@ -295,14 +309,16 @@ describe('readWorkbook .xls refusals', () => {
         }),
       ),
     ).rejects.toThrow('not an XLS workbook: the directory has no root entry')
-    await expect(fail(mini((f) => f.writeUInt32LE(0xffffffff, 0x3c)))).rejects.toThrow(
+    await expect(fail(miniPatched((f) => f.writeUInt32LE(0xffffffff, 0x3c)))).rejects.toThrow(
       'not an XLS workbook: the mini stream is missing',
     )
-    await expect(fail(mini((f, l) => f.writeUInt32LE(64, l.entry(0) + 0x78)))).rejects.toThrow(
-      /not an XLS workbook: mini sector \d+ lies outside the mini stream/,
-    )
+    await expect(
+      fail(miniPatched((f, l) => f.writeUInt32LE(64, l.entry(0) + 0x78))),
+    ).rejects.toThrow(/not an XLS workbook: mini sector \d+ lies outside the mini stream/)
   })
+})
 
+describe('readWorkbook .xls refusals: storages and short sectors', () => {
   it('refuses a storage named Workbook and an empty Workbook stream', async () => {
     const storage = xls(one, {
       patch: (f, l) => {
@@ -340,7 +356,9 @@ describe('readWorkbook .xls refusals', () => {
       `not an XLS workbook: the file ends before byte ${root + 128}`,
     )
   })
+})
 
+describe('readWorkbook .xls refusals: missing streams, encryption and BIFF5', () => {
   it('refuses a file without a Workbook stream, an encrypted file and BIFF5', async () => {
     const data = workbookStream([{ name: 'S', rows }])
     await expect(fail(compoundFile([{ name: 'Other', data }]))).rejects.toThrow(
@@ -354,7 +372,9 @@ describe('readWorkbook .xls refusals', () => {
       'only BIFF8 .xls workbooks (Excel 97 to 2003) are read; save the workbook as .xlsx or export CSV',
     )
   })
+})
 
+describe('readWorkbook .xls refusals: BIFF8 records', () => {
   it('refuses malformed BIFF8 records', async () => {
     await expect(fail(xls([{ name: 'S', rows }], { filePass: true }))).rejects.toThrow(
       'encrypted workbooks are not read; save the workbook without a password',
@@ -390,7 +410,9 @@ describe('readWorkbook .xls refusals', () => {
       ),
     ).rejects.toThrow('XLS sheet substreams overlap')
   })
+})
 
+describe('readWorkbook .xls refusals: nested worksheets and root entries', () => {
   it('refuses a worksheet that starts at a BOF nested in another worksheet', async () => {
     const chart = [record(0x005d, Buffer.alloc(4)), bof(0x0010), numberCell(0, 0, 1), record(EOF)]
     await expect(
@@ -415,38 +437,40 @@ describe('readWorkbook .xls refusals', () => {
       'not an XLS workbook: the root storage holds more than 65536 entries',
     )
   })
+})
 
+describe('readWorkbook .xls refusals: bad cells', () => {
   it('refuses bad cells as in XLSX', async () => {
-    const cells = (records: Buffer[], strings?: string[]) =>
-      fail(xls([{ name: 'S', records }], { strings }))
-    await expect(cells([labelSst(0, 0, 5)], ['a', 'b', 'c'])).rejects.toThrow(
+    await expect(readCells([labelSst(0, 0, 5)], ['a', 'b', 'c'])).rejects.toThrow(
       'XLS worksheet 1: cell A1 refers to shared string 5 of 3',
     )
-    await expect(cells([numberCell(0, 256, 1)])).rejects.toThrow(
+    await expect(readCells([numberCell(0, 256, 1)])).rejects.toThrow(
       'XLS worksheet 1: cell IW1 lies beyond column IV',
     )
-    await expect(cells([numberCell(0, 0, 1), numberCell(0, 0, 2)])).rejects.toThrow(
+    await expect(readCells([numberCell(0, 0, 1), numberCell(0, 0, 2)])).rejects.toThrow(
       'XLS worksheet 1: cell A1 is out of column order',
     )
-    await expect(cells([numberCell(0, 0, Number.POSITIVE_INFINITY)])).rejects.toThrow(
+    await expect(readCells([numberCell(0, 0, Number.POSITIVE_INFINITY)])).rejects.toThrow(
       'XLS worksheet 1: cell A1 holds a number that is not finite',
     )
-    await expect(cells([formula(0, 0, formulaOther(0)), numberCell(0, 1, 1)])).rejects.toThrow(
+    await expect(readCells([formula(0, 0, formulaOther(0)), numberCell(0, 1, 1)])).rejects.toThrow(
       'XLS worksheet 1: formula cell A1 has no String record',
     )
     const wrong = mulRk(0, 0, [rkInt(1), rkInt(2)])
     wrong.writeUInt16LE(5, wrong.length - 2)
-    await expect(cells([wrong])).rejects.toThrow(
+    await expect(readCells([wrong])).rejects.toThrow(
       /XLS record at byte \d+ does not hold the cells it names/,
     )
-    await expect(cells([mulRk(0, 0, [rkInt(1), 0x7ff00000])])).rejects.toThrow(
+    await expect(readCells([mulRk(0, 0, [rkInt(1), 0x7ff00000])])).rejects.toThrow(
       'XLS worksheet 1: cell B1 holds a number that is not finite',
     )
-    await expect(cells([boolErr(0, 0, 0x99, true)])).rejects.toThrow(
+    await expect(readCells([boolErr(0, 0, 0x99, true)])).rejects.toThrow(
       'XLS worksheet 1: cell A1 holds an unknown error code 153',
     )
   })
+})
 
+describe('readWorkbook .xls refusals: shared strings and cell counts', () => {
   it('refuses a shared string table shorter than its count', async () => {
     const book = workbookStream([{ name: 'S', records: [labelSst(0, 0, 0)] }], {
       strings: ['a', 'b'],

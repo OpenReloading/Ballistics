@@ -31,7 +31,7 @@ const crcTable = Array.from({ length: 256 }, (_, n) => {
 function crc32(bytes: Uint8Array): number {
   let crc = 0xffffffff
   for (const b of bytes) {
-    // the index is a byte of a 256-entry table
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the index is a byte of a 256-entry table
     crc = (crcTable[(crc ^ b) & 0xff] as number) ^ (crc >>> 8)
   }
   return (crc ^ 0xffffffff) >>> 0

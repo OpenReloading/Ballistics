@@ -152,33 +152,25 @@ export const truingRow: z.ZodDiscriminatedUnion<
   'kind'
 > = truingRowParser satisfies Exact<typeof truingRow, typeof truingRowParser>
 
-/** A value of a truing parameter in the stored unit of its kind. */
-const parameterValue = {
-  muzzleVelocity: () => quantity('velocity'),
-  dragFactor: () => z.number().meta({ unit: '1' }),
-  clickValue: () => quantity('angle'),
-  zeroOffset: () => quantity('angle'),
-}
-
 /**
  * The schema of the truing parameter `name` N of {@link truing}: its fit status and reasons, and its value
- * with the confidence interval when identified, a quantity or a number.
+ * with the confidence interval when identified, each of the schema V.
  */
-export type TruingParameterSchema<N extends string> = z.ZodObject<{
+export type TruingParameterSchema<N extends string, V extends z.ZodType> = z.ZodObject<{
   name: z.ZodLiteral<N>
   status: z.ZodEnum<z.core.util.ToEnum<'identified' | 'weak' | 'unresolved'>>
   reasons: z.ZodArray<
     z.ZodEnum<z.core.util.ToEnum<'no-information' | 'collinear' | 'imprecise' | 'fit-failed'>>
   >
-  value: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
-  lower: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
-  upper: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
+  value: z.ZodOptional<V>
+  lower: z.ZodOptional<V>
+  upper: z.ZodOptional<V>
   confidenceLevel: z.ZodOptional<z.ZodNumber>
 }>
 
-const truingParameter = <N extends keyof typeof parameterValue>(name: N) => {
-  const value = parameterValue[name]
-  return z.object({
+/** The schema of the truing parameter `name`, with `value` making each value schema in the stored unit of its kind. */
+const truingParameter = <N extends string, V extends z.ZodType>(name: N, value: () => V) =>
+  z.object({
     name: z.literal(name).describe('Which parameter.'),
     status: z
       .enum(['identified', 'weak', 'unresolved'])
@@ -198,7 +190,6 @@ const truingParameter = <N extends keyof typeof parameterValue>(name: N) => {
       .describe('Level of the interval, a fraction.')
       .optional(),
   })
-}
 
 const truingParser = z.object({
   date: z.iso.date().describe('Date the result was stored, ISO 8601.'),
@@ -229,10 +220,10 @@ const truingParser = z.object({
   parameters: z
     .array(
       z.discriminatedUnion('name', [
-        truingParameter('muzzleVelocity'),
-        truingParameter('dragFactor'),
-        truingParameter('clickValue'),
-        truingParameter('zeroOffset'),
+        truingParameter('muzzleVelocity', () => quantity('velocity')),
+        truingParameter('dragFactor', () => z.number().meta({ unit: '1' })),
+        truingParameter('clickValue', () => quantity('angle')),
+        truingParameter('zeroOffset', () => quantity('angle')),
       ]),
     )
     .max(4)
@@ -268,10 +259,10 @@ export const truing: z.ZodObject<{
   parameters: z.ZodArray<
     z.ZodDiscriminatedUnion<
       [
-        TruingParameterSchema<'muzzleVelocity'>,
-        TruingParameterSchema<'dragFactor'>,
-        TruingParameterSchema<'clickValue'>,
-        TruingParameterSchema<'zeroOffset'>,
+        TruingParameterSchema<'muzzleVelocity', QuantitySchema>,
+        TruingParameterSchema<'dragFactor', z.ZodNumber>,
+        TruingParameterSchema<'clickValue', QuantitySchema>,
+        TruingParameterSchema<'zeroOffset', QuantitySchema>,
       ],
       'name'
     >

@@ -20,9 +20,18 @@ function book(replace: Record<string, string | Uint8Array | null>, extra: Part[]
     .map((p) => (replace[p.name] === undefined ? p : { ...p, data: replace[p.name] as string }))
   return zip([...parts, ...extra])
 }
+/** Workbook relationships with one worksheet at `target`. */
+const worksheetRels = (target: string) =>
+  `<Relationships><Relationship Id="rId1" Type="${rel}/worksheet" Target="${target}"/></Relationships>`
+/** A part of elements `<a/>` under `root` as large as a part may be. */
+const filler = (root: string) => {
+  const open = `<${root} xmlns="${main}">`
+  const close = `</${root}>`
+  return `${open}${'<a/>'.repeat((maxPartSize - open.length - close.length) / 4)}${close}`
+}
 const sst = (items: string) => `<sst xmlns="${main}">${items}</sst>`
 
-describe('readWorkbook cells', () => {
+describe('readWorkbook cells: references, cell types and prefixes', () => {
   it('places cells by reference and after the previous cell', async () => {
     const xml = ws(
       '<row r="3"><c r="A3"><v>1</v></c><c r="B3"><v>2800.0</v></c><c r="H3" t="inlineStr"><is><t>x</t></is></c></row>' +
@@ -55,7 +64,9 @@ describe('readWorkbook cells', () => {
     const xml = `<x:worksheet xmlns:x="${main}"><x:sheetData><x:row><x:c r="A1"><x:v>1</x:v></x:c></x:row></x:sheetData></x:worksheet>`
     expect((await readWorkbook(book({ [sheet]: xml }))).worksheets[0]?.rows).toEqual([['1']])
   })
+})
 
+describe('readWorkbook cells: refused cells', () => {
   it('refuses a shared string out of range, a column beyond IV and cells out of order', async () => {
     const strings = sst('<si><t>a</t></si><si><t>b</t></si><si><t>c</t></si>')
     await expect(
@@ -89,7 +100,7 @@ describe('readWorkbook cells', () => {
   })
 })
 
-describe('readWorkbook parts', () => {
+describe('readWorkbook parts: inline strings and relationships', () => {
   it('reads inline strings without a shared strings part', async () => {
     const rels = `<Relationships><Relationship Id="rId1" Type="${rel}/worksheet" Target="worksheets/sheet1.xml"/></Relationships>`
     const r = await readWorkbook(
@@ -118,15 +129,15 @@ describe('readWorkbook parts', () => {
     ]
     expect(await readWorkbook(zip(parts))).toEqual({ worksheets: [{ name: 'B', rows: [['7']] }] })
   })
+})
 
+describe('readWorkbook parts: refused parts', () => {
   it('refuses a missing worksheet part and a target outside the package', async () => {
-    const rels = (target: string) =>
-      `<Relationships><Relationship Id="rId1" Type="${rel}/worksheet" Target="${target}"/></Relationships>`
     await expect(
-      readWorkbook(book({ 'xl/_rels/workbook.xml.rels': rels('worksheets/sheet2.xml') })),
+      readWorkbook(book({ 'xl/_rels/workbook.xml.rels': worksheetRels('worksheets/sheet2.xml') })),
     ).rejects.toThrow('XLSX part xl/worksheets/sheet2.xml is missing')
     await expect(
-      readWorkbook(book({ 'xl/_rels/workbook.xml.rels': rels('../../x.xml') })),
+      readWorkbook(book({ 'xl/_rels/workbook.xml.rels': worksheetRels('../../x.xml') })),
     ).rejects.toThrow('relationship target ../../x.xml leaves the package')
   })
 
@@ -172,11 +183,6 @@ describe('readWorkbook limits', slow, () => {
 
   it('counts the elements of all XML parts and stops at the limit', async () => {
     // '<a/>' compresses to almost nothing; two full parts hold more elements than the limit
-    const filler = (root: string) => {
-      const open = `<${root} xmlns="${main}">`
-      const close = `</${root}>`
-      return `${open}${'<a/>'.repeat((maxPartSize - open.length - close.length) / 4)}${close}`
-    }
     const strings = filler('sst')
     const xml = filler('worksheet')
     expect(2 * ((maxPartSize - 100) / 4)).toBeGreaterThan(maxElements)
@@ -209,12 +215,10 @@ function mulberry32(seed: number) {
   }
 }
 
-/** A worksheet and a shared strings part with the constructs both readers must agree on. */
-function generated(random: () => number) {
+/** The pieces of the generated parts, drawn from `random`, element names with the prefix `p`. */
+function pieces(random: () => number, p: string) {
   const pick = <T>(items: T[]) => defined(items[Math.floor(random() * items.length)], 'pick')
-  const p = random() < 0.3 ? 'x:' : ''
-  const ns = p ? `xmlns:x="${main}"` : `xmlns="${main}"`
-  const ws = () => pick(['', '', ' ', '\n  ', '<!-- c -->', '<?p q?>'])
+  const space = () => pick(['', '', ' ', '\n  ', '<!-- c -->', '<?p q?>'])
   const text = () =>
     Array.from({ length: Math.floor(random() * 4) }, () =>
       pick([
@@ -241,32 +245,39 @@ function generated(random: () => number) {
     Array.from({ length: 1 + Math.floor(random() * 3) }, () =>
       pick([
         t(),
-        `<${p}r><${p}rPr/>${t()}${ws()}${t()}</${p}r>`,
+        `<${p}r><${p}rPr/>${t()}${space()}${t()}</${p}r>`,
         `<${p}rPh sb="0"><${p}t>zz</${p}t></${p}rPh>`,
-        ws(),
+        space(),
         text().replaceAll('<', ''),
         `<${p}v>9</${p}v>`,
       ]),
     ).join('')
-  const count = 1 + Math.floor(random() * 6)
-  const si = Array.from({ length: count }, () => `<${p}si>${rich()}</${p}si>`)
-  const sst = `<${p}sst ${ns}>${ws()}${si.join(ws())}<${p}t>stray</${p}t><${p}x><${p}si><${p}t>deep</${p}t></${p}si></${p}x></${p}sst>`
+  return { pick, space, text, t, rich }
+}
+
+/** The rows of a generated worksheet; a shared string cell refers to one of `count` strings. */
+function generatedRows(
+  random: () => number,
+  p: string,
+  count: number,
+  { pick, space, text, t, rich }: ReturnType<typeof pieces>,
+): string[] {
   const cell = (ref: string) => {
     const r = ref ? ` r="${ref}"` : ''
     const v = (body: string) => `<${p}v>${body}</${p}v>`
     return pick([
       `<${p}c${r}/>`,
       `<${p}c${r} t="s">${v(String(Math.floor(random() * count)))}</${p}c>`,
-      `<${p}c${r} t="s">${ws()}${v(` ${Math.floor(random() * count)} `)}${ws()}</${p}c>`,
-      `<${p}c${r} t="inlineStr"><${p}is>${rich()}</${p}is>${ws()}<${p}is>${t()}</${p}is></${p}c>`,
+      `<${p}c${r} t="s">${space()}${v(` ${Math.floor(random() * count)} `)}${space()}</${p}c>`,
+      `<${p}c${r} t="inlineStr"><${p}is>${rich()}</${p}is>${space()}<${p}is>${t()}</${p}is></${p}c>`,
       `<${p}c${r} t="inlineStr">${v('7')}</${p}c>`,
       `<${p}c${r} t="b">${v(pick(['0', '1', ' 0 ']))}</${p}c>`,
       `<${p}c${r}>${v(text())}${v('second')}</${p}c>`,
-      `<${p}c${r}>${ws()}<${p}t>no</${p}t>${v(`${text()}<${p}x>9</${p}x>${text()}`)}</${p}c>`,
+      `<${p}c${r}>${space()}<${p}t>no</${p}t>${v(`${text()}<${p}x>9</${p}x>${text()}`)}</${p}c>`,
       `<${p}c${r} t="str"><${p}f>A1</${p}f>${v(text())}</${p}c>`,
     ])
   }
-  const rows = Array.from({ length: Math.floor(random() * 8) }, (_, k) => {
+  return Array.from({ length: Math.floor(random() * 8) }, (_, k) => {
     let column = 0
     const cells: string[] = []
     for (let n = Math.floor(random() * 6); n > 0; n--) {
@@ -275,18 +286,29 @@ function generated(random: () => number) {
       cells.push(cell(withRef ? `${letters(column)}${k + 1}` : ''))
       if (random() < 0.1)
         cells.push(`<${p}extLst><${p}c><${p}v>nested</${p}v></${p}c></${p}extLst>`)
-      cells.push(ws())
+      cells.push(space())
     }
-    return `<${p}row r="${k + 1}">${ws()}${cells.join('')}</${p}row>`
+    return `<${p}row r="${k + 1}">${space()}${cells.join('')}</${p}row>`
   })
+}
+
+/** A worksheet and a shared strings part with the constructs both readers must agree on. */
+function generated(random: () => number) {
+  const p = random() < 0.3 ? 'x:' : ''
+  const ns = p ? `xmlns:x="${main}"` : `xmlns="${main}"`
+  const g = pieces(random, p)
+  const count = 1 + Math.floor(random() * 6)
+  const si = Array.from({ length: count }, () => `<${p}si>${g.rich()}</${p}si>`)
+  const sstXml = `<${p}sst ${ns}>${g.space()}${si.join(g.space())}<${p}t>stray</${p}t><${p}x><${p}si><${p}t>deep</${p}t></${p}si></${p}x></${p}sst>`
+  const rows = generatedRows(random, p, count, g)
   const extra =
     random() < 0.3 ? `<${p}g><${p}row><${p}c><${p}v>deep</${p}v></${p}c></${p}row></${p}g>` : ''
   const second =
     random() < 0.3
       ? `<${p}sheetData><${p}row><${p}c><${p}v>2nd</${p}v></${p}c></${p}row></${p}sheetData>`
       : ''
-  const sheetXml = `<?xml version="1.0" encoding="UTF-8"?>\n<${p}worksheet ${ns}>${ws()}<${p}dimension ref="A1"/><${p}sheetData>${extra}${rows.join(ws())}</${p}sheetData>${second}${ws()}</${p}worksheet>`
-  return { sheetXml, sst }
+  const sheetXml = `<?xml version="1.0" encoding="UTF-8"?>\n<${p}worksheet ${ns}>${g.space()}<${p}dimension ref="A1"/><${p}sheetData>${extra}${rows.join(g.space())}</${p}sheetData>${second}${g.space()}</${p}worksheet>`
+  return { sheetXml, sst: sstXml }
 }
 
 /** Column letters for a column number from 1. */
