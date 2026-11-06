@@ -5,7 +5,7 @@
  */
 import { fromSi, toSi } from '@open-reloading/units'
 import { type Point, solveLinear } from './geometry.ts'
-import type { RingFitIssue } from './issue.ts'
+import type { Diagnostic, RingFitIssue } from './issue.ts'
 import { nth } from './nth.ts'
 
 /** A length of a face record in its stored unit, mm. */
@@ -28,7 +28,7 @@ export interface FaceEvent {
   readonly scoring?: 'touch' | 'centre' | 'outward' | undefined
 }
 
-/** A scoring centre of a sheet with several, from the sheet centre (x right, y up). */
+/** A scoring center of a sheet with several, from the sheet center (x right, y up). */
 export interface FaceBull {
   readonly x: FaceLength
   readonly y: FaceLength
@@ -226,11 +226,11 @@ export type RingFit = { centre: Point; scale: number; rmsMisfit: number }
 export function fitRings(marks: readonly RingMarks[]): RingFit | { issue: RingFitIssue } {
   const all = marks.flatMap((m) => m.points.map((p) => ({ p, r: m.diameter / 2 })))
   if (new Set(marks.filter((m) => m.points.length).map((m) => m.diameter)).size < 2)
-    return { issue: { code: 'two-rings' } }
-  if (all.length < 4) return { issue: { code: 'four-points' } }
+    return { issue: { code: 'two-rings', params: {} } }
+  if (all.length < 4) return { issue: { code: 'four-points', params: {} } }
   const norm = normaliseMarks(all)
   const fit = norm.sp > 0 && norm.sr > 0 ? solveCircleFit(all, norm) : undefined
-  if (!fit) return { issue: { code: 'degenerate-points' } }
+  if (!fit) return { issue: { code: 'degenerate-points', params: {} } }
   const { centre, scale } = fit
   const misfit = all.reduce(
     (s, { p, r }) => s + (Math.hypot(p.x - centre.x, p.y - centre.y) - scale * r) ** 2,
@@ -306,9 +306,9 @@ export function faceAlignment(
   aim: Point | undefined,
 ): FaceAlignment | { issue: RingFitIssue } {
   if (!marks?.length) return { centre: aim ?? { x: 0, y: 0 }, scale: 1 }
-  if (face.bulls) return { issue: { code: 'one-bull' } }
+  if (face.bulls) return { issue: { code: 'one-bull', params: {} } }
   if (face.rings.some((r) => r.height || r.shape === 'square'))
-    return { issue: { code: 'circular-rings' } }
+    return { issue: { code: 'circular-rings', params: {} } }
   const byRing = marksByRing(face, marks)
   if ('issue' in byRing) return byRing
   const fit = fitRings(byRing)
@@ -326,7 +326,7 @@ function marksByRing(
   const byRing: RingMarks[] = []
   for (const [value, points] of rings) {
     const ring = face.rings.find((r) => r.value === value)
-    if (!ring) return { issue: { code: 'no-ring', value } }
+    if (!ring) return { issue: { code: 'no-ring', params: { value } } }
     byRing.push({ diameter: ring.diameter.value, points })
   }
   return byRing
@@ -354,7 +354,7 @@ export function usesOwnTenthRule(face: ScoringFace, hole: number): boolean {
 }
 
 /** Why a group cannot be scored on its face: no hole size, or ring marks that do not fit. */
-export type GroupIssue = { code: 'hole-size' } | { code: 'ring-marks'; fit: RingFitIssue }
+export type GroupIssue = Diagnostic<'hole-size'> | Diagnostic<'ring-marks', { fit: RingFitIssue }>
 
 /** A group scored on its face: where the face lies, the scored hole and the scores. */
 export type FaceGroupScore = {
@@ -387,9 +387,10 @@ export function scoreGroupOnFace(
   const event = face.events.find((e) => e.id === choice.event)
   const hole = scoredHoleDiameter(event, bullet, choice.gauge)
   if (hole === undefined || (!hole && event?.scoring !== 'centre'))
-    return { issue: { code: 'hole-size' } }
+    return { issue: { code: 'hole-size', params: {} } }
   const alignment = faceAlignment(face, choice.marks, group.aim)
-  if ('issue' in alignment) return { issue: { code: 'ring-marks', fit: alignment.issue } }
+  if ('issue' in alignment)
+    return { issue: { code: 'ring-marks', params: { fit: alignment.issue } } }
   const outward = event?.scoring === 'outward'
   const shots = group.shots.map((s) => scoreShot(face, onFace(alignment, s), hole, outward))
   const counted = scoreGroup(

@@ -181,7 +181,7 @@ describe('scoreShot on a stadium face, with the hole', () => {
 
   it('refuses ring marks like any non-circular face', () => {
     expect(faceAlignment(stadium, [{ ring: 9, x: 0.05, y: 0 }], undefined)).toEqual({
-      issue: { code: 'circular-rings' },
+      issue: { code: 'circular-rings', params: {} },
     })
   })
 })
@@ -318,23 +318,29 @@ describe('faceAlignment', () => {
       { value: 10, w: 10 },
     ]
     const bulls = faceOf(rings, { bulls: [{ x: mmq(0), y: mmq(0) }] })
-    expect(faceAlignment(bulls, marks, undefined)).toEqual({ issue: { code: 'one-bull' } })
+    expect(faceAlignment(bulls, marks, undefined)).toEqual({
+      issue: { code: 'one-bull', params: {} },
+    })
     const oval = faceOf([
       { value: 9, w: 20, h: 14 },
       { value: 10, w: 10, h: 6 },
     ])
-    expect(faceAlignment(oval, marks, undefined)).toEqual({ issue: { code: 'circular-rings' } })
+    expect(faceAlignment(oval, marks, undefined)).toEqual({
+      issue: { code: 'circular-rings', params: {} },
+    })
     const outerOval = faceOf([
       { value: 9, w: 20, h: 14 },
       { value: 10, w: 10 },
     ])
     expect(faceAlignment(outerOval, marks, undefined)).toEqual({
-      issue: { code: 'circular-rings' },
+      issue: { code: 'circular-rings', params: {} },
     })
     const square = faceOf([
       { value: 9, w: 20, shape: 'square' },
       { value: 10, w: 10, shape: 'square' },
     ])
-    expect(faceAlignment(square, marks, undefined)).toEqual({ issue: { code: 'circular-rings' } })
+    expect(faceAlignment(square, marks, undefined)).toEqual({
+      issue: { code: 'circular-rings', params: {} },
+    })
   })
 })

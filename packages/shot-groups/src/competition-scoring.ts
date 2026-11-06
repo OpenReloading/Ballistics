@@ -47,7 +47,7 @@ export interface StageScore {
 }
 
 const count = (n: number) => {
-  if (!Number.isInteger(n) || n < 0) throw new ShotGroupsError({ code: 'count' })
+  if (!Number.isInteger(n) || n < 0) throw new ShotGroupsError({ code: 'count', params: {} })
   return n
 }
 
@@ -72,7 +72,8 @@ export function stageRawPoints(stage: PracticalStage, rules: HitFactorRules): nu
 
 /** Points over time: the hit factor, 1/s. The time must be positive. */
 export function hitFactor(points: number, time: number): number {
-  if (!(time > 0) || !Number.isFinite(time)) throw new ShotGroupsError({ code: 'stage-time' })
+  if (!(time > 0) || !Number.isFinite(time))
+    throw new ShotGroupsError({ code: 'stage-time', params: {} })
   return points / time
 }
 
@@ -80,7 +81,7 @@ export function hitFactor(points: number, time: number): number {
 export function stagePoints(stage: PracticalStage, rules: HitFactorRules): StageScore {
   const typed = stage.stagePoints
   if (typed !== undefined && (!(typed >= 0) || !Number.isFinite(typed)))
-    throw new ShotGroupsError({ code: 'stage-points' })
+    throw new ShotGroupsError({ code: 'stage-points', params: {} })
   const points = stageRawPoints(stage, rules)
   return {
     points,
@@ -99,13 +100,14 @@ export interface RingSeries {
 export function ringTotal(series: RingSeries): number {
   if (series.shots?.length) {
     for (const s of series.shots)
-      if (!(s >= 0) || !Number.isFinite(s)) throw new ShotGroupsError({ code: 'ring-value' })
+      if (!(s >= 0) || !Number.isFinite(s))
+        throw new ShotGroupsError({ code: 'ring-value', params: {} })
     // sum in tenths, so 10.4 + 10.2 is 20.6 and not 20.599999
     return series.shots.reduce((sum, s) => sum + Math.round(s * 10), 0) / 10
   }
-  if (series.total === undefined) throw new ShotGroupsError({ code: 'series-total' })
+  if (series.total === undefined) throw new ShotGroupsError({ code: 'series-total', params: {} })
   if (!(series.total >= 0) || !Number.isFinite(series.total))
-    throw new ShotGroupsError({ code: 'ring-value' })
+    throw new ShotGroupsError({ code: 'ring-value', params: {} })
   return series.total
 }
 

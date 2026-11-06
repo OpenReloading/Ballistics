@@ -47,7 +47,8 @@ export type Calibration = {
 
 /** The matrix of 9 row-major entries; throws for any other count. */
 export function toMatrix(v: readonly number[]): Mat3 {
-  if (v.length !== 9) throw new ShotGroupsError({ code: 'matrix-size', entries: v.length })
+  if (v.length !== 9)
+    throw new ShotGroupsError({ code: 'matrix-size', params: { entries: v.length } })
   return [
     nth(v, 0),
     nth(v, 1),
@@ -143,7 +144,7 @@ export function applyMatrix(m: Matrix, p: Point): Point {
 /** Inverse of `m`; throws when it is singular. */
 export function invertMatrix(m: Matrix): Matrix {
   const inverse = inv3(m)
-  if (!inverse) throw new ShotGroupsError({ code: 'singular-matrix' })
+  if (!inverse) throw new ShotGroupsError({ code: 'singular-matrix', params: {} })
   return inverse
 }
 
@@ -159,7 +160,7 @@ function normalizing(points: readonly Point[]): Matrix {
 /** Solves a x = b in place by Gaussian elimination with partial pivoting; throws when a pivot vanishes. */
 export function solve(a: number[][], b: number[]): number[] {
   const x = solveLinear(a, b)
-  if (!x) throw new ShotGroupsError({ code: 'degenerate-points' })
+  if (!x) throw new ShotGroupsError({ code: 'degenerate-points', params: {} })
   return x
 }
 
@@ -202,7 +203,8 @@ function backSubstitute(a: number[][], b: number[]): number[] {
  * chapter 4). Throws when three points of either set lie on one line.
  */
 export function solveHomography(from: readonly Point[], to: readonly Point[]): Matrix {
-  if (from.length !== 4 || to.length !== 4) throw new ShotGroupsError({ code: 'four-point-pairs' })
+  if (from.length !== 4 || to.length !== 4)
+    throw new ShotGroupsError({ code: 'four-point-pairs', params: {} })
   const t1 = normalizing(from)
   const t2 = normalizing(to)
   const ps = from.map((p) => applyMatrix(t1, p))
@@ -213,7 +215,7 @@ export function solveHomography(from: readonly Point[], to: readonly Point[]): M
       const [a, b, c] = [nth(rest, 0), nth(rest, 1), nth(rest, 2)]
       // normalized points lie about 1 from their centroid, so an absolute bound fits
       if (Math.abs((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)) < 1e-9)
-        throw new ShotGroupsError({ code: 'collinear-points' })
+        throw new ShotGroupsError({ code: 'collinear-points', params: {} })
     }
   const a: number[][] = []
   const b: number[] = []
@@ -242,7 +244,7 @@ export function circleThrough(a: Point, b: Point, c: Point): { centre: Point; ra
   const [bx, by, cx, cy] = [b.x - a.x, b.y - a.y, c.x - a.x, c.y - a.y]
   const d = 2 * (bx * cy - by * cx)
   if (Math.abs(d) <= 1e-12 * (bx * bx + by * by + cx * cx + cy * cy))
-    throw new ShotGroupsError({ code: 'collinear-points' })
+    throw new ShotGroupsError({ code: 'collinear-points', params: {} })
   const b2 = bx * bx + by * by
   const c2 = cx * cx + cy * cy
   const ux = (cy * b2 - by * c2) / d
@@ -272,7 +274,7 @@ function lengths(r: Reference, m: (p: Point) => Point): [number, number] {
 function factor(r: Reference, base: Matrix): number {
   const [known, measured] = lengths(r, (p) => applyMatrix(base, p))
   if (!(known > 0) || !(measured > 0) || !Number.isFinite(known / measured))
-    throw new ShotGroupsError({ code: 'reference-length', reference: r.kind })
+    throw new ShotGroupsError({ code: 'reference-length', params: { reference: r.kind } })
   return known / measured
 }
 
@@ -287,9 +289,9 @@ export function calibrate(
   rotation: number,
   origin: Point,
 ): Calibration {
-  if (!references.length) throw new ShotGroupsError({ code: 'reference-needed' })
+  if (!references.length) throw new ShotGroupsError({ code: 'reference-needed', params: {} })
   const rects = references.filter((r) => r.kind === 'rectangle')
-  if (rects.length > 1) throw new ShotGroupsError({ code: 'one-rectangle' })
+  if (rects.length > 1) throw new ShotGroupsError({ code: 'one-rectangle', params: {} })
   const rect = rects[0]
   const base = rect
     ? solveHomography(rect.corners, rectangleCorners(rect.width, rect.height))

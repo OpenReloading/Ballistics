@@ -429,7 +429,7 @@ export function concentricPlane(
 ): { toPlane: Mat3; centre: Point; ratio: number } | undefined {
   const [n1, n2] = [normaliseConic(conicMatrix(c1)), normaliseConic(conicMatrix(c2))]
   if (!n1 || !n2) return undefined
-  const pencil = pencilCentre(n1, n2)
+  const pencil = pencilCenter(n1, n2)
   if (!pencil) return undefined
   const toPlane = planeMap(n1, pencil.v)
   if (!toPlane) return undefined
@@ -442,10 +442,10 @@ export function concentricPlane(
 }
 
 /**
- * The image `v` of the common centre of the pencil of `n1` and `n2`, and its single and double
+ * The image `v` of the common center of the pencil of `n1` and `n2`, and its single and double
  * eigenvalues; undefined when the pair is degenerate or the radii are too alike.
  */
-function pencilCentre(
+function pencilCenter(
   n1: Mat3,
   n2: Mat3,
 ): { v: Vector3; single: number; double: number } | undefined {

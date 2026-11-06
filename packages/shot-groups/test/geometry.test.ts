@@ -52,7 +52,7 @@ describe('3 x 3 matrices', () => {
   it('takes 9 entries only', () => {
     expect(issueOf(() => toMatrix([1, 2, 3, 4, 5, 6, 7, 8]))).toEqual({
       code: 'matrix-size',
-      entries: 8,
+      params: { entries: 8 },
     })
   })
 
@@ -71,9 +71,12 @@ describe('3 x 3 matrices', () => {
     expect(inv3([Number.POSITIVE_INFINITY, 0, 0, 0, 1, 0, 0, 0, 1])).toBeUndefined()
     expect(issueOf(() => invertMatrix([1, 2, 3, 2, 4, 6, 0, 0, 1]))).toEqual({
       code: 'singular-matrix',
+      params: {},
     })
   })
+})
 
+describe('linear systems', () => {
   it('solves a linear system and refuses a singular one', () => {
     const x = solve(
       [
@@ -96,7 +99,7 @@ describe('3 x 3 matrices', () => {
           [1, 2],
         ),
       ),
-    ).toEqual({ code: 'degenerate-points' })
+    ).toEqual({ code: 'degenerate-points', params: {} })
   })
 })
 
@@ -147,6 +150,7 @@ describe('solveHomography', () => {
     ]
     expect(issueOf(() => solveHomography(line, rectangleCorners(1, 1)))).toEqual({
       code: 'collinear-points',
+      params: {},
     })
     const lastThree = [
       { x: 0, y: 300 },
@@ -156,6 +160,7 @@ describe('solveHomography', () => {
     ]
     expect(issueOf(() => solveHomography(lastThree, rectangleCorners(1, 1)))).toEqual({
       code: 'collinear-points',
+      params: {},
     })
   })
 
@@ -163,9 +168,11 @@ describe('solveHomography', () => {
     const four = rectangleCorners(1, 1)
     expect(issueOf(() => solveHomography(four.slice(0, 3), four))).toEqual({
       code: 'four-point-pairs',
+      params: {},
     })
     expect(issueOf(() => solveHomography(four, [...four, { x: 2, y: 2 }]))).toEqual({
       code: 'four-point-pairs',
+      params: {},
     })
   })
 })
@@ -182,11 +189,12 @@ describe('circleThrough', () => {
   it('refuses collinear points', () => {
     expect(issueOf(() => circleThrough({ x: 0, y: 0 }, { x: 1, y: 1 }, { x: 2, y: 2 }))).toEqual({
       code: 'collinear-points',
+      params: {},
     })
     // off the line by 2.25e-6 at 2e6: within 1e-12 of the squared spans (5e12), so on it
     expect(
       issueOf(() => circleThrough({ x: 0, y: 0 }, { x: 1e6, y: 1 }, { x: 2e6, y: 2 + 2.25e-6 })),
-    ).toEqual({ code: 'collinear-points' })
+    ).toEqual({ code: 'collinear-points', params: {} })
     expect(() =>
       circleThrough({ x: 0, y: 0 }, { x: 1e6, y: 1 }, { x: 2e6, y: 2 + 1e-5 }),
     ).not.toThrow()
@@ -264,16 +272,22 @@ describe('calibrate on a rectangle', () => {
 
   it('allows one rectangle and refuses lengths of zero', () => {
     const rect: Reference = { kind: 'rectangle', corners, ...sheet }
-    expect(issueOf(() => calibrate([rect, rect], 0, origin))).toEqual({ code: 'one-rectangle' })
+    expect(issueOf(() => calibrate([rect, rect], 0, origin))).toEqual({
+      code: 'one-rectangle',
+      params: {},
+    })
     expect(issueOf(() => calibrate([{ ...line, b: line.a }], 0, origin))).toEqual({
       code: 'reference-length',
-      reference: 'line',
+      params: { reference: 'line' },
     })
     expect(issueOf(() => calibrate([{ ...line, length: 0 }], 0, origin))).toEqual({
       code: 'reference-length',
-      reference: 'line',
+      params: { reference: 'line' },
     })
-    expect(issueOf(() => calibrate([], 0, origin))).toEqual({ code: 'reference-needed' })
+    expect(issueOf(() => calibrate([], 0, origin))).toEqual({
+      code: 'reference-needed',
+      params: {},
+    })
   })
 })
 

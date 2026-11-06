@@ -92,7 +92,7 @@ describe('concentricPlane on special pairs', () => {
     expect(concentricPlane(unitCircle, [0, 0, 1, 1, 0, -1.25])).toBeUndefined()
   })
 
-  it('refuses a pair whose common centre lies at infinity', () => {
+  it('refuses a pair whose common center lies at infinity', () => {
     expect(concentricPlane([1, 0, -1, 0, 0, 1], [4, 0, -1, 0, 0, 1])).toBeUndefined()
   })
 
@@ -104,7 +104,7 @@ describe('concentricPlane on special pairs', () => {
     expect(concentricPlane(negated, circle(0, 0, 0.4))).toEqual(plane)
   })
 
-  it('finds the centre of circles off the origin and of ellipses turned by 45 degrees', () => {
+  it('finds the center of circles off the origin and of ellipses turned by 45 degrees', () => {
     const off = concentricPlane(circle(2, 0, 1), circle(2, 0, 0.4))
     expect(off?.centre.x).toBeCloseTo(2, 12)
     expect(off?.centre.y).toBeCloseTo(0, 12)
@@ -113,8 +113,8 @@ describe('concentricPlane on special pairs', () => {
   })
 })
 
-describe('concentricPlane about centres all round the origin', () => {
-  it('finds each centre', () => {
+describe('concentricPlane about centers all around the origin', () => {
+  it('finds each center', () => {
     for (const [x, y] of [
       [3, 0],
       [0, 3],

@@ -45,6 +45,12 @@ export function conicOf(input: Ellipse): Conic;
 export const det3: (m: Matrix) => number;
 
 // @public
+export type Diagnostic<C extends string, P extends object = Record<string, never>> = {
+    code: C;
+    params: P;
+};
+
+// @public
 export type Ellipse = {
     centreX: number;
     centreY: number;
@@ -190,39 +196,22 @@ export function fitRings(marks: readonly RingMarks[]): RingFit | {
 };
 
 // @public
-export type GeometryIssue = {
-    code: 'matrix-size';
+export type GeometryIssue = Diagnostic<'matrix-size', {
     entries: number;
-} | {
-    code: 'singular-matrix';
-}
+}> | Diagnostic<'singular-matrix'>
 /** The points give no unique solution: a linear system without a pivot, a circle fit without a radius. */
-| {
-    code: 'degenerate-points';
-} | {
-    code: 'four-point-pairs';
-}
+| Diagnostic<'degenerate-points'> | Diagnostic<'four-point-pairs'>
 /** Three points of a homography or a circle lie on one line. */
-| {
-    code: 'collinear-points';
-}
+| Diagnostic<'collinear-points'>
 /** A scale reference without a length above 0 on the photo and on the target. */
-| {
-    code: 'reference-length';
+| Diagnostic<'reference-length', {
     reference: 'line' | 'ringCentre' | 'ringEdge' | 'rectangle';
-} | {
-    code: 'reference-needed';
-} | {
-    code: 'one-rectangle';
-};
+}> | Diagnostic<'reference-needed'> | Diagnostic<'one-rectangle'>;
 
 // @public
-export type GroupIssue = {
-    code: 'hole-size';
-} | {
-    code: 'ring-marks';
+export type GroupIssue = Diagnostic<'hole-size'> | Diagnostic<'ring-marks', {
     fit: RingFitIssue;
-};
+}>;
 
 // @public
 export type GroupScore = {
@@ -364,22 +353,11 @@ export type RingFit = {
 };
 
 // @public
-export type RingFitIssue = {
-    code: 'two-rings';
-} | {
-    code: 'four-points';
-} | {
-    code: 'degenerate-points';
-} | {
-    code: 'one-bull';
-} | {
-    code: 'circular-rings';
-}
+export type RingFitIssue = Diagnostic<'two-rings'> | Diagnostic<'four-points'> | Diagnostic<'degenerate-points'> | Diagnostic<'one-bull'> | Diagnostic<'circular-rings'>
 /** A mark names a ring value the face does not have. */
-| {
-    code: 'no-ring';
+| Diagnostic<'no-ring', {
     value: number;
-};
+}>;
 
 // @public
 export type RingMarks = {
@@ -473,25 +451,15 @@ export interface ScoringFace {
 // @public
 export type ScoringIssue =
 /** A hit, miss or penalty count that is not a whole number of 0 or more. */
-    {
-    code: 'count';
-} | {
-    code: 'stage-time';
-} | {
-    code: 'stage-points';
-} | {
-    code: 'ring-value';
-}
+Diagnostic<'count'> | Diagnostic<'stage-time'> | Diagnostic<'stage-points'> | Diagnostic<'ring-value'>
 /** A series with neither its shots nor its total. */
-| {
-    code: 'series-total';
-};
+| Diagnostic<'series-total'>;
 
 // @public
 export function seededRandom(seed: number): () => number;
 
 // @public
-export class ShotGroupsError extends Error {
+export class ShotGroupsError extends RangeError {
     constructor(issue: Issue);
     // (undocumented)
     readonly issue: Issue;

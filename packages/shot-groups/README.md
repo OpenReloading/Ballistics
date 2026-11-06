@@ -9,7 +9,7 @@ ringTotal({ shots: [10.4, 10.2] }) // 20.6
 try {
   ringTotal({})
 } catch (e) {
-  if (e instanceof ShotGroupsError) e.issue // { code: 'series-total' }
+  if (e instanceof ShotGroupsError) e.issue // { code: 'series-total', params: {} }
 }
 ```
 

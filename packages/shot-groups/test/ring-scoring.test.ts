@@ -86,7 +86,7 @@ describe('scoreShot', () => {
 })
 
 describe('scoreShot under the rules of an event', () => {
-  it('counts the hole centre only for a centre-scored event, and gauges outward', () => {
+  it('counts the hole center only for a center-scored event, and gauges outward', () => {
     expect(scoredHoleDiameter({ id: 'black-powder', scoring: 'centre' }, 7 * mm)).toBe(0)
     // on the 9 ring line (13.2 mm) with a 5.6 mm hole: 9 by touch; outward its far edge at 16 mm
     // lies beyond the 9 ring, so 8
@@ -186,12 +186,14 @@ describe('fitRings', () => {
 
 describe('fitRings refusals', () => {
   it('refuses marks on one ring or fewer than four points', () => {
-    expect(fitRings([ringMarks(5.5, [0, 90, 180, 270])])).toEqual({ issue: { code: 'two-rings' } })
+    expect(fitRings([ringMarks(5.5, [0, 90, 180, 270])])).toEqual({
+      issue: { code: 'two-rings', params: {} },
+    })
     expect(fitRings([ringMarks(5.5, [0, 90]), ringMarks(25.5, [45])])).toEqual({
-      issue: { code: 'four-points' },
+      issue: { code: 'four-points', params: {} },
     })
     expect(fitRings([ringMarks(5.5, [0, 90, 180, 270]), { diameter: 25.5, points: [] }])).toEqual({
-      issue: { code: 'two-rings' },
+      issue: { code: 'two-rings', params: {} },
     })
   })
 
@@ -204,7 +206,7 @@ describe('fitRings refusals', () => {
 
   it('refuses marks on one line', () => {
     expect(fitRings([line(10, [0, 1]), line(20, [2, 3])])).toEqual({
-      issue: { code: 'degenerate-points' },
+      issue: { code: 'degenerate-points', params: {} },
     })
   })
 
@@ -215,13 +217,13 @@ describe('fitRings refusals', () => {
         { diameter: 10, points: [spot, spot] },
         { diameter: 20, points: [spot, spot] },
       ]),
-    ).toEqual({ issue: { code: 'degenerate-points' } })
+    ).toEqual({ issue: { code: 'degenerate-points', params: {} } })
     // the 15.5 mm ring marked where the 35.5 mm ring is, and the other way round
     const swapped = [
       { diameter: 35.5, points: ringMarks(15.5, [0, 90, 180, 270]).points },
       { diameter: 15.5, points: ringMarks(35.5, [45, 135, 225, 315]).points },
     ]
-    expect(fitRings(swapped)).toEqual({ issue: { code: 'degenerate-points' } })
+    expect(fitRings(swapped)).toEqual({ issue: { code: 'degenerate-points', params: {} } })
   })
 })
 
@@ -278,7 +280,7 @@ describe('faceAlignment by ring marks, and ringPath', () => {
     expect(a.scale).toBeCloseTo(scale, 10)
     expect(a.rms).toBeLessThan(1e-12)
     expect(faceAlignment(rifle50, [{ ring: 11, x: 0, y: 0 }, ...marks], undefined)).toEqual({
-      issue: { code: 'no-ring', value: 11 },
+      issue: { code: 'no-ring', params: { value: 11 } },
     })
   })
 
@@ -339,13 +341,13 @@ describe('scoreGroupOnFace', () => {
   it('takes the bullet diameter without an event and follows a moved shot', () => {
     const f = { id: rifle50.id }
     expect(scoreGroupOnFace(rifle50, f, group, undefined)).toEqual({
-      issue: { code: 'hole-size' },
+      issue: { code: 'hole-size', params: {} },
     })
     const s = scoreGroupOnFace(rifle50, f, group, 7.82e-3)
     if ('issue' in s) throw new Error(s.issue.code)
     expect(s.hole).toBe(7.82e-3)
     expect(scoreGroupOnFace(rifle50, f, group, 0)).toEqual({
-      issue: { code: 'hole-size' },
+      issue: { code: 'hole-size', params: {} },
     })
     const moved = scoreGroupOnFace(
       rifle50,
@@ -360,7 +362,7 @@ describe('scoreGroupOnFace', () => {
   it('says so when the marks do not fit', () => {
     const marks = [0, 1, 2, 3].map((i) => ({ ring: 8 + (i % 2), x: 0, y: 0 }))
     expect(scoreGroupOnFace(rifle50, { id: rifle50.id, marks }, group, 5e-3)).toEqual({
-      issue: { code: 'ring-marks', fit: { code: 'degenerate-points' } },
+      issue: { code: 'ring-marks', params: { fit: { code: 'degenerate-points', params: {} } } },
     })
   })
 })

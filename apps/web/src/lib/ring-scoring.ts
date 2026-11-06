@@ -36,14 +36,15 @@ const fitWords = {
 } satisfies Record<RingFitIssue['code'], Message>
 
 /** Why ring marks do not fit, in the language shown. */
-const fitText = (issue: RingFitIssue, t: Translator['t']) =>
-  t(fitWords[issue.code], issue.code === 'no-ring' ? { value: issue.value } : undefined)
+const fitText = (issue: RingFitIssue, t: Translator['t']) => t(fitWords[issue.code], issue.params)
 
 /** Why a group cannot be scored on its face, in the language shown. */
 const groupText = (issue: GroupIssue, t: Translator['t']) =>
   issue.code === 'hole-size'
     ? t('No hole size: set Marker, or choose a discipline or event with a gauge.')
-    : t('The ring marks do not fit: {reason}. Mark them again.', { reason: fitText(issue.fit, t) })
+    : t('The ring marks do not fit: {reason}. Mark them again.', {
+        reason: fitText(issue.params.fit, t),
+      })
 
 /** The face fitted to marks on its rings (`faceAlignment` of shot-groups); throws why they do not fit. */
 export function faceAlignment(

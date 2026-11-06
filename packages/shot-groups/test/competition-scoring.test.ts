@@ -109,20 +109,30 @@ describe('Sportordnung des DSB, Stand 01.01.2027', () => {
 
 describe('input checks', () => {
   it('refuses a time that is not positive, a negative count and a series without values', () => {
-    expect(issueOf(() => hitFactor(10, 0))).toEqual({ code: 'stage-time' })
-    expect(issueOf(() => stageRawPoints(stage({ misses: -1 }), ipsc))).toEqual({ code: 'count' })
+    expect(issueOf(() => hitFactor(10, 0))).toEqual({ code: 'stage-time', params: {} })
+    expect(issueOf(() => stageRawPoints(stage({ misses: -1 }), ipsc))).toEqual({
+      code: 'count',
+      params: {},
+    })
     expect(issueOf(() => stageRawPoints(stage({ hits: { A: 1.5, C: 0, D: 0 } }), ipsc))).toEqual({
       code: 'count',
+      params: {},
     })
-    expect(issueOf(() => ringTotal({}))).toEqual({ code: 'series-total' })
-    expect(issueOf(() => ringTotal({ shots: [-1] }))).toEqual({ code: 'ring-value' })
-    expect(issueOf(() => ringTotal({ total: -5 }))).toEqual({ code: 'ring-value' })
-    expect(issueOf(() => ringTotal({ total: Number.NaN }))).toEqual({ code: 'ring-value' })
+    expect(issueOf(() => ringTotal({}))).toEqual({ code: 'series-total', params: {} })
+    expect(issueOf(() => ringTotal({ shots: [-1] }))).toEqual({ code: 'ring-value', params: {} })
+    expect(issueOf(() => ringTotal({ total: -5 }))).toEqual({ code: 'ring-value', params: {} })
+    expect(issueOf(() => ringTotal({ total: Number.NaN }))).toEqual({
+      code: 'ring-value',
+      params: {},
+    })
     const typedStage = { ...(event[0] as PracticalStage), stagePoints: -1 }
-    expect(issueOf(() => stagePoints(typedStage, ipsc))).toEqual({ code: 'stage-points' })
+    expect(issueOf(() => stagePoints(typedStage, ipsc))).toEqual({
+      code: 'stage-points',
+      params: {},
+    })
     expect(
       issueOf(() => stagePoints({ ...typedStage, stagePoints: Number.POSITIVE_INFINITY }, ipsc)),
-    ).toEqual({ code: 'stage-points' })
+    ).toEqual({ code: 'stage-points', params: {} })
   })
 })
 
