@@ -232,7 +232,9 @@ describe('powder fit over sessions', () => {
       }),
     ).toThrow(InputError)
   })
+})
 
+describe('powder fit over sessions, conditions of the points', () => {
   it('keeps the barrel length and temperature a point states itself', () => {
     const list = sessions(lengths, [294.15], 1)
     // session lengths wrong, point lengths right: the points win
@@ -247,6 +249,23 @@ describe('powder fit over sessions', () => {
     expect(nth(r.parameters, 1).value).toBe(nth(lengthFit.parameters, 1).value)
   })
 
+  it('keeps the temperature a point states itself over its session', () => {
+    const list = sessions([0.6], temperatures, 1)
+    // one session labelled at the reference temperature, its points at their own
+    const mislabelled = [
+      {
+        propellantTemperature: 294.15,
+        ladder: points(list),
+      },
+    ]
+    const parameters = ['burnRate', 'temperatureFactor'] as const
+    const r = fitPowderSessions(start, mislabelled, { parameters })
+    expect(r.resolved).toEqual(parameters)
+    expect(nth(r.parameters, 1).value).toBe(nth(temperatureFit.parameters, 1).value)
+  })
+})
+
+describe('powder fit over sessions, holding parameters', () => {
   it('holds the temperature factor that one hot temperature leaves ill-conditioned', () => {
     const list = sessions([0.6], [313.15], 1)
     const r = fitPowderSessions(start, list, { parameters: ['burnRate', 'temperatureFactor'] })
@@ -272,21 +291,6 @@ describe('powder fit over sessions', () => {
     expect(r.resolved).toEqual(['burnRate'])
   })
 
-  it('keeps the temperature a point states itself over its session', () => {
-    const list = sessions([0.6], temperatures, 1)
-    // one session labelled at the reference temperature, its points at their own
-    const mislabelled = [
-      {
-        propellantTemperature: 294.15,
-        ladder: points(list),
-      },
-    ]
-    const parameters = ['burnRate', 'temperatureFactor'] as const
-    const r = fitPowderSessions(start, mislabelled, { parameters })
-    expect(r.resolved).toEqual(parameters)
-    expect(nth(r.parameters, 1).value).toBe(nth(temperatureFit.parameters, 1).value)
-  })
-
   it('holds the last open parameter when the sessions have fewer points than parameters', () => {
     const [one] = sessions([0.6], [294.15])
     const ladder = (one?.ladder ?? []).slice(0, 1)
@@ -304,7 +308,20 @@ describe('powder fit over sessions', () => {
     expect(r.resolved).toEqual(['burnRate', 'energy'])
     expect(r.held).toEqual([{ name: 'temperatureFactor', reason: 'ill-conditioned' }])
   })
+})
 
+/** `session` with a pressure on `pressureBasis` at every point. */
+const onBasis = (session: PowderSession | undefined, pressureBasis: 'piezo' | 'crusher') => ({
+  ...session,
+  ladder: (session?.ladder ?? []).map((x) => ({
+    ...x,
+    peakPressure: 3e8,
+    pressureSigma: 1e7,
+    pressureBasis,
+  })),
+})
+
+describe('powder fit over sessions, defaults and refusals', () => {
   it('runs a session without a temperature at the temperature of the load', () => {
     const list = sessions(lengths, [294.15]).map(({ propellantTemperature: _, ...s }) => s)
     const parameters = ['burnRate', 'energy'] as const
@@ -328,15 +345,6 @@ describe('powder fit over sessions', () => {
 
   it('refuses pressures on different bases in different sessions', () => {
     const [a, b] = sessions([0.6], [294.15, 313.15])
-    const onBasis = (session: PowderSession | undefined, pressureBasis: 'piezo' | 'crusher') => ({
-      ...session,
-      ladder: (session?.ladder ?? []).map((x) => ({
-        ...x,
-        peakPressure: 3e8,
-        pressureSigma: 1e7,
-        pressureBasis,
-      })),
-    })
     expect(() => fitPowderSessions(start, [onBasis(a, 'piezo'), onBasis(b, 'crusher')])).toThrow(
       MixedPressureBasisError,
     )

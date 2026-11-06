@@ -45,7 +45,9 @@ describe('string ladder', () => {
   it('refuses a string without a shot', () => {
     expect(() => stringLadder([{ charge: 2.8e-3, velocities: [] }])).toThrow(InputError)
   })
+})
 
+describe('string ladder fits', () => {
   it('keeps the truth inside the 2 sigma interval in at least 90 % of 200 noisy 5-charge ladders', () => {
     const charges = [2.6e-3, 2.7e-3, 2.8e-3, 2.9e-3, 3e-3]
     const truth = charges.map((charge) => {
@@ -57,13 +59,13 @@ describe('string ladder', () => {
     let inside = 0
     for (let seed = 1; seed <= seeds; seed++) {
       const noise = normals(seed)
-      const strings = charges.map((charge, i) => ({
+      const noisy = charges.map((charge, i) => ({
         charge,
         velocities: Array.from({ length: 5 }, () => nth(truth, i) + 4 * noise()),
       }))
       // the fit reads only muzzle velocity and peak pressure, which the 10 times coarser curve
       // spacing (also the largest step) moves by less than 1e-6 m/s here, at a sixth of the run time
-      const fit = fitPowder(load(0.38), stringLadder(strings), { options: { outputStep: 2e-5 } })
+      const fit = fitPowder(load(0.38), stringLadder(noisy), { options: { outputStep: 2e-5 } })
       const b = nth(fit.parameters, 0)
       if (Math.abs(b.value - 0.45) <= 2 * (b.standardUncertainty ?? 0)) inside++
     }

@@ -9,7 +9,6 @@ import {
   PowderFitError,
   type PowderParameter,
   type PressureBasis,
-  powderDomainMargin,
   predictPowder,
 } from '../src/index.ts'
 import { load } from './powder-load.ts'
@@ -53,6 +52,20 @@ const velocityFit = fitPowder(load(0.38), ladder(load(), 3, 0))
 /** Both parameters from a noisy ladder with pressures, shared by the tests that read it. */
 const noisy = fitPowder(load(0.38, 20e6), ladder(load(), 3, 5e6, 1), { parameters: both })
 
+/** The rifle load with a spherical grain of burn rate `coefficient`. */
+const sphere = (coefficient: number): InteriorLoad => ({
+  ...load(),
+  propellant: {
+    ...load().propellant,
+    burn: {
+      kind: 'geometric',
+      coefficient,
+      exponent: 0.9,
+      grain: { shape: 'sphere', diameter: 4e-4 },
+    },
+  },
+})
+
 describe('powder fit round trips', () => {
   it('fits the burn coefficient alone by default and keeps the start pressure', () => {
     const r = velocityFit
@@ -83,18 +96,6 @@ describe('powder fit round trips', () => {
   })
 
   it('moves the coefficient of a geometric law', () => {
-    const sphere = (coefficient: number): InteriorLoad => ({
-      ...load(),
-      propellant: {
-        ...load().propellant,
-        burn: {
-          kind: 'geometric',
-          coefficient,
-          exponent: 0.9,
-          grain: { shape: 'sphere', diameter: 4e-4 },
-        },
-      },
-    })
     const r = fitPowder(sphere(4e-9), ladder(sphere(5e-9), 3, 0))
     expect(rel(nth(r.parameters, 0).value, 5e-9)).toBeLessThan(1e-6)
     expect(r.load.propellant.burn).toEqual({
@@ -136,7 +137,9 @@ describe('powder fit uncertainty', () => {
     expect(rel(nth(r.parameters, 0).value, 0.45)).toBeLessThan(1e-6)
     expect(rel(nth(r.parameters, 1).value, 30e6)).toBeLessThan(1e-6)
   })
+})
 
+describe('powder fit uncertainty at the floor and without sigmas', () => {
   it('reports a start pressure driven to the floor as unresolved', () => {
     // from here the steps carry p_st into the flat region at the floor, where it has no effect
     const e = failure(() =>
@@ -173,10 +176,11 @@ describe('powder fit uncertainty', () => {
   })
 })
 
-describe('powder fit pressure basis', () => {
-  const withBases = (bases: PressureBasis[]) =>
-    ladder(load(), 3, 10e6).map((x, i) => ({ ...x, pressureBasis: nth(bases, i) }))
+/** The ladder with pressures, point `i` on `bases[i]`. */
+const withBases = (bases: PressureBasis[]) =>
+  ladder(load(), 3, 10e6).map((x, i) => ({ ...x, pressureBasis: nth(bases, i) }))
 
+describe('powder fit pressure basis', () => {
   it('reports the pressure rows of the one basis, none without pressures', () => {
     expect(fitPowder(load(0.38), ladder(load(), 3, 10e6)).pressureRows).toEqual({ transducer: 5 })
     expect(velocityFit.pressureRows).toEqual({})
@@ -247,7 +251,9 @@ describe('powder fit result', () => {
     })
     expect(r.load.charge).toBe(0.0028)
   })
+})
 
+describe('powder fit result without an accepted step', () => {
   it('predicts at the fitted values when no step is accepted', () => {
     // start at the truth; floor + (p - floor) rounds to the next double above p
     const truth = { ...load(0.45, 41000001.48), ignitionPressure: 5000000.0548 }
@@ -275,14 +281,45 @@ describe('powder fit result', () => {
   })
 })
 
-describe('powder fit failures', () => {
-  const points = ladder(load(), 3, 0)
+const exactPoints = ladder(load(), 3, 0)
 
+/** The shortest maxTime, s, at which the slowest charge of a load of `vivacity` runs. */
+const runTimeLimit = (vivacity: number) => {
+  let lo = 1e-3
+  let hi = 3e-3
+  for (let i = 0; i < 50; i++) {
+    const mid = (lo + hi) / 2
+    if (interior({ ...load(vivacity), charge: 2.6e-3 }, { maxTime: mid }).valid) hi = mid
+    else lo = mid
+  }
+  return hi
+}
+
+/** Whether `f` throws an `InputError` other than a `PowderFitError`: a refusal before any run. */
+const refusedBeforeRun = (f: () => unknown) => {
+  try {
+    f()
+  } catch (e) {
+    return e instanceof InputError && !(e instanceof PowderFitError)
+  }
+  return false
+}
+
+/** The load at start pressure 8 MPa with `resistance`. */
+const resisted = (resistance: InteriorLoad['resistance']) => ({
+  ...load(0.45, 8e6),
+  resistance,
+})
+
+describe('powder fit failures', () => {
   it('reports ill-conditioned ladders', () => {
     const same = failure(() =>
       fitPowder(
         load(0.38, 20e6),
-        [nth(points, 2), { ...nth(points, 2), muzzleVelocity: nth(points, 2).muzzleVelocity + 3 }],
+        [
+          nth(exactPoints, 2),
+          { ...nth(exactPoints, 2), muzzleVelocity: nth(exactPoints, 2).muzzleVelocity + 3 },
+        ],
         {
           parameters: both,
         },
@@ -300,49 +337,41 @@ describe('powder fit failures', () => {
     expect(Math.abs(d0 + d1)).toBeLessThan(1e-6)
     expect(same.estimate).toHaveLength(2)
     const tight = failure(() =>
-      fitPowder(load(0.38, 20e6), points, { parameters: both, maxCondition: 10 }),
+      fitPowder(load(0.38, 20e6), exactPoints, { parameters: both, maxCondition: 10 }),
     )
     expect(tight.reason).toBe('ill-conditioned')
   })
 
   it('reports each failure reason', () => {
     const broken = { ...load(), chamber: { ...load().chamber, volume: -1 } }
-    const under = failure(() => fitPowder(broken, [nth(points, 0)], { parameters: both }))
+    const under = failure(() => fitPowder(broken, [nth(exactPoints, 0)], { parameters: both }))
     expect(under.reason).toBe('underdetermined')
     expect(under.message).toBe('powder fit: underdetermined')
     expect(under).toBeInstanceOf(InputError)
 
     // covolume times 3.5 g exceeds the 3.4 cm3 chamber
     const big = failure(() =>
-      fitPowder(load(0.38), [...points, { ...nth(points, 4), charge: 3.5e-3 }]),
+      fitPowder(load(0.38), [...exactPoints, { ...nth(exactPoints, 4), charge: 3.5e-3 }]),
     )
     expect(big.reason).toBe('invalid')
     expect(big.charge).toBe(3.5e-3)
     expect(big.result?.reason).toBe('chamberVolume')
 
-    const stuck = failure(() => fitPowder(load(0.2), points, { maxIterations: 1 }))
+    const stuck = failure(() => fitPowder(load(0.2), exactPoints, { maxIterations: 1 }))
     expect(stuck.reason).toBe('not-converged')
     expect(stuck.estimate).toHaveLength(1)
 
-    const slow = failure(() => fitPowder(load(0.38), points, { options: { maxTime: 1e-5 } }))
+    const slow = failure(() => fitPowder(load(0.38), exactPoints, { options: { maxTime: 1e-5 } }))
     expect(slow.reason).toBe('invalid')
     expect(slow.result?.reason).toBe('maxTime')
   })
+})
 
+describe('powder fit failures of runs and inputs', () => {
   it('reports an invalid run inside a Jacobian with its charge and result', () => {
     // maxTime between the barrel times at 0.38 1/s and at the Jacobian's down-step, slowest charge
-    const limit = (vivacity: number) => {
-      let lo = 1e-3
-      let hi = 3e-3
-      for (let i = 0; i < 50; i++) {
-        const mid = (lo + hi) / 2
-        if (interior({ ...load(vivacity), charge: 2.6e-3 }, { maxTime: mid }).valid) hi = mid
-        else lo = mid
-      }
-      return hi
-    }
-    const maxTime = (limit(0.38) + limit(0.38 * Math.exp(-1e-3))) / 2
-    const e = failure(() => fitPowder(load(0.38), points, { options: { maxTime } }))
+    const maxTime = (runTimeLimit(0.38) + runTimeLimit(0.38 * Math.exp(-1e-3))) / 2
+    const e = failure(() => fitPowder(load(0.38), exactPoints, { options: { maxTime } }))
     expect(e.reason).toBe('invalid')
     expect(e.charge).toBe(2.6e-3)
     expect(e.result?.reason).toBe('maxTime')
@@ -350,60 +379,55 @@ describe('powder fit failures', () => {
   })
 
   it('rejects malformed inputs before any run', () => {
-    const plain = (f: () => unknown) => {
-      expect(f).toThrow(InputError)
-      try {
-        f()
-      } catch (e) {
-        expect(e).not.toBeInstanceOf(PowderFitError)
-      }
-    }
-    const p = nth(points, 0)
+    const p = nth(exactPoints, 0)
     const { velocitySigma: _, ...bare } = p
-    plain(() => fitPowder(load(), []))
-    plain(() => fitPowder(load(), [{ ...p, charge: -1 }]))
-    plain(() => fitPowder(load(), [{ ...p, muzzleVelocity: Number.NaN }]))
-    plain(() => fitPowder(load(), [{ ...p, velocitySigma: 0 }]))
-    plain(() => fitPowder(load(), [p, bare]))
-    plain(() => fitPowder(load(), [{ ...p, peakPressure: 3e8 }]))
-    plain(() => fitPowder(load(), [{ ...p, pressureSigma: 1e7 }]))
-    plain(() => fitPowder(load(), [{ ...bare, peakPressure: 3e8, pressureSigma: 1e7 }]))
-    plain(() => fitPowder(load(), [{ ...p, peakPressure: -3e8, pressureSigma: 1e7 }]))
-    plain(() => fitPowder(load(), points, { parameters: [] }))
-    // @ts-expect-error an unknown parameter name
-    plain(() => fitPowder(load(), points, { parameters: ['exponent'] }))
-    plain(() => fitPowder(load(), points, { parameters: ['burnRate', 'burnRate'] }))
-    plain(() => fitPowder(load(), points, { maxIterations: 1.5 }))
-    plain(() => fitPowder(load(), points, { maxCondition: 0 }))
-    // start pressure below the floor max(p_i, p_f + p_e(0)): ignition, friction, engraving at travel 0
-    plain(() => fitPowder(load(0.45, 4e6), points, { parameters: both }))
-    const resisted = (resistance: InteriorLoad['resistance']) => ({
-      ...load(0.45, 8e6),
-      resistance,
-    })
-    plain(() => fitPowder(resisted({ friction: 10e6 }), points, { parameters: both }))
-    plain(() =>
-      fitPowder(resisted({ engraving: [{ travel: 0, pressure: 10e6 }] }), points, {
-        parameters: both,
-      }),
-    )
+    const refusals = [
+      () => fitPowder(load(), []),
+      () => fitPowder(load(), [{ ...p, charge: -1 }]),
+      () => fitPowder(load(), [{ ...p, muzzleVelocity: Number.NaN }]),
+      () => fitPowder(load(), [{ ...p, velocitySigma: 0 }]),
+      () => fitPowder(load(), [p, bare]),
+      () => fitPowder(load(), [{ ...p, peakPressure: 3e8 }]),
+      () => fitPowder(load(), [{ ...p, pressureSigma: 1e7 }]),
+      () => fitPowder(load(), [{ ...bare, peakPressure: 3e8, pressureSigma: 1e7 }]),
+      () => fitPowder(load(), [{ ...p, peakPressure: -3e8, pressureSigma: 1e7 }]),
+      () => fitPowder(load(), exactPoints, { parameters: [] }),
+      // @ts-expect-error an unknown parameter name
+      () => fitPowder(load(), exactPoints, { parameters: ['exponent'] }),
+      () => fitPowder(load(), exactPoints, { parameters: ['burnRate', 'burnRate'] }),
+      () => fitPowder(load(), exactPoints, { maxIterations: 1.5 }),
+      () => fitPowder(load(), exactPoints, { maxCondition: 0 }),
+      // start pressure below the floor max(p_i, p_f + p_e(0)): ignition, friction, engraving at travel 0
+      () => fitPowder(load(0.45, 4e6), exactPoints, { parameters: both }),
+      () => fitPowder(resisted({ friction: 10e6 }), exactPoints, { parameters: both }),
+      () =>
+        fitPowder(resisted({ engraving: [{ travel: 0, pressure: 10e6 }] }), exactPoints, {
+          parameters: both,
+        }),
+    ]
+    expect(refusals.map(refusedBeforeRun)).toEqual(refusals.map(() => true))
   })
 })
+
+// 0.005 g apart: the velocities barely separate the two parameters
+const narrowTruth = ladder(load(), 3, 0)
+  .slice(1, 3)
+  .map((x, i) => ({ ...x, charge: 2.8e-3 + i * 5e-6 }))
+  .map((x) => {
+    const r = interior({ ...load(), charge: x.charge })
+    if (!r.valid) throw new Error(r.reason)
+    return { ...x, muzzleVelocity: r.muzzleVelocity }
+  })
+
+/** The log error of the fitted burn coefficient against the truth of 0.45. */
+const burnError = (r: { parameters: { value: number }[] }) =>
+  Math.abs(Math.log(nth(r.parameters, 0).value / 0.45))
 
 describe('powder fit prior and robust loss', () => {
   const priors = {
     burnRate: { value: 0.45, sigma: 0.3 },
     startPressure: { value: 30e6, sigma: 0.5 },
   }
-  // 0.005 g apart: the velocities barely separate the two parameters
-  const narrow = ladder(load(), 3, 0)
-    .slice(1, 3)
-    .map((x, i) => ({ ...x, charge: 2.8e-3 + i * 5e-6 }))
-  const narrowTruth = narrow.map((x) => {
-    const r = interior({ ...load(), charge: x.charge })
-    if (!r.valid) throw new Error(r.reason)
-    return { ...x, muzzleVelocity: r.muzzleVelocity }
-  })
 
   it('fits a two-charge velocity ladder with a prior and reports its uncertainty', () => {
     const e = failure(() => fitPowder(load(0.38, 20e6), narrowTruth, { parameters: both }))
@@ -445,33 +469,33 @@ describe('powder fit prior and robust loss', () => {
       Math.abs(Math.log(nth(none.parameters, 0).value / 0.3)),
     )
   })
+})
 
-  describe('with a string 5 sigma off', () => {
-    const bad = ladder(load(), 3, 0).map((x, i) =>
-      i === 2 ? { ...x, muzzleVelocity: x.muzzleVelocity + 15 } : x,
-    )
-    const plain = fitPowder(load(0.38), bad)
-    const robust = fitPowder(load(0.38), bad, { huberThreshold: 1.5 })
+describe('powder fit prior and robust loss with a string 5 sigma off', () => {
+  const bad = ladder(load(), 3, 0).map((x, i) =>
+    i === 2 ? { ...x, muzzleVelocity: x.muzzleVelocity + 15 } : x,
+  )
+  const plain = fitPowder(load(0.38), bad)
+  const robust = fitPowder(load(0.38), bad, { huberThreshold: 1.5 })
 
-    it('limits the pull of a string 5 sigma off with the Huber loss', () => {
-      const error = (r: { parameters: { value: number }[] }) =>
-        Math.abs(Math.log(nth(r.parameters, 0).value / 0.45))
-      expect(error(robust)).toBeLessThan(error(plain))
-      expect(robust.loss).toBeLessThan(robust.chiSquare)
-      expect(robust.dataChiSquare).toBeGreaterThanOrEqual(plain.dataChiSquare)
-      // a threshold above every residual is the quadratic loss
-      const loose = fitPowder(load(0.38), bad, { huberThreshold: 100 })
-      expect(nth(loose.parameters, 0).value).toBe(nth(plain.parameters, 0).value)
-    })
-
-    it('reports the stop rule and whether the down-weighted rows settled', () => {
-      expect(robust.weightsSettled).toBe(true)
-      expect(['stalled', 'smallStep']).toContain(robust.stop)
-      // without a Huber loss no row is down-weighted
-      expect(plain.weightsSettled).toBe(true)
-    })
+  it('limits the pull of a string 5 sigma off with the Huber loss', () => {
+    expect(burnError(robust)).toBeLessThan(burnError(plain))
+    expect(robust.loss).toBeLessThan(robust.chiSquare)
+    expect(robust.dataChiSquare).toBeGreaterThanOrEqual(plain.dataChiSquare)
+    // a threshold above every residual is the quadratic loss
+    const loose = fitPowder(load(0.38), bad, { huberThreshold: 100 })
+    expect(nth(loose.parameters, 0).value).toBe(nth(plain.parameters, 0).value)
   })
 
+  it('reports the stop rule and whether the down-weighted rows settled', () => {
+    expect(robust.weightsSettled).toBe(true)
+    expect(['stalled', 'smallStep']).toContain(robust.stop)
+    // without a Huber loss no row is down-weighted
+    expect(plain.weightsSettled).toBe(true)
+  })
+})
+
+describe('powder fit prior refusals', () => {
   it('rejects malformed priors and a Huber loss without sigmas', () => {
     const points = ladder(load(), 3, 0)
     const bare = points.map(({ velocitySigma: _, ...x }) => x)
@@ -499,18 +523,37 @@ describe('powder fit prior and robust loss', () => {
   })
 })
 
-describe('powder fit prediction bands', () => {
-  const truth = load()
-  const fit = fitPowder(load(0.4), ladder(truth, 3, 2e6, 1), { parameters: [...both] })
+const bandTruth = load()
+/** Both parameters from a noisy ladder of the true load, shared by the prediction tests. */
+const bandFit = fitPowder(load(0.4), ladder(bandTruth, 3, 2e6, 1), { parameters: [...both] })
+const { domain } = bandFit
+const justAbove = (x: number) => x * (1 + 1e-9)
+const justBelow = (x: number) => x * (1 - 1e-9)
+/** The extrapolation of a prediction at 2.8 g with the bore or barrel of `options`. */
+const extrapolationAt = (options: { boreDiameter?: number; barrelLength?: number }) =>
+  predictPowder(bandFit, 2.8e-3, options).extrapolation
+/** The side of the charge axis on which a prediction at `c` lies outside. */
+const chargeSide = (c: number) => predictPowder(bandFit, c).extrapolation?.charge
+/** A prediction at 2.8 g from a bore of `boreDiameter`. */
+const boreRun = (boreDiameter: number) => predictPowder(bandFit, 2.8e-3, { boreDiameter })
+/** The side of the bore axis on which a prediction from a bore of `d` lies outside. */
+const boreSide = (d: number) => boreRun(d).extrapolation?.boreDiameter
+/** The side of the barrel axis on which a prediction from a barrel of `barrelLength` lies outside. */
+const barrelSide = (barrelLength: number) =>
+  predictPowder(bandFit, 2.8e-3, { barrelLength }).extrapolation?.barrelLength
+/** The extrapolation of a prediction at 2.8 g against a domain whose `axis` spans `range`. */
+const limitedTo = (axis: 'velocity' | 'pressure', range: { min: number; max: number }) =>
+  predictPowder({ ...bandFit, domain: { ...domain, [axis]: range } }, 2.8e-3).extrapolation
 
+describe('powder fit prediction bands', () => {
   it('is wider outside the fired range than at its centre and marks the extrapolation', () => {
-    const centre = predictPowder(fit, 2.8e-3)
-    const below = predictPowder(fit, 2.4e-3)
-    const above = predictPowder(fit, 3.2e-3)
+    const centre = predictPowder(bandFit, 2.8e-3)
+    const below = predictPowder(bandFit, 2.4e-3)
+    const above = predictPowder(bandFit, 3.2e-3)
     expect(centre.extrapolation).toBeUndefined()
     // at the ladder ends the predicted velocity and pressure can leave the noisy measured ones
-    expect(predictPowder(fit, 2.6e-3).extrapolation?.charge).toBeUndefined()
-    expect(predictPowder(fit, 3e-3).extrapolation?.charge).toBeUndefined()
+    expect(predictPowder(bandFit, 2.6e-3).extrapolation?.charge).toBeUndefined()
+    expect(predictPowder(bandFit, 3e-3).extrapolation?.charge).toBeUndefined()
     expect(below.extrapolation).toMatchObject({ charge: 'below' })
     expect(above.extrapolation).toMatchObject({ charge: 'above' })
     for (const outside of [below, above]) {
@@ -521,133 +564,127 @@ describe('powder fit prediction bands', () => {
         centre.pressure.standardUncertainty,
       )
     }
-    expect(predictPowder(fit, 3.3e-3).pressure.standardUncertainty).toBeGreaterThan(
+    expect(predictPowder(bandFit, 3.3e-3).pressure.standardUncertainty).toBeGreaterThan(
       above.pressure.standardUncertainty,
     )
-    expect(predictPowder(fit, 2.2e-3).velocity.standardUncertainty).toBeGreaterThan(
+    expect(predictPowder(bandFit, 2.2e-3).velocity.standardUncertainty).toBeGreaterThan(
       below.velocity.standardUncertainty,
     )
   })
 
   it('refuses a fit that names a parameter it has no setter for', () => {
     const renamed = {
-      ...fit,
-      parameters: fit.parameters.map((p, k) =>
+      ...bandFit,
+      parameters: bandFit.parameters.map((p, k) =>
         k === 0 ? { ...p, name: 'toString' as PowderParameter } : p,
       ),
     }
     expect(() => predictPowder(renamed, 2.8e-3)).toThrow(InputError)
     expect(() => predictPowder(renamed, 2.8e-3)).toThrow(/^parameters: burnRate/)
   })
+})
 
-  describe('domain', () => {
-    const { domain } = fit
-    const above = (x: number) => x * (1 + 1e-9)
-    const below = (x: number) => x * (1 - 1e-9)
-
-    it('holds the span of the data, bore diameter and barrel length 2.5 % above', () => {
-      expect(powderDomainMargin).toBe(0)
-      expect(domain.margin).toBe(0)
-      expect(domain.charge).toEqual({ min: 2.6e-3, max: 3e-3 })
-      const v = fit.residuals.filter((x) => x.kind === 'velocity').map((x) => x.observed)
-      expect(domain.velocity).toEqual({ min: Math.min(...v), max: Math.max(...v) })
-      const p = fit.residuals.filter((x) => x.kind === 'pressure').map((x) => x.observed)
-      expect(domain.pressure).toEqual({ min: Math.min(...p), max: Math.max(...p) })
-      expect(domain.boreDiameter).toEqual({ min: 6.9e-3, max: 6.9e-3 * 1.025 })
-      expect(domain.barrelLength).toEqual({ min: 0.6, max: 0.6 * 1.025 })
-    })
-
-    it('flags bore diameter and barrel length past 2.5 % above and any value below', () => {
-      const at = (options: { boreDiameter?: number; barrelLength?: number }) =>
-        predictPowder(fit, 2.8e-3, options).extrapolation
-      expect(at({ boreDiameter: 6.9e-3 * 1.025 })).toBeUndefined()
-      expect(at({ boreDiameter: 6.9e-3 * 1.026 })).toEqual({ boreDiameter: 'above' })
-      expect(at({ boreDiameter: 6.9e-3 * 0.999 })).toEqual({ boreDiameter: 'below' })
-      expect(at({ barrelLength: 0.6 * 1.025 })).toBeUndefined()
-      expect(at({ barrelLength: 0.6 * 1.026 })).toEqual({ barrelLength: 'above' })
-      expect(at({ barrelLength: 0.6 * 0.999 })).toEqual({ barrelLength: 'below' })
-    })
-
-    it('takes the margin from the options and has no pressure range without pressures', () => {
-      const rows = ladder(truth, 3, 0, 1)
-      const wide = fitPowder(load(0.4), rows, { domainMargin: 0.25 })
-      expect(wide.domain.margin).toBe(0.25)
-      expect(wide.domain.charge.max).toBe(3e-3 * 1.25)
-      expect(wide.domain.pressure).toBeUndefined()
-      for (const domainMargin of [-0.1, 1, Number.NaN, '0.05' as unknown as number])
-        expect(() => fitPowder(load(0.4), rows, { domainMargin })).toThrow(InputError)
-    })
-
-    it('counts the charge at the edge as inside and names the side outside', () => {
-      const charge = (c: number) => predictPowder(fit, c).extrapolation?.charge
-      expect(charge(domain.charge.max)).toBeUndefined()
-      expect(charge(domain.charge.min)).toBeUndefined()
-      expect(charge(below(domain.charge.max))).toBeUndefined()
-      expect(charge(above(domain.charge.min))).toBeUndefined()
-      // a charge converted from grains or grams can miss the ladder value in the last bit
-      expect(charge(domain.charge.max * (1 + 1e-15))).toBeUndefined()
-      expect(charge(domain.charge.min * (1 - 1e-15))).toBeUndefined()
-      expect(charge(above(domain.charge.max))).toBe('above')
-      expect(charge(below(domain.charge.min))).toBe('below')
-    })
-
-    it('counts the bore diameter at the edge as inside and names the side outside', () => {
-      const bore = (boreDiameter: number) => predictPowder(fit, 2.8e-3, { boreDiameter })
-      const side = (d: number) => bore(d).extrapolation?.boreDiameter
-      expect(side(domain.boreDiameter.max)).toBeUndefined()
-      expect(side(domain.boreDiameter.min)).toBeUndefined()
-      expect(side(below(domain.boreDiameter.max))).toBeUndefined()
-      expect(side(above(domain.boreDiameter.max))).toBe('above')
-      expect(side(below(domain.boreDiameter.min))).toBe('below')
-      // the run uses the bore
-      expect(bore(7.2e-3).velocity.value).not.toBe(bore(6.9e-3).velocity.value)
-      expect(() => bore(0)).toThrow(InputError)
-    })
-
-    it('counts the barrel length at the edge as inside and names the side outside', () => {
-      const side = (barrelLength: number) =>
-        predictPowder(fit, 2.8e-3, { barrelLength }).extrapolation?.barrelLength
-      expect(side(domain.barrelLength.max)).toBeUndefined()
-      expect(side(domain.barrelLength.min)).toBeUndefined()
-      expect(side(below(domain.barrelLength.max))).toBeUndefined()
-      expect(side(above(domain.barrelLength.max))).toBe('above')
-      expect(side(below(domain.barrelLength.min))).toBe('below')
-    })
-
-    it('spans the barrel lengths of the ladder points', () => {
-      const points = ladder(truth, 3, 0, 1).map((x, i) => ({
-        ...x,
-        barrelLength: i % 2 === 0 ? 0.5 : 0.6,
-      }))
-      const mixed = fitPowder(load(0.4), points, { domainMargin: 0.25 })
-      expect(mixed.domain.barrelLength).toEqual({ min: 0.5 * 0.75, max: 0.6 * 1.25 })
-      const exact = fitPowder(load(0.4), points)
-      expect(exact.domain.barrelLength).toEqual({ min: 0.5, max: 0.6 * 1.025 })
-    })
-
-    it('checks the predicted velocity and pressure against their ranges', () => {
-      const at = predictPowder(fit, 2.8e-3)
-      const limited = (axis: 'velocity' | 'pressure', range: { min: number; max: number }) =>
-        predictPowder({ ...fit, domain: { ...domain, [axis]: range } }, 2.8e-3).extrapolation
-      for (const axis of ['velocity', 'pressure'] as const) {
-        const value = at[axis].value
-        expect(limited(axis, { min: value, max: value })).toBeUndefined()
-        expect(limited(axis, { min: below(value), max: above(value) })).toBeUndefined()
-        expect(limited(axis, { min: above(value), max: 2 * value })).toEqual({ [axis]: 'below' })
-        expect(limited(axis, { min: 0, max: below(value) })).toEqual({ [axis]: 'above' })
-      }
-    })
-
-    it('names each axis that is outside and only those', () => {
-      const p = predictPowder(fit, 3.2e-3, { boreDiameter: 7.5e-3 })
-      expect(p.extrapolation).toMatchObject({ charge: 'above', boreDiameter: 'above' })
-      expect(p.extrapolation).not.toHaveProperty('barrelLength')
-    })
+describe('powder fit domain', () => {
+  it('holds the span of the data, bore diameter and barrel length 2.5 % above', () => {
+    expect(domain.margin).toBe(0)
+    expect(domain.charge).toEqual({ min: 2.6e-3, max: 3e-3 })
+    const v = bandFit.residuals.filter((x) => x.kind === 'velocity').map((x) => x.observed)
+    expect(domain.velocity).toEqual({ min: Math.min(...v), max: Math.max(...v) })
+    const p = bandFit.residuals.filter((x) => x.kind === 'pressure').map((x) => x.observed)
+    expect(domain.pressure).toEqual({ min: Math.min(...p), max: Math.max(...p) })
+    expect(domain.boreDiameter).toEqual({ min: 6.9e-3, max: 6.9e-3 * 1.025 })
+    expect(domain.barrelLength).toEqual({ min: 0.6, max: 0.6 * 1.025 })
   })
 
+  it('flags bore diameter and barrel length past 2.5 % above and any value below', () => {
+    expect(extrapolationAt({ boreDiameter: 6.9e-3 * 1.025 })).toBeUndefined()
+    expect(extrapolationAt({ boreDiameter: 6.9e-3 * 1.026 })).toEqual({ boreDiameter: 'above' })
+    expect(extrapolationAt({ boreDiameter: 6.9e-3 * 0.999 })).toEqual({ boreDiameter: 'below' })
+    expect(extrapolationAt({ barrelLength: 0.6 * 1.025 })).toBeUndefined()
+    expect(extrapolationAt({ barrelLength: 0.6 * 1.026 })).toEqual({ barrelLength: 'above' })
+    expect(extrapolationAt({ barrelLength: 0.6 * 0.999 })).toEqual({ barrelLength: 'below' })
+  })
+
+  it('takes the margin from the options and has no pressure range without pressures', () => {
+    const rows = ladder(bandTruth, 3, 0, 1)
+    const wide = fitPowder(load(0.4), rows, { domainMargin: 0.25 })
+    expect(wide.domain.margin).toBe(0.25)
+    expect(wide.domain.charge.max).toBe(3e-3 * 1.25)
+    expect(wide.domain.pressure).toBeUndefined()
+    for (const domainMargin of [-0.1, 1, Number.NaN, '0.05' as unknown as number])
+      expect(() => fitPowder(load(0.4), rows, { domainMargin })).toThrow(InputError)
+  })
+})
+
+describe('powder fit domain edges', () => {
+  it('counts the charge at the edge as inside and names the side outside', () => {
+    expect(chargeSide(domain.charge.max)).toBeUndefined()
+    expect(chargeSide(domain.charge.min)).toBeUndefined()
+    expect(chargeSide(justBelow(domain.charge.max))).toBeUndefined()
+    expect(chargeSide(justAbove(domain.charge.min))).toBeUndefined()
+    // a charge converted from grains or grams can miss the ladder value in the last bit
+    expect(chargeSide(domain.charge.max * (1 + 1e-15))).toBeUndefined()
+    expect(chargeSide(domain.charge.min * (1 - 1e-15))).toBeUndefined()
+    expect(chargeSide(justAbove(domain.charge.max))).toBe('above')
+    expect(chargeSide(justBelow(domain.charge.min))).toBe('below')
+  })
+
+  it('counts the bore diameter at the edge as inside and names the side outside', () => {
+    expect(boreSide(domain.boreDiameter.max)).toBeUndefined()
+    expect(boreSide(domain.boreDiameter.min)).toBeUndefined()
+    expect(boreSide(justBelow(domain.boreDiameter.max))).toBeUndefined()
+    expect(boreSide(justAbove(domain.boreDiameter.max))).toBe('above')
+    expect(boreSide(justBelow(domain.boreDiameter.min))).toBe('below')
+    // the run uses the bore
+    expect(boreRun(7.2e-3).velocity.value).not.toBe(boreRun(6.9e-3).velocity.value)
+    expect(() => boreRun(0)).toThrow(InputError)
+  })
+
+  it('counts the barrel length at the edge as inside and names the side outside', () => {
+    expect(barrelSide(domain.barrelLength.max)).toBeUndefined()
+    expect(barrelSide(domain.barrelLength.min)).toBeUndefined()
+    expect(barrelSide(justBelow(domain.barrelLength.max))).toBeUndefined()
+    expect(barrelSide(justAbove(domain.barrelLength.max))).toBe('above')
+    expect(barrelSide(justBelow(domain.barrelLength.min))).toBe('below')
+  })
+})
+
+describe('powder fit domain of the points and predictions', () => {
+  it('spans the barrel lengths of the ladder points', () => {
+    const points = ladder(bandTruth, 3, 0, 1).map((x, i) => ({
+      ...x,
+      barrelLength: i % 2 === 0 ? 0.5 : 0.6,
+    }))
+    const mixed = fitPowder(load(0.4), points, { domainMargin: 0.25 })
+    expect(mixed.domain.barrelLength).toEqual({ min: 0.5 * 0.75, max: 0.6 * 1.25 })
+    const exact = fitPowder(load(0.4), points)
+    expect(exact.domain.barrelLength).toEqual({ min: 0.5, max: 0.6 * 1.025 })
+  })
+
+  it('checks the predicted velocity and pressure against their ranges', () => {
+    const at = predictPowder(bandFit, 2.8e-3)
+    for (const axis of ['velocity', 'pressure'] as const) {
+      const value = at[axis].value
+      expect(limitedTo(axis, { min: value, max: value })).toBeUndefined()
+      expect(limitedTo(axis, { min: justBelow(value), max: justAbove(value) })).toBeUndefined()
+      expect(limitedTo(axis, { min: justAbove(value), max: 2 * value })).toEqual({
+        [axis]: 'below',
+      })
+      expect(limitedTo(axis, { min: 0, max: justBelow(value) })).toEqual({ [axis]: 'above' })
+    }
+  })
+
+  it('names each axis that is outside and only those', () => {
+    const p = predictPowder(bandFit, 3.2e-3, { boreDiameter: 7.5e-3 })
+    expect(p.extrapolation).toMatchObject({ charge: 'above', boreDiameter: 'above' })
+    expect(p.extrapolation).not.toHaveProperty('barrelLength')
+  })
+})
+
+describe('powder fit prediction intervals', () => {
   it('returns the model value, a symmetric interval and the chosen coverage', () => {
-    const p = predictPowder(fit, 2.85e-3)
-    const r = interior({ ...fit.load, charge: 2.85e-3 })
+    const p = predictPowder(bandFit, 2.85e-3)
+    const r = interior({ ...bandFit.load, charge: 2.85e-3 })
     if (!r.valid) throw new Error(r.reason)
     expect(p.velocity.value).toBe(r.muzzleVelocity)
     expect(p.pressure.value).toBe(r.peakBreechPressure)
@@ -658,7 +695,7 @@ describe('powder fit prediction bands', () => {
       1.6449,
       3,
     )
-    const wide = predictPowder(fit, 2.85e-3, { level: 0.99 })
+    const wide = predictPowder(bandFit, 2.85e-3, { level: 0.99 })
     expect(wide.velocity.upper - wide.velocity.lower).toBeGreaterThan(
       p.velocity.upper - p.velocity.lower,
     )
@@ -666,9 +703,9 @@ describe('powder fit prediction bands', () => {
   })
 
   it('uses the Student quantile when the ladder has no uncertainties', () => {
-    const fit = fitPowder(load(0.4), ladder(truth, 0, 0, 0.5))
-    expect(fit.weighted).toBe(false)
-    const p = predictPowder(fit, 2.8e-3)
+    const unweighted = fitPowder(load(0.4), ladder(bandTruth, 0, 0, 0.5))
+    expect(unweighted.weighted).toBe(false)
+    const p = predictPowder(unweighted, 2.8e-3)
     // four degrees of freedom: the 90 % quantile is 2.132, above the normal 1.645
     expect((p.velocity.upper - p.velocity.value) / p.velocity.standardUncertainty).toBeCloseTo(
       2.1318,
@@ -677,26 +714,27 @@ describe('powder fit prediction bands', () => {
   })
 
   it('refuses a fit without covariance, a bad charge or level, and an invalid run', () => {
-    const rows = ladder(truth, 0, 0).slice(0, 1)
+    const rows = ladder(bandTruth, 0, 0).slice(0, 1)
     const exact = fitPowder(load(0.4), rows)
     expect(exact.covariance).toBeUndefined()
     expect(() => predictPowder(exact, 2.8e-3)).toThrow(InputError)
-    const fit = fitPowder(load(0.4), ladder(truth, 3, 0))
-    expect(() => predictPowder(fit, 0)).toThrow(InputError)
-    expect(() => predictPowder(fit, 2.8e-3, { level: 1 })).toThrow(InputError)
-    const e = failure(() => predictPowder(fit, 3.6e-3))
+    const noiseless = fitPowder(load(0.4), ladder(bandTruth, 3, 0))
+    expect(() => predictPowder(noiseless, 0)).toThrow(InputError)
+    expect(() => predictPowder(noiseless, 2.8e-3, { level: 1 })).toThrow(InputError)
+    const e = failure(() => predictPowder(noiseless, 3.6e-3))
     expect(e.reason).toBe('invalid')
     expect(e.charge).toBe(3.6e-3)
   })
 })
 
-describe('powder fit chamber volume factor', () => {
-  const scaled = (f: number): InteriorLoad => {
-    const l = load()
-    return { ...l, chamber: { ...l.chamber, volume: l.chamber.volume * f } }
-  }
-  const pair = ['burnRate', 'volumeFactor'] as const
+/** The true load with its chamber volume times `f`. */
+const scaled = (f: number): InteriorLoad => {
+  const l = load()
+  return { ...l, chamber: { ...l.chamber, volume: l.chamber.volume * f } }
+}
+const pair = ['burnRate', 'volumeFactor'] as const
 
+describe('powder fit chamber volume factor', () => {
   it('leaves the fit as it was with the factor off', () => {
     // values of the fit before the option existed: the default and a start pressure with pressures
     const a = velocityFit
@@ -739,7 +777,9 @@ describe('powder fit chamber volume factor', () => {
     expect(r.load.chamber.boreArea).toBe(load().chamber.boreArea)
     expect(r.degreesOfFreedom).toBe(3)
   })
+})
 
+describe('powder fit chamber volume factor with noise, priors and the start pressure', () => {
   it('reports the factor within its uncertainty of the truth on noisy rows', () => {
     const r = fitPowder(load(0.4), ladder(scaled(1.08), 3, 20e5, 1), { parameters: pair })
     const f = nth(r.parameters, 1)
@@ -772,7 +812,9 @@ describe('powder fit chamber volume factor', () => {
     expect(p.velocity.value).toBeCloseTo(direct.muzzleVelocity, 9)
     expect(p.pressure.standardUncertainty).toBeGreaterThan(0)
   })
+})
 
+describe('powder fit chamber volume factor priors', () => {
   it('needs a prior on the factor where the ladder is too narrow to separate it from the burn rate', () => {
     const points = ladder(scaled(1.08), 3, 0)
       .slice(1, 3)

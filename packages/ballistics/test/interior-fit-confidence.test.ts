@@ -77,7 +77,9 @@ describe('powder pressure range', () => {
       expect(p.standardUncertainty).toBeLessThanOrEqual(p.correlatedLimit)
     }
   })
+})
 
+describe('powder pressure range of the fixed inputs', () => {
   it('adds each fixed input in quadrature, skips fitted and absent ones', () => {
     const used = velocityRange.contributions.map((c) => c.input)
     expect(used).toEqual([
@@ -117,7 +119,9 @@ describe('powder pressure range', () => {
       propellantTemperature: 'absent',
     })
   })
+})
 
+describe('powder pressure range inputs', () => {
   it('takes the measured defaults, caller values and extra inputs', () => {
     expect(powderInputDefaults.caseCapacity).toEqual({
       unit: 'relative',
@@ -142,7 +146,9 @@ describe('powder pressure range', () => {
     expect(extra.contributions.map((c) => c.input)).not.toContain('boreFriction')
     expect(extra.relativeHalfWidth).toBeGreaterThan(0)
   })
+})
 
+describe('powder pressure range points and refusals', () => {
   it('shifts the temperature of the points that carry their own', () => {
     const own = velocityOnly.map((x) => ({ ...x, propellantTemperature: 294.15 }))
     const range = powderPressureRange(fitLadder(own), own, {
@@ -178,6 +184,9 @@ describe('powder pressure range', () => {
     expect(() => powderPressureRange(velocityFit, velocityOnly, { points: [] })).toThrow(InputError)
   })
 })
+
+/** The fitted burn coefficient of `f`. */
+const burnValue = (f: PowderFit) => nth(f.parameters, 0).value
 
 describe('prior from similar powders', () => {
   const target = { burnRate: 0.45, energy: 3.9e6 }
@@ -216,7 +225,9 @@ describe('prior from similar powders', () => {
     expect(() => similarPowdersPrior(target, [{ burnRate: 0, energy: 1 }])).toThrow(InputError)
     expect(() => similarPowdersPrior(target, neighbours, 0)).toThrow(InputError)
   })
+})
 
+describe('prior from similar powders in a fit', () => {
   it('pulls a short ladder toward the prior and marks the fit refined', () => {
     const short = ladder([], 1, [2.8e-3, 2.9e-3])
     const plain = fitPowder(load(0.4), short)
@@ -224,9 +235,8 @@ describe('prior from similar powders', () => {
     const prior = { value: 0.6, sigma: 0.1 }
     const refined = fitPowder(load(0.4), short, { priors: { burnRate: prior } })
     expect(refined.basis).toBe('refined')
-    const value = (f: PowderFit) => nth(f.parameters, 0).value
-    expect(Math.abs(Math.log(value(refined) / 0.6))).toBeLessThan(
-      Math.abs(Math.log(value(plain) / 0.6)),
+    expect(Math.abs(Math.log(burnValue(refined) / 0.6))).toBeLessThan(
+      Math.abs(Math.log(burnValue(plain) / 0.6)),
     )
     // a prior on the start pressure alone does not make the fit refined
     const start = fitPowder(load(0.4), withPressure, {
@@ -237,22 +247,25 @@ describe('prior from similar powders', () => {
   })
 })
 
-describe('confidence label', () => {
-  const rules = (range: typeof velocityRange, width: number) => ({
-    ...range,
-    relativeHalfWidth: width,
-  })
+/** `range` with the relative half-width `width`. */
+const withWidth = (range: typeof velocityRange, width: number) => ({
+  ...range,
+  relativeHalfWidth: width,
+})
 
+/** The label of the velocity-only fit at the relative half-width `w`. */
+const labelAt = (w: number) => powderConfidence(velocityFit, withWidth(velocityRange, w)).label
+
+describe('confidence label', () => {
   it('sets the label from the relative half-width at 10 % and 25 %', () => {
-    const at = (w: number) => powderConfidence(velocityFit, rules(velocityRange, w)).label
-    expect([at(0.05), at(0.1), at(0.1001), at(0.25), at(0.2501), at(0.6)]).toEqual([
-      'tight',
-      'tight',
-      'moderate',
-      'moderate',
-      'loose',
-      'loose',
-    ])
+    expect([
+      labelAt(0.05),
+      labelAt(0.1),
+      labelAt(0.1001),
+      labelAt(0.25),
+      labelAt(0.2501),
+      labelAt(0.6),
+    ]).toEqual(['tight', 'tight', 'moderate', 'moderate', 'loose', 'loose'])
   })
 
   it('states the basis and the reasons of a velocity-only fit with an estimated capacity', () => {
@@ -283,7 +296,9 @@ describe('confidence label', () => {
     expect(c.label).toBe('tight')
     expect(c.relativeHalfWidth).toBeLessThan(velocityRange.relativeHalfWidth)
   })
+})
 
+describe('confidence label flags', () => {
   it('flags a narrow ladder and an extrapolated point', () => {
     const narrow = ladder([], 0, [2.8e-3, 2.82e-3, 2.84e-3])
     const f = fitLadder(narrow)
@@ -337,7 +352,9 @@ describe('confidence label', () => {
       ).reasons,
     ).not.toContain('start-pressure-correlated')
   })
+})
 
+describe('confidence label flags of priors and refits', () => {
   it('flags a weak prior and a fit outside the similar powders', () => {
     const near = similarPowdersPrior(
       { burnRate: 0.45, energy: 3.9e6 },
@@ -365,7 +382,7 @@ describe('confidence label', () => {
       })),
     }
     expect(powderConfidence(velocityFit, failed).reasons).toContain('input-refit-failed')
-    expect(() => powderConfidence(velocityFit, rules(velocityRange, Number.NaN))).toThrow(
+    expect(() => powderConfidence(velocityFit, withWidth(velocityRange, Number.NaN))).toThrow(
       InputError,
     )
   })
