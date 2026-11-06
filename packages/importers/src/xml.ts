@@ -221,7 +221,7 @@ function readEndTag(text: string, lt: number, st: ScanState): number {
   if (!m || top === undefined || m.name !== top) {
     throw new Error(`end tag </${m?.name ?? ''}> does not match <${top ?? ''}>`)
   }
-  // the path grows with qnames, so it holds the element closed here
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the path grows with qnames, so it holds the element closed here
   const name = st.path.pop() as string
   st.events.close(name, st.path)
   return lt + 2 + m.length
@@ -313,6 +313,6 @@ export function parseXml(text: string, remaining?: XmlBudget): XmlElement {
     },
     remaining,
   )
-  // scanXml refuses a text without a root element, so `open` set it
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- scanXml refuses a text without a root element, so `open` set it
   return root as XmlElement
 }

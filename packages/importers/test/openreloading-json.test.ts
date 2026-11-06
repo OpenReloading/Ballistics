@@ -29,7 +29,58 @@ const file = {
 }
 const text = JSON.stringify(file)
 
-describe('OpenReloading session JSON', () => {
+/** Files the reader refuses, each with a part of the message it gives. */
+const refusals: [string, object, string][] = [
+  ['version 2', { ...file, version: 2 }, 'version 2 is not supported'],
+  ['no strings', { ...file, strings: [] }, 'strings: must list at least one string'],
+  ['empty string', { ...file, strings: [{ shots: [] }] }, 'strings[0].shots'],
+  [
+    'text velocity',
+    { ...file, strings: [{ shots: [{ velocity: '800' }] }] },
+    'strings[0].shots[0].velocity: must be a positive number',
+  ],
+  [
+    'no velocity',
+    { ...file, strings: [{ shots: [{}] }] },
+    'strings[0].shots[0].velocity: is required',
+  ],
+  [
+    'zero velocity',
+    { ...file, strings: [{ shots: [{ velocity: 0 }] }] },
+    'must be a positive number',
+  ],
+  ['bad date', { ...file, date: '05.03.2026' }, 'date: must be a date as YYYY-MM-DD'],
+  ['bad kind', { ...file, device: { kind: 'laser' } }, 'device.kind'],
+  [
+    'empty reason',
+    { ...file, strings: [{ shots: [{ velocity: 800, excluded: '' }] }] },
+    'excluded',
+  ],
+  ['text date', { ...file, date: 20260305 }, 'date: must be a date as YYYY-MM-DD'],
+  ['device as text', { ...file, device: 'radar' }, 'device: must be an object'],
+  ['empty model', { ...file, device: { kind: 'other', model: '' } }, 'device.model: must be text'],
+  [
+    'number maker',
+    { ...file, device: { kind: 'other', manufacturerName: 7 } },
+    'device.manufacturerName: must be text',
+  ],
+  ['negative distance', { ...file, muzzleDistance: -1 }, 'muzzleDistance: must be a positive'],
+  ['empty note', { ...file, note: '' }, 'note: must be text'],
+  ['string as list', { ...file, strings: [[]] }, 'strings[0]: must be an object'],
+  [
+    'number label',
+    { ...file, strings: [{ label: 1, shots: [{ velocity: 800 }] }] },
+    'strings[0].label: must be text',
+  ],
+  ['shot as number', { ...file, strings: [{ shots: [800] }] }, 'strings[0].shots[0]: must be'],
+  [
+    'text cold bore',
+    { ...file, strings: [{ shots: [{ velocity: 800, coldBore: 'yes' }] }] },
+    'strings[0].shots[0].coldBore: must be true or false',
+  ],
+]
+
+describe('OpenReloading session JSON: detection and missing fields', () => {
   it('is detected before every CSV format and read in m/s', () => {
     expect(isOpenReloadingJson(text)).toBe(true)
     expect(detectFormat(text)).toBe('openreloading-json')
@@ -67,7 +118,9 @@ describe('OpenReloading session JSON', () => {
       expect.arrayContaining(['date', 'device.manufacturer', 'device.model', 'strings.0.load']),
     )
   })
+})
 
+describe('OpenReloading session JSON: writing, and other JSON', () => {
   it('writes what it reads', () => {
     const r = parseOpenReloadingJson(text)
     const again = parseOpenReloadingJson(stringifyOpenReloadingJson(r))
@@ -99,60 +152,10 @@ describe('OpenReloading session JSON', () => {
     expect(isOpenReloadingJson('{not json')).toBe(false)
     expect(isOpenReloadingJson('string,velocity\nA,2795\n')).toBe(false)
   })
+})
 
-  it.each([
-    ['version 2', { ...file, version: 2 }, 'version 2 is not supported'],
-    ['no strings', { ...file, strings: [] }, 'strings: must list at least one string'],
-    ['empty string', { ...file, strings: [{ shots: [] }] }, 'strings[0].shots'],
-    [
-      'text velocity',
-      { ...file, strings: [{ shots: [{ velocity: '800' }] }] },
-      'strings[0].shots[0].velocity: must be a positive number',
-    ],
-    [
-      'no velocity',
-      { ...file, strings: [{ shots: [{}] }] },
-      'strings[0].shots[0].velocity: is required',
-    ],
-    [
-      'zero velocity',
-      { ...file, strings: [{ shots: [{ velocity: 0 }] }] },
-      'must be a positive number',
-    ],
-    ['bad date', { ...file, date: '05.03.2026' }, 'date: must be a date as YYYY-MM-DD'],
-    ['bad kind', { ...file, device: { kind: 'laser' } }, 'device.kind'],
-    [
-      'empty reason',
-      { ...file, strings: [{ shots: [{ velocity: 800, excluded: '' }] }] },
-      'excluded',
-    ],
-    ['text date', { ...file, date: 20260305 }, 'date: must be a date as YYYY-MM-DD'],
-    ['device as text', { ...file, device: 'radar' }, 'device: must be an object'],
-    [
-      'empty model',
-      { ...file, device: { kind: 'other', model: '' } },
-      'device.model: must be text',
-    ],
-    [
-      'number maker',
-      { ...file, device: { kind: 'other', manufacturerName: 7 } },
-      'device.manufacturerName: must be text',
-    ],
-    ['negative distance', { ...file, muzzleDistance: -1 }, 'muzzleDistance: must be a positive'],
-    ['empty note', { ...file, note: '' }, 'note: must be text'],
-    ['string as list', { ...file, strings: [[]] }, 'strings[0]: must be an object'],
-    [
-      'number label',
-      { ...file, strings: [{ label: 1, shots: [{ velocity: 800 }] }] },
-      'strings[0].label: must be text',
-    ],
-    ['shot as number', { ...file, strings: [{ shots: [800] }] }, 'strings[0].shots[0]: must be'],
-    [
-      'text cold bore',
-      { ...file, strings: [{ shots: [{ velocity: 800, coldBore: 'yes' }] }] },
-      'strings[0].shots[0].coldBore: must be true or false',
-    ],
-  ])('refuses %s', (_, bad, message) => {
+describe('OpenReloading session JSON: refused members', () => {
+  it.each(refusals)('refuses %s', (_, bad, message) => {
     expect(() => parseOpenReloadingJson(JSON.stringify(bad))).toThrow(message)
   })
 })

@@ -1,4 +1,4 @@
-import fc from 'fast-check'
+import * as fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
 import {
   type ChronoFormatId,
@@ -11,15 +11,19 @@ import {
 // fixed seed: the same inputs on every run
 const runs = { seed: 20261022, numRuns: 200 }
 
-/** Runs `read`; a throw passes only as a plain `Error`, the importers' own refusal (a `TypeError` or `RangeError` is a defect). */
-async function readsOrRefuses(read: () => unknown) {
+/**
+ * How `read` ends: `read`, or `refused` with a plain `Error`, the importers' own refusal; anything
+ * else it throws comes back as it is (a `TypeError` or `RangeError` is a defect).
+ */
+async function outcome(read: () => unknown): Promise<unknown> {
   try {
     await read()
+    return 'read'
   } catch (e) {
-    expect(e).toBeInstanceOf(Error)
-    expect((e as Error).constructor).toBe(Error)
+    return Object.getPrototypeOf(e) === Error.prototype ? 'refused' : e
   }
 }
+const readOrRefused = ['read', 'refused']
 
 const cell = fc.constantFrom(
   'string',
@@ -56,18 +60,14 @@ const fileLike = fc
 const text = fc.oneof(fc.string({ unit: 'binary' }), fileLike)
 
 describe('the importers on any input', () => {
-  for (const f of chronoFormats.filter((f) => f.reads === 'text')) {
+  for (const f of chronoFormats.filter((format) => format.reads === 'text')) {
     it(`${f.id} parses any text or refuses it with an Error`, async () => {
+      const options = { columns: { string: 1, velocity: 2 }, velocityUnit: 'ft/s' } as const
       await fc.assert(
-        fc.asyncProperty(text, (t) =>
-          readsOrRefuses(() =>
-            parseChrono(
-              t,
-              { columns: { string: 1, velocity: 2 }, velocityUnit: 'ft/s' },
-              f.id as ChronoFormatId,
-            ),
-          ),
-        ),
+        fc.asyncProperty(text, async (t) => {
+          const read = () => parseChrono(t, options, f.id as ChronoFormatId)
+          expect(readOrRefused).toContain(await outcome(read))
+        }),
         runs,
       )
     })
@@ -75,16 +75,18 @@ describe('the importers on any input', () => {
 
   it('detects and parses any text or refuses it with an Error', async () => {
     await fc.assert(
-      fc.asyncProperty(text, (t) => readsOrRefuses(() => parseChrono(t))),
+      fc.asyncProperty(text, async (t) => {
+        expect(readOrRefused).toContain(await outcome(() => parseChrono(t)))
+      }),
       runs,
     )
   })
 
   it('decodes any bytes or refuses them with an Error', async () => {
     await fc.assert(
-      fc.asyncProperty(fc.uint8Array({ maxLength: 64 }), (b) =>
-        readsOrRefuses(() => decodeText(b)),
-      ),
+      fc.asyncProperty(fc.uint8Array({ maxLength: 64 }), async (b) => {
+        expect(readOrRefused).toContain(await outcome(() => decodeText(b)))
+      }),
       runs,
     )
   })
@@ -97,9 +99,10 @@ describe('the importers on any input', () => {
       [0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1],
     )
     await fc.assert(
-      fc.asyncProperty(start, fc.uint8Array({ maxLength: 600 }), (s, rest) =>
-        readsOrRefuses(() => readWorkbook(Uint8Array.from([...s, ...rest]))),
-      ),
+      fc.asyncProperty(start, fc.uint8Array({ maxLength: 600 }), async (s, rest) => {
+        const read = () => readWorkbook(Uint8Array.from([...s, ...rest]))
+        expect(readOrRefused).toContain(await outcome(read))
+      }),
       runs,
     )
   })
