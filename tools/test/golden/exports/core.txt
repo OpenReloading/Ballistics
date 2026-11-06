@@ -23,6 +23,7 @@
 . ChargeSolution
 . ChargeSolverOptions
 . ChargeTarget
+. ChargeTargetInputs
 . ChargeTargetKind
 . ChargedTrace
 . Chronograph
@@ -161,6 +162,7 @@
 . PressureSensor
 . PressureTolerances
 . Projectile
+. RangeModel
 . RangeStringDefaults
 . RangeStringEntry
 . RangeStringFailure
@@ -184,6 +186,7 @@
 . Rk45Result
 . RoundCountNote
 . SampledBand
+. SampledModel
 . SampledRun
 . SamplingOptions
 . SeatingNote

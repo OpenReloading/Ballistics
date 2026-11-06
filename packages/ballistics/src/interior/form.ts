@@ -155,9 +155,9 @@ const grainShapes: { [S in Grain['shape']]: FormEntry<Extract<Grain, { shape: S 
     },
     error: (g) => {
       if (!(g.perforationDiameter < g.diameter)) return 'propellant.burn.grain.perforationDiameter'
-      if (!(g.length >= (g.diameter - g.perforationDiameter) / 2))
-        return 'propellant.burn.grain.length'
-      return
+      return g.length >= (g.diameter - g.perforationDiameter) / 2
+        ? undefined
+        : 'propellant.burn.grain.length'
     },
   },
   sevenPerf: {
@@ -166,8 +166,7 @@ const grainShapes: { [S in Grain['shape']]: FormEntry<Extract<Grain, { shape: S 
       if (!(3 * g.perforationDiameter < g.diameter))
         return 'propellant.burn.grain.perforationDiameter'
       const form = sevenPerf(g.diameter, g.perforationDiameter, g.length)
-      if (!(g.length > 2 * form.halfWeb * form.end)) return 'propellant.burn.grain.length'
-      return
+      return g.length > 2 * form.halfWeb * form.end ? undefined : 'propellant.burn.grain.length'
     },
   },
 }
@@ -190,8 +189,10 @@ const vivacityForms: {
         end: 1,
         halfWeb: 1,
         // finite beyond z = 1, so an integrator step may cross burnout: 0 after a second stage with q > 0, phi1 otherwise (q = 0 or z1 = 1)
-        phi: (z) =>
-          z <= z1 ? (1 + a * z) ** m : z1 < 1 ? phi1 * (Math.max(0, 1 - z) / (1 - z1)) ** q : phi1,
+        phi: (z) => {
+          if (z <= z1) return (1 + a * z) ** m
+          return z1 < 1 ? phi1 * (Math.max(0, 1 - z) / (1 - z1)) ** q : phi1
+        },
         breaks: z1 < 1 ? [z1] : [],
       }
     },
@@ -217,8 +218,10 @@ const vivacityForms: {
       return {
         // odd in u beyond f = end, so z stays smooth when an integrator step crosses burnout (z = f for r = 0)
         z: (f) => (f <= z2 ? f : 1 - (1 - z2) * Math.sign(u(f)) * Math.abs(u(f)) ** k),
-        phi: (f) =>
-          f <= z1 ? (1 + a * f) ** m : f <= z2 ? phi1 * ((1 - f) / (1 - z1)) ** q : phi2,
+        phi: (f) => {
+          if (f <= z1) return (1 + a * f) ** m
+          return f <= z2 ? phi1 * ((1 - f) / (1 - z1)) ** q : phi2
+        },
         breaks: [z1, z2],
         end: z2 + (1 - z2) * k,
         halfWeb: 1,
@@ -239,30 +242,47 @@ const vivacityForms: {
   },
 }
 
-// the mapped entry types do not narrow on a union key, so these two lookups take the union
-const grainEntry = (g: Grain) => grainShapes[g.shape] as FormEntry<Grain>
-const vivacityEntry = (f: VivacityForm) => vivacityForms[f.kind] as FormEntry<VivacityForm>
+/** The entry of a grain shape, typed per shape so that a grain of that shape fits it. */
+function grainEntry<K extends Grain['shape']>(shape: K): FormEntry<Extract<Grain, { shape: K }>> {
+  return grainShapes[shape]
+}
+
+/** The entry of a vivacity form, typed per kind so that a form of that kind fits it. */
+function vivacityEntry<K extends VivacityForm['kind']>(
+  kind: K,
+): FormEntry<Extract<VivacityForm, { kind: K }>> {
+  return vivacityForms[kind]
+}
 
 /** Form function of a burn law (`apps/docs/docs/models/interior-burn-forms.md`, "Burn laws"). */
 export function burnForm(burn: Burn): BurnForm {
   return burn.kind === 'geometric'
-    ? grainEntry(burn.grain).form(burn.grain)
-    : vivacityEntry(burn.form).form(burn.form)
+    ? grainEntry(burn.grain.shape).form(burn.grain)
+    : vivacityEntry(burn.form.kind).form(burn.form)
+}
+
+const isPositive = (v: number) => Number.isFinite(v) && v > 0
+
+/** Name of the first invalid field of a vivacity law, or undefined. */
+function vivacityError(burn: Extract<Burn, { kind: 'vivacity' }>): string | undefined {
+  if (!isPositive(burn.vivacity)) return 'propellant.burn.vivacity'
+  if (!isPositive(burn.referencePressure)) return 'propellant.burn.referencePressure'
+  // `?.` on the entry (also below): an unlisted shape or form from an untyped caller gets no shape check
+  return vivacityEntry(burn.form.kind)?.error?.(burn.form)
+}
+
+/** Name of the first invalid field of a geometric law and its grain, or undefined. */
+function geometricError(burn: Extract<Burn, { kind: 'geometric' }>): string | undefined {
+  if (!isPositive(burn.coefficient)) return 'propellant.burn.coefficient'
+  const g = burn.grain
+  const dims = Object.entries(g).filter(([k]) => k !== 'shape')
+  for (const [k, v] of dims)
+    if (!(typeof v === 'number' && isPositive(v))) return `propellant.burn.grain.${k}`
+  return grainEntry(g.shape)?.error?.(g)
 }
 
 /** Name of the first invalid field of a burn law, or undefined. */
 export function burnError(burn: Burn): string | undefined {
-  const pos = (v: number) => Number.isFinite(v) && v > 0
   if (!(burn.exponent >= 0 && Number.isFinite(burn.exponent))) return 'propellant.burn.exponent'
-  if (burn.kind === 'vivacity') {
-    if (!pos(burn.vivacity)) return 'propellant.burn.vivacity'
-    if (!pos(burn.referencePressure)) return 'propellant.burn.referencePressure'
-    return vivacityEntry(burn.form)?.error?.(burn.form)
-  }
-  if (!pos(burn.coefficient)) return 'propellant.burn.coefficient'
-  const g = burn.grain
-  const dims = Object.entries(g).filter(([k]) => k !== 'shape')
-  for (const [k, v] of dims) if (!pos(v as number)) return `propellant.burn.grain.${k}`
-  // `?.` on the entry (also above): an unlisted shape or form from an untyped caller gets no shape check
-  return grainEntry(g)?.error?.(g)
+  return burn.kind === 'vivacity' ? vivacityError(burn) : geometricError(burn)
 }

@@ -99,7 +99,7 @@ const lotOf = (s: SessionReading, rule: (typeof lots)[number]) => s[rule]?.trim(
 function inOrder(sessions: readonly SessionReading[]) {
   const dated = sessions.every((s) => s.date !== undefined)
   return dated
-    ? [...sessions].sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''))
+    ? sessions.toSorted((a, b) => (a.date ?? '').localeCompare(b.date ?? ''))
     : [...sessions]
 }
 

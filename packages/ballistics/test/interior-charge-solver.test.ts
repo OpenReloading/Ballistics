@@ -39,7 +39,7 @@ const scanRun = (load: InteriorLoad): InteriorResult => {
 function valueAt(kind: ChargeTargetKind, charge: number) {
   const run = scanRun({ ...base, charge })
   if (!run.valid) throw new Error(run.reason)
-  const value = chargeTargetValue(kind, run, charge, base, bulkDensity)
+  const value = chargeTargetValue(kind, run, { charge, load: base, bulkDensity })
   if (value === undefined) throw new Error('no value')
   return value
 }

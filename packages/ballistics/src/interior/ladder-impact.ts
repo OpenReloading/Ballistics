@@ -30,6 +30,12 @@ export interface LadderImpact {
   varies: boolean
 }
 
+/** The between to pooled within variance ratio: infinite where every charge holds one height but the means differ, 0 where nothing varies. */
+function varianceRatio(between: number, pooled: number): number {
+  if (pooled > 0) return between / pooled
+  return between > 0 ? Number.POSITIVE_INFINITY : 0
+}
+
 /**
  * The height of impact of each shot minus `slope` times its velocity less the mean velocity of the
  * ladder, averaged per charge, and a heterogeneity test across charges at `level` (default 0.99).
@@ -46,7 +52,7 @@ export function ladderImpactResiduals(
   need(charges.length >= 3, 'a ladder needs at least three charges')
   need(Number.isFinite(slope), 'slope must be finite')
   need(level > 0 && level < 1, 'level must lie in (0, 1)')
-  const sorted = [...charges].sort((a, b) => a.charge - b.charge)
+  const sorted = charges.toSorted((a, b) => a.charge - b.charge)
   for (const c of sorted) {
     need(Number.isFinite(c.charge) && c.charge > 0, 'charge must be positive')
     need(c.heights.length >= 2, 'each charge needs at least two shots')
@@ -71,6 +77,6 @@ export function ladderImpactResiduals(
   const pooled = within / (shots - steps.length)
   const degrees = steps.length - 1
   // all shots on one height in every charge: nothing to test
-  const statistic = pooled > 0 ? between / pooled : between > 0 ? Number.POSITIVE_INFINITY : 0
+  const statistic = varianceRatio(between, pooled)
   return { steps, statistic, degrees, varies: statistic > chiSquareQuantile(level, degrees) }
 }

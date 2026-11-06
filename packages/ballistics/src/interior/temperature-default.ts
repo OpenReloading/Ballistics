@@ -56,11 +56,11 @@ const defaults: Partial<Record<GrainForm, SensitivityDefault>> = {
   flake: extruded,
 }
 
+const isGrainForm = (form: string): form is GrainForm => Object.hasOwn(defaults, form)
+
 /** The default sensitivity of a grain form; none for `other` or an unknown form. */
 export function defaultSensitivity(form: string | undefined): SensitivityDefault | undefined {
-  return form !== undefined && Object.hasOwn(defaults, form)
-    ? defaults[form as GrainForm]
-    : undefined
+  return form !== undefined && isGrainForm(form) ? defaults[form] : undefined
 }
 
 /**
@@ -73,7 +73,15 @@ export function coldPeakInterval(
   interval: readonly [number, number],
 ): [number, number] | undefined {
   const s = load.propellant.temperatureSensitivity
-  if (!s || !(load.propellantTemperature < s.reference)) return
+  return s && load.propellantTemperature < s.reference ? peakInterval(load, s, interval) : undefined
+}
+
+/** The peak breech pressure (Pa) with the cold sensitivity at both ends of `interval`, [low, high]; undefined when a run is invalid. */
+function peakInterval(
+  load: InteriorLoad,
+  s: NonNullable<InteriorLoad['propellant']['temperatureSensitivity']>,
+  interval: readonly [number, number],
+): [number, number] | undefined {
   const peaks = interval.map((cold) => {
     const r = interior({
       ...load,
@@ -82,8 +90,7 @@ export function coldPeakInterval(
     return r.valid ? r.peakBreechPressure : undefined
   })
   const [a, b] = peaks
-  if (a === undefined || b === undefined) return
-  return [Math.min(a, b), Math.max(a, b)]
+  return a === undefined || b === undefined ? undefined : [Math.min(a, b), Math.max(a, b)]
 }
 
 /** The powder record fields {@link recordSensitivity} reads, in stored units. */
@@ -117,14 +124,24 @@ export function recordSensitivity(powder: SensitivityPowder): TakenSensitivity |
       sensitivity: { reference: own.reference.value, cold: own.cold.value, hot: own.hot.value },
     }
   const fallback = defaultSensitivity(powder.grainForm)
-  if (!fallback || powder.grainForm === undefined) return
-  // the record stores degrees Celsius; inline, as core cannot import the schema's units
+  return fallback && powder.grainForm !== undefined
+    ? takenDefault(powder, powder.grainForm, fallback)
+    : undefined
+}
+
+/** The default of grain form `form` with the reference of the powder's fit, else {@link sensitivityReferenceDefault}. */
+function takenDefault(
+  powder: SensitivityPowder,
+  form: string,
+  fallback: SensitivityDefault,
+): TakenSensitivity {
+  // the record stores degrees Celsius; inline, as this package cannot import the schema's units
   const reference = powder.interior
     ? powder.interior.propellantTemperature.value + 273.15
     : sensitivityReferenceDefault
   return {
     sensitivity: { reference, cold: fallback.cold, hot: fallback.hot },
-    form: powder.grainForm,
+    form,
     fallback,
   }
 }

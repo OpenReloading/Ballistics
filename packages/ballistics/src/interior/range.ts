@@ -4,7 +4,7 @@
  * pressure-lowering ends. It covers input tolerances only, not model error, and is not a
  * confidence interval.
  */
-import { type Settings } from '../settings.ts'
+import type { Settings } from '../settings.ts'
 import { type InteriorLoad, type InteriorOptions, interior } from './model.ts'
 
 /** Tolerance of each input of a load: relative fractions, except `temperatureKelvin`. */
@@ -98,66 +98,95 @@ function runCase<L>(
   return Number.isFinite(p) ? { maxPressure: p } : { maxPressure: null, reason: 'nonFinite' }
 }
 
-/** Runs each input at both ends of its tolerance, adds the cases and returns the rising side of each. */
+/** How a model of `toleranceRange` runs a load: how each input moves it, and its peak (Pa) or the reason it has none. */
+export interface RangeModel<L> {
+  apply: Record<PressureInput, ApplyTolerance<L>>
+  peak: (load: L) => number | string
+}
+
+/** Every input at side 0, in the order of `pressureInputs`. */
+const noSides = (): Record<PressureInput, Side> => ({
+  chargeFraction: 0,
+  volumeFraction: 0,
+  massFraction: 0,
+  burnRateFraction: 0,
+  temperatureKelvin: 0,
+  startPressureFraction: 0,
+})
+
+const isSide = (x: number): x is Side => x === -1 || x === 0 || x === 1
+
+/** The product of two sides that are not 0. */
+const times = (a: 1 | -1, b: 1 | -1): 1 | -1 => (a === b ? 1 : -1)
+
+/**
+ * The side of an input that raises the peak: the sign of the peak at its upper end less the peak at
+ * its lower end, an end without a peak counted as `nominal`; 0 when neither end has one, and 0 for
+ * a NaN difference, which only a NaN nominal gives.
+ */
+function risingSide(
+  up: Pick<PressureCase, 'maxPressure'>,
+  down: Pick<PressureCase, 'maxPressure'>,
+  nominal: number,
+): Side {
+  if (up.maxPressure === null && down.maxPressure === null) return 0
+  const sign = Math.sign((up.maxPressure ?? nominal) - (down.maxPressure ?? nominal))
+  return isSide(sign) ? sign : 0
+}
+
+/** Runs each input at both ends of its tolerance: the cases and the rising side of each input. */
 function singleInputCases<L>(
   load: L,
-  nominal: number,
-  apply: Record<PressureInput, ApplyTolerance<L>>,
-  peak: (load: L) => number | string,
+  { apply, peak }: RangeModel<L>,
   tolerances: PressureTolerances,
-  cases: PressureCase[],
+  nominal: number,
 ) {
-  const sides = {} as Record<PressureInput, Side>
+  const sides = noSides()
+  const cases: PressureCase[] = []
   for (const input of pressureInputs) {
     const t = tolerances[input]
-    sides[input] = 0
     if (t === 0) continue
     const up = runCase(apply[input](load, 1, t), peak)
     const down = runCase(apply[input](load, -1, t), peak)
     cases.push({ input, side: 1, ...up }, { input, side: -1, ...down })
-    const hi = up.maxPressure ?? nominal
-    const lo = down.maxPressure ?? nominal
-    sides[input] =
-      up.maxPressure === null && down.maxPressure === null ? 0 : (Math.sign(hi - lo) as Side)
+    sides[input] = risingSide(up, down, nominal)
   }
-  return sides
+  return { sides, cases }
 }
 
-/** Runs all inputs moved together, each to the end that raises the pressure (or lowers it). */
-function combinedCase<L>(
+/** Runs all inputs moved together, each to the end that raises the pressure, then to the end that lowers it. */
+function combinedCases<L>(
   load: L,
-  side: 1 | -1,
-  apply: Record<PressureInput, ApplyTolerance<L>>,
-  peak: (load: L) => number | string,
+  { apply, peak }: RangeModel<L>,
   tolerances: PressureTolerances,
   sides: Record<PressureInput, Side>,
-): PressureCase {
-  let moved: L | string = load
-  const used = {} as Record<PressureInput, Side>
-  for (const input of pressureInputs) {
-    const s = sides[input] === 0 ? 0 : ((sides[input] * side) as 1 | -1)
-    // inputs after one that left the model are not applied, so they are reported as 0
-    used[input] = typeof moved === 'string' ? 0 : s
-    if (s !== 0 && typeof moved !== 'string') moved = apply[input](moved, s, tolerances[input])
-  }
-  return { input: 'all', side, sides: used, ...runCase(moved, peak) }
+): PressureCase[] {
+  return ([1, -1] as const).map((side): PressureCase => {
+    let moved: L | string = load
+    const used = noSides()
+    for (const input of pressureInputs) {
+      const si = sides[input]
+      const s = si === 0 ? 0 : times(si, side)
+      // inputs after one that left the model are not applied, so they are reported as 0
+      used[input] = typeof moved === 'string' ? 0 : s
+      if (s !== 0 && typeof moved !== 'string') moved = apply[input](moved, s, tolerances[input])
+    }
+    return { input: 'all', side, sides: used, ...runCase(moved, peak) }
+  })
 }
 
 /**
- * The range of `peak` over the tolerance box of `load`. `peak` returns Pa or a reason for an
- * invalid run; `nominal` is `peak(load)`, computed by the caller.
+ * The range of the model's `peak` over the tolerance box of `load`. `peak` returns Pa or a reason for
+ * an invalid run; `nominal` is `peak(load)`, computed by the caller.
  */
 export function toleranceRange<L>(
   load: L,
   nominal: number,
-  apply: Record<PressureInput, ApplyTolerance<L>>,
-  peak: (load: L) => number | string,
+  model: RangeModel<L>,
   tolerances: PressureTolerances,
 ): PressureRange {
-  const cases: PressureCase[] = []
-  const sides = singleInputCases(load, nominal, apply, peak, tolerances, cases)
-  for (const side of [1, -1] as const)
-    cases.push(combinedCase(load, side, apply, peak, tolerances, sides))
+  const { sides, cases: single } = singleInputCases(load, model, tolerances, nominal)
+  const cases = [...single, ...combinedCases(load, model, tolerances, sides)]
   const valid = cases.flatMap((c) => (c.maxPressure === null ? [] : [c.maxPressure]))
   return {
     quantity: 'maxPressure',
@@ -187,6 +216,12 @@ export interface MaximumPlacement {
   dominantInput: PressureInput | null
 }
 
+/** Where `maximum` (Pa) lies against the low and high end of `range`. */
+function maximumClass(range: PressureRange, maximum: number): MaximumClass {
+  if (maximum < range.lowPressure) return 'modelDiscrepancy'
+  return maximum > range.highPressure ? 'aboveRange' : 'inputPlausible'
+}
+
 /**
  * Places `maximum` (Pa) against `range` with no new run: below `lowPressure` is `modelDiscrepancy`,
  * above `highPressure` is `aboveRange`, else `inputPlausible`. The dominant input is read from the
@@ -205,13 +240,7 @@ export function placeMaximum(range: PressureRange, maximum: number): MaximumPlac
       widest = spread
     }
   }
-  const cls: MaximumClass =
-    maximum < range.lowPressure
-      ? 'modelDiscrepancy'
-      : maximum > range.highPressure
-        ? 'aboveRange'
-        : 'inputPlausible'
-  return { class: cls, dominantInput }
+  return { class: maximumClass(range, maximum), dominantInput }
 }
 
 const relative = (value: number, side: number, t: number) => value * (1 + side * t)
@@ -255,5 +284,5 @@ export function interiorPressureRange(
     const r = interior(l, options)
     return r.valid ? r.peakBreechPressure : r.reason
   }
-  return toleranceRange(load, nominal, interiorApply, peak, tolerances)
+  return toleranceRange(load, nominal, { apply: interiorApply, peak }, tolerances)
 }

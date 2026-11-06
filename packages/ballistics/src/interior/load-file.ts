@@ -41,24 +41,24 @@ const requiredKeys = [
 export const missingLoadKeys = (values: Record<string, number | undefined>): string[] =>
   requiredKeys.filter((key) => !Number.isFinite(values[key]))
 
-/**
- * `InteriorLoad` from SI field values. An empty bore area is the circle of the mean of the bore
- * diameter and `grooveDiameter` (m) where given, else of the bore diameter (`boreArea`; a rifled
- * bore is larger, so the field exists). `label` names a field in an error.
- * Throws `ValueError` for a missing required value or a partly filled burn form.
- */
-export function interiorLoad(
-  values: Record<string, number | undefined>,
-  label: (key: string) => string = (key) => key,
-  grooveDiameter?: number,
-): InteriorLoad {
-  const v = (key: string) => {
+type FieldReader = (key: string) => number
+
+/** A reader of the required field values: throws `ValueError` for a missing or non-finite one, named by `label`. */
+const fieldReader =
+  (values: Record<string, number | undefined>, label: (key: string) => string): FieldReader =>
+  (key) => {
     const x = values[key]
     if (x === undefined || !Number.isFinite(x))
       throw new ValueError(key, `Enter a number for ${label(key)}.`)
     return x
   }
-  const boreDiameter = v('boreDiameter')
+
+/** The leak area and the throat wear of the load file where given; throws `ValueError` for a negative one. */
+function leakAndWear(
+  values: Record<string, number | undefined>,
+  v: FieldReader,
+  label: (key: string) => string,
+): { leakArea: number | undefined; wear: number } {
   // 0 is a leak that never opens: the solver takes it
   const leakArea = values['leakArea'] === undefined ? undefined : v('leakArea')
   if (leakArea !== undefined && leakArea < 0)
@@ -66,6 +66,11 @@ export function interiorLoad(
   // a worn throat adds its length times the bore area behind the bullet (`apps/docs/docs/models/interior-m3.md`, "Throat wear")
   const wear = values['throatWear'] === undefined ? 0 : v('throatWear')
   if (wear < 0) throw new ValueError('throatWear', `${label('throatWear')} must be at least 0.`)
+  return { leakArea, wear }
+}
+
+/** Whether all four burn form fields are given; throws `ValueError` when some but not all are. */
+function burnFormGiven(values: Record<string, number | undefined>): boolean {
   const form = Object.entries(burnFormKeys).filter(([k]) => values[k] !== undefined)
   if (form.length > 0 && form.length < 4) {
     const missing = Object.entries(burnFormKeys).filter(([k]) => values[k] === undefined)
@@ -74,35 +79,35 @@ export function interiorLoad(
       `Burn form: ${missing.map(([, n]) => n).join(', ')} needed with the others, or leave all four empty.`,
     )
   }
+  return form.length === 4
+}
+
+/** The propellant of the load file: its constants and a vivacity law, with the two-stage form when given. */
+function vivacityPropellant(v: FieldReader, twoStage: boolean): InteriorLoad['propellant'] {
   return {
-    chamber: {
-      volume: v('volume'),
-      boreArea: boreArea({ area: values['boreArea'], boreDiameter, grooveDiameter }),
-      boreDiameter,
-      ...(wear > 0 && { throatWear: wear }),
+    specificEnergy: v('propellantEnergy'),
+    gamma: v('gamma'),
+    density: v('density'),
+    covolume: v('covolume'),
+    burn: {
+      kind: 'vivacity',
+      vivacity: v('vivacity'),
+      exponent: v('exponent'),
+      referencePressure: v('referencePressure'),
+      form: twoStage
+        ? { kind: 'twoStage', a: v('formA'), m: v('formM'), q: v('formQ'), z1: v('formZ1') }
+        : { kind: 'constant' },
     },
-    barrel: { length: v('travel'), twist: v('twist') },
-    bullet: { mass: v('bulletMass') },
-    charge: v('charge'),
-    propellant: {
-      specificEnergy: v('propellantEnergy'),
-      gamma: v('gamma'),
-      density: v('density'),
-      covolume: v('covolume'),
-      burn: {
-        kind: 'vivacity',
-        vivacity: v('vivacity'),
-        exponent: v('exponent'),
-        referencePressure: v('referencePressure'),
-        form:
-          form.length === 4
-            ? { kind: 'twoStage', a: v('formA'), m: v('formM'), q: v('formQ'), z1: v('formZ1') }
-            : { kind: 'constant' },
-      },
-    },
-    propellantTemperature: v('propellantTemperature'),
-    ignitionPressure: v('ignitionPressure'),
-    startPressure: v('startPressure'),
+  }
+}
+
+/** The pressure gradient (Sebert) and the leakage the load file gives, as entries to spread. */
+function optionalTerms(
+  values: Record<string, number | undefined>,
+  v: FieldReader,
+  leakArea: number | undefined,
+): Pick<InteriorLoad, 'gradient' | 'leakage'> {
+  return {
     ...(values['sebert'] !== undefined && {
       gradient: { energy: v('sebert'), breech: v('sebert') },
     }),
@@ -115,6 +120,39 @@ export function interiorLoad(
         ],
       },
     }),
+  }
+}
+
+/**
+ * `InteriorLoad` from SI field values. An empty bore area is the circle of the mean of the bore
+ * diameter and `grooveDiameter` (m) where given, else of the bore diameter (`boreArea`; a rifled
+ * bore is larger, so the field exists). `label` names a field in an error.
+ * Throws `ValueError` for a missing required value or a partly filled burn form.
+ */
+export function interiorLoad(
+  values: Record<string, number | undefined>,
+  label: (key: string) => string = (key) => key,
+  grooveDiameter?: number,
+): InteriorLoad {
+  const v = fieldReader(values, label)
+  const boreDiameter = v('boreDiameter')
+  const { leakArea, wear } = leakAndWear(values, v, label)
+  const twoStage = burnFormGiven(values)
+  return {
+    chamber: {
+      volume: v('volume'),
+      boreArea: boreArea({ area: values['boreArea'], boreDiameter, grooveDiameter }),
+      boreDiameter,
+      ...(wear > 0 && { throatWear: wear }),
+    },
+    barrel: { length: v('travel'), twist: v('twist') },
+    bullet: { mass: v('bulletMass') },
+    charge: v('charge'),
+    propellant: vivacityPropellant(v, twoStage),
+    propellantTemperature: v('propellantTemperature'),
+    ignitionPressure: v('ignitionPressure'),
+    startPressure: v('startPressure'),
+    ...optionalTerms(values, v, leakArea),
   }
 }
 
@@ -140,6 +178,27 @@ export function checkResistanceValues(values: Record<string, number | undefined>
   }
 }
 
+type Engraving = NonNullable<InteriorLoad['resistance']>['engraving']
+
+/**
+ * The engraving ramp the load file sets: its start pressure and length, the one not given taken from
+ * the record's `engraving`. Throws `ValueError` when neither gives it.
+ */
+function overriddenRamp(
+  engraving: Engraving,
+  { engravingPressure, engravingLength }: Record<string, number | undefined>,
+): Engraving {
+  const pressure = engravingPressure ?? engraving?.[0]?.pressure
+  const length = engravingLength ?? engraving?.at(-1)?.travel
+  const needed = 'Needed with the other engraving value, or from a powder record.'
+  if (pressure === undefined) throw new ValueError('engravingPressure', needed)
+  if (length === undefined) throw new ValueError('engravingLength', needed)
+  return [
+    { travel: 0, pressure },
+    { travel: length, pressure: 0 },
+  ]
+}
+
 /**
  * The bore resistance of a run: the powder record's (`recordResistance`) with the terms the load
  * file overrides (`apps/docs/docs/models/interior-m3.md`, "Bore resistance"). `boreFriction` replaces the friction
@@ -155,19 +214,9 @@ export function overrideResistance(
   const { boreFriction, engravingPressure, engravingLength } = values
   const ramp = engravingPressure !== undefined || engravingLength !== undefined
   if (boreFriction === undefined && !ramp) return record
-  let engraving = record?.engraving
-  if (ramp) {
-    const pressure = engravingPressure ?? engraving?.[0]?.pressure
-    const length = engravingLength ?? engraving?.at(-1)?.travel
-    const needed = 'Needed with the other engraving value, or from a powder record.'
-    if (pressure === undefined) throw new ValueError('engravingPressure', needed)
-    if (length === undefined) throw new ValueError('engravingLength', needed)
-    engraving = [
-      { travel: 0, pressure },
-      { travel: length, pressure: 0 },
-    ]
-  }
-  const friction = boreFriction ?? record?.friction
+  const own: NonNullable<InteriorLoad['resistance']> = record ?? {}
+  const engraving = ramp ? overriddenRamp(own.engraving, values) : own.engraving
+  const friction = boreFriction ?? own.friction
   return { ...(friction !== undefined && { friction }), ...(engraving && { engraving }) }
 }
 
@@ -177,8 +226,7 @@ export function loadRatio(
   bulkDensity: number | undefined,
   volume: number,
 ): number | undefined {
-  if (!bulkDensity || !(volume > 0)) return
-  return charge / bulkDensity / volume
+  return !bulkDensity || !(volume > 0) ? undefined : charge / bulkDensity / volume
 }
 
 /**

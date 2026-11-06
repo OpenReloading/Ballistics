@@ -6,13 +6,19 @@
 import { bisect, InputError, nth } from '@open-reloading/statistics'
 
 import { icao } from '../exterior/atmosphere.ts'
-import { type Rhs, type Rk45Event, type Rk45Options, rk45 } from '../exterior/rk45.ts'
+import {
+  type Rhs,
+  type Rk45Event,
+  type Rk45Options,
+  type Rk45Problem,
+  rk45,
+} from '../exterior/rk45.ts'
 import { overlay, type Settings } from '../settings.ts'
 import { type Burn, burnError, burnForm } from './form.ts'
 import { wornVolume } from './throat-wear.ts'
 
 /** Unchecked read of a state vector the caller sizes and indexes by the same count (kept in this module so the integrator loops inline it). */
-const el = (a: Float64Array, i: number): number => a[i] as number
+const el = (a: Float64Array, i: number): number => a[i] ?? 0
 
 /** Chamber, barrel, bullet, charge and propellant of one `interior` run, SI units. */
 export interface InteriorLoad {
@@ -323,32 +329,34 @@ function bodyChecks(load: InteriorLoad): Check[] {
   ]
 }
 
+/** Whether an engraving profile has travels and pressures of at least 0, with rising travels. */
+const engravingValid = (profile: readonly { travel: number; pressure: number }[]) =>
+  profile.every(
+    (p, i) =>
+      nonNeg(p.travel) && nonNeg(p.pressure) && (i === 0 || p.travel > nth(profile, i - 1).travel),
+  )
+
+/**
+ * Whether the heat loss inputs hold: none, or a positive flame temperature with positive wall
+ * temperature, viscosity and Prandtl number where given and a factor of at least 0.
+ */
+function heatValid(heat: InteriorLoad['heat']): boolean {
+  if (heat === undefined || heat.model === 'none') return true
+  return (
+    pos(heat.flameTemperature) &&
+    [heat.wallTemperature, heat.viscosity, heat.prandtl].every((v) => v === undefined || pos(v)) &&
+    (heat.factor === undefined || nonNeg(heat.factor))
+  )
+}
+
 /** Checks of the bullet's resistance, the gas gradient and the heat loss. */
 function resistanceChecks(load: InteriorLoad): Check[] {
   const { resistance, gradient, heat } = load
-  const profile = resistance?.engraving ?? []
   return [
     ['resistance.friction', resistance?.friction === undefined || nonNeg(resistance.friction)],
-    [
-      'resistance.engraving',
-      profile.every(
-        (p, i) =>
-          nonNeg(p.travel) &&
-          nonNeg(p.pressure) &&
-          (i === 0 || p.travel > nth(profile, i - 1).travel),
-      ),
-    ],
+    ['resistance.engraving', engravingValid(resistance?.engraving ?? [])],
     ['gradient', gradient === undefined || (nonNeg(gradient.energy) && nonNeg(gradient.breech))],
-    [
-      'heat',
-      heat === undefined ||
-        heat.model === 'none' ||
-        (pos(heat.flameTemperature) &&
-          [heat.wallTemperature, heat.viscosity, heat.prandtl].every(
-            (v) => v === undefined || pos(v),
-          ) &&
-          (heat.factor === undefined || nonNeg(heat.factor))),
-    ],
+    ['heat', heatValid(heat)],
   ]
 }
 
@@ -387,6 +395,17 @@ interface Run {
   energy: InteriorEnergy
 }
 
+/** The burn-law coefficient at the propellant temperature: of the web for a geometric burn, of the reference pressure for vivacity. */
+function burnCoefficient(load: InteriorLoad, form: ReturnType<typeof burnForm>): number {
+  const { burn, temperatureSensitivity: tc } = load.propellant
+  const dT = load.propellantTemperature - (tc?.reference ?? 0)
+  const tauT = tc === undefined ? 1 : Math.exp((dT >= 0 ? tc.hot : tc.cold) * dT)
+  const n = burn.exponent
+  return burn.kind === 'geometric'
+    ? (burn.coefficient * tauT) / form.halfWeb
+    : (burn.vivacity * tauT) / burn.referencePressure ** n
+}
+
 /**
  * Constants of one load and the scales of the state (`apps/docs/docs/models/interior-m3.md`,
  * "Scaled state and integration"): effective mass, burn-law coefficient, reference velocity vr and
@@ -414,16 +433,9 @@ function scaleInteriorLoad(load: InteriorLoad) {
   const { energy: delta, breech: eps } = load.gradient ?? lagrangeGradient
   const me = mpr + delta * mc
 
-  const burn = propellant.burn
-  const form = burnForm(burn)
-  const tc = propellant.temperatureSensitivity
-  const dT = load.propellantTemperature - (tc?.reference ?? 0)
-  const tauT = tc === undefined ? 1 : Math.exp((dT >= 0 ? tc.hot : tc.cold) * dT)
-  const n = burn.exponent
-  const coef =
-    burn.kind === 'geometric'
-      ? (burn.coefficient * tauT) / form.halfWeb
-      : (burn.vivacity * tauT) / burn.referencePressure ** n
+  const form = burnForm(propellant.burn)
+  const n = propellant.burn.exponent
+  const coef = burnCoefficient(load, form)
 
   // scaled state [f, x/xe, v/vr, Wr/E0, Eh/E0], with leakage also [ml/mc, El/E0], and time tau = t / ts
   const vr = Math.sqrt((2 * e0) / mp)
@@ -457,33 +469,48 @@ const profileAt = <T extends { travel: number }>(
   return value(a) + ((x - a.travel) * (value(b) - value(a))) / (b.travel - a.travel)
 }
 
-/**
- * Gas state of the scaled state: bore resistance, leakage, pressure, temperature, heat flux, base
- * and breech pressure, and the leak rates.
- */
-function gasState(load: InteriorLoad, s: Scaling, phase: Phase) {
-  const { propellant } = load
-  const { vc, area, d, xe, mc, k, eta, solid, e0, mpr, delta, eps, me, form, vr, ts } = s
-
+/** The bore resistance force at travel x: the friction plus the engraving pressure there, times the bore area. */
+function resistanceForce(load: InteriorLoad, area: number) {
   const friction = load.resistance?.friction ?? 0
   const profile = load.resistance?.engraving ?? []
-  const resistance = (x: number) => area * (friction + profileAt(profile, (pt) => pt.pressure, x))
+  return (x: number) => area * (friction + profileAt(profile, (pt) => pt.pressure, x))
+}
 
-  // gas leakage (apps/docs/docs/models/interior-leakage-heat.md)
+/**
+ * The gas leakage of a load (`apps/docs/docs/models/interior-leakage-heat.md`): whether it leaks, the
+ * leak area over travel, back pressure, discharge coefficient and the charge mass lost at a state.
+ */
+function leakageOf(load: InteriorLoad, mc: number) {
   const leak = load.leakage !== undefined
-  const leakPoints = load.leakage?.area ?? []
-  const pa = load.leakage?.backPressure ?? icao.pressure
-  const cd = load.leakage?.discharge ?? 1
-  const lostMass = (y: Float64Array) => (leak ? el(y, 5) * mc : 0)
-  // travels before the muzzle where resistance or leak area has a kink; a point at the muzzle would
-  // fire before the muzzle event and hide it
-  const kinks = [...new Set([...profile, ...leakPoints].map((pt) => pt.travel))]
-    .filter((x) => x < xe)
-    .sort((a, b) => a - b)
+  return {
+    leak,
+    leakPoints: load.leakage?.area ?? [],
+    pa: load.leakage?.backPressure ?? icao.pressure,
+    cd: load.leakage?.discharge ?? 1,
+    lostMass: (y: Float64Array) => (leak ? el(y, 5) * mc : 0),
+  }
+}
 
+type Leakage = ReturnType<typeof leakageOf>
+
+/**
+ * Travels before the muzzle `xe` where resistance or leak area has a kink, rising; a point at the
+ * muzzle would fire before the muzzle event and hide it.
+ */
+const kinksBefore = (points: readonly { travel: number }[], xe: number) =>
+  [...new Set(points.map((pt) => pt.travel))].filter((x) => x < xe).toSorted((a, b) => a - b)
+
+/** The gas constant of a convective heat loss, 0 for none. */
+function gasConstantOf(load: InteriorLoad, k: number) {
   const heat = load.heat ?? { model: 'none' }
-  const gasR =
-    heat.model === 'convective' ? ((k - 1) * propellant.specificEnergy) / heat.flameTemperature : 0
+  return heat.model === 'convective'
+    ? ((k - 1) * load.propellant.specificEnergy) / heat.flameTemperature
+    : 0
+}
+
+/** The free volume behind the bullet, the mean pressure and the gas temperature of a scaled state. */
+function gasOf(s: Scaling, { leak, lostMass }: Leakage, gasR: number) {
+  const { vc, area, xe, mc, k, eta, solid, e0, me, form, vr } = s
   // the leak terms are separate summands, exactly 0 without leakage, so those results stay bit-identical
   const freeVolume = (z: number, x: number, lost: number) =>
     vc + area * x - solid * (1 - z) - eta * mc * z + eta * lost
@@ -502,7 +529,22 @@ function gasState(load: InteriorLoad, s: Scaling, phase: Phase) {
     const gas = mc * z - lost
     return gasR > 0 && gas > 0 ? (p * freeVolume(z, el(y, 1) * xe, lost)) / (gas * gasR) : null
   }
-  const heatFlux = (y: Float64Array, p: number) => {
+  return { freeVolume, pressure, temperature }
+}
+
+type FreeVolume = (z: number, x: number, lost: number) => number
+
+/** The convective heat flux to the barrel wall at a scaled state and mean pressure, 0 without convective heat loss. */
+function heatFluxOf(
+  load: InteriorLoad,
+  s: Scaling,
+  lostMass: Leakage['lostMass'],
+  freeVolume: FreeVolume,
+) {
+  const { vc, area, d, xe, mc, k, solid, form, vr } = s
+  const heat = load.heat ?? { model: 'none' }
+  const gasR = gasConstantOf(load, k)
+  return (y: Float64Array, p: number) => {
     if (heat.model !== 'convective') return 0
     const z = form.z(el(y, 0))
     const v = el(y, 2) * vr
@@ -521,18 +563,25 @@ function gasState(load: InteriorLoad, s: Scaling, phase: Phase) {
     const h = ((0.023 * conductivity) / d) * re ** 0.8 * pr
     return (heat.factor ?? 1) * h * Math.PI * d * (x + vc / area) * (gas - tw)
   }
-  /**
-   * Base pressure from mean pressure and resistance force while moving
-   * (`apps/docs/docs/models/interior-m3.md`, "Pressure gradient").
-   */
-  const basePressure = (p: number, fr: number) =>
+}
+
+/**
+ * Base pressure from mean pressure and resistance force while moving
+ * (`apps/docs/docs/models/interior-m3.md`, "Pressure gradient").
+ */
+const basePressureOf =
+  ({ area, mc, mpr, delta }: Scaling) =>
+  (p: number, fr: number) =>
     (p + (delta * mc * fr) / (area * mpr)) / (1 + (delta * mc) / mpr)
 
-  /**
-   * Writes the scaled leak mass and enthalpy rates into el(dy, 5), el(dy, 6)
-   * (`apps/docs/docs/models/interior-leakage-heat.md`, "Flow through the leak" and "Energy carried out").
-   */
-  const leakRates = (y: Float64Array, p: number, pb: number, dy: Float64Array) => {
+/**
+ * The leak rates of a scaled state: writes the scaled leak mass and enthalpy rates into el(dy, 5),
+ * el(dy, 6) (`apps/docs/docs/models/interior-leakage-heat.md`, "Flow through the leak" and "Energy carried out").
+ */
+function leakRatesOf(s: Scaling, leakage: Leakage, freeVolume: FreeVolume, phase: Phase) {
+  const { xe, mc, k, eta, e0, form, ts } = s
+  const { leakPoints, pa, cd, lostMass } = leakage
+  return (y: Float64Array, p: number, pb: number, dy: Float64Array) => {
     dy[5] = 0
     dy[6] = 0
     const z = form.z(el(y, 0))
@@ -547,17 +596,45 @@ function gasState(load: InteriorLoad, s: Scaling, phase: Phase) {
     dy[5] = (flow * ts) / mc
     dy[6] = (flow * ((k * rt) / (k - 1) + eta * p) * ts) / e0
   }
-  /**
-   * Mean, base and breech pressure (`apps/docs/docs/models/interior-m3.md`, "Pressure gradient"); equal while
-   * the projectile is at rest.
-   */
-  const pressures = (y: Float64Array): [number, number, number] => {
-    const p = pressure(y)
+}
+
+/**
+ * Mean, base and breech pressure of a scaled state (`apps/docs/docs/models/interior-m3.md`, "Pressure
+ * gradient"); equal while the projectile is at rest.
+ */
+function pressuresOf(
+  s: Scaling,
+  phase: Phase,
+  f: {
+    pressure: (y: Float64Array) => number
+    resistance: (x: number) => number
+    basePressure: (p: number, fr: number) => number
+  },
+) {
+  const { area, xe, mc, eps, me } = s
+  return (y: Float64Array): [number, number, number] => {
+    const p = f.pressure(y)
     if (!phase.moving) return [p, p, p]
-    const fr = resistance(el(y, 1) * xe)
-    const pb = basePressure(p, fr)
+    const fr = f.resistance(el(y, 1) * xe)
+    const pb = f.basePressure(p, fr)
     return [p, pb, pb + (eps * mc * ((area * p - fr) / me)) / area]
   }
+}
+
+/**
+ * Gas state of the scaled state: bore resistance, leakage, pressure, temperature, heat flux, base
+ * and breech pressure, and the leak rates.
+ */
+function gasState(load: InteriorLoad, s: Scaling, phase: Phase) {
+  const { area, xe, mc, k } = s
+  const resistance = resistanceForce(load, area)
+  const leakage = leakageOf(load, mc)
+  const kinks = kinksBefore([...(load.resistance?.engraving ?? []), ...leakage.leakPoints], xe)
+  const { freeVolume, pressure, temperature } = gasOf(s, leakage, gasConstantOf(load, k))
+  const heatFlux = heatFluxOf(load, s, leakage.lostMass, freeVolume)
+  const basePressure = basePressureOf(s)
+  const leakRates = leakRatesOf(s, leakage, freeVolume, phase)
+  const pressures = pressuresOf(s, phase, { pressure, resistance, basePressure })
   // events
   const pst = load.startPressure
   /** Shot start function: positive once the pressure and the force on the base exceed their limits. */
@@ -567,9 +644,9 @@ function gasState(load: InteriorLoad, s: Scaling, phase: Phase) {
   }
   return {
     resistance,
-    leak,
-    pa,
-    lostMass,
+    leak: leakage.leak,
+    pa: leakage.pa,
+    lostMass: leakage.lostMass,
     kinks,
     freeVolume,
     pressure,
@@ -607,29 +684,32 @@ function interiorRhs(s: Scaling, gas: Gas, phase: Phase): Rhs {
   }
 }
 
+/** The model of one run: its scales, gas state, phase and right-hand side. */
+interface RunModel {
+  s: Scaling
+  gas: Gas
+  phase: Phase
+  rhs: Rhs
+}
+
+type AddEvent = (
+  kind: EventKind,
+  eventFunction: Rk45Event['eventFunction'],
+  direction: -1 | 1,
+  index?: number,
+) => void
+
 /**
- * Event list of the next integration from state y: shot start, form-function breaks, burnout,
- * resistance and leak kinks, muzzle, stall, the three pressure peaks and the onset of leak flow.
+ * Rates of the three pressures along the flow, central difference in tau. rk45 calls the three
+ * peak events with the same state, so the rates are kept for the last state; a new list is made
+ * at each restart, when `moving` or `burning` may change.
  */
-function interiorEvents(
-  s: Scaling,
-  gas: Gas,
-  phase: Phase,
-  rhs: Rhs,
-  size: number,
-  closed: boolean,
-) {
-  const { xe, form } = s
-  const { kinks, leak, pa, pressures, startG } = gas
+function peakSlopes({ gas, rhs }: RunModel, size: number) {
+  const { pressures } = gas
   const fd = new Float64Array(size)
   const yp = new Float64Array(size)
   const ym = new Float64Array(size)
-  /**
-   * Rates of the three pressures along the flow, central difference in tau. rk45 calls the three
-   * peak events with the same state, so the rates are kept for the last state; a new list is made
-   * at each restart, when `moving` or `burning` may change.
-   */
-  const slopes = () => {
+  return () => {
     const last = new Float64Array(size).fill(Number.NaN)
     const rates = [0, 0, 0]
     return (q: number) => (t: number, y: Float64Array) => {
@@ -648,29 +728,45 @@ function interiorEvents(
       return nth(rates, q)
     }
   }
-  type AddEvent = (
-    kind: EventKind,
-    eventFunction: Rk45Event['eventFunction'],
-    direction: -1 | 1,
-    index?: number,
-  ) => void
-  const addBurning = (add: AddEvent, y: Float64Array) => {
-    for (let i = phase.breakIndex; i < form.breaks.length; i++) {
-      const edge = nth(form.breaks, i)
-      if (edge > el(y, 0)) add('break', (_t, y) => el(y, 0) - edge, 1, i)
-    }
-    add('burnout', (_t, y) => el(y, 0) - form.end, 1)
+}
+
+/** The events while the charge burns: the form-function breaks ahead of state y and the burnout. */
+function addBurningEvents({ s, phase }: RunModel, add: AddEvent, y: Float64Array) {
+  const { form } = s
+  for (let i = phase.breakIndex; i < form.breaks.length; i++) {
+    const edge = nth(form.breaks, i)
+    if (edge > el(y, 0)) add('break', (_t, state) => el(state, 0) - edge, 1, i)
   }
-  const addMoving = (add: AddEvent, y: Float64Array) => {
-    for (let i = phase.profileIndex; i < kinks.length; i++) {
-      const kink = nth(kinks, i)
-      if (kink / xe > el(y, 1)) add('profile', (_t, y) => el(y, 1) - kink / xe, 1, i)
-    }
-    add('muzzle', (_t, y) => el(y, 1) - 1, 1)
-    add('stall', (_t, y) => el(y, 2), -1)
-    const slope = slopes()
-    for (const q of [0, 1, 2]) add('peak', slope(q), -1)
+  add('burnout', (_t, state) => el(state, 0) - form.end, 1)
+}
+
+/** The events while the bullet moves: the kinks ahead of state y, muzzle, stall and the three pressure peaks. */
+function addMovingEvents(
+  { s, gas, phase }: RunModel,
+  add: AddEvent,
+  y: Float64Array,
+  slopes: ReturnType<typeof peakSlopes>,
+) {
+  const { xe } = s
+  const { kinks } = gas
+  for (let i = phase.profileIndex; i < kinks.length; i++) {
+    const kink = nth(kinks, i)
+    if (kink / xe > el(y, 1)) add('profile', (_t, state) => el(state, 1) - kink / xe, 1, i)
   }
+  add('muzzle', (_t, state) => el(state, 1) - 1, 1)
+  add('stall', (_t, state) => el(state, 2), -1)
+  const slope = slopes()
+  for (const q of [0, 1, 2]) add('peak', slope(q), -1)
+}
+
+/**
+ * Event list of the next integration from state y: shot start, form-function breaks, burnout,
+ * resistance and leak kinks, muzzle, stall, the three pressure peaks and the onset of leak flow.
+ */
+function interiorEvents(m: RunModel, size: number, closed: boolean) {
+  const { phase } = m
+  const { leak, pa, pressures, startG } = m.gas
+  const slopes = peakSlopes(m, size)
   return (y: Float64Array) => {
     const list: { kind: EventKind; index: number; ev: Rk45Event }[] = []
     const add = (
@@ -679,11 +775,11 @@ function interiorEvents(
       direction: -1 | 1,
       index = 0,
     ) => list.push({ kind, index, ev: { eventFunction, direction, terminal: kind !== 'peak' } })
-    if (!phase.moving && !closed) add('start', (_t, y) => startG(y), 1)
-    if (phase.burning) addBurning(add, y)
-    if (phase.moving) addMoving(add, y)
+    if (!phase.moving && !closed) add('start', (_t, state) => startG(state), 1)
+    if (phase.burning) addBurningEvents(m, add, y)
+    if (phase.moving) addMovingEvents(m, add, y, slopes)
     // onset of flow: the subsonic rate has an infinite slope at p_b = p_a
-    if (leak && !phase.leaking) add('onset', (_t, y) => pressures(y)[1] - pa, 1)
+    if (leak && !phase.leaking) add('onset', (_t, state) => pressures(state)[1] - pa, 1)
     return list
   }
 }
@@ -709,7 +805,11 @@ function energyBalance(s: Scaling, gas: Gas, y: Float64Array): InteriorEnergy {
  * Moves the phase past the event; a burnout also sets the burnt state at the end of the form
  * function. True for a burnout.
  */
-function applyEvent(s: Scaling, phase: Phase, kind: EventKind, index: number, y: Float64Array) {
+function applyEvent(
+  { s, phase }: RunModel,
+  { kind, index }: { kind: EventKind; index: number },
+  y: Float64Array,
+) {
   if (kind === 'start') phase.moving = true
   else if (kind === 'break') phase.breakIndex = index + 1
   else if (kind === 'profile') phase.profileIndex = index + 1
@@ -738,23 +838,17 @@ function ignitionState(
 
 /** One integration to the next terminal event or `until.maxTime`; a step failure invalidates the run. */
 function integrate(
-  rhs: Rhs,
-  tau: number,
-  y: Float64Array,
-  events: Rk45Event[],
+  problem: Rk45Problem,
   options: InteriorOptions,
   until: Pick<Rk45Options, 'stepsBefore' | 'maxTime' | 'initialStep'>,
 ): ReturnType<typeof rk45> | InteriorInvalid {
   try {
-    return rk45(
-      { f: rhs, t0: tau, y0: y, events },
-      {
-        relativeTolerance: options.relativeTolerance,
-        absoluteTolerance: options.absoluteTolerance,
-        maxSteps: options.maxSteps,
-        ...until,
-      },
-    )
+    return rk45(problem, {
+      relativeTolerance: options.relativeTolerance,
+      absoluteTolerance: options.absoluteTolerance,
+      maxSteps: options.maxSteps,
+      ...until,
+    })
   } catch (err) {
     if (err instanceof InputError) return { valid: false, reason: 'integration' }
     throw err
@@ -775,11 +869,7 @@ interface RunState {
 }
 
 /** What the driver needs to restart an integration. */
-interface Driver {
-  s: Scaling
-  gas: Gas
-  phase: Phase
-  rhs: Rhs
+interface Driver extends RunModel {
   events: ReturnType<typeof interiorEvents>
   point: (tau: number, y: Float64Array) => InteriorPoint
   options: InteriorOptions
@@ -799,7 +889,7 @@ function handleEvent(
   if (kind === 'stall') return { valid: false, reason: 'stuck' }
   if (kind === 'start') st.shotStartTime = tau * ts
   if (kind === 'burnout') st.burnout = { time: tau * ts, travel: el(y, 1) * xe }
-  if (applyEvent(d.s, d.phase, kind, index, y) && !d.phase.moving && !d.closed)
+  if (applyEvent(d, { kind, index }, y) && !d.phase.moving && !d.closed)
     return { valid: false, reason: 'noShotStart' }
   st.points.push(d.point(tau, y))
   return kind === 'muzzle' || (d.closed && kind === 'burnout') ? 'done' : 'continue'
@@ -812,10 +902,7 @@ function advance(d: Driver, st: RunState): InteriorInvalid | 'continue' | 'done'
   if (leak && !d.phase.leaking && pressures(st.y)[1] >= pa) d.phase.leaking = true
   const list = d.events(st.y)
   const r = integrate(
-    d.rhs,
-    st.tau,
-    st.y,
-    list.map((e) => e.ev),
+    { f: d.rhs, t0: st.tau, y0: st.y, events: list.map((e) => e.ev) },
     d.options,
     { stepsBefore: st.steps, maxTime: Math.min(st.next, d.tauMax), initialStep: st.h },
   )
@@ -832,28 +919,22 @@ function advance(d: Driver, st: RunState): InteriorInvalid | 'continue' | 'done'
   return 'continue'
 }
 
-/**
- * Driver: from ignition in chunks of `outputStep`, restarted at every terminal event, until the
- * muzzle (closed vessel: burnout).
- */
-function runInterior(
-  load: InteriorLoad,
-  options: InteriorOptions,
-  closed: boolean,
-  s: Scaling,
-): Run | InteriorInvalid {
-  const { xe, form, vr, ts } = s
-  const phase: Phase = {
-    moving: false,
-    burning: true,
-    leaking: false,
-    breakIndex: 0,
-    profileIndex: 0,
+/** Advances the run from `st` until the muzzle (closed vessel: burnout) or an invalid state. */
+function drive(d: Driver, st: RunState): Run | InteriorInvalid {
+  for (;;) {
+    const outcome = advance(d, st)
+    if (outcome === 'done') break
+    if (outcome !== 'continue') return outcome
   }
-  const gas = gasState(load, s, phase)
-  const { leak, lostMass, temperature, pressures, startG } = gas
-  const rhs = interiorRhs(s, gas, phase)
-  const point = (tau: number, y: Float64Array): InteriorPoint => {
+  const { points, shotStartTime, burnout, steps, y } = st
+  return { points, shotStartTime, burnout, steps, energy: energyBalance(d.s, d.gas, y) }
+}
+
+/** The output point of a scaled state at scaled time tau. */
+function pointOf(s: Scaling, gas: Gas) {
+  const { xe, form, vr, ts } = s
+  const { leak, lostMass, temperature, pressures } = gas
+  return (tau: number, y: Float64Array): InteriorPoint => {
     const [p, pb, pbr] = pressures(y)
     const pt: InteriorPoint = {
       time: tau * ts,
@@ -868,12 +949,35 @@ function runInterior(
     if (leak) pt.leakedMass = lostMass(y)
     return pt
   }
+}
 
-  const start = ignitionState(load, s, leak)
+/**
+ * Driver: from ignition in chunks of `outputStep`, restarted at every terminal event, until the
+ * muzzle (closed vessel: burnout).
+ */
+function runInterior(
+  load: InteriorLoad,
+  options: InteriorOptions,
+  closed: boolean,
+  s: Scaling,
+): Run | InteriorInvalid {
+  const { ts } = s
+  const phase: Phase = {
+    moving: false,
+    burning: true,
+    leaking: false,
+    breakIndex: 0,
+    profileIndex: 0,
+  }
+  const gas = gasState(load, s, phase)
+  const rhs = interiorRhs(s, gas, phase)
+  const point = pointOf(s, gas)
+
+  const start = ignitionState(load, s, gas.leak)
   if ('valid' in start) return start
-  const events = interiorEvents(s, gas, phase, rhs, start.length, closed)
+  const events = interiorEvents({ s, gas, phase, rhs }, start.length, closed)
   const first = point(0, start)
-  if (!closed && startG(start) >= 0) phase.moving = true
+  if (!closed && gas.startG(start) >= 0) phase.moving = true
   const dTau = options.outputStep / ts
   const st: RunState = {
     tau: 0,
@@ -897,14 +1001,10 @@ function runInterior(
     tauMax: options.maxTime / ts,
     dTau,
   }
-  for (;;) {
-    const outcome = advance(driver, st)
-    if (outcome === 'done') break
-    if (outcome !== 'continue') return outcome
-  }
-  const { points, shotStartTime, burnout, steps, y } = st
-  return { points, shotStartTime, burnout, steps, energy: energyBalance(s, gas, y) }
+  return drive(driver, st)
 }
+
+const isOptionKey = (key: string): key is keyof InteriorOptions => key in interiorDefaults
 
 function simulate(
   load: InteriorLoad,
@@ -913,9 +1013,9 @@ function simulate(
 ): Run | InteriorInvalid {
   const merged = overlay(interiorDefaults, options)
   // an output step of 0 never advances the run
-  const option = (Object.keys(interiorDefaults) as (keyof InteriorOptions)[]).find(
-    (k) => !(Number.isFinite(merged[k]) && merged[k] > 0),
-  )
+  const option = Object.keys(interiorDefaults)
+    .filter(isOptionKey)
+    .find((k) => !(Number.isFinite(merged[k]) && merged[k] > 0))
   if (option) return { valid: false, reason: 'input', field: option }
   const field = inputError(load)
   if (field) return { valid: false, reason: 'input', field }

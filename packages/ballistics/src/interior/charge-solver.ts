@@ -7,7 +7,7 @@
  * target, not a charge to load.
  */
 import { need, nth } from '@open-reloading/statistics'
-import { type Settings } from '../settings.ts'
+import type { Settings } from '../settings.ts'
 
 import { solidFillLimit } from './load-file.ts'
 import {
@@ -117,13 +117,18 @@ export type ChargeSolution =
       evaluationCount: number
     }
 
+/** What a target quantity reads besides the run: the charge (kg), the chamber and the bulk density (kg/m³) of the load ratio. */
+export interface ChargeTargetInputs {
+  charge: number
+  load: Pick<InteriorLoad, 'chamber'>
+  bulkDensity?: number | undefined
+}
+
 /** The target quantity of a valid run, or undefined where it is not defined. */
 export function chargeTargetValue(
   kind: ChargeTargetKind,
   run: InteriorRun,
-  charge: number,
-  load: Pick<InteriorLoad, 'chamber'>,
-  bulkDensity?: number,
+  { charge, load, bulkDensity }: ChargeTargetInputs,
 ): number | undefined {
   if (kind === 'peakPressure') return run.peakBreechPressure
   if (kind === 'muzzleVelocity') return run.muzzleVelocity
@@ -149,6 +154,18 @@ interface Point {
   run: InteriorRun
 }
 
+/** The point of a valid run, or undefined where its target value is not a finite number. */
+function pointAt(
+  kind: ChargeTargetKind,
+  run: InteriorRun,
+  at: ChargeTargetInputs,
+): Point | undefined {
+  const value = chargeTargetValue(kind, run, at)
+  return value !== undefined && Number.isFinite(value)
+    ? { charge: at.charge, value, run }
+    : undefined
+}
+
 /** Runs the model at a charge and counts the runs; keeps the first failure. */
 interface Evaluator {
   evaluate: (charge: number) => Point | undefined
@@ -167,15 +184,12 @@ function evaluator(
     evaluate: (charge) => {
       state.evaluationCount++
       const run = model({ ...load, charge }, runOptions)
-      if (!run.valid) {
+      if (!run.valid)
         state.failure ??= {
           reason: run.reason,
           ...(run.field !== undefined && { field: run.field }),
         }
-        return
-      }
-      const value = chargeTargetValue(kind, run, charge, load, bulkDensity)
-      return value !== undefined && Number.isFinite(value) ? { charge, value, run } : undefined
+      return run.valid ? pointAt(kind, run, { charge, load, bulkDensity }) : undefined
     },
   }
   return state
@@ -215,20 +229,7 @@ function findBrackets(scan: readonly (Point | undefined)[], target: number): [Po
   return brackets
 }
 
-/** The run at the false position charge inside (a, b), at the midpoint where that gives no valid run. */
-function evaluateInside(
-  a: Point,
-  b: Point,
-  fa: number,
-  fb: number,
-  evaluate: Evaluator['evaluate'],
-): Point | undefined {
-  let c = (a.charge * fb - b.charge * fa) / (fb - fa)
-  if (!(c > a.charge && c < b.charge)) c = (a.charge + b.charge) / 2
-  // a run that is not valid there: bisection
-  return evaluate(c) ?? evaluate((a.charge + b.charge) / 2)
-}
-
+/** A bracket (a, b) of the Illinois method with the target differences at its ends. */
 interface IllinoisState {
   a: Point
   b: Point
@@ -236,6 +237,17 @@ interface IllinoisState {
   fb: number
   /** Side the last point replaced, -1 for b and 1 for a. */
   side: -1 | 0 | 1
+}
+
+/** The run at the false position charge inside (a, b), at the midpoint where that gives no valid run. */
+function evaluateInside(
+  { a, b, fa, fb }: IllinoisState,
+  evaluate: Evaluator['evaluate'],
+): Point | undefined {
+  let c = (a.charge * fb - b.charge * fa) / (fb - fa)
+  if (!(c > a.charge && c < b.charge)) c = (a.charge + b.charge) / 2
+  // a run that is not valid there: bisection
+  return evaluate(c) ?? evaluate((a.charge + b.charge) / 2)
 }
 
 /** The bracket after the run `p` replaced the end it lies on, the retained end's value halved on a repeat. */
@@ -257,13 +269,66 @@ function illinoisRoot(
   const [a, b] = bracket
   let state: IllinoisState = { a, b, fa: a.value - target, fb: b.value - target, side: 0 }
   for (let i = 0; i < maxIterations; i++) {
-    const p = evaluateInside(state.a, state.b, state.fa, state.fb, evaluate)
+    const p = evaluateInside(state, evaluate)
     if (!p) return 'bracketFailed'
     if (within(p.value, target)) return p
     if (p.charge <= state.a.charge || p.charge >= state.b.charge) break
     state = narrow(state, p, p.value - target)
   }
   return 'toleranceNotReached'
+}
+
+/** Checks the target value and the bulk density, which the load ratio target needs. */
+function checkChargeTarget(target: ChargeTarget, bulkDensity: number | undefined): void {
+  need(Number.isFinite(target.value) && target.value > 0, 'target value must be above 0')
+  need(
+    bulkDensity === undefined || (Number.isFinite(bulkDensity) && bulkDensity > 0),
+    'bulk density must be above 0',
+  )
+  need(
+    target.kind !== 'loadRatio' || bulkDensity !== undefined,
+    'the load ratio target needs the bulk density',
+  )
+}
+
+/**
+ * The solution over the valid points of the scan: refused outside the values they reach and where
+ * the value is not monotone in the charge, else a scan point within tolerance or the root of the
+ * one bracket.
+ */
+function solveInRange(
+  scan: readonly (Point | undefined)[],
+  valid: Point[],
+  target: number,
+  runs: Evaluator,
+): ChargeSolution {
+  const reachable = reachableRange(valid)
+  const refuse = (reason: ChargeRefusal) => ({
+    reached: false as const,
+    reason,
+    reachable,
+    evaluationCount: runs.evaluationCount,
+  })
+  if (target < reachable.minValue.value) return refuse('belowRange')
+  if (target > reachable.maxValue.value) return refuse('aboveRange')
+
+  const done = (p: Point): ChargeSolution => ({
+    reached: true,
+    charge: p.charge,
+    value: p.value,
+    run: p.run,
+    evaluationCount: runs.evaluationCount,
+    tolerance: chargeSolverTolerance,
+    reachable,
+  })
+  const hit = valid.find((p) => within(p.value, target))
+  const brackets = findBrackets(scan, target)
+  if (hit && brackets.length <= 1) return done(hit)
+  if (brackets.length > 1) return refuse('notMonotone')
+  if (brackets.length === 0) return refuse('bracketFailed')
+
+  const root = illinoisRoot(nth(brackets, 0), target, runs.evaluate)
+  return typeof root === 'string' ? refuse(root) : done(root)
 }
 
 /**
@@ -275,16 +340,7 @@ export function solveCharge(
   target: ChargeTarget,
   options: ChargeSolverOptions = {},
 ): ChargeSolution {
-  const { bulkDensity } = options
-  need(Number.isFinite(target.value) && target.value > 0, 'target value must be above 0')
-  need(
-    bulkDensity === undefined || (Number.isFinite(bulkDensity) && bulkDensity > 0),
-    'bulk density must be above 0',
-  )
-  need(
-    target.kind !== 'loadRatio' || bulkDensity !== undefined,
-    'the load ratio target needs the bulk density',
-  )
+  checkChargeTarget(target, options.bulkDensity)
   const runs = evaluator(load, target.kind, options)
 
   const scan = scanCharges(load, runs.evaluate)
@@ -293,31 +349,5 @@ export function solveCharge(
     const { failure, evaluationCount } = runs
     return { reached: false, reason: 'noValidRun', ...(failure && { failure }), evaluationCount }
   }
-  const reachable = reachableRange(valid)
-  const refuse = (reason: ChargeRefusal) => ({
-    reached: false as const,
-    reason,
-    reachable,
-    evaluationCount: runs.evaluationCount,
-  })
-  if (target.value < reachable.minValue.value) return refuse('belowRange')
-  if (target.value > reachable.maxValue.value) return refuse('aboveRange')
-
-  const done = (p: Point): ChargeSolution => ({
-    reached: true,
-    charge: p.charge,
-    value: p.value,
-    run: p.run,
-    evaluationCount: runs.evaluationCount,
-    tolerance: chargeSolverTolerance,
-    reachable,
-  })
-  const hit = valid.find((p) => within(p.value, target.value))
-  const brackets = findBrackets(scan, target.value)
-  if (hit && brackets.length <= 1) return done(hit)
-  if (brackets.length > 1) return refuse('notMonotone')
-  if (brackets.length === 0) return refuse('bracketFailed')
-
-  const root = illinoisRoot(nth(brackets, 0), target.value, runs.evaluate)
-  return typeof root === 'string' ? refuse(root) : done(root)
+  return solveInRange(scan, valid, target.value, runs)
 }

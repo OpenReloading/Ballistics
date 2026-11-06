@@ -261,10 +261,20 @@ export interface ChargeTarget {
 }
 
 // @public
+export interface ChargeTargetInputs {
+    // (undocumented)
+    bulkDensity?: number | undefined;
+    // (undocumented)
+    charge: number;
+    // (undocumented)
+    load: Pick<InteriorLoad, 'chamber'>;
+}
+
+// @public
 export type ChargeTargetKind = 'peakPressure' | 'muzzleVelocity' | 'loadRatio' | 'barrelTime' | 'bulletLeadTime';
 
 // @public
-export function chargeTargetValue(kind: ChargeTargetKind, run: InteriorRun, charge: number, load: Pick<InteriorLoad, 'chamber'>, bulkDensity?: number): number | undefined;
+export function chargeTargetValue(kind: ChargeTargetKind, run: InteriorRun, input: ChargeTargetInputs): number | undefined;
 
 // @public
 export function chargeTooSmall(peakMeanPressure: number, startPressure: number, ignitionPressure: number): boolean;
@@ -1155,6 +1165,14 @@ export const radPerMoa: number;
 export const radPerMrad = 0.001;
 
 // @public
+export interface RangeModel<L> {
+    // (undocumented)
+    apply: Record<PressureInput, ApplyTolerance<L>>;
+    // (undocumented)
+    peak: (load: L) => number | string;
+}
+
+// @public
 export interface RangeStringDefaults {
     // (undocumented)
     confidenceLevel: 0.95;
@@ -1452,7 +1470,15 @@ export interface SampledBand {
 }
 
 // @public
-export function sampledBand<L>(load: L, apply: Record<PressureInput, ApplyTolerance<L>>, run: (load: L) => SampledRun | string, tolerances: PressureTolerances, input: SamplingOptions): SampledBand;
+export function sampledBand<L>(load: L, input: SampledModel<L>, tolerances: PressureTolerances, input2: SamplingOptions): SampledBand;
+
+// @public
+export interface SampledModel<L> {
+    // (undocumented)
+    apply: Record<PressureInput, ApplyTolerance<L>>;
+    // (undocumented)
+    run: (load: L) => SampledRun | string;
+}
 
 // @public
 export interface SampledRun {
@@ -1678,7 +1704,7 @@ export interface TargetMotion {
 }
 
 // @public
-export function toleranceRange<L>(load: L, nominal: number, apply: Record<PressureInput, ApplyTolerance<L>>, peak: (load: L) => number | string, tolerances: PressureTolerances): PressureRange;
+export function toleranceRange<L>(load: L, nominal: number, model: RangeModel<L>, tolerances: PressureTolerances): PressureRange;
 
 // @public
 export interface Trajectory {

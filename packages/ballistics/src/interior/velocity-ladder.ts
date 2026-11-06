@@ -46,6 +46,42 @@ export interface LadderFlatSpots {
   flatSpots: FlatSpot[]
 }
 
+/** Checks one string of a ladder: a positive charge, a finite mean, a spread of at least 0 and two shots or more. */
+function checkLadderStep(s: LadderStep): void {
+  need(Number.isFinite(s.charge) && s.charge > 0, 'charge must be positive')
+  need(Number.isFinite(s.mean), 'mean must be finite')
+  need(
+    Number.isFinite(s.standardDeviation) && s.standardDeviation >= 0,
+    'standard deviation must be 0 or more',
+  )
+  need(Number.isInteger(s.count) && s.count >= 2, 'each string needs at least two shots')
+}
+
+/** The segment from string a to the next charge b: the slope of the mean velocity and its band at `level`. */
+function ladderSegment(a: LadderStep, b: LadderStep, level: number): LadderSegment {
+  need(b.charge > a.charge, 'charges must differ')
+  const va = a.standardDeviation ** 2 / a.count
+  const vb = b.standardDeviation ** 2 / b.count
+  const df =
+    va + vb === 0
+      ? a.count + b.count - 2
+      : Math.max(
+          1,
+          Math.floor((va + vb) ** 2 / (va ** 2 / (a.count - 1) + vb ** 2 / (b.count - 1))),
+        )
+  const dc = b.charge - a.charge
+  const slope = (b.mean - a.mean) / dc
+  const halfWidth = (studentTwoSidedQuantile(level, df) * Math.sqrt(va + vb)) / dc
+  return {
+    from: a.charge,
+    to: b.charge,
+    slope,
+    halfWidth,
+    flat: Math.abs(slope) <= halfWidth,
+    counts: [a.count, b.count],
+  }
+}
+
 /**
  * The segments between neighbouring charges, each with the slope of the mean velocity and a
  * two-sided confidence band from Welch's standard error and t quantile (whole degrees of freedom,
@@ -54,40 +90,9 @@ export interface LadderFlatSpots {
  */
 export function ladderFlatSpots(steps: readonly LadderStep[], level = 0.95): LadderFlatSpots {
   need(steps.length >= 2, 'a ladder needs at least two strings')
-  const sorted = [...steps].sort((a, b) => a.charge - b.charge)
-  for (const s of sorted) {
-    need(Number.isFinite(s.charge) && s.charge > 0, 'charge must be positive')
-    need(Number.isFinite(s.mean), 'mean must be finite')
-    need(
-      Number.isFinite(s.standardDeviation) && s.standardDeviation >= 0,
-      'standard deviation must be 0 or more',
-    )
-    need(Number.isInteger(s.count) && s.count >= 2, 'each string needs at least two shots')
-  }
-  const segments = sorted.slice(1).map((b, i): LadderSegment => {
-    const a = nth(sorted, i)
-    need(b.charge > a.charge, 'charges must differ')
-    const va = a.standardDeviation ** 2 / a.count
-    const vb = b.standardDeviation ** 2 / b.count
-    const df =
-      va + vb === 0
-        ? a.count + b.count - 2
-        : Math.max(
-            1,
-            Math.floor((va + vb) ** 2 / (va ** 2 / (a.count - 1) + vb ** 2 / (b.count - 1))),
-          )
-    const dc = b.charge - a.charge
-    const slope = (b.mean - a.mean) / dc
-    const halfWidth = (studentTwoSidedQuantile(level, df) * Math.sqrt(va + vb)) / dc
-    return {
-      from: a.charge,
-      to: b.charge,
-      slope,
-      halfWidth,
-      flat: Math.abs(slope) <= halfWidth,
-      counts: [a.count, b.count],
-    }
-  })
+  const sorted = steps.toSorted((a, b) => a.charge - b.charge)
+  for (const s of sorted) checkLadderStep(s)
+  const segments = sorted.slice(1).map((b, i) => ladderSegment(nth(sorted, i), b, level))
   const flatSpots: FlatSpot[] = []
   let run: LadderSegment[] = []
   const close = () => {

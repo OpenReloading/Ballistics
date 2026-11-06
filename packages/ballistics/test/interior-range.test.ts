@@ -43,7 +43,7 @@ const closed = (l: Toy) => (7 * l.q ** 2 * l.b) / l.v
 describe('toleranceRange', () => {
   it('finds the box extremes of a monotone closed form', () => {
     const p0 = closed(toy)
-    const r = toleranceRange(toy, p0, toyApply, closed, toyTolerances)
+    const r = toleranceRange(toy, p0, { apply: toyApply, peak: closed }, toyTolerances)
     const { chargeFraction: q, volumeFraction: v, burnRateFraction: b } = toyTolerances
     expect(r.highPressure / (p0 * (((1 + q) ** 2 * (1 + b)) / (1 - v))) - 1).toBeLessThan(1e-14)
     expect(Math.abs(r.lowPressure / (p0 * (((1 - q) ** 2 * (1 - b)) / (1 + v))) - 1)).toBeLessThan(
@@ -75,12 +75,17 @@ describe('toleranceRange', () => {
   it('keeps an input nominal in the combined runs when its peak lies at the nominal', () => {
     const hill = (l: Toy) => 1 - (l.q - 1) ** 2
     const one = { ...toy, q: 1 }
-    const r = toleranceRange(one, 1, toyApply, hill, {
-      ...toyTolerances,
-      volumeFraction: 0,
-      massFraction: 0,
-      burnRateFraction: 0,
-    })
+    const r = toleranceRange(
+      one,
+      1,
+      { apply: toyApply, peak: hill },
+      {
+        ...toyTolerances,
+        volumeFraction: 0,
+        massFraction: 0,
+        burnRateFraction: 0,
+      },
+    )
     expect(r.cases.at(-1)?.sides?.chargeFraction).toBe(0)
     expect(r.cases.at(-1)?.maxPressure).toBe(1)
     expect(r.cases.at(-2)?.maxPressure).toBe(1)
@@ -94,7 +99,7 @@ describe('toleranceRange', () => {
       chargeFraction: (l: Toy, s: number, t: number) =>
         s === 1 ? 'outsideModel' : scale('q')(l, s, t),
     }
-    const r = toleranceRange(toy, p0, capped, closed, toyTolerances)
+    const r = toleranceRange(toy, p0, { apply: capped, peak: closed }, toyTolerances)
     expect(r.cases[0]).toEqual({
       input: 'chargeFraction',
       side: 1,
@@ -116,11 +121,11 @@ describe('toleranceRange', () => {
     expect(Object.isFrozen(pressureToleranceDefaults)).toBe(true)
 
     const both = { ...toyApply, chargeFraction: () => 'outsideModel' }
-    const r2 = toleranceRange(toy, p0, both, closed, toyTolerances)
+    const r2 = toleranceRange(toy, p0, { apply: both, peak: closed }, toyTolerances)
     expect(r2.cases.at(-2)?.sides?.chargeFraction).toBe(0)
     expect(r2.complete).toBe(false)
 
-    const none = toleranceRange(toy, p0, toyApply, () => 'stuck', toyTolerances)
+    const none = toleranceRange(toy, p0, { apply: toyApply, peak: () => 'stuck' }, toyTolerances)
     expect(none).toMatchObject({ lowPressure: p0, highPressure: p0, complete: false })
     expect(none.cases.every((c) => c.reason === 'stuck')).toBe(true)
   })
@@ -129,8 +134,7 @@ describe('toleranceRange', () => {
     const r = toleranceRange(
       toy,
       1,
-      toyApply,
-      (l) => (l.q > 2 ? Number.POSITIVE_INFINITY : 1),
+      { apply: toyApply, peak: (l) => (l.q > 2 ? Number.POSITIVE_INFINITY : 1) },
       toyTolerances,
     )
     expect(r.cases[0]).toMatchObject({
@@ -253,7 +257,7 @@ describe('interiorPressureRange', () => {
 
 describe('placeMaximum', () => {
   const p0 = closed(toy)
-  const r = toleranceRange(toy, p0, toyApply, closed, toyTolerances)
+  const r = toleranceRange(toy, p0, { apply: toyApply, peak: closed }, toyTolerances)
 
   it('classifies a maximum below, at, inside and above the range', () => {
     expect(placeMaximum(r, r.lowPressure * 0.99).class).toBe('modelDiscrepancy')
@@ -290,19 +294,24 @@ describe('placeMaximum', () => {
   })
 
   it('has no dominant input when no input moves the pressure', () => {
-    const none = toleranceRange(toy, p0, toyApply, closed, {
-      ...toyTolerances,
-      chargeFraction: 0,
-      volumeFraction: 0,
-      burnRateFraction: 0,
-    })
+    const none = toleranceRange(
+      toy,
+      p0,
+      { apply: toyApply, peak: closed },
+      {
+        ...toyTolerances,
+        chargeFraction: 0,
+        volumeFraction: 0,
+        burnRateFraction: 0,
+      },
+    )
     expect(placeMaximum(none, p0)).toEqual({ class: 'inputPlausible', dominantInput: null })
   })
 })
 
 describe('toleranceRange cases', () => {
   it('labels each case and its side', () => {
-    const r = toleranceRange(toy, closed(toy), toyApply, closed, toyTolerances)
+    const r = toleranceRange(toy, closed(toy), { apply: toyApply, peak: closed }, toyTolerances)
     expect(r.quantity).toBe('maxPressure')
     expect(r.cases.map((c) => [c.input, c.side])).toEqual([
       ['chargeFraction', 1],
@@ -323,7 +332,7 @@ describe('toleranceRange cases', () => {
       chargeFraction: (l: Toy, s: number, t: number) =>
         s === -1 ? 'outsideModel' : scale('q')(l, s, t),
     }
-    const r = toleranceRange(toy, p0, capped, closed, toyTolerances)
+    const r = toleranceRange(toy, p0, { apply: capped, peak: closed }, toyTolerances)
     expect(r.cases.at(-2)?.sides?.chargeFraction).toBe(1)
     expect(r.cases.at(-1)?.reason).toBe('outsideModel')
   })

@@ -27,8 +27,7 @@ export interface CastConstruction {
  * no gas check is stated (`gasCheck` absent or false) and a hardness is set; else undefined.
  */
 export function plainBaseCastHardness(c: CastConstruction | undefined): number | undefined {
-  if (c?.structure !== 'cast' || c.gasCheck === true) return
-  return c.core?.hardness?.value
+  return c?.structure !== 'cast' || c.gasCheck === true ? undefined : c.core?.hardness?.value
 }
 
 /**

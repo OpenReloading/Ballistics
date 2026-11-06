@@ -6,7 +6,7 @@
  */
 
 import { normalsFrom, nth, seededUniforms } from '@open-reloading/statistics'
-import { type Settings } from '../settings.ts'
+import type { Settings } from '../settings.ts'
 import { type InteriorLoad, type InteriorOptions, interior } from './model.ts'
 import {
   type ApplyTolerance,
@@ -88,6 +88,31 @@ const bandOf = (values: number[]): Percentiles => {
   }
 }
 
+/** How a model of `sampledBand` runs a load: how each input moves it, and its two outputs or the reason it has none. */
+export interface SampledModel<L> {
+  apply: Record<PressureInput, ApplyTolerance<L>>
+  run: (load: L) => SampledRun | string
+}
+
+/**
+ * The load of one draw: one standard normal number per input of `pressureInputs`, in that order,
+ * applied where the input has a tolerance; or the reason a move left the model.
+ */
+function drawnLoad<L>(
+  load: L,
+  apply: Record<PressureInput, ApplyTolerance<L>>,
+  tolerances: PressureTolerances,
+  normal: () => number,
+): L | string {
+  let moved: L | string = load
+  for (const input of pressureInputs) {
+    const side = normal() / toleranceSigmas
+    if (tolerances[input] !== 0 && typeof moved !== 'string')
+      moved = apply[input](moved, side, tolerances[input])
+  }
+  return moved
+}
+
 /**
  * The percentiles of `run` over draws of the inputs of `load`. Draw `i` takes one standard normal
  * number per input of `pressureInputs`, in that order, whether or not the input has a tolerance, so
@@ -95,8 +120,7 @@ const bandOf = (values: number[]): Percentiles => {
  */
 export function sampledBand<L>(
   load: L,
-  apply: Record<PressureInput, ApplyTolerance<L>>,
-  run: (load: L) => SampledRun | string,
+  { apply, run }: SampledModel<L>,
   tolerances: PressureTolerances,
   { samples, seed, budgetMs, now }: SamplingOptions,
 ): SampledBand {
@@ -107,12 +131,7 @@ export function sampledBand<L>(
   for (let i = 0; i < samples; i++) {
     if (now() - started > budgetMs)
       return { status: 'overBudget', samples, seed, failed: 0, budgetMs }
-    let moved: L | string = load
-    for (const input of pressureInputs) {
-      const side = normal() / toleranceSigmas
-      if (tolerances[input] !== 0 && typeof moved !== 'string')
-        moved = apply[input](moved, side, tolerances[input])
-    }
+    const moved = drawnLoad(load, apply, tolerances, normal)
     const r = typeof moved === 'string' ? moved : run(moved)
     if (typeof r !== 'string' && Number.isFinite(r.pressure) && Number.isFinite(r.velocity)) {
       pressure.push(r.pressure)
@@ -143,5 +162,5 @@ export function interiorSampledBand(
     const r = interior(l, options)
     return r.valid ? { pressure: r.peakBreechPressure, velocity: r.muzzleVelocity } : r.reason
   }
-  return sampledBand(load, interiorApply, run, tolerances, sampling)
+  return sampledBand(load, { apply: interiorApply, run }, tolerances, sampling)
 }

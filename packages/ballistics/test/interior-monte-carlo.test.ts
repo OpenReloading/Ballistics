@@ -51,15 +51,17 @@ const sampling = (over: Partial<SamplingOptions> = {}): SamplingOptions => ({
 describe('sampledBand', () => {
   it('gives the same band for the same seed and another for another seed', () => {
     const t = { ...none, burnRateFraction: 0.05 }
-    const a = sampledBand(toy, toyApply, closed, t, sampling())
-    expect(sampledBand(toy, toyApply, closed, t, sampling())).toEqual(a)
-    expect(sampledBand(toy, toyApply, closed, t, sampling({ seed: 8 }))).not.toEqual(a)
+    const a = sampledBand(toy, { apply: toyApply, run: closed }, t, sampling())
+    expect(sampledBand(toy, { apply: toyApply, run: closed }, t, sampling())).toEqual(a)
+    expect(
+      sampledBand(toy, { apply: toyApply, run: closed }, t, sampling({ seed: 8 })),
+    ).not.toEqual(a)
   })
 
   it('matches the corner cases of one varied input within the sampling error', () => {
     const t = { ...none, burnRateFraction: 0.05 }
     const samples = 4000
-    const band = sampledBand(toy, toyApply, closed, t, sampling({ samples }))
+    const band = sampledBand(toy, { apply: toyApply, run: closed }, t, sampling({ samples }))
     const p0 = closed(toy).pressure
     // a tolerance is the 90 % interval, so the percentiles of a linear response sit at the ends of
     // the tolerance; the 5th and 95th percentile of `samples` draws have a standard error of
@@ -106,8 +108,7 @@ describe('sampledBand', () => {
   it('returns no band when the clock passes the budget', () => {
     const band = sampledBand(
       toy,
-      toyApply,
-      closed,
+      { apply: toyApply, run: closed },
       { ...none, burnRateFraction: 0.05 },
       sampling({ budgetMs: 3 }),
     )
@@ -117,11 +118,13 @@ describe('sampledBand', () => {
   it('counts draws that leave the model and reports an invalid run', () => {
     const t = { ...none, burnRateFraction: 0.05 }
     const odd = (l: Toy) => (l.b > 3 ? 'outside' : closed(l))
-    const band = sampledBand(toy, toyApply, odd, t, sampling({ samples: 200 }))
+    const band = sampledBand(toy, { apply: toyApply, run: odd }, t, sampling({ samples: 200 }))
     expect(band.status).toBe('sampled')
     expect(band.failed).toBeGreaterThan(60)
     expect(band.failed).toBeLessThan(140)
-    expect(sampledBand(toy, toyApply, () => 'outside', t, sampling({ samples: 5 }))).toEqual({
+    expect(
+      sampledBand(toy, { apply: toyApply, run: () => 'outside' }, t, sampling({ samples: 5 })),
+    ).toEqual({
       status: 'invalid',
       samples: 5,
       seed: 7,
