@@ -1,5 +1,5 @@
+import { nth } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import { nth } from '../src/errors.ts'
 import {
   type ApplyTolerance,
   type InteriorLoad,

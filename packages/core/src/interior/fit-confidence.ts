@@ -6,6 +6,7 @@
  * simulation's uncertainty, not a load. SI in and out.
  */
 
+import { type InteriorLoad, interior } from '@open-reloading/ballistics'
 import { need, nth } from '../errors.ts'
 import {
   fitPowder,
@@ -18,7 +19,6 @@ import {
   type PowderPrior,
   predictPowder,
 } from './fit.ts'
-import { type InteriorLoad, interior } from './model.ts'
 
 /** An input of the interior model that the range can shift by its standard uncertainty. */
 export type PowderInput =

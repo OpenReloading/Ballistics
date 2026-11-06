@@ -1,9 +1,9 @@
+import { InputError } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
 import {
   bulletStructures,
   constructionOf,
   defaultStartPressure,
-  InputError,
   startPressureOf,
 } from '../src/index.ts'
 
@@ -68,9 +68,9 @@ describe('construction of a bullet record', () => {
   })
 
   it('gives each structure its construction and density class from one table', () => {
-    expect(bulletStructures.swaged).toEqual({ construction: 'lead', density: 'unknown' })
-    expect(bulletStructures.cast).toEqual({ construction: 'lead', density: 'cast' })
-    expect(bulletStructures.frangible?.construction).toBeUndefined()
+    expect(bulletStructures['swaged']).toEqual({ construction: 'lead', density: 'unknown' })
+    expect(bulletStructures['cast']).toEqual({ construction: 'lead', density: 'cast' })
+    expect(bulletStructures['frangible']?.construction).toBeUndefined()
   })
 })
 

@@ -22,7 +22,7 @@ $$
 q^{\pm} = q\,(1 \pm t_q), \qquad T^{\pm} = T \pm t_T
 $$
 
-Code: `packages/core/src/interior/range.ts`, `relative`, `interiorApply`.
+Code: `packages/ballistics/src/interior/range.ts`, `relative`, `interiorApply`.
 
 The burn coefficient is the vivacity or the coefficient of a geometric law.
 
@@ -34,7 +34,7 @@ $$
 s_q = \operatorname{sign}\bigl(p_q^{+} - p_q^{-}\bigr)
 $$
 
-Code: `packages/core/src/interior/range.ts`, `toleranceRange` (`sides`).
+Code: `packages/ballistics/src/interior/range.ts`, `toleranceRange` (`sides`).
 - $s_q = 0$ when both ends are invalid or the tolerance is 0.
 - The two combined cases move every input at once: to the side $s_q$ for the pressure-raising case, to $-s_q$ for the pressure-lowering case.
 - Inputs are applied in the order charge, volume, bullet mass, burn coefficient, temperature, start pressure. Once one move leaves the model, the remaining inputs are not applied and are reported with side 0.
@@ -46,7 +46,7 @@ p_\text{low} = \min\bigl(p_\text{nom},\ \min_c p_c\bigr), \qquad
 p_\text{high} = \max\bigl(p_\text{nom},\ \max_c p_c\bigr)
 $$
 
-Code: `packages/core/src/interior/range.ts`, `toleranceRange` (`lowPressure`, `highPressure`, `complete`).
+Code: `packages/ballistics/src/interior/range.ts`, `toleranceRange` (`lowPressure`, `highPressure`, `complete`).
 
 The minimum and maximum run over the cases $c$ with a valid, finite peak pressure. The range is complete when every case has one. The peak pressure is the peak breech pressure (`peakBreechPressure`) of the model. An invalid run reports its `reason`.
 
@@ -63,7 +63,7 @@ $$
 \end{cases}
 $$
 
-Code: `packages/core/src/interior/range.ts`, `placeMaximum`.
+Code: `packages/ballistics/src/interior/range.ts`, `placeMaximum`.
 
 The answer also names the dominant input: the single input whose two ends differ most in peak pressure, an end without a computed value counted as $p_\text{nom}$. It is null when no input moves the pressure.
 
@@ -92,7 +92,7 @@ A typed limit is marked `typed` and names no sheet or method: it is the user's o
 | Propellant temperature | 5 K               |
 | Start pressure         | 20 %              |
 
-Code: `packages/core/src/interior/range.ts`, `pressureToleranceDefaults`.
+Code: `packages/ballistics/src/interior/range.ts`, `pressureToleranceDefaults`.
 
 The workbench replaces the 1 % of the chamber volume with a tolerance from the source of the case capacity ([Case capacity, tolerance of the volume](./case-capacity.md#tolerance-of-the-volume)); a typed volume keeps the 1 %.
 
@@ -104,7 +104,7 @@ $$
 b^{\pm} = b\,(1 \pm t_b)
 $$
 
-Code: `apps/web/src/lib/lot-rows.ts`, `lotLoad` (the burn-coefficient move of `interiorApply` in `packages/core/src/interior/range.ts`).
+Code: `apps/web/src/lib/lot-rows.ts`, `lotLoad` (the burn-coefficient move of `interiorApply` in `packages/ballistics/src/interior/range.ts`).
 
 The rows show the simulated effect of a powder lot that burns faster or slower than the record. They are not a prediction of a lot, and barrel time is a computed value of the model.
 

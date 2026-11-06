@@ -77,8 +77,8 @@ Analytic: synthetic proxy loads compared with unverified figures from the questi
 
 ## Where in the app
 
-- `packages/core/src/interior/model.ts`, `gasState` (`leakRates`), `leakFlowFactor`.
-- `packages/core/test/interior-model.test.ts`, the test "choked blowdown of a fixed vessel follows the isentropic closed form".
+- `packages/ballistics/src/interior/model.ts`, `gasState` (`leakRates`), `leakFlowFactor`.
+- `packages/ballistics/test/interior-model.test.ts`, the test "choked blowdown of a fixed vessel follows the isentropic closed form".
 - Model page: [leakage and heat loss](../models/interior-leakage-heat.md).
 
 ## Confidence

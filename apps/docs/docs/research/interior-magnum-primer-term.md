@@ -42,7 +42,7 @@ Measured. The measurements are not in the repository.
 
 ## Where in the app
 
-- `packages/core/src/interior/model.ts`, the ignition pressure of a run.
+- `packages/ballistics/src/interior/model.ts`, the ignition pressure of a run.
 - Model page: [M3 model](../models/interior-m3.md), data page: [primers](../data/primers.md).
 
 ## Confidence

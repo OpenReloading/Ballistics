@@ -4,8 +4,7 @@
  * (`apps/docs/docs/models/interior-velocity-ladder.md`). SI throughout: charge kg, velocity m/s.
  */
 
-import { studentTwoSidedQuantile } from '@open-reloading/statistics'
-import { need, nth } from '../errors.ts'
+import { need, nth, studentTwoSidedQuantile } from '@open-reloading/statistics'
 
 /** One string of a ladder: the charge, the mean and sample standard deviation of its velocities, and its shot count. */
 export interface LadderStep {

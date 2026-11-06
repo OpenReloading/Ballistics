@@ -1,4 +1,4 @@
-import { need, nth } from '../errors.ts'
+import { need, nth } from '@open-reloading/statistics'
 
 /**
  * Charges of a charge ladder in kg: the i-th (from 0) is `start + i * step` up or `start - i * step`

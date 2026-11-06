@@ -1,5 +1,6 @@
+import { InputError } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import { freeRecoil, gasVelocityFactor, InputError } from '../src/index.ts'
+import { freeRecoil, gasVelocityFactor } from '../src/index.ts'
 
 describe('freeRecoil', () => {
   it('rifle: 4 kg gun, 10 g at 800 m/s, 3 g charge, factor 1.75', () => {

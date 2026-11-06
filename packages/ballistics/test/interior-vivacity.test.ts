@@ -1,10 +1,6 @@
+import { InputError } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import {
-  dynamicVivacity,
-  InputError,
-  meanDynamicVivacity,
-  type VivacityBurn,
-} from '../src/index.ts'
+import { dynamicVivacity, meanDynamicVivacity, type VivacityBurn } from '../src/index.ts'
 
 const burn = (a: number): VivacityBurn => ({
   kind: 'vivacity',

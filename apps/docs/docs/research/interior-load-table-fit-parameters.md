@@ -44,7 +44,7 @@ Measured. The measurements are not in the repository.
 ## Where in the app
 
 - `packages/schema/src/powder.ts`, the `fitted` list of a powder record.
-- `packages/core/src/interior/form.ts`, the two-stage form.
+- `packages/ballistics/src/interior/form.ts`, the two-stage form.
 - Model pages: [burn forms](../models/interior-burn-forms.md), [powder fit](../models/interior-powder-fit.md).
 
 ## Confidence

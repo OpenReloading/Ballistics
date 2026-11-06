@@ -2,7 +2,7 @@
  * Default shot-start pressure of M3 (`apps/docs/docs/models/interior-m3.md`, "Shot start") when the load gives
  * none. Approximate: effective values of the load-table fit, not measurements of a bullet.
  */
-import { need } from '../errors.ts'
+import { need } from '@open-reloading/statistics'
 
 /** A default shot-start pressure with its interval and source. */
 export interface StartPressureDefault {
@@ -93,14 +93,18 @@ export interface StructureFields {
  */
 export type DensityClass = 'cast' | 'monolithic' | 'jacketed' | 'unknown'
 
+/** A bullet structure's construction, when it has one, and its density class. */
+export interface BulletStructure {
+  construction?: BulletConstruction
+  density: DensityClass
+}
+
 /**
  * Each `construction.structure` of a bullet record: the construction its start pressure is fitted
  * for and the class of its effective density. Swaged is lead for the start pressure, of unknown
  * density: the cast class was measured on cast bullets only. A frangible bullet has no construction.
  */
-export const bulletStructures: Readonly<
-  Record<string, { construction?: BulletConstruction; density: DensityClass }>
-> = {
+export const bulletStructures: Readonly<Record<string, BulletStructure>> = {
   'cup-and-core': { construction: 'jacketed', density: 'jacketed' },
   bonded: { construction: 'jacketed', density: 'jacketed' },
   partitioned: { construction: 'jacketed', density: 'jacketed' },
@@ -112,7 +116,7 @@ export const bulletStructures: Readonly<
 }
 
 /** The entry of `bulletStructures` for a structure; undefined for none or one not listed. */
-export const structureOf = (structure: string | undefined) =>
+export const structureOf = (structure: string | undefined): BulletStructure | undefined =>
   structure !== undefined && Object.hasOwn(bulletStructures, structure)
     ? bulletStructures[structure]
     : undefined

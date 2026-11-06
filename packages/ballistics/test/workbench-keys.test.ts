@@ -33,6 +33,6 @@ describe('powderModelValues', () => {
   })
 
   it('takes the fit rule for the start pressure of a record without one', () => {
-    expect(powderModelValues({ interior })?.startPressure).toBe(30e6)
+    expect(powderModelValues({ interior })?.['startPressure']).toBe(30e6)
   })
 })

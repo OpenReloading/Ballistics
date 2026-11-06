@@ -102,10 +102,10 @@ Measured: load rows that are not in the repository, aggregates only. The 76 mm t
 
 ## Where in the app
 
-- `packages/core/src/interior/model.ts` (`gasState`, `resistance`)
-- `packages/core/src/interior/bore-resistance.ts`
-- `packages/core/src/interior/start-pressure.ts`
-- `packages/core/src/interior/record-load.ts`
+- `packages/ballistics/src/interior/model.ts` (`gasState`, `resistance`)
+- `packages/ballistics/src/interior/bore-resistance.ts`
+- `packages/ballistics/src/interior/start-pressure.ts`
+- `packages/ballistics/src/interior/record-load.ts`
 - `packages/cli/src/evaluate.ts`
 - [M3 interior model](../models/interior-m3.md#bore-resistance)
 

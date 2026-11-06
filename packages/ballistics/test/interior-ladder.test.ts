@@ -1,6 +1,6 @@
+import { InputError, nth } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import { nth } from '../src/errors.ts'
-import { chargeLadder, InputError } from '../src/index.ts'
+import { chargeLadder } from '../src/index.ts'
 
 describe('chargeLadder', () => {
   it('steps up from the start charge', () => {

@@ -9,6 +9,7 @@
 . BallisticCoefficientBand
 . BoreAngles
 . BulletConstruction
+. BulletStructure
 . Burn
 . BurnForm
 . CandidatePlan

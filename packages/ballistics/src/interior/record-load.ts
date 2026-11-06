@@ -1,5 +1,5 @@
+import { InputError, need } from '@open-reloading/statistics'
 import { type CartridgeSpecs, cartridgeBulletDiameterMm } from '../cartridge-specs.ts'
-import { InputError, need } from '../errors.ts'
 import { type ResistanceTerms, recordResistance } from './bore-resistance.ts'
 import { interiorLoad } from './load-file.ts'
 import type { InteriorLoad } from './model.ts'

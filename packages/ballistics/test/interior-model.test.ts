@@ -1,6 +1,5 @@
-import { bisect } from '@open-reloading/statistics'
+import { bisect, nth } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import { nth } from '../src/errors.ts'
 import {
   chargeTooSmall,
   chargeTooSmallRatio,

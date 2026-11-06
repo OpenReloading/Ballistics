@@ -1,8 +1,8 @@
-import type { Settings } from '../errors.ts'
 /**
  * Experimental shotshell interior model, `apps/docs/docs/models/interior-shotshell.md`: a shotshell load
  * mapped onto the M3 model `interior`. SI in and out, temperatures in K.
  */
+import { type Settings } from '../settings.ts'
 import { type InteriorLoad, type InteriorOptions, type InteriorResult, interior } from './model.ts'
 
 /**

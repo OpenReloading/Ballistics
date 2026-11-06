@@ -13,7 +13,7 @@ const pascalPerPsi = conversions.psi.factor
  * 1422 psi per BHN (Fryxell, "Cast Bullet Alloys and Obturation", quoted by Wikipedia, "Obturation",
  * https://en.wikipedia.org/wiki/Obturation; the essay itself was not retrieved), about 9.80 MPa.
  */
-export const obturationPressurePerBrinell = 1422 * pascalPerPsi
+export const obturationPressurePerBrinell: number = 1422 * pascalPerPsi
 
 /** The construction fields the rule reads; a bullet record's `construction` is assignable to it. */
 export interface CastConstruction {
@@ -36,5 +36,5 @@ export function plainBaseCastHardness(c: CastConstruction | undefined): number |
  * `peak` (Pa) upsets: `obturationPressurePerBrinell * brinell > peak`. Then the base may not seal
  * the bore and gas may leak past it.
  */
-export const castHarderThanPeak = (brinell: number, peak: number) =>
+export const castHarderThanPeak = (brinell: number, peak: number): boolean =>
   obturationPressurePerBrinell * brinell > peak

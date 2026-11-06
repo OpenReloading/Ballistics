@@ -1,5 +1,6 @@
+import { InputError } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import { InputError, ladderImpactResiduals } from '../src/index.ts'
+import { ladderImpactResiduals } from '../src/index.ts'
 import { normals } from './random.ts'
 
 const IN = 0.0254

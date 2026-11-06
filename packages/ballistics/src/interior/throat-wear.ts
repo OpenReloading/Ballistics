@@ -4,5 +4,5 @@
  */
 
 /** The volume behind the bullet, m³, with a worn throat of length `wear` (m) over a bore of area `boreArea` (m²). */
-export const wornVolume = (volume: number, boreArea: number, wear: number) =>
+export const wornVolume = (volume: number, boreArea: number, wear: number): number =>
   volume + wear * boreArea

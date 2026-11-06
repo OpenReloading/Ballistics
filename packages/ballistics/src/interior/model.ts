@@ -3,9 +3,11 @@
  * `apps/docs/docs/models/interior-m3.md`. SI in and out, temperatures in K.
  */
 
-import { icao, type Rhs, type Rk45Event, type Rk45Options, rk45 } from '@open-reloading/ballistics'
-import { bisect } from '@open-reloading/statistics'
-import { InputError, nth, overlay, type Settings } from '../errors.ts'
+import { bisect, InputError, nth } from '@open-reloading/statistics'
+
+import { icao } from '../exterior/atmosphere.ts'
+import { type Rhs, type Rk45Event, type Rk45Options, rk45 } from '../exterior/rk45.ts'
+import { overlay, type Settings } from '../settings.ts'
 import { type Burn, burnError, burnForm } from './form.ts'
 import { wornVolume } from './throat-wear.ts'
 
@@ -131,7 +133,7 @@ export function leakFlowFactor(gamma: number, ratio: number): number {
 }
 
 /** Lagrange gradient: gas kinetic energy m_c v^2 / 6, breech pressure p_b (1 + m_c / (2 m_p)). */
-export const lagrangeGradient = { energy: 1 / 3, breech: 1 / 2 }
+export const lagrangeGradient: { energy: number; breech: number } = { energy: 1 / 3, breech: 1 / 2 }
 
 /** Integrator tolerances and limits of `interior` and `closedVessel`. */
 export interface InteriorOptions {
@@ -939,7 +941,7 @@ export function chargeTooSmall(
   peakMeanPressure: number,
   startPressure: number,
   ignitionPressure: number,
-) {
+): boolean {
   return !(peakMeanPressure >= chargeTooSmallRatio * Math.max(startPressure, ignitionPressure))
 }
 

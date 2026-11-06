@@ -9,7 +9,7 @@ export default defineConfig({
       include: ['src/**/*.ts'],
       reporter: ['text-summary'],
       // floors: the measured value rounded down, minus one
-      thresholds: { statements: 97, branches: 94, functions: 99, lines: 98 },
+      thresholds: { statements: 98, branches: 95, functions: 98, lines: 98 },
     },
   },
 })

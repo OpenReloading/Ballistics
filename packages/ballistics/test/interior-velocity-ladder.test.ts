@@ -1,6 +1,6 @@
+import { InputError, nth } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import { nth } from '../src/errors.ts'
-import { InputError, ladderFlatSpots } from '../src/index.ts'
+import { ladderFlatSpots } from '../src/index.ts'
 
 const step = (k: number, mean: number, count = 5, standardDeviation = 5) => ({
   charge: 0.002 + k * 0.0001,

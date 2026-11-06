@@ -1,12 +1,11 @@
+import { InputError, nth } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import { nth } from '../src/errors.ts'
 import {
   type ChargeTargetKind,
   chargeSolverMaxRuns,
   chargeSolverTolerance,
   chargeTargetValue,
   chargeUpperBound,
-  InputError,
   type InteriorLoad,
   type InteriorResult,
   interior,

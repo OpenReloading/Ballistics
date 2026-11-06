@@ -16,7 +16,7 @@ $$
 m = \frac{\bar v_b - \bar v_a}{c_b - c_a}
 $$
 
-Code: `packages/core/src/interior/velocity-ladder.ts`, `ladderFlatSpots` (`slope`).
+Code: `packages/ballistics/src/interior/velocity-ladder.ts`, `ladderFlatSpots` (`slope`).
 
 The standard error of the difference of two independent means, without assuming equal variances, gives the half width of the band, with the two-sided Student's t quantile $t_{\gamma,\nu}$ at confidence level $\gamma$:
 
@@ -24,7 +24,7 @@ $$
 u_a = \frac{s_a^2}{n_a}, \quad u_b = \frac{s_b^2}{n_b}, \qquad h = \frac{t_{\gamma,\nu}\sqrt{u_a + u_b}}{c_b - c_a}
 $$
 
-Code: `packages/core/src/interior/velocity-ladder.ts`, `ladderFlatSpots` (`va`, `vb`, `halfWidth`). The t quantile is `studentTwoSidedQuantile` of the [shot group](groups.md) statistics.
+Code: `packages/ballistics/src/interior/velocity-ladder.ts`, `ladderFlatSpots` (`va`, `vb`, `halfWidth`). The t quantile is `studentTwoSidedQuantile` of the [shot group](groups.md) statistics.
 
 The degrees of freedom follow the Welch-Satterthwaite approximation, rounded down to a whole number (at least 1), and are $n_a + n_b - 2$ where both deviations are 0:
 
@@ -32,11 +32,11 @@ $$
 \nu = \frac{(u_a + u_b)^2}{\dfrac{u_a^2}{n_a - 1} + \dfrac{u_b^2}{n_b - 1}}
 $$
 
-Code: `packages/core/src/interior/velocity-ladder.ts`, `ladderFlatSpots` (`df`).
+Code: `packages/ballistics/src/interior/velocity-ladder.ts`, `ladderFlatSpots` (`df`).
 
 The segment is flat when $|m| \le h$, that is when its band $m \pm h$ includes zero. A flat spot is a run of neighbouring flat segments. It spans the charges from the lowest to the highest string of the run.
 
-Code: `packages/core/src/interior/velocity-ladder.ts`, `ladderFlatSpots` (`flat`, `flatSpots`).
+Code: `packages/ballistics/src/interior/velocity-ladder.ts`, `ladderFlatSpots` (`flat`, `flatSpots`).
 
 ## Symbols
 

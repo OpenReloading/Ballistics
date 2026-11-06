@@ -1,10 +1,10 @@
-import type { Settings } from '../errors.ts'
 /**
  * Peak-pressure range over input tolerances (`apps/docs/docs/models/interior-pressure-range.md`): each input
  * alone at both ends of its tolerance, then all inputs together at the pressure-raising and the
  * pressure-lowering ends. It covers input tolerances only, not model error, and is not a
  * confidence interval.
  */
+import { type Settings } from '../settings.ts'
 import { type InteriorLoad, type InteriorOptions, interior } from './model.ts'
 
 /** Tolerance of each input of a load: relative fractions, except `temperatureKelvin`. */

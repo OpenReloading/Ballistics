@@ -1,4 +1,4 @@
-import { need } from './errors.ts'
+import { need } from '@open-reloading/statistics'
 
 /**
  * Velocity of the propellant gas leaving the muzzle over the muzzle velocity of the projectile, by

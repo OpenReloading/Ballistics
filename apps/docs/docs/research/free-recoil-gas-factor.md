@@ -34,7 +34,7 @@ Change of free recoil energy against today's factor, smallest to largest over th
 | increment, $0.5 + 1250 / v_0$    | +17.9 % to +35.3 % | +0.6 % to +11.7 % |
 | outflow speed, $0.5 + v_a / v_0$ | +4.1 % to +8.9 %   | -11.6 % to -3.5 % |
 
-The rifle extreme of the outflow form is the light, fast load (3.6 g at 990 m/s), where the charge is almost half the projectile mass. The test "energy spread of other gas factor forms over ten typical loads" in `packages/core/test/recoil.test.ts` reproduces every range of the table.
+The rifle extreme of the outflow form is the light, fast load (3.6 g at 990 m/s), where the charge is almost half the projectile mass. The test "energy spread of other gas factor forms over ten typical loads" in `packages/ballistics/test/recoil.test.ts` reproduces every range of the table.
 
 ## Result
 
@@ -46,8 +46,8 @@ Analytic: a comparison of model forms over synthetic typical loads, no measureme
 
 ## Where in the app
 
-- `packages/core/src/recoil.ts`, `freeRecoil` and `gasVelocityFactor`.
-- `packages/core/test/recoil.test.ts`, the test of the energy spread.
+- `packages/ballistics/src/recoil.ts`, `freeRecoil` and `gasVelocityFactor`.
+- `packages/ballistics/test/recoil.test.ts`, the test of the energy spread.
 - Model page: [free recoil](../models/free-recoil.md).
 
 ## Confidence

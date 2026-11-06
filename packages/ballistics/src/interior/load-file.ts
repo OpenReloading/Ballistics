@@ -1,4 +1,4 @@
-import { InputError, nth } from '../errors.ts'
+import { InputError, nth } from '@open-reloading/statistics'
 import { boreArea } from './bore-resistance.ts'
 import type { InteriorLoad } from './model.ts'
 import { burnFormKeys } from './workbench-keys.ts'
@@ -60,11 +60,11 @@ export function interiorLoad(
   }
   const boreDiameter = v('boreDiameter')
   // 0 is a leak that never opens: the solver takes it
-  const leakArea = values.leakArea === undefined ? undefined : v('leakArea')
+  const leakArea = values['leakArea'] === undefined ? undefined : v('leakArea')
   if (leakArea !== undefined && leakArea < 0)
     throw new ValueError('leakArea', `${label('leakArea')} must be at least 0.`)
   // a worn throat adds its length times the bore area behind the bullet (`apps/docs/docs/models/interior-m3.md`, "Throat wear")
-  const wear = values.throatWear === undefined ? 0 : v('throatWear')
+  const wear = values['throatWear'] === undefined ? 0 : v('throatWear')
   if (wear < 0) throw new ValueError('throatWear', `${label('throatWear')} must be at least 0.`)
   const form = Object.entries(burnFormKeys).filter(([k]) => values[k] !== undefined)
   if (form.length > 0 && form.length < 4) {
@@ -77,7 +77,7 @@ export function interiorLoad(
   return {
     chamber: {
       volume: v('volume'),
-      boreArea: boreArea({ area: values.boreArea, boreDiameter, grooveDiameter }),
+      boreArea: boreArea({ area: values['boreArea'], boreDiameter, grooveDiameter }),
       boreDiameter,
       ...(wear > 0 && { throatWear: wear }),
     },
@@ -103,7 +103,7 @@ export function interiorLoad(
     propellantTemperature: v('propellantTemperature'),
     ignitionPressure: v('ignitionPressure'),
     startPressure: v('startPressure'),
-    ...(values.sebert !== undefined && {
+    ...(values['sebert'] !== undefined && {
       gradient: { energy: v('sebert'), breech: v('sebert') },
     }),
     // a leak area constant over the whole travel (`apps/docs/docs/models/interior-leakage-heat.md`)
@@ -172,7 +172,11 @@ export function overrideResistance(
 }
 
 /** Charge bulk volume over the free volume behind the seated bullet; charge kg, bulk density kg/m³, volume m³. */
-export function loadRatio(charge: number, bulkDensity: number | undefined, volume: number) {
+export function loadRatio(
+  charge: number,
+  bulkDensity: number | undefined,
+  volume: number,
+): number | undefined {
   if (!bulkDensity || !(volume > 0)) return
   return charge / bulkDensity / volume
 }
@@ -184,9 +188,9 @@ export function loadRatio(charge: number, bulkDensity: number | undefined, volum
 export const solidFillLimit = 0.64
 
 /** Charge solid volume over the chamber volume; charge kg, solid density kg/m³, volume m³. */
-export const solidFill = (charge: number, density: number, volume: number) =>
+export const solidFill = (charge: number, density: number, volume: number): number =>
   charge / (density * volume)
 
 /** The load ratio at `solidFillLimit`; solid and bulk density kg/m³. */
-export const fillLoadRatioLimit = (density: number, bulkDensity: number) =>
+export const fillLoadRatioLimit = (density: number, bulkDensity: number): number =>
   (solidFillLimit * density) / bulkDensity

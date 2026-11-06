@@ -6,9 +6,9 @@
  * charge. A simulation, not load data: the answer is the charge at which the model reaches the
  * target, not a charge to load.
  */
+import { need, nth } from '@open-reloading/statistics'
+import { type Settings } from '../settings.ts'
 
-import type { Settings } from '../errors.ts'
-import { need, nth } from '../errors.ts'
 import { solidFillLimit } from './load-file.ts'
 import {
   type InteriorLoad,
@@ -42,7 +42,7 @@ export const chargeSolverTolerance = 1e-6
 const scanPoints = 32
 const maxIterations = 60
 /** An iteration runs twice where the false position charge gives no valid run (bisection fallback). */
-export const chargeSolverMaxRuns = scanPoints + 2 * maxIterations
+export const chargeSolverMaxRuns: number = scanPoints + 2 * maxIterations
 /** Lowest scanned charge over the highest. */
 const scanSpan = 1e-3
 

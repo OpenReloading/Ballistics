@@ -1,6 +1,6 @@
+import { InputError } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
 import {
-  InputError,
   interior,
   interiorLoad,
   powderModelValues,

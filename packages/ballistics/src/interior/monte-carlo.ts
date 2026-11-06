@@ -5,9 +5,8 @@
  * It covers input tolerances only, not model error.
  */
 
-import { normalsFrom, seededUniforms } from '@open-reloading/statistics'
-import type { Settings } from '../errors.ts'
-import { nth } from '../errors.ts'
+import { normalsFrom, nth, seededUniforms } from '@open-reloading/statistics'
+import { type Settings } from '../settings.ts'
 import { type InteriorLoad, type InteriorOptions, interior } from './model.ts'
 import {
   type ApplyTolerance,
