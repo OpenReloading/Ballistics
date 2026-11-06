@@ -95,6 +95,7 @@
 . UserPowderFit
 . UserRecord
 . UserRecordKind
+. UserRecordSchema
 . UserRecords
 . analysisKinds
 . analysisOverrides
