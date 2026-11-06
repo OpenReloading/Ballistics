@@ -757,12 +757,13 @@ export interface InteriorRun {
 export function interiorSampledBand(load: InteriorLoad, tolerances: PressureTolerances, sampling: SamplingOptions, options?: Settings<InteriorOptions>): SampledBand;
 
 // @public
-export const interiorValueKeys: readonly (keyof InteriorValues)[];
+export type InteriorValueKey = 'volume' | 'boreDiameter' | 'boreArea' | 'travel' | 'twist' | 'bulletMass' | 'charge' | 'propellantEnergy' | 'gamma' | 'density' | 'covolume' | 'vivacity' | 'exponent' | 'referencePressure' | 'propellantTemperature' | 'ignitionPressure' | 'startPressure' | 'sebert' | 'formA' | 'formM' | 'formQ' | 'formZ1' | 'leakArea' | 'throatWear' | 'boreFriction' | 'engravingPressure' | 'engravingLength';
 
-// Warning: (ae-forgotten-export) The symbol "interiorKeys" needs to be exported by the entry point index.d.ts
-//
 // @public
-export interface InteriorValues extends Record<(typeof interiorKeys)[number], number> {
+export const interiorValueKeys: readonly InteriorValueKey[];
+
+// @public
+export interface InteriorValues extends Record<InteriorValueKey, number> {
 }
 
 // @public
@@ -1115,8 +1116,7 @@ export interface PressureCase {
     maxPressure: number | null;
     reason?: string;
     side: 1 | -1;
-    // Warning: (ae-forgotten-export) The symbol "Side" needs to be exported by the entry point index.d.ts
-    sides?: Record<PressureInput, Side>;
+    sides?: Record<PressureInput, -1 | 0 | 1>;
 }
 
 // @public
@@ -2003,10 +2003,11 @@ export interface WindSegment {
     vertical?: number | undefined;
 }
 
-// Warning: (ae-forgotten-export) The symbol "otherKeys" needs to be exported by the entry point index.d.ts
-//
 // @public
-export const workbenchValueKeys: readonly (keyof InteriorValues | (typeof otherKeys)[number])[];
+export type WorkbenchValueKey = InteriorValueKey | 'firearmMass' | 'bulletDiameter' | 'bulletLength' | 'bulletBcG1' | 'bulletBcG7' | 'bulletBaseLength' | 'bulletBaseDiameter' | 'bulletCavityDiameter' | 'bulletCavityDepth' | 'pmax' | 'caseLength' | 'bulkDensity';
+
+// @public
+export const workbenchValueKeys: readonly WorkbenchValueKey[];
 
 // @public
 export const wornVolume: (volume: number, boreArea: number, wear: number) => number;

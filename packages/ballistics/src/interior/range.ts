@@ -24,7 +24,7 @@ export interface PressureTolerances {
 }
 /** Input of a load that carries a tolerance. */
 export type PressureInput = keyof PressureTolerances
-type Side = -1 | 0 | 1
+type Side = NonNullable<PressureCase['sides']>[PressureInput]
 
 /** Unverified assumptions without a source. */
 export const pressureToleranceDefaults: Readonly<PressureTolerances> = Object.freeze({
@@ -57,7 +57,7 @@ export interface PressureCase {
    */
   side: 1 | -1
   /** For `input: 'all'`: the side used per input, 0 for nominal. */
-  sides?: Record<PressureInput, Side>
+  sides?: Record<PressureInput, -1 | 0 | 1>
   /** Pa; null when the run is invalid, not finite or outside the model. */
   maxPressure: number | null
   /** Why `maxPressure` is null: a model reason, `outsideModel` or `nonFinite`. */

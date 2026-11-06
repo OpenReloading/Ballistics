@@ -77,6 +77,7 @@
 . InteriorReason
 . InteriorResult
 . InteriorRun
+. InteriorValueKey
 . InteriorValues
 . Interval
 . LadderFlatSpots
@@ -236,6 +237,7 @@
 . WeakReason
 . WearMeasurement
 . WindSegment
+. WorkbenchValueKey
 . ZeroSpec
 . advisoryIds
 . advisoryRule
