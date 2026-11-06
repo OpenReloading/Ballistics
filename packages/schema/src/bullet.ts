@@ -1,8 +1,16 @@
 import { z } from 'zod'
+import type { Exact } from './exact.ts'
 import { recordId } from './ids.ts'
 import { provenance } from './provenance.ts'
 import { countryCode, needsCountrySource } from './shared.ts'
-import { quantity } from './units.ts'
+import { type QuantitySchema, quantity } from './units.ts'
+
+const ballisticCoefficientParser = z.object({
+  dragModel: z.enum(['G1', 'G7']),
+  value: z.number().positive(),
+  minVelocity: quantity('velocity').optional(),
+  note: z.string().min(1).optional(),
+})
 
 /**
  * A ballistic coefficient a manufacturer publishes for the G1 or G7 drag model: positive `value`, in the
@@ -10,14 +18,17 @@ import { quantity } from './units.ts'
  * `minVelocity`.
  * Inferred type: {@link BallisticCoefficient}.
  */
-export const ballisticCoefficient = z.object({
-  dragModel: z.enum(['G1', 'G7']),
+export const ballisticCoefficient: z.ZodObject<{
+  dragModel: z.ZodEnum<z.core.util.ToEnum<'G1' | 'G7'>>
   /** The coefficient in lb/in2. */
-  value: z.number().positive(),
+  value: z.ZodNumber
   /** Lower bound of the velocity band the value applies to, when the manufacturer publishes bands. */
-  minVelocity: quantity('velocity').optional(),
-  note: z.string().min(1).optional(),
-})
+  minVelocity: z.ZodOptional<QuantitySchema>
+  note: z.ZodOptional<z.ZodString>
+}> = ballisticCoefficientParser satisfies Exact<
+  typeof ballisticCoefficient,
+  typeof ballisticCoefficientParser
+>
 
 /** Core materials of a bullet that contain lead. */
 const leadCoreMaterials = ['lead', 'lead-alloy'] as const
@@ -39,15 +50,8 @@ const coreMaterials = z.enum([
 /** Surface treatments that contain lead. */
 const leadSurfaces = ['lead-wash'] as const
 
-/**
- * How a bullet is built, as structured fields next to the manufacturer's wording. Values are read from
- * that wording; a field is absent where the wording does not state it. Lead-free is not stored:
- * {@link leadFree} derives it.
- * Inferred type: {@link ConstructionFields}.
- */
-export const constructionFields = z
+const constructionFieldsParser = z
   .object({
-    /** The manufacturer's wording as printed. */
     raw: z.string().min(1),
     structure: z
       .enum([
@@ -64,11 +68,9 @@ export const constructionFields = z
     core: z
       .object({
         material: coreMaterials,
-        /** Brinell hardness number (HBW, ISO 6506-1) of a lead or lead alloy core, a cast bullet's alloy. */
         hardness: quantity('dimensionless', z.number().positive()).optional(),
       })
       .optional(),
-    /** Present when the bullet has a jacket; the material and the wall only where they are stated. */
     jacket: z
       .object({
         material: z
@@ -94,11 +96,8 @@ export const constructionFields = z
       )
       .min(1)
       .optional(),
-    /** A gas check, the cup on the base of a cast bullet; `false` for a plain base the wording states. */
     gasCheck: z.boolean().optional(),
-    /** Number of driving bands of a monolithic bullet with relieved shanks. */
     drivingBands: z.int().positive().optional(),
-    /** Set when no structured field could be derived from `raw`; the wording stays as printed. */
     unmapped: z.literal(true).optional(),
   })
   .superRefine((c, ctx) => {
@@ -112,6 +111,89 @@ export const constructionFields = z
     if (c.core?.hardness && !contains(leadCoreMaterials, c.core.material))
       issue(['core', 'hardness'], 'only for a lead or lead alloy core')
   })
+
+/**
+ * How a bullet is built, as structured fields next to the manufacturer's wording. Values are read from
+ * that wording; a field is absent where the wording does not state it. Lead-free is not stored:
+ * {@link leadFree} derives it.
+ * Inferred type: {@link ConstructionFields}.
+ */
+export const constructionFields: z.ZodObject<{
+  /** The manufacturer's wording as printed. */
+  raw: z.ZodString
+  structure: z.ZodOptional<
+    z.ZodEnum<
+      z.core.util.ToEnum<
+        | 'cup-and-core'
+        | 'bonded'
+        | 'partitioned'
+        | 'monolithic'
+        | 'cast'
+        | 'swaged'
+        | 'plated'
+        | 'frangible'
+      >
+    >
+  >
+  core: z.ZodOptional<
+    z.ZodObject<{
+      material: z.ZodEnum<
+        z.core.util.ToEnum<
+          | 'lead'
+          | 'lead-alloy'
+          | 'copper'
+          | 'copper-alloy'
+          | 'tin'
+          | 'tungsten'
+          | 'steel'
+          | 'compressed-powder'
+        >
+      >
+      /** Brinell hardness number (HBW, ISO 6506-1) of a lead or lead alloy core, a cast bullet's alloy. */
+      hardness: z.ZodOptional<QuantitySchema>
+    }>
+  >
+  /** Present when the bullet has a jacket; the material and the wall only where they are stated. */
+  jacket: z.ZodOptional<
+    z.ZodObject<{
+      material: z.ZodOptional<
+        z.ZodEnum<
+          z.core.util.ToEnum<
+            'copper' | 'gilding-metal' | 'copper-clad-steel' | 'copper-plated-steel' | 'steel'
+          >
+        >
+      >
+      thickness: z.ZodOptional<QuantitySchema>
+    }>
+  >
+  surface: z.ZodOptional<
+    z.ZodArray<
+      z.ZodEnum<
+        z.core.util.ToEnum<
+          | 'moly'
+          | 'black-oxide'
+          | 'powder-coat'
+          | 'polymer-coat'
+          | 'paint'
+          | 'wax-lube'
+          | 'boron-nitride'
+          | 'tungsten-disulfide'
+          | 'copper-wash'
+          | 'lead-wash'
+        >
+      >
+    >
+  >
+  /** A gas check, the cup on the base of a cast bullet; `false` for a plain base the wording states. */
+  gasCheck: z.ZodOptional<z.ZodBoolean>
+  /** Number of driving bands of a monolithic bullet with relieved shanks. */
+  drivingBands: z.ZodOptional<z.ZodInt>
+  /** Set when no structured field could be derived from `raw`; the wording stays as printed. */
+  unmapped: z.ZodOptional<z.ZodLiteral<true>>
+}> = constructionFieldsParser satisfies Exact<
+  typeof constructionFields,
+  typeof constructionFieldsParser
+>
 
 /** Whether `value` is one of `list`. */
 function contains(list: readonly string[], value: string | undefined): boolean {
@@ -186,12 +268,7 @@ export function bulletListFields(
   }
 }
 
-/**
- * Base types of a bullet. `conical-hollow-base` and `rounded-hollow-base`: a cavity open at the base,
- * a cone or a hemisphere whose depth follows from `cavityDiameter` unless a measured `cavityDepth`
- * gives it, on a flat base or on the boat tail the other fields describe.
- */
-export const baseTypes = z.enum([
+const baseTypesParser = z.enum([
   'flat',
   'boat-tail',
   'rebated-boat-tail',
@@ -200,19 +277,40 @@ export const baseTypes = z.enum([
 ])
 
 /**
+ * Base types of a bullet. `conical-hollow-base` and `rounded-hollow-base`: a cavity open at the base,
+ * a cone or a hemisphere whose depth follows from `cavityDiameter` unless a measured `cavityDepth`
+ * gives it, on a flat base or on the boat tail the other fields describe.
+ */
+export const baseTypes: z.ZodEnum<
+  z.core.util.ToEnum<
+    'flat' | 'boat-tail' | 'rebated-boat-tail' | 'conical-hollow-base' | 'rounded-hollow-base'
+  >
+> = baseTypesParser satisfies Exact<typeof baseTypes, typeof baseTypesParser>
+
+const ogiveFormsParser = z.enum(['tangent', 'secant', 'hybrid', 'round-nose', 'flat-nose'])
+
+/**
  * Ogive forms of a bullet: `tangent`, `secant` and `hybrid` by the head-shape ratio Rt/R,
  * `round-nose` and `flat-nose` for a nose that is no ogive of revolution.
  */
-export const ogiveForms = z.enum(['tangent', 'secant', 'hybrid', 'round-nose', 'flat-nose'])
+export const ogiveForms: z.ZodEnum<
+  z.core.util.ToEnum<'tangent' | 'secant' | 'hybrid' | 'round-nose' | 'flat-nose'>
+> = ogiveFormsParser satisfies Exact<typeof ogiveForms, typeof ogiveFormsParser>
 
-/** Tip types of a bullet: the nose construction. */
-export const tipTypes = z.enum([
+const tipTypesParser = z.enum([
   'hollow-point',
   'polymer-tip',
   'soft-point',
   'full-metal-jacket',
   'open-meplat',
 ])
+
+/** Tip types of a bullet: the nose construction. */
+export const tipTypes: z.ZodEnum<
+  z.core.util.ToEnum<
+    'hollow-point' | 'polymer-tip' | 'soft-point' | 'full-metal-jacket' | 'open-meplat'
+  >
+> = tipTypesParser satisfies Exact<typeof tipTypes, typeof tipTypesParser>
 
 /** Whether a base type has a cavity open at the base. */
 function hollowBase(type: string | undefined): boolean {
@@ -234,23 +332,9 @@ const bulletBase = z
   .object({
     type: baseTypes.optional(),
     length: quantity('length').optional(),
-    /**
-     * Diameter of the base face at the end of the boat tail (McCoy, ARBRL-TR-02293, 1981, PDF p. 21).
-     * Only with a boat-tail or hollow base type.
-     */
     diameter: quantity('length', z.number().positive()).optional(),
-    /**
-     * Boat-tail angle: half-angle of the conical boat tail, between its surface and the bullet axis
-     * (McCoy, ARBRL-TR-02293, 1981, PDF p. 17). Only with a boat-tail or hollow base type.
-     */
     angle: quantity('angle', z.number().gt(0).lt(90)).optional(),
-    /** Diameter of the cavity where it opens in the base face. Needed by, and only with, a hollow base type. */
     cavityDiameter: quantity('length', z.number().positive()).optional(),
-    /**
-     * Depth of the cavity from the base face, where it is measured (a section, or the volume of a
-     * water or wax fill converted by the shape). Only with a hollow base type; without it the depth
-     * is the cavity's radius, an assumption.
-     */
     cavityDepth: quantity('length', z.number().positive()).optional(),
   })
   .superRefine((base, ctx) => {
@@ -269,15 +353,8 @@ const bulletBase = z
 /** Ogive of a bullet: at least one of form, radius and Rt/R. */
 const bulletOgive = z
   .object({
-    /** Optional: a source may give the radius or Rt/R without naming the form. */
     form: ogiveForms.optional(),
-    /** Ogive radius R: radius of the nose arc in an axial section (McCoy, ARBRL-TR-02293, 1981, PDF p. 13). */
     radius: quantity('length', z.number().positive()).optional(),
-    /**
-     * Head-shape parameter Rt/R: radius of a tangent ogive of the same nose length and diameter
-     * over the actual ogive radius; 1 for a tangent ogive, 0 for a cone, between 0 and 1 for a
-     * secant ogive (McCoy, ARBRL-TR-02293, 1981, PDF p. 13); 0 and 1 are included.
-     */
     radiusRatio: quantity('dimensionless', z.number().min(0).max(1)).optional(),
   })
   .refine((o) => Boolean(o.form || o.radius || o.radiusRatio), {
@@ -305,20 +382,7 @@ const bulletCannelure = z.object({
 const bulletTip = z
   .object({
     type: tipTypes,
-    /**
-     * Polymer tip: axial length of the part forward of the jacket opening (the head), without the
-     * shank seated in the jacket cavity. Mann 1997, p. 1, describes tips as a head and a shaft;
-     * US 10,690,463 B2, summary, splits the tip into a main portion forward of the opening and a
-     * retention portion in the cavity. Only with tip type `polymer-tip`.
-     */
     length: quantity('length', z.number().positive()).optional(),
-    /**
-     * Hollow point: diameter of the front opening of the nose cavity, before impact (US 12,467,728 B2,
-     * description: diameter of the front-side opening of the cavity, stated relative to the
-     * caliber). Whether it is taken at the inner or the outer edge of the mouth is not stated there.
-     * Only with tip type `hollow-point`: that definition covers a hollow point; no source defining
-     * the opening of an `open-meplat` tip was found.
-     */
     mouthDiameter: quantity('length', z.number().positive()).optional(),
   })
   .superRefine((tip, ctx) => {
@@ -332,16 +396,12 @@ const bulletTip = z
 /** The fields of a bullet before its checks across fields. */
 const bulletFields = z.object({
   id: recordId,
-  /** Id of the manufacturer record. */
   manufacturer: recordId,
-  /** Product number. Absent only with `nameOnly`. */
   productNumber: z.string().min(1).optional(),
   name: z.string().min(1),
   country: countryCode.optional(),
   productLine: z.string().min(1).optional(),
-  /** Caliber as the manufacturer writes it, for example `.308`. */
   caliber: z.string().min(1).optional(),
-  /** Diameter. Absent only with `nameOnly`; stored only where a source prints one. */
   diameter: quantity('length').optional(),
   mass: quantity('mass'),
   length: quantity('length').optional(),
@@ -349,23 +409,15 @@ const bulletFields = z.object({
   ogive: bulletOgive.optional(),
   cannelure: bulletCannelure.optional(),
   tip: bulletTip.optional(),
-  /** Diameter of the flat at the nose (McCoy, ARBRL-TR-02293, 1981, PDF p. 14); 0 for a sharp point. */
   meplatDiameter: quantity('length', z.number().min(0)).optional(),
   noseLength: quantity('length').optional(),
   baseToOgive: quantity('length').optional(),
   bearingLength: quantity('length').optional(),
   construction: constructionFields.optional(),
   ballisticCoefficients: z.array(ballisticCoefficient).min(1).optional(),
-  /** Twist the manufacturer recommends, length per turn. */
   recommendedTwist: quantity('length').optional(),
-  /** Slowest twist the manufacturer allows ("1-10\" or faster"), length per turn. */
   slowestTwist: quantity('length').optional(),
   note: z.string().min(1).optional(),
-  /**
-   * Set on a record that only names a bullet a table prints: no product number and, unless the
-   * table prints one, no diameter. Without it `productNumber` and `diameter` are required, so a
-   * full record cannot lose them unnoticed.
-   */
   nameOnly: z
     .literal(true)
     .describe('A record that only names the bullet: it has no product number.')
@@ -475,8 +527,7 @@ function cannelureOnShank(b: BulletFields, issue: Issue) {
     issue(['cannelure', 'depth'], 'must be smaller than the radius')
 }
 
-/** A projectile as its manufacturer sells it. Inferred type: {@link Bullet}. */
-export const bullet = bulletFields.superRefine((b, ctx) => {
+const bulletParser = bulletFields.superRefine((b, ctx) => {
   needsCountrySource(b, ctx)
   const issue: Issue = (path, message) => ctx.addIssue({ code: 'custom', path, message })
   const below: Below = (path, q, limit, what) => {
@@ -489,6 +540,109 @@ export const bullet = bulletFields.superRefine((b, ctx) => {
   jacketIssue(b, below)
   cavityDepthIssues(b, issue, below)
 })
+
+/** A projectile as its manufacturer sells it. Inferred type: {@link Bullet}. */
+export const bullet: z.ZodObject<{
+  id: typeof recordId
+  /** Id of the manufacturer record. */
+  manufacturer: typeof recordId
+  /** Product number. Absent only with `nameOnly`. */
+  productNumber: z.ZodOptional<z.ZodString>
+  name: z.ZodString
+  country: z.ZodOptional<typeof countryCode>
+  productLine: z.ZodOptional<z.ZodString>
+  /** Caliber as the manufacturer writes it, for example `.308`. */
+  caliber: z.ZodOptional<z.ZodString>
+  /** Diameter. Absent only with `nameOnly`; stored only where a source prints one. */
+  diameter: z.ZodOptional<QuantitySchema>
+  mass: QuantitySchema
+  length: z.ZodOptional<QuantitySchema>
+  base: z.ZodOptional<
+    z.ZodObject<{
+      type: z.ZodOptional<typeof baseTypes>
+      length: z.ZodOptional<QuantitySchema>
+      /**
+       * Diameter of the base face at the end of the boat tail (McCoy, ARBRL-TR-02293, 1981, PDF p. 21).
+       * Only with a boat-tail or hollow base type.
+       */
+      diameter: z.ZodOptional<QuantitySchema>
+      /**
+       * Boat-tail angle: half-angle of the conical boat tail, between its surface and the bullet axis
+       * (McCoy, ARBRL-TR-02293, 1981, PDF p. 17). Only with a boat-tail or hollow base type.
+       */
+      angle: z.ZodOptional<QuantitySchema>
+      /** Diameter of the cavity where it opens in the base face. Needed by, and only with, a hollow base type. */
+      cavityDiameter: z.ZodOptional<QuantitySchema>
+      /**
+       * Depth of the cavity from the base face, where it is measured (a section, or the volume of a
+       * water or wax fill converted by the shape). Only with a hollow base type; without it the depth
+       * is the cavity's radius, an assumption.
+       */
+      cavityDepth: z.ZodOptional<QuantitySchema>
+    }>
+  >
+  ogive: z.ZodOptional<
+    z.ZodObject<{
+      /** Optional: a source may give the radius or Rt/R without naming the form. */
+      form: z.ZodOptional<typeof ogiveForms>
+      /** Ogive radius R: radius of the nose arc in an axial section (McCoy, ARBRL-TR-02293, 1981, PDF p. 13). */
+      radius: z.ZodOptional<QuantitySchema>
+      /**
+       * Head-shape parameter Rt/R: radius of a tangent ogive of the same nose length and diameter
+       * over the actual ogive radius; 1 for a tangent ogive, 0 for a cone, between 0 and 1 for a
+       * secant ogive (McCoy, ARBRL-TR-02293, 1981, PDF p. 13); 0 and 1 are included.
+       */
+      radiusRatio: z.ZodOptional<QuantitySchema>
+    }>
+  >
+  cannelure: z.ZodOptional<
+    z.ZodObject<{
+      start: QuantitySchema
+      width: QuantitySchema
+      depth: z.ZodOptional<QuantitySchema>
+    }>
+  >
+  tip: z.ZodOptional<
+    z.ZodObject<{
+      type: typeof tipTypes
+      /**
+       * Polymer tip: axial length of the part forward of the jacket opening (the head), without the
+       * shank seated in the jacket cavity. Mann 1997, p. 1, describes tips as a head and a shaft;
+       * US 10,690,463 B2, summary, splits the tip into a main portion forward of the opening and a
+       * retention portion in the cavity. Only with tip type `polymer-tip`.
+       */
+      length: z.ZodOptional<QuantitySchema>
+      /**
+       * Hollow point: diameter of the front opening of the nose cavity, before impact (US 12,467,728 B2,
+       * description: diameter of the front-side opening of the cavity, stated relative to the
+       * caliber). Whether it is taken at the inner or the outer edge of the mouth is not stated there.
+       * Only with tip type `hollow-point`: that definition covers a hollow point; no source defining
+       * the opening of an `open-meplat` tip was found.
+       */
+      mouthDiameter: z.ZodOptional<QuantitySchema>
+    }>
+  >
+  /** Diameter of the flat at the nose (McCoy, ARBRL-TR-02293, 1981, PDF p. 14); 0 for a sharp point. */
+  meplatDiameter: z.ZodOptional<QuantitySchema>
+  noseLength: z.ZodOptional<QuantitySchema>
+  baseToOgive: z.ZodOptional<QuantitySchema>
+  bearingLength: z.ZodOptional<QuantitySchema>
+  construction: z.ZodOptional<typeof constructionFields>
+  ballisticCoefficients: z.ZodOptional<z.ZodArray<typeof ballisticCoefficient>>
+  /** Twist the manufacturer recommends, length per turn. */
+  recommendedTwist: z.ZodOptional<QuantitySchema>
+  /** Slowest twist the manufacturer allows ("1-10\" or faster"), length per turn. */
+  slowestTwist: z.ZodOptional<QuantitySchema>
+  note: z.ZodOptional<z.ZodString>
+  /**
+   * Set on a record that only names a bullet a table prints: no product number and, unless the
+   * table prints one, no diameter. Without it `productNumber` and `diameter` are required, so a
+   * full record cannot lose them unnoticed.
+   */
+  nameOnly: z.ZodOptional<z.ZodLiteral<true>>
+  /** Where the values of the record come from: a kind and at least one source. */
+  provenance: typeof provenance
+}> = bulletParser satisfies Exact<typeof bullet, typeof bulletParser>
 
 /** One published coefficient: G1 or G7, value in lb/in2, optional velocity band. */
 export interface BallisticCoefficient extends z.infer<typeof ballisticCoefficient> {}
