@@ -1,8 +1,9 @@
 import { expect, test } from '@playwright/test'
+import type { Message } from '../../../web/src/i18n/translate.ts'
 import { sections } from '../../../web/src/lib/sections.ts'
 import { exported, followNav, gotoHydrated } from './nav.ts'
 
-const pages = sections.flatMap((s) => s.pages)
+const pages = sections.flatMap((s): readonly { href: string; label: Message }[] => s.pages)
 // a tool page and a data page: the links all come from `sections`, the lists below check every one
 const visited = pages.filter(({ href }) => href === '/workbench' || href === '/cartridges')
 // the value the web app was built with: set, the shell shows Report an issue and the repository link
@@ -175,7 +176,8 @@ test('the Alpha badge gives its note by pointer and keyboard, and the open note 
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 800 })
-  await page.goto('/session')
+  // a hover before the header is hydrated is lost (tooltip-hover.spec.ts)
+  await gotoHydrated(page, '/session')
   const brand = page.locator('.mantine-AppShell-header .brand')
   const note = page.getByRole('tooltip', {
     name: 'Alpha version: breaking changes are to be expected.',

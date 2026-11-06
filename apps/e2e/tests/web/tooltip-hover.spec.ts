@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { gotoHydrated } from './nav.ts'
 
 const text = 'Alpha version: breaking changes are to be expected.'
 
@@ -6,7 +7,8 @@ test('a tooltip stays open while the pointer moves onto it, Escape and leaving c
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 800 })
-  await page.goto('/session')
+  // the header's tooltip opens on hover once its handlers are hydrated: a hover before that is lost
+  await gotoHydrated(page, '/session')
   const brand = page.locator('.mantine-AppShell-header .brand')
   const note = page.getByRole('tooltip', { name: text })
 

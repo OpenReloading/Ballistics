@@ -14,7 +14,7 @@ const routes = readdirSync(appDir, { recursive: true, encoding: 'utf8' })
   .sort()
 
 test('every page without a dynamic segment is in the navigation, so the sweep covers it', () => {
-  const pages = sections.flatMap((s) => s.pages)
+  const pages = sections.flatMap((s): readonly { href: string }[] => s.pages)
   // the home page and the offline page have no entry of their own
   const unlisted = routes.filter(
     (route) =>
@@ -24,20 +24,11 @@ test('every page without a dynamic segment is in the navigation, so the sweep co
   expect(routes).toEqual(expect.arrayContaining(pages.map((p) => p.href)))
 })
 
-/** Switches the system colour scheme of the open page and waits for the app to follow it and settle. */
+/** Switches the system color scheme of the open page and waits for the app to follow it. */
 async function showScheme(page: Page, colorScheme: (typeof schemes)[number]) {
   await page.emulateMedia({ colorScheme })
   // with no stored theme the provider follows the system setting (theme.spec.ts)
   await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', colorScheme)
-  // axe reads colours at rest, not in a colour transition
-  await page.evaluate(() =>
-    Promise.all(
-      document
-        .getAnimations()
-        .filter((a) => a.effect?.getComputedTiming().iterations !== Infinity)
-        .map((a) => a.finished.catch(() => undefined)),
-    ),
-  )
 }
 
 // one load per page and width, swept in each scheme: the switch is the app's own system-setting path
