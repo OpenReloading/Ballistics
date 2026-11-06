@@ -5,11 +5,8 @@ import { provenance } from './provenance.ts'
 
 const manufacturerParser = z.strictObject({
   id: recordId,
-  /** Name as the manufacturer prints it on its products or site. */
   name: z.string().min(1),
-  /** The manufacturer's own site, https. */
   website: z.url({ protocol: /^https$/ }).optional(),
-  /** Other names: former names and brand names it sells under; searched and checked for duplicates. */
   aliases: z.array(z.string().min(1)).min(1).optional(),
   provenance,
 })
@@ -24,8 +21,11 @@ const manufacturerParser = z.strictObject({
 export const manufacturer: z.ZodObject<
   {
     id: typeof recordId
+    /** Name as the manufacturer prints it on its products or site. */
     name: z.ZodString
+    /** The manufacturer's own site, https. */
     website: z.ZodOptional<z.ZodURL>
+    /** Other names: former names and brand names it sells under; searched and checked for duplicates. */
     aliases: z.ZodOptional<z.ZodArray<z.ZodString>>
     provenance: typeof provenance
   },

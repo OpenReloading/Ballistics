@@ -20,18 +20,13 @@ export type CaseType = z.infer<typeof caseTypes>
 
 const cartridgeParser = z.object({
   id: recordId,
-  /** The name as printed on the sheet. */
   name: z.string().min(1),
-  /** Other names printed in the sheet's title or header, never derived from file names. */
   aliases: z.array(z.string().min(1)).min(1).optional(),
-  /** Table of the C.I.P. sheets, for example `I` (rimless) to `VII` (shotshell). */
   table: z.string().min(1),
-  /** Country of origin as printed. */
   country: z.string().min(1).optional(),
   published: z.iso.date(),
   revised: z.iso.date().optional(),
   pressureMethod: pressureMethod.optional(),
-  /** `verified`: every value checked by hand against the sheet. */
   verification: z.enum(['verified', 'unverified']),
   values: z.array(specValue),
   exceptions: z.array(plausibilityException).min(1).optional(),
@@ -44,13 +39,18 @@ const cartridgeParser = z.object({
  */
 export const cartridge: z.ZodObject<{
   id: typeof recordId
+  /** The name as printed on the sheet. */
   name: z.ZodString
+  /** Other names printed in the sheet's title or header, never derived from file names. */
   aliases: z.ZodOptional<z.ZodArray<z.ZodString>>
+  /** Table of the C.I.P. sheets, for example `I` (rimless) to `VII` (shotshell). */
   table: z.ZodString
+  /** Country of origin as printed. */
   country: z.ZodOptional<z.ZodString>
   published: z.ZodISODate
   revised: z.ZodOptional<z.ZodISODate>
   pressureMethod: z.ZodOptional<typeof pressureMethod>
+  /** `verified`: every value checked by hand against the sheet. */
   verification: z.ZodEnum<z.core.util.ToEnum<'verified' | 'unverified'>>
   values: z.ZodArray<typeof specValue>
   exceptions: z.ZodOptional<z.ZodArray<typeof plausibilityException>>

@@ -40,44 +40,31 @@ const parsesAsUrl = (text: string) => {
 
 const sourceParser = z.object({
   title: z.string().min(1).describe('Title of the source: the document, or the site and table.'),
-  /** Who issued the data: a maker, a standards body or the authors ("Example Bullets Inc."). */
   publisher: z
     .string()
     .min(1)
     .describe('Who issued the data: a maker, a standards body or the authors.')
     .optional(),
-  /** Edition, print or date as the document states it. */
   edition: z
     .string()
     .min(1)
     .describe('Edition, print or date as the document states it.')
     .optional(),
   page: z.string().min(1).describe('Page or section of the document.').optional(),
-  /** An http or https URL: pages render it as a link. */
   url: z
     .url({ protocol: /^https?$/ })
     .describe('An http or https URL of the source.')
     .optional(),
   retrieved: z.iso.date().describe('Date the source was retrieved, ISO 8601.').optional(),
   sha256: sha256.describe('SHA-256 of the retrieved file, 64 lowercase hex digits.').optional(),
-  /** Dot paths of the record fields this source supports; absent means the whole record. */
   fields: z
     .array(z.string().min(1))
     .min(1)
     .describe('Dot paths of the record fields this source supports. Absent: the whole record.')
     .optional(),
-  /** Kind of this source's values when it differs from the record's provenance kind. */
   kind: provenanceKind
     .describe('Kind of this source values when it differs from the provenance kind of the record.')
     .optional(),
-  /**
-   * SPDX id of the license the data is used under ("CC-BY-4.0"; "LicenseRef-US-Gov-PD" for a US Government work),
-   * or `LicenseRef-<name>` for the publisher's own terms, described in `terms`.
-   * Without a license, a source of a record distributed by `@open-reloading/data` is covered by its
-   * data licence, CC BY 4.0 (`packages/data/LICENSE`), except one with `origin: manufacturer`: data a
-   * manufacturer published carries no project licence, only the terms the manufacturer states.
-   * For other producers' records the producer sets the default.
-   */
   license: z
     .string()
     .regex(/^(LicenseRef-)?[A-Za-z0-9.+-]+$/)
@@ -85,11 +72,6 @@ const sourceParser = z.object({
       'SPDX id of the license the data is used under, or `LicenseRef-<name>` for the publisher own terms described in `terms`.',
     )
     .optional(),
-  /**
-   * URL or note of the publisher's terms, where no SPDX license covers the use. A
-   * text starting with http:// or https:// is a link (`isWebLink`) and must be a URL. Any other
-   * text is a note.
-   */
   terms: z
     .string()
     .min(1)
@@ -100,11 +82,9 @@ const sourceParser = z.object({
       'URL or note of the publisher terms where no SPDX license covers the use. Text starting with http:// or https:// is a link.',
     )
     .optional(),
-  /** Who stands behind the source; `title` names the actual source (for example the site and the table). */
   origin: sourceOrigin
     .describe('Who stands behind the source: manufacturer, public or community.')
     .optional(),
-  /** The fit run behind a `fitted` source: model version id the report names, report of its evaluation. */
   run: z
     .object({
       version: z
@@ -125,17 +105,37 @@ const sourceParser = z.object({
  */
 export const source: z.ZodObject<{
   title: z.ZodString
+  /** Who issued the data: a maker, a standards body or the authors ("Example Bullets Inc."). */
   publisher: z.ZodOptional<z.ZodString>
+  /** Edition, print or date as the document states it. */
   edition: z.ZodOptional<z.ZodString>
   page: z.ZodOptional<z.ZodString>
+  /** An http or https URL: pages render it as a link. */
   url: z.ZodOptional<z.ZodURL>
   retrieved: z.ZodOptional<z.ZodISODate>
   sha256: z.ZodOptional<typeof sha256>
+  /** Dot paths of the record fields this source supports; absent means the whole record. */
   fields: z.ZodOptional<z.ZodArray<z.ZodString>>
+  /** Kind of this source's values when it differs from the record's provenance kind. */
   kind: z.ZodOptional<typeof provenanceKind>
+  /**
+   * SPDX id of the license the data is used under ("CC-BY-4.0"; "LicenseRef-US-Gov-PD" for a US Government work),
+   * or `LicenseRef-<name>` for the publisher's own terms, described in `terms`.
+   * Without a license, a source of a record distributed by `@open-reloading/data` is covered by its
+   * data licence, CC BY 4.0 (`packages/data/LICENSE`), except one with `origin: manufacturer`: data a
+   * manufacturer published carries no project licence, only the terms the manufacturer states.
+   * For other producers' records the producer sets the default.
+   */
   license: z.ZodOptional<z.ZodString>
+  /**
+   * URL or note of the publisher's terms, where no SPDX license covers the use. A
+   * text starting with http:// or https:// is a link (`isWebLink`) and must be a URL. Any other
+   * text is a note.
+   */
   terms: z.ZodOptional<z.ZodString>
+  /** Who stands behind the source; `title` names the actual source (for example the site and the table). */
   origin: z.ZodOptional<typeof sourceOrigin>
+  /** The fit run behind a `fitted` source: model version id the report names, report of its evaluation. */
   run: z.ZodOptional<z.ZodObject<{ version: z.ZodString; report: z.ZodString }>>
   note: z.ZodOptional<z.ZodString>
 }> = sourceParser satisfies Exact<typeof source, typeof sourceParser>
@@ -151,19 +151,7 @@ const sourceRecordParser = source
  * Inferred type: {@link SourceRecord}.
  */
 export const sourceRecord: z.ZodObject<
-  {
-    title: z.ZodString
-    publisher: z.ZodOptional<z.ZodString>
-    edition: z.ZodOptional<z.ZodString>
-    url: z.ZodOptional<z.ZodURL>
-    retrieved: z.ZodOptional<z.ZodISODate>
-    sha256: z.ZodOptional<typeof sha256>
-    license: z.ZodOptional<z.ZodString>
-    terms: z.ZodOptional<z.ZodString>
-    origin: z.ZodOptional<typeof sourceOrigin>
-    note: z.ZodOptional<z.ZodString>
-    id: typeof recordId
-  },
+  Omit<(typeof source)['shape'], 'page' | 'fields' | 'kind' | 'run'> & { id: typeof recordId },
   z.core.$strict
 > = sourceRecordParser satisfies Exact<typeof sourceRecord, typeof sourceRecordParser>
 
@@ -189,17 +177,10 @@ const sourceReferenceParser = source
  * Inferred type: {@link SourceReference}.
  */
 export const sourceReference: z.ZodObject<
-  {
-    page: z.ZodOptional<z.ZodString>
-    url: z.ZodOptional<z.ZodURL>
-    retrieved: z.ZodOptional<z.ZodISODate>
-    sha256: z.ZodOptional<typeof sha256>
-    fields: z.ZodOptional<z.ZodArray<z.ZodString>>
-    kind: z.ZodOptional<typeof provenanceKind>
-    run: z.ZodOptional<z.ZodObject<{ version: z.ZodString; report: z.ZodString }>>
-    note: z.ZodOptional<z.ZodString>
-    source: typeof recordId
-  },
+  Pick<
+    (typeof source)['shape'],
+    'page' | 'url' | 'retrieved' | 'sha256' | 'fields' | 'kind' | 'run' | 'note'
+  > & { source: typeof recordId },
   z.core.$strict
 > = sourceReferenceParser satisfies Exact<typeof sourceReference, typeof sourceReferenceParser>
 

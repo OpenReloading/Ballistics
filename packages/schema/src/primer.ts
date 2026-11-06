@@ -61,7 +61,6 @@ const primerFigure = z.strictObject({
 
 const primerParser = z.strictObject({
   id: recordId,
-  /** Id of the manufacturer record. */
   manufacturer: recordId,
   name: z.string().min(1).describe('Name of the product as the manufacturer prints it.'),
   productNumber: z.string().min(1).describe('Product number.').optional(),
@@ -93,6 +92,7 @@ const primerParser = z.strictObject({
 export const primer: z.ZodObject<
   {
     id: typeof recordId
+    /** Id of the manufacturer record. */
     manufacturer: typeof recordId
     name: z.ZodString
     productNumber: z.ZodOptional<z.ZodString>

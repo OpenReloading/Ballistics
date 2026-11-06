@@ -7,20 +7,15 @@ import { type QuantitySchema, quantity } from './units.ts'
 const rangeFiringsParser = z
   .object({
     id: recordId,
-    /** The projectile as the report names it. */
     projectile: z.string().min(1),
-    /** Projectile diameter in mm that the drag coefficients refer to. */
     bulletDiameter: quantity('length'),
     bulletMass: quantity('mass'),
     rounds: z
       .array(
         z.object({
-          /** Round number as printed. */
           label: z.string().min(1),
           mach: quantity('dimensionless'),
-          /** Total angle of attack over the measured flight (alpha t). */
           totalYaw: quantity('angle'),
-          /** Drag coefficient at that yaw. */
           dragCoefficient: quantity('dimensionless'),
         }),
       )
@@ -60,14 +55,19 @@ const rangeFiringsParser = z
  */
 export const rangeFirings: z.ZodObject<{
   id: typeof recordId
+  /** The projectile as the report names it. */
   projectile: z.ZodString
+  /** Projectile diameter in mm that the drag coefficients refer to. */
   bulletDiameter: QuantitySchema
   bulletMass: QuantitySchema
   rounds: z.ZodArray<
     z.ZodObject<{
+      /** Round number as printed. */
       label: z.ZodString
       mach: QuantitySchema
+      /** Total angle of attack over the measured flight (alpha t). */
       totalYaw: QuantitySchema
+      /** Drag coefficient at that yaw. */
       dragCoefficient: QuantitySchema
     }>
   >

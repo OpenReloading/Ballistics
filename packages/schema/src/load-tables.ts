@@ -4,7 +4,6 @@ import { recordId } from './ids.ts'
 import { source } from './provenance.ts'
 
 const loadTableParser = z.strictObject({
-  /** Id of the manufacturer record that publishes the table. */
   manufacturer: recordId,
   title: source.shape.title,
   url: source.shape.url,
@@ -18,6 +17,7 @@ const loadTableParser = z.strictObject({
  */
 export const loadTable: z.ZodObject<
   {
+    /** Id of the manufacturer record that publishes the table. */
     manufacturer: typeof recordId
     title: z.ZodString
     url: z.ZodOptional<z.ZodURL>
