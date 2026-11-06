@@ -1,7 +1,8 @@
 import { z } from 'zod'
+import type { Exact } from './exact.ts'
 import { ref } from './ids.ts'
 import { localId, text } from './shared.ts'
-import { quantity } from './units.ts'
+import { type QuantitySchema, quantity } from './units.ts'
 
 const length = () => quantity('length', z.number().nonnegative())
 /**
@@ -13,12 +14,7 @@ const whileValid = (...keys: string[]) => ({
     !p.issues.some((i) => !i.path?.length || keys.includes(String(i.path[0]))),
 })
 
-/**
- * An optic of a firearm: turret click and travel as angles in degrees, magnification range (the
- * highest not below the lowest).
- * Inferred type: {@link Optic}.
- */
-export const optic = z
+const opticParser = z
   .object({
     id: localId.describe('Id of the optic, unique in the firearm.'),
     kind: z.enum(['scope', 'redDot', 'ironSights', 'other']).describe('Kind of optic.'),
@@ -46,10 +42,23 @@ export const optic = z
   })
 
 /**
- * One optic of the firearm as mounted in a configuration, with its own zero.
- * Inferred type: {@link OpticMount}.
+ * An optic of a firearm: turret click and travel as angles in degrees, magnification range (the
+ * highest not below the lowest).
+ * Inferred type: {@link Optic}.
  */
-export const opticMount = z.object({
+export const optic: z.ZodObject<{
+  id: z.ZodString
+  kind: z.ZodEnum<z.core.util.ToEnum<'scope' | 'redDot' | 'ironSights' | 'other'>>
+  name: z.ZodString
+  clickUnit: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'MOA' | 'mrad'>>>
+  clickValue: z.ZodOptional<QuantitySchema>
+  travel: z.ZodOptional<QuantitySchema>
+  reticle: z.ZodOptional<z.ZodString>
+  minMagnification: z.ZodOptional<z.ZodNumber>
+  maxMagnification: z.ZodOptional<z.ZodNumber>
+}> = opticParser satisfies Exact<typeof optic, typeof opticParser>
+
+const opticMountParser = z.object({
   optic: localId.describe('Id of the optic of the firearm.'),
   sightHeight: length().describe('Bore axis to optic centre.'),
   lateralOffset: quantity('length')
@@ -78,15 +87,28 @@ export const opticMount = z.object({
     .optional(),
 })
 
+/**
+ * One optic of the firearm as mounted in a configuration, with its own zero.
+ * Inferred type: {@link OpticMount}.
+ */
+export const opticMount: z.ZodObject<{
+  optic: z.ZodString
+  sightHeight: QuantitySchema
+  lateralOffset: z.ZodOptional<QuantitySchema>
+  cant: z.ZodOptional<QuantitySchema>
+  zeroRange: QuantitySchema
+  zeroNotes: z.ZodOptional<z.ZodString>
+  zeroTemperature: z.ZodOptional<QuantitySchema>
+  zeroPressure: z.ZodOptional<QuantitySchema>
+  zeroHumidity: z.ZodOptional<QuantitySchema>
+  dragFactor: z.ZodOptional<z.ZodNumber>
+  dragFactorSource: z.ZodOptional<z.ZodString>
+}> = opticMountParser satisfies Exact<typeof opticMount, typeof opticMountParser>
+
 const shots = () => z.int().positive().max(10000)
 const clicks = (s: z.ZodNumber) => s.meta({ unit: '1' })
 
-/**
- * One distance of a truing string: the mean and the deviation of one shot, as the height above
- * the line of sight of the impacts or as clicks dialled.
- * Inferred type: {@link TruingRow}.
- */
-export const truingRow = z.discriminatedUnion('kind', [
+const truingRowParser = z.discriminatedUnion('kind', [
   z.object({
     kind: z.literal('impact').describe('Impacts measured at the zero setting.'),
     range: quantity('length', z.number().positive()).describe('Distance of the row.'),
@@ -104,6 +126,31 @@ export const truingRow = z.discriminatedUnion('kind', [
     deviation: clicks(z.number().positive()).describe('Standard deviation of one shot, clicks.'),
   }),
 ])
+
+/**
+ * One distance of a truing string: the mean and the deviation of one shot, as the height above
+ * the line of sight of the impacts or as clicks dialled.
+ * Inferred type: {@link TruingRow}.
+ */
+export const truingRow: z.ZodDiscriminatedUnion<
+  [
+    z.ZodObject<{
+      kind: z.ZodLiteral<'impact'>
+      range: QuantitySchema
+      shots: z.ZodInt
+      mean: QuantitySchema
+      deviation: QuantitySchema
+    }>,
+    z.ZodObject<{
+      kind: z.ZodLiteral<'dial'>
+      range: QuantitySchema
+      shots: z.ZodInt
+      mean: z.ZodNumber
+      deviation: z.ZodNumber
+    }>,
+  ],
+  'kind'
+> = truingRowParser satisfies Exact<typeof truingRow, typeof truingRowParser>
 
 /** A value of a truing parameter in the stored unit of its kind. */
 const parameterValue = {
@@ -137,13 +184,7 @@ const truingParameter = <N extends keyof typeof parameterValue>(name: N) => {
   })
 }
 
-/**
- * One truing result stored with the configuration it was shot with: the strings as entered, the
- * nominal shot they were fitted against, and the fitted parameters. A parameter that is not
- * identified has no value.
- * Inferred type: {@link Truing}.
- */
-export const truing = z.object({
+const truingParser = z.object({
   date: z.iso.date().describe('Date the result was stored, ISO 8601.'),
   load: ref('load').describe('Reference to the load the strings were shot with.').optional(),
   bullet: text(200).describe('The bullet of the nominal shot as the workbench named it.'),
@@ -188,11 +229,90 @@ export const truing = z.object({
 })
 
 /**
- * The optics mounted on a firearm between a mount date and a removal date: 1 to 4 mounts, removal
- * not before mounting.
- * Inferred type: {@link OpticConfiguration}.
+ * One truing result stored with the configuration it was shot with: the strings as entered, the
+ * nominal shot they were fitted against, and the fitted parameters. A parameter that is not
+ * identified has no value.
+ * Inferred type: {@link Truing}.
  */
-export const opticConfiguration = z
+export const truing: z.ZodObject<{
+  date: z.ZodISODate
+  load: z.ZodOptional<z.ZodString>
+  bullet: z.ZodString
+  muzzleVelocity: QuantitySchema
+  zeroRange: QuantitySchema
+  temperature: QuantitySchema
+  pressure: QuantitySchema
+  humidity: QuantitySchema
+  clickValue: QuantitySchema
+  fitZeroOffset: z.ZodBoolean
+  rows: z.ZodArray<typeof truingRow>
+  chronograph: z.ZodOptional<
+    z.ZodObject<{ shots: z.ZodInt; mean: QuantitySchema; deviation: QuantitySchema }>
+  >
+  parameters: z.ZodArray<
+    z.ZodDiscriminatedUnion<
+      [
+        z.ZodObject<{
+          name: z.ZodLiteral<'muzzleVelocity'>
+          status: z.ZodEnum<z.core.util.ToEnum<'identified' | 'weak' | 'unresolved'>>
+          reasons: z.ZodArray<
+            z.ZodEnum<
+              z.core.util.ToEnum<'no-information' | 'collinear' | 'imprecise' | 'fit-failed'>
+            >
+          >
+          value: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
+          lower: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
+          upper: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
+          confidenceLevel: z.ZodOptional<z.ZodNumber>
+        }>,
+        z.ZodObject<{
+          name: z.ZodLiteral<'dragFactor'>
+          status: z.ZodEnum<z.core.util.ToEnum<'identified' | 'weak' | 'unresolved'>>
+          reasons: z.ZodArray<
+            z.ZodEnum<
+              z.core.util.ToEnum<'no-information' | 'collinear' | 'imprecise' | 'fit-failed'>
+            >
+          >
+          value: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
+          lower: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
+          upper: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
+          confidenceLevel: z.ZodOptional<z.ZodNumber>
+        }>,
+        z.ZodObject<{
+          name: z.ZodLiteral<'clickValue'>
+          status: z.ZodEnum<z.core.util.ToEnum<'identified' | 'weak' | 'unresolved'>>
+          reasons: z.ZodArray<
+            z.ZodEnum<
+              z.core.util.ToEnum<'no-information' | 'collinear' | 'imprecise' | 'fit-failed'>
+            >
+          >
+          value: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
+          lower: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
+          upper: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
+          confidenceLevel: z.ZodOptional<z.ZodNumber>
+        }>,
+        z.ZodObject<{
+          name: z.ZodLiteral<'zeroOffset'>
+          status: z.ZodEnum<z.core.util.ToEnum<'identified' | 'weak' | 'unresolved'>>
+          reasons: z.ZodArray<
+            z.ZodEnum<
+              z.core.util.ToEnum<'no-information' | 'collinear' | 'imprecise' | 'fit-failed'>
+            >
+          >
+          value: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
+          lower: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
+          upper: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
+          confidenceLevel: z.ZodOptional<z.ZodNumber>
+        }>,
+      ],
+      'name'
+    >
+  >
+  consistent: z.ZodOptional<z.ZodBoolean>
+  intervalsTrusted: z.ZodBoolean
+}> = truingParser satisfies Exact<typeof truing, typeof truingParser>
+
+const opticConfigurationParser = z
   .object({
     id: localId.describe('Id of the configuration, unique in the firearm.'),
     name: text(200).describe('Name of the configuration.'),
@@ -212,22 +332,36 @@ export const opticConfiguration = z
     ...whileValid('mounted', 'removed'),
   })
 
+/**
+ * The optics mounted on a firearm between a mount date and a removal date: 1 to 4 mounts, removal
+ * not before mounting.
+ * Inferred type: {@link OpticConfiguration}.
+ */
+export const opticConfiguration: z.ZodObject<{
+  id: z.ZodString
+  name: z.ZodString
+  mounts: z.ZodArray<typeof opticMount>
+  mounted: z.ZodOptional<z.ZodISODate>
+  removed: z.ZodOptional<z.ZodISODate>
+  truing: z.ZodOptional<z.ZodArray<typeof truing>>
+}> = opticConfigurationParser satisfies Exact<
+  typeof opticConfiguration,
+  typeof opticConfigurationParser
+>
+
 const unique = (ids: string[], path: (i: number) => PropertyKey[], ctx: z.RefinementCtx) =>
   ids.forEach((id, i) => {
     if (ids.indexOf(id) !== i)
       ctx.addIssue({ code: 'custom', message: 'Duplicate id', path: path(i) })
   })
 
-/** Kind of firearm where the record states it: a revolver has a gap between cylinder and barrel. */
-export const firearmAction = z.enum(['rifle', 'pistol', 'revolver'])
+const firearmActionParser = z.enum(['rifle', 'pistol', 'revolver'])
 
-/**
- * A firearm, one shape for every origin: lengths in mm, mass in g, angles in degrees, zero air in
- * degC, bar and %. Optic and configuration ids are unique, each mount names an optic of the firearm
- * and `active` names one of its configurations. A record with the maker as text fails the schema.
- * Inferred type: {@link Firearm}.
- */
-export const firearm = z
+/** Kind of firearm where the record states it: a revolver has a gap between cylinder and barrel. */
+export const firearmAction: z.ZodEnum<z.core.util.ToEnum<'rifle' | 'pistol' | 'revolver'>> =
+  firearmActionParser satisfies Exact<typeof firearmAction, typeof firearmActionParser>
+
+const firearmParser = z
   .strictObject({
     origin: z
       .enum(['catalogue', 'user', 'shared'])
@@ -326,6 +460,44 @@ export const firearm = z
         path: ['active'],
       })
   })
+
+/**
+ * A firearm, one shape for every origin: lengths in mm, mass in g, angles in degrees, zero air in
+ * degC, bar and %. Optic and configuration ids are unique, each mount names an optic of the firearm
+ * and `active` names one of its configurations. A record with the maker as text fails the schema.
+ * Inferred type: {@link Firearm}.
+ */
+export const firearm: z.ZodObject<
+  {
+    origin: z.ZodEnum<z.core.util.ToEnum<'catalogue' | 'user' | 'shared'>>
+    name: z.ZodString
+    manufacturer: z.ZodOptional<z.ZodString>
+    model: z.ZodOptional<z.ZodString>
+    action: z.ZodOptional<typeof firearmAction>
+    cartridge: z.ZodOptional<z.ZodString>
+    barrelLength: z.ZodOptional<QuantitySchema>
+    twist: z.ZodOptional<QuantitySchema>
+    twistHand: z.ZodEnum<z.core.util.ToEnum<'right' | 'left'>>
+    grooveDiameter: z.ZodOptional<QuantitySchema>
+    boreDiameter: z.ZodOptional<QuantitySchema>
+    freebore: z.ZodOptional<QuantitySchema>
+    baseToOgiveAtLands: z.ZodOptional<QuantitySchema>
+    overallLengthAtLands: z.ZodOptional<QuantitySchema>
+    landsBullet: z.ZodOptional<z.ZodString>
+    firearmMass: z.ZodOptional<QuantitySchema>
+    roundCount: z.ZodOptional<z.ZodInt>
+    roundCountDate: z.ZodOptional<z.ZodISODate>
+    countedSessions: z.ZodOptional<
+      z.ZodArray<z.ZodObject<{ session: z.ZodString; rounds: z.ZodInt }, z.core.$strict>>
+    >
+    noteAtRoundCount: z.ZodOptional<z.ZodInt>
+    notes: z.ZodOptional<z.ZodString>
+    optics: z.ZodArray<typeof optic>
+    configurations: z.ZodArray<typeof opticConfiguration>
+    active: z.ZodOptional<z.ZodString>
+  },
+  z.core.$strict
+> = firearmParser satisfies Exact<typeof firearm, typeof firearmParser>
 
 /** A firearm: lengths in mm, mass in g, optics and configurations. */
 export interface Firearm extends z.infer<typeof firearm> {}
