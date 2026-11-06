@@ -11,7 +11,7 @@ it('has one entry for each id of ChronoFormatId and WorkbookFormatId, and no oth
     delimited: true,
   }
   const workbook: Record<WorkbookFormatId, true> = { 'shotview-xlsx': true }
-  expect(chronoFormats.map((f) => f.id).sort()).toEqual(Object.keys(chrono).sort())
+  expect(chronoFormats.map((f) => f.id).toSorted()).toEqual(Object.keys(chrono).toSorted())
   expect(chronoFormats.filter((f) => f.reads === 'workbook').map((f) => f.id)).toEqual(
     Object.keys(workbook),
   )

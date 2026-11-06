@@ -11,7 +11,6 @@
   "Form a (moved by the fit)": "Form a (von der Anpassung verschoben)",
   "Ingredient {n}": "Bestandteil {n}",
   "Set Values came about by to Fitted to data.": "Setzen Sie Herkunft der Werte auf An Daten angepasst.",
-  "Replaced by primerState and fillLevel": "Ersetzt durch primerState und fillLevel",
   "Add a source that gives the country.": "Fügen Sie eine Quelle hinzu, die das Land angibt.",
   "Add a source that gives the cartridges the powder is listed for.": "Fügen Sie eine Quelle hinzu, die die Patronen angibt, für die das Treibladungspulver gelistet ist.",
   "Slower ({unit})": "Langsamer ({unit})",
@@ -58,7 +57,6 @@
   "A mark of {diameter} mm does not fit a sheet: choose a smaller size or distance.": "Eine Marke von {diameter} mm passt nicht auf ein Blatt: Wählen Sie eine kleinere Größe oder Entfernung.",
   "A primer (catalogue unavailable)": "Ein Zündhütchen (Katalog nicht verfügbar)",
   "A primer not in the catalogue": "Ein Zündhütchen, das nicht im Katalog steht",
-  "A record of kind \"workbenchState\" is a load in the format of an earlier version, which this app no longer reads. Kind \"load\" replaces it.": "Ein Datensatz der Art „workbenchState“ ist eine Laborierung im Format einer früheren Version, die diese App nicht mehr liest. Die Art „load“ ersetzt sie.",
   "A saved load opens from Open in the page bar.": "Eine gespeicherte Laborierung öffnen Sie über „Öffnen“ in der Kopfleiste.",
   "A user record is not on the server, name a catalogue record": "Ein eigener Datensatz liegt nicht auf dem Server, geben Sie den Namen eines Katalogdatensatzes an",
   "Abbreviation": "Abkürzung",
@@ -4115,10 +4113,6 @@
   "The seated jump has no effect without an engraving ramp.": "Der Freiflug des gesetzten Geschosses wirkt sich ohne Einpressrampe nicht aus.",
   "? opens the shortcut list, / searches the list on a page. Shortcuts with Ctrl or Cmd always work.": "? öffnet die Liste der Tastenkürzel, / durchsucht die Liste einer Seite. Kürzel mit Strg oder Cmd funktionieren immer.",
   "{address} was never opened on this device, so it is not stored. The tools, your own records and pages you opened before work offline.": "{address} wurde auf diesem Gerät noch nie geöffnet und ist daher nicht gespeichert. Die Werkzeuge, Ihre eigenen Datensätze und zuvor geöffnete Seiten funktionieren offline.",
-  "{count} saved load has an earlier format this app no longer reads; Open lists it under Invalid records.|{count} saved loads have an earlier format this app no longer reads; Open lists them under Invalid records.": {
-    "one": "{count} gespeicherte Laborierung hat ein früheres Format, das diese App nicht mehr liest; Öffnen listet sie unter „Ungültige Datensätze“ auf.",
-    "other": "{count} gespeicherte Laborierungen haben ein früheres Format, das diese App nicht mehr liest; Öffnen listet sie unter „Ungültige Datensätze“ auf."
-  },
   "A bullet fits a cartridge when its diameter is above the mean of the land and groove diameters F and Z and at most the projectile diameter G1, all from the CIP sheet (G1 to its printed 0.01 mm).": "Ein Geschoss passt zu einer Patrone, wenn sein Durchmesser über dem Mittel aus Felddurchmesser F und Zugdurchmesser Z liegt und höchstens dem Geschossdurchmesser G1 entspricht, jeweils nach dem C.I.P.-Blatt (G1 mit der gedruckten Genauigkeit von 0,01 mm).",
   "A dispersion model, not a prediction of a score. It assumes your group is typical of the shots to come, dispersion grows linearly with distance, the zero is right, and wind and range errors are independent and small enough for a first-order estimate. Hold and aim errors beyond the group are not included.": "Ein Streuungsmodell, keine Vorhersage eines Ergebnisses. Es nimmt an, dass Ihre Gruppe für die kommenden Schüsse typisch ist, die Streuung linear mit der Entfernung wächst, das Einschießen stimmt und Wind- und Entfernungsfehler unabhängig und klein genug für eine Schätzung erster Ordnung sind. Halte- und Zielfehler über die Gruppe hinaus sind nicht enthalten.",
   "A shadow beside the bullet widens one side of the cut-out: that side is left out and the other side, mirrored about the axis, is measured. Brush the shadow out or take the photograph in even light for a more exact outline.": "Ein Schatten neben dem Geschoss verbreitert eine Seite der Freistellung: Diese Seite bleibt außen vor, gemessen wird die andere Seite, an der Achse gespiegelt. Entfernen Sie den Schatten mit dem Pinsel oder fotografieren Sie in gleichmäßigem Licht, für einen genaueren Umriss.",

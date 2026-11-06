@@ -6,11 +6,11 @@ import { readLink, shareLink } from '../src/lib/share-link.ts'
 import { parseUserDataFile, userDataText } from '../src/lib/user-data.ts'
 import { defined } from './defined.ts'
 
-// Per format version: a user data file with a record of each kind and a second one that sets every field the
-// kind can have, which every later app must read and the current code writes back as the same JSON value, and
-// share links of its records, one of them with text beyond ASCII. `pnpm run baselines` at
-// the root rewrites the links from what the code writes; the file is edited by hand when the format changes, so
-// its diff shows what an older file needs.
+// The current format version only: a user data file with a record of each kind and a second one that sets
+// every field the kind can have, which the current code reads and writes back as the same JSON value, and share
+// links of its records, one of them with text beyond ASCII. A new version replaces these files; no older one is
+// read. `pnpm run baselines` at the root rewrites the links from what the code writes; the file is edited by hand
+// when the format changes.
 const golden = (name: string) => readFileSync(new URL(`golden/${name}`, import.meta.url), 'utf8')
 const page = 'https://example.org/bullets/designer'
 /** A share link with its fragment inflated back to the file text. */
@@ -34,30 +34,20 @@ const kinds = userRecord.options.map((o) => o.shape.kind.value)
 
 /** An object of the user data file's JSON Schema. */
 interface Node {
-  not?: object
   properties?: Record<string, Node>
 }
-/** The fields `n` allows, without those of an earlier format that a file must not have (`{ not: {} }`). */
-const fieldsOf = (n: Node) =>
-  Object.entries(n.properties ?? {}).flatMap(([k, v]) =>
-    v.not && Object.keys(v.not).length === 0 ? [] : [k],
-  )
-
-describe.each(Array.from({ length: userDataVersion }, (_, i) => i + 1))(
-  'golden user data file of version %i',
-  (version) => {
-    it('is read by the current code with its photo and no reference left open', () => {
-      const read = parseUserDataFile(golden(`user-data-v${version}.json`))
-      expect(read).toMatchObject({ ok: true })
-      const { records, files } = defined(read.ok ? read : undefined)
-      expect(records.length).toBeGreaterThan(0)
-      expect(files).toHaveLength(1)
-      expect(checkUserRefs(records)).toEqual([])
-    })
-  },
-)
+/** The fields `n` allows. */
+const fieldsOf = (n: Node) => Object.keys(n.properties ?? {})
 
 describe('golden user data file of the current version', () => {
+  it('is read by the current code with its photo and no reference left open', () => {
+    expect(parsed).toMatchObject({ ok: true })
+    const { records, files } = defined(file)
+    expect(records.length).toBeGreaterThan(0)
+    expect(files).toHaveLength(1)
+    expect(checkUserRefs(records)).toEqual([])
+  })
+
   it('has a record of every kind', () => {
     expect(new Set(defined(file).records.map((r) => r.kind))).toEqual(new Set(kinds))
   })

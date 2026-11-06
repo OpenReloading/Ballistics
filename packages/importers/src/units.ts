@@ -1,5 +1,6 @@
 // Velocity units of export files and the conversion to stored m/s.
 import type { QuantityValue } from '@open-reloading/schema'
+import { conversions } from '@open-reloading/units'
 import { parseNumber } from './text.ts'
 
 /** A velocity unit the importers recognise. Parsed velocities are stored in m/s. */
@@ -15,12 +16,12 @@ export function parseVelocityUnit(text: string | undefined): VelocityUnit | unde
   return undefined
 }
 
-// m/s per unit, exact by definition (NIST SP 811, Appendix B.9)
+// m/s per unit; the customary ones from the conversion table
 const toMps: Record<VelocityUnit, number> = {
   'm/s': 1,
-  'ft/s': 0.3048,
+  'ft/s': conversions.ft.factor,
   'km/h': 1 / 3.6,
-  mph: 0.44704,
+  mph: conversions.mph.factor,
 }
 
 /** `x` rounded to 1e-6, which drops binary float noise of a unit conversion. */

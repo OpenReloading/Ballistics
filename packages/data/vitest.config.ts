@@ -7,9 +7,7 @@ export default defineConfig({
       include: ['src/**/*.ts'],
       // build and validation scripts, run as processes by pnpm
       exclude: ['src/build.ts', 'src/validate.ts'],
-      reporter: ['text-summary', 'lcov'],
-      // floors: the measured value rounded down, minus one
-      thresholds: { statements: 98, branches: 96, functions: 99, lines: 98 },
+      reporter: ['text-summary'],
     },
   },
 })

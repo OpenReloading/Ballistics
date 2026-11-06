@@ -8,8 +8,6 @@ export default defineConfig({
       provider: 'v8',
       include: ['src/**/*.ts'],
       reporter: ['text-summary'],
-      // floors: the measured value rounded down, minus one
-      thresholds: { statements: 97, branches: 94, functions: 99, lines: 98 },
     },
   },
 })

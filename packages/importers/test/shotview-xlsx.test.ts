@@ -20,7 +20,7 @@ const edit = (sheet: Worksheet, test: (cells: string[]) => boolean, rows: string
 const withDate = (sheet: Worksheet, text: string) =>
   edit(sheet, (c) => c[0] === 'DATE' || c[0] === 'DATUM', [['DATE', text]])
 
-describe('parseShotViewWorkbook', () => {
+describe('parseShotViewWorkbook: worksheets like the CSV export', () => {
   it('reads one worksheet like the CSV export with the same values', () => {
     // the values of shotViewEnglish: its date and X in COLD BORE (column 8) of shot 1
     const rows = shotViewSheetEnglish.rows.map((c) => (c[0] === '1' ? [...c, '', 'X'] : c))
@@ -54,7 +54,9 @@ describe('parseShotViewWorkbook', () => {
     expect(r.warnings).toEqual([])
     expect(complete(r).strings).toHaveLength(2)
   })
+})
 
+describe('parseShotViewWorkbook: the footer and worksheets without shots', () => {
   it('ends the shots at the footer', () => {
     const sheet = { ...shotViewSheetEnglish, rows: [...shotViewSheetEnglish.rows, ['5', '2900.0']] }
     expect(parseShotViewWorkbook(book(sheet)).session.strings[0]?.shots).toHaveLength(3)
@@ -96,7 +98,9 @@ describe('parseShotViewWorkbook', () => {
       'worksheet 1: footer STD DEV "n/a" is not a number; not checked',
     ])
   })
+})
 
+describe('parseShotViewWorkbook: footer labels, empty rows and the date option', () => {
   it('warns about a footer date and a statistics row with the label only', () => {
     const labelOnly = edit(withDate(shotViewSheetEnglish, ''), (c) => c[0] === 'DATE', [['DATE']])
     const spread = edit(labelOnly, (c) => c[0] === 'SPREAD', [['SPREAD']])
@@ -135,7 +139,9 @@ describe('parseShotViewWorkbook', () => {
       'no string on 2026-03-09; dates in the file: 2026-03-08',
     )
   })
+})
 
+describe('parseShotViewWorkbook: bore flags, one day and workbook bytes', () => {
   it('notes the bore flags of a shot with its string', () => {
     const flag = (text: string) =>
       edit(shotViewSheetEnglish, (c) => c[0] === '1', [

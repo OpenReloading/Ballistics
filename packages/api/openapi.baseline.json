@@ -1862,10 +1862,6 @@
                             "enum": ["mouth"],
                             "description": "How high the water was filled. Absent: not stated, the mouth is taken."
                           },
-                          "convention": {
-                            "not": {},
-                            "description": "Refused, see primerState."
-                          },
                           "note": {
                             "type": "string",
                             "minLength": 1,
@@ -20568,10 +20564,6 @@
                                   "type": "string",
                                   "enum": ["mouth"],
                                   "description": "How high the water was filled. Absent: not stated, the mouth is taken."
-                                },
-                                "convention": {
-                                  "not": {},
-                                  "description": "Refused, see primerState."
                                 },
                                 "note": {
                                   "type": "string",

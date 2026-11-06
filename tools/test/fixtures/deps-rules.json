@@ -113,11 +113,19 @@
   },
   "packages/importers/src/node-fs.ts": {
     "source": "import { readFileSync } from 'node:fs'\nexport { readFileSync }",
-    "rules": ["importers-imports-schema-only"]
+    "rules": ["importers-imports-schema-and-units"]
   },
   "packages/importers/src/npm-package.ts": {
     "source": "import { z } from 'zod'\nexport { z }",
-    "rules": ["importers-imports-schema-only"]
+    "rules": ["importers-imports-schema-and-units"]
+  },
+  "packages/importers/src/units-package.ts": {
+    "source": "import { conversions } from '@open-reloading/units'\nexport { conversions }",
+    "rules": []
+  },
+  "packages/importers/src/into-statistics.ts": {
+    "source": "import { mean } from '../../statistics/src/index.ts'\nexport { mean }",
+    "rules": ["importers-imports-schema-and-units"]
   },
   "packages/importers/src/runtime-schema.ts": {
     "source": "import { ChronoShot } from '@open-reloading/schema'\nexport { ChronoShot }",
@@ -273,7 +281,7 @@
   },
   "packages/importers/src/node-fs-type.ts": {
     "source": "import type { Stats } from 'node:fs'\nexport type S = Stats",
-    "rules": ["importers-imports-schema-only"]
+    "rules": ["importers-imports-schema-and-units"]
   },
   "packages/importers/src/inline-type.ts": {
     "source": "import { type ChronoShot } from '@open-reloading/schema'\nexport type Shot = ChronoShot",
@@ -281,7 +289,7 @@
   },
   "packages/importers/src/schema-subpath.ts": {
     "source": "import load from '@open-reloading/schema/json-schema/load.json' with { type: 'json' }\nexport { load }",
-    "rules": ["importers-imports-schema-only"]
+    "rules": ["importers-imports-schema-and-units"]
   },
   "packages/core/src/statistics-package.ts": {
     "source": "import { bisect } from '@open-reloading/statistics'\nexport { bisect }",

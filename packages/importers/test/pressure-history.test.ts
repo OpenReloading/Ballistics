@@ -3,7 +3,7 @@ import { parsePressureHistory } from '../src/index.ts'
 
 const mpa = 'time (ms);pressure (MPa)\n0;10\n0.1;150\n0.2;300\n0.3;250\n0.4;120\n'
 
-describe('parsePressureHistory', () => {
+describe('parsePressureHistory: units from the header or the caller', () => {
   it('reads the units from the header and stores s and bar', () => {
     const t = parsePressureHistory(mpa, { sensor: 'breech' })
     expect(t.time).toEqual([0, 1e-4, 2e-4, 3e-4, 4e-4])
@@ -38,7 +38,9 @@ describe('parsePressureHistory', () => {
     ])
     expect(t.time[1]).toBe(1e-6)
   })
+})
 
+describe('parsePressureHistory: refused units and long cells', () => {
   it('rejects a missing unit with a message that names the column', () => {
     expect(() =>
       parsePressureHistory('time (ms);pressure\n0;1\n1;2\n2;3\n', { sensor: 'breech' }),
@@ -68,7 +70,9 @@ describe('parsePressureHistory', () => {
     expect(performance.now() - start).toBeLessThan(500)
     expect(t.time).toEqual([0, 1e-4, 2e-4])
   })
+})
 
+describe('parsePressureHistory: the sensor, the shape of the trace and its columns', () => {
   it('requires the sensor position', () => {
     expect(() => parsePressureHistory(mpa, {} as never)).toThrow('the sensor position is missing')
   })
@@ -96,7 +100,9 @@ describe('parsePressureHistory', () => {
     expect(t.time).toEqual([0, 1e-3, 2e-3])
     for (const [i, p] of t.pressureBar.entries()) expect(p).toBeCloseTo(i + 1, 12)
   })
+})
 
+describe('parsePressureHistory: the zero-phase low-pass', () => {
   it('applies a zero-phase low-pass: smooths a spike, keeps a constant and the time of the peak', () => {
     const o = { sensor: 'breech', timeUnit: 's', pressureUnit: 'bar' } as const
     const n = 41
@@ -122,7 +128,9 @@ describe('parsePressureHistory', () => {
       ),
     ).toThrow('lowPass cutoff')
   })
+})
 
+describe('parsePressureHistory: numbers and unit spellings', () => {
   it('reads exponent notation, square-bracket units and ignores a header cell without a unit', () => {
     const t = parsePressureHistory('Time [ms];Pressure [kPa]\n0;1E+4\n1;2.5e4\n2;3e4\n', {
       sensor: 'mean',
@@ -156,7 +164,9 @@ describe('parsePressureHistory', () => {
     expect(t.time).toEqual([0, 1.25e-4, 2.5e-4])
     expect(t.pressureBar).toEqual([12.5, 30, 20])
   })
+})
 
+describe('parsePressureHistory: unit words, signs and blank lines', () => {
   it('reads a unit as the last word, in leading or spaced brackets, with a micro sign and in lower case', () => {
     const o = { sensor: 'breech' } as const
     const units = (header: string) => parsePressureHistory(`${header}\n0;1\n1;2\n2;3\n`, o).units
@@ -183,7 +193,9 @@ describe('parsePressureHistory', () => {
     const o = { sensor: 'breech', timeUnit: 's', pressureUnit: 'bar' } as const
     expect(parsePressureHistory('0;1\n  \n1;2\n2;3\n', o).time).toEqual([0, 1, 2])
   })
+})
 
+describe('parsePressureHistory: the filter peak and readings that are not finite', () => {
   it('gives a spike the peak of a one-pole filter run forwards and backwards', () => {
     const cutoff = 1e4
     const dt = 1e-5
