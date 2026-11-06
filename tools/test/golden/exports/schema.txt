@@ -61,8 +61,6 @@
 . RecordOfUser
 . Ref
 . RefScope
-. RenameKind
-. Renames
 . RingScoring
 . SessionRecord
 . SessionSnapshot
@@ -184,8 +182,6 @@
 . recordId
 . recordIdRegex
 . ref
-. renameKind
-. renames
 . ringScoring
 . score
 . searchKey

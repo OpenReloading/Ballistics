@@ -56,7 +56,7 @@ The finer standing of a citation (manufacturer, public, community) is `provenanc
 ## References and ids
 
 - A reference is a string `"<scope>:<id>"` with scope `catalogue` or `user`: `ref(kind)` in `packages/schema/src/ids.ts` is `"catalogue:<record id>"` or `"user:<UUID>"`, and `parseRef` splits one into scope and id. The kind only names the entity in the description: the text carries no kind. One string fits URL parameters, form fields and database keys.
-- A catalogue id is the kebab-case slug equal to the file name (`recordIdRegex`), unique per kind. A renamed or removed id resolves through `records/renames.json` ([Catalogue storage](catalogue-storage.md)).
+- A catalogue id is the kebab-case slug equal to the file name (`recordIdRegex`), unique per kind. A renamed or removed id names no record afterwards ([Catalogue storage](catalogue-storage.md)).
 - A user id (`userId`) is a lowercase UUID, unique across kinds. The browser creates the id of every new user record and photo with `crypto.randomUUID()` (`newId` in `apps/web/src/lib/new-id.ts`, with a `crypto.getRandomValues` fallback for origins that are not secure).
 - The record `id` of a user data file is a UUID for every kind (`userIdProblem` in `packages/schema/src/user-data.ts`), so that another record can refer to it by `user:<UUID>`; a target sheet names its load by the same id. A file or link that holds a record with another id is rejected as a whole; a record of the browser stays in the store as an invalid record, listed with Download raw and Delete.
 - Local ids (optics, groups, notes) stay local and are never referenced from outside their record.
@@ -99,7 +99,7 @@ A manufacturer typed by the user is a record of kind `manufacturer` (`userManufa
 
 A table names a bullet by maker, type and mass, often without a product number, diameter or length. Such a bullet is a record with only what is known: `nameOnly: true`, no `productNumber`, a `mass`, and a `diameter` only where a table prints one (never the cartridge's maximum bullet diameter). The schema checks the marker in both directions: without it `productNumber` and `diameter` are required, so a full record that loses one fails `data:validate`; with it `productNumber` must be absent.
 - The name and the id carry the caliber where two records of one maker would otherwise collide (names are unique per maker).
-- When a full record of the product appears, the name-only file is deleted, `records/renames.json` maps its id to the new one, and the loads that name it are rewritten in the same change (a load names current ids only).
+- When a full record of the product appears, the name-only file is deleted and the loads that name it are rewritten in the same change (a load names current ids only).
 - A bullet that no table prints a maker for gets no record: the load keeps the printed text.
 - The API lists `diameter` as `null` and carries `nameOnly: true`. A trajectory needs a diameter and a ballistic coefficient, which such a record lacks.
 

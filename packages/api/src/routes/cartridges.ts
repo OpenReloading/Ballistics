@@ -109,7 +109,6 @@ export const cartridgeRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
       config: {
         response: cartridgeResponse,
         errors: [404],
-        moved: true,
         summary: 'Get a cartridge',
         description:
           'The cartridge record of its C.I.P. sheet with provenance, case type and case capacities. `revision` is a hash of the stored record, changes with any field.',
@@ -117,7 +116,7 @@ export const cartridgeRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
     },
     (request, reply) => {
       const answer = cartridgeAnswer(catalogue, request.params.id)
-      if (!answer) return missing(reply, catalogue, 'cartridges', request.params.id, 'cartridge')
+      if (!answer) return missing(reply, request.params.id, 'cartridge')
       return reply.send(answer)
     },
   )

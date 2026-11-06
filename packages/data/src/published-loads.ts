@@ -51,8 +51,6 @@ type Known = {
   bullets: Set<string>
   powders: Set<string>
   primers: Map<string, Primer>
-  /** Old primer ids of `renames.json`, which still resolve. */
-  renamedPrimers: Set<string>
 }
 
 /** The records published loads are checked against. */
@@ -62,7 +60,6 @@ export type PublishedLoadTargets = {
   bullets: readonly Pick<Bullet, 'id'>[]
   powders: readonly Pick<Powder, 'id'>[]
   primers: readonly Primer[]
-  renamedPrimers: readonly string[]
 }
 
 /** Units of a printed figure and their factor to the stored unit of the quantity. */
@@ -173,7 +170,7 @@ function checkLoadPrimers(l: PublishedLoad, where: string, known: Known, errors:
     const id = parseRef(ref)?.id ?? ref
     const record = known.primers.get(id)
     if (!record) {
-      if (!known.renamedPrimers.has(id)) said(`unknown primer "${ref}"`)
+      said(`unknown primer "${ref}"`)
       continue
     }
     if (size !== undefined && size !== record.size)
@@ -214,8 +211,8 @@ function checkLoadOrder(file: PublishedLoads, where: string, errors: string[]) {
  * - the maker is a manufacturer record, and the file name is the maker's id (`<maker>-customer`
  *   for a table of loads customers sent);
  * - the loads have unique ids and are sorted by them;
- * - a bullet, powder or primer record a load names exists (an old id of a bullet or powder does not
- *   count, so a rename rewrites its loads), and a printed primer size agrees with the records;
+ * - a bullet, powder or primer record a load names exists, and a printed primer size agrees with
+ *   the records;
  * - the value of a printed figure follows its printed text.
  */
 export function checkPublishedLoads(
@@ -229,7 +226,6 @@ export function checkPublishedLoads(
     bullets: new Set(targets.bullets.map((b) => b.id)),
     powders: new Set(targets.powders.map((p) => p.id)),
     primers: new Map(targets.primers.map((p) => [p.id, p])),
-    renamedPrimers: new Set(targets.renamedPrimers),
   }
   for (const { folder, file } of files) {
     const where = `loads/${folder}/${file.id}.json`

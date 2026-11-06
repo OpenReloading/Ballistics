@@ -189,15 +189,13 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
       config: {
         response: manufacturer,
         errors: [404],
-        moved: true,
         summary: 'Get a manufacturer',
         description: 'The manufacturer record with its provenance.',
       },
     },
     (request, reply) => {
       const record = catalogue.get('manufacturer', request.params.id)
-      if (!record)
-        return missing(reply, catalogue, 'manufacturers', request.params.id, 'manufacturer')
+      if (!record) return missing(reply, request.params.id, 'manufacturer')
       return reply.send(stored(record))
     },
   )
@@ -241,14 +239,13 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
         config: {
           response: record,
           errors: [404],
-          moved: true,
           summary: `Get a ${noun}`,
           description: `The ${noun} record with its provenance.${noun === 'bullet' ? ' `revision` is a hash of the stored record, changes with any field.' : ''}`,
         },
       },
       (request, reply) => {
         const found = catalogue.get(noun, request.params.id)
-        if (!found) return missing(reply, catalogue, `${noun}s` as const, request.params.id, noun)
+        if (!found) return missing(reply, request.params.id, noun)
         return reply.send(
           noun === 'bullet' ? revised(found as Catalogued<'bullet'>) : stored(found),
         )
@@ -275,14 +272,13 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
       config: {
         response: primer,
         errors: [404],
-        moved: true,
         summary: 'Get a primer',
         description: 'The primer record with its provenance.',
       },
     },
     (request, reply) => {
       const found = catalogue.get('primer', request.params.id)
-      if (!found) return missing(reply, catalogue, 'primers', request.params.id, 'primer')
+      if (!found) return missing(reply, request.params.id, 'primer')
       return reply.send(stored(found))
     },
   )
@@ -310,7 +306,6 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
           revision,
         }),
         errors: [404],
-        moved: true,
         summary: 'Get a case',
         description:
           'The case record with its provenance and `origin`. `revision` is a hash of the stored record, changes with any field.',
@@ -318,7 +313,7 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
     },
     (request, reply) => {
       const found = catalogue.get('case', request.params.id)
-      if (!found) return missing(reply, catalogue, 'cases', request.params.id, 'case')
+      if (!found) return missing(reply, request.params.id, 'case')
       return reply.send(originated(found))
     },
   )

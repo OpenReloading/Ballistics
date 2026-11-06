@@ -1009,16 +1009,6 @@
               }
             }
           },
-          "308": {
-            "description": "Permanent Redirect: the id was renamed, `Location` is the record that replaced it.",
-            "headers": {
-              "Location": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
@@ -1311,16 +1301,6 @@
                   },
                   "required": ["id", "name", "diameter", "cartridges", "provenance"],
                   "additionalProperties": false
-                }
-              }
-            }
-          },
-          "308": {
-            "description": "Permanent Redirect: the id was renamed, `Location` is the record that replaced it.",
-            "headers": {
-              "Location": {
-                "schema": {
-                  "type": "string"
                 }
               }
             }
@@ -2038,16 +2018,6 @@
               }
             }
           },
-          "308": {
-            "description": "Permanent Redirect: the id was renamed, `Location` is the record that replaced it.",
-            "headers": {
-              "Location": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
@@ -2617,16 +2587,6 @@
                   },
                   "required": ["origin", "manufacturer", "cartridge", "material", "revision"],
                   "additionalProperties": false
-                }
-              }
-            }
-          },
-          "308": {
-            "description": "Permanent Redirect: the id was renamed, `Location` is the record that replaced it.",
-            "headers": {
-              "Location": {
-                "schema": {
-                  "type": "string"
                 }
               }
             }
@@ -3274,16 +3234,6 @@
               }
             }
           },
-          "308": {
-            "description": "Permanent Redirect: the id was renamed, `Location` is the record that replaced it.",
-            "headers": {
-              "Location": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
@@ -3805,16 +3755,6 @@
               }
             }
           },
-          "308": {
-            "description": "Permanent Redirect: the id was renamed, `Location` is the record that replaced it.",
-            "headers": {
-              "Location": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
@@ -3883,7 +3823,7 @@
                     },
                     "dataHash": {
                       "type": "string",
-                      "description": "SHA-256 of the data set the API ran on (every record and the renames) as 64 hex digits. It changes with any record field."
+                      "description": "SHA-256 of the data set the API ran on (every record) as 64 hex digits. It changes with any record field."
                     },
                     "units": {
                       "type": "object",
@@ -5973,7 +5913,7 @@
                     },
                     "dataHash": {
                       "type": "string",
-                      "description": "SHA-256 of the data set the API ran on (every record and the renames) as 64 hex digits. It changes with any record field."
+                      "description": "SHA-256 of the data set the API ran on (every record) as 64 hex digits. It changes with any record field."
                     },
                     "units": {
                       "type": "object",
@@ -7709,7 +7649,7 @@
                     },
                     "dataHash": {
                       "type": "string",
-                      "description": "SHA-256 of the data set the API ran on (every record and the renames) as 64 hex digits. It changes with any record field."
+                      "description": "SHA-256 of the data set the API ran on (every record) as 64 hex digits. It changes with any record field."
                     },
                     "units": {
                       "type": "object",
@@ -7976,7 +7916,7 @@
                     },
                     "dataHash": {
                       "type": "string",
-                      "description": "SHA-256 of the data set the API ran on (every record and the renames) as 64 hex digits. It changes with any record field."
+                      "description": "SHA-256 of the data set the API ran on (every record) as 64 hex digits. It changes with any record field."
                     },
                     "units": {
                       "type": "object",
@@ -9363,7 +9303,7 @@
                     },
                     "dataHash": {
                       "type": "string",
-                      "description": "SHA-256 of the data set the API ran on (every record and the renames) as 64 hex digits. It changes with any record field."
+                      "description": "SHA-256 of the data set the API ran on (every record) as 64 hex digits. It changes with any record field."
                     },
                     "units": {
                       "type": "object",
@@ -11487,16 +11427,6 @@
               }
             }
           },
-          "308": {
-            "description": "Permanent Redirect: the id was renamed, `Location` is the record that replaced it.",
-            "headers": {
-              "Location": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
@@ -11567,7 +11497,7 @@
                         },
                         "dataHash": {
                           "type": "string",
-                          "description": "SHA-256 of the data set the API ran on (every record and the renames) as 64 hex digits. It changes with any record field."
+                          "description": "SHA-256 of the data set the API ran on (every record) as 64 hex digits. It changes with any record field."
                         },
                         "notice": {
                           "type": "string",
@@ -12433,7 +12363,7 @@
                         },
                         "dataHash": {
                           "type": "string",
-                          "description": "SHA-256 of the data set the API ran on (every record and the renames) as 64 hex digits. It changes with any record field."
+                          "description": "SHA-256 of the data set the API ran on (every record) as 64 hex digits. It changes with any record field."
                         },
                         "notice": {
                           "type": "string",
@@ -14145,7 +14075,7 @@
                     },
                     "dataHash": {
                       "type": "string",
-                      "description": "SHA-256 of the data set the API ran on (every record and the renames) as 64 hex digits. It changes with any record field."
+                      "description": "SHA-256 of the data set the API ran on (every record) as 64 hex digits. It changes with any record field."
                     },
                     "notice": {
                       "type": "string",
@@ -15992,7 +15922,7 @@
                     },
                     "dataHash": {
                       "type": "string",
-                      "description": "SHA-256 of the data set the API ran on (every record and the renames) as 64 hex digits. It changes with any record field."
+                      "description": "SHA-256 of the data set the API ran on (every record) as 64 hex digits. It changes with any record field."
                     },
                     "notice": {
                       "type": "string",
@@ -25438,16 +25368,6 @@
               }
             }
           },
-          "308": {
-            "description": "Permanent Redirect: the id was renamed, `Location` is the record that replaced it.",
-            "headers": {
-              "Location": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
@@ -26402,16 +26322,6 @@
               }
             }
           },
-          "308": {
-            "description": "Permanent Redirect: the id was renamed, `Location` is the record that replaced it.",
-            "headers": {
-              "Location": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
@@ -26866,16 +26776,6 @@
                   },
                   "required": ["id", "manufacturer", "name", "size", "provenance"],
                   "additionalProperties": false
-                }
-              }
-            }
-          },
-          "308": {
-            "description": "Permanent Redirect: the id was renamed, `Location` is the record that replaced it.",
-            "headers": {
-              "Location": {
-                "schema": {
-                  "type": "string"
                 }
               }
             }
@@ -27544,16 +27444,6 @@
               }
             }
           },
-          "308": {
-            "description": "Permanent Redirect: the id was renamed, `Location` is the record that replaced it.",
-            "headers": {
-              "Location": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
           "400": {
             "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
@@ -27945,16 +27835,6 @@
                   },
                   "required": ["id", "discipline", "face", "event", "provenance"],
                   "additionalProperties": false
-                }
-              }
-            }
-          },
-          "308": {
-            "description": "Permanent Redirect: the id was renamed, `Location` is the record that replaced it.",
-            "headers": {
-              "Location": {
-                "schema": {
-                  "type": "string"
                 }
               }
             }
