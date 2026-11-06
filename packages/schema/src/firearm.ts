@@ -160,6 +160,22 @@ const parameterValue = {
   zeroOffset: () => quantity('angle'),
 }
 
+/**
+ * The schema of the truing parameter `name` N of {@link truing}: its fit status and reasons, and its value
+ * with the confidence interval when identified, a quantity or a number.
+ */
+export type TruingParameterSchema<N extends string> = z.ZodObject<{
+  name: z.ZodLiteral<N>
+  status: z.ZodEnum<z.core.util.ToEnum<'identified' | 'weak' | 'unresolved'>>
+  reasons: z.ZodArray<
+    z.ZodEnum<z.core.util.ToEnum<'no-information' | 'collinear' | 'imprecise' | 'fit-failed'>>
+  >
+  value: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
+  lower: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
+  upper: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
+  confidenceLevel: z.ZodOptional<z.ZodNumber>
+}>
+
 const truingParameter = <N extends keyof typeof parameterValue>(name: N) => {
   const value = parameterValue[name]
   return z.object({
@@ -252,58 +268,10 @@ export const truing: z.ZodObject<{
   parameters: z.ZodArray<
     z.ZodDiscriminatedUnion<
       [
-        z.ZodObject<{
-          name: z.ZodLiteral<'muzzleVelocity'>
-          status: z.ZodEnum<z.core.util.ToEnum<'identified' | 'weak' | 'unresolved'>>
-          reasons: z.ZodArray<
-            z.ZodEnum<
-              z.core.util.ToEnum<'no-information' | 'collinear' | 'imprecise' | 'fit-failed'>
-            >
-          >
-          value: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
-          lower: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
-          upper: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
-          confidenceLevel: z.ZodOptional<z.ZodNumber>
-        }>,
-        z.ZodObject<{
-          name: z.ZodLiteral<'dragFactor'>
-          status: z.ZodEnum<z.core.util.ToEnum<'identified' | 'weak' | 'unresolved'>>
-          reasons: z.ZodArray<
-            z.ZodEnum<
-              z.core.util.ToEnum<'no-information' | 'collinear' | 'imprecise' | 'fit-failed'>
-            >
-          >
-          value: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
-          lower: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
-          upper: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
-          confidenceLevel: z.ZodOptional<z.ZodNumber>
-        }>,
-        z.ZodObject<{
-          name: z.ZodLiteral<'clickValue'>
-          status: z.ZodEnum<z.core.util.ToEnum<'identified' | 'weak' | 'unresolved'>>
-          reasons: z.ZodArray<
-            z.ZodEnum<
-              z.core.util.ToEnum<'no-information' | 'collinear' | 'imprecise' | 'fit-failed'>
-            >
-          >
-          value: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
-          lower: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
-          upper: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
-          confidenceLevel: z.ZodOptional<z.ZodNumber>
-        }>,
-        z.ZodObject<{
-          name: z.ZodLiteral<'zeroOffset'>
-          status: z.ZodEnum<z.core.util.ToEnum<'identified' | 'weak' | 'unresolved'>>
-          reasons: z.ZodArray<
-            z.ZodEnum<
-              z.core.util.ToEnum<'no-information' | 'collinear' | 'imprecise' | 'fit-failed'>
-            >
-          >
-          value: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
-          lower: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
-          upper: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>
-          confidenceLevel: z.ZodOptional<z.ZodNumber>
-        }>,
+        TruingParameterSchema<'muzzleVelocity'>,
+        TruingParameterSchema<'dragFactor'>,
+        TruingParameterSchema<'clickValue'>,
+        TruingParameterSchema<'zeroOffset'>,
       ],
       'name'
     >
