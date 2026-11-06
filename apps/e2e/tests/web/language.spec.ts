@@ -116,7 +116,7 @@ test('the designers in German at 1280 px keep the title, every action, Safety an
     ['/bullets/designer/', 'Geschoss-Editor'],
     ['/cartridges/designer/', 'Patronen-Editor'],
     ['/targets/designer/', 'Scheiben-Editor'],
-  ]) {
+  ] as const) {
     await gotoHydrated(page, path)
     const bar = page.locator('.page-bar')
     const h1 = bar.getByRole('heading', { level: 1, name: title })

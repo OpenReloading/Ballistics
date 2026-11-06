@@ -1,9 +1,10 @@
 import { z } from 'zod'
 import { baseTypes } from './bullet.ts'
+import type { Exact } from './exact.ts'
 import { catalogueRef, recordId, ref } from './ids.ts'
 import { type Provenance, provenance } from './provenance.ts'
 import { text } from './shared.ts'
-import { type QuantityKind, quantity, units } from './units.ts'
+import { type QuantityKind, type QuantitySchema, quantity, units } from './units.ts'
 
 const kinds = {
   volume: 'volume',
@@ -44,7 +45,7 @@ const kinds = {
   engravingPressure: 'pressure',
   engravingLength: 'length',
   firearmMass: 'mass',
-} as const satisfies Record<string, QuantityKind>
+} as const
 
 /** A solver value a load may override: a key of {@link analysisKinds}. */
 export type AnalysisKey = keyof typeof kinds
@@ -57,12 +58,18 @@ export type AnalysisKey = keyof typeof kinds
  */
 export const analysisKinds: Readonly<Record<AnalysisKey, QuantityKind>> = kinds
 
-/** The stored quantity of each ladder kind: charge in g, seating length in mm, temperature step in K. */
-export const ladderStepKinds = {
+const ladderStepKindsLiteral = {
   charge: 'mass',
   seating: 'length',
   temperature: 'absoluteTemperature',
 } as const satisfies Record<string, QuantityKind>
+
+/** The stored quantity of each ladder kind: charge in g, seating length in mm, temperature step in K. */
+export const ladderStepKinds: {
+  readonly charge: 'mass'
+  readonly seating: 'length'
+  readonly temperature: 'absoluteTemperature'
+} = ladderStepKindsLiteral satisfies Exact<typeof ladderStepKinds, typeof ladderStepKindsLiteral>
 
 const overrideValue = ([key, kind]: [string, QuantityKind]) => [
   key,
@@ -73,18 +80,26 @@ const overrideValue = ([key, kind]: [string, QuantityKind]) => [
     .optional(),
 ]
 
-/**
- * The solver values the user typed instead of taking them from the records the load references,
- * each in its stored unit. A key that is not a workbench value fails.
- * Inferred type: {@link AnalysisOverrides}.
- */
-export const analysisOverrides = z.strictObject(
+const analysisOverridesParser = z.strictObject(
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- fromEntries loses the keys: they are those of analysisKinds
   Object.fromEntries(Object.entries(analysisKinds).map(overrideValue)) as Record<
     AnalysisKey,
     z.ZodOptional<z.ZodNumber>
   >,
 )
+
+/**
+ * The solver values the user typed instead of taking them from the records the load references,
+ * each in its stored unit. A key that is not a workbench value fails.
+ * Inferred type: {@link AnalysisOverrides}.
+ */
+export const analysisOverrides: z.ZodObject<
+  Record<AnalysisKey, z.ZodOptional<z.ZodNumber>>,
+  z.core.$strict
+> = analysisOverridesParser satisfies Exact<
+  typeof analysisOverrides,
+  typeof analysisOverridesParser
+>
 
 const ladderKind = z
   .enum(['charge', 'seating', 'temperature'])
@@ -100,11 +115,7 @@ const ladderStep = z
   )
   .optional()
 
-/**
- * What the load is analysed with: the typed solver values and the ladder.
- * Inferred type: {@link LoadAnalysis}.
- */
-export const loadAnalysis = z.object({
+const loadAnalysisParser = z.object({
   overrides: analysisOverrides
     .describe(
       'Values the user typed in place of the referenced records: solver values, bullet diameter, length, ballistic coefficients and base dimensions (boat-tail length, base face diameter, hollow-base cavity diameter), `pmax` (a limit typed in place of the cartridge sheet), case length L3 and powder bulk density. Every other value follows the records.',
@@ -150,6 +161,47 @@ export const loadAnalysis = z.object({
     .optional(),
 })
 
+/**
+ * What the load is analysed with: the typed solver values and the ladder.
+ * Inferred type: {@link LoadAnalysis}.
+ */
+export const loadAnalysis: z.ZodObject<{
+  overrides: z.ZodOptional<typeof analysisOverrides>
+  bulletBase: z.ZodOptional<typeof baseTypes>
+  ladder: z.ZodOptional<
+    z.ZodUnion<
+      readonly [
+        z.ZodObject<{
+          kind: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'charge' | 'seating' | 'temperature'>>>
+          stepCount: z.ZodInt
+          step: z.ZodOptional<z.ZodNumber>
+          direction: z.ZodEnum<z.core.util.ToEnum<'up' | 'down'>>
+        }>,
+        z.ZodObject<{
+          kind: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'charge' | 'seating' | 'temperature'>>>
+          stepCount: z.ZodLiteral<3 | 5 | 7 | 9 | 11 | 13 | 15 | 17 | 19 | 21>
+          step: z.ZodOptional<z.ZodNumber>
+          direction: z.ZodLiteral<'around'>
+        }>,
+      ]
+    >
+  >
+  powders: z.ZodOptional<
+    z.ZodObject<
+      {
+        mode: z.ZodEnum<z.core.util.ToEnum<'typed' | 'fill' | 'target'>>
+        fill: z.ZodOptional<z.ZodNumber>
+        targetPressure: z.ZodOptional<z.ZodNumber>
+        targetPercent: z.ZodOptional<z.ZodNumber>
+        manufacturer: z.ZodOptional<z.ZodString>
+        base: z.ZodOptional<z.ZodString>
+        form: z.ZodOptional<z.ZodString>
+      },
+      z.core.$strict
+    >
+  >
+}> = loadAnalysisParser satisfies Exact<typeof loadAnalysis, typeof loadAnalysisParser>
+
 const component = {
   manufacturer: ref('manufacturer').describe('Manufacturer record of the component.'),
   lot: z.string().min(1).describe('Lot number as printed on the package.').optional(),
@@ -166,12 +218,7 @@ const powderDescription = z
   .strictObject({ ...component, name: z.string().min(1).describe('Product name of the powder.') })
   .describe('The powder as the publication describes it, where no record exists.')
 
-/**
- * What a load was when a chronograph session was attached to it, kept for the notes on a saved
- * load: the lots, the seating, the firearm's round count and the notes the user dismissed.
- * Inferred type: {@link SessionSnapshot}.
- */
-export const sessionSnapshot = z.strictObject({
+const sessionSnapshotParser = z.strictObject({
   session: ref('session').describe('The session the snapshot belongs to: one of `Load.sessions`.'),
   powderLot: component.lot.describe('Powder lot of the load at the session.').optional(),
   primerLot: component.lot.describe('Primer lot of the load at the session.').optional(),
@@ -194,6 +241,29 @@ export const sessionSnapshot = z.strictObject({
     .describe('Ids of the notes on this session that the user dismissed.')
     .optional(),
 })
+
+/**
+ * What a load was when a chronograph session was attached to it, kept for the notes on a saved
+ * load: the lots, the seating, the firearm's round count and the notes the user dismissed.
+ * Inferred type: {@link SessionSnapshot}.
+ */
+export const sessionSnapshot: z.ZodObject<
+  {
+    session: z.ZodString
+    powderLot: z.ZodOptional<z.ZodOptional<z.ZodString>>
+    primerLot: z.ZodOptional<z.ZodOptional<z.ZodString>>
+    caseLot: z.ZodOptional<z.ZodOptional<z.ZodString>>
+    seating: z.ZodOptional<
+      z.ZodObject<{
+        by: z.ZodEnum<z.core.util.ToEnum<'overallLength' | 'baseToOgive'>>
+        value: QuantitySchema
+      }>
+    >
+    roundCount: z.ZodOptional<z.ZodInt>
+    dismissed: z.ZodOptional<z.ZodArray<z.ZodString>>
+  },
+  z.core.$strict
+> = sessionSnapshotParser satisfies Exact<typeof sessionSnapshot, typeof sessionSnapshotParser>
 
 const loadShape = z.object({
   id: recordId.describe('Id of a catalogue load, the file name without `.json`.').optional(),
@@ -328,16 +398,7 @@ const checkRecordReferences = (l: LoadFields, issue: LoadIssue) => {
   if (catalogue) checkComponentMakers(l, issue)
 }
 
-/**
- * One cartridge recipe fired from one firearm, for every origin. The cartridge, firearm, bullet, powder
- * and case capacity are references; a catalogue load of publication data (provenance `measured`) may
- * describe its bullet and powder by maker and name where no record exists. A catalogue load carries its `id`
- * (the file name), `name`, `provenance`, cartridge, bullet, powder and charge; a user load keeps
- * what the workbench had and takes its name from its record. Charge and masses in g, lengths in mm,
- * the typed solver values in `analysis`.
- * Inferred type: {@link Load}.
- */
-export const load = loadShape.superRefine((l, ctx) => {
+const loadParser = loadShape.superRefine((l, ctx) => {
   const issue: LoadIssue = (path, message) => ctx.addIssue({ code: 'custom', path, message })
   const catalogue = l.origin === 'catalogue'
   if (catalogue) checkCatalogueFields(l, issue)
@@ -353,6 +414,81 @@ export const load = loadShape.superRefine((l, ctx) => {
       issue(['snapshots', i, 'session'], 'A second snapshot of one session')
   })
 })
+
+/**
+ * One cartridge recipe fired from one firearm, for every origin. The cartridge, firearm, bullet, powder
+ * and case capacity are references; a catalogue load of publication data (provenance `measured`) may
+ * describe its bullet and powder by maker and name where no record exists. A catalogue load carries its `id`
+ * (the file name), `name`, `provenance`, cartridge, bullet, powder and charge; a user load keeps
+ * what the workbench had and takes its name from its record. Charge and masses in g, lengths in mm,
+ * the typed solver values in `analysis`.
+ * Inferred type: {@link Load}.
+ */
+export const load: z.ZodObject<{
+  id: z.ZodOptional<typeof recordId>
+  origin: z.ZodEnum<z.core.util.ToEnum<'catalogue' | 'user' | 'shared'>>
+  name: z.ZodOptional<z.ZodString>
+  cartridge: z.ZodOptional<z.ZodString>
+  firearm: z.ZodOptional<z.ZodString>
+  bullet: z.ZodOptional<
+    z.ZodUnion<
+      readonly [
+        z.ZodString,
+        z.ZodObject<
+          {
+            manufacturer: z.ZodString
+            lot: z.ZodOptional<z.ZodString>
+            model: z.ZodString
+            bulletMass: QuantitySchema
+          },
+          z.core.$strict
+        >,
+      ]
+    >
+  >
+  powder: z.ZodOptional<
+    z.ZodUnion<
+      readonly [
+        z.ZodString,
+        z.ZodObject<
+          { manufacturer: z.ZodString; lot: z.ZodOptional<z.ZodString>; name: z.ZodString },
+          z.core.$strict
+        >,
+      ]
+    >
+  >
+  powderLot: z.ZodOptional<z.ZodOptional<z.ZodString>>
+  charge: z.ZodOptional<QuantitySchema>
+  capacity: z.ZodOptional<z.ZodString>
+  primer: z.ZodOptional<
+    z.ZodObject<
+      { lot: z.ZodOptional<z.ZodString>; record: z.ZodOptional<z.ZodString> },
+      z.core.$strict
+    >
+  >
+  case: z.ZodOptional<
+    z.ZodObject<
+      {
+        manufacturer: z.ZodOptional<z.ZodString>
+        lot: z.ZodOptional<z.ZodString>
+        firingCount: z.ZodOptional<z.ZodInt>
+        record: z.ZodOptional<z.ZodString>
+      },
+      z.core.$strict
+    >
+  >
+  seating: z.ZodOptional<
+    z.ZodObject<{
+      by: z.ZodEnum<z.core.util.ToEnum<'overallLength' | 'baseToOgive'>>
+      value: QuantitySchema
+    }>
+  >
+  note: z.ZodOptional<z.ZodString>
+  analysis: z.ZodOptional<typeof loadAnalysis>
+  sessions: z.ZodOptional<z.ZodArray<z.ZodString>>
+  snapshots: z.ZodOptional<z.ZodArray<typeof sessionSnapshot>>
+  provenance: z.ZodOptional<typeof provenance>
+}> = loadParser satisfies Exact<typeof load, typeof loadParser>
 
 /** A load of the catalogue (`records/loads`): {@link load} with `origin` `catalogue`. */
 export const catalogueLoad: z.ZodType<CatalogueLoad> = load.refine(

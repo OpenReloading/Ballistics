@@ -14,7 +14,7 @@ const routes = readdirSync(appDir, { recursive: true, encoding: 'utf8' })
   .sort()
 
 test('every page without a dynamic segment is in the navigation, so the sweep covers it', () => {
-  const pages = sections.flatMap((s) => s.pages)
+  const pages = sections.flatMap((s): readonly { href: string }[] => s.pages)
   // the home page and the offline page have no entry of their own
   const unlisted = routes.filter(
     (route) =>

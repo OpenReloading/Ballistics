@@ -115,7 +115,7 @@ test('a new cartridge without its base values gives a reason, not an empty page'
     ['P1', '11.9'],
     ['L3', '50'],
     ['H2', '8.7'],
-  ])
+  ] as const)
     await field(page, `Cartridge ${symbol}`).fill(value)
   // without a record there is no chamber: Chamber and Combined disabled
   await expect(drawing(page)).toBeVisible()

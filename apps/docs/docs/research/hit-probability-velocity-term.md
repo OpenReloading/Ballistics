@@ -83,7 +83,7 @@ Analytic: synthetic loads and a seeded simulation. Every number is a simulation,
 
 ## Where in the app
 
-- `packages/core/src/groups/hit-probability.ts` (`pointDispersion`)
+- `packages/shot-groups/src/hit-probability.ts` (`pointDispersion`)
 - [Hit probability](../models/hit-probability.md)
 
 ## Confidence

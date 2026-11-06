@@ -48,7 +48,7 @@ Analytic. A closed form and a synthetic case; the drops are figures of the quest
 
 ## Where in the app
 
-- `packages/core/src/groups/hit-probability.ts` (`pointDispersion`)
+- `packages/shot-groups/src/hit-probability.ts` (`pointDispersion`)
 - [Hit probability](../models/hit-probability.md)
 
 ## Confidence
