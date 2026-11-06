@@ -30,7 +30,7 @@ const unit = (symbol: string, factor: number, named?: true): ColumnUnit => ({
   ...(named && { named }),
 })
 
-// the customary factors are those of the conversion table, each to the stored unit (m and kg per unit)
+// the customary factors come from the conversion table (SI per unit), turned into mm, g and bar here
 const inch = conversions.in.factor
 const pound = conversions.lb.factor
 const lengthUnits = [unit('mm', 1), unit('in', inch / conversions.mm.factor), unit('cm', 10)]
