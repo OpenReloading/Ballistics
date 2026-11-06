@@ -103,8 +103,15 @@ function withoutFormatOptions(options: ParseChronoOptions): ChronoParserOptions 
 const anyRow = (book: Workbook, test: (cells: string[]) => boolean) =>
   book.worksheets.some((s) => s.rows.some(test))
 
-// the literal list: `ChronoFormatId` and `WorkbookFormat` read its ids; a format registers here only
-const formats = [
+// the literal list: `ChronoFormatId` and `WorkbookFormat` read its ids; a format registers here only, with
+// its id and what it reads in the type
+const formats: readonly [
+  TextChronoFormat & { id: 'openreloading-json' },
+  TextChronoFormat & { id: 'shotview-csv' },
+  WorkbookChronoFormat & { id: 'shotview-xlsx' },
+  TextChronoFormat & { id: 'openreloading-csv' },
+  TextChronoFormat & { id: 'delimited' },
+] = [
   {
     id: 'openreloading-json',
     name: 'OpenReloading JSON',
@@ -162,7 +169,7 @@ const formats = [
       })
     },
   },
-] as const satisfies readonly ChronoFormat[]
+]
 
 /**
  * Every chronograph format, listed to users in this order by `name`; detection walks the list.

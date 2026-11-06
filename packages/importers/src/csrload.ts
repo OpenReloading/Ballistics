@@ -52,7 +52,7 @@ function shotsOf(c: XmlElement, at: string, unmapped: Set<string>, warnings: str
       continue
     }
     unreadAttributes(s, `${at}.shot`, unmapped)
-    const v = numberOf((s.attributes.velocity ?? '').trim())
+    const v = numberOf((s.attributes['velocity'] ?? '').trim())
     if (Number.isFinite(v) && v > 0) shots.push({ velocity: { value: v } })
     else warnings.push(`${at}: a shot without a velocity is not read.`)
   }
@@ -66,13 +66,13 @@ function shotsOf(c: XmlElement, at: string, unmapped: Set<string>, warnings: str
 function stringOf(c: XmlElement, at: string, unmapped: Set<string>, warnings: string[]) {
   unreadAttributes(c, at, unmapped)
   const shots = shotsOf(c, at, unmapped, warnings)
-  const label = clip(unescaped(c.attributes.name ?? '', `${at}.name`, warnings))
+  const label = clip(unescaped(c.attributes['name'] ?? '', `${at}.name`, warnings))
   if (shots.length === 0) {
     warnings.push(`${at}: the charge ${label ?? ''} holds no shot with a velocity; it is not read.`)
     return
   }
-  const note = clip(unescaped(c.attributes.note ?? '', `${at}.note`, warnings), 2000)
-  const kg = numberOf((c.attributes.value ?? '').trim())
+  const note = clip(unescaped(c.attributes['note'] ?? '', `${at}.note`, warnings), 2000)
+  const kg = numberOf((c.attributes['value'] ?? '').trim())
   const string: ShotString = {
     ...(label && { label }),
     ...(note && { note }),
@@ -149,7 +149,7 @@ export function readCsrLoad(xml: string, saved: string): GrtLoadRead {
   const input = elements(root).find((e) => e.name === 'load')
   if (!input) throw new Error('The file holds no load.')
   const read = readLoadInput(input, saved)
-  const format = root.attributes.format
+  const format = root.attributes['format']
   const warnings =
     format === csrFormat
       ? read.warnings

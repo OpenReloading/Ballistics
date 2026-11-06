@@ -75,15 +75,21 @@ export interface GrtLoadRead {
   warnings: string[]
 }
 
-export const elements = (e: XmlElement) =>
+export const elements = (e: XmlElement): XmlElement[] =>
   e.children.filter((c): c is XmlElement => typeof c !== 'string')
 const textOf = (e: XmlElement) => e.children.filter((c) => typeof c === 'string').join('')
-export const clip = (s: string | undefined, max = 200) => (s ? s.slice(0, max) : undefined)
+export const clip = (s: string | undefined, max: number = 200): string | undefined =>
+  s ? s.slice(0, max) : undefined
 /** A number with `.` or a lone `,` as decimal mark; NaN otherwise. */
-export const numberOf = (s: string) => Number(/^[-+]?\d+,\d+$/.test(s) ? s.replace(',', '.') : s)
+export const numberOf = (s: string): number =>
+  Number(/^[-+]?\d+,\d+$/.test(s) ? s.replace(',', '.') : s)
 
 /** Id, name and data of a record of `kind`, the id from its content: the same content gives the same id in every file. */
-export const named = <D>(kind: string, name: string, data: D) => ({
+export const named = <D>(
+  kind: string,
+  name: string,
+  data: D,
+): { id: string; name: string; data: D } => ({
   id: idOfKey(`${kind}|${JSON.stringify([name, data])}`),
   name,
   data,
@@ -100,7 +106,7 @@ interface Read {
 }
 
 /** Text with its percent escapes resolved; the text as written, with a warning, when they are not valid. */
-export function unescaped(s: string, at: string, warnings: string[]) {
+export function unescaped(s: string, at: string, warnings: string[]): string {
   try {
     return decodeURIComponent(s).trim()
   } catch {
@@ -110,8 +116,14 @@ export function unescaped(s: string, at: string, warnings: string[]) {
 }
 
 /** The number of field `at` in the stored unit of `kind`; undefined, with a warning, when the unit or number is not read. */
-function numberValue(at: string, kind: Kind, f: XmlElement, value: string, warnings: string[]) {
-  const unit = f.attributes.unit ?? ''
+function numberValue(
+  at: string,
+  kind: Kind,
+  f: XmlElement,
+  value: string,
+  warnings: string[],
+): number | undefined {
+  const unit = f.attributes['unit'] ?? ''
   const factor = Object.hasOwn(factors[kind], unit) ? factors[kind][unit] : undefined
   // a finite number can still overflow in the stored unit
   const stored = factor === undefined ? Number.NaN : numberOf(value) * factor
@@ -119,11 +131,12 @@ function numberValue(at: string, kind: Kind, f: XmlElement, value: string, warni
   warnings.push(
     `${at}: "${value.slice(0, 40)}" in unit "${unit.slice(0, 20)}" is not converted; the field is not read.`,
   )
+  return undefined
 }
 
 /** One `input` field of a section into `read`. */
 function readField(at: string, f: XmlElement, read: Read) {
-  const value = (f.attributes.value ?? '').trim()
+  const value = (f.attributes['value'] ?? '').trim()
   if (value === '') return
   if (at === 'caliber.shotshell') {
     if (value === 'true') read.warnings.push(shotshellWarning)
@@ -141,8 +154,8 @@ function readField(at: string, f: XmlElement, read: Read) {
 /** The notes of the appendix into `read`; its measurements, pictures and other parts are not read. */
 function readAppendix(appendix: XmlElement, read: Read) {
   for (const a of elements(appendix)) {
-    if (a.name === 'note' && a.attributes.text)
-      read.notes.push(unescaped(a.attributes.text, 'note', read.warnings))
+    if (a.name === 'note' && a.attributes['text'])
+      read.notes.push(unescaped(a.attributes['text'], 'note', read.warnings))
     else read.unmapped.add(`appendix.${a.name}`)
   }
 }
@@ -155,8 +168,9 @@ function readInput(input: XmlElement): Read {
     if (s === 'title') read.title = unescaped(textOf(section), s, read.warnings)
     else if (s === 'appendix') readAppendix(section, read)
     else if (['caliber', 'gun', 'projectile', 'propellant'].includes(s))
-      for (const f of elements(section)) readField(`${s}.${f.attributes.name ?? f.name}`, f, read)
-    else read.unmapped.add(section.attributes.name ? `${s}.${section.attributes.name}` : s)
+      for (const f of elements(section))
+        readField(`${s}.${f.attributes['name'] ?? f.name}`, f, read)
+    else read.unmapped.add(section.attributes['name'] ? `${s}.${section.attributes['name']}` : s)
   }
   return read
 }
