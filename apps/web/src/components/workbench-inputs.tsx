@@ -21,6 +21,7 @@ import { type ReactNode, useEffect, useId, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import { apiFetch } from '../lib/api-fetch.ts'
 import type { BulletSummary, CartridgeSummary, PowderSummary } from '../lib/api-types.ts'
 import {
   bandCount,
@@ -83,7 +84,7 @@ import { LotField } from './load-notes.tsx'
 import { NavIcon } from './nav-icons.tsx'
 import { NumberField } from './number-field.tsx'
 import { PrimerChoice } from './primer-choice.tsx'
-import { RecordSearch, searchRecords, useChooser } from './record-search.tsx'
+import { RecordSearch, useChooser } from './record-search.tsx'
 import { SegmentedRow } from './segmented-row.tsx'
 import { RecordSourcesLink } from './sources.tsx'
 import { useCompleteOnly } from './use-complete-only.ts'
@@ -1465,12 +1466,14 @@ const missingMark = (name: string, incomplete: boolean, t: Translator['t']) =>
   incomplete ? t('{name} (values missing)', { name }) : name
 
 /** True once the API answers that the catalogue holds no powder; false while it asks or cannot tell. */
-function useNoCataloguePowders(): boolean {
+export function useNoCataloguePowders(): boolean {
   const [none, setNone] = useState(false)
   useEffect(() => {
     const ask = new AbortController()
-    searchRecords('powders', '', 1, '', ask.signal)
-      .then((list) => setNone(list.total === 0))
+    // no `q`: both APIs refuse an empty one
+    apiFetch('powders?limit=1', { signal: ask.signal })
+      .then((res) => (res.ok ? (res.json() as Promise<{ total: number }>) : undefined))
+      .then((list) => setNone(list?.total === 0))
       .catch(() => setNone(false))
     return () => ask.abort()
   }, [])
@@ -1478,7 +1481,7 @@ function useNoCataloguePowders(): boolean {
 }
 
 /** What the powder field says when the catalogue has no powder: where a powder comes from instead. */
-export function NoCataloguePowders() {
+function NoCataloguePowders() {
   const { t } = useTranslation()
   return (
     <Text size="xs" c="dimmed">

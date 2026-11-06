@@ -61,7 +61,7 @@ export const trainingRowsHelp = [
 const n2 = (v: number | undefined) => (v === undefined ? '' : formatNumber(v, 2))
 
 /** What the powder list shows when it has no powder at all: where a powder comes from. */
-export function NoPowders() {
+function NoPowders() {
   const { t } = useTranslation()
   return (
     <EmptyNote
@@ -88,7 +88,7 @@ export function NoPowders() {
 export function PowderList({ packed }: { packed: PackedPowder[] }) {
   const tr = useTranslation()
   const { t, tn } = tr
-  const [records, removeRow] = useUserRecords()
+  const [records, removeRow, read] = useUserRecords()
   const catalogue = useMemo(() => unpackPowders(packed), [packed])
   // the browser's powders first: a few rows would sit unseen behind the catalogue's
   const items = useMemo(() => [...userPowderRows(records), ...catalogue], [records, catalogue])
@@ -280,7 +280,10 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
           breakBefore={state.sort ? undefined : (r, previous) => r.origin !== previous.origin}
           empty={
             items.length === 0 ? (
-              <NoPowders />
+              // the browser's own powders may still be on their way
+              read ? (
+                <NoPowders />
+              ) : null
             ) : (
               <EmptyList noun="powders" filters={filterText(named)} onClear={clear} />
             )
