@@ -494,6 +494,12 @@ importers:
       fast-check:
         specifier: 'catalog:'
         version: 4.10.2
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.90.0(oxlint-tsgolint@7.0.2005)
+      oxlint-tsgolint:
+        specifier: 'catalog:'
+        version: 7.0.2005
       publint:
         specifier: 'catalog:'
         version: 0.3.25

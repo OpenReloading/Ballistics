@@ -61,18 +61,17 @@ function splitRows(text: string, delimiter: TableDelimiter): string[][] {
     cell = ''
     blank = true
   }
+  /** Ends the row; the number of its cells when it is kept, else 0. */
   const endRow = () => {
     endCell()
-    if (droppedFilled || !isBlank(row)) {
-      rows.push(row)
-      cells += row.length
-    }
+    const kept = droppedFilled || !isBlank(row)
+    if (kept) rows.push(row)
+    const count = kept ? row.length : 0
     row = []
     droppedFilled = false
+    return count
   }
-  // `endRow` counts the cells, so the loop asks it through a function
-  const full = () => cells > maxCells
-  while (i < text.length && !full()) {
+  while (i < text.length && cells <= maxCells) {
     const c = text.charAt(i)
     if (c === '"' && blank) {
       const q = readQuoted(text, i + 1)
@@ -83,7 +82,7 @@ function splitRows(text: string, delimiter: TableDelimiter): string[][] {
       endCell()
       i++
     } else if (c === '\n' || c === '\r') {
-      endRow()
+      cells += endRow()
       i += lineBreakLength(text, i)
     } else {
       cell += c

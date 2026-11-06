@@ -8,18 +8,19 @@ const elements = (e: XmlElement | undefined, name: string) =>
   (e?.children ?? []).filter((c): c is XmlElement => typeof c !== 'string' && c.name === name)
 const textOf = (e: XmlElement) => e.children.filter((c) => typeof c === 'string').join('')
 
-const richText = (e: XmlElement) =>
-  e.children
-    .flatMap((c) =>
-      typeof c === 'string' ? [] : c.name === 't' ? [c] : c.name === 'r' ? elements(c, 't') : [],
-    )
-    .map(textOf)
-    .join('')
+/** The `t` elements of a rich text child: itself, or those of a run. */
+function textElements(c: XmlElement | string): XmlElement[] {
+  if (typeof c === 'string') return []
+  if (c.name === 't') return [c]
+  return c.name === 'r' ? elements(c, 't') : []
+}
+
+const richText = (e: XmlElement) => e.children.flatMap(textElements).map(textOf).join('')
 
 const clean = (text: string) => text.replaceAll('﻿', '').trim()
 
 const columnOf = (letters: string) =>
-  [...letters].reduce((col, l) => col * 26 + l.charCodeAt(0) - 64, 0)
+  Array.from(letters).reduce((col, l) => col * 26 + l.charCodeAt(0) - 64, 0)
 
 function cellText(c: XmlElement, strings: string[]): string {
   let text: string

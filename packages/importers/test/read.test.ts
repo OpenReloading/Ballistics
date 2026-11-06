@@ -10,8 +10,8 @@ import {
 } from '../src/index.ts'
 import { shotViewEnglish, shotViewSheetEnglish, template } from './fixtures.ts'
 
-const utf16le = (s: string) => [...s].flatMap((c) => [c.charCodeAt(0), 0])
-const utf16be = (s: string) => [...s].flatMap((c) => [0, c.charCodeAt(0)])
+const utf16le = (s: string) => Array.from(s).flatMap((c) => [c.charCodeAt(0), 0])
+const utf16be = (s: string) => Array.from(s).flatMap((c) => [0, c.charCodeAt(0)])
 const encoding = /not UTF-8 or UTF-16/
 const options = { fileName: 'a.csv', velocityUnit: 'ft/s' as const }
 

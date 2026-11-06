@@ -32,26 +32,24 @@ const bulletCell = (c: string): string => {
   ]
   return rules.find(([re]) => re.test(c))?.[1] ?? '0.45'
 }
-const powderCell = (h: string) =>
-  /form|shape|korn/i.test(h)
-    ? 'extruded'
-    : /base|basis/i.test(h)
-      ? 'single'
-      : /dens|schuett/i.test(h)
-        ? '0.92'
-        : /maker/i.test(h)
-          ? 'Invented Co'
-          : 'Invented P'
-const cartridgeCell = (h: string) =>
-  /case|l3|huelsen/i.test(h)
-    ? '51.2'
-    : /coal|overall/i.test(h)
-      ? '71.1'
-      : /dia|g1|durch/i.test(h)
-        ? '7.82'
-        : /p/i.test(h) && /bar|pmax|press/i.test(h)
-          ? '4150'
-          : 'Invented C'
+const powderCell = (h: string): string => {
+  const rules: [RegExp, string][] = [
+    [/form|shape|korn/i, 'extruded'],
+    [/base|basis/i, 'single'],
+    [/dens|schuett/i, '0.92'],
+    [/maker/i, 'Invented Co'],
+  ]
+  return rules.find(([re]) => re.test(h))?.[1] ?? 'Invented P'
+}
+const cartridgeCell = (h: string): string => {
+  const rules: [(text: string) => boolean, string][] = [
+    [(x) => /case|l3|huelsen/i.test(x), '51.2'],
+    [(x) => /coal|overall/i.test(x), '71.1'],
+    [(x) => /dia|g1|durch/i.test(x), '7.82'],
+    [(x) => /p/i.test(x) && /bar|pmax|press/i.test(x), '4150'],
+  ]
+  return rules.find(([test]) => test(h))?.[1] ?? 'Invented C'
+}
 const variant = (kind: TableKind, header: string[], cell: (h: string) => string) => {
   const row = header.map(cell)
   return { kind, header, text: csv([header, row, row, row]) }
@@ -136,8 +134,20 @@ const bulletOf = (b: ReturnType<typeof buildRecords>, i = 0) => {
   return { ...r.data, overrides: defined(r.data.overrides ?? undefined, 'overrides') }
 }
 
-describe('units and decimal marks', () => {
-  it('converts grains, inches and a decimal comma to g and mm within 1e-12', () => {
+const pmaxOf = (header: string, cells: string[]) => {
+  const t = tableOf(
+    csv([['Name', 'Case length', header], ...cells.map((c, i) => [`C${i}`, '51', c])]),
+  )
+  const map = autoMap(t, 'cartridge')
+  const built = buildRecords(t, 'cartridge', map, now)
+  const r = built.entries[0]?.record
+  const pmax =
+    r?.kind === 'cartridge' ? r.data.overrides?.values?.find((v) => v.symbol === 'Pmax') : undefined
+  return { map: map[2], built, value: pmax?.value }
+}
+
+describe('units and decimal marks: grains, inches and decimal commas', () => {
+  it('converts grains and inches to g and mm within 1e-12', () => {
     const us = tableOf(
       csv([
         ['Name', 'Diameter (in)', 'Weight (gr)'],
@@ -154,7 +164,9 @@ describe('units and decimal marks', () => {
     expect(Math.abs((a.mass?.value ?? Number.NaN) - (168 * 64.79891) / 1000)).toBeLessThan(1e-12)
     expect(Math.abs((a.diameter?.value ?? Number.NaN) - 0.308 * 25.4)).toBeLessThan(1e-12)
     expect(a.mass?.raw).toBe('168')
+  })
 
+  it('reads a decimal comma with the units the header names, mm and g', () => {
     const eu = tableOf(
       csv(
         [
@@ -172,7 +184,9 @@ describe('units and decimal marks', () => {
     expect(Math.abs((b.diameter?.value ?? Number.NaN) - 7.82)).toBeLessThan(1e-12)
     expect(b.mass?.raw).toBeUndefined()
   })
+})
 
+describe('units and decimal marks: units from the values, psi and kg/m2', () => {
   it('guesses the unit from the values when the header names none', () => {
     const t = tableOf(
       csv([
@@ -201,21 +215,9 @@ describe('units and decimal marks', () => {
     expect(bc.symbol).toBe('kg/m2')
     expect(bc.toStored(703.0695796391)).toBeCloseTo(1, 9)
   })
+})
 
-  const pmaxOf = (header: string, cells: string[]) => {
-    const t = tableOf(
-      csv([['Name', 'Case length', header], ...cells.map((c, i) => [`C${i}`, '51', c])]),
-    )
-    const map = autoMap(t, 'cartridge')
-    const built = buildRecords(t, 'cartridge', map, now)
-    const r = built.entries[0]?.record
-    const pmax =
-      r?.kind === 'cartridge'
-        ? r.data.overrides?.values?.find((v) => v.symbol === 'Pmax')
-        : undefined
-    return { map: map[2], built, value: pmax?.value }
-  }
-
+describe('units and decimal marks: units the header names', () => {
   it('reads MPa and kpsi from the header and never guesses them from the values', () => {
     const mpa = pmaxOf('Max pressure (MPa)', ['400', '420'])
     expect(mpa.map).toMatchObject({ unit: 'MPa', unitFrom: 'header' })
@@ -250,7 +252,9 @@ describe('units and decimal marks', () => {
     )
     expect(buildRecords(t, 'cartridge', map, now).entries).toHaveLength(1)
   })
+})
 
+describe('units and decimal marks: a unit word after a space', () => {
   it('reads a unit word after a space and takes another last word as part of the name', () => {
     const t = tableOf(
       csv([
@@ -275,24 +279,24 @@ describe('units and decimal marks', () => {
   })
 })
 
-describe('buildRecords', () => {
-  const rows = [
-    ['Name', 'Maker', 'Diameter (mm)', 'Weight (g)', 'BC G1'],
-    ['Good', 'Invented Maker', '7.82', '10.9', '0.45'],
-    ['', 'Invented Maker', '7.82', '10.9', ''],
-    ['Bad number', '', 'x7', '10.9', ''],
-    ['Zero', '', '0', '10.9', ''],
-    ['Far', 'Invented Maker', '30', '10.9', ''],
-    ['Also good', 'invented  maker', '6.7', '8.4', ''],
-  ]
-  const table = tableOf(csv(rows))
-  const map = autoMap(table, 'bullet')
-  const built = buildRecords(table, 'bullet', map, now)
+const bulletRows = [
+  ['Name', 'Maker', 'Diameter (mm)', 'Weight (g)', 'BC G1'],
+  ['Good', 'Invented Maker', '7.82', '10.9', '0.45'],
+  ['', 'Invented Maker', '7.82', '10.9', ''],
+  ['Bad number', '', 'x7', '10.9', ''],
+  ['Zero', '', '0', '10.9', ''],
+  ['Far', 'Invented Maker', '30', '10.9', ''],
+  ['Also good', 'invented  maker', '6.7', '8.4', ''],
+]
+const bulletTable = tableOf(csv(bulletRows))
+const bulletMap = autoMap(bulletTable, 'bullet')
+const bulletBuilt = buildRecords(bulletTable, 'bullet', bulletMap, now)
 
+describe('buildRecords: a table with failing rows', () => {
   it('rejects a failing row without blocking the other rows of the file', () => {
-    expect(built.counts).toEqual({ accepted: 3, warned: 1, rejected: 3 })
-    expect(built.entries.map((e) => e.row)).toEqual([2, 6, 7])
-    expect(built.rejected).toEqual([
+    expect(bulletBuilt.counts).toEqual({ accepted: 3, warned: 1, rejected: 3 })
+    expect(bulletBuilt.entries.map((e) => e.row)).toEqual([2, 6, 7])
+    expect(bulletBuilt.rejected).toEqual([
       {
         row: 3,
         column: 'Name',
@@ -313,7 +317,7 @@ describe('buildRecords', () => {
         reason: 'Diameter 0 is not above 0. Fix the cell or leave it empty.',
       },
     ])
-    expect(built.warnings).toEqual([
+    expect(bulletBuilt.warnings).toEqual([
       {
         row: 6,
         column: 'Diameter (mm)',
@@ -321,40 +325,53 @@ describe('buildRecords', () => {
         reason: 'Diameter 30 mm is outside the usual 3 to 25 mm. Check the unit of the column.',
       },
     ])
-    expect(bulletOf(built).overrides.ballisticCoefficients).toEqual([
+    expect(bulletOf(bulletBuilt).overrides.ballisticCoefficients).toEqual([
       { dragModel: 'G1', value: 0.45 },
     ])
   })
+})
 
+describe('buildRecords: valid records, makers and ids', () => {
   it('builds records the user record schema accepts', () => {
-    expect(built.entries.length + built.makers.length).toBe(4)
-    for (const r of [...built.entries, ...built.makers]) userRecord.parse(r.record)
+    expect(bulletBuilt.entries.length + bulletBuilt.makers.length).toBe(4)
+    for (const r of [...bulletBuilt.entries, ...bulletBuilt.makers]) userRecord.parse(r.record)
   })
 
   it('makes one manufacturer record per maker and refers to it', () => {
-    expect(built.makers).toHaveLength(1)
-    const maker = defined(built.makers[0]).record
+    expect(bulletBuilt.makers).toHaveLength(1)
+    const maker = defined(bulletBuilt.makers[0]).record
     expect(maker).toMatchObject({ kind: 'manufacturer', name: 'Invented Maker' })
-    expect(bulletOf(built, 0).manufacturer).toBe(`user:${maker.id}`)
-    expect(bulletOf(built, 2).manufacturer).toBe(`user:${maker.id}`)
+    expect(bulletOf(bulletBuilt, 0).manufacturer).toBe(`user:${maker.id}`)
+    expect(bulletOf(bulletBuilt, 2).manufacturer).toBe(`user:${maker.id}`)
   })
 
   it('gives the same ids to the same input read twice, and to a changed value under the same key', () => {
-    const again = buildRecords(tableOf(csv(rows)), 'bullet', map, '2026-10-29T00:00:00.000Z')
-    expect(again.entries.map((e) => e.record.id)).toEqual(built.entries.map((e) => e.record.id))
-    const changed = rows.map((r) => (r[0] === 'Good' ? [...r.slice(0, 4), '0.5'] : r))
-    const c = buildRecords(tableOf(csv(changed)), 'bullet', map, now)
-    expect(c.entries[0]?.record.id).toBe(built.entries[0]?.record.id)
+    const again = buildRecords(
+      tableOf(csv(bulletRows)),
+      'bullet',
+      bulletMap,
+      '2026-10-29T00:00:00.000Z',
+    )
+    expect(again.entries.map((e) => e.record.id)).toEqual(
+      bulletBuilt.entries.map((e) => e.record.id),
+    )
+    const changed = bulletRows.map((r) => (r[0] === 'Good' ? [...r.slice(0, 4), '0.5'] : r))
+    const c = buildRecords(tableOf(csv(changed)), 'bullet', bulletMap, now)
+    expect(c.entries[0]?.record.id).toBe(bulletBuilt.entries[0]?.record.id)
     expect(bulletOf(c).overrides.ballisticCoefficients).toEqual([{ dragModel: 'G1', value: 0.5 }])
-    const otherMass = rows.map((r) => (r[0] === 'Good' ? [r[0], r[1] ?? '', '7.82', '11'] : r))
-    const o = buildRecords(tableOf(csv(otherMass)), 'bullet', map, now)
-    expect(o.entries[0]?.record.id).not.toBe(built.entries[0]?.record.id)
-    expect(defined(built.entries[0]).record.id).toMatch(
+    const otherMass = bulletRows.map((r) =>
+      r[0] === 'Good' ? [r[0], r[1] ?? '', '7.82', '11'] : r,
+    )
+    const o = buildRecords(tableOf(csv(otherMass)), 'bullet', bulletMap, now)
+    expect(o.entries[0]?.record.id).not.toBe(bulletBuilt.entries[0]?.record.id)
+    expect(defined(bulletBuilt.entries[0]).record.id).toMatch(
       /^[0-9a-f]{8}-[0-9a-f]{4}-8[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
     )
     expect(idOfKey('a')).toBe(idOfKey('a'))
   })
+})
 
+describe('buildRecords: repeated ids and unmapped fields', () => {
   it('warns with both rows when two rows give the same id', () => {
     const t = tableOf(
       csv([
@@ -396,7 +413,9 @@ describe('buildRecords', () => {
       'No column is mapped to Name, Diameter, Mass. Map a column to each or read the file as another kind.',
     )
   })
+})
 
+describe('buildRecords: numbers and powder choices', () => {
   it('rejects a cell that is not a finite number with the not-a-number reason', () => {
     const cells = ['1e999', '-1e999', '9'.repeat(400)]
     const t = tableOf(
@@ -441,7 +460,9 @@ describe('buildRecords', () => {
     )
     expect(b.warnings.map((w) => w.cell)).toEqual(['pellet', 'constructor', '__proto__'])
   })
+})
 
+describe('buildRecords: cartridges and tables without a header', () => {
   it('reads cartridges into spec values and numbers rows of a table without a header from 1', () => {
     const read = tableOfRows([['308 Invented', '51.2', '71.1', '0.308', '4150']])
     const t = defined('table' in read ? read.table : undefined, 'table')
@@ -465,7 +486,7 @@ describe('buildRecords', () => {
   })
 })
 
-describe('readTable', () => {
+describe('readTable: rows, sizes and delimiters', () => {
   it('refuses a text with one comma line and no repeated row width as "no table"', () => {
     expect(readTable('Range day, bring the chronograph.\nCheck the new scale.\n')).toEqual({
       refusal:
@@ -494,7 +515,9 @@ describe('readTable', () => {
     ])
     expect(tableOf('a\tb\r\n1\t2\r\n').rows).toEqual([['1', '2']])
   })
+})
 
+describe('readTable: JSON lists and tables without a header', () => {
   it('reads a JSON list of objects and refuses other JSON', () => {
     expect(tableOf('[{"Name":"A","Weight":10},{"Name":"B","Dia":{"x":1},"Weight":null}]')).toEqual({
       header: ['Name', 'Weight', 'Dia'],
@@ -533,7 +556,9 @@ describe('readTable', () => {
       refusal: 'The table has a header but no rows. Add rows or choose another file.',
     })
   })
+})
 
+describe('readTable: column letters and limits', () => {
   it('follows spreadsheet letters past column Z', () => {
     const wide = tableOfRows([Array.from({ length: 256 }, (_, i) => String(i))])
     const header = 'table' in wide ? wide.table.header : []

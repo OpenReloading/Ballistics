@@ -392,11 +392,12 @@ function powderData(c: Cells): DataOf<'powder'> {
     origin: 'user',
     provenanceKind: 'measured',
     draft: {
-      // the choices of the field spell only these values
       ...(typeof c['grainForm'] === 'string' && {
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the choices of the field spell only these values
         grainForm: c['grainForm'] as 'ball' | 'extruded' | 'flake' | 'other',
       }),
       ...(typeof c['propellantBase'] === 'string' && {
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the choices of the field spell only these values
         propellantBase: c['propellantBase'] as 'single' | 'double' | 'triple',
       }),
       ...(bulk && { bulkDensity: bulk }),
