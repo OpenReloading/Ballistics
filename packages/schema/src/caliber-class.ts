@@ -36,6 +36,7 @@ export const caliberClass: z.ZodObject<
     diameter: QuantitySchema
     /** Ids of the cartridge records in the class; empty where the class has no CIP cartridge. */
     cartridges: z.ZodArray<typeof recordId>
+    /** Where the values of the record come from: a kind and at least one source. */
     provenance: typeof provenance
   },
   z.core.$strict

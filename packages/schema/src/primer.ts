@@ -113,6 +113,7 @@ export const primer: z.ZodObject<
       z.ZodArray<z.ZodObject<{ property: z.ZodString; value: z.ZodString }, z.core.$strict>>
     >
     note: z.ZodOptional<z.ZodString>
+    /** Where the values of the record come from: a kind and at least one source. */
     provenance: typeof provenance
   },
   z.core.$strict

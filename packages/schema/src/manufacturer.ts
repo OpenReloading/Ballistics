@@ -27,6 +27,7 @@ export const manufacturer: z.ZodObject<
     website: z.ZodOptional<z.ZodURL>
     /** Other names: former names and brand names it sells under; searched and checked for duplicates. */
     aliases: z.ZodOptional<z.ZodArray<z.ZodString>>
+    /** Where the values of the record come from: a kind and at least one source. */
     provenance: typeof provenance
   },
   z.core.$strict

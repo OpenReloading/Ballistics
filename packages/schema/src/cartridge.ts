@@ -54,6 +54,7 @@ export const cartridge: z.ZodObject<{
   verification: z.ZodEnum<z.core.util.ToEnum<'verified' | 'unverified'>>
   values: z.ZodArray<typeof specValue>
   exceptions: z.ZodOptional<z.ZodArray<typeof plausibilityException>>
+  /** Where the values of the record come from: a kind and at least one source. */
   provenance: typeof provenance
 }> = cartridgeParser satisfies Exact<typeof cartridge, typeof cartridgeParser>
 
