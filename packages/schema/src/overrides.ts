@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { bullet } from './bullet.ts'
 import { cartridge } from './cartridge.ts'
+import type { Exact } from './exact.ts'
 import { type Powder, powder } from './powder.ts'
 import { isPlain, type Plain } from './shared.ts'
 import { specValue } from './standards.ts'
@@ -154,8 +155,7 @@ const {
   ...powderShape
 } = powder.shape
 
-/** One ingredient of a powder draft: the printed name, CAS number and mass percent range, each still optional. */
-const compositionDraft = z.object({
+const compositionDraftParser = z.object({
   name: z
     .string()
     .describe('Name of the ingredient as the safety data sheet prints it.')
@@ -164,6 +164,14 @@ const compositionDraft = z.object({
   min: z.number().describe('Lower end of the mass percent range.').optional(),
   max: z.number().describe('Upper end of the mass percent range.').optional(),
 })
+
+/** One ingredient of a powder draft: the printed name, CAS number and mass percent range, each still optional. */
+const compositionDraft: z.ZodObject<{
+  name: z.ZodOptional<z.ZodString>
+  cas: z.ZodOptional<z.ZodString>
+  min: z.ZodOptional<z.ZodNumber>
+  max: z.ZodOptional<z.ZodNumber>
+}> = compositionDraftParser satisfies Exact<typeof compositionDraft, typeof compositionDraftParser>
 
 /** The fields of a powder draft that {@link powderDraft} types, in stored units. */
 type PowderDraftFields = Overrides<
@@ -200,11 +208,7 @@ export const bulletOverrides = overridesOf(z.object(bulletShape), 'bullet') as z
   Overrides<Omit<z.infer<typeof bullet>, 'id' | 'manufacturer' | 'provenance'>>
 >
 
-/**
- * One entry of the `values` of {@link cartridgeOverrides}: a whole spec value that replaces the one
- * with its side, symbol and variant, or, with a `value` of `null`, removes it.
- */
-export const cartridgeValueOverride = z
+const cartridgeValueOverrideParser = z
   .object({
     ...specValue.shape,
     value: z
@@ -218,6 +222,19 @@ export const cartridgeValueOverride = z
   .refine((v) => v.value !== undefined || v.raw !== undefined, {
     message: 'a value needs value or raw',
   })
+
+/**
+ * One entry of the `values` of {@link cartridgeOverrides}: a whole spec value that replaces the one
+ * with its side, symbol and variant, or, with a `value` of `null`, removes it.
+ */
+export const cartridgeValueOverride: z.ZodObject<
+  Omit<(typeof specValue)['shape'], 'value'> & {
+    value: z.ZodOptional<z.ZodNullable<z.ZodNumber>>
+  }
+> = cartridgeValueOverrideParser satisfies Exact<
+  typeof cartridgeValueOverride,
+  typeof cartridgeValueOverrideParser
+>
 
 /**
  * The overrides of a cartridge record: any of its fields but `id` and `provenance`, in the stored
