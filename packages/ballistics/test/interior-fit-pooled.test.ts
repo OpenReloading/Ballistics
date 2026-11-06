@@ -1,10 +1,9 @@
+import { InputError, nth } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import { nth } from '../src/errors.ts'
 import {
   calibratePooled,
   fitPowder,
   fitPowderPooled,
-  InputError,
   type InteriorLoad,
   interior,
   type LadderPoint,

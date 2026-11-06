@@ -6,8 +6,7 @@
  * simulation's uncertainty, not a load. SI in and out.
  */
 
-import { type InteriorLoad, interior } from '@open-reloading/ballistics'
-import { need, nth } from '../errors.ts'
+import { need, nth } from '@open-reloading/statistics'
 import {
   fitPowder,
   type LadderPoint,
@@ -19,6 +18,7 @@ import {
   type PowderPrior,
   predictPowder,
 } from './fit.ts'
+import { type InteriorLoad, interior } from './model.ts'
 
 /** An input of the interior model that the range can shift by its standard uncertainty. */
 export type PowderInput =
@@ -380,14 +380,22 @@ export interface SimilarPowder {
 }
 
 /** Rules of the choice of similar powders and of the prior they give. */
-export const similarPowderRules = Object.freeze({
+export interface SimilarPowderRules {
   /** Neighbours taken. */
-  count: 5,
+  count: number
   /** Fewest neighbours for a prior from their spread; fewer give a weak prior. */
-  minimum: 3,
+  minimum: number
   /** Standard deviation of ln(burn coefficient) of a weak prior. */
-  weakSigma: 1,
+  weakSigma: number
   /** Smallest standard deviation of a prior from a spread, so near-equal neighbours do not fix the fit. */
+  minimumSigma: number
+}
+
+/** The rules of {@link similarPowdersPrior}. */
+export const similarPowderRules: Readonly<SimilarPowderRules> = Object.freeze({
+  count: 5,
+  minimum: 3,
+  weakSigma: 1,
   minimumSigma: 0.05,
 })
 

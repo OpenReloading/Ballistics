@@ -1,12 +1,11 @@
+import { InputError, nth } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import { nth } from '../src/errors.ts'
 import {
   type ChargedTrace,
   type CurveFitOptions,
   type CurveParameterReport,
   fitPressureCurve,
   fitPressureCurves,
-  InputError,
   type InteriorLoad,
   interior,
   PowderFitError,

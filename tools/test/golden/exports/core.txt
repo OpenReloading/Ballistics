@@ -201,6 +201,7 @@
 . ShotshellLoad
 . ShotshellResult
 . SimilarPowder
+. SimilarPowderRules
 . SimilarPowdersPrior
 . SkippedInput
 . StartPressureDefault

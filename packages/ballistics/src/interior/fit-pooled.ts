@@ -6,11 +6,16 @@
  * Velocities only. SI in and out.
  */
 
-import { type InteriorLoad, type InteriorOptions, interior } from '@open-reloading/ballistics'
-import { chiSquareQuantile, logLeastSquares } from '@open-reloading/statistics'
-import type { Settings } from '../errors.ts'
-import { InputError, need, nth, positive } from '../errors.ts'
+import {
+  chiSquareQuantile,
+  InputError,
+  logLeastSquares,
+  need,
+  nth,
+} from '@open-reloading/statistics'
+import { positive, type Settings } from '../settings.ts'
 import { type LadderPoint, PowderFitError, type PowderPrior } from './fit.ts'
+import { type InteriorLoad, type InteriorOptions, interior } from './model.ts'
 
 /** One chronograph session of a pooled fit: a ladder of one powder lot fired from one rifle. */
 export interface PooledSession {

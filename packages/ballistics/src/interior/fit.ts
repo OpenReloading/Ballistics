@@ -10,20 +10,23 @@
  */
 
 import {
+  chiSquareQuantile,
+  InputError,
+  type LogFitStop,
+  logLeastSquares,
+  need,
+  nth,
+  studentTwoSidedQuantile,
+} from '@open-reloading/statistics'
+import type { Complete } from '../key-list.ts'
+import { positive, type Settings } from '../settings.ts'
+import {
   type InteriorInvalid,
   type InteriorLoad,
   type InteriorOptions,
   type InteriorResult,
   interior,
-} from '@open-reloading/ballistics'
-import {
-  chiSquareQuantile,
-  type LogFitStop,
-  logLeastSquares,
-  studentTwoSidedQuantile,
-} from '@open-reloading/statistics'
-import type { Settings } from '../errors.ts'
-import { InputError, need, nth, positive } from '../errors.ts'
+} from './model.ts'
 
 /**
  * What a peak pressure was measured with: the `pressureMethod` vocabulary of the cartridge records.
@@ -59,13 +62,17 @@ export interface LadderPoint {
   propellantTemperature?: number
 }
 
-const parameterNames = [
+const parameterList = [
   'burnRate',
   'startPressure',
   'volumeFactor',
   'energy',
   'temperatureFactor',
-] as const
+] as const satisfies readonly PowderParameter[]
+const parameterNames: readonly PowderParameter[] = parameterList satisfies Complete<
+  PowderParameter,
+  typeof parameterList
+>
 
 /**
  * Parameter of the fit: the burn coefficient (or vivacity, by the load's burn kind), the start
@@ -75,7 +82,12 @@ const parameterNames = [
  * are resolved only by ladders at several barrel lengths or several temperatures
  * (`apps/docs/docs/models/interior-powder-fit.md`, "Several barrel lengths and temperatures").
  */
-export type PowderParameter = (typeof parameterNames)[number]
+export type PowderParameter =
+  | 'burnRate'
+  | 'startPressure'
+  | 'volumeFactor'
+  | 'energy'
+  | 'temperatureFactor'
 
 /**
  * Gaussian prior of one fitted parameter in its log parameter
