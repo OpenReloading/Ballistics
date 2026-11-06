@@ -1,5 +1,8 @@
 import { z } from 'zod'
+import type { Exact } from './exact.ts'
 import { quantityKind } from './units.ts'
+
+const pressureMethodParser = z.enum(['transducer', 'piezo', 'case-contact', 'crusher', 'energy'])
 
 /**
  * Method that measured a chamber pressure, which is also the basis a pressure is compared on.
@@ -7,14 +10,11 @@ import { quantityKind } from './units.ts'
  * the outside of the case wall at a specified point of the chamber (as some maker tables print
  * it), `crusher` a copper crusher. The values are not converted into one another.
  */
-export const pressureMethod = z.enum(['transducer', 'piezo', 'case-contact', 'crusher', 'energy'])
+export const pressureMethod: z.ZodEnum<
+  z.core.util.ToEnum<'transducer' | 'piezo' | 'case-contact' | 'crusher' | 'energy'>
+> = pressureMethodParser satisfies Exact<typeof pressureMethod, typeof pressureMethodParser>
 
-/**
- * One value as a standard publishes it: a dimension, a pressure, an energy or a measuring position.
- * Symbols are the standard's own (`L3`, `P1`, `Pmax`), Greek letters spelled out (`alpha`).
- * Inferred type: {@link SpecValue}.
- */
-export const specValue = z
+const specValueParser = z
   .object({
     side: z
       .enum(['cartridge', 'chamber'])
@@ -66,11 +66,37 @@ export const specValue = z
     message: 'a value needs value or raw',
   })
 
-/** A plausibility finding that was reviewed and kept, with the reason. */
-export const plausibilityException = z.object({
+/**
+ * One value as a standard publishes it: a dimension, a pressure, an energy or a measuring position.
+ * Symbols are the standard's own (`L3`, `P1`, `Pmax`), Greek letters spelled out (`alpha`).
+ * Inferred type: {@link SpecValue}.
+ */
+export const specValue: z.ZodObject<{
+  side: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'cartridge' | 'chamber'>>>
+  symbol: z.ZodString
+  quantity: typeof quantityKind
+  value: z.ZodOptional<z.ZodNumber>
+  raw: z.ZodOptional<z.ZodString>
+  limit: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'max' | 'min'>>>
+  tolerance: z.ZodOptional<
+    z.ZodObject<{ lower: z.ZodOptional<z.ZodNumber>; upper: z.ZodOptional<z.ZodNumber> }>
+  >
+  variant: z.ZodOptional<z.ZodString>
+  basic: z.ZodOptional<z.ZodBoolean>
+  footnotes: z.ZodOptional<z.ZodArray<z.ZodString>>
+}> = specValueParser satisfies Exact<typeof specValue, typeof specValueParser>
+
+const plausibilityExceptionParser = z.object({
   finding: z.string().min(1),
   note: z.string().min(1),
 })
+
+/** A plausibility finding that was reviewed and kept, with the reason. */
+export const plausibilityException: z.ZodObject<{ finding: z.ZodString; note: z.ZodString }> =
+  plausibilityExceptionParser satisfies Exact<
+    typeof plausibilityException,
+    typeof plausibilityExceptionParser
+  >
 
 /** One printed standard value. */
 export interface SpecValue extends z.infer<typeof specValue> {}

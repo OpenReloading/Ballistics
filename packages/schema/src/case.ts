@@ -1,16 +1,23 @@
 import { z } from 'zod'
+import type { Exact } from './exact.ts'
 import { catalogueRef, recordId, ref } from './ids.ts'
 import { type Provenance, provenance } from './provenance.ts'
-import { quantity } from './units.ts'
+import { type QuantitySchema, quantity } from './units.ts'
 
-/** Wall materials of a cartridge case. */
-export const caseMaterials = z.enum([
+const caseMaterialsParser = z.enum([
   'brass',
   'nickel-plated-brass',
   'lacquered-steel',
   'polymer-coated-steel',
   'aluminium',
 ])
+
+/** Wall materials of a cartridge case. */
+export const caseMaterials: z.ZodEnum<
+  z.core.util.ToEnum<
+    'brass' | 'nickel-plated-brass' | 'lacquered-steel' | 'polymer-coated-steel' | 'aluminium'
+  >
+> = caseMaterialsParser satisfies Exact<typeof caseMaterials, typeof caseMaterialsParser>
 
 /** A wall material of {@link caseMaterials}. */
 export type CaseMaterial = z.infer<typeof caseMaterials>
@@ -27,16 +34,7 @@ const primerPocket = z.strictObject({
     .optional(),
 })
 
-/**
- * A cartridge case, for one cartridge: the entity of a catalogue record (`records/cases`) as its
- * manufacturer sells it, the user record of kind `case` (a group of cases the user keeps, with
- * their measured values) and the case a load references. A catalogue case carries its `id` (the
- * file name), `manufacturer`, `name`, `productNumber` and `provenance`, and names catalogue records
- * only. `waterCapacity` is the capacity the manufacturer states; a capacity the user measured stays
- * a case capacity record that `capacity` names, and takes precedence.
- * Inferred type: {@link Case}.
- */
-export const cartridgeCase = z
+const cartridgeCaseParser = z
   .strictObject({
     id: recordId.describe('Id of a catalogue case, the file name without `.json`.').optional(),
     origin: z
@@ -109,6 +107,51 @@ export const cartridgeCase = z
       if (c[k] !== undefined && !c[k].startsWith('catalogue:'))
         issue([k], 'A catalogue case names catalogue records only')
   })
+
+/**
+ * A cartridge case, for one cartridge: the entity of a catalogue record (`records/cases`) as its
+ * manufacturer sells it, the user record of kind `case` (a group of cases the user keeps, with
+ * their measured values) and the case a load references. A catalogue case carries its `id` (the
+ * file name), `manufacturer`, `name`, `productNumber` and `provenance`, and names catalogue records
+ * only. `waterCapacity` is the capacity the manufacturer states; a capacity the user measured stays
+ * a case capacity record that `capacity` names, and takes precedence.
+ * Inferred type: {@link Case}.
+ */
+export const cartridgeCase: z.ZodObject<
+  {
+    id: z.ZodOptional<typeof recordId>
+    origin: z.ZodEnum<z.core.util.ToEnum<'catalogue' | 'user' | 'shared'>>
+    name: z.ZodOptional<z.ZodString>
+    manufacturer: z.ZodOptional<z.ZodString>
+    cartridge: z.ZodString
+    basedOn: z.ZodOptional<z.ZodString>
+    productNumber: z.ZodOptional<z.ZodString>
+    headstamp: z.ZodOptional<z.ZodString>
+    material: typeof caseMaterials
+    primerPocket: z.ZodOptional<
+      z.ZodObject<
+        {
+          type: z.ZodEnum<z.core.util.ToEnum<'boxer' | 'berdan'>>
+          size: z.ZodOptional<z.ZodString>
+        },
+        z.core.$strict
+      >
+    >
+    flashHole: z.ZodOptional<QuantitySchema>
+    mass: z.ZodOptional<QuantitySchema>
+    waterCapacity: z.ZodOptional<QuantitySchema>
+    annealed: z.ZodOptional<z.ZodBoolean>
+    capacity: z.ZodOptional<z.ZodString>
+    numberOfFirings: z.ZodOptional<z.ZodInt>
+    trimLength: z.ZodOptional<QuantitySchema>
+    neckWall: z.ZodOptional<QuantitySchema>
+    casesMeasured: z.ZodOptional<z.ZodInt>
+    spread: z.ZodOptional<QuantitySchema>
+    note: z.ZodOptional<z.ZodString>
+    provenance: z.ZodOptional<typeof provenance>
+  },
+  z.core.$strict
+> = cartridgeCaseParser satisfies Exact<typeof cartridgeCase, typeof cartridgeCaseParser>
 
 /** A case of the catalogue (`records/cases`): {@link cartridgeCase} with `origin` `catalogue`. */
 export const catalogueCase: z.ZodType<CatalogueCase> = cartridgeCase.refine(

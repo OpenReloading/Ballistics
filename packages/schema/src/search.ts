@@ -7,7 +7,7 @@
 const SEP = '\u0001'
 
 /** Search text of `s`: Unicode NFD, combining marks removed, lower case, a decimal comma a point. */
-export const fold = (s: string) =>
+export const fold = (s: string): string =>
   s
     .normalize('NFD')
     .replace(/\p{M}/gu, '')
@@ -24,7 +24,10 @@ const bare = (s: string) => compact(fold(s).replace(/\.(?=\s|$)/g, ''))
  * ("8x57" finds "8 x 57 IS", "30 06" finds "30-06") and the folded `name` (default: the first
  * text) for the exact match.
  */
-export function searchKey(texts: readonly (string | undefined)[], name = texts[0]): string {
+export function searchKey(
+  texts: readonly (string | undefined)[],
+  name: string | undefined = texts[0],
+): string {
   const joined = fold(texts.filter(Boolean).join(' '))
   return [joined, compact(joined), fold(name ?? '')].join(SEP)
 }
