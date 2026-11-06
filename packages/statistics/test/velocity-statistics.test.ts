@@ -1,10 +1,20 @@
 import { describe, expect, it } from 'vitest'
 import { InputError, shotsNeeded, velocityStatistics } from '../src/index.ts'
-import { normals } from './random.ts'
+import { normalsFrom, seededUniforms } from '../src/random.ts'
+
+const normals = (seed: number) => normalsFrom(seededUniforms(seed))
 
 const defined = <T>(x: T | undefined): T => {
   if (x === undefined) throw new Error('expected a value')
   return x
+}
+
+/** The relative half-width of the standard deviation interval of `n` evenly spread velocities. */
+const halfWidthAt = (n: number) => {
+  const s = defined(velocityStatistics(Array.from({ length: n }, (_, k) => k - n / 2 + 0.5)))
+  const sd = defined(s.standardDeviation)
+  const i = defined(s.standardDeviationInterval)
+  return (i.upper - i.lower) / 2 / sd
 }
 
 describe('velocityStatistics', () => {
@@ -60,7 +70,9 @@ describe('velocityStatistics', () => {
     )
     expect(defined(velocityStatistics([1, 2, 3], 0.999)).standardDeviationInterval).toBeDefined()
   })
+})
 
+describe('velocityStatistics: interval coverage', () => {
   // seeded normal strings: the interval holds its level at every shot count
   it.each([
     [0.95, 3],
@@ -99,15 +111,9 @@ describe('shotsNeeded', () => {
   })
 
   it('is the first shot count that is narrow enough, and 95 % by default', () => {
-    const halfWidth = (n: number) => {
-      const s = defined(velocityStatistics(Array.from({ length: n }, (_, k) => k - n / 2 + 0.5)))
-      const sd = defined(s.standardDeviation)
-      const i = defined(s.standardDeviationInterval)
-      return (i.upper - i.lower) / 2 / sd
-    }
     const n = shotsNeeded(0.25)
-    expect(halfWidth(n)).toBeLessThanOrEqual(0.25)
-    expect(halfWidth(n - 1)).toBeGreaterThan(0.25)
+    expect(halfWidthAt(n)).toBeLessThanOrEqual(0.25)
+    expect(halfWidthAt(n - 1)).toBeGreaterThan(0.25)
   })
 
   it('searches up to the shot limit when doubling would pass it', () => {

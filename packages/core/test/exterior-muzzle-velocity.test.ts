@@ -1,3 +1,4 @@
+import { seededUniforms } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
 import {
   airDensity,
@@ -9,7 +10,6 @@ import {
   standardAtmosphere,
   trajectory,
 } from '../src/index.ts'
-import { uniforms } from './random.ts'
 
 const air = standardAtmosphere(0)
 const grain = 0.00006479891
@@ -72,7 +72,7 @@ describe('muzzle velocity from a speed measured downrange', () => {
   })
 
   it('has no mean bias over seeded shots across calibres, bullets and speeds through the transonic range', () => {
-    const next = uniforms(371)
+    const next = seededUniforms(371)
     const calibres = [5.7, 6.17, 7.23, 7.85, 9.12, 10.57, 11.63]
     const bullets: [number, 'G1' | 'G7', number][] = [
       [0.16, 'G1', 0.55],

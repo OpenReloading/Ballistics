@@ -79,7 +79,7 @@ analytic. Seeded simulation of clean normal strings and of one planted shift; no
 ## Where in the app
 
 - `packages/schema/src/chrono-session.ts` (the `excluded` reason and `coldBore` flag of a shot, set by hand only; unchanged).
-- `packages/core/src/groups/velocity-statistics.ts` (the string statistics the line sits beside).
+- `packages/statistics/src/velocity-statistics.ts` (the string statistics the line sits beside).
 - `packages/core/src/groups/statistics.ts` (`velocityCorrelationOf`, the group statistics).
 - [Groups](../models/groups.md), Limits: add that a flagged shot is advisory, the factors are for normal strings of 10 to 30 shots, and the interval of the standard deviation is not changed by the flag.
 

@@ -1,14 +1,14 @@
+import type { LogFitInput } from '@open-reloading/statistics'
 import { describe, expect, it, vi } from 'vitest'
 import { fitTruingStrings } from '../src/index.ts'
-import type { LogFitInput } from '../src/least-squares.ts'
 
-vi.mock('../src/least-squares.ts', async (original) => {
-  const module = await original<typeof import('../src/least-squares.ts')>()
+vi.mock('@open-reloading/statistics', async (original) => {
+  const module = await original<typeof import('@open-reloading/statistics')>()
   return { ...module, logLeastSquares: vi.fn(module.logLeastSquares) }
 })
 
+import { logLeastSquares } from '@open-reloading/statistics'
 import { nth } from '../src/errors.ts'
-import { logLeastSquares } from '../src/least-squares.ts'
 import { click, nominal } from './range-strings-fixtures.ts'
 
 // values near the nominal prediction are enough: the iteration is replaced in these tests

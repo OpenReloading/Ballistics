@@ -154,4 +154,9 @@ describe('compare', () => {
       expect.arrayContaining(['units/units.js', 'schema/units.js', 'schema/case-capacity.js']),
     )
   })
+
+  it('includes the input checks and the bisection the core model takes from statistics', async () => {
+    const labels = (await loadModel('m3')).files.map((f) => f.label)
+    expect(labels).toEqual(expect.arrayContaining(['statistics/errors.js', 'statistics/bisect.js']))
+  })
 })

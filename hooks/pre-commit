@@ -1,7 +1,8 @@
 #!/bin/sh
 # Oxlint and Biome on the staged files, the rules of `pnpm run lint` (packages/units,
-# packages/locale-format, packages/schema and packages/shot-groups run their typed lint there only). The CI `check`
-# job stays the authority, so a checkout where they do not run is told so and the commit goes on.
+# packages/locale-format, packages/schema, packages/statistics, packages/shot-groups and tooling/
+# run their typed lint there only). The CI `check` job stays the authority, so a checkout where
+# they do not run is told so and the commit goes on.
 # shortcut: both read the working-tree file, not the index, so a partly staged file is checked
 # as a whole; upgrade when that hides a failure in practice.
 [ -n "$CI" ] && exit 0
@@ -11,7 +12,7 @@ if ! "$bin/oxlint" --version >/dev/null 2>&1 || ! "$bin/biome" --version >/dev/n
   echo 'pre-commit: Oxlint or Biome does not run in this checkout, nothing checked (CI checks it). pnpm install installs them; in the dev container: devcontainer exec --workspace-folder . pnpm run lint' >&2
   exit 0
 fi
-code=$(git diff --cached --name-only --diff-filter=ACMR -- '*.ts' '*.tsx' '*.mts' '*.cts' '*.js' '*.mjs' '*.cjs' ':!packages/units/' ':!packages/locale-format/' ':!packages/schema/' ':!packages/shot-groups/')
+code=$(git diff --cached --name-only --diff-filter=ACMR -- '*.ts' '*.tsx' '*.mts' '*.cts' '*.js' '*.mjs' '*.cjs' ':!packages/units/' ':!packages/locale-format/' ':!packages/schema/' ':!packages/statistics/' ':!packages/shot-groups/' ':!tooling/')
 { [ -z "$code" ] || printf '%s\n' "$code" | xargs "$bin/oxlint" --deny-warnings --report-unused-disable-directives; } &&
   "$bin/biome" check --staged --error-on-warnings --no-errors-on-unmatched || {
   echo 'pre-commit: fix the findings above (pnpm run format applies the safe ones), stage the files and commit again' >&2

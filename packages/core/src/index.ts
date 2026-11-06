@@ -1,3 +1,21 @@
+// the statistics this package exported before they moved to their own package
+export {
+  chiSquareCdf,
+  chiSquareQuantile,
+  chiSquareSurvival,
+  fQuantileTwoNumeratorDegrees,
+  type Identifiability,
+  type Interval,
+  identifiability,
+  type LogFitFailure,
+  type LogFitInput,
+  type LogFitResult,
+  type LogFitStop,
+  logLeastSquares,
+  shotsNeeded,
+  type VelocityStatistics,
+  velocityStatistics,
+} from '@open-reloading/statistics'
 // the water density of a case capacity, kept in the export for the callers of core
 export { waterDensityGramsPerCm3 } from '@open-reloading/units'
 export * from './advisories.ts'
@@ -16,11 +34,8 @@ export * from './exterior/rk45.ts'
 export * from './exterior/stability.ts'
 export * from './exterior/trajectory.ts'
 export * from './exterior/truing.ts'
-export * from './groups/chi-square.ts'
-export * from './groups/f-distribution.ts'
 export * from './groups/hit-probability.ts'
 export * from './groups/statistics.ts'
-export * from './groups/velocity-statistics.ts'
 export * from './interior/bore-resistance.ts'
 export * from './interior/charge-solver.ts'
 export * from './interior/curve-fit.ts'
@@ -46,6 +61,5 @@ export * from './interior/throat-wear-measurement.ts'
 export * from './interior/velocity-ladder.ts'
 export * from './interior/vivacity.ts'
 export * from './interior/workbench-keys.ts'
-export * from './least-squares.ts'
 export * from './load-notes.ts'
 export * from './recoil.ts'

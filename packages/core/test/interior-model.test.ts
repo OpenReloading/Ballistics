@@ -1,5 +1,5 @@
+import { bisect } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import { bisect } from '../src/bisect.ts'
 import { nth } from '../src/errors.ts'
 import {
   chargeTooSmall,
@@ -1074,7 +1074,7 @@ describe('chargeTooSmall', () => {
       return r.maxMeanPressure
     }
     const target = chargeTooSmallRatio * load.startPressure
-    const charge = bisect((c) => peak(c) < target, 1e-4, m3Load.charge, 60, true)
+    const charge = bisect((c) => peak(c) < target, [1e-4, m3Load.charge], 60, true)
     const elasticity = Math.log(peak(charge, 3.15e7) / peak(charge, 2.85e7)) / Math.log(1.05 / 0.95)
     expect(elasticity).toBeGreaterThan(0.45)
     expect(elasticity).toBeLessThan(0.55)

@@ -4,9 +4,10 @@
  * (the one-axis form of "Confidence intervals by shot count"), and the shot count that gives the
  * interval a stated width. Velocities in m/s.
  */
-import { need } from '../errors.ts'
+
 import { chiSquareQuantile } from './chi-square.ts'
-import type { Interval } from './statistics.ts'
+import { need } from './errors.ts'
+import type { Interval } from './interval.ts'
 
 /** Level of the intervals when none is given. */
 const defaultLevel = 0.95

@@ -7,6 +7,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY packages/units/package.json packages/units/
 COPY packages/locale-format/package.json packages/locale-format/
+COPY packages/statistics/package.json packages/statistics/
 COPY packages/shot-groups/package.json packages/shot-groups/
 COPY packages/schema/package.json packages/schema/
 COPY packages/importers/package.json packages/importers/
@@ -19,8 +20,10 @@ COPY apps/web/package.json apps/web/
 COPY tools/package.json tools/
 COPY apps/e2e/package.json apps/e2e/
 COPY apps/docs/package.json apps/docs/
+COPY tooling/test-kit/package.json tooling/test-kit/
 RUN pnpm install --frozen-lockfile --ignore-scripts --filter "@open-reloading/docs..."
 COPY packages packages
+COPY tooling tooling
 # the libraries the docs document and the API its REST page describes (the docs also depend on web, cli and tools,
 # whose files their tests read; the site needs no build of them)
 RUN pnpm --filter "@open-reloading/api..." --filter "@open-reloading/drawing..." --filter "@open-reloading/importers..." run build

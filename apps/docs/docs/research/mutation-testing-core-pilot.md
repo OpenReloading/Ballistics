@@ -249,7 +249,7 @@ analytic. The runs mutate the source and run the existing tests; no measured dat
 - `packages/core/src/interior/range.ts`, `packages/core/test/interior-range.test.ts`
 - `packages/core/src/groups/statistics.ts`, `packages/core/test/groups.test.ts`
 - `packages/core/src/recoil.ts`, `packages/core/test/recoil.test.ts`
-- `packages/core/src/groups/velocity-statistics.ts`, `packages/core/test/velocity-statistics.test.ts`
+- `packages/statistics/src/velocity-statistics.ts`, `packages/statistics/test/velocity-statistics.test.ts`
 - `packages/core/src/interior/velocity-ladder.ts`, `packages/core/test/interior-velocity-ladder.test.ts`
 - `packages/core/src/interior/vivacity.ts`, `packages/core/test/interior-vivacity.test.ts`
 - `packages/core/src/interior/ladder.ts`, `packages/core/test/interior-ladder.test.ts`
