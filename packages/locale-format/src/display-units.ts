@@ -1,10 +1,14 @@
-import { conversions, fromSi, type QuantityKind, toSi } from '@open-reloading/units'
+import {
+  conversions,
+  fromSi,
+  type QuantityKind,
+  toSi,
+  waterDensityGramsPerCm3,
+} from '@open-reloading/units'
 
 /**
  * Display units. Every value is held in SI; a unit converts to and from SI and has a fixed number
- * of decimals. Factors: NIST SP 811 Appendix B.8 (exact where NIST marks them exact); lb is
- * 0.45359237 kg and standard gravity 9.80665 m/s2 (ICAO Doc 7488/3), so psi and ft lbf are exact
- * products of those.
+ * of decimals. The customary factors are those of `conversions` in `@open-reloading/units`.
  */
 export interface Unit {
   /** The symbol shown after a value: "mm", "gr H₂O"; empty for a ratio. */
@@ -57,15 +61,7 @@ export interface UnitIds {
 export type Quantity = keyof UnitIds
 
 const inch = conversions.in.factor
-// factors `conversions` lacks, and the grain as the literal the app has always shown:
-// `conversions.gr` (pound / 7000) differs in the last bit
-const yard = 0.9144
-const grain = 6.479891e-5
-const pound = 0.45359237
-const poundForce = pound * 9.80665
-const footPound = conversions.ft.factor * poundForce
-/** Water at 20 °C, g/cm³: `waterDensityGramsPerCm3` of `@open-reloading/core`. */
-const waterGramsPerCm3 = 0.9982
+const grain = conversions.gr.factor
 
 /** A unit that is the stored unit of the quantity `kind`, converted by the unit table of `units`. */
 function stored(kind: QuantityKind, symbol: string, decimals: number, step?: number): Unit {
@@ -78,7 +74,7 @@ function linear(symbol: string, factor: number, decimals: number, step?: number)
 
 /** The display units of each quantity, by unit id. */
 export const unitsOf: { readonly [Q in Quantity]: { readonly [U in UnitIds[Q]]: Unit } } = {
-  range: { m: linear('m', 1, 0), yd: linear('yd', yard, 0) },
+  range: { m: linear('m', 1, 0), yd: linear('yd', conversions.yd.factor, 0) },
   length: { mm: stored('length', 'mm', 2, 0.01), in: linear('in', inch, 4, 0.0005) },
   // barrel twist, length per turn: 1:10 in on rifles and in load data, 254 mm from barrel makers and C.I.P.
   twist: { mm: stored('length', 'mm', 0), in: linear('in', inch, 1) },
@@ -93,9 +89,9 @@ export const unitsOf: { readonly [Q in Quantity]: { readonly [U in UnitIds[Q]]: 
   windSpeed: { 'm/s': linear('m/s', 1, 1), mph: linear('mph', conversions.mph.factor, 1) },
   mass: { g: stored('mass', 'g', 2), gr: linear('gr', grain, 1) },
   // a firearm's mass: bullet mass units do not fit it
-  firearmMass: { kg: linear('kg', 1, 2), lb: linear('lb', pound, 2) },
+  firearmMass: { kg: linear('kg', 1, 2), lb: linear('lb', conversions.lb.factor, 2) },
   charge: { g: stored('mass', 'g', 2, 0.01), gr: linear('gr', grain, 1, 0.1) },
-  energy: { J: linear('J', 1, 0), 'ft-lbf': linear('ft·lbf', footPound, 0) },
+  energy: { J: linear('J', 1, 0), 'ft-lbf': linear('ft·lbf', conversions['ft-lbf'].factor, 0) },
   temperature: {
     degC: stored('temperature', '°C', 1),
     degF: {
@@ -117,7 +113,7 @@ export const unitsOf: { readonly [Q in Quantity]: { readonly [U in UnitIds[Q]]: 
   // gr H2O: the volume of that mass of water
   capacity: {
     cm3: linear('cm³', 1e-6, 3),
-    grH2O: linear('gr H₂O', grain / toSi('density', waterGramsPerCm3), 1),
+    grH2O: linear('gr H₂O', grain / toSi('density', waterDensityGramsPerCm3), 1),
   },
   specificEnergy: { 'MJ/kg': linear('MJ/kg', 1e6, 3) },
   molarMass: { 'kg/kmol': stored('molarMass', 'kg/kmol', 2) },

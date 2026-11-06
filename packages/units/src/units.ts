@@ -64,10 +64,21 @@ export const units: Readonly<StoredUnits> = {
 export type QuantityKind = keyof StoredUnits
 
 /**
- * A unit of {@link conversions}: every stored unit, plus the customary units that published fits
- * and imported files are written in.
+ * A unit of {@link conversions}: every stored unit, plus the customary units that published fits,
+ * imported files and the display units are written in.
  */
-export type UnitId = StoredUnits[QuantityKind] | 'in' | 'ft' | 'gr' | 'mph' | 'inHg' | 'psi' | 'MOA'
+export type UnitId =
+  | StoredUnits[QuantityKind]
+  | 'in'
+  | 'ft'
+  | 'yd'
+  | 'gr'
+  | 'lb'
+  | 'mph'
+  | 'inHg'
+  | 'psi'
+  | 'ft-lbf'
+  | 'MOA'
 
 /** Map from a unit to SI: `si = value * factor + offset`. */
 export interface SiMap {
@@ -81,6 +92,8 @@ const scale = (factor: number): SiMap => ({ factor, offset: 0 })
 const pound = 0.45359237
 /** m per inch (exact). */
 const inch = 0.0254
+/** m per foot (exact). */
+const foot = 0.3048
 /** Standard gravity, m/s2 (exact), which defines the pound-force. */
 const gravity = 9.80665
 
@@ -111,13 +124,24 @@ export const conversions: Readonly<Record<UnitId, SiMap>> = {
   '1': scale(1),
   'lb/in2': scale(pound / inch ** 2),
   in: scale(inch),
-  ft: scale(0.3048),
-  gr: scale(pound / 7000),
+  ft: scale(foot),
+  yd: scale(0.9144),
+  // 64.79891 mg exactly; pound / 7000 lands one ulp above the double nearest to it
+  gr: scale(6.479891e-5),
+  lb: scale(pound),
   mph: scale(0.44704),
   inHg: scale(3386.389),
   psi: scale((pound * gravity) / inch ** 2),
+  'ft-lbf': scale(foot * (pound * gravity)),
   MOA: scale(Math.PI / 10800),
 }
+
+/**
+ * Water at 20 °C, g/cm³ (998.2067 kg/m³ from the table of Tanaka et al., Metrologia 38 (2001)
+ * 301, https://doi.org/10.1088/0026-1394/38/4/3; the table value is unverified, not re-read from
+ * the paper); turns a case water capacity in g or gr into a volume.
+ */
+export const waterDensityGramsPerCm3 = 0.9982
 
 /** The map to SI of each quantity's stored unit: the conversion of `units[kind]`. */
 export const siMaps: Readonly<Record<QuantityKind, SiMap>> = {

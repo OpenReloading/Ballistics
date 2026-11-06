@@ -1,7 +1,7 @@
-import { waterDensityGramsPerCm3 } from '@open-reloading/core'
 import type { PresetId, Quantity, UnitSystem } from '@open-reloading/locale-format'
 import * as locale from '@open-reloading/locale-format'
 import { fromSi, toSi } from '@open-reloading/schema'
+import { conversions, waterDensityGramsPerCm3 } from '@open-reloading/units'
 import { parseNumber } from '../i18n/number.ts'
 import { shownLanguage } from '../i18n/shown.ts'
 import { type Message, msg } from '../i18n/translate.ts'
@@ -33,20 +33,18 @@ export const waterVolume = (grams: number) =>
 export const waterGrams = (m3: number) =>
   fromSi('mass', m3 * toSi('density', waterDensityGramsPerCm3))
 
-// NIST SP 811 Appendix B.8; lb is 0.45359237 kg and standard gravity 9.80665 m/s2 (ICAO Doc 7488/3)
-export const metersPerInch = 0.0254
-export const metersPerFoot = 0.3048
-export const metersPerYard = 0.9144
-export const kilogramsPerGrain = 6.479891e-5
+// the customary factors of `conversions` in `@open-reloading/units`, by the names the app uses
+export const metersPerInch = conversions.in.factor
+export const metersPerFoot = conversions.ft.factor
+export const metersPerYard = conversions.yd.factor
+export const kilogramsPerGrain = conversions.gr.factor
 /** 1 mph in m/s. */
-export const metersPerSecondPerMph = 0.44704
-export const pascalsPerInHg = 3386.389
-/** Water density, g/cm³ (defined in core): turns a water capacity in g or gr into a volume. */
+export const metersPerSecondPerMph = conversions.mph.factor
+export const pascalsPerInHg = conversions.inHg.factor
+/** Water density, g/cm³: turns a water capacity in g or gr into a volume. */
 export { waterDensityGramsPerCm3 }
-
-const poundForce = 0.45359237 * 9.80665
-export const psi = poundForce / metersPerInch ** 2
-export const footPound = metersPerFoot * poundForce
+export const psi = conversions.psi.factor
+export const footPound = conversions['ft-lbf'].factor
 
 export const presetNames: Record<PresetId, Message> = {
   'metric-grains': msg('Metric, common use'),

@@ -50,8 +50,7 @@ function sharedFiles() {
       // the input checks (`need`, `InputError`) every core module raises its refusals with
       ...closure(join(statistics, 'errors.js'), statistics, 'statistics'),
       ...closure(join(core, 'interior/record-load.js'), core, 'core'),
-      // the water density turns every capacity into a chamber volume
-      ...closure(join(core, 'water.js'), core, 'core'),
+      // the unit table, whose water density turns every capacity into a chamber volume
       ...closure(join(units, 'units.js'), units, 'units'),
       ...closure(join(schema, 'units.js'), schema, 'schema'),
       ...closure(join(schema, 'case-capacity.js'), schema, 'schema'),
