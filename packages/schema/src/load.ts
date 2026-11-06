@@ -6,7 +6,54 @@ import { type Provenance, provenance } from './provenance.ts'
 import { text } from './shared.ts'
 import { type QuantityKind, type QuantitySchema, quantity, units } from './units.ts'
 
-const kinds = {
+/** A solver value a load may override: a key of {@link analysisKinds}. */
+export type AnalysisKey =
+  | 'volume'
+  | 'boreDiameter'
+  | 'boreArea'
+  | 'travel'
+  | 'twist'
+  | 'bulletMass'
+  | 'bulletDiameter'
+  | 'bulletLength'
+  | 'bulletBcG1'
+  | 'bulletBcG7'
+  | 'bulletBaseLength'
+  | 'bulletBaseDiameter'
+  | 'bulletCavityDiameter'
+  | 'bulletCavityDepth'
+  | 'pmax'
+  | 'caseLength'
+  | 'bulkDensity'
+  | 'propellantEnergy'
+  | 'gamma'
+  | 'density'
+  | 'covolume'
+  | 'vivacity'
+  | 'exponent'
+  | 'referencePressure'
+  | 'propellantTemperature'
+  | 'ignitionPressure'
+  | 'startPressure'
+  | 'sebert'
+  | 'formA'
+  | 'formM'
+  | 'formQ'
+  | 'formZ1'
+  | 'leakArea'
+  | 'throatWear'
+  | 'boreFriction'
+  | 'engravingPressure'
+  | 'engravingLength'
+  | 'firearmMass'
+
+/**
+ * The stored quantity of each value a load may override under `analysis.overrides`, the keys of the
+ * workbench without `charge` (the load's own `charge`). A bullet key takes the place of the
+ * referenced bullet record's value, and a ballistic coefficient replaces all bands of its drag
+ * model. The values are in the stored unit of the quantity and become SI at the solver call.
+ */
+export const analysisKinds: Readonly<Record<AnalysisKey, QuantityKind>> = {
   volume: 'volume',
   boreDiameter: 'length',
   boreArea: 'area',
@@ -45,18 +92,7 @@ const kinds = {
   engravingPressure: 'pressure',
   engravingLength: 'length',
   firearmMass: 'mass',
-} as const
-
-/** A solver value a load may override: a key of {@link analysisKinds}. */
-export type AnalysisKey = keyof typeof kinds
-
-/**
- * The stored quantity of each value a load may override under `analysis.overrides`, the keys of the
- * workbench without `charge` (the load's own `charge`). A bullet key takes the place of the
- * referenced bullet record's value, and a ballistic coefficient replaces all bands of its drag
- * model. The values are in the stored unit of the quantity and become SI at the solver call.
- */
-export const analysisKinds: Readonly<Record<AnalysisKey, QuantityKind>> = kinds
+}
 
 const ladderStepKindsLiteral = {
   charge: 'mass',

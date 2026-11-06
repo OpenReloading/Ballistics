@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import type { Exact } from './exact.ts'
 import { recordId, ref } from './ids.ts'
 import { hexColour, localId } from './shared.ts'
 
@@ -11,8 +12,7 @@ const imagePoint = z
 const meters = () => z.number().meta({ unit: 'm' })
 const positiveMeters = () => z.number().positive().meta({ unit: 'm' })
 
-/** A scale or perspective reference on the photo. Inferred type: {@link CalibrationReference}. */
-export const calibrationReference = z.discriminatedUnion('kind', [
+const calibrationReferenceParser = z.discriminatedUnion('kind', [
   z.object({
     kind: z.literal('line').describe('Two points a known length apart.'),
     a: imagePoint,
@@ -42,11 +42,55 @@ export const calibrationReference = z.discriminatedUnion('kind', [
   }),
 ])
 
-/**
- * One shot of a group in target m, x right, y up. Not a chronograph `shot`.
- * Inferred type: {@link GroupShot}.
- */
-export const groupShot = z.object({
+/** A scale or perspective reference on the photo. Inferred type: {@link CalibrationReference}. */
+export const calibrationReference: z.ZodDiscriminatedUnion<
+  [
+    z.ZodObject<{
+      kind: z.ZodLiteral<'line'>
+      a: z.ZodObject<{ x: z.ZodNumber; y: z.ZodNumber }>
+      b: z.ZodObject<{ x: z.ZodNumber; y: z.ZodNumber }>
+      length: z.ZodNumber
+    }>,
+    z.ZodObject<{
+      kind: z.ZodLiteral<'ringCentre'>
+      centre: z.ZodObject<{ x: z.ZodNumber; y: z.ZodNumber }>
+      edge: z.ZodObject<{ x: z.ZodNumber; y: z.ZodNumber }>
+      diameter: z.ZodNumber
+    }>,
+    z.ZodObject<{
+      kind: z.ZodLiteral<'ringEdge'>
+      points: z.ZodTuple<
+        [
+          z.ZodObject<{ x: z.ZodNumber; y: z.ZodNumber }>,
+          z.ZodObject<{ x: z.ZodNumber; y: z.ZodNumber }>,
+          z.ZodObject<{ x: z.ZodNumber; y: z.ZodNumber }>,
+        ],
+        null
+      >
+      diameter: z.ZodNumber
+    }>,
+    z.ZodObject<{
+      kind: z.ZodLiteral<'rectangle'>
+      corners: z.ZodTuple<
+        [
+          z.ZodObject<{ x: z.ZodNumber; y: z.ZodNumber }>,
+          z.ZodObject<{ x: z.ZodNumber; y: z.ZodNumber }>,
+          z.ZodObject<{ x: z.ZodNumber; y: z.ZodNumber }>,
+          z.ZodObject<{ x: z.ZodNumber; y: z.ZodNumber }>,
+        ],
+        null
+      >
+      width: z.ZodNumber
+      height: z.ZodNumber
+    }>,
+  ],
+  'kind'
+> = calibrationReferenceParser satisfies Exact<
+  typeof calibrationReference,
+  typeof calibrationReferenceParser
+>
+
+const groupShotParser = z.object({
   x: meters().describe('Right of the target origin, m.'),
   y: meters().describe('Up from the target origin, m.'),
   excluded: z.boolean().describe('Left out of the statistics, still shown.').optional(),
@@ -69,11 +113,19 @@ export const groupShot = z.object({
 })
 
 /**
- * The shots at one distance on a sheet, in target m (x right, y up), with the point of aim, the
- * hole detection choices and the ring-scoring face.
- * Inferred type: {@link ShotGroup}.
+ * One shot of a group in target m, x right, y up. Not a chronograph `shot`.
+ * Inferred type: {@link GroupShot}.
  */
-export const shotGroup = z.object({
+export const groupShot: z.ZodObject<{
+  x: z.ZodNumber
+  y: z.ZodNumber
+  excluded: z.ZodOptional<z.ZodBoolean>
+  placement: z.ZodEnum<z.core.util.ToEnum<'detected' | 'placed'>>
+  holeDiameter: z.ZodOptional<z.ZodNumber>
+  chrono: z.ZodOptional<z.ZodObject<{ session: z.ZodString; string: z.ZodInt; shot: z.ZodInt }>>
+}> = groupShotParser satisfies Exact<typeof groupShot, typeof groupShotParser>
+
+const shotGroupParser = z.object({
   id: localId.describe('Id of the group, unique in the sheet.'),
   name: z.string().min(1).max(200).describe('Name of the group.'),
   colour: hexColour.describe('Colour of the group, `#rrggbb`.'),
@@ -153,10 +205,39 @@ export const shotGroup = z.object({
 })
 
 /**
- * A text on the target in target m; `{key.unit}` placeholders show values of `group`.
- * Inferred type: {@link SheetNote}.
+ * The shots at one distance on a sheet, in target m (x right, y up), with the point of aim, the
+ * hole detection choices and the ring-scoring face.
+ * Inferred type: {@link ShotGroup}.
  */
-export const sheetNote = z.object({
+export const shotGroup: z.ZodObject<{
+  id: z.ZodString
+  name: z.ZodString
+  colour: z.ZodString
+  distance: z.ZodNumber
+  aim: z.ZodOptional<z.ZodObject<{ x: z.ZodNumber; y: z.ZodNumber }>>
+  ladderStep: z.ZodOptional<z.ZodInt>
+  shots: z.ZodArray<typeof groupShot>
+  detection: z.ZodOptional<
+    z.ZodObject<{
+      region: z.ZodOptional<z.ZodArray<z.ZodObject<{ x: z.ZodNumber; y: z.ZodNumber }>>>
+      expectedHoleDiameter: z.ZodOptional<z.ZodNumber>
+      backing: z.ZodOptional<z.ZodString>
+      minContrast: z.ZodOptional<z.ZodNumber>
+      polarity: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'dark' | 'light'>>>
+    }>
+  >
+  face: z.ZodOptional<
+    z.ZodObject<{
+      id: z.ZodString
+      event: z.ZodOptional<z.ZodString>
+      marks: z.ZodOptional<
+        z.ZodArray<z.ZodObject<{ ring: z.ZodInt; x: z.ZodNumber; y: z.ZodNumber }>>
+      >
+    }>
+  >
+}> = shotGroupParser satisfies Exact<typeof shotGroup, typeof shotGroupParser>
+
+const sheetNoteParser = z.object({
   id: localId.describe('Id of the note, unique in the sheet.'),
   x: meters().describe('Right of the target origin, m.'),
   y: meters().describe('Up from the target origin, m.'),
@@ -166,6 +247,18 @@ export const sheetNote = z.object({
     .describe('Text of the note. `{key.unit}` placeholders show values of `group`.'),
   group: localId.describe('Id of the group whose values the placeholders show.').optional(),
 })
+
+/**
+ * A text on the target in target m; `{key.unit}` placeholders show values of `group`.
+ * Inferred type: {@link SheetNote}.
+ */
+export const sheetNote: z.ZodObject<{
+  id: z.ZodString
+  x: z.ZodNumber
+  y: z.ZodNumber
+  text: z.ZodString
+  group: z.ZodOptional<z.ZodString>
+}> = sheetNoteParser satisfies Exact<typeof sheetNote, typeof sheetNoteParser>
 
 const optionalFlag = (description: string) => z.boolean().describe(description).optional()
 const overlaySwitches = z
@@ -183,12 +276,7 @@ const overlaySwitches = z
   })
   .describe('Overlay switches of the editor, as the sheet was last shown.')
 
-/**
- * A target sheet: a photo (a user file, kept on the device) or a drawn target, its calibration and
- * its shot groups. Shots are in target m, so a new calibration keeps them on the target.
- * Inferred type: {@link TargetSheet}.
- */
-export const targetSheet = z
+const targetSheetParser = z
   .object({
     photo: localId
       .describe(
@@ -240,6 +328,37 @@ export const targetSheet = z
         issue(['groups', i, 'ladderStep'], 'A ladder step needs a load')
     })
   })
+
+/**
+ * A target sheet: a photo (a user file, kept on the device) or a drawn target, its calibration and
+ * its shot groups. Shots are in target m, so a new calibration keeps them on the target.
+ * Inferred type: {@link TargetSheet}.
+ */
+export const targetSheet: z.ZodObject<{
+  photo: z.ZodOptional<z.ZodString>
+  references: z.ZodArray<typeof calibrationReference>
+  targetRotation: z.ZodNumber
+  targetOrigin: z.ZodOptional<z.ZodObject<{ x: z.ZodNumber; y: z.ZodNumber }>>
+  photoRotation: z.ZodOptional<z.ZodNumber>
+  groups: z.ZodArray<typeof shotGroup>
+  load: z.ZodOptional<z.ZodString>
+  markerDiameter: z.ZodOptional<z.ZodNumber>
+  notes: z.ZodOptional<z.ZodArray<typeof sheetNote>>
+  overlays: z.ZodOptional<
+    z.ZodObject<{
+      spread: z.ZodOptional<z.ZodBoolean>
+      box: z.ZodOptional<z.ZodBoolean>
+      aim: z.ZodOptional<z.ZodBoolean>
+      ellipses: z.ZodOptional<z.ZodBoolean>
+      dispersion: z.ZodOptional<z.ZodBoolean>
+      axis: z.ZodOptional<z.ZodBoolean>
+      excluded: z.ZodOptional<z.ZodBoolean>
+      numbers: z.ZodOptional<z.ZodBoolean>
+      stats: z.ZodOptional<z.ZodBoolean>
+      rings: z.ZodOptional<z.ZodBoolean>
+    }>
+  >
+}> = targetSheetParser satisfies Exact<typeof targetSheet, typeof targetSheetParser>
 
 /** A scale or perspective reference on a target photo: line, ring or rectangle. */
 export type CalibrationReference = z.infer<typeof calibrationReference>
