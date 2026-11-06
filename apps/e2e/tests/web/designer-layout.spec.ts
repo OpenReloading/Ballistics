@@ -142,8 +142,10 @@ test('a changed field goes back to the record value by its own button, and the r
   await storeUnits(page)
   await page.setViewportSize({ width: 1280, height: 650 })
   await gotoHydrated(page, '/bullets/designer?from=demo-bullet-168')
+  // the record loads after hydration, and a new bullet already shows the same diameter: an edit
+  // before the record arrives has no record value to go back to
+  await expect(page.getByText(/^Started from .*30 Cal 168 gr HPBT Demo\.$/)).toBeVisible()
   const diameter = page.getByRole('textbox', { name: /Diameter \(mm\)$/ })
-  await expect(diameter).not.toHaveValue('')
   const record = await diameter.inputValue()
   await diameter.fill('7.9')
   await diameter.blur()
