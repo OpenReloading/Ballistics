@@ -1,10 +1,10 @@
 /**
  * Probability of a hit and expected score on a target face from a point dispersion
  * (`apps/docs/docs/models/hit-probability.md`). SI throughout: lengths m, speeds m/s, angles rad.
+ * A refusal is an `InputError` with a `HitIssue`.
  */
 
-import { chiSquareCdf } from '@open-reloading/statistics'
-import { need, nth } from '../errors.ts'
+import { chiSquareCdf, need, nth } from '@open-reloading/statistics'
 
 /** A scoring zone: an ellipse about the aim point with the value a hit inside it scores. */
 export interface ScoringZone {
@@ -81,28 +81,25 @@ export interface DispersionResult extends PointDispersion {
  * distance is added: the height part grows faster than the distance.
  */
 export function pointDispersion(i: DispersionInput): DispersionResult {
-  need(i.referenceDistance > 0 && i.distance > 0, 'distances must be positive')
-  need(i.group.horizontal > 0 && i.group.vertical > 0, 'the group dispersion must be positive')
+  need(i.referenceDistance > 0 && i.distance > 0, { code: 'distances', params: {} })
+  need(i.group.horizontal > 0 && i.group.vertical > 0, { code: 'group-dispersion', params: {} })
   const k = i.distance / i.referenceDistance
   let velocity = 0
   let intrinsic = i.group.vertical
   if (i.velocity) {
-    need(i.velocity.sd >= 0, 'the speed spread must not be negative')
+    need(i.velocity.sd >= 0, { code: 'speed-spread', params: {} })
     const atReference = Math.abs(i.velocity.referenceVerticalPerSpeed) * i.velocity.sd
-    need(
-      atReference < i.group.vertical,
-      'the height spread from the muzzle speed exceeds the vertical spread of the group',
-    )
+    need(atReference < i.group.vertical, { code: 'speed-height', params: {} })
     intrinsic = Math.sqrt(i.group.vertical ** 2 - atReference ** 2)
     velocity = Math.abs(i.velocity.verticalPerSpeed) * i.velocity.sd
   }
   const group = { horizontal: i.group.horizontal * k, vertical: intrinsic * k }
   let wind = 0
   if (i.wind) {
-    need(
-      i.wind.speed >= 0 && i.wind.speedSd >= 0 && i.wind.directionSd >= 0,
-      'wind inputs must not be negative',
-    )
+    need(i.wind.speed >= 0 && i.wind.speedSd >= 0 && i.wind.directionSd >= 0, {
+      code: 'wind',
+      params: {},
+    })
     const crosswindSd = Math.hypot(
       Math.sin(i.wind.from) * i.wind.speedSd,
       i.wind.speed * Math.cos(i.wind.from) * i.wind.directionSd,
@@ -111,7 +108,7 @@ export function pointDispersion(i: DispersionInput): DispersionResult {
   }
   let range = 0
   if (i.range) {
-    need(i.range.sd >= 0, 'the range uncertainty must not be negative')
+    need(i.range.sd >= 0, { code: 'range-uncertainty', params: {} })
     range = Math.abs(i.range.verticalPerMetre) * i.range.sd
   }
   return {
@@ -146,11 +143,11 @@ export function ellipseProbability(
   d: PointDispersion,
   offset?: PointOffset,
 ): number {
-  need(a > 0 && b > 0, 'the semi-axes must be positive')
-  need(d.horizontal > 0 && d.vertical > 0, 'the standard deviations must be positive')
+  need(a > 0 && b > 0, { code: 'semi-axes', params: {} })
+  need(d.horizontal > 0 && d.vertical > 0, { code: 'standard-deviations', params: {} })
   const dx = offset?.dx ?? 0
   const dy = offset?.dy ?? 0
-  need(Number.isFinite(dx) && Number.isFinite(dy), 'the offset must be finite')
+  need(Number.isFinite(dx) && Number.isFinite(dy), { code: 'offset', params: {} })
   const xLow = Math.max(-a, dx - 8 * d.horizontal)
   const xHigh = Math.min(a, dx + 8 * d.horizontal)
   if (xLow >= xHigh) return 0
@@ -164,10 +161,15 @@ export function ellipseProbability(
     normalCdf((c - dy) / d.vertical) - normalCdf((-c - dy) / d.vertical)
   const inside = dy === 0 ? centred : shifted
   const f = (t: number) => density(a * Math.sin(t)) * inside(b * Math.cos(t)) * a * Math.cos(t)
+  return Math.min(1, simpson(f, t0, t1))
+}
+
+/** The integral of `f` from `t0` to `t1` by the composite Simpson rule of `simpsonIntervals` intervals. */
+function simpson(f: (t: number) => number, t0: number, t1: number): number {
   const h = (t1 - t0) / simpsonIntervals
   let sum = f(t0) + f(t1)
   for (let k = 1; k < simpsonIntervals; k++) sum += f(t0 + k * h) * (k % 2 === 1 ? 4 : 2)
-  return Math.min(1, (sum * h) / 3)
+  return (sum * h) / 3
 }
 
 /** Shots to fire for a wanted chance of at least one hit, and the mean number of shots to the first hit. */
@@ -180,12 +182,12 @@ export interface ShotsToHit {
 
 /**
  * From the probability `p` of a hit with one shot, the smallest whole number n of independent shots
- * with 1 - (1 - p)^n >= `wanted` (`ln(1 - wanted) / ln(1 - p)` rounded up), and the mean number of
+ * with `1 - (1 - p)^n >= wanted` (`ln(1 - wanted) / ln(1 - p)` rounded up), and the mean number of
  * shots to the first hit.
  */
 export function shotsToHit(p: number, wanted: number): ShotsToHit {
-  need(p >= 0 && p <= 1, 'the hit probability must be between 0 and 1')
-  need(wanted > 0 && wanted < 1, 'the wanted probability must be between 0 and 1 exclusive')
+  need(p >= 0 && p <= 1, { code: 'hit-probability', params: {} })
+  need(wanted > 0 && wanted < 1, { code: 'wanted-probability', params: {} })
   if (p === 0) return { shots: Number.POSITIVE_INFINITY, mean: Number.POSITIVE_INFINITY }
   if (p === 1) return { shots: 1, mean: 1 }
   // the tolerance keeps an exact whole result (p = 0.5, wanted = 0.75) from rounding up by rounding error
@@ -213,7 +215,7 @@ export function hitProbability(
   d: PointDispersion,
   offset?: PointOffset,
 ): HitResult {
-  need(zones.length > 0, 'a face needs at least one zone')
+  need(zones.length > 0, { code: 'zones', params: {} })
   const inside = zones.map((z) => ellipseProbability(z.halfWidth, z.halfHeight, d, offset))
   const parts = zones.map((z, k) => ({
     value: z.value,

@@ -243,7 +243,7 @@ analytic. The runs mutate the source and run the existing tests; no measured dat
 
 - `packages/core/src/exterior/atmosphere.ts`, `packages/core/test/exterior-atmosphere.test.ts`
 - `packages/core/src/interior/form.ts`, `packages/core/test/interior-form.test.ts`
-- `packages/core/src/groups/hit-probability.ts`, `packages/core/test/hit-probability.test.ts`
+- `packages/shot-groups/src/hit-probability.ts`, `packages/shot-groups/test/hit-probability.test.ts`
 - `packages/core/src/exterior/drag.ts`, `packages/core/test/exterior-drag.test.ts`
 - `packages/core/src/exterior/stability.ts`, `packages/core/test/exterior-stability.test.ts`
 - `packages/core/src/interior/range.ts`, `packages/core/test/interior-range.test.ts`

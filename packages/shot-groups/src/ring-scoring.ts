@@ -3,10 +3,10 @@
  * face to ring marks on a sheet. Shots and holes in target m relative to the face centre, as the
  * target sheet stores them; face records in mm. A refusal is a `RingFitIssue` or a `GroupIssue`.
  */
+import { type Diagnostic, nth } from '@open-reloading/statistics'
 import { fromSi, toSi } from '@open-reloading/units'
 import { type Point, solveLinear } from './geometry.ts'
-import type { Diagnostic, RingFitIssue } from './issue.ts'
-import { nth } from './nth.ts'
+import type { RingFitIssue } from './issue.ts'
 
 /** A length of a face record in its stored unit, mm. */
 export interface FaceLength {

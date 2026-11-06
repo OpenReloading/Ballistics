@@ -217,6 +217,9 @@ importers:
       '@open-reloading/shot-groups':
         specifier: workspace:*
         version: link:../../packages/shot-groups
+      '@open-reloading/statistics':
+        specifier: workspace:*
+        version: link:../../packages/statistics
       '@open-reloading/units':
         specifier: workspace:*
         version: link:../../packages/units
@@ -525,6 +528,9 @@ importers:
 
   packages/shot-groups:
     dependencies:
+      '@open-reloading/statistics':
+        specifier: workspace:*
+        version: link:../statistics
       '@open-reloading/units':
         specifier: workspace:*
         version: link:../units

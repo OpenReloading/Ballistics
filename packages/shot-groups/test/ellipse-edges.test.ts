@@ -1,3 +1,4 @@
+import { seededUniforms } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
 import {
   type Conic,
@@ -10,7 +11,6 @@ import {
   mapConic,
   ransacEllipse,
   sampson,
-  seededRandom,
 } from '../src/ellipse.ts'
 
 // The refusals and special cases of the conic code: degenerate, imaginary and centred conics.
@@ -63,7 +63,7 @@ describe('ransacEllipse at its limits', () => {
   })
 
   it('skips samples without a fit and grows the inliers by refitting', () => {
-    const rnd = seededRandom(5)
+    const rnd = seededUniforms(5)
     const noisy = ring(truth, 80).map((p) => ({
       x: p.x + (rnd() - 0.5),
       y: p.y + (rnd() - 0.5),
@@ -72,7 +72,7 @@ describe('ransacEllipse at its limits', () => {
     const fit = ransacEllipse(
       repeated,
       { tolerance: 0.4, minPoints: 6, rounds: 40 },
-      seededRandom(2),
+      seededUniforms(2),
     )
     expect(fit?.inliers.length).toBeGreaterThan(40)
   })

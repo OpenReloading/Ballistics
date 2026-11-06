@@ -1,17 +1,29 @@
+/** A typed diagnostic: a code and the values its message needs, empty when it needs none. */
+export type Diagnostic<C extends string = string, P extends object = Record<string, never>> = {
+  code: C
+  params: P
+}
+
 /**
  * Error the logic packages raise on purpose: an input outside the model, or a computation that does
  * not finish within the limits its inputs set. It extends `RangeError`; other errors are defects.
+ * A package that words nothing raises it with a typed `issue` (its code is the message); the others
+ * still raise it with an English message and no issue.
  */
 export class InputError extends RangeError {
-  constructor(message: string) {
-    super(message)
+  /** The typed refusal; undefined for one raised with an English message. */
+  readonly issue: Diagnostic<string, object> | undefined
+
+  constructor(refusal: string | Diagnostic<string, object>) {
+    super(typeof refusal === 'string' ? refusal : refusal.code)
     this.name = 'InputError'
+    this.issue = typeof refusal === 'string' ? undefined : refusal
   }
 }
 
-/** Throws an `InputError` with `message` unless `ok`. */
-export function need(ok: boolean, message: string): void {
-  if (!ok) throw new InputError(message)
+/** Throws an `InputError` with `refusal`, an English message or a typed issue, unless `ok`. */
+export function need(ok: boolean, refusal: string | Diagnostic<string, object>): void {
+  if (!ok) throw new InputError(refusal)
 }
 
 /**

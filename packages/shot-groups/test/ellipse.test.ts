@@ -1,3 +1,4 @@
+import { seededUniforms } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
 import {
   concentricPlane,
@@ -11,7 +12,6 @@ import {
   meanRadius,
   ransacEllipse,
   sampson,
-  seededRandom,
 } from '../src/ellipse.ts'
 import { apply3 } from '../src/geometry.ts'
 
@@ -33,7 +33,7 @@ describe('fitEllipse', () => {
   })
 
   it('recovers an ellipse from a 140 degree arc with 0.3 px noise', () => {
-    const rnd = seededRandom(3)
+    const rnd = seededUniforms(3)
     const pts = ring(truth, 200, 0.4, 0.4 + (140 * Math.PI) / 180).map((p) => ({
       x: p.x + 0.3 * (rnd() - 0.5) * 2,
       y: p.y + 0.3 * (rnd() - 0.5) * 2,
@@ -66,10 +66,14 @@ describe('fitEllipse', () => {
 
 describe('ransacEllipse', () => {
   it('fits the ellipse through 40 % points that belong to nothing', () => {
-    const rnd = seededRandom(5)
+    const rnd = seededUniforms(5)
     const good = ring(truth, 150)
     const junk = Array.from({ length: 100 }, () => ({ x: 600 * rnd(), y: 450 * rnd() }))
-    const fit = ransacEllipse([...good, ...junk], { tolerance: 1, minPoints: 100 }, seededRandom(2))
+    const fit = ransacEllipse(
+      [...good, ...junk],
+      { tolerance: 1, minPoints: 100 },
+      seededUniforms(2),
+    )
     expect(fit).toBeDefined()
     if (!fit) return
     expect(Math.abs(meanRadius(fit.ellipse) / meanRadius(truth) - 1)).toBeLessThan(0.01)
@@ -77,14 +81,14 @@ describe('ransacEllipse', () => {
   })
 
   it('gives nothing without enough support, or for a shape the caller refuses', () => {
-    const rnd = seededRandom(8)
+    const rnd = seededUniforms(8)
     const junk = Array.from({ length: 80 }, () => ({ x: 600 * rnd(), y: 450 * rnd() }))
-    expect(ransacEllipse(junk, { tolerance: 1, minPoints: 60 }, seededRandom(1))).toBeUndefined()
+    expect(ransacEllipse(junk, { tolerance: 1, minPoints: 60 }, seededUniforms(1))).toBeUndefined()
     expect(
       ransacEllipse(
         ring(truth),
         { tolerance: 1, minPoints: 50, accept: (e) => e.semiMajor < 100 },
-        seededRandom(1),
+        seededUniforms(1),
       ),
     ).toBeUndefined()
   })
