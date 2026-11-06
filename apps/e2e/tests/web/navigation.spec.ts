@@ -175,7 +175,8 @@ test('the Alpha badge gives its note by pointer and keyboard, and the open note 
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 800 })
-  await page.goto('/session')
+  // a hover before the header is hydrated is lost (tooltip-hover.spec.ts)
+  await gotoHydrated(page, '/session')
   const brand = page.locator('.mantine-AppShell-header .brand')
   const note = page.getByRole('tooltip', {
     name: 'Alpha version: breaking changes are to be expected.',
