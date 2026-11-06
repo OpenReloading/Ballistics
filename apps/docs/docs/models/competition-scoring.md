@@ -16,7 +16,7 @@ $$
 P = \max\left(0,\ \sum_{z \in \{A, C, D, \text{metal}\}} n_z\, p_{z,\phi} - m\, q_{\text{miss}} - s\, q_{\text{no-shoot}} - r\, q_{\text{procedural}}\right)
 $$
 
-Code: `packages/core/src/competition/scoring.ts`, `stageRawPoints`.
+Code: `packages/shot-groups/src/competition-scoring.ts`, `stageRawPoints`.
 
 The hit factor is the points over the stage time (IPSC 9.2.1.1, USPSA 9.2.3.1):
 
@@ -24,7 +24,7 @@ $$
 H = \frac{P}{t}
 $$
 
-Code: `packages/core/src/competition/scoring.ts`, `hitFactor`.
+Code: `packages/shot-groups/src/competition-scoring.ts`, `hitFactor`.
 
 The stage points of a match give the best hit factor of the stage the stage's maximum points and every other competitor points in proportion. That needs the hit factors of all competitors, which a person's own record does not have. So the stage points are typed from the official result (`stagePoints`), and the event total (IPSC 9.2.3) is their sum, given only when every stage has them:
 
@@ -32,7 +32,7 @@ $$
 T = \sum_k S_k
 $$
 
-Code: `packages/core/src/competition/scoring.ts`, `practicalEventTotals`.
+Code: `packages/shot-groups/src/competition-scoring.ts`, `practicalEventTotals`.
 
 The no-shoot cap of a rule book (IPSC: two hits per no-shoot, 9.4.2) is applied by the person counting the penalized hits; the record holds that count.
 
@@ -44,11 +44,11 @@ $$
 R = \sum_j \sum_i v_{ij}
 $$
 
-Code: `packages/core/src/competition/scoring.ts`, `ringTotal`, `ringEventTotals`.
+Code: `packages/shot-groups/src/competition-scoring.ts`, `ringTotal`, `ringEventTotals`.
 
 ## Fit to the event type
 
-The scoring trusts that an event fits its type. `eventMismatches` (`packages/core/src/competition/scoring.ts`) names where it does not: a level the type does not list, results of another scoring method, a division the type does not list, or a stage scored major in a division without a major rating. A ring value is a whole ring or tenths, and a series that gives both its shots and its total must agree; the schema refuses anything else.
+The scoring trusts that an event fits its type. `eventMismatches` (`packages/shot-groups/src/competition-scoring.ts`) names where it does not: a level the type does not list, results of another scoring method, a division the type does not list, or a stage scored major in a division without a major rating. A ring value is a whole ring or tenths, and a series that gives both its shots and its total must agree; the schema refuses anything else.
 
 ## Result state
 

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import type { Exact } from './exact.ts'
 import { catalogueRef, recordId } from './ids.ts'
 import { primerSizes } from './primer.ts'
 import { provenance } from './provenance.ts'
@@ -29,17 +30,23 @@ const printedText = (kind: QuantityKind, value: z.ZodNumber = z.number()) =>
 /** Units a pressure is printed in. `CUP` and `LUP` are crusher units, not converted to bar. */
 const pressureUnits = z.enum(['bar', 'psi', 'CUP', 'LUP'])
 
-/**
- * Marks a table prints with a stated meaning. `proof-tested`: tested by a proof house.
- * Inferred type: {@link PublishedMark}.
- */
-export const publishedMarks = z.enum([
+const publishedMarksParser = z.enum([
   'compressed',
   'do-not-reduce',
   'subsonic',
   'reduced-recoil',
   'proof-tested',
 ])
+
+/**
+ * Marks a table prints with a stated meaning. `proof-tested`: tested by a proof house.
+ * Inferred type: {@link PublishedMark}.
+ */
+export const publishedMarks: z.ZodEnum<
+  z.core.util.ToEnum<
+    'compressed' | 'do-not-reduce' | 'subsonic' | 'reduced-recoil' | 'proof-tested'
+  >
+> = publishedMarksParser satisfies Exact<typeof publishedMarks, typeof publishedMarksParser>
 
 /** A mark of {@link publishedMarks}. */
 export type PublishedMark = z.infer<typeof publishedMarks>
@@ -101,13 +108,7 @@ const publishedCharge = z.strictObject({
     .optional(),
 })
 
-/**
- * The primer of a load as the table prints it. `records` is set only through an explicit alias, never
- * by matching; `size` and `magnum` only where the printed text states a size class, never from a
- * model number.
- * Inferred type: {@link PublishedPrimer}.
- */
-export const publishedPrimer = z.strictObject({
+const publishedPrimerParser = z.strictObject({
   printed: z.string().min(1).describe('The primer as printed, `Demo 101 und 102` whole.'),
   records: z
     .array(catalogueRef('primer'))
@@ -118,15 +119,26 @@ export const publishedPrimer = z.strictObject({
   magnum: z.boolean().describe('Whether the printed text states a magnum primer.').optional(),
 })
 
+/**
+ * The primer of a load as the table prints it. `records` is set only through an explicit alias, never
+ * by matching; `size` and `magnum` only where the printed text states a size class, never from a
+ * model number.
+ * Inferred type: {@link PublishedPrimer}.
+ */
+export const publishedPrimer: z.ZodObject<
+  {
+    printed: z.ZodString
+    records: z.ZodOptional<z.ZodArray<z.ZodString>>
+    size: z.ZodOptional<typeof primerSizes>
+    magnum: z.ZodOptional<z.ZodBoolean>
+  },
+  z.core.$strict
+> = publishedPrimerParser satisfies Exact<typeof publishedPrimer, typeof publishedPrimerParser>
+
 /** A primer as printed, with the catalogue primers it is an alias of. */
 export interface PublishedPrimer extends z.infer<typeof publishedPrimer> {}
 
-/**
- * One load of a table: the recipe printed once, with its charges. The `id` is unique in the file and
- * the loads are sorted by it, so a re-import edits loads in place.
- * Inferred type: {@link PublishedLoad}.
- */
-export const publishedLoad = z
+const publishedLoadParser = z
   .strictObject({
     id: recordId.describe('Key of the load in its file, without edition or page.'),
     bullet: z.strictObject({
@@ -177,13 +189,134 @@ export const publishedLoad = z
   })
 
 /**
- * The load rows of one table for one cartridge: `records/loads/<cartridge id>/<id>.json`. A maker's
- * own table has the maker's id as `id`, a table of loads its customers sent `<maker>-customer`.
- * Maker data carries no project licence: a source states the maker as `publisher`, and the maker's
- * terms where it states any.
- * Inferred type: {@link PublishedLoads}.
+ * One load of a table: the recipe printed once, with its charges. The `id` is unique in the file and
+ * the loads are sorted by it, so a re-import edits loads in place.
+ * Inferred type: {@link PublishedLoad}.
  */
-export const publishedLoads = z
+export const publishedLoad: z.ZodObject<
+  {
+    id: typeof recordId
+    bullet: z.ZodObject<
+      {
+        printed: z.ZodString
+        mass: z.ZodObject<
+          { value: z.ZodNumber; raw: z.ZodString; assumedUnit: z.ZodOptional<z.ZodString> },
+          z.core.$strict
+        >
+        diameter: z.ZodOptional<
+          z.ZodObject<
+            { value: z.ZodNumber; raw: z.ZodString; assumedUnit: z.ZodOptional<z.ZodString> },
+            z.core.$strict
+          >
+        >
+        record: z.ZodOptional<z.ZodString>
+      },
+      z.core.$strict
+    >
+    powder: z.ZodObject<
+      { printed: z.ZodString; record: z.ZodOptional<z.ZodString> },
+      z.core.$strict
+    >
+    primer: z.ZodOptional<typeof publishedPrimer>
+    case: z.ZodOptional<z.ZodString>
+    coal: z.ZodOptional<
+      z.ZodObject<
+        {
+          value: z.ZodOptional<z.ZodNumber>
+          raw: z.ZodString
+          assumedUnit: z.ZodOptional<z.ZodString>
+          limit: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'min' | 'max'>>>
+        },
+        z.core.$strict
+      >
+    >
+    barrel: z.ZodOptional<
+      z.ZodObject<
+        {
+          length: z.ZodOptional<
+            z.ZodObject<
+              { value: z.ZodNumber; raw: z.ZodString; assumedUnit: z.ZodOptional<z.ZodString> },
+              z.core.$strict
+            >
+          >
+          twist: z.ZodOptional<
+            z.ZodObject<
+              { value: z.ZodNumber; raw: z.ZodString; assumedUnit: z.ZodOptional<z.ZodString> },
+              z.core.$strict
+            >
+          >
+        },
+        z.core.$strict
+      >
+    >
+    charges: z.ZodArray<
+      z.ZodObject<
+        {
+          kind: z.ZodEnum<z.core.util.ToEnum<'start' | 'max' | 'single' | 'recommended'>>
+          charge: z.ZodObject<
+            { value: z.ZodNumber; raw: z.ZodString; assumedUnit: z.ZodOptional<z.ZodString> },
+            z.core.$strict
+          >
+          velocity: z.ZodOptional<
+            z.ZodObject<
+              {
+                value: z.ZodNumber
+                raw: z.ZodString
+                assumedUnit: z.ZodOptional<z.ZodString>
+                point: z.ZodOptional<
+                  z.ZodObject<
+                    {
+                      label: z.ZodString
+                      distance: z.ZodOptional<
+                        z.ZodObject<
+                          {
+                            value: z.ZodNumber
+                            raw: z.ZodString
+                            assumedUnit: z.ZodOptional<z.ZodString>
+                          },
+                          z.core.$strict
+                        >
+                      >
+                    },
+                    z.core.$strict
+                  >
+                >
+              },
+              z.core.$strict
+            >
+          >
+          pressure: z.ZodOptional<
+            z.ZodObject<
+              {
+                unit: z.ZodEnum<z.core.util.ToEnum<'bar' | 'psi' | 'CUP' | 'LUP'>>
+                peak: z.ZodObject<
+                  {
+                    value: z.ZodOptional<z.ZodNumber>
+                    raw: z.ZodString
+                    assumedUnit: z.ZodOptional<z.ZodString>
+                  },
+                  z.core.$strict
+                >
+                method: z.ZodOptional<typeof pressureMethod>
+                methodBasis: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'stated' | 'from-unit'>>>
+              },
+              z.core.$strict
+            >
+          >
+          marks: z.ZodOptional<z.ZodArray<typeof publishedMarks>>
+          printedMarks: z.ZodOptional<z.ZodArray<z.ZodString>>
+        },
+        z.core.$strict
+      >
+    >
+    source: z.ZodOptional<z.ZodInt>
+    page: z.ZodString
+    url: z.ZodOptional<z.ZodURL>
+  },
+  z.core.$strict
+> = publishedLoadParser satisfies Exact<typeof publishedLoad, typeof publishedLoadParser>
+
+const publishedLoadsParser = z
   .strictObject({
     id: recordId,
     maker: recordId.describe('Manufacturer record that publishes the table.'),
@@ -220,6 +353,26 @@ export const publishedLoads = z
         })
     })
   })
+
+/**
+ * The load rows of one table for one cartridge: `records/loads/<cartridge id>/<id>.json`. A maker's
+ * own table has the maker's id as `id`, a table of loads its customers sent `<maker>-customer`.
+ * Maker data carries no project licence: a source states the maker as `publisher`, and the maker's
+ * terms where it states any.
+ * Inferred type: {@link PublishedLoads}.
+ */
+export const publishedLoads: z.ZodObject<
+  {
+    id: typeof recordId
+    maker: typeof recordId
+    producedBy: z.ZodEnum<z.core.util.ToEnum<'maker' | 'customer'>>
+    cartridgeName: z.ZodString
+    cartridge: z.ZodString
+    loads: z.ZodArray<typeof publishedLoad>
+    provenance: typeof provenance
+  },
+  z.core.$strict
+> = publishedLoadsParser satisfies Exact<typeof publishedLoads, typeof publishedLoadsParser>
 
 /** One load of a table: bullet, powder, primer, case, COAL and barrel as printed, and its charges. */
 export interface PublishedLoad extends z.infer<typeof publishedLoad> {}

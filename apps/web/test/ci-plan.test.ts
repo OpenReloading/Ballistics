@@ -137,10 +137,10 @@ it('prerenders every record when record data, page code or shared parts changed'
 })
 
 const packages =
-  '--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/statistics --filter @open-reloading/ballistics --filter @open-reloading/schema --filter @open-reloading/core --filter @open-reloading/importers --filter @open-reloading/data --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools --filter @open-reloading/test-kit'
+  '--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/statistics --filter @open-reloading/ballistics --filter @open-reloading/shot-groups --filter @open-reloading/schema --filter @open-reloading/core --filter @open-reloading/importers --filter @open-reloading/data --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools --filter @open-reloading/test-kit'
 /** The workspaces of the packages group that a change of units reaches. */
 const reachedByUnits =
-  '--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/schema --filter @open-reloading/core --filter @open-reloading/importers --filter @open-reloading/data --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools'
+  '--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/shot-groups --filter @open-reloading/schema --filter @open-reloading/core --filter @open-reloading/importers --filter @open-reloading/data --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools'
 
 it('tests every workspace of every group without a list of affected ones', () => {
   expect(testJobs()).toEqual([
@@ -155,6 +155,7 @@ it('tests the workspaces a change reaches and leaves out the groups it does not'
   const units = [
     'units',
     'locale-format',
+    'shot-groups',
     'web',
     'cli',
     'core',
@@ -210,7 +211,7 @@ it('tests every group for a change outside the workspaces, an unknown or empty s
 // A test reads these workspaces' files without importing them; each reader declares the workspace it reads as a
 // devDependency, so pnpm selects the reader when the read workspace changes.
 it.each([
-  ['data', 'core'], // the event types (core/test/competition)
+  ['data', 'shot-groups'], // the event types and target faces (shot-groups/test)
   ['data', 'drawing'], // the bullet records (drawing/test/bullet-outline.test.ts)
   ['web', 'docs'], // files named in `Code:` lines, the photo checks (docs/scripts/photo-guide.test.mts)
   ['web', 'e2e'], // the German catalogue (e2e/scripts/visual-check.test.ts)

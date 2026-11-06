@@ -1,21 +1,22 @@
 /**
  * Competition events of this browser: a new event from its event type, the totals by the type's
- * scoring (core `ringEventTotals`, `practicalEventTotals`), the CSV and JSON export and the check
+ * scoring (shot-groups `ringEventTotals`, `practicalEventTotals`), the CSV and JSON export and the check
  * before Save. A self-recorded score is the person's own record, never an official result.
  */
-import {
-  type EventTotals,
-  eventMismatches,
-  practicalEventTotals,
-  ringEventTotals,
-  type StageScore,
-} from '@open-reloading/core'
+
 import {
   type CompetitionEvent,
   competitionEvent,
   type EventType,
   type UserRecord,
 } from '@open-reloading/schema'
+import {
+  type EventTotals,
+  eventMismatches,
+  practicalEventTotals,
+  ringEventTotals,
+  type StageScore,
+} from '@open-reloading/shot-groups'
 import { type Message, msg } from '../i18n/translate.ts'
 import { toCsv } from './csv.ts'
 import { localDay } from './dates.ts'

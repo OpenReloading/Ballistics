@@ -208,6 +208,9 @@ importers:
       '@open-reloading/schema':
         specifier: workspace:*
         version: link:../../packages/schema
+      '@open-reloading/shot-groups':
+        specifier: workspace:*
+        version: link:../../packages/shot-groups
       '@open-reloading/units':
         specifier: workspace:*
         version: link:../../packages/units
@@ -408,9 +411,6 @@ importers:
         specifier: workspace:*
         version: link:../units
     devDependencies:
-      '@open-reloading/data':
-        specifier: workspace:*
-        version: link:../data
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
@@ -535,6 +535,46 @@ importers:
       '@arethetypeswrong/cli':
         specifier: 'catalog:'
         version: 0.18.5
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.6.6
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 5.0.5(vitest@5.0.5)
+      fast-check:
+        specifier: 'catalog:'
+        version: 4.10.2
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.90.0(oxlint-tsgolint@7.0.2005)
+      oxlint-tsgolint:
+        specifier: 'catalog:'
+        version: 7.0.2005
+      publint:
+        specifier: 'catalog:'
+        version: 0.3.25
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.5(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@5.0.5)(vite@8.3.5(@types/node@26.6.6)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
+
+  packages/shot-groups:
+    dependencies:
+      '@open-reloading/units':
+        specifier: workspace:*
+        version: link:../units
+    devDependencies:
+      '@arethetypeswrong/cli':
+        specifier: 'catalog:'
+        version: 0.18.5
+      '@microsoft/api-extractor':
+        specifier: 'catalog:'
+        version: 7.60.1(@types/node@26.6.6)
+      '@open-reloading/data':
+        specifier: workspace:*
+        version: link:../data
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
