@@ -177,7 +177,7 @@
       "data": {
         "origin": "user",
         "name": "Range rifle",
-        "manufacturer": "catalogue:test-maker",
+        "manufacturer": "catalogue:sako",
         "cartridge": "catalogue:308-win",
         "barrelLength": {
           "value": 610
@@ -215,6 +215,27 @@
           }
         ],
         "active": "c1"
+      }
+    },
+    {
+      "kind": "firearm",
+      "id": "57dd534b-6180-5565-b66a-271a28663df7",
+      "name": "Service pistol",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "origin": "user",
+        "name": "Service pistol",
+        "cartridge": "catalogue:9-mm-luger",
+        "action": "pistol",
+        "barrelLength": {
+          "value": 114
+        },
+        "twist": {
+          "value": 250
+        },
+        "twistHand": "right",
+        "optics": [],
+        "configurations": []
       }
     },
     {
@@ -352,9 +373,9 @@
         "date": "2026-06-14",
         "place": "Göttingen",
         "eventType": "catalogue:dsb-meisterschaft",
-        "level": "Landesmeisterschaft",
-        "discipline": "catalogue:dsb-25m-sportpistole",
-        "firearm": "user:2a3b4c5d-6e7f-4a8b-9c0d-1e2f3a4b5c6d",
+        "level": "Kreis-/Gaumeisterschaft",
+        "discipline": "catalogue:dsb-25m-zentralfeuerpistole",
+        "firearm": "user:57dd534b-6180-5565-b66a-271a28663df7",
         "state": "completed",
         "results": {
           "method": "rings",
@@ -373,7 +394,8 @@
               "total": 47
             }
           ]
-        }
+        },
+        "notes": "Startgeld 12 €, Stand 𝟑"
       }
     },
     {
@@ -387,7 +409,7 @@
         "level": "Level I",
         "division": "Production",
         "rounds": 96,
-        "firearm": "user:2a3b4c5d-6e7f-4a8b-9c0d-1e2f3a4b5c6d",
+        "firearm": "user:57dd534b-6180-5565-b66a-271a28663df7",
         "state": "disqualified",
         "results": {
           "method": "hit-factor",
@@ -420,16 +442,617 @@
         "date": "2026-10-12",
         "rounds": 30,
         "place": "Club range",
-        "discipline": "catalogue:dsb-1-35",
+        "discipline": "catalogue:dsb-gewehr-100m-gk",
         "firearm": "user:2a3b4c5d-6e7f-4a8b-9c0d-1e2f3a4b5c6d",
         "load": "user:8c9d0e1f-2a3b-4c4d-9e5f-6a7b8c9d0e1f",
         "result": "285 rings",
-        "event": "user:3c4d5e6f-7a8b-4c9d-8e0f-1a2b3c4d5e6f",
         "notes": "Wind from the left",
         "confirmation": {
           "by": "Range officer",
           "date": "2026-10-12"
         }
+      }
+    },
+    {
+      "kind": "manufacturer",
+      "id": "f986f403-1648-5418-966e-d27c84f70746",
+      "name": "Home Loader (every field)",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "origin": "user"
+      },
+      "imported": {
+        "source": "Every field source",
+        "file": "Every field file",
+        "day": "2026-10-12"
+      }
+    },
+    {
+      "kind": "bullet",
+      "id": "ad651306-fe52-5471-9db1-c322a5aff697",
+      "name": "Home Loader 168 gr (every field)",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "origin": "user",
+        "manufacturer": "user:3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13",
+        "basedOn": "catalogue:alpha-30425",
+        "overrides": {
+          "name": "168 gr",
+          "diameter": {
+            "value": 7.82
+          },
+          "mass": {
+            "value": 10.886
+          },
+          "base": {
+            "type": "boat-tail",
+            "angle": null
+          }
+        },
+        "basedOnRevision": "Every field basedOnRevision"
+      },
+      "imported": {
+        "source": "Every field source",
+        "file": "Every field file",
+        "day": "2026-10-12"
+      }
+    },
+    {
+      "kind": "cartridge",
+      "id": "7ba614e0-4b55-5940-8999-f767acc27fb8",
+      "name": "Design (every field)",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "origin": "user",
+        "overrides": {
+          "table": "I",
+          "values": [
+            {
+              "side": "cartridge",
+              "symbol": "L3",
+              "quantity": "length",
+              "value": 51.18
+            }
+          ]
+        },
+        "basedOn": "catalogue:308-win",
+        "basedOnRevision": "Every field basedOnRevision"
+      },
+      "imported": {
+        "source": "Every field source",
+        "file": "Every field file",
+        "day": "2026-10-12"
+      }
+    },
+    {
+      "kind": "powder",
+      "id": "2d3e4aeb-7aa7-54d0-9417-5b8e80bb7621",
+      "name": "Draft powder (every field)",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "origin": "user",
+        "provenanceKind": "fitted",
+        "draft": {
+          "grainForm": "extruded",
+          "propellantBase": "double",
+          "bulkDensity": {
+            "value": 0.9
+          },
+          "composition": [
+            {
+              "name": "Nitrocellulose",
+              "min": 60,
+              "max": 100
+            }
+          ],
+          "interior": {
+            "fitted": [
+              "vivacity"
+            ],
+            "gamma": 1.24,
+            "burnForm": {
+              "a": {
+                "value": 0.5
+              }
+            }
+          }
+        },
+        "fit": {
+          "input": [
+            {
+              "charge": {
+                "value": 2.8
+              },
+              "muzzleVelocity": {
+                "value": 820
+              },
+              "shots": 5,
+              "barrelLength": {
+                "value": 610
+              },
+              "temperature": {
+                "value": 21
+              },
+              "caseCapacity": {
+                "value": 3.6
+              },
+              "bulletMass": {
+                "value": 10.886
+              }
+            }
+          ],
+          "parameters": [
+            "burnRate"
+          ],
+          "options": {
+            "prior": {
+              "burnRate": {
+                "value": 1.2,
+                "sigma": 0.3
+              }
+            },
+            "loss": {
+              "kind": "quadratic"
+            }
+          },
+          "date": "2026-10-13T10:00:00.000Z",
+          "model": "m3",
+          "modelVersion": "0.0.4",
+          "confidence": "loose",
+          "reasons": [
+            "no-pressure"
+          ],
+          "sessions": [
+            "user:6f5e4d3c-2b1a-4098-8f7e-6d5c4b3a2918"
+          ]
+        }
+      },
+      "imported": {
+        "source": "Every field source",
+        "file": "Every field file",
+        "day": "2026-10-12"
+      }
+    },
+    {
+      "kind": "caseCapacity",
+      "id": "ed1466da-2255-5ed8-8d0d-c09e083060a3",
+      "name": "Measured (every field)",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "origin": "user",
+        "cartridge": "catalogue:308-win",
+        "waterCapacity": {
+          "value": 3.5
+        },
+        "id": "every-field",
+        "caseManufacturer": "catalogue:lapua",
+        "caseCondition": "new",
+        "primerState": "primed-spent",
+        "fillLevel": "mouth",
+        "note": "Every field note",
+        "provenance": {
+          "kind": "published",
+          "sources": [
+            {
+              "title": "Every field title"
+            }
+          ]
+        }
+      },
+      "imported": {
+        "source": "Every field source",
+        "file": "Every field file",
+        "day": "2026-10-12"
+      }
+    },
+    {
+      "kind": "load",
+      "id": "5c906144-05b3-53ee-a4e5-722ccda66554",
+      "name": "Load (every field)",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "origin": "user",
+        "charge": {
+          "value": 2.8
+        },
+        "cartridge": "catalogue:308-win",
+        "bullet": "user:9b8a7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d",
+        "powder": "user:5d4c3b2a-1f0e-4d9c-8b7a-6a5f4e3d2c1b",
+        "firearm": "user:2a3b4c5d-6e7f-4a8b-9c0d-1e2f3a4b5c6d",
+        "case": {
+          "record": "user:5d6e7f80-1a2b-4c3d-8e4f-5a6b7c8d9e0f"
+        },
+        "sessions": [
+          "user:6f5e4d3c-2b1a-4098-8f7e-6d5c4b3a2918"
+        ],
+        "id": "every-field",
+        "name": "Every field name",
+        "powderLot": "Every field powderLot",
+        "capacity": "user:1e2d3c4b-5a69-4788-9a0b-1c2d3e4f5a6b",
+        "primer": {},
+        "seating": {
+          "by": "overallLength",
+          "value": {
+            "value": 1
+          }
+        },
+        "note": "Every field note",
+        "analysis": {},
+        "snapshots": [
+          {
+            "session": "user:6f5e4d3c-2b1a-4098-8f7e-6d5c4b3a2918"
+          }
+        ],
+        "provenance": {
+          "kind": "published",
+          "sources": [
+            {
+              "title": "Every field title"
+            }
+          ]
+        }
+      },
+      "imported": {
+        "source": "Every field source",
+        "file": "Every field file",
+        "day": "2026-10-12"
+      }
+    },
+    {
+      "kind": "firearm",
+      "id": "2a054a76-169c-54e7-b4e7-1805428285b4",
+      "name": "Range rifle (every field)",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "origin": "user",
+        "name": "Range rifle",
+        "manufacturer": "catalogue:sako",
+        "cartridge": "catalogue:308-win",
+        "barrelLength": {
+          "value": 610
+        },
+        "twist": {
+          "value": 254
+        },
+        "twistHand": "right",
+        "optics": [
+          {
+            "id": "o1",
+            "kind": "scope",
+            "name": "5-25x56",
+            "clickUnit": "mrad",
+            "clickValue": {
+              "value": 0.00573
+            }
+          }
+        ],
+        "configurations": [
+          {
+            "id": "c1",
+            "name": "Scope",
+            "mounts": [
+              {
+                "optic": "o1",
+                "sightHeight": {
+                  "value": 55
+                },
+                "zeroRange": {
+                  "value": 100000
+                }
+              }
+            ]
+          }
+        ],
+        "active": "c1",
+        "model": "Every field model",
+        "action": "rifle",
+        "grooveDiameter": {
+          "value": 1
+        },
+        "boreDiameter": {
+          "value": 1
+        },
+        "freebore": {
+          "value": 1
+        },
+        "baseToOgiveAtLands": {
+          "value": 1
+        },
+        "overallLengthAtLands": {
+          "value": 1
+        },
+        "landsBullet": "user:9b8a7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d",
+        "firearmMass": {
+          "value": 1
+        },
+        "roundCount": 1,
+        "roundCountDate": "2026-10-12",
+        "countedSessions": [
+          {
+            "session": "user:6f5e4d3c-2b1a-4098-8f7e-6d5c4b3a2918",
+            "rounds": 1
+          }
+        ],
+        "noteAtRoundCount": 1,
+        "notes": "Every field notes"
+      },
+      "imported": {
+        "source": "Every field source",
+        "file": "Every field file",
+        "day": "2026-10-12"
+      }
+    },
+    {
+      "kind": "session",
+      "id": "acccf230-06bb-5381-8b80-09e09697c255",
+      "name": "Day 1 (every field)",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "origin": "user",
+        "date": "2026-10-12",
+        "device": {
+          "kind": "optical"
+        },
+        "strings": [
+          {
+            "variation": {
+              "kind": "charge",
+              "value": {
+                "value": 2.8
+              }
+            },
+            "shots": [
+              {
+                "velocity": {
+                  "value": 800
+                }
+              },
+              {
+                "velocity": {
+                  "value": 805
+                }
+              }
+            ]
+          }
+        ],
+        "provenance": {
+          "kind": "measured",
+          "sources": [
+            {
+              "title": "Day 1"
+            }
+          ]
+        },
+        "id": "every-field",
+        "muzzleDistance": {
+          "value": 1
+        },
+        "conditions": {},
+        "note": "Every field note"
+      },
+      "imported": {
+        "source": "Every field source",
+        "file": "Every field file",
+        "day": "2026-10-12"
+      }
+    },
+    {
+      "kind": "targetSheet",
+      "id": "78671bd3-71c9-5072-b744-91a860d8fac3",
+      "name": "Ladder sheet (every field)",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "photo": "p1",
+        "references": [],
+        "targetRotation": 0,
+        "load": "8c9d0e1f-2a3b-4c4d-9e5f-6a7b8c9d0e1f",
+        "groups": [
+          {
+            "id": "g1",
+            "name": "Step 1",
+            "colour": "#d9480f",
+            "distance": 100,
+            "ladderStep": 0,
+            "shots": [
+              {
+                "x": 0.003,
+                "y": -0.001,
+                "placement": "placed"
+              }
+            ]
+          }
+        ],
+        "targetOrigin": {
+          "x": 1,
+          "y": 1
+        },
+        "photoRotation": 1,
+        "markerDiameter": 1,
+        "notes": [
+          {
+            "id": "Every field id",
+            "x": 1,
+            "y": 1,
+            "text": "Every field text"
+          }
+        ],
+        "overlays": {}
+      },
+      "imported": {
+        "source": "Every field source",
+        "file": "Every field file",
+        "day": "2026-10-12"
+      }
+    },
+    {
+      "kind": "targetFaceDesign",
+      "id": "babc2c7a-6b6b-5cc5-a594-d9c9b37c50b0",
+      "name": "Club face (every field)",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "rings": [
+          {
+            "value": 1,
+            "diameter": 100,
+            "fill": "white",
+            "line": "black"
+          },
+          {
+            "value": 2,
+            "diameter": 50
+          }
+        ],
+        "innerTen": {
+          "diameter": 10,
+          "rule": "cover"
+        },
+        "blackDiameter": 50,
+        "decimal": true,
+        "events": [
+          {
+            "name": "25 m",
+            "distance": 25000,
+            "gauge": 5.6
+          }
+        ],
+        "blackHeight": 1
+      },
+      "imported": {
+        "source": "Every field source",
+        "file": "Every field file",
+        "day": "2026-10-12"
+      }
+    },
+    {
+      "kind": "case",
+      "id": "6c11d40d-0ecd-584e-9876-7c164cea9686",
+      "name": "Match brass, lot 3 (every field)",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "origin": "user",
+        "name": "Match brass, lot 3",
+        "cartridge": "catalogue:308-win",
+        "material": "brass",
+        "capacity": "user:1e2d3c4b-5a69-4788-9a0b-1c2d3e4f5a6b",
+        "numberOfFirings": 3,
+        "trimLength": {
+          "value": 51.1
+        },
+        "id": "every-field",
+        "manufacturer": "catalogue:lapua",
+        "basedOn": "catalogue:demo-case-308-brass",
+        "productNumber": "Every field productNumber",
+        "headstamp": "Every field headstamp",
+        "primerPocket": {
+          "type": "boxer"
+        },
+        "flashHole": {
+          "value": 1
+        },
+        "mass": {
+          "value": 1
+        },
+        "waterCapacity": {
+          "value": 1
+        },
+        "annealed": true,
+        "neckWall": {
+          "value": 1
+        },
+        "casesMeasured": 1,
+        "spread": {
+          "value": 1
+        },
+        "note": "Every field note",
+        "provenance": {
+          "kind": "published",
+          "sources": [
+            {
+              "title": "Every field title"
+            }
+          ]
+        }
+      },
+      "imported": {
+        "source": "Every field source",
+        "file": "Every field file",
+        "day": "2026-10-12"
+      }
+    },
+    {
+      "kind": "event",
+      "id": "77db4183-e3be-5c94-8628-01de26b8ba77",
+      "name": "Kreismeisterschaft Großkaliber Gewehr (every field)",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "date": "2026-06-14",
+        "place": "Göttingen",
+        "eventType": "catalogue:dsb-meisterschaft",
+        "level": "Kreis-/Gaumeisterschaft",
+        "discipline": "catalogue:dsb-gewehr-100m-gk",
+        "firearm": "user:2a3b4c5d-6e7f-4a8b-9c0d-1e2f3a4b5c6d",
+        "state": "completed",
+        "results": {
+          "method": "rings",
+          "series": [
+            {
+              "shots": [
+                10,
+                9,
+                10,
+                8,
+                9
+              ],
+              "targetSheet": "user:4b5c6d7e-8f90-4a1b-8c2d-3e4f5a6b7c8d"
+            },
+            {
+              "total": 47
+            },
+            {
+              "shots": [
+                10.4,
+                9.8,
+                10.1
+              ],
+              "total": 30.3
+            }
+          ]
+        },
+        "division": "Every field division",
+        "load": "user:8c9d0e1f-2a3b-4c4d-9e5f-6a7b8c9d0e1f",
+        "rounds": 1,
+        "notes": "Every field notes"
+      },
+      "imported": {
+        "source": "Every field source",
+        "file": "Every field file",
+        "day": "2026-10-12"
+      }
+    },
+    {
+      "kind": "shootingLogEntry",
+      "id": "ca297b61-0df0-52ff-9995-b916e26c8be9",
+      "name": "2026-06-14 Kreismeisterschaft (every field)",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "date": "2026-06-14",
+        "rounds": 10,
+        "place": "Göttingen",
+        "discipline": "catalogue:dsb-25m-zentralfeuerpistole",
+        "firearm": "user:57dd534b-6180-5565-b66a-271a28663df7",
+        "result": "93 rings",
+        "event": "user:3c4d5e6f-7a8b-4c9d-8e0f-1a2b3c4d5e6f",
+        "notes": "Wind from the left",
+        "confirmation": {
+          "by": "Range officer",
+          "date": "2026-06-14"
+        },
+        "ammunition": "Factory 9 mm Luger 124 gr FMJ"
+      },
+      "imported": {
+        "source": "Every field source",
+        "file": "Every field file",
+        "day": "2026-10-12"
       }
     }
   ],
