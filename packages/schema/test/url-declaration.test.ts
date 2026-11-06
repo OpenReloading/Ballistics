@@ -9,8 +9,6 @@ import { describe, expect, it } from 'vitest'
 const tsc = createRequire(import.meta.url)
   .resolve('typescript/package.json')
   .replace(/package\.json$/, 'bin/tsc')
-const conflict =
-  "error TS2403: Subsequent variable declarations must have the same type.  Variable 'URL'"
 
 /** What tsc reports on src/url.d.ts with the given options. */
 const compile = (...options: string[]) =>
@@ -28,7 +26,7 @@ describe('src/url.d.ts', () => {
     ['the DOM', ['--lib', 'es2024,dom']],
     ['Node', ['--lib', 'es2024', '--types', 'node']],
   ])('conflicts with the URL of %s', (_, options) => {
-    expect(compile(...options)).toContain(conflict)
+    expect(compile(...options)).toMatch(/error TS2403: .*Variable 'URL'/)
   })
 
   it('is not in the built package, and no built declaration refers to it', () => {
