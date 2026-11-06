@@ -1,7 +1,39 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
-import AxeBuilder from '@axe-core/playwright'
+import Base from '@axe-core/playwright'
 import type { Page } from '@playwright/test'
+
+/**
+ * The `AxeBuilder` of `@axe-core/playwright` that scans once the page's transitions and finite animations have
+ * ended: axe reads colors as painted, and a color midway through a transition (after a color scheme switch) fails
+ * color-contrast.
+ */
+export class AxeBuilder extends Base {
+  readonly #page: Page
+
+  constructor(options: { page: Page }) {
+    super(options)
+    this.#page = options.page
+  }
+
+  override async analyze() {
+    await this.#page.evaluate(async () => {
+      for (;;) {
+        // a media or class change starts its transitions with the next frame's style update
+        await new Promise((done) => requestAnimationFrame(done))
+        const running = document
+          .getAnimations()
+          .filter(
+            (a) => a.playState === 'running' && a.effect?.getComputedTiming().endTime !== Infinity,
+          )
+        if (running.length === 0) return
+        // a transition that a newer one replaces rejects its `finished`
+        await Promise.allSettled(running.map((a) => a.finished))
+      }
+    })
+    return super.analyze()
+  }
+}
 
 /**
  * An axe result listed in `a11y-lists.json`: `rule` is the axe rule id, `node` a part of the node's
