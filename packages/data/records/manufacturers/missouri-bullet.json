@@ -1,6 +1,8 @@
 {
   "id": "missouri-bullet",
   "name": "Missouri Bullet Company",
+  "country": "US",
+  "website": "https://missouribullet.com/",
   "provenance": {
     "kind": "published",
     "sources": [
@@ -9,6 +11,15 @@
         "url": "https://missouribullet.com/pricing.php",
         "retrieved": "2026-10-08",
         "fields": ["name"]
+      },
+      {
+        "title": "Missouri Bullet Company, about page",
+        "publisher": "Missouri Bullet Company",
+        "url": "https://missouribullet.com/AboutUs.php",
+        "retrieved": "2026-11-06",
+        "fields": ["country", "website"],
+        "origin": "manufacturer",
+        "note": "Mailing address: Missouri Bullet Company, 1551 SW 25th Road, Kingsville, MO 64061, United States."
       }
     ]
   }

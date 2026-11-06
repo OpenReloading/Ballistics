@@ -161,7 +161,12 @@ const caseList = page(
 )
 
 const manufacturerList = page(
-  manufacturer.pick({ id: true, name: true, aliases: true, website: true }),
+  z.strictObject({
+    id: manufacturer.shape.id,
+    name: manufacturer.shape.name,
+    aliases: manufacturer.shape.aliases,
+    website: manufacturer.shape.website,
+  }),
 )
 
 /** `GET` of `/manufacturers`, `/powders`, `/primers`, `/bullets` and `/cases`, and their `/:id` routes. */

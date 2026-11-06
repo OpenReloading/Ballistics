@@ -815,6 +815,19 @@ describe('manufacturer', () => {
       expect(manufacturer.safeParse({ ...valid, website }).success).toBe(false)
     expect(manufacturer.safeParse({ ...valid, name: '' }).success).toBe(false)
     expect(manufacturer.safeParse({ ...valid, aliases: [] }).success).toBe(false)
+    expect(manufacturer.safeParse({ ...valid, phone: '+1 555 0100' }).success).toBe(false)
+  })
+
+  it('accepts a country code that a source supports and rejects one without that source or not alpha-2', () => {
+    const withCountrySource = {
+      ...valid,
+      provenance: {
+        kind: 'published',
+        sources: [{ title: 'Product page' }, { title: 'Contact page', fields: ['country'] }],
+      },
+    }
+    expect(manufacturer.safeParse({ ...withCountrySource, country: 'DE' }).success).toBe(true)
+    expect(manufacturer.safeParse({ ...withCountrySource, country: 'de' }).success).toBe(false)
     expect(manufacturer.safeParse({ ...valid, country: 'DE' }).success).toBe(false)
   })
 })

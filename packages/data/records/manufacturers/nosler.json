@@ -1,6 +1,8 @@
 {
   "id": "nosler",
   "name": "Nosler",
+  "country": "US",
+  "website": "https://www.nosler.com/",
   "provenance": {
     "kind": "published",
     "sources": [
@@ -9,6 +11,15 @@
         "url": "https://www.nosler.com/30-caliber-168gr-hpbt-custom-competition-100ct.html",
         "retrieved": "2026-09-05",
         "fields": ["name"]
+      },
+      {
+        "title": "Nosler, home page",
+        "publisher": "Nosler, Inc.",
+        "url": "https://www.nosler.com/",
+        "retrieved": "2026-11-06",
+        "fields": ["country", "website"],
+        "origin": "manufacturer",
+        "note": "Footer: Nosler, Inc., Redmond, OR 97756, United States."
       }
     ]
   }

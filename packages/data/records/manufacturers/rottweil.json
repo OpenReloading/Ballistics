@@ -1,6 +1,8 @@
 {
   "id": "rottweil",
   "name": "Rottweil",
+  "country": "HU",
+  "website": "https://rottweil-ammunition.com/",
   "provenance": {
     "kind": "published",
     "sources": [
@@ -9,6 +11,15 @@
         "url": "https://rws-ammunition.com/de/infotainment/wiederladen",
         "retrieved": "2026-10-13",
         "fields": ["name"]
+      },
+      {
+        "title": "Rottweil, legal notice",
+        "publisher": "HEXAGON Ammunition Zrt.",
+        "url": "https://rottweil-ammunition.com/legal-notice",
+        "retrieved": "2026-11-06",
+        "fields": ["country", "website"],
+        "origin": "manufacturer",
+        "note": "Address of the site operator: HEXAGON Ammunition Zrt., Lechner Ödon Fasor 6, 1095 Budapest, Hungary. Responsible for content: RWS GmbH, Fürth, Germany."
       }
     ]
   }
