@@ -346,5 +346,17 @@
   "packages/shot-groups/src/dom.ts": {
     "source": "export const h = () => window.innerHeight",
     "rules": ["logic-no-dom"]
+  },
+  "packages/ballistics/src/into-shot-groups.ts": {
+    "source": "import { ringScore } from '../../shot-groups/src/index.ts'\nexport { ringScore }",
+    "rules": ["ballistics-imports-units-and-statistics"]
+  },
+  "packages/ballistics/src/into-locale-format.ts": {
+    "source": "import { formatNumber } from '../../locale-format/src/index.ts'\nexport { formatNumber }",
+    "rules": ["ballistics-imports-units-and-statistics"]
+  },
+  "packages/shot-groups/src/into-ballistics.ts": {
+    "source": "import { trajectory } from '../../ballistics/src/index.ts'\nexport { trajectory }",
+    "rules": ["shot-groups-imports-units-statistics-only"]
   }
 }
