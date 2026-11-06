@@ -172,6 +172,7 @@ test('in German the pressure range keeps its gap and the Powder card head its me
 async function openTab(page: Page, name: string) {
   const direct = page.getByRole('tab', { name, exact: true })
   const more = page.getByRole('button', { name: 'More', exact: true })
+  const panel = page.getByRole('tabpanel', { name })
   await expect(direct.or(more).first()).toBeVisible()
   // the row measures its tabs again while the page settles: a tab can move into the More menu
   const clicked =
@@ -180,12 +181,14 @@ async function openTab(page: Page, name: string) {
       () => true,
       () => false,
     ))
-  if (!clicked) {
+  // a click that lands after its timeout shows the panel: the More menu lists only the tabs that
+  // do not fit in the row
+  if (!clicked && !(await panel.isVisible())) {
     await more.click()
     await page.getByRole('menuitem', { name }).click()
   }
-  await expect(page.getByRole('tabpanel', { name })).toBeVisible()
-  return page.getByRole('tabpanel', { name })
+  await expect(panel).toBeVisible()
+  return panel
 }
 
 /** Save writes its file to the origin's private storage instead of asking where. */
