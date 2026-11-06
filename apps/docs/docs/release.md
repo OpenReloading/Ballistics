@@ -51,7 +51,7 @@ Both editions share one origin, so the next edition keeps its data under other n
 
 ## npm packages
 
-Publishing is off until the settings below exist, `pnpm run pack:check` passes and the repository variable `NPM_PUBLISH` is set to `true`. `pnpm run pack:check` fails while a published library depends on a private workspace package that npm does not have: today `schema` and `core` depend on `@open-reloading/units`. Settings outside the repository, once per library (see the [npm documentation on trusted publishers](https://docs.npmjs.com/trusted-publishers)):
+Publishing is off until the settings below exist, `pnpm run pack:check` passes and the repository variable `NPM_PUBLISH` is set to `true`. `pnpm run pack:check` fails while a published library depends on a private workspace package that npm does not have: today `schema` and `core` depend on `@open-reloading/units`, and `core` on `@open-reloading/statistics`. Settings outside the repository, once per library (see the [npm documentation on trusted publishers](https://docs.npmjs.com/trusted-publishers)):
 1. The npm organization `open-reloading` exists. If npm offers trusted publishing only for an existing package, publish the first version by hand from a clean checkout of `main`: `pnpm install && pnpm run build`, then `pnpm --filter @open-reloading/<name> publish` for `schema`, `core`, `drawing`, `importers` and `data`, signed in with two-factor authentication. The `publish` job skips that version.
 2. On npmjs.com, package Settings, Trusted Publisher, GitHub Actions: organization `OpenReloading`, repository `Ballistics`, workflow `release.yml`.
 3. Publishing access: "Require two-factor authentication and disallow tokens".

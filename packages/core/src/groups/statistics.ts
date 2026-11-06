@@ -6,10 +6,13 @@
  * target-plane coordinates m (x right, y up), distance m, velocity m/s, angles rad. A value whose
  * minimum shot count is not met is `undefined`.
  */
-import { bisect } from '../bisect.ts'
+import {
+  bisect,
+  chiSquareQuantile,
+  fQuantileTwoNumeratorDegrees,
+  type Interval,
+} from '@open-reloading/statistics'
 import { need, nth } from '../errors.ts'
-import { chiSquareQuantile } from './chi-square.ts'
-import { fQuantileTwoNumeratorDegrees } from './f-distribution.ts'
 
 /** One shot in the target plane, m (x right, y up); `velocity` m/s. */
 export interface GroupShot {
@@ -35,14 +38,6 @@ export interface GroupInput {
   aim?: GroupPoint
   /** Two-sided level of the intervals in `confidence`, in (0, 1); default 0.95. */
   confidenceLevel?: number
-}
-
-/** Two-sided confidence interval. */
-export interface Interval {
-  /** Lower limit, in the unit of the estimate. */
-  lower: number
-  /** Upper limit, in the unit of the estimate. */
-  upper: number
 }
 
 /**
@@ -354,7 +349,7 @@ function ellipticalCep(c: GroupCovariance): number {
     return sum / steps
   }
   // the circular CEP of the major variance bounds it from above
-  return bisect((r) => outside(r) > 0.5, 0, 1.2 * Math.sqrt(l1), 100, true)
+  return bisect((r) => outside(r) > 0.5, [0, 1.2 * Math.sqrt(l1)], 100, true)
 }
 
 /** Ellipse about the group centre. */

@@ -6,10 +6,9 @@
  * Velocities only. SI in and out.
  */
 
+import { chiSquareQuantile, logLeastSquares } from '@open-reloading/statistics'
 import type { Settings } from '../errors.ts'
 import { InputError, need, nth, positive } from '../errors.ts'
-import { chiSquareQuantile } from '../groups/chi-square.ts'
-import { logLeastSquares } from '../least-squares.ts'
 import { type LadderPoint, PowderFitError, type PowderPrior } from './fit.ts'
 import { type InteriorLoad, type InteriorOptions, interior } from './model.ts'
 

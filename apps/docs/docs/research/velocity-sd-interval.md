@@ -80,8 +80,8 @@ analytic: a seeded simulation of stated distributions. The repository holds no s
 
 ## Where in the app
 
-- `packages/core/src/groups/velocity-statistics.ts` (`velocityStatistics`, the interval of the standard deviation, and `shotsNeeded`).
-- `packages/core/src/groups/chi-square.ts` (`chiSquareQuantile`, used by the script and the interval).
+- `packages/statistics/src/velocity-statistics.ts` (`velocityStatistics`, the interval of the standard deviation, and `shotsNeeded`).
+- `packages/statistics/src/chi-square.ts` (`chiSquareQuantile`, used by the script and the interval).
 - `apps/web/src/lib/string-comparison.ts` (`compareSd`, the comparison of two strings and the 10-shot rule).
 - [Groups](../models/groups.md), Velocity strings and Limits.
 

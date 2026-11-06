@@ -26,6 +26,7 @@ const configs = [
   'packages/units/.oxlintrc.json',
   'packages/locale-format/.oxlintrc.json',
   'packages/schema/.oxlintrc.json',
+  'packages/statistics/.oxlintrc.json',
 ]
 
 let mirror = ''

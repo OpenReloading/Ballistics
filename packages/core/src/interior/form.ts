@@ -3,7 +3,7 @@
  * `apps/docs/docs/models/interior-burn-forms.md`. Dimensions in m.
  */
 
-import { bisect } from '../bisect.ts'
+import { bisect } from '@open-reloading/statistics'
 
 /** Propellant grain by shape; dimensions in m, `perforationDiameter` is the diameter of one perforation. */
 export type Grain =
@@ -92,8 +92,7 @@ function sevenPerf(diameter: number, perforation: number, length: number): BurnF
   // the outer slivers burn longest; they vanish when the outer intersection of two perforation circles reaches the outer surface
   const yEnd = bisect(
     (y) => (Math.sqrt(3) / 2) * s + Math.sqrt(Math.max(0, rho(y) ** 2 - (s * s) / 4)) - r(y) < 0,
-    e1,
-    diameter / 2,
+    [e1, diameter / 2],
     200,
     false,
   )

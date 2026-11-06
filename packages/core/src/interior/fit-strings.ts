@@ -5,8 +5,8 @@
  * Velocities in m/s, charges in kg.
  */
 
+import { velocityStatistics } from '@open-reloading/statistics'
 import { need } from '../errors.ts'
-import { velocityStatistics } from '../groups/velocity-statistics.ts'
 import type { LadderPoint } from './fit.ts'
 
 /** One chronograph string: the shot velocities of one charge and the other values of its ladder point. */

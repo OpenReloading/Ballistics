@@ -8,6 +8,9 @@
   "references": [
     {
       "path": "../units/tsconfig.build.json"
+    },
+    {
+      "path": "../statistics/tsconfig.build.json"
     }
   ]
 }

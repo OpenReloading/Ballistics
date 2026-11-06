@@ -36,8 +36,8 @@ Analytic: a closed form for a two-column design, no measured data.
 
 ## Where in the app
 
-- `packages/core/src/least-squares.ts`, `identifiability`.
-- `packages/core/test/least-squares.test.ts`, the tests "gives the two-parameter closed forms", "gives independent columns unit inflation and a singular matrix a huge one" and "leaves a parameter outside the null direction of a singular design finite".
+- `packages/statistics/src/least-squares.ts`, `identifiability`.
+- `packages/statistics/test/least-squares.test.ts`, the tests "gives the two-parameter closed forms", "gives independent columns unit inflation and a singular matrix a huge one" and "leaves a parameter outside the null direction of a singular design finite".
 - Model page: [least squares](../models/least-squares.md).
 
 ## Confidence
