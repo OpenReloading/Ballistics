@@ -1,4 +1,3 @@
-/* oxlint-disable max-lines-per-function, unicorn/consistent-function-scoping -- these tests predate the package profile and come under it next */
 import { describe, expect, it } from 'vitest'
 import { pressureMethod, publishedLoad, publishedLoads } from '../src/index.ts'
 import { expectIssueAt } from './issue-at.ts'
@@ -153,6 +152,19 @@ const file = {
 
 const load = loads[0]
 
+const withSources = (s: object) => ({
+  ...file,
+  loads: loads.map(({ source: _source, ...l }) => l),
+  provenance: { kind: 'published', sources: [s] },
+})
+
+const charge = (kind: string, value = 1) => ({ kind, charge: { value, raw: `${value} g` } })
+
+const pressure = (p: object) => ({
+  ...load,
+  charges: [{ kind: 'max', charge: { value: 1, raw: '1 g' }, pressure: p }],
+})
+
 describe('publishedLoads', () => {
   it('accepts the hard cases of the printed tables, kept as printed', () => {
     for (const l of loads) expect(publishedLoad.parse(l)).toEqual(l)
@@ -171,10 +183,6 @@ describe('publishedLoads', () => {
   })
 
   it('refuses a bar value on a CUP figure and a psi figure without a value', () => {
-    const pressure = (p: object) => ({
-      ...load,
-      charges: [{ kind: 'max', charge: { value: 1, raw: '1 g' }, pressure: p }],
-    })
     const cup = { unit: 'CUP', peak: { value: 2400, raw: '35,400 CUP' } }
     expectIssueAt(publishedLoad, pressure(cup), 'charges.0.pressure.peak.value')
     expectIssueAt(
@@ -185,10 +193,6 @@ describe('publishedLoads', () => {
   })
 
   it('takes a method and its basis together, and no crusher method for a bar figure', () => {
-    const pressure = (p: object) => ({
-      ...load,
-      charges: [{ kind: 'max', charge: { value: 1, raw: '1 g' }, pressure: p }],
-    })
     const peak = { value: 937.687, raw: '13,600 PSI' }
     expectIssueAt(
       publishedLoad,
@@ -206,16 +210,16 @@ describe('publishedLoads', () => {
       'charges.0.pressure.method',
     )
   })
+})
 
+describe('publishedLoads charges, sources and provenance', () => {
   it('takes one charge of each kind and a single charge alone', () => {
-    const charge = (kind: string) => ({ kind, charge: { value: 1, raw: '1 g' } })
     expectIssueAt(publishedLoad, { ...load, charges: [charge('max'), charge('max')] }, 'charges')
     expectIssueAt(publishedLoad, { ...load, charges: [charge('single'), charge('max')] }, 'charges')
     expectIssueAt(publishedLoad, { ...load, charges: [] }, 'charges')
   })
 
   it('keeps a start charge above the maximum charge as printed (a data:validate warning)', () => {
-    const charge = (kind: string, value: number) => ({ kind, charge: { value, raw: `${value} g` } })
     expect(
       publishedLoad.safeParse({ ...load, charges: [charge('start', 4), charge('max', 3)] }).success,
     ).toBe(true)
@@ -238,11 +242,6 @@ describe('publishedLoads', () => {
   })
 
   it('needs published provenance with the maker as publisher, URL, retrieval date and origin', () => {
-    const sources = (s: object) => ({
-      ...file,
-      loads: loads.map(({ source: _source, ...l }) => l),
-      provenance: { kind: 'published', sources: [s] },
-    })
     expectIssueAt(
       publishedLoads,
       { ...file, provenance: { kind: 'measured', sources: [source] } },
@@ -250,33 +249,30 @@ describe('publishedLoads', () => {
     )
     for (const key of ['publisher', 'url', 'retrieved', 'origin']) {
       const { [key]: _gone, ...rest } = source as Record<string, unknown>
-      expectIssueAt(publishedLoads, sources(rest), `provenance.sources.0.${key}`)
+      expectIssueAt(publishedLoads, withSources(rest), `provenance.sources.0.${key}`)
     }
   })
+})
 
+describe('publishedLoads terms and primers', () => {
   it('gives maker data no project licence, only the maker own terms', () => {
-    const sources = (s: object) => ({
-      ...file,
-      loads: loads.map(({ source: _source, ...l }) => l),
-      provenance: { kind: 'published', sources: [s] },
-    })
     const own = {
       ...source,
       license: 'LicenseRef-Example-Powder',
       terms: 'https://example.org/terms',
     }
-    expect(publishedLoads.safeParse(sources(own)).success).toBe(true)
+    expect(publishedLoads.safeParse(withSources(own)).success).toBe(true)
     expect(
-      publishedLoads.safeParse(sources({ ...source, terms: 'Free for private use.' })).success,
+      publishedLoads.safeParse(withSources({ ...source, terms: 'Free for private use.' })).success,
     ).toBe(true)
     expectIssueAt(
       publishedLoads,
-      sources({ ...source, license: 'CC-BY-4.0' }),
+      withSources({ ...source, license: 'CC-BY-4.0' }),
       'provenance.sources.0.license',
     )
     expectIssueAt(
       publishedLoads,
-      sources({ ...source, license: 'LicenseRef-Example-Powder' }),
+      withSources({ ...source, license: 'LicenseRef-Example-Powder' }),
       'provenance.sources.0.license',
     )
   })

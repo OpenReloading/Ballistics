@@ -3,7 +3,6 @@
   "compilerOptions": {
     "types": ["node"],
     "noEmit": true,
-    "noPropertyAccessFromIndexSignature": false,
     "rootDir": ".."
   },
   "include": [".", "../src", "../scripts"],
