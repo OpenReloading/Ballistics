@@ -180,7 +180,7 @@ export const eventType: z.ZodObject<
         /** An https URL: pages render it as a link. */
         url: z.ZodURL
         /** SHA-256 of a file: 64 lowercase hex digits. */
-        sha256: typeof sha256
+        sha256: z.ZodString
       },
       z.core.$strict
     >

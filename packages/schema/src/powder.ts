@@ -169,7 +169,7 @@ export const powder: z.ZodObject<{
   name: z.ZodString
   /** Other names the same powder is sold under, each as brand and name, stated by a manufacturer. */
   aliases: z.ZodOptional<z.ZodArray<z.ZodString>>
-  country: z.ZodOptional<typeof countryCode>
+  country: z.ZodOptional<z.ZodString>
   /** Grain form: spherical and flattened spherical grains are `ball`; tubes, cylinders and sticks `extruded`. */
   grainForm: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'ball' | 'extruded' | 'flake' | 'other'>>>
   propellantBase: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'single' | 'double' | 'triple'>>>

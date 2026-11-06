@@ -11,10 +11,8 @@ import { StoredUnits } from '@open-reloading/units';
 import { units } from '@open-reloading/units';
 import { z } from 'zod';
 
-// Warning: (ae-forgotten-export) The symbol "kinds" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type AnalysisKey = keyof typeof kinds;
+export type AnalysisKey = 'volume' | 'boreDiameter' | 'boreArea' | 'travel' | 'twist' | 'bulletMass' | 'bulletDiameter' | 'bulletLength' | 'bulletBcG1' | 'bulletBcG7' | 'bulletBaseLength' | 'bulletBaseDiameter' | 'bulletCavityDiameter' | 'bulletCavityDepth' | 'pmax' | 'caseLength' | 'bulkDensity' | 'propellantEnergy' | 'gamma' | 'density' | 'covolume' | 'vivacity' | 'exponent' | 'referencePressure' | 'propellantTemperature' | 'ignitionPressure' | 'startPressure' | 'sebert' | 'formA' | 'formM' | 'formQ' | 'formZ1' | 'leakArea' | 'throatWear' | 'boreFriction' | 'engravingPressure' | 'engravingLength' | 'firearmMass';
 
 // @public
 export const analysisKinds: Readonly<Record<AnalysisKey, QuantityKind>>;
@@ -54,7 +52,7 @@ export const bullet: z.ZodObject<{
     manufacturer: typeof recordId;
     productNumber: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
-    country: z.ZodOptional<typeof countryCode>;
+    country: z.ZodOptional<z.ZodString>;
     productLine: z.ZodOptional<z.ZodString>;
     caliber: z.ZodOptional<z.ZodString>;
     diameter: z.ZodOptional<QuantitySchema>;
@@ -634,7 +632,7 @@ export const eventType: z.ZodObject<{
         edition: z.ZodString;
         publisher: z.ZodString;
         url: z.ZodURL;
-        sha256: typeof sha256;
+        sha256: z.ZodString;
     }, z.core.$strict>;
     scoring: typeof eventScoring;
     levels: z.ZodArray<z.ZodString>;
@@ -661,14 +659,14 @@ export const federation: z.ZodObject<{
     id: typeof recordId;
     name: z.ZodString;
     abbreviation: z.ZodString;
-    country: z.ZodUnion<readonly [z.ZodLiteral<'international'>, typeof countryCode]>;
+    country: z.ZodUnion<readonly [z.ZodLiteral<'international'>, z.ZodString]>;
     internationalFederation: z.ZodOptional<typeof recordId>;
     website: z.ZodOptional<z.ZodURL>;
     ruleBooks: z.ZodArray<z.ZodObject<{
         title: z.ZodString;
         edition: z.ZodString;
         url: z.ZodURL;
-        sha256: typeof sha256;
+        sha256: z.ZodString;
     }, z.core.$strict>>;
     provenance: typeof provenance;
 }, z.core.$strict>;
@@ -1035,7 +1033,7 @@ export const powder: z.ZodObject<{
     manufacturer: typeof recordId;
     name: z.ZodString;
     aliases: z.ZodOptional<z.ZodArray<z.ZodString>>;
-    country: z.ZodOptional<typeof countryCode>;
+    country: z.ZodOptional<z.ZodString>;
     grainForm: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'ball' | 'extruded' | 'flake' | 'other'>>>;
     propellantBase: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'single' | 'double' | 'triple'>>>;
     bulkDensity: z.ZodOptional<QuantitySchema>;
@@ -1122,12 +1120,17 @@ export const powder: z.ZodObject<{
 }>;
 
 // @public
-export type PowderDraft = z.infer<typeof powderDraft>;
+export type PowderDraft = Overrides<Omit<Powder, 'id' | 'manufacturer' | 'name' | 'country' | 'provenance' | 'composition' | 'listedCartridges'>> & {
+    composition?: {
+        name?: string | undefined;
+        cas?: string | undefined;
+        min?: number | undefined;
+        max?: number | undefined;
+    }[] | null;
+};
 
-// Warning: (ae-forgotten-export) The symbol "PowderDraftFields" needs to be exported by the entry point index.d.ts
-//
 // @public
-export const powderDraft: z.ZodType<PowderDraftFields>;
+export const powderDraft: z.ZodType<PowderDraft>;
 
 // @public
 export const pressureMethod: z.ZodEnum<z.core.util.ToEnum<'transducer' | 'piezo' | 'case-contact' | 'crusher' | 'energy'>>;
@@ -1534,7 +1537,7 @@ export const source: z.ZodObject<{
     page: z.ZodOptional<z.ZodString>;
     url: z.ZodOptional<z.ZodURL>;
     retrieved: z.ZodOptional<z.ZodISODate>;
-    sha256: z.ZodOptional<typeof sha256>;
+    sha256: z.ZodOptional<z.ZodString>;
     fields: z.ZodOptional<z.ZodArray<z.ZodString>>;
     kind: z.ZodOptional<typeof provenanceKind>;
     license: z.ZodOptional<z.ZodString>;
@@ -1777,45 +1780,24 @@ export const truing: z.ZodObject<{
         deviation: QuantitySchema;
     }>>;
     parameters: z.ZodArray<z.ZodDiscriminatedUnion<[
-    z.ZodObject<{
-        name: z.ZodLiteral<'muzzleVelocity'>;
-        status: z.ZodEnum<z.core.util.ToEnum<'identified' | 'weak' | 'unresolved'>>;
-        reasons: z.ZodArray<z.ZodEnum<z.core.util.ToEnum<'no-information' | 'collinear' | 'imprecise' | 'fit-failed'>>>;
-        value: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>;
-        lower: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>;
-        upper: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>;
-        confidenceLevel: z.ZodOptional<z.ZodNumber>;
-    }>,
-    z.ZodObject<{
-        name: z.ZodLiteral<'dragFactor'>;
-        status: z.ZodEnum<z.core.util.ToEnum<'identified' | 'weak' | 'unresolved'>>;
-        reasons: z.ZodArray<z.ZodEnum<z.core.util.ToEnum<'no-information' | 'collinear' | 'imprecise' | 'fit-failed'>>>;
-        value: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>;
-        lower: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>;
-        upper: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>;
-        confidenceLevel: z.ZodOptional<z.ZodNumber>;
-    }>,
-    z.ZodObject<{
-        name: z.ZodLiteral<'clickValue'>;
-        status: z.ZodEnum<z.core.util.ToEnum<'identified' | 'weak' | 'unresolved'>>;
-        reasons: z.ZodArray<z.ZodEnum<z.core.util.ToEnum<'no-information' | 'collinear' | 'imprecise' | 'fit-failed'>>>;
-        value: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>;
-        lower: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>;
-        upper: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>;
-        confidenceLevel: z.ZodOptional<z.ZodNumber>;
-    }>,
-    z.ZodObject<{
-        name: z.ZodLiteral<'zeroOffset'>;
-        status: z.ZodEnum<z.core.util.ToEnum<'identified' | 'weak' | 'unresolved'>>;
-        reasons: z.ZodArray<z.ZodEnum<z.core.util.ToEnum<'no-information' | 'collinear' | 'imprecise' | 'fit-failed'>>>;
-        value: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>;
-        lower: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>;
-        upper: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>;
-        confidenceLevel: z.ZodOptional<z.ZodNumber>;
-    }>
+    TruingParameterSchema<'muzzleVelocity'>,
+    TruingParameterSchema<'dragFactor'>,
+    TruingParameterSchema<'clickValue'>,
+    TruingParameterSchema<'zeroOffset'>
     ], 'name'>>;
     consistent: z.ZodOptional<z.ZodBoolean>;
     intervalsTrusted: z.ZodBoolean;
+}>;
+
+// @public
+export type TruingParameterSchema<N extends string> = z.ZodObject<{
+    name: z.ZodLiteral<N>;
+    status: z.ZodEnum<z.core.util.ToEnum<'identified' | 'weak' | 'unresolved'>>;
+    reasons: z.ZodArray<z.ZodEnum<z.core.util.ToEnum<'no-information' | 'collinear' | 'imprecise' | 'fit-failed'>>>;
+    value: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>;
+    lower: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>;
+    upper: z.ZodOptional<QuantitySchema> | z.ZodOptional<z.ZodNumber>;
+    confidenceLevel: z.ZodOptional<z.ZodNumber>;
 }>;
 
 // @public
@@ -2015,11 +1997,6 @@ export function withoutUnknownKinds(json: unknown): {
     json: unknown;
     skipped: SkippedKind[];
 };
-
-// Warnings were encountered during analysis:
-//
-// dist/bullet.d.ts:97:5 - (ae-forgotten-export) The symbol "countryCode" needs to be exported by the entry point index.d.ts
-// dist/event-type.d.ts:83:9 - (ae-forgotten-export) The symbol "sha256" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 
