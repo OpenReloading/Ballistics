@@ -78,12 +78,12 @@ it('lets the config of a logic package add only its import rule to the base', ()
     return { file, keys: Object.keys(config).sort(), extends: config.extends, overrides }
   })
   expect(shapes.length).toBeGreaterThan(0)
-  // a config deeper in a package would replace the package's own for its folder
-  const nested = globSync('packages/*/*/**/.oxlintrc.json', {
+  // Oxlint takes the nearest config of any of its names, so a package holds only the one checked here
+  const anyConfig = globSync('packages/**/{.oxlintrc.json,.oxlintrc.jsonc,oxlint.config.*}', {
     cwd: root,
     exclude: (p) => basename(p) === 'node_modules',
   })
-  expect(nested).toEqual([])
+  expect(anyConfig.sort()).toEqual(shapes.map(({ file }) => file).sort())
   expect(shapes).toEqual(
     shapes.map(({ file, overrides }) => ({
       file,
