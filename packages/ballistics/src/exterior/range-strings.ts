@@ -309,7 +309,7 @@ function planRefusals(
 }
 
 interface Row {
-  kind: 'impact' | 'dial' | 'velocity'
+  kind: RangeStringResidual['kind']
   range: number
   /** Standard uncertainty of the row. */
   sigma: number
@@ -917,7 +917,7 @@ export function comparePlanCandidates(
 /** Observed and predicted value of one row after the fit. */
 export interface RangeStringResidual {
   /** `impact` (m), `dial` (clicks) or `velocity` (m/s); the unit of the values below. */
-  kind: Row['kind']
+  kind: 'impact' | 'dial' | 'velocity'
   /** Slant range, m; the instrument distance for `velocity`. */
   range: number
   /** Observed value. */
