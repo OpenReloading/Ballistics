@@ -132,7 +132,6 @@
 . compareTargetFaces
 . competitionEvent
 . constructionFields
-. designIdProblem
 . discipline
 . disciplineCategory
 . disciplineRules
@@ -220,6 +219,7 @@
 . userDataFormat
 . userDataVersion
 . userId
+. userIdProblem
 . userIdRegex
 . userManufacturer
 . userPowder

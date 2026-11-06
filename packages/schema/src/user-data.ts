@@ -551,8 +551,15 @@ export const shootingLogEntry: z.ZodObject<
   z.core.$strict
 > = shootingLogEntryParser satisfies Exact<typeof shootingLogEntry, typeof shootingLogEntryParser>
 
+/** Why a user record id that is no UUID is refused: other records refer to it by `user:<UUID>`. */
+export const userIdProblem: string =
+  'The id of a user record must be a UUID, so that other records can refer to it.'
+
 const base = {
-  id: z.string().min(1).max(64).describe('Id of the record in the browser library.'),
+  id: z
+    .string()
+    .regex(userIdRegex, userIdProblem)
+    .describe('Id of the record in the browser library: a UUID.'),
   name: z.string().min(1).max(200).describe('Name of the record. Save names the file after it.'),
   saved: z.iso.datetime().describe('Time of the last save, ISO 8601 in UTC.'),
   imported: z
@@ -569,10 +576,6 @@ const base = {
     .optional(),
 }
 
-/** Why an id of a bullet, cartridge, powder or case group that is no UUID is refused: a load refers to it by `user:<UUID>`. */
-export const designIdProblem: string =
-  'The id of a bullet, cartridge, powder or case group must be a UUID, so that a load can refer to it.'
-
 /** The schema of a user record of `kind` K whose `data` has the schema D: one member of {@link userRecord}. */
 export type UserRecordSchema<K extends string, D extends z.ZodType> = z.ZodObject<{
   name: z.ZodString
@@ -581,28 +584,16 @@ export type UserRecordSchema<K extends string, D extends z.ZodType> = z.ZodObjec
     z.ZodObject<{ source: z.ZodString; file: z.ZodString; day: z.ZodISODate }>
   >
   kind: z.ZodLiteral<K>
-  id: z.ZodType<string>
+  id: z.ZodString
   data: D
 }>
 
-const record = <K extends string, D extends z.ZodType>(
-  kind: K,
-  description: string,
-  data: D,
-  id: z.ZodType<string> = base.id,
-) =>
+const record = <K extends string, D extends z.ZodType>(kind: K, description: string, data: D) =>
   z.object({
     kind: z.literal(kind).describe('Kind of the record.'),
     ...base,
-    id,
     data: data.describe(description),
   })
-
-/** The id of a bullet, cartridge, powder or case group: a UUID, as {@link userId}, since loads refer to them. */
-const designId = z
-  .string()
-  .regex(userIdRegex, designIdProblem)
-  .describe('Id of the record in the browser library: a UUID.')
 
 /** Why a record of kind `workbenchState`, the load of the format before kind `load`, is refused. */
 export const legacyLoadProblem: string =
@@ -612,27 +603,21 @@ const userRecordParser = z.discriminatedUnion(
   'kind',
   [
     record('manufacturer', 'A manufacturer typed by the user.', userManufacturer),
-    record('bullet', 'A bullet of the bullet designer.', userBullet, designId),
-    record('cartridge', 'A cartridge of the cartridge designer.', userCartridge, designId),
-    record('powder', 'A powder of the powder designer.', userPowder, designId),
+    record('bullet', 'A bullet of the bullet designer.', userBullet),
+    record('cartridge', 'A cartridge of the cartridge designer.', userCartridge),
+    record('powder', 'A powder of the powder designer.', userPowder),
     record('caseCapacity', 'A case capacity the user measured, in g.', caseCapacity),
     record('load', 'A load of the workbench, in stored units.', load),
     record('firearm', 'A firearm of the library, in stored units.', firearm),
     record('session', 'A chronograph session, in stored units.', chronoSession),
     record('targetSheet', 'A target sheet with its calibration and shot groups.', targetSheet),
     record('targetFaceDesign', 'A target face of the face designer.', targetFaceDesign),
-    record(
-      'case',
-      'A group of cases of the user with their measured values.',
-      cartridgeCase,
-      designId,
-    ),
-    record('event', 'A competition event; never an official result.', competitionEvent, designId),
+    record('case', 'A group of cases of the user with their measured values.', cartridgeCase),
+    record('event', 'A competition event; never an official result.', competitionEvent),
     record(
       'shootingLogEntry',
       "An entry of the shooting log, the person's own record.",
       shootingLogEntry,
-      designId,
     ),
   ],
   {

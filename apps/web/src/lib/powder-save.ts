@@ -157,8 +157,8 @@ export function fittedPowder(
         modelVersion: web.version,
         confidence: f.confidence.label,
         reasons: [...f.confidence.reasons],
-        // a reference names a UUID: a session of an older id is left out; the list is for information
-        sessions: f.sessions.flatMap((s) => userRef(s) ?? []).slice(0, maxFitSessions),
+        // the list is for information
+        sessions: f.sessions.map((s) => `user:${s}` as const).slice(0, maxFitSessions),
         ...(f.previous && { previous: f.previous }),
       },
     },

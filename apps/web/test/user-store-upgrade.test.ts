@@ -15,7 +15,7 @@ const name = 'openreloading-user-data'
 const saved = '2026-10-13T10:00:00.000Z'
 const load = {
   kind: 'load',
-  id: 'w1',
+  id: '00000000-0000-4000-8000-000000007731',
   name: '308 Win.',
   saved,
   data: { origin: 'user', charge: { value: 2.8 }, cartridge: 'catalogue:308-win' },
@@ -49,8 +49,11 @@ it('opens a version 1 database without the later stores and keeps its records', 
   // the stores the old database lacked are there now
   await putPhoto('p1', new Blob(['photo']))
   expect(await storedPhoto('p1')).toBeDefined()
-  await putRecords([{ ...load, id: 'w2' } as never])
-  expect((await storedRecords()).records.map((r) => r.id)).toEqual(['w1', 'w2'])
+  await putRecords([{ ...load, id: '00000000-0000-4000-8000-000000007732' } as never])
+  expect((await storedRecords()).records.map((r) => r.id)).toEqual([
+    '00000000-0000-4000-8000-000000007731',
+    '00000000-0000-4000-8000-000000007732',
+  ])
 
   const db = await open()
   expect(db.version).toBe(2)

@@ -416,7 +416,7 @@ describe('the measured case capacity of a load', () => {
   it('is answered by its record: no reference is left dangling', () => {
     const l = userRecord.parse({
       kind: 'load',
-      id: 'l1',
+      id: '00000000-0000-4000-8000-000000006c31',
       name: 'Load',
       saved: '2026-10-25T10:00:00.000Z',
       data: toLoad(parts({ capacity: measuredCapacityRef(cartridge, m3) })),

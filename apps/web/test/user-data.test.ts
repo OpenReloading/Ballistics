@@ -71,7 +71,7 @@ const bullet: UserRecord = {
 }
 const load: UserRecord = {
   kind: 'load',
-  id: 'w1',
+  id: '00000000-0000-4000-8000-000000007731',
   name: '308 Win.',
   saved,
   data: {
@@ -186,7 +186,7 @@ describe('user data files', () => {
 
   describe('records of a kind this version does not know', () => {
     const event = { kind: 'logEntry', id: 'e1', name: 'Range day', saved, data: { day: 1 } }
-    const stage = { ...event, kind: 'stage', id: 's1' }
+    const stage = { ...event, kind: 'stage', id: '00000000-0000-4000-8000-000000007331' }
     const fileOf = (records: unknown[]) => userDataText(records as UserRecord[])
 
     it('skips them and reads every known record of the file', () => {
@@ -223,7 +223,12 @@ describe('user data files', () => {
 
     it('names each skipped kind with its count in the report, in English and German', async () => {
       const bytes = new TextEncoder().encode(
-        fileOf([event, event, stage, load].map((r, i) => ({ ...r, id: `r${i}` }))),
+        fileOf(
+          [event, event, stage, load].map((r, i) => ({
+            ...r,
+            id: `00000000-0000-4000-8000-00000000000${i}`,
+          })),
+        ),
       )
       const { records, notes } = await parseFiles(
         [{ name: 'later.json', bytes }],
@@ -276,7 +281,7 @@ describe('user data files', () => {
       data: { origin: 'user', charge: { value: 3 } },
     }
     const sameData = { ...bullet, saved: '2026-10-14T10:00:00.000Z' }
-    const fresh = { ...load, id: 'w2' }
+    const fresh = { ...load, id: '00000000-0000-4000-8000-000000007732' }
     expect(planImport([sameData, changed, fresh], [bullet, load])).toEqual({
       added: [fresh],
       equal: [sameData],
@@ -312,12 +317,17 @@ describe('user data files', () => {
       saved: '2026-10-15T10:00:00.000Z',
       data: { references: [], targetRotation: 0, groups: [], ...(photo && { photo }) },
     })
-    const before = [sheet('s1', 'p1'), sheet('s2', 'p2'), sheet('s3', 'p3'), sheet('s4')]
+    const before = [
+      sheet('00000000-0000-4000-8000-000000007331', 'p1'),
+      sheet('00000000-0000-4000-8000-000000007332', 'p2'),
+      sheet('00000000-0000-4000-8000-000000007333', 'p3'),
+      sheet('00000000-0000-4000-8000-000000007334'),
+    ]
     const after = [
-      sheet('s1', 'p9'),
-      sheet('s2', 'p2'),
-      sheet('s3'),
-      sheet('s4'),
+      sheet('00000000-0000-4000-8000-000000007331', 'p9'),
+      sheet('00000000-0000-4000-8000-000000007332', 'p2'),
+      sheet('00000000-0000-4000-8000-000000007333'),
+      sheet('00000000-0000-4000-8000-000000007334'),
       sheet('s5', 'p3'),
     ]
     // p1 replaced, p2 kept, p3 dropped by s3 but still held by s5
@@ -330,7 +340,7 @@ describe('user data files', () => {
     const bytes = Uint8Array.from({ length: 300_000 }, (_, i) => (i * 7) % 256)
     const sheet: UserRecord = {
       kind: 'targetSheet',
-      id: 's1',
+      id: '00000000-0000-4000-8000-000000007331',
       name: 'Sheet',
       saved,
       data: {
@@ -358,7 +368,7 @@ describe('user data files', () => {
   it('gives the text of a file with its photos, or the reason Import would refuse it', () => {
     const sheet: UserRecord = {
       kind: 'targetSheet',
-      id: 's1',
+      id: '00000000-0000-4000-8000-000000007331',
       name: 'Sheet',
       saved,
       data: { photo: 'p1', references: [], targetRotation: 0, groups: [] },
@@ -391,7 +401,12 @@ describe('user data files', () => {
       type: 'image/jpeg' as const,
       data: 'A'.repeat(chars),
     })
-    const records = [sheet('s1', 'p1'), sheet('s2', 'p2'), sheet('s3', 'p3'), load]
+    const records = [
+      sheet('00000000-0000-4000-8000-000000007331', 'p1'),
+      sheet('00000000-0000-4000-8000-000000007332', 'p2'),
+      sheet('00000000-0000-4000-8000-000000007333', 'p3'),
+      load,
+    ]
     const small = [photo('p1', 4), photo('p2', 8)]
     expect(exportAllText(records, small)).toEqual({
       ...checkedUserDataText(records, small),
@@ -457,7 +472,9 @@ describe('user data files', () => {
     expect(
       await folderFileName('new-bullet.json', '9b8a7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d', read),
     ).toBe('new-bullet.json')
-    expect(await folderFileName('mine.json', 'w1', read)).toBe('mine.json')
+    expect(await folderFileName('mine.json', '00000000-0000-4000-8000-000000007731', read)).toBe(
+      'mine.json',
+    )
     expect(await folderFileName('free.json', '1c2d3e4f-5a6b-4c7d-8e9f-0a1b2c3d4e5f', read)).toBe(
       'free.json',
     )
@@ -527,7 +544,7 @@ describe('the user manufacturer of a record', () => {
   it('is the case manufacturer of a case capacity', () => {
     const capacity = {
       kind: 'caseCapacity',
-      id: 'c1',
+      id: '00000000-0000-4000-8000-000000006331',
       name: 'Capacity',
       saved,
       data: { origin: 'user', caseManufacturer: `user:${makerId}` },

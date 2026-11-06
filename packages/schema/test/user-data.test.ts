@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 import {
   checkUserRefs,
-  designIdProblem,
   firearm,
   legacyLoadProblem,
   type UserRecord,
@@ -10,6 +9,7 @@ import {
   userDataFile,
   userDataFormat,
   userDataVersion,
+  userIdProblem,
   userRecord,
   userRefFields,
   versionProblem,
@@ -59,7 +59,7 @@ const cartridgeRecord = {
 } as const
 const loadRecord = {
   kind: 'load',
-  id: 'w4',
+  id: '00000000-0000-4000-8000-000000000004',
   name: 'Load',
   saved,
   data: { origin: 'user', charge: { value: 2.8 }, cartridge: 'catalogue:308-win' },
@@ -67,7 +67,7 @@ const loadRecord = {
 
 const firearmRecord = {
   kind: 'firearm',
-  id: 'f5',
+  id: '00000000-0000-4000-8000-000000000005',
   name: 'Range rifle',
   saved,
   data: {
@@ -128,13 +128,13 @@ const caseRecord = {
 
 const sheetRecord = {
   kind: 'targetSheet',
-  id: 't1',
+  id: '00000000-0000-4000-8000-0000000000a1',
   name: 'Ladder sheet',
   saved: '2026-10-15T10:00:00.000Z',
   data: {
     references: [],
     targetRotation: 0,
-    load: 'w1',
+    load: '00000000-0000-4000-8000-000000000001',
     groups: [
       {
         id: 'g1',
@@ -150,7 +150,7 @@ const sheetRecord = {
 
 const faceRecord = {
   kind: 'targetFaceDesign',
-  id: 'f1',
+  id: '00000000-0000-4000-8000-0000000000f1',
   name: 'Club face',
   saved,
   data: {
@@ -331,7 +331,7 @@ describe('userDataFile powder drafts and fits', () => {
 describe('userDataFile ids, manufacturers and faces', () => {
   it('refuses a powder with an id that is no UUID, and says why', () => {
     const r = userRecord.safeParse({ ...powderRecord, id: 'old-1' })
-    expect(r.error?.issues[0]).toMatchObject({ path: ['id'], message: designIdProblem })
+    expect(r.error?.issues[0]).toMatchObject({ path: ['id'], message: userIdProblem })
   })
 
   it('takes a user manufacturer as a name and refuses another origin', () => {
@@ -394,16 +394,15 @@ describe('userDataFile variants', () => {
     for (const r of [bulletRecord, cartridgeRecord]) {
       const old = userRecord.safeParse({ ...r, id: 'lk3j2h1g-a8s7d6f5' })
       expect(old.success).toBe(false)
-      expect(old.error?.issues[0]).toMatchObject({ path: ['id'], message: designIdProblem })
+      expect(old.error?.issues[0]).toMatchObject({ path: ['id'], message: userIdProblem })
       expect(userDataFile.safeParse(file([r, { ...r, id: 'old-1' }])).success).toBe(false)
     }
   })
 
-  it('opens records with an old browser id and with a UUID', () => {
-    const ids = ['lk3j2h1g-a8s7d6f5', uuid]
-    expect(userDataFile.safeParse(file(ids.map((id) => ({ ...loadRecord, id })))).success).toBe(
-      true,
-    )
+  it('opens a record with a UUID and refuses one with another id, whatever its kind', () => {
+    expect(userDataFile.safeParse(file([{ ...loadRecord, id: uuid }])).success).toBe(true)
+    const old = userDataFile.safeParse(file([{ ...loadRecord, id: 'lk3j2h1g-a8s7d6f5' }]))
+    expect(old.error?.issues[0]).toMatchObject({ message: userIdProblem })
   })
 })
 
@@ -508,7 +507,7 @@ describe('userDataFile files', () => {
 describe('a record of the earlier load format', () => {
   const old = {
     kind: 'workbenchState',
-    id: 'w1',
+    id: '00000000-0000-4000-8000-000000000001',
     name: 'Load',
     saved,
     data: { siValues: { charge: 0.0028 }, cartridge: '308-win' },
@@ -994,7 +993,12 @@ const parsedFirearm = userRecord.parse(firearmRecord)
 describe('checkUserRefs', () => {
   it('reports a load that points at a missing firearm', () => {
     expect(checkUserRefs([withFirearm(`user:${uuid}`)])).toEqual([
-      { record: 'w4', kind: 'load', field: 'firearm', target: `user:${uuid}` },
+      {
+        record: '00000000-0000-4000-8000-000000000004',
+        kind: 'load',
+        field: 'firearm',
+        target: `user:${uuid}`,
+      },
     ])
   })
 
@@ -1069,7 +1073,12 @@ describe('checkUserRefs components of a load', () => {
     ]
     expect(checkUserRefs([withRefs(`user:${uuid}`, `user:${own[1]?.id}`), ...own])).toEqual([])
     expect(checkUserRefs([withRefs(`user:${uuid}`, 'catalogue:alpha-30425')])).toEqual([
-      { record: 'w4', kind: 'load', field: 'cartridge', target: `user:${uuid}` },
+      {
+        record: '00000000-0000-4000-8000-000000000004',
+        kind: 'load',
+        field: 'cartridge',
+        target: `user:${uuid}`,
+      },
     ])
     // a design of the other kind under that id does not answer
     expect(
@@ -1081,7 +1090,12 @@ describe('checkUserRefs components of a load', () => {
     const own = userRecord.parse(powderRecord)
     expect(checkUserRefs([withPowder(`user:${powderId}`), own])).toEqual([])
     expect(checkUserRefs([withPowder(`user:${powderId}`)])).toEqual([
-      { record: 'w4', kind: 'load', field: 'powder', target: `user:${powderId}` },
+      {
+        record: '00000000-0000-4000-8000-000000000004',
+        kind: 'load',
+        field: 'powder',
+        target: `user:${powderId}`,
+      },
     ])
     expect(checkUserRefs([withPowder('catalogue:test-powder')])).toEqual([])
     expect(userRefFields(withPowder(`user:${powderId}`))).toContain('powder')
@@ -1094,7 +1108,7 @@ describe('checkUserRefs components of a load', () => {
   })
 })
 
-describe('checkUserRefs capacities, case groups and sheets', () => {
+describe('checkUserRefs capacities and case groups', () => {
   it('reports a capacity record whose user cartridge or manufacturer nobody answers', () => {
     const capacity = userRecord.parse({
       kind: 'caseCapacity',
@@ -1130,13 +1144,28 @@ describe('checkUserRefs capacities, case groups and sheets', () => {
     expect(checkUserRefs([load]).map((d) => d.field)).toEqual(['case.record'])
     expect(checkUserRefs([load, userRecord.parse(caseRecord)])).toEqual([])
   })
+})
 
+describe('checkUserRefs sheets', () => {
   it('reports a target sheet whose load is missing', () => {
-    const sheet = userRecord.parse({ ...sheetRecord, data: { ...sheetRecord.data, load: 'gone' } })
+    const sheet = userRecord.parse({
+      ...sheetRecord,
+      data: { ...sheetRecord.data, load: '00000000-0000-4000-8000-00000000dead' },
+    })
     expect(checkUserRefs([sheet])).toEqual([
-      { record: 't1', kind: 'targetSheet', field: 'load', target: 'gone' },
+      {
+        record: '00000000-0000-4000-8000-0000000000a1',
+        kind: 'targetSheet',
+        field: 'load',
+        target: '00000000-0000-4000-8000-00000000dead',
+      },
     ])
-    expect(checkUserRefs([sheet, userRecord.parse({ ...loadRecord, id: 'gone' })])).toEqual([])
+    expect(
+      checkUserRefs([
+        sheet,
+        userRecord.parse({ ...loadRecord, id: '00000000-0000-4000-8000-00000000dead' }),
+      ]),
+    ).toEqual([])
   })
 })
 

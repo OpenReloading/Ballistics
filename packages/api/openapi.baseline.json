@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "OpenReloading API",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "description": "Records of cartridges, components and competitions, and the exterior and interior ballistics models. Quantities are SI (m, kg, s, Pa, K, rad) unless a field names another unit. Results are simulations, not load data."
   },
   "tags": [
@@ -17606,9 +17606,8 @@
                             },
                             "id": {
                               "type": "string",
-                              "minLength": 1,
-                              "maxLength": 64,
-                              "description": "Id of the record in the browser library."
+                              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                              "description": "Id of the record in the browser library: a UUID."
                             },
                             "name": {
                               "type": "string",
@@ -20544,9 +20543,8 @@
                             },
                             "id": {
                               "type": "string",
-                              "minLength": 1,
-                              "maxLength": 64,
-                              "description": "Id of the record in the browser library."
+                              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                              "description": "Id of the record in the browser library: a UUID."
                             },
                             "name": {
                               "type": "string",
@@ -20792,9 +20790,8 @@
                             },
                             "id": {
                               "type": "string",
-                              "minLength": 1,
-                              "maxLength": 64,
-                              "description": "Id of the record in the browser library."
+                              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                              "description": "Id of the record in the browser library: a UUID."
                             },
                             "name": {
                               "type": "string",
@@ -21327,6 +21324,59 @@
                                         }
                                       ],
                                       "description": "The ladder of the load: step count, step size and direction."
+                                    },
+                                    "powders": {
+                                      "type": "object",
+                                      "properties": {
+                                        "mode": {
+                                          "type": "string",
+                                          "enum": ["typed", "fill", "target"],
+                                          "description": "Charge of each run."
+                                        },
+                                        "fill": {
+                                          "type": "number",
+                                          "minimum": 10,
+                                          "maximum": 120,
+                                          "description": "Case fill, %."
+                                        },
+                                        "targetPressure": {
+                                          "type": "number",
+                                          "exclusiveMinimum": 0,
+                                          "description": "Target peak pressure, bar."
+                                        },
+                                        "targetPercent": {
+                                          "type": "number",
+                                          "exclusiveMinimum": 0,
+                                          "description": "Target, % of CIP Pmax."
+                                        },
+                                        "manufacturer": {
+                                          "type": "string",
+                                          "allOf": [
+                                            {
+                                              "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$"
+                                            },
+                                            {
+                                              "pattern": "^catalogue:"
+                                            }
+                                          ],
+                                          "description": "Reference `catalogue:<record id>` to a catalogue manufacturer."
+                                        },
+                                        "base": {
+                                          "type": "string",
+                                          "minLength": 1,
+                                          "maxLength": 200,
+                                          "description": "Base filter."
+                                        },
+                                        "form": {
+                                          "type": "string",
+                                          "minLength": 1,
+                                          "maxLength": 200,
+                                          "description": "Form filter."
+                                        }
+                                      },
+                                      "required": ["mode"],
+                                      "additionalProperties": false,
+                                      "description": "Powders tab mode and filters (GLOSSARY `powders`)."
                                     }
                                   },
                                   "description": "The typed solver values and the ladder the load is analysed with."
@@ -21563,9 +21613,8 @@
                             },
                             "id": {
                               "type": "string",
-                              "minLength": 1,
-                              "maxLength": 64,
-                              "description": "Id of the record in the browser library."
+                              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                              "description": "Id of the record in the browser library: a UUID."
                             },
                             "name": {
                               "type": "string",
@@ -22831,9 +22880,8 @@
                             },
                             "id": {
                               "type": "string",
-                              "minLength": 1,
-                              "maxLength": 64,
-                              "description": "Id of the record in the browser library."
+                              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                              "description": "Id of the record in the browser library: a UUID."
                             },
                             "name": {
                               "type": "string",
@@ -23343,9 +23391,8 @@
                             },
                             "id": {
                               "type": "string",
-                              "minLength": 1,
-                              "maxLength": 64,
-                              "description": "Id of the record in the browser library."
+                              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                              "description": "Id of the record in the browser library: a UUID."
                             },
                             "name": {
                               "type": "string",
@@ -23922,9 +23969,8 @@
                                 },
                                 "load": {
                                   "type": "string",
-                                  "minLength": 1,
-                                  "maxLength": 64,
-                                  "description": "Id of the saved load the groups belong to."
+                                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                                  "description": "Id of the saved load the groups belong to: a UUID."
                                 },
                                 "markerDiameter": {
                                   "type": "number",
@@ -24033,9 +24079,8 @@
                             },
                             "id": {
                               "type": "string",
-                              "minLength": 1,
-                              "maxLength": 64,
-                              "description": "Id of the record in the browser library."
+                              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                              "description": "Id of the record in the browser library: a UUID."
                             },
                             "name": {
                               "type": "string",
@@ -25116,7 +25161,7 @@
                 "records": [
                   {
                     "kind": "load",
-                    "id": "load-1",
+                    "id": "00000000-0000-4000-8000-00000000a001",
                     "name": "Load",
                     "saved": "2026-01-01T00:00:00.000Z",
                     "data": {

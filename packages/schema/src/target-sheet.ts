@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import type { Exact } from './exact.ts'
-import { recordId, ref } from './ids.ts'
+import { recordId, ref, userId } from './ids.ts'
 import { hexColour, localId } from './shared.ts'
 
 /** A pixel of the photo as the browser shows it (orientation applied), x right, y down. */
@@ -301,7 +301,7 @@ const targetSheetParser = z
       })
       .optional(),
     groups: z.array(shotGroup).max(50).describe('Shot groups of the sheet.'),
-    load: localId.describe('Id of the saved load the groups belong to.').optional(),
+    load: userId.describe('Id of the saved load the groups belong to: a UUID.').optional(),
     markerDiameter: positiveMeters()
       .describe('Diameter of the shot marks, m. Absent: a fixed size on screen.')
       .optional(),

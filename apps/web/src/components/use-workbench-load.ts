@@ -480,8 +480,7 @@ function cartridgeSource(
 }
 
 /** Whether the seating the load carries is the start's own: the barrel nobody typed. */
-function seatingKeptOf(referenced: boolean, seated: Seated, suggestions: Suggestions) {
-  if (!referenced) return false
+function seatingKeptOf(seated: Seated, suggestions: Suggestions) {
   if (seated.barrel === undefined) return true
   return (
     Math.abs(seated.barrel - (suggestions.barrelLength?.si ?? Number.NaN)) <= 1e-9 * seated.barrel
@@ -517,18 +516,6 @@ function nextPanelOf(next: number, hasVolume: boolean): InputPanel | undefined {
 }
 
 const refOf = (record: { id: string } | undefined) => record && catalogueRef(record.id)
-
-/** Whether the references the load keeps can all be written: a design or firearm whose id is no UUID cannot. */
-function referencedOf(
-  firearm: string | undefined,
-  firearmRef: string | undefined | false,
-  cartridgeDesign: UserCartridgeView | undefined,
-  bulletDesign: { id: string } | undefined,
-) {
-  if (firearm && !firearmRef) return false
-  if (cartridgeDesign && !userRef(cartridgeDesign.id)) return false
-  return !bulletDesign || !!userRef(bulletDesign.id)
-}
 
 /** What a run still needs, in the order of the cards; the first open one is next. */
 function todoOf(a: {
@@ -1478,10 +1465,6 @@ const powderLabelOf = (
   names: ManufacturerNames,
 ) => labelOf(powder, names) ?? design?.name
 
-/** A design the load can name: only such a reference gives its values again. */
-const isNamedDesign = (design: { id: string } | undefined) =>
-  design !== undefined && userRef(design.id) !== undefined
-
 /**
  * The reference a load keeps: the record being loaded (`asked`, kept too when it did not resolve),
  * else a user design of this browser, else the catalogue record `id`.
@@ -2181,7 +2164,7 @@ export function useWorkbenchState() {
   } = useBulletValues(
     bullet,
     bulletDesign,
-    isNamedDesign(bulletDesign),
+    bulletDesign !== undefined,
     fields.bulletMass?.si,
     typedBulletFields,
   )
@@ -3452,7 +3435,6 @@ export function useWorkbenchState() {
   // the references the load keeps; one that cannot be written (a design or firearm whose id is no
   // UUID) leaves what it gives in the load as typed values
   const firearmRef = userRefOf(firearm)
-  const referenced = referencedOf(firearm, firearmRef, cartridgeDesign, bulletDesign)
   const { cartridgeRef, bulletRef, powderRef } = savedRefsOf(asked, {
     cartridge,
     cartridgeDesign,
@@ -3475,11 +3457,9 @@ export function useWorkbenchState() {
     defaults,
     defaulted: savedDefaulted(defaulted, suggestions),
     followed,
-    suggestions: Object.fromEntries(
-      followKeys.map((k) => [k, referenced ? saved[k]?.si : undefined]),
-    ),
+    suggestions: Object.fromEntries(followKeys.map((k) => [k, saved[k]?.si])),
     previewed,
-    seatingKept: seatingKeptOf(referenced, seated, suggestions),
+    seatingKept: seatingKeptOf(seated, suggestions),
     gunMass: gunFromFirearm.current && !!firearmRef,
   })
   /** What the user changed over the records, with each record's value; the one source of the marks and resets. */
@@ -3583,7 +3563,7 @@ export function useWorkbenchState() {
   const storeLoad = useCallback(
     async (record: UserRecord) => {
       const c = measuredCapacity
-      // the strings mapped to a charge name this load, once it has an id the schema accepts as a reference
+      // the strings mapped to a charge name this load
       const ref = userRef(record.id)
       const attached = sessionsNow.current.map((s) => attachLoad(s, ref))
       const changed = attached.filter((s, i) => s !== sessionsNow.current[i])
