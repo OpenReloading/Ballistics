@@ -155,7 +155,6 @@ const {
   ...powderShape
 } = powder.shape
 
-/** One ingredient of a powder draft: the printed name, CAS number and mass percent range, each still optional. */
 const compositionDraftParser = z.object({
   name: z
     .string()
@@ -165,6 +164,8 @@ const compositionDraftParser = z.object({
   min: z.number().describe('Lower end of the mass percent range.').optional(),
   max: z.number().describe('Upper end of the mass percent range.').optional(),
 })
+
+/** One ingredient of a powder draft: the printed name, CAS number and mass percent range, each still optional. */
 const compositionDraft: z.ZodObject<{
   name: z.ZodOptional<z.ZodString>
   cas: z.ZodOptional<z.ZodString>
