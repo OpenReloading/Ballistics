@@ -342,6 +342,95 @@
           }
         ]
       }
+    },
+    {
+      "kind": "event",
+      "id": "3c4d5e6f-7a8b-4c9d-8e0f-1a2b3c4d5e6f",
+      "name": "Kreismeisterschaft Großkaliber",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "date": "2026-06-14",
+        "place": "Göttingen",
+        "eventType": "catalogue:dsb-meisterschaft",
+        "level": "Landesmeisterschaft",
+        "discipline": "catalogue:dsb-25m-sportpistole",
+        "firearm": "user:2a3b4c5d-6e7f-4a8b-9c0d-1e2f3a4b5c6d",
+        "state": "completed",
+        "results": {
+          "method": "rings",
+          "series": [
+            {
+              "shots": [
+                10,
+                9,
+                10,
+                8,
+                9
+              ],
+              "targetSheet": "user:4b5c6d7e-8f90-4a1b-8c2d-3e4f5a6b7c8d"
+            },
+            {
+              "total": 47
+            }
+          ]
+        }
+      }
+    },
+    {
+      "kind": "event",
+      "id": "4d5e6f70-8b9c-4dae-9f10-2b3c4d5e6f70",
+      "name": "Club match",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "date": "2026-07-04",
+        "eventType": "catalogue:ipsc-handgun",
+        "level": "Level I",
+        "division": "Production",
+        "rounds": 96,
+        "firearm": "user:2a3b4c5d-6e7f-4a8b-9c0d-1e2f3a4b5c6d",
+        "state": "disqualified",
+        "results": {
+          "method": "hit-factor",
+          "stages": [
+            {
+              "name": "Stage 1",
+              "hits": {
+                "A": 10,
+                "C": 4,
+                "D": 1,
+                "metal": 2
+              },
+              "misses": 1,
+              "noShoots": 0,
+              "procedurals": 1,
+              "time": 12.5,
+              "powerFactor": "minor",
+              "stagePoints": 88.1234
+            }
+          ]
+        }
+      }
+    },
+    {
+      "kind": "shootingLogEntry",
+      "id": "5e6f7081-9cad-4ebf-a021-3c4d5e6f7081",
+      "name": "2026-10-12 Range",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "date": "2026-10-12",
+        "rounds": 30,
+        "place": "Club range",
+        "discipline": "catalogue:dsb-1-35",
+        "firearm": "user:2a3b4c5d-6e7f-4a8b-9c0d-1e2f3a4b5c6d",
+        "load": "user:8c9d0e1f-2a3b-4c4d-9e5f-6a7b8c9d0e1f",
+        "result": "285 rings",
+        "event": "user:3c4d5e6f-7a8b-4c9d-8e0f-1a2b3c4d5e6f",
+        "notes": "Wind from the left",
+        "confirmation": {
+          "by": "Range officer",
+          "date": "2026-10-12"
+        }
+      }
     }
   ],
   "files": [

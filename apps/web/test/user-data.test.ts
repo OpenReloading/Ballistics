@@ -562,7 +562,7 @@ describe('share links', () => {
   const base = 'https://example.org/bullets/designer'
   // the fitted powder of the golden file
   const golden: { records: UserRecord[] } = JSON.parse(
-    readFileSync(new URL('golden/user-data.json', import.meta.url), 'utf8'),
+    readFileSync(new URL('golden/user-data-v1.json', import.meta.url), 'utf8'),
   )
   const powder = defined(golden.records.find((r) => r.kind === 'powder')) as Extract<
     UserRecord,

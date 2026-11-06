@@ -137,7 +137,7 @@ A fitted user powder keeps a copy of what it was fitted to in the optional `fit`
 | `sessions`               | up to 50 `user:<UUID>` references to the sessions the points came from, for information only                        |                                                                                       |
 | `previous`               | optional: `user:<UUID>` of the powder record this one refits                                                        |                                                                                       |
 
-`sessions` and `previous` are never resolved: `checkUserRefs` does not report them and a share link does not count them as user references. The block is part of the user data file baseline (`apps/web/test/golden/user-data.json`, [release](../release.md#contract-baselines)).
+`sessions` and `previous` are never resolved: `checkUserRefs` does not report them and a share link does not count them as user references. The block is part of the user data file baseline (`apps/web/test/golden/user-data-v1.json`, [release](../release.md#contract-baselines)).
 
 ## Firearm
 
