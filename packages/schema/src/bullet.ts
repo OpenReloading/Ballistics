@@ -549,7 +549,7 @@ export const bullet: z.ZodObject<{
   /** Product number. Absent only with `nameOnly`. */
   productNumber: z.ZodOptional<z.ZodString>
   name: z.ZodString
-  country: z.ZodOptional<typeof countryCode>
+  country: z.ZodOptional<z.ZodString>
   productLine: z.ZodOptional<z.ZodString>
   /** Caliber as the manufacturer writes it, for example `.308`. */
   caliber: z.ZodOptional<z.ZodString>

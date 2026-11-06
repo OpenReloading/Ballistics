@@ -14,7 +14,7 @@ Where questions, ideas, bugs and record requests go: [README](README.md#communit
 
 - `pnpm run build`, `pnpm run typecheck`, `pnpm run lint` (`pnpm run format` applies the fixes), `pnpm test`.
 - Record changes: `pnpm run data:validate`.
-- A change to the exports of `packages/units`, `packages/locale-format`, `packages/statistics`, `packages/shot-groups` or `packages/importers`: `pnpm exec api-extractor run --local` in that folder rewrites its API report (`<name>.api.md`), which the build compares and the pull request shows.
+- A change to the exports of `packages/units`, `packages/locale-format`, `packages/schema`, `packages/statistics`, `packages/shot-groups` or `packages/importers`: `pnpm exec api-extractor run --local` in that folder rewrites its API report (`<name>.api.md`), which the build compares and the pull request shows.
 - API changes, in the dev container (the checks need oasdiff and Schemathesis): `pnpm run api:check` (a breaking change also rewrites the baseline: `pnpm --filter @open-reloading/tools run api-baseline`) and `pnpm run api:conformance` against a running API.
 - CI (`.github/workflows/ci.yml`) also runs `pnpm run docs:check`, `pnpm audit` (`tools/src/audit.ts`: high and critical advisories, except the allowlisted ones without a fix), the licence policy (`tools/src/licences.ts`: licences of the production dependencies of the API image and the web app, and the list of them in `NOTICE`), the API contract checks, the e2e tests, the drawing baseline, the workflow lint (actionlint, zizmor) and the dependency review.
 

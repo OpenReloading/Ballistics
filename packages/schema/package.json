@@ -36,10 +36,11 @@
     "dist",
     "!dist/**/*.map",
     "!dist/*.tsbuildinfo",
+    "!dist/api-extractor",
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc -b tsconfig.build.json && node scripts/write-json-schema.ts",
+    "build": "tsc -b tsconfig.build.json && node scripts/write-json-schema.ts && api-extractor run",
     "typecheck": "tsc --noEmit && tsc -p test",
     "lint": "oxlint --type-aware --deny-warnings --report-unused-disable-directives",
     "test": "vitest run --coverage && publint --strict && attw --pack . --profile esm-only"
@@ -50,6 +51,7 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "catalog:",
+    "@microsoft/api-extractor": "catalog:",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "fast-check": "catalog:",
