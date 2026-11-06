@@ -758,7 +758,7 @@ _Avoid_: holeSize
 ### Truing results
 
 **Truing result**:
-`RangeStringFit`, the result of a fit from range strings (`packages/core/src/exterior/range-strings.ts`): `parameters`, `held`, `correlation`, `confounded`, `conditionNumber`, `residuals` and the residual check.
+`RangeStringFit`, the result of a fit from range strings (`packages/ballistics/src/exterior/range-strings.ts`): `parameters`, `held`, `correlation`, `confounded`, `conditionNumber`, `residuals` and the residual check.
 _Avoid_: `target` (of a truing result)
 
 **Fitted parameter**:

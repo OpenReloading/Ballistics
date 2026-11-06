@@ -52,8 +52,8 @@ Analytic: closed forms and synthetic cases.
 
 ## Where in the app
 
-- `packages/core/test/exterior-closed-form.test.ts`.
-- `packages/core/src/exterior/trajectory.ts`, `packages/core/src/exterior/modified.ts`, `packages/core/src/exterior/stability.ts`.
+- `packages/ballistics/test/exterior-closed-form.test.ts`.
+- `packages/ballistics/src/exterior/trajectory.ts`, `packages/ballistics/src/exterior/modified.ts`, `packages/ballistics/src/exterior/stability.ts`.
 - Model pages: [point mass](../models/exterior-point-mass.md), [modified point mass](../models/exterior-modified-point-mass.md).
 
 ## Confidence

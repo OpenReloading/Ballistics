@@ -16,7 +16,7 @@ $$
 L = v_t\, t \sin\psi, \qquad \theta = \arctan\frac{L}{R}
 $$
 
-Code: `packages/core/src/exterior/moving-target.ts`, `movingTargetLead`.
+Code: `packages/ballistics/src/exterior/moving-target.ts`, `movingTargetLead`.
 
 The lead in target lengths is $L / \ell_t$ for a target of length $\ell_t$ in the direction of its motion. The web app divides by the length typed for the target.
 

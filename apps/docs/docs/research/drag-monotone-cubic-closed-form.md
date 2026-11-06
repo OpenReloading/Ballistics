@@ -42,8 +42,8 @@ Analytic: values worked out by hand for three tables, no measured data.
 
 ## Where in the app
 
-- `packages/core/src/exterior/drag.ts`, `nodeSlope`, `onSegment`, `segmentCoefficient`.
-- `packages/core/test/exterior-drag.test.ts`, the tests "matches the closed form on three nodes and the line on two" and "extends the cubic of a segment past its nodes".
+- `packages/ballistics/src/exterior/drag.ts`, `nodeSlope`, `onSegment`, `segmentCoefficient`.
+- `packages/ballistics/test/exterior-drag.test.ts`, the tests "matches the closed form on three nodes and the line on two" and "extends the cubic of a segment past its nodes".
 - Model page: [drag](../models/exterior-drag.md).
 
 ## Confidence

@@ -18,7 +18,7 @@ $$
 q_j = q_{j,0}\, e^{\theta_j}
 $$
 
-Code: `packages/core/src/exterior/truing.ts`, `leastSquares` (`q`). `packages/core/src/exterior/range-strings.ts`, `applied`.
+Code: `packages/ballistics/src/exterior/truing.ts`, `leastSquares` (`q`). `packages/ballistics/src/exterior/range-strings.ts`, `applied`.
 
 The [powder fit](interior-powder-fit.md) maps the start pressure relative to a floor below which it has no effect. [Truing from range strings](exterior-truing-strings.md) fits the zero offset as $\theta$ itself, in rad.
 

@@ -18,7 +18,7 @@ $$
 S_{g,0} = \frac{30\,m_{\mathrm{gr}}}{t_c^2\,d_{\mathrm{in}}^3\,l_c\,(1 + l_c^2)}
 $$
 
-Code: `packages/core/src/exterior/stability.ts`, `millerStability` (`sg`).
+Code: `packages/ballistics/src/exterior/stability.ts`, `millerStability` (`sg`).
 
 Corrections for the muzzle velocity and for the air at the firing point (288.15 K is 59 degF). $S_g$ scales inversely with the air density:
 
@@ -26,19 +26,19 @@ $$
 S_g = S_{g,0}\left(\frac{v_0}{2800\ \mathrm{ft/s}}\right)^{1/3}\frac{T}{288.15\ \mathrm{K}}\,\frac{29.92\ \mathrm{inHg}}{p}
 $$
 
-Code: `packages/core/src/exterior/stability.ts`, `millerStability` (`fv`, `fa`).
+Code: `packages/ballistics/src/exterior/stability.ts`, `millerStability` (`fv`, `fa`).
 
 The function takes SI inputs and converts them. The trajectory evaluates $S_g$ once, at the muzzle, with the station air of the shot (the zero with the air of the zero).
 
 ### Stability along the trajectory
 
-The result gives Miller's factor at the muzzle only, with no value or warning along the path. In linear theory the gyroscopic factor is proportional to $\omega^2 / (\rho\,v^2\,C_{M_\alpha})$, with the spin rate $\omega$, the air density $\rho$, the speed $v$ and the overturning-moment slope $C_{M_\alpha}$ ([McCoy 1999](../bibliography.md#mccoy-1999), chapter numbers unverified; the same ratio is `gyroscopicStability` in `packages/core/src/exterior/modified.ts`). In flat fire the speed falls faster than the spin, so at a constant moment slope the factor rises with range:
+The result gives Miller's factor at the muzzle only, with no value or warning along the path. In linear theory the gyroscopic factor is proportional to $\omega^2 / (\rho\,v^2\,C_{M_\alpha})$, with the spin rate $\omega$, the air density $\rho$, the speed $v$ and the overturning-moment slope $C_{M_\alpha}$ ([McCoy 1999](../bibliography.md#mccoy-1999), chapter numbers unverified; the same ratio is `gyroscopicStability` in `packages/ballistics/src/exterior/modified.ts`). In flat fire the speed falls faster than the spin, so at a constant moment slope the factor rises with range:
 
 $$
 S_g(x) = S_g(0)\left(\frac{\omega(x)}{\omega_0}\right)^2\left(\frac{v_0}{v(x)}\right)^2\frac{\rho_0}{\rho(x)}\,\frac{C_{M_\alpha}(0)}{C_{M_\alpha}(x)}
 $$
 
-Code: `packages/core/src/exterior/modified.ts`, `gyroscopicStability`, evaluated at the muzzle and at a point.
+Code: `packages/ballistics/src/exterior/modified.ts`, `gyroscopicStability`, evaluated at the muzzle and at a point.
 
 Miller's rule with the speed and the air of a point behaves the other way. Its speed term $v^{1/3}$ is a fit to the muzzle velocity at one twist, where the initial spin is proportional to the muzzle velocity. Along a flight the spin is not proportional to the speed, so the term has no meaning there: it falls with the speed while the factor of linear theory rises. For ordinary rifle loads that start above 1 at the muzzle it fell below 1 late in a long flight, which the factor of linear theory does not do at a constant moment slope ([Along-path stability warning](../research/along-path-stability-warning.md)).
 
@@ -52,7 +52,7 @@ $$
 S_d = \frac{2\left(C_{L_\alpha} + \dfrac{m d^2}{I_x}\,C_{mp_\alpha}\right)}{C_{L_\alpha} - C_D - \dfrac{m d^2}{I_y}\left(C_{m_q} + C_{m_{\dot\alpha}}\right)}
 $$
 
-Code: `packages/core/src/exterior/stability.ts`, `dynamicStabilityFactor`.
+Code: `packages/ballistics/src/exterior/stability.ts`, `dynamicStabilityFactor`.
 
 The bullet is stable in linear theory when it is gyroscopically stable and $S_d$ lies inside the band the gyroscopic factor allows:
 
@@ -60,7 +60,7 @@ $$
 S_g \gt 1 \quad \text{and} \quad \frac{1}{S_g} \lt S_d\,(2 - S_d)
 $$
 
-Code: `packages/core/src/exterior/stability.ts`, `isStable`.
+Code: `packages/ballistics/src/exterior/stability.ts`, `isStable`.
 
 These coefficients come from spark-range firings, not from the Miller inputs. The trajectory result reports $S_g$ only.
 
@@ -72,9 +72,9 @@ $$
 D_s = 1.25\,(S_g + 1.2)\,t^{1.83}\ \mathrm{in}
 $$
 
-Code: `packages/core/src/exterior/stability.ts`, `spinDrift` (`drift`).
+Code: `packages/ballistics/src/exterior/stability.ts`, `spinDrift` (`drift`).
 
-$S_g$ is the muzzle value of Miller's rule and $t$ the time of flight at the output point. The trajectory adds $D_s$ to the windage after integration (`correct` in `packages/core/src/exterior/trajectory.ts`).
+$S_g$ is the muzzle value of Miller's rule and $t$ the time of flight at the output point. The trajectory adds $D_s$ to the windage after integration (`correct` in `packages/ballistics/src/exterior/trajectory.ts`).
 
 ### Aerodynamic jump
 
@@ -84,7 +84,7 @@ $$
 \delta_J = \mp\left(0.01\,S_g - 0.0024\,l_c + 0.032\right)\frac{W_\perp}{1\ \mathrm{mph}}\ \mathrm{MOA}
 $$
 
-Code: `packages/core/src/exterior/stability.ts`, `aerodynamicJump` (`perMph`, `jump`).
+Code: `packages/ballistics/src/exterior/stability.ts`, `aerodynamicJump` (`perMph`, `jump`).
 
 The upper sign holds for right-hand twist: wind from the left lowers the shot, wind from the right raises it. Left-hand twist mirrors this. The [point-mass trajectory](exterior-point-mass.md#outputs-per-point) adds $s\tan\delta_J$ to the height.
 
@@ -132,7 +132,7 @@ The upper sign holds for right-hand twist: wind from the left lowers the shot, w
 - $S_g \lt 1$ predicts a tumbling bullet. The trajectory is still computed, and the caller shows the value.
 - The point mass cannot detect a dynamically unstable bullet. Dynamic stability needs the aerodynamic coefficients.
 - Steep and very long flights lie outside the spin drift fit.
-- Both fits are one-parameter curves in $S_g$ and can run well above the [modified point mass](exterior-modified-point-mass.md) when its coefficients are known. For one bullet, a 168 gr 0.308 in bullet of 3.98 calibres at 2600 ft/s in sea-level standard air with coefficients chosen for the comparison (the inputs are in `packages/core/test/exterior-fit-vs-modified.test.ts`), the spin drift fit gives 1.30, 1.25 and 1.23 times the modified point mass at 1000 yd for the 10, 12 and 14 in twist (14.5, 11.6 and 9.8 in over 11.1, 9.3 and 7.9 in) and 1.38, 1.32 and 1.30 times at 600 yd. The jump fit gives 0.41 in per 10 mph crosswind at 100 yd against 0.36 in from the linear formula (1.13 times). That a rigid-body integration gives 9.3, 11.1 and 8.0 in at 1000 yd is unverified (an external result without a citable source). The fits are kept: a refit to one bullet would fit one data point with estimated inertia, and no second bullet in the repository shows the same bias. Where the coefficients are known, the modified point mass is the better source. See the [research log entry](../research/spin-drift-fit-vs-modified-point-mass.md).
+- Both fits are one-parameter curves in $S_g$ and can run well above the [modified point mass](exterior-modified-point-mass.md) when its coefficients are known. For one bullet, a 168 gr 0.308 in bullet of 3.98 calibres at 2600 ft/s in sea-level standard air with coefficients chosen for the comparison (the inputs are in `packages/ballistics/test/exterior-fit-vs-modified.test.ts`), the spin drift fit gives 1.30, 1.25 and 1.23 times the modified point mass at 1000 yd for the 10, 12 and 14 in twist (14.5, 11.6 and 9.8 in over 11.1, 9.3 and 7.9 in) and 1.38, 1.32 and 1.30 times at 600 yd. The jump fit gives 0.41 in per 10 mph crosswind at 100 yd against 0.36 in from the linear formula (1.13 times). That a rigid-body integration gives 9.3, 11.1 and 8.0 in at 1000 yd is unverified (an external result without a citable source). The fits are kept: a refit to one bullet would fit one data point with estimated inertia, and no second bullet in the repository shows the same bias. Where the coefficients are known, the modified point mass is the better source. See the [research log entry](../research/spin-drift-fit-vs-modified-point-mass.md).
 - Spin drift and jump are left out (`omitted`) when length, twist or twist hand is missing or the option is off.
 
 ## Sources

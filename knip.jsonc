@@ -12,6 +12,9 @@
     "packages/statistics": {
       "entry": ["src/index.ts"]
     },
+    "packages/ballistics": {
+      "entry": ["src/index.ts"]
+    },
     "tooling/test-kit": {
       "entry": ["src/index.ts"]
     },
