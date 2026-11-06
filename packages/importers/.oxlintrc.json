@@ -25,7 +25,7 @@
                 "message": "importers-imports-schema-only: packages/importers has no I/O and imports nothing but @open-reloading/schema and its own files."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|core|data|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "regex": "^(\\.\\./)+[^.]",
                 "message": "importers-imports-schema-only: packages/importers has no I/O and imports nothing but @open-reloading/schema and its own files."
               }
             ]

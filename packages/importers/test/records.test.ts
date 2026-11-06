@@ -42,14 +42,13 @@ const powderCell = (h: string): string => {
   return rules.find(([re]) => re.test(h))?.[1] ?? 'Invented P'
 }
 const cartridgeCell = (h: string): string => {
-  const rules: [RegExp, string][] = [
-    [/case|l3|huelsen/i, '51.2'],
-    [/coal|overall/i, '71.1'],
-    [/dia|g1|durch/i, '7.82'],
-    // a P and a pressure word
-    [/^(?=.*p).*(?:bar|pmax|press)/i, '4150'],
+  const rules: [(text: string) => boolean, string][] = [
+    [(x) => /case|l3|huelsen/i.test(x), '51.2'],
+    [(x) => /coal|overall/i.test(x), '71.1'],
+    [(x) => /dia|g1|durch/i.test(x), '7.82'],
+    [(x) => /p/i.test(x) && /bar|pmax|press/i.test(x), '4150'],
   ]
-  return rules.find(([re]) => re.test(h))?.[1] ?? 'Invented C'
+  return rules.find(([test]) => test(h))?.[1] ?? 'Invented C'
 }
 const variant = (kind: TableKind, header: string[], cell: (h: string) => string) => {
   const row = header.map(cell)

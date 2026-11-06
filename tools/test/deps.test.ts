@@ -98,6 +98,21 @@ it('lets the config of a logic package add only its import rule to the base', ()
   )
 })
 
+// A package with its own config would also get the untyped root run, which reports its typed disable lines as unused
+it('leaves every package with its own config out of the root Oxlint, in the lint script and in the pre-commit hook', () => {
+  const own = globSync('packages/*/.oxlintrc.json', { cwd: root })
+    .map((file) => dirname(file))
+    .toSorted()
+  const lint: string = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).scripts.lint
+  const ignored = [...lint.matchAll(/--ignore-pattern "(packages\/[^/"]+)\/\*\*"/g)].map(
+    (m) => m[1],
+  )
+  const hook = readFileSync(join(root, 'hooks/pre-commit'), 'utf8')
+  const skipped = [...hook.matchAll(/':!(packages\/[^/']+)\/'/g)].map((m) => m[1])
+  expect(ignored.toSorted()).toEqual(own)
+  expect(skipped.toSorted()).toEqual(own)
+})
+
 it('exits non-zero and prints the rule name', () => {
   // the default format, also on GitHub, where Oxlint would otherwise write annotations without the help text
   const run = lint('--format', 'default')
