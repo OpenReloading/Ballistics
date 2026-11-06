@@ -856,7 +856,7 @@ describe('POST /interior/load-file, 400 with the field path', () => {
     expect(body.notice).toBe('simulation, not load data')
   })
 
-  it('refuses the case water capacity of the earlier format at its path', async () => {
+  it('refuses an unknown key of the case at its path', async () => {
     const res = await simulate(file({ siValues, case: { waterCapacity: { value: 3.6 } } }))
     expect(res.status).toBe(400)
     expect(res.body.issues.map((i: { path: unknown[] }) => i.path)).toEqual([

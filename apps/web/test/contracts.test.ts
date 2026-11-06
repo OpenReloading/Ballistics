@@ -34,14 +34,10 @@ const kinds = userRecord.options.map((o) => o.shape.kind.value)
 
 /** An object of the user data file's JSON Schema. */
 interface Node {
-  not?: object
   properties?: Record<string, Node>
 }
-/** The fields `n` allows, without those of an earlier format that a file must not have (`{ not: {} }`). */
-const fieldsOf = (n: Node) =>
-  Object.entries(n.properties ?? {}).flatMap(([k, v]) =>
-    v.not && Object.keys(v.not).length === 0 ? [] : [k],
-  )
+/** The fields `n` allows. */
+const fieldsOf = (n: Node) => Object.keys(n.properties ?? {})
 
 describe('golden user data file of the current version', () => {
   it('is read by the current code with its photo and no reference left open', () => {
