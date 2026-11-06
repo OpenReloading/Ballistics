@@ -36,8 +36,8 @@ Analytic: the closed form of constant-velocity motion and synthetic inputs.
 
 ## Where in the app
 
-- `packages/core/test/exterior-moving-target.test.ts`.
-- `packages/core/src/exterior/moving-target.ts`.
+- `packages/ballistics/test/exterior-moving-target.test.ts`.
+- `packages/ballistics/src/exterior/moving-target.ts`.
 - Model page: [moving target lead](../models/exterior-moving-target.md).
 
 ## Confidence

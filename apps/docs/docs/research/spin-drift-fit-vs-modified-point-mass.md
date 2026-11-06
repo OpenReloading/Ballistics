@@ -12,7 +12,7 @@ Exterior model: do the empirical spin drift and aerodynamic jump fits of the poi
 
 ## Method
 
-One bullet, 168 gr and 0.308 in, 3.98 calibres long, 2600 ft/s, sea-level standard air, G7 ballistic coefficient 0.218 lb/in2, twist 10, 12 and 14 in. The point-mass run (fit) and the modified-point-mass run use the same drag. The modified point mass takes an axial inertia of $0.10\,m d^2$ and a transverse inertia of $1.0\,m d^2$, a lift slope of 2.1 and an overturning-moment slope of 1.81 at Mach 2.4 rising linearly to 4.0 at Mach 0.8. These coefficients are chosen to match the figures below, they are not measured. Metric: the ratio of fit to modified point mass for the spin drift at 600 and 1000 yd and for the jump per 10 mph crosswind at 100 yd. Accept rule set in advance: the two differ by less than 15 percent if the fit is fine; a refit needs a second bullet with the same bias. The test is `packages/core/test/exterior-fit-vs-modified.test.ts`, with the ratios asserted within 3 percent.
+One bullet, 168 gr and 0.308 in, 3.98 calibres long, 2600 ft/s, sea-level standard air, G7 ballistic coefficient 0.218 lb/in2, twist 10, 12 and 14 in. The point-mass run (fit) and the modified-point-mass run use the same drag. The modified point mass takes an axial inertia of $0.10\,m d^2$ and a transverse inertia of $1.0\,m d^2$, a lift slope of 2.1 and an overturning-moment slope of 1.81 at Mach 2.4 rising linearly to 4.0 at Mach 0.8. These coefficients are chosen to match the figures below, they are not measured. Metric: the ratio of fit to modified point mass for the spin drift at 600 and 1000 yd and for the jump per 10 mph crosswind at 100 yd. Accept rule set in advance: the two differ by less than 15 percent if the fit is fine; a refit needs a second bullet with the same bias. The test is `packages/ballistics/test/exterior-fit-vs-modified.test.ts`, with the ratios asserted within 3 percent.
 
 ## Formulas
 
@@ -40,9 +40,9 @@ Analytic: a synthetic bullet with coefficients chosen for the comparison. No mea
 
 ## Where in the app
 
-- `packages/core/src/exterior/stability.ts`, `spinDrift`, `aerodynamicJump`.
-- `packages/core/src/exterior/modified.ts`, `linearJump`.
-- `packages/core/test/exterior-fit-vs-modified.test.ts`.
+- `packages/ballistics/src/exterior/stability.ts`, `spinDrift`, `aerodynamicJump`.
+- `packages/ballistics/src/exterior/modified.ts`, `linearJump`.
+- `packages/ballistics/test/exterior-fit-vs-modified.test.ts`.
 - Model pages: [stability, spin drift and jump](../models/exterior-stability.md), [modified point mass](../models/exterior-modified-point-mass.md).
 
 ## Confidence

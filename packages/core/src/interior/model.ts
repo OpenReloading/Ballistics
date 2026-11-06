@@ -2,10 +2,10 @@
  * M3 interior model with Noble-Abel gas, described in
  * `apps/docs/docs/models/interior-m3.md`. SI in and out, temperatures in K.
  */
+
+import { icao, type Rhs, type Rk45Event, type Rk45Options, rk45 } from '@open-reloading/ballistics'
 import { bisect } from '@open-reloading/statistics'
 import { InputError, nth, overlay, type Settings } from '../errors.ts'
-import { icao } from '../exterior/atmosphere.ts'
-import { type Rhs, type Rk45Event, type Rk45Options, rk45 } from '../exterior/rk45.ts'
 import { type Burn, burnError, burnForm } from './form.ts'
 import { wornVolume } from './throat-wear.ts'
 
@@ -744,12 +744,15 @@ function integrate(
   until: Pick<Rk45Options, 'stepsBefore' | 'maxTime' | 'initialStep'>,
 ): ReturnType<typeof rk45> | InteriorInvalid {
   try {
-    return rk45(rhs, tau, y, events, {
-      relativeTolerance: options.relativeTolerance,
-      absoluteTolerance: options.absoluteTolerance,
-      maxSteps: options.maxSteps,
-      ...until,
-    })
+    return rk45(
+      { f: rhs, t0: tau, y0: y, events },
+      {
+        relativeTolerance: options.relativeTolerance,
+        absoluteTolerance: options.absoluteTolerance,
+        maxSteps: options.maxSteps,
+        ...until,
+      },
+    )
   } catch (err) {
     if (err instanceof InputError) return { valid: false, reason: 'integration' }
     throw err

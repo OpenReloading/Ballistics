@@ -27,6 +27,7 @@ const configs = [
   'packages/locale-format/.oxlintrc.json',
   'packages/schema/.oxlintrc.json',
   'packages/statistics/.oxlintrc.json',
+  'packages/ballistics/.oxlintrc.json',
   'packages/shot-groups/.oxlintrc.json',
   'packages/importers/.oxlintrc.json',
 ]

@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@open-reloading/api": "workspace:*",
+    "@open-reloading/ballistics": "workspace:*",
     "@open-reloading/core": "workspace:*",
     "@open-reloading/data": "workspace:*",
     "@open-reloading/drawing": "workspace:*",

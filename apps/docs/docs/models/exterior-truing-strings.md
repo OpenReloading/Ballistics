@@ -25,7 +25,7 @@ $$
 \theta_v = \ln\frac{v_0}{v_{0,\text{nom}}}, \qquad \theta_k = \ln k, \qquad \theta_c = \ln\frac{c}{c_\text{nom}}, \qquad e
 $$
 
-Code: `packages/core/src/exterior/range-strings.ts`, `applied`, `Model` (`predict`).
+Code: `packages/ballistics/src/exterior/range-strings.ts`, `applied`, `Model` (`predict`).
 
 The drag factor multiplies the drag coefficient as in [truing](exterior-truing.md) (`dragCorrection`). The zero offset is the angle by which the impacts at the zero setting lie above the nominal zero.
 
@@ -41,7 +41,7 @@ $$
 \end{aligned}
 $$
 
-Code: `packages/core/src/exterior/range-strings.ts`, `Model` (`predict`). `packages/core/src/exterior/trajectory.ts`, `TrajectoryPoint` (`height`, `elevationHold`, `velocity`).
+Code: `packages/ballistics/src/exterior/range-strings.ts`, `Model` (`predict`). `packages/ballistics/src/exterior/trajectory.ts`, `TrajectoryPoint` (`height`, `elevationHold`, `velocity`).
 
 An impact does not depend on $c$. Without a dial row the click value has no information.
 
@@ -53,7 +53,7 @@ $$
 \sigma_i = \sqrt{\frac{\sigma_{1,i}^2}{m_i} + \frac{w_i^2}{12}}
 $$
 
-Code: `packages/core/src/exterior/range-strings.ts`, `rowSigma`, `defaultRounding`.
+Code: `packages/ballistics/src/exterior/range-strings.ts`, `rowSigma`, `defaultRounding`.
 
 Default steps: 1 click for a dial, 0 for an impact and for the chronograph. The plan derives the spread of one shot from the standard deviation $\delta$ of one shot's vertical angle:
 
@@ -61,7 +61,7 @@ $$
 \sigma_{1,i} = \delta\, s_i \ \text{(impact)}, \qquad \sigma_{1,i} = \frac{\delta}{c_\text{nom}} \ \text{(dial)}
 $$
 
-Code: `packages/core/src/exterior/range-strings.ts`, `plannedRows` (`spread`).
+Code: `packages/ballistics/src/exterior/range-strings.ts`, `plannedRows` (`spread`).
 
 ### Weighted Jacobian
 
@@ -69,7 +69,7 @@ $$
 J_{ij} = \frac{1}{\sigma_i} \frac{\partial \hat y_i}{\partial \theta_j}
 $$
 
-Code: `packages/core/src/exterior/range-strings.ts`, `Model` (`jacobian`).
+Code: `packages/ballistics/src/exterior/range-strings.ts`, `Model` (`jacobian`).
 
 The columns of $\theta_v$ and $\theta_k$ are central differences with step $10^{-3}$. The columns of $\theta_c$ and $e$ are exact:
 
@@ -77,7 +77,7 @@ $$
 \frac{\partial \hat n_i}{\partial \theta_c} = -\hat n_i, \qquad \frac{\partial \hat y_i}{\partial e} = s_i, \qquad \frac{\partial \hat n_i}{\partial e} = -\frac{1}{c}
 $$
 
-Code: `packages/core/src/exterior/range-strings.ts`, `Model` (`jacobian`, `perClick`).
+Code: `packages/ballistics/src/exterior/range-strings.ts`, `Model` (`jacobian`, `perClick`).
 
 All other entries of these two columns are 0.
 
@@ -89,7 +89,7 @@ $$
 \lvert J_{ij} \rvert \lt \frac{10^{-6}\, a_i}{\sigma_i} \ \text{for all } i, \qquad a_i = \begin{cases} s_i & \text{impact} \\ \max\left(\lvert n_i \rvert, 1\right) & \text{dial} \\ \bar v & \text{chronograph} \end{cases}
 $$
 
-Code: `packages/core/src/exterior/range-strings.ts`, `unresolved`, `measuredRows` (`scale`).
+Code: `packages/ballistics/src/exterior/range-strings.ts`, `unresolved`, `measuredRows` (`scale`).
 
 The plan has no measured values and takes 1 click for a dial and the nominal muzzle velocity for the chronograph.
 
@@ -99,7 +99,7 @@ $$
 \mathrm{VIF}_j \gt 10 \ \Rightarrow \ \text{collinear}, \qquad \sigma_{\theta_j} \gt 0.05 \ \text{or} \ \sigma_e \gt 10^{-4}\ \text{rad} \ \Rightarrow \ \text{imprecise}
 $$
 
-Code: `packages/core/src/exterior/range-strings.ts`, `parameterStatuses`, `analyse`, `rangeStringDefaults`.
+Code: `packages/ballistics/src/exterior/range-strings.ts`, `parameterStatuses`, `analyse`, `rangeStringDefaults`.
 
 The limits are the options `maxInflation`, `maxRelativeStandardUncertainty` and `maxZeroSigma`. When some parameter is collinear, the result names in `confounded` the parameters whose component in the eigenvector of the smallest eigenvalue exceeds 0.3 (`confoundedComponent`). A weak parameter reports $\sigma_{\theta_j}$ and $\mathrm{VIF}_j$ (infinite for a singular design) but no value and no interval.
 
@@ -112,7 +112,7 @@ A plan carries `refusals`, each with a fixed `id` and an `advice` text, when the
 | `single-range`  | Impact and dial entries all at one slant range, no chronograph | Add an entry at a second distance, or chronograph readings together with an impact entry. These may not separate every parameter (dial entries alone leave the click value in the fit, a zero offset needs more observations); the statuses show what is still open. |
 | `velocity-only` | A chronograph and no impact or dial entry                      | Add an impact entry at a distance, or dial entries at two distances. The statuses show what is still open.                                                                                                                                                           |
 
-Code: `packages/core/src/exterior/range-strings.ts`, `planRefusals`, `refusalAdvice`.
+Code: `packages/ballistics/src/exterior/range-strings.ts`, `planRefusals`, `refusalAdvice`.
 
 One drop moves $v_0$ and $k$ along the same direction. A chronograph at the muzzle (the default `instrumentDistance` of 0) depends on $v_0$ only, so the readings alone cannot identify $k$; at a distance one speed moves both. The refusal names the cause that the statuses show as `collinear` or `no-information`. The statuses are still reported. A chronograph at the muzzle with an impact entry at one range passes, since it fixes $v_0$ and the drop then fixes $k$. With dial entries only, $k$ and the click value stay confounded at one range, so the plan passes without refusal and the statuses show `collinear`. With `fitZeroOffset`, a chronograph and one impact entry leave $k$ and the zero offset confounded in the same way.
 
@@ -124,7 +124,7 @@ $$
 \chi^2_\text{prior} = \sum_i r_i^2 + \sum_{j \in P} \frac{\theta_j^2}{s_j^2}
 $$
 
-Code: `packages/core/src/exterior/range-strings.ts`, `solveStrings` (`priors`).
+Code: `packages/ballistics/src/exterior/range-strings.ts`, `solveStrings` (`priors`).
 
 The interval of an identified parameter uses the standard error of the Laplace approximation, from the data rows and one row $1/s_j$ per prior of a resolved parameter:
 
@@ -132,7 +132,7 @@ $$
 C_\text{post} = \left(J^\top J + S\right)^{-1}, \qquad S_{jj} = \frac{1}{s_j^2} \ (j \in P), \qquad S_{jl} = 0 \ \text{otherwise}
 $$
 
-Code: `packages/core/src/exterior/range-strings.ts`, `analyse` (`post`).
+Code: `packages/ballistics/src/exterior/range-strings.ts`, `analyse` (`post`).
 
 Statuses, variance inflation, condition number, correlations and the confounded set come from the data rows alone. A prior narrows an interval and never identifies a parameter. The result reports the ratio of the posterior to the prior standard error, a ratio near 1 meaning the prior decides the interval.
 
@@ -153,7 +153,7 @@ $$
 q \exp\left(\pm t\, u\, \sigma_\theta\right) \ \ (v_0, k, c), \qquad e \pm t\, u\, \sigma_e
 $$
 
-Code: `packages/core/src/exterior/range-strings.ts`, `intervalAround`, `unitSigma`, `stringsFitResult` (`quantile`, `intervalScale`).
+Code: `packages/ballistics/src/exterior/range-strings.ts`, `intervalAround`, `unitSigma`, `stringsFitResult` (`quantile`, `intervalScale`).
 
 By default $u = 1$ and $t = z = \sqrt{\chi^2_{1}(\text{level})}$, the normal quantile (1.960 at the default level 0.95). With `scaleByResidual` and $\nu \gt 0$ degrees of freedom the spreads are taken from the residuals:
 
@@ -161,7 +161,7 @@ $$
 u = \max\left(\sqrt{\frac{\chi^2}{\nu}},\ 10^{-6}\right), \qquad t = t_\nu\left(\tfrac{1 + \text{level}}{2}\right)
 $$
 
-Code: `packages/core/src/exterior/range-strings.ts`, `stringsFitResult` (`intervalScale`, `quantile`), `minIntervalScale`.
+Code: `packages/ballistics/src/exterior/range-strings.ts`, `stringsFitResult` (`intervalScale`, `quantile`), `minIntervalScale`.
 
 $t_\nu$ is the quantile of Student's t distribution with $\nu$ degrees of freedom. The plan reports the interval the fit would give around the nominal value (around 0 for $e$) with $u = 1$ and $t = z$.
 
@@ -171,7 +171,7 @@ $$
 \chi^2 = \sum_{i=1}^{n} \left(\frac{\hat y_i - y_i}{\sigma_i}\right)^2, \qquad \nu = n - \lvert K \rvert, \qquad \text{consistent} \iff \chi^2 \le \chi^2_{\nu}(0.99)
 $$
 
-Code: `packages/core/src/exterior/range-strings.ts`, `stringsFitResult` (`chiSquare`, `dof`, `consistent`).
+Code: `packages/ballistics/src/exterior/range-strings.ts`, `stringsFitResult` (`chiSquare`, `dof`, `consistent`).
 
 $K$ is the set of fitted parameters, $n$ the number of data rows. Prior rows are not counted. The level 0.99 is the option `residualConfidenceLevel`. The p-value is the upper tail of the chi-square distribution ([groups](groups.md)). Without degrees of freedom there is no check.
 
