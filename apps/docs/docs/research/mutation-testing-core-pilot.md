@@ -256,8 +256,8 @@ analytic. The runs mutate the source and run the existing tests; no measured dat
 - `packages/core/src/interior/bore-resistance.ts`, `packages/core/test/interior-bore-resistance.test.ts`
 - `apps/web/src/lib/units.ts`, `apps/web/test/units.test.ts`
 - `apps/web/src/lib/chrono.ts`, `apps/web/test/chrono.test.ts`
-- `apps/web/src/lib/target-geometry.ts`, `apps/web/test/target-geometry.test.ts`
-- `apps/web/src/lib/ring-scoring.ts`, `apps/web/test/ring-scoring.test.ts`, `apps/web/test/ring-scoring-shapes.test.ts`, `apps/web/test/ring-scoring-national.test.ts`
+- `packages/shot-groups/src/geometry.ts`, `packages/shot-groups/test/geometry.test.ts`
+- `packages/shot-groups/src/ring-scoring.ts`, `packages/shot-groups/test/ring-scoring.test.ts`, `packages/shot-groups/test/ring-scoring-shapes.test.ts`, `apps/web/test/ring-scoring-national.test.ts`
 - `apps/web/src/lib/field-spec.ts`, `apps/web/test/field-spec.test.ts`
 - `packages/core/src/cartridge-specs.ts`, `packages/core/test/cartridge-specs.test.ts`
 - `packages/api/src/compute/limits.ts`, `packages/api/test/limits.test.ts`

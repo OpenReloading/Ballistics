@@ -12,8 +12,8 @@ import {
   ransacEllipse,
   sampson,
   seededRandom,
-} from '../src/lib/ellipse.ts'
-import { apply3 } from '../src/lib/target-geometry.ts'
+} from '../src/ellipse.ts'
+import { apply3 } from '../src/geometry.ts'
 
 const truth: Ellipse = { centreX: 310, centreY: 205, semiMajor: 120, semiMinor: 70, angle: 0.6 }
 const ring = (e: Ellipse, n = 120, from = 0, to = 2 * Math.PI) =>
