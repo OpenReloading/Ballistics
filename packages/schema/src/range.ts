@@ -1,31 +1,21 @@
 import { z } from 'zod'
+import type { Exact } from './exact.ts'
 import { recordId } from './ids.ts'
 import { provenance } from './provenance.ts'
-import { quantity } from './units.ts'
+import { type QuantitySchema, quantity } from './units.ts'
 
-/**
- * Spark-range firings of one projectile as a report tabulates them: per round the Mach number, the
- * total angle of attack and the drag coefficient measured at that yaw, each with the printed text in
- * `raw`. A drag coefficient here is not the zero-yaw drag; deriving that is a computation of its own.
- * Inferred type: {@link RangeFirings}.
- */
-export const rangeFirings = z
+const rangeFiringsParser = z
   .object({
     id: recordId,
-    /** The projectile as the report names it. */
     projectile: z.string().min(1),
-    /** Projectile diameter in mm that the drag coefficients refer to. */
     bulletDiameter: quantity('length'),
     bulletMass: quantity('mass'),
     rounds: z
       .array(
         z.object({
-          /** Round number as printed. */
           label: z.string().min(1),
           mach: quantity('dimensionless'),
-          /** Total angle of attack over the measured flight (alpha t). */
           totalYaw: quantity('angle'),
-          /** Drag coefficient at that yaw. */
           dragCoefficient: quantity('dimensionless'),
         }),
       )
@@ -56,6 +46,34 @@ export const rangeFirings = z
       if (round.totalYaw.value < 0) issue(['rounds', k, 'totalYaw'], 'must not be negative')
     })
   })
+
+/**
+ * Spark-range firings of one projectile as a report tabulates them: per round the Mach number, the
+ * total angle of attack and the drag coefficient measured at that yaw, each with the printed text in
+ * `raw`. A drag coefficient here is not the zero-yaw drag; deriving that is a computation of its own.
+ * Inferred type: {@link RangeFirings}.
+ */
+export const rangeFirings: z.ZodObject<{
+  id: typeof recordId
+  /** The projectile as the report names it. */
+  projectile: z.ZodString
+  /** Projectile diameter in mm that the drag coefficients refer to. */
+  bulletDiameter: QuantitySchema
+  bulletMass: QuantitySchema
+  rounds: z.ZodArray<
+    z.ZodObject<{
+      /** Round number as printed. */
+      label: z.ZodString
+      mach: QuantitySchema
+      /** Total angle of attack over the measured flight (alpha t). */
+      totalYaw: QuantitySchema
+      /** Drag coefficient at that yaw. */
+      dragCoefficient: QuantitySchema
+    }>
+  >
+  note: z.ZodOptional<z.ZodString>
+  provenance: typeof provenance
+}> = rangeFiringsParser satisfies Exact<typeof rangeFirings, typeof rangeFiringsParser>
 
 /** A record of spark-range rounds of one projectile from one report. */
 export interface RangeFirings extends z.infer<typeof rangeFirings> {}

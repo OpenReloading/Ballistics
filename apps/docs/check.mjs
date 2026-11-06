@@ -13,8 +13,8 @@ import {
 import { tooLong } from './scripts/type-length.mts'
 
 const packages = ['schema', 'core', 'drawing', 'importers', 'data', 'api']
-// the library's own generics, linked from the doc comment to the inferred type
-const exempt = /^Zod/
+// zod's own generics, linked from the doc comment to the inferred type
+const exempt = (type) => type.type === 'reference' && type.package === 'zod'
 
 /** The value type, return types and parameter types of a variable or function, by name. */
 const typesOf = (r) => [
@@ -30,7 +30,7 @@ const longTypes = (project) =>
   project
     .getReflectionsByKind(ReflectionKind.Variable | ReflectionKind.Function)
     .flatMap((r) => typesOf(r).map(([what, type]) => [r, what, type]))
-    .filter(([, , type]) => type && !(type.type === 'reference' && exempt.test(type.name)))
+    .filter(([, , type]) => type && !exempt(type))
     .map(([r, what, type]) => [r, what, type.toString()])
     .filter(([, , rendered]) => tooLong(rendered))
     .map(([r, what, rendered]) => `${r.getFullName()} ${what}: ${rendered.length} characters`)
