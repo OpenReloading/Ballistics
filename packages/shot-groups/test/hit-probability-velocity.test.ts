@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { pointDispersion } from '../src/index.ts'
 import { issueOf } from './issue.ts'
 
-// the velocity term against trajectories of sampled muzzle speeds: packages/core/test/hit-probability-velocity.test.ts
+// the velocity term against trajectories of sampled muzzle speeds: apps/web/test/hit-probability-velocity.test.ts
 
 const group = { horizontal: 0.006, vertical: 0.006 }
 const base = { group, referenceDistance: 100, distance: 600 }

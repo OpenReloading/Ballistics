@@ -2,7 +2,8 @@
 // (apps/docs/docs/research/hit-probability-offset-shots-needed.md).
 // Run: node packages/core/scripts/hit-probability-offset.mts
 // Synthetic case: a circular normal dispersion of 1 (all lengths in units of sigma).
-import { ellipseProbability, shotsToHit } from '@open-reloading/shot-groups'
+// shot-groups by its source, so core does not depend on it (the API image builds core's dependencies)
+import { ellipseProbability, shotsToHit } from '../../shot-groups/src/index.ts'
 import { normals } from './rng.mts'
 
 const draws = 400_000

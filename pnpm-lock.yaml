@@ -368,9 +368,6 @@ importers:
         specifier: workspace:*
         version: link:../units
     devDependencies:
-      '@open-reloading/shot-groups':
-        specifier: workspace:*
-        version: link:../shot-groups
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
