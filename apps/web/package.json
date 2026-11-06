@@ -26,6 +26,7 @@
     "@open-reloading/importers": "workspace:*",
     "@open-reloading/locale-format": "workspace:*",
     "@open-reloading/schema": "workspace:*",
+    "@open-reloading/shot-groups": "workspace:*",
     "@open-reloading/units": "workspace:*",
     "@phosphor-icons/react": "2.1.10",
     "country-flag-icons": "1.6.20",

@@ -3,9 +3,10 @@
  * stage and the ring totals of series, with the points and penalties of the event type record
  * (`packages/data/records/event-types/`), never hard-coded. Model:
  * `apps/docs/docs/models/competition-scoring.md`. A self-recorded score is never an official result.
+ * A refusal is a `ShotGroupsError` with a `ScoringIssue`.
  */
 
-import { InputError } from '../errors.ts'
+import { ShotGroupsError } from './issue.ts'
 
 /** Points of one hit per zone for one power factor. */
 export interface ZonePoints {
@@ -46,8 +47,7 @@ export interface StageScore {
 }
 
 const count = (n: number) => {
-  if (!Number.isInteger(n) || n < 0)
-    throw new InputError('a hit, miss or penalty count must be a whole number of 0 or more')
+  if (!Number.isInteger(n) || n < 0) throw new ShotGroupsError({ code: 'count', params: {} })
   return n
 }
 
@@ -72,7 +72,8 @@ export function stageRawPoints(stage: PracticalStage, rules: HitFactorRules): nu
 
 /** Points over time: the hit factor, 1/s. The time must be positive. */
 export function hitFactor(points: number, time: number): number {
-  if (!(time > 0) || !Number.isFinite(time)) throw new InputError('the stage time must be positive')
+  if (!(time > 0) || !Number.isFinite(time))
+    throw new ShotGroupsError({ code: 'stage-time', params: {} })
   return points / time
 }
 
@@ -80,7 +81,7 @@ export function hitFactor(points: number, time: number): number {
 export function stagePoints(stage: PracticalStage, rules: HitFactorRules): StageScore {
   const typed = stage.stagePoints
   if (typed !== undefined && (!(typed >= 0) || !Number.isFinite(typed)))
-    throw new InputError('stage points must be 0 or more')
+    throw new ShotGroupsError({ code: 'stage-points', params: {} })
   const points = stageRawPoints(stage, rules)
   return {
     points,
@@ -99,13 +100,14 @@ export interface RingSeries {
 export function ringTotal(series: RingSeries): number {
   if (series.shots?.length) {
     for (const s of series.shots)
-      if (!(s >= 0) || !Number.isFinite(s)) throw new InputError('a ring value must be 0 or more')
+      if (!(s >= 0) || !Number.isFinite(s))
+        throw new ShotGroupsError({ code: 'ring-value', params: {} })
     // sum in tenths, so 10.4 + 10.2 is 20.6 and not 20.599999
     return series.shots.reduce((sum, s) => sum + Math.round(s * 10), 0) / 10
   }
-  if (series.total === undefined) throw new InputError('a series needs its shots or its total')
+  if (series.total === undefined) throw new ShotGroupsError({ code: 'series-total', params: {} })
   if (!(series.total >= 0) || !Number.isFinite(series.total))
-    throw new InputError('a ring value must be 0 or more')
+    throw new ShotGroupsError({ code: 'ring-value', params: {} })
   return series.total
 }
 
@@ -140,9 +142,10 @@ export function practicalEventTotals(
   state: ResultState,
 ): EventTotals {
   const parts = stages.map((s) => stagePoints(s, rules))
-  const typed = parts.every((p) => p.stagePoints !== undefined)
-  if (state === 'disqualified' || !typed || parts.length === 0) return { parts }
-  return { total: parts.reduce((sum, p) => sum + (p.stagePoints ?? 0), 0), parts }
+  const typed = parts.flatMap((p) => p.stagePoints ?? [])
+  if (state === 'disqualified' || typed.length < parts.length || parts.length === 0)
+    return { parts }
+  return { total: typed.reduce((sum, p) => sum + p, 0), parts }
 }
 
 /** What an event type offers an event: its levels, scoring method and, for hit factor, its divisions. */

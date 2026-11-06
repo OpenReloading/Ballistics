@@ -18,10 +18,13 @@
     "packages/schema": {
       "entry": ["src/index.ts"]
     },
-    "packages/core": {
-      "entry": ["src/index.ts", "scripts/*.mts"],
-      // the event types of data's records are read by path in the tests, declared so the CI plan tests core with them
+    "packages/shot-groups": {
+      "entry": ["src/index.ts"],
+      // the event types and target faces of data's records are read by path in the tests, declared so the CI plan tests shot-groups with them
       "ignoreDependencies": ["@open-reloading/data"]
+    },
+    "packages/core": {
+      "entry": ["src/index.ts", "scripts/*.mts"]
     },
     "packages/importers": {
       "entry": ["src/index.ts"]
