@@ -28,10 +28,6 @@ const caseCapacityParser = z
       .enum(['mouth'])
       .describe('How high the water was filled. Absent: not stated, the mouth is taken.')
       .optional(),
-    convention: z
-      .never({ error: 'Replaced by primerState and fillLevel' })
-      .describe('Refused, see primerState.')
-      .optional(),
     note: z.string().min(1).describe('Notes on the measurement.').optional(),
     provenance: provenance
       .describe('Where the value comes from. Required for a catalogue capacity.')
@@ -64,7 +60,6 @@ export const caseCapacity: z.ZodObject<{
   caseCondition: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'new' | 'fired' | 'sized'>>>
   primerState: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'primed-spent' | 'unprimed'>>>
   fillLevel: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'mouth'>>>
-  convention: z.ZodOptional<z.ZodNever>
   note: z.ZodOptional<z.ZodString>
   provenance: z.ZodOptional<typeof provenance>
 }> = caseCapacityParser satisfies Exact<typeof caseCapacity, typeof caseCapacityParser>

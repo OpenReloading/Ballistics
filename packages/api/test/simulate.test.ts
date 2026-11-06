@@ -7,7 +7,7 @@ import {
   recordSensitivity,
   workbenchValueKeys,
 } from '@open-reloading/core'
-import { analysisKinds, legacyLoadProblem, toSi } from '@open-reloading/schema'
+import { analysisKinds, toSi } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { maxPoints } from '../src/compute/interior-schema.ts'
 import { filePath } from '../src/compute/load-file.ts'
@@ -854,16 +854,6 @@ describe('POST /interior/load-file, 400 with the field path', () => {
     const { status, body } = await simulate(file({ siValues: { ...siValues, volume: -1 } }))
     expect(status).toBe(422)
     expect(body.notice).toBe('simulation, not load data')
-  })
-
-  it('refuses a record of the old kind and names the kind that replaces it', async () => {
-    const old = file({ siValues })
-    defined(old.records[0]).kind = 'workbenchState'
-    const res = await simulate(old)
-    expect(res.status).toBe(400)
-    expect(res.body.issues).toEqual([
-      expect.objectContaining({ path: ['records', 0, 'kind'], message: legacyLoadProblem }),
-    ])
   })
 
   it('refuses the case water capacity of the earlier format at its path', async () => {

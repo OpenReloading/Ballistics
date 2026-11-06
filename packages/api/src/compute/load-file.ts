@@ -20,7 +20,6 @@ import {
   type Bullet,
   fromSi,
   type Load,
-  legacyLoadProblem,
   type Powder,
   parseRef,
   type QuantityKind,
@@ -51,17 +50,11 @@ function unknownKeys(input: unknown, parsed: unknown, path: Path): Path[] {
 
 /**
  * The one `load` record of a load file. Throws a `ZodError` with the path of each problem: an
- * unknown field, an invalid value, a record of the old format, no or several loads, an unresolvable
- * `user:` reference.
+ * unknown field, an invalid value, no or several loads, an unresolvable `user:` reference.
  */
 export function readLoadFile(json: unknown): { path: Path; record: Load; name: string } {
   const problem = versionProblem(json)
   if (problem) throw new z.ZodError([issue(['version'], problem)])
-  const old = (json as { records?: unknown } | null)?.records
-  if (Array.isArray(old)) {
-    const at = old.findIndex((r) => (r as { kind?: unknown } | null)?.kind === 'workbenchState')
-    if (at >= 0) throw new z.ZodError([issue(['records', at, 'kind'], legacyLoadProblem)])
-  }
   const file = userDataFile.safeParse(json)
   if (!file.success) throw unknownKeyIssues(file.error)
   const unknown = unknownKeys(json, file.data, []).map((p) => issue(p, 'Unknown field'))
