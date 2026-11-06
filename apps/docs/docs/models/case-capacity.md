@@ -26,7 +26,7 @@ $$
 V_\mathrm{case} = \frac{m_w}{\rho_w}, \qquad \rho_w = 0.9982\ \text{g/cm}^3
 $$
 
-Code: `packages/core/src/water.ts`, `waterDensityGramsPerCm3`, `packages/drawing/src/seating/seating.ts`, `seat` (`caseVolume`).
+Code: `packages/units/src/units.ts`, `waterDensityGramsPerCm3`, `packages/drawing/src/seating/seating.ts`, `seat` (`caseVolume`).
 
 $\rho_w$ is the density of water at 20 °C. The `primerState` (`primed-spent` or `unprimed`) and `fillLevel` (`mouth`) of a case capacity record say how its water was filled, where the source states it. They are recorded and echoed (the `capacities` of `GET /cartridges/:id`) and do not enter $V_\mathrm{case}$: the same mass gives the same volume either way. No volume correction for the primer pocket is applied until a sourced primer pocket volume per primer size exists. A record without `fillLevel` takes the mouth (Assumptions); one without `primerState` has no primer state. A water temperature the source states goes in `note`. A file with the field `convention` is refused (no migrations before 1.0). A case capacity the user measured, stored as a volume, takes the place of the record's water mass.
 
@@ -36,7 +36,7 @@ $$
 1\ \text{gr H}_2\text{O} = \frac{m_\mathrm{gr}}{\rho_w}, \qquad m_\mathrm{gr} = 6.479891 \times 10^{-5}\ \text{kg}
 $$
 
-Code: `packages/locale-format/src/display-units.ts`, `grH2O`, `grain`.
+Code: `packages/locale-format/src/display-units.ts`, `grH2O`, `packages/units/src/units.ts`, `6.479891e-5`.
 
 ### Seated bullet
 

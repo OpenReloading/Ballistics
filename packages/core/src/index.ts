@@ -1,3 +1,5 @@
+// the water density of a case capacity, kept in the export for the callers of core
+export { waterDensityGramsPerCm3 } from '@open-reloading/units'
 export * from './advisories.ts'
 export * from './bullet-fit.ts'
 export * from './cartridge-specs.ts'
@@ -48,4 +50,3 @@ export * from './interior/workbench-keys.ts'
 export * from './least-squares.ts'
 export * from './load-notes.ts'
 export * from './recoil.ts'
-export * from './water.ts'
