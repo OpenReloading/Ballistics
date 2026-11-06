@@ -79,8 +79,10 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/pnpm
-      - run: pnpm run lint
+      # the build first: the type-aware lint of a logic package reads the declarations the build
+      # writes for the workspace packages it imports (without them they are error types)
       - run: pnpm run build
+      - run: pnpm run lint
       - run: pnpm run typecheck
       - run: pnpm run knip
       - run: pnpm run docs:check
