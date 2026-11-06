@@ -6,7 +6,7 @@ import {
   type ChronoParserOptions,
   type SessionCandidate,
 } from './result.ts'
-import { bracketed, splitDelimited, splitLines } from './text.ts'
+import { bracketed, errorMessage, splitDelimited, splitLines } from './text.ts'
 import { parseVelocity, parseVelocityUnit, resolveUnit } from './units.ts'
 
 /** A column number counted from 1, or the header text of the column. */
@@ -88,6 +88,24 @@ interface Row {
 type MappedColumn = [keyof ColumnMap, Column]
 
 /**
+ * What reading the data rows of one file shares: the cell index of each mapped column, the unit
+ * token and text of the velocity header, the options, and the warnings so far.
+ */
+interface RowContext {
+  index: Partial<Record<keyof ColumnMap, number>>
+  token: string | undefined
+  headerText: string | undefined
+  options: DelimitedOptions
+  warnings: string[]
+}
+
+/** Whether a detected comma may cut a velocity, and what the user can do about it. */
+interface CommaCheck {
+  mayCut: boolean
+  remedy: string
+}
+
+/**
  * Delimited text with a user column mapping: one row per shot in firing order. Never detected.
  */
 export function parseDelimited(text: string, options: DelimitedOptions): ChronoImport {
@@ -100,25 +118,39 @@ export function parseDelimited(text: string, options: DelimitedOptions): ChronoI
  */
 function validateColumns(options: DelimitedOptions): MappedColumn[] {
   const columns = Object.entries(options.columns).filter(
-    ([, c]) => c !== undefined,
-  ) as MappedColumn[]
-  for (const [key, c] of columns) {
-    if (typeof c === 'number' && !(Number.isInteger(c) && c >= 1)) {
-      throw new Error(`column ${key} = ${c}: column numbers count from 1`)
-    }
-    if (typeof c === 'string' && !c.trim()) throw new Error(`column ${key}: empty header text`)
+    (column): column is MappedColumn => column[1] !== undefined,
+  )
+  for (const column of columns) checkColumn(column)
+  const { skipRows } = options
+  if (skipRows !== undefined && !(Number.isInteger(skipRows) && skipRows >= 0)) {
+    throw new Error('skipRows must be a whole number >= 0')
   }
-  if (options.skipRows !== undefined) {
-    if (!Number.isInteger(options.skipRows) || options.skipRows < 0) {
-      throw new Error('skipRows must be a whole number >= 0')
-    }
-  }
-  if (columns.some(([, c]) => typeof c === 'string') && options.skipRows !== undefined) {
+  if (skipRows !== undefined && columns.some(([, c]) => typeof c === 'string')) {
     throw new Error(
       'skipRows applies only when every column is a number; the header row is found by name',
     )
   }
   return columns
+}
+
+/** Throws on a column number below 1 or empty header text. */
+function checkColumn([key, c]: MappedColumn): void {
+  if (typeof c === 'number' && !(Number.isInteger(c) && c >= 1)) {
+    throw new Error(`column ${key} = ${c}: column numbers count from 1`)
+  }
+  if (typeof c === 'string' && !c.trim()) throw new Error(`column ${key}: empty header text`)
+}
+
+/** The cell index of each mapped column: its number, or the place of its header text. */
+function columnIndex(
+  columns: MappedColumn[],
+  header: string[] | undefined,
+): Partial<Record<keyof ColumnMap, number>> {
+  const index: Partial<Record<keyof ColumnMap, number>> = {}
+  for (const [key, c] of columns) {
+    index[key] = typeof c === 'number' ? c - 1 : (header ?? []).indexOf(c.trim().toLowerCase())
+  }
+  return index
 }
 
 /**
@@ -186,10 +218,8 @@ function findHeader(
 function checkRows(
   data: Row[],
   header: string[] | undefined,
-  index: Partial<Record<keyof ColumnMap, number>>,
-  commaMayCut: boolean,
-  remedy: string,
-  warnings: string[],
+  { index, warnings }: RowContext,
+  comma: CommaCheck,
 ): void {
   const vi = index.velocity ?? 0
   const nextMapped = header !== undefined && Object.values(index).includes(vi + 1)
@@ -197,26 +227,39 @@ function checkRows(
   let first: [string, string] | undefined
   const [firstRow] = data
   for (const r of data) {
-    checkOverflow(r, header, commaMayCut, remedy)
-    const p = commaMayCut ? commaPair(r, vi, header, nextMapped) : undefined
-    if (p && !header) {
-      throw new Error(
-        `row ${r.lineNumber}: "${p.join(',')}" may be one velocity with a decimal comma or a thousands separator; ${remedy}`,
-      )
-    }
-    if (p) {
+    const pair = comma.mayCut ? commaPair(r, vi, header, nextMapped) : undefined
+    checkRow(r, header, firstRow, { ...comma, pair })
+    if (pair) {
       suspect.push(r.lineNumber)
-      first ??= p
-    }
-    if (!header && firstRow && r.cells.length !== firstRow.cells.length) {
-      throw new Error(
-        `row ${r.lineNumber}: ${r.cells.length} cells, row ${firstRow.lineNumber} has ${firstRow.cells.length}`,
-      )
+      first ??= pair
     }
   }
   if (first) {
     warnings.push(
-      `${suspectRows(suspect)}: "${first.join(',')}" may be a velocity with a decimal comma or a thousands separator split by the delimiter; check the values or ${remedy}`,
+      `${suspectRows(suspect)}: "${first.join(',')}" may be a velocity with a decimal comma or a thousands separator split by the delimiter; check the values or ${comma.remedy}`,
+    )
+  }
+}
+
+/**
+ * Throws for a row with more cells than the header, for a velocity a comma may have cut in a file
+ * without a header (`pair`), and for a row whose cell count differs from the first row's there.
+ */
+function checkRow(
+  r: Row,
+  header: string[] | undefined,
+  firstRow: Row | undefined,
+  { mayCut, remedy, pair }: CommaCheck & { pair: [string, string] | undefined },
+): void {
+  checkOverflow(r, header, mayCut, remedy)
+  if (pair && !header) {
+    throw new Error(
+      `row ${r.lineNumber}: "${pair.join(',')}" may be one velocity with a decimal comma or a thousands separator; ${remedy}`,
+    )
+  }
+  if (!header && firstRow && r.cells.length !== firstRow.cells.length) {
+    throw new Error(
+      `row ${r.lineNumber}: ${r.cells.length} cells, row ${firstRow.lineNumber} has ${firstRow.cells.length}`,
     )
   }
 }
@@ -244,7 +287,8 @@ function commaPair(
   header: string[] | undefined,
   nextMapped: boolean,
 ): [string, string] | undefined {
-  const [before, v, after] = [r.cells[vi - 1] ?? '', r.cells[vi] ?? '', r.cells[vi + 1] ?? '']
+  const at = (k: number) => r.cells[k] ?? ''
+  const [before, v, after] = [at(vi - 1), at(vi), at(vi + 1)]
   if (header)
     return !nextMapped && /^\d+$/.test(v) && /^\d{1,3}$/.test(after) ? [v, after] : undefined
   if (/^\d+$/.test(v) && /^\d+(\.\d+)?$/.test(after)) return [v, after]
@@ -260,18 +304,14 @@ function suspectRows(suspect: number[]): string {
 }
 
 /**
- * The shot of one row from its mapped cells (`cell` returns undefined for an unmapped column):
- * a non-empty unit cell wins over the header `token`, the token over the caller's unit.
+ * The unit text of a row's velocity: a non-empty unit cell wins over the header `token`; refused
+ * when both name different units.
  */
-function readRowShot(
-  cell: (key: keyof ColumnMap) => string | undefined,
+function velocityUnitText(
+  unitCell: string | undefined,
   token: string | undefined,
   headerText: string | undefined,
-  options: DelimitedOptions,
-  warnings: string[],
-): ChronoShot {
-  const v = cell('velocity') ?? ''
-  const unitCell = cell('velocityUnit')
+): string | undefined {
   const [fromCell, fromHeader] = [parseVelocityUnit(unitCell), parseVelocityUnit(token)]
   if (fromCell && fromHeader && fromCell !== fromHeader) {
     throw new Error(
@@ -279,17 +319,37 @@ function readRowShot(
     )
   }
   // an unknown unit cell does not hide a recognised header token
-  const unitText = fromCell || !fromHeader ? unitCell || token : token
+  return fromCell || !fromHeader ? unitCell || token : token
+}
+
+/** True for a cold bore flag, false for none; refused for any other text. */
+function isColdBore(text: string | undefined): boolean {
+  if (text === undefined) return false
+  const lower = text.toLowerCase()
+  if (truthy.includes(lower)) return true
+  if (falsy.includes(lower)) return false
+  throw new Error(
+    `coldBore "${text}" is not one of ${[...truthy, ...falsy.slice(1)].join(', ')} or empty`,
+  )
+}
+
+/**
+ * The shot of one row from its mapped cells (`cell` returns undefined for an unmapped column):
+ * a non-empty unit cell wins over the header token, the token over the caller's unit.
+ */
+function readRowShot(
+  cell: (key: keyof ColumnMap) => string | undefined,
+  { token, headerText, options, warnings }: RowContext,
+): ChronoShot {
+  const unitText = velocityUnitText(cell('velocityUnit'), token, headerText)
   const shot: ChronoShot = {
-    velocity: parseVelocity(v, unitText, resolveUnit(unitText, options, warnings)),
+    velocity: parseVelocity(
+      cell('velocity') ?? '',
+      unitText,
+      resolveUnit(unitText, options, warnings),
+    ),
   }
-  const cold = cell('coldBore')?.toLowerCase()
-  if (cold !== undefined && truthy.includes(cold)) shot.coldBore = true
-  else if (cold !== undefined && !falsy.includes(cold)) {
-    throw new Error(
-      `coldBore "${cell('coldBore')}" is not one of ${[...truthy, ...falsy.slice(1)].join(', ')} or empty`,
-    )
-  }
+  if (isColdBore(cell('coldBore'))) shot.coldBore = true
   const excluded = cell('excluded')
   if (excluded !== undefined && !falsy.includes(excluded.toLowerCase())) shot.excluded = excluded
   return shot
@@ -299,15 +359,12 @@ function readRowShot(
 function readRowShotAt(
   lineNumber: number,
   cell: (key: keyof ColumnMap) => string | undefined,
-  token: string | undefined,
-  headerText: string | undefined,
-  options: DelimitedOptions,
-  warnings: string[],
+  context: RowContext,
 ): ChronoShot {
   try {
-    return readRowShot(cell, token, headerText, options, warnings)
+    return readRowShot(cell, context)
   } catch (e) {
-    throw new Error(`row ${lineNumber}: ${(e as Error).message}`)
+    throw new Error(`row ${lineNumber}: ${errorMessage(e)}`, { cause: e })
   }
 }
 
@@ -331,25 +388,24 @@ export function parseDelimitedRows(
     .slice(skip)
     .filter((r) => r.cells.some((c) => c !== ''))
   const { header, headerText, data } = findHeader(rows, names, options.columns.velocity)
-  const index = {} as Partial<Record<keyof ColumnMap, number>>
-  for (const [key, c] of columns) {
-    index[key] = typeof c === 'number' ? c - 1 : (header ?? []).indexOf(c.trim().toLowerCase())
+  const context: RowContext = {
+    index: columnIndex(columns, header),
+    token: headerText === undefined ? undefined : unitToken(headerText),
+    headerText,
+    options,
+    warnings: [],
   }
-
-  const commaMayCut = (options.delimiter === undefined || detected) && delimiter === ','
-  // a template takes its delimiter from the header line, so the user cannot name another one
-  const remedy = detected ? "quote the cell or use ';' as the delimiter" : 'name the delimiter'
-  const warnings: string[] = []
-  checkRows(data, header, index, commaMayCut, remedy, warnings)
-
-  const token = headerText === undefined ? undefined : unitToken(headerText)
-  const { strings, labels } = readStrings(data, index, token, headerText, options, warnings)
+  checkRows(data, header, context, {
+    mayCut: (options.delimiter === undefined || detected) && delimiter === ',',
+    // a template takes its delimiter from the header line, so the user cannot name another one
+    remedy: detected ? "quote the cell or use ';' as the delimiter" : 'name the delimiter',
+  })
+  const { strings, labels } = readStrings(data, context)
 
   return buildChronoImport(
     format,
     { device: options.device ?? { kind: 'other' }, strings },
-    labels,
-    warnings,
+    { labels, warnings: context.warnings },
     options,
   )
 }
@@ -357,12 +413,9 @@ export function parseDelimitedRows(
 /** The strings of the data rows: consecutive rows with an equal `string` cell form one string. */
 function readStrings(
   data: Row[],
-  index: Partial<Record<keyof ColumnMap, number>>,
-  token: string | undefined,
-  headerText: string | undefined,
-  options: DelimitedOptions,
-  warnings: string[],
+  context: RowContext,
 ): { strings: { shots: ChronoShot[] }[]; labels: (string | undefined)[] } {
+  const { index, warnings } = context
   const strings: { shots: ChronoShot[] }[] = []
   const labels: (string | undefined)[] = []
   const seen = new Set<string>()
@@ -377,7 +430,7 @@ function readStrings(
       warnings.push(`row ${r.lineNumber}: no velocity; skipped`)
       continue
     }
-    const shot = readRowShotAt(r.lineNumber, cell, token, headerText, options, warnings)
+    const shot = readRowShotAt(r.lineNumber, cell, context)
     const label = cell('string')
     if (open === undefined || label !== current) {
       if (label !== undefined && seen.has(label)) {

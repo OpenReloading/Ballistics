@@ -46,34 +46,39 @@ function positive(o: Obj, key: string, path: string): number | undefined {
   if (v === undefined) return undefined
   if (typeof v !== 'number' || !Number.isFinite(v) || v <= 0)
     fail(`${path}.${key}`, 'must be a positive number')
-  return v as number
+  return v
 }
+
+/** The object member `key` as non-empty text, or undefined when absent; `path` names it in a refusal. */
+function optionalText(o: Obj, key: string, path: string): string | undefined {
+  const v = o[key]
+  if (v === undefined) return undefined
+  if (typeof v !== 'string' || v === '') fail(path, 'must be text')
+  return v
+}
+
+const isDeviceKind = (x: unknown): x is (typeof deviceKinds)[number] =>
+  deviceKinds.some((k) => k === x)
 
 /** The `device` member: kind (default `other`), manufacturer name and model as non-empty text when present. */
 function readDevice(root: Obj): SessionCandidate['device'] {
-  const d = root['device'] === undefined ? {} : root['device']
-  if (!isObj(d)) fail('device', 'must be an object')
-  const dev = d as Obj
+  const dev = root['device'] === undefined ? {} : root['device']
+  if (!isObj(dev)) fail('device', 'must be an object')
   const kind = dev['kind'] === undefined ? 'other' : dev['kind']
-  if (!deviceKinds.includes(kind as (typeof deviceKinds)[number]))
-    fail('device.kind', `must be one of ${deviceKinds.join(', ')}`)
-  for (const key of ['manufacturerName', 'model'])
-    if (dev[key] !== undefined && (typeof dev[key] !== 'string' || dev[key] === ''))
-      fail(`device.${key}`, 'must be text')
+  if (!isDeviceKind(kind)) fail('device.kind', `must be one of ${deviceKinds.join(', ')}`)
   return {
-    kind: kind as (typeof deviceKinds)[number],
-    manufacturerName: dev['manufacturerName'] as string | undefined,
-    model: dev['model'] as string | undefined,
+    kind,
+    manufacturerName: optionalText(dev, 'manufacturerName', 'device.manufacturerName'),
+    model: optionalText(dev, 'model', 'device.model'),
   }
 }
 
 /** One shot at the member path `p`: velocity in m/s required, `coldBore` and `excluded` optional. */
-function readShot(raw: unknown, p: string): ChronoShot {
-  if (!isObj(raw)) fail(p, 'must be an object')
-  const shot = raw as Obj
+function readShot(shot: unknown, p: string): ChronoShot {
+  if (!isObj(shot)) fail(p, 'must be an object')
   const v = positive(shot, 'velocity', p)
   if (v === undefined) fail(`${p}.velocity`, 'is required, in m/s')
-  const out: ChronoShot = { velocity: { value: v as number, raw: `${v} m/s` } }
+  const out: ChronoShot = { velocity: { value: v, raw: `${v} m/s` } }
   if (shot['coldBore'] !== undefined) {
     if (typeof shot['coldBore'] !== 'boolean') fail(`${p}.coldBore`, 'must be true or false')
     if (shot['coldBore']) out.coldBore = true
@@ -81,7 +86,7 @@ function readShot(raw: unknown, p: string): ChronoShot {
   if (shot['excluded'] !== undefined) {
     if (typeof shot['excluded'] !== 'string' || shot['excluded'] === '')
       fail(`${p}.excluded`, 'must be the reason as text')
-    out.excluded = shot['excluded'] as string
+    out.excluded = shot['excluded']
   }
   return out
 }
@@ -97,16 +102,23 @@ function readStrings(root: Obj): {
   const strings = (root['strings'] as unknown[]).map((s, i) => {
     const at = `strings[${i}]`
     if (!isObj(s)) fail(at, 'must be an object')
-    const str = s as Obj
-    if (str['label'] !== undefined && typeof str['label'] !== 'string')
+    if (s['label'] !== undefined && typeof s['label'] !== 'string')
       fail(`${at}.label`, 'must be text')
-    labels.push((str['label'] as string | undefined) || undefined)
-    if (!Array.isArray(str['shots']) || str['shots'].length === 0)
+    labels.push(s['label'] || undefined)
+    if (!Array.isArray(s['shots']) || s['shots'].length === 0)
       fail(`${at}.shots`, 'must list at least one shot')
-    const shots = (str['shots'] as unknown[]).map((raw, j) => readShot(raw, `${at}.shots[${j}]`))
+    const shots = (s['shots'] as unknown[]).map((raw, j) => readShot(raw, `${at}.shots[${j}]`))
     return { shots }
   })
   return { strings, labels }
+}
+
+/** The `date` member as `YYYY-MM-DD`, or undefined when absent. */
+function readDate(root: Obj): string | undefined {
+  if (root['date'] === undefined) return undefined
+  const date = typeof root['date'] === 'string' ? yearFirstDate(root['date']) : undefined
+  if (!date) fail('date', 'must be a date as YYYY-MM-DD')
+  return date
 }
 
 /**
@@ -130,17 +142,10 @@ export function parseOpenReloadingJson(
   if (root['version'] !== 1)
     throw new Error(`version ${String(root['version'])} is not supported; expected 1`)
   const warnings: string[] = []
-
-  let date: string | undefined
-  if (root['date'] !== undefined) {
-    date = typeof root['date'] === 'string' ? yearFirstDate(root['date']) : undefined
-    if (!date) fail('date', 'must be a date as YYYY-MM-DD')
-  }
-
+  const date = readDate(root)
   const device = readDevice(root)
   const distance = positive(root, 'muzzleDistance', '')
-  if (root['note'] !== undefined && (typeof root['note'] !== 'string' || root['note'] === ''))
-    fail('note', 'must be text')
+  const note = optionalText(root, 'note', 'note')
   const { strings, labels } = readStrings(root)
 
   return buildChronoImport(
@@ -152,10 +157,9 @@ export function parseOpenReloadingJson(
         ? {}
         : { muzzleDistance: { value: distance * 1000, raw: `${distance} m` } }),
       strings,
-      ...(root['note'] === undefined ? {} : { note: root['note'] as string }),
+      ...(note === undefined ? {} : { note }),
     },
-    labels,
-    warnings,
+    { labels, warnings },
     options,
   )
 }
