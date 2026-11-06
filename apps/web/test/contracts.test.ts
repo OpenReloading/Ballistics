@@ -32,54 +32,16 @@ const file = parsed.ok ? parsed : undefined
 /** The kinds a file of this version holds: every kind the schema reads. */
 const kinds = userRecord.options.map((o) => o.shape.kind.value)
 
-/** A node of the user data file's JSON Schema: the objects, arrays, maps and unions the walks follow. */
+/** An object of the user data file's JSON Schema. */
 interface Node {
   not?: object
   properties?: Record<string, Node>
-  items?: Node
-  additionalProperties?: Node | boolean
-  oneOf?: Node[]
-  anyOf?: Node[]
-  allOf?: Node[]
 }
-const branches = (n: Node): Node[] => [
-  n,
-  ...[...(n.oneOf ?? []), ...(n.anyOf ?? []), ...(n.allOf ?? [])].flatMap(branches),
-]
-/** A property the schema forbids: a field of an earlier format that a file must not have. */
-const forbidden = (n: Node) => n.not !== undefined && Object.keys(n.not).length === 0
-/**
- * Every field path under `n`, `depth` levels down: `.name` per property, `[]` per array item, `.*` per
- * map entry.
- */
-function fieldPaths(n: Node, at: string, depth: number, out: Set<string>): Set<string> {
-  if (depth === 0) return out
-  for (const b of branches(n)) {
-    for (const [k, v] of Object.entries(b.properties ?? {}))
-      if (!forbidden(v)) fieldPaths(v, `${at}.${k}`, depth - 1, out.add(`${at}.${k}`))
-    if (b.items) fieldPaths(b.items, `${at}[]`, depth - 1, out)
-    if (typeof b.additionalProperties === 'object')
-      fieldPaths(b.additionalProperties, `${at}.*`, depth - 1, out.add(`${at}.*`))
-  }
-  return out
-}
-/** The field paths `value` sets, named as `fieldPaths` names them. */
-function setPaths(value: unknown, n: Node, at: string, out: Set<string>): Set<string> {
-  const all = branches(n)
-  if (Array.isArray(value)) {
-    for (const v of value) for (const b of all) if (b.items) setPaths(v, b.items, `${at}[]`, out)
-  } else if (value !== null && typeof value === 'object') {
-    for (const [k, v] of Object.entries(value)) {
-      const named = all.flatMap((b) => (b.properties?.[k] ? [b.properties[k]] : []))
-      for (const sub of named) setPaths(v, sub, `${at}.${k}`, out.add(`${at}.${k}`))
-      if (named.length === 0)
-        for (const b of all)
-          if (typeof b.additionalProperties === 'object')
-            setPaths(v, b.additionalProperties, `${at}.*`, out.add(`${at}.*`))
-    }
-  }
-  return out
-}
+/** The fields `n` allows, without those of an earlier format that a file must not have (`{ not: {} }`). */
+const fieldsOf = (n: Node) =>
+  Object.entries(n.properties ?? {}).flatMap(([k, v]) =>
+    v.not && Object.keys(v.not).length === 0 ? [] : [k],
+  )
 
 describe.each(Array.from({ length: userDataVersion }, (_, i) => i + 1))(
   'golden user data file of version %i',
@@ -100,7 +62,8 @@ describe('golden user data file of the current version', () => {
     expect(new Set(defined(file).records.map((r) => r.kind))).toEqual(new Set(kinds))
   })
 
-  // the fields of a record and of its data; deeper parts are in the records that have them
+  // the fields of a record and of its data and imported block, which hold no union; deeper parts are in the
+  // records that have them, not checked here
   it('sets every field each kind can have, on the record and in its data', () => {
     const schema = JSON.parse(
       readFileSync(
@@ -111,14 +74,22 @@ describe('golden user data file of the current version', () => {
         'utf8',
       ),
     )
-    const records: { kind: string }[] = JSON.parse(fileText).records
+    const records: Record<string, unknown>[] = JSON.parse(fileText).records
     const branchesOfKinds: (Node & { properties: { kind: { const: string } } })[] =
       schema.properties.records.items.oneOf
     const missing = branchesOfKinds.flatMap((branch) => {
       const kind = branch.properties.kind.const
-      const have = new Set<string>()
-      for (const r of records.filter((x) => x.kind === kind)) setPaths(r, branch, kind, have)
-      return [...fieldPaths(branch, kind, 2, new Set())].filter((p) => !have.has(p))
+      const ofKind = records.filter((r) => r['kind'] === kind)
+      return fieldsOf(branch).flatMap((k) => {
+        const values = ofKind.flatMap((r) => (r[k] === undefined ? [] : [r[k]]))
+        if (values.length === 0) return [`${kind}.${k}`]
+        const set = new Set(
+          values.flatMap((v) => (v && typeof v === 'object' ? Object.keys(v) : [])),
+        )
+        return fieldsOf(branch.properties[k] ?? {}).flatMap((f) =>
+          set.has(f) ? [] : [`${kind}.${k}.${f}`],
+        )
+      })
     })
     expect(missing).toEqual([])
   })
