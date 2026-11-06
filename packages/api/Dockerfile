@@ -23,7 +23,7 @@ COPY apps/e2e/package.json apps/e2e/
 COPY apps/docs/package.json apps/docs/
 COPY tooling/test-kit/package.json tooling/test-kit/
 RUN pnpm install --frozen-lockfile --ignore-scripts --filter "@open-reloading/api..."
-# the API Extractor configuration that the builds of units, statistics and schema extend
+# the API Extractor configuration that the builds of the packages extend
 COPY packages/api-extractor.base.json packages/
 COPY packages/units packages/units
 COPY packages/statistics packages/statistics
