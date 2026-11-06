@@ -60,7 +60,7 @@ With the loss proportional to distance, 0.1 percent is reached at about 1.6 m fo
 
 ## Result
 
-Improved. Rule: the correction at 5 m is 0.31 to 0.72 percent of the velocity in every case, above the 0.1 percent limit, so the simulation alone suggests the correction may be worth building, pending a verified limit and measured sessions. The inversion gives the flown muzzle velocity back to $10^{-7}$ m/s on a bullet with a standard drag function and to $2\times10^{-4}$ m/s against the exact solution of a constant coefficient, and both named cases agree within 0.3 m/s by a wide margin. Adopted as a core function `muzzleVelocityFromDownrange` (`packages/core/src/exterior/muzzle-velocity.ts`, [model page](../models/exterior-drag.md#speed-measured-downrange)) with unit tests for test 1 and test 2. The command line corrects published rows printed at a distance with it ([command line](../cli.md#muzzle-distance)).
+Improved. Rule: the correction at 5 m is 0.31 to 0.72 percent of the velocity in every case, above the 0.1 percent limit, so the simulation alone suggests the correction may be worth building, pending a verified limit and measured sessions. The inversion gives the flown muzzle velocity back to $10^{-7}$ m/s on a bullet with a standard drag function and to $2\times10^{-4}$ m/s against the exact solution of a constant coefficient, and both named cases agree within 0.3 m/s by a wide margin. Adopted as a core function `muzzleVelocityFromDownrange` (`packages/ballistics/src/exterior/muzzle-velocity.ts`, [model page](../models/exterior-drag.md#speed-measured-downrange)) with unit tests for test 1 and test 2. The command line corrects published rows printed at a distance with it ([command line](../cli.md#muzzle-distance)).
 
 Wiring for the web app, not built: in `chargeRows` (`apps/web/src/lib/measurements.ts`), when a session has a muzzle distance above zero and the saved load gives the bullet's mass, diameter and drag, call the function on the mean gate velocity and show the result as its own number next to the gate reading. The switch is off by default and switches the number off again. The comparison with the simulated muzzle velocity uses the corrected number only while the switch is on. Without a load there is no corrected number and no field is added to the session. The summary shows the corrected number labelled as a simulation.
 
@@ -72,7 +72,7 @@ Analytic: synthetic bullets with assumed sectional densities and form factors on
 
 - `packages/schema/src/chrono-session.ts`, `muzzleDistance` (stored, shown, not used in any calculation).
 - `apps/web/src/lib/measurements.ts`, `chargeRows` (the gate mean against the simulated muzzle velocity).
-- `packages/core/src/exterior/trajectory.ts`, `trajectory` (the forward run the inversion calls).
+- `packages/ballistics/src/exterior/trajectory.ts`, `trajectory` (the forward run the inversion calls).
 - Model page: [drag](../models/exterior-drag.md).
 
 ## Confidence

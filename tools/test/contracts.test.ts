@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest'
 // type counts as much as a value. `pnpm run baselines` at the root rewrites the lists.
 const published = ['schema', 'core', 'drawing', 'importers', 'data']
 
-/** The names a declaration file exports, following `export *` through its relative imports. */
+/** The names a declaration file exports, following `export *` through its relative imports and into workspace packages. */
 function exportedNames(file: URL, seen = new Set<string>()): string[] {
   if (seen.has(file.href)) return []
   seen.add(file.href)
@@ -30,6 +30,9 @@ function exportedNames(file: URL, seen = new Set<string>()): string[] {
   for (const [, ns] of text.matchAll(/^export \* as (\w+) from/gm)) names.push(ns as string)
   for (const [, from] of text.matchAll(/^export \* from '(\.[^']+)\.ts'/gm))
     names.push(...exportedNames(new URL(`${from}.d.ts`, file), seen))
+  for (const [, pkg] of text.matchAll(/^export \* from '@open-reloading\/([\w-]+)'/gm))
+    for (const [path, entry] of entries(pkg as string))
+      if (path === '.') names.push(...exportedNames(entry, seen))
   return names
 }
 
@@ -82,6 +85,14 @@ describe('export lists of the published packages', () => {
       'ns',
       'value',
     ])
+  })
+
+  it('follows `export *` of a workspace package into its declarations', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'exports-'))
+    writeFileSync(join(dir, 'index.d.ts'), "export * from '@open-reloading/statistics';\n")
+    const names = exportedNames(pathToFileURL(join(dir, 'index.d.ts')))
+    rmSync(dir, { recursive: true })
+    expect(names).toEqual(expect.arrayContaining(['chiSquareQuantile', 'InputError', 'Interval']))
   })
 
   it.each(published)('@open-reloading/%s exports the names of its baseline', async (name) => {
