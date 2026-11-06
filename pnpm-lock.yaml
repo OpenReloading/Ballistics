@@ -544,6 +544,9 @@ importers:
       '@arethetypeswrong/cli':
         specifier: 'catalog:'
         version: 0.18.5
+      '@microsoft/api-extractor':
+        specifier: 'catalog:'
+        version: 7.60.1(@types/node@26.6.6)
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6

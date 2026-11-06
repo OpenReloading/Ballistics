@@ -75,7 +75,7 @@ export const federation: z.ZodObject<
     /** Short name as the rule books and faces print it ("ISSF", "DSB"). */
     abbreviation: z.ZodString
     /** ISO 3166-1 alpha-2 code of the federation's country, `international` for a world body. */
-    country: z.ZodUnion<readonly [z.ZodLiteral<'international'>, typeof countryCode]>
+    country: z.ZodUnion<readonly [z.ZodLiteral<'international'>, z.ZodString]>
     /** Id of the international federation the rule book names this one a member of. */
     internationalFederation: z.ZodOptional<typeof recordId>
     /** An https URL of the federation's own homepage: pages render it as a link. */
@@ -90,7 +90,7 @@ export const federation: z.ZodObject<
           /** An https URL: pages render it as a link. */
           url: z.ZodURL
           /** SHA-256 of a file: 64 lowercase hex digits. */
-          sha256: typeof sha256
+          sha256: z.ZodString
         },
         z.core.$strict
       >
