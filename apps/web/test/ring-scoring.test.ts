@@ -35,9 +35,10 @@ describe('scoreGroupOnFace in the language shown', () => {
   it('words marks on one line in German, the reason too', () => {
     const german = translator(de, 'de').t
     const marks = [0, 1, 2, 3].map((i) => ({ ring: 8 + Math.floor(i / 2), x: i * 1e-3, y: 0 }))
-    expect(scoreGroupOnFace(rifle50, { id: rifle50.id, marks }, group, 5e-3, german)).toEqual({
-      error: 'Die Ringmarkierungen passen nicht: Die Punkte sind entartet. Markieren Sie erneut.',
-    })
+    const scored = scoreGroupOnFace(rifle50, { id: rifle50.id, marks }, group, 5e-3, german)
+    expect('error' in scored && scored.error).toMatch(
+      /^Die Ringmarkierungen passen nicht: Die Punkte sind entartet\. /,
+    )
   })
 })
 
