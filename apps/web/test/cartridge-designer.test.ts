@@ -1,4 +1,5 @@
 import type { UserCartridge } from '@open-reloading/schema'
+import { seededUniforms } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
 import {
   type Action,
@@ -16,7 +17,6 @@ import {
   newDesign,
   reduce,
 } from '../src/lib/cartridge-designer.ts'
-import { seededRandom } from '../src/lib/ellipse.ts'
 import { fieldValueFromText } from '../src/lib/field-spec.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import type { ResolvedCartridge } from '../src/lib/variants.ts'
@@ -342,7 +342,7 @@ describe('random edits', () => {
     [3, 'cip-9-mm-luger-2008-09-23'],
   ] as const)
     it(`always give a drawing or a reason (${start})`, () => {
-      const next = seededRandom(seed)
+      const next = seededUniforms(seed)
       let h = historyOf(fromRecord(sheetRecord(start), metric))
       let drawn = 0
       for (let k = 0; k < 150; k++) {

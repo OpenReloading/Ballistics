@@ -1,5 +1,5 @@
-import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page, test } from '@playwright/test'
+import { AxeBuilder } from './a11y.ts'
 import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
@@ -30,7 +30,11 @@ type Stored = {
   name: string
   data: { sessions?: string[]; snapshots?: { session: string }[]; strings: Strings[] }
 }
-type Strings = { load?: string; shots: { velocity: { value: number }; excluded?: string }[] }
+type Strings = {
+  load?: string
+  note?: string
+  shots: { velocity: { value: number }; excluded?: string }[]
+}
 
 const stored = (page: Page, kind: string) =>
   page.evaluate(async (kind) => {

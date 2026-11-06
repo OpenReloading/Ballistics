@@ -8,5 +8,4 @@ export {
   largestGap,
   meanRadius,
   ransacEllipse,
-  seededRandom,
 } from '@open-reloading/shot-groups'

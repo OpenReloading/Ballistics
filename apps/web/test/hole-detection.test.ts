@@ -1,5 +1,5 @@
+import { seededUniforms } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import { seededRandom } from '../src/lib/ellipse.ts'
 import {
   autoDetect,
   detectFromExample,
@@ -30,7 +30,7 @@ class Scene {
   lum: Float32Array
   /** Pixels painted in colour (R, G, B); the others are grey with the tint of `image`. */
   colour = new Map<number, [number, number, number]>()
-  rnd = seededRandom(7)
+  rnd = seededUniforms(7)
   constructor(
     readonly width: number,
     readonly height: number,

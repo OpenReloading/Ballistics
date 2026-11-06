@@ -4,6 +4,8 @@
 
 ```ts
 
+import { Diagnostic } from '@open-reloading/statistics';
+
 // @public
 export const apply3: (m: Matrix, v: Readonly<Vector3>) => Vector3;
 
@@ -45,10 +47,37 @@ export function conicOf(input: Ellipse): Conic;
 export const det3: (m: Matrix) => number;
 
 // @public
-export type Diagnostic<C extends string, P extends object = Record<string, never>> = {
-    code: C;
-    params: P;
-};
+export interface DispersionInput {
+    distance: number;
+    group: PointDispersion;
+    range?: {
+        sd: number;
+        verticalPerMetre: number;
+    };
+    referenceDistance: number;
+    velocity?: {
+        sd: number;
+        verticalPerSpeed: number;
+        referenceVerticalPerSpeed: number;
+    };
+    wind?: {
+        speed: number;
+        from: number;
+        speedSd: number;
+        directionSd: number;
+        perCrosswind: number;
+    };
+}
+
+// @public
+export interface DispersionResult extends PointDispersion {
+    parts: {
+        group: PointDispersion;
+        wind: number;
+        range: number;
+        velocity?: number;
+    };
+}
 
 // @public
 export type Ellipse = {
@@ -64,6 +93,9 @@ export function ellipseOf(c: Conic): Ellipse | undefined;
 
 // @public
 export function ellipsePoint(e: Ellipse, t: number): Point;
+
+// @public
+export function ellipseProbability(a: number, b: number, d: PointDispersion, offset?: PointOffset): number;
 
 // @public
 export interface EventClaims {
@@ -240,13 +272,31 @@ export interface HitFactorRules {
 }
 
 // @public
+export type HitIssue = Diagnostic<'distances'> | Diagnostic<'group-dispersion'> | Diagnostic<'speed-spread'>
+/** The height spread from the muzzle speed exceeds the vertical spread of the group. */
+| Diagnostic<'speed-height'> | Diagnostic<'wind'> | Diagnostic<'range-uncertainty'> | Diagnostic<'semi-axes'> | Diagnostic<'standard-deviations'> | Diagnostic<'offset'> | Diagnostic<'hit-probability'> | Diagnostic<'wanted-probability'> | Diagnostic<'zones'>;
+
+// @public
+export function hitProbability(zones: readonly ScoringZone[], d: PointDispersion, offset?: PointOffset): HitResult;
+
+// @public
+export interface HitResult {
+    expectedScore: number;
+    hit: number;
+    zones: {
+        value: number;
+        probability: number;
+    }[];
+}
+
+// @public
 export function inv3(m: Matrix): Mat3 | undefined;
 
 // @public
 export function invertMatrix(m: Matrix): Matrix;
 
 // @public
-export type Issue = GeometryIssue | RingFitIssue | ScoringIssue;
+export type Issue = GeometryIssue | RingFitIssue | ScoringIssue | HitIssue;
 
 // @public
 export const keepOnPhoto: (q: Point, before: Calibration, after: Calibration) => Point;
@@ -285,6 +335,25 @@ export type Point = {
     x: number;
     y: number;
 };
+
+// @public
+export interface PointDispersion {
+    // (undocumented)
+    horizontal: number;
+    // (undocumented)
+    vertical: number;
+}
+
+// @public
+export function pointDispersion(i: DispersionInput): DispersionResult;
+
+// @public
+export interface PointOffset {
+    // (undocumented)
+    dx: number;
+    // (undocumented)
+    dy: number;
+}
 
 // @public
 export function practicalEventTotals(stages: readonly PracticalStage[], rules: HitFactorRules, state: ResultState): EventTotals;
@@ -456,14 +525,20 @@ Diagnostic<'count'> | Diagnostic<'stage-time'> | Diagnostic<'stage-points'> | Di
 | Diagnostic<'series-total'>;
 
 // @public
-export function seededRandom(seed: number): () => number;
+export interface ScoringZone {
+    halfHeight: number;
+    halfWidth: number;
+    value: number;
+}
 
 // @public
-export class ShotGroupsError extends RangeError {
-    constructor(issue: Issue);
-    // (undocumented)
-    readonly issue: Issue;
+export interface ShotsToHit {
+    mean: number;
+    shots: number;
 }
+
+// @public
+export function shotsToHit(p: number, wanted: number): ShotsToHit;
 
 // @public
 export function solve(a: number[][], b: number[]): number[];

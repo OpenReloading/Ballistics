@@ -1,5 +1,7 @@
+import { InputError } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import { ellipseProbability, hitProbability, InputError, pointDispersion } from '../src/index.ts'
+import { ellipseProbability, hitProbability, pointDispersion } from '../src/index.ts'
+import { issueOf } from './issue.ts'
 
 const sigma = (s: number) => ({ horizontal: s, vertical: s })
 
@@ -30,14 +32,23 @@ describe('ellipse probability', () => {
       [0, 0.01],
       [0.01, 0],
     ] as const)
-      expect(() => ellipseProbability(a, b, sigma(0.01))).toThrow(/semi-axes/)
+      expect(issueOf(() => ellipseProbability(a, b, sigma(0.01)))).toEqual({
+        code: 'semi-axes',
+        params: {},
+      })
     for (const d of [
       { horizontal: 0, vertical: 0.01 },
       { horizontal: 0.01, vertical: 0 },
     ])
-      expect(() => ellipseProbability(0.01, 0.01, d)).toThrow(/standard deviations/)
+      expect(issueOf(() => ellipseProbability(0.01, 0.01, d))).toEqual({
+        code: 'standard-deviations',
+        params: {},
+      })
   })
 })
+
+/** The closed-form probability inside a circle of radius `r` of a circular normal of 0.03 m. */
+const inside = (r: number) => 1 - Math.exp(-(r * r) / (2 * 0.03 ** 2))
 
 describe('hit probability', () => {
   const zones = [
@@ -45,6 +56,18 @@ describe('hit probability', () => {
     { halfWidth: 0.05, halfHeight: 0.05, value: 2 },
     { halfWidth: 0.01, halfHeight: 0.01, value: 3 },
   ]
+
+  /** The result at a wind speed spread of `speedSd` m/s. */
+  const at = (speedSd: number) =>
+    hitProbability(
+      zones,
+      pointDispersion({
+        group: sigma(0.0003),
+        referenceDistance: 100,
+        distance: 300,
+        wind: { speed: 4, from: Math.PI / 2, speedSd, directionSd: 0, perCrosswind: 0.05 },
+      }),
+    )
 
   it('takes the zones as nested rings and sums the expected score', () => {
     const r = hitProbability(zones, sigma(0.03))
@@ -58,7 +81,6 @@ describe('hit probability', () => {
   })
 
   it('gives each ring the probability inside it and outside the next zone', () => {
-    const inside = (r: number) => 1 - Math.exp(-(r * r) / (2 * 0.03 ** 2))
     const r = hitProbability(zones, sigma(0.03))
     const rings = [inside(0.1) - inside(0.05), inside(0.05) - inside(0.01), inside(0.01)]
     expect(r.zones.map((z) => z.probability)).toHaveLength(3)
@@ -70,20 +92,10 @@ describe('hit probability', () => {
   })
 
   it('rejects a face without zones', () => {
-    expect(() => hitProbability([], sigma(0.03))).toThrow(/at least one zone/)
+    expect(issueOf(() => hitProbability([], sigma(0.03)))).toEqual({ code: 'zones', params: {} })
   })
 
   it('falls monotonically with the wind uncertainty', () => {
-    const at = (speedSd: number) =>
-      hitProbability(
-        zones,
-        pointDispersion({
-          group: sigma(0.0003),
-          referenceDistance: 100,
-          distance: 300,
-          wind: { speed: 4, from: Math.PI / 2, speedSd, directionSd: 0, perCrosswind: 0.05 },
-        }),
-      )
     let last = 2
     for (const s of [0, 0.5, 1, 2, 4]) {
       const p = at(s).hit
@@ -123,7 +135,9 @@ describe('point dispersion', () => {
     })
     expect(head.parts.wind).toBeCloseTo(0.04 * 0.5, 12)
   })
+})
 
+describe('point dispersion refusals', () => {
   it('rejects a dispersion of zero', () => {
     expect(() =>
       pointDispersion({ group: sigma(0), referenceDistance: 100, distance: 100 }),
@@ -132,15 +146,21 @@ describe('point dispersion', () => {
       { horizontal: 0, vertical: 0.01 },
       { horizontal: 0.01, vertical: 0 },
     ])
-      expect(() => pointDispersion({ group, referenceDistance: 100, distance: 100 })).toThrow(
-        /group dispersion/,
-      )
+      expect(
+        issueOf(() => pointDispersion({ group, referenceDistance: 100, distance: 100 })),
+      ).toEqual({ code: 'group-dispersion', params: {} })
   })
 
   it('rejects a distance of zero and negative uncertainties, and accepts zero ones', () => {
     const base = { group: sigma(0.01), referenceDistance: 100, distance: 100 }
-    expect(() => pointDispersion({ ...base, referenceDistance: 0 })).toThrow(/distances/)
-    expect(() => pointDispersion({ ...base, distance: 0 })).toThrow(/distances/)
+    expect(issueOf(() => pointDispersion({ ...base, referenceDistance: 0 }))).toEqual({
+      code: 'distances',
+      params: {},
+    })
+    expect(issueOf(() => pointDispersion({ ...base, distance: 0 }))).toEqual({
+      code: 'distances',
+      params: {},
+    })
     const wind = { speed: 0, from: 1, speedSd: 0, directionSd: 0, perCrosswind: 0.04 }
     expect(pointDispersion({ ...base, wind, range: { sd: 0, verticalPerMetre: 1 } })).toEqual({
       horizontal: 0.01,
@@ -148,9 +168,12 @@ describe('point dispersion', () => {
       parts: { group: sigma(0.01), wind: 0, range: 0 },
     })
     for (const bad of [{ speed: -1 }, { speedSd: -1 }, { directionSd: -1 }])
-      expect(() => pointDispersion({ ...base, wind: { ...wind, ...bad } })).toThrow(/wind inputs/)
-    expect(() => pointDispersion({ ...base, range: { sd: -1, verticalPerMetre: 1 } })).toThrow(
-      /range uncertainty/,
-    )
+      expect(issueOf(() => pointDispersion({ ...base, wind: { ...wind, ...bad } }))).toEqual({
+        code: 'wind',
+        params: {},
+      })
+    expect(
+      issueOf(() => pointDispersion({ ...base, range: { sd: -1, verticalPerMetre: 1 } })),
+    ).toEqual({ code: 'range-uncertainty', params: {} })
   })
 })

@@ -1,7 +1,10 @@
 import type { TrajectoryPoint } from '@open-reloading/core'
 import type { TargetFace } from '@open-reloading/schema'
+import { InputError } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import { faceZones, impactSensitivity } from '../src/lib/hit-probability.ts'
+import de from '../src/i18n/de.json'
+import { english, translator } from '../src/i18n/translate.ts'
+import { faceZones, hitFailureText, impactSensitivity } from '../src/lib/hit-probability.ts'
 import { defined } from './defined.ts'
 
 const mm = (value: number) => ({ value })
@@ -12,6 +15,15 @@ const face = {
     { value: 3, diameter: mm(20), height: mm(30) },
   ],
 } as unknown as TargetFace
+
+describe('hitFailureText', () => {
+  it('words a refusal of the hit probability, and passes any other error as its text', () => {
+    const zones = new InputError({ code: 'zones', params: {} })
+    expect(hitFailureText(zones, english.t)).toBe('a face needs at least one zone')
+    expect(hitFailureText(zones, translator(de, 'de').t)).toBe(de['a face needs at least one zone'])
+    expect(hitFailureText(new Error('offline'), english.t)).toBe('offline')
+  })
+})
 
 describe('faceZones', () => {
   it('grows each ring by the radius of the hole and keeps an oval ring tall', () => {

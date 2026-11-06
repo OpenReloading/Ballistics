@@ -13,7 +13,7 @@ import { chromium, type Page } from '@playwright/test'
 import { barButton } from '../tests/web/bar.ts'
 import { safetyAck } from '../tests/web/nav.ts'
 
-export const presets: Record<string, string[]> = {
+export const presets = {
   // 308 Win., 8 x 51 R Lebel, a belted magnum (table III), a rimfire (V), a long case, a shotshell (VII)
   drawing: [
     '/cartridges/308-win',
@@ -46,7 +46,7 @@ export function args(argv: string[]): string[] {
       throw new Error(
         `unknown preset ${token.value}; known presets: ${Object.keys(presets).join(', ')}`,
       )
-    return presets[name]
+    return presets[name as keyof typeof presets]
   })
   if (!pages.length)
     throw new Error('no pages: give --preset drawing|calculators or page paths such as /workbench')
@@ -185,7 +185,7 @@ async function ready(page: Page, url: string) {
 
 /** On a cartridge page the area from the first to the last drawing figure, else the whole page. */
 async function clip(page: Page, url: string) {
-  if (!url.startsWith('/cartridges/') || url.startsWith('/cartridges/designer')) return
+  if (!url.startsWith('/cartridges/') || url.startsWith('/cartridges/designer')) return {}
   const [x0, y0, x1, y1] = await page
     .locator('figure.drawing-figure')
     .evaluateAll((figures) =>
@@ -201,7 +201,7 @@ async function clip(page: Page, url: string) {
           [Infinity, Infinity, -Infinity, -Infinity],
         ),
     )
-  return { x: x0, y: y0, width: x1 - x0, height: y1 - y0 }
+  return { clip: { x: x0, y: y0, width: x1 - x0, height: y1 - y0 } }
 }
 
 /** Tiles images into one grid of `columns` tiles `tile` px wide under a title and saves it as `file`. */
@@ -271,7 +271,7 @@ if (import.meta.main) {
             shots,
             `${url.slice(1).replaceAll('/', '_') || 'home'}__${theme}__${width}.png`,
           )
-          await page.screenshot({ path: file, fullPage: true, clip: await clip(page, url) })
+          await page.screenshot({ path: file, fullPage: true, ...(await clip(page, url)) })
           tiles.push({ file, caption: `${url}<br>${theme}, ${width} px` })
           console.log(file)
           // VISUAL_TALL=<height>: one more shot in a window that tall, where a tool page's regions
@@ -283,7 +283,7 @@ if (import.meta.main) {
               shots,
               `${url.slice(1).replaceAll('/', '_') || 'home'}__${theme}__${width}__tall.png`,
             )
-            await page.screenshot({ path: file, fullPage: true, clip: await clip(page, url) })
+            await page.screenshot({ path: file, fullPage: true, ...(await clip(page, url)) })
             tiles.push({ file, caption: `${url}<br>${theme}, ${width} x ${tall} px` })
             console.log(file)
           }

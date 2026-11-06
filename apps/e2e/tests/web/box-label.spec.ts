@@ -35,7 +35,7 @@ for (const language of languages)
       ['Powder lot', 'P-2026-0412-A'],
       ['Primer lot', 'Z-778341'],
       ['Case lot', 'H-19-2203'],
-    ])
+    ] as const)
       await page.getByLabel(lot, { exact: true }).first().fill(text)
     await (await barButton(page, 'Save')).click()
     await expect(page.locator('.file-state')).toContainText('Saved')

@@ -1,5 +1,5 @@
-import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page, test } from '@playwright/test'
+import { AxeBuilder } from './a11y.ts'
 import { storeUnits } from './units.ts'
 import { runExample } from './workbench-run.ts'
 
@@ -10,9 +10,9 @@ const trajectoryHeights = (page: Page) =>
   page
     .getByRole('table', { name: /^Trajectory: / })
     .locator('tbody tr')
-    .evaluateAll((rows) =>
+    .evaluateAll((rows: HTMLTableRowElement[]) =>
       Object.fromEntries(
-        rows.map((r) => [r.cells[0].textContent ?? '', Number(r.cells[1].textContent)]),
+        rows.map((r) => [r.cells[0]?.textContent ?? '', Number(r.cells[1]?.textContent)]),
       ),
     )
 

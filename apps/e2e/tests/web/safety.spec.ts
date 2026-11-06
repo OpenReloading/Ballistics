@@ -1,5 +1,5 @@
-import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
+import { AxeBuilder } from './a11y.ts'
 import { safetyAck } from './nav.ts'
 
 // a first visit: nothing accepted yet

@@ -8,6 +8,7 @@ import {
   toSi,
   type UserBullet,
 } from '@open-reloading/schema'
+import { seededUniforms } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
 import { computedBulletRows } from '../src/lib/bullet.ts'
 import {
@@ -28,7 +29,6 @@ import {
   newDesign,
   reduce,
 } from '../src/lib/bullet-designer.ts'
-import { seededRandom } from '../src/lib/ellipse.ts'
 import { fieldError, fieldValueFromText } from '../src/lib/field-spec.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import type { ResolvedBullet } from '../src/lib/variants.ts'
@@ -406,7 +406,7 @@ function randomAction(rnd: () => number, h: History, choices: Choices): Action {
 }
 
 it('random edit sequences always leave a drawing to show', () => {
-  const rnd = seededRandom(118)
+  const rnd = seededUniforms(118)
   const choices = [
     ['base.type', ['', 'flat', 'boat-tail', 'rebated-boat-tail']],
     ['ogive.form', ['', 'tangent', 'secant', 'hybrid', 'round-nose', 'flat-nose']],
