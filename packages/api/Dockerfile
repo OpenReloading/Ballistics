@@ -8,6 +8,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY packages/units/package.json packages/units/
 COPY packages/locale-format/package.json packages/locale-format/
 COPY packages/statistics/package.json packages/statistics/
+COPY packages/ballistics/package.json packages/ballistics/
 COPY packages/shot-groups/package.json packages/shot-groups/
 COPY packages/schema/package.json packages/schema/
 COPY packages/importers/package.json packages/importers/
@@ -24,6 +25,7 @@ COPY tooling/test-kit/package.json tooling/test-kit/
 RUN pnpm install --frozen-lockfile --ignore-scripts --filter "@open-reloading/api..."
 COPY packages/units packages/units
 COPY packages/statistics packages/statistics
+COPY packages/ballistics packages/ballistics
 COPY packages/schema packages/schema
 COPY packages/core packages/core
 COPY packages/data packages/data
@@ -42,6 +44,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/units/package.json packages/units/
 COPY packages/locale-format/package.json packages/locale-format/
 COPY packages/statistics/package.json packages/statistics/
+COPY packages/ballistics/package.json packages/ballistics/
 COPY packages/shot-groups/package.json packages/shot-groups/
 COPY packages/schema/package.json packages/schema/
 COPY packages/importers/package.json packages/importers/
@@ -60,6 +63,7 @@ RUN pnpm install --frozen-lockfile --prod --ignore-scripts --filter "@open-reloa
   && rm -rf /opt/pnpm /usr/local/bin/pnpm /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
 COPY --from=build /app/packages/units/dist packages/units/dist
 COPY --from=build /app/packages/statistics/dist packages/statistics/dist
+COPY --from=build /app/packages/ballistics/dist packages/ballistics/dist
 COPY --from=build /app/packages/schema/dist packages/schema/dist
 COPY --from=build /app/packages/core/dist packages/core/dist
 COPY --from=build /app/packages/data/dist packages/data/dist

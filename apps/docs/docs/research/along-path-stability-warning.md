@@ -71,9 +71,9 @@ Analytic: closed-form scalings and a synthetic grid with stated lengths and coef
 
 ## Where in the app
 
-- `packages/core/src/exterior/stability.ts`, `millerStability` (kept) and the removed `firstLowStability`.
-- `packages/core/src/exterior/modified.ts`, `gyroscopicStability`.
-- `packages/core/test/exterior-stability.test.ts`.
+- `packages/ballistics/src/exterior/stability.ts`, `millerStability` (kept) and the removed `firstLowStability`.
+- `packages/ballistics/src/exterior/modified.ts`, `gyroscopicStability`.
+- `packages/ballistics/test/exterior-stability.test.ts`.
 - `apps/web/src/lib/trajectory-input.ts`, `trajectoryResult`.
 - `apps/web/src/components/trajectory-form.tsx`, the result notes.
 - Model pages: [stability, spin drift and jump](../models/exterior-stability.md), [modified point mass](../models/exterior-modified-point-mass.md).
