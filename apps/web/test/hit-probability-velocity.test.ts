@@ -1,7 +1,6 @@
 // The velocity term of shot-groups' pointDispersion against trajectories of core's solver with sampled
 // muzzle speeds: a check across two packages, so it runs in the app that holds both.
-import { pointDispersion } from '@open-reloading/shot-groups'
-import { describe, expect, it } from 'vitest'
+
 import {
   lbPerSqInToKgPerSqM,
   standardAtmosphere,
@@ -9,6 +8,8 @@ import {
   trajectory,
   zeroAngles,
 } from '@open-reloading/core'
+import { pointDispersion } from '@open-reloading/shot-groups'
+import { describe, expect, it } from 'vitest'
 import { normals } from './normals.ts'
 
 describe('velocity term against sampled muzzle speeds', () => {
