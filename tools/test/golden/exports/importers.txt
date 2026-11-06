@@ -33,6 +33,7 @@
 . VelocityUnit
 . Workbook
 . WorkbookChronoFormat
+. WorkbookFormatId
 . WorkbookOptions
 . Worksheet
 . autoMap

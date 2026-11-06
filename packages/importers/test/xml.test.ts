@@ -18,7 +18,7 @@ describe('parseXml', () => {
 
   it('replaces character references to XML characters', () => {
     expect(parseXml('<t>A&#66;&#x43;&amp;D</t>').children).toEqual(['ABC&D'])
-    expect(parseXml('<t a="&#x1F600;"/>').attributes.a).toBe('\u{1F600}')
+    expect(parseXml('<t a="&#x1F600;"/>').attributes['a']).toBe('\u{1F600}')
   })
 
   it('refuses a document type declaration, unknown entities and a bare &', () => {

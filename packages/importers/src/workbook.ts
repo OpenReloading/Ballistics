@@ -171,7 +171,7 @@ function sheetRows(
         if (depth === 1 && name === 'sheetData' && sheetData === 'before') sheetData = 'open'
         else if (depth === 2 && name === 'row' && sheetData === 'open') cells = []
         else if (depth === 3 && name === 'c' && cells) {
-          cell = { t: attributes.t, r: attributes.r, vs: 0, iss: 0 }
+          cell = { t: attributes['t'], r: attributes['r'], vs: 0, iss: 0 }
         } else if (depth === 4 && cell) countCellChild(cell, name)
       },
       text(t, path) {
@@ -256,16 +256,16 @@ async function readRelationships(
   const all = elements(await tree(path), 'Relationship').map((r) => r.attributes)
   const ids = new Set<string>()
   for (const r of all) {
-    const id = r.Id ?? ''
+    const id = r['Id'] ?? ''
     if (ids.has(id)) throw new Error(`XLSX part ${path}: relationship ${id} appears twice`)
     ids.add(id)
   }
   return all
-    .filter((r) => r.TargetMode !== 'External')
+    .filter((r) => r['TargetMode'] !== 'External')
     .map((r) => ({
-      id: r.Id ?? '',
-      type: r.Type ?? '',
-      target: resolveTarget(source, r.Target ?? ''),
+      id: r['Id'] ?? '',
+      type: r['Type'] ?? '',
+      target: resolveTarget(source, r['Target'] ?? ''),
     }))
 }
 
@@ -286,16 +286,16 @@ async function readWorksheets(
   const read = new Set<string>()
   const worksheets: Worksheet[] = []
   for (const sheet of sheetList) {
-    const rel = byId.get(sheet.id ?? '')
-    if (!rel) throw new Error(`XLSX part ${office}: sheet ${sheet.name} has no relationship`)
+    const rel = byId.get(sheet['id'] ?? '')
+    if (!rel) throw new Error(`XLSX part ${office}: sheet ${sheet['name']} has no relationship`)
     // chart sheets and dialog sheets hold no cells
     if (!rel.type.endsWith('/worksheet')) continue
     if (read.has(rel.target)) {
-      throw new Error(`XLSX part ${office}: sheet ${sheet.name} names part ${rel.target} again`)
+      throw new Error(`XLSX part ${office}: sheet ${sheet['name']} names part ${rel.target} again`)
     }
     read.add(rel.target)
     const rows = await part(rel.target, (text) => sheetRows(text, strings, remaining, xmlRemaining))
-    worksheets.push({ name: sheet.name ?? '', rows })
+    worksheets.push({ name: sheet['name'] ?? '', rows })
   }
   return worksheets
 }

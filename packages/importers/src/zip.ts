@@ -201,7 +201,7 @@ export async function readEntry(
   entry: ZipEntry,
   inflate: Inflate,
   budget: { left: number },
-  limit = maxPartSize,
+  limit: number = maxPartSize,
 ): Promise<Uint8Array<ArrayBuffer>> {
   const part = (message: string) => new Error(`XLSX part ${entry.name}: ${message}`)
   spendDeclared(entry, budget, limit, part)

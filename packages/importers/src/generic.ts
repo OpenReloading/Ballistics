@@ -46,7 +46,7 @@ const truthy = ['1', 'x', 'yes', 'true']
 const candidates = ['\t', ';', ','] as const
 
 /** The cells of a line split at `d`; `none` keeps the trimmed line as one cell. */
-export const splitCells = (line: string, d: Delimiter) =>
+export const splitCells = (line: string, d: Delimiter): string[] =>
   d === 'none' ? [line.trim()] : splitDelimited(line, d)
 
 /** True when `d` separates cells of the line outside quoted cells. */

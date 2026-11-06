@@ -319,10 +319,10 @@ function recordOf(
       const q = quantityOf(c[`bc${m}`])
       return q ? [{ dragModel: m, value: q.value }] : []
     })
-    const diameter = quantityOf(c.diameter)
-    const mass = quantityOf(c.mass)
-    const length = quantityOf(c.length)
-    const caliber = typeof c.caliber === 'string' ? c.caliber : undefined
+    const diameter = quantityOf(c['diameter'])
+    const mass = quantityOf(c['mass'])
+    const length = quantityOf(c['length'])
+    const caliber = typeof c['caliber'] === 'string' ? c['caliber'] : undefined
     return {
       kind,
       id,
@@ -343,7 +343,7 @@ function recordOf(
     }
   }
   if (kind === 'powder') {
-    const bulk = quantityOf(c.bulkDensity)
+    const bulk = quantityOf(c['bulkDensity'])
     return {
       kind,
       id,
@@ -354,11 +354,11 @@ function recordOf(
         provenanceKind: 'measured',
         draft: {
           // the choices of the field spell only these values
-          ...(typeof c.grainForm === 'string' && {
-            grainForm: c.grainForm as 'ball' | 'extruded' | 'flake' | 'other',
+          ...(typeof c['grainForm'] === 'string' && {
+            grainForm: c['grainForm'] as 'ball' | 'extruded' | 'flake' | 'other',
           }),
-          ...(typeof c.propellantBase === 'string' && {
-            propellantBase: c.propellantBase as 'single' | 'double' | 'triple',
+          ...(typeof c['propellantBase'] === 'string' && {
+            propellantBase: c['propellantBase'] as 'single' | 'double' | 'triple',
           }),
           ...(bulk && { bulkDensity: bulk }),
         },
@@ -392,7 +392,7 @@ function recordOf(
 }
 
 /** Lower case, accents and extra spaces folded: the form of a name in a key. */
-export const keyText = (s: string) =>
+export const keyText = (s: string): string =>
   s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim()
 
 /** The text the id of a row is made from: kind, name, maker and, for a bullet, its diameter and mass. */
@@ -534,8 +534,8 @@ export function buildRecords(
       out.rejected.push(c)
       return
     }
-    const name = String(c.name ?? '')
-    const maker = typeof c.maker === 'string' ? c.maker : undefined
+    const name = String(c['name'] ?? '')
+    const maker = typeof c['maker'] === 'string' ? c['maker'] : undefined
     const key = keyOf(kind, name, maker, c)
     const first = firstRow.get(key)
     if (first === undefined) firstRow.set(key, row)
