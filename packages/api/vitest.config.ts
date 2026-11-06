@@ -13,7 +13,7 @@ export default defineConfig({
         'src/catalogue/write.ts',
         'src/compute/worker.ts',
       ],
-      reporter: ['text-summary', 'lcov'],
+      reporter: ['text-summary'],
     },
   },
 })

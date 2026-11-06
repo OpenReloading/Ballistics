@@ -7,7 +7,7 @@ export default defineConfig({
       include: ['src/**/*.ts'],
       // build and validation scripts, run as processes by pnpm
       exclude: ['src/build.ts', 'src/validate.ts'],
-      reporter: ['text-summary', 'lcov'],
+      reporter: ['text-summary'],
     },
   },
 })

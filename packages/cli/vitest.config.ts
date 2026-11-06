@@ -8,7 +8,7 @@ export default defineConfig({
       include: ['src/**/*.ts'],
       // process entry and the schema file writer, run as processes by pnpm
       exclude: ['src/bin.ts', 'src/write-json-schema.ts'],
-      reporter: ['text-summary', 'text', 'lcov'],
+      reporter: ['text-summary', 'text'],
     },
   },
 })
