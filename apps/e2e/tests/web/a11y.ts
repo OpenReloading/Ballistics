@@ -1,7 +1,56 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
-import AxeBuilder from '@axe-core/playwright'
+import Base from '@axe-core/playwright'
 import type { Page } from '@playwright/test'
+
+/** The longest a scan waits for the page to stop moving (ms): Playwright's default expect timeout. */
+const settleTimeout = 5000
+
+/**
+ * The `AxeBuilder` of `@axe-core/playwright` that scans once no transition or finite animation of the page runs:
+ * axe reads colors as painted, and a color midway through a transition (after a color scheme switch) fails
+ * color-contrast. Endless animations (a loader) and paused ones do not hold the scan. Still moving after
+ * `settleTimeout`: the scan fails and names what runs.
+ */
+export class AxeBuilder extends Base {
+  readonly #page: Page
+
+  constructor(options: ConstructorParameters<typeof Base>[0]) {
+    super(options)
+    this.#page = options.page
+  }
+
+  override async analyze(): ReturnType<Base['analyze']> {
+    await this.#page.evaluate(async (wait) => {
+      const name = (a: Animation) => {
+        const el = a.effect instanceof KeyframeEffect ? a.effect.target : null
+        const what =
+          a instanceof CSSTransition
+            ? a.transitionProperty
+            : a instanceof CSSAnimation
+              ? a.animationName
+              : 'animation'
+        return `${what} on ${el ? [el.localName, ...el.classList].join('.') : 'no element'}`
+      }
+      const deadline = performance.now() + wait
+      for (;;) {
+        // a frame first: a media or class change starts its transitions with the next style update
+        await new Promise((done) => requestAnimationFrame(done))
+        const moving = document
+          .getAnimations()
+          .filter(
+            (a) => a.playState === 'running' && a.effect?.getComputedTiming().endTime !== Infinity,
+          )
+        if (moving.length === 0) return
+        if (performance.now() > deadline)
+          throw new Error(
+            `the page still moves after ${wait} ms, so axe would read colors in passing: ${moving.map(name).join(', ')}`,
+          )
+      }
+    }, settleTimeout)
+    return super.analyze()
+  }
+}
 
 /**
  * An axe result listed in `a11y-lists.json`: `rule` is the axe rule id, `node` a part of the node's
