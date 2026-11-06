@@ -1,12 +1,12 @@
 import { z } from 'zod'
+import type { Exact } from './exact.ts'
 import { disciplineCategory } from './federation.ts'
 import { recordId } from './ids.ts'
 import { provenance } from './provenance.ts'
 import { positiveLength } from './shared.ts'
-import { quantity } from './units.ts'
+import { type QuantitySchema, quantity } from './units.ts'
 
-/** Printed colour of a ring zone or ring line. */
-export const faceColour = z.enum([
+const faceColourParser = z.enum([
   'black',
   'white',
   'grey',
@@ -18,8 +18,19 @@ export const faceColour = z.enum([
   'brown',
 ])
 
+/** Printed colour of a ring zone or ring line. */
+export const faceColour: z.ZodEnum<
+  z.core.util.ToEnum<
+    'black' | 'white' | 'grey' | 'red' | 'orange' | 'yellow' | 'green' | 'blue' | 'brown'
+  >
+> = faceColourParser satisfies Exact<typeof faceColour, typeof faceColourParser>
+
+const paperFormatParser = z.enum(['A2', 'A3', 'A4', 'A5', 'A6', 'other'])
+
 /** Paper formats the sheet size can name; `other` for a sheet of no ISO A size. */
-export const paperFormat = z.enum(['A2', 'A3', 'A4', 'A5', 'A6', 'other'])
+export const paperFormat: z.ZodEnum<
+  z.core.util.ToEnum<'A2' | 'A3' | 'A4' | 'A5' | 'A6' | 'other'>
+> = paperFormatParser satisfies Exact<typeof paperFormat, typeof paperFormatParser>
 
 const isoA: Record<string, [number, number]> = {
   A2: [420, 594],
@@ -31,23 +42,8 @@ const isoA: Record<string, [number, number]> = {
 
 const targetFaceFields = z.object({
   id: recordId,
-  /** The face as the rule book names it. */
   name: z.string().min(1),
-  /**
-   * Id of the federation record whose rule book publishes the face. Absent: no federation, a face
-   * a user draws for their own use.
-   */
   federation: recordId.optional(),
-  /**
-   * Outer to inner; values rise by one ring to ring. `diameter` is the width of the ring; for an
-   * oval ring `height` is its height (axis-aligned, the face upright; absent: a circle). A
-   * `square` ring has the edge `diameter` and no `height` (absent: a circle). A `stadium` ring has
-   * straight vertical sides and a half circle of the radius `diameter / 2` at each end, so its
-   * `height` is at least its `diameter`; a face has stadium rings on all rings or on none, and its
-   * inner ten and black area are stadiums too.
-   * `fill` is the colour of the zone that the ring line bounds on the outside (the area up to the
-   * next ring, for the innermost ring the whole disc), `line` the colour of the ring line.
-   */
   rings: z
     .array(
       z.object({
@@ -60,10 +56,6 @@ const targetFaceFields = z.object({
       }),
     )
     .min(2),
-  /**
-   * The inner ten: `touch` counts a hole that touches its circle, `cover` only a hole that
-   * covers it completely (shot out). Absent: the rule book does not state it; scored as `touch`.
-   */
   innerTen: z
     .object({
       diameter: positiveLength(),
@@ -71,48 +63,24 @@ const targetFaceFields = z.object({
       rule: z.enum(['touch', 'cover']).optional(),
     })
     .optional(),
-  /** Diameter (width) of the black aiming area: the outside of the outermost black zone. */
   blackDiameter: positiveLength(),
-  /** Height of the black aiming area of an oval face. */
   blackHeight: positiveLength().optional(),
-  /**
-   * The rule book allows decimal (tenth-ring) values for an event on this face (`true`) or states
-   * whole rings only (`false`). Absent: the rule book does not state it; scored in whole rings.
-   */
   decimal: z.boolean().optional(),
-  /** Events shot on this face, with the gauge diameter that scores them where the rules fix one. */
   events: z
     .array(
       // strict: an event key this schema does not know rejects the record
       z.strictObject({
-        /** Id of the event within its face; a target mapping names the event by it. */
         id: recordId,
         name: z.string().min(1),
         distance: positiveLength(),
-        /** Diameter of the hole as scored: a gauge's measuring edge, or its equivalent hole. */
         gauge: positiveLength().optional(),
-        /**
-         * `touch`: the hole counts a ring when it touches the ring line. `centre`: only when the
-         * centre of the hole lies on its line or inside it (black-powder events); the hole size is
-         * ignored. `outward`: only when the hole edge furthest from the centre stays inside the
-         * outer edge of the ring line; a hole touching the outside of the line takes the lower
-         * value (outward gauging, circular rings and whole rings only). Absent: the rule book does
-         * not state it; scored as `touch`.
-         */
         scoring: z.enum(['touch', 'centre', 'outward']).optional(),
-        /** Id of the federation whose rule book lists the event, where it is not the face's. */
         federation: recordId.optional(),
-        /** Section of that federation's rule book that lists the event. */
         section: z.string().min(1).optional(),
-        /** Kind of firearm the event is shot with, for example `rifle` or `service-pistol`. */
         category: disciplineCategory.optional(),
       }),
     )
     .min(1),
-  /**
-   * Paper size of the sheet the face is printed on, `width` and `height` as the sheet lies
-   * upright.
-   */
   paper: z
     .object({
       format: paperFormat.optional(),
@@ -120,11 +88,6 @@ const targetFaceFields = z.object({
       height: positiveLength(),
     })
     .optional(),
-  /**
-   * Several scoring centres on one sheet: position of each centre from the sheet centre (x right,
-   * y up), all with the rings of this record. Two scoring zones on one card are two entries with
-   * a `zone` label each. Absent: one bull.
-   */
   bulls: z
     .array(
       z.object({
@@ -135,12 +98,7 @@ const targetFaceFields = z.object({
     )
     .min(1)
     .optional(),
-  /** The ring values are printed on the face. */
   numerals: z.boolean().optional(),
-  /**
-   * `false`: the photo face search skips the face, the user picks it from the face list. Absent:
-   * the face search tries it.
-   */
   photoSearch: z.boolean().optional(),
   note: z.string().min(1).optional(),
   provenance,
@@ -266,19 +224,130 @@ function checkSheet(f: z.infer<typeof targetFaceFields>, issue: Issue) {
   })
 }
 
-/**
- * A printed target face as a rule book defines it: scoring rings (diameters to the outside edge of
- * the ring line), the inner ten, the aiming black and the events that use it with their scoring
- * gauge. Scoring: `apps/docs/docs/models/ring-scoring.md`.
- * Inferred type: {@link TargetFace}.
- */
-export const targetFace = targetFaceFields.superRefine((f, ctx) => {
+const targetFaceParser = targetFaceFields.superRefine((f, ctx) => {
   const issue: Issue = (path, message) => ctx.addIssue({ code: 'custom', path, message })
   checkRings(f, issue)
   checkEvents(f, issue)
   checkBlack(f, issue)
   checkSheet(f, issue)
 })
+
+/**
+ * A printed target face as a rule book defines it: scoring rings (diameters to the outside edge of
+ * the ring line), the inner ten, the aiming black and the events that use it with their scoring
+ * gauge. Scoring: `apps/docs/docs/models/ring-scoring.md`.
+ * Inferred type: {@link TargetFace}.
+ */
+export const targetFace: z.ZodObject<{
+  id: typeof recordId
+  /** The face as the rule book names it. */
+  name: z.ZodString
+  /**
+   * Id of the federation record whose rule book publishes the face. Absent: no federation, a face
+   * a user draws for their own use.
+   */
+  federation: z.ZodOptional<typeof recordId>
+  /**
+   * Outer to inner; values rise by one ring to ring. `diameter` is the width of the ring; for an
+   * oval ring `height` is its height (axis-aligned, the face upright; absent: a circle). A
+   * `square` ring has the edge `diameter` and no `height` (absent: a circle). A `stadium` ring has
+   * straight vertical sides and a half circle of the radius `diameter / 2` at each end, so its
+   * `height` is at least its `diameter`; a face has stadium rings on all rings or on none, and its
+   * inner ten and black area are stadiums too.
+   * `fill` is the colour of the zone that the ring line bounds on the outside (the area up to the
+   * next ring, for the innermost ring the whole disc), `line` the colour of the ring line.
+   */
+  rings: z.ZodArray<
+    z.ZodObject<{
+      value: z.ZodInt
+      diameter: QuantitySchema
+      height: z.ZodOptional<QuantitySchema>
+      shape: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'circle' | 'square' | 'stadium'>>>
+      fill: z.ZodOptional<typeof faceColour>
+      line: z.ZodOptional<typeof faceColour>
+    }>
+  >
+  /**
+   * The inner ten: `touch` counts a hole that touches its circle, `cover` only a hole that
+   * covers it completely (shot out). Absent: the rule book does not state it; scored as `touch`.
+   */
+  innerTen: z.ZodOptional<
+    z.ZodObject<{
+      diameter: QuantitySchema
+      height: z.ZodOptional<QuantitySchema>
+      rule: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'touch' | 'cover'>>>
+    }>
+  >
+  /** Diameter (width) of the black aiming area: the outside of the outermost black zone. */
+  blackDiameter: QuantitySchema
+  /** Height of the black aiming area of an oval face. */
+  blackHeight: z.ZodOptional<QuantitySchema>
+  /**
+   * The rule book allows decimal (tenth-ring) values for an event on this face (`true`) or states
+   * whole rings only (`false`). Absent: the rule book does not state it; scored in whole rings.
+   */
+  decimal: z.ZodOptional<z.ZodBoolean>
+  /** Events shot on this face, with the gauge diameter that scores them where the rules fix one. */
+  events: z.ZodArray<
+    z.ZodObject<
+      {
+        /** Id of the event within its face; a target mapping names the event by it. */
+        id: typeof recordId
+        name: z.ZodString
+        distance: QuantitySchema
+        /** Diameter of the hole as scored: a gauge's measuring edge, or its equivalent hole. */
+        gauge: z.ZodOptional<QuantitySchema>
+        /**
+         * `touch`: the hole counts a ring when it touches the ring line. `centre`: only when the
+         * centre of the hole lies on its line or inside it (black-powder events); the hole size is
+         * ignored. `outward`: only when the hole edge furthest from the centre stays inside the
+         * outer edge of the ring line; a hole touching the outside of the line takes the lower
+         * value (outward gauging, circular rings and whole rings only). Absent: the rule book does
+         * not state it; scored as `touch`.
+         */
+        scoring: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'touch' | 'centre' | 'outward'>>>
+        /** Id of the federation whose rule book lists the event, where it is not the face's. */
+        federation: z.ZodOptional<typeof recordId>
+        /** Section of that federation's rule book that lists the event. */
+        section: z.ZodOptional<z.ZodString>
+        /** Kind of firearm the event is shot with, for example `rifle` or `service-pistol`. */
+        category: z.ZodOptional<typeof disciplineCategory>
+      },
+      z.core.$strict
+    >
+  >
+  /**
+   * Paper size of the sheet the face is printed on, `width` and `height` as the sheet lies
+   * upright.
+   */
+  paper: z.ZodOptional<
+    z.ZodObject<{
+      format: z.ZodOptional<typeof paperFormat>
+      width: QuantitySchema
+      height: QuantitySchema
+    }>
+  >
+  /**
+   * Several scoring centres on one sheet: position of each centre from the sheet centre (x right,
+   * y up), all with the rings of this record. Two scoring zones on one card are two entries with
+   * a `zone` label each. Absent: one bull.
+   */
+  bulls: z.ZodOptional<
+    z.ZodArray<
+      z.ZodObject<{ x: QuantitySchema; y: QuantitySchema; zone: z.ZodOptional<z.ZodString> }>
+    >
+  >
+  /** The ring values are printed on the face. */
+  numerals: z.ZodOptional<z.ZodBoolean>
+  /**
+   * `false`: the photo face search skips the face, the user picks it from the face list. Absent:
+   * the face search tries it.
+   */
+  photoSearch: z.ZodOptional<z.ZodBoolean>
+  note: z.ZodOptional<z.ZodString>
+  /** Where the values of the record come from: a kind and at least one source. */
+  provenance: typeof provenance
+}> = targetFaceParser satisfies Exact<typeof targetFace, typeof targetFaceParser>
 
 /** A printed target face record: ring diameters in mm, inner ten, events. */
 export interface TargetFace extends z.infer<typeof targetFace> {}
