@@ -473,7 +473,7 @@ export function truingSummary(entry: Truing, system: UnitSystem, t: T) {
     .flatMap((p) => {
       if (p.value === undefined) return []
       const si =
-        typeof p.value === 'number'
+        p.name === 'dragFactor'
           ? p.value
           : toSi(p.name === 'muzzleVelocity' ? 'velocity' : 'angle', p.value.value)
       return [`${t(parameterLabels[p.name].label)} ${quantityText(p.name, si, system)}`]
