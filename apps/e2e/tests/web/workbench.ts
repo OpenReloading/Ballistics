@@ -12,18 +12,26 @@ export const formValues = (page: Page) =>
       els.map((e) => [e.getAttribute('aria-label') ?? '', (e as HTMLInputElement).value]),
     )
 
-/** Clicks an item of the page bar's Open menu, named `open` in the page's language. */
+/**
+ * Clicks an item of the page bar's Open menu that starts a new load on the fresh workbench, named
+ * `open` in the page's language.
+ */
 async function openItem(page: Page, name: string | RegExp, open = 'Open') {
   const item = page.getByRole('menuitem', { name })
+  // the new load replaces the start card, at once
+  const startCard = page.locator('.start-card')
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' })
-  // retried: the menu can close again before the item's click while an applied example still loads
+  await startCard.waitFor({ state: 'attached' })
+  // retried: the menu can close again before the item's click while an applied example still loads.
+  // A click that lands after its timeout has started the load: another would ask to discard it
   await expect(async () => {
+    if ((await startCard.count()) === 0) return
     if (!(await item.isVisible())) await (await barButton(page, open)).click({ timeout: 1000 })
     await item.click({ timeout: 1000 })
   }).toPass({ timeout: 10_000 })
 }
 
-/** Applies the example load and waits until it is complete, so a run sees all its values. */
+/** Applies the example load to the fresh workbench and waits until it is complete, so a run sees all its values. */
 export async function applyExampleLoad(page: Page, language: 'en' | 'de' = 'en') {
   await (language === 'de'
     ? openItem(page, 'Beispiel-Laborierung', 'Öffnen')

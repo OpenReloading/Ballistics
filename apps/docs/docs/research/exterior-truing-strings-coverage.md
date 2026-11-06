@@ -40,8 +40,8 @@ Analytic: synthetic strings from the solver with seeded noise.
 
 ## Where in the app
 
-- `packages/core/test/exterior-truing-strings.test.ts`, `packages/core/test/exterior-truing-strings-failures.test.ts`, `packages/core/test/range-strings-fixtures.ts`.
-- `packages/core/src/exterior/range-strings.ts`.
+- `packages/ballistics/test/exterior-truing-strings.test.ts`, `packages/ballistics/test/exterior-truing-strings-failures.test.ts`, `packages/ballistics/test/range-strings-fixtures.ts`.
+- `packages/ballistics/src/exterior/range-strings.ts`.
 - Model page: [truing from range strings](../models/exterior-truing-strings.md).
 
 ## Confidence

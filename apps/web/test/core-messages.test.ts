@@ -153,12 +153,9 @@ describe('the message table', () => {
 })
 
 describe('reason codes', () => {
-  /** The members of the string union `name` of a core source file. */
+  /** The members of the string union `name` of a package source file, given from `packages/`. */
   const union = (file: string, name: string) => {
-    const source = readFileSync(
-      new URL(`../../../packages/core/src/${file}`, import.meta.url),
-      'utf8',
-    )
+    const source = readFileSync(new URL(`../../../packages/${file}`, import.meta.url), 'utf8')
     const start = source.indexOf(`type ${name} =`)
     expect(start, `${file}: ${name}`).toBeGreaterThan(-1)
     const body = source.slice(start, source.indexOf('\n\n', start))
@@ -166,11 +163,11 @@ describe('reason codes', () => {
   }
 
   const reasons = [
-    ...union('exterior/truing.ts', 'TruingReason'),
-    ...union('interior/model.ts', 'InteriorReason'),
-    ...union('interior/charge-solver.ts', 'ChargeRefusal'),
-    ...union('interior/fit.ts', 'PowderFitReason'),
-    ...union('exterior/range-strings.ts', 'WeakReason'),
+    ...union('ballistics/src/exterior/truing.ts', 'TruingReason'),
+    ...union('core/src/interior/model.ts', 'InteriorReason'),
+    ...union('core/src/interior/charge-solver.ts', 'ChargeRefusal'),
+    ...union('core/src/interior/fit.ts', 'PowderFitReason'),
+    ...union('ballistics/src/exterior/range-strings.ts', 'WeakReason'),
     // set where the reason is not a union: a range case, the API's 422 and 503 answers
     'outsideModel',
     'nonFinite',
@@ -190,9 +187,11 @@ describe('reason codes', () => {
   ]
 
   it('reads the unions of the sources', () => {
-    expect(union('exterior/truing.ts', 'TruingReason')).toContain('step-budget')
-    expect(union('interior/charge-solver.ts', 'ChargeRefusal')).toContain('toleranceNotReached')
-    expect(union('interior/model.ts', 'InteriorReason')).toEqual([
+    expect(union('ballistics/src/exterior/truing.ts', 'TruingReason')).toContain('step-budget')
+    expect(union('core/src/interior/charge-solver.ts', 'ChargeRefusal')).toContain(
+      'toleranceNotReached',
+    )
+    expect(union('core/src/interior/model.ts', 'InteriorReason')).toEqual([
       'input',
       'chamberVolume',
       'noShotStart',
@@ -377,7 +376,7 @@ describe('the request failures of the app', () => {
 })
 
 /** The package sources whose messages can reach the app through the API. */
-const sources = (['core', 'statistics', 'api'] as const).flatMap((pkg) =>
+const sources = (['core', 'statistics', 'ballistics', 'api'] as const).flatMap((pkg) =>
   readdirSync(new URL(`../../../packages/${pkg}/src`, import.meta.url), {
     recursive: true,
     encoding: 'utf8',
@@ -396,7 +395,7 @@ const dynamicFiles: Record<string, string> = {
 /** Message expressions that are no fixed text, by file and expression, each with the reason. */
 const dynamicArguments: { file: string; arg: string; reason: string }[] = [
   {
-    file: 'core/src/exterior/trajectory.ts',
+    file: 'ballistics/src/exterior/trajectory.ts',
     arg: 'name',
     reason: 'a coefficient named by the caller: its name is the text',
   },
