@@ -12,6 +12,7 @@
     "build": "pnpm --filter \"./packages/*\" --filter \"./tooling/*\" run build",
     "typecheck": "pnpm --recursive --workspace-concurrency=1 run typecheck",
     "test": "pnpm --recursive --workspace-concurrency=1 --filter \"!@open-reloading/e2e\" run test && pnpm --filter @open-reloading/e2e run test:unit",
+    "check:changed": "pnpm run build && pnpm run typecheck && pnpm run lint && pnpm --workspace-concurrency=1 --filter \"...[origin/main]\" --filter \"!{.}\" --filter \"!@open-reloading/e2e\" run test && pnpm --filter @open-reloading/e2e run test:unit",
     "test:e2e": "pnpm --filter @open-reloading/e2e run test",
     "e2e:smoke": "pnpm --filter @open-reloading/e2e run smoke",
     "pages:build": "pnpm --filter @open-reloading/tools run pages",
