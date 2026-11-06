@@ -62,7 +62,7 @@ $$
 r_i = \frac{\hat p(t_i - t_\text{shift};\ \theta) - p_i}{\sigma}, \qquad \chi^2 = \sum_i r_i^2, \qquad \nu = n_s - n_p - 1
 $$
 
-Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurves` (`evaluate`, `degreesOfFreedom`), `packages/statistics/src/least-squares.ts`, `logLeastSquares` (`residuals`, `chi2`).
+Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurves` (`evaluate`, `degreesOfFreedom`), `packages/statistics/src/least-squares.ts`, `logLeastSquares` (`residuals`, `chiSquareOf`).
 
 The sample noise $\sigma$ is the trace's `sigma`. Without it the fit uses $\sigma = 1$ and scales the covariance by $\chi^2/\nu$, so the uncertainties assume the residuals are noise. A candidate whose run is invalid, or whose shifted window leaves the model's barrel time, is a rejected step. A Jacobian entry below $10^{-6}\,p_\text{pk}/\sigma$ per unit log parameter counts as noise. The loop stops at a relative gain of $\chi^2$ below $10^{-9}$ (the flat valley of correlated form parameters), a default of 100 iterations, and fails with the condition number of the column-scaled Jacobian above $10^3$.
 

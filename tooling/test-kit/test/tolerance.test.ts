@@ -9,6 +9,13 @@ describe('near: the tolerance', () => {
     expect(near(1, {}).asymmetricMatch(1)).toBe(true)
     expect(near(1, {}).asymmetricMatch(1 + 1e-15)).toBe(false)
   })
+
+  it('refuses at construction what no number could match', () => {
+    expect(() => near(Number.NaN, {})).toThrow(RangeError)
+    expect(() => near(Number.POSITIVE_INFINITY, { relative: 1 })).toThrow(RangeError)
+    expect(() => near(1, { relative: -1e-12 })).toThrow('relative and absolute at least 0')
+    expect(() => near(1, { absolute: Number.NaN })).toThrow(RangeError)
+  })
 })
 
 describe('near', () => {

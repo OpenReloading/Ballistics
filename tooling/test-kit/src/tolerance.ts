@@ -20,9 +20,15 @@ export interface Near {
 /**
  * Matches a finite number within `tolerance` of `expected`, also inside objects and arrays:
  * `expect(result).toEqual({ mean: near(812.3, { relative: 1e-12 }) })`.
+ * Throws a `RangeError` for a non-finite `expected` or a tolerance part that is negative or not a number,
+ * which no number could match.
  */
 export function near(expected: number, tolerance: Tolerance): Near {
   const { relative = 0, absolute = 0 } = tolerance
+  if (!Number.isFinite(expected) || !(relative >= 0) || !(absolute >= 0))
+    throw new RangeError(
+      `near(${expected}, relative ${relative}, absolute ${absolute}): expected must be finite, relative and absolute at least 0`,
+    )
   return {
     $$typeof: Symbol.for('jest.asymmetricMatcher'),
     asymmetricMatch: (actual) =>
