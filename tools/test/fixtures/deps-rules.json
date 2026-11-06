@@ -255,6 +255,14 @@
     "source": "export const w = () => navigator.language",
     "rules": ["logic-no-dom"]
   },
+  "packages/locale-format/src/cycle-a.ts": {
+    "source": "import { b } from './cycle-b.ts'\nexport const a = () => b",
+    "rules": ["no-cycle"]
+  },
+  "packages/locale-format/src/cycle-b.ts": {
+    "source": "import { a } from './cycle-a.ts'\nexport const b = () => a",
+    "rules": ["no-cycle"]
+  },
   "packages/schema/src/cycle-a.ts": {
     "source": "import { b } from './cycle-b.ts'\nexport const a = () => b",
     "rules": ["no-cycle"]
@@ -274,5 +282,9 @@
   "packages/importers/src/schema-subpath.ts": {
     "source": "import load from '@open-reloading/schema/json-schema/load.json' with { type: 'json' }\nexport { load }",
     "rules": ["importers-imports-schema-only"]
+  },
+  "packages/units/test/same-title.test.ts": {
+    "source": "import { it } from 'vitest'\nit('runs', () => {})\nit('runs', () => {})",
+    "rules": ["no-identical-title"]
   }
 }

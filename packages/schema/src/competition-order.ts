@@ -65,7 +65,8 @@ const compareSegments = (a: number[], b: number[]) => {
 
 /** The place of a category in `disciplineCategory`; a discipline without one comes last. */
 const categoryRank = (category: string | undefined) => {
-  const rank = disciplineCategory.options.findIndex((c) => c === category)
+  const order: readonly (string | undefined)[] = disciplineCategory.options
+  const rank = order.indexOf(category)
   return rank < 0 ? Number.MAX_SAFE_INTEGER : rank
 }
 
