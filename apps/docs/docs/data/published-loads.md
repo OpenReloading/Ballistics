@@ -102,7 +102,7 @@ The command prints per file and in total the created, changed (and how many not 
 `pnpm run data:validate` reports:
 - a file whose cartridge is not its folder, names no cartridge record or a maker that is no manufacturer record, or whose name is not the maker's id (`<maker>-customer` for `producedBy: customer`);
 - a duplicate load id and loads that are not sorted by id;
-- a bullet, powder or primer a load names that is no record (an old bullet or powder id of `renames.json` does not count, so a rename rewrites the loads that name it);
+- a bullet, powder or primer a load names that is no record;
 - a printed primer size or magnum that differs from the primer record;
 - a `value` that does not follow its `raw`;
 - a source without publisher, URL, retrieval date or origin, a kind other than `published`, and a project licence on maker data.
