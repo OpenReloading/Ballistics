@@ -52,7 +52,7 @@ test('a changed powder lot between two sessions is a note on the load and its se
     ['Powder lot', 'P1'],
     ['Primer lot', 'R1'],
     ['Case lot', 'C1'],
-  ])
+  ] as const)
     await lots.getByLabel(label, { exact: true }).fill(lot)
   await page.getByRole('tab', { name: 'Measurements', exact: true }).click()
   await read(page, 'day1.csv')

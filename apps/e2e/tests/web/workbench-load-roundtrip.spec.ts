@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises'
 import { expect, test } from '@playwright/test'
+import { defined } from '../../../web/test/defined.ts'
 import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
@@ -56,7 +57,7 @@ test('a saved load reopens with every field as it was and nothing unsaved', asyn
   await (await barButton(page, 'Save')).click()
   await expect.poll(async () => (await storedLoads(page)).length).toBe(1)
 
-  const [{ name, data }] = await storedLoads(page)
+  const { name, data } = defined((await storedLoads(page))[0])
   const overrides = (data.analysis as { overrides?: Record<string, number> } | undefined)?.overrides
   // only what was typed: the powder and bullet records give the rest
   expect(overrides?.boreDiameter).toBe(7.7)
@@ -119,7 +120,7 @@ test('a diameter and length typed over the bullet record are saved as typed valu
   const before = await values()
   await (await barButton(page, 'Save')).click()
   await expect.poll(async () => (await storedLoads(page)).length).toBe(1)
-  const [{ name, data }] = await storedLoads(page)
+  const { name, data } = defined((await storedLoads(page))[0])
   const overrides = (data.analysis as { overrides?: Record<string, number> } | undefined)?.overrides
   expect(overrides).toMatchObject({ bulletDiameter: 7.84, bulletLength: 31 })
   expect(overrides).not.toHaveProperty('bulletMass')
@@ -156,7 +157,7 @@ test('a load of records keeps the charge and the travel, runs the powder at the 
   expect(before).toContain('10.89')
   await (await barButton(page, 'Save')).click()
   await expect.poll(async () => (await storedLoads(page)).length).toBe(1)
-  const [{ name, data }] = await storedLoads(page)
+  const { name, data } = defined((await storedLoads(page))[0])
   // the powder record has no start pressure of its own: in a rifle it runs at the 30 MPa of its
   // fit, the default a load file names, not at the 29.2 MPa of the jacketed bullet
   expect(data.analysis).toEqual({ overrides: { travel: 533.4 } })
@@ -195,7 +196,7 @@ test('the file downloaded for the API runs through the load file route and the s
 
   await (await barButton(page, 'Save')).click()
   await expect.poll(async () => (await storedLoads(page)).length).toBe(1)
-  const [{ data }] = await storedLoads(page)
+  const { data } = defined((await storedLoads(page))[0])
   expect(data.charge).toEqual({ value: 2.45 })
   expect(data.analysis).not.toHaveProperty('overrides.gamma')
 })

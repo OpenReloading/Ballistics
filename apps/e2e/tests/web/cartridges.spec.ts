@@ -149,7 +149,7 @@ test('the list sorts by L3 through its header button', async ({ page }) => {
 for (const [width, height] of [
   [1280, 800],
   [1920, 1080],
-])
+] as const)
   test(`at ${width} x ${height} the cartridge table is the only scroll box`, async ({ page }) => {
     await page.setViewportSize({ width, height })
     await page.goto('/cartridges')

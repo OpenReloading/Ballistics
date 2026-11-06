@@ -10,9 +10,9 @@ const trajectoryHeights = (page: Page) =>
   page
     .getByRole('table', { name: /^Trajectory: / })
     .locator('tbody tr')
-    .evaluateAll((rows) =>
+    .evaluateAll((rows: HTMLTableRowElement[]) =>
       Object.fromEntries(
-        rows.map((r) => [r.cells[0].textContent ?? '', Number(r.cells[1].textContent)]),
+        rows.map((r) => [r.cells[0]?.textContent ?? '', Number(r.cells[1]?.textContent)]),
       ),
     )
 
