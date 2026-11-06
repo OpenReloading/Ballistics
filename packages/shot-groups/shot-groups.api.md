@@ -310,10 +310,8 @@ export function mapConic(c: Conic, m: Matrix): Conic | undefined;
 // @public
 export const mapMatrix: (m: Mat3, f: (v: number, i: number) => number) => Mat3;
 
-// Warning: (ae-forgotten-export) The symbol "Nine" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type Mat3 = Readonly<Nine<number>>;
+export type Mat3 = readonly [number, number, number, number, number, number, number, number, number];
 
 // @public
 export type Matrix = readonly number[];
