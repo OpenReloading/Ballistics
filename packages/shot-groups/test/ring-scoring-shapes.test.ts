@@ -1,7 +1,5 @@
-import type { TargetFace } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
-import { english } from '../src/i18n/translate.ts'
-import { faceAlignment, scoreShot } from '../src/lib/ring-scoring.ts'
+import { faceAlignment, type ScoringFace, scoreShot } from '../src/ring-scoring.ts'
 import { defined } from './defined.ts'
 
 const mmq = (value: number) => ({ value })
@@ -12,69 +10,66 @@ const off = 1e-6
 /** A face of the given rings (value, width, height or shape) and the extras of one test. */
 function faceOf(
   rings: { value: number; w: number; h?: number; shape?: 'circle' | 'square' | 'stadium' }[],
-  extra: Partial<TargetFace> = {},
-): TargetFace {
+  extra: Partial<ScoringFace> = {},
+): ScoringFace {
   return {
-    id: 'test-face',
-    name: 'Test face',
-    organization: 'Test',
     rings: rings.map((r) => ({
       value: r.value,
       diameter: mmq(r.w),
       ...(r.h && { height: mmq(r.h) }),
       ...(r.shape && { shape: r.shape }),
     })),
-    blackDiameter: mmq(defined(rings[0]).w),
-    events: [{ name: 'Test event', distance: mmq(10000) }],
-    provenance: { kind: 'published', sources: [{ title: 'Test rule book' }] },
+    events: [{ id: 'test-event' }],
     ...extra,
-  } as TargetFace
+  }
 }
 
 /** A shot at x, y mm from the face centre, in target m. */
 const shot = (x: number, y: number) => ({ x: x * mm, y: y * mm })
 
-describe('scoreShot on an oval face', () => {
-  // 9: 100 wide, 60 high; 10: 40 wide, 20 high
-  const oval = faceOf([
-    { value: 9, w: 100, h: 60 },
-    { value: 10, w: 40, h: 20 },
-  ])
+// 9: 100 wide, 60 high; 10: 40 wide, 20 high
+const ovalFace = faceOf([
+  { value: 9, w: 100, h: 60 },
+  { value: 10, w: 40, h: 20 },
+])
 
+describe('scoreShot on an oval face', () => {
   it('counts a hole centre on the ring line as inside along both axes', () => {
-    expect(scoreShot(oval, shot(50, 0), 0).value).toBe(9)
-    expect(scoreShot(oval, shot(-50, 0), 0).value).toBe(9)
-    expect(scoreShot(oval, shot(0, 30), 0).value).toBe(9)
-    expect(scoreShot(oval, shot(0, -30), 0).value).toBe(9)
-    expect(scoreShot(oval, shot(20, 0), 0).value).toBe(10)
-    expect(scoreShot(oval, shot(0, 10), 0).value).toBe(10)
+    expect(scoreShot(ovalFace, shot(50, 0), 0).value).toBe(9)
+    expect(scoreShot(ovalFace, shot(-50, 0), 0).value).toBe(9)
+    expect(scoreShot(ovalFace, shot(0, 30), 0).value).toBe(9)
+    expect(scoreShot(ovalFace, shot(0, -30), 0).value).toBe(9)
+    expect(scoreShot(ovalFace, shot(20, 0), 0).value).toBe(10)
+    expect(scoreShot(ovalFace, shot(0, 10), 0).value).toBe(10)
   })
 
   it('counts a hole centre just inside and just outside along both axes', () => {
-    expect(scoreShot(oval, shot(50 - off, 0), 0).value).toBe(9)
-    expect(scoreShot(oval, shot(50 + off, 0), 0).value).toBe(0)
-    expect(scoreShot(oval, shot(0, 30 - off), 0).value).toBe(9)
-    expect(scoreShot(oval, shot(0, 30 + off), 0).value).toBe(0)
-    expect(scoreShot(oval, shot(20 - off, 0), 0).value).toBe(10)
-    expect(scoreShot(oval, shot(20 + off, 0), 0).value).toBe(9)
-    expect(scoreShot(oval, shot(0, 10 - off), 0).value).toBe(10)
-    expect(scoreShot(oval, shot(0, 10 + off), 0).value).toBe(9)
+    expect(scoreShot(ovalFace, shot(50 - off, 0), 0).value).toBe(9)
+    expect(scoreShot(ovalFace, shot(50 + off, 0), 0).value).toBe(0)
+    expect(scoreShot(ovalFace, shot(0, 30 - off), 0).value).toBe(9)
+    expect(scoreShot(ovalFace, shot(0, 30 + off), 0).value).toBe(0)
+    expect(scoreShot(ovalFace, shot(20 - off, 0), 0).value).toBe(10)
+    expect(scoreShot(ovalFace, shot(20 + off, 0), 0).value).toBe(9)
+    expect(scoreShot(ovalFace, shot(0, 10 - off), 0).value).toBe(10)
+    expect(scoreShot(ovalFace, shot(0, 10 + off), 0).value).toBe(9)
   })
 
   it('scores by height on the vertical axis, not by the width', () => {
     // 40 mm above the centre is inside a circle of the width and outside the oval
-    expect(scoreShot(oval, shot(0, 40), 0).value).toBe(0)
-    expect(scoreShot(oval, shot(40, 0), 0).value).toBe(9)
+    expect(scoreShot(ovalFace, shot(0, 40), 0).value).toBe(0)
+    expect(scoreShot(ovalFace, shot(40, 0), 0).value).toBe(9)
   })
 
   it('adds the hole radius along both axes', () => {
     const hole = 4 * mm
-    expect(scoreShot(oval, shot(52, 0), hole).value).toBe(9)
-    expect(scoreShot(oval, shot(52 + off, 0), hole).value).toBe(0)
-    expect(scoreShot(oval, shot(0, 32), hole).value).toBe(9)
-    expect(scoreShot(oval, shot(0, 32 + off), hole).value).toBe(0)
+    expect(scoreShot(ovalFace, shot(52, 0), hole).value).toBe(9)
+    expect(scoreShot(ovalFace, shot(52 + off, 0), hole).value).toBe(0)
+    expect(scoreShot(ovalFace, shot(0, 32), hole).value).toBe(9)
+    expect(scoreShot(ovalFace, shot(0, 32 + off), hole).value).toBe(0)
   })
+})
 
+describe('scoreShot on an oval face, off the axes', () => {
   it('touches off the axes when the hole reaches the ellipse, as a brute-force search finds', () => {
     const [a, b] = [50, 30]
     const nearest = (x: number, y: number) => {
@@ -93,8 +88,8 @@ describe('scoreShot on an oval face', () => {
       [3, -33],
     ] satisfies [number, number][]) {
       const gap = nearest(x, y)
-      expect(scoreShot(oval, shot(x, y), 2 * (gap + 1e-3) * mm).value).toBe(9)
-      expect(scoreShot(oval, shot(x, y), 2 * (gap - 1e-3) * mm).value).toBe(0)
+      expect(scoreShot(ovalFace, shot(x, y), 2 * (gap + 1e-3) * mm).value).toBe(9)
+      expect(scoreShot(ovalFace, shot(x, y), 2 * (gap - 1e-3) * mm).value).toBe(0)
     }
   })
 
@@ -119,17 +114,17 @@ describe('scoreShot on an oval face', () => {
   })
 })
 
-describe('scoreShot on a stadium face', () => {
-  // 9: 100 wide, 160 high (half circle ends of radius 50 about y = +-30); 10: 40 wide, 100 high,
-  // its inner ten 20 wide and 60 high
-  const stadium = faceOf(
-    [
-      { value: 9, w: 100, h: 160, shape: 'stadium' },
-      { value: 10, w: 40, h: 100, shape: 'stadium' },
-    ],
-    { innerTen: { diameter: mmq(20), height: mmq(60), rule: 'touch' } },
-  )
+// 9: 100 wide, 160 high (half circle ends of radius 50 about y = +-30); 10: 40 wide, 100 high,
+// its inner ten 20 wide and 60 high
+const stadium = faceOf(
+  [
+    { value: 9, w: 100, h: 160, shape: 'stadium' },
+    { value: 10, w: 40, h: 100, shape: 'stadium' },
+  ],
+  { innerTen: { diameter: mmq(20), height: mmq(60), rule: 'touch' } },
+)
 
+describe('scoreShot on a stadium face', () => {
   it('counts a hole centre on the straight sides and the ends as inside', () => {
     // the straight side holds for every height up to the end of the straight part
     for (const y of [0, 15, 30, -30]) expect(scoreShot(stadium, shot(50, y), 0).value).toBe(9)
@@ -159,7 +154,9 @@ describe('scoreShot on a stadium face', () => {
     expect(scoreShot(stadium, shot(0, 50), 0).value).toBe(10)
     expect(scoreShot(stadium, shot(0, 50 + off), 0).value).toBe(9)
   })
+})
 
+describe('scoreShot on a stadium face, with the hole', () => {
   it('adds the hole radius to the straight sides and round the ends', () => {
     const hole = 4 * mm
     expect(scoreShot(stadium, shot(52, 0), hole).value).toBe(9)
@@ -183,9 +180,9 @@ describe('scoreShot on a stadium face', () => {
   })
 
   it('refuses ring marks like any non-circular face', () => {
-    expect(() =>
-      faceAlignment(stadium, [{ ring: 9, x: 0.05, y: 0 }], undefined, english.t),
-    ).toThrow('Ring marks fit circular rings')
+    expect(faceAlignment(stadium, [{ ring: 9, x: 0.05, y: 0 }], undefined)).toEqual({
+      issue: { code: 'circular-rings' },
+    })
   })
 })
 
@@ -321,21 +318,23 @@ describe('faceAlignment', () => {
       { value: 10, w: 10 },
     ]
     const bulls = faceOf(rings, { bulls: [{ x: mmq(0), y: mmq(0) }] })
-    expect(() => faceAlignment(bulls, marks, undefined, english.t)).toThrow('one bull')
+    expect(faceAlignment(bulls, marks, undefined)).toEqual({ issue: { code: 'one-bull' } })
     const oval = faceOf([
       { value: 9, w: 20, h: 14 },
       { value: 10, w: 10, h: 6 },
     ])
-    expect(() => faceAlignment(oval, marks, undefined, english.t)).toThrow('circular')
+    expect(faceAlignment(oval, marks, undefined)).toEqual({ issue: { code: 'circular-rings' } })
     const outerOval = faceOf([
       { value: 9, w: 20, h: 14 },
       { value: 10, w: 10 },
     ])
-    expect(() => faceAlignment(outerOval, marks, undefined, english.t)).toThrow('circular')
+    expect(faceAlignment(outerOval, marks, undefined)).toEqual({
+      issue: { code: 'circular-rings' },
+    })
     const square = faceOf([
       { value: 9, w: 20, shape: 'square' },
       { value: 10, w: 10, shape: 'square' },
     ])
-    expect(() => faceAlignment(square, marks, undefined, english.t)).toThrow('circular')
+    expect(faceAlignment(square, marks, undefined)).toEqual({ issue: { code: 'circular-rings' } })
   })
 })

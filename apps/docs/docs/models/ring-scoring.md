@@ -12,7 +12,7 @@ For each shot on a target:
 - whether it is an inner ten
 - the zone label of the bull it belongs to, on a target with several bulls
 
-A target is placed on the target sheet by fitting its centre and scale to points marked on two or more of its rings. Target records hold ring diameters in mm. Shots are hole centres in target m from the target centre (the sheet centre on a target with several bulls). The group stores the target id and the id of the event, which `lib/ring-scoring.ts` looks up in the target. The target and event of a group come from the target mapping of the discipline picked ([Federations, disciplines and target mappings](../data/federations.md)). Calibrating the sheet on a found target keeps the event of the same target, else takes the event the user chose, the discipline's event on that target, or the target's event at the group's distance (`groupFaceChoice` in `apps/web/src/lib/face-sheet.ts`). A target from the browser's target designer scores like a record: its events have no target mapping, so each is listed under User design and its gauge is the scored hole. Code: `apps/web/src/lib/ring-scoring.ts`.
+A target is placed on the target sheet by fitting its centre and scale to points marked on two or more of its rings. Target records hold ring diameters in mm. Shots are hole centres in target m from the target centre (the sheet centre on a target with several bulls). The group stores the target id and the id of the event, which `scoreGroupOnFace` looks up in the target. The target and event of a group come from the target mapping of the discipline picked ([Federations, disciplines and target mappings](../data/federations.md)). Calibrating the sheet on a found target keeps the event of the same target, else takes the event the user chose, the discipline's event on that target, or the target's event at the group's distance (`groupFaceChoice` in `apps/web/src/lib/face-sheet.ts`). A target from the browser's target designer scores like a record: its events have no target mapping, so each is listed under User design and its gauge is the scored hole. Code: `packages/shot-groups/src/ring-scoring.ts`; `apps/web/src/lib/ring-scoring.ts` words a refused fit or group in the language shown.
 
 ## Equations
 
@@ -24,7 +24,7 @@ $$
 g = \begin{cases} 0 & \text{centre scoring} \\ G/2 & \text{gauge given} \\ d_b/2 & \text{otherwise} \end{cases}
 $$
 
-Code: `apps/web/src/lib/ring-scoring.ts`, `scoredHoleDiameter`.
+Code: `packages/shot-groups/src/ring-scoring.ts`, `scoredHoleDiameter`.
 
 ### Bull
 
@@ -34,7 +34,7 @@ $$
 k^\ast = \arg\min_k \lvert p - c_k \rvert, \qquad p' = p - c_{k^\ast}
 $$
 
-Code: `apps/web/src/lib/ring-scoring.ts`, `nearestBull`, `scoreShot`.
+Code: `packages/shot-groups/src/ring-scoring.ts`, `nearestBull`, `scoreShot`.
 
 ### Ring value
 
@@ -44,7 +44,7 @@ $$
 \delta_n(p') \le g + \varepsilon, \qquad \delta_n(p') = \min_{q \in A_n} \lvert p' - q \rvert
 $$
 
-Code: `apps/web/src/lib/ring-scoring.ts`, `touches`, `scoreShot`.
+Code: `packages/shot-groups/src/ring-scoring.ts`, `touches`, `scoreShot`.
 
 The distance $\delta_n$ is
 
@@ -52,7 +52,7 @@ $$
 \delta_n = \begin{cases} \max(\lvert p' \rvert - R_n,\, 0) & \text{circle} \\ \text{distance to the ellipse} & \text{oval} \\ \sqrt{\max(\lvert x \rvert - R_n, 0)^2 + \max(\lvert y \rvert - R_n, 0)^2} & \text{square} \\ \max\left(\sqrt{x^2 + (y - \operatorname{clamp}(y, -L_n, L_n))^2} - R_n,\, 0\right) & \text{stadium} \end{cases}
 $$
 
-Code: `apps/web/src/lib/ring-scoring.ts`, `touches`, `ellipseGap`. The stadium is the branch of `touches` on `shape: stadium`.
+Code: `packages/shot-groups/src/ring-scoring.ts`, `touches`, `ellipseGap`. The stadium is the branch of `touches` on `shape: stadium`.
 
 For a circle the condition is $\lvert p' \rvert \le R_n + g + \varepsilon$. The distance to an ellipse has no closed form. The code finds the closest point on the ellipse as the root of a monotone function by bisection ([Eberly 2013](../bibliography.md#eberly-2013)) and is 0 inside. Along both axes of an oval the condition reads $\lvert x \rvert \le R_n + g$ and $\lvert y \rvert \le H_n + g$. Away from the axes the hole is a disc, so its reach round an oval ring is the parallel curve of the ellipse, not an ellipse with the axes grown by $g$. A stadium is the set of points within $R_n$ of the segment from $(0, -L_n)$ to $(0, L_n)$ between the centres of its end half circles, $L_n = H_n - R_n$, so the distance has the closed form above, and the hole's reach is the same shape grown by $g$, with round corners. A square scores by its edge: a hole centre on the edge is inside, and the hole's reach is rounded at the corners. With $g = 0$ the square is the condition $\max(\lvert x \rvert, \lvert y \rvert) \le R_n$.
 
@@ -64,7 +64,7 @@ $$
 d + g \lt R_n - \varepsilon
 $$
 
-Code: `apps/web/src/lib/ring-scoring.ts`, `scoreShot` (`outward`), `scoreGroupOnFace`.
+Code: `packages/shot-groups/src/ring-scoring.ts`, `scoreShot` (`outward`), `scoreGroupOnFace`.
 
 A far edge within $\varepsilon$ of the outer edge of the line counts as on the line, so it takes the lower value. A record with an outward event and oval, stadium or square rings, or with `decimal: true`, is refused ([NSRA 2024](../bibliography.md#nsra-2024), Rule 5.1.7 and Appendix B, Fig. 4).
 
@@ -78,7 +78,7 @@ $$
 \text{cover: } d + R_X \le g + \varepsilon, \qquad \text{touch: } d \le R_X + g + \varepsilon
 $$
 
-Code: `apps/web/src/lib/ring-scoring.ts`, `scoreShot`.
+Code: `packages/shot-groups/src/ring-scoring.ts`, `scoreShot`.
 
 ### Tenth-ring value
 
@@ -88,7 +88,7 @@ $$
 \text{decimal} = v_n + \frac{1}{10} \min\left(9,\, \max\left(0,\, \left\lfloor 10\, \frac{R_n + g - d}{w_n} + 10^{-9} \right\rfloor\right)\right)
 $$
 
-Code: `apps/web/src/lib/ring-scoring.ts`, `scoreShot` (`depth`, `tenth`).
+Code: `packages/shot-groups/src/ring-scoring.ts`, `scoreShot` (`depth`, `tenth`).
 
 A target with `decimal: false`, or none where the rule book does not state it, is scored in whole rings.
 
@@ -98,7 +98,7 @@ $$
 R_\mathrm{last} + g \gt R_\mathrm{last-1} - R_\mathrm{last} + \varepsilon
 $$
 
-Code: `apps/web/src/lib/ring-scoring.ts`, `usesOwnTenthRule`. An outward event scores whole rings, so the flag is never raised for it.
+Code: `packages/shot-groups/src/ring-scoring.ts`, `usesOwnTenthRule`. An outward event scores whole rings, so the flag is never raised for it.
 
 ### Group total
 
@@ -108,7 +108,7 @@ $$
 T = \sum_i v_i, \qquad T_\mathrm{dec} = \frac{1}{10} \sum_i \operatorname{round}(10\, \text{decimal}_i)
 $$
 
-Code: `apps/web/src/lib/ring-scoring.ts`, `scoreGroup`, `scoreGroupOnFace`.
+Code: `packages/shot-groups/src/ring-scoring.ts`, `scoreGroup`, `scoreGroupOnFace`.
 
 ### Fit of a target to its rings
 
@@ -118,7 +118,7 @@ $$
 2x\, c_x + 2y\, c_y + R^2 u - t = x^2 + y^2
 $$
 
-Code: `apps/web/src/lib/ring-scoring.ts`, `fitRings`, `apps/web/src/lib/target-geometry.ts`, `solve`.
+Code: `packages/shot-groups/src/ring-scoring.ts`, `fitRings`, `packages/shot-groups/src/geometry.ts`, `solveLinear`.
 
 The system over all marked points is solved by linear least squares (normal equations, Gaussian elimination with partial pivoting) on normalised coordinates: points about their centroid at mean distance 1, radii at mean 1. This is the algebraic circle fit with one shared centre and one known radius per ring. At least two rings and four points are needed. The misfit is
 
@@ -126,7 +126,7 @@ $$
 \mathrm{rms} = \sqrt{\frac{1}{N} \sum_{k=1}^{N} \left(\lvert p_k - c \rvert - s R_k\right)^2}
 $$
 
-Code: `apps/web/src/lib/ring-scoring.ts`, `fitRings`, `apps/web/src/lib/target-geometry.ts`, `solve`.
+Code: `packages/shot-groups/src/ring-scoring.ts`, `fitRings`, `packages/shot-groups/src/geometry.ts`, `solveLinear`.
 
 A sheet point $p$ is scored at its position on the target, with the hole diameter left physical:
 
@@ -134,7 +134,7 @@ $$
 q = \frac{p - c}{s}
 $$
 
-Code: `apps/web/src/lib/ring-scoring.ts`, `onFace`, `faceAlignment`.
+Code: `packages/shot-groups/src/ring-scoring.ts`, `onFace`, `faceAlignment`.
 
 Without marks the target is centred on the group's point of aim, or on the sheet origin without one, with $s = 1$.
 

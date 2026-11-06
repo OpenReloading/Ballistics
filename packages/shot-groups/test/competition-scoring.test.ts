@@ -10,12 +10,13 @@ import {
   ringTotal,
   stagePoints,
   stageRawPoints,
-} from '../../src/index.ts'
+} from '../src/index.ts'
+import { issueOf } from './issue.ts'
 
 /** The scoring of an event type record of the data package, as the event user record names it. */
 const rulesOf = (id: string): HitFactorRules =>
   JSON.parse(
-    readFileSync(new URL(`../../../data/records/event-types/${id}.json`, import.meta.url), 'utf8'),
+    readFileSync(new URL(`../../data/records/event-types/${id}.json`, import.meta.url), 'utf8'),
   ).scoring
 
 const ipsc = rulesOf('ipsc-handgun')
@@ -108,56 +109,59 @@ describe('Sportordnung des DSB, Stand 01.01.2027', () => {
 
 describe('input checks', () => {
   it('refuses a time that is not positive, a negative count and a series without values', () => {
-    expect(() => hitFactor(10, 0)).toThrow('time')
-    expect(() => stageRawPoints(stage({ misses: -1 }), ipsc)).toThrow('count')
-    expect(() => stageRawPoints(stage({ hits: { A: 1.5, C: 0, D: 0 } }), ipsc)).toThrow('count')
-    expect(() => ringTotal({})).toThrow('shots or its total')
-    expect(() => ringTotal({ shots: [-1] })).toThrow('ring value')
-    expect(() => ringTotal({ total: -5 })).toThrow('ring value')
-    expect(() => ringTotal({ total: Number.NaN })).toThrow('ring value')
+    expect(issueOf(() => hitFactor(10, 0))).toEqual({ code: 'stage-time' })
+    expect(issueOf(() => stageRawPoints(stage({ misses: -1 }), ipsc))).toEqual({ code: 'count' })
+    expect(issueOf(() => stageRawPoints(stage({ hits: { A: 1.5, C: 0, D: 0 } }), ipsc))).toEqual({
+      code: 'count',
+    })
+    expect(issueOf(() => ringTotal({}))).toEqual({ code: 'series-total' })
+    expect(issueOf(() => ringTotal({ shots: [-1] }))).toEqual({ code: 'ring-value' })
+    expect(issueOf(() => ringTotal({ total: -5 }))).toEqual({ code: 'ring-value' })
+    expect(issueOf(() => ringTotal({ total: Number.NaN }))).toEqual({ code: 'ring-value' })
     const typedStage = { ...(event[0] as PracticalStage), stagePoints: -1 }
-    expect(() => stagePoints(typedStage, ipsc)).toThrow('stage points')
-    expect(() =>
-      stagePoints({ ...typedStage, stagePoints: Number.POSITIVE_INFINITY }, ipsc),
-    ).toThrow('stage points')
+    expect(issueOf(() => stagePoints(typedStage, ipsc))).toEqual({ code: 'stage-points' })
+    expect(
+      issueOf(() => stagePoints({ ...typedStage, stagePoints: Number.POSITIVE_INFINITY }, ipsc)),
+    ).toEqual({ code: 'stage-points' })
   })
 })
 
-describe('eventMismatches', () => {
-  const type = (id: string) =>
-    JSON.parse(
-      readFileSync(
-        new URL(`../../../data/records/event-types/${id}.json`, import.meta.url),
-        'utf8',
-      ),
-    )
-  const practical = (powerFactor: 'major' | 'minor') => ({
-    method: 'hit-factor' as const,
-    stages: [{ powerFactor }],
-  })
+/** An event type record of the data package. */
+const eventType = (id: string) =>
+  JSON.parse(
+    readFileSync(new URL(`../../data/records/event-types/${id}.json`, import.meta.url), 'utf8'),
+  )
+const practical = (powerFactor: 'major' | 'minor') => ({
+  method: 'hit-factor' as const,
+  stages: [{ powerFactor }],
+})
 
+describe('eventMismatches', () => {
   it('accepts an event that fits its type', () => {
     const fits = { level: 'Level II', division: 'Open', results: practical('major') }
-    expect(eventMismatches(fits, type('ipsc-handgun'))).toEqual([])
+    expect(eventMismatches(fits, eventType('ipsc-handgun'))).toEqual([])
     const ring = { level: 'Landesmeisterschaft', results: { method: 'rings' as const } }
-    expect(eventMismatches(ring, type('dsb-meisterschaft'))).toEqual([])
+    expect(eventMismatches(ring, eventType('dsb-meisterschaft'))).toEqual([])
   })
 
   it('names a foreign level, results of another method, an unknown division and major without a major rating', () => {
-    const ipsc = type('ipsc-handgun')
-    expect(eventMismatches({ level: 'Nationals', results: practical('minor') }, ipsc)).toEqual([
+    const ipscType = eventType('ipsc-handgun')
+    expect(eventMismatches({ level: 'Nationals', results: practical('minor') }, ipscType)).toEqual([
       { problem: 'level', level: 'Nationals' },
     ])
     expect(
-      eventMismatches({ level: 'Level I', results: { method: 'rings' as const } }, ipsc),
+      eventMismatches({ level: 'Level I', results: { method: 'rings' as const } }, ipscType),
     ).toEqual([{ problem: 'method', method: 'rings' }])
     expect(
-      eventMismatches({ level: 'Level I', division: 'Limited', results: practical('minor') }, ipsc),
+      eventMismatches(
+        { level: 'Level I', division: 'Limited', results: practical('minor') },
+        ipscType,
+      ),
     ).toEqual([{ problem: 'division', division: 'Limited' }])
     expect(
       eventMismatches(
         { level: 'Level I', division: 'Production', results: practical('major') },
-        ipsc,
+        ipscType,
       ),
     ).toEqual([{ problem: 'major', division: 'Production', stage: 0 }])
   })

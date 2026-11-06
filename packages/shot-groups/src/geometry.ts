@@ -1,0 +1,341 @@
+/**
+ * Geometry of a target photo: image pixels (x right, y down) to
+ * target coordinates (x right, y up) from scale references, a known rectangle for perspective and
+ * a rotation. Unit-free: target coordinates are in the unit of the reference lengths (the record
+ * uses m; "mm" below reads as that unit). A refusal is a `ShotGroupsError` with a `GeometryIssue`.
+ */
+
+import { ShotGroupsError } from './issue.ts'
+import { nth } from './nth.ts'
+
+export type Point = { x: number; y: number }
+type Nine<T> = [T, T, T, T, T, T, T, T, T]
+/** A 3 x 3 matrix in row-major order, acting on homogeneous points (x, y, 1). */
+export type Matrix = readonly number[]
+/** A matrix known to have its nine entries, as the functions of this module return it. */
+export type Mat3 = Readonly<Nine<number>>
+/** A homogeneous point or direction. */
+export type Vector3 = [number, number, number]
+
+/** The nine entries of `m`: a matrix always has them, a plain array type cannot say so. */
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- a Matrix has nine entries by its contract
+const nine = (m: Matrix) => m as Mat3
+
+/** A scale reference on the photo, its points in image pixels and its lengths in mm. */
+export type Reference =
+  | { kind: 'line'; a: Point; b: Point; length: number }
+  | { kind: 'ringCentre'; centre: Point; edge: Point; diameter: number }
+  | { kind: 'ringEdge'; points: readonly [Point, Point, Point]; diameter: number }
+  /** Corners as `rectangleCorners` orders them. */
+  | {
+      kind: 'rectangle'
+      corners: readonly [Point, Point, Point, Point]
+      width: number
+      height: number
+    }
+
+export type Calibration = {
+  toTarget: Matrix
+  toImage: Matrix
+  /** Known over measured length per reference, in the order given. */
+  factors: number[]
+  /** Mean of the factors: mm per pixel, or 1 near a rectangle's own scale. */
+  scale: number
+  /** (largest - smallest factor) / scale; 0 with one reference. */
+  spread: number
+}
+
+/** The matrix of 9 row-major entries; throws for any other count. */
+export function toMatrix(v: readonly number[]): Mat3 {
+  if (v.length !== 9) throw new ShotGroupsError({ code: 'matrix-size', entries: v.length })
+  return [
+    nth(v, 0),
+    nth(v, 1),
+    nth(v, 2),
+    nth(v, 3),
+    nth(v, 4),
+    nth(v, 5),
+    nth(v, 6),
+    nth(v, 7),
+    nth(v, 8),
+  ]
+}
+
+/** `a b` (row-major). */
+export function mul3(a: Matrix, b: Matrix): Mat3 {
+  const [a0, a1, a2, a3, a4, a5, a6, a7, a8] = nine(a)
+  const [b0, b1, b2, b3, b4, b5, b6, b7, b8] = nine(b)
+  return [
+    a0 * b0 + a1 * b3 + a2 * b6,
+    a0 * b1 + a1 * b4 + a2 * b7,
+    a0 * b2 + a1 * b5 + a2 * b8,
+    a3 * b0 + a4 * b3 + a5 * b6,
+    a3 * b1 + a4 * b4 + a5 * b7,
+    a3 * b2 + a4 * b5 + a5 * b8,
+    a6 * b0 + a7 * b3 + a8 * b6,
+    a6 * b1 + a7 * b4 + a8 * b7,
+    a6 * b2 + a7 * b5 + a8 * b8,
+  ]
+}
+
+export const transpose3 = (m: Matrix): Mat3 => {
+  const k = nine(m)
+  return [k[0], k[3], k[6], k[1], k[4], k[7], k[2], k[5], k[8]]
+}
+
+/** The matrix with `f` applied to each entry (value, row-major index). */
+export const mapMatrix = (m: Mat3, f: (v: number, i: number) => number): Mat3 => [
+  f(m[0], 0),
+  f(m[1], 1),
+  f(m[2], 2),
+  f(m[3], 3),
+  f(m[4], 4),
+  f(m[5], 5),
+  f(m[6], 6),
+  f(m[7], 7),
+  f(m[8], 8),
+]
+
+/** `m v` for a 3-vector `v` (a homogeneous point stays undivided). */
+export const apply3 = (m: Matrix, v: Readonly<Vector3>): Vector3 => {
+  const k = nine(m)
+  return [
+    k[0] * v[0] + k[1] * v[1] + k[2] * v[2],
+    k[3] * v[0] + k[4] * v[1] + k[5] * v[2],
+    k[6] * v[0] + k[7] * v[1] + k[8] * v[2],
+  ]
+}
+
+export const det3 = (m: Matrix): number => {
+  const k = nine(m)
+  return (
+    k[0] * (k[4] * k[8] - k[5] * k[7]) -
+    k[1] * (k[3] * k[8] - k[5] * k[6]) +
+    k[2] * (k[3] * k[7] - k[4] * k[6])
+  )
+}
+
+/** Inverse of `m` by its adjugate; undefined when `m` is singular or not finite. */
+export function inv3(m: Matrix): Mat3 | undefined {
+  const d = det3(m)
+  if (!d || !Number.isFinite(d)) return undefined
+  const k = nine(m)
+  return [
+    (k[4] * k[8] - k[5] * k[7]) / d,
+    (k[2] * k[7] - k[1] * k[8]) / d,
+    (k[1] * k[5] - k[2] * k[4]) / d,
+    (k[5] * k[6] - k[3] * k[8]) / d,
+    (k[0] * k[8] - k[2] * k[6]) / d,
+    (k[2] * k[3] - k[0] * k[5]) / d,
+    (k[3] * k[7] - k[4] * k[6]) / d,
+    (k[1] * k[6] - k[0] * k[7]) / d,
+    (k[0] * k[4] - k[1] * k[3]) / d,
+  ]
+}
+
+/** `p` mapped by `m` and divided by the third coordinate. */
+export function applyMatrix(m: Matrix, p: Point): Point {
+  const k = nine(m)
+  const w = k[6] * p.x + k[7] * p.y + k[8]
+  return { x: (k[0] * p.x + k[1] * p.y + k[2]) / w, y: (k[3] * p.x + k[4] * p.y + k[5]) / w }
+}
+
+/** Inverse of `m`; throws when it is singular. */
+export function invertMatrix(m: Matrix): Matrix {
+  const inverse = inv3(m)
+  if (!inverse) throw new ShotGroupsError({ code: 'singular-matrix' })
+  return inverse
+}
+
+/** Moves the centroid to 0 and the mean distance from it to sqrt(2). */
+function normalizing(points: readonly Point[]): Matrix {
+  const cx = points.reduce((s, p) => s + p.x, 0) / points.length
+  const cy = points.reduce((s, p) => s + p.y, 0) / points.length
+  const mean = points.reduce((s, p) => s + Math.hypot(p.x - cx, p.y - cy), 0) / points.length
+  const s = Math.SQRT2 / mean
+  return [s, 0, -s * cx, 0, s, -s * cy, 0, 0, 1]
+}
+
+/** Solves a x = b in place by Gaussian elimination with partial pivoting; throws when a pivot vanishes. */
+export function solve(a: number[][], b: number[]): number[] {
+  const x = solveLinear(a, b)
+  if (!x) throw new ShotGroupsError({ code: 'degenerate-points' })
+  return x
+}
+
+/** `solve`, undefined where a pivot vanishes (the points are degenerate). */
+export function solveLinear(a: number[][], b: number[]): number[] | undefined {
+  const n = b.length
+  const cell = (r: number, c: number) => nth(nth(a, r), c)
+  for (let k = 0; k < n; k++) {
+    let p = k
+    for (let r = k + 1; r < n; r++) if (Math.abs(cell(r, k)) > Math.abs(cell(p, k))) p = r
+    if (Math.abs(cell(p, k)) < 1e-10) return undefined
+    const [rowK, rowP, bk, bp] = [nth(a, k), nth(a, p), nth(b, k), nth(b, p)]
+    ;[a[k], a[p], b[k], b[p]] = [rowP, rowK, bp, bk]
+    for (let r = k + 1; r < n; r++) {
+      const row = nth(a, r)
+      const f = cell(r, k) / cell(k, k)
+      for (let c = k; c < n; c++) row[c] = cell(r, c) - f * cell(k, c)
+      b[r] = nth(b, r) - f * nth(b, k)
+    }
+  }
+  return backSubstitute(a, b)
+}
+
+/** The solution of the upper triangular system `a` x = `b`. */
+function backSubstitute(a: number[][], b: number[]): number[] {
+  const n = b.length
+  const x = Array.from({ length: n }, () => 0)
+  for (let k = n - 1; k >= 0; k--) {
+    const row = nth(a, k)
+    let s = nth(b, k)
+    for (let c = k + 1; c < n; c++) s -= nth(row, c) * nth(x, c)
+    x[k] = s / nth(row, k)
+  }
+  return x
+}
+
+/**
+ * The homography that maps four points `from` onto four points `to`: the direct linear
+ * transformation with the last entry fixed at 1, on normalized points (Hartley 2004,
+ * chapter 4). Throws when three points of either set lie on one line.
+ */
+export function solveHomography(from: readonly Point[], to: readonly Point[]): Matrix {
+  if (from.length !== 4 || to.length !== 4) throw new ShotGroupsError({ code: 'four-point-pairs' })
+  const t1 = normalizing(from)
+  const t2 = normalizing(to)
+  const ps = from.map((p) => applyMatrix(t1, p))
+  const qs = to.map((q) => applyMatrix(t2, q))
+  for (const set of [ps, qs])
+    for (let skip = 0; skip < 4; skip++) {
+      const rest = set.filter((_, i) => i !== skip)
+      const [a, b, c] = [nth(rest, 0), nth(rest, 1), nth(rest, 2)]
+      // normalized points lie about 1 from their centroid, so an absolute bound fits
+      if (Math.abs((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)) < 1e-9)
+        throw new ShotGroupsError({ code: 'collinear-points' })
+    }
+  const a: number[][] = []
+  const b: number[] = []
+  ps.forEach((p, i) => {
+    const q = nth(qs, i)
+    a.push([p.x, p.y, 1, 0, 0, 0, -q.x * p.x, -q.x * p.y])
+    b.push(q.x)
+    a.push([0, 0, 0, p.x, p.y, 1, -q.y * p.x, -q.y * p.y])
+    b.push(q.y)
+  })
+  return mul3(invertMatrix(t2), mul3(toMatrix([...solve(a, b), 1]), t1))
+}
+
+/** Corners of a width x height rectangle in mm, y up: top left, top right, bottom right, bottom left. */
+export function rectangleCorners(width: number, height: number): [Point, Point, Point, Point] {
+  return [
+    { x: 0, y: height },
+    { x: width, y: height },
+    { x: width, y: 0 },
+    { x: 0, y: 0 },
+  ]
+}
+
+/** The circle through three points; throws when they lie on one line. */
+export function circleThrough(a: Point, b: Point, c: Point): { centre: Point; radius: number } {
+  const [bx, by, cx, cy] = [b.x - a.x, b.y - a.y, c.x - a.x, c.y - a.y]
+  const d = 2 * (bx * cy - by * cx)
+  if (Math.abs(d) <= 1e-12 * (bx * bx + by * by + cx * cx + cy * cy))
+    throw new ShotGroupsError({ code: 'collinear-points' })
+  const b2 = bx * bx + by * by
+  const c2 = cx * cx + cy * cy
+  const ux = (cy * b2 - by * c2) / d
+  const uy = (bx * c2 - cx * b2) / d
+  return { centre: { x: a.x + ux, y: a.y + uy }, radius: Math.hypot(ux, uy) }
+}
+
+const distance = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y)
+const flipY: Matrix = [1, 0, 0, 0, -1, 0, 0, 0, 1]
+
+/** Known and measured length of a reference, its points mapped by `m` first; a rectangle's are 1. */
+function lengths(r: Reference, m: (p: Point) => Point): [number, number] {
+  switch (r.kind) {
+    case 'line':
+      return [r.length, distance(m(r.a), m(r.b))]
+    case 'ringCentre':
+      return [r.diameter, 2 * distance(m(r.centre), m(r.edge))]
+    case 'ringEdge':
+      return [r.diameter, 2 * circleThrough(m(r.points[0]), m(r.points[1]), m(r.points[2])).radius]
+    default:
+      // a rectangle: the homography holds its scale
+      return [1, 1]
+  }
+}
+
+/** Known over measured length of a reference, its points mapped through `base` first. */
+function factor(r: Reference, base: Matrix): number {
+  const [known, measured] = lengths(r, (p) => applyMatrix(base, p))
+  if (!(known > 0) || !(measured > 0) || !Number.isFinite(known / measured))
+    throw new ShotGroupsError({ code: 'reference-length', reference: r.kind })
+  return known / measured
+}
+
+/**
+ * Image pixels to target mm. With a rectangle (at most one) the photo is rectified onto it first;
+ * every reference then gives a scale factor, and their mean scales the result. `origin` (image
+ * pixels) maps to (0, 0); `rotation` (rad, counter-clockwise) is the angle of the target's x axis
+ * on the photo, so target coordinates turn by minus that angle.
+ */
+export function calibrate(
+  references: readonly Reference[],
+  rotation: number,
+  origin: Point,
+): Calibration {
+  if (!references.length) throw new ShotGroupsError({ code: 'reference-needed' })
+  const rects = references.filter((r) => r.kind === 'rectangle')
+  if (rects.length > 1) throw new ShotGroupsError({ code: 'one-rectangle' })
+  const rect = rects[0]
+  const base = rect
+    ? solveHomography(rect.corners, rectangleCorners(rect.width, rect.height))
+    : flipY
+  const factors = references.map((r) => factor(r, base))
+  const scale = factors.reduce((s, f) => s + f, 0) / factors.length
+  const spread = (Math.max(...factors) - Math.min(...factors)) / scale
+  const o = applyMatrix(base, origin)
+  const [c, s] = [Math.cos(rotation), Math.sin(rotation)]
+  const scaled: Matrix = [scale, 0, -scale * o.x, 0, scale, -scale * o.y, 0, 0, 1]
+  const toTarget = mul3([c, s, 0, -s, c, 0, 0, 0, 1], mul3(scaled, base))
+  return { toTarget, toImage: invertMatrix(toTarget), factors, scale, spread }
+}
+
+export const toTarget = (c: Calibration, p: Point): Point => applyMatrix(c.toTarget, p)
+export const toImage = (c: Calibration, q: Point): Point => applyMatrix(c.toImage, q)
+
+/**
+ * A target point re-expressed after the calibration, rotation or origin changed, so it stays on
+ * the same photo point (the same hole).
+ */
+export const keepOnPhoto = (q: Point, before: Calibration, after: Calibration): Point =>
+  toTarget(after, toImage(before, q))
+
+/** `p` turned by `angle` (rad, counter-clockwise on screen, y down) about `c`. */
+export function turnPoint(p: Point, c: Point, angle: number): Point {
+  const [cos, sin] = [Math.cos(angle), Math.sin(angle)]
+  const [dx, dy] = [p.x - c.x, p.y - c.y]
+  return { x: c.x + cos * dx + sin * dy, y: c.y - sin * dx + cos * dy }
+}
+
+/** The box of a `width` x `height` photo turned by `angle` (as `turnPoint`) about its middle. */
+export function turnedBox(
+  width: number,
+  height: number,
+  angle: number,
+): { x: number; y: number; w: number; h: number } {
+  const c = { x: width / 2, y: height / 2 }
+  const pts = [
+    { x: 0, y: 0 },
+    { x: width, y: 0 },
+    { x: width, y: height },
+    { x: 0, y: height },
+  ].map((p) => turnPoint(p, c, angle))
+  const xs = pts.map((p) => p.x)
+  const ys = pts.map((p) => p.y)
+  const [x, y] = [Math.min(...xs), Math.min(...ys)]
+  return { x, y, w: Math.max(...xs) - x, h: Math.max(...ys) - y }
+}

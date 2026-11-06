@@ -1,0 +1,38 @@
+{
+  "$schema": "../../node_modules/oxlint/configuration_schema.json",
+  "extends": ["../oxlint.logic.json"],
+  "overrides": [
+    {
+      "files": ["src/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [],
+            "patterns": [
+              {
+                "group": [
+                  "@*/*",
+                  "@*/*/**",
+                  "!@open-reloading/units",
+                  "!@open-reloading/units/**",
+                  "!@open-reloading/statistics",
+                  "!@open-reloading/statistics/**"
+                ],
+                "message": "shot-groups-imports-units-statistics-only: packages/shot-groups has no I/O: it imports only @open-reloading/units, @open-reloading/statistics and its own files."
+              },
+              {
+                "regex": "^[^.@]",
+                "message": "shot-groups-imports-units-statistics-only: packages/shot-groups has no I/O: it imports only @open-reloading/units, @open-reloading/statistics and its own files."
+              },
+              {
+                "regex": "^(\\.\\./)+((units|statistics|locale-format|shot-groups|schema|importers|core|data|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "message": "shot-groups-imports-units-statistics-only: packages/shot-groups has no I/O: it imports only @open-reloading/units, @open-reloading/statistics and its own files."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
