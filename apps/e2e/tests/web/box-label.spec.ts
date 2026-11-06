@@ -6,8 +6,8 @@ import { storeUnits } from './units.ts'
 import { applyExampleLoad } from './workbench.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
-// the printed QR code is read from a screenshot: at 96 dpi a module is 2.9 px, which jsQR misreads
-// for some codes; at 3 x it is 8.6 px
+// the printed QR code is read from a screenshot: at 96 dpi a module is 2.9 px, which jsQR cannot
+// read for some codes; at 3 x it is 8.6 px
 test.use({ deviceScaleFactor: 3 })
 
 /** The label in each language: German row names are longer, the label must still hold them. */
