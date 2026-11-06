@@ -535,8 +535,7 @@ export interface RangeStringPriors {
 
 // @public
 export interface RangeStringResidual {
-    // Warning: (ae-forgotten-export) The symbol "Row" needs to be exported by the entry point index.d.ts
-    kind: Row['kind'];
+    kind: 'impact' | 'dial' | 'velocity';
     observed: number;
     predicted: number;
     range: number;
