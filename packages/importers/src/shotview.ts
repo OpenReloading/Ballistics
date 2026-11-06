@@ -18,7 +18,7 @@ import {
 } from './worksheet-strings.ts'
 
 /** A ShotView header row: first cell `#`, the velocity unit in brackets in the second. */
-export const isShotViewHeader = (cells: string[]) =>
+export const isShotViewHeader = (cells: string[]): boolean =>
   cells[0] === '#' && bracketed(cells[1] ?? '') !== undefined
 
 /** Index of the `#` header row whose second cell names the velocity unit in brackets, or -1. */
