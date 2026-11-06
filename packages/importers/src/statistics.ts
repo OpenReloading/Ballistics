@@ -55,13 +55,17 @@ function compareStatistics(
  * found; no warning without values.
  */
 export function warnStatistics(
-  rows: string[][],
+  {
+    rows,
+    rowLabels,
+    readNumber,
+  }: {
+    rows: string[][]
+    rowLabels: [string[], string[], string[]]
+    readNumber: (cell: string) => number
+  },
   values: number[],
-  rowLabels: [string[], string[], string[]],
-  readNumber: (cell: string) => number,
-  warnings: string[],
-  prefix: string,
-  notFound: string,
+  { warnings, prefix, notFound }: { warnings: string[]; prefix: string; notFound: string },
 ): void {
   if (values.length === 0) return
   const checks = compareStatistics(rows, values, rowLabels, readNumber)

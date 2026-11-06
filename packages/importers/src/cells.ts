@@ -22,16 +22,20 @@ export interface CellBudget {
 /** Cell text trimmed and U+FEFF removed. */
 export const clean = (text: string): string => text.replaceAll('﻿', '').trim()
 
+/** A cell to place: its column (from 1), its text, and its name, built only for a refusal. */
+export interface PlacedCell {
+  column: number
+  text: string
+  name: () => string
+}
+
 /**
- * Places `text` at `column` (from 1) after the row's cells, gaps as empty text, counting the
- * budgets; refuses a column beyond IV or not after the previous cell. `name` names the cell, built
- * only for a refusal.
+ * Places the cell's text at its column after the row's cells, gaps as empty text, counting the
+ * budgets; refuses a column beyond IV or not after the previous cell.
  */
 export function placeCell(
   cells: string[],
-  column: number,
-  text: string,
-  name: () => string,
+  { column, text, name }: PlacedCell,
   remaining: CellBudget,
 ): void {
   if (column > maxColumn) throw new Error(`cell ${name()} lies beyond column IV`)

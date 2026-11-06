@@ -26,8 +26,9 @@ function templateHeader(
   const cells = splitCells(first, delimiter)
   while (cells.length > 1 && cells[cells.length - 1] === '') cells.pop()
   const names = cells.map((c) => templateNames.find((n) => n.toLowerCase() === c.toLowerCase()))
-  if (!names.includes('velocity') || names.some((n) => n === undefined)) return undefined
-  return { names: names as (typeof templateNames)[number][], delimiter }
+  const known = names.filter((n) => n !== undefined)
+  if (!known.includes('velocity') || known.length !== names.length) return undefined
+  return { names: known, delimiter }
 }
 
 /** OpenReloading CSV template: a first row of known column names, `velocity` among them. */
@@ -46,7 +47,8 @@ export function parseOpenReloadingCsv(text: string, options: TemplateOptions = {
       `not an OpenReloading CSV template: the first row must name columns from ${templateNames.join(', ')}, velocity among them`,
     )
   }
-  const columns = Object.fromEntries(h.names.map((n) => [n, n])) as unknown as ColumnMap
+  const columns: ColumnMap = { velocity: 'velocity' }
+  for (const n of h.names) columns[n] = n
   return parseDelimitedRows(
     'openreloading-csv',
     text,

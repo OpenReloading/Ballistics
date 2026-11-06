@@ -12,7 +12,7 @@ export interface WorkbookOptions extends ChronoParserOptions {
 }
 
 /** The shots, label and bore flags of one worksheet, read as one string of shots. */
-interface WorksheetString {
+export interface WorksheetString {
   shots: ChronoShot[]
   label: string
   /** Bore flags as `shot <n> <flag>`. */
@@ -31,7 +31,7 @@ export interface FoundWorksheet {
 
 /** The distinct dates of the worksheets, ascending. */
 const datesOf = (list: FoundWorksheet[]) =>
-  [...new Set(list.flatMap((f) => (f.date ? [f.date] : [])))].sort((a, b) =>
+  [...new Set(list.flatMap((f) => (f.date ? [f.date] : [])))].toSorted((a, b) =>
     a.localeCompare(b, 'en'),
   )
 
@@ -64,11 +64,7 @@ export function collectWorksheetStrings(
 ): { strings: { shots: ChronoShot[] }[]; labels: string[]; flags: string[]; date?: string } {
   const fill = options.date !== undefined && found.every((f) => !f.date)
   const kept = options.date ? found.filter((f) => !f.date || f.date === options.date) : found
-  if (options.date && !fill && !found.some((f) => f.date === options.date)) {
-    throw new Error(
-      `no string on ${options.date}; dates in the file: ${datesOf(found).join(', ') || 'none'}`,
-    )
-  }
+  checkDateOption(found, options.date, fill)
   const strings: { shots: ChronoShot[] }[] = []
   const labels: string[] = []
   const flags: string[] = []
@@ -85,14 +81,35 @@ export function collectWorksheetStrings(
     flags.push(...s.flags.map((flag) => `string ${strings.length} ${flag}`))
     read.push(f)
   }
+  const date = commonDate(read, options.date, warnings)
+  return { strings, labels, flags, ...(date ? { date } : {}) }
+}
+
+/** Refuses a `date` option that no worksheet has while some worksheet has a date (`fill` unset). */
+function checkDateOption(found: FoundWorksheet[], date: string | undefined, fill: boolean): void {
+  if (date && !fill && !found.some((f) => f.date === date)) {
+    throw new Error(
+      `no string on ${date}; dates in the file: ${datesOf(found).join(', ') || 'none'}`,
+    )
+  }
+}
+
+/**
+ * The session date: the `date` option, else the one date every read worksheet has; warns when
+ * the read worksheets have several.
+ */
+function commonDate(
+  read: FoundWorksheet[],
+  option: string | undefined,
+  warnings: string[],
+): string | undefined {
   const dates = datesOf(read)
   if (dates.length > 1) {
     warnings.push(
       `strings from several days (${dates.join(', ')}); enter the date, or import one day with the date option`,
     )
   }
-  const date =
-    options.date ||
-    (dates.length === 1 && read.every((f) => f.date === dates[0]) ? dates[0] : undefined)
-  return { strings, labels, flags, ...(date ? { date } : {}) }
+  return (
+    option || (dates.length === 1 && read.every((f) => f.date === dates[0]) ? dates[0] : undefined)
+  )
 }
