@@ -10,12 +10,15 @@
     "drawing-baseline": "sh scripts/baseline.sh",
     "drawing-baseline:full": "DRAWING_BASELINE=full sh scripts/baseline.sh",
     "visual-check": "node scripts/visual-check.mts",
-    "test:unit": "vitest run --dir scripts"
+    "test:unit": "vitest run --dir scripts",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
     "@open-reloading/web": "workspace:*",
     "@playwright/test": "catalog:",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
     "vitest": "catalog:"
   }
 }

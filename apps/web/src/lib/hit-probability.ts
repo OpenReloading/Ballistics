@@ -1,6 +1,38 @@
-import type { ScoringZone, TrajectoryPoint } from '@open-reloading/core'
-import { type TargetFace, toSi } from '@open-reloading/schema'
+import type { TrajectoryPoint } from '@open-reloading/core'
+import type { TargetFace } from '@open-reloading/schema'
+import { toSi } from '@open-reloading/schema'
+import type { HitIssue, ScoringZone } from '@open-reloading/shot-groups'
+import { InputError } from '@open-reloading/statistics'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import { translateMessage } from './core-messages.ts'
+import { errorText } from './error-text.ts'
 import { nth } from './nth.ts'
+
+const hitWords = {
+  distances: msg('distances must be positive'),
+  'group-dispersion': msg('the group dispersion must be positive'),
+  'speed-spread': msg('the speed spread must not be negative'),
+  'speed-height': msg(
+    'the height spread from the muzzle speed exceeds the vertical spread of the group',
+  ),
+  wind: msg('wind inputs must not be negative'),
+  'range-uncertainty': msg('the range uncertainty must not be negative'),
+  'semi-axes': msg('the semi-axes must be positive'),
+  'standard-deviations': msg('the standard deviations must be positive'),
+  offset: msg('the offset must be finite'),
+  'hit-probability': msg('the hit probability must be between 0 and 1'),
+  'wanted-probability': msg('the wanted probability must be between 0 and 1 exclusive'),
+  zones: msg('a face needs at least one zone'),
+} satisfies Record<HitIssue['code'], Message>
+
+const isHitCode = (code: string): code is HitIssue['code'] => Object.hasOwn(hitWords, code)
+
+/** Why the hit probability failed, in the language shown: its refusal, else the error's text. */
+export function hitFailureText(e: unknown, t: Translator['t']): string {
+  if (e instanceof InputError && e.issue && isHitCode(e.issue.code))
+    return t(hitWords[e.issue.code])
+  return translateMessage(errorText(e), t)
+}
 
 /**
  * The scoring zones of a face for a hole of diameter `hole` m, outermost first: each ring grown by

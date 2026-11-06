@@ -36,8 +36,6 @@
 . CurveResidual
 . CurveWarning
 . DensityClass
-. DispersionInput
-. DispersionResult
 . DownrangeReading
 . DragInput
 . DragInterpolation
@@ -62,7 +60,6 @@
 . GroupStatistics
 . GyroscopicStabilityInput
 . HeldPowderParameter
-. HitResult
 . IcaoConstants
 . Identifiability
 . Identification
@@ -110,8 +107,6 @@
 . PlanEntry
 . PlanRefusal
 . PlanRefusalId
-. PointDispersion
-. PointOffset
 . PooledFitOptions
 . PooledGroupStatistics
 . PooledParameterKind
@@ -190,7 +185,6 @@
 . SampledBand
 . SampledRun
 . SamplingOptions
-. ScoringZone
 . SeatingNote
 . SeatingReading
 . SegmentReading
@@ -199,7 +193,6 @@
 . SessionReading
 . SessionsTruingResult
 . Settings
-. ShotsToHit
 . ShotshellLoad
 . ShotshellResult
 . SimilarPowder
@@ -297,7 +290,6 @@
 . dynamicVivacity
 . earthRotation
 . earthRotationRate
-. ellipseProbability
 . estimateDragFromOutline
 . fQuantileTwoNumeratorDegrees
 . fillLoadRatioLimit
@@ -313,7 +305,6 @@
 . gyroscopicStability
 . handgunBarrelLengthLimit
 . heldSegment
-. hitProbability
 . icao
 . identifiability
 . inDragTable
@@ -357,7 +348,6 @@
 . placeMaximum
 . plainBaseCastHardness
 . planTruingStrings
-. pointDispersion
 . pooledDefaults
 . pooledGroupStatistics
 . pooledVelocitySd
@@ -386,7 +376,6 @@
 . segmentCoefficient
 . sensitivityReferenceDefault
 . shotsNeeded
-. shotsToHit
 . shotshellInterior
 . shotshellInteriorLoad
 . similarPowderRules

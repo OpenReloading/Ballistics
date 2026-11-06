@@ -704,6 +704,28 @@
           }
         ]
       }
+    },
+    {
+      "files": ["apps/e2e/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "@axe-core/playwright",
+                "message": "e2e-axe-settles: import AxeBuilder from tests/web/a11y.ts, which scans once the page's transitions have ended; a color midway through one fails color-contrast."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["apps/e2e/tests/web/a11y.ts"],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
     }
   ]
 }

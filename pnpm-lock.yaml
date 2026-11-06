@@ -169,6 +169,12 @@ importers:
       '@playwright/test':
         specifier: 'catalog:'
         version: 1.64.1
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.6.6
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
       vitest:
         specifier: 'catalog:'
         version: 5.0.5(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@5.0.5)(vite@8.3.5(@types/node@26.6.6)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
@@ -211,6 +217,9 @@ importers:
       '@open-reloading/shot-groups':
         specifier: workspace:*
         version: link:../../packages/shot-groups
+      '@open-reloading/statistics':
+        specifier: workspace:*
+        version: link:../../packages/statistics
       '@open-reloading/units':
         specifier: workspace:*
         version: link:../../packages/units
@@ -562,6 +571,9 @@ importers:
 
   packages/shot-groups:
     dependencies:
+      '@open-reloading/statistics':
+        specifier: workspace:*
+        version: link:../statistics
       '@open-reloading/units':
         specifier: workspace:*
         version: link:../units

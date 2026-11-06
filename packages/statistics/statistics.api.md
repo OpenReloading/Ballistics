@@ -17,6 +17,12 @@ export function chiSquareQuantile(p: number, df: number): number;
 export function chiSquareSurvival(x: number, df: number): number;
 
 // @public
+export type Diagnostic<C extends string = string, P extends object = Record<string, never>> = {
+    code: C;
+    params: P;
+};
+
+// @public
 export function fQuantileTwoNumeratorDegrees(p: number, m: number): number;
 
 // @public
@@ -40,7 +46,8 @@ export function identifiability(j: number[][]): Identifiability;
 
 // @public
 export class InputError extends RangeError {
-    constructor(message: string);
+    constructor(refusal: string | Diagnostic<string, object>);
+    readonly issue: Diagnostic<string, object> | undefined;
 }
 
 // @public
@@ -96,7 +103,7 @@ export type LogFitStop = 'stalled' | 'smallStep';
 export function logLeastSquares(fit: LogFitInput): LogFitResult;
 
 // @public
-export function need(ok: boolean, message: string): void;
+export function need(ok: boolean, refusal: string | Diagnostic<string, object>): void;
 
 // @public
 export function normalsFrom(uniform: () => number): () => number;

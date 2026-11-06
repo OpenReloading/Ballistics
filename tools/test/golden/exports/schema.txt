@@ -85,6 +85,7 @@
 . TargetSheet
 . TargetSheetRecord
 . Truing
+. TruingParameterSchema
 . TruingRow
 . UserBullet
 . UserCartridge
@@ -95,6 +96,7 @@
 . UserPowderFit
 . UserRecord
 . UserRecordKind
+. UserRecordSchema
 . UserRecords
 . analysisKinds
 . analysisOverrides

@@ -6,6 +6,9 @@ import { storeUnits } from './units.ts'
 import { applyExampleLoad } from './workbench.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
+// the printed QR code is read from a screenshot: at 96 dpi a module is 2.9 px, which jsQR cannot
+// read for some codes; at 3 x it is 8.6 px
+test.use({ deviceScaleFactor: 3 })
 
 /** The label in each language: German row names are longer, the label must still hold them. */
 const languages = [
@@ -32,7 +35,7 @@ for (const language of languages)
       ['Powder lot', 'P-2026-0412-A'],
       ['Primer lot', 'Z-778341'],
       ['Case lot', 'H-19-2203'],
-    ])
+    ] as const)
       await page.getByLabel(lot, { exact: true }).first().fill(text)
     await (await barButton(page, 'Save')).click()
     await expect(page.locator('.file-state')).toContainText('Saved')
@@ -71,6 +74,12 @@ test('a printed box label opens its load by photo, by camera and by its text', a
     ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
     window.print = () => {}
+    // record ids in order, not at random: the saved load's QR code is the same in every run
+    let n = Number(sessionStorage.getItem('e2e-ids') ?? 0)
+    crypto.randomUUID = () => {
+      sessionStorage.setItem('e2e-ids', String(++n))
+      return `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`
+    }
     // the fake camera: a canvas stream of the label image the test hands over, calls counted
     const w = window as unknown as Record<string, unknown>
     w.cameraCalls = 0
