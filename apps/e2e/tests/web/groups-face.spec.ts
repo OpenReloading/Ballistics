@@ -1,5 +1,5 @@
-import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page, test } from '@playwright/test'
+import { AxeBuilder } from './a11y.ts'
 import { gotoHydrated } from './nav.ts'
 import { toolbarPopover } from './target.ts'
 import { storeUnits } from './units.ts'
