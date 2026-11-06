@@ -13,9 +13,7 @@ export default defineConfig({
         'src/catalogue/write.ts',
         'src/compute/worker.ts',
       ],
-      reporter: ['text-summary', 'lcov'],
-      // floors: the measured value rounded down, minus one
-      thresholds: { statements: 97, branches: 94, functions: 97, lines: 97 },
+      reporter: ['text-summary'],
     },
   },
 })

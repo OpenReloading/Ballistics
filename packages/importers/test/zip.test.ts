@@ -11,7 +11,10 @@ const parts = workbookParts([{ name: 'S1', rows }])
 const withSheet = (change: Partial<Part>, more: Part[] = []) =>
   zip([...parts.map((p) => (p.name === sheet ? { ...p, ...change } : p)), ...more])
 
-describe('ZIP container', () => {
+/** Node's raw inflate as the function the reader takes. */
+const inflate = async (data: Uint8Array<ArrayBuffer>) => new Uint8Array(inflateRawSync(data))
+
+describe('ZIP container: archives, comments and inflate functions', () => {
   it('reads stored and deflated archives to the same worksheets', async () => {
     const deflated = await readWorkbook(xlsx([{ name: 'S1', rows }]))
     expect(await readWorkbook(xlsx([{ name: 'S1', rows }], 0))).toEqual(deflated)
@@ -24,7 +27,6 @@ describe('ZIP container', () => {
   })
 
   it('takes an inflate function', async () => {
-    const inflate = async (data: Uint8Array<ArrayBuffer>) => new Uint8Array(inflateRawSync(data))
     expect((await readWorkbook(xlsx([{ name: 'S1', rows }]), { inflate })).worksheets).toHaveLength(
       1,
     )
@@ -49,7 +51,9 @@ describe('ZIP container', () => {
       'ZIP64 archives are not read',
     )
   })
+})
 
+describe('ZIP container: data descriptors and refused entries', () => {
   it('reads entries with a data descriptor, stored and deflated', async () => {
     for (const method of [0, 8]) {
       const book = zip(parts.map((p) => ({ ...p, method, descriptor: true })))
