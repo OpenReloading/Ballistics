@@ -4,7 +4,6 @@ export default defineConfig({
   test: {
     testTimeout: 30_000,
     hookTimeout: 60_000,
-    // no thresholds: the run feeds the code quality gate
     coverage: {
       provider: 'v8',
       include: ['src/**/*.{ts,tsx}'],
@@ -14,7 +13,7 @@ export default defineConfig({
         // worker entries run in a Worker, which is not instrumented
         'src/**/*.worker.ts',
       ],
-      reporter: ['text-summary', 'lcov'],
+      reporter: ['text-summary'],
     },
   },
 })
