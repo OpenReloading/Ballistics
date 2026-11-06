@@ -20,7 +20,7 @@ export interface CellBudget {
 }
 
 /** Cell text trimmed and U+FEFF removed. */
-export const clean = (text: string) => text.replaceAll('﻿', '').trim()
+export const clean = (text: string): string => text.replaceAll('﻿', '').trim()
 
 /**
  * Places `text` at `column` (from 1) after the row's cells, gaps as empty text, counting the

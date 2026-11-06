@@ -49,5 +49,5 @@ export function readShotRows(
 }
 
 /** In a workbook the shots end at the first row whose first cell is neither empty nor a whole number. */
-export const workbookFooterStarts = (cells: string[]) =>
+export const workbookFooterStarts = (cells: string[]): boolean =>
   (cells[0] ?? '') !== '' && !/^\d+$/.test(cells[0] ?? '')

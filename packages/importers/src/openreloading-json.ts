@@ -33,7 +33,7 @@ export function isOpenReloadingJson(text: string): boolean {
   )
     return false
   const root = parse(text)
-  return isObj(root) && root.format === sessionJsonFormat
+  return isObj(root) && root['format'] === sessionJsonFormat
 }
 
 function fail(path: string, what: string): never {
@@ -51,10 +51,10 @@ function positive(o: Obj, key: string, path: string): number | undefined {
 
 /** The `device` member: kind (default `other`), manufacturer name and model as non-empty text when present. */
 function readDevice(root: Obj): SessionCandidate['device'] {
-  const d = root.device === undefined ? {} : root.device
+  const d = root['device'] === undefined ? {} : root['device']
   if (!isObj(d)) fail('device', 'must be an object')
   const dev = d as Obj
-  const kind = dev.kind === undefined ? 'other' : dev.kind
+  const kind = dev['kind'] === undefined ? 'other' : dev['kind']
   if (!deviceKinds.includes(kind as (typeof deviceKinds)[number]))
     fail('device.kind', `must be one of ${deviceKinds.join(', ')}`)
   for (const key of ['manufacturerName', 'model'])
@@ -62,8 +62,8 @@ function readDevice(root: Obj): SessionCandidate['device'] {
       fail(`device.${key}`, 'must be text')
   return {
     kind: kind as (typeof deviceKinds)[number],
-    manufacturerName: dev.manufacturerName as string | undefined,
-    model: dev.model as string | undefined,
+    manufacturerName: dev['manufacturerName'] as string | undefined,
+    model: dev['model'] as string | undefined,
   }
 }
 
@@ -74,14 +74,14 @@ function readShot(raw: unknown, p: string): ChronoShot {
   const v = positive(shot, 'velocity', p)
   if (v === undefined) fail(`${p}.velocity`, 'is required, in m/s')
   const out: ChronoShot = { velocity: { value: v as number, raw: `${v} m/s` } }
-  if (shot.coldBore !== undefined) {
-    if (typeof shot.coldBore !== 'boolean') fail(`${p}.coldBore`, 'must be true or false')
-    if (shot.coldBore) out.coldBore = true
+  if (shot['coldBore'] !== undefined) {
+    if (typeof shot['coldBore'] !== 'boolean') fail(`${p}.coldBore`, 'must be true or false')
+    if (shot['coldBore']) out.coldBore = true
   }
-  if (shot.excluded !== undefined) {
-    if (typeof shot.excluded !== 'string' || shot.excluded === '')
+  if (shot['excluded'] !== undefined) {
+    if (typeof shot['excluded'] !== 'string' || shot['excluded'] === '')
       fail(`${p}.excluded`, 'must be the reason as text')
-    out.excluded = shot.excluded as string
+    out.excluded = shot['excluded'] as string
   }
   return out
 }
@@ -91,53 +91,55 @@ function readStrings(root: Obj): {
   strings: { shots: ChronoShot[] }[]
   labels: (string | undefined)[]
 } {
-  if (!Array.isArray(root.strings) || root.strings.length === 0)
+  if (!Array.isArray(root['strings']) || root['strings'].length === 0)
     fail('strings', 'must list at least one string')
   const labels: (string | undefined)[] = []
-  const strings = (root.strings as unknown[]).map((s, i) => {
+  const strings = (root['strings'] as unknown[]).map((s, i) => {
     const at = `strings[${i}]`
     if (!isObj(s)) fail(at, 'must be an object')
     const str = s as Obj
-    if (str.label !== undefined && typeof str.label !== 'string')
+    if (str['label'] !== undefined && typeof str['label'] !== 'string')
       fail(`${at}.label`, 'must be text')
-    labels.push((str.label as string | undefined) || undefined)
-    if (!Array.isArray(str.shots) || str.shots.length === 0)
+    labels.push((str['label'] as string | undefined) || undefined)
+    if (!Array.isArray(str['shots']) || str['shots'].length === 0)
       fail(`${at}.shots`, 'must list at least one shot')
-    const shots = (str.shots as unknown[]).map((raw, j) => readShot(raw, `${at}.shots[${j}]`))
+    const shots = (str['shots'] as unknown[]).map((raw, j) => readShot(raw, `${at}.shots[${j}]`))
     return { shots }
   })
   return { strings, labels }
 }
 
 /**
- * An OpenReloading session JSON file, the format the session summary exports:
- * `{ "format": "openreloading-session", "version": 1, "date"?, "device"?: { "kind",
- * "manufacturerName"?, "model"? }, "muzzleDistance"? (m), "note"?, "strings": [{ "label"?, "shots": [{ "velocity" (m/s),
- * "coldBore"?, "excluded"? }] }] }`. Velocities are m/s. The muzzle distance is m in the file and mm
- * (the stored unit) in the session.
+ * An OpenReloading session JSON file, the format the session summary exports. Velocities are m/s.
+ * The muzzle distance is m in the file and mm (the stored unit) in the session.
+ *
+ * ```
+ * { "format": "openreloading-session", "version": 1, "date"?, "device"?: { "kind", "manufacturerName"?, "model"? },
+ *   "muzzleDistance"? (m), "note"?, "strings": [{ "label"?, "shots": [{ "velocity" (m/s), "coldBore"?, "excluded"? }] }] }
+ * ```
  */
 export function parseOpenReloadingJson(
   text: string,
   options: ChronoParserOptions = {},
 ): ChronoImport {
   const root = parse(text)
-  if (!isObj(root) || root.format !== sessionJsonFormat)
+  if (!isObj(root) || root['format'] !== sessionJsonFormat)
     throw new Error(
       `not an OpenReloading session JSON file: "format" must be "${sessionJsonFormat}"`,
     )
-  if (root.version !== 1)
-    throw new Error(`version ${String(root.version)} is not supported; expected 1`)
+  if (root['version'] !== 1)
+    throw new Error(`version ${String(root['version'])} is not supported; expected 1`)
   const warnings: string[] = []
 
   let date: string | undefined
-  if (root.date !== undefined) {
-    date = typeof root.date === 'string' ? yearFirstDate(root.date) : undefined
+  if (root['date'] !== undefined) {
+    date = typeof root['date'] === 'string' ? yearFirstDate(root['date']) : undefined
     if (!date) fail('date', 'must be a date as YYYY-MM-DD')
   }
 
   const device = readDevice(root)
   const distance = positive(root, 'muzzleDistance', '')
-  if (root.note !== undefined && (typeof root.note !== 'string' || root.note === ''))
+  if (root['note'] !== undefined && (typeof root['note'] !== 'string' || root['note'] === ''))
     fail('note', 'must be text')
   const { strings, labels } = readStrings(root)
 
@@ -150,7 +152,7 @@ export function parseOpenReloadingJson(
         ? {}
         : { muzzleDistance: { value: distance * 1000, raw: `${distance} m` } }),
       strings,
-      ...(root.note === undefined ? {} : { note: root.note as string }),
+      ...(root['note'] === undefined ? {} : { note: root['note'] as string }),
     },
     labels,
     warnings,
