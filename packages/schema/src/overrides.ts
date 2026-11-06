@@ -155,6 +155,12 @@ const {
   ...powderShape
 } = powder.shape
 
+/** `A` when `A` and `B` are the same type, optional keys included (which mutual assignability misses), else `never`. */
+/* oxlint-disable typescript/no-unnecessary-type-parameters -- the identity test compares two generic signatures, so each G appears once */
+type Identical<A, B> =
+  (<G>() => G extends A ? 1 : 2) extends <G>() => G extends B ? 1 : 2 ? A : never
+/* oxlint-enable typescript/no-unnecessary-type-parameters */
+
 const compositionDraftParser = z.object({
   name: z
     .string()
@@ -173,14 +179,6 @@ const compositionDraft: z.ZodObject<{
   max: z.ZodOptional<z.ZodNumber>
 }> = compositionDraftParser satisfies Exact<typeof compositionDraft, typeof compositionDraftParser>
 
-/** The fields of a powder draft that {@link powderDraft} types, in stored units. */
-type PowderDraftFields = Overrides<
-  Omit<
-    Powder,
-    'id' | 'manufacturer' | 'name' | 'country' | 'provenance' | 'composition' | 'listedCartridges'
-  >
-> & { composition?: z.infer<typeof compositionDraft>[] | null }
-
 /**
  * The fields of a powder in the powder designer while the draft is unfinished: any of the powder
  * record's fields but `id`, `manufacturer`, `name`, `country`, `provenance` and `listedCartridges`
@@ -192,11 +190,17 @@ type PowderDraftFields = Overrides<
  */
 // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- overridesOf builds the schema at run time, so its type is stated here
 export const powderDraft = overridesOf(
-  z.object({ ...powderShape, composition: z.array(compositionDraft).max(40) }),
+  z.object({
+    ...powderShape,
+    // the entry type PowderDraft writes out is that of compositionDraft, or the type resolves to never
+    composition: z.array(compositionDraft).max(40) satisfies z.ZodType<
+      Identical<NonNullable<PowderDraft['composition']>[number], z.infer<typeof compositionDraft>>[]
+    >,
+  }),
   'powder',
   [],
   true,
-) as z.ZodType<PowderDraftFields>
+) as z.ZodType<PowderDraft>
 
 /**
  * The overrides of a bullet record: any of its fields but `id`, `manufacturer` (the user bullet's
@@ -252,7 +256,21 @@ export const cartridgeOverrides = overridesOf(
 >
 
 /** The fields of a powder in the powder designer: a partial of {@link Powder} in stored units. */
-export type PowderDraft = z.infer<typeof powderDraft>
+export type PowderDraft = Overrides<
+  Omit<
+    Powder,
+    'id' | 'manufacturer' | 'name' | 'country' | 'provenance' | 'composition' | 'listedCartridges'
+  >
+> & {
+  composition?:
+    | {
+        name?: string | undefined
+        cas?: string | undefined
+        min?: number | undefined
+        max?: number | undefined
+      }[]
+    | null
+}
 /** The overrides of a bullet: a partial of {@link Bullet} in stored units. */
 export type BulletOverrides = z.infer<typeof bulletOverrides>
 /** The overrides of a cartridge: a partial of {@link Cartridge} in stored units. */

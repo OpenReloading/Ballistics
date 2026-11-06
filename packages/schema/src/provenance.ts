@@ -113,7 +113,7 @@ export const source: z.ZodObject<{
   /** An http or https URL: pages render it as a link. */
   url: z.ZodOptional<z.ZodURL>
   retrieved: z.ZodOptional<z.ZodISODate>
-  sha256: z.ZodOptional<typeof sha256>
+  sha256: z.ZodOptional<z.ZodString>
   /** Dot paths of the record fields this source supports; absent means the whole record. */
   fields: z.ZodOptional<z.ZodArray<z.ZodString>>
   /** Kind of this source's values when it differs from the record's provenance kind. */
