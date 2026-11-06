@@ -55,6 +55,7 @@
 . PublishedMark
 . PublishedPrimer
 . QuantityKind
+. QuantitySchema
 . QuantityValue
 . RangeFirings
 . RecordOfUser

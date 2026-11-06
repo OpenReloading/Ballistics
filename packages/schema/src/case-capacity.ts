@@ -1,17 +1,11 @@
 import { z } from 'zod'
 import type { Case } from './case.ts'
+import type { Exact } from './exact.ts'
 import { recordId, ref } from './ids.ts'
 import { type Provenance, provenance } from './provenance.ts'
-import { quantity } from './units.ts'
+import { type QuantitySchema, quantity } from './units.ts'
 
-/**
- * Water capacity of a case of one cartridge, from one source: the one entity of a catalogue
- * record (`records/capacities`), the user record of kind `caseCapacity` (a capacity the user
- * measured) and the capacity a load references. A catalogue capacity carries its `id` (the file
- * name), `provenance` and catalogue references only; a user capacity is named by its record.
- * Inferred type: {@link CaseCapacity}.
- */
-export const caseCapacity = z
+const caseCapacityParser = z
   .object({
     id: recordId.describe('Id of a catalogue capacity, the file name without `.json`.').optional(),
     origin: z
@@ -53,6 +47,27 @@ export const caseCapacity = z
       if (c[k] !== undefined && !c[k].startsWith('catalogue:'))
         issue([k], 'A catalogue capacity names catalogue records only')
   })
+
+/**
+ * Water capacity of a case of one cartridge, from one source: the one entity of a catalogue
+ * record (`records/capacities`), the user record of kind `caseCapacity` (a capacity the user
+ * measured) and the capacity a load references. A catalogue capacity carries its `id` (the file
+ * name), `provenance` and catalogue references only; a user capacity is named by its record.
+ * Inferred type: {@link CaseCapacity}.
+ */
+export const caseCapacity: z.ZodObject<{
+  id: z.ZodOptional<typeof recordId>
+  origin: z.ZodEnum<z.core.util.ToEnum<'catalogue' | 'user' | 'shared'>>
+  cartridge: z.ZodString
+  waterCapacity: QuantitySchema
+  caseManufacturer: z.ZodOptional<z.ZodString>
+  caseCondition: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'new' | 'fired' | 'sized'>>>
+  primerState: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'primed-spent' | 'unprimed'>>>
+  fillLevel: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'mouth'>>>
+  convention: z.ZodOptional<z.ZodNever>
+  note: z.ZodOptional<z.ZodString>
+  provenance: z.ZodOptional<typeof provenance>
+}> = caseCapacityParser satisfies Exact<typeof caseCapacity, typeof caseCapacityParser>
 
 /** A capacity of the catalogue (`records/capacities`): {@link caseCapacity} with `origin` `catalogue`. */
 export const catalogueCaseCapacity: z.ZodType<CatalogueCaseCapacity> = caseCapacity.refine(
