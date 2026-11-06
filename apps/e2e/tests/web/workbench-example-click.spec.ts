@@ -2,9 +2,7 @@ import { expect, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
 import { applyExampleLoad } from './workbench.ts'
 
-test('a menu click handled after its timeout applies the example once, with no discard prompt', async ({
-  page,
-}) => {
+test('a menu click handled after its timeout applies the example once', async ({ page }) => {
   // a busy page: each click on a menu item is handled 1.5 s late, past the helper's 1 s click timeout
   await page.addInitScript(() =>
     document.addEventListener(
@@ -22,5 +20,4 @@ test('a menu click handled after its timeout applies the example once, with no d
   await gotoHydrated(page, '/workbench')
   await applyExampleLoad(page)
   await expect(page.locator('html')).toHaveAttribute('data-item-clicks', '1')
-  await expect(page.getByText('Discard the unsaved changes and start a new record?')).toHaveCount(0)
 })

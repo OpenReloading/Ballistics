@@ -181,7 +181,8 @@ async function openTab(page: Page, name: string) {
       () => true,
       () => false,
     ))
-  // a click that lands after its timeout shows the panel: the More menu does not list a shown tab
+  // a click that lands after its timeout shows the panel: the More menu lists only the tabs that
+  // do not fit in the row
   if (!clicked && !(await panel.isVisible())) {
     await more.click()
     await page.getByRole('menuitem', { name }).click()
