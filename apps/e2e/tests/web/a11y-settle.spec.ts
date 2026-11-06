@@ -23,6 +23,6 @@ test('a page still moving after 5 s fails the scan, which names what runs', asyn
     @keyframes slide { to { translate: 1em } }
   </style><main><p class="far">Text</p></main></html>`)
   await expect(new AxeBuilder({ page }).analyze()).rejects.toThrow(
-    /still moves .*: slide on p\.far$/,
+    /still moves after 5000 ms.*: slide on p\.far\b/,
   )
 })
