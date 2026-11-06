@@ -9,8 +9,8 @@ import {
   zeroAngles,
 } from '@open-reloading/core'
 import { pointDispersion } from '@open-reloading/shot-groups'
+import { normalsFrom, seededUniforms } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import { normals } from './normals.ts'
 
 describe('velocity term against sampled muzzle speeds', () => {
   const distances = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
@@ -47,7 +47,7 @@ describe('velocity term against sampled muzzle speeds', () => {
         trajectory(shot(v, bore), distances, options).points.map((p) => p.height)
       const nominal = heights(v0)
       const slope = heights(v0 + 1).map((h, i) => h - (nominal[i] ?? 0))
-      const draw = normals(seed)
+      const draw = normalsFrom(seededUniforms(seed))
       const intrinsic = 0.006
       const columns = distances.map(() => [] as number[])
       for (let n = 0; n < 4000; n++) {

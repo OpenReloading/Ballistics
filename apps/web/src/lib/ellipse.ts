@@ -9,4 +9,3 @@ export {
   meanRadius,
   ransacEllipse,
 } from '@open-reloading/shot-groups'
-export { seededUniforms as seededRandom } from '@open-reloading/statistics'

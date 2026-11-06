@@ -4,6 +4,7 @@
 // Synthetic case: a circular normal dispersion of 1 (all lengths in units of sigma).
 // shot-groups by its build (after `pnpm run build`), so core does not depend on it: the API image
 // builds core's dependencies
+// shortcut: a path into another workspace's build; move the script to shot-groups when core empties (W3.4)
 import { ellipseProbability, shotsToHit } from '../../shot-groups/dist/index.js'
 import { normals } from './rng.mts'
 

@@ -4,7 +4,7 @@
  * test reads the files, so JPEG artefacts, blur and noise are part of the fixture.
  */
 
-import { seededRandom } from '../../../src/lib/ellipse.ts'
+import { seededUniforms } from '@open-reloading/statistics'
 import { defined } from '../../defined.ts'
 
 type Rgb = [number, number, number]
@@ -242,7 +242,7 @@ export function tilted(s: Scene, p: { x: number; y: number }, inverse = false) {
 
 /** RGB bytes of the photo before blur and compression. */
 export function render(s: Scene): Uint8Array {
-  const rnd = seededRandom(s.width * 31 + s.holes.length)
+  const rnd = seededUniforms(s.width * 31 + s.holes.length)
   const phase = s.holes.flatMap(() => [rnd() * 6, rnd() * 6])
   const out = new Uint8Array(s.width * s.height * 3)
   for (let v = 0; v < s.height; v++)

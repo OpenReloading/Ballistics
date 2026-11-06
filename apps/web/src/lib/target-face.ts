@@ -5,7 +5,9 @@
  * centre and scale from two or more concentric ellipses (the conic pencil). Pure: no React, DOM or
  * Next.js, so it runs in the Web Worker.
  */
+
 import type { TargetFace } from '@open-reloading/schema'
+import { seededUniforms } from '@open-reloading/statistics'
 import {
   concentricPlane,
   conicOf,
@@ -14,7 +16,6 @@ import {
   largestGap,
   meanRadius,
   ransacEllipse,
-  seededRandom,
 } from './ellipse.ts'
 import {
   blackAreas,
@@ -226,7 +227,7 @@ function groupFragments(components: Point[][], uOf: RadiusOf): Point[][] {
 
 /** One robust ellipse per group of ridge points (`rb` the black radius, grid px), as rings in image px. */
 function fitRingGroups(fine: Grid, groups: Point[][], rb: number): Ring[] {
-  const rnd = seededRandom(7)
+  const rnd = seededUniforms(7)
   const rings: Ring[] = []
   for (const pts of groups) {
     if (pts.length < Math.max(30, 0.5 * rb)) continue
