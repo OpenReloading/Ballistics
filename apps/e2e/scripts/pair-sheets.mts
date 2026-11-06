@@ -7,7 +7,7 @@ import path from 'node:path'
 import { chromium } from '@playwright/test'
 
 const [before, after, out] = process.argv.slice(2)
-if (!out) {
+if (!before || !after || !out) {
   console.error('usage: node scripts/pair-sheets.mts <before> <after> <out>')
   process.exit(1)
 }
@@ -31,8 +31,8 @@ const groups = new Map<string, { stem: string; files: [string, string] }[]>()
 for (const [key, file] of a) {
   const other = b.get(key)
   if (!other) continue
-  const [table, rest] = key.split('/')
-  const [stem, theme, width] = rest.split('__')
+  const [table, rest = ''] = key.split('/')
+  const [stem = '', theme, width] = rest.split('__')
   const group = `${table}__${theme}__${width}`
   groups.set(group, [...(groups.get(group) ?? []), { stem, files: [file, other] }])
 }
