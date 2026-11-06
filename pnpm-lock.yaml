@@ -478,6 +478,9 @@ importers:
       '@open-reloading/schema':
         specifier: workspace:*
         version: link:../schema
+      '@open-reloading/units':
+        specifier: workspace:*
+        version: link:../units
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: 'catalog:'

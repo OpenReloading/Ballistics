@@ -284,7 +284,6 @@ export const caseCapacity: z.ZodObject<{
     caseCondition: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'new' | 'fired' | 'sized'>>>;
     primerState: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'primed-spent' | 'unprimed'>>>;
     fillLevel: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'mouth'>>>;
-    convention: z.ZodOptional<z.ZodNever>;
     note: z.ZodOptional<z.ZodString>;
     provenance: z.ZodOptional<typeof provenance>;
 }>;
@@ -807,9 +806,6 @@ export const ladderStepKinds: {
 
 // @public
 export function leadFree(c: ConstructionFields | undefined): boolean | undefined;
-
-// @public
-export const legacyLoadProblem: string;
 
 // @public
 export interface Load extends z.infer<typeof load> {

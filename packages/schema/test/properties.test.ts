@@ -114,7 +114,7 @@ it('leaves the base untouched and keeps it whole under empty overrides', () => {
 
 it('drops the records of unknown kinds only, in order, and counts each such kind', () => {
   const unknownKinds: unknown[] = ['eventOfALaterVersion', 'other']
-  const kind = fc.constantFrom('bullet', 'load', 'workbenchState', 7, ...unknownKinds)
+  const kind = fc.constantFrom('bullet', 'load', 7, ...unknownKinds)
   const records = fc.array(fc.record({ kind, id: word }))
   fc.assert(
     fc.property(records, (rs) => {

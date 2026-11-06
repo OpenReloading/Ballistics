@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { caseCapacity, catalogueCaseCapacity, loadWaterCapacity, userRecord } from '../src/index.ts'
-import { expectIssueAt, issuePaths } from './issue-at.ts'
+import { expectIssueAt } from './issue-at.ts'
 
 const provenance = { kind: 'published', sources: [{ title: 'Example manual' }] }
 const catalogue = {
@@ -33,7 +33,7 @@ describe('CaseCapacity', () => {
     expect(catalogueCaseCapacity.safeParse(user).success).toBe(false)
   })
 
-  it('takes an optional primer state and fill level, and rejects the old convention text', () => {
+  it('takes an optional primer state and fill level', () => {
     expect(caseCapacity.parse(user).primerState).toBeUndefined()
     expect(caseCapacity.parse(user).fillLevel).toBeUndefined()
     for (const primerState of ['primed-spent', 'unprimed'])
@@ -43,9 +43,6 @@ describe('CaseCapacity', () => {
     )
     expectIssueAt(caseCapacity, { ...user, primerState: 'primed' }, 'primerState')
     expectIssueAt(caseCapacity, { ...user, fillLevel: 'shoulder' }, 'fillLevel')
-    const convention = 'to the mouth, water at 20 C, primer seated'
-    expect(issuePaths(caseCapacity, { ...user, convention })).toEqual(['convention'])
-    expect(issuePaths(catalogueCaseCapacity, { ...catalogue, convention })).toEqual(['convention'])
     expect(catalogueCaseCapacity.parse({ ...catalogue, primerState: 'unprimed' }).primerState).toBe(
       'unprimed',
     )

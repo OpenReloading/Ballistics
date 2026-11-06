@@ -1,4 +1,5 @@
 // The record kinds a table is read as and the fields each one maps.
+import { conversions } from '@open-reloading/units'
 
 /** A kind of user record a table is read as. */
 export type TableKind = 'bullet' | 'powder' | 'cartridge'
@@ -29,14 +30,14 @@ const unit = (symbol: string, factor: number, named?: true): ColumnUnit => ({
   ...(named && { named }),
 })
 
-// exact by definition (NIST SP 811, Appendix B.9): 1 in = 25.4 mm, 1 gr = 64.79891 mg, 1 lb = 0.45359237 kg, standard gravity 9.80665 m/s2
-const inch = 0.0254
-const pound = 0.45359237
-const lengthUnits = [unit('mm', 1), unit('in', 25.4), unit('cm', 10)]
-const massUnits = [unit('g', 1), unit('gr', 0.06479891)]
+// the customary factors come from the conversion table (SI per unit), turned into mm, g and bar here
+const inch = conversions.in.factor
+const pound = conversions.lb.factor
+const lengthUnits = [unit('mm', 1), unit('in', inch / conversions.mm.factor), unit('cm', 10)]
+const massUnits = [unit('g', 1), unit('gr', conversions.gr.factor * 1000)]
 const coefficientUnits = [unit('lb/in2', 1), unit('kg/m2', inch ** 2 / pound)]
 const densityUnits = [unit('g/cm3', 1)]
-export const psi: number = (pound * 9.80665) / inch ** 2 / 1e5
+export const psi: number = conversions.psi.factor / conversions.bar.factor
 // the values of MPa and kpsi fall in the usual bar range too, so only a header names them
 const pressureUnits = [
   unit('bar', 1),

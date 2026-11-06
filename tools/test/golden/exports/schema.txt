@@ -151,7 +151,6 @@
 . isWebLink
 . ladderStepKinds
 . leadFree
-. legacyLoadProblem
 . load
 . loadAnalysis
 . loadTable
