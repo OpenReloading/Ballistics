@@ -744,12 +744,15 @@ function integrate(
   until: Pick<Rk45Options, 'stepsBefore' | 'maxTime' | 'initialStep'>,
 ): ReturnType<typeof rk45> | InteriorInvalid {
   try {
-    return rk45(rhs, tau, y, events, {
-      relativeTolerance: options.relativeTolerance,
-      absoluteTolerance: options.absoluteTolerance,
-      maxSteps: options.maxSteps,
-      ...until,
-    })
+    return rk45(
+      { f: rhs, t0: tau, y0: y, events },
+      {
+        relativeTolerance: options.relativeTolerance,
+        absoluteTolerance: options.absoluteTolerance,
+        maxSteps: options.maxSteps,
+        ...until,
+      },
+    )
   } catch (err) {
     if (err instanceof InputError) return { valid: false, reason: 'integration' }
     throw err

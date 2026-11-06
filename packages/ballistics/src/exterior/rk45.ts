@@ -6,7 +6,7 @@
 import { InputError, nth } from '@open-reloading/statistics'
 
 /** Unchecked read of a state vector the caller sizes and indexes by the same count (kept in this module so the integrator loops inline it). */
-const el = (a: Float64Array, i: number): number => a[i] as number
+const el = (a: Float64Array, i: number): number => a[i] ?? 0
 
 /** Right-hand side: writes dy/dt at (t, y) into `dy`. */
 export type Rhs = (t: number, y: Float64Array, dy: Float64Array) => void
@@ -118,7 +118,9 @@ const d7 = 69997945 / 29380423
 function crosses(g0: number, g1: number, direction: -1 | 0 | 1): boolean {
   const rising = g0 < 0 && g1 >= 0
   const falling = g0 > 0 && g1 <= 0
-  return direction > 0 ? rising : direction < 0 ? falling : rising || falling
+  if (direction > 0) return rising
+  if (direction < 0) return falling
+  return rising || falling
 }
 
 /**
@@ -171,27 +173,29 @@ interface Work {
   /** f at the end of the step. */
   k7: Float64Array
   tmp: Float64Array
+  /** The fifth-order state at the end of the last step; swapped with the state after an accepted step. */
+  out: Float64Array
   r2: Float64Array
   r3: Float64Array
   r4: Float64Array
   r5: Float64Array
 }
 
+/** One `rk45` call: the right-hand side, the scratch vectors and the options with the tolerances. */
+interface Integration {
+  f: Rhs
+  work: Work
+  options: Rk45Options
+}
+
 /**
  * One Dormand-Prince step of size h from (t, y) with `work.k1` = f(t, y); writes the fifth-order
- * state into `out`, f there into `work.k7`, and returns the error norm.
+ * state into `work.out`, f there into `work.k7`, and returns the error norm.
  */
-function dormandPrinceStep(
-  f: Rhs,
-  work: Work,
-  t: number,
-  y: Float64Array,
-  h: number,
-  out: Float64Array,
-  relativeTolerance: number,
-  absoluteTolerance: number,
-): number {
-  const { n, k1, k2, k3, k4, k5, k6, k7, tmp } = work
+function dormandPrinceStep(run: Integration, t: number, y: Float64Array, h: number): number {
+  const { f, work } = run
+  const { relativeTolerance, absoluteTolerance } = run.options
+  const { n, k1, k2, k3, k4, k5, k6, k7, tmp, out } = work
   for (let i = 0; i < n; i++) tmp[i] = el(y, i) + h * a21 * el(k1, i)
   f(t + c2 * h, tmp, k2)
   for (let i = 0; i < n; i++) tmp[i] = el(y, i) + h * (a31 * el(k1, i) + a32 * el(k2, i))
@@ -229,14 +233,9 @@ function dormandPrinceStep(
 }
 
 /** Starting step size at (t, y), s (Hairer, Norsett and Wanner 1993, section II.4); uses `work.k2`. */
-function startingStep(
-  f: Rhs,
-  work: Work,
-  t: number,
-  y: Float64Array,
-  relativeTolerance: number,
-  absoluteTolerance: number,
-): number {
+function startingStep(run: Integration, t: number, y: Float64Array): number {
+  const { f, work } = run
+  const { relativeTolerance, absoluteTolerance } = run.options
   const { n, k1, k2, tmp } = work
   const sc = (i: number) => absoluteTolerance + relativeTolerance * Math.abs(el(y, i))
   const dy0 = rms(n, (i) => el(y, i) / sc(i))
@@ -279,33 +278,43 @@ function denseOutput(
   }
 }
 
+/** The events whose function changed sign over a step and their function values at both ends of it. */
+interface Crossings {
+  crossed: readonly number[]
+  before: readonly number[]
+  after: readonly number[]
+}
+
+/** A step of size h from t with its dense output. */
+interface DenseStep {
+  t: number
+  h: number
+  dense: (s: number) => Float64Array
+}
+
 /**
- * Roots of the `crossed` events on the step of size h from t; appends the non-terminal roots before
- * the first terminal root to `hits` in time order and returns that terminal root as a step fraction.
+ * Roots of the crossed events on the step: the non-terminal roots before the first terminal root, in
+ * time order, and that terminal root as a step fraction.
  */
 function locateEvents(
   events: readonly Rk45Event[],
-  crossed: readonly number[],
-  gPrev: readonly number[],
-  gNew: readonly number[],
-  t: number,
-  h: number,
-  dense: (s: number) => Float64Array,
-  hits: Rk45Hit[],
-): { i: number; s: number } | null {
+  { crossed, before, after }: Crossings,
+  { t, h, dense }: DenseStep,
+): { stop: { i: number; s: number } | null; hits: Rk45Hit[] } {
   const tol = minStep / h
   const roots = crossed.map((i) => {
     const { eventFunction } = nth(events, i)
-    const s = root((x) => eventFunction(t + x * h, dense(x)), nth(gPrev, i), nth(gNew, i), tol)
+    const s = root((x) => eventFunction(t + x * h, dense(x)), nth(before, i), nth(after, i), tol)
     return { i, s }
   })
   let stop: { i: number; s: number } | null = null
   for (const r of roots) if (nth(events, r.i).terminal && (!stop || r.s < stop.s)) stop = r
-  for (const r of roots.sort((p, q) => p.s - q.s)) {
+  const hits: Rk45Hit[] = []
+  for (const r of roots.toSorted((p, q) => p.s - q.s)) {
     if (nth(events, r.i).terminal || (stop && r.s > stop.s)) continue
     hits.push({ event: r.i, t: t + r.s * h, y: dense(r.s) })
   }
-  return stop
+  return { stop, hits }
 }
 
 /** The scratch vectors of one integration, `n` states long. */
@@ -321,6 +330,7 @@ function makeWork(n: number): Work {
     k6: make(),
     k7: make(),
     tmp: make(),
+    out: make(),
     r2: make(),
     r3: make(),
     r4: make(),
@@ -346,18 +356,12 @@ function crossedEvents(events: readonly Rk45Event[], gPrev: number[], gNew: numb
 }
 
 /** The fifth-order state at an event `hs` into the step from `y` at `t`. */
-function reStepToEvent(
-  f: Rhs,
-  work: Work,
-  t: number,
-  y: Float64Array,
-  hs: number,
-  options: Rk45Options,
-) {
-  const out = new Float64Array(work.n)
-  if (hs > 0)
-    dormandPrinceStep(f, work, t, y, hs, out, options.relativeTolerance, options.absoluteTolerance)
-  else out.set(y)
+function reStepToEvent(run: Integration, t: number, y: Float64Array, hs: number) {
+  const out = new Float64Array(run.work.n)
+  if (hs > 0) {
+    dormandPrinceStep(run, t, y, hs)
+    out.set(run.work.out)
+  } else out.set(y)
   return out
 }
 
@@ -378,30 +382,60 @@ function checkMinStep(h: number) {
 }
 
 /** The step size to start with: the given one, or the automatic choice when none is positive. */
-function firstStep(f: Rhs, work: Work, t: number, y: Float64Array, options: Rk45Options) {
-  const given = options.initialStep ?? 0
+function firstStep(run: Integration, t: number, y: Float64Array) {
+  const given = run.options.initialStep ?? 0
   if (given > 0) return given
-  return startingStep(f, work, t, y, options.relativeTolerance, options.absoluteTolerance)
+  return startingStep(run, t, y)
+}
+
+/** After an accepted step, f at its end is f at the start of the next one (first same as last). */
+function reuseLastStage(work: Work) {
+  const k = work.k1
+  work.k1 = work.k7
+  work.k7 = k
+}
+
+/** The terminal event the step from `y` at `t` reaches, with the non-terminal hits before it added to `hits`. */
+function eventEnd(
+  run: Integration,
+  events: readonly Rk45Event[],
+  crossings: Crossings,
+  step: { t: number; y: Float64Array; h: number; hits: Rk45Hit[] },
+) {
+  const { t, y, h, hits } = step
+  const found = locateEvents(events, crossings, {
+    t,
+    h,
+    dense: denseOutput(run.work, y, run.work.out, h),
+  })
+  hits.push(...found.hits)
+  if (!found.stop) return null
+  const { i, s } = found.stop
+  return { t: t + h * s, y: reStepToEvent(run, t, y, h * s), event: i }
+}
+
+/** An initial value problem: y' = f(t, y) from `y0` at `t0`, with the events to watch on the way. */
+export interface Rk45Problem {
+  /** The right-hand side. */
+  f: Rhs
+  /** Start time, s. */
+  t0: number
+  /** State at `t0`; not changed. */
+  y0: Float64Array
+  /** Events watched on the way. */
+  events: readonly Rk45Event[]
 }
 
 /** Integrates y' = f(t, y) from t0 until a terminal event or `maxTime`. */
-export function rk45(
-  f: Rhs,
-  t0: number,
-  y0: Float64Array,
-  events: readonly Rk45Event[],
-  options: Rk45Options,
-): Rk45Result {
-  const { relativeTolerance, absoluteTolerance, maxTime, budget } = options
-  const n = y0.length
-  const make = () => new Float64Array(n)
-  let y = Float64Array.from(y0)
-  const work = makeWork(n)
-  let ynew = make()
+export function rk45(problem: Rk45Problem, options: Rk45Options): Rk45Result {
+  const { f, t0, y0, events } = problem
+  const { maxTime, budget } = options
+  const run: Integration = { f, work: makeWork(y0.length), options }
+  let y: Float64Array = Float64Array.from(y0)
   let t = t0
-  f(t, y, work.k1)
+  f(t, y, run.work.k1)
 
-  let h = firstStep(f, work, t, y, options)
+  let h = firstStep(run, t, y)
 
   let gPrev = events.map((e) => e.eventFunction(t, y))
   const hits: Rk45Hit[] = []
@@ -412,7 +446,7 @@ export function rk45(
     checkStepLimits(steps, options)
     const clipped = h >= maxTime - t
     h = clipped ? maxTime - t : checkMinStep(h)
-    const err = dormandPrinceStep(f, work, t, y, h, ynew, relativeTolerance, absoluteTolerance)
+    const err = dormandPrinceStep(run, t, y, h)
     steps++
     if (budget) budget.used++
     if (!(err <= 1)) {
@@ -421,24 +455,18 @@ export function rk45(
       continue
     }
     const t1 = clipped ? maxTime : t + h
+    const ynew = run.work.out
     const gNew = events.map((e) => e.eventFunction(t1, ynew))
 
     const crossed = crossedEvents(events, gPrev, gNew)
     if (crossed.length > 0) {
-      const dense = denseOutput(work, y, ynew, h)
-      const stop = locateEvents(events, crossed, gPrev, gNew, t, h, dense, hits)
-      if (stop) {
-        const out = reStepToEvent(f, work, t, y, h * stop.s, options)
-        return { t: t + h * stop.s, y: out, event: stop.i, hits, steps, h }
-      }
+      const end = eventEnd(run, events, { crossed, before: gPrev, after: gNew }, { t, y, h, hits })
+      if (end) return { ...end, hits, steps, h }
     }
 
-    const swap = y
+    run.work.out = y
     y = ynew
-    ynew = swap
-    const k = work.k1
-    work.k1 = work.k7
-    work.k7 = k
+    reuseLastStage(run.work)
     t = t1
     gPrev = gNew
     h *= growFactor(err, rejected)

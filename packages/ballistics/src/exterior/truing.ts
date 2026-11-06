@@ -224,16 +224,31 @@ function observedPoints(u: Run, t: ReturnType<typeof trajectory>): Prediction | 
   return { values, points }
 }
 
+/** The parameters of a fit at log parameters theta: their values, and the estimate a failure reports. */
+interface ParameterMap {
+  q: (theta: number[]) => number[]
+  estimate: (theta: number[]) => TruedParameter[]
+}
+
+/** The parameter map of `specs`: each value is the initial value times exp(theta). */
+function parameterMap(specs: Spec[]): ParameterMap {
+  const q = (theta: number[]) => specs.map((s, j) => s.initial * Math.exp(nth(theta, j)))
+  const estimate = (theta: number[]): TruedParameter[] => {
+    const values = q(theta)
+    return specs.map((s, j) => ({ ...s, value: nth(values, j) }))
+  }
+  return { q, estimate }
+}
+
 /**
  * Flies each session at the parameters `q(trial)` with the trajectory options `o`; a failure once
  * `budget` is spent throws `step-budget` with the estimate at `current`.
  */
 function predictSessions(
   runs: readonly Run[],
-  q: (theta: number[]) => number[],
+  { q, estimate }: ParameterMap,
   o: Settings<TrajectoryOptions>,
   budget: StepBudget,
-  estimate: (theta: number[]) => TruedParameter[],
 ): Predictor {
   const predictRun = (
     u: Run,
@@ -274,15 +289,12 @@ function predictSessions(
   return predictor
 }
 
-/** Result of the fit from the solver's solution, the fitted values and the solution's predictions. */
+/** Result of the fit from the solver's solution, the fitted values and the solution's predictions, and what it took. */
 function truingResult(
   runs: readonly Run[],
   specs: Spec[],
-  fit: LogFitResult,
-  values: number[],
-  final: Prediction,
-  trajectories: number,
-  steps: number,
+  { fit, values, final }: { fit: LogFitResult; values: number[]; final: Prediction },
+  { trajectories, steps }: { trajectories: number; steps: number },
 ): SessionsTruingResult {
   const observations = runs.flatMap((u) => u.observations)
   const owner = runs.flatMap((u, k) => u.observations.map(() => k))
@@ -321,6 +333,42 @@ function truingResult(
   }
 }
 
+/** The scale of an observation its Jacobian floor is relative to: the range of a height, the size of a velocity, else 1. */
+function observationScale(x: Observation): number {
+  if (x.kind === 'height') return x.range
+  if (x.kind === 'velocity') return Math.abs(x.value)
+  return 1
+}
+
+/** The trajectory options of a fit: tight tolerances unless given, and the shared step budget. */
+function fitTrajectoryOptions(
+  rest: Settings<TrajectoryOptions>,
+  budget: StepBudget,
+): Settings<TrajectoryOptions> {
+  return {
+    ...overlay<Settings<TrajectoryOptions>>(
+      { relativeTolerance: 1e-10, absoluteTolerance: 1e-9, zeroTolerance: 1e-9 },
+      rest,
+    ),
+    budget,
+  }
+}
+
+/** The predictions the solver asks for: one session's, or all of them, which `full` keeps by their values. */
+function solverPredict(
+  predictor: Predictor,
+  runs: readonly Run[],
+  full: WeakMap<readonly number[], Prediction>,
+) {
+  return (trial: number[], current: number[], run?: number): number[] | null => {
+    if (run !== undefined)
+      return predictor.predictRun(nth(runs, run), trial, current, false)?.values ?? null
+    const p = predictor.predict(trial, current)
+    if (p) full.set(p.values, p)
+    return p?.values ?? null
+  }
+}
+
 /**
  * Levenberg-Marquardt on the log parameters over the stacked runs
  * (`apps/docs/docs/models/least-squares.md`, "Levenberg-Marquardt step"; `apps/docs/docs/models/exterior-truing.md`, "Observations and cost").
@@ -332,35 +380,19 @@ function leastSquares(
 ): SessionsTruingResult {
   const observations = runs.flatMap((u) => u.observations)
   const { maxIterations = 30, maxCondition = 1e3, maxTotalSteps = Infinity, ...rest } = options
-  const n = observations.length
   const np = specs.length
   need(maxTotalSteps > 0, 'maxTotalSteps must be positive')
-  if (n < np) throw new TruingError('underdetermined')
+  if (observations.length < np) throw new TruingError('underdetermined')
   const budget = { used: 0, max: maxTotalSteps }
-  const o: Settings<TrajectoryOptions> = {
-    ...overlay<Settings<TrajectoryOptions>>(
-      { relativeTolerance: 1e-10, absoluteTolerance: 1e-9, zeroTolerance: 1e-9 },
-      rest,
-    ),
-    budget,
-  }
+  const o = fitTrajectoryOptions(rest, budget)
   const sigma = observations.map((x) => x.standardUncertainty ?? 1)
   // a Jacobian entry below 1e-6 of the observation's scale per unit log parameter is noise
-  const floor = observations.map(
-    (x, i) =>
-      (1e-6 * (x.kind === 'height' ? x.range : x.kind === 'velocity' ? Math.abs(x.value) : 1)) /
-      nth(sigma, i),
-  )
-  const q = (theta: number[]) => specs.map((s, j) => s.initial * Math.exp(nth(theta, j)))
-  const estimate = (theta: number[]): TruedParameter[] => {
-    const values = q(theta)
-    return specs.map((s, j) => ({ ...s, value: nth(values, j) }))
-  }
-  const predictor = predictSessions(runs, q, o, budget, estimate)
-  const { predictRun, predict } = predictor
+  const floor = observations.map((x, i) => (1e-6 * observationScale(x)) / nth(sigma, i))
+  const params = parameterMap(specs)
+  const predictor = predictSessions(runs, params, o, budget)
 
   const zero = specs.map(() => 0)
-  const first = predict(zero, zero, true)
+  const first = predictor.predict(zero, zero, true)
   if (!first) throw new TruingError('unreachable')
   // full predictions by their values, so the solution's points come without another run
   const full = new WeakMap<readonly number[], Prediction>([[first.values, first]])
@@ -371,13 +403,7 @@ function leastSquares(
     weighted: observations.every((x) => x.standardUncertainty !== undefined),
     floor,
     first: first.values,
-    predict: (trial, current, run) => {
-      if (run !== undefined)
-        return predictRun(nth(runs, run), trial, current, false)?.values ?? null
-      const p = predict(trial, current)
-      if (p) full.set(p.values, p)
-      return p?.values ?? null
-    },
+    predict: solverPredict(predictor, runs, full),
     runs: runs.map((u) => u.observations.length),
     // a session parameter moves only its own session's predictions
     moves: (j, run) => {
@@ -387,12 +413,16 @@ function leastSquares(
     maxIterations,
     maxCondition,
     fail: (reason, theta, extra = {}) => {
-      throw new TruingError(reason, { ...extra, estimate: estimate(theta) })
+      throw new TruingError(reason, { ...extra, estimate: params.estimate(theta) })
     },
   })
   const final = full.get(fit.predicted)
   if (!final) throw new TruingError('unreachable')
-  return truingResult(runs, specs, fit, q(fit.theta), final, predictor.trajectories, budget.used)
+  const solution = { fit, values: params.q(fit.theta), final }
+  return truingResult(runs, specs, solution, {
+    trajectories: predictor.trajectories,
+    steps: budget.used,
+  })
 }
 
 function checkObservations(observations: readonly Observation[]): void {
@@ -486,7 +516,9 @@ export function dragCorrection(
   // a knot replaces a base node within 1e-9 relative: a closer pair makes the cubic's node slopes
   // rounding noise
   const near = (m: number) => knots.some((k) => Math.abs(m - k) <= 1e-9 * k)
-  const nodes = [...base.map((x) => x[0]).filter((m) => !near(m)), ...knots].sort((a, b) => a - b)
+  const nodes = [...base.map((x) => x[0]).filter((m) => !near(m)), ...knots].toSorted(
+    (a, b) => a - b,
+  )
   return (f) => {
     const factor: DragTable = knots.map((m, k) => [m, nth(f, k)] as const)
     return {
@@ -516,7 +548,12 @@ export function trueDrag(
   const { knots, fitMuzzleVelocity = false } = spec
   // the whole shot as the session shot keeps the key order of the trued shot
   return single(
-    fitDrag(shot.projectile, [{ shot, observations, fitMuzzleVelocity }], knots, options, false),
+    fitDrag(
+      shot.projectile,
+      [{ shot, observations, fitMuzzleVelocity }],
+      { knots, tag: false },
+      options,
+    ),
   )
 }
 
@@ -586,15 +623,20 @@ export function trueDragSessions(
   spec: { knots?: readonly number[] | undefined } = {},
   options?: TruingOptions,
 ): SessionsTruingResult {
-  return fitDrag(projectile, sessions, spec.knots, options, true)
+  return fitDrag(projectile, sessions, { knots: spec.knots, tag: true }, options)
+}
+
+/** A drag fit: the knots of the drag factor, and whether parameters and residuals name their session. */
+interface DragFit {
+  knots: readonly number[] | undefined
+  tag: boolean
 }
 
 function fitDrag(
   projectile: Projectile,
   sessions: readonly TruingSession[],
-  knots: readonly number[] | undefined,
+  { knots, tag }: DragFit,
   options: TruingOptions | undefined,
-  tag: boolean,
 ): SessionsTruingResult {
   need(sessions.length > 0, 'at least one session')
   checkObservations(sessions.flatMap((x) => x.observations))

@@ -123,8 +123,8 @@ export function speedOfSound(air: Air): number {
   return Math.sqrt((cp / (cp - 1)) * gas * air.temperature)
 }
 
-/** Rejects air outside the model's limits with an InputError; returns the air unchanged. */
-export function checkAir(air: Air): Air {
+/** Rejects an altitude, temperature, humidity or pressure outside the model's limits with an InputError. */
+function checkAirValues(air: Air): void {
   const { altitude, pressure, temperature, humidity } = air
   if (!(altitude >= minAltitude && altitude <= icao.tropopause))
     throw new InputError(`altitude ${altitude} m outside ${minAltitude} to ${icao.tropopause} m`)
@@ -133,6 +133,12 @@ export function checkAir(air: Air): Air {
   if (!(humidity >= 0 && humidity <= 1)) throw new InputError(`humidity ${humidity} outside 0..1`)
   if (!(pressure > humidity * saturationVapourPressure(temperature) && Number.isFinite(pressure)))
     throw new InputError(`pressure ${pressure} Pa`)
+}
+
+/** Rejects air outside the model's limits with an InputError; returns the air unchanged. */
+export function checkAir(air: Air): Air {
+  checkAirValues(air)
+  const { pressure, temperature } = air
   const density = airDensity(air)
   if (!(density > 0 && density <= maxDensity))
     throw new InputError(

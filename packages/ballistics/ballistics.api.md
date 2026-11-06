@@ -548,7 +548,7 @@ export interface RangeStringResidual {
 export type Rhs = (t: number, y: Float64Array, dy: Float64Array) => void;
 
 // @public
-export function rk45(f: Rhs, t0: number, y0: Float64Array, events: readonly Rk45Event[], options: Rk45Options): Rk45Result;
+export function rk45(problem: Rk45Problem, options: Rk45Options): Rk45Result;
 
 // @public
 export interface Rk45Event {
@@ -576,6 +576,14 @@ export interface Rk45Options {
 }
 
 // @public
+export interface Rk45Problem {
+    events: readonly Rk45Event[];
+    f: Rhs;
+    t0: number;
+    y0: Float64Array;
+}
+
+// @public
 export interface Rk45Result {
     event: number | null;
     h: number;
@@ -589,7 +597,13 @@ export interface Rk45Result {
 export function saturationVapourPressure(temperature: number): number;
 
 // @public
-export function segmentCoefficient(table: DragTable, k: number, mach: number, interpolation?: DragInterpolation, held?: boolean): number;
+export function segmentCoefficient(table: DragTable, k: number, mach: number, reading?: SegmentReading): number;
+
+// @public
+export interface SegmentReading {
+    held?: boolean | undefined;
+    interpolation?: DragInterpolation | undefined;
+}
 
 // @public
 export interface SessionsTruingResult extends Omit<TruingResult, 'shot'> {

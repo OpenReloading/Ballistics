@@ -38,7 +38,7 @@ import { type Rhs, type Rk45Event, type Rk45Hit, rk45, type StepBudget } from '.
 import { aerodynamicJump, millerStability, spinDrift } from './stability.ts'
 
 /** Unchecked read of a state vector the caller sizes and indexes by the same count (kept in this module so the integrator loops inline it). */
-const el = (a: Float64Array, i: number): number => a[i] as number
+const el = (a: Float64Array, i: number): number => a[i] ?? 0
 
 /** Projectile of a shot, SI units. */
 export interface Projectile {
@@ -346,8 +346,8 @@ function dragBandTable(p: Projectile) {
   const bands =
     drag.kind === 'curve'
       ? [{ s: p.mass / p.diameter ** 2, minVelocity: 0 }]
-      : [...drag.bands]
-          .sort((a, b) => a.minVelocity - b.minVelocity)
+      : drag.bands
+          .toSorted((a, b) => a.minVelocity - b.minVelocity)
           .map((b) => ({ s: b.ballisticCoefficient, minVelocity: b.minVelocity }))
   const bandFor = (speed: number) => {
     let k = 0
@@ -355,6 +355,14 @@ function dragBandTable(p: Projectile) {
     return k
   }
   return { bands, bandFor }
+}
+
+/** A Mach number inside grid segment mi: one below the first node, one above the last, else the segment's midpoint. */
+function insideSegment(grid: DragTable, mi: number): number {
+  const last = grid.length - 1
+  if (mi < 0) return nth(grid, 0)[0] - 1
+  if (mi >= last) return nth(grid, last)[0] + 1
+  return (nth(grid, mi)[0] + nth(grid, mi + 1)[0]) / 2
 }
 
 /**
@@ -374,18 +382,13 @@ function machGrid(table: DragTable, aero: Aero | undefined) {
     tables.length === 1
       ? table
       : [...new Set(tables.flatMap((k) => k.map((n) => n[0])))]
-          .sort((a, b) => a - b)
+          .toSorted((a, b) => a - b)
           .map((m) => [m, 0] as const)
   const last = grid.length - 1
   const seg = tables.map((k) =>
     Array.from({ length: grid.length + 1 }, (_, i) => {
       const mi = i - 1
-      const m =
-        mi < 0
-          ? nth(grid, 0)[0] - 1
-          : mi >= last
-            ? nth(grid, last)[0] + 1
-            : (nth(grid, mi)[0] + nth(grid, mi + 1)[0]) / 2
+      const m = insideSegment(grid, mi)
       return tables.length === 1 ? mi : dragSegment(k, m)
     }),
   )
@@ -432,8 +435,9 @@ const machOf = (c: FlightContext, y: Float64Array) =>
 function pointMassRhs(c: FlightContext): Rhs {
   const { air, table, bands, ox, oy, oz, g } = c
   const seg0 = nth(c.mg.seg, 0)
-  const held0 = nth(c.mg.held, 0)
   const drag = c.p.drag
+  // how each grid segment reads the drag table, built once for the integrator loop
+  const readings = nth(c.mg.held, 0).map((held) => ({ interpolation: drag.interpolation, held }))
   return (_t, y, dy) => {
     const local = airAt(air, el(y, 1))
     const w = nth(c.wv, c.wi)
@@ -448,8 +452,7 @@ function pointMassRhs(c: FlightContext): Rhs {
           table,
           nth(seg0, c.mi + 1),
           va / speedOfSound(local),
-          drag.interpolation,
-          nth(held0, c.mi + 1),
+          nth(readings, c.mi + 1),
         ) *
         va) /
       nth(bands, c.bi).s
@@ -469,11 +472,15 @@ function pointMassRhs(c: FlightContext): Rhs {
 function modifiedPointMassRhs(c: FlightContext, pointMass: Rhs) {
   const { air, p } = c
   const { seg, held, liftAt, momentAt, magnusAt, dampingAt } = c.mg
+  // how each grid segment of each table reads it, built once for the integrator loop
+  const readings = held.map((row) =>
+    row.map((h) => ({ interpolation: 'linear' as const, held: h })),
+  )
   /** A coefficient on the current grid segment, extended linearly within the step. */
   const coefficient = (k: CoefficientOverMach, j: number, m: number) =>
     typeof k === 'number'
       ? k
-      : segmentCoefficient(k, nth(nth(seg, j), c.mi + 1), m, 'linear', nth(nth(held, j), c.mi + 1))
+      : segmentCoefficient(k, nth(nth(seg, j), c.mi + 1), m, nth(nth(readings, j), c.mi + 1))
   const area = (Math.PI / 4) * p.diameter ** 2
   return (y: Float64Array, dy: Float64Array, a: Aero) => {
     pointMass(0, y, dy)
@@ -483,8 +490,8 @@ function modifiedPointMassRhs(c: FlightContext, pointMass: Rhs) {
     const va = [el(y, 3) - w[0], el(y, 4) - w[1], el(y, 5) - w[2]] as const
     const speed = Math.hypot(va[0], va[1], va[2])
     const m = speed / speedOfSound(local)
-    const spin = el(y, 6)
-    const yaw = yawOfRepose(va, [el(dy, 3), el(dy, 4), el(dy, 5)], spin, {
+    const spinRate = el(y, 6)
+    const yaw = yawOfRepose(va, [el(dy, 3), el(dy, 4), el(dy, 5)], spinRate, {
       axialInertia: a.axialInertia,
       momentSlope: coefficient(a.momentSlope, momentAt, m),
       density: rho,
@@ -494,7 +501,7 @@ function modifiedPointMassRhs(c: FlightContext, pointMass: Rhs) {
     // Magnus force -(rho A d / 2m) p C_N-p-alpha (yaw x va), ČOS 109001 eqs. (10) and (27)
     const km =
       -((rho * area * p.diameter) / (2 * p.mass)) *
-      spin *
+      spinRate *
       coefficient(a.magnusForceSlope, magnusAt, m)
     dy[3] = el(dy, 3) + (kl * yaw[0] + km * (yaw[1] * va[2] - yaw[2] * va[1]))
     dy[4] = el(dy, 4) + (kl * yaw[1] + km * (yaw[2] * va[0] - yaw[0] * va[2]))
@@ -503,7 +510,7 @@ function modifiedPointMassRhs(c: FlightContext, pointMass: Rhs) {
       ((rho * area * p.diameter ** 2) / (2 * a.axialInertia)) *
       coefficient(a.spinDamping, dampingAt, m) *
       speed *
-      spin
+      spinRate
     return yaw
   }
 }
@@ -540,82 +547,117 @@ function trajectoryPointAt(
   }
 }
 
+/** What the events of a flight read besides its context: the wind segments, the line of sight, the slant range and the yaw of a state. */
+interface Watch {
+  winds: readonly WindSegment[]
+  /** Unit vector of the line of sight. */
+  ux: number
+  uy: number
+  maxYaw: number
+  slant: (y: Float64Array) => number
+  yawAt: (y: Float64Array) => number
+}
+
+type KindEvent = [Kind, Rk45Event]
+
+/** The pending ranges from index `next`; the last one ends the integration. */
+function rangeEvents(
+  ranges: readonly number[],
+  next: number,
+  slant: (y: Float64Array) => number,
+): KindEvent[] {
+  const out: KindEvent[] = []
+  for (let j = next; j < ranges.length; j++) {
+    const s = nth(ranges, j)
+    out.push([
+      'range',
+      { eventFunction: (_t, y) => slant(y) - s, direction: 1, terminal: j === ranges.length - 1 },
+    ])
+  }
+  return out
+}
+
+/** A terminal event where `f` of the state crosses `edge` in `direction`. */
+const crossingOf = (
+  f: (y: Float64Array) => number,
+  edge: number,
+  direction: -1 | 1,
+): Rk45Event => ({
+  eventFunction: (_t, y) => f(y) - edge,
+  direction,
+  terminal: true,
+})
+
+const distance = (y: Float64Array) => el(y, 0)
+
+/** The boundaries of the current wind segment, BC band and Mach grid segment, each a restart. */
+function boundaryEvents(c: FlightContext, winds: readonly WindSegment[]): KindEvent[] {
+  const { bands, wi, bi, mi } = c
+  const { grid, last } = c.mg
+  const airspeed = (y: Float64Array) => airspeedOf(c, y)
+  const mach = (y: Float64Array) => machOf(c, y)
+  const out: KindEvent[] = []
+  if (wi > 0) out.push(['windDown', crossingOf(distance, nth(winds, wi - 1).endDistance, -1)])
+  if (wi < winds.length - 1)
+    out.push(['windUp', crossingOf(distance, nth(winds, wi).endDistance, 1)])
+  if (bi > 0) out.push(['bandDown', crossingOf(airspeed, nth(bands, bi).minVelocity, -1)])
+  if (bi < bands.length - 1)
+    out.push(['bandUp', crossingOf(airspeed, nth(bands, bi + 1).minVelocity, 1)])
+  // table nodes are kinks in Cd(Mach): restart there so that no step crosses one
+  if (mi >= 0) out.push(['machDown', crossingOf(mach, nth(grid, mi)[0], -1)])
+  if (mi < last) out.push(['machUp', crossingOf(mach, nth(grid, mi + 1)[0], 1)])
+  return out
+}
+
+/** The ends of a flight: the apex, the yaw limit and the limits of the atmosphere model. */
+function limitEvents(c: FlightContext, watch: Watch): KindEvent[] {
+  const { ux, uy, yawAt, maxYaw } = watch
+  const altitude = c.air.altitude
+  const out: KindEvent[] = [
+    [
+      'apex',
+      { eventFunction: (_t, y) => el(y, 3) * ux + el(y, 4) * uy, direction: -1, terminal: true },
+    ],
+  ]
+  if (c.aero)
+    out.push(['yaw', { eventFunction: (_t, y) => yawAt(y) - maxYaw, direction: 1, terminal: true }])
+  out.push(
+    [
+      'atmosphere',
+      {
+        eventFunction: (_t, y) => altitude + el(y, 1) - icao.tropopause,
+        direction: 1,
+        terminal: true,
+      },
+    ],
+    [
+      'atmosphere',
+      {
+        eventFunction: (_t, y) => altitude + el(y, 1) - minAltitude,
+        direction: -1,
+        terminal: true,
+      },
+    ],
+  )
+  return out
+}
+
 /**
  * Events of one integration from the current segments: the pending ranges, the segment
  * boundaries of wind, BC band and Mach grid, the apex, the yaw limit and the atmosphere limits.
  */
 function flightEvents(
   c: FlightContext,
-  winds: readonly WindSegment[],
+  watch: Watch,
   ranges: readonly number[],
   next: number,
-  slant: (y: Float64Array) => number,
-  yawAt: (y: Float64Array) => number,
-  ux: number,
-  uy: number,
-  maxYaw: number,
 ): { kinds: Kind[]; events: Rk45Event[] } {
-  const { air, aero, bands, wi, bi, mi } = c
-  const { grid, last } = c.mg
-  const airspeed = (y: Float64Array) => airspeedOf(c, y)
-  const mach = (y: Float64Array) => machOf(c, y)
-  const kinds: Kind[] = []
-  const events: Rk45Event[] = []
-  const add = (kind: Kind, ev: Rk45Event) => {
-    kinds.push(kind)
-    events.push(ev)
-  }
-  for (let j = next; j < ranges.length; j++) {
-    const s = nth(ranges, j)
-    add('range', {
-      eventFunction: (_t, y) => slant(y) - s,
-      direction: 1,
-      terminal: j === ranges.length - 1,
-    })
-  }
-  if (wi > 0) {
-    const x = nth(winds, wi - 1).endDistance
-    add('windDown', { eventFunction: (_t, y) => el(y, 0) - x, direction: -1, terminal: true })
-  }
-  if (wi < winds.length - 1) {
-    const x = nth(winds, wi).endDistance
-    add('windUp', { eventFunction: (_t, y) => el(y, 0) - x, direction: 1, terminal: true })
-  }
-  if (bi > 0) {
-    const v = nth(bands, bi).minVelocity
-    add('bandDown', { eventFunction: (_t, y) => airspeed(y) - v, direction: -1, terminal: true })
-  }
-  if (bi < bands.length - 1) {
-    const v = nth(bands, bi + 1).minVelocity
-    add('bandUp', { eventFunction: (_t, y) => airspeed(y) - v, direction: 1, terminal: true })
-  }
-  // table nodes are kinks in Cd(Mach): restart there so that no step crosses one
-  if (mi >= 0) {
-    const m = nth(grid, mi)[0]
-    add('machDown', { eventFunction: (_t, y) => mach(y) - m, direction: -1, terminal: true })
-  }
-  if (mi < last) {
-    const m = nth(grid, mi + 1)[0]
-    add('machUp', { eventFunction: (_t, y) => mach(y) - m, direction: 1, terminal: true })
-  }
-  add('apex', {
-    eventFunction: (_t, y) => el(y, 3) * ux + el(y, 4) * uy,
-    direction: -1,
-    terminal: true,
-  })
-  if (aero)
-    add('yaw', { eventFunction: (_t, y) => yawAt(y) - maxYaw, direction: 1, terminal: true })
-  add('atmosphere', {
-    eventFunction: (_t, y) => air.altitude + el(y, 1) - icao.tropopause,
-    direction: 1,
-    terminal: true,
-  })
-  add('atmosphere', {
-    eventFunction: (_t, y) => air.altitude + el(y, 1) - minAltitude,
-    direction: -1,
-    terminal: true,
-  })
-  return { kinds, events }
+  const all = [
+    ...rangeEvents(ranges, next, watch.slant),
+    ...boundaryEvents(c, watch.winds),
+    ...limitEvents(c, watch),
+  ]
+  return { kinds: all.map(([kind]) => kind), events: all.map(([, event]) => event) }
 }
 
 /** The rotation of the earth in the frame of the shot, zero without the coriolis effect or a site. */
@@ -656,48 +698,38 @@ function restartSegments(
 ) {
   const d = kind.endsWith('Up') ? 1 : -1
   const along = (prefix: string) => (kind.startsWith(prefix) ? d : 0)
-  fc.wi = settle(
-    fc.wi,
-    along('wind'),
-    el(y, 0),
-    0,
-    winds.length - 1,
-    (k) => nth(winds, k - 1).endDistance,
-  )
-  fc.bi = settle(
-    fc.bi,
-    along('band'),
-    airspeedOf(fc, y),
-    0,
-    fc.bands.length - 1,
-    (k) => nth(fc.bands, k).minVelocity,
-  )
-  fc.mi = settle(fc.mi, along('mach'), machOf(fc, y), -1, fc.mg.last, (k) => nth(fc.mg.grid, k)[0])
+  fc.wi = settle(fc.wi, along('wind'), el(y, 0), {
+    lo: 0,
+    hi: winds.length - 1,
+    edge: (k) => nth(winds, k - 1).endDistance,
+  })
+  fc.bi = settle(fc.bi, along('band'), airspeedOf(fc, y), {
+    lo: 0,
+    hi: fc.bands.length - 1,
+    edge: (k) => nth(fc.bands, k).minVelocity,
+  })
+  fc.mi = settle(fc.mi, along('mach'), machOf(fc, y), {
+    lo: -1,
+    hi: fc.mg.last,
+    edge: (k) => nth(fc.mg.grid, k)[0],
+  })
 }
 
 const endsFlight = (kind: Kind): kind is 'apex' | 'atmosphere' | 'yaw' =>
   kind === 'apex' || kind === 'atmosphere' || kind === 'yaw'
 
-/** Integrates one trajectory with fixed bore angles; corrections are added by the caller. */
-function fly(c: Conditions, bore: BoreAngles, ranges: number[], o: TrajectoryOptions): Flight {
+/** The fixed inputs and lookup tables of one flight, with its segments at the muzzle state `y0`. */
+function flightContext(c: Conditions, o: TrajectoryOptions, y0: Float64Array) {
   const { projectile: p } = c.shot
-  const air = c.air
-  const ux = Math.cos(c.lookAngle)
-  const uy = Math.sin(c.lookAngle)
-  const nx = -uy
-  const ny = ux
-  const aero = c.aero
-  const y0 = launchState(c, bore, ux, uy)
-
   const { winds, wv, segmentFor } = windTable(c.wind)
   const table = dragTableOf(p.drag)
   const { bands, bandFor } = dragBandTable(p)
   const [ox, oy, oz] = earthRotationOf(c.shot, o)
-  const mg = machGrid(table, aero)
+  const mg = machGrid(table, c.aero)
   const fc: FlightContext = {
     p,
-    air,
-    aero,
+    air: c.air,
+    aero: c.aero,
     wv,
     bands,
     table,
@@ -710,10 +742,14 @@ function fly(c: Conditions, bore: BoreAngles, ranges: number[], o: TrajectoryOpt
     bi: 0,
     mi: 0,
   }
-  const airspeed = (y: Float64Array) => airspeedOf(fc, y)
-  const mach = (y: Float64Array) => machOf(fc, y)
-  fc.bi = bandFor(airspeed(y0))
-  fc.mi = mg.segmentAt(mach(y0))
+  fc.bi = bandFor(airspeedOf(fc, y0))
+  fc.mi = mg.segmentAt(machOf(fc, y0))
+  return { fc, winds }
+}
+
+/** The right-hand side of a flight and the yaw of a state: the modified point mass with aerodynamic data, else the point mass and yaw 0. */
+function flightDynamics(fc: FlightContext): { rhs: Rhs; yawAt: (y: Float64Array) => number } {
+  const aero = fc.aero
   const pointMass = pointMassRhs(fc)
   const mpm = modifiedPointMassRhs(fc, pointMass)
   const scratch = new Float64Array(7)
@@ -723,71 +759,102 @@ function fly(c: Conditions, bore: BoreAngles, ranges: number[], o: TrajectoryOpt
         mpm(y, dy, aero)
       }
     : pointMass
+  return { rhs, yawAt }
+}
 
-  const slant = (y: Float64Array) => el(y, 0) * ux + el(y, 1) * uy
-  const point = trajectoryPointAt(fc, nx, ny, yawAt)
-
+/** The output points of a flight: the ranges in order, each recorded once the state reaches it. */
+function pointRecorder(
+  ranges: readonly number[],
+  slant: (y: Float64Array) => number,
+  point: (t: number, y: Float64Array, range: number) => Raw,
+) {
   const points: Raw[] = []
   let next = 0
-  /** Records pending ranges the state has reached (start, and rounding at restarts). */
-  const catchUp = (t: number, y: Float64Array) => {
-    while (next < ranges.length && nth(ranges, next) <= slant(y))
-      points.push(point(t, y, nth(ranges, next++)))
+  return {
+    points,
+    /** Index of the first range not recorded yet. */
+    next: () => next,
+    /** Records pending ranges the state has reached (start, and rounding at restarts). */
+    catchUp(t: number, y: Float64Array) {
+      while (next < ranges.length && nth(ranges, next) <= slant(y))
+        points.push(point(t, y, nth(ranges, next++)))
+    },
+    /** Records the hits of the pending range events, in order, from the event index `first`. */
+    recordHits(hits: readonly Rk45Hit[], first: number) {
+      for (const hit of hits)
+        if (first + hit.event === next) points.push(point(hit.t, hit.y, nth(ranges, next++)))
+    },
+    /** Records every pending range at the state of the last range. */
+    recordRest(t: number, y: Float64Array) {
+      while (next < ranges.length) points.push(point(t, y, nth(ranges, next++)))
+    },
   }
+}
 
-  /** Records the hits of the pending range events, in order, from the event index `first`. */
-  const recordHits = (hits: readonly Rk45Hit[], first: number) => {
-    for (const hit of hits)
-      if (first + hit.event === next) points.push(point(hit.t, hit.y, nth(ranges, next++)))
-  }
+/** The integrator options of one integration of a flight, after `steps` steps, starting with step `h`. */
+const stepOptions = (o: TrajectoryOptions, steps: number, h: number | undefined) => ({
+  relativeTolerance: o.relativeTolerance,
+  absoluteTolerance: o.absoluteTolerance,
+  maxSteps: o.maxSteps,
+  stepsBefore: steps,
+  maxTime: o.maxTime,
+  initialStep: h,
+  budget: o.budget,
+})
+
+/** Integrates one trajectory with fixed bore angles; corrections are added by the caller. */
+function fly(c: Conditions, bore: BoreAngles, ranges: number[], o: TrajectoryOptions): Flight {
+  const ux = Math.cos(c.lookAngle)
+  const uy = Math.sin(c.lookAngle)
+  const nx = -uy
+  const ny = ux
+  const y0 = launchState(c, bore, ux, uy)
+  const { fc, winds } = flightContext(c, o, y0)
+  const { rhs, yawAt } = flightDynamics(fc)
+  const slant = (y: Float64Array) => el(y, 0) * ux + el(y, 1) * uy
+  const record = pointRecorder(ranges, slant, trajectoryPointAt(fc, nx, ny, yawAt))
+  const { points } = record
+  const watch: Watch = { winds, ux, uy, maxYaw: o.maxYaw, slant, yawAt }
 
   let t = 0
   let y: Float64Array = y0
   let h: number | undefined
   let steps = 0
-  catchUp(t, y)
+  record.catchUp(t, y)
   if (el(y, 3) * ux + el(y, 4) * uy <= 0) return { points, stop: 'apex', steps }
-  while (next < ranges.length) {
+  while (record.next() < ranges.length) {
     // at the muzzle and after every restart, where the yaw can jump (wind, BC band)
-    if (aero && yawAt(y) >= o.maxYaw) return { points, stop: 'yaw', steps }
-    const { kinds, events } = flightEvents(fc, winds, ranges, next, slant, yawAt, ux, uy, o.maxYaw)
-
-    const first = next
-    const r = rk45(rhs, t, y, events, {
-      relativeTolerance: o.relativeTolerance,
-      absoluteTolerance: o.absoluteTolerance,
-      maxSteps: o.maxSteps,
-      stepsBefore: steps,
-      maxTime: o.maxTime,
-      initialStep: h,
-      budget: o.budget,
-    })
+    if (fc.aero && yawAt(y) >= o.maxYaw) return { points, stop: 'yaw', steps }
+    const first = record.next()
+    const { kinds, events } = flightEvents(fc, watch, ranges, first)
+    const r = rk45({ f: rhs, t0: t, y0: y, events }, stepOptions(o, steps, h))
     steps += r.steps
-    recordHits(r.hits, first)
+    record.recordHits(r.hits, first)
     t = r.t
     y = r.y
     h = r.h
     if (r.event === null) return { points, stop: 'maxTime', steps }
     const kind = nth(kinds, r.event)
     if (kind === 'range') {
-      while (next < ranges.length) points.push(point(t, y, nth(ranges, next++)))
+      record.recordRest(t, y)
       break
     }
-    catchUp(t, y)
+    record.catchUp(t, y)
     if (endsFlight(kind)) return { points, stop: kind, steps }
     restartSegments(fc, winds, kind, y)
   }
   return { points, stop: 'done', steps }
 }
 
+/** Segments `lo` to `hi` of a value; segment k spans edge(k) to edge(k + 1). */
+interface Segments {
+  lo: number
+  hi: number
+  edge: (k: number) => number
+}
+
 /** The index after a restart without a crossing: past the boundaries `v` lies strictly beyond. */
-function settleWithoutCrossing(
-  k: number,
-  v: number,
-  lo: number,
-  hi: number,
-  edge: (k: number) => number,
-): number {
+function settleWithoutCrossing(k: number, v: number, { lo, hi, edge }: Segments): number {
   let j = k
   while (j > lo && v < edge(j)) j--
   while (j < hi && v > edge(j + 1)) j++
@@ -795,22 +862,15 @@ function settleWithoutCrossing(
 }
 
 /**
- * Segment index after a restart at value v; segment k spans edge(k) to edge(k + 1), k from lo to
- * hi. A crossing in direction d moves past the crossed boundary b and every further boundary within
+ * Segment index after a restart at value v among `segments`. A crossing in direction d moves past the crossed boundary b and every further boundary within
  * |v - b| of b or at or beyond v (boundaries closer than the event resolution). Without a crossing
  * (d = 0) the index moves only past boundaries that v lies strictly beyond, whose events could no
  * longer fire.
  */
-function settle(
-  k: number,
-  d: -1 | 0 | 1,
-  v: number,
-  lo: number,
-  hi: number,
-  edge: (k: number) => number,
-): number {
+function settle(k: number, d: -1 | 0 | 1, v: number, segments: Segments): number {
+  const { lo, hi, edge } = segments
   let j = k
-  if (d === 0) return settleWithoutCrossing(j, v, lo, hi, edge)
+  if (d === 0) return settleWithoutCrossing(j, v, segments)
   const b = edge(d > 0 ? j + 1 : j)
   const reach = d > 0 ? Math.max(v, 2 * b - v) : Math.min(v, 2 * b - v)
   j += d
@@ -885,9 +945,8 @@ function checkProjectile(p: Projectile): void {
 
 const look = (a: number | undefined) => a === undefined || Math.abs(a) <= Math.PI / 2
 
-/** Checks firearm, look angle, air, wind, site and zero of the shot. */
-function checkConditions(shot: TrajectoryInput): void {
-  const { firearm, site, zero } = shot
+/** Checks the sight and the twist of the firearm. */
+function checkFirearm(firearm: Firearm): void {
   need(
     Number.isFinite(firearm.sightHeight) && finite(firearm.sightOffset),
     'sight height and offset',
@@ -896,11 +955,10 @@ function checkConditions(shot: TrajectoryInput): void {
     firearm.twist === undefined || (firearm.twist > 0 && Number.isFinite(firearm.twist)),
     'twist must be positive',
   )
-  need(look(shot.lookAngle), 'look angle outside -pi/2..pi/2')
-  checkAir(shot.air)
-  checkWind(shot.wind ?? [])
-  need(site?.latitude === undefined || Math.abs(site.latitude) <= Math.PI / 2, 'latitude')
-  need(finite(site?.azimuth), 'azimuth')
+}
+
+/** Checks the zero: its range, look angle, air and wind, or the bore angles. */
+function checkZero(zero: ZeroSpec | BoreAngles): void {
   if ('range' in zero) {
     need(zero.range > 0 && Number.isFinite(zero.range), 'zero range must be positive')
     need(look(zero.lookAngle), 'zero look angle outside -pi/2..pi/2')
@@ -908,6 +966,18 @@ function checkConditions(shot: TrajectoryInput): void {
     checkWind(zero.wind ?? [])
   } else
     need(Number.isFinite(zero.elevationAngle) && Number.isFinite(zero.windageAngle), 'bore angles')
+}
+
+/** Checks firearm, look angle, air, wind, site and zero of the shot. */
+function checkConditions(shot: TrajectoryInput): void {
+  const { firearm, site, zero } = shot
+  checkFirearm(firearm)
+  need(look(shot.lookAngle), 'look angle outside -pi/2..pi/2')
+  checkAir(shot.air)
+  checkWind(shot.wind ?? [])
+  need(site?.latitude === undefined || Math.abs(site.latitude) <= Math.PI / 2, 'latitude')
+  need(finite(site?.azimuth), 'azimuth')
+  checkZero(zero)
 }
 
 /** Checks the tolerances, limits and switches of the options. */
@@ -1093,8 +1163,7 @@ function correct(
     jumpAngle = aerodynamicJump(s.sg, s.calibres, crosswind, hand)
   return raw.map((q) => {
     const fit = !a && s && hand && o.spinDrift ? spinDrift(s.sg, q.time, hand) : 0
-    // shortcut: NaN when the twin run stops before this range; rare, as the twin has no yaw stop
-    const drift = a ? (twin ? q.windage - (twin.get(q.range) ?? Number.NaN) : 0) : fit
+    const drift = a ? twinDrift(q, twin) : fit
     const jump = q.range * Math.tan(jumpAngle)
     const height = q.height + jump
     const windage = q.windage + fit
@@ -1108,6 +1177,12 @@ function correct(
       windageHold: q.range > 0 ? -Math.atan2(windage, q.range) : 0,
     }
   })
+}
+
+/** The spin drift of the modified point mass: the windage beyond its point-mass twin, 0 without one. */
+function twinDrift(q: Raw, twin: Map<number, number> | undefined): number {
+  // shortcut: NaN when the twin run stops before this range; rare, as the twin has no yaw stop
+  return twin ? q.windage - (twin.get(q.range) ?? Number.NaN) : 0
 }
 
 const resolve = (options?: Settings<TrajectoryOptions>): TrajectoryOptions =>
@@ -1190,6 +1265,23 @@ const coriolisOmitted = (shot: TrajectoryInput, o: TrajectoryOptions): OmittedEf
   return site.azimuth === undefined ? ['coriolisVertical'] : []
 }
 
+/** The effects the modified point mass leaves out: the jump when off, spin decay and Magnus without their coefficients. */
+function aeroOmitted(shot: TrajectoryInput, o: TrajectoryOptions): OmittedEffect[] {
+  const omitted: OmittedEffect[] = []
+  if (!o.jump) omitted.push('jump')
+  if (shot.projectile.aerodynamics?.spinDamping === undefined) omitted.push('spinDecay')
+  if (shot.projectile.aerodynamics?.magnusForceSlope === undefined) omitted.push('magnus')
+  return omitted
+}
+
+/** The effects the point mass leaves out: the spin drift and jump fits when off or without a twist. */
+function fitOmitted(s: ReturnType<typeof spin>, o: TrajectoryOptions): OmittedEffect[] {
+  const omitted: OmittedEffect[] = []
+  if (!(s?.hand && o.spinDrift)) omitted.push('spinDrift')
+  if (!(s?.hand && o.jump)) omitted.push('jump')
+  return omitted
+}
+
 /** The effects the result leaves out, from the options and the data the shot carries. */
 function omittedEffects(
   shot: TrajectoryInput,
@@ -1197,16 +1289,7 @@ function omittedEffects(
   s: ReturnType<typeof spin>,
   aero: Aero | undefined,
 ): OmittedEffect[] {
-  const omitted = coriolisOmitted(shot, o)
-  if (aero) {
-    if (!o.jump) omitted.push('jump')
-    if (shot.projectile.aerodynamics?.spinDamping === undefined) omitted.push('spinDecay')
-    if (shot.projectile.aerodynamics?.magnusForceSlope === undefined) omitted.push('magnus')
-  } else {
-    if (!(s?.hand && o.spinDrift)) omitted.push('spinDrift')
-    if (!(s?.hand && o.jump)) omitted.push('jump')
-  }
-  return omitted
+  return [...coriolisOmitted(shot, o), ...(aero ? aeroOmitted(shot, o) : fitOmitted(s, o))]
 }
 
 /** Trajectory at the requested slant ranges, m. */
@@ -1227,7 +1310,7 @@ export function trajectory(
     wind: shot.wind ?? [],
     aero,
   }
-  const sorted = [...new Set(ranges)].sort((a, b) => a - b)
+  const sorted = [...new Set(ranges)].toSorted((a, b) => a - b)
   const f = fly(c, bore, sorted, o)
   const s = spin(shot, shot.air)
   let twin: Map<number, number> | undefined

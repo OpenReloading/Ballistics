@@ -192,6 +192,7 @@
 . Rk45Event
 . Rk45Hit
 . Rk45Options
+. Rk45Problem
 . Rk45Result
 . RoundCountNote
 . SampledBand
@@ -200,6 +201,7 @@
 . ScoringZone
 . SeatingNote
 . SeatingReading
+. SegmentReading
 . SensitivityDefault
 . SensitivityPowder
 . SessionReading

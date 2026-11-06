@@ -18,7 +18,12 @@ import {
   studentTwoSidedQuantile,
 } from '@open-reloading/statistics'
 import { overlay, type Settings } from '../settings.ts'
-import { type TrajectoryInput, type TrajectoryOptions, trajectory } from './trajectory.ts'
+import {
+  type TrajectoryInput,
+  type TrajectoryOptions,
+  type TrajectoryPoint,
+  trajectory,
+} from './trajectory.ts'
 import { dragCorrection, TruingError } from './truing.ts'
 
 /**
@@ -382,13 +387,15 @@ function checkCommon(shot: TrajectoryInput, clickValue: number, options: RangeSt
   checkSolverLimits(options)
 }
 
+const isParameterName = (name: string): name is RangeStringParameterName =>
+  (names as readonly string[]).includes(name)
+
 function checkPriors(
   priors: NonNullable<RangeStringOptions['priors']>,
   fitZeroOffset: RangeStringOptions['fitZeroOffset'],
 ): void {
-  for (const name of Object.keys(priors) as RangeStringParameterName[]) {
-    need(names.includes(name), `prior ${name}`)
-    const sigma = priors[name]
+  for (const [name, sigma] of Object.entries(priors)) {
+    need(isParameterName(name), `prior ${name}`)
     need(
       sigma === undefined || (sigma > 0 && Number.isFinite(sigma)),
       `prior ${name} must be positive`,
@@ -400,14 +407,13 @@ function checkPriors(
   )
 }
 
-function checkSolverLimits(options: RangeStringOptions): void {
+/** Checks the confidence levels of the intervals and of the residual check. */
+function checkConfidenceLevels(options: RangeStringOptions): void {
   const d = rangeStringDefaults
-  const { confidenceLevel: level = d.confidenceLevel, maxInflation = d.maxInflation } = options
   const {
-    maxRelativeStandardUncertainty = d.maxRelativeStandardUncertainty,
+    confidenceLevel: level = d.confidenceLevel,
     residualConfidenceLevel = d.residualConfidenceLevel,
   } = options
-  const { maxCondition = d.maxCondition, maxIterations = d.maxIterations } = options
   need(Number.isFinite(level) && level > 0 && level < 1, 'confidenceLevel must lie in (0, 1)')
   need(
     Number.isFinite(residualConfidenceLevel) &&
@@ -415,6 +421,16 @@ function checkSolverLimits(options: RangeStringOptions): void {
       residualConfidenceLevel < 1,
     'residualConfidenceLevel must lie in (0, 1)',
   )
+}
+
+/** Checks the limits of identification and of the solver. */
+function checkFitLimits(options: RangeStringOptions): void {
+  const d = rangeStringDefaults
+  const {
+    maxInflation = d.maxInflation,
+    maxRelativeStandardUncertainty = d.maxRelativeStandardUncertainty,
+  } = options
+  const { maxCondition = d.maxCondition, maxIterations = d.maxIterations } = options
   need(maxInflation > 1, 'maxInflation must exceed 1')
   need(maxRelativeStandardUncertainty > 0, 'maxRelativeStandardUncertainty must be positive')
   need(Number.isFinite(maxCondition) && maxCondition > 1, 'maxCondition must be finite and above 1')
@@ -422,6 +438,11 @@ function checkSolverLimits(options: RangeStringOptions): void {
     Number.isInteger(maxIterations) && maxIterations >= 1,
     'maxIterations must be a whole number of at least 1',
   )
+}
+
+function checkSolverLimits(options: RangeStringOptions): void {
+  checkConfidenceLevels(options)
+  checkFitLimits(options)
 }
 
 /** An impact and a dial entry of one group count the same shots twice. */
@@ -441,7 +462,15 @@ function checkGroups(
   }
 }
 
-function checkRow(kind: string, range: number, shots: number, spread: number, rounding = 0): void {
+/** A row to check: its range, shot count, spread and rounding. */
+interface RowSpec {
+  range: number
+  shots: number
+  spread: number
+  rounding?: number | undefined
+}
+
+function checkRow(kind: string, { range, shots, spread, rounding = 0 }: RowSpec): void {
   need(Number.isFinite(range) && (kind === 'velocity' ? range >= 0 : range > 0), `${kind} range`)
   need(
     Number.isInteger(shots) && shots >= 1,
@@ -449,6 +478,21 @@ function checkRow(kind: string, range: number, shots: number, spread: number, ro
   )
   need(spread > 0 && Number.isFinite(spread), `${kind} standardDeviation must be positive`)
   need(rounding >= 0 && Number.isFinite(rounding), `${kind} rounding must not be negative`)
+}
+
+/** Checks the chronograph row of a plan or, with `measured`, of a fit, which adds its mean. */
+function checkChronograph(
+  chronograph: TruingPlanInput['chronograph'] & { mean?: number },
+  measured: boolean,
+): void {
+  if (measured)
+    need((chronograph.mean ?? 0) > 0 && Number.isFinite(chronograph.mean), 'chronograph mean')
+  checkRow('velocity', {
+    range: chronograph.instrumentDistance ?? 0,
+    shots: chronograph.shotCount,
+    spread: chronograph.standardDeviation,
+    rounding: chronograph.rounding,
+  })
 }
 
 /**
@@ -464,29 +508,16 @@ function checkEntries(
   for (const e of entries) {
     need(e.kind === 'impact' || e.kind === 'dial', `entry kind ${e.kind}`)
     if (measured) need(Number.isFinite(e.value), 'entry value')
-    checkRow(
-      e.kind,
-      e.range,
-      e.shotCount,
-      measured ? (e.standardDeviation as number) : 1,
-      e.rounding,
-    )
+    checkRow(e.kind, {
+      range: e.range,
+      shots: e.shotCount,
+      // a measured entry without a spread fails the check
+      spread: measured ? (e.standardDeviation ?? Number.NaN) : 1,
+      rounding: e.rounding,
+    })
   }
   checkGroups(entries)
-  if (chronograph) {
-    if (measured)
-      need(
-        (chronograph.mean as number) > 0 && Number.isFinite(chronograph.mean),
-        'chronograph mean',
-      )
-    checkRow(
-      'velocity',
-      chronograph.instrumentDistance ?? 0,
-      chronograph.shotCount,
-      chronograph.standardDeviation,
-      chronograph.rounding,
-    )
-  }
+  if (chronograph) checkChronograph(chronograph, measured)
 }
 
 /** The shot with the parameters applied; `theta` holds ln(q / nominal) of the first three. */
@@ -507,6 +538,26 @@ const zeros = [0, 0, 0, 0]
 interface Prior {
   j: number
   sigma: number
+}
+
+/** The predicted value of a row at its trajectory point: impact height plus the zero offset, velocity, or the dial in clicks. */
+function rowPrediction(
+  x: Row,
+  p: TrajectoryPoint,
+  theta: readonly number[],
+  clickValue: number,
+): number {
+  const offset = theta[3] ?? 0
+  if (x.kind === 'impact') return p.height + offset * x.range
+  if (x.kind === 'velocity') return p.velocity
+  return (p.elevationHold - offset) / (clickValue * Math.exp(nth(theta, 2)))
+}
+
+/** The derivative of a row by the zero offset: the range in an impact, minus the clicks per rad in a dial, 0 in a velocity. */
+function offsetDerivative(x: Row, perClick: number): number {
+  if (x.kind === 'impact') return x.range
+  if (x.kind === 'dial') return -perClick
+  return 0
 }
 
 class Model {
@@ -564,14 +615,7 @@ class Model {
         this.failure = `range ${x.range} m not reached`
         return null
       }
-      const offset = theta[3] ?? 0
-      out.push(
-        x.kind === 'impact'
-          ? p.height + offset * x.range
-          : x.kind === 'velocity'
-            ? p.velocity
-            : (p.elevationHold - offset) / (this.clickValue * Math.exp(nth(theta, 2))),
-      )
+      out.push(rowPrediction(x, p, theta, this.clickValue))
     }
     return out
   }
@@ -595,9 +639,7 @@ class Model {
       if (j === 3) {
         // the offset is linear: range times it in an impact, minus it over the click value in a dial
         const perClick = 1 / (this.clickValue * Math.exp(nth(theta, 2)))
-        return this.rows.map((x) =>
-          x.kind === 'impact' ? x.range : x.kind === 'dial' ? -perClick : 0,
-        )
+        return this.rows.map((x) => offsetDerivative(x, perClick))
       }
       const up = this.predict(theta.map((x, k) => (k === j ? x + h : x)))
       const down = this.predict(theta.map((x, k) => (k === j ? x - h : x)))
@@ -644,8 +686,7 @@ interface StatusInput {
 /** Why a parameter with these standard errors is weak, none when it is identified. */
 function weakReasons(
   j: number,
-  dataSigma: number,
-  inflation: number,
+  { dataSigma, inflation }: { dataSigma: number; inflation: number },
   options: RangeStringOptions,
   fitted: StatusInput['fitted'],
 ): WeakReason[] {
@@ -662,6 +703,20 @@ function weakReasons(
   return reasons
 }
 
+/**
+ * The standard errors of the resolved parameter `j`, column `k` of `info` and `post`: of the data
+ * alone, its variance inflation, the one the interval uses, and the prior of the parameter.
+ */
+function resolvedErrors(input: StatusInput, j: number, k: number) {
+  const { model, info, post } = input
+  // standard error per unit parameter: of ln q, or of the zero offset in rad
+  const dataSigma = info?.standardUncertainty[k] ?? Infinity
+  const inflation = info?.varianceInflation[k] ?? Infinity
+  const used = post ? nth(post.standardUncertainty, k) : dataSigma
+  const prior = model.priors.find((p) => p.j === j)
+  return { dataSigma, inflation, used, prior }
+}
+
 /** Status and standard errors of the resolved parameter `j`, column `k` of `info` and `post`. */
 function resolvedStatus(
   input: StatusInput,
@@ -669,14 +724,10 @@ function resolvedStatus(
   k: number,
   base: { name: RangeStringParameterName; nominal: number },
 ): RangeStringParameter {
-  const { model, theta, options, fitted, info, post } = input
-  // standard error per unit parameter: of ln q, or of the zero offset in rad
-  const dataSigma = info?.standardUncertainty[k] ?? Infinity
-  const inflation = info?.varianceInflation[k] ?? Infinity
-  const reasons = weakReasons(j, dataSigma, inflation, options, fitted)
+  const { theta, options, fitted, post } = input
+  const { dataSigma, inflation, used, prior } = resolvedErrors(input, j, k)
+  const reasons = weakReasons(j, { dataSigma, inflation }, options, fitted)
   const at = j === 3 ? nth(theta, 3) : base.nominal * Math.exp(nth(theta, j))
-  const used = post ? nth(post.standardUncertainty, k) : dataSigma
-  const prior = model.priors.find((p) => p.j === j)
   const common = {
     ...base,
     ...(j === 3 ? {} : { relativeStandardUncertainty: dataSigma }),
@@ -716,6 +767,38 @@ function confoundedParameters(
 }
 
 /**
+ * Laplace posterior: the data rows `full` and one pseudo-row 1 / sigma per prior of a live parameter;
+ * null without such a prior. Statuses stay with the data alone; a prior narrows an interval, it identifies nothing.
+ */
+function posterior(
+  model: Model,
+  full: number[][],
+  live: readonly number[],
+): Identifiability | null {
+  const priors = model.priors.filter((p) => live.includes(p.j))
+  return priors.length > 0
+    ? identifiability([
+        ...full.map((row) => live.map((j) => nth(row, j))),
+        ...priors.map((p) => live.map((j) => (j === p.j ? 1 / p.sigma : 0))),
+      ])
+    : null
+}
+
+/** The correlation of each pair of resolved parameters, keyed `a:b` by their names. */
+function correlations(
+  info: Identifiability | null,
+  live: readonly number[],
+): Record<string, number> {
+  const correlation: Record<string, number> = {}
+  if (!info) return correlation
+  for (const [ia, a] of live.entries())
+    for (const [ib, b] of live.entries())
+      if (a < b)
+        correlation[`${nth(names, a)}:${nth(names, b)}`] = nth(nth(info.correlation, ia), ib)
+  return correlation
+}
+
+/**
  * Statuses of the resolved parameters from their weighted Jacobian at `theta`. With `fitted`, the
  * parameters of `kept` have the values of `theta`; one outside `kept` cannot be identified.
  */
@@ -723,7 +806,7 @@ function analyse(
   model: Model,
   theta: readonly number[],
   options: RangeStringOptions,
-  fitted?: { kept: readonly number[] } | undefined,
+  fitted?: { kept: readonly number[] },
 ): Identification {
   const { maxInflation = rangeStringDefaults.maxInflation } = options
   const all = model.active
@@ -733,28 +816,13 @@ function analyse(
   const live = all.filter((j) => !dead.includes(j))
   const info =
     live.length > 0 ? identifiability(full.map((row) => live.map((j) => nth(row, j)))) : null
-  // Laplace posterior: the data rows and one pseudo-row 1 / sigma per prior of a live parameter.
-  // Statuses stay with the data alone; a prior narrows an interval, it identifies nothing.
-  const priors = model.priors.filter((p) => live.includes(p.j))
-  const post =
-    info && priors.length > 0
-      ? identifiability([
-          ...full.map((row) => live.map((j) => nth(row, j))),
-          ...priors.map((p) => live.map((j) => (j === p.j ? 1 / p.sigma : 0))),
-        ])
-      : null
+  const post = info && posterior(model, full, live)
   const parameters = parameterStatuses({ model, theta, options, fitted, live, info, post })
-  const correlation: Record<string, number> = {}
-  if (info)
-    for (const [ia, a] of live.entries())
-      for (const [ib, b] of live.entries())
-        if (a < b)
-          correlation[`${nth(names, a)}:${nth(names, b)}`] = nth(nth(info.correlation, ia), ib)
   return {
     parameters,
     conditionNumber: info?.conditionNumber ?? Infinity,
     confounded: confoundedParameters(info, live, maxInflation),
-    correlation,
+    correlation: correlations(info, live),
   }
 }
 
@@ -769,11 +837,11 @@ function intervalAround(p: RangeStringParameter, value: number, half: number, le
 }
 
 /** Standard error of the parameter per unit of its scale: of ln q, or of the zero offset in rad. */
-const unitSigma = (p: RangeStringParameter) =>
+const unitSigma = (p: RangeStringParameter): number =>
   p.posteriorSigma ??
-  (p.name === 'zeroOffset'
-    ? (p.standardUncertainty as number)
-    : (p.relativeStandardUncertainty as number))
+  (p.name === 'zeroOffset' ? p.standardUncertainty : p.relativeStandardUncertainty) ??
+  // NaN for a missing standard error (an identified parameter has both)
+  Number.NaN
 
 /**
  * Standard errors and identifiability of muzzle velocity, drag factor and click value (and the
@@ -957,8 +1025,7 @@ function solveStrings(
   model: Model,
   first: readonly number[],
   fitting: readonly number[],
-  maxIterations: number,
-  maxCondition: number,
+  { maxIterations, maxCondition }: { maxIterations: number; maxCondition: number },
 ): StringsSolution {
   const rows = model.rows
   if (fitting.length === 0) return { theta: zeros, predicted: first, iterations: 0 }
@@ -1000,12 +1067,33 @@ interface Refit {
   dropped: Map<number, RangeStringParameter>
 }
 
+const fitFailures: readonly string[] = [
+  'unresolved',
+  'ill-conditioned',
+  'unreachable',
+  'not-converged',
+] satisfies LogFitFailure[]
+const isFitFailure = (reason: string): reason is LogFitFailure => fitFailures.includes(reason)
+
 /** The kept parameters (by column) a failure of the fit names, none when it names none. */
 function failureParameters(e: TruingError, kept: readonly number[]) {
   if (e.reason === 'unresolved') return kept.filter((_, i) => e.unresolved?.includes(i))
   if (e.reason === 'ill-conditioned')
     return kept.filter((_, i) => Math.abs(e.direction?.[i] ?? 0) > confoundedComponent)
   return []
+}
+
+/**
+ * The kept parameters after a failed fit: without those the failure names, or without all when it
+ * names none, which `failures` records. Rethrows anything but a failure of the fit.
+ */
+function afterFailure(e: unknown, kept: number[], failures: RangeStringFailure[]): number[] {
+  // a failure of the solver (its reasons) or an unreachable Jacobian at its solution
+  if (!(e instanceof TruingError) || kept.length === 0 || !isFitFailure(e.reason)) throw e
+  const named = failureParameters(e, kept)
+  const left = named.length > 0 ? named : kept
+  failures.push({ reason: e.reason, parameters: left.map((j) => nth(names, j)) })
+  return kept.filter((j) => !left.includes(j))
 }
 
 /**
@@ -1028,17 +1116,10 @@ function refitUntilIdentified(
   let a: Identification
   for (;;) {
     try {
-      fitted = solveStrings(model, first, kept, maxIterations, maxCondition)
+      fitted = solveStrings(model, first, kept, { maxIterations, maxCondition })
       a = analyse(model, fitted.theta, options, { kept })
     } catch (e) {
-      if (!(e instanceof TruingError) || kept.length === 0) throw e
-      const named = failureParameters(e, kept)
-      const left = named.length > 0 ? named : kept
-      failures.push({
-        reason: e.reason as LogFitFailure,
-        parameters: left.map((j) => nth(names, j)),
-      })
-      kept = kept.filter((j) => !left.includes(j))
+      kept = afterFailure(e, kept, failures)
       continue
     }
     const weak = kept.filter((j) => nth(a.parameters, j).status !== 'identified')
@@ -1049,14 +1130,14 @@ function refitUntilIdentified(
   return { fitted, a, kept, failures, dropped }
 }
 
-/** Residuals, residual check and intervals of the reported model. */
-function stringsFitResult(model: Model, options: RangeStringOptions, refit: Refit): RangeStringFit {
-  const { fitted, a, kept, failures, dropped } = refit
-  const rows = model.rows
-  const n = rows.length
-  const level = options.confidenceLevel ?? rangeStringDefaults.confidenceLevel
-  const { theta, predicted, iterations } = fitted
-  const residuals = rows.map((x, i): RangeStringResidual => {
+/** The residuals of the reported model and its chi-square check with `dof` degrees of freedom. */
+function residualCheck(
+  model: Model,
+  predicted: readonly number[],
+  dof: number,
+  options: RangeStringOptions,
+) {
+  const residuals = model.rows.map((x, i): RangeStringResidual => {
     const value = nth(predicted, i)
     return {
       kind: x.kind,
@@ -1068,15 +1149,30 @@ function stringsFitResult(model: Model, options: RangeStringOptions, refit: Refi
     }
   })
   const chiSquare = residuals.reduce((s, r) => s + r.standardized ** 2, 0)
-  const dof = n - kept.length
   const { residualConfidenceLevel = rangeStringDefaults.residualConfidenceLevel } = options
   const consistent =
     dof > 0 ? chiSquare <= chiSquareQuantile(residualConfidenceLevel, dof) : undefined
+  return { residuals, chiSquare, consistent }
+}
+
+/** The scale and quantile of the intervals: scaled by the residuals on request, with Student's t then. */
+function intervalWidth(options: RangeStringOptions, chiSquare: number, dof: number, level: number) {
   const scaled = options.scaleByResidual === true && dof > 0
   const intervalScale = scaled ? Math.max(Math.sqrt(chiSquare / dof), minIntervalScale) : 1
   const quantile = scaled
     ? studentTwoSidedQuantile(level, dof)
     : Math.sqrt(chiSquareQuantile(level, 1))
+  return { intervalScale, quantile }
+}
+
+/** Residuals, residual check and intervals of the reported model. */
+function stringsFitResult(model: Model, options: RangeStringOptions, refit: Refit): RangeStringFit {
+  const { fitted, a, kept, failures, dropped } = refit
+  const level = options.confidenceLevel ?? rangeStringDefaults.confidenceLevel
+  const { theta, predicted, iterations } = fitted
+  const dof = model.rows.length - kept.length
+  const { residuals, chiSquare, consistent } = residualCheck(model, predicted, dof, options)
+  const { intervalScale, quantile } = intervalWidth(options, chiSquare, dof, level)
   const failed = failures.flatMap((f) => f.parameters)
   const final = a.parameters.map((q, j) => dropped.get(j) ?? q)
   // A held parameter with information (weak or failed) shifts the fitted ones: their intervals

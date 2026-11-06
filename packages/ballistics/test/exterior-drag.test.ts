@@ -307,7 +307,7 @@ describe('monotone cubic interpolation', () => {
       [1, 1],
       [3, 2],
     ]
-    const c = segmentCoefficient(curve, 0, 1.5, 'monotone-cubic')
+    const c = segmentCoefficient(curve, 0, 1.5, { interpolation: 'monotone-cubic' })
     expect(Math.abs(c / (21 / 16) - 1)).toBeLessThan(1e-15)
   })
 
@@ -320,8 +320,8 @@ describe('monotone cubic interpolation', () => {
       [1.4, 0.36],
     ]
     for (const interpolation of ['linear', 'monotone-cubic'] as const) {
-      expect(segmentCoefficient(curve, 1, 1.35 - 1e-4, interpolation)).toBe(0.35)
-      expect(segmentCoefficient(curve, 1, 1.35 + 1e-4, interpolation)).toBe(0.65)
+      expect(segmentCoefficient(curve, 1, 1.35 - 1e-4, { interpolation })).toBe(0.35)
+      expect(segmentCoefficient(curve, 1, 1.35 + 1e-4, { interpolation })).toBe(0.65)
     }
   })
 
@@ -335,7 +335,7 @@ describe('monotone cubic interpolation', () => {
     ]
     expect([heldSegment(lift, 1), heldSegment(lift, 1, false)]).toEqual([true, false])
     expect(segmentCoefficient(lift, 1, 1.62)).toBe(1)
-    expect(segmentCoefficient(lift, 1, 1.62, 'linear', false)).toBeCloseTo(3, 12)
+    expect(segmentCoefficient(lift, 1, 1.62, { held: false })).toBeCloseTo(3, 12)
     expect(
       heldSegment(
         [

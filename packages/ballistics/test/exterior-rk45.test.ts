@@ -15,16 +15,22 @@ describe('rk45', () => {
   it("keeps the error of y' = -y and of the oscillator near the tolerance", () => {
     let last = Number.POSITIVE_INFINITY
     for (const relativeTolerance of [1e-6, 1e-8, 1e-10]) {
-      const a = rk45(decay, 0, Float64Array.of(1), [], {
-        ...options,
-        relativeTolerance,
-        absoluteTolerance: relativeTolerance * 1e-2,
-      })
-      const b = rk45(oscillator, 0, Float64Array.of(0, 1), [], {
-        ...options,
-        relativeTolerance,
-        absoluteTolerance: relativeTolerance,
-      })
+      const a = rk45(
+        { f: decay, t0: 0, y0: Float64Array.of(1), events: [] },
+        {
+          ...options,
+          relativeTolerance,
+          absoluteTolerance: relativeTolerance * 1e-2,
+        },
+      )
+      const b = rk45(
+        { f: oscillator, t0: 0, y0: Float64Array.of(0, 1), events: [] },
+        {
+          ...options,
+          relativeTolerance,
+          absoluteTolerance: relativeTolerance,
+        },
+      )
       const err = Math.max(
         Math.abs(nth(a.y, 0) - Math.exp(-5)),
         Math.abs(nth(b.y, 0) - Math.sin(5)),
@@ -43,10 +49,12 @@ describe('rk45', () => {
       dy[1] = 2
     }
     const r = rk45(
-      f,
-      0,
-      Float64Array.of(0, 0),
-      [{ eventFunction: (_t, y) => nth(y, 0) - 2.25, direction: 1, terminal: false }],
+      {
+        f,
+        t0: 0,
+        y0: Float64Array.of(0, 0),
+        events: [{ eventFunction: (_t, y) => nth(y, 0) - 2.25, direction: 1, terminal: false }],
+      },
       {
         ...options,
         relativeTolerance: 1e-3,
@@ -63,13 +71,16 @@ describe('rk45', () => {
 
   it('has steps whose local error falls as h^6 (fifth order)', () => {
     const stepError = (h: number) => {
-      const r = rk45(decay, 0, Float64Array.of(1), [], {
-        relativeTolerance: 1e9,
-        absoluteTolerance: 1e9,
-        maxSteps: 1,
-        maxTime: h,
-        initialStep: h,
-      })
+      const r = rk45(
+        { f: decay, t0: 0, y0: Float64Array.of(1), events: [] },
+        {
+          relativeTolerance: 1e9,
+          absoluteTolerance: 1e9,
+          maxSteps: 1,
+          maxTime: h,
+          initialStep: h,
+        },
+      )
       return Math.abs(nth(r.y, 0) - Math.exp(-h))
     }
     const order = Math.log2(stepError(0.2) / stepError(0.1))
@@ -80,10 +91,12 @@ describe('rk45', () => {
   it('has a dense output whose midpoint error falls as h^5', () => {
     const midpointError = (h: number) => {
       const r = rk45(
-        decay,
-        0,
-        Float64Array.of(1),
-        [{ eventFunction: (t) => t - h / 2, direction: 1, terminal: false }],
+        {
+          f: decay,
+          t0: 0,
+          y0: Float64Array.of(1),
+          events: [{ eventFunction: (t) => t - h / 2, direction: 1, terminal: false }],
+        },
         {
           relativeTolerance: 1e9,
           absoluteTolerance: 1e9,
@@ -101,10 +114,12 @@ describe('rk45', () => {
 
   it('locates a terminal event on sin t', () => {
     const r = rk45(
-      oscillator,
-      0,
-      Float64Array.of(0, 1),
-      [{ eventFunction: (_t, y) => nth(y, 0), direction: -1, terminal: true }],
+      {
+        f: oscillator,
+        t0: 0,
+        y0: Float64Array.of(0, 1),
+        events: [{ eventFunction: (_t, y) => nth(y, 0), direction: -1, terminal: true }],
+      },
       {
         ...options,
         relativeTolerance: 1e-12,
@@ -124,10 +139,18 @@ describe('rk45', () => {
       direction: 1 as const,
       terminal,
     })
-    const r = rk45(clock, 0, Float64Array.of(0), [at(0.5, false), at(1, true), at(1.01, false)], {
-      ...options,
-      initialStep: 2,
-    })
+    const r = rk45(
+      {
+        f: clock,
+        t0: 0,
+        y0: Float64Array.of(0),
+        events: [at(0.5, false), at(1, true), at(1.01, false)],
+      },
+      {
+        ...options,
+        initialStep: 2,
+      },
+    )
     expect(r.steps).toBe(1)
     expect(r.event).toBe(1)
     expect(r.t).toBeCloseTo(1, 12)
@@ -136,19 +159,25 @@ describe('rk45', () => {
 
   it('counts the steps of earlier calls against the limit', () => {
     expect(() =>
-      rk45(oscillator, 0, Float64Array.of(0, 1), [], { ...options, maxSteps: 10, stepsBefore: 10 }),
+      rk45(
+        { f: oscillator, t0: 0, y0: Float64Array.of(0, 1), events: [] },
+        { ...options, maxSteps: 10, stepsBefore: 10 },
+      ),
     ).toThrow('more than 10 integration steps')
   })
 
   it('fails instead of looping', () => {
     expect(() =>
-      rk45(oscillator, 0, Float64Array.of(0, 1), [], { ...options, maxSteps: 3 }),
+      rk45(
+        { f: oscillator, t0: 0, y0: Float64Array.of(0, 1), events: [] },
+        { ...options, maxSteps: 3 },
+      ),
     ).toThrow(RangeError)
     const blowUp: Rhs = (_t, y, dy) => {
       dy[0] = nth(y, 0) * nth(y, 0)
     }
-    expect(() => rk45(blowUp, 0, Float64Array.of(1), [], { ...options, maxTime: 2 })).toThrow(
-      RangeError,
-    )
+    expect(() =>
+      rk45({ f: blowUp, t0: 0, y0: Float64Array.of(1), events: [] }, { ...options, maxTime: 2 }),
+    ).toThrow(RangeError)
   })
 })

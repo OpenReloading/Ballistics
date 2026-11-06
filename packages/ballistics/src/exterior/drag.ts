@@ -155,19 +155,29 @@ export function heldSegment(table: DragTable, k: number, slope = true): boolean 
   )
 }
 
+/** How `segmentCoefficient` reads a segment. */
+export interface SegmentReading {
+  /** Default `linear`. */
+  interpolation?: DragInterpolation | undefined
+  /**
+   * Whether the segment is held at its node values outside its nodes; default `heldSegment` with the
+   * slope rule, the reading of a drag table (a coefficient table passes `heldSegment(table, k, false)`).
+   */
+  held?: boolean | undefined
+}
+
 /**
  * Drag coefficient on segment k (see `dragSegment`), extended past the segment's nodes as the same
- * line or cubic, or held at the node values when `held` (default: `heldSegment` with the slope
- * rule, the reading of a drag table; a coefficient table passes `heldSegment(table, k, false)`);
- * the end value on the segments outside the table. The integrator holds k fixed within a step.
+ * line or cubic, or held at the node values when the reading holds it; the end value on the
+ * segments outside the table. The integrator holds k fixed within a step.
  */
 export function segmentCoefficient(
   table: DragTable,
   k: number,
   mach: number,
-  interpolation: DragInterpolation = 'linear',
-  held?: boolean,
+  reading: SegmentReading = {},
 ): number {
+  const { interpolation = 'linear', held } = reading
   if (k < 0) return entry(table, 0)[1]
   if (k >= table.length - 1) return entry(table, table.length - 1)[1]
   const m =

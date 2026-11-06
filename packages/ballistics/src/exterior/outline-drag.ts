@@ -205,18 +205,22 @@ function band(m: number, dRB: number): number {
   return (m < 0.95 ? m ** 12.5 : 0.21 + 0.28 / (m * m)) * (dRB - 1)
 }
 
-/** The validated outline in calibers, with the meplat and band diameters the nodes need. */
-function outlineShape(input: OutlineDragInput) {
-  const d = input.diameter
-  need(Number.isFinite(d) && d > 0, 'diameter must be positive')
+/** The lengths and diameters of the outline in calibers of `d`, with the defaults of the optional ones. */
+function outlineCalibers(input: OutlineDragInput, d: number) {
   const cal = (len: number) => len / d
-  const lt = cal(input.length)
-  const ln = cal(input.noseLength)
-  const lbt = cal(input.boatTailLength ?? 0)
-  const db = cal(input.baseDiameter ?? d)
-  const dM = cal(input.meplatDiameter ?? 0)
-  const dRB = cal(input.bandDiameter ?? d)
-  const rtr = input.headShape
+  return {
+    lt: cal(input.length),
+    ln: cal(input.noseLength),
+    lbt: cal(input.boatTailLength ?? 0),
+    db: cal(input.baseDiameter ?? d),
+    dM: cal(input.meplatDiameter ?? 0),
+    dRB: cal(input.bandDiameter ?? d),
+  }
+}
+
+/** Rejects an outline in calibers, with its head shape `rtr`, that the method cannot take. */
+function checkOutline(c: ReturnType<typeof outlineCalibers>, rtr: number): void {
+  const { lt, ln, lbt, db, dM, dRB } = c
   need(Number.isFinite(lt) && ln > 0, 'length and noseLength must be positive')
   need(Number.isFinite(rtr) && rtr >= 0 && rtr <= 1, 'headShape must be from 0 to 1')
   need(Number.isFinite(lbt) && lbt >= 0, 'boatTailLength must be zero or more')
@@ -224,6 +228,16 @@ function outlineShape(input: OutlineDragInput) {
   need(Number.isFinite(dM) && dM >= 0 && dM < 1, 'meplatDiameter must be zero up to the diameter')
   need(Number.isFinite(dRB) && dRB >= 1, 'bandDiameter must be at least the diameter')
   need(ln + lbt <= lt, 'noseLength plus boatTailLength must not exceed length')
+}
+
+/** The validated outline in calibers, with the meplat and band diameters the nodes need. */
+function outlineShape(input: OutlineDragInput) {
+  const d = input.diameter
+  need(Number.isFinite(d) && d > 0, 'diameter must be positive')
+  const calibers = outlineCalibers(input, d)
+  const { lt, ln, lbt, db, dM, dRB } = calibers
+  const rtr = input.headShape
+  checkOutline(calibers, rtr)
   const dMm = d * 1000
   const shape: Shape = {
     lt,
