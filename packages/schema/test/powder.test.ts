@@ -8,6 +8,9 @@ const base = {
   provenance: { kind: 'published', sources: [{ title: 'Product page', fields: ['name'] }] },
 } as const
 
+const paths = (record: object) =>
+  powder.safeParse(record).error?.issues.map((i) => i.path.join('.'))
+
 describe('powder', () => {
   it('accepts a record without the identity fields', () => {
     expect(powder.safeParse(base).success).toBe(true)
@@ -28,14 +31,14 @@ describe('powder', () => {
   })
 
   it('rejects an unknown form or base, an empty alias and an empty alias list', () => {
-    const paths = (record: object) =>
-      powder.safeParse(record).error?.issues.map((i) => i.path.join('.'))
     expect(paths({ ...base, grainForm: 'granular' })).toEqual(['grainForm'])
     expect(paths({ ...base, propellantBase: 'quadruple' })).toEqual(['propellantBase'])
     expect(paths({ ...base, aliases: [''] })).toEqual(['aliases.0'])
     expect(paths({ ...base, aliases: [] })).toEqual(['aliases'])
   })
+})
 
+describe('powder country and listed cartridges', () => {
   it('accepts a country with a source that names it, and rejects the other cases', () => {
     const named = { title: 'Supplier address', fields: ['country'] }
     const sources = (...more: object[]) => ({
@@ -43,8 +46,6 @@ describe('powder', () => {
       sources: [...base.provenance.sources, ...more],
     })
     expect(powder.parse({ ...base, country: 'FI', provenance: sources(named) }).country).toBe('FI')
-    const paths = (record: object) =>
-      powder.safeParse(record).error?.issues.map((i) => i.path.join('.'))
     // a source without `fields` supports the whole record in general, but not a country
     expect(
       paths({
@@ -71,8 +72,6 @@ describe('powder', () => {
       powder.parse({ ...base, listedCartridges: ['308-win'], provenance }).listedCartridges,
     ).toEqual(['308-win'])
     expect(powder.parse(base).listedCartridges).toBeUndefined()
-    const paths = (record: object) =>
-      powder.safeParse(record).error?.issues.map((i) => i.path.join('.'))
     // a source without `fields` does not name the list
     expect(paths({ ...base, listedCartridges: ['308-win'] })).toEqual(['listedCartridges'])
     expect(paths({ ...base, listedCartridges: [], provenance })).toEqual(['listedCartridges'])

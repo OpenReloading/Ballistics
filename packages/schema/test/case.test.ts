@@ -48,7 +48,9 @@ describe('Case', () => {
     for (const material of caseMaterials.options)
       expect(cartridgeCase.safeParse({ ...record, material }).success).toBe(true)
   })
+})
 
+describe('Case: pockets, values and references', () => {
   it('knows Boxer and Berdan pockets only', () => {
     expect(cartridgeCase.safeParse({ ...record, primerPocket: { type: 'berdan' } }).success).toBe(
       true,
@@ -79,7 +81,9 @@ describe('Case', () => {
   it('is no catalogue record without origin catalogue', () => {
     expectIssueAt(catalogueCase, { ...record, origin: 'user' }, 'origin')
   })
+})
 
+describe('Case groups', () => {
   describe('a group of cases of the user', () => {
     const own = {
       origin: 'user',

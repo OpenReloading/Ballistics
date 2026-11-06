@@ -135,6 +135,10 @@
     "source": "import { waterDensity } from '@open-reloading/core'\nexport { waterDensity }",
     "rules": ["schema-imports-units-only"]
   },
+  "packages/schema/src/dom.ts": {
+    "source": "export const w = () => window.location.href",
+    "rules": ["logic-no-dom"]
+  },
   "packages/data/src/schema-and-fs.ts": {
     "source": "import { readFileSync } from 'node:fs'\nimport { Load } from '@open-reloading/schema'\nexport { readFileSync, Load }",
     "rules": []
@@ -251,6 +255,14 @@
     "source": "export const w = () => navigator.language",
     "rules": ["logic-no-dom"]
   },
+  "packages/locale-format/src/cycle-a.ts": {
+    "source": "import { b } from './cycle-b.ts'\nexport const a = () => b",
+    "rules": ["no-cycle"]
+  },
+  "packages/locale-format/src/cycle-b.ts": {
+    "source": "import { a } from './cycle-a.ts'\nexport const b = () => a",
+    "rules": ["no-cycle"]
+  },
   "packages/schema/src/cycle-a.ts": {
     "source": "import { b } from './cycle-b.ts'\nexport const a = () => b",
     "rules": ["no-cycle"]
@@ -290,5 +302,9 @@
   "packages/statistics/src/into-core.ts": {
     "source": "import { interior } from '../../core/src/index.ts'\nexport { interior }",
     "rules": ["statistics-imports-nothing"]
+  },
+  "packages/units/test/same-title.test.ts": {
+    "source": "import { it } from 'vitest'\nit('runs', () => {})\nit('runs', () => {})",
+    "rules": ["no-identical-title"]
   }
 }

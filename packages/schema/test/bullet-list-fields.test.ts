@@ -1,10 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { bulletListFields } from '../src/index.ts'
 
+const free = (material: 'copper' | 'lead') =>
+  bulletListFields({ construction: { raw: 'x', core: { material } } }).leadFree
+
+const of = (construction: Parameters<typeof bulletListFields>[0]['construction']) =>
+  bulletListFields({ construction }).construction
+
 describe('bulletListFields', () => {
   it('takes the structure, else the core material as <material>-core, else none', () => {
-    const of = (construction: Parameters<typeof bulletListFields>[0]['construction']) =>
-      bulletListFields({ construction }).construction
     expect(of({ raw: 'x', structure: 'monolithic', core: { material: 'copper' } })).toBe(
       'monolithic',
     )
@@ -14,8 +18,6 @@ describe('bulletListFields', () => {
   })
 
   it('gives lead-free true, false or undefined as leadFree', () => {
-    const free = (material: 'copper' | 'lead') =>
-      bulletListFields({ construction: { raw: 'x', core: { material } } }).leadFree
     expect(free('copper')).toBe(true)
     expect(free('lead')).toBe(false)
     expect(bulletListFields({}).leadFree).toBeUndefined()

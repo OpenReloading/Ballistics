@@ -7,7 +7,7 @@ import { catalogueRef, parseRef, ref, userIdRegex } from './ids.ts'
 import { load } from './load.ts'
 import { bulletOverrides, cartridgeOverrides, powderDraft } from './overrides.ts'
 import { provenanceKind } from './provenance.ts'
-import { text } from './shared.ts'
+import { isPlain, text } from './shared.ts'
 import { faceColour } from './target-face.ts'
 import { targetSheet } from './target-sheet.ts'
 import { quantity } from './units.ts'
@@ -433,7 +433,7 @@ export const userRecord = z.discriminatedUnion(
   ],
   {
     error: (issue) =>
-      (issue.input as { kind?: unknown } | null)?.kind === 'workbenchState'
+      isPlain(issue.input) && issue.input['kind'] === 'workbenchState'
         ? legacyLoadProblem
         : undefined,
   },
@@ -456,18 +456,17 @@ export interface SkippedKind {
  * `kind` or of kind `workbenchState` stays, for the schema to refuse as before.
  */
 export function withoutUnknownKinds(json: unknown): { json: unknown; skipped: SkippedKind[] } {
-  const records = (json as { records?: unknown } | null)?.records
-  if (!Array.isArray(records)) return { json, skipped: [] }
+  if (!isPlain(json) || !Array.isArray(json['records'])) return { json, skipped: [] }
   const counts = new Map<string, number>()
-  const kept = records.filter((r) => {
-    const kind = (r as { kind?: unknown } | null)?.kind
+  const kept = json['records'].filter((r) => {
+    const kind = isPlain(r) ? r['kind'] : undefined
     if (typeof kind !== 'string' || knownKinds.has(kind) || kind === 'workbenchState') return true
     counts.set(kind, (counts.get(kind) ?? 0) + 1)
     return false
   })
   if (!counts.size) return { json, skipped: [] }
   const skipped = [...counts].map(([kind, count]) => ({ kind, count }))
-  return { json: { ...(json as object), records: kept }, skipped }
+  return { json: { ...json, records: kept }, skipped }
 }
 
 /** Media type of a stored photo: a raster image (an SVG can carry script). */
@@ -552,13 +551,19 @@ export function checkUserRefs(records: UserRecords): DanglingRef[] {
   for (const r of records) {
     for (const [field, target, kind, userOnly] of userRefsOf(r)) {
       if (target === undefined) continue
-      const parsed = parseRef(target)
-      if (parsed?.scope === 'catalogue' || (userOnly && parsed?.scope !== 'user')) continue
-      if (kindOf.get(parsed?.id ?? target) !== kind)
+      const id = userRecordId(target, userOnly)
+      if (id !== undefined && kindOf.get(id) !== kind)
         dangling.push({ record: r.id, kind: r.kind, field, target })
     }
   }
   return dangling
+}
+
+/** The id of the user record a reference names; undefined for a catalogue record. */
+function userRecordId(target: string, userOnly: boolean): string | undefined {
+  const parsed = parseRef(target)
+  if (parsed?.scope === 'catalogue' || (userOnly && parsed?.scope !== 'user')) return undefined
+  return parsed?.id ?? target
 }
 
 /** A user record as {@link userRefFields} reads it. */
@@ -568,39 +573,27 @@ export interface RecordOfUser {
 }
 
 /**
- * The fields of `record` whose reference names a record of the user (`user:<id>`): what another
+ * The fields of `r` whose reference names a record of the user (`user:<id>`): what another
  * browser would not have. A `catalogue:` reference and a plain catalogue id are not listed.
  */
-export function userRefFields(record: RecordOfUser): string[] {
-  return userRefsOf(record as UserRecord).flatMap(([field, target]) =>
+export function userRefFields(r: RecordOfUser): string[] {
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- reads only the reference fields the kind has
+  return userRefsOf(r as UserRecord).flatMap(([field, target]) =>
     target !== undefined && parseRef(target)?.scope === 'user' ? [field] : [],
   )
 }
 
 /**
- * The references of a record to other user records: the field, its text, the kind the record must
+ * A reference of a record to another user record: the field, its text, the kind the record must
  * have and whether only a `user:` reference counts (a plain text names a catalogue record).
  */
-function userRefsOf(r: UserRecord): [string, string | undefined, UserRecordKind, boolean][] {
+type UserRef = [field: string, target: string | undefined, kind: UserRecordKind, userOnly: boolean]
+
+/** The references of a record to other user records. */
+function userRefsOf(r: UserRecord): UserRef[] {
   switch (r.kind) {
     case 'load':
-      return [
-        ['firearm', r.data.firearm, 'firearm', true],
-        ['cartridge', r.data.cartridge, 'cartridge', true],
-        ['bullet', typeof r.data.bullet === 'string' ? r.data.bullet : undefined, 'bullet', true],
-        ['powder', typeof r.data.powder === 'string' ? r.data.powder : undefined, 'powder', true],
-        ['capacity', r.data.capacity, 'caseCapacity', true],
-        ['case.record', r.data.case?.record, 'case', true],
-        ['case.manufacturer', r.data.case?.manufacturer, 'manufacturer', true],
-        ...(r.data.sessions ?? []).map(
-          (s, i): [string, string | undefined, UserRecordKind, boolean] => [
-            `sessions.${i}`,
-            s,
-            'session',
-            true,
-          ],
-        ),
-      ]
+      return loadRefs(r.data)
     case 'caseCapacity':
       return [
         ['cartridge', r.data.cartridge, 'cartridge', true],
@@ -613,27 +606,9 @@ function userRefsOf(r: UserRecord): [string, string | undefined, UserRecordKind,
         ['capacity', r.data.capacity, 'caseCapacity', true],
       ]
     case 'targetSheet':
-      return [
-        ['load', r.data.load, 'load', false],
-        ...r.data.groups.flatMap((g, gi) =>
-          g.shots.map((shot, si): [string, string | undefined, UserRecordKind, boolean] => [
-            `groups.${gi}.shots.${si}.chrono.session`,
-            shot.chrono?.session,
-            'session',
-            true,
-          ]),
-        ),
-      ]
+      return targetSheetRefs(r.data)
     case 'session':
-      return [
-        ['device.manufacturer', r.data.device.manufacturer, 'manufacturer', true],
-        ...r.data.strings.map((s, i): [string, string | undefined, UserRecordKind, boolean] => [
-          `strings.${i}.load`,
-          s.load,
-          'load',
-          true,
-        ]),
-      ]
+      return sessionRefs(r.data)
     case 'bullet':
       return [['manufacturer', r.data.manufacturer, 'manufacturer', true]]
     case 'firearm':
@@ -642,18 +617,7 @@ function userRefsOf(r: UserRecord): [string, string | undefined, UserRecordKind,
         ['landsBullet', r.data.landsBullet, 'bullet', true],
       ]
     case 'event':
-      return [
-        ['firearm', r.data.firearm, 'firearm', true],
-        ['load', r.data.load, 'load', true],
-        ...(r.data.results.method === 'rings' ? r.data.results.series : []).map(
-          (s, i): [string, string | undefined, UserRecordKind, boolean] => [
-            `results.series.${i}.targetSheet`,
-            s.targetSheet,
-            'targetSheet',
-            true,
-          ],
-        ),
-      ]
+      return eventRefs(r.data)
     case 'shootingLogEntry':
       return [
         ['firearm', r.data.firearm, 'firearm', true],
@@ -665,14 +629,64 @@ function userRefsOf(r: UserRecord): [string, string | undefined, UserRecordKind,
   }
 }
 
+/** The records a load names: its firearm, cartridge, components, case and sessions. */
+function loadRefs(l: z.infer<typeof load>): UserRef[] {
+  return [
+    ['firearm', l.firearm, 'firearm', true],
+    ['cartridge', l.cartridge, 'cartridge', true],
+    ['bullet', typeof l.bullet === 'string' ? l.bullet : undefined, 'bullet', true],
+    ['powder', typeof l.powder === 'string' ? l.powder : undefined, 'powder', true],
+    ['capacity', l.capacity, 'caseCapacity', true],
+    ['case.record', l.case?.record, 'case', true],
+    ['case.manufacturer', l.case?.manufacturer, 'manufacturer', true],
+    ...(l.sessions ?? []).map((s, i): UserRef => [`sessions.${i}`, s, 'session', true]),
+  ]
+}
+
+/** The load a target sheet names and the session of each chronographed shot. */
+function targetSheetRefs(t: z.infer<typeof targetSheet>): UserRef[] {
+  return [
+    ['load', t.load, 'load', false],
+    ...t.groups.flatMap((g, gi) =>
+      g.shots.map(
+        (shot, si): UserRef => [
+          `groups.${gi}.shots.${si}.chrono.session`,
+          shot.chrono?.session,
+          'session',
+          true,
+        ],
+      ),
+    ),
+  ]
+}
+
+/** The maker of a session's device and the load of each string. */
+function sessionRefs(s: z.infer<typeof chronoSession>): UserRef[] {
+  return [
+    ['device.manufacturer', s.device.manufacturer, 'manufacturer', true],
+    ...s.strings.map((str, i): UserRef => [`strings.${i}.load`, str.load, 'load', true]),
+  ]
+}
+
+/** The firearm and load of an event and the target sheet of each ring series. */
+function eventRefs(e: z.infer<typeof competitionEvent>): UserRef[] {
+  return [
+    ['firearm', e.firearm, 'firearm', true],
+    ['load', e.load, 'load', true],
+    ...(e.results.method === 'rings' ? e.results.series : []).map(
+      (s, i): UserRef => [`results.series.${i}.targetSheet`, s.targetSheet, 'targetSheet', true],
+    ),
+  ]
+}
+
 /**
  * Why a user data file of another format version is refused, naming the version this build reads;
  * undefined for a file of the current version or of another format.
  */
 export function versionProblem(json: unknown): string | undefined {
-  const f = json as { format?: unknown; version?: unknown } | null
-  if (f?.format === userDataFormat && f.version !== userDataVersion)
-    return `The file has format version ${JSON.stringify(f.version)}; this app reads version ${userDataVersion}.`
+  if (isPlain(json) && json['format'] === userDataFormat && json['version'] !== userDataVersion)
+    return `The file has format version ${JSON.stringify(json['version'])}; this app reads version ${userDataVersion}.`
+  return undefined
 }
 
 /** A user manufacturer. */

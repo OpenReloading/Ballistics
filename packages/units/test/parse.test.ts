@@ -63,8 +63,8 @@ it('reads a number written with either decimal mark in either language', () => {
         expect(asOwn).toEqual(number(value, canonical))
         // the other mark reads as the same number, or as ambiguous with it as the decimal reading
         const asOther = parseNumber(canonical.replace('.', own === '.' ? ',' : '.'), own)
-        if (asOther.kind === 'ambiguous') expect(asOther.decimal).toBe(value)
-        else expect(asOther).toEqual(number(value, canonical))
+        const decimal = asOther.kind === 'ambiguous' ? number(asOther.decimal, canonical) : asOther
+        expect(decimal).toEqual(number(value, canonical))
       },
     ),
   )

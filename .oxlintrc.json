@@ -278,12 +278,7 @@
       }
     },
     {
-      "files": [
-        "packages/schema/src/**",
-        "packages/core/src/**",
-        "packages/importers/src/**",
-        "packages/drawing/src/**"
-      ],
+      "files": ["packages/core/src/**", "packages/importers/src/**", "packages/drawing/src/**"],
       "rules": {
         "no-restricted-globals": [
           "error",
@@ -544,32 +539,6 @@
               {
                 "regex": "^(\\.\\./)+((units|schema|importers|core|data|api|drawing|cli)/(src|dist)|packages|apps)/",
                 "message": "importers-imports-schema-only: packages/importers has no I/O and imports nothing but @open-reloading/schema and its own files."
-              }
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "files": ["packages/schema/src/**"],
-      "rules": {
-        "no-restricted-imports": [
-          "error",
-          {
-            "paths": [],
-            "patterns": [
-              {
-                "group": [
-                  "@open-reloading/*",
-                  "@open-reloading/*/**",
-                  "!@open-reloading/units",
-                  "!@open-reloading/units/**"
-                ],
-                "message": "schema-imports-units-only: packages/schema imports no workspace package but @open-reloading/units."
-              },
-              {
-                "regex": "^(\\.\\./)+((units|schema|importers|core|data|api|drawing|cli)/(src|dist)|packages|apps)/",
-                "message": "schema-imports-units-only: packages/schema imports no workspace package but @open-reloading/units."
               }
             ]
           }

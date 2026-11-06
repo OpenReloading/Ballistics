@@ -1,0 +1,260 @@
+{
+  "$schema": "../node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc", "import", "promise", "vitest", "jest"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error"
+  },
+  "rules": {
+    "array-callback-return": "error",
+    "complexity": [
+      "error",
+      {
+        "max": 10
+      }
+    ],
+    "default-case-last": "error",
+    "eqeqeq": [
+      "error",
+      "always",
+      {
+        "null": "ignore"
+      }
+    ],
+    "import/no-cycle": "error",
+    "jest/expect-expect": "off",
+    "jest/no-commented-out-tests": "off",
+    "jest/no-conditional-expect": "off",
+    "jest/no-disabled-tests": "off",
+    "jest/no-focused-tests": "off",
+    "jest/no-standalone-expect": "off",
+    "jest/prefer-snapshot-hint": "off",
+    "jest/require-to-throw-message": "off",
+    "jest/valid-describe-callback": "off",
+    "jest/valid-expect": "off",
+    "jest/valid-expect-in-promise": "off",
+    "jest/valid-title": "off",
+    "max-depth": [
+      "error",
+      {
+        "max": 3
+      }
+    ],
+    "max-lines-per-function": [
+      "error",
+      {
+        "max": 50,
+        "skipBlankLines": true,
+        "skipComments": true
+      }
+    ],
+    "max-params": [
+      "error",
+      {
+        "max": 4
+      }
+    ],
+    "no-array-constructor": "error",
+    "no-case-declarations": "error",
+    "no-cond-assign": ["error", "always"],
+    "no-constructor-return": "error",
+    "no-else-return": "error",
+    "no-extra-label": "error",
+    "no-fallthrough": "error",
+    "no-inner-declarations": "error",
+    "no-label-var": "error",
+    "no-labels": [
+      "error",
+      {
+        "allowLoop": true
+      }
+    ],
+    "no-lone-blocks": "error",
+    "no-lonely-if": "error",
+    "no-nested-ternary": "error",
+    "no-param-reassign": "error",
+    "no-proto": "error",
+    "no-prototype-builtins": "error",
+    "no-redeclare": "error",
+    "no-regex-spaces": "error",
+    "no-script-url": "error",
+    "no-self-compare": "error",
+    "no-sequences": "error",
+    "no-template-curly-in-string": "error",
+    "no-unneeded-ternary": "error",
+    "no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrors": "none",
+        "ignoreRestSiblings": true
+      }
+    ],
+    "no-use-before-define": [
+      "error",
+      {
+        "functions": false,
+        "classes": false,
+        "variables": false,
+        "typedefs": false,
+        "ignoreTypeReferences": true
+      }
+    ],
+    "no-useless-catch": "error",
+    "no-useless-return": "error",
+    "oxc/no-accumulating-spread": "error",
+    "oxc/no-const-enum": "error",
+    "prefer-arrow-callback": [
+      "error",
+      {
+        "allowNamedFunctions": true
+      }
+    ],
+    "prefer-const": "error",
+    "prefer-exponentiation-operator": "error",
+    "prefer-numeric-literals": "error",
+    "prefer-regex-literals": "error",
+    "prefer-rest-params": "error",
+    "prefer-template": "error",
+    "promise/no-nesting": "error",
+    "radix": "error",
+    "typescript/adjacent-overload-signatures": "error",
+    "typescript/ban-ts-comment": "error",
+    "typescript/ban-types": "error",
+    "typescript/consistent-type-imports": [
+      "error",
+      {
+        "disallowTypeAnnotations": false
+      }
+    ],
+    "typescript/no-empty-interface": [
+      "error",
+      {
+        "allowSingleExtends": true
+      }
+    ],
+    "typescript/no-explicit-any": "error",
+    "typescript/no-import-type-side-effects": "error",
+    "typescript/no-invalid-void-type": "error",
+    "typescript/no-non-null-assertion": "error",
+    "typescript/no-unnecessary-boolean-literal-compare": "error",
+    "typescript/no-unnecessary-type-assertion": "error",
+    "typescript/no-unnecessary-type-parameters": "error",
+    "typescript/prefer-for-of": "error",
+    "typescript/prefer-function-type": "error",
+    "typescript/prefer-literal-enum-member": "error",
+    "unicorn/no-document-cookie": "error",
+    "unicorn/no-instanceof-array": "error",
+    "unicorn/no-static-only-class": "error",
+    "unicorn/no-useless-switch-case": "error",
+    "unicorn/no-useless-undefined": [
+      "error",
+      {
+        "checkArguments": false,
+        "checkArrowFunctionBody": false
+      }
+    ],
+    "unicorn/prefer-array-flat-map": "error",
+    "unicorn/prefer-array-index-of": "error",
+    "unicorn/prefer-date-now": "error",
+    "unicorn/prefer-dom-node-text-content": "error",
+    "unicorn/prefer-math-min-max": "error",
+    "unicorn/prefer-node-protocol": "error",
+    "unicorn/prefer-number-properties": [
+      "error",
+      {
+        "checkNaN": false
+      }
+    ],
+    "vitest/expect-expect": [
+      "error",
+      {
+        "assertFunctionNames": [
+          "expect",
+          "expectTypeOf",
+          "assert",
+          "assertType",
+          "expectIssueAt",
+          "rejectsAt",
+          "accepts"
+        ]
+      }
+    ],
+    "vitest/valid-expect": ["error", { "maxArgs": 2 }]
+  },
+  "overrides": [
+    {
+      "files": ["test/**"],
+      "rules": {
+        "typescript/no-unsafe-type-assertion": "off",
+        "unicorn/prefer-dom-node-text-content": "off",
+        "no-script-url": "off",
+        "vitest/no-focused-tests": "error",
+        "vitest/no-duplicate-hooks": "error",
+        "vitest/no-identical-title": "error",
+        "jest/no-export": "error"
+      }
+    },
+    {
+      "files": ["src/**"],
+      "rules": {
+        "no-restricted-globals": [
+          "error",
+          {
+            "name": "window",
+            "message": "logic-no-dom: a logic package runs anywhere, so it reads no browser global."
+          },
+          {
+            "name": "document",
+            "message": "logic-no-dom: a logic package runs anywhere, so it reads no browser global."
+          },
+          {
+            "name": "navigator",
+            "message": "logic-no-dom: a logic package runs anywhere, so it reads no browser global."
+          },
+          {
+            "name": "location",
+            "message": "logic-no-dom: a logic package runs anywhere, so it reads no browser global."
+          },
+          {
+            "name": "localStorage",
+            "message": "logic-no-dom: a logic package runs anywhere, so it reads no browser global."
+          },
+          {
+            "name": "sessionStorage",
+            "message": "logic-no-dom: a logic package runs anywhere, so it reads no browser global."
+          },
+          {
+            "name": "indexedDB",
+            "message": "logic-no-dom: a logic package runs anywhere, so it reads no browser global."
+          },
+          {
+            "name": "HTMLElement",
+            "message": "logic-no-dom: a logic package runs anywhere, so it reads no browser global."
+          },
+          {
+            "name": "Element",
+            "message": "logic-no-dom: a logic package runs anywhere, so it reads no browser global."
+          },
+          {
+            "name": "requestAnimationFrame",
+            "message": "logic-no-dom: a logic package runs anywhere, so it reads no browser global."
+          },
+          {
+            "name": "getComputedStyle",
+            "message": "logic-no-dom: a logic package runs anywhere, so it reads no browser global."
+          },
+          {
+            "name": "matchMedia",
+            "message": "logic-no-dom: a logic package runs anywhere, so it reads no browser global."
+          },
+          {
+            "name": "alert",
+            "message": "logic-no-dom: a logic package runs anywhere, so it reads no browser global."
+          }
+        ]
+      }
+    }
+  ]
+}

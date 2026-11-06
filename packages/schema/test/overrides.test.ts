@@ -68,7 +68,7 @@ describe('applyOverrides', () => {
   })
 
   it('skips a field whose override is undefined', () => {
-    const r = applyOverrides({ name: 'a' } as Partial<Bullet>, { name: undefined, note: undefined })
+    const r = applyOverrides<Partial<Bullet>>({ name: 'a' }, { name: undefined, note: undefined })
     expect(r).toEqual({ name: 'a' })
     expect('note' in r).toBe(false)
   })
@@ -81,14 +81,17 @@ describe('applyOverrides', () => {
   })
 
   it('keeps no null from an override that adds an object the base lacks', () => {
-    const r = applyOverrides({ name: 'a' } as Partial<Bullet>, {
-      tip: { type: 'hollow-point', length: null },
-    })
+    const r = applyOverrides<Partial<Bullet>>(
+      { name: 'a' },
+      {
+        tip: { type: 'hollow-point', length: null },
+      },
+    )
     expect(r.tip).toEqual({ type: 'hollow-point' })
   })
 
   it('applies overrides to an empty base', () => {
-    expect(applyOverrides({} as Partial<Bullet>, { diameter: { value: 7.8 } })).toEqual({
+    expect(applyOverrides<Partial<Bullet>>({}, { diameter: { value: 7.8 } })).toEqual({
       diameter: { value: 7.8 },
     })
   })
@@ -123,7 +126,9 @@ describe('applyOverrides on cartridge values', () => {
     })
     expect(r.values).toHaveLength(5)
   })
+})
 
+describe('applyOverrides removing cartridge values', () => {
   it('removes the entry of a null value, a variant apart from its plain value', () => {
     const r = applyOverrides(cartridge, {
       values: [
@@ -142,13 +147,16 @@ describe('applyOverrides on cartridge values', () => {
   })
 
   it('takes every value as new without a base value list, dropping removals', () => {
-    const r = applyOverrides({} as Partial<Cartridge>, {
-      table: 'III',
-      values: [
-        { side: 'cartridge', symbol: 'L3', quantity: 'length', value: 50 },
-        { side: 'cartridge', symbol: 'R', quantity: 'length', value: null },
-      ],
-    })
+    const r = applyOverrides<Partial<Cartridge>>(
+      {},
+      {
+        table: 'III',
+        values: [
+          { side: 'cartridge', symbol: 'L3', quantity: 'length', value: 50 },
+          { side: 'cartridge', symbol: 'R', quantity: 'length', value: null },
+        ],
+      },
+    )
     expect(r).toEqual({
       table: 'III',
       values: [{ side: 'cartridge', symbol: 'L3', quantity: 'length', value: 50 }],
@@ -196,24 +204,26 @@ const items = (schema: z.ZodType, field: string) =>
 
 describe('override schema descriptions', () => {
   it('describes a field without one by its path and record', () => {
-    expect(descriptions(bulletOverrides).mass).toBe(
+    expect(descriptions(bulletOverrides)['mass']).toBe(
       'The `mass` of the bullet record. `null` removes it.',
     )
-    expect(descriptions(cartridgeOverrides).table).toBe(
+    expect(descriptions(cartridgeOverrides)['table']).toBe(
       'The `table` of the cartridge record. `null` removes it.',
     )
-    expect(items(bulletOverrides, 'ballisticCoefficients')?.properties?.dragModel).toMatchObject({
+    expect(
+      items(bulletOverrides, 'ballisticCoefficients')?.properties?.['dragModel'],
+    ).toMatchObject({
       description:
         'The `ballisticCoefficients.[].dragModel` of the bullet record. `null` removes it.',
     })
   })
 
   it('keeps the own description of an array item field and of a whole described item', () => {
-    expect(items(cartridgeOverrides, 'values')?.properties?.value).toMatchObject({
+    expect(items(cartridgeOverrides, 'values')?.properties?.['value']).toMatchObject({
       description:
         'In the stored unit of `quantity`. `null` removes the value of this side, symbol and variant.',
     })
-    expect(items(cartridgeOverrides, 'values')?.properties?.side).toMatchObject({
+    expect(items(cartridgeOverrides, 'values')?.properties?.['side']).toMatchObject({
       description:
         'Column the value is printed in. Absent for pressures, energies and measuring positions.',
     })

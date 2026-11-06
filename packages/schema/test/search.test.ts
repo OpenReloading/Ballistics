@@ -15,7 +15,7 @@ const find = (query: string) =>
   keys
     .map(({ id, key }) => ({ id, s: score(key, query) }))
     .filter((r): r is { id: string; s: number } => r.s !== undefined)
-    .sort((a, b) => b.s - a.s)
+    .toSorted((a, b) => b.s - a.s)
     .map((r) => r.id)
 
 describe('fold', () => {
@@ -24,10 +24,14 @@ describe('fold', () => {
   })
 })
 
+const key = (name: string) => searchKey([name])
+
+const mass = (text: string) => searchKey(['Plain', text])
+
 describe('score', () => {
   it('finds the same rows for every order of the words', () => {
-    expect(find('win 308').sort()).toEqual(find('308 win').sort())
-    expect(find('308 win').sort()).toEqual(['308-win'])
+    expect(find('win 308').toSorted()).toEqual(find('308 win').toSorted())
+    expect(find('308 win').toSorted()).toEqual(['308-win'])
     for (const q of ['win 300 mag', 'mag win 300', '300 mag win'])
       expect(find(q)).toEqual(['300-win-mag'])
   })
@@ -43,7 +47,6 @@ describe('score', () => {
   })
 
   it('matches a number as a whole number, not inside a longer one', () => {
-    const mass = (text: string) => searchKey(['Plain', text])
     // 7.8 is neither 17.82 nor 7.82; 7.82 is not 17.82
     expect(score(mass('17.82 g'), '7.8')).toBeUndefined()
     expect(score(mass('7.82 g'), '7.8')).toBeUndefined()
@@ -58,7 +61,9 @@ describe('score', () => {
     // a number ends at a point that is not followed by a digit
     expect(score(mass('7.62.'), '7.62')).toBeDefined()
   })
+})
 
+describe('score case, ranking and permutations', () => {
   it('ignores accents and case and has no match for a word no text holds', () => {
     expect(find('CAFE creme')).toEqual(['cafe'])
     expect(find('café')).toEqual(['cafe'])
@@ -70,7 +75,6 @@ describe('score', () => {
   })
 
   it('ranks the exact name over a word start over a substring', () => {
-    const key = (name: string) => searchKey([name])
     const exact = score(key('308 Win.'), '308 win')
     const start = score(key('308 Win. Short Magnum'), '308 win')
     const inner = score(key('Super308 Win.'), '308 win')
@@ -85,9 +89,9 @@ describe('score', () => {
   })
 
   it('gives every permutation of the words of a query the same score', () => {
-    const key = searchKey(['Maker', '168 HPBT Match'])
-    const base = score(key, 'maker 168 match')
+    const rowKey = searchKey(['Maker', '168 HPBT Match'])
+    const base = score(rowKey, 'maker 168 match')
     for (const q of ['168 maker match', 'match 168 maker', 'match maker 168'])
-      expect(score(key, q)).toBe(base)
+      expect(score(rowKey, q)).toBe(base)
   })
 })

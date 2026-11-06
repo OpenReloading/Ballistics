@@ -18,6 +18,13 @@ const user = {
   waterCapacity: { value: 3.52 },
 }
 
+const issues = (value: unknown) =>
+  caseCapacity.safeParse(value).error?.issues.map(({ code, path, message }) => ({
+    code,
+    path,
+    message,
+  }))
+
 describe('CaseCapacity', () => {
   it('is one schema for a catalogue record and a user record', () => {
     expect(caseCapacity.safeParse(catalogue).success).toBe(true)
@@ -55,17 +62,13 @@ describe('CaseCapacity', () => {
       'caseManufacturer',
     )
   })
+})
 
+describe('CaseCapacity rules of each origin', () => {
   it('names each catalogue rule in its issue and needs no case manufacturer', () => {
     const { caseManufacturer: _m, ...noMaker } = catalogue
     expect(caseCapacity.safeParse(noMaker).success).toBe(true)
     const { id: _id, provenance: _p, ...bare } = catalogue
-    const issues = (value: unknown) =>
-      caseCapacity.safeParse(value).error?.issues.map(({ code, path, message }) => ({
-        code,
-        path,
-        message,
-      }))
     expect(issues({ ...bare, cartridge: user.cartridge })).toEqual([
       { code: 'custom', path: ['id'], message: 'A catalogue capacity needs an id' },
       { code: 'custom', path: ['provenance'], message: 'A catalogue capacity needs provenance' },

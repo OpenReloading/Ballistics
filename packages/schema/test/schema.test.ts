@@ -47,6 +47,8 @@ const validSession = {
   provenance: measured,
 }
 
+const acceptsSource = (s: object) => source.safeParse({ title: 'Data sheet', ...s }).success
+
 describe('source', () => {
   it('takes an SPDX id or a LicenseRef with terms as the license', () => {
     const terms = {
@@ -62,17 +64,17 @@ describe('source', () => {
   })
 
   it('takes only http and https links in url and terms', () => {
-    const ok = (s: object) => source.safeParse({ title: 'Data sheet', ...s }).success
-    expect(ok({ url: 'https://example.com/sheet.pdf', terms: 'http://example.com/terms' })).toBe(
-      true,
-    )
-    expect(ok({ terms: 'Written permission on file' })).toBe(true)
+    expect(
+      acceptsSource({ url: 'https://example.com/sheet.pdf', terms: 'http://example.com/terms' }),
+    ).toBe(true)
+    expect(acceptsSource({ terms: 'Written permission on file' })).toBe(true)
     for (const link of ['javascript:alert(1)', 'data:text/html,x', 'ftp://example.com/x'])
-      expect(ok({ url: link })).toBe(false)
+      expect(acceptsSource({ url: link })).toBe(false)
     // terms: a link only from http:// or https://, any other text a note shown as text
     for (const note of ['Permission: granted by mail, 2026-11-02', 'javascript:alert(1)'])
-      expect(ok({ terms: note })).toBe(true)
-    for (const link of ['http://', 'https://a b']) expect(ok({ terms: link })).toBe(false)
+      expect(acceptsSource({ terms: note })).toBe(true)
+    for (const link of ['http://', 'https://a b'])
+      expect(acceptsSource({ terms: link })).toBe(false)
   })
 })
 
@@ -130,34 +132,34 @@ describe('firingSeries', () => {
   })
 
   it('needs the license and URL of every source', () => {
-    const [source] = series.provenance.sources
-    for (const sources of [[{ ...source, license: undefined }], [{ ...source, url: undefined }]]) {
+    const [cited] = series.provenance.sources
+    for (const sources of [[{ ...cited, license: undefined }], [{ ...cited, url: undefined }]]) {
       const provenance = { ...series.provenance, sources }
       expectIssueAt(firingSeries, { ...series, provenance }, 'provenance')
     }
   })
 })
 
-describe('rangeFirings', () => {
-  const firings = {
-    id: 'report-1988-m118',
-    projectile: 'M118 Match Bullet',
-    bulletDiameter: { value: 7.82 },
-    bulletMass: { value: 11.27 },
-    rounds: [
-      {
-        label: '13903',
-        mach: { value: 2.191 },
-        totalYaw: { value: 2.6, raw: '2.60' },
-        dragCoefficient: { value: 0.329, raw: '.3290' },
-      },
-    ],
-    provenance: {
-      kind: 'measured',
-      sources: [{ title: 'Report', url: 'https://example.org/r', sha256: 'a'.repeat(64) }],
+const firings = {
+  id: 'report-1988-m118',
+  projectile: 'M118 Match Bullet',
+  bulletDiameter: { value: 7.82 },
+  bulletMass: { value: 11.27 },
+  rounds: [
+    {
+      label: '13903',
+      mach: { value: 2.191 },
+      totalYaw: { value: 2.6, raw: '2.60' },
+      dragCoefficient: { value: 0.329, raw: '.3290' },
     },
-  }
+  ],
+  provenance: {
+    kind: 'measured',
+    sources: [{ title: 'Report', url: 'https://example.org/r', sha256: 'a'.repeat(64) }],
+  },
+}
 
+describe('rangeFirings', () => {
   it('accepts rounds with Mach, yaw and drag coefficient', () => {
     expect(rangeFirings.safeParse(firings).success).toBe(true)
   })
@@ -201,9 +203,9 @@ describe('caseTypes', () => {
   })
 })
 
-describe('leadFree', () => {
-  const of = (fields: Omit<ConstructionFields, 'raw'>) => leadFree({ raw: 'x', ...fields })
+const of = (fields: Omit<ConstructionFields, 'raw'>) => leadFree({ raw: 'x', ...fields })
 
+describe('leadFree', () => {
   it('is false for a lead core, with or without a jacket', () => {
     expect(of({ core: { material: 'lead' } })).toBe(false)
     expect(of({ core: { material: 'lead-alloy' }, jacket: { material: 'gilding-metal' } })).toBe(
@@ -232,27 +234,68 @@ describe('leadFree', () => {
   })
 })
 
-describe('bullet', () => {
-  const base = {
-    id: 'test-bullet-1',
-    manufacturer: 'test-manufacturer',
-    productNumber: '1',
-    name: 'Test bullet',
-    diameter: { value: 7.823 },
-    mass: { value: 10.886 },
-    provenance: {
-      kind: 'published',
-      sources: [
-        { title: 'Data sheet' },
-        { title: 'Photograph', kind: 'measured', fields: ['meplatDiameter'] },
-      ],
-    },
-  } as const
+type JsonNode = { properties?: Record<string, JsonNode> }
 
+/** The node at `path` of a JSON Schema, through `properties`. */
+const nodeAt = (node: JsonNode | undefined, path: string[]) =>
+  path.reduce((n, key) => n?.properties?.[key], node)
+
+const polymer = (value: number) => ({ type: 'polymer-tip', length: { value } })
+
+const conicalHollow = (fields: Record<string, unknown>) => ({
+  length: { value: 30 },
+  base: { type: 'conical-hollow-base', ...fields },
+})
+
+const hollow = (type: string, fields: Record<string, unknown> = {}) => ({
+  length: { value: 30 },
+  base: { type, cavityDiameter: { value: 5 }, ...fields },
+})
+
+const jacket = (value: number) => ({
+  construction: { raw: 'x', jacket: { thickness: { value } } },
+})
+
+const core = (material: string, hardness = 12) => ({
+  construction: { raw: 'x', core: { material, hardness: { value: hardness } } },
+})
+
+const tail = (fields: Record<string, unknown>) => ({ base: { type: 'boat-tail', ...fields } })
+
+const unit = (s: unknown) => JSON.stringify(s).match(/"unit":"([^"]+)"/)?.[1]
+
+const groove = (start: number, width: number, depth?: number) => ({
+  start: { value: start },
+  width: { value: width },
+  ...(depth === undefined ? {} : { depth: { value: depth } }),
+})
+
+const validBullet = {
+  id: 'test-bullet-1',
+  manufacturer: 'test-manufacturer',
+  productNumber: '1',
+  name: 'Test bullet',
+  diameter: { value: 7.823 },
+  mass: { value: 10.886 },
+  provenance: {
+    kind: 'published',
+    sources: [
+      { title: 'Data sheet' },
+      { title: 'Photograph', kind: 'measured', fields: ['meplatDiameter'] },
+    ],
+  },
+} as const
+
+const rejectsAt = (patch: Record<string, unknown>, path: string) =>
+  expectIssueAt(bullet, { ...validBullet, ...patch }, path)
+const accepts = (patch: Record<string, unknown>) =>
+  expect(bullet.safeParse({ ...validBullet, ...patch }).success).toBe(true)
+
+describe('bullet', () => {
   it('accepts the geometry fields, each optional', () => {
-    expect(bullet.safeParse(base).success).toBe(true)
+    expect(bullet.safeParse(validBullet).success).toBe(true)
     const full = {
-      ...base,
+      ...validBullet,
       meplatDiameter: { value: 1.6 },
       base: {
         type: 'boat-tail',
@@ -264,38 +307,40 @@ describe('bullet', () => {
       tip: { type: 'polymer-tip', length: { value: 3.2 } },
     }
     expect(bullet.parse(full)).toEqual(full)
-    const hollow = { ...base, tip: { type: 'hollow-point', mouthDiameter: { value: 1.5 } } }
-    const unnamed = { ...base, ogive: { radiusRatio: { value: 0.5 } } }
+    const hollowPoint = {
+      ...validBullet,
+      tip: { type: 'hollow-point', mouthDiameter: { value: 1.5 } },
+    }
+    const unnamed = { ...validBullet, ogive: { radiusRatio: { value: 0.5 } } }
     expect(bullet.parse(unnamed)).toEqual(unnamed)
-    expect(bullet.parse(hollow)).toEqual(hollow)
+    expect(bullet.parse(hollowPoint)).toEqual(hollowPoint)
   })
 
   it('accepts the round and flat nose forms and a cannelure', () => {
     for (const form of ['round-nose', 'flat-nose']) {
-      expect(bullet.safeParse({ ...base, ogive: { form } }).success).toBe(true)
+      expect(bullet.safeParse({ ...validBullet, ogive: { form } }).success).toBe(true)
     }
-    const grooved = { ...base, cannelure: { start: { value: 9 }, width: { value: 1.2 } } }
+    const grooved = { ...validBullet, cannelure: { start: { value: 9 }, width: { value: 1.2 } } }
     expect(bullet.parse(grooved)).toEqual(grooved)
     const deep = {
-      ...base,
+      ...validBullet,
       cannelure: { start: { value: 9 }, width: { value: 1.2 }, depth: { value: 0.2 } },
     }
     expect(bullet.parse(deep)).toEqual(deep)
-    expect(bullet.safeParse({ ...base, cannelure: { start: { value: 9 } } }).success).toBe(false)
+    expect(bullet.safeParse({ ...validBullet, cannelure: { start: { value: 9 } } }).success).toBe(
+      false,
+    )
     expect(
-      bullet.safeParse({ ...base, cannelure: { start: { value: 9 }, width: { value: 0 } } })
+      bullet.safeParse({ ...validBullet, cannelure: { start: { value: 9 }, width: { value: 0 } } })
         .success,
     ).toBe(false)
   })
+})
 
+describe('bullet cannelure and units', () => {
   it('refuses a cannelure that leaves the shank or is deeper than the radius', () => {
-    const groove = (start: number, width: number, depth?: number) => ({
-      start: { value: start },
-      width: { value: width },
-      ...(depth === undefined ? {} : { depth: { value: depth } }),
-    })
     const issues = (extra: object) => {
-      const r = bullet.safeParse({ ...base, ...extra })
+      const r = bullet.safeParse({ ...validBullet, ...extra })
       return r.success ? [] : r.error.issues.map((i) => i.path.join('.'))
     }
     const shaped = { length: { value: 30 }, noseLength: { value: 12 } }
@@ -318,33 +363,28 @@ describe('bullet', () => {
     expect(issues({ ...shaped, ...flat, cannelure: groove(1, 1.2) })).toEqual([])
     // the depth stays below the radius (3.9115 mm)
     expect(issues({ cannelure: groove(9, 1.2, 3.9) })).toEqual([])
-    expect(issues({ cannelure: groove(9, 1.2, base.diameter.value / 2) })).toEqual([
+    expect(issues({ cannelure: groove(9, 1.2, validBullet.diameter.value / 2) })).toEqual([
       'cannelure.depth',
     ])
     expect(issues({ cannelure: groove(9, 1.2, 3.92) })).toEqual(['cannelure.depth'])
   })
 
   it('carries the unit of each geometry field in the JSON Schema', () => {
-    const json = z.toJSONSchema(bullet, { io: 'input' }) as {
-      properties: Record<string, { properties?: Record<string, unknown> }>
-    }
-    const unit = (s: unknown) => JSON.stringify(s).match(/"unit":"([^"]+)"/)?.[1]
-    const { meplatDiameter, base, ogive, tip } = json.properties
-    expect(unit(meplatDiameter)).toBe('mm')
-    expect(unit(base?.properties?.diameter)).toBe('mm')
-    expect(unit(base?.properties?.angle)).toBe('deg')
-    expect(unit(ogive?.properties?.radius)).toBe('mm')
-    expect(unit(ogive?.properties?.radiusRatio)).toBe('1')
-    expect(unit(tip?.properties?.length)).toBe('mm')
-    expect(unit(tip?.properties?.mouthDiameter)).toBe('mm')
+    const json = z.toJSONSchema(bullet, { io: 'input' }) as JsonNode
+    for (const [path, u] of [
+      ['meplatDiameter', 'mm'],
+      ['base.diameter', 'mm'],
+      ['base.angle', 'deg'],
+      ['ogive.radius', 'mm'],
+      ['ogive.radiusRatio', '1'],
+      ['tip.length', 'mm'],
+      ['tip.mouthDiameter', 'mm'],
+    ] as const)
+      expect(unit(nodeAt(json, path.split('.'))), path).toBe(u)
   })
+})
 
-  const rejectsAt = (patch: Record<string, unknown>, path: string) =>
-    expectIssueAt(bullet, { ...base, ...patch }, path)
-  const accepts = (patch: Record<string, unknown>) =>
-    expect(bullet.safeParse({ ...base, ...patch }).success).toBe(true)
-  const tail = (fields: Record<string, unknown>) => ({ base: { type: 'boat-tail', ...fields } })
-
+describe('bullet construction', () => {
   it('takes the construction as the manufacturer wording with optional structured fields', () => {
     accepts({ construction: { raw: 'Jacketed Lead' } })
     accepts({
@@ -385,21 +425,17 @@ describe('bullet', () => {
   })
 
   it('takes the core hardness for a lead core and the jacket thickness below the radius', () => {
-    const core = (material: string, hardness = 12) => ({
-      construction: { raw: 'x', core: { material, hardness: { value: hardness } } },
-    })
     accepts(core('lead-alloy'))
     accepts(core('lead'))
     rejectsAt(core('copper'), 'construction.core.hardness')
     rejectsAt(core('lead', 0), 'construction.core.hardness.value')
-    const jacket = (value: number) => ({
-      construction: { raw: 'x', jacket: { thickness: { value } } },
-    })
     accepts(jacket(0.3))
     rejectsAt(jacket(0), 'construction.jacket.thickness.value')
-    rejectsAt(jacket(base.diameter.value / 2), 'construction.jacket.thickness')
+    rejectsAt(jacket(validBullet.diameter.value / 2), 'construction.jacket.thickness')
   })
+})
 
+describe('bullet construction rules and country', () => {
   it('takes a gas check only for a cast bullet and driving bands only for a monolithic one', () => {
     accepts({ construction: { raw: 'x', structure: 'cast', gasCheck: true } })
     accepts({ construction: { raw: 'x', structure: 'cast', gasCheck: false } })
@@ -438,9 +474,9 @@ describe('bullet', () => {
   it('needs a source that names the country, from a code of two capital letters', () => {
     const named = { title: 'Contact page', fields: ['country'] }
     const sources = (...more: object[]) => ({
-      provenance: { kind: 'published', sources: [...base.provenance.sources, ...more] },
+      provenance: { kind: 'published', sources: [...validBullet.provenance.sources, ...more] },
     })
-    expect(bullet.parse({ ...base, country: 'US', ...sources(named) }).country).toBe('US')
+    expect(bullet.parse({ ...validBullet, country: 'US', ...sources(named) }).country).toBe('US')
     rejectsAt({ country: 'US' }, 'country')
     rejectsAt(
       { country: 'US', provenance: { kind: 'published', sources: [{ title: 'Sheet' }] } },
@@ -449,7 +485,9 @@ describe('bullet', () => {
     for (const country of ['us', 'USA', 'United States'])
       rejectsAt({ country, ...sources(named) }, 'country')
   })
+})
 
+describe('bullet ogive, tip and base', () => {
   it('rejects an ogive without form, radius and Rt/R', () => {
     rejectsAt({ ogive: {} }, 'ogive')
     accepts({ ogive: { radius: { value: 60 } } })
@@ -471,10 +509,6 @@ describe('bullet', () => {
   })
 
   it('takes a hollow base with its cavity diameter, alone or on a tail', () => {
-    const hollow = (type: string, fields: Record<string, unknown> = {}) => ({
-      length: { value: 30 },
-      base: { type, cavityDiameter: { value: 5 }, ...fields },
-    })
     for (const type of ['conical-hollow-base', 'rounded-hollow-base']) {
       accepts(hollow(type))
       accepts(hollow(type, { length: { value: 3 }, diameter: { value: 6.6 }, angle: { value: 8 } }))
@@ -486,16 +520,12 @@ describe('bullet', () => {
   })
 
   it('keeps the cavity inside the base face and the tail inside the bullet', () => {
-    const hollow = (fields: Record<string, unknown>) => ({
-      length: { value: 30 },
-      base: { type: 'conical-hollow-base', ...fields },
-    })
-    rejectsAt(hollow({ cavityDiameter: { value: 7.823 } }), 'base.cavityDiameter')
+    rejectsAt(conicalHollow({ cavityDiameter: { value: 7.823 } }), 'base.cavityDiameter')
     rejectsAt(
-      hollow({ cavityDiameter: { value: 6.6 }, diameter: { value: 6.6 } }),
+      conicalHollow({ cavityDiameter: { value: 6.6 }, diameter: { value: 6.6 } }),
       'base.cavityDiameter',
     )
-    accepts(hollow({ cavityDiameter: { value: 6 }, diameter: { value: 6.6 } }))
+    accepts(conicalHollow({ cavityDiameter: { value: 6 }, diameter: { value: 6.6 } }))
     rejectsAt(
       {
         length: { value: 5 },
@@ -507,7 +537,9 @@ describe('bullet', () => {
     rejectsAt({ length: { value: 30 }, ...tail({ length: { value: 31 } }) }, 'base.length')
     accepts({ length: { value: 30 }, ...tail({ length: { value: 5 } }) })
   })
+})
 
+describe('bullet ranges', () => {
   it('rejects geometry values out of range', () => {
     rejectsAt({ meplatDiameter: { value: -0.1 } }, 'meplatDiameter')
     accepts({ meplatDiameter: { value: 0 } })
@@ -531,32 +563,22 @@ describe('bullet', () => {
       { tip: { type: 'hollow-point', mouthDiameter: { value: 7.823 } } },
       'tip.mouthDiameter',
     )
-    const polymer = (value: number) => ({ type: 'polymer-tip', length: { value } })
     rejectsAt({ length: { value: 30 }, tip: polymer(30) }, 'tip.length')
     rejectsAt({ length: { value: 30 }, noseLength: { value: 18 }, tip: polymer(18) }, 'tip.length')
     accepts({ length: { value: 30 }, noseLength: { value: 18 }, tip: polymer(5) })
   })
 
   it('carries the field ranges in the JSON Schema', () => {
-    const json = z.toJSONSchema(bullet, { io: 'input' }) as {
-      properties: Record<
-        string,
-        { properties?: Record<string, { properties?: Record<string, unknown> }> }
-      >
-    }
-    const value = (s: { properties?: Record<string, unknown> } | undefined) => s?.properties?.value
-    const { meplatDiameter, base, ogive, tip } = json.properties
-    expect(meplatDiameter?.properties?.value).toMatchObject({ minimum: 0 })
-    expect(value(base?.properties?.diameter)).toMatchObject({ exclusiveMinimum: 0 })
-    expect(value(base?.properties?.angle)).toMatchObject({
-      exclusiveMinimum: 0,
-      exclusiveMaximum: 90,
-    })
-    expect(value(base?.properties?.cavityDiameter)).toMatchObject({ exclusiveMinimum: 0 })
-    expect(value(ogive?.properties?.radius)).toMatchObject({ exclusiveMinimum: 0 })
-    expect(value(ogive?.properties?.radiusRatio)).toMatchObject({ minimum: 0, maximum: 1 })
-    expect(value(tip?.properties?.length)).toMatchObject({ exclusiveMinimum: 0 })
-    expect(value(tip?.properties?.mouthDiameter)).toMatchObject({ exclusiveMinimum: 0 })
+    const json = z.toJSONSchema(bullet, { io: 'input' }) as JsonNode
+    const range = (path: string) => nodeAt(json, [...path.split('.'), 'value'])
+    expect(range('meplatDiameter')).toMatchObject({ minimum: 0 })
+    expect(range('base.diameter')).toMatchObject({ exclusiveMinimum: 0 })
+    expect(range('base.angle')).toMatchObject({ exclusiveMinimum: 0, exclusiveMaximum: 90 })
+    expect(range('base.cavityDiameter')).toMatchObject({ exclusiveMinimum: 0 })
+    expect(range('ogive.radius')).toMatchObject({ exclusiveMinimum: 0 })
+    expect(range('ogive.radiusRatio')).toMatchObject({ minimum: 0, maximum: 1 })
+    expect(range('tip.length')).toMatchObject({ exclusiveMinimum: 0 })
+    expect(range('tip.mouthDiameter')).toMatchObject({ exclusiveMinimum: 0 })
   })
 })
 
@@ -625,29 +647,55 @@ describe('standards', () => {
   })
 })
 
-describe('powder', () => {
-  const t = (value: number) => ({ value, min: value * 0.9, max: value * 1.1 })
-  const valid = {
-    id: 'test-powder',
-    manufacturer: 'test-manufacturer',
-    name: 'Powder',
-    composition: [
-      { name: 'Nitrocellulose', cas: '9004-70-0', min: 80, max: 99, raw: '80 - <99' },
-      { name: 'Not named', min: 0, max: 5 },
-    ],
-    thermochemistry: {
-      loadingDensity: { value: 0.1 },
-      flameTemperature: t(3000),
-      impetus: t(1.05e6),
-      gamma: t(1.23),
-      molarMass: t(24.5),
-      covolume: t(1.0e-3),
-    },
-    provenance: measured,
-  }
+const t = (value: number) => ({ value, min: value * 0.9, max: value * 1.1 })
 
+const validPowder = {
+  id: 'test-powder',
+  manufacturer: 'test-manufacturer',
+  name: 'Powder',
+  composition: [
+    { name: 'Nitrocellulose', cas: '9004-70-0', min: 80, max: 99, raw: '80 - <99' },
+    { name: 'Not named', min: 0, max: 5 },
+  ],
+  thermochemistry: {
+    loadingDensity: { value: 0.1 },
+    flameTemperature: t(3000),
+    impetus: t(1.05e6),
+    gamma: t(1.23),
+    molarMass: t(24.5),
+    covolume: t(1.0e-3),
+  },
+  provenance: measured,
+}
+
+const interior = {
+  model: 'm3',
+  fitted: ['vivacity', 'energy'],
+  vivacity: { value: 0.45, standardUncertainty: 0.01 },
+  energy: { value: 4.0e6, standardUncertainty: 1e5 },
+  gamma: 1.24,
+  covolume: { value: 1.0e-3 },
+  density: { value: 1.6 },
+  pressureExponent: 1,
+  referencePressure: { value: 0.980665 },
+  ignitionPressure: { value: 50 },
+  startPressure: { value: 300 },
+  propellantTemperature: { value: 21 },
+  burnForm: { kind: 'twoStage', a: { value: 0.8 }, m: 0.5, q: 0.5, z1: 0.8 },
+  trainingRows: 40,
+  trainingCartridges: 5,
+}
+
+const fittedSource = {
+  title: 'Manufacturer load data, edition 1',
+  fields: ['interior'],
+  kind: 'fitted',
+  note: '40 training rows.',
+}
+
+describe('powder', () => {
   it('accepts a composition and computed thermochemistry', () => {
-    expect(powder.safeParse(valid).success).toBe(true)
+    expect(powder.safeParse(validPowder).success).toBe(true)
   })
 
   it('accepts a temperature sensitivity and rejects a reference temperature of 0 K or less', () => {
@@ -656,11 +704,14 @@ describe('powder', () => {
       cold: { value: 0.004 },
       hot: { value: 0.002 },
     }
-    expect(powder.safeParse({ ...valid, temperatureSensitivity }).success).toBe(true)
+    expect(powder.safeParse({ ...validPowder, temperatureSensitivity }).success).toBe(true)
     for (const value of [0, -1]) {
       expectIssueAt(
         powder,
-        { ...valid, temperatureSensitivity: { ...temperatureSensitivity, reference: { value } } },
+        {
+          ...validPowder,
+          temperatureSensitivity: { ...temperatureSensitivity, reference: { value } },
+        },
         'temperatureSensitivity.reference.value',
       )
     }
@@ -673,71 +724,53 @@ describe('powder', () => {
       [{ name: 'A', min: 1, max: 101 }, 'composition.0.max'],
       [{ name: 'A', cas: '9004', min: 1, max: 2 }, 'composition.0.cas'],
     ] as const)
-      expectIssueAt(powder, { ...valid, composition: [entry] }, path)
+      expectIssueAt(powder, { ...validPowder, composition: [entry] }, path)
   })
 
   it('needs a composition for thermochemistry', () => {
-    const { composition: _, ...rest } = valid
+    const { composition: _, ...rest } = validPowder
     expectIssueAt(powder, rest, 'thermochemistry')
   })
 
   it('rejects composition ranges that cannot sum to 100 %', () => {
     const composition = [{ name: 'A', cas: '9004-70-0', min: 50, max: 60 }]
-    expectIssueAt(powder, { ...valid, composition }, 'composition')
+    expectIssueAt(powder, { ...validPowder, composition }, 'composition')
   })
 
   it('rejects a thermochemistry value outside its range', () => {
-    const thermochemistry = { ...valid.thermochemistry, gamma: { value: 1.3, min: 1.2, max: 1.25 } }
-    expectIssueAt(powder, { ...valid, thermochemistry }, 'thermochemistry.gamma')
+    const thermochemistry = {
+      ...validPowder.thermochemistry,
+      gamma: { value: 1.3, min: 1.2, max: 1.25 },
+    }
+    expectIssueAt(powder, { ...validPowder, thermochemistry }, 'thermochemistry.gamma')
   })
+})
 
-  const interior = {
-    model: 'm3',
-    fitted: ['vivacity', 'energy'],
-    vivacity: { value: 0.45, standardUncertainty: 0.01 },
-    energy: { value: 4.0e6, standardUncertainty: 1e5 },
-    gamma: 1.24,
-    covolume: { value: 1.0e-3 },
-    density: { value: 1.6 },
-    pressureExponent: 1,
-    referencePressure: { value: 0.980665 },
-    ignitionPressure: { value: 50 },
-    startPressure: { value: 300 },
-    propellantTemperature: { value: 21 },
-    burnForm: { kind: 'twoStage', a: { value: 0.8 }, m: 0.5, q: 0.5, z1: 0.8 },
-    trainingRows: 40,
-    trainingCartridges: 5,
-  }
-  const fittedSource = {
-    title: 'Manufacturer load data, edition 1',
-    fields: ['interior'],
-    kind: 'fitted',
-    note: '40 training rows.',
-  }
-
+describe('powder interior parameters', () => {
   it('accepts fitted interior parameters with a fitted source', () => {
     const provenance = { ...measured, sources: [...measured.sources, fittedSource] }
-    expect(powder.safeParse({ ...valid, interior, provenance }).success).toBe(true)
+    expect(powder.safeParse({ ...validPowder, interior, provenance }).success).toBe(true)
   })
 
   it('accepts interior parameters fitted with the default start pressure per load', () => {
     const provenance = { ...measured, sources: [...measured.sources, fittedSource] }
     const { startPressure: _, ...rest } = interior
-    expect(powder.safeParse({ ...valid, interior: rest, provenance }).success).toBe(true)
+    expect(powder.safeParse({ ...validPowder, interior: rest, provenance }).success).toBe(true)
   })
 
   it('needs a fitted source for the interior parameters', () => {
-    expect(powder.safeParse({ ...valid, interior }).success).toBe(false)
+    expect(powder.safeParse({ ...validPowder, interior }).success).toBe(false)
     const other = { ...fittedSource, kind: 'published' }
     const provenance = { ...measured, sources: [...measured.sources, other] }
-    expect(powder.safeParse({ ...valid, interior, provenance }).success).toBe(false)
+    expect(powder.safeParse({ ...validPowder, interior, provenance }).success).toBe(false)
   })
 
   it('accepts the bore-resistance constants of the fit and rejects a negative stress', () => {
     const provenance = { ...measured, sources: [...measured.sources, fittedSource] }
     const resistance = { stress: { value: 4.2 }, oversize: 1.3, engraving: 0.85 }
     const ok = (r: object) =>
-      powder.safeParse({ ...valid, interior: { ...interior, resistance: r }, provenance }).success
+      powder.safeParse({ ...validPowder, interior: { ...interior, resistance: r }, provenance })
+        .success
     expect(ok(resistance)).toBe(true)
     expect(ok({ ...resistance, stress: { value: -1 } })).toBe(false)
   })
@@ -746,7 +779,7 @@ describe('powder', () => {
     const provenance = { ...measured, sources: [...measured.sources, fittedSource] }
     const burnForm = { ...interior.burnForm, a: { value: -1.25 } }
     expect(
-      powder.safeParse({ ...valid, interior: { ...interior, burnForm }, provenance }).success,
+      powder.safeParse({ ...validPowder, interior: { ...interior, burnForm }, provenance }).success,
     ).toBe(false)
   })
 
@@ -754,7 +787,7 @@ describe('powder', () => {
     const json = z.toJSONSchema(powder, { io: 'input' }) as {
       properties: Record<string, { properties?: Record<string, { unit?: string }> }>
     }
-    const fields = json.properties.thermochemistry?.properties ?? {}
+    const fields = json.properties['thermochemistry']?.properties ?? {}
     const units = Object.fromEntries(Object.entries(fields).map(([k, v]) => [k, v.unit]))
     expect(units).toEqual({
       loadingDensity: 'g/cm3',
