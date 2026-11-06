@@ -17,16 +17,16 @@
             ],
             "patterns": [
               {
-                "group": ["@*/*", "@*/*/**", "!@open-reloading/schema"],
-                "message": "importers-imports-schema-only: packages/importers has no I/O and imports nothing but @open-reloading/schema and its own files."
+                "group": ["@*/*", "@*/*/**", "!@open-reloading/schema", "!@open-reloading/units"],
+                "message": "importers-imports-schema-and-units: packages/importers has no I/O and imports nothing but @open-reloading/schema, @open-reloading/units and its own files."
               },
               {
                 "regex": "^[^.@]",
-                "message": "importers-imports-schema-only: packages/importers has no I/O and imports nothing but @open-reloading/schema and its own files."
+                "message": "importers-imports-schema-and-units: packages/importers has no I/O and imports nothing but @open-reloading/schema, @open-reloading/units and its own files."
               },
               {
                 "regex": "^(\\.\\./)+[^.]",
-                "message": "importers-imports-schema-only: packages/importers has no I/O and imports nothing but @open-reloading/schema and its own files."
+                "message": "importers-imports-schema-and-units: packages/importers has no I/O and imports nothing but @open-reloading/schema, @open-reloading/units and its own files."
               }
             ]
           }

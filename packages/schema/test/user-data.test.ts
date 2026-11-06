@@ -4,7 +4,6 @@ import {
   checkUserRefs,
   designIdProblem,
   firearm,
-  legacyLoadProblem,
   type UserRecord,
   units,
   userDataFile,
@@ -505,32 +504,6 @@ describe('userDataFile files', () => {
   })
 })
 
-describe('a record of the earlier load format', () => {
-  const old = {
-    kind: 'workbenchState',
-    id: 'w1',
-    name: 'Load',
-    saved,
-    data: { siValues: { charge: 0.0028 }, cartridge: '308-win' },
-  }
-
-  it('is refused with a message that names the new kind', () => {
-    const r = userRecord.safeParse(old)
-    expect(r.success).toBe(false)
-    expect(r.error?.issues[0]?.message).toBe(legacyLoadProblem)
-    expect(legacyLoadProblem).toContain('"load"')
-    const f = userDataFile.safeParse(file([old]))
-    expect(f.success).toBe(false)
-    expect(JSON.stringify(f.error?.issues)).toContain('earlier version')
-  })
-
-  it('does not hide the usual message for another unknown kind', () => {
-    const r = userRecord.safeParse({ ...old, kind: 'other' })
-    expect(r.success).toBe(false)
-    expect(r.error?.issues[0]?.message).not.toBe(legacyLoadProblem)
-  })
-})
-
 describe('withoutUnknownKinds', () => {
   const event = { kind: 'logEntry', id: 'e1', name: 'Range day', saved, data: {} }
 
@@ -542,13 +515,8 @@ describe('withoutUnknownKinds', () => {
     expect(json.records).toHaveLength(3)
   })
 
-  it('keeps known kinds, the old load kind and records without a text kind for the schema', () => {
-    const json = file([
-      loadRecord,
-      { ...event, kind: 'workbenchState' },
-      { ...event, kind: 2 },
-      null,
-    ])
+  it('keeps known kinds and records without a text kind for the schema', () => {
+    const json = file([loadRecord, { ...event, kind: 2 }, null])
     expect(withoutUnknownKinds(json)).toEqual({ json, skipped: [] })
     expect(withoutUnknownKinds('text')).toEqual({ json: 'text', skipped: [] })
   })
