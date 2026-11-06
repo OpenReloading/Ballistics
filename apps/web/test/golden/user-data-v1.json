@@ -409,7 +409,6 @@
         "level": "Level I",
         "division": "Production",
         "rounds": 96,
-        "firearm": "user:57dd534b-6180-5565-b66a-271a28663df7",
         "state": "disqualified",
         "results": {
           "method": "hit-factor",
@@ -462,8 +461,8 @@
         "origin": "user"
       },
       "imported": {
-        "source": "Every field source",
-        "file": "Every field file",
+        "source": "Range notebook export",
+        "file": "range-notebook.json",
         "day": "2026-10-12"
       }
     },
@@ -489,11 +488,11 @@
             "angle": null
           }
         },
-        "basedOnRevision": "Every field basedOnRevision"
+        "basedOnRevision": "3f9a1c07b2e4d6"
       },
       "imported": {
-        "source": "Every field source",
-        "file": "Every field file",
+        "source": "Range notebook export",
+        "file": "range-notebook.json",
         "day": "2026-10-12"
       }
     },
@@ -516,11 +515,11 @@
           ]
         },
         "basedOn": "catalogue:308-win",
-        "basedOnRevision": "Every field basedOnRevision"
+        "basedOnRevision": "0b7e52d9a4c318"
       },
       "imported": {
-        "source": "Every field source",
-        "file": "Every field file",
+        "source": "Range notebook export",
+        "file": "range-notebook.json",
         "day": "2026-10-12"
       }
     },
@@ -608,8 +607,8 @@
         }
       },
       "imported": {
-        "source": "Every field source",
-        "file": "Every field file",
+        "source": "Range notebook export",
+        "file": "range-notebook.json",
         "day": "2026-10-12"
       }
     },
@@ -629,19 +628,19 @@
         "caseCondition": "new",
         "primerState": "primed-spent",
         "fillLevel": "mouth",
-        "note": "Every field note",
+        "note": "Fired cases, not resized",
         "provenance": {
           "kind": "published",
           "sources": [
             {
-              "title": "Every field title"
+              "title": "Water weight, 10 cases"
             }
           ]
         }
       },
       "imported": {
-        "source": "Every field source",
-        "file": "Every field file",
+        "source": "Range notebook export",
+        "file": "range-notebook.json",
         "day": "2026-10-12"
       }
     },
@@ -665,19 +664,39 @@
         "sessions": [
           "user:6f5e4d3c-2b1a-4098-8f7e-6d5c4b3a2918"
         ],
-        "id": "every-field",
-        "name": "Every field name",
-        "powderLot": "Every field powderLot",
+        "id": "308-win-168-gr-ladder",
+        "name": "Ladder 168 gr",
+        "powderLot": "Lot 2291",
         "capacity": "user:1e2d3c4b-5a69-4788-9a0b-1c2d3e4f5a6b",
-        "primer": {},
+        "primer": {
+          "record": "catalogue:demo-primer-large-rifle",
+          "lot": "LR 4471"
+        },
         "seating": {
           "by": "overallLength",
           "value": {
-            "value": 1
+            "value": 71.1
           }
         },
-        "note": "Every field note",
-        "analysis": {},
+        "note": "Ladder for the 610 mm barrel",
+        "analysis": {
+          "overrides": {
+            "pmax": 4150,
+            "travel": 560
+          },
+          "bulletBase": "boat-tail",
+          "ladder": {
+            "kind": "charge",
+            "stepCount": 5,
+            "step": 0.1,
+            "direction": "around"
+          },
+          "powders": {
+            "mode": "fill",
+            "fill": 95,
+            "manufacturer": "catalogue:vihtavuori"
+          }
+        },
         "snapshots": [
           {
             "session": "user:6f5e4d3c-2b1a-4098-8f7e-6d5c4b3a2918"
@@ -687,14 +706,14 @@
           "kind": "published",
           "sources": [
             {
-              "title": "Every field title"
+              "title": "Club load book"
             }
           ]
         }
       },
       "imported": {
-        "source": "Every field source",
-        "file": "Every field file",
+        "source": "Range notebook export",
+        "file": "range-notebook.json",
         "day": "2026-10-12"
       }
     },
@@ -744,41 +763,41 @@
           }
         ],
         "active": "c1",
-        "model": "Every field model",
+        "model": "TRG 22",
         "action": "rifle",
         "grooveDiameter": {
-          "value": 1
+          "value": 7.82
         },
         "boreDiameter": {
-          "value": 1
+          "value": 7.62
         },
         "freebore": {
-          "value": 1
+          "value": 1.6
         },
         "baseToOgiveAtLands": {
-          "value": 1
+          "value": 56.2
         },
         "overallLengthAtLands": {
-          "value": 1
+          "value": 72.4
         },
         "landsBullet": "user:9b8a7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d",
         "firearmMass": {
-          "value": 1
+          "value": 4700
         },
-        "roundCount": 1,
+        "roundCount": 1240,
         "roundCountDate": "2026-10-12",
         "countedSessions": [
           {
             "session": "user:6f5e4d3c-2b1a-4098-8f7e-6d5c4b3a2918",
-            "rounds": 1
+            "rounds": 40
           }
         ],
-        "noteAtRoundCount": 1,
-        "notes": "Every field notes"
+        "noteAtRoundCount": 3000,
+        "notes": "Barrel replaced 2026"
       },
       "imported": {
-        "source": "Every field source",
-        "file": "Every field file",
+        "source": "Range notebook export",
+        "file": "range-notebook.json",
         "day": "2026-10-12"
       }
     },
@@ -823,16 +842,27 @@
             }
           ]
         },
-        "id": "every-field",
+        "id": "308-win-ladder-day-1",
         "muzzleDistance": {
-          "value": 1
+          "value": 3000
         },
-        "conditions": {},
-        "note": "Every field note"
+        "conditions": {
+          "airTemperature": {
+            "value": 18
+          },
+          "stationPressure": {
+            "value": 0.987
+          },
+          "relativeHumidity": {
+            "value": 62,
+            "raw": "62 %"
+          }
+        },
+        "note": "Chronograph 3 m from the muzzle"
       },
       "imported": {
-        "source": "Every field source",
-        "file": "Every field file",
+        "source": "Range notebook export",
+        "file": "range-notebook.json",
         "day": "2026-10-12"
       }
     },
@@ -843,7 +873,20 @@
       "saved": "2026-10-13T10:00:00.000Z",
       "data": {
         "photo": "p1",
-        "references": [],
+        "references": [
+          {
+            "kind": "line",
+            "a": {
+              "x": 212,
+              "y": 604
+            },
+            "b": {
+              "x": 1412,
+              "y": 604
+            },
+            "length": 0.2
+          }
+        ],
         "targetRotation": 0,
         "load": "8c9d0e1f-2a3b-4c4d-9e5f-6a7b8c9d0e1f",
         "groups": [
@@ -863,24 +906,35 @@
           }
         ],
         "targetOrigin": {
-          "x": 1,
-          "y": 1
+          "x": 812,
+          "y": 604
         },
-        "photoRotation": 1,
-        "markerDiameter": 1,
+        "photoRotation": 0.02,
+        "markerDiameter": 0.0078,
         "notes": [
           {
-            "id": "Every field id",
-            "x": 1,
-            "y": 1,
-            "text": "Every field text"
+            "id": "n1",
+            "x": 0.02,
+            "y": 0.015,
+            "text": "Called flyer"
           }
         ],
-        "overlays": {}
+        "overlays": {
+          "spread": true,
+          "box": false,
+          "aim": true,
+          "ellipses": false,
+          "dispersion": true,
+          "axis": false,
+          "excluded": false,
+          "numbers": true,
+          "stats": true,
+          "rings": true
+        }
       },
       "imported": {
-        "source": "Every field source",
-        "file": "Every field file",
+        "source": "Range notebook export",
+        "file": "range-notebook.json",
         "day": "2026-10-12"
       }
     },
@@ -892,13 +946,13 @@
       "data": {
         "rings": [
           {
-            "value": 1,
+            "value": 9,
             "diameter": 100,
             "fill": "white",
             "line": "black"
           },
           {
-            "value": 2,
+            "value": 10,
             "diameter": 50
           }
         ],
@@ -915,11 +969,11 @@
             "gauge": 5.6
           }
         ],
-        "blackHeight": 1
+        "blackHeight": 70
       },
       "imported": {
-        "source": "Every field source",
-        "file": "Every field file",
+        "source": "Range notebook export",
+        "file": "range-notebook.json",
         "day": "2026-10-12"
       }
     },
@@ -941,41 +995,41 @@
         "id": "every-field",
         "manufacturer": "catalogue:lapua",
         "basedOn": "catalogue:demo-case-308-brass",
-        "productNumber": "Every field productNumber",
-        "headstamp": "Every field headstamp",
+        "productNumber": "4PH7015",
+        "headstamp": "LAPUA 308 WIN",
         "primerPocket": {
           "type": "boxer"
         },
         "flashHole": {
-          "value": 1
+          "value": 1.5
         },
         "mass": {
-          "value": 1
+          "value": 11.4
         },
         "waterCapacity": {
-          "value": 1
+          "value": 3.6
         },
         "annealed": true,
         "neckWall": {
-          "value": 1
+          "value": 0.38
         },
-        "casesMeasured": 1,
+        "casesMeasured": 20,
         "spread": {
-          "value": 1
+          "value": 0.12
         },
-        "note": "Every field note",
+        "note": "Lot 3, after the first firing",
         "provenance": {
           "kind": "published",
           "sources": [
             {
-              "title": "Every field title"
+              "title": "Own measurement"
             }
           ]
         }
       },
       "imported": {
-        "source": "Every field source",
-        "file": "Every field file",
+        "source": "Range notebook export",
+        "file": "range-notebook.json",
         "day": "2026-10-12"
       }
     },
@@ -997,35 +1051,26 @@
           "series": [
             {
               "shots": [
-                10,
-                9,
-                10,
-                8,
-                9
-              ],
-              "targetSheet": "user:4b5c6d7e-8f90-4a1b-8c2d-3e4f5a6b7c8d"
-            },
-            {
-              "total": 47
-            },
-            {
-              "shots": [
                 10.4,
                 9.8,
                 10.1
               ],
-              "total": 30.3
+              "total": 30.3,
+              "targetSheet": "user:4b5c6d7e-8f90-4a1b-8c2d-3e4f5a6b7c8d"
+            },
+            {
+              "total": 47
             }
           ]
         },
-        "division": "Every field division",
+        "division": "Offene Klasse",
         "load": "user:8c9d0e1f-2a3b-4c4d-9e5f-6a7b8c9d0e1f",
-        "rounds": 1,
-        "notes": "Every field notes"
+        "rounds": 20,
+        "notes": "Wertung in Zehnteln"
       },
       "imported": {
-        "source": "Every field source",
-        "file": "Every field file",
+        "source": "Range notebook export",
+        "file": "range-notebook.json",
         "day": "2026-10-12"
       }
     },
@@ -1050,8 +1095,8 @@
         "ammunition": "Factory 9 mm Luger 124 gr FMJ"
       },
       "imported": {
-        "source": "Every field source",
-        "file": "Every field file",
+        "source": "Range notebook export",
+        "file": "range-notebook.json",
         "day": "2026-10-12"
       }
     }
