@@ -290,7 +290,10 @@ const states: State[] = [
       // below 75em the toolbar is in the "Page actions" panel
       const actions = page.getByRole('button', { name: 'Page actions' })
       const photo = page.getByRole('button', { name: 'From a photo' })
+      // a click that lands after its timeout opens the dialog: another would hit its overlay
+      const opened = page.getByRole('dialog', { name: 'Bullet from a photograph' })
       await expect(async () => {
+        if (await opened.isVisible()) return
         if (!(await photo.isVisible())) await actions.click({ timeout: 1000 })
         await photo.click({ timeout: 1000 })
       }).toPass({ timeout: 10_000 })
