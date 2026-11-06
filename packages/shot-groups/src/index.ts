@@ -1,5 +1,6 @@
 export * from './competition-scoring.ts'
 export * from './ellipse.ts'
 export * from './geometry.ts'
+export * from './hit-probability.ts'
 export * from './issue.ts'
 export * from './ring-scoring.ts'

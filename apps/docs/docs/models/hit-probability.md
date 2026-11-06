@@ -18,7 +18,7 @@ $$
 \sigma_c = \sqrt{\left(\sin\phi\ \sigma_W\right)^2 + \left(W \cos\phi\ \sigma_\phi\right)^2}
 $$
 
-Code: `packages/core/src/groups/hit-probability.ts`, `pointDispersion` (`crosswindSd`).
+Code: `packages/shot-groups/src/hit-probability.ts`, `pointDispersion` (`crosswindSd`).
 
 With $S_c$ the lateral displacement of the point of impact per 1 m/s of crosswind at the distance and $S_R$ the change of its height per metre of range, both from the trajectory, and $\sigma_R$ the standard deviation of the range, the standard deviations of the point of impact are
 
@@ -26,7 +26,7 @@ $$
 \sigma_x = \sqrt{\sigma_{g,x}^2 + \left(S_c\,\sigma_c\right)^2}, \qquad \sigma_y = \sqrt{\sigma_{g,y}^2 + \left(S_R\,\sigma_R\right)^2}
 $$
 
-Code: `packages/core/src/groups/hit-probability.ts`, `pointDispersion`.
+Code: `packages/shot-groups/src/hit-probability.ts`, `pointDispersion`.
 
 ### Muzzle speed spread
 
@@ -36,7 +36,7 @@ $$
 \sigma_y = \sqrt{\left(\sigma_{g,y}^2 - \left(S_{v,0}\,\sigma_v\right)^2\right)\left(\frac{D}{D_0}\right)^2 + \left(S_v\,\sigma_v\right)^2 + \left(S_R\,\sigma_R\right)^2}
 $$
 
-Code: `packages/core/src/groups/hit-probability.ts`, `pointDispersion` (`velocity`).
+Code: `packages/shot-groups/src/hit-probability.ts`, `pointDispersion` (`velocity`).
 
 The height part grows faster than the distance (with constant speed as the square of the time of flight, with drag faster), so scaling the whole group linearly counts it too small at long range. The input is refused when $S_{v,0}\,\sigma_v$ reaches $\sigma_{g,y}$.
 
@@ -48,7 +48,7 @@ $$
 P(a, b) = \int_{-t_0}^{t_0} \frac{e^{-x^2/(2\sigma_x^2)}}{\sigma_x \sqrt{2\pi}}\ \operatorname{erf}\!\left(\frac{b \cos t}{\sigma_y \sqrt{2}}\right) a \cos t\ \mathrm{d}t, \qquad x = a \sin t
 $$
 
-Code: `packages/core/src/groups/hit-probability.ts`, `ellipseProbability` (`f`, composite Simpson rule).
+Code: `packages/shot-groups/src/hit-probability.ts`, `ellipseProbability` (`f`, composite Simpson rule).
 
 The integral is cut at $\lvert x \rvert = 8\sigma_x$. For a circular zone of radius $r$ and equal standard deviations it equals the closed form $1 - e^{-r^2/(2\sigma^2)}$, which the tests compare against. The error function is the chi-square distribution of one degree of freedom, $\operatorname{erf}(z/\sqrt{2}) = F_{\chi^2_1}(z^2)$ ([shot groups](groups.md)).
 
@@ -60,7 +60,7 @@ $$
 P(a, b) = \int \frac{e^{-(x-\delta_x)^2/(2\sigma_x^2)}}{\sigma_x \sqrt{2\pi}}\left[\Phi\!\left(\frac{b \cos t - \delta_y}{\sigma_y}\right) - \Phi\!\left(\frac{-b \cos t - \delta_y}{\sigma_y}\right)\right] a \cos t\ \mathrm{d}t
 $$
 
-Code: `packages/core/src/groups/hit-probability.ts`, `ellipseProbability` (`offset`), `hitProbability`.
+Code: `packages/shot-groups/src/hit-probability.ts`, `ellipseProbability` (`offset`), `hitProbability`.
 
 With $\Phi$ the standard normal distribution function. For a circular zone of radius $r$ and equal standard deviations it is $1 - Q_1(\delta/\sigma,\ r/\sigma)$ with $\delta = \sqrt{\delta_x^2 + \delta_y^2}$ and $Q_1$ the Marcum Q function of order 1 (source not in the bibliography, unverified); the tests compare against it, written as the noncentral chi-square distribution of two degrees of freedom. For $\delta > r$ the probability first rises and then falls as $\sigma$ grows: a tighter group lowers it. The offset is an input of the prediction, not a setting of the sight.
 
@@ -72,7 +72,7 @@ $$
 n = \left\lceil \frac{\ln(1 - P_w)}{\ln(1 - p)} \right\rceil, \qquad \bar n = \frac{1}{p}
 $$
 
-Code: `packages/core/src/groups/hit-probability.ts`, `shotsToHit`.
+Code: `packages/shot-groups/src/hit-probability.ts`, `shotsToHit`.
 
 After $\bar n$ shots the chance tends to $1 - e^{-1} \approx 63.2$ percent as $p$ becomes small.
 
@@ -84,29 +84,29 @@ $$
 p_k = P_k - P_{k+1}, \qquad P_{\text{hit}} = P_1, \qquad \mathbb{E}[v] = \sum_k v_k\,p_k
 $$
 
-Code: `packages/core/src/groups/hit-probability.ts`, `hitProbability`.
+Code: `packages/shot-groups/src/hit-probability.ts`, `hitProbability`.
 
 The zones of a target are its rings, grown by the radius of the scored hole as in [ring scoring](ring-scoring.md): a shot scores a ring when the hole edge touches it. The tenth-ring values and the inner ten are not part of the expected score.
 
 ## Symbols
 
-| Symbol                     | Meaning                                                                                | Stored unit | Unit in `core` |
-| -------------------------- | -------------------------------------------------------------------------------------- | ----------- | -------------- |
-| $\sigma_{g,0}$, $\sigma_g$ | Group standard deviation per axis, at the reference distance and the target            | mm          | m              |
-| $D_0$, $D$                 | Reference distance, distance of the target                                             | m           | m              |
-| $W$, $\sigma_W$            | Wind speed, its standard deviation                                                     | m/s         | m/s            |
-| $\phi$, $\sigma_\phi$      | Direction the wind comes from, its standard deviation                                  | deg         | rad            |
-| $\sigma_c$                 | Standard deviation of the crosswind                                                    | m/s         | m/s            |
-| $S_c$                      | Lateral displacement per 1 m/s of crosswind                                            | no kind     | m per m/s      |
-| $S_R$, $\sigma_R$          | Height change per metre of range, standard deviation of the range                      | no kind, m  | m/m, m         |
-| $\sigma_v$                 | Standard deviation of the muzzle speed                                                 | m/s         | m/s            |
-| $S_v$, $S_{v,0}$           | Height change per 1 m/s of muzzle speed, at the distance and at the reference distance | no kind     | m per m/s      |
-| $\sigma_x$, $\sigma_y$     | Standard deviations of the point of impact                                             | mm          | m              |
-| $a$, $b$                   | Semi-axes of a scoring zone                                                            | mm          | m              |
-| $P$, $p_k$                 | Probability inside a zone, inside a zone and outside the next                          | 1           | 1              |
-| $v_k$                      | Value of zone $k$                                                                      | 1           | 1              |
-| $\delta_x$, $\delta_y$     | Offset of the centre of the point of impact from the aim point                         | mm          | m              |
-| $n$, $\bar n$, $P_w$       | Shots needed, mean shots to the first hit, wanted chance of a hit                      | 1           | 1              |
+| Symbol                     | Meaning                                                                                | Stored unit | Unit in `shot-groups` |
+| -------------------------- | -------------------------------------------------------------------------------------- | ----------- | --------------------- |
+| $\sigma_{g,0}$, $\sigma_g$ | Group standard deviation per axis, at the reference distance and the target            | mm          | m                     |
+| $D_0$, $D$                 | Reference distance, distance of the target                                             | m           | m                     |
+| $W$, $\sigma_W$            | Wind speed, its standard deviation                                                     | m/s         | m/s                   |
+| $\phi$, $\sigma_\phi$      | Direction the wind comes from, its standard deviation                                  | deg         | rad                   |
+| $\sigma_c$                 | Standard deviation of the crosswind                                                    | m/s         | m/s                   |
+| $S_c$                      | Lateral displacement per 1 m/s of crosswind                                            | no kind     | m per m/s             |
+| $S_R$, $\sigma_R$          | Height change per metre of range, standard deviation of the range                      | no kind, m  | m/m, m                |
+| $\sigma_v$                 | Standard deviation of the muzzle speed                                                 | m/s         | m/s                   |
+| $S_v$, $S_{v,0}$           | Height change per 1 m/s of muzzle speed, at the distance and at the reference distance | no kind     | m per m/s             |
+| $\sigma_x$, $\sigma_y$     | Standard deviations of the point of impact                                             | mm          | m                     |
+| $a$, $b$                   | Semi-axes of a scoring zone                                                            | mm          | m                     |
+| $P$, $p_k$                 | Probability inside a zone, inside a zone and outside the next                          | 1           | 1                     |
+| $v_k$                      | Value of zone $k$                                                                      | 1           | 1                     |
+| $\delta_x$, $\delta_y$     | Offset of the centre of the point of impact from the aim point                         | mm          | m                     |
+| $n$, $\bar n$, $P_w$       | Shots needed, mean shots to the first hit, wanted chance of a hit                      | 1           | 1                     |
 
 ## Assumptions
 
