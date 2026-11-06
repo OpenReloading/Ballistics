@@ -4,32 +4,30 @@ import Base from '@axe-core/playwright'
 import type { Page } from '@playwright/test'
 
 /**
- * The `AxeBuilder` of `@axe-core/playwright` that scans once the page's transitions and finite animations have
- * ended: axe reads colors as painted, and a color midway through a transition (after a color scheme switch) fails
- * color-contrast.
+ * The `AxeBuilder` of `@axe-core/playwright` that scans once no transition or finite animation of the page runs:
+ * axe reads colors as painted, and a color midway through a transition (after a color scheme switch) fails
+ * color-contrast. Endless animations (a loader) and paused ones do not hold the scan.
  */
 export class AxeBuilder extends Base {
   readonly #page: Page
 
-  constructor(options: { page: Page }) {
+  constructor(options: ConstructorParameters<typeof Base>[0]) {
     super(options)
     this.#page = options.page
   }
 
   override async analyze() {
     await this.#page.evaluate(async () => {
-      for (;;) {
-        // a media or class change starts its transitions with the next frame's style update
-        await new Promise((done) => requestAnimationFrame(done))
-        const running = document
+      const moving = () =>
+        document
           .getAnimations()
-          .filter(
+          .some(
             (a) => a.playState === 'running' && a.effect?.getComputedTiming().endTime !== Infinity,
           )
-        if (running.length === 0) return
-        // a transition that a newer one replaces rejects its `finished`
-        await Promise.allSettled(running.map((a) => a.finished))
-      }
+      // a frame first: a media or class change starts its transitions with the next style update
+      do {
+        await new Promise((done) => requestAnimationFrame(done))
+      } while (moving())
     })
     return super.analyze()
   }
