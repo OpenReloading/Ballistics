@@ -6,6 +6,8 @@
 set -eu
 cd "$(dirname "$0")/../../.."
 version=$(node -p "require('./apps/e2e/node_modules/@playwright/test/package.json').version")
+# CI passes its digest-pinned image of the same version (ci.yml)
+image=${PLAYWRIGHT_IMAGE:-mcr.microsoft.com/playwright:v$version-noble}
 engine=$(command -v docker || command -v podman) || { echo 'baseline.sh: needs docker or podman' >&2; exit 1; }
 # Docker runs the image as root, so the results and snapshots it writes would belong to root: run
 # as the caller. Podman (also behind a docker command) and rootless Docker map root to the caller.
@@ -15,5 +17,5 @@ if "$engine" --version | grep -q podman ||
 # amd64 as on the CI runner, also on an arm64 host; :z relabels the checkout for SELinux hosts
 exec "$engine" run --rm --platform=linux/amd64 --network=host --ipc=host $user \
   -v "$PWD:/work:z" -w /work/apps/e2e -e DRAWING_BASELINE="${DRAWING_BASELINE:-1}" -e WEB_URL="${WEB_URL:-http://localhost:3003}" \
-  "mcr.microsoft.com/playwright:v$version-noble" \
+  "$image" \
   npx playwright test --project=full tests/web/drawing-baseline "$@"

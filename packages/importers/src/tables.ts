@@ -38,6 +38,10 @@ const spaceOrTab = /^[ \t]$/
 
 const isBlank = (row: string[]) => row.every((x) => x.trim() === '')
 
+/** The length of the line break at `i`: 2 for CR LF, else 1. */
+const lineBreakLength = (text: string, i: number) =>
+  text.charAt(i) === '\r' && text.charAt(i + 1) === '\n' ? 2 : 1
+
 /**
  * Rows of cells of `text` split at `delimiter`, with quoted cells (a quoted cell may follow spaces and span lines); blank rows are left out.
  * Cells past `maxColumn + 1` in a row are dropped and splitting stops past `maxCells` cells, enough for the size refusal.
@@ -57,14 +61,15 @@ function splitRows(text: string, delimiter: TableDelimiter): string[][] {
     cell = ''
     blank = true
   }
+  /** Ends the row; the number of its cells when it is kept, else 0. */
   const endRow = () => {
     endCell()
-    if (droppedFilled || !isBlank(row)) {
-      rows.push(row)
-      cells += row.length
-    }
+    const kept = droppedFilled || !isBlank(row)
+    if (kept) rows.push(row)
+    const count = kept ? row.length : 0
     row = []
     droppedFilled = false
+    return count
   }
   while (i < text.length && cells <= maxCells) {
     const c = text.charAt(i)
@@ -77,8 +82,8 @@ function splitRows(text: string, delimiter: TableDelimiter): string[][] {
       endCell()
       i++
     } else if (c === '\n' || c === '\r') {
-      endRow()
-      i += c === '\r' && text.charAt(i + 1) === '\n' ? 2 : 1
+      cells += endRow()
+      i += lineBreakLength(text, i)
     } else {
       cell += c
       blank &&= spaceOrTab.test(c)
@@ -156,6 +161,13 @@ export function tableOfRows(raw: string[][]): TableRead {
   return rows.length === 0 ? headerOnly : { table: { header, hasHeader, rows } }
 }
 
+/** The text of a JSON value in a cell: empty for none, JSON for an object or a list, else its text. */
+function jsonCellText(v: unknown): string {
+  if (typeof v === 'string') return v
+  if (typeof v === 'number' || typeof v === 'boolean') return String(v)
+  return v === null || v === undefined ? '' : JSON.stringify(v)
+}
+
 /** A table from a JSON list of objects: the keys of all objects as columns. Undefined for no such list. */
 function tableOfObjects(list: unknown): TableRead | undefined {
   if (!Array.isArray(list)) return undefined
@@ -167,13 +179,13 @@ function tableOfObjects(list: unknown): TableRead | undefined {
   if (keys.length < 2) return undefined
   const refused = tooLarge(keys.length, objects.length)
   if (refused) return refused
-  const cell = (v: unknown) =>
-    v === null || v === undefined ? '' : typeof v === 'object' ? JSON.stringify(v) : String(v)
   return {
     table: {
       header: keys,
       hasHeader: true,
-      rows: objects.map((o) => keys.map((k) => cell(Object.hasOwn(o, k) ? o[k] : undefined))),
+      rows: objects.map((o) =>
+        keys.map((k) => jsonCellText(Object.hasOwn(o, k) ? o[k] : undefined)),
+      ),
     },
   }
 }

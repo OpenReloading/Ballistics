@@ -119,11 +119,9 @@ export function unescaped(s: string, at: string, warnings: string[]): string {
 function numberValue(
   at: string,
   kind: Kind,
-  f: XmlElement,
-  value: string,
+  { unit, value }: { unit: string; value: string },
   warnings: string[],
 ): number | undefined {
-  const unit = f.attributes['unit'] ?? ''
   const factor = Object.hasOwn(factors[kind], unit) ? factors[kind][unit] : undefined
   // a finite number can still overflow in the stored unit
   const stored = factor === undefined ? Number.NaN : numberOf(value) * factor
@@ -134,6 +132,8 @@ function numberValue(
   return undefined
 }
 
+const isField = (at: string): at is Field => Object.hasOwn(fields, at)
+
 /** One `input` field of a section into `read`. */
 function readField(at: string, f: XmlElement, read: Read) {
   const value = (f.attributes['value'] ?? '').trim()
@@ -142,12 +142,15 @@ function readField(at: string, f: XmlElement, read: Read) {
     if (value === 'true') read.warnings.push(shotshellWarning)
     return
   }
-  const kind = Object.hasOwn(fields, at) ? fields[at as Field] : undefined
-  if (!kind) read.unmapped.add(at)
-  else if (kind === 'text') read.texts[at as Field] = unescaped(value, at, read.warnings)
+  if (!isField(at)) {
+    read.unmapped.add(at)
+    return
+  }
+  const kind = fields[at]
+  if (kind === 'text') read.texts[at] = unescaped(value, at, read.warnings)
   else {
-    const x = numberValue(at, kind, f, value, read.warnings)
-    if (x !== undefined) read.nums[at as Field] = x
+    const x = numberValue(at, kind, { unit: f.attributes['unit'] ?? '', value }, read.warnings)
+    if (x !== undefined) read.nums[at] = x
   }
 }
 
@@ -180,12 +183,12 @@ const quantity = (v: number | undefined) => (v === undefined ? undefined : { val
 function cartridgeOf(r: Read, name: string, saved: string): UserRecord {
   const spec = (
     symbol: string,
-    quantity: 'length' | 'area' | 'pressure',
+    kind: 'length' | 'area' | 'pressure',
     f: Field,
     side?: 'cartridge' | 'chamber',
   ) => {
     const value = r.nums[f]
-    return value === undefined ? [] : [{ ...(side && { side }), symbol, quantity, value }]
+    return value === undefined ? [] : [{ ...(side && { side }), symbol, quantity: kind, value }]
   }
   const values = [
     ...spec('L3', 'length', 'caliber.caselen', 'cartridge'),
@@ -234,6 +237,22 @@ function powderOf(r: Read, name: string, saved: string): UserRecord {
   return { kind: 'powder', ...named('powder', name, data), saved }
 }
 
+const userRef = (id: string | undefined) => (id ? (`user:${id}` as const) : undefined)
+
+/** The `user:<id>` references of the load's components that have a record. */
+function componentRefs(refs: {
+  cartridge?: string | undefined
+  bullet?: string | undefined
+  powder?: string | undefined
+}) {
+  const [cartridge, bullet, powder] = [
+    userRef(refs.cartridge),
+    userRef(refs.bullet),
+    userRef(refs.powder),
+  ]
+  return { ...(cartridge && { cartridge }), ...(bullet && { bullet }), ...(powder && { powder }) }
+}
+
 /** The load, naming the component records by `user:<id>`. */
 function loadOf(
   r: Read,
@@ -255,13 +274,9 @@ function loadOf(
   const oal = r.nums['caliber.oal'] ?? 0
   const lot = clip(r.texts['propellant.lotid'])
   const note = clip(r.notes.filter(Boolean).join('\n\n'), 10000)
-  const ref = (id: string | undefined) => (id ? (`user:${id}` as const) : undefined)
-  const [cartridge, bullet, powder] = [ref(refs.cartridge), ref(refs.bullet), ref(refs.powder)]
   const data = {
     origin: 'user' as const,
-    ...(cartridge && { cartridge }),
-    ...(bullet && { bullet }),
-    ...(powder && { powder }),
+    ...componentRefs(refs),
     ...(lot && { powderLot: lot }),
     ...(charge > 0 && { charge: { value: charge } }),
     ...(oal > 0 && { seating: { by: 'overallLength' as const, value: { value: oal } } }),

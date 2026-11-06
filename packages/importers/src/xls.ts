@@ -5,6 +5,7 @@
 import { type CellBudget, clean, placeCell, type Workbook, type Worksheet } from './cells.ts'
 import { compoundStreams } from './cfb.ts'
 import { maxCellCharacters, maxCells, maxPartSize } from './limits.ts'
+import { errorMessage } from './text.ts'
 
 // record types (2.3)
 const BOF = 0x0809
@@ -125,11 +126,10 @@ class Cursor {
   }
   /** `n` characters from the cursor inside the current chunk, one or two bytes each. */
   private codeUnits(n: number, wide: boolean): string {
-    const codes = new Array<number>(n)
-    for (let i = 0; i < n; i++) {
+    const codes = Array.from({ length: n }, (_, i) => {
       const k = this.at + (wide ? 2 * i : i)
-      codes[i] = wide ? this.byte(k) | (this.byte(k + 1) << 8) : this.byte(k)
-    }
+      return wide ? this.byte(k) | (this.byte(k + 1) << 8) : this.byte(k)
+    })
     this.at += wide ? 2 * n : n
     return String.fromCharCode(...codes)
   }
@@ -177,7 +177,7 @@ function readText(read: () => string): string {
   try {
     return read()
   } catch (e) {
-    if (e instanceof Short) throw new Error('string record is malformed')
+    if (e instanceof Short) throw new Error('string record is malformed', { cause: e })
     throw e
   }
 }
@@ -190,9 +190,9 @@ interface RecordReader {
    * The record at byte `at` with the Continue records after it; throws when it runs past the
    * stream or when the bytes read over all calls exceed the stream (substreams overlap).
    */
-  record(at: number): Rec
+  record: (at: number) => Rec
   /** True when the record is a BOF of BIFF8 with substream type `dt` (2.4.21). */
-  isBof(r: Rec, dt: number): boolean
+  isBof: (r: Rec, dt: number) => boolean
 }
 
 function recordReader(s: Uint8Array): RecordReader {
@@ -235,7 +235,7 @@ function whenShort<T>(r: Rec, read: () => T): T {
     return read()
   } catch (e) {
     if (!(e instanceof Short)) throw e
-    throw new Error(`XLS record at byte ${r.at} is too short`)
+    throw new Error(`XLS record at byte ${r.at} is too short`, { cause: e })
   }
 }
 
@@ -292,7 +292,11 @@ function put(st: SheetState, row: number, col: number, text: string): void {
     cells = []
     st.rows.set(row, cells)
   }
-  placeCell(cells, col + 1, text, () => `${letters(col + 1)}${row + 1}`, st.remaining)
+  placeCell(
+    cells,
+    { column: col + 1, text, name: () => `${letters(col + 1)}${row + 1}` },
+    st.remaining,
+  )
 }
 
 /** Refuses a formula cell still waiting for its String record. */
@@ -303,7 +307,10 @@ function checkNoPending(st: SheetState): void {
 }
 
 /** How a record changes the nesting of substreams: a BOF opens one, an EOF closes one. */
-const depthChange = (type: number) => (type === BOF ? 1 : type === EOF ? -1 : 0)
+function depthChange(type: number): number {
+  if (type === BOF) return 1
+  return type === EOF ? -1 : 0
+}
 
 /** A cell record of the worksheet, with the places of its fields. */
 interface CellRecord {
@@ -428,8 +435,7 @@ function putCell(reader: RecordReader, r: Rec, strings: string[], st: SheetState
  */
 function readWorksheetCells(
   reader: RecordReader,
-  from: number,
-  n: number,
+  { from, n }: { from: number; n: number },
   strings: string[],
   remaining: CellBudget,
 ): { rows: string[][]; end: number } {
@@ -460,7 +466,7 @@ function readWorksheetCells(
     checkNoPending(st)
     putCell(reader, r, strings, st)
   }
-  return { rows: [...st.rows].sort((a, b) => a[0] - b[0]).map(([, cells]) => cells), end }
+  return { rows: [...st.rows].toSorted((a, b) => a[0] - b[0]).map(([, cells]) => cells), end }
 }
 
 /**
@@ -482,23 +488,25 @@ function assembleWorksheets(
   const ranges: [number, number][] = [[0, workbookEnd]]
   const worksheets: Worksheet[] = []
   // only worksheets (and dialog sheets); macro, chart and VBA module sheets hold no cells
-  for (const b of bound.filter((b) => b.type === 0)) {
+  for (const sheet of bound.filter((b) => b.type === 0)) {
     const n = worksheets.length + 1
-    const first = b.position + 4 <= s.length ? record(b.position) : undefined
+    const first = sheet.position + 4 <= s.length ? record(sheet.position) : undefined
     if (!first || !isBof(first, 0x0010)) {
       throw new Error(`XLS worksheet ${n} does not start with a worksheet BOF record`)
     }
-    if (starts.has(b.position)) {
+    if (starts.has(sheet.position)) {
       throw new Error(`XLS worksheet ${n} starts where an earlier worksheet starts`)
     }
-    starts.add(b.position)
+    starts.add(sheet.position)
     try {
-      const { rows, end } = readWorksheetCells(reader, first.next, n, strings, remaining)
-      worksheets.push({ name: b.name, rows })
-      ranges.push([b.position, end])
+      const { rows, end } = readWorksheetCells(reader, { from: first.next, n }, strings, remaining)
+      worksheets.push({ name: sheet.name, rows })
+      ranges.push([sheet.position, end])
     } catch (e) {
-      const message = (e as Error).message
-      throw new Error(message.startsWith('XLS ') ? message : `XLS worksheet ${n}: ${message}`)
+      const message = errorMessage(e)
+      throw new Error(message.startsWith('XLS ') ? message : `XLS worksheet ${n}: ${message}`, {
+        cause: e,
+      })
     }
   }
   ranges.sort((a, b) => a[0] - b[0])
@@ -536,9 +544,14 @@ function sharedStrings(c: Cursor): string[] {
       strings.push(clean(c.richString()))
     } catch (e) {
       if (e instanceof Short) {
-        throw new Error(`XLS shared string table ends after ${strings.length} of ${unique} strings`)
+        throw new Error(
+          `XLS shared string table ends after ${strings.length} of ${unique} strings`,
+          { cause: e },
+        )
       }
-      throw new Error(`XLS shared string ${strings.length} is malformed: ${(e as Error).message}`)
+      throw new Error(`XLS shared string ${strings.length} is malformed: ${errorMessage(e)}`, {
+        cause: e,
+      })
     }
   }
   return strings

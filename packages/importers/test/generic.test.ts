@@ -22,7 +22,7 @@ describe('splitDelimited', () => {
   })
 })
 
-describe('parseDelimited', () => {
+describe('parseDelimited: one column, decimal commas and tabs', () => {
   it('reads one column without a header in the named unit', () => {
     const r = parseDelimited('2800\n2810\n\n2795\n', {
       columns: { velocity: 1 },
@@ -64,7 +64,9 @@ describe('parseDelimited', () => {
       { velocity: { value: 813, raw: '813' } },
     ])
   })
+})
 
+describe('parseDelimited: the header row, skipped rows and string labels', () => {
   it('finds the header row by column names and reads quoted cells', () => {
     const text = [
       'Exported by a phone',
@@ -101,7 +103,9 @@ describe('parseDelimited', () => {
       'row 4: string "A" returns after another string; read as a new string',
     )
   })
+})
 
+describe('parseDelimited: cold bore and excluded shots', () => {
   it('reads coldBore and excluded values', () => {
     const rows = ['1', 'x', 'YES', 'true', '', '0', 'no', 'False'].map(
       (c, i) => `${800 + i},${c},${c}`,
@@ -138,7 +142,9 @@ describe('parseDelimited', () => {
       }),
     ).toThrow(/^row 2: coldBore "maybe"/)
   })
+})
 
+describe('parseDelimited: rows it skips or refuses', () => {
   it('skips a row without a velocity with a warning and throws on other bad cells', () => {
     const r = parseDelimited('A,800\nA,\nA,801', {
       columns: { string: 1, velocity: 2 },
@@ -184,7 +190,9 @@ describe('parseDelimited', () => {
       'row 2: "812,5" may be one velocity',
     )
   })
+})
 
+describe('parseDelimited: a detected comma that may cut a velocity without a header', () => {
   it('refuses a detected comma that may cut a velocity with decimals or thousands', () => {
     const fps = { columns: { velocity: 1 }, velocityUnit: 'ft/s' } as const
     expect(() => parseDelimited('2,800.0\n2,810.5\n2,795.0\n', fps)).toThrow(
@@ -200,7 +208,9 @@ describe('parseDelimited', () => {
     const r = parseDelimited('A,2795\nA,2801', { ...fps, columns: { string: 1, velocity: 2 } })
     expect(values(r)).toEqual([[851.916, 853.7448]])
   })
+})
 
+describe('parseDelimited: a detected comma that may cut a velocity after a header', () => {
   it('warns once when a detected comma may cut a velocity after a header row', () => {
     const ms = { columns: { velocity: 'velocity' }, velocityUnit: 'm/s' } as const
     const cut = parseDelimited('velocity,note\n812,5\n810,0', ms)
@@ -249,7 +259,9 @@ describe('parseDelimited', () => {
     ).toBe(false)
     expect(values(parseDelimited('Shot,Velocity,Energy\n1,1150,450', fps))).toEqual([[350.52]])
   })
+})
 
+describe('parseDelimited: warnings, the delimiter and skipped rows', () => {
   it('warns on velocities outside the plausible range', () => {
     const r = parseDelimited('Shot,Speed\n1,2800\n2,2810\nAVG,2805\nSD,7', {
       columns: { velocity: 'Speed' },
@@ -290,7 +302,9 @@ describe('parseDelimited', () => {
       /skipRows applies only when every column is a number/,
     )
   })
+})
 
+describe('parseDelimited: the velocity unit of a header', () => {
   it('reads the unit token of a header-text velocity column', () => {
     const cases: [string, number, string][] = [
       ['Speed (fps)', 304.8, 'fps'],
@@ -336,7 +350,9 @@ describe('parseDelimited', () => {
       'row 2: velocity unit missing',
     )
   })
+})
 
+describe('parseDelimited: unit cells and refused columns', () => {
   it('takes the token for an empty unit cell and refuses a unit cell that differs', () => {
     const columns = { velocity: 'Speed (fps)', velocityUnit: 'unit' }
     const same = parseDelimited('Speed (fps),unit\n2800,\n2810,FPS', { columns })

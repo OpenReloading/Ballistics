@@ -224,6 +224,20 @@ interface WorkbookStreamOptions {
   strings?: (string | RichString)[] | undefined
 }
 
+/** The BoundSheet8 record of a sheet whose substream starts at `position`. */
+function boundSheet(s: XlsSheet, position: number): Buffer {
+  const name = units(s.name)
+  const high = name.some((c) => c > 0xff)
+  return record(
+    0x0085,
+    Buffer.concat([
+      u32(position),
+      Buffer.from([s.hidden ?? 0, s.type ?? 0, name.length, high ? 1 : 0]),
+      chars(name, high),
+    ]),
+  )
+}
+
 /** A BIFF8 Workbook stream; every non-empty text is a LabelSst cell at its row and column. */
 export function workbookStream(sheets: XlsSheet[], options: WorkbookStreamOptions = {}): Buffer {
   const strings: (string | RichString)[] = []
@@ -248,18 +262,6 @@ export function workbookStream(sheets: XlsSheet[], options: WorkbookStreamOption
     ])
   })
   strings.push(...(options.strings ?? []))
-  const boundSheet = (s: XlsSheet, position: number) => {
-    const name = units(s.name)
-    const high = name.some((c) => c > 0xff)
-    return record(
-      0x0085,
-      Buffer.concat([
-        u32(position),
-        Buffer.from([s.hidden ?? 0, s.type ?? 0, name.length, high ? 1 : 0]),
-        chars(name, high),
-      ]),
-    )
-  }
   const globals = (positions: number[]) =>
     Buffer.concat([
       bof(0x0005, options.bofVersion),
@@ -370,7 +372,7 @@ function planCompound(streams: CompoundStream[], options: CompoundOptions): Comp
   const bigSectors = streams.map((s, i) => (big[i] ? Math.ceil(s.data.length / sectorSize) : 0))
   const content = dirSectors + miniFatSectors + miniSectors + bigSectors.reduce((a, b) => a + b, 0)
   const { fat, difat } = fatCounts(content, per, options.fatSectors ?? 0)
-  const table = new Array<number>(fat * per).fill(FREESECT)
+  const table = Array.from({ length: fat * per }, () => FREESECT)
   let next = 0
   const run = (count: number, mark?: number) => {
     const start = next
@@ -450,7 +452,10 @@ function writeCompoundDirectory(
   streams: CompoundStream[],
   entry: (id: number) => number,
 ): void {
-  const writeEntry = (id: number, name: string, type: number, start: number, size: number) => {
+  const writeEntry = (
+    id: number,
+    { name, type, start, size }: { name: string; type: number; start: number; size: number },
+  ) => {
     const at = entry(id)
     const nameUnits = units(name)
     for (const [k, c] of nameUnits.entries()) file.writeUInt16LE(c, at + 2 * k)
@@ -470,9 +475,15 @@ function writeCompoundDirectory(
     file.writeUInt32LE(NOSTREAM, at + 0x4c)
   }
   const { miniStream, miniStart } = plan
-  writeEntry(0, 'Root Entry', 5, miniStream.length ? miniStart : ENDOFCHAIN, miniStream.length)
+  writeEntry(0, {
+    name: 'Root Entry',
+    type: 5,
+    start: miniStream.length ? miniStart : ENDOFCHAIN,
+    size: miniStream.length,
+  })
   for (const [i, s] of streams.entries()) {
-    writeEntry(i + 1, s.name, 2, plan.starts[i] ?? defined(plan.miniStarts[i]), s.data.length)
+    const start = plan.starts[i] ?? defined(plan.miniStarts[i])
+    writeEntry(i + 1, { name: s.name, type: 2, start, size: s.data.length })
   }
 }
 
@@ -487,7 +498,7 @@ function writeCompoundData(
   for (const [i, s] of streams.entries()) {
     if (big[i]) Buffer.from(s.data).copy(file, offset(plan.starts[i] as number))
   }
-  const miniTable = new Array<number>(plan.miniFatSectors * per).fill(FREESECT)
+  const miniTable = Array.from({ length: plan.miniFatSectors * per }, () => FREESECT)
   for (const [i, s] of streams.entries()) {
     if (big[i] || !s.data.length) continue
     const n = Math.ceil(s.data.length / 64)

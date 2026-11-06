@@ -17,14 +17,11 @@ export type Tier = 'high' | 'medium' | 'low'
 /** Lowest kind score that suggests a kind, and the scores from which the tier is medium and high. */
 export const tierFloors = { low: 0.4, medium: 0.6, high: 0.8 } as const
 
-const tierOf = (score: number): Tier | undefined =>
-  score >= tierFloors.high
-    ? 'high'
-    : score >= tierFloors.medium
-      ? 'medium'
-      : score >= tierFloors.low
-        ? 'low'
-        : undefined
+function tierOf(score: number): Tier | undefined {
+  if (score >= tierFloors.high) return 'high'
+  if (score >= tierFloors.medium) return 'medium'
+  return score >= tierFloors.low ? 'low' : undefined
+}
 
 /** How a column of a table is read: the field it fills, the unit and decimal mark of its numbers. */
 export interface TableColumnMap {
@@ -58,20 +55,22 @@ const sampleOf = (table: Table, column: number) =>
     .map((r) => r[column] ?? '')
     .filter((c) => c !== '')
 
+/** A unit symbol folded for comparison: lower case, letters and digits only, ² and ³ as digits. */
+const plain = (s: string) =>
+  s
+    .toLowerCase()
+    .replaceAll('²', '2')
+    .replaceAll('³', '3')
+    .replace(/[^a-z0-9]/g, '')
+
 /** The unit the header names, `unknown` for a unit in brackets or after a slash or underscore the field does not take. */
 const unitFromHeader = (
   header: string,
   units: ColumnUnit[],
 ): ColumnUnit | 'unknown' | undefined => {
   const raw = headerUnit(header)
-  if (!raw) return
+  if (!raw) return undefined
   const key = raw.replace(/inch(es)?|"/g, 'in').replace(/grains?/g, 'gr')
-  const plain = (s: string) =>
-    s
-      .toLowerCase()
-      .replaceAll('²', '2')
-      .replaceAll('³', '3')
-      .replace(/[^a-z0-9]/g, '')
   const named = units.find((u) => plain(u.symbol) === plain(key))
   // a last word after a space may be a word of the name (Case length, Max OAL), not a unit
   return named ?? (header.toLowerCase().endsWith(` ${raw}`) ? undefined : 'unknown')
@@ -94,13 +93,18 @@ const inRange = (
   return cells.length === 0 ? 0 : n / cells.length
 }
 
+/** The first non-empty cells of a column and their decimal mark. */
+interface Sample {
+  cells: string[]
+  decimal: '.' | ','
+}
+
 /** The unit of a numeric column: from its header, else the one that fits the usual range best, else the stored unit. */
 function unitOf(
   field: FieldSpec,
   first: ColumnUnit,
   header: string,
-  cells: string[],
-  decimal: '.' | ',',
+  sample: Sample,
 ): { unit?: ColumnUnit; from: 'header' | 'values' | 'default' | 'unknown' } {
   const all = field.units ?? [first]
   const named = unitFromHeader(header, all)
@@ -108,14 +112,28 @@ function unitOf(
   if (named) return { unit: named, from: 'header' }
   const units = all.filter((u) => !u.named)
   if (units.length === 1 || !field.range) return { unit: first, from: 'default' }
-  const typical = field.typical ?? field.range
+  const spans = { range: field.range, typical: field.typical ?? field.range }
+  const best = bestFit(units, first, sample, spans)
+  return { unit: best.unit, from: best.fit > 0 ? 'values' : 'default' }
+}
+
+/**
+ * The unit whose reading of the sample puts most values in `range`, ties broken by `typical`;
+ * `first` with no fit when the sample has no number.
+ */
+function bestFit(
+  units: ColumnUnit[],
+  first: ColumnUnit,
+  { cells, decimal }: Sample,
+  { range, typical }: { range: [number, number]; typical: [number, number] },
+): { unit: ColumnUnit; fit: number } {
   let best = { unit: first, fit: -1, usual: -1 }
   for (const unit of units) {
-    const fit = inRange(cells, decimal, unit, field.range)
+    const fit = inRange(cells, decimal, unit, range)
     const usual = inRange(cells, decimal, unit, typical)
     if (fit > best.fit || (fit === best.fit && usual > best.usual)) best = { unit, fit, usual }
   }
-  return { unit: best.unit, from: best.fit > 0 ? 'values' : 'default' }
+  return best
 }
 
 /** How much the words of a header say it names a field: 1 for the whole header, 0.8 for a word, 0.5 for a part. */
@@ -153,7 +171,8 @@ function columnScore(field: FieldSpec, header: string, cells: string[]): number 
   const h = headerScore(field, header)
   const v = valueScore(field, cells)
   if (h > 0) return 0.65 * h + 0.35 * v
-  return field.choices ? 0.5 * v : field.units ? 0.2 * v : 0
+  if (field.choices) return 0.5 * v
+  return field.units ? 0.2 * v : 0
 }
 
 /** Best one-to-one assignment (greedy by score) of columns to the fields of `kind`; scores of the fields that got one. */
@@ -188,7 +207,7 @@ function scoreKinds(table: Table): KindScore[] {
       )
       return { kind, score }
     })
-    .sort((a, b) => b.score - a.score)
+    .toSorted((a, b) => b.score - a.score)
 }
 
 /**
@@ -218,7 +237,7 @@ export function autoMap(table: Table, kind: TableKind): TableColumnMap[] {
     const map: TableColumnMap = { field: hit.field.key, decimal, ambiguousDecimal: ambiguous }
     const first = hit.field.units?.[0]
     if (first) {
-      const u = unitOf(hit.field, first, header, sample, decimal)
+      const u = unitOf(hit.field, first, header, { cells: sample, decimal })
       map.unit = u.unit?.symbol
       map.unitFrom = u.from
     }
@@ -262,20 +281,39 @@ export interface BuiltRecords {
 const stored = (map: TableColumnMap, field: FieldSpec) =>
   field.units?.find((u) => u.symbol === map.unit) ?? field.units?.[0]
 
-/** A number cell in the stored unit with its raw text when the unit differs and a plausibility warning, or why the row is rejected. */
-function numberCell(
-  cell: string,
-  map: TableColumnMap,
-  field: FieldSpec,
-): { value: number; raw?: string; warning?: string } | { problem: string } {
+/** The unit the cells of a column are read in, or why the column has none. */
+function columnUnit(map: TableColumnMap, field: FieldSpec): ColumnUnit | { problem: string } {
   if (map.unitFrom === 'unknown' && map.unit === undefined) {
     const symbols = field.units?.map((u) => u.symbol).join(', ')
     return {
       problem: `${field.label}: the header names a unit other than ${symbols}. Choose the unit of the column.`,
     }
   }
-  const unit = stored(map, field)
-  if (!unit) return { problem: `${field.label} has no unit. Choose a unit for the column.` }
+  return (
+    stored(map, field) ?? { problem: `${field.label} has no unit. Choose a unit for the column.` }
+  )
+}
+
+/** The warning for a value in the stored unit outside the field's usual range. */
+function rangeWarning(
+  field: FieldSpec,
+  cell: string,
+  unit: ColumnUnit,
+  value: number,
+): string | undefined {
+  const range = field.range
+  if (!range || (value >= range[0] && value <= range[1])) return undefined
+  return `${field.label} ${cell} ${unit.symbol} is outside the usual ${range[0]} to ${range[1]} ${field.units?.[0]?.symbol}. Check the unit of the column.`
+}
+
+/** A number cell in the stored unit with its raw text when the unit differs and a plausibility warning, or why the row is rejected. */
+function numberCell(
+  cell: string,
+  map: TableColumnMap,
+  field: FieldSpec,
+): { value: number; raw?: string; warning?: string } | { problem: string } {
+  const unit = columnUnit(map, field)
+  if ('problem' in unit) return unit
   const x = readNumber(cell, map.decimal)
   if (x === undefined) {
     return {
@@ -285,15 +323,11 @@ function numberCell(
   const value = unit.toStored(x)
   if (!(value > 0))
     return { problem: `${field.label} ${cell} is not above 0. Fix the cell or leave it empty.` }
-  const first = field.units?.[0]
-  const range = field.range
-  const out = range && (value < range[0] || value > range[1])
+  const warning = rangeWarning(field, cell, unit, value)
   return {
     value,
-    ...(unit !== first && { raw: cell }),
-    ...(out && {
-      warning: `${field.label} ${cell} ${unit.symbol} is outside the usual ${range[0]} to ${range[1]} ${first?.symbol}. Check the unit of the column.`,
-    }),
+    ...(unit !== field.units?.[0] && { raw: cell }),
+    ...(warning && { warning }),
   }
 }
 
@@ -305,66 +339,74 @@ const quantityOf = (c: Cells[string] | undefined) =>
     ? { value: c.value, ...(c.raw && { raw: c.raw }) }
     : undefined
 
+/** The data of a record of `kind`. */
+type DataOf<K extends TableKind> = Extract<UserRecord, { kind: K }>['data']
+
+/** The id, name and save time of a row's record. */
+interface RecordHead {
+  id: string
+  name: string
+  saved: string
+}
+
 /** The record of one row of `kind`; `makerId` is the id of its maker's record. */
 function recordOf(
   kind: TableKind,
-  id: string,
-  name: string,
-  saved: string,
+  head: RecordHead,
   c: Cells,
   makerId: string | undefined,
 ): UserRecord {
-  if (kind === 'bullet') {
-    const coefficients = (['G1', 'G7'] as const).flatMap((m) => {
-      const q = quantityOf(c[`bc${m}`])
-      return q ? [{ dragModel: m, value: q.value }] : []
-    })
-    const diameter = quantityOf(c['diameter'])
-    const mass = quantityOf(c['mass'])
-    const length = quantityOf(c['length'])
-    const caliber = typeof c['caliber'] === 'string' ? c['caliber'] : undefined
-    return {
-      kind,
-      id,
+  if (kind === 'bullet') return { kind, ...head, data: bulletData(head.name, c, makerId) }
+  if (kind === 'powder') return { kind, ...head, data: powderData(c) }
+  return { kind, ...head, data: cartridgeData(head.name, c) }
+}
+
+/** The data of a bullet row: its name, maker and the numbers it gives as overrides. */
+function bulletData(name: string, c: Cells, makerId: string | undefined): DataOf<'bullet'> {
+  const coefficients = (['G1', 'G7'] as const).flatMap((m) => {
+    const q = quantityOf(c[`bc${m}`])
+    return q ? [{ dragModel: m, value: q.value }] : []
+  })
+  const diameter = quantityOf(c['diameter'])
+  const mass = quantityOf(c['mass'])
+  const length = quantityOf(c['length'])
+  const caliber = typeof c['caliber'] === 'string' ? c['caliber'] : undefined
+  return {
+    origin: 'user',
+    ...(makerId && { manufacturer: `user:${makerId}` as const }),
+    overrides: {
       name,
-      saved,
-      data: {
-        origin: 'user',
-        ...(makerId && { manufacturer: `user:${makerId}` as const }),
-        overrides: {
-          name,
-          ...(caliber && { caliber }),
-          ...(diameter && { diameter }),
-          ...(mass && { mass }),
-          ...(length && { length }),
-          ...(coefficients.length > 0 && { ballisticCoefficients: coefficients }),
-        },
-      },
-    }
+      ...(caliber && { caliber }),
+      ...(diameter && { diameter }),
+      ...(mass && { mass }),
+      ...(length && { length }),
+      ...(coefficients.length > 0 && { ballisticCoefficients: coefficients }),
+    },
   }
-  if (kind === 'powder') {
-    const bulk = quantityOf(c['bulkDensity'])
-    return {
-      kind,
-      id,
-      name,
-      saved,
-      data: {
-        origin: 'user',
-        provenanceKind: 'measured',
-        draft: {
-          // the choices of the field spell only these values
-          ...(typeof c['grainForm'] === 'string' && {
-            grainForm: c['grainForm'] as 'ball' | 'extruded' | 'flake' | 'other',
-          }),
-          ...(typeof c['propellantBase'] === 'string' && {
-            propellantBase: c['propellantBase'] as 'single' | 'double' | 'triple',
-          }),
-          ...(bulk && { bulkDensity: bulk }),
-        },
-      },
-    }
+}
+
+/** The data of a powder row: a measured draft with the grain form, base and bulk density it gives. */
+function powderData(c: Cells): DataOf<'powder'> {
+  const bulk = quantityOf(c['bulkDensity'])
+  return {
+    origin: 'user',
+    provenanceKind: 'measured',
+    draft: {
+      ...(typeof c['grainForm'] === 'string' && {
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the choices of the field spell only these values
+        grainForm: c['grainForm'] as 'ball' | 'extruded' | 'flake' | 'other',
+      }),
+      ...(typeof c['propellantBase'] === 'string' && {
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the choices of the field spell only these values
+        propellantBase: c['propellantBase'] as 'single' | 'double' | 'triple',
+      }),
+      ...(bulk && { bulkDensity: bulk }),
+    },
   }
+}
+
+/** The data of a cartridge row: its name and the case length, overall length, bullet diameter and Pmax it gives. */
+function cartridgeData(name: string, c: Cells): DataOf<'cartridge'> {
   const spec = (
     symbol: string,
     key: string,
@@ -382,13 +424,7 @@ function recordOf(
     ...spec('G1', 'bulletDiameter', 'length', 'cartridge'),
     ...spec('Pmax', 'maxPressure', 'pressure'),
   ]
-  return {
-    kind,
-    id,
-    name,
-    saved,
-    data: { origin: 'user', overrides: { name, ...(values.length > 0 && { values }) } },
-  }
+  return { origin: 'user', overrides: { name, ...(values.length > 0 && { values }) } }
 }
 
 /** Lower case, accents and extra spaces folded: the form of a name in a key. */
@@ -411,13 +447,18 @@ interface Column {
   i: number
 }
 
+/** The cells of a row read so far, and the warnings of the table. */
+interface RowOut {
+  c: Cells
+  warnings: RowIssue[]
+}
+
 /** One cell into `c` as the field says: a choice, a number in the stored unit, or text. Returns the issue that rejects the row. */
 function readCell(
   col: Column,
   cell: string,
   at: { row: number; header: string; map: TableColumnMap },
-  c: Cells,
-  warnings: RowIssue[],
+  { c, warnings }: RowOut,
 ): RowIssue | undefined {
   const { f } = col
   const issue = (reason: string): RowIssue => ({ row: at.row, column: at.header, cell, reason })
@@ -446,13 +487,18 @@ function readCell(
   return undefined
 }
 
+/** A table read as a kind: its columns by field and the column map. */
+interface TableRead {
+  table: Table
+  columns: Column[]
+  map: TableColumnMap[]
+}
+
 /** The cells of one row by field, or the issue that rejects it. */
 function readRow(
-  columns: Column[],
-  table: Table,
+  { table, columns, map }: TableRead,
   cells: string[],
   row: number,
-  map: TableColumnMap[],
   warnings: RowIssue[],
 ): Cells | RowIssue {
   const c: Cells = {}
@@ -462,12 +508,48 @@ function readRow(
       col,
       (cells[col.i] ?? '').trim(),
       { row, header: table.header[col.i] ?? col.f.label, map: map[col.i] ?? { decimal: '.' } },
-      c,
-      warnings,
+      { c, warnings },
     )
     if (bad) return bad
   }
   return c
+}
+
+/** `out` with every row rejected because no column is mapped to the `missing` required fields. */
+function rejectAll(out: BuiltRecords, missing: Column[], rows: number): BuiltRecords {
+  const labels = missing.map((c) => c.f.label).join(', ')
+  out.rejected.push({
+    row: 1,
+    column: labels,
+    cell: '',
+    reason: `No column is mapped to ${labels}. Map a column to ${missing.length > 1 ? 'each' : 'it'} or read the file as another kind.`,
+  })
+  out.counts.rejected = rows
+  return out
+}
+
+/** The id of a maker's record by its name, adding the record to `makers` the first time, saved at `now`. */
+function makerRecords(makers: BuiltRecords['makers'], now: string): (maker: string) => string {
+  const ids = new Map<string, string>()
+  return (maker) => {
+    const key = `manufacturer|${keyText(maker)}`
+    const known = ids.get(key)
+    if (known) return known
+    const id = idOfKey(key)
+    ids.set(key, id)
+    makers.push({
+      key,
+      record: { kind: 'manufacturer', id, name: maker, saved: now, data: { origin: 'user' } },
+    })
+    return id
+  }
+}
+
+/** Why the row `row` is not imported: it gives the same id as the earlier row `first`. */
+function sameIdReason(kind: TableKind, first: number, row: number): string {
+  return kind === 'bullet'
+    ? `Rows ${first} and ${row} give the same name, maker, diameter and mass, so one id: only row ${first} is imported. Change the name, maker, diameter or mass of row ${row} to import it as a record of its own.`
+    : `Rows ${first} and ${row} give the same name and maker, so one id: only row ${first} is imported. Change the name or maker of row ${row} to import it as a record of its own.`
 }
 
 const isIssue = (x: Cells | RowIssue): x is RowIssue =>
@@ -496,30 +578,8 @@ export function buildRecords(
     warnings: [],
   }
   const missing = columns.filter((c) => c.f.required && c.i < 0)
-  if (missing.length > 0) {
-    const labels = missing.map((c) => c.f.label).join(', ')
-    out.rejected.push({
-      row: 1,
-      column: labels,
-      cell: '',
-      reason: `No column is mapped to ${labels}. Map a column to ${missing.length > 1 ? 'each' : 'it'} or read the file as another kind.`,
-    })
-    out.counts.rejected = table.rows.length
-    return out
-  }
-  const makers = new Map<string, string>()
-  const makerOf = (maker: string) => {
-    const key = `manufacturer|${keyText(maker)}`
-    const known = makers.get(key)
-    if (known) return known
-    const id = idOfKey(key)
-    makers.set(key, id)
-    out.makers.push({
-      key,
-      record: { kind: 'manufacturer', id, name: maker, saved: now, data: { origin: 'user' } },
-    })
-    return id
-  }
+  if (missing.length > 0) return rejectAll(out, missing, table.rows.length)
+  const makerOf = makerRecords(out.makers, now)
   const warned = new Set<number>()
   const firstRow = new Map<string, number>()
   const nameColumn = columns.find((col) => col.f.key === 'name')
@@ -527,30 +587,26 @@ export function buildRecords(
   table.rows.forEach((cells, r) => {
     const row = r + (table.hasHeader ? 2 : 1)
     const before = out.warnings.length
-    const c = readRow(columns, table, cells, row, map, out.warnings)
+    const c = readRow({ table, columns, map }, cells, row, out.warnings)
     if (isIssue(c)) {
       // warnings of a rejected row are dropped with it
       out.warnings.length = before
       out.rejected.push(c)
       return
     }
-    const name = String(c['name'] ?? '')
+    const nameCell = c['name']
+    const name = typeof nameCell === 'string' ? nameCell : ''
     const maker = typeof c['maker'] === 'string' ? c['maker'] : undefined
     const key = keyOf(kind, name, maker, c)
     const first = firstRow.get(key)
     if (first === undefined) firstRow.set(key, row)
-    else
-      out.warnings.push({
-        row,
-        column: nameHeader,
-        cell: name,
-        reason:
-          kind === 'bullet'
-            ? `Rows ${first} and ${row} give the same name, maker, diameter and mass, so one id: only row ${first} is imported. Change the name, maker, diameter or mass of row ${row} to import it as a record of its own.`
-            : `Rows ${first} and ${row} give the same name and maker, so one id: only row ${first} is imported. Change the name or maker of row ${row} to import it as a record of its own.`,
-      })
+    else {
+      const reason = sameIdReason(kind, first, row)
+      out.warnings.push({ row, column: nameHeader, cell: name, reason })
+    }
     if (out.warnings.length > before) warned.add(row)
-    const record = recordOf(kind, idOfKey(key), name, now, c, maker && makerOf(maker))
+    const head = { id: idOfKey(key), name, saved: now }
+    const record = recordOf(kind, head, c, maker && makerOf(maker))
     out.entries.push({ key, row, record })
   })
   out.counts = { accepted: out.entries.length, warned: warned.size, rejected: out.rejected.length }

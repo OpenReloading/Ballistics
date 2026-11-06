@@ -4,7 +4,14 @@ import { isShotViewHeader } from '../src/shotview.ts'
 import { complete } from './complete.ts'
 import { shotViewEnglish, shotViewGerman } from './fixtures.ts'
 
-describe('parseShotView', () => {
+/** The English export with the bore flag cells of the first shot set to `clean` and `cold`. */
+const flagged = (clean: string, cold: string) =>
+  shotViewEnglish.replace(', , X, ', `, ${clean}, ${cold}, `)
+/** The string labels of the English export with `line` as its name line. */
+const labelsOf = (line: string) =>
+  parseShotView(shotViewEnglish.replace(/^[^\n]*"Test load A 42.0gr"/, line)).stringLabels
+
+describe('parseShotView: an English export and bore flags', () => {
   it('reads an English export in fps', () => {
     const r = parseShotView(shotViewEnglish, { fileName: 'session.csv', sha256: 'a'.repeat(64) })
     const shots = r.session.strings[0]?.shots
@@ -36,8 +43,6 @@ describe('parseShotView', () => {
   })
 
   it('reads 0, no, false and n in a bore flag column as unset, other text as set', () => {
-    const flagged = (clean: string, cold: string) =>
-      shotViewEnglish.replace(', , X, ', `, ${clean}, ${cold}, `)
     for (const text of ['No', 'FALSE', '0', 'n', ' no ']) {
       const r = parseShotView(flagged(text, text))
       expect(r.session.strings[0]?.shots[0]?.coldBore).toBeUndefined()
@@ -49,14 +54,14 @@ describe('parseShotView', () => {
       expect(r.session.note).toBe('ShotView bore flags: shot 1 cold bore')
     }
   })
+})
 
+describe('parseShotView: the name line, a German export, dates and the footer', () => {
   it('cuts the commas and the white space after them from the name line', () => {
-    const name = (line: string) =>
-      parseShotView(shotViewEnglish.replace(/^[^\n]*"Test load A 42.0gr"/, line)).stringLabels
-    expect(name('Load A,,,')).toEqual(['Load A'])
-    expect(name('Load A, ,')).toEqual(['Load A,'])
-    expect(name('Load A,,  ')).toEqual(['Load A'])
-    expect(name(`Load A${','.repeat(5000)}x${' '.repeat(5000)}`)).toHaveLength(1)
+    expect(labelsOf('Load A,,,')).toEqual(['Load A'])
+    expect(labelsOf('Load A, ,')).toEqual(['Load A,'])
+    expect(labelsOf('Load A,,  ')).toEqual(['Load A'])
+    expect(labelsOf(`Load A${','.repeat(5000)}x${' '.repeat(5000)}`)).toHaveLength(1)
   })
 
   it('reads a German export in m/s with decimal commas', () => {
@@ -94,7 +99,9 @@ describe('parseShotView', () => {
       'footer AVERAGE SPEED "2812.0" differs from 2802.0 computed from the shots',
     ])
   })
+})
 
+describe('parseShotView: units and refused files', () => {
   // spellings seen in exports; KPH, km/h, MPH assumed
   it('reads the unit token of each header spelling', () => {
     const cases: [string, string, number, string, string][] = [
@@ -141,7 +148,9 @@ describe('parseShotView', () => {
   ])('refuses a velocity: %s', (_, cell, message) => {
     expect(() => parseShotView(shotViewEnglish.replace(' 2810.5,', cell))).toThrow(message)
   })
+})
 
+describe('parseShotView: footers, quotes, line ends and hashes', () => {
   it('reads no shots after the footer starts and keeps line breaks in quoted notes', () => {
     const shot2 = '8.5, , , 2:10:31 PM, , , ""'
     expect(shotViewEnglish).toContain(shot2)
@@ -189,11 +198,11 @@ describe('parseShotView', () => {
   })
 })
 
-describe('ShotView CSV rows, name line and footer date', () => {
-  const header = shotViewEnglish.split('\n')[1] ?? ''
-  const dated = (text: string) =>
-    parseShotView(shotViewEnglish.replace(/DATE, "[^"]*"/, `DATE, "${text}"`))
+const header = shotViewEnglish.split('\n')[1] ?? ''
+const dated = (text: string) =>
+  parseShotView(shotViewEnglish.replace(/DATE, "[^"]*"/, `DATE, "${text}"`))
 
+describe('ShotView CSV rows and footer dates', () => {
   it('takes a header only with # in its first cell and a bracketed unit in its second', () => {
     expect(isShotViewHeader(['#', 'SPEED (FPS)'])).toBe(true)
     expect(isShotViewHeader(['No', 'SPEED (FPS)'])).toBe(false)
@@ -226,13 +235,13 @@ describe('ShotView CSV rows, name line and footer date', () => {
     const r = parseShotView([header, '1, 2800.0', '-,,,'].join('\n'))
     expect(r.session.date).toBeUndefined()
   })
+})
 
+describe('ShotView CSV name line, date row, bore flags and footer labels', () => {
   it('takes the first line with text as the name and reads a quoted name as one cell', () => {
-    const named = (line: string) =>
-      parseShotView(shotViewEnglish.replace(/^[^\n]*"Test load A 42.0gr"/, line)).stringLabels
-    expect(named('   \nLoad A')).toEqual(['Load A'])
-    expect(named('"Load A, 42.0gr",,')).toEqual(['Load A, 42.0gr'])
-    expect(named(' "Load A, 42.0gr"')).toEqual(['Load A, 42.0gr'])
+    expect(labelsOf('   \nLoad A')).toEqual(['Load A'])
+    expect(labelsOf('"Load A, 42.0gr",,')).toEqual(['Load A, 42.0gr'])
+    expect(labelsOf(' "Load A, 42.0gr"')).toEqual(['Load A, 42.0gr'])
     const numbers = parseShotView(
       shotViewEnglish.replace(/^[^\n]*"Test load A 42.0gr"/, '308, 175gr'),
     )

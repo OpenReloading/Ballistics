@@ -9,9 +9,17 @@ import {
   maxTotalSize,
   maxXmlCharacters,
 } from './limits.ts'
+import { errorMessage } from './text.ts'
 import { readXls } from './xls.ts'
 import { parseXml, scanXml, type XmlBudget, type XmlElement } from './xml.ts'
-import { type Inflate, inflateRaw, readEntry, type ZipEntry, zipEntries } from './zip.ts'
+import {
+  type Archive,
+  type Inflate,
+  inflateRaw,
+  readEntry,
+  type ZipEntry,
+  zipEntries,
+} from './zip.ts'
 
 // assumed bound, not a cited one, for the relationships and workbook parts read into an element
 // tree
@@ -54,7 +62,7 @@ function resolveTarget(source: string, target: string): string {
 
 /** Column number of the letters of a cell reference, bijective base 26 (`A` 1, `IV` 256). */
 const columnOf = (letters: string) =>
-  [...letters].reduce((col, l) => col * 26 + l.charCodeAt(0) - 64, 0)
+  Array.from(letters).reduce((col, l) => col * 26 + l.charCodeAt(0) - 64, 0)
 
 /** The shared string a cell's `v` text indexes; refused when the index is not in the table. */
 function sharedString(text: string, strings: string[], ref: () => string): string {
@@ -70,13 +78,7 @@ function sharedString(text: string, strings: string[], ref: () => string): strin
  * Text of a cell from its type, the text of its first `v` and of its first `is`. `ref` names the
  * cell, built only for a refusal.
  */
-function cellText(
-  t: string | undefined,
-  v: string | undefined,
-  is: string | undefined,
-  strings: string[],
-  ref: () => string,
-): string {
+function cellText({ t, v, is }: CellState, strings: string[], ref: () => string): string {
   let text: string
   if (t === 'inlineStr') {
     text = is ?? ''
@@ -144,8 +146,11 @@ function closeCell(
     column = columnOf(letters)
   }
   const name = () => ref ?? `at column ${column}`
-  placeCell(cells, column, cellText(cell.t, cell.v, cell.is, strings, name), name, remaining)
+  placeCell(cells, { column, text: cellText(cell, strings, name), name }, remaining)
 }
+
+/** The element at each depth of a worksheet the scan reads: the sheet data, a row, a cell. */
+const sheetPath = ['sheetData', 'row', 'c']
 
 /**
  * Rows of cell text, read in one pass: the `row` children of the first `sheetData` child of the
@@ -168,11 +173,16 @@ function sheetRows(
     {
       open(name, attributes, path) {
         const depth = path.length
-        if (depth === 1 && name === 'sheetData' && sheetData === 'before') sheetData = 'open'
-        else if (depth === 2 && name === 'row' && sheetData === 'open') cells = []
-        else if (depth === 3 && name === 'c' && cells) {
-          cell = { t: attributes['t'], r: attributes['r'], vs: 0, iss: 0 }
-        } else if (depth === 4 && cell) countCellChild(cell, name)
+        if (depth === 4) {
+          if (cell) countCellChild(cell, name)
+          return
+        }
+        if (name !== sheetPath[depth - 1]) return
+        if (depth === 1) {
+          if (sheetData === 'before') sheetData = 'open'
+        } else if (depth === 2) {
+          if (sheetData === 'open') cells = []
+        } else if (cells) cell = { t: attributes['t'], r: attributes['r'], vs: 0, iss: 0 }
       },
       text(t, path) {
         if (!cell || path.length < 5) return
@@ -181,11 +191,13 @@ function sheetRows(
       },
       close(name, path) {
         const depth = path.length
-        if (depth === 1 && name === 'sheetData' && sheetData === 'open') sheetData = 'after'
-        else if (depth === 2 && name === 'row' && cells) {
-          if (cells.length > 0) rows.push(cells)
+        if (name !== sheetPath[depth - 1]) return
+        if (depth === 1) {
+          if (sheetData === 'open') sheetData = 'after'
+        } else if (depth === 2) {
+          if (cells && cells.length > 0) rows.push(cells)
           cells = undefined
-        } else if (depth === 3 && name === 'c' && cells && cell) {
+        } else if (cells && cell) {
           closeCell(cell, cells, strings, remaining)
           cell = undefined
         }
@@ -209,20 +221,18 @@ function exhausted(xmlRemaining: XmlBudget): string | undefined {
 }
 
 /**
- * A part reader over the entries of the archive; `budget.left` is the declared size the workbook
+ * A part reader over the `entries` of the archive; `budget.left` is the declared size the workbook
  * may still read and `xmlRemaining` the XML budget, both shared by all parts.
  */
 function partReader(
-  bytes: Uint8Array,
-  entries: Map<string, ZipEntry>,
-  inflate: Inflate,
+  archive: Archive & { entries: Map<string, ZipEntry> },
   budget: { left: number },
   xmlRemaining: XmlBudget,
 ): ReadPart {
   return async (name, read, limit) => {
-    const entry = entries.get(name.toLowerCase())
+    const entry = archive.entries.get(name.toLowerCase())
     if (!entry) throw new Error(`XLSX part ${name} is missing`)
-    const data = await readEntry(bytes, entry, inflate, budget, limit)
+    const data = await readEntry(archive, entry, budget, limit)
     try {
       // the Encoding Standard's UTF-8 reading drops a byte order mark and marks bad bytes U+FFFD
       const text = await new Response(data).text()
@@ -231,8 +241,8 @@ function partReader(
     } catch (e) {
       // the budget is shared by all parts, so name it, not only the part that used it up
       const over = exhausted(xmlRemaining)
-      const message = over ? `the XML parts hold more than ${over}` : (e as Error).message
-      throw new Error(`XLSX part ${entry.name}: ${message}`)
+      const message = over ? `the XML parts hold more than ${over}` : errorMessage(e)
+      throw new Error(`XLSX part ${entry.name}: ${message}`, { cause: e })
     }
   }
 }
@@ -269,15 +279,20 @@ async function readRelationships(
     }))
 }
 
+/** The workbook part: its name, the attributes of its `sheet` elements and its relationships. */
+interface WorkbookPart {
+  office: string
+  sheetList: Record<string, string>[]
+  rels: Relationship[]
+}
+
 /**
  * The worksheets the `sheet` elements of the workbook part `office` list, in that order, each
  * part read at most once; chart and dialog sheets are left out.
  */
 async function readWorksheets(
   part: ReadPart,
-  office: string,
-  sheetList: Record<string, string>[],
-  rels: Relationship[],
+  { office, sheetList, rels }: WorkbookPart,
   strings: string[],
   xmlRemaining: XmlBudget,
 ): Promise<Worksheet[]> {
@@ -317,7 +332,7 @@ export async function readWorkbook(
   const entries = zipEntries(bytes)
   const budget = { left: maxTotalSize }
   const xmlRemaining = { elements: maxElements, characters: maxXmlCharacters }
-  const part = partReader(bytes, entries, inflate, budget, xmlRemaining)
+  const part = partReader({ bytes, entries, inflate }, budget, xmlRemaining)
   const tree = (name: string) => part(name, (text) => parseXml(text, xmlRemaining), maxTreePartSize)
   const office = (await readRelationships(tree, '')).find((r) => r.type.endsWith('/officeDocument'))
   if (!office) throw new Error('XLSX part _rels/.rels names no workbook')
@@ -339,9 +354,7 @@ export async function readWorkbook(
     : []
   const worksheets = await readWorksheets(
     part,
-    office.target,
-    sheetList,
-    rels,
+    { office: office.target, sheetList, rels },
     strings,
     xmlRemaining,
   )

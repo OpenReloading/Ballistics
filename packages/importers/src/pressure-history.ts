@@ -103,27 +103,118 @@ function namedUnit(table: Record<string, number>, cell: string): string {
  */
 function lookup<T extends string>(table: Record<T, number>, text: string): T | undefined {
   const key = text.replace('µ', 'u').replace('μ', 'u')
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the keys of the table are its units
   const units = Object.keys(table) as T[]
   const exact = units.find((k) => k === key)
   const loose = key === key.toLowerCase() || key === key.toUpperCase()
   return exact ?? (loose ? units.find((k) => k.toLowerCase() === key.toLowerCase()) : undefined)
 }
 
-/** One pass of the one-pole low-pass over `v` at times `t`. */
-function pass(t: number[], v: number[], rc: number): number[] {
-  const out = [...v]
-  for (let i = 1; i < v.length; i++) {
-    const dt = (t[i] as number) - (t[i - 1] as number)
-    out[i] = (out[i - 1] as number) + (dt / (rc + dt)) * ((v[i] as number) - (out[i - 1] as number))
+/** A sample of the trace: its time and its value. */
+interface Sample {
+  time: number
+  value: number
+}
+
+/** One pass of the one-pole low-pass over the samples, in their order. */
+function pass(samples: Sample[], rc: number): Sample[] {
+  const out: Sample[] = []
+  for (const s of samples) {
+    const before = out.at(-1)
+    if (!before) {
+      out.push(s)
+      continue
+    }
+    const dt = s.time - before.time
+    out.push({ time: s.time, value: before.value + (dt / (rc + dt)) * (s.value - before.value) })
   }
   return out
 }
 
 /** Zero-phase one-pole low-pass: forwards, then backwards on the reversed series. */
-function zeroPhase(t: number[], v: number[], cutoff: number): number[] {
+function zeroPhase(samples: Sample[], cutoff: number): number[] {
   const rc = 1 / (2 * Math.PI * cutoff)
-  const reversed = t.map((x) => -x).reverse()
-  return pass(reversed, pass(t, v, rc).reverse(), rc).reverse()
+  const forward = pass(samples, rc).map((s) => ({ time: -s.time, value: s.value }))
+  return pass(forward.toReversed(), rc)
+    .toReversed()
+    .map((s) => s.value)
+}
+
+/** The time and pressure column numbers and the low-pass cutoff of the options, checked. */
+function checkedOptions(options: PressureHistoryOptions): {
+  tc: number
+  pc: number
+  cutoff: number | undefined
+} {
+  if (!sensors.includes(options.sensor))
+    throw new Error('the sensor position is missing: name breech, mean or base')
+  const { time: tc = 1, pressure: pc = 2 } = options.columns ?? {}
+  if (![tc, pc].every((c) => Number.isInteger(c) && c >= 1) || tc === pc)
+    throw new Error('columns: two different column numbers counted from 1')
+  return { tc, pc, cutoff: checkedCutoff(options.lowPass?.cutoff) }
+}
+
+/** The low-pass cutoff, refused unless it is a frequency above 0 Hz. */
+function checkedCutoff(cutoff: number | undefined): number | undefined {
+  if (cutoff !== undefined && !(Number.isFinite(cutoff) && cutoff > 0))
+    throw new Error('lowPass cutoff must be a frequency above 0 Hz')
+  return cutoff
+}
+
+/** Removes and returns the first row when its time cell is not a number: the header row. */
+function takeHeader(rows: string[][], tc: number): string[] | undefined {
+  const [top] = rows
+  return top && Number.isNaN(reading(top[tc - 1] ?? '')) ? rows.shift() : undefined
+}
+
+/**
+ * The unit of a column: the one its header cell names, else the caller's; refused when the two
+ * differ or neither names one, and a warning when the header names an unknown unit.
+ */
+function columnUnit<T extends string>(
+  column: { name: string; header: string },
+  table: Record<T, number>,
+  caller: T | undefined,
+  warnings: string[],
+): { unit: T; source: 'file' | 'caller' } {
+  const named = namedUnit(table, column.header)
+  const file = lookup(table, named)
+  if (file && caller && file !== caller)
+    throw new Error(
+      `${column.name} unit "${named}" in the file differs from ${caller} named by the caller`,
+    )
+  const unit = file ?? caller
+  if (!unit) throw new Error(`${column.name} unit is missing: name the unit to import this file`)
+  if (!file && named)
+    warnings.push(
+      `${column.name} unit "${named}" in the file is unknown; using ${unit} as named by the caller`,
+    )
+  return { unit, source: file ? 'file' : 'caller' }
+}
+
+/**
+ * The samples of the rows in s and bar, with the factors of the time and pressure units;
+ * refused for a cell that is not a finite number and for times that do not increase. `first` is
+ * the line number of the first row.
+ */
+function readSamples(
+  rows: string[][],
+  { tc, pc, first }: { tc: number; pc: number; first: number },
+  { tf, pf }: { tf: number; pf: number },
+): Sample[] {
+  const samples: Sample[] = []
+  rows.forEach((cells, i) => {
+    const [t, p] = [reading(cells[tc - 1] ?? ''), reading(cells[pc - 1] ?? '')]
+    if (Number.isNaN(t) || Number.isNaN(p))
+      throw new Error(`line ${i + first}: time or pressure is not a number`)
+    const [seconds, bar] = [t * tf, p * pf]
+    if (!Number.isFinite(seconds) || !Number.isFinite(bar))
+      throw new Error(`line ${i + first}: time or pressure is not finite`)
+    const before = samples.at(-1)
+    if (before && seconds <= before.time) throw new Error(`line ${i + first}: times must increase`)
+    samples.push({ time: seconds, value: bar })
+  })
+  return samples
 }
 
 /**
@@ -136,63 +227,34 @@ export function parsePressureHistory(
   text: string,
   options: PressureHistoryOptions,
 ): PressureHistoryImport {
-  if (!sensors.includes(options.sensor))
-    throw new Error('the sensor position is missing: name breech, mean or base')
-  const { time: tc = 1, pressure: pc = 2 } = options.columns ?? {}
-  if (![tc, pc].every((c) => Number.isInteger(c) && c >= 1) || tc === pc)
-    throw new Error('columns: two different column numbers counted from 1')
-  const cutoff = options.lowPass?.cutoff
-  if (cutoff !== undefined && !(Number.isFinite(cutoff) && cutoff > 0))
-    throw new Error('lowPass cutoff must be a frequency above 0 Hz')
+  const { tc, pc, cutoff } = checkedOptions(options)
   const lines = splitLines(text).filter((l) => l.trim())
   const delimiter = options.delimiter ?? detectDelimiter(lines)
   const rows = lines.map((l) => splitCells(l, delimiter))
-  const header = rows[0] && Number.isNaN(reading(rows[0][tc - 1] ?? '')) ? rows.shift() : undefined
+  const header = takeHeader(rows, tc)
+  const headerCell = (c: number) => header?.[c - 1] ?? ''
   const warnings: string[] = []
-  const resolve = <T extends string>(
-    column: string,
-    table: Record<T, number>,
-    caller: T | undefined,
-    cell: number,
-  ) => {
-    const named = namedUnit(table, header?.[cell - 1] ?? '')
-    const file = lookup(table, named)
-    if (file && caller && file !== caller)
-      throw new Error(
-        `${column} unit "${named}" in the file differs from ${caller} named by the caller`,
-      )
-    const unit = file ?? caller
-    if (!unit) throw new Error(`${column} unit is missing: name the unit to import this file`)
-    if (!file && named)
-      warnings.push(
-        `${column} unit "${named}" in the file is unknown; using ${unit} as named by the caller`,
-      )
-    return { unit, source: file ? ('file' as const) : ('caller' as const) }
-  }
-  const timeUnit = resolve<TimeUnit>('time', timeUnits, options.timeUnit, tc)
-  const pressureUnit = resolve<PressureUnit>('pressure', pressureUnits, options.pressureUnit, pc)
-  const tf = timeUnits[timeUnit.unit]
-  const pf = pressureUnits[pressureUnit.unit]
-  const first = header ? 2 : 1
-  const time: number[] = []
-  const pressure: number[] = []
-  rows.forEach((cells, i) => {
-    const [t, p] = [reading(cells[tc - 1] ?? ''), reading(cells[pc - 1] ?? '')]
-    if (Number.isNaN(t) || Number.isNaN(p))
-      throw new Error(`line ${i + first}: time or pressure is not a number`)
-    const [seconds, bar] = [t * tf, p * pf]
-    if (!Number.isFinite(seconds) || !Number.isFinite(bar))
-      throw new Error(`line ${i + first}: time or pressure is not finite`)
-    if (time.length > 0 && seconds <= (time.at(-1) as number))
-      throw new Error(`line ${i + first}: times must increase`)
-    time.push(seconds)
-    pressure.push(bar)
-  })
-  if (time.length < 3) throw new Error('a trace needs at least 3 samples')
+  const timeUnit = columnUnit(
+    { name: 'time', header: headerCell(tc) },
+    timeUnits,
+    options.timeUnit,
+    warnings,
+  )
+  const pressureUnit = columnUnit(
+    { name: 'pressure', header: headerCell(pc) },
+    pressureUnits,
+    options.pressureUnit,
+    warnings,
+  )
+  const factors = { tf: timeUnits[timeUnit.unit], pf: pressureUnits[pressureUnit.unit] }
+  const samples = readSamples(rows, { tc, pc, first: header ? 2 : 1 }, factors)
+  if (samples.length < 3) throw new Error('a trace needs at least 3 samples')
+  const time = samples.map((s) => s.time)
+  const pressure = samples.map((s) => s.value)
   return {
     sensor: options.sensor,
     time,
-    pressureBar: cutoff === undefined ? pressure : zeroPhase(time, pressure, cutoff),
+    pressureBar: cutoff === undefined ? pressure : zeroPhase(samples, cutoff),
     units: { time: timeUnit, pressure: pressureUnit },
     ...(cutoff === undefined ? {} : { lowPass: { cutoff } }),
     warnings,
