@@ -20,13 +20,12 @@ const record = {
 }
 
 /** The errors of a copy of the valid fixtures that holds `cases` (file name without `.json` to record). */
-function errorsWith(cases: Record<string, object>, renames?: object) {
+function errorsWith(cases: Record<string, object>) {
   const root = mkdtempSync(join(tmpdir(), 'cases-'))
   cpSync(fixtures, root, { recursive: true })
   try {
     for (const [id, json] of Object.entries(cases))
       writeFileSync(join(root, 'cases', `${id}.json`), JSON.stringify(json))
-    if (renames) writeFileSync(join(root, 'renames.json'), JSON.stringify(renames))
     return readRecords(root)
   } finally {
     rmSync(root, { recursive: true })
@@ -83,22 +82,12 @@ describe('case records', () => {
     )
   })
 
-  it('resolves a renamed case id through renames.json', () => {
-    const { errors } = errorsWith({ 'test-case': record }, { cases: { 'old-case': 'test-case' } })
-    expect(errors).toEqual([])
-    const stale = errorsWith({ 'test-case': record }, { cases: { 'old-case': 'missing-case' } })
-    expect(stale.errors).toContain(
-      'renames.json: cases.old-case: replacement "missing-case" is no record',
-    )
-  })
-
   /** The errors about the case of a catalogue load over the valid fixtures plus the test case. */
-  function caseErrors(load: { cartridge: string; record: string }, renames?: object) {
+  function caseErrors(load: { cartridge: string; record: string }) {
     const root = mkdtempSync(join(tmpdir(), 'cases-'))
     cpSync(fixtures, root, { recursive: true })
     try {
       writeFileSync(join(root, 'cases', 'test-case.json'), JSON.stringify(record))
-      if (renames) writeFileSync(join(root, 'renames.json'), JSON.stringify(renames))
       writeFileSync(
         join(root, 'loads', 'test-load.json'),
         JSON.stringify({
@@ -135,15 +124,6 @@ describe('case records', () => {
     expect(
       caseErrors({ cartridge: 'catalogue:other-cartridge', record: 'catalogue:test-case' }),
     ).toEqual(['loads/test-load.json: case "catalogue:test-case" is a case of another cartridge'])
-  })
-
-  it('resolves a renamed case id and a renamed cartridge id of a load', () => {
-    expect(
-      caseErrors(
-        { cartridge: 'catalogue:old-cartridge', record: 'catalogue:old-case' },
-        { cases: { 'old-case': 'test-case' }, cartridges: { 'old-cartridge': 'test-cartridge' } },
-      ),
-    ).toEqual([])
   })
 
   it('accepts the demo case of the committed records', () => {

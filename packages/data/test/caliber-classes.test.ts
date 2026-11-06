@@ -17,18 +17,13 @@ const cls = (id: string, diameter: number, cartridges: string[]): CaliberClass =
   cartridges,
   provenance,
 })
-const check = (
-  caliberClasses: CaliberClass[],
-  disciplineClasses: string[] = [],
-  renames?: Parameters<typeof checkCaliberClasses>[0]['renames'],
-) =>
+const check = (caliberClasses: CaliberClass[], disciplineClasses: string[] = []) =>
   checkCaliberClasses({
     caliberClasses,
     cartridges: [cartridge('a', 5.6), cartridge('b', 5.65), cartridge('c', 6.2), cartridge('d')],
     disciplines: [
       { id: 'disc', caliberClasses: { ids: disciplineClasses, basis: 'stated' } },
     ] as never,
-    renames,
   })
 
 describe('checkCaliberClasses', () => {
@@ -45,9 +40,7 @@ describe('checkCaliberClasses', () => {
     ])
   })
 
-  it('resolves a renamed cartridge and class, and names a class no record answers', () => {
-    const renames = { cartridges: { old: 'a' }, 'caliber-classes': { 'old-class': 'x' } }
-    expect(check([cls('x', 5.6, ['old'])], ['old-class'], renames)).toEqual([])
+  it('names a class of a discipline that no record answers', () => {
     expect(check([cls('x', 5.6, [])], ['nope'])).toEqual([
       'disciplines/disc.json: unknown caliber class "nope"',
     ])

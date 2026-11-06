@@ -195,17 +195,6 @@ describe('published load files', () => {
     expect(errorsOf(unknownPowder)).toContain(`${where}: unknown powder "catalogue:missing-powder"`)
   })
 
-  it('takes an old primer id that renames.json replaces as a known primer', () => {
-    const { errors } = readAfter((write) => {
-      write(
-        'loads/test-cartridge/test-manufacturer.json',
-        file([load('a', { primer: { printed: 'x', records: ['catalogue:old-primer'] } })]),
-      )
-      write('renames.json', { primers: { 'old-primer': 'test-primer' } })
-    })
-    expect(errors).toEqual([])
-  })
-
   it('reports a printed size or magnum that differs from the primer record', () => {
     const where = 'loads/test-cartridge/test-manufacturer.json: loads a'
     const { errors } = readAfter((write) => {
@@ -520,23 +509,6 @@ describe('plausibility warnings of published loads', () => {
     expect(
       readWith({ charges: caseContact }, { ...withL6, pressureMethod: 'case-contact' }).warnings,
     ).toEqual([])
-  })
-
-  it('reads the cartridge record of a load folder under an old cartridge id', () => {
-    const { errors, warnings } = readAfter((write) => {
-      write('cartridges/test-cartridge.json', withL6)
-      write('renames.json', { cartridges: { 'old-cartridge': 'test-cartridge' } })
-      write(
-        'loads/old-cartridge/test-manufacturer.json',
-        file([load('a', { coal: { value: 61, raw: '61 mm' } })], {
-          cartridge: 'catalogue:old-cartridge',
-        }),
-      )
-    })
-    expect(errors).toEqual([])
-    expect(warnings).toEqual([
-      'loads/old-cartridge/test-manufacturer.json: loads a: coal-above-cartridge-max: COAL 61 mm is above L6 60 mm of test-cartridge',
-    ])
   })
 
   it('warns of a COAL above L6', () => {

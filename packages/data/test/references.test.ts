@@ -25,7 +25,6 @@ const bundle = (parts: object = {}) =>
     chronoSessions: [],
     powdersOf: [],
     loads: [],
-    renames: {},
     ...parts,
   }) as unknown as Bundle
 
@@ -36,39 +35,26 @@ const errorsOf = (check: (errors: string[]) => void) => {
 }
 
 describe('recordIds', () => {
-  it('holds the record ids and the old ids renames.json replaces, by kind', () => {
-    const b = bundle({
-      loads: [{ id: 'l1' }],
-      renames: {
-        cartridges: { 'old-c': 'c1' },
-        cases: { 'old-case': 'case-1' },
-        manufacturers: { 'old-m': 'm1' },
-      },
-    })
+  it('holds the record ids by kind', () => {
+    const b = bundle({ loads: [{ id: 'l1' }] })
     expect(recordIds(b)).toEqual({
-      cartridges: new Set(['c1', 'c2', 'old-c']),
-      cases: new Set(['case-1', 'old-case']),
+      cartridges: new Set(['c1', 'c2']),
+      cases: new Set(['case-1']),
       loads: new Set(['l1']),
-      manufacturers: new Set(['m1', 'old-m']),
+      manufacturers: new Set(['m1']),
     })
-  })
-
-  it('reads a bundle without renames', () => {
-    const b = bundle({ renames: undefined })
-    expect(recordIds(b).cartridges).toEqual(new Set(['c1', 'c2']))
   })
 })
 
 describe('checkCartridgeReferences', () => {
   it('names the unknown cartridge of a firing series, case, capacity and load as written', () => {
     const b = bundle({
-      renames: { cartridges: { 'old-c1': 'c1' } },
       firings: [
         { id: 'f1', cartridge: 'c1' },
         { id: 'f2', cartridge: 'c9' },
       ],
       cases: [
-        { id: 'case-1', cartridge: 'catalogue:old-c1' },
+        { id: 'case-1', cartridge: 'catalogue:c1' },
         { id: 'case-2', cartridge: 'catalogue:c9' },
       ],
       capacities: [
@@ -88,17 +74,15 @@ describe('checkCartridgeReferences', () => {
     ])
   })
 
-  it('names a listed cartridge of a powder that is unknown or an old id', () => {
+  it('names a listed cartridge of a powder that is unknown', () => {
     const b = bundle({
-      renames: { cartridges: { 'old-c1': 'c1' } },
       firings: [],
       cases: [],
       capacities: [],
       loads: [],
-      powders: [{ id: 'p1', listedCartridges: ['c1', 'old-c1', 'c9'] }, { id: 'p2' }],
+      powders: [{ id: 'p1', listedCartridges: ['c1', 'c9'] }, { id: 'p2' }],
     })
     expect(errorsOf((e) => checkCartridgeReferences(b, recordIds(b), e))).toEqual([
-      'powders/p1.json: unknown listed cartridge "old-c1"',
       'powders/p1.json: unknown listed cartridge "c9"',
     ])
   })
@@ -131,12 +115,11 @@ describe('load references', () => {
     ])
   })
 
-  it('accepts a primer by its current or its old id and names an unknown one', () => {
+  it('accepts a primer by its reference or plain id and names an unknown one', () => {
     const b = bundle({
-      renames: { primers: { 'old-pr': 'pr1' } },
       loads: [
         { id: 'l1', primer: { record: 'catalogue:pr1' } },
-        { id: 'l2', primer: { record: 'old-pr' } },
+        { id: 'l2', primer: { record: 'pr1' } },
         { id: 'l3', primer: { record: 'catalogue:pr9' } },
         { id: 'l4', primer: {} },
       ],
@@ -144,14 +127,6 @@ describe('load references', () => {
     expect(errorsOf((e) => checkLoadPrimerReferences(b, e))).toEqual([
       'loads/l3.json: unknown primer "catalogue:pr9"',
     ])
-  })
-
-  it('reads primers without renames and a load without a primer', () => {
-    const b = bundle({
-      renames: undefined,
-      loads: [{ id: 'l1', primer: { record: 'pr1' } }, { id: 'l2' }],
-    })
-    expect(errorsOf((e) => checkLoadPrimerReferences(b, e))).toEqual([])
   })
 
   it('names a capacity that is no record', () => {
@@ -168,11 +143,10 @@ describe('load references', () => {
     ])
   })
 
-  it('names a case that is unknown or of another cartridge, through renames of either', () => {
+  it('names a case that is unknown or of another cartridge', () => {
     const b = bundle({
-      renames: { cases: { 'old-case': 'case-1' }, cartridges: { 'old-c1': 'c1' } },
       loads: [
-        { id: 'l1', cartridge: 'catalogue:old-c1', case: { record: 'catalogue:old-case' } },
+        { id: 'l1', cartridge: 'catalogue:c1', case: { record: 'catalogue:case-1' } },
         { id: 'l2', cartridge: 'catalogue:c2', case: { record: 'case-1' } },
         { id: 'l3', cartridge: 'catalogue:c1', case: { record: 'case-9' } },
         { id: 'l4', cartridge: 'catalogue:c1' },
@@ -184,11 +158,10 @@ describe('load references', () => {
     ])
   })
 
-  it('compares the cartridge of the case with that of the load through renames and plain ids', () => {
+  it('compares the cartridge of the case with that of the load, by reference or plain id', () => {
     const b = bundle({
-      renames: { cartridges: { 'old-c1': 'c1' } },
       cases: [
-        { id: 'case-1', cartridge: 'old-c1' },
+        { id: 'case-1', cartridge: 'c1' },
         { id: 'case-2', cartridge: 'catalogue:c2' },
       ],
       loads: [
@@ -200,14 +173,6 @@ describe('load references', () => {
     expect(errorsOf((e) => checkLoadCaseReferences(b, recordIds(b), e))).toEqual([
       'loads/l3.json: case "case-2" is a case of another cartridge',
     ])
-  })
-
-  it('reads cases without renames', () => {
-    const b = bundle({
-      renames: undefined,
-      loads: [{ id: 'l1', cartridge: 'catalogue:c1', case: { record: 'case-1' } }],
-    })
-    expect(errorsOf((e) => checkLoadCaseReferences(b, recordIds(b), e))).toEqual([])
   })
 
   it('names a session that is no record and reads a load without sessions', () => {

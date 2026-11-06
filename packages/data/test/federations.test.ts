@@ -95,16 +95,6 @@ describe('checkFederations', () => {
     )
   })
 
-  it('resolves a renamed federation of a face', () => {
-    expect(
-      checkFederations({
-        ...valid,
-        renames: { federations: { old: 'world' } },
-        targetFaces: [{ ...face, federation: 'old' }],
-      }),
-    ).toEqual([])
-  })
-
   it('accepts consistent references', () => {
     expect(checkFederations(valid)).toEqual([])
   })
