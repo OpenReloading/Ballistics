@@ -29,7 +29,7 @@ describe('targetFace', () => {
   })
 
   it('refuses rings out of order, skipped values and an inner ten larger than the inner ring', () => {
-    const rings = [...face.rings].reverse()
+    const rings = face.rings.toReversed()
     expectIssueAt(targetFace, { ...face, rings }, 'rings.1.value')
     const skipped = [face.rings[0], { value: 11, diameter: mm(10) }]
     expectIssueAt(targetFace, { ...face, rings: skipped }, 'rings.1.value')
@@ -100,21 +100,21 @@ describe('targetFace outward gauging', () => {
   })
 })
 
-describe('targetFace extended geometry', () => {
-  const rings = [
-    { value: 8, diameter: mm(30), fill: 'white', line: 'black' },
-    { value: 9, diameter: mm(20), fill: 'black', line: 'white' },
-    { value: 10, diameter: mm(10), fill: 'black', line: 'white' },
-  ]
-  const faceWith = (extra: object) => ({
-    ...face,
-    rings,
-    blackDiameter: mm(20),
-    decimal: false,
-    ...extra,
-  })
-  const ok = (extra: object) => targetFace.safeParse(faceWith(extra))
+const colourRings = [
+  { value: 8, diameter: mm(30), fill: 'white', line: 'black' },
+  { value: 9, diameter: mm(20), fill: 'black', line: 'white' },
+  { value: 10, diameter: mm(10), fill: 'black', line: 'white' },
+]
+const faceWith = (extra: object) => ({
+  ...face,
+  rings: colourRings,
+  blackDiameter: mm(20),
+  decimal: false,
+  ...extra,
+})
+const ok = (extra: object) => targetFace.safeParse(faceWith(extra))
 
+describe('targetFace extended geometry', () => {
   it('accepts colours, a sheet, bulls and the numerals flag', () => {
     const r = ok({
       paper: { format: 'A4', width: mm(210), height: mm(297) },
@@ -130,9 +130,9 @@ describe('targetFace extended geometry', () => {
   it('refuses a black diameter that is not the outermost black ring', () => {
     expectIssueAt(targetFace, faceWith({ blackDiameter: mm(30) }), 'blackDiameter')
     const split = [
-      { ...rings[0], fill: 'black' },
-      { ...rings[1], fill: 'white' },
-      { ...rings[2], fill: 'black' },
+      { ...colourRings[0], fill: 'black' },
+      { ...colourRings[1], fill: 'white' },
+      { ...colourRings[2], fill: 'black' },
     ]
     expectIssueAt(targetFace, faceWith({ rings: split, blackDiameter: mm(30) }), 'rings')
   })
@@ -147,11 +147,17 @@ describe('targetFace extended geometry', () => {
     const paper = { width: mm(100), height: mm(100) }
     expectIssueAt(targetFace, faceWith({ paper, bulls: [{ x: mm(60), y: mm(0) }] }), 'bulls.0')
   })
+})
 
+describe('targetFace oval and stadium rings', () => {
   it('accepts oval rings on all rings only, each smaller than the one outside', () => {
-    const oval = [40, 26, 12].map((height, i) => ({ ...rings[i], height: mm(height) }))
+    const oval = [40, 26, 12].map((height, i) => ({ ...colourRings[i], height: mm(height) }))
     expect(ok({ rings: oval, blackHeight: mm(26) }).success).toBe(true)
-    expectIssueAt(targetFace, faceWith({ rings: [oval[0], rings[1], rings[2]] }), 'rings')
+    expectIssueAt(
+      targetFace,
+      faceWith({ rings: [oval[0], colourRings[1], colourRings[2]] }),
+      'rings',
+    )
     expectIssueAt(
       targetFace,
       faceWith({ rings: [oval[0], { ...oval[1], height: mm(45) }, oval[2]] }),
@@ -162,16 +168,20 @@ describe('targetFace extended geometry', () => {
 
   it('accepts stadium rings on all rings, each at least as high as wide, with a stadium inner ten', () => {
     const stadium = [40, 26, 12].map((height, i) => ({
-      ...rings[i],
+      ...colourRings[i],
       height: mm(height),
       shape: 'stadium',
     }))
     const innerTen = { diameter: mm(5), height: mm(8), rule: 'touch' }
     expect(ok({ rings: stadium, innerTen }).success).toBe(true)
-    expectIssueAt(targetFace, faceWith({ rings: [stadium[0], rings[1], rings[2]] }), 'rings')
+    expectIssueAt(
+      targetFace,
+      faceWith({ rings: [stadium[0], colourRings[1], colourRings[2]] }),
+      'rings',
+    )
     const flat = [{ ...stadium[0], height: mm(15) }, stadium[1], stadium[2]]
     expectIssueAt(targetFace, faceWith({ rings: flat }), 'rings.0.height')
-    const noHeight = [{ ...rings[0], shape: 'stadium' }, rings[1], rings[2]]
+    const noHeight = [{ ...colourRings[0], shape: 'stadium' }, colourRings[1], colourRings[2]]
     expectIssueAt(targetFace, faceWith({ rings: noHeight }), 'rings')
     expectIssueAt(
       targetFace,
@@ -185,23 +195,25 @@ describe('targetFace extended geometry', () => {
     )
     expectIssueAt(targetFace, faceWith({ rings: stadium, decimal: true }), 'decimal')
   })
+})
 
+describe('targetFace square rings, tenths and events', () => {
   it('accepts a square ring and refuses a square with a height', () => {
-    const square = [{ ...rings[0], shape: 'square' }, rings[1], rings[2]]
+    const square = [{ ...colourRings[0], shape: 'square' }, colourRings[1], colourRings[2]]
     expect(ok({ rings: square }).success).toBe(true)
-    const tall = [{ ...square[0], height: mm(40) }, rings[1], rings[2]]
+    const tall = [{ ...square[0], height: mm(40) }, colourRings[1], colourRings[2]]
     expectIssueAt(targetFace, faceWith({ rings: tall }), 'rings.0.height')
     expectIssueAt(
       targetFace,
-      faceWith({ rings: [{ ...rings[0], shape: 'round' }] }),
+      faceWith({ rings: [{ ...colourRings[0], shape: 'round' }] }),
       'rings.0.shape',
     )
   })
 
   it('refuses tenth-ring values on a square or oval face, and a cover rule on an oval inner ten', () => {
-    const square = [{ ...rings[0], shape: 'square' }, rings[1], rings[2]]
+    const square = [{ ...colourRings[0], shape: 'square' }, colourRings[1], colourRings[2]]
     expectIssueAt(targetFace, faceWith({ rings: square, decimal: true }), 'decimal')
-    const oval = [40, 26, 12].map((height, i) => ({ ...rings[i], height: mm(height) }))
+    const oval = [40, 26, 12].map((height, i) => ({ ...colourRings[i], height: mm(height) }))
     expectIssueAt(targetFace, faceWith({ rings: oval, decimal: true }), 'decimal')
     expect(ok({ rings: square, decimal: false }).success).toBe(true)
     const inner = { diameter: mm(5), height: mm(4), rule: 'cover' }

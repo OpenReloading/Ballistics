@@ -483,12 +483,27 @@ importers:
         specifier: 'catalog:'
         version: 4.6.7
     devDependencies:
+      '@arethetypeswrong/cli':
+        specifier: 'catalog:'
+        version: 0.18.5
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
       '@vitest/coverage-v8':
         specifier: 'catalog:'
         version: 5.0.5(vitest@5.0.5)
+      fast-check:
+        specifier: 'catalog:'
+        version: 4.10.2
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.90.0(oxlint-tsgolint@7.0.2005)
+      oxlint-tsgolint:
+        specifier: 'catalog:'
+        version: 7.0.2005
+      publint:
+        specifier: 'catalog:'
+        version: 0.3.25
       typescript:
         specifier: 'catalog:'
         version: 7.0.2

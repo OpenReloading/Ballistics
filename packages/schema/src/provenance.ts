@@ -22,6 +22,7 @@ export const isWebLink = (text: string) => /^https?:\/\//.test(text)
 // `new URL` instead of `URL.canParse`, which the oldest supported browsers lack.
 const parsesAsUrl = (text: string) => {
   try {
+    // oxlint-disable-next-line no-new -- constructing is the check: it throws on a text that is no URL
     new URL(text)
     return true
   } catch {

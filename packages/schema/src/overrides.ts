@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { bullet } from './bullet.ts'
 import { cartridge } from './cartridge.ts'
 import { type Powder, powder } from './powder.ts'
+import { isPlain, type Plain } from './shared.ts'
 import { specValue } from './standards.ts'
 
 /**
@@ -14,29 +15,29 @@ export type Overrides<T> = T extends readonly unknown[]
     ? { [K in keyof T]?: Overrides<T[K]> } | null
     : T | null
 
-type Plain = Record<string, unknown>
-
-const isPlain = (x: unknown): x is Plain => typeof x === 'object' && x !== null && !Array.isArray(x)
-
 /** The key a value of a cartridge's `values` has: side, symbol and variant. */
-export const valueKey = (v: { side?: string; symbol: string; variant?: string }) =>
+export const valueKey = (v: { side?: string; symbol: string; variant?: string }): string =>
   JSON.stringify([v.side ?? null, v.symbol, v.variant ?? null])
 
-/** A spec value with a `value` of `null` removes the value of its key. */
-const removes = (v: Plain) => v.value === null
+/** A spec value: its key and its value. */
+type Keyed = Parameters<typeof valueKey>[0] & { value?: unknown }
 
-function mergeValues(base: Plain[], over: Plain[]): Plain[] {
-  const given = new Map(over.map((v) => [valueKey(v as Parameters<typeof valueKey>[0]), v]))
+/** A spec value with a `value` of `null` removes the value of its key. */
+const removes = (v: { value?: unknown }) => v.value === null
+
+function mergeValues(base: Keyed[], over: Keyed[]): Keyed[] {
+  const given = new Map(over.map((v) => [valueKey(v), v]))
   const kept = base.flatMap((v) => {
-    const key = valueKey(v as Parameters<typeof valueKey>[0])
+    const key = valueKey(v)
     const o = given.get(key)
     given.delete(key)
-    return o === undefined ? [v] : removes(o) ? [] : [o]
+    if (o === undefined) return [v]
+    return removes(o) ? [] : [o]
   })
   return [...kept, ...[...given.values()].filter((v) => !removes(v))]
 }
 
-function merge(base: unknown, over: Plain): Plain {
+function merge(base: unknown, over: object): Plain {
   const out: Plain = isPlain(base) ? { ...base } : {}
   for (const [k, v] of Object.entries(over)) {
     if (v === null) delete out[k]
@@ -58,19 +59,21 @@ function merge(base: unknown, over: Plain): Plain {
  */
 export function applyOverrides<T extends object>(base: T, overrides: object | null | undefined): T {
   if (!overrides) return base
-  const over = overrides as Plain
-  const merged = merge(base, over)
-  const values = (base as Plain).values
-  if (Array.isArray(over.values) && Array.isArray(values))
-    merged.values = mergeValues(values as Plain[], over.values as Plain[])
-  else if (Array.isArray(over.values))
-    merged.values = (over.values as Plain[]).filter((v) => !removes(v))
+  const merged = merge(base, overrides)
+  const values: unknown = Reflect.get(base, 'values')
+  const over: unknown = Reflect.get(overrides, 'values')
+  if (Array.isArray(over))
+    merged['values'] = Array.isArray(values)
+      ? mergeValues(values, over)
+      : over.filter((v: Keyed) => !removes(v))
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- overrides are a partial of T, so the merge has its fields
   return merged as T
 }
 
 /** The description of a field, also when it was given before the field was made optional. */
 const descriptionOf = (v: z.ZodType) =>
-  v.description ?? (v instanceof z.ZodOptional ? (v.unwrap() as z.ZodType).description : undefined)
+  v.description ??
+  (v instanceof z.ZodOptional ? z.globalRegistry.get(v.unwrap())?.description : undefined)
 
 const describeAt = (own: string | undefined, record: string, at: string[]) =>
   own ?? `The \`${at.join('.')}\` of the ${record} record. \`null\` removes it.`
@@ -104,27 +107,23 @@ function overridesOf(
   path: string[] = [],
   bare = false,
 ): z.ZodType {
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- every schema here is built with the classic API
   const inner = schema instanceof z.ZodOptional ? (schema.unwrap() as z.ZodType) : schema
   // a draft holds what was typed, so a number loses the bounds the finished record has
   if (bare && inner instanceof z.ZodNumber) return z.number()
   if (inner instanceof z.ZodArray && inner.element instanceof z.ZodObject)
-    return z.array(describedFields(inner.element as z.ZodObject, record, [...path, '[]']))
+    return z.array(describedFields(inner.element, record, [...path, '[]']))
   if (!(inner instanceof z.ZodObject)) return inner
   return z.object(
     Object.fromEntries(
       Object.entries(inner.shape as Record<string, z.ZodType>).map(([k, v]) => {
         const at = [...path, k]
-        const own =
-          v.description ??
-          (v instanceof z.ZodOptional ? (v.unwrap() as z.ZodType).description : undefined)
         return [
           k,
           overridesOf(v, record, at, bare)
             .nullable()
             .optional()
-            .describe(
-              own ?? `The \`${at.join('.')}\` of the ${record} record. \`null\` removes it.`,
-            ),
+            .describe(describeAt(descriptionOf(v), record, at)),
         ]
       }),
     ),
@@ -183,6 +182,7 @@ type PowderDraftFields = Overrides<
  * `powder`.
  * Inferred type: {@link PowderDraft}.
  */
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- overridesOf builds the schema at run time, so its type is stated here
 export const powderDraft = overridesOf(
   z.object({ ...powderShape, composition: z.array(compositionDraft).max(40) }),
   'powder',
@@ -195,6 +195,7 @@ export const powderDraft = overridesOf(
  * own `manufacturer`) and `provenance`, in the stored units, `null` removes a field.
  * Inferred type: {@link BulletOverrides}.
  */
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- overridesOf builds the schema at run time, so its type is stated here
 export const bulletOverrides = overridesOf(z.object(bulletShape), 'bullet') as z.ZodType<
   Overrides<Omit<z.infer<typeof bullet>, 'id' | 'manufacturer' | 'provenance'>>
 >
@@ -223,6 +224,7 @@ export const cartridgeValueOverride = z
  * units, `null` removes a field. `values` lists the values to replace, add or remove.
  * Inferred type: {@link CartridgeOverrides}.
  */
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- overridesOf builds the schema at run time, so its type is stated here
 export const cartridgeOverrides = overridesOf(
   z.object({ ...cartridgeShape, values: z.array(cartridgeValueOverride).max(500) }),
   'cartridge',

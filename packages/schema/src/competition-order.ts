@@ -65,7 +65,8 @@ const compareSegments = (a: number[], b: number[]) => {
 
 /** The place of a category in `disciplineCategory`; a discipline without one comes last. */
 const categoryRank = (category: string | undefined) => {
-  const rank = disciplineCategory.options.indexOf(category as never)
+  const order: readonly (string | undefined)[] = disciplineCategory.options
+  const rank = order.indexOf(category)
   return rank < 0 ? Number.MAX_SAFE_INTEGER : rank
 }
 
@@ -80,19 +81,22 @@ export function compareDisciplines(a: DisciplineKey, b: DisciplineKey): number {
   const byFederation = compareNames(a.federation, b.federation)
   if (byFederation) return byFederation
   if (!a.number !== !b.number) return a.number ? -1 : 1
-  if (a.number && b.number) {
-    const x = codeParts(a.number)
-    const y = codeParts(b.number)
-    const byCode =
-      compareNames(x.prefix, y.prefix) ||
-      compareSegments(x.segments, y.segments) ||
-      compareNames(x.rest, y.rest)
-    if (byCode) return byCode
-  } else {
-    const byCategory = categoryRank(a.category) - categoryRank(b.category)
-    if (byCategory) return byCategory
-  }
-  return a.distanceMm - b.distanceMm || compareNames(a.name, b.name)
+  const byCodeOrCategory =
+    a.number && b.number
+      ? compareCodes(a.number, b.number)
+      : categoryRank(a.category) - categoryRank(b.category)
+  return byCodeOrCategory || a.distanceMm - b.distanceMm || compareNames(a.name, b.name)
+}
+
+/** Two codes of one federation: text prefix, numeric segments, then the rest. */
+function compareCodes(a: string, b: string): number {
+  const x = codeParts(a)
+  const y = codeParts(b)
+  return (
+    compareNames(x.prefix, y.prefix) ||
+    compareSegments(x.segments, y.segments) ||
+    compareNames(x.rest, y.rest)
+  )
 }
 
 /** The code a BDS face name ends with (`(Z18)`). */
@@ -110,9 +114,16 @@ export function compareTargetFaces(
   const y = faceCode(b.name)
   return (
     compareNames(a.federation ?? '', b.federation ?? '') ||
-    (x === undefined ? (y === undefined ? 0 : 1) : y === undefined ? -1 : Number(x) - Number(y)) ||
+    compareFaceCodes(x, y) ||
     compareNames(a.name, b.name)
   )
+}
+
+/** Faces with a code before faces without, codes in numeric order. */
+function compareFaceCodes(x: string | undefined, y: string | undefined): number {
+  if (x === undefined) return y === undefined ? 0 : 1
+  if (y === undefined) return -1
+  return Number(x) - Number(y)
 }
 
 /** A target mapping with the key of its discipline. */

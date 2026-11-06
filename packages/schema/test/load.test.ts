@@ -4,7 +4,6 @@ import {
   checkUserRefs,
   type Load,
   load,
-  type QuantityKind,
   units,
   userDataFile,
   userDataFormat,
@@ -50,6 +49,10 @@ const wrap = (data: object, kind = 'load') => ({
   data,
 })
 
+const withLadder = (ladder: unknown) => ({ ...userLoad, analysis: { ladder } })
+
+const primer = (p: unknown) => ({ ...userLoad, primer: p })
+
 describe('Load', () => {
   it('is one schema for a catalogue record, a user record and the load file', () => {
     expect(load.safeParse(catalogueLoad).success).toBe(true)
@@ -73,7 +76,7 @@ describe('Load', () => {
   })
 
   it('keeps one stored unit per override key', () => {
-    const kinds = Object.values(analysisKinds) as QuantityKind[]
+    const kinds = Object.values(analysisKinds)
     for (const kind of kinds) expect(units[kind]).toBeTruthy()
     expect(Object.keys(analysisKinds)).not.toContain('charge')
   })
@@ -92,7 +95,9 @@ describe('Load', () => {
     }
     expect(load.parse(typed)).toEqual(typed)
   })
+})
 
+describe('Load overrides and catalogue fields', () => {
   it('keeps the typed base form and dimensions', () => {
     const typed = {
       ...userLoad,
@@ -124,7 +129,9 @@ describe('Load', () => {
     expect(load.safeParse({ ...userLoad, powder: `user:${uuid}` }).success).toBe(true)
     expect(load.safeParse({ ...userLoad, powder: 'example-a-fast' }).success).toBe(false)
   })
+})
 
+describe('Load references to records', () => {
   it('names records only: a user record is no catalogue record, a description is measured data', () => {
     expectIssueAt(load, { ...catalogueLoad, bullet: `user:${uuid}` }, 'bullet')
     expectIssueAt(load, { ...catalogueLoad, powder: `user:${uuid}` }, 'powder')
@@ -167,14 +174,15 @@ describe('Load', () => {
   })
 
   it('names the primer by a catalogue record and refuses the older maker and model text', () => {
-    const primer = (p: unknown) => ({ ...userLoad, primer: p })
     expect(issuePaths(load, primer({ record: 'catalogue:example-primer', lot: 'R-2' }))).toEqual([])
     expect(issuePaths(load, primer({ lot: 'R-2' }))).toEqual([])
     expectIssueAt(load, primer({ record: `user:${uuid}` }), 'primer.record')
     expectIssueAt(load, primer({ record: 'example-primer' }), 'primer.record')
     expectIssueAt(load, primer({ manufacturer: 'catalogue:maker', model: 'LR' }), 'primer')
   })
+})
 
+describe('Load lots, snapshots and ladder', () => {
   it('keeps lots and one snapshot per session of the load, and a firearm round count to note', () => {
     const session = `user:${other}`
     const snapshot = {
@@ -206,7 +214,6 @@ describe('Load', () => {
   })
 
   it('keeps the ladder: counts, steps and directions', () => {
-    const withLadder = (ladder: unknown) => ({ ...userLoad, analysis: { ladder } })
     for (const ladder of [
       { stepCount: 21, direction: 'around' },
       { kind: 'seating', stepCount: 3, step: 0.5, direction: 'up' },
@@ -223,7 +230,9 @@ describe('Load', () => {
     ])
       expectIssueAt(load, withLadder(ladder), 'analysis.ladder')
   })
+})
 
+describe('Load quantities, capacity, case and sessions', () => {
   it('rejects a charge, capacity or seating of 0 and an unknown seating mode', () => {
     for (const data of [
       { charge: { value: 0 } },
@@ -268,13 +277,13 @@ describe('Load', () => {
   })
 })
 
-describe('checkUserRefs of a load', () => {
-  const records = (data: Partial<Load>) =>
-    [
-      wrap({ ...userLoad, ...data }),
-      { ...wrap({ origin: 'user' }, 'firearm'), id: uuid },
-    ] as unknown as Parameters<typeof checkUserRefs>[0]
+const records = (data: Partial<Load>) =>
+  [
+    wrap({ ...userLoad, ...data }),
+    { ...wrap({ origin: 'user' }, 'firearm'), id: uuid },
+  ] as unknown as Parameters<typeof checkUserRefs>[0]
 
+describe('checkUserRefs of a load', () => {
   it('reports a user reference no record answers, and none for a catalogue reference or a firearm that exists', () => {
     const missing = checkUserRefs(records({ cartridge: `user:${other}` }))
     expect(missing.map((d) => d.field)).toEqual(['cartridge', 'bullet'])

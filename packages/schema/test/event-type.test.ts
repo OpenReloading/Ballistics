@@ -90,7 +90,9 @@ describe('eventType', () => {
       'scoring.powerFactors.0.major',
     )
   })
+})
 
+describe('eventType levels, magazines and rule books', () => {
   it('refuses a level listed twice and an empty level list', () => {
     expectIssueAt(eventType, { ...rings, levels: ['A', 'A'] }, 'levels')
     expectIssueAt(eventType, { ...rings, levels: [] }, 'levels')

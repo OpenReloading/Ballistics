@@ -109,31 +109,32 @@ describe('discipline', () => {
   })
 })
 
-describe('discipline rules', () => {
-  const rules = {
-    firearm: 'long-gun',
-    actions: ['single-shot', 'repeater'],
-    positions: ['prone'],
-    supports: ['freehand', 'sling'],
-    sights: ['open', 'aperture'],
-    maxMagnification: { value: 4 },
-    minTriggerWeight: { value: 1500, raw: '1500 g' },
-    maxBarrelLength: mm(762),
-    maxFirearmMass: { value: 4500 },
-    ammunition: {
-      handloads: true,
-      minMuzzleEnergy: { value: 200 },
-      minBulletMass: { value: 6 },
-      bulletTypes: ['jacketed'],
-    },
-    sighters: 'unlimited',
-    seriesShots: 10,
-    timeLimits: [
-      { duration: { value: 1800, raw: '30 min' }, covers: 'discipline', includesSighters: true },
-    ],
-  }
-  const withRules = (r: object) => ({ ...validDiscipline, rules: r })
+const withRules = (r: object) => ({ ...validDiscipline, rules: r })
 
+const rules = {
+  firearm: 'long-gun',
+  actions: ['single-shot', 'repeater'],
+  positions: ['prone'],
+  supports: ['freehand', 'sling'],
+  sights: ['open', 'aperture'],
+  maxMagnification: { value: 4 },
+  minTriggerWeight: { value: 1500, raw: '1500 g' },
+  maxBarrelLength: mm(762),
+  maxFirearmMass: { value: 4500 },
+  ammunition: {
+    handloads: true,
+    minMuzzleEnergy: { value: 200 },
+    minBulletMass: { value: 6 },
+    bulletTypes: ['jacketed'],
+  },
+  sighters: 'unlimited',
+  seriesShots: 10,
+  timeLimits: [
+    { duration: { value: 1800, raw: '30 min' }, covers: 'discipline', includesSighters: true },
+  ],
+}
+
+describe('discipline rules', () => {
   it('accepts every rule fact, a count of sighters and an empty set', () => {
     expect(discipline.safeParse(withRules(rules)).success).toBe(true)
     expect(discipline.safeParse(withRules({ ...rules, sighters: 0 })).success).toBe(true)

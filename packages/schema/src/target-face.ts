@@ -148,8 +148,20 @@ const targetFaceFields = z.object({
 
 type Issue = (path: PropertyKey[], message: string) => void
 
+type FaceFields = z.infer<typeof targetFaceFields>
+
 /** Ring values and diameters from outer to inner, the inner ten, and oval heights. */
-function checkRings(f: z.infer<typeof targetFaceFields>, issue: Issue) {
+function checkRings(f: FaceFields, issue: Issue) {
+  checkNesting(f, issue)
+  const oval = f.rings.filter((r) => r.height).length
+  checkOvalRings(f, oval, issue)
+  checkStadium(f, issue)
+  checkCircularRules(f, oval, issue)
+  checkHeightOrder(f, issue)
+}
+
+/** Each ring one value above and smaller than the ring outside it, the inner ten within the innermost. */
+function checkNesting(f: FaceFields, issue: Issue) {
   f.rings.forEach((r, i) => {
     const outer = f.rings[i - 1]
     if (!outer) return
@@ -161,18 +173,33 @@ function checkRings(f: z.infer<typeof targetFaceFields>, issue: Issue) {
   const inner = f.rings.at(-1)
   if (f.innerTen && inner && f.innerTen.diameter.value > inner.diameter.value)
     issue(['innerTen', 'diameter'], 'must not exceed the innermost ring')
-  const oval = f.rings.filter((r) => r.height).length
+}
+
+/** Oval rings: a height on all rings or on none, and never on a square. */
+function checkOvalRings(f: FaceFields, oval: number, issue: Issue) {
   f.rings.forEach((r, i) => {
     if (r.shape === 'square' && r.height) issue(['rings', i, 'height'], 'a square has no height')
   })
   if (oval > 0 && oval < f.rings.length) issue(['rings'], 'height on all rings or on none')
-  checkStadium(f, issue)
-  if (f.decimal && (oval > 0 || f.rings.some((r) => r.shape === 'square')))
+}
+
+/** Tenth values and a covering inner ten need circular rings; a height needs oval rings. */
+function checkCircularRules(f: FaceFields, oval: number, issue: Issue) {
+  if (f.decimal && !circularRings(f, oval))
     issue(['decimal'], 'tenth-ring values need circular rings')
   if (f.innerTen?.height && f.innerTen.rule === 'cover')
     issue(['innerTen', 'rule'], 'cover needs a circular inner ten')
   if (oval === 0 && (f.blackHeight || f.innerTen?.height))
     issue(['rings'], 'a height needs oval rings')
+}
+
+/** Whether every ring is a circle: no oval and no square. */
+function circularRings(f: FaceFields, oval: number): boolean {
+  return oval === 0 && !f.rings.some((r) => r.shape === 'square')
+}
+
+/** Oval heights from outer to inner, each below the one outside it. */
+function checkHeightOrder(f: FaceFields, issue: Issue) {
   f.rings.forEach((r, i) => {
     const outer = f.rings[i - 1]
     if (r.height && outer?.height && r.height.value >= outer.height.value)
@@ -181,7 +208,7 @@ function checkRings(f: z.infer<typeof targetFaceFields>, issue: Issue) {
 }
 
 /** Stadium rings on all rings, each with its height, the inner ten a stadium too. */
-function checkStadium(f: z.infer<typeof targetFaceFields>, issue: Issue) {
+function checkStadium(f: FaceFields, issue: Issue) {
   const stadiums = f.rings.filter((r) => r.shape === 'stadium').length
   if (stadiums === 0) return
   if (stadiums < f.rings.length) issue(['rings'], 'stadium on all rings or on none')
