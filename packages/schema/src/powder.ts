@@ -1,8 +1,9 @@
 import { z } from 'zod'
+import type { Exact } from './exact.ts'
 import { recordId } from './ids.ts'
 import { provenance } from './provenance.ts'
 import { countryCode, needsCountrySource } from './shared.ts'
-import { type QuantityKind, quantity, units } from './units.ts'
+import { type QuantityKind, type QuantitySchema, quantity, units } from './units.ts'
 
 /** A computed value with the extremes over the input ranges, in the unit of its quantity. */
 function computedRange(kind: QuantityKind) {
@@ -50,7 +51,6 @@ const powderThermochemistry = z.object({
   loadingDensity: quantity('density'),
   flameTemperature: computedRange('absoluteTemperature'),
   impetus: computedRange('specificEnergy'),
-  /** Frozen ratio of specific heats at the flame temperature. */
   gamma: computedRange('dimensionless'),
   molarMass: computedRange('molarMass'),
   covolume: computedRange('specificVolume'),
@@ -63,21 +63,16 @@ const powderThermochemistry = z.object({
  */
 const powderInterior = z.object({
   model: z.literal('m3'),
-  /** The parameters the fit moved; the others are fixed inputs. */
   fitted: z.array(z.enum(['vivacity', 'energy', 'form.a'])).min(1),
   vivacity: estimate('burnRate'),
-  /** Specific energy at constant volume. */
   energy: estimate('specificEnergy'),
   gamma: z.number().gt(1),
   covolume: quantity('specificVolume', z.number().nonnegative()),
-  /** Solid density of the grains. */
   density: quantity('density', z.number().positive()),
   pressureExponent: z.number().positive(),
   referencePressure: quantity('pressure', z.number().positive()),
   ignitionPressure: quantity('pressure', z.number().positive()),
-  /** Absent: each load had the default of `defaultStartPressure` in core. */
   startPressure: quantity('pressure', z.number().nonnegative()).optional(),
-  /** Propellant temperature of the fit. */
   propellantTemperature: quantity('temperature'),
   burnForm: z
     .object({
@@ -90,11 +85,6 @@ const powderInterior = z.object({
     .refine((f) => 1 + f.a.value * f.z1 > 0 && (f.z1 === 1 || f.q < 1), {
       message: 'needs 1 + a z1 > 0, and q < 1 when z1 < 1',
     }),
-  /**
-   * Bore-resistance constants of the fit (`apps/docs/docs/models/interior-m3.md`, "Bore resistance"): friction
-   * stress on the bullet side area, oversize coefficient per percent, engraving fraction of
-   * the start pressure. The record's energy and vivacity hold only with this law applied.
-   */
   resistance: z
     .object({
       stress: quantity('pressure', z.number().nonnegative()),
@@ -102,7 +92,6 @@ const powderInterior = z.object({
       engraving: z.number().nonnegative(),
     })
     .optional(),
-  /** Training rows and cartridges of the fit; absent without a load-table fit. */
   trainingRows: z.number().int().positive().optional(),
   trainingCartridges: z.number().int().positive().optional(),
 })
@@ -118,37 +107,20 @@ const powderTemperatureSensitivity = z.object({
   hot: quantity('inverseTemperature'),
 })
 
-/**
- * A propellant as its manufacturer sells it, with M3 interior parameters where fitted.
- * Inferred type: {@link Powder}.
- */
-export const powder = z
+const powderParser = z
   .object({
     id: recordId,
-    /** Id of the manufacturer record. */
     manufacturer: recordId,
     name: z.string().min(1),
-    /** Other names the same powder is sold under, each as brand and name, stated by a manufacturer. */
     aliases: z.array(z.string().min(1)).min(1).optional(),
     country: countryCode.optional(),
-    /** Grain form: spherical and flattened spherical grains are `ball`; tubes, cylinders and sticks `extruded`. */
     grainForm: z.enum(['ball', 'extruded', 'flake', 'other']).optional(),
     propellantBase: z.enum(['single', 'double', 'triple']).optional(),
-    /**
-     * Bulk density: mass per volume of uncompressed powder, voids between grains included. It depends
-     * on how the volume was filled (thrown by a powder measure, poured, tapped); the source note says
-     * how, when the source states it.
-     */
     bulkDensity: quantity('density').optional(),
     composition: powderComposition.optional(),
     thermochemistry: powderThermochemistry.optional(),
     interior: powderInterior.optional(),
-    /** Burn-rate sensitivity to the propellant temperature; absent: the burn rate does not depend on it. */
     temperatureSensitivity: powderTemperatureSensitivity.optional(),
-    /**
-     * Ids of the cartridge records the manufacturer lists the powder for, as its product page or data
-     * sheet does: what the manufacturer says, not a recommendation. Absent: not recorded, never none.
-     */
     listedCartridges: z.array(recordId).min(1).optional(),
     note: z.string().min(1).optional(),
     provenance,
@@ -185,6 +157,102 @@ export const powder = z
         })
     }
   })
+
+/**
+ * A propellant as its manufacturer sells it, with M3 interior parameters where fitted.
+ * Inferred type: {@link Powder}.
+ */
+export const powder: z.ZodObject<{
+  id: typeof recordId
+  /** Id of the manufacturer record. */
+  manufacturer: typeof recordId
+  name: z.ZodString
+  /** Other names the same powder is sold under, each as brand and name, stated by a manufacturer. */
+  aliases: z.ZodOptional<z.ZodArray<z.ZodString>>
+  country: z.ZodOptional<typeof countryCode>
+  /** Grain form: spherical and flattened spherical grains are `ball`; tubes, cylinders and sticks `extruded`. */
+  grainForm: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'ball' | 'extruded' | 'flake' | 'other'>>>
+  propellantBase: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'single' | 'double' | 'triple'>>>
+  /**
+   * Bulk density: mass per volume of uncompressed powder, voids between grains included. It depends
+   * on how the volume was filled (thrown by a powder measure, poured, tapped); the source note says
+   * how, when the source states it.
+   */
+  bulkDensity: z.ZodOptional<QuantitySchema>
+  composition: z.ZodOptional<
+    z.ZodArray<
+      z.ZodObject<{
+        name: z.ZodString
+        cas: z.ZodOptional<z.ZodString>
+        min: z.ZodNumber
+        max: z.ZodNumber
+        raw: z.ZodOptional<z.ZodString>
+      }>
+    >
+  >
+  thermochemistry: z.ZodOptional<
+    z.ZodObject<{
+      loadingDensity: QuantitySchema
+      flameTemperature: z.ZodObject<{ value: z.ZodNumber; min: z.ZodNumber; max: z.ZodNumber }>
+      impetus: z.ZodObject<{ value: z.ZodNumber; min: z.ZodNumber; max: z.ZodNumber }>
+      /** Frozen ratio of specific heats at the flame temperature. */
+      gamma: z.ZodObject<{ value: z.ZodNumber; min: z.ZodNumber; max: z.ZodNumber }>
+      molarMass: z.ZodObject<{ value: z.ZodNumber; min: z.ZodNumber; max: z.ZodNumber }>
+      covolume: z.ZodObject<{ value: z.ZodNumber; min: z.ZodNumber; max: z.ZodNumber }>
+    }>
+  >
+  interior: z.ZodOptional<
+    z.ZodObject<{
+      model: z.ZodLiteral<'m3'>
+      /** The parameters the fit moved; the others are fixed inputs. */
+      fitted: z.ZodArray<z.ZodEnum<z.core.util.ToEnum<'vivacity' | 'energy' | 'form.a'>>>
+      vivacity: z.ZodObject<{ value: z.ZodNumber; standardUncertainty: z.ZodOptional<z.ZodNumber> }>
+      /** Specific energy at constant volume. */
+      energy: z.ZodObject<{ value: z.ZodNumber; standardUncertainty: z.ZodOptional<z.ZodNumber> }>
+      gamma: z.ZodNumber
+      covolume: QuantitySchema
+      /** Solid density of the grains. */
+      density: QuantitySchema
+      pressureExponent: z.ZodNumber
+      referencePressure: QuantitySchema
+      ignitionPressure: QuantitySchema
+      /** Absent: each load had the default of `defaultStartPressure` in core. */
+      startPressure: z.ZodOptional<QuantitySchema>
+      /** Propellant temperature of the fit. */
+      propellantTemperature: QuantitySchema
+      burnForm: z.ZodObject<{
+        kind: z.ZodLiteral<'twoStage'>
+        a: z.ZodObject<{ value: z.ZodNumber; standardUncertainty: z.ZodOptional<z.ZodNumber> }>
+        m: z.ZodNumber
+        q: z.ZodNumber
+        z1: z.ZodNumber
+      }>
+      /**
+       * Bore-resistance constants of the fit (`apps/docs/docs/models/interior-m3.md`, "Bore resistance"): friction
+       * stress on the bullet side area, oversize coefficient per percent, engraving fraction of
+       * the start pressure. The record's energy and vivacity hold only with this law applied.
+       */
+      resistance: z.ZodOptional<
+        z.ZodObject<{ stress: QuantitySchema; oversize: z.ZodNumber; engraving: z.ZodNumber }>
+      >
+      /** Training rows and cartridges of the fit; absent without a load-table fit. */
+      trainingRows: z.ZodOptional<z.ZodNumber>
+      trainingCartridges: z.ZodOptional<z.ZodNumber>
+    }>
+  >
+  /** Burn-rate sensitivity to the propellant temperature; absent: the burn rate does not depend on it. */
+  temperatureSensitivity: z.ZodOptional<
+    z.ZodObject<{ reference: QuantitySchema; cold: QuantitySchema; hot: QuantitySchema }>
+  >
+  /**
+   * Ids of the cartridge records the manufacturer lists the powder for, as its product page or data
+   * sheet does: what the manufacturer says, not a recommendation. Absent: not recorded, never none.
+   */
+  listedCartridges: z.ZodOptional<z.ZodArray<typeof recordId>>
+  note: z.ZodOptional<z.ZodString>
+  /** Where the values of the record come from: a kind and at least one source. */
+  provenance: typeof provenance
+}> = powderParser satisfies Exact<typeof powder, typeof powderParser>
 
 /** A powder record: grain form, composition, thermochemistry and M3 interior parameters. */
 export interface Powder extends z.infer<typeof powder> {}

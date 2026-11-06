@@ -14,19 +14,19 @@ import type { TargetFace } from './target-face.ts'
 const collator = new Intl.Collator('en', { numeric: true })
 
 /** Names alphabetical, numbers in numeric order (25 before 100). */
-export const compareNames = (a: string, b: string) => collator.compare(a, b)
+export const compareNames = (a: string, b: string): number => collator.compare(a, b)
 
 /** Federations by abbreviation. */
 export const compareFederations = (
   a: Pick<Federation, 'abbreviation'>,
   b: Pick<Federation, 'abbreviation'>,
-) => compareNames(a.abbreviation, b.abbreviation)
+): number => compareNames(a.abbreviation, b.abbreviation)
 
 /** Face events by distance ascending (m), then name. */
 export const compareEvents = (
   a: { distance: number; name: string },
   b: { distance: number; name: string },
-) => a.distance - b.distance || compareNames(a.name, b.name)
+): number => a.distance - b.distance || compareNames(a.name, b.name)
 
 /** What the discipline order reads: the federation (id or abbreviation), the code and the name. */
 export type DisciplineKey = Pick<Discipline, 'federation' | 'name' | 'number' | 'category'> & {
@@ -130,7 +130,7 @@ function compareFaceCodes(x: string | undefined, y: string | undefined): number 
 export type MappingKey = Pick<TargetMapping, 'id' | 'face'> & { discipline: DisciplineKey }
 
 /** Target mappings by their discipline's order, then face id, then id. */
-export const compareMappings = (a: MappingKey, b: MappingKey) =>
+export const compareMappings = (a: MappingKey, b: MappingKey): number =>
   compareDisciplines(a.discipline, b.discipline) ||
   compareNames(a.face, b.face) ||
   compareNames(a.id, b.id)
