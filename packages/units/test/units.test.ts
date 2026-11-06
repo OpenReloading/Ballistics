@@ -29,7 +29,10 @@ it('has a finite, positive factor and a finite offset for every unit', () => {
 it.each<[UnitId, number]>([
   ['in', 0.0254],
   ['ft', 0.3048],
+  ['yd', 0.9144],
   ['gr', 6.479891e-5],
+  ['lb', 0.45359237],
+  ['ft-lbf', 1.355817948],
   ['mph', 0.44704],
   ['psi', 6894.757293168],
   ['lb/in2', 703.0695796],
@@ -37,6 +40,11 @@ it.each<[UnitId, number]>([
   ['inHg', 3386.389],
 ])('converts 1 %s to SI as the exact definition', (unit, si) => {
   expect(conversions[unit].factor).toBeCloseTo(si, 7)
+})
+
+it('takes the grain as the double nearest to 64.79891 mg, not pound / 7000', () => {
+  expect(conversions.gr.factor).toBe(6.479891e-5)
+  expect(conversions.gr.factor).not.toBe(conversions.lb.factor / 7000)
 })
 
 it('round-trips every quantity kind between stored unit and SI', () => {
