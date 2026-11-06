@@ -8,6 +8,7 @@
     "noPropertyAccessFromIndexSignature": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "isolatedDeclarations": true,
     "skipLibCheck": false,
     "outDir": "dist",
     "rootDir": "."
