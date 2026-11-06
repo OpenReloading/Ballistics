@@ -15,6 +15,7 @@ import {
   collectWorksheetStrings,
   type FoundWorksheet,
   type WorkbookOptions,
+  type WorksheetString,
 } from './worksheet-strings.ts'
 
 /** A ShotView header row: first cell `#`, the velocity unit in brackets in the second. */
@@ -108,8 +109,7 @@ export function parseShotView(text: string, options: ChronoParserOptions = {}): 
       strings: shots.length > 0 ? [{ shots }] : [],
       ...(flags.length > 0 ? { note: `ShotView bore flags: ${flags.join('; ')}` } : {}),
     },
-    [name || undefined],
-    warnings,
+    { labels: [name || undefined], warnings },
     options,
   )
 }
@@ -127,7 +127,11 @@ function dateFromFooter(footer: string[][], warnings: string[]): string | undefi
 /** Footer statistics against the shots, as warnings; `prefix` names the worksheet. */
 function checkFooter(footer: string[][], values: number[], warnings: string[], prefix = ''): void {
   const notFound = `${prefix}footer statistics`
-  warnStatistics(footer, values, footerLabels, parseNumber, warnings, `${prefix}footer `, notFound)
+  warnStatistics({ rows: footer, rowLabels: footerLabels, readNumber: parseNumber }, values, {
+    warnings,
+    prefix: `${prefix}footer `,
+    notFound,
+  })
 }
 
 const dateLabels = ['DATE', 'DATUM']
@@ -156,12 +160,12 @@ export function parseShotViewWorkbook(book: Workbook, options: WorkbookOptions =
     found.push({
       position: n,
       ...(date ? { date } : { dateWarning }),
-      read: (warnings) => {
+      read: (sheetWarnings): WorksheetString | undefined => {
         const unitText = bracketed(headerCells[1] ?? '')
-        const unit = resolveUnit(unitText, options, warnings)
+        const unit = resolveUnit(unitText, options, sheetWarnings)
         const r = readShotRows(after, unitText, unit, workbookFooterStarts)
-        if (r.shots.length === 0) return
-        checkFooter(r.footer, r.values, warnings, `worksheet ${n}: `)
+        if (r.shots.length === 0) return undefined
+        checkFooter(r.footer, r.values, sheetWarnings, `worksheet ${n}: `)
         const label = sheet.rows.slice(0, h).flat().find(Boolean) || sheet.name
         return { shots: r.shots, flags: r.flags, label }
       },
@@ -176,8 +180,7 @@ export function parseShotViewWorkbook(book: Workbook, options: WorkbookOptions =
       strings: s.strings,
       ...(s.flags.length > 0 ? { note: `ShotView bore flags: ${s.flags.join('; ')}` } : {}),
     },
-    s.labels,
-    warnings,
+    { labels: s.labels, warnings },
     options,
   )
 }

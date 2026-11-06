@@ -6,20 +6,31 @@
  * characters. A UTF-8 byte order mark stays as U+FEFF; the parsers remove it.
  */
 export function decodeText(bytes: Uint8Array): string {
-  const le = bytes[0] === 0xff && bytes[1] === 0xfe
-  const be = bytes[0] === 0xfe && bytes[1] === 0xff
-  if ((le || be) && bytes.length % 2 !== 0)
-    throw new Error('UTF-16 text with an odd number of bytes')
-  const encoding = le ? 'utf-16le' : be ? 'utf-16be' : 'utf-8'
-  const decoder = new TextDecoder(encoding, { fatal: true, ignoreBOM: true })
+  const utf16 = utf16Order(bytes)
+  if (utf16 && bytes.length % 2 !== 0) throw new Error('UTF-16 text with an odd number of bytes')
+  const decoder = new TextDecoder(utf16 ?? 'utf-8', { fatal: true, ignoreBOM: true })
   try {
-    return decoder.decode(le || be ? bytes.subarray(2) : bytes)
+    return decoder.decode(utf16 ? bytes.subarray(2) : bytes)
   } catch {
     throw new Error(
       'the file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again',
     )
   }
 }
+
+/** The UTF-16 byte order the byte order mark at the start gives, or undefined. */
+function utf16Order(bytes: Uint8Array): 'utf-16le' | 'utf-16be' | undefined {
+  if (bytes[0] === 0xff && bytes[1] === 0xfe) return 'utf-16le'
+  if (bytes[0] === 0xfe && bytes[1] === 0xff) return 'utf-16be'
+  return undefined
+}
+
+/** The message of a caught error, or its text when something else was thrown. */
+export const errorMessage = (e: unknown): string => (e instanceof Error ? e.message : String(e))
+
+/** True for a character skipped before a cell: a space, or a tab unless tabs delimit. */
+const skippedBefore = (c: string | undefined, delimiter: string) =>
+  c === ' ' || (c === '\t' && delimiter !== '\t')
 
 /** The text of a quoted cell from `from`, after its opening quote, and the position after its closing quote. */
 function readQuoted(line: string, from: number): { cell: string; next: number } {
@@ -41,7 +52,7 @@ export function splitDelimited(line: string, delimiter: ',' | ';' | '\t' = ','):
   const cells: string[] = []
   let i = 0
   while (i <= line.length) {
-    while (line[i] === ' ' || (line[i] === '\t' && delimiter !== '\t')) i++
+    while (skippedBefore(line[i], delimiter)) i++
     let cell = ''
     if (line[i] === '"') {
       const quoted = readQuoted(line, i + 1)

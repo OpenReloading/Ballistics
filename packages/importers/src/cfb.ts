@@ -31,11 +31,17 @@ interface CompoundFile {
   /** Sectors that start inside the file. */
   sectors: number
   /** `at`, after checking that `n` bytes from it lie inside the file. */
-  within(at: number, n: number): number
-  u16(at: number): number
-  u32(at: number): number
+  within: (at: number, n: number) => number
+  u16: (at: number) => number
+  u32: (at: number) => number
   /** Byte position of sector `n`; throws unless it starts inside the file. */
-  offset(n: number): number
+  offset: (n: number) => number
+}
+
+/** A sector chain's table: the next sector of each, and whether its sectors lie in the file. */
+interface Chain {
+  step: (n: number) => number
+  inFile: boolean
 }
 
 /** The header (2.2): byte order, version 3 or 4 with its sector size, standard mini stream layout. */
@@ -68,12 +74,21 @@ function readHeader(bytes: Uint8Array): CompoundFile {
 
 /** The FAT sectors: 109 in the header, then the DIFAT chain (2.5); each must lie in the file. */
 function buildFat(file: CompoundFile): number[] {
-  const { u32, offset, size, per } = file
+  const { u32, offset } = file
   const fatCount = u32(0x2c)
   const fat: number[] = []
   const listed = () => fail(`the FAT lists ${fat.length} of ${fatCount} sectors`)
   if (fatCount > file.sectors) listed()
   for (let k = 0; k < 109 && fat.length < fatCount; k++) fat.push(u32(0x4c + 4 * k))
+  readDifat(file, fat, fatCount)
+  if (fat.length < fatCount) listed()
+  for (const n of fat) offset(n)
+  return fat
+}
+
+/** Adds the FAT sectors the DIFAT chain lists (2.5) to `fat`, up to `fatCount`. */
+function readDifat(file: CompoundFile, fat: number[], fatCount: number): void {
+  const { u32, offset, size, per } = file
   const difatSeen = new Set<number>()
   for (let d = u32(0x44), k = 0; fat.length < fatCount && k < u32(0x48); k++) {
     if (d > lastRegular) break
@@ -83,9 +98,6 @@ function buildFat(file: CompoundFile): number[] {
     for (let j = 0; j < per - 1 && fat.length < fatCount; j++) fat.push(u32(at + 4 * j))
     d = u32(at + size - 4)
   }
-  if (fat.length < fatCount) listed()
-  for (const n of fat) offset(n)
-  return fat
 }
 
 /**
@@ -111,10 +123,9 @@ function tableNext(
  */
 function readChain(
   file: CompoundFile,
+  { step, inFile }: Chain,
   start: number,
-  count: number | undefined,
-  step: (n: number) => number,
-  inFile: boolean,
+  count?: number,
 ): number[] {
   const out: number[] = []
   const seen = new Set<number>()
@@ -135,11 +146,9 @@ function readChain(
  */
 function streamReader(
   file: CompoundFile,
-  next: (n: number) => number,
+  fatChain: Chain,
   root: number,
-  name: string,
-  start: number,
-  declared: number,
+  { name, start, declared }: { name: string; start: number; declared: number },
 ): (limit: number) => Uint8Array {
   const { bytes, size, u32, offset } = file
   return (limit) => {
@@ -150,7 +159,7 @@ function streamReader(
       out.set(bytes.subarray(from, from + length), to)
     }
     if (declared >= 4096) {
-      readChain(file, start, Math.ceil(declared / size), next, true).forEach((n, k) => {
+      readChain(file, fatChain, start, Math.ceil(declared / size)).forEach((n, k) => {
         copy(offset(n), Math.min(size, declared - k * size), k * size)
       })
       return out
@@ -160,11 +169,12 @@ function streamReader(
     const miniFatStart = u32(0x3c)
     const rootStart = u32(root + 0x74)
     if (miniFatStart > lastRegular || rootStart > lastRegular) fail('the mini stream is missing')
-    const miniFat = readChain(file, miniFatStart, undefined, next, true)
-    const rootChain = readChain(file, rootStart, undefined, next, true)
+    const miniFat = readChain(file, fatChain, miniFatStart)
+    const rootChain = readChain(file, fatChain, rootStart)
     const miniLength = Math.min(u32(root + 0x78), rootChain.length * size)
     const miniNext = tableNext(file, miniFat, 'mini sector', 'mini FAT')
-    readChain(file, start, Math.ceil(declared / 64), miniNext, false).forEach((m, k) => {
+    const miniChain = { step: miniNext, inFile: false }
+    readChain(file, miniChain, start, Math.ceil(declared / 64)).forEach((m, k) => {
       if ((m + 1) * 64 > miniLength) fail(`mini sector ${m} lies outside the mini stream`)
       const from = offset(inChain(rootChain, Math.floor((m * 64) / size))) + ((m * 64) % size)
       copy(from, Math.min(64, declared - k * 64), k * 64)
@@ -194,11 +204,11 @@ function entrySize(file: CompoundFile, at: number): number {
  */
 function readDirectory(
   file: CompoundFile,
-  next: (n: number) => number,
+  fatChain: Chain,
   wanted: readonly string[],
 ): Map<string, (limit: number) => Uint8Array> {
   const { bytes, size, within, u32, offset } = file
-  const directory = readChain(file, u32(0x30), undefined, next, true)
+  const directory = readChain(file, fatChain, u32(0x30))
   const perSector = size / 128
   const entries = directory.length * perSector
   const entry = (id: number) =>
@@ -209,8 +219,7 @@ function readDirectory(
   // the root's children form a binary tree of siblings (2.6.4); visited without recursion
   const stack = [u32(root + 0x4c)]
   const visited = new Set<number>()
-  while (stack.length > 0) {
-    const id = stack.pop() as number
+  for (let id = stack.pop(); id !== undefined; id = stack.pop()) {
     if (id === noStream) continue
     if (id >= entries || visited.has(id)) fail(`directory entry ${id} is out of range or repeated`)
     visited.add(id)
@@ -222,11 +231,8 @@ function readDirectory(
     if (bytes[at + 0x42] !== 2) continue
     const name = entryName(file, at)
     if (!wanted.includes(name.toUpperCase())) continue
-    const start = u32(at + 0x74)
-    streams.set(
-      name.toUpperCase(),
-      streamReader(file, next, root, name, start, entrySize(file, at)),
-    )
+    const stream = { name, start: u32(at + 0x74), declared: entrySize(file, at) }
+    streams.set(name.toUpperCase(), streamReader(file, fatChain, root, stream))
   }
   return streams
 }
@@ -241,5 +247,5 @@ export function compoundStreams(
 ): Map<string, (limit: number) => Uint8Array> {
   const file = readHeader(bytes)
   const fat = buildFat(file)
-  return readDirectory(file, tableNext(file, fat, 'sector', 'FAT'), wanted)
+  return readDirectory(file, { step: tableNext(file, fat, 'sector', 'FAT'), inFile: true }, wanted)
 }

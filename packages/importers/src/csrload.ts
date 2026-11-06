@@ -63,16 +63,22 @@ function shotsOf(c: XmlElement, at: string, unmapped: Set<string>, warnings: str
  * One charge of a series as a shot string: velocities in m/s, the charge from kg to g. Undefined,
  * with a warning, when no shot has a velocity.
  */
-function stringOf(c: XmlElement, at: string, unmapped: Set<string>, warnings: string[]) {
+function stringOf(
+  c: XmlElement,
+  at: string,
+  unmapped: Set<string>,
+  warnings: string[],
+): ShotString | undefined {
   unreadAttributes(c, at, unmapped)
   const shots = shotsOf(c, at, unmapped, warnings)
   const label = clip(unescaped(c.attributes['name'] ?? '', `${at}.name`, warnings))
+  const labelText = label ?? ''
   if (shots.length === 0) {
-    warnings.push(`${at}: the charge ${label ?? ''} holds no shot with a velocity; it is not read.`)
-    return
+    warnings.push(`${at}: the charge ${labelText} holds no shot with a velocity; it is not read.`)
+    return undefined
   }
   const note = clip(unescaped(c.attributes['note'] ?? '', `${at}.note`, warnings), 2000)
-  const kg = numberOf((c.attributes['value'] ?? '').trim())
+  const grams = chargeGrams(c)
   const string: ShotString = {
     ...(label && { label }),
     ...(note && { note }),
@@ -80,12 +86,18 @@ function stringOf(c: XmlElement, at: string, unmapped: Set<string>, warnings: st
   }
   if (shots.length > maxShots)
     warnings.push(
-      `${at}: ${shots.length - maxShots} shots of the charge ${label ?? ''} beyond the limit of ${maxShots} are left out.`,
+      `${at}: ${shots.length - maxShots} shots of the charge ${labelText} beyond the limit of ${maxShots} are left out.`,
     )
-  if (Number.isFinite(kg) && kg > 0)
-    string.variation = { kind: 'charge', value: { value: Number((kg * 1000).toPrecision(12)) } }
-  else warnings.push(`${at}: the charge ${label ?? ''} has no mass; its string varies nothing.`)
+  if (grams === undefined)
+    warnings.push(`${at}: the charge ${labelText} has no mass; its string varies nothing.`)
+  else string.variation = { kind: 'charge', value: { value: grams } }
   return string
+}
+
+/** The mass of a charge in g from its `value` in kg, or undefined when that is not above 0. */
+function chargeGrams(c: XmlElement): number | undefined {
+  const kg = numberOf((c.attributes['value'] ?? '').trim())
+  return Number.isFinite(kg) && kg > 0 ? Number((kg * 1000).toPrecision(12)) : undefined
 }
 
 /** Each measurement series of the appendix as a session whose strings name the load. */
@@ -93,8 +105,7 @@ function sessionsOf(
   appendix: XmlElement | undefined,
   load: UserRecord,
   saved: string,
-  unmapped: Set<string>,
-  warnings: string[],
+  { unmapped, warnings }: { unmapped: Set<string>; warnings: string[] },
 ): SessionRecord[] {
   const sessions: SessionRecord[] = []
   const seen = new Map<string, number>()
@@ -160,6 +171,6 @@ export function readCsrLoad(xml: string, saved: string): GrtLoadRead {
   const unmapped = new Set(read.unmapped.filter((u) => u !== 'appendix.Measurement'))
   const load = read.records.at(-1)
   const appendix = elements(input).find((e) => e.name === 'appendix')
-  const sessions = load ? sessionsOf(appendix, load, saved, unmapped, warnings) : []
+  const sessions = load ? sessionsOf(appendix, load, saved, { unmapped, warnings }) : []
   return { records: [...read.records, ...sessions], unmapped: [...unmapped], warnings }
 }

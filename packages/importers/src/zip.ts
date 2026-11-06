@@ -30,7 +30,10 @@ const crcTable = Array.from({ length: 256 }, (_, n) => {
 /** CRC-32 of APPNOTE 4.4.7 (reflected polynomial 0xEDB88320, RFC 1952 section 8). */
 function crc32(bytes: Uint8Array): number {
   let crc = 0xffffffff
-  for (const b of bytes) crc = (crcTable[(crc ^ b) & 0xff] as number) ^ (crc >>> 8) // the index is a byte of a 256-entry table
+  for (const b of bytes) {
+    // the index is a byte of a 256-entry table
+    crc = (crcTable[(crc ^ b) & 0xff] as number) ^ (crc >>> 8)
+  }
   return (crc ^ 0xffffffff) >>> 0
 }
 
@@ -128,6 +131,22 @@ export function zipEntries(bytes: Uint8Array): Map<string, ZipEntry> {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
   const end = findEnd(bytes, view)
   if (end < 0) fail('no ZIP end of central directory record')
+  const { total, directoryOffset } = centralDirectory(view, end)
+  const entries = new Map<string, ZipEntry>()
+  let p = directoryOffset
+  for (let k = 0; k < total; k++) {
+    const { entry, next } = readHeader(bytes, view, p, end)
+    p = next
+    if (!entry.name.endsWith('/')) addEntry(entries, entry)
+  }
+  return entries
+}
+
+/**
+ * The entry count and offset of the central directory, from the end record at `end` (4.3.16);
+ * ZIP64 and split archives and a directory past the end record are refused.
+ */
+function centralDirectory(view: DataView, end: number): { total: number; directoryOffset: number } {
   const disk = view.getUint16(end + 4, true)
   const directoryDisk = view.getUint16(end + 6, true)
   const onDisk = view.getUint16(end + 8, true)
@@ -139,14 +158,7 @@ export function zipEntries(bytes: Uint8Array): Map<string, ZipEntry> {
   }
   if (disk !== 0 || directoryDisk !== 0 || onDisk !== total) fail('split archives are not read')
   if (directoryOffset + directorySize > end) fail('central directory lies outside the file')
-  const entries = new Map<string, ZipEntry>()
-  let p = directoryOffset
-  for (let k = 0; k < total; k++) {
-    const { entry, next } = readHeader(bytes, view, p, end)
-    p = next
-    if (!entry.name.endsWith('/')) addEntry(entries, entry)
-  }
-  return entries
+  return { total, directoryOffset }
 }
 
 /** Checks the declared sizes of an entry against `limit` and the shared budget, and spends them. */
@@ -191,15 +203,20 @@ function entryData(
   return bytes.slice(start, start + entry.compressedSize)
 }
 
+/** The bytes of an archive and the function that inflates its deflated entries. */
+export interface Archive {
+  bytes: Uint8Array
+  inflate: Inflate
+}
+
 /**
  * The bytes of one entry: stored (method 0) or deflated (method 8), checked against the declared
  * size and CRC-32. `budget.left` is the declared size the workbook may still read; `limit` is
  * the largest declared size of this part.
  */
 export async function readEntry(
-  bytes: Uint8Array,
+  { bytes, inflate }: Archive,
   entry: ZipEntry,
-  inflate: Inflate,
   budget: { left: number },
   limit: number = maxPartSize,
 ): Promise<Uint8Array<ArrayBuffer>> {
