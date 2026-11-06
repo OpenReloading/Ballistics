@@ -127,6 +127,10 @@
     "source": "import { mean } from '../../statistics/src/index.ts'\nexport { mean }",
     "rules": ["importers-imports-schema-and-units"]
   },
+  "packages/importers/src/into-statistics.ts": {
+    "source": "import { mean } from '../../statistics/src/index.ts'\nexport { mean }",
+    "rules": ["importers-imports-schema-only"]
+  },
   "packages/importers/src/runtime-schema.ts": {
     "source": "import { ChronoShot } from '@open-reloading/schema'\nexport { ChronoShot }",
     "rules": ["importers-schema-for-types-only"]
