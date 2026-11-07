@@ -7,10 +7,9 @@ import type {
   Powder,
   PublishedLoads,
 } from '@open-reloading/schema'
-import { parseRef } from '@open-reloading/schema'
+import { compareKeys, parseRef } from '@open-reloading/schema'
 import { readRecords } from '@open-reloading/tools/catalog'
 import { UsageError } from './errors.ts'
-import { byText } from './stats.ts'
 
 /** The records a run reads, by id; a cartridge's capacity and case (one with a stated water capacity) are the first by id. */
 export interface Records {
@@ -30,7 +29,7 @@ const byId = <T extends { id: string }>(list: T[]) => new Map(list.map((r) => [r
 /** The first of `list` by id for each cartridge it names. */
 function firstPerCartridge<T extends { id: string; cartridge: string }>(list: T[]) {
   const out = new Map<string, T>()
-  for (const r of list.toSorted((a, b) => byText(a.id, b.id))) {
+  for (const r of list.toSorted((a, b) => compareKeys(a.id, b.id))) {
     const cartridge = parseRef(r.cartridge)?.id ?? r.cartridge
     if (!out.has(cartridge)) out.set(cartridge, r)
   }

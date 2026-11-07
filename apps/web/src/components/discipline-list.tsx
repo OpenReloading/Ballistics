@@ -18,19 +18,12 @@ import {
 import { facetNames } from '../lib/facets.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { kebabValue } from '../lib/list-values.ts'
-import { countText, filterText, matchingText, widestCount } from '../lib/lists.ts'
+import { countText, filterText, matchingText } from '../lib/lists.ts'
 import type { Origin } from '../lib/sources.ts'
-import {
-  type DirectoryColumn,
-  DirectoryFilters,
-  DirectoryTable,
-  useListState,
-} from './directory-table.tsx'
+import { DirectoryPage } from './directory-page.tsx'
+import { type DirectoryColumn, DirectoryTable, useListState } from './directory-table.tsx'
 import { FacetFilters, useFacets } from './facet-filters.tsx'
 import { HomepageLink } from './homepage-link.tsx'
-import { LibraryTabs } from './library-tabs.tsx'
-import { SourceFilter } from './list-sources.tsx'
-import { BarCount, PageBar } from './page-bar.tsx'
 import { EmptyList } from './states.tsx'
 
 /** Disciplines and federations are rule-book records only: the catalogue is the lists' one source. */
@@ -45,8 +38,7 @@ export function DisciplineList({
   /** The faces the disciplines are shot on, for the Face filter's names. */
   faces: readonly { id: string; name: string }[]
 }) {
-  const tr = useTranslation()
-  const { t } = tr
+  const { t } = useTranslation()
   const [state, set, clear] = useListState(disciplineFacetKeys)
   const filters = useDeferredValue(state)
   const facets = useMemo(
@@ -114,38 +106,27 @@ export function DisciplineList({
       .filter(Boolean)
       .join(' · ')
   return (
-    <>
-      <PageBar
-        title={listTitles.disciplines}
-        translated
-        status={
-          <BarCount widest={widestCount(tr, items.length, 'disciplines')}>
-            {countText(tr, shown.length, items.length, 'disciplines')}
-          </BarCount>
-        }
-      />
-      <LibraryTabs />
-      <div className="directory">
-        <DirectoryFilters
-          query={state.query}
-          onQuery={(q) => set({ query: q })}
-          placeholder={t('Name, number, federation or caliber, 2.53…')}
-          sorting={{ columns, sort: state.sort, onSort: (sort) => set({ sort }) }}
-        >
-          <SourceFilter
-            src={state.sources}
-            counts={{ openreloading: items.length, user: 0 }}
-            sources={ruleBookSources}
-            onChange={(src) => set({ sources: src })}
-          />
-          <FacetFilters
-            facets={facets}
-            options={options}
-            state={state}
-            onChange={(next) => set({ facets: next })}
-            onClear={clear}
-          />
-        </DirectoryFilters>
+    <DirectoryPage
+      title={listTitles.disciplines}
+      noun="disciplines"
+      shown={shown.length}
+      total={items.length}
+      state={state}
+      set={set}
+      placeholder={t('Name, number, federation or caliber, 2.53…')}
+      columns={columns}
+      counts={{ openreloading: items.length, user: 0 }}
+      sources={ruleBookSources}
+      filters={
+        <FacetFilters
+          facets={facets}
+          options={options}
+          state={state}
+          onChange={(next) => set({ facets: next })}
+          onClear={clear}
+        />
+      }
+      table={
         <DirectoryTable
           rows={shown}
           columns={columns}
@@ -163,8 +144,8 @@ export function DisciplineList({
           onSort={(sort) => set({ sort })}
           empty={<EmptyList noun="disciplines" filters={filterText(named)} onClear={clear} />}
         />
-      </div>
-    </>
+      }
+    />
   )
 }
 
@@ -230,38 +211,27 @@ export function FederationList({ items }: { items: FederationRow[] }) {
       countText(tr, r.disciplines, r.disciplines, 'disciplines'),
     ].join(' · ')
   return (
-    <>
-      <PageBar
-        title={listTitles.federations}
-        translated
-        status={
-          <BarCount widest={widestCount(tr, items.length, 'federations')}>
-            {countText(tr, shown.length, items.length, 'federations')}
-          </BarCount>
-        }
-      />
-      <LibraryTabs />
-      <div className="directory">
-        <DirectoryFilters
-          query={state.query}
-          onQuery={(q) => set({ query: q })}
-          placeholder={t('Name, abbreviation or country, DSB…')}
-          sorting={{ columns, sort: state.sort, onSort: (sort) => set({ sort }) }}
-        >
-          <SourceFilter
-            src={state.sources}
-            counts={{ openreloading: items.length, user: 0 }}
-            sources={ruleBookSources}
-            onChange={(src) => set({ sources: src })}
-          />
-          <FacetFilters
-            facets={federationFacets}
-            options={options}
-            state={state}
-            onChange={(next) => set({ facets: next })}
-            onClear={clear}
-          />
-        </DirectoryFilters>
+    <DirectoryPage
+      title={listTitles.federations}
+      noun="federations"
+      shown={shown.length}
+      total={items.length}
+      state={state}
+      set={set}
+      placeholder={t('Name, abbreviation or country, DSB…')}
+      columns={columns}
+      counts={{ openreloading: items.length, user: 0 }}
+      sources={ruleBookSources}
+      filters={
+        <FacetFilters
+          facets={federationFacets}
+          options={options}
+          state={state}
+          onChange={(next) => set({ facets: next })}
+          onClear={clear}
+        />
+      }
+      table={
         <DirectoryTable
           rows={shown}
           columns={columns}
@@ -279,7 +249,7 @@ export function FederationList({ items }: { items: FederationRow[] }) {
           onSort={(sort) => set({ sort })}
           empty={<EmptyList noun="federations" filters={filterText(named)} onClear={clear} />}
         />
-      </div>
-    </>
+      }
+    />
   )
 }

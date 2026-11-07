@@ -291,7 +291,7 @@ function ReadNote({ c }: { c: Exclude<CardView, { header: string[] }> }) {
   if ('refusal' in c)
     return (
       <>
-        <Text size="sm" c="red" className="import-refusal">
+        <Text size="sm" c="var(--error-fg)" className="import-refusal">
           {c.format === undefined
             ? label(c.refusal, t)
             : t('{format}: {reason}', { format: c.format, reason: label(c.refusal, t) })}
@@ -417,13 +417,13 @@ export function FileCard({
           </Button>
         </Group>
         {e.failure && (
-          <Text size="sm" c="red">
+          <Text size="sm" c="var(--error-fg)">
             {label(e.failure, t)}
           </Text>
         )}
         {c && !('header' in c) && <ReadNote c={c} />}
         {table && !e.kind && (
-          <Text size="sm" c="red">
+          <Text size="sm" c="var(--error-fg)">
             {noKindText(table, t)}
           </Text>
         )}
