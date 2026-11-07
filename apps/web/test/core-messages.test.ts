@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync } from 'node:fs'
-import { advisoryText } from '@open-reloading/api/compute'
+import { advisoryText } from '@open-reloading/api/advisories'
 import { buildOpenApi } from '@open-reloading/api/openapi'
 import { autoMap, buildRecords, readTable } from '@open-reloading/importers'
 import { pressureMethod } from '@open-reloading/schema'
