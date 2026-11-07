@@ -125,6 +125,11 @@ it('rejects a bad row and keeps the others, counting a repeated row once', async
   const b = built(await h.ask({ type: 'build', id: 1, kind: 'bullet' }))
   expect(b.counts).toMatchObject({ accepted: 4, rejected: 1 })
   expect(b.rejected[0]).toMatchObject({ row: 6, column: 'Diameter (mm)' })
+  // the page gets the field as its label, so it words the reason without the field table
+  expect(b.rejected[0]?.reason).toEqual({
+    code: 'notNumber',
+    params: { field: 'Diameter', cell: 'abc', mark: '.' },
+  })
   expect(b).toMatchObject({ added: 3, repeated: 1 })
 })
 

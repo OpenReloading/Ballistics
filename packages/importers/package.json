@@ -47,6 +47,7 @@
   },
   "dependencies": {
     "@open-reloading/schema": "workspace:*",
+    "@open-reloading/statistics": "workspace:*",
     "@open-reloading/units": "workspace:*"
   },
   "devDependencies": {

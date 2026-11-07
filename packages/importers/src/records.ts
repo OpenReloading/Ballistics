@@ -1,5 +1,6 @@
-// Kind scoring, column mapping and the user records a mapped table becomes, with a report per row.
+// Kind scoring, column mapping and the record candidates a mapped table becomes, with a report per row.
 import type { UserRecord } from '@open-reloading/schema'
+import type { Candidate, ReaderDiagnostic } from './diagnostics.ts'
 import {
   type ColumnUnit,
   type FieldSpec,
@@ -245,12 +246,30 @@ export function autoMap(table: Table, kind: TableKind): TableColumnMap[] {
   })
 }
 
-/** Where a row was rejected or warned: the 1-based row of the file (the header is row 1), the column's header, the cell and why. */
+/** Why a row of a table is rejected or warned, as a code and the values its message names. */
+export type TableDiagnostic = ReaderDiagnostic<
+  | 'emptyCell'
+  | 'noUnit'
+  | 'unitOther'
+  | 'notNumber'
+  | 'notAboveZero'
+  | 'outsideUsual'
+  | 'notChoice'
+  | 'noColumn'
+  | 'noColumns'
+  | 'sameId'
+  | 'sameBulletId'
+>
+
+/**
+ * Where a row was rejected or warned: the 1-based row of the file (the header is row 1), the
+ * column's header, the cell and why; `field` params are field keys.
+ */
 export interface RowIssue {
   row: number
   column: string
   cell: string
-  reason: string
+  reason: TableDiagnostic
 }
 
 /** Counts of the row report: rows accepted (those with a warning among them), rows with a warning and rows rejected. */
@@ -260,19 +279,18 @@ export interface RowCounts {
   rejected: number
 }
 
-/** One record of an accepted row, with the key its id is made from. */
+/** The candidate of an accepted row. */
 export interface BuiltEntry {
-  key: string
   row: number
-  record: UserRecord
+  candidate: Candidate
 }
 
-/** The records of a table and its row report. */
+/** The candidates of a table and its row report. */
 export interface BuiltRecords {
   /** One entry per accepted row. */
   entries: BuiltEntry[]
-  /** The makers the rows name, as manufacturer records the entries refer to. */
-  makers: { key: string; record: UserRecord }[]
+  /** The makers the rows name, as manufacturer candidates the entries refer to. */
+  makers: Candidate[]
   counts: RowCounts
   rejected: RowIssue[]
   warnings: RowIssue[]
@@ -282,16 +300,15 @@ const stored = (map: TableColumnMap, field: FieldSpec) =>
   field.units?.find((u) => u.symbol === map.unit) ?? field.units?.[0]
 
 /** The unit the cells of a column are read in, or why the column has none. */
-function columnUnit(map: TableColumnMap, field: FieldSpec): ColumnUnit | { problem: string } {
+function columnUnit(
+  map: TableColumnMap,
+  field: FieldSpec,
+): ColumnUnit | { problem: TableDiagnostic } {
   if (map.unitFrom === 'unknown' && map.unit === undefined) {
-    const symbols = field.units?.map((u) => u.symbol).join(', ')
-    return {
-      problem: `${field.label}: the header names a unit other than ${symbols}. Choose the unit of the column.`,
-    }
+    const symbols = field.units?.map((u) => u.symbol) ?? []
+    return { problem: { code: 'unitOther', params: { field: field.key, symbols } } }
   }
-  return (
-    stored(map, field) ?? { problem: `${field.label} has no unit. Choose a unit for the column.` }
-  )
+  return stored(map, field) ?? { problem: { code: 'noUnit', params: { field: field.key } } }
 }
 
 /** The warning for a value in the stored unit outside the field's usual range. */
@@ -300,10 +317,20 @@ function rangeWarning(
   cell: string,
   unit: ColumnUnit,
   value: number,
-): string | undefined {
+): TableDiagnostic | undefined {
   const range = field.range
   if (!range || (value >= range[0] && value <= range[1])) return undefined
-  return `${field.label} ${cell} ${unit.symbol} is outside the usual ${range[0]} to ${range[1]} ${field.units?.[0]?.symbol}. Check the unit of the column.`
+  return {
+    code: 'outsideUsual',
+    params: {
+      field: field.key,
+      cell,
+      unit: unit.symbol,
+      low: range[0],
+      high: range[1],
+      stored: field.units?.[0]?.symbol ?? '',
+    },
+  }
 }
 
 /** A number cell in the stored unit with its raw text when the unit differs and a plausibility warning, or why the row is rejected. */
@@ -311,18 +338,16 @@ function numberCell(
   cell: string,
   map: TableColumnMap,
   field: FieldSpec,
-): { value: number; raw?: string; warning?: string } | { problem: string } {
+): { value: number; raw?: string; warning?: TableDiagnostic } | { problem: TableDiagnostic } {
   const unit = columnUnit(map, field)
   if ('problem' in unit) return unit
   const x = readNumber(cell, map.decimal)
-  if (x === undefined) {
+  if (x === undefined)
     return {
-      problem: `${field.label} "${cell}" is not a number with "${map.decimal}" as decimal mark. Fix the cell or change the decimal mark of the column.`,
+      problem: { code: 'notNumber', params: { field: field.key, cell, mark: map.decimal } },
     }
-  }
   const value = unit.toStored(x)
-  if (!(value > 0))
-    return { problem: `${field.label} ${cell} is not above 0. Fix the cell or leave it empty.` }
+  if (!(value > 0)) return { problem: { code: 'notAboveZero', params: { field: field.key, cell } } }
   const warning = rangeWarning(field, cell, unit, value)
   return {
     value,
@@ -342,20 +367,13 @@ const quantityOf = (c: Cells[string] | undefined) =>
 /** The data of a record of `kind`. */
 type DataOf<K extends TableKind> = Extract<UserRecord, { kind: K }>['data']
 
-/** The id, name and save time of a row's record. */
-interface RecordHead {
-  id: string
-  name: string
-  saved: string
-}
-
-/** The record of one row of `kind`; `makerId` is the id of its maker's record. */
-function recordOf(
+/** The candidate of one row of `kind`; `makerId` is the id of its maker's candidate. */
+function candidateOf(
   kind: TableKind,
-  head: RecordHead,
+  head: { key: string; name: string },
   c: Cells,
   makerId: string | undefined,
-): UserRecord {
+): Candidate {
   if (kind === 'bullet') return { kind, ...head, data: bulletData(head.name, c, makerId) }
   if (kind === 'powder') return { kind, ...head, data: powderData(c) }
   return { kind, ...head, data: cartridgeData(head.name, c) }
@@ -461,18 +479,20 @@ function readCell(
   { c, warnings }: RowOut,
 ): RowIssue | undefined {
   const { f } = col
-  const issue = (reason: string): RowIssue => ({ row: at.row, column: at.header, cell, reason })
+  const issue = (reason: TableDiagnostic): RowIssue => ({
+    row: at.row,
+    column: at.header,
+    cell,
+    reason,
+  })
   if (cell === '')
-    return f.required ? issue(`${f.label} is empty. Fill the cell or delete the row.`) : undefined
+    return f.required ? issue({ code: 'emptyCell', params: { field: f.key } }) : undefined
   if (f.choices) {
     const key = cell.toLowerCase()
     const v = Object.hasOwn(f.choices, key) ? f.choices[key] : undefined
     if (v === undefined) {
-      warnings.push(
-        issue(
-          `${f.label} "${cell}" is not one of ${[...new Set(Object.values(f.choices))].join(', ')}. The value is left out; change the cell to keep it.`,
-        ),
-      )
+      const choices = [...new Set(Object.values(f.choices))]
+      warnings.push(issue({ code: 'notChoice', params: { field: f.key, cell, choices } }))
     } else c[f.key] = v
     return undefined
   }
@@ -517,19 +537,21 @@ function readRow(
 
 /** `out` with every row rejected because no column is mapped to the `missing` required fields. */
 function rejectAll(out: BuiltRecords, missing: Column[], rows: number): BuiltRecords {
-  const labels = missing.map((c) => c.f.label).join(', ')
   out.rejected.push({
     row: 1,
-    column: labels,
+    column: missing.map((c) => c.f.label).join(', '),
     cell: '',
-    reason: `No column is mapped to ${labels}. Map a column to ${missing.length > 1 ? 'each' : 'it'} or read the file as another kind.`,
+    reason: {
+      code: missing.length > 1 ? 'noColumns' : 'noColumn',
+      params: { fields: missing.map((c) => c.f.key) },
+    },
   })
   out.counts.rejected = rows
   return out
 }
 
-/** The id of a maker's record by its name, adding the record to `makers` the first time, saved at `now`. */
-function makerRecords(makers: BuiltRecords['makers'], now: string): (maker: string) => string {
+/** The id of a maker's candidate by its name, adding the candidate to `makers` the first time. */
+function makerCandidates(makers: BuiltRecords['makers']): (maker: string) => string {
   const ids = new Map<string, string>()
   return (maker) => {
     const key = `manufacturer|${keyText(maker)}`
@@ -537,38 +559,28 @@ function makerRecords(makers: BuiltRecords['makers'], now: string): (maker: stri
     if (known) return known
     const id = idOfKey(key)
     ids.set(key, id)
-    makers.push({
-      key,
-      record: { kind: 'manufacturer', id, name: maker, saved: now, data: { origin: 'user' } },
-    })
+    makers.push({ kind: 'manufacturer', key, name: maker, data: { origin: 'user' } })
     return id
   }
 }
 
 /** Why the row `row` is not imported: it gives the same id as the earlier row `first`. */
-function sameIdReason(kind: TableKind, first: number, row: number): string {
-  return kind === 'bullet'
-    ? `Rows ${first} and ${row} give the same name, maker, diameter and mass, so one id: only row ${first} is imported. Change the name, maker, diameter or mass of row ${row} to import it as a record of its own.`
-    : `Rows ${first} and ${row} give the same name and maker, so one id: only row ${first} is imported. Change the name or maker of row ${row} to import it as a record of its own.`
-}
+const sameIdReason = (kind: TableKind, first: number, row: number): TableDiagnostic => ({
+  code: kind === 'bullet' ? 'sameBulletId' : 'sameId',
+  params: { first, row },
+})
 
-const isIssue = (x: Cells | RowIssue): x is RowIssue =>
-  typeof x.row === 'number' && typeof x.reason === 'string'
+const isIssue = (x: Cells | RowIssue): x is RowIssue => typeof x.row === 'number' && 'reason' in x
 
 /**
- * The user records of `table` read with `map` as `kind`, saved at `now` (ISO 8601). A row that
- * fails is listed with row, column, cell and reason and never blocks the others. Ids are
- * deterministic (`idOfKey` of kind, name, maker and, for a bullet, diameter and mass), so the same
- * row read again gets the same id. A row whose id repeats an earlier row's gets a warning naming
- * both rows; the caller keeps the first record of an id. The caller still parses each record with
- * the user record schema before storing it.
+ * The record candidates of `table` read with `map` as `kind`. A row that fails is listed with row,
+ * column, cell and reason and never blocks the others. Keys are deterministic (kind, name, maker
+ * and, for a bullet, diameter and mass), so the same row read again gets the same id
+ * (`idOfKey(key)`). A row whose key repeats an earlier row's gets a warning naming both rows; the
+ * caller keeps the first record of an id. The caller makes each candidate a record and parses it
+ * with the user record schema before storing it.
  */
-export function buildRecords(
-  table: Table,
-  kind: TableKind,
-  map: TableColumnMap[],
-  now: string,
-): BuiltRecords {
+export function buildRecords(table: Table, kind: TableKind, map: TableColumnMap[]): BuiltRecords {
   const columns = fieldSpecs[kind].map((f) => ({ f, i: map.findIndex((m) => m.field === f.key) }))
   const out: BuiltRecords = {
     entries: [],
@@ -579,7 +591,7 @@ export function buildRecords(
   }
   const missing = columns.filter((c) => c.f.required && c.i < 0)
   if (missing.length > 0) return rejectAll(out, missing, table.rows.length)
-  const makerOf = makerRecords(out.makers, now)
+  const makerOf = makerCandidates(out.makers)
   const warned = new Set<number>()
   const firstRow = new Map<string, number>()
   const nameColumn = columns.find((col) => col.f.key === 'name')
@@ -605,9 +617,8 @@ export function buildRecords(
       out.warnings.push({ row, column: nameHeader, cell: name, reason })
     }
     if (out.warnings.length > before) warned.add(row)
-    const head = { id: idOfKey(key), name, saved: now }
-    const record = recordOf(kind, head, c, maker && makerOf(maker))
-    out.entries.push({ key, row, record })
+    const candidate = candidateOf(kind, { key, name }, c, maker && makerOf(maker))
+    out.entries.push({ row, candidate })
   })
   out.counts = { accepted: out.entries.length, warned: warned.size, rejected: out.rejected.length }
   return out

@@ -2,8 +2,13 @@ import { type UserRecord, userRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { readCsrLoad, readGrtLoad } from '../src/index.ts'
 import { defined } from './defined.ts'
+import { recordOf } from './record-of.ts'
 
-const saved = '2026-10-30T00:00:00.000Z'
+/** The read of `xml` with the records the app makes of its candidates. */
+function read(xml: string) {
+  const r = readCsrLoad(xml)
+  return { ...r, records: r.candidates.map(recordOf) }
+}
 
 const field = (name: string, value: string, unit = '') =>
   `<input name="${name}" value="${value}" unit="${unit}" type="decimal" descr="x"/>`
@@ -64,7 +69,7 @@ function csrFile(o: { format?: string | null; appendix?: string; physical?: stri
 
 /** The session ids of a file whose appendix is `appendix`. */
 const sessionIds = (appendix: string) =>
-  readCsrLoad(csrFile({ appendix }), saved)
+  read(csrFile({ appendix }))
     .records.filter((r) => r.kind === 'session')
     .map((r) => r.id)
 /** `n` shots of the same velocity. */
@@ -75,7 +80,7 @@ const ofKind = <K extends UserRecord['kind']>(records: UserRecord[], kind: K) =>
 
 describe('readCsrLoad: the load, its components and its series', () => {
   it('reads the load, its components and its measurement series, each a valid user record', () => {
-    const { records, warnings } = readCsrLoad(csrFile(), saved)
+    const { records, warnings } = read(csrFile())
     for (const r of records) expect(userRecord.safeParse(r).success, r.kind).toBe(true)
     expect(records.map((r) => r.kind)).toEqual([
       'cartridge',
@@ -114,7 +119,7 @@ describe('readCsrLoad: the load, its components and its series', () => {
 
 describe('readCsrLoad: fields and ids', () => {
   it('accounts for every field with a value: read, not read, or warned about', () => {
-    const { unmapped } = readCsrLoad(csrFile(), saved)
+    const { unmapped } = read(csrFile())
     expect(unmapped.toSorted((a, b) => a.localeCompare(b))).toEqual(
       [
         'caliber.primer',
@@ -135,13 +140,13 @@ describe('readCsrLoad: fields and ids', () => {
   })
 
   it('gives the same ids on a second read', () => {
-    const a = readCsrLoad(csrFile(), saved)
-    const b = readCsrLoad(csrFile(), '2027-01-01T00:00:00.000Z')
+    const a = read(csrFile())
+    const b = read(csrFile())
     expect(b.records.map((r) => r.id)).toEqual(a.records.map((r) => r.id))
   })
 
   it('gives two series of the same content distinct session ids', () => {
-    const { records } = readCsrLoad(csrFile({ appendix: series + series }), saved)
+    const { records } = read(csrFile({ appendix: series + series }))
     const ids = records.filter((r) => r.kind === 'session').map((r) => r.id)
     expect(ids).toHaveLength(2)
     expect(new Set(ids).size).toBe(2)
@@ -157,11 +162,12 @@ describe('readCsrLoad: fields and ids', () => {
 
 describe('readCsrLoad: formats, and shots without a velocity', () => {
   it('warns on another or a missing format and still reads the load', () => {
-    expect(readCsrLoad(csrFile({ format: '2' }), saved).warnings[0]).toMatch(
-      /^The file is of format "2"; the reader is written for format 1/,
-    )
-    const none = readCsrLoad(csrFile({ format: null }), saved)
-    expect(none.warnings[0]).toMatch(/^The file is of format unknown/)
+    expect(read(csrFile({ format: '2' })).warnings[0]).toEqual({
+      code: 'otherFormat',
+      params: { format: '2', expected: '1' },
+    })
+    const none = read(csrFile({ format: null }))
+    expect(none.warnings[0]).toEqual({ code: 'unknownFormat', params: { expected: '1' } })
     expect(none.records.some((r) => r.kind === 'load')).toBe(true)
   })
 
@@ -170,18 +176,19 @@ describe('readCsrLoad: formats, and shots without a velocity', () => {
       '<Measurement><charge name="Empty" value="0.002"><shot velocity="0"/></charge>' +
       '<charge name="No%20mass" value=""><shot velocity="650"/><extra/></charge></Measurement>' +
       '<Measurement><charge name="X"/></Measurement>'
-    const { records, warnings, unmapped } = readCsrLoad(csrFile({ appendix }), saved)
+    const { records, warnings, unmapped } = read(csrFile({ appendix }))
     const sessions = records.filter((r) => r.kind === 'session')
     expect(sessions).toHaveLength(1)
     expect(ofKind(records, 'session').data.strings).toEqual([
       expect.objectContaining({ label: 'No mass', shots: [{ velocity: { value: 650 } }] }),
     ])
     expect(ofKind(records, 'session').data.strings[0]?.variation).toBeUndefined()
+    const at = 'appendix.Measurement.charge'
     expect(warnings).toEqual([
-      'appendix.Measurement.charge: a shot without a velocity is not read.',
-      'appendix.Measurement.charge: the charge Empty holds no shot with a velocity; it is not read.',
-      'appendix.Measurement.charge: the charge No mass has no mass; its string varies nothing.',
-      'appendix.Measurement.charge: the charge X holds no shot with a velocity; it is not read.',
+      { code: 'shotWithoutVelocity', params: { at } },
+      { code: 'chargeWithoutShots', params: { at, label: 'Empty' } },
+      { code: 'chargeWithoutMass', params: { at, label: 'No mass' } },
+      { code: 'chargeWithoutShots', params: { at, label: 'X' } },
     ])
     expect(unmapped).toContain('appendix.Measurement.charge.extra')
   })
@@ -193,24 +200,29 @@ describe('readCsrLoad: limits and refused files', () => {
       { length: 502 },
       (_, i) => `<charge name="C${i}" value="0.002">${shots(i === 0 ? 5003 : 2)}</charge>`,
     ).join('')
-    const { records, warnings } = readCsrLoad(
+    const { records, warnings } = read(
       csrFile({ appendix: `<Measurement>${charges}</Measurement>` }),
-      saved,
     )
     const strings = ofKind(records, 'session').data.strings
     expect(strings).toHaveLength(500)
     expect(strings[0]?.shots).toHaveLength(5000)
     expect(strings.at(-1)?.label).toBe('C499')
     expect(warnings).toEqual([
-      'appendix.Measurement.charge: 3 shots of the charge C0 beyond the limit of 5000 are left out.',
-      'appendix.Measurement: 2 charges (4 shots) of the series beyond the limit of 500 are left out.',
+      {
+        code: 'shotsBeyondLimit',
+        params: { at: 'appendix.Measurement.charge', count: 3, label: 'C0', max: 5000 },
+      },
+      {
+        code: 'chargesBeyondLimit',
+        params: { at: 'appendix.Measurement', count: 2, shots: 4, max: 500 },
+      },
     ])
     for (const r of records) expect(userRecord.safeParse(r).success, r.kind).toBe(true)
   })
 
   it('refuses another root, a file without load and the files of the GRT reader', () => {
-    expect(() => readCsrLoad('<other/>', saved)).toThrow('root element')
-    expect(() => readCsrLoad('<ChamberSimReloaded format="1"/>', saved)).toThrow('no load')
-    expect(() => readGrtLoad(csrFile(), saved)).toThrow('root element')
+    expect(() => readCsrLoad('<other/>')).toThrow('root element')
+    expect(() => readCsrLoad('<ChamberSimReloaded format="1"/>')).toThrow('no load')
+    expect(() => readGrtLoad(csrFile())).toThrow('root element')
   })
 })
