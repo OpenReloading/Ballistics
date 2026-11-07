@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+import type { Bundle } from '@open-reloading/catalog'
 import { sheetId } from '@open-reloading/schema'
 import type { CartridgeDetail } from '../src/lib/api-types.ts'
 import { readRecord } from './read-record.ts'
@@ -11,3 +14,9 @@ export function sheetRecord(sheet: string) {
   if (sheetId(c) !== sheet) throw new Error(`${c.id} is sheet ${sheetId(c)}, not ${sheet}`)
   return c
 }
+
+/** The catalog records, as the build of `@open-reloading/catalog` writes them to its `bundle.json`. */
+export const catalogBundle = (): Bundle =>
+  JSON.parse(
+    readFileSync(fileURLToPath(import.meta.resolve('@open-reloading/catalog/bundle.json')), 'utf8'),
+  )

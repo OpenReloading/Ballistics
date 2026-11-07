@@ -24,6 +24,8 @@ COPY tooling/test-kit/package.json tooling/test-kit/
 RUN pnpm install --frozen-lockfile --ignore-scripts --filter "@open-reloading/docs..."
 COPY packages packages
 COPY tooling tooling
+# the catalog reader that the catalog build writes its bundle with
+COPY tools/src/catalog tools/src/catalog
 # the libraries the docs document and the API its REST page describes (the docs also depend on web, cli and tools,
 # whose files their tests read; the site needs no build of them)
 RUN pnpm --filter "@open-reloading/api..." --filter "@open-reloading/drawing..." --filter "@open-reloading/importers..." run build

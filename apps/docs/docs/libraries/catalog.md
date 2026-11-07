@@ -2,12 +2,12 @@
 
 title: '@open-reloading/catalog'
 sidebar_label: catalog
-description: The catalogue records as one bundle, their reader and plausibility checks.
+description: The catalogue records as one bundle and the checks they pass.
 ---
 
 # `@open-reloading/catalog`
 
-The catalogue records of this repository as one JSON bundle, the reader that validates a records folder into that bundle, and the plausibility checks the records pass. The code is MIT. Each record entry states its licence in its `license` field; entries without one are CC BY 4.0, except data a maker published (a source with `origin` `manufacturer`), which carries no project licence (see `packages/catalog/LICENSE`). The [Data](../data/federations.md) pages describe the records and their sources.
+The catalogue records of this repository as one JSON bundle and the checks the records pass. The package reads no files. The code is MIT. Each record entry states its licence in its `license` field; entries without one are CC BY 4.0, except data a maker published (a source with `origin` `manufacturer`), which carries no project licence (see `packages/catalog/LICENSE`). The [Data](../data/federations.md) pages describe the records and their sources.
 
 ## Install
 
@@ -19,11 +19,11 @@ It installs `@open-reloading/schema` with it. Each library has its own [Semantic
 
 ## Entry points
 
-| Import                                 | Contents                                                                                         |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `@open-reloading/catalog`              | `readRecords` and `readLoadTables` (Node, they read files), the coverage and plausibility checks |
-| `@open-reloading/catalog/plausibility` | The plausibility checks alone, without file access                                               |
-| `@open-reloading/catalog/bundle.json`  | Every record, one array per kind (the `Bundle` type)                                             |
+| Import                                 | Contents                                                                                    |
+| -------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `@open-reloading/catalog`              | `checkRecords` (the cross-checks of a set of records), the coverage and plausibility checks |
+| `@open-reloading/catalog/plausibility` | The plausibility checks alone                                                               |
+| `@open-reloading/catalog/bundle.json`  | Every record, one array per kind (the `Bundle` type)                                        |
 
 ## Example
 
@@ -37,15 +37,7 @@ console.log(twistPlausible(254)) // true
 
 ## Reading a records folder
 
-`readRecords(root)` validates the records of a folder laid out as `packages/catalog/records/` of the repository, one directory per kind. Pass that folder of a clone, or several folders read as one set: the first must hold every kind directory, and the `load-tables.json` of every folder lists tables for checking fitted powders. The npm package ships no records folder: without `root`, `readRecords` reads the `records/` folder next to the package only in a repository checkout and throws in an installed package. For the records themselves, import `bundle.json`.
-
-```js
-import { readRecords } from '@open-reloading/catalog'
-
-const { bundle, errors, warnings } = readRecords('Ballistics/packages/catalog/records')
-```
-
-`errors` fail the validation. `warnings` are plausibility findings of published loads, which stay as printed and do not fail it.
+The reader that validates a folder laid out as `packages/catalog/records/` into the bundle is repository tooling, not part of the package: `readRecords` of `tools/src/catalog/records.ts`, which `pnpm run data:validate` and the package build run. It reads the files and runs `checkRecords` on them. `errors` fail the validation. `warnings` are plausibility findings of published loads, which stay as printed and do not fail it.
 
 ## Reference
 

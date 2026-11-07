@@ -10,7 +10,7 @@ type Named = { file: string; scope: string; names: string[] }
  * Lower-case letters and digits only, accents removed: `P-140` and `p140` are one name. A decimal
  * point between digits stays, so `6.5x55` and `65x55` differ.
  */
-export function normaliseName(name: string) {
+export function normaliseName(name: string): string {
   return name
     .normalize('NFKD')
     .toLowerCase()

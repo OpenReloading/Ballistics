@@ -1,4 +1,3 @@
-import { readRecords } from '@open-reloading/catalog'
 import { describe, expect, it } from 'vitest'
 import {
   disciplineChoice,
@@ -10,8 +9,9 @@ import {
 } from '../src/lib/face-disciplines.ts'
 import { type Face, withOrganization } from '../src/lib/face-organization.ts'
 import { defined } from './defined.ts'
+import { catalogBundle } from './records.ts'
 
-const { bundle } = readRecords()
+const bundle = catalogBundle()
 const faces = bundle.targetFaces.map((f) => withOrganization(f, bundle.federations))
 const issf = faces.filter((f) => f.organization === 'ISSF')
 const own = (f: Face) => ({ ...f, events: f.events.filter((e) => !e.organization) })

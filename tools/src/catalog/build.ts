@@ -7,4 +7,6 @@ if (errors.length > 0) {
   for (const error of errors) console.error(error)
   process.exit(1)
 }
-writeFileSync(join(import.meta.dirname, 'bundle.json'), `${JSON.stringify(bundle)}\n`)
+// the catalog package ships the bundle as `@open-reloading/catalog/bundle.json`
+const dist = join(import.meta.dirname, '..', '..', '..', 'packages', 'catalog', 'dist')
+writeFileSync(join(dist, 'bundle.json'), `${JSON.stringify(bundle)}\n`)

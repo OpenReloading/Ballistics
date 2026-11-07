@@ -3,22 +3,22 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import type { PublishedLoads } from '@open-reloading/schema'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { defined } from '../../../packages/catalog/test/defined.ts'
 import {
   formatRecord,
   main,
   mergeLoadFolder,
   parseMergeArgs,
   reportLines,
-} from '../src/merge-loads.ts'
+} from '../../src/catalog/merge-loads.ts'
 import {
   type IncomingLoad,
   type IncomingLoads,
   loadId,
   mergePublishedLoads,
   withLoadIds,
-} from '../src/published-load-merge.ts'
-import { readRecords } from '../src/records.ts'
-import { defined } from './defined.ts'
+} from '../../src/catalog/published-load-merge.ts'
+import { readRecords } from '../../src/catalog/records.ts'
 
 // Test data, not maker data: a made-up table of the test manufacturer for the test cartridge.
 

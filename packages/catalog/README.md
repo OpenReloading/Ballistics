@@ -1,6 +1,6 @@
 # @open-reloading/catalog
 
-The OpenReloading catalogue records as one JSON bundle, the reader that validates a records folder into that bundle, and the plausibility checks the records pass.
+The OpenReloading catalogue records as one JSON bundle and the checks the records pass. The package reads no files.
 
 ```sh
 npm install @open-reloading/catalog
@@ -13,8 +13,6 @@ import { twistPlausible } from '@open-reloading/catalog/plausibility'
 console.log(bundle.cartridges.length > 0) // true
 console.log(twistPlausible(254)) // true
 ```
-
-`readRecords(root)` validates a records folder, such as `packages/catalog/records/` of a repository clone. The package ships none, so it throws without `root`.
 
 Documentation: https://openreloading.github.io/Ballistics/docs/libraries/catalog/
 

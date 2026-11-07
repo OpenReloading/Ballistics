@@ -491,17 +491,16 @@
             "paths": [],
             "patterns": [
               {
-                "group": [
-                  "@open-reloading/*",
-                  "@open-reloading/*/**",
-                  "!@open-reloading/schema",
-                  "!@open-reloading/schema/**"
-                ],
-                "message": "catalog-imports-schema-only: packages/catalog depends on @open-reloading/schema alone."
+                "group": ["@*/*", "@*/*/**", "!@open-reloading/schema"],
+                "message": "catalog-imports-schema-only: packages/catalog has no I/O and imports nothing but @open-reloading/schema and its own files."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|catalog|api|drawing|cli)/(src|dist)|packages|apps)/",
-                "message": "catalog-imports-schema-only: packages/catalog depends on @open-reloading/schema alone."
+                "regex": "^[^.@]",
+                "message": "catalog-imports-schema-only: packages/catalog has no I/O and imports nothing but @open-reloading/schema and its own files."
+              },
+              {
+                "regex": "^(\\.\\./)+[^.]",
+                "message": "catalog-imports-schema-only: packages/catalog has no I/O and imports nothing but @open-reloading/schema and its own files."
               }
             ]
           }
@@ -571,13 +570,14 @@
                   "!@open-reloading/schema",
                   "!@open-reloading/schema/**",
                   "!@open-reloading/api/compute",
-                  "!@open-reloading/api/catalogue"
+                  "!@open-reloading/api/catalogue",
+                  "!@open-reloading/tools/catalog"
                 ],
-                "message": "cli-imports-logic-catalog-drawing-schema-only: packages/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), catalog, drawing and schema, and of @open-reloading/api only the compute and catalogue entries the browser runs."
+                "message": "cli-imports-logic-catalog-drawing-schema-only: packages/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), catalog, drawing and schema, and of @open-reloading/api only the compute and catalogue entries the browser runs, and of @open-reloading/tools only the catalog reader."
               },
               {
                 "regex": "^(\\.\\./)+((units|schema|importers|catalog|api|drawing|cli)/(src|dist)|packages|apps)/",
-                "message": "cli-imports-logic-catalog-drawing-schema-only: packages/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), catalog, drawing and schema, and of @open-reloading/api only the compute and catalogue entries the browser runs."
+                "message": "cli-imports-logic-catalog-drawing-schema-only: packages/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), catalog, drawing and schema, and of @open-reloading/api only the compute and catalogue entries the browser runs, and of @open-reloading/tools only the catalog reader."
               }
             ]
           }

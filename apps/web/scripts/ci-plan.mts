@@ -27,6 +27,8 @@ const repoRoot = path.join(webRoot, '../..')
 const webInputs = [
   /^apps\/web\//,
   /^packages\/(units|locale-format|statistics|ballistics|shot-groups|schema|importers|drawing|catalog|api)\//,
+  // the catalog reader that writes the bundle the API serves
+  /^tools\/src\/catalog\//,
   /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|tsconfig\.base\.json|\.nvmrc)$/,
   /^\.github\/(pnpm|actions)\//,
   /^\.github\/workflows\/ci\.yml$/,
@@ -62,6 +64,7 @@ const recordInputs = [
   /^packages\/statistics\//,
   /^packages\/ballistics\//,
   /^packages\/catalog\//,
+  /^tools\/src\/catalog\//,
   /^packages\/schema\//,
   /^packages\/api\//,
   /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|tsconfig\.base\.json|\.nvmrc)$/,

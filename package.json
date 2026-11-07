@@ -19,7 +19,7 @@
     "pages:serve": "pnpm --filter @open-reloading/tools run pages:serve",
     "dev:static": "pnpm --filter @open-reloading/tools run dev:static",
     "static:build": "pnpm --filter @open-reloading/tools run pages --sample",
-    "data:validate": "pnpm --filter @open-reloading/catalog run validate",
+    "data:validate": "pnpm --filter @open-reloading/tools run catalog:validate",
     "api:check": "pnpm --filter @open-reloading/tools run api-check",
     "api:conformance": "pnpm --filter @open-reloading/tools run api-conformance",
     "baselines": "pnpm --filter @open-reloading/schema --filter @open-reloading/web --filter @open-reloading/tools exec vitest run test/contracts.test.ts --update",

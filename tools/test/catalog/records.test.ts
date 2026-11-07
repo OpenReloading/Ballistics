@@ -2,7 +2,7 @@ import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:f
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { readLoadTables, readRecords } from '../src/records.ts'
+import { readLoadTables, readRecords } from '../../src/catalog/records.ts'
 
 const fixtures = join(import.meta.dirname, 'fixtures')
 
@@ -118,20 +118,6 @@ describe('readRecords', () => {
 
   it('accepts the committed records', () => {
     expect(readRecords().errors).toEqual([])
-  })
-
-  it('names the missing root in the packed layout, which has no records folder', async () => {
-    // inside the package, so the copy resolves its dependencies as the installed one does
-    const dir = mkdtempSync(join(import.meta.dirname, '.packed-'))
-    try {
-      cpSync(join(import.meta.dirname, '..', 'src'), join(dir, 'src'), { recursive: true })
-      const packed: typeof import('../src/records.ts') = await import(
-        join(dir, 'src', 'records.ts')
-      )
-      expect(() => packed.readRecords()).toThrow('readRecords: pass the records root')
-    } finally {
-      rmSync(dir, { recursive: true })
-    }
   })
 
   it('reports an unknown or missing manufacturer of a powder, a case capacity and a load table', () => {

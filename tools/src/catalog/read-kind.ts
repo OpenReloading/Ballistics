@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { basename, join } from 'node:path'
+import { resolveRecord, type SourceIndex } from '@open-reloading/catalog'
 import type { z } from 'zod'
-import { resolveRecord, type SourceIndex } from './sources.ts'
 
 /**
  * Where reading adds its errors, the source records that resolve references, where given, and

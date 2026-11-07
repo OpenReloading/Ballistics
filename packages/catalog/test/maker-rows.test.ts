@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { makerRows } from '../src/maker-rows.ts'
-import { type Bundle, readRecords } from '../src/records.ts'
+import type { Bundle } from '../src/records.ts'
 
 const maker = { title: 'Maker page', origin: 'manufacturer' }
 const book = { title: 'Rule book' }
@@ -34,14 +34,5 @@ describe('makerRows', () => {
 
   it('keeps manufacturer records as identity records', () => {
     expect(makerRows(bundleOf({ manufacturers: [cited('m1', 'published', maker)] }))).toEqual({})
-  })
-})
-
-describe('the committed records', () => {
-  it('cite no manufacturer source, except the manufacturer records', () => {
-    const { bundle, publishedLoads, errors } = readRecords()
-    expect(errors).toEqual([])
-    // a published loads file cites its sources once for all its loads
-    expect(makerRows(bundleOf({ ...bundle, publishedLoads }))).toEqual({})
   })
 })
