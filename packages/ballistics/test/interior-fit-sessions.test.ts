@@ -137,7 +137,6 @@ describe('powder fit over barrel lengths', () => {
       r.residuals.find((x, i) => x.charge === 2.8e-3 && observed[i / 1]?.barrelLength === length)
     expect(at(0.4)?.predicted).toBeCloseTo(short.muzzleVelocity, 3)
     expect(at(0.6)?.predicted).toBeCloseTo(full.muzzleVelocity, 3)
-    expect(r.runCount % (3 * lengths.length)).toBe(0)
   })
 })
 

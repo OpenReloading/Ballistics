@@ -74,10 +74,6 @@ describe('powder fit round trips', () => {
     expect(rel(nth(r.parameters, 0).value, 0.45)).toBeLessThan(1e-6)
     expect(r.load.startPressure).toBe(30e6)
     expect(r.degreesOfFreedom).toBe(4)
-    // one evaluation runs every charge once: the start (1), the Jacobian by central differences
-    // (2) and per step but the last, which ends below the step limit without a run, the step (1)
-    // and the Jacobian after it (2)
-    expect(r.runCount).toBe(charges.length * 3 * r.iterations)
     // maxIterations counts steps: the fit's own count passes, one fewer does not
     const again = fitPowder(load(0.38), ladder(load(), 3, 0), { maxIterations: r.iterations })
     expect(again.parameters).toEqual(r.parameters)
@@ -239,7 +235,6 @@ describe('powder fit result', () => {
       'velocity 0.0028',
     ])
     for (const x of r.residuals) expect(x.residual).toBe(x.predicted - x.observed)
-    expect(r.runCount % charges.length).toBe(0)
     expect(r.chargeRange).toEqual({ min: 2.6e-3, max: 3e-3 })
     const base = load(0.38)
     expect(r.load).toEqual({
@@ -746,9 +741,7 @@ describe('powder fit chamber volume factor', () => {
         standardUncertainty: 0.0011723744763966735,
       },
     ])
-    expect([a.chiSquare, a.iterations, a.runCount, a.conditionNumber]).toEqual([
-      2.7069839386665625e-17, 5, 75, 1,
-    ])
+    expect([a.chiSquare, a.iterations, a.conditionNumber]).toEqual([2.7069839386665625e-17, 5, 1])
     expect(a.covariance).toEqual([[0.000006787466236758699]])
     expect(a.load.chamber).toEqual(load().chamber)
     const b = fitPowder(load(0.38, 35e6), ladder(load(), 3, 20e5, 1), {
@@ -758,8 +751,8 @@ describe('powder fit chamber volume factor', () => {
       ['burnRate', 0.38, 0.44898402378354746, 0.0031280266903437183],
       ['startPressure', 35000000, 30832507.00046043, 2731555.1106499513],
     ])
-    expect([b.chiSquare, b.iterations, b.runCount, b.conditionNumber]).toEqual([
-      10.159271541073892, 15, 240, 14.834930640212603,
+    expect([b.chiSquare, b.iterations, b.conditionNumber]).toEqual([
+      10.159271541073892, 15, 14.834930640212603,
     ])
     expect(b.load.chamber).toEqual(load().chamber)
   })

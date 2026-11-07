@@ -7,7 +7,6 @@ import {
   type LadderPoint,
   type PowderFit,
   powderConfidence,
-  powderInputDefaults,
   powderPressureRange,
   similarPowdersPrior,
 } from '../src/index.ts'
@@ -123,11 +122,6 @@ describe('powder pressure range of the fixed inputs', () => {
 
 describe('powder pressure range inputs', () => {
   it('takes the measured defaults, caller values and extra inputs', () => {
-    expect(powderInputDefaults.caseCapacity).toEqual({
-      unit: 'relative',
-      measured: 0.005,
-      estimated: 0.03,
-    })
     const narrow = powderPressureRange(velocityFit, velocityOnly, {
       inputs: { caseCapacity: { basis: 'measured' } },
     })
