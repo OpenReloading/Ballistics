@@ -93,7 +93,6 @@ export const theme = {
     "light": 8,
     "dark": 4
   },
-  "autoContrast": true,
   "white": "#ffffff",
   "black": "#10121b"
 } as const
@@ -113,6 +112,7 @@ export const cssVariables = {
     "--mantine-color-default-color": "#1d2130",
     "--mantine-color-default-border": "#7b7f91",
     "--mantine-color-error": "#c92a2a",
+    "--mantine-primary-color-contrast": "#ffffff",
     "--mantine-color-blue-filled-hover": "#1864ab",
     "--mantine-color-blue-light": "#e7f5ff"
   },
@@ -128,6 +128,7 @@ export const cssVariables = {
     "--mantine-color-default-color": "#e9ebf1",
     "--mantine-color-default-border": "#6f7485",
     "--mantine-color-error": "#ffa8a8",
+    "--mantine-primary-color-contrast": "#10121b",
     "--mantine-color-blue-filled-hover": "#74c0fc",
     "--mantine-color-blue-light": "#172a40"
   }

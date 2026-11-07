@@ -153,8 +153,8 @@ function mantineTheme(tokens: TokenNormalizedSet, colors: Colors) {
       light: blueShade(colors.light['accent']),
       dark: blueShade(colors.dark['accent']),
     },
-    // Mantine picks white or black text on a filled color by its luminance: both are the accent's text colors
-    autoContrast: true,
+    // no autoContrast: Mantine picks its text from the light shade in both schemes; the scheme's accent text is
+    // --mantine-primary-color-contrast (below), which `ui` gives the filled controls
     white: colors.light['on-accent'],
     black: colors.dark['on-accent'],
   }
@@ -176,6 +176,7 @@ const mantineRoles = {
   '--mantine-color-default-color': 'ink',
   '--mantine-color-default-border': 'control-line',
   '--mantine-color-error': 'error-text',
+  '--mantine-primary-color-contrast': 'on-accent',
   // Mantine's hover and tint of the primary color are other shades of its blue than the accent's
   '--mantine-color-blue-filled-hover': 'accent-hover',
   '--mantine-color-blue-light': 'accent-tint',

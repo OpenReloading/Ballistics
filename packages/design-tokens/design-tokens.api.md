@@ -63,6 +63,7 @@ export const cssVariables: {
         readonly "--mantine-color-default-color": "#1d2130";
         readonly "--mantine-color-default-border": "#7b7f91";
         readonly "--mantine-color-error": "#c92a2a";
+        readonly "--mantine-primary-color-contrast": "#ffffff";
         readonly "--mantine-color-blue-filled-hover": "#1864ab";
         readonly "--mantine-color-blue-light": "#e7f5ff";
     };
@@ -78,6 +79,7 @@ export const cssVariables: {
         readonly "--mantine-color-default-color": "#e9ebf1";
         readonly "--mantine-color-default-border": "#6f7485";
         readonly "--mantine-color-error": "#ffa8a8";
+        readonly "--mantine-primary-color-contrast": "#10121b";
         readonly "--mantine-color-blue-filled-hover": "#74c0fc";
         readonly "--mantine-color-blue-light": "#172a40";
     };
@@ -132,7 +134,6 @@ export const theme: {
         readonly light: 8;
         readonly dark: 4;
     };
-    readonly autoContrast: true;
     readonly white: "#ffffff";
     readonly black: "#10121b";
 };
