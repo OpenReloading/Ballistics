@@ -72,7 +72,7 @@
     "rules": ["drawing-seating-imports"]
   },
   "packages/drawing/src/seating/workspace-package.ts": {
-    "source": "import { waterDensity } from '@open-reloading/core'\nexport { waterDensity }",
+    "source": "import { waterDensity } from '@open-reloading/ballistics'\nexport { waterDensity }",
     "rules": ["drawing-seating-imports"]
   },
   "packages/drawing/src/seating/into-web.ts": {
@@ -90,22 +90,6 @@
   "packages/units/src/schema.ts": {
     "source": "import { quantity } from '@open-reloading/schema'\nexport { quantity }",
     "rules": ["units-imports-nothing"]
-  },
-  "packages/core/src/units.ts": {
-    "source": "import { conversions } from '@open-reloading/units'\nexport { conversions }",
-    "rules": []
-  },
-  "packages/core/src/node-fs.ts": {
-    "source": "import { readFileSync } from 'node:fs'\nexport { readFileSync }",
-    "rules": ["core-imports-units-statistics-and-ballistics"]
-  },
-  "packages/core/src/npm-package.ts": {
-    "source": "import { z } from 'zod'\nexport { z }",
-    "rules": ["core-imports-units-statistics-and-ballistics"]
-  },
-  "packages/core/src/missing.ts": {
-    "source": "import './nope.ts'",
-    "rules": []
   },
   "packages/importers/src/types-of-schema.ts": {
     "source": "import type { ChronoShot } from '@open-reloading/schema'\nexport type Shot = ChronoShot",
@@ -147,8 +131,8 @@
     "source": "import { units } from '@open-reloading/units'\nexport { units }",
     "rules": []
   },
-  "packages/schema/src/core.ts": {
-    "source": "import { waterDensity } from '@open-reloading/core'\nexport { waterDensity }",
+  "packages/schema/src/ballistics.ts": {
+    "source": "import { waterDensity } from '@open-reloading/ballistics'\nexport { waterDensity }",
     "rules": ["schema-imports-units-only"]
   },
   "packages/schema/src/dom.ts": {
@@ -159,17 +143,17 @@
     "source": "import { readFileSync } from 'node:fs'\nimport { Load } from '@open-reloading/schema'\nexport { readFileSync, Load }",
     "rules": []
   },
-  "packages/data/src/core.ts": {
-    "source": "import { waterDensity } from '@open-reloading/core'\nexport { waterDensity }",
+  "packages/data/src/ballistics.ts": {
+    "source": "import { waterDensity } from '@open-reloading/ballistics'\nexport { waterDensity }",
     "rules": ["data-imports-schema-only"]
   },
-  "packages/api/src/core-data-schema.ts": {
-    "source": "import { waterDensity } from '@open-reloading/core'\nimport { readRecords } from '@open-reloading/data'\nimport { Load } from '@open-reloading/schema'\nimport Fastify from 'fastify'\nexport { waterDensity, readRecords, Load, Fastify }",
+  "packages/api/src/logic-data-schema.ts": {
+    "source": "import { waterDensity } from '@open-reloading/ballistics'\nimport { readRecords } from '@open-reloading/data'\nimport { Load } from '@open-reloading/schema'\nimport Fastify from 'fastify'\nexport { waterDensity, readRecords, Load, Fastify }",
     "rules": []
   },
   "packages/api/src/importers.ts": {
     "source": "import { parse } from '@open-reloading/importers'\nexport { parse }",
-    "rules": ["api-imports-core-data-schema-only"]
+    "rules": ["api-imports-logic-data-schema-only"]
   },
   "packages/cli/src/rows.ts": {
     "source": "export const rows = 1",
@@ -180,12 +164,12 @@
     "rules": []
   },
   "packages/cli/src/libraries.ts": {
-    "source": "import { interior } from '@open-reloading/core'\nimport { readRecords } from '@open-reloading/data'\nimport { seat } from '@open-reloading/drawing/seating'\nimport { toSi } from '@open-reloading/schema'\nexport { interior, readRecords, seat, toSi }",
+    "source": "import { interior } from '@open-reloading/ballistics'\nimport { readRecords } from '@open-reloading/data'\nimport { seat } from '@open-reloading/drawing/seating'\nimport { toSi } from '@open-reloading/schema'\nexport { interior, readRecords, seat, toSi }",
     "rules": []
   },
   "packages/cli/src/api.ts": {
     "source": "import { buildApp } from '@open-reloading/api'\nexport { buildApp }",
-    "rules": ["cli-imports-core-data-drawing-schema-only"]
+    "rules": ["cli-imports-logic-data-drawing-schema-only"]
   },
   "packages/cli/src/api-entries.ts": {
     "source": "import { runTask } from '@open-reloading/api/compute'\nimport { openCatalogue } from '@open-reloading/api/catalogue'\nexport { runTask, openCatalogue }",
@@ -193,18 +177,18 @@
   },
   "packages/cli/src/api-static.ts": {
     "source": "import { startBundleApi } from '@open-reloading/api/static'\nexport { startBundleApi }",
-    "rules": ["cli-imports-core-data-drawing-schema-only"]
+    "rules": ["cli-imports-logic-data-drawing-schema-only"]
   },
   "packages/cli/src/web.ts": {
     "source": "import type { SpecValue } from '../../../apps/web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
-    "rules": ["cli-imports-core-data-drawing-schema-only"]
+    "rules": ["cli-imports-logic-data-drawing-schema-only"]
   },
   "packages/api/src/web.ts": {
     "source": "import type { SpecValue } from '../../../apps/web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
-    "rules": ["api-imports-core-data-schema-only"]
+    "rules": ["api-imports-logic-data-schema-only"]
   },
   "apps/web/src/lib/allowed.ts": {
-    "source": "import { checkSpec } from '@open-reloading/data/plausibility'\nimport { runTask } from '@open-reloading/api/compute'\nimport { openCatalogue } from '@open-reloading/api/catalogue'\nimport { waterDensity } from '@open-reloading/core'\nimport { seating } from '@open-reloading/drawing/seating'\nexport { checkSpec, runTask, openCatalogue, waterDensity, seating }",
+    "source": "import { checkSpec } from '@open-reloading/data/plausibility'\nimport { runTask } from '@open-reloading/api/compute'\nimport { openCatalogue } from '@open-reloading/api/catalogue'\nimport { waterDensity } from '@open-reloading/ballistics'\nimport { seating } from '@open-reloading/drawing/seating'\nexport { checkSpec, runTask, openCatalogue, waterDensity, seating }",
     "rules": []
   },
   "apps/web/src/lib/alias.ts": {
@@ -234,22 +218,6 @@
   "apps/web/src/lib/api-server.ts": {
     "source": "import Fastify from 'fastify'\nexport { Fastify }",
     "rules": ["web-reads-api-only"]
-  },
-  "packages/core/src/react.ts": {
-    "source": "import { useMemo } from 'react'\nexport { useMemo }",
-    "rules": ["core-imports-units-statistics-and-ballistics"]
-  },
-  "packages/core/src/dom.ts": {
-    "source": "export const title = () => document.title",
-    "rules": ["logic-no-dom"]
-  },
-  "packages/core/src/into-web.ts": {
-    "source": "import type { SpecValue } from '../../../apps/web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
-    "rules": ["core-imports-units-statistics-and-ballistics"]
-  },
-  "packages/core/src/app-package.ts": {
-    "source": "import { App } from '@open-reloading/web'\nexport { App }",
-    "rules": ["core-imports-units-statistics-and-ballistics"]
   },
   "packages/units/src/dom.ts": {
     "source": "export const w = () => window.innerWidth",
@@ -303,10 +271,6 @@
     "source": "import load from '@open-reloading/schema/json-schema/load.json' with { type: 'json' }\nexport { load }",
     "rules": ["importers-imports-schema-and-units"]
   },
-  "packages/core/src/statistics-package.ts": {
-    "source": "import { bisect } from '@open-reloading/statistics'\nexport { bisect }",
-    "rules": []
-  },
   "packages/statistics/src/own.ts": {
     "source": "import { need } from './errors.ts'\nexport { need }",
     "rules": []
@@ -319,17 +283,13 @@
     "source": "import { z } from 'zod'\nexport { z }",
     "rules": ["statistics-imports-nothing"]
   },
-  "packages/statistics/src/into-core.ts": {
-    "source": "import { interior } from '../../core/src/index.ts'\nexport { interior }",
+  "packages/statistics/src/into-schema.ts": {
+    "source": "import { interior } from '../../schema/src/index.ts'\nexport { interior }",
     "rules": ["statistics-imports-nothing"]
   },
   "packages/units/test/same-title.test.ts": {
     "source": "import { it } from 'vitest'\nit('runs', () => {})\nit('runs', () => {})",
     "rules": ["no-identical-title"]
-  },
-  "packages/core/src/ballistics-package.ts": {
-    "source": "import { trajectory } from '@open-reloading/ballistics'\nexport { trajectory }",
-    "rules": []
   },
   "packages/ballistics/src/exterior/own.ts": {
     "source": "import { overlay } from '../settings.ts'\nimport { need } from '@open-reloading/statistics'\nimport { toSi } from '@open-reloading/units'\nexport { need, overlay, toSi }",
@@ -343,8 +303,8 @@
     "source": "import { z } from 'zod'\nexport { z }",
     "rules": ["ballistics-imports-units-and-statistics"]
   },
-  "packages/ballistics/src/into-core.ts": {
-    "source": "import { interior } from '../../core/src/index.ts'\nexport { interior }",
+  "packages/ballistics/src/into-schema.ts": {
+    "source": "import { interior } from '../../schema/src/index.ts'\nexport { interior }",
     "rules": ["ballistics-imports-units-and-statistics"]
   },
   "packages/shot-groups/src/units.ts": {

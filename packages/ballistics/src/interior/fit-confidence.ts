@@ -38,7 +38,7 @@ export type PowderInput =
 export type InputBasis = 'measured' | 'estimated'
 
 /** Default standard uncertainty of an input: relative to its value, or in K for the temperature. */
-export interface InputDefault {
+interface InputDefault {
   /** `relative` fraction of the value, or `K`. */
   unit: 'relative' | 'K'
   /** When the input is measured or entered; absent where there is no such case. */
@@ -52,7 +52,7 @@ export interface InputDefault {
  * the model page. Inputs not listed here (ignition pressure, gamma, covolume, bullet mass)
  * contribute only when the caller states an uncertainty.
  */
-export const powderInputDefaults: Readonly<Partial<Record<PowderInput, Readonly<InputDefault>>>> =
+const powderInputDefaults: Readonly<Partial<Record<PowderInput, Readonly<InputDefault>>>> =
   Object.freeze({
     caseCapacity: Object.freeze({ unit: 'relative', measured: 0.005, estimated: 0.03 }),
     propellantEnergy: Object.freeze({ unit: 'relative', estimated: 0.03 }),
@@ -445,7 +445,7 @@ export interface SimilarPowder {
 }
 
 /** Rules of the choice of similar powders and of the prior they give. */
-export interface SimilarPowderRules {
+interface SimilarPowderRules {
   /** Neighbours taken. */
   count: number
   /** Fewest neighbours for a prior from their spread; fewer give a weak prior. */
@@ -457,7 +457,7 @@ export interface SimilarPowderRules {
 }
 
 /** The rules of {@link similarPowdersPrior}. */
-export const similarPowderRules: Readonly<SimilarPowderRules> = Object.freeze({
+const similarPowderRules: Readonly<SimilarPowderRules> = Object.freeze({
   count: 5,
   minimum: 3,
   weakSigma: 1,

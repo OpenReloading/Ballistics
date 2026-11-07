@@ -1,4 +1,4 @@
-import type { InteriorLoad, PowderParameter } from '@open-reloading/core'
+import type { InteriorLoad, PowderParameter } from '@open-reloading/ballistics'
 import { useEffect, useRef, useState } from 'react'
 import {
   type HandPoint,

@@ -1,4 +1,4 @@
-import { type Interval, velocityStatistics } from '@open-reloading/core'
+import { type Interval, velocityStatistics } from '@open-reloading/statistics'
 
 /** The part of a shot the statistics read: velocity in m/s and the reason it is excluded. */
 interface StatShot {

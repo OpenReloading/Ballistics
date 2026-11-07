@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { interior, type ShotshellLoad, shotshellInterior } from '../src/index.ts'
+import { interior } from '../src/index.ts'
+import { type ShotshellLoad, shotshellInterior } from '../src/interior/shotshell.ts'
 
 /** Synthetic 12 gauge load; values are assumed, not a published load. */
 const load = (over: Partial<ShotshellLoad> = {}): ShotshellLoad => ({

@@ -1,6 +1,6 @@
 import { nth } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import { dragTables } from '../src/index.ts'
+import { dragTables } from '../src/drag-tables.ts'
 
 describe('dragTables', () => {
   it('holds every JBM table with its printed end points', () => {

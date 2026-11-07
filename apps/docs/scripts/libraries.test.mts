@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 
 const docs = fileURLToPath(new URL('../', import.meta.url))
 const root = fileURLToPath(new URL('../../../', import.meta.url))
-const libraries = ['schema', 'core', 'drawing', 'importers', 'data']
+const libraries = ['schema', 'drawing', 'importers', 'data']
 
 for (const name of libraries) {
   const pkg = `@open-reloading/${name}`

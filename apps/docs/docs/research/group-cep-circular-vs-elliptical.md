@@ -44,8 +44,8 @@ Analytic: exact populations and a closed-form limit, no measured data.
 
 ## Where in the app
 
-- `packages/core/src/groups/statistics.ts`, `groupStatistics` (`cep`, `cepElliptical`).
-- `packages/core/test/groups.test.ts`, the tests "circular against elliptical CEP by axis ratio".
+- `packages/shot-groups/src/group-statistics.ts`, `groupStatistics` (`cep`, `cepElliptical`).
+- `packages/shot-groups/test/group-statistics.test.ts`, the tests "circular against elliptical CEP by axis ratio".
 - `apps/web/src/lib/group-readouts.ts`, the CEP readout with the circular value beside it.
 - Model page: [groups](../models/groups.md).
 

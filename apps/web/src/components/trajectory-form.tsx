@@ -17,7 +17,7 @@ import {
   dragModels,
   type OmittedEffect,
   type Trajectory,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
 import { type Bullet, toSi, type UserRecord } from '@open-reloading/schema'
 import { Printer } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'

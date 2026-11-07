@@ -1,20 +1,20 @@
 import { InputError, nth } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
+import { dragTables } from '../src/drag-tables.ts'
+import { airAt, airDensity, speedOfSound } from '../src/exterior/atmosphere.ts'
+import { dragCoefficient } from '../src/exterior/drag.ts'
+import { aerodynamicJump } from '../src/exterior/stability.ts'
 import {
-  aerodynamicJump,
-  airAt,
-  airDensity,
-  type BallisticCoefficientBand,
-  type DragTable,
-  dragCoefficient,
-  dragTables,
   earthRotation,
   earthRotationRate,
-  lbPerSqInToKgPerSqM,
   normalGravity,
-  radPerMoa,
   radPerMrad,
-  speedOfSound,
+} from '../src/exterior/trajectory.ts'
+import {
+  type BallisticCoefficientBand,
+  type DragTable,
+  lbPerSqInToKgPerSqM,
+  radPerMoa,
   standardAtmosphere,
   type TrajectoryInput,
   trajectory,

@@ -7,7 +7,6 @@ import {
   cartridgeGrooveDiameterMm,
   cartridgeLandDiameterMm,
   fillLoadRatioLimit,
-  InputError,
   type InteriorLoad,
   loadRatio,
   type PressureRange,
@@ -16,7 +15,7 @@ import {
   recordSensitivity,
   solidFill,
   solidFillLimit,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
 import {
   type Bullet,
   fromSi,
@@ -26,6 +25,7 @@ import {
   toSi,
   userDataFile,
 } from '@open-reloading/schema'
+import { InputError } from '@open-reloading/statistics'
 import { z } from 'zod'
 import type { Catalogue } from '../catalogue/types.ts'
 import { assertFinite, notice, resolvedRecord, unprocessable } from './answer.ts'

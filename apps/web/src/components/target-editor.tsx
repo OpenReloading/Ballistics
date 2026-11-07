@@ -21,7 +21,7 @@ import {
   Tooltip,
 } from '@mantine/core'
 import { useElementSize, useMediaQuery, useMergedRef } from '@mantine/hooks'
-import { overlay } from '@open-reloading/core'
+import { overlay } from '@open-reloading/ballistics'
 import {
   type CalibrationReference,
   type GroupFace,

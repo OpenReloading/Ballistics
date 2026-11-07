@@ -1,5 +1,5 @@
 /** The fields of API responses the pages read (`packages/api/src/catalogue/`, `packages/api/src/compute/`, `packages/api/src/routes/`). */
-import type { InteriorResult } from '@open-reloading/core'
+import type { InteriorResult } from '@open-reloading/ballistics'
 import type {
   Cartridge,
   CaseMaterial,
@@ -139,7 +139,7 @@ export interface ListOf<T> {
 /** `POST /interior` 200 response with `model: 'm3'` (`packages/api/src/compute/interior-run.ts`). */
 export interface InteriorResponse {
   notice: string
-  /** Core's result as the API sends it: every point field. */
+  /** The interior result as the API sends it: every point field. */
   result: Pick<
     Extract<InteriorResult, { valid: true }>,
     | 'points'

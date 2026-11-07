@@ -1,4 +1,4 @@
-import { overrideResistance, recordResistance } from '@open-reloading/core'
+import { overrideResistance, recordResistance } from '@open-reloading/ballistics'
 import { expect, it } from 'vitest'
 import { fieldValueFromText, initialFields } from '../src/lib/field-spec.ts'
 import {

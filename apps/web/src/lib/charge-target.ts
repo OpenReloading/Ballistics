@@ -1,4 +1,4 @@
-import type { ChargeRange, ChargeTargetKind } from '@open-reloading/core'
+import type { ChargeRange, ChargeTargetKind } from '@open-reloading/ballistics'
 import { formatNumber, plainNumber } from '../i18n/number.ts'
 import { english, type Message, msg, type Say, type Translator } from '../i18n/translate.ts'
 import type { ErrorBody, InteriorResponse } from './api-types.ts'

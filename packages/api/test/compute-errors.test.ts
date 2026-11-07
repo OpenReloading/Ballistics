@@ -1,10 +1,10 @@
 import {
   comparePlanCandidates,
   fitTruingStrings,
-  InputError,
   trajectory,
   trueMuzzleVelocity,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
+import { InputError } from '@open-reloading/statistics'
 import { describe, expect, it, vi } from 'vitest'
 import { buildApp } from '../src/app.ts'
 import { caps } from '../src/compute/schemas.ts'
@@ -15,26 +15,27 @@ import { withApi } from './setup.ts'
 
 // millerStability by velocity: 1 throws an engine RangeError, 2 an InputError, 3 returns NaN,
 // 4 throws a typed InputError
-vi.mock('@open-reloading/core', async (importOriginal) => {
-  const core = await importOriginal<typeof import('@open-reloading/core')>()
+vi.mock('@open-reloading/ballistics', async (importOriginal) => {
+  const ballistics = await importOriginal<typeof import('@open-reloading/ballistics')>()
+  const { InputError } = await import('@open-reloading/statistics')
   return {
-    ...core,
-    millerStability: (input: Parameters<typeof core.millerStability>[0]) => {
+    ...ballistics,
+    millerStability: (input: Parameters<typeof ballistics.millerStability>[0]) => {
       if (input.velocity === 1) throw new RangeError('Invalid array length')
-      if (input.velocity === 2) throw new core.InputError('velocity 2')
+      if (input.velocity === 2) throw new InputError('velocity 2')
       if (input.velocity === 3) return Number.NaN
       if (input.velocity === 4)
-        throw new core.InputError({ code: 'matrix-size', params: { entries: 8 } })
-      return core.millerStability(input)
+        throw new InputError({ code: 'matrix-size', params: { entries: 8 } })
+      return ballistics.millerStability(input)
     },
-    trajectory: vi.fn(core.trajectory),
-    trueMuzzleVelocity: vi.fn(core.trueMuzzleVelocity),
-    comparePlanCandidates: vi.fn(core.comparePlanCandidates),
-    fitTruingStrings: vi.fn(core.fitTruingStrings),
+    trajectory: vi.fn(ballistics.trajectory),
+    trueMuzzleVelocity: vi.fn(ballistics.trueMuzzleVelocity),
+    comparePlanCandidates: vi.fn(ballistics.comparePlanCandidates),
+    fitTruingStrings: vi.fn(ballistics.fitTruingStrings),
   }
 })
 
-// in-process tasks, so the core mock applies (a worker would load the real core)
+// in-process tasks, so the ballistics mock applies (a worker would load the real ballistics)
 const api = withApi({ seed: false, compute: inlineRunner })
 
 const stability = async (velocity: number) => {

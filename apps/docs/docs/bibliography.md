@@ -131,40 +131,17 @@ Measurement data imported as values carry their license: public domain in the US
 
 ## Component data sources
 
-Cited by the bullet, powder, case capacity and manufacturer records, grouped by maker, then the project's own methods and the Wikipedia pages (CC BY-SA 4.0) that case capacities cite. The makers hold the rights to their publications, and the records carry no project licence on what the makers published (`packages/data/LICENSE`). The records may keep selected source wording in fields such as `raw` and `note`; no source table or figure is copied.
-
-### Accurate
-
-- Accurate SDS "Double Base Powders - Accurate", May 2026 (inner sheet St. Marks Powder, revision 1, 02/08/2023). <https://hodgdonpowderco.com/wp-content/uploads/2023/06/2022-Accurate-Double-Base-St-Marks-SDS.pdf>
-- Accurate SDS "Single Base Powders - Accurate", March 2022 (inner sheet General Dynamics SDS-18F003 rev. 2). <https://hodgdonpowderco.com/wp-content/uploads/2023/06/2022-Accurate-Single-Base-SDS.pdf>
+Cited by the manufacturer and case capacity records, grouped by maker, then the project's own methods and the Wikipedia pages (CC BY-SA 4.0) that case capacities cite. The makers hold the rights to their publications, and the records carry no project licence on what the makers published (`packages/data/LICENSE`). The records may keep selected source wording in fields such as `raw` and `note`; no source table or figure is copied.
 
 ### ADI World Class Powders
 
-- ADI load data web pages (rifle and pistol), 2026-10-13.
-- ADI World Class Powders news, "Bench Mark 8208 launches at Shot Show", 13 June 2012. <https://www.adiworldclass.com.au/2012/06/13/bench-mark-8208-launches-at-shot-show/>
-- ADI World Class Powders news, "Technological Advancement Results In New Pistol and Shotgun Propellant", 31 May 2018.
 - ADI World Class Powders, contact page.
-- ADI World Class Powders, FAQ "Is Hodgdon propellant the same as ADI propellant?".
-- ADI World Class Powders, pistol load data page, powder list.
 - ADI World Class Powders, rifle load data page, powder list.
 
 ### Alliant Powder
 
-- Alliant Powder product page, Power Pro 1200-R. <https://www.alliantpowder.com/products/powder/power_pro_1200-r.aspx>
-- Alliant Powder product page, Power Pro 2000-MR. <https://www.alliantpowder.com/products/powder/power_pro_2000.aspx>
-- Alliant Powder product page, Power Pro 4000-MR. <https://www.alliantpowder.com/products/powder/power_pro_4000.aspx>
-- Alliant Powder product page, Power Pro Varmint. <https://www.alliantpowder.com/products/powder/power_pro_varmint.aspx>
-- Alliant Powder Reloader's Guide 2023.
-- Alliant Powder SDS "15-25 Smokeless Powder", revision 03/01/2017, version 2.0. <https://www.alliantpowder.com/downloads/sds/15-25_Smokeless_Powder.pdf>
-- Alliant Powder SDS "30-40 Smokeless Powder", revision 03/01/2017, version 2.1.
-- Alliant Powder SDS "Reloder Series Smokeless Powders, AR-Comp", revision 03/02/2017, version 2.0.
 - Alliant Powder, questions page. <https://www.alliantpowder.com/questions/default.aspx>
 - Alliant Reloader's Guide 2023, metallic tables.
-- Alliant safety data sheet "15-25 Smokeless Powder", revision 03/01/2017.
-- Alliant safety data sheet "30-40 Smokeless Powder", revision 03/01/2017.
-- Alliant safety data sheet "American Select". <https://www.alliantpowder.com/downloads/sds/AmericanSelect.pdf>
-- Alliant safety data sheet "Reloder Series Smokeless Powders, AR-Comp".
-- Alliant safety data sheet for Reloder 17, 26, 33 and 50.
 
 ### Berger Bullets
 
@@ -175,127 +152,31 @@ Cited by the bullet, powder, case capacity and manufacturer records, grouped by 
 
 - Cutting Edge Bullets technical data sheets 2026.
 - Cutting Edge Bullets, contact page. <https://cuttingedgebullets.com/pages/contact-cutting-edge-bullets>
-- Cutting Edge Bullets, home page. <https://cuttingedgebullets.com/>
 
 ### Explosia a.s.
 
 - Explosia a.s., contacts page. <https://explosia.cz/en/contacts/>
-- Explosia a.s., Propellants civil catalogue 2023 (EN).
 - LOVEX Reloading Guide EN 37 (Explosia a.s.).
-- LOVEX Reloading Guide EN 37 (Explosia).
 
 ### Hammer Bullets
 
 - Hammer Bullets store (WooCommerce Store API).
 - Hammer Bullets, about page. <https://hammerbullets.com/about-us/>
-- Hammer Bullets, home page. <https://hammerbullets.com/>
 
 ### Hodgdon Powder Co.
 
-- Hodgdon Annual Manual 2025.
-- Hodgdon Annual Manual 2025, rifle and pistol tables.
 - Hodgdon Powder Co. product page, 700X® Shotshell Powder.
-- Hodgdon Powder Co. product page, Accuarte No. 5® Pistol Powder. <https://shop.hodgdon.com/accurate-no-5/>
-- Hodgdon Powder Co. product page, Accurate #11FS® Pistol Powder. <https://shop.hodgdon.com/accurate-11fs/>
-- Hodgdon Powder Co. product page, Accurate #7 Pistol Powder. <https://shop.hodgdon.com/accurate-no-7/>
-- Hodgdon Powder Co. product page, Accurate #9® Pistol Powder. <https://shop.hodgdon.com/accurate-no-9/>
 - Hodgdon Powder Co. product page, Accurate 1680® Rifle Powder.
-- Hodgdon Powder Co. product page, Accurate 2015® Rifle Powder. <https://shop.hodgdon.com/accurate-2015/>
-- Hodgdon Powder Co. product page, Accurate 2200® Rifle Powder. <https://shop.hodgdon.com/accurate-2200/>
-- Hodgdon Powder Co. product page, Accurate 2230® Rifle Powder. <https://shop.hodgdon.com/accurate-2230/>
-- Hodgdon Powder Co. product page, Accurate 2460® Rifle Powder. <https://shop.hodgdon.com/accurate-2460/>
-- Hodgdon Powder Co. product page, Accurate 2495® Rifle Powder. <https://shop.hodgdon.com/accurate-2495/>
-- Hodgdon Powder Co. product page, Accurate 2520® Rifle Powder. <https://shop.hodgdon.com/accurate-2520/>
-- Hodgdon Powder Co. product page, Accurate 2700® Rifle Powder. <https://shop.hodgdon.com/accurate-2700/>
-- Hodgdon Powder Co. product page, Accurate 4064® Rifle Powder. <https://shop.hodgdon.com/accurate-4064/>
-- Hodgdon Powder Co. product page, Accurate 4100® Pistol Powder. <https://shop.hodgdon.com/accurate-4100/>
-- Hodgdon Powder Co. product page, Accurate 4350® Rifle Powder. <https://shop.hodgdon.com/accurate-4350/>
-- Hodgdon Powder Co. product page, Accurate 5744® Rifle Powder. <https://shop.hodgdon.com/accurate-5744/>
-- Hodgdon Powder Co. product page, Accurate LT30® Rifle Powder. <https://shop.hodgdon.com/accurate-lt-30/>
-- Hodgdon Powder Co. product page, Accurate LT32® Rifle Powder. <https://shop.hodgdon.com/accurate-lt-32/>
-- Hodgdon Powder Co. product page, Accurate MAGPRO® Rifle Powder. <https://shop.hodgdon.com/accurate-magpro/>
-- Hodgdon Powder Co. product page, Accurate Nitro 100NF. <https://shop.hodgdon.com/nitro-100-new-formulation/>
-- Hodgdon Powder Co. product page, Accurate No.2® Pistol Powder. <https://shop.hodgdon.com/accurate-no-2/>
-- Hodgdon Powder Co. product page, Accurate TCM® Pistol Powder. <https://shop.hodgdon.com/accurate-tcm/>
-- Hodgdon Powder Co. product page, CFE 223® Rifle Powder. <https://shop.hodgdon.com/hodgdon-cfe-223/>
-- Hodgdon Powder Co. product page, H1000® Extreme Rifle® Powder. <https://shop.hodgdon.com/hodgdon-h1000/>
-- Hodgdon Powder Co. product page, H110® Shotshell and Pistol Powder. <https://shop.hodgdon.com/hodgdon-h110/>
-- Hodgdon Powder Co. product page, H335® Rifle Powder. <https://shop.hodgdon.com/hodgdon-h335/>
-- Hodgdon Powder Co. product page, H4198® Extreme Rifle® Powder. <https://shop.hodgdon.com/hodgdon-h4198/>
-- Hodgdon Powder Co. product page, H4350® Extreme Rifle® Powder. <https://shop.hodgdon.com/hodgdon-h4350/>
-- Hodgdon Powder Co. product page, H4831SC® Extreme Rifle Powder. <https://shop.hodgdon.com/hodgdon-h4831sc/>
-- Hodgdon Powder Co. product page, H4831® Extreme Rifle® Powder. <https://shop.hodgdon.com/hodgdon-h4831/>
-- Hodgdon Powder Co. product page, H4895® Extreme Rifle Powder. <https://shop.hodgdon.com/hodgdon-h4895/>
-- Hodgdon Powder Co. product page, Hodgdon 322® Extreme Rifle Powder. <https://shop.hodgdon.com/hodgdon-h322/>
-- Hodgdon Powder Co. product page, Hodgdon 50BMG Extreme Rifle® Powder. <https://shop.hodgdon.com/hodgdon-h50bmg/>
-- Hodgdon Powder Co. product page, Hodgdon Benchmark® Extreme Rifle® Powder. <https://shop.hodgdon.com/hodgdon-benchmark/>
-- Hodgdon Powder Co. product page, Hodgdon BL-C(2)® Rifle Powder. <https://shop.hodgdon.com/hodgdon-bl-c-2/>
-- Hodgdon Powder Co. product page, Hodgdon CFE® Black BLK Rifle Powder. <https://shop.hodgdon.com/hodgdon-cfe-blk/>
-- Hodgdon Powder Co. product page, Hodgdon CFE® Pistol Handgun Powder. <https://shop.hodgdon.com/hodgdon-cfe-pistol/>
-- Hodgdon Powder Co. product page, Hodgdon Clays® Shotshell Powder. <https://shop.hodgdon.com/hodgdon-clays/>
-- Hodgdon Powder Co. product page, Hodgdon H380® Rifle Powder. <https://shop.hodgdon.com/hodgdon-h380/>
-- Hodgdon Powder Co. product page, Hodgdon HP-38® Pistol Powder. <https://shop.hodgdon.com/hodgdon-hp-38/>
-- Hodgdon Powder Co. product page, Hodgdon HS-6® Shotshell and Pistol Powder. <https://shop.hodgdon.com/hodgdon-hs-6/>
-- Hodgdon Powder Co. product page, Hodgdon LEVERevolution® by Hornady Rifle Powder. <https://shop.hodgdon.com/hodgdon-leverevolution/>
-- Hodgdon Powder Co. product page, Hodgdon Lil'Gun® Shotshell Powder. <https://shop.hodgdon.com/hodgdon-lil-gun/>
-- Hodgdon Powder Co. product page, Hodgdon Longshot® Shotshell Powder. <https://shop.hodgdon.com/hodgdon-longshot/>
-- Hodgdon Powder Co. product page, Hodgdon Retumbo® Extreme Rifle® Powder. <https://shop.hodgdon.com/hodgdon-retumbo/>
-- Hodgdon Powder Co. product page, Hodgdon Superformance® by Hornady Rifle Powder. <https://shop.hodgdon.com/hodgdon-suprform/>
-- Hodgdon Powder Co. product page, Hodgdon Titewad® Shotshell Powder. <https://shop.hodgdon.com/hodgdon-titewad/>
-- Hodgdon Powder Co. product page, Hodgdon Trail Boss® Cowboy Action Powder. <https://shop.hodgdon.com/hodgdon-trail-boss/>
-- Hodgdon Powder Co. product page, Hodgdon Universal® Shotshell Powder. <https://shop.hodgdon.com/hodgdon-universal/>
-- Hodgdon Powder Co. product page, Hybrid 100V® Rifle Powder. <https://shop.hodgdon.com/hodgdon-hybrid-100v/>
-- Hodgdon Powder Co. product page, IMR 3031® Rifle Powder. <https://shop.hodgdon.com/imr-3031/>
-- Hodgdon Powder Co. product page, IMR 4064® Rifle Powder. <https://shop.hodgdon.com/imr-4064/>
-- Hodgdon Powder Co. product page, IMR 4198® Rifle Powder. <https://shop.hodgdon.com/imr-4198/>
-- Hodgdon Powder Co. product page, IMR 4227® Rifle Powder. <https://shop.hodgdon.com/imr-4227/>
-- Hodgdon Powder Co. product page, IMR 4350® Rifle Powder. <https://shop.hodgdon.com/imr-4350/>
-- Hodgdon Powder Co. product page, IMR 4831® Rifle Powder. <https://shop.hodgdon.com/imr-4831/>
-- Hodgdon Powder Co. product page, IMR 4895® Rifle Powder. <https://shop.hodgdon.com/imr-4895/>
-- Hodgdon Powder Co. product page, IMR 7828 SSC® Rifle Powder. <https://shop.hodgdon.com/imr-7828-ssc/>
-- Hodgdon Powder Co. product page, IMR 8208 XBR® Extreme Rifle Powder. <https://shop.hodgdon.com/imr-8208-xbr/>
 - Hodgdon Powder Co. product page, Ramshot Big Game® Rifle Powder.
-- Hodgdon Powder Co. product page, Ramshot Competition® Shotshell Powder. <https://shop.hodgdon.com/ramshot-competition/>
-- Hodgdon Powder Co. product page, Ramshot Enforcer® Pistol Powder. <https://shop.hodgdon.com/ramshot-enforcer/>
-- Hodgdon Powder Co. product page, Ramshot Grand® Rifle Powder. <https://shop.hodgdon.com/ramshot-grand/>
-- Hodgdon Powder Co. product page, Ramshot Hunter® Rifle Powder. <https://shop.hodgdon.com/ramshot-hunter/>
-- Hodgdon Powder Co. product page, Ramshot LRT® Rifle Powder. <https://shop.hodgdon.com/ramshot-lrt/>
-- Hodgdon Powder Co. product page, Ramshot Magnum® Rifle Powder. <https://shop.hodgdon.com/ramshot-magnum/>
-- Hodgdon Powder Co. product page, Ramshot Silhouette® Pistol Powder. <https://shop.hodgdon.com/ramshot-silhouette/>
-- Hodgdon Powder Co. product page, Ramshot TAC® Rifle Powder. <https://shop.hodgdon.com/ramshot-tac/>
-- Hodgdon Powder Co. product page, Ramshot True Blue® Pistol Powder. <https://shop.hodgdon.com/ramshot-true-blue/>
-- Hodgdon Powder Co. product page, Ramshot X-Terminator® Rifle Powder. <https://shop.hodgdon.com/ramshot-x-terminator/>
-- Hodgdon Powder Co. product page, Ramshot Zip® Pistol Powder. <https://shop.hodgdon.com/ramshot-zip/>
-- Hodgdon Powder Co. product page, Titegroup® Pistol and Shotshell Powder. <https://shop.hodgdon.com/hodgdon-titegroup/>
-- Hodgdon Powder Co. product page, US 869® Rifle Powder. <https://shop.hodgdon.com/hodgdon-us-869/>
-- Hodgdon Powder Co. product page, Varget® Extreme Rifle® Powder. <https://shop.hodgdon.com/hodgdon-varget/>
-- Hodgdon Powder Co. product page, Winchester 231® Pistol Powder. <https://shop.hodgdon.com/winchester-231/>
-- Hodgdon Powder Co. product page, Winchester 296® Shotshell and Pistol Powder. <https://shop.hodgdon.com/winchester-296/>
-- Hodgdon Powder Co. product page, Winchester 572® Shotshell and Pistol Powder. <https://shop.hodgdon.com/winchester-572/>
-- Hodgdon Powder Co. product page, Winchester 748® Shotshell and Pistol Powder. <https://shop.hodgdon.com/winchester-748/>
-- Hodgdon Powder Co. product page, Winchester 760® Rifle Powder. <https://shop.hodgdon.com/winchester-760/>
-- Hodgdon Powder Co. product page, Winchester AA Super Field Shotshell and Pistol Powder. <https://shop.hodgdon.com/winchester-super-field/>
-- Hodgdon Powder Co. product page, Winchester AutoComp® Pistol Powder. <https://shop.hodgdon.com/winchester-autocomp/>
-- Hodgdon Powder Co. product page, Winchester StaBALL 6.5® Rifle Powder. <https://shop.hodgdon.com/winchester-staball-6-5/>
-- Hodgdon Powder Co. product page, Winchester StaBALL HD® Rifle Powder. <https://shop.hodgdon.com/winchester-staball-hd/>
-- Hodgdon Powder Co. product page, Winchester StaBALL Match® Rifle Powder. <https://shop.hodgdon.com/winchester-staball-match/>
-- Hodgdon Powder Co. product page, Winchester Super Target® Shotshell Powder. <https://shop.hodgdon.com/winchester-wst/>
-- Hodgdon Powder Co. product page, Winchester WinClean 244® Pistol Powder. <https://shop.hodgdon.com/winchester-winclean-244/>
-- Hodgdon safety data sheet "Spherical Powders", February 2022 cover. <https://hodgdonpowderco.com/wp-content/uploads/2023/04/2022-hodgdon-spherical-powders-sds.pdf>
-- Hodgdon SDS "Extruded Rifle Powders", February 2022 (inner sheet "Propellant AR22 Series", Chemwatch 5189-29, version 7.1).
-- Hodgdon SDS "Extruded Rifle Powders", February 2022, Benchmark (inner sheet "Propellant BM2", Chemwatch 4693-84). <https://hodgdonpowderco.com/wp-content/uploads/2023/04/2022-bm2-sds.pdf>
-- Hodgdon SDS "Spherical Powders", February 2022 (inner sheet St. Marks Powder "BALL POWDER Propellant", revision 10, 12/11/2021).
 - Hodgdon Powder Company, locations page. <https://hodgdonpowderco.com/locations/>
 
 ### Hornady Manufacturing
 
 - Hornady 2026 Product Catalog.
-- Hornady Manufacturing. <https://www.hornady.com/bullets/rifle/30-cal-308-168-gr-bthp-match>
 - Hornady, contact page. <https://www.hornady.com/contact>
 
 ### IMR
 
-- IMR safety data sheet "Single Base Powders", February 2022 cover. <https://hodgdonpowderco.com/wp-content/uploads/2023/04/2022-imr-single-base-sds.pdf>
 - IMR SDS "Single Base Powders", February 2022 (inner sheet General Dynamics OTS Canada Valleyfield, SDS-19C001 rev. 1).
 
 ### Lapua
@@ -311,20 +192,11 @@ Cited by the bullet, powder, case capacity and manufacturer records, grouped by 
 ### Missouri Bullet Company
 
 - Missouri Bullet Company, pricing page.
-- Missouri Bullet Company, home page. <https://missouribullet.com/>
 - Missouri Bullet Company, about page. <https://missouribullet.com/AboutUs.php>
 
 ### Norma
 
 - Norma product page, Norma 200.
-- Norma product page, Norma 201. <https://www.norma-ammunition.com/products/components/gunpowder/norma-201---20902015>
-- Norma product page, Norma 202. <https://www.norma-ammunition.com/products/components/gunpowder/norma-202---20902025>
-- Norma product page, Norma 203-B. <https://www.norma-ammunition.com/products/components/gunpowder/norma-203-b---20902035>
-- Norma product page, Norma 204. <https://www.norma-ammunition.com/products/components/gunpowder/norma-204---20902045>
-- Norma product page, Norma 217. <https://www.norma-ammunition.com/products/components/gunpowder/norma-217---20902175>
-- Norma product page, Norma MRP. <https://www.norma-ammunition.com/products/components/gunpowder/norma-mrp---20902155>
-- Norma product page, Norma URP. <https://www.norma-ammunition.com/products/components/gunpowder/norma-urp---20902195>
-- Norma reloading data web pages, 2026-10-13.
 - Norma, imprint. <https://www.norma-ammunition.com/about-norma/impressum>
 
 ### Nosler
@@ -332,27 +204,9 @@ Cited by the bullet, powder, case capacity and manufacturer records, grouped by 
 - Nosler, home page. <https://www.nosler.com/>
 - Nosler.
 
-### Ramshot
-
-- Ramshot SDS "Double Base Powders - Ramshot", March 2022, TAC (inner sheet St. Marks Powder, revision 10, 12/11/2021). <https://hodgdonpowderco.com/wp-content/uploads/2023/06/2022-Ramshot-TAC-SDS.pdf>
-
 ### Reload Swiss
 
 - Reload Swiss data sheet RS12 (EN).
-- Reload Swiss data sheet RS14 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS14/RS14-EN.pdf>
-- Reload Swiss data sheet RS20 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS20/RS20-EN.pdf>
-- Reload Swiss data sheet RS24 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS24/RS24-EN.pdf>
-- Reload Swiss data sheet RS30 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS30/RS30-EN.pdf>
-- Reload Swiss data sheet RS36 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS36/RS36-EN.pdf>
-- Reload Swiss data sheet RS40 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS40/RS40-EN.pdf>
-- Reload Swiss data sheet RS50 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS50/RS50-EN.pdf>
-- Reload Swiss data sheet RS52 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS52/RS52-EN.pdf>
-- Reload Swiss data sheet RS60 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS60/RS60-EN.pdf>
-- Reload Swiss data sheet RS62 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS62/RS62-EN.pdf>
-- Reload Swiss data sheet RS70 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS70/RS70-EN.pdf>
-- Reload Swiss data sheet RS76 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS76/RS76-EN.pdf>
-- Reload Swiss data sheet RS80 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS80/RS80-EN.pdf>
-- Reload Swiss loading data web table, 2026-10-12.
 - Reload Swiss, career page. <https://www.reload-swiss.com/en/about-us/career>
 
 ### RWS
@@ -369,7 +223,6 @@ Cited by the bullet, powder, case capacity and manufacturer records, grouped by 
 ### Sellier & Bellot
 
 - Sellier & Bellot, component bullets (pistol and revolver table).
-- Sellier & Bellot, component bullets (rifle table).
 - Sellier & Bellot, contacts page. <https://www.sellier-bellot.cz/en/contacts/>
 
 ### Sierra Bullets
@@ -380,38 +233,21 @@ Cited by the bullet, powder, case capacity and manufacturer records, grouped by 
 ### Vectan
 
 - Vectan catalogue 12/2023, powder ranges.
-- Vectan catalogue 2023-12.
 - Vectan, mentions légales. <https://www.vectan.fr/FR/mentions-legales>
 
 ### Vihtavuori
 
-- Vihtavuori product page, 3N37. <https://vihtavuori.com/powder/3n37-powder/>
-- Vihtavuori product page, N310. <https://vihtavuori.com/powder/n310-handgun-powder/>
-- Vihtavuori product page, N320. <https://vihtavuori.com/powder/n320-handgun-powder/>
-- Vihtavuori product page, N340. <https://vihtavuori.com/powder/n340-handgun-powder/>
-- Vihtavuori reloading data, release 14.9.2026.
 - Vihtavuori safety data sheet "N-Powder (Centralite)", revised 03/12/2025, version 2.
-- Vihtavuori safety data sheet "N-Powder High Energy N500 series", revised 04/12/2025, version 2.
-- Vihtavuori safety data sheet "N-Powder", revised 03/12/2025, version 2.
-- Vihtavuori SDS "N-Powder (Centralite)", revised 03/12/2025, version 2.
-- Vihtavuori SDS "N-Powder High Energy N500 series", revised 04/12/2025, version 2.
-- Vihtavuori SDS "N-Powder", revised 03/12/2025, version 2.
 - Vihtavuori, contact information. <https://vihtavuori.com/company/vihtavuori/contact-information/>
 
 ### Western Powders
 
 - Western Powders Handloading Guide 8.0.
-- Western Powders Handloading Guide 8.0 (Accurate, Ramshot).
 - Shooting Illustrated, "Hodgdon Acquires Several Western Powder Brands", 2020-10-15. <https://www.shootingillustrated.com/articles/2020/10/15/hodgdon-acquires-several-western-powder-brands/>
 
 ### Winchester
 
 - Winchester SDS "BALL Powder Propellant", November 2022 (inner sheet St. Marks Powder, revision 10, 12/11/2021).
-
-### OpenReloading
-
-- Mapping of the maker wording to the construction fields (docs/data/bullet-construction.md).
-- OpenReloading constant-volume equilibrium solver.
 
 ### Wikipedia
 

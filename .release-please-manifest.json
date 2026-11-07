@@ -1,6 +1,5 @@
 {
   "packages/schema": "0.0.5",
-  "packages/core": "0.0.4",
   "packages/drawing": "0.0.4",
   "packages/importers": "0.0.5",
   "packages/data": "0.0.5",

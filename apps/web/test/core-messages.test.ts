@@ -363,14 +363,18 @@ describe('the request failures of the app', () => {
 })
 
 /** The package sources whose messages can reach the app through the API. */
-const sources = (['core', 'statistics', 'ballistics', 'api'] as const).flatMap((pkg) =>
-  readdirSync(new URL(`../../../packages/${pkg}/src`, import.meta.url), {
-    recursive: true,
-    encoding: 'utf8',
-  })
-    .filter((f) => f.endsWith('.ts'))
-    .map((f) => `${pkg}/src/${f}`),
-)
+const sources = [
+  ...(['statistics', 'ballistics', 'api'] as const).flatMap((pkg) =>
+    readdirSync(new URL(`../../../packages/${pkg}/src`, import.meta.url), {
+      recursive: true,
+      encoding: 'utf8',
+    })
+      .filter((f) => f.endsWith('.ts'))
+      .map((f) => `${pkg}/src/${f}`),
+  ),
+  // the rest of shot-groups raises typed issues only
+  'shot-groups/src/group-statistics.ts',
+]
 
 /** Files whose messages are no fixed text, each with the reason. */
 const dynamicFiles: Record<string, string> = {
@@ -539,7 +543,7 @@ describe('the messages of the packages', () => {
     expect(texts).toContain('Unknown field')
   })
 
-  it('maps every message of core and the API', () => {
+  it('maps every message of the packages and the API', () => {
     expect(unmapped('7')).toEqual([])
   })
 

@@ -1,4 +1,4 @@
-import { type LadderFlatSpots, ladderFlatSpots } from '@open-reloading/core'
+import { type LadderFlatSpots, ladderFlatSpots } from '@open-reloading/ballistics'
 import type { ChronoImport } from '@open-reloading/importers'
 import { fromSi, type SessionRecord, toSi } from '@open-reloading/schema'
 import type { Shot } from './chrono.ts'

@@ -1,6 +1,6 @@
 import { nth } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import { type Rhs, rk45 } from '../src/index.ts'
+import { type Rhs, rk45 } from '../src/exterior/rk45.ts'
 
 const decay: Rhs = (_t, y, dy) => {
   dy[0] = -nth(y, 0)

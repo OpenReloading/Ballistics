@@ -1,4 +1,4 @@
-import { leastSpecValue } from '@open-reloading/core'
+import { leastSpecValue } from '@open-reloading/ballistics'
 import {
   type Bullet,
   bulletListFields,

@@ -3,14 +3,13 @@ import { describe, expect, it } from 'vitest'
 import {
   chargeTooSmall,
   chargeTooSmallRatio,
-  closedVessel,
   convectiveDefaults,
   type InteriorLoad,
   type InteriorOptions,
   type InteriorPoint,
   interior,
-  leakFlowFactor,
 } from '../src/index.ts'
+import { closedVessel, leakFlowFactor } from '../src/interior/model.ts'
 import { m3Load } from './fixtures.ts'
 
 const pref = 98066.5

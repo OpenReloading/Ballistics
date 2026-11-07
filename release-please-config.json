@@ -23,7 +23,6 @@
   ],
   "packages": {
     "packages/schema": { "component": "schema" },
-    "packages/core": { "component": "core" },
     "packages/drawing": { "component": "drawing" },
     "packages/importers": { "component": "importers" },
     "packages/data": { "component": "data" },

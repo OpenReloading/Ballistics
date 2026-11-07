@@ -35,7 +35,6 @@ exclude = [
   '^https://chromedevtools\.github\.io/devtools-protocol/#/Emulation\.setCPUThrottlingRate$',
   # The site root serves the docs of the latest release, and no release has them yet. Drop these at the first release.
   '^https://openreloading\.github\.io/Ballistics/docs/feedback-tasks/$',
-  '^https://openreloading\.github\.io/Ballistics/docs/libraries/core/$',
   '^https://openreloading\.github\.io/Ballistics/docs/libraries/data/$',
   '^https://openreloading\.github\.io/Ballistics/docs/libraries/drawing/$',
   '^https://openreloading\.github\.io/Ballistics/docs/libraries/importers/$',

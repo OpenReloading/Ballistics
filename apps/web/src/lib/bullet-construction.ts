@@ -1,4 +1,4 @@
-import { type DensityClass, structureOf } from '@open-reloading/core'
+import { type DensityClass, structureOf } from '@open-reloading/ballistics'
 import type { Bullet } from '@open-reloading/schema'
 import { type Message, msg } from '../i18n/translate.ts'
 
@@ -18,6 +18,6 @@ export const effectiveDensity: Record<
   unknown: { value: 6.8, error: 0.332, name: msg('construction unknown') },
 }
 
-/** The class of the record's `construction.structure` (`bulletStructures` of core); not stated is unknown. */
+/** The class of the record's `construction.structure` (`bulletStructures` of ballistics); not stated is unknown. */
 export const classOf = (construction: Bullet['construction'] | undefined): DensityClass =>
   structureOf(construction?.structure)?.density ?? 'unknown'

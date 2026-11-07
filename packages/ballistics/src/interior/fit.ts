@@ -141,7 +141,7 @@ export interface PowderFitOptions {
 }
 
 /** Default relative margin of a fit's `domain`: the range edge, outside which the interval loses coverage once the model has any error. */
-export const powderDomainMargin = 0
+const powderDomainMargin = 0
 
 /** Relative tolerance above the barrel length and bore diameter of the data, for values rounded in the input. */
 const powderDomainTolerance = 0.025

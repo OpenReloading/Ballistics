@@ -4,7 +4,7 @@
  * standard uncertainties of the fitted vivacity.
  */
 
-import { dynamicVivacity, meanDynamicVivacity, type VivacityBurn } from '@open-reloading/core'
+import { dynamicVivacity, meanDynamicVivacity, type VivacityBurn } from '@open-reloading/ballistics'
 import { type Powder, toSi } from '@open-reloading/schema'
 import { formatNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator, translator } from '../i18n/translate.ts'

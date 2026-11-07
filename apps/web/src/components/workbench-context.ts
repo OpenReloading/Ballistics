@@ -1,6 +1,6 @@
 'use client'
 
-import type { LoadNote, LoadNoteRule } from '@open-reloading/core'
+import type { LoadNote, LoadNoteRule } from '@open-reloading/ballistics'
 import type { Powder, SessionRecord } from '@open-reloading/schema'
 import type { Context, Dispatch, RefObject, SetStateAction } from 'react'
 import { createContext, useContext } from 'react'

@@ -1,17 +1,15 @@
 import { InputError, nth } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
+import { type InteriorLoad, interior, PowderFitError } from '../src/index.ts'
 import {
   type ChargedTrace,
   type CurveFitOptions,
   type CurveParameterReport,
   fitPressureCurve,
   fitPressureCurves,
-  type InteriorLoad,
-  interior,
-  PowderFitError,
   type PressureHistory,
   type PressureSensor,
-} from '../src/index.ts'
+} from '../src/interior/curve-fit.ts'
 import { normals } from './random.ts'
 
 interface Burn {

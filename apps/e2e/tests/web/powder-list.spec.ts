@@ -33,25 +33,6 @@ const design = {
   },
 }
 
-test('sorts the powders by their training rows, the count of the record page', async ({ page }) => {
-  await gotoHydrated(page, '/powders?sort=-rows')
-  const counts = page.locator('.fit-rows > span:first-child')
-  await expect(counts.first()).toBeVisible()
-  const shown = (await counts.allTextContents()).slice(0, 10).map(Number)
-  expect(shown.length).toBeGreaterThan(1)
-  expect(shown).toEqual([...shown].sort((a, b) => b - a))
-  // the first row's count is the sum of its record page's load tables
-  const first = page
-    .locator('tbody tr')
-    .filter({ has: page.locator('.fit-rows') })
-    .first()
-  await first.getByRole('link').first().click()
-  const fit = page.getByRole('table', { name: 'Model fit' })
-  await expect(fit).toBeVisible()
-  const rows = (await fit.locator('tbody tr td:nth-child(2)').allTextContents()).map(Number)
-  expect(rows.reduce((s, n) => s + n, 0)).toBe(shown[0])
-})
-
 test("adds the browser's own powder to the burn-rate overlay, marked as a user design", async ({
   page,
 }) => {

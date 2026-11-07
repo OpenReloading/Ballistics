@@ -42,7 +42,7 @@ export interface SamplingOptions {
 }
 
 /** The two outputs of one draw. */
-export interface SampledRun {
+interface SampledRun {
   /** Peak breech pressure, Pa. */
   pressure: number
   /** Muzzle velocity, m/s. */

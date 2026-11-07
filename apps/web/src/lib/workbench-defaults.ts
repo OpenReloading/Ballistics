@@ -1,4 +1,4 @@
-import { defaultStartPressure, handgunBarrelLengthLimit } from '@open-reloading/core'
+import { defaultStartPressure, handgunBarrelLengthLimit } from '@open-reloading/ballistics'
 import { msg } from '../i18n/translate.ts'
 import { storageName } from './edition.ts'
 import { interiorFields } from './interior-input.ts'

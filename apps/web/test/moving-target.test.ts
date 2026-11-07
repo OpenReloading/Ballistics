@@ -1,4 +1,4 @@
-import type { TrajectoryPoint } from '@open-reloading/core'
+import type { TrajectoryPoint } from '@open-reloading/ballistics'
 import { describe, expect, it } from 'vitest'
 import { movingTargetRows } from '../src/lib/moving-target.ts'
 

@@ -41,7 +41,7 @@ export interface OutlineDragInput {
  * Result warnings: diameter outside 4 to 400 mm, a Mach number outside 0.5 to 5, nose under 1
  * caliber, boat tail over 1.5 calibers, base under 0.65 caliber, or a negative base pressure ratio.
  */
-export type OutlineDragWarning =
+type OutlineDragWarning =
   | 'diameter-range'
   | 'mach-range'
   | 'nose-short'
@@ -50,7 +50,7 @@ export type OutlineDragWarning =
   | 'base-pressure-negative'
 
 /** Zero-yaw drag coefficient at one Mach number, with its parts. */
-export interface OutlineDragNode {
+interface OutlineDragNode {
   /** Mach number. */
   mach: number
   /** Total zero-yaw drag coefficient on area pi d^2 / 4. */

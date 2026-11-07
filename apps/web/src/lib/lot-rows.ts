@@ -1,4 +1,4 @@
-import { type InteriorLoad, interiorApply } from '@open-reloading/core'
+import { type InteriorLoad, interiorApply } from '@open-reloading/ballistics'
 import { formatNumber } from '../i18n/number.ts'
 import type { Translator } from '../i18n/translate.ts'
 import { longerBody } from './barrel-length.ts'

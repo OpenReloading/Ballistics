@@ -1,4 +1,4 @@
-import { movingTargetLead, type TrajectoryPoint } from '@open-reloading/core'
+import { movingTargetLead, type TrajectoryPoint } from '@open-reloading/ballistics'
 
 /** The lead at one range of the trajectory table (SI: m, s, rad). */
 export interface MovingTargetRow {
@@ -14,7 +14,7 @@ export interface MovingTargetRow {
 
 /**
  * The lead at each range of `points` for a target moving at `speed` m/s on `heading` rad
- * (`movingTargetLead` of core), the time of flight read from each point. `targetLength` (m) turns
+ * (`movingTargetLead` of ballistics), the time of flight read from each point. `targetLength` (m) turns
  * the lateral lead into target lengths.
  */
 export function movingTargetRows(

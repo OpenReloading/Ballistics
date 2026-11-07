@@ -5,7 +5,7 @@ import {
   pressureToleranceDefaults,
   recordResistance,
   trajectory,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
 import { bulletDimensions } from '@open-reloading/drawing/bullet'
 import { firearm, sheetId, userRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'

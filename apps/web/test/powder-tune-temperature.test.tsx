@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core'
-import { type InteriorLoad, interior } from '@open-reloading/core'
+import { type InteriorLoad, interior } from '@open-reloading/ballistics'
 import { fromSi, type SessionRecord, userRecord } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'

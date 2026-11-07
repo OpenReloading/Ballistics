@@ -160,6 +160,14 @@ test('an unknown path answers 404 with the section links', async ({ page }) => {
     )
 })
 
+test('a record id the catalogue does not hold, as after its removal, answers 404 with the not-found page', async ({
+  page,
+}) => {
+  const res = await page.goto('/bullets/no-such-bullet/')
+  expect(res?.status()).toBe(404)
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Page not found')
+})
+
 test('the drawer marks the current page and its rows are at least 44 px high', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/bullets')

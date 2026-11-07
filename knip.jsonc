@@ -13,7 +13,7 @@
       "entry": ["src/index.ts"]
     },
     "packages/ballistics": {
-      "entry": ["src/index.ts"]
+      "entry": ["src/index.ts", "scripts/*.mts"]
     },
     "tooling/test-kit": {
       "entry": ["src/index.ts"]
@@ -22,12 +22,9 @@
       "entry": ["src/index.ts"]
     },
     "packages/shot-groups": {
-      "entry": ["src/index.ts"],
+      "entry": ["src/index.ts", "scripts/*.mts"],
       // the event types and target faces of data's records are read by path in the tests, declared so the CI plan tests shot-groups with them
       "ignoreDependencies": ["@open-reloading/data"]
-    },
-    "packages/core": {
-      "entry": ["src/index.ts", "scripts/*.mts"]
     },
     "packages/importers": {
       "entry": ["src/index.ts"]
@@ -71,13 +68,13 @@
         // its stylesheet is imported by src/css/custom.css, which knip does not read
         "katex",
         // imported by the examples of the library pages, which scripts/libraries.test.mts runs from this folder
-        "@open-reloading/core",
         "@open-reloading/data",
         "@open-reloading/drawing",
         "@open-reloading/importers",
         "@open-reloading/schema",
         // files these name in `Code:` lines and the research log, or that the docs tests import by path, so the CI
         // plan tests the docs when they change
+        "@open-reloading/ballistics",
         "@open-reloading/cli",
         "@open-reloading/tools",
         "@open-reloading/web"

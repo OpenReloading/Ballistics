@@ -3,7 +3,7 @@
 import { Button, Menu } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { spotlight } from '@mantine/spotlight'
-import { bulletWindow } from '@open-reloading/core'
+import { bulletWindow } from '@open-reloading/ballistics'
 import { toSi, type UserRecord } from '@open-reloading/schema'
 import { MagnifyingGlass, Play, Printer } from '@phosphor-icons/react'
 import {

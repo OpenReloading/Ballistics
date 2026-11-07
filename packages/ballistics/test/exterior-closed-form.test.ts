@@ -1,10 +1,9 @@
 import { nth } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
+import { airDensity } from '../src/exterior/atmosphere.ts'
+import { gyroscopicStability } from '../src/exterior/modified.ts'
+import { dynamicStabilityFactor, isStable } from '../src/exterior/stability.ts'
 import {
-  airDensity,
-  dynamicStabilityFactor,
-  gyroscopicStability,
-  isStable,
   lbPerSqInToKgPerSqM,
   standardAtmosphere,
   type TrajectoryInput,

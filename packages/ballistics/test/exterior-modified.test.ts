@@ -1,22 +1,23 @@
 import { nth } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
+import { airDensity, speedOfSound } from '../src/exterior/atmosphere.ts'
 import {
-  airDensity,
-  type CoefficientOverMach,
   coefficientAt,
   cylinderInertia,
-  type DragTable,
   gyroscopicStability,
-  lbPerSqInToKgPerSqM,
   linearJump,
-  millerStability,
   momentSlopeFromStability,
-  speedOfSound,
+  yawOfRepose,
+} from '../src/exterior/modified.ts'
+import {
+  type CoefficientOverMach,
+  type DragTable,
+  lbPerSqInToKgPerSqM,
+  millerStability,
   standardAtmosphere,
   type TrajectoryInput,
   type TrajectoryPoint,
   trajectory,
-  yawOfRepose,
 } from '../src/index.ts'
 
 const g = 9.80665

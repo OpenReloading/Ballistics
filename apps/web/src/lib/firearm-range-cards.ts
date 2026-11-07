@@ -121,7 +121,7 @@ export type LoadCard = TrajectoryResult & {
 /**
  * The range card of a planned load with its bullet record, as `RangeCard` takes it: the record's
  * G7 BC as the Trajectory tab starts with, else its G1. A message when the record's BC cannot be
- * used; throws the input and core errors of the computation.
+ * used; throws the input and model errors of the computation.
  */
 export function cardResult(
   plan: Extract<CardPlan, { bullet: string }>,

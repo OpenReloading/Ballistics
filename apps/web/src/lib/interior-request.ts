@@ -5,7 +5,7 @@ import {
   recordResistance,
   recordSensitivity,
   sensitivityReferenceDefault,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
 import { type Powder, toSi } from '@open-reloading/schema'
 import { type InteriorBody, interiorBody } from './interior-input.ts'
 import type { RecordValues } from './query.ts'

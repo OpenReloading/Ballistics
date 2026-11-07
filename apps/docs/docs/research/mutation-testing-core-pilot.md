@@ -247,7 +247,7 @@ analytic. The runs mutate the source and run the existing tests; no measured dat
 - `packages/ballistics/src/exterior/drag.ts`, `packages/ballistics/test/exterior-drag.test.ts`
 - `packages/ballistics/src/exterior/stability.ts`, `packages/ballistics/test/exterior-stability.test.ts`
 - `packages/ballistics/src/interior/range.ts`, `packages/ballistics/test/interior-range.test.ts`
-- `packages/core/src/groups/statistics.ts`, `packages/core/test/groups.test.ts`
+- `packages/shot-groups/src/group-statistics.ts`, `packages/shot-groups/test/group-statistics.test.ts`
 - `packages/ballistics/src/recoil.ts`, `packages/ballistics/test/recoil.test.ts`
 - `packages/statistics/src/velocity-statistics.ts`, `packages/statistics/test/velocity-statistics.test.ts`
 - `packages/ballistics/src/interior/velocity-ladder.ts`, `packages/ballistics/test/interior-velocity-ladder.test.ts`
@@ -279,7 +279,6 @@ analytic. The runs mutate the source and run the existing tests; no measured dat
 - `tools/src/licences.ts`, `tools/test/licences.test.ts`
 - `tools/src/pages-serve.ts`, `tools/test/pages-serve.test.ts`
 - `packages/importers/src/shotview.ts`, `packages/importers/test/shotview.test.ts`, `packages/importers/test/shotview-xlsx.test.ts`
-- `packages/core/vitest.config.ts` (the line coverage floors the mutation score is compared with)
 
 ## Confidence
 
