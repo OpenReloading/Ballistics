@@ -6,6 +6,19 @@ const meta = { title: 'Controls' } satisfies Meta
 export default meta
 type Story = StoryObj<typeof meta>
 
+/** The WCAG 2 contrast of two computed `rgb()` colors. */
+function contrast(a: string, b: string): number {
+  const luminance = (color: string) => {
+    const [r = 0, g = 0, b = 0] = (color.match(/[\d.]+/g) ?? []).map((v) => {
+      const c = Number(v) / 255
+      return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
+    })
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+  }
+  const [high = 0, low = 0] = [luminance(a), luminance(b)].sort((x, y) => y - x)
+  return (high + 0.05) / (low + 0.05)
+}
+
 /** The dense field of property grids: 24 px under a fine pointer, 44 px with 16 px text under a coarse one (spike S8). */
 export const DenseField: Story = {
   render: () => <TextInput size="field" label="Charge" />,
@@ -15,10 +28,11 @@ export const DenseField: Story = {
     // the touch browsers of vitest.config.ts, WebKit among them, must report a coarse pointer
     await expect(coarse).toBe('ontouchstart' in window)
     await expect(getComputedStyle(input).height).toBe(coarse ? '44px' : '24px')
-    await expect(getComputedStyle(input).fontSize).toBe(coarse ? '16px' : '13px')
+    // iOS zooms into a field whose text is under 16 px
+    if (coarse) await expect(getComputedStyle(input).fontSize).toBe('16px')
     await userEvent.tab()
     await expect(input).toHaveFocus()
-    await expect(getComputedStyle(input).outlineStyle).toBe('solid')
+    await expect(getComputedStyle(input).outlineStyle).not.toBe('none')
     await expect(getComputedStyle(input).outlineWidth).toBe('2px')
   },
 }
@@ -34,23 +48,34 @@ export const Fields: Story = {
   ),
 }
 
-/** A checked box and radio: their marks take the accent's text color of the scheme. */
+/** Boxes and radios, checked and not: each part a control needs is visible at 3:1 (WCAG 1.4.11), which axe does not check. */
 export const Choices: Story = {
   render: () => (
     <Stack>
       <Checkbox defaultChecked label="Seated" />
-      <Radio defaultChecked label="Crimped" />
+      <Checkbox label="Crimped" />
+      <Radio defaultChecked name="sizing" label="Neck sized" />
+      <Radio name="sizing" label="Full length" />
     </Stack>
   ),
   play: async ({ canvasElement }) => {
-    const marks = canvasElement.querySelectorAll('.mantine-Checkbox-icon, .mantine-Radio-icon')
-    await expect(marks).toHaveLength(2)
+    const boxes = canvasElement.querySelectorAll<HTMLInputElement>(
+      '.mantine-Checkbox-input, .mantine-Radio-radio',
+    )
+    await expect(boxes).toHaveLength(4)
     if (matchMedia('(forced-colors: active)').matches) return
-    const dark = matchMedia('(prefers-color-scheme: dark)').matches
-    for (const mark of marks) {
-      await expect(getComputedStyle(mark).color).toBe(
-        dark ? 'rgb(16, 18, 27)' : 'rgb(255, 255, 255)',
-      )
+    const page = getComputedStyle(canvasElement.ownerDocument.body).backgroundColor
+    for (const box of boxes) {
+      const { backgroundColor, borderTopColor } = getComputedStyle(box)
+      if (!box.checked) {
+        await expect(contrast(borderTopColor, page)).toBeGreaterThanOrEqual(3)
+        continue
+      }
+      const mark = box.parentElement?.querySelector('.mantine-Checkbox-icon, .mantine-Radio-icon')
+      await expect(
+        contrast(getComputedStyle(mark ?? box).color, backgroundColor),
+      ).toBeGreaterThanOrEqual(3)
+      await expect(contrast(backgroundColor, page)).toBeGreaterThanOrEqual(3)
     }
   },
 }

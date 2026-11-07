@@ -1,0 +1,21 @@
+name: Playwright image
+description: Pulls PLAYWRIGHT_IMAGE (ci.yml) once its tag, and the Playwright version the image records, are those of a locked Playwright package.
+inputs:
+  package:
+    description: The package.json of the locked Playwright package whose browsers the image must hold.
+    required: true
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        PACKAGE: ${{ inputs.package }}
+      run: |
+        version=$(node -p "require(process.argv[1]).version" "$PWD/$PACKAGE")
+        case $PLAYWRIGHT_IMAGE in
+          "mcr.microsoft.com/playwright:v$version-noble@sha256:"*) docker pull --quiet "$PLAYWRIGHT_IMAGE" ;;
+          *) echo "::error::PLAYWRIGHT_IMAGE (ci.yml) is not v$version-noble, the locked $PACKAGE"; exit 1 ;;
+        esac
+        # the digest decides what is pulled, not the tag: the version the image records must match as well
+        image=$(docker run --rm "$PLAYWRIGHT_IMAGE" cat /ms-playwright/.docker-info | jq -r .driverVersion)
+        [ "$image" = "$version" ] || { echo "::error::the digest of PLAYWRIGHT_IMAGE (ci.yml) is Playwright $image, not $version"; exit 1; }
