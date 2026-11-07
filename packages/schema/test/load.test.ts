@@ -43,7 +43,7 @@ const catalogueLoad = {
 } as const
 const wrap = (data: object, kind = 'load') => ({
   kind,
-  id: 'l1',
+  id: '00000000-0000-4000-8000-0000000000b1',
   name: 'Load',
   saved,
   data,

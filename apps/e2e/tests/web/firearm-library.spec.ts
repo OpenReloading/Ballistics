@@ -4,13 +4,16 @@ import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
 import { runExample } from './workbench-run.ts'
 
-/** Firearms in the browser store, as the library saves them; ids `firearm-<first>` on. */
+/** The UUID of the `n`th seeded firearm. */
+const firearmId = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`
+
+/** Firearms in the browser store, as the library saves them; ids `firearmId(first)` on. */
 async function seed(page: Page, names: string[], extra: object = {}, first = 0) {
   await putRecords(
     page,
     names.map((name, i) => ({
       kind: 'firearm',
-      id: `firearm-${first + i}`,
+      id: firearmId(first + i),
       name,
       saved: '2026-10-20T00:00:00.000Z',
       data: {
@@ -148,7 +151,7 @@ test('a record link does not put its loading status in the alert line', async ({
   })
   await page.goto('/firearms')
   await seed(page, ['Bench rifle'])
-  await page.goto('/firearms?record=firearm-0')
+  await page.goto(`/firearms?record=${firearmId(0)}`)
   await expect(page.getByRole('textbox', { name: 'Name' }).first()).toHaveValue('Bench rifle')
   expect(
     await page.evaluate(() => (window as unknown as { seen: { loading: boolean } }).seen.loading),

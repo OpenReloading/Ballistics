@@ -41,7 +41,7 @@ const save = (base?: Powder, previous?: string, name = 'My fitted powder') =>
     confidence: ranged.confidence,
     strings,
     base,
-    sessions: [session, 's1'],
+    sessions: [session],
     id,
     name,
     date,

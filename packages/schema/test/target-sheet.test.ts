@@ -84,7 +84,7 @@ const sheet = {
       face: { id: 'issf-300m-rifle' },
     },
   ],
-  load: 'w4',
+  load: '00000000-0000-4000-8000-000000000004',
   markerDiameter: 0.00782,
   notes: [
     { id: 'n1', x: 0.01, y: -0.02, text: 'ES {extremeSpread.length}', group: 'g1' },

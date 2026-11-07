@@ -792,7 +792,12 @@ describe('POST /interior/load-file, 400 with the field path', () => {
     const one = file({ siValues })
     const load = defined(one.records[0])
     expect(await paths({ ...one, records: [] })).toEqual([['records']])
-    expect(await paths({ ...one, records: [load, { ...load, id: 'l2' }] })).toEqual([['records']])
+    expect(
+      await paths({
+        ...one,
+        records: [load, { ...load, id: '00000000-0000-4000-8000-0000000000b2' }],
+      }),
+    ).toEqual([['records']])
     const maker = {
       kind: 'manufacturer',
       id: '3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13',
@@ -871,7 +876,7 @@ describe('POST /interior/load-file, 400 with the field path', () => {
   it('names a file that is not one load', async () => {
     expect(await paths({ ...file({ siValues }), records: [] })).toEqual([['records']])
     const two = file({ siValues })
-    two.records.push({ ...defined(two.records[0]), id: 'l2' })
+    two.records.push({ ...defined(two.records[0]), id: '00000000-0000-4000-8000-0000000000b2' })
     expect(await paths(two)).toEqual([['records']])
     expect(await paths({ ...file({ siValues }), version: 99 })).toContainEqual(['version'])
     expect(await paths({ format: 'other' })).toContainEqual(['format'])

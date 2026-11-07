@@ -529,9 +529,6 @@ export interface DanglingRef {
 }
 
 // @public
-export const designIdProblem: string;
-
-// @public
 export interface Discipline extends z.infer<typeof discipline> {
 }
 
@@ -1861,6 +1858,9 @@ export const userDataVersion = 1;
 export const userId: z.ZodString;
 
 // @public
+export const userIdProblem: string;
+
+// @public
 export const userIdRegex: RegExp;
 
 // @public
@@ -1960,7 +1960,7 @@ export type UserRecordSchema<K extends string, D extends z.ZodType> = z.ZodObjec
         day: z.ZodISODate;
     }>>;
     kind: z.ZodLiteral<K>;
-    id: z.ZodType<string>;
+    id: z.ZodString;
     data: D;
 }>;
 

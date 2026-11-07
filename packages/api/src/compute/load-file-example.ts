@@ -11,7 +11,7 @@ export const loadFileExample: LoadFileRequest = {
   records: [
     {
       kind: 'load',
-      id: 'load-1',
+      id: '00000000-0000-4000-8000-00000000a001',
       name: 'Load',
       saved: '2026-01-01T00:00:00.000Z',
       data: {
