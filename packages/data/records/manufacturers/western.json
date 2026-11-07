@@ -1,6 +1,7 @@
 {
   "id": "western",
   "name": "Western",
+  "country": "US",
   "provenance": {
     "kind": "published",
     "sources": [
@@ -9,6 +10,14 @@
         "url": "https://hodgdonpowderco.com/wp-content/uploads/2023/04/WesternPowdersHandloadingGuide8.0_WEB-1.pdf",
         "retrieved": "2026-10-12",
         "fields": ["name"]
+      },
+      {
+        "title": "Hodgdon Acquires Several Western Powder Brands",
+        "publisher": "Shooting Illustrated",
+        "url": "https://www.shootingillustrated.com/articles/2020/10/15/hodgdon-acquires-several-western-powder-brands/",
+        "retrieved": "2026-11-06",
+        "fields": ["country"],
+        "note": "Western Powders of Miles City, Montana, United States; Hodgdon took over its Accurate, Ramshot and Blackhorn 209 brands in October 2020. westernpowders.com serves unrelated content, so the record has no website."
       }
     ]
   }

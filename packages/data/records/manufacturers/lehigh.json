@@ -1,6 +1,8 @@
 {
   "id": "lehigh",
   "name": "Lehigh Defense",
+  "country": "US",
+  "website": "https://wilsoncombat.com/lehigh-defense/",
   "provenance": {
     "kind": "published",
     "sources": [
@@ -9,6 +11,15 @@
         "url": "https://lehighdefense.com/graphql?query=%7Bproducts%28filter%3A%7Bcategory_uid%3A%7Beq%3A%22MTA%3D%22%7D%7D%2CpageSize%3A500%29%7Btotal_count%20items%7Bsku%20name%20url_key%20all_reloading_diameter%20all_reloading_weight_grains%20all_reloading_ld_tech%20all_reloading_ld_material%20all_reloading_ld_g1%20all_reloading_ld_g7%20all_reloading_ld_length%20all_reloading_ld_ogive_length%20all_reloading_ld_minimum_twist%20all_reloading_ld_sectional%7D%7D%7D",
         "retrieved": "2026-10-08",
         "fields": ["name"]
+      },
+      {
+        "title": "Wilson Combat, contact page",
+        "publisher": "Wilson Combat",
+        "url": "https://wilsoncombat.com/contact-us/",
+        "retrieved": "2026-11-06",
+        "fields": ["country", "website"],
+        "origin": "manufacturer",
+        "note": "lehighdefense.com redirects to the Lehigh Defense page on the Wilson Combat site. Address: Wilson Combat, 2452 County Road 719, Berryville, AR 72616, United States."
       }
     ]
   }
