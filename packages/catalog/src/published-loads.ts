@@ -1,6 +1,7 @@
 import {
   type Bullet,
   type Cartridge,
+  conversions,
   type Powder,
   type Primer,
   type PublishedLoad,
@@ -32,12 +33,15 @@ export type PublishedLoadTargets = {
 
 /** Units of a printed figure and their factor to the stored unit of the quantity. */
 type Printed = 'mass' | 'velocity' | 'pressure' | 'length'
+const grain = conversions.gr.factor * 1000
+const foot = conversions.ft.factor
+const psi = conversions.psi.factor / conversions.bar.factor
+const inch = conversions.in.factor / conversions.mm.factor
 const factors: Record<Printed, Record<string, number>> = {
-  mass: { g: 1, gr: 0.06479891, grs: 0.06479891, grain: 0.06479891, grains: 0.06479891 },
-  velocity: { 'm/s': 1, ms: 1, 'ft/s': 0.3048, 'ft/sec': 0.3048, fps: 0.3048 },
-  // 1 psi = 0.45359237 kg * 9.80665 m/s2 / (0.0254 m)2, in bar
-  pressure: { bar: 1, psi: 0.0689475729316836 },
-  length: { mm: 1, cm: 10, m: 1000, in: 25.4, '"': 25.4, '″': 25.4, inch: 25.4, inches: 25.4 },
+  mass: { g: 1, gr: grain, grs: grain, grain, grains: grain },
+  velocity: { 'm/s': 1, ms: 1, 'ft/s': foot, 'ft/sec': foot, fps: foot },
+  pressure: { bar: 1, psi },
+  length: { mm: 1, cm: 10, m: 1000, in: inch, '"': inch, '″': inch, inch, inches: inch },
 }
 
 /** The relative difference below which a stored value follows its printed number (7 significant digits). */
