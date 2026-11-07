@@ -8,6 +8,7 @@ import { z } from 'zod'
 import type { Exact } from './exact.ts'
 
 export {
+  conversions,
   type QuantityKind,
   type SiMap,
   type StoredUnits,

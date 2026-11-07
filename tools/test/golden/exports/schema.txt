@@ -130,6 +130,7 @@
 . compareTargetFaces
 . competitionEvent
 . constructionFields
+. conversions
 . discipline
 . disciplineCategory
 . disciplineRules
