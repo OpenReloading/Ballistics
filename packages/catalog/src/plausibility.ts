@@ -148,37 +148,50 @@ function checkBulletSize(bullet: Bullet): Finding[] {
   return findings
 }
 
-/** Each coefficient within the range of its drag model, and the G7 to G1 ratio of one pair. */
-function checkBallisticCoefficients(bullet: Bullet): Finding[] {
-  const findings: Finding[] = []
-  const ballisticCoefficients = bullet.ballisticCoefficients ?? []
-  for (const ballisticCoefficient of ballisticCoefficients) {
-    const { dragModel, value } = ballisticCoefficient
+type BallisticCoefficients = NonNullable<Bullet['ballisticCoefficients']>
+
+/** Each coefficient within the range of its drag model. */
+function checkCoefficientRanges(ballisticCoefficients: BallisticCoefficients): Finding[] {
+  return ballisticCoefficients.flatMap(({ dragModel, value }) => {
     const [low, high] = dragModel === 'G1' ? [0.05, 1.2] : [0.03, 0.65]
-    if (value < low || value > high) {
-      findings.push({
+    if (!(value < low || value > high)) return []
+    return [
+      {
         finding: `ballistic-coefficient-range:${dragModel}`,
         message: `${dragModel} BC ${value} is outside ${low} to ${high}`,
-      })
-    }
-  }
-  // One G1 and one G7 for the same bullet: the G7 is 0.43 to 0.55 times the G1 for every pair in
-  // the records; outside 0.35 to 0.65 one of the two is wrong.
+      },
+    ]
+  })
+}
+
+/**
+ * One G1 and one G7 for the same bullet: the G7 is 0.43 to 0.55 times the G1 for every pair in the
+ * records; outside 0.35 to 0.65 one of the two is wrong.
+ */
+function checkG7G1Ratio(ballisticCoefficients: BallisticCoefficients): Finding[] {
   const g1Coefficients = ballisticCoefficients.filter((b) => b.dragModel === 'G1' && !b.minVelocity)
   const g7Coefficients = ballisticCoefficients.filter((b) => b.dragModel === 'G7' && !b.minVelocity)
   const [g1Coefficient, ...moreG1] = g1Coefficients
   const [g7Coefficient, ...moreG7] = g7Coefficients
-  if (g1Coefficient && g7Coefficient && moreG1.length === 0 && moreG7.length === 0) {
-    const [g1, g7] = [g1Coefficient.value, g7Coefficient.value]
-    const ratio = g7 / g1
-    if (ratio < 0.35 || ratio > 0.65) {
-      findings.push({
-        finding: 'g7-g1-ratio',
-        message: `G7 ${g7} is ${ratio.toFixed(2)} times G1 ${g1}, outside 0.35 to 0.65`,
-      })
-    }
-  }
-  return findings
+  if (!g1Coefficient || !g7Coefficient || moreG1.length > 0 || moreG7.length > 0) return []
+  const [g1, g7] = [g1Coefficient.value, g7Coefficient.value]
+  const ratio = g7 / g1
+  if (!(ratio < 0.35 || ratio > 0.65)) return []
+  return [
+    {
+      finding: 'g7-g1-ratio',
+      message: `G7 ${g7} is ${ratio.toFixed(2)} times G1 ${g1}, outside 0.35 to 0.65`,
+    },
+  ]
+}
+
+/** Each coefficient within the range of its drag model, and the G7 to G1 ratio of one pair. */
+function checkBallisticCoefficients(bullet: Bullet): Finding[] {
+  const ballisticCoefficients = bullet.ballisticCoefficients ?? []
+  return [
+    ...checkCoefficientRanges(ballisticCoefficients),
+    ...checkG7G1Ratio(ballisticCoefficients),
+  ]
 }
 
 /** Length between 1 and 7 diameters. */
@@ -399,16 +412,22 @@ function checkShotStrings(strings: CatalogueSession['strings']): Finding[] {
   return findings
 }
 
-/** Humidity, air temperature and station pressure within their physical and recorded ranges. */
-function checkConditions(conditions: CatalogueSession['conditions']): Finding[] {
-  const findings: Finding[] = []
+/** Relative humidity within 0 to 100 %. */
+function checkHumidity(conditions: CatalogueSession['conditions']): Finding[] {
   const relativeHumidity = conditions.relativeHumidity?.value
-  if (relativeHumidity !== undefined && !(relativeHumidity >= 0 && relativeHumidity <= 100)) {
-    findings.push({
+  if (relativeHumidity === undefined || (relativeHumidity >= 0 && relativeHumidity <= 100))
+    return []
+  return [
+    {
       finding: 'humidity-range',
       message: `relative humidity ${relativeHumidity} % is outside 0 to 100 %`,
-    })
-  }
+    },
+  ]
+}
+
+/** Humidity, air temperature and station pressure within their physical and recorded ranges. */
+function checkConditions(conditions: CatalogueSession['conditions']): Finding[] {
+  const findings: Finding[] = checkHumidity(conditions)
   const air = conditions.airTemperature.value
   if (!(air >= airTemperatureRange.min && air <= airTemperatureRange.max)) {
     findings.push({

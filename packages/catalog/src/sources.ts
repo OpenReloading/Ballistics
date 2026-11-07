@@ -1,4 +1,5 @@
 import { type SourceRecord, sourceReference } from '@open-reloading/schema'
+import { isObject } from './json-object.ts'
 
 /** The source records by id, the ids records cite, and the files that embed each other source. */
 export type SourceIndex = {
@@ -15,8 +16,6 @@ export function sourceIndex(records: SourceRecord[]): SourceIndex {
 /** The file being read, where its errors go, and the source records. */
 type Resolving = { index: SourceIndex; file: string; errors: string[] }
 
-const isObject = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null
-
 /** The source record `id`, marked cited, or undefined with an error. */
 function cite(id: string, index: SourceIndex, where: string, errors: string[]) {
   const record = index.byId.get(id)
@@ -25,14 +24,18 @@ function cite(id: string, index: SourceIndex, where: string, errors: string[]) {
   return record
 }
 
+/** The key of an embedded source: its SHA-256, else its title and URL as printed. */
+function embeddedKey({ sha256, title, url }: Record<string, unknown>): string {
+  if (typeof sha256 === 'string') return sha256
+  // oxlint-disable-next-line typescript/no-base-to-string -- the key of a malformed URL as before; the schema reports the URL
+  return `${String(title)} ${url === undefined || url === null ? '' : String(url)}`
+}
+
 /** A reference resolved to the source record with this record's parts, or an embedded source noted. */
 function resolveSource(entry: unknown, at: string, { index, file, errors }: Resolving) {
   if (!isObject(entry)) return entry
   if (!('source' in entry)) {
-    const key =
-      typeof entry['sha256'] === 'string'
-        ? entry['sha256']
-        : `${entry['title']} ${entry['url'] ?? ''}`
+    const key = embeddedKey(entry)
     index.embedded.set(key, (index.embedded.get(key) ?? new Set()).add(file))
     return entry
   }

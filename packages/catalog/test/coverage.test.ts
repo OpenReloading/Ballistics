@@ -25,7 +25,9 @@ describe('checkCoverage', () => {
     }
     expect(checkCoverage(record)).toEqual([])
   })
+})
 
+describe('checkCoverage of construction and geometry', () => {
   it('asks a source for each new construction field, and takes the construction path as covering them', () => {
     const construction = {
       raw: 'x',
@@ -73,7 +75,9 @@ describe('checkCoverage', () => {
       'field meplatDiameter has no source',
     ])
   })
+})
 
+describe('checkCoverage findings', () => {
   it('reports fields without a source and source fields that do not exist', () => {
     const record = {
       id: 'x',
