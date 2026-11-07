@@ -1,6 +1,5 @@
 /** The user data file: its text, parsing and validation, and import planning against the browser store. */
 
-import type { LoadDiagnostic } from '@open-reloading/importers'
 import {
   checkUserRefs,
   type EmbeddedFile,
@@ -15,7 +14,7 @@ import {
   withoutUnknownKinds,
 } from '@open-reloading/schema'
 import { z } from 'zod'
-import type { Translator } from '../i18n/translate.ts'
+import type { Message, Translator } from '../i18n/translate.ts'
 import { translateMessage } from './core-messages.ts'
 
 /** Files above this size are skipped on import: a sheet file carries its photo as base64. */
@@ -68,6 +67,12 @@ export const userDataText = (
     2,
   )}\n`
 
+/** A warning of a read file as its message and values, worded where it is shown. */
+export interface WordedWarning {
+  message: Message
+  values: Record<string, string | number>
+}
+
 export type ParsedUserFile =
   | {
       ok: true
@@ -77,7 +82,7 @@ export type ParsedUserFile =
       invalid?: unknown[]
       /** Fields of the file mapped to no record field, as the format names them. */
       unmapped?: string[]
-      warnings?: LoadDiagnostic[]
+      warnings?: WordedWarning[]
       /** Records of a kind this version does not know, left out of `records`. */
       skipped?: SkippedKind[]
     }

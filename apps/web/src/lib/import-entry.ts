@@ -7,7 +7,6 @@ import {
   fieldSpecs,
   isWorkbook,
   type KindScore,
-  type LoadDiagnostic,
   type RowCounts,
   type RowIssue,
   readTable,
@@ -21,10 +20,11 @@ import {
   tableOfRows,
 } from '@open-reloading/importers'
 import { type UserRecord, type UserRecordKind, userRecord } from '@open-reloading/schema'
+import { recordOf } from './candidates.ts'
 import { storageName } from './edition.ts'
-import { type InvalidRecordDiagnostic, recordOf } from './import-diagnostics.ts'
+import type { InvalidRecordDiagnostic } from './import-diagnostics.ts'
 import { type LoadFileFormat, loadFileFormats, loadFormatOf } from './load-file-formats.ts'
-import { type InvalidRecord, maxFileBytes, planImport } from './user-data.ts'
+import { type InvalidRecord, maxFileBytes, planImport, type WordedWarning } from './user-data.ts'
 
 /**
  * What a card shows of a read file: the refusal (with the load-file format that refused it and the
@@ -39,7 +39,7 @@ export type CardView =
       records: number
       /** The records of the file by kind, manufacturers left out. */
       kinds: Partial<Record<UserRecordKind, number>>
-      warnings: LoadDiagnostic[]
+      warnings: WordedWarning[]
       unmapped: string[]
     }
   | {
@@ -250,13 +250,28 @@ function builtOf(records: UserRecord[]): Built {
   }
 }
 
+/** The label of each field key of the table kinds, as the column picker shows it. */
+const labels = new Map(tableKinds.flatMap((k) => fieldSpecs[k].map((f) => [f.key, f.label])))
+const labelOf = (key: string) => labels.get(key) ?? key
+
+/** An issue with its `field` and `fields` as their labels, so the page words it without the field table. */
+const labelled = (i: RowIssue): ShownIssue => {
+  const { field, fields } = i.reason.params
+  const params = {
+    ...i.reason.params,
+    ...(typeof field === 'string' && { field: labelOf(field) }),
+    ...(Array.isArray(fields) && { fields: fields.map(labelOf) }),
+  }
+  return { ...i, reason: { ...i.reason, params } }
+}
+
 /**
  * The record of each candidate, saved at `saved`, parsed with the user record schema; a record it
  * refuses turns its row into a rejected one.
  */
 function checked(built: BuiltRecords, saved: string): Built {
   const entries: Built['entries'] = []
-  const rejected: ShownIssue[] = [...built.rejected]
+  const rejected: ShownIssue[] = built.rejected.map(labelled)
   for (const e of built.entries) {
     const parsed = userRecord.safeParse(recordOf(e.candidate, saved))
     if (parsed.success) entries.push({ row: e.row, record: parsed.data })
@@ -272,7 +287,7 @@ function checked(built: BuiltRecords, saved: string): Built {
   }
   rejected.sort((a, b) => a.row - b.row)
   const warnedRows = new Set(entries.map((e) => e.row))
-  const warnings = built.warnings.filter((w) => warnedRows.has(w.row))
+  const warnings = built.warnings.filter((w) => warnedRows.has(w.row)).map(labelled)
   return {
     entries,
     makers: built.makers.map((m) => recordOf(m, saved)),

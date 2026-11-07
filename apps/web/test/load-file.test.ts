@@ -1,6 +1,6 @@
 import type { UserRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
-import { english } from '../src/i18n/translate.ts'
+import { english, type Message } from '../src/i18n/translate.ts'
 import {
   type LoadFileFormat,
   loadFileFormats,
@@ -29,7 +29,7 @@ const lines: LoadFileFormat = {
     ok: true,
     records: [load],
     unmapped: ['primer', 'lot'],
-    warnings: [{ code: 'shotshell', params: {} }],
+    warnings: [{ message: 'The date is not in the file.' as Message, values: {} }],
   }),
 }
 const formats = [...loadFileFormats, lines]
@@ -60,7 +60,7 @@ describe('load-file formats', () => {
 
   it('warnings and fields not mapped reach the import as one note per file', async () => {
     expect(readNote(await lines.parse(bytes('')), english.t)).toBe(
-      'The file holds a shotshell load. This import is not checked on shotshell files: the fields it does not know are listed as not read. Check every value. Not read: primer, lot.',
+      'The date is not in the file. Not read: primer, lot.',
     )
     expect(readNote({ ok: true, records: [] }, english.t)).toBe('')
     const { records, notes, skipped } = await parseFiles(
@@ -76,7 +76,7 @@ describe('load-file formats', () => {
     expect(notes).toEqual([
       {
         name: 'a.txt',
-        note: 'The file holds a shotshell load. This import is not checked on shotshell files: the fields it does not know are listed as not read. Check every value. Not read: primer, lot.',
+        note: 'The date is not in the file. Not read: primer, lot.',
       },
     ])
     expect(skipped.map((s) => s.name)).toEqual(['c.txt'])

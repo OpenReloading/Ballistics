@@ -2,7 +2,9 @@ import { autoMap, buildRecords, idOfKey, readTable } from '@open-reloading/impor
 import { describe, expect, it } from 'vitest'
 import de from '../src/i18n/de.json'
 import { type Catalogue, english, translator } from '../src/i18n/translate.ts'
-import { loadWarningText, recordOf, tableReasonText } from '../src/lib/import-diagnostics.ts'
+import { recordOf } from '../src/lib/candidates.ts'
+import { tableReasonText } from '../src/lib/import-diagnostics.ts'
+import { loadWarning } from '../src/lib/load-warnings.ts'
 
 const german = translator(de as Catalogue, 'de')
 const { t } = english
@@ -11,28 +13,28 @@ describe('the reasons of a table import in words', () => {
   it('words each code as the importers wrote it before they returned codes', () => {
     const cases = [
       [
-        { code: 'emptyCell', params: { field: 'name' } },
+        { code: 'emptyCell', params: { field: 'Name' } },
         'Name is empty. Fill the cell or delete the row.',
       ],
       [
-        { code: 'notNumber', params: { field: 'diameter', cell: 'x7', mark: '.' } },
+        { code: 'notNumber', params: { field: 'Diameter', cell: 'x7', mark: '.' } },
         'Diameter "x7" is not a number with "." as decimal mark. Fix the cell or change the decimal mark of the column.',
       ],
       [
-        { code: 'notAboveZero', params: { field: 'diameter', cell: '0' } },
+        { code: 'notAboveZero', params: { field: 'Diameter', cell: '0' } },
         'Diameter 0 is not above 0. Fix the cell or leave it empty.',
       ],
       [
         {
           code: 'outsideUsual',
-          params: { field: 'diameter', cell: '30', unit: 'mm', low: 3, high: 25, stored: 'mm' },
+          params: { field: 'Diameter', cell: '30', unit: 'mm', low: 3, high: 25, stored: 'mm' },
         },
         'Diameter 30 mm is outside the usual 3 to 25 mm. Check the unit of the column.',
       ],
       [
         {
           code: 'unitOther',
-          params: { field: 'maxPressure', symbols: ['bar', 'psi', 'MPa', 'kpsi'] },
+          params: { field: 'Max pressure', symbols: ['bar', 'psi', 'MPa', 'kpsi'] },
         },
         'Max pressure: the header names a unit other than bar, psi, MPa, kpsi. Choose the unit of the column.',
       ],
@@ -40,7 +42,7 @@ describe('the reasons of a table import in words', () => {
         {
           code: 'notChoice',
           params: {
-            field: 'grainForm',
+            field: 'Grain form',
             cell: 'pellet',
             choices: ['ball', 'extruded', 'flake', 'other'],
           },
@@ -48,11 +50,11 @@ describe('the reasons of a table import in words', () => {
         'Grain form "pellet" is not one of ball, extruded, flake, other. The value is left out; change the cell to keep it.',
       ],
       [
-        { code: 'noColumn', params: { fields: ['diameter'] } },
+        { code: 'noColumn', params: { fields: ['Diameter'] } },
         'No column is mapped to Diameter. Map a column to it or read the file as another kind.',
       ],
       [
-        { code: 'noColumns', params: { fields: ['name', 'diameter', 'mass'] } },
+        { code: 'noColumns', params: { fields: ['Name', 'Diameter', 'Mass'] } },
         'No column is mapped to Name, Diameter, Mass. Map a column to each or read the file as another kind.',
       ],
       [
@@ -78,7 +80,7 @@ describe('the reasons of a table import in words', () => {
     const reason = {
       code: 'outsideUsual',
       params: {
-        field: 'bulkDensity',
+        field: 'Bulk density',
         cell: '1,5',
         unit: 'g/cm3',
         low: 0.4,
@@ -111,7 +113,10 @@ describe('the warnings of a load file in words', () => {
         'appendix.Measurement: 2 charges (4 shots) of the series beyond the limit of 500 are left out.',
       ],
     ] as const
-    for (const [warning, text] of cases) expect(loadWarningText(warning, t)).toBe(text)
+    for (const [warning, text] of cases) {
+      const { message, values } = loadWarning(warning)
+      expect(t(message, values)).toBe(text)
+    }
   })
 })
 

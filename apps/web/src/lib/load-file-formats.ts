@@ -3,7 +3,6 @@ import { type EmbeddedFile, type UserRecord, userDataFormat } from '@open-reload
 import type { Translator } from '../i18n/translate.ts'
 import { csrLoadFormat } from './csr-load-format.ts'
 import { grtLoadFormat } from './grt-load-format.ts'
-import { loadWarningText } from './import-diagnostics.ts'
 import { nth } from './nth.ts'
 import {
   maxFileBytes,
@@ -66,7 +65,7 @@ export async function readLoadFile(
 export const readNote = (p: ParsedUserFile, t: Translator['t']) =>
   p.ok
     ? [
-        ...(p.warnings ?? []).map((w) => loadWarningText(w, t)),
+        ...(p.warnings ?? []).map((w) => t(w.message, w.values)),
         ...(p.unmapped?.length
           ? [t('Not read: {fields}.', { fields: p.unmapped.join(', ') })]
           : []),

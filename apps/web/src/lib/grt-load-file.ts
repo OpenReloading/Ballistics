@@ -2,7 +2,8 @@
 import { readCsrLoad, readGrtLoad } from '@open-reloading/importers'
 import { type UserRecord, userRecord } from '@open-reloading/schema'
 import { z } from 'zod'
-import { recordOf } from './import-diagnostics.ts'
+import { recordOf } from './candidates.ts'
+import { loadWarning } from './load-warnings.ts'
 import type { ParsedUserFile } from './user-data.ts'
 
 /** The records of the candidates `read` gives, each checked with the user record schema; the file is refused when one fails. */
@@ -23,7 +24,7 @@ function parseWith(read: typeof readGrtLoad, format: string, text: string): Pars
     if (!parsed.success) return { ok: false, reason: `${x.kind}: ${z.prettifyError(parsed.error)}` }
     records.push(parsed.data)
   }
-  return { ok: true, records, unmapped: r.unmapped, warnings: r.warnings }
+  return { ok: true, records, unmapped: r.unmapped, warnings: r.warnings.map(loadWarning) }
 }
 
 /** A GRT load file's records, each checked with the user record schema. */
