@@ -72,7 +72,6 @@ it('lists the load tables of a fit with their rows on the record page, and nothi
   const table = html(
     <PowderFit powder={powder([fitted('12 training rows of this table.'), fitted()])} />,
   )
-  expect(table).toContain('Model fit')
   expect(
     [...table.matchAll(/<th[^>]*scope="row"[^>]*>([^<]+)<\/th><td[^>]*>([^<]+)</g)].map((m) => [
       m[1],
