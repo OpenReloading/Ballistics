@@ -15,7 +15,7 @@ import { Backspace, Camera, Gauge } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useTranslation } from '../i18n/language.ts'
 import { decimalMark, formatNumber, plainNumber } from '../i18n/number.ts'
-import { msg, type Translator } from '../i18n/translate.ts'
+import type { Translator } from '../i18n/translate.ts'
 import type { RangeStep } from '../lib/range-entry.ts'
 import { loadSummary, rangeStats } from '../lib/range-entry.ts'
 import { type UnitSystem, withUnit } from '../lib/units.ts'
@@ -160,8 +160,7 @@ export function RangeMode() {
   return (
     <>
       <PageBar
-        title={msg('Range mode')}
-        translated
+        title={t('Range mode')}
         status={<BarCount>{online ? t('Online') : t('Offline, saved on this device')}</BarCount>}
       />
       <Stack gap="md" maw="32rem" mx="auto" py="md" px="md">
