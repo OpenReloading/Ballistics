@@ -226,7 +226,8 @@ export function BulletList({
     {
       key: 'type',
       label: msg('Type'),
-      width: '11rem',
+      // the longest value, "Full metal jacket, boat tail", fits without an ellipsis
+      width: '12rem',
       wide: true,
       value: (b) => typeOf(b) || undefined,
       cell: typeOf,

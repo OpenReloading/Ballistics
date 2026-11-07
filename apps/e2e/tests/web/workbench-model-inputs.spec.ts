@@ -84,28 +84,61 @@ test("a firearm's measured bore diameter and freebore and a brass group's trim l
   )
 })
 
+/**
+ * Adds a catalogue powder without burn values to the static API files the workbench reads: a row of
+ * the catalogue index and its record, made from the demo powder DP15 without its `interior`.
+ */
+async function withBurnlessPowder(page: Page) {
+  await page.route('**/api/catalogue/index.json', async (route) => {
+    const response = await route.fetch()
+    const index = await response.json()
+    const row = {
+      item: { id: 'e2e-burnless', manufacturer: 'demo-powder', name: 'Burnless' },
+      sortKey: 'demo powder co.\u001fburnless',
+      search: 'demo powder co. burnless\u0001demopowderco.burnless\u0001burnless',
+    }
+    await route.fulfill({ response, json: { ...index, powders: [...index.powders, row] } })
+  })
+  await page.route('**/api/powders/e2e-burnless.json', async (route) => {
+    const response = await route.fetch({
+      url: route.request().url().replace('e2e-burnless', 'demo-powder-dp15'),
+    })
+    const { interior: _, ...record } = await response.json()
+    await route.fulfill({
+      response,
+      json: {
+        ...record,
+        id: 'e2e-burnless',
+        name: 'Burnless',
+        provenance: { kind: 'published', sources: [{ title: 'End-to-end fixture' }] },
+      },
+    })
+  })
+}
+
 test('the powder choosers hide powders without burn values until the filter is off, and such a powder cannot run', async ({
   page,
 }) => {
+  await withBurnlessPowder(page)
   await gotoHydrated(page, '/workbench?cartridge=308-win')
   const search = loadForm(page).getByRole('combobox', { name: /^Search powders/ })
-  await search.fill('Titewad')
+  await search.fill('Burnless')
   await expect(page.getByText('No powder found')).toBeVisible()
 
   await loadForm(page).getByRole('button', { name: 'Browse powders' }).click()
   const dialog = page.getByRole('dialog', { name: 'Choose a powder' })
   const box = dialog.getByRole('combobox', { name: 'Search powders' })
-  await box.fill('Titewad')
+  await box.fill('Burnless')
   await expect(dialog.getByRole('option')).toHaveCount(0)
   const filter = dialog.getByRole('switch', { name: 'Complete records only' })
   await expect(filter).toBeChecked()
   await filter.click({ force: true })
-  const option = dialog.getByRole('option').filter({ hasText: 'Titewad' })
+  const option = dialog.getByRole('option').filter({ hasText: 'Burnless' })
   await expect(option).toContainText('Values missing')
   await option.click()
 
   // the card names what is missing and the two ways on; Run refuses with the same reason
-  await expect(page.getByText(/Titewad has no burn values, so it cannot run\./)).toBeVisible()
+  await expect(page.getByText(/Burnless has no burn values, so it cannot run\./)).toBeVisible()
   await expect(
     loadForm(page).getByRole('link', { name: 'Choose a similar powder on the burn-rate chart' }),
   ).toHaveAttribute('href', /\/powders\/burn-rates/)
