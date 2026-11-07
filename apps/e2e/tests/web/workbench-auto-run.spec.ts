@@ -21,6 +21,8 @@ async function lowerCharge(page: Page) {
 test('a charge change updates the result without Run', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
   await runExample(page)
+  // the safety wording on every view of a result
+  await expect(page.getByText('Simulation, not load data', { exact: true })).toBeVisible()
   const before = await resultLine(page).textContent()
   await lowerCharge(page)
   await expect(stale(page)).toBeAttached()
