@@ -6,16 +6,16 @@
  * with one shift each, `apps/docs/docs/models/interior-curve-fit.md`. SI in and out.
  */
 
-import { identifiability, logLeastSquares } from '@open-reloading/statistics'
-import { InputError, need, nth, type Settings } from '../errors.ts'
-import { PowderFitError } from './fit.ts'
 import {
   type InteriorInvalid,
   type InteriorLoad,
   type InteriorOptions,
   type InteriorPoint,
   interior,
-} from './model.ts'
+} from '@open-reloading/ballistics'
+import { identifiability, logLeastSquares } from '@open-reloading/statistics'
+import { InputError, need, nth, type Settings } from '../errors.ts'
+import { PowderFitError } from './fit.ts'
 
 /** Where the sensor measured: the model's pressure at the breech, the space mean or the projectile base. */
 export type PressureSensor = 'breech' | 'mean' | 'base'

@@ -40,7 +40,7 @@ Analytic. The rule is a published rule of thumb; the leak-area table is the solv
 
 ## Where in the app
 
-- `packages/core/src/interior/obturation.ts`, the rule and the three conditions.
+- `packages/ballistics/src/interior/obturation.ts`, the rule and the three conditions.
 - `apps/web/src/components/workbench-outcome.ts`, the warning of the result notes.
 - `packages/schema/src/bullet.ts`, `construction.core.hardness` (lead or lead alloy core only).
 - Model page: [M3, cast bullet hardness](../models/interior-m3.md#cast-bullet-hardness), data page: [bullet construction](../data/bullet-construction.md).

@@ -100,10 +100,6 @@ export function openCatalogue({ index, records }: CatalogueData): Catalogue {
     caliberClasses: () => select(index.caliberClasses, {}),
     eventTypes: () => select(index.eventTypes, {}),
     get,
-    renamed: (kind, id) => {
-      const map = (index.renames as Record<string, Record<string, string> | undefined>)[kind]
-      return map && Object.hasOwn(map, id) ? map[id] : undefined
-    },
     capacities: (cartridge) => {
       const ids = Object.hasOwn(index.capacities, cartridge)
         ? index.capacities[cartridge]
@@ -111,8 +107,7 @@ export function openCatalogue({ index, records }: CatalogueData): Catalogue {
       return (ids ?? []).flatMap((id) => get('caseCapacity', id) ?? [])
     },
     dataHash: () =>
-      (dataHash ??= (async () =>
-        sha256(canonicalJson({ records: load(), renames: index.renames })))().catch((error) => {
+      (dataHash ??= (async () => sha256(canonicalJson({ records: load() })))().catch((error) => {
         // a failed read is not kept: the next call tries again
         dataHash = undefined
         throw error

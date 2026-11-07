@@ -18,7 +18,7 @@ $$
 G_1 = \min G_{1,\mathrm{cartridge}}, \qquad F = \min F_\mathrm{chamber}, \qquad Z = \min Z_\mathrm{chamber}
 $$
 
-Code: `packages/core/src/cartridge-specs.ts`, `cartridgeDiameters`.
+Code: `packages/ballistics/src/cartridge-specs.ts`, `cartridgeDiameters`.
 
 ### Window
 
@@ -26,7 +26,7 @@ $$
 \frac{F + Z}{2} \lt d \le G_1 + \delta, \qquad \delta = 0.005\ \text{mm}
 $$
 
-Code: `packages/core/src/bullet-fit.ts`, `bulletWindow`, `bulletFits`, `cipRounding`.
+Code: `packages/ballistics/src/bullet-fit.ts`, `bulletWindow`, `bulletFits`, `cipRounding`.
 
 $\delta$ is half the last printed digit of the two-decimal C.I.P. values, so a $G_1$ printed as 7.85 holds diameters up to 7.855 mm. A further $10^{-9}$ mm keeps a bullet exactly on the upper bound despite binary rounding.
 

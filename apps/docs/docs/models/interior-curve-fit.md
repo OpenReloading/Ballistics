@@ -20,7 +20,7 @@ $$
 \frac{dz}{dt} = B_a\, \tau_T\, \varphi(z; a, z_1) \left(\frac{\max(\bar p, 0)}{p_\text{ref}}\right)^{n}
 $$
 
-Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurves` (`apply`), `packages/core/src/interior/model.ts`, `interiorRhs`.
+Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurves` (`apply`), `packages/ballistics/src/interior/model.ts`, `interiorRhs`.
 
 The fit compares the trace with the pressure the model gives at the sensor position: the breech pressure, the space-mean pressure or the pressure at the projectile base. The fit window starts where the trace first reaches 25 % of its peak (at its first sample when it already starts above that) $p_\text{pk}$, found on a parabola through the crossing samples, and ends where it first falls to the fraction $f_\text{end}$ of the peak after the peak (default 0.5):
 

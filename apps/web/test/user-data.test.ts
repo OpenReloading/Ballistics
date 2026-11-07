@@ -1,17 +1,12 @@
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
-import {
-  type UserRecord,
-  userDataFormat,
-  userDataVersion,
-  userRecord,
-} from '@open-reloading/schema'
+import { type UserRecord, userDataFormat, userRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import de from '../src/i18n/de.json'
 import { english, translator } from '../src/i18n/translate.ts'
 import { installCoreMessages } from '../src/lib/core-message-table.ts'
 import { exampleFirearm } from '../src/lib/example-data.ts'
-import { parseFiles, readLoadFile, readNote } from '../src/lib/load-file-formats.ts'
+import { parseFiles, readNote } from '../src/lib/load-file-formats.ts'
 import {
   maxLinkChars,
   readLink,
@@ -215,9 +210,6 @@ describe('user data files', () => {
       const parsed = parseUserDataFile(fileOf([event, stage, bad]))
       expect(parsed.ok).toBe(false)
       expect(!parsed.ok && parsed.reason).toContain('records[2].data.charge.value')
-      const old = { ...event, kind: 'workbenchState' }
-      const legacy = parseUserDataFile(fileOf([event, old]))
-      expect(!legacy.ok && legacy.reason).toContain('earlier version')
       expect(parseUserDataFile(fileOf([{ ...event, kind: 1 }])).ok).toBe(false)
     })
 
@@ -477,28 +469,6 @@ describe('user data files', () => {
     expect(invalid[2]).toMatchObject({ id: 'o1', name: 'Old', kind: 'bulletDesign' })
     expect(defined(invalid[2]).error).toContain('kind')
     expect(invalid[1]).toMatchObject({ id: undefined, name: undefined, kind: undefined })
-  })
-
-  it('names the earlier load format in a stored record, an opened file and a pasted text', async () => {
-    const old = {
-      kind: 'workbenchState',
-      id: 'w9',
-      name: 'Old load',
-      saved,
-      data: { siValues: { charge: 0.0028 }, cartridge: '308-win' },
-    }
-    const stored = defined(validRecords([old]).invalid[0])
-    expect(stored.error).toContain('earlier version')
-    expect(stored).toMatchObject({ id: 'w9', kind: 'workbenchState' })
-    const text = JSON.stringify({
-      format: userDataFormat,
-      version: userDataVersion,
-      records: [old],
-    })
-    const parsed = parseUserDataFile(text)
-    expect(!parsed.ok && parsed.reason).toContain('earlier version')
-    const read = await readLoadFile(new TextEncoder().encode(text))
-    expect(!read.ok && read.reason).toContain('earlier version')
   })
 
   it('Export all carries the invalid records as stored; parsing hands them on unchecked', () => {

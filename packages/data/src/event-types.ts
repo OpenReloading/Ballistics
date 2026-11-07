@@ -25,7 +25,7 @@ function checkDivisions(t: EventType, where: string, errors: string[]) {
 
 /** The federation is a record and lists the rule book; returns the federation. */
 function checkFederation(t: EventType, where: string, lookup: Lookup, errors: string[]) {
-  const federation = lookup.federations.get(lookup.now('federations', t.federation))
+  const federation = lookup.federations.get(t.federation)
   if (!federation) errors.push(`${where}: unknown federation "${t.federation}"`)
   else if (!federation.ruleBooks.some((b) => b.sha256 === t.ruleBook.sha256))
     errors.push(`${where}: rule book is not one of federation "${federation.id}"`)
@@ -41,9 +41,9 @@ function checkDiscipline(
   errors: string[],
 ) {
   if (t.scoring.method !== 'rings' || !t.scoring.discipline) return
-  const d = lookup.disciplines.get(lookup.now('disciplines', t.scoring.discipline))
+  const d = lookup.disciplines.get(t.scoring.discipline)
   if (!d) errors.push(`${where}: unknown discipline "${t.scoring.discipline}"`)
-  else if (federation && lookup.now('federations', d.federation) !== federation.id)
+  else if (federation && d.federation !== federation.id)
     errors.push(`${where}: discipline "${d.id}" is not one of federation "${federation.id}"`)
 }
 
@@ -53,7 +53,7 @@ function checkDiscipline(
  * every division of a magazine limit has a power factor.
  */
 export function checkEventTypes(
-  bundle: Pick<Bundle, 'eventTypes' | 'federations' | 'disciplines' | 'renames'>,
+  bundle: Pick<Bundle, 'eventTypes' | 'federations' | 'disciplines'>,
 ): string[] {
   const errors: string[] = []
   const lookup = lookupOf(bundle)

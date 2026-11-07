@@ -93,8 +93,8 @@ Analytic: synthetic proxy loads compared with unverified figures from the questi
 
 ## Where in the app
 
-- `packages/core/src/interior/model.ts`, `gasState` (`heatFlux`), `convectiveDefaults`.
-- `packages/core/test/interior-model.test.ts`, the test "heat loss equals the quadrature of the convective flux over the curve".
+- `packages/ballistics/src/interior/model.ts`, `gasState` (`heatFlux`), `convectiveDefaults`.
+- `packages/ballistics/test/interior-model.test.ts`, the test "heat loss equals the quadrature of the convective flux over the curve".
 - Model page: [leakage and heat loss](../models/interior-leakage-heat.md).
 
 ## Confidence

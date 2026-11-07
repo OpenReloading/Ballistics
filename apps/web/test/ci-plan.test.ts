@@ -61,7 +61,7 @@ it('builds nothing when no changed file feeds the web build', () => {
 
 it('runs no e2e for unit tests, tools and other workflows, and nothing for prose alone', () => {
   for (const f of [
-    'packages/core/test/recoil.test.ts',
+    'packages/ballistics/test/recoil.test.ts',
     'apps/web/test/api.test.ts',
     'tools/src/load-fit.ts',
     'tools/src/audit.ts',

@@ -284,7 +284,6 @@ export const caseCapacity: z.ZodObject<{
     caseCondition: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'new' | 'fired' | 'sized'>>>;
     primerState: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'primed-spent' | 'unprimed'>>>;
     fillLevel: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'mouth'>>>;
-    convention: z.ZodOptional<z.ZodNever>;
     note: z.ZodOptional<z.ZodString>;
     provenance: z.ZodOptional<typeof provenance>;
 }>;
@@ -810,9 +809,6 @@ export const ladderStepKinds: {
 
 // @public
 export function leadFree(c: ConstructionFields | undefined): boolean | undefined;
-
-// @public
-export const legacyLoadProblem: string;
 
 // @public
 export interface Load extends z.infer<typeof load> {
@@ -1366,18 +1362,6 @@ export const ref: (kind: string) => z.ZodString;
 
 // @public
 export type RefScope = 'catalogue' | 'user';
-
-// @public
-export type RenameKind = z.infer<typeof renameKind>;
-
-// @public
-export const renameKind: z.ZodEnum<z.core.util.ToEnum<'cartridges' | 'manufacturers' | 'powders' | 'primers' | 'bullets' | 'cases' | 'target-faces' | 'federations' | 'disciplines' | 'target-mappings' | 'caliber-classes'>>;
-
-// @public
-export type Renames = z.infer<typeof renames>;
-
-// @public
-export const renames: z.ZodRecord<typeof renameKind & z.core.$partial, z.ZodRecord<typeof recordId, typeof recordId>>;
 
 // @public
 export type RingScoring = z.infer<typeof ringScoring>;

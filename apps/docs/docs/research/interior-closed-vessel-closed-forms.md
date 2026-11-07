@@ -50,8 +50,8 @@ Analytic: closed forms and numerical quadratures compared with the model, no mea
 
 ## Where in the app
 
-- `packages/core/src/interior/model.ts`, `closedVessel`.
-- `packages/core/test/interior-model.test.ts`, the tests of the `closed vessel` block: "final pressure (k-1) m_c Q / (V_c - eta m_c)", "burn time against the closed form", "burn time with pressure exponent n = 0.8", "burn time scales as 1/tau_T with the propellant temperature", "burn time of the two-stage form function" and "burn time of the three-stage form".
+- `packages/ballistics/src/interior/model.ts`, `closedVessel`.
+- `packages/ballistics/test/interior-model.test.ts`, the tests of the `closed vessel` block: "final pressure (k-1) m_c Q / (V_c - eta m_c)", "burn time against the closed form", "burn time with pressure exponent n = 0.8", "burn time scales as 1/tau_T with the propellant temperature", "burn time of the two-stage form function" and "burn time of the three-stage form".
 - Model pages: [M3 interior model](../models/interior-m3.md), [burn laws and form functions](../models/interior-burn-forms.md).
 
 ## Confidence

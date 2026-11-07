@@ -36,7 +36,7 @@ Analytic: the stated fit conditions of the powder records and the fitted values 
 
 ## Where in the app
 
-- `packages/core/src/interior/start-pressure.ts` (`bulletStructures`, `constructionOf`, `startPressureOf`).
+- `packages/ballistics/src/interior/start-pressure.ts` (`bulletStructures`, `constructionOf`, `startPressureOf`).
 - `apps/web/src/lib/start-pressure.ts` (`startPressureDefault`).
 - `apps/web/src/lib/powder-compare.ts` (`fittedAtDefaultStart`, `powderValues`).
 - `apps/web/src/lib/bullet-construction.ts` (`classOf`).

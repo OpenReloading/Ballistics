@@ -67,24 +67,26 @@ describe('the message table', () => {
   })
 
   it('translates the rule text of a refused record in a file, keeping the marks and the path', () => {
-    const capacity = {
-      kind: 'caseCapacity',
-      id: 'c1',
-      name: 'Capacity',
+    const entry = {
+      kind: 'shootingLogEntry',
+      id: '00000000-0000-4000-8000-000000000001',
+      name: 'Range day',
       saved: '2026-01-01T00:00:00.000Z',
       data: {
-        origin: 'user',
-        cartridge: 'catalogue:308-win',
-        waterCapacity: { value: 3.62 },
-        convention: 'water-to-mouth',
+        date: '2026-01-01',
+        rounds: 30,
+        load: 'user:00000000-0000-4000-8000-000000000002',
+        ammunition: 'Factory 9 mm Luger',
       },
     }
-    const read = parseUserDataFile(userDataText([capacity] as never))
+    const read = parseUserDataFile(userDataText([entry] as never))
     if (read.ok) throw new Error('not refused')
-    expect(read.reason).toContain('✖ Replaced by primerState and fillLevel')
+    const rule = 'Give a load or factory ammunition, not both.'
+    expect(read.reason).toContain(`✖ ${rule}`)
     const shown = reasonText(read.reason, german)
-    expect(shown).toContain('✖ Ersetzt durch primerState und fillLevel')
-    expect(shown).toContain('→ bei records[0].data.convention')
+    expect(german.t(rule)).not.toBe(rule)
+    expect(shown).toContain(`✖ ${german.t(rule)}`)
+    expect(shown).toContain('→ bei records[0].data')
   })
 
   it('leaves a long text as it is without matching it', () => {
@@ -164,8 +166,8 @@ describe('reason codes', () => {
 
   const reasons = [
     ...union('ballistics/src/exterior/truing.ts', 'TruingReason'),
-    ...union('core/src/interior/model.ts', 'InteriorReason'),
-    ...union('core/src/interior/charge-solver.ts', 'ChargeRefusal'),
+    ...union('ballistics/src/interior/model.ts', 'InteriorReason'),
+    ...union('ballistics/src/interior/charge-solver.ts', 'ChargeRefusal'),
     ...union('core/src/interior/fit.ts', 'PowderFitReason'),
     ...union('ballistics/src/exterior/range-strings.ts', 'WeakReason'),
     // set where the reason is not a union: a range case, the API's 422 and 503 answers
@@ -188,10 +190,10 @@ describe('reason codes', () => {
 
   it('reads the unions of the sources', () => {
     expect(union('ballistics/src/exterior/truing.ts', 'TruingReason')).toContain('step-budget')
-    expect(union('core/src/interior/charge-solver.ts', 'ChargeRefusal')).toContain(
+    expect(union('ballistics/src/interior/charge-solver.ts', 'ChargeRefusal')).toContain(
       'toleranceNotReached',
     )
-    expect(union('core/src/interior/model.ts', 'InteriorReason')).toEqual([
+    expect(union('ballistics/src/interior/model.ts', 'InteriorReason')).toEqual([
       'input',
       'chamberVolume',
       'noShotStart',
@@ -400,12 +402,12 @@ const dynamicArguments: { file: string; arg: string; reason: string }[] = [
     reason: 'a coefficient named by the caller: its name is the text',
   },
   {
-    file: 'core/src/interior/load-file.ts',
+    file: 'ballistics/src/interior/load-file.ts',
     arg: "key === 'engravingLength' ? 'Must be above 0.' : 'Must be at least 0.'",
     reason: 'a choice of two sentences: each has its own template',
   },
   {
-    file: 'core/src/interior/load-file.ts',
+    file: 'ballistics/src/interior/load-file.ts',
     arg: 'needed',
     reason: 'the sentence is a variable with its own template',
   },
@@ -417,11 +419,6 @@ const dynamicArguments: { file: string; arg: string; reason: string }[] = [
   {
     file: 'api/src/compute/load-file.ts',
     arg: 'problem',
-    reason: 'the text comes from the schema package',
-  },
-  {
-    file: 'api/src/compute/load-file.ts',
-    arg: 'legacyLoadProblem',
     reason: 'the text comes from the schema package',
   },
   {

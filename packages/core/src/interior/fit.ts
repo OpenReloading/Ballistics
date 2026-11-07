@@ -10,6 +10,13 @@
  */
 
 import {
+  type InteriorInvalid,
+  type InteriorLoad,
+  type InteriorOptions,
+  type InteriorResult,
+  interior,
+} from '@open-reloading/ballistics'
+import {
   chiSquareQuantile,
   type LogFitStop,
   logLeastSquares,
@@ -17,13 +24,6 @@ import {
 } from '@open-reloading/statistics'
 import type { Settings } from '../errors.ts'
 import { InputError, need, nth, positive } from '../errors.ts'
-import {
-  type InteriorInvalid,
-  type InteriorLoad,
-  type InteriorOptions,
-  type InteriorResult,
-  interior,
-} from './model.ts'
 
 /**
  * What a peak pressure was measured with: the `pressureMethod` vocabulary of the cartridge records.

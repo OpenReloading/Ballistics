@@ -39,8 +39,8 @@ Analytic: a closed-form toy model and the M3 model on a fixture load, compared w
 
 ## Where in the app
 
-- `packages/core/test/interior-monte-carlo.test.ts`.
-- `packages/core/src/interior/monte-carlo.ts`.
+- `packages/ballistics/test/interior-monte-carlo.test.ts`.
+- `packages/ballistics/src/interior/monte-carlo.ts`.
 - Model pages: [sampled band](../models/interior-sampled-band.md), [peak-pressure range](../models/interior-pressure-range.md).
 
 ## Confidence

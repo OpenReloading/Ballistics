@@ -58,8 +58,7 @@ describe('buildOpenApi', () => {
       Object.keys(d.paths[path]?.[method]?.responses ?? {})
     expect(statuses('/v1/target-faces', 'get')).toEqual(['200', '400', '500'])
     expect(statuses('/v1/cartridges', 'get')).toEqual(['200', '400', '500'])
-    expect(statuses('/v1/bullets/{id}', 'get')).toEqual(['200', '308', '400', '404', '414', '500'])
-    expect(d.paths['/v1/bullets/{id}']?.get?.responses['308']?.headers).toHaveProperty('Location')
+    expect(statuses('/v1/bullets/{id}', 'get')).toEqual(['200', '400', '404', '414', '500'])
     expect(statuses('/v1/exterior/stability', 'get')).toEqual(['200', '400', '404', '422', '500'])
     for (const path of ['/v1/interior', '/v1/interior/load-file', '/v1/interior/charge-target'])
       expect(statuses(path, 'post')).toEqual([
@@ -76,7 +75,7 @@ describe('buildOpenApi', () => {
     for (const op of ops)
       for (const [status, r] of Object.entries(op.responses)) {
         expect(r.description).toBeTruthy()
-        if (status !== '200' && status !== '308')
+        if (status !== '200')
           expect(r.content?.['application/json'].schema).toEqual({
             $ref: '#/components/schemas/Error',
           })
