@@ -9,6 +9,33 @@ import { LogFitFailure } from '@open-reloading/statistics';
 import { LogFitStop } from '@open-reloading/statistics';
 
 // @public
+export type AdvisoryId = 'limitExceeded' | 'noCartridge' | 'noComparableLimit' | 'rangeIncomplete' | 'chargeTooSmall' | 'resistanceNotApplied' | 'loadRatioHigh' | 'startPressureBelowResistance' | 'gyrationRadiusWithoutTwist' | 'startPressureHeldOnce';
+
+// @public
+export const advisoryIds: readonly [AdvisoryId, ...AdvisoryId[]];
+
+// @public
+export type AdvisoryLoad = Pick<InteriorLoad, 'startPressure' | 'ignitionPressure' | 'barrel' | 'bullet' | 'resistance'>;
+
+// @public
+export interface AdvisoryRule {
+    // (undocumented)
+    id: AdvisoryId;
+    inputs: readonly string[];
+    // (undocumented)
+    severity: AdvisorySeverity;
+}
+
+// @public
+export const advisoryRule: Readonly<Record<AdvisoryId, AdvisoryRule>>;
+
+// @public
+export const advisoryRules: readonly AdvisoryRule[];
+
+// @public
+export type AdvisorySeverity = 'error' | 'warn' | 'info';
+
+// @public
 export function aerodynamicJump(sg: number, lengthCalibres: number, crosswind: number, hand: 'right' | 'left'): number;
 
 // @public
@@ -698,6 +725,9 @@ export interface InputDefault {
 
 // @public
 export function interior(load: InteriorLoad, options?: Settings<InteriorOptions>): InteriorResult;
+
+// @public
+export function interiorAdvisories(load: AdvisoryLoad): AdvisoryRule[];
 
 // @public
 export const interiorApply: Record<PressureInput, ApplyTolerance<InteriorLoad>>;

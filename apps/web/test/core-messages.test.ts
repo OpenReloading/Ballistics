@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync } from 'node:fs'
+import { advisoryText } from '@open-reloading/api/compute'
 import { buildOpenApi } from '@open-reloading/api/openapi'
-import { advisoryRules } from '@open-reloading/core'
 import { autoMap, buildRecords, readTable } from '@open-reloading/importers'
 import { pressureMethod } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
@@ -311,7 +311,7 @@ describe('the warnings of an interior answer', () => {
   })
 
   it('names every rule of the registry in German', () => {
-    for (const { name } of advisoryRules) {
+    for (const { name } of Object.values(advisoryText)) {
       expect(translateMessage(name, marker.t), name).toBe('MAPPED')
       expect(translateMessage(name, german.t), name).not.toBe(name)
     }

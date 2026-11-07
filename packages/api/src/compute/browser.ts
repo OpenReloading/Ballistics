@@ -2,6 +2,7 @@
  * The compute code of the exterior, interior, charge target and load file routes without Fastify,
  * the database or Node APIs: the web app runs it in the browser (`@open-reloading/api/compute`).
  */
+export { type AdvisoryText, advisoryText } from './advisory-text.ts'
 export { errorAnswer, notice } from './answer.ts'
 export { type ChargeContext, runChargeTarget } from './charge-run.ts'
 export { chargeBody } from './charge-schema.ts'
