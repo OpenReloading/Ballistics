@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.0.6](https://github.com/OpenReloading/Ballistics/compare/importers-v0.0.5...importers-v0.0.6) (2026-11-07)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @open-reloading/schema bumped to 0.0.6
+
 ## [0.0.5](https://github.com/OpenReloading/Ballistics/compare/importers-v0.0.4...importers-v0.0.5) (2026-11-02)
 
 

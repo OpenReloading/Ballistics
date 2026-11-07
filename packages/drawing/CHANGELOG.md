@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.0.5](https://github.com/OpenReloading/Ballistics/compare/drawing-v0.0.4...drawing-v0.0.5) (2026-11-07)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @open-reloading/catalog bumped to 0.0.6
+
 ## [0.0.4](https://github.com/OpenReloading/Ballistics/compare/drawing-v0.0.3...drawing-v0.0.4) (2026-11-02)
 
 
