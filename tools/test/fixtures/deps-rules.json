@@ -263,6 +263,14 @@
     "source": "import { a } from './cycle-a.ts'\nexport const b = () => a",
     "rules": ["no-cycle"]
   },
+  "packages/design-tokens/src/units.ts": {
+    "source": "import { conversions } from '@open-reloading/units'\nexport { conversions }",
+    "rules": ["design-tokens-src-imports-nothing"]
+  },
+  "packages/design-tokens/src/local.ts": {
+    "source": "import { colors } from './index.ts'\nexport { colors }",
+    "rules": ["design-tokens-src-imports-nothing"]
+  },
   "packages/schema/src/cycle-a.ts": {
     "source": "import { b } from './cycle-b.ts'\nexport const a = () => b",
     "rules": ["no-cycle"]

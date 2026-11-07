@@ -15,10 +15,10 @@
     "test:coverage": "vitest run --dir test --coverage"
   },
   "dependencies": {
-    "@mantine/core": "9.7.4",
-    "@mantine/form": "9.7.4",
-    "@mantine/hooks": "9.7.4",
-    "@mantine/spotlight": "9.7.4",
+    "@mantine/core": "catalog:",
+    "@mantine/form": "catalog:",
+    "@mantine/hooks": "catalog:",
+    "@mantine/spotlight": "catalog:",
     "@open-reloading/api": "workspace:*",
     "@open-reloading/ballistics": "workspace:*",
     "@open-reloading/catalog": "workspace:*",

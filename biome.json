@@ -21,6 +21,8 @@
       "!tools/test/fixtures/markdown-meaning.md",
       "!pnpm-lock.yaml",
       "!**/test/golden",
+      "!packages/design-tokens/css/tokens.css",
+      "!packages/design-tokens/src/index.ts",
       "!tools/test/catalog/fixtures/invalid/chrono/broken.json"
     ]
   },
