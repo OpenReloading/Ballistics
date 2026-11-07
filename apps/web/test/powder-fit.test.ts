@@ -6,7 +6,7 @@ import {
   stringLadder,
 } from '@open-reloading/core'
 import { describe, expect, it } from 'vitest'
-import { load } from '../../../packages/core/test/powder-load.ts'
+import { load } from '../../../packages/ballistics/test/powder-load.ts'
 import { nth } from '../src/lib/nth.ts'
 import type {
   HandPoint,

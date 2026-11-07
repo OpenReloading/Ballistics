@@ -1,0 +1,368 @@
+import { InputError, nth } from '@open-reloading/statistics'
+import { describe, expect, it } from 'vitest'
+import {
+  calibratePooled,
+  fitPowder,
+  fitPowderPooled,
+  type InteriorLoad,
+  interior,
+  type LadderPoint,
+  type PooledPowderFit,
+  type PooledRequest,
+  type PooledSession,
+  PowderFitError,
+  predictPooled,
+  predictPowder,
+} from '../src/index.ts'
+
+/** Synthetic rifle load as in the single-ladder tests, with its own barrel length. */
+const load = (vivacity: number, length = 0.6): InteriorLoad => ({
+  chamber: { volume: 3.4e-6, boreArea: 3.75e-5, boreDiameter: 6.9e-3 },
+  barrel: { length, twist: 0.254 },
+  bullet: { mass: 0.0095 },
+  charge: 0.0028,
+  propellant: {
+    specificEnergy: 3.9e6,
+    gamma: 1.23,
+    density: 1600,
+    covolume: 1e-3,
+    burn: {
+      kind: 'vivacity',
+      vivacity,
+      exponent: 1,
+      referencePressure: 98066.5,
+      form: { kind: 'twoStage', a: 0.8, m: 0.5, q: 0.5, z1: 0.8 },
+    },
+    temperatureSensitivity: { reference: 294.15, cold: 0.004, hot: 0.003 },
+  },
+  propellantTemperature: 294.15,
+  ignitionPressure: 5e6,
+  startPressure: 30e6,
+})
+
+/** Standard normal draws from a fixed seed (mulberry32 and Box-Muller). */
+const normals = (seed: number) => {
+  let a = seed >>> 0
+  const uniform = () => {
+    a = (a + 0x6d2b79f5) >>> 0
+    let t = a
+    t = Math.imul(t ^ (t >>> 15), t | 1)
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+  return () => Math.sqrt(-2 * Math.log(1 - uniform())) * Math.cos(2 * Math.PI * uniform())
+}
+
+const sigma = 3
+/** Truth: burn coefficient per powder, velocity factor per rifle (with its barrel), burn factor per lot. */
+const powders = { A: 0.4, B: 0.45, C: 0.55 }
+const rifles = {
+  r1: { factor: 0.99, length: 0.5 },
+  r2: { factor: 1.003, length: 0.6 },
+  r3: { factor: 1.007, length: 0.66 },
+}
+const lots: Record<string, number> = { a1: 1.02, a2: 0.98 }
+const charges = [2.5e-3, 2.7e-3, 2.9e-3, 3.1e-3]
+
+type Setup = Omit<PooledSession, 'ladder'>
+const setups: Setup[] = Object.keys(powders).flatMap((powder) =>
+  Object.entries(rifles).map(([rifle, r], j) => ({
+    powder,
+    rifle,
+    ...(powder === 'A' ? { lot: j < 2 ? 'a1' : 'a2' } : {}),
+    // the fit starts away from the truth
+    load: load(0.5, r.length),
+  })),
+)
+
+/** True mean velocity of a setup at a charge. */
+const truth = (s: Setup, charge: number) => {
+  const vivacity =
+    powders[s.powder as keyof typeof powders] * (s.lot === undefined ? 1 : (lots[s.lot] ?? 1))
+  const r = interior({ ...load(vivacity, s.load.barrel.length), charge })
+  if (!r.valid) throw new Error(r.reason)
+  return r.muzzleVelocity * rifles[s.rifle as keyof typeof rifles].factor
+}
+
+/** Strings of the setups at `at` charges: measurement noise `sigma` plus relative model error `model`. */
+const strings = (draw: () => number, at: number[], model: number, repeat = 1): PooledSession[] =>
+  setups.map((s) => ({
+    ...s,
+    ladder: at.flatMap((charge) => {
+      const v = truth(s, charge)
+      return Array.from(
+        { length: repeat },
+        (): LadderPoint => ({
+          charge,
+          muzzleVelocity: v * (1 + model * draw()) + sigma * draw(),
+          velocitySigma: sigma,
+        }),
+      )
+    }),
+  }))
+
+const failure = (f: () => unknown) => {
+  try {
+    f()
+  } catch (error) {
+    return error
+  }
+  throw new Error('no failure')
+}
+
+const parameter = (fit: PooledPowderFit, kind: string, group: string) => {
+  const p = fit.parameters.find((x) => x.kind === kind && x.group === group)
+  if (!p) throw new Error(`no ${kind} ${group}`)
+  return p
+}
+
+/** Exact strings of every setup and their fit, shared by the tests that read them. */
+const data = strings(normals(1), charges, 0)
+const exact = fitPowderPooled(data)
+
+/** A session of powder B from rifle r2 at temperature `t`, K, with the exact velocities of vivacity 0.45. */
+const atTemperature = (t: number): PooledSession => {
+  const ladder = charges.map((charge) => {
+    const r = interior({ ...load(0.45), charge, propellantTemperature: t })
+    if (!r.valid) throw new Error(r.reason)
+    return { charge, muzzleVelocity: r.muzzleVelocity, velocitySigma: sigma }
+  })
+  return { powder: 'B', rifle: 'r2', load: load(0.4), propellantTemperature: t, ladder }
+}
+
+/** The rifle load with a geometric seven-perforated grain of burn rate `coefficient`. */
+const geometric = (coefficient: number): InteriorLoad => ({
+  ...load(0.5),
+  propellant: {
+    ...load(0.5).propellant,
+    burn: {
+      kind: 'geometric',
+      coefficient,
+      exponent: 0.9,
+      grain: {
+        shape: 'sevenPerf',
+        diameter: 1.25e-3,
+        perforationDiameter: 1.5e-4,
+        length: 2e-3,
+      },
+    },
+  },
+})
+
+describe('fitPowderPooled', () => {
+  it('recovers the burn coefficient per powder and the factor per rifle within 3 standard uncertainties', () => {
+    const fit = exact
+    expect(fit.parameters.map((p) => p.kind)).toEqual([
+      'burnRate',
+      'burnRate',
+      'burnRate',
+      'rifle',
+      'rifle',
+      'rifle',
+      'lot',
+      'lot',
+    ])
+    for (const [powder, value] of Object.entries(powders)) {
+      const p = parameter(fit, 'burnRate', powder)
+      expect(Math.abs(p.value - value)).toBeLessThan(3 * p.standardUncertainty)
+    }
+    for (const [rifle, { factor }] of Object.entries(rifles)) {
+      const p = parameter(fit, 'rifle', rifle)
+      expect(Math.abs(p.value - factor)).toBeLessThan(3 * p.standardUncertainty)
+    }
+    expect(fit.modelError).toBe(0)
+    expect(fit.degreesOfFreedom).toBe(36 - 8)
+  })
+})
+
+describe('fitPowderPooled calibration', () => {
+  it('covers 85 to 95 % of held-out strings with a nominal 90 % interval after calibration', () => {
+    const draw = normals(7)
+    const model = 0.004
+    const fit = fitPowderPooled(strings(draw, charges, model))
+    const untested = [2.6e-3, 2.8e-3, 3e-3]
+    const calibrated = calibratePooled(fit, strings(draw, untested, model, 4))
+    expect(calibrated.calibrationStrings).toBe(9 * 3 * 4)
+    expect(calibrated.modelError).toBeGreaterThan(0.002)
+    expect(calibrated.modelError).toBeLessThan(0.006)
+    const heldOut = strings(draw, untested, model, 10)
+    // per string point: whether the interval of its string and charge holds it
+    const held = heldOut.flatMap((s) =>
+      untested.flatMap((charge) => {
+        const p = predictPooled(calibrated, s, charge, { velocitySigma: sigma })
+        return s.ladder
+          .filter((y) => y.charge === charge)
+          .map((x) => x.muzzleVelocity >= p.lower && x.muzzleVelocity <= p.upper)
+      }),
+    )
+    const inside = held.filter(Boolean).length
+    const count = held.length
+    expect(count).toBe(270)
+    expect(inside / count).toBeGreaterThanOrEqual(0.85)
+    expect(inside / count).toBeLessThanOrEqual(0.95)
+    // without the model-error term the interval is too narrow
+    const raw = predictPooled(fit, nth(heldOut, 0), 2.8e-3, { velocitySigma: sigma })
+    const wide = predictPooled(calibrated, nth(heldOut, 0), 2.8e-3, { velocitySigma: sigma })
+    expect(wide.standardUncertainty).toBeGreaterThan(raw.standardUncertainty)
+  })
+})
+
+describe('fitPowderPooled against fitPowder and for an unseen rifle', () => {
+  it('fits one session as fitPowder does', () => {
+    const draw = normals(3)
+    const session: PooledSession = {
+      powder: 'B',
+      rifle: 'r2',
+      load: load(0.38),
+      ladder: [2.6e-3, 2.8e-3, 3e-3].map((charge) => {
+        const r = interior({ ...load(0.45), charge })
+        if (!r.valid) throw new Error(r.reason)
+        return { charge, muzzleVelocity: r.muzzleVelocity + sigma * draw(), velocitySigma: sigma }
+      }),
+    }
+    const pooled = fitPowderPooled([session])
+    const single = fitPowder(session.load, session.ladder)
+    const burn = nth(pooled.parameters, 0)
+    const reference = nth(single.parameters, 0)
+    // tolerance 1e-9 relative: the same rows, priors and solver, other run stacking
+    expect(burn.value).toBeCloseTo(reference.value, 9)
+    expect(burn.standardUncertainty / (reference.standardUncertainty as number)).toBeCloseTo(1, 9)
+    const a = predictPooled(pooled, session, 2.9e-3)
+    const b = predictPowder(single, 2.9e-3)
+    expect(a.value).toBeCloseTo(b.velocity.value, 6)
+    expect(a.parameterUncertainty / b.velocity.standardUncertainty).toBeCloseTo(1, 4)
+  })
+
+  it('adds the spread of a rifle it has not seen', () => {
+    const fit = exact
+    const known = predictPooled(fit, nth(setups, 3), 2.8e-3)
+    const unseen = predictPooled(fit, { ...nth(setups, 3), rifle: 'r9' }, 2.8e-3)
+    expect(unseen.parameterUncertainty).toBeGreaterThan(0.9 * fit.rifleSigma * unseen.value)
+    expect(known.parameterUncertainty).toBeLessThan(unseen.parameterUncertainty)
+  })
+})
+
+describe('fitPowderPooled temperature factors, priors and burn laws', () => {
+  it('fits a temperature factor per powder only where its sessions span two temperatures', () => {
+    const fit = fitPowderPooled(
+      [atTemperature(273.15), atTemperature(313.15), { ...atTemperature(294.15), powder: 'C' }],
+      {
+        parameters: ['burnRate', 'temperatureFactor'],
+      },
+    )
+    expect(fit.parameters.map((p) => `${p.kind} ${p.group}`)).toEqual([
+      'burnRate B',
+      'temperatureFactor B',
+      'burnRate C',
+    ])
+    expect(fit.held).toEqual([{ powder: 'C', name: 'temperatureFactor' }])
+    expect(parameter(fit, 'temperatureFactor', 'B').value).toBeCloseTo(1, 3)
+  })
+
+  it('holds a burn coefficient at a tight prior', () => {
+    const free = exact
+    const fit = fitPowderPooled(data, { priors: { C: { burnRate: { value: 0.6, sigma: 1e-6 } } } })
+    expect(parameter(fit, 'burnRate', 'C').value).toBeCloseTo(0.6, 4)
+    expect(parameter(free, 'burnRate', 'C').value).toBeCloseTo(0.55, 2)
+  })
+
+  it('fits the burn rate coefficient of a geometric burn law', () => {
+    const ladder = charges.map((charge): LadderPoint => {
+      const r = interior({ ...geometric(7e-9), charge })
+      if (!r.valid) throw new Error(r.reason)
+      return { charge, muzzleVelocity: r.muzzleVelocity, velocitySigma: sigma }
+    })
+    const fit = fitPowderPooled([{ powder: 'G', rifle: 'r1', load: geometric(6e-9), ladder }])
+    expect(parameter(fit, 'burnRate', 'G').value).toBeCloseTo(7e-9, 12)
+  })
+})
+
+describe('fitPowderPooled refusals', () => {
+  it.each(['exponent', 'form'])('refuses the %s from velocities', (name) => {
+    const error = failure(() =>
+      fitPowderPooled(data, { parameters: ['burnRate', name as PooledRequest] }),
+    )
+    expect(error).toBeInstanceOf(PowderFitError)
+    expect((error as PowderFitError).reason).toBe('unresolved')
+  })
+
+  it('refuses a powder with a single charge level', () => {
+    const one = data.map((s) =>
+      s.powder === 'C' ? { ...s, ladder: s.ladder.filter((x) => x.charge === 2.9e-3) } : s,
+    )
+    const error = failure(() => fitPowderPooled(one))
+    expect(error).toBeInstanceOf(PowderFitError)
+    expect((error as PowderFitError).reason).toBe('unresolved')
+    expect((error as PowderFitError).unresolved).toEqual([2])
+  })
+
+  it('refuses temperature factors that two close temperatures leave parallel to the burn coefficient', () => {
+    const close = data
+      .filter((s) => s.powder === 'B')
+      .map((s, k) => ({ ...s, propellantTemperature: k === 0 ? 300 : 300.01 }))
+    const error = failure(() =>
+      fitPowderPooled(close, { parameters: ['burnRate', 'temperatureFactor'] }),
+    )
+    expect(error).toBeInstanceOf(PowderFitError)
+    expect((error as PowderFitError).reason).toBe('ill-conditioned')
+  })
+
+  it('refuses a prior without a positive finite value and sigma, or for a powder not in the sessions', () => {
+    for (const prior of [
+      { value: 0, sigma: 0.05 },
+      { value: 0.5, sigma: 0 },
+      { value: Number.NaN, sigma: 0.05 },
+    ])
+      expect(() => fitPowderPooled(data, { priors: { B: { burnRate: prior } } })).toThrow(
+        'prior burnRate of B: value and sigma above 0',
+      )
+    expect(() =>
+      fitPowderPooled(data, { priors: { D: { burnRate: { value: 0.5, sigma: 0.05 } } } }),
+    ).toThrow(InputError)
+  })
+})
+
+describe('fitPowderPooled refusals of runs, priors and points', () => {
+  it('refuses sessions whose first run is not valid', () => {
+    const broken = data.map((s) => ({ ...s, load: { ...s.load, startPressure: 1e18 } }))
+    const error = failure(() => fitPowderPooled(broken))
+    expect(error).toBeInstanceOf(PowderFitError)
+    expect((error as PowderFitError).reason).toBe('invalid')
+  })
+
+  it.each([
+    { value: 0, sigma: 0.1 },
+    { value: Number.NaN, sigma: 0.1 },
+    { value: 0.4, sigma: 0 },
+    { value: 0.4, sigma: Number.POSITIVE_INFINITY },
+  ])('refuses a burn coefficient prior of $value with sigma $sigma', (prior) => {
+    expect(() => fitPowderPooled(data, { priors: { A: { burnRate: prior } } })).toThrow(
+      'prior burnRate of A: value and sigma above 0',
+    )
+  })
+
+  it('refuses a charge the interior model cannot run, in the fit and in a prediction', () => {
+    const s = nth(data, 0)
+    const overfull = { charge: 0.05, muzzleVelocity: 900, velocitySigma: sigma }
+    const error = failure(() => fitPowderPooled([{ ...s, ladder: [...s.ladder, overfull] }]))
+    expect((error as PowderFitError).reason).toBe('invalid')
+    const fit = fitPowderPooled([s])
+    const prediction = failure(() => predictPooled(fit, s, 0.05))
+    expect((prediction as PowderFitError).reason).toBe('invalid')
+  })
+
+  it('refuses pressures and points without a velocity sigma', () => {
+    const s = nth(data, 0)
+    const point = nth(s.ladder, 0)
+    expect(() =>
+      fitPowderPooled([
+        {
+          ...s,
+          ladder: [{ ...point, peakPressure: 3e8, pressureSigma: 1e7, pressureBasis: 'piezo' }],
+        },
+      ]),
+    ).toThrow('velocities only')
+    const { velocitySigma: _, ...bare } = point
+    expect(() => fitPowderPooled([{ ...s, ladder: [bare] }])).toThrow('velocitySigma')
+  })
+})

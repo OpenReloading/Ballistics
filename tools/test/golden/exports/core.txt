@@ -9,6 +9,7 @@
 . BallisticCoefficientBand
 . BoreAngles
 . BulletConstruction
+. BulletStructure
 . Burn
 . BurnForm
 . CandidatePlan
@@ -22,6 +23,7 @@
 . ChargeSolution
 . ChargeSolverOptions
 . ChargeTarget
+. ChargeTargetInputs
 . ChargeTargetKind
 . ChargedTrace
 . Chronograph
@@ -75,6 +77,7 @@
 . InteriorReason
 . InteriorResult
 . InteriorRun
+. InteriorValueKey
 . InteriorValues
 . Interval
 . LadderFlatSpots
@@ -160,6 +163,7 @@
 . PressureSensor
 . PressureTolerances
 . Projectile
+. RangeModel
 . RangeStringDefaults
 . RangeStringEntry
 . RangeStringFailure
@@ -183,6 +187,7 @@
 . Rk45Result
 . RoundCountNote
 . SampledBand
+. SampledModel
 . SampledRun
 . SamplingOptions
 . SeatingNote
@@ -196,6 +201,7 @@
 . ShotshellLoad
 . ShotshellResult
 . SimilarPowder
+. SimilarPowderRules
 . SimilarPowdersPrior
 . SkippedInput
 . StartPressureDefault
@@ -232,6 +238,7 @@
 . WeakReason
 . WearMeasurement
 . WindSegment
+. WorkbenchValueKey
 . ZeroSpec
 . advisoryIds
 . advisoryRule

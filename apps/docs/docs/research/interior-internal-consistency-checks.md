@@ -48,8 +48,8 @@ Analytic: identities of the model compared with its own output, no measured data
 
 ## Where in the app
 
-- `packages/core/src/interior/model.ts`, `interior`.
-- `packages/core/test/interior-model.test.ts`, the tests "energy terms add up to m_c Q z; resistance work equals its integral over travel", "p V_f^k is constant after burnout without heat loss (Noble-Abel isentrope)", "Lagrange pressure ratios without resistance", "base and breech pressure with bore resistance" and "halving the tolerances and the output step changes the results below 1e-7".
+- `packages/ballistics/src/interior/model.ts`, `interior`.
+- `packages/ballistics/test/interior-model.test.ts`, the tests "energy terms add up to m_c Q z; resistance work equals its integral over travel", "p V_f^k is constant after burnout without heat loss (Noble-Abel isentrope)", "Lagrange pressure ratios without resistance", "base and breech pressure with bore resistance" and "halving the tolerances and the output step changes the results below 1e-7".
 - Model page: [M3 interior model](../models/interior-m3.md).
 
 ## Confidence

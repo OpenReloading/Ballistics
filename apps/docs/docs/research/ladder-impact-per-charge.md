@@ -66,7 +66,7 @@ analytic. Seeded ladders from assumed values (the numbers of the issue for the d
 
 ## Where in the app
 
-- `packages/core/src/interior/velocity-ladder.ts` (`ladderFlatSpots`, velocity only; unchanged, the residual steps fit its input).
+- `packages/ballistics/src/interior/velocity-ladder.ts` (`ladderFlatSpots`, velocity only; unchanged, the residual steps fit its input).
 - `apps/web/src/components/ladder-flat-spots.tsx` and `apps/web/src/components/ladder-target.tsx` (where the note sits).
 - `packages/schema/src/target-sheet.ts` (`ladderStep` of a group).
 - `apps/web/src/lib/hit-probability.ts` (`verticalPerMetre`).

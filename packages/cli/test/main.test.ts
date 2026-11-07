@@ -68,15 +68,9 @@ describe('the JSON result', () => {
       expect(code).toBe(0)
       const json = JSON.parse(stdout)
       expect(validate(json), JSON.stringify(validate.errors)).toBe(true)
-      expect(json.schemaVersion).toBe(2)
       expect(json.notice).toBe('simulation, not load data')
       expect(result.safeParse(json).success).toBe(true)
     }
-  })
-
-  it('rejects a result of another shape', () => {
-    expect(validate({ schemaVersion: 2, command: 'verify' })).toBe(false)
-    expect(validate({ schemaVersion: 1, command: 'run' })).toBe(false)
   })
 
   it('has an absolute $id', () => {

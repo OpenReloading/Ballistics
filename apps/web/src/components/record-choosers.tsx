@@ -56,6 +56,12 @@ export const powderKind: ChooserKind<PowderRow> = {
       'The powder data could not be loaded. Check the connection and retry. The designer and the workbench still work.',
     ),
     empty: msg('No powder matches'),
+    none: {
+      title: msg('The catalogue has no powders.'),
+      text: msg(
+        'Make a powder in the powder designer, import a table of your powders with Import, or type the model values in the workbench.',
+      ),
+    },
   },
   load: fetchPowderCatalogue,
   selects: [

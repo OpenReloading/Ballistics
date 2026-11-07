@@ -46,8 +46,8 @@ Measured. The measurements are not in the repository.
 
 ## Where in the app
 
-- `packages/core/src/interior/bore-resistance.ts`, `boreResistance`, `recordResistance`.
-- `packages/core/src/interior/load-file.ts`, `overrideResistance`.
+- `packages/ballistics/src/interior/bore-resistance.ts`, `boreResistance`, `recordResistance`.
+- `packages/ballistics/src/interior/load-file.ts`, `overrideResistance`.
 - Model page: [M3 model](../models/interior-m3.md).
 
 ## Confidence

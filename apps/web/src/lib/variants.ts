@@ -59,10 +59,10 @@ function remember(key: string, record: object | undefined) {
 }
 
 /**
- * The catalogue record a variant is based on (`kind` as `bullets`); a renamed id is followed by the
- * API. `missing` when the catalogue no longer has it, `unreachable` when the API did not answer and
- * this browser holds no earlier read, so a record is never called gone for a network error. While
- * the API does not answer, the base last read stands in for it.
+ * The catalogue record a variant is based on (`kind` as `bullets`). `missing` when the catalogue no
+ * longer has it, `unreachable` when the API did not answer and this browser holds no earlier read,
+ * so a record is never called gone for a network error. While the API does not answer, the base
+ * last read stands in for it.
  * shortcut: a kept base is never removed for a deleted design, only replaced or dropped when its
  * record is gone from the catalogue; add a sweep if the entries pile up.
  */

@@ -808,13 +808,25 @@ describe('manufacturer', () => {
     provenance: { kind: 'published', sources: [{ title: 'Product page' }] },
   }
 
-  it('accepts a record with aliases and rejects an empty name, empty aliases, a site that is not https and unknown keys', () => {
+  it('accepts a record with aliases and rejects an empty name, empty aliases and a site that is not https', () => {
     expect(manufacturer.safeParse(valid).success).toBe(true)
     expect(manufacturer.safeParse({ ...valid, website: 'https://example.com' }).success).toBe(true)
     for (const website of ['http://example.com', 'javascript:alert(1)'])
       expect(manufacturer.safeParse({ ...valid, website }).success).toBe(false)
     expect(manufacturer.safeParse({ ...valid, name: '' }).success).toBe(false)
     expect(manufacturer.safeParse({ ...valid, aliases: [] }).success).toBe(false)
+  })
+
+  it('accepts a country code that a source supports and rejects one without that source or not alpha-2', () => {
+    const withCountrySource = {
+      ...valid,
+      provenance: {
+        kind: 'published',
+        sources: [{ title: 'Product page' }, { title: 'Contact page', fields: ['country'] }],
+      },
+    }
+    expect(manufacturer.safeParse({ ...withCountrySource, country: 'DE' }).success).toBe(true)
+    expect(manufacturer.safeParse({ ...withCountrySource, country: 'de' }).success).toBe(false)
     expect(manufacturer.safeParse({ ...valid, country: 'DE' }).success).toBe(false)
   })
 })

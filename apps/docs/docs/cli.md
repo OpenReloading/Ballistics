@@ -6,7 +6,7 @@ description: One compute operation of the API offline, the list of operations wi
 
 # Command line
 
-`packages/cli` (`@open-reloading/cli`, bin `ballistics`) measures how far the interior model is from printed load rows it was not fitted to, and says whether a changed model got better. It adds no model of its own: a row becomes an interior run through `recordLoad` of `@open-reloading/core` (the [M3 page](models/interior-m3.md#load-from-records)) and the seating of `@open-reloading/drawing`. Results are simulations compared with printed values, never load data.
+`packages/cli` (`@open-reloading/cli`, bin `ballistics`) measures how far the interior model is from printed load rows it was not fitted to, and says whether a changed model got better. It adds no model of its own: a row becomes an interior run through `recordLoad` of `@open-reloading/ballistics`, which the CLI imports through `@open-reloading/core` (the [M3 page](models/interior-m3.md#load-from-records)) and the seating of `@open-reloading/drawing`. Results are simulations compared with printed values, never load data.
 
 ```sh
 pnpm run build
@@ -96,7 +96,7 @@ A powder without rows gets no value, not an estimate, as the app refuses a powde
 ## Model version
 
 Every result carries `modelVersion`, the SHA-256 over the sorted lines:
-- `<label> <sha256>` of each built source file the model's result depends on: the files `@open-reloading/core` builds for `interior/model.js` and `interior/record-load.js`, the files `@open-reloading/units` builds for the unit conversion (`toSi`, `fromSi`, the conversion table and the water density that turns a capacity into a chamber volume), the files `@open-reloading/statistics` builds for the input checks (`need`, `InputError`) and the bisection the core model solves with, the files `@open-reloading/ballistics` builds for the options bag (`overlay`), the integrator and the standard atmosphere the core model reads, the files `@open-reloading/schema` builds for its unit entry and the water capacity of a case or capacity record, the files `@open-reloading/drawing` builds for its seating and bullet entries, each with the files they import by a relative path (a candidate module adds itself and its relative imports, because it may call the model of core; imports of other packages are not followed), and the family median estimator (`unseen.js` of the CLI with its relative imports), which no run calls, kept so that published versions stay valid;
+- `<label> <sha256>` of each built source file the model's result depends on: the files `@open-reloading/units` builds for the unit conversion (`toSi`, `fromSi`, the conversion table and the water density that turns a capacity into a chamber volume), the files `@open-reloading/statistics` builds for the input checks (`need`, `InputError`) and the bisection the interior model solves with, the files `@open-reloading/ballistics` builds for `interior/model.js` and `interior/record-load.js`, the files `@open-reloading/schema` builds for its unit entry and the water capacity of a case or capacity record, the files `@open-reloading/drawing` builds for its seating and bullet entries, each with the files they import by a relative path (a candidate module adds itself and its relative imports, because it may call the installed interior model; imports of other packages are not followed), and the family median estimator (`unseen.js` of the CLI with its relative imports), which no run calls, kept so that published versions stay valid;
 - `<kind>/<id> <sha256>` of the stored JSON of every cartridge, bullet, powder, capacity and case record the rows name;
 - `rows <sha256>` over the SHA-256 of each rows file.
 
@@ -114,7 +114,7 @@ The code of the evaluation itself (rows, split, the metrics and the percentiles,
 
 ## Output
 
-JSON when stdout is not a terminal or with `--json`, a table with `--table` or on a terminal. The JSON of `verify` and `compare` carries `schemaVersion` (2) and `notice: "simulation, not load data"`, the label of the API's answers. It is described by `packages/cli/schema/result.schema.json`, written from the zod definition in `src/result.ts` by `pnpm --filter @open-reloading/cli run schema`; a test validates real output of both commands against it. The schema's `$id`, `https://openreloading.github.io/Ballistics/docs/result.schema.json`, is where the build of this site copies it.
+JSON when stdout is not a terminal or with `--json`, a table with `--table` or on a terminal. The JSON of `verify` and `compare` carries `schemaVersion` (1) and `notice: "simulation, not load data"`, the label of the API's answers. It is described by `packages/cli/schema/result.schema.json`, written from the zod definition in `src/result.ts` by `pnpm --filter @open-reloading/cli run schema`; a test validates real output of both commands against it. The schema's `$id`, `https://openreloading.github.io/Ballistics/docs/result.schema.json`, is where the build of this site copies it.
 
 `--version` prints `ballistics <version>` and exits 0.
 

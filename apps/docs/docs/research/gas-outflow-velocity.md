@@ -38,7 +38,7 @@ Analytic: published forms evaluated on one example load; the forms are unverifie
 
 ## Where in the app
 
-- `packages/core/src/recoil.ts`, `gasVelocityFactor`.
+- `packages/ballistics/src/recoil.ts`, `gasVelocityFactor`.
 - Model pages: [free recoil](../models/free-recoil.md), [M3 model](../models/interior-m3.md).
 
 ## Confidence

@@ -16,7 +16,7 @@ interface PageEntry {
   description: Message
   /** The routes the page shows as tabs, in the tab bar's order; each is current under this page. */
   tabs?: readonly LibraryTab[]
-  /** Routes under no tab that the page links to and that link back to it (`/my-cases`). */
+  /** Routes under no tab that the page links to and that link back to it (`/events`). */
   covers?: readonly string[]
 }
 
@@ -118,7 +118,7 @@ export const sections = [
         icon: 'database',
         description: msg('The published records, each with its source, and your own beside them.'),
         tabs: databaseTabs,
-        covers: ['/my-cases', '/events'],
+        covers: ['/events'],
       },
     ],
   },

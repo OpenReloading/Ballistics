@@ -32,8 +32,8 @@ Analytic: a statement of the model's inputs; the composition figures are unverif
 
 ## Where in the app
 
-- `packages/core/src/interior/model.ts`, `interior`.
-- `packages/core/src/interior/fit.ts`, `fitPowder`.
+- `packages/ballistics/src/interior/model.ts`, `interior`.
+- `packages/ballistics/src/interior/fit.ts`, `fitPowder`.
 - Model pages: [M3 interior model](../models/interior-m3.md), [powder fit](../models/interior-powder-fit.md).
 
 ## Confidence

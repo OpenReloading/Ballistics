@@ -35,7 +35,7 @@ Analytic: model runs on the example load, no measured data.
 
 ## Where in the app
 
-- `packages/core/src/interior/model.ts`, `interior`.
+- `packages/ballistics/src/interior/model.ts`, `interior`.
 - `packages/api/src/compute/load-file-example.ts`, `loadFileExample`.
 - Model page: [M3 interior model](../models/interior-m3.md).
 

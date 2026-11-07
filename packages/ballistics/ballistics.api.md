@@ -6,6 +6,7 @@
 
 import { InputError } from '@open-reloading/statistics';
 import { LogFitFailure } from '@open-reloading/statistics';
+import { LogFitStop } from '@open-reloading/statistics';
 
 // @public
 export function aerodynamicJump(sg: number, lengthCalibres: number, crosswind: number, hand: 'right' | 'left'): number;
@@ -35,6 +36,9 @@ export function airAt(station: Air, height: number): Air;
 export function airDensity(air: Air): number;
 
 // @public
+export type ApplyTolerance<L> = (load: L, side: number, tolerance: number) => L | string;
+
+// @public
 export interface BallisticCoefficientBand {
     ballisticCoefficient: number;
     minVelocity: number;
@@ -47,6 +51,83 @@ export interface BoreAngles {
 }
 
 // @public
+export function boreArea(b: {
+    area?: number | undefined;
+    boreDiameter: number;
+    grooveDiameter?: number | undefined;
+}): number;
+
+// @public
+export function boreResistance(t: ResistanceTerms, c: ResistanceCartridge, bearing: number, startPressure: number): InteriorLoad['resistance'];
+
+// @public
+export type BulletConstruction = 'lead' | 'plated' | 'jacketed' | 'monolithic';
+
+// @public
+export function bulletFits(diameter: number, c: CartridgeDiameters): boolean;
+
+// @public
+export interface BulletStructure {
+    // (undocumented)
+    construction?: BulletConstruction;
+    // (undocumented)
+    density: DensityClass;
+}
+
+// @public
+export const bulletStructures: Readonly<Record<string, BulletStructure>>;
+
+// @public
+export function bulletWindow(c: CartridgeDiameters): {
+    above: number;
+    upTo: number;
+};
+
+// @public
+export type Burn =
+/** r = coefficient p^exponent, coefficient in m s^-1 Pa^-exponent. */
+    {
+    kind: 'geometric';
+    coefficient: number;
+    exponent: number;
+    grain: Grain;
+}
+/** dz/dt = vivacity phi(z) (p/referencePressure)^exponent, vivacity in 1/s. */
+| {
+    kind: 'vivacity';
+    vivacity: number;
+    exponent: number;
+    referencePressure: number;
+    form: VivacityForm;
+};
+
+// @public
+export function burnError(burn: Burn): string | undefined;
+
+// @public
+export interface BurnForm {
+    breaks: readonly number[];
+    end: number;
+    halfWeb: number;
+    phi: (f: number) => number;
+    z: (f: number) => number;
+}
+
+// @public
+export function burnForm(burn: Burn): BurnForm;
+
+// @public
+export const burnFormKeys: {
+    readonly formA: 'a';
+    readonly formM: 'm';
+    readonly formQ: 'q';
+    readonly formZ1: 'z1';
+};
+
+// @public
+export function calibratePooled(fit: PooledPowderFit, heldOut: readonly PooledSession[], options?: Pick<PooledPredictionOptions, 'options'>): PooledPowderFit;
+
+// @public
 export interface CandidatePlan {
     name?: string;
     plan: TruingPlan;
@@ -54,7 +135,171 @@ export interface CandidatePlan {
 }
 
 // @public
+export function cartridgeBoreAreaMm2(c: CartridgeSpecs): number | undefined;
+
+// @public
+export function cartridgeBulletDiameterMm(c: CartridgeSpecs): number | undefined;
+
+// @public
+export type CartridgeDiameters = {
+    g1: number;
+    land: number;
+    groove: number;
+};
+
+// @public
+export function cartridgeDiameters(c: CartridgeSpecs): CartridgeDiameters | undefined;
+
+// @public
+export function cartridgeGrooveDiameterMm(c: CartridgeSpecs): number | undefined;
+
+// @public
+export function cartridgeLandDiameterMm(c: CartridgeSpecs): number | undefined;
+
+// @public
+export interface CartridgeSpecs {
+    // (undocumented)
+    values: {
+        side?: string | undefined;
+        symbol: string;
+        value?: number | undefined;
+        variant?: string | undefined;
+    }[];
+}
+
+// @public
+export interface CastConstruction {
+    // (undocumented)
+    core?: {
+        hardness?: {
+            value: number;
+        } | undefined;
+    } | undefined;
+    // (undocumented)
+    gasCheck?: boolean | undefined;
+    // (undocumented)
+    structure?: string | undefined;
+}
+
+// @public
+export const castHarderThanPeak: (brinell: number, peak: number) => boolean;
+
+// @public
+export interface ChargedTrace {
+    charge: number;
+    trace: PressureHistory;
+}
+
+// @public
+export interface ChargeExtreme {
+    // (undocumented)
+    charge: number;
+    // (undocumented)
+    value: number;
+}
+
+// @public
+export function chargeLadder(start: number, step: number, steps: number, direction: 'up' | 'down' | 'around'): number[];
+
+// @public
+export interface ChargeRange {
+    // (undocumented)
+    maxValue: ChargeExtreme;
+    // (undocumented)
+    minValue: ChargeExtreme;
+}
+
+// @public
+export type ChargeRefusal =
+/** No scanned charge gives a valid run with the target defined. */
+'noValidRun'
+/** The target is below every scanned value. */
+| 'belowRange'
+/** The target is above every scanned value. */
+| 'aboveRange'
+/** The curve crosses the target more than once, so no charge is unique. */
+| 'notMonotone'
+/** The target lies in the range, but no two neighbouring valid runs enclose it. */
+| 'bracketFailed'
+/** `maxIterations` runs did not reach the tolerance. */
+| 'toleranceNotReached';
+
+// @public
+export interface ChargeRunFailure {
+    // (undocumented)
+    field?: string;
+    // (undocumented)
+    reason: string;
+}
+
+// @public
+export type ChargeSolution = {
+    reached: true;
+    charge: number;
+    value: number;
+    run: InteriorRun;
+    evaluationCount: number;
+    tolerance: number;
+    reachable: ChargeRange;
+} | {
+    reached: false;
+    reason: ChargeRefusal;
+    reachable?: ChargeRange;
+    failure?: ChargeRunFailure;
+    evaluationCount: number;
+};
+
+// @public
+export const chargeSolverMaxRuns: number;
+
+// @public
+export interface ChargeSolverOptions {
+    bulkDensity?: number | undefined;
+    options?: Settings<InteriorOptions> | undefined;
+    run?: ((load: InteriorLoad, options?: Settings<InteriorOptions>) => InteriorResult) | undefined;
+}
+
+// @public
+export const chargeSolverTolerance = 0.000001;
+
+// @public
+export interface ChargeTarget {
+    // (undocumented)
+    kind: ChargeTargetKind;
+    // (undocumented)
+    value: number;
+}
+
+// @public
+export interface ChargeTargetInputs {
+    // (undocumented)
+    bulkDensity?: number | undefined;
+    // (undocumented)
+    charge: number;
+    // (undocumented)
+    load: Pick<InteriorLoad, 'chamber'>;
+}
+
+// @public
+export type ChargeTargetKind = 'peakPressure' | 'muzzleVelocity' | 'loadRatio' | 'barrelTime' | 'bulletLeadTime';
+
+// @public
+export function chargeTargetValue(kind: ChargeTargetKind, run: InteriorRun, input: ChargeTargetInputs): number | undefined;
+
+// @public
+export function chargeTooSmall(peakMeanPressure: number, startPressure: number, ignitionPressure: number): boolean;
+
+// @public
+export const chargeTooSmallRatio = 2.2;
+
+// @public
+export function chargeUpperBound(load: InteriorLoad): number;
+
+// @public
 export function checkAir(air: Air): Air;
+
+// @public
+export function checkResistanceValues(values: Record<string, number | undefined>): void;
 
 // @public
 export interface Chronograph {
@@ -68,16 +313,100 @@ export interface Chronograph {
 }
 
 // @public
+export interface ChronographString extends Omit<LadderPoint, 'muzzleVelocity' | 'velocitySigma'> {
+    velocities: readonly number[];
+}
+
+// @public
+export const cipRounding = 0.005;
+
+// @public
+export function closedVessel(load: InteriorLoad, options?: Settings<InteriorOptions>): ClosedVesselResult;
+
+// @public
+export type ClosedVesselResult = InteriorInvalid | {
+    valid: true;
+    points: InteriorPoint[];
+    burnoutTime: number;
+    finalPressure: number;
+    steps: number;
+};
+
+// @public
 export function coefficientAt(c: CoefficientOverMach, mach: number): number;
 
 // @public
 export type CoefficientOverMach = number | DragTable;
 
 // @public
+export function coldPeakInterval(load: InteriorLoad, interval: readonly [number, number]): [number, number] | undefined;
+
+// @public
 export function comparePlanCandidates(input: Omit<TruingPlanInput, 'entries' | 'chronograph'>, candidates: readonly PlanCandidate[], options?: RangeStringOptions): CandidatePlan[];
 
 // @public
 export function compareTruingFits(shot: TrajectoryInput, observations: readonly Observation[], options?: TruingOptions): TruingComparison;
+
+// @public
+export function constructionOf(fields: StructureFields | undefined): {
+    construction: BulletConstruction;
+    assumed: boolean;
+} | undefined;
+
+// @public
+export const convectiveDefaults: {
+    wallTemperature: number;
+    viscosity: number;
+    prandtl: number;
+};
+
+// @public
+export interface CurveFitOptions {
+    fallFraction?: number | undefined;
+    maxCondition?: number | undefined;
+    maxInflation?: number | undefined;
+    maxIterations?: number | undefined;
+    maxRelativeStandardUncertainty?: number | undefined;
+    options?: Settings<InteriorOptions> | undefined;
+    parameters?: readonly CurveParameter[] | undefined;
+}
+
+// @public
+export type CurveParameter = 'burnRate' | 'formSlope' | 'transition' | 'exponent';
+
+// @public
+export interface CurveParameterReport {
+    initial: number;
+    interval?: {
+        low: number;
+        high: number;
+    };
+    leaveOneOut?: number[];
+    name: CurveParameter | 'timeShift';
+    reasons: CurveReason[];
+    relativeStandardUncertainty?: number;
+    standardUncertainty?: number;
+    status: 'identified' | 'weak' | 'fixed';
+    value: number;
+    varianceInflation?: number;
+}
+
+// @public
+export type CurveReason = 'collinear' | 'imprecise' | 'unresolved' | 'ill-conditioned' | 'inconsistent';
+
+// @public
+export interface CurveResidual {
+    observed: number;
+    predicted: number;
+    time: number;
+}
+
+// @public
+export interface CurveWarning {
+    message: string;
+    reason: 'sameCharge' | 'narrowPeaks';
+    traces: number[];
+}
 
 // @public
 export function cylinderInertia(mass: number, diameter: number, length: number): {
@@ -93,7 +422,16 @@ export const defaultRounding: {
 };
 
 // @public
+export function defaultSensitivity(form: string | undefined): SensitivityDefault | undefined;
+
+// @public
+export function defaultStartPressure(barrel: number, construction?: BulletConstruction): StartPressureDefault;
+
+// @public
 export function densityAltitude(air: Air): number;
+
+// @public
+export type DensityClass = 'cast' | 'monolithic' | 'jacketed' | 'unknown';
 
 // @public
 export interface DownrangeReading {
@@ -167,6 +505,9 @@ export interface DynamicStabilityInput {
 }
 
 // @public
+export function dynamicVivacity(burn: VivacityBurn, z: number): number;
+
+// @public
 export function earthRotation(latitude: number, azimuth?: number): [number, number, number];
 
 // @public
@@ -177,6 +518,9 @@ export type EstimatedInput = 'axialInertia' | 'transverseInertia' | 'momentSlope
 
 // @public
 export function estimateDragFromOutline(input: OutlineDragInput): OutlineDragEstimate;
+
+// @public
+export const fillLoadRatioLimit: (density: number, bulkDensity: number) => number;
 
 // @public
 export interface Firearm {
@@ -193,7 +537,86 @@ export interface FiringSite {
 }
 
 // @public
+export function fitPowder(load: InteriorLoad, ladder: readonly LadderPoint[], options?: PowderFitOptions): PowderFit;
+
+// @public
+export function fitPowderPooled(sessions: readonly PooledSession[], options?: PooledFitOptions): PooledPowderFit;
+
+// @public
+export function fitPowderSessions(load: InteriorLoad, sessions: readonly PowderSession[], options?: PowderFitOptions): PowderSessionsFit;
+
+// @public
+export function fitPressureCurve(load: InteriorLoad, trace: PressureHistory, options?: CurveFitOptions): PressureCurveFit;
+
+// @public
+export function fitPressureCurves(load: InteriorLoad, shots: readonly ChargedTrace[], options?: CurveFitOptions): PressureCurvesFit;
+
+// @public
+export interface FittedPowderParameter {
+    initial: number;
+    name: PowderParameter;
+    standardUncertainty?: number;
+    value: number;
+}
+
+// @public
 export function fitTruingStrings(input: TruingStringsInput, options?: RangeStringOptions): RangeStringFit;
+
+// @public
+export interface FlatSpot {
+    counts: number[];
+    from: number;
+    // (undocumented)
+    to: number;
+}
+
+// @public
+export type FreeRecoil = {
+    momentum: number;
+    velocity: number;
+    energy: number;
+};
+
+// @public
+export function freeRecoil(input: FreeRecoilInput): FreeRecoil;
+
+// @public
+export type FreeRecoilInput = {
+    firearmMass: number;
+    projectileMass: number;
+    chargeMass: number;
+    muzzleVelocity: number;
+    gasFactor: number;
+};
+
+// @public
+export const gasVelocityFactor: {
+    readonly rifle: 1.75;
+    readonly pistol: 1.5;
+};
+
+// @public
+export type Grain = {
+    shape: 'sphere';
+    diameter: number;
+} | {
+    shape: 'cylinder';
+    diameter: number;
+    length: number;
+} | {
+    shape: 'tube';
+    diameter: number;
+    perforationDiameter: number;
+    length: number;
+} | {
+    shape: 'sevenPerf';
+    diameter: number;
+    perforationDiameter: number;
+    length: number;
+};
+
+// @public
+export type GrainForm = 'ball' | 'extruded' | 'flake' | 'other';
 
 // @public
 export function gyroscopicStability(i: GyroscopicStabilityInput): number;
@@ -214,6 +637,15 @@ export interface GyroscopicStabilityInput {
     spin: number;
     // (undocumented)
     transverseInertia: number;
+}
+
+// @public
+export const handgunBarrelLengthLimit = 0.3;
+
+// @public
+export interface HeldPowderParameter {
+    name: PowderParameter;
+    reason: Extract<PowderFitReason, 'underdetermined' | 'unresolved' | 'ill-conditioned'>;
 }
 
 // @public
@@ -242,13 +674,282 @@ export interface Identification {
 }
 
 // @public
+export interface ImpactStep {
+    // (undocumented)
+    charge: number;
+    // (undocumented)
+    heights: readonly number[];
+    // (undocumented)
+    velocities: readonly number[];
+}
+
+// @public
 export function inDragTable(table: DragTable, mach: number): boolean;
+
+// @public
+export type InputBasis = 'measured' | 'estimated';
+
+// @public
+export interface InputDefault {
+    estimated: number;
+    measured?: number;
+    unit: 'relative' | 'K';
+}
+
+// @public
+export function interior(load: InteriorLoad, options?: Settings<InteriorOptions>): InteriorResult;
+
+// @public
+export const interiorApply: Record<PressureInput, ApplyTolerance<InteriorLoad>>;
+
+// @public
+export const interiorDefaults: InteriorOptions;
+
+// @public
+export interface InteriorEnergy {
+    gas: number;
+    gasKinetic: number;
+    heat: number;
+    leakage: number;
+    resistance: number;
+    rotation: number;
+    translation: number;
+}
+
+// @public
+export type InteriorInvalid = {
+    valid: false;
+    reason: InteriorReason;
+    field?: string;
+};
+
+// @public
+export interface InteriorLoad {
+    // (undocumented)
+    barrel: {
+        length: number;
+        twist: number;
+    };
+    // (undocumented)
+    bullet: {
+        mass: number;
+        gyrationRadius?: number | undefined;
+    };
+    // (undocumented)
+    chamber: {
+        volume: number;
+        boreArea: number;
+        boreDiameter: number;
+        throatWear?: number | undefined;
+    };
+    charge: number;
+    gradient?: {
+        energy: number;
+        breech: number;
+    } | undefined;
+    heat?: undefined | {
+        model: 'none';
+    } | {
+        model: 'convective';
+        flameTemperature: number;
+        wallTemperature?: number | undefined;
+        viscosity?: number | undefined;
+        prandtl?: number | undefined;
+        factor?: number | undefined;
+    };
+    ignitionPressure: number;
+    leakage?: {
+        area: readonly {
+            travel: number;
+            area: number;
+        }[];
+        backPressure?: number | undefined;
+        discharge?: number | undefined;
+    } | undefined;
+    // (undocumented)
+    propellant: {
+        specificEnergy: number;
+        gamma: number;
+        density: number;
+        covolume: number;
+        burn: Burn;
+        temperatureSensitivity?: {
+            reference: number;
+            cold: number;
+            hot: number;
+        } | undefined;
+        energyTemperature?: number | undefined;
+    };
+    propellantTemperature: number;
+    resistance?: {
+        friction?: number | undefined;
+        engraving?: readonly {
+            travel: number;
+            pressure: number;
+        }[] | undefined;
+    } | undefined;
+    startPressure: number;
+}
+
+// @public
+export function interiorLoad(values: Record<string, number | undefined>, label?: (key: string) => string, grooveDiameter?: number): InteriorLoad;
+
+// @public
+export interface InteriorOptions {
+    absoluteTolerance: number;
+    maxSteps: number;
+    maxTime: number;
+    outputStep: number;
+    relativeTolerance: number;
+}
+
+// @public
+export interface InteriorPoint {
+    basePressure: number;
+    breechPressure: number;
+    burntFraction: number;
+    gasTemperature: number | null;
+    leakedMass?: number;
+    meanPressure: number;
+    time: number;
+    travel: number;
+    velocity: number;
+}
+
+// @public
+export function interiorPressureRange(load: InteriorLoad, nominal: number, tolerances?: PressureTolerances, options?: Settings<InteriorOptions>): PressureRange;
+
+// @public
+export type InteriorReason = 'input' | 'chamberVolume' | 'noShotStart' | 'stuck' | 'integration' | 'maxTime';
+
+// @public
+export type InteriorResult = InteriorInvalid | InteriorRun;
+
+// @public
+export interface InteriorRun {
+    barrelTime: number;
+    burnout: {
+        time: number;
+        travel: number;
+    } | null;
+    efficiency: number;
+    energy: InteriorEnergy;
+    maxBasePressure: number;
+    maxMeanPressure: number;
+    maxPressureTime: number;
+    maxPressureTravel: number;
+    muzzleBasePressure: number;
+    muzzleBreechPressure: number;
+    muzzleBurntFraction: number;
+    muzzleEnergy: number;
+    muzzleMeanPressure: number;
+    muzzleTime: number;
+    muzzleVelocity: number;
+    peakBreechPressure: number;
+    // (undocumented)
+    points: InteriorPoint[];
+    shotStartTime: number;
+    steps: number;
+    tenPercentPressureTime: number;
+    // (undocumented)
+    valid: true;
+}
+
+// @public
+export function interiorSampledBand(load: InteriorLoad, tolerances: PressureTolerances, sampling: SamplingOptions, options?: Settings<InteriorOptions>): SampledBand;
+
+// @public
+export type InteriorValueKey = 'volume' | 'boreDiameter' | 'boreArea' | 'travel' | 'twist' | 'bulletMass' | 'charge' | 'propellantEnergy' | 'gamma' | 'density' | 'covolume' | 'vivacity' | 'exponent' | 'referencePressure' | 'propellantTemperature' | 'ignitionPressure' | 'startPressure' | 'sebert' | 'formA' | 'formM' | 'formQ' | 'formZ1' | 'leakArea' | 'throatWear' | 'boreFriction' | 'engravingPressure' | 'engravingLength';
+
+// @public
+export const interiorValueKeys: readonly InteriorValueKey[];
+
+// @public
+export interface InteriorValues extends Record<InteriorValueKey, number> {
+}
 
 // @public
 export function isStable(sg: number, sd: number): boolean;
 
 // @public
+export interface LadderFlatSpots {
+    // (undocumented)
+    flatSpots: FlatSpot[];
+    level: number;
+    // (undocumented)
+    segments: LadderSegment[];
+}
+
+// @public
+export function ladderFlatSpots(steps: readonly LadderStep[], level?: number): LadderFlatSpots;
+
+// @public
+export interface LadderImpact {
+    degrees: number;
+    statistic: number;
+    steps: LadderStep[];
+    varies: boolean;
+}
+
+// @public
+export function ladderImpactResiduals(charges: readonly ImpactStep[], slope: number, level?: number): LadderImpact;
+
+// @public
+export interface LadderPoint {
+    barrelLength?: number;
+    charge: number;
+    muzzleVelocity: number;
+    peakPressure?: number;
+    pressureBasis?: PressureBasis;
+    pressureSigma?: number;
+    propellantTemperature?: number;
+    velocitySigma?: number;
+}
+
+// @public
+export interface LadderSegment {
+    counts: [number, number];
+    flat: boolean;
+    from: number;
+    halfWidth: number;
+    slope: number;
+    // (undocumented)
+    to: number;
+}
+
+// @public
+export interface LadderStep {
+    // (undocumented)
+    charge: number;
+    // (undocumented)
+    count: number;
+    // (undocumented)
+    mean: number;
+    // (undocumented)
+    standardDeviation: number;
+}
+
+// @public
+export const lagrangeGradient: {
+    energy: number;
+    breech: number;
+};
+
+// @public
 export const lbPerSqInToKgPerSqM: number;
+
+// @public
+export function leakFlowFactor(gamma: number, ratio: number): number;
+
+// @public
+export function leastSpecValue(values: readonly {
+    side?: string | null | undefined;
+    symbol: string;
+    value?: number | null | undefined;
+}[], side: string, symbol: string): number | undefined;
+
+// @public
+export function lensArea(r1: number, r2: number, d: number): number;
 
 // @public
 export function linearJump(i: LinearJumpInput): number;
@@ -274,7 +975,55 @@ export interface LinearJumpInput {
 }
 
 // @public
+export type LoadNote = LotNote | SeatingNote | VelocityNote | RoundCountNote;
+
+// @public
+export type LoadNoteRule = 'powderLot' | 'primerLot' | 'caseLot' | 'seating' | 'velocity' | 'roundCount';
+
+// @public
+export function loadNotes(sessions: readonly SessionReading[], roundCountThreshold?: number): LoadNote[];
+
+// @public
+export function loadRatio(charge: number, bulkDensity: number | undefined, volume: number): number | undefined;
+
+// @public
+export interface LotNote {
+    // (undocumented)
+    before?: string | undefined;
+    // (undocumented)
+    change: 'changed' | 'missing';
+    earlier?: string | undefined;
+    // (undocumented)
+    now?: string | undefined;
+    // (undocumented)
+    rule: 'powderLot' | 'primerLot' | 'caseLot';
+    // (undocumented)
+    session: string;
+}
+
+// @public
 export const maxDensity = 1000;
+
+// @public
+export type MaximumClass =
+/** Inside [low, high] of the range, ends included. */
+'inputPlausible'
+/** Below the low end of the range. */
+| 'modelDiscrepancy'
+/** Above the high end of the range. */
+| 'aboveRange';
+
+// @public
+export interface MaximumPlacement {
+    class: MaximumClass;
+    dominantInput: PressureInput | null;
+}
+
+// @public
+export const maxOversizePercent = 5;
+
+// @public
+export function meanDynamicVivacity(burn: VivacityBurn, from?: number, to?: number): number;
 
 // @public
 export function millerStability(i: MillerStabilityInput): number;
@@ -300,6 +1049,15 @@ export const minAltitude = -5000;
 
 // @public
 export const minIntervalScale = 0.000001;
+
+// @public
+export const missingLoadKeys: (values: Record<string, number | undefined>) => string[];
+
+// @public
+export class MixedPressureBasisError extends InputError {
+    constructor(rows: Partial<Record<PressureBasis, number>>);
+    readonly rows: Partial<Record<PressureBasis, number>>;
+}
 
 // @public
 export function momentSlopeFromStability(i: MomentSlopeInput): number;
@@ -334,6 +1092,9 @@ export interface Observation {
     standardUncertainty?: number | undefined;
     value: number;
 }
+
+// @public
+export const obturationPressurePerBrinell: number;
 
 // @public
 export type OmittedEffect = 'coriolis' | 'coriolisVertical' | 'spinDrift' | 'jump' | 'spinDecay' | 'magnus';
@@ -379,7 +1140,29 @@ export interface OutlineDragNode {
 export type OutlineDragWarning = 'diameter-range' | 'mach-range' | 'nose-short' | 'boat-tail-long' | 'base-small' | 'base-pressure-negative';
 
 // @public
+export function outsideDomain(domain: PowderDomain, values: Partial<Record<PowderAxis, number>>): PowderExtrapolation;
+
+// @public
 export function overlay<T extends object>(base: T, settings: Settings<T> | undefined): T;
+
+// @public
+export function overrideResistance(record: InteriorLoad['resistance'], values: Record<string, number | undefined>): InteriorLoad['resistance'];
+
+// @public
+export function oversizePercent(c: Pick<ResistanceCartridge, 'bulletDiameterMm' | 'grooveDiameterMm'>): number | undefined;
+
+// @public
+export interface Percentiles {
+    p05: number;
+    p50: number;
+    p95: number;
+}
+
+// @public
+export function placeMaximum(range: PressureRange, maximum: number): MaximumPlacement;
+
+// @public
+export function plainBaseCastHardness(c: CastConstruction | undefined): number | undefined;
 
 // @public
 export interface PlanCandidate {
@@ -410,6 +1193,485 @@ export type PlanRefusalId = 'single-range' | 'velocity-only';
 export function planTruingStrings(input: TruingPlanInput, options?: RangeStringOptions): TruingPlan;
 
 // @public
+export const pooledDefaults: {
+    rifleSigma: number;
+    lotSigma: number;
+};
+
+// @public
+export interface PooledFitOptions {
+    lotSigma?: number | undefined;
+    maxCondition?: number | undefined;
+    maxIterations?: number | undefined;
+    options?: Settings<InteriorOptions> | undefined;
+    parameters?: readonly PooledRequest[] | undefined;
+    priors?: PooledPriors | undefined;
+    rifleSigma?: number | undefined;
+}
+
+// @public
+export type PooledParameterKind = 'burnRate' | 'temperatureFactor' | 'rifle' | 'lot';
+
+// @public
+export interface PooledPowderFit {
+    calibrationStrings: number;
+    chiSquare: number;
+    conditionNumber: number;
+    correlation: number[][];
+    covariance: number[][];
+    dataChiSquare: number;
+    degreesOfFreedom: number;
+    held: {
+        powder: string;
+        name: 'temperatureFactor';
+    }[];
+    iterations: number;
+    lotSigma: number;
+    modelError: number;
+    parameters: PooledPowderParameter[];
+    residuals: PooledResidual[];
+    rifleSigma: number;
+    runCount: number;
+    sessions: Pick<PooledSession, 'powder' | 'rifle' | 'lot'>[];
+}
+
+// @public
+export interface PooledPowderParameter {
+    group: string;
+    initial: number;
+    kind: PooledParameterKind;
+    lot?: string;
+    standardUncertainty: number;
+    value: number;
+}
+
+// @public
+export interface PooledPrediction {
+    charge: number;
+    coverageFactor: number;
+    level: number;
+    lower: number;
+    modelUncertainty: number;
+    parameterUncertainty: number;
+    runCount: number;
+    standardUncertainty: number;
+    upper: number;
+    value: number;
+}
+
+// @public
+export interface PooledPredictionOptions {
+    level?: number | undefined;
+    options?: Settings<InteriorOptions> | undefined;
+    velocitySigma?: number | undefined;
+}
+
+// @public
+export type PooledPriors = Readonly<Record<string, Partial<Record<PooledRequest, PowderPrior | undefined>> | undefined>>;
+
+// @public
+export type PooledRequest = 'burnRate' | 'temperatureFactor';
+
+// @public
+export interface PooledResidual {
+    charge: number;
+    observed: number;
+    predicted: number;
+    residual: number;
+    session: number;
+}
+
+// @public
+export interface PooledSession {
+    barrelLength?: number | undefined;
+    ladder: readonly LadderPoint[];
+    load: InteriorLoad;
+    lot?: string | undefined;
+    powder: string;
+    propellantTemperature?: number | undefined;
+    rifle: string;
+}
+
+// @public
+export type PooledTarget = Omit<PooledSession, 'ladder'>;
+
+// @public
+export function pooledVelocitySd(strings: readonly ChronographString[]): number | undefined;
+
+// @public
+export type PowderAxis = 'charge' | 'velocity' | 'pressure' | 'boreDiameter' | 'barrelLength';
+
+// @public
+export interface PowderAxisRange {
+    max: number;
+    min: number;
+}
+
+// @public
+export interface PowderConfidence {
+    basis: PowderFit['basis'];
+    label: PowderFitLabel;
+    reasons: PowderConfidenceReason[];
+    relativeHalfWidth: number;
+}
+
+// @public
+export function powderConfidence(fit: PowderFit, range: PowderPressureRange, options?: PowderConfidenceOptions): PowderConfidence;
+
+// @public
+export interface PowderConfidenceOptions {
+    similar?: SimilarPowdersPrior | undefined;
+}
+
+// @public
+export type PowderConfidenceReason = 'no-pressure' | 'capacity-estimated' | 'narrow-ladder' | 'residual-trend' | 'start-pressure-correlated' | 'outside-similar-powders' | 'weak-prior' | 'extrapolated' | 'input-refit-failed';
+
+// @public
+export interface PowderConfidenceRules {
+    readonly correlation: number;
+    readonly moderate: number;
+    readonly narrowRatio: number;
+    readonly priorSpread: number;
+    readonly tight: number;
+    readonly trendRows: number;
+}
+
+// @public
+export const powderConfidenceRules: PowderConfidenceRules;
+
+// @public
+export interface PowderDomain {
+    barrelLength: PowderAxisRange;
+    boreDiameter: PowderAxisRange;
+    charge: PowderAxisRange;
+    margin: number;
+    pressure?: PowderAxisRange;
+    velocity: PowderAxisRange;
+}
+
+// @public
+export const powderDomainMargin = 0;
+
+// @public
+export type PowderExtrapolation = Partial<Record<PowderAxis, 'below' | 'above'>>;
+
+// @public
+export interface PowderFit {
+    basis: PowderFitBasis;
+    chargeRange: {
+        min: number;
+        max: number;
+    };
+    chiSquare: number;
+    conditionNumber: number;
+    correlation?: number[][];
+    covariance?: number[][];
+    dataChiSquare: number;
+    degreesOfFreedom: number;
+    domain: PowderDomain;
+    iterations: number;
+    load: InteriorLoad;
+    loss: number;
+    parameters: FittedPowderParameter[];
+    pressureRows: Partial<Record<PressureBasis, number>>;
+    priorChiSquare: number;
+    residuals: PowderFitResidual[];
+    runCount: number;
+    stop: LogFitStop;
+    weighted: boolean;
+    weightsSettled: boolean;
+}
+
+// @public
+export type PowderFitBasis = 'refined' | 'from-scratch';
+
+// @public
+export class PowderFitError extends InputError {
+    constructor(reason: PowderFitReason, extra?: {
+        conditionNumber?: number | undefined;
+        unresolved?: number[] | undefined;
+        direction?: number[] | undefined;
+        estimate?: FittedPowderParameter[] | undefined;
+        charge?: number | undefined;
+        result?: InteriorInvalid | undefined;
+    });
+    readonly charge?: number | undefined;
+    // (undocumented)
+    readonly conditionNumber?: number | undefined;
+    readonly direction?: number[] | undefined;
+    // (undocumented)
+    readonly estimate?: FittedPowderParameter[] | undefined;
+    // (undocumented)
+    readonly reason: PowderFitReason;
+    readonly result?: InteriorInvalid | undefined;
+    readonly unresolved?: number[] | undefined;
+}
+
+// @public
+export type PowderFitLabel = 'tight' | 'moderate' | 'loose';
+
+// @public
+export interface PowderFitOptions {
+    domainMargin?: number | undefined;
+    huberThreshold?: number | undefined;
+    maxCondition?: number | undefined;
+    maxIterations?: number | undefined;
+    options?: Settings<InteriorOptions> | undefined;
+    parameters?: readonly PowderParameter[] | undefined;
+    priors?: Partial<Record<PowderParameter, PowderPrior | undefined>>;
+}
+
+// @public
+export type PowderFitReason = 'underdetermined' | 'unresolved' | 'ill-conditioned' | 'invalid' | 'not-converged';
+
+// @public
+export interface PowderFitResidual {
+    charge: number;
+    kind: 'velocity' | 'pressure';
+    observed: number;
+    predicted: number;
+    residual: number;
+}
+
+// @public
+export type PowderInput = 'caseCapacity' | 'propellantEnergy' | 'startPressure' | 'boreFriction' | 'propellantTemperature' | 'ignitionPressure' | 'gamma' | 'covolume' | 'bulletMass';
+
+// @public
+export const powderInputDefaults: Readonly<Partial<Record<PowderInput, Readonly<InputDefault>>>>;
+
+// @public
+export interface PowderInputUncertainty {
+    basis?: InputBasis | undefined;
+    standardUncertainty?: number | undefined;
+}
+
+// @public
+export interface PowderInteriorRecord {
+    // (undocumented)
+    interior?: {
+        energy: {
+            value: number;
+        };
+        gamma: number;
+        density: {
+            value: number;
+        };
+        covolume: {
+            value: number;
+        };
+        vivacity: {
+            value: number;
+        };
+        pressureExponent: number;
+        referencePressure: {
+            value: number;
+        };
+        ignitionPressure: {
+            value: number;
+        };
+        startPressure?: {
+            value: number;
+        } | undefined;
+        burnForm: {
+            a: {
+                value: number;
+            };
+            m: number;
+            q: number;
+            z1: number;
+        };
+    } | undefined;
+}
+
+// @public
+export function powderModelValues(p: PowderInteriorRecord): Record<string, number> | undefined;
+
+// @public
+export type PowderParameter = 'burnRate' | 'startPressure' | 'volumeFactor' | 'energy' | 'temperatureFactor';
+
+// @public
+export interface PowderPrediction {
+    charge: number;
+    coverageFactor: number;
+    extrapolation?: PowderExtrapolation;
+    level: number;
+    pressure: PowderPredictionBand;
+    runCount: number;
+    velocity: PowderPredictionBand;
+}
+
+// @public
+export interface PowderPredictionBand {
+    lower: number;
+    standardUncertainty: number;
+    upper: number;
+    value: number;
+}
+
+// @public
+export interface PowderPredictionOptions {
+    barrelLength?: number | undefined;
+    boreDiameter?: number | undefined;
+    level?: number | undefined;
+    options?: Settings<InteriorOptions> | undefined;
+    propellantTemperature?: number | undefined;
+}
+
+// @public
+export interface PowderPressureRange {
+    contributions: PowderRangeContribution[];
+    coverageFactor: number;
+    extrapolated: boolean;
+    level: number;
+    points: PowderRangeBand[];
+    relativeHalfWidth: number;
+}
+
+// @public
+export function powderPressureRange(fit: PowderFit, ladder: readonly LadderPoint[], options?: PowderRangeOptions): PowderPressureRange;
+
+// @public
+export interface PowderPrior {
+    sigma: number;
+    value: number;
+}
+
+// @public
+export interface PowderRangeBand extends PowderRangePoint {
+    correlatedLimit: number;
+    fitUncertainty: number;
+    lower: number;
+    peakPressure: number;
+    relativeHalfWidth: number;
+    standardUncertainty: number;
+    upper: number;
+}
+
+// @public
+export interface PowderRangeContribution {
+    basis: InputBasis;
+    effects: number[];
+    input: PowderInput;
+    skipped?: SkippedInput;
+    standardUncertainty: number;
+    unit: 'relative' | 'K';
+}
+
+// @public
+export interface PowderRangeOptions {
+    fit?: PowderFitOptions | undefined;
+    inputs?: Partial<Record<PowderInput, PowderInputUncertainty | undefined>> | undefined;
+    level?: number | undefined;
+    points?: readonly PowderRangePoint[] | undefined;
+}
+
+// @public
+export interface PowderRangePoint {
+    barrelLength?: number | undefined;
+    charge: number;
+    propellantTemperature?: number | undefined;
+}
+
+// @public
+export interface PowderSession {
+    barrelLength?: number | undefined;
+    ladder: readonly LadderPoint[];
+    propellantTemperature?: number | undefined;
+}
+
+// @public
+export interface PowderSessionsFit extends PowderFit {
+    held: HeldPowderParameter[];
+    resolved: PowderParameter[];
+}
+
+// @public
+export function predictPooled(fit: PooledPowderFit, target: PooledTarget, charge: number, options?: PooledPredictionOptions): PooledPrediction;
+
+// @public
+export function predictPowder(fit: PowderFit, charge: number, options?: PowderPredictionOptions): PowderPrediction;
+
+// @public
+export type PressureBasis = 'transducer' | 'piezo' | 'case-contact' | 'crusher' | 'energy';
+
+// @public
+export interface PressureCase {
+    input: PressureInput | 'all';
+    maxPressure: number | null;
+    reason?: string;
+    side: 1 | -1;
+    sides?: Record<PressureInput, -1 | 0 | 1>;
+}
+
+// @public
+export interface PressureCurveFit {
+    chiSquare: number;
+    conditionNumber: number;
+    correlation: number[][];
+    degreesOfFreedom: number;
+    iterations: number;
+    load: InteriorLoad;
+    parameters: CurveParameterReport[];
+    referencePressure: number;
+    residuals: CurveResidual[];
+    runCount: number;
+    weighted: boolean;
+    window: {
+        start: number;
+        end: number;
+    };
+}
+
+// @public
+export interface PressureCurvesFit extends Omit<PressureCurveFit, 'window' | 'residuals'> {
+    parameters: CurveParameterReport[];
+    referencePressure: number;
+    traces: TraceResiduals[];
+    warnings: CurveWarning[];
+}
+
+// @public
+export interface PressureHistory {
+    pressure: readonly number[];
+    sensor: PressureSensor;
+    sigma?: number | undefined;
+    time: readonly number[];
+}
+
+// @public
+export type PressureInput = keyof PressureTolerances;
+
+// @public
+export const pressureInputs: readonly PressureInput[];
+
+// @public
+export interface PressureRange {
+    cases: PressureCase[];
+    complete: boolean;
+    highPressure: number;
+    lowPressure: number;
+    nominalPressure: number;
+    quantity: 'maxPressure';
+    tolerances: PressureTolerances;
+}
+
+// @public
+export type PressureSensor = 'breech' | 'mean' | 'base';
+
+// @public
+export const pressureToleranceDefaults: Readonly<PressureTolerances>;
+
+// @public
+export interface PressureTolerances {
+    burnRateFraction: number;
+    chargeFraction: number;
+    massFraction: number;
+    startPressureFraction: number;
+    temperatureKelvin: number;
+    volumeFraction: number;
+}
+
+// @public
 export interface Projectile {
     aerodynamics?: Aerodynamics | undefined;
     diameter: number;
@@ -423,6 +1685,14 @@ export const radPerMoa: number;
 
 // @public
 export const radPerMrad = 0.001;
+
+// @public
+export interface RangeModel<L> {
+    // (undocumented)
+    apply: Record<PressureInput, ApplyTolerance<L>>;
+    // (undocumented)
+    peak: (load: L) => number | string;
+}
 
 // @public
 export interface RangeStringDefaults {
@@ -544,6 +1814,107 @@ export interface RangeStringResidual {
 }
 
 // @public
+export function recordBoreArea(q: number | undefined, land: number | undefined, boreDiameter: number | undefined): number | undefined;
+
+// @public
+export function recordLoad(r: RecordRun): InteriorLoad;
+
+// @public
+export interface RecordPowder {
+    // (undocumented)
+    interior?: (NonNullable<PowderInteriorRecord['interior']> & {
+        propellantTemperature: {
+            value: number;
+        };
+        resistance?: ({
+            stress: {
+                value: number;
+            };
+        } & Omit<ResistanceTerms, 'stress'>) | undefined;
+    }) | undefined;
+    temperatureSensitivity?: {
+        reference: {
+            value: number;
+        };
+        cold: {
+            value: number;
+        };
+        hot: {
+            value: number;
+        };
+    } | undefined;
+}
+
+// @public
+export interface RecordResistance {
+    // (undocumented)
+    missing: string[];
+    // (undocumented)
+    resistance?: InteriorLoad['resistance'] | undefined;
+}
+
+// @public
+export function recordResistance(p: {
+    interior?: {
+        resistance?: ({
+            stress: {
+                value: number;
+            };
+        } & Omit<ResistanceTerms, 'stress'>) | undefined;
+    } | undefined;
+}, run: ResistanceRun): RecordResistance;
+
+// @public
+export interface RecordRun {
+    // (undocumented)
+    bullet: {
+        mass: number;
+        lengthMm?: number | undefined;
+    };
+    cartridge: CartridgeSpecs;
+    charge: number;
+    // (undocumented)
+    powder: RecordPowder;
+    temperature?: number | undefined;
+    travel: number;
+    volume: number;
+}
+
+// @public
+export function recordSensitivity(powder: SensitivityPowder): TakenSensitivity | undefined;
+
+// @public
+export interface ResistanceCartridge {
+    boreAreaMm2: number;
+    bulletDiameterMm: number;
+    grooveDiameterMm?: number | undefined;
+}
+
+// @public
+export interface ResistanceRun {
+    // (undocumented)
+    boreArea: number;
+    // (undocumented)
+    boreDiameter: number;
+    // (undocumented)
+    bulletLengthMm?: number | undefined;
+    // (undocumented)
+    cartridge?: {
+        g1?: number | undefined;
+        z?: number | undefined;
+    } | undefined;
+    // (undocumented)
+    startPressure: number;
+}
+
+// @public
+export interface ResistanceTerms {
+    engraving: number;
+    oversize: number;
+    stress: number;
+}
+
+// @public
 export type Rhs = (t: number, y: Float64Array, dy: Float64Array) => void;
 
 // @public
@@ -593,7 +1964,86 @@ export interface Rk45Result {
 }
 
 // @public
+export interface RoundCountNote {
+    // (undocumented)
+    before: number;
+    // (undocumented)
+    earlier: string;
+    // (undocumented)
+    now: number;
+    // (undocumented)
+    rule: 'roundCount';
+    // (undocumented)
+    session: string;
+    // (undocumented)
+    threshold: number;
+}
+
+// @public
+export interface SampledBand {
+    budgetMs: number;
+    failed: number;
+    pressure?: Percentiles;
+    samples: number;
+    seed: number;
+    status: 'sampled' | 'overBudget' | 'invalid';
+    velocity?: Percentiles;
+}
+
+// @public
+export function sampledBand<L>(load: L, input: SampledModel<L>, tolerances: PressureTolerances, input2: SamplingOptions): SampledBand;
+
+// @public
+export interface SampledModel<L> {
+    // (undocumented)
+    apply: Record<PressureInput, ApplyTolerance<L>>;
+    // (undocumented)
+    run: (load: L) => SampledRun | string;
+}
+
+// @public
+export interface SampledRun {
+    pressure: number;
+    velocity: number;
+}
+
+// @public
+export interface SamplingOptions {
+    budgetMs: number;
+    now: () => number;
+    samples: number;
+    seed: number;
+}
+
+// @public
 export function saturationVapourPressure(temperature: number): number;
+
+// @public
+export interface SeatingNote {
+    // (undocumented)
+    before: number;
+    // (undocumented)
+    by: SeatingReading['by'];
+    // (undocumented)
+    earlier: string;
+    // (undocumented)
+    now: number;
+    // (undocumented)
+    rule: 'seating';
+    // (undocumented)
+    session: string;
+}
+
+// @public
+export interface SeatingReading {
+    // (undocumented)
+    by: 'overallLength' | 'baseToOgive';
+    // (undocumented)
+    value: number;
+}
+
+// @public
+export const seatingTolerance = 0.01;
 
 // @public
 export function segmentCoefficient(table: DragTable, k: number, mach: number, reading?: SegmentReading): number;
@@ -602,6 +2052,61 @@ export function segmentCoefficient(table: DragTable, k: number, mach: number, re
 export interface SegmentReading {
     held?: boolean | undefined;
     interpolation?: DragInterpolation | undefined;
+}
+
+// @public
+export interface SensitivityDefault {
+    // (undocumented)
+    approximate: true;
+    cold: number;
+    coldInterval: readonly [number, number];
+    hot: number;
+    hotInterval: readonly [number, number];
+    source: string;
+}
+
+// @public
+export interface SensitivityPowder {
+    // (undocumented)
+    grainForm?: string | undefined;
+    interior?: {
+        propellantTemperature: {
+            value: number;
+        };
+    } | undefined;
+    temperatureSensitivity?: {
+        reference: {
+            value: number;
+        };
+        cold: {
+            value: number;
+        };
+        hot: {
+            value: number;
+        };
+    } | undefined;
+}
+
+// @public
+export const sensitivityReferenceDefault = 294.15;
+
+// @public
+export interface SessionReading {
+    // (undocumented)
+    caseLot?: string | undefined;
+    date?: string | undefined;
+    dismissed?: readonly string[] | undefined;
+    // (undocumented)
+    id: string;
+    // (undocumented)
+    powderLot?: string | undefined;
+    // (undocumented)
+    primerLot?: string | undefined;
+    roundCount?: number | undefined;
+    // (undocumented)
+    seating?: SeatingReading | undefined;
+    // (undocumented)
+    velocity?: VelocityReading | undefined;
 }
 
 // @public
@@ -615,6 +2120,75 @@ export type Settings<T> = {
 };
 
 // @public
+export function shotshellInterior(load: ShotshellLoad, options?: Settings<InteriorOptions>): ShotshellResult;
+
+// @public
+export function shotshellInteriorLoad(load: ShotshellLoad): InteriorLoad;
+
+// @public
+export interface ShotshellLoad extends Omit<InteriorLoad, 'chamber' | 'barrel' | 'bullet' | 'startPressure'> {
+    // (undocumented)
+    chamber: {
+        volume: number;
+        boreDiameter: number;
+    };
+    crimpPressure: number;
+    shotMass: number;
+    wadMass: number;
+    wadTravel: number;
+}
+
+// @public
+export type ShotshellResult = InteriorResult & {
+    experimental: true;
+};
+
+// @public
+export interface SimilarPowder {
+    burnRate: number;
+    energy: number;
+}
+
+// @public
+export interface SimilarPowderRules {
+    count: number;
+    minimum: number;
+    minimumSigma: number;
+    weakSigma: number;
+}
+
+// @public
+export const similarPowderRules: Readonly<SimilarPowderRules>;
+
+// @public
+export interface SimilarPowdersPrior {
+    count: number;
+    prior: PowderPrior;
+    weak: boolean;
+}
+
+// @public
+export function similarPowdersPrior(target: SimilarPowder, candidates: readonly SimilarPowder[], count?: number): SimilarPowdersPrior;
+
+// @public
+export type SkippedInput = 'fitted' | 'absent' | 'refit-failed';
+
+// @public
+export function sliverArea(rho: number, r: number, s: number): {
+    inner: number;
+    outer: number;
+};
+
+// @public
+export const solidFill: (charge: number, density: number, volume: number) => number;
+
+// @public
+export const solidFillLimit = 0.64;
+
+// @public
+export function solveCharge(load: InteriorLoad, target: ChargeTarget, options?: ChargeSolverOptions): ChargeSolution;
+
+// @public
 export function speedOfSound(air: Air): number;
 
 // @public
@@ -624,9 +2198,55 @@ export function spinDrift(sg: number, time: number, hand: 'right' | 'left'): num
 export function standardAtmosphere(altitude: number, humidity?: number): Air;
 
 // @public
+export interface StartPressureDefault {
+    // (undocumented)
+    approximate: true;
+    interval?: [number, number];
+    // (undocumented)
+    source: string;
+    value: number;
+}
+
+// @public
+export function startPressureOf(barrel: number | undefined, fields: StructureFields | undefined): StartPressureRule;
+
+// @public
+export interface StartPressureRule extends StartPressureDefault {
+    // (undocumented)
+    assumed?: true;
+    // (undocumented)
+    construction?: BulletConstruction;
+}
+
+// @public
 export interface StepBudget {
     max: number;
     used: number;
+}
+
+// @public
+export function stringLadder(strings: readonly ChronographString[]): LadderPoint[];
+
+// @public
+export interface StructureFields {
+    // (undocumented)
+    structure?: string | undefined;
+}
+
+// @public
+export const structureOf: (structure: string | undefined) => BulletStructure | undefined;
+
+// @public
+export interface TakenSensitivity {
+    // (undocumented)
+    fallback?: SensitivityDefault;
+    // (undocumented)
+    form?: string;
+    sensitivity: {
+        reference: number;
+        cold: number;
+        hot: number;
+    };
 }
 
 // @public
@@ -635,6 +2255,18 @@ export interface TargetMotion {
     heading: number;
     // (undocumented)
     speed: number;
+}
+
+// @public
+export function toleranceRange<L>(load: L, nominal: number, model: RangeModel<L>, tolerances: PressureTolerances): PressureRange;
+
+// @public
+export interface TraceResiduals {
+    residuals: CurveResidual[];
+    window: {
+        start: number;
+        end: number;
+    };
 }
 
 // @public
@@ -831,10 +2463,101 @@ export interface TruingStringsInput {
 }
 
 // @public
+export const unknownValueKeys: (values: Record<string, unknown>) => string[];
+
+// @public
+export class ValueError extends InputError {
+    constructor(field: string, message: string);
+    // (undocumented)
+    field: string;
+}
+
+// @public
 export type Vec3 = readonly [number, number, number];
 
 // @public
+export interface VelocityNote {
+    // (undocumented)
+    before: number;
+    // (undocumented)
+    earlier: string;
+    // (undocumented)
+    now: number;
+    // (undocumented)
+    rule: 'velocity';
+    // (undocumented)
+    session: string;
+    spread: number;
+}
+
+// @public
+export interface VelocityReading {
+    // (undocumented)
+    count: number;
+    // (undocumented)
+    mean: number;
+    standardDeviation?: number | undefined;
+}
+
+// @public
+export type VivacityBurn = Extract<Burn, {
+    kind: 'vivacity';
+}> & {
+    form: {
+        kind: 'constant';
+    } | {
+        kind: 'twoStage';
+        a: number;
+        m: number;
+        q: number;
+        z1: number;
+    };
+};
+
+// @public
+export type VivacityForm =
+/** phi = 1. */
+    {
+    kind: 'constant';
+}
+/** (1 + a z)^m up to z1, then falling as (1 - z)^q. */
+| {
+    kind: 'twoStage';
+    a: number;
+    m: number;
+    q: number;
+    z1: number;
+}
+/** As `twoStage` up to z2, then falling as (1 - z)^r. */
+| {
+    kind: 'threeStage';
+    a: number;
+    m: number;
+    q: number;
+    z1: number;
+    z2: number;
+    r: number;
+};
+
+// @public
+export const vuong2026: WearMeasurement;
+
+// @public
 export type WeakReason = 'no-information' | 'collinear' | 'imprecise' | 'fit-failed';
+
+// @public
+export interface WearMeasurement {
+    chamberLength: Readonly<{
+        new: number;
+        worn: number;
+    }>;
+    modelChange: Readonly<{
+        peakPressure: number;
+        muzzleVelocity: number;
+    }>;
+    source: Readonly<Record<'authors' | 'title' | 'journal' | 'doi' | 'licence', string>>;
+    velocity: readonly (readonly [number, number])[];
+}
 
 // @public
 export interface WindSegment {
@@ -843,6 +2566,15 @@ export interface WindSegment {
     speed: number;
     vertical?: number | undefined;
 }
+
+// @public
+export type WorkbenchValueKey = InteriorValueKey | 'firearmMass' | 'bulletDiameter' | 'bulletLength' | 'bulletBcG1' | 'bulletBcG7' | 'bulletBaseLength' | 'bulletBaseDiameter' | 'bulletCavityDiameter' | 'bulletCavityDepth' | 'pmax' | 'caseLength' | 'bulkDensity';
+
+// @public
+export const workbenchValueKeys: readonly WorkbenchValueKey[];
+
+// @public
+export const wornVolume: (volume: number, boreArea: number, wear: number) => number;
 
 // @public
 export function yawOfRepose(va: Vec3, accel: Vec3, spin: number, i: {

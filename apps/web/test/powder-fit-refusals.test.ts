@@ -5,7 +5,7 @@ import {
   type PowderParameter,
 } from '@open-reloading/core'
 import { describe, expect, it } from 'vitest'
-import { load } from '../../../packages/core/test/powder-load.ts'
+import { load } from '../../../packages/ballistics/test/powder-load.ts'
 import type { PowderFitReply } from '../src/lib/powder-fit.ts'
 import { answerPowderFit } from '../src/lib/powder-fit-answer.ts'
 

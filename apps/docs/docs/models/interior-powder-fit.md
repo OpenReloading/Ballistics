@@ -24,7 +24,7 @@ m_i = m_0 \pm i\,\Delta m, \qquad
 m_i = m_0 + \Bigl(i - \frac{N - 1}{2}\Bigr)\Delta m, \qquad i = 0, \dots, N - 1
 $$
 
-Code: `packages/core/src/interior/ladder.ts`, `chargeLadder`.
+Code: `packages/ballistics/src/interior/ladder.ts`, `chargeLadder`.
 
 Each charge is a product, not a running sum. Every charge must be above 0.
 
@@ -41,7 +41,7 @@ p_\text{max}\bigl(m_k, q(\theta)\bigr) & \text{pressure row}
 \qquad \sigma_i = 1 \text{ without stated uncertainties}
 $$
 
-Code: `packages/core/src/interior/fit.ts`, `ladderRows`, `fitPowder` (`rows`, `evaluate`).
+Code: `packages/ballistics/src/interior/fit.ts`, `ladderRows`, `fitPowder` (`rows`, `evaluate`).
 
 A point carries its own `barrelLength` and `propellantTemperature` where they differ from the load's, and its prediction is the run at that length and temperature. Velocity uncertainties are given on all points or on none. Pressures need their uncertainty and need velocity uncertainties. Repeated charges add rows but no runs.
 
@@ -53,7 +53,7 @@ $$
 s_p = \sqrt{\frac{\sum_j \sum_i (v_{ji} - \bar v_j)^2}{\sum_j (n_j - 1)}}, \qquad \sigma_j = \frac{s_p}{\sqrt{n_j}}
 $$
 
-Code: `packages/core/src/interior/fit-strings.ts`, `stringLadder`, `pooledVelocitySd`.
+Code: `packages/ballistics/src/interior/fit-strings.ts`, `stringLadder`, `pooledVelocitySd`.
 
 The sample standard deviation of one string of five shots is too uncertain to weight its row by: on synthetic 5-charge ladders the 2 sigma interval of the burn coefficient held the truth in about 80 % of the fits with each string's own standard deviation, and in 92 to 93 % with the pooled one. Without a string of 2 shots, or with a pooled value of 0, the points carry no uncertainty and the fit is unweighted. The other values of a point (pressure, barrel length, temperature) pass through.
 
@@ -69,7 +69,7 @@ Q = Q_0\,e^{\theta_4}, \qquad
 f_T = e^{\theta_5}
 $$
 
-Code: `packages/core/src/interior/fit.ts`, `powderParameterMap` (`q`, `offset`).
+Code: `packages/ballistics/src/interior/fit.ts`, `powderParameterMap` (`q`, `offset`).
 
 The specific energy $Q$ (parameter `energy`, initial value the load's) replaces the energy of the propellant. The temperature factor $f_T$ (parameter `temperatureFactor`, initial value 1) multiplies both temperature sensitivities of the load, $\sigma_c$ and $\sigma_h$, of the [temperature factor on the burn rate](interior-m3.md#temperature-of-the-propellant), so their ratio stays the load's. It needs a load that carries a sensitivity other than 0. The fitted load carries the scaled sensitivities.
 
@@ -79,7 +79,7 @@ $$
 p_\text{floor} = \max\bigl(p_i,\ p_f + p_e(0)\bigr)
 $$
 
-Code: `packages/core/src/interior/fit.ts`, `startPressureFloor`.
+Code: `packages/ballistics/src/interior/fit.ts`, `startPressureFloor`.
 
 $p_e(0)$ is the engraving pressure of a profile point at travel 0, else 0. The gas starts at $p_i$, and the projectile starts once the mean pressure reaches $p_\text{st}$ and overcomes the resistance at travel 0 ([shot start](interior-m3.md)). Below $p_\text{floor}$ the start pressure therefore changes nothing. A fitted start pressure must start above $p_\text{floor}$, and the map keeps every step above it. The default fits $B$ alone.
 
@@ -91,7 +91,7 @@ $$
 r_i = \frac{\hat y_i(\theta) - y_i}{\sigma_i}, \qquad \chi^2 = \sum_i r_i^2, \qquad \nu = n - n_p
 $$
 
-Code: `packages/statistics/src/least-squares.ts`, `logLeastSquares` (`residuals`, `chiSquareOf`), `packages/core/src/interior/fit.ts`, `fitPowder` (`degreesOfFreedom`).
+Code: `packages/statistics/src/least-squares.ts`, `logLeastSquares` (`residuals`, `chiSquareOf`), `packages/ballistics/src/interior/fit.ts`, `fitPowder` (`degreesOfFreedom`).
 
 The loop starts at $\theta = 0$. By default it takes at most 30 steps, accepted and rejected, and fails when the condition number of the column-scaled Jacobian exceeds $10^3$. A Jacobian column is unresolved when its norm is 0 or below $10^{-9}$ of the largest column norm, or when every entry lies below the noise floor per unit log parameter:
 
@@ -99,7 +99,7 @@ $$
 J_\text{floor,i} = 10^{-6}\,\frac{y_i}{\sigma_i}
 $$
 
-Code: `packages/core/src/interior/fit.ts`, `fitPowder` (the `floor` field of the `logLeastSquares` call).
+Code: `packages/ballistics/src/interior/fit.ts`, `fitPowder` (the `floor` field of the `logLeastSquares` call).
 
 A candidate with an invalid run at any charge is a rejected step.
 
@@ -112,7 +112,7 @@ $$
 \chi^2 = \underbrace{\sum_i r_i^2}_{\chi^2_\text{data}} + \underbrace{\sum_{j \in P} \frac{(\theta_j - \mu_j)^2}{s_j^2}}_{\chi^2_\text{prior}}
 $$
 
-Code: `packages/core/src/interior/fit.ts`, `fitPowder` (`priorRows`, `priorChiSquare`, `dataChiSquare`).
+Code: `packages/ballistics/src/interior/fit.ts`, `fitPowder` (`priorRows`, `priorChiSquare`, `dataChiSquare`).
 
 The burn coefficient and the volume factor need $q_j^\ast \gt 0$ and the start pressure $q_j^\ast \gt p_\text{floor}$, with $s_j \gt 0$ in both. A volume factor prior is centred on 1, with a standard deviation that states how far the load's volume may be from the real one, for example the spread of the capacity of a fired case; its width is the caller's choice and no default is built in. A prior on a parameter that is not fitted is refused. The checks for unresolved and ill-conditioned parameters see the prior rows too. A ladder whose velocities barely separate the burn coefficient and the start pressure therefore fits with priors where it fails as `ill-conditioned` without them, and a prior keeps its parameter from counting as `unresolved`. The reported uncertainty is then the posterior one, and its size against $s_j$ shows how much the ladder added. The degrees of freedom still count the ladder rows only. A prior with a very large $s_j$ leaves the fit unchanged.
 
@@ -122,11 +122,11 @@ $$
 \text{loss} = \sum_{i \in \text{ladder}} L_k(r_i) + \chi^2_\text{prior}
 $$
 
-Code: `packages/core/src/interior/fit.ts`, `fitPowder` (`huber`, `loss`), `packages/statistics/src/huber.ts`, `huberLoss`.
+Code: `packages/ballistics/src/interior/fit.ts`, `fitPowder` (`huber`, `loss`), `packages/statistics/src/huber.ts`, `huberLoss`.
 
 The result carries `stop` and `weightsSettled` of the [solver](least-squares.md#levenberg-marquardt-step): which rule ended the loop and whether the set of ladder rows beyond the threshold was unchanged over the last accepted step. Without `huberThreshold` the second is true.
 
-Code: `packages/core/src/interior/fit.ts`, `fitPowder` (`stop`, `weightsSettled`).
+Code: `packages/ballistics/src/interior/fit.ts`, `fitPowder` (`stop`, `weightsSettled`).
 
 Priors and the Huber loss need uncertainties on every velocity, since $s_j$ and $k$ are in absolute and in sigma units. Without `huberThreshold` the loss is quadratic ([Huber 1964](../bibliography.md#huber-1964)).
 
@@ -138,7 +138,7 @@ $$
 \sigma_{q_j} = (q_j - o_j)\sqrt{C_{\theta,jj}}, \qquad o_j = \begin{cases} p_\text{floor} & \text{start pressure} \\ 0 & \text{burn coefficient, volume factor} \end{cases}
 $$
 
-Code: `packages/core/src/interior/fit.ts`, `fitPowder` (`standardUncertainty`), `powderParameterMap` (`offset`).
+Code: `packages/ballistics/src/interior/fit.ts`, `fitPowder` (`standardUncertainty`), `powderParameterMap` (`offset`).
 
 Without stated uncertainties and with as many rows as parameters there is no uncertainty and no correlation. The values are linearized, assume independent observations with the stated uncertainties and contain no model error.
 
@@ -152,7 +152,7 @@ g_j = \frac{\partial \hat y(m, \theta)}{\partial \theta_j}, \qquad
 \hat y \pm k\, u(\hat y)
 $$
 
-Code: `packages/core/src/interior/fit.ts`, `predictPowder` (`gradient`, `band`).
+Code: `packages/ballistics/src/interior/fit.ts`, `predictPowder` (`gradient`, `band`).
 
 The coverage factor $k$ is the two-sided quantile of the normal distribution at the coverage $1 - \alpha$ (default 90 %, $k = 1.645$) when the ladder carried velocity uncertainties. Without them $C_\theta$ is scaled by the residual variance, and $k$ is the Student quantile with $\nu$ degrees of freedom:
 
@@ -163,7 +163,7 @@ t_{1 - \alpha/2,\,\nu} & \text{otherwise}
 \end{cases}
 $$
 
-Code: `packages/core/src/interior/fit.ts`, `predictPowder` (`quantile`), `packages/statistics/src/chi-square.ts`, `chiSquareQuantile`, `packages/statistics/src/student-t.ts`, `studentTwoSidedQuantile`.
+Code: `packages/ballistics/src/interior/fit.ts`, `predictPowder` (`quantile`), `packages/statistics/src/chi-square.ts`, `chiSquareQuantile`, `packages/statistics/src/student-t.ts`, `studentTwoSidedQuantile`.
 
 #### Domain
 
@@ -173,7 +173,7 @@ $$
 [\,x_\min (1 - \delta),\; x_\max (1 + \delta_+)\,]
 $$
 
-Code: `packages/core/src/interior/fit.ts`, `fitDomain`, `outsideDomain`.
+Code: `packages/ballistics/src/interior/fit.ts`, `fitDomain`, `outsideDomain`.
 
 | Axis           | Spans                                                       | Checked in a prediction against                   |
 | -------------- | ----------------------------------------------------------- | ------------------------------------------------- |
@@ -193,7 +193,7 @@ $$
 c_j = \frac{\hat p(x_j + u_j) - \hat p(x_j - u_j)}{2}
 $$
 
-Code: `packages/core/src/interior/fit-confidence.ts`, `powderPressureRange` (`side`, `effects`).
+Code: `packages/ballistics/src/interior/fit-confidence.ts`, `powderPressureRange` (`side`, `effects`).
 
 Because the refit sees the same ladder, an input that the ladder constrains moves the peak pressure little. Measured pressure rows therefore narrow the range through the fit itself: with a pressure row, the refit has to keep the row, and the burn coefficient cannot absorb the shift. A shift common to every point that the burn coefficient absorbs exactly, such as one temperature offset on a ladder at one temperature, has an effect of about 0.
 
@@ -206,7 +206,7 @@ h = \frac{k\,u_c}{\hat p}, \qquad
 u_\text{corr} = u_\text{fit} + \sum_j |c_j|
 $$
 
-Code: `packages/core/src/interior/fit-confidence.ts`, `powderPressureRange` (`standardUncertainty`, `correlatedLimit`, `relativeHalfWidth`).
+Code: `packages/ballistics/src/interior/fit-confidence.ts`, `powderPressureRange` (`standardUncertainty`, `correlatedLimit`, `relativeHalfWidth`).
 
 $h$ is the relative half-width of the range at a point, and the label uses its largest value over the points. $u_\text{corr}$ is the limit for inputs that are fully correlated in the direction that adds their effects, and it is reported next to $u_c$: the independence of the inputs is an assumption, and real errors of capacity, energy and burn rate are partly correlated. Nothing in the range models such correlation. The coverage factor is not corrected for the effective degrees of freedom of the combination.
 
@@ -232,7 +232,7 @@ s = \max\Bigl(0.05,\ \sqrt{\tfrac{1}{n-1}\sum_i (\ln B_i - \mu)^2}\Bigr), \qquad
 q^\ast = e^{\mu}
 $$
 
-Code: `packages/core/src/interior/fit-confidence.ts`, `similarPowdersPrior`, `similarPowderRules`.
+Code: `packages/ballistics/src/interior/fit-confidence.ts`, `similarPowdersPrior`, `similarPowderRules`.
 
 With fewer than 3 neighbours the prior is weak: it is centred on the target's own value with $s = 1$, and `weak` is set. The floor of 0.05 keeps neighbours with nearly equal coefficients from fixing the fit. The caller passes plain values of the powders and takes the prior from the result into `priors.burnRate`. Core reads no records. A prior from one known powder is a `PowderPrior` the caller builds from that powder's value and the spread it states. The fit states its basis: `refined` when a prior on the burn coefficient was given, else `from-scratch`. A prior pulls a short ladder toward its centre by its weight $1/s^2$ against the ladder rows.
 
@@ -246,7 +246,7 @@ With fewer than 3 neighbours the prior is weak: it is centred on the target's ow
 | `moderate` | up to 25 % |
 | `loose`    | above 25 % |
 
-Code: `packages/core/src/interior/fit-confidence.ts`, `powderConfidence`, `powderConfidenceRules`.
+Code: `packages/ballistics/src/interior/fit-confidence.ts`, `powderConfidence`, `powderConfidenceRules`.
 
 The reasons do not change the label. They say what the range rests on or does not hold, in a fixed order:
 
@@ -276,11 +276,11 @@ Sessions that differ in barrel length or in powder temperature share the powder 
 
 The muzzle velocity against barrel length depends on how much of the charge is burnt along the bore, so a cut-down series separates the energy from the burn coefficient: a shorter barrel ends the run earlier in the burn. The burn coefficient alone fixes the burn rate at the reference temperature of the load, and a series at other temperatures moves the burn rate by $\tau_T$, so it fixes $f_T$. A charge ladder at one length also moves the velocity with energy and burn coefficient, but nearly alike, and in the model the other fixed inputs (covolume, isentropic exponent, heat loss, form function) are absorbed by whichever of the two is fitted. The fit therefore treats the energy as resolved only by lengths that differ: it fails as `unresolved` when the longest barrel is less than 5 % longer than the shortest. The 5 % is a choice of the fit. The temperature factor needs no such rule: with one temperature its Jacobian column is parallel to the burn coefficient's (at the reference temperature it is 0), and the conditioning check fails the fit.
 
-Code: `packages/core/src/interior/fit.ts`, `fitPowder` (`conditions`, `evaluate`), `checkParameters` (`minLengthSpan`).
+Code: `packages/ballistics/src/interior/fit.ts`, `fitPowder` (`conditions`, `evaluate`), `checkParameters` (`minLengthSpan`).
 
 `fitPowderSessions` takes the sessions (a barrel length, a temperature and a ladder each), joins their points and requests the parameters of `options.parameters`, which must hold the burn coefficient. When the fit fails as `unresolved`, it drops the unresolved requested parameter other than the burn coefficient. When it fails as `ill-conditioned`, it drops the one with the largest component in the direction of the smallest eigenvalue. When it fails as `underdetermined`, it drops the last. It then fits again, until a fit passes or no parameter other than the burn coefficient is left (the failure is then thrown). A prior on a dropped parameter is dropped too. The result lists the `resolved` parameters, the fitted ones in the order of the fit, and the `held` ones with the reason of the failure. A held parameter is not in `parameters`: it keeps the value of the input load, so the caller sets the prior centre of a parameter it wants held there as the load's value. A parameter that a prior resolves counts as resolved, with the posterior uncertainty, as in the single-ladder fit.
 
-Code: `packages/core/src/interior/fit-sessions.ts`, `fitPowderSessions` (`giveUp`).
+Code: `packages/ballistics/src/interior/fit-sessions.ts`, `fitPowderSessions` (`giveUp`).
 
 The tuning screen of the web app fits the strings a user recorded or typed. Each string carries its powder temperature: the one its session records, the one typed with it, or else the load's. Strings at two or more temperatures request the temperature factor with the burn coefficient from `fitPowderSessions`, as one session whose points carry their temperatures; a factor the strings do not resolve is held at 1, and the screen says that only the burn coefficient was fitted. Strings at one temperature fit the burn coefficient alone, and the screen says that the factor needs two or more temperatures. A load whose temperature sensitivity is 0 or absent, as a user powder may be, fits no factor, and the screen asks for one value: it is used below and above the reference, which is the load's propellant temperature, so the ratio of the two sensitivities is 1. Since the fit scales it, the value only starts the fit. The saved powder keeps the fitted load's sensitivities, scaled by the fitted factor, and each string's temperature in its fit points.
 
@@ -295,7 +295,7 @@ Two rules of the screen can fit fewer values than the request names. A value the
 
 On 2 charges every extra value moves with the burn coefficient, so the screen offers to try the other values anyway, which lifts both rules. Hand tuning gives each fitted value with a standard uncertainty a slider of 3 standard uncertainties either side of the fitted value, in steps of 0.05; the lower end stays at 5 % of the fitted value or above. The sliders move the shown values and the curve of the chart, whose runs take an output step of 2e-5 s, 10 times the default: the muzzle velocity moves by less than 1e-6 m/s and a run takes about a sixth of the time. The band and the pressure range stay those of the fit. Save as a powder stores the fitted values, never the hand-tuned ones.
 
-Code: `apps/web/src/lib/powder-fit-answer.ts`, `thinRule`, `heldFit`; `packages/core/src/interior/fit-confidence.ts`, `powderConfidenceRules`; `apps/web/src/components/powder-tune.tsx`, `FitResult`, `SaveFit`.
+Code: `apps/web/src/lib/powder-fit-answer.ts`, `thinRule`, `heldFit`; `packages/ballistics/src/interior/fit-confidence.ts`, `powderConfidenceRules`; `apps/web/src/components/powder-tune.tsx`, `FitResult`, `SaveFit`.
 
 The values describe the rifle's barrels, the lot and the temperatures of the sessions. A fitted energy absorbs every fixed input that moves the velocity with the barrel length (see Identifiability), and a fitted temperature factor absorbs the effect of the initial temperature on the gas energy, which the model does not have. Neither is a property of the powder to carry to another load, and the result is a simulation parameter, not load data.
 
@@ -308,7 +308,7 @@ $$
 B_P = B_{P,0}\, e^{\theta_{B,P}}, \quad r_R = e^{\theta_R}, \quad \ell_L = e^{\theta_L}, \quad f_{T,P} = e^{\theta_{T,P}}
 $$
 
-Code: `packages/core/src/interior/fit-pooled.ts`, `fitPowderPooled` (`velocity`, `targetLoad`).
+Code: `packages/ballistics/src/interior/fit-pooled.ts`, `fitPowderPooled` (`velocity`, `targetLoad`).
 - $B_P$, the burn coefficient of powder $P$, is shared by all its sessions. The burn coefficient of the powder's first session is the start $B_{P,0}$ and replaces that of its other sessions. On request the temperature factor $f_{T,P}$ of the powder is fitted too, where its sessions span two or more temperatures and its load carries a sensitivity; otherwise it is listed in `held` and stays 1.
 - $r_R$, the velocity factor of rifle $R$, holds what the rifle changes beyond its load: bore, throat, chronograph. It is fitted only where the sessions hold two or more rifles. With one rifle it is absorbed by the burn coefficients.
 - $\ell_L$, the factor of lot $L$ on its powder's burn coefficient, is fitted for each named lot of a powder whose sessions hold two or more lots (a session without a lot counts as one, without a factor).
@@ -324,7 +324,7 @@ u^2(\hat v) = g^\top C_\theta\, g + \bigl(\varepsilon\, \hat v\bigr)^2 + \sigma_
 \hat v \pm z_{1 - \alpha/2}\, u(\hat v)
 $$
 
-Code: `packages/core/src/interior/fit-pooled.ts`, `predictPooled` (`gradient`, `variance`).
+Code: `packages/ballistics/src/interior/fit-pooled.ts`, `predictPooled` (`gradient`, `variance`).
 
 A rifle the fit has not seen adds the spread of its random effect, $\tau_R \hat v$, and a lot it has not seen for the powder adds $\tau_L g_B$, with $g_B$ the gradient in the powder's burn coefficient. $\sigma_s$ is the `velocitySigma` of the string (default 0, the true mean). `calibratePooled` estimates the relative model error $\varepsilon$ from strings the fit was not fitted to: the mean of the squared relative residual beyond the variance of the prediction without model error, at least 0. In the bracket, the first term applies to a string of a rifle the fit has not seen, the second to a lot it has not seen:
 
@@ -332,7 +332,7 @@ $$
 \varepsilon^2 = \max\Bigl(0,\ \frac{1}{n} \sum_{i=1}^{n} \frac{(y_i - \hat v_i)^2 - g_i^\top C_\theta\, g_i - \sigma_i^2 \;\bigl[-\ (\tau_R\, \hat v_i)^2 - (\tau_L\, g_{B,i})^2\bigr]}{\hat v_i^2}\Bigr)
 $$
 
-Code: `packages/core/src/interior/fit-pooled.ts`, `calibratePooled` (`excess`).
+Code: `packages/ballistics/src/interior/fit-pooled.ts`, `calibratePooled` (`excess`).
 
 The held-out strings are chosen by the caller before the fit is looked at; strings that also test the interval must be others again. On synthetic sessions (3 powders, 3 rifles, 2 lots, 4 charges each, a relative model error of 0.4 % on top of a 3 m/s string uncertainty), the nominal 90 % interval after calibration on 108 strings covers between 85 and 95 % of 270 other strings at charges between the fitted ones. The parameter covariance itself holds no model error, as in the single fit.
 

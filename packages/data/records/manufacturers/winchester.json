@@ -1,12 +1,21 @@
 {
   "id": "winchester",
   "name": "Winchester",
+  "country": "US",
+  "website": "https://hodgdonpowderco.com/winchester/",
   "provenance": {
     "kind": "published",
     "sources": [
       {
         "source": "winchester-sds-ball-powder-propellant-november",
         "fields": ["name"]
+      },
+      {
+        "source": "hodgdon-powder-company-locations",
+        "url": "https://hodgdonpowderco.com/locations/",
+        "retrieved": "2026-11-06",
+        "fields": ["country", "website"],
+        "note": "Corporate headquarters: Hodgdon Powder Company, 6430 Vista Drive, Shawnee, KS 66218, United States. wwpowder.com redirects to the Winchester brand page on the same site."
       }
     ]
   }

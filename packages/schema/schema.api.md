@@ -927,6 +927,7 @@ export interface Manufacturer extends z.infer<typeof manufacturer> {
 export const manufacturer: z.ZodObject<{
     id: typeof recordId;
     name: z.ZodString;
+    country: z.ZodOptional<z.ZodString>;
     website: z.ZodOptional<z.ZodURL>;
     aliases: z.ZodOptional<z.ZodArray<z.ZodString>>;
     provenance: typeof provenance;

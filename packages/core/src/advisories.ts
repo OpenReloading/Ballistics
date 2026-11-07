@@ -3,7 +3,7 @@
  * "Advisories"). An `error` blocks a run; a `warn` or `info` never changes a result. A message states facts about the
  * inputs and the model only, never a statement about the load.
  */
-import { chargeTooSmallRatio, type InteriorLoad } from './interior/model.ts'
+import { chargeTooSmallRatio, type InteriorLoad } from '@open-reloading/ballistics'
 
 /** How a rule bears on a run: `error` blocks it, `warn` and `info` leave the result as it is. */
 export type AdvisorySeverity = 'error' | 'warn' | 'info'

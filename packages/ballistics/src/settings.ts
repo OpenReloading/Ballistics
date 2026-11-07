@@ -11,3 +11,7 @@ export function overlay<T extends object>(base: T, settings: Settings<T> | undef
   }
   return out
 }
+
+/** Whether an optional input is absent or a finite number above zero. */
+export const positive = (v: number | undefined): boolean =>
+  v === undefined || (Number.isFinite(v) && v > 0)

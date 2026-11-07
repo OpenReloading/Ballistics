@@ -9,6 +9,7 @@ import {
   Paper,
   Popover,
   Switch,
+  Text,
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { boreArea } from '@open-reloading/core'
@@ -20,6 +21,7 @@ import { type ReactNode, useEffect, useId, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import { apiFetch } from '../lib/api-fetch.ts'
 import type { BulletSummary, CartridgeSummary, PowderSummary } from '../lib/api-types.ts'
 import {
   bandCount,
@@ -1463,6 +1465,33 @@ const missingValueMark = (
 const missingMark = (name: string, incomplete: boolean, t: Translator['t']) =>
   incomplete ? t('{name} (values missing)', { name }) : name
 
+/** True once the API answers that the catalogue holds no powder; false while it asks or cannot tell. */
+export function useNoCataloguePowders(): boolean {
+  const [none, setNone] = useState(false)
+  useEffect(() => {
+    const ask = new AbortController()
+    // no `q`: both APIs refuse an empty one
+    apiFetch('powders?limit=1', { signal: ask.signal })
+      .then((res) => (res.ok ? (res.json() as Promise<{ total: number }>) : undefined))
+      .then((list) => setNone(list?.total === 0))
+      .catch(() => setNone(false))
+    return () => ask.abort()
+  }, [])
+  return none
+}
+
+/** What the powder field says when the catalogue has no powder: where a powder comes from instead. */
+function NoCataloguePowders() {
+  const { t } = useTranslation()
+  return (
+    <Text size="xs" c="dimmed">
+      {t(
+        'The catalogue has no powders. Choose one of your powder designs, make one in the powder designer, import a table of your powders with Import, or type the model values of your powder.',
+      )}
+    </Text>
+  )
+}
+
 /** The powder search, with the chosen powder, the link's name or the typed parameters as its text. */
 function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames> }) {
   const {
@@ -1478,6 +1507,7 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
   } = useLoad()
   const { t } = useTranslation()
   const dialog = useChooser()
+  const noCatalogue = useNoCataloguePowders()
   const [completeOnly] = useCompleteOnly()
   const chosen = (() => {
     if (powderDesign) return t('{name} (your design)', { name: powderDesign.name })
@@ -1514,6 +1544,7 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
           },
         }}
       />
+      {noCatalogue && <NoCataloguePowders />}
       <PowderChooser
         opened={dialog.opened}
         onClose={dialog.close}

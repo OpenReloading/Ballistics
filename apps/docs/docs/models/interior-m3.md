@@ -25,7 +25,7 @@ $$
 V_f(z, x) = V_c + A x - \frac{m_c}{\rho_s}(1 - z) - \eta\, m_c z
 $$
 
-Code: `packages/core/src/interior/model.ts`, `gasState` (`freeVolume`).
+Code: `packages/ballistics/src/interior/model.ts`, `gasState` (`freeVolume`).
 
 With leakage the covolume term uses the gas still in the barrel ([leakage and heat loss](interior-leakage-heat.md)).
 
@@ -35,7 +35,7 @@ $$
 m_c Q z = \frac{\bar p\, V_f}{k - 1} + \tfrac{1}{2} m_e v^2 + W_r + E_h
 $$
 
-Code: `packages/core/src/interior/model.ts`, `gasState` (`pressure`).
+Code: `packages/ballistics/src/interior/model.ts`, `gasState` (`pressure`).
 
 With leakage the enthalpy $E_\ell$ carried out by the leaking gas is a further term next to $W_r$ and $E_h$ ([leakage and heat loss](interior-leakage-heat.md)). Solved for the space-mean pressure, without leakage:
 
@@ -43,7 +43,7 @@ $$
 \bar p = \frac{(k - 1)\left(m_c Q z - W_r - E_h - \tfrac{1}{2} m_e v^2\right)}{V_f}
 $$
 
-Code: `packages/core/src/interior/model.ts`, `gasState` (`pressure`).
+Code: `packages/ballistics/src/interior/model.ts`, `gasState` (`pressure`).
 
 The force constant (impetus) of the propellant is $(k - 1) Q$.
 
@@ -55,7 +55,7 @@ $$
 m_p' = m_p \left(1 + \left(\frac{2\pi r_g}{L_\text{tw}}\right)^2\right), \qquad r_g = \frac{d}{2\sqrt{2}} \text{ by default}, \qquad m_e = m_p' + \delta\, m_c
 $$
 
-Code: `packages/core/src/interior/model.ts`, `scaleInteriorLoad` (`rg`, `mpr`, `me`).
+Code: `packages/ballistics/src/interior/model.ts`, `scaleInteriorLoad` (`rg`, `mpr`, `me`).
 
 Without rifling ($L_\text{tw} = 0$), $m_p' = m_p$.
 
@@ -65,7 +65,7 @@ $$
 m_e \frac{dv}{dt} = A \bar p - F_r(x), \qquad \frac{dx}{dt} = v, \qquad \frac{dW_r}{dt} = F_r(x)\, v, \qquad \frac{dE_h}{dt} = \dot q
 $$
 
-Code: `packages/core/src/interior/model.ts`, `interiorRhs`.
+Code: `packages/ballistics/src/interior/model.ts`, `interiorRhs`.
 
 $\dot q$ is the heat flux of [leakage and heat loss](interior-leakage-heat.md), 0 by default. While the projectile is held, $dv/dt = dx/dt = 0$ and only the charge burns.
 
@@ -77,7 +77,7 @@ $$
 \bar p = p_b + \delta\, \frac{m_c a}{A}, \qquad p_\text{br} = p_b + \varepsilon\, \frac{m_c a}{A}, \qquad m_p' a = A p_b - F_r
 $$
 
-Code: `packages/core/src/interior/model.ts`, `gasState` (`basePressure`, `pressures`).
+Code: `packages/ballistics/src/interior/model.ts`, `gasState` (`basePressure`, `pressures`).
 
 Base and breech pressure from the mean pressure:
 
@@ -85,7 +85,7 @@ $$
 p_b = \frac{\bar p + \delta\, m_c F_r / (A\, m_p')}{1 + \delta\, m_c / m_p'}, \qquad p_\text{br} = p_b + \varepsilon\, \frac{m_c}{A} \cdot \frac{A \bar p - F_r}{m_e}
 $$
 
-Code: `packages/core/src/interior/model.ts`, `gasState` (`basePressure`, `pressures`).
+Code: `packages/ballistics/src/interior/model.ts`, `gasState` (`basePressure`, `pressures`).
 
 Default coefficients (Lagrange):
 
@@ -93,7 +93,7 @@ $$
 \delta = \tfrac{1}{3}, \qquad \varepsilon = \tfrac{1}{2}
 $$
 
-Code: `packages/core/src/interior/model.ts`, `lagrangeGradient`.
+Code: `packages/ballistics/src/interior/model.ts`, `lagrangeGradient`.
 
 A Sébert factor $s$ sets both coefficients to $s$, so the mean pressure equals the breech pressure:
 
@@ -101,7 +101,7 @@ $$
 \delta = \varepsilon = s
 $$
 
-Code: `packages/core/src/interior/load-file.ts`, `interiorLoad` (`sebert`).
+Code: `packages/ballistics/src/interior/load-file.ts`, `interiorLoad` (`sebert`).
 
 Setting $\varepsilon$ equal to the Sébert factor is a choice of the model, not taken from a source.
 
@@ -115,7 +115,7 @@ $$
 z_0 = \frac{p_i \left(V_c - m_c/\rho_s\right)}{(k - 1)\, m_c Q - p_i\, m_c \left(1/\rho_s - \eta\right)}
 $$
 
-Code: `packages/core/src/interior/model.ts`, `runInterior` (`z0`, `bisect`).
+Code: `packages/ballistics/src/interior/model.ts`, `runInterior` (`z0`, `bisect`).
 
 For a geometric grain the form variable $f_0$ with $Z(f_0) = z_0$ is found by bisection. A $z_0$ outside $(0, 1)$ makes the run invalid with reason `input` and field `ignitionPressure`.
 
@@ -129,7 +129,7 @@ $$
 g_\text{start} = \min\left(\bar p - p_\text{st},\; A \bar p - F_r(0)\right) \ge 0
 $$
 
-Code: `packages/core/src/interior/model.ts`, `gasState` (`startG`).
+Code: `packages/ballistics/src/interior/model.ts`, `gasState` (`startG`).
 
 The second term of $g_\text{start}$ is a choice of the model.
 
@@ -141,7 +141,7 @@ These are effective values of the model, not measured shot-start pressures.
 
 The barrel length of 0.3 m that separates the two cases is a choice of the model.
 
-Code: `packages/core/src/interior/start-pressure.ts`, `defaultStartPressure`, `handgunBarrelLengthLimit`.
+Code: `packages/ballistics/src/interior/start-pressure.ts`, `defaultStartPressure`, `handgunBarrelLengthLimit`.
 
 The workbench takes the construction from the bullet record's `construction.structure` and the barrel length of the seating (else the firearm's, the Settings default or the one assumed for the cartridge class):
 
@@ -159,7 +159,7 @@ No powder record has one now: each powder model was fitted at `defaultStartPress
 
 The table is `bulletStructures` in core, which also gives each structure the class of its effective density for a bullet without a length ([case capacity](./case-capacity.md)).
 
-Code: `packages/core/src/interior/start-pressure.ts`, `bulletStructures`, `constructionOf`, `startPressureOf`; `apps/web/src/lib/start-pressure.ts`, `startPressureDefault`.
+Code: `packages/ballistics/src/interior/start-pressure.ts`, `bulletStructures`, `constructionOf`, `startPressureOf`; `apps/web/src/lib/start-pressure.ts`, `startPressureDefault`.
 
 ### Bore resistance
 
@@ -169,7 +169,7 @@ $$
 F_r(x) = A \left(p_f + p_e(x)\right)
 $$
 
-Code: `packages/core/src/interior/model.ts`, `gasState` (`resistance`), `profileAt`.
+Code: `packages/ballistics/src/interior/model.ts`, `gasState` (`resistance`), `profileAt`.
 
 $p_e(x)$ is interpolated linearly between `{ travel, pressure }` points with increasing travel and is 0 before the first and after the last point. Free travel before the lands is a profile that starts at the jump distance.
 
@@ -183,7 +183,7 @@ $$
 p_f = \tau_f\, \frac{\pi G_1 L}{A} \left(1 + c\, o\right), \qquad o = \max\left(0,\; 100\, \frac{G_1 - Z}{Z}\right), \qquad p_e(x) = \phi_e\, p_\text{st} \left(1 - \frac{x}{L}\right) \text{ for } 0 \le x \le L
 $$
 
-Code: `packages/core/src/interior/bore-resistance.ts`, `boreResistance`, `oversizePercent`, `recordResistance`.
+Code: `packages/ballistics/src/interior/bore-resistance.ts`, `boreResistance`, `oversizePercent`, `recordResistance`.
 - $o$ is taken as 0 without $Z$ and above `maxOversizePercent` (5 %).
 - $G_1$ and $Z$ are C.I.P. tolerance limits, not measurements. A run reads $G_1$ from the cartridge record, else the bore diameter.
 - The workbench keeps the record's $Z$ in $o$ when the chosen firearm has a measured groove diameter: $G_1$ stays a nominal limit, and a measured $Z$ against it would give an oversize no bullet was measured for. A bullet below the measured groove diameter gets a note, as gas passing the bullet is not in the model.
@@ -191,7 +191,7 @@ Code: `packages/core/src/interior/bore-resistance.ts`, `boreResistance`, `oversi
 - $\tau_f$, $c$ and $\phi_e$ are stored with the fitted powder parameters.
 - A load file can replace the friction pressure (`boreFriction`) and the start and length of the engraving ramp (`engravingPressure`, `engravingLength`).
 
-Code: `packages/core/src/interior/load-file.ts`, `overrideResistance`, `checkResistanceValues`.
+Code: `packages/ballistics/src/interior/load-file.ts`, `overrideResistance`, `checkResistanceValues`.
 
 The resistance law with $\tau_f$, $c$ and $\phi_e$ and the oversize limit of 5 % are choices of the model, not taken from a source.
 
@@ -214,7 +214,7 @@ $$
 A = Q_\text{CIP} \quad\text{or}\quad A = \frac{\pi}{4}\left(\frac{F + Z}{2}\right)^2 \quad\text{or}\quad A = \frac{\pi}{4} F^2
 $$
 
-Code: `packages/core/src/interior/bore-resistance.ts`, `boreArea` and `recordBoreArea`. `packages/core/src/cartridge-specs.ts`, `cartridgeBoreAreaMm2` and `cartridgeLandDiameterMm`.
+Code: `packages/ballistics/src/interior/bore-resistance.ts`, `boreArea` and `recordBoreArea`. `packages/ballistics/src/cartridge-specs.ts`, `cartridgeBoreAreaMm2` and `cartridgeLandDiameterMm`.
 
 The circle of the mean of $F$ and $Z$ is a choice of the model, not taken from a source.
 
@@ -232,9 +232,9 @@ $$
 V_0' = V_0 + w A
 $$
 
-Code: `packages/core/src/interior/throat-wear.ts`, `wornVolume`. `packages/core/src/interior/model.ts`, `scaleInteriorLoad`. `packages/core/src/interior/load-file.ts`, `interiorLoad`.
+Code: `packages/ballistics/src/interior/throat-wear.ts`, `wornVolume`. `packages/ballistics/src/interior/model.ts`, `scaleInteriorLoad`. `packages/ballistics/src/interior/load-file.ts`, `interiorLoad`.
 
-The default is 0. The wear is a typed value: no rate per round is applied. One barrel measured by [Vuong 2026](../bibliography.md#vuong-2026) (5.56x45 mm, 361 mm, 10-shot means) lost velocity from 840.6 m/s new to 821.3 m/s at 8000 and 785.8 m/s at 16000 rounds, while its chamber grew from 49.20 to 54.62 mm; those values are stored with authors, DOI and licence in `vuong2026` (`packages/core/src/interior/throat-wear-measurement.ts`). Rates do not carry over to another cartridge or firing regime, and an automatic value would need an interval of about 0 to 0.3 to 0.8 mm per 1000 rounds (unverified). When the chosen firearm has a `roundCount` and no throat wear is entered, the result notes say that the velocity may be lower than simulated and give the measured 5.56 rates as an example: 0.29 % per 1000 rounds from 0 to 8000 and 0.54 % per 1000 rounds from 8000 to 16000. Round count: [Firearm round count](../research/firearm-round-count-age.md).
+The default is 0. The wear is a typed value: no rate per round is applied. One barrel measured by [Vuong 2026](../bibliography.md#vuong-2026) (5.56x45 mm, 361 mm, 10-shot means) lost velocity from 840.6 m/s new to 821.3 m/s at 8000 and 785.8 m/s at 16000 rounds, while its chamber grew from 49.20 to 54.62 mm; those values are stored with authors, DOI and licence in `vuong2026` (`packages/ballistics/src/interior/throat-wear-measurement.ts`). Rates do not carry over to another cartridge or firing regime, and an automatic value would need an interval of about 0 to 0.3 to 0.8 mm per 1000 rounds (unverified). When the chosen firearm has a `roundCount` and no throat wear is entered, the result notes say that the velocity may be lower than simulated and give the measured 5.56 rates as an example: 0.29 % per 1000 rounds from 0 to 8000 and 0.54 % per 1000 rounds from 8000 to 16000. Round count: [Firearm round count](../research/firearm-round-count-age.md).
 
 ### Temperature of the propellant
 
@@ -244,7 +244,7 @@ $$
 \tau_T = \begin{cases} \exp\left(\sigma_h (T_p - T_\text{ref})\right) & T_p \ge T_\text{ref} \\ \exp\left(\sigma_c (T_p - T_\text{ref})\right) & T_p \lt T_\text{ref} \end{cases}
 $$
 
-Code: `packages/core/src/interior/model.ts`, `scaleInteriorLoad` (`tauT`, `coef`).
+Code: `packages/ballistics/src/interior/model.ts`, `scaleInteriorLoad` (`tauT`, `coef`).
 
 Without temperature sensitivities, $\tau_T = 1$.
 
@@ -260,7 +260,7 @@ The default is a value of the grain form, not of the powder. Its reference $T_\t
 | extruded, flake | 0.0010           | 0.0001 to 0.0029       | 0.0010                   | 0 to 0.0030            | [Hodgdon 2012](../bibliography.md#hodgdon-2012): velocities at 70 and 125 °F of 14 extruded powders outside the Extreme line, converted through this model on stand-in loads ([research entry](../research/powder-temperature-default.md))                                         |
 | other           | none             |                        |                          |                        |                                                                                                                                                                                                                                                                                    |
 
-Code: `packages/core/src/interior/temperature-default.ts`, `defaultSensitivity`, `recordSensitivity`, `coldPeakInterval`. `apps/web/src/lib/interior-request.ts`, `interiorRequest`.
+Code: `packages/ballistics/src/interior/temperature-default.ts`, `defaultSensitivity`, `recordSensitivity`, `coldPeakInterval`. `apps/web/src/lib/interior-request.ts`, `interiorRequest`.
 
 The record's own coefficient always wins. The result notes of a run on the default name it ("Default temperature coefficient of ... powder"). Below the reference the peak pressure is given as an interval, the peaks at $\sigma_c = 0$ and $\sigma_c = 0.0030$, never as a single drop: the measured cold changes of the peak pressure of ball powders (Boulkadid 2016, 0.022 and 0.037 %/K, each within its uncertainty of 0) were not significant, while the model with the measured cold burn-rate sensitivity over-predicts the cold fall of the peak (-13.0 % against about -1.65 % measured at -75 K, issue #842).
 
@@ -272,7 +272,7 @@ $$
 Q(T_p) = Q \exp\left(\beta_Q (T_p - T_\text{ref})\right)
 $$
 
-Code: `packages/core/src/interior/model.ts`, `energyAtTemperature` (used for the charge energy $m_c Q$ in `scaleInteriorLoad` and for `efficiency`).
+Code: `packages/ballistics/src/interior/model.ts`, `energyAtTemperature` (used for the charge energy $m_c Q$ in `scaleInteriorLoad` and for `efficiency`).
 
 The reference $T_\text{ref}$ is that of `temperatureSensitivity`, which a nonzero value needs. The default is 0, which leaves every result unchanged. The convective heat model keeps the unscaled $Q$ in its gas constant $R = (\gamma - 1) Q / T_f$, so a scaled energy there acts as a different gas temperature at a fixed $R$. The option is not a field of the powder record or the load file.
 
@@ -284,7 +284,7 @@ $$
 Y = \left(f,\; \frac{x}{x_e},\; \frac{v}{v_r},\; \frac{W_r}{m_c Q},\; \frac{E_h}{m_c Q}\right), \qquad v_r = \sqrt{\frac{2 m_c Q}{m_p}}, \qquad \tau = \frac{t\, v_r}{x_e}
 $$
 
-Code: `packages/core/src/interior/model.ts`, `scaleInteriorLoad` (`vr`, `ts`), `interiorRhs`.
+Code: `packages/ballistics/src/interior/model.ts`, `scaleInteriorLoad` (`vr`, `ts`), `interiorRhs`.
 
 With leakage the state has two more components ([leakage and heat loss](interior-leakage-heat.md)). The system is integrated in $\tau$ with the Dormand-Prince 5(4) method of the [point-mass page](exterior-point-mass.md), in chunks of `outputStep`. A curve point falls at each chunk end and at each event. Defaults (`interiorDefaults`):
 - relative tolerance $10^{-9}$, absolute tolerance $10^{-11}$ on the scaled state
@@ -307,7 +307,7 @@ The right-hand side has kinks at shot start, at form-function breakpoints, at bu
 | stall                                                | $v$                | falling   | moving                |
 | peak of $\bar p$, $p_b$, $p_\text{br}$               | $dq/d\tau$         | falling   | moving, not terminal  |
 
-Code: `packages/core/src/interior/model.ts`, `interiorEvents`.
+Code: `packages/ballistics/src/interior/model.ts`, `interiorEvents`.
 
 The rate of each pressure $q$ for the peak events is a central difference along the flow of the state:
 
@@ -315,7 +315,7 @@ $$
 \frac{dq}{d\tau} \approx \frac{q(Y + \epsilon \dot Y) - q(Y - \epsilon \dot Y)}{2\epsilon}, \qquad \epsilon = 10^{-7}
 $$
 
-Code: `packages/core/src/interior/model.ts`, `interiorEvents` (`slopes`).
+Code: `packages/ballistics/src/interior/model.ts`, `interiorEvents` (`slopes`).
 
 The step $\epsilon = 10^{-7}$ is a choice of the model.
 
@@ -327,7 +327,7 @@ $$
 E_0 = \tfrac{1}{2} m_p v_e^2, \qquad \eta_b = \frac{E_0}{m_c Q}
 $$
 
-Code: `packages/core/src/interior/model.ts`, `interior` (`muzzleEnergy`, `efficiency`).
+Code: `packages/ballistics/src/interior/model.ts`, `interior` (`muzzleEnergy`, `efficiency`).
 
 Energy split at the muzzle, the terms adding up to the released energy:
 
@@ -335,7 +335,7 @@ $$
 m_c Q z_e = \frac{\bar p V_f}{k - 1} + \tfrac{1}{2} m_p v_e^2 + \tfrac{1}{2}(m_p' - m_p) v_e^2 + \tfrac{1}{2}\delta m_c v_e^2 + W_r + E_h + E_\ell
 $$
 
-Code: `packages/core/src/interior/model.ts`, `energyBalance`.
+Code: `packages/ballistics/src/interior/model.ts`, `energyBalance`.
 
 Ten percent pressure time: the last time before the peak at which the breech pressure equals $0.1\, p_\text{br,max}$, interpolated linearly between curve points $j$ and $j+1$, and 0 when the first point is at or above that pressure:
 
@@ -343,7 +343,7 @@ $$
 t_{10} = t_j + \left(0.1\, p_\text{br,max} - p_{\text{br},j}\right) \frac{t_{j+1} - t_j}{p_{\text{br},j+1} - p_{\text{br},j}}
 $$
 
-Code: `packages/core/src/interior/model.ts`, `interior` (`tenPercentPressureTime`).
+Code: `packages/ballistics/src/interior/model.ts`, `interior` (`tenPercentPressureTime`).
 
 The level of 10 % in $t_{10}$ is a choice of the model, not taken from a source.
 
@@ -362,7 +362,7 @@ $$
 \Lambda = \frac{m_c}{\rho_\text{bulk} V_c}
 $$
 
-Code: `packages/core/src/interior/load-file.ts`, `interiorLoad`, `missingLoadKeys`, `loadRatio`. `packages/core/src/interior/workbench-keys.ts`, `interiorValueKeys`, `burnFormKeys`, `powderModelValues`.
+Code: `packages/ballistics/src/interior/load-file.ts`, `interiorLoad`, `missingLoadKeys`, `loadRatio`. `packages/ballistics/src/interior/workbench-keys.ts`, `interiorValueKeys`, `burnFormKeys`, `powderModelValues`.
 
 The solid fill, the solid volume of the charge over the same volume, is the packing fraction of the grains in the chamber:
 
@@ -370,7 +370,7 @@ $$
 \varphi = \frac{m_c}{\rho_s V_c} = \Lambda\,\frac{\rho_\text{bulk}}{\rho_s}
 $$
 
-Code: `packages/core/src/interior/load-file.ts`, `solidFill`.
+Code: `packages/ballistics/src/interior/load-file.ts`, `solidFill`.
 
 A charge at its bulk density fills the chamber to $\varphi = \rho_\text{bulk}/\rho_s$, at $\rho_s$ = 1.6 g/cm3 for example 0.61 for a bulk density of 0.98 g/cm3 and 0.55 for 0.88 g/cm3. A random packing of equal spheres reaches at most $\varphi = 0.6366$. A denser fill needs grains that deform or break, which changes their burning surface, and the model takes free grains with a fixed form function. A load is outside the model above:
 
@@ -378,7 +378,7 @@ $$
 \varphi_\text{max} = 0.64, \qquad \Lambda_\text{max} = \varphi_\text{max}\,\frac{\rho_s}{\rho_\text{bulk}}
 $$
 
-Code: `packages/core/src/interior/load-file.ts`, `solidFillLimit`, `fillLoadRatioLimit`.
+Code: `packages/ballistics/src/interior/load-file.ts`, `solidFillLimit`, `fillLoadRatioLimit`.
 - The limit needs no bulk density, so it applies to every run. With a bulk density the API and the workbench state it as the load ratio $\Lambda_\text{max}$ of the powder.
 - The [charge solver](interior-charge-solver.md) stops at $\varphi_\text{max}$.
 - The `chamberVolume` rule of `interior` stops where the solid volume or the covolume of the charge fills $V_c$, at $\varphi = \min\left(1,\ 1/(\eta \rho_s)\right)$. With $\eta$ = 1 cm3/g and $\rho_s$ = 1.6 g/cm3 that is 0.625, below $\varphi_\text{max}$.
@@ -389,7 +389,7 @@ Taking the random close packing of equal spheres as the limit for grains of ever
 
 `recordLoad` builds the run of a load that names a cartridge, a powder and a bullet, for callers that have no form state: the powder record's model parameters (`powderModelValues`), the cartridge's chamber land diameter $F$ as the bore diameter, its twist $u$ and its bore area $Q$ (without $Q$, the circle of the mean of $F$ and the groove diameter $Z$, `boreArea`), the bore resistance of the powder's fit (`recordResistance`) and the powder's temperature sensitivity. The charge, the chamber volume behind the seated bullet, the bullet travel and the bullet mass are the caller's, and so is the propellant temperature (K), which defaults to the temperature of the powder's fit. A powder without an interior model, a missing value or a bore-resistance law without the bullet length is an error, never a run without that term.
 
-Code: `packages/core/src/interior/record-load.ts`, `recordLoad`.
+Code: `packages/ballistics/src/interior/record-load.ts`, `recordLoad`.
 
 ## Symbols
 
@@ -495,7 +495,7 @@ $$
 p_h = \max(p_\text{st},\ p_i), \qquad E_p = \frac{\partial \ln \bar p_\text{max}}{\partial \ln p_h}, \qquad E_v = \frac{\partial \ln v_e}{\partial \ln p_h}
 $$
 
-Code: `packages/core/src/interior/model.ts`, `chargeTooSmall`.
+Code: `packages/ballistics/src/interior/model.ts`, `chargeTooSmall`.
 
 Central differences at 5 % of $p_h$ over a charge ladder of five made-up loads (rifle, rifle with bore resistance, magnum with the two-stage form, pistol, lead-bullet pistol) give:
 - Without bore resistance, $E_p$ is close to one function of $r = \bar p_\text{max} / p_h$ for every load: 0.68 to 0.70 at $r = 1.5$, 0.5 at $r$ = 2.18 to 2.39, 1/3 at $r$ = 3.7 to 4.3.
@@ -510,7 +510,7 @@ $$
 \bar p_\text{max} \lt 2.2\, p_h
 $$
 
-Code: `packages/core/src/interior/model.ts`, `chargeTooSmallRatio`. `packages/api/src/compute/limits.ts`, `chargeWarning`.
+Code: `packages/ballistics/src/interior/model.ts`, `chargeTooSmallRatio`. `packages/api/src/compute/limits.ts`, `chargeWarning`.
 
 The ratio 2.2 is the rounded low end of $r$ at the bound over the loads. With bore resistance it flags more loads than the bound needs. The bound of 0.5 is a choice of the model, not taken from a source.
 
@@ -545,7 +545,7 @@ $$
 p_\text{ob} = 9.80\ \text{MPa} \cdot \text{BHN}
 $$
 
-Code: `packages/core/src/interior/obturation.ts`, `obturationPressurePerBrinell`, `plainBaseCastHardness`, `castHarderThanPeak`. `apps/web/src/components/workbench-outcome.ts`, `derived`.
+Code: `packages/ballistics/src/interior/obturation.ts`, `obturationPressurePerBrinell`, `plainBaseCastHardness`, `castHarderThanPeak`. `apps/web/src/components/workbench-outcome.ts`, `derived`.
 
 The workbench's result notes carry the warning "possible gas leakage" when the bullet record has `construction.structure` `cast`, no gas check (`gasCheck` absent or `false`), a `construction.core.hardness`, and $p_\text{ob}$ is above the simulated peak breech pressure. Any of the three missing gives none. The warning states no number, and the run is not changed: the model has no leak past the bullet, no default leak area and no coefficient for a gas check, since no source gives one. The research entry [cast bullet hardness against peak pressure](../research/cast-bullet-hardness-peak-pressure.md) has the solver's response to a leak area.
 

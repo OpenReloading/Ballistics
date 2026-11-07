@@ -20,7 +20,7 @@ $$
 \frac{dz}{dt} = B_a\, \tau_T\, \varphi(z; a, z_1) \left(\frac{\max(\bar p, 0)}{p_\text{ref}}\right)^{n}
 $$
 
-Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurves` (`apply`), `packages/core/src/interior/model.ts`, `interiorRhs`.
+Code: `packages/ballistics/src/interior/curve-fit.ts`, `fitPressureCurves` (`apply`), `packages/ballistics/src/interior/model.ts`, `interiorRhs`.
 
 The fit compares the trace with the pressure the model gives at the sensor position: the breech pressure, the space-mean pressure or the pressure at the projectile base. The fit window starts where the trace first reaches 25 % of its peak (at its first sample when it already starts above that) $p_\text{pk}$, found on a parabola through the crossing samples, and ends where it first falls to the fraction $f_\text{end}$ of the peak after the peak (default 0.5):
 
@@ -29,7 +29,7 @@ t_s = \min\{t : p(t) \ge 0.25\, p_\text{pk}\}, \qquad
 t_e = \min\{t > t_\text{pk} : p(t) \le f_\text{end}\, p_\text{pk}\}
 $$
 
-Code: `packages/core/src/interior/curve-fit.ts`, `traceWindow`, `riseTime`, `parabola`.
+Code: `packages/ballistics/src/interior/curve-fit.ts`, `traceWindow`, `riseTime`, `parabola`.
 
 The rise is aligned above the shot-start pressure, which the M3 model does not reproduce (the pressure at which the projectile starts is of the order of 10 % of the peak, see [powder fit](interior-powder-fit.md)). The window must lie inside the barrel time of the model, else the fit throws an `InputError` that asks for a start closer to the trace or a larger $f_\text{end}$.
 
@@ -41,7 +41,7 @@ $$
 B_\text{pk} = B_a \left(\frac{p_\text{pk}}{p_\text{ref,0}}\right)^{n_0}
 $$
 
-Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurves` (`restated`).
+Code: `packages/ballistics/src/interior/curve-fit.ts`, `fitPressureCurves` (`restated`).
 
 The fitted parameters are the logarithms of the ratios to the start values, $B_\text{pk}$, $a$, $z_1$ and $n$ ($a$ needs a start value above 0, $z_1$ below 1, $n$ above 0):
 
@@ -50,7 +50,7 @@ q_j = q_{j,0}\, e^{\theta_j}, \qquad
 t_\text{shift} = t_{\text{shift},0} + s\,\theta_\text{shift}, \qquad s = 10^{-4}\ \text{s}
 $$
 
-Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurves` (`values`, `shiftScale`).
+Code: `packages/ballistics/src/interior/curve-fit.ts`, `fitPressureCurves` (`values`, `shiftScale`).
 
 The time shift is always fitted and linear. Its start value puts the model's rise to 25 % of its own peak on the trace's rise. A shift fixed at that start value instead biases the other parameters by about the granularity of the trace's sampling, so it is fitted.
 
@@ -62,7 +62,7 @@ $$
 r_i = \frac{\hat p(t_i - t_\text{shift};\ \theta) - p_i}{\sigma}, \qquad \chi^2 = \sum_i r_i^2, \qquad \nu = n_s - n_p - 1
 $$
 
-Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurves` (`evaluate`, `degreesOfFreedom`), `packages/statistics/src/least-squares.ts`, `logLeastSquares` (`residuals`, `chiSquareOf`).
+Code: `packages/ballistics/src/interior/curve-fit.ts`, `fitPressureCurves` (`evaluate`, `degreesOfFreedom`), `packages/statistics/src/least-squares.ts`, `logLeastSquares` (`residuals`, `chiSquareOf`).
 
 The sample noise $\sigma$ is the trace's `sigma`. Without it the fit uses $\sigma = 1$ and scales the covariance by $\chi^2/\nu$, so the uncertainties assume the residuals are noise. A candidate whose run is invalid, or whose shifted window leaves the model's barrel time, is a rejected step. A Jacobian entry below $10^{-6}\,p_\text{pk}/\sigma$ per unit log parameter counts as noise. The loop stops at a relative gain of $\chi^2$ below $10^{-9}$ (the flat valley of correlated form parameters), a default of 100 iterations, and fails with the condition number of the column-scaled Jacobian above $10^3$.
 
@@ -75,7 +75,7 @@ $$
 u_\text{rel}(q_j) = \sqrt{C_{\theta,jj}}, \qquad u(q_j) = q_j\, u_\text{rel}(q_j)
 $$
 
-Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurves` (`attempt`, `collinear`), `packages/statistics/src/least-squares.ts`, `identifiability` (`varianceInflation`).
+Code: `packages/ballistics/src/interior/curve-fit.ts`, `fitPressureCurves` (`attempt`, `collinear`), `packages/statistics/src/least-squares.ts`, `identifiability` (`varianceInflation`).
 
 A parameter is `weak` when its variance inflation exceeds `maxInflation` (default 10, reason `collinear`) or its relative standard uncertainty exceeds `maxRelativeStandardUncertainty` (default 0.25, reason `imprecise`). The time shift reports its variance inflation and uncertainty but is not held.
 
@@ -89,7 +89,7 @@ $$
 n_\text{low} = n\, e^{-k\, u_\text{rel}(n)}, \qquad n_\text{high} = n\, e^{k\, u_\text{rel}(n)}, \qquad k = 2.2
 $$
 
-Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurves` (`interval`), `coverage`.
+Code: `packages/ballistics/src/interior/curve-fit.ts`, `fitPressureCurves` (`interval`), `coverage`.
 
 $k$ comes from a synthetic study of `fitPressureCurves` at its default limits ([research log](../research/interior-curve-fit-exponent-interval.md)): 2, 3 and 5 breech traces at charges from 2.4 to 3.0 g, exponents 0.3, 0.5 and 0.8, noise 0.1, 0.5 and 2 % of the peak, the exponent starting 20 % high, 40 replicates per cell. $k$ is the 90th percentile of $\lvert \ln(\hat n / n) \rvert / u_\text{rel}$ over the fitted runs of half the replicates, 2.20 on 535 runs. On the other half it covered 91 % of the runs, 75 to 100 % per cell (18 of 27 cells at 90 % or more), against 85 % with 1.645. Two traces needed less (90th percentile 1.5), five more (2.3).
 
@@ -104,7 +104,7 @@ s_J = \sqrt{\frac{K-1}{K} \sum_k \bigl(\ln n_{(k)} - \overline{\ln n_{(\cdot)}}\
 s_J > 2\, k\, u_\text{rel}(n) \ \Rightarrow\ \text{reason } \texttt{inconsistent}
 $$
 
-Code: `packages/core/src/interior/curve-fit.ts`, `checkSpread`, `refits`, `jackknife`.
+Code: `packages/ballistics/src/interior/curve-fit.ts`, `checkSpread`, `refits`, `jackknife`.
 
 An `inconsistent` exponent is `weak` and stays fitted with its value and interval: the traces do not agree on it, and holding it at the caller's start value would not make them agree. When a refit fails or holds the exponent, there is no `leaveOneOut` and no check. With two traces there is none either.
 
@@ -118,7 +118,7 @@ A trace often fixes the burn coefficient and the shape of the rise but not the e
 - An `ill-conditioned` failure holds the next of the exponent, the form slope and the transition point that is still fitted.
 - The burn coefficient is never held. A fit that would leave nothing to fit, and any other failure, throws.
 
-Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurves` (the loop over `attempt`), `withheld`, `giveUp`.
+Code: `packages/ballistics/src/interior/curve-fit.ts`, `fitPressureCurves` (the loop over `attempt`), `withheld`, `giveUp`.
 
 A `fixed` parameter keeps the variance inflation of the attempt that showed it and has no standard uncertainty: with the exponent held at its start value, the other parameters absorb whatever the true exponent differs by. The start exponent is the caller's assumption, and a wrong one shows as model error in the residuals, not as an uncertainty. A weak parameter other than the exponent stays in the fit with its `reasons`, and its uncertainty then says how little the trace constrains it.
 
@@ -134,7 +134,7 @@ p_\text{ref} = \Bigl(\prod_k p_{\text{pk},k}\Bigr)^{1/K}, \qquad
 \nu = \sum_k n_{s,k} - n_p - K
 $$
 
-Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurves` (`peak`, `evaluate`, `moves`).
+Code: `packages/ballistics/src/interior/curve-fit.ts`, `fitPressureCurves` (`peak`, `evaluate`, `moves`).
 
 Each trace has its own window, sensor and $\sigma_k$, found as for one trace. Either every trace gives `sigma` or none does. A time shift moves only its own trace's residuals, so its Jacobian columns are zero elsewhere. The parameters are held and reported as for one trace, with one `timeShift` entry per trace in input order. With one trace the result is that of `fitPressureCurve`.
 
@@ -142,7 +142,7 @@ A trace at a higher peak sees the burn rate change as $(p/p_\text{ref})^n$, whil
 - `sameCharge`: traces at the same charge (within a relative $10^{-6}$). Repeat shots add no pressure range but keep the limit of the other charges.
 - `narrowPeaks`: the highest peak is below 1.2 times the lowest. The exponent is then held under the limit of one trace.
 
-Code: `packages/core/src/interior/curve-fit.ts`, `curveWarnings`, `minPeakRatio`.
+Code: `packages/ballistics/src/interior/curve-fit.ts`, `curveWarnings`, `minPeakRatio`.
 
 ### Failures
 

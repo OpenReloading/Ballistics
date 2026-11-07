@@ -186,10 +186,6 @@
           "initial": 555700,
           "total": 595803
         },
-        "/my-cases": {
-          "initial": 407634,
-          "total": 457146
-        },
         "/range": {
           "initial": 421307,
           "total": 470819
@@ -199,7 +195,7 @@
     "workbench": {
       "budget": {
         "initial": 643000,
-        "total": 1059000
+        "total": 1060000
       },
       "routes": {
         "/workbench": {

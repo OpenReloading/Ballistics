@@ -7,7 +7,7 @@
       "properties": {
         "schemaVersion": {
           "type": "number",
-          "const": 2
+          "const": 1
         },
         "notice": {
           "type": "string",
@@ -908,7 +908,7 @@
       "properties": {
         "schemaVersion": {
           "type": "number",
-          "const": 2
+          "const": 1
         },
         "notice": {
           "type": "string",

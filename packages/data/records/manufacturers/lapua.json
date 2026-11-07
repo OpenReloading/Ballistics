@@ -1,6 +1,8 @@
 {
   "id": "lapua",
   "name": "Lapua",
+  "country": "FI",
+  "website": "https://www.lapua.com/",
   "provenance": {
     "kind": "published",
     "sources": [
@@ -9,6 +11,15 @@
         "url": "https://www.lapua.com/product/30-scenar-bullet-gb422-1085-g-167-gr-otm/",
         "retrieved": "2026-09-05",
         "fields": ["name"]
+      },
+      {
+        "title": "Lapua, about page",
+        "publisher": "Nammo Lapua Oy",
+        "url": "https://www.lapua.com/more/about/",
+        "retrieved": "2026-11-06",
+        "fields": ["country", "website"],
+        "origin": "manufacturer",
+        "note": "Address: Nammo Lapua Oy, P.O. Box 5 / Patruunatehtaantie 15, FI-62100 Lapua, Finland."
       }
     ]
   }

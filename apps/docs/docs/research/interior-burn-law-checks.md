@@ -61,9 +61,9 @@ Analytic: the Noble-Abel closed-vessel pressure and the demo powder. Items 1, 3 
 
 ## Where in the app
 
-- `packages/core/src/interior/vivacity.ts`, `dynamicVivacity`, `meanDynamicVivacity`.
-- `packages/core/src/interior/form.ts`, the two-stage form.
-- `packages/core/src/interior/fit.ts`, the start pressure of the powder fit.
+- `packages/ballistics/src/interior/vivacity.ts`, `dynamicVivacity`, `meanDynamicVivacity`.
+- `packages/ballistics/src/interior/form.ts`, the two-stage form.
+- `packages/ballistics/src/interior/fit.ts`, the start pressure of the powder fit.
 - Model pages: [burn laws and form functions](../models/interior-burn-forms.md), [powder fit](../models/interior-powder-fit.md).
 
 ## Confidence
