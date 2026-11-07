@@ -15,9 +15,9 @@
     "test:coverage": "vitest run --dir test --coverage"
   },
   "dependencies": {
-    "@mantine/core": "9.7.4",
+    "@mantine/core": "catalog:",
     "@mantine/form": "9.7.4",
-    "@mantine/hooks": "9.7.4",
+    "@mantine/hooks": "catalog:",
     "@mantine/spotlight": "9.7.4",
     "@open-reloading/api": "workspace:*",
     "@open-reloading/ballistics": "workspace:*",

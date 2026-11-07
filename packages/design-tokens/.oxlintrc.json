@@ -1,0 +1,23 @@
+{
+  "$schema": "../../node_modules/oxlint/configuration_schema.json",
+  "extends": ["../oxlint.logic.json"],
+  "overrides": [
+    {
+      "files": ["src/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [],
+            "patterns": [
+              {
+                "regex": ".",
+                "message": "design-tokens-src-imports-nothing: packages/design-tokens/src is generated constants; the generator in scripts/ holds the imports."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

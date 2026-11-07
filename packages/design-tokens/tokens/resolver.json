@@ -1,0 +1,29 @@
+{
+  "name": "design-tokens",
+  "version": "2025.10",
+  "description": "The Brand palette, version 1, in a light and a dark scheme, and the sizes for a fine and a coarse pointer.",
+  "sets": {
+    "base": { "sources": [{ "$ref": "base.tokens.json" }] }
+  },
+  "modifiers": {
+    "theme": {
+      "contexts": {
+        "light": [{ "$ref": "light.tokens.json" }],
+        "dark": [{ "$ref": "dark.tokens.json" }]
+      },
+      "default": "light"
+    },
+    "density": {
+      "contexts": {
+        "fine": [{ "$ref": "fine.tokens.json" }],
+        "coarse": [{ "$ref": "coarse.tokens.json" }]
+      },
+      "default": "fine"
+    }
+  },
+  "resolutionOrder": [
+    { "$ref": "#/sets/base" },
+    { "$ref": "#/modifiers/theme" },
+    { "$ref": "#/modifiers/density" }
+  ]
+}

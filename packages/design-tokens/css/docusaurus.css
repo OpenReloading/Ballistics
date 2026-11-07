@@ -1,0 +1,64 @@
+/* Infima and Pagefind's search dialog on the tokens of tokens.css, which a Docusaurus site loads first. Docusaurus sets
+   data-theme on <html>; html[data-theme] outranks Infima's own html[data-theme="dark"] block. The primary shades mix
+   the accent with Docusaurus's steps (10, 15 and 30 %), so they follow the scheme. Taken from Brand's docusaurus/brand.css. */
+html[data-theme] {
+  --ifm-font-family-base: var(--font-family-ui);
+  --ifm-color-primary: var(--accent);
+  --ifm-color-primary-dark: color-mix(in srgb, var(--accent), #000 10%);
+  --ifm-color-primary-darker: color-mix(in srgb, var(--accent), #000 15%);
+  --ifm-color-primary-darkest: color-mix(in srgb, var(--accent), #000 30%);
+  --ifm-color-primary-light: color-mix(in srgb, var(--accent), #fff 10%);
+  --ifm-color-primary-lighter: color-mix(in srgb, var(--accent), #fff 15%);
+  --ifm-color-primary-lightest: color-mix(in srgb, var(--accent), #fff 30%);
+  --ifm-background-color: var(--page);
+  --ifm-background-surface-color: var(--surface);
+  --ifm-color-content: var(--ink);
+  --ifm-color-content-secondary: var(--muted);
+  --ifm-font-color-base: var(--ink);
+  --ifm-font-color-secondary: var(--muted);
+  --ifm-heading-color: var(--ink);
+  --ifm-link-color: var(--link);
+  --ifm-link-hover-color: var(--link-hover);
+  --ifm-color-emphasis-0: var(--page);
+  --ifm-color-emphasis-100: var(--surface);
+  --ifm-color-emphasis-200: var(--surface-alt);
+  --ifm-color-emphasis-300: var(--line);
+  --ifm-color-emphasis-400: color-mix(in srgb, var(--line), var(--control-line));
+  --ifm-color-emphasis-500: var(--control-line);
+  --ifm-color-emphasis-600: color-mix(in srgb, var(--control-line), var(--muted));
+  --ifm-color-emphasis-700: var(--muted);
+  --ifm-color-emphasis-800: color-mix(in srgb, var(--muted), var(--ink));
+  --ifm-color-emphasis-900: var(--ink);
+  --ifm-color-emphasis-1000: var(--ink);
+  --ifm-hover-overlay: var(--surface-alt);
+  --ifm-toc-border-color: var(--line);
+  --ifm-table-border-color: var(--line);
+  --ifm-table-stripe-background: var(--surface);
+  --ifm-code-background: var(--surface-alt);
+  --ifm-pre-background: var(--surface-alt);
+  --ifm-pre-color: var(--ink);
+  --ifm-navbar-background-color: var(--page);
+  --ifm-navbar-link-color: var(--muted);
+  --ifm-navbar-link-hover-color: var(--ink);
+  --ifm-navbar-link-active-color: var(--ink);
+  --ifm-navbar-shadow: none;
+  --ifm-menu-color: var(--ink);
+  --ifm-menu-color-active: var(--link);
+  --ifm-footer-background-color: var(--page);
+  --ifm-footer-color: var(--ink);
+  --ifm-footer-link-color: var(--ink);
+  --ifm-footer-link-hover-color: var(--link);
+  --ifm-footer-title-color: var(--ink);
+  --pf-background: var(--page);
+  --pf-text: var(--ink);
+  --pf-text-secondary: var(--muted);
+  --pf-text-muted: var(--muted);
+  --pf-border: var(--line);
+  --pf-border-focus: var(--accent);
+  --pf-outline-focus: var(--accent);
+  --pf-hover: var(--surface-alt);
+  --pf-mark: var(--ink);
+  --pf-skeleton: var(--surface-alt);
+  --pf-skeleton-shine: var(--surface);
+  --pf-font: var(--ifm-font-family-base);
+}

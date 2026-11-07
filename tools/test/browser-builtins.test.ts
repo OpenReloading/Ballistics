@@ -12,6 +12,7 @@ const browserSources = [
   ...[
     'units',
     'locale-format',
+    'design-tokens',
     'statistics',
     'ballistics',
     'shot-groups',
