@@ -28,7 +28,7 @@
   --font-size-xs: 0.75rem;
   --ink: #1d2130;
   --line: #dcdfe9;
-  --link: var(--accent);
+  --link: var(--accent-hover);
   --link-hover: var(--ink);
   --muted: #555a6d;
   --on-accent: #fff;

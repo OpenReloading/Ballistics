@@ -14,7 +14,7 @@ export const colors: {
         readonly "error-text": "#c92a2a";
         readonly ink: "#1d2130";
         readonly line: "#dcdfe9";
-        readonly link: "#1971c2";
+        readonly link: "#1864ab";
         readonly "link-hover": "#1d2130";
         readonly muted: "#555a6d";
         readonly "on-accent": "#ffffff";
@@ -57,7 +57,7 @@ export const cssVariables: {
         readonly "--mantine-color-bright": "#1d2130";
         readonly "--mantine-color-dimmed": "#555a6d";
         readonly "--mantine-color-placeholder": "#555a6d";
-        readonly "--mantine-color-anchor": "#1971c2";
+        readonly "--mantine-color-anchor": "#1864ab";
         readonly "--mantine-color-default": "#ffffff";
         readonly "--mantine-color-default-hover": "#eef0f6";
         readonly "--mantine-color-default-color": "#1d2130";

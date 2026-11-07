@@ -29,7 +29,7 @@
       "$value": { "colorSpace": "srgb", "components": [1, 1, 1], "hex": "#ffffff" }
     },
     "link": {
-      "$value": "{color.accent}"
+      "$value": "{color.accent-hover}"
     },
     "link-hover": {
       "$value": "{color.ink}"
