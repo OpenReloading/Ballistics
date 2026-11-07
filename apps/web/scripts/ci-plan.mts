@@ -196,8 +196,12 @@ const everything = (reason: string): Plan => ({
   reason,
 })
 
-/** A file of a workspace (a folder with a `package.json`): pnpm finds the workspaces a change reaches from these alone. */
+/**
+ * A file of a workspace (a folder with a `package.json`): pnpm finds the workspaces a change reaches from these alone.
+ * The catalog reader of tools is not one: it writes the bundle that the web and API tests read, which pnpm does not see.
+ */
 const inWorkspace = (file: string) => {
+  if (/^tools\/src\/catalog\//.test(file)) return false
   const folder = /^((packages|apps|tooling)\/[^/]+|tools)\//.exec(file)?.[1]
   return folder !== undefined && existsSync(path.join(repoRoot, folder, 'package.json'))
 }
