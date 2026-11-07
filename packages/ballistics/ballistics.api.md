@@ -6,6 +6,7 @@
 
 import { InputError } from '@open-reloading/statistics';
 import { LogFitFailure } from '@open-reloading/statistics';
+import { LogFitStop } from '@open-reloading/statistics';
 
 // @public
 export function aerodynamicJump(sg: number, lengthCalibres: number, crosswind: number, hand: 'right' | 'left'): number;
@@ -124,6 +125,9 @@ export const burnFormKeys: {
 };
 
 // @public
+export function calibratePooled(fit: PooledPowderFit, heldOut: readonly PooledSession[], options?: Pick<PooledPredictionOptions, 'options'>): PooledPowderFit;
+
+// @public
 export interface CandidatePlan {
     name?: string;
     plan: TruingPlan;
@@ -179,6 +183,12 @@ export interface CastConstruction {
 
 // @public
 export const castHarderThanPeak: (brinell: number, peak: number) => boolean;
+
+// @public
+export interface ChargedTrace {
+    charge: number;
+    trace: PressureHistory;
+}
 
 // @public
 export interface ChargeExtreme {
@@ -303,6 +313,11 @@ export interface Chronograph {
 }
 
 // @public
+export interface ChronographString extends Omit<LadderPoint, 'muzzleVelocity' | 'velocitySigma'> {
+    velocities: readonly number[];
+}
+
+// @public
 export const cipRounding = 0.005;
 
 // @public
@@ -344,6 +359,54 @@ export const convectiveDefaults: {
     viscosity: number;
     prandtl: number;
 };
+
+// @public
+export interface CurveFitOptions {
+    fallFraction?: number | undefined;
+    maxCondition?: number | undefined;
+    maxInflation?: number | undefined;
+    maxIterations?: number | undefined;
+    maxRelativeStandardUncertainty?: number | undefined;
+    options?: Settings<InteriorOptions> | undefined;
+    parameters?: readonly CurveParameter[] | undefined;
+}
+
+// @public
+export type CurveParameter = 'burnRate' | 'formSlope' | 'transition' | 'exponent';
+
+// @public
+export interface CurveParameterReport {
+    initial: number;
+    interval?: {
+        low: number;
+        high: number;
+    };
+    leaveOneOut?: number[];
+    name: CurveParameter | 'timeShift';
+    reasons: CurveReason[];
+    relativeStandardUncertainty?: number;
+    standardUncertainty?: number;
+    status: 'identified' | 'weak' | 'fixed';
+    value: number;
+    varianceInflation?: number;
+}
+
+// @public
+export type CurveReason = 'collinear' | 'imprecise' | 'unresolved' | 'ill-conditioned' | 'inconsistent';
+
+// @public
+export interface CurveResidual {
+    observed: number;
+    predicted: number;
+    time: number;
+}
+
+// @public
+export interface CurveWarning {
+    message: string;
+    reason: 'sameCharge' | 'narrowPeaks';
+    traces: number[];
+}
 
 // @public
 export function cylinderInertia(mass: number, diameter: number, length: number): {
@@ -474,6 +537,29 @@ export interface FiringSite {
 }
 
 // @public
+export function fitPowder(load: InteriorLoad, ladder: readonly LadderPoint[], options?: PowderFitOptions): PowderFit;
+
+// @public
+export function fitPowderPooled(sessions: readonly PooledSession[], options?: PooledFitOptions): PooledPowderFit;
+
+// @public
+export function fitPowderSessions(load: InteriorLoad, sessions: readonly PowderSession[], options?: PowderFitOptions): PowderSessionsFit;
+
+// @public
+export function fitPressureCurve(load: InteriorLoad, trace: PressureHistory, options?: CurveFitOptions): PressureCurveFit;
+
+// @public
+export function fitPressureCurves(load: InteriorLoad, shots: readonly ChargedTrace[], options?: CurveFitOptions): PressureCurvesFit;
+
+// @public
+export interface FittedPowderParameter {
+    initial: number;
+    name: PowderParameter;
+    standardUncertainty?: number;
+    value: number;
+}
+
+// @public
 export function fitTruingStrings(input: TruingStringsInput, options?: RangeStringOptions): RangeStringFit;
 
 // @public
@@ -557,6 +643,12 @@ export interface GyroscopicStabilityInput {
 export const handgunBarrelLengthLimit = 0.3;
 
 // @public
+export interface HeldPowderParameter {
+    name: PowderParameter;
+    reason: Extract<PowderFitReason, 'underdetermined' | 'unresolved' | 'ill-conditioned'>;
+}
+
+// @public
 export function heldSegment(table: DragTable, k: number, slope?: boolean): boolean;
 
 // @public
@@ -593,6 +685,16 @@ export interface ImpactStep {
 
 // @public
 export function inDragTable(table: DragTable, mach: number): boolean;
+
+// @public
+export type InputBasis = 'measured' | 'estimated';
+
+// @public
+export interface InputDefault {
+    estimated: number;
+    measured?: number;
+    unit: 'relative' | 'K';
+}
 
 // @public
 export function interior(load: InteriorLoad, options?: Settings<InteriorOptions>): InteriorResult;
@@ -793,6 +895,18 @@ export interface LadderImpact {
 export function ladderImpactResiduals(charges: readonly ImpactStep[], slope: number, level?: number): LadderImpact;
 
 // @public
+export interface LadderPoint {
+    barrelLength?: number;
+    charge: number;
+    muzzleVelocity: number;
+    peakPressure?: number;
+    pressureBasis?: PressureBasis;
+    pressureSigma?: number;
+    propellantTemperature?: number;
+    velocitySigma?: number;
+}
+
+// @public
 export interface LadderSegment {
     counts: [number, number];
     flat: boolean;
@@ -940,6 +1054,12 @@ export const minIntervalScale = 0.000001;
 export const missingLoadKeys: (values: Record<string, number | undefined>) => string[];
 
 // @public
+export class MixedPressureBasisError extends InputError {
+    constructor(rows: Partial<Record<PressureBasis, number>>);
+    readonly rows: Partial<Record<PressureBasis, number>>;
+}
+
+// @public
 export function momentSlopeFromStability(i: MomentSlopeInput): number;
 
 // @public
@@ -1020,6 +1140,9 @@ export interface OutlineDragNode {
 export type OutlineDragWarning = 'diameter-range' | 'mach-range' | 'nose-short' | 'boat-tail-long' | 'base-small' | 'base-pressure-negative';
 
 // @public
+export function outsideDomain(domain: PowderDomain, values: Partial<Record<PowderAxis, number>>): PowderExtrapolation;
+
+// @public
 export function overlay<T extends object>(base: T, settings: Settings<T> | undefined): T;
 
 // @public
@@ -1070,6 +1193,259 @@ export type PlanRefusalId = 'single-range' | 'velocity-only';
 export function planTruingStrings(input: TruingPlanInput, options?: RangeStringOptions): TruingPlan;
 
 // @public
+export const pooledDefaults: {
+    rifleSigma: number;
+    lotSigma: number;
+};
+
+// @public
+export interface PooledFitOptions {
+    lotSigma?: number | undefined;
+    maxCondition?: number | undefined;
+    maxIterations?: number | undefined;
+    options?: Settings<InteriorOptions> | undefined;
+    parameters?: readonly PooledRequest[] | undefined;
+    priors?: PooledPriors | undefined;
+    rifleSigma?: number | undefined;
+}
+
+// @public
+export type PooledParameterKind = 'burnRate' | 'temperatureFactor' | 'rifle' | 'lot';
+
+// @public
+export interface PooledPowderFit {
+    calibrationStrings: number;
+    chiSquare: number;
+    conditionNumber: number;
+    correlation: number[][];
+    covariance: number[][];
+    dataChiSquare: number;
+    degreesOfFreedom: number;
+    held: {
+        powder: string;
+        name: 'temperatureFactor';
+    }[];
+    iterations: number;
+    lotSigma: number;
+    modelError: number;
+    parameters: PooledPowderParameter[];
+    residuals: PooledResidual[];
+    rifleSigma: number;
+    runCount: number;
+    sessions: Pick<PooledSession, 'powder' | 'rifle' | 'lot'>[];
+}
+
+// @public
+export interface PooledPowderParameter {
+    group: string;
+    initial: number;
+    kind: PooledParameterKind;
+    lot?: string;
+    standardUncertainty: number;
+    value: number;
+}
+
+// @public
+export interface PooledPrediction {
+    charge: number;
+    coverageFactor: number;
+    level: number;
+    lower: number;
+    modelUncertainty: number;
+    parameterUncertainty: number;
+    runCount: number;
+    standardUncertainty: number;
+    upper: number;
+    value: number;
+}
+
+// @public
+export interface PooledPredictionOptions {
+    level?: number | undefined;
+    options?: Settings<InteriorOptions> | undefined;
+    velocitySigma?: number | undefined;
+}
+
+// @public
+export type PooledPriors = Readonly<Record<string, Partial<Record<PooledRequest, PowderPrior | undefined>> | undefined>>;
+
+// @public
+export type PooledRequest = 'burnRate' | 'temperatureFactor';
+
+// @public
+export interface PooledResidual {
+    charge: number;
+    observed: number;
+    predicted: number;
+    residual: number;
+    session: number;
+}
+
+// @public
+export interface PooledSession {
+    barrelLength?: number | undefined;
+    ladder: readonly LadderPoint[];
+    load: InteriorLoad;
+    lot?: string | undefined;
+    powder: string;
+    propellantTemperature?: number | undefined;
+    rifle: string;
+}
+
+// @public
+export type PooledTarget = Omit<PooledSession, 'ladder'>;
+
+// @public
+export function pooledVelocitySd(strings: readonly ChronographString[]): number | undefined;
+
+// @public
+export type PowderAxis = 'charge' | 'velocity' | 'pressure' | 'boreDiameter' | 'barrelLength';
+
+// @public
+export interface PowderAxisRange {
+    max: number;
+    min: number;
+}
+
+// @public
+export interface PowderConfidence {
+    basis: PowderFit['basis'];
+    label: PowderFitLabel;
+    reasons: PowderConfidenceReason[];
+    relativeHalfWidth: number;
+}
+
+// @public
+export function powderConfidence(fit: PowderFit, range: PowderPressureRange, options?: PowderConfidenceOptions): PowderConfidence;
+
+// @public
+export interface PowderConfidenceOptions {
+    similar?: SimilarPowdersPrior | undefined;
+}
+
+// @public
+export type PowderConfidenceReason = 'no-pressure' | 'capacity-estimated' | 'narrow-ladder' | 'residual-trend' | 'start-pressure-correlated' | 'outside-similar-powders' | 'weak-prior' | 'extrapolated' | 'input-refit-failed';
+
+// @public
+export interface PowderConfidenceRules {
+    readonly correlation: number;
+    readonly moderate: number;
+    readonly narrowRatio: number;
+    readonly priorSpread: number;
+    readonly tight: number;
+    readonly trendRows: number;
+}
+
+// @public
+export const powderConfidenceRules: PowderConfidenceRules;
+
+// @public
+export interface PowderDomain {
+    barrelLength: PowderAxisRange;
+    boreDiameter: PowderAxisRange;
+    charge: PowderAxisRange;
+    margin: number;
+    pressure?: PowderAxisRange;
+    velocity: PowderAxisRange;
+}
+
+// @public
+export const powderDomainMargin = 0;
+
+// @public
+export type PowderExtrapolation = Partial<Record<PowderAxis, 'below' | 'above'>>;
+
+// @public
+export interface PowderFit {
+    basis: PowderFitBasis;
+    chargeRange: {
+        min: number;
+        max: number;
+    };
+    chiSquare: number;
+    conditionNumber: number;
+    correlation?: number[][];
+    covariance?: number[][];
+    dataChiSquare: number;
+    degreesOfFreedom: number;
+    domain: PowderDomain;
+    iterations: number;
+    load: InteriorLoad;
+    loss: number;
+    parameters: FittedPowderParameter[];
+    pressureRows: Partial<Record<PressureBasis, number>>;
+    priorChiSquare: number;
+    residuals: PowderFitResidual[];
+    runCount: number;
+    stop: LogFitStop;
+    weighted: boolean;
+    weightsSettled: boolean;
+}
+
+// @public
+export type PowderFitBasis = 'refined' | 'from-scratch';
+
+// @public
+export class PowderFitError extends InputError {
+    constructor(reason: PowderFitReason, extra?: {
+        conditionNumber?: number | undefined;
+        unresolved?: number[] | undefined;
+        direction?: number[] | undefined;
+        estimate?: FittedPowderParameter[] | undefined;
+        charge?: number | undefined;
+        result?: InteriorInvalid | undefined;
+    });
+    readonly charge?: number | undefined;
+    // (undocumented)
+    readonly conditionNumber?: number | undefined;
+    readonly direction?: number[] | undefined;
+    // (undocumented)
+    readonly estimate?: FittedPowderParameter[] | undefined;
+    // (undocumented)
+    readonly reason: PowderFitReason;
+    readonly result?: InteriorInvalid | undefined;
+    readonly unresolved?: number[] | undefined;
+}
+
+// @public
+export type PowderFitLabel = 'tight' | 'moderate' | 'loose';
+
+// @public
+export interface PowderFitOptions {
+    domainMargin?: number | undefined;
+    huberThreshold?: number | undefined;
+    maxCondition?: number | undefined;
+    maxIterations?: number | undefined;
+    options?: Settings<InteriorOptions> | undefined;
+    parameters?: readonly PowderParameter[] | undefined;
+    priors?: Partial<Record<PowderParameter, PowderPrior | undefined>>;
+}
+
+// @public
+export type PowderFitReason = 'underdetermined' | 'unresolved' | 'ill-conditioned' | 'invalid' | 'not-converged';
+
+// @public
+export interface PowderFitResidual {
+    charge: number;
+    kind: 'velocity' | 'pressure';
+    observed: number;
+    predicted: number;
+    residual: number;
+}
+
+// @public
+export type PowderInput = 'caseCapacity' | 'propellantEnergy' | 'startPressure' | 'boreFriction' | 'propellantTemperature' | 'ignitionPressure' | 'gamma' | 'covolume' | 'bulletMass';
+
+// @public
+export const powderInputDefaults: Readonly<Partial<Record<PowderInput, Readonly<InputDefault>>>>;
+
+// @public
+export interface PowderInputUncertainty {
+    basis?: InputBasis | undefined;
+    standardUncertainty?: number | undefined;
+}
+
+// @public
 export interface PowderInteriorRecord {
     // (undocumented)
     interior?: {
@@ -1111,12 +1487,155 @@ export interface PowderInteriorRecord {
 export function powderModelValues(p: PowderInteriorRecord): Record<string, number> | undefined;
 
 // @public
+export type PowderParameter = 'burnRate' | 'startPressure' | 'volumeFactor' | 'energy' | 'temperatureFactor';
+
+// @public
+export interface PowderPrediction {
+    charge: number;
+    coverageFactor: number;
+    extrapolation?: PowderExtrapolation;
+    level: number;
+    pressure: PowderPredictionBand;
+    runCount: number;
+    velocity: PowderPredictionBand;
+}
+
+// @public
+export interface PowderPredictionBand {
+    lower: number;
+    standardUncertainty: number;
+    upper: number;
+    value: number;
+}
+
+// @public
+export interface PowderPredictionOptions {
+    barrelLength?: number | undefined;
+    boreDiameter?: number | undefined;
+    level?: number | undefined;
+    options?: Settings<InteriorOptions> | undefined;
+    propellantTemperature?: number | undefined;
+}
+
+// @public
+export interface PowderPressureRange {
+    contributions: PowderRangeContribution[];
+    coverageFactor: number;
+    extrapolated: boolean;
+    level: number;
+    points: PowderRangeBand[];
+    relativeHalfWidth: number;
+}
+
+// @public
+export function powderPressureRange(fit: PowderFit, ladder: readonly LadderPoint[], options?: PowderRangeOptions): PowderPressureRange;
+
+// @public
+export interface PowderPrior {
+    sigma: number;
+    value: number;
+}
+
+// @public
+export interface PowderRangeBand extends PowderRangePoint {
+    correlatedLimit: number;
+    fitUncertainty: number;
+    lower: number;
+    peakPressure: number;
+    relativeHalfWidth: number;
+    standardUncertainty: number;
+    upper: number;
+}
+
+// @public
+export interface PowderRangeContribution {
+    basis: InputBasis;
+    effects: number[];
+    input: PowderInput;
+    skipped?: SkippedInput;
+    standardUncertainty: number;
+    unit: 'relative' | 'K';
+}
+
+// @public
+export interface PowderRangeOptions {
+    fit?: PowderFitOptions | undefined;
+    inputs?: Partial<Record<PowderInput, PowderInputUncertainty | undefined>> | undefined;
+    level?: number | undefined;
+    points?: readonly PowderRangePoint[] | undefined;
+}
+
+// @public
+export interface PowderRangePoint {
+    barrelLength?: number | undefined;
+    charge: number;
+    propellantTemperature?: number | undefined;
+}
+
+// @public
+export interface PowderSession {
+    barrelLength?: number | undefined;
+    ladder: readonly LadderPoint[];
+    propellantTemperature?: number | undefined;
+}
+
+// @public
+export interface PowderSessionsFit extends PowderFit {
+    held: HeldPowderParameter[];
+    resolved: PowderParameter[];
+}
+
+// @public
+export function predictPooled(fit: PooledPowderFit, target: PooledTarget, charge: number, options?: PooledPredictionOptions): PooledPrediction;
+
+// @public
+export function predictPowder(fit: PowderFit, charge: number, options?: PowderPredictionOptions): PowderPrediction;
+
+// @public
+export type PressureBasis = 'transducer' | 'piezo' | 'case-contact' | 'crusher' | 'energy';
+
+// @public
 export interface PressureCase {
     input: PressureInput | 'all';
     maxPressure: number | null;
     reason?: string;
     side: 1 | -1;
     sides?: Record<PressureInput, -1 | 0 | 1>;
+}
+
+// @public
+export interface PressureCurveFit {
+    chiSquare: number;
+    conditionNumber: number;
+    correlation: number[][];
+    degreesOfFreedom: number;
+    iterations: number;
+    load: InteriorLoad;
+    parameters: CurveParameterReport[];
+    referencePressure: number;
+    residuals: CurveResidual[];
+    runCount: number;
+    weighted: boolean;
+    window: {
+        start: number;
+        end: number;
+    };
+}
+
+// @public
+export interface PressureCurvesFit extends Omit<PressureCurveFit, 'window' | 'residuals'> {
+    parameters: CurveParameterReport[];
+    referencePressure: number;
+    traces: TraceResiduals[];
+    warnings: CurveWarning[];
+}
+
+// @public
+export interface PressureHistory {
+    pressure: readonly number[];
+    sensor: PressureSensor;
+    sigma?: number | undefined;
+    time: readonly number[];
 }
 
 // @public
@@ -1135,6 +1654,9 @@ export interface PressureRange {
     quantity: 'maxPressure';
     tolerances: PressureTolerances;
 }
+
+// @public
+export type PressureSensor = 'breech' | 'mean' | 'base';
 
 // @public
 export const pressureToleranceDefaults: Readonly<PressureTolerances>;
@@ -1622,6 +2144,36 @@ export type ShotshellResult = InteriorResult & {
 };
 
 // @public
+export interface SimilarPowder {
+    burnRate: number;
+    energy: number;
+}
+
+// @public
+export interface SimilarPowderRules {
+    count: number;
+    minimum: number;
+    minimumSigma: number;
+    weakSigma: number;
+}
+
+// @public
+export const similarPowderRules: Readonly<SimilarPowderRules>;
+
+// @public
+export interface SimilarPowdersPrior {
+    count: number;
+    prior: PowderPrior;
+    weak: boolean;
+}
+
+// @public
+export function similarPowdersPrior(target: SimilarPowder, candidates: readonly SimilarPowder[], count?: number): SimilarPowdersPrior;
+
+// @public
+export type SkippedInput = 'fitted' | 'absent' | 'refit-failed';
+
+// @public
 export function sliverArea(rho: number, r: number, s: number): {
     inner: number;
     outer: number;
@@ -1673,6 +2225,9 @@ export interface StepBudget {
 }
 
 // @public
+export function stringLadder(strings: readonly ChronographString[]): LadderPoint[];
+
+// @public
 export interface StructureFields {
     // (undocumented)
     structure?: string | undefined;
@@ -1704,6 +2259,15 @@ export interface TargetMotion {
 
 // @public
 export function toleranceRange<L>(load: L, nominal: number, model: RangeModel<L>, tolerances: PressureTolerances): PressureRange;
+
+// @public
+export interface TraceResiduals {
+    residuals: CurveResidual[];
+    window: {
+        start: number;
+        end: number;
+    };
+}
 
 // @public
 export interface Trajectory {

@@ -56,8 +56,8 @@ it('marks Database current on the federation pages and the burn-rate overlay it 
   expect(hrefs.filter((h) => pageCoversRoute(h, '/powders/burn-rates'))).toEqual(['/cartridges'])
 })
 
-it('marks the Database current on the firearms, the old My cases route and the case group editor', () => {
-  for (const r of ['/firearms', '/my-cases', '/events', '/cases/editor', '/cases/some-id'])
+it('marks the Database current on the firearms, the events and the case group editor', () => {
+  for (const r of ['/firearms', '/events', '/cases/editor', '/cases/some-id'])
     expect(
       hrefs.filter((h) => pageCoversRoute(h, r)),
       r,
@@ -70,7 +70,6 @@ it('shows a tab bar on the route of a tab only, not on a record or a designer un
   expect(libraryOf('/firearms')?.label).toBe('Database')
   expect(libraryOf('/federations')?.label).toBe('Database')
   for (const r of [
-    '/my-cases',
     '/cases/editor',
     '/bullets/designer',
     '/cartridges/308-win',

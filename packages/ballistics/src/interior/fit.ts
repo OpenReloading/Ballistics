@@ -10,20 +10,24 @@
  */
 
 import {
+  chiSquareQuantile,
+  InputError,
+  type LogFitResult,
+  type LogFitStop,
+  logLeastSquares,
+  need,
+  nth,
+  studentTwoSidedQuantile,
+} from '@open-reloading/statistics'
+import type { Complete } from '../key-list.ts'
+import { positive, type Settings } from '../settings.ts'
+import {
   type InteriorInvalid,
   type InteriorLoad,
   type InteriorOptions,
   type InteriorResult,
   interior,
-} from '@open-reloading/ballistics'
-import {
-  chiSquareQuantile,
-  type LogFitStop,
-  logLeastSquares,
-  studentTwoSidedQuantile,
-} from '@open-reloading/statistics'
-import type { Settings } from '../errors.ts'
-import { InputError, need, nth, positive } from '../errors.ts'
+} from './model.ts'
 
 /**
  * What a peak pressure was measured with: the `pressureMethod` vocabulary of the cartridge records.
@@ -59,13 +63,17 @@ export interface LadderPoint {
   propellantTemperature?: number
 }
 
-const parameterNames = [
+const parameterList = [
   'burnRate',
   'startPressure',
   'volumeFactor',
   'energy',
   'temperatureFactor',
-] as const
+] as const satisfies readonly PowderParameter[]
+const parameterNames: readonly PowderParameter[] = parameterList satisfies Complete<
+  PowderParameter,
+  typeof parameterList
+>
 
 /**
  * Parameter of the fit: the burn coefficient (or vivacity, by the load's burn kind), the start
@@ -75,7 +83,12 @@ const parameterNames = [
  * are resolved only by ladders at several barrel lengths or several temperatures
  * (`apps/docs/docs/models/interior-powder-fit.md`, "Several barrel lengths and temperatures").
  */
-export type PowderParameter = (typeof parameterNames)[number]
+export type PowderParameter =
+  | 'burnRate'
+  | 'startPressure'
+  | 'volumeFactor'
+  | 'energy'
+  | 'temperatureFactor'
 
 /**
  * Gaussian prior of one fitted parameter in its log parameter
@@ -169,13 +182,24 @@ export interface PowderDomain {
 /** The axes on which a prediction lies outside the `domain`, each with the side it lies on. */
 export type PowderExtrapolation = Partial<Record<PowderAxis, 'below' | 'above'>>
 
+const axisList = [
+  'charge',
+  'velocity',
+  'pressure',
+  'boreDiameter',
+  'barrelLength',
+] as const satisfies readonly PowderAxis[]
+const axes: readonly string[] = axisList satisfies Complete<PowderAxis, typeof axisList>
+const isAxis = (key: string): key is PowderAxis => axes.includes(key)
+
 /** The axes of `values` that lie outside `domain`; an axis without a range or a value is not checked. */
 export function outsideDomain(
   domain: PowderDomain,
   values: Partial<Record<PowderAxis, number>>,
 ): PowderExtrapolation {
   const outside: PowderExtrapolation = {}
-  for (const [axis, value] of Object.entries(values) as [PowderAxis, number][]) {
+  for (const [axis, value] of Object.entries(values)) {
+    if (!isAxis(axis) || value === undefined) continue
     const range = domain[axis]
     if (range === undefined) continue
     if (value < range.min * (1 - powderDomainEdgeTolerance)) outside[axis] = 'below'
@@ -421,6 +445,42 @@ function ladderRows(ladder: readonly LadderPoint[]): LadderRow[] {
   ])
 }
 
+/** The start value of parameter `p` of `load`. */
+function startValue(load: InteriorLoad, p: PowderParameter): number {
+  const burn = load.propellant.burn
+  if (p === 'startPressure') return load.startPressure
+  if (p === 'volumeFactor' || p === 'temperatureFactor') return 1
+  if (p === 'energy') return load.propellant.specificEnergy
+  return burn.kind === 'vivacity' ? burn.vivacity : burn.coefficient
+}
+
+const withPropellant = (l: InteriorLoad, p: Partial<InteriorLoad['propellant']>): InteriorLoad => ({
+  ...l,
+  propellant: { ...l.propellant, ...p },
+})
+
+/** `l` with parameter `name` at `v`; the factors scale the values of the fitted `load`. */
+function withParameter(
+  load: InteriorLoad,
+  l: InteriorLoad,
+  name: PowderParameter,
+  v: number,
+): InteriorLoad {
+  const burn = load.propellant.burn
+  if (name === 'burnRate')
+    return withPropellant(l, {
+      burn: burn.kind === 'vivacity' ? { ...burn, vivacity: v } : { ...burn, coefficient: v },
+    })
+  if (name === 'startPressure') return { ...l, startPressure: v }
+  if (name === 'volumeFactor')
+    return { ...l, chamber: { ...l.chamber, volume: load.chamber.volume * v } }
+  if (name === 'energy') return withPropellant(l, { specificEnergy: v })
+  const t = load.propellant.temperatureSensitivity
+  return t === undefined
+    ? l
+    : withPropellant(l, { temperatureSensitivity: { ...t, cold: t.cold * v, hot: t.hot * v } })
+}
+
 /**
  * Maps the fitted parameters onto the load: start values, the load at given values, and the
  * values at log parameters theta.
@@ -430,47 +490,11 @@ function powderParameterMap(
   parameters: readonly PowderParameter[],
   floor: number,
 ) {
-  const burn = load.propellant.burn
-  const startValue = (p: PowderParameter) => {
-    if (p === 'startPressure') return load.startPressure
-    if (p === 'volumeFactor' || p === 'temperatureFactor') return 1
-    if (p === 'energy') return load.propellant.specificEnergy
-    return burn.kind === 'vivacity' ? burn.vivacity : burn.coefficient
-  }
-  const initial = parameters.map(startValue)
-  const withPropellant = (
-    l: InteriorLoad,
-    p: Partial<InteriorLoad['propellant']>,
-  ): InteriorLoad => ({
-    ...l,
-    propellant: { ...l.propellant, ...p },
-  })
-  const setParameter = (l: InteriorLoad, name: PowderParameter, v: number): InteriorLoad => {
-    switch (name) {
-      case 'burnRate':
-        return withPropellant(l, {
-          burn: burn.kind === 'vivacity' ? { ...burn, vivacity: v } : { ...burn, coefficient: v },
-        })
-      case 'startPressure':
-        return { ...l, startPressure: v }
-      case 'volumeFactor':
-        return { ...l, chamber: { ...l.chamber, volume: load.chamber.volume * v } }
-      case 'energy':
-        return withPropellant(l, { specificEnergy: v })
-      case 'temperatureFactor': {
-        const t = load.propellant.temperatureSensitivity
-        return t === undefined
-          ? l
-          : withPropellant(l, {
-              temperatureSensitivity: { ...t, cold: t.cold * v, hot: t.hot * v },
-            })
-      }
-    }
-  }
+  const initial = parameters.map((p) => startValue(load, p))
   if (!parameters.every((p) => parameterNames.includes(p)))
     throw new InputError(`parameters: ${parameterNames.join(', ')}, each at most once`)
   const apply = (values: number[]): InteriorLoad =>
-    parameters.reduce((l, name, k) => setParameter(l, name, nth(values, k)), load)
+    parameters.reduce((l, name, k) => withParameter(load, l, name, nth(values, k)), load)
   // log parameters; the start pressure in ln((p_st - p_floor)/(p_st0 - p_floor)), so no step reaches the floor
   const offset = parameters.map((p) => (p === 'startPressure' ? floor : 0))
   const q = (theta: number[]) =>
@@ -484,6 +508,9 @@ function powderParameterMap(
   }
   return { initial, apply, offset, q, estimate }
 }
+
+/** The map of the fitted parameters onto the load, from `powderParameterMap`. */
+type PowderParameterMap = ReturnType<typeof powderParameterMap>
 
 /** Checks the requested parameters against the load and the ladder; `energy` needs cut-down barrels. */
 function checkParameters(
@@ -525,16 +552,50 @@ function checkSolverOptions(
   )
 }
 
+/** The checked inputs of a powder fit, with the defaults of its options. */
+interface PowderFitSetup {
+  parameters: readonly PowderParameter[]
+  maxIterations: number
+  maxCondition: number
+  domainMargin: number
+  /** How many ladder points carry `velocitySigma` (all or none). */
+  withSigma: number
+  pressureRows: Partial<Record<PressureBasis, number>>
+  /** The given priors, in the order of `options.priors`. */
+  priors: { name: string; prior: PowderPrior }[]
+  /** Pa, the floor of the start pressure. */
+  floor: number
+}
+
 /**
- * Fits burn coefficient and optionally start pressure, chamber volume factor, specific energy and
- * temperature factor of `load` to the ladder. Points with another `barrelLength` or
- * `propellantTemperature` are fired from another barrel or at another temperature.
+ * The given priors in the order of `options.priors`; each needs its parameter among the fitted
+ * ones, and priors and a Huber loss need velocity sigmas.
  */
-export function fitPowder(
+function givenPriors(
+  options: PowderFitOptions,
+  parameters: readonly PowderParameter[],
+  withSigma: number,
+): PowderFitSetup['priors'] {
+  const priors: PowderFitSetup['priors'] = Object.entries(options.priors ?? {}).flatMap(
+    ([name, prior]) => (prior === undefined ? [] : [{ name, prior }]),
+  )
+  need(
+    priors.every(({ name }) => (parameters as readonly string[]).includes(name)),
+    'a prior needs its parameter in parameters',
+  )
+  need(
+    withSigma > 0 || (priors.length === 0 && options.huberThreshold === undefined),
+    'priors and huberThreshold need velocity sigmas',
+  )
+  return priors
+}
+
+/** Checks the options, the ladder and the priors of a powder fit. */
+function checkPowderFit(
   load: InteriorLoad,
   ladder: readonly LadderPoint[],
-  options: PowderFitOptions = {},
-): PowderFit {
+  options: PowderFitOptions,
+): PowderFitSetup {
   const {
     parameters = ['burnRate'],
     maxIterations = 30,
@@ -549,33 +610,36 @@ export function fitPowder(
   const pressureRows = pressureRowsPerBasis(ladder)
   checkParameters(load, ladder, parameters)
   checkSolverOptions(maxIterations, maxCondition, options.huberThreshold)
-  const priors = options.priors ?? {}
-  const priorNames = (Object.keys(priors) as PowderParameter[]).filter(
-    (n) => priors[n] !== undefined,
-  )
-  need(
-    priorNames.every((name) => parameters.includes(name)),
-    'a prior needs its parameter in parameters',
-  )
-  need(
-    withSigma > 0 || (priorNames.length === 0 && options.huberThreshold === undefined),
-    'priors and huberThreshold need velocity sigmas',
-  )
+  const priors = givenPriors(options, parameters, withSigma)
   const floor = startPressureFloor(load)
   need(
     !parameters.includes('startPressure') || load.startPressure > floor,
     'startPressure must be above the ignition pressure and the resistance at travel 0',
   )
+  return {
+    parameters,
+    maxIterations,
+    maxCondition,
+    domainMargin,
+    withSigma,
+    pressureRows,
+    priors,
+    floor,
+  }
+}
 
-  const rows = ladderRows(ladder)
-  if (rows.length < parameters.length) throw new PowderFitError('underdetermined')
-  const { initial, apply, offset, q, estimate } = powderParameterMap(load, parameters, floor)
+/** A prior as a pseudo-row after the data: observed log centre, predicted theta `k`, its sigma. */
+interface PriorRow {
+  k: number
+  sigma: number
+  centre: number
+}
 
-  // a prior is a pseudo-row after the data: observed log centre, predicted theta, its sigma
-  const priorRows = priorNames.map((name) => {
-    const prior = priors[name] as PowderPrior
-    const k = parameters.indexOf(name)
-    const base = nth(offset, k)
+/** The priors of `setup` as pseudo-rows of the log parameters of `map`. */
+function priorRows(setup: PowderFitSetup, map: PowderParameterMap): PriorRow[] {
+  return setup.priors.map(({ name, prior }) => {
+    const k = (setup.parameters as readonly string[]).indexOf(name)
+    const base = nth(map.offset, k)
     need(
       Number.isFinite(prior.value) &&
         prior.value > base &&
@@ -586,125 +650,193 @@ export function fitPowder(
     return {
       k,
       sigma: prior.sigma,
-      centre: Math.log((prior.value - base) / (nth(initial, k) - base)),
+      centre: Math.log((prior.value - base) / (nth(map.initial, k) - base)),
     }
   })
+}
 
-  // one run per distinct charge, barrel length and temperature
-  const key = (o: LadderRow) => `${o.charge} ${o.barrelLength} ${o.temperature}`
-  const runs = new Map(rows.map((o) => [key(o), o]))
-  const conditions = [...runs.values()]
-  const keys = [...runs.keys()]
-  const index = rows.map((o) => keys.indexOf(key(o)))
-  const charges = [...new Set(ladder.map((x) => x.charge))]
-  let runCount = 0
+/** The run a ladder row needs: one per distinct charge, barrel length and temperature. */
+const conditionKey = (o: LadderRow) => `${o.charge} ${o.barrelLength} ${o.temperature}`
+
+/** What a powder fit runs on: the parameter map, the ladder's rows and runs, and the counters of the runs. */
+interface LadderProblem {
+  map: PowderParameterMap
+  rows: LadderRow[]
+  /** The distinct conditions of the rows, one run each. */
+  conditions: LadderRow[]
+  /** Index into `conditions` per row. */
+  index: number[]
+  options: Settings<InteriorOptions> | undefined
+  /** Model runs so far. */
+  runCount: number
   /** The last invalid run. */
-  let rejected: { charge?: number; result?: InteriorInvalid } = {}
-  /** Predicted values per observation, or null when a run is invalid. */
-  const evaluate = (values: number[]): number[] | null => {
-    const trial = apply(values)
-    const results: Valid[] = []
-    for (const { charge, barrelLength, temperature } of conditions) {
-      runCount++
-      const r = interior(
-        {
-          ...trial,
-          charge,
-          ...(barrelLength === undefined
-            ? {}
-            : { barrel: { ...trial.barrel, length: barrelLength } }),
-          ...(temperature === undefined ? {} : { propellantTemperature: temperature }),
-        },
-        options.options,
-      )
-      if (!r.valid) {
-        rejected = { charge, result: r }
-        return null
-      }
-      results.push(r)
-    }
-    return rows.map((o, i) =>
-      o.kind === 'velocity'
-        ? nth(results, nth(index, i)).muzzleVelocity
-        : nth(results, nth(index, i)).peakBreechPressure,
-    )
-  }
+  rejected: { charge?: number; result?: InteriorInvalid }
+}
 
+function ladderProblem(
+  map: PowderParameterMap,
+  rows: LadderRow[],
+  options: Settings<InteriorOptions> | undefined,
+): LadderProblem {
+  const runs = new Map(rows.map((o) => [conditionKey(o), o]))
+  const keys = [...runs.keys()]
+  return {
+    map,
+    rows,
+    conditions: [...runs.values()],
+    index: rows.map((o) => keys.indexOf(conditionKey(o))),
+    options,
+    runCount: 0,
+    rejected: {},
+  }
+}
+
+/** Predicted values per observation at the parameter `values`, or null when a run is invalid. */
+function evaluateLadder(problem: LadderProblem, values: number[]): number[] | null {
+  const trial = problem.map.apply(values)
+  const results: Valid[] = []
+  for (const { charge, barrelLength, temperature } of problem.conditions) {
+    problem.runCount++
+    const r = interior(
+      {
+        ...trial,
+        charge,
+        ...(barrelLength === undefined
+          ? {}
+          : { barrel: { ...trial.barrel, length: barrelLength } }),
+        ...(temperature === undefined ? {} : { propellantTemperature: temperature }),
+      },
+      problem.options,
+    )
+    if (!r.valid) {
+      problem.rejected = { charge, result: r }
+      return null
+    }
+    results.push(r)
+  }
+  return problem.rows.map((o, i) =>
+    o.kind === 'velocity'
+      ? nth(results, nth(problem.index, i)).muzzleVelocity
+      : nth(results, nth(problem.index, i)).peakBreechPressure,
+  )
+}
+
+/** The least-squares fit of the ladder rows and the prior pseudo-rows. */
+function solvePowder(
+  problem: LadderProblem,
+  setup: PowderFitSetup,
+  priors: readonly PriorRow[],
+  huberThreshold: number | undefined,
+): LogFitResult {
+  const { map, rows } = problem
   // q(0), not `initial`: with the start pressure fitted they can differ in the last place
-  const first = evaluate(q(parameters.map(() => 0)))
-  if (!first) throw new PowderFitError('invalid', rejected)
-  const fit = logLeastSquares({
-    parameterCount: parameters.length,
-    observed: [...rows.map((o) => o.value), ...priorRows.map((x) => x.centre)],
-    standardUncertainty: [...rows.map((o) => o.sigma), ...priorRows.map((x) => x.sigma)],
-    weighted: withSigma > 0,
+  const first = evaluateLadder(problem, map.q(setup.parameters.map(() => 0)))
+  if (!first) throw new PowderFitError('invalid', problem.rejected)
+  return logLeastSquares({
+    parameterCount: setup.parameters.length,
+    observed: [...rows.map((o) => o.value), ...priors.map((x) => x.centre)],
+    standardUncertainty: [...rows.map((o) => o.sigma), ...priors.map((x) => x.sigma)],
+    weighted: setup.withSigma > 0,
     // a Jacobian entry below 1e-6 of the observation per unit log parameter is noise; a prior row never is
-    floor: [...rows.map((o) => (1e-6 * o.value) / o.sigma), ...priorRows.map(() => 0)],
-    first: [...first, ...priorRows.map(() => 0)],
+    floor: [...rows.map((o) => (1e-6 * o.value) / o.sigma), ...priors.map(() => 0)],
+    first: [...first, ...priors.map(() => 0)],
     predict: (trial) => {
-      const out = evaluate(q(trial))
-      return out && [...out, ...priorRows.map((x) => nth(trial, x.k))]
+      const out = evaluateLadder(problem, map.q(trial))
+      return out && [...out, ...priors.map((x) => nth(trial, x.k))]
     },
-    ...(options.huberThreshold === undefined
+    ...(huberThreshold === undefined
       ? {}
-      : { huber: { threshold: options.huberThreshold, count: rows.length } }),
-    maxIterations,
-    maxCondition,
+      : { huber: { threshold: huberThreshold, count: rows.length } }),
+    maxIterations: setup.maxIterations,
+    maxCondition: setup.maxCondition,
     fail: (reason, theta, extra = {}) => {
-      const e = { ...extra, estimate: estimate(theta) }
+      const e = { ...extra, estimate: map.estimate(theta) }
       throw reason === 'unreachable'
-        ? new PowderFitError('invalid', { ...e, ...rejected })
+        ? new PowderFitError('invalid', { ...e, ...problem.rejected })
         : new PowderFitError(reason, e)
     },
   })
-  const values = q(fit.theta)
-  const priorChiSquare = priorRows.reduce(
-    (sum, x) => sum + ((nth(fit.theta, x.k) - x.centre) / x.sigma) ** 2,
-    0,
-  )
+}
+
+/** Each fitted parameter at the solution, with its standard uncertainty where the fit has one. */
+function fittedParameters(
+  parameters: readonly PowderParameter[],
+  map: PowderParameterMap,
+  fit: LogFitResult,
+): FittedPowderParameter[] {
+  const values = map.q(fit.theta)
+  return parameters.map((name, k) => {
+    const value = nth(values, k)
+    return {
+      name,
+      initial: nth(map.initial, k),
+      value,
+      ...(fit.standardUncertainty
+        ? { standardUncertainty: (value - nth(map.offset, k)) * nth(fit.standardUncertainty, k) }
+        : {}),
+    }
+  })
+}
+
+/** Observed and predicted value of each ladder row. */
+const ladderResiduals = (rows: readonly LadderRow[], predicted: readonly number[]) =>
+  rows.map((o, i) => {
+    const value = nth(predicted, i)
+    return {
+      kind: o.kind,
+      charge: o.charge,
+      observed: o.value,
+      predicted: value,
+      residual: value - o.value,
+    }
+  })
+
+/**
+ * Fits burn coefficient and optionally start pressure, chamber volume factor, specific energy and
+ * temperature factor of `load` to the ladder. Points with another `barrelLength` or
+ * `propellantTemperature` are fired from another barrel or at another temperature.
+ */
+export function fitPowder(
+  load: InteriorLoad,
+  ladder: readonly LadderPoint[],
+  options: PowderFitOptions = {},
+): PowderFit {
+  const setup = checkPowderFit(load, ladder, options)
+  const { parameters } = setup
+  const rows = ladderRows(ladder)
+  if (rows.length < parameters.length) throw new PowderFitError('underdetermined')
+  const map = powderParameterMap(load, parameters, setup.floor)
+  const priors = priorRows(setup, map)
+  const problem = ladderProblem(map, rows, options.options)
+  const charges = [...new Set(ladder.map((x) => x.charge))]
+  const fit = solvePowder(problem, setup, priors, options.huberThreshold)
   return {
-    load: apply(values),
-    parameters: parameters.map((name, k) => {
-      const value = nth(values, k)
-      return {
-        name,
-        initial: nth(initial, k),
-        value,
-        ...(fit.standardUncertainty
-          ? { standardUncertainty: (value - nth(offset, k)) * nth(fit.standardUncertainty, k) }
-          : {}),
-      }
-    }),
+    load: map.apply(map.q(fit.theta)),
+    parameters: fittedParameters(parameters, map, fit),
     ...(fit.correlation ? { correlation: fit.correlation } : {}),
     ...(fit.covariance ? { covariance: fit.covariance } : {}),
-    weighted: withSigma > 0,
-    basis: priors.burnRate === undefined ? 'from-scratch' : 'refined',
-    pressureRows,
-    residuals: rows.map((o, i) => {
-      const predicted = nth(fit.predicted, i)
-      return {
-        kind: o.kind,
-        charge: o.charge,
-        observed: o.value,
-        predicted,
-        residual: predicted - o.value,
-      }
-    }),
+    weighted: setup.withSigma > 0,
+    basis: options.priors?.burnRate === undefined ? 'from-scratch' : 'refined',
+    pressureRows: setup.pressureRows,
+    residuals: ladderResiduals(rows, fit.predicted),
     chiSquare: fit.chiSquare,
     dataChiSquare: rows.reduce(
       (sum, o, i) => sum + ((nth(fit.predicted, i) - o.value) / o.sigma) ** 2,
       0,
     ),
-    priorChiSquare,
+    priorChiSquare: priors.reduce(
+      (sum, x) => sum + ((nth(fit.theta, x.k) - x.centre) / x.sigma) ** 2,
+      0,
+    ),
     loss: fit.loss,
     degreesOfFreedom: rows.length - parameters.length,
     conditionNumber: fit.conditionNumber,
     chargeRange: { min: Math.min(...charges), max: Math.max(...charges) },
-    domain: fitDomain(load, ladder, domainMargin),
+    domain: fitDomain(load, ladder, setup.domainMargin),
     iterations: fit.iterations,
     stop: fit.stop,
     weightsSettled: fit.weightsSettled,
-    runCount,
+    runCount: problem.runCount,
   }
 }
 
@@ -780,6 +912,60 @@ export interface PowderPrediction {
   runCount: number
 }
 
+/** Checks the charge, the level and the conditions of a prediction. */
+function checkPrediction(charge: number, level: number, options: PowderPredictionOptions) {
+  need(Number.isFinite(charge) && charge > 0, 'charge must be positive')
+  need(level > 0 && level < 1, 'level must lie in (0, 1)')
+  need(positive(options.barrelLength), 'barrelLength must be positive')
+  need(positive(options.boreDiameter), 'boreDiameter must be positive')
+  need(positive(options.propellantTemperature), 'propellantTemperature must be positive')
+}
+
+/** `fitted` at `charge` and the barrel length, bore and temperature of the prediction. */
+function predictionLoad(
+  fitted: InteriorLoad,
+  charge: number,
+  { barrelLength, boreDiameter, propellantTemperature }: PowderPredictionOptions,
+): InteriorLoad {
+  return {
+    ...fitted,
+    charge,
+    ...(barrelLength === undefined ? {} : { barrel: { ...fitted.barrel, length: barrelLength } }),
+    ...(boreDiameter === undefined
+      ? {}
+      : {
+          chamber: {
+            ...fitted.chamber,
+            boreDiameter,
+            boreArea: fitted.chamber.boreArea * (boreDiameter / fitted.chamber.boreDiameter) ** 2,
+          },
+        }),
+    ...(propellantTemperature === undefined ? {} : { propellantTemperature }),
+  }
+}
+
+/** The band of output `i` at `value`: its standard uncertainty along `gradient` and the interval of `quantile`. */
+function predictionBand(
+  value: number,
+  i: number,
+  gradient: readonly [number, number][],
+  { covariance, quantile }: { covariance: number[][]; quantile: number },
+): PowderPredictionBand {
+  const variance = gradient.reduce(
+    (sum, gj, j) =>
+      sum +
+      nth(gj, i) * gradient.reduce((s, gk, k) => s + nth(nth(covariance, j), k) * nth(gk, i), 0),
+    0,
+  )
+  const standardUncertainty = Math.sqrt(Math.max(variance, 0))
+  return {
+    value,
+    standardUncertainty,
+    lower: value - quantile * standardUncertainty,
+    upper: value + quantile * standardUncertainty,
+  }
+}
+
 /**
  * Muzzle velocity and peak breech pressure of a fitted powder at `charge`, with the standard
  * uncertainty and the interval that the covariance of the fitted parameters gives
@@ -791,12 +977,8 @@ export function predictPowder(
   charge: number,
   options: PowderPredictionOptions = {},
 ): PowderPrediction {
-  const { level = 0.9, barrelLength, boreDiameter, propellantTemperature } = options
-  need(Number.isFinite(charge) && charge > 0, 'charge must be positive')
-  need(level > 0 && level < 1, 'level must lie in (0, 1)')
-  need(positive(barrelLength), 'barrelLength must be positive')
-  need(positive(boreDiameter), 'boreDiameter must be positive')
-  need(positive(propellantTemperature), 'propellantTemperature must be positive')
+  const { level = 0.9, barrelLength, boreDiameter } = options
+  checkPrediction(charge, level, options)
   const { covariance } = fit
   if (!covariance) throw new InputError('the fit has no covariance: add rows or velocity sigmas')
   const names = fit.parameters.map((p) => p.name)
@@ -804,28 +986,7 @@ export function predictPowder(
   let runCount = 0
   const run = (theta: number[]): [number, number] => {
     runCount++
-    const fitted = apply(q(theta))
-    const r = interior(
-      {
-        ...fitted,
-        charge,
-        ...(barrelLength === undefined
-          ? {}
-          : { barrel: { ...fitted.barrel, length: barrelLength } }),
-        ...(boreDiameter === undefined
-          ? {}
-          : {
-              chamber: {
-                ...fitted.chamber,
-                boreDiameter,
-                boreArea:
-                  fitted.chamber.boreArea * (boreDiameter / fitted.chamber.boreDiameter) ** 2,
-              },
-            }),
-        ...(propellantTemperature === undefined ? {} : { propellantTemperature }),
-      },
-      options.options,
-    )
+    const r = interior(predictionLoad(apply(q(theta)), charge, options), options.options)
     if (!r.valid) throw new PowderFitError('invalid', { charge, result: r })
     return [r.muzzleVelocity, r.peakBreechPressure]
   }
@@ -841,21 +1002,6 @@ export function predictPowder(
   const quantile = fit.weighted
     ? Math.sqrt(chiSquareQuantile(level, 1))
     : studentTwoSidedQuantile(level, fit.degreesOfFreedom)
-  const band = (value: number, i: number): PowderPredictionBand => {
-    const variance = gradient.reduce(
-      (sum, gj, j) =>
-        sum +
-        nth(gj, i) * gradient.reduce((s, gk, k) => s + nth(nth(covariance, j), k) * nth(gk, i), 0),
-      0,
-    )
-    const standardUncertainty = Math.sqrt(Math.max(variance, 0))
-    return {
-      value,
-      standardUncertainty,
-      lower: value - quantile * standardUncertainty,
-      upper: value + quantile * standardUncertainty,
-    }
-  }
   const extrapolation = outsideDomain(fit.domain, {
     charge,
     velocity,
@@ -867,8 +1013,8 @@ export function predictPowder(
     charge,
     level,
     coverageFactor: quantile,
-    velocity: band(velocity, 0),
-    pressure: band(pressure, 1),
+    velocity: predictionBand(velocity, 0, gradient, { covariance, quantile }),
+    pressure: predictionBand(pressure, 1, gradient, { covariance, quantile }),
     ...(Object.keys(extrapolation).length > 0 ? { extrapolation } : {}),
     runCount,
   }

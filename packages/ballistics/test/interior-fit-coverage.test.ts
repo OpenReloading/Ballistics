@@ -1,5 +1,5 @@
+import { nth } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import { nth } from '../src/errors.ts'
 import { fitPowder, interior, predictPowder } from '../src/index.ts'
 import { load } from './powder-load.ts'
 import { normals } from './random.ts'

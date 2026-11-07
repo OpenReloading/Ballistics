@@ -68,7 +68,7 @@ Analytic: synthetic traces from the M3 model, no measured data.
 
 ## Where in the app
 
-- `packages/core/src/interior/curve-fit.ts`, `fitPressureCurve`.
+- `packages/ballistics/src/interior/curve-fit.ts`, `fitPressureCurve`.
 - `packages/statistics/src/least-squares.ts`, `logLeastSquares` (stacked runs), `identifiability`.
 - Model page: [burn form and exponent from a pressure-time curve](../models/interior-curve-fit.md).
 
