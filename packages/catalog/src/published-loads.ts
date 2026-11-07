@@ -33,6 +33,7 @@ export type PublishedLoadTargets = {
 
 /** Units of a printed figure and their factor to the stored unit of the quantity. */
 type Printed = 'mass' | 'velocity' | 'pressure' | 'length'
+// * 1000, not / conversions.g.factor: the division lands one ulp below the exact 0.06479891 g
 const grain = conversions.gr.factor * 1000
 const foot = conversions.ft.factor
 const psi = conversions.psi.factor / conversions.bar.factor
