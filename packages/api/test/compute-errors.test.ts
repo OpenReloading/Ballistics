@@ -13,7 +13,8 @@ import { API_PREFIX } from '../src/version.ts'
 import { m3Load, flatShot as shot } from './fixtures.ts'
 import { withApi } from './setup.ts'
 
-// millerStability by velocity: 1 throws an engine RangeError, 2 an InputError, 3 returns NaN
+// millerStability by velocity: 1 throws an engine RangeError, 2 an InputError, 3 returns NaN,
+// 4 throws a typed InputError
 vi.mock('@open-reloading/core', async (importOriginal) => {
   const core = await importOriginal<typeof import('@open-reloading/core')>()
   return {
@@ -22,6 +23,8 @@ vi.mock('@open-reloading/core', async (importOriginal) => {
       if (input.velocity === 1) throw new RangeError('Invalid array length')
       if (input.velocity === 2) throw new core.InputError('velocity 2')
       if (input.velocity === 3) return Number.NaN
+      if (input.velocity === 4)
+        throw new core.InputError({ code: 'matrix-size', params: { entries: 8 } })
       return core.millerStability(input)
     },
     trajectory: vi.fn(core.trajectory),
@@ -59,6 +62,18 @@ describe('compute error mapping', () => {
     const { status, body } = await stability(2)
     expect(status).toBe(422)
     expect(body).toEqual({ statusCode: 422, error: 'Unprocessable Entity', message: 'velocity 2' })
+  })
+
+  it('answers 422 with the code and params of a typed refusal', async () => {
+    const { status, body } = await stability(4)
+    expect(status).toBe(422)
+    expect(body).toEqual({
+      statusCode: 422,
+      error: 'Unprocessable Entity',
+      message: 'matrix-size',
+      code: 'matrix-size',
+      params: { entries: 8 },
+    })
   })
 
   it('answers 422 for a NaN outside the documented NaN fields', async () => {

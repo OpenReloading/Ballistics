@@ -242,7 +242,6 @@
 . ZeroSpec
 . advisoryIds
 . advisoryRule
-. advisoryRules
 . aerodynamicJump
 . airAt
 . airDensity
