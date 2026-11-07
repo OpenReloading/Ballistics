@@ -436,6 +436,28 @@ export function FirearmEditor({
         <Tabs.Panel value="configurations">
           {data.configurations.map((c, i) => {
             const title = c.name || t('Configuration {n}', { n: i + 1 })
+            const mountCells = (
+              specs: typeof mountFields | typeof zeroFields,
+              m: OpticMount,
+              k: number,
+            ) =>
+              specs.map((spec: (typeof specs)[number]) => (
+                <Table.Td key={spec.key}>
+                  <SiField
+                    spec={{
+                      ...spec,
+                      label: t('{label}, {name} mount {n}', {
+                        label: t(spec.label),
+                        name: title,
+                        n: k + 1,
+                      }),
+                    }}
+                    system={system}
+                    si={fieldSi(spec, m[spec.key])}
+                    onChange={(si) => setMount(i, k, { [spec.key]: fieldStored(spec, si) })}
+                  />
+                </Table.Td>
+              ))
             return (
               <Card key={c.id} withBorder padding="xs" mb="sm">
                 <Group justify="space-between" wrap="nowrap" mb={4}>
@@ -523,25 +545,7 @@ export function FirearmEditor({
                               onChange={(e) => setMount(i, k, { optic: e.currentTarget.value })}
                             />
                           </Table.Td>
-                          {mountFields.map((spec) => (
-                            <Table.Td key={spec.key}>
-                              <SiField
-                                spec={{
-                                  ...spec,
-                                  label: t('{label}, {name} mount {n}', {
-                                    label: t(spec.label),
-                                    name: title,
-                                    n: k + 1,
-                                  }),
-                                }}
-                                system={system}
-                                si={fieldSi(spec, m[spec.key])}
-                                onChange={(si) =>
-                                  setMount(i, k, { [spec.key]: fieldStored(spec, si) })
-                                }
-                              />
-                            </Table.Td>
-                          ))}
+                          {mountCells(mountFields, m, k)}
                           <Table.Td>
                             <TextInput
                               label={t('Zero conditions and ammunition, {name} mount {n}', {
@@ -592,25 +596,7 @@ export function FirearmEditor({
                         // oxlint-disable-next-line react/no-array-index-key -- mounts have no id and keep their order
                         <Table.Tr key={k}>
                           <Table.Th scope="row">{opticName(m.optic)}</Table.Th>
-                          {zeroFields.map((spec) => (
-                            <Table.Td key={spec.key}>
-                              <SiField
-                                spec={{
-                                  ...spec,
-                                  label: t('{label}, {name} mount {n}', {
-                                    label: t(spec.label),
-                                    name: title,
-                                    n: k + 1,
-                                  }),
-                                }}
-                                system={system}
-                                si={fieldSi(spec, m[spec.key])}
-                                onChange={(si) =>
-                                  setMount(i, k, { [spec.key]: fieldStored(spec, si) })
-                                }
-                              />
-                            </Table.Td>
-                          ))}
+                          {mountCells(zeroFields, m, k)}
                           <Table.Td>
                             <TextInput
                               label={t('Drag factor source, {name} mount {n}', {

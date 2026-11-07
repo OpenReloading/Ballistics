@@ -12,9 +12,12 @@ import {
   vivacityUnit,
 } from '../lib/burn-rate.ts'
 import { niceTicks, tickDecimals } from '../lib/ticks.ts'
-import { EChart, tickStep, useChartTokens } from './echart.tsx'
+import { axisText, chartTooltip, EChart, tickStep, useChartTokens } from './echart.tsx'
 
-const vivacityTokens: Record<string, string> = {
+// the named colours and the series slots 1 to 6
+type Tokens = Record<'muted' | 'border' | 'bg' | 'fg' | `${number}`, string>
+
+const vivacityTokens: Tokens = {
   muted: '--muted',
   border: '--border',
   bg: '--bg',
@@ -31,7 +34,6 @@ interface Series {
 /** One array for every chart without marks, so its option is not rebuilt on each render. */
 const noMarks: Mark[] = []
 
-type Tokens = Record<string, string>
 type Mark = { z: number; label: string }
 
 /** The interval as a band: an invisible lower line, the width stacked on it. */
@@ -52,7 +54,7 @@ function bandSeries(series: Series[], tokens: Tokens, t: Translator['t']) {
       stack: 'band',
       symbol: 'none',
       lineStyle: { opacity: 0 },
-      areaStyle: { color: tokens[slot + 1], opacity: 0.2 },
+      areaStyle: { color: tokens[`${slot + 1}`], opacity: 0.2 },
       tooltip: { show: false },
       data: chartBurntFractions.map((z) => {
         const v = curveAt(p, z)
@@ -103,7 +105,7 @@ function vivacityOption(
   const dy = tickDecimals(yt)
   // the workbench's small figure: 12 px text, half the ticks, the unit in its card title
   const small = height !== undefined && height < 200
-  const axisText = { color: tokens.muted, fontSize: 12 }
+  const text = axisText(tokens.muted)
   return {
     animation: false,
     // the bottom keeps room for the x axis name below its labels (containLabel counts labels only)
@@ -116,16 +118,7 @@ function vivacityOption(
       bottom: small ? 18 : 24,
       containLabel: true,
     },
-    tooltip: {
-      trigger: 'axis',
-      // kept inside the chart: `.chart` clips overflow, a tooltip past its edge was cut and left text over the note
-      confine: true,
-      borderRadius: 0,
-      valueFormatter: (v: number) => formatNumber(v, 2),
-      backgroundColor: tokens.bg,
-      borderColor: tokens.border,
-      textStyle: { color: tokens.fg },
-    },
+    tooltip: { ...chartTooltip(tokens), valueFormatter: (v: number) => formatNumber(v, 2) },
     xAxis: {
       type: 'value',
       min: 0,
@@ -134,8 +127,8 @@ function vivacityOption(
       name: t('Burnt fraction z'),
       nameLocation: 'middle',
       nameGap: small ? 20 : 26,
-      nameTextStyle: axisText,
-      axisLabel: { ...axisText, formatter: (v: number) => formatNumber(v, 1) },
+      nameTextStyle: text,
+      axisLabel: { ...text, formatter: (v: number) => formatNumber(v, 1) },
       axisLine: { lineStyle: { color: tokens.muted } },
       splitLine: { lineStyle: { color: tokens.border } },
     },
@@ -146,8 +139,8 @@ function vivacityOption(
       interval: yt.length > 1 ? tickStep(yt) * (small && yt.length > 4 ? 2 : 1) : undefined,
       name: small ? '' : t('Dynamic vivacity, {unit}', { unit: vivacityUnit }),
       nameLocation: 'end',
-      nameTextStyle: { ...axisText, align: 'left' },
-      axisLabel: { ...axisText, formatter: (v: number) => formatNumber(v, dy) },
+      nameTextStyle: { ...text, align: 'left' },
+      axisLabel: { ...text, formatter: (v: number) => formatNumber(v, dy) },
       axisLine: { show: true, lineStyle: { color: tokens.muted } },
       splitLine: { lineStyle: { color: tokens.border } },
     },
@@ -157,8 +150,8 @@ function vivacityOption(
         type: 'line',
         name: p.label,
         symbol: 'none',
-        lineStyle: { color: tokens[slot + 1], width: 2, type: dashArray(dashes[slot] ?? '') },
-        itemStyle: { color: tokens[slot + 1] },
+        lineStyle: { color: tokens[`${slot + 1}`], width: 2, type: dashArray(dashes[slot] ?? '') },
+        itemStyle: { color: tokens[`${slot + 1}`] },
         data: chartBurntFractions.map((z) => [z, curveAt(p, z).value]),
       })),
       ...marksSeries(marks, tokens, small, t),
