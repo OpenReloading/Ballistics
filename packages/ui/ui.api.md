@@ -7,8 +7,8 @@
 import type { ComponentPropsWithRef } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import { MantineProviderProps } from '@mantine/core';
-import type { ReactElement } from 'react';
-import type { ReactNode } from 'react';
+import { ReactElement } from 'react';
+import { ReactNode } from 'react';
 
 // @public
 export function AppFrame(input: AppFrameProps): ReactElement;
@@ -30,7 +30,7 @@ export interface AppFrameProps {
 export function NavItem(input: NavItemProps): ReactElement;
 
 // @public (undocumented)
-export interface NavItemProps extends ComponentPropsWithRef<'a'> {
+export interface NavItemProps extends Omit<ComponentPropsWithRef<'a'>, 'children'> {
     icon: LucideIcon;
     // (undocumented)
     label: string;

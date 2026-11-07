@@ -1,8 +1,8 @@
 'use client'
 
 import { AppShell, Burger, Group } from '@mantine/core'
-import { useDisclosure } from '@mantine/hooks'
-import type { ReactElement, ReactNode } from 'react'
+import { useDisclosure, useWindowEvent } from '@mantine/hooks'
+import { type MouseEvent, type ReactElement, type ReactNode, useId } from 'react'
 
 export interface AppFrameProps {
   /** The product's name or mark, as a link home. */
@@ -28,11 +28,20 @@ export function AppFrame({
   labels,
   children,
 }: AppFrameProps): ReactElement {
-  const [opened, { toggle }] = useDisclosure(false)
+  const [opened, { toggle, close }] = useDisclosure(false)
+  const navigationId = useId()
+  useWindowEvent('keydown', (event) => {
+    if (event.key === 'Escape') close()
+  })
+  // a followed link closes the panel, also when a router changes the page without a reload
+  const closeOnLink = (event: MouseEvent) => {
+    if (event.target instanceof Element && event.target.closest('a')) close()
+  }
   return (
     <AppShell
       header={{ height: { base: 52, lg: 56 } }}
       navbar={{ width: '4.5rem', breakpoint: 'lg', collapsed: { mobile: !opened } }}
+      mod={{ 'menu-open': opened }}
     >
       <AppShell.Header px="md">
         <Group h="100%" wrap="nowrap" gap="sm">
@@ -43,6 +52,7 @@ export function AppFrame({
             onClick={toggle}
             aria-label={labels.menu}
             aria-expanded={opened}
+            aria-controls={navigationId}
           />
           {brand}
           <Group ml="auto" wrap="nowrap" gap="xs">
@@ -51,7 +61,13 @@ export function AppFrame({
           </Group>
         </Group>
       </AppShell.Header>
-      <AppShell.Navbar component="nav" aria-label={labels.navigation} p="xs">
+      <AppShell.Navbar
+        id={navigationId}
+        component="nav"
+        aria-label={labels.navigation}
+        p="xs"
+        onClick={closeOnLink}
+      >
         {navigation}
       </AppShell.Navbar>
       <AppShell.Main>{children}</AppShell.Main>

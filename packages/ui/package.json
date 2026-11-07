@@ -40,12 +40,12 @@
   },
   "dependencies": {
     "@fontsource-variable/inter": "5.3.0",
-    "@open-reloading/design-tokens": "workspace:*",
-    "lucide-react": "1.68.0"
+    "@open-reloading/design-tokens": "workspace:*"
   },
   "peerDependencies": {
     "@mantine/core": "catalog:",
     "@mantine/hooks": "catalog:",
+    "lucide-react": "^1.68.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },
@@ -62,6 +62,7 @@
     "@types/react-dom": "19.3.0",
     "@vitest/browser": "catalog:",
     "@vitest/browser-playwright": "catalog:",
+    "lucide-react": "1.68.0",
     "playwright": "catalog:",
     "publint": "catalog:",
     "react": "catalog:",

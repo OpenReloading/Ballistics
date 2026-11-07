@@ -115,6 +115,13 @@
   background: var(--surface-alt);
 }
 
+.ui-nav-item span {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+  text-align: center;
+}
+
 .ui-nav-item[aria-current="page"] {
   color: var(--accent);
 }
@@ -124,7 +131,13 @@
   outline-offset: -2px;
 }
 
+/* below Mantine's lg breakpoint (75em), where AppFrame's navigation is the menu button's panel; while closed the
+   panel is hidden, not only moved off the screen, so its links take no focus and are not read */
 @media (max-width: 74.99em) {
+  .mantine-AppShell-root:not([data-menu-open]) .mantine-AppShell-navbar {
+    visibility: hidden;
+  }
+
   .ui-nav-item {
     flex-direction: row;
     gap: var(--space-sm);
