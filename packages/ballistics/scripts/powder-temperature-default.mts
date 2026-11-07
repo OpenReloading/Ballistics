@@ -3,7 +3,7 @@
  * (`apps/docs/docs/research/powder-temperature-default.md`). Stand-in loads only: simulations, not
  * load data. Run from the repository root, after `pnpm install`:
  *
- *   node packages/core/scripts/powder-temperature-default.mts
+ *   node packages/ballistics/scripts/powder-temperature-default.mts
  *
  * Input: the velocities at 70 and 125 °F of the 17 powders outside the Extreme line in Hodgdon
  * Powder Co., "Extreme Rifle Powders, test results for temperature sensitivity", 13 July 2012

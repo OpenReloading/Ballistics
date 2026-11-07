@@ -3,7 +3,7 @@
  * (`apps/docs/docs/research/propellant-temperature-energy.md`). Synthetic loads and ladders only:
  * simulations, not load data. Run from the repository root, after `pnpm install`:
  *
- *   node packages/core/scripts/propellant-temperature-energy.mts
+ *   node packages/ballistics/scripts/propellant-temperature-energy.mts
  *
  * Prints the three tables of the entry as Markdown. Seeds are fixed, so a rerun prints the same
  * numbers. The rules below were set before the first run.

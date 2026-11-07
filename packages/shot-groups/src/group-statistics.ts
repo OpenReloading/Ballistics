@@ -11,8 +11,9 @@ import {
   chiSquareQuantile,
   fQuantileTwoNumeratorDegrees,
   type Interval,
+  need,
+  nth,
 } from '@open-reloading/statistics'
-import { need, nth } from '../errors.ts'
 
 /** One shot in the target plane, m (x right, y up); `velocity` m/s. */
 export interface GroupShot {
@@ -202,13 +203,14 @@ function pairDistances(points: GroupPoint[]) {
   return { max, min, mean: sum / ((points.length * (points.length - 1)) / 2) }
 }
 
+const scaled = (i: Interval, f: number): Interval => ({ lower: f * i.lower, upper: f * i.upper })
+
 function confidenceOf(sxx: number, syy: number, df: number, level: number): GroupConfidence {
   const tail = (1 - level) / 2
   const sd = (s: number, nu: number): Interval => ({
     lower: Math.sqrt(s / chiSquareQuantile(1 - tail, nu)),
     upper: Math.sqrt(s / chiSquareQuantile(tail, nu)),
   })
-  const scale = (i: Interval, f: number): Interval => ({ lower: f * i.lower, upper: f * i.upper })
   const sigma = sd(sxx + syy, 2 * df)
   return {
     confidenceLevel: level,
@@ -217,8 +219,8 @@ function confidenceOf(sxx: number, syy: number, df: number, level: number): Grou
     standardDeviationX: sd(sxx, df),
     standardDeviationY: sd(syy, df),
     sigma,
-    radialStandardDeviation: scale(sigma, Math.SQRT2),
-    cep: scale(sigma, cepFactor),
+    radialStandardDeviation: scaled(sigma, Math.SQRT2),
+    cep: scaled(sigma, cepFactor),
   }
 }
 
@@ -244,9 +246,7 @@ function compassOf(dx: number, dy: number, distance: number): CompassPoint {
 }
 
 function velocityCorrelationOf(shots: GroupShot[]): VelocityCorrelation | undefined {
-  const withV = shots.filter((s) => s.velocity !== undefined) as Required<
-    Pick<GroupShot, 'y' | 'velocity'>
-  >[]
+  const withV = shots.filter((s): s is GroupShot & { velocity: number } => s.velocity !== undefined)
   if (withV.length < 3) return undefined
   const v0 = mean(withV.map((s) => s.velocity))
   const y0 = mean(withV.map((s) => s.y))
@@ -260,6 +260,14 @@ function velocityCorrelationOf(shots: GroupShot[]): VelocityCorrelation | undefi
   }
   if (vv === 0 || yy === 0) return undefined
   return { shotCount: withV.length, correlation: vy / Math.sqrt(vv * yy), slope: vy / vv }
+}
+
+/** The offset of the group centre `c` from the aim point, with its compass point. */
+function aimOffsetOf(c: GroupPoint, aim: GroupPoint): AimOffset {
+  const dx = c.x - aim.x
+  const dy = c.y - aim.y
+  const distance = Math.hypot(dx, dy)
+  return { dx, dy, distance, compass: compassOf(dx, dy, distance) }
 }
 
 /** Statistics of one group, `apps/docs/docs/models/groups.md`. */
@@ -279,12 +287,7 @@ export function groupStatistics(input: GroupInput): GroupStatistics {
     const e = centreOf(excluded)
     out.excludedOffset = { x: e.x - c.x, y: e.y - c.y }
   }
-  if (input.aim) {
-    const dx = c.x - input.aim.x
-    const dy = c.y - input.aim.y
-    const distance = Math.hypot(dx, dy)
-    out.aimOffset = { dx, dy, distance, compass: compassOf(dx, dy, distance) }
-  }
+  if (input.aim) out.aimOffset = aimOffsetOf(c, input.aim)
   const vc = velocityCorrelationOf(included)
   if (vc) out.velocityCorrelation = vc
   if (n < 2) return out
@@ -353,7 +356,7 @@ function ellipticalCep(c: GroupCovariance): number {
 }
 
 /** Ellipse about the group centre. */
-export interface Ellipse {
+export interface GroupEllipse {
   /** Semi-major axis, m. */
   semiMajor: number
   /** Semi-minor axis, m. */
@@ -363,7 +366,7 @@ export interface Ellipse {
 }
 
 /** Covariance ellipse about the centre scaled by `k`; `undefined` without covariance. */
-function ellipseAt(stats: GroupStatistics, k: number): Ellipse | undefined {
+function ellipseAt(stats: GroupStatistics, k: number): GroupEllipse | undefined {
   const c = stats.covariance
   if (!c) return undefined
   const [l1, l2] = eigenvalues(c)
@@ -380,7 +383,10 @@ function ellipseAt(stats: GroupStatistics, k: number): Ellipse | undefined {
  * the shots fired: semi-axes m, `angle` of the
  * major axis rad from +x (0 for equal variances); `undefined` below 2 shots.
  */
-export function dispersionEllipse(stats: GroupStatistics, coverage: number): Ellipse | undefined {
+export function dispersionEllipse(
+  stats: GroupStatistics,
+  coverage: number,
+): GroupEllipse | undefined {
   need(coverage > 0 && coverage < 1, 'coverage must lie in (0, 1)')
   return ellipseAt(stats, Math.sqrt(-2 * Math.log(1 - coverage)))
 }
@@ -390,7 +396,10 @@ export function dispersionEllipse(stats: GroupStatistics, coverage: number): Ell
  * with probability `coverage`, mean and covariance estimated from the group; scale
  * k^2 = 2 (n^2 - 1) / (n (n - 2)) F(2, n - 2). Same axes as `dispersionEllipse`; `undefined` below 3 shots.
  */
-export function predictionEllipse(stats: GroupStatistics, coverage: number): Ellipse | undefined {
+export function predictionEllipse(
+  stats: GroupStatistics,
+  coverage: number,
+): GroupEllipse | undefined {
   need(coverage > 0 && coverage < 1, 'coverage must lie in (0, 1)')
   const n = stats.shotCount
   if (n < 3) return undefined
@@ -406,10 +415,9 @@ export function subtendedAngle(length: number, distance: number): number {
   return 2 * Math.atan(length / (2 * distance))
 }
 
+/** Pooled values of the sums of squares `sxx`, `syy` over `df` degrees of freedom. */
 function pooledValues(
-  sxx: number,
-  syy: number,
-  df: number,
+  { sxx, syy, df }: { sxx: number; syy: number; df: number },
   spreads: number[],
   level: number,
 ): PooledValues {
@@ -461,15 +469,13 @@ export function pooledGroupStatistics(
     groupSizes: sizes,
   }
   if (df === 0) return out
-  out.angular = pooledValues(axx, ayy, df, spreads, confidenceLevel)
+  out.angular = pooledValues({ sxx: axx, syy: ayy, df }, spreads, confidenceLevel)
   const d = nth(distances, 0)
   if (distances.every((x) => Math.abs(x - d) <= 1e-9 * d))
     Object.assign(
       out,
       pooledValues(
-        axx * d * d,
-        ayy * d * d,
-        df,
+        { sxx: axx * d * d, syy: ayy * d * d, df },
         spreads.map((a) => a * d),
         confidenceLevel,
       ),
