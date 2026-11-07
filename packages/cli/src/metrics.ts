@@ -1,8 +1,8 @@
-import { fromSi } from '@open-reloading/schema'
+import { compareKeys, fromSi } from '@open-reloading/schema'
 import type { Outcome } from './evaluate.ts'
 import { reasons } from './evaluate.ts'
 import type { Change, Evaluation, Metrics } from './result.ts'
-import { byText, percentile } from './stats.ts'
+import { percentile } from './stats.ts'
 
 type Used = Outcome & { prediction: { velocity: number; pressure: number } }
 
@@ -60,7 +60,7 @@ export function metricsOf(items: readonly Outcome[], halfWidth: number | null): 
     pressure: pressureStats && { ...pressureStats, rows: pressure.length },
     pressureByBasis: Object.fromEntries(
       [...bases]
-        .toSorted(([a], [b]) => byText(a, b))
+        .toSorted(([a], [b]) => compareKeys(a, b))
         .map(([basis, errors]) => [
           basis,
           { ...(stats(errors) as NonNullable<ReturnType<typeof stats>>), rows: errors.length },
@@ -83,7 +83,7 @@ function grouped(items: readonly Outcome[], key: (o: Outcome) => string, halfWid
   }
   return Object.fromEntries(
     [...groups]
-      .toSorted(([a], [b]) => byText(a, b))
+      .toSorted(([a], [b]) => compareKeys(a, b))
       .map(([name, list]) => [name, metricsOf(list, halfWidth)]),
   )
 }

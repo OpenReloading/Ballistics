@@ -1,15 +1,10 @@
 // Fixed-seed normal draws for the hit-probability research scripts: mulberry32 uniforms, Box-Muller pairs.
+import { seededUniforms } from '@open-reloading/statistics'
 
-/** Deterministic uniform numbers in (0, 1): the mulberry32 generator, never exactly 0. */
-export function uniforms(seed: number): () => number {
-  let a = seed >>> 0
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0
-    let t = a
-    t = Math.imul(t ^ (t >>> 15), t | 1)
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
-    return (((t ^ (t >>> 14)) >>> 0) + 0.5) / 4294967296
-  }
+/** Deterministic uniform numbers in (0, 1): half a step above mulberry32's, so never 0 for the log. */
+function uniforms(seed: number): () => number {
+  const u = seededUniforms(seed)
+  return () => u() + 0.5 / 4294967296
 }
 
 /** Standard normal draws from `seed`, two per pair of uniforms. */
