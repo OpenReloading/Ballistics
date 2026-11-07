@@ -1,12 +1,8 @@
 import { type UserRecord, userRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
-import { type Candidate, idOfKey, readGrtLoad } from '../src/index.ts'
+import { readGrtLoad } from '../src/index.ts'
 import { defined } from './defined.ts'
-
-const saved = '2026-10-30T00:00:00.000Z'
-
-/** The record the app makes of a candidate: its id from the key, saved at `saved`. */
-const recordOf = ({ key, ...c }: Candidate): UserRecord => ({ ...c, id: idOfKey(key), saved })
+import { recordOf } from './record-of.ts'
 
 /** The read of `xml` with the records the app makes of its candidates. */
 function read(xml: string) {

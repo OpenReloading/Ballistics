@@ -1,9 +1,8 @@
-import { type UserRecord, userRecord } from '@open-reloading/schema'
+import { userRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import {
   autoMap,
   buildRecords,
-  type Candidate,
   fieldSpecs,
   idOfKey,
   readTable,
@@ -13,11 +12,8 @@ import {
   tableOfRows,
 } from '../src/index.ts'
 import { defined } from './defined.ts'
+import { recordOf } from './record-of.ts'
 
-const now = '2026-10-28T00:00:00.000Z'
-
-/** The record the app makes of a candidate: its id from the key, saved at `now`. */
-const recordOf = ({ key, ...c }: Candidate): UserRecord => ({ ...c, id: idOfKey(key), saved: now })
 const csv = (rows: string[][], d = ',') => rows.map((r) => r.join(d)).join('\n')
 const tableOf = (text: string): Table => {
   const r = readTable(text)

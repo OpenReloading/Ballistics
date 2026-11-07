@@ -13,7 +13,7 @@ import { splitLines } from './text.ts'
 
 export type { Workbook, Worksheet } from './cells.ts'
 export { readCsrLoad } from './csrload.ts'
-export type { Candidate, Diagnostic } from './diagnostics.ts'
+export type { Candidate, ReaderDiagnostic } from './diagnostics.ts'
 export type { Column, ColumnMap, DelimitedOptions, Delimiter } from './generic.ts'
 export { parseDelimited } from './generic.ts'
 export type { GrtLoadRead, LoadDiagnostic } from './grtload.ts'

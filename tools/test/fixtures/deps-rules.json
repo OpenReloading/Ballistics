@@ -119,6 +119,14 @@
     "source": "import { z } from 'zod'\nexport { z }",
     "rules": ["importers-imports-schema-and-units"]
   },
+  "packages/importers/src/types-of-statistics.ts": {
+    "source": "import type { Diagnostic } from '@open-reloading/statistics'\nexport type Found = Diagnostic<'x'>",
+    "rules": []
+  },
+  "packages/importers/src/statistics-code.ts": {
+    "source": "import { need } from '@open-reloading/statistics'\nexport { need }",
+    "rules": ["importers-statistics-for-types-only"]
+  },
   "packages/importers/src/units-package.ts": {
     "source": "import { conversions } from '@open-reloading/units'\nexport { conversions }",
     "rules": []

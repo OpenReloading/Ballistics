@@ -6,6 +6,7 @@
 
 import type { ChronoSession } from '@open-reloading/schema';
 import type { ChronoShot } from '@open-reloading/schema';
+import type { Diagnostic } from '@open-reloading/statistics';
 import type { QuantityValue } from '@open-reloading/schema';
 import type { UserRecord } from '@open-reloading/schema';
 
@@ -118,14 +119,6 @@ export function detectFormat(text: string): ChronoFormatId | null;
 export function detectWorkbookFormat(book: Workbook): WorkbookFormatId | null;
 
 // @public
-export interface Diagnostic<Code extends string = string> {
-    // (undocumented)
-    code: Code;
-    // (undocumented)
-    params: Readonly<Record<string, string | number | readonly string[]>>;
-}
-
-// @public
 export interface FieldSpec {
     aliases: string[];
     choices?: Record<string, string>;
@@ -190,7 +183,7 @@ export interface KindSuggestion {
 }
 
 // @public
-export type LoadDiagnostic = Diagnostic<'notPercentEncoded' | 'notConverted' | 'shotshell' | 'shotWithoutVelocity' | 'chargeWithoutShots' | 'shotsBeyondLimit' | 'chargeWithoutMass' | 'chargesBeyondLimit' | 'otherFormat' | 'unknownFormat'>;
+export type LoadDiagnostic = ReaderDiagnostic<'notPercentEncoded' | 'notConverted' | 'shotshell' | 'shotWithoutVelocity' | 'chargeWithoutShots' | 'shotsBeyondLimit' | 'chargeWithoutMass' | 'chargesBeyondLimit' | 'otherFormat' | 'unknownFormat'>;
 
 // @public
 export function parseChrono(input: string | Workbook, options: ParseChronoOptions, format: ChronoFormatId): ChronoImport;
@@ -267,6 +260,9 @@ export type PressureUnit = 'bar' | 'mbar' | 'MPa' | 'kPa' | 'Pa' | 'psi' | 'kpsi
 
 // @public
 export function readCsrLoad(xml: string): GrtLoadRead;
+
+// @public
+export type ReaderDiagnostic<Code extends string> = Diagnostic<Code, Readonly<Record<string, string | number | readonly string[]>>>;
 
 // @public
 export function readGrtLoad(xml: string): GrtLoadRead;
@@ -362,7 +358,7 @@ export interface TableColumnMap {
 }
 
 // @public
-export type TableDiagnostic = Diagnostic<'emptyCell' | 'noUnit' | 'unitOther' | 'notNumber' | 'notAboveZero' | 'outsideUsual' | 'notChoice' | 'noColumn' | 'noColumns' | 'sameId' | 'sameBulletId'>;
+export type TableDiagnostic = ReaderDiagnostic<'emptyCell' | 'noUnit' | 'unitOther' | 'notNumber' | 'notAboveZero' | 'outsideUsual' | 'notChoice' | 'noColumn' | 'noColumns' | 'sameId' | 'sameBulletId'>;
 
 // @public
 export type TableKind = 'bullet' | 'powder' | 'cartridge';

@@ -2,12 +2,13 @@
  * The reasons of a table import in words. The import worker gives `field` and `fields` as the
  * column labels (`labelled` in `import-entry.ts`), so this module carries no importer code.
  */
-import type { Diagnostic, TableDiagnostic } from '@open-reloading/importers'
+import type { TableDiagnostic } from '@open-reloading/importers'
+import type { Diagnostic } from '@open-reloading/statistics'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { translateMessage } from './core-messages.ts'
 
 /** A table row the user record schema refuses, with the schema's reason. */
-export type InvalidRecordDiagnostic = Diagnostic<'invalidRecord'>
+export type InvalidRecordDiagnostic = Diagnostic<'invalidRecord', { reason: string }>
 
 const tableMessages: Record<TableDiagnostic['code'] | InvalidRecordDiagnostic['code'], Message> = {
   emptyCell: msg('{field} is empty. Fill the cell or delete the row.'),

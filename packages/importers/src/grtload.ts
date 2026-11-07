@@ -1,7 +1,7 @@
 // The load files of Gordon's Reloading Tool (`.grtload`, XML) as record candidates. The mapping and
 // its reasons: `apps/docs/docs/data/grt-load-files.md`. It was written from saved files.
 
-import type { Candidate, Diagnostic } from './diagnostics.ts'
+import type { Candidate, ReaderDiagnostic } from './diagnostics.ts'
 import { idOfKey } from './record-ids.ts'
 import { keyText } from './records.ts'
 import { parseXml, type XmlElement } from './xml.ts'
@@ -65,7 +65,7 @@ const overrideFields = [
 ] as const
 
 /** A warning of a load file read, as a code and the values its message names; `at` is the field path. */
-export type LoadDiagnostic = Diagnostic<
+export type LoadDiagnostic = ReaderDiagnostic<
   | 'notPercentEncoded'
   | 'notConverted'
   | 'shotshell'

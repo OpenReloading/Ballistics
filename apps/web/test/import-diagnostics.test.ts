@@ -1,123 +1,110 @@
-import { autoMap, buildRecords, idOfKey, readTable } from '@open-reloading/importers'
+import type { TableKind } from '@open-reloading/importers'
 import { describe, expect, it } from 'vitest'
 import de from '../src/i18n/de.json'
 import { type Catalogue, english, translator } from '../src/i18n/translate.ts'
 import { recordOf } from '../src/lib/candidates.ts'
+import { parseCsrLoad } from '../src/lib/grt-load-file.ts'
 import { tableReasonText } from '../src/lib/import-diagnostics.ts'
-import { loadWarning } from '../src/lib/load-warnings.ts'
+import { type BuildView, type ImportReply, importWorker } from '../src/lib/import-entry.ts'
 
 const german = translator(de as Catalogue, 'de')
 const { t } = english
 
-describe('the reasons of a table import in words', () => {
-  it('words each code as the importers wrote it before they returned codes', () => {
-    const cases = [
-      [
-        { code: 'emptyCell', params: { field: 'Name' } },
-        'Name is empty. Fill the cell or delete the row.',
-      ],
-      [
-        { code: 'notNumber', params: { field: 'Diameter', cell: 'x7', mark: '.' } },
-        'Diameter "x7" is not a number with "." as decimal mark. Fix the cell or change the decimal mark of the column.',
-      ],
-      [
-        { code: 'notAboveZero', params: { field: 'Diameter', cell: '0' } },
-        'Diameter 0 is not above 0. Fix the cell or leave it empty.',
-      ],
-      [
-        {
-          code: 'outsideUsual',
-          params: { field: 'Diameter', cell: '30', unit: 'mm', low: 3, high: 25, stored: 'mm' },
-        },
-        'Diameter 30 mm is outside the usual 3 to 25 mm. Check the unit of the column.',
-      ],
-      [
-        {
-          code: 'unitOther',
-          params: { field: 'Max pressure', symbols: ['bar', 'psi', 'MPa', 'kpsi'] },
-        },
-        'Max pressure: the header names a unit other than bar, psi, MPa, kpsi. Choose the unit of the column.',
-      ],
-      [
-        {
-          code: 'notChoice',
-          params: {
-            field: 'Grain form',
-            cell: 'pellet',
-            choices: ['ball', 'extruded', 'flake', 'other'],
-          },
-        },
-        'Grain form "pellet" is not one of ball, extruded, flake, other. The value is left out; change the cell to keep it.',
-      ],
-      [
-        { code: 'noColumn', params: { fields: ['Diameter'] } },
-        'No column is mapped to Diameter. Map a column to it or read the file as another kind.',
-      ],
-      [
-        { code: 'noColumns', params: { fields: ['Name', 'Diameter', 'Mass'] } },
-        'No column is mapped to Name, Diameter, Mass. Map a column to each or read the file as another kind.',
-      ],
-      [
-        { code: 'sameBulletId', params: { first: 2, row: 3 } },
-        'Rows 2 and 3 give the same name, maker, diameter and mass, so one id: only row 2 is imported. Change the name, maker, diameter or mass of row 3 to import it as a record of its own.',
-      ],
-    ] as const
-    for (const [reason, text] of cases) expect(tableReasonText(reason, t)).toBe(text)
-  })
+/** The build of a table file read as `kind` by the import worker: the reasons the page words, from the readers. */
+async function built(lines: string[], kind: TableKind): Promise<BuildView> {
+  const replies: ImportReply[] = []
+  const handle = importWorker(
+    { records: async () => ({ records: [], invalid: [] }), put: () => Promise.resolve() },
+    (r) => replies.push(r),
+  )
+  const bytes = new TextEncoder().encode(lines.join('\n')).buffer as ArrayBuffer
+  await handle({ type: 'read', id: 1, bytes })
+  await handle({ type: 'build', id: 1, kind })
+  const last = replies.at(-1)
+  if (last?.type !== 'built') throw new Error(`no build: ${JSON.stringify(last)}`)
+  return last.build
+}
 
-  it('gives the repeated-id warning of a table import in German', () => {
-    const read = readTable('name,maker,diameter,mass\nB1,M1,7.82,175\nB1,M1,7.82,175')
-    if ('refusal' in read) throw new Error(read.refusal)
-    const built = buildRecords(read.table, 'bullet', autoMap(read.table, 'bullet'))
-    const reason = built.warnings[0]?.reason
-    if (!reason) throw new Error('no warning')
-    expect(tableReasonText(reason, german.t)).toBe(
-      'Die Zeilen 2 und 3 haben denselben Namen, Hersteller, Durchmesser und dieselbe Masse und damit eine ID: Nur Zeile 2 wird importiert. Ändern Sie Name, Hersteller, Durchmesser oder Masse der Zeile 3, um sie als eigenen Datensatz zu importieren.',
+const header = 'Name,Maker,Diameter (mm),Weight (gr),BC G1'
+
+describe('the reasons of a table import in words', () => {
+  it('words the rejected rows and a warning as the importers wrote them before they returned codes', async () => {
+    const b = await built(
+      [
+        header,
+        ',Invented Arms,7.82,150,0.4',
+        'B,Invented Arms,x7,150,0.4',
+        'C,Invented Arms,0,150,0.4',
+        'D,Invented Arms,30,150,0.4',
+      ],
+      'bullet',
+    )
+    expect(b.rejected.map((r) => tableReasonText(r.reason, t))).toEqual([
+      'Name is empty. Fill the cell or delete the row.',
+      'Diameter "x7" is not a number with "." as decimal mark. Fix the cell or change the decimal mark of the column.',
+      'Diameter 0 is not above 0. Fix the cell or leave it empty.',
+    ])
+    expect(tableReasonText(b.firstWarning?.reason ?? fail(), t)).toBe(
+      'Diameter 30 mm is outside the usual 3 to 25 mm. Check the unit of the column.',
     )
   })
 
-  it('shows a field by its label and a number with the decimal mark of the language', () => {
-    const reason = {
-      code: 'outsideUsual',
-      params: {
-        field: 'Bulk density',
-        cell: '1,5',
-        unit: 'g/cm3',
-        low: 0.4,
-        high: 1.2,
-        stored: 'g/cm3',
-      },
-    } as const
-    expect(tableReasonText(reason, german.t)).toBe(
-      `${german.t('Bulk density')} 1,5 g/cm3 liegt außerhalb der üblichen 0,4 bis 1,2 g/cm3. Prüfen Sie die Einheit der Spalte.`,
+  it('words the reasons of columns, choices and repeated rows', async () => {
+    const first = async (lines: string[], kind: TableKind, which: 'rejected' | 'warning') => {
+      const b = await built(lines, kind)
+      const reason = which === 'rejected' ? b.rejected[0]?.reason : b.firstWarning?.reason
+      return tableReasonText(reason ?? fail(), t)
+    }
+    expect(await first(['Name,Weight (g)', 'A,10'], 'bullet', 'rejected')).toBe(
+      'No column is mapped to Diameter. Map a column to it or read the file as another kind.',
+    )
+    expect(await first(['Foo,Bar', 'A,10'], 'bullet', 'rejected')).toBe(
+      'No column is mapped to Name, Diameter, Mass. Map a column to each or read the file as another kind.',
+    )
+    expect(
+      await first(['Name,Case length,Max pressure (atm)', 'C0,51,4000'], 'cartridge', 'rejected'),
+    ).toBe(
+      'Max pressure: the header names a unit other than bar, psi, MPa, kpsi. Choose the unit of the column.',
+    )
+    expect(await first(['Name,Grain form', 'P2,pellet'], 'powder', 'warning')).toBe(
+      'Grain form "pellet" is not one of ball, extruded, flake, other. The value is left out; change the cell to keep it.',
+    )
+    expect(
+      await first([header, 'B1,M1,7.82,175,0.5', 'B1,M1,7.82,175,0.6'], 'bullet', 'warning'),
+    ).toBe(
+      'Rows 2 and 3 give the same name, maker, diameter and mass, so one id: only row 2 is imported. Change the name, maker, diameter or mass of row 3 to import it as a record of its own.',
+    )
+  })
+
+  it('gives the repeated-id warning and a field label in German', async () => {
+    const repeated = await built([header, 'B1,M1,7.82,175,0.5', 'B1,M1,7.82,175,0.6'], 'bullet')
+    expect(tableReasonText(repeated.firstWarning?.reason ?? fail(), german.t)).toBe(
+      'Die Zeilen 2 und 3 haben denselben Namen, Hersteller, Durchmesser und dieselbe Masse und damit eine ID: Nur Zeile 2 wird importiert. Ändern Sie Name, Hersteller, Durchmesser oder Masse der Zeile 3, um sie als eigenen Datensatz zu importieren.',
+    )
+    const dense = await built(['Name;Bulk density (g/cm3)', 'P1;1,5'], 'powder')
+    expect(tableReasonText(dense.firstWarning?.reason ?? fail(), german.t)).toBe(
+      `${german.t('Bulk density')} 1,5 g/cm3 liegt außerhalb der üblichen 0,3 bis 1,3 g/cm3. Prüfen Sie die Einheit der Spalte.`,
     )
   })
 })
 
-describe('the warnings of a load file in words', () => {
-  it('words each code as the readers wrote it before they returned codes', () => {
-    const cases = [
-      [
-        { code: 'notConverted', params: { at: 'gun.twistlen', value: '200', unit: 'in' } },
-        'gun.twistlen: "200" in unit "in" is not converted; the field is not read.',
-      ],
-      [
-        { code: 'otherFormat', params: { format: '2', expected: '1' } },
-        'The file is of format "2"; the reader is written for format 1. Check every value.',
-      ],
-      [
-        {
-          code: 'chargesBeyondLimit',
-          params: { at: 'appendix.Measurement', count: 2, shots: 4, max: 500 },
-        },
-        'appendix.Measurement: 2 charges (4 shots) of the series beyond the limit of 500 are left out.',
-      ],
-    ] as const
-    for (const [warning, text] of cases) {
-      const { message, values } = loadWarning(warning)
-      expect(t(message, values)).toBe(text)
-    }
-  })
+it('words the warnings of a load file as the reader wrote them before it returned codes', () => {
+  const file = [
+    '<ChamberSimReloaded format="2">',
+    '<load><title>T</title><appendix><Measurement>',
+    '<charge name="Empty" value="0.002"><shot velocity="0"/></charge>',
+    '<charge name="No%20mass" value=""><shot velocity="650"/></charge>',
+    '</Measurement></appendix></load>',
+    '</ChamberSimReloaded>',
+  ].join('')
+  const p = parseCsrLoad(file)
+  if (!p.ok) throw new Error(p.reason)
+  expect((p.warnings ?? []).map((w) => t(w.message, w.values))).toEqual([
+    'The file is of format "2"; the reader is written for format 1. Check every value.',
+    'appendix.Measurement.charge: a shot without a velocity is not read.',
+    'appendix.Measurement.charge: the charge Empty holds no shot with a velocity; it is not read.',
+    'appendix.Measurement.charge: the charge No mass has no mass; its string varies nothing.',
+  ])
 })
 
 it('makes a record of a candidate with the id of its key and the save time', () => {
@@ -129,9 +116,14 @@ it('makes a record of a candidate with the id of its key and the save time', () 
   } as const
   expect(recordOf(candidate, '2026-11-07T00:00:00.000Z')).toEqual({
     kind: 'manufacturer',
-    id: idOfKey('manufacturer|m1'),
+    id: 'fe0f962a-3cda-80e8-afe3-a44aed367288',
     name: 'M1',
     saved: '2026-11-07T00:00:00.000Z',
     data: { origin: 'user' },
   })
 })
+
+/** A failed expectation where a value is missing. */
+function fail(): never {
+  throw new Error('missing')
+}

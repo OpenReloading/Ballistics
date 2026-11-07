@@ -1,6 +1,6 @@
 // Kind scoring, column mapping and the record candidates a mapped table becomes, with a report per row.
 import type { UserRecord } from '@open-reloading/schema'
-import type { Candidate, Diagnostic } from './diagnostics.ts'
+import type { Candidate, ReaderDiagnostic } from './diagnostics.ts'
 import {
   type ColumnUnit,
   type FieldSpec,
@@ -246,9 +246,8 @@ export function autoMap(table: Table, kind: TableKind): TableColumnMap[] {
   })
 }
 
-/** Where a row was rejected or warned: the 1-based row of the file (the header is row 1), the column's header, the cell and why. */
 /** Why a row of a table is rejected or warned, as a code and the values its message names. */
-export type TableDiagnostic = Diagnostic<
+export type TableDiagnostic = ReaderDiagnostic<
   | 'emptyCell'
   | 'noUnit'
   | 'unitOther'
@@ -262,7 +261,10 @@ export type TableDiagnostic = Diagnostic<
   | 'sameBulletId'
 >
 
-/** A rejected or warned row: its number, the column header, the cell and why; `field` params are field keys. */
+/**
+ * Where a row was rejected or warned: the 1-based row of the file (the header is row 1), the
+ * column's header, the cell and why; `field` params are field keys.
+ */
 export interface RowIssue {
   row: number
   column: string
