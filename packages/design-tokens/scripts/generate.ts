@@ -21,7 +21,10 @@ const source = new URL('tokens/resolver.json', root)
 const darkScheme = ':root[data-mantine-color-scheme="dark"], :root[data-theme="dark"]'
 const systemScheme = ':root:not([data-mantine-color-scheme], [data-theme])'
 
-/** WCAG 2.2 pairs, checked in each scheme: text at 4.5:1, control edges at 3:1 (`largeText`). */
+/**
+ * WCAG 2.2 pairs, checked in each scheme: text at 4.5:1, and at 3:1 (`largeText`) the control edges and the accent as a
+ * focus ring and a checked fill, which axe does not see.
+ */
 const contrastPairs = [
   ...[
     ['ink', 'page'],
@@ -33,16 +36,19 @@ const contrastPairs = [
     ['muted', 'surface-alt'],
     ['link', 'page'],
     ['link', 'surface'],
+    ['link', 'surface-alt'],
     ['on-accent', 'accent'],
+    ['on-accent', 'accent-hover'],
     ['warn-text', 'warn-fill'],
     ['error-text', 'page'],
     ['error-text', 'surface'],
   ].map(([fg, bg]) => ({ foreground: `color.${fg}`, background: `color.${bg}` })),
-  ...['page', 'surface'].map((bg) => ({
-    foreground: 'color.control-line',
-    background: `color.${bg}`,
-    largeText: true,
-  })),
+  ...[
+    ['control-line', 'page'],
+    ['control-line', 'surface'],
+    ['accent', 'page'],
+    ['accent', 'surface'],
+  ].map(([fg, bg]) => ({ foreground: `color.${fg}`, background: `color.${bg}`, largeText: true })),
 ]
 
 /** Terrazzo lints the default context only, so this runs the configured rules on every context. */

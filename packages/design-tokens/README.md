@@ -1,6 +1,6 @@
 # @open-reloading/design-tokens
 
-The Brand palette (version 1) and the interface sizes as one DTCG 2025.10 source in `tokens/`, built with Terrazzo into files every surface uses: CSS variables for any page, Docusaurus and BuildGuide, typed constants and the Mantine theme. The generated files are committed, so a site needs no Node to use them. Private to this repository: it is not published.
+The Brand palette (version 1, with the light link at Mantine's blue 9, `#1864ab`, by owner decision: 5.3:1 on every surface where blue 8 gave 4.4:1 on `surface-alt`) and the interface sizes as one DTCG 2025.10 source in `tokens/`, built with Terrazzo into files every surface uses: CSS variables for any page, Docusaurus and BuildGuide, typed constants and the Mantine theme. The generated files are committed, so a site needs no Node to use them. Private to this repository: it is not published.
 
 | Export                                         | What it holds                                                                                                                                                                                                                      |
 | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
