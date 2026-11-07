@@ -88,6 +88,13 @@ test('the Database list and a record page show in German', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1, name: 'Patronen' })).toBeVisible()
   await expect(page.getByRole('tab', { name: 'Treibladungspulver' })).toBeVisible()
   await expect(page.getByRole('searchbox')).toHaveAttribute('placeholder', /Alias/)
+  // the tab title is the page title in the language shown, after a full load and a client-side navigation
+  const tabTitle = async () =>
+    `${await page.locator('.page-bar h1').getAttribute('title')} · OpenReloading Ballistics`
+  await expect(page).toHaveTitle(await tabTitle())
+  await page.getByRole('tab', { name: 'Treibladungspulver' }).click()
+  await expect(page.getByRole('heading', { level: 1, name: 'Treibladungspulver' })).toBeVisible()
+  await expect(page).toHaveTitle(await tabTitle())
 
   await gotoHydrated(page, '/cartridges/308-win/')
   await expect(page.getByRole('link', { name: 'In der Werkbank verwenden' })).toBeVisible()

@@ -4,7 +4,8 @@ import path from 'node:path'
 import { afterEach, expect, it } from 'vitest'
 import { checkPages } from '../scripts/check-prerender.mts'
 import { sampleIds } from '../src/lib/prerender-sample.ts'
-import { type RecordKind, recordHeadText, titleTemplate } from '../src/lib/record-metadata.ts'
+import { type RecordKind, recordHeadText } from '../src/lib/record-metadata.ts'
+import { titleTemplate } from '../src/lib/title-template.ts'
 import { defined } from './defined.ts'
 
 const kinds = [

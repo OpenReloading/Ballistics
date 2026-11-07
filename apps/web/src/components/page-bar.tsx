@@ -15,6 +15,7 @@ import {
 import { useTranslation } from '../i18n/language.ts'
 import type { Message } from '../i18n/translate.ts'
 import { tipEvents } from '../lib/theme.ts'
+import { titleTemplate } from '../lib/title-template.ts'
 import { useBarEndSlot } from './bar-end.ts'
 import { SafetyBarButton } from './safety-dialog.tsx'
 
@@ -185,6 +186,18 @@ export function PageBar({
 )) {
   const { t } = useTranslation()
   const title = translated ? t(given) : given
+  // React writes Next's English metadata title back after hydration: keep the tab in the language shown
+  useEffect(() => {
+    if (!translated) return
+    const wanted = titleTemplate.replace('%s', title)
+    const keep = () => {
+      if (document.title !== wanted) document.title = wanted
+    }
+    keep()
+    const head = new MutationObserver(keep)
+    head.observe(document.head, { childList: true, subtree: true, characterData: true })
+    return () => head.disconnect()
+  }, [translated, title])
   const [statusLine, setStatusLine] = useState<HTMLDivElement | null>(null)
   const full = useWholeText(statusLine)
   const [open, setOpen] = useState(false)
