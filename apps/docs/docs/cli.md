@@ -114,7 +114,7 @@ The code of the evaluation itself (rows, split, the metrics and the percentiles,
 
 ## Output
 
-JSON when stdout is not a terminal or with `--json`, a table with `--table` or on a terminal. The JSON of `verify` and `compare` carries `schemaVersion` (2) and `notice: "simulation, not load data"`, the label of the API's answers. It is described by `packages/cli/schema/result.schema.json`, written from the zod definition in `src/result.ts` by `pnpm --filter @open-reloading/cli run schema`; a test validates real output of both commands against it. The schema's `$id`, `https://openreloading.github.io/Ballistics/docs/result.schema.json`, is where the build of this site copies it.
+JSON when stdout is not a terminal or with `--json`, a table with `--table` or on a terminal. The JSON of `verify` and `compare` carries `schemaVersion` (1) and `notice: "simulation, not load data"`, the label of the API's answers. It is described by `packages/cli/schema/result.schema.json`, written from the zod definition in `src/result.ts` by `pnpm --filter @open-reloading/cli run schema`; a test validates real output of both commands against it. The schema's `$id`, `https://openreloading.github.io/Ballistics/docs/result.schema.json`, is where the build of this site copies it.
 
 `--version` prints `ballistics <version>` and exits 0.
 

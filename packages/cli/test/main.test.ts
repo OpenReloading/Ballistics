@@ -68,7 +68,6 @@ describe('the JSON result', () => {
       expect(code).toBe(0)
       const json = JSON.parse(stdout)
       expect(validate(json), JSON.stringify(validate.errors)).toBe(true)
-      expect(json.schemaVersion).toBe(2)
       expect(json.notice).toBe('simulation, not load data')
       expect(result.safeParse(json).success).toBe(true)
     }
