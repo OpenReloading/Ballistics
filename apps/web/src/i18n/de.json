@@ -4352,5 +4352,10 @@
   "Barrel length study": "Studie zur Lauflänge",
   "Curves (CSV)": "Kurven (CSV)",
   "5th percentile": "5. Perzentil",
-  "Download CSV": "CSV herunterladen"
+  "Download CSV": "CSV herunterladen",
+  "The catalogue has no powders.": "Der Katalog enthält kein Treibladungspulver.",
+  "Make a powder in the powder designer, import a table of your powders with Import, or type the model values in the workbench.": "Legen Sie ein Treibladungspulver im Treibladungspulver-Editor an, importieren Sie eine Tabelle Ihrer Treibladungspulver mit Import oder geben Sie die Modellwerte in der Werkbank ein.",
+  "The catalogue has no powders. Choose one of your powder designs, make one in the powder designer, import a table of your powders with Import, or type the model values of your powder.": "Der Katalog enthält kein Treibladungspulver. Wählen Sie einen Ihrer Treibladungspulver-Entwürfe, legen Sie einen im Treibladungspulver-Editor an, importieren Sie eine Tabelle Ihrer Treibladungspulver mit Import oder geben Sie die Modellwerte Ihres Treibladungspulvers ein.",
+  "No powders yet": "Noch keine Treibladungspulver",
+  "The catalogue has no powders. Make one with New powder, or import a table of your powders with Import.": "Der Katalog enthält kein Treibladungspulver. Legen Sie eines mit „Neues Treibladungspulver“ an oder importieren Sie eine Tabelle Ihrer Treibladungspulver mit Import."
 }
