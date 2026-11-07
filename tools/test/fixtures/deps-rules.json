@@ -263,6 +263,30 @@
     "source": "import { colors } from './index.ts'\nexport { colors }",
     "rules": ["design-tokens-src-imports-nothing"]
   },
+  "packages/ui/src/allowed.tsx": {
+    "source": "import { Button } from '@mantine/core'\nimport { useState } from 'react'\nimport { Printer } from 'lucide-react'\nimport { colors } from '@open-reloading/design-tokens'\nimport { other } from './other.tsx'\nexport { Button, useState, Printer, colors, other }",
+    "rules": []
+  },
+  "packages/ui/src/other.tsx": {
+    "source": "export const other = 1",
+    "rules": []
+  },
+  "packages/ui/src/schema.tsx": {
+    "source": "import { quantity } from '@open-reloading/schema'\nexport { quantity }",
+    "rules": ["ui-imports-the-ui-base"]
+  },
+  "packages/ui/src/node-fs.tsx": {
+    "source": "import { readFileSync } from 'node:fs'\nexport { readFileSync }",
+    "rules": ["ui-imports-the-ui-base"]
+  },
+  "packages/ui/src/zod.tsx": {
+    "source": "import { z } from 'zod'\nexport { z }",
+    "rules": ["ui-imports-the-ui-base"]
+  },
+  "packages/ui/src/out.tsx": {
+    "source": "import { x } from '../../catalog/src/index.ts'\nexport { x }",
+    "rules": ["ui-imports-the-ui-base"]
+  },
   "packages/schema/src/cycle-a.ts": {
     "source": "import { b } from './cycle-b.ts'\nexport const a = () => b",
     "rules": ["no-cycle"]

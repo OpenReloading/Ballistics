@@ -8,6 +8,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY packages/units/package.json packages/units/
 COPY packages/locale-format/package.json packages/locale-format/
 COPY packages/design-tokens/package.json packages/design-tokens/
+COPY packages/ui/package.json packages/ui/
 COPY packages/statistics/package.json packages/statistics/
 COPY packages/ballistics/package.json packages/ballistics/
 COPY packages/shot-groups/package.json packages/shot-groups/
@@ -47,6 +48,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/units/package.json packages/units/
 COPY packages/locale-format/package.json packages/locale-format/
 COPY packages/design-tokens/package.json packages/design-tokens/
+COPY packages/ui/package.json packages/ui/
 COPY packages/statistics/package.json packages/statistics/
 COPY packages/ballistics/package.json packages/ballistics/
 COPY packages/shot-groups/package.json packages/shot-groups/

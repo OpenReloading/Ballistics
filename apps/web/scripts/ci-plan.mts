@@ -160,6 +160,8 @@ export const testGroups: Record<string, string[]> = {
     'test-kit',
     'e2e',
   ],
+  // its job also runs the stories as browser tests (ci.yml)
+  ui: ['ui'],
 }
 
 /** One test job: its group, the pnpm filters of its workspaces to test, whether it runs the e2e unit tests. */
