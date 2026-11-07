@@ -98,7 +98,9 @@ describe('checkFederations', () => {
   it('accepts consistent references', () => {
     expect(checkFederations(valid)).toEqual([])
   })
+})
 
+describe('checkFederations across federations', () => {
   it('reports international links to national records', () => {
     expect(
       checkFederations({
