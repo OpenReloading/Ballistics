@@ -1,6 +1,8 @@
 {
   "id": "sellier-bellot",
   "name": "Sellier & Bellot",
+  "country": "CZ",
+  "website": "https://www.sellier-bellot.cz/",
   "provenance": {
     "kind": "published",
     "sources": [
@@ -9,6 +11,15 @@
         "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
         "retrieved": "2026-10-08",
         "fields": ["name"]
+      },
+      {
+        "title": "Sellier & Bellot, contacts page",
+        "publisher": "Sellier & Bellot",
+        "url": "https://www.sellier-bellot.cz/en/contacts/",
+        "retrieved": "2026-11-06",
+        "fields": ["country", "website"],
+        "origin": "manufacturer",
+        "note": "Sellier & Bellot Int. a.s., Lidická 667, 258 01 Vlašim, Česká republika (Czech Republic). sellier-bellot.com redirects to this site."
       }
     ]
   }

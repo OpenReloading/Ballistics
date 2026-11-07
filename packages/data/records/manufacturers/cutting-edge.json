@@ -1,6 +1,8 @@
 {
   "id": "cutting-edge",
   "name": "Cutting Edge Bullets",
+  "country": "US",
+  "website": "https://cuttingedgebullets.com/",
   "provenance": {
     "kind": "published",
     "sources": [
@@ -9,6 +11,15 @@
         "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
         "retrieved": "2026-10-08",
         "fields": ["name"]
+      },
+      {
+        "title": "Cutting Edge Bullets, contact page",
+        "publisher": "Cutting Edge Bullets",
+        "url": "https://cuttingedgebullets.com/pages/contact-cutting-edge-bullets",
+        "retrieved": "2026-11-06",
+        "fields": ["country", "website"],
+        "origin": "manufacturer",
+        "note": "Location: Cutting Edge Bullets, LLC, 6766 W Melrose Street, Boise, ID 83709, United States."
       }
     ]
   }

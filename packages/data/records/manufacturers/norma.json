@@ -1,6 +1,8 @@
 {
   "id": "norma",
   "name": "Norma",
+  "country": "SE",
+  "website": "https://www.norma-ammunition.com/",
   "provenance": {
     "kind": "published",
     "sources": [
@@ -9,6 +11,15 @@
         "url": "https://www.norma-ammunition.com/products/components/gunpowder/norma-200---20902005",
         "retrieved": "2026-10-13",
         "fields": ["name"]
+      },
+      {
+        "title": "Norma, imprint",
+        "publisher": "Norma Precision AB",
+        "url": "https://www.norma-ammunition.com/about-norma/impressum",
+        "retrieved": "2026-11-06",
+        "fields": ["country", "website"],
+        "origin": "manufacturer",
+        "note": "Norma Precision AB, Jägargatan 2, 673 35 Åmotfors, Sweden."
       }
     ]
   }
