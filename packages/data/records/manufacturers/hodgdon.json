@@ -1,6 +1,8 @@
 {
   "id": "hodgdon",
   "name": "Hodgdon",
+  "country": "US",
+  "website": "https://hodgdonpowderco.com/",
   "provenance": {
     "kind": "published",
     "sources": [
@@ -9,6 +11,13 @@
         "url": "https://shop.hodgdon.com/hodgdon-hi-skor-700-x/",
         "retrieved": "2026-10-13",
         "fields": ["name"]
+      },
+      {
+        "source": "hodgdon-powder-company-locations",
+        "url": "https://hodgdonpowderco.com/locations/",
+        "retrieved": "2026-11-06",
+        "fields": ["country", "website"],
+        "note": "Corporate headquarters: Hodgdon Powder Company, 6430 Vista Drive, Shawnee, KS 66218, United States."
       }
     ]
   }

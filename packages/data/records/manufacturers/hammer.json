@@ -1,6 +1,8 @@
 {
   "id": "hammer",
   "name": "Hammer Bullets",
+  "country": "US",
+  "website": "https://hammerbullets.com/",
   "provenance": {
     "kind": "published",
     "sources": [
@@ -9,6 +11,15 @@
         "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
         "retrieved": "2026-10-08",
         "fields": ["name"]
+      },
+      {
+        "title": "Hammer Bullets, about page",
+        "publisher": "Hammer Bullets",
+        "url": "https://hammerbullets.com/about-us/",
+        "retrieved": "2026-11-06",
+        "fields": ["country", "website"],
+        "origin": "manufacturer",
+        "note": "The page names no street address; it says the owners live and work in Montana, United States, and the office phone has a Montana area code (406)."
       }
     ]
   }

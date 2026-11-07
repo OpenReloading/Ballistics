@@ -1,12 +1,23 @@
 {
   "id": "lovex",
   "name": "Lovex",
+  "country": "CZ",
+  "website": "https://explosia.cz/en/propellants/reloading-powders/",
   "provenance": {
     "kind": "published",
     "sources": [
       {
         "source": "lovex-reloading-guide-en-37-explosia-a-s",
         "fields": ["name"]
+      },
+      {
+        "title": "Explosia a.s., contacts page",
+        "publisher": "Explosia a.s.",
+        "url": "https://explosia.cz/en/contacts/",
+        "retrieved": "2026-11-06",
+        "fields": ["country", "website"],
+        "origin": "manufacturer",
+        "note": "Address: Semtín 107, 530 02 Pardubice, Czech Republic (company id IČ 25291581). Explosia makes the Lovex powders (propellants page of the same site); lovex.cz serves unrelated content."
       }
     ]
   }

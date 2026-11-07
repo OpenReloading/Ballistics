@@ -1,6 +1,8 @@
 {
   "id": "vihtavuori",
   "name": "Vihtavuori",
+  "country": "FI",
+  "website": "https://vihtavuori.com/",
   "provenance": {
     "kind": "published",
     "sources": [
@@ -9,6 +11,22 @@
         "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-Centralite-RELO-18-01-2026-en.pdf",
         "retrieved": "2026-10-13",
         "fields": ["name"]
+      },
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-centralite",
+        "page": "section 1.3",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-Centralite-RELO-18-01-2026-en.pdf",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Supplier of the safety data sheet: Nammo Vihtavuori Oy, Ruutitehtaantie 80, 41330 Vihtavuori, Finland."
+      },
+      {
+        "title": "Vihtavuori, contact information",
+        "publisher": "Nammo Vihtavuori Oy",
+        "url": "https://vihtavuori.com/company/vihtavuori/contact-information/",
+        "retrieved": "2026-11-06",
+        "fields": ["website"],
+        "origin": "manufacturer"
       }
     ]
   }
