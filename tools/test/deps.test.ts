@@ -25,6 +25,7 @@ const configs = [
   'packages/oxlint.logic.json',
   'packages/units/.oxlintrc.json',
   'packages/locale-format/.oxlintrc.json',
+  'packages/design-tokens/.oxlintrc.json',
   'packages/schema/.oxlintrc.json',
   'packages/statistics/.oxlintrc.json',
   'packages/ballistics/.oxlintrc.json',

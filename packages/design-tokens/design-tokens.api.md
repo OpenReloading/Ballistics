@@ -54,6 +54,7 @@ export const cssVariables: {
     readonly light: {
         readonly "--mantine-color-body": "#ffffff";
         readonly "--mantine-color-text": "#1d2130";
+        readonly "--mantine-color-bright": "#1d2130";
         readonly "--mantine-color-dimmed": "#555a6d";
         readonly "--mantine-color-placeholder": "#555a6d";
         readonly "--mantine-color-anchor": "#1971c2";
@@ -62,10 +63,13 @@ export const cssVariables: {
         readonly "--mantine-color-default-color": "#1d2130";
         readonly "--mantine-color-default-border": "#7b7f91";
         readonly "--mantine-color-error": "#c92a2a";
+        readonly "--mantine-color-blue-filled-hover": "#1864ab";
+        readonly "--mantine-color-blue-light": "#e7f5ff";
     };
     readonly dark: {
         readonly "--mantine-color-body": "#10121b";
         readonly "--mantine-color-text": "#e9ebf1";
+        readonly "--mantine-color-bright": "#e9ebf1";
         readonly "--mantine-color-dimmed": "#acb0c0";
         readonly "--mantine-color-placeholder": "#acb0c0";
         readonly "--mantine-color-anchor": "#74c0fc";
@@ -74,6 +78,8 @@ export const cssVariables: {
         readonly "--mantine-color-default-color": "#e9ebf1";
         readonly "--mantine-color-default-border": "#6f7485";
         readonly "--mantine-color-error": "#ffa8a8";
+        readonly "--mantine-color-blue-filled-hover": "#74c0fc";
+        readonly "--mantine-color-blue-light": "#172a40";
     };
 };
 

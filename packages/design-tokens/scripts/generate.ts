@@ -72,12 +72,28 @@ function lintEveryContext(): Plugin {
   }
 }
 
+/** The hex of an sRGB color token, which must equal its `hex`: the contrast lint reads the components, the outputs the hex. */
+function colorHex(token: TokenNormalized & { $type: 'color' }): string {
+  const { colorSpace, components, hex } = token.$value
+  const fromComponents = `#${components
+    .map((c) =>
+      Math.round(Number(c) * 255)
+        .toString(16)
+        .padStart(2, '0'),
+    )
+    .join('')}`
+  if (colorSpace !== 'srgb' || hex !== fromComponents)
+    throw new Error(
+      `${token.id}: hex ${hex} is not its ${colorSpace} components (${fromComponents})`,
+    )
+  return hex
+}
+
 /** The CSS value of a resolved token: a color as its hex, a dimension with its unit, a font stack as one list. */
 function cssValue(token: TokenNormalized): string {
   switch (token.$type) {
     case 'color':
-      if (token.$value.hex === undefined) throw new Error(`${token.id} has no hex value`)
-      return token.$value.hex
+      return colorHex(token)
     case 'dimension':
       return `${token.$value.value}${token.$value.unit}`
     case 'fontFamily':
@@ -144,10 +160,14 @@ function mantineTheme(tokens: TokenNormalizedSet, colors: Colors) {
   }
 }
 
-/** The Mantine CSS variables that the theme cannot set, by the token role each takes. */
+/**
+ * The Mantine CSS variables that the theme cannot set, by the token role each takes. The input edges and fills and the
+ * table borders read Mantine's gray and dark shades, which mix control edges and separators: `ui` sets those.
+ */
 const mantineRoles = {
   '--mantine-color-body': 'page',
   '--mantine-color-text': 'ink',
+  '--mantine-color-bright': 'ink',
   '--mantine-color-dimmed': 'muted',
   '--mantine-color-placeholder': 'muted',
   '--mantine-color-anchor': 'link',
@@ -156,6 +176,9 @@ const mantineRoles = {
   '--mantine-color-default-color': 'ink',
   '--mantine-color-default-border': 'control-line',
   '--mantine-color-error': 'error-text',
+  // Mantine's hover and tint of the primary color are other shades of its blue than the accent's
+  '--mantine-color-blue-filled-hover': 'accent-hover',
+  '--mantine-color-blue-light': 'accent-tint',
 }
 
 /** The Mantine CSS variables of one scheme, from its colors by role. */

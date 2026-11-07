@@ -1,7 +1,8 @@
 /* Infima and Pagefind's search dialog on the tokens of tokens.css, which a Docusaurus site loads first. Docusaurus sets
-   data-theme on <html>; html[data-theme] outranks Infima's own html[data-theme="dark"] block. The primary shades mix
-   the accent with Docusaurus's steps (10, 15 and 30 %), so they follow the scheme. Taken from Brand's docusaurus/brand.css. */
-html[data-theme] {
+   data-theme on <html>; :root[data-theme] outranks Infima's html[data-theme="dark"] in any load order. The primary
+   shades mix the accent with Docusaurus's steps (10, 15 and 30 %), so they follow the scheme. Taken from Brand's
+   docusaurus/brand.css. */
+:root[data-theme] {
   --ifm-font-family-base: var(--font-family-ui);
   --ifm-color-primary: var(--accent);
   --ifm-color-primary-dark: color-mix(in srgb, var(--accent), #000 10%);

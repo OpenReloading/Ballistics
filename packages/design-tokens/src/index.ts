@@ -104,6 +104,7 @@ export const cssVariables = {
   "light": {
     "--mantine-color-body": "#ffffff",
     "--mantine-color-text": "#1d2130",
+    "--mantine-color-bright": "#1d2130",
     "--mantine-color-dimmed": "#555a6d",
     "--mantine-color-placeholder": "#555a6d",
     "--mantine-color-anchor": "#1971c2",
@@ -111,11 +112,14 @@ export const cssVariables = {
     "--mantine-color-default-hover": "#eef0f6",
     "--mantine-color-default-color": "#1d2130",
     "--mantine-color-default-border": "#7b7f91",
-    "--mantine-color-error": "#c92a2a"
+    "--mantine-color-error": "#c92a2a",
+    "--mantine-color-blue-filled-hover": "#1864ab",
+    "--mantine-color-blue-light": "#e7f5ff"
   },
   "dark": {
     "--mantine-color-body": "#10121b",
     "--mantine-color-text": "#e9ebf1",
+    "--mantine-color-bright": "#e9ebf1",
     "--mantine-color-dimmed": "#acb0c0",
     "--mantine-color-placeholder": "#acb0c0",
     "--mantine-color-anchor": "#74c0fc",
@@ -123,6 +127,8 @@ export const cssVariables = {
     "--mantine-color-default-hover": "#1e212c",
     "--mantine-color-default-color": "#e9ebf1",
     "--mantine-color-default-border": "#6f7485",
-    "--mantine-color-error": "#ffa8a8"
+    "--mantine-color-error": "#ffa8a8",
+    "--mantine-color-blue-filled-hover": "#74c0fc",
+    "--mantine-color-blue-light": "#172a40"
   }
 } as const

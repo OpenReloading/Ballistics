@@ -48,12 +48,12 @@ const system = '@(prefers-color-scheme: dark) :root:not([data-mantine-color-sche
 const pages: Record<Scheme, Record<'device' | 'docusaurus' | 'buildguide', string[]>> = {
   light: {
     device: [':root'],
-    docusaurus: [':root', 'html[data-theme]'],
+    docusaurus: [':root', ':root[data-theme]'],
     buildguide: [':root', ':root .ag-guide'],
   },
   dark: {
     device: [':root', system],
-    docusaurus: [':root', ':root[data-theme="dark"]', 'html[data-theme]'],
+    docusaurus: [':root', ':root[data-theme="dark"]', ':root[data-theme]'],
     buildguide: [':root', system, ':root .ag-guide'],
   },
 }
@@ -63,9 +63,12 @@ const steps = ['xs', 'sm', 'md', 'lg', 'xl']
 const roles: (string | undefined)[][] = [
   ['--mantine-color-body', '--page', '--ifm-background-color', '--ag-page'],
   ['--mantine-color-text', '--ink', '--ifm-font-color-base', '--ag-ink'],
+  ['--mantine-color-bright', '--ink', '--ifm-heading-color', '--ag-text'],
   ['--mantine-color-dimmed', '--muted', '--ifm-font-color-secondary', '--ag-muted'],
   ['--mantine-color-anchor', '--link', '--ifm-link-color', undefined],
   ['--mantine-primary-color-filled', '--accent', '--ifm-color-primary', '--ag-primary'],
+  ['--mantine-primary-color-filled-hover', '--accent-hover', undefined, '--ag-primary-hover'],
+  ['--mantine-primary-color-light', '--accent-tint', undefined, '--ag-row-selected'],
   ['--mantine-primary-color-contrast', '--on-accent', undefined, undefined],
   ['--mantine-color-default-hover', '--surface-alt', '--ifm-hover-overlay', '--ag-control-hover'],
   [

@@ -17,6 +17,8 @@ import '@open-reloading/design-tokens/tokens.css'
 <MantineProvider theme={createTheme(theme)} cssVariablesResolver={() => cssVariables} />
 ```
 
+The UI font is Inter as `@fontsource-variable/inter` registers it (`"Inter Variable"`, every weight): a surface that uses `--font-family-ui` loads that package, or the stack falls back to the system font. Mantine's input edges and fills and its table borders read its gray and dark shades, which serve both control edges and separators; `ui` sets those per component.
+
 Change a token in `tokens/`, then run `pnpm run generate` and commit the source with the generated `css/tokens.css` and `src/index.ts`. The tests fail when the committed files differ from the source, when a pair of `scripts/generate.ts` falls below its WCAG 2.2 contrast in either scheme, or when Mantine, the CSS variables, Docusaurus and BuildGuide show a role differently.
 
 License: MIT
