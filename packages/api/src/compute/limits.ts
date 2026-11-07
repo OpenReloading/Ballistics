@@ -15,6 +15,7 @@ import {
   placeMaximum,
 } from '@open-reloading/core'
 import { type Cartridge, fromSi, type SpecValue, sheetId, toSi } from '@open-reloading/schema'
+import { advisoryText } from './advisory-text.ts'
 
 /** The fields of a `getCartridge` record that the limit check reads. */
 export type CartridgeWithSpecs = Pick<
@@ -45,7 +46,7 @@ export type Limit = {
 }
 
 /**
- * A message of an interior response; `code` names the rule of the advisory registry of core, with its
+ * A message of an interior response; `code` names the rule of the advisory registry, with its
  * `severity`, `inputs` and `fix`. `spec` is the id of the C.I.P. sheet it refers to, and `symbol`,
  * `variant` and `method` the limit of a `limitExceeded` message.
  */
@@ -61,14 +62,14 @@ export type Warning = {
   method?: string | null
 }
 
-/** A warning of `rule` with the registry's severity, inputs and fix around `message`. */
+/** A warning of `rule` with the registry's severity and inputs and the rule's fix around `message`. */
 export function warning(
   rule: AdvisoryRule,
   message: string,
   extra: Pick<Warning, 'spec' | 'symbol' | 'variant' | 'method'> = {},
 ): Warning {
-  const { id, severity, inputs, fix } = rule
-  return { code: id, severity, inputs: [...inputs], message, fix, ...extra }
+  const { id, severity, inputs } = rule
+  return { code: id, severity, inputs: [...inputs], message, fix: advisoryText[id].fix, ...extra }
 }
 
 // a case-contact value is no C.I.P. figure, so it is not set against the C.I.P. Pmax
@@ -210,9 +211,7 @@ function cartridgeLimits(
     return { limits: [typed], warnings, resolved: echo }
   }
   if (cartridge === undefined) {
-    warnings.push(
-      warning(advisoryRule.noCartridge, 'No cartridge id was given, so no CIP Pmax was checked.'),
-    )
+    warnings.push(warning(advisoryRule.noCartridge, advisoryText.noCartridge.message))
     return { limits: undefined, warnings, resolved: undefined }
   }
   const limits = cartridge.values
@@ -284,6 +283,9 @@ export function limitCheck(
       ignitionPressure: run.load.ignitionPressure,
     })
   if (small) warnings.push(small)
-  if (run) warnings.push(...interiorAdvisories(run.load).map((a) => warning(a, a.message)))
+  if (run)
+    warnings.push(
+      ...interiorAdvisories(run.load).map((a) => warning(a, advisoryText[a.id].message)),
+    )
   return { limits, warnings, cartridge: resolved }
 }

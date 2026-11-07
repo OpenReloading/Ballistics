@@ -127,8 +127,8 @@ const tagOf = (url: string) => {
 
 /**
  * The body of every error answer: Fastify's (with `code`, for example `FST_ERR_VALIDATION`), the
- * schema 400 (`issues`), the compute answers (`reason`, `missing`, `notice` and more) and the 500
- * (`requestId`, the `reqId` of the server log line).
+ * schema 400 (`issues`), the compute answers (`reason`, `missing`, `notice` and more; a typed refusal
+ * with its `code` and `params`) and the 500 (`requestId`, the `reqId` of the server log line).
  */
 const errorBody: JsonSchema = {
   type: 'object',
@@ -137,6 +137,11 @@ const errorBody: JsonSchema = {
     error: { type: 'string' },
     message: { type: 'string' },
     code: { type: 'string' },
+    params: {
+      type: 'object',
+      description:
+        'A typed refusal of a compute route: the values its message needs, named by `code`.',
+    },
     issues: {
       type: 'array',
       items: {

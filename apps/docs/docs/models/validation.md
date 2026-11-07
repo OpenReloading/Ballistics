@@ -42,7 +42,7 @@ node packages/cli/dist/bin.js verify --rows <rows> --records <records> --split t
 
 `--json` gives the result as data; `--group-by powder` and `--group-by family` give the groups; `--leave-one-powder-out` gives the line of the powder not in the fitted set (`notInFittedSet`), which fills the last row of the results table. The second command is the sealed run and is refused without `--final`. A change to the model is judged with `compare --baseline <verify.json> --candidate <model>` on the same rows. The row and column format and the model version hash are defined on the [command line](../cli.md) page.
 
-The repository holds no measured rows. The command line tests run on synthetic rows built from the model itself, so they test the arithmetic of the evaluation and not the model.
+The repository holds no measured rows. The command line tests run on synthetic rows built from the model itself, so they test the arithmetic of the evaluation and not the model. Before a release, a test reruns the table below from the rows file ([Releases](../release.md#validation-results)).
 
 ## Results
 

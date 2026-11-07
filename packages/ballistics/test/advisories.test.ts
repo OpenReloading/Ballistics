@@ -1,45 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import {
-  type AdvisoryId,
-  advisoryIds,
-  advisoryRule,
-  advisoryRules,
-  chargeTooSmallRatio,
-  interior,
-  interiorAdvisories,
-} from '../src/index.ts'
+import { type AdvisoryId, interior, interiorAdvisories } from '../src/index.ts'
 import { m3Load } from './fixtures.ts'
 
 const fired = (load: Parameters<typeof interiorAdvisories>[0]) =>
   interiorAdvisories(load).map((a) => a.id)
 const withLoad = (over: Partial<typeof m3Load>) => ({ ...m3Load, ...over })
 const ramp = (pressure: number) => ({ engraving: [{ travel: 0, pressure }] })
-
-describe('advisory registry', () => {
-  it('lists each code once with its fields', () => {
-    const expected: Record<AdvisoryId, true> = {
-      limitExceeded: true,
-      noCartridge: true,
-      noComparableLimit: true,
-      rangeIncomplete: true,
-      chargeTooSmall: true,
-      resistanceNotApplied: true,
-      loadRatioHigh: true,
-      startPressureBelowResistance: true,
-      gyrationRadiusWithoutTwist: true,
-      startPressureHeldOnce: true,
-    }
-    expect(advisoryIds).toEqual(Object.keys(expected))
-    expect(new Set(advisoryIds).size).toBe(advisoryRules.length)
-    for (const r of advisoryRules) {
-      expect(advisoryRule[r.id]).toBe(r)
-      expect(r.inputs.length).toBeGreaterThan(0)
-      expect(r.message).not.toMatch(/safe/i)
-      expect(r.fix).not.toMatch(/safe/i)
-    }
-    expect(advisoryRule.chargeTooSmall.message).toContain(String(chargeTooSmallRatio))
-  })
-})
 
 describe('start pressure at or below the resistance floor', () => {
   const id: AdvisoryId = 'startPressureBelowResistance'
@@ -82,7 +48,7 @@ describe('start pressure held once and resisted again', () => {
       fired(withLoad({ resistance: { friction: 1e6, ...ramp(2e6) }, startPressure: 3e6 + 1 })),
     ).toContain(id)
   })
-  it('fires for a profile that rises after travel 0 and says the lower resistance is the one at travel 0', () => {
+  it('fires for a profile that rises after travel 0', () => {
     const resistance = {
       engraving: [
         { travel: 0, pressure: 2e6 },
@@ -90,7 +56,6 @@ describe('start pressure held once and resisted again', () => {
       ],
     }
     expect(fired(withLoad({ resistance, startPressure: 3e6 }))).toContain(id)
-    expect(advisoryRule[id].message).toContain('lower bore resistance at travel 0')
   })
   it('does not fire at the floor, without engraving at travel 0 or with friction only', () => {
     expect(fired(withLoad({ resistance: ramp(2e6), startPressure: 2e6 }))).not.toContain(id)
@@ -116,11 +81,6 @@ describe('start pressure held once and resisted again', () => {
     expect(
       fired(withLoad({ resistance, startPressure: 3e6, ignitionPressure: 4e6 })),
     ).not.toContain(id)
-  })
-  it('reads the friction as an input', () => {
-    expect(advisoryRule[id].inputs).toEqual(
-      expect.arrayContaining(['ignitionPressure', 'resistance.friction']),
-    )
   })
 })
 

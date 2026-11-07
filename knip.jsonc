@@ -54,6 +54,7 @@
         "src/openapi.ts",
         "src/static.ts",
         "src/compute/browser.ts",
+        "src/compute/advisory-text.ts",
         "src/compute/worker.ts",
         "src/catalogue/browser.ts",
         "src/catalogue/write.ts"
