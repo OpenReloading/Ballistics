@@ -68,8 +68,8 @@ import { Providers } from '../components/providers.tsx'
 import { ContentSkipLink, ResultsSkipLink } from '../components/results-skip-link.tsx'
 import { SafetyDialog } from '../components/safety-dialog.tsx'
 import { basePath } from '../lib/edition.ts'
-import { titleTemplate } from '../lib/record-metadata.ts'
 import { colorSchemeScript, pageWidth } from '../lib/theme.ts'
+import { titleTemplate } from '../lib/title-template.ts'
 import { uiFont } from './fonts/ui.ts'
 
 export const metadata: Metadata = {

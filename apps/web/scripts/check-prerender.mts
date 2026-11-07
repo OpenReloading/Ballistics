@@ -12,12 +12,8 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { type ManufacturerNames, noManufacturerNames } from '../src/lib/manufacturers.ts'
 import { exportIds, isSampling } from '../src/lib/prerender-sample.ts'
-import {
-  type HeadSource,
-  type RecordKind,
-  recordHeadText,
-  titleTemplate,
-} from '../src/lib/record-metadata.ts'
+import { type HeadSource, type RecordKind, recordHeadText } from '../src/lib/record-metadata.ts'
+import { titleTemplate } from '../src/lib/title-template.ts'
 
 /** The data folder of each list, its record kind for the sample and its page route. */
 const lists = [
