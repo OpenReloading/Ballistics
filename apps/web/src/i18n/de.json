@@ -4359,5 +4359,16 @@
   "No powders yet": "Noch keine Treibladungspulver",
   "The catalogue has no powders. Make one with New powder, or import a table of your powders with Import.": "Der Katalog enthält kein Treibladungspulver. Legen Sie eines mit „Neues Treibladungspulver“ an oder importieren Sie eine Tabelle Ihrer Treibladungspulver mit Import.",
   "Data of a pre-release version": "Daten einer Vorabversion",
-  "This browser holds data of a pre-release version of the app, which this version does not read. Delete it to save records in this browser again.": "Dieser Browser enthält Daten einer Vorabversion der App, die diese Version nicht liest. Löschen Sie sie, um wieder Datensätze in diesem Browser zu speichern."
+  "This browser holds data of a pre-release version of the app, which this version does not read. Delete it to save records in this browser again.": "Dieser Browser enthält Daten einer Vorabversion der App, die diese Version nicht liest. Löschen Sie sie, um wieder Datensätze in diesem Browser zu speichern.",
+  "{field}: the header names a unit other than {symbols}. Choose the unit of the column.": "{field}: Die Kopfzeile nennt eine andere Einheit als {symbols}. Wählen Sie die Einheit der Spalte.",
+  "{at}: the text is not percent-encoded; it is read as written.": "{at}: Der Text ist nicht prozentkodiert; er wird so gelesen, wie er steht.",
+  "{at}: \"{value}\" in unit \"{unit}\" is not converted; the field is not read.": "{at}: „{value}“ in der Einheit „{unit}“ wird nicht umgerechnet; das Feld wird nicht gelesen.",
+  "The file holds a shotshell load. This import is not checked on shotshell files: the fields it does not know are listed as not read. Check every value.": "Die Datei enthält eine Schrotladung. Dieser Import ist für Schrotdateien nicht geprüft: Die Felder, die er nicht kennt, werden als nicht gelesen aufgeführt. Prüfen Sie jeden Wert.",
+  "{at}: a shot without a velocity is not read.": "{at}: Ein Schuss ohne Geschwindigkeit wird nicht gelesen.",
+  "{at}: the charge {label} holds no shot with a velocity; it is not read.": "{at}: Die Treibladung {label} enthält keinen Schuss mit Geschwindigkeit; sie wird nicht gelesen.",
+  "{at}: {count} shots of the charge {label} beyond the limit of {max} are left out.": "{at}: {count} Schüsse der Treibladung {label} über der Grenze von {max} werden weggelassen.",
+  "{at}: the charge {label} has no mass; its string varies nothing.": "{at}: Die Treibladung {label} hat keine Masse; ihre Schussreihe variiert nichts.",
+  "{at}: {count} charges ({shots} shots) of the series beyond the limit of {max} are left out.": "{at}: {count} Treibladungen ({shots} Schüsse) der Serie über der Grenze von {max} werden weggelassen.",
+  "The file is of format \"{format}\"; the reader is written for format {expected}. Check every value.": "Die Datei hat das Format „{format}“; der Leser ist für Format {expected} geschrieben. Prüfen Sie jeden Wert.",
+  "The file is of format unknown; the reader is written for format {expected}. Check every value.": "Das Format der Datei ist unbekannt; der Leser ist für Format {expected} geschrieben. Prüfen Sie jeden Wert."
 }

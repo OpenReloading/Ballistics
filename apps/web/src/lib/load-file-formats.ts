@@ -1,7 +1,6 @@
 /** The load-file formats the File menu opens, and reading files with them. */
 import { type EmbeddedFile, type UserRecord, userDataFormat } from '@open-reloading/schema'
 import type { Translator } from '../i18n/translate.ts'
-import { translateMessage } from './core-messages.ts'
 import { csrLoadFormat } from './csr-load-format.ts'
 import { grtLoadFormat } from './grt-load-format.ts'
 import { nth } from './nth.ts'
@@ -66,7 +65,7 @@ export async function readLoadFile(
 export const readNote = (p: ParsedUserFile, t: Translator['t']) =>
   p.ok
     ? [
-        ...(p.warnings ?? []).map((w) => translateMessage(w, t)),
+        ...(p.warnings ?? []).map((w) => t(w.message, w.values)),
         ...(p.unmapped?.length
           ? [t('Not read: {fields}.', { fields: p.unmapped.join(', ') })]
           : []),

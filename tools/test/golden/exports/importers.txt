@@ -1,5 +1,6 @@
 . BuiltEntry
 . BuiltRecords
+. Candidate
 . ChronoFormat
 . ChronoFormatId
 . ChronoImport
@@ -14,16 +15,19 @@
 . Inflate
 . KindScore
 . KindSuggestion
+. LoadDiagnostic
 . ParseChronoOptions
 . PressureHistoryImport
 . PressureHistoryOptions
 . PressureUnit
+. ReaderDiagnostic
 . RowCounts
 . RowIssue
 . SensorPosition
 . SessionCandidate
 . Table
 . TableColumnMap
+. TableDiagnostic
 . TableKind
 . TableRead
 . TemplateOptions

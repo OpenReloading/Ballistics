@@ -2,8 +2,13 @@ import { type UserRecord, userRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { readGrtLoad } from '../src/index.ts'
 import { defined } from './defined.ts'
+import { recordOf } from './record-of.ts'
 
-const saved = '2026-10-30T00:00:00.000Z'
+/** The read of `xml` with the records the app makes of its candidates. */
+function read(xml: string) {
+  const r = readGrtLoad(xml)
+  return { ...r, records: r.candidates.map(recordOf) }
+}
 
 type Field = [name: string, value: string, unit?: string]
 
@@ -90,7 +95,7 @@ const ofKind = <K extends UserRecord['kind']>(records: UserRecord[], kind: K) =>
 
 describe('readGrtLoad: the component records', () => {
   it('reads a load with its cartridge, bullet, maker and powder, each a valid user record', () => {
-    const { records, unmapped, warnings } = readGrtLoad(grtFile({}), saved)
+    const { records, unmapped, warnings } = read(grtFile({}))
     for (const r of records) expect(userRecord.safeParse(r).success, r.kind).toBe(true)
     expect(records.map((r) => r.kind)).toEqual([
       'cartridge',
@@ -134,7 +139,7 @@ describe('readGrtLoad: the component records', () => {
 
 describe('readGrtLoad: the load', () => {
   it('reads the load naming its components, with the charge, seating, note and analysis values', () => {
-    const { records } = readGrtLoad(grtFile({}), saved)
+    const { records } = read(grtFile({}))
     const load = ofKind(records, 'load')
     expect(load.name).toBe('Testcal load')
     expect(load.data).toEqual({
@@ -167,10 +172,10 @@ describe('readGrtLoad: fields, overflows and ids', () => {
     const text = grtFile({
       sections: { caliber: [['oal', '12', 'mm'], ...extra], gun: [['twistlen', '200', 'in']] },
     })
-    const { unmapped, warnings } = readGrtLoad(text, saved)
+    const { unmapped, warnings } = read(text)
     expect(unmapped).toContain('caliber.odd')
     expect(warnings).toEqual([
-      'gun.twistlen: "200" in unit "in" is not converted; the field is not read.',
+      { code: 'notConverted', params: { at: 'gun.twistlen', value: '200', unit: 'in' } },
     ])
   })
 
@@ -185,9 +190,9 @@ describe('readGrtLoad: fields, overflows and ids', () => {
         ],
       },
     })
-    const { records, warnings } = readGrtLoad(text, saved)
+    const { records, warnings } = read(text)
     expect(warnings).toEqual([
-      'propellant.mc: "1e308" in unit "kg" is not converted; the field is not read.',
+      { code: 'notConverted', params: { at: 'propellant.mc', value: '1e308', unit: 'kg' } },
     ])
     const load = ofKind(records, 'load')
     expect(load.data.charge).toBeUndefined()
@@ -196,11 +201,9 @@ describe('readGrtLoad: fields, overflows and ids', () => {
   })
 
   it('gives the same ids on a second read and one record for a component two files share', () => {
-    const a = readGrtLoad(grtFile({}), saved)
-    expect(readGrtLoad(grtFile({}), '2027-01-01T00:00:00.000Z').records.map((r) => r.id)).toEqual(
-      a.records.map((r) => r.id),
-    )
-    const b = readGrtLoad(grtFile({ title: 'Other%20load' }), saved)
+    const a = read(grtFile({}))
+    expect(read(grtFile({})).records.map((r) => r.id)).toEqual(a.records.map((r) => r.id))
+    const b = read(grtFile({ title: 'Other%20load' }))
     expect(ofKind(b.records, 'powder').id).toBe(ofKind(a.records, 'powder').id)
     expect(ofKind(b.records, 'load').id).not.toBe(ofKind(a.records, 'load').id)
   })
@@ -208,7 +211,7 @@ describe('readGrtLoad: fields, overflows and ids', () => {
 
 describe('readGrtLoad: units', () => {
   it('converts each value from the unit its field declares', () => {
-    const { records } = readGrtLoad(
+    const { records } = read(
       grtFile({
         sections: {
           caliber: [
@@ -224,7 +227,6 @@ describe('readGrtLoad: units', () => {
           ],
         },
       }),
-      saved,
     )
     expect(ofKind(records, 'cartridge').data.overrides?.values).toEqual([
       { side: 'cartridge', symbol: 'L3', quantity: 'length', value: 40 },
@@ -242,9 +244,8 @@ describe('readGrtLoad: line ends, warnings, names and refused files', () => {
     const picture = `<gallery title="p"><picture name="a.jpg" data="${'A'.repeat(80_000)}" /></gallery>`
     const measured =
       '<Measurement><charge name="1" value="0.001"><shot velocity="800" /></charge></Measurement>'
-    const { records, unmapped } = readGrtLoad(
+    const { records, unmapped } = read(
       `\uFEFF${grtFile({ eol: '\r\n', appendix: picture + measured, extra: '<caliberfile><var name="a" value="1" /></caliberfile>' })}`,
-      saved,
     )
     expect(ofKind(records, 'load').data.note).toBeUndefined()
     expect(unmapped).toEqual(
@@ -253,28 +254,29 @@ describe('readGrtLoad: line ends, warnings, names and refused files', () => {
   })
 
   it('warns on a shotshell load and on text that is not percent-encoded', () => {
-    const { warnings, records } = readGrtLoad(
+    const { warnings, records } = read(
       grtFile({
         title: '100%25%20sure%zz',
         sections: { caliber: [['shotshell', 'true']] },
       }),
-      saved,
     )
-    expect(warnings[0]).toMatch(/^title: the text is not percent-encoded/)
-    expect(warnings[1]).toMatch(/shotshell/)
+    expect(warnings.slice(0, 2)).toEqual([
+      { code: 'notPercentEncoded', params: { at: 'title' } },
+      { code: 'shotshell', params: {} },
+    ])
     expect(ofKind(records, 'load').name).toBe('100%25%20sure%zz')
   })
 
   it('names a load without title, cartridge, bullet or powder by its kind', () => {
-    const { records } = readGrtLoad(grtFile({ title: '', sections: {}, appendix: '' }), saved)
+    const { records } = read(grtFile({ title: '', sections: {}, appendix: '' }))
     expect(records).toEqual([
       expect.objectContaining({ kind: 'load', name: 'Load', data: { origin: 'user' } }),
     ])
   })
 
   it('refuses XML of another root, a file without load and text that is no XML', () => {
-    expect(() => readGrtLoad('<other/>', saved)).toThrow('root element')
-    expect(() => readGrtLoad('<GordonsReloadingTool/>', saved)).toThrow('no load')
-    expect(() => readGrtLoad('<GordonsReloadingTool>', saved)).toThrow('unclosed element')
+    expect(() => readGrtLoad('<other/>')).toThrow('root element')
+    expect(() => readGrtLoad('<GordonsReloadingTool/>')).toThrow('no load')
+    expect(() => readGrtLoad('<GordonsReloadingTool>')).toThrow('unclosed element')
   })
 })

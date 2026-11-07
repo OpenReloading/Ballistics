@@ -6,6 +6,7 @@
 
 import type { ChronoSession } from '@open-reloading/schema';
 import type { ChronoShot } from '@open-reloading/schema';
+import type { Diagnostic } from '@open-reloading/statistics';
 import type { QuantityValue } from '@open-reloading/schema';
 import type { UserRecord } from '@open-reloading/schema';
 
@@ -13,14 +14,12 @@ import type { UserRecord } from '@open-reloading/schema';
 export function autoMap(table: Table, kind: TableKind): TableColumnMap[];
 
 // @public
-export function buildRecords(table: Table, kind: TableKind, map: TableColumnMap[], now: string): BuiltRecords;
+export function buildRecords(table: Table, kind: TableKind, map: TableColumnMap[]): BuiltRecords;
 
 // @public
 export interface BuiltEntry {
     // (undocumented)
-    key: string;
-    // (undocumented)
-    record: UserRecord;
+    candidate: Candidate;
     // (undocumented)
     row: number;
 }
@@ -30,15 +29,17 @@ export interface BuiltRecords {
     // (undocumented)
     counts: RowCounts;
     entries: BuiltEntry[];
-    makers: {
-        key: string;
-        record: UserRecord;
-    }[];
+    makers: Candidate[];
     // (undocumented)
     rejected: RowIssue[];
     // (undocumented)
     warnings: RowIssue[];
 }
+
+// @public
+export type Candidate = UserRecord extends infer R ? R extends UserRecord ? Omit<R, 'id' | 'saved'> & {
+    key: string;
+} : never : never;
 
 // @public
 export type ChronoFormat = TextChronoFormat | WorkbookChronoFormat;
@@ -143,10 +144,10 @@ export const formatMinutes: (seconds: number) => string;
 // @public
 export interface GrtLoadRead {
     // (undocumented)
-    records: UserRecord[];
+    candidates: Candidate[];
     unmapped: string[];
     // (undocumented)
-    warnings: string[];
+    warnings: LoadDiagnostic[];
 }
 
 // @public
@@ -180,6 +181,9 @@ export interface KindSuggestion {
     // (undocumented)
     tier?: Tier | undefined;
 }
+
+// @public
+export type LoadDiagnostic = ReaderDiagnostic<'notPercentEncoded' | 'notConverted' | 'shotshell' | 'shotWithoutVelocity' | 'chargeWithoutShots' | 'shotsBeyondLimit' | 'chargeWithoutMass' | 'chargesBeyondLimit' | 'otherFormat' | 'unknownFormat'>;
 
 // @public
 export function parseChrono(input: string | Workbook, options: ParseChronoOptions, format: ChronoFormatId): ChronoImport;
@@ -255,10 +259,13 @@ export interface PressureHistoryOptions {
 export type PressureUnit = 'bar' | 'mbar' | 'MPa' | 'kPa' | 'Pa' | 'psi' | 'kpsi';
 
 // @public
-export function readCsrLoad(xml: string, saved: string): GrtLoadRead;
+export function readCsrLoad(xml: string): GrtLoadRead;
 
 // @public
-export function readGrtLoad(xml: string, saved: string): GrtLoadRead;
+export type ReaderDiagnostic<Code extends string> = Diagnostic<Code, Readonly<Record<string, string | number | readonly string[]>>>;
+
+// @public
+export function readGrtLoad(xml: string): GrtLoadRead;
 
 // @public
 export function readTable(raw: string): TableRead;
@@ -285,7 +292,7 @@ export interface RowIssue {
     // (undocumented)
     column: string;
     // (undocumented)
-    reason: string;
+    reason: TableDiagnostic;
     // (undocumented)
     row: number;
 }
@@ -349,6 +356,9 @@ export interface TableColumnMap {
     unit?: string | undefined;
     unitFrom?: 'header' | 'values' | 'default' | 'unknown' | undefined;
 }
+
+// @public
+export type TableDiagnostic = ReaderDiagnostic<'emptyCell' | 'noUnit' | 'unitOther' | 'notNumber' | 'notAboveZero' | 'outsideUsual' | 'notChoice' | 'noColumn' | 'noColumns' | 'sameId' | 'sameBulletId'>;
 
 // @public
 export type TableKind = 'bullet' | 'powder' | 'cartridge';
