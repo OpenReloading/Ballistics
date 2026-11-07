@@ -5,7 +5,7 @@ import type { Bundle } from './records.ts'
 // Federation, discipline and target mapping references are checked with their other rules in
 // checkFederations (federations.ts).
 
-/** The ids a record may reference, by kind: the records and the ids `renames.json` replaces. */
+/** The ids a record may reference, by kind. */
 type RecordIds = {
   cartridges: Set<string>
   cases: Set<string>
@@ -15,15 +15,13 @@ type RecordIds = {
 
 /** The ids of the referenced kinds in `bundle`. */
 export function recordIds(
-  bundle: Pick<Bundle, 'cartridges' | 'cases' | 'loads' | 'manufacturers' | 'renames'>,
+  bundle: Pick<Bundle, 'cartridges' | 'cases' | 'loads' | 'manufacturers'>,
 ): RecordIds {
-  const renamed = (kind: 'cartridges' | 'cases' | 'manufacturers') =>
-    Object.keys(bundle.renames?.[kind] ?? {})
   return {
-    cartridges: new Set([...bundle.cartridges.map((c) => c.id), ...renamed('cartridges')]),
-    cases: new Set([...bundle.cases.map((c) => c.id), ...renamed('cases')]),
+    cartridges: new Set(bundle.cartridges.map((c) => c.id)),
+    cases: new Set(bundle.cases.map((c) => c.id)),
     loads: new Set(bundle.loads.map((l) => l.id)),
-    manufacturers: new Set([...bundle.manufacturers.map((m) => m.id), ...renamed('manufacturers')]),
+    manufacturers: new Set(bundle.manufacturers.map((m) => m.id)),
   }
 }
 
@@ -46,11 +44,10 @@ export function checkCartridgeReferences(
   for (const c of bundle.capacities)
     unknown('capacities', c.id, c.cartridge, parseRef(c.cartridge)?.id)
   for (const l of bundle.loads) unknown('loads', l.id, l.cartridge, parseRef(l.cartridge)?.id)
-  // the workbench compares the list with the chosen record's id, so an old id never matches
-  const current = new Set(bundle.cartridges.map((c) => c.id))
   for (const p of bundle.powders)
     for (const c of p.listedCartridges ?? [])
-      if (!current.has(c)) errors.push(`powders/${p.id}.json: unknown listed cartridge "${c}"`)
+      if (!ids.cartridges.has(c))
+        errors.push(`powders/${p.id}.json: unknown listed cartridge "${c}"`)
 }
 
 /** The bullet and powder of every load that names a record. */
@@ -72,14 +69,10 @@ export function checkLoadComponentReferences(
 
 /** The primer of every load that names one. */
 export function checkLoadPrimerReferences(
-  bundle: Pick<Bundle, 'loads' | 'primers' | 'renames'>,
+  bundle: Pick<Bundle, 'loads' | 'primers'>,
   errors: string[],
 ) {
-  // an old id counts as the record that replaced it
-  const known = new Set([
-    ...bundle.primers.map((p) => p.id),
-    ...Object.keys(bundle.renames?.primers ?? {}),
-  ])
+  const known = new Set(bundle.primers.map((p) => p.id))
   for (const l of bundle.loads) {
     const record = l.primer?.record
     if (record !== undefined && !known.has(parseRef(record)?.id ?? record))
@@ -100,27 +93,19 @@ export function checkLoadCapacityReferences(
 
 /** The case record of every load that names one: it exists and is a case of the load's cartridge. */
 export function checkLoadCaseReferences(
-  bundle: Pick<Bundle, 'loads' | 'cases' | 'renames'>,
+  bundle: Pick<Bundle, 'loads' | 'cases'>,
   ids: RecordIds,
   errors: string[],
 ) {
-  // an old id counts as the record that replaced it
-  const current = (kind: 'cartridges' | 'cases', id: string) => bundle.renames?.[kind]?.[id] ?? id
   const cartridgeOfCase = new Map(
-    bundle.cases.map((c) => [
-      c.id,
-      current('cartridges', parseRef(c.cartridge)?.id ?? c.cartridge),
-    ]),
+    bundle.cases.map((c) => [c.id, parseRef(c.cartridge)?.id ?? c.cartridge]),
   )
   for (const l of bundle.loads) {
     const record = l.case?.record
     if (record === undefined) continue
     const id = parseRef(record)?.id ?? record
     if (!ids.cases.has(id)) errors.push(`loads/${l.id}.json: unknown case "${record}"`)
-    else if (
-      cartridgeOfCase.get(current('cases', id)) !==
-      current('cartridges', parseRef(l.cartridge)?.id ?? l.cartridge)
-    )
+    else if (cartridgeOfCase.get(id) !== (parseRef(l.cartridge)?.id ?? l.cartridge))
       errors.push(`loads/${l.id}.json: case "${record}" is a case of another cartridge`)
   }
 }

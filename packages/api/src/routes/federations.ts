@@ -96,7 +96,6 @@ export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = as
       config: {
         response: targetFace,
         errors: [404],
-        moved: true,
         summary: 'Get a target face',
         description:
           'The target face record: federation id, ring diameters (mm), inner ten, events with ids, and provenance.',
@@ -104,8 +103,7 @@ export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = as
     },
     (request, reply) => {
       const record = catalogue.get('targetFace', request.params.id)
-      if (!record)
-        return missing(reply, catalogue, 'target-faces', request.params.id, 'target face')
+      if (!record) return missing(reply, request.params.id, 'target face')
       return reply.send(stored(record))
     },
   )
@@ -193,14 +191,13 @@ export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = as
         config: {
           response: record,
           errors: [404],
-          moved: true,
           summary: `Get a ${noun}`,
           description: `The ${noun} record with its provenance.`,
         },
       },
       (request, reply) => {
         const found = catalogue.get(kind, request.params.id)
-        if (!found) return missing(reply, catalogue, path.slice(1), request.params.id, noun)
+        if (!found) return missing(reply, request.params.id, noun)
         return reply.send(stored(found))
       },
     )
