@@ -1,12 +1,11 @@
+import { InputError, nth } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import { nth } from '../src/errors.ts'
 import {
   type ChargedTrace,
   type CurveFitOptions,
   type CurveParameterReport,
   fitPressureCurve,
   fitPressureCurves,
-  InputError,
   type InteriorLoad,
   interior,
   PowderFitError,
@@ -58,8 +57,10 @@ function trace(
 ): PressureHistory {
   const run = interior(source)
   if (!run.valid) throw new Error(run.reason)
-  const at = (p: (typeof run.points)[number]) =>
-    sensor === 'breech' ? p.breechPressure : sensor === 'mean' ? p.meanPressure : p.basePressure
+  const at = (p: (typeof run.points)[number]) => {
+    if (sensor === 'breech') return p.breechPressure
+    return sensor === 'mean' ? p.meanPressure : p.basePressure
+  }
   const peak = Math.max(...run.points.map(at))
   const random = normals(seed)
   const time: number[] = []
@@ -130,6 +131,10 @@ describe('curve fit of a synthetic trace', () => {
     expect(nth(fit.residuals, 0).time).toBeLessThan(1e-5)
     expect(fit.correlation).toHaveLength(5)
   })
+})
+
+describe('curve fit of a synthetic trace, its load and another start', () => {
+  const fit = full
 
   it('applies the fitted values to the returned load at the reference pressure', () => {
     const { burn } = fit.load.propellant
@@ -199,7 +204,9 @@ describe('curve fit identifiability', () => {
     expect(exponent.status).toBe('fixed')
     expect(exponent.reasons).toEqual(['ill-conditioned'])
   })
+})
 
+describe('curve fit identifiability limits', () => {
   it('fails when even the burn coefficient and the shift are ill-conditioned', () => {
     expect(() => fitPressureCurve(start(), noisy, { ...base, maxCondition: 1.0001 })).toThrow(
       PowderFitError,
@@ -227,21 +234,38 @@ describe('curve fit identifiability', () => {
   })
 })
 
-describe('joint curve fit of several traces', () => {
-  const charged = (charge: number, seed: number): ChargedTrace => ({
-    charge,
-    trace: trace({ ...truth, charge }, 0.005, 'breech', seed),
-  })
-  const set = [charged(0.0024, 11), charged(0.0027, 12), charged(0.003, 13)]
-  // the exponent starts 10 % high, the burn coefficient matched near the peaks
-  const high = load({
-    vivacity: 8.24 * (1.3e8 / 98066.5) ** -0.05,
-    exponent: 0.55,
-    a: 0.84,
-    z1: 0.315,
-  })
-  const joint = fitPressureCurves(high, set, base)
+/** The trace of the true load at `charge`, with the noise of `seed`. */
+const charged = (charge: number, seed: number): ChargedTrace => ({
+  charge,
+  trace: trace({ ...truth, charge }, 0.005, 'breech', seed),
+})
+const set = [charged(0.0024, 11), charged(0.0027, 12), charged(0.003, 13)]
+// the exponent starts 10 % high, the burn coefficient matched near the peaks
+const high = load({
+  vivacity: 8.24 * (1.3e8 / 98066.5) ** -0.05,
+  exponent: 0.55,
+  a: 0.84,
+  z1: 0.315,
+})
+const joint = fitPressureCurves(high, set, base)
 
+/** The trace at `charge` of the true load with heat loss and bore friction, with the noise of `seed`. */
+const lossy = (charge: number, seed: number): ChargedTrace => ({
+  charge,
+  trace: trace(
+    {
+      ...truth,
+      charge,
+      heat: { model: 'convective', flameTemperature: 2800, factor: 0.5 },
+      resistance: { friction: 2.5e6 },
+    },
+    0.005,
+    'breech',
+    seed,
+  ),
+})
+
+describe('joint curve fit of several traces', () => {
   it('fits the exponent within its uncertainty at the default limit', () => {
     const exponent = find(joint.parameters, 'exponent')
     expect(exponent.status).toBe('identified')
@@ -284,7 +308,9 @@ describe('joint curve fit of several traces', () => {
     for (const n of exponent.leaveOneOut ?? []) expect(n).toBeCloseTo(0.5, 1)
     expect(find(joint.parameters, 'burnRate').interval).toBeUndefined()
   })
+})
 
+describe('joint curve fit consistency', () => {
   it('refits without each trace only with three or more traces', () => {
     const two = fitPressureCurves(high, [nth(set, 0), nth(set, 2)], base)
     const exponent = find(two.parameters, 'exponent')
@@ -308,20 +334,6 @@ describe('joint curve fit of several traces', () => {
   })
 
   it('does not see heat loss and bore friction the fitted model lacks', () => {
-    const lossy = (charge: number, seed: number): ChargedTrace => ({
-      charge,
-      trace: trace(
-        {
-          ...truth,
-          charge,
-          heat: { model: 'convective', flameTemperature: 2800, factor: 0.5 },
-          resistance: { friction: 2.5e6 },
-        },
-        0.005,
-        'breech',
-        seed,
-      ),
-    })
     const fit = fitPressureCurves(
       high,
       [lossy(0.0024, 51), lossy(0.0027, 52), lossy(0.003, 53)],
@@ -334,7 +346,9 @@ describe('joint curve fit of several traces', () => {
     expect(exponent.leaveOneOut).toHaveLength(3)
     expect(fit.chiSquare / fit.degreesOfFreedom).toBeLessThan(1.2)
   })
+})
 
+describe('joint curve fit of one trace and of close charges', () => {
   it('holds the exponent with one trace of the same set', () => {
     const one = fitPressureCurves(high, set.slice(2), base)
     expect(find(one.parameters, 'exponent').status).toBe('fixed')
@@ -390,22 +404,34 @@ describe('curve fit sensors', () => {
   )
 })
 
+/** Asserts that `f` throws a `kind` whose message matches `message`. */
+const rejectsWith = (f: () => unknown, message: string | RegExp, kind = InputError) => {
+  expect(f).toThrow(kind)
+  expect(f).toThrow(message)
+}
+
+/** What `f` throws; fails when it returns. */
+const failure = (f: () => unknown) => {
+  try {
+    f()
+  } catch (error) {
+    return error
+  }
+  throw new Error('no failure')
+}
+
 describe('curve fit failures', () => {
   const t = noisy
-  const rejects = (f: () => unknown, message: string | RegExp, kind = InputError) => {
-    expect(f).toThrow(kind)
-    expect(f).toThrow(message)
-  }
 
   it('rejects a malformed trace', () => {
-    rejects(() => fitPressureCurve(start(), { ...t, time: t.time.slice(1) }), /trace:/)
-    rejects(() => fitPressureCurve(start(), { ...t, time: [...t.time].reverse() }), /trace:/)
-    rejects(
+    rejectsWith(() => fitPressureCurve(start(), { ...t, time: t.time.slice(1) }), /trace:/)
+    rejectsWith(() => fitPressureCurve(start(), { ...t, time: t.time.toReversed() }), /trace:/)
+    rejectsWith(
       () => fitPressureCurve(start(), { ...t, pressure: t.pressure.map(() => Number.NaN) }),
       /trace:/,
     )
-    rejects(() => fitPressureCurve(start(), { ...t, sigma: 0 }), /sigma must be positive/)
-    rejects(
+    rejectsWith(() => fitPressureCurve(start(), { ...t, sigma: 0 }), /sigma must be positive/)
+    rejectsWith(
       () => fitPressureCurve(start(), { ...t, sensor: 'Breech' as PressureSensor }),
       /trace.sensor/,
     )
@@ -413,24 +439,28 @@ describe('curve fit failures', () => {
 
   it('rejects a trace that does not rise and fall', () => {
     const flat = t.pressure.map((_, i) => i)
-    rejects(
+    rejectsWith(
       () => fitPressureCurve(start(), { ...t, pressure: flat.map((x) => -x) }),
       /no positive pressure/,
     )
-    rejects(() => fitPressureCurve(start(), { ...t, pressure: flat }), /never falls/)
+    rejectsWith(() => fitPressureCurve(start(), { ...t, pressure: flat }), /never falls/)
   })
 
   it('rejects a trace too short for the parameters', () => {
     const peak = t.pressure.indexOf(Math.max(...t.pressure))
     const few = { ...t, time: t.time.slice(0, peak + 3), pressure: t.pressure.slice(0, peak + 3) }
-    rejects(() => fitPressureCurve(start(), few, base), /never falls|too few/)
+    rejectsWith(() => fitPressureCurve(start(), few, base), /never falls|too few/)
     const tiny = {
       ...t,
       time: [0, 1, 2, 3, 4],
       pressure: [0, 1e8, 3e8, 1e8, 0],
     }
-    rejects(() => fitPressureCurve(start(), tiny, base), /too few trace samples/)
+    rejectsWith(() => fitPressureCurve(start(), tiny, base), /too few trace samples/)
   })
+})
+
+describe('curve fit failures of options and burn laws', () => {
+  const t = noisy
 
   it('fits a lone exponent instead of holding it', () => {
     const fit = fitPressureCurve(start(), noisy, { ...base, parameters: ['exponent'] })
@@ -441,40 +471,40 @@ describe('curve fit failures', () => {
 
   it('rejects options and burn laws it cannot fit', () => {
     const o = (options: CurveFitOptions) => () => fitPressureCurve(start(), t, options)
-    rejects(o({ parameters: [] }), /parameters:/)
-    rejects(o({ parameters: ['burnRate', 'burnRate'] }), /parameters:/)
-    rejects(o({ parameters: ['speed' as 'burnRate'] }), /parameters:/)
-    rejects(o({ maxIterations: 0 }), /maxIterations/)
-    rejects(o({ maxCondition: 0 }), /maxCondition/)
-    rejects(o({ fallFraction: 1 }), /fallFraction/)
+    rejectsWith(o({ parameters: [] }), /parameters:/)
+    rejectsWith(o({ parameters: ['burnRate', 'burnRate'] }), /parameters:/)
+    rejectsWith(o({ parameters: ['speed' as 'burnRate'] }), /parameters:/)
+    rejectsWith(o({ maxIterations: 0 }), /maxIterations/)
+    rejectsWith(o({ maxCondition: 0 }), /maxCondition/)
+    rejectsWith(o({ fallFraction: 1 }), /fallFraction/)
     const burn = start().propellant.burn
     const withBurn = (b: unknown) => () =>
       fitPressureCurve({ ...start(), propellant: { ...start().propellant, burn: b as never } }, t)
-    rejects(withBurn({ ...burn, form: { kind: 'constant' } }), /two-stage/)
-    rejects(withBurn({ ...burn, kind: 'geometric' }), /two-stage/)
+    rejectsWith(withBurn({ ...burn, form: { kind: 'constant' } }), /two-stage/)
+    rejectsWith(withBurn({ ...burn, kind: 'geometric' }), /two-stage/)
     const form = (patch: object) => ({
       ...burn,
       form: { ...(burn as { form: object }).form, ...patch },
     })
-    rejects(withBurn(form({ a: 0 })), /formSlope needs/)
-    rejects(withBurn(form({ z1: 1 })), /transition needs/)
-    rejects(withBurn({ ...burn, exponent: 0 }), /exponent needs/)
+    rejectsWith(withBurn(form({ a: 0 })), /formSlope needs/)
+    rejectsWith(withBurn(form({ z1: 1 })), /transition needs/)
+    rejectsWith(withBurn({ ...burn, exponent: 0 }), /exponent needs/)
   })
+})
+
+describe('curve fit failures of the runs', () => {
+  const t = noisy
 
   it('throws the failure of an invalid start or an exhausted step budget', () => {
     const crowded = { ...start(), chamber: { ...start().chamber, volume: 1e-9 } }
     expect(() => fitPressureCurve(crowded, t, base)).toThrow(PowderFitError)
-    try {
-      fitPressureCurve(start(), t, { ...base, maxIterations: 1 })
-      throw new Error('no error')
-    } catch (e) {
-      expect(e).toBeInstanceOf(PowderFitError)
-      expect((e as PowderFitError).reason).toBe('not-converged')
-    }
+    const exhausted = failure(() => fitPressureCurve(start(), t, { ...base, maxIterations: 1 }))
+    expect(exhausted).toBeInstanceOf(PowderFitError)
+    expect(exhausted).toMatchObject({ reason: 'not-converged' })
   })
 
   it('names the window when the model leaves the barrel before it ends', () => {
     const quick = load({ vivacity: 20, exponent: 0.5, a: 0.8, z1: 0.3 })
-    rejects(() => fitPressureCurve(quick, t, base), /leaves the barrel/)
+    rejectsWith(() => fitPressureCurve(quick, t, base), /leaves the barrel/)
   })
 })

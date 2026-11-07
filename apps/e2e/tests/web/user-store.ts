@@ -6,9 +6,9 @@ export async function putRecords(page: Page, records: object[]) {
     const db: IDBDatabase = await new Promise((ok, no) => {
       const r = indexedDB.open('openreloading-user-data')
       r.onupgradeneeded = () => {
-        for (const n of ['records', 'handles', 'files'])
-          if (!r.result.objectStoreNames.contains(n))
-            r.result.createObjectStore(n, n === 'records' ? { keyPath: 'id' } : undefined)
+        r.result.createObjectStore('records', { keyPath: 'id' })
+        r.result.createObjectStore('handles')
+        r.result.createObjectStore('files')
       }
       r.onsuccess = () => ok(r.result)
       r.onerror = () => no(r.error ?? new Error('could not open the user store'))

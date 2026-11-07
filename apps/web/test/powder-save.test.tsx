@@ -3,7 +3,7 @@ import { type ChronographString, interior, powderModelValues } from '@open-reloa
 import { fromSi, type Powder, userRecord } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
-import { load } from '../../../packages/core/test/powder-load.ts'
+import { load } from '../../../packages/ballistics/test/powder-load.ts'
 import { saveFailures, TuneNotes } from '../src/components/powder-tune.tsx'
 import { english, translator } from '../src/i18n/translate.ts'
 import { dayText, localDay } from '../src/lib/dates.ts'

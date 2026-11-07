@@ -3,8 +3,9 @@ import { expect, test } from '@playwright/test'
 import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
+import { putRecords } from './user-store.ts'
 
-// An older (version 1) store holding a record the current format rejects.
+// A stored record the current format rejects.
 const old = {
   kind: 'bulletDesign',
   id: 'old-1',
@@ -24,30 +25,10 @@ test.beforeEach(async ({ page }) => {
     ]
   })
   await page.goto('/')
-  await page.evaluate(async (record) => {
-    await new Promise<void>((done, fail) => {
-      const r = indexedDB.deleteDatabase('openreloading-user-data')
-      r.onsuccess = () => done()
-      r.onerror = () => fail(r.error)
-    })
-    const db = await new Promise<IDBDatabase>((done, fail) => {
-      const r = indexedDB.open('openreloading-user-data', 1)
-      r.onupgradeneeded = () => r.result.createObjectStore('records', { keyPath: 'id' })
-      r.onsuccess = () => done(r.result)
-      r.onerror = () => fail(r.error)
-    })
-    await new Promise<void>((done) => {
-      const tx = db.transaction('records', 'readwrite')
-      tx.objectStore('records').put(record)
-      tx.oncomplete = () => done()
-    })
-    db.close()
-  }, old)
+  await putRecords(page, [old])
 })
 
-test('an invalid record of an older store is listed, downloadable and in Export all', async ({
-  page,
-}) => {
+test('an invalid stored record is listed, downloadable and in Export all', async ({ page }) => {
   await gotoHydrated(page, '/bullets/designer')
   await (await barButton(page, 'Open')).click()
   await page.getByRole('menuitem', { name: 'Invalid records (1)…' }).click()

@@ -5,8 +5,7 @@
  * Velocities in m/s, charges in kg.
  */
 
-import { velocityStatistics } from '@open-reloading/statistics'
-import { need } from '../errors.ts'
+import { need, velocityStatistics } from '@open-reloading/statistics'
 import type { LadderPoint } from './fit.ts'
 
 /** One chronograph string: the shot velocities of one charge and the other values of its ladder point. */
@@ -17,7 +16,7 @@ export interface ChronographString extends Omit<LadderPoint, 'muzzleVelocity' | 
 
 /**
  * Pooled sample standard deviation of the shots about their string means, m/s:
- * sqrt(sum (n - 1) s^2 / sum (n - 1)) over the strings of n >= 2 shots; `undefined` when no string
+ * sqrt(sum (n - 1) s^2 / sum (n - 1)) over the strings of n shots, n at least 2; `undefined` when no string
  * has 2 shots.
  */
 export function pooledVelocitySd(strings: readonly ChronographString[]): number | undefined {

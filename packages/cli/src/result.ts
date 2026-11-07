@@ -5,7 +5,7 @@ import { skipReasons } from './published-rows.ts'
 import { splits } from './split.ts'
 
 /** Version of the JSON shape every result carries as `schemaVersion`. */
-export const schemaVersion = 2
+export const schemaVersion = 1
 
 const count = z.int().nonnegative()
 const fraction = z.number().describe('A fraction: 0.034 is 3.4 %.')

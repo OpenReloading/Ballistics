@@ -108,9 +108,6 @@ it('precaches the catalogue index, and answers it from the shell cache', () => {
   ).toBe('records')
 })
 
-// page routes the shell leaves out on purpose: `/my-cases` only redirects
-const notPrecached = ['/my-cases']
-
 it('the shell holds every page route but the record pages, the manifest and its icons', () => {
   const app = new URL('../src/app/', import.meta.url)
   const routes = readdirSync(app, { recursive: true, encoding: 'utf8' })
@@ -119,7 +116,7 @@ it('the shell holds every page route but the record pages, the manifest and its 
   expect(routes).toContain('/powders/tune')
   // every page route without a `[...]` segment is in both the full and the sample export, so
   // `cache.addAll` finds each shell page
-  expect([...shellPages].sort()).toEqual(routes.filter((r) => !notPrecached.includes(r)).sort())
+  expect([...shellPages].sort()).toEqual(routes.sort())
   // Settings is a dialog, no page
   expect(shellPages).not.toContain('/settings')
   for (const u of ['/manifest.webmanifest', '/icon.png', '/icon-192.png'])
