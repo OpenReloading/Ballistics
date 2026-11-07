@@ -72,9 +72,10 @@ export const Choices: Story = {
         continue
       }
       const mark = box.parentElement?.querySelector('.mantine-Checkbox-icon, .mantine-Radio-icon')
-      await expect(
-        contrast(getComputedStyle(mark ?? box).color, backgroundColor),
-      ).toBeGreaterThanOrEqual(3)
+      if (!mark) throw new Error(`a checked ${box.className} shows no mark`)
+      await expect(contrast(getComputedStyle(mark).color, backgroundColor)).toBeGreaterThanOrEqual(
+        3,
+      )
       await expect(contrast(backgroundColor, page)).toBeGreaterThanOrEqual(3)
     }
   },
