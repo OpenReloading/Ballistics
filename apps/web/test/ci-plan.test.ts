@@ -147,6 +147,7 @@ it('tests every workspace of every group without a list of affected ones', () =>
     { name: 'drawing', filter: '--filter @open-reloading/drawing', e2eUnit: false },
     { name: 'web', filter: '--filter @open-reloading/web', e2eUnit: false },
     { name: 'packages', filter: packages, e2eUnit: true },
+    { name: 'ui', filter: '--filter @open-reloading/ui', e2eUnit: false },
   ])
 })
 

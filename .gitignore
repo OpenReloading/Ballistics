@@ -3,6 +3,7 @@ dist
 .env
 test-results
 playwright-report
+storybook-static
 .pnpm-store/
 .playwright-mcp/
 visual-check-out
