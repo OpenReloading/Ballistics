@@ -44,7 +44,12 @@ export function checkCartridgeReferences(
   for (const c of bundle.capacities)
     unknown('capacities', c.id, c.cartridge, parseRef(c.cartridge)?.id)
   for (const l of bundle.loads) unknown('loads', l.id, l.cartridge, parseRef(l.cartridge)?.id)
-  for (const p of bundle.powders)
+  checkListedCartridges(bundle.powders, ids, errors)
+}
+
+/** The cartridges a powder is listed for. */
+function checkListedCartridges(powders: Bundle['powders'], ids: RecordIds, errors: string[]) {
+  for (const p of powders)
     for (const c of p.listedCartridges ?? [])
       if (!ids.cartridges.has(c))
         errors.push(`powders/${p.id}.json: unknown listed cartridge "${c}"`)
@@ -137,10 +142,13 @@ export function checkLoadReferences(
   }
 }
 
+/** Checks that `id`, where given, names a manufacturer record; the error names `where` and `field`. */
+type MakerCheck = (where: string, field: string, id: string | undefined) => void
+
 /** The manufacturers a load names: a described bullet or powder and the case. */
 function checkLoadMakers(
   l: Pick<Bundle['loads'][number], 'id' | 'bullet' | 'powder' | 'case'>,
-  check: (where: string, field: string, id: string | undefined) => void,
+  check: MakerCheck,
 ) {
   const named = [
     ['bullet.manufacturer', typeof l.bullet === 'object' ? l.bullet.manufacturer : undefined],
@@ -149,6 +157,24 @@ function checkLoadMakers(
   ] as const
   for (const [field, maker] of named)
     check(`loads/${l.id}.json`, field, maker && parseRef(maker)?.id)
+}
+
+/** The manufacturer of every powder, primer, bullet and case, and the case manufacturer of a capacity. */
+function checkComponentMakers(
+  bundle: Pick<Bundle, 'powders' | 'primers' | 'bullets' | 'cases' | 'capacities'>,
+  check: MakerCheck,
+) {
+  for (const p of bundle.powders) check(`powders/${p.id}.json`, 'manufacturer', p.manufacturer)
+  for (const p of bundle.primers) check(`primers/${p.id}.json`, 'manufacturer', p.manufacturer)
+  for (const b of bundle.bullets) check(`bullets/${b.id}.json`, 'manufacturer', b.manufacturer)
+  for (const c of bundle.cases)
+    check(`cases/${c.id}.json`, 'manufacturer', parseRef(c.manufacturer)?.id)
+  for (const c of bundle.capacities)
+    check(
+      `capacities/${c.id}.json`,
+      'caseManufacturer',
+      c.caseManufacturer && (parseRef(c.caseManufacturer)?.id ?? c.caseManufacturer),
+    )
 }
 
 /**
@@ -165,21 +191,11 @@ export function checkManufacturerReferences(
   ids: RecordIds,
   errors: string[],
 ): void {
-  const check = (where: string, field: string, id: string | undefined) => {
+  const check: MakerCheck = (where, field, id) => {
     if (id !== undefined && !ids.manufacturers.has(id))
       errors.push(`${where}: unknown ${field} "${id}"`)
   }
-  for (const p of bundle.powders) check(`powders/${p.id}.json`, 'manufacturer', p.manufacturer)
-  for (const p of bundle.primers) check(`primers/${p.id}.json`, 'manufacturer', p.manufacturer)
-  for (const b of bundle.bullets) check(`bullets/${b.id}.json`, 'manufacturer', b.manufacturer)
-  for (const c of bundle.cases)
-    check(`cases/${c.id}.json`, 'manufacturer', parseRef(c.manufacturer)?.id)
-  for (const c of bundle.capacities)
-    check(
-      `capacities/${c.id}.json`,
-      'caseManufacturer',
-      c.caseManufacturer && (parseRef(c.caseManufacturer)?.id ?? c.caseManufacturer),
-    )
+  checkComponentMakers(bundle, check)
   for (const s of bundle.chronoSessions)
     check(`chrono/${s.id}.json`, 'device.manufacturer', parseRef(s.device.manufacturer)?.id)
   for (const l of bundle.loads) checkLoadMakers(l, check)

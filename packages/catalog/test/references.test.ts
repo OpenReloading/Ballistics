@@ -86,7 +86,9 @@ describe('checkCartridgeReferences', () => {
       'powders/p1.json: unknown listed cartridge "c9"',
     ])
   })
+})
 
+describe('checkCartridgeReferences by plain id', () => {
   it('reads a cartridge given as a plain id', () => {
     const b = bundle({
       firings: [],
@@ -100,7 +102,7 @@ describe('checkCartridgeReferences', () => {
   })
 })
 
-describe('load references', () => {
+describe('load component references', () => {
   it('names a bullet or powder record that does not exist and accepts a described one', () => {
     const b = bundle({
       loads: [
@@ -128,7 +130,9 @@ describe('load references', () => {
       'loads/l3.json: unknown primer "catalogue:pr9"',
     ])
   })
+})
 
+describe('load capacity and case references', () => {
   it('names a capacity that is no record', () => {
     const b = bundle({
       loads: [
@@ -174,7 +178,9 @@ describe('load references', () => {
       'loads/l3.json: case "case-2" is a case of another cartridge',
     ])
   })
+})
 
+describe('load session references', () => {
   it('names a session that is no record and reads a load without sessions', () => {
     const b = bundle({
       chronoSessions: [{ id: 's1', strings: [] }],
@@ -196,6 +202,47 @@ describe('load references', () => {
   })
 })
 
+/** A record of every kind that names a manufacturer, each with a known and an unknown one. */
+const everyKind = bundle({
+  powders: [
+    { id: 'p1', manufacturer: 'm1' },
+    { id: 'p2', manufacturer: 'm2' },
+  ],
+  primers: [
+    { id: 'pr1', manufacturer: 'm1' },
+    { id: 'pr2', manufacturer: 'm3' },
+  ],
+  bullets: [
+    { id: 'b1', manufacturer: 'm1' },
+    { id: 'b2', manufacturer: 'm4' },
+  ],
+  cases: [
+    { id: 'case-1', manufacturer: 'catalogue:m1' },
+    { id: 'case-2', manufacturer: 'catalogue:m5' },
+  ],
+  capacities: [],
+  chronoSessions: [
+    { id: 's1', device: { manufacturer: 'catalogue:m1' } },
+    { id: 's2', device: { manufacturer: 'catalogue:m6' } },
+    { id: 's3', device: {} },
+  ],
+  loads: [
+    {
+      id: 'l1',
+      bullet: { manufacturer: 'catalogue:m7' },
+      powder: { manufacturer: 'catalogue:m8' },
+      case: { manufacturer: 'catalogue:m9' },
+    },
+    {
+      id: 'l2',
+      bullet: { manufacturer: 'catalogue:m1' },
+      powder: 'catalogue:p1',
+      case: { record: 'case-1' },
+    },
+    { id: 'l3', bullet: 'catalogue:b1', powder: {} },
+  ],
+})
+
 describe('checkManufacturerReferences', () => {
   it('reads the case maker of a capacity as a reference or a plain id', () => {
     const b = bundle({
@@ -211,48 +258,11 @@ describe('checkManufacturerReferences', () => {
   })
 
   it('names the unknown maker of every kind, by file and field', () => {
-    const b = bundle({
-      powders: [
-        { id: 'p1', manufacturer: 'm1' },
-        { id: 'p2', manufacturer: 'm2' },
-      ],
-      primers: [
-        { id: 'pr1', manufacturer: 'm1' },
-        { id: 'pr2', manufacturer: 'm3' },
-      ],
-      bullets: [
-        { id: 'b1', manufacturer: 'm1' },
-        { id: 'b2', manufacturer: 'm4' },
-      ],
-      cases: [
-        { id: 'case-1', manufacturer: 'catalogue:m1' },
-        { id: 'case-2', manufacturer: 'catalogue:m5' },
-      ],
-      capacities: [],
-      chronoSessions: [
-        { id: 's1', device: { manufacturer: 'catalogue:m1' } },
-        { id: 's2', device: { manufacturer: 'catalogue:m6' } },
-        { id: 's3', device: {} },
-      ],
-      loads: [
-        {
-          id: 'l1',
-          bullet: { manufacturer: 'catalogue:m7' },
-          powder: { manufacturer: 'catalogue:m8' },
-          case: { manufacturer: 'catalogue:m9' },
-        },
-        {
-          id: 'l2',
-          bullet: { manufacturer: 'catalogue:m1' },
-          powder: 'catalogue:p1',
-          case: { record: 'case-1' },
-        },
-        { id: 'l3', bullet: 'catalogue:b1', powder: {} },
-      ],
-    })
     const tables = { 'a.pdf': { manufacturer: 'm1' }, 'b.pdf': { manufacturer: 'm10' } }
     expect(
-      errorsOf((e) => checkManufacturerReferences(b, tables as never, recordIds(b), e)),
+      errorsOf((e) =>
+        checkManufacturerReferences(everyKind, tables as never, recordIds(everyKind), e),
+      ),
     ).toEqual([
       'powders/p2.json: unknown manufacturer "m2"',
       'primers/pr2.json: unknown manufacturer "m3"',

@@ -40,7 +40,7 @@ import {
 } from '../lib/units.ts'
 import { AppModal } from './app-modal.tsx'
 import { ChartPlayback } from './chart-playback.tsx'
-import { EChart, useChartTokens } from './echart.tsx'
+import { chartTooltip, EChart, useChartTokens } from './echart.tsx'
 import { PanelTable } from './scroll-region.tsx'
 
 type Limits = Parameters<typeof limitLines>[0]
@@ -215,13 +215,8 @@ export function InteriorChart({
     return {
       ...base,
       tooltip: {
-        trigger: 'axis',
-        confine: true,
-        borderRadius: 0,
+        ...chartTooltip({ bg: theme.background, border: theme.border, fg: theme.foreground }),
         className: 'chart-tooltip',
-        backgroundColor: theme.background,
-        borderColor: theme.border,
-        textStyle: { color: theme.foreground },
         axisPointer: { type: 'line', lineStyle: { color: theme.muted } },
         formatter: (params: { axisValue: number }[]) => {
           const s = sampleAtX(r.points, x, params[0]?.axisValue ?? 0, system)

@@ -64,37 +64,55 @@ function checkFaceFederations(faces: TargetFace[], lookup: Lookup, errors: strin
   }
 }
 
+type Mapping = Bundle['targetMappings'][number]
+
+/** The face event a mapping names, the face and the mapping's discipline record, if any. */
+type MappedEvent = {
+  face: TargetFace
+  event: TargetFace['events'][number]
+  d: Discipline | undefined
+}
+
 /**
- * A mapping names a known discipline and an event of a known face, listed by the discipline's
- * federation, with the event's gauge; every face event has at most one mapping.
+ * A mapped face event has at most one mapping (`mapped`: face event to mapping id), is listed by the
+ * discipline's federation and has the mapping's gauge.
  */
+function checkMappedEvent(
+  m: Mapping,
+  { face, event, d }: MappedEvent,
+  mapped: Map<string, string>,
+): string[] {
+  const where = `target-mappings/${m.id}.json`
+  const errors: string[] = []
+  const key = `${face.id} ${m.event}`
+  if (mapped.has(key)) errors.push(`${where}: event "${m.event}" is also in ${mapped.get(key)}`)
+  else mapped.set(key, m.id)
+  const listedBy = event.federation ?? face.federation
+  if (d && listedBy && listedBy !== d.federation)
+    errors.push(`${where}: event "${m.event}" is not one of federation "${d.federation}"`)
+  if (m.gauge && event.gauge && m.gauge.value !== event.gauge.value)
+    errors.push(
+      `${where}: gauge ${m.gauge.value} mm differs from the event's ${event.gauge.value} mm`,
+    )
+  return errors
+}
+
+/** A mapping names a known discipline and an event of a known face (see {@link checkMappedEvent}). */
+function checkMapping(m: Mapping, lookup: Lookup, mapped: Map<string, string>): string[] {
+  const where = `target-mappings/${m.id}.json`
+  const d = lookup.disciplines.get(m.discipline)
+  const face = lookup.faces.get(m.face)
+  const errors = d ? [] : [`${where}: unknown discipline "${m.discipline}"`]
+  if (!face) return [...errors, `${where}: unknown face "${m.face}"`]
+  const event = face.events.find((e) => e.id === m.event)
+  if (!event) return [...errors, `${where}: face "${m.face}" has no event "${m.event}"`]
+  return [...errors, ...checkMappedEvent(m, { face, event, d }, mapped)]
+}
+
+/** Every mapping is checked, and every face event has at most one mapping. */
 function checkMappings(mappings: Bundle['targetMappings'], lookup: Lookup, errors: string[]) {
   const mapped = new Map<string, string>()
-  for (const m of mappings) {
-    const where = `target-mappings/${m.id}.json`
-    const d = lookup.disciplines.get(m.discipline)
-    const face = lookup.faces.get(m.face)
-    if (!d) errors.push(`${where}: unknown discipline "${m.discipline}"`)
-    if (!face) {
-      errors.push(`${where}: unknown face "${m.face}"`)
-      continue
-    }
-    const event = face.events.find((e) => e.id === m.event)
-    if (!event) {
-      errors.push(`${where}: face "${m.face}" has no event "${m.event}"`)
-      continue
-    }
-    const key = `${face.id} ${m.event}`
-    if (mapped.has(key)) errors.push(`${where}: event "${m.event}" is also in ${mapped.get(key)}`)
-    else mapped.set(key, m.id)
-    const listedBy = event.federation ?? face.federation
-    if (d && listedBy && listedBy !== d.federation)
-      errors.push(`${where}: event "${m.event}" is not one of federation "${d.federation}"`)
-    if (m.gauge && event.gauge && m.gauge.value !== event.gauge.value)
-      errors.push(
-        `${where}: gauge ${m.gauge.value} mm differs from the event's ${event.gauge.value} mm`,
-      )
-  }
+  for (const m of mappings) errors.push(...checkMapping(m, lookup, mapped))
 }
 
 /**

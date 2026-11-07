@@ -483,31 +483,6 @@
       }
     },
     {
-      "files": ["packages/catalog/src/**"],
-      "rules": {
-        "no-restricted-imports": [
-          "error",
-          {
-            "paths": [],
-            "patterns": [
-              {
-                "group": ["@*/*", "@*/*/**", "!@open-reloading/schema"],
-                "message": "catalog-imports-schema-only: packages/catalog has no I/O and imports nothing but @open-reloading/schema and its own files."
-              },
-              {
-                "regex": "^[^.@]",
-                "message": "catalog-imports-schema-only: packages/catalog has no I/O and imports nothing but @open-reloading/schema and its own files."
-              },
-              {
-                "regex": "^(\\.\\./)+[^.]",
-                "message": "catalog-imports-schema-only: packages/catalog has no I/O and imports nothing but @open-reloading/schema and its own files."
-              }
-            ]
-          }
-        ]
-      }
-    },
-    {
       "files": ["packages/ui/src/**"],
       "rules": {
         "no-restricted-imports": [

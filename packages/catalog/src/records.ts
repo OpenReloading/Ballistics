@@ -139,10 +139,12 @@ function checkRangeRounds(records: RangeFirings[], errors: string[]) {
   }
 }
 
+/** The findings of the record `<dir>/<id>.json`. */
+const located = (dir: string, id: string, findings: { finding: string; message: string }[]) =>
+  findings.map((f) => ({ file: `${dir}/${id}.json`, ...f }))
+
 /** The findings of duplicate names, cases, capacities, powders and sessions; each is an error. */
 function collectFindings(bundle: Bundle, cartridges: Map<string, Cartridge>): LocatedFinding[] {
-  const located = (dir: string, id: string, findings: { finding: string; message: string }[]) =>
-    findings.map((f) => ({ file: `${dir}/${id}.json`, ...f }))
   return [
     ...checkNames(bundle),
     ...bundle.capacities.flatMap((c) =>
@@ -158,6 +160,24 @@ function collectFindings(bundle: Bundle, cartridges: Map<string, Cartridge>): Lo
     ...bundle.powders.flatMap((p) => located('powders', p.id, checkPowder(p))),
     ...bundle.chronoSessions.flatMap((s) => located('chrono', s.id, checkChronoSession(s))),
   ]
+}
+
+/** The references between records: cartridges, manufacturers, range rounds, loads and their parts. */
+function checkReferences(
+  bundle: Bundle,
+  ids: ReturnType<typeof recordIds>,
+  loadTables: LoadTables,
+  errors: string[],
+) {
+  checkCartridgeReferences(bundle, ids, errors)
+  checkManufacturerReferences(bundle, loadTables, ids, errors)
+  checkRangeRounds(bundle.rangeFirings, errors)
+  checkLoadReferences(bundle, ids, errors)
+  checkLoadComponentReferences(bundle, errors)
+  checkLoadPrimerReferences(bundle, errors)
+  checkLoadCapacityReferences(bundle, errors)
+  checkLoadCaseReferences(bundle, ids, errors)
+  checkLoadSessionReferences(bundle, errors)
 }
 
 /** What the checks of {@link checkRecords} take: the records, the published load files and the load tables. */
@@ -192,15 +212,7 @@ export function checkRecords({ bundle, published, loadTables }: RecordsRead): {
   for (const b of bundle.bullets) {
     for (const f of checkBullet(b)) errors.push(`bullets/${b.id}.json: ${f.finding}: ${f.message}`)
   }
-  checkCartridgeReferences(bundle, ids, errors)
-  checkManufacturerReferences(bundle, loadTables, ids, errors)
-  checkRangeRounds(bundle.rangeFirings, errors)
-  checkLoadReferences(bundle, ids, errors)
-  checkLoadComponentReferences(bundle, errors)
-  checkLoadPrimerReferences(bundle, errors)
-  checkLoadCapacityReferences(bundle, errors)
-  checkLoadCaseReferences(bundle, ids, errors)
-  checkLoadSessionReferences(bundle, errors)
+  checkReferences(bundle, ids, loadTables, errors)
   checkPublishedLoads(
     published,
     {

@@ -34,7 +34,7 @@ const cartridge = (id: string, name: string, aliases?: string[]): Cartridge => (
   values: [],
   provenance,
 })
-const manufacturer = (id: string, name: string, aliases?: string[]): Manufacturer => ({
+const manufacturerRecord = (id: string, name: string, aliases?: string[]): Manufacturer => ({
   id,
   name,
   aliases,
@@ -94,6 +94,20 @@ describe('normaliseName', () => {
   })
 })
 
+const face = (id: string, federation: string): TargetFace => ({
+  id,
+  name: '10m Air Rifle Target',
+  federation,
+  rings: [
+    { value: 9, diameter: { value: 5.5 } },
+    { value: 10, diameter: { value: 0.5 } },
+  ],
+  blackDiameter: { value: 30.5 },
+  decimal: true,
+  events: [{ id: 'air-rifle', name: '10m Air Rifle', distance: { value: 10000 } }],
+  provenance,
+})
+
 describe('checkNames', () => {
   it('reports cartridge names and aliases shared by two records, the later file only', () => {
     expect(lines({ cartridges: [cartridge('a', 'A'), cartridge('b', 'B', ['C'])] })).toEqual([])
@@ -126,7 +140,9 @@ describe('checkNames', () => {
   it('ignores a name repeated inside one record', () => {
     expect(lines({ cartridges: [cartridge('a', '22 LR', ['22LR', '22 LR'])] })).toEqual([])
   })
+})
 
+describe('checkNames per manufacturer', () => {
   it('compares powder names per manufacturer and aliases across manufacturers', () => {
     expect(
       lines({ powders: [powder('a', 'M', 'P140', ['O 1']), powder('b', 'O', 'P140', ['M P140'])] }),
@@ -152,11 +168,16 @@ describe('checkNames', () => {
   })
 
   it('compares manufacturer names and aliases across manufacturers', () => {
-    expect(lines({ manufacturers: [manufacturer('a', 'A Co.'), manufacturer('b', 'B')] })).toEqual(
-      [],
-    )
     expect(
-      lines({ manufacturers: [manufacturer('a', 'A Co.', ['Old A']), manufacturer('b', 'Old A')] }),
+      lines({ manufacturers: [manufacturerRecord('a', 'A Co.'), manufacturerRecord('b', 'B')] }),
+    ).toEqual([])
+    expect(
+      lines({
+        manufacturers: [
+          manufacturerRecord('a', 'A Co.', ['Old A']),
+          manufacturerRecord('b', 'Old A'),
+        ],
+      }),
     ).toEqual(['manufacturers/b.json: duplicate-name:Old A'])
   })
 
@@ -166,7 +187,9 @@ describe('checkNames', () => {
       'bullets/b.json: duplicate-name:FMJ',
     ])
   })
+})
 
+describe('checkNames per report and federation', () => {
   it('compares range projectiles per report', () => {
     expect(lines({ rangeFirings: [range('a', 'P', '1'), range('b', 'P', '2')] })).toEqual([])
     expect(lines({ rangeFirings: [range('a', 'P', '1'), range('b', 'P', '1')] })).toEqual([
@@ -183,19 +206,6 @@ describe('checkNames', () => {
   })
 
   it('reports target faces of one federation sharing a name', () => {
-    const face = (id: string, federation: string): TargetFace => ({
-      id,
-      name: '10m Air Rifle Target',
-      federation,
-      rings: [
-        { value: 9, diameter: { value: 5.5 } },
-        { value: 10, diameter: { value: 0.5 } },
-      ],
-      blackDiameter: { value: 30.5 },
-      decimal: true,
-      events: [{ id: 'air-rifle', name: '10m Air Rifle', distance: { value: 10000 } }],
-      provenance,
-    })
     expect(
       lines({ targetFaces: [face('a', 'issf'), face('b', 'issf'), face('c', 'other')] }),
     ).toEqual(['target-faces/b.json: duplicate-name:10m Air Rifle Target'])
