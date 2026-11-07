@@ -23,9 +23,11 @@ COPY --from=ghcr.io/astral-sh/uv:0.12.23@sha256:61d393e44e249f2e4b526b6c7ddcecce
 RUN UV_TOOL_BIN_DIR=/usr/local/bin UV_TOOL_DIR=/opt/uv-tools UV_PYTHON_DOWNLOADS=never UV_NO_CACHE=1 \
   uv tool install schemathesis==4.29.4
 
-# pnpm, the version .github/pnpm/package-lock.json pins for CI (keep both equal), in place of the image's own; the
-# native binary comes as an optional dependency, so no install script runs
-RUN npm rm -g pnpm && npm i -g --ignore-scripts --prefix /usr/local pnpm@12.16.1 && npm cache clean --force
+# pnpm, the version .github/pnpm/package-lock.json pins for CI (keep both equal), in place of the image's own. The
+# native binary comes as an optional dependency; without install scripts the bins stay shebang-less placeholders that
+# fail `exec` (`devcontainer exec ... pnpm`), so pnpm's own install.js, run once, links the binary over them
+RUN npm rm -g pnpm && npm i -g --ignore-scripts --prefix /usr/local pnpm@12.16.1 \
+  && node /usr/local/lib/node_modules/pnpm/install.js && npm cache clean --force
 
 # runtime user: the image's own non-root user (rootless podman keep-id maps the host uid to it)
 USER node

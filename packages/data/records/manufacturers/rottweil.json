@@ -1,6 +1,8 @@
 {
   "id": "rottweil",
   "name": "Rottweil",
+  "country": "DE",
+  "website": "https://rws-ammunition.com/de/infotainment/wiederladen",
   "provenance": {
     "kind": "published",
     "sources": [
@@ -8,7 +10,14 @@
         "source": "rws-reloading-data-page-wiederladen-powder",
         "url": "https://rws-ammunition.com/de/infotainment/wiederladen",
         "retrieved": "2026-10-13",
-        "fields": ["name"]
+        "fields": ["name", "website"]
+      },
+      {
+        "source": "rws-impressum",
+        "url": "https://rws-ammunition.com/de/impressum",
+        "retrieved": "2026-11-06",
+        "fields": ["country"],
+        "note": "Anschrift: RWS GmbH, Kronacher Straße 63, 90765 Fürth, Deutschland. RWS GmbH sells the Rottweil reloading powders on its reloading page."
       }
     ]
   }

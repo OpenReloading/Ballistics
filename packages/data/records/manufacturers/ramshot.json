@@ -1,6 +1,8 @@
 {
   "id": "ramshot",
   "name": "Ramshot",
+  "country": "US",
+  "website": "https://hodgdonpowderco.com/ramshot/",
   "provenance": {
     "kind": "published",
     "sources": [
@@ -9,6 +11,13 @@
         "url": "https://shop.hodgdon.com/ramshot-big-game/",
         "retrieved": "2026-10-13",
         "fields": ["name"]
+      },
+      {
+        "source": "hodgdon-powder-company-locations",
+        "url": "https://hodgdonpowderco.com/locations/",
+        "retrieved": "2026-11-06",
+        "fields": ["country", "website"],
+        "note": "Corporate headquarters: Hodgdon Powder Company, 6430 Vista Drive, Shawnee, KS 66218, United States. ramshot.com redirects to the Ramshot brand page on the same site."
       }
     ]
   }

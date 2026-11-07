@@ -1,6 +1,8 @@
 {
   "id": "sierra",
   "name": "Sierra",
+  "country": "US",
+  "website": "https://sierrabullets.com/",
   "provenance": {
     "kind": "published",
     "sources": [
@@ -9,6 +11,13 @@
         "url": "https://sierrabullets.com/20-cal-32-gr-tipped-varmintking-tvk/",
         "retrieved": "2026-10-08",
         "fields": ["name"]
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country", "website"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
       }
     ]
   }

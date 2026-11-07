@@ -1,12 +1,21 @@
 {
   "id": "imr",
   "name": "IMR",
+  "country": "US",
+  "website": "https://hodgdonpowderco.com/imr/",
   "provenance": {
     "kind": "published",
     "sources": [
       {
         "source": "imr-sds-single-base-powders-february-2022-inner",
         "fields": ["name"]
+      },
+      {
+        "source": "hodgdon-powder-company-locations",
+        "url": "https://hodgdonpowderco.com/locations/",
+        "retrieved": "2026-11-06",
+        "fields": ["country", "website"],
+        "note": "Corporate headquarters: Hodgdon Powder Company, 6430 Vista Drive, Shawnee, KS 66218, United States. imrpowder.com redirects to the IMR brand page on the same site."
       }
     ]
   }
