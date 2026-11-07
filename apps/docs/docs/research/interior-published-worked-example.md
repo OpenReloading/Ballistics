@@ -42,8 +42,8 @@ Public: values printed in a handbook worked example, as held by the test (not re
 
 ## Where in the app
 
-- `packages/core/src/interior/model.ts`, `interior`.
-- `packages/core/test/interior-model.test.ts`, the test "reproduces the values of sheets 1 to 3".
+- `packages/ballistics/src/interior/model.ts`, `interior`.
+- `packages/ballistics/test/interior-model.test.ts`, the test "reproduces the values of sheets 1 to 3".
 - Model page: [M3 interior model](../models/interior-m3.md).
 
 ## Confidence

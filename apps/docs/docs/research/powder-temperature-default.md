@@ -42,7 +42,7 @@ Public. Boulkadid 2016 (as quoted, unverified here) and the Hodgdon 2012 maker t
 
 ## Where in the app
 
-- `packages/core/src/interior/temperature-default.ts`, `defaultSensitivity`, `coldPeakInterval`.
+- `packages/ballistics/src/interior/temperature-default.ts`, `defaultSensitivity`, `coldPeakInterval`.
 - `packages/core/scripts/powder-temperature-default.mts`, the derivation.
 - `apps/web/src/lib/interior-request.ts`, the default in the run.
 - `apps/web/src/components/workbench-outcome.ts`, the notes.

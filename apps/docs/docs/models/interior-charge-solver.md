@@ -23,7 +23,7 @@ L = \frac{m_c}{\rho_b V_c}, \qquad
 t_\text{lead} = t_\text{muzzle} - t_{10}
 $$
 
-Code: `packages/core/src/interior/charge-solver.ts`, `chargeTargetValue`.
+Code: `packages/ballistics/src/interior/charge-solver.ts`, `chargeTargetValue`.
 
 $t_\text{lead}$ is undefined when $t_{10} = 0$ (the breech pressure of the first curve point, the ignition pressure, is at or above 10 % of the peak), and a scanned charge with an undefined or not finite value counts as not valid.
 
@@ -35,7 +35,7 @@ $$
 m_\text{max} = \min\left(\frac{0.999\,V_c}{\max(1/\rho_s,\ \eta)},\ 0.64\,\rho_s V_c\right)
 $$
 
-Code: `packages/core/src/interior/charge-solver.ts`, `chargeUpperBound` (`solidFillLimit`).
+Code: `packages/ballistics/src/interior/charge-solver.ts`, `chargeUpperBound` (`solidFillLimit`).
 
 ### Scan
 
@@ -45,7 +45,7 @@ $$
 m_i = m_\text{max}\,\bigl(10^{-3}\bigr)^{1 - i/31}, \qquad i = 0, \dots, 31
 $$
 
-Code: `packages/core/src/interior/charge-solver.ts`, `scanCharges` (`scanPoints`, `scanSpan`).
+Code: `packages/ballistics/src/interior/charge-solver.ts`, `scanCharges` (`scanPoints`, `scanSpan`).
 
 The lowest and highest values over the valid scanned runs, each with its charge, are the reachable range. Neighbouring valid scan points with values on opposite sides of the target form a bracket. A scanned run already within the tolerance is returned when there is at most one bracket.
 
@@ -57,7 +57,7 @@ $$
 c = \frac{a\,f_b - b\,f_a}{f_b - f_a}
 $$
 
-Code: `packages/core/src/interior/charge-solver.ts`, `illinoisRoot`.
+Code: `packages/ballistics/src/interior/charge-solver.ts`, `illinoisRoot`.
 
 and replaces the end whose $f$ has the sign of $f_c$. When the same end is replaced twice in a row, the function value of the other end is halved. A $c$ outside the open bracket is replaced by the midpoint, and so is a $c$ whose run is not valid. The search stops when
 
@@ -65,7 +65,7 @@ $$
 \lvert y(c) - y^\ast \rvert \le 10^{-6}\,y^\ast
 $$
 
-Code: `packages/core/src/interior/charge-solver.ts`, `within`, `chargeSolverTolerance`.
+Code: `packages/ballistics/src/interior/charge-solver.ts`, `within`, `chargeSolverTolerance`.
 
 or after 60 iterations. An iteration runs `interior` twice where the false-position charge gives no valid run, so a call makes at most $32 + 2 \cdot 60$ runs (`chargeSolverMaxRuns`).
 

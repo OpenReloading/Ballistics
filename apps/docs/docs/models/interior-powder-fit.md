@@ -24,7 +24,7 @@ m_i = m_0 \pm i\,\Delta m, \qquad
 m_i = m_0 + \Bigl(i - \frac{N - 1}{2}\Bigr)\Delta m, \qquad i = 0, \dots, N - 1
 $$
 
-Code: `packages/core/src/interior/ladder.ts`, `chargeLadder`.
+Code: `packages/ballistics/src/interior/ladder.ts`, `chargeLadder`.
 
 Each charge is a product, not a running sum. Every charge must be above 0.
 

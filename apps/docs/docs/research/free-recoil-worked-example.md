@@ -39,8 +39,8 @@ Public: a worked example of a published standard. The printed values are quoted 
 
 ## Where in the app
 
-- `packages/core/src/recoil.ts`, `freeRecoil`.
-- `packages/core/test/recoil.test.ts`, the test "reproduces the SAAMI worked example in SI".
+- `packages/ballistics/src/recoil.ts`, `freeRecoil`.
+- `packages/ballistics/test/recoil.test.ts`, the test "reproduces the SAAMI worked example in SI".
 - Model page: [free recoil](../models/free-recoil.md).
 
 ## Confidence
