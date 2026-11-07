@@ -1,6 +1,6 @@
 import 'fake-indexeddb/auto'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
-import { inStore } from '../src/lib/user-db.ts'
+import { deleteDatabase, inStore } from '../src/lib/user-db.ts'
 import { deleteUserDb } from './user-db-reset.ts'
 
 beforeEach(deleteUserDb)
@@ -35,6 +35,26 @@ it('rejects a request the store refuses, and the write it was part of', async ()
   await inStore('records', 'readwrite', (s) => s.put({ id: 'r1' }))
   await expect(inStore('records', 'readwrite', (s) => s.add({ id: 'r1' }))).rejects.toThrow()
   await expect(inStore('records', 'readonly', (s) => s.count())).resolves.toBe(1)
+})
+
+it('refuses a database of a pre-release version, which deleteDatabase removes', async () => {
+  const fired: string[] = []
+  vi.stubGlobal('dispatchEvent', (e: Event) => fired.push(e.type))
+  await new Promise<void>((resolve, reject) => {
+    const r = indexedDB.open('openreloading-user-data', 2)
+    r.onupgradeneeded = () => r.result.createObjectStore('records', { keyPath: 'id' })
+    r.onsuccess = () => {
+      r.result.close()
+      resolve()
+    }
+    r.onerror = () => reject(r.error)
+  })
+  await expect(inStore('records', 'readonly', (s) => s.count())).rejects.toMatchObject({
+    name: 'VersionError',
+  })
+  expect(fired).toEqual(['user-db-refused'])
+  await deleteDatabase()
+  await expect(inStore('records', 'readonly', (s) => s.count())).resolves.toBe(0)
 })
 
 it('opens again with every store after another tab deleted the database', async () => {

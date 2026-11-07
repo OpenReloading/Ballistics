@@ -1,0 +1,34 @@
+'use client'
+
+import { useEffect, useRef } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import { deleteDatabase, refusedEvent } from '../lib/user-db.ts'
+import { confirmDialog } from './confirm.tsx'
+
+/**
+ * Offers to delete the browser's database of a pre-release version, which this version refuses
+ * (`refusedEvent`): asked once per page load; Delete reloads the page with an empty database.
+ */
+export function PreReleaseData() {
+  const { t } = useTranslation()
+  const asked = useRef(false)
+  useEffect(() => {
+    const ask = async () => {
+      if (asked.current) return
+      asked.current = true
+      const ok = await confirmDialog({
+        title: t('Data of a pre-release version'),
+        message: t(
+          'This browser holds data of a pre-release version of the app, which this version does not read. Delete it to save records in this browser again.',
+        ),
+        confirmLabel: t('Delete'),
+        danger: true,
+      })
+      // a failed delete asks again after the reload
+      if (ok) void deleteDatabase().finally(() => location.reload())
+    }
+    window.addEventListener(refusedEvent, ask)
+    return () => window.removeEventListener(refusedEvent, ask)
+  }, [t])
+  return null
+}
