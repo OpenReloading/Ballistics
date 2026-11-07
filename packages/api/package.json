@@ -9,6 +9,10 @@
       "types": "./dist/openapi.d.ts",
       "default": "./dist/openapi.js"
     },
+    "./advisories": {
+      "types": "./dist/compute/advisory-text.d.ts",
+      "default": "./dist/compute/advisory-text.js"
+    },
     "./compute": {
       "types": "./dist/compute/browser.d.ts",
       "default": "./dist/compute/browser.js"

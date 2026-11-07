@@ -1,10 +1,6 @@
-import {
-  advisoryRules,
-  fillLoadRatioLimit,
-  loadRatio,
-  solidFill,
-  solidFillLimit,
-} from '@open-reloading/core'
+// the words alone: the compute entry would pull its schemas into the workbench
+import { advisoryText } from '@open-reloading/api/advisories'
+import { fillLoadRatioLimit, loadRatio, solidFill, solidFillLimit } from '@open-reloading/core'
 import { fromSi, sheetId, toSi } from '@open-reloading/schema'
 import { formatNumber } from '../i18n/number.ts'
 import { msg, type Say, type Translator } from '../i18n/translate.ts'
@@ -116,7 +112,7 @@ export const statusText = (status: Status, line: string | undefined, t: Translat
 
 /** The short name of a warning code from the advisory registry, in the language of `t`. */
 function ruleName(code: string, t: Translator['t']) {
-  const name = advisoryRules.find((r) => r.id === code)?.name
+  const name = Object.entries(advisoryText).find(([id]) => id === code)?.[1].name
   return name && translateMessage(name, t)
 }
 

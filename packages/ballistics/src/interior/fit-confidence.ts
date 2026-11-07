@@ -7,6 +7,7 @@
  */
 
 import { need, nth } from '@open-reloading/statistics'
+import type { Complete } from '../key-list.ts'
 import {
   fitPowder,
   type LadderPoint,
@@ -217,7 +218,22 @@ const shifts: Record<PowderInput, Shift> = {
   },
 }
 
-const inputNames = Object.keys(shifts).filter((k): k is PowderInput => k in shifts)
+// in the order of `shifts`, which is the order of the contributions
+const inputList = [
+  'caseCapacity',
+  'propellantEnergy',
+  'startPressure',
+  'boreFriction',
+  'propellantTemperature',
+  'ignitionPressure',
+  'gamma',
+  'covolume',
+  'bulletMass',
+] as const satisfies readonly PowderInput[]
+const inputNames: readonly PowderInput[] = inputList satisfies Complete<
+  PowderInput,
+  typeof inputList
+>
 
 const pointKey = (p: PowderRangePoint) => `${p.charge} ${p.barrelLength} ${p.propellantTemperature}`
 

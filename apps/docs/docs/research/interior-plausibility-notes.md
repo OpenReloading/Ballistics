@@ -53,7 +53,7 @@ Measured: 57,536 printed load rows and the powder fits that are not in the repos
 
 - `packages/ballistics/src/interior/model.ts`, `interior` (`efficiency`, `maxMeanPressure`, the `stall` event).
 - `packages/ballistics/test/interior-model.test.ts`, the test "a projectile that slows before the muzzle without stopping is a valid run".
-- `packages/core/test/fixtures.ts`, `m3Load`.
+- `packages/ballistics/test/fixtures.ts`, `m3Load`.
 - Model pages: [M3 interior model](../models/interior-m3.md), [powder fit](../models/interior-powder-fit.md).
 
 ## Confidence

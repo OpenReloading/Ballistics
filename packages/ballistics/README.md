@@ -1,6 +1,6 @@
 # @open-reloading/ballistics
 
-The ballistics models in SI: the M3 interior model with its load records and load files, the charge solver, tolerance ranges, ladders, the Monte Carlo band, recoil and the powder and pressure-curve fits; the ICAO standard atmosphere and measured air, the G1 to GS drag tables with their interpolation and the drag estimate from a bullet outline, the point mass and modified point mass trajectory with its zero, gyroscopic stability, spin drift and aerodynamic jump, the truing of the muzzle velocity and drag, range strings, and the RK45 integrator they run on. It depends on `@open-reloading/units` and `@open-reloading/statistics` only. Private to this repository: it is not published.
+The ballistics models in SI: the M3 interior model with its load records and load files, the charge solver, tolerance ranges, ladders, the Monte Carlo band, recoil, the powder and pressure-curve fits and the advisory registry; the ICAO standard atmosphere and measured air, the G1 to GS drag tables with their interpolation and the drag estimate from a bullet outline, the point mass and modified point mass trajectory with its zero, gyroscopic stability, spin drift and aerodynamic jump, the truing of the muzzle velocity and drag, range strings, and the RK45 integrator they run on. It depends on `@open-reloading/units` and `@open-reloading/statistics` only. Private to this repository: it is not published.
 
 ```js
 import { millerStability, speedOfSound, standardAtmosphere } from '@open-reloading/ballistics'

@@ -42,8 +42,9 @@ type ErrorAnswer = { status: number; body: Record<string, unknown>; retryAfter?:
 /**
  * The answer of a compute error: 503 for a compute deadline (`timeout`) or a full pool (`busy`,
  * with `retryAfter`), 400 with `issues` for a zod error, 422 for an `InputError`, with the
- * `TruingError` fields where `truingDetails` is set. `withNotice` adds the notice (a `TruingError`
- * answer never has it). Undefined for any other error.
+ * `TruingError` fields where `truingDetails` is set and with the `code` and `params` of a typed
+ * refusal. `withNotice` adds the notice (a `TruingError` answer never has it). Undefined for any
+ * other error.
  */
 export function errorAnswer(
   error: unknown,
@@ -87,8 +88,11 @@ export function errorAnswer(
       },
     }
   }
-  if (error instanceof InputError)
-    return { status: 422, body: { ...unprocessable, message: error.message, ...extra } }
+  if (error instanceof InputError) {
+    const { issue } = error
+    const typed = issue === undefined ? {} : { code: issue.code, params: issue.params }
+    return { status: 422, body: { ...unprocessable, message: error.message, ...typed, ...extra } }
+  }
   return undefined
 }
 
