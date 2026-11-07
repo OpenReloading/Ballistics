@@ -32,7 +32,7 @@ test('a bullet list filtered by tip and base narrows the list, survives a reload
   await expect(count).toHaveText(/^\d[\d,]* of [\d,]+ bullets$/)
 
   await filters.getByRole('button', { name: 'Construction', exact: true }).click()
-  await expect(page.getByRole('checkbox', { name: /^Lead core\s*\d+$/ })).toBeVisible()
+  await expect(page.getByRole('checkbox', { name: /^Cup and core\s*\d+$/ })).toBeVisible()
   await page.keyboard.press('Escape')
   await filters.getByRole('button', { name: 'Clear all' }).click()
   await expect(page).not.toHaveURL(/tip=|base=/)
