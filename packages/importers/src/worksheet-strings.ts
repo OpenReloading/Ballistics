@@ -1,5 +1,6 @@
 // The import step shared by the workbook parsers: one string per worksheet, kept by date.
 import type { ChronoShot } from '@open-reloading/schema'
+import { type ChronoDiagnostic, refuse } from './diagnostics.ts'
 import type { ChronoParserOptions } from './result.ts'
 
 /**
@@ -24,9 +25,9 @@ export interface FoundWorksheet {
   /** Position in the workbook, from 1. */
   position: number
   date?: string
-  dateWarning?: string
+  dateWarning?: ChronoDiagnostic
   /** The string, or undefined when the worksheet holds no shot row. */
-  read: (warnings: string[]) => WorksheetString | undefined
+  read: (warnings: ChronoDiagnostic[]) => WorksheetString | undefined
 }
 
 /** The distinct dates of the worksheets, ascending. */
@@ -40,12 +41,10 @@ function warnDate(
   f: FoundWorksheet,
   options: WorkbookOptions,
   fill: boolean,
-  warnings: string[],
+  warnings: ChronoDiagnostic[],
 ): void {
   if (options.date && !fill && !f.date) {
-    warnings.push(
-      `worksheet ${f.position}: no date read; ${options.date} taken from the date option`,
-    )
+    warnings.push({ code: 'dateFromOption', params: { worksheet: f.position, date: options.date } })
   } else if (!fill && f.dateWarning && !warnings.includes(f.dateWarning)) {
     warnings.push(f.dateWarning)
   }
@@ -60,7 +59,7 @@ function warnDate(
 export function collectWorksheetStrings(
   found: FoundWorksheet[],
   options: WorkbookOptions,
-  warnings: string[],
+  warnings: ChronoDiagnostic[],
 ): { strings: { shots: ChronoShot[] }[]; labels: string[]; flags: string[]; date?: string } {
   const fill = options.date !== undefined && found.every((f) => !f.date)
   const kept = options.date ? found.filter((f) => !f.date || f.date === options.date) : found
@@ -73,7 +72,7 @@ export function collectWorksheetStrings(
     warnDate(f, options, fill, warnings)
     const s = f.read(warnings)
     if (!s) {
-      warnings.push(`worksheet ${f.position}: no shot rows; skipped`)
+      warnings.push({ code: 'noShotRows', params: { worksheet: f.position } })
       continue
     }
     strings.push({ shots: s.shots })
@@ -87,11 +86,9 @@ export function collectWorksheetStrings(
 
 /** Refuses a `date` option that no worksheet has while some worksheet has a date (`fill` unset). */
 function checkDateOption(found: FoundWorksheet[], date: string | undefined, fill: boolean): void {
-  if (date && !fill && !found.some((f) => f.date === date)) {
-    throw new Error(
-      `no string on ${date}; dates in the file: ${datesOf(found).join(', ') || 'none'}`,
-    )
-  }
+  // `fill` is unset, so some worksheet has a date and the list is never empty
+  if (date && !fill && !found.some((f) => f.date === date))
+    refuse('noStringOnDate', { date, dates: datesOf(found) })
 }
 
 /**
@@ -101,14 +98,10 @@ function checkDateOption(found: FoundWorksheet[], date: string | undefined, fill
 function commonDate(
   read: FoundWorksheet[],
   option: string | undefined,
-  warnings: string[],
+  warnings: ChronoDiagnostic[],
 ): string | undefined {
   const dates = datesOf(read)
-  if (dates.length > 1) {
-    warnings.push(
-      `strings from several days (${dates.join(', ')}); enter the date, or import one day with the date option`,
-    )
-  }
+  if (dates.length > 1) warnings.push({ code: 'severalDays', params: { dates } })
   return (
     option || (dates.length === 1 && read.every((f) => f.date === dates[0]) ? dates[0] : undefined)
   )

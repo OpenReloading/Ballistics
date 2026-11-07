@@ -1,4 +1,5 @@
 import type { Workbook } from './cells.ts'
+import { refuse } from './diagnostics.ts'
 import { type DelimitedOptions, parseDelimited } from './generic.ts'
 import { isOpenReloadingJson, parseOpenReloadingJson } from './openreloading-json.ts'
 import type { ChronoImport, ChronoParserOptions } from './result.ts'
@@ -13,7 +14,8 @@ import { splitLines } from './text.ts'
 
 export type { Workbook, Worksheet } from './cells.ts'
 export { readCsrLoad } from './csrload.ts'
-export type { Candidate, ReaderDiagnostic } from './diagnostics.ts'
+export type { Candidate, ChronoDiagnostic, ReaderDiagnostic } from './diagnostics.ts'
+export { ReaderError } from './diagnostics.ts'
 export type { Column, ColumnMap, DelimitedOptions, Delimiter } from './generic.ts'
 export { parseDelimited } from './generic.ts'
 export type { GrtLoadRead, LoadDiagnostic } from './grtload.ts'
@@ -162,7 +164,7 @@ const formats: readonly [
     /** Parses delimited text with the column mapping in `columns`; throws without it. */
     parse: (text: string, options: ParseChronoOptions) => {
       const { columns, delimiter, skipRows, device } = options
-      if (!columns) throw new Error('the delimited format needs a column mapping')
+      if (!columns) refuse('needsColumnMapping')
       return parseDelimited(text, {
         ...withoutFormatOptions(options),
         columns,
@@ -232,9 +234,9 @@ export function parseChrono(
   const f = chronoFormats.find((c) => c.id === id)
   if (!f) return null
   if (f.reads === 'text') {
-    if (!text) throw new Error(`${f.id} reads text files; this file is a workbook`)
+    if (!text) refuse('readsText', { format: f.id })
     return f.parse(input, options)
   }
-  if (text) throw new Error(`${f.id} reads workbooks; this file is text`)
+  if (text) refuse('readsWorkbooks', { format: f.id })
   return f.parse(input, options)
 }

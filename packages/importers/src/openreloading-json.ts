@@ -1,4 +1,5 @@
 import type { ChronoShot } from '@open-reloading/schema'
+import { type ChronoDiagnostic, refuse } from './diagnostics.ts'
 import {
   buildChronoImport,
   type ChronoImport,
@@ -36,8 +37,9 @@ export function isOpenReloadingJson(text: string): boolean {
   return isObj(root) && root['format'] === sessionJsonFormat
 }
 
-function fail(path: string, what: string): never {
-  throw new Error(`${path}: ${what}`)
+/** Refuses the member at `path` with `code`. */
+function fail(path: string, code: ChronoDiagnostic['code']): never {
+  refuse(code, { path })
 }
 
 /** A finite positive number of the object member `key`, or undefined when absent. */
@@ -45,7 +47,7 @@ function positive(o: Obj, key: string, path: string): number | undefined {
   const v = o[key]
   if (v === undefined) return undefined
   if (typeof v !== 'number' || !Number.isFinite(v) || v <= 0)
-    fail(`${path}.${key}`, 'must be a positive number')
+    fail(`${path}.${key}`, 'memberNotPositive')
   return v
 }
 
@@ -53,7 +55,7 @@ function positive(o: Obj, key: string, path: string): number | undefined {
 function optionalText(o: Obj, key: string, path: string): string | undefined {
   const v = o[key]
   if (v === undefined) return undefined
-  if (typeof v !== 'string' || v === '') fail(path, 'must be text')
+  if (typeof v !== 'string' || v === '') fail(path, 'memberNotText')
   return v
 }
 
@@ -63,9 +65,9 @@ const isDeviceKind = (x: unknown): x is (typeof deviceKinds)[number] =>
 /** The `device` member: kind (default `other`), manufacturer name and model as non-empty text when present. */
 function readDevice(root: Obj): SessionCandidate['device'] {
   const dev = root['device'] === undefined ? {} : root['device']
-  if (!isObj(dev)) fail('device', 'must be an object')
+  if (!isObj(dev)) fail('device', 'memberNotObject')
   const kind = dev['kind'] === undefined ? 'other' : dev['kind']
-  if (!isDeviceKind(kind)) fail('device.kind', `must be one of ${deviceKinds.join(', ')}`)
+  if (!isDeviceKind(kind)) refuse('memberNotDeviceKind', { path: 'device.kind', kinds: deviceKinds })
   return {
     kind,
     manufacturerName: optionalText(dev, 'manufacturerName', 'device.manufacturerName'),
@@ -75,17 +77,17 @@ function readDevice(root: Obj): SessionCandidate['device'] {
 
 /** One shot at the member path `p`: velocity in m/s required, `coldBore` and `excluded` optional. */
 function readShot(shot: unknown, p: string): ChronoShot {
-  if (!isObj(shot)) fail(p, 'must be an object')
+  if (!isObj(shot)) fail(p, 'memberNotObject')
   const v = positive(shot, 'velocity', p)
-  if (v === undefined) fail(`${p}.velocity`, 'is required, in m/s')
+  if (v === undefined) fail(`${p}.velocity`, 'velocityRequired')
   const out: ChronoShot = { velocity: { value: v, raw: `${v} m/s` } }
   if (shot['coldBore'] !== undefined) {
-    if (typeof shot['coldBore'] !== 'boolean') fail(`${p}.coldBore`, 'must be true or false')
+    if (typeof shot['coldBore'] !== 'boolean') fail(`${p}.coldBore`, 'memberNotBoolean')
     if (shot['coldBore']) out.coldBore = true
   }
   if (shot['excluded'] !== undefined) {
     if (typeof shot['excluded'] !== 'string' || shot['excluded'] === '')
-      fail(`${p}.excluded`, 'must be the reason as text')
+      fail(`${p}.excluded`, 'excludedNotText')
     out.excluded = shot['excluded']
   }
   return out
@@ -97,16 +99,16 @@ function readStrings(root: Obj): {
   labels: (string | undefined)[]
 } {
   if (!Array.isArray(root['strings']) || root['strings'].length === 0)
-    fail('strings', 'must list at least one string')
+    fail('strings', 'noStrings')
   const labels: (string | undefined)[] = []
   const strings = (root['strings'] as unknown[]).map((s, i) => {
     const at = `strings[${i}]`
-    if (!isObj(s)) fail(at, 'must be an object')
+    if (!isObj(s)) fail(at, 'memberNotObject')
     if (s['label'] !== undefined && typeof s['label'] !== 'string')
-      fail(`${at}.label`, 'must be text')
+      fail(`${at}.label`, 'memberNotText')
     labels.push(s['label'] || undefined)
     if (!Array.isArray(s['shots']) || s['shots'].length === 0)
-      fail(`${at}.shots`, 'must list at least one shot')
+      fail(`${at}.shots`, 'noStringShots')
     const shots = (s['shots'] as unknown[]).map((raw, j) => readShot(raw, `${at}.shots[${j}]`))
     return { shots }
   })
@@ -117,7 +119,7 @@ function readStrings(root: Obj): {
 function readDate(root: Obj): string | undefined {
   if (root['date'] === undefined) return undefined
   const date = typeof root['date'] === 'string' ? yearFirstDate(root['date']) : undefined
-  if (!date) fail('date', 'must be a date as YYYY-MM-DD')
+  if (!date) fail('date', 'memberNotDate')
   return date
 }
 
@@ -136,12 +138,9 @@ export function parseOpenReloadingJson(
 ): ChronoImport {
   const root = parse(text)
   if (!isObj(root) || root['format'] !== sessionJsonFormat)
-    throw new Error(
-      `not an OpenReloading session JSON file: "format" must be "${sessionJsonFormat}"`,
-    )
-  if (root['version'] !== 1)
-    throw new Error(`version ${String(root['version'])} is not supported; expected 1`)
-  const warnings: string[] = []
+    refuse('notSessionJson', { format: sessionJsonFormat })
+  if (root['version'] !== 1) refuse('versionUnsupported', { version: String(root['version']) })
+  const warnings: ChronoDiagnostic[] = []
   const date = readDate(root)
   const device = readDevice(root)
   const distance = positive(root, 'muzzleDistance', '')

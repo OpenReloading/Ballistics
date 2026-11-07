@@ -3,6 +3,7 @@ import { parseDelimited, parseOpenReloadingCsv } from '../src/index.ts'
 import { splitDelimited } from '../src/text.ts'
 import { complete } from './complete.ts'
 import { template } from './fixtures.ts'
+import { refusal } from './refusal.ts'
 
 const values = (r: ReturnType<typeof parseDelimited>) =>
   r.session.strings.map((s) => s.shots.map((shot) => shot.velocity.value))
@@ -16,9 +17,11 @@ describe('splitDelimited', () => {
 
   it('keeps text after a closing quote', () => {
     expect(splitDelimited('"a" x,b')).toEqual(['a x', 'b'])
-    expect(() =>
-      parseDelimited('v,n\n"812" 5,a', { columns: { velocity: 'v' }, velocityUnit: 'm/s' }),
-    ).toThrow('row 2: velocity "812 5" is not a number')
+    expect(
+      refusal(() =>
+        parseDelimited('v,n\n"812" 5,a', { columns: { velocity: 'v' }, velocityUnit: 'm/s' }),
+      ),
+    ).toEqual({ code: 'velocityNotNumber', params: { cell: '812 5', row: 2 } })
   })
 })
 
@@ -99,9 +102,7 @@ describe('parseDelimited: the header row, skipped rows and string labels', () =>
     })
     expect(values(r)).toEqual([[800, 801], [810], [802]])
     expect(r.stringLabels).toEqual(['A', 'B', 'A'])
-    expect(r.warnings).toContain(
-      'row 4: string "A" returns after another string; read as a new string',
-    )
+    expect(r.warnings).toContainEqual({ code: 'stringReturns', params: { row: 4, label: 'A' } })
   })
 })
 
@@ -140,7 +141,7 @@ describe('parseDelimited: cold bore and excluded shots', () => {
         columns: { velocity: 'v', coldBore: 'cold' },
         velocityUnit: 'm/s',
       }),
-    ).toThrow(/^row 2: coldBore "maybe"/)
+    ).toMatchObject({ code: 'coldBoreUnknown', params: { row: 2, text: 'maybe' } })
   })
 })
 
@@ -152,59 +153,79 @@ describe('parseDelimited: rows it skips or refuses', () => {
       velocityUnit: 'm/s',
     })
     expect(values(r)).toEqual([[800, 801]])
-    expect(r.warnings).toContain('row 2: no velocity; skipped')
-    expect(() =>
-      parseDelimited('800\nfast', { columns: { velocity: 1 }, velocityUnit: 'm/s' }),
-    ).toThrow('row 2: velocity "fast" is not a number')
-    expect(() =>
-      parseDelimited('800\n-1', { columns: { velocity: 1 }, velocityUnit: 'm/s' }),
-    ).toThrow(/not positive/)
+    expect(r.warnings).toContainEqual({ code: 'noVelocity', params: { row: 2 } })
+    expect(
+      refusal(() =>
+        parseDelimited('800\nfast', { columns: { velocity: 1 }, velocityUnit: 'm/s' }),
+      ),
+    ).toEqual({ code: 'velocityNotNumber', params: { cell: 'fast', row: 2 } })
+    expect(
+      refusal(() => parseDelimited('800\n-1', { columns: { velocity: 1 }, velocityUnit: 'm/s' })),
+    ).toEqual({ code: 'velocityNotPositive', params: { cell: '-1', row: 2 } })
   })
 
   it.each(['1e999', '-1e999', '9'.repeat(400)])(
     'throws on a velocity that is not a finite number: %s',
     (cell) => {
-      expect(() =>
-        parseDelimited(`800\n${cell}`, { columns: { velocity: 1 }, velocityUnit: 'm/s' }),
-      ).toThrow(`row 2: velocity "${cell}" is not a number`)
+      expect(
+        refusal(() =>
+          parseDelimited(`800\n${cell}`, { columns: { velocity: 1 }, velocityUnit: 'm/s' }),
+        ),
+      ).toEqual({ code: 'velocityNotNumber', params: { cell, row: 2 } })
     },
   )
 
   it('throws on ambiguous commas and uneven rows', () => {
     const opts = { columns: { velocity: 1 }, velocityUnit: 'm/s' } as const
-    expect(() => parseDelimited('812,5\n813,0', opts)).toThrow(/name the delimiter/)
-    expect(() =>
-      parseDelimited('v\n812,5\n813,0', { ...opts, columns: { velocity: 'v' } }),
-    ).toThrow('row 2: 2 cells, the header has 1; an unquoted comma inside a cell')
-    expect(() => parseDelimited('v\nA,B\n813', { ...opts, columns: { velocity: 'v' } })).toThrow(
-      'row 2: 2 cells, the header has 1',
-    )
-    expect(() => parseDelimited('A,2800\n2810', { ...opts, columns: { velocity: 2 } })).toThrow(
-      'row 2: 1 cells, row 1 has 2',
-    )
+    const cut = { remedy: 'nameDelimiter' }
+    expect(refusal(() => parseDelimited('812,5\n813,0', opts))).toEqual({
+      code: 'commaMayCutVelocity',
+      params: { row: 1, cells: '812,5', ...cut },
+    })
+    expect(
+      refusal(() => parseDelimited('v\n812,5\n813,0', { ...opts, columns: { velocity: 'v' } })),
+    ).toEqual({ code: 'moreCellsThanHeaderComma', params: { row: 2, cells: 2, header: 1, ...cut } })
+    expect(
+      refusal(() => parseDelimited('v\nA,B\n813', { ...opts, columns: { velocity: 'v' } })),
+    ).toEqual({ code: 'moreCellsThanHeaderComma', params: { row: 2, cells: 2, header: 1, ...cut } })
+    expect(
+      refusal(() => parseDelimited('v\nA;B\n813', { ...opts, columns: { velocity: 'v' } })),
+    ).toEqual({ code: 'moreCellsThanHeader', params: { row: 2, cells: 2, header: 1 } })
+    expect(
+      refusal(() => parseDelimited('A,2800\n2810', { ...opts, columns: { velocity: 2 } })),
+    ).toEqual({ code: 'cellCountDiffers', params: { row: 2, cells: 1, firstRow: 1, firstCells: 2 } })
     expect(values(parseDelimited('812,5\n813,0', { ...opts, delimiter: 'none' }))).toEqual([
       [812.5, 813],
     ])
     // a one-column paste with some decimal commas names the remedy, not the cell count
-    expect(() => parseDelimited('810\n812,5\n809,8', opts)).toThrow(
-      'row 2: "812,5" may be one velocity',
-    )
+    expect(refusal(() => parseDelimited('810\n812,5\n809,8', opts))).toEqual({
+      code: 'commaMayCutVelocity',
+      params: { row: 2, cells: '812,5', ...cut },
+    })
   })
 })
 
 describe('parseDelimited: a detected comma that may cut a velocity without a header', () => {
   it('refuses a detected comma that may cut a velocity with decimals or thousands', () => {
     const fps = { columns: { velocity: 1 }, velocityUnit: 'ft/s' } as const
-    expect(() => parseDelimited('2,800.0\n2,810.5\n2,795.0\n', fps)).toThrow(
-      'row 1: "2,800.0" may be one velocity',
+    const cut = (row: number, cells: string) => ({
+      code: 'commaMayCutVelocity',
+      params: { row, cells, remedy: 'nameDelimiter' },
+    })
+    expect(refusal(() => parseDelimited('2,800.0\n2,810.5\n2,795.0\n', fps))).toEqual(
+      cut(1, '2,800.0'),
     )
-    expect(() => parseDelimited('2,800\n2,810\n2,805.5', fps)).toThrow(/name the delimiter/)
-    expect(() =>
-      parseDelimited('A,2,800\nA,2,810', { ...fps, columns: { string: 1, velocity: 2 } }),
-    ).toThrow('row 1: "2,800" may be one velocity')
-    expect(() =>
-      parseDelimited('A,812,5\nA,813,0', { ...fps, columns: { string: 1, velocity: 2 } }),
-    ).toThrow('row 1: "812,5" may be one velocity')
+    expect(refusal(() => parseDelimited('2,800\n2,810\n2,805.5', fps))).toEqual(cut(1, '2,800'))
+    expect(
+      refusal(() =>
+        parseDelimited('A,2,800\nA,2,810', { ...fps, columns: { string: 1, velocity: 2 } }),
+      ),
+    ).toEqual(cut(1, '2,800'))
+    expect(
+      refusal(() =>
+        parseDelimited('A,812,5\nA,813,0', { ...fps, columns: { string: 1, velocity: 2 } }),
+      ),
+    ).toEqual(cut(1, '812,5'))
     const r = parseDelimited('A,2795\nA,2801', { ...fps, columns: { string: 1, velocity: 2 } })
     expect(values(r)).toEqual([[851.916, 853.7448]])
   })
@@ -215,10 +236,13 @@ describe('parseDelimited: a detected comma that may cut a velocity after a heade
     const ms = { columns: { velocity: 'velocity' }, velocityUnit: 'm/s' } as const
     const cut = parseDelimited('velocity,note\n812,5\n810,0', ms)
     expect(values(cut)).toEqual([[812, 810]])
-    expect(cut.warnings).toContain(
-      'rows 2, 3: "812,5" may be a velocity with a decimal comma or a thousands separator split by the delimiter; check the values or name the delimiter',
-    )
-    expect(cut.warnings.filter((w) => w.includes('may be a velocity'))).toHaveLength(1)
+    const split = (w: { code: string }) => w.code === 'commaMaySplit'
+    expect(cut.warnings.filter(split)).toEqual([
+      {
+        code: 'commaMaySplit',
+        params: { rows: ['2', '3'], cells: '812,5', remedy: 'nameDelimiter' },
+      },
+    ])
     expect(values(parseDelimited('velocity,note\n812,5', { ...ms, delimiter: ',' }))).toEqual([
       [812],
     ])
@@ -230,17 +254,15 @@ describe('parseDelimited: a detected comma that may cut a velocity after a heade
     expect(r.session.strings[0]?.shots).toEqual([
       { velocity: { value: 812, raw: '812' }, coldBore: true },
     ])
-    expect(r.warnings.some((w) => w.includes('may be a velocity'))).toBe(false)
+    expect(r.warnings.some(split)).toBe(false)
     const fps = { columns: { velocity: 'velocity' }, velocityUnit: 'ft/s' } as const
-    const w = (t: string) => parseDelimited(t, fps).warnings.find((x) => x.includes('may be'))
-    expect(w('velocity,note\n2,800')).toMatch(/^row 2: "2,800" may be/)
+    const w = (t: string) => parseDelimited(t, fps).warnings.find(split)?.params
+    expect(w('velocity,note\n2,800')).toMatchObject({ rows: ['2'], cells: '2,800' })
     // limits: a thousands group after the velocity and a cut before it are not flagged;
     // the plausibility check reports the first (2 ft/s)
     expect(w('velocity,note\n2,800.0')).toBeUndefined()
     expect(
-      parseDelimited('velocity,note\n2,800.0', fps).warnings.some((x) =>
-        x.includes('outside 30 to 2000 m/s'),
-      ),
+      parseDelimited('velocity,note\n2,800.0', fps).warnings.some((x) => x.code === 'outsideRange'),
     ).toBe(true)
     expect(w('Energy,Velocity,Note\n2,600,2800')).toBeUndefined()
     // an unmapped number of 4 or more digits after an integer velocity is a cell
@@ -253,10 +275,8 @@ describe('parseDelimited: a detected comma that may cut a velocity after a heade
     // a named delimiter silences it
     const shots = 'Velocity,Shot\n2800,1\n2810,2'
     expect(values(parseDelimited(shots, fps))).toEqual([[853.44, 856.488]])
-    expect(w(shots)).toMatch(/^rows 2, 3: "2800,1" may be/)
-    expect(
-      parseDelimited(shots, { ...fps, delimiter: ',' }).warnings.some((x) => x.includes('may be')),
-    ).toBe(false)
+    expect(w(shots)).toMatchObject({ rows: ['2', '3'], cells: '2800,1' })
+    expect(parseDelimited(shots, { ...fps, delimiter: ',' }).warnings.some(split)).toBe(false)
     expect(values(parseDelimited('Shot,Velocity,Energy\n1,1150,450', fps))).toEqual([[350.52]])
   })
 })
@@ -267,9 +287,10 @@ describe('parseDelimited: warnings, the delimiter and skipped rows', () => {
       columns: { velocity: 'Speed' },
       velocityUnit: 'ft/s',
     })
-    expect(r.warnings).toContain(
-      'string 1: shots 4 outside 30 to 2000 m/s; check the unit, the column and statistics rows',
-    )
+    expect(r.warnings).toContainEqual({
+      code: 'outsideRange',
+      params: { string: 1, shots: ['4'], min: 30, max: 2000 },
+    })
   })
 
   it('records a unit named by the caller in the provenance note', () => {
@@ -295,12 +316,14 @@ describe('parseDelimited: warnings, the delimiter and skipped rows', () => {
 
   it('refuses skipRows that is invalid or given with a named column', () => {
     const opts = { columns: { velocity: 'Speed' }, velocityUnit: 'm/s' } as const
-    expect(() => parseDelimited('Speed\n800', { ...opts, skipRows: -3 })).toThrow(
-      /whole number >= 0/,
-    )
-    expect(() => parseDelimited('Speed\n800', { ...opts, skipRows: 1 })).toThrow(
-      /skipRows applies only when every column is a number/,
-    )
+    expect(refusal(() => parseDelimited('Speed\n800', { ...opts, skipRows: -3 }))).toEqual({
+      code: 'skipRowsNotWhole',
+      params: {},
+    })
+    expect(refusal(() => parseDelimited('Speed\n800', { ...opts, skipRows: 1 }))).toEqual({
+      code: 'skipRowsWithHeaderText',
+      params: {},
+    })
   })
 })
 
@@ -328,7 +351,7 @@ describe('parseDelimited: the velocity unit of a header', () => {
       velocityUnit: 'm/s',
     })
     expect(r.session.strings[0]?.shots[0]?.velocity).toEqual({ value: 800, raw: '800' })
-    expect(r.warnings.join()).not.toContain('avg')
+    expect(r.warnings).toEqual([{ code: 'missingUnitNamedByCaller', params: { unit: 'm/s' } }])
     expect(r.velocityUnits).toEqual([{ unit: 'm/s', source: 'caller' }])
   })
 
@@ -346,9 +369,9 @@ describe('parseDelimited: the velocity unit of a header', () => {
     })
     expect(r.session.strings[0]?.shots[0]?.velocity).toEqual({ value: 812, raw: '812' })
     expect(r.velocityUnits).toEqual([{ unit: 'm/s', source: 'caller' }])
-    expect(() => parseDelimited('Velocity\n812', { columns: { velocity: 'velocity' } })).toThrow(
-      'row 2: velocity unit missing',
-    )
+    expect(
+      refusal(() => parseDelimited('Velocity\n812', { columns: { velocity: 'velocity' } })),
+    ).toEqual({ code: 'missingUnit', params: { row: 2 } })
   })
 })
 
@@ -360,31 +383,38 @@ describe('parseDelimited: unit cells and refused columns', () => {
       { value: 853.44, raw: '2800 fps' },
       { value: 856.488, raw: '2810 FPS' },
     ])
-    expect(() => parseDelimited('Speed (fps),unit\n2800,\n857,m/s', { columns })).toThrow(
-      'row 3: velocityUnit "m/s" differs from "fps" in the velocity header "Speed (fps)"',
+    expect(refusal(() => parseDelimited('Speed (fps),unit\n2800,\n857,m/s', { columns }))).toEqual(
+      {
+        code: 'unitCellDiffersFromHeader',
+        params: { cell: 'm/s', token: 'fps', header: 'Speed (fps)', row: 3 },
+      },
     )
   })
 
   it('throws on an unknown header name, a bad column number or a missing unit', () => {
-    expect(() =>
-      parseDelimited('a,b\n1,2', { columns: { velocity: 'speed' }, velocityUnit: 'm/s' }),
-    ).toThrow('no header row holds "speed"')
-    expect(() => parseDelimited('800', { columns: { velocity: 0 }, velocityUnit: 'm/s' })).toThrow(
-      /count from 1/,
-    )
-    expect(() => parseDelimited('800', { columns: { velocity: 1 } })).toThrow(
-      /velocity unit missing/,
-    )
+    expect(
+      refusal(() =>
+        parseDelimited('a,b\n1,2', { columns: { velocity: 'speed' }, velocityUnit: 'm/s' }),
+      ),
+    ).toEqual({ code: 'noHeaderRow', params: { names: ['speed'] } })
+    expect(
+      refusal(() => parseDelimited('800', { columns: { velocity: 0 }, velocityUnit: 'm/s' })),
+    ).toEqual({ code: 'columnBelowOne', params: { column: 'velocity', number: 0 } })
+    expect(refusal(() => parseDelimited('800', { columns: { velocity: 1 } }))).toEqual({
+      code: 'missingUnit',
+      params: { row: 1 },
+    })
   })
 })
 
 describe('parseOpenReloadingCsv', () => {
   it('names the template remedy when a comma splits a cell', () => {
-    expect(() =>
-      parseOpenReloadingCsv('velocity,coldBore\n812,5,1', { velocityUnit: 'm/s' }),
-    ).toThrow(
-      "row 2: 3 cells, the header has 2; an unquoted comma inside a cell (a decimal comma or a thousands separator) splits it: quote the cell or use ';' as the delimiter",
-    )
+    expect(
+      refusal(() => parseOpenReloadingCsv('velocity,coldBore\n812,5,1', { velocityUnit: 'm/s' })),
+    ).toEqual({
+      code: 'moreCellsThanHeaderComma',
+      params: { row: 2, cells: 3, header: 2, remedy: 'quoteOrSemicolon' },
+    })
   })
 
   it('reads the template with labels, cold bore and excluded shots', () => {
@@ -412,9 +442,10 @@ describe('parseOpenReloadingCsv', () => {
   })
 
   it('throws when the first row is not the template header', () => {
-    expect(() => parseOpenReloadingCsv('date,velocity\n2026-03-01,800')).toThrow(
-      'not an OpenReloading CSV template: the first row must name columns from string, velocity, velocityUnit, coldBore, excluded, velocity among them',
-    )
+    expect(refusal(() => parseOpenReloadingCsv('date,velocity\n2026-03-01,800'))).toEqual({
+      code: 'notTemplate',
+      params: { columns: ['string', 'velocity', 'velocityUnit', 'coldBore', 'excluded'] },
+    })
   })
 })
 
@@ -422,11 +453,13 @@ describe('caller unit against the file unit', () => {
   const header = { columns: { velocity: 'Speed (fps)' } }
 
   it('refuses a caller unit that differs from the header token or the template unit cell', () => {
-    expect(() => parseDelimited('Speed (fps)\n1000', { ...header, velocityUnit: 'm/s' })).toThrow(
-      'row 2: velocity unit "fps" (ft/s) in the file differs from m/s named by the caller',
-    )
-    expect(() => parseOpenReloadingCsv(template, { velocityUnit: 'm/s' })).toThrow(
-      'velocity unit "fps" (ft/s) in the file differs from m/s named by the caller',
-    )
+    const differs = { text: 'fps', unit: 'ft/s', caller: 'm/s' }
+    expect(
+      refusal(() => parseDelimited('Speed (fps)\n1000', { ...header, velocityUnit: 'm/s' })),
+    ).toEqual({ code: 'unitDiffersFromCaller', params: { ...differs, row: 2 } })
+    expect(refusal(() => parseOpenReloadingCsv(template, { velocityUnit: 'm/s' }))).toMatchObject({
+      code: 'unitDiffersFromCaller',
+      params: differs,
+    })
   })
 })
