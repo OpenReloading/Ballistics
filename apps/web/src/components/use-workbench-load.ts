@@ -3432,8 +3432,7 @@ export function useWorkbenchState() {
   // a compared powder record without a start pressure of its own runs at the default of its fit
   const fittedStart = withStartPressure(baseSuggestions, { ...startInputs, fittedPowder: true })
     .startPressure?.si
-  // the references the load keeps; one that cannot be written (a design or firearm whose id is no
-  // UUID) leaves what it gives in the load as typed values
+  // the references the load keeps
   const firearmRef = userRefOf(firearm)
   const { cartridgeRef, bulletRef, powderRef } = savedRefsOf(asked, {
     cartridge,

@@ -36,7 +36,7 @@ const grtText = [
 
 const load: UserRecord = {
   kind: 'load',
-  id: 'w1',
+  id: '00000000-0000-4000-8000-0000000000a1',
   name: '308 Win.',
   saved: '2026-10-13T10:00:00.000Z',
   data: { origin: 'user', charge: { value: 2.8 } },

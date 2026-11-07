@@ -11,7 +11,7 @@ const saved = '2026-10-26T10:00:00.000Z'
 /** A firearm of the library with measured bore and groove diameters and freebore, mm. */
 const measuredRifle = {
   kind: 'firearm',
-  id: 'firearm-measured',
+  id: '00000000-0000-4000-8000-0000000000f1',
   name: 'Measured rifle',
   saved,
   data: {

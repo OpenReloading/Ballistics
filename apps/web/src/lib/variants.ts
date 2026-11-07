@@ -268,7 +268,7 @@ export function dropPath(target: Record<string, unknown>, path: string) {
 export const catalogueRef = (idOrRef: string) =>
   parseRef(idOrRef) ? idOrRef : `catalogue:${idOrRef}`
 
-/** The reference to a user record of the browser; undefined for an id that is no UUID, which a reference cannot name. */
+/** The reference to a user record of the browser; undefined for a catalogue id. */
 export const userRef = (id: string) => (userIdRegex.test(id) ? `user:${id}` : undefined)
 
 /** The id of a catalogue record named by a plain id or a `catalogue:` reference; undefined for a user reference. */

@@ -6,6 +6,8 @@ import { loadForm } from './workbench.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
+const landsRifle = '00000000-0000-4000-8000-00000000000a'
+
 const firearm = (id: string, name: string, landsBullet: string) => ({
   kind: 'firearm',
   id,
@@ -37,11 +39,15 @@ test("a firearm's lands contact gives the jump of the bullet it was measured wit
 }) => {
   await gotoHydrated(page, '/firearms')
   await putRecords(page, [
-    firearm('firearm-a', 'Lands rifle', 'catalogue:demo-bullet-168'),
-    firearm('firearm-b', 'Other bullet rifle', 'catalogue:demo-bullet-150'),
+    firearm(landsRifle, 'Lands rifle', 'catalogue:demo-bullet-168'),
+    firearm(
+      '00000000-0000-4000-8000-00000000000b',
+      'Other bullet rifle',
+      'catalogue:demo-bullet-150',
+    ),
   ])
   // the editor shows the contact's lengths and the bullet it names
-  await gotoHydrated(page, '/firearms?record=firearm-a')
+  await gotoHydrated(page, `/firearms?record=${landsRifle}`)
   await expect(page.getByRole('textbox', { name: /^Base to ogive at the lands/ })).toHaveValue('57')
   await expect(page.getByRole('textbox', { name: /^Overall length at the lands/ })).toHaveValue('')
   await expect(page.getByRole('combobox', { name: 'Bullet of the lands contact' })).toHaveAttribute(

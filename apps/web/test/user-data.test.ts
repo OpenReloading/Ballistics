@@ -320,9 +320,9 @@ describe('user data files', () => {
       sheet('00000000-0000-4000-8000-000000007332', 'p2'),
       sheet('00000000-0000-4000-8000-000000007333'),
       sheet('00000000-0000-4000-8000-000000007334'),
-      sheet('s5', 'p3'),
+      sheet('00000000-0000-4000-8000-000000007335', 'p3'),
     ]
-    // p1 replaced, p2 kept, p3 dropped by s3 but still held by s5
+    // p1 replaced, p2 kept, p3 dropped by the third sheet but still held by the fifth
     expect(droppedPhotos(before, after)).toEqual(['p1'])
     expect(droppedPhotos([load, bullet], [])).toEqual([])
   })
