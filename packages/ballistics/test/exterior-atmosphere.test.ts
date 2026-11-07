@@ -5,14 +5,12 @@ import {
   airAt,
   airDensity,
   checkAir,
-  densityAltitude,
-  icao,
   maxDensity,
   minAltitude,
   saturationVapourPressure,
   speedOfSound,
-  standardAtmosphere,
-} from '../src/index.ts'
+} from '../src/exterior/atmosphere.ts'
+import { densityAltitude, icao, standardAtmosphere } from '../src/index.ts'
 
 const rel = (a: number, b: number) => Math.abs(a / b - 1)
 

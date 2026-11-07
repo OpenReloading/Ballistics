@@ -45,7 +45,7 @@ export interface PressureHistory {
  * coefficient (restated at the trace's peak pressure), the form parameter `a` that sets the
  * initial slope of the form function, its transition point `z1` and the pressure exponent.
  */
-export type CurveParameter = 'burnRate' | 'formSlope' | 'transition' | 'exponent'
+type CurveParameter = 'burnRate' | 'formSlope' | 'transition' | 'exponent'
 
 const sensors: readonly PressureSensor[] = ['breech', 'mean', 'base']
 
@@ -79,12 +79,7 @@ export interface CurveFitOptions {
  * Why a parameter is `weak` or `fixed`; `inconsistent`: the exponents of the leave-one-trace-out
  * refits of a joint fit spread wider than its interval.
  */
-export type CurveReason =
-  | 'collinear'
-  | 'imprecise'
-  | 'unresolved'
-  | 'ill-conditioned'
-  | 'inconsistent'
+type CurveReason = 'collinear' | 'imprecise' | 'unresolved' | 'ill-conditioned' | 'inconsistent'
 
 /** Identifiability of one parameter of the curve fit. */
 export interface CurveParameterReport {
@@ -122,7 +117,7 @@ export interface CurveParameterReport {
 }
 
 /** One fitted sample of the trace window. */
-export interface CurveResidual {
+interface CurveResidual {
   /** Time from the 25 % rise of the trace, s. */
   time: number
   /** Measured pressure, Pa. */
@@ -338,7 +333,7 @@ export interface ChargedTrace {
  * which add no pressure range), `narrowPeaks` a highest peak below 1.2 times the lowest, which
  * keeps the exponent's limit at that of one trace.
  */
-export interface CurveWarning {
+interface CurveWarning {
   /** Which check. */
   reason: 'sameCharge' | 'narrowPeaks'
   /** Indices of the traces it names, in input order. */
@@ -348,7 +343,7 @@ export interface CurveWarning {
 }
 
 /** Window and residuals of one trace of a joint fit. */
-export interface TraceResiduals {
+interface TraceResiduals {
   /** Window of the trace, s on the trace's own clock. */
   window: { start: number; end: number }
   /** The samples of the trace in the fit window. */

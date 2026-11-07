@@ -57,7 +57,7 @@ export function recordBoreArea(
 }
 
 /** Oversize above which the C.I.P. limits are taken as not comparable, percent. */
-export const maxOversizePercent = 5
+const maxOversizePercent = 5
 
 /**
  * Bullet oversize over the groove diameter, 100 (G1 - Z) / Z in percent, 0 when negative;

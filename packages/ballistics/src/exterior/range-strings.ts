@@ -132,7 +132,7 @@ export interface RangeStringOptions {
 }
 
 /** Defaults of `RangeStringOptions` for the fields it lists. */
-export interface RangeStringDefaults {
+interface RangeStringDefaults {
   confidenceLevel: 0.95
   maxInflation: 10
   maxRelativeStandardUncertainty: 0.05
@@ -143,7 +143,7 @@ export interface RangeStringDefaults {
 }
 
 /** The values of {@link RangeStringDefaults}. */
-export const rangeStringDefaults: Readonly<RangeStringDefaults> = {
+const rangeStringDefaults: Readonly<RangeStringDefaults> = {
   confidenceLevel: 0.95,
   maxInflation: 10,
   maxRelativeStandardUncertainty: 0.05,
@@ -163,7 +163,7 @@ export const minIntervalScale = 1e-6
  * Rounding step of a row without `rounding`, in the unit of its value
  * (`apps/docs/docs/models/exterior-truing-strings.md`, "Uncertainty of a row").
  */
-export const defaultRounding = { impact: 0, dial: 1, velocity: 0 }
+const defaultRounding = { impact: 0, dial: 1, velocity: 0 }
 
 /** `fit-failed`: the iteration for this parameter failed (`RangeStringFit.failures`). */
 export type WeakReason = 'no-information' | 'collinear' | 'imprecise' | 'fit-failed'

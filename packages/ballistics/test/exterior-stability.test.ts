@@ -3,10 +3,9 @@ import {
   aerodynamicJump,
   dynamicStabilityFactor,
   isStable,
-  millerStability,
-  radPerMoa,
   spinDrift,
-} from '../src/index.ts'
+} from '../src/exterior/stability.ts'
+import { millerStability, radPerMoa } from '../src/index.ts'
 
 const inch = 0.0254
 const base = {

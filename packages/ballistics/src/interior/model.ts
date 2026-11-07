@@ -139,7 +139,7 @@ export function leakFlowFactor(gamma: number, ratio: number): number {
 }
 
 /** Lagrange gradient: gas kinetic energy m_c v^2 / 6, breech pressure p_b (1 + m_c / (2 m_p)). */
-export const lagrangeGradient: { energy: number; breech: number } = { energy: 1 / 3, breech: 1 / 2 }
+const lagrangeGradient: { energy: number; breech: number } = { energy: 1 / 3, breech: 1 / 2 }
 
 /** Integrator tolerances and limits of `interior` and `closedVessel`. */
 export interface InteriorOptions {

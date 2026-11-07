@@ -13,10 +13,10 @@ import {
   recordResistance,
   solidFill,
   solidFillLimit,
-  unknownValueKeys,
   ValueError,
   workbenchValueKeys,
 } from '../src/index.ts'
+import { unknownValueKeys } from '../src/interior/workbench-keys.ts'
 
 const values: Record<string, number> = {
   volume: 3.4e-6,

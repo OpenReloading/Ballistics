@@ -558,7 +558,7 @@ export function trueDrag(
 }
 
 /** One observation's predictions under the two fits of `compareTruingFits`. */
-export interface TruingDifference {
+interface TruingDifference {
   /** Quantity observed. */
   kind: Observation['kind']
   /** Slant range, m. */
