@@ -4,8 +4,10 @@ import { verify } from '../src/commands.ts'
 import type { Metrics, VerifyResult } from '../src/result.ts'
 
 // A release step: reproduces the published results of the validation page on the load rows that are
-// not in the repository. It runs when VALIDATION_ROWS names the rows file, and is skipped otherwise.
+// not in the repository. It runs when VALIDATION_ROWS names the rows file, and is skipped otherwise;
+// BALLISTICS_RECORDS names the records roots of the run, as for the command line.
 const rows = process.env.VALIDATION_ROWS
+const records = process.env.BALLISTICS_RECORDS?.split(':').filter(Boolean) ?? []
 
 const page = readFileSync(
   new URL('../../../apps/docs/docs/models/validation.md', import.meta.url),
@@ -60,7 +62,7 @@ function expectVelocityLine(r: VerifyResult, cells: string[]) {
 
 describe.skipIf(rows === undefined)('published validation results', () => {
   it('reproduces the velocity table and the pressure line of the validation page', async () => {
-    const r = await verify({ rows: rows ?? '', records: [], split: 'validation', final: false })
+    const r = await verify({ rows: rows ?? '', records, split: 'validation', final: false })
     const velocity = table('Median velocity error').filter(
       ([label]) => label === 'All' || label?.startsWith('Family '),
     )

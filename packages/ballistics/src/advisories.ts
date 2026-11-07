@@ -84,9 +84,6 @@ export const advisoryRule: Readonly<Record<AdvisoryId, AdvisoryRule>> = {
   },
 }
 
-/** The rules, in the order the API lists its warning codes. */
-export const advisoryRules: readonly AdvisoryRule[] = advisoryIds.map((id) => advisoryRule[id])
-
 /** The inputs of an interior load that the input rules read. */
 export type AdvisoryLoad = Pick<
   InteriorLoad,

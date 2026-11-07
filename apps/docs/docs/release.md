@@ -69,7 +69,7 @@ The stored and published contracts besides the API each have a committed baselin
 
 ## Validation results
 
-The [results](models/validation.md#results) of the validation page are a local run on load rows that are not in the repository, updated by hand at each release. After the update, `pnpm run build`, then `VALIDATION_ROWS=<rows file> pnpm --filter @open-reloading/cli exec vitest run test/published-validation.test.ts` reruns `verify` on the validation split and checks every velocity line of the page and its pressure line at their printed decimals. Without `VALIDATION_ROWS` the test is skipped, so CI never reads the rows; the command line tests check the arithmetic of the evaluation on synthetic rows.
+The [results](models/validation.md#results) of the validation page are a local run on load rows that are not in the repository, updated by hand at each release. After the update, `pnpm run build`, then `VALIDATION_ROWS=<rows file> BALLISTICS_RECORDS=<records roots> pnpm --filter @open-reloading/cli exec vitest run test/published-validation.test.ts` reruns `verify` on the validation split with the run's records and checks every velocity line of the page and its pressure line at their printed decimals. Without `VALIDATION_ROWS` the test is skipped, so CI never reads the rows; the command line tests check the arithmetic of the evaluation on synthetic rows. No run on the real input has passed it yet: the rows and records of the published run are not yet kept in a form the command line reads, so until they are, the step can fail for its inputs, not for the model.
 
 ## 1.0.0 release
 

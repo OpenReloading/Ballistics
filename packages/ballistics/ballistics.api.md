@@ -30,9 +30,6 @@ export interface AdvisoryRule {
 export const advisoryRule: Readonly<Record<AdvisoryId, AdvisoryRule>>;
 
 // @public
-export const advisoryRules: readonly AdvisoryRule[];
-
-// @public
 export type AdvisorySeverity = 'error' | 'warn' | 'info';
 
 // @public

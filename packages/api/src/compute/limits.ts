@@ -211,9 +211,7 @@ function cartridgeLimits(
     return { limits: [typed], warnings, resolved: echo }
   }
   if (cartridge === undefined) {
-    warnings.push(
-      warning(advisoryRule.noCartridge, 'No cartridge id was given, so no CIP Pmax was checked.'),
-    )
+    warnings.push(warning(advisoryRule.noCartridge, advisoryText.noCartridge.message))
     return { limits: undefined, warnings, resolved: undefined }
   }
   const limits = cartridge.values
