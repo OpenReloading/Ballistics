@@ -568,7 +568,7 @@ function startShifts(
   return traces.map(({ charge, pick, window }) => {
     const start = interior(curveLoad(law, [], [], charge), options.options)
     if (!start.valid) throw new PowderFitError('invalid', { result: start })
-    const risePressure = start.points.map(pick)
+    const risePressure = start.points.map((p) => pick(p))
     return (
       window.start -
       riseTime(
@@ -671,7 +671,12 @@ function evaluateTrace(
     problem.rejected = 'window'
     return null
   }
-  return interpolated(t, run.points.map(pick), times, shift)
+  return interpolated(
+    t,
+    run.points.map((p) => pick(p)),
+    times,
+    shift,
+  )
 }
 
 /** Model pressure at the windows of trace `k`, or of all traces stacked without it. */
