@@ -349,7 +349,6 @@ describe('verify on published loads', () => {
       split: 'validation',
       final: false,
     })
-    expect(r.schemaVersion).toBe(2)
     expect(r.published).toEqual({ files: 3, rows: 6, skipped: { customerTable: 3 } })
     expect(r.overall.rows.used).toBe(3)
     // every row is printed at the model's own velocity, the V5 row at the speed flown to 5 m

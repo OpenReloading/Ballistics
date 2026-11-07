@@ -32,7 +32,7 @@ Analytic: the step response of an elastic gauge.
 
 ## Where in the app
 
-- `packages/core/src/interior/fit.ts`, `MixedPressureBasisError`.
+- `packages/ballistics/src/interior/fit.ts`, `MixedPressureBasisError`.
 - Model page: [powder fit](../models/interior-powder-fit.md).
 
 ## Confidence

@@ -79,8 +79,8 @@ Analytic: synthetic traces from the M3 model, no measured data.
 
 ## Where in the app
 
-- `packages/core/src/interior/curve-fit.ts`, `fitPressureCurves`, `checkSpread`, `refits`, `jackknife`.
-- `packages/core/test/interior-curve-fit.test.ts`.
+- `packages/ballistics/src/interior/curve-fit.ts`, `fitPressureCurves`, `checkSpread`, `refits`, `jackknife`.
+- `packages/ballistics/test/interior-curve-fit.test.ts`.
 - Model page: [burn form and exponent from a pressure-time curve](../models/interior-curve-fit.md).
 
 ## Confidence

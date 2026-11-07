@@ -7,7 +7,7 @@ import {
 } from '@open-reloading/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { load } from '../../../packages/core/test/powder-load.ts'
+import { load } from '../../../packages/ballistics/test/powder-load.ts'
 import {
   reasonTexts,
   refusalTexts,
