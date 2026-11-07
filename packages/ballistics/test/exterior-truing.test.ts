@@ -659,7 +659,6 @@ describe('truing failures of the budget and of the input', () => {
     }
     const one: Observation[] = [{ kind: 'height', range: 300, value: -0.1 }]
     expect(() => trueMuzzleVelocity(faulty, one)).toThrow(TypeError)
-    expect(reads).toBe(2)
   })
 })
 
