@@ -3,7 +3,7 @@
 // Synthetic loads only; every number is a simulation, not load data.
 
 // the generator of the other hit-probability scripts, so the seeds give the same draws
-// shortcut: an import from a sibling package, and ballistics' scripts are not typechecked; drop both when the scripts take the generator of statistics
+// shortcut: an import from a sibling package; drop it when the scripts take the generator of statistics
 import { normals } from '../../shot-groups/scripts/rng.mts'
 import {
   lbPerSqInToKgPerSqM,
