@@ -166,8 +166,8 @@ describe('reason codes', () => {
 
   const reasons = [
     ...union('ballistics/src/exterior/truing.ts', 'TruingReason'),
-    ...union('core/src/interior/model.ts', 'InteriorReason'),
-    ...union('core/src/interior/charge-solver.ts', 'ChargeRefusal'),
+    ...union('ballistics/src/interior/model.ts', 'InteriorReason'),
+    ...union('ballistics/src/interior/charge-solver.ts', 'ChargeRefusal'),
     ...union('core/src/interior/fit.ts', 'PowderFitReason'),
     ...union('ballistics/src/exterior/range-strings.ts', 'WeakReason'),
     // set where the reason is not a union: a range case, the API's 422 and 503 answers
@@ -190,10 +190,10 @@ describe('reason codes', () => {
 
   it('reads the unions of the sources', () => {
     expect(union('ballistics/src/exterior/truing.ts', 'TruingReason')).toContain('step-budget')
-    expect(union('core/src/interior/charge-solver.ts', 'ChargeRefusal')).toContain(
+    expect(union('ballistics/src/interior/charge-solver.ts', 'ChargeRefusal')).toContain(
       'toleranceNotReached',
     )
-    expect(union('core/src/interior/model.ts', 'InteriorReason')).toEqual([
+    expect(union('ballistics/src/interior/model.ts', 'InteriorReason')).toEqual([
       'input',
       'chamberVolume',
       'noShotStart',
@@ -402,12 +402,12 @@ const dynamicArguments: { file: string; arg: string; reason: string }[] = [
     reason: 'a coefficient named by the caller: its name is the text',
   },
   {
-    file: 'core/src/interior/load-file.ts',
+    file: 'ballistics/src/interior/load-file.ts',
     arg: "key === 'engravingLength' ? 'Must be above 0.' : 'Must be at least 0.'",
     reason: 'a choice of two sentences: each has its own template',
   },
   {
-    file: 'core/src/interior/load-file.ts',
+    file: 'ballistics/src/interior/load-file.ts',
     arg: 'needed',
     reason: 'the sentence is a variable with its own template',
   },

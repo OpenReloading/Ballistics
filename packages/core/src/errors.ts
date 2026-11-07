@@ -1,5 +1,5 @@
 // the options bags of the models, shared with the exterior models of ballistics
-export { overlay, type Settings } from '@open-reloading/ballistics'
+export type { Settings } from '@open-reloading/ballistics'
 // one error class for every logic package, so `instanceof InputError` holds for their errors too
 export { InputError, need, nth } from '@open-reloading/statistics'
 

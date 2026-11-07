@@ -46,8 +46,8 @@ Analytic: synthetic loads. The vertex comparison is not a committed test.
 
 ## Where in the app
 
-- `packages/core/src/interior/range.ts`, `toleranceRange`.
-- `packages/core/test/interior-range.test.ts`.
+- `packages/ballistics/src/interior/range.ts`, `toleranceRange`.
+- `packages/ballistics/test/interior-range.test.ts`.
 - Model page: [pressure range](../models/interior-pressure-range.md).
 
 ## Confidence

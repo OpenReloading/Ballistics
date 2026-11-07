@@ -22,7 +22,7 @@ $$
 m_g = m_c z - m_\ell, \qquad V_f = V_c + A x - \frac{m_c}{\rho_s}(1 - z) - \eta\, m_g
 $$
 
-Code: `packages/core/src/interior/model.ts`, `gasState` (`freeVolume`, `lostMass`).
+Code: `packages/ballistics/src/interior/model.ts`, `gasState` (`freeVolume`, `lostMass`).
 
 The Noble-Abel equation of state gives the product of gas constant and temperature from the state alone, so leakage needs no flame temperature:
 
@@ -30,7 +30,7 @@ $$
 R T = \frac{\bar p\, V_f}{m_g}
 $$
 
-Code: `packages/core/src/interior/model.ts`, `gasState` (`leakRates`, `rt`).
+Code: `packages/ballistics/src/interior/model.ts`, `gasState` (`leakRates`, `rt`).
 
 ### Flow through the leak
 
@@ -40,7 +40,7 @@ $$
 \dot m_\ell = C_d\, A_\ell(x)\, \frac{p_b}{\sqrt{R T}}\, \Phi_k\!\left(\frac{p_a}{p_b}\right)
 $$
 
-Code: `packages/core/src/interior/model.ts`, `gasState` (`leakRates`, `flow`), `profileAt`.
+Code: `packages/ballistics/src/interior/model.ts`, `gasState` (`leakRates`, `flow`), `profileAt`.
 
 Flow factor, choked below the critical pressure ratio $r^\ast$, subsonic above it, 0 when the back pressure reaches the reservoir pressure:
 
@@ -48,7 +48,7 @@ $$
 \Phi_k(r) = \begin{cases} \sqrt{k} \left(\dfrac{2}{k + 1}\right)^{\frac{k + 1}{2(k - 1)}} & r \le r^\ast \\ \sqrt{\dfrac{2k}{k - 1}\left(r^{2/k} - r^{(k + 1)/k}\right)} & r^\ast \lt r \lt 1 \\ 0 & r \ge 1 \end{cases}, \qquad r^\ast = \left(\frac{2}{k + 1}\right)^{\frac{k}{k - 1}}
 $$
 
-Code: `packages/core/src/interior/model.ts`, `leakFlowFactor`.
+Code: `packages/ballistics/src/interior/model.ts`, `leakFlowFactor`.
 
 $\Phi_k$ and its slope are continuous at $r^\ast$. $A_\ell(x)$ is interpolated linearly between `{ travel, area }` points with increasing travel and is 0 before the first and after the last point. While the projectile is held, the area at travel 0 applies.
 
@@ -60,7 +60,7 @@ $$
 \frac{dE_\ell}{dt} = \dot m_\ell \left(\frac{k}{k - 1} R T + \eta\, \bar p\right)
 $$
 
-Code: `packages/core/src/interior/model.ts`, `gasState` (`leakRates`).
+Code: `packages/ballistics/src/interior/model.ts`, `gasState` (`leakRates`).
 
 The energy balance of the M3 model gains the term $E_\ell$:
 
@@ -68,7 +68,7 @@ $$
 \bar p = \frac{(k - 1)\left(m_c Q z - W_r - E_h - E_\ell - \tfrac{1}{2} m_e v^2\right)}{V_f}
 $$
 
-Code: `packages/core/src/interior/model.ts`, `gasState` (`pressure`, `leaked`).
+Code: `packages/ballistics/src/interior/model.ts`, `gasState` (`pressure`, `leaked`).
 
 With this enthalpy, the gas left behind expands along the Noble-Abel adiabat when nothing burns and no heat is lost:
 
@@ -76,7 +76,7 @@ $$
 \bar p \left(\frac{V_f}{m_g}\right)^{k} = \text{constant}
 $$
 
-Code: `packages/core/src/interior/model.ts`, `gasState` (`pressure`, `leakRates`).
+Code: `packages/ballistics/src/interior/model.ts`, `gasState` (`pressure`, `leakRates`).
 
 ### Integration
 
@@ -86,7 +86,7 @@ $$
 Y = \left(f,\; \frac{x}{x_e},\; \frac{v}{v_r},\; \frac{W_r}{m_c Q},\; \frac{E_h}{m_c Q},\; \frac{m_\ell}{m_c},\; \frac{E_\ell}{m_c Q}\right)
 $$
 
-Code: `packages/core/src/interior/model.ts`, `gasState` (`leakRates`, `lostMass`).
+Code: `packages/ballistics/src/interior/model.ts`, `gasState` (`leakRates`, `lostMass`).
 
 The subsonic flow factor has an infinite slope at $r = 1$. The onset of flow is therefore located as an event, after which the integration restarts:
 
@@ -94,7 +94,7 @@ $$
 g_\text{onset} = p_b - p_a, \quad \text{rising}
 $$
 
-Code: `packages/core/src/interior/model.ts`, `interiorEvents` (`onset`), `runInterior` (`leaking`).
+Code: `packages/ballistics/src/interior/model.ts`, `interiorEvents` (`onset`), `runInterior` (`leaking`).
 
 The flow rate is 0 until the onset fires. Where $p_b \ge p_a$ at the start or at a restart, the flow begins there, because a rising event cannot fire. Points of the leak-area profile join the engraving points as events, and profile points at or beyond the muzzle travel are left out.
 
@@ -102,7 +102,7 @@ The load-file key `leakArea` sets a leak area that is constant from travel 0 to 
 
 The discharge coefficient of 1 is a choice of the model.
 
-Code: `packages/core/src/interior/load-file.ts`, `interiorLoad` (`leakArea`).
+Code: `packages/ballistics/src/interior/load-file.ts`, `interiorLoad` (`leakArea`).
 
 ### Convective heat loss
 
@@ -112,7 +112,7 @@ $$
 R = \frac{(k - 1)\, Q}{T_0}, \qquad T = \frac{\bar p\, V_f}{m_g R}
 $$
 
-Code: `packages/core/src/interior/model.ts`, `gasState` (`gasR`, `temperature`).
+Code: `packages/ballistics/src/interior/model.ts`, `gasState` (`gasR`, `temperature`).
 
 Heat flux to the bore surface behind the base, with the chamber taken as a bore-diameter cylinder of the same volume:
 
@@ -120,7 +120,7 @@ $$
 \dot q = c_h\, h\, \pi d \left(x + \frac{V_c}{A}\right) (T - T_w)
 $$
 
-Code: `packages/core/src/interior/model.ts`, `gasState` (`heatFlux`).
+Code: `packages/ballistics/src/interior/model.ts`, `gasState` (`heatFlux`).
 
 Heat-transfer coefficient from the correlation for turbulent pipe flow (Dittus-Boelter form), with the mean gas speed $v/2$ of a velocity rising linearly from breech to base:
 
@@ -128,19 +128,19 @@ $$
 h = 0.023\, \frac{\lambda_g}{d}\, \mathrm{Re}^{0.8}\, \mathrm{Pr}^{n_h}, \qquad n_h = \begin{cases} 0.3 & T \gt T_w \\ 0.4 & T \le T_w \end{cases}
 $$
 
-Code: `packages/core/src/interior/model.ts`, `gasState` (`heatFlux`, `pr`, `h`).
+Code: `packages/ballistics/src/interior/model.ts`, `gasState` (`heatFlux`, `pr`, `h`).
 
 $$
 \mathrm{Re} = \frac{\rho_g\, (v/2)\, d}{\mu_g}, \qquad \rho_g = \frac{m_g}{V_c + A x - (m_c/\rho_s)(1 - z)}, \qquad \lambda_g = \frac{\mu_g\, c_p}{\mathrm{Pr}}, \qquad c_p = \frac{k R}{k - 1}
 $$
 
-Code: `packages/core/src/interior/model.ts`, `gasState` (`heatFlux`, `density`, `re`, `conductivity`).
+Code: `packages/ballistics/src/interior/model.ts`, `gasState` (`heatFlux`, `density`, `re`, `conductivity`).
 
 The flux is 0 while the projectile is at rest, for $z \lt 10^{-9}$ and without gas in the barrel. Omitted inputs take the defaults $\mu_g = 6.0\times10^{-5}$ Pa s, $\mathrm{Pr} = 0.69$ and $T_w = 300$ K. The flame temperature has no default.
 
 The cutoff at $z \lt 10^{-9}$ is a choice of the model.
 
-Code: `packages/core/src/interior/model.ts`, `convectiveDefaults`.
+Code: `packages/ballistics/src/interior/model.ts`, `convectiveDefaults`.
 
 ## Symbols
 

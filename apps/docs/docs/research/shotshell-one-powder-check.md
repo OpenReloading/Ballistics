@@ -32,7 +32,7 @@ Measured. The measurements are not in the repository.
 
 ## Where in the app
 
-- `packages/core/src/interior/shotshell.ts`.
+- `packages/ballistics/src/interior/shotshell.ts`.
 - Model page: [shotshell model](../models/interior-shotshell.md).
 
 ## Confidence

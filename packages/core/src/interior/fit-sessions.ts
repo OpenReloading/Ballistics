@@ -5,6 +5,7 @@
  * and out.
  */
 
+import type { InteriorLoad } from '@open-reloading/ballistics'
 import { need, nth } from '../errors.ts'
 import {
   fitPowder,
@@ -15,7 +16,6 @@ import {
   type PowderFitReason,
   type PowderParameter,
 } from './fit.ts'
-import type { InteriorLoad } from './model.ts'
 
 /** One chronograph session: a ladder fired from one barrel at one powder temperature. */
 export interface PowderSession {

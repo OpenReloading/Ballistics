@@ -26,7 +26,7 @@ $$
 \left| L_k - L_{k-1} \right| > 0.01\ \text{mm}
 $$
 
-Code: `packages/core/src/load-notes.ts`, `loadNotes` (`seatingTolerance`).
+Code: `packages/ballistics/src/load-notes.ts`, `loadNotes` (`seatingTolerance`).
 
 $L$ is the cartridge overall length or the base-to-ogive length, whichever the load is seated by. Two sessions seated by different lengths are not compared. 0.01 mm is the resolution of the length fields.
 
@@ -36,7 +36,7 @@ $$
 \left| \bar v_k - \bar v_{k-1} \right| > \max\left(s_k,\ s_{k-1}\right)
 $$
 
-Code: `packages/core/src/load-notes.ts`, `loadNotes` (`velocity`).
+Code: `packages/ballistics/src/load-notes.ts`, `loadNotes` (`velocity`).
 
 $\bar v$ is the mean and $s$ the sample standard deviation of the counted shots of a session. Both sessions need at least two counted shots, otherwise there is no standard deviation and no note. The threshold is the sessions' own spread: a mean that moved by less than the larger spread of the two sessions is within what each session shows from shot to shot.
 
@@ -46,7 +46,7 @@ $$
 n_{k-1} < N \le n_k
 $$
 
-Code: `packages/core/src/load-notes.ts`, `loadNotes` (`roundCount`).
+Code: `packages/ballistics/src/load-notes.ts`, `loadNotes` (`roundCount`).
 
 $n$ is the firearm's round count recorded in a session and $N$ the count the user set on the firearm (`noteAtRoundCount`). A note comes in the session that first reaches $N$, when the session before it recorded a lower count. Without $N$, or without a count in both sessions, there is no note.
 

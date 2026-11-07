@@ -46,7 +46,7 @@ Analytic: two closed-form gas columns, no measured pressure.
 
 ## Where in the app
 
-- `packages/core/src/interior/model.ts`, `lagrangeGradient`.
+- `packages/ballistics/src/interior/model.ts`, `lagrangeGradient`.
 - Model page: [M3 interior model](../models/interior-m3.md).
 
 ## Confidence

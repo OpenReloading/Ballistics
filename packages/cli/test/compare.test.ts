@@ -144,7 +144,7 @@ describe('compare', () => {
 
   it('includes the files of the core model in a candidate version', async () => {
     const { files } = await loadModel(worse)
-    expect(files.map((f) => f.label)).toContain('core/interior/model.js')
+    expect(files.map((f) => f.label)).toContain('ballistics/interior/model.js')
     expect(files.map((f) => f.label)).toContain('candidate/worse-model.mjs')
   })
 

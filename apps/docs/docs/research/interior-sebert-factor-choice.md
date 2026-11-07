@@ -41,10 +41,10 @@ Analytic: a modelling choice with algebraic checks, no measured data.
 
 ## Where in the app
 
-- `packages/core/src/interior/load-file.ts`, `interiorLoad`.
-- `packages/core/src/interior/model.ts`, `lagrangeGradient`, `gasState`.
-- `packages/core/test/interior-model.test.ts`, the test "Lagrange pressure ratios without resistance".
-- `packages/core/test/interior-load-file.test.ts`, the test "maps the field values; an empty bore area is the circle of the bore diameter".
+- `packages/ballistics/src/interior/load-file.ts`, `interiorLoad`.
+- `packages/ballistics/src/interior/model.ts`, `lagrangeGradient`, `gasState`.
+- `packages/ballistics/test/interior-model.test.ts`, the test "Lagrange pressure ratios without resistance".
+- `packages/ballistics/test/interior-load-file.test.ts`, the test "maps the field values; an empty bore area is the circle of the bore diameter".
 - Model page: [M3 interior model](../models/interior-m3.md).
 
 ## Confidence

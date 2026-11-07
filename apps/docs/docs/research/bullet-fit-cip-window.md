@@ -35,8 +35,8 @@ Public: the C.I.P. values of the cartridge records and nominal bullet diameters.
 
 ## Where in the app
 
-- `packages/core/test/bullet-fit.test.ts`.
-- `packages/core/src/bullet-fit.ts`, `packages/core/src/cartridge-specs.ts`.
+- `packages/ballistics/test/bullet-fit.test.ts`.
+- `packages/ballistics/src/bullet-fit.ts`, `packages/ballistics/src/cartridge-specs.ts`.
 - Model page: [bullet fit](../models/bullet-fit.md).
 
 ## Confidence

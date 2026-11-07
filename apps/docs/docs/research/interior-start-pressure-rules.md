@@ -54,7 +54,7 @@ Measured. The measurements are not in the repository.
 
 ## Where in the app
 
-- `packages/core/src/interior/start-pressure.ts`, `defaultStartPressure`, `handgunBarrelLengthLimit`.
+- `packages/ballistics/src/interior/start-pressure.ts`, `defaultStartPressure`, `handgunBarrelLengthLimit`.
 - Model page: [M3 model](../models/interior-m3.md).
 
 ## Confidence

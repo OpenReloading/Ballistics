@@ -2,7 +2,7 @@
   "name": "@open-reloading/ballistics",
   "version": "0.0.0",
   "private": true,
-  "description": "The exterior ballistics models in SI: atmosphere, drag tables and models, the trajectory solver, stability, truing and range strings.",
+  "description": "The ballistics models in SI: the interior model with its load records, charge solver, ranges and ladders, and the exterior atmosphere, drag, trajectory, stability, truing and range strings.",
   "license": "MIT",
   "repository": {
     "type": "git",
