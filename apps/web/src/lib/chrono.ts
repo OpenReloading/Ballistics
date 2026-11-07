@@ -6,14 +6,17 @@ import {
   decodeText,
   isWorkbook,
   parseChrono,
+  ReaderError,
   readWorkbook,
   stringifyOpenReloadingJson,
   type VelocityUnit,
 } from '@open-reloading/importers'
 import { formatNumber } from '../i18n/number.ts'
 import { english, type Message, msg, type Translator } from '../i18n/translate.ts'
+import { chronoDiagnosticText } from './chrono-diagnostics.ts'
 import { translateMessage } from './core-messages.ts'
 import { toCsv } from './csv.ts'
+import { errorText } from './error-text.ts'
 import { stringName } from './string-name.ts'
 import { stringStats } from './string-stats.ts'
 import type { Unit } from './units.ts'
@@ -94,8 +97,10 @@ const notExport = msg(
 )
 const ownMessages: readonly Message[] = [tooLarge, notWorkbook, notExport]
 
-/** The message of an error thrown here or by the importers, in the language of `t`. */
-export const chronoMessageText = (text: string, t: Translator['t']) => {
+/** Why a chronograph file was not read, in the language of `t`: a reader's refusal, this module's own, or another error's message. */
+export function chronoErrorText(error: unknown, t: Translator['t']): string {
+  if (error instanceof ReaderError) return chronoDiagnosticText(error.diagnostic, t)
+  const text = errorText(error)
   const own = ownMessages.find((m) => m === text)
   return own ? t(own, { formats }) : translateMessage(text, t)
 }
@@ -139,7 +144,7 @@ export async function readSession(
       return await readChrono(bytes, { fileName, velocityUnit: fallback })
     } catch (second) {
       // the file names its unit, so the first reason is the one that counts
-      throw second instanceof Error && second.message.includes('named by the caller')
+      throw second instanceof ReaderError && second.diagnostic.code === 'unitDiffersFromCaller'
         ? first
         : second
     }

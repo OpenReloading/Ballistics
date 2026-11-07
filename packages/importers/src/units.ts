@@ -49,7 +49,8 @@ export function resolveUnit(
   if (text && unit) checkCallerUnit(text, unit, options)
   if (unit) return unit
   const shown = text?.trim()
-  if (!options.velocityUnit) refuse(shown ? 'unknownUnit' : 'missingUnit', shown ? { text: shown } : {})
+  if (!options.velocityUnit)
+    refuse(shown ? 'unknownUnit' : 'missingUnit', shown ? { text: shown } : {})
   const warning: ChronoDiagnostic = shown
     ? { code: 'unknownUnitNamedByCaller', params: { text: shown, unit: options.velocityUnit } }
     : { code: 'missingUnitNamedByCaller', params: { unit: options.velocityUnit } }

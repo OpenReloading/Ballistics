@@ -67,7 +67,8 @@ function readDevice(root: Obj): SessionCandidate['device'] {
   const dev = root['device'] === undefined ? {} : root['device']
   if (!isObj(dev)) fail('device', 'memberNotObject')
   const kind = dev['kind'] === undefined ? 'other' : dev['kind']
-  if (!isDeviceKind(kind)) refuse('memberNotDeviceKind', { path: 'device.kind', kinds: deviceKinds })
+  if (!isDeviceKind(kind))
+    refuse('memberNotDeviceKind', { path: 'device.kind', kinds: deviceKinds })
   return {
     kind,
     manufacturerName: optionalText(dev, 'manufacturerName', 'device.manufacturerName'),
@@ -98,8 +99,7 @@ function readStrings(root: Obj): {
   strings: { shots: ChronoShot[] }[]
   labels: (string | undefined)[]
 } {
-  if (!Array.isArray(root['strings']) || root['strings'].length === 0)
-    fail('strings', 'noStrings')
+  if (!Array.isArray(root['strings']) || root['strings'].length === 0) fail('strings', 'noStrings')
   const labels: (string | undefined)[] = []
   const strings = (root['strings'] as unknown[]).map((s, i) => {
     const at = `strings[${i}]`
@@ -107,8 +107,7 @@ function readStrings(root: Obj): {
     if (s['label'] !== undefined && typeof s['label'] !== 'string')
       fail(`${at}.label`, 'memberNotText')
     labels.push(s['label'] || undefined)
-    if (!Array.isArray(s['shots']) || s['shots'].length === 0)
-      fail(`${at}.shots`, 'noStringShots')
+    if (!Array.isArray(s['shots']) || s['shots'].length === 0) fail(`${at}.shots`, 'noStringShots')
     const shots = (s['shots'] as unknown[]).map((raw, j) => readShot(raw, `${at}.shots[${j}]`))
     return { shots }
   })

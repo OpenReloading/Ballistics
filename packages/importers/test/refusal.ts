@@ -1,7 +1,7 @@
-import { type ReaderDiagnostic, ReaderError } from '../src/diagnostics.ts'
+import { type ChronoDiagnostic, ReaderError } from '../src/diagnostics.ts'
 
 /** The diagnostic `read` refuses with; anything else it throws, or a read without a refusal, fails the test. */
-export function refusal(read: () => unknown): ReaderDiagnostic<string> {
+export function refusal(read: () => unknown): ChronoDiagnostic {
   try {
     read()
   } catch (e) {

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import type { ChronoDiagnostic } from '../src/diagnostics.ts'
 import { parseVelocity, parseVelocityUnit, resolveUnit } from '../src/units.ts'
+import { refusal } from './refusal.ts'
 
 describe('parseVelocityUnit', () => {
   it('reads every spelling in any case and with surrounding space', () => {
@@ -21,7 +23,7 @@ describe('parseVelocityUnit', () => {
 
 describe('resolveUnit', () => {
   it('takes the file unit, a caller unit equal to it without a warning', () => {
-    const warnings: string[] = []
+    const warnings: ChronoDiagnostic[] = []
     expect(resolveUnit('fps', { velocityUnit: 'ft/s' }, warnings)).toBe('ft/s')
     expect(resolveUnit('M/S', { velocityUnit: 'm/s' }, warnings)).toBe('m/s')
     expect(resolveUnit('mph', {}, warnings)).toBe('mph')
@@ -29,27 +31,30 @@ describe('resolveUnit', () => {
   })
 
   it('throws when the caller names another unit than the file', () => {
-    expect(() => resolveUnit(' fps ', { velocityUnit: 'm/s' }, [])).toThrow(
-      'velocity unit "fps" (ft/s) in the file differs from m/s named by the caller',
-    )
+    expect(refusal(() => resolveUnit(' fps ', { velocityUnit: 'm/s' }, []))).toEqual({
+      code: 'unitDiffersFromCaller',
+      params: { text: 'fps', unit: 'ft/s', caller: 'm/s' },
+    })
   })
 
   it('throws for an unknown or missing file unit the caller does not name', () => {
-    expect(() => resolveUnit(' knots ', {}, [])).toThrow(
-      'velocity unit "knots" is unknown; name the unit to import this file',
-    )
-    expect(() => resolveUnit('  ', {}, [])).toThrow('velocity unit missing is unknown')
-    expect(() => resolveUnit(undefined, {}, [])).toThrow('velocity unit missing is unknown')
+    expect(refusal(() => resolveUnit(' knots ', {}, []))).toEqual({
+      code: 'unknownUnit',
+      params: { text: 'knots' },
+    })
+    const missing = { code: 'missingUnit', params: {} }
+    expect(refusal(() => resolveUnit('  ', {}, []))).toEqual(missing)
+    expect(refusal(() => resolveUnit(undefined, {}, []))).toEqual(missing)
   })
 
   it('takes the caller unit for an unknown file unit and warns once', () => {
-    const warnings: string[] = []
+    const warnings: ChronoDiagnostic[] = []
     expect(resolveUnit('knots', { velocityUnit: 'km/h' }, warnings)).toBe('km/h')
     expect(resolveUnit('knots', { velocityUnit: 'km/h' }, warnings)).toBe('km/h')
     expect(resolveUnit(undefined, { velocityUnit: 'km/h' }, warnings)).toBe('km/h')
     expect(warnings).toEqual([
-      'velocity unit "knots" in the file; using km/h as named by the caller',
-      'velocity unit missing in the file; using km/h as named by the caller',
+      { code: 'unknownUnitNamedByCaller', params: { text: 'knots', unit: 'km/h' } },
+      { code: 'missingUnitNamedByCaller', params: { unit: 'km/h' } },
     ])
   })
 })
@@ -73,9 +78,18 @@ describe('parseVelocity', () => {
   })
 
   it('rejects a cell that is no number or not positive', () => {
-    expect(() => parseVelocity(' fast ', 'fps', 'ft/s')).toThrow('velocity "fast" is not a number')
-    expect(() => parseVelocity(' 0 ', 'fps', 'ft/s')).toThrow('velocity "0" is not positive')
-    expect(() => parseVelocity('-5', 'fps', 'ft/s')).toThrow('velocity "-5" is not positive')
+    expect(refusal(() => parseVelocity(' fast ', 'fps', 'ft/s'))).toEqual({
+      code: 'velocityNotNumber',
+      params: { cell: 'fast' },
+    })
+    expect(refusal(() => parseVelocity(' 0 ', 'fps', 'ft/s'))).toEqual({
+      code: 'velocityNotPositive',
+      params: { cell: '0' },
+    })
+    expect(refusal(() => parseVelocity('-5', 'fps', 'ft/s'))).toEqual({
+      code: 'velocityNotPositive',
+      params: { cell: '-5' },
+    })
     expect(parseVelocity('0.001', 'm/s', 'm/s').value).toBe(0.001)
   })
 })

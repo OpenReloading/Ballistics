@@ -9,9 +9,9 @@ export type ReaderDiagnostic<Code extends string> = Diagnostic<
 
 /** A file a reader refuses: `diagnostic` says why, and the app words it. The message is the code. */
 export class ReaderError extends Error {
-  readonly diagnostic: ReaderDiagnostic<string>
+  readonly diagnostic: ChronoDiagnostic
 
-  constructor(diagnostic: ReaderDiagnostic<string>, options?: ErrorOptions) {
+  constructor(diagnostic: ChronoDiagnostic, options?: ErrorOptions) {
     super(diagnostic.code, options)
     this.name = 'ReaderError'
     this.diagnostic = diagnostic
@@ -77,7 +77,10 @@ export type ChronoDiagnostic = ReaderDiagnostic<
 >
 
 /** Throws the refusal `code` with `params`. */
-export function refuse(code: ChronoDiagnostic['code'], params: ChronoDiagnostic['params'] = {}): never {
+export function refuse(
+  code: ChronoDiagnostic['code'],
+  params: ChronoDiagnostic['params'] = {},
+): never {
   throw new ReaderError({ code, params })
 }
 

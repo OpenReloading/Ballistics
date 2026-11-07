@@ -9,6 +9,7 @@ import {
 } from '../src/index.ts'
 import { complete } from './complete.ts'
 import { shotViewEnglish, shotViewSheetEnglish, shotViewSheetGerman } from './fixtures.ts'
+import { refusal } from './refusal.ts'
 import { xlsx } from './xlsx.ts'
 
 const book = (...sheets: Worksheet[]): Workbook => ({ worksheets: sheets })
@@ -68,12 +69,13 @@ describe('parseShotViewWorkbook: the footer and worksheets without shots', () =>
     const r = parseShotViewWorkbook(book(shotViewSheetEnglish, noHeader, noShots))
     expect(r.session.strings).toHaveLength(1)
     expect(r.warnings).toEqual([
-      'worksheet 2: no ShotView header row; skipped',
-      'worksheet 3: footer date row not found; enter the date',
-      'worksheet 3: no shot rows; skipped',
+      { code: 'noShotViewHeader', params: { worksheet: 2 } },
+      { code: 'footerDateMissing', params: { worksheet: 3 } },
+      { code: 'noShotRows', params: { worksheet: 3 } },
     ])
-    expect(() => parseShotViewWorkbook(book(noShots))).toThrow('no shots found')
-    expect(() => parseShotViewWorkbook(book())).toThrow('no shots found')
+    const noShotsFound = { code: 'noShots', params: {} }
+    expect(refusal(() => parseShotViewWorkbook(book(noShots)))).toEqual(noShotsFound)
+    expect(refusal(() => parseShotViewWorkbook(book()))).toEqual(noShotsFound)
   })
 
   it('warns about a missing or unrecognised footer date and footer statistics', () => {
@@ -81,21 +83,24 @@ describe('parseShotViewWorkbook: the footer and worksheets without shots', () =>
     const r = parseShotViewWorkbook(book(shotViewSheetEnglish, noDate))
     expect(r.session.date).toBeUndefined()
     expect(r.missingPaths).toContain('date')
-    expect(r.warnings).toEqual(['worksheet 2: footer date row not found; enter the date'])
+    expect(r.warnings).toEqual([{ code: 'footerDateMissing', params: { worksheet: 2 } }])
     const odd = withDate(shotViewSheetGerman, 'QUARZ 2026')
     expect(parseShotViewWorkbook(book(odd)).warnings).toEqual([
-      'worksheet 1: footer date "QUARZ 2026" is not recognised; enter the date',
+      { code: 'footerDateUnknown', params: { worksheet: 1, text: 'QUARZ 2026' } },
     ])
     const average = edit(shotViewSheetGerman, (c) => c[0] === 'AVERAGE SPEED', [
       ['AVERAGE SPEED', '855.0'],
     ])
     const w = parseShotViewWorkbook(book(shotViewSheetEnglish, average)).warnings
     expect(w).toEqual([
-      'worksheet 2: footer AVERAGE SPEED "855.0" differs from 851.0 computed from the shots',
+      {
+        code: 'statisticDiffers',
+        params: { worksheet: 2, label: 'AVERAGE SPEED', value: '855.0', computed: '851.0' },
+      },
     ])
     const sd = edit(shotViewSheetEnglish, (c) => c[0] === 'STD DEV', [['STD DEV', 'n/a']])
     expect(parseShotViewWorkbook(book(sd)).warnings).toEqual([
-      'worksheet 1: footer STD DEV "n/a" is not a number; not checked',
+      { code: 'statisticNotNumber', params: { worksheet: 1, label: 'STD DEV', value: 'n/a' } },
     ])
   })
 })
@@ -105,8 +110,8 @@ describe('parseShotViewWorkbook: footer labels, empty rows and the date option',
     const labelOnly = edit(withDate(shotViewSheetEnglish, ''), (c) => c[0] === 'DATE', [['DATE']])
     const spread = edit(labelOnly, (c) => c[0] === 'SPREAD', [['SPREAD']])
     expect(parseShotViewWorkbook(book(spread)).warnings).toEqual([
-      'worksheet 1: footer date "" is not recognised; enter the date',
-      'worksheet 1: footer SPREAD "" is not a number; not checked',
+      { code: 'footerDateUnknown', params: { worksheet: 1, text: '' } },
+      { code: 'statisticNotNumber', params: { worksheet: 1, label: 'SPREAD', value: '' } },
     ])
   })
 
@@ -115,8 +120,8 @@ describe('parseShotViewWorkbook: footer labels, empty rows and the date option',
     const r = parseShotViewWorkbook(book(sheet))
     expect(r.session.strings[0]?.shots).toHaveLength(1)
     expect(r.warnings).toEqual([
-      'worksheet 1: footer date row not found; enter the date',
-      'worksheet 1: footer statistics not found; not checked',
+      { code: 'footerDateMissing', params: { worksheet: 1 } },
+      { code: 'footerStatisticsMissing', params: { worksheet: 1 } },
     ])
   })
 
@@ -134,10 +139,12 @@ describe('parseShotViewWorkbook: footer labels, empty rows and the date option',
     const r = parseShotViewWorkbook(book(dated, noDate), { date: '2026-03-08' })
     expect(r.session.strings).toHaveLength(2)
     expect(r.session.date).toBe('2026-03-08')
-    expect(r.warnings).toEqual(['worksheet 2: no date read; 2026-03-08 taken from the date option'])
-    expect(() => parseShotViewWorkbook(book(dated, noDate), { date: '2026-03-09' })).toThrow(
-      'no string on 2026-03-09; dates in the file: 2026-03-08',
-    )
+    expect(r.warnings).toEqual([
+      { code: 'dateFromOption', params: { worksheet: 2, date: '2026-03-08' } },
+    ])
+    expect(
+      refusal(() => parseShotViewWorkbook(book(dated, noDate), { date: '2026-03-09' })),
+    ).toEqual({ code: 'noStringOnDate', params: { date: '2026-03-09', dates: ['2026-03-08'] } })
   })
 })
 
@@ -164,14 +171,17 @@ describe('parseShotViewWorkbook: bore flags, one day and workbook bytes', () => 
     expect(all.session.date).toBeUndefined()
     expect(all.missingPaths).toContain('date')
     expect(all.warnings).toEqual([
-      'strings from several days (2026-03-07, 2026-03-08); enter the date, or import one day with the date option',
+      { code: 'severalDays', params: { dates: ['2026-03-07', '2026-03-08'] } },
     ])
     const day = parseShotViewWorkbook(book(first, second), { date: '2026-03-08' })
     expect(day.stringLabels).toEqual(['Load B'])
     expect(day.session.date).toBe('2026-03-08')
-    expect(() => parseShotViewWorkbook(book(first, second), { date: '2026-03-09' })).toThrow(
-      'no string on 2026-03-09; dates in the file: 2026-03-07, 2026-03-08',
-    )
+    expect(
+      refusal(() => parseShotViewWorkbook(book(first, second), { date: '2026-03-09' })),
+    ).toEqual({
+      code: 'noStringOnDate',
+      params: { date: '2026-03-09', dates: ['2026-03-07', '2026-03-08'] },
+    })
   })
 
   it('reads the same session from workbook bytes', async () => {
@@ -207,8 +217,11 @@ describe('detectWorkbookFormat', () => {
 
 describe('caller unit against the workbook header unit', () => {
   it('refuses a caller unit that differs from the header unit', () => {
-    expect(() =>
-      parseShotViewWorkbook(book(shotViewSheetGerman), { velocityUnit: 'ft/s' }),
-    ).toThrow('velocity unit "mps" (m/s) in the file differs from ft/s named by the caller')
+    expect(
+      refusal(() => parseShotViewWorkbook(book(shotViewSheetGerman), { velocityUnit: 'ft/s' })),
+    ).toEqual({
+      code: 'unitDiffersFromCaller',
+      params: { text: 'mps', unit: 'm/s', caller: 'ft/s' },
+    })
   })
 })

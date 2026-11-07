@@ -8,7 +8,7 @@ import { type Dispatch, type ReactNode, type SetStateAction, useRef, useState } 
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
-import { chronoFileBytes, chronoMessageText, readChrono } from '../lib/chrono.ts'
+import { chronoErrorText, chronoFileBytes, readChrono } from '../lib/chrono.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { chronographGuide } from '../lib/docs-url.ts'
 import { errorText } from '../lib/error-text.ts'
@@ -186,14 +186,14 @@ async function readSession(
   return sessionOf(file.name, data, charges, { id, manufacturer: makers.get(named), now })
 }
 
-/** A file that was not read: too many sessions for the load, else the reader's message (English). */
-type Failure = { file: string; tooMany: true } | { file: string; message: string }
+/** A file that was not read: too many sessions for the load, else the reader's error. */
+type Failure = { file: string; tooMany: true } | { file: string; error: unknown }
 
 /** The reason `f` gives for its file, in the language of `t`. */
 const failureText = (f: Failure, t: Translator['t']) =>
   'tooMany' in f
     ? t('{file}: a load keeps {max} sessions at most.', { file: f.file, max: maxSessions })
-    : `${f.file}: ${chronoMessageText(f.message, t)}`
+    : `${f.file}: ${chronoErrorText(f.error, t)}`
 
 /** `text` of a statistic when there is one, else nothing. */
 const when = <T,>(x: T | undefined, text: (x: T) => string) => (x === undefined ? '' : text(x))
@@ -317,7 +317,7 @@ export function Measurements({
       try {
         added.push(await readSession(file, unit, steps, makers, manufacturerRef))
       } catch (err) {
-        failed.push({ file: file.name, message: errorText(err) })
+        failed.push({ file: file.name, error: err })
       }
     }
     setSessions((s) => [...s, ...added])

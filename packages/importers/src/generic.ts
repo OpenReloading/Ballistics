@@ -318,7 +318,7 @@ function isColdBore(text: string | undefined): boolean {
   const lower = text.toLowerCase()
   if (truthy.includes(lower)) return true
   if (falsy.includes(lower)) return false
-  refuse('coldBoreUnknown', { text, choices: [...truthy, ...falsy.slice(1)] })
+  return refuse('coldBoreUnknown', { text, choices: [...truthy, ...falsy.slice(1)] })
 }
 
 /**
