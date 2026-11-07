@@ -104,6 +104,8 @@ export type SerializedError = {
   unresolved?: number[] | undefined
   direction?: number[] | undefined
   estimate?: TruedParameter[] | undefined
+  /** The typed refusal of an `InputError` that has one. */
+  issue?: InputError['issue']
 }
 
 /** Plain-object form of `error`: `TruingError` and `InputError` keep their fields, any other value becomes an `Error` with its message. */
@@ -120,7 +122,12 @@ export function serializeError(error: unknown): SerializedError {
       estimate,
     }
   }
-  if (error instanceof InputError) return { name: 'InputError', message: error.message }
+  if (error instanceof InputError)
+    return {
+      name: 'InputError',
+      message: error.message,
+      ...(error.issue && { issue: error.issue }),
+    }
   return { name: 'Error', message: error instanceof Error ? error.message : String(error) }
 }
 
@@ -139,7 +146,7 @@ export function reviveError(error: SerializedError): Error {
       { message },
     )
   }
-  if (error.name === 'InputError') return new InputError(error.message)
+  if (error.name === 'InputError') return new InputError(error.issue ?? error.message)
   return new Error(error.message)
 }
 

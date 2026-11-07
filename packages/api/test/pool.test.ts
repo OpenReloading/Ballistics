@@ -82,7 +82,7 @@ describe('createPool', () => {
 describe('errors across the thread boundary', () => {
   const roundTrip = (e: unknown) => reviveError(structuredClone(serializeError(e)))
 
-  it('rebuilds TruingError, InputError and Error', () => {
+  it('rebuilds TruingError, InputError with its typed refusal, and Error', () => {
     const truing = new TruingError('ill-conditioned', {
       conditionNumber: Number.POSITIVE_INFINITY,
       unresolved: [1],
@@ -102,6 +102,12 @@ describe('errors across the thread boundary', () => {
     expect(input).toBeInstanceOf(InputError)
     expect(input).not.toBeInstanceOf(TruingError)
     expect(input.message).toBe('step limit')
+    const typed = roundTrip(new InputError({ code: 'matrix-size', params: { entries: 8 } }))
+    expect(typed).toBeInstanceOf(InputError)
+    expect(typed).toMatchObject({
+      message: 'matrix-size',
+      issue: { code: 'matrix-size', params: { entries: 8 } },
+    })
     const range = roundTrip(new RangeError('Invalid array length'))
     expect(range).not.toBeInstanceOf(RangeError)
     expect(range.message).toBe('Invalid array length')
