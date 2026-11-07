@@ -23,7 +23,7 @@ $$
 q_k = q\,\Bigl(1 + \frac{z_k}{c}\,t_q\Bigr), \qquad T_k = T + \frac{z_k}{c}\,t_T, \qquad c = 1.645
 $$
 
-Code: `packages/core/src/interior/monte-carlo.ts`, `sampledBand` (`side`), `toleranceSigmas`; `packages/core/src/interior/range.ts`, `interiorApply`.
+Code: `packages/ballistics/src/interior/monte-carlo.ts`, `sampledBand` (`side`), `toleranceSigmas`; `packages/ballistics/src/interior/range.ts`, `interiorApply`.
 
 JCGM 101:2008 gives an input known only by its bounds a rectangular distribution. Here the tolerance is instead the half width of the central 90 % interval of a normal distribution ($c$ is the 95th percentile of the standard normal distribution), so for a response that rises or falls steadily with one varied input the 5th and 95th percentile of the output are the corner cases.
 
@@ -35,7 +35,7 @@ $$
 z = \sqrt{-2 \ln(1 - u_1)}\,\cos(2 \pi u_2)
 $$
 
-Code: `packages/core/src/interior/monte-carlo.ts`, `sampledBand` (`normal`), `packages/statistics/src/random.ts`, `seededUniforms`, `normalsFrom`.
+Code: `packages/ballistics/src/interior/monte-carlo.ts`, `sampledBand` (`normal`), `packages/statistics/src/random.ts`, `seededUniforms`, `normalsFrom`.
 
 Every draw takes one number per input, in the order of `pressureInputs`, also for an input whose tolerance is 0, so a tolerance set to 0 does not shift the draws of the others.
 
@@ -48,7 +48,7 @@ r = p\,(n - 1), \qquad i = \lfloor r \rfloor, \qquad
 y_p = y_{(i+1)} + (r - i)\bigl(y_{(i+2)} - y_{(i+1)}\bigr)
 $$
 
-Code: `packages/core/src/interior/monte-carlo.ts`, `percentile`, `bandOf`.
+Code: `packages/ballistics/src/interior/monte-carlo.ts`, `percentile`, `bandOf`.
 
 With $p$ = 0.05, 0.5 and 0.95 these are the reported `p05`, `p50` and `p95`. The standard error of a percentile of $n$ draws shrinks with $\sqrt n$.
 

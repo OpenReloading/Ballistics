@@ -59,8 +59,8 @@ Analytic: a closed form compared with the model on a synthetic case, no measured
 
 ## Where in the app
 
-- `packages/core/src/interior/model.ts`, `interior`.
-- `packages/core/test/interior-model.test.ts`, the tests "peak pressure, its travel, burnout travel and muzzle velocity", "velocity and pressure along the barrel, offset by the ignition gas near the start" and "deviation from the closed form falls with the ignition pressure".
+- `packages/ballistics/src/interior/model.ts`, `interior`.
+- `packages/ballistics/test/interior-model.test.ts`, the tests "peak pressure, its travel, burnout travel and muzzle velocity", "velocity and pressure along the barrel, offset by the ignition gas near the start" and "deviation from the closed form falls with the ignition pressure".
 - Model page: [M3 interior model](../models/interior-m3.md).
 
 ## Confidence

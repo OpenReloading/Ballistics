@@ -242,24 +242,24 @@ analytic. The runs mutate the source and run the existing tests; no measured dat
 ## Where in the app
 
 - `packages/ballistics/src/exterior/atmosphere.ts`, `packages/ballistics/test/exterior-atmosphere.test.ts`
-- `packages/core/src/interior/form.ts`, `packages/core/test/interior-form.test.ts`
+- `packages/ballistics/src/interior/form.ts`, `packages/ballistics/test/interior-form.test.ts`
 - `packages/shot-groups/src/hit-probability.ts`, `packages/shot-groups/test/hit-probability.test.ts`
 - `packages/ballistics/src/exterior/drag.ts`, `packages/ballistics/test/exterior-drag.test.ts`
 - `packages/ballistics/src/exterior/stability.ts`, `packages/ballistics/test/exterior-stability.test.ts`
-- `packages/core/src/interior/range.ts`, `packages/core/test/interior-range.test.ts`
+- `packages/ballistics/src/interior/range.ts`, `packages/ballistics/test/interior-range.test.ts`
 - `packages/core/src/groups/statistics.ts`, `packages/core/test/groups.test.ts`
-- `packages/core/src/recoil.ts`, `packages/core/test/recoil.test.ts`
+- `packages/ballistics/src/recoil.ts`, `packages/ballistics/test/recoil.test.ts`
 - `packages/statistics/src/velocity-statistics.ts`, `packages/statistics/test/velocity-statistics.test.ts`
-- `packages/core/src/interior/velocity-ladder.ts`, `packages/core/test/interior-velocity-ladder.test.ts`
-- `packages/core/src/interior/vivacity.ts`, `packages/core/test/interior-vivacity.test.ts`
-- `packages/core/src/interior/ladder.ts`, `packages/core/test/interior-ladder.test.ts`
-- `packages/core/src/interior/bore-resistance.ts`, `packages/core/test/interior-bore-resistance.test.ts`
+- `packages/ballistics/src/interior/velocity-ladder.ts`, `packages/ballistics/test/interior-velocity-ladder.test.ts`
+- `packages/ballistics/src/interior/vivacity.ts`, `packages/ballistics/test/interior-vivacity.test.ts`
+- `packages/ballistics/src/interior/ladder.ts`, `packages/ballistics/test/interior-ladder.test.ts`
+- `packages/ballistics/src/interior/bore-resistance.ts`, `packages/ballistics/test/interior-bore-resistance.test.ts`
 - `apps/web/src/lib/units.ts`, `apps/web/test/units.test.ts`
 - `apps/web/src/lib/chrono.ts`, `apps/web/test/chrono.test.ts`
 - `packages/shot-groups/src/geometry.ts`, `packages/shot-groups/test/geometry.test.ts`
 - `packages/shot-groups/src/ring-scoring.ts`, `packages/shot-groups/test/ring-scoring.test.ts`, `packages/shot-groups/test/ring-scoring-shapes.test.ts`, `apps/web/test/ring-scoring-national.test.ts`
 - `apps/web/src/lib/field-spec.ts`, `apps/web/test/field-spec.test.ts`
-- `packages/core/src/cartridge-specs.ts`, `packages/core/test/cartridge-specs.test.ts`
+- `packages/ballistics/src/cartridge-specs.ts`, `packages/ballistics/test/cartridge-specs.test.ts`
 - `packages/api/src/compute/limits.ts`, `packages/api/test/limits.test.ts`
 - `packages/cli/src/rows.ts`, `packages/cli/test/rows.test.ts`
 - `packages/cli/src/metrics.ts`, `packages/cli/test/metrics.test.ts`

@@ -41,10 +41,10 @@ Public: the packing density of a published measurement of equal spheres; no meas
 
 ## Where in the app
 
-- `packages/core/src/interior/load-file.ts`, `solidFill`, `solidFillLimit`, `fillLoadRatioLimit`.
-- `packages/core/src/interior/charge-solver.ts`, `chargeUpperBound`.
-- `packages/core/test/interior-load-file.test.ts`, the tests of the `solidFill` block.
-- `packages/core/test/interior-charge-solver.test.ts`, the test "caps the charge at the solid fill limit and below the chamber volume".
+- `packages/ballistics/src/interior/load-file.ts`, `solidFill`, `solidFillLimit`, `fillLoadRatioLimit`.
+- `packages/ballistics/src/interior/charge-solver.ts`, `chargeUpperBound`.
+- `packages/ballistics/test/interior-load-file.test.ts`, the tests of the `solidFill` block.
+- `packages/ballistics/test/interior-charge-solver.test.ts`, the test "caps the charge at the solid fill limit and below the chamber volume".
 - Model page: [M3 interior model](../models/interior-m3.md).
 
 ## Confidence

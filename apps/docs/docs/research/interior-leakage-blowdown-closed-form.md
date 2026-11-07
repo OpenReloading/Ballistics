@@ -38,8 +38,8 @@ Analytic: a closed form compared with the model, no measured data.
 
 ## Where in the app
 
-- `packages/core/src/interior/model.ts`, `closedVessel`, `leakFlowFactor`.
-- `packages/core/test/interior-model.test.ts`, the test "choked blowdown of a fixed vessel follows the isentropic closed form".
+- `packages/ballistics/src/interior/model.ts`, `closedVessel`, `leakFlowFactor`.
+- `packages/ballistics/test/interior-model.test.ts`, the test "choked blowdown of a fixed vessel follows the isentropic closed form".
 - Model page: [gas leakage and heat loss](../models/interior-leakage-heat.md).
 
 ## Confidence

@@ -16,7 +16,7 @@ $$
 I = m_p v_0 + m_c f v_0
 $$
 
-Code: `packages/core/src/recoil.ts`, `freeRecoil` (`momentum`).
+Code: `packages/ballistics/src/recoil.ts`, `freeRecoil` (`momentum`).
 
 Velocity and kinetic energy of the firearm:
 
@@ -24,11 +24,11 @@ $$
 v_g = \frac{I}{m_g}, \qquad E_g = \tfrac{1}{2} m_g v_g^2
 $$
 
-Code: `packages/core/src/recoil.ts`, `freeRecoil` (`velocity`, `energy`).
+Code: `packages/ballistics/src/recoil.ts`, `freeRecoil` (`velocity`, `energy`).
 
 Gas velocity factor by firearm type: $f = 1.75$ for high-powered rifles, $f = 1.50$ for pistols and revolvers.
 
-Code: `packages/core/src/recoil.ts`, `gasVelocityFactor`.
+Code: `packages/ballistics/src/recoil.ts`, `gasVelocityFactor`.
 
 ## Symbols
 

@@ -18,7 +18,7 @@ $$
 A = \frac{\pi}{4} d^2, \qquad m_p = m_s + m_w, \qquad L_\text{tw} = 0, \qquad p_\text{st} = p_c
 $$
 
-Code: `packages/core/src/interior/shotshell.ts`, `shotshellInteriorLoad` (the result fields `boreArea`, `twist`, `mass` and `startPressure`).
+Code: `packages/ballistics/src/interior/shotshell.ts`, `shotshellInteriorLoad` (the result fields `boreArea`, `twist`, `mass` and `startPressure`).
 
 The powder space $V_c$, the wad travel $x_e$ and every other input (charge, propellant, temperature, ignition pressure, resistance, leakage, gradient, heat) pass to M3 unchanged. With $L_\text{tw} = 0$ the rotation factor of M3 is 1, so the column has no rotational energy.
 

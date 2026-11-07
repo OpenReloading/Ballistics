@@ -16,7 +16,7 @@ $$
 z_{ij} = y_{ij} - b \left( v_{ij} - \bar v \right), \qquad r_i = \bar z_i = \frac{1}{n_i} \sum_j z_{ij}
 $$
 
-Code: `packages/core/src/interior/ladder-impact.ts`, `ladderImpactResiduals` (`z`, `mean`). The sample standard deviation of the $z_{ij}$ of a charge (`standardDeviation`) and the shot count (`count`) are returned in the shape of `LadderStep`, so [`ladderFlatSpots`](interior-velocity-ladder.md) reads the steps.
+Code: `packages/ballistics/src/interior/ladder-impact.ts`, `ladderImpactResiduals` (`z`, `mean`). The sample standard deviation of the $z_{ij}$ of a charge (`standardDeviation`) and the shot count (`count`) are returned in the shape of `LadderStep`, so [`ladderFlatSpots`](interior-velocity-ladder.md) reads the steps.
 
 With $m$ charges, $N$ shots in all, the count-weighted mean $\bar r$ of the $r_i$ and the variance $s_p^2$ of the $z_{ij}$ pooled over the charges, the heterogeneity statistic is
 
@@ -24,11 +24,11 @@ $$
 Q = \frac{\sum_i n_i \left( r_i - \bar r \right)^2}{s_p^2}, \qquad s_p^2 = \frac{\sum_i (n_i - 1) s_i^2}{N - m}
 $$
 
-Code: `packages/core/src/interior/ladder-impact.ts`, `ladderImpactResiduals` (`between`, `within`, `pooled`, `statistic`).
+Code: `packages/ballistics/src/interior/ladder-impact.ts`, `ladderImpactResiduals` (`between`, `within`, `pooled`, `statistic`).
 
 The note is raised when $Q$ exceeds the chi-square quantile at level $\gamma$ (0.99 by default) with $m - 1$ degrees of freedom. When every shot of every charge has one height, $Q$ is 0 if the centres agree and infinite otherwise.
 
-Code: `packages/core/src/interior/ladder-impact.ts`, `ladderImpactResiduals` (`degrees`, `varies`). The quantile is `chiSquareQuantile` of the [shot group](groups.md) statistics.
+Code: `packages/ballistics/src/interior/ladder-impact.ts`, `ladderImpactResiduals` (`degrees`, `varies`). The quantile is `chiSquareQuantile` of the [shot group](groups.md) statistics.
 
 ### Drop slope
 
