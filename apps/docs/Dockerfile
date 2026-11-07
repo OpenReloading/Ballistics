@@ -1,5 +1,5 @@
 # Build context: repository root (docker build -f apps/docs/Dockerfile .)
-FROM docker.io/library/node:26-bookworm-slim@sha256:28147155d47dc31abe0a46e0d12b59b2fb3d0a2dcc5dc65fce76a074180b16fe AS build
+FROM docker.io/library/node:26-bookworm-slim@sha256:bc0a2afd3b74ce12222fc8bab99271e66257f021078f5f4a5d687a77d280c1d9 AS build
 # pnpm as .github/pnpm/package-lock.json pins it; its native binary comes as an optional dependency, so no install script runs
 COPY .github/pnpm /opt/pnpm
 RUN cd /opt/pnpm && npm ci --ignore-scripts --no-audit --no-fund && ln -s /opt/pnpm/node_modules/.bin/pnpm /usr/local/bin/pnpm
