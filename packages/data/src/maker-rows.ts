@@ -1,6 +1,6 @@
 import type { Bundle } from './records.ts'
 
-/** A record that leaves the public catalogue: it cites a manufacturer-origin source. */
+/** A record the public catalogue may not hold: it cites a manufacturer-origin source. */
 export interface MakerRow {
   id: string
 }
@@ -11,13 +11,13 @@ interface Cited {
   provenance?: { sources?: { origin?: string | undefined }[] } | undefined
 }
 
-/** True when `record` cites any manufacturer-origin source; it then leaves whole, also beside other sources. */
+/** True when `record` cites any manufacturer-origin source, also beside other sources. */
 const citesMaker = (record: Cited) =>
   (record.provenance?.sources ?? []).some((s) => s.origin === 'manufacturer')
 
 /**
- * The records of `bundle` that leave the public catalogue, by kind, in the order of the bundle;
- * kinds without one are left out. Manufacturer records stay as identity records.
+ * The records of `bundle` the public catalogue may not hold, by kind, in the order of the bundle;
+ * kinds without one are left out. Manufacturer records are identity records and may cite their maker.
  */
 export function makerRows(bundle: Bundle): Record<string, MakerRow[]> {
   const out: Record<string, MakerRow[]> = {}

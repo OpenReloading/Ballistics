@@ -37,11 +37,10 @@ describe('makerRows', () => {
   })
 })
 
-describe('the maker rows of the committed records', () => {
-  const { bundle, errors } = readRecords()
-
-  it('are bullets and powders only: no other kind cites a manufacturer', () => {
+describe('the committed records', () => {
+  it('cite no manufacturer source, except the manufacturer records', () => {
+    const { bundle, errors } = readRecords()
     expect(errors).toEqual([])
-    expect(Object.keys(makerRows(bundle)).toSorted()).toEqual(['bullets', 'powders'])
+    expect(makerRows(bundle)).toEqual({})
   })
 })
