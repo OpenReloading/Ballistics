@@ -41,7 +41,7 @@ const database = () =>
     }
     r.onerror = () => {
       reject(r.error ?? new Error('IndexedDB request failed'))
-      // `globalThis`: the import worker opens the database too, without a `window`
+      // `globalThis`: a worker has no `window` (its event reaches no page listener)
       if (r.error?.name === 'VersionError') globalThis.dispatchEvent(new Event(refusedEvent))
     }
     // a failure, also a throw of `open` itself (no IndexedDB here), is not kept: the next call tries again

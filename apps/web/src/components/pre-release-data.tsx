@@ -2,12 +2,13 @@
 
 import { useEffect, useRef } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import { deleteDatabase, refusedEvent } from '../lib/user-db.ts'
+import { deleteDatabase, inStore, refusedEvent } from '../lib/user-db.ts'
 import { confirmDialog } from './confirm.tsx'
 
 /**
  * Offers to delete the browser's database of a pre-release version, which this version refuses
- * (`refusedEvent`): asked once per page load; Delete reloads the page with an empty database.
+ * (`refusedEvent`): asked once per page load; Delete reloads the page with an empty database. The
+ * page opens the database on mount, as a refusal in a worker never reaches this listener.
  */
 export function PreReleaseData() {
   const { t } = useTranslation()
@@ -28,6 +29,8 @@ export function PreReleaseData() {
       if (ok) void deleteDatabase().finally(() => location.reload())
     }
     window.addEventListener(refusedEvent, ask)
+    // the read's own error (refused, or no IndexedDB here) is shown where a page reads
+    inStore('records', 'readonly', (s) => s.count()).catch(() => {})
     return () => window.removeEventListener(refusedEvent, ask)
   }, [t])
   return null
