@@ -51,7 +51,7 @@
     "@vitest/coverage-v8": "catalog:",
     "oxlint": "catalog:",
     "oxlint-tsgolint": "catalog:",
-    "postcss": "8.5.31",
+    "postcss": "8.5.32",
     "publint": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",

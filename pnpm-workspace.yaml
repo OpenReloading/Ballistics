@@ -15,7 +15,7 @@ catalog:
   "@arethetypeswrong/cli": 0.18.5
   # every @mantine package, so one upgrade moves them together
   "@mantine/core": 9.7.4
-  "@mantine/form": 9.7.4
+  "@mantine/form": 9.7.5
   "@mantine/hooks": 9.7.4
   "@mantine/spotlight": 9.7.4
   "@microsoft/api-extractor": 7.60.1
@@ -26,7 +26,7 @@ catalog:
   "@vitest/coverage-v8": 5.0.5
   ajv: 8.20.0
   fast-check: 4.10.2
-  oxlint: 1.90.0
+  oxlint: 1.91.0
   oxlint-tsgolint: 7.0.2005
   # the same version as @playwright/test: both run in PLAYWRIGHT_IMAGE (ci.yml)
   playwright: 1.64.1
