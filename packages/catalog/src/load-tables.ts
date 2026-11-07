@@ -10,22 +10,22 @@ function isListedLoadTable(source: Source, loadTables: LoadTables) {
 
 const isInterior = (f: string) => f === 'interior' || f.startsWith('interior.')
 
-/** The findings of one source that supports `interior` or is fitted. */
+/** The findings of one source that supports `interior` or is fitted, of `powder`. */
 function checkInteriorSource(
   s: Source,
   at: string,
   kind: string,
-  powder: Powder,
-  loadTables: LoadTables,
-  errors: string[],
-) {
+  { powder, loadTables }: { powder: Powder; loadTables: LoadTables },
+): string[] {
+  const errors: string[] = []
   if (kind !== 'fitted') errors.push(`${at} supports interior but is not fitted`)
   else if (!s.fields?.every(isInterior))
     errors.push(`${at}: a fitted source supports only interior`)
   else if (!powder.interior) errors.push(`${at}: fitted source without interior`)
-  if (kind !== 'fitted') return
+  if (kind !== 'fitted') return errors
   if (!isListedLoadTable(s, loadTables)) errors.push(`${at} is not a listed load table`)
   if (!s.run) errors.push(`${at} names no fit run (version, report)`)
+  return errors
 }
 
 /**
@@ -49,7 +49,9 @@ export function checkFittedSources(powder: Powder, loadTables: LoadTables): stri
     }
     if (kind !== 'fitted' && !(covers && powder.interior)) return
     if (kind === 'fitted') fitted++
-    checkInteriorSource(s, `source ${i} ("${s.title}")`, kind, powder, loadTables, errors)
+    errors.push(
+      ...checkInteriorSource(s, `source ${i} ("${s.title}")`, kind, { powder, loadTables }),
+    )
   })
   if (powder.interior && fitted === 0) errors.push('interior without a fitted source')
   return errors

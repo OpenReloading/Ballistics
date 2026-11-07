@@ -48,6 +48,20 @@ export function useChartTokens<K extends string>(names: Record<K, string>) {
   return tokens
 }
 
+/** The axis tooltip frame of the charts in the page's colours. */
+export const chartTooltip = (c: { bg: string; border: string; fg: string }) => ({
+  trigger: 'axis',
+  // kept inside the chart: `.chart` clips overflow, so a tooltip past its edge was cut
+  confine: true,
+  borderRadius: 0,
+  backgroundColor: c.bg,
+  borderColor: c.border,
+  textStyle: { color: c.fg },
+})
+
+/** The text of an axis name or tick label. */
+export const axisText = (color: string) => ({ color, fontSize: 12 })
+
 /** The chart's print width, px: the A4 column (210 mm less 15 mm margins) at 96 px per inch. */
 const printWidth = 680
 

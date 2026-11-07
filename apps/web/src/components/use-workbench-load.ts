@@ -1893,7 +1893,6 @@ export function useWorkbenchState() {
       putRecords(changed.map((r) => ({ ...r, saved }))).catch(() => {})
     }
   }, [])
-  const [csvCopied, setCsvCopied] = useState<boolean | 'failed'>(false)
   /** Phones: the model parameters stand open on request. */
   const [modelShown, setModelShown] = useState(false)
   /** The defaults the current load started from, and the fields still holding them. */
@@ -3784,7 +3783,6 @@ export function useWorkbenchState() {
     chooseFirearm,
     applyCharge,
     choosePowder,
-    csvCopied,
     defaulted,
     defaultOf,
     grooveDiameter: grooveM,
@@ -3867,7 +3865,6 @@ export function useWorkbenchState() {
     setBulletDesign,
     setByHand,
     setChartView,
-    setCsvCopied,
     setDefaulted,
     setFollowed,
     setDirection,

@@ -93,21 +93,22 @@ describe('checkSpec', () => {
   })
 })
 
-describe('checkBullet', () => {
-  const base: Bullet = {
-    id: 'test-bullet',
-    manufacturer: 'test-manufacturer',
-    productNumber: '1',
-    name: 'Test',
-    diameter: { value: 7.823 },
-    mass: { value: 10.886 },
-    provenance: { kind: 'published', sources: [{ title: 'Test' }] },
-  }
-  const kinds = (b: Partial<Bullet>) => checkBullet({ ...base, ...b }).map((f) => f.finding)
+const plausibleBullet: Bullet = {
+  id: 'test-bullet',
+  manufacturer: 'test-manufacturer',
+  productNumber: '1',
+  name: 'Test',
+  diameter: { value: 7.823 },
+  mass: { value: 10.886 },
+  provenance: { kind: 'published', sources: [{ title: 'Test' }] },
+}
+const bulletKinds = (b: Partial<Bullet>) =>
+  checkBullet({ ...plausibleBullet, ...b }).map((f) => f.finding)
 
+describe('checkBullet', () => {
   it('accepts a plausible bullet', () => {
     expect(
-      kinds({
+      bulletKinds({
         length: { value: 31.29 },
         ballisticCoefficients: [
           { dragModel: 'G1', value: 0.462 },
@@ -119,15 +120,15 @@ describe('checkBullet', () => {
   })
 
   it('flags misread values', () => {
-    expect(kinds({ diameter: { value: 308 } })).toEqual(['diameter-range'])
-    expect(kinds({ mass: { value: 168 } })).toEqual(['mass-range'])
-    expect(kinds({ mass: { value: 70.5 } })).toEqual(['mass-range'])
-    expect(kinds({ mass: { value: 64.9 } })).toEqual([])
-    expect(kinds({ ballisticCoefficients: [{ dragModel: 'G1', value: 4.62 }] })).toEqual([
+    expect(bulletKinds({ diameter: { value: 308 } })).toEqual(['diameter-range'])
+    expect(bulletKinds({ mass: { value: 168 } })).toEqual(['mass-range'])
+    expect(bulletKinds({ mass: { value: 70.5 } })).toEqual(['mass-range'])
+    expect(bulletKinds({ mass: { value: 64.9 } })).toEqual([])
+    expect(bulletKinds({ ballisticCoefficients: [{ dragModel: 'G1', value: 4.62 }] })).toEqual([
       'ballistic-coefficient-range:G1',
     ])
     expect(
-      kinds({
+      bulletKinds({
         ballisticCoefficients: [
           { dragModel: 'G1', value: 0.224 },
           { dragModel: 'G7', value: 0.462 },
@@ -135,68 +136,81 @@ describe('checkBullet', () => {
       }),
     ).toEqual(['g7-g1-ratio'])
     expect(
-      kinds({
+      bulletKinds({
         ballisticCoefficients: [
           { dragModel: 'G1', value: 0.273 },
           { dragModel: 'G7', value: 0.246 },
         ],
       }),
     ).toEqual(['g7-g1-ratio'])
-    expect(kinds({ length: { value: 70 } })).toEqual(['length-ratio'])
-    expect(kinds({ recommendedTwist: { value: 10 } })).toEqual(['twist-range'])
-    expect(kinds({ slowestTwist: { value: 2000 } })).toEqual(['twist-range'])
+    expect(bulletKinds({ length: { value: 70 } })).toEqual(['length-ratio'])
+    expect(bulletKinds({ recommendedTwist: { value: 10 } })).toEqual(['twist-range'])
+    expect(bulletKinds({ slowestTwist: { value: 2000 } })).toEqual(['twist-range'])
   })
 })
 
+const capacity = (value: number): CaseCapacity => ({
+  id: 'test-capacity',
+  origin: 'catalogue',
+  cartridge: 'catalogue:test',
+  waterCapacity: { value },
+  provenance: { kind: 'published', sources: [{ title: 'Test' }] },
+})
+
+const capacityKinds = (value: number, s?: { values: SpecValue[] }) =>
+  checkCapacity(capacity(value), s).map((f) => f.finding)
+
 describe('checkCapacity', () => {
-  const capacity = (value: number): CaseCapacity => ({
-    id: 'test-capacity',
-    origin: 'catalogue',
-    cartridge: 'catalogue:test',
-    waterCapacity: { value },
-    provenance: { kind: 'published', sources: [{ title: 'Test' }] },
-  })
   // Enclosing cylinder: pi / 4 * 12^2 mm^2 * 50 mm = 5.65 cm3, 5.65 g of water.
   const caseSpec = spec([cartridge('P1', 11.9), cartridge('R1', 12), cartridge('L3', 50)])
-  const kinds = (value: number, s?: { values: SpecValue[] }) =>
-    checkCapacity(capacity(value), s).map((f) => f.finding)
 
   it('accepts a capacity inside the enclosing cylinder', () => {
-    expect(kinds(3.5, caseSpec)).toEqual([])
-    expect(kinds(3.5)).toEqual([])
+    expect(capacityKinds(3.5, caseSpec)).toEqual([])
+    expect(capacityKinds(3.5)).toEqual([])
   })
 
   it('flags a capacity above the enclosing cylinder or not positive', () => {
-    expect(kinds(5.7, caseSpec)).toEqual(['capacity-range'])
-    expect(kinds(0)).toEqual(['capacity-range'])
+    expect(capacityKinds(5.7, caseSpec)).toEqual(['capacity-range'])
+    expect(capacityKinds(0)).toEqual(['capacity-range'])
   })
 
   it('uses P1 or R1 alone when the spec has only one of them', () => {
     // pi / 4 * 12^2 mm^2 * 50 mm = 5.65 g.
-    expect(kinds(5.6, spec([cartridge('P1', 12), cartridge('L3', 50)]))).toEqual([])
-    expect(kinds(5.7, spec([cartridge('P1', 12), cartridge('L3', 50)]))).toEqual(['capacity-range'])
-    expect(kinds(5.6, spec([cartridge('R1', 12), cartridge('L3', 50)]))).toEqual([])
-    expect(kinds(5.7, spec([cartridge('R1', 12), cartridge('L3', 50)]))).toEqual(['capacity-range'])
+    expect(capacityKinds(5.6, spec([cartridge('P1', 12), cartridge('L3', 50)]))).toEqual([])
+    expect(capacityKinds(5.7, spec([cartridge('P1', 12), cartridge('L3', 50)]))).toEqual([
+      'capacity-range',
+    ])
+    expect(capacityKinds(5.6, spec([cartridge('R1', 12), cartridge('L3', 50)]))).toEqual([])
+    expect(capacityKinds(5.7, spec([cartridge('R1', 12), cartridge('L3', 50)]))).toEqual([
+      'capacity-range',
+    ])
   })
 })
 
+const range = (value: number) => ({ value, min: value, max: value })
+
+// 8314.462618 * 3000 / 25 = 997735.5 J/kg.
+const thermo = (impetus: number, gamma = 1.24, covolume = 0.001) => ({
+  loadingDensity: { value: 0.1 },
+  flameTemperature: range(3000),
+  impetus: range(impetus),
+  gamma: range(gamma),
+  molarMass: range(25),
+  covolume: range(covolume),
+})
+
+// 8314.462618 * T / M at the mean composition; min and max set apart from it.
+const withThermo = (p: Partial<NonNullable<Powder['thermochemistry']>>) => ({
+  thermochemistry: { ...thermo(997735), ...p },
+})
+
 describe('checkPowder', () => {
-  const range = (value: number) => ({ value, min: value, max: value })
   const base: Powder = {
     id: 'test-powder',
     manufacturer: 'test-manufacturer',
     name: 'Test',
     provenance: { kind: 'published', sources: [{ title: 'Test' }] },
   }
-  // 8314.462618 * 3000 / 25 = 997735.5 J/kg.
-  const thermo = (impetus: number, gamma = 1.24, covolume = 0.001) => ({
-    loadingDensity: { value: 0.1 },
-    flameTemperature: range(3000),
-    impetus: range(impetus),
-    gamma: range(gamma),
-    molarMass: range(25),
-    covolume: range(covolume),
-  })
   const kinds = (p: Partial<Powder>) => checkPowder({ ...base, ...p }).map((f) => f.finding)
 
   it('accepts plausible values', () => {
@@ -211,31 +225,40 @@ describe('checkPowder', () => {
     expect(kinds({ thermochemistry: thermo(997735, 1.24, 0) })).toEqual(['covolume-range'])
   })
 
-  // 8314.462618 * T / M at the mean composition; min and max set apart from it.
-  const t = (p: Partial<NonNullable<Powder['thermochemistry']>>) => ({
-    thermochemistry: { ...thermo(997735), ...p },
-  })
-
   it('accepts loading density, flame temperature and molar mass at their bounds', () => {
-    expect(kinds(t({ loadingDensity: { value: 1.6 } }))).toEqual([])
-    expect(kinds(t({ loadingDensity: { value: 0.01 } }))).toEqual([])
-    expect(kinds(t({ flameTemperature: { value: 3000, min: 300, max: 6000 } }))).toEqual([])
-    expect(kinds(t({ molarMass: { value: 25, min: 1.01, max: 25 } }))).toEqual([])
+    expect(kinds(withThermo({ loadingDensity: { value: 1.6 } }))).toEqual([])
+    expect(kinds(withThermo({ loadingDensity: { value: 0.01 } }))).toEqual([])
+    expect(kinds(withThermo({ flameTemperature: { value: 3000, min: 300, max: 6000 } }))).toEqual(
+      [],
+    )
+    expect(kinds(withThermo({ molarMass: { value: 25, min: 1.01, max: 25 } }))).toEqual([])
   })
 
   it('flags loading density, flame temperature and molar mass out of range', () => {
-    expect(kinds(t({ loadingDensity: { value: 0 } }))).toEqual(['loading-density-range'])
-    expect(kinds(t({ loadingDensity: { value: 1.65 } }))).toEqual(['loading-density-range'])
-    expect(kinds(t({ flameTemperature: { value: 3000, min: 290, max: 3000 } }))).toEqual([
+    expect(kinds(withThermo({ loadingDensity: { value: 0 } }))).toEqual(['loading-density-range'])
+    expect(kinds(withThermo({ loadingDensity: { value: 1.65 } }))).toEqual([
+      'loading-density-range',
+    ])
+    expect(kinds(withThermo({ flameTemperature: { value: 3000, min: 290, max: 3000 } }))).toEqual([
       'flame-temperature-range',
     ])
-    expect(kinds(t({ flameTemperature: { value: 3000, min: 3000, max: 6500 } }))).toEqual([
+    expect(kinds(withThermo({ flameTemperature: { value: 3000, min: 3000, max: 6500 } }))).toEqual([
       'flame-temperature-range',
     ])
-    expect(kinds(t({ molarMass: { value: 25, min: 1.008, max: 25 } }))).toEqual([
+    expect(kinds(withThermo({ molarMass: { value: 25, min: 1.008, max: 25 } }))).toEqual([
       'molar-mass-range',
     ])
   })
+})
+
+const string = (temperature: number) => ({
+  strings: [
+    {
+      load: 'catalogue:test-load',
+      propellantTemperature: { value: temperature },
+      shots: [{ velocity: { value: 800 } }],
+    },
+  ],
 })
 
 describe('checkChronoSession', () => {
@@ -274,16 +297,6 @@ describe('checkChronoSession', () => {
     expect(kinds(conditions({ airTemperature: { value: -90 } }))).toEqual(['air-temperature-range'])
     expect(kinds(conditions({ stationPressure: { value: 0 } }))).toEqual(['pressure-range'])
     expect(kinds({ muzzleDistance: { value: -1 } })).toEqual(['muzzle-distance-range'])
-  })
-
-  const string = (temperature: number) => ({
-    strings: [
-      {
-        load: 'catalogue:test-load',
-        propellantTemperature: { value: temperature },
-        shots: [{ velocity: { value: 800 } }],
-      },
-    ],
   })
 
   it('accepts station pressure and propellant temperature at their bounds', () => {

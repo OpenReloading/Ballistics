@@ -4,6 +4,7 @@
 
 ```ts
 
+import { conversions } from '@open-reloading/units';
 import { QuantityKind } from '@open-reloading/units';
 import { SiMap } from '@open-reloading/units';
 import { siMaps } from '@open-reloading/units';
@@ -519,6 +520,8 @@ export const constructionFields: z.ZodObject<{
     drivingBands: z.ZodOptional<z.ZodInt>;
     unmapped: z.ZodOptional<z.ZodLiteral<true>>;
 }>;
+
+export { conversions }
 
 // @public
 export interface DanglingRef {

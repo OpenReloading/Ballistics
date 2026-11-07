@@ -2,57 +2,57 @@ import type { Discipline, EventType, Federation } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { checkEventTypes } from '../src/event-types.ts'
 
-describe('checkEventTypes', () => {
-  const provenance = { kind: 'published' as const, sources: [{ title: 'Test rule book' }] }
-  const book = {
-    title: 'Rules',
-    edition: '1',
-    publisher: 'Test',
-    url: 'https://example.org/r.pdf',
-    sha256: '0'.repeat(64),
-  }
-  const fed = (id: string): Federation => ({
-    id,
-    name: id,
-    abbreviation: id.toUpperCase(),
-    country: 'DE',
-    ruleBooks: [{ title: book.title, edition: book.edition, url: book.url, sha256: book.sha256 }],
-    provenance,
-  })
-  const disc = (id: string, federation: string): Discipline => ({
-    id,
-    federation,
-    name: id,
-    section: '1',
-    page: '1',
-    distance: { value: 25000, unit: 'm' },
-    provenance,
-  })
-  const rings = (discipline?: string): EventType => ({
-    id: 'rings',
-    name: 'Rings',
-    federation: 'national',
-    ruleBook: book,
-    scoring: { method: 'rings', ...(discipline && { discipline }) },
-    levels: ['Local'],
-    provenance,
-  })
-  const practical: EventType = {
-    ...rings(),
-    id: 'practical',
-    scoring: {
-      method: 'hit-factor',
-      points: { major: { A: 5, C: 4, D: 2, metal: 5 }, minor: { A: 5, C: 3, D: 1, metal: 5 } },
-      penalties: { miss: 10, noShoot: 10, procedural: 10 },
-      powerFactors: [{ division: 'Open', minor: 125, major: 160 }],
-    },
-    magazine: [{ division: 'Open', maxRounds: 10 }],
-  }
-  const bundle = {
-    federations: [fed('national'), fed('other')],
-    disciplines: [disc('own', 'national'), disc('foreign', 'other')],
-  }
+const provenance = { kind: 'published' as const, sources: [{ title: 'Test rule book' }] }
+const book = {
+  title: 'Rules',
+  edition: '1',
+  publisher: 'Test',
+  url: 'https://example.org/r.pdf',
+  sha256: '0'.repeat(64),
+}
+const fed = (id: string): Federation => ({
+  id,
+  name: id,
+  abbreviation: id.toUpperCase(),
+  country: 'DE',
+  ruleBooks: [{ title: book.title, edition: book.edition, url: book.url, sha256: book.sha256 }],
+  provenance,
+})
+const disc = (id: string, federation: string): Discipline => ({
+  id,
+  federation,
+  name: id,
+  section: '1',
+  page: '1',
+  distance: { value: 25000, unit: 'm' },
+  provenance,
+})
+const rings = (discipline?: string): EventType => ({
+  id: 'rings',
+  name: 'Rings',
+  federation: 'national',
+  ruleBook: book,
+  scoring: { method: 'rings', ...(discipline && { discipline }) },
+  levels: ['Local'],
+  provenance,
+})
+const practical: EventType = {
+  ...rings(),
+  id: 'practical',
+  scoring: {
+    method: 'hit-factor',
+    points: { major: { A: 5, C: 4, D: 2, metal: 5 }, minor: { A: 5, C: 3, D: 1, metal: 5 } },
+    penalties: { miss: 10, noShoot: 10, procedural: 10 },
+    powerFactors: [{ division: 'Open', minor: 125, major: 160 }],
+  },
+  magazine: [{ division: 'Open', maxRounds: 10 }],
+}
+const bundle = {
+  federations: [fed('national'), fed('other')],
+  disciplines: [disc('own', 'national'), disc('foreign', 'other')],
+}
 
+describe('checkEventTypes', () => {
   it('accepts a known federation, its rule book, its discipline and known divisions', () => {
     expect(checkEventTypes({ ...bundle, eventTypes: [rings('own'), practical] })).toEqual([])
   })
@@ -75,7 +75,9 @@ describe('checkEventTypes', () => {
       'event-types/rings.json: discipline "foreign" is not one of federation "national"',
     ])
   })
+})
 
+describe('checkEventTypes divisions', () => {
   it('finds a major magazine limit of a division without major, and any limit on ring scoring', () => {
     const noMajor: EventType = {
       ...practical,

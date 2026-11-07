@@ -38,13 +38,13 @@ function checkDiscipline(
   where: string,
   federation: Federation | undefined,
   lookup: Lookup,
-  errors: string[],
-) {
-  if (t.scoring.method !== 'rings' || !t.scoring.discipline) return
+): string[] {
+  if (t.scoring.method !== 'rings' || !t.scoring.discipline) return []
   const d = lookup.disciplines.get(t.scoring.discipline)
-  if (!d) errors.push(`${where}: unknown discipline "${t.scoring.discipline}"`)
-  else if (federation && d.federation !== federation.id)
-    errors.push(`${where}: discipline "${d.id}" is not one of federation "${federation.id}"`)
+  if (!d) return [`${where}: unknown discipline "${t.scoring.discipline}"`]
+  if (federation && d.federation !== federation.id)
+    return [`${where}: discipline "${d.id}" is not one of federation "${federation.id}"`]
+  return []
 }
 
 /**
@@ -60,7 +60,7 @@ export function checkEventTypes(
   for (const t of bundle.eventTypes ?? []) {
     const where = `event-types/${t.id}.json`
     const federation = checkFederation(t, where, lookup, errors)
-    checkDiscipline(t, where, federation, lookup, errors)
+    errors.push(...checkDiscipline(t, where, federation, lookup))
     checkDivisions(t, where, errors)
   }
   return errors

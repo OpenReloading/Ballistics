@@ -11,20 +11,22 @@ const projectileDiameter = (values: Bundle['cartridges'][number]['values']) => {
 
 type CaliberBundle = Pick<Bundle, 'caliberClasses' | 'cartridges' | 'disciplines'>
 
+/** The cartridge records by id and the class each cartridge already belongs to. */
+type Members = {
+  cartridges: Map<string, Bundle['cartridges'][number]>
+  owner: Map<string, string>
+}
+
 /** Checks one member of a class: its record, its single class and G1 against the class diameter. */
 function checkMember(
   c: CaliberBundle['caliberClasses'][number],
   id: string,
-  cartridges: Map<string, Bundle['cartridges'][number]>,
-  owner: Map<string, string>,
-  errors: string[],
-) {
+  { cartridges, owner }: Members,
+): string[] {
   const where = `caliber-classes/${c.id}.json`
   const cartridge = cartridges.get(id)
-  if (!cartridge) {
-    errors.push(`${where}: unknown cartridge "${id}"`)
-    return
-  }
+  if (!cartridge) return [`${where}: unknown cartridge "${id}"`]
+  const errors: string[] = []
   const other = owner.get(cartridge.id)
   if (other) errors.push(`${where}: cartridge "${id}" is also in ${other}`)
   else owner.set(cartridge.id, c.id)
@@ -34,6 +36,7 @@ function checkMember(
     errors.push(
       `${where}: diameter ${c.diameter.value} mm is more than ${diameterTolerance} mm from G1 ${g1} mm of "${id}"`,
     )
+  return errors
 }
 
 /**
@@ -43,10 +46,12 @@ function checkMember(
  */
 export function checkCaliberClasses(bundle: CaliberBundle): string[] {
   const errors: string[] = []
-  const cartridges = new Map(bundle.cartridges.map((c) => [c.id, c]))
-  const owner = new Map<string, string>()
+  const members: Members = {
+    cartridges: new Map(bundle.cartridges.map((c) => [c.id, c])),
+    owner: new Map<string, string>(),
+  }
   for (const c of bundle.caliberClasses)
-    for (const id of c.cartridges) checkMember(c, id, cartridges, owner, errors)
+    for (const id of c.cartridges) errors.push(...checkMember(c, id, members))
   const classes = new Set(bundle.caliberClasses.map((c) => c.id))
   for (const d of bundle.disciplines)
     for (const id of d.caliberClasses?.ids ?? [])

@@ -54,7 +54,7 @@ function duplicateOf(
 function duplicates(records: Named[]): LocatedFinding[] {
   const findings: LocatedFinding[] = []
   const seen: Seen = { exact: new Map(), normalised: new Map() }
-  for (const record of [...records].sort((a, b) => (a.file < b.file ? -1 : 1))) {
+  for (const record of records.toSorted((a, b) => (a.file < b.file ? -1 : 1))) {
     const reported = new Set<string>()
     for (const name of new Set(record.names)) {
       const found = duplicateOf(seen, record, name, reported)
@@ -62,6 +62,77 @@ function duplicates(records: Named[]): LocatedFinding[] {
     }
   }
   return findings
+}
+
+/** The record file of `id` in directory `dir`. */
+const fileOf = (dir: string, id: string) => `${dir}/${id}.json`
+
+/** The names of cartridges, manufacturers, powders, primers and bullets, one group per comparison. */
+function componentNames(
+  bundle: Pick<Bundle, 'cartridges' | 'manufacturers' | 'powders' | 'primers' | 'bullets'>,
+): Named[][] {
+  return [
+    bundle.cartridges.map((c) => ({
+      file: fileOf('cartridges', c.id),
+      scope: '',
+      names: [c.name, ...(c.aliases ?? [])],
+    })),
+    bundle.manufacturers.map((m) => ({
+      file: fileOf('manufacturers', m.id),
+      scope: '',
+      names: [m.name, ...(m.aliases ?? [])],
+    })),
+    bundle.powders.map((p) => ({
+      file: fileOf('powders', p.id),
+      scope: p.manufacturer,
+      names: [p.name],
+    })),
+    // An alias names a brand and name of another manufacturer, so aliases are compared with aliases only.
+    bundle.powders.map((p) => ({
+      file: fileOf('powders', p.id),
+      scope: '',
+      names: p.aliases ?? [],
+    })),
+    bundle.primers.map((p) => ({
+      file: fileOf('primers', p.id),
+      scope: p.manufacturer,
+      names: [p.name],
+    })),
+    bundle.bullets.map((b) => ({
+      file: fileOf('bullets', b.id),
+      scope: b.manufacturer,
+      names: [b.name],
+    })),
+  ]
+}
+
+/** The names of cases, range records and target faces, one group per comparison. */
+function otherNames(bundle: Pick<Bundle, 'cases' | 'rangeFirings' | 'targetFaces'>): Named[][] {
+  return [
+    // A case is named per cartridge, as the same product line serves several.
+    bundle.cases.map((c) => ({
+      file: fileOf('cases', c.id),
+      scope: `${c.manufacturer} ${c.cartridge}`,
+      names: [c.name],
+    })),
+    // One projectile may appear in several reports.
+    bundle.rangeFirings.flatMap((r) => {
+      const [source] = r.provenance.sources
+      if (!source) return []
+      return [
+        {
+          file: fileOf('range', r.id),
+          scope: source.sha256 ?? source.url ?? source.title,
+          names: [r.projectile],
+        },
+      ]
+    }),
+    bundle.targetFaces.map((f) => ({
+      file: fileOf('target-faces', f.id),
+      scope: f.federation ?? '',
+      names: [f.name],
+    })),
+  ]
 }
 
 /**
@@ -83,75 +154,5 @@ export function checkNames(
     | 'targetFaces'
   >,
 ): LocatedFinding[] {
-  const at = (dir: string, id: string) => `${dir}/${id}.json`
-  return [
-    ...duplicates(
-      bundle.cartridges.map((c) => ({
-        file: at('cartridges', c.id),
-        scope: '',
-        names: [c.name, ...(c.aliases ?? [])],
-      })),
-    ),
-    ...duplicates(
-      bundle.manufacturers.map((m) => ({
-        file: at('manufacturers', m.id),
-        scope: '',
-        names: [m.name, ...(m.aliases ?? [])],
-      })),
-    ),
-    ...duplicates(
-      bundle.powders.map((p) => ({
-        file: at('powders', p.id),
-        scope: p.manufacturer,
-        names: [p.name],
-      })),
-    ),
-    // An alias names a brand and name of another manufacturer, so aliases are compared with aliases only.
-    ...duplicates(
-      bundle.powders.map((p) => ({ file: at('powders', p.id), scope: '', names: p.aliases ?? [] })),
-    ),
-    ...duplicates(
-      bundle.primers.map((p) => ({
-        file: at('primers', p.id),
-        scope: p.manufacturer,
-        names: [p.name],
-      })),
-    ),
-    ...duplicates(
-      bundle.bullets.map((b) => ({
-        file: at('bullets', b.id),
-        scope: b.manufacturer,
-        names: [b.name],
-      })),
-    ),
-    // A case is named per cartridge, as the same product line serves several.
-    ...duplicates(
-      bundle.cases.map((c) => ({
-        file: at('cases', c.id),
-        scope: `${c.manufacturer} ${c.cartridge}`,
-        names: [c.name],
-      })),
-    ),
-    // One projectile may appear in several reports.
-    ...duplicates(
-      bundle.rangeFirings.flatMap((r) => {
-        const [source] = r.provenance.sources
-        if (!source) return []
-        return [
-          {
-            file: at('range', r.id),
-            scope: source.sha256 ?? source.url ?? source.title,
-            names: [r.projectile],
-          },
-        ]
-      }),
-    ),
-    ...duplicates(
-      bundle.targetFaces.map((f) => ({
-        file: at('target-faces', f.id),
-        scope: f.federation ?? '',
-        names: [f.name],
-      })),
-    ),
-  ]
+  return [...componentNames(bundle), ...otherNames(bundle)].flatMap((group) => duplicates(group))
 }

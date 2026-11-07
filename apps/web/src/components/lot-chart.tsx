@@ -7,7 +7,7 @@ import type { Translator } from '../i18n/translate.ts'
 import { type BarrelTimes, barrelTimeBand, lotChartDescription, lotLabel } from '../lib/lot-rows.ts'
 import { niceTicks } from '../lib/ticks.ts'
 import type { UnitSystem } from '../lib/units.ts'
-import { EChart, tickStep, useChartTokens } from './echart.tsx'
+import { axisText, chartTooltip, EChart, tickStep, useChartTokens } from './echart.tsx'
 
 const tokens = {
   line: '--series-1',
@@ -60,8 +60,8 @@ export function LotChart({
       name,
       nameLocation: 'middle' as const,
       nameGap: gap,
-      nameTextStyle: { color: theme.muted, fontSize: 12 },
-      axisLabel: { color: theme.muted, fontSize: 12 },
+      nameTextStyle: axisText(theme.muted),
+      axisLabel: axisText(theme.muted),
       axisLine: { show: true, lineStyle: { color: theme.muted } },
     })
     const none = { opacity: 0 }
@@ -79,12 +79,7 @@ export function LotChart({
         outerBoundsContain: 'all',
       },
       tooltip: {
-        trigger: 'axis',
-        confine: true,
-        borderRadius: 0,
-        backgroundColor: theme.bg,
-        borderColor: theme.border,
-        textStyle: { color: theme.fg },
+        ...chartTooltip(theme),
         formatter: (params: { dataIndex: number }[]) => {
           const index = params[0]?.dataIndex
           const row = index === undefined ? undefined : times[index]

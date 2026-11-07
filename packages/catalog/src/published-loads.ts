@@ -1,6 +1,7 @@
 import {
   type Bullet,
   type Cartridge,
+  conversions,
   type Powder,
   type Primer,
   type PublishedLoad,
@@ -32,12 +33,16 @@ export type PublishedLoadTargets = {
 
 /** Units of a printed figure and their factor to the stored unit of the quantity. */
 type Printed = 'mass' | 'velocity' | 'pressure' | 'length'
+// * 1000, not / conversions.g.factor: the division lands one ulp below the exact 0.06479891 g
+const grain = conversions.gr.factor * 1000
+const foot = conversions.ft.factor
+const psi = conversions.psi.factor / conversions.bar.factor
+const inch = conversions.in.factor / conversions.mm.factor
 const factors: Record<Printed, Record<string, number>> = {
-  mass: { g: 1, gr: 0.06479891, grs: 0.06479891, grain: 0.06479891, grains: 0.06479891 },
-  velocity: { 'm/s': 1, ms: 1, 'ft/s': 0.3048, 'ft/sec': 0.3048, fps: 0.3048 },
-  // 1 psi = 0.45359237 kg * 9.80665 m/s2 / (0.0254 m)2, in bar
-  pressure: { bar: 1, psi: 0.0689475729316836 },
-  length: { mm: 1, cm: 10, m: 1000, in: 25.4, '"': 25.4, '″': 25.4, inch: 25.4, inches: 25.4 },
+  mass: { g: 1, gr: grain, grs: grain, grain, grains: grain },
+  velocity: { 'm/s': 1, ms: 1, 'ft/s': foot, 'ft/sec': foot, fps: foot },
+  pressure: { bar: 1, psi },
+  length: { mm: 1, cm: 10, m: 1000, in: inch, '"': inch, '″': inch, inch, inches: inch },
 }
 
 /** The relative difference below which a stored value follows its printed number (7 significant digits). */
@@ -72,7 +77,7 @@ function follows(
     known = true
     if (
       // group 1 always takes part in a match
-      readings(number as string).some(
+      readings(number ?? '').some(
         (n) => Math.abs(n * factor - figure.value) <= tolerance * Math.abs(figure.value),
       )
     )
@@ -81,33 +86,54 @@ function follows(
   return !known
 }
 
+/** A printed figure of a load: its path, quantity, whether it is a twist, and the figure. */
+type Figure = {
+  path: string
+  kind: Printed
+  twist: boolean
+  figure: { value: number; raw: string; assumedUnit?: string | undefined }
+}
+
+/** The figure at `path`, none when it has no value. */
+const figureAt = (
+  path: string,
+  kind: Printed,
+  figure: { value?: number | undefined; raw: string; assumedUnit?: string | undefined },
+  twist = false,
+): Figure[] =>
+  figure.value === undefined
+    ? []
+    : [{ path, kind, twist, figure: { ...figure, value: figure.value } }]
+
+/** The printed figures of charge `i` of a load. */
+function chargeFigures(c: PublishedLoad['charges'][number], i: number): Figure[] {
+  const distance = c.velocity?.point?.distance
+  return [
+    ...figureAt(`charges.${i}.charge`, 'mass', c.charge),
+    ...(c.velocity ? figureAt(`charges.${i}.velocity`, 'velocity', c.velocity) : []),
+    ...(distance ? figureAt(`charges.${i}.velocity.point.distance`, 'length', distance) : []),
+    ...(c.pressure
+      ? figureAt(`charges.${i}.pressure.peak`, 'pressure', {
+          ...c.pressure.peak,
+          assumedUnit: c.pressure.peak.assumedUnit ?? c.pressure.unit,
+        })
+      : []),
+  ]
+}
+
 /** Every printed figure of a load with its path, quantity and whether it is a twist. */
-function* figures(l: PublishedLoad) {
-  const at = (
-    path: string,
-    kind: Printed,
-    figure: { value?: number | undefined; raw: string; assumedUnit?: string | undefined },
-    twist = false,
-  ) =>
-    figure.value === undefined
-      ? []
-      : [{ path, kind, twist, figure: { ...figure, value: figure.value } }]
-  yield* at('bullet.mass', 'mass', l.bullet.mass)
-  if (l.bullet.diameter) yield* at('bullet.diameter', 'length', l.bullet.diameter)
-  if (l.coal) yield* at('coal', 'length', l.coal)
-  if (l.barrel?.length) yield* at('barrel.length', 'length', l.barrel.length)
-  if (l.barrel?.twist) yield* at('barrel.twist', 'length', l.barrel.twist, true)
-  for (const [i, c] of l.charges.entries()) {
-    yield* at(`charges.${i}.charge`, 'mass', c.charge)
-    if (c.velocity) yield* at(`charges.${i}.velocity`, 'velocity', c.velocity)
-    if (c.velocity?.point?.distance)
-      yield* at(`charges.${i}.velocity.point.distance`, 'length', c.velocity.point.distance)
-    if (c.pressure)
-      yield* at(`charges.${i}.pressure.peak`, 'pressure', {
-        ...c.pressure.peak,
-        assumedUnit: c.pressure.peak.assumedUnit ?? c.pressure.unit,
-      })
-  }
+function figures(l: PublishedLoad): Figure[] {
+  const { diameter } = l.bullet
+  const length = l.barrel?.length
+  const twist = l.barrel?.twist
+  return [
+    ...figureAt('bullet.mass', 'mass', l.bullet.mass),
+    ...(diameter ? figureAt('bullet.diameter', 'length', diameter) : []),
+    ...(l.coal ? figureAt('coal', 'length', l.coal) : []),
+    ...(length ? figureAt('barrel.length', 'length', length) : []),
+    ...(twist ? figureAt('barrel.twist', 'length', twist, true) : []),
+    ...l.charges.flatMap((c, i) => chargeFigures(c, i)),
+  ]
 }
 
 /** A pressure whose printed text names a unit other than its `unit`. */
@@ -130,33 +156,44 @@ function checkPrintedFigures(l: PublishedLoad, where: string, errors: string[]) 
       )
 }
 
+/** The record id a reference names, or the reference as it is. */
+const refId = (ref: string) => parseRef(ref)?.id ?? ref
+
+type PrintedPrimer = NonNullable<PublishedLoad['primer']>
+
+/** Where a printed primer size or magnum disagrees with the primer record it names. */
+function primerDifferences(
+  record: Primer,
+  { size, magnum }: { size: PrintedPrimer['size']; magnum: PrintedPrimer['magnum'] },
+): string[] {
+  const found: string[] = []
+  if (size !== undefined && size !== record.size)
+    found.push(`primer size ${size} differs from ${record.id} (${record.size})`)
+  // a primer record leaves magnum out when no source states it, which is not a disagreement
+  if (magnum !== undefined && record.magnum !== undefined && magnum !== record.magnum)
+    found.push(`primer magnum differs from ${record.id}`)
+  return found
+}
+
 /** The primers of one load: each named record exists, and a printed size or magnum agrees with it. */
 function checkLoadPrimers(l: PublishedLoad, where: string, known: Known, errors: string[]) {
   const { records = [], size, magnum } = l.primer ?? {}
-  const said = (message: string) => errors.push(`${where}: loads ${l.id}: ${message}`)
   for (const ref of records) {
-    const id = parseRef(ref)?.id ?? ref
-    const record = known.primers.get(id)
-    if (!record) {
-      said(`unknown primer "${ref}"`)
-      continue
-    }
-    if (size !== undefined && size !== record.size)
-      said(`primer size ${size} differs from ${record.id} (${record.size})`)
-    // a primer record leaves magnum out when no source states it, which is not a disagreement
-    if (magnum !== undefined && record.magnum !== undefined && magnum !== record.magnum)
-      said(`primer magnum differs from ${record.id}`)
+    const record = known.primers.get(refId(ref))
+    const messages = record
+      ? primerDifferences(record, { size, magnum })
+      : [`unknown primer "${ref}"`]
+    for (const message of messages) errors.push(`${where}: loads ${l.id}: ${message}`)
   }
 }
 
 /** The references of one load: bullet, powder and primers exist, and a printed size agrees with them. */
 function checkLoadReferences(l: PublishedLoad, where: string, known: Known, errors: string[]) {
-  const id = (ref: string) => parseRef(ref)?.id ?? ref
   const unknown = (field: string, ref: string) =>
     errors.push(`${where}: loads ${l.id}: unknown ${field} "${ref}"`)
-  if (l.bullet.record !== undefined && !known.bullets.has(id(l.bullet.record)))
+  if (l.bullet.record !== undefined && !known.bullets.has(refId(l.bullet.record)))
     unknown('bullet', l.bullet.record)
-  if (l.powder.record !== undefined && !known.powders.has(id(l.powder.record)))
+  if (l.powder.record !== undefined && !known.powders.has(refId(l.powder.record)))
     unknown('powder', l.powder.record)
   checkLoadPrimers(l, where, known, errors)
 }
@@ -235,12 +272,53 @@ function largest(cartridge: Pick<Cartridge, 'values'>, symbol: string, side?: st
   return values.length > 0 ? Math.max(...values) : undefined
 }
 
+/** Two printed distances agree where both are printed. */
+const sameDistance = (d: number | undefined, e: number | undefined) =>
+  d === undefined || e === undefined || d === e
+
+type Velocity = NonNullable<Charge['velocity']>
+
 /** Where two velocities apply: the same printed symbol (or none), and the same distance where both print one. */
-function samePoint(a: Charge['velocity'], b: Charge['velocity']) {
-  const [p, q] = [a?.point, b?.point]
+function samePoint(a: Velocity, b: Velocity) {
+  const [p, q] = [a.point, b.point]
   if (p?.label !== q?.label) return false
-  const [d, e] = [p?.distance?.value, q?.distance?.value]
-  return d === undefined || e === undefined || d === e
+  return sameDistance(p?.distance?.value, q?.distance?.value)
+}
+
+/** The start charge above the max charge. */
+function chargeOrder(start: Charge, max: Charge): Finding[] {
+  if (!(start.charge.value > max.charge.value)) return []
+  return [
+    {
+      finding: 'start-above-max',
+      message: `the start charge ${start.charge.raw} is above the max charge ${max.charge.raw}`,
+    },
+  ]
+}
+
+/** The velocity of the max charge below that of the start charge, at the same point. */
+function velocityOrder(start: Charge, max: Charge): Finding[] {
+  const [v, w] = [start.velocity, max.velocity]
+  if (!v || !w || !samePoint(v, w) || !(w.value < v.value)) return []
+  return [
+    {
+      finding: 'velocity-order',
+      message: `the velocity of the max charge, ${w.raw}, is below that of the start charge, ${v.raw}`,
+    },
+  ]
+}
+
+/** The pressure of the max charge below that of the start charge, on the same unit and method. */
+function pressureOrder(start: Charge, max: Charge): Finding[] {
+  const [p, q] = [start.pressure, max.pressure]
+  if (p?.peak.value === undefined || q?.peak.value === undefined) return []
+  if (p.unit !== q.unit || p.method !== q.method || !(q.peak.value < p.peak.value)) return []
+  return [
+    {
+      finding: 'pressure-order',
+      message: `the pressure of the max charge, ${q.peak.raw}, is below that of the start charge, ${p.peak.raw}`,
+    },
+  ]
 }
 
 /** The order findings of a load's start and max charge: charge, velocity and pressure. */
@@ -248,55 +326,46 @@ function orderFindings(l: PublishedLoad): Finding[] {
   const pair = startAndMax(l)
   if (!pair) return []
   const [start, max] = pair
-  const found: Finding[] = []
-  if (start.charge.value > max.charge.value)
-    found.push({
-      finding: 'start-above-max',
-      message: `the start charge ${start.charge.raw} is above the max charge ${max.charge.raw}`,
-    })
-  if (start.velocity && max.velocity && samePoint(start.velocity, max.velocity))
-    if (max.velocity.value < start.velocity.value)
-      found.push({
-        finding: 'velocity-order',
-        message: `the velocity of the max charge, ${max.velocity.raw}, is below that of the start charge, ${start.velocity.raw}`,
-      })
-  const [p, q] = [start.pressure, max.pressure]
-  if (p?.peak.value !== undefined && q?.peak.value !== undefined)
-    if (p.unit === q.unit && p.method === q.method && q.peak.value < p.peak.value)
-      found.push({
-        finding: 'pressure-order',
-        message: `the pressure of the max charge, ${q.peak.raw}, is below that of the start charge, ${p.peak.raw}`,
-      })
-  return found
+  return [...chargeOrder(start, max), ...velocityOrder(start, max), ...pressureOrder(start, max)]
+}
+
+type CartridgeLimits = Pick<Cartridge, 'id' | 'pressureMethod' | 'values'>
+
+/** The pressures on the cartridge record's own basis above its largest Pmax. */
+function pressureAboveMax(l: PublishedLoad, cartridge: CartridgeLimits): Finding[] {
+  const pmax = largest(cartridge, 'Pmax')
+  const method = cartridge.pressureMethod
+  // only a value on the record's own basis; no value is converted between bases
+  if (pmax === undefined || method === undefined) return []
+  return l.charges.flatMap((c) => {
+    const p = c.pressure
+    // a case-contact gauge reads on its own basis: Pmax is not its limit (#855)
+    if (p?.peak.value === undefined || p.method !== method || p.method === 'case-contact') return []
+    if (!(p.peak.value > pmax)) return []
+    return [
+      {
+        finding: 'pressure-above-cartridge-max',
+        message: `the ${c.kind} pressure ${p.peak.raw} (${p.method}) is above Pmax ${pmax} bar of ${cartridge.id}`,
+      },
+    ]
+  })
+}
+
+/** COAL above the cartridge record's largest L6. */
+function coalAboveMax(l: PublishedLoad, cartridge: CartridgeLimits): Finding[] {
+  const l6 = largest(cartridge, 'L6', 'cartridge')
+  if (l6 === undefined || l.coal?.value === undefined || !(l.coal.value > l6)) return []
+  return [
+    {
+      finding: 'coal-above-cartridge-max',
+      message: `COAL ${l.coal.raw} is above L6 ${l6} mm of ${cartridge.id}`,
+    },
+  ]
 }
 
 /** The findings of a load against its cartridge record: pressure above Pmax, COAL above L6. */
-function cartridgeFindings(
-  l: PublishedLoad,
-  cartridge: Pick<Cartridge, 'id' | 'pressureMethod' | 'values'>,
-): Finding[] {
-  const found: Finding[] = []
-  const pmax = largest(cartridge, 'Pmax')
-  for (const c of l.charges) {
-    const p = c.pressure
-    // only a value on the record's own basis; no value is converted between bases
-    if (pmax === undefined || p?.peak.value === undefined) continue
-    if (cartridge.pressureMethod === undefined || p.method !== cartridge.pressureMethod) continue
-    // a case-contact gauge reads on its own basis: Pmax is not its limit (#855)
-    if (p.method === 'case-contact') continue
-    if (p.peak.value > pmax)
-      found.push({
-        finding: 'pressure-above-cartridge-max',
-        message: `the ${c.kind} pressure ${p.peak.raw} (${p.method}) is above Pmax ${pmax} bar of ${cartridge.id}`,
-      })
-  }
-  const l6 = largest(cartridge, 'L6', 'cartridge')
-  if (l6 !== undefined && l.coal?.value !== undefined && l.coal.value > l6)
-    found.push({
-      finding: 'coal-above-cartridge-max',
-      message: `COAL ${l.coal.raw} is above L6 ${l6} mm of ${cartridge.id}`,
-    })
-  return found
+function cartridgeFindings(l: PublishedLoad, cartridge: CartridgeLimits): Finding[] {
+  return [...pressureAboveMax(l, cartridge), ...coalAboveMax(l, cartridge)]
 }
 
 /**

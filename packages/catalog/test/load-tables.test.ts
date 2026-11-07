@@ -25,13 +25,14 @@ const product: Source = { title: 'Product page', fields: ['name', 'form'] }
 const powder = (...sources: Source[]) =>
   ({ id: 'test', interior: {}, provenance: { kind: 'published', sources } }) as unknown as Powder
 
+const fails = (s: Source) => checkFittedSources(powder(product, s), loadTables).length > 0
+
 describe('checkFittedSources', () => {
   it('accepts a listed load table with its fit run', () => {
     expect(checkFittedSources(powder(product, fitted), loadTables)).toEqual([])
   })
 
   it('fails every other source for interior', () => {
-    const fails = (s: Source) => checkFittedSources(powder(product, s), loadTables).length > 0
     expect(fails({ ...fitted, kind: 'published' })).toBe(true)
     expect(fails({ ...fitted, fields: undefined })).toBe(true)
     expect(fails({ ...fitted, title: 'Unlisted load tables' })).toBe(true)

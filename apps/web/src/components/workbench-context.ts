@@ -60,9 +60,6 @@ export type ResultState = {
   setSeen: Dispatch<SetStateAction<ReadonlySet<ResultTab>>>
   /** The tab was opened once, or the page prints. */
   opened: (v: ResultTab) => boolean
-  /** `failed`: the browser refused the clipboard. */
-  csvCopied: boolean | 'failed'
-  setCsvCopied: (copied: boolean | 'failed') => void
   /** The File menu's record id: set by Save and Open. */
   fileId: string | undefined
   /** Counts the File menu's store writes. */
