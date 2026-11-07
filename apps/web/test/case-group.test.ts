@@ -96,7 +96,13 @@ it('is picked by a saved load as case.record, and a missing group is a dangling 
   })
   expect(l.case).toEqual({ record: `user:${caseId}` })
   expect(loadSchema.safeParse(l).success).toBe(true)
-  const record = userRecord.parse({ kind: 'load', id: 'w1', name: 'Load', saved, data: l })
+  const record = userRecord.parse({
+    kind: 'load',
+    id: '00000000-0000-4000-8000-000000007731',
+    name: 'Load',
+    saved,
+    data: l,
+  })
   expect(checkUserRefs([record]).map((d) => d.field)).toEqual(['case.record'])
   expect(checkUserRefs([record, caseRecord(group)])).toEqual([])
 })

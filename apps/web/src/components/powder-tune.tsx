@@ -895,11 +895,8 @@ function usePowderNames(refs: readonly string[], records: readonly UserRecord[])
   useEffect(() => {
     const aborts = new AbortController()
     const wanted = key === '' ? [] : key.split(' ')
-    const own = new Map(
-      records.flatMap((r) => {
-        const ref = userRef(r.id)
-        return ref && r.kind === 'powder' ? [[ref, r.name] as const] : []
-      }),
+    const own = new Map<string, string>(
+      records.flatMap((r) => (r.kind === 'powder' ? [[`user:${r.id}`, r.name]] : [])),
     )
     const catalogue = wanted.flatMap((ref) => {
       const id = own.has(ref) ? undefined : catalogueIdOf(ref)

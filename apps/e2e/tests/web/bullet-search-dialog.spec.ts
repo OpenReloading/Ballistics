@@ -1,8 +1,26 @@
 import { expect, type Page, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
+import { putRecords } from './user-store.ts'
 import { loadForm } from './workbench.ts'
 
-// the Bullet card's search dialog, narrowed to the two invented demo bullets (both .308, 150 and 168 gr) by the word `demo`
+// the Bullet card's search dialog, narrowed to the two invented demo bullets (both .308, 150 and 168 gr) by the word `demo`;
+// a .308 bullet of the browser's own keeps the list of every bullet longer than that, with or without other catalogue bullets
+
+test.beforeEach(async ({ page }) => {
+  await gotoHydrated(page, '/workbench?cartridge=308-win')
+  await putRecords(page, [
+    {
+      kind: 'bullet',
+      id: '6a1d3c5e-7f90-4b2d-8e4f-1a3c5e7f9b2d',
+      name: 'Own 175 gr',
+      saved: '2026-11-07T00:00:00.000Z',
+      data: {
+        origin: 'user',
+        overrides: { name: 'Own 175 gr', diameter: { value: 7.823 }, mass: { value: 11.34 } },
+      },
+    },
+  ])
+})
 
 const browse = (page: Page) => loadForm(page).getByRole('button', { name: 'Browse bullets' })
 const dialog = (page: Page) => page.getByRole('dialog', { name: 'Choose a bullet' })

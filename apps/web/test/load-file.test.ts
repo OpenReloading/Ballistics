@@ -12,7 +12,7 @@ import { maxFileBytes, userDataText } from '../src/lib/user-data.ts'
 
 const load: UserRecord = {
   kind: 'load',
-  id: 'w1',
+  id: '00000000-0000-4000-8000-000000007731',
   name: '308 Win.',
   saved: '2026-10-13T10:00:00.000Z',
   data: { origin: 'user', charge: { value: 2.8 }, cartridge: 'catalogue:308-win' },

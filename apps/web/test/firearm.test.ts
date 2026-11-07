@@ -36,7 +36,7 @@ import { defined, missing } from './defined.ts'
 const saved = '2026-10-13T10:00:00.000Z'
 const rifle: UserRecord = {
   kind: 'firearm',
-  id: 'r1',
+  id: '00000000-0000-4000-8000-000000007231',
   name: 'Range rifle',
   saved,
   data: {
@@ -68,7 +68,7 @@ const rifle: UserRecord = {
 }
 const carbine: UserRecord = {
   kind: 'firearm',
-  id: 'r2',
+  id: '00000000-0000-4000-8000-000000007232',
   name: 'Carbine',
   saved,
   data: {
@@ -161,7 +161,13 @@ describe('sightOptions', () => {
 
 describe('firearm helpers', () => {
   it('a blank firearm is a valid record once named', () => {
-    const r = { kind: 'firearm', id: 'x', name: 'New', saved, data: blankFirearm() }
+    const r = {
+      kind: 'firearm',
+      id: '00000000-0000-4000-8000-000000000078',
+      name: 'New',
+      saved,
+      data: blankFirearm(),
+    }
     expect(userRecord.safeParse(r).success).toBe(true)
     expect(defined(userRecord.safeParse({ ...r, name: '' }).error?.issues[0]).path).toEqual([
       'name',
@@ -294,13 +300,13 @@ describe('clickOptions', () => {
     } as UserRecord
     expect(clickOptions([scoped, carbine])).toEqual([
       {
-        value: 'r1/c2/0',
+        value: '00000000-0000-4000-8000-000000007231/c2/0',
         label: 'Range rifle, Summer, Scope (active)',
         click: toSi('angle', 0.00573),
         unit: 'mrad',
       },
       {
-        value: 'r1/c1/0',
+        value: '00000000-0000-4000-8000-000000007231/c1/0',
         label: 'Range rifle, Winter, Scope',
         click: toSi('angle', 0.00573),
         unit: 'mrad',

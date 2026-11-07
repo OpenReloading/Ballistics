@@ -174,9 +174,11 @@ it('names the switcher by the typed name, else cartridge and powder, else the ge
 })
 
 it('renames and copies the stored load, not the older copy of the list', async () => {
+  const first = '00000000-0000-4000-8000-0000000000a1'
+  const second = '00000000-0000-4000-8000-0000000000a2'
   const listed: LoadRecord = {
     kind: 'load',
-    id: 'w1',
+    id: first,
     name: 'Ladder',
     saved: '2026-10-01T10:00:00.000Z',
     data: { origin: 'user', charge: { value: 2.8 } },
@@ -186,12 +188,12 @@ it('renames and copies the stored load, not the older copy of the list', async (
     saved: '2026-10-02T10:00:00.000Z',
     data: { origin: 'user', charge: { value: 3 } },
   }
-  store.set('w1', newer)
-  await renameStored('w1', 'Ladder 2')
-  expect(store.get('w1')).toEqual({ ...newer, name: 'Ladder 2' })
-  await duplicateStored(listed, 'w2')
-  expect(store.get('w2')).toMatchObject({ id: 'w2', name: 'Ladder 2 copy', data: newer.data })
-  store.delete('w1')
-  await expect(renameStored('w1', 'Gone')).rejects.toThrow('no longer in this browser')
-  expect(store.has('w1')).toBe(false)
+  store.set(first, newer)
+  await renameStored(first, 'Ladder 2')
+  expect(store.get(first)).toEqual({ ...newer, name: 'Ladder 2' })
+  await duplicateStored(listed, second)
+  expect(store.get(second)).toMatchObject({ id: second, name: 'Ladder 2 copy', data: newer.data })
+  store.delete(first)
+  await expect(renameStored(first, 'Gone')).rejects.toThrow('no longer in this browser')
+  expect(store.has(first)).toBe(false)
 })

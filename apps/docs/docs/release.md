@@ -42,7 +42,7 @@ The web app's home page lists the newest five items of `apps/web/news/`, newest 
 
 It runs on every push to `main`, when a release is published and on `workflow_dispatch`. A release created with the workflow token starts no workflow of its own, so `release.yml` then dispatches `pages.yml` itself (with the App token, the `release: published` event does).
 
-Both editions share one origin, so the next edition keeps its data under other names: its IndexedDB database, local storage keys and caches are prefixed `next:`, and its service worker has the scope `<site>/next/`. What the next edition stores in the browser is not carried over to the stable edition, and an earlier preview database is not migrated. The stable edition's service worker leaves `/next/` to the network.
+Both editions share one origin, so the next edition keeps its data under other names: its IndexedDB database, local storage keys and caches are prefixed `next:`, and its service worker has the scope `<site>/next/`. What the next edition stores in the browser is not carried over to the stable edition, and a database that a pre-release version wrote is not read: the app offers to delete it. The stable edition's service worker leaves `/next/` to the network.
 
 ## Self-hosting
 
