@@ -168,7 +168,7 @@ describe('reason codes', () => {
     ...union('ballistics/src/exterior/truing.ts', 'TruingReason'),
     ...union('ballistics/src/interior/model.ts', 'InteriorReason'),
     ...union('ballistics/src/interior/charge-solver.ts', 'ChargeRefusal'),
-    ...union('core/src/interior/fit.ts', 'PowderFitReason'),
+    ...union('ballistics/src/interior/fit.ts', 'PowderFitReason'),
     ...union('ballistics/src/exterior/range-strings.ts', 'WeakReason'),
     // set where the reason is not a union: a range case, the API's 422 and 503 answers
     'outsideModel',

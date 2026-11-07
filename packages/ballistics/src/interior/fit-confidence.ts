@@ -6,8 +6,7 @@
  * simulation's uncertainty, not a load. SI in and out.
  */
 
-import { type InteriorLoad, interior } from '@open-reloading/ballistics'
-import { need, nth } from '../errors.ts'
+import { need, nth } from '@open-reloading/statistics'
 import {
   fitPowder,
   type LadderPoint,
@@ -16,9 +15,11 @@ import {
   PowderFitError,
   type PowderFitOptions,
   type PowderParameter,
+  type PowderPrediction,
   type PowderPrior,
   predictPowder,
 } from './fit.ts'
+import { type InteriorLoad, interior } from './model.ts'
 
 /** An input of the interior model that the range can shift by its standard uncertainty. */
 export type PowderInput =
@@ -216,7 +217,7 @@ const shifts: Record<PowderInput, Shift> = {
   },
 }
 
-const inputNames = Object.keys(shifts) as PowderInput[]
+const inputNames = Object.keys(shifts).filter((k): k is PowderInput => k in shifts)
 
 const pointKey = (p: PowderRangePoint) => `${p.charge} ${p.barrelLength} ${p.propellantTemperature}`
 
@@ -239,6 +240,146 @@ function peakAt(load: InteriorLoad, point: PowderRangePoint, fit: PowderFitOptio
   return r.peakBreechPressure
 }
 
+/** The distinct points of the ladder: charge, barrel length and temperature. */
+function ladderPoints(ladder: readonly LadderPoint[]): PowderRangePoint[] {
+  return [
+    ...new Map(
+      ladder.map((x): [string, PowderRangePoint] => [
+        pointKey(x),
+        {
+          charge: x.charge,
+          barrelLength: x.barrelLength,
+          propellantTemperature: x.propellantTemperature,
+        },
+      ]),
+    ).values(),
+  ]
+}
+
+/** An input with a standard uncertainty above 0, and how it moves the load. */
+interface UsedInput {
+  input: PowderInput
+  basis: InputBasis
+  u: number
+  shift: Shift
+}
+
+/** The inputs with a standard uncertainty above 0: the caller's, else the default of their basis. */
+function usedInputs(options: PowderRangeOptions): UsedInput[] {
+  const inputs = options.inputs ?? {}
+  return inputNames.flatMap((input) => {
+    const given = inputs[input]
+    const basis = given?.basis ?? 'estimated'
+    const table = powderInputDefaults[input]
+    const u = given?.standardUncertainty ?? (table && (table[basis] ?? table.estimated))
+    need(
+      u === undefined || (Number.isFinite(u) && u >= 0),
+      `${input}: standardUncertainty must be 0 or above`,
+    )
+    return u ? [{ input, basis, u, shift: shifts[input] }] : []
+  })
+}
+
+/** What the refits of a range share: the fit, its ladder and options, and the points of the range. */
+interface RangeRefit {
+  fit: PowderFit
+  ladder: readonly LadderPoint[]
+  fitOptions: PowderFitOptions
+  points: readonly PowderRangePoint[]
+  /** The fitted parameters. */
+  names: readonly PowderParameter[]
+}
+
+/**
+ * Peak pressures at the points after the input of `shift` is moved by `d` and the ladder fitted
+ * again from the solution, so every refit starts near its answer.
+ */
+function refitPeaks(refit: RangeRefit, shift: Shift, d: number): number[] {
+  const { fit, ladder, fitOptions, points } = refit
+  const dT = shift.unit === 'K' ? d : 0
+  const moved = shift.apply(fit.load, d)
+  const again = fitPowder(
+    moved,
+    dT === 0
+      ? ladder
+      : ladder.map((x) => ({
+          ...x,
+          ...(x.propellantTemperature === undefined
+            ? {}
+            : { propellantTemperature: x.propellantTemperature + dT }),
+        })),
+    fitOptions,
+  )
+  return points.map((p) =>
+    peakAt(
+      again.load,
+      {
+        ...p,
+        ...(dT === 0 || p.propellantTemperature === undefined
+          ? {}
+          : { propellantTemperature: p.propellantTemperature + dT }),
+      },
+      fitOptions,
+    ),
+  )
+}
+
+/** What one input adds to the range: half the change of the peak between its two refits, or why it adds nothing. */
+function inputContribution(
+  refit: RangeRefit,
+  { input, basis, u, shift }: UsedInput,
+): PowderRangeContribution {
+  const out = { input, basis, standardUncertainty: u, unit: shift.unit, effects: [] }
+  if (shift.fitted !== undefined && refit.names.includes(shift.fitted))
+    return { ...out, skipped: 'fitted' }
+  if (!shift.present(refit.fit.load)) return { ...out, skipped: 'absent' }
+  try {
+    const up = refitPeaks(refit, shift, u)
+    const down = refitPeaks(refit, shift, -u)
+    return { ...out, effects: up.map((v, i) => (v - nth(down, i)) / 2) }
+  } catch (e) {
+    if (e instanceof PowderFitError) return { ...out, skipped: 'refit-failed' }
+    throw e
+  }
+}
+
+/** The range at each point: the fit's own uncertainty and the inputs' effects combined, with its interval. */
+function rangeBands(
+  points: readonly PowderRangePoint[],
+  predictions: readonly PowderPrediction[],
+  contributions: readonly PowderRangeContribution[],
+): PowderRangeBand[] {
+  const k = nth(predictions, 0).coverageFactor
+  return points.map((p, i): PowderRangeBand => {
+    const fitUncertainty = nth(predictions, i).pressure.standardUncertainty
+    const effects = contributions.map((c) => c.effects[i] ?? 0)
+    const standardUncertainty = Math.hypot(fitUncertainty, ...effects)
+    const peakPressure = nth(predictions, i).pressure.value
+    return {
+      ...p,
+      peakPressure,
+      fitUncertainty,
+      standardUncertainty,
+      correlatedLimit: effects.reduce((s, e) => s + Math.abs(e), fitUncertainty),
+      lower: peakPressure - k * standardUncertainty,
+      upper: peakPressure + k * standardUncertainty,
+      relativeHalfWidth: (k * standardUncertainty) / peakPressure,
+    }
+  })
+}
+
+/** Whether a point lies outside the fit's domain in charge or barrel length. */
+const outsidePoints = (fit: PowderFit, points: readonly PowderRangePoint[]) =>
+  points.some(
+    (p) =>
+      Object.keys(
+        outsideDomain(fit.domain, {
+          charge: p.charge,
+          barrelLength: p.barrelLength ?? fit.load.barrel.length,
+        }),
+      ).length > 0,
+  )
+
 /**
  * Peak-pressure range of a powder fit at each point: the fit's own uncertainty combined with the
  * change that each fixed input makes when it is moved by its standard uncertainty and the ladder
@@ -255,32 +396,9 @@ export function powderPressureRange(
   const { level = 0.9 } = options
   const names = fit.parameters.map((p) => p.name)
   const fitOptions: PowderFitOptions = { ...options.fit, parameters: names }
-  const points = options.points ?? [
-    ...new Map(
-      ladder.map((x): [string, PowderRangePoint] => [
-        pointKey(x),
-        {
-          charge: x.charge,
-          barrelLength: x.barrelLength,
-          propellantTemperature: x.propellantTemperature,
-        },
-      ]),
-    ).values(),
-  ]
+  const points = options.points ?? ladderPoints(ladder)
   need(points.length > 0, 'at least one point')
-  const inputs = options.inputs ?? {}
-  const used = inputNames.flatMap((input) => {
-    const given = inputs[input]
-    const basis = given?.basis ?? 'estimated'
-    const table = powderInputDefaults[input]
-    const u = given?.standardUncertainty ?? (table && (table[basis] ?? table.estimated))
-    need(
-      u === undefined || (Number.isFinite(u) && u >= 0),
-      `${input}: standardUncertainty must be 0 or above`,
-    )
-    return u ? [{ input, basis, u, shift: shifts[input] }] : []
-  })
-
+  const used = usedInputs(options)
   const predictions = points.map((p) =>
     predictPowder(fit, p.charge, {
       level,
@@ -289,85 +407,16 @@ export function powderPressureRange(
       propellantTemperature: p.propellantTemperature,
     }),
   )
-  const base = predictions.map((x) => x.pressure.value)
-
-  const contributions = used.map(({ input, basis, u, shift }): PowderRangeContribution => {
-    const out = { input, basis, standardUncertainty: u, unit: shift.unit, effects: [] }
-    if (shift.fitted !== undefined && names.includes(shift.fitted))
-      return { ...out, skipped: 'fitted' }
-    if (!shift.present(fit.load)) return { ...out, skipped: 'absent' }
-    // refit from the solution with the input moved, so every refit starts near its answer
-    const side = (sign: 1 | -1): number[] => {
-      const d = sign * u
-      const dT = shift.unit === 'K' ? d : 0
-      const moved = shift.apply(fit.load, d)
-      const refit = fitPowder(
-        moved,
-        dT === 0
-          ? ladder
-          : ladder.map((x) => ({
-              ...x,
-              ...(x.propellantTemperature === undefined
-                ? {}
-                : { propellantTemperature: x.propellantTemperature + dT }),
-            })),
-        fitOptions,
-      )
-      return points.map((p) =>
-        peakAt(
-          refit.load,
-          {
-            ...p,
-            ...(dT === 0 || p.propellantTemperature === undefined
-              ? {}
-              : { propellantTemperature: p.propellantTemperature + dT }),
-          },
-          fitOptions,
-        ),
-      )
-    }
-    try {
-      const up = side(1)
-      const down = side(-1)
-      return { ...out, effects: up.map((v, i) => (v - nth(down, i)) / 2) }
-    } catch (e) {
-      if (e instanceof PowderFitError) return { ...out, skipped: 'refit-failed' }
-      throw e
-    }
-  })
-
-  const k = nth(predictions, 0).coverageFactor
-  const bands = points.map((p, i): PowderRangeBand => {
-    const fitUncertainty = nth(predictions, i).pressure.standardUncertainty
-    const effects = contributions.map((c) => c.effects[i] ?? 0)
-    const standardUncertainty = Math.hypot(fitUncertainty, ...effects)
-    const peakPressure = nth(base, i)
-    return {
-      ...p,
-      peakPressure,
-      fitUncertainty,
-      standardUncertainty,
-      correlatedLimit: effects.reduce((s, e) => s + Math.abs(e), fitUncertainty),
-      lower: peakPressure - k * standardUncertainty,
-      upper: peakPressure + k * standardUncertainty,
-      relativeHalfWidth: (k * standardUncertainty) / peakPressure,
-    }
-  })
+  const refit: RangeRefit = { fit, ladder, fitOptions, points, names }
+  const contributions = used.map((entry) => inputContribution(refit, entry))
+  const bands = rangeBands(points, predictions, contributions)
   return {
     level,
-    coverageFactor: k,
+    coverageFactor: nth(predictions, 0).coverageFactor,
     points: bands,
     contributions,
     relativeHalfWidth: Math.max(...bands.map((b) => b.relativeHalfWidth)),
-    extrapolated: points.some(
-      (p) =>
-        Object.keys(
-          outsideDomain(fit.domain, {
-            charge: p.charge,
-            barrelLength: p.barrelLength ?? fit.load.barrel.length,
-          }),
-        ).length > 0,
-    ),
+    extrapolated: outsidePoints(fit, points),
   }
 }
 
@@ -380,14 +429,22 @@ export interface SimilarPowder {
 }
 
 /** Rules of the choice of similar powders and of the prior they give. */
-export const similarPowderRules = Object.freeze({
+export interface SimilarPowderRules {
   /** Neighbours taken. */
-  count: 5,
+  count: number
   /** Fewest neighbours for a prior from their spread; fewer give a weak prior. */
-  minimum: 3,
+  minimum: number
   /** Standard deviation of ln(burn coefficient) of a weak prior. */
-  weakSigma: 1,
+  weakSigma: number
   /** Smallest standard deviation of a prior from a spread, so near-equal neighbours do not fix the fit. */
+  minimumSigma: number
+}
+
+/** The rules of {@link similarPowdersPrior}. */
+export const similarPowderRules: Readonly<SimilarPowderRules> = Object.freeze({
+  count: 5,
+  minimum: 3,
+  weakSigma: 1,
   minimumSigma: 0.05,
 })
 
@@ -418,7 +475,7 @@ export function similarPowdersPrior(
   need(Number.isInteger(count) && count > 0, 'count must be a positive integer')
   const distance = (x: SimilarPowder) =>
     Math.hypot(Math.log(x.burnRate / target.burnRate), Math.log(x.energy / target.energy))
-  const near = [...candidates].sort((a, b) => distance(a) - distance(b)).slice(0, count)
+  const near = candidates.toSorted((a, b) => distance(a) - distance(b)).slice(0, count)
   if (near.length < similarPowderRules.minimum)
     return {
       prior: { value: target.burnRate, sigma: similarPowderRules.weakSigma },
@@ -502,7 +559,7 @@ export interface PowderConfidenceOptions {
 function hasResidualTrend(fit: PowderFit): boolean {
   const velocities = fit.residuals
     .filter((r) => r.kind === 'velocity')
-    .sort((a, b) => a.charge - b.charge)
+    .toSorted((a, b) => a.charge - b.charge)
     .map((r) => r.residual)
   const changes = velocities.slice(1).filter((r, i) => r * nth(velocities, i) < 0).length
   return (
@@ -524,6 +581,51 @@ function priorReasons(fit: PowderFit, similar: SimilarPowdersPrior | undefined) 
     : []
 }
 
+/** What the ladder lacks: pressures, a measured capacity, charge span or a residual without trend. */
+function ladderReasons(fit: PowderFit, range: PowderPressureRange): PowderConfidenceReason[] {
+  const rules = powderConfidenceRules
+  const reasons: PowderConfidenceReason[] = []
+  if (!fit.residuals.some((r) => r.kind === 'pressure')) reasons.push('no-pressure')
+  if (
+    range.contributions.some(
+      (c) => c.input === 'caseCapacity' && c.basis === 'estimated' && c.skipped === undefined,
+    )
+  )
+    reasons.push('capacity-estimated')
+  const { min, max } = fit.chargeRange
+  if (max / min < rules.narrowRatio) reasons.push('narrow-ladder')
+  if (hasResidualTrend(fit)) reasons.push('residual-trend')
+  return reasons
+}
+
+/** What the fit and its range show: a correlated start pressure, the prior, extrapolation, a failed refit. */
+function rangeReasons(
+  fit: PowderFit,
+  range: PowderPressureRange,
+  similar: SimilarPowdersPrior | undefined,
+): PowderConfidenceReason[] {
+  const reasons: PowderConfidenceReason[] = []
+  const names = fit.parameters.map((p) => p.name)
+  const burn = names.indexOf('burnRate')
+  const start = names.indexOf('startPressure')
+  if (
+    start >= 0 &&
+    Math.abs(fit.correlation?.[burn]?.[start] ?? 0) > powderConfidenceRules.correlation
+  )
+    reasons.push('start-pressure-correlated')
+  reasons.push(...priorReasons(fit, similar))
+  if (range.extrapolated) reasons.push('extrapolated')
+  if (range.contributions.some((c) => c.skipped === 'refit-failed'))
+    reasons.push('input-refit-failed')
+  return reasons
+}
+
+/** The label of the relative half-width `w` under `rules`. */
+function labelOf(w: number, rules: PowderConfidenceRules): PowderFitLabel {
+  if (w <= rules.tight) return 'tight'
+  return w <= rules.moderate ? 'moderate' : 'loose'
+}
+
 /**
  * Label of a fit's pressure range by its relative half-width, with the reasons that apply
  * (`apps/docs/docs/models/interior-powder-fit.md`, "Confidence label"). The label describes the
@@ -537,28 +639,9 @@ export function powderConfidence(
   const rules = powderConfidenceRules
   const w = range.relativeHalfWidth
   need(Number.isFinite(w), 'the range has no width')
-  const reasons: PowderConfidenceReason[] = []
-  if (!fit.residuals.some((r) => r.kind === 'pressure')) reasons.push('no-pressure')
-  if (
-    range.contributions.some(
-      (c) => c.input === 'caseCapacity' && c.basis === 'estimated' && c.skipped === undefined,
-    )
-  )
-    reasons.push('capacity-estimated')
-  const { min, max } = fit.chargeRange
-  if (max / min < rules.narrowRatio) reasons.push('narrow-ladder')
-  if (hasResidualTrend(fit)) reasons.push('residual-trend')
-  const names = fit.parameters.map((p) => p.name)
-  const burn = names.indexOf('burnRate')
-  const start = names.indexOf('startPressure')
-  if (start >= 0 && Math.abs(fit.correlation?.[burn]?.[start] ?? 0) > rules.correlation)
-    reasons.push('start-pressure-correlated')
-  reasons.push(...priorReasons(fit, options.similar))
-  if (range.extrapolated) reasons.push('extrapolated')
-  if (range.contributions.some((c) => c.skipped === 'refit-failed'))
-    reasons.push('input-refit-failed')
+  const reasons = [...ladderReasons(fit, range), ...rangeReasons(fit, range, options.similar)]
   return {
-    label: w <= rules.tight ? 'tight' : w <= rules.moderate ? 'moderate' : 'loose',
+    label: labelOf(w, rules),
     reasons,
     basis: fit.basis,
     relativeHalfWidth: w,

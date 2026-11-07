@@ -177,6 +177,7 @@
           "assertType",
           "expectIssueAt",
           "rejectsAt",
+          "rejectsWith",
           "accepts"
         ]
       }

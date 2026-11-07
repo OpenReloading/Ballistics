@@ -1,12 +1,5 @@
+import type { Complete } from '../key-list.ts'
 import { defaultStartPressure, handgunBarrelLengthLimit } from './start-pressure.ts'
-
-/**
- * `readonly K[]` when the list `L` holds every key of `K`; otherwise a type that names the keys it
- * leaves out, which the list does not satisfy.
- */
-type Complete<K, L extends readonly K[]> = [Exclude<K, L[number]>] extends [never]
-  ? readonly K[]
-  : { missing: Exclude<K, L[number]> }
 
 /** A field key of the `values` of `interiorLoad`. */
 export type InteriorValueKey =

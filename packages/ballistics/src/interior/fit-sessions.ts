@@ -5,8 +5,7 @@
  * and out.
  */
 
-import type { InteriorLoad } from '@open-reloading/ballistics'
-import { need, nth } from '../errors.ts'
+import { need, nth } from '@open-reloading/statistics'
 import {
   fitPowder,
   type LadderPoint,
@@ -16,6 +15,7 @@ import {
   type PowderFitReason,
   type PowderParameter,
 } from './fit.ts'
+import type { InteriorLoad } from './model.ts'
 
 /** One chronograph session: a ladder fired from one barrel at one powder temperature. */
 export interface PowderSession {
@@ -43,26 +43,40 @@ export interface PowderSessionsFit extends PowderFit {
   held: HeldPowderParameter[]
 }
 
-/** The parameter to give up after `error`, never the burn coefficient; undefined where none is left. */
-function giveUp(error: PowderFitError, parameters: readonly PowderParameter[]) {
+/** The entry of `open` that carries the most weight of `direction`. */
+function heaviest(open: readonly number[], direction: readonly number[]): number | undefined {
+  return open.reduce<number | undefined>(
+    (best, k) =>
+      best === undefined || Math.abs(nth(direction, k)) > Math.abs(nth(direction, best)) ? k : best,
+    undefined,
+  )
+}
+
+/** The index of the parameter `error` names, among the `open` ones. */
+function namedIndex(error: PowderFitError, open: readonly number[]): number | undefined {
+  if (error.reason === 'unresolved') return open.find((k) => error.unresolved?.includes(k))
+  // the direction the sessions leave open: the one the most weight of it lies on
+  if (error.reason === 'ill-conditioned') return heaviest(open, error.direction ?? [])
+  return error.reason === 'underdetermined' ? open.at(-1) : undefined
+}
+
+const isHeldReason = (reason: PowderFitReason): reason is HeldPowderParameter['reason'] =>
+  reason === 'underdetermined' || reason === 'unresolved' || reason === 'ill-conditioned'
+
+/**
+ * The parameter to give up after `error`, never the burn coefficient, with the failure's reason;
+ * undefined where none is left.
+ */
+function giveUp(
+  error: PowderFitError,
+  parameters: readonly PowderParameter[],
+): HeldPowderParameter | undefined {
   const open = parameters.flatMap((name, k) => (name === 'burnRate' ? [] : [k]))
-  const named =
-    error.reason === 'unresolved'
-      ? open.find((k) => error.unresolved?.includes(k))
-      : error.reason === 'ill-conditioned'
-        ? // the direction the sessions leave open: the one the most weight of it lies on
-          open.reduce<number | undefined>(
-            (best, k) =>
-              best === undefined ||
-              Math.abs(nth(error.direction ?? [], k)) > Math.abs(nth(error.direction ?? [], best))
-                ? k
-                : best,
-            undefined,
-          )
-        : error.reason === 'underdetermined'
-          ? open.at(-1)
-          : undefined
-  return named === undefined ? undefined : nth(parameters, named)
+  const named = namedIndex(error, open)
+  const reason = error.reason
+  return named === undefined || !isHeldReason(reason)
+    ? undefined
+    : { name: nth(parameters, named), reason }
 }
 
 /**
@@ -98,7 +112,7 @@ export function fitPowderSessions(
   const requested = parameters
   need(
     Object.entries(options.priors ?? {}).every(
-      ([name, prior]) => prior === undefined || requested.includes(name as PowderParameter),
+      ([name, prior]) => prior === undefined || (requested as readonly string[]).includes(name),
     ),
     'a prior needs its parameter in parameters',
   )
@@ -107,7 +121,7 @@ export function fitPowderSessions(
     try {
       const priors = Object.fromEntries(
         Object.entries(options.priors ?? {}).filter(([name]) =>
-          parameters.includes(name as PowderParameter),
+          (parameters as readonly string[]).includes(name),
         ),
       )
       return {
@@ -116,10 +130,10 @@ export function fitPowderSessions(
         held,
       }
     } catch (error) {
-      const name = error instanceof PowderFitError ? giveUp(error, parameters) : undefined
-      if (name === undefined || !(error instanceof PowderFitError)) throw error
-      held.push({ name, reason: error.reason as HeldPowderParameter['reason'] })
-      parameters = parameters.filter((p) => p !== name)
+      const given = error instanceof PowderFitError ? giveUp(error, parameters) : undefined
+      if (given === undefined) throw error
+      held.push(given)
+      parameters = parameters.filter((p) => p !== given.name)
     }
   }
 }

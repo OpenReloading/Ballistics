@@ -6,11 +6,17 @@
  * Velocities only. SI in and out.
  */
 
-import { type InteriorLoad, type InteriorOptions, interior } from '@open-reloading/ballistics'
-import { chiSquareQuantile, logLeastSquares } from '@open-reloading/statistics'
-import type { Settings } from '../errors.ts'
-import { InputError, need, nth, positive } from '../errors.ts'
+import {
+  chiSquareQuantile,
+  InputError,
+  type LogFitResult,
+  logLeastSquares,
+  need,
+  nth,
+} from '@open-reloading/statistics'
+import { positive, type Settings } from '../settings.ts'
 import { type LadderPoint, PowderFitError, type PowderPrior } from './fit.ts'
+import { type InteriorLoad, type InteriorOptions, interior } from './model.ts'
 
 /** One chronograph session of a pooled fit: a ladder of one powder lot fired from one rifle. */
 export interface PooledSession {
@@ -238,6 +244,11 @@ function checkPooled(
     'maxIterations must be a positive integer',
   )
   need(maxCondition > 0, 'maxCondition must be positive')
+  checkSessions(sessions)
+}
+
+/** Checks each session and its ladder points: velocities with sigmas only, conditions per session. */
+function checkSessions(sessions: readonly PooledSession[]) {
   for (const s of sessions) {
     need(s.ladder.length > 0, 'at least one ladder point per session')
     need(positive(s.barrelLength), 'barrelLength must be positive')
@@ -338,6 +349,198 @@ function priorRowsOf(
   })
 }
 
+/** The start of a pooled parameter: its kind, group and initial value. */
+type PooledStart = Omit<PooledPowderParameter, 'value' | 'standardUncertainty'>
+
+/** One ladder point of a session, with the indices of its parameters. */
+interface PooledRow {
+  session: number
+  x: LadderPoint
+  /** Its velocity sigma, m/s; `checkSessions` makes every point carry one. */
+  sigma: number
+  indices: ReturnType<typeof sessionIndices>
+}
+
+/** What a pooled fit runs on, with its cache of runs and their count. */
+interface PooledProblem {
+  sessions: readonly PooledSession[]
+  parameters: readonly PooledStart[]
+  priorRows: ReturnType<typeof priorRowsOf>
+  rows: PooledRow[]
+  options: Settings<InteriorOptions> | undefined
+  /** Last interior velocity per session and charge; a rifle step reuses it. */
+  cache: Map<string, { burn: number; factor: number; velocity: number }>
+  /** Model runs so far. */
+  runCount: number
+}
+
+/** Velocity of `row` at `theta`, or null when its run is invalid. */
+function pooledVelocity(
+  problem: PooledProblem,
+  row: PooledRow,
+  theta: readonly number[],
+): number | null {
+  const { burn, temperature, rifle, lot } = row.indices
+  const s = nth(problem.sessions, row.session)
+  const b = nth(problem.parameters, burn).initial * Math.exp(at(theta, burn) + at(theta, lot))
+  const factor = Math.exp(at(theta, temperature))
+  const key = `${row.session} ${row.x.charge}`
+  let hit = problem.cache.get(key)
+  if (hit?.burn !== b || hit.factor !== factor) {
+    problem.runCount++
+    const r = interior(targetLoad(s, row.x.charge, b, factor), problem.options)
+    if (!r.valid) return null
+    hit = { burn: b, factor, velocity: r.muzzleVelocity }
+    problem.cache.set(key, hit)
+  }
+  return hit.velocity * Math.exp(at(theta, rifle))
+}
+
+/** Prediction of row `run` at `theta`, or of its prior pseudo-row after the rows. */
+function predictPooledRun(
+  problem: PooledProblem,
+  theta: readonly number[],
+  run: number,
+): number | null {
+  const row = problem.rows[run]
+  return row === undefined
+    ? nth(theta, nth(problem.priorRows, run - problem.rows.length).k)
+    : pooledVelocity(problem, row, theta)
+}
+
+/** Predictions of every row and pseudo-row, or of `run` alone; null when a run is invalid. */
+function predictPooledRows(
+  problem: PooledProblem,
+  theta: readonly number[],
+  run?: number,
+): number[] | null {
+  const runs =
+    run === undefined
+      ? Array.from({ length: problem.rows.length + problem.priorRows.length }, (_, k) => k)
+      : [run]
+  const out: number[] = []
+  for (const k of runs) {
+    const v = predictPooledRun(problem, theta, k)
+    if (v === null) return null
+    out.push(v)
+  }
+  return out
+}
+
+/** Whether log parameter `j` moves row or pseudo-row `run`. */
+function pooledMoves(problem: PooledProblem, j: number, run: number): boolean {
+  const row = problem.rows[run]
+  if (row === undefined) return nth(problem.priorRows, run - problem.rows.length).k === j
+  return Object.values(row.indices).includes(j)
+}
+
+/** The least-squares fit of the velocities and the prior pseudo-rows. */
+function solvePooled(
+  problem: PooledProblem,
+  limits: { maxIterations: number; maxCondition: number },
+): LogFitResult {
+  const { parameters, rows, priorRows } = problem
+  const zero = parameters.map(() => 0)
+  const start = predictPooledRows(problem, zero)
+  if (!start) throw new PowderFitError('invalid')
+  return logLeastSquares({
+    parameterCount: parameters.length,
+    observed: [...rows.map((r) => r.x.muzzleVelocity), ...priorRows.map((p) => p.centre)],
+    standardUncertainty: [...rows.map((r) => r.sigma), ...priorRows.map((p) => p.sigma)],
+    weighted: true,
+    // as in fitPowder: a Jacobian entry below 1e-6 of the observation per unit log parameter is noise
+    floor: [...rows.map((r) => (1e-6 * r.x.muzzleVelocity) / r.sigma), ...priorRows.map(() => 0)],
+    first: start,
+    predict: (theta, _current, run) => predictPooledRows(problem, theta, run),
+    runs: [...rows, ...priorRows].map(() => 1),
+    moves: (j, run) => pooledMoves(problem, j, run),
+    maxIterations: limits.maxIterations,
+    maxCondition: limits.maxCondition,
+    fail: (reason, _theta, extra = {}) => {
+      throw new PowderFitError(reason === 'unreachable' ? 'invalid' : reason, extra)
+    },
+  })
+}
+
+/** The velocity residual of each ladder point. */
+const pooledResiduals = (rows: readonly PooledRow[], predicted: readonly number[]) =>
+  rows.map((r, i): PooledResidual => {
+    const value = nth(predicted, i)
+    return {
+      session: r.session,
+      charge: r.x.charge,
+      observed: r.x.muzzleVelocity,
+      predicted: value,
+      residual: value - r.x.muzzleVelocity,
+    }
+  })
+
+/** The rows of `sessions` and the prior pseudo-rows of a pooled fit of `parameters`. */
+function pooledProblem(
+  sessions: readonly PooledSession[],
+  parameters: readonly PooledStart[],
+  priorRows: PooledProblem['priorRows'],
+  options: Settings<InteriorOptions> | undefined,
+): PooledProblem {
+  return {
+    sessions,
+    parameters,
+    priorRows,
+    rows: sessions.flatMap((s, session) =>
+      s.ladder.map((x) => ({
+        session,
+        x,
+        sigma: x.velocitySigma ?? Number.NaN,
+        indices: sessionIndices(parameters, s),
+      })),
+    ),
+    options,
+    cache: new Map(),
+    runCount: 0,
+  }
+}
+
+/** The result of the pooled fit `fit` of `problem`. */
+function pooledFitResult(
+  problem: PooledProblem,
+  fit: LogFitResult,
+  given: Pick<PooledPowderFit, 'held' | 'rifleSigma' | 'lotSigma'>,
+): PooledPowderFit {
+  const { covariance, correlation, standardUncertainty } = fit
+  // weighted, with at least the burn coefficient per powder: logLeastSquares always gives them
+  if (!covariance || !correlation || !standardUncertainty)
+    throw new InputError('the pooled fit has no covariance')
+  const residuals = pooledResiduals(problem.rows, fit.predicted)
+  return {
+    parameters: problem.parameters.map((p, k) => {
+      const value = p.initial * Math.exp(nth(fit.theta, k))
+      return { ...p, value, standardUncertainty: value * nth(standardUncertainty, k) }
+    }),
+    held: given.held,
+    sessions: problem.sessions.map((s) => ({
+      powder: s.powder,
+      rifle: s.rifle,
+      ...(s.lot === undefined ? {} : { lot: s.lot }),
+    })),
+    covariance,
+    correlation,
+    conditionNumber: fit.conditionNumber,
+    chiSquare: fit.chiSquare,
+    dataChiSquare: residuals.reduce(
+      (sum, r, i) => sum + (r.residual / nth(problem.rows, i).sigma) ** 2,
+      0,
+    ),
+    degreesOfFreedom: problem.rows.length - problem.parameters.length,
+    residuals,
+    modelError: 0,
+    calibrationStrings: 0,
+    rifleSigma: given.rifleSigma,
+    lotSigma: given.lotSigma,
+    iterations: fit.iterations,
+    runCount: problem.runCount,
+  }
+}
+
 /**
  * Fits the burn coefficient (and, on request, the temperature factor) of each powder, a velocity
  * factor per rifle and a burn factor per lot to many sessions at once
@@ -361,121 +564,14 @@ export function fitPowderPooled(
   } = options
   checkPooled(sessions, requested, { rifleSigma, lotSigma, maxIterations, maxCondition })
   const { parameters, held } = pooledParameters(sessions, requested, priors)
-  const priorRows = priorRowsOf(parameters, priors, rifleSigma, lotSigma)
-
-  const rows = sessions.flatMap((s, session) =>
-    s.ladder.map((x) => ({ session, x, indices: sessionIndices(parameters, s) })),
+  const problem = pooledProblem(
+    sessions,
+    parameters,
+    priorRowsOf(parameters, priors, rifleSigma, lotSigma),
+    options.options,
   )
-  let runCount = 0
-  // last interior velocity per session and charge; a rifle step reuses it
-  const cache = new Map<string, { burn: number; factor: number; velocity: number }>()
-  const velocity = (row: (typeof rows)[number], theta: readonly number[]): number | null => {
-    const { burn, temperature, rifle, lot } = row.indices
-    const s = nth(sessions, row.session)
-    const b = nth(parameters, burn).initial * Math.exp(at(theta, burn) + at(theta, lot))
-    const factor = Math.exp(at(theta, temperature))
-    const key = `${row.session} ${row.x.charge}`
-    let hit = cache.get(key)
-    if (hit?.burn !== b || hit.factor !== factor) {
-      runCount++
-      const r = interior(targetLoad(s, row.x.charge, b, factor), options.options)
-      if (!r.valid) return null
-      hit = { burn: b, factor, velocity: r.muzzleVelocity }
-      cache.set(key, hit)
-    }
-    return hit.velocity * Math.exp(at(theta, rifle))
-  }
-  const predictRun = (theta: readonly number[], run: number): number | null => {
-    const row = rows[run]
-    return row === undefined
-      ? nth(theta, nth(priorRows, run - rows.length).k)
-      : velocity(row, theta)
-  }
-  const predict = (theta: number[], _current: number[], run?: number) => {
-    const runs =
-      run === undefined
-        ? Array.from({ length: rows.length + priorRows.length }, (_, k) => k)
-        : [run]
-    const out: number[] = []
-    for (const k of runs) {
-      const v = predictRun(theta, k)
-      if (v === null) return null
-      out.push(v)
-    }
-    return out
-  }
-  const zero = parameters.map(() => 0)
-  const start = predict(zero, zero)
-  if (!start) throw new PowderFitError('invalid')
-  const fit = logLeastSquares({
-    parameterCount: parameters.length,
-    observed: [...rows.map((r) => r.x.muzzleVelocity), ...priorRows.map((p) => p.centre)],
-    standardUncertainty: [
-      ...rows.map((r) => r.x.velocitySigma as number),
-      ...priorRows.map((p) => p.sigma),
-    ],
-    weighted: true,
-    // as in fitPowder: a Jacobian entry below 1e-6 of the observation per unit log parameter is noise
-    floor: [
-      ...rows.map((r) => (1e-6 * r.x.muzzleVelocity) / (r.x.velocitySigma as number)),
-      ...priorRows.map(() => 0),
-    ],
-    first: start,
-    predict,
-    runs: [...rows, ...priorRows].map(() => 1),
-    moves: (j, run) => {
-      const row = rows[run]
-      if (row === undefined) return nth(priorRows, run - rows.length).k === j
-      return Object.values(row.indices).includes(j)
-    },
-    maxIterations,
-    maxCondition,
-    fail: (reason, _theta, extra = {}) => {
-      throw new PowderFitError(reason === 'unreachable' ? 'invalid' : reason, extra)
-    },
-  })
-  const { covariance, correlation, standardUncertainty } = fit
-  // weighted, with at least the burn coefficient per powder: logLeastSquares always gives them
-  if (!covariance || !correlation || !standardUncertainty)
-    throw new InputError('the pooled fit has no covariance')
-  const residuals = rows.map((r, i): PooledResidual => {
-    const predicted = nth(fit.predicted, i)
-    return {
-      session: r.session,
-      charge: r.x.charge,
-      observed: r.x.muzzleVelocity,
-      predicted,
-      residual: predicted - r.x.muzzleVelocity,
-    }
-  })
-  return {
-    parameters: parameters.map((p, k) => {
-      const value = p.initial * Math.exp(nth(fit.theta, k))
-      return { ...p, value, standardUncertainty: value * nth(standardUncertainty, k) }
-    }),
-    held,
-    sessions: sessions.map((s) => ({
-      powder: s.powder,
-      rifle: s.rifle,
-      ...(s.lot === undefined ? {} : { lot: s.lot }),
-    })),
-    covariance,
-    correlation,
-    conditionNumber: fit.conditionNumber,
-    chiSquare: fit.chiSquare,
-    dataChiSquare: residuals.reduce(
-      (sum, r, i) => sum + (r.residual / (nth(rows, i).x.velocitySigma as number)) ** 2,
-      0,
-    ),
-    degreesOfFreedom: rows.length - parameters.length,
-    residuals,
-    modelError: 0,
-    calibrationStrings: 0,
-    rifleSigma,
-    lotSigma,
-    iterations: fit.iterations,
-    runCount,
-  }
+  const fit = solvePooled(problem, { maxIterations, maxCondition })
+  return pooledFitResult(problem, fit, { held, rifleSigma, lotSigma })
 }
 
 /** Options of `predictPooled`. */
@@ -515,6 +611,47 @@ export interface PooledPrediction {
   runCount: number
 }
 
+/** Checks the charge, the level and the string sigma of a prediction, and that the fit knows the powder. */
+function checkPooledPrediction(
+  fit: PooledPowderFit,
+  target: PooledTarget,
+  charge: number,
+  { level, velocitySigma }: { level: number; velocitySigma: number },
+) {
+  need(Number.isFinite(charge) && charge > 0, 'charge must be positive')
+  need(level > 0 && level < 1, 'level must lie in (0, 1)')
+  need(Number.isFinite(velocitySigma) && velocitySigma >= 0, 'velocitySigma must be 0 or above')
+  need(
+    fit.sessions.some((s) => s.powder === target.powder),
+    'the powder of the target must be one of the fit',
+  )
+}
+
+/**
+ * Variance of the velocity `v` from the parameter covariance along `gradient`, plus the spread of
+ * a rifle or lot the fit has not seen.
+ */
+function pooledVariance(
+  fit: PooledPowderFit,
+  target: PooledTarget,
+  gradient: readonly number[],
+  { v, burn }: { v: number; burn: number },
+): number {
+  let variance = gradient.reduce(
+    (sum, gj, j) =>
+      gj === 0
+        ? sum
+        : sum + gj * gradient.reduce((s, gk, k) => s + nth(nth(fit.covariance, j), k) * gk, 0),
+    0,
+  )
+  const seen = (pick: (s: PooledPowderFit['sessions'][number]) => boolean) =>
+    fit.sessions.some(pick)
+  if (!seen((s) => s.rifle === target.rifle)) variance += (fit.rifleSigma * v) ** 2
+  if (!seen((s) => s.powder === target.powder && s.lot === target.lot))
+    variance += (fit.lotSigma * nth(gradient, burn)) ** 2
+  return variance
+}
+
 /**
  * Mean muzzle velocity of `target` at `charge` with the prediction interval of the pooled fit
  * (`apps/docs/docs/models/interior-powder-fit.md`, "Pooled fit over rifles, powders and lots"): the
@@ -528,13 +665,7 @@ export function predictPooled(
   options: PooledPredictionOptions = {},
 ): PooledPrediction {
   const { level = 0.9, velocitySigma = 0 } = options
-  need(Number.isFinite(charge) && charge > 0, 'charge must be positive')
-  need(level > 0 && level < 1, 'level must lie in (0, 1)')
-  need(Number.isFinite(velocitySigma) && velocitySigma >= 0, 'velocitySigma must be 0 or above')
-  need(
-    fit.sessions.some((s) => s.powder === target.powder),
-    'the powder of the target must be one of the fit',
-  )
+  checkPooledPrediction(fit, target, charge, { level, velocitySigma })
   const { burn, temperature, rifle, lot } = sessionIndices(fit.parameters, target)
   const value = (k: number) => (k < 0 ? 1 : nth(fit.parameters, k).value)
   const theta0 = fit.parameters.map(() => 0)
@@ -557,18 +688,7 @@ export function predictPooled(
     const shifted = (d: number) => run(theta0.map((x, k) => (k === j ? x + d : x)))
     return (shifted(step) - shifted(-step)) / (2 * step)
   })
-  let variance = gradient.reduce(
-    (sum, gj, j) =>
-      gj === 0
-        ? sum
-        : sum + gj * gradient.reduce((s, gk, k) => s + nth(nth(fit.covariance, j), k) * gk, 0),
-    0,
-  )
-  const seen = (pick: (s: PooledPowderFit['sessions'][number]) => boolean) =>
-    fit.sessions.some(pick)
-  if (!seen((s) => s.rifle === target.rifle)) variance += (fit.rifleSigma * v) ** 2
-  if (!seen((s) => s.powder === target.powder && s.lot === target.lot))
-    variance += (fit.lotSigma * nth(gradient, burn)) ** 2
+  const variance = pooledVariance(fit, target, gradient, { v, burn })
   const parameterUncertainty = Math.sqrt(Math.max(variance, 0))
   const modelUncertainty = fit.modelError * v
   const standardUncertainty = Math.hypot(parameterUncertainty, modelUncertainty, velocitySigma)

@@ -105,7 +105,7 @@ Analytic: synthetic loads and a synthetic truth with the fitted model's own stru
 ## Where in the app
 
 - `packages/ballistics/src/interior/model.ts`, `energyAtTemperature`.
-- `packages/core/src/interior/fit.ts`, `fitPowder`.
+- `packages/ballistics/src/interior/fit.ts`, `fitPowder`.
 - `packages/ballistics/test/interior-energy-temperature.test.ts`.
 - `packages/core/scripts/propellant-temperature-energy.mts`.
 - `packages/cli/scripts/temperature-energy.mts`, the measured check.

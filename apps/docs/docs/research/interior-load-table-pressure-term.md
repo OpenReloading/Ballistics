@@ -55,7 +55,7 @@ Measured. The measurements are not in the repository.
 ## Where in the app
 
 - `packages/schema/src/powder.ts`, the fitted interior parameters of a powder record.
-- `packages/core/src/interior/fit.ts`, priors and residuals of the powder fit.
+- `packages/ballistics/src/interior/fit.ts`, priors and residuals of the powder fit.
 - Model pages: [powder fit](../models/interior-powder-fit.md), [M3 model](../models/interior-m3.md).
 
 ## Confidence

@@ -134,8 +134,8 @@ Analytic: synthetic ladders from the interior model with chosen noise, input unc
 
 ## Where in the app
 
-- `packages/core/src/interior/fit.ts`, `predictPowder`, `fitDomain`, `outsideDomain`, `powderDomainMargin`.
-- `packages/core/src/interior/fit-confidence.ts`, `powderPressureRange`.
+- `packages/ballistics/src/interior/fit.ts`, `predictPowder`, `fitDomain`, `outsideDomain`, `powderDomainMargin`.
+- `packages/ballistics/src/interior/fit-confidence.ts`, `powderPressureRange`.
 - Model page: [powder fit](../models/interior-powder-fit.md#domain).
 
 ## Confidence

@@ -7,15 +7,23 @@
  */
 
 import {
+  type Identifiability,
+  InputError,
+  identifiability,
+  type LogFitResult,
+  logLeastSquares,
+  need,
+  nth,
+} from '@open-reloading/statistics'
+import type { Settings } from '../settings.ts'
+import { PowderFitError } from './fit.ts'
+import {
   type InteriorInvalid,
   type InteriorLoad,
   type InteriorOptions,
   type InteriorPoint,
   interior,
-} from '@open-reloading/ballistics'
-import { identifiability, logLeastSquares } from '@open-reloading/statistics'
-import { InputError, need, nth, type Settings } from '../errors.ts'
-import { PowderFitError } from './fit.ts'
+} from './model.ts'
 
 /** Where the sensor measured: the model's pressure at the breech, the space mean or the projectile base. */
 export type PressureSensor = 'breech' | 'mean' | 'base'
@@ -212,12 +220,13 @@ function traceWindow(trace: PressureHistory, peak: number, fall: number) {
   return { start, end, rows }
 }
 
-const pressureOf = (sensor: PressureSensor) => (p: InteriorPoint) =>
-  sensor === 'breech' ? p.breechPressure : sensor === 'mean' ? p.meanPressure : p.basePressure
+const pressureOf = (sensor: PressureSensor) => (p: InteriorPoint) => {
+  if (sensor === 'breech') return p.breechPressure
+  return sensor === 'mean' ? p.meanPressure : p.basePressure
+}
 
-/** Checks the inputs; returns the load's two-stage vivacity law and the parameters to fit. */
-function checkInput(load: InteriorLoad, trace: PressureHistory, options: CurveFitOptions) {
-  const { time, pressure, sigma } = trace
+/** Checks the trace: its times and pressures, its sensor and its sigma. */
+function checkTrace({ time, pressure, sigma, sensor }: PressureHistory) {
   need(
     time.length === pressure.length &&
       time.length > 1 &&
@@ -225,14 +234,15 @@ function checkInput(load: InteriorLoad, trace: PressureHistory, options: CurveFi
       pressure.every(Number.isFinite),
     'trace: equal numbers of finite, strictly increasing times and finite pressures, at least 2',
   )
-  need(sensors.includes(trace.sensor), 'trace.sensor: breech, mean or base')
+  need(sensors.includes(sensor), 'trace.sensor: breech, mean or base')
   need(sigma === undefined || (Number.isFinite(sigma) && sigma > 0), 'sigma must be positive')
-  const given = load.propellant.burn
-  need(
-    given.kind === 'vivacity' && given.form.kind === 'twoStage',
-    'a curve fit needs a vivacity burn law with a two-stage form',
-  )
-  const burn = given as TwoStageBurn
+}
+
+const isTwoStage = (burn: InteriorLoad['propellant']['burn']): burn is TwoStageBurn =>
+  burn.kind === 'vivacity' && burn.form.kind === 'twoStage'
+
+/** The parameters to fit, checked against the start values of `burn`. */
+function wantedParameters(burn: TwoStageBurn, options: CurveFitOptions) {
   const wanted = options.parameters ?? order
   need(
     wanted.length > 0 &&
@@ -243,6 +253,11 @@ function checkInput(load: InteriorLoad, trace: PressureHistory, options: CurveFi
   need(!wanted.includes('formSlope') || burn.form.a > 0, 'formSlope needs a start value above 0')
   need(!wanted.includes('transition') || burn.form.z1 < 1, 'transition needs a start value below 1')
   need(!wanted.includes('exponent') || burn.exponent > 0, 'exponent needs a start value above 0')
+  return wanted
+}
+
+/** Checks the iteration limit, the condition limit and the fall fraction. */
+function checkSolverOptions(options: CurveFitOptions) {
   const { maxIterations = 100, maxCondition = 1e3 } = options
   need(
     Number.isInteger(maxIterations) && maxIterations > 0,
@@ -253,6 +268,16 @@ function checkInput(load: InteriorLoad, trace: PressureHistory, options: CurveFi
     options.fallFraction === undefined || (options.fallFraction > 0 && options.fallFraction < 1),
     'fallFraction must lie in (0, 1)',
   )
+}
+
+/** Checks the inputs; returns the load's two-stage vivacity law and the parameters to fit. */
+function checkInput(load: InteriorLoad, trace: PressureHistory, options: CurveFitOptions) {
+  checkTrace(trace)
+  const burn = load.propellant.burn
+  if (!isTwoStage(burn))
+    throw new InputError('a curve fit needs a vivacity burn law with a two-stage form')
+  const wanted = wantedParameters(burn, options)
+  checkSolverOptions(options)
   return { burn, wanted }
 }
 
@@ -288,15 +313,16 @@ const giveUp: readonly CurveParameter[] = ['exponent', 'formSlope', 'transition'
  */
 function withheld(e: unknown, current: readonly CurveParameter[]): Withheld {
   if (!(e instanceof PowderFitError)) throw e
+  const reason = e.reason
+  // any other failure holds nothing
+  if (reason !== 'unresolved' && reason !== 'ill-conditioned') throw e
   const names =
-    e.reason === 'unresolved'
+    reason === 'unresolved'
       ? (e.unresolved ?? []).flatMap((i) => current.slice(i, i + 1))
-      : e.reason === 'ill-conditioned'
-        ? giveUp.filter((p) => current.includes(p)).slice(0, 1)
-        : []
+      : giveUp.filter((p) => current.includes(p)).slice(0, 1)
   const held = names.filter((p) => p !== 'burnRate')
   if (held.length === 0 || held.length === current.length) throw e
-  return { names: held, reasons: [e.reason as CurveReason] }
+  return { names: held, reasons: [reason] }
 }
 
 /** A pressure trace of one shot of a joint fit and the charge it was fired with. */
@@ -409,13 +435,95 @@ export function fitPressureCurves(
   return fitTraces(load, shots, options, true)
 }
 
-/** `fitPressureCurves`, with the leave-one-trace-out refits only when `refit`. */
-function fitTraces(
-  load: InteriorLoad,
-  shots: readonly ChargedTrace[],
-  options: CurveFitOptions,
-  refit: boolean,
-): PressureCurvesFit {
+/** Start values in the order of `order`: burn coefficient, form slope, transition, exponent. */
+type CurveValues = [number, number, number, number]
+
+/** A trace prepared for the fit: its window, the samples in it and the model pressure it meets. */
+interface WindowTrace {
+  charge: number
+  peak: number
+  window: ReturnType<typeof traceWindow>
+  times: number[]
+  observed: number[]
+  rowSigma: number
+  pick: (p: InteriorPoint) => number
+}
+
+/** The law a curve fit varies: the load, its two-stage law and the start values restated at `peak`. */
+interface CurveLaw {
+  load: InteriorLoad
+  burn: TwoStageBurn
+  /** Reference pressure of the restated law, Pa: the geometric mean of the trace peaks. */
+  peak: number
+  base: CurveValues
+}
+
+/** What the fit of one set of traces runs on, and the counters of its model runs. */
+interface CurveProblem extends CurveLaw {
+  wanted: readonly CurveParameter[]
+  traces: WindowTrace[]
+  warnings: CurveWarning[]
+  weighted: boolean
+  options: CurveFitOptions
+  /** Trace time at model time 0 at the start values, per trace. */
+  shift0: number[]
+  /** The samples of all windows stacked, their sigmas and the count per trace. */
+  samples: { observed: number[]; rowSigma: number[]; runs: number[] }
+  limits: {
+    maxIterations: number
+    maxCondition: number
+    maxInflation: number
+    maxRelativeStandardUncertainty: number
+  }
+  /** Model runs so far. */
+  runCount: number
+  /** The last rejected candidate: an invalid run, or the window past the model's muzzle exit. */
+  rejected: InteriorInvalid | 'window' | undefined
+}
+
+/** The time shifts follow the parameters of the fit; one unit of their log-free parameter is `shiftScale` s. */
+const shiftScale = 1e-4
+
+/** Value of each parameter at the log parameters `theta` of the fitted ones, the start value for the others. */
+function curveValues(
+  base: CurveValues,
+  parameters: readonly CurveParameter[],
+  theta: readonly number[],
+): CurveValues {
+  const at = (k: number) => {
+    const j = parameters.indexOf(nth(order, k))
+    return nth(base, k) * (j < 0 ? 1 : Math.exp(nth(theta, j)))
+  }
+  return [at(0), at(1), at(2), at(3)]
+}
+
+/** The load at the parameter values of `theta`, fired at `charge`. */
+function curveLoad(
+  law: CurveLaw,
+  parameters: readonly CurveParameter[],
+  theta: readonly number[],
+  charge: number = law.load.charge,
+): InteriorLoad {
+  const { load, burn, peak } = law
+  const [vivacity, a, z1, exponent] = curveValues(law.base, parameters, theta)
+  return {
+    ...load,
+    charge,
+    propellant: {
+      ...load.propellant,
+      burn: {
+        ...burn,
+        vivacity,
+        exponent,
+        referencePressure: peak,
+        form: { ...burn.form, a, z1 },
+      },
+    },
+  }
+}
+
+/** Checks the charges and that the traces carry a sigma on all or none. */
+function checkShots(shots: readonly ChargedTrace[]) {
   need(shots.length > 0, 'at least one trace')
   need(
     shots.every((s) => Number.isFinite(s.charge) && s.charge > 0),
@@ -426,16 +534,11 @@ function fitTraces(
       shots.every((s) => s.trace.sigma !== undefined),
     'sigma: on every trace or on none',
   )
-  const { maxRelativeStandardUncertainty = 0.25 } = options
-  const { maxIterations = 100, maxCondition = 1e3, fallFraction = 0.5 } = options
-  const { burn, wanted } = nth(
-    shots.map((s) => checkInput(load, s.trace, options)),
-    0,
-  )
-  const { form } = burn
-  const weighted = nth(shots, 0).trace.sigma !== undefined
+}
 
-  const traces = shots.map(({ charge, trace }) => {
+/** Each trace with its window from the start of the rise to `fallFraction` of the peak after it. */
+function windowTraces(shots: readonly ChargedTrace[], fallFraction: number): WindowTrace[] {
+  return shots.map(({ charge, trace }) => {
     const peak = maxOf(trace.pressure)
     need(peak > 0, 'the trace has no positive pressure')
     const window = traceWindow(trace, peak, fallFraction)
@@ -449,66 +552,23 @@ function fitTraces(
       pick: pressureOf(trace.sensor),
     }
   })
-  const observed = traces.flatMap((t) => t.observed)
-  const shotCount = traces.length
-  need(observed.length > wanted.length + shotCount, 'too few trace samples in the window')
-  const peaks = traces.map((t) => t.peak)
-  const warnings = curveWarnings(
-    traces.map((t) => t.charge),
-    peaks,
-  )
-  // traces at two or more charges spanning 1.2 in peak resolve the exponent at a limit of 100
-  const spread =
-    traces.some((t) => !sameCharge(t.charge, nth(traces, 0).charge)) &&
-    warnings.every((w) => w.reason !== 'narrowPeaks')
-  const { maxInflation = spread ? 100 : 10 } = options
-  // the product of K-th roots is exact for one trace, where the mean of the logs is not
-  const peak = peaks.reduce((a, b) => a * b ** (1 / shotCount), 1)
+}
 
-  // M3 states the burn rate at a reference pressure: restating it at the traces' peak keeps the
-  // coefficient and the exponent from being collinear and gives the same model
-  const restated = burn.vivacity * (peak / burn.referencePressure) ** burn.exponent
-  const base = [restated, form.a, form.z1, burn.exponent]
-  let runCount = 0
-  /** The last rejected candidate: an invalid run, or the window past the model's muzzle exit. */
-  let rejected: InteriorInvalid | 'window' | undefined
-  /** Value of each parameter at the log parameters `theta` of the fitted ones, the start value for the others. */
-  const values = (parameters: readonly CurveParameter[], theta: readonly number[]) =>
-    order.map((name, k) => {
-      const j = parameters.indexOf(name)
-      return nth(base, k) * (j < 0 ? 1 : Math.exp(nth(theta, j)))
-    })
-  const apply = (
-    parameters: readonly CurveParameter[],
-    theta: readonly number[],
-    charge = load.charge,
-  ): InteriorLoad => {
-    const [vivacity, a, z1, exponent] = values(parameters, theta) as [
-      number,
-      number,
-      number,
-      number,
-    ]
-    return {
-      ...load,
-      charge,
-      propellant: {
-        ...load.propellant,
-        burn: {
-          ...burn,
-          vivacity,
-          exponent,
-          referencePressure: peak,
-          form: { ...form, a, z1 },
-        },
-      },
-    }
-  }
-  /** Trace time at model time 0 at the start values, per trace: the model's rise meets the trace's. */
-  const shift0 = traces.map(({ charge, pick, window }) => {
-    const start = interior(apply([], [], charge), options.options)
+/** Whether the traces lie at two or more charges with peaks that span enough to resolve the exponent. */
+const resolvesExponent = (traces: readonly WindowTrace[], warnings: readonly CurveWarning[]) =>
+  traces.some((t) => !sameCharge(t.charge, nth(traces, 0).charge)) &&
+  warnings.every((w) => w.reason !== 'narrowPeaks')
+
+/** Trace time at model time 0 at the start values, per trace: the model's rise meets the trace's. */
+function startShifts(
+  law: CurveLaw,
+  traces: readonly WindowTrace[],
+  options: CurveFitOptions,
+): number[] {
+  return traces.map(({ charge, pick, window }) => {
+    const start = interior(curveLoad(law, [], [], charge), options.options)
     if (!start.valid) throw new PowderFitError('invalid', { result: start })
-    const risePressure = start.points.map(pick)
+    const risePressure = start.points.map((p) => pick(p))
     return (
       window.start -
       riseTime(
@@ -518,160 +578,286 @@ function fitTraces(
       )
     )
   })
-  /** The time shifts follow the parameters of the fit; one unit of their log-free parameter is `shiftScale` s. */
-  const shiftScale = 1e-4
-  /** Model pressure at the window's samples of trace `k`, or null when the candidate is rejected. */
-  const evaluateOne = (
-    parameters: readonly CurveParameter[],
-    theta: readonly number[],
-    k: number,
-  ) => {
-    const { charge, pick, times } = nth(traces, k)
-    runCount++
-    const run = interior(apply(parameters, theta, charge), options.options)
-    if (!run.valid) {
-      rejected = run
-      return null
-    }
-    const t = run.points.map((p) => p.time)
-    const p = run.points.map(pick)
-    const shift = nth(shift0, k) + shiftScale * nth(theta, parameters.length + k)
-    if (nth(times, 0) - shift < 0 || (times.at(-1) as number) - shift > (t.at(-1) as number)) {
-      rejected = 'window'
-      return null
-    }
-    let i = 1
-    return times.map((x) => {
-      while (nth(t, i) < x - shift) i++
-      const f = (x - shift - nth(t, i - 1)) / (nth(t, i) - nth(t, i - 1))
-      return nth(p, i - 1) + f * (nth(p, i) - nth(p, i - 1))
-    })
-  }
-  /** Model pressure at the windows of trace `k`, or of all traces stacked without it. */
-  const evaluate = (
-    parameters: readonly CurveParameter[],
-    theta: readonly number[],
-    k?: number,
-  ) => {
-    if (k !== undefined) return evaluateOne(parameters, theta, k)
-    const all: number[] = []
-    for (let j = 0; j < shotCount; j++) {
-      const one = evaluateOne(parameters, theta, j)
-      if (!one) return null
-      all.push(...one)
-    }
-    return all
-  }
-  const rowSigma = traces.flatMap((t) => t.observed.map(() => t.rowSigma))
-  const runs = traces.map((t) => t.observed.length)
+}
 
-  /** One fit of `parameters`, with the identifiability of each from the Jacobian at the solution. */
-  const attempt = (parameters: readonly CurveParameter[]) => {
-    const n = parameters.length
-    const zero = [...parameters.map(() => 0), ...traces.map(() => 0)]
-    // a time shift moves only its own trace
-    const moves = (j: number, run: number) => j < n || j - n === run
-    const first = evaluate(parameters, zero)
-    if (!first) {
-      if (rejected === 'window' || rejected === undefined)
-        throw new InputError(
-          'the model at the start values leaves the barrel before the end of the trace window; start closer or raise fallFraction',
-        )
-      throw new PowderFitError('invalid', { result: rejected })
-    }
-    const unreachable = () =>
-      new PowderFitError('invalid', rejected && rejected !== 'window' ? { result: rejected } : {})
-    const fit = logLeastSquares({
-      parameterCount: zero.length,
+/** The checked inputs of a curve fit, its windows and its law restated at the traces' peak. */
+function curveProblem(
+  load: InteriorLoad,
+  shots: readonly ChargedTrace[],
+  options: CurveFitOptions,
+): CurveProblem {
+  const { maxRelativeStandardUncertainty = 0.25 } = options
+  const { maxIterations = 100, maxCondition = 1e3, fallFraction = 0.5 } = options
+  const { burn, wanted } = nth(
+    shots.map((s) => checkInput(load, s.trace, options)),
+    0,
+  )
+  const weighted = nth(shots, 0).trace.sigma !== undefined
+  const traces = windowTraces(shots, fallFraction)
+  const observed = traces.flatMap((t) => t.observed)
+  need(observed.length > wanted.length + traces.length, 'too few trace samples in the window')
+  const peaks = traces.map((t) => t.peak)
+  const warnings = curveWarnings(
+    traces.map((t) => t.charge),
+    peaks,
+  )
+  // traces at two or more charges spanning 1.2 in peak resolve the exponent at a limit of 100
+  const { maxInflation = resolvesExponent(traces, warnings) ? 100 : 10 } = options
+  // the product of K-th roots is exact for one trace, where the mean of the logs is not
+  const peak = peaks.reduce((a, b) => a * b ** (1 / traces.length), 1)
+  // M3 states the burn rate at a reference pressure: restating it at the traces' peak keeps the
+  // coefficient and the exponent from being collinear and gives the same model
+  const restated = burn.vivacity * (peak / burn.referencePressure) ** burn.exponent
+  const law: CurveLaw = {
+    load,
+    burn,
+    peak,
+    base: [restated, burn.form.a, burn.form.z1, burn.exponent],
+  }
+  return {
+    ...law,
+    wanted,
+    traces,
+    warnings,
+    weighted,
+    options,
+    shift0: startShifts(law, traces, options),
+    samples: {
       observed,
-      standardUncertainty: rowSigma,
-      weighted,
-      // a Jacobian entry below 1e-6 of the peak per unit log parameter is noise
-      floor: traces.flatMap((t) => t.observed.map(() => (1e-6 * t.peak) / t.rowSigma)),
-      first,
-      predict: (theta, _current, run) => evaluate(parameters, theta, run),
-      runs,
-      moves,
-      maxIterations,
-      maxCondition,
-      // the valley of correlated form parameters is flat: a step that gains 1e-9 of chi2 is converged
-      tolerance: 1e-9,
-      fail: (reason, _theta, extra = {}) => {
-        throw reason === 'unreachable' ? unreachable() : new PowderFitError(reason, extra)
-      },
-    })
-    const step = 1e-3
-    const columns = zero.map((_, j) =>
-      runs.flatMap((count, run) => {
-        if (!moves(j, run)) return Array.from({ length: count }, () => 0)
-        const at = (d: number) =>
-          evaluate(
-            parameters,
-            fit.theta.map((x, k) => (k === j ? x + d : x)),
-            run,
-          )
-        const [up, down] = [at(step), at(-step)]
-        if (!up || !down) throw unreachable()
-        const { rowSigma: s } = nth(traces, run)
-        return up.map((v, i) => (v - nth(down, i)) / (2 * step * s))
-      }),
-    )
-    const info = identifiability(observed.map((_, i) => columns.map((c) => nth(c, i))))
-    const done = values(parameters, fit.theta)
-    const collinear = (k: number) =>
-      nth(info.varianceInflation, k) > maxInflation ? ['collinear' as const] : []
-    const timeShifts = shift0.map((initial, k): CurveParameterReport => {
-      const j = n + k
-      return {
-        name: 'timeShift',
-        status: collinear(j).length > 0 ? 'weak' : 'identified',
-        initial,
-        value: initial + shiftScale * nth(fit.theta, j),
-        standardUncertainty: shiftScale * (fit.standardUncertainty?.[j] ?? Infinity),
-        varianceInflation: nth(info.varianceInflation, j),
-        reasons: collinear(j),
-      }
-    })
-    const reports = parameters.map((name, k): CurveParameterReport => {
-      const j = order.indexOf(name)
-      const value = nth(done, j)
-      const relative = fit.standardUncertainty?.[k] ?? Infinity
-      const inflation = nth(info.varianceInflation, k)
-      const reasons: CurveReason[] = [
-        ...collinear(k),
-        ...(relative > maxRelativeStandardUncertainty ? ['imprecise' as const] : []),
-      ]
-      return {
-        name,
-        status: reasons.length > 0 ? 'weak' : 'identified',
-        initial: nth(base, j),
-        value,
-        standardUncertainty: value * relative,
-        relativeStandardUncertainty: relative,
-        varianceInflation: inflation,
-        ...(name === 'exponent'
-          ? {
-              interval: {
-                low: value * Math.exp(-coverage * relative),
-                high: value * Math.exp(coverage * relative),
-              },
-            }
-          : {}),
-        reasons,
-      }
-    })
-    return { parameters, fit, reports: [...reports, ...timeShifts] }
+      rowSigma: traces.flatMap((t) => t.observed.map(() => t.rowSigma)),
+      runs: traces.map((t) => t.observed.length),
+    },
+    limits: { maxIterations, maxCondition, maxInflation, maxRelativeStandardUncertainty },
+    runCount: 0,
+    rejected: undefined,
   }
+}
 
-  // A parameter the trace does not resolve is held at its start value instead of failing the
-  // fit; the burn coefficient is never dropped
+/** `p` over the times `t` at `times` less `shift`, linear between the points; `times` rise. */
+function interpolated(
+  t: readonly number[],
+  p: readonly number[],
+  times: readonly number[],
+  shift: number,
+): number[] {
+  let i = 1
+  return times.map((x) => {
+    while (nth(t, i) < x - shift) i++
+    const f = (x - shift - nth(t, i - 1)) / (nth(t, i) - nth(t, i - 1))
+    return nth(p, i - 1) + f * (nth(p, i) - nth(p, i - 1))
+  })
+}
+
+/** Model pressure at the window's samples of trace `k`, or null when the candidate is rejected. */
+function evaluateTrace(
+  problem: CurveProblem,
+  parameters: readonly CurveParameter[],
+  theta: readonly number[],
+  k: number,
+): number[] | null {
+  const { charge, pick, times } = nth(problem.traces, k)
+  problem.runCount++
+  const run = interior(curveLoad(problem, parameters, theta, charge), problem.options.options)
+  if (!run.valid) {
+    problem.rejected = run
+    return null
+  }
+  const t = run.points.map((p) => p.time)
+  const shift = nth(problem.shift0, k) + shiftScale * nth(theta, parameters.length + k)
+  if (
+    nth(times, 0) - shift < 0 ||
+    (times.at(-1) ?? Number.NaN) - shift > (t.at(-1) ?? Number.NaN)
+  ) {
+    problem.rejected = 'window'
+    return null
+  }
+  return interpolated(
+    t,
+    run.points.map((p) => pick(p)),
+    times,
+    shift,
+  )
+}
+
+/** Model pressure at the windows of trace `k`, or of all traces stacked without it. */
+function evaluateCurves(
+  problem: CurveProblem,
+  parameters: readonly CurveParameter[],
+  theta: readonly number[],
+  k?: number,
+): number[] | null {
+  if (k !== undefined) return evaluateTrace(problem, parameters, theta, k)
+  const all: number[] = []
+  for (let j = 0; j < problem.traces.length; j++) {
+    const one = evaluateTrace(problem, parameters, theta, j)
+    if (!one) return null
+    all.push(...one)
+  }
+  return all
+}
+
+/** Whether the log parameter `j` of a fit of `n` parameters moves trace `run`: a time shift moves only its own. */
+const moves = (n: number, j: number, run: number) => j < n || j - n === run
+
+/** The failure of a candidate the fit cannot evaluate, with the last invalid run when that was the cause. */
+const unreachable = (problem: CurveProblem) =>
+  new PowderFitError(
+    'invalid',
+    problem.rejected && problem.rejected !== 'window' ? { result: problem.rejected } : {},
+  )
+
+/** The least-squares fit of `parameters` and the time shifts from `zero`; throws when the start values are rejected. */
+function solveCurves(
+  problem: CurveProblem,
+  parameters: readonly CurveParameter[],
+  zero: number[],
+): LogFitResult {
+  const n = parameters.length
+  const first = evaluateCurves(problem, parameters, zero)
+  if (!first) {
+    if (problem.rejected === 'window' || problem.rejected === undefined)
+      throw new InputError(
+        'the model at the start values leaves the barrel before the end of the trace window; start closer or raise fallFraction',
+      )
+    throw new PowderFitError('invalid', { result: problem.rejected })
+  }
+  const { traces, samples, limits } = problem
+  return logLeastSquares({
+    parameterCount: zero.length,
+    observed: samples.observed,
+    standardUncertainty: samples.rowSigma,
+    weighted: problem.weighted,
+    // a Jacobian entry below 1e-6 of the peak per unit log parameter is noise
+    floor: traces.flatMap((t) => t.observed.map(() => (1e-6 * t.peak) / t.rowSigma)),
+    first,
+    predict: (theta, _current, run) => evaluateCurves(problem, parameters, theta, run),
+    runs: samples.runs,
+    moves: (j, run) => moves(n, j, run),
+    maxIterations: limits.maxIterations,
+    maxCondition: limits.maxCondition,
+    // the valley of correlated form parameters is flat: a step that gains 1e-9 of chi2 is converged
+    tolerance: 1e-9,
+    fail: (reason, _theta, extra = {}) => {
+      throw reason === 'unreachable' ? unreachable(problem) : new PowderFitError(reason, extra)
+    },
+  })
+}
+
+/** Rows of the Jacobian at `theta` by central differences, per row sigma; zero where a parameter does not move a trace. */
+function jacobianRows(
+  problem: CurveProblem,
+  parameters: readonly CurveParameter[],
+  zero: readonly number[],
+  theta: readonly number[],
+): number[][] {
+  const step = 1e-3
+  const columns = zero.map((_, j) =>
+    problem.samples.runs.flatMap((count, run) => {
+      if (!moves(parameters.length, j, run)) return Array.from({ length: count }, () => 0)
+      const at = (d: number) =>
+        evaluateCurves(
+          problem,
+          parameters,
+          theta.map((x, k) => (k === j ? x + d : x)),
+          run,
+        )
+      const [up, down] = [at(step), at(-step)]
+      if (!up || !down) throw unreachable(problem)
+      const { rowSigma: s } = nth(problem.traces, run)
+      return up.map((v, i) => (v - nth(down, i)) / (2 * step * s))
+    }),
+  )
+  return problem.samples.observed.map((_, i) => columns.map((c) => nth(c, i)))
+}
+
+/** `collinear` when the variance inflation of parameter `k` exceeds `maxInflation`. */
+const collinear = (info: Identifiability, k: number, maxInflation: number) =>
+  nth(info.varianceInflation, k) > maxInflation ? ['collinear' as const] : []
+
+/** Reports of the time shifts, s; weak when collinear. */
+function shiftReports(
+  problem: CurveProblem,
+  n: number,
+  fit: LogFitResult,
+  info: Identifiability,
+): CurveParameterReport[] {
+  const { maxInflation } = problem.limits
+  return problem.shift0.map((initial, k): CurveParameterReport => {
+    const j = n + k
+    return {
+      name: 'timeShift',
+      status: collinear(info, j, maxInflation).length > 0 ? 'weak' : 'identified',
+      initial,
+      value: initial + shiftScale * nth(fit.theta, j),
+      standardUncertainty: shiftScale * (fit.standardUncertainty?.[j] ?? Infinity),
+      varianceInflation: nth(info.varianceInflation, j),
+      reasons: collinear(info, j, maxInflation),
+    }
+  })
+}
+
+/** The interval of a fitted exponent `value` of relative standard uncertainty `relative`. */
+const exponentInterval = (value: number, relative: number) => ({
+  low: value * Math.exp(-coverage * relative),
+  high: value * Math.exp(coverage * relative),
+})
+
+/** Reports of the fitted parameters; weak when collinear or imprecise. */
+function parameterReports(
+  problem: CurveProblem,
+  parameters: readonly CurveParameter[],
+  fit: LogFitResult,
+  info: Identifiability,
+): CurveParameterReport[] {
+  const done = curveValues(problem.base, parameters, fit.theta)
+  const { maxInflation, maxRelativeStandardUncertainty } = problem.limits
+  return parameters.map((name, k): CurveParameterReport => {
+    const j = order.indexOf(name)
+    const value = nth(done, j)
+    const relative = fit.standardUncertainty?.[k] ?? Infinity
+    const reasons: CurveReason[] = [
+      ...collinear(info, k, maxInflation),
+      ...(relative > maxRelativeStandardUncertainty ? ['imprecise' as const] : []),
+    ]
+    return {
+      name,
+      status: reasons.length > 0 ? 'weak' : 'identified',
+      initial: nth(problem.base, j),
+      value,
+      standardUncertainty: value * relative,
+      relativeStandardUncertainty: relative,
+      varianceInflation: nth(info.varianceInflation, k),
+      ...(name === 'exponent' ? { interval: exponentInterval(value, relative) } : {}),
+      reasons,
+    }
+  })
+}
+
+/** One fit of `parameters`, with the identifiability of each from the Jacobian at the solution. */
+function attemptCurves(problem: CurveProblem, parameters: readonly CurveParameter[]) {
+  const zero = [...parameters.map(() => 0), ...problem.traces.map(() => 0)]
+  const fit = solveCurves(problem, parameters, zero)
+  const info = identifiability(jacobianRows(problem, parameters, zero, fit.theta))
+  const reports = parameterReports(problem, parameters, fit, info)
+  return {
+    parameters,
+    fit,
+    reports: [...reports, ...shiftReports(problem, parameters.length, fit, info)],
+  }
+}
+
+/**
+ * Fits `problem.wanted`, holding at its start value each parameter the traces do not resolve
+ * instead of failing the fit; the burn coefficient is never dropped.
+ */
+function fitHolding(problem: CurveProblem) {
   const held = new Map<CurveParameter, CurveParameterReport>()
-  let current = [...wanted]
-  let result: ReturnType<typeof attempt> | undefined
+  let current = [...problem.wanted]
+  let result: ReturnType<typeof attemptCurves> | undefined
   while (!result) {
     let cause: Withheld | undefined
     try {
-      const done = attempt(current)
+      const done = attemptCurves(problem, current)
       const weak = done.reports.find((r) => r.name === 'exponent' && r.status === 'weak')
       // a lone exponent stays in the fit as `weak`: holding it would leave nothing to fit
       if (weak && current.length > 1)
@@ -682,44 +868,67 @@ function fitTraces(
     }
     if (cause)
       for (const name of cause.names)
-        held.set(name, heldReport(name, cause, nth(base, order.indexOf(name))))
+        held.set(name, heldReport(name, cause, nth(problem.base, order.indexOf(name))))
     current = current.filter((p) => !held.has(p))
   }
-  const { fit, parameters, reports } = result as NonNullable<typeof result>
+  return { ...result, held }
+}
+
+/** The observed and predicted pressure of each trace's window, at times from its start. */
+function traceResiduals(
+  traces: readonly WindowTrace[],
+  runs: readonly number[],
+  predicted: readonly number[],
+): TraceResiduals[] {
+  return traces.map(({ times, observed, window }, k) => {
+    const from = runs.slice(0, k).reduce((a, b) => a + b, 0)
+    return {
+      window: { start: window.start, end: window.end },
+      residuals: times.map((t, i) => ({
+        time: t - window.start,
+        observed: nth(observed, i),
+        predicted: nth(predicted, from + i),
+      })),
+    }
+  })
+}
+
+/** `fitPressureCurves`, with the leave-one-trace-out refits only when `refit`. */
+function fitTraces(
+  load: InteriorLoad,
+  shots: readonly ChargedTrace[],
+  options: CurveFitOptions,
+  refit: boolean,
+): PressureCurvesFit {
+  checkShots(shots)
+  const problem = curveProblem(load, shots, options)
+  const { fit, parameters, reports, held } = fitHolding(problem)
   if (refit)
     // a subset may narrow the peak range: its exponent is measured, not judged
-    checkSpread(reports, apply(parameters, fit.theta), shots, {
+    checkSpread(reports, curveLoad(problem, parameters, fit.theta), shots, {
       ...options,
       parameters,
       maxInflation: Infinity,
       maxRelativeStandardUncertainty: Infinity,
     })
+  const { traces, samples } = problem
   return {
-    load: apply(parameters, fit.theta),
-    referencePressure: peak,
+    load: curveLoad(problem, parameters, fit.theta),
+    referencePressure: problem.peak,
     parameters: [
       ...order.flatMap((name) => held.get(name) ?? reports.filter((r) => r.name === name)),
       ...reports.filter((r) => r.name === 'timeShift'),
     ],
-    correlation: fit.correlation as number[][],
+    // present: the windows hold more samples than parameters (checked in curveProblem)
+    correlation: fit.correlation ?? [],
     conditionNumber: fit.conditionNumber,
-    weighted,
-    traces: traces.map(({ times, observed, window }, k) => {
-      const from = runs.slice(0, k).reduce((a, b) => a + b, 0)
-      return {
-        window: { start: window.start, end: window.end },
-        residuals: times.map((t, i) => ({
-          time: t - window.start,
-          observed: nth(observed, i),
-          predicted: nth(fit.predicted, from + i),
-        })),
-      }
-    }),
+    weighted: problem.weighted,
+    traces: traceResiduals(traces, samples.runs, fit.predicted),
     chiSquare: fit.chiSquare,
-    degreesOfFreedom: observed.length - parameters.length - shotCount,
+    degreesOfFreedom: samples.observed.length - parameters.length - traces.length,
     iterations: fit.iterations,
-    runCount,
-    warnings,
+    runCount: problem.runCount,
+    warnings: problem.warnings,
   }
 }
 
