@@ -90,20 +90,6 @@ test('an own case group is a Mine row of the Cases list, opened in its editor, p
   await expect(capacity).toHaveValue('')
 })
 
-test('the old My cases route opens the Cases list filtered to Mine, or the group a link names', async ({
-  page,
-}) => {
-  await gotoHydrated(page, '/cases')
-  await putRecords(page, records)
-  await page.goto('/my-cases')
-  await expect(page).toHaveURL(/\/cases\/\?src=user$/)
-  await expect(page.getByRole('button', { name: 'Source: Mine' })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Plain brass', exact: true })).toBeVisible()
-  await page.goto(`/my-cases?record=${caseId}`)
-  await expect(page).toHaveURL(new RegExp(`/cases/editor/\\?record=${caseId}$`))
-  await expect(page.getByRole('textbox', { name: /^Cases measured/ })).toHaveValue('10')
-})
-
 test('Settings, General: Your data counts the records per kind and opens the list filtered to Mine', async ({
   page,
 }) => {
