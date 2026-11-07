@@ -79,7 +79,7 @@ All three work in the browser and against the API.
 
 **D. Server `q` with tokens.** Keep the list routes, make `q` token based on the server, add query parameters for caliber and mass ranges. One request per search, about 4 KB for 20 rows (a 200-row page is 41 KB at 10,000 bullets). Needs a contract change (baseline, schema, docs) and the same rule a second time in the browser's file reader (`static-api.ts`), tested against the API. Server time at 10,000 records is not measured (unverified; the current substring scan is linear).
 
-**E. The browser reads the whole list through the existing routes once, then matches and orders.** No API change. The browser's own designs and the cartridge fit filter (`bulletFits` of core) are already client side.
+**E. The browser reads the whole list through the existing routes once, then matches and orders.** No API change. The browser's own designs and the cartridge fit filter (`bulletFits` of ballistics) are already client side.
 
 |                                               | 1,686 bullets  | 10,000 bullets                                  |
 | --------------------------------------------- | -------------- | ----------------------------------------------- |

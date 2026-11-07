@@ -175,6 +175,7 @@
           "expectTypeOf",
           "assert",
           "assertType",
+          "expectClose",
           "expectIssueAt",
           "rejectsAt",
           "rejectsWith",

@@ -6,7 +6,7 @@ import {
   recordResistance,
   recordSensitivity,
   workbenchValueKeys,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
 import { analysisKinds, toSi } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { maxPoints } from '../src/compute/interior-schema.ts'

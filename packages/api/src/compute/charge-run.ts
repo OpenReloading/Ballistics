@@ -1,12 +1,12 @@
 /** `POST /interior/charge-target`: the charge of an M3 run that reaches a target, with range, limits and warnings. */
 import {
   type ChargeTarget,
-  InputError,
   overlay,
   type PressureRange,
   pressureToleranceDefaults,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
 import { type Powder, toSi } from '@open-reloading/schema'
+import { InputError } from '@open-reloading/statistics'
 import { notice, resolvedRecord, unprocessable } from './answer.ts'
 import type { ChargeBody } from './charge-schema.ts'
 import { bulkDensityBound, m3Options } from './interior-schema.ts'

@@ -19,7 +19,7 @@
                 "message": "locale-format-imports-units-only: packages/locale-format has no I/O: it imports only @open-reloading/units and its own files."
               },
               {
-                "regex": "^(\\.\\./)+((units|locale-format|schema|importers|core|catalog|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "regex": "^(\\.\\./)+((units|locale-format|schema|importers|catalog|api|drawing|cli)/(src|dist)|packages|apps)/",
                 "message": "locale-format-imports-units-only: packages/locale-format has no I/O: it imports only @open-reloading/units and its own files."
               }
             ]

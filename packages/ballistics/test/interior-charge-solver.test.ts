@@ -2,9 +2,6 @@ import { InputError, nth } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
 import {
   type ChargeTargetKind,
-  chargeSolverMaxRuns,
-  chargeSolverTolerance,
-  chargeTargetValue,
   chargeUpperBound,
   type InteriorLoad,
   type InteriorResult,
@@ -13,6 +10,11 @@ import {
   solidFillLimit,
   solveCharge,
 } from '../src/index.ts'
+import {
+  chargeSolverMaxRuns,
+  chargeSolverTolerance,
+  chargeTargetValue,
+} from '../src/interior/charge-solver.ts'
 import { m3Load as base } from './fixtures.ts'
 
 const bulkDensity = 900

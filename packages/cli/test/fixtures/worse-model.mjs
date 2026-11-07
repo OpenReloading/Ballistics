@@ -1,4 +1,4 @@
-import { interior as core } from '@open-reloading/core'
+import { interior as core } from '@open-reloading/ballistics'
 
 /** The core model with every muzzle velocity 10 % too high. */
 export function interior(load, options) {

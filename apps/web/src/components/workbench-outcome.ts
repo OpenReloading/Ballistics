@@ -1,4 +1,4 @@
-import { castHarderThanPeak, loadRatio } from '@open-reloading/core'
+import { castHarderThanPeak, loadRatio } from '@open-reloading/ballistics'
 import { fromSi } from '@open-reloading/schema'
 import { formatNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'

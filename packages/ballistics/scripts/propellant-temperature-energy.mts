@@ -3,7 +3,7 @@
  * (`apps/docs/docs/research/propellant-temperature-energy.md`). Synthetic loads and ladders only:
  * simulations, not load data. Run from the repository root, after `pnpm install`:
  *
- *   node packages/core/scripts/propellant-temperature-energy.mts
+ *   node packages/ballistics/scripts/propellant-temperature-energy.mts
  *
  * Prints the three tables of the entry as Markdown. Seeds are fixed, so a rerun prints the same
  * numbers. The rules below were set before the first run.
@@ -155,6 +155,8 @@ const loads: [string, InteriorLoad][] = [
 ]
 
 const pct = (a: number, b: number) => (100 * (a - b)) / b
+/** A velocity and pressure change pair as the study 1 table writes it. */
+const pair = (x: readonly [number, number]) => `${x[0].toFixed(3)} / ${x[1].toFixed(2)}`
 
 function study1() {
   const lines = [
@@ -175,9 +177,8 @@ function study1() {
     const b = change(burnSensitivity, 0)
     const e = change(0, energyCoefficient)
     const t = change(burnSensitivity, energyCoefficient)
-    const f = (x: readonly [number, number]) => `${x[0].toFixed(3)} / ${x[1].toFixed(2)}`
     lines.push(
-      `| ${name} | ${(load.charge / load.bullet.mass).toFixed(3)} | ${(load.charge / load.chamber.volume).toFixed(0)} | ${f(b)} | ${f(e)} | ${f(t)} | ${((100 * e[0]) / t[0]).toFixed(1)} % / ${((100 * e[1]) / t[1]).toFixed(1)} % |`,
+      `| ${name} | ${(load.charge / load.bullet.mass).toFixed(3)} | ${(load.charge / load.chamber.volume).toFixed(0)} | ${pair(b)} | ${pair(e)} | ${pair(t)} | ${((100 * e[0]) / t[0]).toFixed(1)} % / ${((100 * e[1]) / t[1]).toFixed(1)} % |`,
     )
   }
   return lines.join('\n')
@@ -233,6 +234,33 @@ interface Rms {
   failed: number
 }
 
+/** A ladder from the truth at the fit temperatures of `span`, with the noise of `noise`. */
+function ladderOf(
+  truthEnergy: number,
+  span: (typeof spans)[number],
+  withPressure: boolean,
+  noise: () => number,
+): LadderPoint[] {
+  return span.fit.flatMap((temperature) =>
+    charges.map((charge) => {
+      const t = truthFor(truthEnergy, charge, temperature)
+      return {
+        charge,
+        propellantTemperature: temperature,
+        muzzleVelocity: t.muzzleVelocity + velocitySigma * noise(),
+        velocitySigma,
+        ...(withPressure
+          ? {
+              peakPressure: t.peakBreechPressure * (1 + pressureSigma * noise()),
+              pressureSigma: pressureSigma * t.peakBreechPressure,
+              pressureBasis: 'transducer' as const,
+            }
+          : {}),
+      }
+    }),
+  )
+}
+
 /** Pooled RMS over the replicates of one arm, span and model. */
 function evaluate(
   truthEnergy: number,
@@ -246,24 +274,7 @@ function evaluate(
   for (let r = 0; r < replicates; r++) {
     const noise = normals(1000 + r)
     const held = normals(5000 + r)
-    const ladder: LadderPoint[] = span.fit.flatMap((temperature) =>
-      charges.map((charge) => {
-        const t = truthFor(truthEnergy, charge, temperature)
-        return {
-          charge,
-          propellantTemperature: temperature,
-          muzzleVelocity: t.muzzleVelocity + velocitySigma * noise(),
-          velocitySigma,
-          ...(withPressure
-            ? {
-                peakPressure: t.peakBreechPressure * (1 + pressureSigma * noise()),
-                pressureSigma: pressureSigma * t.peakBreechPressure,
-                pressureBasis: 'transducer' as const,
-              }
-            : {}),
-        }
-      }),
-    )
+    const ladder = ladderOf(truthEnergy, span, withPressure, noise)
     let fitted: InteriorLoad
     try {
       fitted = fitPowder(start(fitEnergy), ladder, {

@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { interiorBody } from '@open-reloading/api/compute'
-import { interior, recordResistance } from '@open-reloading/core'
+import { interior, recordResistance } from '@open-reloading/ballistics'
 import { powder } from '@open-reloading/schema'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { exampleInterior } from '../src/lib/example-data.ts'

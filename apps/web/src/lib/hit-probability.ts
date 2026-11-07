@@ -1,4 +1,4 @@
-import type { TrajectoryPoint } from '@open-reloading/core'
+import type { TrajectoryPoint } from '@open-reloading/ballistics'
 import type { TargetFace } from '@open-reloading/schema'
 import { toSi } from '@open-reloading/schema'
 import type { HitIssue, ScoringZone } from '@open-reloading/shot-groups'

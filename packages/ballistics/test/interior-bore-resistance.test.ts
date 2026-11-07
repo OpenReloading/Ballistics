@@ -1,13 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import {
   boreArea,
-  boreResistance,
   cartridgeBulletDiameterMm,
   cartridgeGrooveDiameterMm,
-  oversizePercent,
   recordBoreArea,
   recordResistance,
 } from '../src/index.ts'
+import { boreResistance, oversizePercent } from '../src/interior/bore-resistance.ts'
 
 const c = { bulletDiameterMm: 7.85, boreAreaMm2: 47.51, grooveDiameterMm: 7.82 }
 const terms = { stress: 0.42e6, oversize: 1.3, engraving: 0.89 }

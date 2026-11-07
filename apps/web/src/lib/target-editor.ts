@@ -4,18 +4,18 @@
  * out (m, rad); no React, DOM or Next.js.
  */
 import {
-  type AimOffset,
-  dispersionEllipse,
-  type Ellipse,
-  type GroupStatistics,
-  subtendedAngle,
-} from '@open-reloading/core'
-import {
   type CalibrationReference,
   type ShotGroup,
   type TargetSheet,
   toSi,
 } from '@open-reloading/schema'
+import {
+  type AimOffset,
+  dispersionEllipse,
+  type GroupEllipse,
+  type GroupStatistics,
+  subtendedAngle,
+} from '@open-reloading/shot-groups'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { nth } from './nth.ts'
 import {
@@ -249,7 +249,7 @@ export const coverages = [0.5, 0.95] as const
 /** Ellipse `e` about the group centre as `n` points in target m; undefined without either. */
 export function ellipsePoints(
   s: GroupStatistics,
-  e: Ellipse | undefined,
+  e: GroupEllipse | undefined,
   n = 72,
 ): Point[] | undefined {
   if (!e || !s.centre) return undefined

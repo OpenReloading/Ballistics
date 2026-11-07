@@ -1,4 +1,4 @@
-import { icao, startPressureOf } from '@open-reloading/core'
+import { icao, startPressureOf } from '@open-reloading/ballistics'
 import { seat } from '@open-reloading/drawing/seating'
 import { fromSi, toSi } from '@open-reloading/schema'
 import type { InteriorKey } from './interior-input.ts'
@@ -10,7 +10,7 @@ import { kilogramsPerGrain, unitsOf, waterDensityGramsPerCm3 } from './units.ts'
  * The .308 Win. example of both forms: an invented load, the demo powder under the demo
  * 168 gr bullet at COAL 71.12 mm, in a 24 in barrel. Record values are embedded as stored (mm, g,
  * cm³, bar) with their record ids; `apps/web/test/examples.test.ts` checks them against the committed
- * records and runs the interior example through core.
+ * records and runs the interior example through ballistics.
  */
 export const exampleRecords = {
   /** The id, mass and G7 BC, then the shape fields as the seating preview reads them (`bulletDimensions`). */
@@ -118,7 +118,7 @@ export const exampleInterior = {
   bulletMass: toSi('mass', bullet.mass),
   charge: toSi('mass', choices.charge),
   propellantTemperature: icao.temperature,
-  // the powder record's fit, as the workbench fills it (`powderModelValues` of core)
+  // the powder record's fit, as the workbench fills it (`powderModelValues` of ballistics)
   propellantEnergy: powder.interior.energy,
   gamma: powder.interior.gamma,
   density: toSi('density', powder.interior.density),

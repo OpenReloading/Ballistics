@@ -1,5 +1,6 @@
-import { type Aerodynamics, InputError, lbPerSqInToKgPerSqM } from '@open-reloading/core'
+import { type Aerodynamics, lbPerSqInToKgPerSqM } from '@open-reloading/ballistics'
 import { type Bullet, toSi } from '@open-reloading/schema'
+import { InputError } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
 import {
   bulletProjectile,

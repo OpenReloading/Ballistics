@@ -4,10 +4,15 @@ import { describe, expect, it } from 'vitest'
 import { defined } from './defined.ts'
 
 /** The packages `@open-reloading/api/compute` may import: it runs in the browser. */
-const allowed = ['@open-reloading/core', '@open-reloading/schema', 'zod']
+const allowed = [
+  '@open-reloading/ballistics',
+  '@open-reloading/schema',
+  '@open-reloading/statistics',
+  'zod',
+]
 
-/** The packages `@open-reloading/api/catalogue` may import: core and schema, no Node API. */
-const catalogueAllowed = ['@open-reloading/core', '@open-reloading/schema']
+/** The packages `@open-reloading/api/catalogue` may import: ballistics and schema, no Node API. */
+const catalogueAllowed = ['@open-reloading/ballistics', '@open-reloading/schema']
 
 /** The files below `src/` that `entry` reaches by relative imports, and their other imports. */
 function imports(entry: string) {
@@ -30,7 +35,7 @@ function imports(entry: string) {
 }
 
 describe('compute entry', () => {
-  it('imports only core, schema and zod, also through the modules it imports', () => {
+  it('imports only ballistics, schema, statistics and zod, also through the modules it imports', () => {
     const { files, found } = imports('compute/browser.ts')
     expect(files.size).toBeGreaterThan(5)
     expect(found.filter((f) => !allowed.includes(defined(f.split(': ')[1])))).toEqual([])
@@ -42,7 +47,7 @@ describe('compute entry', () => {
 })
 
 describe('catalogue entry', () => {
-  it('imports only core and schema, no Node API, also through the modules it imports', () => {
+  it('imports only ballistics and schema, no Node API, also through the modules it imports', () => {
     const { files, found } = imports('catalogue/browser.ts')
     expect([...files].sort()).toEqual([
       'catalogue/browser.ts',

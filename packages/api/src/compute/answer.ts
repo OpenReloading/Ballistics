@@ -1,6 +1,7 @@
 /** Parts of compute answers shared by the compute routes: the notice, error answers and checks. */
-import { InputError, TruingError } from '@open-reloading/core'
+import { TruingError } from '@open-reloading/ballistics'
 import type { Bullet, Powder, Provenance } from '@open-reloading/schema'
+import { InputError } from '@open-reloading/statistics'
 import type { FastifyError, FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 import { ComputeBusy, ComputeTimeout } from './tasks.ts'

@@ -1,4 +1,4 @@
-import { interior } from '@open-reloading/core'
+import { interior } from '@open-reloading/ballistics'
 import { describe, expect, it } from 'vitest'
 import type { z } from 'zod'
 import {

@@ -89,7 +89,7 @@ export interface RoundCountNote {
 export type LoadNote = LotNote | SeatingNote | VelocityNote | RoundCountNote
 
 /** Two seating lengths closer than this are the same, mm: the 0.01 mm the fields show. */
-export const seatingTolerance = 0.01
+const seatingTolerance = 0.01
 
 const lots = ['powderLot', 'primerLot', 'caseLot'] as const
 

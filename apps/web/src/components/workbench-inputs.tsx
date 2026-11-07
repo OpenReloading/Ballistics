@@ -12,7 +12,7 @@ import {
   Text,
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
-import { boreArea } from '@open-reloading/core'
+import { boreArea } from '@open-reloading/ballistics'
 import { type Bullet, toSi } from '@open-reloading/schema'
 import { DotsThree } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'

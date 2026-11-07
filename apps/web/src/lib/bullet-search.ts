@@ -3,7 +3,7 @@
  * matcher over each bullet's text (`bulletScore`), the picker's filters, results ordered by how well
  * each bullet matches the typed words, and the whole catalogue read once per page load.
  */
-import { bulletFits, type CartridgeDiameters } from '@open-reloading/core'
+import { bulletFits, type CartridgeDiameters } from '@open-reloading/ballistics'
 import { compareKeys, fold, sortKey } from '@open-reloading/schema'
 import { apiFetch } from './api-fetch.ts'
 import type { BulletSummary, ListOf, ManufacturerSummary } from './api-types.ts'
@@ -26,7 +26,7 @@ export interface BulletFilters {
   caliber: string
   /** A mass range with its unit: "150-180gr", "9.5-g". */
   mass: string
-  /** The CIP values of the cartridge: only the bullets that fit it (`bulletFits` of core). */
+  /** The CIP values of the cartridge: only the bullets that fit it (`bulletFits` of ballistics). */
   fit?: CartridgeDiameters | undefined
   /** `catalogue` or `designs` (the browser's own); both without it. */
   origin?: 'catalogue' | 'designs' | undefined

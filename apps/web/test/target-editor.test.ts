@@ -1,5 +1,5 @@
-import { dispersionEllipse, predictionEllipse, subtendedAngle } from '@open-reloading/core'
 import type { ShotGroup, TargetSheet } from '@open-reloading/schema'
+import { dispersionEllipse, predictionEllipse, subtendedAngle } from '@open-reloading/shot-groups'
 import { describe, expect, it } from 'vitest'
 import de from '../src/i18n/de.json'
 import { english, translator } from '../src/i18n/translate.ts'

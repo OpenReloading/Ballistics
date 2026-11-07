@@ -17,7 +17,7 @@ export type CartridgeDiameters = {
 }
 
 /** Half the last printed digit of the two-decimal C.I.P. values, mm: G1 7.85 holds up to 7.855. */
-export const cipRounding = 0.005
+const cipRounding = 0.005
 
 /** The fitting bullet diameters, mm: above `above`, up to and with `upTo`. */
 export function bulletWindow(c: CartridgeDiameters): { above: number; upTo: number } {

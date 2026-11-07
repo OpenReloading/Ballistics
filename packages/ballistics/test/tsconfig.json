@@ -3,7 +3,8 @@
   "compilerOptions": {
     "types": ["node"],
     "noEmit": true,
-    "rootDir": ".."
+    // the velocity script imports the generator of shot-groups' scripts
+    "rootDir": "../.."
   },
-  "include": [".", "../src"]
+  "include": [".", "../src", "../scripts"]
 }

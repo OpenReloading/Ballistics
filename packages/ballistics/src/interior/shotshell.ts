@@ -34,7 +34,7 @@ export type ShotshellResult = InteriorResult & { experimental: true }
  * The M3 load of a shotshell load (`apps/docs/docs/models/interior-shotshell.md`, "Mapping onto M3");
  * inputs as `shotshellInterior` checks them.
  */
-export function shotshellInteriorLoad(load: ShotshellLoad): InteriorLoad {
+function shotshellInteriorLoad(load: ShotshellLoad): InteriorLoad {
   const { chamber, wadTravel, shotMass, wadMass, crimpPressure, ...rest } = load
   return {
     ...rest,

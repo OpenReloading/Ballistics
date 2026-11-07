@@ -1,7 +1,12 @@
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { interior, lbPerSqInToKgPerSqM, standardAtmosphere, trajectory } from '@open-reloading/core'
+import {
+  interior,
+  lbPerSqInToKgPerSqM,
+  standardAtmosphere,
+  trajectory,
+} from '@open-reloading/ballistics'
 import type { PublishedLoads } from '@open-reloading/schema'
 import { describe, expect, it, vi } from 'vitest'
 import { compare, verify } from '../src/commands.ts'

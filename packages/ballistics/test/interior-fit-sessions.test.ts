@@ -6,11 +6,11 @@ import {
   type InteriorLoad,
   interior,
   type LadderPoint,
-  MixedPressureBasisError,
   PowderFitError,
   type PowderSession,
   predictPowder,
 } from '../src/index.ts'
+import { MixedPressureBasisError } from '../src/interior/fit.ts'
 
 /** Synthetic rifle load (apps/docs/docs/models/interior-powder-fit.md): truth B_a 0.45 1/s, 3.9 MJ/kg, factor 1.4. */
 const load = (vivacity = 0.45, energy = 3.9e6, tempering = 1): InteriorLoad => ({

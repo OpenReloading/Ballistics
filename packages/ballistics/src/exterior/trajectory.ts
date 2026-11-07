@@ -161,7 +161,7 @@ export interface TrajectoryOptions {
 }
 
 /** Defaults of `TrajectoryOptions`; options passed to `trajectory` override them by field. */
-export const trajectoryDefaults: TrajectoryOptions = {
+const trajectoryDefaults: TrajectoryOptions = {
   relativeTolerance: 1e-8,
   absoluteTolerance: 1e-6,
   maxTime: 120,

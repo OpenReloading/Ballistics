@@ -1,4 +1,4 @@
-import { icao, type Projectile, trajectory, zeroAngles } from '@open-reloading/core'
+import { icao, type Projectile, trajectory, zeroAngles } from '@open-reloading/ballistics'
 import { shotFromValues } from './trajectory-input.ts'
 
 /** The load the Trajectory tab starts from, SI: the inputs of the drop slope. */

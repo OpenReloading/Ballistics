@@ -1,6 +1,6 @@
 import { InputError, nth } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import { estimateDragFromOutline, outlineDragMach } from '../src/index.ts'
+import { estimateDragFromOutline, outlineDragMach } from '../src/exterior/outline-drag.ts'
 
 // Printed outputs of McCoy, ARBRL-TR-02293, Figures 26 to 28 (pp. 57 to 59), three decimals, so a
 // computed value matches within half a unit of the last printed digit plus 1e-5 for the constants

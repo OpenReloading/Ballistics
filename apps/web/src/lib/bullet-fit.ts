@@ -1,4 +1,4 @@
-import { bulletFits, type CartridgeDiameters } from '@open-reloading/core'
+import { bulletFits, type CartridgeDiameters } from '@open-reloading/ballistics'
 import { msg } from '../i18n/translate.ts'
 import type { CartridgeSummary } from './api-types.ts'
 
@@ -19,7 +19,7 @@ export const summaryFitSource = (
   groove: c.grooveDiameter,
 })
 
-/** The values of `bulletFits` of core, the rule of `GET /bullets?cartridge`; undefined when one is missing. */
+/** The values of `bulletFits` of ballistics, the rule of `GET /bullets?cartridge`; undefined when one is missing. */
 export const fitOf = (c: FitSource | undefined): CartridgeDiameters | undefined =>
   c?.g1 !== undefined && c.land !== undefined && c.groove !== undefined
     ? { g1: c.g1, land: c.land, groove: c.groove }

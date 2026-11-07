@@ -4,7 +4,7 @@ import {
   interior,
   type PowderPrediction,
   predictPowder,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { load } from '../../../packages/ballistics/test/powder-load.ts'

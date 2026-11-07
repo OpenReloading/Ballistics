@@ -1,4 +1,4 @@
-import { burnFormKeys, type InteriorLoad, interiorLoad } from '@open-reloading/core'
+import { burnFormKeys, type InteriorLoad, interiorLoad } from '@open-reloading/ballistics'
 import { msg, type Translator } from '../i18n/translate.ts'
 import type { FieldSpec } from './field-spec.ts'
 
@@ -387,7 +387,7 @@ export type InteriorBody = {
 }
 
 /**
- * `POST /interior` body from SI field values; the mapping is `interiorLoad` of core, shared with
+ * `POST /interior` body from SI field values; the mapping is `interiorLoad` of ballistics, shared with
  * `POST /interior/load-file`. `grooveDiameter` (m) is the fallback of an empty bore area.
  */
 export function interiorBody(

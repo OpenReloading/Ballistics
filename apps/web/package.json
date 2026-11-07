@@ -20,7 +20,7 @@
     "@mantine/hooks": "9.7.4",
     "@mantine/spotlight": "9.7.4",
     "@open-reloading/api": "workspace:*",
-    "@open-reloading/core": "workspace:*",
+    "@open-reloading/ballistics": "workspace:*",
     "@open-reloading/catalog": "workspace:*",
     "@open-reloading/drawing": "workspace:*",
     "@open-reloading/importers": "workspace:*",

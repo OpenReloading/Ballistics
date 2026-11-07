@@ -1,4 +1,4 @@
-import { cartridgeBulletDiameterMm } from '@open-reloading/core'
+import { cartridgeBulletDiameterMm } from '@open-reloading/ballistics'
 import type { Bullet, Cartridge, PublishedLoads } from '@open-reloading/schema'
 import { parseRef } from '@open-reloading/schema'
 import type { Records } from './records.ts'

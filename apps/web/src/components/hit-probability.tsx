@@ -1,7 +1,7 @@
 'use client'
 
 import { NativeSelect } from '@mantine/core'
-import type { TrajectoryPoint } from '@open-reloading/core'
+import type { TrajectoryPoint } from '@open-reloading/ballistics'
 import type { TargetFace } from '@open-reloading/schema'
 import { type HitResult, hitProbability, pointDispersion } from '@open-reloading/shot-groups'
 import { useEffect, useMemo, useState } from 'react'

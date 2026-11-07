@@ -1,9 +1,9 @@
 import { InputError, nth } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
+import { minIntervalScale } from '../src/exterior/range-strings.ts'
 import {
   type Chronograph,
   fitTruingStrings,
-  minIntervalScale,
   planTruingStrings,
   TruingError,
   trajectory,

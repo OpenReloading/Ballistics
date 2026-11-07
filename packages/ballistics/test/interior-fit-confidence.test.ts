@@ -8,8 +8,8 @@ import {
   type PowderFit,
   powderConfidence,
   powderPressureRange,
-  similarPowdersPrior,
 } from '../src/index.ts'
+import { similarPowdersPrior } from '../src/interior/fit-confidence.ts'
 import { load as rifleLoad } from './powder-load.ts'
 
 /** The synthetic rifle load with a temperature sensitivity and bore friction. */

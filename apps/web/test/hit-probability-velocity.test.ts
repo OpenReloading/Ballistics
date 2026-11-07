@@ -7,7 +7,7 @@ import {
   type TrajectoryInput,
   trajectory,
   zeroAngles,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
 import { pointDispersion } from '@open-reloading/shot-groups'
 import { normalsFrom, seededUniforms } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'

@@ -1,4 +1,4 @@
-import type { InteriorLoad } from '@open-reloading/core'
+import type { InteriorLoad } from '@open-reloading/ballistics'
 import type { SessionRecord, UserRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import {

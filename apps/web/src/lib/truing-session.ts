@@ -1,4 +1,4 @@
-/** The truing section of the Trajectory tab: rows as typed, the core plan and fit, and their readouts. */
+/** The truing section of the Trajectory tab: rows as typed, the plan and fit of ballistics, and their readouts. */
 import {
   fitTruingStrings,
   planTruingStrings,
@@ -10,7 +10,7 @@ import {
   TruingError,
   type TruingPlan,
   type WeakReason,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
 import { type Truing, toSi, truing, type UserRecord, userRecord } from '@open-reloading/schema'
 import { formatNumber, parseNumber, untranslated } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'

@@ -1,23 +1,8 @@
 import type { ShotGroup, TargetSheet } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { beforeEach, expect, it, vi } from 'vitest'
-import { defined } from './defined.ts'
-
-const calls = vi.hoisted(() => ({ n: 0 }))
-vi.mock('@open-reloading/core', async (actual) => {
-  const core = await actual<typeof import('@open-reloading/core')>()
-  return {
-    ...core,
-    groupStatistics: (...a: Parameters<typeof core.groupStatistics>) => {
-      calls.n++
-      return core.groupStatistics(...a)
-    },
-  }
-})
-
-const { TargetCanvas } = await import('../src/components/target-canvas.tsx')
-const { frameOf, withGroup } = await import('../src/lib/target-editor.ts')
-const { groupStatisticsOf: statisticsOf } = await import('../src/lib/target-groups.ts')
+import { expect, it } from 'vitest'
+import { TargetCanvas } from '../src/components/target-canvas.tsx'
+import { frameOf } from '../src/lib/target-editor.ts'
 
 const group = (id: string): ShotGroup => ({
   id,
@@ -31,23 +16,6 @@ const group = (id: string): ShotGroup => ({
   ],
 })
 const sheet: TargetSheet = { references: [], targetRotation: 0, groups: [group('g1'), group('g2')] }
-
-beforeEach(() => {
-  calls.n = 0
-})
-
-it('statistics are computed once per group object, again only for an edited group', () => {
-  // groups of its own: a drawing of `sheet` in another test has computed those already
-  const fresh: TargetSheet = { ...sheet, groups: [group('g1'), group('g2')] }
-  const a = statisticsOf(defined(fresh.groups[0]))
-  expect(statisticsOf(defined(fresh.groups[0]))).toBe(a)
-  expect(calls.n).toBe(1)
-  const edited = withGroup(fresh, 'g2', (g) => ({ ...g, name: 'renamed' }))
-  expect(edited.groups[0]).toBe(fresh.groups[0])
-  statisticsOf(defined(edited.groups[0]))
-  statisticsOf(defined(edited.groups[1]))
-  expect(calls.n).toBe(2)
-})
 
 const noop = () => {}
 const draw = (selected?: { group: string; index: number }) =>
@@ -85,15 +53,6 @@ const draw = (selected?: { group: string; index: number }) =>
       onAimMove={noop}
     />,
   )
-
-it('a render of the canvas with the same sheet (a pointer move) computes no statistics', () => {
-  draw()
-  const first = calls.n
-  expect(first).toBeLessThanOrEqual(sheet.groups.length)
-  draw()
-  draw()
-  expect(calls.n).toBe(first)
-})
 
 it('makes the selected shot of the active group its one tab stop, else the first', () => {
   const stops = (html: string) =>

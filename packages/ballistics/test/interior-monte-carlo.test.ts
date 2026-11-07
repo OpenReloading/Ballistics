@@ -7,8 +7,8 @@ import {
   type PressureTolerances,
   pressureToleranceDefaults,
   type SamplingOptions,
-  sampledBand,
 } from '../src/index.ts'
+import { sampledBand } from '../src/interior/monte-carlo.ts'
 import { m3Load } from './fixtures.ts'
 
 type Toy = { q: number; b: number; v: number }

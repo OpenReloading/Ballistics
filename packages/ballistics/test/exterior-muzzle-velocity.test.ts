@@ -1,7 +1,7 @@
 import { InputError, seededUniforms } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
+import { airDensity } from '../src/exterior/atmosphere.ts'
 import {
-  airDensity,
   type DragInput,
   lbPerSqInToKgPerSqM,
   muzzleVelocityFromDownrange,

@@ -5,12 +5,12 @@ import {
   type InteriorLoad,
   interior,
   type LadderPoint,
-  MixedPressureBasisError,
   PowderFitError,
   type PowderParameter,
   type PressureBasis,
   predictPowder,
 } from '../src/index.ts'
+import { MixedPressureBasisError } from '../src/interior/fit.ts'
 import { load } from './powder-load.ts'
 
 const charges = [2.6e-3, 2.7e-3, 2.8e-3, 2.9e-3, 3e-3]

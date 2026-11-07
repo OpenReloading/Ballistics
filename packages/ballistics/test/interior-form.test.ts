@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { type Burn, burnError, burnForm, type Grain, lensArea, sliverArea } from '../src/index.ts'
+import type { Burn, Grain } from '../src/index.ts'
+import { burnError, burnForm, lensArea, sliverArea } from '../src/interior/form.ts'
 
 const geometric = (grain: Grain): Burn => ({
   kind: 'geometric',
