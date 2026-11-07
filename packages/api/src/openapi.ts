@@ -20,8 +20,6 @@ declare module 'fastify' {
      * the statuses of Fastify (400, 413, 414, 415) and 500.
      */
     errors?: number[]
-    /** The route answers an unknown id that `renames.json` replaces with 308 and a `Location`. */
-    moved?: boolean
     /** One line on what the route answers. */
     summary?: string
     /** What the route reads or computes. */
@@ -186,7 +184,6 @@ function responses(
   const statuses = [
     ...([...inputs, config.body].some(Boolean) ? [400] : []),
     ...(config.errors ?? []),
-    ...(config.moved ? [308] : []),
     ...(url.includes('{') ? [414] : []),
     ...(config.body ? [413, 415] : []),
     500,
@@ -200,19 +197,13 @@ function responses(
     ...Object.fromEntries(
       statuses.map((s) => [
         s,
-        s === 308
-          ? {
-              description:
-                'Permanent Redirect: the id was renamed, `Location` is the record that replaced it.',
-              headers: { Location: { schema: { type: 'string' } } },
-            }
-          : {
-              description:
-                s === 400
-                  ? 'Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.'
-                  : (STATUS_CODES[s] ?? String(s)),
-              content: json({ $ref: '#/components/schemas/Error' }),
-            },
+        {
+          description:
+            s === 400
+              ? 'Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.'
+              : (STATUS_CODES[s] ?? String(s)),
+          content: json({ $ref: '#/components/schemas/Error' }),
+        },
       ]),
     ),
   }

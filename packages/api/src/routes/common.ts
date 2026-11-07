@@ -3,7 +3,6 @@ import type { FastifyReply } from 'fastify'
 import { z } from 'zod'
 import type { Catalogue, Catalogued, CatalogueKind } from '../catalogue/types.ts'
 import type { ComputeRunner } from '../compute/tasks.ts'
-import { API_PREFIX } from '../version.ts'
 
 /** `pattern` of a query string value without a NUL character. */
 export const noNul = '^[^\\u0000]*$'
@@ -37,18 +36,9 @@ export function originated<K extends CatalogueKind>(record: Catalogued<K>) {
   return rest
 }
 
-/** The answer for an id no record has: 308 to the record that replaced it in `renames.json`, else 404 naming the `noun`. */
-export function missing(
-  reply: FastifyReply,
-  catalogue: Catalogue,
-  kind: string,
-  id: string,
-  noun: string,
-): FastifyReply {
-  const now = catalogue.renamed(kind, id)
-  return now
-    ? reply.redirect(`${API_PREFIX}/${kind}/${now}`, 308)
-    : reply.notFound(`${noun} ${id} not found`)
+/** The answer for an id no record has: 404 naming the `noun`. */
+export function missing(reply: FastifyReply, id: string, noun: string): FastifyReply {
+  return reply.notFound(`${noun} ${id} not found`)
 }
 
 /** The JSON Schema of a route's path parameters or query string. */

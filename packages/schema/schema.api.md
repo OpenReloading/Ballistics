@@ -1363,18 +1363,6 @@ export const ref: (kind: string) => z.ZodString;
 export type RefScope = 'catalogue' | 'user';
 
 // @public
-export type RenameKind = z.infer<typeof renameKind>;
-
-// @public
-export const renameKind: z.ZodEnum<z.core.util.ToEnum<'cartridges' | 'manufacturers' | 'powders' | 'primers' | 'bullets' | 'cases' | 'target-faces' | 'federations' | 'disciplines' | 'target-mappings' | 'caliber-classes'>>;
-
-// @public
-export type Renames = z.infer<typeof renames>;
-
-// @public
-export const renames: z.ZodRecord<typeof renameKind & z.core.$partial, z.ZodRecord<typeof recordId, typeof recordId>>;
-
-// @public
 export type RingScoring = z.infer<typeof ringScoring>;
 
 // @public
