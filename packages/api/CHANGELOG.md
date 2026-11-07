@@ -51,7 +51,7 @@
 * The following workspace dependencies were updated
   * dependencies
     * @open-reloading/core bumped from 0.0.3 to 0.0.4
-    * @open-reloading/catalog bumped from 0.0.4 to 0.0.5
+    * @open-reloading/data bumped from 0.0.4 to 0.0.5
     * @open-reloading/schema bumped from 0.0.4 to 0.0.5
 
 ## [0.0.4](https://github.com/OpenReloading/Ballistics/compare/api-v0.0.3...api-v0.0.4) (2026-10-27)
@@ -66,7 +66,7 @@
 
 * The following workspace dependencies were updated
   * dependencies
-    * @open-reloading/catalog bumped from 0.0.3 to 0.0.4
+    * @open-reloading/data bumped from 0.0.3 to 0.0.4
     * @open-reloading/schema bumped from 0.0.3 to 0.0.4
 
 ## [0.0.3](https://github.com/OpenReloading/Ballistics/compare/api-v0.0.2...api-v0.0.3) (2026-10-27)
@@ -91,7 +91,7 @@
 * The following workspace dependencies were updated
   * dependencies
     * @open-reloading/core bumped from 0.0.2 to 0.0.3
-    * @open-reloading/catalog bumped from 0.0.2 to 0.0.3
+    * @open-reloading/data bumped from 0.0.2 to 0.0.3
     * @open-reloading/schema bumped from 0.0.2 to 0.0.3
 
 ## [0.0.2](https://github.com/OpenReloading/Ballistics/compare/api-v0.0.1...api-v0.0.2) (2026-10-26)
@@ -155,7 +155,7 @@
 * The following workspace dependencies were updated
   * dependencies
     * @open-reloading/core bumped from 0.0.1 to 0.0.2
-    * @open-reloading/catalog bumped from 0.0.1 to 0.0.2
+    * @open-reloading/data bumped from 0.0.1 to 0.0.2
     * @open-reloading/schema bumped from 0.0.1 to 0.0.2
 
 ## 0.0.1 (2026-10-22)
@@ -171,5 +171,5 @@
 * The following workspace dependencies were updated
   * dependencies
     * @open-reloading/core bumped from * to 0.0.1
-    * @open-reloading/catalog bumped from * to 0.0.1
+    * @open-reloading/data bumped from * to 0.0.1
     * @open-reloading/schema bumped from * to 0.0.1

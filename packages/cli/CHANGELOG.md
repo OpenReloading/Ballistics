@@ -29,6 +29,6 @@
   * dependencies
     * @open-reloading/api bumped from 0.0.4 to 0.0.5
     * @open-reloading/core bumped from 0.0.3 to 0.0.4
-    * @open-reloading/catalog bumped from 0.0.4 to 0.0.5
+    * @open-reloading/data bumped from 0.0.4 to 0.0.5
     * @open-reloading/drawing bumped from 0.0.3 to 0.0.4
     * @open-reloading/schema bumped from 0.0.4 to 0.0.5
