@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.6](https://github.com/OpenReloading/Ballistics/compare/schema-v0.0.5...schema-v0.0.6) (2026-11-07)
+
+
+### Features
+
+* **schema,data:** manufacturers name their country and website ([#1047](https://github.com/OpenReloading/Ballistics/issues/1047)) ([16a6c59](https://github.com/OpenReloading/Ballistics/commit/16a6c59203b22abdee4211f59c34750061404b7c))
+* **units:** add the units package with the new-package gate profile ([#996](https://github.com/OpenReloading/Ballistics/issues/996)) ([fee565b](https://github.com/OpenReloading/Ballistics/commit/fee565bdccc35afb221db665c2526e7103eee004))
+
 ## [0.0.5](https://github.com/OpenReloading/Ballistics/compare/schema-v0.0.4...schema-v0.0.5) (2026-11-02)
 
 

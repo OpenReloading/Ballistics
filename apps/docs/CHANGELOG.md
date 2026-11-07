@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.0.6](https://github.com/OpenReloading/Ballistics/compare/docs-v0.0.5...docs-v0.0.6) (2026-11-07)
+
+
+### Features
+
+* **ballistics:** add the ballistics package with the exterior models ([#1024](https://github.com/OpenReloading/Ballistics/issues/1024)) ([6038aac](https://github.com/OpenReloading/Ballistics/commit/6038aac5d72c2bd6838f47ba301a2aea88691c12))
+* **ballistics:** move the interior model and the record helpers into ballistics ([#1038](https://github.com/OpenReloading/Ballistics/issues/1038)) ([1ac9bd7](https://github.com/OpenReloading/Ballistics/commit/1ac9bd721bbfaf47f9c042d9850242f70ed8e85d))
+* **ballistics:** move the powder and pressure-curve fits into ballistics ([#1049](https://github.com/OpenReloading/Ballistics/issues/1049)) ([225670f](https://github.com/OpenReloading/Ballistics/commit/225670fdb60a8e5c3a9742cd254c464334fd1607))
+* **data:** the public catalogue holds no record that cites a manufacturer source ([#1056](https://github.com/OpenReloading/Ballistics/issues/1056)) ([a7f9929](https://github.com/OpenReloading/Ballistics/commit/a7f9929952b838c8bca41d67faf24acf554b7234))
+* **locale-format:** add the locale-format package for Intl formatting and display units ([#1010](https://github.com/OpenReloading/Ballistics/issues/1010)) ([5791255](https://github.com/OpenReloading/Ballistics/commit/579125550369889b1a761325a93d0a3774a646fc))
+* **schema,data:** manufacturers name their country and website ([#1047](https://github.com/OpenReloading/Ballistics/issues/1047)) ([16a6c59](https://github.com/OpenReloading/Ballistics/commit/16a6c59203b22abdee4211f59c34750061404b7c))
+* **shot-groups:** add the shot-groups package for photo geometry, ellipses, ring and competition scoring ([#1020](https://github.com/OpenReloading/Ballistics/issues/1020)) ([0170b0b](https://github.com/OpenReloading/Ballistics/commit/0170b0be5c6f43d8266fa48e330978b27f5dc85c))
+* **shot-groups:** hit probability on statistics, with statistics' InputError carrying the typed issue ([#1025](https://github.com/OpenReloading/Ballistics/issues/1025)) ([ee3a36b](https://github.com/OpenReloading/Ballistics/commit/ee3a36bbe399f9c70fa55716eb0182a483df30ae))
+* **statistics:** add the statistics package and the test kit ([#1013](https://github.com/OpenReloading/Ballistics/issues/1013)) ([6a7ef0a](https://github.com/OpenReloading/Ballistics/commit/6a7ef0a5d0f2de689b39d822fa2505a72db25b67))
+* **units:** add the units package with the new-package gate profile ([#996](https://github.com/OpenReloading/Ballistics/issues/996)) ([fee565b](https://github.com/OpenReloading/Ballistics/commit/fee565bdccc35afb221db665c2526e7103eee004))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @open-reloading/api bumped to 0.0.6
+  * devDependencies
+    * @open-reloading/cli bumped to 0.0.2
+    * @open-reloading/catalog bumped to 0.0.6
+    * @open-reloading/drawing bumped to 0.0.5
+    * @open-reloading/importers bumped to 0.0.6
+    * @open-reloading/schema bumped to 0.0.6
+    * @open-reloading/web bumped to 0.0.6
+
 ## [0.0.5](https://github.com/OpenReloading/Ballistics/compare/docs-v0.0.4...docs-v0.0.5) (2026-11-02)
 
 
