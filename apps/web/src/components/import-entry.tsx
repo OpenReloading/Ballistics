@@ -28,6 +28,7 @@ import { translateMessage } from '../lib/core-messages.ts'
 import { localDay } from '../lib/dates.ts'
 import { errorText } from '../lib/error-text.ts'
 import { pickFiles, tableFormats } from '../lib/file-access.ts'
+import { tableReasonText } from '../lib/import-diagnostics.ts'
 import {
   type BuildView,
   type CardView,
@@ -249,7 +250,7 @@ function Report({ b }: { b: BuildView }) {
               {t('Row {row}, {column}: {reason}', {
                 row: r.row,
                 column: r.column,
-                reason: label(r.reason, t),
+                reason: tableReasonText(r.reason, t),
               })}
             </li>
           ))}
@@ -260,7 +261,7 @@ function Report({ b }: { b: BuildView }) {
         <Text size="xs" c="dimmed">
           {t('First warning, row {row}: {reason}', {
             row: b.firstWarning.row,
-            reason: label(b.firstWarning.reason, t),
+            reason: tableReasonText(b.firstWarning.reason, t),
           })}
         </Text>
       )}

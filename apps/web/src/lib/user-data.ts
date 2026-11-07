@@ -1,4 +1,6 @@
 /** The user data file: its text, parsing and validation, and import planning against the browser store. */
+
+import type { LoadDiagnostic } from '@open-reloading/importers'
 import {
   checkUserRefs,
   type EmbeddedFile,
@@ -75,7 +77,7 @@ export type ParsedUserFile =
       invalid?: unknown[]
       /** Fields of the file mapped to no record field, as the format names them. */
       unmapped?: string[]
-      warnings?: string[]
+      warnings?: LoadDiagnostic[]
       /** Records of a kind this version does not know, left out of `records`. */
       skipped?: SkippedKind[]
     }

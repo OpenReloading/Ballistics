@@ -1,8 +1,9 @@
-import { userRecord } from '@open-reloading/schema'
+import { type UserRecord, userRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import {
   autoMap,
   buildRecords,
+  type Candidate,
   fieldSpecs,
   idOfKey,
   readTable,
@@ -14,6 +15,9 @@ import {
 import { defined } from './defined.ts'
 
 const now = '2026-10-28T00:00:00.000Z'
+
+/** The record the app makes of a candidate: its id from the key, saved at `now`. */
+const recordOf = ({ key, ...c }: Candidate): UserRecord => ({ ...c, id: idOfKey(key), saved: now })
 const csv = (rows: string[][], d = ',') => rows.map((r) => r.join(d)).join('\n')
 const tableOf = (text: string): Table => {
   const r = readTable(text)
@@ -129,7 +133,7 @@ describe('suggestKind', () => {
 })
 
 const bulletOf = (b: ReturnType<typeof buildRecords>, i = 0) => {
-  const r = defined(b.entries[i], 'entry').record
+  const r = defined(b.entries[i], 'entry').candidate
   if (r.kind !== 'bullet') throw new Error('not a bullet')
   return { ...r.data, overrides: defined(r.data.overrides ?? undefined, 'overrides') }
 }
@@ -139,8 +143,8 @@ const pmaxOf = (header: string, cells: string[]) => {
     csv([['Name', 'Case length', header], ...cells.map((c, i) => [`C${i}`, '51', c])]),
   )
   const map = autoMap(t, 'cartridge')
-  const built = buildRecords(t, 'cartridge', map, now)
-  const r = built.entries[0]?.record
+  const built = buildRecords(t, 'cartridge', map)
+  const r = built.entries[0]?.candidate
   const pmax =
     r?.kind === 'cartridge' ? r.data.overrides?.values?.find((v) => v.symbol === 'Pmax') : undefined
   return { map: map[2], built, value: pmax?.value }
@@ -160,7 +164,7 @@ describe('units and decimal marks: grains, inches and decimal commas', () => {
       ['in', 'header'],
       ['gr', 'header'],
     ])
-    const a = bulletOf(buildRecords(us, 'bullet', usMap, now)).overrides
+    const a = bulletOf(buildRecords(us, 'bullet', usMap)).overrides
     expect(Math.abs((a.mass?.value ?? Number.NaN) - (168 * 64.79891) / 1000)).toBeLessThan(1e-12)
     expect(Math.abs((a.diameter?.value ?? Number.NaN) - 0.308 * 25.4)).toBeLessThan(1e-12)
     expect(a.mass?.raw).toBe('168')
@@ -179,7 +183,7 @@ describe('units and decimal marks: grains, inches and decimal commas', () => {
     )
     const euMap = autoMap(eu, 'bullet')
     expect(euMap[1]).toMatchObject({ decimal: ',', unit: 'mm' })
-    const b = bulletOf(buildRecords(eu, 'bullet', euMap, now)).overrides
+    const b = bulletOf(buildRecords(eu, 'bullet', euMap)).overrides
     expect(Math.abs((b.mass?.value ?? Number.NaN) - 10.89)).toBeLessThan(1e-12)
     expect(Math.abs((b.diameter?.value ?? Number.NaN) - 7.82)).toBeLessThan(1e-12)
     expect(b.mass?.raw).toBeUndefined()
@@ -207,7 +211,7 @@ describe('units and decimal marks: units from the values, psi and kg/m2', () => 
         ['D', '57', '60000'],
       ]),
     )
-    const r = defined(buildRecords(t, 'cartridge', autoMap(t, 'cartridge'), now).entries[0]).record
+    const r = defined(buildRecords(t, 'cartridge', autoMap(t, 'cartridge')).entries[0]).candidate
     const values = r.kind === 'cartridge' ? r.data.overrides?.values : undefined
     const pmax = values?.find((v) => v.symbol === 'Pmax')
     expect(defined(pmax?.value)).toBeCloseTo(62000 * 0.06894757, 3)
@@ -237,9 +241,10 @@ describe('units and decimal marks: units the header names', () => {
         unitFrom: 'unknown',
       })
       expect(built.entries).toHaveLength(0)
-      expect(built.rejected[0]?.reason).toBe(
-        'Max pressure: the header names a unit other than bar, psi, MPa, kpsi. Choose the unit of the column.',
-      )
+      expect(built.rejected[0]?.reason).toEqual({
+        code: 'unitOther',
+        params: { field: 'maxPressure', symbols: ['bar', 'psi', 'MPa', 'kpsi'] },
+      })
     }
     const t = tableOf(
       csv([
@@ -250,7 +255,7 @@ describe('units and decimal marks: units the header names', () => {
     const map = autoMap(t, 'cartridge').map((m, i) =>
       i === 2 ? { ...m, unit: 'bar', unitFrom: undefined } : m,
     )
-    expect(buildRecords(t, 'cartridge', map, now).entries).toHaveLength(1)
+    expect(buildRecords(t, 'cartridge', map).entries).toHaveLength(1)
   })
 })
 
@@ -275,7 +280,7 @@ describe('units and decimal marks: a unit word after a space', () => {
     )
     const map = autoMap(c, 'cartridge')
     expect(map.map((m) => m.unitFrom)).toEqual([undefined, 'values', 'values'])
-    expect(buildRecords(c, 'cartridge', map, now).rejected).toEqual([])
+    expect(buildRecords(c, 'cartridge', map).rejected).toEqual([])
   })
 })
 
@@ -290,7 +295,7 @@ const bulletRows = [
 ]
 const bulletTable = tableOf(csv(bulletRows))
 const bulletMap = autoMap(bulletTable, 'bullet')
-const bulletBuilt = buildRecords(bulletTable, 'bullet', bulletMap, now)
+const bulletBuilt = buildRecords(bulletTable, 'bullet', bulletMap)
 
 describe('buildRecords: a table with failing rows', () => {
   it('rejects a failing row without blocking the other rows of the file', () => {
@@ -301,20 +306,19 @@ describe('buildRecords: a table with failing rows', () => {
         row: 3,
         column: 'Name',
         cell: '',
-        reason: 'Name is empty. Fill the cell or delete the row.',
+        reason: { code: 'emptyCell', params: { field: 'name' } },
       },
       {
         row: 4,
         column: 'Diameter (mm)',
         cell: 'x7',
-        reason:
-          'Diameter "x7" is not a number with "." as decimal mark. Fix the cell or change the decimal mark of the column.',
+        reason: { code: 'notNumber', params: { field: 'diameter', cell: 'x7', mark: '.' } },
       },
       {
         row: 5,
         column: 'Diameter (mm)',
         cell: '0',
-        reason: 'Diameter 0 is not above 0. Fix the cell or leave it empty.',
+        reason: { code: 'notAboveZero', params: { field: 'diameter', cell: '0' } },
       },
     ])
     expect(bulletBuilt.warnings).toEqual([
@@ -322,7 +326,10 @@ describe('buildRecords: a table with failing rows', () => {
         row: 6,
         column: 'Diameter (mm)',
         cell: '30',
-        reason: 'Diameter 30 mm is outside the usual 3 to 25 mm. Check the unit of the column.',
+        reason: {
+          code: 'outsideUsual',
+          params: { field: 'diameter', cell: '30', unit: 'mm', low: 3, high: 25, stored: 'mm' },
+        },
       },
     ])
     expect(bulletOf(bulletBuilt).overrides.ballisticCoefficients).toEqual([
@@ -332,39 +339,35 @@ describe('buildRecords: a table with failing rows', () => {
 })
 
 describe('buildRecords: valid records, makers and ids', () => {
-  it('builds records the user record schema accepts', () => {
+  it('builds candidates whose records the user record schema accepts', () => {
     expect(bulletBuilt.entries.length + bulletBuilt.makers.length).toBe(4)
-    for (const r of [...bulletBuilt.entries, ...bulletBuilt.makers]) userRecord.parse(r.record)
+    const candidates = [...bulletBuilt.entries.map((e) => e.candidate), ...bulletBuilt.makers]
+    for (const c of candidates) userRecord.parse(recordOf(c))
   })
 
-  it('makes one manufacturer record per maker and refers to it', () => {
+  it('makes one manufacturer candidate per maker and refers to its id', () => {
     expect(bulletBuilt.makers).toHaveLength(1)
-    const maker = defined(bulletBuilt.makers[0]).record
+    const maker = defined(bulletBuilt.makers[0])
     expect(maker).toMatchObject({ kind: 'manufacturer', name: 'Invented Maker' })
-    expect(bulletOf(bulletBuilt, 0).manufacturer).toBe(`user:${maker.id}`)
-    expect(bulletOf(bulletBuilt, 2).manufacturer).toBe(`user:${maker.id}`)
+    expect(bulletOf(bulletBuilt, 0).manufacturer).toBe(`user:${idOfKey(maker.key)}`)
+    expect(bulletOf(bulletBuilt, 2).manufacturer).toBe(`user:${idOfKey(maker.key)}`)
   })
 
-  it('gives the same ids to the same input read twice, and to a changed value under the same key', () => {
-    const again = buildRecords(
-      tableOf(csv(bulletRows)),
-      'bullet',
-      bulletMap,
-      '2026-10-29T00:00:00.000Z',
-    )
-    expect(again.entries.map((e) => e.record.id)).toEqual(
-      bulletBuilt.entries.map((e) => e.record.id),
+  it('gives the same keys to the same input read twice, and to a changed value under the same key', () => {
+    const again = buildRecords(tableOf(csv(bulletRows)), 'bullet', bulletMap)
+    expect(again.entries.map((e) => e.candidate.key)).toEqual(
+      bulletBuilt.entries.map((e) => e.candidate.key),
     )
     const changed = bulletRows.map((r) => (r[0] === 'Good' ? [...r.slice(0, 4), '0.5'] : r))
-    const c = buildRecords(tableOf(csv(changed)), 'bullet', bulletMap, now)
-    expect(c.entries[0]?.record.id).toBe(bulletBuilt.entries[0]?.record.id)
+    const c = buildRecords(tableOf(csv(changed)), 'bullet', bulletMap)
+    expect(c.entries[0]?.candidate.key).toBe(bulletBuilt.entries[0]?.candidate.key)
     expect(bulletOf(c).overrides.ballisticCoefficients).toEqual([{ dragModel: 'G1', value: 0.5 }])
     const otherMass = bulletRows.map((r) =>
       r[0] === 'Good' ? [r[0], r[1] ?? '', '7.82', '11'] : r,
     )
-    const o = buildRecords(tableOf(csv(otherMass)), 'bullet', bulletMap, now)
-    expect(o.entries[0]?.record.id).not.toBe(bulletBuilt.entries[0]?.record.id)
-    expect(defined(bulletBuilt.entries[0]).record.id).toMatch(
+    const o = buildRecords(tableOf(csv(otherMass)), 'bullet', bulletMap)
+    expect(o.entries[0]?.candidate.key).not.toBe(bulletBuilt.entries[0]?.candidate.key)
+    expect(idOfKey(defined(bulletBuilt.entries[0]).candidate.key)).toMatch(
       /^[0-9a-f]{8}-[0-9a-f]{4}-8[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
     )
     expect(idOfKey('a')).toBe(idOfKey('a'))
@@ -380,12 +383,10 @@ describe('buildRecords: repeated ids and unmapped fields', () => {
         ['B1', 'M1', '7.82', '175', '0.6'],
       ]),
     )
-    const b = buildRecords(t, 'bullet', autoMap(t, 'bullet'), now)
+    const b = buildRecords(t, 'bullet', autoMap(t, 'bullet'))
     expect(b.warnings.map((w) => [w.row, w.column, w.cell])).toEqual([[3, 'name', 'B1']])
     // the hint names the fields of the id: a changed bcG1 would leave the id and the drop as they are
-    expect(b.warnings[0]?.reason).toBe(
-      'Rows 2 and 3 give the same name, maker, diameter and mass, so one id: only row 2 is imported. Change the name, maker, diameter or mass of row 3 to import it as a record of its own.',
-    )
+    expect(b.warnings[0]?.reason).toEqual({ code: 'sameBulletId', params: { first: 2, row: 3 } })
     expect(b.counts).toEqual({ accepted: 2, warned: 1, rejected: 0 })
   })
 
@@ -397,21 +398,21 @@ describe('buildRecords: repeated ids and unmapped fields', () => {
         ['B', '11'],
       ]),
     )
-    const b = buildRecords(t, 'bullet', autoMap(t, 'bullet'), now)
+    const b = buildRecords(t, 'bullet', autoMap(t, 'bullet'))
     expect(b.counts).toEqual({ accepted: 0, warned: 0, rejected: 2 })
     expect(b.rejected).toEqual([
       {
         row: 1,
         column: 'Diameter',
         cell: '',
-        reason:
-          'No column is mapped to Diameter. Map a column to it or read the file as another kind.',
+        reason: { code: 'noColumn', params: { fields: ['diameter'] } },
       },
     ])
-    const none = buildRecords(t, 'bullet', [{ decimal: '.' }, { decimal: '.' }], now)
-    expect(none.rejected[0]?.reason).toBe(
-      'No column is mapped to Name, Diameter, Mass. Map a column to each or read the file as another kind.',
-    )
+    const none = buildRecords(t, 'bullet', [{ decimal: '.' }, { decimal: '.' }])
+    expect(none.rejected[0]?.reason).toEqual({
+      code: 'noColumns',
+      params: { fields: ['name', 'diameter', 'mass'] },
+    })
   })
 })
 
@@ -425,12 +426,12 @@ describe('buildRecords: numbers and powder choices', () => {
         ...cells.map((c, i) => [`Big ${i}`, c, '10.9']),
       ]),
     )
-    const b = buildRecords(t, 'bullet', autoMap(t, 'bullet'), now)
+    const b = buildRecords(t, 'bullet', autoMap(t, 'bullet'))
     expect(b.counts).toEqual({ accepted: 1, warned: 0, rejected: 3 })
     expect(b.rejected.map((r) => [r.cell, r.reason])).toEqual(
       cells.map((c) => [
         c,
-        `Diameter "${c}" is not a number with "." as decimal mark. Fix the cell or change the decimal mark of the column.`,
+        { code: 'notNumber', params: { field: 'diameter', cell: c, mark: '.' } },
       ]),
     )
   })
@@ -445,19 +446,24 @@ describe('buildRecords: numbers and powder choices', () => {
         ['P4', '__proto__', '', ''],
       ]),
     )
-    const b = buildRecords(t, 'powder', autoMap(t, 'powder'), now)
+    const b = buildRecords(t, 'powder', autoMap(t, 'powder'))
     expect(b.counts).toEqual({ accepted: 4, warned: 3, rejected: 0 })
-    for (const e of b.entries) userRecord.parse(e.record)
-    const [p1, p2] = b.entries.map((e) => e.record)
+    for (const e of b.entries) userRecord.parse(recordOf(e.candidate))
+    const [p1, p2] = b.entries.map((e) => e.candidate)
     expect(p1?.kind === 'powder' && p1.data.draft).toEqual({
       grainForm: 'ball',
       propellantBase: 'double',
       bulkDensity: { value: 0.95 },
     })
     expect(p2?.kind === 'powder' && p2.data.draft).toEqual({ propellantBase: 'single' })
-    expect(b.warnings[0]?.reason).toBe(
-      'Grain form "pellet" is not one of ball, extruded, flake, other. The value is left out; change the cell to keep it.',
-    )
+    expect(b.warnings[0]?.reason).toEqual({
+      code: 'notChoice',
+      params: {
+        field: 'grainForm',
+        cell: 'pellet',
+        choices: ['ball', 'extruded', 'flake', 'other'],
+      },
+    })
     expect(b.warnings.map((w) => w.cell)).toEqual(['pellet', 'constructor', '__proto__'])
   })
 })
@@ -474,9 +480,9 @@ describe('buildRecords: cartridges and tables without a header', () => {
       { field: 'bulletDiameter', unit: 'in', decimal: '.' as const },
       { field: 'maxPressure', decimal: '.' as const },
     ]
-    const b = buildRecords(t, 'cartridge', map, now)
+    const b = buildRecords(t, 'cartridge', map)
     expect(b.entries[0]?.row).toBe(1)
-    const r = userRecord.parse(defined(b.entries[0]).record)
+    const r = userRecord.parse(recordOf(defined(b.entries[0]).candidate))
     expect(r.kind === 'cartridge' && r.data.overrides?.values).toEqual([
       { side: 'cartridge', symbol: 'L3', quantity: 'length', value: 51.2 },
       { side: 'cartridge', symbol: 'L6', quantity: 'length', value: 71.1 },

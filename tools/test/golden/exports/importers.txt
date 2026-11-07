@@ -1,5 +1,6 @@
 . BuiltEntry
 . BuiltRecords
+. Candidate
 . ChronoFormat
 . ChronoFormatId
 . ChronoImport
@@ -9,11 +10,13 @@
 . ColumnUnit
 . DelimitedOptions
 . Delimiter
+. Diagnostic
 . FieldSpec
 . GrtLoadRead
 . Inflate
 . KindScore
 . KindSuggestion
+. LoadDiagnostic
 . ParseChronoOptions
 . PressureHistoryImport
 . PressureHistoryOptions
@@ -24,6 +27,7 @@
 . SessionCandidate
 . Table
 . TableColumnMap
+. TableDiagnostic
 . TableKind
 . TableRead
 . TemplateOptions

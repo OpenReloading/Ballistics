@@ -1,7 +1,7 @@
-// The load files of Gordon's Reloading Tool (`.grtload`, XML) as user records. The mapping and
+// The load files of Gordon's Reloading Tool (`.grtload`, XML) as record candidates. The mapping and
 // its reasons: `apps/docs/docs/data/grt-load-files.md`. It was written from saved files.
 
-import type { UserRecord } from '@open-reloading/schema'
+import type { Candidate, Diagnostic } from './diagnostics.ts'
 import { idOfKey } from './record-ids.ts'
 import { keyText } from './records.ts'
 import { parseXml, type XmlElement } from './xml.ts'
@@ -64,15 +64,26 @@ const overrideFields = [
   ['propellantTemperature', 'propellant.pt'],
 ] as const
 
-const shotshellWarning =
-  'The file holds a shotshell load. This import is not checked on shotshell files: the fields it does not know are listed as not read. Check every value.'
+/** A warning of a load file read, as a code and the values its message names; `at` is the field path. */
+export type LoadDiagnostic = Diagnostic<
+  | 'notPercentEncoded'
+  | 'notConverted'
+  | 'shotshell'
+  | 'shotWithoutVelocity'
+  | 'chargeWithoutShots'
+  | 'shotsBeyondLimit'
+  | 'chargeWithoutMass'
+  | 'chargesBeyondLimit'
+  | 'otherFormat'
+  | 'unknownFormat'
+>
 
-/** The records of one load file, the fields it did not read and its warnings. */
+/** The record candidates of one load file, the fields it did not read and its warnings. */
 export interface GrtLoadRead {
-  records: UserRecord[]
+  candidates: Candidate[]
   /** Fields with a value that no record field takes, as `section.name`. */
   unmapped: string[]
-  warnings: string[]
+  warnings: LoadDiagnostic[]
 }
 
 export const elements = (e: XmlElement): XmlElement[] =>
@@ -84,13 +95,13 @@ export const clip = (s: string | undefined, max: number = 200): string | undefin
 export const numberOf = (s: string): number =>
   Number(/^[-+]?\d+,\d+$/.test(s) ? s.replace(',', '.') : s)
 
-/** Id, name and data of a record of `kind`, the id from its content: the same content gives the same id in every file. */
+/** Key, name and data of a candidate of `kind`, the key from its content: the same content gives the same id in every file. */
 export const named = <D>(
   kind: string,
   name: string,
   data: D,
-): { id: string; name: string; data: D } => ({
-  id: idOfKey(`${kind}|${JSON.stringify([name, data])}`),
+): { key: string; name: string; data: D } => ({
+  key: `${kind}|${JSON.stringify([name, data])}`,
   name,
   data,
 })
@@ -102,15 +113,15 @@ interface Read {
   notes: string[]
   title?: string | undefined
   unmapped: Set<string>
-  warnings: string[]
+  warnings: LoadDiagnostic[]
 }
 
 /** Text with its percent escapes resolved; the text as written, with a warning, when they are not valid. */
-export function unescaped(s: string, at: string, warnings: string[]): string {
+export function unescaped(s: string, at: string, warnings: LoadDiagnostic[]): string {
   try {
     return decodeURIComponent(s).trim()
   } catch {
-    warnings.push(`${at}: the text is not percent-encoded; it is read as written.`)
+    warnings.push({ code: 'notPercentEncoded', params: { at } })
     return s.trim()
   }
 }
@@ -120,15 +131,16 @@ function numberValue(
   at: string,
   kind: Kind,
   { unit, value }: { unit: string; value: string },
-  warnings: string[],
+  warnings: LoadDiagnostic[],
 ): number | undefined {
   const factor = Object.hasOwn(factors[kind], unit) ? factors[kind][unit] : undefined
   // a finite number can still overflow in the stored unit
   const stored = factor === undefined ? Number.NaN : numberOf(value) * factor
   if (Number.isFinite(stored)) return Number(stored.toPrecision(12))
-  warnings.push(
-    `${at}: "${value.slice(0, 40)}" in unit "${unit.slice(0, 20)}" is not converted; the field is not read.`,
-  )
+  warnings.push({
+    code: 'notConverted',
+    params: { at, value: value.slice(0, 40), unit: unit.slice(0, 20) },
+  })
   return undefined
 }
 
@@ -139,7 +151,7 @@ function readField(at: string, f: XmlElement, read: Read) {
   const value = (f.attributes['value'] ?? '').trim()
   if (value === '') return
   if (at === 'caliber.shotshell') {
-    if (value === 'true') read.warnings.push(shotshellWarning)
+    if (value === 'true') read.warnings.push({ code: 'shotshell', params: {} })
     return
   }
   if (!isField(at)) {
@@ -180,7 +192,7 @@ function readInput(input: XmlElement): Read {
 
 const quantity = (v: number | undefined) => (v === undefined ? undefined : { value: v })
 
-function cartridgeOf(r: Read, name: string, saved: string): UserRecord {
+function cartridgeOf(r: Read, name: string): Candidate {
   const spec = (
     symbol: string,
     kind: 'length' | 'area' | 'pressure',
@@ -200,13 +212,20 @@ function cartridgeOf(r: Read, name: string, saved: string): UserRecord {
     origin: 'user' as const,
     overrides: { name, ...(values.length > 0 && { values }) },
   }
-  return { kind: 'cartridge', ...named('cartridge', name, data), saved }
+  return { kind: 'cartridge', ...named('cartridge', name, data) }
 }
 
-/** The bullet, and its maker's record first when the file names one. */
-function bulletOf(r: Read, name: string, saved: string): UserRecord[] {
-  const maker = clip(r.texts['projectile.mname'])
-  const makerId = maker && idOfKey(`manufacturer|${keyText(maker)}`)
+/** The candidate of a bullet's maker named `name` and the reference to it. */
+function makerOf(name: string) {
+  const key = `manufacturer|${keyText(name)}`
+  const candidate: Candidate = { kind: 'manufacturer', key, name, data: { origin: 'user' } }
+  return { candidate, ref: `user:${idOfKey(key)}` as const }
+}
+
+/** The bullet, and its maker's candidate first when the file names one. */
+function bulletOf(r: Read, name: string): Candidate[] {
+  const makerName = clip(r.texts['projectile.mname'])
+  const maker = makerName ? makerOf(makerName) : undefined
   const coefficients = (['G1', 'G7'] as const).flatMap((m) => {
     const value = r.nums[m === 'G1' ? 'projectile.g1bc' : 'projectile.g7bc']
     return value !== undefined && value > 0 ? [{ dragModel: m, value }] : []
@@ -216,7 +235,7 @@ function bulletOf(r: Read, name: string, saved: string): UserRecord[] {
   const length = quantity(r.nums['projectile.glen'])
   const data = {
     origin: 'user' as const,
-    ...(makerId && { manufacturer: `user:${makerId}` as const }),
+    ...(maker && { manufacturer: maker.ref }),
     overrides: {
       name: clip(r.texts['projectile.pname']) ?? name,
       ...(diameter && { diameter }),
@@ -225,16 +244,14 @@ function bulletOf(r: Read, name: string, saved: string): UserRecord[] {
       ...(coefficients.length > 0 && { ballisticCoefficients: coefficients }),
     },
   }
-  const bullet: UserRecord = { kind: 'bullet', ...named('bullet', name, data), saved }
-  return maker && makerId
-    ? [{ kind: 'manufacturer', id: makerId, name: maker, saved, data: { origin: 'user' } }, bullet]
-    : [bullet]
+  const bullet: Candidate = { kind: 'bullet', ...named('bullet', name, data) }
+  return maker ? [maker.candidate, bullet] : [bullet]
 }
 
-function powderOf(r: Read, name: string, saved: string): UserRecord {
+function powderOf(r: Read, name: string): Candidate {
   const bulk = quantity(r.nums['propellant.pcd'])
   const data = { origin: 'user' as const, draft: { ...(bulk && { bulkDensity: bulk }) } }
-  return { kind: 'powder', ...named('powder', name, data), saved }
+  return { kind: 'powder', ...named('powder', name, data) }
 }
 
 const userRef = (id: string | undefined) => (id ? (`user:${id}` as const) : undefined)
@@ -257,13 +274,12 @@ function componentRefs(refs: {
 function loadOf(
   r: Read,
   name: string,
-  saved: string,
   refs: {
     cartridge?: string | undefined
     bullet?: string | undefined
     powder?: string | undefined
   },
-): UserRecord {
+): Candidate {
   const overrides = Object.fromEntries(
     overrideFields.flatMap(([key, f]) => {
       const value = r.nums[f]
@@ -283,48 +299,51 @@ function loadOf(
     ...(note && { note }),
     ...(Object.keys(overrides).length > 0 && { analysis: { overrides } }),
   }
-  return { kind: 'load', ...named('load', name, data), saved }
+  return { kind: 'load', ...named('load', name, data) }
 }
 
+/** The id the app gives a candidate, which the other candidates of its read refer to. */
+const idOf = (c: Candidate | undefined) => c && idOfKey(c.key)
+
 /**
- * The records of the load input element of a file of this layout (GRT's, also written by other
+ * The candidates of the load input element of a file of this layout (GRT's, also written by other
  * programs): the cartridge, the bullet after its maker, the powder, then the load last.
  */
-export function readLoadInput(input: XmlElement, saved: string): GrtLoadRead {
+export function readLoadInput(input: XmlElement): GrtLoadRead {
   const r = readInput(input)
   const cartridgeName = clip(r.texts['caliber.CaliberName'])
   const bulletName = clip(r.texts['projectile.ProjectileName'] ?? r.texts['projectile.pname'])
   const powderName = clip(
     [r.texts['propellant.mname'], r.texts['propellant.pname']].filter(Boolean).join(' '),
   )
-  const cartridge = cartridgeName ? cartridgeOf(r, cartridgeName, saved) : undefined
-  const bullet = bulletName ? bulletOf(r, bulletName, saved) : []
-  const powder = powderName ? powderOf(r, powderName, saved) : undefined
+  const cartridge = cartridgeName ? cartridgeOf(r, cartridgeName) : undefined
+  const bullet = bulletName ? bulletOf(r, bulletName) : []
+  const powder = powderName ? powderOf(r, powderName) : undefined
   const loadName =
     clip(r.title) ??
     clip([cartridgeName, bulletName, powderName].filter(Boolean).join(', ')) ??
     'Load'
-  const load = loadOf(r, loadName, saved, {
-    cartridge: cartridge?.id,
-    bullet: bullet.at(-1)?.id,
-    powder: powder?.id,
+  const load = loadOf(r, loadName, {
+    cartridge: idOf(cartridge),
+    bullet: idOf(bullet.at(-1)),
+    powder: idOf(powder),
   })
-  const records = [cartridge, ...bullet, powder, load].filter((x) => x !== undefined)
-  return { records, unmapped: [...r.unmapped], warnings: r.warnings }
+  const candidates = [cartridge, ...bullet, powder, load].filter((x) => x !== undefined)
+  return { candidates, unmapped: [...r.unmapped], warnings: r.warnings }
 }
 
 /**
- * The records of a load file: the cartridge, the bullet (after its maker) and the powder it names,
- * then the load, saved at `saved` (ISO 8601). Percent escapes in text values are resolved, numbers converted
- * from the unit each field declares to the stored unit; a field with an empty value holds nothing
- * to read. Ids come from the content, so a file read again gives the same records and files that
- * share a component give it one id. Throws with the reason on a file that is no load file of this
- * format. The caller checks each record with the user record schema.
+ * The record candidates of a load file: the cartridge, the bullet (after its maker) and the powder
+ * it names, then the load. Percent escapes in text values are resolved, numbers converted from the
+ * unit each field declares to the stored unit; a field with an empty value holds nothing to read.
+ * Keys come from the content, so a file read again gives the same ids and files that share a
+ * component give it one id. Throws with the reason on a file that is no load file of this format.
+ * The caller makes each candidate a record and checks it with the user record schema.
  */
-export function readGrtLoad(xml: string, saved: string): GrtLoadRead {
+export function readGrtLoad(xml: string): GrtLoadRead {
   const root = parseXml(xml.replace(/^\uFEFF/, ''))
   if (root.name !== grtLoadRoot) throw new Error(`The root element is not ${grtLoadRoot}.`)
   const input = elements(root).find((e) => e.name === 'InnerBallistikInput')
   if (!input) throw new Error('The file holds no load.')
-  return readLoadInput(input, saved)
+  return readLoadInput(input)
 }

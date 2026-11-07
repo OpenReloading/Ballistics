@@ -7,6 +7,7 @@ import {
   fieldSpecs,
   isWorkbook,
   type KindScore,
+  type LoadDiagnostic,
   type RowCounts,
   type RowIssue,
   readTable,
@@ -21,6 +22,7 @@ import {
 } from '@open-reloading/importers'
 import { type UserRecord, type UserRecordKind, userRecord } from '@open-reloading/schema'
 import { storageName } from './edition.ts'
+import { type InvalidRecordDiagnostic, recordOf } from './import-diagnostics.ts'
 import { type LoadFileFormat, loadFileFormats, loadFormatOf } from './load-file-formats.ts'
 import { type InvalidRecord, maxFileBytes, planImport } from './user-data.ts'
 
@@ -37,7 +39,7 @@ export type CardView =
       records: number
       /** The records of the file by kind, manufacturers left out. */
       kinds: Partial<Record<UserRecordKind, number>>
-      warnings: string[]
+      warnings: LoadDiagnostic[]
       unmapped: string[]
     }
   | {
@@ -52,14 +54,19 @@ export type CardView =
       sheet?: string | undefined
     }
 
+/** A rejected or warned row: the importers' reason, or the user record schema's for a row it refuses. */
+type ShownIssue = Omit<RowIssue, 'reason'> & {
+  reason: RowIssue['reason'] | InvalidRecordDiagnostic
+}
+
 /** The counts and first rejected rows of a built table, planned against the browser store. */
 export interface BuildView {
   /** The column map used: the request's, or the automatic one for the kind. */
   map: TableColumnMap[]
   counts: RowCounts
   /** The first rejected rows, at most `shownIssues`. */
-  rejected: RowIssue[]
-  firstWarning?: RowIssue | undefined
+  rejected: ShownIssue[]
+  firstWarning?: ShownIssue | undefined
   /** Rows of the file new to the browser, already there with the same content, there with other content, repeated in the file. */
   added: number
   equal: number
@@ -115,11 +122,20 @@ interface Plan {
   blocked: number
 }
 
+/** The records of a build that the user record schema accepts, with the row report. */
+interface Built {
+  entries: { row: number; record: UserRecord }[]
+  makers: UserRecord[]
+  counts: RowCounts
+  rejected: ShownIssue[]
+  warnings: ShownIssue[]
+}
+
 interface Held {
   table?: { header: string[]; hasHeader: boolean; rows: string[][] }
   kind?: TableKind
   map?: TableColumnMap[]
-  built?: BuiltRecords
+  built?: Built
   plan?: Plan
 }
 
@@ -203,7 +219,7 @@ const samplesOf = (t: { header: string[]; rows: string[][] }) =>
  * `built` against `stored`: rows with one id in the file collapse (same content) or keep the first
  * (other content); makers count only as written, never as changed.
  */
-function planOf(built: BuiltRecords, { records: stored, invalid }: Stored): Plan {
+function planOf(built: Built, { records: stored, invalid }: Stored): Plan {
   const first = new Map<string, UserRecord>()
   let repeated = 0
   for (const { record } of built.entries) {
@@ -211,11 +227,7 @@ function planOf(built: BuiltRecords, { records: stored, invalid }: Stored): Plan
     if (!seen) first.set(record.id, record)
     else repeated++
   }
-  const makers = planImport(
-    built.makers.map((m) => m.record),
-    stored,
-    invalid,
-  )
+  const makers = planImport(built.makers, stored, invalid)
   const rows = planImport([...first.values()], stored, invalid)
   return {
     added: [...makers.added, ...rows.added],
@@ -227,33 +239,34 @@ function planOf(built: BuiltRecords, { records: stored, invalid }: Stored): Plan
 }
 
 /** The records of a load file as a build: every record accepted, manufacturers as makers. */
-function builtOf(records: UserRecord[]): BuiltRecords {
+function builtOf(records: UserRecord[]): Built {
   const entries = records.filter((r) => r.kind !== 'manufacturer')
   return {
-    entries: entries.map((record) => ({ key: record.id, row: 0, record })),
-    makers: records
-      .filter((r) => r.kind === 'manufacturer')
-      .map((record) => ({ key: record.id, record })),
+    entries: entries.map((record) => ({ row: 0, record })),
+    makers: records.filter((r) => r.kind === 'manufacturer'),
     counts: { accepted: entries.length, warned: 0, rejected: 0 },
     rejected: [],
     warnings: [],
   }
 }
 
-/** Each record parsed with the user record schema; a record it refuses turns its row into a rejected one. */
-function checked(built: BuiltRecords): BuiltRecords {
-  const entries: BuiltRecords['entries'] = []
-  const rejected = [...built.rejected]
+/**
+ * The record of each candidate, saved at `saved`, parsed with the user record schema; a record it
+ * refuses turns its row into a rejected one.
+ */
+function checked(built: BuiltRecords, saved: string): Built {
+  const entries: Built['entries'] = []
+  const rejected: ShownIssue[] = [...built.rejected]
   for (const e of built.entries) {
-    const parsed = userRecord.safeParse(e.record)
-    if (parsed.success) entries.push(e)
+    const parsed = userRecord.safeParse(recordOf(e.candidate, saved))
+    if (parsed.success) entries.push({ row: e.row, record: parsed.data })
     else {
       const issue = parsed.error.issues[0]
       rejected.push({
         row: e.row,
         column: issue?.path.join('.') ?? '',
         cell: '',
-        reason: `${issue?.message ?? 'Invalid record'}. Fix the row or delete it.`,
+        reason: { code: 'invalidRecord', params: { reason: issue?.message ?? 'Invalid record' } },
       })
     }
   }
@@ -261,8 +274,8 @@ function checked(built: BuiltRecords): BuiltRecords {
   const warnedRows = new Set(entries.map((e) => e.row))
   const warnings = built.warnings.filter((w) => warnedRows.has(w.row))
   return {
-    ...built,
     entries,
+    makers: built.makers.map((m) => recordOf(m, saved)),
     rejected,
     warnings,
     counts: {
@@ -329,7 +342,7 @@ export function importWorker(
     const h = held(id)
     h.kind = kind
     h.map = map ?? autoMap(h.table, kind)
-    h.built = checked(buildRecords(h.table, kind, h.map, new Date().toISOString()))
+    h.built = checked(buildRecords(h.table, kind, h.map), new Date().toISOString())
     h.plan = planOf(h.built, await store.records())
     return viewOf(h)
   }
