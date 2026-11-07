@@ -42,12 +42,7 @@ import { type BaseType, type BulletValues, typedBullet } from '../lib/bullet.ts'
 import { type BelowMouth, belowMouth, unseatedBecause } from '../lib/bullet-below-mouth.ts'
 import { designShape } from '../lib/bullet-designer.ts'
 import { drawable, withCaseLength } from '../lib/cartridge-sheet.ts'
-import {
-  measuredWaterCapacitySpec,
-  renamedCasePath,
-  type UsedWater,
-  usedWater,
-} from '../lib/case-capacity.ts'
+import { measuredWaterCapacitySpec, type UsedWater, usedWater } from '../lib/case-capacity.ts'
 import type { OwnCase } from '../lib/case-group.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { capacityGuide } from '../lib/docs-url.ts'
@@ -1022,21 +1017,6 @@ function useChoice(
   return [onLifted ? lifted : own, onLifted ?? setOwn] as const
 }
 
-/** The listed case record `caseId`; a renamed case answers with the record that replaced it, and the choice takes that id. */
-function useChosenCase(
-  caseList: Load<{ items: CaseSummary[] }>,
-  caseId: string | undefined,
-  setCaseId: (id: string | undefined) => void,
-) {
-  const items = caseList.status === 'ok' ? caseList.value.items : undefined
-  const renamed = useRecord<{ id: string }>(renamedCasePath(caseId, items))
-  const renamedTo = renamed.status === 'ok' ? renamed.value.id : undefined
-  useEffect(() => {
-    if (renamedTo !== undefined && renamedTo !== caseId) setCaseId(renamedTo)
-  }, [renamedTo, caseId, setCaseId])
-  return items?.find((c) => c.id === caseId)
-}
-
 /** The records' water, and the water with a measured value typed over it. */
 function watersOf<T extends Parameters<typeof usedWater>[0]['capacities'][number]>(o: {
   measured: number | undefined
@@ -1130,7 +1110,8 @@ function useSeatingModel(p: PreviewProps) {
     freebore: p.freebore === undefined ? undefined : fromSi('length', p.freebore),
     unit: drawingLengthUnit(system),
   })
-  const chosenCase = useChosenCase(caseList, caseId, setCaseId)
+  const chosenCase =
+    caseList.status === 'ok' ? caseList.value.items.find((c) => c.id === caseId) : undefined
   // a case record is chosen but not read (loading, failed or no longer listed): no other record stands in
   const pendingCase = caseId !== undefined && chosenCase === undefined
   // apart from `fixed`: a unit switch relabels the drawing and keeps the seating position
