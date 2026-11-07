@@ -61,7 +61,7 @@ const recordInputs = [
   /^packages\/locale-format\//,
   /^packages\/statistics\//,
   /^packages\/ballistics\//,
-  /^packages\/data\//,
+  /^packages\/catalog\//,
   /^packages\/schema\//,
   /^packages\/api\//,
   /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|tsconfig\.base\.json|\.nvmrc)$/,
