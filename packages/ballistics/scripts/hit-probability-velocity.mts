@@ -1,6 +1,10 @@
 // Velocity-spread term of the hit probability against a seeded simulation of impact heights
-// (apps/docs/docs/research/hit-probability-velocity-term.md). Run: node packages/core/scripts/hit-probability-velocity.mts
+// (apps/docs/docs/research/hit-probability-velocity-term.md). Run: node packages/ballistics/scripts/hit-probability-velocity.mts
 // Synthetic loads only; every number is a simulation, not load data.
+
+// the generator of the other hit-probability scripts, so the seeds give the same draws
+// shortcut: an import from a sibling package, and ballistics' scripts are not typechecked; drop both when the scripts take the generator of statistics
+import { normals } from '../../shot-groups/scripts/rng.mts'
 import {
   lbPerSqInToKgPerSqM,
   standardAtmosphere,
@@ -8,7 +12,6 @@ import {
   trajectory,
   zeroAngles,
 } from '../src/index.ts'
-import { normals } from './rng.mts'
 
 /** The five synthetic loads: muzzle velocity m/s, G7 ballistic coefficient lb/in^2, velocity SD m/s. */
 const loads = [

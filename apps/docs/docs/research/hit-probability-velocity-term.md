@@ -28,7 +28,7 @@ Distances 100, 200, ..., 1000 m (the range of the issue; the distance limit of t
 
 Simulation: 5000 shots per load from a fixed seed (mulberry32), each with a normally drawn muzzle speed and one trajectory run, plus a normal draw of the velocity-independent part. The simulated value is the standard deviation of the heights at each distance (sampling error about $1/\sqrt{2N} = 1$ percent). The group a shooter measures at $D_0$ is the simulated one, with its speed part inside. The model gets that group, $S_v$ from one extra run at the speed plus 1 m/s, and the speed SD, and returns the vertical SD at each distance. The linear baseline scales the same group by $D/D_0$.
 
-Run: `node packages/core/scripts/hit-probability-velocity.mts` (seeds fixed in the script).
+Run: `node packages/ballistics/scripts/hit-probability-velocity.mts` (seeds fixed in the script).
 
 ## Formulas
 
