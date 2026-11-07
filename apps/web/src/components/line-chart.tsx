@@ -4,7 +4,7 @@ import type { ECharts } from 'echarts/core'
 import { createContext, type ReactNode, useContext, useMemo, useState } from 'react'
 import { formatNumber } from '../i18n/number.ts'
 import { niceTicks, tickDecimals } from '../lib/ticks.ts'
-import { EChart, tickStep, useChartTokens } from './echart.tsx'
+import { axisText, chartTooltip, EChart, tickStep, useChartTokens } from './echart.tsx'
 
 const lineTokens = { muted: '--muted', border: '--border', link: '--link', bg: '--bg', fg: '--fg' }
 
@@ -118,7 +118,7 @@ export function LineChart({
   const option = useMemo(() => {
     if (!tokens || !ok) return {}
     const [dx, dy] = [tickDecimals(xt), tickDecimals(yt)]
-    const text = { color: tokens.muted, fontSize: 12 }
+    const text = axisText(tokens.muted)
     const axis = (ticks: number[], name: string, d: number, max: number | undefined) => ({
       type: 'value',
       min: ticks[0],
@@ -144,13 +144,7 @@ export function LineChart({
         outerBoundsContain: 'all',
       },
       tooltip: {
-        trigger: 'axis',
-        // kept inside the chart: `.chart` clips overflow (as in interior-chart.tsx)
-        confine: true,
-        borderRadius: 0,
-        backgroundColor: tokens.bg,
-        borderColor: tokens.border,
-        textStyle: { color: tokens.fg },
+        ...chartTooltip(tokens),
         valueFormatter: (v: number) => formatNumber(v, dy),
         axisPointer: {
           label: { formatter: ({ value }: { value: number }) => formatNumber(value, dx) },

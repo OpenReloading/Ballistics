@@ -5,6 +5,7 @@
  */
 import { fromSi } from '@open-reloading/schema'
 import type { Cutout } from './bullet-photo.ts'
+import { median1 as median } from './raster-ops.ts'
 import type { Point } from './target-geometry.ts'
 
 // Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
@@ -264,12 +265,6 @@ function lineOf(xs: readonly number[], ys: readonly number[]) {
   if (!(det > 0)) return
   const b = (n * sxy - sx * sy) / det
   return { a: (sy - b * sx) / n, b }
-}
-
-const median = (xs: readonly number[]) => {
-  const a = [...xs].sort((p, q) => p - q)
-  const m = a.length >> 1
-  return a.length % 2 ? at(a, m) : (at(a, m - 1) + at(a, m)) / 2
 }
 
 /** The shank is where the half width is at least this share of its widest. */

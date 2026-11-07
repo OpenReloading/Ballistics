@@ -1,7 +1,7 @@
 'use client'
 
 import { Button, Menu, Tabs, Textarea } from '@mantine/core'
-import { useMediaQuery } from '@mantine/hooks'
+import { useClipboard, useMediaQuery } from '@mantine/hooks'
 import { CaretDown } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
 import { memo, type RefObject, useEffect, useMemo, useRef, useState } from 'react'
@@ -331,14 +331,9 @@ function ResultTabBar({
 }
 
 /** Copies the ladder table as shown, for a spreadsheet. */
-function CopyCsvButton({
-  csvCopied,
-  setCsvCopied,
-}: {
-  csvCopied: boolean | 'failed'
-  setCsvCopied: (copied: boolean | 'failed') => void
-}) {
+function CopyCsvButton() {
   const { t } = useTranslation()
+  const clipboard = useClipboard({ timeout: 2000 })
   return (
     <Button
       size={controlSize.row.button}
@@ -348,22 +343,16 @@ function CopyCsvButton({
         const table = e.currentTarget.parentElement?.querySelector('table')
         if (!table) return
         // a file or a spreadsheet gets the point, whatever the language shown
-        const csv = toCsv(
-          [...table.querySelectorAll('tr')].map((r) =>
-            [...r.cells].map((c) => canonicalNumberText(c.textContent?.trim() ?? '')),
+        clipboard.copy(
+          toCsv(
+            [...table.querySelectorAll('tr')].map((r) =>
+              [...r.cells].map((c) => canonicalNumberText(c.textContent?.trim() ?? '')),
+            ),
           ),
-        )
-        const show = (state: true | 'failed') => {
-          setCsvCopied(state)
-          setTimeout(() => setCsvCopied(false), 2000)
-        }
-        navigator.clipboard.writeText(csv).then(
-          () => show(true),
-          () => show('failed'),
         )
       }}
     >
-      {csvCopied === 'failed' ? t('Copy failed') : csvCopied ? t('Copied') : t('Copy as CSV')}
+      {clipboard.error ? t('Copy failed') : clipboard.copied ? t('Copied') : t('Copy as CSV')}
     </Button>
   )
 }
@@ -490,7 +479,7 @@ function ResultsHead({
 /** The ladder table tab's content: the table with its CSV copy, lot rows and target. */
 function LadderBody() {
   const { t } = useTranslation()
-  const { ok, steps, stepValue, velocity, csvCopied, setCsvCopied, lot, system } = useResult()
+  const { ok, steps, stepValue, velocity, lot, system } = useResult()
   return (
     <>
       {/* one step: its row would repeat the readouts */}
@@ -498,7 +487,7 @@ function LadderBody() {
         notRun(msg('Run the simulation to see the ladder table.'), t)
       ) : steps.length > 1 ? (
         <>
-          <CopyCsvButton csvCopied={csvCopied} setCsvCopied={setCsvCopied} />
+          <CopyCsvButton />
           {lot.applies && <LotPanel lot={lot} system={system} />}
           <LadderTarget labels={steps.map(stepValue)} system={system} />
           <LadderTable

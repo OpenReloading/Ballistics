@@ -7,7 +7,7 @@ import type { Translator } from '../i18n/translate.ts'
 import type { BarrelRow } from '../lib/barrel-length.ts'
 import { niceTicks } from '../lib/ticks.ts'
 import { formatQuantity, type UnitSystem } from '../lib/units.ts'
-import { EChart, tickStep, useChartTokens } from './echart.tsx'
+import { axisText, chartTooltip, EChart, tickStep, useChartTokens } from './echart.tsx'
 import type { BarrelStep } from './use-barrel-study.ts'
 
 const tokens = {
@@ -45,10 +45,9 @@ const valueAxis = (
     name,
     nameLocation: 'middle' as const,
     nameGap: 44,
-    nameTextStyle: { color, fontSize: 12 },
+    nameTextStyle: axisText(color),
     axisLabel: {
-      color,
-      fontSize: 12,
+      ...axisText(color),
       formatter: (v: number) => plainNumber(Number(v.toPrecision(10))),
     },
     axisLine: { show: true, lineStyle: { color } },
@@ -173,15 +172,7 @@ function chartOption(
       outerBoundsMode: 'same',
       outerBoundsContain: 'all',
     },
-    tooltip: {
-      trigger: 'axis',
-      confine: true,
-      borderRadius: 0,
-      backgroundColor: theme.bg,
-      borderColor: theme.border,
-      textStyle: { color: theme.fg },
-      formatter: tooltipFormatter(system, t),
-    },
+    tooltip: { ...chartTooltip(theme), formatter: tooltipFormatter(system, t) },
     xAxis: {
       type: 'value' as const,
       min: xt[0],
@@ -190,10 +181,9 @@ function chartOption(
       name: t('Barrel length, {unit}', { unit: length.symbol }),
       nameLocation: 'middle' as const,
       nameGap: 26,
-      nameTextStyle: { color: theme.muted, fontSize: 12 },
+      nameTextStyle: axisText(theme.muted),
       axisLabel: {
-        color: theme.muted,
-        fontSize: 12,
+        ...axisText(theme.muted),
         formatter: (v: number) => formatNumber(v, length.decimals),
       },
       axisLine: { show: true, lineStyle: { color: theme.muted } },
