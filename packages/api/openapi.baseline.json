@@ -25240,6 +25240,10 @@
                       "type": "string",
                       "minLength": 1
                     },
+                    "country": {
+                      "type": "string",
+                      "pattern": "^[A-Z]{2}$"
+                    },
                     "website": {
                       "type": "string",
                       "format": "uri"

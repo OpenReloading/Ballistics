@@ -1,6 +1,8 @@
 {
   "id": "reload-swiss",
   "name": "Reload Swiss",
+  "country": "CH",
+  "website": "https://www.reload-swiss.com/",
   "provenance": {
     "kind": "published",
     "sources": [
@@ -9,6 +11,15 @@
         "url": "https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS12/RS12-EN.pdf",
         "retrieved": "2026-10-13",
         "fields": ["name"]
+      },
+      {
+        "title": "Reload Swiss, career page",
+        "publisher": "Nitrochemie Wimmis AG",
+        "url": "https://www.reload-swiss.com/en/about-us/career",
+        "retrieved": "2026-11-06",
+        "fields": ["country", "website"],
+        "origin": "manufacturer",
+        "note": "Address: Nitrochemie Wimmis AG, Niesenstrasse 44, 3752 Wimmis/BE, Switzerland."
       }
     ]
   }
