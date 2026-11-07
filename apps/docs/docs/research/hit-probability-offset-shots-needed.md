@@ -12,7 +12,7 @@ Hit probability (`hit-probability.md`): does the zone integral with an optional 
 
 ## Method
 
-Accept rules, decided before any run. Offset: build when the integral agrees with a seeded Monte Carlo within 0.5 percentage points over $\delta/\sigma$ from 0 to 4 and $R/\sigma$ from 0.25 to 4, and it shows an interior maximum over $\sigma$ for $\delta > R$. Shots needed: build when a test reproduces the formula (no new input). The offset takes its default from the measured group's `AimOffset` (group centre minus point of aim, `packages/core/src/groups/statistics.ts`) when a group is selected, otherwise zero, so no typed field is added.
+Accept rules, decided before any run. Offset: build when the integral agrees with a seeded Monte Carlo within 0.5 percentage points over $\delta/\sigma$ from 0 to 4 and $R/\sigma$ from 0.25 to 4, and it shows an interior maximum over $\sigma$ for $\delta > R$. Shots needed: build when a test reproduces the formula (no new input). The offset takes its default from the measured group's `AimOffset` (group centre minus point of aim, `packages/shot-groups/src/group-statistics.ts`) when a group is selected, otherwise zero, so no typed field is added.
 
 Implementation: the offset shifts the density of $x$ and the interval of $y$ in the same composite Simpson rule of 2000 intervals as the centred integral, with the $x$ range cut to $[-a, a] \cap [\delta_x \pm 8\sigma_x]$. The Marcum Q function is used only as a circular cross-check in the tests, as the noncentral chi-square distribution of two degrees of freedom written as a Poisson mixture of central ones (a sum of known terms, no special function).
 
@@ -59,7 +59,7 @@ Analytic: synthetic cases, closed forms and a seeded Monte Carlo.
 ## Where in the app
 
 - `packages/shot-groups/src/hit-probability.ts` (`ellipseProbability`, `hitProbability`, `shotsToHit`)
-- `packages/core/src/groups/statistics.ts` (`AimOffset`)
+- `packages/shot-groups/src/group-statistics.ts` (`AimOffset`)
 - [Hit probability](../models/hit-probability.md)
 
 ## Confidence
