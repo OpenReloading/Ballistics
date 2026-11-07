@@ -1,6 +1,8 @@
 {
   "id": "accurate",
   "name": "Accurate",
+  "country": "US",
+  "website": "https://hodgdonpowderco.com/accurate/",
   "provenance": {
     "kind": "published",
     "sources": [
@@ -9,6 +11,13 @@
         "url": "https://shop.hodgdon.com/accurate-1680/",
         "retrieved": "2026-10-13",
         "fields": ["name"]
+      },
+      {
+        "source": "hodgdon-powder-company-locations",
+        "url": "https://hodgdonpowderco.com/locations/",
+        "retrieved": "2026-11-06",
+        "fields": ["country", "website"],
+        "note": "Corporate headquarters: Hodgdon Powder Company, 6430 Vista Drive, Shawnee, KS 66218, United States. The Accurate brand page is on the same site; accuratepowder.com no longer serves it."
       }
     ]
   }

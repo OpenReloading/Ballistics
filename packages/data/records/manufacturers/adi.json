@@ -1,6 +1,8 @@
 {
   "id": "adi",
   "name": "ADI",
+  "country": "AU",
+  "website": "https://www.adiworldclass.com.au/",
   "provenance": {
     "kind": "published",
     "sources": [
@@ -9,6 +11,13 @@
         "url": "https://www.adiworldclass.com.au/rifle/",
         "retrieved": "2026-10-13",
         "fields": ["name"]
+      },
+      {
+        "source": "adi-world-class-powders-contact-page",
+        "url": "https://www.adiworldclass.com.au/contact/",
+        "retrieved": "2026-10-19",
+        "fields": ["country", "website"],
+        "note": "Reloading enquiries: Australian Munitions, Private Bag No. 1, Mulwala, New South Wales 2647, Australia."
       }
     ]
   }

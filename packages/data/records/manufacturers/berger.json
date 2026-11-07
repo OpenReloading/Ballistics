@@ -1,6 +1,8 @@
 {
   "id": "berger",
   "name": "Berger",
+  "country": "US",
+  "website": "https://bergerbullets.com/",
   "provenance": {
     "kind": "published",
     "sources": [
@@ -9,6 +11,15 @@
         "url": "https://bergerbullets.com/pdf/Quick-Reference-Sheets.pdf",
         "retrieved": "2026-09-05",
         "fields": ["name"]
+      },
+      {
+        "title": "Berger Bullets, privacy policy",
+        "publisher": "Berger Bullets",
+        "url": "https://bergerbullets.com/privacy-policy/",
+        "retrieved": "2026-11-06",
+        "fields": ["country", "website"],
+        "origin": "manufacturer",
+        "note": "Contact by mail: Capstone Precision Group, 4051 N Higley Rd, Mesa, AZ 85215, United States."
       }
     ]
   }

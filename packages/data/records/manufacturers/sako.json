@@ -1,6 +1,8 @@
 {
   "id": "sako",
   "name": "Sako",
+  "country": "FI",
+  "website": "https://www.sako.global/",
   "provenance": {
     "kind": "published",
     "sources": [
@@ -9,6 +11,15 @@
         "url": "https://media.sako.global/image/upload/v1716205194/Sako-RELO-kaikki-kaliiperit-checked_kqmd86.pdf",
         "retrieved": "2026-10-08",
         "fields": ["name"]
+      },
+      {
+        "title": "Sako, home page",
+        "publisher": "Sako Ltd",
+        "url": "https://www.sako.global/",
+        "retrieved": "2026-11-06",
+        "fields": ["country", "website"],
+        "origin": "manufacturer",
+        "note": "Footer: Sako Ltd, P.O. Box 149, FI-11101 Riihimäki, Finland."
       }
     ]
   }
