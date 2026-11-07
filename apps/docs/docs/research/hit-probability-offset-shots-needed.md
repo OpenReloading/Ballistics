@@ -18,7 +18,7 @@ Implementation: the offset shifts the density of $x$ and the interval of $y$ in 
 
 Monte Carlo: a circular normal of standard deviation 1 (lengths in units of $\sigma$) centred $d$ from the aim point on a circle of radius $R$; $d = 0, 0.5, 1, 1.5, 2, 3, 4$ and $R = 0.25, 0.5, 1, 2, 3, 4$ (42 cases), 400 000 shots per case from a fixed seed (mulberry32, Box-Muller); the sampling error is at most 0.08 percentage points. The unit tests add five cases with unequal standard deviations, elliptical zones and offsets along both axes (200 000 shots, same tolerance).
 
-Run: `node packages/core/scripts/hit-probability-offset.mts`; the unit tests are `packages/shot-groups/test/hit-probability-offset.test.ts`.
+Run: `node packages/shot-groups/scripts/hit-probability-offset.mts`; the unit tests are `packages/shot-groups/test/hit-probability-offset.test.ts`.
 
 ## Formulas
 

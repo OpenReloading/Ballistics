@@ -1,11 +1,11 @@
 // Offset of the point of impact and shots needed against a seeded Monte Carlo
 // (apps/docs/docs/research/hit-probability-offset-shots-needed.md).
-// Run: node packages/core/scripts/hit-probability-offset.mts
+// Run: node packages/shot-groups/scripts/hit-probability-offset.mts
 // Synthetic case: a circular normal dispersion of 1 (all lengths in units of sigma).
 // shot-groups by its build (after `pnpm run build`), so core does not depend on it: the API image
 // builds core's dependencies
 // shortcut: a path into another workspace's build; move the script to shot-groups when core empties (W3.4)
-import { ellipseProbability, shotsToHit } from '../../shot-groups/dist/index.js'
+import { ellipseProbability, shotsToHit } from '../src/index.ts'
 import { normals } from './rng.mts'
 
 const draws = 400_000
@@ -14,16 +14,23 @@ const radii = [0.25, 0.5, 1, 2, 3, 4]
 const sigma = { horizontal: 1, vertical: 1 }
 
 const draw = normals(369)
+
+/** Hits inside the circle of radius `r` of `draws` shots with unit sigma, offset by `d`. */
+function simulatedHits(d: number, r: number): number {
+  let hits = 0
+  for (let i = 0; i < draws; i++) {
+    const x = d + draw()
+    const y = draw()
+    if (x * x + y * y <= r * r) hits++
+  }
+  return hits
+}
+
 let worst = 0
 console.log('d/sigma,R/sigma,model,monte_carlo,difference_pp')
 for (const d of offsets) {
   for (const r of radii) {
-    let hits = 0
-    for (let i = 0; i < draws; i++) {
-      const x = d + draw()
-      const y = draw()
-      if (x * x + y * y <= r * r) hits++
-    }
+    const hits = simulatedHits(d, r)
     const model = ellipseProbability(r, r, sigma, { dx: d, dy: 0 })
     const diff = 100 * (model - hits / draws)
     worst = Math.max(worst, Math.abs(diff))

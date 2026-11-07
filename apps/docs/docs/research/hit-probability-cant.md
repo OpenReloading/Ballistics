@@ -16,7 +16,7 @@ Accept rule, decided before any run: the closed form agrees with the figures of 
 
 Synthetic case: a rifle zeroed with the sight raised to compensate for drop, rolled about the bore by an angle $c$; the drops are 7.93 in at 200 yd and 296 in at 1000 yd (figures of the question, unverified). The closed form is compared with the drop vector rotated about the origin (the same trigonometry: a check of the algebra, not an independent measurement). The simulation draws 400 000 cants per case from a fixed seed (mulberry32, Box-Muller) for cant standard deviations of 0.5, 1, 2, 3 and 5 degrees.
 
-Run: `node packages/core/scripts/hit-probability-cant.mts`.
+Run: `node packages/shot-groups/scripts/hit-probability-cant.mts`.
 
 ## Formulas
 
