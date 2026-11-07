@@ -56,8 +56,9 @@ extend-ignore-re = [
   "Die Datei ist keine OpenReloading-Datendatei\\.",
   # German count of the problems a refused file does not list, that the user data test expects
   "und 2 weitere Probleme",
-  # German repeated-id warning that the core message test expects
+  # German repeated-id warning and unit warning that the import diagnostics test expects
   "Ändern Sie Name, Hersteller, Durchmesser oder Masse der Zeile 3, um sie als eigenen Datensatz zu importieren\\.",
+  "Prüfen Sie die Einheit der Spalte\\.",
   # German umlaut folded to its transliteration by the table import
   "replaceAll\\('ü', 'ue'\\)",
 ]
