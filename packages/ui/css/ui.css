@@ -26,11 +26,25 @@
   --ai-size-input-sm: var(--size-control-bar);
 }
 
-/* 16 px text in every field under a coarse pointer, so iOS does not zoom into it */
+/* 16 px text in every field under a coarse pointer, so iOS does not zoom into it; monospace fields read their own size */
 @media (pointer: coarse) {
   .mantine-Input-input {
     --input-fz: var(--font-size-field);
   }
+
+  .mantine-Input-input[data-monospace] {
+    --_input-fz: var(--font-size-field);
+  }
+}
+
+/* The marks of a checked box or radio take the accent's text color of the scheme (Mantine's white is 2.5:1 on the
+   dark accent); an iconColor prop still wins */
+.mantine-Checkbox-root {
+  --checkbox-icon-color: var(--mantine-primary-color-contrast);
+}
+
+.mantine-Radio-root {
+  --radio-icon-color: var(--mantine-primary-color-contrast);
 }
 
 /* Input edges are control edges (3:1) on the page color; Mantine's error and focus edges still win */

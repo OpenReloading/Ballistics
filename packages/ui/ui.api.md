@@ -5,10 +5,10 @@
 ```ts
 
 import { MantineProviderProps } from '@mantine/core';
-import type { ReactElement } from 'react';
+import { ReactElement } from 'react';
 
 // @public
-export function UiProvider(props: Omit<MantineProviderProps, 'theme' | 'cssVariablesResolver'>): ReactElement;
+export function UiProvider(input: Omit<MantineProviderProps, 'cssVariablesResolver'>): ReactElement;
 
 // (No @packageDocumentation comment for this package)
 

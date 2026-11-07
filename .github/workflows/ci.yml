@@ -137,6 +137,8 @@ jobs:
             "mcr.microsoft.com/playwright:v$version-noble@sha256:"*) docker pull --quiet "$PLAYWRIGHT_IMAGE" ;;
             *) echo "::error::PLAYWRIGHT_IMAGE (ci.yml) is not v$version-noble, the locked playwright"; exit 1 ;;
           esac
+          image=$(docker run --rm "$PLAYWRIGHT_IMAGE" cat /ms-playwright/.docker-info | jq -r .driverVersion)
+          [ "$image" = "$version" ] || { echo "::error::the digest of PLAYWRIGHT_IMAGE (ci.yml) is Playwright $image, not $version"; exit 1; }
           docker run --rm --init --ipc=host --user "$(id -u):$(id -g)" --env HOME=/tmp --env CI \
             --volume "$PWD:$PWD" --workdir "$PWD/packages/ui" "$PLAYWRIGHT_IMAGE" npm run test:browser
       - if: matrix.e2eUnit

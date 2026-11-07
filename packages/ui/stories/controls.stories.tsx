@@ -1,4 +1,4 @@
-import { Button, Group, Stack, TextInput } from '@mantine/core'
+import { Button, Checkbox, Group, Radio, Stack, TextInput } from '@mantine/core'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect } from 'storybook/test'
 
@@ -32,6 +32,27 @@ export const Fields: Story = {
       <TextInput size="sm" label="Field with an error" error="Enter a number" />
     </Stack>
   ),
+}
+
+/** A checked box and radio: their marks take the accent's text color of the scheme. */
+export const Choices: Story = {
+  render: () => (
+    <Stack>
+      <Checkbox defaultChecked label="Seated" />
+      <Radio defaultChecked label="Crimped" />
+    </Stack>
+  ),
+  play: async ({ canvasElement }) => {
+    const marks = canvasElement.querySelectorAll('.mantine-Checkbox-icon, .mantine-Radio-icon')
+    await expect(marks).toHaveLength(2)
+    if (matchMedia('(forced-colors: active)').matches) return
+    const dark = matchMedia('(prefers-color-scheme: dark)').matches
+    for (const mark of marks) {
+      await expect(getComputedStyle(mark).color).toBe(
+        dark ? 'rgb(16, 18, 27)' : 'rgb(255, 255, 255)',
+      )
+    }
+  },
 }
 
 /** Buttons at the row and bar sizes, filled, light and default. */

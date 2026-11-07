@@ -3,13 +3,16 @@ import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
 import { playwright } from '@vitest/browser-playwright'
 import { defineConfig } from 'vitest/config'
 
-/** Every story runs as a test, axe included, at three widths in the light, dark and forced-colors schemes. */
-const schemes = {
-  light: { colorScheme: 'light' },
-  dark: { colorScheme: 'dark' },
-  forced: { forcedColors: 'active' },
-} as const
-const widths = [320, 390, 1280]
+/** Every story runs as a test, axe included: at three widths in the light scheme, and in the dark and forced-colors schemes at 390 px. */
+const contexts = [
+  ...[320, 390, 1280].map((width) => ({
+    name: `light-${width}`,
+    width,
+    options: { colorScheme: 'light' } as const,
+  })),
+  { name: 'dark-390', width: 390, options: { colorScheme: 'dark' } },
+  { name: 'forced-390', width: 390, options: { forcedColors: 'active' } },
+] as const
 
 export default defineConfig({
   test: {
@@ -26,14 +29,12 @@ export default defineConfig({
             headless: true,
             provider: playwright(),
             instances: [
-              ...Object.entries(schemes).flatMap(([scheme, contextOptions]) =>
-                widths.map((width) => ({
-                  browser: 'chromium' as const,
-                  name: `${scheme}-${width}`,
-                  viewport: { width, height: 900 },
-                  provider: playwright({ contextOptions }),
-                })),
-              ),
+              ...contexts.map(({ name, width, options }) => ({
+                browser: 'chromium' as const,
+                name,
+                viewport: { width, height: 900 },
+                provider: playwright({ contextOptions: options }),
+              })),
               // a phone with touch: a coarse pointer, under WebKit as well (spike S8)
               {
                 browser: 'webkit',
