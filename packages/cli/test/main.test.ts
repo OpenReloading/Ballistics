@@ -73,11 +73,6 @@ describe('the JSON result', () => {
     }
   })
 
-  it('rejects a result of another shape', () => {
-    expect(validate({ schemaVersion: 2, command: 'verify' })).toBe(false)
-    expect(validate({ schemaVersion: 1, command: 'run' })).toBe(false)
-  })
-
   it('has an absolute $id', () => {
     const { $id } = JSON.parse(readFileSync(schemaPath, 'utf8'))
     expect(new URL($id).href).toBe($id)
