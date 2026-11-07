@@ -29,7 +29,7 @@ import { compareHref, maxComparedBullets } from '../lib/compare-ids.ts'
 import { bulletIncomplete } from '../lib/complete-records.ts'
 import { facetNames } from '../lib/facets.ts'
 import { listTitles } from '../lib/list-titles.ts'
-import { countText, filterText, matchingText, widestCount } from '../lib/lists.ts'
+import { filterText, matchingText } from '../lib/lists.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import {
   countOrigins,
@@ -43,23 +43,11 @@ import {
 import type { UnitSystem } from '../lib/units.ts'
 import { userBullets } from '../lib/variants.ts'
 import { CompareButton, SelectionSummary, usePicks } from './compare-picks.tsx'
-import {
-  type DirectoryColumn,
-  DirectoryFilters,
-  DirectoryTable,
-  useListState,
-} from './directory-table.tsx'
+import { DirectoryPage } from './directory-page.tsx'
+import { type DirectoryColumn, DirectoryTable, useListState } from './directory-table.tsx'
 import { FacetFilters, useFacets } from './facet-filters.tsx'
-import { LibraryTabs } from './library-tabs.tsx'
-import {
-  DeleteRow,
-  SourceFilter,
-  sourceColumn,
-  useResolved,
-  useUserRecords,
-} from './list-sources.tsx'
+import { DeleteRow, sourceColumn, useResolved, useUserRecords } from './list-sources.tsx'
 import { MissingMark } from './missing-mark.tsx'
-import { BarCount, PageBar } from './page-bar.tsx'
 import { EmptyList } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
 
@@ -80,8 +68,7 @@ export function BulletList({
   packed: PackedBullet[]
   cartridges?: FitCartridge[]
 }) {
-  const tr = useTranslation()
-  const { t } = tr
+  const { t } = useTranslation()
   const [records, removeRow] = useUserRecords()
   const mine = useResolved(records, userBullets)
   // the browser's designs first: a few rows would sit unseen behind 1684 catalogue rows
@@ -129,7 +116,6 @@ export function BulletList({
   )
 
   const on = readOrigins(state.sources)
-  const count = countText(tr, shown.length, items.length, 'bullets')
   const named = [
     fits && t('fitting {name}', { name: fits.name }),
     onlyText(t, on),
@@ -250,67 +236,58 @@ export function BulletList({
       .join(' · ')
   }
   return (
-    <>
-      <PageBar
-        title={listTitles.bullets}
-        translated
-        status={
-          <>
-            <BarCount widest={widestCount(tr, items.length, 'bullets')}>{count}</BarCount>
-            <SelectionSummary
-              count={picked.length}
-              max={maxComparedBullets}
-              onClear={() => replace([])}
-            />
-          </>
-        }
-        actions={
-          <>
-            <CompareButton
-              count={picked.length}
-              min={2}
-              max={maxComparedBullets}
-              href={compareHref(picked)}
-              need={t('Pick 2 to {max}', { max: maxComparedBullets })}
-            />
-            <Button
-              component={Link}
-              href="/bullets/designer"
-              leftSection={<Plus aria-hidden="true" />}
-            >
-              {t('New bullet')}
-            </Button>
-            <UnitsIconButton />
-          </>
-        }
-      />
-      <LibraryTabs />
-      <div className="directory">
-        <DirectoryFilters
-          query={state.query}
-          onQuery={(q) => set({ query: q })}
-          placeholder={t('Manufacturer, name, 168, .308 or 7.82…')}
-          sorting={{ columns, sort: state.sort, onSort: (sort) => set({ sort }) }}
-          scope={
-            fits && {
-              label: t('Fits {name}', { name: fits.name }),
-              onRemove: () => set({ fits: '' }),
-            }
-          }
-        >
-          <SourceFilter
-            src={state.sources}
-            counts={counts}
-            onChange={(src) => set({ sources: src })}
+    <DirectoryPage
+      title={listTitles.bullets}
+      noun="bullets"
+      shown={shown.length}
+      total={items.length}
+      status={
+        <SelectionSummary
+          count={picked.length}
+          max={maxComparedBullets}
+          onClear={() => replace([])}
+        />
+      }
+      actions={
+        <>
+          <CompareButton
+            count={picked.length}
+            min={2}
+            max={maxComparedBullets}
+            href={compareHref(picked)}
+            need={t('Pick 2 to {max}', { max: maxComparedBullets })}
           />
-          <FacetFilters
-            facets={facets}
-            options={options}
-            state={state}
-            onChange={(next) => set({ facets: next })}
-            onClear={clear}
-          />
-        </DirectoryFilters>
+          <Button
+            component={Link}
+            href="/bullets/designer"
+            leftSection={<Plus aria-hidden="true" />}
+          >
+            {t('New bullet')}
+          </Button>
+          <UnitsIconButton />
+        </>
+      }
+      state={state}
+      set={set}
+      placeholder={t('Manufacturer, name, 168, .308 or 7.82…')}
+      columns={columns}
+      counts={counts}
+      scope={
+        fits && {
+          label: t('Fits {name}', { name: fits.name }),
+          onRemove: () => set({ fits: '' }),
+        }
+      }
+      filters={
+        <FacetFilters
+          facets={facets}
+          options={options}
+          state={state}
+          onChange={(next) => set({ facets: next })}
+          onClear={clear}
+        />
+      }
+      table={
         <DirectoryTable
           rows={shown}
           columns={columns}
@@ -340,7 +317,7 @@ export function BulletList({
           }}
           empty={<EmptyList noun="bullets" filters={filterText(named)} onClear={clear} />}
         />
-      </div>
-    </>
+      }
+    />
   )
 }
