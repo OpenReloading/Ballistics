@@ -1,4 +1,4 @@
-import type { PowderConfidence, PowderFit } from '@open-reloading/core'
+import type { PowderConfidence, PowderFit } from '@open-reloading/ballistics'
 import {
   fromSi,
   type Powder,

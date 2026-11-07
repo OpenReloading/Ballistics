@@ -1,11 +1,7 @@
 import { InputError } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import {
-  bulletStructures,
-  constructionOf,
-  defaultStartPressure,
-  startPressureOf,
-} from '../src/index.ts'
+import { bulletStructures, defaultStartPressure, startPressureOf } from '../src/index.ts'
+import { constructionOf } from '../src/interior/start-pressure.ts'
 
 const constructionOfStructure = (structure?: string) => constructionOf({ structure })
 /** The start pressure of a 610 mm rifle barrel for a bullet structure. */

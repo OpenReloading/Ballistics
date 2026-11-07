@@ -1,12 +1,7 @@
 import { InputError, nth } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import {
-  type ChronographString,
-  fitPowder,
-  interior,
-  pooledVelocitySd,
-  stringLadder,
-} from '../src/index.ts'
+import { type ChronographString, fitPowder, interior, stringLadder } from '../src/index.ts'
+import { pooledVelocitySd } from '../src/interior/fit-strings.ts'
 import { load } from './powder-load.ts'
 import { normals } from './random.ts'
 

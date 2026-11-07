@@ -1,7 +1,7 @@
 'use client'
 
 import { NumberInput, Pill } from '@mantine/core'
-import type { CartridgeDiameters } from '@open-reloading/core'
+import type { CartridgeDiameters } from '@open-reloading/ballistics'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'

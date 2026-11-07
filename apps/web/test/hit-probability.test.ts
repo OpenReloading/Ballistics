@@ -1,4 +1,4 @@
-import type { TrajectoryPoint } from '@open-reloading/core'
+import type { TrajectoryPoint } from '@open-reloading/ballistics'
 import type { TargetFace } from '@open-reloading/schema'
 import { InputError } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'

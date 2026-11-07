@@ -1,4 +1,4 @@
-import { powderModelValues, recordResistance } from '@open-reloading/core'
+import { powderModelValues, recordResistance } from '@open-reloading/ballistics'
 import type { Powder } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'

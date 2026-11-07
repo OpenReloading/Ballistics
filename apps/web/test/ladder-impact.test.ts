@@ -1,4 +1,4 @@
-import type { Projectile } from '@open-reloading/core'
+import type { Projectile } from '@open-reloading/ballistics'
 import type { SessionRecord, ShotGroup } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { linkString, stringChoices } from '../src/lib/chrono-link.ts'

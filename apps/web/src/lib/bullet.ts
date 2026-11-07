@@ -1,4 +1,4 @@
-import { millerStability, type Projectile } from '@open-reloading/core'
+import { millerStability, type Projectile } from '@open-reloading/ballistics'
 import { type Bullet, baseTypes, fromSi, toSi } from '@open-reloading/schema'
 import { msg } from '../i18n/translate.ts'
 import type { FieldRow } from './record-fields.ts'

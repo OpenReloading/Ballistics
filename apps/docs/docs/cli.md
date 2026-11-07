@@ -6,7 +6,7 @@ description: One compute operation of the API offline, the list of operations wi
 
 # Command line
 
-`packages/cli` (`@open-reloading/cli`, bin `ballistics`) measures how far the interior model is from printed load rows it was not fitted to, and says whether a changed model got better. It adds no model of its own: a row becomes an interior run through `recordLoad` of `@open-reloading/ballistics`, which the CLI imports through `@open-reloading/core` (the [M3 page](models/interior-m3.md#load-from-records)) and the seating of `@open-reloading/drawing`. Results are simulations compared with printed values, never load data.
+`packages/cli` (`@open-reloading/cli`, bin `ballistics`) measures how far the interior model is from printed load rows it was not fitted to, and says whether a changed model got better. It adds no model of its own: a row becomes an interior run through `recordLoad` of `@open-reloading/ballistics` (the [M3 page](models/interior-m3.md#load-from-records)) and the seating of `@open-reloading/drawing`. Results are simulations compared with printed values, never load data.
 
 ```sh
 pnpm run build
@@ -26,7 +26,7 @@ node packages/cli/dist/bin.js run interior --input packages/cli/examples/interio
 node packages/cli/dist/bin.js operations
 ```
 
-Record ids in a body (`cartridge`, `bullet`, `powder`) resolve against the records of `--records <dir>` (repeatable, `BALLISTICS_RECORDS`), by default the records of the data package, as for `verify`. An unknown id is bad input. A body the schema rejects is bad input with the issues in the error object (`issues`, each with `path` and `message`). An answer the route gives with 422 (an input core refuses, a charge target out of reach, a load file without a value) is a refusal: the error object carries it as `answer`.
+Record ids in a body (`cartridge`, `bullet`, `powder`) resolve against the records of `--records <dir>` (repeatable, `BALLISTICS_RECORDS`), by default the records of the data package, as for `verify`. An unknown id is bad input. A body the schema rejects is bad input with the issues in the error object (`issues`, each with `path` and `message`). An answer the route gives with 422 (an input the model refuses, a charge target out of reach, a load file without a value) is a refusal: the error object carries it as `answer`.
 
 `operations` writes one JSON document, `{"operations":[...]}`, with each operation's `name`, `summary`, `description`, `input` (the JSON Schema 2020-12 of the body) and `output` (that of the 200 answer). The schemas are written from the zod definitions the API's OpenAPI document is built from.
 
@@ -83,7 +83,7 @@ A pressure is compared only with pressures of its own basis: `pressureByBasis` o
 
 ### Muzzle distance
 
-A row with a muzzle distance above 0 (a velocity printed at `V5`, for example) is compared at the muzzle: its printed velocity is turned into the muzzle velocity whose flown speed at that distance equals it, with `muzzleVelocityFromDownrange` of core ([model page](models/exterior-drag.md#speed-measured-downrange)), over the bullet record's G7 ballistic coefficients (else its G1 ones) in the ICAO standard atmosphere at sea level, before the error and the interval. A bullet without a coefficient, such as a stand-in, or with two of one model that share a band start, gives `noBulletDrag`. A row without a distance is a muzzle value and is not corrected.
+A row with a muzzle distance above 0 (a velocity printed at `V5`, for example) is compared at the muzzle: its printed velocity is turned into the muzzle velocity whose flown speed at that distance equals it, with `muzzleVelocityFromDownrange` of ballistics ([model page](models/exterior-drag.md#speed-measured-downrange)), over the bullet record's G7 ballistic coefficients (else its G1 ones) in the ICAO standard atmosphere at sea level, before the error and the interval. A bullet without a coefficient, such as a stand-in, or with two of one model that share a band start, gives `noBulletDrag`. A row without a distance is a muzzle value and is not corrected.
 
 The powder parameters are those of the records (`--params records`, the only mode).
 
@@ -108,7 +108,7 @@ The code of the evaluation itself (rows, split, the metrics and the percentiles,
 
 `verify` takes no `--baseline` or `--candidate`, `compare` takes no `--model`: such an option is bad input.
 
-`verify --rows <path> [--model m3|<module>]` evaluates one model on the split. `m3` is the model of the installed core; a module path is a file that exports `interior(load, options?)` with the signature of core's `interior`.
+`verify --rows <path> [--model m3|<module>]` evaluates one model on the split. `m3` is the model of the installed `@open-reloading/ballistics`; a module path is a file that exports `interior(load, options?)` with the signature of its `interior`.
 
 `compare --baseline <m3|module|verify.json> --candidate <m3|module>` evaluates both on the same rows and split and gives each result and the change, candidate minus baseline, overall and per powder family (and per group of `--group-by`). A baseline `.json` is a saved `verify` result: it must be of the same split, rows and records, else the run is refused. A positive change of an error is worse; the change of the coverage is in fractions, the change of used rows in rows. The candidate may use fewer rows than the baseline: `usedRows` shows it.
 

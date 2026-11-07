@@ -1,5 +1,4 @@
 import {
-  InputError,
   type InteriorLoad,
   type interior,
   muzzleVelocityFromDownrange,
@@ -7,12 +6,13 @@ import {
   recordLoad,
   standardAtmosphere,
   ValueError,
-  waterDensityGramsPerCm3,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
 import { bulletDimensions } from '@open-reloading/drawing/bullet'
 import { chamberOf, seat } from '@open-reloading/drawing/seating'
 import type { Bullet, Cartridge } from '@open-reloading/schema'
 import { bulletListFields, loadWaterCapacity, toSi } from '@open-reloading/schema'
+import { InputError } from '@open-reloading/statistics'
+import { waterDensityGramsPerCm3 } from '@open-reloading/units'
 import type { Records } from './records.ts'
 import type { Row } from './rows.ts'
 import { type Split, splitOf } from './split.ts'

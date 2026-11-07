@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@mantine/core'
-import { bulletFits, type CartridgeDiameters } from '@open-reloading/core'
+import { bulletFits, type CartridgeDiameters } from '@open-reloading/ballistics'
 import { Plus } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useDeferredValue, useMemo } from 'react'

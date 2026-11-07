@@ -1,19 +1,21 @@
 import { InputError, nth } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
 import {
-  calibratePooled,
   fitPowder,
-  fitPowderPooled,
   type InteriorLoad,
   interior,
   type LadderPoint,
+  PowderFitError,
+  predictPowder,
+} from '../src/index.ts'
+import {
+  calibratePooled,
+  fitPowderPooled,
   type PooledPowderFit,
   type PooledRequest,
   type PooledSession,
-  PowderFitError,
   predictPooled,
-  predictPowder,
-} from '../src/index.ts'
+} from '../src/interior/fit-pooled.ts'
 
 /** Synthetic rifle load as in the single-ladder tests, with its own barrel length. */
 const load = (vivacity: number, length = 0.6): InteriorLoad => ({

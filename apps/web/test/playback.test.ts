@@ -1,4 +1,4 @@
-import { interior } from '@open-reloading/core'
+import { interior } from '@open-reloading/ballistics'
 import { expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import { baseAt, flightAt, flightTime, type StripModel } from '../src/lib/barrel-strip.ts'

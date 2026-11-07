@@ -14,7 +14,7 @@ Interior model ([M3](../models/interior-m3.md), [powder fit](../models/interior-
 
 ## Method
 
-Script: `node packages/core/scripts/propellant-temperature-energy.mts` from the repository root (about 9 minutes, fixed seeds; it evaluates the rule below). The option is `propellant.energyTemperature` (1/K, default 0) on the interior load.
+Script: `node packages/ballistics/scripts/propellant-temperature-energy.mts` from the repository root (about 9 minutes, fixed seeds; it evaluates the rule below). The option is `propellant.energyTemperature` (1/K, default 0) on the interior load.
 
 Assumed figures, none with a source in the [bibliography](../bibliography.md), all unverified: energy coefficient 0.0003 1/K, burn-rate sensitivity 0.004 1/K on both sides of the reference 294.15 K, velocity noise 3 m/s per string mean, pressure noise 3 %.
 
@@ -107,7 +107,7 @@ Analytic: synthetic loads and a synthetic truth with the fitted model's own stru
 - `packages/ballistics/src/interior/model.ts`, `energyAtTemperature`.
 - `packages/ballistics/src/interior/fit.ts`, `fitPowder`.
 - `packages/ballistics/test/interior-energy-temperature.test.ts`.
-- `packages/core/scripts/propellant-temperature-energy.mts`.
+- `packages/ballistics/scripts/propellant-temperature-energy.mts`.
 - `packages/cli/scripts/temperature-energy.mts`, the measured check.
 - Model pages: [M3 interior model](../models/interior-m3.md), [powder fit](../models/interior-powder-fit.md).
 

@@ -78,7 +78,7 @@ analytic. Seeded simulation of a stated distribution; no measured group is used.
 
 ## Where in the app
 
-- `packages/core/src/groups/statistics.ts` (`groupStatistics`, `pooledGroupStatistics`, extreme spread and its mean over groups; unchanged).
+- `packages/shot-groups/src/group-statistics.ts` (`groupStatistics`, `pooledGroupStatistics`, extreme spread and its mean over groups; unchanged).
 - `apps/web/src/components/groups-tab.tsx` (where the lines are shown).
 - [Groups](../models/groups.md), Limits: the replaced sentence above.
 

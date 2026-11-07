@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@mantine/core'
-import { radPerMoa } from '@open-reloading/core'
+import { radPerMoa } from '@open-reloading/ballistics'
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'

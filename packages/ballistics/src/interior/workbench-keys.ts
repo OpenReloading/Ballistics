@@ -62,9 +62,6 @@ const interiorKeys = [
   'engravingLength',
 ] as const satisfies readonly InteriorValueKey[]
 
-/** The SI field values `interiorLoad` reads, one per key of {@link interiorValueKeys}. */
-export interface InteriorValues extends Record<InteriorValueKey, number> {}
-
 /** Field keys of the `values` of `interiorLoad`, the workbench fields a load keeps (`charge` and `analysis.overrides`). */
 export const interiorValueKeys: readonly InteriorValueKey[] = interiorKeys satisfies Complete<
   InteriorValueKey,

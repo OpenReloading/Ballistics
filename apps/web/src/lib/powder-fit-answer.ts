@@ -1,7 +1,6 @@
 import {
   fitPowder,
   fitPowderSessions,
-  InputError,
   type InteriorLoad,
   interior,
   type LadderPoint,
@@ -13,7 +12,8 @@ import {
   powderPressureRange,
   predictPowder,
   stringLadder,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
+import { InputError } from '@open-reloading/statistics'
 import { errorText } from './error-text.ts'
 import { nth } from './nth.ts'
 import type {
@@ -64,7 +64,7 @@ function heldFit(fit: PowderFit) {
 /**
  * Answers `q` through `post`: the fit and band as soon as they are known, then the slow pressure
  * range. Unless `anyway`, a thin ladder leaves out the values of `thinRule.values`, and the burn
- * coefficient is fitted alone when a value asked for besides it moves with it (`held`): the core
+ * coefficient is fitted alone when a value asked for besides it moves with it (`held`): the model
  * fits such a value without refusing. On 2 charges every extra value moves with it, pressures or
  * not, so `anyway` lifts both rules. A temperature factor the strings do not resolve is held at 1
  * by `fitPowderSessions` (`temperature`) instead of refusing the fit.

@@ -2,8 +2,8 @@
  * Notes on a target sheet: placeholders `{key.unit}`
  * that show a group's values, resolved on every render. No React, DOM or Next.js.
  */
-import type { GroupStatistics } from '@open-reloading/core'
 import type { ShotGroup } from '@open-reloading/schema'
+import type { GroupStatistics } from '@open-reloading/shot-groups'
 import { formatNumber, plainNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { readoutRows, readouts } from './group-readouts.ts'

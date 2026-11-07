@@ -16,7 +16,7 @@ import {
   recordBoreArea,
   recordResistance,
   ValueError,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
 import {
   type Bullet,
   type Firearm,
@@ -1194,7 +1194,7 @@ function fetchBand(request: unknown, signal: AbortSignal): Promise<SampledBand> 
 
 /**
  * The peak breech pressure (Pa) of `body` at both ends of the cold sensitivity interval `interval`,
- * [low, high], as two runs of the same request (`coldPeakInterval` in core does the same); none at
+ * [low, high], as two runs of the same request (`coldPeakInterval` in ballistics does the same); none at
  * or above the reference, or when a run gives no result.
  */
 async function fetchColdPeak(

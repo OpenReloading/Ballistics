@@ -1,4 +1,4 @@
-import type { PressureRange } from '@open-reloading/core'
+import type { PressureRange } from '@open-reloading/ballistics'
 import { describe, expect, it } from 'vitest'
 import { type CartridgeWithSpecs, limitCheck, maximumCheck } from '../src/compute/limits.ts'
 

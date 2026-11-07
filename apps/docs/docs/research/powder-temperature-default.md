@@ -12,7 +12,7 @@ Interior ballistics, propellant temperature: can a powder record without its own
 
 ## Method
 
-Ball: the closed-vessel burn-rate sensitivities of [Boulkadid 2016](../bibliography.md#boulkadid-2016) for deterred ball powders with about 10 % nitroglycerin, as quoted in issue #842 (the paper's tables were not re-read). Extruded and flake: the velocities at 70 and 125 °F of the 17 powders outside the Extreme line in [Hodgdon 2012](../bibliography.md#hodgdon-2012) (three of them ball: Win 748, AA 2520, AA 2460), each converted to a hot sensitivity $\sigma_h$ by bisection on three stand-in rifle loads (seven-perforated grain, 10.9 g, charges 2.4, 2.8 and 3.2 g, each set to peak at 380 MPa at 294.15 K) so that +30.56 K moves the muzzle velocity as the powder did. Script: `node packages/core/scripts/powder-temperature-default.mts`. Decided in advance: the default is the mean of the 14 extruded powders on the middle load, the interval spans the loads' mean ± 1 SD, and the cold-side peak pressure is shown as an interval over $\sigma_c$ from 0 to 0.0030, never as a point.
+Ball: the closed-vessel burn-rate sensitivities of [Boulkadid 2016](../bibliography.md#boulkadid-2016) for deterred ball powders with about 10 % nitroglycerin, as quoted in issue #842 (the paper's tables were not re-read). Extruded and flake: the velocities at 70 and 125 °F of the 17 powders outside the Extreme line in [Hodgdon 2012](../bibliography.md#hodgdon-2012) (three of them ball: Win 748, AA 2520, AA 2460), each converted to a hot sensitivity $\sigma_h$ by bisection on three stand-in rifle loads (seven-perforated grain, 10.9 g, charges 2.4, 2.8 and 3.2 g, each set to peak at 380 MPa at 294.15 K) so that +30.56 K moves the muzzle velocity as the powder did. Script: `node packages/ballistics/scripts/powder-temperature-default.mts`. Decided in advance: the default is the mean of the 14 extruded powders on the middle load, the interval spans the loads' mean ± 1 SD, and the cold-side peak pressure is shown as an interval over $\sigma_c$ from 0 to 0.0030, never as a point.
 
 ## Formulas
 
@@ -43,7 +43,7 @@ Public. Boulkadid 2016 (as quoted, unverified here) and the Hodgdon 2012 maker t
 ## Where in the app
 
 - `packages/ballistics/src/interior/temperature-default.ts`, `defaultSensitivity`, `coldPeakInterval`.
-- `packages/core/scripts/powder-temperature-default.mts`, the derivation.
+- `packages/ballistics/scripts/powder-temperature-default.mts`, the derivation.
 - `apps/web/src/lib/interior-request.ts`, the default in the run.
 - `apps/web/src/components/workbench-outcome.ts`, the notes.
 - Model page: [M3, default by grain form](../models/interior-m3.md#default-by-grain-form).

@@ -1,19 +1,20 @@
 import { InputError, nth } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
+import { dragTables } from '../src/drag-tables.ts'
+import { airAt, speedOfSound } from '../src/exterior/atmosphere.ts'
 import {
-  airAt,
-  type DragInput,
-  type DragTable,
   dragCoefficient,
-  dragModels,
   dragSegment,
   dragTableOf,
-  dragTables,
   heldSegment,
   inDragTable,
-  lbPerSqInToKgPerSqM,
   segmentCoefficient,
-  speedOfSound,
+} from '../src/exterior/drag.ts'
+import {
+  type DragInput,
+  type DragTable,
+  dragModels,
+  lbPerSqInToKgPerSqM,
   standardAtmosphere,
   type TrajectoryInput,
   trajectory,

@@ -1,4 +1,4 @@
-import type { Projectile } from '@open-reloading/core'
+import type { Projectile } from '@open-reloading/ballistics'
 import type { Bullet } from '@open-reloading/schema'
 import { useEffect, useMemo, useState } from 'react'
 import { fetchRecord } from '../lib/api-fetch.ts'

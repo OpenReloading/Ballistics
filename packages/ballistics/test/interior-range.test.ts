@@ -10,8 +10,8 @@ import {
   type PressureTolerances,
   placeMaximum,
   pressureToleranceDefaults,
-  toleranceRange,
 } from '../src/index.ts'
+import { toleranceRange } from '../src/interior/range.ts'
 import { m3Load } from './fixtures.ts'
 
 type Toy = { q: number; b: number; v: number }

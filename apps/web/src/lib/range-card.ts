@@ -1,4 +1,4 @@
-import type { TrajectoryPoint } from '@open-reloading/core'
+import type { TrajectoryPoint } from '@open-reloading/ballistics'
 import { formatNumber, localizeNumber } from '../i18n/number.ts'
 import type { Translator } from '../i18n/translate.ts'
 import {

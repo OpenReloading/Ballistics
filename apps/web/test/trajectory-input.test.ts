@@ -1,4 +1,4 @@
-import { lbPerSqInToKgPerSqM } from '@open-reloading/core'
+import { lbPerSqInToKgPerSqM } from '@open-reloading/ballistics'
 import { describe, expect, it } from 'vitest'
 import { initialFields, siValues } from '../src/lib/field-spec.ts'
 import {

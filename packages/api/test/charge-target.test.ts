@@ -3,7 +3,7 @@ import {
   interior,
   interiorPressureRange,
   pressureToleranceDefaults,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
 import { describe, expect, it } from 'vitest'
 import { buildApp } from '../src/app.ts'
 import { chargeTargetExample } from '../src/compute/charge-schema.ts'

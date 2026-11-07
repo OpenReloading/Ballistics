@@ -4,7 +4,7 @@
  * changes the situation. A message states facts about the inputs and the model only, never a
  * statement about the load.
  */
-import { type AdvisoryId, chargeTooSmallRatio } from '@open-reloading/core'
+import { type AdvisoryId, chargeTooSmallRatio } from '@open-reloading/ballistics'
 
 /** The English words of one rule. */
 export interface AdvisoryText {

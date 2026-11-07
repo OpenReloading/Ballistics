@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core'
-import type { TrajectoryPoint } from '@open-reloading/core'
+import type { TrajectoryPoint } from '@open-reloading/ballistics'
 import type { ShotGroup, TargetSheet } from '@open-reloading/schema'
 import type { ReactNode } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'

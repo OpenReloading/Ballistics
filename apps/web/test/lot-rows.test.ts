@@ -1,4 +1,4 @@
-import { chargeLadder, type InteriorLoad, interior } from '@open-reloading/core'
+import { chargeLadder, type InteriorLoad, interior } from '@open-reloading/ballistics'
 import { describe, expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import { exampleInterior, exampleRecords, loadExample } from '../src/lib/example-data.ts'

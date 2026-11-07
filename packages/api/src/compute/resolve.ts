@@ -1,6 +1,7 @@
-/** Database records to core inputs, with exact unit conversions. */
-import { type Aerodynamics, InputError, type Projectile } from '@open-reloading/core'
+/** Database records to model inputs, with exact unit conversions. */
+import type { Aerodynamics, Projectile } from '@open-reloading/ballistics'
 import { type Bullet, toSi } from '@open-reloading/schema'
+import { InputError } from '@open-reloading/statistics'
 import type { Catalogue } from '../catalogue/types.ts'
 import { type ResolvedRecord, resolvedRecord } from './answer.ts'
 import type { CartridgeWithSpecs } from './limits.ts'

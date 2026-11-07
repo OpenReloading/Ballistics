@@ -1,7 +1,7 @@
 'use client'
 
 import { Anchor, NativeSelect } from '@mantine/core'
-import { cartridgeDiameters } from '@open-reloading/core'
+import { cartridgeDiameters } from '@open-reloading/ballistics'
 import { fullSection, svgPath, toPartFrame } from '@open-reloading/drawing'
 import { bulletDimensions } from '@open-reloading/drawing/bullet'
 import { drawnTables } from '@open-reloading/drawing/cartridge'

@@ -1,4 +1,4 @@
-import { pressureToleranceDefaults } from '@open-reloading/core'
+import { pressureToleranceDefaults } from '@open-reloading/ballistics'
 
 /** The highest volume tolerance the API takes (`tolerances.volumeFraction`). */
 const volumeFractionMax = 0.2

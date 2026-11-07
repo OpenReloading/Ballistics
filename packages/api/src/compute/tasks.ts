@@ -8,7 +8,6 @@ import {
   type ChargeTarget,
   comparePlanCandidates,
   fitTruingStrings,
-  InputError,
   type InteriorLoad,
   type InteriorOptions,
   interior,
@@ -23,7 +22,8 @@ import {
   trajectory,
   trueDrag,
   trueMuzzleVelocity,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
+import { InputError } from '@open-reloading/statistics'
 
 /** The deadline passed while the task was queued or running. */
 export class ComputeTimeout extends Error {}

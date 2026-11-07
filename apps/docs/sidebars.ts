@@ -97,7 +97,7 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Libraries',
       collapsed: true,
-      items: ['schema', 'core', 'drawing', 'importers', 'data'].map((name) => `libraries/${name}`),
+      items: ['schema', 'drawing', 'importers', 'data'].map((name) => `libraries/${name}`),
     },
     'release',
     'ci-tools',

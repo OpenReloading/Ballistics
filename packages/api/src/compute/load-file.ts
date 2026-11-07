@@ -13,7 +13,7 @@ import {
   overrideResistance,
   powderModelValues,
   ValueError,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
 import {
   type AnalysisKey,
   analysisKinds,

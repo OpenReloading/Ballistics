@@ -1,20 +1,18 @@
 import { InputError, nth } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
+import { dragTables } from '../src/drag-tables.ts'
+import { airDensity } from '../src/exterior/atmosphere.ts'
+import { dragCoefficient } from '../src/exterior/drag.ts'
+import { compareTruingFits, type TruingSession, trueDragSessions } from '../src/exterior/truing.ts'
 import {
   type Air,
-  airDensity,
-  compareTruingFits,
-  dragCoefficient,
-  dragTables,
   lbPerSqInToKgPerSqM,
   type Observation,
   standardAtmosphere,
   type TrajectoryInput,
   TruingError,
-  type TruingSession,
   trajectory,
   trueDrag,
-  trueDragSessions,
   trueMuzzleVelocity,
 } from '../src/index.ts'
 

@@ -6,7 +6,7 @@
 import { type InteriorLoad, interior } from './model.ts'
 
 /** Grain forms of a powder record (`grainForm`). */
-export type GrainForm = 'ball' | 'extruded' | 'flake' | 'other'
+type GrainForm = 'ball' | 'extruded' | 'flake' | 'other'
 
 /** A default sensitivity with its intervals and its source, 1/K. */
 export interface SensitivityDefault {

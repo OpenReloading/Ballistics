@@ -46,7 +46,7 @@ export type PooledTarget = Omit<PooledSession, 'ladder'>
 export type PooledRequest = 'burnRate' | 'temperatureFactor'
 
 /** Gaussian priors of the per-powder parameters, by powder name, in the form of `PowderPrior`. */
-export type PooledPriors = Readonly<
+type PooledPriors = Readonly<
   Record<string, Partial<Record<PooledRequest, PowderPrior | undefined>> | undefined>
 >
 
@@ -77,16 +77,16 @@ export interface PooledFitOptions {
  * Default spreads of the random effects (assumptions): a rifle moves the velocity by about 1 %, a
  * lot the burn coefficient by about 3 %.
  */
-export const pooledDefaults = { rifleSigma: 0.01, lotSigma: 0.03 }
+const pooledDefaults = { rifleSigma: 0.01, lotSigma: 0.03 }
 
 /**
  * Kind of a pooled parameter: the burn coefficient or temperature factor of a powder, the velocity
  * factor of a rifle, the factor of a lot on its powder's burn coefficient.
  */
-export type PooledParameterKind = 'burnRate' | 'temperatureFactor' | 'rifle' | 'lot'
+type PooledParameterKind = 'burnRate' | 'temperatureFactor' | 'rifle' | 'lot'
 
 /** A fitted parameter of the pooled fit. Factors start at 1. */
-export interface PooledPowderParameter {
+interface PooledPowderParameter {
   /** Which parameter. */
   kind: PooledParameterKind
   /** The powder (burn coefficient, temperature factor, lot) or the rifle it belongs to. */
@@ -102,7 +102,7 @@ export interface PooledPowderParameter {
 }
 
 /** Observed and predicted velocity of one ladder point after the fit. */
-export interface PooledResidual {
+interface PooledResidual {
   /** Index of the session in the input. */
   session: number
   /** Charge mass, kg. */

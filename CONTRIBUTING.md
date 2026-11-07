@@ -37,7 +37,7 @@ Where questions, ideas, bugs and record requests go: [README](README.md#communit
 
 - Commit messages and pull request titles follow [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/): `<type>(<scope>): <summary>`.
   - Types: `feat`, `fix`, `perf`, `refactor`, `docs`, `test`, `build`, `ci`, `chore`, `revert`, `style`.
-  - Scope (optional): the workspace or area, for example `core`, `api`, `web`, `data`, `schema`, `drawing`, `importers`, `tools`, `e2e`.
+  - Scope (optional): the workspace or area, for example `ballistics`, `api`, `web`, `data`, `schema`, `drawing`, `importers`, `tools`, `e2e`.
   - Breaking change: no marker before 1.0.0. From 1.0.0 on, `!` after the type or scope, or a `BREAKING CHANGE:` footer.
 - Commits are signed (SSH or GPG key).
 - Branches: `main` is the only long-lived branch. Branch from it as `<type>/<issue>-<slug>` (for example `fix/123-powder-search`) and open the pull request against `main`.

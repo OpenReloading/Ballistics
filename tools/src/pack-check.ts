@@ -15,7 +15,7 @@ import { parse } from 'yaml'
 import { executable } from './executable.ts'
 
 /** The workspaces published to npm. */
-const published = ['schema', 'core', 'drawing', 'importers', 'data']
+const published = ['schema', 'drawing', 'importers', 'data']
 
 /** The fields of package.json the check reads. */
 interface Manifest {

@@ -65,6 +65,6 @@ extend-ignore-re = [
 [default.extend-words]
 # English verb of gyrodynamics (the spin axis precesses)
 precess = "precess"
-# symbols of the equations in packages/core: transverse moment of inertia, burn rate factor
+# symbols of the equations in packages/ballistics: transverse moment of inertia, burn rate factor
 iy = "iy"
 ba = "ba"

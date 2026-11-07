@@ -1,4 +1,4 @@
-import type { LoadNote, LoadNoteRule } from '@open-reloading/core'
+import type { LoadNote, LoadNoteRule } from '@open-reloading/ballistics'
 import { describe, expect, it } from 'vitest'
 import de from '../src/i18n/de.json'
 import { english, translator } from '../src/i18n/translate.ts'

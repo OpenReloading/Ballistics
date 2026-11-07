@@ -12,7 +12,6 @@ COPY packages/ballistics/package.json packages/ballistics/
 COPY packages/shot-groups/package.json packages/shot-groups/
 COPY packages/schema/package.json packages/schema/
 COPY packages/importers/package.json packages/importers/
-COPY packages/core/package.json packages/core/
 COPY packages/data/package.json packages/data/
 COPY packages/api/package.json packages/api/
 COPY packages/drawing/package.json packages/drawing/
@@ -29,10 +28,9 @@ COPY packages/units packages/units
 COPY packages/statistics packages/statistics
 COPY packages/ballistics packages/ballistics
 COPY packages/schema packages/schema
-COPY packages/core packages/core
 COPY packages/data packages/data
 COPY packages/api packages/api
-# core's tests and statistics' draw on the test kit, a dev dependency the filter builds too
+# statistics' tests draw on the test kit, a dev dependency the filter builds too
 COPY tooling/test-kit tooling/test-kit
 RUN pnpm --filter "@open-reloading/api..." run build
 
@@ -50,7 +48,6 @@ COPY packages/ballistics/package.json packages/ballistics/
 COPY packages/shot-groups/package.json packages/shot-groups/
 COPY packages/schema/package.json packages/schema/
 COPY packages/importers/package.json packages/importers/
-COPY packages/core/package.json packages/core/
 COPY packages/data/package.json packages/data/
 COPY packages/api/package.json packages/api/
 COPY packages/drawing/package.json packages/drawing/
@@ -67,7 +64,6 @@ COPY --from=build /app/packages/units/dist packages/units/dist
 COPY --from=build /app/packages/statistics/dist packages/statistics/dist
 COPY --from=build /app/packages/ballistics/dist packages/ballistics/dist
 COPY --from=build /app/packages/schema/dist packages/schema/dist
-COPY --from=build /app/packages/core/dist packages/core/dist
 COPY --from=build /app/packages/data/dist packages/data/dist
 COPY --from=build /app/packages/api/dist packages/api/dist
 COPY LICENSE NOTICE ./
