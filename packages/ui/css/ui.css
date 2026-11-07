@@ -1,0 +1,46 @@
+/* The styles of the interface base, in their order: Mantine, the design tokens, the UI font, then Mantine's controls on
+   the tokens. Import this file once; a Vite build resolves the package imports. */
+@import "@mantine/core/styles.css";
+@import "@open-reloading/design-tokens/tokens.css";
+@import "@fontsource-variable/inter";
+
+/* Control heights from the size tokens, which are 44 px under a coarse pointer: rows (xs), bars (sm) and the dense
+   field of property grids (size="field", 24 px). Mantine sets these on each control, so they are set there too. */
+:root {
+  --mantine-font-size-field: var(--font-size-field);
+}
+
+.mantine-Input-wrapper {
+  --input-height-xs: var(--size-control-row);
+  --input-height-sm: var(--size-control-bar);
+  --input-height-field: var(--size-field);
+}
+
+.mantine-Button-root {
+  --button-height-xs: var(--size-control-row);
+  --button-height-sm: var(--size-control-bar);
+}
+
+.mantine-ActionIcon-root {
+  --ai-size-input-xs: var(--size-control-row);
+  --ai-size-input-sm: var(--size-control-bar);
+}
+
+/* 16 px text in every field under a coarse pointer, so iOS does not zoom into it */
+@media (pointer: coarse) {
+  .mantine-Input-input {
+    --input-fz: var(--font-size-field);
+  }
+}
+
+/* Input edges are control edges (3:1) on the page color; Mantine's error and focus edges still win */
+[data-mantine-color-scheme] .mantine-Input-wrapper[data-variant="default"] {
+  --input-bd: var(--control-line);
+  --input-bg: var(--page);
+}
+
+/* A focus ring outside the field, visible at the 24 px field too */
+.mantine-Input-input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

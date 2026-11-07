@@ -1,0 +1,73 @@
+{
+  "name": "@open-reloading/ui",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The shared interface base: Mantine on the design tokens, with Storybook.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenReloading/Ballistics.git",
+    "directory": "packages/ui"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "sideEffects": [
+    "*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./ui.css": "./css/ui.css"
+  },
+  "files": [
+    "css",
+    "dist",
+    "!dist/**/*.map",
+    "!dist/*.tsbuildinfo",
+    "!dist/api-extractor",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json && api-extractor run",
+    "typecheck": "tsc --noEmit && tsc -p test",
+    "test": "vitest run --project node && publint --strict && attw --pack . --profile esm-only --exclude-entrypoints ui.css",
+    "test:browser": "vitest run --project 'stories*' && storybook build --quiet",
+    "storybook": "storybook dev --port 6006"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "5.3.0",
+    "@open-reloading/design-tokens": "workspace:*"
+  },
+  "peerDependencies": {
+    "@mantine/core": "9.7.4",
+    "@mantine/hooks": "9.7.4",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "catalog:",
+    "@mantine/core": "catalog:",
+    "@mantine/hooks": "catalog:",
+    "@microsoft/api-extractor": "catalog:",
+    "@storybook/addon-a11y": "10.6.5",
+    "@storybook/addon-vitest": "10.6.5",
+    "@storybook/react-vite": "10.6.5",
+    "@types/node": "catalog:",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitest/browser": "5.0.5",
+    "@vitest/browser-playwright": "5.0.5",
+    "playwright": "catalog:",
+    "publint": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "storybook": "10.6.5",
+    "typescript": "catalog:",
+    "vite": "8.3.5",
+    "vitest": "catalog:"
+  }
+}

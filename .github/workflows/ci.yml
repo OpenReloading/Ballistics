@@ -113,7 +113,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include: ${{ fromJSON(needs.changes.outputs.tests || '[{"name":"drawing","filter":"--filter @open-reloading/drawing","e2eUnit":false},{"name":"web","filter":"--filter @open-reloading/web","e2eUnit":false},{"name":"packages","filter":"--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/design-tokens --filter @open-reloading/statistics --filter @open-reloading/ballistics --filter @open-reloading/shot-groups --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/catalog --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools --filter @open-reloading/test-kit","e2eUnit":true}]') }}
+        include: ${{ fromJSON(needs.changes.outputs.tests || '[{"name":"drawing","filter":"--filter @open-reloading/drawing","e2eUnit":false},{"name":"web","filter":"--filter @open-reloading/web","e2eUnit":false},{"name":"packages","filter":"--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/design-tokens --filter @open-reloading/statistics --filter @open-reloading/ballistics --filter @open-reloading/shot-groups --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/catalog --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools --filter @open-reloading/test-kit","e2eUnit":true},{"name":"ui","filter":"--filter @open-reloading/ui","e2eUnit":false}]') }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -127,6 +127,18 @@ jobs:
           pnpm --workspace-concurrency=1 $WORKSPACES run test
         env:
           WORKSPACES: ${{ matrix.filter }}
+      # The stories of packages/ui as browser tests (axe included) and the Storybook build, in the Playwright image of
+      # the e2e job, whose browsers are those of the locked playwright
+      - if: matrix.name == 'ui'
+        name: Story tests and the Storybook build in the Playwright image
+        run: |
+          version=$(node -p "require('./packages/ui/node_modules/playwright/package.json').version")
+          case $PLAYWRIGHT_IMAGE in
+            "mcr.microsoft.com/playwright:v$version-noble@sha256:"*) docker pull --quiet "$PLAYWRIGHT_IMAGE" ;;
+            *) echo "::error::PLAYWRIGHT_IMAGE (ci.yml) is not v$version-noble, the locked playwright"; exit 1 ;;
+          esac
+          docker run --rm --init --ipc=host --user "$(id -u):$(id -g)" --env HOME=/tmp --env CI \
+            --volume "$PWD:$PWD" --workdir "$PWD/packages/ui" "$PLAYWRIGHT_IMAGE" npm run test:browser
       - if: matrix.e2eUnit
         run: pnpm --filter @open-reloading/e2e run test:unit
 

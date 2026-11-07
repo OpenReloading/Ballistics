@@ -26,6 +26,7 @@ catalog:
   fast-check: 4.10.2
   oxlint: 1.90.0
   oxlint-tsgolint: 7.0.2005
+  playwright: 1.64.1
   publint: 0.3.25
   react: 19.3.1
   react-dom: 19.3.1
@@ -47,4 +48,5 @@ overrides:
 allowBuilds:
   "@swc/core": false
   core-js: false
+  esbuild: false
   vue-demi: false
