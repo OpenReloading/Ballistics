@@ -8,6 +8,9 @@
 export function bisect(below: (x: number) => boolean, bracket: readonly [low: number, high: number], iterations: number, stopAtEnds: boolean): number;
 
 // @public
+export function checkLogFitLimits(maxIterations: number, maxCondition: number): void;
+
+// @public
 export function chiSquareCdf(x: number, df: number): number;
 
 // @public
@@ -110,6 +113,9 @@ export function normalsFrom(uniform: () => number): () => number;
 
 // @public
 export function nth<T>(a: ArrayLike<T>, i: number): T;
+
+// @public
+export function percentile(sorted: readonly number[], q: number): number;
 
 // @public
 export function seededUniforms(seed: number): () => number;

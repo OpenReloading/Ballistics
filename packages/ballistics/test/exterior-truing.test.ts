@@ -625,6 +625,14 @@ describe('truing failures', () => {
 })
 
 describe('truing failures of the budget and of the input', () => {
+  it('refuses an iteration or condition limit the solver cannot use', () => {
+    const obs = observe(scaled(base, 1.02, 0.95), mixed)
+    for (const limits of [{ maxIterations: 0 }, { maxIterations: 1.5 }, { maxCondition: 1 }])
+      expect(
+        isPlainInputError(() => trueDrag(base, obs, { fitMuzzleVelocity: true }, limits)),
+      ).toBe(true)
+  })
+
   it('fails with step-budget when the fit uses up maxTotalSteps', () => {
     const zeroed = { ...base, zero: { range: 100 } }
     const obs = observe(scaled(zeroed, 1.02, 0.95), mixed)
