@@ -29,15 +29,15 @@
                   "!@open-reloading/statistics",
                   "!@open-reloading/units"
                 ],
-                "message": "importers-imports-schema-and-units: packages/importers has no I/O and imports nothing but @open-reloading/schema, @open-reloading/units and its own files."
+                "message": "importers-imports-schema-and-units: packages/importers has no I/O and imports nothing but @open-reloading/schema, @open-reloading/units, the Diagnostic type of @open-reloading/statistics and its own files."
               },
               {
                 "regex": "^[^.@]",
-                "message": "importers-imports-schema-and-units: packages/importers has no I/O and imports nothing but @open-reloading/schema, @open-reloading/units and its own files."
+                "message": "importers-imports-schema-and-units: packages/importers has no I/O and imports nothing but @open-reloading/schema, @open-reloading/units, the Diagnostic type of @open-reloading/statistics and its own files."
               },
               {
                 "regex": "^(\\.\\./)+[^.]",
-                "message": "importers-imports-schema-and-units: packages/importers has no I/O and imports nothing but @open-reloading/schema, @open-reloading/units and its own files."
+                "message": "importers-imports-schema-and-units: packages/importers has no I/O and imports nothing but @open-reloading/schema, @open-reloading/units, the Diagnostic type of @open-reloading/statistics and its own files."
               }
             ]
           }
