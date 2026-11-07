@@ -371,7 +371,7 @@ export function file(data: Parameters<typeof loadData>[0], extra: object = {}) {
     records: [
       {
         kind: 'load',
-        id: 'l1',
+        id: '00000000-0000-4000-8000-0000000000b1',
         name: 'Load',
         saved: '2026-10-20T10:00:00.000Z',
         data: loadData(data),

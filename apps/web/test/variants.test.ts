@@ -130,7 +130,7 @@ it('names references: a catalogue record by id or reference, a user record by UU
 it('keeps a load that names a design: it parses with the reference and finds its record', () => {
   const load = {
     kind: 'load',
-    id: 'w1',
+    id: '00000000-0000-4000-8000-000000007731',
     name: 'Load',
     saved,
     data: { origin: 'user', bullet: `user:${uuid}`, cartridge: 'catalogue:308-win' },

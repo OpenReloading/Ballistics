@@ -114,7 +114,7 @@ describe('faceOf', () => {
 describe('the draft file', () => {
   const record = (d: Design): UserRecord => ({
     kind: 'targetFaceDesign',
-    id: 'a1',
+    id: '00000000-0000-4000-8000-000000006131',
     name: d.name,
     saved: '2026-10-24T10:00:00.000Z',
     data: fileData(d),

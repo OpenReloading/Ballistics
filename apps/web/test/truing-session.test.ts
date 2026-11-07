@@ -264,7 +264,7 @@ describe('a fit stored with a firearm configuration', () => {
   if (typeof entry === 'string') throw new Error(`refused: ${entry}`)
   const record = {
     kind: 'firearm',
-    id: 'f1',
+    id: '00000000-0000-4000-8000-000000006631',
     name: 'Rifle',
     saved: '2026-10-01T00:00:00.000Z',
     data: {
