@@ -5,7 +5,7 @@ export interface MakerRow {
   id: string
 }
 
-/** What a record carries that decides whether it leaves: its provenance, with the cited sources resolved. */
+/** What a record carries that decides whether the public catalogue may hold it: its provenance, with the cited sources resolved. */
 interface Cited {
   id: string
   provenance?: { sources?: { origin?: string | undefined }[] } | undefined
