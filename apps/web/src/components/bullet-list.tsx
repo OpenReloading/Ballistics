@@ -226,7 +226,9 @@ export function BulletList({
     {
       key: 'type',
       label: msg('Type'),
-      width: '11rem',
+      // fits the longest catalogue values whole: "Teilmantelgeschoss, flach" (German) and
+      // "Full metal jacket, boat tail" (English)
+      width: '12.5rem',
       wide: true,
       value: (b) => typeOf(b) || undefined,
       cell: typeOf,

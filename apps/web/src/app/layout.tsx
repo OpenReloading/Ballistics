@@ -63,6 +63,7 @@ import { Container, mantineHtmlProps } from '@mantine/core'
 import type { Metadata, Viewport } from 'next'
 import { OfflineLayer } from '../components/offline-layer.tsx'
 import { PageShell } from '../components/page-shell.tsx'
+import { PreReleaseData } from '../components/pre-release-data.tsx'
 import { Providers } from '../components/providers.tsx'
 import { ContentSkipLink, ResultsSkipLink } from '../components/results-skip-link.tsx'
 import { SafetyDialog } from '../components/safety-dialog.tsx'
@@ -109,6 +110,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
           <ContentSkipLink />
           <ResultsSkipLink />
           <SafetyDialog />
+          <PreReleaseData />
           <OfflineLayer />
           {/* Mantine AppShell for the header and sidebar; the workbench makes .page-top a full-height column (globals.css) */}
           <PageShell>
