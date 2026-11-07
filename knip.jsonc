@@ -24,7 +24,7 @@
     "packages/shot-groups": {
       "entry": ["src/index.ts", "scripts/*.mts"],
       // the event types and target faces of data's records are read by path in the tests, declared so the CI plan tests shot-groups with them
-      "ignoreDependencies": ["@open-reloading/data"]
+      "ignoreDependencies": ["@open-reloading/catalog"]
     },
     "packages/core": {
       "entry": ["src/index.ts", "scripts/*.mts"]
@@ -32,12 +32,12 @@
     "packages/importers": {
       "entry": ["src/index.ts"]
     },
-    "packages/data": {
+    "packages/catalog": {
       "entry": ["src/index.ts", "src/plausibility.ts", "src/build.ts"]
     },
     "packages/drawing": {
       // the bullet records of data are read by path in the tests, declared so the CI plan tests drawing with them
-      "ignoreDependencies": ["@open-reloading/data"],
+      "ignoreDependencies": ["@open-reloading/catalog"],
       "entry": [
         "src/index.ts",
         "src/cartridge/index.ts",
@@ -72,7 +72,7 @@
         "katex",
         // imported by the examples of the library pages, which scripts/libraries.test.mts runs from this folder
         "@open-reloading/core",
-        "@open-reloading/data",
+        "@open-reloading/catalog",
         "@open-reloading/drawing",
         "@open-reloading/importers",
         "@open-reloading/schema",

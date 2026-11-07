@@ -1,4 +1,4 @@
-import { readRecords } from '@open-reloading/data'
+import { readRecords } from '@open-reloading/catalog'
 import type { TargetFace } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'

@@ -13,7 +13,7 @@ Who names a manufacturer, and how:
 
 A name a user types that no manufacturer has becomes a user manufacturer, a record kept in the browser with the name as its `name`. The same name typed again finds it; a name or alias of a catalogue manufacturer finds the catalogue record first. While the catalogue cannot be read, a name that matches none of the user's own manufacturers gets no reference and no record (the field keeps the text and says so), so a user manufacturer never duplicates a catalogue one; leaving the field asks the catalogue again. The file and copied JSON of a bullet or firearm, and the share link of a bullet, carry the user manufacturer record it names; opening them keeps that record in the browser (an existing record of that id stays). Settings, Manufacturers lists the user manufacturers of the browser and deletes one that no record names.
 
-Schema: `packages/schema/src/manufacturer.ts`. Records: `packages/data/records/manufacturers/`.
+Schema: `packages/schema/src/manufacturer.ts`. Records: `packages/catalog/records/manufacturers/`.
 
 ## Record
 
@@ -36,7 +36,7 @@ The id is the slug of the name without the legal form: "Demo Powder Co." becomes
 
 ## Validation
 
-`pnpm run data:validate` (`packages/data/src/references.ts`, `checkManufacturerReferences`) reports a powder, primer or bullet `manufacturer`, a case capacity `caseManufacturer`, a load table `manufacturer`, a chronograph session's `device.manufacturer` or a load's `bullet.manufacturer`, `powder.manufacturer` or `case.manufacturer` that names no manufacturer record. Names and aliases of manufacturers are unique. Powder, primer and bullet names are unique per manufacturer.
+`pnpm run data:validate` (`packages/catalog/src/references.ts`, `checkManufacturerReferences`) reports a powder, primer or bullet `manufacturer`, a case capacity `caseManufacturer`, a load table `manufacturer`, a chronograph session's `device.manufacturer` or a load's `bullet.manufacturer`, `powder.manufacturer` or `case.manufacturer` that names no manufacturer record. Names and aliases of manufacturers are unique. Powder, primer and bullet names are unique per manufacturer.
 
 ## API
 

@@ -128,7 +128,7 @@
   * dependencies
     * @open-reloading/api bumped from 0.0.4 to 0.0.5
     * @open-reloading/core bumped from 0.0.3 to 0.0.4
-    * @open-reloading/data bumped from 0.0.4 to 0.0.5
+    * @open-reloading/catalog bumped from 0.0.4 to 0.0.5
     * @open-reloading/drawing bumped from 0.0.3 to 0.0.4
     * @open-reloading/importers bumped from 0.0.4 to 0.0.5
     * @open-reloading/schema bumped from 0.0.4 to 0.0.5
@@ -157,7 +157,7 @@
 * The following workspace dependencies were updated
   * dependencies
     * @open-reloading/api bumped from 0.0.3 to 0.0.4
-    * @open-reloading/data bumped from 0.0.3 to 0.0.4
+    * @open-reloading/catalog bumped from 0.0.3 to 0.0.4
     * @open-reloading/importers bumped from 0.0.3 to 0.0.4
     * @open-reloading/schema bumped from 0.0.3 to 0.0.4
 
@@ -199,7 +199,7 @@
   * dependencies
     * @open-reloading/api bumped from 0.0.2 to 0.0.3
     * @open-reloading/core bumped from 0.0.2 to 0.0.3
-    * @open-reloading/data bumped from 0.0.2 to 0.0.3
+    * @open-reloading/catalog bumped from 0.0.2 to 0.0.3
     * @open-reloading/drawing bumped from 0.0.2 to 0.0.3
     * @open-reloading/importers bumped from 0.0.2 to 0.0.3
     * @open-reloading/schema bumped from 0.0.2 to 0.0.3
@@ -307,7 +307,7 @@
   * dependencies
     * @open-reloading/api bumped from 0.0.1 to 0.0.2
     * @open-reloading/core bumped from 0.0.1 to 0.0.2
-    * @open-reloading/data bumped from 0.0.1 to 0.0.2
+    * @open-reloading/catalog bumped from 0.0.1 to 0.0.2
     * @open-reloading/drawing bumped from 0.0.1 to 0.0.2
     * @open-reloading/importers bumped from 0.0.1 to 0.0.2
     * @open-reloading/schema bumped from 0.0.1 to 0.0.2
@@ -336,7 +336,7 @@
   * dependencies
     * @open-reloading/api bumped from * to 0.0.1
     * @open-reloading/core bumped from * to 0.0.1
-    * @open-reloading/data bumped from * to 0.0.1
+    * @open-reloading/catalog bumped from * to 0.0.1
     * @open-reloading/drawing bumped from * to 0.0.1
     * @open-reloading/importers bumped from * to 0.0.1
     * @open-reloading/schema bumped from * to 0.0.1

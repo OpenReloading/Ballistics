@@ -31,7 +31,7 @@ test('a source matches by URL, DOI, the C.I.P. entry or its title', () => {
 })
 
 test('every source of the records has a bibliography entry', () => {
-  const missing = missingSources(recordSources(`${root}packages/data/records`), bibliography)
+  const missing = missingSources(recordSources(`${root}packages/catalog/records`), bibliography)
   assert.deepEqual(
     missing.map((s) => `${s.file}: ${s.title}`),
     [],

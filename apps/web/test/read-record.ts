@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 
-const root = new URL('../../../packages/data/records/', import.meta.url)
+const root = new URL('../../../packages/catalog/records/', import.meta.url)
 
 /** The record at `<kind>/<id>.json` of the records folder; untyped, its fields are read by name. */
 export function readRecord<T = ReturnType<typeof JSON.parse>>(path: string): T {

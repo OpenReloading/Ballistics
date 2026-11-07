@@ -1,10 +1,10 @@
+import type { Bundle } from '@open-reloading/catalog'
 import {
   type InteriorLoad,
   lbPerSqInToKgPerSqM,
   type Projectile,
   type TrajectoryInput,
 } from '@open-reloading/core'
-import type { Bundle } from '@open-reloading/data'
 import {
   type AnalysisKey,
   analysisKinds,

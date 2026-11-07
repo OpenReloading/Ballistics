@@ -127,15 +127,15 @@ importers:
       '@docusaurus/types':
         specifier: 3.10.2
         version: 3.10.2(@swc/core@1.16.20(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@6.1.2(postcss@8.5.31))(csso@5.0.5)(html-minifier-terser@7.2.0)(lightningcss@1.33.0)(postcss@8.5.31)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sharp@0.35.5(@types/node@26.6.6))(supports-color@8.1.1)(svgo@3.3.5)
+      '@open-reloading/catalog':
+        specifier: workspace:*
+        version: link:../../packages/catalog
       '@open-reloading/cli':
         specifier: workspace:*
         version: link:../../packages/cli
       '@open-reloading/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@open-reloading/data':
-        specifier: workspace:*
-        version: link:../../packages/data
       '@open-reloading/drawing':
         specifier: workspace:*
         version: link:../../packages/drawing
@@ -196,12 +196,12 @@ importers:
       '@open-reloading/api':
         specifier: workspace:*
         version: link:../../packages/api
+      '@open-reloading/catalog':
+        specifier: workspace:*
+        version: link:../../packages/catalog
       '@open-reloading/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@open-reloading/data':
-        specifier: workspace:*
-        version: link:../../packages/data
       '@open-reloading/drawing':
         specifier: workspace:*
         version: link:../../packages/drawing
@@ -287,12 +287,12 @@ importers:
       '@fastify/sensible':
         specifier: ^6.0.7
         version: 6.0.7
+      '@open-reloading/catalog':
+        specifier: workspace:*
+        version: link:../catalog
       '@open-reloading/core':
         specifier: workspace:*
         version: link:../core
-      '@open-reloading/data':
-        specifier: workspace:*
-        version: link:../data
       '@open-reloading/schema':
         specifier: workspace:*
         version: link:../schema
@@ -362,6 +362,28 @@ importers:
         specifier: 'catalog:'
         version: 5.0.5(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@5.0.5)(vite@8.3.5(@types/node@26.6.6)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
 
+  packages/catalog:
+    dependencies:
+      '@open-reloading/schema':
+        specifier: workspace:*
+        version: link:../schema
+      zod:
+        specifier: 'catalog:'
+        version: 4.6.7
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.6.6
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 5.0.5(vitest@5.0.5)
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.5(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@5.0.5)(vite@8.3.5(@types/node@26.6.6)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
+
   packages/cli:
     dependencies:
       '@open-reloading/api':
@@ -370,12 +392,12 @@ importers:
       '@open-reloading/ballistics':
         specifier: workspace:*
         version: link:../ballistics
+      '@open-reloading/catalog':
+        specifier: workspace:*
+        version: link:../catalog
       '@open-reloading/core':
         specifier: workspace:*
         version: link:../core
-      '@open-reloading/data':
-        specifier: workspace:*
-        version: link:../data
       '@open-reloading/drawing':
         specifier: workspace:*
         version: link:../drawing
@@ -433,33 +455,11 @@ importers:
         specifier: 'catalog:'
         version: 5.0.5(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@5.0.5)(vite@8.3.5(@types/node@26.6.6)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
 
-  packages/data:
-    dependencies:
-      '@open-reloading/schema':
-        specifier: workspace:*
-        version: link:../schema
-      zod:
-        specifier: 'catalog:'
-        version: 4.6.7
-    devDependencies:
-      '@types/node':
-        specifier: 'catalog:'
-        version: 26.6.6
-      '@vitest/coverage-v8':
-        specifier: 'catalog:'
-        version: 5.0.5(vitest@5.0.5)
-      typescript:
-        specifier: 'catalog:'
-        version: 7.0.2
-      vitest:
-        specifier: 'catalog:'
-        version: 5.0.5(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/coverage-v8@5.0.5)(vite@8.3.5(@types/node@26.6.6)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
-
   packages/drawing:
     devDependencies:
-      '@open-reloading/data':
+      '@open-reloading/catalog':
         specifier: workspace:*
-        version: link:../data
+        version: link:../catalog
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
@@ -605,9 +605,9 @@ importers:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
         version: 7.60.1(@types/node@26.6.6)
-      '@open-reloading/data':
+      '@open-reloading/catalog':
         specifier: workspace:*
-        version: link:../data
+        version: link:../catalog
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6

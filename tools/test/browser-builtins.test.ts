@@ -20,7 +20,7 @@ const browserSources = [
     'schema',
     'api',
     'importers',
-    'data',
+    'catalog',
   ].map((p) => `packages/${p}/src`),
 ]
 

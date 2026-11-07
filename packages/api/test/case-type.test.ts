@@ -20,7 +20,7 @@ describe('caseType', () => {
   })
 
   it('keeps table III belted and table II rimmed, but for its three semi-rimmed heads', () => {
-    const dir = path.join(import.meta.dirname, '../../data/records/cartridges')
+    const dir = path.join(import.meta.dirname, '../../catalog/records/cartridges')
     const types = new Map<string, Set<string>>()
     const named: Record<string, string> = {
       '308-win': 'rimless',

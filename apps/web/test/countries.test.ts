@@ -7,7 +7,7 @@ import { defined } from './defined.ts'
 
 const withoutFlag = new Set(['ussr', 'serbie and montenegro'])
 
-const dir = new URL('../../../packages/data/records/cartridges/', import.meta.url)
+const dir = new URL('../../../packages/catalog/records/cartridges/', import.meta.url)
 
 describe('parseCountries', () => {
   it('split several and give their codes', () => {
@@ -55,7 +55,7 @@ describe('countryOf', () => {
   // the flags' codes, so the test runs while no bullet or powder record names a country
   const codes = new Set(Object.keys(flags))
   for (const kind of ['bullets', 'powders']) {
-    const dir = new URL(`../../../packages/data/records/${kind}/`, import.meta.url)
+    const dir = new URL(`../../../packages/catalog/records/${kind}/`, import.meta.url)
     for (const f of readdirSync(dir)) {
       const { country } = JSON.parse(readFileSync(new URL(f, dir), 'utf8')) as {
         country?: string | undefined

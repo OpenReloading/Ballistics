@@ -13,7 +13,7 @@ M3 shot start: should the workbench run a powder model fitted without a start pr
 ## Method
 
 - **Compared.** The default of the start pressure field and of the Powders tab rows after #852 against the start pressure each powder record was fitted at, as its `interior` source notes state it, and against `defaultStartPressure` in core.
-- **Data.** The 224 powder records with a model in `packages/data/records/powders`; the fitted values of the [start pressure rules](./interior-start-pressure-rules.md).
+- **Data.** The 224 powder records with a model in `packages/catalog/records/powders`; the fitted values of the [start pressure rules](./interior-start-pressure-rules.md).
 - **Accept rule** (decided before the change, the recommendation of #944). A model parameter runs at the conditions of its fit: a rifle run of a powder model fitted without a start pressure takes the value of its fit; the workbench and core give a handgun without a construction the same value.
 
 ## Formulas

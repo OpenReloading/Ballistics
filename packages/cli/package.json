@@ -17,7 +17,7 @@
     "@open-reloading/api": "workspace:*",
     "@open-reloading/ballistics": "workspace:*",
     "@open-reloading/core": "workspace:*",
-    "@open-reloading/data": "workspace:*",
+    "@open-reloading/catalog": "workspace:*",
     "@open-reloading/drawing": "workspace:*",
     "@open-reloading/schema": "workspace:*",
     "@open-reloading/statistics": "workspace:*",

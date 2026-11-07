@@ -7,7 +7,7 @@ reviews:
   high_level_summary: true
   poem: false
   path_filters:
-    - "!packages/data/records/**"
+    - "!packages/catalog/records/**"
     - "!**/*-snapshots/**"
     - "!**/__snapshots__/**"
     - "!apps/web/test/golden/**"

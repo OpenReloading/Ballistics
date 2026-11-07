@@ -8,7 +8,7 @@ import type { Row } from '../src/rows.ts'
 
 /** The records of the data package and a synthetic root with case capacities and two more powders. */
 export const recordRoots = [
-  join(import.meta.dirname, '../../data/records'),
+  join(import.meta.dirname, '../../catalog/records'),
   join(import.meta.dirname, 'fixtures/records'),
 ]
 

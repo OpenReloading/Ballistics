@@ -169,7 +169,7 @@ The 9 equivalent mutants: in the projectile, a placeholder BC list for a record 
 Screening of 16 small modules of the web libraries, the data checks, the drawing geometry and the tools not covered before, with coverage analysis over all tests; the scores before in the table are a second run with per-test coverage and match the screening. Score and surviving or not covered mutants: `web/hole-proposals.ts` 50.9 % (57), `web/user-store.ts` 51.6 % (78, over its three test files), `tools/audit.ts` 60.0 % (28), `data/references.ts` 63.1 % (58), `web/caliber.ts` 69.2 % (36), `tools/pack-check.ts` 69.8 % (54), `drawing/core/geometry.ts` 71.8 % (94), `drawing/cartridge/regions.ts` 72.6 % (26), `web/case-rows.ts` 73.9 % (12), `web/ticks.ts` 74.1 % (15), `web/lot-rows.ts` 75.6 % (19), `data/load-tables.ts` 82.3 % (17), `data/names.ts` 82.5 % (22), `data/renames.ts` 87.8 % (5), `web/mass-range.ts` 93.0 % (4) and `web/query.ts` 94.5 % (8). `web/dates.ts` has no score: its test file failed the tool's first run. Taken:
 - `apps/web/src/lib/hole-proposals.ts`: the expected hole size of the target editor (typed, learned median, bullet, marker), the maybe tier of a proposal, the local photo scale under a perspective calibration and the proposals kept clear of placed shots.
 - `apps/web/src/lib/user-store.ts`: the browser store of user records and photos: invalid entries stored only where the id is free, the photo ids of invalid sheets, a change read and written in one transaction, the relink of a chain of refits on delete and the persistent storage request.
-- `packages/data/src/references.ts`: the reference checks of the record data (cartridge, components, primer, capacity, case, session, load and manufacturer of every record kind), with renamed ids.
+- `packages/catalog/src/references.ts`: the reference checks of the record data (cartridge, components, primer, capacity, case, session, load and manufacturer of every record kind), with renamed ids.
 - `tools/src/pack-check.ts`: the tarball check of the published libraries: entry points, the `files` field, test files, source maps and undeclared imports.
 - `packages/drawing/src/core/geometry.ts`: the overlap tests the label placement of the drawings reads: segment and box, two boxes, two segments, two polygons with a pad, and the distance to a box.
 
@@ -271,7 +271,7 @@ analytic. The runs mutate the source and run the existing tests; no measured dat
 - `packages/schema/src/case-capacity.ts`, `packages/schema/test/case-capacity.test.ts`, `packages/schema/test/case-capacity-unit.test.ts`
 - `apps/web/src/lib/hole-proposals.ts`, `apps/web/test/hole-proposals.test.ts`
 - `apps/web/src/lib/user-store.ts`, `apps/web/test/user-store.test.ts`, `apps/web/test/user-store-refit.test.ts`, `apps/web/test/user-store-write.test.ts`
-- `packages/data/src/references.ts`, `packages/data/test/references.test.ts`
+- `packages/catalog/src/references.ts`, `packages/catalog/test/references.test.ts`
 - `tools/src/pack-check.ts`, `tools/test/pack-check.test.ts`
 - `packages/drawing/src/core/geometry.ts`, `packages/drawing/test/geometry.test.ts`
 - `packages/importers/src/units.ts`, `packages/importers/test/units.test.ts`

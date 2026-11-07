@@ -21,7 +21,7 @@ afterEach(() => vi.unstubAllGlobals())
 const values = { ...exampleInterior, boreArea: undefined }
 const record = JSON.parse(
   readFileSync(
-    new URL('../../../packages/data/records/powders/demo-powder-dp40.json', import.meta.url),
+    new URL('../../../packages/catalog/records/powders/demo-powder-dp40.json', import.meta.url),
     'utf8',
   ),
 )

@@ -6,9 +6,9 @@ import { loadModel } from '../src/model.ts'
 import { unseenPowder } from '../src/unseen.ts'
 import { recordRoots, records, rowsCsv, writeRows } from './fixture.ts'
 
-vi.mock('@open-reloading/data', async (original) =>
+vi.mock('@open-reloading/catalog', async (original) =>
   (await import('./records-memo.ts')).memoRecords(
-    await original<typeof import('@open-reloading/data')>(),
+    await original<typeof import('@open-reloading/catalog')>(),
   ),
 )
 

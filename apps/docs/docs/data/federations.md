@@ -9,7 +9,7 @@ description: The records of shooting sport federations, the disciplines their ru
 Three record kinds describe who defines a discipline, what the discipline is and which target scores it. Ring scoring starts from them: a federation, then a discipline, then the target (see [Ring scoring](../models/ring-scoring.md)).
 - Every value is read from a rule book that the target records already cite, with its section and page. A value the rule book does not state stays absent.
 - Schemas: `packages/schema/src/federation.ts`.
-- Records: `packages/data/records/federations/`, `disciplines/`, `target-mappings/` and `caliber-classes/`.
+- Records: `packages/catalog/records/federations/`, `disciplines/`, `target-mappings/` and `caliber-classes/`.
 
 ## Caliber class
 
@@ -125,7 +125,7 @@ A target with `photoSearch: false` is skipped by the photo target search. The us
 
 ## Validation
 
-`pnpm run data:validate` (`packages/data/src/federations.ts`, `checkFederations`) reports:
+`pnpm run data:validate` (`packages/catalog/src/federations.ts`, `checkFederations`) reports:
 - a discipline whose `federation` names no record
 - an `internationalFederation` or `internationalDiscipline` link to a record that is not of an international federation, or to no record
 - a mapping whose discipline, target or target event does not exist, whose event belongs to another federation than the discipline's, or whose gauge differs from the event's

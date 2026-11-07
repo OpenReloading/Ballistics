@@ -1,4 +1,4 @@
-import { checkSpec } from '@open-reloading/data/plausibility'
+import { checkSpec } from '@open-reloading/catalog/plausibility'
 import {
   drawnTables,
   type Figure,

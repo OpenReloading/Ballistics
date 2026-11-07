@@ -26,7 +26,7 @@ node packages/cli/dist/bin.js run interior --input packages/cli/examples/interio
 node packages/cli/dist/bin.js operations
 ```
 
-Record ids in a body (`cartridge`, `bullet`, `powder`) resolve against the records of `--records <dir>` (repeatable, `BALLISTICS_RECORDS`), by default the records of the data package, as for `verify`. An unknown id is bad input. A body the schema rejects is bad input with the issues in the error object (`issues`, each with `path` and `message`). An answer the route gives with 422 (an input core refuses, a charge target out of reach, a load file without a value) is a refusal: the error object carries it as `answer`.
+Record ids in a body (`cartridge`, `bullet`, `powder`) resolve against the records of `--records <dir>` (repeatable, `BALLISTICS_RECORDS`), by default the records of the catalog package, as for `verify`. An unknown id is bad input. A body the schema rejects is bad input with the issues in the error object (`issues`, each with `path` and `message`). An answer the route gives with 422 (an input core refuses, a charge target out of reach, a load file without a value) is a refusal: the error object carries it as `answer`.
 
 `operations` writes one JSON document, `{"operations":[...]}`, with each operation's `name`, `summary`, `description`, `input` (the JSON Schema 2020-12 of the body) and `output` (that of the 200 answer). The schemas are written from the zod definitions the API's OpenAPI document is built from.
 
@@ -63,7 +63,7 @@ A problem in the file is reported as file, line and column with a reason, never 
 
 A table of loads customers sent (`producedBy: customer`) is never read. Charges that give no row are counted by reason in `published.skipped`: `noVelocity`, `customerTable`, `noPowderRecord`, `noCartridge` (no cartridge record). `published` also carries the number of files and rows. `inputs.rows` is the SHA-256 over the SHA-256 of each file's JSON, in cartridge and file order.
 
-The records are read with `readRecords` of `@open-reloading/data`: `--records <dir>` (repeatable, read as one set; `BALLISTICS_RECORDS` is a `:`-separated list), by default the records of the data package. The problems the reader reports (a record that fails its schema is left out, a duplicate id is kept) are counted in a note on stderr. The default rows path is `BALLISTICS_ROWS`; `--rows -` reads one rows file from standard input. A cartridge's chamber volume is its water capacity (a capacity record, else a case record with a stated capacity, the first by id) less the volume of the seated bullet, as the [seating](models/case-capacity.md) computes it.
+The records are read with `readRecords` of `@open-reloading/catalog`: `--records <dir>` (repeatable, read as one set; `BALLISTICS_RECORDS` is a `:`-separated list), by default the records of the catalog package. The problems the reader reports (a record that fails its schema is left out, a duplicate id is kept) are counted in a note on stderr. The default rows path is `BALLISTICS_ROWS`; `--rows -` reads one rows file from standard input. A cartridge's chamber volume is its water capacity (a capacity record, else a case record with a stated capacity, the first by id) less the volume of the seated bullet, as the [seating](models/case-capacity.md) computes it.
 
 ## Split
 

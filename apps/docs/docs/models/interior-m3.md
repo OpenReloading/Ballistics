@@ -535,7 +535,7 @@ A powder record may carry `listedCartridges`: the ids of the cartridge records t
 
 When the powder record has a list and the chosen cartridge record is not in it, the workbench's result notes carry one warning: "<cartridge> is not among the cartridges the manufacturer lists this powder for." A listed cartridge, a powder without a list or a run without a cartridge record give none. The powder record page shows the list as "Listed by the manufacturer for", its source with the record's other sources.
 
-Code: `apps/web/src/components/workbench-outcome.ts`, `unlistedCartridge`. `packages/data/src/references.ts`, `checkCartridgeReferences` (each id names a current cartridge record).
+Code: `apps/web/src/components/workbench-outcome.ts`, `unlistedCartridge`. `packages/catalog/src/references.ts`, `checkCartridgeReferences` (each id names a current cartridge record).
 
 ### Cast bullet hardness
 

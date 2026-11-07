@@ -295,7 +295,7 @@ export type RecordFile = CatalogueHeader & {
   [K in CatalogueKind]: Record<string, RecordOfKind[K]>
 }
 
-/** The records a catalogue is built from; `Bundle` of `@open-reloading/data` has them. */
+/** The records a catalogue is built from; `Bundle` of `@open-reloading/catalog` has them. */
 export interface CatalogueSource {
   cartridges: Cartridge[]
   manufacturers: Manufacturer[]

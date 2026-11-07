@@ -80,7 +80,7 @@ type Spec = {
   verification?: string
   values: SpecValue[]
 }
-const dir = path.join(__dirname, '../../../../packages/data/records/cartridges')
+const dir = path.join(__dirname, '../../../../packages/catalog/records/cartridges')
 /** The record in `file` with the id of its C.I.P. sheet, `cip-<cartridge id>-<revised or published date>`, which figure ids and shot names carry. */
 const readFile = (file: string) => {
   const c = JSON.parse(readFileSync(path.join(dir, file), 'utf8')) as Spec & {

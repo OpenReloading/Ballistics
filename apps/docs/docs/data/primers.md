@@ -6,7 +6,7 @@ description: The primer records that describe a primer product by size, cup, pri
 
 # Primers
 
-A primer record describes one primer product as its manufacturer sells it. A load names it with `primer.record`, next to the lot of the primer. No value of the record enters a solver. Schema: `packages/schema/src/primer.ts`. Records: `packages/data/records/primers/`.
+A primer record describes one primer product as its manufacturer sells it. A load names it with `primer.record`, next to the lot of the primer. No value of the record enters a solver. Schema: `packages/schema/src/primer.ts`. Records: `packages/catalog/records/primers/`.
 
 ## Record
 
@@ -26,7 +26,7 @@ A primer record describes one primer product as its manufacturer sells it. A loa
 
 Every data field needs a source that lists it in `fields`. A value a source does not state is left out, never estimated. A source other than a fact source (a standard, an official specification) needs a `license` or the maker's `terms` in its record.
 
-`packages/data/records/primers/` holds the synthetic demo records (CC0-1.0), invented for tests and the example. No record of a real product is in the catalogue yet.
+`packages/catalog/records/primers/` holds the synthetic demo records (CC0-1.0), invented for tests and the example. No record of a real product is in the catalogue yet.
 
 ## In a load
 

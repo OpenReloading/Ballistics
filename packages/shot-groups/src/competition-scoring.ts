@@ -1,7 +1,7 @@
 /**
  * Scoring of a person's own competition results: the stage points and hit factor of a practical
  * stage and the ring totals of series, with the points and penalties of the event type record
- * (`packages/data/records/event-types/`), never hard-coded. Model:
+ * (`packages/catalog/records/event-types/`), never hard-coded. Model:
  * `apps/docs/docs/models/competition-scoring.md`. A self-recorded score is never an official result.
  * A refusal is an `InputError` of `@open-reloading/statistics` with a `ScoringIssue`.
  */
