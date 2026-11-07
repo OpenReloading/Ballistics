@@ -158,6 +158,7 @@ Cited by the bullet, powder, case capacity and manufacturer records, grouped by 
 - Alliant Powder SDS "15-25 Smokeless Powder", revision 03/01/2017, version 2.0. <https://www.alliantpowder.com/downloads/sds/15-25_Smokeless_Powder.pdf>
 - Alliant Powder SDS "30-40 Smokeless Powder", revision 03/01/2017, version 2.1.
 - Alliant Powder SDS "Reloder Series Smokeless Powders, AR-Comp", revision 03/02/2017, version 2.0.
+- Alliant Powder, questions page. <https://www.alliantpowder.com/questions/default.aspx>
 - Alliant Reloader's Guide 2023, metallic tables.
 - Alliant safety data sheet "15-25 Smokeless Powder", revision 03/01/2017.
 - Alliant safety data sheet "30-40 Smokeless Powder", revision 03/01/2017.
@@ -167,15 +168,18 @@ Cited by the bullet, powder, case capacity and manufacturer records, grouped by 
 
 ### Berger Bullets
 
+- Berger Bullets, privacy policy. <https://bergerbullets.com/privacy-policy/>
 - Berger Bullets, Quick Reference Sheet 2020.
 
 ### Cutting Edge Bullets
 
 - Cutting Edge Bullets technical data sheets 2026.
+- Cutting Edge Bullets, contact page. <https://cuttingedgebullets.com/pages/contact-cutting-edge-bullets>
 - Cutting Edge Bullets, home page. <https://cuttingedgebullets.com/>
 
 ### Explosia a.s.
 
+- Explosia a.s., contacts page. <https://explosia.cz/en/contacts/>
 - Explosia a.s., Propellants civil catalogue 2023 (EN).
 - LOVEX Reloading Guide EN 37 (Explosia a.s.).
 - LOVEX Reloading Guide EN 37 (Explosia).
@@ -183,6 +187,7 @@ Cited by the bullet, powder, case capacity and manufacturer records, grouped by 
 ### Hammer Bullets
 
 - Hammer Bullets store (WooCommerce Store API).
+- Hammer Bullets, about page. <https://hammerbullets.com/about-us/>
 - Hammer Bullets, home page. <https://hammerbullets.com/>
 
 ### Hodgdon Powder Co.
@@ -280,11 +285,13 @@ Cited by the bullet, powder, case capacity and manufacturer records, grouped by 
 - Hodgdon SDS "Extruded Rifle Powders", February 2022 (inner sheet "Propellant AR22 Series", Chemwatch 5189-29, version 7.1).
 - Hodgdon SDS "Extruded Rifle Powders", February 2022, Benchmark (inner sheet "Propellant BM2", Chemwatch 4693-84). <https://hodgdonpowderco.com/wp-content/uploads/2023/04/2022-bm2-sds.pdf>
 - Hodgdon SDS "Spherical Powders", February 2022 (inner sheet St. Marks Powder "BALL POWDER Propellant", revision 10, 12/11/2021).
+- Hodgdon Powder Company, locations page. <https://hodgdonpowderco.com/locations/>
 
 ### Hornady Manufacturing
 
 - Hornady 2026 Product Catalog.
 - Hornady Manufacturing. <https://www.hornady.com/bullets/rifle/30-cal-308-168-gr-bthp-match>
+- Hornady, contact page. <https://www.hornady.com/contact>
 
 ### IMR
 
@@ -293,16 +300,19 @@ Cited by the bullet, powder, case capacity and manufacturer records, grouped by 
 
 ### Lapua
 
+- Lapua, about page. <https://www.lapua.com/more/about/>
 - Lapua.
 
 ### Lehigh Defense
 
 - Lehigh Defense store, product attributes (GraphQL).
+- Wilson Combat, contact page. <https://wilsoncombat.com/contact-us/>
 
 ### Missouri Bullet Company
 
 - Missouri Bullet Company, pricing page.
 - Missouri Bullet Company, home page. <https://missouribullet.com/>
+- Missouri Bullet Company, about page. <https://missouribullet.com/AboutUs.php>
 
 ### Norma
 
@@ -315,9 +325,11 @@ Cited by the bullet, powder, case capacity and manufacturer records, grouped by 
 - Norma product page, Norma MRP. <https://www.norma-ammunition.com/products/components/gunpowder/norma-mrp---20902155>
 - Norma product page, Norma URP. <https://www.norma-ammunition.com/products/components/gunpowder/norma-urp---20902195>
 - Norma reloading data web pages, 2026-10-13.
+- Norma, imprint. <https://www.norma-ammunition.com/about-norma/impressum>
 
 ### Nosler
 
+- Nosler, home page. <https://www.nosler.com/>
 - Nosler.
 
 ### Ramshot
@@ -341,20 +353,24 @@ Cited by the bullet, powder, case capacity and manufacturer records, grouped by 
 - Reload Swiss data sheet RS76 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS76/RS76-EN.pdf>
 - Reload Swiss data sheet RS80 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS80/RS80-EN.pdf>
 - Reload Swiss loading data web table, 2026-10-12.
+- Reload Swiss, career page. <https://www.reload-swiss.com/en/about-us/career>
 
 ### RWS
 
 - RWS reloading data page (Wiederladen), powder column.
 - RWS reloading data web table (Rottweil powders), 2026-10-13.
+- RWS, Impressum. <https://rws-ammunition.com/de/impressum>
 
 ### Sako
 
 - Sako reloading data (PDF).
+- Sako, home page. <https://www.sako.global/>
 
 ### Sellier & Bellot
 
 - Sellier & Bellot, component bullets (pistol and revolver table).
 - Sellier & Bellot, component bullets (rifle table).
+- Sellier & Bellot, contacts page. <https://www.sellier-bellot.cz/en/contacts/>
 
 ### Sierra Bullets
 
@@ -365,6 +381,7 @@ Cited by the bullet, powder, case capacity and manufacturer records, grouped by 
 
 - Vectan catalogue 12/2023, powder ranges.
 - Vectan catalogue 2023-12.
+- Vectan, mentions légales. <https://www.vectan.fr/FR/mentions-legales>
 
 ### Vihtavuori
 
@@ -379,11 +396,13 @@ Cited by the bullet, powder, case capacity and manufacturer records, grouped by 
 - Vihtavuori SDS "N-Powder (Centralite)", revised 03/12/2025, version 2.
 - Vihtavuori SDS "N-Powder High Energy N500 series", revised 04/12/2025, version 2.
 - Vihtavuori SDS "N-Powder", revised 03/12/2025, version 2.
+- Vihtavuori, contact information. <https://vihtavuori.com/company/vihtavuori/contact-information/>
 
 ### Western Powders
 
 - Western Powders Handloading Guide 8.0.
 - Western Powders Handloading Guide 8.0 (Accurate, Ramshot).
+- Shooting Illustrated, "Hodgdon Acquires Several Western Powder Brands", 2020-10-15. <https://www.shootingillustrated.com/articles/2020/10/15/hodgdon-acquires-several-western-powder-brands/>
 
 ### Winchester
 

@@ -1,12 +1,23 @@
 {
   "id": "alliant",
   "name": "Alliant",
+  "country": "US",
+  "website": "https://www.alliantpowder.com/",
   "provenance": {
     "kind": "published",
     "sources": [
       {
         "source": "alliant-reloader-s-guide-2023-metallic-tables",
         "fields": ["name"]
+      },
+      {
+        "title": "Alliant Powder, questions page",
+        "publisher": "Alliant Powder",
+        "url": "https://www.alliantpowder.com/questions/default.aspx",
+        "retrieved": "2026-11-06",
+        "fields": ["country", "website"],
+        "origin": "manufacturer",
+        "note": "Mailing address: Alliant Powder, 2299 Snake River Avenue, Lewiston, ID 83501, United States."
       }
     ]
   }
