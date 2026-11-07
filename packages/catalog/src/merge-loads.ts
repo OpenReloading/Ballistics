@@ -73,7 +73,7 @@ export function formatRecord(json: unknown) {
     [
       join(repository, 'node_modules', '@biomejs', 'biome', 'bin', 'biome'),
       'format',
-      '--stdin-file-path=packages/data/records/loads/merged.json',
+      '--stdin-file-path=packages/catalog/records/loads/merged.json',
     ],
     {
       cwd: repository,

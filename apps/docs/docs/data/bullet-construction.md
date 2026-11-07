@@ -39,7 +39,7 @@ A jacket does not enter: the jackets of the schema hold no lead. The flag descri
 
 ## Provenance
 
-The record's `provenance` covers the construction as a whole (`fields: ["construction"]`) or by dot path (`construction.core.hardness`, `construction.gasCheck`). `pnpm run data:validate` fails a construction field no source covers (`checkCoverage`, `packages/data/src/coverage.ts`).
+The record's `provenance` covers the construction as a whole (`fields: ["construction"]`) or by dot path (`construction.core.hardness`, `construction.gasCheck`). `pnpm run data:validate` fails a construction field no source covers (`checkCoverage`, `packages/catalog/src/coverage.ts`).
 
 ## Maker wording
 

@@ -2,7 +2,7 @@
   "packages/schema": "0.0.5",
   "packages/drawing": "0.0.4",
   "packages/importers": "0.0.5",
-  "packages/data": "0.0.5",
+  "packages/catalog": "0.0.5",
   "packages/api": "0.0.5",
   "packages/cli": "0.0.1",
   "apps/web": "0.0.5",

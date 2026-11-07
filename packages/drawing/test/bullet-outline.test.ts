@@ -610,7 +610,7 @@ function shapeOf(r: BulletJson): BulletDimensions | undefined {
   })
 }
 
-const bulletDir = new URL('../../data/records/bullets/', import.meta.url)
+const bulletDir = new URL('../../catalog/records/bullets/', import.meta.url)
 
 describe('records', () => {
   it('every committed bullet record with a length gives a valid outline', () => {

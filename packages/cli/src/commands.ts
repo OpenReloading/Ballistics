@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { readPublishedLoads } from '@open-reloading/data'
+import { readPublishedLoads } from '@open-reloading/catalog'
 import { type SourceRecord, sourceRecord } from '@open-reloading/schema'
 import { Refusal, UsageError } from './errors.ts'
 import { type InteriorModel, outcomes } from './evaluate.ts'
@@ -50,7 +50,7 @@ function checkSealed({ split, final }: Options) {
 
 /** The records folder of the data package, which `readRecords` reads without roots. */
 const packageRecords = () =>
-  fileURLToPath(new URL('../records', import.meta.resolve('@open-reloading/data')))
+  fileURLToPath(new URL('../records', import.meta.resolve('@open-reloading/catalog')))
 
 /** Whether `path` is a folder of published load files: cartridge folders and no `.csv` file. */
 function isPublishedFolder(path: string) {

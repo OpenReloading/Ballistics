@@ -89,7 +89,7 @@ if (docs)
     },
   )
 for (const file of ['LICENSE', 'NOTICE']) cpSync(at(file), `${site}/${file}`)
-cpSync(at('packages/data/LICENSE'), `${site}/data/LICENSE`)
+cpSync(at('packages/catalog/LICENSE'), `${site}/data/LICENSE`)
 // GitHub Pages serves the files as they are, `_next/` among them, without Jekyll
 writeFileSync(`${site}/.nojekyll`, '')
 console.log(`pages/: the Pages site under ${base || '/'}`)

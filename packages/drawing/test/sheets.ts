@@ -10,7 +10,7 @@ export interface SpecRecord {
   values: (SpecValue & { side?: Side })[]
 }
 
-const dir = new URL('../../data/records/cartridges/', import.meta.url)
+const dir = new URL('../../catalog/records/cartridges/', import.meta.url)
 
 function read(file: string): SpecRecord {
   const c = JSON.parse(readFileSync(new URL(file, dir), 'utf8')) as SpecRecord & {

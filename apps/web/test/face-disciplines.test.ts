@@ -1,4 +1,4 @@
-import { readRecords } from '@open-reloading/data'
+import { readRecords } from '@open-reloading/catalog'
 import { describe, expect, it } from 'vitest'
 import {
   disciplineChoice,

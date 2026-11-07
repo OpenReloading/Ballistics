@@ -16,7 +16,7 @@ import { issueOf } from './issue.ts'
 /** The scoring of an event type record of the data package, as the event user record names it. */
 const rulesOf = (id: string): HitFactorRules =>
   JSON.parse(
-    readFileSync(new URL(`../../data/records/event-types/${id}.json`, import.meta.url), 'utf8'),
+    readFileSync(new URL(`../../catalog/records/event-types/${id}.json`, import.meta.url), 'utf8'),
   ).scoring
 
 const ipsc = rulesOf('ipsc-handgun')
@@ -139,7 +139,7 @@ describe('input checks', () => {
 /** An event type record of the data package. */
 const eventType = (id: string) =>
   JSON.parse(
-    readFileSync(new URL(`../../data/records/event-types/${id}.json`, import.meta.url), 'utf8'),
+    readFileSync(new URL(`../../catalog/records/event-types/${id}.json`, import.meta.url), 'utf8'),
   )
 const practical = (powerFactor: 'major' | 'minor') => ({
   method: 'hit-factor' as const,

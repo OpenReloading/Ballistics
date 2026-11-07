@@ -1,4 +1,4 @@
-import type { Bundle } from '@open-reloading/data'
+import type { Bundle } from '@open-reloading/catalog'
 import type { Cartridge, SpecValue } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { revisionOf } from '../src/catalogue/derive.ts'

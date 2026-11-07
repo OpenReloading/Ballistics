@@ -13,7 +13,7 @@ Seated volume and bullet records: can the [bullet from a photo](../models/bullet
 ## Method
 
 Fixed before the run.
-- **Data coverage.** Count the bullet records (`packages/data/records/bullets/`, 1,686 files on 2026-11-01) by maker and by geometry field.
+- **Data coverage.** Count the bullet records (`packages/catalog/records/bullets/`, 1,686 files on 2026-11-01) by maker and by geometry field.
 - **Accuracy.** Truth: the drawing (`bulletDimensions`, `bulletOutline`) of up to six records with a length per maker, taken in name order at a step of the maker's count over six (fewer than twelve: the first six; six or fewer: all): Cutting Edge, Hammer, Lehigh and Missouri Bullet six each, Berger 2, Nosler 1 and the two demo records, 29 bullets and three boat tails of the existing photo tests, 32 bullets from 10.5 to 58 mm long. A record with a boat-tail length and no base type (Berger) is drawn as a boat tail. Each bullet is rendered with `renderPhoto` in eight scenarios and measured with the tool's worker steps (`segmentPhoto`, `fitOutline`, `outlineHints`, `resolveScale`, `measureOutline`):
   - A: own photograph beside a ruler, 24 px per mm, scale from the ruler.
   - B, C, D: product-style image (light background, side shading, noise 3, blur 1 px, no ruler) with the bullet 900, 450 and 225 px long, scale from the record's diameter only.

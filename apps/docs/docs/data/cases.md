@@ -6,7 +6,7 @@ description: The case records that name a cartridge, a manufacturer and the stat
 
 # Brass
 
-A case record describes one cartridge case product as its manufacturer sells it, for one cartridge. A load names it with `case.record`. The stated water capacity of a case record is the default capacity of a load that names it; a capacity the user measured stays the user's value and takes precedence ([Case capacity and seating](../models/case-capacity.md)). Schema: `packages/schema/src/case.ts`. Records: `packages/data/records/cases/`.
+A case record describes one cartridge case product as its manufacturer sells it, for one cartridge. A load names it with `case.record`. The stated water capacity of a case record is the default capacity of a load that names it; a capacity the user measured stays the user's value and takes precedence ([Case capacity and seating](../models/case-capacity.md)). Schema: `packages/schema/src/case.ts`. Records: `packages/catalog/records/cases/`.
 
 ## Record
 
@@ -39,4 +39,4 @@ Served under `/v1` (`packages/api/src/routes/components.ts`): `GET /cases` filte
 
 ## Validation
 
-`pnpm run data:validate` reports a case whose `cartridge` or `manufacturer` names no record, a flash hole or mass outside the ranges of `checkCase` (`packages/data/src/plausibility.ts`), a stated water capacity above the water the case's enclosing cylinder holds, and two cases of one manufacturer and cartridge with the same name.
+`pnpm run data:validate` reports a case whose `cartridge` or `manufacturer` names no record, a flash hole or mass outside the ranges of `checkCase` (`packages/catalog/src/plausibility.ts`), a stated water capacity above the water the case's enclosing cylinder holds, and two cases of one manufacturer and cartridge with the same name.

@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core'
-import { readRecords } from '@open-reloading/data'
+import { readRecords } from '@open-reloading/catalog'
 import { toSi } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { beforeEach, expect, it, vi } from 'vitest'

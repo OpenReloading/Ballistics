@@ -69,7 +69,7 @@ analytic. Counts over the data package's discipline and caliber class records an
 
 - `packages/schema/src/federation.ts` (`category` and `caliberClasses` of a discipline).
 - `packages/schema/src/caliber-class.ts` (the member cartridges of a class).
-- `packages/data/src/caliber-classes.ts` (each member in one class only).
+- `packages/catalog/src/caliber-classes.ts` (each member in one class only).
 - `packages/schema/src/firearm.ts` (`cartridge`, no category).
 - `apps/web/src/lib/disciplines.ts` (the category and caliber class filters of the discipline list).
 - `apps/web/src/lib/directory.ts` and `apps/web/src/components/directory-table.tsx` (filters kept in the URL).

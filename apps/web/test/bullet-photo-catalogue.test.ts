@@ -28,7 +28,7 @@ import { type Known, resolveScale } from '../src/lib/bullet-photo-scale.ts'
 
 const out = process.env.BULLET_PHOTO_EVAL
 const perMaker = Number(process.env.BULLET_PHOTO_PER_MAKER ?? 6)
-const records = new URL('../../../packages/data/records/bullets/', import.meta.url)
+const records = new URL('../../../packages/catalog/records/bullets/', import.meta.url)
 
 interface Truth {
   id: string

@@ -5,7 +5,7 @@ export default {
     '../../packages/schema',
     '../../packages/drawing',
     '../../packages/importers',
-    '../../packages/data',
+    '../../packages/catalog',
     '../../packages/api',
   ],
   name: 'OpenReloading Ballistics library',

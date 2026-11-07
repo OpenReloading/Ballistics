@@ -64,7 +64,7 @@ Reuse decision:
 Simplicity gate per command:
 - Error contract, `--version`, `-`, notice, `$id`, fast `--help`: run by every script and agent that calls `verify` or `compare`; replaces guessing from stderr text. Passes.
 - `run <operation>` and `operations`: replaces starting the API server, or each user writing the 9-line script plus record resolution and error handling; the listing is what an agent reads first. How often it would run is unverified (no user report asks for it). Passes on the reuse condition only.
-- Catalogue lookup and search command: the records are JSON files in git and the API has list routes; `grep` or `jq` over `packages/data/records` (1484 files) does it. Negative result, not proposed.
+- Catalogue lookup and search command: the records are JSON files in git and the API has list routes; `grep` or `jq` over `packages/catalog/records` (1484 files) does it. Negative result, not proposed.
 - Group statistics and powder fit commands: no API operation exists, so a command would be the first and only contract for them. Not proposed; the API route comes first.
 - Tool-server wrapper: with `operations` and `run` it is a thin mapping; no agent client asks for it today. Deferred, outside the pre-release scope.
 

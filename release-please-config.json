@@ -25,7 +25,7 @@
     "packages/schema": { "component": "schema" },
     "packages/drawing": { "component": "drawing" },
     "packages/importers": { "component": "importers" },
-    "packages/data": { "component": "data" },
+    "packages/catalog": { "component": "catalog" },
     "packages/api": { "component": "api" },
     "packages/cli": { "component": "cli" },
     "apps/web": { "component": "web" },

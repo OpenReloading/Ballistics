@@ -1,4 +1,4 @@
-// Synthetic photos of the target faces of packages/data/records/target-faces for the face search:
+// Synthetic photos of the target faces of packages/catalog/records/target-faces for the face search:
 // the face drawn from its record, seen by a pinhole camera.
 import { readdirSync, readFileSync } from 'node:fs'
 import type { Federation, TargetFace } from '@open-reloading/schema'
@@ -7,8 +7,8 @@ import type { RgbaImage } from '../src/lib/image.ts'
 import { mul3, type Point, type Vector3 } from '../src/lib/target-geometry.ts'
 import { defined } from './defined.ts'
 
-const dir = new URL('../../../packages/data/records/target-faces/', import.meta.url)
-const federationDir = new URL('../../../packages/data/records/federations/', import.meta.url)
+const dir = new URL('../../../packages/catalog/records/target-faces/', import.meta.url)
+const federationDir = new URL('../../../packages/catalog/records/federations/', import.meta.url)
 const federations = readdirSync(federationDir).map(
   (f) => JSON.parse(readFileSync(new URL(f, federationDir), 'utf8')) as Federation,
 )

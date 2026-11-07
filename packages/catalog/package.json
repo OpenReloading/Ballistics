@@ -1,5 +1,5 @@
 {
-  "name": "@open-reloading/data",
+  "name": "@open-reloading/catalog",
   "version": "0.0.5",
   "description": "OpenReloading catalogue records as one JSON bundle, their reader and plausibility checks.",
   "keywords": [
@@ -10,11 +10,11 @@
     "powder"
   ],
   "license": "MIT AND CC-BY-4.0",
-  "homepage": "https://openreloading.github.io/Ballistics/docs/libraries/data/",
+  "homepage": "https://openreloading.github.io/Ballistics/docs/libraries/catalog/",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OpenReloading/Ballistics.git",
-    "directory": "packages/data"
+    "directory": "packages/catalog"
   },
   "publishConfig": {
     "access": "public"

@@ -354,7 +354,7 @@
                 "message": "drawing-core-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its core folder imports only the folders core."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|data|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "regex": "^(\\.\\./)+((units|schema|importers|catalog|api|drawing|cli)/(src|dist)|packages|apps)/",
                 "message": "drawing-core-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its core folder imports only the folders core."
               },
               {
@@ -383,7 +383,7 @@
                 "message": "drawing-cartridge-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its cartridge folder imports only the folders core, cartridge."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|data|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "regex": "^(\\.\\./)+((units|schema|importers|catalog|api|drawing|cli)/(src|dist)|packages|apps)/",
                 "message": "drawing-cartridge-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its cartridge folder imports only the folders core, cartridge."
               },
               {
@@ -412,7 +412,7 @@
                 "message": "drawing-bullet-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its bullet folder imports only the folders core, bullet."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|data|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "regex": "^(\\.\\./)+((units|schema|importers|catalog|api|drawing|cli)/(src|dist)|packages|apps)/",
                 "message": "drawing-bullet-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its bullet folder imports only the folders core, bullet."
               },
               {
@@ -441,7 +441,7 @@
                 "message": "drawing-seating-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its seating folder imports only the folders core, cartridge, bullet, seating."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|data|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "regex": "^(\\.\\./)+((units|schema|importers|catalog|api|drawing|cli)/(src|dist)|packages|apps)/",
                 "message": "drawing-seating-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its seating folder imports only the folders core, cartridge, bullet, seating."
               },
               {
@@ -470,7 +470,7 @@
                 "message": "drawing-target-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its target folder imports only the folders target."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|data|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "regex": "^(\\.\\./)+((units|schema|importers|catalog|api|drawing|cli)/(src|dist)|packages|apps)/",
                 "message": "drawing-target-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its target folder imports only the folders target."
               },
               {
@@ -483,7 +483,7 @@
       }
     },
     {
-      "files": ["packages/data/src/**"],
+      "files": ["packages/catalog/src/**"],
       "rules": {
         "no-restricted-imports": [
           "error",
@@ -497,11 +497,11 @@
                   "!@open-reloading/schema",
                   "!@open-reloading/schema/**"
                 ],
-                "message": "data-imports-schema-only: packages/data depends on @open-reloading/schema alone."
+                "message": "catalog-imports-schema-only: packages/catalog depends on @open-reloading/schema alone."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|data|api|drawing|cli)/(src|dist)|packages|apps)/",
-                "message": "data-imports-schema-only: packages/data depends on @open-reloading/schema alone."
+                "regex": "^(\\.\\./)+((units|schema|importers|catalog|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "message": "catalog-imports-schema-only: packages/catalog depends on @open-reloading/schema alone."
               }
             ]
           }
@@ -528,16 +528,16 @@
                   "!@open-reloading/ballistics/**",
                   "!@open-reloading/shot-groups",
                   "!@open-reloading/shot-groups/**",
-                  "!@open-reloading/data",
-                  "!@open-reloading/data/**",
+                  "!@open-reloading/catalog",
+                  "!@open-reloading/catalog/**",
                   "!@open-reloading/schema",
                   "!@open-reloading/schema/**"
                 ],
-                "message": "api-imports-logic-data-schema-only: packages/api depends on the logic packages (units, statistics, ballistics, shot-groups), data and schema."
+                "message": "api-imports-logic-catalog-schema-only: packages/api depends on the logic packages (units, statistics, ballistics, shot-groups), catalog and schema."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|data|api|drawing|cli)/(src|dist)|packages|apps)/",
-                "message": "api-imports-logic-data-schema-only: packages/api depends on the logic packages (units, statistics, ballistics, shot-groups), data and schema."
+                "regex": "^(\\.\\./)+((units|schema|importers|catalog|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "message": "api-imports-logic-catalog-schema-only: packages/api depends on the logic packages (units, statistics, ballistics, shot-groups), catalog and schema."
               }
             ]
           }
@@ -564,8 +564,8 @@
                   "!@open-reloading/ballistics/**",
                   "!@open-reloading/shot-groups",
                   "!@open-reloading/shot-groups/**",
-                  "!@open-reloading/data",
-                  "!@open-reloading/data/**",
+                  "!@open-reloading/catalog",
+                  "!@open-reloading/catalog/**",
                   "!@open-reloading/drawing",
                   "!@open-reloading/drawing/**",
                   "!@open-reloading/schema",
@@ -573,11 +573,11 @@
                   "!@open-reloading/api/compute",
                   "!@open-reloading/api/catalogue"
                 ],
-                "message": "cli-imports-logic-data-drawing-schema-only: packages/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), data, drawing and schema, and of @open-reloading/api only the compute and catalogue entries the browser runs."
+                "message": "cli-imports-logic-catalog-drawing-schema-only: packages/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), catalog, drawing and schema, and of @open-reloading/api only the compute and catalogue entries the browser runs."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|data|api|drawing|cli)/(src|dist)|packages|apps)/",
-                "message": "cli-imports-logic-data-drawing-schema-only: packages/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), data, drawing and schema, and of @open-reloading/api only the compute and catalogue entries the browser runs."
+                "regex": "^(\\.\\./)+((units|schema|importers|catalog|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "message": "cli-imports-logic-catalog-drawing-schema-only: packages/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), catalog, drawing and schema, and of @open-reloading/api only the compute and catalogue entries the browser runs."
               }
             ]
           }
@@ -594,9 +594,9 @@
             "patterns": [
               {
                 "group": [
-                  "@open-reloading/data",
-                  "@open-reloading/data/**",
-                  "!@open-reloading/data/plausibility",
+                  "@open-reloading/catalog",
+                  "@open-reloading/catalog/**",
+                  "!@open-reloading/catalog/plausibility",
                   "@open-reloading/api",
                   "@open-reloading/api/**",
                   "!@open-reloading/api/compute",
@@ -606,11 +606,11 @@
                   "fastify/**",
                   "@fastify/**"
                 ],
-                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/data only the plausibility checks and of @open-reloading/api only the compute, catalogue and advisories entries of the static site run in the web app."
+                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/catalog only the plausibility checks and of @open-reloading/api only the compute, catalogue and advisories entries of the static site run in the web app."
               },
               {
                 "regex": "^(\\.\\./)+packages/",
-                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/data only the plausibility checks and of @open-reloading/api only the compute, catalogue and advisories entries of the static site run in the web app."
+                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/catalog only the plausibility checks and of @open-reloading/api only the compute, catalogue and advisories entries of the static site run in the web app."
               },
               {
                 "regex": "^node:",
@@ -631,9 +631,9 @@
             "patterns": [
               {
                 "group": [
-                  "@open-reloading/data",
-                  "@open-reloading/data/**",
-                  "!@open-reloading/data/plausibility",
+                  "@open-reloading/catalog",
+                  "@open-reloading/catalog/**",
+                  "!@open-reloading/catalog/plausibility",
                   "@open-reloading/api",
                   "@open-reloading/api/**",
                   "!@open-reloading/api/compute",
@@ -643,11 +643,11 @@
                   "fastify/**",
                   "@fastify/**"
                 ],
-                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/data only the plausibility checks and of @open-reloading/api only the compute, catalogue and advisories entries of the static site run in the web app."
+                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/catalog only the plausibility checks and of @open-reloading/api only the compute, catalogue and advisories entries of the static site run in the web app."
               },
               {
                 "regex": "^(\\.\\./)+packages/",
-                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/data only the plausibility checks and of @open-reloading/api only the compute, catalogue and advisories entries of the static site run in the web app."
+                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/catalog only the plausibility checks and of @open-reloading/api only the compute, catalogue and advisories entries of the static site run in the web app."
               }
             ]
           }

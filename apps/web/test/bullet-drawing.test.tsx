@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs'
-import { readRecords } from '@open-reloading/data'
+import { readRecords } from '@open-reloading/catalog'
 import { face } from '@open-reloading/drawing'
 import {
   type BulletProfile,

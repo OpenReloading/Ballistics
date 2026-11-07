@@ -19,7 +19,7 @@
                 "message": "units-imports-nothing: packages/units is the bottom of the graph and has no I/O: it imports only its own files."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|data|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "regex": "^(\\.\\./)+((units|schema|importers|catalog|api|drawing|cli)/(src|dist)|packages|apps)/",
                 "message": "units-imports-nothing: packages/units is the bottom of the graph and has no I/O: it imports only its own files."
               }
             ]

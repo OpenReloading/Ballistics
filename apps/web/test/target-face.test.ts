@@ -24,7 +24,7 @@ import {
   type Scene,
 } from './face-render.ts'
 
-// Face recognition on photos drawn from the records of packages/data/records/target-faces:
+// Face recognition on photos drawn from the records of packages/catalog/records/target-faces:
 // the face on a 1200 x 900 px photo, its rings 2.2 px wide, seen by a
 // pinhole camera at three views, with noise. The truth is the camera's homography.
 const W = 1200

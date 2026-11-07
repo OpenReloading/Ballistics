@@ -139,21 +139,21 @@
     "source": "export const w = () => window.location.href",
     "rules": ["logic-no-dom"]
   },
-  "packages/data/src/schema-and-fs.ts": {
+  "packages/catalog/src/schema-and-fs.ts": {
     "source": "import { readFileSync } from 'node:fs'\nimport { Load } from '@open-reloading/schema'\nexport { readFileSync, Load }",
     "rules": []
   },
-  "packages/data/src/ballistics.ts": {
+  "packages/catalog/src/ballistics.ts": {
     "source": "import { waterDensity } from '@open-reloading/ballistics'\nexport { waterDensity }",
-    "rules": ["data-imports-schema-only"]
+    "rules": ["catalog-imports-schema-only"]
   },
-  "packages/api/src/logic-data-schema.ts": {
-    "source": "import { waterDensity } from '@open-reloading/ballistics'\nimport { readRecords } from '@open-reloading/data'\nimport { Load } from '@open-reloading/schema'\nimport Fastify from 'fastify'\nexport { waterDensity, readRecords, Load, Fastify }",
+  "packages/api/src/logic-catalog-schema.ts": {
+    "source": "import { waterDensity } from '@open-reloading/ballistics'\nimport { readRecords } from '@open-reloading/catalog'\nimport { Load } from '@open-reloading/schema'\nimport Fastify from 'fastify'\nexport { waterDensity, readRecords, Load, Fastify }",
     "rules": []
   },
   "packages/api/src/importers.ts": {
     "source": "import { parse } from '@open-reloading/importers'\nexport { parse }",
-    "rules": ["api-imports-logic-data-schema-only"]
+    "rules": ["api-imports-logic-catalog-schema-only"]
   },
   "packages/cli/src/rows.ts": {
     "source": "export const rows = 1",
@@ -164,12 +164,12 @@
     "rules": []
   },
   "packages/cli/src/libraries.ts": {
-    "source": "import { interior } from '@open-reloading/ballistics'\nimport { readRecords } from '@open-reloading/data'\nimport { seat } from '@open-reloading/drawing/seating'\nimport { toSi } from '@open-reloading/schema'\nexport { interior, readRecords, seat, toSi }",
+    "source": "import { interior } from '@open-reloading/ballistics'\nimport { readRecords } from '@open-reloading/catalog'\nimport { seat } from '@open-reloading/drawing/seating'\nimport { toSi } from '@open-reloading/schema'\nexport { interior, readRecords, seat, toSi }",
     "rules": []
   },
   "packages/cli/src/api.ts": {
     "source": "import { buildApp } from '@open-reloading/api'\nexport { buildApp }",
-    "rules": ["cli-imports-logic-data-drawing-schema-only"]
+    "rules": ["cli-imports-logic-catalog-drawing-schema-only"]
   },
   "packages/cli/src/api-entries.ts": {
     "source": "import { runTask } from '@open-reloading/api/compute'\nimport { openCatalogue } from '@open-reloading/api/catalogue'\nexport { runTask, openCatalogue }",
@@ -177,18 +177,18 @@
   },
   "packages/cli/src/api-static.ts": {
     "source": "import { startBundleApi } from '@open-reloading/api/static'\nexport { startBundleApi }",
-    "rules": ["cli-imports-logic-data-drawing-schema-only"]
+    "rules": ["cli-imports-logic-catalog-drawing-schema-only"]
   },
   "packages/cli/src/web.ts": {
     "source": "import type { SpecValue } from '../../../apps/web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
-    "rules": ["cli-imports-logic-data-drawing-schema-only"]
+    "rules": ["cli-imports-logic-catalog-drawing-schema-only"]
   },
   "packages/api/src/web.ts": {
     "source": "import type { SpecValue } from '../../../apps/web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
-    "rules": ["api-imports-logic-data-schema-only"]
+    "rules": ["api-imports-logic-catalog-schema-only"]
   },
   "apps/web/src/lib/allowed.ts": {
-    "source": "import { checkSpec } from '@open-reloading/data/plausibility'\nimport { runTask } from '@open-reloading/api/compute'\nimport { openCatalogue } from '@open-reloading/api/catalogue'\nimport { waterDensity } from '@open-reloading/ballistics'\nimport { seating } from '@open-reloading/drawing/seating'\nexport { checkSpec, runTask, openCatalogue, waterDensity, seating }",
+    "source": "import { checkSpec } from '@open-reloading/catalog/plausibility'\nimport { runTask } from '@open-reloading/api/compute'\nimport { openCatalogue } from '@open-reloading/api/catalogue'\nimport { waterDensity } from '@open-reloading/ballistics'\nimport { seating } from '@open-reloading/drawing/seating'\nexport { checkSpec, runTask, openCatalogue, waterDensity, seating }",
     "rules": []
   },
   "apps/web/src/lib/alias.ts": {
@@ -204,7 +204,7 @@
     "rules": []
   },
   "apps/web/src/lib/data-package.ts": {
-    "source": "import { readRecords } from '@open-reloading/data'\nexport { readRecords }",
+    "source": "import { readRecords } from '@open-reloading/catalog'\nexport { readRecords }",
     "rules": ["web-reads-api-only"]
   },
   "apps/web/src/lib/api-static.ts": {

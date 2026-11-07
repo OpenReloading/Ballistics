@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest'
 
 // The exported names of each published package, read from the declarations the build writes, so a
 // type counts as much as a value. `pnpm run baselines` at the root rewrites the lists.
-const published = ['schema', 'drawing', 'importers', 'data']
+const published = ['schema', 'drawing', 'importers', 'catalog']
 
 /** The names a declaration file exports, following `export *` through its relative imports and into workspace packages. */
 function exportedNames(file: URL, seen = new Set<string>()): string[] {

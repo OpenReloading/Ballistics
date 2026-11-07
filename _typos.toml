@@ -6,7 +6,7 @@ ignore-hidden = false
 extend-exclude = [
   ".git/",
   # records quote names, titles and units in the language of their source
-  "packages/data/records/",
+  "packages/catalog/records/",
   # generated or copied byte for byte from a tool
   "pnpm-lock.yaml",
   ".github/pnpm/package-lock.json",

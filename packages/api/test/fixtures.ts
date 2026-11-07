@@ -4,7 +4,7 @@ import {
   type Projectile,
   type TrajectoryInput,
 } from '@open-reloading/ballistics'
-import type { Bundle } from '@open-reloading/data'
+import type { Bundle } from '@open-reloading/catalog'
 import {
   type AnalysisKey,
   analysisKinds,

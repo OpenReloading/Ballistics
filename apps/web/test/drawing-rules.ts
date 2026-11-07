@@ -33,7 +33,7 @@ export interface SpecRecord {
   values: SpecValue[]
 }
 
-const dir = new URL('../../../packages/data/records/cartridges/', import.meta.url)
+const dir = new URL('../../../packages/catalog/records/cartridges/', import.meta.url)
 /** The CIP records whose every value was checked by hand against the sheet. */
 export const verified: SpecRecord[] = readdirSync(dir)
   .filter((f) => f.endsWith('.json'))

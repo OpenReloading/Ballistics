@@ -28,7 +28,7 @@ vi.mock('next/navigation', () => ({
 }))
 
 const mappings = readdirSync(
-  new URL('../../../packages/data/records/target-mappings/', import.meta.url),
+  new URL('../../../packages/catalog/records/target-mappings/', import.meta.url),
 )
   .sort()
   .map((f) => readRecord<TargetMapping>(`target-mappings/${f}`))

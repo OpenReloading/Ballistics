@@ -24,7 +24,7 @@ function ok<R extends object>(r: R): Exclude<R, { issue: unknown }> {
 /** A target face record of the data package, read from its file. */
 const face = (id: string): ScoringFace & { id: string } =>
   JSON.parse(
-    readFileSync(new URL(`../../data/records/target-faces/${id}.json`, import.meta.url), 'utf8'),
+    readFileSync(new URL(`../../catalog/records/target-faces/${id}.json`, import.meta.url), 'utf8'),
   )
 
 const airRifle = face('issf-10m-air-rifle')
