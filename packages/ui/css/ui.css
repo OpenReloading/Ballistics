@@ -65,3 +65,70 @@
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+
+/* The page bar: title, status and actions on one line, the actions wrapping under the title when narrow */
+.ui-page-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs) var(--space-sm);
+  min-height: var(--size-control-bar);
+  padding-block: var(--space-xs);
+  margin-block-end: var(--space-md);
+  border-block-end: 1px solid var(--line);
+}
+
+.ui-page-bar h1 {
+  margin: 0;
+  font-size: var(--font-heading-h1-size);
+  font-weight: var(--font-heading-h1-weight);
+  line-height: var(--font-heading-h1-line-height);
+}
+
+.ui-page-bar-status {
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+}
+
+.ui-page-bar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-inline-start: auto;
+}
+
+/* A navigation link: the icon over its label in the rail, side by side in the phone's panel */
+.ui-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  min-height: var(--size-target);
+  padding: var(--space-xs) 0;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  text-decoration: none;
+}
+
+.ui-nav-item:hover {
+  color: var(--ink);
+  background: var(--surface-alt);
+}
+
+.ui-nav-item[aria-current="page"] {
+  color: var(--accent);
+}
+
+.ui-nav-item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+@media (max-width: 74.99em) {
+  .ui-nav-item {
+    flex-direction: row;
+    gap: var(--space-sm);
+    padding-inline: var(--space-sm);
+    font-size: var(--font-size-md);
+  }
+}

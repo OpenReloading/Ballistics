@@ -4,8 +4,47 @@
 
 ```ts
 
+import type { ComponentPropsWithRef } from 'react';
+import type { LucideIcon } from 'lucide-react';
 import { MantineProviderProps } from '@mantine/core';
 import type { ReactElement } from 'react';
+import type { ReactNode } from 'react';
+
+// @public
+export function AppFrame(input: AppFrameProps): ReactElement;
+
+// @public (undocumented)
+export interface AppFrameProps {
+    account?: ReactNode;
+    brand: ReactNode;
+    children: ReactNode;
+    end?: ReactNode;
+    labels: {
+        menu: string;
+        navigation: string;
+    };
+    navigation: ReactNode;
+}
+
+// @public
+export function NavItem(input: NavItemProps): ReactElement;
+
+// @public (undocumented)
+export interface NavItemProps extends ComponentPropsWithRef<'a'> {
+    icon: LucideIcon;
+    // (undocumented)
+    label: string;
+}
+
+// @public
+export function PageBar(input: PageBarProps): ReactElement;
+
+// @public (undocumented)
+export interface PageBarProps {
+    actions?: ReactNode;
+    status?: ReactNode;
+    title: string;
+}
 
 // @public
 export function UiProvider(props: Pick<MantineProviderProps, 'children' | 'defaultColorScheme' | 'forceColorScheme' | 'colorSchemeManager'>): ReactElement;
