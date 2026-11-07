@@ -9,7 +9,7 @@ import {
   type TrajectoryInput,
   type TrajectoryPoint,
   trajectory,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
 import { msg } from '../i18n/translate.ts'
 import type { FieldSpec } from './field-spec.ts'
 import { nth } from './nth.ts'
@@ -204,7 +204,7 @@ function zeroAir(values: Values, air: Air): Air | undefined {
 }
 
 /**
- * Core `TrajectoryInput` from SI field values. The zero has no wind and the air of the shot unless
+ * The `TrajectoryInput` of ballistics from SI field values. The zero has no wind and the air of the shot unless
  * a zero air field is set; a drag factor multiplies the drag of the projectile, in the zero too.
  */
 export function shotFromValues(
@@ -238,7 +238,7 @@ export function shotFromValues(
   }
 }
 
-/** Core `Projectile` from the manual bullet fields (SI). */
+/** The `Projectile` of ballistics from the manual bullet fields (SI). */
 export function manualProjectile(values: Values, model: DragModel): Projectile {
   const v = (key: string) => requireValue(values, manualBulletFields, key)
   const length = values.length
@@ -302,7 +302,7 @@ export type TrajectoryResult = {
   densityAltitude: number
 }
 
-/** Table and chart points of one shot from SI field values; throws the input and core errors. */
+/** Table and chart points of one shot from SI field values; throws the input and model errors. */
 export function trajectoryResult(
   values: Values,
   projectile: Projectile,

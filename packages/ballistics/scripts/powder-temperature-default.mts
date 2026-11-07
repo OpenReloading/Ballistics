@@ -98,6 +98,8 @@ const stats = (xs: number[]) => {
 
 console.log('| Load | Velocity | sigma 0.0025: dv | Extruded (14) mean, SD | All 17 mean, SD |')
 console.log('|---|---|---|---|---|')
+const fixed5 = (x: number) => x.toFixed(5)
+
 for (const charge of [0.0024, 0.0028, 0.0032]) {
   const load = calibrated(charge)
   const v0 = valid(load).muzzleVelocity
@@ -114,8 +116,7 @@ for (const charge of [0.0024, 0.0028, 0.0032]) {
   const sigmas = rows.map(([, form, cool, warm]) => ({ form, sigma: invert(warm / cool - 1) }))
   const extruded = stats(sigmas.filter((s) => s.form === 'extruded').map((s) => s.sigma))
   const all = stats(sigmas.map((s) => s.sigma))
-  const f = (x: number) => x.toFixed(5)
   console.log(
-    `| ${charge * 1000} g | ${v0.toFixed(0)} m/s | ${(100 * dv(0.0025)).toFixed(2)} % | ${f(extruded.mean)}, ${f(extruded.sd)} | ${f(all.mean)}, ${f(all.sd)} |`,
+    `| ${charge * 1000} g | ${v0.toFixed(0)} m/s | ${(100 * dv(0.0025)).toFixed(2)} % | ${fixed5(extruded.mean)}, ${fixed5(extruded.sd)} | ${fixed5(all.mean)}, ${fixed5(all.sd)} |`,
   )
 }

@@ -1,4 +1,4 @@
-import { lbPerSqInToKgPerSqM, millerStability } from '@open-reloading/core'
+import { lbPerSqInToKgPerSqM, millerStability } from '@open-reloading/ballistics'
 import { bulletDimensions } from '@open-reloading/drawing/bullet'
 import { bulletOutline } from '@open-reloading/drawing/seating'
 import type { Bullet } from '@open-reloading/schema'

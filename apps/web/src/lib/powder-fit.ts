@@ -7,7 +7,7 @@ import type {
   PowderFitReason,
   PowderPrediction,
   PowderPressureRange,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
 import { msg } from '../i18n/translate.ts'
 
 /**

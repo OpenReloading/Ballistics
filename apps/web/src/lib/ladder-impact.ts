@@ -1,4 +1,4 @@
-import { type ImpactStep, ladderImpactResiduals } from '@open-reloading/core'
+import { type ImpactStep, ladderImpactResiduals } from '@open-reloading/ballistics'
 import { type SessionRecord, type ShotGroup, toSi } from '@open-reloading/schema'
 import { sessionRef } from './measurements.ts'
 

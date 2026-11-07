@@ -1,7 +1,8 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { dirname, extname, join, relative, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { InputError, interior } from '@open-reloading/core'
+import { interior } from '@open-reloading/ballistics'
+import { InputError } from '@open-reloading/statistics'
 import { UsageError } from './errors.ts'
 import type { InteriorModel } from './evaluate.ts'
 

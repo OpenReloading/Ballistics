@@ -1,4 +1,4 @@
-import { loadRatio } from '@open-reloading/core'
+import { loadRatio } from '@open-reloading/ballistics'
 import { type Annotation, angleText, face, greek } from '@open-reloading/drawing'
 import type { Seating } from '@open-reloading/drawing/seating'
 import { toSi } from '@open-reloading/schema'

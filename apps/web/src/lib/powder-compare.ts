@@ -1,4 +1,4 @@
-import { powderModelValues } from '@open-reloading/core'
+import { powderModelValues } from '@open-reloading/ballistics'
 import { type Powder, toSi } from '@open-reloading/schema'
 import type { InteriorBody } from './interior-input.ts'
 import { type SortDirection, sortRows } from './lists.ts'

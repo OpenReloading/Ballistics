@@ -65,11 +65,21 @@ test('every display equation of a model page names its code', () => {
   assert.deepEqual(errors, [])
 })
 
-test('every core source file is named on a model page', () => {
+test('every source file of the model packages is named on a model page', () => {
   const text = pages.map((p) => p.text).join('\n')
-  const internal = new Set(['index.ts', 'errors.ts', 'bisect.ts'])
-  const unnamed = filesUnder(`${root}packages/core/src`).filter(
-    (f) => !internal.has(f) && !text.includes(`packages/core/src/${f}`),
+  const internal = new Set([
+    'index.ts',
+    'errors.ts',
+    'interval.ts',
+    'issue.ts',
+    'key-list.ts',
+    'parse.ts',
+    'settings.ts',
+  ])
+  const unnamed = ['units', 'statistics', 'ballistics', 'shot-groups'].flatMap((name) =>
+    filesUnder(`${root}packages/${name}/src`).filter(
+      (f) => !internal.has(f) && !text.includes(`packages/${name}/src/${f}`),
+    ),
   )
   assert.deepEqual(unnamed, [])
 })

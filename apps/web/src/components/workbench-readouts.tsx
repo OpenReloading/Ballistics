@@ -1,7 +1,7 @@
 'use client'
 
 import { Popover, UnstyledButton } from '@mantine/core'
-import { type FreeRecoil, freeRecoil } from '@open-reloading/core'
+import { type FreeRecoil, freeRecoil } from '@open-reloading/ballistics'
 import { fromSi } from '@open-reloading/schema'
 import { memo, useEffect, useRef } from 'react'
 import { useTranslation } from '../i18n/language.ts'
@@ -52,7 +52,7 @@ import {
 
 const reasonText: Record<string, Message> = { noValue: msg('no value') }
 
-/** What an invalid run (the reasons of `InteriorReason` in core) means and what to change. */
+/** What an invalid run (the reasons of `InteriorReason` in ballistics) means and what to change. */
 const invalidRunText: Record<string, Message> = {
   input: msg("A value is outside the model's range. Check the field named below."),
   chamberVolume: msg(

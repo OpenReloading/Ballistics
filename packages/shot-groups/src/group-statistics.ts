@@ -29,7 +29,7 @@ export interface GroupPoint {
   y: number
 }
 
-/** Input of the group statistics: shots at one distance, finite coordinates, `distance` > 0. */
+/** Input of the group statistics: shots at one distance, finite coordinates, a positive `distance`. */
 export interface GroupInput {
   /** Shots of the group; excluded shots are left out of the dispersion values. */
   shots: GroupShot[]
@@ -92,7 +92,7 @@ export interface VelocityCorrelation {
 
 /**
  * Values of one group, m unless stated; definitions, divisors and sources in
- * `apps/docs/docs/models/groups.md`. Dispersion values need n >= 2.
+ * `apps/docs/docs/models/groups.md`. Dispersion values need two shots or more.
  */
 export interface GroupStatistics {
   /** Included shots. */
@@ -187,7 +187,7 @@ function sums(points: GroupPoint[], c: GroupPoint) {
   return { xx, yy, xy }
 }
 
-/** Largest, smallest and mean distance over all pairs; n >= 2. */
+/** Largest, smallest and mean distance over all pairs; two shots or more. */
 function pairDistances(points: GroupPoint[]) {
   let max = 0
   let min = Number.POSITIVE_INFINITY

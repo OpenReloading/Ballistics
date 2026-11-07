@@ -4,7 +4,7 @@ import {
   interiorDefaults,
   overlay,
   pressureToleranceDefaults,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
 import { z } from 'zod'
 import { caps, recordId, steps } from './schemas.ts'
 

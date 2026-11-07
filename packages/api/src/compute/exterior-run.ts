@@ -2,8 +2,9 @@
  * `POST /exterior/trajectory`, `/exterior/truing`, `/exterior/range-strings/plan` and `/fit` and
  * `GET /exterior/stability`: the answers, with the bullet of a `bullet` id resolved.
  */
-import { InputError, icao, millerStability } from '@open-reloading/core'
+import { icao, millerStability } from '@open-reloading/ballistics'
 import type { Bullet } from '@open-reloading/schema'
+import { InputError } from '@open-reloading/statistics'
 import { assertFinite, resolvedRecord } from './answer.ts'
 import type { TrajectoryBody, TruingBody } from './exterior-schema.ts'
 import { bulletProjectile, bulletSi } from './resolve.ts'

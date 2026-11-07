@@ -4,7 +4,7 @@ import {
   interior,
   predictPowder,
   stringLadder,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
 import { describe, expect, it } from 'vitest'
 import { load } from '../../../packages/ballistics/test/powder-load.ts'
 import { nth } from '../src/lib/nth.ts'

@@ -5,6 +5,15 @@
 ```ts
 
 import { Diagnostic } from '@open-reloading/statistics';
+import { Interval } from '@open-reloading/statistics';
+
+// @public
+export interface AimOffset {
+    compass: CompassPoint;
+    distance: number;
+    dx: number;
+    dy: number;
+}
 
 // @public
 export const apply3: (m: Matrix, v: Readonly<Vector3>) => Vector3;
@@ -31,6 +40,9 @@ export function circleThrough(a: Point, b: Point, c: Point): {
 };
 
 // @public
+export type CompassPoint = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW' | 'centre';
+
+// @public
 export function concentricPlane(c1: Conic, c2: Conic): {
     toPlane: Mat3;
     centre: Point;
@@ -45,6 +57,9 @@ export function conicOf(input: Ellipse): Conic;
 
 // @public (undocumented)
 export const det3: (m: Matrix) => number;
+
+// @public
+export function dispersionEllipse(stats: GroupStatistics, coverage: number): GroupEllipse | undefined;
 
 // @public
 export interface DispersionInput {
@@ -241,9 +256,62 @@ export type GeometryIssue = Diagnostic<'matrix-size', {
 }> | Diagnostic<'reference-needed'> | Diagnostic<'one-rectangle'>;
 
 // @public
+export interface GroupConfidence {
+    // (undocumented)
+    axisDegreesOfFreedom: number;
+    // (undocumented)
+    cep: Interval;
+    // (undocumented)
+    circularDegreesOfFreedom: number;
+    // (undocumented)
+    confidenceLevel: number;
+    // (undocumented)
+    radialStandardDeviation: Interval;
+    // (undocumented)
+    sigma: Interval;
+    // (undocumented)
+    standardDeviationX: Interval;
+    // (undocumented)
+    standardDeviationY: Interval;
+}
+
+// @public
+export interface GroupCovariance {
+    // (undocumented)
+    xx: number;
+    // (undocumented)
+    xy: number;
+    // (undocumented)
+    yy: number;
+}
+
+// @public
+export interface GroupEllipse {
+    angle: number;
+    semiMajor: number;
+    semiMinor: number;
+}
+
+// @public
+export interface GroupInput {
+    aim?: GroupPoint;
+    confidenceLevel?: number;
+    distance: number;
+    shots: GroupShot[];
+}
+
+// @public
 export type GroupIssue = Diagnostic<'hole-size'> | Diagnostic<'ring-marks', {
     fit: RingFitIssue;
 }>;
+
+// @public
+export interface GroupPoint {
+    // (undocumented)
+    x: number;
+    // (undocumented)
+    y: number;
+}
 
 // @public
 export type GroupScore = {
@@ -252,6 +320,46 @@ export type GroupScore = {
     decimalTotal?: number;
     innerTenCount: number;
 };
+
+// @public
+export interface GroupShot {
+    // (undocumented)
+    excluded?: boolean;
+    // (undocumented)
+    velocity?: number;
+    // (undocumented)
+    x: number;
+    // (undocumented)
+    y: number;
+}
+
+// @public
+export interface GroupStatistics {
+    aimOffset?: AimOffset;
+    centre?: GroupPoint;
+    cep?: number;
+    cepElliptical?: number;
+    confidence?: GroupConfidence;
+    covariance?: GroupCovariance;
+    excludedCount: number;
+    excludedOffset?: GroupPoint;
+    extremeSpread?: number;
+    height?: number;
+    meanPairDistance?: number;
+    meanRadius?: number;
+    minPairDistance?: number;
+    principalAxisAngle?: number;
+    radialStandardDeviation?: number;
+    radiusStandardDeviation?: number;
+    shotCount: number;
+    standardDeviationX?: number;
+    standardDeviationY?: number;
+    velocityCorrelation?: VelocityCorrelation;
+    width?: number;
+}
+
+// @public
+export function groupStatistics(input: GroupInput): GroupStatistics;
 
 // @public
 export function hitFactor(points: number, time: number): number;
@@ -354,6 +462,33 @@ export interface PointOffset {
 }
 
 // @public
+export interface PooledGroupStatistics extends Partial<PooledValues> {
+    angular?: PooledValues;
+    groupCount: number;
+    // (undocumented)
+    groupSizes: number[];
+    shotCount: number;
+}
+
+// @public
+export function pooledGroupStatistics(groups: GroupInput[], confidenceLevel?: number): PooledGroupStatistics;
+
+// @public
+export interface PooledValues {
+    // (undocumented)
+    cep: number;
+    // (undocumented)
+    confidence: GroupConfidence;
+    meanExtremeSpread: number;
+    // (undocumented)
+    radialStandardDeviation: number;
+    // (undocumented)
+    standardDeviationX: number;
+    // (undocumented)
+    standardDeviationY: number;
+}
+
+// @public
 export function practicalEventTotals(stages: readonly PracticalStage[], rules: HitFactorRules, state: ResultState): EventTotals;
 
 // @public
@@ -375,6 +510,9 @@ export interface PracticalStage {
     stagePoints?: number | undefined;
     time: number;
 }
+
+// @public
+export function predictionEllipse(stats: GroupStatistics, coverage: number): GroupEllipse | undefined;
 
 // @public
 export function ransacEllipse(pts: readonly Point[], o: RobustOptions, rnd?: () => number): RobustFit | undefined;
@@ -560,6 +698,9 @@ export interface StageScore {
     stagePoints?: number | undefined;
 }
 
+// @public
+export function subtendedAngle(length: number, distance: number): number;
+
 // @public (undocumented)
 export const toImage: (c: Calibration, q: Point) => Point;
 
@@ -588,6 +729,13 @@ export function usesOwnTenthRule(face: ScoringFace, hole: number): boolean;
 
 // @public
 export type Vector3 = [number, number, number];
+
+// @public
+export interface VelocityCorrelation {
+    correlation: number;
+    shotCount: number;
+    slope: number;
+}
 
 // @public
 export interface ZonePoints {

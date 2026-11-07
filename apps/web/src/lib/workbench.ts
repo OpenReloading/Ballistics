@@ -1,6 +1,11 @@
 // the words alone: the compute entry would pull its schemas into the workbench
 import { advisoryText } from '@open-reloading/api/advisories'
-import { fillLoadRatioLimit, loadRatio, solidFill, solidFillLimit } from '@open-reloading/core'
+import {
+  fillLoadRatioLimit,
+  loadRatio,
+  solidFill,
+  solidFillLimit,
+} from '@open-reloading/ballistics'
 import { fromSi, sheetId, toSi } from '@open-reloading/schema'
 import { formatNumber } from '../i18n/number.ts'
 import { msg, type Say, type Translator } from '../i18n/translate.ts'

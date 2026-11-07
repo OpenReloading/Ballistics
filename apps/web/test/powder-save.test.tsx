@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core'
-import { type ChronographString, interior, powderModelValues } from '@open-reloading/core'
+import { type ChronographString, interior, powderModelValues } from '@open-reloading/ballistics'
 import { fromSi, type Powder, userRecord } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'

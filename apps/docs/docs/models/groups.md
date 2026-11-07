@@ -27,13 +27,13 @@ $$
 \bar x = \frac{1}{n} \sum_{i=1}^{n} x_i, \qquad \bar y = \frac{1}{n} \sum_{i=1}^{n} y_i
 $$
 
-Code: `packages/core/src/groups/statistics.ts`, `groupStatistics` (`centreOf`).
+Code: `packages/shot-groups/src/group-statistics.ts`, `groupStatistics` (`centreOf`).
 
 $$
 S_{xx} = \sum_i (x_i - \bar x)^2, \qquad S_{yy} = \sum_i (y_i - \bar y)^2, \qquad S_{xy} = \sum_i (x_i - \bar x)(y_i - \bar y)
 $$
 
-Code: `packages/core/src/groups/statistics.ts`, `sums`.
+Code: `packages/shot-groups/src/group-statistics.ts`, `sums`.
 
 The offset of the centre from the point of aim $(x_a, y_a)$ is $(\bar x - x_a, \bar y - y_a)$. Its compass point (N up, E right) is the nearest of eight sectors of 45 degrees, or the centre below $10^{-9}$ m:
 
@@ -41,7 +41,7 @@ $$
 \beta = \operatorname{atan2}(\Delta x, \Delta y), \qquad q = \left(\operatorname{round}\frac{\beta}{\pi/4} + 8\right) \bmod 8
 $$
 
-Code: `packages/core/src/groups/statistics.ts`, `compassOf`.
+Code: `packages/shot-groups/src/group-statistics.ts`, `compassOf`.
 
 ### Sizes
 
@@ -51,7 +51,7 @@ $$
 \mathrm{ES} = \max_{i \lt j} d_{ij}, \qquad d_{\min} = \min_{i \lt j} d_{ij}, \qquad \bar d = \frac{2}{n(n-1)} \sum_{i \lt j} d_{ij}, \qquad d_{ij} = \sqrt{(x_i - x_j)^2 + (y_i - y_j)^2}
 $$
 
-Code: `packages/core/src/groups/statistics.ts`, `pairDistances`.
+Code: `packages/shot-groups/src/group-statistics.ts`, `pairDistances`.
 
 Width and height are the ranges of the coordinates along the target axes:
 
@@ -59,7 +59,7 @@ $$
 W = \max_i x_i - \min_i x_i, \qquad H = \max_i y_i - \min_i y_i
 $$
 
-Code: `packages/core/src/groups/statistics.ts`, `groupStatistics` (`width`, `height`).
+Code: `packages/shot-groups/src/group-statistics.ts`, `groupStatistics` (`width`, `height`).
 
 Mean radius and the standard deviation of the radii:
 
@@ -67,7 +67,7 @@ $$
 r_i = \sqrt{(x_i - \bar x)^2 + (y_i - \bar y)^2}, \qquad \bar r = \frac{1}{n} \sum_i r_i, \qquad s_r = \sqrt{\frac{\sum_i (r_i - \bar r)^2}{n - 1}}
 $$
 
-Code: `packages/core/src/groups/statistics.ts`, `groupStatistics` (`meanRadius`, `radiusStandardDeviation`).
+Code: `packages/shot-groups/src/group-statistics.ts`, `groupStatistics` (`meanRadius`, `radiusStandardDeviation`).
 
 ### Standard deviations and circular error probable
 
@@ -75,7 +75,7 @@ $$
 s_x = \sqrt{\frac{S_{xx}}{n-1}}, \qquad s_y = \sqrt{\frac{S_{yy}}{n-1}}, \qquad s_\mathrm{rad} = \sqrt{s_x^2 + s_y^2}
 $$
 
-Code: `packages/core/src/groups/statistics.ts`, `groupStatistics` (`standardDeviationX`, `standardDeviationY`, `radialStandardDeviation`).
+Code: `packages/shot-groups/src/group-statistics.ts`, `groupStatistics` (`standardDeviationX`, `standardDeviationY`, `radialStandardDeviation`).
 
 The circular CEP assumes equal, uncorrelated axes with per-axis standard deviation $\hat\sigma$:
 
@@ -83,7 +83,7 @@ $$
 \hat\sigma = \sqrt{\frac{s_x^2 + s_y^2}{2}}, \qquad \mathrm{CEP} = \sqrt{2 \ln 2}\, \hat\sigma
 $$
 
-Code: `packages/core/src/groups/statistics.ts`, `groupStatistics` (`cepFactor`).
+Code: `packages/shot-groups/src/group-statistics.ts`, `groupStatistics` (`cepFactor`).
 
 ### Covariance and principal axis
 
@@ -93,7 +93,7 @@ $$
 C = \frac{1}{n-1} \begin{pmatrix} S_{xx} & S_{xy} \\ S_{xy} & S_{yy} \end{pmatrix}, \qquad \lambda_{1,2} = \frac{c_{xx} + c_{yy}}{2} \pm \sqrt{\left(\frac{c_{xx} - c_{yy}}{2}\right)^2 + c_{xy}^2}
 $$
 
-Code: `packages/core/src/groups/statistics.ts`, `groupStatistics` (`covariance`), `eigenvalues`.
+Code: `packages/shot-groups/src/group-statistics.ts`, `groupStatistics` (`covariance`), `eigenvalues`.
 
 The major axis lies at the angle $\theta$ from $+x$, counterclockwise, reported in $(-\pi/2, \pi/2]$. It is undefined when $c_{xx} = c_{yy}$ and $c_{xy} = 0$:
 
@@ -101,7 +101,7 @@ $$
 \theta = \tfrac{1}{2} \operatorname{atan2}(2 c_{xy},\, c_{xx} - c_{yy})
 $$
 
-Code: `packages/core/src/groups/statistics.ts`, `axisAngle`.
+Code: `packages/shot-groups/src/group-statistics.ts`, `axisAngle`.
 
 ### Elliptical CEP
 
@@ -111,7 +111,7 @@ $$
 P_\mathrm{out}(R) = \frac{2}{\pi} \int_0^{\pi/2} \exp\!\left(-\frac{R^2}{2(\lambda_1 \cos^2\varphi + \lambda_2 \sin^2\varphi)}\right) d\varphi = \frac{1}{2}
 $$
 
-Code: `packages/core/src/groups/statistics.ts`, `ellipticalCep` (`outside`), `packages/statistics/src/bisect.ts`, `bisect`.
+Code: `packages/shot-groups/src/group-statistics.ts`, `ellipticalCep` (`outside`), `packages/statistics/src/bisect.ts`, `bisect`.
 
 Trapezoid rule with 64 steps; $R$ comes from bisection on $[0, 1.2\sqrt{\lambda_1}]$.
 
@@ -123,7 +123,7 @@ $$
 k = \sqrt{-2 \ln(1 - p)}
 $$
 
-Code: `packages/core/src/groups/statistics.ts`, `dispersionEllipse`, `ellipseAt`.
+Code: `packages/shot-groups/src/group-statistics.ts`, `dispersionEllipse`, `ellipseAt`.
 
 The prediction ellipse holds one further shot from the same population with probability $p$ when mean and covariance are both estimated from the $n$ shots ($n \ge 3$):
 
@@ -131,7 +131,7 @@ $$
 k^2 = \frac{2(n^2 - 1)}{n(n - 2)}\, F_{2,\,n-2}(p)
 $$
 
-Code: `packages/core/src/groups/statistics.ts`, `predictionEllipse`.
+Code: `packages/shot-groups/src/group-statistics.ts`, `predictionEllipse`.
 
 With 2 numerator degrees of freedom the regularized incomplete beta function in the F distribution function reduces to a power, so the quantile is closed form:
 
@@ -149,7 +149,7 @@ $$
 \sqrt{\frac{S}{\chi^2_{1-\alpha/2,\,\nu}}} \le \sigma \le \sqrt{\frac{S}{\chi^2_{\alpha/2,\,\nu}}}
 $$
 
-Code: `packages/core/src/groups/statistics.ts`, `confidenceOf`.
+Code: `packages/shot-groups/src/group-statistics.ts`, `confidenceOf`.
 
 with:
 - one axis: $S = S_{xx}$ or $S_{yy}$, $\nu = n - 1$
@@ -235,7 +235,7 @@ $$
 r = \frac{S_{vy}}{\sqrt{S_{vv} S_{yy}}}, \qquad b = \frac{S_{vy}}{S_{vv}}
 $$
 
-Code: `packages/core/src/groups/statistics.ts`, `velocityCorrelationOf`.
+Code: `packages/shot-groups/src/group-statistics.ts`, `velocityCorrelationOf`.
 
 with the sums of squares and products about the means of these shots. With all these velocities or all heights equal there is no correlation.
 
@@ -247,7 +247,7 @@ $$
 \alpha = 2 \arctan\frac{L}{2D}
 $$
 
-Code: `packages/core/src/groups/statistics.ts`, `subtendedAngle`.
+Code: `packages/shot-groups/src/group-statistics.ts`, `subtendedAngle`.
 
 Groups $j$ with $n_j \ge 2$ are pooled about their own centres, each in angle at its own distance $D_j$ as the small angle $L/D_j$, which differs from $\alpha$ by less than 0.01 % below 30 mrad:
 
@@ -255,7 +255,7 @@ $$
 s_x^2 = \frac{\sum_j S_{xx,j} / D_j^2}{\sum_j (n_j - 1)}, \qquad s_y^2 = \frac{\sum_j S_{yy,j} / D_j^2}{\sum_j (n_j - 1)}, \qquad \hat\sigma^2 = \frac{s_x^2 + s_y^2}{2}
 $$
 
-Code: `packages/core/src/groups/statistics.ts`, `pooledGroupStatistics`, `pooledValues`.
+Code: `packages/shot-groups/src/group-statistics.ts`, `pooledGroupStatistics`, `pooledValues`.
 
 The intervals use $\nu = \sum_j (n_j - 1)$ per axis and $2\sum_j (n_j - 1)$ for $\hat\sigma$. The mean extreme spread is the average of $\mathrm{ES}_j / D_j$. Lengths are the angular values times $D$.
 

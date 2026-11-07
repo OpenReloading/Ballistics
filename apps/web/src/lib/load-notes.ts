@@ -3,7 +3,7 @@ import {
   type LoadNoteRule,
   loadNotes,
   type SessionReading,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
 import { type Load, type SessionRecord, type SessionSnapshot, toSi } from '@open-reloading/schema'
 import { msg, type Translator } from '../i18n/translate.ts'
 import { sessionRef } from './measurements.ts'

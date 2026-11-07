@@ -13,7 +13,7 @@ import {
   trajectory,
   trueDrag,
   trueMuzzleVelocity,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
 import type { Cartridge } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { caps } from '../src/compute/schemas.ts'

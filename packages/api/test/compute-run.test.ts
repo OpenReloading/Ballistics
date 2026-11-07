@@ -1,4 +1,4 @@
-import { type TrajectoryInput, trajectory } from '@open-reloading/core'
+import { type TrajectoryInput, trajectory } from '@open-reloading/ballistics'
 import { describe, expect, it } from 'vitest'
 import {
   type ExteriorContext,

@@ -1,4 +1,4 @@
-import { bulletStructures } from '@open-reloading/core'
+import { bulletStructures } from '@open-reloading/ballistics'
 import { constructionFields } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
 import { followWrites } from '../src/components/use-workbench-load.ts'

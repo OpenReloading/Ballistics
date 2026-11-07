@@ -3,7 +3,7 @@
  * later do not break the document. Paths where the route writes a NaN or infinite number as null
  * are nullable.
  */
-import { dragModels } from '@open-reloading/core'
+import { dragModels } from '@open-reloading/ballistics'
 import { provenance } from '@open-reloading/schema'
 import { z } from 'zod'
 import { identity } from './identity.ts'

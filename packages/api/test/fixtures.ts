@@ -3,7 +3,7 @@ import {
   lbPerSqInToKgPerSqM,
   type Projectile,
   type TrajectoryInput,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
 import type { Bundle } from '@open-reloading/data'
 import {
   type AnalysisKey,

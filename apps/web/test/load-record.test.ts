@@ -1,4 +1,4 @@
-import { lbPerSqInToKgPerSqM, workbenchValueKeys } from '@open-reloading/core'
+import { lbPerSqInToKgPerSqM, workbenchValueKeys } from '@open-reloading/ballistics'
 import {
   checkUserRefs,
   ladderStepKinds,

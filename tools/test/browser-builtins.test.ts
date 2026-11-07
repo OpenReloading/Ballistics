@@ -15,7 +15,6 @@ const browserSources = [
     'statistics',
     'ballistics',
     'shot-groups',
-    'core',
     'drawing',
     'schema',
     'api',

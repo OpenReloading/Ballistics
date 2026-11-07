@@ -1,4 +1,4 @@
-import type { ChronographString, InteriorLoad } from '@open-reloading/core'
+import type { ChronographString, InteriorLoad } from '@open-reloading/ballistics'
 import {
   type Firearm,
   type Powder,

@@ -8,7 +8,7 @@ import type {
   PowderFitResidual,
   PowderParameter,
   PowderPrediction,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
 import {
   chronoSession,
   type Firearm,

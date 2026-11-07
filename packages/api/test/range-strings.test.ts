@@ -6,7 +6,7 @@ import {
   planTruingStrings,
   type TrajectoryInput,
   trajectory,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
 import { describe, expect, it } from 'vitest'
 import { caps } from '../src/compute/schemas.ts'
 import { rangeStringsLimits } from '../src/compute/strings-schema.ts'

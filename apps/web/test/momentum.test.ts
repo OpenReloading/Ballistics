@@ -1,4 +1,4 @@
-import { freeRecoil } from '@open-reloading/core'
+import { freeRecoil } from '@open-reloading/ballistics'
 import { describe, expect, it } from 'vitest'
 import { momentumParts, momentumText, momentumUnit } from '../src/lib/momentum.ts'
 import { presetUnits } from '../src/lib/units.ts'

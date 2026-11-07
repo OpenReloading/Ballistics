@@ -12,7 +12,6 @@ COPY packages/ballistics/package.json packages/ballistics/
 COPY packages/shot-groups/package.json packages/shot-groups/
 COPY packages/schema/package.json packages/schema/
 COPY packages/importers/package.json packages/importers/
-COPY packages/core/package.json packages/core/
 COPY packages/data/package.json packages/data/
 COPY packages/api/package.json packages/api/
 COPY packages/drawing/package.json packages/drawing/

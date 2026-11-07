@@ -1,4 +1,4 @@
-import type { DensityClass } from '@open-reloading/core'
+import type { DensityClass } from '@open-reloading/ballistics'
 import {
   type BulletDimensions,
   estimateIntrusion,

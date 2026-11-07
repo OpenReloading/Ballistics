@@ -13,7 +13,7 @@ import {
   type MaximumPlacement,
   type PressureRange,
   placeMaximum,
-} from '@open-reloading/core'
+} from '@open-reloading/ballistics'
 import { type Cartridge, fromSi, type SpecValue, sheetId, toSi } from '@open-reloading/schema'
 import { advisoryText } from './advisory-text.ts'
 

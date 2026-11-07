@@ -1,4 +1,4 @@
-import { interior } from '@open-reloading/core'
+import { interior } from '@open-reloading/ballistics'
 import { describe, expect, it } from 'vitest'
 import { spansOf, temperatureEnergyCheck } from '../scripts/temperature-energy.mts'
 import { loadOf } from '../src/evaluate.ts'
