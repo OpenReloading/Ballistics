@@ -1,10 +1,10 @@
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
+import { checkPublishedLoadPlausibility } from '@open-reloading/catalog'
 import type { PublishedLoads } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
-import { checkPublishedLoadPlausibility } from '../src/published-loads.ts'
-import { readRecords } from '../src/records.ts'
+import { readRecords } from '../../src/catalog/records.ts'
 
 const fixtures = join(import.meta.dirname, 'fixtures', 'valid')
 

@@ -8,9 +8,9 @@ import { Ajv2020 } from 'ajv/dist/2020.js'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { run } from '../src/main.ts'
 
-vi.mock('@open-reloading/catalog', async (original) =>
+vi.mock('@open-reloading/tools/catalog', async (original) =>
   (await import('./records-memo.ts')).memoRecords(
-    await original<typeof import('@open-reloading/catalog')>(),
+    await original<typeof import('@open-reloading/tools/catalog')>(),
   ),
 )
 

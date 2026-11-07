@@ -1,7 +1,6 @@
 import type { CaliberClass, Cartridge } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { checkCaliberClasses } from '../src/caliber-classes.ts'
-import { readRecords } from '../src/records.ts'
 
 const provenance = { kind: 'derived' as const, sources: [{ title: 'Test' }] }
 const cartridge = (id: string, g1?: number): Cartridge =>
@@ -44,13 +43,5 @@ describe('checkCaliberClasses', () => {
     expect(check([cls('x', 5.6, [])], ['nope'])).toEqual([
       'disciplines/disc.json: unknown caliber class "nope"',
     ])
-  })
-})
-
-describe('the caliber class records', () => {
-  const { bundle, errors } = readRecords()
-  it('are valid against the C.I.P. records and every discipline', () => {
-    expect(errors).toEqual([])
-    expect(bundle.caliberClasses.length).toBeGreaterThan(0)
   })
 })

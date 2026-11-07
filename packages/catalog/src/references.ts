@@ -33,7 +33,7 @@ export function checkCartridgeReferences(
   bundle: Pick<Bundle, 'cartridges' | 'cases' | 'capacities' | 'loads' | 'firings' | 'powders'>,
   ids: RecordIds,
   errors: string[],
-) {
+): void {
   const unknown = (dir: string, id: string, cartridge: string, found: string | undefined) => {
     if (!ids.cartridges.has(found ?? cartridge))
       errors.push(`${dir}/${id}.json: unknown cartridge "${cartridge}"`)
@@ -54,7 +54,7 @@ export function checkCartridgeReferences(
 export function checkLoadComponentReferences(
   bundle: Pick<Bundle, 'loads' | 'bullets' | 'powders'>,
   errors: string[],
-) {
+): void {
   const known = {
     bullet: new Set(bundle.bullets.map((b) => b.id)),
     powder: new Set(bundle.powders.map((p) => p.id)),
@@ -71,7 +71,7 @@ export function checkLoadComponentReferences(
 export function checkLoadPrimerReferences(
   bundle: Pick<Bundle, 'loads' | 'primers'>,
   errors: string[],
-) {
+): void {
   const known = new Set(bundle.primers.map((p) => p.id))
   for (const l of bundle.loads) {
     const record = l.primer?.record
@@ -84,7 +84,7 @@ export function checkLoadPrimerReferences(
 export function checkLoadCapacityReferences(
   bundle: Pick<Bundle, 'loads' | 'capacities'>,
   errors: string[],
-) {
+): void {
   const known = new Set(bundle.capacities.map((c) => c.id))
   for (const l of bundle.loads)
     if (l.capacity !== undefined && !known.has(parseRef(l.capacity)?.id ?? l.capacity))
@@ -96,7 +96,7 @@ export function checkLoadCaseReferences(
   bundle: Pick<Bundle, 'loads' | 'cases'>,
   ids: RecordIds,
   errors: string[],
-) {
+): void {
   const cartridgeOfCase = new Map(
     bundle.cases.map((c) => [c.id, parseRef(c.cartridge)?.id ?? c.cartridge]),
   )
@@ -114,7 +114,7 @@ export function checkLoadCaseReferences(
 export function checkLoadSessionReferences(
   bundle: Pick<Bundle, 'loads' | 'chronoSessions'>,
   errors: string[],
-) {
+): void {
   const known = new Set(bundle.chronoSessions.map((s) => s.id))
   for (const l of bundle.loads)
     for (const ref of l.sessions ?? [])
@@ -127,7 +127,7 @@ export function checkLoadReferences(
   bundle: Pick<Bundle, 'chronoSessions'>,
   ids: RecordIds,
   errors: string[],
-) {
+): void {
   for (const session of bundle.chronoSessions) {
     for (const string of session.strings) {
       if (!ids.loads.has(parseRef(string.load)?.id ?? string.load)) {
@@ -164,7 +164,7 @@ export function checkManufacturerReferences(
   loadTables: LoadTables,
   ids: RecordIds,
   errors: string[],
-) {
+): void {
   const check = (where: string, field: string, id: string | undefined) => {
     if (id !== undefined && !ids.manufacturers.has(id))
       errors.push(`${where}: unknown ${field} "${id}"`)

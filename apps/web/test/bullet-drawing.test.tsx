@@ -1,5 +1,4 @@
 import { readFileSync } from 'node:fs'
-import { readRecords } from '@open-reloading/catalog'
 import { face } from '@open-reloading/drawing'
 import {
   type BulletProfile,
@@ -13,12 +12,13 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { bullet } from '../../../packages/schema/src/index.ts'
 import { type Laid, sideRules, textSize } from './drawing-rules.ts'
+import { catalogBundle } from './records.ts'
 
 // next/font is compiled by Next; here the drawing font class is a fixed name
 vi.mock('next/font/local', () => ({ default: () => ({ variable: 'drawing-font', className: '' }) }))
 const { TechnicalDrawing } = await import('../src/components/technical-drawing.tsx')
 
-const records = readRecords().bundle.bullets as Bullet[]
+const records = catalogBundle().bullets as Bullet[]
 
 /** No committed record has a polymer tip, and only an invented one a flat base; the sparse cast bullet and the boat-tail length without a base type keep the drawing's fill-in covered: test fixtures. */
 const fixtures = [

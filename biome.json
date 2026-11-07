@@ -21,7 +21,7 @@
       "!tools/test/fixtures/markdown-meaning.md",
       "!pnpm-lock.yaml",
       "!**/test/golden",
-      "!packages/catalog/test/fixtures/invalid/chrono/broken.json"
+      "!tools/test/catalog/fixtures/invalid/chrono/broken.json"
     ]
   },
   "formatter": {

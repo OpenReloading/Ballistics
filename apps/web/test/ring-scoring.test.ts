@@ -1,16 +1,14 @@
-import { readRecords } from '@open-reloading/catalog'
 import type { TargetFace } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import de from '../src/i18n/de.json'
 import { english, translator } from '../src/i18n/translate.ts'
 import { faceAlignment, scoreGroupOnFace } from '../src/lib/ring-scoring.ts'
+import { catalogBundle } from './records.ts'
 
 // The adapter over the ring scoring of shot-groups (packages/shot-groups/test holds the scoring
 // tests): an issue becomes its message in the language shown.
 
-const rifle50 = readRecords().bundle.targetFaces.find(
-  (f) => f.id === 'issf-50m-rifle',
-) as TargetFace
+const rifle50 = catalogBundle().targetFaces.find((f) => f.id === 'issf-50m-rifle') as TargetFace
 const group = { shots: [{ x: 0, y: 0 }] }
 
 describe('scoreGroupOnFace in the language shown', () => {

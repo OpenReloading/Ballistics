@@ -1,5 +1,4 @@
 import { statSync } from 'node:fs'
-import { readRecords } from '@open-reloading/catalog'
 import type {
   Bullet,
   Cartridge,
@@ -9,6 +8,7 @@ import type {
   PublishedLoads,
 } from '@open-reloading/schema'
 import { parseRef } from '@open-reloading/schema'
+import { readRecords } from '@open-reloading/tools/catalog'
 import { UsageError } from './errors.ts'
 import { byText } from './stats.ts'
 
@@ -37,7 +37,7 @@ function firstPerCartridge<T extends { id: string; cartridge: string }>(list: T[
   return out
 }
 
-/** Reads the records of `roots` as one set, or the records of the data package without roots; a `UsageError` for a root that is not a folder. */
+/** Reads the records of `roots` as one set, or the records of the catalog package without roots; a `UsageError` for a root that is not a folder. */
 export function readBundle(roots: readonly string[]) {
   for (const [i, root] of roots.entries())
     if (!statSync(root, { throwIfNoEntry: false })?.isDirectory())

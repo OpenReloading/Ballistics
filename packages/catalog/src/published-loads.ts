@@ -1,48 +1,16 @@
-import { existsSync, readdirSync } from 'node:fs'
-import { join } from 'node:path'
 import {
   type Bullet,
   type Cartridge,
-  compareKeys,
   type Powder,
   type Primer,
   type PublishedLoad,
   type PublishedLoads,
   parseRef,
-  publishedLoads,
 } from '@open-reloading/schema'
 import type { Finding } from './plausibility.ts'
-import { readKind } from './read-kind.ts'
-import type { SourceIndex } from './sources.ts'
 
 /** A file of published loads and the cartridge folder it is read from. */
 export type LocatedPublishedLoads = { folder: string; file: PublishedLoads }
-
-/**
- * The published load files of every roots' `loads/<cartridge id>/` folder, source references
- * resolved. A missing `loads/` folder or a root without one is no error: the plain `Load` records
- * in `loads/` itself are another kind.
- */
-export function readPublishedLoads(
-  roots: string[],
-  sources: SourceIndex,
-  errors: string[],
-): LocatedPublishedLoads[] {
-  const folders = new Set<string>()
-  for (const root of roots) {
-    const path = join(root, 'loads')
-    if (!existsSync(path)) continue
-    for (const entry of readdirSync(path, { withFileTypes: true }))
-      if (entry.isDirectory()) folders.add(entry.name)
-  }
-  return [...folders]
-    .sort(compareKeys)
-    .flatMap((folder) =>
-      readKind(roots, `loads/${folder}`, publishedLoads, { errors, sources, optional: true }).map(
-        (file) => ({ folder, file }),
-      ),
-    )
-}
 
 /** The records a published load names. */
 type Known = {
@@ -219,7 +187,7 @@ export function checkPublishedLoads(
   files: readonly LocatedPublishedLoads[],
   targets: PublishedLoadTargets,
   errors: string[],
-) {
+): void {
   const known: Known = {
     cartridges: targets.cartridges,
     manufacturers: targets.manufacturers,

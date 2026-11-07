@@ -2,7 +2,7 @@ import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:f
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { readRecords } from '../src/records.ts'
+import { readRecords } from '../../src/catalog/records.ts'
 
 const fixtures = join(import.meta.dirname, 'fixtures', 'valid')
 const record = {

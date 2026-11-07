@@ -4,6 +4,9 @@
   "private": true,
   "license": "MIT",
   "type": "module",
+  "exports": {
+    "./catalog": "./src/catalog/records.ts"
+  },
   "scripts": {
     "typecheck": "tsc --noEmit",
     "api-check": "f=\"${TMPDIR:-/tmp}/openapi.json\" && TMPDIR=\"${TMPDIR:-/tmp}\" node src/openapi.ts && oasdiff breaking ../packages/api/openapi.baseline.json \"$f\" --fail-on ERR",
@@ -13,11 +16,16 @@
     "pages:serve": "node src/pages-serve.ts",
     "dev:static": "node src/static-dev.ts",
     "pack-check": "node src/pack-check.ts",
+    "catalog:validate": "node src/catalog/validate.ts",
+    "loads:merge": "node src/catalog/merge-loads.ts",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage --coverage.include='src/**/*.ts' --coverage.reporter=text-summary --coverage.reporter=lcov"
   },
   "dependencies": {
-    "@open-reloading/api": "workspace:*"
+    "@open-reloading/api": "workspace:*",
+    "@open-reloading/catalog": "workspace:*",
+    "@open-reloading/schema": "workspace:*",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@open-reloading/drawing": "workspace:*",

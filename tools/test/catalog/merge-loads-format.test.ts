@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process'
 import { expect, it, vi } from 'vitest'
-import { formatRecord } from '../src/merge-loads.ts'
+import { formatRecord } from '../../src/catalog/merge-loads.ts'
 
 vi.mock('node:child_process', () => ({ spawnSync: vi.fn() }))
 

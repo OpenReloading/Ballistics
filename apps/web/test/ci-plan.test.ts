@@ -202,6 +202,10 @@ it('tests every group for a change outside the workspaces, an unknown or empty s
   ).toEqual(testJobs())
   // a workspace that no group lists (a new one)
   expect(testJobs(['drawing', 'stray'])).toEqual(testJobs())
+  // the catalog reader of tools, which writes the bundle other workspaces' tests read
+  expect(plan(['tools/src/catalog/read-kind.ts'], closure, ['tools', 'cli', 'docs']).tests).toEqual(
+    testJobs(),
+  )
   expect(plan(['apps/docs/docs/research/index.md'], closure, ['docs']).tests).toEqual(
     testJobs(['docs']),
   )

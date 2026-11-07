@@ -1,12 +1,12 @@
-import type * as data from '@open-reloading/catalog'
+import type * as reader from '@open-reloading/tools/catalog'
 
 /**
- * The data package with `readRecords` read once per set of roots and cloned on each call: a test
+ * The records reader with `readRecords` read once per set of roots and cloned on each call: a test
  * file runs the command line many times over the same unchanged record folders. Use as
- * `vi.mock('@open-reloading/catalog', async (original) => memoRecords(await original()))`.
+ * `vi.mock('@open-reloading/tools/catalog', async (original) => memoRecords(await original()))`.
  */
-export function memoRecords(original: typeof data): typeof data {
-  const read = new Map<string, data.ReadRecordsResult>()
+export function memoRecords(original: typeof reader): typeof reader {
+  const read = new Map<string, reader.ReadRecordsResult>()
   return {
     ...original,
     readRecords: (root) => {

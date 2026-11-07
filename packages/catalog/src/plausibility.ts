@@ -122,9 +122,12 @@ export function checkSpec(spec: Pick<Cartridge, 'values'>): Finding[] {
 }
 
 /** Twist per turn in mm, 1:4 to about 1:70 in: pistol and muzzleloader bullets list twists such as 1:48. */
-export const twistRange = Object.freeze({ min: 100, max: 1800 })
+export const twistRange: Readonly<{ min: number; max: number }> = Object.freeze({
+  min: 100,
+  max: 1800,
+})
 /** A finite twist inside the range; NaN is not a misprint but a value that was not read. */
-export const twistPlausible = (mm: number) =>
+export const twistPlausible = (mm: number): boolean =>
   Number.isFinite(mm) && mm >= twistRange.min && mm <= twistRange.max
 
 /** Diameter and mass within small-arms ranges. */
@@ -359,7 +362,10 @@ export function checkPowder(powder: Powder): Finding[] {
 }
 
 /** World air temperature extremes, degC (WMO 2025). */
-export const airTemperatureRange = Object.freeze({ min: -89.2, max: 56.7 })
+export const airTemperatureRange: Readonly<{ min: number; max: number }> = Object.freeze({
+  min: -89.2,
+  max: 56.7,
+})
 /**
  * Station pressure, bar: the sea-level extremes of WMO 2025 (870 and 1089.1 hPa) carried to 9000 m
  * and to -500 m in an isothermal column at the coldest air temperature give 0.1635 and 1.1951 bar.

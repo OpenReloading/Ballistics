@@ -21,7 +21,8 @@ COPY tools/package.json tools/
 COPY apps/e2e/package.json apps/e2e/
 COPY apps/docs/package.json apps/docs/
 COPY tooling/test-kit/package.json tooling/test-kit/
-RUN pnpm install --frozen-lockfile --ignore-scripts --filter "@open-reloading/api..."
+# tools: the catalog build writes its bundle with the catalog reader of tools/src/catalog
+RUN pnpm install --frozen-lockfile --ignore-scripts --filter "@open-reloading/api..." --filter @open-reloading/tools
 # the API Extractor configuration that the builds of the packages extend
 COPY packages/api-extractor.base.json packages/
 COPY packages/units packages/units
@@ -30,6 +31,7 @@ COPY packages/ballistics packages/ballistics
 COPY packages/schema packages/schema
 COPY packages/catalog packages/catalog
 COPY packages/api packages/api
+COPY tools/src/catalog tools/src/catalog
 # statistics' tests draw on the test kit, a dev dependency the filter builds too
 COPY tooling/test-kit tooling/test-kit
 RUN pnpm --filter "@open-reloading/api..." run build

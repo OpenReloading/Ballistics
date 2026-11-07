@@ -1,8 +1,8 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { readPublishedLoads } from '@open-reloading/catalog'
 import { type SourceRecord, sourceRecord } from '@open-reloading/schema'
+import { readPublishedLoads } from '@open-reloading/tools/catalog'
 import { Refusal, UsageError } from './errors.ts'
 import { type InteriorModel, outcomes } from './evaluate.ts'
 import { changeOf, evaluate, type Grouping, metricsOf } from './metrics.ts'
@@ -48,7 +48,7 @@ function checkSealed({ split, final }: Options) {
     throw new Refusal('the test split is sealed: run it once per model version with --final')
 }
 
-/** The records folder of the data package, which `readRecords` reads without roots. */
+/** The records folder of the catalog package, which `readRecords` reads without roots. */
 const packageRecords = () =>
   fileURLToPath(new URL('../records', import.meta.resolve('@open-reloading/catalog')))
 
