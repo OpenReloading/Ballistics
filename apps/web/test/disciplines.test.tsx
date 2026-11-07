@@ -1,5 +1,4 @@
 import { MantineProvider } from '@mantine/core'
-import { readRecords } from '@open-reloading/catalog'
 import { toSi } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { beforeEach, expect, it, vi } from 'vitest'
@@ -31,6 +30,7 @@ import { rowText } from '../src/lib/record-fields.ts'
 import { formatQuantity, presetUnits } from '../src/lib/units.ts'
 import { say } from '../src/lib/wording.ts'
 import { defined } from './defined.ts'
+import { catalogBundle } from './records.ts'
 
 // the list renders its tab bar, which reads the route and the router
 const route = vi.hoisted(() => ({ path: '/disciplines' }))
@@ -48,7 +48,7 @@ vi.mock('../src/i18n/language.ts', async (original) => {
   return { ...actual, useTranslation: vi.fn(actual.useTranslation) }
 })
 
-const { bundle } = readRecords()
+const bundle = catalogBundle()
 const records = bundle.disciplines as unknown as DisciplineRecord[]
 const federationRecords = bundle.federations as unknown as FederationRecord[]
 const federations = bundle.federations

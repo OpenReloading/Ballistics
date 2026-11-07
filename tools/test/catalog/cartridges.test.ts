@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { readRecords } from '../src/records.ts'
+import { readRecords } from '../../src/catalog/records.ts'
 
 const { cartridges } = readRecords().bundle
 const byId = (id: string) => cartridges.find((c) => c.id === id)

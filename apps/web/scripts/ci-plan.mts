@@ -27,6 +27,8 @@ const repoRoot = path.join(webRoot, '../..')
 const webInputs = [
   /^apps\/web\//,
   /^packages\/(units|locale-format|statistics|ballistics|shot-groups|schema|importers|drawing|catalog|api)\//,
+  // the catalog reader that writes the bundle the API serves
+  /^tools\/src\/catalog\//,
   /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|tsconfig\.base\.json|\.nvmrc)$/,
   /^\.github\/(pnpm|actions)\//,
   /^\.github\/workflows\/ci\.yml$/,
@@ -62,6 +64,7 @@ const recordInputs = [
   /^packages\/statistics\//,
   /^packages\/ballistics\//,
   /^packages\/catalog\//,
+  /^tools\/src\/catalog\//,
   /^packages\/schema\//,
   /^packages\/api\//,
   /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|tsconfig\.base\.json|\.nvmrc)$/,
@@ -193,8 +196,12 @@ const everything = (reason: string): Plan => ({
   reason,
 })
 
-/** A file of a workspace (a folder with a `package.json`): pnpm finds the workspaces a change reaches from these alone. */
+/**
+ * A file of a workspace (a folder with a `package.json`): pnpm finds the workspaces a change reaches from these alone.
+ * The catalog reader of tools is not one: it writes the bundle that the web and API tests read, which pnpm does not see.
+ */
 const inWorkspace = (file: string) => {
+  if (/^tools\/src\/catalog\//.test(file)) return false
   const folder = /^((packages|apps|tooling)\/[^/]+|tools)\//.exec(file)?.[1]
   return folder !== undefined && existsSync(path.join(repoRoot, folder, 'package.json'))
 }

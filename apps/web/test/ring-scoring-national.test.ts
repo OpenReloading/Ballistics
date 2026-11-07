@@ -1,4 +1,3 @@
-import { readRecords } from '@open-reloading/catalog'
 import type { TargetFace } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
@@ -10,8 +9,9 @@ import {
 } from '../src/lib/ring-scoring.ts'
 import { matchFaces } from '../src/lib/target-face.ts'
 import { defined } from './defined.ts'
+import { catalogBundle } from './records.ts'
 
-const { bundle } = readRecords()
+const bundle = catalogBundle()
 const faces = bundle.targetFaces
 const face = (id: string) => faces.find((f) => f.id === id) as TargetFace
 

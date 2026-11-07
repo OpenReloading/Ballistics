@@ -1,7 +1,7 @@
 {
   "name": "@open-reloading/catalog",
   "version": "0.0.5",
-  "description": "OpenReloading catalogue records as one JSON bundle, their reader and plausibility checks.",
+  "description": "OpenReloading catalogue records as one JSON bundle and the checks they pass.",
   "keywords": [
     "reloading",
     "ballistics",
@@ -23,6 +23,9 @@
   "engines": {
     "node": ">=22"
   },
+  "sideEffects": false,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -37,23 +40,25 @@
   "files": [
     "dist",
     "!dist/**/*.map",
+    "!dist/*.tsbuildinfo",
+    "!dist/api-extractor",
     "LICENSE",
     "LICENSE-MIT"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && node dist/build.js",
-    "validate": "node src/validate.ts",
-    "loads:merge": "node src/merge-loads.ts",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run --coverage"
+    "build": "tsc -b tsconfig.build.json && api-extractor run && node ../../tools/src/catalog/build.ts",
+    "typecheck": "tsc --noEmit && tsc -p test",
+    "test": "vitest run --coverage && publint --strict && attw --pack . --profile esm-only"
   },
   "dependencies": {
-    "@open-reloading/schema": "workspace:*",
-    "zod": "catalog:"
+    "@open-reloading/schema": "workspace:*"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "catalog:",
+    "@microsoft/api-extractor": "catalog:",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
+    "publint": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

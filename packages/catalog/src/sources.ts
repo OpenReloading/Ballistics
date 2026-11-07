@@ -30,7 +30,9 @@ function resolveSource(entry: unknown, at: string, { index, file, errors }: Reso
   if (!isObject(entry)) return entry
   if (!('source' in entry)) {
     const key =
-      typeof entry.sha256 === 'string' ? entry.sha256 : `${entry.title} ${entry.url ?? ''}`
+      typeof entry['sha256'] === 'string'
+        ? entry['sha256']
+        : `${entry['title']} ${entry['url'] ?? ''}`
     index.embedded.set(key, (index.embedded.get(key) ?? new Set()).add(file))
     return entry
   }
@@ -64,20 +66,25 @@ const ruleBookOf = ({ title, edition, url, sha256 }: SourceRecord) => ({
  * book of a federation (a source record id) resolved to title, edition, URL and SHA-256, and the
  * rule book of an event type to title, edition, publisher, URL and SHA-256.
  */
-export function resolveRecord(json: unknown, index: SourceIndex, file: string, errors: string[]) {
+export function resolveRecord(
+  json: unknown,
+  index: SourceIndex,
+  file: string,
+  errors: string[],
+): unknown {
   if (!isObject(json)) return json
   const out = { ...json }
-  const provenance = json.provenance
-  if (isObject(provenance) && Array.isArray(provenance.sources)) {
-    out.provenance = {
+  const provenance = json['provenance']
+  if (isObject(provenance) && Array.isArray(provenance['sources'])) {
+    out['provenance'] = {
       ...provenance,
-      sources: provenance.sources.map((s, i) =>
+      sources: provenance['sources'].map((s, i) =>
         resolveSource(s, `provenance.sources.${i}`, { index, file, errors }),
       ),
     }
   }
-  if (Array.isArray(json.ruleBooks)) {
-    out.ruleBooks = json.ruleBooks.map((id, i) => {
+  if (Array.isArray(json['ruleBooks'])) {
+    out['ruleBooks'] = json['ruleBooks'].map((id, i) => {
       const at = `${file}: ruleBooks.${i}`
       if (typeof id !== 'string') {
         errors.push(`${at}: name a source record by id`)
@@ -87,11 +94,11 @@ export function resolveRecord(json: unknown, index: SourceIndex, file: string, e
       return record && ruleBookOf(record)
     })
   }
-  if (typeof json.ruleBook === 'string') {
+  if (typeof json['ruleBook'] === 'string') {
     const at = `${file}: ruleBook`
-    const record = cite(json.ruleBook, index, at, errors)
+    const record = cite(json['ruleBook'], index, at, errors)
     if (record && !record.publisher) errors.push(`${at}: source "${record.id}" names no publisher`)
-    out.ruleBook = record && { ...ruleBookOf(record), publisher: record.publisher }
+    out['ruleBook'] = record && { ...ruleBookOf(record), publisher: record.publisher }
   }
   return out
 }
@@ -114,7 +121,7 @@ function checkSourceRecords(index: SourceIndex, errors: string[]) {
  * Each source is stored one way: a source record that some record cites, with a SHA-256 no other
  * source record has, or embedded in one record only and not also a source record.
  */
-export function checkSources(index: SourceIndex, errors: string[]) {
+export function checkSources(index: SourceIndex, errors: string[]): void {
   const bySha = checkSourceRecords(index, errors)
   for (const [key, files] of index.embedded) {
     const record = bySha.get(key)

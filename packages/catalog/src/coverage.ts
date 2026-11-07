@@ -40,7 +40,7 @@ function hasPath(record: Record<string, unknown>, path: string) {
  * Checks that every data field is supported by a source and that every `fields` entry names a
  * field of the record.
  */
-export function checkCoverage(record: { provenance: Provenance }) {
+export function checkCoverage(record: { provenance: Provenance }): string[] {
   const errors: string[] = []
   const { sources } = record.provenance
   for (const source of sources) {

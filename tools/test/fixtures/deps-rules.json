@@ -139,16 +139,20 @@
     "source": "export const w = () => window.location.href",
     "rules": ["logic-no-dom"]
   },
-  "packages/catalog/src/schema-and-fs.ts": {
-    "source": "import { readFileSync } from 'node:fs'\nimport { Load } from '@open-reloading/schema'\nexport { readFileSync, Load }",
+  "packages/catalog/src/schema.ts": {
+    "source": "import { Load } from '@open-reloading/schema'\nexport { Load }",
     "rules": []
+  },
+  "packages/catalog/src/node-fs.ts": {
+    "source": "import { readFileSync } from 'node:fs'\nexport { readFileSync }",
+    "rules": ["catalog-imports-schema-only"]
   },
   "packages/catalog/src/ballistics.ts": {
     "source": "import { waterDensity } from '@open-reloading/ballistics'\nexport { waterDensity }",
     "rules": ["catalog-imports-schema-only"]
   },
   "packages/api/src/logic-catalog-schema.ts": {
-    "source": "import { waterDensity } from '@open-reloading/ballistics'\nimport { readRecords } from '@open-reloading/catalog'\nimport { Load } from '@open-reloading/schema'\nimport Fastify from 'fastify'\nexport { waterDensity, readRecords, Load, Fastify }",
+    "source": "import { waterDensity } from '@open-reloading/ballistics'\nimport { checkRecords } from '@open-reloading/catalog'\nimport { Load } from '@open-reloading/schema'\nimport Fastify from 'fastify'\nexport { waterDensity, checkRecords, Load, Fastify }",
     "rules": []
   },
   "packages/api/src/importers.ts": {
@@ -164,7 +168,7 @@
     "rules": []
   },
   "packages/cli/src/libraries.ts": {
-    "source": "import { interior } from '@open-reloading/ballistics'\nimport { readRecords } from '@open-reloading/catalog'\nimport { seat } from '@open-reloading/drawing/seating'\nimport { toSi } from '@open-reloading/schema'\nexport { interior, readRecords, seat, toSi }",
+    "source": "import { interior } from '@open-reloading/ballistics'\nimport { checkRecords } from '@open-reloading/catalog'\nimport { seat } from '@open-reloading/drawing/seating'\nimport { toSi } from '@open-reloading/schema'\nimport { readRecords } from '@open-reloading/tools/catalog'\nexport { interior, checkRecords, seat, toSi, readRecords }",
     "rules": []
   },
   "packages/cli/src/api.ts": {
@@ -204,7 +208,7 @@
     "rules": []
   },
   "apps/web/src/lib/data-package.ts": {
-    "source": "import { readRecords } from '@open-reloading/catalog'\nexport { readRecords }",
+    "source": "import { checkRecords } from '@open-reloading/catalog'\nexport { checkRecords }",
     "rules": ["web-reads-api-only"]
   },
   "apps/web/src/lib/api-static.ts": {

@@ -1,8 +1,17 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "target": "ES2024",
+    "lib": ["ES2024"],
+    "types": [],
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "isolatedDeclarations": true,
+    "skipLibCheck": false,
     "outDir": "dist",
     "rootDir": "."
   },
-  "include": ["src", "test"]
+  "include": ["src"]
 }

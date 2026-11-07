@@ -82,10 +82,10 @@ The split of a row follows from its cartridge: the first byte of the SHA-256 of 
 A collector writes the loads of a table edition to a folder of its own, laid out like the records: `loads/<cartridge id>/<table>.json`, the loads in the order the table prints them. The merge sets the load ids and merges each file into `packages/catalog/records/loads/`:
 
 ```sh
-pnpm --filter @open-reloading/catalog run loads:merge <incoming folder> [--accept <id>... | --accept-all] [--dry-run]
+pnpm --filter @open-reloading/tools run loads:merge <incoming folder> [--accept <id>... | --accept-all] [--dry-run]
 ```
 
-The id of a load is the first 10 hex digits of the SHA-1 of its natural key: maker, cartridge, printed bullet text and bullet mass, COAL with its limit, printed powder, the set of charge kinds, barrel length and twist, and the marks of each charge. A figure counts by its `value` (its `raw` where it has none), so `55 gr` and `55 grs` are one key. Loads of equal key are counted in printed order: the first has the bare hash, the second `<hash>-2`, and so on. Edition, page, charge, velocity, pressure, primer and case are not in the key, so a newer edition finds its older load. An id the incoming file carries is replaced. Code: `loadId` and `mergePublishedLoads` in `packages/catalog/src/published-load-merge.ts`.
+The id of a load is the first 10 hex digits of the SHA-1 of its natural key: maker, cartridge, printed bullet text and bullet mass, COAL with its limit, printed powder, the set of charge kinds, barrel length and twist, and the marks of each charge. A figure counts by its `value` (its `raw` where it has none), so `55 gr` and `55 grs` are one key. Loads of equal key are counted in printed order: the first has the bare hash, the second `<hash>-2`, and so on. Edition, page, charge, velocity, pressure, primer and case are not in the key, so a newer edition finds its older load. An id the incoming file carries is replaced. Code: `loadId` and `mergePublishedLoads` in `tools/src/catalog/published-load-merge.ts`.
 
 By load id, the merge:
 - creates a load the repository does not have;

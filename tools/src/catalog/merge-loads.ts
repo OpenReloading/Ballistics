@@ -1,6 +1,7 @@
 import { spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { basename, dirname, join, resolve } from 'node:path'
+import { resolveRecord, type SourceIndex, sourceIndex } from '@open-reloading/catalog'
 import {
   compareKeys,
   type PublishedLoads,
@@ -15,7 +16,6 @@ import {
   withLoadIds,
 } from './published-load-merge.ts'
 import { readKind } from './read-kind.ts'
-import { resolveRecord, type SourceIndex, sourceIndex } from './sources.ts'
 
 const repository = join(import.meta.dirname, '..', '..', '..')
 
@@ -275,5 +275,5 @@ if (import.meta.main)
   process.exitCode = main(
     process.argv.slice(2),
     process.env.INIT_CWD ?? process.cwd(),
-    join(import.meta.dirname, '..', 'records'),
+    join(repository, 'packages', 'catalog', 'records'),
   )
