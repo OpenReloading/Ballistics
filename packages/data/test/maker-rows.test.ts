@@ -8,7 +8,7 @@ const cited = (id: string, kind: string, ...sources: object[]) => ({
   id,
   provenance: { kind, sources },
 })
-const bundleOf = (parts: Record<string, object[]>) => parts as unknown as Bundle
+const bundleOf = (parts: object) => parts as unknown as Bundle
 
 describe('makerRows', () => {
   it('lists a record that cites a manufacturer, also beside other sources, and keeps the others', () => {
@@ -37,11 +37,11 @@ describe('makerRows', () => {
   })
 })
 
-describe('the maker rows of the committed records', () => {
-  const { bundle, errors } = readRecords()
-
-  it('are bullets and powders only: no other kind cites a manufacturer', () => {
+describe('the committed records', () => {
+  it('cite no manufacturer source, except the manufacturer records', () => {
+    const { bundle, publishedLoads, errors } = readRecords()
     expect(errors).toEqual([])
-    expect(Object.keys(makerRows(bundle)).toSorted()).toEqual(['bullets', 'powders'])
+    // a published loads file cites its sources once for all its loads
+    expect(makerRows(bundleOf({ ...bundle, publishedLoads }))).toEqual({})
   })
 })
