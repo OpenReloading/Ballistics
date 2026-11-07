@@ -1,0 +1,25 @@
+{
+  "size": {
+    "$type": "dimension",
+    "target": {
+      "$value": { "value": 2.75, "unit": "rem" }
+    },
+    "field": {
+      "$value": { "value": 2.75, "unit": "rem" }
+    },
+    "control-row": {
+      "$value": { "value": 2.75, "unit": "rem" }
+    },
+    "control-bar": {
+      "$value": { "value": 2.75, "unit": "rem" }
+    }
+  },
+  "font": {
+    "size": {
+      "field": {
+        "$type": "dimension",
+        "$value": { "value": 16, "unit": "px" }
+      }
+    }
+  }
+}

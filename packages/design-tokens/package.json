@@ -1,0 +1,61 @@
+{
+  "name": "@open-reloading/design-tokens",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The Brand palette and sizes as CSS variables, typed constants and the Mantine theme.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenReloading/Ballistics.git",
+    "directory": "packages/design-tokens"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "sideEffects": [
+    "*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./tokens.css": "./css/tokens.css",
+    "./docusaurus.css": "./css/docusaurus.css",
+    "./buildguide.css": "./css/buildguide.css"
+  },
+  "files": [
+    "css",
+    "dist",
+    "!dist/**/*.map",
+    "!dist/*.tsbuildinfo",
+    "!dist/api-extractor",
+    "LICENSE"
+  ],
+  "scripts": {
+    "generate": "node scripts/generate.ts",
+    "build": "tsc -b tsconfig.build.json && api-extractor run",
+    "typecheck": "tsc --noEmit && tsc -p test",
+    "lint": "oxlint --type-aware --deny-warnings --report-unused-disable-directives",
+    "test": "vitest run --coverage && publint --strict && attw --pack . --profile esm-only --exclude-entrypoints tokens.css docusaurus.css buildguide.css"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "catalog:",
+    "@mantine/core": "catalog:",
+    "@mantine/hooks": "catalog:",
+    "@microsoft/api-extractor": "catalog:",
+    "@terrazzo/parser": "2.10.0",
+    "@terrazzo/plugin-css": "2.10.0",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "oxlint": "catalog:",
+    "oxlint-tsgolint": "catalog:",
+    "postcss": "8.5.31",
+    "publint": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
