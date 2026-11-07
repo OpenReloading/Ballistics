@@ -2,50 +2,49 @@ import { fileURLToPath } from 'node:url'
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
 import { playwright } from '@vitest/browser-playwright'
 import { defineConfig } from 'vitest/config'
+import type { BrowserInstanceOption } from 'vitest/node'
 
-/** Every story runs as a test, axe included: at three widths in the light scheme, and in the dark and forced-colors schemes at 390 px. */
-const contexts = [
-  ...[320, 390, 1280].map((width) => ({
-    name: `light-${width}`,
-    width,
-    options: { colorScheme: 'light' } as const,
-  })),
-  { name: 'dark-390', width: 390, options: { colorScheme: 'dark' } },
-  { name: 'forced-390', width: 390, options: { forcedColors: 'active' } },
-] as const
+const configDir = fileURLToPath(new URL('.storybook', import.meta.url))
+
+/** The browsers a story runs in; `touch` is a phone with a coarse pointer, under WebKit as well (spike S8). */
+const browsers = {
+  light: { browser: 'chromium', contextOptions: { colorScheme: 'light' } },
+  dark: { browser: 'chromium', contextOptions: { colorScheme: 'dark' } },
+  forced: { browser: 'chromium', contextOptions: { forcedColors: 'active' } },
+  touch: { browser: 'webkit', contextOptions: { hasTouch: true, isMobile: true } },
+} as const
+
+/**
+ * Every story runs as a test, axe included, in a project per width: Storybook sizes each story's frame from its
+ * viewport (1200 px by default), so the width reaches the stories as `__STORY_WIDTH__` (.storybook/preview.tsx).
+ */
+const stories = (width: number, schemes: (keyof typeof browsers)[]) => ({
+  plugins: [storybookTest({ configDir })],
+  define: { __STORY_WIDTH__: String(width) },
+  test: {
+    name: `stories-${width}`,
+    browser: {
+      enabled: true,
+      headless: true,
+      provider: playwright(),
+      instances: schemes.map(
+        (scheme): BrowserInstanceOption => ({
+          browser: browsers[scheme].browser,
+          name: `${scheme}-${width}`,
+          provider: playwright({ contextOptions: browsers[scheme].contextOptions }),
+        }),
+      ),
+    },
+  },
+})
 
 export default defineConfig({
   test: {
     projects: [
       { test: { name: 'node', include: ['test/**/*.test.tsx'], environment: 'node' } },
-      {
-        plugins: [
-          storybookTest({ configDir: fileURLToPath(new URL('.storybook', import.meta.url)) }),
-        ],
-        test: {
-          name: 'stories',
-          browser: {
-            enabled: true,
-            headless: true,
-            provider: playwright(),
-            instances: [
-              ...contexts.map(({ name, width, options }) => ({
-                browser: 'chromium' as const,
-                name,
-                viewport: { width, height: 900 },
-                provider: playwright({ contextOptions: options }),
-              })),
-              // a phone with touch: a coarse pointer, under WebKit as well (spike S8)
-              {
-                browser: 'webkit',
-                name: 'webkit-touch-390',
-                viewport: { width: 390, height: 900 },
-                provider: playwright({ contextOptions: { hasTouch: true, isMobile: true } }),
-              },
-            ],
-          },
-        },
-      },
+      stories(320, ['light']),
+      stories(390, ['light', 'dark', 'forced', 'touch']),
+      stories(1280, ['light']),
     ],
   },
 })
