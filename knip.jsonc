@@ -13,7 +13,7 @@
       "entry": ["src/index.ts"]
     },
     "packages/ballistics": {
-      "entry": ["src/index.ts"]
+      "entry": ["src/index.ts", "scripts/*.mts"]
     },
     "tooling/test-kit": {
       "entry": ["src/index.ts"]
@@ -22,7 +22,7 @@
       "entry": ["src/index.ts"]
     },
     "packages/shot-groups": {
-      "entry": ["src/index.ts"],
+      "entry": ["src/index.ts", "scripts/*.mts"],
       // the event types and target faces of data's records are read by path in the tests, declared so the CI plan tests shot-groups with them
       "ignoreDependencies": ["@open-reloading/data"]
     },
