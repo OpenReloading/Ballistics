@@ -117,6 +117,17 @@ interface ChooserTexts {
   errorTitle: Message
   errorText: Message
   empty: Message
+  /** What the dialog says when the kind has no record at all; absent: the note of an empty search. */
+  none?: { title: Message; text: Message }
+}
+
+/** The note of an empty list: the kind has no record at all (`none`), or nothing matches. */
+export function emptyListNote(
+  texts: ChooserTexts,
+  none: boolean,
+): { title: Message; text: Message } {
+  if (none && texts.none) return texts.none
+  return { title: texts.empty, text: msg('Remove a filter or a word.') }
 }
 
 /**
@@ -263,8 +274,15 @@ function Results<R extends ChooserRow>({
   status,
   retry,
   shown,
+  none,
   ...props
-}: RowsProps<R> & { status: Catalogue<R>['status']; retry: () => void; shown: R[] }) {
+}: RowsProps<R> & {
+  status: Catalogue<R>['status']
+  retry: () => void
+  shown: R[]
+  /** The kind has no record at all, not even one of this browser. */
+  none: boolean
+}) {
   const { t } = useTranslation()
   const { texts, columns } = props.kind
   if (status === 'error')
@@ -273,14 +291,17 @@ function Results<R extends ChooserRow>({
         {t(texts.errorText)}
       </ErrorNote>
     )
-  if (shown.length === 0)
-    return status === 'ok' ? (
+  if (shown.length === 0) {
+    if (status !== 'ok') return null
+    const note = emptyListNote(texts, none)
+    return (
       <EmptyNote
         icon={<MagnifyingGlass size={20} aria-hidden="true" />}
-        title={t(texts.empty)}
-        description={t('Remove a filter or a word.')}
+        title={t(note.title)}
+        description={t(note.text)}
       />
-    ) : null
+    )
+  }
   return (
     <div className="bd-list-wrap">
       <div className="bd-head" aria-hidden="true">
@@ -544,6 +565,7 @@ function ChooserBody<R extends ChooserRow>({
           status={state.status}
           retry={retry}
           shown={shown}
+          none={rows.length === 0}
           kind={kind}
           id={id}
           active={active}

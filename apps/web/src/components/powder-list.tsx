@@ -1,7 +1,7 @@
 'use client'
 
 import { Box, Button, Text } from '@mantine/core'
-import { Plus } from '@phosphor-icons/react'
+import { Flask, Plus } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useDeferredValue, useMemo } from 'react'
 import { useTranslation } from '../i18n/language.ts'
@@ -48,7 +48,7 @@ import { DeleteRow, SourceFilter, sourceColumn, useUserRecords } from './list-so
 import { MissingMark } from './missing-mark.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
 import { RateBar, RateTicks, scaleWidth } from './rate-scale.tsx'
-import { EmptyList } from './states.tsx'
+import { EmptyList, EmptyNote } from './states.tsx'
 
 /** The Training rows column's help: the column, then the burn-rate page's sentence for a powder without fitted parameters. */
 export const trainingRowsHelp = [
@@ -60,6 +60,25 @@ export const trainingRowsHelp = [
 
 const n2 = (v: number | undefined) => (v === undefined ? '' : formatNumber(v, 2))
 
+/** What the powder list shows when it has no powder at all: where a powder comes from. */
+function NoPowders() {
+  const { t } = useTranslation()
+  return (
+    <EmptyNote
+      icon={<Flask size={24} aria-hidden="true" />}
+      title={t('No powders yet')}
+      description={t(
+        'The catalogue has no powders. Make one with New powder, or import a table of your powders with Import.',
+      )}
+      action={
+        <Button component={Link} href="/powders/designer" leftSection={<Plus aria-hidden="true" />}>
+          {t('New powder')}
+        </Button>
+      }
+    />
+  )
+}
+
 /**
  * The powder directory: manufacturer, name, form, base and the burn rate in one cell (the
  * mean dynamic vivacity, its interval and both on one log scale for every row); powders with a
@@ -69,7 +88,7 @@ const n2 = (v: number | undefined) => (v === undefined ? '' : formatNumber(v, 2)
 export function PowderList({ packed }: { packed: PackedPowder[] }) {
   const tr = useTranslation()
   const { t, tn } = tr
-  const [records, removeRow] = useUserRecords()
+  const [records, removeRow, read] = useUserRecords()
   const catalogue = useMemo(() => unpackPowders(packed), [packed])
   // the browser's powders first: a few rows would sit unseen behind the catalogue's
   const items = useMemo(() => [...userPowderRows(records), ...catalogue], [records, catalogue])
@@ -259,7 +278,16 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
             ) : null
           }
           breakBefore={state.sort ? undefined : (r, previous) => r.origin !== previous.origin}
-          empty={<EmptyList noun="powders" filters={filterText(named)} onClear={clear} />}
+          empty={
+            items.length === 0 ? (
+              // the browser's own powders may still be on their way
+              read ? (
+                <NoPowders />
+              ) : null
+            ) : (
+              <EmptyList noun="powders" filters={filterText(named)} onClear={clear} />
+            )
+          }
         />
       </div>
     </>
