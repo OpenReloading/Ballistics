@@ -149,6 +149,8 @@ const targetRecords = [
 const otherSense: Record<string, string> = {
   ...Object.fromEntries(targetRecords.map((k) => [k, 'target: a target record, Scheibe'])),
   'Bullet position': 'where the bullet is in the barrel, not a shooting position',
+  '{field}: the header names a unit other than {symbols}. Choose the unit of the column.':
+    'names: the verb (the header gives a unit), not a name',
   'Case fill': 'the load ratio, whose verified term (Ladedichte) names no case',
   'single shot': 'a firearm action that is loaded by hand for each shot (Einzellader)',
   'Powder temperature': 'the compound Pulvertemperatur, the usual word, in a label of one line',

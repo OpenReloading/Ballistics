@@ -1,6 +1,6 @@
 import type { UserRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
-import { english } from '../src/i18n/translate.ts'
+import { english, type Message } from '../src/i18n/translate.ts'
 import {
   type LoadFileFormat,
   loadFileFormats,
@@ -29,7 +29,7 @@ const lines: LoadFileFormat = {
     ok: true,
     records: [load],
     unmapped: ['primer', 'lot'],
-    warnings: ['The date is not in the file.'],
+    warnings: [{ message: 'The date is not in the file.' as Message, values: {} }],
   }),
 }
 const formats = [...loadFileFormats, lines]
@@ -74,7 +74,10 @@ describe('load-file formats', () => {
     )
     expect(records).toEqual([load, load])
     expect(notes).toEqual([
-      { name: 'a.txt', note: 'The date is not in the file. Not read: primer, lot.' },
+      {
+        name: 'a.txt',
+        note: 'The date is not in the file. Not read: primer, lot.',
+      },
     ])
     expect(skipped.map((s) => s.name)).toEqual(['c.txt'])
   })
