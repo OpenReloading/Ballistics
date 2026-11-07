@@ -23,6 +23,7 @@ import type { EventTotals, StageScore } from '@open-reloading/shot-groups'
 import { Plus, Trash } from '@phosphor-icons/react'
 import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
+import { plainNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import {
   blankEvent,
@@ -742,10 +743,12 @@ function EventSheet({
                   <Table.Td className="num">
                     {[s.misses, s.noShoots, s.procedurals].join('/')}
                   </Table.Td>
-                  <Table.Td className="num">{s.time}</Table.Td>
+                  <Table.Td className="num">{plainNumber(s.time)}</Table.Td>
                   <Table.Td className="num">{score && scoreText(score.points)}</Table.Td>
                   <Table.Td className="num">{score && hitFactorText(score.hitFactor)}</Table.Td>
-                  <Table.Td className="num">{s.stagePoints}</Table.Td>
+                  <Table.Td className="num">
+                    {s.stagePoints !== undefined && plainNumber(s.stagePoints)}
+                  </Table.Td>
                 </Table.Tr>
               )
             })}

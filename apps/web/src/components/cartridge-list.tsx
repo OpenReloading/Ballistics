@@ -19,7 +19,7 @@ import {
 } from '../lib/cartridge-rows.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { caseTypeText } from '../lib/list-values.ts'
-import { countText, filterText, matchingText, widestCount } from '../lib/lists.ts'
+import { filterText, matchingText } from '../lib/lists.ts'
 import {
   countOrigins,
   designerHref,
@@ -30,29 +30,16 @@ import {
   userCartridgeRows,
 } from '../lib/sources.ts'
 import { userCartridges } from '../lib/variants.ts'
-import {
-  type DirectoryColumn,
-  DirectoryFilters,
-  DirectoryTable,
-  useListState,
-} from './directory-table.tsx'
-import { LibraryTabs } from './library-tabs.tsx'
-import {
-  DeleteRow,
-  SourceFilter,
-  sourceColumn,
-  useResolved,
-  useUserRecords,
-} from './list-sources.tsx'
-import { BarCount, PageBar } from './page-bar.tsx'
+import { DirectoryPage } from './directory-page.tsx'
+import { type DirectoryColumn, DirectoryTable, useListState } from './directory-table.tsx'
+import { DeleteRow, sourceColumn, useResolved, useUserRecords } from './list-sources.tsx'
 import { GapBadge } from './standard-badge.tsx'
 import { EmptyList } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
 
 /** The cartridge directory: page bar with the count, search row, windowed table. */
 export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
-  const tr = useTranslation()
-  const { t } = tr
+  const { t } = useTranslation()
   const [records, removeRow] = useUserRecords()
   const mine = useResolved(records, userCartridges)
   // the browser's designs first: a few rows would sit unseen behind the catalogue rows
@@ -88,7 +75,6 @@ export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
   const cell = (c: CartridgeRow) => cells.get(c.id) ?? cartridgeCells(c, system)
 
   const on = readOrigins(state.sources)
-  const count = countText(tr, shown.length, items.length, 'cartridges')
   const named = [onlyText(t, on), matchingText(t, state.query)].filter(Boolean)
   const lengthUnit = system.length.symbol
   const pressureUnit = system.pressure.symbol
@@ -184,38 +170,29 @@ export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
       .join(' · ')
   }
   return (
-    <>
-      <PageBar
-        title={listTitles.cartridges}
-        translated
-        status={<BarCount widest={widestCount(tr, items.length, 'cartridges')}>{count}</BarCount>}
-        actions={
-          <>
-            <Button
-              component={Link}
-              href="/cartridges/designer"
-              leftSection={<Plus aria-hidden="true" />}
-            >
-              {t('New cartridge')}
-            </Button>
-            <UnitsIconButton />
-          </>
-        }
-      />
-      <LibraryTabs />
-      <div className="directory">
-        <DirectoryFilters
-          query={state.query}
-          onQuery={(q) => set({ query: q })}
-          placeholder={t('Name or alias, 308, 7,62 or .308…')}
-          sorting={{ columns, sort: state.sort, onSort: (sort) => set({ sort }) }}
-        >
-          <SourceFilter
-            src={state.sources}
-            counts={counts}
-            onChange={(src) => set({ sources: src })}
-          />
-        </DirectoryFilters>
+    <DirectoryPage
+      title={listTitles.cartridges}
+      noun="cartridges"
+      shown={shown.length}
+      total={items.length}
+      actions={
+        <>
+          <Button
+            component={Link}
+            href="/cartridges/designer"
+            leftSection={<Plus aria-hidden="true" />}
+          >
+            {t('New cartridge')}
+          </Button>
+          <UnitsIconButton />
+        </>
+      }
+      state={state}
+      set={set}
+      placeholder={t('Name or alias, 308, 7,62 or .308…')}
+      columns={columns}
+      counts={counts}
+      table={
         <DirectoryTable
           rows={shown}
           columns={columns}
@@ -241,7 +218,7 @@ export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
           onSort={(sort) => set({ sort })}
           empty={<EmptyList noun="cartridges" filters={filterText(named)} onClear={clear} />}
         />
-      </div>
-    </>
+      }
+    />
   )
 }

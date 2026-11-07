@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "noEmit": true,
+    "isolatedDeclarations": false,
+    // Mantine's declarations do not pass under exactOptionalPropertyTypes
+    "skipLibCheck": true,
+    "rootDir": ".."
+  },
+  "include": [".", "../src", "../scripts"]
+}

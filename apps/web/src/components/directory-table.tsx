@@ -807,7 +807,7 @@ function SelectBox({
 }
 
 /** A column as the phone's Sort select reads it. */
-type SortColumn = { key: string; label: Message; num?: boolean; value?: unknown }
+export type SortColumn = { key: string; label: Message; num?: boolean; value?: unknown }
 
 /**
  * The phone's sort (below 48em only the name column shows its head), also shown when a tablet's
@@ -869,7 +869,7 @@ export const focusSearch = () =>
   document.querySelector<HTMLInputElement>('.directory-search input')?.focus()
 
 /** A scope the page was opened with (a cartridge's fit, a federation): named, with a button that lifts it. */
-type Scope = { label: string; onRemove: () => void }
+export type Scope = { label: string; onRemove: () => void }
 
 /**
  * The filter row: search with an icon and a clear button, the source choice (`children`), the scope

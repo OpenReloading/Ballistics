@@ -7,6 +7,3 @@ export function percentile(values: readonly number[], q: number): number | undef
   const low = sorted[i] as number
   return low + (rank - i) * ((sorted[i + 1] ?? low) - low)
 }
-
-/** Compare function of `toSorted` for text. */
-export const byText = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0)

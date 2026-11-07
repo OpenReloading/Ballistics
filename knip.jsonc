@@ -9,6 +9,9 @@
     "packages/locale-format": {
       "entry": ["src/index.ts"]
     },
+    "packages/design-tokens": {
+      "entry": ["src/index.ts"]
+    },
     "packages/statistics": {
       "entry": ["src/index.ts"]
     },

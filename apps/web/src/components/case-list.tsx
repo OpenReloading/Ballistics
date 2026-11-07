@@ -10,7 +10,7 @@ import { msg } from '../i18n/translate.ts'
 import { type CaseRow, caseMatches, userCaseRows } from '../lib/case-rows.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { kebabValue } from '../lib/list-values.ts'
-import { countText, filterText, matchingText, widestCount } from '../lib/lists.ts'
+import { filterText, matchingText } from '../lib/lists.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import {
   countOrigins,
@@ -22,15 +22,9 @@ import {
 } from '../lib/sources.ts'
 import { controlSize } from '../lib/theme.ts'
 import { formatQuantity, waterVolume } from '../lib/units.ts'
-import {
-  type DirectoryColumn,
-  DirectoryFilters,
-  DirectoryTable,
-  useListState,
-} from './directory-table.tsx'
-import { LibraryTabs } from './library-tabs.tsx'
-import { DeleteRow, SourceFilter, sourceColumn, useUserRecords } from './list-sources.tsx'
-import { BarCount, PageBar } from './page-bar.tsx'
+import { DirectoryPage } from './directory-page.tsx'
+import { type DirectoryColumn, DirectoryTable, useListState } from './directory-table.tsx'
+import { DeleteRow, sourceColumn, useUserRecords } from './list-sources.tsx'
 import { EmptyList, EmptyNote } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
 
@@ -46,8 +40,7 @@ export function CaseList({
   rows: CaseRow[]
   cartridgeNames: Record<string, string>
 }) {
-  const tr = useTranslation()
-  const { t } = tr
+  const { t } = useTranslation()
   const { system } = useUnits()
   const [records, removeRow, read] = useUserRecords()
   // the browser's groups first: a few rows would sit unseen behind the catalogue's
@@ -126,38 +119,25 @@ export function CaseList({
       .filter(Boolean)
       .join(' · ')
   return (
-    <>
-      <PageBar
-        title={listTitles.cases}
-        translated
-        status={
-          <BarCount widest={widestCount(tr, rows.length, 'cases')}>
-            {countText(tr, shown.length, rows.length, 'cases')}
-          </BarCount>
-        }
-        actions={
-          <>
-            <Button component={Link} href="/cases/editor" leftSection={<Plus aria-hidden="true" />}>
-              {t('New brass group')}
-            </Button>
-            <UnitsIconButton />
-          </>
-        }
-      />
-      <LibraryTabs />
-      <div className="directory">
-        <DirectoryFilters
-          query={state.query}
-          onQuery={(q) => set({ query: q })}
-          placeholder={t('Manufacturer, name or cartridge…')}
-          sorting={{ columns, sort: state.sort, onSort: (sort) => set({ sort }) }}
-        >
-          <SourceFilter
-            src={state.sources}
-            counts={counts}
-            onChange={(src) => set({ sources: src })}
-          />
-        </DirectoryFilters>
+    <DirectoryPage
+      title={listTitles.cases}
+      noun="cases"
+      shown={shown.length}
+      total={rows.length}
+      actions={
+        <>
+          <Button component={Link} href="/cases/editor" leftSection={<Plus aria-hidden="true" />}>
+            {t('New brass group')}
+          </Button>
+          <UnitsIconButton />
+        </>
+      }
+      state={state}
+      set={set}
+      placeholder={t('Manufacturer, name or cartridge…')}
+      columns={columns}
+      counts={counts}
+      table={
         <DirectoryTable
           rows={shown}
           columns={columns}
@@ -207,7 +187,7 @@ export function CaseList({
             )
           }
         />
-      </div>
-    </>
+      }
+    />
   )
 }

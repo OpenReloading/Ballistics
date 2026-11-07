@@ -10,7 +10,7 @@ import { plainNumber } from '../i18n/number.ts'
 import { msg } from '../i18n/translate.ts'
 import { facetNames } from '../lib/facets.ts'
 import { listTitles } from '../lib/list-titles.ts'
-import { countText, filterText, matchingText, widestCount } from '../lib/lists.ts'
+import { filterText, matchingText } from '../lib/lists.ts'
 import {
   countOrigins,
   designerHref,
@@ -27,16 +27,10 @@ import {
   userFaceRows,
 } from '../lib/target-faces.ts'
 import { formatQuantity } from '../lib/units.ts'
-import {
-  type DirectoryColumn,
-  DirectoryFilters,
-  DirectoryTable,
-  useListState,
-} from './directory-table.tsx'
+import { DirectoryPage } from './directory-page.tsx'
+import { type DirectoryColumn, DirectoryTable, useListState } from './directory-table.tsx'
 import { FacetFilters, useFacets } from './facet-filters.tsx'
-import { LibraryTabs } from './library-tabs.tsx'
-import { DeleteRow, SourceFilter, sourceColumn, useUserRecords } from './list-sources.tsx'
-import { BarCount, PageBar } from './page-bar.tsx'
+import { DeleteRow, sourceColumn, useUserRecords } from './list-sources.tsx'
 import { EmptyList } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
 
@@ -52,8 +46,7 @@ export function TargetFaceList({
   /** The names of the disciplines by id, for the Discipline filter. */
   disciplines: readonly { id: string; name: string }[]
 }) {
-  const tr = useTranslation()
-  const { t, tn } = tr
+  const { t, tn } = useTranslation()
   const { system } = useUnits()
   const [records, removeRow] = useUserRecords()
   // the browser's faces first: a few rows would sit unseen behind the catalogue's
@@ -142,49 +135,38 @@ export function TargetFaceList({
       .filter(Boolean)
       .join(' · ')
   return (
-    <>
-      <PageBar
-        title={listTitles.targets}
-        translated
-        status={
-          <BarCount widest={widestCount(tr, items.length, 'faces')}>
-            {countText(tr, shown.length, items.length, 'faces')}
-          </BarCount>
-        }
-        actions={
-          <>
-            <Button
-              component={Link}
-              href="/targets/designer"
-              leftSection={<Plus aria-hidden="true" />}
-            >
-              {t('New target')}
-            </Button>
-            <UnitsIconButton />
-          </>
-        }
-      />
-      <LibraryTabs />
-      <div className="directory">
-        <DirectoryFilters
-          query={state.query}
-          onQuery={(q) => set({ query: q })}
-          placeholder={t('Name, federation or event, 25 m…')}
-          sorting={{ columns, sort: state.sort, onSort: (sort) => set({ sort }) }}
-        >
-          <SourceFilter
-            src={state.sources}
-            counts={counts}
-            onChange={(src) => set({ sources: src })}
-          />
-          <FacetFilters
-            facets={facets}
-            options={options}
-            state={state}
-            onChange={(next) => set({ facets: next })}
-            onClear={clear}
-          />
-        </DirectoryFilters>
+    <DirectoryPage
+      title={listTitles.targets}
+      noun="faces"
+      shown={shown.length}
+      total={items.length}
+      actions={
+        <>
+          <Button
+            component={Link}
+            href="/targets/designer"
+            leftSection={<Plus aria-hidden="true" />}
+          >
+            {t('New target')}
+          </Button>
+          <UnitsIconButton />
+        </>
+      }
+      state={state}
+      set={set}
+      placeholder={t('Name, federation or event, 25 m…')}
+      columns={columns}
+      counts={counts}
+      filters={
+        <FacetFilters
+          facets={facets}
+          options={options}
+          state={state}
+          onChange={(next) => set({ facets: next })}
+          onClear={clear}
+        />
+      }
+      table={
         <DirectoryTable
           rows={shown}
           columns={columns}
@@ -208,7 +190,7 @@ export function TargetFaceList({
           breakBefore={state.sort ? undefined : (r, previous) => r.origin !== previous.origin}
           empty={<EmptyList noun="target faces" filters={filterText(named)} onClear={clear} />}
         />
-      </div>
-    </>
+      }
+    />
   )
 }

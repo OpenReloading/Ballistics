@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { type SourceRecord, sourceRecord } from '@open-reloading/schema'
+import { compareKeys, type SourceRecord, sourceRecord } from '@open-reloading/schema'
 import { readPublishedLoads } from '@open-reloading/tools/catalog'
 import { Refusal, UsageError } from './errors.ts'
 import { type InteriorModel, outcomes } from './evaluate.ts'
@@ -19,7 +19,6 @@ import {
 } from './result.ts'
 import { type Row, readRows } from './rows.ts'
 import { type Split, splitOf } from './split.ts'
-import { byText } from './stats.ts'
 import { inputsOf, modelVersion } from './version.ts'
 
 /** What `verify` and `compare` read: the rows, the records, the split and the sealed-split switch. */
@@ -102,7 +101,7 @@ function catalogueRows(options: Options) {
     folder === undefined
       ? records.published
       : readPublishedLoads([dirname(folder)], sourcesOf(roots), errors).map((l) => l.file)
-  ).toSorted((a, b) => byText(`${a.cartridge}/${a.id}`, `${b.cartridge}/${b.id}`))
+  ).toSorted((a, b) => compareKeys(`${a.cartridge}/${a.id}`, `${b.cartridge}/${b.id}`))
   if (errors.length > 0)
     options.warn?.(
       `${errors.length} problem(s) in the published load files; those files are left out\n`,
@@ -274,13 +273,13 @@ export async function compare(
       overall: changeOf(baseline.overall, candidate.overall),
       byFamily: Object.fromEntries(
         [...families]
-          .toSorted(byText)
+          .toSorted(compareKeys)
           .map((f) => [f, changeOf(baseline.byFamily[f], candidate.byFamily[f])]),
       ),
       ...(sameGroups && {
         grouped: Object.fromEntries(
           [...groupNames]
-            .toSorted(byText)
+            .toSorted(compareKeys)
             .map((g) => [g, changeOf(baseline.grouped?.groups[g], candidate.grouped?.groups[g])]),
         ),
       }),

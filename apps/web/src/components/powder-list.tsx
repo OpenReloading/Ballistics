@@ -18,7 +18,7 @@ import {
 import { powderRowIncomplete } from '../lib/complete-records.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { baseLine, baseText, grainFormText } from '../lib/list-values.ts'
-import { countText, filterText, matchingText, widestCount } from '../lib/lists.ts'
+import { filterText, matchingText } from '../lib/lists.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import {
   inOverlay,
@@ -37,16 +37,10 @@ import {
 } from '../lib/sources.ts'
 import { CompareButton, SelectionSummary, usePicks } from './compare-picks.tsx'
 import { Day } from './day.tsx'
-import {
-  type DirectoryColumn,
-  DirectoryFilters,
-  DirectoryTable,
-  useListState,
-} from './directory-table.tsx'
-import { LibraryTabs } from './library-tabs.tsx'
-import { DeleteRow, SourceFilter, sourceColumn, useUserRecords } from './list-sources.tsx'
+import { DirectoryPage } from './directory-page.tsx'
+import { type DirectoryColumn, DirectoryTable, useListState } from './directory-table.tsx'
+import { DeleteRow, sourceColumn, useUserRecords } from './list-sources.tsx'
 import { MissingMark } from './missing-mark.tsx'
-import { BarCount, PageBar } from './page-bar.tsx'
 import { RateBar, RateTicks, scaleWidth } from './rate-scale.tsx'
 import { EmptyList, EmptyNote } from './states.tsx'
 
@@ -86,8 +80,7 @@ function NoPowders() {
  * are Mine rows, opened in the powder designer.
  */
 export function PowderList({ packed }: { packed: PackedPowder[] }) {
-  const tr = useTranslation()
-  const { t, tn } = tr
+  const { t, tn } = useTranslation()
   const [records, removeRow, read] = useUserRecords()
   const catalogue = useMemo(() => unpackPowders(packed), [packed])
   // the browser's powders first: a few rows would sit unseen behind the catalogue's
@@ -206,51 +199,38 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
       .filter(Boolean)
       .join(' · ')
   return (
-    <>
-      <PageBar
-        title={listTitles.powders}
-        translated
-        status={
-          <>
-            <BarCount widest={widestCount(tr, items.length, 'powders')}>
-              {countText(tr, shown.length, items.length, 'powders')}
-            </BarCount>
-            <SelectionSummary count={picked.length} max={maxOverlay} onClear={() => replace([])} />
-          </>
-        }
-        actions={
-          <>
-            <CompareButton
-              count={picked.length}
-              min={0}
-              max={maxOverlay}
-              href={overlayHref(picked)}
-              idle={t('Burn rates')}
-            />
-            <Button
-              component={Link}
-              href="/powders/designer"
-              leftSection={<Plus aria-hidden="true" />}
-            >
-              {t('New powder')}
-            </Button>
-          </>
-        }
-      />
-      <LibraryTabs />
-      <div className="directory">
-        <DirectoryFilters
-          query={state.query}
-          onQuery={(q) => set({ query: q })}
-          placeholder={t('Manufacturer or name, DP40…')}
-          sorting={{ columns, sort: state.sort, onSort: (sort) => set({ sort }) }}
-        >
-          <SourceFilter
-            src={state.sources}
-            counts={counts}
-            onChange={(src) => set({ sources: src })}
+    <DirectoryPage
+      title={listTitles.powders}
+      noun="powders"
+      shown={shown.length}
+      total={items.length}
+      status={
+        <SelectionSummary count={picked.length} max={maxOverlay} onClear={() => replace([])} />
+      }
+      actions={
+        <>
+          <CompareButton
+            count={picked.length}
+            min={0}
+            max={maxOverlay}
+            href={overlayHref(picked)}
+            idle={t('Burn rates')}
           />
-        </DirectoryFilters>
+          <Button
+            component={Link}
+            href="/powders/designer"
+            leftSection={<Plus aria-hidden="true" />}
+          >
+            {t('New powder')}
+          </Button>
+        </>
+      }
+      state={state}
+      set={set}
+      placeholder={t('Manufacturer or name, DP40…')}
+      columns={columns}
+      counts={counts}
+      table={
         <DirectoryTable
           rows={shown}
           columns={columns}
@@ -289,7 +269,7 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
             )
           }
         />
-      </div>
-    </>
+      }
+    />
   )
 }

@@ -1,0 +1,38 @@
+/* BuildGuide's --ag-* colors on the tokens of tokens.css, which the host page loads first. BuildGuide reads them on
+   .ag-guide; :root .ag-guide outranks its defaults whatever the load order. BuildGuide keeps the system font stack.
+   Taken from Brand's docusaurus/brand.css. */
+:root .ag-guide {
+  --ag-font: var(--font-family-system);
+  --ag-page: var(--page);
+  --ag-ink: var(--ink);
+  --ag-muted: var(--muted);
+  --ag-text: var(--ink);
+  --ag-accent: var(--accent);
+  --ag-line: var(--line);
+  --ag-divider: var(--line);
+  --ag-detail-line: var(--line);
+  --ag-control-line: var(--control-line);
+  --ag-placeholder-line: var(--control-line);
+  --ag-swatch-line: var(--control-line);
+  --ag-control-ink: var(--ink);
+  --ag-control-hover: var(--surface-alt);
+  --ag-surface: var(--surface);
+  --ag-surface-soft: var(--surface-alt);
+  --ag-surface-head: var(--surface-alt);
+  --ag-surface-chip: var(--surface-alt);
+  --ag-primary: var(--accent);
+  --ag-primary-hover: var(--accent-hover);
+  --ag-done: var(--accent);
+  --ag-focus: var(--accent);
+  --ag-glow: var(--accent);
+  --ag-step-current-bg: var(--accent-tint);
+  --ag-step-current-line: var(--accent);
+  --ag-row-selected: var(--accent-tint);
+  --ag-row-selected-bar: var(--accent);
+  --ag-row-hover: var(--surface-alt);
+  --ag-bom-hover: var(--surface-alt);
+  --ag-row-arrow: var(--muted);
+  --ag-arrow: var(--muted);
+  --ag-error-bg: var(--warn-fill);
+  --ag-done-bg: var(--accent-tint);
+}

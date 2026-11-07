@@ -1,7 +1,6 @@
 /**
  * Weighted least squares on log parameters by Levenberg-Marquardt with central-difference
- * Jacobians, a conditioning check and the parameter covariance, shared by truing and the powder
- * fit: `apps/docs/docs/models/least-squares.md`.
+ * Jacobians, a conditioning check and the parameter covariance: `apps/docs/docs/models/least-squares.md`.
  */
 
 import { nth } from './errors.ts'

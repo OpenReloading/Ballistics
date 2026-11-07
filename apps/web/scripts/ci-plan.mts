@@ -146,6 +146,7 @@ export const testGroups: Record<string, string[]> = {
   packages: [
     'units',
     'locale-format',
+    'design-tokens',
     'statistics',
     'ballistics',
     'shot-groups',
