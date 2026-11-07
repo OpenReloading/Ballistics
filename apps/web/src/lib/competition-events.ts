@@ -17,6 +17,7 @@ import {
   ringEventTotals,
   type StageScore,
 } from '@open-reloading/shot-groups'
+import { fixedNumber, plainNumber } from '../i18n/number.ts'
 import { type Message, msg } from '../i18n/translate.ts'
 import { toCsv } from './csv.ts'
 import { localDay } from './dates.ts'
@@ -129,11 +130,11 @@ export function eventTotals(e: CompetitionEvent, type: EventType | undefined) {
 }
 
 /** A total as the list and the sheets show it: rings with tenths as typed, points as a whole. */
-export const scoreText = (n: number | undefined) =>
-  n === undefined ? '' : String(Math.round(n * 100) / 100)
+export const scoreText = (n: number | undefined, language?: string) =>
+  n === undefined ? '' : plainNumber(Math.round(n * 100) / 100, language)
 
 /** A hit factor with four decimals, as the score sheets print it. */
-export const hitFactorText = (hf: number) => hf.toFixed(4)
+export const hitFactorText = (hf: number, language?: string) => fixedNumber(hf, 4, language)
 
 /** The total of a stored event for the list, empty where it has none. */
 export const totalText = (e: CompetitionEvent, type: EventType | undefined) =>
@@ -223,7 +224,7 @@ function partCells(e: CompetitionEvent, i: number, totals: EventTotals | undefin
     const s = e.results.series[i]
     const total = typeof part === 'number' ? part : s?.total
     const blank = Array<string>(9).fill('')
-    return [`Series ${i + 1}`, s?.shots?.join(' ') ?? '', ...blank, scoreText(total), '', '']
+    return [`Series ${i + 1}`, s?.shots?.join(' ') ?? '', ...blank, scoreText(total, 'en'), '', '']
   }
   const s = e.results.stages[i]
   if (!s) return []
@@ -240,8 +241,8 @@ function partCells(e: CompetitionEvent, i: number, totals: EventTotals | undefin
     s.procedurals,
     s.time,
     s.powerFactor,
-    score ? scoreText(score.points) : '',
-    score ? hitFactorText(score.hitFactor) : '',
+    score ? scoreText(score.points, 'en') : '',
+    score ? hitFactorText(score.hitFactor, 'en') : '',
     s.stagePoints ?? '',
   ]
 }
@@ -266,7 +267,7 @@ export function eventRows(
       names.firearm(e.firearm),
       names.load(e.load),
       e.state,
-      scoreText(totals?.total),
+      scoreText(totals?.total, 'en'),
     ]
     const n = e.results.method === 'rings' ? e.results.series.length : e.results.stages.length
     if (n === 0) rows.push([...head, ...Array<string>(14).fill('')])

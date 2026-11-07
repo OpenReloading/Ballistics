@@ -1,5 +1,6 @@
 import type { CompetitionEvent, EventType } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
+import { setShownLanguage } from '../src/i18n/shown.ts'
 import {
   blankEvent,
   blankStage,
@@ -124,6 +125,25 @@ describe('totals', () => {
     expect(eventTotals({ ...ringEvent, state: 'disqualified' }, dsb)?.total).toBeUndefined()
     expect(eventTotals(ringEvent, undefined)).toBeUndefined()
     expect(eventTotals(ringEvent, ipsc)).toBeUndefined()
+  })
+
+  it('writes the total with the decimal mark of the language shown and the CSV with a point', () => {
+    setShownLanguage('de')
+    try {
+      expect(totalText(ringEvent, dsb)).toBe('124,5')
+      const rows = eventRows(
+        [record('00000000-0000-4000-8000-000000000001', 'LM', ringEvent)],
+        types,
+        {
+          type: () => '',
+          firearm: () => '',
+          load: () => '',
+        },
+      )
+      expect(rows[1]?.[(rows[0] ?? []).indexOf('Event total')]).toBe('124.5')
+    } finally {
+      setShownLanguage('en')
+    }
   })
 })
 
