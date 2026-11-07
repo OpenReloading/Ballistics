@@ -14,6 +14,7 @@ import {
 } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import type { Message } from '../i18n/translate.ts'
+import { titleTemplate } from '../lib/record-metadata.ts'
 import { tipEvents } from '../lib/theme.ts'
 import { useBarEndSlot } from './bar-end.ts'
 import { SafetyBarButton } from './safety-dialog.tsx'
@@ -185,6 +186,10 @@ export function PageBar({
 )) {
   const { t } = useTranslation()
   const title = translated ? t(given) : given
+  // the static metadata title is English; a catalogue title follows the language shown
+  useEffect(() => {
+    if (translated) document.title = titleTemplate.replace('%s', title)
+  }, [translated, title])
   const [statusLine, setStatusLine] = useState<HTMLDivElement | null>(null)
   const full = useWholeText(statusLine)
   const [open, setOpen] = useState(false)

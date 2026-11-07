@@ -53,9 +53,7 @@ export const theme = createTheme({
       h3: { fontSize: '1rem', fontWeight: '600' },
     },
   },
-  // xs and sm tighter; md and up as Mantine's, so page containers and the drawings in them keep
-  // their size (the drawing baseline holds). Mantine's components read these; the steps of
-  // globals.css are 0.25, 0.5, 0.75, 1 and 1.5rem
+  // xs and sm tighter; md and up as Mantine's, so page containers and their drawings keep their size
   spacing: {
     xs: '0.5rem',
     sm: '0.625rem',

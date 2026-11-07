@@ -157,7 +157,7 @@ export function ConfirmHost() {
               // the live region is the box around it; Mantine's default role is alert
               role="presentation"
               withCloseButton
-              closeButtonProps={{ 'aria-label': 'Close notice' }}
+              closeButtonProps={{ 'aria-label': t('Close notice') }}
               onClose={() => close(notice)}
               onMouseEnter={() => setHeld(notice.n)}
               onMouseLeave={() => setHeld(undefined)}
@@ -175,7 +175,7 @@ export function ConfirmHost() {
                     notice.undo()
                   }}
                 >
-                  Undo
+                  {t('Undo')}
                 </Button>
               </Group>
             </Notification>
