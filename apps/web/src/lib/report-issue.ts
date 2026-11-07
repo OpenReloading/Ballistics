@@ -50,7 +50,6 @@ const areaRoutes: [string, ReportArea][] = [
   ['/disciplines', 'Disciplines'],
   ['/federations', 'Federations'],
   ['/firearms', 'Firearms'],
-  ['/my-cases', 'Brass'],
 ]
 
 const under = (route: string, path: string) => route === path || route.startsWith(`${path}/`)
