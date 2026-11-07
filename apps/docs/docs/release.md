@@ -67,6 +67,10 @@ The stored and published contracts besides the API each have a committed baselin
 
 `pnpm run baselines` (after `pnpm run build`) rewrites the JSON Schemas, the export lists and the share links from the build. The user data file is edited by hand, so its diff shows the change of the format. Before 1.0.0 a pull request may rewrite a baseline in the same change. From 1.0.0 on, a rewrite is a breaking change and its pull request title carries the `!` marker.
 
+## Validation results
+
+The [results](models/validation.md#results) of the validation page are a local run on load rows that are not in the repository, updated by hand at each release. After the update, `pnpm run build`, then `VALIDATION_ROWS=<rows file> pnpm --filter @open-reloading/cli exec vitest run test/published-validation.test.ts` reruns `verify` on the validation split and checks every velocity line of the page and its pressure line at their printed decimals. Without `VALIDATION_ROWS` the test is skipped, so CI never reads the rows; the command line tests check the arithmetic of the evaluation on synthetic rows.
+
 ## 1.0.0 release
 
 Release notes paragraph, pasted into the release:
