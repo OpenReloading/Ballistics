@@ -38,7 +38,7 @@ const own = translator(
     'Enter a number for {field}.': 'Zahl für {field}.',
     Pressure: 'Druck',
     'ladder charge {charge} kg must be above 0': 'Ladung {charge} kg zu klein',
-    'bullet {id} has no length': 'Geschoss {id} ohne Länge',
+    'bullet {bullet} has no length': 'Geschoss {bullet} ohne Länge',
     'Error {status}.': 'Fehler {status}.',
     'Give a load or factory ammunition, not both.': 'Eine Munition genügt.',
     '→ at {path}': '→ bei {path}',
@@ -507,7 +507,9 @@ describe('the messages of the packages', () => {
   it('reads the sources', () => {
     const texts = scan('7').map((f) => f.text)
     expect(texts.length).toBeGreaterThan(20)
-    expect(texts).toContain('ladder charge 7 g must be above 0')
+    const files = scan('7').map((f) => f.where)
+    expect(files.some((w) => w.startsWith('use-cases/src/'))).toBe(true)
+    expect(files.some((w) => w.startsWith('api/src/'))).toBe(true)
     expect(texts).toContain('Unknown field')
   })
 

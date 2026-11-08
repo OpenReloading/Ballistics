@@ -1,14 +1,16 @@
 /**
- * The words of the typed refusals that statistics, the group statistics of shot-groups and
- * ballistics raise (`InputError` of `@open-reloading/statistics` with an issue): the English
- * sentence of each code, `{name}` where a param stands. The language module loads them once a page
- * has started, outside every page's own JavaScript, for `refusalText` of `core-messages.ts`;
- * `core-message-table.ts` reads them as templates, so `translateMessage` shows a sentence in the
- * language shown. Hit probability and ring scoring word their own issues where they are shown.
+ * The words of the typed refusals that statistics, the group statistics of shot-groups, ballistics
+ * and use-cases raise (`InputError` of `@open-reloading/statistics` with an issue), and of an
+ * unknown record id (`RecordNotFound`): the English sentence of each code, `{name}` where a param
+ * stands. The language module loads them once a page has started, outside every page's own
+ * JavaScript, for `refusalText` of `core-messages.ts`; `core-message-table.ts` reads them as
+ * templates, so `translateMessage` shows a sentence in the language shown. Hit probability and ring
+ * scoring word their own issues where they are shown.
  */
 import type { ExteriorIssue, InteriorIssue, LoadFileIssue } from '@open-reloading/ballistics'
 import type { GroupStatisticsIssue } from '@open-reloading/shot-groups'
 import type { Diagnostic, StatisticsIssue } from '@open-reloading/statistics'
+import type { RecordNotFoundIssue, UseCaseIssue } from '@open-reloading/use-cases'
 import { english, type Message, msg } from '../i18n/translate.ts'
 import { gapWords } from './resistance-gaps.ts'
 
@@ -272,6 +274,25 @@ const loadFileWords = {
   engravingValueNeeded: msg('Needed with the other engraving value, or from a powder record.'),
 } satisfies Record<LoadFileIssue['code'], Message>
 
+const useCaseWords = {
+  resultNotFinite: msg('result holds a non-finite number at {path}'),
+  powderBulkDensityOutOfRange: msg(
+    'powder {powder} bulk density {density} kg/m3 must be above 0 and at most {max} kg/m3',
+  ),
+  powderWithoutBulkDensity: msg('powder {powder} has no bulk density'),
+  bulletWithoutDiameter: msg('bullet {bullet} has no diameter'),
+  bulletWithoutLength: msg('bullet {bullet} has no length'),
+  bulletValueOutOfBounds: msg(
+    'bullet {bullet} {key} {value} {unit} must be within {low} and {high} {unit}',
+  ),
+  bulletWithoutCoefficient: msg('bullet {bullet} has no {model} ballistic coefficient'),
+  bulletCoefficientsWithoutBands: msg(
+    'bullet {bullet} has {count} {model} values without distinct velocity bands; send drag explicitly',
+  ),
+  ladderChargeNotAboveZero: msg('ladder charge {charge} g must be above 0'),
+  recordNotFound: msg('{kind} {id} not found'),
+} satisfies Record<(UseCaseIssue | RecordNotFoundIssue)['code'], Message>
+
 /** Joins two packages' words; a code both use fails `tsc`, since a refusal carries no package. */
 const disjoint = <L extends object, R extends object>(
   l: L,
@@ -280,8 +301,14 @@ const disjoint = <L extends object, R extends object>(
 
 /** The words of every code. */
 export const refusalWords: Readonly<Record<string, Message>> = disjoint(
-  disjoint(disjoint(disjoint(statisticsWords, groupStatisticsWords), exteriorWords), interiorWords),
-  loadFileWords,
+  disjoint(
+    disjoint(
+      disjoint(disjoint(statisticsWords, groupStatisticsWords), exteriorWords),
+      interiorWords,
+    ),
+    loadFileWords,
+  ),
+  useCaseWords,
 )
 
 /** An item of a list param: a resistance gap in its words, anything else as it is. */

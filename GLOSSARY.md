@@ -794,7 +794,7 @@ _Avoid_: search
 `GET /v1/cartridges/{id}`: the cartridge record with `caseType` and `capacities` (case capacity records).
 
 **Error body**:
-The body of every error answer: `statusCode`, `error`, `message`, and where they apply `code` (Fastify), `issues` (schema errors, each `path` and `message`), `reason` (compute failures), `notice` and `requestId` (the server log id of a 500).
+The body of every error answer: `statusCode`, `error`, `message`, and where they apply `code` (Fastify's, or the code of a typed refusal and of an unknown record id of a compute route, then also the `message`), `params` (the values of that code), `detail` (a truing answer: the trajectory refusal that stopped the fit), `issues` (schema errors, each `path` and `message`), `reason` (compute failures), `notice` and `requestId` (the server log id of a 500).
 
 ### API exterior bodies
 
