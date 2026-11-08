@@ -58,11 +58,11 @@ pnpm --filter @open-reloading/web run i18n messages     # every message in the s
 3. Run `missing <code>` until it lists nothing you want to translate.
 4. `pnpm --filter @open-reloading/web run i18n check <code>` checks the catalogue: no message without a text, no key without a message, equal placeholders, only categories of the language. Add it to the root `lint` script next to `check de`.
 
-The German catalogue follows the term table `apps/web/src/i18n/german-terms.json`. A verified or decided term is used as the table gives it. Another language has no table yet: add one with the same shape if the language needs one.
+The German catalogue follows the term table `apps/web/src/i18n/german-terms.json`. Only the texts in `safeTexts` of `apps/web/scripts/i18n-lint.json` (the Safety notice and the disclaimers) may say "safe", and their German says "sicher" as often. A verified or decided term is used as the table gives it. Another language has no table yet: add one with the same shape if the language needs one.
 
 A row has one of three statuses:
 - `verified`: one German term and its sources. `forms` lists the forms a string may write instead, for example `["Serie", "Serien"]` for a text about one series.
-- `decided`: the sources disagree. `german` holds the chosen candidate, `candidates` keeps all of them with their sources, and `decision` names the rule that chose. Changing the choice means changing `german` and `decision` and the catalogue strings that write the term; `i18n-catalogue.test.ts` fails for a string that writes a rejected candidate where the English word occurs.
+- `decided`: the sources disagree. `german` holds the chosen candidate, `candidates` keeps all of them with their sources, and `decision` names the rule that chose. Changing the choice means changing `german` and `decision` and the catalogue strings that write the term; `i18n check de` (part of `pnpm run lint`) fails for a string that writes a rejected candidate where the English word occurs, and for one that lacks a verified term. A key where the English word has another sense goes into `otherSense` of `apps/web/scripts/i18n-lint.json`, with the sense.
 - `unverified`: no source found. The row keeps its candidate or none and the note starts "Accepted as candidate for 1.0".
 
 The rules for a decided row, applied in this order:

@@ -118,7 +118,7 @@ describe('limitCheck', () => {
     )
   })
 
-  it('adds rangeIncomplete with the reasons, and never says safe', () => {
+  it('adds rangeIncomplete with the reasons', () => {
     const incomplete = {
       ...range,
       complete: false,
@@ -137,7 +137,6 @@ describe('limitCheck', () => {
     expect(warnings[1]?.message).toBe(
       '1 of 2 range cases could not be computed (chargeTooHigh); the range covers only the computed cases, and the true range can be wider.',
     )
-    for (const w of warnings) expect(w.message).not.toMatch(/safe/i)
   })
 
   it('adds chargeTooSmall below 2.2 times the start or the ignition pressure', () => {
