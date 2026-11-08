@@ -36,7 +36,7 @@
     "typecheck": "tsc --noEmit && tsc -p test",
     "test": "vitest run --project node && publint --strict && attw --pack . --profile esm-only --exclude-entrypoints ui.css",
     "test:browser": "vitest run --project 'stories*' && storybook build --quiet",
-    "storybook": "storybook dev --port 6006",
+    "storybook": "lingui compile && storybook dev --port 6006",
     "messages": "lingui extract --clean --overwrite"
   },
   "dependencies": {

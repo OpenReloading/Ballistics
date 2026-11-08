@@ -14,7 +14,7 @@
     },
     "packages/ui": {
       // the Lingui CLI reads its configuration
-      "entry": ["src/index.ts", "lingui.config.ts"],
+      "entry": ["src/index.ts", "lingui.config.ts", "test/message-ids.ts"],
       // css/ui.css imports it, and knip reads no CSS
       "ignoreDependencies": ["@fontsource-variable/inter"]
     },

@@ -24,6 +24,10 @@ The web app's language is a setting (Settings, General, Language). There is one 
 - A refusal, reason code or warning that came from the packages or the API stays English where it is held. Translate it where it is shown with `translateMessage(text, t)` (`src/lib/core-messages.ts`) and add it to `src/lib/core-message-table.json` (the warning codes are in `core-message-table.ts`), keyed by its code or, for a refusal without a code, by its sentence with placeholders, and its German text to the catalogue. `apps/web/test/core-messages.test.ts` fails for a message of `packages/statistics/src`, `packages/ballistics/src`, `packages/shot-groups/src/group-statistics.ts` or `packages/api/src` the table lacks.
 - Rows that must stay on one line (the workbench's input rows and readouts) take the German words as they are: a long term is shortened in the catalogue or the label takes a smaller size under `:lang(de)`. `tests/web/workbench-no-scroll.spec.ts` runs the workbench in German at 1280 x 650.
 
+## The interface base (`packages/ui`)
+
+The shared base keeps its own texts in Lingui catalogs, the format the rebuilt web app moves to: `packages/ui/src/locales/en.po` and `de.po`, each text with an explicit id (`frame.menu`). A text in `ui` is `i18n._({ id: 'frame.menu', message: 'Navigation' })`; `pnpm --filter @open-reloading/ui run messages` adds new texts to both catalogs, and a German one is written into `de.po` by hand. The build fails while a German text is missing, and `tsc` fails on an id the English catalog lacks. The app loads `uiMessages` of `@open-reloading/ui` beside its own texts.
+
 ## Numbers, dates and country names
 
 These follow the language shown and need no catalogue text. Under German a decimal is written with a comma (`2,5`), a date and a country name come from `Intl`. English is unchanged.
