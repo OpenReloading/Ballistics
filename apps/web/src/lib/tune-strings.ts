@@ -48,7 +48,7 @@ export type StringForm = { charge: string; shots: string; temperature: string }
 /** The fields of `StringForm` that do not read: the charge, the velocities, the temperature. */
 export type StringFormErrors = Partial<Record<keyof StringForm, true>>
 
-/** Or the fields that do not read. */
+/** In SI by the unit converters, or the fields that do not read. */
 export function readStringForm(
   form: StringForm,
   units: {

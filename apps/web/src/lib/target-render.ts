@@ -19,7 +19,7 @@ const styleProps = [
   'display',
 ]
 
-/** An SVG drawn into a canvas loads no stylesheet, so computed styles are inlined. */
+/** An SVG drawn into a canvas loads no stylesheet, so computed styles are inlined; a stroke that keeps its screen width scales by `k` (view units per px). */
 function standalone(svg: SVGSVGElement, k: number, size: { w: number; h: number }) {
   const clone = svg.cloneNode(true) as SVGSVGElement
   const walk = (a: Element, b: Element) => {

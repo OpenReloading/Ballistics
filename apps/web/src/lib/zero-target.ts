@@ -36,7 +36,7 @@ const white = '#fff'
 const markRadius = 5
 const squareSide = 25
 
-/** Marks are thin rings with a cross, so none prints as a filled spot of a hole's size. */
+/** mm; marks are thin rings with a cross, so none prints as a filled spot of a hole's size. */
 export function zeroTargetShapes(): { lines: Line[]; rings: Ring[]; rects: Rect[] } {
   const lines: Line[] = []
   const rings: Ring[] = []

@@ -45,7 +45,7 @@ function ladderValues(start: number, step: number, steps: number, direction: Lad
   )
 }
 
-/** `show` writes a temperature in the page's unit with its symbol. */
+/** Temperatures in K from `start`; `show` writes a temperature in the page's unit with its symbol. */
 export function temperatureLadder(
   start: number | undefined,
   step: number,
@@ -80,7 +80,7 @@ export type SeatingLengths = {
   lengthKind: SeatingLengthKind
   /** Slider range of the length it seats by, m. */
   range: readonly [number, number]
-  /** Absent without the record values; a hollow base of assumed depth adds its volume bracket (`cavityRange`). */
+  /** Volume behind the bullet (m³), travel and jump (m) at `value` (m); absent without the record values; a hollow base of assumed depth adds its volume bracket (`cavityRange`, m³). */
   at: (value: number) => {
     volume?: number | undefined
     travel?: number | undefined

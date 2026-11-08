@@ -22,7 +22,7 @@ export type ChargeFill =
       compressed: boolean
     }
 
-/** Without one of the three inputs, what is missing. */
+/** `base` in mm from the head; charge kg, bulk density kg/m³, free volume m³; without one of the three inputs, what is missing. */
 export function chargeFill(o: {
   charge: number | undefined
   bulkDensity: number | undefined

@@ -7,7 +7,7 @@ export const colorSchemeKey = storageName('theme')
 /** Mantine's `ColorSchemeScript` skips the system setting when storage throws, so dark systems would flash light. */
 export const colorSchemeScript = `var t;try{t=localStorage.getItem('${colorSchemeKey}')}catch(e){}document.documentElement.setAttribute('data-mantine-color-scheme',t==='light'||t==='dark'?t:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')`
 
-/** `bar` 36 px, `row` 30 px; checkboxes, radios and switches 16 px, close buttons 24 px (WCAG 2.2 target size). */
+/** `bar` 36 px (top bar, page bars, toolbars), `row` 30 px (card heads, table rows, filters, side panels, notes); checkboxes, radios and switches 16 px, close buttons 24 px (WCAG 2.2 target size). */
 export const controlSize = {
   bar: { button: 'sm', icon: 'input-sm', toggle: 'sm', input: 'sm' },
   row: { button: 'xs', icon: 'input-xs', toggle: 'xs', input: 'xs' },

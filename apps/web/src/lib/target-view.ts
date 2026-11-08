@@ -32,7 +32,7 @@ const round = (lo: number, hi: number) =>
 /** The printed target's largest size on the sheet, mm. */
 export const printArea = { width: 170, height: 140 }
 
-/** The largest round scale that fits, with a ruler of round display units at most 60 mm. */
+/** The largest round scale (printed mm per target mm) that fits, with a ruler of round display units (`unit` m each) at most 60 mm and the image's width. */
 export function printLayout(
   box: { w: number; h: number },
   mPerUnit: number,

@@ -14,7 +14,7 @@ const constructionName = {
   monolithic: msg('monolithic'),
 }
 
-/** A fitted powder without its own start pressure ran at the rifle assumption, so a rifle barrel keeps it (`apps/docs/docs/models/interior-m3.md`, "Shot start"). */
+/** By bullet construction and barrel class (under 300 mm or not) with a 95 % interval; a fitted powder without its own start pressure ran at the rifle assumption, so a rifle barrel keeps it (`apps/docs/docs/models/interior-m3.md`, "Shot start"). */
 export function startPressureDefault(a: {
   barrel: number | undefined
   construction: StructureFields | undefined

@@ -89,7 +89,7 @@ function turnReferences(
   })
 }
 
-/** Counter-clockwise on screen; target axes stay on the screen and every mark stays on its hole. */
+/** `angle` in rad, counter-clockwise on screen; target axes stay on the screen and every mark stays on its hole. */
 export function turnSheet(
   sheet: TargetSheet,
   size: { width: number; height: number },
@@ -159,7 +159,7 @@ export function newGroup(
   }
 }
 
-/** A nudge follows the screen whatever the axes' rotation; view length near `q` keeps it about `step` on a perspective photo. */
+/** `step` m in the screen direction (`dx`, `dy`, view y down) whatever the axes' rotation; the view length near `q` keeps it about `step` on a perspective photo. */
 export function screenNudge(f: Frame, q: Point, dx: number, dy: number, step: number): Point {
   const p = targetToView(f, q)
   const e = targetToView(f, { x: q.x + step, y: q.y })
@@ -167,7 +167,7 @@ export function screenNudge(f: Frame, q: Point, dx: number, dy: number, step: nu
   return viewToTarget(f, { x: p.x + dx * len, y: p.y + dy * len })
 }
 
-/** As an angle so groups at different distances average fairly; `length` only at one distance. */
+/** `charges` in kg; as an angle (rad) so groups at different distances average fairly; `length` (m) only at one distance. */
 export function ladderExtremeSpreads(groups: ShotGroup[], charges: number[]) {
   const sized = groups.flatMap((g) => {
     const es = g.ladderStep === undefined ? undefined : groupStatisticsOf(g).extremeSpread

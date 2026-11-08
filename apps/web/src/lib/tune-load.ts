@@ -10,7 +10,7 @@ import {
   tuneTableKey,
 } from './powder-tune.ts'
 
-/** Apart from `powder-tune.ts`, so the workbench that writes it does not load the run's schema. */
+/** Apart from `powder-tune.ts`, so the workbench that writes it does not load the run's schema; undefined when none or invalid. */
 export function readTuneLoad(load: string) {
   try {
     const text = sessionStorage.getItem(tuneLoadKey(load))
@@ -57,7 +57,7 @@ export function readTuneAction(load: string) {
   }
 }
 
-/** The handed-over table, else fetched for a cartridge that was still loading, as the workbench's run does. */
+/** The handed-over table, else fetched for a cartridge that was still loading, as the workbench's run does; undefined when neither gives one. */
 export async function tuneTable(load: string, signal?: AbortSignal) {
   const handed = readTuneTable(load)
   if (handed !== undefined) return handed

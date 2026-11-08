@@ -58,7 +58,7 @@ export async function putRecordIf(record: UserRecord, base: string | undefined) 
   return fits(stored, base)
 }
 
-/** Read and written in one transaction, so two tabs changing one record never lose each other's change. */
+/** Read and written in one transaction, so two tabs changing one record never lose each other's change; resolves with the record written, undefined when `change` left it, and rejects with what `change` throws. */
 export async function updateRecord(
   id: string,
   change: (stored: unknown) => UserRecord | undefined,

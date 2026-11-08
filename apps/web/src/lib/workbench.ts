@@ -76,7 +76,7 @@ export function stepLabel(i: number, steps: number, direction: LadderDirection) 
   return k === 0 ? '0' : `${k > 0 ? '+' : '−'}${Math.abs(k)}`
 }
 
-/** The rest go into More; a row not yet measured (0) keeps them all. */
+/** `widths` and `room` in px; the rest go into More; a row not yet measured (0) keeps them all. */
 export function resultTabsFit(widths: number[], room: number) {
   if (room <= 0) return widths.length
   let used = 0
@@ -134,7 +134,7 @@ function convertBarMessage(message: string, system: UnitSystem) {
       )
 }
 
-/** Its source as the standard with the sheet's date and the measuring method. */
+/** `pressure` in Pa; its source as the standard with the sheet's date and the measuring method. */
 function limitExceededText(
   body: InteriorResponse,
   l: Limit,
@@ -225,7 +225,7 @@ export function shownWarnings(
   })
 }
 
-/** A missing bullet record at once; other reasons only after the Trajectory result has stayed away. */
+/** A missing bullet record at once; other reasons only after the Trajectory result has stayed away, never during the wait. */
 export const rangeCardNote = (
   ran: boolean,
   bullet: string | undefined,
@@ -255,7 +255,7 @@ export function rangeHero(
   }
 }
 
-/** 5th to 95th percentile of the sampled band, else the corner cases; `cornerOnly` so a print does not depend on sampling. */
+/** Peak pressure (Pa) and muzzle velocity (m/s): 5th to 95th percentile of the sampled band, else the corner cases; `cornerOnly` so a print does not depend on sampling. */
 export function resultBand(body: InteriorResponse, cornerOnly = false) {
   const { sampled, pressureRange: range } = body
   const sample = sampled?.status === 'sampled' && !cornerOnly ? sampled : undefined

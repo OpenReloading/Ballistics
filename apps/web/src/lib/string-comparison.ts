@@ -3,7 +3,7 @@ import type { StringStats } from './string-stats.ts'
 /** Fewest shots in each string for a ranking by SD: below it the intervals are too wide to rank on. */
 const rankingShots = 10
 
-/** `few` when an interval is missing or a ranking needs more shots; `same` when the intervals overlap. */
+/** `few` when an interval is missing or a ranking needs more shots; `same` when the intervals overlap, else `first` or `second`, the string with the smaller SD. */
 export type SdComparison = 'first' | 'second' | 'same' | 'few'
 
 /** Compares the SD of two strings by their intervals. */

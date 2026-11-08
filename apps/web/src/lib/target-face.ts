@@ -274,7 +274,7 @@ type FaceMatch = {
   matched: Array<{ ring: Ring; label: string; radius: number; error: number }>
 }
 
-/** The black edge fixes the scale; rings match within 4 %, missing expected rings count a little against, `photoSearch: false` faces are skipped. */
+/** The black edge fixes the scale; rings match within `TOLERANCE`, a known `scale` (image px per mm) drops other sizes, missing expected rings count a little against, `photoSearch: false` faces are skipped. */
 export function matchFaces(
   black: Ellipse,
   rings: readonly Ring[],
@@ -488,7 +488,7 @@ function planePolylines(
   }
 }
 
-/** The pair farthest apart in radius gives the pencil, whose ratio must match within 6 %; the others are checked on the plane. */
+/** Radii in mm; the pair farthest apart in radius gives the pencil, whose ratio must match within 6 %; the others are checked on the plane; undefined without a usable pair. */
 function planeFromEllipses(members: Member[], outer: number, black: number): FacePlane | undefined {
   let best: { a: Member; plane: NonNullable<ReturnType<typeof concentricPlane>> } | undefined
   let bestKey = 0
@@ -659,7 +659,7 @@ export function searchFaces(
   return result
 }
 
-/** Two matched rings give the plane through the pencil, else the black edge alone (approximate). */
+/** With `MIN_RINGS` matched rings the pencil gives the plane, else the black edge alone (approximate). */
 export function fitPicked(search: FaceSearch, face: TargetFace): FaceFit | undefined {
   if (!search.black) return undefined
   const match = nth(matchFaces(search.black, search.rings, [face]), 0)
@@ -716,7 +716,7 @@ export function onPhoto(search: FaceSearch, k: number, x0: number, y0: number): 
   }
 }
 
-/** The outer ring grown by `hole` mm, since a hole touching it still scores. */
+/** The outer ring grown by half the hole diameter `hole` (mm), since a hole touching it still scores. */
 export function faceLabel(g: FaceGeometry, hole: number): FaceLabel {
   const inv = inv3(g.toFace) ?? [1, 0, 0, 0, 1, 0, 0, 0, 1]
   const R = g.outer + hole / 2

@@ -76,7 +76,7 @@ export const percentText = (fraction: number) => locale.percentText(fraction, sh
 export const withUnit = (q: Quantity, system: UnitSystem, si: number) =>
   locale.withUnit(q, system, si, shownLanguage())
 
-/** "1:8", "1 in 8" or "8" turns per the field's length unit. */
+/** "1:8", "1 in 8" or "8": one turn per that many units of the field's length unit. */
 export function parseTwist(text: string): number | undefined {
   const m = /^\s*(?:1\s*(?::|in)\s*)?(-?(?:\d+(?:\.\d+)?|\.\d+))\s*$/i.exec(text)
   return m ? Number(m[1]) : undefined
@@ -105,7 +105,7 @@ export function exactFieldText(q: Quantity, system: UnitSystem, si: number): str
   return q === 'twist' ? twistLabel(text) : text
 }
 
-/** Trailing zeros kept, so a card's values align by their decimals. */
+/** Trailing zeros kept (37.0 gr, 0.300 in), so a card's values align by their decimals. */
 export function fixedFieldText(q: Quantity, system: UnitSystem, si: number): string {
   const { fromSi, decimals } = system[q]
   const x = fromSi(si)
@@ -114,7 +114,7 @@ export function fixedFieldText(q: Quantity, system: UnitSystem, si: number): str
   return x.toFixed(Math.min(d, 12))
 }
 
-/** The field keeps the exact SI value beside the text, so a unit switch converts without drift. */
+/** Display decimals, at least three significant digits (38.3 gr, not 38.2722); the field keeps the exact SI value beside the text, so a unit switch converts without drift. */
 export function roundedFieldText(q: Quantity, system: UnitSystem, si: number): string {
   const { fromSi, decimals } = system[q]
   const x = fromSi(si)

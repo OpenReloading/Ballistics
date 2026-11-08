@@ -22,7 +22,7 @@ export const capacityRuleText: Record<CapacityRule, Message> = {
 /** A capacity record of the cartridge as the catalogue lists it: water (g) and the case's maker. */
 type Recorded = { waterCapacity: { value: number }; caseManufacturer?: string | undefined }
 
-/** Measured: its spread, else 0.5 %; a record: the spread over two or more makers' capacity records, else 2 %. */
+/** Measured: its spread (SD, g) over the capacity, else 0.5 %; a record: the spread over two or more makers' capacity records, else 2 %. */
 export function capacityFraction(a: {
   source: 'measured' | 'capacity' | 'case'
   grams: number
@@ -45,7 +45,7 @@ export function capacityFraction(a: {
   return { fraction: capacityTolerance.catalogue, rule: 'catalogue' }
 }
 
-/** The bullet length interval adds to the capacity's; at most the API's limit. */
+/** Relative to the volume behind the bullet (m³); the bullet length interval adds to the capacity's; at most the API's limit. */
 export function volumeFraction(a: {
   capacity: { fraction: number } | undefined
   caseVolume: number | undefined

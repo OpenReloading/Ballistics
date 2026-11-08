@@ -32,7 +32,7 @@ export const tours = {
       ),
     },
     {
-      // The menu has no box of its own: its Open button, or below 75em the Page actions toggle that hides it.
+      // The menu has no box of its own: its Open button, or below 75em the Page actions toggle, since the closed panel hides the menu.
       target: '.file-menu button:not(:disabled), .page-bar-toggle',
       title: msg('File'),
       text: msg(

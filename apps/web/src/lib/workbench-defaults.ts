@@ -7,7 +7,7 @@ import { storedChoice } from './stored-choice.ts'
 /** `localStorage` key of the user's workbench defaults: JSON of the tuned values, SI. */
 const defaultsKey = storageName('workbenchDefaults')
 
-/** `source` names where each value comes from, `effect` how it reaches the result. */
+/** SI; `source` names where each value comes from, `effect` how it reaches the result. */
 export const citedDefaults = {
   propellantTemperature: {
     si: 294.15,

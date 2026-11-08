@@ -251,7 +251,7 @@ export function manualProjectile(values: Values, model: DragModel): Projectile {
   }
 }
 
-/** A difference to the shot without wind, rad; wind from the left holds the other way. */
+/** Per 1 m/s and per 1 mph of wind from the right, as a difference to the shot without wind, rad; wind from the left holds the other way. */
 function windPerUnit(shot: TrajectoryInput, points: readonly TrajectoryPoint[]) {
   const ranges = points.map((p) => p.range)
   const { wind: _, ...calm } = shot

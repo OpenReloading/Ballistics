@@ -203,7 +203,7 @@ export const truingLimits = { rows: 50, shots: 10000, results: 100 }
 /** Each refusal is one of the `truingLimits` caps, or the firearm or configuration is gone. */
 export type StoreRefusal = 'missing' | 'full' | 'rows' | 'shots'
 
-/** Stored units; only an identified parameter keeps its value and interval. */
+/** Stored units; `input` must be the one the fit was made from; only an identified parameter keeps its value and interval. */
 export function truingEntry(
   nominal: { shot: TrajectoryInput; bullet: string; zeroRange: number },
   input: TruingInputs,

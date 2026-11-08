@@ -30,7 +30,7 @@ export function reasonText(reason: string, { t, tn }: Pick<Translator, 't' | 'tn
     return t('The file is larger than {size} MB.', { size: maxFileBytes / 1e6 })
   if (reason === notJsonMessage) return t('The file is not JSON.')
   if (reason === notDataFileMessage) return t('The file is not an OpenReloading data file.')
-  // zod's `✖` and `→ at` lines, with the problem count on the last line only.
+  // zod's `✖` and `→ at` lines, then the problem count on the last line only: no `m` flag, since a key in the file may carry a line of its own into a message.
   if (!reason.startsWith('✖ ')) return translateMessage(reason, t)
   return reason
     .replace(/^✖ (.+)$/gm, (_, message: string) => `✖ ${translateMessage(message, t)}`)
