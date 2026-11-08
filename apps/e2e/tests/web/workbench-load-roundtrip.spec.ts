@@ -97,15 +97,16 @@ test('a diameter and length typed over the bullet record are saved as typed valu
     form.getByRole('textbox', { name: /^Diameter/ }),
     form.getByRole('textbox', { name: /^Length/ }),
   ]
-  // the record's values, in muted text until typed over
+  // the record's values, without a reset until typed over
+  const reset = form.getByRole('button', { name: /^Reset Diameter to the record value/ })
   const record = await diameter.inputValue()
   expect(record).not.toBe('')
-  await expect(diameter).toHaveClass(/field-default/)
+  await expect(reset).toHaveCount(0)
   const volume = form.getByRole('textbox', { name: /^Usable case volume/ })
   const seated = await volume.inputValue()
   await diameter.fill('7.84')
   await length.fill('31.00')
-  await expect(diameter).not.toHaveClass(/field-default/)
+  await expect(reset).toHaveCount(1)
   // the seated bullet is bigger: the volume behind it moves and settles before the fields are read
   await expect(volume).not.toHaveValue(seated)
   await expect
@@ -136,7 +137,7 @@ test('a diameter and length typed over the bullet record are saved as typed valu
   await diameter.fill('')
   await diameter.blur()
   await expect(diameter).toHaveValue(record)
-  await expect(diameter).toHaveClass(/field-default/)
+  await expect(reset).toHaveCount(0)
 })
 
 test('a load of records keeps the charge and the travel, runs the powder at the start pressure of its fit, and reopens with the records filling the rest', async ({
