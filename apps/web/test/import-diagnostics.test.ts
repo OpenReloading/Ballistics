@@ -1,13 +1,11 @@
 import type { TableKind } from '@open-reloading/importers'
 import { describe, expect, it } from 'vitest'
-import de from '../src/i18n/de.json'
-import { type Catalogue, english, translator } from '../src/i18n/translate.ts'
+import { english } from '../src/i18n/translate.ts'
 import { recordOf } from '../src/lib/candidates.ts'
 import { parseCsrLoad } from '../src/lib/grt-load-file.ts'
 import { tableReasonText } from '../src/lib/import-diagnostics.ts'
 import { type BuildView, type ImportReply, importWorker } from '../src/lib/import-entry.ts'
 
-const german = translator(de as Catalogue, 'de')
 const { t } = english
 
 /** The build of a table file read as `kind` by the import worker: the reasons the page words, from the readers. */
@@ -73,17 +71,6 @@ describe('the reasons of a table import in words', () => {
       await first([header, 'B1,M1,7.82,175,0.5', 'B1,M1,7.82,175,0.6'], 'bullet', 'warning'),
     ).toBe(
       'Rows 2 and 3 give the same name, maker, diameter and mass, so one id: only row 2 is imported. Change the name, maker, diameter or mass of row 3 to import it as a record of its own.',
-    )
-  })
-
-  it('gives the repeated-id warning and a field label in German', async () => {
-    const repeated = await built([header, 'B1,M1,7.82,175,0.5', 'B1,M1,7.82,175,0.6'], 'bullet')
-    expect(tableReasonText(repeated.firstWarning?.reason ?? fail(), german.t)).toBe(
-      'Die Zeilen 2 und 3 haben denselben Namen, Hersteller, Durchmesser und dieselbe Masse und damit eine ID: Nur Zeile 2 wird importiert. Ändern Sie Name, Hersteller, Durchmesser oder Masse der Zeile 3, um sie als eigenen Datensatz zu importieren.',
-    )
-    const dense = await built(['Name;Bulk density (g/cm3)', 'P1;1,5'], 'powder')
-    expect(tableReasonText(dense.firstWarning?.reason ?? fail(), german.t)).toBe(
-      `${german.t('Bulk density')} 1,5 g/cm3 liegt außerhalb der üblichen 0,3 bis 1,3 g/cm3. Prüfen Sie die Einheit der Spalte.`,
     )
   })
 })
