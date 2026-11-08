@@ -7,6 +7,7 @@
  */
 
 import {
+  checkLogFitLimits,
   chiSquareQuantile,
   InputError,
   type LogFitResult,
@@ -239,11 +240,7 @@ function checkPooled(
     'parameters: burnRate, temperatureFactor, each at most once, burnRate always',
   )
   need(rifleSigma > 0 && lotSigma > 0, 'rifleSigma and lotSigma must be positive')
-  need(
-    Number.isInteger(maxIterations) && maxIterations > 0,
-    'maxIterations must be a positive integer',
-  )
-  need(maxCondition > 0, 'maxCondition must be positive')
+  checkLogFitLimits(maxIterations, maxCondition)
   checkSessions(sessions)
 }
 
