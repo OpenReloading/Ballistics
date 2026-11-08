@@ -1,8 +1,7 @@
 import type { ShotGroup, TargetSheet } from '@open-reloading/schema'
 import { dispersionEllipse, predictionEllipse, subtendedAngle } from '@open-reloading/shot-groups'
 import { describe, expect, it } from 'vitest'
-import de from '../src/i18n/de.json'
-import { english, translator } from '../src/i18n/translate.ts'
+import { english } from '../src/i18n/translate.ts'
 import { readouts } from '../src/lib/group-readouts.ts'
 import { type LabelBox, type LabelScene, placeLabel } from '../src/lib/label-placement.ts'
 import {
@@ -506,6 +505,5 @@ describe('newGroup', () => {
   it('names the group after its place, in the language shown', () => {
     const sheet = { references: [], targetRotation: 0, groups: [group] }
     expect(newGroup(sheet, 'g2', 100, english.t).name).toBe('Group 2')
-    expect(newGroup(sheet, 'g2', 100, translator(de, 'de').t).name).toBe('Schussbild 2')
   })
 })

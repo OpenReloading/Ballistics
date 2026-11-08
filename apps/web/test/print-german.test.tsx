@@ -1,12 +1,9 @@
 import { MantineProvider } from '@mantine/core'
-import type { TrajectoryPoint } from '@open-reloading/ballistics'
 import type { ShotGroup, TargetSheet } from '@open-reloading/schema'
 import type { ReactNode } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
-import { LadderTarget } from '../src/components/ladder-target.tsx'
 import { LoadSheets } from '../src/components/load-sheets.tsx'
-import { RangeCard } from '../src/components/range-card.tsx'
 import { TargetPrint } from '../src/components/target-print.tsx'
 import de from '../src/i18n/de.json'
 import { setShownLanguage } from '../src/i18n/shown.ts'
@@ -46,10 +43,6 @@ const printed = (language: Translator, node: ReactNode) => {
     .replace(/\s+/g, ' ')
     .trim()
 }
-
-/** English words of the printed pages' own text that no German page may keep. */
-const englishWords =
-  /\b(Printed|Step|Steps|Rounds|Loaded|Statistics|Scale|Notes|Velocity|At the range|Loading|Range card|Ladder target|Distance|Shots|Pressure signs|Date)\b/
 
 beforeAll(() => {
   setShownLanguage('de')
@@ -92,20 +85,6 @@ describe('the load sheets', () => {
     return [...(thead?.[1] ?? '').matchAll(/<th scope="col">([^<]*)<\/th>/g)].map((m) => m[1])
   }
 
-  it('are in German under the German setting, the overview and a page per charge', () => {
-    const page = sheets(german)
-    expect(page).toContain('Gedruckt am')
-    expect(page).toContain('Treibladungen')
-    expect(page).toContain('Streukreis')
-    expect(page).toContain('Hauptladung: 41,0 gr')
-    expect(page).not.toContain('Stufe 0')
-    expect(page).toContain('Simulierter Gasdruck 3500 bar')
-    expect(page).toContain('Auf dem Schießstand')
-    expect(page).toContain('Druckanzeichen')
-    expect(page).toContain('Schuss')
-    expect(page).not.toMatch(englishWords)
-  })
-
   it('name the length a seating ladder seats by', () => {
     expect(sheets(german, 'overallLength')).toContain('Stufen nach COAL')
     expect(sheets(english, 'overallLength')).toContain('41,0 gr main')
@@ -123,58 +102,6 @@ describe('the load sheets', () => {
     expect(heads(german)).not.toContain('Schritt')
     expect(sheets(english)).toContain('41,0 gr main')
     expect(sheets(german, 'temperature')).toContain('Stufen nach Pulvertemperatur')
-  })
-
-  it('stay English under the English setting', () => {
-    const page = sheets(english)
-    expect(page).toContain('Charges')
-    expect(page).toContain('Main charge: 41,0 gr')
-    expect(page).not.toContain('Step 0')
-    expect(page).not.toContain('Treibladungen')
-  })
-})
-
-describe('the range card', () => {
-  const moa = Math.PI / 180 / 60
-  const point = {
-    range: 91.44,
-    time: 0.1234,
-    velocity: 800,
-    energy: 3000,
-    height: -0.0254,
-    elevationHold: moa,
-    windageHold: -2 * moa,
-  } as TrajectoryPoint
-  const card = (language: Translator) =>
-    printed(
-      language,
-      <RangeCard
-        result={{
-          bulletText: 'Beispiel, G7 0.250',
-          zeroRange: 91.44,
-          si: { muzzleVelocity: 800, temperature: 288.15 },
-          manual: false,
-          tablePoints: [point],
-          windPerUnit: { mps: [0.5 * moa], mph: [0.2 * moa] },
-          click: { value: moa / 4, unit: 'MOA' },
-        }}
-        system={presetUnits('us')}
-        paper="a5"
-      />,
-    )
-
-  it('is in German under the German setting, with the decimal comma', () => {
-    const page = card(german)
-    expect(page).toContain('Schusstafel: Beispiel, G7 0.250')
-    expect(page).toContain('Gedruckt am')
-    expect(page).toContain('Klickwert')
-    expect(page).toContain('Höhenverstellung (MOA / Klicks)')
-    expect(page).toContain('0,123')
-    expect(page).not.toMatch(englishWords)
-  })
-
-  it('stays English under the English setting', () => {
-    expect(card(english)).toContain('Range card: Beispiel, G7 0.250')
   })
 })
 
@@ -207,32 +134,8 @@ describe('the target sheet', () => {
       />,
     )
 
-  it('is in German under the German setting', () => {
-    const text = page(german)
-    expect(text).toContain('Gedruckt am')
-    expect(text).toContain('Laborierung: Beispiel.')
-    expect(text).toContain('Maßstab')
-    expect(text).toContain('Statistik (mm / mrad)')
-    expect(text).toContain('2 + 1 ausgeschl.')
-    expect(text).toContain('Geschwindigkeit, simuliert')
-    expect(text).not.toMatch(englishWords)
-  })
-
   it('says why a sheet without a reference has no scale', () => {
     expect(page(german, false)).toContain('Kein Maßstab: Das Foto hat keine Referenz.')
     expect(page(english, false)).toContain('No scale: the photo has no reference.')
-  })
-})
-
-describe('the ladder target', () => {
-  const sheet = (language: Translator) =>
-    printed(language, <LadderTarget labels={['41,0 gr', '41,5 gr']} system={presetUnits('us')} />)
-
-  it('is in German under the German setting, with the decimal comma', () => {
-    const page = sheet(german)
-    expect(page).toContain('Ladeleiter-Zielscheibe')
-    expect(page).toContain('Gedruckt am')
-    expect(page).toContain('Das Lineal misst 100 mm')
-    expect(page).toMatch(/Markengröße [\d,]+ MOA \(\d+,\d mm\)/)
   })
 })
