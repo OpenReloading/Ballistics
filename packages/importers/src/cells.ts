@@ -23,11 +23,14 @@ export interface CellBudget {
 /** Cell text trimmed and U+FEFF removed. */
 export const clean = (text: string): string => text.replaceAll('﻿', '').trim()
 
-/** A cell to place: its column (from 1), its text, and its name, built only for a refusal. */
+/** Where a refused cell is: its reference, or its column (from 1) when it has none. */
+export type CellPlace = { cell: string } | { column: number }
+
+/** A cell to place: its column (from 1), its text, and its place, built only for a refusal. */
 export interface PlacedCell {
   column: number
   text: string
-  name: () => string
+  at: () => CellPlace
 }
 
 /**
@@ -36,11 +39,11 @@ export interface PlacedCell {
  */
 export function placeCell(
   cells: string[],
-  { column, text, name }: PlacedCell,
+  { column, text, at }: PlacedCell,
   remaining: CellBudget,
 ): void {
-  if (column > maxColumn) refuseFile('cellBeyondColumnIV', { cell: name() })
-  if (column <= cells.length) refuseFile('cellOutOfOrder', { cell: name() })
+  if (column > maxColumn) refuseFile('cellBeyondColumnIV', at())
+  if (column <= cells.length) refuseFile('cellOutOfOrder', at())
   remaining.cells -= column - cells.length
   remaining.characters -= text.length
   if (remaining.cells < 0) refuseFile('tooManyCells', { max: maxCells })

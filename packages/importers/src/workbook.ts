@@ -1,7 +1,14 @@
 // XLSX workbooks (ECMA-376 Part 1 SpreadsheetML, Part 2 Open Packaging Conventions;
 // https://ecma-international.org/publications-and-standards/standards/ecma-376/) read into rows
 // of cell text: no styles, number formats or formulas are applied.
-import { type CellBudget, clean, placeCell, type Workbook, type Worksheet } from './cells.ts'
+import {
+  type CellBudget,
+  type CellPlace,
+  clean,
+  placeCell,
+  type Workbook,
+  type Worksheet,
+} from './cells.ts'
 import { type FileDiagnostic, locatedError, ReaderError, refuseFile } from './diagnostics.ts'
 import {
   maxCellCharacters,
@@ -63,27 +70,27 @@ const columnOf = (letters: string) =>
   Array.from(letters).reduce((col, l) => col * 26 + l.charCodeAt(0) - 64, 0)
 
 /** The shared string a cell's `v` text indexes; refused when the index is not in the table. */
-function sharedString(text: string, strings: string[], ref: () => string): string {
+function sharedString(text: string, strings: string[], at: () => CellPlace): string {
   const k = /^\d+$/.test(text.trim()) ? Number(text) : Number.NaN
   const shared = strings[k]
   if (shared === undefined) {
-    refuseFile('sharedStringOutOfRange', { cell: ref(), index: text, count: strings.length })
+    refuseFile('sharedStringOutOfRange', { ...at(), index: text, count: strings.length })
   }
   return shared
 }
 
 /**
- * Text of a cell from its type, the text of its first `v` and of its first `is`. `ref` names the
+ * Text of a cell from its type, the text of its first `v` and of its first `is`. `at` places the
  * cell, built only for a refusal.
  */
-function cellText({ t, v, is }: CellState, strings: string[], ref: () => string): string {
+function cellText({ t, v, is }: CellState, strings: string[], at: () => CellPlace): string {
   let text: string
   if (t === 'inlineStr') {
     text = is ?? ''
   } else {
     text = v ?? ''
     // shared strings are cleaned once when the table is read
-    if (t === 's' && text !== '') return sharedString(text, strings, ref)
+    if (t === 's' && text !== '') return sharedString(text, strings, at)
     if (t === 'b' && text.trim() === '0') return ''
   }
   return clean(text)
@@ -143,8 +150,8 @@ function closeCell(
     if (letters === undefined) refuseFile('cellRefMalformed', { ref })
     column = columnOf(letters)
   }
-  const name = () => ref ?? `at column ${column}`
-  placeCell(cells, { column, text: cellText(cell, strings, name), name }, remaining)
+  const at = (): CellPlace => (ref === undefined ? { column } : { cell: ref })
+  placeCell(cells, { column, text: cellText(cell, strings, at), at }, remaining)
 }
 
 /** The element at each depth of a worksheet the scan reads: the sheet data, a row, a cell. */

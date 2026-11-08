@@ -120,10 +120,12 @@ export const isFileDiagnostic = (d: { code: string }): d is FileDiagnostic =>
 
 /** Why a file reader refused a file, in the language of `t`: the XLS worksheet, the XLSX part and the XLS shared string first where named. */
 export function fileDiagnosticText(d: FileDiagnostic, t: Translator['t']): string {
-  const { part, worksheet, sharedString, ...rest } = d.params
+  const { part, worksheet, sharedString, column, ...rest } = d.params
   const values = Object.fromEntries(
     Object.entries(rest).map(([k, v]) => [k, typeof v === 'object' ? v.join(', ') : v]),
   )
+  // a cell without a reference is named by its column
+  if (typeof column === 'number') values['cell'] = t('at column {column}', { column })
   const message = t(fileMessages[d.code], values)
   const text =
     typeof sharedString === 'number'
