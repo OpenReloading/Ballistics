@@ -201,17 +201,15 @@ describe('powder fit pressure basis', () => {
   it('refuses a pressure without a basis, a basis without a pressure and an unknown basis', () => {
     const [first, ...rest] = ladder(load(), 3, 10e6)
     const { pressureBasis, ...bare } = first as LadderPoint
-    expect(() => fitPowder(load(0.38), [bare, ...rest])).toThrow('peakPressure and pressureBasis')
+    expect(() => fitPowder(load(0.38), [bare, ...rest])).toThrow('pressureWithoutBasis')
     const { peakPressure, pressureSigma, ...velocityOnly } = first as LadderPoint
-    expect(() => fitPowder(load(0.38), [velocityOnly, ...rest])).toThrow(
-      'peakPressure and pressureBasis',
-    )
+    expect(() => fitPowder(load(0.38), [velocityOnly, ...rest])).toThrow('pressureWithoutBasis')
     expect(() =>
       fitPowder(load(0.38), [
         { ...(first as LadderPoint), pressureBasis: 'gauge' as never },
         ...rest,
       ]),
-    ).toThrow('pressureBasis must be one of')
+    ).toThrow('pressureBasisUnknown')
   })
 })
 
@@ -575,7 +573,7 @@ describe('powder fit prediction bands', () => {
       ),
     }
     expect(() => predictPowder(renamed, 2.8e-3)).toThrow(InputError)
-    expect(() => predictPowder(renamed, 2.8e-3)).toThrow(/^parameters: burnRate/)
+    expect(() => predictPowder(renamed, 2.8e-3)).toThrow('fitParametersInvalid')
   })
 })
 
