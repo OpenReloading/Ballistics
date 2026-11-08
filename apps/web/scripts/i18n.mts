@@ -120,7 +120,7 @@ export function compare(source: readonly string[], catalogue: Record<string, unk
 const placeholders = (s: string) =>
   [...s.matchAll(/\{(\w+)\}/g)]
     .map((m) => m[1] ?? '')
-    .sort()
+    .sort((a, b) => a.localeCompare(b))
     .join()
 
 /**
