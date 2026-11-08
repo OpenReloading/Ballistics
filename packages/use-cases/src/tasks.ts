@@ -11,10 +11,13 @@ import {
   fitTruingStrings,
   type InteriorLoad,
   type InteriorOptions,
+  type InteriorResult,
   interior,
   interiorPressureRange,
   interiorSampledBand,
+  type PressureRange,
   type PressureTolerances,
+  type SampledBand,
   type SamplingOptions,
   solveCharge,
   type TruedParameter,
@@ -25,7 +28,6 @@ import {
   trueMuzzleVelocity,
 } from '@open-reloading/ballistics'
 import { InputError } from '@open-reloading/statistics'
-import type { Catalogue } from '../catalogue/types.ts'
 
 /** The deadline passed while the task was queued or running. */
 export class ComputeTimeout extends Error {}
@@ -43,7 +45,7 @@ export class ComputeBusy extends Error {
 /** Deadline of one task from submit, queue wait included (ms). */
 export const taskTimeoutMs = 5000
 
-/** A compute task and its arguments; `kind` selects the core function that runs it. */
+/** A compute task and its arguments; `kind` selects the ballistics function that runs it. */
 export type Task =
   | { kind: 'trajectory'; args: Parameters<typeof trajectory> }
   | { kind: 'truingMuzzleVelocity'; args: Parameters<typeof trueMuzzleVelocity> }
@@ -60,15 +62,28 @@ export type Task =
     }
   | { kind: 'chargeSolve'; load: InteriorLoad; target: ChargeTarget; options: ChargeSolverOptions }
 
-const runners = {
-  trajectory: (t: Extract<Task, { kind: 'trajectory' }>) => trajectory(...t.args),
-  truingMuzzleVelocity: (t: Extract<Task, { kind: 'truingMuzzleVelocity' }>) =>
-    trueMuzzleVelocity(...t.args),
-  truingDrag: (t: Extract<Task, { kind: 'truingDrag' }>) => trueDrag(...t.args),
-  rangeStringsPlan: (t: Extract<Task, { kind: 'rangeStringsPlan' }>) =>
-    comparePlanCandidates(...t.args),
-  rangeStringsFit: (t: Extract<Task, { kind: 'rangeStringsFit' }>) => fitTruingStrings(...t.args),
-  interiorM3: (t: Extract<Task, { kind: 'interiorM3' }>) => {
+/** Result type of each `Task` kind: the return type of the ballistics function that runs it; `interiorM3` holds the run, its pressure range and its sampled band. */
+export interface Results {
+  trajectory: ReturnType<typeof trajectory>
+  truingMuzzleVelocity: ReturnType<typeof trueMuzzleVelocity>
+  truingDrag: ReturnType<typeof trueDrag>
+  rangeStringsPlan: ReturnType<typeof comparePlanCandidates>
+  rangeStringsFit: ReturnType<typeof fitTruingStrings>
+  interiorM3: {
+    result: InteriorResult
+    range: PressureRange | undefined
+    sampled: SampledBand | undefined
+  }
+  chargeSolve: ReturnType<typeof solveCharge>
+}
+
+const runners: { [K in Task['kind']]: (t: Extract<Task, { kind: K }>) => Results[K] } = {
+  trajectory: (t) => trajectory(...t.args),
+  truingMuzzleVelocity: (t) => trueMuzzleVelocity(...t.args),
+  truingDrag: (t) => trueDrag(...t.args),
+  rangeStringsPlan: (t) => comparePlanCandidates(...t.args),
+  rangeStringsFit: (t) => fitTruingStrings(...t.args),
+  interiorM3: (t) => {
     const result = interior(t.load, t.options)
     // the pressure range is computed only for a valid result
     const range = result.valid
@@ -85,16 +100,16 @@ const runners = {
         : undefined
     return { result, range, sampled }
   },
-  chargeSolve: (t: Extract<Task, { kind: 'chargeSolve' }>) =>
-    solveCharge(t.load, t.target, t.options),
+  chargeSolve: (t) => solveCharge(t.load, t.target, t.options),
 }
 
-/** Result type of each `Task` kind: the return type of the core function that runs it. */
-export type Results = { [K in Task['kind']]: ReturnType<(typeof runners)[K]> }
-
-/** Runs `task` in this thread and returns the result of the core function of its `kind`. */
+/** Runs `task` in this thread and returns the result of the ballistics function of its `kind`. */
 export function runTask<T extends Task>(task: T): Results[T['kind']] {
-  return (runners[task.kind] as (t: Task) => unknown)(task) as Results[T['kind']]
+  // a task can arrive in a worker message: only the table's own kinds dispatch
+  const run: unknown = Object.hasOwn(runners, task.kind) ? runners[task.kind] : undefined
+  if (typeof run !== 'function') throw new Error(`unknown compute task kind ${task.kind}`)
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- `runners` maps each kind to the function of that kind's task and result
+  return (run as (t: Task) => unknown)(task) as Results[T['kind']]
 }
 
 /** An error as a plain object, so it crosses the worker thread boundary. */
@@ -133,12 +148,27 @@ export function serializeError(error: unknown): SerializedError {
   return { name: 'Error', message: error instanceof Error ? error.message : String(error) }
 }
 
+/** What a worker posts back for one task: the result, or the error as a plain object. */
+export type TaskReply =
+  | { succeeded: true; value: unknown }
+  | { succeeded: false; error: SerializedError }
+
+/** The reply to `task` that a worker posts: runs it in this thread and serializes its error. */
+export function replyTo(task: Task): TaskReply {
+  try {
+    return { succeeded: true, value: runTask(task) }
+  } catch (error) {
+    return { succeeded: false, error: serializeError(error) }
+  }
+}
+
 /** Inverse of `serializeError`: rebuilds a `TruingError`, an `InputError` or an `Error`. */
 export function reviveError(error: SerializedError): Error {
   if (error.name === 'TruingError') {
     const { conditionNumber, unresolved, direction, estimate, message } = error
     // the message keeps the solver detail the constructor appended
     return Object.assign(
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- serializeError writes the reason of every TruingError
       new TruingError(error.reason as TruingReason, {
         conditionNumber,
         unresolved,
@@ -160,10 +190,7 @@ export interface ComputeRunner {
   close(): Promise<void>
 }
 
-/** What the compute routes read: the records to resolve ids against and the solver task runner. */
-export type ComputeContext = { catalogue: Catalogue; compute: ComputeRunner }
-
-/** Runs tasks in this thread; for tests that mock core. */
+/** Runs tasks in this thread: the command line, the API's contract document and static files, and tests. */
 export const inlineRunner: ComputeRunner = {
   run: async (task) => runTask(task),
   close: async () => {},

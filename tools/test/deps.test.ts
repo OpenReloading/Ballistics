@@ -32,6 +32,7 @@ const configs = [
   'packages/shot-groups/.oxlintrc.json',
   'packages/importers/.oxlintrc.json',
   'packages/catalog/.oxlintrc.json',
+  'packages/use-cases/.oxlintrc.json',
 ]
 
 let mirror = ''

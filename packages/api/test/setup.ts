@@ -1,4 +1,5 @@
 import type { Bundle } from '@open-reloading/catalog'
+import type { ComputeRunner } from '@open-reloading/use-cases'
 import { Ajv2020 } from 'ajv/dist/2020.js'
 import type { InjectOptions } from 'fastify'
 import { beforeAll, expect } from 'vitest'
@@ -7,7 +8,6 @@ import { buildApp } from '../src/app.ts'
 import { buildCatalogue } from '../src/catalogue/build.ts'
 import { openCatalogue } from '../src/catalogue/open.ts'
 import type { Catalogue } from '../src/catalogue/types.ts'
-import type { ComputeRunner } from '../src/compute/tasks.ts'
 import { bundle } from './fixtures.ts'
 
 const emptyBundle: Bundle = {

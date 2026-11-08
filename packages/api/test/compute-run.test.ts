@@ -1,4 +1,5 @@
 import { type TrajectoryInput, trajectory } from '@open-reloading/ballistics'
+import { inlineRunner } from '@open-reloading/use-cases'
 import { describe, expect, it } from 'vitest'
 import {
   type ExteriorContext,
@@ -15,7 +16,6 @@ import {
   truingBody,
 } from '../src/compute/browser.ts'
 import { findBullet } from '../src/compute/resolve.ts'
-import { inlineRunner } from '../src/compute/tasks.ts'
 import { API_PREFIX } from '../src/version.ts'
 import { bundle, file, rifleShot, siValues } from './fixtures.ts'
 import { testCatalogue, withApi } from './setup.ts'

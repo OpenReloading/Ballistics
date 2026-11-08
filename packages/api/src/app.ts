@@ -1,4 +1,5 @@
 import sensible from '@fastify/sensible'
+import type { ComputeRunner } from '@open-reloading/use-cases'
 import apiReference from '@scalar/fastify-api-reference'
 import Fastify, {
   type FastifyError,
@@ -8,7 +9,6 @@ import Fastify, {
 } from 'fastify'
 import type { Catalogue } from './catalogue/types.ts'
 import { createComputeRunner, poolDefaults } from './compute/pool.ts'
-import type { ComputeRunner } from './compute/tasks.ts'
 import type { OpenApiDocument } from './openapi.ts'
 import { cartridgeRoutes } from './routes/cartridges.ts'
 import { chargeTargetRoutes } from './routes/charge-target.ts'

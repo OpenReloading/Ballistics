@@ -1,4 +1,5 @@
 import { type TrajectoryInput, trajectory } from '@open-reloading/ballistics'
+import { inlineRunner } from '@open-reloading/use-cases'
 import { describe, expect, it } from 'vitest'
 import {
   rangeStringsFitResponse,
@@ -7,7 +8,6 @@ import {
   trajectoryResponse,
   truingResponse,
 } from '../src/compute/exterior-response.ts'
-import { inlineRunner } from '../src/compute/tasks.ts'
 import { API_PREFIX } from '../src/version.ts'
 import { defined } from './defined.ts'
 import { rifleProjectile as projectile, rifleShot } from './fixtures.ts'

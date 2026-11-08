@@ -26,6 +26,7 @@ import {
   userDataFile,
 } from '@open-reloading/schema'
 import { InputError } from '@open-reloading/statistics'
+import type { ComputeRunner, Results } from '@open-reloading/use-cases'
 import { z } from 'zod'
 import type { Catalogue } from '../catalogue/types.ts'
 import { assertFinite, notice, resolvedRecord, unprocessable } from './answer.ts'
@@ -45,7 +46,6 @@ import {
   unknownKeyIssues,
 } from './load-file.ts'
 import { findBullet, findCartridge, findPowder } from './resolve.ts'
-import type { ComputeRunner, Results } from './tasks.ts'
 import { responseUnits } from './units.ts'
 
 /** Query of `POST /interior/load-file`: the body is the load file, so the query is the only option. */

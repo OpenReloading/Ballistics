@@ -26,7 +26,7 @@
                 "message": "shot-groups-imports-units-statistics-only: packages/shot-groups has no I/O: it imports only @open-reloading/units, @open-reloading/statistics and its own files."
               },
               {
-                "regex": "^(\\.\\./)+((units|statistics|ballistics|locale-format|shot-groups|schema|importers|catalog|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "regex": "^(\\.\\./)+((units|statistics|ballistics|locale-format|shot-groups|schema|importers|catalog|use-cases|api|drawing|cli)/(src|dist)|packages|apps)/",
                 "message": "shot-groups-imports-units-statistics-only: packages/shot-groups has no I/O: it imports only @open-reloading/units, @open-reloading/statistics and its own files."
               }
             ]

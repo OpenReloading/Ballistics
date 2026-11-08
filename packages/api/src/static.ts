@@ -4,12 +4,12 @@
  */
 import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
+import { inlineRunner } from '@open-reloading/use-cases'
 import { buildApp } from './app.ts'
 import { loadBundle } from './bundle.ts'
 import { buildCatalogue } from './catalogue/build.ts'
 import { openCatalogue } from './catalogue/open.ts'
 import type { Catalogue, CatalogueData, Catalogued, CatalogueKind } from './catalogue/types.ts'
-import { inlineRunner } from './compute/tasks.ts'
 import { cartridgeAnswer } from './routes/cartridges.ts'
 import { originated, revised, stored } from './routes/record-answers.ts'
 

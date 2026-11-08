@@ -5,10 +5,10 @@ import {
   trueMuzzleVelocity,
 } from '@open-reloading/ballistics'
 import { InputError } from '@open-reloading/statistics'
+import { ComputeBusy, inlineRunner } from '@open-reloading/use-cases'
 import { describe, expect, it, vi } from 'vitest'
 import { buildApp } from '../src/app.ts'
 import { caps } from '../src/compute/schemas.ts'
-import { ComputeBusy, inlineRunner } from '../src/compute/tasks.ts'
 import { API_PREFIX } from '../src/version.ts'
 import { m3Load, flatShot as shot } from './fixtures.ts'
 import { withApi } from './setup.ts'

@@ -10,9 +10,9 @@ import {
   type ComputeRunner,
   ComputeTimeout,
   reviveError,
-  type SerializedError,
+  type TaskReply,
   taskTimeoutMs,
-} from './tasks.ts'
+} from '@open-reloading/use-cases'
 
 /** Settings of `createPool`. */
 export interface PoolOptions {
@@ -33,20 +33,17 @@ export const poolDefaults: Omit<PoolOptions, 'filename'> = {
   timeoutMs: taskTimeoutMs,
 }
 
-/** What a worker posts back: the task value, or the error as a plain object. */
-type Reply = { succeeded: true; value: unknown } | { succeeded: false; error: unknown }
-
 /** Handle of a running worker pool: `run` queues one task, `close` ends the workers. */
 interface Pool {
   /** Queues `task`; resolves with the worker's reply. Rejections: see `createPool`. */
-  run(task: unknown): Promise<Reply>
+  run(task: unknown): Promise<TaskReply>
   /** Rejects the queued and running tasks and ends the workers; later `run` calls reject. */
   close(): Promise<void>
 }
 
 type Job = {
   task: unknown
-  resolve: (reply: Reply) => void
+  resolve: (reply: TaskReply) => void
   reject: (error: Error) => void
   timer?: NodeJS.Timeout
   worker?: Worker
@@ -93,7 +90,7 @@ export function createPool({ filename, workerCount, maxQueue, timeoutMs }: PoolO
     // the server's socket keeps the process alive, an idle worker does not
     worker.unref()
     live.add(worker)
-    worker.on('message', (reply: Reply) => {
+    worker.on('message', (reply: TaskReply) => {
       const job = running.get(worker)
       if (!job || typeof reply !== 'object' || reply === null || !('succeeded' in reply)) return
       running.delete(worker)
@@ -141,7 +138,7 @@ export function createPool({ filename, workerCount, maxQueue, timeoutMs }: PoolO
       if (closed) return Promise.reject(new Error('compute pool closed'))
       if (idle.length === 0 && live.size >= workerCount && queue.length >= maxQueue)
         return Promise.reject(new ComputeBusy('all compute workers are busy', retryAfterSeconds))
-      return new Promise<Reply>((resolve, reject) => {
+      return new Promise<TaskReply>((resolve, reject) => {
         const job: Job = { task, resolve, reject }
         job.timer = setTimeout(() => {
           const error = new ComputeTimeout(`computation did not finish within ${timeoutMs} ms`)
@@ -176,7 +173,7 @@ export function createComputeRunner(options: Omit<PoolOptions, 'filename'>): Com
     async run(task) {
       const reply = await pool.run(task)
       if (reply.succeeded) return reply.value as never
-      throw reviveError(reply.error as SerializedError)
+      throw reviveError(reply.error)
     },
     close: () => pool.close(),
   }

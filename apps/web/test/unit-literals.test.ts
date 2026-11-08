@@ -40,9 +40,13 @@ function sources(dir: string): string[] {
 }
 
 describe('stored-to-SI conversion', () => {
-  it('has no factor literal outside the unit table in the API and the web app sources', () => {
+  it('has no factor literal outside the unit table in the API, use-cases and web app sources', () => {
     const found: string[] = []
-    for (const file of [...sources('packages/api/src'), ...sources('apps/web/src')]) {
+    for (const file of [
+      ...sources('packages/api/src'),
+      ...sources('packages/use-cases/src'),
+      ...sources('apps/web/src'),
+    ]) {
       readFileSync(join(root, file), 'utf8')
         .split('\n')
         .forEach((line, i) => {

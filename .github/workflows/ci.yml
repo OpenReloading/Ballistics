@@ -113,7 +113,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include: ${{ fromJSON(needs.changes.outputs.tests || '[{"name":"drawing","filter":"--filter @open-reloading/drawing","e2eUnit":false},{"name":"web","filter":"--filter @open-reloading/web","e2eUnit":false},{"name":"packages","filter":"--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/design-tokens --filter @open-reloading/statistics --filter @open-reloading/ballistics --filter @open-reloading/shot-groups --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/catalog --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools --filter @open-reloading/test-kit","e2eUnit":true},{"name":"ui","filter":"--filter @open-reloading/ui","e2eUnit":false}]') }}
+        include: ${{ fromJSON(needs.changes.outputs.tests || '[{"name":"drawing","filter":"--filter @open-reloading/drawing","e2eUnit":false},{"name":"web","filter":"--filter @open-reloading/web","e2eUnit":false},{"name":"packages","filter":"--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/design-tokens --filter @open-reloading/statistics --filter @open-reloading/ballistics --filter @open-reloading/shot-groups --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/catalog --filter @open-reloading/use-cases --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools --filter @open-reloading/test-kit","e2eUnit":true},{"name":"ui","filter":"--filter @open-reloading/ui","e2eUnit":false}]') }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -241,7 +241,7 @@ jobs:
           package: apps/e2e/node_modules/@playwright/test/package.json
       # the export build and the specs import the workspace packages from their dist/
       # units and statistics first: schema, ballistics and shot-groups build them through their project references
-      - run: pnpm --filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/statistics --filter @open-reloading/ballistics --filter @open-reloading/shot-groups --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/drawing --filter @open-reloading/catalog --filter @open-reloading/api run build
+      - run: pnpm --filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/statistics --filter @open-reloading/ballistics --filter @open-reloading/shot-groups --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/drawing --filter @open-reloading/catalog --filter @open-reloading/use-cases --filter @open-reloading/api run build
       - run: docker compose up --detach --build api
       - name: Wait for the API
         run: |

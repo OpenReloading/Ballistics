@@ -2,6 +2,8 @@
  * The compute operations of the `POST` routes. The routes and the contract document read their
  * texts, schemas and examples here, the command line runs them offline, so none can drift.
  */
+
+import type { ComputeRunner } from '@open-reloading/use-cases'
 import type { z } from 'zod'
 import type { Catalogue } from '../catalogue/types.ts'
 import { runChargeTarget } from './charge-run.ts'
@@ -32,7 +34,6 @@ import {
   rangeStringsPlanBody,
   rangeStringsPlanExample,
 } from './strings-schema.ts'
-import type { ComputeRunner } from './tasks.ts'
 
 /** What an operation runs on: the records and the compute runner. */
 export interface OperationContext {

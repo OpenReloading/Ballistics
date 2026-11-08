@@ -15,6 +15,7 @@ COPY packages/shot-groups/package.json packages/shot-groups/
 COPY packages/schema/package.json packages/schema/
 COPY packages/importers/package.json packages/importers/
 COPY packages/catalog/package.json packages/catalog/
+COPY packages/use-cases/package.json packages/use-cases/
 COPY packages/api/package.json packages/api/
 COPY packages/drawing/package.json packages/drawing/
 COPY packages/cli/package.json packages/cli/
@@ -32,6 +33,7 @@ COPY packages/statistics packages/statistics
 COPY packages/ballistics packages/ballistics
 COPY packages/schema packages/schema
 COPY packages/catalog packages/catalog
+COPY packages/use-cases packages/use-cases
 COPY packages/api packages/api
 COPY tools/src/catalog tools/src/catalog
 # statistics' tests draw on the test kit, a dev dependency the filter builds too
@@ -55,6 +57,7 @@ COPY packages/shot-groups/package.json packages/shot-groups/
 COPY packages/schema/package.json packages/schema/
 COPY packages/importers/package.json packages/importers/
 COPY packages/catalog/package.json packages/catalog/
+COPY packages/use-cases/package.json packages/use-cases/
 COPY packages/api/package.json packages/api/
 COPY packages/drawing/package.json packages/drawing/
 COPY packages/cli/package.json packages/cli/
@@ -71,6 +74,7 @@ COPY --from=build /app/packages/statistics/dist packages/statistics/dist
 COPY --from=build /app/packages/ballistics/dist packages/ballistics/dist
 COPY --from=build /app/packages/schema/dist packages/schema/dist
 COPY --from=build /app/packages/catalog/dist packages/catalog/dist
+COPY --from=build /app/packages/use-cases/dist packages/use-cases/dist
 COPY --from=build /app/packages/api/dist packages/api/dist
 COPY LICENSE NOTICE ./
 COPY packages/catalog/LICENSE packages/catalog/

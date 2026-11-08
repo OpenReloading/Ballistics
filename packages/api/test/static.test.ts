@@ -1,11 +1,11 @@
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { inlineRunner } from '@open-reloading/use-cases'
 import { afterAll, describe, expect, it } from 'vitest'
 import { buildApp } from '../src/app.ts'
 import { buildCatalogue } from '../src/catalogue/build.ts'
 import { openCatalogue } from '../src/catalogue/open.ts'
-import { inlineRunner } from '../src/compute/tasks.ts'
 import { startBundleApi, writeStaticApi } from '../src/static.ts'
 import { bundle } from './fixtures.ts'
 

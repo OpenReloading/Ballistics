@@ -1,4 +1,4 @@
-/** The TypeDoc site of the five packages; its Docs link is the site root (`DOCS_BASE_URL`, as docusaurus.config.ts). */
+/** The TypeDoc site of the six packages; its Docs link is the site root (`DOCS_BASE_URL`, as docusaurus.config.ts). */
 export default {
   entryPointStrategy: 'packages',
   entryPoints: [
@@ -6,6 +6,7 @@ export default {
     '../../packages/drawing',
     '../../packages/importers',
     '../../packages/catalog',
+    '../../packages/use-cases',
     '../../packages/api',
   ],
   name: 'OpenReloading Ballistics library',

@@ -1,12 +1,13 @@
 import { mkdtemp, readdir, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
-import { runTask, serializeError, type Task } from '@open-reloading/api/compute'
 import { startBundleApi, writeStaticApi } from '@open-reloading/api/static'
 import { sortKey } from '@open-reloading/schema'
+import { replyTo, type Task } from '@open-reloading/use-cases'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { chargeTargetExample } from '../../../packages/api/src/compute/charge-schema.ts'
 import { interiorExample } from '../../../packages/api/src/compute/interior-schema.ts'
+import { dataFile } from '../src/lib/data-file.ts'
 import { staticFetch } from '../src/lib/static-api.ts'
 
 let api: Awaited<ReturnType<typeof startBundleApi>>
@@ -17,13 +18,7 @@ class InlineWorker {
   onmessage?: (e: { data: unknown }) => void
   onerror?: () => void
   postMessage(task: Task) {
-    setTimeout(() => {
-      try {
-        this.onmessage?.({ data: { succeeded: true, value: runTask(task) } })
-      } catch (error) {
-        this.onmessage?.({ data: { succeeded: false, error: serializeError(error) } })
-      }
-    })
+    setTimeout(() => this.onmessage?.({ data: replyTo(task) }))
   }
   terminate() {}
 }
@@ -354,6 +349,35 @@ describe('the static site computes as the API', () => {
       await expect(res).rejects.toThrow(/\.json not read/)
     } finally {
       vi.stubGlobal('fetch', online)
+    }
+  })
+
+  it('starts no worker for a run whose signal aborted while its cartridge record was read', async () => {
+    const started: InlineWorker[] = []
+    vi.stubGlobal(
+      'Worker',
+      class extends InlineWorker {
+        constructor() {
+          super()
+          started.push(this)
+        }
+      },
+    )
+    try {
+      // the record file is read already, so the run follows the abort within this task's microtasks
+      await dataFile('cartridges/308-win')
+      const abort = new AbortController()
+      const res = staticFetch('interior', {
+        method: 'POST',
+        body: JSON.stringify({ ...interior, cartridge: '308-win' }),
+        signal: abort.signal,
+      })
+      abort.abort()
+      await expect(res).rejects.toMatchObject({ name: 'AbortError' })
+      await new Promise((resolve) => setTimeout(resolve))
+      expect(started).toEqual([])
+    } finally {
+      vi.stubGlobal('Worker', InlineWorker)
     }
   })
 

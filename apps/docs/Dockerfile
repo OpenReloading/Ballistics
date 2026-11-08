@@ -15,6 +15,7 @@ COPY packages/shot-groups/package.json packages/shot-groups/
 COPY packages/schema/package.json packages/schema/
 COPY packages/importers/package.json packages/importers/
 COPY packages/catalog/package.json packages/catalog/
+COPY packages/use-cases/package.json packages/use-cases/
 COPY packages/api/package.json packages/api/
 COPY packages/drawing/package.json packages/drawing/
 COPY packages/cli/package.json packages/cli/

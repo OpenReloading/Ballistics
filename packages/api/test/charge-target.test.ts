@@ -4,10 +4,10 @@ import {
   interiorPressureRange,
   pressureToleranceDefaults,
 } from '@open-reloading/ballistics'
+import { ComputeBusy } from '@open-reloading/use-cases'
 import { describe, expect, it } from 'vitest'
 import { buildApp } from '../src/app.ts'
 import { chargeTargetExample } from '../src/compute/charge-schema.ts'
-import { ComputeBusy } from '../src/compute/tasks.ts'
 import { buildOpenApi } from '../src/openapi.ts'
 import { API_PREFIX, API_VERSION } from '../src/version.ts'
 import { bundle, m3Load as load } from './fixtures.ts'

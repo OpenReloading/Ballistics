@@ -41,6 +41,9 @@
     "packages/catalog": {
       "entry": ["src/index.ts", "src/plausibility.ts"]
     },
+    "packages/use-cases": {
+      "entry": ["src/index.ts"]
+    },
     "packages/drawing": {
       // the bullet records of data are read by path in the tests, declared so the CI plan tests drawing with them
       "ignoreDependencies": ["@open-reloading/catalog"],
