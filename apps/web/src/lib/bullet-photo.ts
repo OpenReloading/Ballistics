@@ -1,4 +1,4 @@
-/** Cut-out and ruler scale of a bullet photograph (`apps/docs/docs/models/bullet-photo.md`); photo px, y down; pure, so it runs in a worker. */
+/** Cut-out and ruler scale of a bullet photograph (`apps/docs/docs/models/bullet-photo.md`); photo px, y down, pixel (i, j) covering [i, i + 1) x [j, j + 1); pure, so it runs in a worker. */
 import { msg } from '../i18n/translate.ts'
 import type { RgbaImage } from './image.ts'
 import { nth } from './nth.ts'
@@ -312,7 +312,7 @@ function localLevels(
 export const morphN = (mask: Uint8Array, w: number, box: Box, erode: boolean, n: number) =>
   Array.from({ length: n }).reduce<Uint8Array>((m) => morph3(m, w, box, erode), mask)
 
-/** Contrast over steepest slope, upper quartile (a shadow lies along one side): a Gaussian step rises 10 to 90 % over about 2.5 s. */
+/** px: contrast over steepest slope, upper quartile (a shadow lies along one side); a Gaussian step of standard deviation s px rises 10 to 90 % over about 2.5 s. */
 function edgeSpreadOf(
   flat: Float32Array,
   mask: Uint8Array,

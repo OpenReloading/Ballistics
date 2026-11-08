@@ -37,7 +37,7 @@ function estimatesOf(px: BulletMeasurement, known: Known): Estimate[] {
   })
 }
 
-/** Inverse-variance weighted mean, with half the spread as a rectangular term in quadrature. */
+/** Weighted by the inverse squared relative uncertainty, with half the spread as a rectangular term in quadrature. */
 function combined(es: readonly Estimate[]): Scale {
   const weights = es.map((e) => 1 / e.rel ** 2)
   const total = weights.reduce((a, w) => a + w, 0)
@@ -109,7 +109,7 @@ export function withBasis(m: BulletMeasurement, basis: ScaleBasis | undefined): 
   return { ...m, ...(basis && { scaleBasis: basis }), notes: note ? [...m.notes, note] : m.notes }
 }
 
-/** The ruler wins and the known sizes are checked against it; without one they give the scale and check each other. */
+/** `px` is the photograph's measure at 1 px per mm; the ruler wins and the known sizes are checked against it, without one they give the scale; undefined when nothing does. */
 export function resolveScale(
   px: BulletMeasurement,
   ruler: Scale | undefined,

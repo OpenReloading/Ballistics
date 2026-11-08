@@ -61,7 +61,7 @@ export const radiiOf = (D: number, factors: number[]) => [
   ),
 ]
 
-/** The smaller eigenvalue where both are negative (a bright blob), so a ring line, with one eigenvalue near 0, gives none. */
+/** sigma² times the smaller-magnitude eigenvalue where both are negative (a bright blob), so a ring line, with one eigenvalue near 0, gives none. */
 function response(P: Float32Array, w: number, h: number, r: number): Float32Array {
   const tmp = new Float32Array(w * h)
   const B = new Float32Array(w * h)

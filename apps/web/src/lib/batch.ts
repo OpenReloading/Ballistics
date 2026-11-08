@@ -1,4 +1,4 @@
-/** A throwing task ends its worker only: the others finish, then the first error is thrown; nothing new starts once `signal` aborts. */
+/** A throwing task ends its worker only: the others finish, then the first error is thrown; on abort nothing new starts, and a task in flight must carry `signal` itself. */
 export async function runBatch<T, R>(
   items: readonly T[],
   limit: number,

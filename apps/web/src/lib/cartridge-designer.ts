@@ -368,7 +368,7 @@ export function reduce(h: History, a: Action): History {
   }
 }
 
-/** `changed` carries the record's other value. */
+/** `changed`: entered against a record, whose value `record` carries. */
 export type FieldState =
   | { kind: 'record' }
   | { kind: 'entered'; changed: boolean; record?: number | undefined }
@@ -698,7 +698,7 @@ function derive(figure: Figure, values: SpecValue[], t: Translator['t']): Derive
 export const designFileName = (d: Pick<Design, 'name' | 'origin'>, fallback = 'Cartridge design') =>
   d.name?.trim() || d.origin?.title || fallback
 
-/** Undefined where the design does not draw, is a shotshell (table VII) or lacks the L3 the seating needs. */
+/** SI, from the resolved values; undefined where the design does not draw, is a shotshell (table VII) or lacks the L3 the seating needs. */
 export function workbenchDesign(
   d: UserCartridge,
   resolved: ResolvedCartridge,

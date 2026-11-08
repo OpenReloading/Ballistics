@@ -267,7 +267,7 @@ const baseCount = 6
 
 type Line = { a: number; b: number }
 
-/** From the shank's start to its middle (at least 10 samples), with the larger slope uncertainty. */
+/** px, from the shank's start to its middle (at least 10 samples), with the larger slope uncertainty; undefined without sides or a shank. */
 function shankLines(o: Outline): { left: Line; right: Line; slopeError: number } | undefined {
   const sides = o.sides
   if (!sides || o.r.length < 40) return
@@ -299,7 +299,7 @@ function shankLines(o: Outline): { left: Line; right: Line; slopeError: number }
 /** A side's shank line at sample `i`. */
 const levelAt = (o: Outline, line: Line, i: number) => line.a + line.b * at(o.z, i)
 
-/** Each side's base edge inside its shank line, px, with the lines, the base samples and the larger slope uncertainty. */
+/** Each side's base edge inside its shank line, px, with the lines, the base samples and the larger slope uncertainty; undefined without sides or a shank. */
 export function sideTapers(o: Outline) {
   const sides = o.sides
   const lines = sides && shankLines(o)
@@ -472,7 +472,7 @@ function typedAxisOff(o: Outline): Outline {
   return off >= least ? { ...o, typedOff: off } : o
 }
 
-/** The axis is turned and shifted until the edges' middle lies on it; the nose is the longer taper; a fixed `angle` fits the offset only. */
+/** The axis is turned and shifted until the edges' middle lies on it; the nose is the longer taper; a fixed `angle` fits the offset only; undefined without a bullet. */
 export function fitOutline(seg: Cutout, opt: OutlineOptions = {}): Outline | undefined {
   const m = momentsOf(seg)
   if (!m) return

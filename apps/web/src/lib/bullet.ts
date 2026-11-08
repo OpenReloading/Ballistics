@@ -57,7 +57,7 @@ const bandsOf = (record: Partial<Bullet>, model: 'G1' | 'G7') =>
 export const bandCount = (record: Partial<Bullet> | undefined, model: 'G1' | 'G7') =>
   record ? bandsOf(record, model).length : 0
 
-/** A BC only where the record has one value of the model: several bands have no single value to show. */
+/** SI; a BC only where the record has one value of the model: several bands have no single value to show. */
 export function recordBulletValues(record: Partial<Bullet> | undefined): BulletValues {
   if (!record) return {}
   const out: BulletValues = {}
@@ -99,7 +99,7 @@ export const diameterMm = (values: BulletValues) =>
 const sameValue = (a: number, b: number | undefined) =>
   b !== undefined && Math.abs(a - b) <= 1e-9 * Math.abs(b)
 
-/** The one place a record meets typed values; a typed BC replaces all bands of its model, a typed boat tail drops the bearing length. */
+/** The one place a record meets typed values; a typed BC replaces all bands of its model with one from 0 m/s, a typed boat tail drops the bearing length. */
 export function typedBullet<B extends Partial<Bullet>>(
   record: B,
   typed: BulletValues,
@@ -180,7 +180,7 @@ type BulletDrag =
   | { kind: 'choose'; values: BallisticCoefficientChoice[] }
   | { kind: 'none' }
 
-/** By the API's rule: each BC of `model` a band from its `minVelocity`; several without distinct starts give `choose`, `choice` picks one. */
+/** By the API's rule, SI: each BC of `model` (lb/in2 to kg/m2) a band from its `minVelocity` (0 m/s when absent); several without distinct starts give `choose`, `choice` picks one. */
 export function bulletDrag(record: Bullet, model: 'G1' | 'G7', choice?: number): BulletDrag {
   const bcs = (record.ballisticCoefficients ?? []).filter((c) => c.dragModel === model)
   // the trajectory needs a diameter, which a record that only names the bullet lacks
@@ -221,7 +221,7 @@ const sectionalDensity = (r: Pick<Bullet, 'mass' | 'diameter'>) =>
 /** Litz's recommended minimum (Litz 2015, 3rd edition; `apps/docs/docs/models/exterior-stability.md`, "Miller gyroscopic stability factor"). */
 const millerStabilityTarget = 1.5
 
-/** At 2800 ft/s, 59 degF and 29.92 inHg Miller's corrections are 1, and Sg goes with the inverse square of the twist. */
+/** Twist per turn, m, for Sg `millerStabilityTarget`: at 2800 ft/s, 59 degF and 29.92 inHg Miller's corrections are 1, and Sg goes with the inverse square of the twist; undefined without a length. */
 export function millerTwist(r: Pick<Bullet, 'mass' | 'diameter' | 'length'>): number | undefined {
   if (!r.length || !r.diameter) return
   const reference = 0.254

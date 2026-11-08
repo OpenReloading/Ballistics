@@ -85,7 +85,7 @@ export function targetError(
     })
 }
 
-/** With a bulk density the charge is capped at the load ratio limit. */
+/** With a bulk density (kg/m³) the charge is capped at the load ratio limit. */
 export function chargeTargetBody(
   base: {
     model?: string | undefined

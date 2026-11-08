@@ -50,7 +50,7 @@ export type Group = keyof typeof groups
 export interface DesignerSpec extends FieldSpec {
   label: Message
   group: Group
-  /** Outside it the field asks to check the unit, a soft flag that blocks nothing (the ranges of issue #788). */
+  /** SI range; outside it the field asks to check the unit, a soft flag that blocks nothing (the ranges of issue #788). */
   plausible?: [number, number]
 }
 

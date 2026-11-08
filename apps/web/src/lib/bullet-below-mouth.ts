@@ -12,7 +12,7 @@ import type { Suggestion } from './input-defaults.ts'
 /** Why the bullet is not seated: the record has no length or diameter, its outline is refused, the cartridge has no case length, CBTO needs a base-to-ogive, no seating is entered. */
 export type Unseated = 'dimensions' | 'outline' | 'chamber' | 'cbto' | 'seating'
 
-/** With its interval and what it rests on, or refused naming what is missing (English, for `t`). */
+/** Volume and interval in m³, with what it rests on, or refused naming what is missing (English, for `t`). */
 export type BelowMouth =
   | {
       kind: 'estimate'

@@ -1,4 +1,4 @@
-/** From fitted M3 parameters (`apps/docs/docs/models/interior-burn-forms.md`, "Dynamic vivacity"), interval ± `uncertaintyFactor` standard uncertainties. */
+/** Dynamic vivacity in 1/(MPa s) from fitted M3 parameters (`apps/docs/docs/models/interior-burn-forms.md`, "Dynamic vivacity"), interval ± `uncertaintyFactor` standard uncertainties. */
 
 import { dynamicVivacity, meanDynamicVivacity, type VivacityBurn } from '@open-reloading/ballistics'
 import { type Powder, toSi } from '@open-reloading/schema'
@@ -149,7 +149,7 @@ export function classifyPowder(
 
 export const isFitted = (p: FittedPowder | UnfittedPowder): p is FittedPowder => 'burn' in p
 
-/** As the workbench sends them: no interval, no record; undefined while a value is missing. */
+/** SI field values as the workbench sends them: no interval, no record; undefined while a value is missing. */
 export function typedBurn(
   v: Partial<Record<string, number>>,
   t: Translator['t'] = english,

@@ -58,7 +58,7 @@ const labels: Record<string, Message> = Object.fromEntries(
   [...caseGroupFields, caseGroupCapacitySpec].map((s) => [s.key, s.label]),
 )
 
-/** With the field label; undefined when valid. */
+/** With the field label; undefined when valid; `name` must not be empty. */
 export function caseGroupProblem(name: string, c: Case, t: Translator['t']): string | undefined {
   if (!name) return t('Enter a name.')
   if (!c.cartridge) return t('Choose the cartridge.')
@@ -80,7 +80,7 @@ export function groupCapacity(c: Case, records: readonly UserRecord[]): number |
   return r?.kind === 'caseCapacity' ? r.data.waterCapacity.value : undefined
 }
 
-/** The same record as the workbench's measured capacity, so a capacity is stored once. */
+/** `m3` in SI; the same record as the workbench's measured capacity, so a capacity is stored once, and without `m3` the reference stays, for a record this browser does not hold. */
 export function withCapacity(c: Case, m3: number | undefined): Case {
   const { capacity: held, ...rest } = c
   if (!c.cartridge) return rest

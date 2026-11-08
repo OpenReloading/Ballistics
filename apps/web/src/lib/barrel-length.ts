@@ -55,7 +55,7 @@ export function barrelDefaults(system: UnitSystem) {
   return { from: toSi(from), to: toSi(to), step: toSi(step) }
 }
 
-/** As "78.74 in (2000 mm)": a field may show another unit than the Settings, and its message stands outside the field. */
+/** `length` in m, as "78.74 in (2000 mm)": a field may show another unit than the Settings, and its message stands outside the field. */
 export function inEveryUnit(system: UnitSystem, length: number): string {
   const own = system.barrelLength
   const units = [own, ...Object.values(unitsOf.barrelLength).filter((u) => u.symbol !== own.symbol)]

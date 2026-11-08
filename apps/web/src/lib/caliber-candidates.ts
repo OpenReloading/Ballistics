@@ -24,7 +24,7 @@ const HOLE_SIZE_RESOLUTION = toSi('length', 0.5)
 /** A hole fits a class within this share of its diameter: the detector's band (`SIZE_MIN`, `SIZE_MAX`). */
 const HOLE_BAND = [0.7, 1.4] as const
 
-/** A hole in paper shows smaller than its bullet, so a measured size matches within `HOLE_BAND` and preselects nothing; the user's classes first. */
+/** A hole in paper shows smaller than its bullet, so a measured size matches within `HOLE_BAND` and preselects nothing; the user's classes first among equals. */
 export function caliberCandidates(
   classes: readonly CandidateClass[],
   hole: { diameter: number; source: string } | undefined,

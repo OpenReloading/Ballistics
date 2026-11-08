@@ -3,7 +3,7 @@ import { pressureToleranceDefaults } from '@open-reloading/ballistics'
 /** The highest volume tolerance the API takes (`tolerances.volumeFraction`). */
 const volumeFractionMax = 0.2
 
-/** Widens the range to the hollow base's cavity depth bracket, at most the API's 0.2 (`apps/docs/docs/models/case-capacity.md`, "Cavity depth"). */
+/** Widens the range to the hollow base's cavity depth bracket, at most the API's 0.2; volumes in m³, undefined without a bracket (`apps/docs/docs/models/case-capacity.md`, "Cavity depth"). */
 export function cavityVolumeFraction(
   range: { low: number; high: number } | undefined,
   volume: number | undefined,
