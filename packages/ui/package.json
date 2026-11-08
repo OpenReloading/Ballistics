@@ -70,14 +70,14 @@
     "@types/react-dom": "19.3.0",
     "@vitest/browser": "catalog:",
     "@vitest/browser-playwright": "catalog:",
-    "lucide-react": "1.68.0",
+    "lucide-react": "1.69.0",
     "playwright": "catalog:",
     "publint": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "storybook": "10.6.5",
     "typescript": "catalog:",
-    "vite": "8.3.5",
+    "vite": "8.3.6",
     "vitest": "catalog:"
   }
 }

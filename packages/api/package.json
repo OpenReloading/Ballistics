@@ -41,8 +41,8 @@
     "@open-reloading/schema": "workspace:*",
     "@open-reloading/statistics": "workspace:*",
     "@open-reloading/use-cases": "workspace:*",
-    "@scalar/fastify-api-reference": "1.75.1",
-    "fastify": "^5.12.7",
+    "@scalar/fastify-api-reference": "1.77.0",
+    "fastify": "^5.12.8",
     "zod": "catalog:"
   },
   "devDependencies": {
