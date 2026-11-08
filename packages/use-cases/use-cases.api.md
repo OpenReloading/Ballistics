@@ -850,9 +850,7 @@ export const steps: (max: number) => z.ZodOptional<z.ZodNumber>;
 
 // @public
 export type StringsOptionsSchema = z.ZodObject<{
-    trajectoryOptions: z.ZodOptional<z.ZodObject<{
-        maxSteps: z.ZodOptional<z.ZodNumber>;
-    } & ExteriorOptionsShape, z.core.$strict>>;
+    trajectoryOptions: z.ZodOptional<z.ZodObject<TrajectoryOptionsShape, z.core.$strict>>;
     fitZeroOffset: z.ZodOptional<z.ZodBoolean>;
     priors: z.ZodOptional<z.ZodObject<{
         muzzleVelocity: z.ZodOptional<z.ZodNumber>;
@@ -910,13 +908,16 @@ export interface TrajectoryBody extends z.infer<typeof trajectoryBody> {
 export const trajectoryBody: z.ZodObject<{
     shot: z.ZodObject<ShotShape, z.core.$strict>;
     ranges: z.ZodArray<z.ZodNumber>;
-    options: z.ZodOptional<z.ZodObject<ExteriorOptionsShape & {
-        maxSteps: z.ZodOptional<z.ZodNumber>;
-    }, z.core.$strict>>;
+    options: z.ZodOptional<z.ZodObject<TrajectoryOptionsShape, z.core.$strict>>;
 }, z.core.$strict>;
 
 // @public
 export const trajectoryExample: TrajectoryRequest;
+
+// @public
+export type TrajectoryOptionsShape = ExteriorOptionsShape & {
+    maxSteps: z.ZodOptional<z.ZodNumber>;
+};
 
 // @public
 export interface TrajectoryRequest extends z.input<typeof trajectoryBody> {
@@ -952,8 +953,7 @@ export const truingBody: z.ZodObject<{
         fitMuzzleVelocity: z.ZodOptional<z.ZodBoolean>;
     }, z.core.$strict>
     ], 'kind'>;
-    options: z.ZodOptional<z.ZodObject<ExteriorOptionsShape & {
-        maxSteps: z.ZodOptional<z.ZodNumber>;
+    options: z.ZodOptional<z.ZodObject<TrajectoryOptionsShape & {
         maxIterations: z.ZodOptional<z.ZodNumber>;
         maxCondition: z.ZodOptional<z.ZodNumber>;
     }, z.core.$strict>>;

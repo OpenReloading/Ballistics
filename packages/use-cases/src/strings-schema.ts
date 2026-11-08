@@ -1,10 +1,10 @@
 import { z } from 'zod'
 import type { Exact } from './exact.ts'
 import {
-  type ExteriorOptionsShape,
   exteriorOptions,
   type ShotShape,
   shot,
+  type TrajectoryOptionsShape,
   trajectoryExample,
 } from './exterior-schema.ts'
 import { caps, fitIterations, steps } from './schemas.ts'
@@ -217,9 +217,7 @@ export type RangeStringsChronographShape = {
 /** The zod type of the solver settings and identification thresholds of a range-strings request. */
 export type StringsOptionsSchema = z.ZodObject<
   {
-    trajectoryOptions: z.ZodOptional<
-      z.ZodObject<{ maxSteps: z.ZodOptional<z.ZodNumber> } & ExteriorOptionsShape, z.core.$strict>
-    >
+    trajectoryOptions: z.ZodOptional<z.ZodObject<TrajectoryOptionsShape, z.core.$strict>>
     fitZeroOffset: z.ZodOptional<z.ZodBoolean>
     priors: z.ZodOptional<
       z.ZodObject<

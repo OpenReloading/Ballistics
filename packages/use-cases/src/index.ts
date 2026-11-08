@@ -39,6 +39,7 @@ export {
   type InterpolationSchema,
   type ShotShape,
   type TrajectoryBody,
+  type TrajectoryOptionsShape,
   type TrajectoryRequest,
   type TruingBody,
   type TruingRequest,

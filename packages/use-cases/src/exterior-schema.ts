@@ -285,6 +285,9 @@ export type ExteriorOptionsShape = {
   maxYaw: z.ZodOptional<z.ZodNumber>
 }
 
+/** The zod shape of the options of one trajectory's integrations: those of every request and the step cap. */
+export type TrajectoryOptionsShape = ExteriorOptionsShape & { maxSteps: z.ZodOptional<z.ZodNumber> }
+
 const shotParser = z
   .strictObject({
     projectile: z
@@ -447,9 +450,7 @@ export const trajectoryBody: z.ZodObject<
   {
     shot: z.ZodObject<ShotShape, z.core.$strict>
     ranges: z.ZodArray<z.ZodNumber>
-    options: z.ZodOptional<
-      z.ZodObject<ExteriorOptionsShape & { maxSteps: z.ZodOptional<z.ZodNumber> }, z.core.$strict>
-    >
+    options: z.ZodOptional<z.ZodObject<TrajectoryOptionsShape, z.core.$strict>>
   },
   z.core.$strict
 > = trajectoryBodyParser satisfies Exact<typeof trajectoryBody, typeof trajectoryBodyParser>
@@ -562,8 +563,7 @@ export const truingBody: z.ZodObject<
     >
     options: z.ZodOptional<
       z.ZodObject<
-        ExteriorOptionsShape & {
-          maxSteps: z.ZodOptional<z.ZodNumber>
+        TrajectoryOptionsShape & {
           maxIterations: z.ZodOptional<z.ZodNumber>
           maxCondition: z.ZodOptional<z.ZodNumber>
         },
