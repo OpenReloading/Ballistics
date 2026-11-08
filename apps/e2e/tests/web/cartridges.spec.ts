@@ -640,6 +640,7 @@ test('a table row and its drawn dimension mark each other on hover and focus, wi
   const cartridgeL1 = drawn('Cartridge', 'L1')
   const rowFe = symbolRow(page, 'Cartridge', 'Fe')
   const rowDeltaL = symbolRow(page, 'Cartridge', 'δ L')
+  const cartridgeDelta = drawn('Cartridge', 'delta')
   const atRest = new Map<Locator, string>()
   for (const l of [
     cartridgeP2,
@@ -651,6 +652,7 @@ test('a table row and its drawn dimension mark each other on hover and focus, wi
     cartridgeL1,
     rowFe,
     rowDeltaL,
+    cartridgeDelta,
   ])
     atRest.set(l, await look(l))
   const marked = (l: Locator) => expect.poll(() => look(l)).not.toBe(atRest.get(l))
@@ -678,8 +680,9 @@ test('a table row and its drawn dimension mark each other on hover and focus, wi
   // a row whose symbol the drawing does not show links nothing, so it stays as it is
   await rowFe.hover()
   await unmarked(rowFe)
-  // "δ L" is one symbol: the drawing has no such dimension, so the row links nothing either
+  // "δ L" is one symbol: it does not mark the drawn δ, and the row links nothing either
   await rowDeltaL.hover()
+  await unmarked(cartridgeDelta)
   await unmarked(rowDeltaL)
   // no mark in print: the drawn symbol of a hovered row prints as it does at rest
   await page.mouse.move(0, 0)
