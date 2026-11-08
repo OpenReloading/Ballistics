@@ -2,6 +2,7 @@ import { defaultStartPressure, handgunBarrelLengthLimit } from '@open-reloading/
 import { msg } from '../i18n/translate.ts'
 import { storageName } from './edition.ts'
 import { interiorFields } from './interior-input.ts'
+import { storedChoice } from './stored-choice.ts'
 
 /** `localStorage` key of the user's workbench defaults: JSON of the tuned values, SI. */
 const defaultsKey = storageName('workbenchDefaults')
@@ -89,26 +90,14 @@ export function storeDefaults(d: WorkbenchDefaults) {
   } catch {}
 }
 
-/** `localStorage` key of the Run automatically switch: `off` when switched off, else absent. */
-const autoRunKey = storageName('workbenchAutoRun')
-
-/** The switch as set in this page load, kept when storage takes no write. */
-let sessionAutoRun: boolean | undefined
+/** The Run automatically switch: stored `off` when switched off, else absent. */
+const autoRun = storedChoice(
+  storageName('workbenchAutoRun'),
+  (text) => text !== 'off',
+  (on) => (on ? null : 'off'),
+)
 
 /** Whether the workbench runs on its own after an input change; on when storage is empty or not available. */
-export function readAutoRun(): boolean {
-  if (sessionAutoRun !== undefined) return sessionAutoRun
-  try {
-    return localStorage.getItem(autoRunKey) !== 'off'
-  } catch {
-    return true
-  }
-}
+export const readAutoRun = autoRun.read
 
-export function storeAutoRun(on: boolean) {
-  sessionAutoRun = on
-  try {
-    if (on) localStorage.removeItem(autoRunKey)
-    else localStorage.setItem(autoRunKey, 'off')
-  } catch {}
-}
+export const storeAutoRun = autoRun.set

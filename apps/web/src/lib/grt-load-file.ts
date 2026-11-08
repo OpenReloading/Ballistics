@@ -3,6 +3,7 @@ import { readCsrLoad, readGrtLoad } from '@open-reloading/importers'
 import { type UserRecord, userRecord } from '@open-reloading/schema'
 import { z } from 'zod'
 import { recordOf } from './candidates.ts'
+import { readerErrorText } from './file-diagnostics.ts'
 import { loadWarning } from './load-warnings.ts'
 import type { ParsedUserFile } from './user-data.ts'
 
@@ -14,7 +15,7 @@ function parseWith(read: typeof readGrtLoad, format: string, text: string): Pars
   } catch (e) {
     return {
       ok: false,
-      reason: `The file is not a readable ${format}: ${e instanceof Error ? e.message : String(e)}`,
+      reason: `The file is not a readable ${format}: ${readerErrorText(e)}`,
     }
   }
   const saved = new Date().toISOString()

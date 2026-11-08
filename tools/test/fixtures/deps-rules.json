@@ -131,6 +131,14 @@
     "source": "import { units } from '@open-reloading/units'\nexport { units }",
     "rules": []
   },
+  "packages/schema/src/types-of-statistics.ts": {
+    "source": "import type { Diagnostic } from '@open-reloading/statistics'\nexport type Found = Diagnostic<'x'>",
+    "rules": []
+  },
+  "packages/schema/src/statistics-code.ts": {
+    "source": "import { need } from '@open-reloading/statistics'\nexport { need }",
+    "rules": ["schema-statistics-for-types-only"]
+  },
   "packages/schema/src/ballistics.ts": {
     "source": "import { waterDensity } from '@open-reloading/ballistics'\nexport { waterDensity }",
     "rules": ["schema-imports-units-only"]

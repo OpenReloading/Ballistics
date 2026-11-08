@@ -10,6 +10,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "isolatedDeclarations": true,
+    "resolveJsonModule": true,
     // Mantine's declarations do not pass under exactOptionalPropertyTypes
     "skipLibCheck": true,
     "outDir": "dist",

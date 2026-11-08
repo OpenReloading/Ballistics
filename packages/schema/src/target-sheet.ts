@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import type { Exact } from './exact.ts'
+import { hexColour, localId } from './fields.ts'
 import { recordId, ref, userId } from './ids.ts'
-import { hexColour, localId } from './shared.ts'
 
 /** A pixel of the photo as the browser shows it (orientation applied), x right, y down. */
 const pixel = z.number().meta({ unit: 'px' })

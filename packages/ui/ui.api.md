@@ -4,8 +4,25 @@
 
 ```ts
 
+import type { ComponentPropsWithRef } from 'react';
+import type { I18n } from '@lingui/core';
+import type { LucideIcon } from 'lucide-react';
 import { MantineProviderProps } from '@mantine/core';
-import type { ReactElement } from 'react';
+import type { Messages } from '@lingui/core';
+import { ReactElement } from 'react';
+import { ReactNode } from 'react';
+
+// @public
+export function AppFrame(input: AppFrameProps): ReactElement;
+
+// @public (undocumented)
+export interface AppFrameProps {
+    account?: ReactNode;
+    brand: ReactNode;
+    children: ReactNode;
+    end?: ReactNode;
+    navigation: ReactNode;
+}
 
 // @public
 export interface ArrayColumns<Row> {
@@ -52,7 +69,32 @@ export interface DataSource<Row> {
 }
 
 // @public
-export function UiProvider(props: Pick<MantineProviderProps, 'children' | 'defaultColorScheme' | 'forceColorScheme' | 'colorSchemeManager'>): ReactElement;
+export function NavItem(input: NavItemProps): ReactElement;
+
+// @public (undocumented)
+export interface NavItemProps extends Omit<ComponentPropsWithRef<'a'>, 'children'> {
+    icon: LucideIcon;
+    // (undocumented)
+    label: string;
+}
+
+// @public
+export function PageBar(input: PageBarProps): ReactElement;
+
+// @public (undocumented)
+export interface PageBarProps {
+    actions?: ReactNode;
+    status?: ReactNode;
+    title: string;
+}
+
+// @public
+export const uiMessages: Record<'en' | 'de', Messages>;
+
+// @public
+export function UiProvider(input: {
+    i18n: I18n;
+} & Pick<MantineProviderProps, 'children' | 'defaultColorScheme' | 'forceColorScheme' | 'colorSchemeManager'>): ReactElement;
 
 // (No @packageDocumentation comment for this package)
 

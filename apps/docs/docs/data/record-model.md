@@ -211,9 +211,9 @@ The user record of kind `case` (`packages/schema/src/user-data.ts`) holds a `Cas
 ## Share links
 
 The File menu's Copy share link copies a link to a bullet, a cartridge or a load (`shareable` in `apps/web/src/components/file-menu.tsx`). Opening the link in another browser opens the record there as unsaved work.
-- What it carries: the record as a user data file (`shareLink` in `apps/web/src/lib/share-link.ts`). A bullet's link also carries the user manufacturer it names. A design based on a catalogue record carries its `catalogue:` base, not a copy of the base. The workbench's Copy link carries the values of a design, not its reference.
+- What it carries: the record as a user data file (`shareLinkOf` in `packages/schema/src/share-link.ts`). A bullet's link also carries the user manufacturer it names. A design based on a catalogue record carries its `catalogue:` base, not a copy of the base. The workbench's Copy link carries the values of a design, not its reference.
 - Where it goes: the record is compressed and written after `#record=` in the address. A browser does not send the part after `#` to a server, so the record is not uploaded; it goes only where the link is pasted or sent. Anyone who has the link can read the record.
-- Length: at most 8000 characters (`maxLinkChars` in `apps/web/src/lib/share-link.ts`, the length RFC 9110 recommends every sender and recipient support). A longer record gets no link, with a message to save it to a file instead. A received link over the limit is not opened.
+- Length: at most 8000 characters (`maxShareLinkChars` in `packages/schema/src/share-link.ts`, the length RFC 9110 recommends every sender and recipient support). A longer record gets no link, with a message to save it to a file instead. A received link over the limit is not opened.
 - Refused: a load that names records kept only in this browser (`user:` in its firearm, cartridge, bullet, powder, case capacity, case, case maker or chronograph sessions; `userRefFields` in `packages/schema/src/user-data.ts`, `shareProblem` in `apps/web/src/lib/share-link.ts`). The browser that opens the link has none of them, so the message names those fields: use catalogue records, or save the load and those records to a file.
 
 ## Catalogue and API

@@ -7,6 +7,8 @@
 import { Bullet } from '@open-reloading/schema';
 import type { CaliberClass } from '@open-reloading/schema';
 import { Cartridge } from '@open-reloading/schema';
+import type { CaseMaterial } from '@open-reloading/schema';
+import type { CaseType } from '@open-reloading/schema';
 import type { CatalogueCase } from '@open-reloading/schema';
 import type { CatalogueCaseCapacity } from '@open-reloading/schema';
 import type { CatalogueLoad } from '@open-reloading/schema';
@@ -20,6 +22,8 @@ import { LoadTables } from '@open-reloading/schema';
 import type { Manufacturer } from '@open-reloading/schema';
 import { Powder } from '@open-reloading/schema';
 import { Primer } from '@open-reloading/schema';
+import type { PrimerCompound } from '@open-reloading/schema';
+import type { PrimerSize } from '@open-reloading/schema';
 import type { Provenance } from '@open-reloading/schema';
 import { PublishedLoads } from '@open-reloading/schema';
 import type { RangeFirings } from '@open-reloading/schema';
@@ -32,6 +36,44 @@ export const airTemperatureRange: Readonly<{
     min: number;
     max: number;
 }>;
+
+// @public
+export interface BulletItem {
+    // (undocumented)
+    ballisticCoefficientG1: number | null;
+    // (undocumented)
+    ballisticCoefficientG7: number | null;
+    // (undocumented)
+    baseType?: string;
+    // (undocumented)
+    construction?: string;
+    // (undocumented)
+    country?: string;
+    // (undocumented)
+    diameter: number | null;
+    // (undocumented)
+    id: string;
+    // (undocumented)
+    leadFree?: boolean;
+    // (undocumented)
+    length: number | null;
+    // (undocumented)
+    manufacturer: string;
+    // (undocumented)
+    mass: number;
+    // (undocumented)
+    name: string;
+    // (undocumented)
+    nameOnly?: true;
+    // (undocumented)
+    tipType?: string;
+}
+
+// @public
+export interface BulletQuery extends PowderQuery {
+    // (undocumented)
+    cartridge?: string | undefined;
+}
 
 // @public
 export type Bundle = {
@@ -53,6 +95,120 @@ export type Bundle = {
     targetMappings: TargetMapping[];
     eventTypes?: EventType[] | undefined;
 };
+
+// @public
+export interface CaliberClassItem {
+    // (undocumented)
+    diameterMm: number;
+    // (undocumented)
+    id: string;
+    // (undocumented)
+    name: string;
+}
+
+// @public
+export interface CartridgeItem {
+    // (undocumented)
+    aliases: string[];
+    // (undocumented)
+    boreDiameter?: number;
+    // (undocumented)
+    cartridgeLength?: number;
+    // (undocumented)
+    caseLength?: number;
+    // (undocumented)
+    caseType?: CaseType;
+    // (undocumented)
+    country?: string;
+    // (undocumented)
+    grooveDiameter?: number;
+    // (undocumented)
+    id: string;
+    // (undocumented)
+    maxBulletDiameter?: number;
+    // (undocumented)
+    name: string;
+    // (undocumented)
+    pmax?: number;
+    // (undocumented)
+    table: string;
+}
+
+// @public
+export interface CartridgeQuery extends Paging {
+    // (undocumented)
+    q?: string | undefined;
+    // (undocumented)
+    table?: string | undefined;
+}
+
+// @public
+export interface CaseItem {
+    // (undocumented)
+    cartridge: string;
+    // (undocumented)
+    id: string;
+    // (undocumented)
+    manufacturer: string;
+    // (undocumented)
+    mass?: number;
+    // (undocumented)
+    material: CaseMaterial;
+    // (undocumented)
+    name: string;
+    // (undocumented)
+    productNumber: string;
+    // (undocumented)
+    waterCapacity?: number;
+}
+
+// @public
+export interface CaseQuery extends PowderQuery {
+    // (undocumented)
+    cartridge?: string | undefined;
+}
+
+// @public
+export interface Catalogue {
+    bullets(query?: BulletQuery): CataloguePage<BulletItem>;
+    caliberClasses(): CataloguePage<CaliberClassItem>;
+    capacities(cartridge: string): Catalogued<'caseCapacity'>[];
+    cartridges(query?: CartridgeQuery): CataloguePage<CartridgeItem>;
+    cases(query?: CaseQuery): CataloguePage<CaseItem>;
+    dataHash(): Promise<string>;
+    disciplines(query?: {
+        federation?: string | undefined;
+    }): CataloguePage<DisciplineItem>;
+    eventTypes(): CataloguePage<EventTypeItem>;
+    federations(): CataloguePage<FederationItem>;
+    get<K extends CatalogueKind>(kind: K, id: string): Catalogued<K> | undefined;
+    manufacturers(): CataloguePage<ManufacturerItem>;
+    powders(query?: PowderQuery): CataloguePage<PowderItem>;
+    primers(query?: PrimerQuery): CataloguePage<PrimerItem>;
+    targetFaces(): CataloguePage<TargetFaceItem>;
+    targetMappings(query?: {
+        discipline?: string | undefined;
+        face?: string | undefined;
+    }): CataloguePage<TargetMappingItem>;
+}
+
+// @public
+export type Catalogued<K extends CatalogueKind> = RecordOfKind[K] & {
+    kind: K;
+    origin: 'catalogue';
+    revision: string;
+};
+
+// @public
+export type CatalogueKind = 'cartridge' | 'manufacturer' | 'powder' | 'primer' | 'bullet' | 'case' | 'caseCapacity' | 'targetFace' | 'federation' | 'discipline' | 'targetMapping' | 'caliberClass' | 'eventType';
+
+// @public
+export interface CataloguePage<T> {
+    // (undocumented)
+    items: T[];
+    // (undocumented)
+    total: number;
+}
 
 // @public
 export function checkBullet(bullet: Bullet): Finding[];
@@ -100,6 +256,50 @@ export function checkSources(index: SourceIndex, errors: string[]): void;
 export function checkSpec(spec: Pick<Cartridge, 'values'>): Finding[];
 
 // @public
+export interface DisciplineItem {
+    // (undocumented)
+    category?: string;
+    // (undocumented)
+    distanceMm: number;
+    // (undocumented)
+    federation: string;
+    // (undocumented)
+    id: string;
+    // (undocumented)
+    name: string;
+    // (undocumented)
+    number?: string;
+}
+
+// @public
+export interface EventTypeItem {
+    // (undocumented)
+    federation: string;
+    // (undocumented)
+    id: string;
+    // (undocumented)
+    method: 'hit-factor' | 'rings';
+    // (undocumented)
+    name: string;
+}
+
+// @public
+export interface FederationItem {
+    // (undocumented)
+    abbreviation: string;
+    // (undocumented)
+    country?: string;
+    // (undocumented)
+    id: string;
+    // (undocumented)
+    internationalFederation?: string;
+    // (undocumented)
+    name: string;
+    // (undocumented)
+    website?: string;
+}
+
+// @public
 export type Finding = {
     finding: string;
     message: string;
@@ -125,6 +325,95 @@ export interface MakerRow {
 export function makerRows(bundle: Bundle): Record<string, MakerRow[]>;
 
 // @public
+export interface ManufacturerItem {
+    // (undocumented)
+    aliases?: string[];
+    // (undocumented)
+    id: string;
+    // (undocumented)
+    name: string;
+    // (undocumented)
+    website?: string;
+}
+
+// @public
+export interface Paging {
+    // (undocumented)
+    limit?: number | undefined;
+    // (undocumented)
+    offset?: number | undefined;
+}
+
+// @public
+export interface PowderInteriorItem {
+    // (undocumented)
+    burnForm?: unknown;
+    // (undocumented)
+    pressureExponent?: number;
+    // (undocumented)
+    referencePressure?: unknown;
+    retrieved?: string;
+    // (undocumented)
+    trainingCartridges?: number;
+    // (undocumented)
+    trainingRows?: number;
+    // (undocumented)
+    vivacity?: unknown;
+}
+
+// @public
+export interface PowderItem {
+    // (undocumented)
+    country?: string;
+    // (undocumented)
+    grainForm?: string;
+    // (undocumented)
+    id: string;
+    // (undocumented)
+    interior?: PowderInteriorItem;
+    // (undocumented)
+    manufacturer: string;
+    // (undocumented)
+    name: string;
+    // (undocumented)
+    propellantBase?: string;
+}
+
+// @public
+export interface PowderQuery extends Paging {
+    // (undocumented)
+    manufacturer?: string | undefined;
+    // (undocumented)
+    q?: string | undefined;
+}
+
+// @public
+export interface PrimerItem {
+    // (undocumented)
+    compound?: PrimerCompound;
+    // (undocumented)
+    id: string;
+    // (undocumented)
+    magnum?: boolean;
+    // (undocumented)
+    manufacturer: string;
+    // (undocumented)
+    name: string;
+    // (undocumented)
+    productNumber?: string;
+    // (undocumented)
+    size: PrimerSize;
+}
+
+// @public
+export interface PrimerQuery extends PowderQuery {
+    // (undocumented)
+    compound?: PrimerCompound | undefined;
+    // (undocumented)
+    size?: PrimerSize | undefined;
+}
+
+// @public
 export type PublishedLoadFinding = Finding & {
     load: string;
 };
@@ -137,6 +426,34 @@ export type PublishedLoadTargets = {
     powders: readonly Pick<Powder, 'id'>[];
     primers: readonly Primer[];
 };
+
+// @public
+export interface RecordOfKind {
+    // (undocumented)
+    bullet: Bullet;
+    // (undocumented)
+    caliberClass: CaliberClass;
+    // (undocumented)
+    cartridge: Cartridge;
+    case: Omit<CatalogueCase, 'origin'>;
+    caseCapacity: Omit<CatalogueCaseCapacity, 'origin'>;
+    // (undocumented)
+    discipline: Discipline;
+    // (undocumented)
+    eventType: EventType;
+    // (undocumented)
+    federation: Federation;
+    // (undocumented)
+    manufacturer: Manufacturer;
+    // (undocumented)
+    powder: Powder;
+    // (undocumented)
+    primer: Primer;
+    // (undocumented)
+    targetFace: TargetFace;
+    // (undocumented)
+    targetMapping: TargetMapping;
+}
 
 // @public
 export type RecordsRead = {
@@ -157,6 +474,38 @@ export type SourceIndex = {
 
 // @public
 export function sourceIndex(records: SourceRecord[]): SourceIndex;
+
+// @public
+export interface TargetFaceItem {
+    // (undocumented)
+    caliberClasses: string[];
+    // (undocumented)
+    categories: string[];
+    // (undocumented)
+    federation?: string | undefined;
+    // (undocumented)
+    id: string;
+    // (undocumented)
+    name: string;
+    // (undocumented)
+    organization?: string;
+}
+
+// @public
+export interface TargetMappingItem {
+    // (undocumented)
+    discipline: string;
+    // (undocumented)
+    event?: string;
+    // (undocumented)
+    face: string;
+    // (undocumented)
+    gaugeMm?: number;
+    // (undocumented)
+    id: string;
+    // (undocumented)
+    stage?: string;
+}
 
 // @public
 export const twistPlausible: (mm: number) => boolean;

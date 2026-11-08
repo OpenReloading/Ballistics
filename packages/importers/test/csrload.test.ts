@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { readCsrLoad, readGrtLoad } from '../src/index.ts'
 import { defined } from './defined.ts'
 import { recordOf } from './record-of.ts'
+import { refusal } from './refusal.ts'
 
 /** The read of `xml` with the records the app makes of its candidates. */
 function read(xml: string) {
@@ -221,8 +222,17 @@ describe('readCsrLoad: limits and refused files', () => {
   })
 
   it('refuses another root, a file without load and the files of the GRT reader', () => {
-    expect(() => readCsrLoad('<other/>')).toThrow('root element')
-    expect(() => readCsrLoad('<ChamberSimReloaded format="1"/>')).toThrow('no load')
-    expect(() => readGrtLoad(csrFile())).toThrow('root element')
+    expect(refusal(() => readCsrLoad('<other/>'))).toEqual({
+      code: 'rootNotLoad',
+      params: { root: 'ChamberSimReloaded' },
+    })
+    expect(refusal(() => readCsrLoad('<ChamberSimReloaded format="1"/>'))).toEqual({
+      code: 'noLoad',
+      params: {},
+    })
+    expect(refusal(() => readGrtLoad(csrFile()))).toEqual({
+      code: 'rootNotLoad',
+      params: { root: 'GordonsReloadingTool' },
+    })
   })
 })

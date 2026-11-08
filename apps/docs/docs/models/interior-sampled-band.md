@@ -48,7 +48,7 @@ r = p\,(n - 1), \qquad i = \lfloor r \rfloor, \qquad
 y_p = y_{(i+1)} + (r - i)\bigl(y_{(i+2)} - y_{(i+1)}\bigr)
 $$
 
-Code: `packages/ballistics/src/interior/monte-carlo.ts`, `percentile`, `bandOf`.
+Code: `packages/statistics/src/percentile.ts`, `percentile`; `packages/ballistics/src/interior/monte-carlo.ts`, `bandOf`.
 
 With $p$ = 0.05, 0.5 and 0.95 these are the reported `p05`, `p50` and `p95`. The standard error of a percentile of $n$ draws shrinks with $\sqrt n$.
 

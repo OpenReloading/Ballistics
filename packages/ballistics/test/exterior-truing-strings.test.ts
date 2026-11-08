@@ -560,7 +560,7 @@ describe('errors in the options and plans', () => {
     for (const [name, value] of [
       ['maxCondition', Number.NaN],
       ['maxCondition', Infinity],
-      ['maxCondition', 1],
+      ['maxCondition', 0.5],
       ['maxIterations', 0],
       ['maxIterations', Number.NaN],
       ['maxIterations', Infinity],

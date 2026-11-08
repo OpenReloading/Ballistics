@@ -6,8 +6,8 @@ import { chargeTarget, type Operation, operations } from '../compute/operations.
 import { findBullet } from '../compute/resolve.ts'
 import { simulate, simulateQuery } from '../compute/simulate.ts'
 import { stabilityQuery } from '../compute/stability-schema.ts'
+import type { ComputeContext } from '../compute/tasks.ts'
 import { API_PREFIX } from '../version.ts'
-import type { ComputeContext } from './common.ts'
 import { describeAnswers } from './identity.ts'
 
 /**
