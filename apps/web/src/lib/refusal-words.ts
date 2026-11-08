@@ -1,13 +1,12 @@
 /**
- * The words of the typed refusals that statistics, the group statistics of shot-groups and the
- * exterior models of ballistics raise (`InputError` of `@open-reloading/statistics` with an issue):
- * the English sentence of each code, `{name}` where a param stands. The language module loads them
- * once a page has started, outside every page's own JavaScript, for `refusalText` of
- * `core-messages.ts`; `core-message-table.ts` reads them as templates, so `translateMessage` shows a
- * sentence in the language shown. Hit probability and ring scoring word their own issues where they
- * are shown.
+ * The words of the typed refusals that statistics, the group statistics of shot-groups and
+ * ballistics raise (`InputError` of `@open-reloading/statistics` with an issue): the English
+ * sentence of each code, `{name}` where a param stands. The language module loads them once a page
+ * has started, outside every page's own JavaScript, for `refusalText` of `core-messages.ts`;
+ * `core-message-table.ts` reads them as templates, so `translateMessage` shows a sentence in the
+ * language shown. Hit probability and ring scoring word their own issues where they are shown.
  */
-import type { ExteriorIssue } from '@open-reloading/ballistics'
+import type { ExteriorIssue, InteriorIssue } from '@open-reloading/ballistics'
 import type { GroupStatisticsIssue } from '@open-reloading/shot-groups'
 import type { Diagnostic, StatisticsIssue } from '@open-reloading/statistics'
 import { english, type Message, msg } from '../i18n/translate.ts'
@@ -152,6 +151,32 @@ const exteriorWords = {
   ),
 } satisfies Record<ExteriorIssue['code'], Message>
 
+/** The codes interior shares with exterior and statistics take their words there. */
+const interiorWords = {
+  gasVelocityFactorNegative: msg('Gas velocity factor must not be negative.'),
+  muzzleVelocityNegative: msg('Muzzle velocity must not be negative.'),
+  chargeMassNegative: msg('Charge mass must not be negative.'),
+  projectileMassNotPositive: msg('Projectile mass must be positive.'),
+  firearmMassNotPositive: msg('Firearm mass must be positive.'),
+  loadRatioTargetNeedsBulkDensity: msg('the load ratio target needs the bulk density'),
+  bulkDensityNotPositive: msg('bulk density must be above 0'),
+  targetValueNotPositive: msg('target value must be above 0'),
+  ladderLowestChargeNotPositive: msg('ladder charge {charge} kg must be above 0'),
+  ladderAroundNeedsOddCount: msg('a ladder around the charge needs an odd count'),
+  ladderStepCountInvalid: msg('ladder steps must be an integer of at least 1'),
+  ladderStepNotPositive: msg('ladder step must be above 0'),
+  ladderStartNotPositive: msg('ladder start charge must be above 0'),
+  boreResistanceNeedsValues: msg('the bore resistance of the powder needs {missing}'),
+  powderWithoutInteriorModel: msg('the powder has no interior model'),
+  bulletConstructionUnknown: msg('unknown bullet construction {construction}'),
+  barrelNotPositive: msg('barrel {barrel} m must be a positive number'),
+  dynamicVivacityRangeInvalid: msg('dynamic vivacity: need 0 <= from < to <= 1'),
+  dynamicVivacityExponentNotOne: msg('dynamic vivacity: exponent must be 1'),
+} satisfies Record<
+  Exclude<InteriorIssue['code'], ExteriorIssue['code'] | StatisticsIssue['code']>,
+  Message
+>
+
 /** Joins two packages' words; a code both use fails `tsc`, since a refusal carries no package. */
 const disjoint = <L extends object, R extends object>(
   l: L,
@@ -160,14 +185,16 @@ const disjoint = <L extends object, R extends object>(
 
 /** The words of every code. */
 export const refusalWords: Readonly<Record<string, Message>> = disjoint(
-  disjoint(statisticsWords, groupStatisticsWords),
-  exteriorWords,
+  disjoint(disjoint(statisticsWords, groupStatisticsWords), exteriorWords),
+  interiorWords,
 )
+
+/** A param as the sentence shows it: a list joined by commas, a number as JavaScript writes it. */
+const shown = (v: unknown) => (Array.isArray(v) ? v.join(', ') : String(v))
 
 /** The English sentence of a typed refusal; undefined for a code without words. */
 export function refusalSentence({ code, params }: Diagnostic<string, object>): string | undefined {
   const words = Object.hasOwn(refusalWords, code) ? refusalWords[code] : undefined
-  // a number as JavaScript writes it, as the packages wrote their sentences
-  const values = Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)]))
+  const values = Object.fromEntries(Object.entries(params).map(([k, v]) => [k, shown(v)]))
   return words && english.t(words, values)
 }

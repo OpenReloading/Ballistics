@@ -2,8 +2,7 @@ import type { ChargeRange, ChargeTargetKind } from '@open-reloading/ballistics'
 import { formatNumber, plainNumber } from '../i18n/number.ts'
 import { english, type Message, msg, type Say, type Translator } from '../i18n/translate.ts'
 import type { ErrorBody, InteriorResponse } from './api-types.ts'
-import { translateMessage } from './core-messages.ts'
-import { errorText } from './error-text.ts'
+import { refusalText as thrownText, translateMessage } from './core-messages.ts'
 import { interiorFields } from './interior-input.ts'
 import { type UnitSystem, withUnit } from './units.ts'
 
@@ -226,8 +225,7 @@ export function checkedRequest<R extends { bulkDensity?: number | undefined }>(
   try {
     req = loadRequest()
   } catch (err) {
-    const message = errorText(err)
-    return { text: (t) => translateMessage(message, t) }
+    return { text: (t) => translateMessage(thrownText(err), t) }
   }
   if (kind === 'loadRatio' && req.bulkDensity === undefined)
     return { text: (t) => t('The load ratio needs a powder with a bulk density.') }
