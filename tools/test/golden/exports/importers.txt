@@ -1,6 +1,7 @@
 . BuiltEntry
 . BuiltRecords
 . Candidate
+. ChronoDiagnostic
 . ChronoFormat
 . ChronoFormatId
 . ChronoImport
@@ -21,6 +22,7 @@
 . PressureHistoryOptions
 . PressureUnit
 . ReaderDiagnostic
+. ReaderError
 . RowCounts
 . RowIssue
 . SensorPosition
