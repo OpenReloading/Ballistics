@@ -1,22 +1,4 @@
-/**
- * The measured check of the propellant-temperature energy term
- * (`apps/docs/docs/research/propellant-temperature-energy.md`), run by the owner on rows that are
- * not in the repository. It prints aggregates only: no record id, row, charge or temperature.
- *
- *   pnpm run build
- *   node packages/cli/scripts/temperature-energy.mts --rows <rows.csv|folder> [--records <dir>]
- *
- * Rows are the CLI's (`apps/docs/docs/cli.md`, Rows) with `temperature_c` on every row. A ladder is
- * the rows of one powder, cartridge, bullet, barrel, COAL and rifle. Per ladder and span, fit (A)
- * the current model with the burn rate and the shared temperature factor free, and (B) the same
- * with the energy coefficient fixed at 0.0003 1/K, then predict the held-out rows:
- * - interpolating: fit on the coldest and the hottest temperature (at least 20 K apart), hold out
- *   the temperatures between;
- * - extrapolating: hold out the hottest temperature, fit on the temperatures at least 20 K colder
- *   (two or more).
- * Rule of the issue (#367): the term is supported when (B) has a pooled RMS at least 15 % lower
- * than (A) for velocity (m/s) and for pressure (%) at both spans.
- */
+// The measured check of apps/docs/docs/research/propellant-temperature-energy.md; it prints aggregates only
 import { parseArgs } from 'node:util'
 import {
   fitPowder,

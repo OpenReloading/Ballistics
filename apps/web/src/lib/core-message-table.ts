@@ -3,19 +3,7 @@ import table from './core-message-table.json' with { type: 'json' }
 import { setCoreMessages } from './core-messages.ts'
 import { refusalWords } from './refusal-words.ts'
 
-/**
- * Messages of the packages, the API and the app's own request code, in the language shown.
- *
- * They are English text: some packages raise `InputError`s with free text and the API passes it on,
- * and the app writes a typed refusal in its English sentence (`refusal-words.ts`), so a message is
- * known by its template, the English text with `{name}` where a value stands.
- * A template is matched against the whole text, the values are taken from the match and the
- * German sentence is filled with them. A text that no template matches is shown as it is.
- * A message stays English in state, links and files; it is translated where it is shown.
- *
- * This table is large and English pages never read it: the language module loads it when a
- * language other than English is chosen and `installCoreMessages` hands it to `translateMessage`.
- */
+// Package and API message templates (apps/docs/docs/translating.md); only a non-English language loads them
 
 /** The `code` of a warning of an interior answer (`Warning['code']` of the API). */
 export type WarningCode =

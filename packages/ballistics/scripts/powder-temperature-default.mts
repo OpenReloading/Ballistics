@@ -1,21 +1,4 @@
-/**
- * Derivation of the default hot burn-rate sensitivity of extruded and flake powders
- * (`apps/docs/docs/research/powder-temperature-default.md`). Stand-in loads only: simulations, not
- * load data. Run from the repository root, after `pnpm install`:
- *
- *   node packages/ballistics/scripts/powder-temperature-default.mts
- *
- * Input: the velocities at 70 and 125 °F of the 17 powders outside the Extreme line in Hodgdon
- * Powder Co., "Extreme Rifle Powders, test results for temperature sensitivity", 13 July 2012
- * (bibliography: hodgdon-2012), maker data, shots and lots not stated. The grain form of each
- * powder is the maker's line: Win 748, AA 2520 and AA 2460 are ball powders, the others extruded.
- *
- * Method: three stand-in rifle loads of a seven-perforated grain behind 10.9 g (charges 2.4, 2.8
- * and 3.2 g), each with the burn coefficient set so it peaks at 380 MPa at 294.15 K. For each powder
- * the sensitivity sigma (same on both sides) is found by bisection so that the load at +30.56 K
- * (55 °F) changes its muzzle velocity as the powder did. Printed: mean and sample standard
- * deviation of sigma over the 14 extruded powders and over all 17, per load.
- */
+// The derivation of apps/docs/docs/research/powder-temperature-default.md, which states its input and method
 import { type InteriorLoad, interior } from '../src/index.ts'
 
 const rows: readonly [string, 'ball' | 'extruded', number, number][] = [
