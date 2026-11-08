@@ -145,15 +145,6 @@
       "the highest peak (trace {high}) is {ratio} times the lowest (trace {low}), below {limit}"
     ],
     "ladders": ["ladder charge {n} g must be above 0", "Too big: expected number to be <={n}"],
-    "load file values": [
-      "Enter a number for {label}.",
-      "{label} must be at least 0.",
-      "Burn form: {list} needed with the others, or leave all four empty.",
-      "Enter a number.",
-      "Must be above 0.",
-      "Must be at least 0.",
-      "Needed with the other engraving value, or from a powder record."
-    ],
     "advisory registry": [
       "The simulated peak pressure is above a CIP maximum pressure of the cartridge.",
       "The cartridge has no CIP Pmax measured by transducer or piezo.",

@@ -35,7 +35,7 @@ const own = translator(
     'truing: {reason} ({detail})': 'Truing: {reason} ({detail})',
     apex: 'Scheitel',
     'zero range {range} m not reached ({stop})': 'Fleck {range} m verfehlt ({stop})',
-    'Enter a number for {label}.': 'Zahl für {label}.',
+    'Enter a number for {field}.': 'Zahl für {field}.',
     Pressure: 'Druck',
     'ladder charge {charge} kg must be above 0': 'Ladung {charge} kg zu klein',
     'bullet {id} has no length': 'Geschoss {id} ohne Länge',
@@ -364,13 +364,8 @@ const dynamicArguments: { file: string; arg: string; reason: string }[] = [
   },
   {
     file: 'ballistics/src/interior/load-file.ts',
-    arg: "key === 'engravingLength' ? 'Must be above 0.' : 'Must be at least 0.'",
-    reason: 'a choice of two sentences: each has its own template',
-  },
-  {
-    file: 'ballistics/src/interior/load-file.ts',
     arg: 'needed',
-    reason: 'the sentence is a variable with its own template',
+    reason: 'a typed issue held in a const: `refusal-words.ts` words its code',
   },
   {
     file: 'use-cases/src/limits.ts',
@@ -385,7 +380,7 @@ const dynamicArguments: { file: string; arg: string; reason: string }[] = [
   {
     file: 'use-cases/src/load-file.ts',
     arg: 'error.message',
-    reason: 'the text of a `ValueError`: has its own template',
+    reason: 'the code of a `ValueError`: `refusal-words.ts` words it',
   },
 ]
 
@@ -489,7 +484,7 @@ function scan(sample: string): Found[] {
       const where = `${file}:${src.slice(0, match.index).split('\n').length}`
       const arg = messageOf(src, match)
       // a typed issue: `refusal-words.ts` words its code
-      if (arg?.includes("code: '")) continue
+      if (arg?.includes('code:')) continue
       const text = arg === undefined ? undefined : literalText(arg, sample)
       if (text !== undefined) found.push({ where, text })
       else if (
@@ -512,7 +507,6 @@ describe('the messages of the packages', () => {
   it('reads the sources', () => {
     const texts = scan('7').map((f) => f.text)
     expect(texts.length).toBeGreaterThan(20)
-    expect(texts).toContain('Enter a number.')
     expect(texts).toContain('ladder charge 7 g must be above 0')
     expect(texts).toContain('Unknown field')
   })

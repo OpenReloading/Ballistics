@@ -396,10 +396,9 @@ export function interiorBody(
   grooveDiameter?: number | undefined,
   pressureLimit?: number | undefined,
 ): InteriorBody {
-  const label = (key: string) => interiorFields.find((s) => s.key === key)?.label ?? key
   return {
     model: 'm3',
-    load: interiorLoad(values, label, grooveDiameter),
+    load: interiorLoad(values, grooveDiameter),
     ...(cartridge && { cartridge }),
     ...(pressureLimit !== undefined && { pressureLimit }),
   }
