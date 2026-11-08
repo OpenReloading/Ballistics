@@ -14,6 +14,7 @@ import {
   stringLadder,
 } from '@open-reloading/ballistics'
 import { InputError } from '@open-reloading/statistics'
+import { refusalText } from './core-messages.ts'
 import { nth } from './nth.ts'
 import type {
   HandPoint,
@@ -22,7 +23,6 @@ import type {
   PowderHandReply,
   PowderHandRequest,
 } from './powder-fit.ts'
-import { refusalErrorText } from './refusal-words.ts'
 
 /** Charges of the band: the ladder's range widened by 10 % each way, in 25 steps. */
 export function bandCharges({ min, max }: PowderFit['chargeRange'], n = 25) {
@@ -106,7 +106,7 @@ export function answerPowderFit(q: PowderFitRequest, post: (r: PowderFitReply) =
     post(
       err instanceof PowderFitError
         ? { kind: 'refused', id, reason: err.reason, charge: err.charge }
-        : { kind: 'error', id, message: refusalErrorText(err) },
+        : { kind: 'error', id, message: refusalText(err) },
     )
   }
 }

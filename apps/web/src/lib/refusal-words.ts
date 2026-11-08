@@ -7,9 +7,8 @@
  * their own issues where they are shown.
  */
 import type { GroupStatisticsIssue } from '@open-reloading/shot-groups'
-import { type Diagnostic, InputError, type StatisticsIssue } from '@open-reloading/statistics'
+import type { Diagnostic, StatisticsIssue } from '@open-reloading/statistics'
 import { english, type Message, msg } from '../i18n/translate.ts'
-import { errorText } from './error-text.ts'
 
 const statisticsWords = {
   probabilityOutsideUnit: msg('probability must lie in (0, 1)'),
@@ -33,18 +32,22 @@ const groupStatisticsWords = {
   coverage: msg('coverage must lie in (0, 1)'),
 } satisfies Record<GroupStatisticsIssue['code'], Message>
 
+/** Joins two packages' words; a code both use fails `tsc`, since a refusal carries no package. */
+const disjoint = <L extends object, R extends object>(
+  l: L,
+  r: R & { [K in keyof L & keyof R]: never },
+) => ({ ...l, ...r })
+
 /** The words of every code. */
-export const refusalWords: Readonly<Record<string, Message>> = {
-  ...statisticsWords,
-  ...groupStatisticsWords,
-}
+export const refusalWords: Readonly<Record<string, Message>> = disjoint(
+  statisticsWords,
+  groupStatisticsWords,
+)
 
 /** The English sentence of a typed refusal; undefined for a code without words. */
-export function refusalSentence({ code }: Diagnostic<string, object>): string | undefined {
+export function refusalSentence({ code, params }: Diagnostic<string, object>): string | undefined {
   const words = Object.hasOwn(refusalWords, code) ? refusalWords[code] : undefined
-  return words && english.t(words)
+  // a number as JavaScript writes it, as the packages wrote their sentences
+  const values = Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)]))
+  return words && english.t(words, values)
 }
-
-/** The message of a thrown value, with a typed refusal as its English sentence: for a worker, which has the words at once. */
-export const refusalErrorText = (e: unknown): string =>
-  (e instanceof InputError && e.issue && refusalSentence(e.issue)) || errorText(e)
