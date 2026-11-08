@@ -325,13 +325,13 @@ describe('statusText', () => {
   })
 
   it('writes a stored text and prefix in the language shown now', () => {
-    const german = translator(de as Catalogue, 'de')
+    const own = translator({ 'Simulation done. ': 'Fertig. ', Simulating: 'Läuft' }, 'de')
     const done = { prefix: (t: Translator['t']) => t('Simulation done. ') }
     expect(statusText(done, 'Peak 4 bar.', english.t)).toBe('Simulation done. Peak 4 bar.')
-    expect(statusText(done, 'Peak 4 bar.', german.t)).toBe('Simulation abgeschlossen. Peak 4 bar.')
+    expect(statusText(done, 'Peak 4 bar.', own.t)).toBe('Fertig. Peak 4 bar.')
     const running = { say: (t: Translator['t']) => t('Simulating') }
     expect(statusText(running, undefined, english.t)).toBe('Simulating')
-    expect(statusText(running, undefined, german.t)).toBe('Simulation läuft')
+    expect(statusText(running, undefined, own.t)).toBe('Läuft')
   })
 
   it('shows another status as it is, and no result status without a result', () => {
