@@ -1,9 +1,9 @@
 import { z } from 'zod'
 import type { Exact } from './exact.ts'
 import { disciplineCategory } from './federation.ts'
+import { positiveLength } from './fields.ts'
 import { recordId } from './ids.ts'
 import { provenance } from './provenance.ts'
-import { positiveLength } from './shared.ts'
 import { type QuantitySchema, quantity } from './units.ts'
 
 const faceColourParser = z.enum([

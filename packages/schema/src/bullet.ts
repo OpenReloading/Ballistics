@@ -1,8 +1,9 @@
 import { z } from 'zod'
+import { needsCountrySource } from './country-source.ts'
 import type { Exact } from './exact.ts'
+import { countryCode } from './fields.ts'
 import { recordId } from './ids.ts'
 import { provenance } from './provenance.ts'
-import { countryCode, needsCountrySource } from './shared.ts'
 import { type QuantitySchema, quantity } from './units.ts'
 
 const ballisticCoefficientParser = z.object({

@@ -1,4 +1,5 @@
 import type { Workbook } from './cells.ts'
+import { type ChronoDiagnostic, refuse } from './diagnostics.ts'
 import { buildChronoImport, type ChronoImport, type ChronoParserOptions } from './result.ts'
 import { readShotRows, workbookFooterStarts } from './shot-rows.ts'
 import { warnStatistics } from './statistics.ts'
@@ -81,10 +82,8 @@ export function parseShotView(text: string, options: ChronoParserOptions = {}): 
   const lines = splitLines(text)
   const h = shotViewHeaderIndex(lines)
   const headerLine = lines[h]
-  if (headerLine === undefined) {
-    throw new Error('not a ShotView CSV: no "#" header row with a velocity unit')
-  }
-  const warnings: string[] = []
+  if (headerLine === undefined) refuse('notShotView')
+  const warnings: ChronoDiagnostic[] = []
   const unitText = bracketed(splitDelimited(headerLine)[1] ?? '')
   const unit = resolveUnit(unitText, options, warnings)
 
@@ -115,22 +114,25 @@ export function parseShotView(text: string, options: ChronoParserOptions = {}): 
 }
 
 /** The date row follows the last `-` row; its label depends on the phone's language. */
-function dateFromFooter(footer: string[][], warnings: string[]): string | undefined {
+function dateFromFooter(footer: string[][], warnings: ChronoDiagnostic[]): string | undefined {
   const dash = footer.findLastIndex((cells) => cells[0] === '-')
   const text = dash < 0 ? undefined : footer[dash + 1]?.[1]
   if (!text) return undefined
   const date = footerDate(text)
-  if (!date) warnings.push(`footer date "${text}" is not recognised; enter the date`)
+  if (!date) warnings.push({ code: 'footerDateUnknown', params: { text } })
   return date
 }
 
-/** Footer statistics against the shots, as warnings; `prefix` names the worksheet. */
-function checkFooter(footer: string[][], values: number[], warnings: string[], prefix = ''): void {
-  const notFound = `${prefix}footer statistics`
+/** Footer statistics against the shots, as warnings; `at` names the worksheet. */
+function checkFooter(
+  footer: string[][],
+  values: number[],
+  warnings: ChronoDiagnostic[],
+  at: { worksheet?: number } = {},
+): void {
   warnStatistics({ rows: footer, rowLabels: footerLabels, readNumber: parseNumber }, values, {
     warnings,
-    prefix: `${prefix}footer `,
-    notFound,
+    at,
   })
 }
 
@@ -141,22 +143,22 @@ const dateLabels = ['DATE', 'DATUM']
  * row. The date row is found by its label, the first cell above the header.
  */
 export function parseShotViewWorkbook(book: Workbook, options: WorkbookOptions = {}): ChronoImport {
-  const warnings: string[] = []
+  const warnings: ChronoDiagnostic[] = []
   const found: FoundWorksheet[] = []
   book.worksheets.forEach((sheet, k) => {
     const n = k + 1
     const h = sheet.rows.findIndex(isShotViewHeader)
     const headerCells = sheet.rows[h]
     if (headerCells === undefined) {
-      warnings.push(`worksheet ${n}: no ShotView header row; skipped`)
+      warnings.push({ code: 'noShotViewHeader', params: { worksheet: n } })
       return
     }
     const after = sheet.rows.slice(h + 1)
     const dateRow = after.find((cells) => dateLabels.includes((cells[0] ?? '').toUpperCase()))
     const date = footerDate(dateRow?.[1] ?? '')
-    const dateWarning = !dateRow
-      ? `worksheet ${n}: footer date row not found; enter the date`
-      : `worksheet ${n}: footer date "${dateRow[1] ?? ''}" is not recognised; enter the date`
+    const dateWarning: ChronoDiagnostic = !dateRow
+      ? { code: 'footerDateMissing', params: { worksheet: n } }
+      : { code: 'footerDateUnknown', params: { worksheet: n, text: dateRow[1] ?? '' } }
     found.push({
       position: n,
       ...(date ? { date } : { dateWarning }),
@@ -165,7 +167,7 @@ export function parseShotViewWorkbook(book: Workbook, options: WorkbookOptions =
         const unit = resolveUnit(unitText, options, sheetWarnings)
         const r = readShotRows(after, unitText, unit, workbookFooterStarts)
         if (r.shots.length === 0) return undefined
-        checkFooter(r.footer, r.values, sheetWarnings, `worksheet ${n}: `)
+        checkFooter(r.footer, r.values, sheetWarnings, { worksheet: n })
         const label = sheet.rows.slice(0, h).flat().find(Boolean) || sheet.name
         return { shots: r.shots, flags: r.flags, label }
       },

@@ -5,6 +5,7 @@
 ```ts
 
 import { conversions } from '@open-reloading/units';
+import type { Diagnostic } from '@open-reloading/statistics';
 import { QuantityKind } from '@open-reloading/units';
 import { SiMap } from '@open-reloading/units';
 import { siMaps } from '@open-reloading/units';
@@ -386,6 +387,15 @@ export interface CatalogueSession extends ChronoSession {
 export const catalogueSession: z.ZodType<CatalogueSession>;
 
 // @public
+export function checkedUserDataFileText(records: UserRecords, files?: EmbeddedFile[], invalid?: unknown[]): {
+    ok: true;
+    text: string;
+} | {
+    ok: false;
+    diagnostic: UserDataDiagnostic;
+};
+
+// @public
 export function checkUserRefs(records: UserRecords): DanglingRef[];
 
 // @public
@@ -645,6 +655,16 @@ export const eventType: z.ZodObject<{
     movingTargets: z.ZodOptional<z.ZodBoolean>;
     provenance: typeof provenance;
 }, z.core.$strict>;
+
+// @public
+export function exportAllFileText(records: UserRecords, files?: EmbeddedFile[], invalid?: unknown[]): {
+    ok: true;
+    text: string;
+    left: string[];
+} | {
+    ok: false;
+    diagnostic: UserDataDiagnostic;
+};
 
 // @public
 export const faceColour: z.ZodEnum<z.core.util.ToEnum<'black' | 'white' | 'grey' | 'red' | 'orange' | 'yellow' | 'green' | 'blue' | 'brown'>>;
@@ -940,6 +960,12 @@ export const manufacturer: z.ZodObject<{
 export type MappingKey = Pick<TargetMapping, 'id' | 'face'> & {
     discipline: DisciplineKey;
 };
+
+// @public
+export const maxShareLinkChars = 8000;
+
+// @public
+export const maxUserDataBytes = 40000000;
 
 // @public
 export const ogiveForms: z.ZodEnum<z.core.util.ToEnum<'tangent' | 'secant' | 'hybrid' | 'round-nose' | 'flat-nose'>>;
@@ -1341,6 +1367,12 @@ export const rangeFirings: z.ZodObject<{
 }>;
 
 // @public
+export function readShareLink(hash: string): Promise<ShareLinkRead | undefined>;
+
+// @public
+export function readUserDataFile(text: string): UserDataRead;
+
+// @public
 export const recordId: z.ZodString;
 
 // @public
@@ -1401,6 +1433,20 @@ export const sessionSnapshot: z.ZodObject<{
     roundCount: z.ZodOptional<z.ZodInt>;
     dismissed: z.ZodOptional<z.ZodArray<z.ZodString>>;
 }, z.core.$strict>;
+
+// @public
+export type ShareLinkDiagnostic = Diagnostic<'damagedLink'> | Diagnostic<'longLink', {
+    maxChars: number;
+}>;
+
+// @public
+export function shareLinkOf(records: UserRecords, page: string): Promise<string | undefined>;
+
+// @public
+export type ShareLinkRead = UserDataRead | {
+    ok: false;
+    diagnostic: ShareLinkDiagnostic;
+};
 
 // @public
 export const sheetId: (c: Pick<Cartridge, 'id' | 'published' | 'revised'>) => string;
@@ -1844,6 +1890,19 @@ export type UserCaseRecord = Extract<UserRecord, {
 }>;
 
 // @public
+export type UserDataDiagnostic = Diagnostic<'tooLarge', {
+    maxBytes: number;
+}> | Diagnostic<'notJson'> | Diagnostic<'notDataFile'> | Diagnostic<'otherVersion', {
+    version: unknown;
+    readVersion: number;
+}>
+/** The first issues of the records the schema refuses, and how many more there are. */
+| Diagnostic<'invalidRecords', {
+    issues: z.core.$ZodIssue[];
+    more: number;
+}>;
+
+// @public
 export const userDataFile: z.ZodObject<{
     format: z.ZodLiteral<typeof userDataFormat>;
     version: z.ZodLiteral<typeof userDataVersion>;
@@ -1852,7 +1911,22 @@ export const userDataFile: z.ZodObject<{
 }>;
 
 // @public
+export const userDataFileText: (records: UserRecords, files?: EmbeddedFile[], invalid?: unknown[]) => string;
+
+// @public
 export const userDataFormat = "openreloading-user-data";
+
+// @public
+export type UserDataRead = {
+    ok: true;
+    records: UserRecords;
+    files?: EmbeddedFile[] | undefined;
+    invalid?: unknown[];
+    skipped?: SkippedKind[];
+} | {
+    ok: false;
+    diagnostic: UserDataDiagnostic;
+};
 
 // @public
 export const userDataVersion = 1;

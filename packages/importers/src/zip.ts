@@ -1,6 +1,10 @@
 // ZIP container reading for XLSX workbooks: PKWARE APPNOTE.TXT 6.3.10,
 // https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT (section numbers below refer to it).
+import { type FileDiagnostic, refuseFile } from './diagnostics.ts'
 import { maxPartSize, maxTotalSize } from './limits.ts'
+
+/** Refuses a part with `code`, its name added to the params. */
+type Refuse = (code: FileDiagnostic['code'], params?: FileDiagnostic['params']) => never
 
 /**
  * Raw DEFLATE data (RFC 1951) to bytes. It may stop once the output exceeds `size`; the reader
@@ -64,10 +68,6 @@ export const inflateRaw: Inflate = async (data, size) => {
   return out
 }
 
-const fail = (message: string): never => {
-  throw new Error(`not an XLSX workbook: ${message}`)
-}
-
 /** The position of the end of central directory record (4.3.16), or -1. */
 function findEnd(bytes: Uint8Array, view: DataView): number {
   // 22 bytes plus a comment of up to 65535 bytes
@@ -89,10 +89,10 @@ function readHeader(
   p: number,
   end: number,
 ): { entry: ZipEntry; next: number } {
-  if (p + 46 > end || view.getUint32(p, true) !== 0x02014b50) fail('central directory is malformed')
+  if (p + 46 > end || view.getUint32(p, true) !== 0x02014b50) refuseFile('zipDirectoryMalformed')
   const nameLength = view.getUint16(p + 28, true)
   const next = p + 46 + nameLength + view.getUint16(p + 30, true) + view.getUint16(p + 32, true)
-  if (next > end) fail('central directory is malformed')
+  if (next > end) refuseFile('zipDirectoryMalformed')
   // shortcut: names read as Latin-1, exact for the ASCII part names of XLSX; upgrade if a needed part name is not ASCII
   const name = String.fromCharCode(...bytes.subarray(p + 46, p + 46 + nameLength))
   const entry: ZipEntry = {
@@ -114,12 +114,12 @@ function addEntry(entries: Map<string, ZipEntry>, entry: ZipEntry): void {
     entry.size === 0xffffffff ||
     entry.offset === 0xffffffff
   ) {
-    fail('ZIP64 archives are not read')
+    refuseFile('zip64')
   }
   const key = entry.name.toLowerCase()
   const other = entries.get(key)
-  if (other?.name === entry.name) throw new Error(`XLSX part ${entry.name} appears twice`)
-  if (other) throw new Error(`XLSX parts ${other.name} and ${entry.name} differ only in case`)
+  if (other?.name === entry.name) refuseFile('partTwice', { name: entry.name })
+  if (other) refuseFile('partsDifferInCase', { name: entry.name, other: other.name })
   entries.set(key, entry)
 }
 
@@ -130,7 +130,7 @@ function addEntry(entries: Map<string, ZipEntry>, entry: ZipEntry): void {
 export function zipEntries(bytes: Uint8Array): Map<string, ZipEntry> {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
   const end = findEnd(bytes, view)
-  if (end < 0) fail('no ZIP end of central directory record')
+  if (end < 0) refuseFile('zipNoEnd')
   const { total, directoryOffset } = centralDirectory(view, end)
   const entries = new Map<string, ZipEntry>()
   let p = directoryOffset
@@ -154,10 +154,10 @@ function centralDirectory(view: DataView, end: number): { total: number; directo
   const directorySize = view.getUint32(end + 12, true)
   const directoryOffset = view.getUint32(end + 16, true)
   if (total === 0xffff || directorySize === 0xffffffff || directoryOffset === 0xffffffff) {
-    fail('ZIP64 archives are not read')
+    refuseFile('zip64')
   }
-  if (disk !== 0 || directoryDisk !== 0 || onDisk !== total) fail('split archives are not read')
-  if (directoryOffset + directorySize > end) fail('central directory lies outside the file')
+  if (disk !== 0 || directoryDisk !== 0 || onDisk !== total) refuseFile('zipSplit')
+  if (directoryOffset + directorySize > end) refuseFile('zipDirectoryOutside')
   return { total, directoryOffset }
 }
 
@@ -166,40 +166,30 @@ function spendDeclared(
   entry: ZipEntry,
   budget: { left: number },
   limit: number,
-  part: (message: string) => Error,
+  part: Refuse,
 ): void {
-  if (entry.flags & 1) throw part('encrypted entries are not read')
-  if (entry.method !== 0 && entry.method !== 8) {
-    throw part(`compression method ${entry.method} is not read`)
-  }
-  if (entry.size > limit) throw part(`declares ${entry.size} bytes; the limit is ${limit}`)
-  if (entry.size > budget.left) {
-    throw new Error(`XLSX parts declare more than ${maxTotalSize} bytes in total`)
-  }
+  if (entry.flags & 1) part('partEncrypted')
+  if (entry.method !== 0 && entry.method !== 8) part('partMethod', { method: entry.method })
+  if (entry.size > limit) part('partTooLarge', { size: entry.size, limit })
+  if (entry.size > budget.left) refuseFile('partsTooLarge', { max: maxTotalSize })
   budget.left -= entry.size
   // assumed bound, not a cited one: literal-only fixed Huffman blocks code a byte in at most 9
   // bits (RFC 1951 3.2.6); the margin keeps a too-small declared size refused as an overrun below
   const maxCompressed = entry.size + (entry.size >>> 3) + 65536
   if (entry.method === 8 && entry.compressedSize > maxCompressed) {
-    throw part(`compressed size ${entry.compressedSize} is more than ${entry.size} bytes can take`)
+    part('partCompressedTooLarge', { compressed: entry.compressedSize, size: entry.size })
   }
 }
 
 /** The compressed data of an entry, located through its local header. */
-function entryData(
-  bytes: Uint8Array,
-  entry: ZipEntry,
-  part: (message: string) => Error,
-): Uint8Array<ArrayBuffer> {
+function entryData(bytes: Uint8Array, entry: ZipEntry, part: Refuse): Uint8Array<ArrayBuffer> {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
   // local header (4.3.7): only its name and extra field lengths locate the data; sizes come
   // from the central directory, since a data descriptor (4.3.9) leaves them zero here
   const at = entry.offset
-  if (at + 30 > bytes.length || view.getUint32(at, true) !== 0x04034b50) {
-    throw part('local header not found')
-  }
+  if (at + 30 > bytes.length || view.getUint32(at, true) !== 0x04034b50) part('partNoLocalHeader')
   const start = at + 30 + view.getUint16(at + 26, true) + view.getUint16(at + 28, true)
-  if (start + entry.compressedSize > bytes.length) throw part('data lies outside the file')
+  if (start + entry.compressedSize > bytes.length) part('partDataOutside')
   return bytes.slice(start, start + entry.compressedSize)
 }
 
@@ -220,27 +210,23 @@ export async function readEntry(
   budget: { left: number },
   limit: number = maxPartSize,
 ): Promise<Uint8Array<ArrayBuffer>> {
-  const part = (message: string) => new Error(`XLSX part ${entry.name}: ${message}`)
+  const part: Refuse = (code, params = {}) => refuseFile(code, { ...params, part: entry.name })
   spendDeclared(entry, budget, limit, part)
   const data = entryData(bytes, entry, part)
   let out: Uint8Array<ArrayBuffer>
   if (entry.method === 0) {
-    if (entry.compressedSize !== entry.size) {
-      throw part(`stored size ${entry.compressedSize} differs from the declared ${entry.size}`)
-    }
+    if (entry.compressedSize !== entry.size)
+      part('partStoredSize', { stored: entry.compressedSize, size: entry.size })
     out = data
   } else {
     try {
       out = await inflate(data, entry.size)
     } catch {
-      throw part('deflate data is corrupt or truncated')
+      return part('partCorrupt')
     }
-    if (out.length > entry.size)
-      throw part(`inflates to more than the declared ${entry.size} bytes`)
-    if (out.length < entry.size) {
-      throw part(`inflates to ${out.length} bytes, not the declared ${entry.size}`)
-    }
+    if (out.length > entry.size) part('partInflatesMore', { size: entry.size })
+    if (out.length < entry.size) part('partInflatesLess', { length: out.length, size: entry.size })
   }
-  if (crc32(out) !== entry.crc) throw part('CRC-32 mismatch')
+  if (crc32(out) !== entry.crc) part('partCrc')
   return out
 }

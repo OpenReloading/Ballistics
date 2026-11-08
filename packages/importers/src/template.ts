@@ -1,4 +1,5 @@
 // The OpenReloading CSV template: delimited text whose first row names the columns.
+import { refuse } from './diagnostics.ts'
 import {
   type ColumnMap,
   type Delimiter,
@@ -42,11 +43,7 @@ export function isOpenReloadingCsv(text: string): boolean {
  */
 export function parseOpenReloadingCsv(text: string, options: TemplateOptions = {}): ChronoImport {
   const h = templateHeader(text)
-  if (!h) {
-    throw new Error(
-      `not an OpenReloading CSV template: the first row must name columns from ${templateNames.join(', ')}, velocity among them`,
-    )
-  }
+  if (!h) refuse('notTemplate', { columns: templateNames })
   const columns: ColumnMap = { velocity: 'velocity' }
   for (const n of h.names) columns[n] = n
   return parseDelimitedRows(

@@ -1,9 +1,13 @@
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 import {
   extract,
   messages,
   problems,
   safeWordingProblems,
+  tableMessages,
   termUseProblems,
 } from '../scripts/i18n.mts'
 
@@ -59,9 +63,12 @@ describe('the catalogue lint', () => {
       Busy: 'Busy',
     }
     expect(
-      problems(['Value {n}', 'Missing', '{count} row|{count} rows', 'Busy'], catalogue, 'de', [
-        'Busy',
-      ]),
+      problems(
+        ['Value {n}', 'Missing', 'Shown in English', '{count} row|{count} rows', 'Busy'],
+        catalogue,
+        'de',
+        ['Busy', 'Missing'],
+      ),
     ).toEqual([
       'untranslated: Missing',
       'no message has this key: Stray',
@@ -116,5 +123,36 @@ describe('the catalogue lint', () => {
       'says safe without approval: A safe load',
       'says "sicher" other than "safe" 1 times: Safety notice',
     ])
+  })
+
+  it('counts the warning sentences that core-message-table.ts marks as texts of the table', () => {
+    const root = mkdtempSync(path.join(tmpdir(), 'i18n-'))
+    try {
+      mkdirSync(path.join(root, 'src/lib'), { recursive: true })
+      writeFileSync(
+        path.join(root, 'src/lib/core-message-table.json'),
+        JSON.stringify({ codes: ['busy'], templates: { truing: ['range {n}'] } }),
+      )
+      writeFileSync(
+        path.join(root, 'src/lib/core-message-table.ts'),
+        "import { msg } from '../i18n/translate.ts'\nexport const w = [msg('A seeded warning.')]\n",
+      )
+      const table = tableMessages(root)
+      expect(table).toEqual(['busy', 'range {n}', 'A seeded warning.'])
+      expect(
+        problems(
+          table,
+          {
+            busy: 'besetzt',
+            'range {n}': 'Entfernung {n}',
+            'A seeded warning.': 'A seeded warning.',
+          },
+          'de',
+          table,
+        ),
+      ).toEqual(['left English: A seeded warning.'])
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
   })
 })

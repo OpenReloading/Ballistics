@@ -4,6 +4,7 @@
 // same rows of cell text as XLSX workbooks.
 import { type CellBudget, clean, placeCell, type Workbook, type Worksheet } from './cells.ts'
 import { compoundStreams } from './cfb.ts'
+import { locatedError, ReaderError } from './diagnostics.ts'
 import { maxCellCharacters, maxCells, maxPartSize } from './limits.ts'
 import { errorMessage } from './text.ts'
 
@@ -294,7 +295,7 @@ function put(st: SheetState, row: number, col: number, text: string): void {
   }
   placeCell(
     cells,
-    { column: col + 1, text, name: () => `${letters(col + 1)}${row + 1}` },
+    { column: col + 1, text, at: () => ({ cell: `${letters(col + 1)}${row + 1}` }) },
     st.remaining,
   )
 }
@@ -503,6 +504,7 @@ function assembleWorksheets(
       worksheets.push({ name: sheet.name, rows })
       ranges.push([sheet.position, end])
     } catch (e) {
+      if (e instanceof ReaderError) throw locatedError(e, { worksheet: n })
       const message = errorMessage(e)
       throw new Error(message.startsWith('XLS ') ? message : `XLS worksheet ${n}: ${message}`, {
         cause: e,

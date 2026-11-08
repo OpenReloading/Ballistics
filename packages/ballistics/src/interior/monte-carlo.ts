@@ -5,7 +5,7 @@
  * It covers input tolerances only, not model error.
  */
 
-import { normalsFrom, nth, seededUniforms } from '@open-reloading/statistics'
+import { normalsFrom, percentile, seededUniforms } from '@open-reloading/statistics'
 import type { Settings } from '../settings.ts'
 import { type InteriorLoad, type InteriorOptions, interior } from './model.ts'
 import {
@@ -69,14 +69,6 @@ export interface SampledBand {
   pressure?: Percentiles
   /** Muzzle velocity, m/s; with status `sampled`. */
   velocity?: Percentiles
-}
-
-/** Percentile `q` (0 to 1) of ascending `sorted` by linear interpolation between the closest ranks. */
-function percentile(sorted: number[], q: number) {
-  const rank = q * (sorted.length - 1)
-  const i = Math.floor(rank)
-  const low = nth(sorted, i)
-  return low + (rank - i) * ((sorted[i + 1] ?? low) - low)
 }
 
 const bandOf = (values: number[]): Percentiles => {

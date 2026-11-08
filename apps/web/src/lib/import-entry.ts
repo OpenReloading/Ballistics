@@ -7,6 +7,7 @@ import {
   fieldSpecs,
   isWorkbook,
   type KindScore,
+  ReaderError,
   type RowCounts,
   type RowIssue,
   readTable,
@@ -22,6 +23,7 @@ import {
 import { type UserRecord, type UserRecordKind, userRecord } from '@open-reloading/schema'
 import { recordOf } from './candidates.ts'
 import { storageName } from './edition.ts'
+import { readerErrorText } from './file-diagnostics.ts'
 import type { InvalidRecordDiagnostic } from './import-diagnostics.ts'
 import { type LoadFileFormat, loadFileFormats, loadFormatOf } from './load-file-formats.ts'
 import { type InvalidRecord, maxFileBytes, planImport, type WordedWarning } from './user-data.ts'
@@ -153,7 +155,7 @@ async function workbookTable(bytes: Uint8Array): Promise<FileRead> {
   } catch (e) {
     return {
       refusal: 'The workbook cannot be read. Save it again as XLSX or CSV.',
-      detail: e instanceof Error ? e.message : String(e),
+      detail: readerErrorText(e),
     }
   }
   let first: string | undefined
@@ -170,10 +172,8 @@ async function workbookTable(bytes: Uint8Array): Promise<FileRead> {
 }
 
 /** `decodeText`'s two reasons as refusals that end with the action. */
-const textRefusals: Record<string, string> = {
-  'UTF-16 text with an odd number of bytes':
-    'UTF-16 text with an odd number of bytes; save it as UTF-8 (CSV UTF-8) and import again.',
-}
+const oddBytes =
+  'UTF-16 text with an odd number of bytes; save it as UTF-8 (CSV UTF-8) and import again.'
 const notText =
   'The file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again.'
 
@@ -201,7 +201,8 @@ async function readFile(bytes: Uint8Array, formats: LoadFileFormat[]): Promise<F
   try {
     text = decodeText(bytes)
   } catch (e) {
-    return { refusal: textRefusals[e instanceof Error ? e.message : ''] ?? notText }
+    const odd = e instanceof ReaderError && e.diagnostic.code === 'utf16OddBytes'
+    return { refusal: odd ? oddBytes : notText }
   }
   return readTable(text.replace(/^\uFEFF/, ''))
 }

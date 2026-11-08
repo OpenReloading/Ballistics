@@ -7,6 +7,7 @@ import {
   stringifyOpenReloadingJson,
 } from '../src/index.ts'
 import { complete } from './complete.ts'
+import { refusal } from './refusal.ts'
 
 const file = {
   format: 'openreloading-session',
@@ -29,54 +30,74 @@ const file = {
 }
 const text = JSON.stringify(file)
 
-/** Files the reader refuses, each with a part of the message it gives. */
-const refusals: [string, object, string][] = [
-  ['version 2', { ...file, version: 2 }, 'version 2 is not supported'],
-  ['no strings', { ...file, strings: [] }, 'strings: must list at least one string'],
-  ['empty string', { ...file, strings: [{ shots: [] }] }, 'strings[0].shots'],
+/** Files the reader refuses, each with the diagnostic it refuses them with. */
+const at = (code: string, path: string) => ({ code, params: { path } })
+const refusals: [string, object, object][] = [
+  ['version 2', { ...file, version: 2 }, { code: 'versionUnsupported', params: { version: '2' } }],
+  ['no strings', { ...file, strings: [] }, at('noStrings', 'strings')],
+  ['empty string', { ...file, strings: [{ shots: [] }] }, at('noStringShots', 'strings[0].shots')],
   [
     'text velocity',
     { ...file, strings: [{ shots: [{ velocity: '800' }] }] },
-    'strings[0].shots[0].velocity: must be a positive number',
+    at('memberNotPositive', 'strings[0].shots[0].velocity'),
   ],
   [
     'no velocity',
     { ...file, strings: [{ shots: [{}] }] },
-    'strings[0].shots[0].velocity: is required',
+    at('velocityRequired', 'strings[0].shots[0].velocity'),
   ],
   [
     'zero velocity',
     { ...file, strings: [{ shots: [{ velocity: 0 }] }] },
-    'must be a positive number',
+    at('memberNotPositive', 'strings[0].shots[0].velocity'),
   ],
-  ['bad date', { ...file, date: '05.03.2026' }, 'date: must be a date as YYYY-MM-DD'],
-  ['bad kind', { ...file, device: { kind: 'laser' } }, 'device.kind'],
+  ['bad date', { ...file, date: '05.03.2026' }, at('memberNotDate', 'date')],
+  [
+    'bad kind',
+    { ...file, device: { kind: 'laser' } },
+    {
+      code: 'memberNotDeviceKind',
+      params: { path: 'device.kind', kinds: ['doppler-radar', 'optical', 'magnetic', 'other'] },
+    },
+  ],
   [
     'empty reason',
     { ...file, strings: [{ shots: [{ velocity: 800, excluded: '' }] }] },
-    'excluded',
+    at('excludedNotText', 'strings[0].shots[0].excluded'),
   ],
-  ['text date', { ...file, date: 20260305 }, 'date: must be a date as YYYY-MM-DD'],
-  ['device as text', { ...file, device: 'radar' }, 'device: must be an object'],
-  ['empty model', { ...file, device: { kind: 'other', model: '' } }, 'device.model: must be text'],
+  ['text date', { ...file, date: 20260305 }, at('memberNotDate', 'date')],
+  ['device as text', { ...file, device: 'radar' }, at('memberNotObject', 'device')],
+  [
+    'empty model',
+    { ...file, device: { kind: 'other', model: '' } },
+    at('memberNotText', 'device.model'),
+  ],
   [
     'number maker',
     { ...file, device: { kind: 'other', manufacturerName: 7 } },
-    'device.manufacturerName: must be text',
+    at('memberNotText', 'device.manufacturerName'),
   ],
-  ['negative distance', { ...file, muzzleDistance: -1 }, 'muzzleDistance: must be a positive'],
-  ['empty note', { ...file, note: '' }, 'note: must be text'],
-  ['string as list', { ...file, strings: [[]] }, 'strings[0]: must be an object'],
+  [
+    'negative distance',
+    { ...file, muzzleDistance: -1 },
+    at('memberNotPositive', '.muzzleDistance'),
+  ],
+  ['empty note', { ...file, note: '' }, at('memberNotText', 'note')],
+  ['string as list', { ...file, strings: [[]] }, at('memberNotObject', 'strings[0]')],
   [
     'number label',
     { ...file, strings: [{ label: 1, shots: [{ velocity: 800 }] }] },
-    'strings[0].label: must be text',
+    at('memberNotText', 'strings[0].label'),
   ],
-  ['shot as number', { ...file, strings: [{ shots: [800] }] }, 'strings[0].shots[0]: must be'],
+  [
+    'shot as number',
+    { ...file, strings: [{ shots: [800] }] },
+    at('memberNotObject', 'strings[0].shots[0]'),
+  ],
   [
     'text cold bore',
     { ...file, strings: [{ shots: [{ velocity: 800, coldBore: 'yes' }] }] },
-    'strings[0].shots[0].coldBore: must be true or false',
+    at('memberNotBoolean', 'strings[0].shots[0].coldBore'),
   ],
 ]
 
@@ -155,7 +176,7 @@ describe('OpenReloading session JSON: writing, and other JSON', () => {
 })
 
 describe('OpenReloading session JSON: refused members', () => {
-  it.each(refusals)('refuses %s', (_, bad, message) => {
-    expect(() => parseOpenReloadingJson(JSON.stringify(bad))).toThrow(message)
+  it.each(refusals)('refuses %s', (_, bad, diagnostic) => {
+    expect(refusal(() => parseOpenReloadingJson(JSON.stringify(bad)))).toEqual(diagnostic)
   })
 })
