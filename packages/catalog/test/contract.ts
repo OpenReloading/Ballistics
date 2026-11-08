@@ -70,22 +70,28 @@ const lists: [string, List, string[], number?][] = [
   ['event types', (c) => c.eventTypes(), ['test-championship']],
 ]
 
-/** A record of the fixture bundle by kind and id, and its name where it has one. */
-const records: [CatalogueKind, string, string?][] = [
-  ['cartridge', 'alpha-rifle', 'Alpha Rifle'],
-  ['manufacturer', 'example-a', 'Example A'],
-  ['powder', 'example-a-fast', 'Fast'],
-  ['primer', 'example-a-large-rifle', 'Large Rifle'],
-  ['bullet', 'example-a-1', 'Test 168'],
-  ['case', 'alpha-brass', 'Alpha Brass'],
-  ['caseCapacity', 'alpha-rifle-test'],
-  ['targetFace', 'test-face', 'Test Face'],
-  ['federation', 'test-federation', 'Test Federation'],
-  ['discipline', 'test-discipline', 'Test discipline'],
-  ['targetMapping', 'test-discipline-test-face'],
-  ['caliberClass', 'air-4-5', '4.5 mm (.177) air'],
-  ['eventType', 'test-championship', 'Test championship'],
+/**
+ * A record of the fixture bundle by kind and id, its revision, and its name where it has one. A
+ * revision changes with any field of the stored record: update it with the fixture.
+ */
+const records: [CatalogueKind, string, string, string?][] = [
+  ['cartridge', 'alpha-rifle', '1d2713937e50c5', 'Alpha Rifle'],
+  ['manufacturer', 'example-a', '137c9d55f895bd', 'Example A'],
+  ['powder', 'example-a-fast', '19e0478241d44d', 'Fast'],
+  ['primer', 'example-a-large-rifle', '10f3c2652460d4', 'Large Rifle'],
+  ['bullet', 'example-a-1', '001abc6b0beec5', 'Test 168'],
+  ['case', 'alpha-brass', '0fc76454c0c1ef', 'Alpha Brass'],
+  ['caseCapacity', 'alpha-rifle-test', '1634ea6acba1ee'],
+  ['targetFace', 'test-face', '0ad5cb203143c5', 'Test Face'],
+  ['federation', 'test-federation', '1de7b755784a79', 'Test Federation'],
+  ['discipline', 'test-discipline', '1c3619c5c4c31b', 'Test discipline'],
+  ['targetMapping', 'test-discipline-test-face', '1487636e7e4668'],
+  ['caliberClass', 'air-4-5', '1d5d128ae27e4d', '4.5 mm (.177) air'],
+  ['eventType', 'test-championship', '0b6d36f7b9213b', 'Test championship'],
 ]
+
+/** The SHA-256 of every record of the fixture bundle: update it with the fixture or the record file's header. */
+const fixtureDataHash = '54d3b177acab15454234f7d3b6ada5ea64a547ddf4d97d03bb07b7c7cdc8df67'
 
 /** The lists of the contract, which every opener answers, the static site's index included. */
 export function catalogueListContract(name: string, open: OpenCatalogue): void {
@@ -109,15 +115,14 @@ export function catalogueRecordContract(name: string, open: OpenCatalogue): void
     beforeAll(async () => {
       catalogue = await open(bundle)
     })
-    it.each(records)('answers the %s %s', (kind, id, recordName) => {
-      const found = catalogue.get(kind, id)
-      expect(found).toMatchObject({
+    it.each(records)('answers the %s %s', (kind, id, revision, recordName) => {
+      expect(catalogue.get(kind, id)).toMatchObject({
         id,
         kind,
         origin: 'catalogue',
+        revision,
         ...(recordName && { name: recordName }),
       })
-      expect(found?.revision).toMatch(/^[0-9a-f]{14}$/)
     })
     it('answers nothing for an unknown id or an id of another kind', () => {
       expect(catalogue.get('cartridge', 'none')).toBeUndefined()
@@ -127,10 +132,9 @@ export function catalogueRecordContract(name: string, open: OpenCatalogue): void
       expect(catalogue.capacities('alpha-rifle').map((c) => c.id)).toEqual(['alpha-rifle-test'])
       expect(catalogue.capacities('beta-pistol')).toEqual([])
     })
-    it('hashes the whole data set as 64 hex digits, the same on every call', async () => {
-      const hash = await catalogue.dataHash()
-      expect(hash).toMatch(/^[0-9a-f]{64}$/)
-      expect(await catalogue.dataHash()).toBe(hash)
+    it('hashes the whole data set, the same on every call', async () => {
+      expect(await catalogue.dataHash()).toBe(fixtureDataHash)
+      expect(await catalogue.dataHash()).toBe(fixtureDataHash)
     })
   })
 }

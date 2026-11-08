@@ -59,16 +59,6 @@ describe('build', () => {
     expect(Object.keys(defined(built.records.cartridge['alpha-rifle']))).not.toContain('kind')
   })
 
-  it('keeps each list in its default order', () => {
-    expect(ids(catalogue.cartridges())).toEqual(['alpha-rifle', 'beta-pistol', 'gamma-100-percent'])
-    expect(ids(catalogue.manufacturers())).toEqual([
-      'example-a',
-      'example-b',
-      'example-c',
-      'example-f',
-    ])
-  })
-
   it('names a component without its manufacturer', () => {
     const bad = { ...bundle, bullets: [{ ...defined(bundle.bullets[0]), manufacturer: 'nobody' }] }
     expect(() => buildCatalogue(bad)).toThrow('example-a-1: unknown manufacturer nobody')
@@ -104,11 +94,7 @@ describe('open', () => {
     }
   })
 
-  it('pages after counting, and filters by table', () => {
-    expect(catalogue.cartridges({ limit: 1, offset: 1 })).toMatchObject({
-      total: 3,
-      items: [{ id: 'beta-pistol' }],
-    })
+  it('filters by table', () => {
     expect(ids(catalogue.cartridges({ table: 'I' }))).toEqual(['alpha-rifle', 'gamma-100-percent'])
   })
 
@@ -181,14 +167,10 @@ describe('open', () => {
     const record = catalogue.get('bullet', 'example-a-1')
     expect(record).toMatchObject({ id: 'example-a-1', kind: 'bullet', origin: 'catalogue' })
     expect(record?.revision).toBe(revisionOf(defined(bundle.bullets[0])))
-    expect(catalogue.get('bullet', 'unknown')).toBeUndefined()
     expect(catalogue.get('bullet', 'constructor')).toBeUndefined()
-    expect(catalogue.get('cartridge', 'example-a-1')).toBeUndefined()
   })
 
-  it('lists the capacities of a cartridge', () => {
-    expect(catalogue.capacities('alpha-rifle').map((c) => c.id)).toEqual(['alpha-rifle-test'])
-    expect(catalogue.capacities('beta-pistol')).toEqual([])
+  it('lists no capacities for an inherited key', () => {
     expect(catalogue.capacities('constructor')).toEqual([])
   })
 
@@ -209,10 +191,6 @@ describe('open', () => {
   })
 
   it('filters the competition lists', () => {
-    expect(ids(catalogue.disciplines({ federation: 'test-federation' }))).toEqual([
-      'test-discipline',
-    ])
-    expect(catalogue.disciplines({ federation: 'unknown' }).total).toBe(0)
     expect(ids(catalogue.targetMappings({ face: 'test-face' }))).toEqual([
       'test-discipline-test-face',
     ])
