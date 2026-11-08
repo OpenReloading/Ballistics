@@ -7,8 +7,8 @@ export type Diagnostic<C extends string = string, P extends object = Record<stri
 /**
  * Error the logic packages raise on purpose: an input outside the model, or a computation that does
  * not finish within the limits its inputs set. It extends `RangeError`; other errors are defects.
- * A package that words nothing raises it with a typed `issue` (its code is the message); the others
- * still raise it with an English message and no issue.
+ * The logic packages raise it with a typed `issue` (its code is the message) and word nothing; a
+ * subclass with fields of its own (`TruingError`, `ValueError`) may still pass a message.
  */
 export class InputError extends RangeError {
   /** The typed refusal; undefined for one raised with an English message. */
