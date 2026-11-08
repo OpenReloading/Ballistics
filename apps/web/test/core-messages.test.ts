@@ -275,6 +275,7 @@ describe('the warnings of an interior answer', () => {
     }
     const one = missingValuesAnswer(values(all.slice(1)), [])?.payload.message ?? ''
     expect(one).toMatch(/lacks 1 value:/)
+    expect(translateMessage(one, marker.t), one).toBe('MAPPED')
   })
 
   it('writes the load ratio warning with the words of the API', () => {
