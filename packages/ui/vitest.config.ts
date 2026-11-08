@@ -41,7 +41,7 @@ const stories = (width: number, schemes: (keyof typeof browsers)[]) => ({
 export default defineConfig({
   test: {
     projects: [
-      { test: { name: 'node', include: ['test/**/*.test.tsx'], environment: 'node' } },
+      { test: { name: 'node', include: ['test/**/*.test.{ts,tsx}'], environment: 'node' } },
       stories(320, ['light']),
       stories(390, ['light', 'dark', 'forced', 'touch']),
       stories(1280, ['light']),

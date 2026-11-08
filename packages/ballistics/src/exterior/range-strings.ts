@@ -6,6 +6,7 @@
  */
 
 import {
+  checkLogFitLimits,
   chiSquareQuantile,
   chiSquareSurvival,
   type Identifiability,
@@ -433,11 +434,7 @@ function checkFitLimits(options: RangeStringOptions): void {
   const { maxCondition = d.maxCondition, maxIterations = d.maxIterations } = options
   need(maxInflation > 1, 'maxInflation must exceed 1')
   need(maxRelativeStandardUncertainty > 0, 'maxRelativeStandardUncertainty must be positive')
-  need(Number.isFinite(maxCondition) && maxCondition > 1, 'maxCondition must be finite and above 1')
-  need(
-    Number.isInteger(maxIterations) && maxIterations >= 1,
-    'maxIterations must be a whole number of at least 1',
-  )
+  checkLogFitLimits(maxIterations, maxCondition)
 }
 
 function checkSolverLimits(options: RangeStringOptions): void {

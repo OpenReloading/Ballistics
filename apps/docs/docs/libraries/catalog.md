@@ -19,11 +19,11 @@ It installs `@open-reloading/schema` with it. Each library has its own [Semantic
 
 ## Entry points
 
-| Import                                 | Contents                                                                                    |
-| -------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `@open-reloading/catalog`              | `checkRecords` (the cross-checks of a set of records), the coverage and plausibility checks |
-| `@open-reloading/catalog/plausibility` | The plausibility checks alone                                                               |
-| `@open-reloading/catalog/bundle.json`  | Every record, one array per kind (the `Bundle` type)                                        |
+| Import                                 | Contents                                                                                                               |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `@open-reloading/catalog`              | The `Catalogue` interface, `checkRecords` (the cross-checks of a set of records), the coverage and plausibility checks |
+| `@open-reloading/catalog/plausibility` | The plausibility checks alone                                                                                          |
+| `@open-reloading/catalog/bundle.json`  | Every record, one array per kind (the `Bundle` type)                                                                   |
 
 ## Example
 
