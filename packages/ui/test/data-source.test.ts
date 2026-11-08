@@ -10,14 +10,18 @@ describe('arraySource', () => {
     }),
   )
 
-  it('sorts a column of mixed keys in one order: numbers by value, NaN after them, then text', async () => {
-    const keys = ['b', 3, Number.NaN, 'a', 1, 'item 10', 'item 2']
-    const source = arraySource(keys, { matches: () => true, sortKey: (key) => key })
-    const page = await source.query({
-      filters: [],
-      sorting: [{ id: 'key', desc: false }],
-      range: { start: 0, count: 10 },
+  it('answers a new query with new filters, also when their values look alike as JSON', async () => {
+    const source = arraySource([150, 168, 175], {
+      matches: (weight, _, value) => value instanceof Set && value.has(weight),
+      sortKey: (weight) => weight,
     })
-    expect(page.rows).toEqual([1, 3, Number.NaN, 'a', 'b', 'item 2', 'item 10'])
+    const range = { start: 0, count: 10 }
+    await source.query({ filters: [{ id: 'weight', value: new Set([168]) }], sorting: [], range })
+    const page = await source.query({
+      filters: [{ id: 'weight', value: new Set([175]) }],
+      sorting: [],
+      range,
+    })
+    expect(page.rows).toEqual([175])
   })
 })

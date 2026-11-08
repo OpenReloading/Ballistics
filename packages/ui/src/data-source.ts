@@ -61,20 +61,27 @@ function matching<Row>(rows: readonly Row[], columns: ArrayColumns<Row>, query: 
 
 /**
  * A data source over rows in memory, for small tables and as the reference of the contract. The rows that pass the
- * filters, sorted, are kept for the next query with the same filters and sorting, which a scrolling table asks.
+ * filters, sorted, are kept for the next query with the same filter and sort arrays, which a scrolling table asks.
  */
 export function arraySource<Row>(
   rows: readonly Row[],
   columns: ArrayColumns<Row>,
 ): DataSource<Row> {
-  let last: { key: string; rows: Row[] } | undefined
+  let last:
+    | { filters: DataQuery['filters']; sorting: DataQuery['sorting']; rows: Row[] }
+    | undefined
   return {
     query: (query, signal) => {
       if (signal?.aborted) return Promise.reject(signal.reason)
       if (!validRange(query.range))
         return Promise.reject(new RangeError(`not a range of rows: ${JSON.stringify(query.range)}`))
-      const key = JSON.stringify([query.filters, query.sorting])
-      if (last?.key !== key) last = { key, rows: matching(rows, columns, query) }
+      // a table replaces its filter and sort state when either changes, so the same arrays ask for the same rows
+      if (last?.filters !== query.filters || last.sorting !== query.sorting)
+        last = {
+          filters: query.filters,
+          sorting: query.sorting,
+          rows: matching(rows, columns, query),
+        }
       const { start, count } = query.range
       return Promise.resolve({
         rows: last.rows.slice(start, start + count),
