@@ -1,6 +1,7 @@
 /** The refusals of the file readers (text, XLSX, XML, an XML load file's root) in words. */
-import type { FileDiagnostic } from '@open-reloading/importers'
-import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import { type FileDiagnostic, ReaderError } from '@open-reloading/importers'
+import { english, type Message, msg, type Translator } from '../i18n/translate.ts'
+import { errorText } from './error-text.ts'
 
 const fileMessages: Record<FileDiagnostic['code'], Message> = {
   utf16OddBytes: msg('UTF-16 text with an odd number of bytes'),
@@ -84,3 +85,9 @@ export function fileDiagnosticText(d: FileDiagnostic, t: Translator['t']): strin
     ? t('XLS worksheet {worksheet}: {text}', { worksheet, text: inPart })
     : inPart
 }
+
+/** A file reader's refusal in English, or another error's message: the detail of a refused file, English as the readers wrote it. */
+export const readerErrorText = (e: unknown): string =>
+  e instanceof ReaderError && isFileDiagnostic(e.diagnostic)
+    ? fileDiagnosticText(e.diagnostic, english.t)
+    : errorText(e)

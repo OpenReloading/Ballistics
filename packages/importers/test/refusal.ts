@@ -10,3 +10,14 @@ export function refusal(read: () => unknown): ReaderError['diagnostic'] {
   }
   throw new Error('read without a refusal')
 }
+
+/** The diagnostic `read` rejects with; any other rejection, or a read that resolves, fails the test. */
+export async function rejection(read: Promise<unknown>): Promise<ReaderError['diagnostic']> {
+  try {
+    await read
+  } catch (e) {
+    if (e instanceof ReaderError) return e.diagnostic
+    throw e
+  }
+  throw new Error('read without a refusal')
+}

@@ -13,7 +13,7 @@ import { refusal } from './refusal.ts'
 
 const utf16le = (s: string) => Array.from(s).flatMap((c) => [c.charCodeAt(0), 0])
 const utf16be = (s: string) => Array.from(s).flatMap((c) => [0, c.charCodeAt(0)])
-const encoding = /not UTF-8 or UTF-16/
+const notUnicode = { code: 'notUnicodeText', params: {} }
 const options = { fileName: 'a.csv', velocityUnit: 'ft/s' as const }
 
 describe('decodeText', () => {
@@ -28,16 +28,17 @@ describe('decodeText', () => {
   })
 
   it('refuses an odd byte count after a UTF-16 mark and invalid UTF-8 or UTF-16', () => {
-    expect(() => decodeText(new Uint8Array([0xff, 0xfe, 0x41]))).toThrow(
-      'UTF-16 text with an odd number of bytes',
-    )
-    expect(() => decodeText(new Uint8Array([0xfe, 0xff, 0x00]))).toThrow(/odd number of bytes/)
-    expect(() => decodeText(new Uint8Array([0x41, 0xe9, 0x42]))).toThrow(
-      'the file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again',
-    )
+    const odd = { code: 'utf16OddBytes', params: {} }
+    expect(refusal(() => decodeText(new Uint8Array([0xff, 0xfe, 0x41])))).toEqual(odd)
+    expect(refusal(() => decodeText(new Uint8Array([0xfe, 0xff, 0x00])))).toEqual(odd)
+    expect(refusal(() => decodeText(new Uint8Array([0x41, 0xe9, 0x42])))).toEqual(notUnicode)
     // a lone high surrogate, D800, in UTF-16 LE and BE
-    expect(() => decodeText(new Uint8Array([0xff, 0xfe, 0x00, 0xd8, 0x41, 0x00]))).toThrow(encoding)
-    expect(() => decodeText(new Uint8Array([0xfe, 0xff, 0xd8, 0x00, 0x00, 0x41]))).toThrow(encoding)
+    expect(refusal(() => decodeText(new Uint8Array([0xff, 0xfe, 0x00, 0xd8, 0x41, 0x00])))).toEqual(
+      notUnicode,
+    )
+    expect(refusal(() => decodeText(new Uint8Array([0xfe, 0xff, 0xd8, 0x00, 0x00, 0x41])))).toEqual(
+      notUnicode,
+    )
   })
 })
 
