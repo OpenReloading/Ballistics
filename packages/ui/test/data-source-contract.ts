@@ -15,7 +15,8 @@ const contractRows: ContractRow[] = [
 
 /**
  * The behavior every data source shares, for a source made from `contractRows` that filters `weight` by equality and
- * sorts by `name` and `weight`. The device's index and the chunked catalog run it too.
+ * sorts by `name` and `weight`. The device's index and the catalog read in chunks (W7) are to run it as well; it
+ * moves to a package they can import when the first of them lands.
  */
 export function dataSourceContract(make: (rows: ContractRow[]) => DataSource<ContractRow>): void {
   const all = { start: 0, count: 100 }
@@ -55,6 +56,18 @@ export function dataSourceContract(make: (rows: ContractRow[]) => DataSource<Con
       range: { start: 5, count: 3 },
     })
     expect(page).toEqual({ rows: [], total: 5 })
+  })
+
+  it('refuses a range with a negative or fractional start or count', async () => {
+    for (const range of [
+      { start: -3, count: 2 },
+      { start: 0.5, count: 2 },
+      { start: 0, count: -1 },
+    ]) {
+      await expect(make(contractRows).query({ filters: [], sorting: [], range })).rejects.toThrow(
+        RangeError,
+      )
+    }
   })
 
   it('refuses an aborted query', async () => {

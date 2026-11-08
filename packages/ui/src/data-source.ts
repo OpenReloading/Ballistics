@@ -22,33 +22,63 @@ export interface ArrayColumns<Row> {
   sortKey(row: Row, id: string): string | number
 }
 
-const collator = new Intl.Collator(undefined, { numeric: true })
+// one collation for every source, so a table pages the same rows whichever source answers it
+const collator = new Intl.Collator('en', { numeric: true })
 
-const compareKeys = (a: string | number, b: string | number): number =>
-  typeof a === 'number' && typeof b === 'number' ? a - b : collator.compare(String(a), String(b))
+/** Numbers by value and before text, NaN last; text by the shared collation. */
+function compareSortKeys(a: string | number, b: string | number): number {
+  if (typeof a === 'number' && typeof b === 'number') {
+    if (Number.isNaN(a) || Number.isNaN(b)) return Number(Number.isNaN(a)) - Number(Number.isNaN(b))
+    return a - b
+  }
+  if (typeof a !== typeof b) return typeof a === 'number' ? -1 : 1
+  return collator.compare(String(a), String(b))
+}
 
-/** A data source over rows in memory, for small tables and as the reference of the contract. */
+const validRange = ({ start, count }: DataQuery['range']) =>
+  Number.isInteger(start) && Number.isInteger(count) && start >= 0 && count >= 0
+
+/** The rows that pass `filters`, sorted by `sorting`; equal rows keep their order. */
+function matching<Row>(rows: readonly Row[], columns: ArrayColumns<Row>, query: DataQuery): Row[] {
+  const found = rows.filter((row) =>
+    query.filters.every(({ id, value }) => columns.matches(row, id, value)),
+  )
+  if (query.sorting.length === 0) return found
+  // each row's keys once, then a stable sort of them
+  const keyed = found.map((row) => ({
+    row,
+    keys: query.sorting.map(({ id }) => columns.sortKey(row, id)),
+  }))
+  keyed.sort((a, b) => {
+    for (const [i, { desc }] of query.sorting.entries()) {
+      const order = compareSortKeys(a.keys[i] ?? '', b.keys[i] ?? '')
+      if (order !== 0) return desc ? -order : order
+    }
+    return 0
+  })
+  return keyed.map(({ row }) => row)
+}
+
+/**
+ * A data source over rows in memory, for small tables and as the reference of the contract. The rows that pass the
+ * filters, sorted, are kept for the next query with the same filters and sorting, which a scrolling table asks.
+ */
 export function arraySource<Row>(
   rows: readonly Row[],
   columns: ArrayColumns<Row>,
 ): DataSource<Row> {
+  let last: { key: string; rows: Row[] } | undefined
   return {
-    query: ({ filters, sorting, range }, signal) => {
+    query: (query, signal) => {
       if (signal?.aborted) return Promise.reject(signal.reason)
-      const found = rows.filter((row) =>
-        filters.every(({ id, value }) => columns.matches(row, id, value)),
-      )
-      // toSorted is stable, so rows with equal keys keep their order
-      const sorted = found.toSorted((a, b) => {
-        for (const { id, desc } of sorting) {
-          const order = compareKeys(columns.sortKey(a, id), columns.sortKey(b, id))
-          if (order !== 0) return desc ? -order : order
-        }
-        return 0
-      })
+      if (!validRange(query.range))
+        return Promise.reject(new RangeError(`not a range of rows: ${JSON.stringify(query.range)}`))
+      const key = JSON.stringify([query.filters, query.sorting])
+      if (last?.key !== key) last = { key, rows: matching(rows, columns, query) }
+      const { start, count } = query.range
       return Promise.resolve({
-        rows: sorted.slice(range.start, range.start + range.count),
-        total: found.length,
+        rows: last.rows.slice(start, start + count),
+        total: last.rows.length,
       })
     },
   }
