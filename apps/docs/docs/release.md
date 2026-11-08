@@ -44,6 +44,18 @@ It runs on every push to `main`, when a release is published and on `workflow_di
 
 Both editions share one origin, so the next edition keeps its data under other names: its IndexedDB database, local storage keys and caches are prefixed `next:`, and its service worker has the scope `<site>/next/`. What the next edition stores in the browser is not carried over to the stable edition, and a database that a pre-release version wrote is not read: the app offers to delete it. The stable edition's service worker leaves `/next/` to the network.
 
+`pnpm run pages:build` (`tools/src/pages.ts`, after `pnpm run build`) writes the site into `pages/`:
+- the web app as a static export under `PAGES_BASE_PATH`, with every record page prerendered from the API over the catalogue built from the data bundle;
+- the catalogue index and the records as data files under `api/`, the docs site under `docs/`, LICENSE, NOTICE, the data license (`data/LICENSE`) and `.nojekyll`.
+
+Settings:
+- `PAGES_EDITION`: `stable` (default) or `next`. The next edition is built for `<base>/next`, with browser store names of its own.
+- `PAGES_URL`: the site's origin, which sets the docs' `url` and the app's `metadataBase`.
+- `--sample`: only the cartridge pages of `apps/web/src/lib/prerender-sample.ts` prerendered and no docs site, for the review and e2e loop. The data files stay complete.
+- `--no-docs`: no docs site, every record prerendered (the e2e job's full export).
+
+`apps/web/.next` stays after the build: CI restores it as the Turbopack cache, and `check-weight` reads its manifests.
+
 ## Self-hosting
 
 - The web app is the static `pages/` folder that `pnpm run pages:build` writes (`PAGES_BASE_PATH` is the path the site is served under, empty for a site root). Any static host serves it: the calculations run in the browser, so there is no server process.
