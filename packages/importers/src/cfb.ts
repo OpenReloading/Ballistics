@@ -4,17 +4,15 @@
 // Every loop is bounded by the file's sector count, and no buffer is sized from a declared value
 // before that value has been checked against a limit.
 
+import { refuseFile } from './diagnostics.ts'
+
 // sector numbers above REGSECT 0xFFFFFFF9 are markers (2.1)
 const lastRegular = 0xfffffff9
 const noStream = 0xffffffff
 
-function fail(cause: string): never {
-  throw new Error(`not an XLS workbook: ${cause}`)
-}
-
 /** Sector `k` of `chain`; the callers' bounds checks keep `k` inside it. */
 function inChain(chain: readonly number[], k: number): number {
-  return chain[k] ?? fail(`sector index ${k} lies outside its chain of ${chain.length}`)
+  return chain[k] ?? refuseFile('cfbSectorOutsideChain', { index: k, length: chain.length })
 }
 
 // assumed bound, not a cited one: a workbook's root storage holds a few entries
@@ -46,27 +44,27 @@ interface Chain {
 
 /** The header (2.2): byte order, version 3 or 4 with its sector size, standard mini stream layout. */
 function readHeader(bytes: Uint8Array): CompoundFile {
-  if (bytes.length < 512) fail('the file is shorter than its 512-byte header')
+  if (bytes.length < 512) refuseFile('cfbTooShort')
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
   // the last sector may be short (2.3), so every read is checked against the file length
   const within = (at: number, n: number) => {
-    if (at + n > bytes.length) fail(`the file ends before byte ${at + n}`)
+    if (at + n > bytes.length) refuseFile('cfbEndsBefore', { byte: at + n })
     return at
   }
   const u16 = (at: number) => view.getUint16(within(at, 2), true)
   const u32 = (at: number) => view.getUint32(within(at, 4), true)
-  if (u16(0x1c) !== 0xfffe) fail('byte order mark is not FFFE')
+  if (u16(0x1c) !== 0xfffe) refuseFile('cfbByteOrder')
   const version = u16(0x1a)
   const shift = u16(0x1e)
   if (!((version === 3 && shift === 9) || (version === 4 && shift === 12))) {
-    fail(`version ${version} with sector shift ${shift} is not read`)
+    refuseFile('cfbVersion', { version, shift })
   }
-  if (u16(0x20) !== 6 || u32(0x38) !== 4096) fail('mini stream layout is not the standard one')
+  if (u16(0x20) !== 6 || u32(0x38) !== 4096) refuseFile('cfbMiniLayout')
   const size = 1 << shift
   // sector n starts at (n + 1) * size (2.3) and must start inside the file
   const sectors = Math.ceil(bytes.length / size) - 1
   const offset = (n: number) => {
-    if (n >= sectors) fail(`sector ${n} lies outside the file`)
+    if (n >= sectors) refuseFile('cfbSectorOutside', { sector: n })
     return (n + 1) * size
   }
   return { bytes, version, size, per: size / 4, sectors, within, u16, u32, offset }
@@ -77,7 +75,7 @@ function buildFat(file: CompoundFile): number[] {
   const { u32, offset } = file
   const fatCount = u32(0x2c)
   const fat: number[] = []
-  const listed = () => fail(`the FAT lists ${fat.length} of ${fatCount} sectors`)
+  const listed = () => refuseFile('cfbFatListed', { listed: fat.length, count: fatCount })
   if (fatCount > file.sectors) listed()
   for (let k = 0; k < 109 && fat.length < fatCount; k++) fat.push(u32(0x4c + 4 * k))
   readDifat(file, fat, fatCount)
@@ -92,7 +90,7 @@ function readDifat(file: CompoundFile, fat: number[], fatCount: number): void {
   const difatSeen = new Set<number>()
   for (let d = u32(0x44), k = 0; fat.length < fatCount && k < u32(0x48); k++) {
     if (d > lastRegular) break
-    if (difatSeen.has(d)) fail(`sector chain loops at sector ${d}`)
+    if (difatSeen.has(d)) refuseFile('cfbChainLoops', { sector: d })
     difatSeen.add(d)
     const at = offset(d)
     for (let j = 0; j < per - 1 && fat.length < fatCount; j++) fat.push(u32(at + 4 * j))
@@ -102,17 +100,16 @@ function readDifat(file: CompoundFile, fat: number[], fatCount: number): void {
 
 /**
  * The next sector of `n` from the table (FAT or mini FAT) held in the sectors `table`, read in
- * place (2.3); `what` names a sector and `tableName` the table in refusals.
+ * place (2.3); `missing` is the refusal of a sector the table does not reach.
  */
 function tableNext(
   file: CompoundFile,
   table: number[],
-  what: string,
-  tableName: string,
+  missing: 'cfbNoFatEntry' | 'cfbNoMiniFatEntry',
 ): (n: number) => number {
   return (n) => {
     const s = table[Math.floor(n / file.per)]
-    if (s === undefined) fail(`${what} ${n} has no ${tableName} entry`)
+    if (s === undefined) refuseFile(missing, { sector: n })
     return file.u32(file.offset(s) + 4 * (n % file.per))
   }
 }
@@ -130,8 +127,8 @@ function readChain(
   const out: number[] = []
   const seen = new Set<number>()
   for (let n = start; count === undefined ? n <= lastRegular : out.length < count; n = step(n)) {
-    if (n > lastRegular) fail('sector chain ends before the stream does')
-    if (seen.has(n)) fail(`sector chain loops at sector ${n}`)
+    if (n > lastRegular) refuseFile('cfbChainEnds')
+    if (seen.has(n)) refuseFile('cfbChainLoops', { sector: n })
     seen.add(n)
     if (inFile) file.offset(n)
     out.push(n)
@@ -152,10 +149,10 @@ function streamReader(
 ): (limit: number) => Uint8Array {
   const { bytes, size, u32, offset } = file
   return (limit) => {
-    if (declared > limit) fail(`the ${name} stream holds ${declared} bytes; the limit is ${limit}`)
+    if (declared > limit) refuseFile('cfbStreamTooLarge', { stream: name, declared, limit })
     const out = new Uint8Array(declared)
     const copy = (from: number, length: number, to: number) => {
-      if (from + length > bytes.length) fail(`the ${name} stream runs past the end of the file`)
+      if (from + length > bytes.length) refuseFile('cfbStreamPastEnd', { stream: name })
       out.set(bytes.subarray(from, from + length), to)
     }
     if (declared >= 4096) {
@@ -168,14 +165,14 @@ function streamReader(
     // mini stream (2.4): 64-byte mini sectors in the root entry's chain
     const miniFatStart = u32(0x3c)
     const rootStart = u32(root + 0x74)
-    if (miniFatStart > lastRegular || rootStart > lastRegular) fail('the mini stream is missing')
+    if (miniFatStart > lastRegular || rootStart > lastRegular) refuseFile('cfbNoMiniStream')
     const miniFat = readChain(file, fatChain, miniFatStart)
     const rootChain = readChain(file, fatChain, rootStart)
     const miniLength = Math.min(u32(root + 0x78), rootChain.length * size)
-    const miniNext = tableNext(file, miniFat, 'mini sector', 'mini FAT')
+    const miniNext = tableNext(file, miniFat, 'cfbNoMiniFatEntry')
     const miniChain = { step: miniNext, inFile: false }
     readChain(file, miniChain, start, Math.ceil(declared / 64)).forEach((m, k) => {
-      if ((m + 1) * 64 > miniLength) fail(`mini sector ${m} lies outside the mini stream`)
+      if ((m + 1) * 64 > miniLength) refuseFile('cfbMiniSectorOutside', { sector: m })
       const from = offset(inChain(rootChain, Math.floor((m * 64) / size))) + ((m * 64) % size)
       copy(from, Math.min(64, declared - k * 64), k * 64)
     })
@@ -213,7 +210,7 @@ function readDirectory(
   const entries = directory.length * perSector
   const entry = (id: number) =>
     within(offset(inChain(directory, Math.floor(id / perSector))) + (id % perSector) * 128, 128)
-  if (entries === 0 || bytes[entry(0) + 0x42] !== 5) fail('the directory has no root entry')
+  if (entries === 0 || bytes[entry(0) + 0x42] !== 5) refuseFile('cfbNoRoot')
   const root = entry(0)
   const streams = new Map<string, (limit: number) => Uint8Array>()
   // the root's children form a binary tree of siblings (2.6.4); visited without recursion
@@ -221,10 +218,10 @@ function readDirectory(
   const visited = new Set<number>()
   for (let id = stack.pop(); id !== undefined; id = stack.pop()) {
     if (id === noStream) continue
-    if (id >= entries || visited.has(id)) fail(`directory entry ${id} is out of range or repeated`)
+    if (id >= entries || visited.has(id)) refuseFile('cfbEntryRepeated', { entry: id })
     visited.add(id)
     if (visited.size > maxRootEntries) {
-      fail(`the root storage holds more than ${maxRootEntries} entries`)
+      refuseFile('cfbRootTooLarge', { max: maxRootEntries })
     }
     const at = entry(id)
     stack.push(u32(at + 0x44), u32(at + 0x48))
@@ -247,5 +244,5 @@ export function compoundStreams(
 ): Map<string, (limit: number) => Uint8Array> {
   const file = readHeader(bytes)
   const fat = buildFat(file)
-  return readDirectory(file, { step: tableNext(file, fat, 'sector', 'FAT'), inFile: true }, wanted)
+  return readDirectory(file, { step: tableNext(file, fat, 'cfbNoFatEntry'), inFile: true }, wanted)
 }
