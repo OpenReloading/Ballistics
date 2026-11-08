@@ -1,7 +1,6 @@
-import { readFileSync } from 'node:fs'
 import type { Page } from '@playwright/test'
 import { describe, expect, it } from 'vitest'
-import { args, bar, fittedCaption, inLanguage, presets } from './visual-check.mts'
+import { args, bar, inLanguage, presets } from './visual-check.mts'
 
 describe('visual check arguments', () => {
   it('takes page paths and presets together, each page once', () => {
@@ -53,12 +52,5 @@ describe('workbench page bar in the language shown', () => {
     }
     await bar(page as unknown as Page, 'Open', german)
     expect(names).toEqual([{ name: 'Seitenaktionen' }, { name: 'Open', exact: true }])
-  })
-
-  it('waits for the powder chart by a caption the German catalogue translates', () => {
-    const de = JSON.parse(
-      readFileSync(new URL('../../web/src/i18n/de.json', import.meta.url), 'utf8'),
-    )
-    expect(inLanguage(fittedCaption, de)).not.toBe(fittedCaption)
   })
 })

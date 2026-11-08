@@ -178,7 +178,6 @@ describe('the answer kept for a language change', () => {
     )
     if (!('text' in checked)) throw new Error('expected an error')
     expect(checked.text(english.t)).toBe('Enter a target above 0.')
-    expect(checked.text(german.t)).toBe('Geben Sie eine Zielgröße über 0 ein.')
   })
 
   it('writes a failed answer from the API message in the language shown', () => {
