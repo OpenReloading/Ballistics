@@ -10,7 +10,8 @@ import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
 import { cartridgeItem } from '../catalogue/derive.ts'
 import type { CartridgeQuery, Catalogue } from '../catalogue/types.ts'
-import { idParams, listQuery, missing, noNul, revision, stored } from './common.ts'
+import { missing, stored } from './record-answers.ts'
+import { idParams, listQuery, noNul, revision } from './schemas.ts'
 
 const cartridgeQuery = listQuery({
   table: {

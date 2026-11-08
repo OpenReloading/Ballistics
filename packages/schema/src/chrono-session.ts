@@ -1,8 +1,8 @@
 import { z } from 'zod'
 import type { Exact } from './exact.ts'
+import { text } from './fields.ts'
 import { recordId, ref } from './ids.ts'
 import { provenance } from './provenance.ts'
-import { text } from './shared.ts'
 import { type QuantitySchema, quantity } from './units.ts'
 
 const chronoShotParser = z.object({
