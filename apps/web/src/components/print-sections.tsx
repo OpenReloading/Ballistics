@@ -12,56 +12,19 @@ import {
   printSections,
   printSectionsKey,
 } from '../lib/print-sections.ts'
+import { storedChoice } from '../lib/stored-choice.ts'
 
-const listeners = new Set<() => void>()
-let cached: { text: string | null; choice: PrintChoice } | undefined
+const printChoice = storedChoice(printSectionsKey, parsePrintChoice, (c) => JSON.stringify(c))
 
-/** The stored text; none where the browser keeps no storage (a private window, blocked site data). */
-function storedText() {
-  try {
-    return localStorage.getItem(printSectionsKey)
-  } catch {
-    return null
-  }
-}
-
-/** The choice of this browser, the same object while its text is unchanged. */
-function current(): PrintChoice {
-  const text = storedText()
-  if (cached?.text !== text) cached = { text, choice: parsePrintChoice(text) }
-  return cached.choice
-}
-
-function subscribe(notify: () => void) {
-  listeners.add(notify)
-  // a change made in another tab
-  const onStorage = (e: StorageEvent) => {
-    if (e.key === printSectionsKey) notify()
-  }
-  window.addEventListener('storage', onStorage)
-  return () => {
-    listeners.delete(notify)
-    window.removeEventListener('storage', onStorage)
-  }
-}
-
-function setSection(key: PrintSection, on: boolean) {
-  const next = { ...current(), [key]: on }
-  try {
-    localStorage.setItem(printSectionsKey, JSON.stringify(next))
-  } catch {
-    // kept for this page only
-    cached = { text: storedText(), choice: next }
-  }
-  for (const notify of listeners) notify()
-}
+const setSection = (key: PrintSection, on: boolean) =>
+  printChoice.set({ ...printChoice.read(), [key]: on })
 
 /**
  * The sections of the workbench report that print, remembered in this browser. While mounted,
  * `<html data-report-omit>` names the ones left out for the print rules (the chart copy).
  */
 export function usePrintChoice(): PrintChoice {
-  const choice = useSyncExternalStore(subscribe, current, () => allSections)
+  const choice = useSyncExternalStore(printChoice.subscribe, printChoice.read, () => allSections)
   const omit = omittedSections(choice)
   useEffect(() => {
     const html = document.documentElement
@@ -77,7 +40,7 @@ export function usePrintChoice(): PrintChoice {
 /** The Print menu's tick-boxes of the report's sections; the menu stays open while they change. */
 export function PrintSectionItems() {
   const { t } = useTranslation()
-  const choice = useSyncExternalStore(subscribe, current, () => allSections)
+  const choice = useSyncExternalStore(printChoice.subscribe, printChoice.read, () => allSections)
   return (
     <>
       <Menu.Divider />
