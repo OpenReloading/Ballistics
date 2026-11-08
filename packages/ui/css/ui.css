@@ -130,8 +130,8 @@
   text-underline-offset: 0.2em;
 }
 
-/* the menu button at the bar's control size: 44 px under a coarse pointer */
-.ui-frame-menu {
+/* the menu button and the drawer's close button at the bar's control size: 44 px under a coarse pointer */
+.ui-frame-button {
   min-width: var(--size-control-bar);
   min-height: var(--size-control-bar);
 }

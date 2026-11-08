@@ -56,17 +56,24 @@ export const Frame: Story = {
     const page = within(canvasElement.ownerDocument.body)
     await expect(canvas.queryByRole('navigation', { name: 'Main' })).toBeNull()
     const menu = canvas.getByRole('button', { name: 'Menu' })
-    if (matchMedia('(pointer: coarse)').matches)
-      await expect(menu.getBoundingClientRect().height).toBeGreaterThanOrEqual(44)
     await userEvent.click(menu)
     const drawer = await page.findByRole('dialog', { name: 'Main' })
+    if (matchMedia('(pointer: coarse)').matches) {
+      await expect(menu.getBoundingClientRect().height).toBeGreaterThanOrEqual(44)
+      const close = page.getByRole('button', { name: 'Close navigation' })
+      await expect(close.getBoundingClientRect().height).toBeGreaterThanOrEqual(44)
+    }
     // past its last link the focus stays inside: the close button and three links, five steps
     for (let step = 0; step < 5; step++) await userEvent.tab()
     await expect(drawer).toContainElement(canvasElement.ownerDocument.activeElement as HTMLElement)
     await userEvent.keyboard('{Escape}')
     await waitFor(() => expect(menu).toHaveFocus())
+    // the drawer leaves after its transition; reopened before that, the old one would still be found
+    const closed = () =>
+      waitFor(() => expect(page.queryByRole('dialog')).toBeNull(), { timeout: 3000 })
+    await closed()
     await userEvent.click(menu)
     await userEvent.click(await page.findByRole('link', { name: 'Groups' }))
-    await waitFor(() => expect(page.queryByRole('dialog')).toBeNull())
+    await closed()
   },
 }

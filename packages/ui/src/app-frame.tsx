@@ -34,7 +34,7 @@ export function AppFrame({
   useEffect(() => {
     if (wide) close()
   }, [wide, close])
-  // a followed link closes the drawer, also when a router changes the page without a reload
+  // a followed link in the drawer (the brand's too) closes it, also when a router changes the page without a reload
   const closeOnLink = (event: MouseEvent) => {
     if (event.target instanceof Element && event.target.closest('a')) close()
   }
@@ -49,7 +49,7 @@ export function AppFrame({
           <Burger
             hiddenFrom="lg"
             size="sm"
-            className="ui-frame-menu"
+            className="ui-frame-button"
             opened={opened}
             onClick={toggle}
             aria-label={labels.menu}
@@ -69,13 +69,17 @@ export function AppFrame({
       {/* Mantine's drawer traps the focus, closes on Escape and gives the focus back to the menu button */}
       <Drawer.Root opened={opened} onClose={close} size="xs" hiddenFrom="lg">
         <Drawer.Overlay />
-        <Drawer.Content aria-label={labels.navigation}>
+        <Drawer.Content aria-label={labels.navigation} onClick={closeOnLink}>
           {/* a div: a second <header> outside the top bar would be another banner landmark */}
           <Drawer.Header component="div">
             {brand}
-            <Drawer.CloseButton aria-label={labels.close} data-autofocus />
+            <Drawer.CloseButton
+              className="ui-frame-button"
+              aria-label={labels.close}
+              data-autofocus
+            />
           </Drawer.Header>
-          <Drawer.Body component="nav" aria-label={labels.navigation} onClick={closeOnLink}>
+          <Drawer.Body component="nav" aria-label={labels.navigation}>
             {navigation}
           </Drawer.Body>
         </Drawer.Content>
