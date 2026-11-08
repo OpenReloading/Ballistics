@@ -4,6 +4,7 @@
 import { type Candidate, type ReaderDiagnostic, refuseFile } from './diagnostics.ts'
 import { idOfKey } from './record-ids.ts'
 import { keyText } from './records.ts'
+import { readDecimal } from './text.ts'
 import { parseXml, type XmlElement } from './xml.ts'
 
 /** The root element of the file, which tells it apart from other XML. */
@@ -91,9 +92,6 @@ export const elements = (e: XmlElement): XmlElement[] =>
 const textOf = (e: XmlElement) => e.children.filter((c) => typeof c === 'string').join('')
 export const clip = (s: string | undefined, max: number = 200): string | undefined =>
   s ? s.slice(0, max) : undefined
-/** A number with `.` or a lone `,` as decimal mark; NaN otherwise. */
-export const numberOf = (s: string): number =>
-  Number(/^[-+]?\d+,\d+$/.test(s) ? s.replace(',', '.') : s)
 
 /** Key, name and data of a candidate of `kind`, the key from its content: the same content gives the same id in every file. */
 export const named = <D>(
@@ -135,7 +133,7 @@ function numberValue(
 ): number | undefined {
   const factor = Object.hasOwn(factors[kind], unit) ? factors[kind][unit] : undefined
   // a finite number can still overflow in the stored unit
-  const stored = factor === undefined ? Number.NaN : numberOf(value) * factor
+  const stored = factor === undefined ? Number.NaN : readDecimal(value) * factor
   if (Number.isFinite(stored)) return Number(stored.toPrecision(12))
   warnings.push({
     code: 'notConverted',
