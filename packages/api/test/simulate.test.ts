@@ -542,7 +542,8 @@ describe('POST /interior/load-file', () => {
     )
     expect(below.status).toBe(422)
     expect(below.body).toMatchObject({
-      message: 'ladder charge -1.2 g must be above 0',
+      code: 'ladderChargeNotAboveZero',
+      params: { charge: -1.2 },
       notice: 'simulation, not load data',
     })
   })

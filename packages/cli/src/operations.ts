@@ -7,6 +7,7 @@ import {
   jsonSchema,
   operation,
   operations,
+  RecordNotFound,
 } from '@open-reloading/use-cases'
 import { z } from 'zod'
 import { Refusal, UsageError } from './errors.ts'
@@ -65,6 +66,14 @@ function schemaError(error: z.ZodError) {
 /** The catalogue `run` answers over: the records read, opened in memory. */
 export const catalogueOf = (bundle: Bundle): Catalogue => openCatalogue(buildCatalogue(bundle))
 
+/** A message with the values after it; a typed refusal's message is its code, which the command line does not word. */
+function withParams(message: string, params: object): string {
+  const values = Object.entries(params).map(
+    ([k, v]) => `${k}: ${typeof v === 'object' && v !== null ? JSON.stringify(v) : String(v)}`,
+  )
+  return values.length === 0 ? message : `${message} (${values.join(', ')})`
+}
+
 /** `run`: the answer of the operation `name` to the body of `input`, over the records of `roots`. */
 export async function runOperation(
   name: string,
@@ -87,17 +96,22 @@ export async function runOperation(
     answer = await op.run(context, body)
   } catch (error) {
     if (error instanceof z.ZodError) throw schemaError(error)
-    // a record lookup of the routes fails an unknown id with a 404 error
-    if ((error as { statusCode?: unknown }).statusCode === 404)
-      throw new UsageError((error as Error).message)
+    // an unknown record id is bad input, not a refusal of the model
+    if (error instanceof RecordNotFound)
+      throw new UsageError(withParams(error.message, error.issue.params), error.issue)
     const known = errorAnswer(error, op.errors)
     if (!known) throw error
     answer = { status: known.status, payload: known.body }
   }
   if (answer.status !== 200) {
-    const { message, field } = answer.payload as { message?: unknown; field?: unknown }
+    const { message, field, params } = answer.payload as {
+      message?: unknown
+      field?: unknown
+      params?: Record<string, unknown>
+    }
     const text = String(message ?? `answer ${answer.status}`)
-    throw new Refusal(field === undefined ? text : `${text} (${String(field)})`, {
+    const named = field === undefined ? text : `${text} (${String(field)})`
+    throw new Refusal(withParams(named, params ?? {}), {
       answer: answer.payload,
     })
   }

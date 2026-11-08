@@ -1,7 +1,7 @@
 import { TruingError } from '@open-reloading/ballistics'
 import { InputError } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import { replyTo, reviveError, serializeError, type Task } from '../src/index.ts'
+import { errorAnswer, replyTo, reviveError, serializeError, type Task } from '../src/index.ts'
 
 const roundTrip = (e: unknown) => reviveError(structuredClone(serializeError(e)))
 
@@ -21,6 +21,7 @@ describe('errors across the thread boundary', () => {
       conditionNumber: Number.POSITIVE_INFINITY,
       unresolved: [1],
       direction: [0.6, 0.8],
+      detail: { code: 'rangeNotReached', params: { range: 500 } },
     })
     const input = roundTrip(new InputError('step limit'))
     expect(input).toBeInstanceOf(InputError)
@@ -49,6 +50,17 @@ describe('a task from a worker message', () => {
     expect(replyTo(inherited)).toEqual({
       succeeded: false,
       error: { name: 'Error', message: 'unknown compute task kind constructor' },
+    })
+  })
+})
+
+describe('the answer of a typed refusal', () => {
+  it('writes a param number that JSON cannot hold as JavaScript writes it', () => {
+    const error = new InputError({ code: 'pressureInvalid', params: { pressure: Infinity } })
+    const answer = errorAnswer(error, { withNotice: false, truingDetails: false })
+    expect(answer?.body).toMatchObject({
+      code: 'pressureInvalid',
+      params: { pressure: 'Infinity' },
     })
   })
 })

@@ -473,3 +473,24 @@ describe('caller unit against the file unit', () => {
     })
   })
 })
+
+describe('parseDelimited: quoted line breaks', () => {
+  it('reads a quoted line break as part of its cell and counts rows by their first line', () => {
+    const text = 'v,note\n2795,"first\nsecond, still the note"\n2801,"a ""quote"""\n,none'
+    const r = parseDelimited(text, { velocityUnit: 'ft/s', columns: { velocity: 'v' } })
+    expect(values(r)).toEqual([[851.916, 853.7448]])
+    expect(r.warnings).toContainEqual({ code: 'noVelocity', params: { row: 5 } })
+    // a quote that never closes joins nothing
+    const open = parseDelimited('v,note\n2795,"open\n2801,b', {
+      velocityUnit: 'ft/s',
+      columns: { velocity: 'v' },
+    })
+    expect(values(open)).toEqual([[851.916, 853.7448]])
+  })
+
+  it('joins no quote of a skipped line into the data rows', () => {
+    const text = '"Session 1\n2800,ok\n2810,"note"\n2820,x'
+    const r = parseDelimited(text, { columns: { velocity: 1 }, skipRows: 1, velocityUnit: 'm/s' })
+    expect(values(r)).toEqual([[2800, 2810, 2820]])
+  })
+})

@@ -53,6 +53,7 @@ export {
   type M3LoadShape,
   maxPoints,
 } from './interior-schema.ts'
+export { RecordNotFound, type RecordNotFoundIssue, type UseCaseIssue } from './issue.ts'
 export { type JsonSchema, jsonSchema } from './json-schema.ts'
 export { type CartridgeWithSpecs } from './limits.ts'
 export { filePath, type Path } from './load-file.ts'

@@ -141,7 +141,11 @@ describe('run offline', () => {
     ])
     expect(code).toBe(1)
     const error = errorOf(stderr)
-    expect(error.message).toBe('powder demo-powder-dp40 has no bulk density')
+    expect(error.message).toBe('powderWithoutBulkDensity (powder: demo-powder-dp40)')
+    expect(error.answer).toMatchObject({
+      code: 'powderWithoutBulkDensity',
+      params: { powder: 'demo-powder-dp40' },
+    })
     expect(error.answer.statusCode).toBe(422)
   })
 
@@ -165,7 +169,11 @@ describe('run offline', () => {
     const body = { ...(defined(operation('interior')).example as object), cartridge: 'no-such' }
     const { code, stderr } = await cli(['run', 'interior', '--input', bodyFile('id', body)])
     expect(code).toBe(2)
-    expect(errorOf(stderr).message).toBe('cartridge no-such not found')
+    expect(errorOf(stderr)).toMatchObject({
+      message: 'recordNotFound (kind: cartridge, id: no-such)',
+      code: 'recordNotFound',
+      params: { kind: 'cartridge', id: 'no-such' },
+    })
   })
 
   it.each([
