@@ -2684,7 +2684,7 @@ export function useWorkbenchState() {
   function loadFailed(err: unknown) {
     // engraving values that need each other: the empty one shows the message
     if (err instanceof ValueError) {
-      form.setFieldError(err.field, err.message)
+      form.setFieldError(err.field, refusalText(err))
       if ((powderMoreFields as readonly string[]).includes(err.field)) setMore('powder')
       if ((firearmMoreFields as readonly string[]).includes(err.field)) setMore('firearm')
     }
@@ -2903,7 +2903,8 @@ export function useWorkbenchState() {
     try {
       loadRequest()
     } catch (err) {
-      if (err instanceof ValueError) form.setFieldError(err.field, err.message)
+      // a field error is a string: worded when it is set, long after the words loaded
+      if (err instanceof ValueError) form.setFieldError(err.field, refusalText(err))
       return
     }
     void send()

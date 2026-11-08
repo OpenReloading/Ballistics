@@ -85,13 +85,11 @@ describe('interiorLoad', () => {
 
   it('takes an empty bore area from the groove diameter, else the bore diameter', () => {
     const d = 7.82e-3
-    expect(interiorLoad(values, undefined, 7.82e-3 + 1e-4).chamber.boreArea).toBeCloseTo(
+    expect(interiorLoad(values, 7.82e-3 + 1e-4).chamber.boreArea).toBeCloseTo(
       (Math.PI / 4) * (d + 5e-5) ** 2,
       15,
     )
-    expect(interiorLoad({ ...values, boreArea: 4.7e-5 }, undefined, 8e-3).chamber.boreArea).toBe(
-      4.7e-5,
-    )
+    expect(interiorLoad({ ...values, boreArea: 4.7e-5 }, 8e-3).chamber.boreArea).toBe(4.7e-5)
   })
 
   it('reads the two-stage form when all four values are there', () => {
@@ -102,13 +100,16 @@ describe('interiorLoad', () => {
   })
 })
 
+/** The `ValueError` of a missing value of `field`. */
+const missingValue = (field: string) =>
+  expect.objectContaining({ field, issue: { code: 'valueMissing', params: { field } } })
+
 describe('interiorLoad missing values and burn forms', () => {
-  it('names the field of a missing value, with the label given', () => {
+  it('names the field of a missing value', () => {
     const missing = { ...values, charge: undefined }
-    expect(() => interiorLoad(missing)).toThrow('Enter a number for charge.')
-    expect(() => interiorLoad(missing, () => 'Charge mass')).toThrow('Charge mass')
+    expect(() => interiorLoad(missing)).toThrow(missingValue('charge'))
     expect(() => interiorLoad({ ...values, sebert: Number.POSITIVE_INFINITY })).toThrow(
-      'Enter a number for sebert.',
+      missingValue('sebert'),
     )
     const error = thrownBy(() => interiorLoad({ ...values, vivacity: Number.NaN }))
     expect(error).toBeInstanceOf(ValueError)
@@ -116,7 +117,12 @@ describe('interiorLoad missing values and burn forms', () => {
   })
 
   it('refuses a partly filled burn form at the first empty field', () => {
-    expect(() => interiorLoad({ ...values, formA: 0.8 })).toThrow('m, q, z1')
+    expect(() => interiorLoad({ ...values, formA: 0.8 })).toThrow(
+      expect.objectContaining({
+        field: 'formM',
+        issue: { code: 'burnFormPartial', params: { missing: ['m', 'q', 'z1'] } },
+      }),
+    )
     expect(() => interiorLoad({ ...values, formA: 0.8 })).toThrow(ValueError)
   })
 })
@@ -184,10 +190,10 @@ describe('recordResistance', () => {
 
   it('names what the run lacks', () => {
     expect(recordResistance(law, { ...run, cartridge: undefined }).missing).toEqual([
-      'a cartridge record',
+      'cartridgeRecord',
     ])
     expect(recordResistance(law, { ...run, bulletLengthMm: undefined }).missing).toEqual([
-      'a bullet length',
+      'bulletLength',
     ])
   })
 

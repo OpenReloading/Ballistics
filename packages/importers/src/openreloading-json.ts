@@ -1,4 +1,4 @@
-import type { ChronoShot } from '@open-reloading/schema'
+import type { ChronoSession, ChronoShot } from '@open-reloading/schema'
 import { type ChronoDiagnostic, refuse } from './diagnostics.ts'
 import {
   buildChronoImport,
@@ -11,7 +11,15 @@ import { yearFirstDate } from './text.ts'
 /** Value of the `format` member: `openreloading-session`. */
 export const sessionJsonFormat = 'openreloading-session'
 
-const deviceKinds = ['doppler-radar', 'optical', 'magnetic', 'other'] as const
+type DeviceKind = ChronoSession['device']['kind']
+// every kind of the session schema once: a kind added or dropped there fails the type check here
+const deviceKindSet: Record<DeviceKind, true> = {
+  'doppler-radar': true,
+  optical: true,
+  magnetic: true,
+  other: true,
+}
+const deviceKinds = Object.keys(deviceKindSet)
 
 type Obj = Record<string, unknown>
 const isObj = (v: unknown): v is Obj => typeof v === 'object' && v !== null && !Array.isArray(v)
@@ -59,8 +67,8 @@ function optionalText(o: Obj, key: string, path: string): string | undefined {
   return v
 }
 
-const isDeviceKind = (x: unknown): x is (typeof deviceKinds)[number] =>
-  deviceKinds.some((k) => k === x)
+const isDeviceKind = (x: unknown): x is DeviceKind =>
+  typeof x === 'string' && Object.hasOwn(deviceKindSet, x)
 
 /** The `device` member: kind (default `other`), manufacturer name and model as non-empty text when present. */
 function readDevice(root: Obj): SessionCandidate['device'] {
