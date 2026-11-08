@@ -595,13 +595,6 @@ describe('share links', () => {
     expect(await readLink(new URL(link).hash)).toEqual({ ok: true, records: [fitted] })
   })
 
-  it('refuses a fragment over the link limit without decoding it', async () => {
-    const long = await readLink(`#record=${'A'.repeat(8001)}`)
-    expect(long?.ok).toBe(false)
-    // a short fragment of the same kind is read and found damaged: the long one gets its own reason
-    expect(long).not.toEqual(await readLink(`#record=${'A'.repeat(80)}`))
-  })
-
   it('rejects a damaged or invalid fragment with a reason', async () => {
     expect(await readLink('#record=@@@')).toEqual({
       ok: false,

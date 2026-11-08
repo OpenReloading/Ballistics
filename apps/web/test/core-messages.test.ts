@@ -110,7 +110,7 @@ describe('the message table', () => {
   })
 
   it('leaves a long text as it is without matching it', () => {
-    const text = 'x'.repeat(200_000)
+    const text = 'x'.repeat(1_000_000)
     expect(translateMessage(text, german.t)).toBe(text)
   })
 
