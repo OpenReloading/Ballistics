@@ -204,6 +204,9 @@ z.ZodObject<{
 ], 'kind'>;
 
 // @public
+export function canonicalJson(value: unknown): string;
+
+// @public
 export type CapacitySource = 'capacity' | 'case';
 
 // @public
