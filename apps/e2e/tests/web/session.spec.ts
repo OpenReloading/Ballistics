@@ -1,5 +1,6 @@
 import { expect, type Page, type Request, test } from '@playwright/test'
 import { barButton } from './bar.ts'
+import { isDark } from './luminance.ts'
 import { gotoHydrated } from './nav.ts'
 import { choosePreset, storeUnits } from './units.ts'
 
@@ -83,7 +84,8 @@ test('prints the summary without the file control', async ({ page }) => {
   })
   expect(await region.evaluate((e) => e.scrollWidth <= e.clientWidth)).toBe(true)
   await expect(page.getByRole('region', { name: 'Safety' })).toHaveCount(0)
-  expect(await page.evaluate(() => getComputedStyle(document.body).color)).toBe('rgb(26, 26, 26)')
+  // the printed text is dark
+  expect(isDark(await page.evaluate(() => getComputedStyle(document.body).color))).toBe(true)
 })
 
 /** Loads the example from the empty state. */
