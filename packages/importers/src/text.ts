@@ -63,6 +63,44 @@ export function splitDelimited(line: string, delimiter: ',' | ';' | '\t' = ','):
   return cells
 }
 
+/** Whether `line` ends inside a quoted cell as `splitDelimited` reads it, given whether it starts in one. */
+function endsInQuote(line: string, delimiter: string, open: boolean): boolean {
+  let quoted = open
+  let cellStart = !open
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i]
+    if (quoted && c === '"' && line[i + 1] === '"') i++
+    else if (quoted) quoted = c !== '"'
+    else if (c === delimiter) cellStart = true
+    else if (!(cellStart && skippedBefore(c, delimiter))) {
+      quoted = cellStart && c === '"'
+      cellStart = false
+    }
+  }
+  return quoted
+}
+
+/**
+ * Lines joined where a quoted cell holds a line break, each with the index of its first line, so
+ * `splitDelimited` reads the joined text as one row. A quote that never closes joins nothing.
+ */
+export function joinQuotedLines(
+  lines: string[],
+  delimiter: ',' | ';' | '\t',
+): { text: string; index: number }[] {
+  const joined: { text: string; index: number }[] = []
+  let start = 0
+  let open = false
+  for (const [n, line] of lines.entries()) {
+    open = endsInQuote(line, delimiter, open)
+    if (open) continue
+    joined.push({ text: lines.slice(start, n + 1).join('\n'), index: start })
+    start = n + 1
+  }
+  for (let n = start; n < lines.length; n++) joined.push({ text: lines[n] ?? '', index: n })
+  return joined
+}
+
 /** Lines without byte order marks or NUL characters, which exports carry in varying places. */
 export function splitLines(text: string): string[] {
   return text
