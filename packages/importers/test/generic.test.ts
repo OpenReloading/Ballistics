@@ -487,4 +487,10 @@ describe('parseDelimited: quoted line breaks', () => {
     })
     expect(values(open)).toEqual([[851.916, 853.7448]])
   })
+
+  it('joins no quote of a skipped line into the data rows', () => {
+    const text = '"Session 1\n2800,ok\n2810,"note"\n2820,x'
+    const r = parseDelimited(text, { columns: { velocity: 1 }, skipRows: 1, velocityUnit: 'm/s' })
+    expect(values(r)).toEqual([[2800, 2810, 2820]])
+  })
 })

@@ -364,13 +364,17 @@ function readRowShotAt(
 
 /** The rows from line `skip` on that hold a cell, a quoted line break kept inside its row. */
 function filledRows(lines: string[], delimiter: Delimiter, skip: number): Row[] {
+  // joined from `skip` on, so a quote in a skipped line cannot swallow data rows
+  const kept = lines.slice(skip)
   const joined =
     delimiter === 'none'
-      ? lines.map((line, index) => ({ text: line, index }))
-      : joinQuotedLines(lines, delimiter)
+      ? kept.map((line, index) => ({ text: line, index }))
+      : joinQuotedLines(kept, delimiter)
   return joined
-    .filter(({ index }) => index >= skip)
-    .map(({ text, index }) => ({ lineNumber: index + 1, cells: splitCells(text, delimiter) }))
+    .map(({ text, index }) => ({
+      lineNumber: skip + index + 1,
+      cells: splitCells(text, delimiter),
+    }))
     .filter((r) => r.cells.some((c) => c !== ''))
 }
 
