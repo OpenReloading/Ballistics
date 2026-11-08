@@ -27,19 +27,7 @@ const byText = (a: string, b: string) => a.localeCompare(b)
 
 type Equal<A, B> = [A] extends [B] ? ([B] extends [A] ? true : never) : never
 
-const placeholders = (s: string) =>
-  [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1] ?? '').sort((a, b) => a.localeCompare(b))
-
 describe('the message table', () => {
-  it('has a German text with the placeholders of the English one for every message', () => {
-    for (const text of messageTexts) {
-      const entry = (de as Record<string, unknown>)[text]
-      expect(typeof entry, text).toBe('string')
-      expect(placeholders(entry as string), text).toEqual(placeholders(text))
-      expect(entry, text).not.toBe(text)
-    }
-  })
-
   it('leaves a text that no message matches as it is', () => {
     for (const text of ['Hello', 'The cartridge is fine.', '', 'range']) {
       expect(translateMessage(text, german.t)).toBe(text)

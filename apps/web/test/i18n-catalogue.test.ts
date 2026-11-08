@@ -1,6 +1,5 @@
-import { readdirSync, readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { compare, extract, messages } from '../scripts/i18n.mts'
+import { extract, messages, problems } from '../scripts/i18n.mts'
 import de from '../src/i18n/de.json'
 import terms from '../src/i18n/german-terms.json'
 
@@ -13,8 +12,6 @@ const fold = (s: string) =>
     .replace(/ü/g, 'u')
     .replace(/ß/g, 'ss')
     .replace(/\u00ad/g, '') // a soft hyphen marks where a long compound may break
-const placeholders = (s: string) =>
-  [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1] ?? '').sort((a, b) => a.localeCompare(b))
 
 describe('message extraction', () => {
   const head = "import { msg, useTranslation } from '../i18n/language.ts'\n"
@@ -57,37 +54,25 @@ describe('message extraction', () => {
   })
 })
 
-const catalogues = readdirSync(new URL('../src/i18n', import.meta.url))
-  .filter((f) => /^[a-z]{2,3}\.json$/.test(f))
-  .map((f) => f.replace('.json', ''))
-
-describe.each(catalogues)('catalogue %s', (code) => {
-  const catalogue: Record<string, string | Record<string, string>> = JSON.parse(
-    readFileSync(new URL(`../src/i18n/${code}.json`, import.meta.url), 'utf8'),
-  )
-
-  it('has no key the English source lacks', () => {
-    expect(compare(source, catalogue).stale).toEqual([])
-  })
-
-  it('gives every entry the placeholders of its key and every plural the forms of its language', () => {
-    const categories = new Intl.PluralRules(code).resolvedOptions().pluralCategories
-    for (const [key, entry] of Object.entries(catalogue)) {
-      const forms = key.split('|')
-      if (typeof entry === 'string') {
-        expect(forms, key).toHaveLength(1)
-        expect(entry.trim(), key).not.toBe('')
-        expect(placeholders(entry), key).toEqual(placeholders(key))
-      } else {
-        expect(forms, key).toHaveLength(2)
-        expect(Object.keys(entry).length, key).toBeGreaterThan(0)
-        for (const [category, text] of Object.entries(entry)) {
-          expect(categories, key).toContain(category)
-          expect(text.trim(), key).not.toBe('')
-          expect(placeholders(text), key).toEqual(placeholders(forms[1] ?? ''))
-        }
-      }
+describe('the catalogue lint', () => {
+  it('names a missing text, a stray key, other placeholders, a wrong plural and a table text left English', () => {
+    const catalogue = {
+      'Value {n}': 'Wert {m}',
+      Stray: 'Streuner',
+      '{count} row|{count} rows': { one: '{count} Zeile', few: '{count} Zeilen' },
+      Busy: 'Busy',
     }
+    expect(
+      problems(['Value {n}', 'Missing', '{count} row|{count} rows', 'Busy'], catalogue, 'de', [
+        'Busy',
+      ]),
+    ).toEqual([
+      'untranslated: Missing',
+      'no message has this key: Stray',
+      'placeholders differ: Value {n}',
+      'few is no plural category of de: {count} row|{count} rows',
+      'left English: Busy',
+    ])
   })
 })
 

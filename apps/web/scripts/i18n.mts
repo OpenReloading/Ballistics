@@ -4,6 +4,8 @@
  *   node scripts/i18n.mts messages        every message, one per line
  *   node scripts/i18n.mts missing <code>  the messages `src/i18n/<code>.json` lacks, and its keys no
  *                                         message matches (exit 1 for such a key)
+ *   node scripts/i18n.mts check <code>    the catalogue lint `pnpm run lint` runs: exit 1 for any
+ *                                         problem `problems` names
  *
  * A message is the first argument of `t(...)` or `msg(...)` and the two forms of `tn(count, one,
  * other)`, as a string literal, in a file that imports from `src/i18n/`.
@@ -91,7 +93,7 @@ export function extract(source: string, file = 'source'): string[] {
 }
 
 /** The messages of the table `src/lib/core-message-table.json`: its codes and the templates of every group. */
-function tableMessages(root: string): string[] {
+export function tableMessages(root: string): string[] {
   const { codes, templates } = JSON.parse(
     readFileSync(path.join(root, 'src/lib/core-message-table.json'), 'utf8'),
   ) as { codes: string[]; templates: Record<string, string[]> }
@@ -115,6 +117,47 @@ export function compare(source: readonly string[], catalogue: Record<string, unk
   }
 }
 
+const placeholders = (s: string) =>
+  [...s.matchAll(/\{(\w+)\}/g)]
+    .map((m) => m[1] ?? '')
+    .sort()
+    .join()
+
+/**
+ * What is wrong with `catalogue` of `language` against the English `source`: a message without a
+ * text, a key no message matches, an empty text, placeholders other than its key's, a plural that is
+ * no object of the language's categories, and a text of the message table (`table`) left English.
+ */
+export function problems(
+  source: readonly string[],
+  catalogue: Record<string, unknown>,
+  language: string,
+  table: readonly string[],
+): string[] {
+  const { untranslated, stale } = compare(source, catalogue)
+  const found = [
+    ...untranslated.map((s) => `untranslated: ${s}`),
+    ...stale.map((k) => `no message has this key: ${k}`),
+  ]
+  const categories: string[] = new Intl.PluralRules(language).resolvedOptions().pluralCategories
+  for (const [key, entry] of Object.entries(catalogue)) {
+    const forms = key.split('|')
+    const plural = typeof entry === 'object' && entry !== null
+    if (forms.length !== (plural ? 2 : 1)) found.push(`a plural is an object of forms: ${key}`)
+    const texts: [string, unknown][] = plural ? Object.entries(entry) : [['', entry]]
+    if (texts.length === 0) found.push(`no plural forms: ${key}`)
+    for (const [category, text] of texts) {
+      if (plural && !categories.includes(category))
+        found.push(`${category} is no plural category of ${language}: ${key}`)
+      if (typeof text !== 'string' || text.trim() === '') found.push(`empty: ${key}`)
+      else if (placeholders(text) !== placeholders(plural ? (forms[1] ?? '') : key))
+        found.push(`placeholders differ: ${key}`)
+    }
+  }
+  for (const text of table) if (catalogue[text] === text) found.push(`left English: ${text}`)
+  return found
+}
+
 if (import.meta.main) {
   const [command, code] = process.argv.slice(2)
   const source = messages()
@@ -129,8 +172,13 @@ if (import.meta.main) {
       for (const s of stale) console.log(`  ${s}`)
       process.exit(1)
     }
+  } else if (command === 'check' && code && /^[a-z]{2,3}$/.test(code)) {
+    const catalogue = JSON.parse(readFileSync(path.join(webRoot, `src/i18n/${code}.json`), 'utf8'))
+    const found = problems(source, catalogue, code, tableMessages(webRoot))
+    for (const p of found) console.error(`src/i18n/${code}.json: ${p}`)
+    if (found.length > 0) process.exit(1)
   } else {
-    console.error('usage: i18n.mts messages | missing <language code>')
+    console.error('usage: i18n.mts messages | missing <language code> | check <language code>')
     process.exit(2)
   }
 }
