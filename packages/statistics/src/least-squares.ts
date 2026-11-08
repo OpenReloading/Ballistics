@@ -3,7 +3,7 @@
  * Jacobians, a conditioning check and the parameter covariance: `apps/docs/docs/models/least-squares.md`.
  */
 
-import { nth } from './errors.ts'
+import { need, nth } from './errors.ts'
 import { type HuberLoss, huberCost, huberRoots } from './huber.ts'
 
 /** Whether the off-diagonal part of `m` is negligible against its diagonal. */
@@ -185,6 +185,22 @@ export interface LogFitInput {
     theta: number[],
     extra?: { conditionNumber?: number; unresolved?: number[]; direction?: number[] },
   ) => never
+}
+
+/**
+ * Throws an `InputError` unless `maxIterations` is a positive integer and `maxCondition` is finite
+ * and at least 1, the condition number of a one-parameter fit; for callers that refuse their options
+ * before any run.
+ */
+export function checkLogFitLimits(maxIterations: number, maxCondition: number): void {
+  need(
+    Number.isInteger(maxIterations) && maxIterations > 0,
+    'maxIterations must be a positive integer',
+  )
+  need(
+    Number.isFinite(maxCondition) && maxCondition >= 1,
+    'maxCondition must be finite and at least 1',
+  )
 }
 
 /** Solution of `logLeastSquares`. */
@@ -425,6 +441,7 @@ function iterate(m: Model, s: State, tolerance: number): LogFitStop | undefined 
  * (`apps/docs/docs/models/least-squares.md`, "Levenberg-Marquardt step").
  */
 export function logLeastSquares(fit: LogFitInput): LogFitResult {
+  checkLogFitLimits(fit.maxIterations, fit.maxCondition)
   const m = modelOf(fit)
   const s = startState(m)
   const tolerance = fit.tolerance ?? 1e-12
