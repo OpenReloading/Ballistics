@@ -364,7 +364,7 @@ describe('the request failures of the app', () => {
 
 /** The package sources whose messages can reach the app through the API. */
 const sources = [
-  ...(['statistics', 'ballistics', 'api'] as const).flatMap((pkg) =>
+  ...(['statistics', 'ballistics', 'use-cases', 'api'] as const).flatMap((pkg) =>
     readdirSync(new URL(`../../../packages/${pkg}/src`, import.meta.url), {
       recursive: true,
       encoding: 'utf8',
@@ -380,7 +380,7 @@ const sources = [
 const dynamicFiles: Record<string, string> = {
   'statistics/src/errors.ts':
     'the definition of `need` and `InputError`: the message is the argument',
-  'api/src/compute/tasks.ts': 'passes the message of another error on',
+  'use-cases/src/tasks.ts': 'passes the message of another error on',
 }
 
 /** Message expressions that are no fixed text, by file and expression, each with the reason. */
