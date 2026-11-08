@@ -27,13 +27,13 @@ import {
   toSi,
   userDataFile,
 } from '@open-reloading/schema'
-import { InputError } from '@open-reloading/statistics'
 import { z } from 'zod'
 import { resistanceGapText } from './advisory-text.ts'
 import { assertFinite, notice, resolvedRecord, unprocessable } from './answer.ts'
 import { powderBulkDensity } from './charge-run.ts'
 import { runInterior } from './interior-run.ts'
 import { type InteriorBody, interiorBody } from './interior-schema.ts'
+import { InputError } from './issue.ts'
 import { type CartridgeWithSpecs, type Warning, warning } from './limits.ts'
 import {
   bulletLengthMm,
@@ -278,7 +278,8 @@ function needChargesAboveZero(charge: number, ladder: InteriorBody['ladder']) {
   if (!ladder) return
   const below = { up: 0, down: ladder.stepCount - 1, around: (ladder.stepCount - 1) / 2 }
   const lowest = charge - below[ladder.direction ?? 'up'] * ladder.chargeStep
-  if (lowest <= 0) throw new InputError(`ladder charge ${grams(lowest)} g must be above 0`)
+  if (lowest <= 0)
+    throw new InputError({ code: 'ladderChargeNotAboveZero', params: { charge: grams(lowest) } })
 }
 
 /** The bulk density of the run, kg/m3: the file's own, else the powder record's. */
