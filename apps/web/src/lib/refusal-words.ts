@@ -10,7 +10,6 @@ import type { ExteriorIssue, InteriorIssue, LoadFileIssue } from '@open-reloadin
 import type { GroupStatisticsIssue } from '@open-reloading/shot-groups'
 import type { Diagnostic, StatisticsIssue } from '@open-reloading/statistics'
 import { english, type Message, msg } from '../i18n/translate.ts'
-import { interiorFields } from './interior-input.ts'
 import { gapWords } from './resistance-gaps.ts'
 
 const statisticsWords = {
@@ -292,11 +291,10 @@ const item = (x: unknown) =>
     : String(x)
 
 /**
- * A param as the sentence shows it: a load file field by its label, a list joined by commas, the
- * pressure rows counted per basis, a number as JavaScript writes it.
+ * A param as the sentence shows it: a list joined by commas, the pressure rows counted per basis, a
+ * number as JavaScript writes it. A load file field arrives labelled (`interior-input.ts`).
  */
 function shown(name: string, v: unknown): string {
-  if (name === 'field') return interiorFields.find((f) => f.key === v)?.label ?? String(v)
   if (Array.isArray(v)) return v.map(item).join(', ')
   if (name === 'rows' && typeof v === 'object' && v !== null)
     return Object.entries(v)

@@ -1,4 +1,9 @@
-import { burnFormKeys, type InteriorLoad, interiorLoad } from '@open-reloading/ballistics'
+import {
+  burnFormKeys,
+  type InteriorLoad,
+  interiorLoad,
+  ValueError,
+} from '@open-reloading/ballistics'
 import { msg, type Translator } from '../i18n/translate.ts'
 import type { FieldSpec } from './field-spec.ts'
 
@@ -387,6 +392,25 @@ export type InteriorBody = {
 }
 
 /**
+ * `interiorLoad` of `values`; a refused value names its field by the field's label, as the refusal
+ * words show it: their module loads apart from the page and holds no field table.
+ */
+function labelledLoad(
+  values: Record<string, number | undefined>,
+  grooveDiameter: number | undefined,
+): InteriorLoad {
+  try {
+    return interiorLoad(values, grooveDiameter)
+  } catch (err) {
+    if (!(err instanceof ValueError)) throw err
+    const code = err.issue?.code
+    if (code !== 'valueMissing' && code !== 'valueNegative') throw err
+    const label = interiorFields.find((s) => s.key === err.field)?.label ?? err.field
+    throw new ValueError(err.field, { code, params: { field: label } })
+  }
+}
+
+/**
  * `POST /interior` body from SI field values; the mapping is `interiorLoad` of ballistics, shared with
  * `POST /interior/load-file`. `grooveDiameter` (m) is the fallback of an empty bore area.
  */
@@ -398,7 +422,7 @@ export function interiorBody(
 ): InteriorBody {
   return {
     model: 'm3',
-    load: interiorLoad(values, grooveDiameter),
+    load: labelledLoad(values, grooveDiameter),
     ...(cartridge && { cartridge }),
     ...(pressureLimit !== undefined && { pressureLimit }),
   }
