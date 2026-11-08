@@ -46,6 +46,32 @@ One tool per job, each free for a public repository. Terms checked on 2026-10-20
 
 Not used: a hosted coverage service (Codecov), jscpd, Trivy (its action tags were rewritten in March 2026, [GHSA-69fq-xp46-6x23](https://github.com/aquasecurity/trivy/security/advisories/GHSA-69fq-xp46-6x23)).
 
+## Which jobs a pull request runs
+
+`apps/web/scripts/ci-plan.mts` decides from the files changed since a base commit and writes these lines to `$GITHUB_OUTPUT` (the reason goes to stderr):
+- `check=true|false`: lint, build, types and unit tests.
+- `e2e=true|false`: the API's conformance run and the e2e tests on the static export.
+- `prerender=full|sample`: every record page, or the cartridge sample of `src/lib/prerender-sample.ts`.
+- `tests=`: the test jobs as JSON, one per group of workspaces the change reaches. pnpm's `--filter "...[<base>]"` adds every workspace that depends on a changed one.
+
+It fails closed. Anything but a pull request, a missing base commit, a failed git call or an empty change list gives every job, every test group and `prerender=full`. A change outside the workspaces (the lockfile, a root config, a workflow) or a failed pnpm call gives every test group.
+
+CI reads `EVENT_NAME` and `BASE_SHA` from the environment. Locally, `--stamp FILE` plans from the changes since the build recorded in FILE, `--require full` asks for every record page, and `--write-stamp FILE --prerender full|sample` records a finished build (clean tree only).
+
+## Web JavaScript budget
+
+`apps/web/scripts/check-weight.mts` fails when the JavaScript a route of the built web app loads grows past the budget of its group in `apps/web/weight-budget.json`. It prints a table per route (also to `$GITHUB_STEP_SUMMARY`): the change against the recorded values and the headroom left. A route with less than `nearShare` of its budget left gets a warning line, which does not fail the check.
+
+It reads `.next` after `pnpm run static:build`:
+- the routes of `app-path-routes-manifest.json`;
+- for each route, its client reference manifest (client component chunks, `entryJSFiles`), the root main and polyfill files of `build-manifest.json`, and the page's `react-loadable-manifest.json` (lazy `next/dynamic` chunks).
+
+Each route is counted in bytes of gzip level 9, each file once:
+- `initial`: what a first visit loads (root main, polyfill, the client chunks of the page and its layouts);
+- `total`: `initial` plus the lazy chunks the page can load on demand.
+
+Only file content counts, so the numbers do not depend on the API, `PRERENDER`, the clock or the build directory. A route in no group, or a group route the build lacks, fails: a new route needs a budget in its pull request, and raising a number is an edit of `weight-budget.json` that review sees.
+
 ## Lint rules without an Oxlint counterpart
 
 Oxlint replaced Biome's lint of JavaScript and TypeScript. These rules of Biome's set had no counterpart:

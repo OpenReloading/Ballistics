@@ -121,6 +121,8 @@ export type SerializedError = {
   unresolved?: number[] | undefined
   direction?: number[] | undefined
   estimate?: TruedParameter[] | undefined
+  /** The trajectory refusal that stopped a truing fit. */
+  detail?: TruingError['detail']
   /** The typed refusal of an `InputError` that has one. */
   issue?: InputError['issue']
 }
@@ -128,7 +130,7 @@ export type SerializedError = {
 /** Plain-object form of `error`: `TruingError` and `InputError` keep their fields, any other value becomes an `Error` with its message. */
 export function serializeError(error: unknown): SerializedError {
   if (error instanceof TruingError) {
-    const { message, reason, conditionNumber, unresolved, direction, estimate } = error
+    const { message, reason, conditionNumber, unresolved, direction, estimate, detail } = error
     return {
       name: 'TruingError',
       message,
@@ -137,6 +139,7 @@ export function serializeError(error: unknown): SerializedError {
       unresolved,
       direction,
       estimate,
+      detail,
     }
   }
   if (error instanceof InputError)
@@ -165,18 +168,15 @@ export function replyTo(task: Task): TaskReply {
 /** Inverse of `serializeError`: rebuilds a `TruingError`, an `InputError` or an `Error`. */
 export function reviveError(error: SerializedError): Error {
   if (error.name === 'TruingError') {
-    const { conditionNumber, unresolved, direction, estimate, message } = error
-    // the message keeps the solver detail the constructor appended
-    return Object.assign(
-      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- serializeError writes the reason of every TruingError
-      new TruingError(error.reason as TruingReason, {
-        conditionNumber,
-        unresolved,
-        direction,
-        estimate,
-      }),
-      { message },
-    )
+    const { conditionNumber, unresolved, direction, estimate, detail } = error
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- serializeError writes the reason of every TruingError
+    return new TruingError(error.reason as TruingReason, {
+      conditionNumber,
+      unresolved,
+      direction,
+      estimate,
+      detail,
+    })
   }
   if (error.name === 'InputError') return new InputError(error.issue ?? error.message)
   return new Error(error.message)

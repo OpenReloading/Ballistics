@@ -7,7 +7,7 @@ import {
   type ChronoParserOptions,
   type SessionCandidate,
 } from './result.ts'
-import { bracketed, splitDelimited, splitLines } from './text.ts'
+import { bracketed, joinQuotedLines, splitDelimited, splitLines } from './text.ts'
 import { parseVelocity, parseVelocityUnit, resolveUnit } from './units.ts'
 
 /** A column number counted from 1, or the header text of the column. */
@@ -362,6 +362,22 @@ function readRowShotAt(
   }
 }
 
+/** The rows from line `skip` on that hold a cell, a quoted line break kept inside its row. */
+function filledRows(lines: string[], delimiter: Delimiter, skip: number): Row[] {
+  // joined from `skip` on, so a quote in a skipped line cannot swallow data rows
+  const kept = lines.slice(skip)
+  const joined =
+    delimiter === 'none'
+      ? kept.map((line, index) => ({ text: line, index }))
+      : joinQuotedLines(kept, delimiter)
+  return joined
+    .map(({ text, index }) => ({
+      lineNumber: skip + index + 1,
+      cells: splitCells(text, delimiter),
+    }))
+    .filter((r) => r.cells.some((c) => c !== ''))
+}
+
 /**
  * Reads delimited text with `options.columns` as `format`. `detected`: the delimiter in
  * `options` was detected, not named by the user.
@@ -377,10 +393,7 @@ export function parseDelimitedRows(
   const names = columns.flatMap(([, c]) => (typeof c === 'string' ? [c.trim().toLowerCase()] : []))
   const skip = options.skipRows ?? 0
   const delimiter = chooseDelimiter(lines, options.delimiter, names, skip)
-  const rows: Row[] = lines
-    .map((line, i) => ({ lineNumber: i + 1, cells: splitCells(line, delimiter) }))
-    .slice(skip)
-    .filter((r) => r.cells.some((c) => c !== ''))
+  const rows = filledRows(lines, delimiter, skip)
   const { header, headerText, data } = findHeader(rows, names, options.columns.velocity)
   const context: RowContext = {
     index: columnIndex(columns, header),

@@ -108,8 +108,7 @@ describe('exterior run functions without Fastify', () => {
       ranges: [0],
     }
     await expect(runTrajectory(context, trajectoryBody.parse(request))).rejects.toMatchObject({
-      statusCode: 404,
-      message: 'bullet nope not found',
+      issue: { code: 'recordNotFound', params: { kind: 'bullet', id: 'nope' } },
     })
   })
 })

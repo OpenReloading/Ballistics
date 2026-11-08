@@ -188,12 +188,16 @@ describe('POST /exterior/trajectory', () => {
     expect((await send({ bullet: 'example-a-1' })).status).toBe(400)
     const noG7 = await send({ bullet: 'example-a-1', dragModel: 'G7' })
     expect(noG7.status).toBe(422)
-    expect(noG7.body.message).toBe('bullet example-a-1 has no G7 ballistic coefficient')
+    expect(noG7.body).toMatchObject({
+      code: 'bulletWithoutCoefficient',
+      params: { bullet: 'example-a-1', model: 'G7' },
+    })
     const twoG1 = await send({ bullet: 'example-a-3', dragModel: 'G1' })
     expect(twoG1.status).toBe(422)
-    expect(twoG1.body.message).toBe(
-      'bullet example-a-3 has 2 G1 values without distinct velocity bands; send drag explicitly',
-    )
+    expect(twoG1.body).toMatchObject({
+      code: 'bulletCoefficientsWithoutBands',
+      params: { bullet: 'example-a-3', count: 2, model: 'G1' },
+    })
   })
 
   it('matches the vacuum drop with a zero drag curve', async () => {
@@ -985,9 +989,17 @@ describe('GET /exterior/stability', () => {
       url: `${API_PREFIX}/exterior/stability?bullet=example-a-4&twist=0.254&muzzleVelocity=800`,
     })
     expect(heavy.statusCode).toBe(422)
-    expect(heavy.json().message).toBe(
-      'bullet example-a-4 mass 0.5 kg must be within 0.0001 and 0.2 kg',
-    )
+    expect(heavy.json()).toMatchObject({
+      code: 'bulletValueOutOfBounds',
+      params: {
+        bullet: 'example-a-4',
+        key: 'mass',
+        value: 0.5,
+        unit: 'kg',
+        low: 0.0001,
+        high: 0.2,
+      },
+    })
   })
 
   it('keeps Miller stability finite and above 0 at every vertex of the bounds', () => {
