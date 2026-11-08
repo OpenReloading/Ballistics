@@ -99,7 +99,7 @@ describe('parseShotView: the name line, a German export, dates and the footer', 
     expect(r.warnings).toEqual([
       {
         code: 'statisticDiffers',
-        params: { label: 'AVERAGE SPEED', value: '2812.0', computed: '2802.0' },
+        params: { label: 'AVERAGE SPEED', value: '2812.0', computed: expect.closeTo(2802, 1) },
       },
     ])
   })
@@ -290,12 +290,15 @@ describe('ShotView CSV name line, date row, bore flags and footer labels', () =>
     expect(sd.warnings).toEqual([
       {
         code: 'statisticDiffers',
-        params: { label: 'STANDARDABWEICHUNG', value: '9,1', computed: '1.1' },
+        params: { label: 'STANDARDABWEICHUNG', value: '9,1', computed: expect.closeTo(1.1, 1) },
       },
     ])
     const spread = parseShotView(shotViewGerman.replace('STREUUNG,"2,5"', 'STREUUNG,"9,5"'))
     expect(spread.warnings).toEqual([
-      { code: 'statisticDiffers', params: { label: 'STREUUNG', value: '9,5', computed: '2.5' } },
+      {
+        code: 'statisticDiffers',
+        params: { label: 'STREUUNG', value: '9,5', computed: expect.closeTo(2.5, 1) },
+      },
     ])
   })
 })

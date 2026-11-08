@@ -1,5 +1,6 @@
 /** The warnings and refusals of the chronograph readers in words, loaded where they are shown. */
-import { type ChronoDiagnostic, ReaderError } from '@open-reloading/importers'
+import { type ChronoDiagnostic, type CommaRemedy, ReaderError } from '@open-reloading/importers'
+import { fixedNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { chronoOwnMessages, formats } from './chrono.ts'
 import { translateMessage } from './core-messages.ts'
@@ -81,7 +82,7 @@ const chronoMessages: Record<ChronoDiagnostic['code'], Message> = {
   readsWorkbooks: msg('{format} reads workbooks; this file is text'),
 }
 
-const remedies: Record<string, Message> = {
+const remedies: Record<CommaRemedy, Message> = {
   quoteOrSemicolon: msg("quote the cell or use ';' as the delimiter"),
   nameDelimiter: msg('name the delimiter'),
 }
@@ -97,7 +98,9 @@ function rowsText(rows: readonly string[], t: Translator['t']) {
 
 /** A value as the message shows it: lists joined, the comma remedy and the comma rows in words. */
 function shown(name: string, v: string | number | readonly string[], t: Translator['t']) {
-  if (name === 'remedy' && typeof v === 'string') return t(remedies[v] ?? (v as Message))
+  if (name === 'remedy' && typeof v === 'string' && Object.hasOwn(remedies, v))
+    return t(remedies[v as CommaRemedy])
+  if (name === 'computed' && typeof v === 'number') return fixedNumber(v, 1)
   if (typeof v !== 'object') return v
   if (name === 'rows') return rowsText(v, t)
   return (name === 'names' ? v.map((n) => `"${n}"`) : v).join(', ')

@@ -9,6 +9,7 @@ import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
 import { msg, type Say, type Translator } from '../i18n/translate.ts'
 import { chronoFileBytes, readChrono } from '../lib/chrono.ts'
+import { chronoFailureSay } from '../lib/chrono-failure.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { chronographGuide } from '../lib/docs-url.ts'
 import { errorText } from '../lib/error-text.ts'
@@ -317,9 +318,7 @@ export function Measurements({
       try {
         added.push(await readSession(file, unit, steps, makers, manufacturerRef))
       } catch (err) {
-        // the readers' words load only when a file fails: the workbench carries none of them
-        const { chronoErrorText } = await import('../lib/chrono-diagnostics.ts')
-        failed.push({ file: file.name, say: (t) => chronoErrorText(err, t) })
+        failed.push({ file: file.name, say: await chronoFailureSay(err) })
       }
     }
     setSessions((s) => [...s, ...added])
