@@ -353,8 +353,8 @@ function readRowShotAt(
     return readRowShot(cell, context)
   } catch (e) {
     if (!(e instanceof ReaderError)) throw e
-    const { code, params } = e.diagnostic
-    throw new ReaderError({ code, params: { ...params, row: lineNumber } }, { cause: e })
+    const d = e.diagnostic
+    throw new ReaderError({ ...d, params: { ...d.params, row: lineNumber } }, { cause: e })
   }
 }
 

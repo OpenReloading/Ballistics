@@ -13,7 +13,7 @@ import {
 } from '@open-reloading/importers'
 import { formatNumber } from '../i18n/number.ts'
 import { english, type Message, msg, type Translator } from '../i18n/translate.ts'
-import { chronoDiagnosticText } from './chrono-diagnostics.ts'
+import { chronoDiagnosticText, isChronoDiagnostic } from './chrono-diagnostics.ts'
 import { translateMessage } from './core-messages.ts'
 import { toCsv } from './csv.ts'
 import { errorText } from './error-text.ts'
@@ -99,7 +99,8 @@ const ownMessages: readonly Message[] = [tooLarge, notWorkbook, notExport]
 
 /** Why a chronograph file was not read, in the language of `t`: a reader's refusal, this module's own, or another error's message. */
 export function chronoErrorText(error: unknown, t: Translator['t']): string {
-  if (error instanceof ReaderError) return chronoDiagnosticText(error.diagnostic, t)
+  if (error instanceof ReaderError && isChronoDiagnostic(error.diagnostic))
+    return chronoDiagnosticText(error.diagnostic, t)
   const text = errorText(error)
   const own = ownMessages.find((m) => m === text)
   return own ? t(own, { formats }) : translateMessage(text, t)

@@ -100,6 +100,10 @@ function shown(name: string, v: string | number | readonly string[], t: Translat
   return (name === 'names' ? v.map((n) => `"${n}"`) : v).join(', ')
 }
 
+/** True for a diagnostic of a chronograph reader, which `chronoDiagnosticText` words. */
+export const isChronoDiagnostic = (d: { code: string }): d is ChronoDiagnostic =>
+  Object.hasOwn(chronoMessages, d.code)
+
 /** What a chronograph reader warned of or refused, in the language of `t`: the worksheet and row first where named. */
 export function chronoDiagnosticText(d: ChronoDiagnostic, t: Translator['t']): string {
   const { worksheet, row, ...rest } = d.params

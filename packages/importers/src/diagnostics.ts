@@ -9,9 +9,9 @@ export type ReaderDiagnostic<Code extends string> = Diagnostic<
 
 /** A file a reader refuses: `diagnostic` says why, and the app words it. The message is the code. */
 export class ReaderError extends Error {
-  readonly diagnostic: ChronoDiagnostic
+  readonly diagnostic: ChronoDiagnostic | PressureDiagnostic
 
-  constructor(diagnostic: ChronoDiagnostic, options?: ErrorOptions) {
+  constructor(diagnostic: ChronoDiagnostic | PressureDiagnostic, options?: ErrorOptions) {
     super(diagnostic.code, options)
     this.name = 'ReaderError'
     this.diagnostic = diagnostic
@@ -80,6 +80,31 @@ export type ChronoDiagnostic = ReaderDiagnostic<
 export function refuse(
   code: ChronoDiagnostic['code'],
   params: ChronoDiagnostic['params'] = {},
+): never {
+  throw new ReaderError({ code, params })
+}
+
+/**
+ * What the pressure-history reader warns of or refuses a trace for. `column` is `time` or
+ * `pressure`, `line` the line of the file.
+ */
+export type PressureDiagnostic = ReaderDiagnostic<
+  | 'sensorMissing'
+  | 'columnsNotDistinct'
+  | 'cutoffNotPositive'
+  | 'columnUnitDiffersFromCaller'
+  | 'columnUnitMissing'
+  | 'columnUnitNamedByCaller'
+  | 'readingNotNumber'
+  | 'readingNotFinite'
+  | 'timesNotIncreasing'
+  | 'tooFewSamples'
+>
+
+/** Throws the pressure-history refusal `code` with `params`. */
+export function refuseTrace(
+  code: PressureDiagnostic['code'],
+  params: PressureDiagnostic['params'] = {},
 ): never {
   throw new ReaderError({ code, params })
 }

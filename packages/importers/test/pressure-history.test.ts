@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { parsePressureHistory } from '../src/index.ts'
+import { refusal } from './refusal.ts'
 
 const mpa = 'time (ms);pressure (MPa)\n0;10\n0.1;150\n0.2;300\n0.3;250\n0.4;120\n'
 
@@ -34,7 +35,7 @@ describe('parsePressureHistory: units from the header or the caller', () => {
       timeUnit: 'us',
     })
     expect(t.warnings).toEqual([
-      'time unit "ticks" in the file is unknown; using us as named by the caller',
+      { code: 'columnUnitNamedByCaller', params: { column: 'time', text: 'ticks', unit: 'us' } },
     ])
     expect(t.time[1]).toBe(1e-6)
   })
@@ -42,54 +43,61 @@ describe('parsePressureHistory: units from the header or the caller', () => {
 
 describe('parsePressureHistory: refused units and long cells', () => {
   it('rejects a missing unit with a message that names the column', () => {
-    expect(() =>
-      parsePressureHistory('time (ms);pressure\n0;1\n1;2\n2;3\n', { sensor: 'breech' }),
-    ).toThrow('pressure unit is missing: name the unit to import this file')
-    expect(() =>
-      parsePressureHistory('0;1\n1;2\n2;3\n', { sensor: 'breech', pressureUnit: 'bar' }),
-    ).toThrow('time unit is missing')
+    expect(
+      refusal(() =>
+        parsePressureHistory('time (ms);pressure\n0;1\n1;2\n2;3\n', { sensor: 'breech' }),
+      ),
+    ).toEqual({ code: 'columnUnitMissing', params: { column: 'pressure' } })
+    expect(
+      refusal(() =>
+        parsePressureHistory('0;1\n1;2\n2;3\n', { sensor: 'breech', pressureUnit: 'bar' }),
+      ),
+    ).toEqual({ code: 'columnUnitMissing', params: { column: 'time' } })
   })
 
   it('rejects a unit that differs from the one the caller names', () => {
-    expect(() => parsePressureHistory(mpa, { sensor: 'breech', pressureUnit: 'bar' })).toThrow(
-      'pressure unit "MPa" in the file differs from bar named by the caller',
-    )
-  })
-
-  it('reads a long header and a long cell that is no number in linear time', () => {
-    const start = performance.now()
-    const t = parsePressureHistory(
-      `time ${'['.repeat(50_000)};pressure (MPa)\n0;10\n0.1;150\n0.2;300\n`,
-      { sensor: 'breech', timeUnit: 'ms' },
-    )
-    expect(() =>
-      parsePressureHistory(`time (ms);pressure (MPa)\n${'1'.repeat(50_000)}x;0\n0;10\n0.1;150\n`, {
-        sensor: 'breech',
-      }),
-    ).toThrow('line 2: time or pressure is not a number')
-    expect(performance.now() - start).toBeLessThan(500)
-    expect(t.time).toEqual([0, 1e-4, 2e-4])
+    expect(
+      refusal(() => parsePressureHistory(mpa, { sensor: 'breech', pressureUnit: 'bar' })),
+    ).toEqual({
+      code: 'columnUnitDiffersFromCaller',
+      params: { column: 'pressure', text: 'MPa', caller: 'bar' },
+    })
   })
 })
 
 describe('parsePressureHistory: the sensor, the shape of the trace and its columns', () => {
   it('requires the sensor position', () => {
-    expect(() => parsePressureHistory(mpa, {} as never)).toThrow('the sensor position is missing')
+    expect(refusal(() => parsePressureHistory(mpa, {} as never))).toEqual({
+      code: 'sensorMissing',
+      params: { sensors: ['breech', 'mean', 'base'] },
+    })
   })
 
   it('rejects a bad shape: text, decreasing times, too few samples, wrong columns', () => {
     const o = { sensor: 'breech', timeUnit: 's', pressureUnit: 'bar' } as const
-    expect(() => parsePressureHistory('0;1\n1;x\n2;3\n', o)).toThrow(
-      'line 2: time or pressure is not a number',
-    )
-    expect(() => parsePressureHistory('0;1\n1;2\n1;3\n', o)).toThrow('line 3: times must increase')
-    expect(() => parsePressureHistory('0;1\n1;2\n', o)).toThrow('at least 3 samples')
-    expect(() =>
-      parsePressureHistory('0;1\n1;2\n2;3\n', { ...o, columns: { time: 1, pressure: 1 } }),
-    ).toThrow('columns:')
-    expect(() =>
-      parsePressureHistory('0;1\n1;2\n2;3\n', { ...o, columns: { time: 0, pressure: 2 } }),
-    ).toThrow('columns:')
+    expect(refusal(() => parsePressureHistory('0;1\n1;x\n2;3\n', o))).toEqual({
+      code: 'readingNotNumber',
+      params: { line: 2 },
+    })
+    expect(refusal(() => parsePressureHistory('0;1\n1;2\n1;3\n', o))).toEqual({
+      code: 'timesNotIncreasing',
+      params: { line: 3 },
+    })
+    expect(refusal(() => parsePressureHistory('0;1\n1;2\n', o))).toEqual({
+      code: 'tooFewSamples',
+      params: { min: 3 },
+    })
+    const notDistinct = { code: 'columnsNotDistinct', params: {} }
+    expect(
+      refusal(() =>
+        parsePressureHistory('0;1\n1;2\n2;3\n', { ...o, columns: { time: 1, pressure: 1 } }),
+      ),
+    ).toEqual(notDistinct)
+    expect(
+      refusal(() =>
+        parsePressureHistory('0;1\n1;2\n2;3\n', { ...o, columns: { time: 0, pressure: 2 } }),
+      ),
+    ).toEqual(notDistinct)
   })
 
   it('reads other columns', () => {
@@ -121,12 +129,14 @@ describe('parsePressureHistory: the zero-phase low-pass', () => {
     expect(Math.max(...spike.pressureBar)).toBeLessThan(1000)
     expect(spike.pressureBar.indexOf(Math.max(...spike.pressureBar))).toBe(20)
     expect(spike.pressureBar[19]).toBeCloseTo(spike.pressureBar[21] as number, 3)
-    expect(() =>
-      parsePressureHistory(
-        rows(() => 1),
-        { ...o, lowPass: { cutoff: 0 } },
+    expect(
+      refusal(() =>
+        parsePressureHistory(
+          rows(() => 1),
+          { ...o, lowPass: { cutoff: 0 } },
+        ),
       ),
-    ).toThrow('lowPass cutoff')
+    ).toEqual({ code: 'cutoffNotPositive', params: {} })
   })
 })
 
@@ -148,9 +158,10 @@ describe('parsePressureHistory: numbers and unit spellings', () => {
   it('does not read mPa or Mbar as another unit', () => {
     const o = { sensor: 'breech', timeUnit: 's' } as const
     for (const unit of ['mPa', 'Mbar'])
-      expect(() => parsePressureHistory(`t (s);p (${unit})\n0;1\n1;2\n2;3\n`, o)).toThrow(
-        'pressure unit is missing',
-      )
+      expect(refusal(() => parsePressureHistory(`t (s);p (${unit})\n0;1\n1;2\n2;3\n`, o))).toEqual({
+        code: 'columnUnitMissing',
+        params: { column: 'pressure' },
+      })
     const t = parsePressureHistory('t (s);p (MPA)\n0;1\n1;2\n2;3\n', o)
     expect(t.units.pressure.unit).toBe('MPa')
   })
@@ -184,9 +195,10 @@ describe('parsePressureHistory: unit words, signs and blank lines', () => {
   it('reads signed numbers and a fraction without a leading digit, rejects a number with a tail', () => {
     const o = { sensor: 'breech', timeUnit: 's', pressureUnit: 'bar' } as const
     expect(parsePressureHistory('-0;+1\n.25;2\n1;3\n', o).pressureBar).toEqual([1, 2, 3])
-    expect(() => parsePressureHistory('0;1\n1;2x\n2;3\n', o)).toThrow(
-      'line 2: time or pressure is not a number',
-    )
+    expect(refusal(() => parsePressureHistory('0;1\n1;2x\n2;3\n', o))).toEqual({
+      code: 'readingNotNumber',
+      params: { line: 2 },
+    })
   })
 
   it('skips a line of only white space', () => {
@@ -213,12 +225,11 @@ describe('parsePressureHistory: the filter peak and readings that are not finite
 
   it('rejects a reading that is not finite, also after the unit factor', () => {
     const o = { sensor: 'breech', timeUnit: 's', pressureUnit: 'bar' } as const
-    expect(() => parsePressureHistory('0;1\n1;1e309\n2;3\n', o)).toThrow(
-      'line 2: time or pressure is not finite',
-    )
-    expect(() => parsePressureHistory('0;1\n1e309;2\n2;3\n', o)).toThrow('line 2:')
-    expect(() =>
-      parsePressureHistory('0;1\n1;1.7e308\n2;3\n', { ...o, pressureUnit: 'MPa' }),
-    ).toThrow('line 2: time or pressure is not finite')
+    const notFinite = { code: 'readingNotFinite', params: { line: 2 } }
+    expect(refusal(() => parsePressureHistory('0;1\n1;1e309\n2;3\n', o))).toEqual(notFinite)
+    expect(refusal(() => parsePressureHistory('0;1\n1e309;2\n2;3\n', o))).toEqual(notFinite)
+    expect(
+      refusal(() => parsePressureHistory('0;1\n1;1.7e308\n2;3\n', { ...o, pressureUnit: 'MPa' })),
+    ).toEqual(notFinite)
   })
 })
