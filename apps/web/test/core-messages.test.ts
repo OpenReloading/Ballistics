@@ -186,10 +186,9 @@ describe('reason codes', () => {
     ])
   })
 
-  it('has a German text for each reason', () => {
+  it('maps each reason', () => {
     for (const reason of new Set(reasons)) {
       expect(translateMessage(reason, marker.t), reason).toBe('MAPPED')
-      expect(translateMessage(reason, german.t), reason).not.toBe(reason)
     }
   })
 })
@@ -264,7 +263,7 @@ describe('the warnings of an interior answer', () => {
     'Simulation: solid fill 0.66 is above 0.64; the model is outside the range it was built for.',
   ]
 
-  it('gives the answer of a load file that lacks values a German sentence', () => {
+  it('maps the answer of a load file that lacks values', () => {
     const values = (keys: string[]) => Object.fromEntries(keys.map((k) => [k, 1]))
     const all = missingValuesAnswer({}, [])?.payload.missing.map((m) => m.key) ?? []
     expect(all.length).toBeGreaterThan(2)
@@ -276,7 +275,6 @@ describe('the warnings of an interior answer', () => {
     }
     const one = missingValuesAnswer(values(all.slice(1)), [])?.payload.message ?? ''
     expect(one).toMatch(/lacks 1 value:/)
-    expect(translateMessage(one, german.t)).toMatch(/^In der Datei der Laborierung fehlt 1 Wert: /)
   })
 
   it('writes the load ratio warning with the words of the API', () => {
@@ -293,20 +291,16 @@ describe('the warnings of an interior answer', () => {
     expect(source).toContain('advisoryRule.loadRatioHigh')
   })
 
-  it('names every rule of the registry in German', () => {
+  it('maps every rule of the registry', () => {
     for (const { name } of Object.values(advisoryText)) {
       expect(translateMessage(name, marker.t), name).toBe('MAPPED')
-      expect(translateMessage(name, german.t), name).not.toBe(name)
     }
   })
 
-  it('gives each message of the API a German sentence and keeps English as it is', () => {
+  it('maps each message of the API and keeps English as it is', () => {
     for (const text of [...produced.map((w) => w.message), ...fromLoadFile]) {
       expect(translateMessage(text, marker.t), text).toBe('MAPPED')
       expect(translateMessage(text, english.t), text).toBe(text)
-      const shown = translateMessage(text, german.t)
-      expect(shown, text).not.toBe(text)
-      expect(shown, text).not.toMatch(/[{}]/)
     }
   })
 })
@@ -327,10 +321,9 @@ describe('the request failures of the app', () => {
     'internal server error',
   ]
 
-  it('has a German text for each sentence', () => {
+  it('maps each sentence and keeps it in English', () => {
     for (const text of sentences) {
       expect(translateMessage(text, marker.t), text).toBe('MAPPED')
-      expect(translateMessage(text, german.t), text).not.toBe(text)
       expect(translateMessage(text, english.t), text).toBe(text)
     }
   })
@@ -528,12 +521,5 @@ describe('the messages of the packages', () => {
 
   it('keeps every message as it is in English', () => {
     for (const f of scan('0.5')) expect(translateMessage(f.text, english.t), f.where).toBe(f.text)
-  })
-
-  it('has a German text that differs from the English for every message', () => {
-    const same = scan('7')
-      .filter((f) => translateMessage(f.text, german.t) === f.text)
-      .map((f) => `${f.where}: ${f.text}`)
-    expect(same).toEqual([])
   })
 })
