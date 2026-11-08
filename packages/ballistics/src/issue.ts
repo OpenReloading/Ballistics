@@ -29,6 +29,25 @@ export type ExteriorIssue =
   | Diagnostic<'boatTailLengthNegative'>
   | Diagnostic<'headShapeOutsideUnit'>
   | Diagnostic<'outlineLengthsNotPositive'>
+  | Diagnostic<'noCandidate'>
+  | Diagnostic<'dispersionNotPositive'>
+  | Diagnostic<'entryValueInvalid'>
+  | Diagnostic<'entryKindUnknown', { kind: string }>
+  | Diagnostic<'noEntryOrChronograph'>
+  | Diagnostic<'chronographMeanInvalid'>
+  | Diagnostic<'entryRoundingNegative', { kind: string }>
+  | Diagnostic<'entryStandardDeviationNotPositive', { kind: string }>
+  | Diagnostic<'entryShotCountInvalid', { kind: string }>
+  | Diagnostic<'entryRangeInvalid', { kind: string }>
+  | Diagnostic<'maxRelativeStandardUncertaintyNotPositive'>
+  | Diagnostic<'maxInflationNotAboveOne'>
+  | Diagnostic<'residualConfidenceLevelOutsideUnit'>
+  | Diagnostic<'confidenceLevelOptionOutsideUnit'>
+  | Diagnostic<'zeroOffsetPriorWithoutFit'>
+  | Diagnostic<'priorNotPositive', { name: string }>
+  | Diagnostic<'priorUnknown', { name: string }>
+  | Diagnostic<'clickValueNotPositive'>
+  | Diagnostic<'maxZeroSigmaNotPositive'>
   | Diagnostic<'muzzleVelocityNotPositive'>
   | Diagnostic<'stepSizeBelowMinimum', { step: number; min: number }>
   | Diagnostic<'integrationBudgetExceeded', { max: number }>
@@ -74,10 +93,28 @@ export type ExteriorIssue =
   | Diagnostic<'dragModelUnknown', { model: string }>
   | Diagnostic<'windSegmentsNotRising'>
   | Diagnostic<'windSegmentInvalid'>
+  | Diagnostic<'sessionWithoutObservation'>
+  | Diagnostic<'noSession'>
+  | Diagnostic<'knotsNeedSingleBandOrCurve'>
+  | Diagnostic<'knotsNotRising'>
+  | Diagnostic<'knotMachNotPositive'>
+  | Diagnostic<'knotsTooFew'>
+  | Diagnostic<'mixedObservationsNeedUncertainty'>
+  | Diagnostic<'standardUncertaintyPartial'>
+  | Diagnostic<'standardUncertaintyNotPositive'>
+  | Diagnostic<'observationRangeInvalid', { range: number }>
+  | Diagnostic<'observationValueInvalid'>
+  | Diagnostic<'observationKindUnknown', { kind: string }>
+  | Diagnostic<'noObservation'>
+  | Diagnostic<'maxTotalStepsNotPositive'>
   | Diagnostic<
       'airDensityOutsideRange',
       { pressure: number; temperature: number; density: number; max: number }
     >
+  | Diagnostic<'groupSharesShots', { group: string }>
+  | Diagnostic<'rangeGroupSharesShots', { range: number }>
+  /** A trajectory of a truing fit that ends before a range of the rows. */
+  | Diagnostic<'rangeNotReached', { range: number }>
 
 /** Why a function of this package refuses its input. */
 export type BallisticsIssue = ExteriorIssue
