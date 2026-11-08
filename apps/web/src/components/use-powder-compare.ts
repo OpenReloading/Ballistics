@@ -13,8 +13,7 @@ import {
   chargeTargetBody,
   noComparableLimitText,
 } from '../lib/charge-target.ts'
-import { translateMessage } from '../lib/core-messages.ts'
-import { errorText } from '../lib/error-text.ts'
+import { refusalText, translateMessage } from '../lib/core-messages.ts'
 import type { InteriorBody } from '../lib/interior-input.ts'
 import {
   fetchManufacturerNames,
@@ -128,7 +127,7 @@ export function answerRow(
       flagText: flag === undefined ? undefined : (t) => stepFlag(shown, t),
     }
   } catch (err) {
-    return { ...head, charge, reason: errorText(err) }
+    return { ...head, charge, reason: refusalText(err) }
   }
 }
 
@@ -235,7 +234,7 @@ async function powderRow(
   try {
     req = cx.loadRequest({ powder: record, charge })
   } catch (err) {
-    return { ...head, charge, reason: errorText(err) }
+    return { ...head, charge, reason: refusalText(err) }
   }
   if (cx.mode.kind === 'target') return targetRow(cx, head, req, cx.mode)
   const run = await postInteriorRun(req.body, cx.batch)
@@ -318,7 +317,7 @@ function baseRequest(loadRequest: UseWorkbenchStateResult['loadRequest']) {
   try {
     return { base: loadRequest() }
   } catch (err) {
-    return { message: errorText(err) }
+    return { message: refusalText(err) }
   }
 }
 
@@ -387,7 +386,7 @@ export function usePowderCompare(
       const ended = endMessage(done, signal.aborted)
       if (ended && current()) setMessage(ended)
     } catch (err) {
-      if (!signal.aborted) setMessage({ kind: 'error', text: errorText(err) })
+      if (!signal.aborted) setMessage({ kind: 'error', text: refusalText(err) })
     } finally {
       clearTimeout(timer)
       if (current()) setRunning(false)

@@ -48,7 +48,7 @@ describe('dynamic vivacity', () => {
 
   it('names the field it rejects and accepts the ends 0 and 1', () => {
     expect(() => dynamicVivacity({ ...burn(0), exponent: 1.1 }, 0.5)).toThrow(
-      'dynamic vivacity: exponent must be 1',
+      'dynamicVivacityExponentNotOne',
     )
     for (const [from, to] of [
       [0.5, 0.5],
@@ -56,9 +56,7 @@ describe('dynamic vivacity', () => {
       [-0.1, 0.4],
       [0.2, 1.1],
     ] as const)
-      expect(() => meanDynamicVivacity(burn(0), from, to)).toThrow(
-        'dynamic vivacity: need 0 <= from < to <= 1',
-      )
+      expect(() => meanDynamicVivacity(burn(0), from, to)).toThrow('dynamicVivacityRangeInvalid')
     const whole = ((0.6 / 98066.5) * (phiIntegral(0.8, 1) - phiIntegral(0.8, 0))) / 1
     // phi falls as sqrt(1 - z) at z = 1, where Simpson converges slowly
     expect(meanDynamicVivacity(burn(0.8), 0, 1) / whole).toBeCloseTo(1, 4)

@@ -55,14 +55,14 @@ describe('chargeLadder counts and checks', () => {
   it.each(
     (
       [
-        [0, 0.0001, 2, 'up', 'ladder start charge must be above 0'],
-        [-0.001, 0.0001, 2, 'up', 'ladder start charge must be above 0'],
-        [Number.NaN, 0.0001, 2, 'up', 'ladder start charge must be above 0'],
-        [Number.POSITIVE_INFINITY, 0.0001, 2, 'up', 'ladder start charge must be above 0'],
-        [0.0029, 0, 2, 'up', 'ladder step must be above 0'],
-        [0.0029, 0.0001, 0, 'up', 'ladder steps must be an integer of at least 1'],
-        [0.0029, 0.0001, 4, 'around', 'a ladder around the charge needs an odd count'],
-        [0.0002, 0.0001, 3, 'down', 'ladder charge 0 kg must be above 0'],
+        [0, 0.0001, 2, 'up', 'ladderStartNotPositive'],
+        [-0.001, 0.0001, 2, 'up', 'ladderStartNotPositive'],
+        [Number.NaN, 0.0001, 2, 'up', 'ladderStartNotPositive'],
+        [Number.POSITIVE_INFINITY, 0.0001, 2, 'up', 'ladderStartNotPositive'],
+        [0.0029, 0, 2, 'up', 'ladderStepNotPositive'],
+        [0.0029, 0.0001, 0, 'up', 'ladderStepCountInvalid'],
+        [0.0029, 0.0001, 4, 'around', 'ladderAroundNeedsOddCount'],
+        [0.0002, 0.0001, 3, 'down', 'ladderChargeBelowZero'],
       ] as const
     ).map(([start, step, steps, direction, message]) => ({
       start,

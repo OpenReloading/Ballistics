@@ -894,7 +894,7 @@ describe('POST /interior charge ladder', () => {
     })
     expect(negative.status).toBe(422)
     expect(negative.body).toMatchObject({ notice: 'simulation, not load data' })
-    expect(negative.body.message).toMatch(/ladder charge .* must be above 0/)
+    expect(negative.body.code).toBe('ladderChargeBelowZero')
   })
 })
 

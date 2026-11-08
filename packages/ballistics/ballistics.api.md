@@ -61,7 +61,7 @@ export interface BallisticCoefficientBand {
 }
 
 // @public
-export type BallisticsIssue = ExteriorIssue;
+export type BallisticsIssue = ExteriorIssue | InteriorIssue;
 
 // @public
 export interface BoreAngles {
@@ -592,6 +592,17 @@ export type InteriorInvalid = {
     reason: InteriorReason;
     field?: string;
 };
+
+// @public
+export type InteriorIssue = Diagnostic<'gasVelocityFactorNegative'> | Diagnostic<'muzzleVelocityNegative'> | Diagnostic<'chargeMassNegative'> | Diagnostic<'projectileMassNotPositive'> | Diagnostic<'firearmMassNotPositive'> | Diagnostic<'loadRatioTargetNeedsBulkDensity'> | Diagnostic<'bulkDensityNotPositive'> | Diagnostic<'targetValueNotPositive'> | Diagnostic<'ladderChargeBelowZero', {
+    charge: number;
+}> | Diagnostic<'ladderAroundNeedsOddCount'> | Diagnostic<'ladderStepCountInvalid'> | Diagnostic<'ladderStepNotPositive'> | Diagnostic<'ladderStartNotPositive'> | Diagnostic<'boreResistanceNeedsValues', {
+    missing: string[];
+}> | Diagnostic<'powderWithoutInteriorModel'> | Diagnostic<'bulletConstructionUnknown', {
+    construction: string;
+}> | Diagnostic<'barrelNotPositive', {
+    barrel: number;
+}> | Diagnostic<'dynamicVivacityRangeInvalid'> | Diagnostic<'dynamicVivacityExponentNotOne'>;
 
 // @public
 export interface InteriorLoad {
