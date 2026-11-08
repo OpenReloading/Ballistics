@@ -1,5 +1,7 @@
 'use client'
 
+import type { I18n } from '@lingui/core'
+import { I18nProvider } from '@lingui/react'
 import {
   type CSSVariablesResolver,
   createTheme,
@@ -27,14 +29,20 @@ const uiTheme = createTheme({ ...theme, variantColorResolver })
 const resolver: CSSVariablesResolver = () => cssVariables
 
 /**
- * Mantine on the design tokens: the generated theme and the scheme colors it cannot set. It takes only the color
- * scheme: Mantine's theme, class and variable props would undo ui.css or the tokens. Load `@open-reloading/ui/ui.css` with it.
+ * Mantine on the design tokens, with the app's messages: the generated theme, the scheme colors it cannot set, and
+ * `i18n`, which holds `uiMessages` beside the app's own. It takes only the color scheme besides: Mantine's theme,
+ * class and variable props would undo ui.css or the tokens. Load `@open-reloading/ui/ui.css` with it.
  */
-export function UiProvider(
-  props: Pick<
-    MantineProviderProps,
-    'children' | 'defaultColorScheme' | 'forceColorScheme' | 'colorSchemeManager'
-  >,
-): ReactElement {
-  return <MantineProvider {...props} theme={uiTheme} cssVariablesResolver={resolver} />
+export function UiProvider({
+  i18n,
+  ...props
+}: { i18n: I18n } & Pick<
+  MantineProviderProps,
+  'children' | 'defaultColorScheme' | 'forceColorScheme' | 'colorSchemeManager'
+>): ReactElement {
+  return (
+    <I18nProvider i18n={i18n}>
+      <MantineProvider {...props} theme={uiTheme} cssVariablesResolver={resolver} />
+    </I18nProvider>
+  )
 }
