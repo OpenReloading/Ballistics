@@ -17,6 +17,7 @@ export { readCsrLoad } from './csrload.ts'
 export type {
   Candidate,
   ChronoDiagnostic,
+  FileDiagnostic,
   PressureDiagnostic,
   ReaderDiagnostic,
 } from './diagnostics.ts'

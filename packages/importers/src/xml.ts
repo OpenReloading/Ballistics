@@ -167,7 +167,8 @@ function readAttributes(
     const name = a.name
     if (seen.has(name)) refuseFile('duplicateAttribute', { name, tag: qname })
     seen.add(name)
-    if (seen.size > maxAttributes) refuseFile('tooManyAttributes', { max: maxAttributes, tag: qname })
+    if (seen.size > maxAttributes)
+      refuseFile('tooManyAttributes', { max: maxAttributes, tag: qname })
     spend(remaining, 'characters', a.length)
     if (name !== 'xmlns' && !name.startsWith('xmlns:')) {
       attributes[local(name)] = references(a.value)

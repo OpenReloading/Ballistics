@@ -12,6 +12,7 @@
 . DelimitedOptions
 . Delimiter
 . FieldSpec
+. FileDiagnostic
 . GrtLoadRead
 . Inflate
 . KindScore

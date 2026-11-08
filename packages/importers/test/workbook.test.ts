@@ -70,22 +70,48 @@ describe('readWorkbook cells: references, cell types and prefixes', () => {
 describe('readWorkbook cells: refused cells', () => {
   it('refuses a shared string out of range, a column beyond IV and cells out of order', async () => {
     const strings = sst('<si><t>a</t></si><si><t>b</t></si><si><t>c</t></si>')
-    expect(await rejection(readWorkbook(
-        book({
-          [sheet]: ws('<row><c r="A1" t="s"><v>5</v></c></row>'),
-          'xl/sharedStrings.xml': strings,
-        }),
-      ))).toEqual({ code: 'sharedStringOutOfRange', params: { cell: 'A1', index: '5', count: 3, part: sheet } })
-    expect(await rejection(readWorkbook(book({ [sheet]: ws('<row><c r="IW1"><v>1</v></c></row>') })))).toEqual({ code: 'cellBeyondColumnIV', params: { cell: 'IW1', part: sheet } })
-    expect(await rejection(readWorkbook(book({ [sheet]: ws('<row><c r="B1"/><c r="A1"/></row>') })))).toEqual({ code: 'cellOutOfOrder', params: { cell: 'A1', part: sheet } })
-    expect(await rejection(readWorkbook(book({ [sheet]: ws('<row><c r="a1"/></row>') })))).toEqual({ code: 'cellRefMalformed', params: { ref: 'a1', part: sheet } })
+    expect(
+      await rejection(
+        readWorkbook(
+          book({
+            [sheet]: ws('<row><c r="A1" t="s"><v>5</v></c></row>'),
+            'xl/sharedStrings.xml': strings,
+          }),
+        ),
+      ),
+    ).toEqual({
+      code: 'sharedStringOutOfRange',
+      params: { cell: 'A1', index: '5', count: 3, part: sheet },
+    })
+    expect(
+      await rejection(readWorkbook(book({ [sheet]: ws('<row><c r="IW1"><v>1</v></c></row>') }))),
+    ).toEqual({ code: 'cellBeyondColumnIV', params: { cell: 'IW1', part: sheet } })
+    expect(
+      await rejection(readWorkbook(book({ [sheet]: ws('<row><c r="B1"/><c r="A1"/></row>') }))),
+    ).toEqual({ code: 'cellOutOfOrder', params: { cell: 'A1', part: sheet } })
+    expect(await rejection(readWorkbook(book({ [sheet]: ws('<row><c r="a1"/></row>') })))).toEqual({
+      code: 'cellRefMalformed',
+      params: { ref: 'a1', part: sheet },
+    })
   })
 
   it('names a cell without reference by its column in a refusal', async () => {
-    expect(await rejection(readWorkbook(book({ [sheet]: ws(`<row>${'<c/>'.repeat(257)}</row>`) })))).toEqual({ code: 'cellBeyondColumnIV', params: { cell: 'at column 257', part: sheet } })
-    expect(await rejection(readWorkbook(
-        book({ [sheet]: ws('<row><c t="s"><v>5</v></c></row>'), 'xl/sharedStrings.xml': sst('') }),
-      ))).toEqual({ code: 'sharedStringOutOfRange', params: { cell: 'at column 1', index: '5', count: 0, part: sheet } })
+    expect(
+      await rejection(readWorkbook(book({ [sheet]: ws(`<row>${'<c/>'.repeat(257)}</row>`) }))),
+    ).toEqual({ code: 'cellBeyondColumnIV', params: { cell: 'at column 257', part: sheet } })
+    expect(
+      await rejection(
+        readWorkbook(
+          book({
+            [sheet]: ws('<row><c t="s"><v>5</v></c></row>'),
+            'xl/sharedStrings.xml': sst(''),
+          }),
+        ),
+      ),
+    ).toEqual({
+      code: 'sharedStringOutOfRange',
+      params: { cell: 'at column 1', index: '5', count: 0, part: sheet },
+    })
   })
 })
 
@@ -122,18 +148,39 @@ describe('readWorkbook parts: inline strings and relationships', () => {
 
 describe('readWorkbook parts: refused parts', () => {
   it('refuses a missing worksheet part and a target outside the package', async () => {
-    expect(await rejection(readWorkbook(book({ 'xl/_rels/workbook.xml.rels': worksheetRels('worksheets/sheet2.xml') })))).toEqual({ code: 'partMissing', params: { name: 'xl/worksheets/sheet2.xml' } })
-    expect(await rejection(readWorkbook(book({ 'xl/_rels/workbook.xml.rels': worksheetRels('../../x.xml') })))).toEqual({ code: 'relationshipLeaves', params: { target: '../../x.xml' } })
+    expect(
+      await rejection(
+        readWorkbook(
+          book({ 'xl/_rels/workbook.xml.rels': worksheetRels('worksheets/sheet2.xml') }),
+        ),
+      ),
+    ).toEqual({ code: 'partMissing', params: { name: 'xl/worksheets/sheet2.xml' } })
+    expect(
+      await rejection(
+        readWorkbook(book({ 'xl/_rels/workbook.xml.rels': worksheetRels('../../x.xml') })),
+      ),
+    ).toEqual({ code: 'relationshipLeaves', params: { target: '../../x.xml' } })
   })
 
   it('refuses invalid UTF-8, a document type declaration and an unclosed row, naming the part', async () => {
     const bad = new Uint8Array([...new TextEncoder().encode(ws('<row>')), 0xff])
-    expect(await rejection(readWorkbook(book({ [sheet]: bad })))).toEqual({ code: 'notUtf8', params: { part: sheet } })
-    expect(await rejection(readWorkbook(
-        book({ 'xl/sharedStrings.xml': `<!DOCTYPE sst [<!ENTITY a "aaaa">]>${sst('')}` }),
-      ))).toEqual({ code: 'doctype', params: { part: 'xl/sharedStrings.xml' } })
-    expect(await rejection(readWorkbook(book({ 'xl/sharedStrings.xml': sst('<si><t>&ext;</t></si>') })))).toEqual({ code: 'unknownEntity', params: { name: 'ext', part: 'xl/sharedStrings.xml' } })
-    expect(await rejection(readWorkbook(book({ [sheet]: `<worksheet><sheetData><row>` })))).toEqual({ code: 'unclosedElement', params: { tag: 'row', part: sheet } })
+    expect(await rejection(readWorkbook(book({ [sheet]: bad })))).toEqual({
+      code: 'notUtf8',
+      params: { part: sheet },
+    })
+    expect(
+      await rejection(
+        readWorkbook(
+          book({ 'xl/sharedStrings.xml': `<!DOCTYPE sst [<!ENTITY a "aaaa">]>${sst('')}` }),
+        ),
+      ),
+    ).toEqual({ code: 'doctype', params: { part: 'xl/sharedStrings.xml' } })
+    expect(
+      await rejection(readWorkbook(book({ 'xl/sharedStrings.xml': sst('<si><t>&ext;</t></si>') }))),
+    ).toEqual({ code: 'unknownEntity', params: { name: 'ext', part: 'xl/sharedStrings.xml' } })
+    expect(await rejection(readWorkbook(book({ [sheet]: `<worksheet><sheetData><row>` })))).toEqual(
+      { code: 'unclosedElement', params: { tag: 'row', part: sheet } },
+    )
   })
 })
 
@@ -144,14 +191,19 @@ describe('readWorkbook limits', slow, () => {
       { name: 'A', xml: half },
       { name: 'B', xml: half },
     ])
-    expect(await rejection(readWorkbook(zip(parts)))).toEqual({ code: 'tooManyCells', params: { max: maxCells, part: 'xl/worksheets/sheet2.xml' } })
+    expect(await rejection(readWorkbook(zip(parts)))).toEqual({
+      code: 'tooManyCells',
+      params: { max: maxCells, part: 'xl/worksheets/sheet2.xml' },
+    })
   })
 
   it('counts a shared string at every cell that refers to it', async () => {
     const strings = sst(`<si><t>${'a'.repeat(1024 * 1024)}</t></si>`)
     const cells = maxCellCharacters / (1024 * 1024) + 1
     const xml = ws(`<row>${'<c t="s"><v>0</v></c>'.repeat(cells)}</row>`)
-    expect(await rejection(readWorkbook(book({ [sheet]: xml, 'xl/sharedStrings.xml': strings })))).toEqual({ code: 'tooMuchCellText', params: { max: maxCellCharacters, part: sheet } })
+    expect(
+      await rejection(readWorkbook(book({ [sheet]: xml, 'xl/sharedStrings.xml': strings }))),
+    ).toEqual({ code: 'tooMuchCellText', params: { max: maxCellCharacters, part: sheet } })
   })
 
   it('counts the elements of all XML parts and stops at the limit', async () => {
@@ -159,14 +211,22 @@ describe('readWorkbook limits', slow, () => {
     const strings = filler('sst')
     const xml = filler('worksheet')
     expect(2 * ((maxPartSize - 100) / 4)).toBeGreaterThan(maxElements)
-    expect(await rejection(readWorkbook(book({ [sheet]: xml, 'xl/sharedStrings.xml': strings })))).toEqual({ code: 'xmlElementsExceeded', params: { max: maxElements, part: sheet } })
+    expect(
+      await rejection(readWorkbook(book({ [sheet]: xml, 'xl/sharedStrings.xml': strings }))),
+    ).toEqual({ code: 'xmlElementsExceeded', params: { max: maxElements, part: sheet } })
   })
 
   it('refuses a repeated relationship id and a worksheet named twice', async () => {
     const twice = `<Relationships><Relationship Id="rId1" Type="${rel}/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId1" Type="${rel}/worksheet" Target="worksheets/sheet1.xml"/></Relationships>`
-    expect(await rejection(readWorkbook(book({ 'xl/_rels/workbook.xml.rels': twice })))).toEqual({ code: 'relationshipTwice', params: { part: 'xl/_rels/workbook.xml.rels', id: 'rId1' } })
+    expect(await rejection(readWorkbook(book({ 'xl/_rels/workbook.xml.rels': twice })))).toEqual({
+      code: 'relationshipTwice',
+      params: { part: 'xl/_rels/workbook.xml.rels', id: 'rId1' },
+    })
     const again = `<workbook xmlns:r="${rel}"><sheets><sheet name="A" r:id="rId1"/><sheet name="B" r:id="rId1"/></sheets></workbook>`
-    expect(await rejection(readWorkbook(book({ 'xl/workbook.xml': again })))).toEqual({ code: 'sheetPartAgain', params: { part: 'xl/workbook.xml', sheet: 'B', target: 'xl/worksheets/sheet1.xml' } })
+    expect(await rejection(readWorkbook(book({ 'xl/workbook.xml': again })))).toEqual({
+      code: 'sheetPartAgain',
+      params: { part: 'xl/workbook.xml', sheet: 'B', target: 'xl/worksheets/sheet1.xml' },
+    })
   })
 })
 
@@ -306,24 +366,34 @@ describe('readWorkbook in one pass', slow, () => {
 
   it('reports a cell error before a later markup error', async () => {
     const xml = `<worksheet><sheetData><row><c r="IW1"><v>1</v></c></row><row>`
-    expect(await rejection(readWorkbook(book({ [sheet]: xml })))).toEqual({ code: 'cellBeyondColumnIV', params: { cell: 'IW1', part: sheet } })
+    expect(await rejection(readWorkbook(book({ [sheet]: xml })))).toEqual({
+      code: 'cellBeyondColumnIV',
+      params: { cell: 'IW1', part: sheet },
+    })
   })
 
   it('names the part as stored in the archive in a cell error', async () => {
     const rels = `<Relationships><Relationship Id="rId1" Type="${rel}/worksheet" Target="worksheets/Sheet1.xml"/></Relationships>`
-    expect(await rejection(readWorkbook(
-        book({
-          'xl/_rels/workbook.xml.rels': rels,
-          [sheet]: ws('<row><c r="IW1"><v>1</v></c></row>'),
-        }),
-      ))).toEqual({ code: 'cellBeyondColumnIV', params: { cell: 'IW1', part: sheet } })
+    expect(
+      await rejection(
+        readWorkbook(
+          book({
+            'xl/_rels/workbook.xml.rels': rels,
+            [sheet]: ws('<row><c r="IW1"><v>1</v></c></row>'),
+          }),
+        ),
+      ),
+    ).toEqual({ code: 'cellBeyondColumnIV', params: { cell: 'IW1', part: sheet } })
   })
 
   it('refuses a relationships or workbook part over 1 MiB before inflating', async () => {
     const parts = workbookParts([{ name: 'S1', rows: [['x']] }]).map((p) =>
       p.name === 'xl/workbook.xml' ? { ...p, size: 2097152 } : p,
     )
-    expect(await rejection(readWorkbook(zip(parts)))).toEqual({ code: 'partTooLarge', params: { size: 2097152, limit: 1048576, part: 'xl/workbook.xml' } })
+    expect(await rejection(readWorkbook(zip(parts)))).toEqual({
+      code: 'partTooLarge',
+      params: { size: 2097152, limit: 1048576, part: 'xl/workbook.xml' },
+    })
   })
 })
 

@@ -68,7 +68,6 @@ export const inflateRaw: Inflate = async (data, size) => {
   return out
 }
 
-
 /** The position of the end of central directory record (4.3.16), or -1. */
 function findEnd(bytes: Uint8Array, view: DataView): number {
   // 22 bytes plus a comment of up to 65535 bytes
@@ -183,11 +182,7 @@ function spendDeclared(
 }
 
 /** The compressed data of an entry, located through its local header. */
-function entryData(
-  bytes: Uint8Array,
-  entry: ZipEntry,
-  part: Refuse,
-): Uint8Array<ArrayBuffer> {
+function entryData(bytes: Uint8Array, entry: ZipEntry, part: Refuse): Uint8Array<ArrayBuffer> {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
   // local header (4.3.7): only its name and extra field lengths locate the data; sizes come
   // from the central directory, since a data descriptor (4.3.9) leaves them zero here
