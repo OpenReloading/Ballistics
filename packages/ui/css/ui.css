@@ -124,6 +124,16 @@
 
 .ui-nav-item[aria-current="page"] {
   color: var(--accent);
+  /* more than a color, which forced colors would drop */
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* the menu button at the bar's control size: 44 px under a coarse pointer */
+.ui-frame-menu {
+  min-width: var(--size-control-bar);
+  min-height: var(--size-control-bar);
 }
 
 .ui-nav-item:focus-visible {
@@ -131,13 +141,8 @@
   outline-offset: -2px;
 }
 
-/* below Mantine's lg breakpoint (75em), where AppFrame's navigation is the menu button's panel; while closed the
-   panel is hidden, not only moved off the screen, so its links take no focus and are not read */
+/* below Mantine's lg breakpoint (75em), where AppFrame's navigation is the menu button's drawer */
 @media (max-width: 74.99em) {
-  .mantine-AppShell-root:not([data-menu-open]) .mantine-AppShell-navbar {
-    visibility: hidden;
-  }
-
   .ui-nav-item {
     flex-direction: row;
     gap: var(--space-sm);

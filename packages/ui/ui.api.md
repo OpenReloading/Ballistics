@@ -22,6 +22,7 @@ export interface AppFrameProps {
     labels: {
         menu: string;
         navigation: string;
+        close: string;
     };
     navigation: ReactNode;
 }

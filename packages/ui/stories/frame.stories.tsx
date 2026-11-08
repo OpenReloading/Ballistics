@@ -1,7 +1,7 @@
 import { ActionIcon, Anchor, Button, Stack, Text } from '@mantine/core'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Calculator, Library, Printer, Settings, Target } from 'lucide-react'
-import { expect, waitFor } from 'storybook/test'
+import { expect, waitFor, within } from 'storybook/test'
 import { AppFrame, NavItem, PageBar } from '../src/index.ts'
 
 const meta = { title: 'Frame', parameters: { layout: 'fullscreen' } } satisfies Meta
@@ -17,7 +17,7 @@ export const Frame: Story = {
           Ballistics
         </Anchor>
       }
-      labels={{ menu: 'Menu', navigation: 'Main' }}
+      labels={{ menu: 'Menu', navigation: 'Main', close: 'Close navigation' }}
       navigation={
         // the story's links lead nowhere: a followed link would leave the test page
         <Stack gap={0} onClick={(event) => event.preventDefault()}>
@@ -48,22 +48,25 @@ export const Frame: Story = {
     </AppFrame>
   ),
   play: async ({ canvas, canvasElement, userEvent }) => {
-    // by element: a closed, hidden navigation has no accessible name to find it by
-    const navigation = canvasElement.querySelector('nav')
-    if (!navigation) throw new Error('the frame renders no navigation')
-    // Mantine slides a closed navigation off the screen, which visibility checks do not see
-    const onScreen = () => navigation.getBoundingClientRect().right > 0
     if (matchMedia('(min-width: 75em)').matches) {
-      await expect(onScreen()).toBe(true)
-      await expect(navigation).toBeVisible()
+      await expect(canvas.getByRole('navigation', { name: 'Main' })).toBeVisible()
       return
     }
-    // closed, the panel is hidden as well, so its links take no focus
-    await expect(navigation).not.toBeVisible()
-    await userEvent.click(canvas.getByRole('button', { name: 'Menu' }))
-    await waitFor(() => expect(onScreen()).toBe(true))
-    await expect(navigation).toBeVisible()
-    await userEvent.click(canvas.getByRole('link', { name: 'Groups' }))
-    await waitFor(() => expect(navigation).not.toBeVisible())
+    // below 75em the links are in the drawer only, which Mantine renders into the document's body
+    const page = within(canvasElement.ownerDocument.body)
+    await expect(canvas.queryByRole('navigation', { name: 'Main' })).toBeNull()
+    const menu = canvas.getByRole('button', { name: 'Menu' })
+    if (matchMedia('(pointer: coarse)').matches)
+      await expect(menu.getBoundingClientRect().height).toBeGreaterThanOrEqual(44)
+    await userEvent.click(menu)
+    const drawer = await page.findByRole('dialog', { name: 'Main' })
+    // past its last link the focus stays inside: the close button and three links, five steps
+    for (let step = 0; step < 5; step++) await userEvent.tab()
+    await expect(drawer).toContainElement(canvasElement.ownerDocument.activeElement as HTMLElement)
+    await userEvent.keyboard('{Escape}')
+    await waitFor(() => expect(menu).toHaveFocus())
+    await userEvent.click(menu)
+    await userEvent.click(await page.findByRole('link', { name: 'Groups' }))
+    await waitFor(() => expect(page.queryByRole('dialog')).toBeNull())
   },
 }
