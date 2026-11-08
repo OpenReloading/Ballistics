@@ -43,6 +43,9 @@ export class ComputeTimeout extends Error {
 export const inlineRunner: ComputeRunner;
 
 // @public
+export function replyTo(task: Task): TaskReply;
+
+// @public
 export interface Results {
     // (undocumented)
     chargeSolve: ReturnType<typeof solveCharge>;
@@ -112,6 +115,15 @@ export type Task = {
     load: InteriorLoad;
     target: ChargeTarget;
     options: ChargeSolverOptions;
+};
+
+// @public
+export type TaskReply = {
+    succeeded: true;
+    value: unknown;
+} | {
+    succeeded: false;
+    error: SerializedError;
 };
 
 // @public

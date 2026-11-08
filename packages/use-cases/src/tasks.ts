@@ -145,6 +145,20 @@ export function serializeError(error: unknown): SerializedError {
   return { name: 'Error', message: error instanceof Error ? error.message : String(error) }
 }
 
+/** What a worker posts back for one task: the result, or the error as a plain object. */
+export type TaskReply =
+  | { succeeded: true; value: unknown }
+  | { succeeded: false; error: SerializedError }
+
+/** The reply to `task` that a worker posts: runs it in this thread and serializes its error. */
+export function replyTo(task: Task): TaskReply {
+  try {
+    return { succeeded: true, value: runTask(task) }
+  } catch (error) {
+    return { succeeded: false, error: serializeError(error) }
+  }
+}
+
 /** Inverse of `serializeError`: rebuilds a `TruingError`, an `InputError` or an `Error`. */
 export function reviveError(error: SerializedError): Error {
   if (error.name === 'TruingError') {

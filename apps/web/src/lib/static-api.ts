@@ -21,6 +21,7 @@ import {
   type ComputeRunner,
   ComputeTimeout,
   reviveError,
+  type TaskReply,
   taskTimeoutMs,
 } from '@open-reloading/use-cases'
 import { maxRecordIdLength } from './compare-ids.ts'
@@ -229,8 +230,10 @@ const findRecord =
  */
 function workerRunner(signal: AbortSignal | undefined): ComputeRunner {
   return {
-    run: (task) =>
-      new Promise((resolve, reject) => {
+    run: (task) => {
+      // an abort during the record reads before the first run lands before any worker starts
+      if (signal?.aborted) return Promise.reject(signal.reason)
+      return new Promise((resolve, reject) => {
         const worker = new Worker(new URL('./compute.worker.ts', import.meta.url), {
           type: 'module',
         })
@@ -248,9 +251,9 @@ function workerRunner(signal: AbortSignal | undefined): ComputeRunner {
           reject(new ComputeTimeout(`computation did not finish within ${taskTimeoutMs} ms`))
         }, taskTimeoutMs)
         signal?.addEventListener('abort', abort, { once: true })
-        worker.onmessage = (e) => {
+        worker.onmessage = (e: MessageEvent<TaskReply>) => {
           end()
-          if (e.data.succeeded) resolve(e.data.value)
+          if (e.data.succeeded) resolve(e.data.value as never)
           else reject(reviveError(e.data.error))
         }
         worker.onerror = () => {
@@ -258,7 +261,8 @@ function workerRunner(signal: AbortSignal | undefined): ComputeRunner {
           reject(new Error('compute worker failed'))
         }
         worker.postMessage(task)
-      }),
+      })
+    },
     close: async () => {},
   }
 }
