@@ -6,7 +6,8 @@
  * simulation's uncertainty, not a load. SI in and out.
  */
 
-import { need, nth } from '@open-reloading/statistics'
+import { nth } from '@open-reloading/statistics'
+import { need } from '../issue.ts'
 import type { Complete } from '../key-list.ts'
 import {
   fitPowder,
@@ -288,10 +289,10 @@ function usedInputs(options: PowderRangeOptions): UsedInput[] {
     const basis = given?.basis ?? 'estimated'
     const table = powderInputDefaults[input]
     const u = given?.standardUncertainty ?? (table && (table[basis] ?? table.estimated))
-    need(
-      u === undefined || (Number.isFinite(u) && u >= 0),
-      `${input}: standardUncertainty must be 0 or above`,
-    )
+    need(u === undefined || (Number.isFinite(u) && u >= 0), {
+      code: 'inputUncertaintyNegative',
+      params: { input },
+    })
     return u ? [{ input, basis, u, shift: shifts[input] }] : []
   })
 }
@@ -413,7 +414,7 @@ export function powderPressureRange(
   const names = fit.parameters.map((p) => p.name)
   const fitOptions: PowderFitOptions = { ...options.fit, parameters: names }
   const points = options.points ?? ladderPoints(ladder)
-  need(points.length > 0, 'at least one point')
+  need(points.length > 0, { code: 'noPoint', params: {} })
   const used = usedInputs(options)
   const predictions = points.map((p) =>
     predictPowder(fit, p.charge, {
@@ -487,8 +488,11 @@ export function similarPowdersPrior(
 ): SimilarPowdersPrior {
   const valid = (x: SimilarPowder) =>
     Number.isFinite(x.burnRate) && x.burnRate > 0 && Number.isFinite(x.energy) && x.energy > 0
-  need(valid(target) && candidates.every(valid), 'burn coefficient and energy must be positive')
-  need(Number.isInteger(count) && count > 0, 'count must be a positive integer')
+  need(valid(target) && candidates.every(valid), {
+    code: 'burnCoefficientOrEnergyNotPositive',
+    params: {},
+  })
+  need(Number.isInteger(count) && count > 0, { code: 'countNotPositiveInteger', params: {} })
   const distance = (x: SimilarPowder) =>
     Math.hypot(Math.log(x.burnRate / target.burnRate), Math.log(x.energy / target.energy))
   const near = candidates.toSorted((a, b) => distance(a) - distance(b)).slice(0, count)
@@ -654,7 +658,7 @@ export function powderConfidence(
 ): PowderConfidence {
   const rules = powderConfidenceRules
   const w = range.relativeHalfWidth
-  need(Number.isFinite(w), 'the range has no width')
+  need(Number.isFinite(w), { code: 'rangeWithoutWidth', params: {} })
   const reasons = [...ladderReasons(fit, range), ...rangeReasons(fit, range, options.similar)]
   return {
     label: labelOf(w, rules),

@@ -381,11 +381,11 @@ describe('joint curve fit of one trace and of close charges', () => {
   })
 
   it('rejects an empty set, a bad charge and sigma on only some traces', () => {
-    expect(() => fitPressureCurves(high, [])).toThrow(/at least one trace/)
+    expect(() => fitPressureCurves(high, [])).toThrow('noTrace')
     expect(() => fitPressureCurves(high, [{ ...nth(set, 0), charge: 0 }])).toThrow(/charge/)
     const { sigma: _, ...bare } = nth(set, 1).trace
     expect(() => fitPressureCurves(high, [nth(set, 0), { charge: 0.0027, trace: bare }])).toThrow(
-      /sigma: on every trace or on none/,
+      'sigmaPartial',
     )
   })
 })
@@ -422,16 +422,19 @@ describe('curve fit failures', () => {
   const t = noisy
 
   it('rejects a malformed trace', () => {
-    rejectsWith(() => fitPressureCurve(start(), { ...t, time: t.time.slice(1) }), /trace:/)
-    rejectsWith(() => fitPressureCurve(start(), { ...t, time: t.time.toReversed() }), /trace:/)
+    rejectsWith(() => fitPressureCurve(start(), { ...t, time: t.time.slice(1) }), 'traceInvalid')
+    rejectsWith(
+      () => fitPressureCurve(start(), { ...t, time: t.time.toReversed() }),
+      'traceInvalid',
+    )
     rejectsWith(
       () => fitPressureCurve(start(), { ...t, pressure: t.pressure.map(() => Number.NaN) }),
-      /trace:/,
+      'traceInvalid',
     )
-    rejectsWith(() => fitPressureCurve(start(), { ...t, sigma: 0 }), /sigma must be positive/)
+    rejectsWith(() => fitPressureCurve(start(), { ...t, sigma: 0 }), 'sigmaNotPositive')
     rejectsWith(
       () => fitPressureCurve(start(), { ...t, sensor: 'Breech' as PressureSensor }),
-      /trace.sensor/,
+      'traceSensorUnknown',
     )
   })
 
@@ -439,21 +442,21 @@ describe('curve fit failures', () => {
     const flat = t.pressure.map((_, i) => i)
     rejectsWith(
       () => fitPressureCurve(start(), { ...t, pressure: flat.map((x) => -x) }),
-      /no positive pressure/,
+      'traceNoPositivePressure',
     )
-    rejectsWith(() => fitPressureCurve(start(), { ...t, pressure: flat }), /never falls/)
+    rejectsWith(() => fitPressureCurve(start(), { ...t, pressure: flat }), 'traceNeverFalls')
   })
 
   it('rejects a trace too short for the parameters', () => {
     const peak = t.pressure.indexOf(Math.max(...t.pressure))
     const few = { ...t, time: t.time.slice(0, peak + 3), pressure: t.pressure.slice(0, peak + 3) }
-    rejectsWith(() => fitPressureCurve(start(), few, base), /never falls|too few/)
+    rejectsWith(() => fitPressureCurve(start(), few, base), /traceNeverFalls|traceWindowTooShort/)
     const tiny = {
       ...t,
       time: [0, 1, 2, 3, 4],
       pressure: [0, 1e8, 3e8, 1e8, 0],
     }
-    rejectsWith(() => fitPressureCurve(start(), tiny, base), /too few trace samples/)
+    rejectsWith(() => fitPressureCurve(start(), tiny, base), 'traceWindowTooShort')
   })
 })
 
@@ -469,24 +472,24 @@ describe('curve fit failures of options and burn laws', () => {
 
   it('rejects options and burn laws it cannot fit', () => {
     const o = (options: CurveFitOptions) => () => fitPressureCurve(start(), t, options)
-    rejectsWith(o({ parameters: [] }), /parameters:/)
-    rejectsWith(o({ parameters: ['burnRate', 'burnRate'] }), /parameters:/)
-    rejectsWith(o({ parameters: ['speed' as 'burnRate'] }), /parameters:/)
+    rejectsWith(o({ parameters: [] }), 'curveFitParametersInvalid')
+    rejectsWith(o({ parameters: ['burnRate', 'burnRate'] }), 'curveFitParametersInvalid')
+    rejectsWith(o({ parameters: ['speed' as 'burnRate'] }), 'curveFitParametersInvalid')
     rejectsWith(o({ maxIterations: 0 }), /maxIterations/)
     rejectsWith(o({ maxCondition: 0 }), /maxCondition/)
     rejectsWith(o({ fallFraction: 1 }), /fallFraction/)
     const burn = start().propellant.burn
     const withBurn = (b: unknown) => () =>
       fitPressureCurve({ ...start(), propellant: { ...start().propellant, burn: b as never } }, t)
-    rejectsWith(withBurn({ ...burn, form: { kind: 'constant' } }), /two-stage/)
-    rejectsWith(withBurn({ ...burn, kind: 'geometric' }), /two-stage/)
+    rejectsWith(withBurn({ ...burn, form: { kind: 'constant' } }), 'curveFitNeedsTwoStageVivacity')
+    rejectsWith(withBurn({ ...burn, kind: 'geometric' }), 'curveFitNeedsTwoStageVivacity')
     const form = (patch: object) => ({
       ...burn,
       form: { ...(burn as { form: object }).form, ...patch },
     })
-    rejectsWith(withBurn(form({ a: 0 })), /formSlope needs/)
-    rejectsWith(withBurn(form({ z1: 1 })), /transition needs/)
-    rejectsWith(withBurn({ ...burn, exponent: 0 }), /exponent needs/)
+    rejectsWith(withBurn(form({ a: 0 })), 'formSlopeStartNotPositive')
+    rejectsWith(withBurn(form({ z1: 1 })), 'transitionStartNotBelowOne')
+    rejectsWith(withBurn({ ...burn, exponent: 0 }), 'exponentStartNotPositive')
   })
 })
 
@@ -503,6 +506,6 @@ describe('curve fit failures of the runs', () => {
 
   it('names the window when the model leaves the barrel before it ends', () => {
     const quick = load({ vivacity: 20, exponent: 0.5, a: 0.8, z1: 0.3 })
-    rejectsWith(() => fitPressureCurve(quick, t, base), /leaves the barrel/)
+    rejectsWith(() => fitPressureCurve(quick, t, base), 'modelLeavesBarrelBeforeWindowEnd')
   })
 })

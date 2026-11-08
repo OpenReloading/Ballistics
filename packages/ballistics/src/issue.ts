@@ -126,6 +126,72 @@ export type InteriorIssue =
   | Diagnostic<'loadRatioTargetNeedsBulkDensity'>
   | Diagnostic<'bulkDensityNotPositive'>
   | Diagnostic<'targetValueNotPositive'>
+  | Diagnostic<'modelLeavesBarrelBeforeWindowEnd'>
+  | Diagnostic<'traceWindowTooShort'>
+  | Diagnostic<'traceNoPositivePressure'>
+  | Diagnostic<'sigmaPartial'>
+  | Diagnostic<'chargeNotPositive'>
+  | Diagnostic<'noTrace'>
+  | Diagnostic<'curveFitNeedsTwoStageVivacity'>
+  | Diagnostic<'fallFractionOutsideUnit'>
+  | Diagnostic<'exponentStartNotPositive'>
+  | Diagnostic<'transitionStartNotBelowOne'>
+  | Diagnostic<'formSlopeStartNotPositive'>
+  | Diagnostic<'curveFitParametersInvalid'>
+  | Diagnostic<'sigmaNotPositive'>
+  | Diagnostic<'traceSensorUnknown'>
+  | Diagnostic<'traceInvalid'>
+  | Diagnostic<'traceNeverFalls'>
+  | Diagnostic<'rangeWithoutWidth'>
+  | Diagnostic<'countNotPositiveInteger'>
+  | Diagnostic<'burnCoefficientOrEnergyNotPositive'>
+  | Diagnostic<'noPoint'>
+  | Diagnostic<'inputUncertaintyNegative', { input: string }>
+  | Diagnostic<'noHeldOutString'>
+  | Diagnostic<'velocitySigmaMissing'>
+  | Diagnostic<'targetPowderNotInFit'>
+  | Diagnostic<'velocitySigmaNegative'>
+  | Diagnostic<'levelOutsideUnit'>
+  | Diagnostic<'pooledFitNoCovariance'>
+  | Diagnostic<'groupPriorNotPositive', { kind: string; group: string }>
+  | Diagnostic<'priorPowderNotInSessions'>
+  | Diagnostic<'sessionsBurnKindDiffers'>
+  | Diagnostic<'barrelOrTemperatureOnPoint'>
+  | Diagnostic<'pooledFitVelocitiesOnly'>
+  | Diagnostic<'ladderChargeOrVelocityNotPositive'>
+  | Diagnostic<'propellantTemperatureNotPositive'>
+  | Diagnostic<'barrelLengthNotPositive'>
+  | Diagnostic<'sessionWithoutLadderPoint'>
+  | Diagnostic<'rifleOrLotSigmaNotPositive'>
+  | Diagnostic<'pooledFitParametersInvalid'>
+  | Diagnostic<'noSession'>
+  | Diagnostic<'priorParameterNotFitted'>
+  | Diagnostic<'burnCoefficientNotFitted'>
+  | Diagnostic<'stringWithoutVelocity'>
+  | Diagnostic<'fitNoCovariance'>
+  | Diagnostic<'boreDiameterNotPositive'>
+  | Diagnostic<'startPressureTooLow'>
+  | Diagnostic<'domainMarginOutsideRange'>
+  | Diagnostic<'priorsNeedVelocitySigmas'>
+  | Diagnostic<'huberThresholdNotPositive'>
+  | Diagnostic<'temperatureFactorNeedsSensitivity'>
+  | Diagnostic<'fitParametersInvalid', { parameters: string[] }>
+  | Diagnostic<'pressuresNeedVelocitySigmas'>
+  | Diagnostic<'velocitySigmaPartial'>
+  | Diagnostic<'pressureBasisUnknown', { bases: string[] }>
+  | Diagnostic<'pressureWithoutBasis'>
+  | Diagnostic<'pressureWithoutSigma'>
+  | Diagnostic<'pressureSigmaNotPositive'>
+  | Diagnostic<'ladderPressureNotPositive'>
+  | Diagnostic<'velocitySigmaNotPositive'>
+  | Diagnostic<'ladderVelocityNotPositive'>
+  | Diagnostic<'ladderChargeNotPositive'>
+  | Diagnostic<'noLadderPoint'>
+  | Diagnostic<'heightsOrVelocitiesNotFinite'>
+  | Diagnostic<'shotWithoutHeightOrVelocity'>
+  | Diagnostic<'chargeTooFewShots'>
+  | Diagnostic<'slopeNotFinite'>
+  | Diagnostic<'ladderTooFewCharges'>
   | Diagnostic<'ladderLowestChargeNotPositive', { charge: number }>
   | Diagnostic<'ladderAroundNeedsOddCount'>
   | Diagnostic<'ladderStepCountInvalid'>
@@ -135,8 +201,15 @@ export type InteriorIssue =
   | Diagnostic<'powderWithoutInteriorModel'>
   | Diagnostic<'bulletConstructionUnknown', { construction: string }>
   | Diagnostic<'barrelNotPositive', { barrel: number }>
+  | Diagnostic<'ladderTooFewStrings'>
+  | Diagnostic<'chargesEqual'>
+  | Diagnostic<'stringTooFewShots'>
+  | Diagnostic<'standardDeviationNegative'>
+  | Diagnostic<'meanNotFinite'>
   | Diagnostic<'dynamicVivacityRangeInvalid'>
   | Diagnostic<'dynamicVivacityExponentNotOne'>
+  | Diagnostic<'priorValueOrSigmaNotPositive', { name: string }>
+  | Diagnostic<'priorValueBelowFloorOrSigmaNotPositive', { name: string }>
 
 /** Why a function of this package refuses its input. */
 export type BallisticsIssue = ExteriorIssue | InteriorIssue

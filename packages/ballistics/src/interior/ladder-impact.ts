@@ -4,7 +4,8 @@
  * (`apps/docs/docs/models/interior-ladder-impact.md`). SI throughout: charge kg, height m, velocity m/s.
  */
 
-import { chiSquareQuantile, need, nth } from '@open-reloading/statistics'
+import { chiSquareQuantile, nth } from '@open-reloading/statistics'
+import { need } from '../issue.ts'
 import type { LadderStep } from './velocity-ladder.ts'
 
 /** The shots of one charge: height of impact above the aim point and the velocity of each shot. */
@@ -49,17 +50,20 @@ export function ladderImpactResiduals(
   slope: number,
   level = 0.99,
 ): LadderImpact {
-  need(charges.length >= 3, 'a ladder needs at least three charges')
-  need(Number.isFinite(slope), 'slope must be finite')
-  need(level > 0 && level < 1, 'level must lie in (0, 1)')
+  need(charges.length >= 3, { code: 'ladderTooFewCharges', params: {} })
+  need(Number.isFinite(slope), { code: 'slopeNotFinite', params: {} })
+  need(level > 0 && level < 1, { code: 'levelOutsideUnit', params: {} })
   const sorted = charges.toSorted((a, b) => a.charge - b.charge)
   for (const c of sorted) {
-    need(Number.isFinite(c.charge) && c.charge > 0, 'charge must be positive')
-    need(c.heights.length >= 2, 'each charge needs at least two shots')
-    need(c.heights.length === c.velocities.length, 'each shot needs a height and a velocity')
+    need(Number.isFinite(c.charge) && c.charge > 0, { code: 'chargeNotPositive', params: {} })
+    need(c.heights.length >= 2, { code: 'chargeTooFewShots', params: {} })
+    need(c.heights.length === c.velocities.length, {
+      code: 'shotWithoutHeightOrVelocity',
+      params: {},
+    })
     need(
       [...c.heights, ...c.velocities].every((v) => Number.isFinite(v)),
-      'heights and velocities must be finite',
+      { code: 'heightsOrVelocitiesNotFinite', params: {} },
     )
   }
   const all = sorted.flatMap((c) => c.velocities)
