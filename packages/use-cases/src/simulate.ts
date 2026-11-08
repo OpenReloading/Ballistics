@@ -302,11 +302,7 @@ function chargeLadderOf(ladder: NonNullable<Load['analysis']>['ladder']) {
     : undefined
 }
 
-/**
- * The interior body of the file's load with `resistance`, as `interiorBody` parses it; a `ZodError`
- * at the paths of the file. The file is validated before any record is read: a bad file answers 400
- * whatever its ids.
- */
+/** The file's interior body, a `ZodError` at the file's paths: it is checked before any record is read, so a bad file answers 400 whatever its ids. */
 function bodyParser({
   load,
   record,
@@ -337,11 +333,7 @@ function bodyParser({
   }
 }
 
-/**
- * The 422 of a ladder kind this route does not run, after the file's checks (a bad file answers
- * 400): a seating ladder needs the seating geometry of the drawing package, which this route lacks,
- * and a temperature ladder is not run here.
- */
+/** A seating ladder needs the drawing package's seating geometry, which this route lacks, and a temperature ladder is not run here. */
 function ladderKindRefusal(ladder: NonNullable<Load['analysis']>['ladder']) {
   return ladder?.kind === 'seating' || ladder?.kind === 'temperature'
     ? {
@@ -356,10 +348,7 @@ function ladderKindRefusal(ladder: NonNullable<Load['analysis']>['ladder']) {
     : undefined
 }
 
-/**
- * Sets an empty bore area to the cartridge record's, as the workbench fills it, while the bore
- * diameter is the record's land diameter.
- */
+/** An empty bore area takes the cartridge record's, as the workbench fills it, with the record's land diameter as the bore. */
 function fillBoreArea(
   load: InteriorLoad,
   cartridge: CartridgeWithSpecs | undefined,
