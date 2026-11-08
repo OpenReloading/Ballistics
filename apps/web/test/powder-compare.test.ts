@@ -263,10 +263,10 @@ describe('answerRow', () => {
     expect(row.reason).toBeUndefined()
   })
 
-  it('gives a row with the reason when the answer cannot be read', () => {
+  it('gives a row with the failure when the answer cannot be read', () => {
     const row = answerRow(head, { body }, 0.003, {} as never)
     expect(row.values).toBeUndefined()
-    expect(row.reason).toBeTruthy()
+    expect(row.failure).toBeInstanceOf(Error)
   })
 })
 

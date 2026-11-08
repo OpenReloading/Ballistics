@@ -161,7 +161,7 @@ const interiorWords = {
   loadRatioTargetNeedsBulkDensity: msg('the load ratio target needs the bulk density'),
   bulkDensityNotPositive: msg('bulk density must be above 0'),
   targetValueNotPositive: msg('target value must be above 0'),
-  ladderChargeBelowZero: msg('ladder charge {charge} kg must be above 0'),
+  ladderLowestChargeNotPositive: msg('ladder charge {charge} kg must be above 0'),
   ladderAroundNeedsOddCount: msg('a ladder around the charge needs an odd count'),
   ladderStepCountInvalid: msg('ladder steps must be an integer of at least 1'),
   ladderStepNotPositive: msg('ladder step must be above 0'),

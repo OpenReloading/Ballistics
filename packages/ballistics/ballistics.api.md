@@ -594,7 +594,7 @@ export type InteriorInvalid = {
 };
 
 // @public
-export type InteriorIssue = Diagnostic<'gasVelocityFactorNegative'> | Diagnostic<'muzzleVelocityNegative'> | Diagnostic<'chargeMassNegative'> | Diagnostic<'projectileMassNotPositive'> | Diagnostic<'firearmMassNotPositive'> | Diagnostic<'loadRatioTargetNeedsBulkDensity'> | Diagnostic<'bulkDensityNotPositive'> | Diagnostic<'targetValueNotPositive'> | Diagnostic<'ladderChargeBelowZero', {
+export type InteriorIssue = Diagnostic<'gasVelocityFactorNegative'> | Diagnostic<'muzzleVelocityNegative'> | Diagnostic<'chargeMassNegative'> | Diagnostic<'projectileMassNotPositive'> | Diagnostic<'firearmMassNotPositive'> | Diagnostic<'loadRatioTargetNeedsBulkDensity'> | Diagnostic<'bulkDensityNotPositive'> | Diagnostic<'targetValueNotPositive'> | Diagnostic<'ladderLowestChargeNotPositive', {
     charge: number;
 }> | Diagnostic<'ladderAroundNeedsOddCount'> | Diagnostic<'ladderStepCountInvalid'> | Diagnostic<'ladderStepNotPositive'> | Diagnostic<'ladderStartNotPositive'> | Diagnostic<'boreResistanceNeedsValues', {
     missing: string[];

@@ -22,6 +22,6 @@ export function chargeLadder(
       : start + (direction === 'up' ? 1 : -1) * i * step,
   )
   const lowest = Math.min(nth(charges, 0), nth(charges, steps - 1))
-  need(lowest > 0, { code: 'ladderChargeBelowZero', params: { charge: lowest } })
+  need(lowest > 0, { code: 'ladderLowestChargeNotPositive', params: { charge: lowest } })
   return charges
 }

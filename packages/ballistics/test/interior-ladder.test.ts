@@ -62,7 +62,7 @@ describe('chargeLadder counts and checks', () => {
         [0.0029, 0, 2, 'up', 'ladderStepNotPositive'],
         [0.0029, 0.0001, 0, 'up', 'ladderStepCountInvalid'],
         [0.0029, 0.0001, 4, 'around', 'ladderAroundNeedsOddCount'],
-        [0.0002, 0.0001, 3, 'down', 'ladderChargeBelowZero'],
+        [0.0002, 0.0001, 3, 'down', 'ladderLowestChargeNotPositive'],
       ] as const
     ).map(([start, step, steps, direction, message]) => ({
       start,
@@ -73,5 +73,13 @@ describe('chargeLadder counts and checks', () => {
     })),
   )('names the field for start $start, step $step, $steps steps $direction', (c) => {
     expect(() => chargeLadder(c.start, c.step, c.steps, c.direction)).toThrow(c.message)
+  })
+
+  it('names the lowest charge of a ladder that reaches 0', () => {
+    expect(() => chargeLadder(0.0002, 0.0001, 3, 'down')).toThrow(
+      expect.objectContaining({
+        issue: { code: 'ladderLowestChargeNotPositive', params: { charge: 0 } },
+      }),
+    )
   })
 })

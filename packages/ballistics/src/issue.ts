@@ -126,7 +126,7 @@ export type InteriorIssue =
   | Diagnostic<'loadRatioTargetNeedsBulkDensity'>
   | Diagnostic<'bulkDensityNotPositive'>
   | Diagnostic<'targetValueNotPositive'>
-  | Diagnostic<'ladderChargeBelowZero', { charge: number }>
+  | Diagnostic<'ladderLowestChargeNotPositive', { charge: number }>
   | Diagnostic<'ladderAroundNeedsOddCount'>
   | Diagnostic<'ladderStepCountInvalid'>
   | Diagnostic<'ladderStepNotPositive'>
