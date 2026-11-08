@@ -4,8 +4,9 @@
  * and out; angles in rad. Integration in the local-level ground frame (x downrange horizontal,
  * y up, z right); the line of sight is an output projection (`apps/docs/docs/models/exterior-point-mass.md`, "Frames").
  */
-import { InputError, need, nth } from '@open-reloading/statistics'
+import { nth } from '@open-reloading/statistics'
 import { type DragModel, type DragTable, dragTables } from '../drag-tables.ts'
+import { InputError, need } from '../issue.ts'
 import { overlay, type Settings } from '../settings.ts'
 import {
   type Air,
@@ -883,63 +884,66 @@ const finite = (x: number | undefined) => x === undefined || Number.isFinite(x)
 
 function checkWind(wind: readonly WindSegment[]): void {
   wind.forEach((w, k) => {
-    need(
-      Number.isFinite(w.speed) && Number.isFinite(w.fromDirection) && finite(w.vertical),
-      'wind segment',
-    )
-    need(
-      k === 0 || w.endDistance > nth(wind, k - 1).endDistance,
-      'wind segments must end in rising order',
-    )
+    need(Number.isFinite(w.speed) && Number.isFinite(w.fromDirection) && finite(w.vertical), {
+      code: 'windSegmentInvalid',
+      params: {},
+    })
+    need(k === 0 || w.endDistance > nth(wind, k - 1).endDistance, {
+      code: 'windSegmentsNotRising',
+      params: {},
+    })
   })
 }
 
 /** Checks a drag input: BC bands against a standard model, or a drag curve, and the interpolation. */
 function checkDragInput(drag: DragInput): void {
   if (drag.kind === 'bc') {
-    need(drag.model in dragTables, `drag model ${drag.model}`)
+    need(drag.model in dragTables, { code: 'dragModelUnknown', params: { model: drag.model } })
     const bands = drag.bands
-    need(bands.length > 0, 'at least one BC band')
+    need(bands.length > 0, { code: 'noBcBand', params: {} })
     for (const b of bands)
       need(
         b.ballisticCoefficient > 0 &&
           Number.isFinite(b.ballisticCoefficient) &&
           b.minVelocity >= 0 &&
           Number.isFinite(b.minVelocity),
-        'BC band',
+        { code: 'bcBandInvalid', params: {} },
       )
-    need(
-      new Set(bands.map((b) => b.minVelocity)).size === bands.length,
-      'BC bands need distinct speeds',
-    )
+    need(new Set(bands.map((b) => b.minVelocity)).size === bands.length, {
+      code: 'bcBandsSameSpeed',
+      params: {},
+    })
     const reference = drag.reference
-    need(
-      reference === undefined || reference === 'icao' || reference === 'metro',
-      `BC reference ${reference}`,
-    )
+    need(reference === undefined || reference === 'icao' || reference === 'metro', {
+      code: 'bcReferenceUnknown',
+      params: { reference: String(reference) },
+    })
   } else {
     const curve = drag.curve
-    need(curve.length >= 2, 'a drag curve needs at least two nodes')
+    need(curve.length >= 2, { code: 'dragCurveTooShort', params: {} })
     curve.forEach(([mach, cd], k) => {
-      need(Number.isFinite(mach) && cd >= 0 && Number.isFinite(cd), 'drag curve node')
-      need(k === 0 || mach > nth(curve, k - 1)[0], 'drag curve Mach must rise')
+      need(Number.isFinite(mach) && cd >= 0 && Number.isFinite(cd), {
+        code: 'dragCurveNodeInvalid',
+        params: {},
+      })
+      need(k === 0 || mach > nth(curve, k - 1)[0], { code: 'dragCurveMachNotRising', params: {} })
     })
   }
   const interpolation = drag.interpolation
   need(
     interpolation === undefined || interpolation === 'linear' || interpolation === 'monotone-cubic',
-    `drag interpolation ${interpolation}`,
+    { code: 'dragInterpolationUnknown', params: { interpolation: String(interpolation) } },
   )
 }
 
 /** Checks mass, diameter, length and drag input of the projectile. */
 function checkProjectile(p: Projectile): void {
-  need(p.mass > 0 && Number.isFinite(p.mass), 'mass must be positive')
-  need(p.diameter > 0 && Number.isFinite(p.diameter), 'diameter must be positive')
-  need(
-    p.length === undefined || (p.length > 0 && Number.isFinite(p.length)),
-    'length must be positive',
-  )
+  need(p.mass > 0 && Number.isFinite(p.mass), { code: 'massNotPositive', params: {} })
+  need(p.diameter > 0 && Number.isFinite(p.diameter), { code: 'diameterNotPositive', params: {} })
+  need(p.length === undefined || (p.length > 0 && Number.isFinite(p.length)), {
+    code: 'lengthNotPositive',
+    params: {},
+  })
   checkDragInput(p.drag)
 }
 
@@ -947,57 +951,75 @@ const look = (a: number | undefined) => a === undefined || Math.abs(a) <= Math.P
 
 /** Checks the sight and the twist of the firearm. */
 function checkFirearm(firearm: Firearm): void {
-  need(
-    Number.isFinite(firearm.sightHeight) && finite(firearm.sightOffset),
-    'sight height and offset',
-  )
-  need(
-    firearm.twist === undefined || (firearm.twist > 0 && Number.isFinite(firearm.twist)),
-    'twist must be positive',
-  )
+  need(Number.isFinite(firearm.sightHeight) && finite(firearm.sightOffset), {
+    code: 'sightInvalid',
+    params: {},
+  })
+  need(firearm.twist === undefined || (firearm.twist > 0 && Number.isFinite(firearm.twist)), {
+    code: 'twistNotPositive',
+    params: {},
+  })
 }
 
 /** Checks the zero: its range, look angle, air and wind, or the bore angles. */
 function checkZero(zero: ZeroSpec | BoreAngles): void {
   if ('range' in zero) {
-    need(zero.range > 0 && Number.isFinite(zero.range), 'zero range must be positive')
-    need(look(zero.lookAngle), 'zero look angle outside -pi/2..pi/2')
+    need(zero.range > 0 && Number.isFinite(zero.range), {
+      code: 'zeroRangeNotPositive',
+      params: {},
+    })
+    need(look(zero.lookAngle), { code: 'zeroLookAngleOutsideRange', params: {} })
     if (zero.air) checkAir(zero.air)
     checkWind(zero.wind ?? [])
   } else
-    need(Number.isFinite(zero.elevationAngle) && Number.isFinite(zero.windageAngle), 'bore angles')
+    need(Number.isFinite(zero.elevationAngle) && Number.isFinite(zero.windageAngle), {
+      code: 'boreAnglesInvalid',
+      params: {},
+    })
 }
 
 /** Checks firearm, look angle, air, wind, site and zero of the shot. */
 function checkConditions(shot: TrajectoryInput): void {
   const { firearm, site, zero } = shot
   checkFirearm(firearm)
-  need(look(shot.lookAngle), 'look angle outside -pi/2..pi/2')
+  need(look(shot.lookAngle), { code: 'lookAngleOutsideRange', params: {} })
   checkAir(shot.air)
   checkWind(shot.wind ?? [])
-  need(site?.latitude === undefined || Math.abs(site.latitude) <= Math.PI / 2, 'latitude')
-  need(finite(site?.azimuth), 'azimuth')
+  need(site?.latitude === undefined || Math.abs(site.latitude) <= Math.PI / 2, {
+    code: 'latitudeInvalid',
+    params: {},
+  })
+  need(finite(site?.azimuth), { code: 'azimuthInvalid', params: {} })
   checkZero(zero)
 }
 
 /** Checks the tolerances, limits and switches of the options. */
 function checkOptions(o: TrajectoryOptions): void {
-  need(
-    o.relativeTolerance > 0 && o.absoluteTolerance > 0 && o.maxTime > 0 && o.maxSteps > 0,
-    'tolerances and limits',
-  )
-  need(o.budget === undefined || (o.budget.used >= 0 && o.budget.max >= 0), 'step budget')
-  need(Number.isFinite(o.gravity), 'gravity')
-  need(o.zeroTolerance > 0 && o.maxYaw > 0, 'zero tolerance and maximum yaw must be positive')
-  need(o.model === 'point-mass' || o.model === 'modified-point-mass', `model ${o.model}`)
+  need(o.relativeTolerance > 0 && o.absoluteTolerance > 0 && o.maxTime > 0 && o.maxSteps > 0, {
+    code: 'tolerancesInvalid',
+    params: {},
+  })
+  need(o.budget === undefined || (o.budget.used >= 0 && o.budget.max >= 0), {
+    code: 'stepBudgetInvalid',
+    params: {},
+  })
+  need(Number.isFinite(o.gravity), { code: 'gravityInvalid', params: {} })
+  need(o.zeroTolerance > 0 && o.maxYaw > 0, {
+    code: 'zeroToleranceOrMaxYawNotPositive',
+    params: {},
+  })
+  need(o.model === 'point-mass' || o.model === 'modified-point-mass', {
+    code: 'modelUnknown',
+    params: { model: o.model },
+  })
 }
 
 function checkShot(shot: TrajectoryInput, o: TrajectoryOptions): void {
   checkProjectile(shot.projectile)
-  need(
-    shot.muzzleVelocity > 0 && Number.isFinite(shot.muzzleVelocity),
-    'muzzle velocity must be positive',
-  )
+  need(shot.muzzleVelocity > 0 && Number.isFinite(shot.muzzleVelocity), {
+    code: 'muzzleVelocityNotPositive',
+    params: {},
+  })
   checkConditions(shot)
   checkOptions(o)
 }
@@ -1005,13 +1027,19 @@ function checkShot(shot: TrajectoryInput, o: TrajectoryOptions): void {
 function checkCoefficient(k: CoefficientOverMach | undefined, name: string): void {
   if (k === undefined) return
   if (typeof k === 'number') {
-    need(Number.isFinite(k), name)
+    need(Number.isFinite(k), { code: 'coefficientNotFinite', params: { name } })
     return
   }
-  need(k.length >= 2, `${name} table needs at least two nodes`)
+  need(k.length >= 2, { code: 'coefficientTableTooShort', params: { name } })
   k.forEach(([mach, value], j) => {
-    need(Number.isFinite(mach) && Number.isFinite(value), `${name} table node`)
-    need(j === 0 || mach > nth(k, j - 1)[0], `${name} table Mach must rise`)
+    need(Number.isFinite(mach) && Number.isFinite(value), {
+      code: 'coefficientTableNodeInvalid',
+      params: { name },
+    })
+    need(j === 0 || mach > nth(k, j - 1)[0], {
+      code: 'coefficientTableMachNotRising',
+      params: { name },
+    })
   })
 }
 
@@ -1019,12 +1047,13 @@ function checkCoefficient(k: CoefficientOverMach | undefined, name: string): voi
 function checkAerodynamics(shot: TrajectoryInput): Aerodynamics {
   const { projectile: p, firearm } = shot
   const a = p.aerodynamics
-  if (a === undefined) throw new InputError('the modified point mass needs projectile.aerodynamics')
-  need(
-    firearm.twist !== undefined && firearm.twistHand !== undefined,
-    'the modified point mass needs twist and twist hand',
-  )
-  need(a.liftSlope !== undefined, 'the modified point mass needs liftSlope')
+  if (a === undefined)
+    throw new InputError({ code: 'modifiedPointMassNeedsAerodynamics', params: {} })
+  need(firearm.twist !== undefined && firearm.twistHand !== undefined, {
+    code: 'modifiedPointMassNeedsTwist',
+    params: {},
+  })
+  need(a.liftSlope !== undefined, { code: 'modifiedPointMassNeedsLiftSlope', params: {} })
   checkCoefficient(a.liftSlope, 'liftSlope')
   checkCoefficient(a.momentSlope, 'momentSlope')
   checkCoefficient(a.magnusForceSlope, 'magnusForceSlope')
@@ -1040,7 +1069,7 @@ function estimateInertias(
 ): { ix: number; iy: number } {
   let { axialInertia: ix, transverseInertia: iy } = a
   if (ix === undefined || iy === undefined) {
-    need(p.length !== undefined, 'a missing moment of inertia needs the length')
+    need(p.length !== undefined, { code: 'inertiaNeedsLength', params: {} })
     const cyl = cylinderInertia(p.mass, p.diameter, p.length ?? 0)
     if (ix === undefined) {
       ix = cyl.axial
@@ -1051,10 +1080,10 @@ function estimateInertias(
       estimated.push('transverseInertia')
     }
   }
-  need(
-    ix > 0 && Number.isFinite(ix) && iy > 0 && Number.isFinite(iy),
-    'moments of inertia must be positive',
-  )
+  need(ix > 0 && Number.isFinite(ix) && iy > 0 && Number.isFinite(iy), {
+    code: 'inertiaNotPositive',
+    params: {},
+  })
   return { ix, iy }
 }
 
@@ -1062,7 +1091,7 @@ function estimateInertias(
 function estimateMomentSlope(shot: TrajectoryInput, ix: number, iy: number, spin0: number): number {
   const { projectile: p, firearm } = shot
   const v0 = shot.muzzleVelocity
-  need(p.length !== undefined, 'a missing momentSlope needs the length')
+  need(p.length !== undefined, { code: 'momentSlopeNeedsLength', params: {} })
   const stability = millerStability({
     mass: p.mass,
     diameter: p.diameter,
@@ -1096,10 +1125,10 @@ function resolveAero(shot: TrajectoryInput): Aero {
     estimated.push('momentSlope')
   }
   const cma = momentSlope
-  need(
-    typeof cma === 'number' ? cma > 0 : cma.every((n) => n[1] > 0),
-    'momentSlope must be positive (spin-stabilised bullet)',
-  )
+  need(typeof cma === 'number' ? cma > 0 : cma.every((n) => n[1] > 0), {
+    code: 'momentSlopeNotPositive',
+    params: {},
+  })
   return {
     liftSlope: a.liftSlope,
     momentSlope: cma,
@@ -1204,7 +1233,8 @@ function zeroWith(shot: TrajectoryInput, o: TrajectoryOptions, aero: Aero | unde
   const range = zero.range
   const miss = (bore: BoreAngles): [number, number] => {
     const f = fly(c, bore, [range], o)
-    if (f.points.length === 0) throw new InputError(`zero range ${range} m not reached (${f.stop})`)
+    if (f.points.length === 0)
+      throw new InputError({ code: 'zeroRangeNotReached', params: { range, stop: f.stop } })
     const q = nth(correct(c, f.points, o), 0)
     return [q.height, q.windage]
   }
@@ -1232,7 +1262,7 @@ function zeroWith(shot: TrajectoryInput, o: TrajectoryOptions, aero: Aero | unde
       windageAngle: bore.windageAngle - w / range,
     }
   }
-  throw new InputError(`zero did not converge (miss ${h} m, ${w} m)`)
+  throw new InputError({ code: 'zeroNotConverged', params: { vertical: h, horizontal: w } })
 }
 
 /** Bore angles that put the impact on the line of sight at the zero range (`apps/docs/docs/models/exterior-point-mass.md`, "Zeroing"). */
@@ -1300,7 +1330,8 @@ export function trajectory(
 ): Trajectory {
   const o = resolve(options)
   checkShot(shot, o)
-  for (const s of ranges) need(s >= 0 && Number.isFinite(s), `range ${s}`)
+  for (const s of ranges)
+    need(s >= 0 && Number.isFinite(s), { code: 'rangeInvalid', params: { range: s } })
   const aero = aeroFor(shot, o)
   const bore = zeroWith(shot, o, aero)
   const c: Conditions = {

@@ -2,7 +2,8 @@
  * Muzzle velocity from a speed measured downrange, `apps/docs/docs/models/exterior-drag.md`,
  * "Speed measured downrange". SI in and out.
  */
-import { InputError, need, nth } from '@open-reloading/statistics'
+import { nth } from '@open-reloading/statistics'
+import { InputError, need } from '../issue.ts'
 import { overlay, type Settings } from '../settings.ts'
 import type { Air } from './atmosphere.ts'
 import {
@@ -38,8 +39,8 @@ export function muzzleVelocityFromDownrange(
   options?: Settings<TrajectoryOptions>,
 ): number {
   const { projectile, air, distance, velocity } = reading
-  need(distance >= 0 && Number.isFinite(distance), 'distance must not be negative')
-  need(velocity > 0 && Number.isFinite(velocity), 'velocity must be positive')
+  need(distance >= 0 && Number.isFinite(distance), { code: 'distanceNegative', params: {} })
+  need(velocity > 0 && Number.isFinite(velocity), { code: 'velocityNotPositive', params: {} })
   if (distance === 0) return velocity
   const o = overlay<Settings<TrajectoryOptions>>(options ?? {}, {
     model: 'point-mass',
@@ -57,15 +58,15 @@ export function muzzleVelocityFromDownrange(
     }
     const t = trajectory(shot, [distance], o)
     if (t.points.length === 0)
-      throw new InputError(`distance ${distance} m not reached (${t.stop})`)
+      throw new InputError({ code: 'distanceNotReached', params: { distance, stop: t.stop } })
     return nth(t.points, 0).velocity
   }
   let v0 = velocity
   for (let pass = 0; pass < 20; pass++) {
     const step = velocity - flown(v0)
     v0 += step
-    need(v0 > 0, 'the speed measured is lower than the bullet can keep over the distance')
+    need(v0 > 0, { code: 'measuredSpeedTooLow', params: {} })
     if (Math.abs(step) < convergence) return v0
   }
-  throw new InputError('muzzle velocity did not converge')
+  throw new InputError({ code: 'muzzleVelocityNotConverged', params: {} })
 }
