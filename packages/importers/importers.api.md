@@ -145,6 +145,9 @@ export interface FieldSpec {
 export const fieldSpecs: Record<TableKind, FieldSpec[]>;
 
 // @public
+export type FileDiagnostic = ReaderDiagnostic<'utf16OddBytes' | 'notUnicodeText' | 'cellBeyondColumnIV' | 'cellOutOfOrder' | 'tooManyCells' | 'tooMuchCellText' | 'zipDirectoryMalformed' | 'zip64' | 'zipNoEnd' | 'zipSplit' | 'zipDirectoryOutside' | 'partTwice' | 'partsDifferInCase' | 'partEncrypted' | 'partMethod' | 'partTooLarge' | 'partsTooLarge' | 'partCompressedTooLarge' | 'partNoLocalHeader' | 'partDataOutside' | 'partStoredSize' | 'partCorrupt' | 'partInflatesMore' | 'partInflatesLess' | 'partCrc' | 'relationshipLeaves' | 'sharedStringOutOfRange' | 'cellRefMalformed' | 'partMissing' | 'notUtf8' | 'xmlElementsExceeded' | 'xmlCharactersExceeded' | 'relationshipTwice' | 'sheetNoRelationship' | 'sheetPartAgain' | 'noDecompressionStream' | 'noWorkbookPart' | 'unknownEntity' | 'notXmlChar' | 'bareAmpersand' | 'xmlBudgetSpent' | 'unclosedProcessingInstruction' | 'unclosedComment' | 'unclosedCdata' | 'duplicateAttribute' | 'tooManyAttributes' | 'malformedTag' | 'malformedTagNamed' | 'textOutsideRoot' | 'encodingNotRead' | 'endTagMismatch' | 'nestTooDeep' | 'secondRoot' | 'doctype' | 'markupDeclaration' | 'unclosedElement' | 'noRoot' | 'rootNotLoad' | 'noLoad'>;
+
+// @public
 export const formatMinutes: (seconds: number) => string;
 
 // @public
@@ -275,9 +278,9 @@ export type ReaderDiagnostic<Code extends string> = Diagnostic<Code, Readonly<Re
 
 // @public
 export class ReaderError extends Error {
-    constructor(diagnostic: ChronoDiagnostic | PressureDiagnostic, options?: ErrorOptions);
+    constructor(diagnostic: ChronoDiagnostic | PressureDiagnostic | FileDiagnostic, options?: ErrorOptions);
     // (undocumented)
-    readonly diagnostic: ChronoDiagnostic | PressureDiagnostic;
+    readonly diagnostic: ChronoDiagnostic | PressureDiagnostic | FileDiagnostic;
 }
 
 // @public

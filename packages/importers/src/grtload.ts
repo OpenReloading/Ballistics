@@ -1,7 +1,7 @@
 // The load files of Gordon's Reloading Tool (`.grtload`, XML) as record candidates. The mapping and
 // its reasons: `apps/docs/docs/data/grt-load-files.md`. It was written from saved files.
 
-import type { Candidate, ReaderDiagnostic } from './diagnostics.ts'
+import { type Candidate, type ReaderDiagnostic, refuseFile } from './diagnostics.ts'
 import { idOfKey } from './record-ids.ts'
 import { keyText } from './records.ts'
 import { parseXml, type XmlElement } from './xml.ts'
@@ -342,8 +342,8 @@ export function readLoadInput(input: XmlElement): GrtLoadRead {
  */
 export function readGrtLoad(xml: string): GrtLoadRead {
   const root = parseXml(xml.replace(/^\uFEFF/, ''))
-  if (root.name !== grtLoadRoot) throw new Error(`The root element is not ${grtLoadRoot}.`)
+  if (root.name !== grtLoadRoot) refuseFile('rootNotLoad', { root: grtLoadRoot })
   const input = elements(root).find((e) => e.name === 'InnerBallistikInput')
-  if (!input) throw new Error('The file holds no load.')
+  if (!input) refuseFile('noLoad')
   return readLoadInput(input)
 }
