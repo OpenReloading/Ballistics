@@ -42,6 +42,9 @@ export type Candidate = UserRecord extends infer R ? R extends UserRecord ? Omit
 } : never : never;
 
 // @public
+export type ChronoDiagnostic = ReaderDiagnostic<'sha256Malformed' | 'outsideRange' | 'noShots' | 'unitDiffersFromCaller' | 'unknownUnit' | 'missingUnit' | 'unknownUnitNamedByCaller' | 'missingUnitNamedByCaller' | 'velocityNotNumber' | 'velocityNotPositive' | 'skipRowsNotWhole' | 'skipRowsWithHeaderText' | 'columnBelowOne' | 'emptyHeaderText' | 'noHeaderRow' | 'commaMaySplit' | 'commaMayCutVelocity' | 'cellCountDiffers' | 'moreCellsThanHeader' | 'moreCellsThanHeaderComma' | 'unitCellDiffersFromHeader' | 'coldBoreUnknown' | 'noVelocity' | 'stringReturns' | 'notShotView' | 'footerDateUnknown' | 'footerDateMissing' | 'noShotViewHeader' | 'statisticNotNumber' | 'statisticDiffers' | 'footerStatisticsMissing' | 'dateFromOption' | 'noShotRows' | 'noStringOnDate' | 'severalDays' | 'notSessionJson' | 'versionUnsupported' | 'memberNotPositive' | 'memberNotText' | 'memberNotObject' | 'memberNotDeviceKind' | 'velocityRequired' | 'memberNotBoolean' | 'excludedNotText' | 'noStrings' | 'noStringShots' | 'memberNotDate' | 'notTemplate' | 'needsColumnMapping' | 'readsText' | 'readsWorkbooks'>;
+
+// @public
 export type ChronoFormat = TextChronoFormat | WorkbookChronoFormat;
 
 // @public
@@ -63,7 +66,7 @@ export interface ChronoImport {
         source: 'file' | 'caller';
     }[];
     // (undocumented)
-    warnings: string[];
+    warnings: ChronoDiagnostic[];
 }
 
 // @public
@@ -96,6 +99,9 @@ export interface ColumnUnit {
     symbol: string;
     toStored: (x: number) => number;
 }
+
+// @public
+export type CommaRemedy = 'quoteOrSemicolon' | 'nameDelimiter';
 
 // @public
 export function decodeText(bytes: Uint8Array): string;
@@ -137,6 +143,9 @@ export interface FieldSpec {
 
 // @public
 export const fieldSpecs: Record<TableKind, FieldSpec[]>;
+
+// @public
+export type FileDiagnostic = ReaderDiagnostic<'utf16OddBytes' | 'notUnicodeText' | 'cellBeyondColumnIV' | 'cellOutOfOrder' | 'tooManyCells' | 'tooMuchCellText' | 'zipDirectoryMalformed' | 'zip64' | 'zipNoEnd' | 'zipSplit' | 'zipDirectoryOutside' | 'partTwice' | 'partsDifferInCase' | 'partEncrypted' | 'partMethod' | 'partTooLarge' | 'partsTooLarge' | 'partCompressedTooLarge' | 'partNoLocalHeader' | 'partDataOutside' | 'partStoredSize' | 'partCorrupt' | 'partInflatesMore' | 'partInflatesLess' | 'partCrc' | 'relationshipLeaves' | 'sharedStringOutOfRange' | 'cellRefMalformed' | 'partMissing' | 'notUtf8' | 'xmlElementsExceeded' | 'xmlCharactersExceeded' | 'relationshipTwice' | 'sheetNoRelationship' | 'sheetPartAgain' | 'noDecompressionStream' | 'noWorkbookPart' | 'unknownEntity' | 'notXmlChar' | 'bareAmpersand' | 'xmlBudgetSpent' | 'unclosedProcessingInstruction' | 'unclosedComment' | 'unclosedCdata' | 'duplicateAttribute' | 'tooManyAttributes' | 'malformedTag' | 'malformedTagNamed' | 'textOutsideRoot' | 'encodingNotRead' | 'endTagMismatch' | 'nestTooDeep' | 'secondRoot' | 'doctype' | 'markupDeclaration' | 'unclosedElement' | 'noRoot' | 'rootNotLoad' | 'noLoad'>;
 
 // @public
 export const formatMinutes: (seconds: number) => string;
@@ -218,6 +227,9 @@ export function parseShotViewWorkbook(book: Workbook, options?: WorkbookOptions)
 export function parseVelocityUnit(text: string | undefined): VelocityUnit | undefined;
 
 // @public
+export type PressureDiagnostic = ReaderDiagnostic<'sensorMissing' | 'columnsNotDistinct' | 'cutoffNotPositive' | 'columnUnitDiffersFromCaller' | 'columnUnitMissing' | 'columnUnitNamedByCaller' | 'readingNotNumber' | 'readingNotFinite' | 'timesNotIncreasing' | 'tooFewSamples'>;
+
+// @public
 export interface PressureHistoryImport {
     lowPass?: {
         cutoff: number;
@@ -237,7 +249,7 @@ export interface PressureHistoryImport {
         };
     };
     // (undocumented)
-    warnings: string[];
+    warnings: PressureDiagnostic[];
 }
 
 // @public
@@ -263,6 +275,13 @@ export function readCsrLoad(xml: string): GrtLoadRead;
 
 // @public
 export type ReaderDiagnostic<Code extends string> = Diagnostic<Code, Readonly<Record<string, string | number | readonly string[]>>>;
+
+// @public
+export class ReaderError extends Error {
+    constructor(diagnostic: ChronoDiagnostic | PressureDiagnostic | FileDiagnostic, options?: ErrorOptions);
+    // (undocumented)
+    readonly diagnostic: ChronoDiagnostic | PressureDiagnostic | FileDiagnostic;
+}
 
 // @public
 export function readGrtLoad(xml: string): GrtLoadRead;

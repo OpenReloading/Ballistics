@@ -1,7 +1,8 @@
 // The result every chronograph parser returns, and the options they share.
 import type { ChronoSession, ChronoShot, QuantityValue } from '@open-reloading/schema'
+import { type ChronoDiagnostic, refuse } from './diagnostics.ts'
 import type { ChronoFormatId } from './index.ts'
-import { namedByCaller, parseVelocityUnit, type VelocityUnit } from './units.ts'
+import { parseVelocityUnit, type VelocityUnit } from './units.ts'
 
 export type { ChronoFormatId }
 
@@ -48,7 +49,7 @@ export interface ChronoImport {
    * and, for optical devices, `muzzleDistance`.
    */
   missingPaths: string[]
-  warnings: string[]
+  warnings: ChronoDiagnostic[]
 }
 
 type Source = SessionCandidate['provenance']['sources'][0]
@@ -56,7 +57,7 @@ type Source = SessionCandidate['provenance']['sources'][0]
 /** The sha256 lowercase; throws unless it is 64 hex digits. */
 function checkSha256(sha256: string): string {
   const lower = sha256.toLowerCase()
-  if (!/^[0-9a-f]{64}$/.test(lower)) throw new Error('sha256 must be 64 hex digits')
+  if (!/^[0-9a-f]{64}$/.test(lower)) refuse('sha256Malformed')
   return lower
 }
 
@@ -65,28 +66,30 @@ const minVelocity = 30
 const maxVelocity = 2000
 
 /** File name, hash and, when a velocity unit named by the caller was used, a note saying so. */
-function provenanceSource(options: ChronoParserOptions, warnings: string[]): Source {
+function provenanceSource(options: ChronoParserOptions, warnings: ChronoDiagnostic[]): Source {
   const source: Source = {}
   if (options.fileName) source.title = options.fileName
   if (options.sha256) source.sha256 = checkSha256(options.sha256)
   // raw keeps only the file's text, so the record states the unit the user named
   const unit = options.velocityUnit
-  if (unit && warnings.some((w) => w.endsWith(namedByCaller(unit)))) {
+  const named = ['unknownUnitNamedByCaller', 'missingUnitNamedByCaller']
+  if (unit && warnings.some((w) => named.includes(w.code))) {
     source.note = `velocities without a known unit in the file are read as ${unit}, as named by the user at import`
   }
   return source
 }
 
 /** One warning per string listing the shots outside the assumed small-arms range. */
-function rangeWarnings(strings: { shots: ChronoShot[] }[], warnings: string[]): void {
+function rangeWarnings(strings: { shots: ChronoShot[] }[], warnings: ChronoDiagnostic[]): void {
   strings.forEach((s, i) => {
     const out = s.shots.flatMap((shot, j) =>
       shot.velocity.value < minVelocity || shot.velocity.value > maxVelocity ? [j + 1] : [],
     )
     if (out.length > 0) {
-      warnings.push(
-        `string ${i + 1}: shots ${out.join(', ')} outside ${minVelocity} to ${maxVelocity} m/s; check the unit, the column and statistics rows`,
-      )
+      warnings.push({
+        code: 'outsideRange',
+        params: { string: i + 1, shots: out.map(String), min: minVelocity, max: maxVelocity },
+      })
     }
   })
 }
@@ -134,10 +137,10 @@ function missingPaths(session: Omit<SessionCandidate, 'provenance'>, source: Sou
 export function buildChronoImport(
   format: ChronoFormatId,
   session: Omit<SessionCandidate, 'provenance'>,
-  { labels, warnings }: { labels: (string | undefined)[]; warnings: string[] },
+  { labels, warnings }: { labels: (string | undefined)[]; warnings: ChronoDiagnostic[] },
   options: ChronoParserOptions,
 ): ChronoImport {
-  if (session.strings.length === 0) throw new Error('no shots found')
+  if (session.strings.length === 0) refuse('noShots')
   const source = provenanceSource(options, warnings)
   rangeWarnings(session.strings, warnings)
   return {

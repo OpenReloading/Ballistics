@@ -8,20 +8,27 @@
         "no-restricted-imports": [
           "error",
           {
-            "paths": [],
+            "paths": [
+              {
+                "name": "@open-reloading/statistics",
+                "allowTypeImports": true,
+                "message": "schema-statistics-for-types-only: packages/schema takes the Diagnostic type of @open-reloading/statistics, no code."
+              }
+            ],
             "patterns": [
               {
                 "group": [
                   "@open-reloading/*",
                   "@open-reloading/*/**",
                   "!@open-reloading/units",
-                  "!@open-reloading/units/**"
+                  "!@open-reloading/units/**",
+                  "!@open-reloading/statistics"
                 ],
-                "message": "schema-imports-units-only: packages/schema imports no workspace package but @open-reloading/units."
+                "message": "schema-imports-units-only: packages/schema imports no workspace package but @open-reloading/units and the Diagnostic type of @open-reloading/statistics."
               },
               {
                 "regex": "^(\\.\\./)+((units|schema|importers|catalog|api|drawing|cli)/(src|dist)|packages|apps)/",
-                "message": "schema-imports-units-only: packages/schema imports no workspace package but @open-reloading/units."
+                "message": "schema-imports-units-only: packages/schema imports no workspace package but @open-reloading/units and the Diagnostic type of @open-reloading/statistics."
               }
             ]
           }

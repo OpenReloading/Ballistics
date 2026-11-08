@@ -11,7 +11,6 @@ import { formatNumber } from '../i18n/number.ts'
 import { msg } from '../i18n/translate.ts'
 import {
   chronoFileBytes,
-  chronoMessageText,
   exampleCsv,
   exampleSessionFileName,
   formatNames,
@@ -20,10 +19,9 @@ import {
   sessionCsvBlob,
   sessionJsonBlob,
 } from '../lib/chrono.ts'
-import { translateMessage } from '../lib/core-messages.ts'
+import { chronoDiagnosticText, chronoErrorText } from '../lib/chrono-diagnostics.ts'
 import { dayText, localDay } from '../lib/dates.ts'
 import { download } from '../lib/download.ts'
-import { errorText } from '../lib/error-text.ts'
 import { stringName } from '../lib/string-name.ts'
 import { type StringStats, stringStats } from '../lib/string-stats.ts'
 import { controlSize } from '../lib/theme.ts'
@@ -54,7 +52,7 @@ export function SessionSummary() {
   const [chosen, setChosen] = useState<VelocityUnit>()
   const unit = chosen ?? (system.velocity.symbol as VelocityUnit)
   const [read, setRead] = useState<Read>()
-  const [error, setError] = useState('')
+  const [error, setError] = useState<unknown>()
   // kept outside the input, which is cleared so choosing the same file again reads it again
   const file = useRef<File | undefined>(undefined)
   // a later file or unit choice wins over a read still running
@@ -70,7 +68,7 @@ export function SessionSummary() {
     }
     file.current = next
     const pick = picks.current
-    setError('')
+    setError(undefined)
     if (!next) return
     try {
       const data = await readSession(await chronoFileBytes(next), next.name, fallback)
@@ -78,7 +76,7 @@ export function SessionSummary() {
     } catch (err) {
       if (run !== latest.current) return
       setRead(undefined)
-      setError(errorText(err))
+      setError(err)
     }
   }
 
@@ -164,18 +162,18 @@ export function SessionSummary() {
           />
           <TemplateLinks />
         </Flex>
-        {error && (
+        {error !== undefined && (
           <ErrorNote
             title={t('The file was not read.')}
             onRetry={() => readFile(file.current, unit)}
           >
-            {chronoMessageText(error, t)}
+            {chronoErrorText(error, t)}
           </ErrorNote>
         )}
         {read ? (
           <SummaryView key={read.pick} read={read} system={system} />
         ) : (
-          !error && (
+          error === undefined && (
             <EmptyNote
               icon={<FileArrowUp size={24} aria-hidden="true" />}
               title={t('No file read yet.')}
@@ -356,7 +354,7 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
           <ul>
             {warnings.map((w, k) => (
               // oxlint-disable-next-line react/no-array-index-key -- warnings keep the importer order and may repeat
-              <li key={k}>{translateMessage(w, t)}</li>
+              <li key={k}>{chronoDiagnosticText(w, t)}</li>
             ))}
           </ul>
         </Message>

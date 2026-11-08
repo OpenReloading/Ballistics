@@ -5,6 +5,7 @@ export { fQuantileTwoNumeratorDegrees } from './f-distribution.ts'
 export type { HuberLoss } from './huber.ts'
 export type { Interval } from './interval.ts'
 export {
+  checkLogFitLimits,
   type Identifiability,
   identifiability,
   type LogFitFailure,
@@ -13,6 +14,7 @@ export {
   type LogFitStop,
   logLeastSquares,
 } from './least-squares.ts'
+export { percentile } from './percentile.ts'
 export { normalsFrom, seededUniforms } from './random.ts'
 export { studentTwoSidedQuantile } from './student-t.ts'
 export { shotsNeeded, type VelocityStatistics, velocityStatistics } from './velocity-statistics.ts'

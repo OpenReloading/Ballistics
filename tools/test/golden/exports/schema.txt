@@ -64,6 +64,8 @@
 . RingScoring
 . SessionRecord
 . SessionSnapshot
+. ShareLinkDiagnostic
+. ShareLinkRead
 . SheetNote
 . ShootingLogEntry
 . ShootingLogRecord
@@ -89,6 +91,8 @@
 . UserCartridge
 . UserCaseCapacity
 . UserCaseRecord
+. UserDataDiagnostic
+. UserDataRead
 . UserManufacturer
 . UserPowder
 . UserPowderFit
@@ -119,6 +123,7 @@
 . catalogueRef
 . catalogueSession
 . checkUserRefs
+. checkedUserDataFileText
 . chronoSession
 . chronoShot
 . compareDisciplines
@@ -138,6 +143,7 @@
 . embeddedFile
 . eventScoring
 . eventType
+. exportAllFileText
 . faceColour
 . federation
 . firearm
@@ -156,6 +162,8 @@
 . loadTables
 . loadWaterCapacity
 . manufacturer
+. maxShareLinkChars
+. maxUserDataBytes
 . ogiveForms
 . optic
 . opticConfiguration
@@ -180,6 +188,8 @@
 . quantity
 . quantityKind
 . rangeFirings
+. readShareLink
+. readUserDataFile
 . recordId
 . recordIdRegex
 . ref
@@ -187,6 +197,7 @@
 . score
 . searchKey
 . sessionSnapshot
+. shareLinkOf
 . sheetId
 . sheetNote
 . shootingLogEntry
@@ -212,6 +223,7 @@
 . userBullet
 . userCartridge
 . userDataFile
+. userDataFileText
 . userDataFormat
 . userDataVersion
 . userId

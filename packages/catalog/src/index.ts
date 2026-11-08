@@ -1,3 +1,4 @@
+export * from './catalogue.ts'
 export * from './coverage.ts'
 export * from './load-tables.ts'
 export * from './maker-rows.ts'
