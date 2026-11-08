@@ -4,8 +4,7 @@ import { toSi } from '@open-reloading/schema'
 import type { HitIssue, ScoringZone } from '@open-reloading/shot-groups'
 import { InputError } from '@open-reloading/statistics'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
-import { translateMessage } from './core-messages.ts'
-import { errorText } from './error-text.ts'
+import { refusalText, translateMessage } from './core-messages.ts'
 import { nth } from './nth.ts'
 
 const hitWords = {
@@ -31,7 +30,7 @@ const isHitCode = (code: string): code is HitIssue['code'] => Object.hasOwn(hitW
 export function hitFailureText(e: unknown, t: Translator['t']): string {
   if (e instanceof InputError && e.issue && isHitCode(e.issue.code))
     return t(hitWords[e.issue.code])
-  return translateMessage(errorText(e), t)
+  return translateMessage(refusalText(e), t)
 }
 
 /**

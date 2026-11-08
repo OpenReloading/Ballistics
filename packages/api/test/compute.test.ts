@@ -336,7 +336,7 @@ describe('POST /exterior/trajectory', () => {
       options: { maxSteps: 10 },
     })
     expect(status).toBe(422)
-    expect(body.message).toMatch(/step/)
+    expect(body).toMatchObject({ code: 'integrationStepsExceeded', params: { max: 10 } })
   })
 })
 

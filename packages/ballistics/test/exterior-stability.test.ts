@@ -81,9 +81,7 @@ describe('spin drift and jump', () => {
 describe('stability inputs and limits', () => {
   it('rejects each input at zero', () => {
     for (const key of ['mass', 'diameter', 'length', 'twist', 'velocity'] as const)
-      expect(() => millerStability({ ...base, [key]: 0 })).toThrow(
-        'mass, diameter, length, twist and velocity must be positive',
-      )
+      expect(() => millerStability({ ...base, [key]: 0 })).toThrow('stabilityInputsNotPositive')
   })
 
   it('adds the Magnus moment over the axial inertia', () => {
