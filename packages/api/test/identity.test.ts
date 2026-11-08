@@ -1,8 +1,12 @@
-import { chargeTargetExample, interiorExample, trajectoryExample } from '@open-reloading/use-cases'
+import {
+  chargeTargetExample,
+  interiorExample,
+  loadFileExample,
+  trajectoryExample,
+} from '@open-reloading/use-cases'
 import { describe, expect, it } from 'vitest'
 import { buildCatalogue } from '../src/catalogue/build.ts'
 import { openCatalogue } from '../src/catalogue/open.ts'
-import { loadFileExample } from '../src/compute/load-file-example.ts'
 import { canonicalJson, sha256 } from '../src/hash.ts'
 import { API_PREFIX, API_VERSION } from '../src/version.ts'
 import { bundle } from './fixtures.ts'

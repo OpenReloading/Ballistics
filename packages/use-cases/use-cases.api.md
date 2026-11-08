@@ -5,7 +5,6 @@
 ```ts
 
 import { AdvisoryId } from '@open-reloading/ballistics';
-import { AdvisoryRule } from '@open-reloading/ballistics';
 import type { Aerodynamics } from '@open-reloading/ballistics';
 import { Bullet } from '@open-reloading/schema';
 import { Cartridge } from '@open-reloading/schema';
@@ -34,6 +33,7 @@ import { TruedParameter } from '@open-reloading/ballistics';
 import { trueDrag } from '@open-reloading/ballistics';
 import { trueMuzzleVelocity } from '@open-reloading/ballistics';
 import { TruingReason } from '@open-reloading/ballistics';
+import { userDataFile } from '@open-reloading/schema';
 import { z } from 'zod';
 
 // @public
@@ -63,9 +63,6 @@ export type AirSchema = z.ZodObject<{
     temperature: z.ZodNumber;
     humidity: z.ZodNumber;
 }, z.core.$strict>;
-
-// @public
-export function assertFinite<T>(response: T, allowed?: RegExp, infinite?: boolean): T;
 
 // @public
 export interface BulletProjectile {
@@ -187,6 +184,9 @@ export type ChargeContext = {
 };
 
 // @public
+export const chargeTarget: Operation;
+
+// @public
 export const chargeTargetExample: ChargeTargetRequest;
 
 // @public
@@ -195,6 +195,9 @@ export const chargeTargetKinds: readonly ['peakPressure', 'muzzleVelocity', 'loa
 // @public
 export interface ChargeTargetRequest extends z.input<typeof chargeBody> {
 }
+
+// @public
+export const chargeTargetResponse: z.ZodType;
 
 // @public
 export type CoefficientSchema = z.ZodUnion<readonly [z.ZodNumber, z.ZodArray<z.ZodTuple<[z.ZodNumber, z.ZodNumber], null>>]>;
@@ -252,84 +255,7 @@ export type ExteriorOptionsShape = {
 };
 
 // @public
-export interface ExteriorUnits {
-    // (undocumented)
-    readonly altitude: 'm';
-    // (undocumented)
-    readonly azimuth: 'rad';
-    // (undocumented)
-    readonly ballisticCoefficient: 'kg/m2';
-    // (undocumented)
-    readonly bore: 'rad';
-    // (undocumented)
-    readonly diameter: 'm';
-    // (undocumented)
-    readonly distance: 'm';
-    // (undocumented)
-    readonly elevationAngle: 'rad';
-    // (undocumented)
-    readonly elevationHold: 'rad';
-    // (undocumented)
-    readonly endDistance: 'm';
-    // (undocumented)
-    readonly energy: 'J';
-    // (undocumented)
-    readonly fromDirection: 'rad';
-    // (undocumented)
-    readonly height: 'm';
-    // (undocumented)
-    readonly heightAboveFiringPoint: 'm';
-    // (undocumented)
-    readonly humidity: '1';
-    // (undocumented)
-    readonly jump: 'm';
-    // (undocumented)
-    readonly latitude: 'rad';
-    // (undocumented)
-    readonly length: 'm';
-    // (undocumented)
-    readonly lookAngle: 'rad';
-    // (undocumented)
-    readonly mach: '1';
-    // (undocumented)
-    readonly mass: 'kg';
-    // (undocumented)
-    readonly minVelocity: 'm/s';
-    // (undocumented)
-    readonly pathAngle: 'rad';
-    // (undocumented)
-    readonly pressure: 'Pa';
-    // (undocumented)
-    readonly range: 'm';
-    // (undocumented)
-    readonly sightOffset: 'm';
-    // (undocumented)
-    readonly speed: 'm/s';
-    // (undocumented)
-    readonly spin: 'rad/s';
-    // (undocumented)
-    readonly spinDrift: 'm';
-    // (undocumented)
-    readonly stability: '1';
-    // (undocumented)
-    readonly temperature: 'K';
-    // (undocumented)
-    readonly time: 's';
-    // (undocumented)
-    readonly twist: 'm';
-    // (undocumented)
-    readonly velocity: 'm/s';
-    // (undocumented)
-    readonly vertical: 'm/s';
-    // (undocumented)
-    readonly windage: 'm';
-    // (undocumented)
-    readonly windageAngle: 'rad';
-    // (undocumented)
-    readonly windageHold: 'rad';
-    // (undocumented)
-    readonly yaw: 'rad';
-}
+export function filePath(path: PropertyKey[], at: Path): Path;
 
 // @public
 export const findBullet: (catalogue: Catalogue, id: string) => Catalogued<'bullet'>;
@@ -339,16 +265,6 @@ export const findCartridge: (catalogue: Catalogue, id: string) => CartridgeWithS
 
 // @public
 export const findPowder: (catalogue: Catalogue, id: string) => Catalogued<'powder'>;
-
-// @public
-export const fitIterations: z.ZodOptional<z.ZodNumber>;
-
-// @public
-export const identity: {
-    inputHash: z.ZodString;
-    apiVersion: z.ZodString;
-    dataHash: z.ZodString;
-};
 
 // @public
 export const inlineRunner: ComputeRunner;
@@ -413,10 +329,29 @@ export interface InteriorRequest extends z.input<typeof interiorBody> {
 }
 
 // @public
+export const interiorResponse: z.ZodType;
+
+// @public
 export type InterpolationSchema = z.ZodOptional<z.ZodEnum<{
     linear: 'linear';
     'monotone-cubic': 'monotone-cubic';
 }>>;
+
+// @public
+export type JsonSchema = Record<string, unknown>;
+
+// @public
+export const jsonSchema: (schema: z.ZodType, io?: 'input' | 'output') => JsonSchema;
+
+// @public
+export const loadFileExample: LoadFileRequest;
+
+// @public
+export interface LoadFileRequest extends z.input<typeof userDataFile> {
+}
+
+// @public
+export const loadFileResponse: z.ZodType;
 
 // @public
 export type M3LoadShape = {
@@ -485,35 +420,47 @@ export type M3LoadShape = {
 };
 
 // @public
-export interface M3Units {
-    // (undocumented)
-    readonly burntFraction: '1';
-    // (undocumented)
-    readonly efficiency: '1';
-    // (undocumented)
-    readonly energy: 'J';
-    // (undocumented)
-    readonly gasTemperature: 'K';
-    // (undocumented)
-    readonly mass: 'kg';
-    // (undocumented)
-    readonly pressure: 'Pa';
-    // (undocumented)
-    readonly time: 's';
-    // (undocumented)
-    readonly travel: 'm';
-    // (undocumented)
-    readonly velocity: 'm/s';
-}
-
-// @public
 export const maxPoints = 20000;
 
 // @public
-export const notice = "simulation, not load data";
+export interface Operation {
+    body: z.ZodType;
+    description: string;
+    errors: {
+        withNotice: boolean;
+        truingDetails: boolean;
+    };
+    example: unknown;
+    name: string;
+    response: z.ZodType;
+    run: (context: OperationContext, body: unknown) => Promise<OperationAnswer>;
+    summary: string;
+}
 
 // @public
-export function powderBulkDensity(record: Powder): number | undefined;
+export const operation: (name: string) => Operation | undefined;
+
+// @public
+export interface OperationAnswer {
+    // (undocumented)
+    payload: unknown;
+    // (undocumented)
+    status: number;
+}
+
+// @public
+export interface OperationContext {
+    // (undocumented)
+    catalogue: Catalogue;
+    // (undocumented)
+    compute: ComputeRunner;
+}
+
+// @public
+export const operations: readonly Operation[];
+
+// @public
+export type Path = PropertyKey[];
 
 // @public
 export type QueryNumberSchema = z.ZodPipe<z.ZodPipe<z.ZodString, z.ZodTransform<number, string>>, z.ZodNumber>;
@@ -600,17 +547,6 @@ export interface RangeStringsPlanRequest extends z.input<typeof rangeStringsPlan
 export const rangeStringsPlanResponse: z.ZodType;
 
 // @public
-export interface RangeStringsUnits extends TruingUnits {
-    // (undocumented)
-    readonly clickValue: 'rad';
-    // (undocumented)
-    readonly zeroOffset: 'rad';
-}
-
-// @public
-export const recordId: z.ZodString;
-
-// @public
 export interface ResolvedRecord {
     // (undocumented)
     id: string;
@@ -623,28 +559,6 @@ export interface ResolvedRecord {
     // (undocumented)
     suppliedFields: string[];
 }
-
-// @public
-export function resolvedRecord(record: Bullet | Powder, suppliedFields: string[]): ResolvedRecord;
-
-// @public
-export interface ResponseUnits {
-    // (undocumented)
-    exterior: ExteriorUnits;
-    // (undocumented)
-    m3: M3Units;
-    // (undocumented)
-    rangeStrings: RangeStringsUnits;
-    // (undocumented)
-    stability: {
-        result: '1';
-    };
-    // (undocumented)
-    truing: TruingUnits;
-}
-
-// @public
-export const responseUnits: ResponseUnits;
 
 // @public
 export interface Results {
@@ -789,6 +703,23 @@ export type ShotShape = {
 };
 
 // @public
+export function simulate(context: {
+    catalogue: Catalogue;
+    compute: ComputeRunner;
+}, query: unknown, json: unknown): Promise<{
+    status: 200 | 422;
+    payload: object;
+}>;
+
+// @public
+export const simulateQuery: z.ZodObject<{
+    curves: z.ZodOptional<z.ZodEnum<{
+        true: 'true';
+        false: 'false';
+    }>>;
+}, z.core.$strict>;
+
+// @public
 export interface StabilityBounds {
     // (undocumented)
     diameter: readonly [1e-3, 0.04];
@@ -844,9 +775,6 @@ export interface StepCaps {
     // (undocumented)
     truingTotalSteps: 200000;
 }
-
-// @public
-export const steps: (max: number) => z.ZodOptional<z.ZodNumber>;
 
 // @public
 export type StringsOptionsSchema = z.ZodObject<{
@@ -968,36 +896,6 @@ export interface TruingRequest extends z.input<typeof truingBody> {
 
 // @public
 export const truingResponse: z.ZodType;
-
-// @public
-export interface TruingUnits extends ExteriorUnits {
-    // (undocumented)
-    readonly dragFactor: '1';
-    // (undocumented)
-    readonly muzzleVelocity: 'm/s';
-}
-
-// @public
-export const unprocessable: {
-    readonly statusCode: 422;
-    readonly error: 'Unprocessable Entity';
-};
-
-// @public
-export type Warning = {
-    code: AdvisoryId;
-    severity: AdvisoryRule['severity'];
-    inputs: string[];
-    message: string;
-    fix: string;
-    spec?: string;
-    symbol?: string;
-    variant?: string;
-    method?: string | null;
-};
-
-// @public
-export function warning(rule: AdvisoryRule, message: string, extra?: Pick<Warning, 'spec' | 'symbol' | 'variant' | 'method'>): Warning;
 
 // @public
 export type WindSchema = z.ZodArray<z.ZodObject<{

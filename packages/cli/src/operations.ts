@@ -1,8 +1,13 @@
 import { readFileSync } from 'node:fs'
 import { buildCatalogue, type Catalogue, openCatalogue } from '@open-reloading/api/catalogue'
-import { jsonSchema, operation, operations } from '@open-reloading/api/compute'
 import type { Bundle } from '@open-reloading/catalog'
-import { errorAnswer, inlineRunner } from '@open-reloading/use-cases'
+import {
+  errorAnswer,
+  inlineRunner,
+  jsonSchema,
+  operation,
+  operations,
+} from '@open-reloading/use-cases'
 import { z } from 'zod'
 import { Refusal, UsageError } from './errors.ts'
 import { readBundle } from './records.ts'

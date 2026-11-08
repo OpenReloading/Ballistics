@@ -9,10 +9,6 @@
       "types": "./dist/openapi.d.ts",
       "default": "./dist/openapi.js"
     },
-    "./compute": {
-      "types": "./dist/compute/browser.d.ts",
-      "default": "./dist/compute/browser.js"
-    },
     "./catalogue": {
       "types": "./dist/catalogue/browser.d.ts",
       "default": "./dist/catalogue/browser.js"

@@ -3,10 +3,10 @@ import {
   chargeTargetExample,
   interiorBody,
   interiorExample,
+  loadFileExample,
 } from '@open-reloading/use-cases'
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
-import { loadFileExample } from '../src/compute/load-file-example.ts'
 import { API_PREFIX } from '../src/version.ts'
 import { undescribed, withApi } from './setup.ts'
 

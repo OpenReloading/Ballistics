@@ -16,6 +16,7 @@ import {
   solidFill,
   solidFillLimit,
 } from '@open-reloading/ballistics'
+import type { Catalogue } from '@open-reloading/catalog'
 import {
   type Bullet,
   fromSi,
@@ -26,26 +27,12 @@ import {
   userDataFile,
 } from '@open-reloading/schema'
 import { InputError } from '@open-reloading/statistics'
-import type { ComputeRunner, Results } from '@open-reloading/use-cases'
-import {
-  assertFinite,
-  type CartridgeWithSpecs,
-  findBullet,
-  findCartridge,
-  findPowder,
-  type InteriorBody,
-  interiorBody,
-  notice,
-  powderBulkDensity,
-  resolvedRecord,
-  responseUnits,
-  runInterior,
-  unprocessable,
-  type Warning,
-  warning,
-} from '@open-reloading/use-cases'
 import { z } from 'zod'
-import type { Catalogue } from '../catalogue/types.ts'
+import { assertFinite, notice, resolvedRecord, unprocessable } from './answer.ts'
+import { powderBulkDensity } from './charge-run.ts'
+import { runInterior } from './interior-run.ts'
+import { type InteriorBody, interiorBody } from './interior-schema.ts'
+import { type CartridgeWithSpecs, type Warning, warning } from './limits.ts'
 import {
   bulletLengthMm,
   catalogueIdOf,
@@ -54,12 +41,19 @@ import {
   fileResistance,
   loadValues,
   missingValuesAnswer,
+  type Path,
   readLoadFile,
   unknownKeyIssues,
 } from './load-file.ts'
+import { findBullet, findCartridge, findPowder } from './resolve.ts'
+import type { ComputeRunner, Results } from './tasks.ts'
+import { responseUnits } from './units.ts'
 
 /** Query of `POST /interior/load-file`: the body is the load file, so the query is the only option. */
-export const simulateQuery = z.strictObject({
+export const simulateQuery: z.ZodObject<
+  { curves: z.ZodOptional<z.ZodEnum<{ true: 'true'; false: 'false' }>> },
+  z.core.$strict
+> = z.strictObject({
   curves: z
     .enum(['true', 'false'])
     .optional()
@@ -67,7 +61,7 @@ export const simulateQuery = z.strictObject({
 })
 
 /** The body of `POST /interior/load-file` as the document shows it. The route reads it with `readLoadFile`. */
-export const loadFileBody = userDataFile
+export const loadFileBody: typeof userDataFile = userDataFile
   .extend({
     records: userDataFile.shape.records.describe(
       'The records of the file. Exactly one is a workbench load (`kind` `load`). Its `charge` and the solver values it types under `data.analysis.overrides` are in stored units (g, mm, cm3, bar, degC).',
@@ -184,6 +178,42 @@ function summarizeStep(
   }
 }
 
+/** What a simulation's answer reads besides the payload of its interior run. */
+type AnswerInputs = {
+  name: string
+  load: InteriorLoad
+  around: boolean
+  curves: boolean
+  bullet: Bullet | undefined
+  powder: Powder | undefined
+  resistance: InteriorLoad['resistance']
+  summary: SummaryInputs
+}
+
+/** The shown step: the middle of a ladder around the charge when it is valid, else the first valid one; -1 when none is. */
+function shownStep(all: SimulateStep[], around: boolean) {
+  const middle = around ? (all.length - 1) / 2 : 0
+  const middleStep = all[middle]
+  return middleStep && 'result' in middleStep ? middle : all.findIndex((s) => 'result' in s)
+}
+
+/** The `resolved` part of a simulation: the run's cartridge and the records with the fields they supplied. */
+function resolvedRecords(
+  cartridge: unknown,
+  { bullet, powder, resistance, summary }: AnswerInputs,
+) {
+  return {
+    cartridge,
+    bullet: bullet && resolvedRecord(bullet, resistance && bullet.length ? ['length'] : []),
+    powder:
+      powder &&
+      resolvedRecord(powder, [
+        ...(summary.bulkDensity && !summary.bulkDensityTyped ? ['bulkDensity'] : []),
+        ...(powder.interior?.resistance ? ['interior.resistance'] : []),
+      ]),
+  }
+}
+
 /**
  * The status and body of a simulation from the 200 payload of its interior run: the summary of the
  * shown step (the middle of a ladder around the charge, else the first valid one), its points when
@@ -191,38 +221,21 @@ function summarizeStep(
  */
 function simulateAnswer(
   payload: Record<string, unknown>,
-  {
-    name,
-    load,
-    around,
-    curves,
-    bullet,
-    powder,
-    resistance,
-    summary,
-  }: {
-    name: string
-    load: InteriorLoad
-    around: boolean
-    curves: boolean
-    bullet: Bullet | undefined
-    powder: Powder | undefined
-    resistance: InteriorLoad['resistance']
-    summary: SummaryInputs
-  },
+  inputs: AnswerInputs,
 ): { status: 200 | 422; payload: object } {
+  const { name, load, around, curves, summary } = inputs
   const { ladderSteps: steps, resolved } = payload as {
     ladderSteps?: SimulateStep[]
     resolved?: { cartridge?: unknown }
   }
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- a single run's 200 payload is the fields of one step
   const all = steps ?? [{ charge: load.charge, ...(payload as object) } as SimulateStep]
-  const middle = around ? (all.length - 1) / 2 : 0
-  const middleStep = all[middle]
-  const shown = middleStep && 'result' in middleStep ? middle : all.findIndex((s) => 'result' in s)
+  const shown = shownStep(all, around)
   const results = all.map((s) => ('result' in s ? summarizeStep(s, summary) : s))
   if (shown < 0)
     return {
       status: 422,
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- with no valid step, the first one failed
       payload: { ...unprocessable, ...(all[0] as { error: object }).error, notice },
     }
   return {
@@ -231,20 +244,13 @@ function simulateAnswer(
       notice,
       units: { charge: 'kg', summary: summaryUnits, points: responseUnits.m3 },
       loadName: name,
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the shown step is a valid one, so its summary
       ...(results[shown] as ReturnType<typeof summarizeStep>),
       // once, with the shown step: the ladder's steps carry none
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the shown step is a valid one, so it has a result
       ...(curves && { points: (all[shown] as { result: M3Result }).result.points }),
       ...(steps && { shown, ladderSteps: results }),
-      resolved: {
-        cartridge: resolved?.cartridge,
-        bullet: bullet && resolvedRecord(bullet, resistance && bullet.length ? ['length'] : []),
-        powder:
-          powder &&
-          resolvedRecord(powder, [
-            ...(summary.bulkDensity && !summary.bulkDensityTyped ? ['bulkDensity'] : []),
-            ...(powder.interior?.resistance ? ['interior.resistance'] : []),
-          ]),
-      },
+      resolved: resolvedRecords(resolved?.cartridge, inputs),
     }),
   }
 }
@@ -275,8 +281,8 @@ function needChargesAboveZero(charge: number, ladder: InteriorBody['ladder']) {
 
 /** The bulk density of the run, kg/m3: the file's own, else the powder record's. */
 const bulkDensityOf = (values: Record<string, number>, powder: Powder | undefined) => ({
-  bulkDensity: values.bulkDensity ?? (powder && powderBulkDensity(powder)),
-  bulkDensityTyped: values.bulkDensity !== undefined,
+  bulkDensity: values['bulkDensity'] ?? (powder && powderBulkDensity(powder)),
+  bulkDensityTyped: values['bulkDensity'] !== undefined,
 })
 
 /** Sets the temperature sensitivity a run of `powder` takes on `load` (`recordSensitivity`); none leaves it. */
@@ -296,6 +302,111 @@ function chargeLadderOf(ladder: NonNullable<Load['analysis']>['ladder']) {
     : undefined
 }
 
+/**
+ * The interior body of the file's load with `resistance`, as `interiorBody` parses it; a `ZodError`
+ * at the paths of the file. The file is validated before any record is read: a bad file answers 400
+ * whatever its ids.
+ */
+function bodyParser({
+  load,
+  record,
+  values,
+  chargeLadder,
+  path,
+}: {
+  load: InteriorLoad
+  record: Load
+  values: Record<string, number>
+  chargeLadder: ReturnType<typeof chargeLadderOf>
+  path: Path
+}) {
+  return (resistance?: InteriorLoad['resistance']) => {
+    try {
+      return interiorBody.parse({
+        model: 'm3',
+        load: resistance ? { ...load, resistance } : load,
+        ...(record.cartridge && { cartridge: catalogueIdOf(record.cartridge) }),
+        ...(values['pmax'] !== undefined && { pressureLimit: values['pmax'] }),
+        ...(chargeLadder && { ladder: chargeLadder }),
+      })
+    } catch (error) {
+      if (error instanceof z.ZodError)
+        throw new z.ZodError(error.issues.map((i) => fileIssue(i, path)))
+      throw error
+    }
+  }
+}
+
+/**
+ * The 422 of a ladder kind this route does not run, after the file's checks (a bad file answers
+ * 400): a seating ladder needs the seating geometry of the drawing package, which this route lacks,
+ * and a temperature ladder is not run here.
+ */
+function ladderKindRefusal(ladder: NonNullable<Load['analysis']>['ladder']) {
+  return ladder?.kind === 'seating' || ladder?.kind === 'temperature'
+    ? {
+        status: 422 as const,
+        payload: {
+          ...unprocessable,
+          message: `ladder.kind: a ${ladder.kind} ladder runs in the workbench, not in this route`,
+          field: 'ladder.kind',
+          notice,
+        },
+      }
+    : undefined
+}
+
+/**
+ * Sets an empty bore area to the cartridge record's, as the workbench fills it, while the bore
+ * diameter is the record's land diameter.
+ */
+function fillBoreArea(
+  load: InteriorLoad,
+  cartridge: CartridgeWithSpecs | undefined,
+  values: Record<string, number>,
+) {
+  if (cartridge && values['boreArea'] === undefined)
+    load.chamber.boreArea = toSi(
+      'area',
+      boreArea({
+        area: recordBoreArea(
+          cartridgeBoreAreaMm2(cartridge),
+          cartridgeLandDiameterMm(cartridge),
+          fromSi('length', load.chamber.boreDiameter),
+        ),
+        boreDiameter: fromSi('length', load.chamber.boreDiameter),
+        grooveDiameter: cartridgeGrooveDiameterMm(cartridge),
+      }),
+    )
+}
+
+/** The bore resistance of the powder record's fit, as the workbench adds it to a run. */
+function powderResistance(
+  load: InteriorLoad,
+  {
+    cartridge,
+    bullet,
+    powder,
+    values,
+  }: {
+    cartridge: CartridgeWithSpecs | undefined
+    bullet: Bullet | undefined
+    powder: Powder | undefined
+    values: Record<string, number>
+  },
+) {
+  return recordResistance(powder ?? {}, {
+    boreDiameter: load.chamber.boreDiameter,
+    boreArea: load.chamber.boreArea,
+    startPressure: load.startPressure,
+    cartridge: cartridge && {
+      g1: cartridgeBulletDiameterMm(cartridge),
+      z: cartridgeGrooveDiameterMm(cartridge),
+    },
+    bulletLengthMm: bulletLengthMm(values, bullet),
+  })
+}
+
 /** One `POST /interior/load-file` request (`query`, the load file `json`): the status and body of the answer. */
 export async function simulate(
   context: { catalogue: Catalogue; compute: ComputeRunner },
@@ -312,65 +423,16 @@ export async function simulate(
   const load = fileLoad(values, path)
   const ladder = record.analysis?.ladder
   const chargeLadder = chargeLadderOf(ladder)
-  // the file is validated before any record is read: a bad file answers 400 whatever its ids
-  const parseBody = (resistance?: InteriorLoad['resistance']) => {
-    try {
-      return interiorBody.parse({
-        model: 'm3',
-        load: resistance ? { ...load, resistance } : load,
-        ...(record.cartridge && { cartridge: catalogueIdOf(record.cartridge) }),
-        ...(values.pmax !== undefined && { pressureLimit: values.pmax }),
-        ...(chargeLadder && { ladder: chargeLadder }),
-      })
-    } catch (error) {
-      if (error instanceof z.ZodError)
-        throw new z.ZodError(error.issues.map((i) => fileIssue(i, path)))
-      throw error
-    }
-  }
+  const parseBody = bodyParser({ load, record, values, chargeLadder, path })
   needChargesAboveZero(load.charge, parseBody().ladder)
-  // after the file's checks (a bad file answers 400): a seating ladder needs the seating
-  // geometry of the drawing package, which this route lacks, and a temperature ladder is not run here
-  if (ladder?.kind === 'seating' || ladder?.kind === 'temperature')
-    return {
-      status: 422,
-      payload: {
-        ...unprocessable,
-        message: `ladder.kind: a ${ladder.kind} ladder runs in the workbench, not in this route`,
-        field: 'ladder.kind',
-        notice,
-      },
-    }
+  const refusal = ladderKindRefusal(ladder)
+  if (refusal) return refusal
   const { cartridge, bullet, powder, powderLabel } = loadFileRecords(context.catalogue, record)
-  // an empty bore area is the cartridge record's, as the workbench fills it, while the bore
-  // diameter is the record's land diameter
-  if (cartridge && values.boreArea === undefined)
-    load.chamber.boreArea = toSi(
-      'area',
-      boreArea({
-        area: recordBoreArea(
-          cartridgeBoreAreaMm2(cartridge),
-          cartridgeLandDiameterMm(cartridge),
-          fromSi('length', load.chamber.boreDiameter),
-        ),
-        boreDiameter: fromSi('length', load.chamber.boreDiameter),
-        grooveDiameter: cartridgeGrooveDiameterMm(cartridge),
-      }),
-    )
+  fillBoreArea(load, cartridge, values)
   // the temperature sensitivity of the powder record, its own or the default of its grain form, as
   // the workbench adds it to a run
   takeSensitivity(load, powder)
-  // the bore resistance of the powder record's fit, as the workbench adds it to a run
-  const { resistance, missing } = recordResistance(powder ?? {}, {
-    boreDiameter: load.chamber.boreDiameter,
-    boreArea: load.chamber.boreArea,
-    startPressure: load.startPressure,
-    cartridge: cartridge && {
-      g1: cartridgeBulletDiameterMm(cartridge),
-      z: cartridgeGrooveDiameterMm(cartridge),
-    },
-    bulletLengthMm: bulletLengthMm(values, bullet),
-  })
+  const { resistance, missing } = powderResistance(load, { cartridge, bullet, powder, values })
   // the powder record's resistance with the file's overrides: one engraving value alone completes
   // the record's ramp, so the pair is only known here
   const applied = fileResistance(values, path, resistance)

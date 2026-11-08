@@ -2,7 +2,7 @@ import { type userDataFile, userDataFormat, userDataVersion } from '@open-reload
 import type { z } from 'zod'
 
 /** A body of `POST /interior/load-file` as a client sends it, before defaults. */
-interface LoadFileRequest extends z.input<typeof userDataFile> {}
+export interface LoadFileRequest extends z.input<typeof userDataFile> {}
 
 /** A valid `POST /interior/load-file` body: one workbench load with its typed values in stored units and no records. */
 export const loadFileExample: LoadFileRequest = {

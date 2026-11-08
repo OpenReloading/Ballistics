@@ -3,40 +3,37 @@
  * texts, schemas and examples here, the command line runs them offline, so none can drift.
  */
 
-import type { ComputeRunner } from '@open-reloading/use-cases'
+import type { Catalogue } from '@open-reloading/catalog'
+import type { z } from 'zod'
+import { runChargeTarget } from './charge-run.ts'
+import { chargeBody, chargeTargetExample } from './charge-schema.ts'
 import {
-  chargeBody,
-  chargeTargetExample,
-  type ExteriorContext,
-  findBullet,
-  findCartridge,
-  findPowder,
-  interiorBody,
-  interiorExample,
-  rangeStringsFitBody,
-  rangeStringsFitExample,
   rangeStringsFitResponse,
-  rangeStringsPlanBody,
-  rangeStringsPlanExample,
   rangeStringsPlanResponse,
-  runChargeTarget,
-  runInterior,
+  trajectoryResponse,
+  truingResponse,
+} from './exterior-response.ts'
+import {
+  type ExteriorContext,
   runRangeStringsFit,
   runRangeStringsPlan,
   runTrajectory,
   runTruing,
-  trajectoryBody,
-  trajectoryExample,
-  trajectoryResponse,
-  truingBody,
-  truingExample,
-  truingResponse,
-} from '@open-reloading/use-cases'
-import type { z } from 'zod'
-import type { Catalogue } from '../catalogue/types.ts'
+} from './exterior-run.ts'
+import { trajectoryBody, trajectoryExample, truingBody, truingExample } from './exterior-schema.ts'
 import { chargeTargetResponse, interiorResponse, loadFileResponse } from './interior-response.ts'
+import { runInterior } from './interior-run.ts'
+import { interiorBody, interiorExample } from './interior-schema.ts'
 import { loadFileExample } from './load-file-example.ts'
+import { findBullet, findCartridge, findPowder } from './resolve.ts'
 import { loadFileBody, simulate } from './simulate.ts'
+import {
+  rangeStringsFitBody,
+  rangeStringsFitExample,
+  rangeStringsPlanBody,
+  rangeStringsPlanExample,
+} from './strings-schema.ts'
+import type { ComputeRunner } from './tasks.ts'
 
 /** What an operation runs on: the records and the compute runner. */
 export interface OperationContext {

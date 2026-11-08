@@ -1,6 +1,6 @@
+import { chargeTarget } from '@open-reloading/use-cases'
 import type { FastifyError, FastifyPluginAsync } from 'fastify'
 import { computeErrorHandler } from '../compute/error-handler.ts'
-import { chargeTarget } from '../compute/operations.ts'
 import type { ComputeContext } from './compute.ts'
 import { describeAnswers } from './identity.ts'
 

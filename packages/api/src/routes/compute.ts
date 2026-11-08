@@ -1,16 +1,19 @@
 import {
   type ComputeRunner,
+  chargeTarget,
   type ExteriorContext,
   findBullet,
+  type Operation,
+  operations,
   runStability,
+  simulate,
+  simulateQuery,
   stabilityQuery,
   stabilityResponse,
 } from '@open-reloading/use-cases'
 import type { FastifyError, FastifyPluginAsync } from 'fastify'
 import type { Catalogue } from '../catalogue/types.ts'
 import { computeErrorHandler } from '../compute/error-handler.ts'
-import { chargeTarget, type Operation, operations } from '../compute/operations.ts'
-import { simulate, simulateQuery } from '../compute/simulate.ts'
 import { API_PREFIX } from '../version.ts'
 import { describeAnswers } from './identity.ts'
 
