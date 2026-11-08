@@ -2,7 +2,7 @@
  * Atmosphere for the exterior model, described in `apps/docs/docs/models/exterior-atmosphere.md`.
  * SI throughout: altitude m, pressure Pa (absolute station pressure), temperature K, humidity 0..1.
  */
-import { InputError } from '@open-reloading/statistics'
+import { InputError } from '../issue.ts'
 
 /** Air at one point: altitude above mean sea level, station pressure, temperature, humidity. */
 export interface Air {
@@ -127,12 +127,16 @@ export function speedOfSound(air: Air): number {
 function checkAirValues(air: Air): void {
   const { altitude, pressure, temperature, humidity } = air
   if (!(altitude >= minAltitude && altitude <= icao.tropopause))
-    throw new InputError(`altitude ${altitude} m outside ${minAltitude} to ${icao.tropopause} m`)
+    throw new InputError({
+      code: 'altitudeOutsideRange',
+      params: { altitude, low: minAltitude, high: icao.tropopause },
+    })
   if (!(temperature > 0 && Number.isFinite(temperature)))
-    throw new InputError(`temperature ${temperature} K`)
-  if (!(humidity >= 0 && humidity <= 1)) throw new InputError(`humidity ${humidity} outside 0..1`)
+    throw new InputError({ code: 'temperatureInvalid', params: { temperature } })
+  if (!(humidity >= 0 && humidity <= 1))
+    throw new InputError({ code: 'humidityOutsideUnit', params: { humidity } })
   if (!(pressure > humidity * saturationVapourPressure(temperature) && Number.isFinite(pressure)))
-    throw new InputError(`pressure ${pressure} Pa`)
+    throw new InputError({ code: 'pressureInvalid', params: { pressure } })
 }
 
 /** Rejects air outside the model's limits with an InputError; returns the air unchanged. */
@@ -141,8 +145,9 @@ export function checkAir(air: Air): Air {
   const { pressure, temperature } = air
   const density = airDensity(air)
   if (!(density > 0 && density <= maxDensity))
-    throw new InputError(
-      `pressure ${pressure} Pa at temperature ${temperature} K gives an air density of ${density} kg/m3, outside 0 to ${maxDensity} kg/m3`,
-    )
+    throw new InputError({
+      code: 'airDensityOutsideRange',
+      params: { pressure, temperature, density, max: maxDensity },
+    })
   return air
 }

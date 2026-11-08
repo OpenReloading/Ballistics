@@ -535,7 +535,7 @@ describe('errors in the input', () => {
         }),
     ]
     for (const f of run) {
-      expect(f).toThrow(/mass must be positive/)
+      expect(f).toThrow('massNotPositive')
       expect(f).not.toThrow(TruingError)
     }
   })

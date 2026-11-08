@@ -37,8 +37,7 @@ import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { BulletSummary } from '../lib/api-types.ts'
 import { type BulletValues, bulletDrag, typedBullet } from '../lib/bullet.ts'
-import { translateMessage } from '../lib/core-messages.ts'
-import { errorText } from '../lib/error-text.ts'
+import { refusalText, translateMessage } from '../lib/core-messages.ts'
 import { loadExample as exampleData } from '../lib/example-data.ts'
 import { exampleFields } from '../lib/examples.ts'
 import {
@@ -175,7 +174,7 @@ type Attempt =
   | { kind: 'invalid'; label: string }
   /** A missing choice or an empty field not yet edited: plain text, no alert. */
   | { kind: 'prompt'; text: string }
-  | { kind: 'error'; message: string }
+  | { kind: 'error'; error: unknown }
 
 /** An angle in the correction unit, with its symbol. */
 function angle(system: UnitSystem, rad: number) {
@@ -279,7 +278,7 @@ function evaluate(i: Inputs, t: T): { errors: Record<string, string>; attempt: A
   } catch (err) {
     return {
       errors,
-      attempt: { kind: 'error', message: errorText(err) },
+      attempt: { kind: 'error', error: err },
     }
   }
 }
@@ -1205,7 +1204,7 @@ export function TrajectoryForm({
   // announced and alerted 1 s after the last change, so values passed while typing stay quiet
   const [status] = useDebouncedValue(summary, 1000)
   const [staleStatus] = useDebouncedValue(stale, 1000)
-  const message = attempt.kind === 'error' ? attempt.message : ''
+  const message = attempt.kind === 'error' ? refusalText(attempt.error) : ''
   const [alerted] = useDebouncedValue(message, 1000)
   const alert = alerted && alerted === message && (
     <ErrorNote>{translateMessage(message, t)}</ErrorNote>

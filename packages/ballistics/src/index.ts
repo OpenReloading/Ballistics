@@ -258,6 +258,7 @@ export {
   type WorkbenchValueKey,
   workbenchValueKeys,
 } from './interior/workbench-keys.ts'
+export type { BallisticsIssue, ExteriorIssue } from './issue.ts'
 export {
   type LoadNote,
   type LoadNoteRule,

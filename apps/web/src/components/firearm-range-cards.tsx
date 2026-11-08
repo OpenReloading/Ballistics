@@ -6,8 +6,7 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'
 import type { Say } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
-import { translateMessage } from '../lib/core-messages.ts'
-import { errorText } from '../lib/error-text.ts'
+import { refusalText, translateMessage } from '../lib/core-messages.ts'
 import {
   cardResult,
   firearmCardPlans,
@@ -51,8 +50,7 @@ export async function firearmCards(
         if ('reason' in card) return { ...base, reason: (t) => t(card.reason) }
         return { ...base, result: card, velocity: plan.velocity }
       } catch (e) {
-        const text = errorText(e)
-        return { ...base, reason: (t) => translateMessage(text, t) }
+        return { ...base, reason: (t) => translateMessage(refusalText(e), t) }
       }
     }),
   )

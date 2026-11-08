@@ -179,7 +179,9 @@ describe('rk45 limits', () => {
         { f: oscillator, t0: 0, y0: Float64Array.of(0, 1), events: [] },
         { ...options, maxSteps: 10, stepsBefore: 10 },
       ),
-    ).toThrow('more than 10 integration steps')
+    ).toThrow(
+      expect.objectContaining({ issue: { code: 'integrationStepsExceeded', params: { max: 10 } } }),
+    )
   })
 
   it('fails instead of looping', () => {

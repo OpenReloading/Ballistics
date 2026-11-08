@@ -4,8 +4,9 @@
  * report; "listing" is its appendix (pp. 63 to 64), which fixes the constants and the Mach cut-offs
  * that the text leaves out. Lengths in calibers inside, SI at the interface.
  */
-import { need, nth } from '@open-reloading/statistics'
+import { nth } from '@open-reloading/statistics'
 import type { DragTable } from '../drag-tables.ts'
+import { need } from '../issue.ts'
 
 /** Mach numbers of the report's output tables (Figures 26 to 28, p. 57 to 59). */
 export const outlineDragMach: readonly number[] = [
@@ -221,19 +222,19 @@ function outlineCalibers(input: OutlineDragInput, d: number) {
 /** Rejects an outline in calibers, with its head shape `rtr`, that the method cannot take. */
 function checkOutline(c: ReturnType<typeof outlineCalibers>, rtr: number): void {
   const { lt, ln, lbt, db, dM, dRB } = c
-  need(Number.isFinite(lt) && ln > 0, 'length and noseLength must be positive')
-  need(Number.isFinite(rtr) && rtr >= 0 && rtr <= 1, 'headShape must be from 0 to 1')
-  need(Number.isFinite(lbt) && lbt >= 0, 'boatTailLength must be zero or more')
-  need(Number.isFinite(db) && db > 0, 'baseDiameter must be positive')
-  need(Number.isFinite(dM) && dM >= 0 && dM < 1, 'meplatDiameter must be zero up to the diameter')
-  need(Number.isFinite(dRB) && dRB >= 1, 'bandDiameter must be at least the diameter')
-  need(ln + lbt <= lt, 'noseLength plus boatTailLength must not exceed length')
+  need(Number.isFinite(lt) && ln > 0, { code: 'outlineLengthsNotPositive', params: {} })
+  need(Number.isFinite(rtr) && rtr >= 0 && rtr <= 1, { code: 'headShapeOutsideUnit', params: {} })
+  need(Number.isFinite(lbt) && lbt >= 0, { code: 'boatTailLengthNegative', params: {} })
+  need(Number.isFinite(db) && db > 0, { code: 'baseDiameterNotPositive', params: {} })
+  need(Number.isFinite(dM) && dM >= 0 && dM < 1, { code: 'meplatDiameterOutsideRange', params: {} })
+  need(Number.isFinite(dRB) && dRB >= 1, { code: 'bandDiameterBelowDiameter', params: {} })
+  need(ln + lbt <= lt, { code: 'noseAndBoatTailExceedLength', params: {} })
 }
 
 /** The validated outline in calibers, with the meplat and band diameters the nodes need. */
 function outlineShape(input: OutlineDragInput) {
   const d = input.diameter
-  need(Number.isFinite(d) && d > 0, 'diameter must be positive')
+  need(Number.isFinite(d) && d > 0, { code: 'diameterNotPositive', params: {} })
   const calibers = outlineCalibers(input, d)
   const { lt, ln, lbt, db, dM, dRB } = calibers
   const rtr = input.headShape
@@ -274,7 +275,10 @@ export function estimateDragFromOutline(input: OutlineDragInput): OutlineDragEst
   const { shape, dM, dRB } = outlineShape(input)
   const { rtr, db } = shape
   const machs = input.machNumbers ?? outlineDragMach
-  need(machs.length > 0 && machs.every((m) => Number.isFinite(m) && m > 0), 'mach must be positive')
+  need(machs.length > 0 && machs.every((m) => Number.isFinite(m) && m > 0), {
+    code: 'machNotPositive',
+    params: {},
+  })
 
   const nodes = machs.map((m): OutlineDragNode => {
     const head =
@@ -301,7 +305,7 @@ export function estimateDragFromOutline(input: OutlineDragInput): OutlineDragEst
   // drag that is not finite or not positive: no estimate
   need(
     nodes.every((n) => Number.isFinite(n.dragCoefficient) && n.dragCoefficient > 0),
-    'the outline gives no positive finite drag: outside the method',
+    { code: 'outlineOutsideMethod', params: {} },
   )
   const warnings = outlineWarnings(shape, machs, nodes)
   return { nodes, dragTable: nodes.map((n) => [n.mach, n.dragCoefficient] as const), warnings }
