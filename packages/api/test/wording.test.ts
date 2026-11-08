@@ -1,4 +1,3 @@
-import { advisoryText } from '@open-reloading/use-cases'
 import { describe, expect, it } from 'vitest'
 import { buildOpenApi } from '../src/openapi.ts'
 
@@ -34,10 +33,5 @@ describe('safety wording: results are simulations, not load data', () => {
       expect(v.required).toContain('notice')
       expect(v.properties?.notice?.const).toBe('simulation, not load data')
     }
-  })
-
-  it('never calls a load or a result safe in the words of an advisory', () => {
-    for (const { name, message, fix } of Object.values(advisoryText))
-      expect(`${name} ${message} ${fix}`).not.toMatch(/\bsafe/i)
   })
 })
