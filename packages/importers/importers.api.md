@@ -224,6 +224,9 @@ export function parseShotViewWorkbook(book: Workbook, options?: WorkbookOptions)
 export function parseVelocityUnit(text: string | undefined): VelocityUnit | undefined;
 
 // @public
+export type PressureDiagnostic = ReaderDiagnostic<'sensorMissing' | 'columnsNotDistinct' | 'cutoffNotPositive' | 'columnUnitDiffersFromCaller' | 'columnUnitMissing' | 'columnUnitNamedByCaller' | 'readingNotNumber' | 'readingNotFinite' | 'timesNotIncreasing' | 'tooFewSamples'>;
+
+// @public
 export interface PressureHistoryImport {
     lowPass?: {
         cutoff: number;
@@ -243,7 +246,7 @@ export interface PressureHistoryImport {
         };
     };
     // (undocumented)
-    warnings: string[];
+    warnings: PressureDiagnostic[];
 }
 
 // @public
@@ -272,9 +275,9 @@ export type ReaderDiagnostic<Code extends string> = Diagnostic<Code, Readonly<Re
 
 // @public
 export class ReaderError extends Error {
-    constructor(diagnostic: ChronoDiagnostic, options?: ErrorOptions);
+    constructor(diagnostic: ChronoDiagnostic | PressureDiagnostic, options?: ErrorOptions);
     // (undocumented)
-    readonly diagnostic: ChronoDiagnostic;
+    readonly diagnostic: ChronoDiagnostic | PressureDiagnostic;
 }
 
 // @public

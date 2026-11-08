@@ -19,6 +19,7 @@
 . KindSuggestion
 . LoadDiagnostic
 . ParseChronoOptions
+. PressureDiagnostic
 . PressureHistoryImport
 . PressureHistoryOptions
 . PressureUnit

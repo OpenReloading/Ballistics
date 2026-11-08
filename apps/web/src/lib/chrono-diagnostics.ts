@@ -106,6 +106,10 @@ function shown(name: string, v: string | number | readonly string[], t: Translat
   return (name === 'names' ? v.map((n) => `"${n}"`) : v).join(', ')
 }
 
+/** True for a diagnostic of a chronograph reader, which `chronoDiagnosticText` words. */
+const isChronoDiagnostic = (d: { code: string }): d is ChronoDiagnostic =>
+  Object.hasOwn(chronoMessages, d.code)
+
 /** What a chronograph reader warned of or refused, in the language of `t`: the worksheet and row first where named. */
 export function chronoDiagnosticText(d: ChronoDiagnostic, t: Translator['t']): string {
   const { worksheet, row, ...rest } = d.params
@@ -119,7 +123,8 @@ export function chronoDiagnosticText(d: ChronoDiagnostic, t: Translator['t']): s
 
 /** Why a chronograph file was not read, in the language of `t`: a reader's refusal, `chrono.ts`'s own, or another error's message. */
 export function chronoErrorText(error: unknown, t: Translator['t']): string {
-  if (error instanceof ReaderError) return chronoDiagnosticText(error.diagnostic, t)
+  if (error instanceof ReaderError && isChronoDiagnostic(error.diagnostic))
+    return chronoDiagnosticText(error.diagnostic, t)
   const text = errorText(error)
   const own = chronoOwnMessages.find((m) => m === text)
   return own ? t(own, { formats }) : translateMessage(text, t)

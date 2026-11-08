@@ -7,7 +7,7 @@ description: Parsers of chronograph exports, pressure histories and record table
 
 # `@open-reloading/importers`
 
-Parsers that turn chronograph exports, pressure histories, spreadsheets, load files and the OpenReloading JSON and CSV files into candidates: a session, or a record without the id and save time the caller gives it (`id` is `idOfKey(key)`). The table, load-file and chronograph readers report a skipped cell or field as a code with its values (`{ code, params }`) for the caller to word, and the chronograph readers refuse a file with a `ReaderError` that carries such a code. They take text or a workbook the caller has read, and do no I/O. The [table import](../data/table-import.md) page describes the table formats.
+Parsers that turn chronograph exports, pressure histories, spreadsheets, load files and the OpenReloading JSON and CSV files into candidates: a session, or a record without the id and save time the caller gives it (`id` is `idOfKey(key)`). The table, load-file, chronograph and pressure-history readers report a skipped cell or field as a code with its values (`{ code, params }`) for the caller to word, and the chronograph and pressure-history readers refuse a file with a `ReaderError` that carries such a code. They take text or a workbook the caller has read, and do no I/O. The [table import](../data/table-import.md) page describes the table formats.
 
 ## Install
 
