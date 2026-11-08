@@ -10,10 +10,7 @@ import type {
 } from '@open-reloading/ballistics'
 import { msg } from '../i18n/translate.ts'
 
-/**
- * A fit the tuning screen asks for: the start load, the strings and the options of `fitPowder`,
- * whose `parameters` are the values asked for.
- */
+/** `parameters` are the values asked for. */
 export interface PowderFitRequest {
   id: number
   load: InteriorLoad
@@ -23,10 +20,7 @@ export interface PowderFitRequest {
   anyway?: boolean | undefined
 }
 
-/**
- * `load` with the temperature sensitivity `sensitivity`, 1/K, below and above the load's propellant
- * temperature; `load` itself without a value above 0.
- */
+/** `load` itself without a value above 0. */
 export const withSensitivity = (
   load: InteriorLoad,
   sensitivity: number | undefined,
@@ -45,10 +39,7 @@ export const withSensitivity = (
       }
     : load
 
-/**
- * Whether the strings fit the temperature factor: `one`, they are at one powder temperature;
- * `sensitivity`, at two or more, but the load's temperature sensitivity is 0 or absent; else `fit`.
- */
+/** `one`: one powder temperature; `sensitivity`: two or more but no sensitivity on the load. */
 export function temperatureFit(load: InteriorLoad, strings: readonly ChronographString[]) {
   const temperatures = new Set(
     strings.map((s) => s.propellantTemperature ?? load.propellantTemperature),
@@ -58,16 +49,9 @@ export function temperatureFit(load: InteriorLoad, strings: readonly Chronograph
   return t && (t.cold !== 0 || t.hot !== 0) ? 'fit' : 'sensitivity'
 }
 
-/**
- * The worker's answers to one request, in this order: the fit and its band, then the pressure
- * range and its label. A refused fit or a failure ends the answer, after the fit when the range failed.
- */
+/** A refused fit or a failure ends the answer. */
 export type PowderFitReply =
-  /**
-   * `rule`: the burn coefficient was fitted alone instead of the values asked for, because the
-   * ladder is thin, because another value moved with it (`held`) or because the strings did not
-   * resolve the temperature factor (`temperature`).
-   */
+  /** Why the burn coefficient was fitted alone. */
   | {
       kind: 'fit'
       id: number
@@ -80,10 +64,7 @@ export type PowderFitReply =
   | { kind: 'refused'; id: number; reason: PowderFitReason; charge?: number | undefined }
   | { kind: 'error'; id: number; message: string }
 
-/**
- * A hand-tuned curve the tuning screen asks for: the fitted load at `values`, one per parameter
- * of `fit` in its order, run at `charges`, kg.
- */
+/** One value per parameter of `fit`, in its order. */
 export interface PowderHandRequest {
   kind: 'hand'
   id: number
@@ -107,10 +88,7 @@ export interface PowderFitState {
   running: boolean
 }
 
-/**
- * Runs requests in a worker made by `create`. A new request while one runs ends that worker and
- * starts another, so only the answer to the last request reaches `show`.
- */
+/** A new request ends the running worker, so only the last answer reaches `show`. */
 export function powderFitRunner(create: () => Worker, show: (s: PowderFitState) => void) {
   let worker: Worker | undefined
   let state: PowderFitState = { running: false }
@@ -160,10 +138,7 @@ export function powderFitRunner(create: () => Worker, show: (s: PowderFitState) 
   }
 }
 
-/**
- * Runs hand curve requests in a worker made by `create`, one at a time with only the last request
- * waiting next. A worker that errors is ended and the next request starts another.
- */
+/** One at a time, only the last request waiting; a failed worker is replaced. */
 export function handCurveRunner(
   create: () => Worker,
   show: (curve: HandPoint[] | undefined) => void,

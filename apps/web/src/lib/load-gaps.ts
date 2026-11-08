@@ -4,19 +4,10 @@ import type { Translator } from '../i18n/translate.ts'
 /** A saved load whose cartridge differs from the cartridge of the firearm it names. */
 type Mismatch = { load: string; cartridge: string }
 
-/**
- * The gap of a saved load: it names no firearm, its firearm reference names no stored firearm, or
- * its cartridge differs from its firearm's (`own`).
- */
+/** `own` is the firearm's cartridge where it differs. */
 type LoadGap = { kind: 'none' | 'missing' } | { kind: 'mismatch'; cartridge: string; own: string }
 
-/**
- * The gaps between saved loads and the user's firearms, by firearm id: the loads that name a
- * firearm of another cartridge (compared by reference, both set) and the firearms no load names.
- * By load id (`loads`): the loads without a firearm, those whose firearm reference names no stored
- * firearm (no mismatch) and the mismatches. `designs` names the user's cartridge designs by
- * reference.
- */
+/** Compared by reference, both set; `designs` names the user's cartridge designs by reference. */
 export function loadGaps(records: readonly UserRecord[]) {
   const cartridges = new Map(
     records.flatMap((r) => (r.kind === 'firearm' ? [[r.id, r.data.cartridge] as const] : [])),
@@ -44,10 +35,7 @@ export function loadGaps(records: readonly UserRecord[]) {
   return { unused, mismatches, loads, designs }
 }
 
-/**
- * The number of notes each place shows: the firearm library (`firearms`: a firearm no load names
- * and each mismatch) and the Saved loads line (`loads`: each load with a gap, mismatches too).
- */
+/** The firearm library counts unused firearms and mismatches; the Saved loads line each load with a gap. */
 export const gapCounts = ({ unused, mismatches, loads }: ReturnType<typeof loadGaps>) => ({
   firearms: [...mismatches.values()].reduce((n, m) => n + m.length, unused.size),
   loads: loads.size,

@@ -1,8 +1,4 @@
-/**
- * The ring scoring of `@open-reloading/shot-groups` (packages/shot-groups/src/ring-scoring.ts) in the
- * language shown: ring marks that do not fit, or a group that cannot be scored, become the message
- * of the issue.
- */
+/** Issues of packages/shot-groups/src/ring-scoring.ts become messages in the language shown. */
 import {
   faceAlignment as alignFace,
   type FaceAlignment,

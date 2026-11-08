@@ -13,11 +13,7 @@ export type FirearmUse = { loads: number; last?: string | undefined }
 const later = (a: string | undefined, b: string | undefined) =>
   a === undefined || (b !== undefined && b > a) ? b : a
 
-/**
- * What the stored records say about loads and firearms, by record id: per load its firearm, its
- * sessions and the last session day; per firearm the loads that name it and their last session day.
- * Sessions without a date count but give no day. Nothing of it is stored.
- */
+/** Derived, never stored; sessions without a date count but give no day. */
 export function loadUse(records: readonly UserRecord[]) {
   const days = new Map(
     records.flatMap((r) =>
@@ -41,10 +37,7 @@ export function loadUse(records: readonly UserRecord[]) {
   return { loads, firearms }
 }
 
-/**
- * The line under a load's name in the saved loads: the name of its firearm, its sessions or
- * "No session", and the last session day.
- */
+/** Firearm, sessions or "No session", and the last session day. */
 export const loadUseText = (
   use: LoadUse | undefined,
   firearm: string | undefined,

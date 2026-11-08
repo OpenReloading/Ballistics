@@ -16,10 +16,7 @@ function valueText(system: UnitSystem, q: Quantity, x: number | undefined, t: Tr
     : `${inchText(localizeNumber(roundedFieldText(q, system, x)), system[q].symbol)} ${system[q].symbol}`
 }
 
-/**
- * The zero air and the drag factor a result was computed with, as texts; a key is missing when
- * its fields were empty. A zero air field left empty shows the shot's value it took.
- */
+/** An empty zero air field shows the shot's value it took. */
 export function zeroConditions(
   si: {
     zeroTemperature?: number
@@ -54,12 +51,7 @@ export function zeroConditions(
   }
 }
 
-/**
- * The heading of a printed range card: label and value pairs from the SI inputs a trajectory result
- * was computed with (`si`, keys of `shotFields`) and its zero range (m), written as the fields show
- * them (`roundedFieldText`). `manual`: the bullet came from the manual fields; its mass and BC lead.
- * `dragSource` names where the drag factor comes from.
- */
+/** Written as the fields show them (`roundedFieldText`); manual bullet fields lead with mass and BC. */
 export function rangeCardFacts(
   si: Record<string, number | undefined>,
   zero: number,

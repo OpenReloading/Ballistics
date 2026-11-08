@@ -1,11 +1,4 @@
-/**
- * The words of the typed refusals that statistics, the group statistics of shot-groups and
- * ballistics raise (`InputError` of `@open-reloading/statistics` with an issue): the English
- * sentence of each code, `{name}` where a param stands. The language module loads them once a page
- * has started, outside every page's own JavaScript, for `refusalText` of `core-messages.ts`;
- * `core-message-table.ts` reads them as templates, so `translateMessage` shows a sentence in the
- * language shown. Hit probability and ring scoring word their own issues where they are shown.
- */
+/** Loaded once a page has started, outside every page's own JavaScript; `core-message-table.ts` reads them as templates. */
 import type { ExteriorIssue, InteriorIssue } from '@open-reloading/ballistics'
 import type { GroupStatisticsIssue } from '@open-reloading/shot-groups'
 import type { Diagnostic, StatisticsIssue } from '@open-reloading/statistics'

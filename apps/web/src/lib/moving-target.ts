@@ -12,11 +12,7 @@ export interface MovingTargetRow {
   lengths?: number
 }
 
-/**
- * The lead at each range of `points` for a target moving at `speed` m/s on `heading` rad
- * (`movingTargetLead` of ballistics), the time of flight read from each point. `targetLength` (m) turns
- * the lateral lead into target lengths.
- */
+/** `targetLength` turns the lateral lead into target lengths. */
 export function movingTargetRows(
   points: readonly TrajectoryPoint[],
   speed: number,

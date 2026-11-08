@@ -1,13 +1,6 @@
-/**
- * The pure parts of the offline layer. `scripts/service-worker.mts`
- * writes every export of this module into `out/sw.js` ahead of `src/service-worker.js`, so these
- * are the functions the worker runs: no imports, and each refers only to other exports.
- */
+/** `scripts/service-worker.mts` writes every export into `out/sw.js`, so no imports and only references to other exports. */
 
-/**
- * A browser store name of `edition` (`'next'`, else `''`): the editions of one origin keep separate
- * databases, local storage keys and caches.
- */
+/** The editions of one origin keep separate databases, local storage keys and caches. */
 export const editionName = (edition: string, name: string) =>
   edition ? `${edition}:${name}` : name
 
@@ -17,10 +10,7 @@ export const shellPrefix = (edition = '') => editionName(edition, 'openreloading
 export const recordsCache = (edition = '') => editionName(edition, 'openreloading-records')
 export const offlinePage = '/offline'
 
-/**
- * Pages precached per build next to the static output: every page route but the record pages,
- * which stay network-first.
- */
+/** Every page route but the record pages, which stay network-first. */
 export const shellPages = [
   '/',
   '/offline',
@@ -54,12 +44,7 @@ export const shellFiles = ['/manifest.webmanifest', '/icon.png', '/icon-192.png'
 
 export const shellCache = (version: string, edition = '') => shellPrefix(edition) + version
 
-/**
- * The caches a worker of `version` deletes on activation: the shells of other builds but the newest
- * of them (`names` in creation order, as `caches.keys()` gives them), whose chunks tabs still on
- * that build load later.
- * shortcut: a tab open across two deploys still loses its chunks; keep more shells if that matters.
- */
+/** The newest other shell stays for tabs still on that build; shortcut: a tab open across two deploys loses its chunks, keep more shells if that matters. */
 export const staleCaches = (names: string[], version: string, edition = '') =>
   names
     .filter((n) => n.startsWith(shellPrefix(edition)) && n !== shellCache(version, edition))
@@ -68,10 +53,7 @@ export const staleCaches = (names: string[], version: string, edition = '') =>
 /** How long a network-first request waits before a cached copy answers (ms). */
 export const slowNetwork = 4000
 
-/**
- * Network first: the network's answer, or `cached` when the network fails, answers with a server
- * error or takes longer than `ms`; without a cached copy the network's answer or failure.
- */
+/** `cached` answers a network failure, a server error or a wait over `ms`. */
 export const networkOr = <T extends { status: number }>(
   network: Promise<T>,
   cached: T | undefined,
@@ -87,10 +69,7 @@ export const networkOr = <T extends { status: number }>(
       ])
     : network
 
-/**
- * The URL of an app path under `base` (the base path, `''` at a domain root). A page ends in
- * `slash` (`'/'`: the pages are `<path>/index.html`).
- */
+/** Pages are `<path>/index.html`, hence `slash`. */
 export const appUrl = (base: string, path: string, slash = '') =>
   base + (path === '/' ? '/' : path + slash)
 
@@ -111,34 +90,18 @@ export const pageKey = (url: string) => {
   return u.pathname + u.search
 }
 
-/**
- * A page key with `slash` added to its path, before the query: the shell stores pages under
- * `appUrl`, while an address typed or linked without the slash keeps its path as given.
- */
+/** The shell stores pages under `appUrl`, while a typed or linked address keeps its path as given. */
 export const slashedKey = (key: string, slash = '') => {
   const i = key.indexOf('?')
   const path = i < 0 ? key : key.slice(0, i)
   return slash && !path.endsWith(slash) ? path + slash + key.slice(path.length) : key
 }
 
-/**
- * The shell cache's answer to a request for `destination`. A cached response carries its key without
- * query and fragment, and a worker takes its script response's URL as `location`, so a worker script
- * gets a copy without a URL: the worker keeps the URL it was started with (its bootstrap reads the
- * `#params=` fragment).
- */
+/** A worker takes its script response's URL as `location`, so it gets a copy without a URL and keeps its `#params=` fragment. */
 export const shellAnswer = (cached: Response, destination: string) =>
   destination === 'worker' ? new Response(cached.body, cached) : cached
 
-/**
- * How the worker answers a request: `static` from the shell cache (the chunks, the manifest and
- * icons, the catalogue index), `records` network-first with
- * the cached record behind it, `page` network-first with the cached page and the offline page
- * behind it, `navigation` (a client navigation fetching RSC) from the network while the page's HTML
- * is stored; undefined leaves the request to the network (other methods, searches, prefetches,
- * other origins, paths outside `base`, the docs site under `<base>/docs/` and the `next` edition under
- * `<base>/next/`, whose own worker has that scope).
- */
+/** Undefined leaves the request to the network, including the docs and the `next` edition, whose own worker has that scope. */
 export const strategyOf = (
   request: {
     method: string

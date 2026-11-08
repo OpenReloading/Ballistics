@@ -15,10 +15,7 @@ export interface NewsItem {
 
 const fileName = /^(\d{4}-\d{2}-\d{2})-([a-z0-9-]+)\.md$/
 
-/**
- * The title, link and text of a news file, split by lines; undefined for no front matter. Blank
- * lines may come between the lines of the front matter (Biome's formatter puts one after `---`).
- */
+/** Blank lines may sit inside the front matter (Biome puts one after `---`); undefined without front matter. */
 function newsContent(file: string): [title: string, link: string, text: string] | undefined {
   const lines = file.split(/\r?\n/)
   let i = 1
@@ -34,10 +31,7 @@ function newsContent(file: string): [title: string, link: string, text: string] 
     : undefined
 }
 
-/**
- * The newest `count` items of the news folder, newest first. Read by the server page at build
- * time: a malformed file name or a file without title, link or text throws, so the build fails.
- */
+/** Read at build time: a malformed file throws, so the build fails. */
 export function newestNews(count = 5, dir = path.join(process.cwd(), 'news')): NewsItem[] {
   // every file is checked, not only the newest; the leading date sorts the names
   const items = readdirSync(dir)

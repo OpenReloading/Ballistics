@@ -1,8 +1,4 @@
-/**
- * The record choosers' catalogues and ranking: every summary read once per page
- * load, ranked as the API's `q` ranks them (`score` of the schema over a key built like the
- * catalogue's), so the dialog finds what the card's field finds.
- */
+/** Ranked as the API's `q` ranks them, so the dialog finds what the card's field finds. */
 import { type CaseMaterial, compareKeys, score, searchKey, sortKey } from '@open-reloading/schema'
 import { apiFetch } from './api-fetch.ts'
 import type { CartridgeSummary, ListOf, PowderSummary, PrimerSummary } from './api-types.ts'
@@ -62,10 +58,7 @@ export const fetchPrimerCatalogue = once(
   (): Promise<PrimerRow[]> => listWithMakers<PrimerSummary>('primers'),
 )
 
-/**
- * A brass choice of the cartridge: a case record, or a group of the user's cases (an id with
- * `user:`). `waterCapacity` is the stated water, g, or the group's measured one.
- */
+/** A group of the user's cases has a `user:` id and its measured water. */
 export interface CaseRow {
   id: string
   name: string
@@ -137,11 +130,7 @@ function compareValues(kx: number | undefined, ky: number | undefined) {
   return kx === undefined ? 1 : -1
 }
 
-/**
- * The rows that match every typed word: best match first (`relevance`), the browser's designs
- * first among equal matches, ties and `name` by the catalogue's order; with `value` the largest
- * first, rows without one last.
- */
+/** The browser's designs first among equal matches; with `value`, largest first and rows without one last. */
 export function rankRecords<R extends { id: string; origin?: 'user' | undefined }>(
   rows: readonly R[],
   query: string,

@@ -1,11 +1,4 @@
-/**
- * Quality of a target photo for hole detection (`apps/docs/docs/models/hole-detection.md`, Photo
- * quality): tilt, contrast, exposure, sharpness, resolution, framing, glare and uneven light,
- * measured on the photo, on the black area the face search found when there is one, and on the
- * edges of the photo when there is not: a target may have no black area, or no unfilled paper. Each problem comes with a level and a plain
- * sentence on what to change when retaking the photo. The check says what the photo makes hard for
- * detection, never that a detection is right. Pure: no React, DOM or Next.js.
- */
+/** Says what the photo makes hard for detection, never that a detection is right (`apps/docs/docs/models/hole-detection.md`, Photo quality). */
 import { fromSi, type TargetFace } from '@open-reloading/schema'
 import { type Message, msg } from '../i18n/translate.ts'
 import type { Ellipse } from './ellipse.ts'
@@ -62,10 +55,7 @@ export type QualityIssue = {
   fix: Message
 }
 
-/**
- * What a selected target says about the photo, as a hint: the photo may show only its centre or cut
- * through its rings, so only the presence of a black zone is used, never a ring, a size or an extent.
- */
+/** The photo may show only the centre or cut the rings, so only the presence of a black zone is used. */
 export type TargetLayout = {
   /** Whether the target has a black zone; absent when the record does not give the zone colours. */
   dark?: boolean | undefined
@@ -194,12 +184,7 @@ const smooth = (p: readonly number[]) =>
     return w.reduce((a, b) => a + b, 0) / w.length
   })
 
-/**
- * Width of the black area's edge in image px: the profile across the edge on 120 rays along the
- * ellipse's normals, aligned at each ray's steepest point and averaged, then the grey step over the
- * steepest slope (the 10 to 90 % width of a Gaussian edge, up to a factor of 1). Undefined when the
- * rays show no step.
- */
+/** Profiles on 120 normal rays aligned at their steepest point: the 10 to 90 % width of a Gaussian edge; undefined without a step. */
 function edgeWidth(image: RgbaImage, e: Ellipse): number | undefined {
   const [span, step, rays] = [clamp(0.1 * ((e.semiMajor + e.semiMinor) / 2), 6, 30), 0.25, 120]
   const n = Math.round((2 * span) / step) + 1
@@ -269,10 +254,7 @@ const quantileOf = (v: readonly number[], p: number) => {
 /** Grey level that counts as lit paper. */
 const LIT = 120
 
-/**
- * The 90th percentile of each quarter of the photo, the paper level of a target of any pattern;
- * undefined when fewer than three quarters show lit paper (the photo may be filled by a black zone).
- */
+/** The paper level of any pattern; undefined below three lit quarters, as a black zone may fill the photo. */
 function quarterLight(grid: ReturnType<typeof grayGrid>): number | undefined {
   const parts: number[][] = [[], [], [], []]
   grid.grey.forEach((g, i) => {
@@ -283,13 +265,7 @@ function quarterLight(grid: ReturnType<typeof grayGrid>): number | undefined {
   return levels.filter((v) => v >= LIT).length >= 3 ? sidesDifference(levels) : undefined
 }
 
-/**
- * Contrast, brightness, glare and uneven light on the grey grid. With a black area: its darkest
- * fifth against the paper just around it (a white zone inside it does not count), glare as
- * saturated paper, the four sides of that ring for the light. Without one, or with its ring out of
- * the frame, the brightness of the photo (95th percentile), its darkest 5 % and its quarters for
- * the light, whatever the pattern of the target.
- */
+/** A white zone inside the black area does not count; without one in frame, the photo's own percentiles. */
 function gridMeasures(image: RgbaImage, black: Ellipse | undefined, s: number) {
   const grid = grayGrid(image, s)
   const whole = Array.from(grid.grey)
@@ -321,12 +297,7 @@ function stepWidth(p: readonly number[], step: number): number | undefined {
   return rise > 0 ? Math.abs(hi - lo) / (rise / step) : undefined
 }
 
-/**
- * Width in image px of the sharpest edges of the photo, whatever the target: at the 6000 points of
- * strongest grey gradient (on a lattice of 3 px) the profile across the edge, the grey step over the
- * steepest slope, the median over the points whose step is at least 40 grey levels. Thin lines are
- * left out by that step, so a photo of rings alone, with no hole, gives no measure. Undefined when fewer than 20 points qualify: the photo shows no edge.
- */
+/** Steps of 40 grey levels leave thin lines out, so rings alone give no measure; undefined below 20 points. */
 function edgeSharpness(image: RgbaImage, hole: number): number | undefined {
   const { width, height } = image
   const [span, step] = [clamp(0.75 * hole, 6, 30), 0.5]
@@ -411,10 +382,7 @@ function lightIssues(
     )
 }
 
-/**
- * Tilt and framing of the black area. A black area cut by the frame gives no tilt, and with a
- * known target no framing note: the photo may show only its centre or cut through its rings.
- */
+/** A black area cut by the frame gives no tilt, and with a known target no framing note: the photo may show only the centre. */
 function shapeIssues(add: Add, black: Ellipse, image: RgbaImage, layout: TargetLayout | undefined) {
   const framed = shareInside(black, image.width, image.height)
   if (framed >= limits.framing[0]) {
@@ -437,11 +405,7 @@ function shapeIssues(add: Add, black: Ellipse, image: RgbaImage, layout: TargetL
     )
 }
 
-/**
- * The problems of the photo that make hole detection harder, the worst first, each with how to
- * retake it. Empty when none of the measures is past its limit; that is no statement that the
- * holes will be found right.
- */
+/** Worst first; empty is no statement that the holes will be found right. */
 export function photoQuality(view: PhotoView): QualityIssue[] {
   const { image, scale, black, holePx, layout } = view
   const issues: QualityIssue[] = []

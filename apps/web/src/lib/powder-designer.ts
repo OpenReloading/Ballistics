@@ -353,10 +353,7 @@ const lines = (text: string) =>
     .map((l) => l.trim())
     .filter(Boolean)
 
-/**
- * The burn law of the draft: the numbers entered with the fixed model and burn form names, and
- * the parameters the fit moved; none while nothing of it is entered.
- */
+/** None while nothing of it is entered. */
 function interiorOf(entered: Tree | undefined, fitted: readonly FittedKey[]): Tree | undefined {
   if (entered === undefined && fitted.length === 0) return undefined
   const burnForm = entered?.burnForm as Tree | undefined
@@ -495,10 +492,7 @@ function withRanges(draft: UserPowder['draft']): UserPowder['draft'] {
   }
 }
 
-/**
- * The record data builds this powder, or the issues of the powder schema by path. An empty Min or
- * Max of a thermochemistry range counts as its value.
- */
+/** An empty Min or Max of a thermochemistry range counts as its value. */
 export function powderOf(
   data: UserPowder,
   name: string,
@@ -557,10 +551,7 @@ function labelOf(d: Design, path: PropertyKey[], t: Translator['t']): string {
   return section ? t(section) : key
 }
 
-/**
- * A schema issue in plain words with its limit, naming the field `label`. An issue without a sentence
- * of its own names its field only: zod's English message stays out of the interface.
- */
+/** An issue without its own sentence names its field only: zod's English stays out of the interface. */
 export function issueText(issue: Issue, label: string, t: Translator['t']): string {
   const rule = ruleTexts[issue.message]
   if (rule) return t(rule, { label })
@@ -610,12 +601,7 @@ const sectionLabels: Record<string, Message> = {
   listedCartridges: msg('Cartridges'),
 }
 
-/**
- * What the draft lacks for the schema's rules across its parts, all at once: the schema checks
- * them only once every part passes on its own, so they would surface one at a time. The rules stay
- * the schema's: the burn law holds effective fitted values (a fitted parameter and the kind
- * "Fitted to data"), the thermochemistry is computed from a composition.
- */
+/** All at once, because the schema checks cross-part rules only once every part passes; the rules stay the schema's. */
 function draftProblems(d: Design, data: UserPowder, t: Translator['t']): Problem[] {
   const draft = data.draft
   const problems: Problem[] = []
@@ -639,10 +625,7 @@ function draftProblems(d: Design, data: UserPowder, t: Translator['t']): Problem
   return problems
 }
 
-/**
- * The problems of the schema issues: at the field an issue belongs to, else about a section. A value
- * the record needs and the draft lacks is reported at each empty field below that place.
- */
+/** A value the record needs is reported at each empty field below its place. */
 function problemsOf(d: Design, issues: Issue[], t: Translator['t']): Problem[] {
   const live = liveRows(d)
   return issues.flatMap((issue): Problem[] => {
@@ -718,11 +701,7 @@ export const powderDesigns = (records: readonly UserRecord[]): PowderDesign[] =>
       : []
   })
 
-/**
- * The newest design (latest fit date, then id) whose `fit.previous` chain reaches the powder `id`,
- * or undefined when no refit of it is stored. A refit names the record it refits, so the chain is
- * walked from `id` forward; deleting a powder relinks the records that name it (`deleteRecords`).
- */
+/** A refit names the record it refits, so the chain walks forward from `id`; `deleteRecords` relinks. */
 export function newerFit(designs: readonly PowderDesign[], id: string): PowderDesign | undefined {
   let newest: PowderDesign | undefined
   const seen = new Set<string>()

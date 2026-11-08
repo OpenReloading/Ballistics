@@ -97,12 +97,7 @@ const r3 = (x: number | undefined) => (x === undefined ? undefined : Number(x.to
 
 const interiorSchema = powder.shape.interior.unwrap()
 
-/**
- * The burn-rate curves of the powder designs among `records` by record id: a design whose burn law
- * passes the powder schema's interior, with the kind "Fitted to data" the schema asks of it, and a
- * curve (`classifyPowder`). Labelled with the design's name. Checks the burn law only, not the whole
- * record: the list and the overlay load no designer code.
- */
+/** Checks the burn law only, so the list and the overlay load no designer code. */
 export function designCurves(records: readonly UserRecord[]): Map<string, FittedPowder> {
   return new Map(
     records.flatMap((r): [string, FittedPowder][] => {
@@ -122,11 +117,7 @@ export function designCurves(records: readonly UserRecord[]): Map<string, Fitted
   )
 }
 
-/**
- * The powders among `records` as Mine rows: no manufacturer (a design has none), the grain form and
- * base of the draft, and the mean vivacity of a design that builds a powder with a curve (no
- * burn-rate order: that is the catalogue's).
- */
+/** A design has no maker and no burn-rate order: that is the catalogue's. */
 export function userPowderRows(records: readonly UserRecord[]): PowderRow[] {
   const curves = designCurves(records)
   return records.flatMap((r) => {

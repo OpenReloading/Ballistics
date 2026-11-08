@@ -1,10 +1,6 @@
 import { fromSi, toSi } from '@open-reloading/schema'
 
-/**
- * The values of the cartridge sheet and the powder record that the user may type over them, by
- * the keys of `analysis.overrides`: the Pmax (a limit the user types is theirs, no CIP value), the
- * case length L3 and the powder's bulk density.
- */
+/** A Pmax the user types is theirs, no CIP value. */
 export const specValueKeys = ['pmax', 'caseLength', 'bulkDensity'] as const
 export type SpecKey = (typeof specValueKeys)[number]
 

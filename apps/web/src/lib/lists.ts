@@ -103,11 +103,7 @@ export function filterText(named: readonly (string | false | undefined)[]) {
 export const matchingText = (t: Translator['t'], query: string) =>
   query.trim() !== '' && t('matching "{query}"', { query: query.trim() })
 
-/**
- * True when every word of `query` occurs in one of `texts`, in any order, ignoring case and
- * accents, with spaces, hyphens and decimal separators as the schema's matcher reads them
- * ("8x57" finds "8 x 57 IS"); an empty query matches.
- */
+/** As the schema's matcher reads words ("8x57" finds "8 x 57 IS"); an empty query matches. */
 export const matchesQuery = (texts: (string | undefined)[], query: string) =>
   score(searchKey(texts), query) !== undefined
 

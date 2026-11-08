@@ -4,10 +4,7 @@ import { localDay } from './dates.ts'
 import { interiorFields } from './interior-input.ts'
 import { fixedFieldText, type UnitSystem } from './units.ts'
 
-/**
- * A powder record's M3 parameters in the workbench: the fill, the field marks, the fit summary
- * and the bore resistance of the fit.
- */
+/** Fill, field marks, fit summary and the fit's bore resistance. */
 
 /** A field value still equal to the record value `from`, within 1e-9 relative. */
 const matchesRecordValue = (from: number, si: number | undefined) =>
@@ -31,11 +28,7 @@ const fittedKey: Record<string, FittedKey> = {
   formA: 'form.a',
 }
 
-/**
- * Whether a fitted field of `p` shows another value than the one the record filled (`origin`):
- * a typed value moved a fitted parameter. `shown` writes a field's SI value at its display
- * precision, so a value typed as shown is no move.
- */
+/** A value typed as shown is no move, since `shown` writes at display precision. */
 const handTuned = (
   p: Powder,
   origin: Record<string, number>,
@@ -52,10 +45,7 @@ const handTuned = (
     )
   })
 
-/**
- * The mark of a fitted powder: fitted to `strings` strings on the local day of `date`, an ISO time
- * (`day` writes that day, given as YYYY-MM-DD), or hand-tuned once a fitted value moved.
- */
+/** Hand-tuned once a fitted value moved. */
 export const fitMark = (
   strings: number,
   date: string,
@@ -72,11 +62,7 @@ export const fitMark = (
         { date: day(localDay(new Date(date))) },
       )
 
-/**
- * The fit mark of the workbench's powder `design` against the record values it filled (`origin`)
- * and the SI field values, compared as the fields write them in `s`; undefined for a powder not
- * saved from a fit.
- */
+/** Compared as the fields write them; undefined for a powder not saved from a fit. */
 export function loadFitMark(
   design: { powder: Powder; fit?: UserPowderFit | undefined } | undefined,
   origin: Record<string, number> | undefined,
@@ -94,10 +80,7 @@ export function loadFitMark(
   return fitMark(design.fit.input.length, design.fit.date, tuned, day, tr)
 }
 
-/**
- * A field's mark against the filled record values `origin`: from the record (fitted or an input of
- * the fit), or changed from the record value; undefined for a field the record does not fill.
- */
+/** Undefined for a field the record does not fill. */
 export function recordMark(
   p: Powder,
   origin: Record<string, number>,
@@ -127,10 +110,7 @@ export function recordMark(
     : t('Changed from the user design value {value}.', { value })
 }
 
-/**
- * Plausibility of the fitted energy: fitted over the thermochemistry energy, impetus / (gamma - 1),
- * at the record's mean composition; undefined without thermochemistry or a fit.
- */
+/** Fitted energy over impetus / (gamma - 1) at the mean composition, a plausibility check. */
 export function fittedEnergyRatio(p: Powder) {
   const t = p.thermochemistry
   if (!t || !p.interior || !(t.gamma.value > 1)) return

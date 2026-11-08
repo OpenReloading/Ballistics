@@ -1,8 +1,4 @@
-/**
- * Navigation started from code: the app router's `push` and `replace` ask every registered
- * question first and do nothing when one is declined. Links are guarded by the File menu itself
- * (`file-menu.tsx`), Back and Forward through `guardPop`.
- */
+/** `push` and `replace` ask every registered question first; links are guarded by `file-menu.tsx`, Back and Forward by `guardPop`. */
 
 // shortcut: a dev Fast Refresh of this module empties the set until a reload, keep it on the router if that bites
 const questions = new Set<() => Promise<boolean>>()
@@ -17,11 +13,7 @@ export function guardNavigation(ask: () => Promise<boolean>) {
 
 const pops = new Set<(e: PopStateEvent) => void>()
 
-/**
- * Runs `on` for every Back and Forward before the router sees it, so `on` can stop it; returns its
- * removal. Listeners on window run in the order they were added, the capture flag aside: one added
- * by a page comes after the router's, which then moves to another page before the page's runs.
- */
+/** Window listeners run in the order added, so one added by a page would run after the router has moved on. */
 export function guardPop(on: (e: PopStateEvent) => void) {
   pops.add(on)
   return () => {
@@ -38,8 +30,7 @@ if (typeof window !== 'undefined')
 type Go = (href: string, options?: object) => void
 type Router = { push: Go; replace: Go; guarded?: true }
 
-// `window.next.router` is the instance `useRouter` hands out; `useRouter` copies its methods when
-// a component first renders, so this module is imported by the root providers, before any page.
+// `useRouter` copies the instance's methods on first render, so the root providers import this module before any page.
 const router =
   typeof window === 'undefined'
     ? undefined

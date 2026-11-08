@@ -44,11 +44,7 @@ export function componentRefs(load: Load): [ComponentKind, string][] {
   return refs.flatMap(([kind, ref]) => (ref ? [[kind, ref] as [ComponentKind, string]] : []))
 }
 
-/**
- * The load in two lines: the cartridge and the bullet, then the powder with the charge, the primer
- * and the COAL (or CBTO) where the load has them. A reference without a known name (`nameOf`) is
- * left out; a described bullet or powder comes with its manufacturer's name where that is known.
- */
+/** A reference without a known name is left out. */
 export function loadSummary(
   load: Load,
   nameOf: (kind: ComponentKind, ref: string) => string | undefined,
@@ -114,11 +110,7 @@ const fnv = (text: string, seed: number) => {
   return h.toString(16).padStart(8, '0')
 }
 
-/**
- * The id of the range session of `loadRef` on `date`: derived from both, so every tab and every
- * reload that enters shots for that load that day writes the one record. A UUID of the shape
- * `userId` takes; four FNV-1a hashes with different seeds, not a secret.
- */
+/** Derived from load and date, so every tab and reload writes the one record; four seeded FNV-1a hashes, not a secret. */
 export function rangeSessionId(loadRef: string, date: string) {
   const text = `range:${loadRef}:${date}`
   const [a = '', b = '', c = '', d = ''] = [2166136261, 3339675911, 1013904223, 1664525].map((x) =>
@@ -143,12 +135,7 @@ export interface RangeContext {
   now: Date
 }
 
-/**
- * A change of one string of the range session: `edit` applied to the string of `step`, a new one
- * when none exists. The returned function takes the stored record as written (undefined when
- * absent) and gives the record to store, so the store applies it to what is stored at that moment.
- * It throws for a stored record that is not a session of this load: that record is left alone.
- */
+/** Applied to what is stored at that moment; a stored record that is not this load's session throws and is left alone. */
 const changeString =
   (
     context: RangeContext,
@@ -282,10 +269,7 @@ export const setNotes = (
 /** The statistics of a string over its shots that are not excluded; undefined when none is left. */
 export const rangeStats = (s: SessionString | undefined) => s && stringStats(s.shots)
 
-/**
- * A velocity typed as text, in the unit `toSi` converts from: m/s, or the reason it is refused.
- * Either decimal mark is accepted ({@link parseNumber}).
- */
+/** Either decimal mark ({@link parseNumber}). */
 export function parseVelocity(
   text: string,
   toSi: (x: number) => number,
@@ -305,21 +289,14 @@ export function typedRounds(text: string) {
   return p.kind === 'number' && Number.isInteger(p.value) && p.value >= 1 ? p.value : undefined
 }
 
-/**
- * The references a Save of a load writes: the ones it holds (`current`) and those another tab
- * stored since it was opened (`stored` not in `opened`), such as a session the range page added.
- * A reference it removed after opening (in `opened`, not in `current`) stays removed.
- */
+/** Adds what another tab stored since opening; a reference removed here stays removed. */
 export const mergeSessionRefs = (
   stored: readonly string[],
   opened: readonly string[],
   current: readonly string[],
 ) => [...current, ...stored.filter((r) => !opened.includes(r) && !current.includes(r))]
 
-/**
- * `record`, a load about to be saved, with the sessions the stored copy `stored` gained since the
- * load was opened with `opened`; the same record when there are none.
- */
+/** The same record when the stored copy gained none. */
 export function withStoredSessions(
   record: UserRecord,
   stored: UserRecord | undefined,
@@ -352,10 +329,7 @@ export interface WeatherText {
   wind: string
 }
 
-/**
- * The weather typed for a string as stored values; an empty field is left out. The first field that
- * is not a number, or is out of range (pressure above zero, wind not negative), gives its reason.
- */
+/** Empty fields are left out; the first bad field gives its reason. */
 export function parseWeather(
   text: WeatherText,
   units: { temperature: Unit; airPressure: Unit; windSpeed: Unit },
@@ -417,12 +391,7 @@ const maxSessions = 50
 
 const lot = (text: string | undefined) => text?.trim() || undefined
 
-/**
- * The stored load `record` naming the session `ref`, with the snapshot of the load as it is now (its
- * lots, seating and `roundCount` of the firearm) so the session does not read later changes of
- * the load. undefined when it names the session already; throws for a record that is not a load
- * and for a load at its limit of sessions.
- */
+/** The snapshot keeps the session from reading later changes of the load; throws at the load's session limit. */
 export function withSession(
   record: UserRecord,
   ref: string,
