@@ -1,6 +1,7 @@
 // Minimal XML 1.0 reader for workbook parts (https://www.w3.org/TR/xml/, section numbers below
 // refer to it): one left-to-right pass, no document type declarations, so no entity can be
 // declared, expanded or fetched.
+import { refuseFile } from './diagnostics.ts'
 
 export interface XmlElement {
   /** Name without its namespace prefix. */
@@ -31,9 +32,9 @@ function replacementOf(name: string): string {
   const known = Object.hasOwn(predefined, name) ? predefined[name] : undefined
   if (known !== undefined) return known
   const m = /^#(?:x([0-9a-fA-F]+)|([0-9]+))$/.exec(name)
-  if (!m) throw new Error(`unknown entity &${name};`)
+  if (!m) refuseFile('unknownEntity', { name })
   const code = m[1] ? Number.parseInt(m[1], 16) : Number(m[2])
-  if (!isXmlChar(code)) throw new Error(`character reference &${name}; is not an XML character`)
+  if (!isXmlChar(code)) refuseFile('notXmlChar', { name })
   return String.fromCodePoint(code)
 }
 
@@ -51,7 +52,7 @@ function references(text: string): string {
     pieces.push(text.slice(from, amp))
     const semi = text.indexOf(';', amp + 1)
     const next = text.indexOf('&', amp + 1)
-    if (semi <= amp + 1 || (next >= 0 && next < semi)) throw new Error('bare & in text')
+    if (semi <= amp + 1 || (next >= 0 && next < semi)) refuseFile('bareAmpersand')
     const name = text.slice(amp + 1, semi)
     pieces.push(replacementOf(name))
     if (pieces.length >= 8192) {
@@ -138,14 +139,18 @@ interface XmlEvents {
 function spend(remaining: XmlBudget | undefined, key: keyof XmlBudget, n: number): void {
   if (!remaining) return
   remaining[key] -= n
-  if (remaining[key] < 0) throw new Error(`more ${key} than allowed`)
+  if (remaining[key] < 0) refuseFile('xmlBudgetSpent', { key })
 }
 
-/** Position of `marker` from `from`; throws naming the unclosed `what` when it is absent. */
-function closing(text: string, marker: string, from: number, what: string): number {
+/** Position of `marker` from `from`; refuses with `unclosed` when it is absent. */
+function closing(
+  text: string,
+  marker: string,
+  from: number,
+  unclosed: 'unclosedProcessingInstruction' | 'unclosedComment' | 'unclosedCdata',
+): number {
   const e = text.indexOf(marker, from)
-  if (e < 0) throw new Error(`unclosed ${what}`)
-  return e
+  return e < 0 ? refuseFile(unclosed) : e
 }
 
 /** Attributes of the start tag `qname` from `at`, and the position after the last one. */
@@ -160,11 +165,9 @@ function readAttributes(
   let end = at
   for (let a = attributeAt(text, end); a; a = attributeAt(text, end)) {
     const name = a.name
-    if (seen.has(name)) throw new Error(`duplicate attribute ${name} in <${qname}>`)
+    if (seen.has(name)) refuseFile('duplicateAttribute', { name, tag: qname })
     seen.add(name)
-    if (seen.size > maxAttributes) {
-      throw new Error(`more than ${maxAttributes} attributes in <${qname}>`)
-    }
+    if (seen.size > maxAttributes) refuseFile('tooManyAttributes', { max: maxAttributes, tag: qname })
     spend(remaining, 'characters', a.length)
     if (name !== 'xmlns' && !name.startsWith('xmlns:')) {
       attributes[local(name)] = references(a.value)
@@ -181,12 +184,12 @@ function readStartTag(
   remaining: XmlBudget | undefined,
 ): { qname: string; attributes: Record<string, string>; empty: boolean; end: number } {
   const n = match(nameAt, text, lt + 1)
-  if (!n) throw new Error('malformed tag')
+  if (!n) refuseFile('malformedTag')
   const qname = n[0]
   spend(remaining, 'elements', 1)
   const { attributes, end } = readAttributes(text, lt + 1 + qname.length, qname, remaining)
   const close = tagEndAt(text, end)
-  if (!close) throw new Error(`malformed tag <${qname}>`)
+  if (!close) refuseFile('malformedTagNamed', { tag: qname })
   return { qname, attributes, empty: close.empty, end: end + close.length }
 }
 
@@ -203,24 +206,22 @@ interface ScanState {
 
 function addText(st: ScanState, t: string): void {
   if (st.path.length > 0) st.events.text(t, st.path)
-  else if (t.trim()) throw new Error('text outside the root element')
+  else if (t.trim()) refuseFile('textOutsideRoot')
 }
 
 /** Refuses an XML declaration that names an encoding other than UTF-8. */
 function checkEncoding(pi: string): void {
   const encoding = /^xml\s[\s\S]*?encoding\s*=\s*["']([^"']*)["']/.exec(pi)?.[1]
-  if (encoding !== undefined && encoding.toLowerCase() !== 'utf-8') {
-    throw new Error(`encoding "${encoding}" is not read; only UTF-8`)
-  }
+  if (encoding !== undefined && encoding.toLowerCase() !== 'utf-8')
+    refuseFile('encodingNotRead', { encoding })
 }
 
 /** Closes the element named by the end tag at `lt`; returns the position after the tag. */
 function readEndTag(text: string, lt: number, st: ScanState): number {
   const m = endTagBodyAt(text, lt + 2)
   const top = st.qnames.pop()
-  if (!m || top === undefined || m.name !== top) {
-    throw new Error(`end tag </${m?.name ?? ''}> does not match <${top ?? ''}>`)
-  }
+  if (!m || top === undefined || m.name !== top)
+    refuseFile('endTagMismatch', { end: m?.name ?? '', start: top ?? '' })
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the path grows with qnames, so it holds the element closed here
   const name = st.path.pop() as string
   st.events.close(name, st.path)
@@ -230,9 +231,9 @@ function readEndTag(text: string, lt: number, st: ScanState): number {
 /** Opens the element of the start tag at `lt`; returns the position after the tag. */
 function readElement(text: string, lt: number, st: ScanState): number {
   const tag = readStartTag(text, lt, st.remaining)
-  if (st.qnames.length >= maxDepth) throw new Error(`elements nest deeper than ${maxDepth}`)
+  if (st.qnames.length >= maxDepth) refuseFile('nestTooDeep', { max: maxDepth })
   if (st.qnames.length === 0) {
-    if (st.rooted) throw new Error('more than one root element')
+    if (st.rooted) refuseFile('secondRoot')
     st.rooted = true
   }
   const name = local(tag.qname)
@@ -248,19 +249,19 @@ function readElement(text: string, lt: number, st: ScanState): number {
 /** Reads the markup at `lt` (a `<`); returns the position after it. */
 function readMarkup(text: string, lt: number, st: ScanState): number {
   if (text.startsWith('<?', lt)) {
-    const e = closing(text, '?>', lt + 2, 'processing instruction')
+    const e = closing(text, '?>', lt + 2, 'unclosedProcessingInstruction')
     checkEncoding(text.slice(lt + 2, e))
     return e + 2
   }
-  if (text.startsWith('<!--', lt)) return closing(text, '-->', lt + 4, 'comment') + 3
+  if (text.startsWith('<!--', lt)) return closing(text, '-->', lt + 4, 'unclosedComment') + 3
   if (text.startsWith('<![CDATA[', lt)) {
-    const e = closing(text, ']]>', lt + 9, 'CDATA section')
+    const e = closing(text, ']]>', lt + 9, 'unclosedCdata')
     spend(st.remaining, 'characters', e - lt - 9)
     addText(st, text.slice(lt + 9, e))
     return e + 3
   }
-  if (text.startsWith('<!DOCTYPE', lt)) throw new Error('DOCTYPE is not allowed')
-  if (text[lt + 1] === '!') throw new Error('markup declarations are not allowed')
+  if (text.startsWith('<!DOCTYPE', lt)) refuseFile('doctype')
+  if (text[lt + 1] === '!') refuseFile('markupDeclaration')
   if (text[lt + 1] === '/') return readEndTag(text, lt, st)
   return readElement(text, lt, st)
 }
@@ -286,8 +287,8 @@ export function scanXml(text: string, events: XmlEvents, remaining?: XmlBudget):
     }
     i = readMarkup(text, lt, st)
   }
-  if (st.qnames.length > 0) throw new Error(`unclosed element <${st.qnames.at(-1)}>`)
-  if (!st.rooted) throw new Error('no root element')
+  if (st.qnames.length > 0) refuseFile('unclosedElement', { tag: st.qnames.at(-1) ?? '' })
+  if (!st.rooted) refuseFile('noRoot')
 }
 
 /** The root element of `text` as a tree, read with `scanXml` (same checks and budget). */

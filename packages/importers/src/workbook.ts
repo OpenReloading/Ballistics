@@ -2,6 +2,7 @@
 // https://ecma-international.org/publications-and-standards/standards/ecma-376/) read into rows
 // of cell text: no styles, number formats or formulas are applied.
 import { type CellBudget, clean, placeCell, type Workbook, type Worksheet } from './cells.ts'
+import { type FileDiagnostic, locatedError, ReaderError, refuseFile } from './diagnostics.ts'
 import {
   maxCellCharacters,
   maxCells,
@@ -9,7 +10,6 @@ import {
   maxTotalSize,
   maxXmlCharacters,
 } from './limits.ts'
-import { errorMessage } from './text.ts'
 import { readXls } from './xls.ts'
 import { parseXml, scanXml, type XmlBudget, type XmlElement } from './xml.ts'
 import {
@@ -53,9 +53,7 @@ function resolveTarget(source: string, target: string): string {
   for (const s of target.split('/')) {
     if (s === '' || s === '.') continue
     if (s !== '..') segments.push(s)
-    else if (segments.pop() === undefined) {
-      throw new Error(`relationship target ${target} leaves the package`)
-    }
+    else if (segments.pop() === undefined) refuseFile('relationshipLeaves', { target })
   }
   return segments.join('/')
 }
@@ -69,7 +67,7 @@ function sharedString(text: string, strings: string[], ref: () => string): strin
   const k = /^\d+$/.test(text.trim()) ? Number(text) : Number.NaN
   const shared = strings[k]
   if (shared === undefined) {
-    throw new Error(`cell ${ref()} refers to shared string ${text} of ${strings.length}`)
+    refuseFile('sharedStringOutOfRange', { cell: ref(), index: text, count: strings.length })
   }
   return shared
 }
@@ -142,7 +140,7 @@ function closeCell(
   let column = cells.length + 1
   if (ref !== undefined) {
     const letters = /^([A-Z]{1,3})[0-9]+$/.exec(ref)?.[1]
-    if (letters === undefined) throw new Error(`cell reference "${ref}" is malformed`)
+    if (letters === undefined) refuseFile('cellRefMalformed', { ref })
     column = columnOf(letters)
   }
   const name = () => ref ?? `at column ${column}`
@@ -211,12 +209,12 @@ function sheetRows(
 /** Reads a part of the archive as UTF-8 text with `read`; `limit` caps its declared size. */
 type ReadPart = <T>(name: string, read: (text: string) => T, limit?: number) => Promise<T>
 
-/** The XML limit a shared budget ran out of, as text, or undefined while it holds. */
-function exhausted(xmlRemaining: XmlBudget): string | undefined {
-  if (xmlRemaining.elements < 0) return `${maxElements} elements`
-  if (xmlRemaining.characters < 0) {
-    return `${maxXmlCharacters} characters of text and attribute markup`
-  }
+/** The refusal of the XML limit a shared budget ran out of, or undefined while it holds. */
+function exhausted(xmlRemaining: XmlBudget, part: string): FileDiagnostic | undefined {
+  if (xmlRemaining.elements < 0)
+    return { code: 'xmlElementsExceeded', params: { max: maxElements, part } }
+  if (xmlRemaining.characters < 0)
+    return { code: 'xmlCharactersExceeded', params: { max: maxXmlCharacters, part } }
   return undefined
 }
 
@@ -231,18 +229,17 @@ function partReader(
 ): ReadPart {
   return async (name, read, limit) => {
     const entry = archive.entries.get(name.toLowerCase())
-    if (!entry) throw new Error(`XLSX part ${name} is missing`)
+    if (!entry) refuseFile('partMissing', { name })
     const data = await readEntry(archive, entry, budget, limit)
     try {
       // the Encoding Standard's UTF-8 reading drops a byte order mark and marks bad bytes U+FFFD
       const text = await new Response(data).text()
-      if (text.includes('\uFFFD')) throw new Error('not valid UTF-8')
+      if (text.includes('\uFFFD')) refuseFile('notUtf8')
       return read(text)
     } catch (e) {
       // the budget is shared by all parts, so name it, not only the part that used it up
-      const over = exhausted(xmlRemaining)
-      const message = over ? `the XML parts hold more than ${over}` : errorMessage(e)
-      throw new Error(`XLSX part ${entry.name}: ${message}`, { cause: e })
+      const over = exhausted(xmlRemaining, entry.name)
+      throw over ? new ReaderError(over, { cause: e }) : locatedError(e, { part: entry.name })
     }
   }
 }
@@ -267,7 +264,7 @@ async function readRelationships(
   const ids = new Set<string>()
   for (const r of all) {
     const id = r['Id'] ?? ''
-    if (ids.has(id)) throw new Error(`XLSX part ${path}: relationship ${id} appears twice`)
+    if (ids.has(id)) refuseFile('relationshipTwice', { part: path, id })
     ids.add(id)
   }
   return all
@@ -302,11 +299,11 @@ async function readWorksheets(
   const worksheets: Worksheet[] = []
   for (const sheet of sheetList) {
     const rel = byId.get(sheet['id'] ?? '')
-    if (!rel) throw new Error(`XLSX part ${office}: sheet ${sheet['name']} has no relationship`)
+    if (!rel) refuseFile('sheetNoRelationship', { part: office, sheet: sheet['name'] ?? '' })
     // chart sheets and dialog sheets hold no cells
     if (!rel.type.endsWith('/worksheet')) continue
     if (read.has(rel.target)) {
-      throw new Error(`XLSX part ${office}: sheet ${sheet['name']} names part ${rel.target} again`)
+      refuseFile('sheetPartAgain', { part: office, sheet: sheet['name'] ?? '', target: rel.target })
     }
     read.add(rel.target)
     const rows = await part(rel.target, (text) => sheetRows(text, strings, remaining, xmlRemaining))
@@ -325,9 +322,8 @@ export async function readWorkbook(
   options: { inflate?: Inflate } = {},
 ): Promise<Workbook> {
   if (startsWith(bytes, legacySignature)) return readXls(bytes)
-  if (!options.inflate && typeof DecompressionStream === 'undefined') {
-    throw new Error('DecompressionStream is not available; pass an inflate function')
-  }
+  if (!options.inflate && typeof DecompressionStream === 'undefined')
+    refuseFile('noDecompressionStream')
   const inflate = options.inflate ?? inflateRaw
   const entries = zipEntries(bytes)
   const budget = { left: maxTotalSize }
@@ -335,7 +331,7 @@ export async function readWorkbook(
   const part = partReader({ bytes, entries, inflate }, budget, xmlRemaining)
   const tree = (name: string) => part(name, (text) => parseXml(text, xmlRemaining), maxTreePartSize)
   const office = (await readRelationships(tree, '')).find((r) => r.type.endsWith('/officeDocument'))
-  if (!office) throw new Error('XLSX part _rels/.rels names no workbook')
+  if (!office) refuseFile('noWorkbookPart', { part: '_rels/.rels' })
   // only the sheet attributes are kept, so the workbook tree can be collected
   const sheetList = elements(elements(await tree(office.target), 'sheets')[0], 'sheet').map(
     (s) => s.attributes,
@@ -346,9 +342,7 @@ export async function readWorkbook(
     (n, r) => n + (r ? (entries.get(r.target.toLowerCase())?.size ?? 0) : 0),
     0,
   )
-  if (declared > budget.left) {
-    throw new Error(`XLSX parts declare more than ${maxTotalSize} bytes in total`)
-  }
+  if (declared > budget.left) refuseFile('partsTooLarge', { max: maxTotalSize })
   const strings = shared
     ? await part(shared.target, (text) => sharedStrings(text, xmlRemaining))
     : []
