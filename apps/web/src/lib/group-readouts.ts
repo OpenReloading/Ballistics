@@ -3,10 +3,7 @@ import { type GroupStatistics, subtendedAngle } from '@open-reloading/shot-group
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { type UnitSystem, withUnit } from './units.ts'
 
-/**
- * A two-sided interval of a readout at `level` with `df` degrees of freedom; `circular` when it
- * assumes equal, uncorrelated axes (radial SD, CEP).
- */
+/** `circular` when it assumes equal, uncorrelated axes (radial SD, CEP). */
 export type Interval = {
   lower: number
   upper: number
@@ -109,10 +106,7 @@ export function readouts(s: GroupStatistics, distance: number): Readout[] {
 /** The readouts of the statistics box, the image export and the compact workbench tab. */
 export const keyReadouts: string[] = ['extremeSpread', 'meanRadius', 'cepElliptical']
 
-/**
- * The statistics box text of a group below its name: the shot count, then each key readout of
- * `rows` (the group's `readouts`) in length and angle.
- */
+/** The shot count, then each key readout in length and angle. */
 export function statLines(
   s: GroupStatistics,
   rows: Readout[],

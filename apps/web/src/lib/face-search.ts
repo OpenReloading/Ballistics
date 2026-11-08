@@ -1,7 +1,4 @@
-/**
- * The face search with the hole size as a scale, apart from `target-face.ts` because only the
- * Web Worker runs it: the blob detector stays out of the pages' bundles.
- */
+/** Apart from `target-face.ts` because only the worker runs it, which keeps the blob detector out of the pages' bundles. */
 import type { TargetFace } from '@open-reloading/schema'
 import { peaksOf, radiiOf, space } from './blob-detector.ts'
 import { conicOf, type Ellipse } from './ellipse.ts'
@@ -15,14 +12,7 @@ const D_OVER_SIGMA = 2 * Math.SQRT2
 /** The holes are measured on a grid where the largest expected hole is about this many px across. */
 const HOLE_PX = 30
 
-/**
- * Finds the target face in a photo. `image` may be any size: the search runs on a grid of about
- * 700 px and a crop of about 1400 px. `fits` is empty when no face is proposed (no black area, or
- * fewer than two rings match): `ellipses` and `ranked` are then what the editor shows. More than
- * one fit means ratio twins: the user's event or distance tells them apart. A known `scale` (image px per mm) drops the faces of another size first.
- * Without one, the hole diameter (`hole`, mm) sets it when the faces `alike` differ in size: the
- * size of the holes on the black area in px over `hole`.
- */
+/** On a grid of about 700 px; several fits are ratio twins that the event or distance tells apart, a known `scale` or `hole` drops other sizes. */
 export function findFace(
   image: RgbaImage,
   faces: readonly TargetFace[],
@@ -36,18 +26,14 @@ export function findFace(
   // faces of one size: a scale does not tell them apart
   if (hi / lo < 1 + 2 * SCALE_TOLERANCE) return found
   const px = holeSize(image, found.black, lo, hi)
-  // a fit's px per mm, and so the holes measured, are a mean over the tilt; `scale` runs along the
-  // black area's long axis
+  // A fit's px per mm is a mean over the tilt; `scale` runs along the black area's long axis.
   const fit = nth(found.alike, 0)
   const toMajor = found.black.semiMajor / (fit.face.blackDiameter.value / 2) / fit.pxPerMm
   const scaled = px ? searchFaces(image, faces, (px * toMajor) / hole) : undefined
   return scaled?.fits.length ? scaled : found
 }
 
-/**
- * The diameter (px) of the strongest light blobs on the black area between `lo` and `hi` px: the
- * holes, which show the backing. Undefined when there is none.
- */
+/** The holes show the backing; undefined when there is none. */
 function holeSize(image: RgbaImage, black: Ellipse, lo: number, hi: number) {
   const r = black.semiMajor
   const grid = grayGrid(image, Math.max(1, Math.floor(hi / HOLE_PX)), {

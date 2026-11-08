@@ -33,10 +33,6 @@ export function parseCompareIds(param: string | string[] | undefined): CompareId
 
 export const compareHref = (ids: readonly string[]) => `/bullets/compare?ids=${ids.join(',')}`
 
-/**
- * A bullet record's "Compare": the bullet list searched by its common caliber with the bullet
- * ticked (`pick`), so one more tick opens the comparison. A bullet without a diameter is ticked in the
- * unsearched list.
- */
+/** Searched by common caliber with the bullet ticked, so one more tick opens the comparison. */
 export const compareFrom = (id: string, diameterMm?: number) =>
   `/bullets?${new URLSearchParams(diameterMm === undefined ? { pick: id } : { q: commonCaliber(diameterMm), pick: id })}`

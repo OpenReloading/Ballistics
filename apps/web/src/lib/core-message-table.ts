@@ -95,13 +95,7 @@ export const warningMessages = {
   ],
 } satisfies Record<WarningCode, readonly Message[]>
 
-/**
- * The texts of the table, in `core-message-table.json` so that the scan of `scripts/i18n.mts` reads
- * them as it reads the `msg` calls: `codes` are words that stand alone as a message (the reasons of
- * a refused or invalid run, of a limit that is not compared and of a failed fit, and the notice
- * every answer carries), `templates` the messages of the packages and the API that carry values and
- * the app's own request failures, in groups named by their source.
- */
+/** In `core-message-table.json` so the scan of `scripts/i18n.mts` reads them as it reads `msg` calls. */
 const codes: readonly Message[] = table.codes.map(msg)
 
 const templates: readonly Message[] = [
@@ -159,11 +153,7 @@ function withDecimalMark(text: string, t: Translator['t']): string {
   return mark === '.' ? text : text.replace(/(?<=\d)\.(?=\d)/g, mark)
 }
 
-/**
- * Longest text matched against the templates: the longest template has fewer than 150 characters
- * and its values are short. The lazy groups backtrack, so the time of a text that matches no
- * template grows much faster than its length.
- */
+/** The longest template is under 150 characters, and the lazy groups backtrack, so a text that matches nothing costs far more than its length. */
 const maxMessageChars = 2000
 
 /** The German of `text` when it is a code or an instance of a template, else undefined. */

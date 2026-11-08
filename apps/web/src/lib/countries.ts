@@ -1,9 +1,6 @@
 import { shownLanguage } from '../i18n/shown.ts'
 
-/**
- * ISO 3166-1 alpha-2 codes of the countries of origin as the cartridge records print them (CIP sheets:
- * "Country of Origin"), lower case. A record may name several, comma-separated.
- */
+/** ISO 3166-1 alpha-2, lower case, as CIP sheets print the country of origin; a record may name several. */
 const codes: Record<string, string> = {
   austria: 'AT',
   belgium: 'BE',
@@ -60,11 +57,7 @@ function regions(language: string) {
   return names
 }
 
-/**
- * The name of a country in the language shown: another language than English takes the name of
- * its code from `Intl`; English keeps the name as the record prints it, and a name with no code
- * stays as it is.
- */
+/** Other languages name the code through `Intl`; English keeps the record's own name. */
 export const countryName = (name: string, code: string | undefined, language = shownLanguage()) =>
   language === 'en' || !code ? name : (regions(language).of(code) ?? name)
 

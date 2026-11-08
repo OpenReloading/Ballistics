@@ -37,10 +37,7 @@ function velocityOf(
   return shot && !shot.excluded ? toSi('velocity', shot.velocity.value) : undefined
 }
 
-/**
- * Heights above the point of aim and velocities of the shots of a group that the note can use:
- * included shots with a linked velocity. Empty without a point of aim or below `minShots` shots.
- */
+/** Empty without a point of aim or below `minShots` shots. */
 function usableShots(group: ShotGroup, sessions: readonly SessionRecord[]) {
   const aim = group.aim
   const shots = aim
@@ -52,12 +49,7 @@ function usableShots(group: ShotGroup, sessions: readonly SessionRecord[]) {
   return shots.length >= minShots ? shots : []
 }
 
-/**
- * The note for a ladder: the groups of every ladder step (`groups`, all sheets of the load) with
- * `minGroups` groups of `minShots` shots that have a velocity and an aim point, at three or more
- * charges and one distance. `slopeAt` gives the drop slope at that distance, m per m/s.
- * `none` when no group has a velocity linked, so nothing shows before the link is made.
- */
+/** `none` until a velocity is linked, so nothing shows before the link is made. */
 export function ladderImpact(
   groups: readonly ShotGroup[],
   charges: readonly number[],

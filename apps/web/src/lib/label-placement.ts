@@ -46,12 +46,7 @@ function boxHitsSegment(b: LabelBox, [p, q]: [Point, Point]): boolean {
   return true
 }
 
-/**
- * Places `text` next to the first of `anchors` where its box clears every circle, segment and box of
- * `scene`: outward from `from` first, then turned in steps of 45 degrees, then farther out in half
- * lines; inside the view when it can. Close to an anchor a crossing line is taken before a far
- * place. The box is estimated (0.6 font size per character) and added to `scene.boxes`.
- */
+/** Close to an anchor a crossing line beats a far place; the box is estimated at 0.6 font size per character. */
 export function placeLabel(
   scene: LabelScene,
   text: string,

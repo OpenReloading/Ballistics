@@ -58,12 +58,7 @@ function burntTime(points: readonly Point[], f: number) {
   return a.time + ((f - a.burntFraction) / (b.burntFraction - a.burntFraction)) * (b.time - a.time)
 }
 
-/**
- * 10 % pressure time (none when 0), the burn form's z1 (with the run's `z1` below 1), peak breech
- * pressure, 95 % burnt, burnout in the barrel and muzzle exit. z1 and 95 % only where the bullet
- * is in the barrel: from the shot start up to, not including, the muzzle exit (a line at the muzzle
- * would lie on the muzzle line).
- */
+/** z1 and 95 % only while the bullet is in the barrel: a line at the muzzle would lie on the muzzle line. */
 export function chartEvents(
   r: PlaybackResult,
   z1: number | undefined,
@@ -99,11 +94,7 @@ const labelPriority: readonly ChartEvent['key'][] = [
 /** Width of a label as a fraction of the x axis: per character, plus a gap (about 7 px a character at 400 px). */
 const labelWidth = (label: string) => 0.018 * label.length + 0.01
 
-/**
- * The row of each event label (0 on top; none for a label that fits in no row, whose line stays).
- * Labels are placed by priority, each in the lowest row where it overlaps no label placed before;
- * a label is centred on its line, the muzzle label ends at it. `x` in axis units, `range` the axis span.
- */
+/** By priority, each in the lowest row it fits; a label in no row keeps its line. */
 export function eventLabelRows(
   events: readonly { key: ChartEvent['key']; label: string; x: number }[],
   range: number,
@@ -124,10 +115,7 @@ export function eventLabelRows(
   return rows
 }
 
-/**
- * The sample at display x: on the time axis at that time, on the travel axis at the time the bullet
- * reaches that travel (at travel 0 the shot start, the last point there).
- */
+/** On the travel axis, at the time the bullet reaches that travel. */
 export function sampleAtX(points: readonly Point[], x: ChartX, value: number, system: UnitSystem) {
   const at = sampler(points)
   if (x === 'time') return at(value / 1e3)
@@ -162,10 +150,7 @@ type Limit = NonNullable<InteriorResponse['limits']>[number]
 /** Percentages of the limit that the reference lines mark. */
 const referenceLines = [85, 75] as const
 
-/**
- * Lines at the compared limit with a pressure (`pressureLimit`), as "Percent of maximum" uses, and at the
- * `referenceLines` percentages of it, in display units; undefined without such a limit. Never "safe".
- */
+/** At the compared limit and its `referenceLines` percentages; never "safe". */
 export function limitLines(limits: Limit[] | undefined, system: UnitSystem, t: Translator['t']) {
   const l = pressureLimit(limits)
   if (l?.pressure === undefined) return
@@ -188,20 +173,11 @@ export function shownQuantities(show: ChartShow): ChartQuantity[] {
   return show === 'all' ? ['pressure', 'velocity', 'energy'] : [show]
 }
 
-/**
- * Room above and below the plot in the chart box, px: the row of event labels and axis units, the
- * tick row with the x unit at its end. A 12 px text box is 14 px high plus its 8 px offset from
- * the axis, so 20 px cut it.
- */
+/** A 12 px text box is 14 px high plus its 8 px offset from the axis, so 20 px would cut it. */
 const plotTop = 24
 const plotBottom = 24
 
-/**
- * The plot's left and right edges in the chart box, px, for `shown` quantities (one source for the
- * grid and the playback strip). The left edge is the pressure axis labels' 56 px. The right edge
- * leaves the 72 px of Play and the speed at the playback row's right end (`globals.css`
- * `.play-controls`) when one axis shows, else the labels of the further axes.
- */
+/** One source for the grid and the playback strip: 56 px of pressure labels, 72 px for Play and the speed (`globals.css` `.play-controls`). */
 export const plotEdges = (shown: number): readonly [number, number] => [56, shown > 1 ? 100 : 72]
 
 /** Colours of the chart, read from the page's tokens so light and dark match the app. */
@@ -323,10 +299,7 @@ type CurveSeriesInput = {
   limitMarks: ReturnType<typeof limitMarkLines>
 }
 
-/**
- * One line per step and shown quantity: the selected step solid, on top and with its text key,
- * the others dashed; the event and limit lines on the selected step's first shown curve.
- */
+/** The selected step solid and on top with its key, the others dashed. */
 function curveSeries(o: CurveSeriesInput) {
   return o.quantities.flatMap((q, axis) =>
     o.steps.map((s, i) => stepCurve(o, { q, axis, s, own: i === o.selected })),
@@ -340,8 +313,7 @@ function stepCurve(
 ) {
   const { steps, mass, xAxis, system, theme } = o
   const c = chartSeries(s.result.points, xAxis, q, mass, system)
-  // with a ladder the selected pressure curve marks its peak with a dot, without a label: the
-  // highlight and the ladder strip name the step
+  // With a ladder, the highlight and the strip name the step, so the peak dot has no label.
   const peak = own && steps.length > 1 && q === 'pressure' ? c.y.indexOf(Math.max(...c.y)) : -1
   const look = own ? selectedLook : otherLook
   return {
@@ -413,10 +385,7 @@ function niceStep(raw: number) {
   return (stepMantissas.find((m) => m * e >= raw * (1 - 1e-9)) ?? 10) * e
 }
 
-/**
- * Axes from 0 for the data maxima `maxima`, all with one count of intervals (4 to 6), so one grid
- * line is a tick of every axis: the count whose emptiest axis leaves the least room above its data.
- */
+/** One interval count (4 to 6) for all, so each grid line is a tick of every axis. */
 export function alignedAxes(maxima: readonly number[]) {
   let best: { waste: number; axes: { max: number; interval: number }[] } | undefined
   for (let n = 4; n <= 6; n++) {
@@ -438,8 +407,7 @@ function yAxisOptions(
   theme: ChartTheme,
 ) {
   const unit = { pressure: system.pressure, velocity: system.velocity, energy: system.energy }
-  // the unit above each axis in its colour, ending at the left axis and starting at a right one,
-  // so it stays clear of the event labels over the plot
+  // Each unit sits at its axis's outer end, clear of the event labels over the plot.
   return quantities.map((q, i) => ({
     type: 'value' as const,
     name: unit[q].symbol,
@@ -462,12 +430,7 @@ function yAxisOptions(
   }))
 }
 
-/**
- * The ECharts option of the interior chart: one line per step and shown quantity, the
- * selected step solid and on top, the others dashed; event lines of the selected step; limit and
- * reference lines when pressure is shown; the x axis from the first point to the last muzzle. Only
- * data: tooltips and sizes are the component's.
- */
+/** Only data: tooltips and sizes are the component's. */
 export function interiorOption({
   steps,
   selected,
@@ -502,8 +465,7 @@ export function interiorOption({
   // reduce, not a spread: a ladder of long runs passes the engine's argument limit
   const xMax = xs.reduce((a, v) => Math.max(a, v), -Infinity)
   const xMin = xs.reduce((a, v) => Math.min(a, v), Infinity)
-  // the axis ends 0.5 % past the last muzzle: ECharts drops a mark line on the plot's very edge,
-  // so the muzzle line keeps its true place only with this room (the data still ends the axis)
+  // ECharts drops a mark line on the plot's very edge, so the axis runs 0.5 % past the last muzzle.
   const axisEnd = xMax + (xMax - xMin) * 5e-3
   const eventX = (e: ChartEvent) => {
     const v = chartX(at(e.time), x, system)

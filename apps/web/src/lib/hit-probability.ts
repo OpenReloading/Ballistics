@@ -33,10 +33,7 @@ export function hitFailureText(e: unknown, t: Translator['t']): string {
   return translateMessage(refusalText(e), t)
 }
 
-/**
- * The scoring zones of a face for a hole of diameter `hole` m, outermost first: each ring grown by
- * the hole's radius, as `scoreShot` counts a touched ring. An oval ring keeps its height.
- */
+/** Each ring grown by the hole's radius, as `scoreShot` counts a touched ring; an oval keeps its height. */
 export function faceZones(face: TargetFace, hole: number): ScoringZone[] {
   const g = hole / 2
   return face.rings.map((r) => ({
@@ -54,11 +51,7 @@ export interface ImpactSensitivity {
   verticalPerMetre: number
 }
 
-/**
- * The sensitivities at `points[i]`: the windage hold per 1 m/s of crosswind (`windHold`, rad, one
- * per point) times the range, and the slope of the height over the neighbouring table points.
- * Undefined with fewer than two points.
- */
+/** Windage hold per 1 m/s of crosswind times range, and the height's slope over neighbouring points; undefined below two points. */
 export function impactSensitivity(
   points: readonly TrajectoryPoint[],
   windHold: readonly number[],

@@ -1,7 +1,4 @@
-/**
- * Reads a box label's QR code from a photo or a camera frame in the browser (`jsqr`, loaded on
- * first use). Nothing is uploaded or stored.
- */
+/** `jsqr` loads on first use; nothing is uploaded or stored. */
 import type { RgbaImage } from './image.ts'
 
 /** The long side, in px, a photo or frame is read at: a label that fills a fair part of it has modules of several px. */
@@ -16,10 +13,7 @@ export async function readCode(image: RgbaImage) {
 /** A part of a picture (x, y, w, h in picture px) and the size it is read at. */
 export type Try = { x: number; y: number; w: number; h: number; width: number; height: number }
 
-/**
- * The parts of a `width` x `height` picture read in turn: the whole with its long side at most
- * `side`, then once its middle half at the same size, which reads a small label at twice the scale.
- */
+/** The middle half at the same size reads a small label at twice the scale. */
 export function photoTries(width: number, height: number, side = readSide): Try[] {
   const at = (x: number, y: number, w: number, h: number): Try => {
     const k = Math.min(1, side / Math.max(w, h))

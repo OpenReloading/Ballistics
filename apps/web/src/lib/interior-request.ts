@@ -41,10 +41,7 @@ export interface InteriorSources {
   jump?: number | undefined
 }
 
-/**
- * The resistance with its engraving ramp moved to start at `jump` (m), 0 for a bullet touching or
- * jammed into the lands; unchanged without a ramp or a jump. The friction stays as it is.
- */
+/** 0 for a bullet touching or jammed into the lands; the friction stays. */
 export function rampAtJump(
   resistance: InteriorLoad['resistance'],
   jump: number | undefined,
@@ -84,12 +81,7 @@ function resistanceFor(s: InteriorSources, body: InteriorBody) {
   })
 }
 
-/**
- * The `POST /interior` body of the workbench's run, which the workbench and the powder tuning
- * route both send: the field values with the powder record's bore resistance (the typed friction
- * and engraving values replace its terms) and temperature sensitivity, its bulk density, kg/m3, and
- * the resistance parameters it lacks. Throws on an invalid value.
- */
+/** Shared by the workbench and powder tuning; typed friction and engraving values replace the record's terms. */
 export function interiorRequest(s: InteriorSources) {
   const { values, powder } = s
   const body = interiorBody(
@@ -106,8 +98,7 @@ export function interiorRequest(s: InteriorSources) {
   const applied = rampAtJump(overrideResistance(resistance, values), s.jump)
   if (applied) body.load.resistance = applied
   if (s.volumeFraction !== undefined) body.tolerances = { volumeFraction: s.volumeFraction }
-  // the record's own coefficient, else the default of its grain form (`recordSensitivity`, which
-  // the API's load-file route reads too); a missing record, what its link carried of it
+  // The record's coefficient, else its grain form's default (`recordSensitivity`, as the API's load-file route reads it).
   const linked = s.linked
   const taken = powder
     ? recordSensitivity(powder)

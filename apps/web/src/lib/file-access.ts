@@ -1,7 +1,4 @@
-/**
- * File actions on user data files: the File System Access API where the browser has it
- * (Chromium), download and file input elsewhere.
- */
+/** The File System Access API where the browser has it (Chromium), download and file input elsewhere. */
 import { download } from './download.ts'
 import { loadFileFormats } from './load-file-formats.ts'
 import { folderFileName } from './user-file-names.ts'
@@ -103,10 +100,7 @@ export async function readHandleText(handle: FileSystemFileHandle) {
   }
 }
 
-/**
- * Writes record `id` as `name` into the folder, or as `<stem>-2.json` and so on when another record
- * holds that name; undefined, nothing written, when `allow` refuses the file's current text.
- */
+/** Another record's name gets `<stem>-2.json` and on; nothing is written when `allow` refuses the current text. */
 export async function saveToFolder(
   folder: FileSystemDirectoryHandle,
   name: string,

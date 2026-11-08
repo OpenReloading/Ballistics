@@ -66,10 +66,7 @@ export const rangeOf = (spec: FieldSpec): NumberRange => ({
   integer: spec.integer,
 })
 
-/**
- * Field state from canonical text (a point as the decimal mark, what the app stores and
- * generates). Text a person typed goes through {@link typedFieldValue}.
- */
+/** Canonical text has a point as the decimal mark; typed text goes through {@link typedFieldValue}. */
 export function fieldValueFromText(q: Quantity, system: UnitSystem, text: string): FieldValue {
   const x = q === 'twist' ? (parseTwist(text) ?? Number.NaN) : Number(text)
   return {
@@ -78,10 +75,7 @@ export function fieldValueFromText(q: Quantity, system: UnitSystem, text: string
   }
 }
 
-/**
- * Field state from text a person typed or pasted: either decimal mark is read ({@link parseNumber}).
- * The state's text is the canonical form; text that is no number stays as typed, with no value.
- */
+/** Either decimal mark is read ({@link parseNumber}); text that is no number stays as typed, with no value. */
 export function typedFieldValue(
   q: Quantity,
   system: UnitSystem,
@@ -130,18 +124,10 @@ export function siValues(fields: Fields): Record<string, number | undefined> {
   return Object.fromEntries(Object.entries(fields).map(([k, f]) => [k, f.si]))
 }
 
-/**
- * The text of a spec's `label` or `help` in the language of `t`. A spec marks its texts as messages
- * where it is defined, so the catalogue has them.
- */
+/** A spec marks its texts as messages where it is defined, so the catalogue has them. */
 export const specText = (t: Translator['t'], text: string) => t(text as Message)
 
-/**
- * The validation message of a field in the language of `t` (English without one), undefined when
- * valid. `min` and `max` are inclusive bounds in display units, as the HTML attributes. The message
- * names the unit of `shown`, the units the field shows (its own unit after an inline switch), not
- * the Settings.
- */
+/** Bounds inclusive in display units, as the HTML attributes; the message names the field's own unit, not the Settings. */
 export function fieldError(
   spec: FieldSpec,
   value: FieldValue | undefined,

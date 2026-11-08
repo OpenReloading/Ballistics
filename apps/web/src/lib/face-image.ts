@@ -1,8 +1,4 @@
-/**
- * Image steps of the target face search: grey levels on a coarse grid,
- * the black area by a sweep of thresholds, the edge of an ellipse refined along its normals, and the
- * Hessian ridge map of the ring lines. Pure: no React, DOM or Next.js.
- */
+/** Image steps of the target face search; pure, no React, DOM or Next.js. */
 import { conicOf, type Ellipse, ellipsePoint, meanRadius, ransacEllipse } from './ellipse.ts'
 import type { RgbaImage } from './image.ts'
 import { nth } from './nth.ts'
@@ -203,11 +199,7 @@ const MAX_CHROMA = 50
 /** A black area's minor over its major axis is at least this (a face tilted by about 70 degrees). */
 const MIN_ASPECT = 0.3
 
-/**
- * The dark components (grey level under `t`, 0 to 255) among the five largest of at least `minArea`
- * grid px, filled, and how well each is an ellipse. A component cut by the photo's edge is fitted
- * to its edge inside the photo.
- */
+/** A component the photo's edge cuts is fitted to its edge inside the photo. */
 function blobsAt(grid: Grid, t: number, minArea: number): Blob[] {
   const { width: w, height: h, grey: g } = grid
   const mask = new Uint8Array(w * h)
@@ -315,10 +307,7 @@ function isBlackArea(grid: Grid, { lab, k, box: b, area }: Component, m: Moments
   return Math.sqrt(m.l2 / m.l1) >= MIN_ASPECT
 }
 
-/**
- * Dark share (grey level under `t`) of the filled pixels within 0.8 to 1.05 of the ellipse `e`: a
- * black area is dark to its edge (white ring lines cut it into annuli), the closed line of a ring is not.
- */
+/** A black area is dark to its edge, while a ring's closed line is not. */
 function rimDarkness(grid: Grid, t: number, f: Filled, e: Ellipse): number {
   const { width: w, height: h, grey: g } = grid
   const c = conicOf(e)
@@ -335,11 +324,7 @@ function rimDarkness(grid: Grid, t: number, f: Filled, e: Ellipse): number {
   return total ? darkRim / total : 0
 }
 
-/**
- * The blob of a filled component: a robust ellipse through its outline, else its moment ellipse,
- * rough. A component cut by the grid's border is fitted to its outline inside the grid, needs half
- * of the ellipse there and its centre inside, and has no moment ellipse: undefined otherwise.
- */
+/** A component the grid's border cuts needs half its ellipse and its centre inside, and has no moment ellipse. */
 function blobOf(grid: Grid, t: number, f: Filled, m: Moments): Blob | undefined {
   const { n } = m
   const { width: w, height: h } = grid
@@ -418,13 +403,7 @@ export function shareInside(e: Ellipse, w: number, h: number): number {
   return inside / total
 }
 
-/**
- * The black area: nine thresholds between the 2nd and the 98th percentile of the grey levels, the
- * compact dark components (also those the photo's edge cuts), filled, each fitted by a robust ellipse
- * (single Otsu failed on shadow and glare). The distinct candidates, best first: the area times
- * how well the outline fits, with a small bonus for the thresholds at which the same ellipse
- * stands.
- */
+/** Nine thresholds and robust ellipse fits, because a single Otsu threshold failed on shadow and glare. */
 export function blackAreas(grid: Grid): Array<Blob & { stable: number }> {
   const lo = quantile(grid.grey, 0.02)
   const hi = quantile(grid.grey, 0.98)
@@ -472,10 +451,7 @@ function sameEllipse(a: Ellipse, b: Ellipse): boolean {
   )
 }
 
-/**
- * Share of the points in the photo 1.1 to 1.3 times out from the ellipse that are lighter than `t`:
- * the paper about a black area, not the black about a disc inside it.
- */
+/** The paper about a black area, not the black about a disc inside it. */
 function paperAround(grid: Grid, e: Ellipse, t: number): number {
   let [light, total] = [0, 0]
   for (let k = 0; k < 72; k++)
@@ -524,12 +500,7 @@ function rankDistinct(grid: Grid, all: readonly Blob[]): Array<Blob & { stable: 
   return out.slice(0, 2)
 }
 
-/**
- * The edge of an ellipse refined along its normals: on each of 180 rays the position within
- * `reach` (a share of the radius) where the grey level crosses halfway between the inside and the
- * outside and stays on the paper side, then a robust ellipse fit to those edge points. Undefined
- * when the rays do not agree on an edge.
- */
+/** 180 rays, each crossing halfway between inside and outside on the paper side; undefined when they disagree. */
 export function refineEdge(
   grid: Grid,
   start: Ellipse,
@@ -592,10 +563,7 @@ function paperSideHolds(at: (o: number) => number, o: number, span: number, mid:
   return above >= 0.7 * total
 }
 
-/**
- * The edge on the normal of `start` at parameter `t` (rad), within `span` grid px of the ellipse,
- * and the median grey levels inside and outside; undefined without a contrast or a crossing.
- */
+/** Undefined without a contrast or a crossing. */
 function edgeAlongRay(
   grid: Grid,
   start: Ellipse,
@@ -734,14 +702,7 @@ type Ridges = {
   components: Point[][]
 }
 
-/**
- * Hessian ridges of the ring lines (dark lines on light paper and light lines on black), at the
- * scales `sigmas` (grid px): the stronger eigenvalue of the Hessian, scaled by sigma squared,
- * where the other one is under a third of it, thinned along the normal, with the grey levels
- * `2 sigma` to both sides lower (or higher) than the line: a step edge gives one side only.
- * Hysteresis between `low` and `high` times the 99th percentile of the strength, then 8-connected
- * components of at least `minLength` pixels. Only pixels where `searchMask` is set are looked at.
- */
+/** Both sides of a line must differ from it, so a step edge gives none; hysteresis, then components of at least `minLength`. */
 export function ridges(
   grid: Grid,
   searchMask: Uint8Array,
@@ -768,11 +729,7 @@ type Hessian = {
   sigmaAt: Float32Array
 }
 
-/**
- * Per pixel the strongest line response over the scales (the dominant Hessian eigenvalue times
- * sigma squared, where the other is under a third of it), its normal, its sign (1 bright, -1 dark)
- * and its sigma.
- */
+/** Dominant Hessian eigenvalue times sigma squared where the other is under a third of it. */
 function hessianStrength(grid: Grid, searchMask: Uint8Array, sigmas: number[]) {
   const n = grid.width * grid.height
   const acc = {
@@ -858,10 +815,7 @@ function parabolaOffset(m1: number, v: number, p1: number): number {
   return den < 0 ? clamp((0.5 * (m1 - p1)) / den, -0.5, 0.5) : 0
 }
 
-/**
- * The response thinned along the normal to lines (both sides at 2 sigma lower or higher, not a
- * step): `thin` is 2 at or above `high`, 1 at or above `low`; `sub` holds the sub-pixel positions.
- */
+/** Both sides at 2 sigma lower or higher, so not a step; `thin` 2 at `high`, 1 at `low`. */
 function thinRidges(
   grid: Grid,
   { strength, normalX, normalY, sgn, sigmaAt }: Hessian,

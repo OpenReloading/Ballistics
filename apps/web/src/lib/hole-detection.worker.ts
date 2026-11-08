@@ -1,10 +1,4 @@
-/**
- * Web Worker of the target editor: decodes the photo the editor posts (a Blob from the browser
- * store; nothing leaves the browser), downscales it so a hole is about 32 px across (`createImageBitmap`
- * with a resize), cuts the region with its margin (the whole turned photo without a region) and runs
- * `findHoles`, `autoDetect` or `detectFromExample` on it (`apps/docs/docs/models/hole-detection.md`),
- * or looks for the target face in the whole photo. Points are on the photo as turned on screen.
- */
+/** Decodes and downscales the posted photo so a hole is about 32 px across (`apps/docs/docs/models/hole-detection.md`); nothing leaves the browser. */
 
 import { fromSi } from '@open-reloading/schema'
 import { errorText } from './error-text.ts'
@@ -29,10 +23,7 @@ const FACE_LONG = 2000
 
 const post = (m: WorkerReply) => self.postMessage(m)
 
-/**
- * The turned photo's pixels from (x0, y0) to (x1, y1) (photo px) at `k` times its size, orientation
- * applied as the browser shows it; outside the photo white. `k` below 1 resizes while decoding.
- */
+/** Orientation applied as the browser shows it, white outside the photo; `k` below 1 resizes while decoding. */
 async function pixels(p: Photo, x0: number, y0: number, x1: number, y1: number, k = 1) {
   const width = Math.round(p.width * k)
   let bitmap = await createImageBitmap(p.photo, {
@@ -126,8 +117,7 @@ async function handleDetect(
     { x: t.x, y: t.y },
     { x: t.x + t.w, y: t.y + t.h },
   ]
-  // a hole about twice WORK_DIAMETER px across: the photo is resized while it loads, and the
-  // module averages it down to the working size (a coarse and a full one for auto detection)
+  // Resized while loading to a hole about twice WORK_DIAMETER px; the module averages down to the working size.
   const k = Math.min(1, (2 * WORK_DIAMETER) / (r.holeDiameter * r.pxPerM))
   // the face's outline on the photo, grown by half a hole
   const holeMm = fromSi('length', r.holeDiameter)

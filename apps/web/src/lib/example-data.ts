@@ -6,12 +6,7 @@ import type { LadderDirection } from './seating-ladder.ts'
 import type { ManualKey, ShotKey, zeroKeys } from './trajectory-input.ts'
 import { kilogramsPerGrain, unitsOf, waterDensityGramsPerCm3 } from './units.ts'
 
-/**
- * The .308 Win. example of both forms: an invented load, the demo powder under the demo
- * 168 gr bullet at COAL 71.12 mm, in a 24 in barrel. Record values are embedded as stored (mm, g,
- * cm³, bar) with their record ids; `apps/web/test/examples.test.ts` checks them against the committed
- * records and runs the interior example through ballistics.
- */
+/** An invented load; `apps/web/test/examples.test.ts` checks the embedded values against the committed records. */
 export const exampleRecords = {
   /** The id, mass and G7 BC, then the shape fields as the seating preview reads them (`bulletDimensions`). */
   bullet: {
@@ -65,10 +60,7 @@ const { bullet, spec, case: brass, powder } = exampleRecords
 
 /** The invented load: start and maximum charge, g. Barrel, sight height and zero are example choices. */
 const published = { start: 2.4, max: 2.55 }
-/**
- * The example charge, g: the start charge, with a ladder of 5 steps of 0.2 gr down from it. The
- * barrel is a common 24 in (609.6 mm) rifle barrel.
- */
+/** The start charge, with 5 steps of 0.2 gr down; a common 24 in barrel. */
 const choices = {
   barrel: 609.6,
   sightHeight: 50,
@@ -180,10 +172,7 @@ export const interiorSources = [
   `Charge ladder: 5 steps of 0.2 gr down from the start charge ${published.start} g (example choice)`,
 ]
 
-/**
- * The example's rifle: built in, never stored; the firearm library lists it read-only and the
- * example load selects it. Its barrel and twist are the example's (`choices.barrel`, `spec.u`).
- */
+/** Built in, never stored: the firearm library lists it read-only. */
 export const exampleFirearm = {
   kind: 'firearm',
   id: '3b7e6d1c-5a2f-4e0b-8c94-1d6f0a9b2e57',

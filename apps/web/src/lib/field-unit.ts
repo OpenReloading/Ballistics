@@ -1,11 +1,7 @@
 import { type FieldValue, fieldValueFromText } from './field-spec.ts'
 import { type Quantity, roundedFieldText, type Unit, type UnitSystem, unitsOf } from './units.ts'
 
-/**
- * A field's own unit, set by its inline switch and held in memory: never stored, and dropped
- * when the page's units change. The units store makes a new `UnitSystem` for each choice, so the
- * system the pick was made under tells whether it is current.
- */
+/** Never stored, dropped when the page's units change; the units store makes a new `UnitSystem` per choice, which tells a stale pick. */
 export type UnitPick = {
   id: string
   /** The page units the pick was made under. */
@@ -17,10 +13,7 @@ export type UnitPick = {
 /** The units of a quantity as [id, unit] pairs. */
 export const unitList = (q: Quantity) => Object.entries(unitsOf[q] as Record<string, Unit>)
 
-/**
- * `pick` while the page units are still the ones it was made under, else none: kept in state, a pick
- * would come back when the same `UnitSystem` object returns after another one.
- */
+/** Kept in state, a pick would come back when the same `UnitSystem` object returns after another one. */
 export const livePick = (pick: UnitPick | undefined, system: UnitSystem) =>
   pick?.system === system ? pick : undefined
 
@@ -52,10 +45,7 @@ export function pickedText(
   return pick?.typed?.si === value.si ? pick.typed.text : roundedFieldText(q, shown, value.si)
 }
 
-/**
- * Text typed in the picked unit `shown`: the SI value from that unit, the text for the page unit
- * `system` beside it so the form's own checks keep reading its unit.
- */
+/** With the page-unit text beside it, so the form's own checks keep reading its unit. */
 export function pickedTyped(q: Quantity, system: UnitSystem, shown: UnitSystem, text: string) {
   const v = fieldValueFromText(q, shown, text)
   if (v.si === undefined) return { value: v }

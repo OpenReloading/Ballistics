@@ -1,10 +1,4 @@
-/**
- * A face found on a photo as the calibration of a target sheet:
- * the square about the outer ring as the rectangle reference (the photo's perspective and its scale
- * in one), the face centre as the origin, no turn of the target axes, and the face and its event as
- * the group's ring scoring choice; and the face of a group as the detection takes it. Pure: no
- * React, DOM or Next.js.
- */
+/** The outer ring's square gives perspective and scale in one; pure, no React, DOM or Next.js. */
 import { type ShotGroup, type TargetFace, type TargetSheet, toSi } from '@open-reloading/schema'
 import { english } from '../i18n/translate.ts'
 import { type FederationData, mappingOf } from './face-disciplines.ts'
@@ -58,11 +52,7 @@ function faceReference(found: FoundFace): TargetSheet['references'][number] {
   }
 }
 
-/**
- * The group with the found face as its ring scoring choice: the same face keeps its event and marks,
- * another one starts afresh with the event the user chose, else the group's discipline when it
- * scores on this face, else an event at the group's distance (`eventAt`), else none.
- */
+/** The same face keeps its event and marks; another starts afresh with the user's event, the discipline or `eventAt`. */
 function groupFaceChoice(g: ShotGroup, found: FoundFace, scope: FaceScope): ShotGroup {
   if (found.id === undefined) return g
   if (g.face?.id === found.id && !found.event) return g
@@ -74,11 +64,7 @@ function groupFaceChoice(g: ShotGroup, found: FoundFace, scope: FaceScope): Shot
   return { ...g, face: { id: found.id, ...(event && { event }), ...(marks && { marks }) } }
 }
 
-/**
- * The face's event at `distance` (m): of the federation the user chose, else of the face's own
- * federation, else of the one federation that shoots the face there. Undefined when none is,
- * or when several other federations are: no federation is guessed.
- */
+/** Undefined when no federation shoots it there or several others do: no federation is guessed. */
 function eventAt(distance: number, found: FoundFace, { federation }: FaceScope) {
   const near = (found.events ?? []).filter((e) => Math.abs(e.distance - distance) < 0.5)
   const of = (e: (typeof near)[number]) => e.federation ?? found.federation
@@ -88,14 +74,7 @@ function eventAt(distance: number, found: FoundFace, { federation }: FaceScope) 
   return new Set(near.map(of)).size === 1 ? nth(near, 0).id : undefined
 }
 
-/**
- * The face of `group` on the photo for the hole detection: photo px (the calibration's) to face mm,
- * x right and y up from the face centre, with its radii in mm. Only where the face lies on the sheet
- * as known: fitted to ring marks, or the sheet was calibrated on the face (its rectangle is the square
- * about the outer ring and the origin its centre), or centred on a point of aim the user set. A face
- * chosen for scoring on a sheet calibrated otherwise is centred on the origin, which may be anywhere:
- * no geometry then.
- */
+/** Only where the face lies on the sheet as known; a face on a sheet calibrated otherwise is centred on an origin that may be anywhere. */
 export function faceGeometry(o: {
   sheet: TargetSheet
   group: ShotGroup | undefined
