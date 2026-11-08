@@ -1,3 +1,2 @@
-// The clock the interior task samples with, which every runtime this package targets has and its ES library lacks.
-// The file stays in this package's compile: it is not emitted, and test/tsconfig.json, which has Node's types, leaves it out.
+// The clock the interior task samples with, which every target runtime has and the ES library lacks.
 declare var performance: { now(): number }

@@ -16,7 +16,7 @@ describe('errors across the thread boundary', () => {
     const t = roundTrip(truing)
     expect(t).toBeInstanceOf(TruingError)
     expect(t).toMatchObject({
-      message: truing.message,
+      message: 'truing: ill-conditioned (step limit)',
       reason: 'ill-conditioned',
       conditionNumber: Number.POSITIVE_INFINITY,
       unresolved: [1],

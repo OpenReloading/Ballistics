@@ -354,7 +354,7 @@
                 "message": "drawing-core-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its core folder imports only the folders core."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|catalog|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|api|drawing|cli)/(src|dist)|packages|apps)/",
                 "message": "drawing-core-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its core folder imports only the folders core."
               },
               {
@@ -383,7 +383,7 @@
                 "message": "drawing-cartridge-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its cartridge folder imports only the folders core, cartridge."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|catalog|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|api|drawing|cli)/(src|dist)|packages|apps)/",
                 "message": "drawing-cartridge-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its cartridge folder imports only the folders core, cartridge."
               },
               {
@@ -412,7 +412,7 @@
                 "message": "drawing-bullet-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its bullet folder imports only the folders core, bullet."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|catalog|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|api|drawing|cli)/(src|dist)|packages|apps)/",
                 "message": "drawing-bullet-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its bullet folder imports only the folders core, bullet."
               },
               {
@@ -441,7 +441,7 @@
                 "message": "drawing-seating-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its seating folder imports only the folders core, cartridge, bullet, seating."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|catalog|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|api|drawing|cli)/(src|dist)|packages|apps)/",
                 "message": "drawing-seating-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its seating folder imports only the folders core, cartridge, bullet, seating."
               },
               {
@@ -470,7 +470,7 @@
                 "message": "drawing-target-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its target folder imports only the folders target."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|catalog|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|api|drawing|cli)/(src|dist)|packages|apps)/",
                 "message": "drawing-target-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its target folder imports only the folders target."
               },
               {
@@ -554,7 +554,7 @@
                 "message": "api-imports-logic-catalog-schema-only: packages/api depends on the logic packages (units, statistics, ballistics, shot-groups), catalog, schema and use-cases."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|catalog|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|api|drawing|cli)/(src|dist)|packages|apps)/",
                 "message": "api-imports-logic-catalog-schema-only: packages/api depends on the logic packages (units, statistics, ballistics, shot-groups), catalog, schema and use-cases."
               }
             ]
@@ -597,7 +597,7 @@
                 "message": "cli-imports-logic-catalog-drawing-schema-only: packages/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), catalog, drawing, schema and use-cases, and of @open-reloading/api only the compute and catalogue entries the browser runs, and of @open-reloading/tools only the catalog reader."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|catalog|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|api|drawing|cli)/(src|dist)|packages|apps)/",
                 "message": "cli-imports-logic-catalog-drawing-schema-only: packages/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), catalog, drawing, schema and use-cases, and of @open-reloading/api only the compute and catalogue entries the browser runs, and of @open-reloading/tools only the catalog reader."
               }
             ]

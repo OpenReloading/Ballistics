@@ -61,7 +61,7 @@ export type Task =
     }
   | { kind: 'chargeSolve'; load: InteriorLoad; target: ChargeTarget; options: ChargeSolverOptions }
 
-/** Result type of each `Task` kind: the return type of the ballistics function that runs it. */
+/** Result type of each `Task` kind: the return type of the ballistics function that runs it; `interiorM3` holds the run, its pressure range and its sampled band. */
 export interface Results {
   trajectory: ReturnType<typeof trajectory>
   truingMuzzleVelocity: ReturnType<typeof trueMuzzleVelocity>
@@ -77,14 +77,12 @@ export interface Results {
 }
 
 const runners: { [K in Task['kind']]: (t: Extract<Task, { kind: K }>) => Results[K] } = {
-  trajectory: (t: Extract<Task, { kind: 'trajectory' }>) => trajectory(...t.args),
-  truingMuzzleVelocity: (t: Extract<Task, { kind: 'truingMuzzleVelocity' }>) =>
-    trueMuzzleVelocity(...t.args),
-  truingDrag: (t: Extract<Task, { kind: 'truingDrag' }>) => trueDrag(...t.args),
-  rangeStringsPlan: (t: Extract<Task, { kind: 'rangeStringsPlan' }>) =>
-    comparePlanCandidates(...t.args),
-  rangeStringsFit: (t: Extract<Task, { kind: 'rangeStringsFit' }>) => fitTruingStrings(...t.args),
-  interiorM3: (t: Extract<Task, { kind: 'interiorM3' }>) => {
+  trajectory: (t) => trajectory(...t.args),
+  truingMuzzleVelocity: (t) => trueMuzzleVelocity(...t.args),
+  truingDrag: (t) => trueDrag(...t.args),
+  rangeStringsPlan: (t) => comparePlanCandidates(...t.args),
+  rangeStringsFit: (t) => fitTruingStrings(...t.args),
+  interiorM3: (t) => {
     const result = interior(t.load, t.options)
     // the pressure range is computed only for a valid result
     const range = result.valid
@@ -101,8 +99,7 @@ const runners: { [K in Task['kind']]: (t: Extract<Task, { kind: K }>) => Results
         : undefined
     return { result, range, sampled }
   },
-  chargeSolve: (t: Extract<Task, { kind: 'chargeSolve' }>) =>
-    solveCharge(t.load, t.target, t.options),
+  chargeSolve: (t) => solveCharge(t.load, t.target, t.options),
 }
 
 /** Runs `task` in this thread and returns the result of the ballistics function of its `kind`. */
@@ -175,7 +172,7 @@ export interface ComputeRunner {
   close(): Promise<void>
 }
 
-/** Runs tasks in this thread; for tests that mock ballistics. */
+/** Runs tasks in this thread: the command line, the API's contract document and static files, and tests. */
 export const inlineRunner: ComputeRunner = {
   run: async (task) => runTask(task),
   close: async () => {},

@@ -195,6 +195,14 @@
     "source": "import type { SpecValue } from '../../../apps/web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
     "rules": ["cli-imports-logic-catalog-drawing-schema-only"]
   },
+  "packages/api/src/into-use-cases.ts": {
+    "source": "import { ComputeBusy } from '../../use-cases/src/tasks.ts'\nexport { ComputeBusy }",
+    "rules": ["api-imports-logic-catalog-schema-only"]
+  },
+  "packages/ballistics/src/into-use-cases.ts": {
+    "source": "import { runTask } from '../../use-cases/src/index.ts'\nexport { runTask }",
+    "rules": ["ballistics-imports-units-and-statistics"]
+  },
   "packages/api/src/web.ts": {
     "source": "import type { SpecValue } from '../../../apps/web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
     "rules": ["api-imports-logic-catalog-schema-only"]

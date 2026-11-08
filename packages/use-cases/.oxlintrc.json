@@ -15,22 +15,29 @@
                   "@*/*",
                   "@*/*/**",
                   "!@open-reloading/units",
+                  "!@open-reloading/units/**",
                   "!@open-reloading/statistics",
+                  "!@open-reloading/statistics/**",
                   "!@open-reloading/schema",
+                  "!@open-reloading/schema/**",
                   "!@open-reloading/ballistics",
+                  "!@open-reloading/ballistics/**",
                   "!@open-reloading/shot-groups",
+                  "!@open-reloading/shot-groups/**",
                   "!@open-reloading/catalog",
-                  "!@open-reloading/importers"
+                  "!@open-reloading/catalog/**",
+                  "!@open-reloading/importers",
+                  "!@open-reloading/importers/**"
                 ],
-                "message": "use-cases-imports-logic-only: packages/use-cases has no framework and no I/O: it imports the logic packages below it, catalog, importers, zod and its own files."
+                "message": "use-cases-imports-logic-only: packages/use-cases has no framework and no I/O: it imports units, statistics, schema, ballistics, shot-groups, catalog, importers, zod and its own files."
               },
               {
-                "regex": "^([^.@z]|z([^o]|o([^d]|d.)))",
-                "message": "use-cases-imports-logic-only: packages/use-cases has no framework and no I/O: it imports the logic packages below it, catalog, importers, zod and its own files."
+                "regex": "^([^.@z]|z([^o]|o([^d]|d[^/])))",
+                "message": "use-cases-imports-logic-only: packages/use-cases has no framework and no I/O: it imports units, statistics, schema, ballistics, shot-groups, catalog, importers, zod and its own files."
               },
               {
                 "regex": "^(\\.\\./)+[^.]",
-                "message": "use-cases-imports-logic-only: packages/use-cases has no framework and no I/O: it imports the logic packages below it, catalog, importers, zod and its own files."
+                "message": "use-cases-imports-logic-only: packages/use-cases has no framework and no I/O: it imports units, statistics, schema, ballistics, shot-groups, catalog, importers, zod and its own files."
               }
             ]
           }
