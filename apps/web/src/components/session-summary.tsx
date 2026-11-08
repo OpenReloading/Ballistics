@@ -10,7 +10,6 @@ import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
 import { msg } from '../i18n/translate.ts'
 import {
-  chronoErrorText,
   chronoFileBytes,
   exampleCsv,
   exampleSessionFileName,
@@ -20,7 +19,7 @@ import {
   sessionCsvBlob,
   sessionJsonBlob,
 } from '../lib/chrono.ts'
-import { chronoDiagnosticText } from '../lib/chrono-diagnostics.ts'
+import { chronoDiagnosticText, chronoErrorText } from '../lib/chrono-diagnostics.ts'
 import { dayText, localDay } from '../lib/dates.ts'
 import { download } from '../lib/download.ts'
 import { stringName } from '../lib/string-name.ts'

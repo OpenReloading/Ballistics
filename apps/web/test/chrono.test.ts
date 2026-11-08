@@ -3,7 +3,6 @@ import { shotViewSheetEnglish } from '../../../packages/importers/test/fixtures.
 import { xlsx } from '../../../packages/importers/test/xlsx.ts'
 import { english } from '../src/i18n/translate.ts'
 import {
-  chronoErrorText,
   chronoFileBytes,
   exampleCsv,
   exampleSessionFileName,
@@ -18,6 +17,7 @@ import {
   templateCsv,
   templateJson,
 } from '../src/lib/chrono.ts'
+import { chronoErrorText } from '../src/lib/chrono-diagnostics.ts'
 import { stringName } from '../src/lib/string-name.ts'
 import { stringStats } from '../src/lib/string-stats.ts'
 import { unitsOf } from '../src/lib/units.ts'
