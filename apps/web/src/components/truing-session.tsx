@@ -363,13 +363,13 @@ export function TruingSession({ nominal, system }: { nominal: TruingNominal; sys
       </p>
       {planned && 'problem' in planned && (
         <p role="alert" className="error-text">
-          {t('Plan: {problem}', { problem: planned.problem })}
+          {t('Plan: {problem}', { problem: planned.problem(t) })}
         </p>
       )}
       {planLines && <Statuses lines={planLines} fit={false} />}
       {fitted && 'problem' in fitted && (
         <p role="alert" className="error-text">
-          {t('Fit: {problem}', { problem: fitted.problem })}
+          {t('Fit: {problem}', { problem: fitted.problem(t) })}
         </p>
       )}
       {fitted && 'answer' in fitted && fitLines && (

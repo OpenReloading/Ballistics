@@ -608,26 +608,26 @@ describe('circular against elliptical CEP by axis ratio', () => {
 
 describe('groupStatistics: inputs, signs and limits', () => {
   it('names each invalid input', () => {
-    const level = 'confidence level must lie in (0, 1)'
+    const level = 'confidence-level'
     for (const confidenceLevel of [0, 1])
       expect(() => groupStatistics({ shots: five, distance: 100, confidenceLevel })).toThrow(level)
     expect(() => pooledGroupStatistics([{ shots: five, distance: 100 }], 1)).toThrow(level)
-    expect(() => groupStatistics({ shots: five, distance: 0 })).toThrow('distance must be positive')
+    expect(() => groupStatistics({ shots: five, distance: 0 })).toThrow(/^distance$/)
     expect(() =>
       pooledGroupStatistics([{ shots: [{ x: 0, y: Number.NaN }], distance: 100 }]),
-    ).toThrow('shot coordinates must be finite')
+    ).toThrow('shot-coordinates')
     expect(() =>
       groupStatistics({ shots: [{ x: 0, y: 0, velocity: Number.NaN }], distance: 100 }),
-    ).toThrow('shot velocity must be finite')
+    ).toThrow('shot-velocity')
     expect(() =>
       groupStatistics({ shots: five, distance: 100, aim: { x: 0, y: Number.NaN } }),
-    ).toThrow('aim must be finite')
+    ).toThrow(/^aim$/)
     const s = groupStatistics({ shots: five, distance: 100 })
     for (const coverage of [0, 1]) {
-      expect(() => dispersionEllipse(s, coverage)).toThrow('coverage must lie in (0, 1)')
-      expect(() => predictionEllipse(s, coverage)).toThrow('coverage must lie in (0, 1)')
+      expect(() => dispersionEllipse(s, coverage)).toThrow(/^coverage$/)
+      expect(() => predictionEllipse(s, coverage)).toThrow(/^coverage$/)
     }
-    expect(() => subtendedAngle(0.1, 0)).toThrow('distance must be positive')
+    expect(() => subtendedAngle(0.1, 0)).toThrow(/^distance$/)
   })
 
   it('measures width, height and aim offset of a group off the origin', () => {

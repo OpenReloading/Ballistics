@@ -21,7 +21,6 @@ test('a value changed over its record is marked and one click gives the record v
   await expect(reset('Diameter')).toHaveCount(1)
   await reset('Diameter').click()
   await expect(diameter).toHaveValue(record)
-  await expect(diameter).toHaveClass(/field-default/)
   await expect(reset('Diameter')).toHaveCount(0)
 
   // a Cartridge card value that follows the cartridge record until typed
@@ -31,7 +30,7 @@ test('a value changed over its record is marked and one click gives the record v
   await expect(reset('Bore diameter')).toHaveCount(1)
   await reset('Bore diameter').click()
   await expect(bore).toHaveValue(followed)
-  await expect(bore).toHaveClass(/field-default/)
+  await expect(reset('Bore diameter')).toHaveCount(0)
 
   // a Powder card model parameter
   await form.getByRole('button', { name: 'Show' }).click()
@@ -92,7 +91,10 @@ test('picking another bullet replaces the changed values of the card and says ho
   const form = loadForm(page)
   const diameter = form.getByRole('textbox', { name: /^Diameter/ })
   const length = form.getByRole('textbox', { name: /^Length/ })
-  await expect(diameter).toHaveClass(/field-default/)
+  // a value typed over its record offers its reset; a record value offers none
+  const reset = (label: string) =>
+    form.getByRole('button', { name: new RegExp(`^Reset ${label} to the record value`) })
+  await expect(reset('Diameter')).toHaveCount(0)
   await diameter.fill('7.84')
   await length.fill('31.00')
   await form.getByRole('combobox', { name: 'Search bullets by manufacturer and name' }).fill('150')
@@ -101,8 +103,8 @@ test('picking another bullet replaces the changed values of the card and says ho
     .first()
     .click()
   await expect(form.getByText('The new record replaced 2 changed values.')).toBeVisible()
-  await expect(diameter).toHaveClass(/field-default/)
-  await expect(length).toHaveClass(/field-default/)
+  await expect(reset('Diameter')).toHaveCount(0)
+  await expect(reset('Length')).toHaveCount(0)
   // the note stays until the next pick or a reset
   await form.getByRole('combobox', { name: 'Search bullets by manufacturer and name' }).fill('168')
   await page
@@ -143,7 +145,7 @@ test('the base form and its dimensions are typed over the record, change the vol
   const seated = await settled()
   await more().click()
   await expect(base).toHaveValue('boat-tail')
-  await expect(tail).toHaveClass(/field-default/)
+  await expect(reset('Boat-tail length')).toHaveCount(0)
   const recorded = await tail.inputValue()
 
   // a typed boat-tail length moves the volume, a reset brings it back
@@ -198,7 +200,7 @@ test('a typed Pmax is the limit of the readouts, marked as yours, and a reset br
   const reset = form.getByRole('button', { name: /^Reset Pmax to the record value/ })
   const peak = () => page.locator('.result .readout-limits')
   const recorded = await pmax.inputValue()
-  await expect(pmax).toHaveClass(/field-default/)
+  await expect(reset).toHaveCount(0)
   await form.getByLabel(/^Charge mass/).press('Control+Enter')
   await expect(peak().first()).toContainText('of CIP Pmax', { timeout: 15_000 })
 

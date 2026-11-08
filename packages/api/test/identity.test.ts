@@ -1,11 +1,13 @@
 import { canonicalJson } from '@open-reloading/schema'
+import {
+  chargeTargetExample,
+  interiorExample,
+  loadFileExample,
+  trajectoryExample,
+} from '@open-reloading/use-cases'
 import { describe, expect, it } from 'vitest'
 import { buildCatalogue } from '../src/catalogue/build.ts'
 import { openCatalogue } from '../src/catalogue/open.ts'
-import { chargeTargetExample } from '../src/compute/charge-schema.ts'
-import { trajectoryExample } from '../src/compute/exterior-schema.ts'
-import { interiorExample } from '../src/compute/interior-schema.ts'
-import { loadFileExample } from '../src/compute/load-file-example.ts'
 import { sha256 } from '../src/hash.ts'
 import { API_PREFIX, API_VERSION } from '../src/version.ts'
 import { bundle } from './fixtures.ts'

@@ -1,10 +1,10 @@
 import { readdirSync, readFileSync } from 'node:fs'
-import { advisoryText } from '@open-reloading/api/advisories'
 import { buildOpenApi } from '@open-reloading/api/openapi'
 import { pressureMethod } from '@open-reloading/schema'
+import { advisoryText } from '@open-reloading/use-cases'
 import { describe, expect, it } from 'vitest'
-import { limitCheck, type Warning } from '../../../packages/api/dist/compute/limits.js'
-import { missingValuesAnswer } from '../../../packages/api/dist/compute/load-file.js'
+import { limitCheck, type Warning } from '../../../packages/use-cases/dist/limits.js'
+import { missingValuesAnswer } from '../../../packages/use-cases/dist/load-file.js'
 import de from '../src/i18n/de.json'
 import { type Catalogue, english, translator } from '../src/i18n/translate.ts'
 import {
@@ -280,7 +280,7 @@ describe('the warnings of an interior answer', () => {
   it('writes the load ratio warning with the words of the API', () => {
     // the warning of a load file run is built inside a function that needs a catalogue: its words are read from the source
     const source = readFileSync(
-      new URL('../../../packages/api/src/compute/simulate.ts', import.meta.url),
+      new URL('../../../packages/use-cases/src/simulate.ts', import.meta.url),
       'utf8',
     )
     expect(source).toContain(`solid fill \${fill.toFixed(2)} is above \${solidFillLimit}`)
@@ -339,8 +339,6 @@ const sources = [
       .filter((f) => f.endsWith('.ts'))
       .map((f) => `${pkg}/src/${f}`),
   ),
-  // the rest of shot-groups raises typed issues only
-  'shot-groups/src/group-statistics.ts',
 ]
 
 /** Files whose messages are no fixed text, each with the reason. */
@@ -368,17 +366,17 @@ const dynamicArguments: { file: string; arg: string; reason: string }[] = [
     reason: 'the sentence is a variable with its own template',
   },
   {
-    file: 'api/src/compute/limits.ts',
+    file: 'use-cases/src/limits.ts',
     arg: 'exceededMessage(l, range)',
     reason: 'the exceeded-limit message: tested above',
   },
   {
-    file: 'api/src/compute/load-file.ts',
+    file: 'use-cases/src/load-file.ts',
     arg: 'problem',
     reason: 'the text comes from the schema package',
   },
   {
-    file: 'api/src/compute/load-file.ts',
+    file: 'use-cases/src/load-file.ts',
     arg: 'error.message',
     reason: 'the text of a `ValueError`: has its own template',
   },
@@ -386,9 +384,9 @@ const dynamicArguments: { file: string; arg: string; reason: string }[] = [
 
 /** Messages built from parts that a sample value cannot stand for: the tests of the warnings cover them. */
 const compound: { file: string; text: string }[] = [
-  { file: 'api/src/compute/limits.ts', text: 'the simulated peak mean pressure' },
-  { file: 'api/src/compute/simulate.ts', text: 'the model is outside the range it was built for' },
-  { file: 'api/src/compute/load-file.ts', text: 'The load file lacks' },
+  { file: 'use-cases/src/limits.ts', text: 'the simulated peak mean pressure' },
+  { file: 'use-cases/src/simulate.ts', text: 'the model is outside the range it was built for' },
+  { file: 'use-cases/src/load-file.ts', text: 'The load file lacks' },
 ]
 
 /** The end of the string or template literal that starts at `j`, `${}` parts skipped. */
@@ -483,6 +481,8 @@ function scan(sample: string): Found[] {
     for (const match of src.matchAll(calls)) {
       const where = `${file}:${src.slice(0, match.index).split('\n').length}`
       const arg = messageOf(src, match)
+      // a typed issue: `refusal-words.ts` words its code
+      if (arg?.includes("code: '")) continue
       const text = arg === undefined ? undefined : literalText(arg, sample)
       if (text !== undefined) found.push({ where, text })
       else if (

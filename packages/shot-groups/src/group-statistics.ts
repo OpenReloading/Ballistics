@@ -11,9 +11,13 @@ import {
   chiSquareQuantile,
   fQuantileTwoNumeratorDegrees,
   type Interval,
-  need,
+  need as needAny,
   nth,
 } from '@open-reloading/statistics'
+import type { GroupStatisticsIssue } from './issue.ts'
+
+/** `need` with an issue of the group statistics. */
+const need: (ok: boolean, issue: GroupStatisticsIssue) => void = needAny
 
 /** One shot in the target plane, m (x right, y up); `velocity` m/s. */
 export interface GroupShot {
@@ -225,17 +229,20 @@ function confidenceOf(sxx: number, syy: number, df: number, level: number): Grou
 }
 
 function checkLevel(level: number): void {
-  need(level > 0 && level < 1, 'confidence level must lie in (0, 1)')
+  need(level > 0 && level < 1, { code: 'confidence-level', params: {} })
 }
 
 function checkInput(input: GroupInput): void {
-  need(Number.isFinite(input.distance) && input.distance > 0, 'distance must be positive')
+  need(Number.isFinite(input.distance) && input.distance > 0, { code: 'distance', params: {} })
   for (const s of input.shots) {
-    need(Number.isFinite(s.x) && Number.isFinite(s.y), 'shot coordinates must be finite')
-    need(s.velocity === undefined || Number.isFinite(s.velocity), 'shot velocity must be finite')
+    need(Number.isFinite(s.x) && Number.isFinite(s.y), { code: 'shot-coordinates', params: {} })
+    need(s.velocity === undefined || Number.isFinite(s.velocity), {
+      code: 'shot-velocity',
+      params: {},
+    })
   }
   if (input.aim)
-    need(Number.isFinite(input.aim.x) && Number.isFinite(input.aim.y), 'aim must be finite')
+    need(Number.isFinite(input.aim.x) && Number.isFinite(input.aim.y), { code: 'aim', params: {} })
 }
 
 function compassOf(dx: number, dy: number, distance: number): CompassPoint {
@@ -387,7 +394,7 @@ export function dispersionEllipse(
   stats: GroupStatistics,
   coverage: number,
 ): GroupEllipse | undefined {
-  need(coverage > 0 && coverage < 1, 'coverage must lie in (0, 1)')
+  need(coverage > 0 && coverage < 1, { code: 'coverage', params: {} })
   return ellipseAt(stats, Math.sqrt(-2 * Math.log(1 - coverage)))
 }
 
@@ -400,7 +407,7 @@ export function predictionEllipse(
   stats: GroupStatistics,
   coverage: number,
 ): GroupEllipse | undefined {
-  need(coverage > 0 && coverage < 1, 'coverage must lie in (0, 1)')
+  need(coverage > 0 && coverage < 1, { code: 'coverage', params: {} })
   const n = stats.shotCount
   if (n < 3) return undefined
   return ellipseAt(
@@ -411,7 +418,7 @@ export function predictionEllipse(
 
 /** Exact angle, rad, of a segment of `length` centred on the line of sight at `distance` (m): 2 atan(L / 2D). */
 export function subtendedAngle(length: number, distance: number): number {
-  need(distance > 0, 'distance must be positive')
+  need(distance > 0, { code: 'distance', params: {} })
   return 2 * Math.atan(length / (2 * distance))
 }
 

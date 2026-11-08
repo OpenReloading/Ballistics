@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import type { Exact } from './exact.ts'
 import { recordId } from './schemas.ts'
 
 /** A decimal number in a query string; Number() alone would read '' and ' ' as 0 and '0x10' as 16. */
@@ -34,8 +35,7 @@ export const stabilityBounds: Readonly<StabilityBounds> = {
 }
 const bounded = (key: keyof typeof stabilityBounds) =>
   queryNumber(z.number().min(stabilityBounds[key][0]).max(stabilityBounds[key][1]))
-/** Query of `GET /exterior/stability`: SI, bounds in `stabilityBounds`. */
-export const stabilityQuery = z
+const stabilityQueryParser = z
   .strictObject({
     bullet: recordId.optional().meta({
       description:
@@ -86,6 +86,27 @@ export const stabilityQuery = z
     { message: 'mass, diameter and length are required without bullet' },
   )
   .describe('Projectile, twist, muzzle velocity and air of the stability factor. Units SI.')
+
+/** A decimal number read from a query string. */
+export type QueryNumberSchema = z.ZodPipe<
+  z.ZodPipe<z.ZodString, z.ZodTransform<number, string>>,
+  z.ZodNumber
+>
+
+/** Query of `GET /exterior/stability`: SI, bounds in `stabilityBounds`. */
+export const stabilityQuery: z.ZodObject<
+  {
+    bullet: z.ZodOptional<z.ZodString>
+    mass: z.ZodOptional<QueryNumberSchema>
+    diameter: z.ZodOptional<QueryNumberSchema>
+    length: z.ZodOptional<QueryNumberSchema>
+    twist: QueryNumberSchema
+    muzzleVelocity: QueryNumberSchema
+    temperature: z.ZodOptional<QueryNumberSchema>
+    pressure: z.ZodOptional<QueryNumberSchema>
+  },
+  z.core.$strict
+> = stabilityQueryParser satisfies Exact<typeof stabilityQuery, typeof stabilityQueryParser>
 
 /** A parsed `GET /exterior/stability` query. */
 export interface StabilityQuery extends z.infer<typeof stabilityQuery> {}

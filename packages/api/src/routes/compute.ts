@@ -1,25 +1,27 @@
-import type { ComputeRunner } from '@open-reloading/use-cases'
+import {
+  chargeTarget,
+  type ExteriorContext,
+  findBullet,
+  type Operation,
+  type OperationContext,
+  operations,
+  runStability,
+  simulate,
+  simulateQuery,
+  stabilityQuery,
+  stabilityResponse,
+} from '@open-reloading/use-cases'
 import type { FastifyError, FastifyPluginAsync } from 'fastify'
-import type { Catalogue } from '../catalogue/types.ts'
-import { computeErrorHandler } from '../compute/answer.ts'
-import { stabilityResponse } from '../compute/exterior-response.ts'
-import { type ExteriorContext, runStability } from '../compute/exterior-run.ts'
-import { chargeTarget, type Operation, operations } from '../compute/operations.ts'
-import { findBullet } from '../compute/resolve.ts'
-import { simulate, simulateQuery } from '../compute/simulate.ts'
-import { stabilityQuery } from '../compute/stability-schema.ts'
+import { computeErrorHandler } from '../compute/error-handler.ts'
 import { API_PREFIX } from '../version.ts'
 import { describeAnswers } from './identity.ts'
-
-/** What the compute routes read: the records to resolve ids against and the solver task runner. */
-export type ComputeContext = { catalogue: Catalogue; compute: ComputeRunner }
 
 /**
  * Exterior trajectory and truing, interior simulation and Miller stability.
  * Registered without fastify-plugin, so the error handler applies to these routes only. Solver
  * calls run on `compute` (a worker pool), stability here (closed form).
  */
-export const computeRoutes: FastifyPluginAsync<ComputeContext> = async (
+export const computeRoutes: FastifyPluginAsync<OperationContext> = async (
   app,
   { catalogue, compute },
 ) => {

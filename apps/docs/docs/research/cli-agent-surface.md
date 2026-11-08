@@ -89,9 +89,9 @@ measured: runs of the built CLI and of a 9-line script over the API compute entr
 - `packages/cli/src/main.ts`: commands, options, exit codes, the error catch.
 - `packages/cli/schema/result.schema.json`: the result schema.
 - `apps/docs/docs/cli.md`: the docs.
-- `packages/api/src/compute/browser.ts`: the compute entry the web app runs.
+- `packages/use-cases/src/index.ts`: the use cases the web app, the command line and the API run.
 - `packages/api/src/routes/compute.ts`: the compute routes, exterior handlers inline.
-- `packages/api/src/compute/answer.ts`: the notice.
+- `packages/use-cases/src/answer.ts`: the notice.
 - `.oxlintrc.json` (the dependency-cruiser configuration when this was written): the rule `cli-imports-core-data-drawing-schema-only`.
 - `apps/docs/scripts/research-index.mts`: the docs `llms.txt`.
 

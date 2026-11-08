@@ -1,12 +1,14 @@
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import table from './core-message-table.json' with { type: 'json' }
 import { setCoreMessages } from './core-messages.ts'
+import { refusalWords } from './refusal-words.ts'
 
 /**
  * Messages of the packages, the API and the app's own request code, in the language shown.
  *
- * They are English text: the packages raise `InputError`s with free text and the API passes it on,
- * so a message is known by its template, the English text with `{name}` where a value stands.
+ * They are English text: some packages raise `InputError`s with free text and the API passes it on,
+ * and the app writes a typed refusal in its English sentence (`refusal-words.ts`), so a message is
+ * known by its template, the English text with `{name}` where a value stands.
  * A template is matched against the whole text, the values are taken from the match and the
  * German sentence is filled with them. A text that no template matches is shown as it is.
  * A message stays English in state, links and files; it is translated where it is shown.
@@ -104,6 +106,7 @@ const codes: readonly Message[] = table.codes.map(msg)
 
 const templates: readonly Message[] = [
   ...Object.values(warningMessages).flat(),
+  ...Object.values(refusalWords),
   ...Object.values(table.templates).flat().map(msg),
 ]
 

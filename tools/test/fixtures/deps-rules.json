@@ -184,7 +184,7 @@
     "rules": ["cli-imports-logic-catalog-drawing-schema-only"]
   },
   "packages/cli/src/api-entries.ts": {
-    "source": "import { operations } from '@open-reloading/api/compute'\nimport { openCatalogue } from '@open-reloading/api/catalogue'\nimport { runTask } from '@open-reloading/use-cases'\nexport { operations, openCatalogue, runTask }",
+    "source": "import { openCatalogue } from '@open-reloading/api/catalogue'\nimport { operations } from '@open-reloading/use-cases'\nexport { openCatalogue, operations }",
     "rules": []
   },
   "packages/cli/src/api-static.ts": {
@@ -231,9 +231,17 @@
     "source": "import { startBundleApi } from '@open-reloading/api/static'\nexport { startBundleApi }",
     "rules": ["web-reads-api-only"]
   },
+  "apps/web/src/lib/api-compute.ts": {
+    "source": "import { runTask } from '@open-reloading/api/compute'\nexport { runTask }",
+    "rules": ["web-reads-api-only"]
+  },
+  "packages/cli/src/api-compute.ts": {
+    "source": "import { operations } from '@open-reloading/api/compute'\nexport { operations }",
+    "rules": ["cli-imports-logic-catalog-drawing-schema-only"]
+  },
   "apps/web/src/lib/api-advisories.ts": {
     "source": "import { advisoryText } from '@open-reloading/api/advisories'\nexport { advisoryText }",
-    "rules": []
+    "rules": ["web-reads-api-only"]
   },
   "apps/web/src/lib/api-server.ts": {
     "source": "import Fastify from 'fastify'\nexport { Fastify }",

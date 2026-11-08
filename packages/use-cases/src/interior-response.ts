@@ -275,8 +275,9 @@ const checked = { pressureRange, sampled, limits, warnings }
 /** The fields of a valid run of `POST /interior`: the shared ones and the check of an entered maximum. */
 const interiorChecked = { ...checked, maximumCheck }
 
+// the answer schemas are read as JSON Schema and to check answers, so their zod types stay unnamed
 /** 200 body of `POST /interior`: one M3 run, or the steps of a charge ladder. */
-export const interiorResponse = z.union([
+export const interiorResponse: z.ZodType = z.union([
   z.looseObject({
     ...identity,
     notice: noticeField,
@@ -325,7 +326,7 @@ const summary = z
 const summaryStep = { charge, summary, ...checked }
 
 /** 200 body of `POST /interior/load-file`: the summary of the shown step, its curve on request and the ladder. */
-export const loadFileResponse = z.looseObject({
+export const loadFileResponse: z.ZodType = z.looseObject({
   ...identity,
   notice: noticeField,
   units: z
@@ -370,7 +371,7 @@ const extreme = (description: string) =>
     .describe(description)
 
 /** 200 body of `POST /interior/charge-target`: the charge that reaches the target and its run without the curve. */
-export const chargeTargetResponse = z.looseObject({
+export const chargeTargetResponse: z.ZodType = z.looseObject({
   ...identity,
   notice: noticeField,
   model: z.literal('m3').describe('The interior model'),

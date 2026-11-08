@@ -3,9 +3,8 @@
  * texts, schemas and examples here, the command line runs them offline, so none can drift.
  */
 
-import type { ComputeRunner } from '@open-reloading/use-cases'
+import type { Catalogue } from '@open-reloading/catalog'
 import type { z } from 'zod'
-import type { Catalogue } from '../catalogue/types.ts'
 import { runChargeTarget } from './charge-run.ts'
 import { chargeBody, chargeTargetExample } from './charge-schema.ts'
 import {
@@ -34,6 +33,7 @@ import {
   rangeStringsPlanBody,
   rangeStringsPlanExample,
 } from './strings-schema.ts'
+import type { ComputeRunner } from './tasks.ts'
 
 /** What an operation runs on: the records and the compute runner. */
 export interface OperationContext {

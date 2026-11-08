@@ -320,9 +320,6 @@ importers:
       '@open-reloading/schema':
         specifier: workspace:*
         version: link:../schema
-      '@open-reloading/statistics':
-        specifier: workspace:*
-        version: link:../statistics
       '@open-reloading/use-cases':
         specifier: workspace:*
         version: link:../use-cases
@@ -336,6 +333,9 @@ importers:
         specifier: 'catalog:'
         version: 4.6.7
     devDependencies:
+      '@open-reloading/statistics':
+        specifier: workspace:*
+        version: link:../statistics
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
@@ -872,9 +872,18 @@ importers:
       '@open-reloading/ballistics':
         specifier: workspace:*
         version: link:../ballistics
+      '@open-reloading/catalog':
+        specifier: workspace:*
+        version: link:../catalog
+      '@open-reloading/schema':
+        specifier: workspace:*
+        version: link:../schema
       '@open-reloading/statistics':
         specifier: workspace:*
         version: link:../statistics
+      zod:
+        specifier: 'catalog:'
+        version: 4.6.7
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: 'catalog:'

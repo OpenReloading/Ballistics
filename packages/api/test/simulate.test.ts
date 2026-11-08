@@ -8,9 +8,8 @@ import {
   workbenchValueKeys,
 } from '@open-reloading/ballistics'
 import { analysisKinds, toSi } from '@open-reloading/schema'
+import { filePath, maxPoints } from '@open-reloading/use-cases'
 import { describe, expect, it } from 'vitest'
-import { maxPoints } from '../src/compute/interior-schema.ts'
-import { filePath } from '../src/compute/load-file.ts'
 import { API_PREFIX } from '../src/version.ts'
 import { defined } from './defined.ts'
 import { bundle, file, siValues } from './fixtures.ts'

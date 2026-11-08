@@ -590,15 +590,14 @@
                   "!@open-reloading/schema/**",
                   "!@open-reloading/use-cases",
                   "!@open-reloading/use-cases/**",
-                  "!@open-reloading/api/compute",
                   "!@open-reloading/api/catalogue",
                   "!@open-reloading/tools/catalog"
                 ],
-                "message": "cli-imports-logic-catalog-drawing-schema-only: packages/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), catalog, drawing, schema and use-cases, and of @open-reloading/api only the compute and catalogue entries the browser runs, and of @open-reloading/tools only the catalog reader."
+                "message": "cli-imports-logic-catalog-drawing-schema-only: packages/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), catalog, drawing, schema and use-cases, and of @open-reloading/api only the catalogue entry the browser runs, and of @open-reloading/tools only the catalog reader."
               },
               {
                 "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|api|drawing|cli)/(src|dist)|packages|apps)/",
-                "message": "cli-imports-logic-catalog-drawing-schema-only: packages/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), catalog, drawing, schema and use-cases, and of @open-reloading/api only the compute and catalogue entries the browser runs, and of @open-reloading/tools only the catalog reader."
+                "message": "cli-imports-logic-catalog-drawing-schema-only: packages/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), catalog, drawing, schema and use-cases, and of @open-reloading/api only the catalogue entry the browser runs, and of @open-reloading/tools only the catalog reader."
               }
             ]
           }
@@ -620,18 +619,16 @@
                   "!@open-reloading/catalog/plausibility",
                   "@open-reloading/api",
                   "@open-reloading/api/**",
-                  "!@open-reloading/api/compute",
                   "!@open-reloading/api/catalogue",
-                  "!@open-reloading/api/advisories",
                   "fastify",
                   "fastify/**",
                   "@fastify/**"
                 ],
-                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/catalog only the plausibility checks and of @open-reloading/api only the compute, catalogue and advisories entries of the static site run in the web app."
+                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/catalog only the plausibility checks and of @open-reloading/api only the catalogue entry of the static site runs in the web app."
               },
               {
                 "regex": "^(\\.\\./)+packages/",
-                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/catalog only the plausibility checks and of @open-reloading/api only the compute, catalogue and advisories entries of the static site run in the web app."
+                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/catalog only the plausibility checks and of @open-reloading/api only the catalogue entry of the static site runs in the web app."
               },
               {
                 "regex": "^node:",
@@ -657,18 +654,16 @@
                   "!@open-reloading/catalog/plausibility",
                   "@open-reloading/api",
                   "@open-reloading/api/**",
-                  "!@open-reloading/api/compute",
                   "!@open-reloading/api/catalogue",
-                  "!@open-reloading/api/advisories",
                   "fastify",
                   "fastify/**",
                   "@fastify/**"
                 ],
-                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/catalog only the plausibility checks and of @open-reloading/api only the compute, catalogue and advisories entries of the static site run in the web app."
+                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/catalog only the plausibility checks and of @open-reloading/api only the catalogue entry of the static site runs in the web app."
               },
               {
                 "regex": "^(\\.\\./)+packages/",
-                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/catalog only the plausibility checks and of @open-reloading/api only the compute, catalogue and advisories entries of the static site run in the web app."
+                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/catalog only the plausibility checks and of @open-reloading/api only the catalogue entry of the static site runs in the web app."
               }
             ]
           }

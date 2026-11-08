@@ -75,7 +75,7 @@ Measured: tier 2 runs on published load table rows, powder fits and capacity rec
 ## Where in the app
 
 - `packages/ballistics/src/interior/range.ts`, `interiorPressureRange`, `pressureToleranceDefaults`, `placeMaximum`.
-- `packages/api/src/compute/limits.ts`, `maximumCheck` (the messages).
+- `packages/use-cases/src/limits.ts`, `maximumCheck` (the messages).
 - Model page: [peak-pressure range](../models/interior-pressure-range.md#placing-an-entered-maximum).
 
 ## Confidence

@@ -5,7 +5,14 @@
  * the solver runs up to 152 times in one compute task.
  */
 import { z } from 'zod'
-import { bulkDensityBound, interiorBase, interiorExample } from './interior-schema.ts'
+import type { Exact } from './exact.ts'
+import {
+  bulkDensityBound,
+  type InteriorBaseShape,
+  interiorBase,
+  interiorExample,
+  type M3LoadShape,
+} from './interior-schema.ts'
 import { caps } from './schemas.ts'
 
 /** Target quantities with their units: `peakPressure` Pa, `muzzleVelocity` m/s, `loadRatio` 1, `barrelTime` s, `bulletLeadTime` s. */
@@ -45,11 +52,7 @@ const target = z
 
 const m3Load = interiorBase.shape.load
 
-/**
- * Body of `POST /interior/charge-target`; `target.value` is in SI (Pa, m/s, s) or a ratio.
- * Inferred type: {@link ChargeBody}. Request type: {@link ChargeTargetRequest}.
- */
-export const chargeBody = interiorBase
+const chargeBodyParser = interiorBase
   .omit({ model: true, ladder: true, maximumPressure: true })
   .extend({
     load: m3Load
@@ -85,6 +88,34 @@ export const chargeBody = interiorBase
   .describe(
     'The charge at which one M3 interior run reaches a target value. Results are simulations, not load data.',
   )
+
+/**
+ * Body of `POST /interior/charge-target`; `target.value` is in SI (Pa, m/s, s) or a ratio.
+ * Inferred type: {@link ChargeBody}. Request type: {@link ChargeTargetRequest}.
+ */
+export const chargeBody: z.ZodObject<
+  Omit<InteriorBaseShape, 'model' | 'ladder' | 'maximumPressure' | 'load'> & {
+    load: z.ZodObject<
+      Omit<M3LoadShape, 'propellant'> & {
+        propellant: z.ZodObject<
+          M3LoadShape['propellant']['shape'] & { bulkDensity: z.ZodOptional<z.ZodNumber> },
+          z.core.$strict
+        >
+      },
+      z.core.$strict
+    >
+    target: z.ZodObject<
+      {
+        kind: z.ZodEnum<{ [K in (typeof chargeTargetKinds)[number]]: K }>
+        value: z.ZodNumber
+        unit: z.ZodOptional<z.ZodLiteral<'percentOfLimit'>>
+      },
+      z.core.$strict
+    >
+    powder: z.ZodOptional<z.ZodString>
+  },
+  z.core.$strict
+> = chargeBodyParser satisfies Exact<typeof chargeBody, typeof chargeBodyParser>
 
 /** A parsed `POST /interior/charge-target` body, defaults applied. */
 export interface ChargeBody extends z.infer<typeof chargeBody> {}

@@ -1,17 +1,15 @@
-import { describe, expect, it } from 'vitest'
-import { z } from 'zod'
-import {
-  trajectoryBody,
-  trajectoryExample,
-  truingBody,
-  truingExample,
-} from '../src/compute/exterior-schema.ts'
 import {
   rangeStringsFitBody,
   rangeStringsFitExample,
   rangeStringsPlanBody,
   rangeStringsPlanExample,
-} from '../src/compute/strings-schema.ts'
+  trajectoryBody,
+  trajectoryExample,
+  truingBody,
+  truingExample,
+} from '@open-reloading/use-cases'
+import { describe, expect, it } from 'vitest'
+import { z } from 'zod'
 import { undescribed } from './setup.ts'
 
 const bodies = {

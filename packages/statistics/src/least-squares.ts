@@ -3,8 +3,9 @@
  * Jacobians, a conditioning check and the parameter covariance: `apps/docs/docs/models/least-squares.md`.
  */
 
-import { need, nth } from './errors.ts'
+import { nth } from './errors.ts'
 import { type HuberLoss, huberCost, huberRoots } from './huber.ts'
+import { need } from './issue.ts'
 
 /** Whether the off-diagonal part of `m` is negligible against its diagonal. */
 function isDiagonal(m: number[][]): boolean {
@@ -193,14 +194,14 @@ export interface LogFitInput {
  * before any run.
  */
 export function checkLogFitLimits(maxIterations: number, maxCondition: number): void {
-  need(
-    Number.isInteger(maxIterations) && maxIterations > 0,
-    'maxIterations must be a positive integer',
-  )
-  need(
-    Number.isFinite(maxCondition) && maxCondition >= 1,
-    'maxCondition must be finite and at least 1',
-  )
+  need(Number.isInteger(maxIterations) && maxIterations > 0, {
+    code: 'maxIterationsNotPositiveInteger',
+    params: {},
+  })
+  need(Number.isFinite(maxCondition) && maxCondition >= 1, {
+    code: 'maxConditionOutOfRange',
+    params: {},
+  })
 }
 
 /** Solution of `logLeastSquares`. */

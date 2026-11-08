@@ -129,7 +129,7 @@ describe('the catalogue lint', () => {
     ])
   })
 
-  it('counts the warning sentences that core-message-table.ts marks as texts of the table', () => {
+  it('counts the warning sentences and refusal words the two files mark as texts of the table', () => {
     const root = mkdtempSync(path.join(tmpdir(), 'i18n-'))
     try {
       mkdirSync(path.join(root, 'src/lib'), { recursive: true })
@@ -142,11 +142,15 @@ describe('the catalogue lint', () => {
         "import { msg } from '../i18n/translate.ts'\nexport const w = [msg('A seeded warning.')]\n",
       )
       writeFileSync(
+        path.join(root, 'src/lib/refusal-words.ts'),
+        "import { msg } from '../i18n/translate.ts'\nexport const r = { x: msg('A seeded refusal.') }\n",
+      )
+      writeFileSync(
         path.join(root, 'src/lib/safety.ts'),
         "import { msg } from '../i18n/translate.ts'\nexport const safety = { binding: msg('A seeded safety line.') }\n",
       )
       const table = tableMessages(root)
-      expect(table).toEqual(['busy', 'range {n}', 'A seeded warning.'])
+      expect(table).toEqual(['busy', 'range {n}', 'A seeded warning.', 'A seeded refusal.'])
       // the lines of the Safety notice need German too
       expect(problems(['A seeded safety line.'], {}, 'de', requiredMessages(root))).toEqual([
         'untranslated: A seeded safety line.',
@@ -158,6 +162,7 @@ describe('the catalogue lint', () => {
             busy: 'besetzt',
             'range {n}': 'Entfernung {n}',
             'A seeded warning.': 'A seeded warning.',
+            'A seeded refusal.': 'Eine gesetzte Ablehnung.',
           },
           'de',
           table,

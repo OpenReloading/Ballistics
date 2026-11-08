@@ -5,7 +5,7 @@ import {
   trajectory,
 } from '@open-reloading/ballistics'
 import { describe, expect, it } from 'vitest'
-import { english } from '../src/i18n/translate.ts'
+import { english, type Say } from '../src/i18n/translate.ts'
 import {
   blankChrono,
   blankRow,
@@ -112,7 +112,7 @@ describe('fit of the typed strings', () => {
   const fit = fitSession(nominal, input, english.t)
 
   it('gives a result within the stated intervals for strings made with the solver', () => {
-    if (!('answer' in fit)) throw new Error(fit.problem)
+    if (!('answer' in fit)) throw new Error(fit.problem(english.t))
     const wanted = { muzzleVelocity: truth.v, dragFactor: truth.k, clickValue: click * truth.c }
     for (const p of fit.answer.parameters) {
       expect(p.status).toBe('identified')
@@ -126,7 +126,7 @@ describe('fit of the typed strings', () => {
   })
 
   it('shows value, interval and level of an identified parameter in the shown units', () => {
-    if (!('answer' in fit)) throw new Error(fit.problem)
+    if (!('answer' in fit)) throw new Error(fit.problem(english.t))
     const v = at(parameterLines(fit.answer.parameters, system, english.t), 'muzzleVelocity')
     expect(v.statusText).toBe('Identified')
     expect(v.value).toMatch(/^26\d\d ft\/s$/)
@@ -139,7 +139,7 @@ describe('a parameter the data cannot separate', () => {
     // one impact distance: no clicks dialled, and speed and drag cannot be told apart
     const input = { ...measured([300], []), chrono: blankChrono }
     const fit = fitSession(nominal, input, english.t)
-    if (!('answer' in fit)) throw new Error(fit.problem)
+    if (!('answer' in fit)) throw new Error(fit.problem(english.t))
     const lines = parameterLines(fit.answer.parameters, system, english.t)
     expect(at(lines, 'clickValue').status).toBe('unresolved')
     for (const l of lines.filter((x) => x.status !== 'identified')) {
@@ -164,7 +164,7 @@ describe('a parameter the data cannot separate', () => {
       },
       english.t,
     )
-    if (!('answer' in plan)) throw new Error(plan.problem)
+    if (!('answer' in plan)) throw new Error(plan.problem(english.t))
     const lines = parameterLines(plan.answer.parameters, presetUnits('metric-grams'), english.t)
     expect(lines.filter((l) => l.status === 'identified')).toHaveLength(0)
     expect(lines.every((l) => l.value === undefined)).toBe(true)
@@ -175,7 +175,7 @@ describe('plan', () => {
   it('shows which parameters a string of distances identifies, with standard errors', () => {
     const input = measured([300, 600, 900], [400, 700, 1000])
     const plan = planSession(nominal, input, english.t)
-    if (!('answer' in plan)) throw new Error(plan.problem)
+    if (!('answer' in plan)) throw new Error(plan.problem(english.t))
     const lines = parameterLines(plan.answer.parameters, system, english.t)
     expect(lines.map((l) => l.status)).toEqual(['identified', 'identified', 'identified'])
     expect(at(lines, 'muzzleVelocity').error).toMatch(/^±[\d.]+ %$/)
@@ -184,30 +184,34 @@ describe('plan', () => {
   it('names the zero offset only when asked for', () => {
     const input = measured([300, 600, 900], [400, 700, 1000])
     const plan = planSession(nominal, { ...input, fitZeroOffset: true }, english.t)
-    if (!('answer' in plan)) throw new Error(plan.problem)
+    if (!('answer' in plan)) throw new Error(plan.problem(english.t))
     expect(plan.answer.parameters.map((p) => p.name)).toContain('zeroOffset')
   })
 })
+
+/** The English problem of an attempt; undefined for an answer. */
+const problem = (a: { answer: unknown } | { problem: Say }) =>
+  'problem' in a ? a.problem(english.t) : undefined
 
 describe('entry problems', () => {
   const input = measured([300, 600, 900], [400, 700, 1000])
 
   it('names the row and the field that is missing', () => {
     const rows = input.rows.map((r, i) => (i === 1 ? { ...r, deviation: '' } : r))
-    expect(fitSession(nominal, { ...input, rows }, english.t)).toEqual({
-      problem: 'Row 2 deviation: enter a number.',
-    })
+    expect(problem(fitSession(nominal, { ...input, rows }, english.t))).toBe(
+      'Row 2 deviation: enter a number.',
+    )
   })
 
   it('rejects a deviation of 0 and a fraction of a shot', () => {
     const zero = input.rows.map((r, i) => (i === 0 ? { ...r, deviation: '0' } : r))
-    expect(fitSession(nominal, { ...input, rows: zero }, english.t)).toEqual({
-      problem: 'Row 1 deviation: must be greater than 0.',
-    })
+    expect(problem(fitSession(nominal, { ...input, rows: zero }, english.t))).toBe(
+      'Row 1 deviation: must be greater than 0.',
+    )
     const half = input.rows.map((r, i) => (i === 0 ? { ...r, shots: '2.5' } : r))
-    expect(fitSession(nominal, { ...input, rows: half }, english.t)).toEqual({
-      problem: 'Row 1 shots: enter a number.',
-    })
+    expect(problem(fitSession(nominal, { ...input, rows: half }, english.t))).toBe(
+      'Row 1 shots: enter a number.',
+    )
   })
 
   it('leaves blank rows out', () => {
@@ -227,12 +231,12 @@ describe('entry problems', () => {
   })
 
   it('needs a click value and a dispersion for the plan', () => {
-    expect(planSession(nominal, { ...input, click: '' }, english.t)).toEqual({
-      problem: 'Click value: enter a number.',
-    })
-    expect(planSession(nominal, { ...input, dispersion: '' }, english.t)).toEqual({
-      problem: 'Dispersion of one shot: enter a number.',
-    })
+    expect(problem(planSession(nominal, { ...input, click: '' }, english.t))).toBe(
+      'Click value: enter a number.',
+    )
+    expect(problem(planSession(nominal, { ...input, dispersion: '' }, english.t))).toBe(
+      'Dispersion of one shot: enter a number.',
+    )
   })
 })
 
@@ -251,7 +255,7 @@ describe('nominal line', () => {
 describe('a fit stored with a firearm configuration', () => {
   const input = measured([300, 600], [800])
   const fit = fitSession(nominal, input, english.t)
-  if (!('answer' in fit)) throw new Error(fit.problem)
+  if (!('answer' in fit)) throw new Error(fit.problem(english.t))
   const entryOf = (inputs: TruingInputs) =>
     truingEntry(
       { shot: nominal, bullet: 'Test bullet', zeroRange: 100 },

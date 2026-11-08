@@ -1,4 +1,4 @@
-/** The fields of API responses the pages read (`packages/api/src/catalogue/`, `packages/api/src/compute/`, `packages/api/src/routes/`). */
+/** The fields of API responses the pages read (`packages/api/src/catalogue/`, `packages/use-cases/src/`, `packages/api/src/routes/`). */
 import type { InteriorResult } from '@open-reloading/ballistics'
 import type {
   Cartridge,
@@ -136,7 +136,7 @@ export interface ListOf<T> {
   items: T[]
 }
 
-/** `POST /interior` 200 response with `model: 'm3'` (`packages/api/src/compute/interior-run.ts`). */
+/** `POST /interior` 200 response with `model: 'm3'` (`packages/use-cases/src/interior-run.ts`). */
 export interface InteriorResponse {
   notice: string
   /** The interior result as the API sends it: every point field. */

@@ -94,16 +94,18 @@ export function extract(source: string, file = 'source'): string[] {
 }
 
 /**
- * The texts of the message table: the codes and templates of `src/lib/core-message-table.json`
- * and the warning sentences that `src/lib/core-message-table.ts` marks.
+ * The texts of the message table: the codes and templates of `src/lib/core-message-table.json`,
+ * the warning sentences that `src/lib/core-message-table.ts` marks and the refusal words of
+ * `src/lib/refusal-words.ts`.
  */
 export function tableMessages(root: string): string[] {
   const { codes, templates } = JSON.parse(
     readFileSync(path.join(root, 'src/lib/core-message-table.json'), 'utf8'),
   ) as { codes: string[]; templates: Record<string, string[]> }
-  const file = 'src/lib/core-message-table.ts'
-  const warnings = extract(readFileSync(path.join(root, file), 'utf8'), file)
-  return [...codes, ...Object.values(templates).flat(), ...warnings]
+  const marked = ['src/lib/core-message-table.ts', 'src/lib/refusal-words.ts'].flatMap((file) =>
+    extract(readFileSync(path.join(root, file), 'utf8'), file),
+  )
+  return [...codes, ...Object.values(templates).flat(), ...marked]
 }
 
 /** The distinct messages of every source under `src/` and of the message table, sorted. */

@@ -1,8 +1,12 @@
+import {
+  chargeBody,
+  chargeTargetExample,
+  interiorBody,
+  interiorExample,
+  loadFileExample,
+} from '@open-reloading/use-cases'
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
-import { chargeBody, chargeTargetExample } from '../src/compute/charge-schema.ts'
-import { interiorBody, interiorExample } from '../src/compute/interior-schema.ts'
-import { loadFileExample } from '../src/compute/load-file-example.ts'
 import { API_PREFIX } from '../src/version.ts'
 import { undescribed, withApi } from './setup.ts'
 
