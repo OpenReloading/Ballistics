@@ -16,3 +16,4 @@ visual-check-out
 /.benchkeeper/
 coverage
 .lycheecache
+packages/ui/src/locales/*.json

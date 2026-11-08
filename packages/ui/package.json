@@ -32,17 +32,20 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc -b tsconfig.build.json && api-extractor run",
+    "build": "lingui compile --strict && tsc -b tsconfig.build.json && api-extractor run",
     "typecheck": "tsc --noEmit && tsc -p test",
     "test": "vitest run --project node && publint --strict && attw --pack . --profile esm-only --exclude-entrypoints ui.css",
     "test:browser": "vitest run --project 'stories*' && storybook build --quiet",
-    "storybook": "storybook dev --port 6006"
+    "storybook": "storybook dev --port 6006",
+    "messages": "lingui extract --clean --overwrite"
   },
   "dependencies": {
     "@fontsource-variable/inter": "5.3.0",
     "@open-reloading/design-tokens": "workspace:*"
   },
   "peerDependencies": {
+    "@lingui/core": "^6.12.0",
+    "@lingui/react": "^6.12.0",
     "@mantine/core": "catalog:",
     "@mantine/hooks": "catalog:",
     "lucide-react": "^1.68.0",
@@ -51,6 +54,11 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "catalog:",
+    "@lingui/cli": "6.12.0",
+    "@lingui/conf": "6.12.0",
+    "@lingui/core": "6.12.0",
+    "@lingui/format-po": "6.12.0",
+    "@lingui/react": "6.12.0",
     "@mantine/core": "catalog:",
     "@mantine/hooks": "catalog:",
     "@microsoft/api-extractor": "catalog:",

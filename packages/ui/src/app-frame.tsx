@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { AppShell, Burger, Drawer, Group } from '@mantine/core'
 import { useDisclosure, useMediaQuery } from '@mantine/hooks'
 import { type MouseEvent, type ReactElement, type ReactNode, useEffect } from 'react'
@@ -13,8 +14,6 @@ export interface AppFrameProps {
   end?: ReactNode
   /** The account menu of a surface with accounts; the offline apps leave it out. */
   account?: ReactNode
-  /** The accessible names of the menu button, the navigation and the drawer's close button, in the page's language. */
-  labels: { menu: string; navigation: string; close: string }
   /** The page, with its page bar first. */
   children: ReactNode
 }
@@ -25,9 +24,14 @@ export function AppFrame({
   navigation,
   end,
   account,
-  labels,
   children,
 }: AppFrameProps): ReactElement {
+  const { i18n } = useLingui()
+  const labels = {
+    menu: i18n._({ id: 'frame.menu', message: 'Navigation' }),
+    navigation: i18n._({ id: 'frame.navigation', message: 'Main' }),
+    close: i18n._({ id: 'frame.close', message: 'Close navigation' }),
+  }
   const [opened, { toggle, close }] = useDisclosure(false)
   // the drawer is only hidden from 75em: left open there, its focus trap and scroll lock would stay
   const wide = useMediaQuery('(min-width: 75em)')

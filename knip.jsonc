@@ -13,7 +13,8 @@
       "entry": ["src/index.ts"]
     },
     "packages/ui": {
-      "entry": ["src/index.ts"],
+      // the Lingui CLI reads its configuration
+      "entry": ["src/index.ts", "lingui.config.ts"],
       // css/ui.css imports it, and knip reads no CSS
       "ignoreDependencies": ["@fontsource-variable/inter"]
     },
