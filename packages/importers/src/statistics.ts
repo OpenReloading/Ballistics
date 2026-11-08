@@ -76,7 +76,7 @@ export function warnStatistics(
     else if (!withinTolerance) {
       warnings.push({
         code: 'statisticDiffers',
-        params: { ...printed, computed: computed.toFixed(1) },
+        params: { ...printed, computed },
       })
     }
   }

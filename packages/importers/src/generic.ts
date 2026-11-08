@@ -101,12 +101,16 @@ interface RowContext {
 }
 
 /**
- * Whether a detected comma may cut a velocity, and what the user can do about it: quote the cell
- * or use `;` (`quoteOrSemicolon`, a template), else name the delimiter (`nameDelimiter`).
+ * What the user can do about a detected comma that may cut a velocity, the `remedy` param of
+ * `commaMaySplit`, `commaMayCutVelocity` and `moreCellsThanHeaderComma`: quote the cell or use `;`
+ * (`quoteOrSemicolon`, a template), else name the delimiter (`nameDelimiter`).
  */
+export type CommaRemedy = 'quoteOrSemicolon' | 'nameDelimiter'
+
+/** Whether a detected comma may cut a velocity, and the remedy. */
 interface CommaCheck {
   mayCut: boolean
-  remedy: 'quoteOrSemicolon' | 'nameDelimiter'
+  remedy: CommaRemedy
 }
 
 /**

@@ -95,7 +95,12 @@ describe('parseShotViewWorkbook: the footer and worksheets without shots', () =>
     expect(w).toEqual([
       {
         code: 'statisticDiffers',
-        params: { worksheet: 2, label: 'AVERAGE SPEED', value: '855.0', computed: '851.0' },
+        params: {
+          worksheet: 2,
+          label: 'AVERAGE SPEED',
+          value: '855.0',
+          computed: expect.closeTo(851, 1),
+        },
       },
     ])
     const sd = edit(shotViewSheetEnglish, (c) => c[0] === 'STD DEV', [['STD DEV', 'n/a']])
