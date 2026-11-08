@@ -145,6 +145,9 @@ export interface FieldSpec {
 export const fieldSpecs: Record<TableKind, FieldSpec[]>;
 
 // @public
+export type FileDiagnostic = ReaderDiagnostic<'utf16OddBytes' | 'notUnicodeText' | 'cellBeyondColumnIV' | 'cellOutOfOrder' | 'tooManyCells' | 'tooMuchCellText' | 'zipDirectoryMalformed' | 'zip64' | 'zipNoEnd' | 'zipSplit' | 'zipDirectoryOutside' | 'partTwice' | 'partsDifferInCase' | 'partEncrypted' | 'partMethod' | 'partTooLarge' | 'partsTooLarge' | 'partCompressedTooLarge' | 'partNoLocalHeader' | 'partDataOutside' | 'partStoredSize' | 'partCorrupt' | 'partInflatesMore' | 'partInflatesLess' | 'partCrc' | 'relationshipLeaves' | 'sharedStringOutOfRange' | 'cellRefMalformed' | 'partMissing' | 'notUtf8' | 'xmlElementsExceeded' | 'xmlCharactersExceeded' | 'relationshipTwice' | 'sheetNoRelationship' | 'sheetPartAgain' | 'noDecompressionStream' | 'noWorkbookPart' | 'unknownEntity' | 'notXmlChar' | 'bareAmpersand' | 'xmlBudgetSpent' | 'unclosedProcessingInstruction' | 'unclosedComment' | 'unclosedCdata' | 'duplicateAttribute' | 'tooManyAttributes' | 'malformedTag' | 'malformedTagNamed' | 'textOutsideRoot' | 'encodingNotRead' | 'endTagMismatch' | 'nestTooDeep' | 'secondRoot' | 'doctype' | 'markupDeclaration' | 'unclosedElement' | 'noRoot' | 'rootNotLoad' | 'noLoad' | 'cfbSectorOutsideChain' | 'cfbTooShort' | 'cfbEndsBefore' | 'cfbByteOrder' | 'cfbVersion' | 'cfbMiniLayout' | 'cfbSectorOutside' | 'cfbFatListed' | 'cfbChainLoops' | 'cfbNoFatEntry' | 'cfbNoMiniFatEntry' | 'cfbChainEnds' | 'cfbStreamTooLarge' | 'cfbStreamPastEnd' | 'cfbNoMiniStream' | 'cfbMiniSectorOutside' | 'cfbNoRoot' | 'cfbEntryRepeated' | 'cfbRootTooLarge' | 'xlsPhoneticNegative' | 'xlsStringMalformed' | 'xlsRecordPastEnd' | 'xlsSubstreamsOverlap' | 'xlsRecordShort' | 'xlsNotBiff8' | 'xlsNoWorkbookEof' | 'xlsEncrypted' | 'xlsFormulaNoString' | 'xlsNumberNotFinite' | 'xlsUnknownErrorCode' | 'xlsCellsMismatch' | 'xlsUnknownValueType' | 'xlsWorksheetNoEof' | 'xlsWorksheetNoBof' | 'xlsWorksheetSameStart' | 'xlsNoWorkbookStream' | 'xlsSharedStringsEnd'>;
+
+// @public
 export const formatMinutes: (seconds: number) => string;
 
 // @public
@@ -224,6 +227,9 @@ export function parseShotViewWorkbook(book: Workbook, options?: WorkbookOptions)
 export function parseVelocityUnit(text: string | undefined): VelocityUnit | undefined;
 
 // @public
+export type PressureDiagnostic = ReaderDiagnostic<'sensorMissing' | 'columnsNotDistinct' | 'cutoffNotPositive' | 'columnUnitDiffersFromCaller' | 'columnUnitMissing' | 'columnUnitNamedByCaller' | 'readingNotNumber' | 'readingNotFinite' | 'timesNotIncreasing' | 'tooFewSamples'>;
+
+// @public
 export interface PressureHistoryImport {
     lowPass?: {
         cutoff: number;
@@ -243,7 +249,7 @@ export interface PressureHistoryImport {
         };
     };
     // (undocumented)
-    warnings: string[];
+    warnings: PressureDiagnostic[];
 }
 
 // @public
@@ -272,9 +278,9 @@ export type ReaderDiagnostic<Code extends string> = Diagnostic<Code, Readonly<Re
 
 // @public
 export class ReaderError extends Error {
-    constructor(diagnostic: ChronoDiagnostic, options?: ErrorOptions);
+    constructor(diagnostic: ChronoDiagnostic | PressureDiagnostic | FileDiagnostic, options?: ErrorOptions);
     // (undocumented)
-    readonly diagnostic: ChronoDiagnostic;
+    readonly diagnostic: ChronoDiagnostic | PressureDiagnostic | FileDiagnostic;
 }
 
 // @public

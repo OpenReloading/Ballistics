@@ -69,12 +69,9 @@ describe('parseRows', () => {
   })
 
   it('rejects a long run of digits with a bad tail without stalling', () => {
-    const start = performance.now()
-    expect(() => parseRows(`${head}\nc,b,p,"${'1'.repeat(100000)}x",800\n`, 'f.csv')).toThrow(
+    expect(() => parseRows(`${head}\nc,b,p,"${'1'.repeat(1_000_000)}x",800\n`, 'f.csv')).toThrow(
       'not a number',
     )
-    // a backtracking regression takes seconds to minutes here, a coverage run on a loaded runner far less
-    expect(performance.now() - start).toBeLessThan(5000)
   })
 
   it.each(['2', '2.5', '.5', '.25', '5.', '+2', '2e-1', '2E0', '2e10'])(

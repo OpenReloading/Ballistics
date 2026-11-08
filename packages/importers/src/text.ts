@@ -1,4 +1,5 @@
 // Text of export files: bytes to text, lines, cells, numbers and dates.
+import { refuseFile } from './diagnostics.ts'
 
 /**
  * UTF-16 LE after FF FE, UTF-16 BE after FE FF, else UTF-8, all strict: other encodings (Windows-1252
@@ -7,14 +8,12 @@
  */
 export function decodeText(bytes: Uint8Array): string {
   const utf16 = utf16Order(bytes)
-  if (utf16 && bytes.length % 2 !== 0) throw new Error('UTF-16 text with an odd number of bytes')
+  if (utf16 && bytes.length % 2 !== 0) refuseFile('utf16OddBytes')
   const decoder = new TextDecoder(utf16 ?? 'utf-8', { fatal: true, ignoreBOM: true })
   try {
     return decoder.decode(utf16 ? bytes.subarray(2) : bytes)
   } catch {
-    throw new Error(
-      'the file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again',
-    )
+    return refuseFile('notUnicodeText')
   }
 }
 
@@ -24,9 +23,6 @@ function utf16Order(bytes: Uint8Array): 'utf-16le' | 'utf-16be' | undefined {
   if (bytes[0] === 0xfe && bytes[1] === 0xff) return 'utf-16be'
   return undefined
 }
-
-/** The message of a caught error, or its text when something else was thrown. */
-export const errorMessage = (e: unknown): string => (e instanceof Error ? e.message : String(e))
 
 /** True for a character skipped before a cell: a space, or a tab unless tabs delimit. */
 const skippedBefore = (c: string | undefined, delimiter: string) =>

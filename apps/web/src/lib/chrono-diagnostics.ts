@@ -5,6 +5,7 @@ import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { chronoOwnMessages, formats } from './chrono.ts'
 import { translateMessage } from './core-messages.ts'
 import { errorText } from './error-text.ts'
+import { fileDiagnosticText, isFileDiagnostic } from './file-diagnostics.ts'
 
 const chronoMessages: Record<ChronoDiagnostic['code'], Message> = {
   sha256Malformed: msg('sha256 must be 64 hex digits'),
@@ -106,6 +107,10 @@ function shown(name: string, v: string | number | readonly string[], t: Translat
   return (name === 'names' ? v.map((n) => `"${n}"`) : v).join(', ')
 }
 
+/** True for a diagnostic of a chronograph reader, which `chronoDiagnosticText` words. */
+const isChronoDiagnostic = (d: { code: string }): d is ChronoDiagnostic =>
+  Object.hasOwn(chronoMessages, d.code)
+
 /** What a chronograph reader warned of or refused, in the language of `t`: the worksheet and row first where named. */
 export function chronoDiagnosticText(d: ChronoDiagnostic, t: Translator['t']): string {
   const { worksheet, row, ...rest } = d.params
@@ -117,9 +122,11 @@ export function chronoDiagnosticText(d: ChronoDiagnostic, t: Translator['t']): s
     : atRow
 }
 
-/** Why a chronograph file was not read, in the language of `t`: a reader's refusal, `chrono.ts`'s own, or another error's message. */
+/** Why a chronograph file was not read, in the language of `t`: a chronograph or file reader's refusal, `chrono.ts`'s own, or another error's message. */
 export function chronoErrorText(error: unknown, t: Translator['t']): string {
-  if (error instanceof ReaderError) return chronoDiagnosticText(error.diagnostic, t)
+  const d = error instanceof ReaderError ? error.diagnostic : undefined
+  if (d && isChronoDiagnostic(d)) return chronoDiagnosticText(d, t)
+  if (d && isFileDiagnostic(d)) return fileDiagnosticText(d, t)
   const text = errorText(error)
   const own = chronoOwnMessages.find((m) => m === text)
   return own ? t(own, { formats }) : translateMessage(text, t)

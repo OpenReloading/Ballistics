@@ -1,8 +1,5 @@
 import { recordIdRegex } from '@open-reloading/schema'
-import type { FastifyReply } from 'fastify'
 import { z } from 'zod'
-import type { Catalogue, Catalogued, CatalogueKind } from '../catalogue/types.ts'
-import type { ComputeRunner } from '../compute/tasks.ts'
 
 /** `pattern` of a query string value without a NUL character. */
 export const noNul = '^[^\\u0000]*$'
@@ -13,33 +10,8 @@ const noControl = '^[^\\u0000-\\u001f\\u007f-\\u009f]*$'
 /** `pattern` of a record id, as `recordId` of `@open-reloading/schema`. */
 export const recordIdPattern = recordIdRegex.source
 
-/** What the compute routes read: the records to resolve ids against and the solver task runner. */
-export type ComputeContext = { catalogue: Catalogue; compute: ComputeRunner }
-
-/** A record as the routes answer it: the stored record without the `kind`, `origin` and `revision` that `Catalogue.get` adds. */
-export function stored<K extends CatalogueKind>(record: Catalogued<K>) {
-  const { kind, origin, revision, ...rest } = record
-  return rest
-}
-
 /** The `revision` field of the record answers that carry one. */
 export const revision = z.string().describe('Hash of the stored record, changes with any field.')
-
-/** A record as {@link stored} gives it, with its `revision`. */
-export function revised<K extends CatalogueKind>(record: Catalogued<K>) {
-  return { ...stored(record), revision: record.revision }
-}
-
-/** A record with its `origin` and `revision`, without the `kind`, for a kind whose schema carries `origin`. */
-export function originated<K extends CatalogueKind>(record: Catalogued<K>) {
-  const { kind, ...rest } = record
-  return rest
-}
-
-/** The answer for an id no record has: 404 naming the `noun`. */
-export function missing(reply: FastifyReply, id: string, noun: string): FastifyReply {
-  return reply.notFound(`${noun} ${id} not found`)
-}
 
 /** The JSON Schema of a route's path parameters or query string. */
 interface ObjectSchema {

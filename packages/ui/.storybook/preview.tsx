@@ -1,19 +1,28 @@
+import { setupI18n } from '@lingui/core'
 import type { Preview } from '@storybook/react-vite'
-import { UiProvider } from '../src/index.ts'
+import { UiProvider, uiMessages } from '../src/index.ts'
 import '../css/ui.css'
 
 // the width of a story test's project (vitest.config.ts); undefined in Storybook itself
 declare const __STORY_WIDTH__: number | undefined
 const testWidth = typeof __STORY_WIDTH__ === 'number' ? __STORY_WIDTH__ : undefined
 
+// one instance per language, picked by the toolbar: activating inside the decorator would update the provider in render
+const i18n = {
+  en: setupI18n({ locale: 'en', messages: uiMessages }),
+  de: setupI18n({ locale: 'de', messages: uiMessages }),
+}
+
 export default {
-  ...(testWidth && {
-    initialGlobals: { viewport: { value: 'test' } },
-  }),
+  // the story tests run in English
+  initialGlobals: { locale: 'en', ...(testWidth && { viewport: { value: 'test' } }) },
+  globalTypes: {
+    locale: { description: 'Language', toolbar: { icon: 'globe', items: ['en', 'de'] } },
+  },
   // the scheme follows the system setting, which each test browser of vitest.config.ts emulates
   decorators: [
-    (Story) => (
-      <UiProvider defaultColorScheme="auto">
+    (Story, { globals }) => (
+      <UiProvider i18n={globals['locale'] === 'de' ? i18n.de : i18n.en} defaultColorScheme="auto">
         <Story />
       </UiProvider>
     ),

@@ -5,8 +5,10 @@
 ```ts
 
 import type { ComponentPropsWithRef } from 'react';
+import type { I18n } from '@lingui/core';
 import type { LucideIcon } from 'lucide-react';
 import { MantineProviderProps } from '@mantine/core';
+import type { Messages } from '@lingui/core';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
 
@@ -19,11 +21,6 @@ export interface AppFrameProps {
     brand: ReactNode;
     children: ReactNode;
     end?: ReactNode;
-    labels: {
-        menu: string;
-        navigation: string;
-        close: string;
-    };
     navigation: ReactNode;
 }
 
@@ -92,7 +89,12 @@ export interface PageBarProps {
 }
 
 // @public
-export function UiProvider(props: Pick<MantineProviderProps, 'children' | 'defaultColorScheme' | 'forceColorScheme' | 'colorSchemeManager'>): ReactElement;
+export const uiMessages: Record<'en' | 'de', Messages>;
+
+// @public
+export function UiProvider(input: {
+    i18n: I18n;
+} & Pick<MantineProviderProps, 'children' | 'defaultColorScheme' | 'forceColorScheme' | 'colorSchemeManager'>): ReactElement;
 
 // (No @packageDocumentation comment for this package)
 

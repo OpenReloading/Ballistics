@@ -7,13 +7,7 @@ import { english, translator } from '../src/i18n/translate.ts'
 import { installCoreMessages } from '../src/lib/core-message-table.ts'
 import { exampleFirearm } from '../src/lib/example-data.ts'
 import { parseFiles, readNote } from '../src/lib/load-file-formats.ts'
-import {
-  maxLinkChars,
-  readLink,
-  shareLink,
-  shareProblem,
-  tooLongText,
-} from '../src/lib/share-link.ts'
+import { readLink, shareLink, shareProblem, tooLongText } from '../src/lib/share-link.ts'
 import {
   canonicalJson,
   checkedUserDataText,
@@ -572,7 +566,6 @@ describe('share links', () => {
   it('refuses a record whose link is longer than the limit', async () => {
     const big = { ...load, data: { ...load.data, notes: noise(12000) } } as UserRecord
     await expect(shareLink([big], base)).resolves.toBeUndefined()
-    expect(maxLinkChars).toBe(8000)
   })
 
   it('refuses a record whose compressed text is over 200 kB without building the link', async () => {

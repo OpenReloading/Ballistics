@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { readGrtLoad } from '../src/index.ts'
 import { defined } from './defined.ts'
 import { recordOf } from './record-of.ts'
+import { refusal } from './refusal.ts'
 
 /** The read of `xml` with the records the app makes of its candidates. */
 function read(xml: string) {
@@ -275,8 +276,17 @@ describe('readGrtLoad: line ends, warnings, names and refused files', () => {
   })
 
   it('refuses XML of another root, a file without load and text that is no XML', () => {
-    expect(() => readGrtLoad('<other/>')).toThrow('root element')
-    expect(() => readGrtLoad('<GordonsReloadingTool/>')).toThrow('no load')
-    expect(() => readGrtLoad('<GordonsReloadingTool>')).toThrow('unclosed element')
+    expect(refusal(() => readGrtLoad('<other/>'))).toEqual({
+      code: 'rootNotLoad',
+      params: { root: 'GordonsReloadingTool' },
+    })
+    expect(refusal(() => readGrtLoad('<GordonsReloadingTool/>'))).toEqual({
+      code: 'noLoad',
+      params: {},
+    })
+    expect(refusal(() => readGrtLoad('<GordonsReloadingTool>'))).toEqual({
+      code: 'unclosedElement',
+      params: { tag: 'GordonsReloadingTool' },
+    })
   })
 })

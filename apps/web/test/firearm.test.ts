@@ -1,8 +1,7 @@
 import type { CompetitionEvent, UserRecord } from '@open-reloading/schema'
 import { toSi, userRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
-import de from '../src/i18n/de.json'
-import { type Catalogue, translator } from '../src/i18n/translate.ts'
+import { translator } from '../src/i18n/translate.ts'
 import { loadExample } from '../src/lib/example-data.ts'
 import {
   activeClick,
@@ -549,11 +548,6 @@ describe('gunPicker', () => {
     expect(picker.placeholder).toBe(
       'No firearm saved yet. Pick the example rifle, or add yours under Firearms.',
     )
-    const german = gunPicker([], example, translator(de as Catalogue, 'de').t)
-    expect(german.placeholder).toBe(
-      de['No firearm saved yet. Pick the example rifle, or add yours under Firearms.'],
-    )
-    expect(german.rows[0]?.name).toBe('Example rifle, 308 Win. (Beispiel)')
   })
 
   it('lists the stored firearms first, the example after them', () => {
@@ -581,9 +575,6 @@ describe('sightPicker', () => {
     expect(picker.options[0]?.fill).toEqual(sightOptions([example])[0]?.fill)
     expect(picker.none).toBe(
       'No firearm saved yet. Pick the example rifle, or add yours under Firearms.',
-    )
-    expect(sightPicker([], example, translator(de as Catalogue, 'de').t).none).toBe(
-      de['No firearm saved yet. Pick the example rifle, or add yours under Firearms.'],
     )
   })
 

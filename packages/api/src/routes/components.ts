@@ -18,18 +18,8 @@ import type {
   Catalogued,
   PrimerQuery,
 } from '../catalogue/types.ts'
-import {
-  idParams,
-  listQuery,
-  missing,
-  noQuery,
-  originated,
-  page,
-  recordIdPattern,
-  revised,
-  revision,
-  stored,
-} from './common.ts'
+import { missing, originated, revised, stored } from './record-answers.ts'
+import { idParams, listQuery, noQuery, page, recordIdPattern, revision } from './schemas.ts'
 
 const powderQuery = listQuery({
   manufacturer: {

@@ -1,8 +1,8 @@
 import { z } from 'zod'
 import type { Exact } from './exact.ts'
+import { positiveLength, sha256 } from './fields.ts'
 import { recordId } from './ids.ts'
 import { provenance } from './provenance.ts'
-import { positiveLength, sha256 } from './shared.ts'
 import type { QuantitySchema } from './units.ts'
 
 /**

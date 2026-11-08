@@ -14,7 +14,13 @@ import { splitLines } from './text.ts'
 
 export type { Workbook, Worksheet } from './cells.ts'
 export { readCsrLoad } from './csrload.ts'
-export type { Candidate, ChronoDiagnostic, ReaderDiagnostic } from './diagnostics.ts'
+export type {
+  Candidate,
+  ChronoDiagnostic,
+  FileDiagnostic,
+  PressureDiagnostic,
+  ReaderDiagnostic,
+} from './diagnostics.ts'
 export { ReaderError } from './diagnostics.ts'
 export type { Column, ColumnMap, CommaRemedy, DelimitedOptions, Delimiter } from './generic.ts'
 export { parseDelimited } from './generic.ts'

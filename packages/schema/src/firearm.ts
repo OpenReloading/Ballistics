@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import type { Exact } from './exact.ts'
+import { localId, text } from './fields.ts'
 import { ref } from './ids.ts'
-import { localId, text } from './shared.ts'
 import { type QuantitySchema, quantity } from './units.ts'
 
 const length = () => quantity('length', z.number().nonnegative())
