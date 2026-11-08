@@ -193,9 +193,10 @@ describe('powder fit pressure basis', () => {
     expect(error).toBeInstanceOf(MixedPressureBasisError)
     expect(error).toBeInstanceOf(InputError)
     expect((error as MixedPressureBasisError).rows).toEqual({ piezo: 2, transducer: 3 })
-    expect((error as Error).message).toBe(
-      'pressure rows use more than one basis: 2 piezo, 3 transducer',
-    )
+    expect((error as InputError).issue).toEqual({
+      code: 'pressureBasesMixed',
+      params: { rows: { piezo: 2, transducer: 3 } },
+    })
   })
 
   it('refuses a pressure without a basis, a basis without a pressure and an unknown basis', () => {

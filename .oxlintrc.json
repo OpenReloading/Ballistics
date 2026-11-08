@@ -691,6 +691,24 @@
       "rules": {
         "no-restricted-imports": "off"
       }
+    },
+    {
+      "files": ["apps/web/src/lib/refusal-words.ts"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [],
+            "patterns": [
+              {
+                "group": ["*", "!../i18n/translate.ts", "!./*-gaps.ts", "!./*-words.ts"],
+                "allowTypeImports": true,
+                "message": "refusal-words-imports: refusal-words.ts loads in its own chunk once a page has started; it imports types, translate.ts and word modules only, so no page carries it or what it imports."
+              }
+            ]
+          }
+        ]
+      }
     }
   ]
 }

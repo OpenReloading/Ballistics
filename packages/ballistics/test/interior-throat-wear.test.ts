@@ -49,7 +49,11 @@ describe('interiorLoad with throat wear', () => {
     expect(worn.muzzleVelocity).toBeCloseTo(larger.muzzleVelocity, 9)
   })
   it('refuses a negative wear', () => {
-    expect(() => interiorLoad({ ...values, throatWear: -1e-3 })).toThrow(/at least 0/)
+    expect(() => interiorLoad({ ...values, throatWear: -1e-3 })).toThrow(
+      expect.objectContaining({
+        issue: { code: 'valueNegative', params: { field: 'throatWear' } },
+      }),
+    )
   })
 })
 
