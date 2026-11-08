@@ -1,7 +1,10 @@
 /**
  * `U` when the annotation `T` and the parser type `U` are assignable both ways, otherwise `never`. An export written
- * `export const x: T = parser satisfies Exact<typeof x, typeof parser>` fails tsc when `T` differs from the parser's type,
- * as in `@open-reloading/schema`. A type only, so the check leaves no code behind. It cannot see what zod types alike:
- * object strictness and what a schema checks within its type (`.min()`, `.refine()`, `.describe()`).
+ * `export const x: T = parser satisfies Exact<typeof x, typeof parser>` fails tsc when `T` lists fewer or more
+ * object keys or enum members than the parser, a looser type or another optionality. A type only, so the check
+ * leaves no code behind.
+ * It cannot see what zod types alike. Object strictness: `$strict` and `$strip` are one type, and a `$strip`
+ * annotation also passes for a loose object, so check the strictness of an annotation by eye. And what a schema
+ * checks within its type: `.min()`, `.regex()`, `.refine()`, `.describe()` or `.meta()`.
  */
 export type Exact<T, U> = [T] extends [U] ? ([U] extends [T] ? U : never) : never

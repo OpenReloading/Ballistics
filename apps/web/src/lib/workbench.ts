@@ -1,5 +1,3 @@
-// the words alone: the compute entry would pull its schemas into the workbench
-
 import {
   fillLoadRatioLimit,
   loadRatio,
@@ -7,7 +5,8 @@ import {
   solidFillLimit,
 } from '@open-reloading/ballistics'
 import { fromSi, sheetId, toSi } from '@open-reloading/schema'
-import { advisoryText } from '@open-reloading/use-cases'
+// the words alone: the package root would pull the schemas of the runs into the workbench
+import { advisoryText } from '@open-reloading/use-cases/advisories'
 import { formatNumber } from '../i18n/number.ts'
 import { msg, type Say, type Translator } from '../i18n/translate.ts'
 import type { InteriorResponse } from './api-types.ts'
