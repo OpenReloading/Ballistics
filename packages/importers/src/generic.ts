@@ -1,4 +1,5 @@
 import type { ChronoShot } from '@open-reloading/schema'
+import { type ChronoDiagnostic, ReaderError, refuse } from './diagnostics.ts'
 import {
   buildChronoImport,
   type ChronoFormatId,
@@ -6,7 +7,7 @@ import {
   type ChronoParserOptions,
   type SessionCandidate,
 } from './result.ts'
-import { bracketed, errorMessage, splitDelimited, splitLines } from './text.ts'
+import { bracketed, splitDelimited, splitLines } from './text.ts'
 import { parseVelocity, parseVelocityUnit, resolveUnit } from './units.ts'
 
 /** A column number counted from 1, or the header text of the column. */
@@ -96,13 +97,20 @@ interface RowContext {
   token: string | undefined
   headerText: string | undefined
   options: DelimitedOptions
-  warnings: string[]
+  warnings: ChronoDiagnostic[]
 }
 
-/** Whether a detected comma may cut a velocity, and what the user can do about it. */
+/**
+ * What the user can do about a detected comma that may cut a velocity, the `remedy` param of
+ * `commaMaySplit`, `commaMayCutVelocity` and `moreCellsThanHeaderComma`: quote the cell or use `;`
+ * (`quoteOrSemicolon`, a template), else name the delimiter (`nameDelimiter`).
+ */
+export type CommaRemedy = 'quoteOrSemicolon' | 'nameDelimiter'
+
+/** Whether a detected comma may cut a velocity, and the remedy. */
 interface CommaCheck {
   mayCut: boolean
-  remedy: string
+  remedy: CommaRemedy
 }
 
 /**
@@ -122,23 +130,18 @@ function validateColumns(options: DelimitedOptions): MappedColumn[] {
   )
   for (const column of columns) checkColumn(column)
   const { skipRows } = options
-  if (skipRows !== undefined && !(Number.isInteger(skipRows) && skipRows >= 0)) {
-    throw new Error('skipRows must be a whole number >= 0')
-  }
-  if (skipRows !== undefined && columns.some(([, c]) => typeof c === 'string')) {
-    throw new Error(
-      'skipRows applies only when every column is a number; the header row is found by name',
-    )
-  }
+  if (skipRows !== undefined && !(Number.isInteger(skipRows) && skipRows >= 0))
+    refuse('skipRowsNotWhole')
+  if (skipRows !== undefined && columns.some(([, c]) => typeof c === 'string'))
+    refuse('skipRowsWithHeaderText')
   return columns
 }
 
 /** Throws on a column number below 1 or empty header text. */
 function checkColumn([key, c]: MappedColumn): void {
-  if (typeof c === 'number' && !(Number.isInteger(c) && c >= 1)) {
-    throw new Error(`column ${key} = ${c}: column numbers count from 1`)
-  }
-  if (typeof c === 'string' && !c.trim()) throw new Error(`column ${key}: empty header text`)
+  if (typeof c === 'number' && !(Number.isInteger(c) && c >= 1))
+    refuse('columnBelowOne', { column: key, number: c })
+  if (typeof c === 'string' && !c.trim()) refuse('emptyHeaderText', { column: key })
 }
 
 /** The cell index of each mapped column: its number, or the place of its header text. */
@@ -197,9 +200,7 @@ function findHeader(
     names,
   )
   const row = rows[h]
-  if (row === undefined) {
-    throw new Error(`no header row holds ${names.map((n) => `"${n}"`).join(', ')}`)
-  }
+  if (row === undefined) refuse('noHeaderRow', { names })
   const header = row.cells.map((c) => c.toLowerCase())
   const headerText =
     typeof velocity === 'string'
@@ -235,9 +236,10 @@ function checkRows(
     }
   }
   if (first) {
-    warnings.push(
-      `${suspectRows(suspect)}: "${first.join(',')}" may be a velocity with a decimal comma or a thousands separator split by the delimiter; check the values or ${comma.remedy}`,
-    )
+    warnings.push({
+      code: 'commaMaySplit',
+      params: { rows: suspect.map(String), cells: first.join(','), remedy: comma.remedy },
+    })
   }
 }
 
@@ -252,15 +254,15 @@ function checkRow(
   { mayCut, remedy, pair }: CommaCheck & { pair: [string, string] | undefined },
 ): void {
   checkOverflow(r, header, mayCut, remedy)
-  if (pair && !header) {
-    throw new Error(
-      `row ${r.lineNumber}: "${pair.join(',')}" may be one velocity with a decimal comma or a thousands separator; ${remedy}`,
-    )
-  }
+  if (pair && !header)
+    refuse('commaMayCutVelocity', { row: r.lineNumber, cells: pair.join(','), remedy })
   if (!header && firstRow && r.cells.length !== firstRow.cells.length) {
-    throw new Error(
-      `row ${r.lineNumber}: ${r.cells.length} cells, row ${firstRow.lineNumber} has ${firstRow.cells.length}`,
-    )
+    refuse('cellCountDiffers', {
+      row: r.lineNumber,
+      cells: r.cells.length,
+      firstRow: firstRow.lineNumber,
+      firstCells: firstRow.cells.length,
+    })
   }
 }
 
@@ -269,15 +271,12 @@ function checkOverflow(
   r: Row,
   header: string[] | undefined,
   commaMayCut: boolean,
-  remedy: string,
+  remedy: CommaCheck['remedy'],
 ): void {
   if (!header || r.cells.length <= header.length) return
-  const hint = commaMayCut
-    ? `; an unquoted comma inside a cell (a decimal comma or a thousands separator) splits it: ${remedy}`
-    : ''
-  throw new Error(
-    `row ${r.lineNumber}: ${r.cells.length} cells, the header has ${header.length}${hint}`,
-  )
+  const params = { row: r.lineNumber, cells: r.cells.length, header: header.length }
+  if (commaMayCut) refuse('moreCellsThanHeaderComma', { ...params, remedy })
+  refuse('moreCellsThanHeader', params)
 }
 
 /** The two cells of a row that may be one velocity split at a comma, when there are such. */
@@ -296,13 +295,6 @@ function commaPair(
   return undefined
 }
 
-/** The line numbers of suspect rows as text, the first five named. */
-function suspectRows(suspect: number[]): string {
-  if (suspect.length === 1) return `row ${suspect[0]}`
-  const more = suspect.length > 5 ? ` and ${suspect.length - 5} more` : ''
-  return `rows ${suspect.slice(0, 5).join(', ')}${more}`
-}
-
 /**
  * The unit text of a row's velocity: a non-empty unit cell wins over the header `token`; refused
  * when both name different units.
@@ -314,9 +306,11 @@ function velocityUnitText(
 ): string | undefined {
   const [fromCell, fromHeader] = [parseVelocityUnit(unitCell), parseVelocityUnit(token)]
   if (fromCell && fromHeader && fromCell !== fromHeader) {
-    throw new Error(
-      `velocityUnit "${unitCell}" differs from "${token}" in the velocity header "${headerText}"`,
-    )
+    refuse('unitCellDiffersFromHeader', {
+      cell: unitCell ?? '',
+      token: token ?? '',
+      header: headerText ?? '',
+    })
   }
   // an unknown unit cell does not hide a recognised header token
   return fromCell || !fromHeader ? unitCell || token : token
@@ -328,9 +322,7 @@ function isColdBore(text: string | undefined): boolean {
   const lower = text.toLowerCase()
   if (truthy.includes(lower)) return true
   if (falsy.includes(lower)) return false
-  throw new Error(
-    `coldBore "${text}" is not one of ${[...truthy, ...falsy.slice(1)].join(', ')} or empty`,
-  )
+  return refuse('coldBoreUnknown', { text, choices: [...truthy, ...falsy.slice(1)] })
 }
 
 /**
@@ -355,7 +347,7 @@ function readRowShot(
   return shot
 }
 
-/** `readRowShot` with the row's line number in the message of an error. */
+/** `readRowShot` with the row's line number in the diagnostic of a refusal. */
 function readRowShotAt(
   lineNumber: number,
   cell: (key: keyof ColumnMap) => string | undefined,
@@ -364,7 +356,9 @@ function readRowShotAt(
   try {
     return readRowShot(cell, context)
   } catch (e) {
-    throw new Error(`row ${lineNumber}: ${errorMessage(e)}`, { cause: e })
+    if (!(e instanceof ReaderError)) throw e
+    const { code, params } = e.diagnostic
+    throw new ReaderError({ code, params: { ...params, row: lineNumber } }, { cause: e })
   }
 }
 
@@ -398,7 +392,7 @@ export function parseDelimitedRows(
   checkRows(data, header, context, {
     mayCut: (options.delimiter === undefined || detected) && delimiter === ',',
     // a template takes its delimiter from the header line, so the user cannot name another one
-    remedy: detected ? "quote the cell or use ';' as the delimiter" : 'name the delimiter',
+    remedy: detected ? 'quoteOrSemicolon' : 'nameDelimiter',
   })
   const { strings, labels } = readStrings(data, context)
 
@@ -427,17 +421,14 @@ function readStrings(
       return i === undefined ? undefined : (r.cells[i] ?? '')
     }
     if (!cell('velocity')) {
-      warnings.push(`row ${r.lineNumber}: no velocity; skipped`)
+      warnings.push({ code: 'noVelocity', params: { row: r.lineNumber } })
       continue
     }
     const shot = readRowShotAt(r.lineNumber, cell, context)
     const label = cell('string')
     if (open === undefined || label !== current) {
-      if (label !== undefined && seen.has(label)) {
-        warnings.push(
-          `row ${r.lineNumber}: string "${label}" returns after another string; read as a new string`,
-        )
-      }
+      if (label !== undefined && seen.has(label))
+        warnings.push({ code: 'stringReturns', params: { row: r.lineNumber, label } })
       if (label !== undefined) seen.add(label)
       open = { shots: [] }
       strings.push(open)

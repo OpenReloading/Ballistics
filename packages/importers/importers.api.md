@@ -42,6 +42,9 @@ export type Candidate = UserRecord extends infer R ? R extends UserRecord ? Omit
 } : never : never;
 
 // @public
+export type ChronoDiagnostic = ReaderDiagnostic<'sha256Malformed' | 'outsideRange' | 'noShots' | 'unitDiffersFromCaller' | 'unknownUnit' | 'missingUnit' | 'unknownUnitNamedByCaller' | 'missingUnitNamedByCaller' | 'velocityNotNumber' | 'velocityNotPositive' | 'skipRowsNotWhole' | 'skipRowsWithHeaderText' | 'columnBelowOne' | 'emptyHeaderText' | 'noHeaderRow' | 'commaMaySplit' | 'commaMayCutVelocity' | 'cellCountDiffers' | 'moreCellsThanHeader' | 'moreCellsThanHeaderComma' | 'unitCellDiffersFromHeader' | 'coldBoreUnknown' | 'noVelocity' | 'stringReturns' | 'notShotView' | 'footerDateUnknown' | 'footerDateMissing' | 'noShotViewHeader' | 'statisticNotNumber' | 'statisticDiffers' | 'footerStatisticsMissing' | 'dateFromOption' | 'noShotRows' | 'noStringOnDate' | 'severalDays' | 'notSessionJson' | 'versionUnsupported' | 'memberNotPositive' | 'memberNotText' | 'memberNotObject' | 'memberNotDeviceKind' | 'velocityRequired' | 'memberNotBoolean' | 'excludedNotText' | 'noStrings' | 'noStringShots' | 'memberNotDate' | 'notTemplate' | 'needsColumnMapping' | 'readsText' | 'readsWorkbooks'>;
+
+// @public
 export type ChronoFormat = TextChronoFormat | WorkbookChronoFormat;
 
 // @public
@@ -63,7 +66,7 @@ export interface ChronoImport {
         source: 'file' | 'caller';
     }[];
     // (undocumented)
-    warnings: string[];
+    warnings: ChronoDiagnostic[];
 }
 
 // @public
@@ -96,6 +99,9 @@ export interface ColumnUnit {
     symbol: string;
     toStored: (x: number) => number;
 }
+
+// @public
+export type CommaRemedy = 'quoteOrSemicolon' | 'nameDelimiter';
 
 // @public
 export function decodeText(bytes: Uint8Array): string;
@@ -263,6 +269,13 @@ export function readCsrLoad(xml: string): GrtLoadRead;
 
 // @public
 export type ReaderDiagnostic<Code extends string> = Diagnostic<Code, Readonly<Record<string, string | number | readonly string[]>>>;
+
+// @public
+export class ReaderError extends Error {
+    constructor(diagnostic: ChronoDiagnostic, options?: ErrorOptions);
+    // (undocumented)
+    readonly diagnostic: ChronoDiagnostic;
+}
 
 // @public
 export function readGrtLoad(xml: string): GrtLoadRead;

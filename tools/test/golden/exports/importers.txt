@@ -1,6 +1,7 @@
 . BuiltEntry
 . BuiltRecords
 . Candidate
+. ChronoDiagnostic
 . ChronoFormat
 . ChronoFormatId
 . ChronoImport
@@ -8,6 +9,7 @@
 . Column
 . ColumnMap
 . ColumnUnit
+. CommaRemedy
 . DelimitedOptions
 . Delimiter
 . FieldSpec
@@ -21,6 +23,7 @@
 . PressureHistoryOptions
 . PressureUnit
 . ReaderDiagnostic
+. ReaderError
 . RowCounts
 . RowIssue
 . SensorPosition

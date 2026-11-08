@@ -9,6 +9,7 @@ import {
   type Workbook,
 } from '../src/index.ts'
 import { shotViewEnglish, shotViewSheetEnglish, template } from './fixtures.ts'
+import { refusal } from './refusal.ts'
 
 const utf16le = (s: string) => Array.from(s).flatMap((c) => [c.charCodeAt(0), 0])
 const utf16be = (s: string) => Array.from(s).flatMap((c) => [0, c.charCodeAt(0)])
@@ -77,11 +78,20 @@ describe('parseChrono', () => {
     expect(parseChrono(template, { device })?.session.device).toEqual(device)
     const r = parseChrono('2800\n2810', { columns: { velocity: 1 }, ...options }, 'delimited')
     expect(r).toEqual(parseDelimited('2800\n2810', { columns: { velocity: 1 }, ...options }))
-    expect(() => parseChrono('2800', {}, 'delimited')).toThrow(/needs a column mapping/)
+    expect(refusal(() => parseChrono('2800', {}, 'delimited'))).toEqual({
+      code: 'needsColumnMapping',
+      params: {},
+    })
   })
 
   it('refuses a named format of the other file kind', () => {
-    expect(() => parseChrono({ worksheets: [] }, {}, 'shotview-csv')).toThrow(/reads text/)
-    expect(() => parseChrono('2800', {}, 'shotview-xlsx')).toThrow(/reads workbooks/)
+    expect(refusal(() => parseChrono({ worksheets: [] }, {}, 'shotview-csv'))).toEqual({
+      code: 'readsText',
+      params: { format: 'shotview-csv' },
+    })
+    expect(refusal(() => parseChrono('2800', {}, 'shotview-xlsx'))).toEqual({
+      code: 'readsWorkbooks',
+      params: { format: 'shotview-xlsx' },
+    })
   })
 })
