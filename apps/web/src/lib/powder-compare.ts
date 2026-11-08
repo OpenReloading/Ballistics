@@ -3,7 +3,7 @@ import { type Powder, toSi } from '@open-reloading/schema'
 import type { InteriorBody } from './interior-input.ts'
 import { type SortDirection, sortRows } from './lists.ts'
 
-/** `percent`: of the cartridge's compared CIP limit. */
+/** `fill` is a fraction of the case fill, `value` a peak pressure in Pa, or with `percent` in percent of the cartridge's compared CIP limit. */
 export type CompareMode =
   | { kind: 'typed' }
   | { kind: 'fill'; fill: number }
@@ -15,7 +15,7 @@ export const caseFillPercentRange = { min: 10, max: 120, initial: 100 } as const
 /** Powders in flight at once: within the API pool, which also serves the user's own Run. */
 export const compareConcurrency = 3
 
-/** Undefined for a fill without a bulk density. */
+/** kg; undefined for a fill without a bulk density. */
 export function compareCharge(
   mode: CompareMode,
   typed: number,
@@ -37,7 +37,7 @@ export function recordFill(p: Powder) {
   return Object.fromEntries(Object.entries(all).filter(([k]) => k !== 'startPressure'))
 }
 
-/** The current powder's fields stand as edited; a record without its own start pressure runs at `startDefault`, not the current one's. */
+/** SI, `as.charge` in kg; the current powder's fields stand as edited, and a record without its own start pressure runs at `startDefault` (SI), not the current one's. */
 export function powderValues(
   fields: Record<string, number | undefined>,
   current: { id: string } | undefined,

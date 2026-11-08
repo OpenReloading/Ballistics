@@ -37,7 +37,7 @@ type Translate = Translator['t']
 /** Without a catalogue every text is English: what the record functions give when no translation is passed. */
 const english = translator().t
 
-/** The printed text and how a computed value is computed show on hover. */
+/** A quantity in SI shows in the viewer's unit; the printed text and how a computed value is computed show on hover. */
 export interface FieldRow {
   /** A message (`msg`), or `verbatim(name)` for a name as published (a drag model, a composition's substance). */
   label: Wording
@@ -398,7 +398,7 @@ export function powderRowGroups(
   ]
 }
 
-/** Interval to two significant digits, value to the same place; no-break spaces so it wraps only before the percent. */
+/** Interval to two significant digits, value to the same place, the interval also in percent (whole from 10 %); no-break spaces so it wraps only before the percent. */
 export function intervalText(value: number, half: number | undefined): string {
   if (half === undefined || !(half > 0)) return `${value}`
   const digits = Math.max(0, 1 - Math.floor(Math.log10(half)))
@@ -628,7 +628,6 @@ const bulletType = (b: Bullet): FieldRow[] => {
     : [{ label: msg('Type'), text: parts.join(', '), words: parts.map((p) => rawWording(p)) }]
 }
 
-/** Only what the record has. */
 export function bulletStrip(b: Bullet): StripItem[] {
   const bcs = b.ballisticCoefficients ?? []
   const shown = ['G1', 'G7'].flatMap((m) => {
@@ -718,7 +717,6 @@ const capacityRow = (c: Pick<Case, 'waterCapacity'>): FieldRow[] =>
       ]
     : []
 
-/** Only what the record has. */
 export function caseStrip(c: Case, manufacturerName?: string): StripItem[] {
   return [
     ...stripItem(
@@ -736,7 +734,6 @@ export function caseStrip(c: Case, manufacturerName?: string): StripItem[] {
   ]
 }
 
-/** Only what the record has. */
 export function primerStrip(p: Primer, manufacturerName?: string): StripItem[] {
   return [
     ...stripItem(

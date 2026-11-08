@@ -12,7 +12,7 @@ export interface MovingTargetRow {
   lengths?: number
 }
 
-/** `targetLength` turns the lateral lead into target lengths. */
+/** For a target at `speed` m/s on `heading` rad; `targetLength` (m) turns the lateral lead into target lengths. */
 export function movingTargetRows(
   points: readonly TrajectoryPoint[],
   speed: number,

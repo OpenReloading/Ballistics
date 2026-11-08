@@ -67,7 +67,7 @@ export function givenKeys(values: Record<string, number | undefined>, g: Givers)
 /** The grams of a measured capacity as the schema stores it, rounded like every stored value. */
 const gramsOf = (m3: number) => Number(waterGrams(m3).toPrecision(12))
 
-/** A UUID v8 from both, so one measurement is one record and a changed value a new one that older loads keep. */
+/** `m3` is the water to the mouth, m³; a UUID v8 from both, so one measurement is one record and a changed value a new one that older loads keep. */
 export function measuredCapacityId(cartridge: string, m3: number): string {
   let [a, b, c, d] = [1779033703, 3144134277, 1013904242, 2773480762]
   for (const ch of `${cartridge}|${gramsOf(m3)}`) {
@@ -88,7 +88,7 @@ export function measuredCapacityId(cartridge: string, m3: number): string {
 export const measuredCapacityRef = (cartridge: string, m3: number) =>
   `user:${measuredCapacityId(cartridge, m3)}`
 
-/** A record of another cartridge is no capacity of this load. */
+/** Water capacity in g; a record of another cartridge is no capacity of this load. */
 export function capacityOfRecord(raw: unknown, cartridge: string): number | undefined {
   const r = userRecord.safeParse(raw)
   return r.success && r.data.kind === 'caseCapacity' && r.data.data.cartridge === cartridge

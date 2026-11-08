@@ -58,7 +58,7 @@ export const fetchPrimerCatalogue = once(
   (): Promise<PrimerRow[]> => listWithMakers<PrimerSummary>('primers'),
 )
 
-/** A group of the user's cases has a `user:` id and its measured water. */
+/** A group of the user's cases has a `user:` id; `waterCapacity` is the stated or measured water, g. */
 export interface CaseRow {
   id: string
   name: string

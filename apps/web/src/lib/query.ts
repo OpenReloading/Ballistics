@@ -94,7 +94,7 @@ export function linkedLoad(query: URLSearchParams):
 export const workbenchHref = (kind: 'cartridge' | 'bullet' | 'powder', id: string) =>
   `/workbench?${new URLSearchParams({ [kind]: id })}`
 
-/** A workbench link carries these under `record.`, so the load runs the same where a record is missing. */
+/** SI (`sensitivityReference` in K); a workbench link carries these under `record.`, so the load runs the same where a record is missing. */
 export type RecordValues = {
   bullet?: { name?: string | undefined; length?: number | undefined } | undefined
   powder?:

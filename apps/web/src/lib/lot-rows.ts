@@ -88,7 +88,7 @@ export function barrelTimes(
   }))
 }
 
-/** Undefined unless both lots and the nominal row have a result, so a band never spans fewer rows than it names. */
+/** Shortest and longest barrel time, s; undefined unless both lots and the nominal row have a result, so a band never spans fewer rows than it names. */
 export function barrelTimeBand(t: BarrelTimes): [number, number] | undefined {
   if (t.nominal === undefined || t.low === undefined || t.high === undefined) return
   return [Math.min(t.nominal, t.low, t.high), Math.max(t.nominal, t.low, t.high)]

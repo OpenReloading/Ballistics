@@ -37,7 +37,6 @@ export function loadUse(records: readonly UserRecord[]) {
   return { loads, firearms }
 }
 
-/** Firearm, sessions or "No session", and the last session day. */
 export const loadUseText = (
   use: LoadUse | undefined,
   firearm: string | undefined,

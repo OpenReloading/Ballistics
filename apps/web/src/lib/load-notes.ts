@@ -65,7 +65,7 @@ export function effectiveSnapshots(
   return refs.map((ref) => stored.find((s) => s.session === ref) ?? snapshotOf(ref, now))
 }
 
-/** Only that session's snapshot becomes stored; the others stay live. */
+/** Only that session's snapshot becomes stored; the others stay stored or live as they were. */
 export function dismissed(
   stored: readonly SessionSnapshot[],
   effective: readonly SessionSnapshot[],
@@ -78,7 +78,7 @@ export function dismissed(
   return [...stored.filter((s) => s.session !== session), next]
 }
 
-/** None without such a string or counted shot. */
+/** `charge` in kg; none without such a string or counted shot. */
 function velocityOf(record: SessionRecord | undefined, charge: number | undefined) {
   if (!record || charge === undefined) return
   const shots = record.data.strings

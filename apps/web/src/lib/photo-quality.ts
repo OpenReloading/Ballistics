@@ -55,7 +55,7 @@ export type QualityIssue = {
   fix: Message
 }
 
-/** The photo may show only the centre or cut the rings, so only the presence of a black zone is used. */
+/** The photo may show only the centre or cut the rings, so only the presence of a black zone is used, never a ring, size or extent. */
 export type TargetLayout = {
   /** Whether the target has a black zone; absent when the record does not give the zone colours. */
   dark?: boolean | undefined
@@ -254,7 +254,7 @@ const quantileOf = (v: readonly number[], p: number) => {
 /** Grey level that counts as lit paper. */
 const LIT = 120
 
-/** The paper level of any pattern; undefined below three lit quarters, as a black zone may fill the photo. */
+/** The unevenness of the light over the quarters' 90th percentiles, the paper level of any pattern; undefined below three lit quarters, as a black zone may fill the photo. */
 function quarterLight(grid: ReturnType<typeof grayGrid>): number | undefined {
   const parts: number[][] = [[], [], [], []]
   grid.grey.forEach((g, i) => {
@@ -265,7 +265,7 @@ function quarterLight(grid: ReturnType<typeof grayGrid>): number | undefined {
   return levels.filter((v) => v >= LIT).length >= 3 ? sidesDifference(levels) : undefined
 }
 
-/** A white zone inside the black area does not count; without one in frame, the photo's own percentiles. */
+/** A white zone inside the black area does not count; without one in frame, the photo's 95th percentile, darkest 5 % and quarters. */
 function gridMeasures(image: RgbaImage, black: Ellipse | undefined, s: number) {
   const grid = grayGrid(image, s)
   const whole = Array.from(grid.grey)
@@ -297,7 +297,7 @@ function stepWidth(p: readonly number[], step: number): number | undefined {
   return rise > 0 ? Math.abs(hi - lo) / (rise / step) : undefined
 }
 
-/** Steps of 40 grey levels leave thin lines out, so rings alone give no measure; undefined below 20 points. */
+/** Width in px of the sharpest edges: steps of 40 grey levels leave thin lines out, so rings alone give no measure; undefined below 20 points. */
 function edgeSharpness(image: RgbaImage, hole: number): number | undefined {
   const { width, height } = image
   const [span, step] = [clamp(0.75 * hole, 6, 30), 0.5]

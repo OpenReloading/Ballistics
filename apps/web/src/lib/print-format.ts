@@ -8,7 +8,7 @@ const printed = (text: string, symbol: string) => {
   return symbol ? `${local} ${symbol}` : local
 }
 
-/** With a workbench field's decimals (`fixedFieldText`), the language's mark and the unit. */
+/** With a workbench field's decimals (`fixedFieldText`: 2.8000 in, 71.12 mm, 37.0 gr), the language's mark and the unit. */
 export const printedValue = (q: Quantity, system: UnitSystem, si: number) =>
   printed(fixedFieldText(q, system, si), system[q].symbol)
 

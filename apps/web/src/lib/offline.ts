@@ -44,7 +44,7 @@ export const shellFiles = ['/manifest.webmanifest', '/icon.png', '/icon-192.png'
 
 export const shellCache = (version: string, edition = '') => shellPrefix(edition) + version
 
-/** The newest other shell stays for tabs still on that build; shortcut: a tab open across two deploys loses its chunks, keep more shells if that matters. */
+/** `names` in creation order, as `caches.keys()` gives them, so the newest other shell stays for tabs still on that build; shortcut: a tab open across two deploys loses its chunks, keep more shells if that matters. */
 export const staleCaches = (names: string[], version: string, edition = '') =>
   names
     .filter((n) => n.startsWith(shellPrefix(edition)) && n !== shellCache(version, edition))

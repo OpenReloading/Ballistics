@@ -30,7 +30,7 @@ if (typeof window !== 'undefined')
 type Go = (href: string, options?: object) => void
 type Router = { push: Go; replace: Go; guarded?: true }
 
-// `useRouter` copies the instance's methods on first render, so the root providers import this module before any page.
+// `window.next.router` is the instance `useRouter` hands out, and `useRouter` copies its methods on first render, so the root providers import this module before any page.
 const router =
   typeof window === 'undefined'
     ? undefined

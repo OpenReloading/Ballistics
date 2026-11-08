@@ -11,7 +11,7 @@ import {
   tooLargeMessage,
 } from './user-data.ts'
 
-/** Detected and read from the bytes, so the extension plays no part; a new format is its module plus one entry here. */
+/** Detected and read from the bytes into records that passed `@open-reloading/schema` at runtime, so the extension plays no part; a new format is its module plus one entry here. */
 export interface LoadFileFormat {
   /** Shown in the open picker and on the Import entry's card. */
   name: string

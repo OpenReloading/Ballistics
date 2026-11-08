@@ -20,7 +20,7 @@ export interface PowderFitRequest {
   anyway?: boolean | undefined
 }
 
-/** `load` itself without a value above 0. */
+/** `sensitivity` in 1/K below and above the load's propellant temperature; `load` itself without a value above 0. */
 export const withSensitivity = (
   load: InteriorLoad,
   sensitivity: number | undefined,
@@ -49,7 +49,7 @@ export function temperatureFit(load: InteriorLoad, strings: readonly Chronograph
   return t && (t.cold !== 0 || t.hot !== 0) ? 'fit' : 'sensitivity'
 }
 
-/** A refused fit or a failure ends the answer. */
+/** In order: the fit and its band, then the range; a refused fit or a failure ends the answer, after the fit when the range failed. */
 export type PowderFitReply =
   /** Why the burn coefficient was fitted alone. */
   | {
@@ -64,7 +64,7 @@ export type PowderFitReply =
   | { kind: 'refused'; id: number; reason: PowderFitReason; charge?: number | undefined }
   | { kind: 'error'; id: number; message: string }
 
-/** One value per parameter of `fit`, in its order. */
+/** One value per parameter of `fit`, in its order; `charges` in kg. */
 export interface PowderHandRequest {
   kind: 'hand'
   id: number

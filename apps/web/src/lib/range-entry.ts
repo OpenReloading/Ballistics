@@ -391,7 +391,7 @@ const maxSessions = 50
 
 const lot = (text: string | undefined) => text?.trim() || undefined
 
-/** The snapshot keeps the session from reading later changes of the load; throws at the load's session limit. */
+/** The snapshot keeps the session from reading later changes of the load; throws at the load's session limit; undefined when it names the session already. */
 export function withSession(
   record: UserRecord,
   ref: string,

@@ -136,7 +136,6 @@ export function loadStrings(sessions: readonly SessionRecord[]) {
   return { load, strings: pick(true), left: pick(false) }
 }
 
-/** Excluded shots and empty strings are left out. */
 export const fitStrings = (strings: readonly TuneString[]): ChronographString[] =>
   strings.flatMap(({ charge, shots, temperature }) => {
     const velocities = shots.filter((s) => !s.excluded).map((s) => s.velocity.value)
@@ -144,7 +143,7 @@ export const fitStrings = (strings: readonly TuneString[]): ChronographString[] 
     return [{ charge, velocities, ...(temperature && { propellantTemperature: temperature }) }]
   })
 
-/** Spaces or semicolons separate, since a comma may be the decimal mark. */
+/** Spaces or semicolons separate, since a comma may be the decimal mark; undefined when none or one is no positive number. */
 export function parseVelocities(text: string, toSi: (x: number) => number) {
   const parts = text.split(/[\s;]+/).filter((p) => p !== '')
   const values = parts.map((p) => parseNumber(p, { min: 0 }))

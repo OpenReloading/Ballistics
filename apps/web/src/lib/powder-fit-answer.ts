@@ -31,7 +31,7 @@ export function bandCharges({ min, max }: PowderFit['chargeRange'], n = 25) {
   return Array.from({ length: n }, (_, i) => lo + ((hi - lo) * i) / (n - 1))
 }
 
-/** Below these, the ladder is too thin to fit more than the burn coefficient. */
+/** A ladder below these charges and spread leaves `values` out of the fit. */
 const thinRule = {
   charges: 3,
   spread: 0.1,
@@ -137,7 +137,7 @@ export function handLoad(fit: PowderHandRequest['fit'], values: readonly number[
   return l
 }
 
-/** 10 times the default: under 1e-6 m/s of muzzle velocity, about 6 times faster, so the curve follows a slider on a slow device. */
+/** s, 10 times the default: under 1e-6 m/s of muzzle velocity, about 6 times faster, so the curve follows a slider on a slow device. */
 const handOutputStep = 2e-5
 
 /** The muzzle velocity of the hand-tuned load at each charge of `q`; a charge that does not run is left out. */

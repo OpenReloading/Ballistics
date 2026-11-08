@@ -69,7 +69,7 @@ export const newManufacturerRecord = (id: string, typed: string, now: Date): Use
   data: { origin: 'user' },
 })
 
-/** Undefined for an unmatched name while the catalogue is unknown: a user maker made now could duplicate one there. */
+/** The caller stores `created` and adds it to `known`, or the reference dangles and the next name duplicates it; undefined for an unmatched name while the catalogue is unknown. */
 export function referTo(
   known: readonly KnownManufacturer[],
   typed: string,

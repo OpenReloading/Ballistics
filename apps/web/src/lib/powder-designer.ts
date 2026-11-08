@@ -701,7 +701,7 @@ export const powderDesigns = (records: readonly UserRecord[]): PowderDesign[] =>
       : []
   })
 
-/** A refit names the record it refits, so the chain walks forward from `id`; `deleteRecords` relinks. */
+/** A refit names the record it refits, so the chain walks forward from `id`; `deleteRecords` relinks; undefined when no refit is stored. */
 export function newerFit(designs: readonly PowderDesign[], id: string): PowderDesign | undefined {
   let newest: PowderDesign | undefined
   const seen = new Set<string>()

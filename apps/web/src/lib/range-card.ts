@@ -51,7 +51,7 @@ export function zeroConditions(
   }
 }
 
-/** Written as the fields show them (`roundedFieldText`); manual bullet fields lead with mass and BC. */
+/** From the SI inputs and the zero range (m), written as the fields show them (`roundedFieldText`); manual bullet fields lead with mass and BC. */
 export function rangeCardFacts(
   si: Record<string, number | undefined>,
   zero: number,

@@ -23,7 +23,7 @@ export function withCharge(s: SessionString, kg: number | undefined): SessionStr
     : { ...rest, variation: { kind: 'charge', value: { value: storedMass(kg) } } }
 }
 
-/** Texts are cut to the schema's caps. */
+/** `charges[i]` in kg; texts are cut to the schema's caps. */
 export function sessionOf(
   name: string,
   data: ChronoImport,

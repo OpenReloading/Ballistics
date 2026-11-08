@@ -110,7 +110,7 @@ export function recordMark(
     : t('Changed from the user design value {value}.', { value })
 }
 
-/** Fitted energy over impetus / (gamma - 1) at the mean composition, a plausibility check. */
+/** Fitted energy over impetus / (gamma - 1) at the mean composition, a plausibility check; undefined without thermochemistry or a fit. */
 export function fittedEnergyRatio(p: Powder) {
   const t = p.thermochemistry
   if (!t || !p.interior || !(t.gamma.value > 1)) return

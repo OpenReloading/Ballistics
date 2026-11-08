@@ -26,7 +26,7 @@ export function defaultFactor(duration: number): number {
 /** Positions of the time slider: k from 0 to `scrubSteps` is k / `scrubSteps` of the muzzle time. */
 export const scrubSteps = 1000
 
-/** Equal times give the last; a table cell per point holds the index at its start, so a lookup walks only its cell. */
+/** times[i] <= t < times[i + 1], 0 to n - 2 (0 before the first time or for NaN), equal times the last; a table cell per point holds the index at its start, so a lookup walks only its cell. */
 export function timeIndex(times: readonly number[]): (t: number) => number {
   const n = times.length
   // no times: NaN, as arithmetic on a missing entry has it
@@ -122,7 +122,7 @@ export function travelScrub(points: readonly Point[]): Scrub {
   }
 }
 
-/** A frame lands on the next stop, so the marker sits on the event line; a stop at `t` itself is passed. */
+/** `stops` ascending; a frame lands on the next stop, never past it, so the marker sits on the event line; a stop at `t` itself is passed. */
 export function advance(t: number, dt: number, end: number, stops: readonly number[]): number {
   const next = Math.min(end, t + dt)
   const stop = stops.find((s) => s > t + 1e-12)
@@ -172,7 +172,7 @@ const energyLabels = {
 /** Terms whose inputs the web form does not send, so 0 means not modelled. */
 const unsent: ReadonlySet<string> = new Set(['resistance', 'heat', 'leakage'])
 
-/** Resistance, heat and leakage of 0 are apart; spin is listed even at 0 (a bore without rifling). */
+/** Terms in J with their share of the released energy; resistance, heat and leakage of 0 are apart; spin is listed even at 0 (a bore without rifling). */
 export function energySplit(energy: PlaybackResult['energy']) {
   const keys = Object.keys(energyLabels) as (keyof typeof energyLabels)[]
   const total = keys.reduce((sum, k) => sum + energy[k], 0)
