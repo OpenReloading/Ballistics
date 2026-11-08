@@ -30,7 +30,7 @@ interface Extras {
 }
 
 /** The record page's content: re-rendered on a language change, which the stages' decimal marks follow. */
-export function DisciplineRecordView({
+function DisciplineRecordView({
   d,
   mappings,
   faces,

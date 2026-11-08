@@ -1,5 +1,6 @@
 export * from './bullet.ts'
 export * from './caliber-class.ts'
+export * from './canonical-json.ts'
 export * from './cartridge.ts'
 export * from './case.ts'
 export * from './case-capacity.ts'

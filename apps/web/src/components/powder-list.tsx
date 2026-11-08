@@ -45,7 +45,7 @@ import { RateBar, RateTicks, scaleWidth } from './rate-scale.tsx'
 import { EmptyList, EmptyNote } from './states.tsx'
 
 /** The Training rows column's help: the column, then the burn-rate page's sentence for a powder without fitted parameters. */
-export const trainingRowsHelp = [
+const trainingRowsHelp = [
   msg(
     'Load-table rows the model was fitted to, their cartridges and the day the load tables were read; the record page lists them per load table. A count, not a rating.',
   ),

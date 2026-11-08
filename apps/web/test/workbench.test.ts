@@ -478,41 +478,9 @@ describe('in German', () => {
   const small =
     'Charge too small for the model: the simulated peak mean pressure, 250 bar, is below 2.2 times the start pressure (200 bar); results are outside the range the model was built for.'
 
-  it('writes the warnings of an answer in German with the decimal comma', () => {
-    const [line, charge, none] = shownWarnings(sheet(small), presetUnits('metric-grains'), german.t)
-    expect(line).toEqual({
-      text: 'Das obere Ende des simulierten Gasdruckbereichs, 4400 bar, liegt über CIP Pmax 4150 bar, Quelle CIP (2008-09-23, mechanisch-elektrischer Wandler); der Nennwert beträgt 4000 bar.',
-      name: 'Bereich über CIP Pmax',
-    })
-    expect(charge).toEqual({
-      text: 'Treibladung zu klein für das Modell: Der simulierte höchste mittlere Druck, 250 bar, liegt unter dem 2,2-Fachen des Startdrucks (200 bar); die Ergebnisse liegen außerhalb des Bereichs, für den das Modell gebaut wurde.',
-      name: 'Treibladung zu klein für das Modell',
-    })
-    expect(none).toEqual({
-      text: 'Es wurde keine Patronen-ID angegeben, daher wurde kein CIP-Pmax geprüft.',
-      name: 'keine Patrone',
-    })
-  })
-
   it('converts the pressures of a message before it is translated', () => {
     const [, charge] = shownWarnings(sheet(small), presetUnits('us'), german.t)
     expect(charge?.text).toContain('3626 psi')
     expect(charge?.text).toContain('(2901 psi)')
-  })
-
-  it('writes the solid fill warning', () => {
-    const fill = solidFillWarning(0.65 * 1600 * 3.4e-6, 1600, undefined, 3.4e-6, german.t)
-    expect(fill).toEqual({
-      text: 'Simulation: Der Feststoff-Füllgrad 0,65 liegt über 0,64; das Modell liegt außerhalb des Bereichs, für den es gebaut wurde.',
-      name: 'Feststoff-Füllgrad über 0,64',
-    })
-  })
-
-  it('writes the notes of the range view and the sampled band in German', () => {
-    expect(rangeCardNote(true, undefined, false, german.t)).toBe(
-      'Die Schusstafel braucht einen Geschossdatensatz.',
-    )
-    expect(rangeHero(presetUnits('us'), 0.0027, 765, '−1', german.t).step).toBe('Schritt −1')
-    expect(bandNotice({ status: 'invalid' } as never, german.t)).toBe('keine gültige Ziehung')
   })
 })

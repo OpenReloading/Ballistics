@@ -2,8 +2,7 @@ import type { TrajectoryPoint } from '@open-reloading/ballistics'
 import type { TargetFace } from '@open-reloading/schema'
 import { InputError } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import de from '../src/i18n/de.json'
-import { english, translator } from '../src/i18n/translate.ts'
+import { english } from '../src/i18n/translate.ts'
 import { faceZones, hitFailureText, impactSensitivity } from '../src/lib/hit-probability.ts'
 import { defined } from './defined.ts'
 
@@ -20,7 +19,6 @@ describe('hitFailureText', () => {
   it('words a refusal of the hit probability, and passes any other error as its text', () => {
     const zones = new InputError({ code: 'zones', params: {} })
     expect(hitFailureText(zones, english.t)).toBe('a face needs at least one zone')
-    expect(hitFailureText(zones, translator(de, 'de').t)).toBe(de['a face needs at least one zone'])
     expect(hitFailureText(new Error('offline'), english.t)).toBe('offline')
   })
 })

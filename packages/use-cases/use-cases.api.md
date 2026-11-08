@@ -547,6 +547,9 @@ export interface RangeStringsPlanRequest extends z.input<typeof rangeStringsPlan
 export const rangeStringsPlanResponse: z.ZodType;
 
 // @public
+export function replyTo(task: Task): TaskReply;
+
+// @public
 export interface ResolvedRecord {
     // (undocumented)
     id: string;
@@ -823,6 +826,15 @@ export type Task = {
     load: InteriorLoad;
     target: ChargeTarget;
     options: ChargeSolverOptions;
+};
+
+// @public
+export type TaskReply = {
+    succeeded: true;
+    value: unknown;
+} | {
+    succeeded: false;
+    error: SerializedError;
 };
 
 // @public

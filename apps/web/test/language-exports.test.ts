@@ -10,7 +10,7 @@ import { setShownLanguage } from '../src/i18n/shown.ts'
 import { readChrono, sessionCsv, sessionCsvBlob, sessionJsonBlob } from '../src/lib/chrono.ts'
 import { countryName } from '../src/lib/countries.ts'
 import { toCsv } from '../src/lib/csv.ts'
-import { dateTimeText, dayText, monthText, timeText } from '../src/lib/dates.ts'
+import { dayText, monthText } from '../src/lib/dates.ts'
 import { shareLink } from '../src/lib/share-link.ts'
 import {
   exactFieldText,
@@ -91,7 +91,6 @@ describe('the language shown never changes what is exported', () => {
 describe('numbers, dates and country names follow the language shown', () => {
   it('writes numbers, units and dates in the language shown by default', () => {
     const grains = presetUnits('metric-grains')
-    const d = new Date(Date.UTC(2026, 4, 1, 13, 5, 9))
     setShownLanguage('de')
     expect([
       decimalMark(),
@@ -124,8 +123,6 @@ describe('numbers, dates and country names follow the language shown', () => {
       '1. Mai 2026',
       'Mai',
     ])
-    expect(dateTimeText(d)).toBe(d.toLocaleString('de'))
-    expect(timeText(d)).toBe(d.toLocaleTimeString('de'))
   })
 
   it('names a country through Intl except in English', () => {

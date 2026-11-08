@@ -53,14 +53,14 @@ pnpm --filter @open-reloading/web run i18n missing de   # English messages witho
 pnpm --filter @open-reloading/web run i18n messages     # every message in the sources
 ```
 
-`missing` also lists catalogue keys that no message matches (a text that was reworded in the source) and then exits with 1. The test `apps/web/test/i18n-catalogue.test.ts` fails on such a key.
+`missing` also lists catalogue keys that no message matches (a text that was reworded in the source) and then exits with 1. `pnpm run lint` runs `i18n check de`, which fails on such a key, an empty text, placeholders other than the key's, a plural form the language lacks, and a text of the message table (`core-message-table.json` and the warning sentences of `core-message-table.ts`) without a translation or left in English.
 
 ## Add a language
 
 1. Add the language to `languages` and `loaders` in `apps/web/src/i18n/language.ts`: its code (a BCP 47 language tag such as `fr`) and its own name (`Français`). `loaders` is typed over `languages`, so the build fails until both are there.
 2. Create `apps/web/src/i18n/<code>.json`: the English text as key and its translation as value, or for a plural the key `one|other` (the two English forms, as in the `tn` call) and an object of the plural forms of the language by CLDR category (`one` and `other` in English and German; `Intl.PluralRules('<code>').resolvedOptions().pluralCategories` lists a language's categories). A translation keeps the placeholders of its key.
 3. Run `missing <code>` until it lists nothing you want to translate.
-4. `pnpm --filter @open-reloading/web test` checks every catalogue: no key without a message, equal placeholders, only categories of the language.
+4. `pnpm --filter @open-reloading/web run i18n check <code>` checks the catalogue: no message-table text without a translation, no key without a message, equal placeholders, only categories of the language. Add it to the root `lint` script next to `check de`.
 
 The German catalogue follows the term table `apps/web/src/i18n/german-terms.json`. A verified or decided term is used as the table gives it. Another language has no table yet: add one with the same shape if the language needs one.
 

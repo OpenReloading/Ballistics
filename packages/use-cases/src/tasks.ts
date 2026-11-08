@@ -105,8 +105,11 @@ const runners: { [K in Task['kind']]: (t: Extract<Task, { kind: K }>) => Results
 
 /** Runs `task` in this thread and returns the result of the ballistics function of its `kind`. */
 export function runTask<T extends Task>(task: T): Results[T['kind']] {
+  // a task can arrive in a worker message: only the table's own kinds dispatch
+  const run: unknown = Object.hasOwn(runners, task.kind) ? runners[task.kind] : undefined
+  if (typeof run !== 'function') throw new Error(`unknown compute task kind ${task.kind}`)
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- `runners` maps each kind to the function of that kind's task and result
-  return (runners[task.kind] as (t: Task) => unknown)(task) as Results[T['kind']]
+  return (run as (t: Task) => unknown)(task) as Results[T['kind']]
 }
 
 /** An error as a plain object, so it crosses the worker thread boundary. */
@@ -143,6 +146,20 @@ export function serializeError(error: unknown): SerializedError {
       ...(error.issue && { issue: error.issue }),
     }
   return { name: 'Error', message: error instanceof Error ? error.message : String(error) }
+}
+
+/** What a worker posts back for one task: the result, or the error as a plain object. */
+export type TaskReply =
+  | { succeeded: true; value: unknown }
+  | { succeeded: false; error: SerializedError }
+
+/** The reply to `task` that a worker posts: runs it in this thread and serializes its error. */
+export function replyTo(task: Task): TaskReply {
+  try {
+    return { succeeded: true, value: runTask(task) }
+  } catch (error) {
+    return { succeeded: false, error: serializeError(error) }
+  }
 }
 
 /** Inverse of `serializeError`: rebuilds a `TruingError`, an `InputError` or an `Error`. */
