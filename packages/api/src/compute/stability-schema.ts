@@ -1,5 +1,5 @@
+import { recordId } from '@open-reloading/use-cases'
 import { z } from 'zod'
-import { recordId } from './schemas.ts'
 
 /** A decimal number in a query string; Number() alone would read '' and ' ' as 0 and '0x10' as 16. */
 const queryNumber = (n: z.ZodNumber) =>

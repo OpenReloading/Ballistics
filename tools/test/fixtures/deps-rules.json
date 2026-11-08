@@ -233,7 +233,7 @@
   },
   "apps/web/src/lib/api-advisories.ts": {
     "source": "import { advisoryText } from '@open-reloading/api/advisories'\nexport { advisoryText }",
-    "rules": []
+    "rules": ["web-reads-api-only"]
   },
   "apps/web/src/lib/api-server.ts": {
     "source": "import Fastify from 'fastify'\nexport { Fastify }",

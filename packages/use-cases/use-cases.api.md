@@ -4,6 +4,10 @@
 
 ```ts
 
+import { AdvisoryId } from '@open-reloading/ballistics';
+import { AdvisoryRule } from '@open-reloading/ballistics';
+import type { Bullet } from '@open-reloading/schema';
+import { Cartridge } from '@open-reloading/schema';
 import { ChargeSolverOptions } from '@open-reloading/ballistics';
 import { ChargeTarget } from '@open-reloading/ballistics';
 import { comparePlanCandidates } from '@open-reloading/ballistics';
@@ -12,16 +16,138 @@ import { InputError } from '@open-reloading/statistics';
 import { InteriorLoad } from '@open-reloading/ballistics';
 import { InteriorOptions } from '@open-reloading/ballistics';
 import { InteriorResult } from '@open-reloading/ballistics';
+import { Powder } from '@open-reloading/schema';
 import { PressureRange } from '@open-reloading/ballistics';
 import { PressureTolerances } from '@open-reloading/ballistics';
+import type { Provenance } from '@open-reloading/schema';
 import { SampledBand } from '@open-reloading/ballistics';
 import { SamplingOptions } from '@open-reloading/ballistics';
 import { solveCharge } from '@open-reloading/ballistics';
+import { SpecValue } from '@open-reloading/schema';
 import { trajectory } from '@open-reloading/ballistics';
 import { TruedParameter } from '@open-reloading/ballistics';
 import { trueDrag } from '@open-reloading/ballistics';
 import { trueMuzzleVelocity } from '@open-reloading/ballistics';
 import { TruingReason } from '@open-reloading/ballistics';
+import { z } from 'zod';
+
+// @public
+export interface AdvisoryText {
+    fix: string;
+    message: string;
+    name: string;
+}
+
+// @public
+export const advisoryText: Readonly<Record<AdvisoryId, AdvisoryText>>;
+
+// @public
+export function assertFinite<T>(response: T, allowed?: RegExp, infinite?: boolean): T;
+
+// @public
+export type BurnSchema = z.ZodDiscriminatedUnion<[
+z.ZodObject<{
+    kind: z.ZodLiteral<'geometric'>;
+    coefficient: z.ZodNumber;
+    exponent: z.ZodNumber;
+    grain: z.ZodDiscriminatedUnion<[
+    z.ZodObject<{
+        shape: z.ZodLiteral<'sphere'>;
+        diameter: z.ZodNumber;
+    }, z.core.$strict>,
+    z.ZodObject<{
+        shape: z.ZodLiteral<'cylinder'>;
+        diameter: z.ZodNumber;
+        length: z.ZodNumber;
+    }, z.core.$strict>,
+    z.ZodObject<{
+        diameter: z.ZodNumber;
+        perforationDiameter: z.ZodNumber;
+        length: z.ZodNumber;
+        shape: z.ZodLiteral<'tube'>;
+    }, z.core.$strict>,
+    z.ZodObject<{
+        diameter: z.ZodNumber;
+        perforationDiameter: z.ZodNumber;
+        length: z.ZodNumber;
+        shape: z.ZodLiteral<'sevenPerf'>;
+    }, z.core.$strict>
+    ], 'shape'>;
+}, z.core.$strict>,
+z.ZodObject<{
+    kind: z.ZodLiteral<'vivacity'>;
+    vivacity: z.ZodNumber;
+    exponent: z.ZodNumber;
+    referencePressure: z.ZodNumber;
+    form: z.ZodDiscriminatedUnion<[
+    z.ZodObject<{
+        kind: z.ZodLiteral<'constant'>;
+    }, z.core.$strict>,
+    z.ZodObject<{
+        a: z.ZodNumber;
+        m: z.ZodNumber;
+        q: z.ZodNumber;
+        z1: z.ZodNumber;
+        kind: z.ZodLiteral<'twoStage'>;
+    }, z.core.$strict>,
+    z.ZodObject<{
+        a: z.ZodNumber;
+        m: z.ZodNumber;
+        q: z.ZodNumber;
+        z1: z.ZodNumber;
+        kind: z.ZodLiteral<'threeStage'>;
+        z2: z.ZodNumber;
+        r: z.ZodNumber;
+    }, z.core.$strict>
+    ], 'kind'>;
+}, z.core.$strict>
+], 'kind'>;
+
+// @public
+export const caps: Readonly<StepCaps>;
+
+// @public
+export type CartridgeWithSpecs = Pick<Cartridge, 'id' | 'name' | 'published' | 'revised' | 'pressureMethod' | 'provenance'> & {
+    values: Pick<SpecValue, 'symbol' | 'value' | 'variant'>[];
+};
+
+// @public
+export interface ChargeBody extends z.infer<typeof chargeBody> {
+}
+
+// @public
+export const chargeBody: z.ZodObject<Omit<InteriorBaseShape, 'model' | 'ladder' | 'maximumPressure' | 'load'> & {
+    load: z.ZodObject<Omit<M3LoadShape, 'propellant'> & {
+        propellant: z.ZodObject<M3LoadShape['propellant']['shape'] & {
+            bulkDensity: z.ZodOptional<z.ZodNumber>;
+        }, z.core.$strict>;
+    }, z.core.$strict>;
+    target: z.ZodObject<{
+        kind: z.ZodEnum<{
+            [K in (typeof chargeTargetKinds)[number]]: K;
+        }>;
+        value: z.ZodNumber;
+        unit: z.ZodOptional<z.ZodLiteral<'percentOfLimit'>>;
+    }, z.core.$strict>;
+    powder: z.ZodOptional<z.ZodString>;
+}, z.core.$strict>;
+
+// @public
+export type ChargeContext = {
+    compute: ComputeRunner;
+    findCartridge: (id: string) => CartridgeWithSpecs | Promise<CartridgeWithSpecs>;
+    findPowder: (id: string) => Powder | Promise<Powder>;
+};
+
+// @public
+export const chargeTargetExample: ChargeTargetRequest;
+
+// @public
+export const chargeTargetKinds: readonly ['peakPressure', 'muzzleVelocity', 'loadRatio', 'barrelTime', 'bulletLeadTime'];
+
+// @public
+export interface ChargeTargetRequest extends z.input<typeof chargeBody> {
+}
 
 // @public
 export class ComputeBusy extends Error {
@@ -40,7 +166,306 @@ export class ComputeTimeout extends Error {
 }
 
 // @public
+export type ErrorAnswer = {
+    status: number;
+    body: Record<string, unknown>;
+    retryAfter?: number;
+};
+
+// @public
+export function errorAnswer(error: unknown, input: {
+    withNotice: boolean;
+    truingDetails: boolean;
+}): ErrorAnswer | undefined;
+
+// @public
+export interface ExteriorUnits {
+    // (undocumented)
+    readonly altitude: 'm';
+    // (undocumented)
+    readonly azimuth: 'rad';
+    // (undocumented)
+    readonly ballisticCoefficient: 'kg/m2';
+    // (undocumented)
+    readonly bore: 'rad';
+    // (undocumented)
+    readonly diameter: 'm';
+    // (undocumented)
+    readonly distance: 'm';
+    // (undocumented)
+    readonly elevationAngle: 'rad';
+    // (undocumented)
+    readonly elevationHold: 'rad';
+    // (undocumented)
+    readonly endDistance: 'm';
+    // (undocumented)
+    readonly energy: 'J';
+    // (undocumented)
+    readonly fromDirection: 'rad';
+    // (undocumented)
+    readonly height: 'm';
+    // (undocumented)
+    readonly heightAboveFiringPoint: 'm';
+    // (undocumented)
+    readonly humidity: '1';
+    // (undocumented)
+    readonly jump: 'm';
+    // (undocumented)
+    readonly latitude: 'rad';
+    // (undocumented)
+    readonly length: 'm';
+    // (undocumented)
+    readonly lookAngle: 'rad';
+    // (undocumented)
+    readonly mach: '1';
+    // (undocumented)
+    readonly mass: 'kg';
+    // (undocumented)
+    readonly minVelocity: 'm/s';
+    // (undocumented)
+    readonly pathAngle: 'rad';
+    // (undocumented)
+    readonly pressure: 'Pa';
+    // (undocumented)
+    readonly range: 'm';
+    // (undocumented)
+    readonly sightOffset: 'm';
+    // (undocumented)
+    readonly speed: 'm/s';
+    // (undocumented)
+    readonly spin: 'rad/s';
+    // (undocumented)
+    readonly spinDrift: 'm';
+    // (undocumented)
+    readonly stability: '1';
+    // (undocumented)
+    readonly temperature: 'K';
+    // (undocumented)
+    readonly time: 's';
+    // (undocumented)
+    readonly twist: 'm';
+    // (undocumented)
+    readonly velocity: 'm/s';
+    // (undocumented)
+    readonly vertical: 'm/s';
+    // (undocumented)
+    readonly windage: 'm';
+    // (undocumented)
+    readonly windageAngle: 'rad';
+    // (undocumented)
+    readonly windageHold: 'rad';
+    // (undocumented)
+    readonly yaw: 'rad';
+}
+
+// @public
+export const fitIterations: z.ZodOptional<z.ZodNumber>;
+
+// @public
 export const inlineRunner: ComputeRunner;
+
+// @public
+export type InteriorBaseShape = {
+    model: z.ZodLiteral<'m3'>;
+    load: z.ZodObject<M3LoadShape, z.core.$strict>;
+    options: z.ZodOptional<z.ZodObject<{
+        relativeTolerance: z.ZodOptional<z.ZodNumber>;
+        absoluteTolerance: z.ZodOptional<z.ZodNumber>;
+        outputStep: z.ZodOptional<z.ZodNumber>;
+        maxSteps: z.ZodOptional<z.ZodNumber>;
+        maxTime: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$strict>>;
+    cartridge: z.ZodOptional<z.ZodString>;
+    pressureLimit: z.ZodOptional<z.ZodNumber>;
+    maximumPressure: z.ZodOptional<z.ZodNumber>;
+    tolerances: z.ZodOptional<z.ZodObject<{
+        chargeFraction: z.ZodOptional<z.ZodNumber>;
+        volumeFraction: z.ZodOptional<z.ZodNumber>;
+        massFraction: z.ZodOptional<z.ZodNumber>;
+        burnRateFraction: z.ZodOptional<z.ZodNumber>;
+        temperatureKelvin: z.ZodOptional<z.ZodNumber>;
+        startPressureFraction: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$strict>>;
+    ladder: z.ZodOptional<z.ZodObject<{
+        chargeStep: z.ZodNumber;
+        stepCount: z.ZodNumber;
+        direction: z.ZodOptional<z.ZodEnum<{
+            up: 'up';
+            down: 'down';
+            around: 'around';
+        }>>;
+    }, z.core.$strict>>;
+};
+
+// @public
+export interface InteriorBody extends z.infer<typeof interiorBody> {
+}
+
+// @public
+export const interiorBody: z.ZodObject<InteriorBaseShape & {
+    sampling: z.ZodOptional<z.ZodObject<{
+        samples: z.ZodOptional<z.ZodInt>;
+        seed: z.ZodOptional<z.ZodInt>;
+        budgetMs: z.ZodOptional<z.ZodInt>;
+    }, z.core.$strict>>;
+}, z.core.$strict>;
+
+// @public
+export type InteriorContext = {
+    compute: ComputeRunner;
+    findCartridge: (id: string) => CartridgeWithSpecs | Promise<CartridgeWithSpecs>;
+};
+
+// @public
+export const interiorExample: InteriorRequest;
+
+// @public
+export interface InteriorRequest extends z.input<typeof interiorBody> {
+}
+
+// @public
+export type M3LoadShape = {
+    chamber: z.ZodObject<{
+        volume: z.ZodNumber;
+        boreArea: z.ZodNumber;
+        boreDiameter: z.ZodNumber;
+        throatWear: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$strict>;
+    barrel: z.ZodObject<{
+        length: z.ZodNumber;
+        twist: z.ZodNumber;
+    }, z.core.$strict>;
+    bullet: z.ZodObject<{
+        mass: z.ZodNumber;
+        gyrationRadius: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$strict>;
+    charge: z.ZodNumber;
+    propellant: z.ZodObject<{
+        specificEnergy: z.ZodNumber;
+        gamma: z.ZodNumber;
+        density: z.ZodNumber;
+        covolume: z.ZodNumber;
+        burn: BurnSchema;
+        temperatureSensitivity: z.ZodOptional<z.ZodObject<{
+            reference: z.ZodNumber;
+            cold: z.ZodNumber;
+            hot: z.ZodNumber;
+        }, z.core.$strict>>;
+    }, z.core.$strict>;
+    propellantTemperature: z.ZodNumber;
+    ignitionPressure: z.ZodNumber;
+    startPressure: z.ZodNumber;
+    resistance: z.ZodOptional<z.ZodObject<{
+        friction: z.ZodOptional<z.ZodNumber>;
+        engraving: z.ZodOptional<z.ZodArray<z.ZodObject<{
+            travel: z.ZodNumber;
+            pressure: z.ZodNumber;
+        }, z.core.$strict>>>;
+    }, z.core.$strict>>;
+    gradient: z.ZodOptional<z.ZodObject<{
+        energy: z.ZodNumber;
+        breech: z.ZodNumber;
+    }, z.core.$strict>>;
+    heat: z.ZodOptional<z.ZodDiscriminatedUnion<[
+    z.ZodObject<{
+        model: z.ZodLiteral<'none'>;
+    }, z.core.$strict>,
+    z.ZodObject<{
+        model: z.ZodLiteral<'convective'>;
+        flameTemperature: z.ZodNumber;
+        wallTemperature: z.ZodOptional<z.ZodNumber>;
+        viscosity: z.ZodOptional<z.ZodNumber>;
+        prandtl: z.ZodOptional<z.ZodNumber>;
+        factor: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$strict>
+    ], 'model'>>;
+    leakage: z.ZodOptional<z.ZodObject<{
+        area: z.ZodArray<z.ZodObject<{
+            travel: z.ZodNumber;
+            area: z.ZodNumber;
+        }, z.core.$strict>>;
+        backPressure: z.ZodOptional<z.ZodNumber>;
+        discharge: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$strict>>;
+};
+
+// @public
+export interface M3Units {
+    // (undocumented)
+    readonly burntFraction: '1';
+    // (undocumented)
+    readonly efficiency: '1';
+    // (undocumented)
+    readonly energy: 'J';
+    // (undocumented)
+    readonly gasTemperature: 'K';
+    // (undocumented)
+    readonly mass: 'kg';
+    // (undocumented)
+    readonly pressure: 'Pa';
+    // (undocumented)
+    readonly time: 's';
+    // (undocumented)
+    readonly travel: 'm';
+    // (undocumented)
+    readonly velocity: 'm/s';
+}
+
+// @public
+export const maxPoints = 20000;
+
+// @public
+export const notice = "simulation, not load data";
+
+// @public
+export function powderBulkDensity(record: Powder): number | undefined;
+
+// @public
+export interface RangeStringsUnits extends TruingUnits {
+    // (undocumented)
+    readonly clickValue: 'rad';
+    // (undocumented)
+    readonly zeroOffset: 'rad';
+}
+
+// @public
+export const recordId: z.ZodString;
+
+// @public
+export interface ResolvedRecord {
+    // (undocumented)
+    id: string;
+    // (undocumented)
+    manufacturer: string;
+    // (undocumented)
+    name: string;
+    // (undocumented)
+    provenance: Provenance;
+    // (undocumented)
+    suppliedFields: string[];
+}
+
+// @public
+export function resolvedRecord(record: Bullet | Powder, suppliedFields: string[]): ResolvedRecord;
+
+// @public
+export interface ResponseUnits {
+    // (undocumented)
+    exterior: ExteriorUnits;
+    // (undocumented)
+    m3: M3Units;
+    // (undocumented)
+    rangeStrings: RangeStringsUnits;
+    // (undocumented)
+    stability: {
+        result: '1';
+    };
+    // (undocumented)
+    truing: TruingUnits;
+}
+
+// @public
+export const responseUnits: ResponseUnits;
 
 // @public
 export interface Results {
@@ -68,6 +493,18 @@ export interface Results {
 export function reviveError(error: SerializedError): Error;
 
 // @public
+export function runChargeTarget(context: ChargeContext, body: ChargeBody): Promise<{
+    status: 200 | 422;
+    payload: Record<string, unknown>;
+}>;
+
+// @public
+export function runInterior(context: InteriorContext, body: InteriorBody, known?: CartridgeWithSpecs): Promise<{
+    status: 200 | 422;
+    payload: Record<string, unknown>;
+}>;
+
+// @public
 export function runTask<T extends Task>(task: T): Results[T['kind']];
 
 // @public
@@ -84,6 +521,26 @@ export type SerializedError = {
 
 // @public
 export function serializeError(error: unknown): SerializedError;
+
+// @public
+export interface StepCaps {
+    chargeSteps: 10000;
+    // (undocumented)
+    interiorSteps: 50000;
+    // (undocumented)
+    ladderSteps: 21;
+    // (undocumented)
+    trajectorySteps: 5000;
+    // (undocumented)
+    truingIterations: 20;
+    // (undocumented)
+    truingSteps: 1000;
+    // (undocumented)
+    truingTotalSteps: 200000;
+}
+
+// @public
+export const steps: (max: number) => z.ZodOptional<z.ZodNumber>;
 
 // @public
 export type Task = {
@@ -116,6 +573,36 @@ export type Task = {
 
 // @public
 export const taskTimeoutMs = 5000;
+
+// @public
+export interface TruingUnits extends ExteriorUnits {
+    // (undocumented)
+    readonly dragFactor: '1';
+    // (undocumented)
+    readonly muzzleVelocity: 'm/s';
+}
+
+// @public
+export const unprocessable: {
+    readonly statusCode: 422;
+    readonly error: 'Unprocessable Entity';
+};
+
+// @public
+export type Warning = {
+    code: AdvisoryId;
+    severity: AdvisoryRule['severity'];
+    inputs: string[];
+    message: string;
+    fix: string;
+    spec?: string;
+    symbol?: string;
+    variant?: string;
+    method?: string | null;
+};
+
+// @public
+export function warning(rule: AdvisoryRule, message: string, extra?: Pick<Warning, 'spec' | 'symbol' | 'variant' | 'method'>): Warning;
 
 // (No @packageDocumentation comment for this package)
 

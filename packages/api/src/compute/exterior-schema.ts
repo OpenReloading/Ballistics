@@ -1,6 +1,6 @@
 import { dragModels } from '@open-reloading/ballistics'
+import { caps, fitIterations, recordId, steps } from '@open-reloading/use-cases'
 import { z } from 'zod'
-import { caps, fitIterations, recordId, steps } from './schemas.ts'
 import { stabilityBounds } from './stability-schema.ts'
 
 /** An angle in rad strictly between -pi/2 and pi/2: a value in degrees falls outside. */

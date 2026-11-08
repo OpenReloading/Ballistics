@@ -4,10 +4,16 @@
  */
 
 import type { ComputeRunner } from '@open-reloading/use-cases'
+import {
+  chargeBody,
+  chargeTargetExample,
+  interiorBody,
+  interiorExample,
+  runChargeTarget,
+  runInterior,
+} from '@open-reloading/use-cases'
 import type { z } from 'zod'
 import type { Catalogue } from '../catalogue/types.ts'
-import { runChargeTarget } from './charge-run.ts'
-import { chargeBody, chargeTargetExample } from './charge-schema.ts'
 import {
   rangeStringsFitResponse,
   rangeStringsPlanResponse,
@@ -23,8 +29,6 @@ import {
 } from './exterior-run.ts'
 import { trajectoryBody, trajectoryExample, truingBody, truingExample } from './exterior-schema.ts'
 import { chargeTargetResponse, interiorResponse, loadFileResponse } from './interior-response.ts'
-import { runInterior } from './interior-run.ts'
-import { interiorBody, interiorExample } from './interior-schema.ts'
 import { loadFileExample } from './load-file-example.ts'
 import { findBullet, findCartridge, findPowder } from './resolve.ts'
 import { loadFileBody, simulate } from './simulate.ts'

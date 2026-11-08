@@ -2,9 +2,8 @@
 import { TruingError } from '@open-reloading/ballistics'
 import type { Bullet, Powder, Provenance } from '@open-reloading/schema'
 import { InputError } from '@open-reloading/statistics'
-import { ComputeBusy, ComputeTimeout } from '@open-reloading/use-cases'
-import type { FastifyError, FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
+import { ComputeBusy, ComputeTimeout } from './tasks.ts'
 
 /** The text every interior answer carries. */
 export const notice = 'simulation, not load data'
@@ -30,15 +29,8 @@ export function resolvedRecord(record: Bullet | Powder, suppliedFields: string[]
   return { id, manufacturer, name, suppliedFields, provenance }
 }
 
-/** A Fastify error handler that answers with a status code and a JSON body. */
-type ComputeErrorHandler = (
-  error: FastifyError,
-  request: FastifyRequest,
-  reply: FastifyReply,
-) => FastifyReply
-
 /** A compute error as an answer: status, body and, for a full pool, `retry-after` in seconds. */
-type ErrorAnswer = { status: number; body: Record<string, unknown>; retryAfter?: number }
+export type ErrorAnswer = { status: number; body: Record<string, unknown>; retryAfter?: number }
 
 /**
  * The answer of a compute error: 503 for a compute deadline (`timeout`) or a full pool (`busy`,
@@ -97,25 +89,9 @@ export function errorAnswer(
   return undefined
 }
 
-/**
- * Error handler of a compute route plugin: the answer of `errorAnswer`, the notice on requests for
- * which `withNotice` is true. Anything else goes to Fastify's default handler: its own errors
- * (invalid JSON, body too large, not found) keep their status, the rest is a 500.
- */
-export function computeErrorHandler({
-  withNotice,
-  truingDetails,
-}: {
-  withNotice: (request: FastifyRequest) => boolean
-  truingDetails: boolean
-}): ComputeErrorHandler {
-  return (error: FastifyError, request: FastifyRequest, reply: FastifyReply) => {
-    const answer = errorAnswer(error, { withNotice: withNotice(request), truingDetails })
-    if (!answer) throw error
-    if (answer.retryAfter !== undefined) reply.header('retry-after', String(answer.retryAfter))
-    return reply.code(answer.status).send(answer.body)
-  }
-}
+/** Whether the number `n` at `path` may stand: finite, or NaN (with `infinite` also infinite) at an `allowed` path. */
+const numberAllowed = (n: number, path: string, allowed: RegExp | undefined, infinite: boolean) =>
+  Number.isFinite(n) || ((infinite || Number.isNaN(n)) && allowed?.test(path) === true)
 
 /**
  * Path of the first non-finite number in a result, undefined if none (null is allowed). `allowed`
@@ -128,9 +104,7 @@ function nonFinite(
   infinite = false,
 ): string | undefined {
   if (typeof value === 'number')
-    return Number.isFinite(value) || ((infinite || Number.isNaN(value)) && allowed?.test(path))
-      ? undefined
-      : path
+    return numberAllowed(value, path, allowed, infinite) ? undefined : path
   if (value === null || typeof value !== 'object') return undefined
   for (const [key, v] of Object.entries(value)) {
     const found = nonFinite(v, `${path}.${key}`, allowed, infinite)

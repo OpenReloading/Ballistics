@@ -8,11 +8,11 @@ import {
   type SampledBand,
   type SamplingOptions,
 } from '@open-reloading/ballistics'
-import { type ComputeRunner, ComputeTimeout, taskTimeoutMs } from '@open-reloading/use-cases'
 import { assertFinite, notice, unprocessable } from './answer.ts'
 import { type InteriorBody, m3Options, maxPoints, samplingDefaults } from './interior-schema.ts'
 import { type CartridgeWithSpecs, limitCheck, maximumCheck } from './limits.ts'
 import { caps } from './schemas.ts'
+import { type ComputeRunner, ComputeTimeout, taskTimeoutMs } from './tasks.ts'
 import { responseUnits } from './units.ts'
 
 /** Ladder steps submitted to the pool at once: within the queue of a one-worker pool (4 per worker). */
@@ -120,6 +120,7 @@ function m3Runner(body: InteriorBody, { compute, cartridge, tolerances, resolved
 /** Output points of the valid runs among `steps`. */
 const pointsOf = (steps: Run[]) =>
   steps.reduce(
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- a valid run's result is the model's, which holds its points
     (n, s) => n + ('result' in s ? (s.result as { points: unknown[] }).points.length : 0),
     0,
   )
@@ -147,6 +148,22 @@ async function runLadder(run: (charge: number) => Promise<Run>, charges: number[
   return steps
 }
 
+/** The 422 of a ladder of long runs, refused before its answer is serialized; undefined within `ladderPoints`. */
+function outputTooLarge(steps: Run[] | undefined) {
+  const points = pointsOf(steps ?? [])
+  return points > ladderPoints
+    ? {
+        status: 422 as const,
+        payload: {
+          ...unprocessable,
+          message: `ladder output of ${points} points is above ${ladderPoints}: fewer steps or a larger options.outputStep`,
+          reason: 'outputTooLarge',
+          notice,
+        },
+      }
+    : undefined
+}
+
 /** The status and body of an interior answer from its ladder steps, or from one run at `load.charge`. */
 async function interiorAnswer(
   body: InteriorBody,
@@ -154,18 +171,8 @@ async function interiorAnswer(
   steps: ({ charge: number } & Run)[] | undefined,
   resolved: Resolved,
 ): Promise<{ status: 200 | 422; payload: Record<string, unknown> }> {
-  // a ladder of long runs is refused before its answer is serialized
-  const points = pointsOf(steps ?? [])
-  if (points > ladderPoints)
-    return {
-      status: 422,
-      payload: {
-        ...unprocessable,
-        message: `ladder output of ${points} points is above ${ladderPoints}: fewer steps or a larger options.outputStep`,
-        reason: 'outputTooLarge',
-        notice,
-      },
-    }
+  const large = outputTooLarge(steps)
+  if (large) return large
   const one = steps ? undefined : await run(body.load.charge)
   // a ladder without one valid step is refused as a failed single run, with its first step's reason
   const failed = one ?? (steps?.every((s) => 'error' in s) ? steps[0] : undefined)

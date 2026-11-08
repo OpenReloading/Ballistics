@@ -1,6 +1,6 @@
 import type { PressureRange } from '@open-reloading/ballistics'
 import { describe, expect, it } from 'vitest'
-import { type CartridgeWithSpecs, limitCheck, maximumCheck } from '../src/compute/limits.ts'
+import { type CartridgeWithSpecs, limitCheck, maximumCheck } from '../src/limits.ts'
 
 const range: PressureRange = {
   quantity: 'maxPressure',
@@ -26,6 +26,14 @@ const cartridge = (values: object[], over: object = {}): CartridgeWithSpecs => (
   provenance: { kind: 'published', sources: [{ title: 'Test standard' }] },
   values: values as CartridgeWithSpecs['values'],
   ...over,
+})
+const pmax = (value: number, over: object = {}, variant?: string) =>
+  cartridge([{ symbol: 'Pmax', quantity: 'pressure', value, ...(variant && { variant }) }], over)
+const failed = (reason: string) => ({
+  input: 'chargeFraction' as const,
+  side: 1 as const,
+  maxPressure: null,
+  reason,
 })
 
 describe('limitCheck', () => {
@@ -75,7 +83,9 @@ describe('limitCheck', () => {
     expect(above.warnings).toEqual([])
     expect(above.cartridge).toBeUndefined()
   })
+})
 
+describe('limitCheck on symbols, dates and decimals', () => {
   it('ignores other symbols, lists values without a number', () => {
     const { limits, warnings } = limitCheck(
       range,
@@ -103,7 +113,6 @@ describe('limitCheck', () => {
   })
 
   it('prints the stored decimals of a limit and enough decimals to keep a value on its side', () => {
-    const pmax = (value: number) => cartridge([{ symbol: 'Pmax', quantity: 'pressure', value }])
     const near = { ...range, nominalPressure: 4274.74e5, highPressure: 4274.9e5 }
     expect(limitCheck(near, pmax(4274.75)).warnings[0]?.message).toBe(
       'The upper end of the simulated peak pressure range, 4275 bar, is above CIP Pmax 4274.75 bar (cip-x-2020-01-01; transducer); the nominal value is 4274.7 bar.',
@@ -117,7 +126,9 @@ describe('limitCheck', () => {
       'Simulated peak pressure 4000.3 bar (range 3500 to 4100 bar) is above CIP Pmax 4000 bar (cip-x-2020-01-01; transducer).',
     )
   })
+})
 
+describe('limitCheck warnings', () => {
   it('adds rangeIncomplete with the reasons, and never says safe', () => {
     const incomplete = {
       ...range,
@@ -139,12 +150,13 @@ describe('limitCheck', () => {
     )
     for (const w of warnings) expect(w.message).not.toMatch(/safe/i)
   })
+})
 
+describe('limitCheck on a small charge', () => {
   it('adds chargeTooSmall below 2.2 times the start or the ignition pressure', () => {
-    const pmax = cartridge([{ symbol: 'Pmax', quantity: 'pressure', value: 4000 }])
     const low = { ...range, nominalPressure: 5e7, lowPressure: 4e7, highPressure: 6e7 }
     const check = (meanPressure: number, startPressure: number, ignitionPressure: number) =>
-      limitCheck(low, pmax, {
+      limitCheck(low, pmax(4000), {
         result: { maxMeanPressure: meanPressure },
         load: {
           startPressure,
@@ -175,16 +187,7 @@ describe('limitCheck', () => {
   })
 })
 
-describe('limitCheck on the method, the boundary and the echo', () => {
-  const pmax = (value: number, over: object = {}, variant?: string) =>
-    cartridge([{ symbol: 'Pmax', quantity: 'pressure', value, ...(variant && { variant }) }], over)
-  const load = {
-    startPressure: 2e7,
-    ignitionPressure: 1e6,
-    barrel: { length: 0.6, twist: 0.3 },
-    bullet: { mass: 0.01 },
-  }
-
+describe('limitCheck on the method and the boundary', () => {
   it('compares piezo and an unstated method, lists crusher values uncompared', () => {
     expect(limitCheck(range, pmax(4000, { pressureMethod: 'piezo' })).limits?.[0]?.compared).toBe(
       true,
@@ -226,7 +229,9 @@ describe('limitCheck on the method, the boundary and the echo', () => {
     const variant = limitCheck(range, pmax(4000, {}, '12/70'))
     expect(variant.warnings[0]).toMatchObject({ symbol: 'Pmax', variant: '12/70' })
   })
+})
 
+describe('limitCheck on rounding, the echo and failed cases', () => {
   it('stops at five decimals for a value that rounds onto the limit', () => {
     const close = { ...range, highPressure: 4000.0000001e5 }
     expect(limitCheck(close, pmax(4000)).warnings[0]?.message).toMatch(
@@ -246,24 +251,27 @@ describe('limitCheck on the method, the boundary and the echo', () => {
   })
 
   it('joins the distinct reasons of failed range cases', () => {
-    const failed = (reason: string) => ({
-      input: 'chargeFraction' as const,
-      side: 1 as const,
-      maxPressure: null,
-      reason,
-    })
     const incomplete = { ...range, cases: [failed('a'), failed('b'), failed('a')] }
     expect(limitCheck(incomplete, pmax(5000)).warnings[0]?.message).toMatch(
       /^3 of 3 range cases could not be computed \(a, b\);/,
     )
   })
+})
+
+describe('limitCheck on an M3 run', () => {
+  const load = {
+    startPressure: 2e7,
+    ignitionPressure: 1e6,
+    barrel: { length: 0.6, twist: 0.3 },
+    bullet: { mass: 0.01 },
+  }
+  const run = (maxMeanPressure: number, startPressure: number, ignitionPressure: number) =>
+    limitCheck(range, pmax(5000), {
+      result: { maxMeanPressure },
+      load: { ...load, startPressure, ignitionPressure },
+    }).warnings[0]?.message
 
   it('names the start pressure when it equals the ignition pressure and keeps the side of 2.2 times it', () => {
-    const run = (maxMeanPressure: number, startPressure: number, ignitionPressure: number) =>
-      limitCheck(range, pmax(5000), {
-        result: { maxMeanPressure },
-        load: { ...load, startPressure, ignitionPressure },
-      }).warnings[0]?.message
     expect(run(4e7, 2e7, 2e7)).toContain('below 2.2 times the start pressure (200 bar)')
     expect(run(4.3996e7, 2e7, 1e6)).toContain('peak mean pressure, 439.96 bar, is below')
   })
@@ -292,8 +300,9 @@ describe('maximumCheck', () => {
     ],
   }
 
+  const at = (pa: number) => maximumCheck(spread, pa)
+
   it('states the range for each class and names the dominant input', () => {
-    const at = (pa: number) => maximumCheck(spread, pa)
     expect(at(3.9e8)).toMatchObject({
       class: 'inputPlausible',
       dominantInput: 'burnRateFraction',

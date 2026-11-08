@@ -1,6 +1,6 @@
+import { caps, fitIterations, steps } from '@open-reloading/use-cases'
 import { z } from 'zod'
 import { exteriorOptions, shot, trajectoryExample } from './exterior-schema.ts'
-import { caps, fitIterations, steps } from './schemas.ts'
 
 /** Most entries of one candidate or fit, candidates of one plan. */
 export const rangeStringsLimits = { entries: 20, candidates: 10 } as const

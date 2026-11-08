@@ -35,7 +35,9 @@
   },
   "dependencies": {
     "@open-reloading/ballistics": "workspace:*",
-    "@open-reloading/statistics": "workspace:*"
+    "@open-reloading/schema": "workspace:*",
+    "@open-reloading/statistics": "workspace:*",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "catalog:",

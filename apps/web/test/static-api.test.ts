@@ -5,8 +5,8 @@ import { startBundleApi, writeStaticApi } from '@open-reloading/api/static'
 import { sortKey } from '@open-reloading/schema'
 import { runTask, serializeError, type Task } from '@open-reloading/use-cases'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
-import { chargeTargetExample } from '../../../packages/api/src/compute/charge-schema.ts'
-import { interiorExample } from '../../../packages/api/src/compute/interior-schema.ts'
+import { chargeTargetExample } from '../../../packages/use-cases/src/charge-schema.ts'
+import { interiorExample } from '../../../packages/use-cases/src/interior-schema.ts'
 import { staticFetch } from '../src/lib/static-api.ts'
 
 let api: Awaited<ReturnType<typeof startBundleApi>>

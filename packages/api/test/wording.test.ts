@@ -1,5 +1,5 @@
+import { advisoryText } from '@open-reloading/use-cases'
 import { describe, expect, it } from 'vitest'
-import { advisoryText } from '../src/compute/advisory-text.ts'
 import { buildOpenApi } from '../src/openapi.ts'
 
 const d = await buildOpenApi()

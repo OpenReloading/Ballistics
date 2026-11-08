@@ -2,9 +2,6 @@
  * The compute code of the exterior, interior, charge target and load file routes without Fastify,
  * the database or Node APIs: the web app runs it in the browser (`@open-reloading/api/compute`).
  */
-export { errorAnswer, notice } from './answer.ts'
-export { type ChargeContext, runChargeTarget } from './charge-run.ts'
-export { chargeBody } from './charge-schema.ts'
 export {
   type ExteriorContext,
   runRangeStringsFit,
@@ -19,10 +16,7 @@ export {
   trajectoryBody,
   truingBody,
 } from './exterior-schema.ts'
-export { type InteriorContext, runInterior } from './interior-run.ts'
-export { interiorBody } from './interior-schema.ts'
 export { type JsonSchema, jsonSchema } from './json-schema.ts'
-export type { CartridgeWithSpecs } from './limits.ts'
 export {
   type Operation,
   type OperationAnswer,

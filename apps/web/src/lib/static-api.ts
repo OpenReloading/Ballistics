@@ -3,24 +3,22 @@
  * writes under `<base>/api/` (`writeStaticApi` of `@open-reloading/api/static`): lists from the
  * catalogue over `catalogue/index.json`, the code the API's routes run, and records from
  * `<kind>/<id>.json`. `POST interior` and
- * `interior/charge-target` run the API's own validation and runs (`@open-reloading/api/compute`),
+ * `interior/charge-target` run the API's own validation and runs (`@open-reloading/use-cases`),
  * each compute task in a Web Worker of its own, terminated at the API's task deadline.
  */
 
 import { type Catalogue, type CatalogueIndex, openCatalogue } from '@open-reloading/api/catalogue'
+import { type Powder, primerCompounds, primerSizes, recordIdRegex } from '@open-reloading/schema'
 import {
   type CartridgeWithSpecs,
+  type ComputeRunner,
+  ComputeTimeout,
   chargeBody,
   errorAnswer,
   interiorBody,
+  reviveError,
   runChargeTarget,
   runInterior,
-} from '@open-reloading/api/compute'
-import { type Powder, primerCompounds, primerSizes, recordIdRegex } from '@open-reloading/schema'
-import {
-  type ComputeRunner,
-  ComputeTimeout,
-  reviveError,
   taskTimeoutMs,
 } from '@open-reloading/use-cases'
 import { maxRecordIdLength } from './compare-ids.ts'
