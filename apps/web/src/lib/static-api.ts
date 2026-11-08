@@ -71,7 +71,7 @@ let opened: { index: CatalogueIndex; catalogue: Catalogue } | undefined
  * The catalogue over `catalogue/index.json`, the index every list is answered from.
  * shortcut: lists only, a record is read from its own data file; extend `records` when a caller needs `get`.
  */
-async function catalogue() {
+export async function catalogue(): Promise<Catalogue> {
   const index = await dataFile<CatalogueIndex>('catalogue/index')
   if (!index) throw new Error('catalogue/index.json answered 404')
   if (opened?.index !== index)

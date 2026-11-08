@@ -10,6 +10,7 @@
  */
 
 import {
+  checkLogFitLimits,
   chiSquareQuantile,
   InputError,
   type LogFitResult,
@@ -541,11 +542,7 @@ function checkSolverOptions(
   maxCondition: number,
   huberThreshold: number | undefined,
 ) {
-  need(
-    Number.isInteger(maxIterations) && maxIterations > 0,
-    'maxIterations must be a positive integer',
-  )
-  need(maxCondition > 0, 'maxCondition must be positive')
+  checkLogFitLimits(maxIterations, maxCondition)
   need(
     huberThreshold === undefined || (Number.isFinite(huberThreshold) && huberThreshold > 0),
     'huberThreshold must be positive',

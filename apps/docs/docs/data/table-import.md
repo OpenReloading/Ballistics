@@ -13,7 +13,7 @@ Each file is told by its bytes, its extension is not read. An OpenReloading data
 ## Limits
 
 A file over a limit is not imported. The card or the status line says which limit it met.
-- 40 MB per file (`maxFileBytes` in `apps/web/src/lib/user-data.ts`): a larger file is refused before it is read, with "The file is larger than 40 MB."
+- 40 MB per file (`maxUserDataBytes` in `packages/schema/src/user-data-file.ts`): a larger file is refused before it is read, with "The file is larger than 40 MB."
 - 256 columns (`maxColumn` in `packages/importers/src/limits.ts`): a wider table is refused, with "The table has more than 256 columns." Remove the extra columns or choose another file.
 - 1,000,000 cells, columns times rows (`maxCells` in `packages/importers/src/limits.ts`): a larger table is refused, with "The table has more than 1000000 cells." Split it into smaller files.
 - 32 MiB for a chronograph file in the workbench's Measurements tab (`maxFileBytes` in `apps/web/src/lib/chrono.ts`): a larger file is refused before it is read, with "The file is larger than 32 MiB."

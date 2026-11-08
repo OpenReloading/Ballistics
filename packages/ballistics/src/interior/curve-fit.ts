@@ -7,6 +7,7 @@
  */
 
 import {
+  checkLogFitLimits,
   type Identifiability,
   InputError,
   identifiability,
@@ -254,11 +255,7 @@ function wantedParameters(burn: TwoStageBurn, options: CurveFitOptions) {
 /** Checks the iteration limit, the condition limit and the fall fraction. */
 function checkSolverOptions(options: CurveFitOptions) {
   const { maxIterations = 100, maxCondition = 1e3 } = options
-  need(
-    Number.isInteger(maxIterations) && maxIterations > 0,
-    'maxIterations must be a positive integer',
-  )
-  need(maxCondition > 0, 'maxCondition must be positive')
+  checkLogFitLimits(maxIterations, maxCondition)
   need(
     options.fallFraction === undefined || (options.fallFraction > 0 && options.fallFraction < 1),
     'fallFraction must lie in (0, 1)',

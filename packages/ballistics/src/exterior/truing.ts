@@ -6,6 +6,7 @@
  */
 
 import {
+  checkLogFitLimits,
   InputError,
   type LogFitResult,
   logLeastSquares,
@@ -381,6 +382,7 @@ function leastSquares(
   const observations = runs.flatMap((u) => u.observations)
   const { maxIterations = 30, maxCondition = 1e3, maxTotalSteps = Infinity, ...rest } = options
   const np = specs.length
+  checkLogFitLimits(maxIterations, maxCondition)
   need(maxTotalSteps > 0, 'maxTotalSteps must be positive')
   if (observations.length < np) throw new TruingError('underdetermined')
   const budget = { used: 0, max: maxTotalSteps }

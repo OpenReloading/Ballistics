@@ -4,8 +4,92 @@
 
 ```ts
 
+import type { ComponentPropsWithRef } from 'react';
+import type { LucideIcon } from 'lucide-react';
 import { MantineProviderProps } from '@mantine/core';
-import type { ReactElement } from 'react';
+import { ReactElement } from 'react';
+import { ReactNode } from 'react';
+
+// @public
+export function AppFrame(input: AppFrameProps): ReactElement;
+
+// @public (undocumented)
+export interface AppFrameProps {
+    account?: ReactNode;
+    brand: ReactNode;
+    children: ReactNode;
+    end?: ReactNode;
+    labels: {
+        menu: string;
+        navigation: string;
+        close: string;
+    };
+    navigation: ReactNode;
+}
+
+// @public
+export interface ArrayColumns<Row> {
+    // (undocumented)
+    matches(row: Row, id: string, value: unknown): boolean;
+    // (undocumented)
+    sortKey(row: Row, id: string): string | number;
+}
+
+// @public
+export function arraySource<Row>(rows: readonly Row[], columns: ArrayColumns<Row>): DataSource<Row>;
+
+// @public
+export interface DataPage<Row> {
+    // (undocumented)
+    readonly rows: readonly Row[];
+    // (undocumented)
+    readonly total: number;
+}
+
+// @public
+export interface DataQuery {
+    // (undocumented)
+    readonly filters: readonly {
+        readonly id: string;
+        readonly value: unknown;
+    }[];
+    // (undocumented)
+    readonly range: {
+        readonly start: number;
+        readonly count: number;
+    };
+    // (undocumented)
+    readonly sorting: readonly {
+        readonly id: string;
+        readonly desc: boolean;
+    }[];
+}
+
+// @public
+export interface DataSource<Row> {
+    // (undocumented)
+    query(query: DataQuery, signal?: AbortSignal): Promise<DataPage<Row>>;
+}
+
+// @public
+export function NavItem(input: NavItemProps): ReactElement;
+
+// @public (undocumented)
+export interface NavItemProps extends Omit<ComponentPropsWithRef<'a'>, 'children'> {
+    icon: LucideIcon;
+    // (undocumented)
+    label: string;
+}
+
+// @public
+export function PageBar(input: PageBarProps): ReactElement;
+
+// @public (undocumented)
+export interface PageBarProps {
+    actions?: ReactNode;
+    status?: ReactNode;
+    title: string;
+}
 
 // @public
 export function UiProvider(props: Pick<MantineProviderProps, 'children' | 'defaultColorScheme' | 'forceColorScheme' | 'colorSchemeManager'>): ReactElement;
