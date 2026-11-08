@@ -7,13 +7,14 @@
 
 import {
   checkLogFitLimits,
+  type Diagnostic,
   InputError,
   type LogFitResult,
   logLeastSquares,
-  need,
   nth,
 } from '@open-reloading/statistics'
 import type { DragTable } from '../drag-tables.ts'
+import { need } from '../issue.ts'
 import { overlay, type Settings } from '../settings.ts'
 import { type DragInput, dragCoefficient, dragTableOf } from './drag.ts'
 import type { StepBudget } from './rk45.ts'
@@ -143,6 +144,8 @@ export class TruingError extends InputError {
   /** Parameter combination (in log parameters, column-scaled) with the smallest eigenvalue. */
   readonly direction?: number[] | undefined
   readonly estimate?: TruedParameter[] | undefined
+  /** The refusal of the trajectory that stopped the fit. */
+  readonly detail?: Diagnostic<string, object> | undefined
 
   constructor(
     reason: TruingReason,
@@ -151,17 +154,18 @@ export class TruingError extends InputError {
       unresolved?: number[] | undefined
       direction?: number[] | undefined
       estimate?: TruedParameter[] | undefined
-      /** What the solver reported, appended to the message. */
-      detail?: string | undefined
+      /** The refusal of the trajectory that stopped the fit; its code is appended to the message. */
+      detail?: Diagnostic<string, object> | undefined
     } = {},
   ) {
-    super(extra.detail ? `truing: ${reason} (${extra.detail})` : `truing: ${reason}`)
+    super(extra.detail ? `truing: ${reason} (${extra.detail.code})` : `truing: ${reason}`)
     this.name = 'TruingError'
     this.reason = reason
     this.conditionNumber = extra.conditionNumber
     this.unresolved = extra.unresolved
     this.direction = extra.direction
     this.estimate = extra.estimate
+    this.detail = extra.detail
   }
 }
 
@@ -383,7 +387,7 @@ function leastSquares(
   const { maxIterations = 30, maxCondition = 1e3, maxTotalSteps = Infinity, ...rest } = options
   const np = specs.length
   checkLogFitLimits(maxIterations, maxCondition)
-  need(maxTotalSteps > 0, 'maxTotalSteps must be positive')
+  need(maxTotalSteps > 0, { code: 'maxTotalStepsNotPositive', params: {} })
   if (observations.length < np) throw new TruingError('underdetermined')
   const budget = { used: 0, max: maxTotalSteps }
   const o = fitTrajectoryOptions(rest, budget)
@@ -428,29 +432,32 @@ function leastSquares(
 }
 
 function checkObservations(observations: readonly Observation[]): void {
-  need(observations.length > 0, 'at least one observation')
+  need(observations.length > 0, { code: 'noObservation', params: {} })
   for (const x of observations) {
-    need(['height', 'elevationHold', 'velocity'].includes(x.kind), `observation kind ${x.kind}`)
-    need(Number.isFinite(x.value), 'observation value')
-    need(
-      Number.isFinite(x.range) && (x.kind === 'velocity' ? x.range >= 0 : x.range > 0),
-      `observation range ${x.range}`,
-    )
+    need(['height', 'elevationHold', 'velocity'].includes(x.kind), {
+      code: 'observationKindUnknown',
+      params: { kind: x.kind },
+    })
+    need(Number.isFinite(x.value), { code: 'observationValueInvalid', params: {} })
+    need(Number.isFinite(x.range) && (x.kind === 'velocity' ? x.range >= 0 : x.range > 0), {
+      code: 'observationRangeInvalid',
+      params: { range: x.range },
+    })
     need(
       x.standardUncertainty === undefined ||
         (x.standardUncertainty > 0 && Number.isFinite(x.standardUncertainty)),
-      'standardUncertainty must be positive',
+      { code: 'standardUncertaintyNotPositive', params: {} },
     )
   }
   const withSigma = observations.filter((x) => x.standardUncertainty !== undefined).length
-  need(
-    withSigma === 0 || withSigma === observations.length,
-    'standardUncertainty on all observations or none',
-  )
-  need(
-    withSigma > 0 || new Set(observations.map((x) => x.kind)).size === 1,
-    'observations of different kinds need standard uncertainties',
-  )
+  need(withSigma === 0 || withSigma === observations.length, {
+    code: 'standardUncertaintyPartial',
+    params: {},
+  })
+  need(withSigma > 0 || new Set(observations.map((x) => x.kind)).size === 1, {
+    code: 'mixedObservationsNeedUncertainty',
+    params: {},
+  })
 }
 
 /** Fits the muzzle velocity to the observations. */
@@ -497,17 +504,20 @@ export function dragCorrection(
           }
         : { ...drag, curve: drag.curve.map(([m, c]) => [m, c * k] as const) }
     }
-  need(knots.length >= 2, 'at least two knots')
+  need(knots.length >= 2, { code: 'knotsTooFew', params: {} })
   knots.forEach((m, k) => {
-    need(m > 0 && Number.isFinite(m), 'knot Mach must be positive')
-    need(k === 0 || m > nth(knots, k - 1), 'knots must rise')
+    need(m > 0 && Number.isFinite(m), { code: 'knotMachNotPositive', params: {} })
+    need(k === 0 || m > nth(knots, k - 1), { code: 'knotsNotRising', params: {} })
   })
-  need(drag.kind === 'curve' || drag.bands.length === 1, 'knots need a single-band BC or a curve')
+  need(drag.kind === 'curve' || drag.bands.length === 1, {
+    code: 'knotsNeedSingleBandOrCurve',
+    params: {},
+  })
   // the curve built below drops the reference, so trajectory cannot reject a misspelled one
-  need(
-    drag.kind === 'curve' || [undefined, 'icao', 'metro'].includes(drag.reference),
-    `BC reference ${drag.kind === 'bc' && drag.reference}`,
-  )
+  need(drag.kind === 'curve' || [undefined, 'icao', 'metro'].includes(drag.reference), {
+    code: 'bcReferenceUnknown',
+    params: { reference: String(drag.kind === 'bc' && drag.reference) },
+  })
   // the bullet's own drag coefficient on pi d^2 / 4
   const base: DragTable = dragTableOf(drag)
   const own = (m: number) =>
@@ -640,9 +650,10 @@ function fitDrag(
   { knots, tag }: DragFit,
   options: TruingOptions | undefined,
 ): SessionsTruingResult {
-  need(sessions.length > 0, 'at least one session')
+  need(sessions.length > 0, { code: 'noSession', params: {} })
   checkObservations(sessions.flatMap((x) => x.observations))
-  for (const x of sessions) need(x.observations.length > 0, 'at least one observation per session')
+  for (const x of sessions)
+    need(x.observations.length > 0, { code: 'sessionWithoutObservation', params: {} })
   const drag = dragCorrection(projectile, knots)
   const specs: Spec[] = sessions.flatMap((x, k) =>
     x.fitMuzzleVelocity

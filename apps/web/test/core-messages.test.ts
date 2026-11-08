@@ -31,7 +31,7 @@ const own = translator(
     stuck: 'steckt',
     'interior: {reason}': 'Innen: {reason}',
     unreachable: 'unerreichbar',
-    'range {n} m not reached': '{n} m verfehlt',
+    'range {range} m not reached': '{range} m verfehlt',
     'truing: {reason} ({detail})': 'Truing: {reason} ({detail})',
     apex: 'Scheitel',
     'zero range {range} m not reached ({stop})': 'Fleck {range} m verfehlt ({stop})',
