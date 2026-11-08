@@ -9,15 +9,16 @@ import {
   checkLogFitLimits,
   chiSquareQuantile,
   chiSquareSurvival,
+  type Diagnostic,
   type Identifiability,
   InputError,
   identifiability,
   type LogFitFailure,
   logLeastSquares,
-  need,
   nth,
   studentTwoSidedQuantile,
 } from '@open-reloading/statistics'
+import { need } from '../issue.ts'
 import { overlay, type Settings } from '../settings.ts'
 import {
   type TrajectoryInput,
@@ -380,11 +381,14 @@ function measuredRows(
 }
 
 function checkCommon(shot: TrajectoryInput, clickValue: number, options: RangeStringOptions): void {
-  need(shot.muzzleVelocity > 0, 'muzzle velocity must be positive')
+  need(shot.muzzleVelocity > 0, { code: 'muzzleVelocityNotPositive', params: {} })
   const { priors = {}, maxZeroSigma = rangeStringDefaults.maxZeroSigma } = options
-  need(maxZeroSigma > 0 && Number.isFinite(maxZeroSigma), 'maxZeroSigma must be positive')
+  need(maxZeroSigma > 0 && Number.isFinite(maxZeroSigma), {
+    code: 'maxZeroSigmaNotPositive',
+    params: {},
+  })
   checkPriors(priors, options.fitZeroOffset)
-  need(clickValue > 0 && Number.isFinite(clickValue), 'click value must be positive')
+  need(clickValue > 0 && Number.isFinite(clickValue), { code: 'clickValueNotPositive', params: {} })
   checkSolverLimits(options)
 }
 
@@ -396,16 +400,16 @@ function checkPriors(
   fitZeroOffset: RangeStringOptions['fitZeroOffset'],
 ): void {
   for (const [name, sigma] of Object.entries(priors)) {
-    need(isParameterName(name), `prior ${name}`)
-    need(
-      sigma === undefined || (sigma > 0 && Number.isFinite(sigma)),
-      `prior ${name} must be positive`,
-    )
+    need(isParameterName(name), { code: 'priorUnknown', params: { name } })
+    need(sigma === undefined || (sigma > 0 && Number.isFinite(sigma)), {
+      code: 'priorNotPositive',
+      params: { name },
+    })
   }
-  need(
-    priors.zeroOffset === undefined || fitZeroOffset === true,
-    'a zeroOffset prior needs the fitZeroOffset option',
-  )
+  need(priors.zeroOffset === undefined || fitZeroOffset === true, {
+    code: 'zeroOffsetPriorWithoutFit',
+    params: {},
+  })
 }
 
 /** Checks the confidence levels of the intervals and of the residual check. */
@@ -415,12 +419,15 @@ function checkConfidenceLevels(options: RangeStringOptions): void {
     confidenceLevel: level = d.confidenceLevel,
     residualConfidenceLevel = d.residualConfidenceLevel,
   } = options
-  need(Number.isFinite(level) && level > 0 && level < 1, 'confidenceLevel must lie in (0, 1)')
+  need(Number.isFinite(level) && level > 0 && level < 1, {
+    code: 'confidenceLevelOptionOutsideUnit',
+    params: {},
+  })
   need(
     Number.isFinite(residualConfidenceLevel) &&
       residualConfidenceLevel > 0 &&
       residualConfidenceLevel < 1,
-    'residualConfidenceLevel must lie in (0, 1)',
+    { code: 'residualConfidenceLevelOutsideUnit', params: {} },
   )
 }
 
@@ -432,8 +439,11 @@ function checkFitLimits(options: RangeStringOptions): void {
     maxRelativeStandardUncertainty = d.maxRelativeStandardUncertainty,
   } = options
   const { maxCondition = d.maxCondition, maxIterations = d.maxIterations } = options
-  need(maxInflation > 1, 'maxInflation must exceed 1')
-  need(maxRelativeStandardUncertainty > 0, 'maxRelativeStandardUncertainty must be positive')
+  need(maxInflation > 1, { code: 'maxInflationNotAboveOne', params: {} })
+  need(maxRelativeStandardUncertainty > 0, {
+    code: 'maxRelativeStandardUncertaintyNotPositive',
+    params: {},
+  })
   checkLogFitLimits(maxIterations, maxCondition)
 }
 
@@ -454,7 +464,9 @@ function checkGroups(
     kinds.set(key, seen)
     need(
       seen.size === 1,
-      `group ${key}: an impact and a dial entry share their shots, keep one or name two groups`,
+      e.group === undefined
+        ? { code: 'rangeGroupSharesShots', params: { range: e.range } }
+        : { code: 'groupSharesShots', params: { group: e.group } },
     )
   }
 }
@@ -468,13 +480,19 @@ interface RowSpec {
 }
 
 function checkRow(kind: string, { range, shots, spread, rounding = 0 }: RowSpec): void {
-  need(Number.isFinite(range) && (kind === 'velocity' ? range >= 0 : range > 0), `${kind} range`)
-  need(
-    Number.isInteger(shots) && shots >= 1,
-    `${kind} shotCount must be a whole number of at least 1`,
-  )
-  need(spread > 0 && Number.isFinite(spread), `${kind} standardDeviation must be positive`)
-  need(rounding >= 0 && Number.isFinite(rounding), `${kind} rounding must not be negative`)
+  need(Number.isFinite(range) && (kind === 'velocity' ? range >= 0 : range > 0), {
+    code: 'entryRangeInvalid',
+    params: { kind },
+  })
+  need(Number.isInteger(shots) && shots >= 1, { code: 'entryShotCountInvalid', params: { kind } })
+  need(spread > 0 && Number.isFinite(spread), {
+    code: 'entryStandardDeviationNotPositive',
+    params: { kind },
+  })
+  need(rounding >= 0 && Number.isFinite(rounding), {
+    code: 'entryRoundingNegative',
+    params: { kind },
+  })
 }
 
 /** Checks the chronograph row of a plan or, with `measured`, of a fit, which adds its mean. */
@@ -483,7 +501,10 @@ function checkChronograph(
   measured: boolean,
 ): void {
   if (measured)
-    need((chronograph.mean ?? 0) > 0 && Number.isFinite(chronograph.mean), 'chronograph mean')
+    need((chronograph.mean ?? 0) > 0 && Number.isFinite(chronograph.mean), {
+      code: 'chronographMeanInvalid',
+      params: {},
+    })
   checkRow('velocity', {
     range: chronograph.instrumentDistance ?? 0,
     shots: chronograph.shotCount,
@@ -501,10 +522,16 @@ function checkEntries(
   chronograph: (TruingPlanInput['chronograph'] & { mean?: number }) | undefined,
   measured: boolean,
 ): void {
-  need(entries.length > 0 || chronograph !== undefined, 'at least one entry or a chronograph')
+  need(entries.length > 0 || chronograph !== undefined, {
+    code: 'noEntryOrChronograph',
+    params: {},
+  })
   for (const e of entries) {
-    need(e.kind === 'impact' || e.kind === 'dial', `entry kind ${e.kind}`)
-    if (measured) need(Number.isFinite(e.value), 'entry value')
+    need(e.kind === 'impact' || e.kind === 'dial', {
+      code: 'entryKindUnknown',
+      params: { kind: e.kind },
+    })
+    if (measured) need(Number.isFinite(e.value), { code: 'entryValueInvalid', params: {} })
     checkRow(e.kind, {
       range: e.range,
       shots: e.shotCount,
@@ -566,7 +593,7 @@ class Model {
   readonly active: readonly number[]
   readonly priors: readonly Prior[]
   /** Why the last prediction that returned null failed. */
-  failure = ''
+  failure: Diagnostic<string, object> | undefined
   constructor(
     shot: TrajectoryInput,
     clickValue: number,
@@ -601,7 +628,7 @@ class Model {
       )
     } catch (e) {
       if (strict || !(e instanceof InputError)) throw e
-      this.failure = e.message
+      this.failure = e.issue
       return null
     }
     const at = new Map(t.points.map((p) => [p.range, p]))
@@ -609,7 +636,7 @@ class Model {
     for (const x of this.rows) {
       const p = at.get(x.range)
       if (!p) {
-        this.failure = `range ${x.range} m not reached`
+        this.failure = { code: 'rangeNotReached', params: { range: x.range } }
         return null
       }
       out.push(rowPrediction(x, p, theta, this.clickValue))
@@ -852,7 +879,7 @@ export function planTruingStrings(
 ): TruingPlan {
   const { shot, clickValue, dispersion, entries, chronograph } = input
   checkCommon(shot, clickValue, options)
-  need(dispersion > 0 && Number.isFinite(dispersion), 'dispersion must be positive')
+  need(dispersion > 0 && Number.isFinite(dispersion), { code: 'dispersionNotPositive', params: {} })
   checkEntries(entries, chronograph, false)
   const rows = plannedRows(input)
   const model = new Model(shot, clickValue, rows, options)
@@ -903,7 +930,7 @@ export function comparePlanCandidates(
   candidates: readonly PlanCandidate[],
   options: RangeStringOptions = {},
 ): CandidatePlan[] {
-  need(candidates.length > 0, 'at least one candidate')
+  need(candidates.length > 0, { code: 'noCandidate', params: {} })
   return candidates.map((c) => ({
     ...(c.name === undefined ? {} : { name: c.name }),
     shotCount: c.entries.reduce((n, e) => n + e.shotCount, 0) + (c.chronograph?.shotCount ?? 0),

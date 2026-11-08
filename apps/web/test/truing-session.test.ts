@@ -6,6 +6,8 @@ import {
 } from '@open-reloading/ballistics'
 import { describe, expect, it } from 'vitest'
 import { english, type Say } from '../src/i18n/translate.ts'
+import { setRefusalWords } from '../src/lib/core-messages.ts'
+import { refusalSentence } from '../src/lib/refusal-words.ts'
 import {
   blankChrono,
   blankRow,
@@ -211,6 +213,16 @@ describe('entry problems', () => {
     const half = input.rows.map((r, i) => (i === 0 ? { ...r, shots: '2.5' } : r))
     expect(problem(fitSession(nominal, { ...input, rows: half }, english.t))).toBe(
       'Row 1 shots: enter a number.',
+    )
+  })
+
+  it('words the refusal of the trajectory that stopped the fit', () => {
+    setRefusalWords(refusalSentence)
+    const row = defined(input.rows[0])
+    const far = { ...input, rows: [{ ...row, range: text(system.range.fromSi(5000)) }] }
+    const vertical = { ...nominal, zero: { elevationAngle: 1.5, windageAngle: 0 } }
+    expect(problem(fitSession(vertical, far, english.t))).toMatch(
+      /^truing: unreachable \(range [\d.]+ m not reached\)$/,
     )
   })
 
