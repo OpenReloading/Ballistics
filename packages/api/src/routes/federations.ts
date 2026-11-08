@@ -11,7 +11,8 @@ import {
 import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
 import type { Catalogue } from '../catalogue/types.ts'
-import { idParams, missing, noQuery, page, recordIdPattern, stored } from './common.ts'
+import { missing, stored } from './record-answers.ts'
+import { idParams, noQuery, page, recordIdPattern } from './schemas.ts'
 
 const id = { type: 'string', pattern: recordIdPattern, maxLength: 100 } as const
 const cappedIdParams = {

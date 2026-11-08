@@ -3,6 +3,7 @@
  * app). Errors cross the thread boundary as plain objects and are rebuilt into
  * `TruingError`, `InputError` or `Error`. No Node imports: the web app bundles this module.
  */
+
 import {
   type ChargeSolverOptions,
   type ChargeTarget,
@@ -24,6 +25,7 @@ import {
   trueMuzzleVelocity,
 } from '@open-reloading/ballistics'
 import { InputError } from '@open-reloading/statistics'
+import type { Catalogue } from '../catalogue/types.ts'
 
 /** The deadline passed while the task was queued or running. */
 export class ComputeTimeout extends Error {}
@@ -157,6 +159,9 @@ export interface ComputeRunner {
   /** Releases the workers, if any. */
   close(): Promise<void>
 }
+
+/** What the compute routes read: the records to resolve ids against and the solver task runner. */
+export type ComputeContext = { catalogue: Catalogue; compute: ComputeRunner }
 
 /** Runs tasks in this thread; for tests that mock core. */
 export const inlineRunner: ComputeRunner = {

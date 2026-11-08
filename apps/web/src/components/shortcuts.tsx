@@ -12,6 +12,7 @@ import {
   shortcuts,
   singleKeysKey,
 } from '../lib/shortcuts.ts'
+import { storedChoice } from '../lib/stored-choice.ts'
 import { AppModal } from './app-modal.tsx'
 
 /** The shortcuts mounted now, counted per id, for the help dialog. */
@@ -23,40 +24,14 @@ const changed = () => {
   for (const l of listeners) l()
 }
 
-const singleKeysEvent = 'openreloading:single-keys'
-/** The choice of this session where the browser has no storage to keep it in. */
-let sessionSingleKeys = true
-const readSingleKeys = () => {
-  try {
-    return parseSingleKeys(localStorage.getItem(singleKeysKey))
-  } catch {
-    return sessionSingleKeys
-  }
-}
-const subscribeSingleKeys = (l: () => void) => {
-  window.addEventListener(singleKeysEvent, l)
-  window.addEventListener('storage', l)
-  return () => {
-    window.removeEventListener(singleKeysEvent, l)
-    window.removeEventListener('storage', l)
-  }
-}
+const singleKeys = storedChoice(singleKeysKey, parseSingleKeys, (on) => (on ? null : 'off'))
 
 /** Turns the single-key shortcuts (`?`, `/`) on or off for this browser. */
-export function setSingleKeys(on: boolean) {
-  sessionSingleKeys = on
-  try {
-    if (on) localStorage.removeItem(singleKeysKey)
-    else localStorage.setItem(singleKeysKey, 'off')
-  } catch {
-    // shortcut: without storage the choice lasts until the page reloads
-  }
-  window.dispatchEvent(new Event(singleKeysEvent))
-}
+export const setSingleKeys = singleKeys.set
 
 /** Whether the single-key shortcuts are on (the Settings choice). */
 export const useSingleKeys = () =>
-  useSyncExternalStore(subscribeSingleKeys, readSingleKeys, () => true)
+  useSyncExternalStore(singleKeys.subscribe, singleKeys.read, () => true)
 
 const inField = (t: EventTarget | null) =>
   t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))
@@ -94,7 +69,7 @@ function unmount(id: ShortcutId) {
 /** Whether the Settings choice, a text field or an open dialog keeps shortcut `id` from running. */
 function keptFromPage(id: ShortcutId, e: KeyboardEvent, modal: boolean) {
   const s = shortcuts[id]
-  if (isSingleKey(id) && !readSingleKeys()) return true
+  if (isSingleKey(id) && !singleKeys.read()) return true
   if (!s.fields && inField(e.target)) return true
   // the browser's own print stays with a dialog open: nothing else would print
   return modal && (isSingleKey(id) || id === 'print')

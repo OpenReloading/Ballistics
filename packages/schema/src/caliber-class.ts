@@ -1,8 +1,8 @@
 import { z } from 'zod'
 import type { Exact } from './exact.ts'
+import { positiveLength } from './fields.ts'
 import { recordId } from './ids.ts'
 import { provenance } from './provenance.ts'
-import { positiveLength } from './shared.ts'
 import type { QuantitySchema } from './units.ts'
 
 const caliberClassParser = z.strictObject({
