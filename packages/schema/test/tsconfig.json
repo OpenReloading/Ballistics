@@ -6,5 +6,5 @@
     "rootDir": ".."
   },
   "include": [".", "../src", "../scripts"],
-  "exclude": ["../src/url.d.ts"]
+  "exclude": ["../src/url.d.ts", "../src/platform.d.ts"]
 }

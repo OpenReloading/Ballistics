@@ -1,24 +1,25 @@
 /** The user data file: its text, parsing and validation, and import planning against the browser store. */
 
 import {
+  checkedUserDataFileText,
   checkUserRefs,
   type EmbeddedFile,
+  exportAllFileText,
+  maxUserDataBytes,
   parseRef,
+  readUserDataFile,
   type SkippedKind,
+  type UserDataDiagnostic,
   type UserRecord,
-  userDataFile,
-  userDataFormat,
-  userDataVersion,
+  userDataFileText,
   userRecord,
-  versionProblem,
-  withoutUnknownKinds,
 } from '@open-reloading/schema'
 import { z } from 'zod'
 import type { Message, Translator } from '../i18n/translate.ts'
 import { translateMessage } from './core-messages.ts'
 
 /** Files above this size are skipped on import: a sheet file carries its photo as base64. */
-export const maxFileBytes = 40_000_000
+export const maxFileBytes = maxUserDataBytes
 export const tooLargeMessage = `The file is larger than ${maxFileBytes / 1e6} MB.`
 const notJsonMessage = 'The file is not JSON.'
 const notDataFileMessage = 'The file is not an OpenReloading data file.'
@@ -42,9 +43,6 @@ export function reasonText(reason: string, { t, tn }: Pick<Translator, 't' | 'tn
     )
 }
 
-/** The size of `text` as a file, UTF-8 bytes, as Open and Import compare it with `maxFileBytes`. */
-const fileBytes = (text: string) => new TextEncoder().encode(text).byteLength
-
 /**
  * The text of a user data file holding `records` and the photos they point at (`files`). The
  * `invalid` records of the browser, as stored, are added under `invalid` (not part of the format
@@ -55,17 +53,11 @@ export const userDataText = (
   files?: EmbeddedFile[] | undefined,
   invalid?: InvalidRecord[],
 ) =>
-  `${JSON.stringify(
-    {
-      format: userDataFormat,
-      version: userDataVersion,
-      records,
-      ...(files?.length && { files }),
-      ...(invalid?.length && { invalid: invalid.map((i) => i.raw) }),
-    },
-    null,
-    2,
-  )}\n`
+  userDataFileText(
+    records,
+    files,
+    invalid?.map((i) => i.raw),
+  )
 
 /** A warning of a read file as its message and values, worded where it is shown. */
 export interface WordedWarning {
@@ -88,62 +80,32 @@ export type ParsedUserFile =
     }
   | { ok: false; reason: string }
 
+/** The first problems of the records the schema refuses, as zod words them, and how many more there are. */
+function problemsText(issues: z.core.$ZodIssue[], more: number) {
+  const text = z.prettifyError(new z.ZodError(issues))
+  return more > 0 ? `${text}\nand ${more} more problem${more === 1 ? '' : 's'}` : text
+}
+
+/** The English reason of a diagnostic of the user data file, which `reasonText` words. */
+export function reasonOf(d: UserDataDiagnostic): string {
+  switch (d.code) {
+    case 'tooLarge':
+      return tooLargeMessage
+    case 'notJson':
+      return notJsonMessage
+    case 'notDataFile':
+      return notDataFileMessage
+    case 'otherVersion':
+      return `The file has format version ${JSON.stringify(d.params.version)}; this app reads version ${d.params.readVersion}.`
+    case 'invalidRecords':
+      return problemsText(d.params.issues, d.params.more)
+  }
+}
+
 /** One file, validated against `@open-reloading/schema` as a whole but for records of a kind it does not know. */
 export function parseUserDataFile(text: string): ParsedUserFile {
-  if (fileBytes(text) > maxFileBytes) return { ok: false, reason: tooLargeMessage }
-  let json: unknown
-  try {
-    json = JSON.parse(text)
-  } catch {
-    return { ok: false, reason: notJsonMessage }
-  }
-  const problem = versionProblem(json)
-  if (problem) return { ok: false, reason: problem }
-  if ((json as { format?: unknown } | null)?.format !== userDataFormat)
-    return { ok: false, reason: notDataFileMessage }
-  const { json: known, skipped } = withoutUnknownKinds(json)
-  const r = userDataFile.safeParse(known)
-  const invalid = (json as { invalid?: unknown }).invalid
-  return r.success
-    ? {
-        ok: true,
-        records: r.data.records,
-        files: r.data.files,
-        ...(Array.isArray(invalid) && invalid.length > 0 && { invalid }),
-        ...(skipped.length > 0 && { skipped }),
-      }
-    : {
-        ok: false,
-        reason: problemsText(skipped.length ? atFileIndex(r.error, json, known) : r.error),
-      }
-}
-
-/** `error` with each record index of `known` turned back into the index in `json`, which holds the skipped records too. */
-function atFileIndex(error: z.ZodError, json: unknown, known: unknown) {
-  const kept = (known as { records: unknown[] }).records
-  // `kept` is `records` in order without the skipped records, which are objects
-  const index: number[] = []
-  ;(json as { records: unknown[] }).records.forEach((r, i) => {
-    if (r === kept[index.length]) index.push(i)
-  })
-  return new z.ZodError(
-    error.issues.map((i) => {
-      const [field, at, ...rest] = i.path
-      return field === 'records' && typeof at === 'number'
-        ? { ...i, path: [field, index[at] ?? at, ...rest] }
-        : i
-    }),
-  )
-}
-
-/** Problems a reason names: a file of many invalid records would otherwise list every one. */
-const shownProblems = 3
-
-/** The first `shownProblems` problems of `error` and how many more there are. */
-function problemsText(error: z.ZodError) {
-  const text = z.prettifyError(new z.ZodError(error.issues.slice(0, shownProblems)))
-  const more = error.issues.length - shownProblems
-  return more > 0 ? `${text}\nand ${more} more problem${more === 1 ? '' : 's'}` : text
+  const read = readUserDataFile(text)
+  return read.ok ? read : { ok: false, reason: reasonOf(read.diagnostic) }
 }
 
 /** The text of `userDataText`, or why Open and Import would reject it (too large, invalid). */
@@ -152,9 +114,12 @@ export function checkedUserDataText(
   files?: EmbeddedFile[] | undefined,
   invalid?: InvalidRecord[],
 ): { ok: true; text: string } | { ok: false; reason: string } {
-  const text = userDataText(records, files, invalid)
-  const check = parseUserDataFile(text)
-  return check.ok ? { ok: true, text } : check
+  const checked = checkedUserDataFileText(
+    records,
+    files,
+    invalid?.map((i) => i.raw),
+  )
+  return checked.ok ? checked : { ok: false, reason: reasonOf(checked.diagnostic) }
 }
 
 /**
@@ -167,21 +132,12 @@ export function exportAllText(
   files: EmbeddedFile[] = [],
   invalid: InvalidRecord[] = [],
 ): { ok: true; text: string; left: string[] } | { ok: false; reason: string } {
-  const all = checkedUserDataText(records, files, invalid)
-  if (all.ok || all.reason !== tooLargeMessage) return all.ok ? { ...all, left: [] } : all
-  // a photo adds its entry and less than 64 characters of indentation and separators
-  let room = maxFileBytes - fileBytes(userDataText(records, undefined, invalid)) - 64
-  const kept: EmbeddedFile[] = []
-  const left: string[] = []
-  for (const f of files) {
-    const size = fileBytes(JSON.stringify(f)) + 64
-    if (size <= room) {
-      kept.push(f)
-      room -= size
-    } else left.push(f.id)
-  }
-  const checked = checkedUserDataText(records, kept, invalid)
-  return checked.ok ? { ...checked, left } : checked
+  const all = exportAllFileText(
+    records,
+    files,
+    invalid.map((i) => i.raw),
+  )
+  return all.ok ? all : { ok: false, reason: reasonOf(all.diagnostic) }
 }
 
 /**
