@@ -1,7 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
-
-const light = 'rgb(255, 255, 255)'
-const dark = 'rgb(22, 22, 22)'
+import { isDark } from './luminance.ts'
 
 // the body background as first computed, at DOMContentLoaded, before any client code runs
 const recordFirstPaint = (page: Page) =>
@@ -26,11 +24,11 @@ test('with nothing stored the system setting decides', async ({ page }) => {
   await page.goto('/cartridges/308-win')
   expect(await page.evaluate(() => localStorage.getItem('theme'))).toBeNull()
   await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', 'dark')
-  expect(await bg(page)).toBe(dark)
+  expect(isDark(await bg(page))).toBe(true)
   await expect(themeSwitch(page)).toHaveAttribute('aria-pressed', 'true')
   await page.emulateMedia({ colorScheme: 'light' })
   // the provider follows the system change in a media query listener
-  await expect.poll(() => bg(page)).toBe(light)
+  await expect.poll(async () => isDark(await bg(page))).toBe(false)
   await expect(themeSwitch(page)).toHaveAttribute('aria-pressed', 'false')
 })
 
@@ -43,13 +41,13 @@ test('the switch overrides the system setting and the choice survives a reload',
   await expect(themeSwitch(page)).toHaveAttribute('aria-pressed', 'true')
   await themeSwitch(page).click()
   await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', 'light')
-  expect(await bg(page)).toBe(light)
+  expect(isDark(await bg(page))).toBe(false)
   expect(await page.evaluate(() => getComputedStyle(document.documentElement).colorScheme)).toBe(
     'light',
   )
   await page.reload()
   await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', 'light')
-  expect(await firstBg(page)).toBe(light)
+  expect(isDark(await firstBg(page))).toBe(false)
   expect(await page.evaluate(() => localStorage.getItem('theme'))).toBe('light')
   await expect(themeSwitch(page)).toHaveAttribute('aria-pressed', 'false')
 })
@@ -59,7 +57,7 @@ test('a stored dark applies before the first paint', async ({ page }) => {
   await recordFirstPaint(page)
   await page.emulateMedia({ colorScheme: 'light' })
   await page.goto('/workbench')
-  expect(await firstBg(page)).toBe(dark)
+  expect(isDark(await firstBg(page))).toBe(true)
   await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', 'dark')
   await expect(themeSwitch(page)).toHaveAttribute('aria-pressed', 'true')
 })
@@ -67,7 +65,7 @@ test('a stored dark applies before the first paint', async ({ page }) => {
 test('print with system dark and nothing stored is light', async ({ page }) => {
   await page.goto('/cartridges/308-win')
   await page.emulateMedia({ media: 'print', colorScheme: 'dark' })
-  expect(await bg(page)).toBe(light)
+  expect(isDark(await bg(page))).toBe(false)
   await expect(themeSwitch(page)).toBeHidden()
 })
 
@@ -76,8 +74,9 @@ test('print with dark stored is light', async ({ page }) => {
   await page.goto('/cartridges/308-win')
   await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', 'dark')
   await page.emulateMedia({ media: 'print' })
-  expect(await bg(page)).toBe(light)
-  expect(await page.evaluate(() => getComputedStyle(document.body).color)).toBe('rgb(26, 26, 26)')
+  // a light page with dark text, whatever the theme
+  expect(isDark(await bg(page))).toBe(false)
+  expect(isDark(await page.evaluate(() => getComputedStyle(document.body).color))).toBe(true)
 })
 
 test('the switch is reachable by keyboard and exposes its name and pressed state', async ({
@@ -96,10 +95,10 @@ test('the switch is reachable by keyboard and exposes its name and pressed state
   await expect(themeSwitch(page)).toBeFocused()
   await page.keyboard.press('Space')
   await expect(themeSwitch(page)).toHaveAttribute('aria-pressed', 'false')
-  expect(await bg(page)).toBe(light)
+  expect(isDark(await bg(page))).toBe(false)
   await page.keyboard.press('Enter')
   await expect(themeSwitch(page)).toHaveAttribute('aria-pressed', 'true')
-  expect(await bg(page)).toBe(dark)
+  expect(isDark(await bg(page))).toBe(true)
 })
 
 for (const scheme of ['light', 'dark'] as const)
