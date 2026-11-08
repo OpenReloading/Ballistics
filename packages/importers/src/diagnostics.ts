@@ -114,8 +114,9 @@ export function refuseTrace(
 
 /**
  * Why a file reader refuses the bytes or the text of a file: text decoding, the ZIP and XML of an
- * XLSX workbook, its cells, and the root of an XML load file. A `part` param names the XLSX part
- * and a `worksheet` param the XLS worksheet; the app words them before the message.
+ * XLSX workbook, the compound file and records of an XLS workbook, their cells, and the root of an
+ * XML load file. A `part` param names the XLSX part, a `worksheet` param the XLS worksheet and a
+ * `sharedString` param the XLS shared string; the app words them before the message.
  */
 export type FileDiagnostic = ReaderDiagnostic<
   | 'utf16OddBytes'
@@ -177,6 +178,43 @@ export type FileDiagnostic = ReaderDiagnostic<
   | 'noRoot'
   | 'rootNotLoad'
   | 'noLoad'
+  | 'cfbSectorOutsideChain'
+  | 'cfbTooShort'
+  | 'cfbEndsBefore'
+  | 'cfbByteOrder'
+  | 'cfbVersion'
+  | 'cfbMiniLayout'
+  | 'cfbSectorOutside'
+  | 'cfbFatListed'
+  | 'cfbChainLoops'
+  | 'cfbNoFatEntry'
+  | 'cfbNoMiniFatEntry'
+  | 'cfbChainEnds'
+  | 'cfbStreamTooLarge'
+  | 'cfbStreamPastEnd'
+  | 'cfbNoMiniStream'
+  | 'cfbMiniSectorOutside'
+  | 'cfbNoRoot'
+  | 'cfbEntryRepeated'
+  | 'cfbRootTooLarge'
+  | 'xlsPhoneticNegative'
+  | 'xlsStringMalformed'
+  | 'xlsRecordPastEnd'
+  | 'xlsSubstreamsOverlap'
+  | 'xlsRecordShort'
+  | 'xlsNotBiff8'
+  | 'xlsNoWorkbookEof'
+  | 'xlsEncrypted'
+  | 'xlsFormulaNoString'
+  | 'xlsNumberNotFinite'
+  | 'xlsUnknownErrorCode'
+  | 'xlsCellsMismatch'
+  | 'xlsUnknownValueType'
+  | 'xlsWorksheetNoEof'
+  | 'xlsWorksheetNoBof'
+  | 'xlsWorksheetSameStart'
+  | 'xlsNoWorkbookStream'
+  | 'xlsSharedStringsEnd'
 >
 
 /** Throws the file refusal `code` with `params`. */
