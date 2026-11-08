@@ -6,6 +6,7 @@ import {
   pressureToleranceDefaults,
 } from '@open-reloading/ballistics'
 import { z } from 'zod'
+import type { Exact } from './exact.ts'
 import { caps, recordId, steps } from './schemas.ts'
 
 const grainShape = <T extends string>(shape: T) => z.literal(shape).describe('Grain shape.')
@@ -83,7 +84,10 @@ const burn = z
 /** Interior defaults of the API: `maxTime` 0.04 s, `outputStep` as core (2e-6 s). */
 const interiorApiDefaults = { maxTime: 0.04, outputStep: 2e-6 } as const
 /** The options of an M3 run: the API's `maxTime`, `maxSteps`, then the request's `options`. */
-export const m3Options = <T extends object>(maxSteps: number, options?: T) => ({
+export const m3Options = (
+  maxSteps: number,
+  options?: object,
+): { maxTime: typeof interiorApiDefaults.maxTime; maxSteps: number } => ({
   maxTime: interiorApiDefaults.maxTime,
   maxSteps,
   ...options,
@@ -360,12 +364,207 @@ const m3Load = z
   })
   .describe('The load: chamber, barrel, bullet, charge and propellant, SI units.')
 
-/**
- * The fields of the M3 interior body and of the charge-target body
- * (`apps/docs/docs/models/interior-m3.md`): SI, `load.propellantTemperature` in K.
- * `interiorBody` adds the sampling field.
- */
-export const interiorBase = z
+/** The zod type of `load.propellant.burn`: a geometric or a vivacity burn law. */
+export type BurnSchema = z.ZodDiscriminatedUnion<
+  [
+    z.ZodObject<
+      {
+        kind: z.ZodLiteral<'geometric'>
+        coefficient: z.ZodNumber
+        exponent: z.ZodNumber
+        grain: z.ZodDiscriminatedUnion<
+          [
+            z.ZodObject<{ shape: z.ZodLiteral<'sphere'>; diameter: z.ZodNumber }, z.core.$strict>,
+            z.ZodObject<
+              { shape: z.ZodLiteral<'cylinder'>; diameter: z.ZodNumber; length: z.ZodNumber },
+              z.core.$strict
+            >,
+            z.ZodObject<
+              {
+                diameter: z.ZodNumber
+                perforationDiameter: z.ZodNumber
+                length: z.ZodNumber
+                shape: z.ZodLiteral<'tube'>
+              },
+              z.core.$strict
+            >,
+            z.ZodObject<
+              {
+                diameter: z.ZodNumber
+                perforationDiameter: z.ZodNumber
+                length: z.ZodNumber
+                shape: z.ZodLiteral<'sevenPerf'>
+              },
+              z.core.$strict
+            >,
+          ],
+          'shape'
+        >
+      },
+      z.core.$strict
+    >,
+    z.ZodObject<
+      {
+        kind: z.ZodLiteral<'vivacity'>
+        vivacity: z.ZodNumber
+        exponent: z.ZodNumber
+        referencePressure: z.ZodNumber
+        form: z.ZodDiscriminatedUnion<
+          [
+            z.ZodObject<{ kind: z.ZodLiteral<'constant'> }, z.core.$strict>,
+            z.ZodObject<
+              {
+                a: z.ZodNumber
+                m: z.ZodNumber
+                q: z.ZodNumber
+                z1: z.ZodNumber
+                kind: z.ZodLiteral<'twoStage'>
+              },
+              z.core.$strict
+            >,
+            z.ZodObject<
+              {
+                a: z.ZodNumber
+                m: z.ZodNumber
+                q: z.ZodNumber
+                z1: z.ZodNumber
+                kind: z.ZodLiteral<'threeStage'>
+                z2: z.ZodNumber
+                r: z.ZodNumber
+              },
+              z.core.$strict
+            >,
+          ],
+          'kind'
+        >
+      },
+      z.core.$strict
+    >,
+  ],
+  'kind'
+>
+
+/** The zod shape of `load` of the M3 body. */
+export type M3LoadShape = {
+  chamber: z.ZodObject<
+    {
+      volume: z.ZodNumber
+      boreArea: z.ZodNumber
+      boreDiameter: z.ZodNumber
+      throatWear: z.ZodOptional<z.ZodNumber>
+    },
+    z.core.$strict
+  >
+  barrel: z.ZodObject<{ length: z.ZodNumber; twist: z.ZodNumber }, z.core.$strict>
+  bullet: z.ZodObject<
+    { mass: z.ZodNumber; gyrationRadius: z.ZodOptional<z.ZodNumber> },
+    z.core.$strict
+  >
+  charge: z.ZodNumber
+  propellant: z.ZodObject<
+    {
+      specificEnergy: z.ZodNumber
+      gamma: z.ZodNumber
+      density: z.ZodNumber
+      covolume: z.ZodNumber
+      burn: BurnSchema
+      temperatureSensitivity: z.ZodOptional<
+        z.ZodObject<{ reference: z.ZodNumber; cold: z.ZodNumber; hot: z.ZodNumber }, z.core.$strict>
+      >
+    },
+    z.core.$strict
+  >
+  propellantTemperature: z.ZodNumber
+  ignitionPressure: z.ZodNumber
+  startPressure: z.ZodNumber
+  resistance: z.ZodOptional<
+    z.ZodObject<
+      {
+        friction: z.ZodOptional<z.ZodNumber>
+        engraving: z.ZodOptional<
+          z.ZodArray<z.ZodObject<{ travel: z.ZodNumber; pressure: z.ZodNumber }, z.core.$strict>>
+        >
+      },
+      z.core.$strict
+    >
+  >
+  gradient: z.ZodOptional<z.ZodObject<{ energy: z.ZodNumber; breech: z.ZodNumber }, z.core.$strict>>
+  heat: z.ZodOptional<
+    z.ZodDiscriminatedUnion<
+      [
+        z.ZodObject<{ model: z.ZodLiteral<'none'> }, z.core.$strict>,
+        z.ZodObject<
+          {
+            model: z.ZodLiteral<'convective'>
+            flameTemperature: z.ZodNumber
+            wallTemperature: z.ZodOptional<z.ZodNumber>
+            viscosity: z.ZodOptional<z.ZodNumber>
+            prandtl: z.ZodOptional<z.ZodNumber>
+            factor: z.ZodOptional<z.ZodNumber>
+          },
+          z.core.$strict
+        >,
+      ],
+      'model'
+    >
+  >
+  leakage: z.ZodOptional<
+    z.ZodObject<
+      {
+        area: z.ZodArray<z.ZodObject<{ travel: z.ZodNumber; area: z.ZodNumber }, z.core.$strict>>
+        backPressure: z.ZodOptional<z.ZodNumber>
+        discharge: z.ZodOptional<z.ZodNumber>
+      },
+      z.core.$strict
+    >
+  >
+}
+
+/** The zod shape of `interiorBase`, the fields the interior and charge-target bodies share. */
+export type InteriorBaseShape = {
+  model: z.ZodLiteral<'m3'>
+  load: z.ZodObject<M3LoadShape, z.core.$strict>
+  options: z.ZodOptional<
+    z.ZodObject<
+      {
+        relativeTolerance: z.ZodOptional<z.ZodNumber>
+        absoluteTolerance: z.ZodOptional<z.ZodNumber>
+        outputStep: z.ZodOptional<z.ZodNumber>
+        maxSteps: z.ZodOptional<z.ZodNumber>
+        maxTime: z.ZodOptional<z.ZodNumber>
+      },
+      z.core.$strict
+    >
+  >
+  cartridge: z.ZodOptional<z.ZodString>
+  pressureLimit: z.ZodOptional<z.ZodNumber>
+  maximumPressure: z.ZodOptional<z.ZodNumber>
+  tolerances: z.ZodOptional<
+    z.ZodObject<
+      {
+        chargeFraction: z.ZodOptional<z.ZodNumber>
+        volumeFraction: z.ZodOptional<z.ZodNumber>
+        massFraction: z.ZodOptional<z.ZodNumber>
+        burnRateFraction: z.ZodOptional<z.ZodNumber>
+        temperatureKelvin: z.ZodOptional<z.ZodNumber>
+        startPressureFraction: z.ZodOptional<z.ZodNumber>
+      },
+      z.core.$strict
+    >
+  >
+  ladder: z.ZodOptional<
+    z.ZodObject<
+      {
+        chargeStep: z.ZodNumber
+        stepCount: z.ZodNumber
+        direction: z.ZodOptional<z.ZodEnum<{ up: 'up'; down: 'down'; around: 'around' }>>
+      },
+      z.core.$strict
+    >
+  >
+}
+
+const interiorBaseParser = z
   .strictObject({
     model: z.literal('m3').describe('Interior model: m3, one gas state with a Noble-Abel gas.'),
     load: m3Load,
@@ -414,11 +613,14 @@ export const interiorBase = z
   )
 
 /**
- * Body of `POST /interior` for the M3 model (`apps/docs/docs/models/interior-m3.md`): SI,
- * `load.propellantTemperature` in K.
- * Inferred type: {@link InteriorBody}. Request type: {@link InteriorRequest}.
+ * The fields of the M3 interior body and of the charge-target body
+ * (`apps/docs/docs/models/interior-m3.md`): SI, `load.propellantTemperature` in K.
+ * `interiorBody` adds the sampling field.
  */
-export const interiorBody = interiorBase
+export const interiorBase: z.ZodObject<InteriorBaseShape, z.core.$strict> =
+  interiorBaseParser satisfies Exact<typeof interiorBase, typeof interiorBaseParser>
+
+const interiorBodyParser = interiorBase
   .extend({ sampling: sampling.optional() })
   .refine((b) => !(b.ladder && b.sampling), {
     message: 'sampling applies to a single run, not to a ladder',
@@ -428,9 +630,30 @@ export const interiorBody = interiorBase
     'One run of the M3 interior model with an optional sampled band, or a charge ladder, in SI units. Results are simulations, not load data.',
   )
 
+/**
+ * Body of `POST /interior` for the M3 model (`apps/docs/docs/models/interior-m3.md`): SI,
+ * `load.propellantTemperature` in K.
+ * Inferred type: {@link InteriorBody}. Request type: {@link InteriorRequest}.
+ */
+export const interiorBody: z.ZodObject<
+  InteriorBaseShape & {
+    sampling: z.ZodOptional<
+      z.ZodObject<
+        {
+          samples: z.ZodOptional<z.ZodInt>
+          seed: z.ZodOptional<z.ZodInt>
+          budgetMs: z.ZodOptional<z.ZodInt>
+        },
+        z.core.$strict
+      >
+    >
+  },
+  z.core.$strict
+> = interiorBodyParser satisfies Exact<typeof interiorBody, typeof interiorBodyParser>
+
 const positive = (max: number) => z.number().positive().max(max)
 /** Bound of `propellant.bulkDensity`, kg/m3; also applied to the value of a powder record. */
-export const bulkDensityBound = positive(5000)
+export const bulkDensityBound: z.ZodNumber = positive(5000)
 
 /** A parsed `POST /interior` body, defaults applied. */
 export interface InteriorBody extends z.infer<typeof interiorBody> {}

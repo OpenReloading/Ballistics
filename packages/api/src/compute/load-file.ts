@@ -27,8 +27,8 @@ import {
   userDataFile,
   versionProblem,
 } from '@open-reloading/schema'
+import { notice, unprocessable } from '@open-reloading/use-cases'
 import { z } from 'zod'
-import { notice, unprocessable } from './answer.ts'
 
 type Path = PropertyKey[]
 const issue = (path: Path, message: string): z.core.$ZodIssue => ({

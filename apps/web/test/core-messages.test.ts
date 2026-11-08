@@ -1,10 +1,10 @@
 import { readdirSync, readFileSync } from 'node:fs'
-import { advisoryText } from '@open-reloading/api/advisories'
 import { buildOpenApi } from '@open-reloading/api/openapi'
 import { pressureMethod } from '@open-reloading/schema'
+import { advisoryText } from '@open-reloading/use-cases'
 import { describe, expect, it } from 'vitest'
-import { limitCheck, type Warning } from '../../../packages/api/dist/compute/limits.js'
 import { missingValuesAnswer } from '../../../packages/api/dist/compute/load-file.js'
+import { limitCheck, type Warning } from '../../../packages/use-cases/dist/limits.js'
 import de from '../src/i18n/de.json'
 import { type Catalogue, english, translator } from '../src/i18n/translate.ts'
 import {
@@ -375,7 +375,7 @@ const dynamicArguments: { file: string; arg: string; reason: string }[] = [
     reason: 'the sentence is a variable with its own template',
   },
   {
-    file: 'api/src/compute/limits.ts',
+    file: 'use-cases/src/limits.ts',
     arg: 'exceededMessage(l, range)',
     reason: 'the exceeded-limit message: tested above',
   },
@@ -393,7 +393,7 @@ const dynamicArguments: { file: string; arg: string; reason: string }[] = [
 
 /** Messages built from parts that a sample value cannot stand for: the tests of the warnings cover them. */
 const compound: { file: string; text: string }[] = [
-  { file: 'api/src/compute/limits.ts', text: 'the simulated peak mean pressure' },
+  { file: 'use-cases/src/limits.ts', text: 'the simulated peak mean pressure' },
   { file: 'api/src/compute/simulate.ts', text: 'the model is outside the range it was built for' },
   { file: 'api/src/compute/load-file.ts', text: 'The load file lacks' },
 ]

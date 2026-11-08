@@ -260,7 +260,7 @@ analytic. The runs mutate the source and run the existing tests; no measured dat
 - `packages/shot-groups/src/ring-scoring.ts`, `packages/shot-groups/test/ring-scoring.test.ts`, `packages/shot-groups/test/ring-scoring-shapes.test.ts`, `apps/web/test/ring-scoring-national.test.ts`
 - `apps/web/src/lib/field-spec.ts`, `apps/web/test/field-spec.test.ts`
 - `packages/ballistics/src/cartridge-specs.ts`, `packages/ballistics/test/cartridge-specs.test.ts`
-- `packages/api/src/compute/limits.ts`, `packages/api/test/limits.test.ts`
+- `packages/use-cases/src/limits.ts`, `packages/use-cases/test/limits.test.ts`
 - `packages/cli/src/rows.ts`, `packages/cli/test/rows.test.ts`
 - `packages/cli/src/metrics.ts`, `packages/cli/test/metrics.test.ts`
 - `packages/importers/src/pressure-history.ts`, `packages/importers/test/pressure-history.test.ts`

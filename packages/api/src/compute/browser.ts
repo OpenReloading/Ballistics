@@ -1,10 +1,7 @@
 /**
- * The compute code of the exterior, interior, charge target and load file routes without Fastify,
- * the database or Node APIs: the web app runs it in the browser (`@open-reloading/api/compute`).
+ * The compute code of the exterior and load file routes and the list of operations without Fastify,
+ * the database or Node APIs (`@open-reloading/api/compute`); the command line runs the operations.
  */
-export { errorAnswer, notice } from './answer.ts'
-export { type ChargeContext, runChargeTarget } from './charge-run.ts'
-export { chargeBody } from './charge-schema.ts'
 export {
   type ExteriorContext,
   runRangeStringsFit,
@@ -19,10 +16,7 @@ export {
   trajectoryBody,
   truingBody,
 } from './exterior-schema.ts'
-export { type InteriorContext, runInterior } from './interior-run.ts'
-export { interiorBody } from './interior-schema.ts'
 export { type JsonSchema, jsonSchema } from './json-schema.ts'
-export type { CartridgeWithSpecs } from './limits.ts'
 export {
   type Operation,
   type OperationAnswer,

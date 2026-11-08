@@ -8,7 +8,7 @@ import { recordIdRegex } from '@open-reloading/schema'
 import { z } from 'zod'
 
 /** A record id in a request body or query, at most 200 characters. */
-export const recordId = z.string().max(200).regex(recordIdRegex)
+export const recordId: z.ZodString = z.string().max(200).regex(recordIdRegex)
 
 /**
  * Step caps per integration (a trajectory runs at most 33 integrations), the truing iteration cap
@@ -38,7 +38,7 @@ export const caps: Readonly<StepCaps> = {
 }
 
 /** The iteration cap of a truing fit, optional, from 1 to `caps.truingIterations`. */
-export const fitIterations = z
+export const fitIterations: z.ZodOptional<z.ZodNumber> = z
   .number()
   .int()
   .min(1)
@@ -49,4 +49,5 @@ export const fitIterations = z
   )
 
 /** An optional integer step count from 1 to `max`. */
-export const steps = (max: number) => z.number().int().min(1).max(max).optional()
+export const steps = (max: number): z.ZodOptional<z.ZodNumber> =>
+  z.number().int().min(1).max(max).optional()

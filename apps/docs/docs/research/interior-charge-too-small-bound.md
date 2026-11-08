@@ -49,7 +49,7 @@ Analytic: made-up loads and the model's own elasticities, no measured data.
 ## Where in the app
 
 - `packages/ballistics/src/interior/model.ts`, `chargeTooSmall`, `chargeTooSmallRatio`.
-- `packages/api/src/compute/limits.ts`, `chargeWarning`.
+- `packages/use-cases/src/limits.ts`, `chargeWarning`.
 - `packages/ballistics/test/interior-model.test.ts`, the tests "holds below 2.2 times the larger of the start and the ignition pressure" and "sits where half of a change of the start pressure reaches the peak mean pressure".
 - Model page: [M3 interior model](../models/interior-m3.md).
 

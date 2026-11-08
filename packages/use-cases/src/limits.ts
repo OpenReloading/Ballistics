@@ -82,7 +82,7 @@ function bar(pa: number, limit: number) {
   return `${p.toFixed(d)} bar`
 }
 
-function limit(
+function sheetLimit(
   c: CartridgeWithSpecs,
   v: CartridgeWithSpecs['values'][number],
   range: PressureRange,
@@ -123,7 +123,9 @@ function typedLimit(pressure: number, range: PressureRange): Limit {
 function exceededMessage(l: Limit, range: PressureRange) {
   if (l.typed) return typedExceededMessage(l, range)
   const name = `CIP ${l.symbol}${l.variant ? ` (${l.variant})` : ''}`
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- a sheet's limit names its cartridge and revision
   const where = `${sheetId({ id: l.cartridge as string, published: l.revised as string })}; ${l.method ?? 'measuring method not stated in the record'}`
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- an exceeded limit was compared, so it has a pressure
   const limit = l.pressure as number
   // the limit with the decimals stored in the record
   const limitText = `${name} ${+fromSi('pressure', limit).toPrecision(12)} bar (${where})`
@@ -134,6 +136,7 @@ function exceededMessage(l: Limit, range: PressureRange) {
 }
 
 function typedExceededMessage(l: Limit, range: PressureRange) {
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- a typed limit always has its pressure
   const limit = l.pressure as number
   const limitText = `the typed ${l.symbol} ${+fromSi('pressure', limit).toPrecision(12)} bar`
   const { nominalPressure: p0, lowPressure: low, highPressure: high } = range
@@ -216,7 +219,7 @@ function cartridgeLimits(
   }
   const limits = cartridge.values
     .filter((v) => v.symbol === 'Pmax')
-    .map((v) => limit(cartridge, v, range))
+    .map((v) => sheetLimit(cartridge, v, range))
   for (const l of limits)
     if (l.exceeded) warnings.push(exceededWarning(l, range, sheetId(cartridge)))
   if (!limits.some((l) => l.compared))

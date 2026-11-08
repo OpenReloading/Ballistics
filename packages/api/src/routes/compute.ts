@@ -1,7 +1,7 @@
 import type { ComputeRunner } from '@open-reloading/use-cases'
 import type { FastifyError, FastifyPluginAsync } from 'fastify'
 import type { Catalogue } from '../catalogue/types.ts'
-import { computeErrorHandler } from '../compute/answer.ts'
+import { computeErrorHandler } from '../compute/error-handler.ts'
 import { stabilityResponse } from '../compute/exterior-response.ts'
 import { type ExteriorContext, runStability } from '../compute/exterior-run.ts'
 import { chargeTarget, type Operation, operations } from '../compute/operations.ts'

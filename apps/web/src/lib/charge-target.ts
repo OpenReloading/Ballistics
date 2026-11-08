@@ -67,7 +67,7 @@ export function targetNumber(typed: string | number): number {
   return text === '' ? Number.NaN : Number(text)
 }
 
-/** Highest `target.value` the API accepts (`src/compute/charge-schema.ts`), Pa or percent. */
+/** Highest `target.value` the API accepts (`packages/use-cases/src/charge-schema.ts`), Pa or percent. */
 const targetMax = 1e12
 
 /**

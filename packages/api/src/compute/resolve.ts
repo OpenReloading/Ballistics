@@ -2,9 +2,9 @@
 import type { Aerodynamics, Projectile } from '@open-reloading/ballistics'
 import { type Bullet, toSi } from '@open-reloading/schema'
 import { InputError } from '@open-reloading/statistics'
+import type { CartridgeWithSpecs } from '@open-reloading/use-cases'
+import { type ResolvedRecord, resolvedRecord } from '@open-reloading/use-cases'
 import type { Catalogue } from '../catalogue/types.ts'
-import { type ResolvedRecord, resolvedRecord } from './answer.ts'
-import type { CartridgeWithSpecs } from './limits.ts'
 
 /**
  * `record`, or a 404 error naming the `kind` and `id` that were not found. Fastify answers it with

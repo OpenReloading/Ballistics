@@ -872,9 +872,15 @@ importers:
       '@open-reloading/ballistics':
         specifier: workspace:*
         version: link:../ballistics
+      '@open-reloading/schema':
+        specifier: workspace:*
+        version: link:../schema
       '@open-reloading/statistics':
         specifier: workspace:*
         version: link:../statistics
+      zod:
+        specifier: 'catalog:'
+        version: 4.6.7
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: 'catalog:'

@@ -77,7 +77,7 @@ $$
 \text{nominalExceeded} = p_\text{nom} > p_\text{lim}, \qquad \text{exceeded} = p_\text{high} > p_\text{lim}
 $$
 
-Code: `packages/api/src/compute/limits.ts`, `typedLimit`, `limitCheck`.
+Code: `packages/use-cases/src/limits.ts`, `typedLimit`, `limitCheck`.
 
 A typed limit is marked `typed` and names no sheet or method: it is the user's own number, no C.I.P. value, and the answers and the workbench say "your Pmax". The percentage charge target (`unit: percentOfLimit`) reads the same limit.
 
