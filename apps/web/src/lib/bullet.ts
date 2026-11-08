@@ -57,10 +57,7 @@ const bandsOf = (record: Partial<Bullet>, model: 'G1' | 'G7') =>
 export const bandCount = (record: Partial<Bullet> | undefined, model: 'G1' | 'G7') =>
   record ? bandsOf(record, model).length : 0
 
-/**
- * The values a bullet record gives, SI. A BC only where the record lists one value of the model: a
- * record with several bands has no single value to show.
- */
+/** A BC only where the record has one value of the model: several bands have no single value to show. */
 export function recordBulletValues(record: Partial<Bullet> | undefined): BulletValues {
   if (!record) return {}
   const out: BulletValues = {}
@@ -78,10 +75,7 @@ export function recordBulletValues(record: Partial<Bullet> | undefined): BulletV
   return out
 }
 
-/**
- * The bullet values a run reads: the record's, then the mass of the Bullet mass field, then the
- * typed values (`typed` holds the field values by key). The one source of every reader.
- */
+/** Record, then the Bullet mass field, then typed values: the one source of every reader. */
 export function effectiveBulletValues(
   record: Partial<Bullet> | undefined,
   mass: number | undefined,
@@ -105,13 +99,7 @@ export const diameterMm = (values: BulletValues) =>
 const sameValue = (a: number, b: number | undefined) =>
   b !== undefined && Math.abs(a - b) <= 1e-9 * Math.abs(b)
 
-/**
- * The one place a bullet record meets typed values: `record` with each value of `typed` in place
- * (every reader of the record's mass, diameter, length and BCs takes the result). A typed BC
- * replaces all bands of its drag model with one band from 0 m/s; the record's own single value
- * typed again leaves it as it is. The shape fields stay the record's, but a typed boat-tail length
- * leaves out the bearing length, which the outline derives.
- */
+/** The one place a record meets typed values; a typed BC replaces all bands of its model, a typed boat tail drops the bearing length. */
 export function typedBullet<B extends Partial<Bullet>>(
   record: B,
   typed: BulletValues,
@@ -147,12 +135,7 @@ export function typedBullet<B extends Partial<Bullet>>(
   return out as B
 }
 
-/**
- * The record's base with the typed form and dimensions in place, none where nothing differs. A form
- * keeps only what it can have (`bulletBase` in the schema): flat no dimension (its length is a boat
- * tail's), a boat tail no cavity. A typed dimension equal to the record's stays the record's; a
- * typed length or diameter leaves out the record's angle, which the outline derives from them.
- */
+/** A form keeps only what it can have (`bulletBase`); a typed length or diameter drops the record's angle, which the outline derives. */
 function typedBase(
   own: Bullet['base'],
   typed: BulletValues,
@@ -197,12 +180,7 @@ type BulletDrag =
   | { kind: 'choose'; values: BallisticCoefficientChoice[] }
   | { kind: 'none' }
 
-/**
- * Projectile from a bullet record, by the rule of the API: mass g
- * and lengths mm to SI, each BC of `model` (lb/in2) to kg/m2 as a band from its `minVelocity`
- * (0 when absent). Several BCs without distinct band starts give `choose`; `choice` then picks one
- * of them as a single band from 0 m/s. A record without a BC of `model` gives `none`.
- */
+/** By the API's rule: each BC of `model` a band from its `minVelocity`; several without distinct starts give `choose`, `choice` picks one. */
 export function bulletDrag(record: Bullet, model: 'G1' | 'G7', choice?: number): BulletDrag {
   const bcs = (record.ballisticCoefficients ?? []).filter((c) => c.dragModel === model)
   // the trajectory needs a diameter, which a record that only names the bullet lacks
@@ -240,18 +218,10 @@ export function bulletDrag(record: Bullet, model: 'G1' | 'G7', choice?: number):
 const sectionalDensity = (r: Pick<Bullet, 'mass' | 'diameter'>) =>
   r.diameter && toSi('mass', r.mass.value) / toSi('length', r.diameter.value) ** 2
 
-/**
- * Gyroscopic stability factor the Miller twist gives (Litz's recommended minimum, B. Litz, Applied
- * Ballistics for Long Range Shooting, 3rd edition, Applied Ballistics, LLC, 2015;
- * `apps/docs/docs/models/exterior-stability.md`, "Miller gyroscopic stability factor").
- */
+/** Litz's recommended minimum (Litz 2015, 3rd edition; `apps/docs/docs/models/exterior-stability.md`, "Miller gyroscopic stability factor"). */
 const millerStabilityTarget = 1.5
 
-/**
- * Twist per turn, m, at which Miller's rule gives Sg 1.5 at 2800 ft/s, 59 degF and 29.92 inHg,
- * where its velocity and atmosphere corrections are 1; undefined without a length. Sg goes with
- * the inverse square of the twist, so a reference twist scales to it.
- */
+/** At 2800 ft/s, 59 degF and 29.92 inHg Miller's corrections are 1, and Sg goes with the inverse square of the twist. */
 export function millerTwist(r: Pick<Bullet, 'mass' | 'diameter' | 'length'>): number | undefined {
   if (!r.length || !r.diameter) return
   const reference = 0.254

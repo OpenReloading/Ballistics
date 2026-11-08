@@ -1,8 +1,4 @@
-/**
- * What a bullet photograph's measurements become in the bullet designer: the design they seed, the
- * note that keeps their uncertainties, the lines of the values table and the comparison with a
- * catalogue record (`apps/docs/docs/models/bullet-photo.md`).
- */
+/** What a photograph's measurements become in the bullet designer (`apps/docs/docs/models/bullet-photo.md`). */
 
 import { fixedNumber } from '../i18n/number.ts'
 import { type Design, type DesignerSpec, designerSpecs } from './bullet-designer.ts'
@@ -62,12 +58,7 @@ export interface PhotoRow {
   differs: boolean
 }
 
-/**
- * The values of a measurement as table rows. `record` holds the SI values of the catalogue record
- * the designer started from: a row it covers carries the record's value, and `differs` when the
- * photograph is away from it by more than three standard uncertainties and 2 % (a manufacturing
- * spread is no flag). The record is never changed.
- */
+/** `differs` beyond three standard uncertainties and 2 %, so a manufacturing spread is no flag; the record is never changed. */
 export function photoRows(
   m: BulletMeasurement,
   record: Record<string, number | undefined> | undefined,
@@ -114,11 +105,7 @@ export interface PhotoFacts {
 
 const noteUnits: Partial<Record<DesignerSpec['quantity'], string>> = { length: 'mm', angle: '°' }
 
-/**
- * The note kept on the design: that the values are measured from a photograph, at what scale, what
- * a scale from sizes entered without a ruler rests on, and each value with its standard
- * uncertainty in the stored units. No image is stored.
- */
+/** Each value with its standard uncertainty in stored units; no image is stored. */
 export function photoNote(m: BulletMeasurement, facts: PhotoFacts): string {
   const parts = specs.flatMap((s) => {
     const v = m.values[s.key as PhotoField]
@@ -138,12 +125,7 @@ export function photoNote(m: BulletMeasurement, facts: PhotoFacts): string {
   ].join(' ')
 }
 
-/**
- * The design a measurement seeds: the measured values, the nose form and base type the photograph
- * shows, the mass and the manufacturer left empty, and the note with every uncertainty. A tangent
- * nose carries Rt/R of 1 and a secant nose its circle radius; the designer derives the other from
- * the nose length, so the two never disagree.
- */
+/** A tangent nose carries Rt/R 1 and a secant nose its radius; the designer derives the other, so the two never disagree. */
 export function photoDesign(m: BulletMeasurement, facts: PhotoFacts, system: UnitSystem): Design {
   const given = (s: DesignerSpec): number | undefined => {
     if (s.key === 'ogive.radiusRatio') return m.ogiveForm === 'tangent' ? 1 : undefined

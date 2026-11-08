@@ -258,11 +258,7 @@ function groupOf(symbol: string, sides: ('cartridge' | 'chamber')[], table?: str
   return extraGroups[symbol] ?? 'other'
 }
 
-/**
- * The record's own row order: the groups as the drawing runs from top to bottom (mouth to head,
- * the lengths a reloader looks up first at the top), not the designer's order, which starts at the
- * head. The sort is stable, so the record order holds within a group.
- */
+/** Mouth to head, as the drawing runs, so the lengths a reloader looks up first come first; the stable sort keeps record order within a group. */
 const readingOrder: RowGroup[] = ['neck', 'shoulder', 'body', 'head', 'throat', 'other']
 export const inReadingOrder = <T extends { group: RowGroup }>(rows: T[]): T[] =>
   [...rows].sort((a, b) => readingOrder.indexOf(a.group) - readingOrder.indexOf(b.group))
@@ -294,11 +290,7 @@ export function toleranceText(v: SpecValue, system: UnitSystem) {
     .join(' ')
 }
 
-/**
- * A difference in the preset's length unit with its sign, minus as U+2212, as the drawing's
- * callouts write it; one that rounds to zero keeps its sign ("−0.00" stays a conflict), an exact
- * zero is "±0" in the column's decimals ("±.0000", "±0.00").
- */
+/** Minus as U+2212; a difference rounding to zero keeps its sign ("−0.00" stays a conflict), an exact zero is "±0". */
 export function signedLength(x: number, system: UnitSystem) {
   const text = specValueText('length', Math.abs(x), system)
   if (text !== '0') return x < 0 ? `−${text}` : `+${text}`
@@ -373,10 +365,7 @@ type Sheet = Pick<CartridgeDetail, 'table' | 'values'>
 
 type Draft = Omit<CombinedRow, 'storedSymbol' | 'group'> & { sideNotes: string[] }
 
-/**
- * A draft row per symbol and variant, in record order: the sided values outside the shotshell
- * variant matrix, the first value of each side, its own notes as side notes.
- */
+/** Record order; the first value of each side, its own notes as side notes. */
 function rowsBySymbol(spec: Sheet, t: Translate): Map<string, Draft> {
   const matrix = new Set(variantColumns(spec))
   const sided = spec.values.filter(
@@ -443,14 +432,7 @@ function withClearanceAndGroup(
   }
 }
 
-/**
- * The cartridge and chamber dimensions of a record as one table: a row per symbol and
- * variant, the cartridge maximum and the chamber minimum side by side, in record order (the chamber
- * symbols the cartridge lacks after). The clearance is our own fit, not published by CIP (`fits`:
- * the diameters and the case length, each value the
- * side's own limit); symbols that differ only in case (r1 and R1, e and E) stay apart. Values of a
- * shotshell variant go to the variant matrix instead; a derived cartridge e joins as a note.
- */
+/** The clearance is our own fit, not published by CIP; symbols differing only in case (r1, R1) stay apart. */
 export function combinedRows(spec: Sheet, list: Figure[], t: Translate = english): CombinedRow[] {
   const rows = rowsBySymbol(spec, t)
   addDerivedE(rows, list, t)
@@ -461,11 +443,7 @@ export function combinedRows(spec: Sheet, list: Figure[], t: Translate = english
   return out.sort((a, b) => rank(a) - rank(b))
 }
 
-/**
- * The hover lines of a symbol in the table of one side: the symbol and what it stands for there,
- * the spelled name of a Greek letter without a meaning, then that side's notes (basic, the text as
- * printed, derived), the meaning of a clearance note and a clearance that is a data conflict.
- */
+/** A Greek letter without a meaning shows its spelled name. */
 export function sideHint(
   r: CombinedRow,
   side: 'cartridge' | 'chamber',
@@ -499,12 +477,7 @@ function variantColumns(spec: Sheet): string[] {
   return shotshellVariants(spec.values).filter((v): v is string => v !== undefined)
 }
 
-/**
- * The variant the shotshell select starts on: a convenience default for the most common case
- * length, no source and no data. The case length is the number after the slash of the label
- * (12/70, 24/63,5): 76 mm for the 410 bore, 70 mm for every other gauge, else the nearest one
- * (10 gauge: 12/76), the first variant where no label gives a length.
- */
+/** A convenience default with no source: 76 mm for the 410 bore, 70 mm for other gauges, else the nearest length. */
 export function defaultVariantIndex(variants: string[]): number {
   const length = (label: string) =>
     Number.parseFloat(label.split('/').at(-1)?.replace(',', '.') ?? '')
@@ -522,10 +495,7 @@ export interface MatrixRow {
   cells: (SpecValue | undefined)[]
 }
 
-/**
- * The shotshell matrix: rows Pmax, PK, PE, M, then the variant lengths (cartridge l,
- * chamber L) and any other value of a variant; columns the variants.
- */
+/** Rows Pmax, PK, PE, M, then the variant lengths and other values; columns the variants. */
 export function variantMatrix(
   spec: Sheet,
   t: Translate = english,

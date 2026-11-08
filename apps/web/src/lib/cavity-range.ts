@@ -3,14 +3,7 @@ import { pressureToleranceDefaults } from '@open-reloading/ballistics'
 /** The highest volume tolerance the API takes (`tolerances.volumeFraction`). */
 const volumeFractionMax = 0.2
 
-/**
- * The volume tolerance of a run whose volume follows the seated bullet, so that the pressure range
- * reaches the cavity depth bracket of a hollow base (`apps/docs/docs/models/case-capacity.md`,
- * "Cavity depth"): the default tolerance plus the larger move of the volume behind the bullet over
- * the bracket (`range`, the `cavityRange` of the seating), relative to that volume (`volume`), at
- * most the 0.2 the API takes; undefined without a bracket. Both m³. A typed cavity depth has no
- * bracket.
- */
+/** Widens the range to the hollow base's cavity depth bracket, at most the API's 0.2 (`apps/docs/docs/models/case-capacity.md`, "Cavity depth"). */
 export function cavityVolumeFraction(
   range: { low: number; high: number } | undefined,
   volume: number | undefined,

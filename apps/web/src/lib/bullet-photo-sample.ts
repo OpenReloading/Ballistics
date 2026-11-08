@@ -1,9 +1,4 @@
-/**
- * A synthetic photograph of a bullet: the silhouette of the bullet drawing laid on a background
- * with a ruler, at a known scale, with lighting, blur and noise as choices. It is the sample the
- * photo tool offers to try, and the known truth the tests measure against
- * (`apps/docs/docs/models/bullet-photo.md`). Pure: no DOM, so tests and workers can use it.
- */
+/** The sample photo the tool offers and the known truth the tests measure against (`apps/docs/docs/models/bullet-photo.md`). */
 import { type BulletDimensions, bulletProfile } from '@open-reloading/drawing/bullet'
 import { toSi } from '@open-reloading/schema'
 import type { ScaleSpan } from './bullet-photo.ts'
@@ -243,9 +238,7 @@ function rulerSpan(spec: PhotoSpec): ScaleSpan | undefined {
   return { a: { x: r.x0, y }, b: { x: r.x0 + mm * spec.pxPerMm, y }, mm }
 }
 
-/**
- * Renders the photograph of `spec`. Throws when the drawing refuses the shape.
- */
+/** Throws when the drawing refuses the shape. */
 export function renderPhoto(spec: PhotoSpec): BulletPhoto {
   const { width: w, height: h } = spec
   const p = bulletProfile(spec.shape, () => true, 'entered')

@@ -2,12 +2,7 @@ import { type DensityClass, structureOf } from '@open-reloading/ballistics'
 import type { Bullet } from '@open-reloading/schema'
 import { type Message, msg } from '../i18n/translate.ts'
 
-/**
- * Effective bullet density by class, g/cm³ (mass over the volume of a cylinder of the diameter and
- * length), with the 90th percentile of the relative length error it gives: the median of the bullet
- * records of the class with a published length (`apps/docs/docs/models/case-capacity.md`, "Bullet
- * without a length"). `unknown` is the pooled value of every class.
- */
+/** Median of the class's records with a published length, with its 90th percentile length error (`apps/docs/docs/models/case-capacity.md`, "Bullet without a length"). */
 export const effectiveDensity: Record<
   DensityClass,
   { value: number; error: number; name: Message }

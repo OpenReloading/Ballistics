@@ -1,7 +1,4 @@
-/**
- * Common caliber names of the lists:
- * a bullet diameter (a bullet's, or a cartridge's G1) falls in the group whose span holds it.
- */
+/** A bullet diameter (a bullet's, or a cartridge's G1) falls in the group whose span holds it. */
 import { toSi } from '@open-reloading/schema'
 import type { Translator } from '../i18n/translate.ts'
 import { inchText, metersPerInch, type UnitSystem } from './units.ts'
@@ -63,10 +60,7 @@ export function commonCaliber(mm: number | null): string {
 
 const named = new Set(commonCalibers.map(([name]) => name))
 
-/**
- * The options of the caliber Select: the common calibers, then the other diameters, each by
- * size with its count; an empty group left out.
- */
+/** Common calibers first, then the other diameters by size; empty groups left out. */
 export function caliberOptions(diameters: readonly (number | null)[], t: Translator['t']) {
   const groups = new Map<string, { mm: number; count: number }>()
   for (const mm of diameters) {

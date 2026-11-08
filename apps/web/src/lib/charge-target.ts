@@ -69,10 +69,7 @@ export function targetNumber(typed: string | number): number {
 /** Highest `target.value` the API accepts (`packages/use-cases/src/charge-schema.ts`), Pa or percent. */
 const targetMax = 1e12
 
-/**
- * Why `typed` is no target in `unit`: not above 0, or above what the API accepts; undefined for a
- * valid target. The message names the unit shown.
- */
+/** Not above 0 or above what the API accepts, in the unit shown. */
 export function targetError(
   typed: string | number,
   unit: TargetUnit,
@@ -88,11 +85,7 @@ export function targetError(
     })
 }
 
-/**
- * The request body: the load of `POST /interior` without `model`, the target and, with a powder
- * bulk density (kg/m3), the density that caps the charge at the load ratio limit in
- * `load.propellant.bulkDensity`.
- */
+/** With a bulk density the charge is capped at the load ratio limit. */
 export function chargeTargetBody(
   base: {
     model?: string | undefined

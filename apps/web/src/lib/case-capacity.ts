@@ -19,11 +19,7 @@ export interface UsedWater<T extends Recorded = Recorded> {
   record?: T
 }
 
-/**
- * The water the workbench takes as the case's capacity: the measured value typed (g), else the
- * capacity record chosen, else the stated capacity (g) of the case record chosen, else the first
- * capacity record of the cartridge.
- */
+/** Measured value, else the capacity record chosen, else the case record's stated capacity, else the cartridge's first capacity record. */
 export function usedWater<T extends Recorded>(o: {
   measured?: number | undefined
   capacities: readonly T[]

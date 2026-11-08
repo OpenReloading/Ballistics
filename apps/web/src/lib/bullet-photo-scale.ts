@@ -1,9 +1,4 @@
-/**
- * The scale of a bullet photograph when the user also gives sizes measured with a caliper: the
- * diameter and the overall length of the bullet give a scale where the photograph has no ruler, and
- * check the ruler's scale (or each other) where it has (`apps/docs/docs/models/bullet-photo.md`).
- * Pure: no React, DOM or Next.js, so it can run in a Web Worker.
- */
+/** Caliper sizes give the scale without a ruler and check it with one (`apps/docs/docs/models/bullet-photo.md`); pure, so it runs in a worker. */
 import { type Message, msg } from '../i18n/translate.ts'
 import type { Scale } from './bullet-photo.ts'
 import type { BulletMeasurement } from './bullet-photo-measure.ts'
@@ -42,11 +37,7 @@ function estimatesOf(px: BulletMeasurement, known: Known): Estimate[] {
   })
 }
 
-/**
- * The scale of several estimates: the mean weighted by the inverse square of the relative
- * uncertainty, with half of the spread between them, as a rectangular distribution, joining the
- * weighted mean's uncertainty in quadrature.
- */
+/** Inverse-variance weighted mean, with half the spread as a rectangular term in quadrature. */
 function combined(es: readonly Estimate[]): Scale {
   const weights = es.map((e) => 1 / e.rel ** 2)
   const total = weights.reduce((a, w) => a + w, 0)
@@ -92,13 +83,7 @@ const againstEach = (a: Estimate, b: Estimate) =>
 /** What gives the scale: the ruler's points, or the sizes entered without a ruler. */
 export type ScaleBasis = 'ruler' | 'diameter' | 'length' | 'diameter+length'
 
-/**
- * What a scale from sizes entered without a ruler rests on, for the values and for the note kept on
- * the design; nothing for a ruler's scale. A bullet turned by an angle towards the camera keeps its
- * diameter and shows its length times the cosine: 1 - cos 10 degrees = 1.5 %; two scales are
- * flagged above 2 % apart, cos 11.5 degrees = 0.98 (research log
- * `apps/docs/docs/research/bullet-photo-catalogue-geometry.md`).
- */
+/** A bullet turned 10 degrees shows its length 1.5 % short, so scales over 2 % apart are flagged (`apps/docs/docs/research/bullet-photo-catalogue-geometry.md`). */
 export function basisNote(basis: ScaleBasis | undefined): Message | undefined {
   switch (basis) {
     case 'diameter':
@@ -124,13 +109,7 @@ export function withBasis(m: BulletMeasurement, basis: ScaleBasis | undefined): 
   return { ...m, ...(basis && { scaleBasis: basis }), notes: note ? [...m.notes, note] : m.notes }
 }
 
-/**
- * The scale to measure with and what to tell the user. `px` is the photograph's measurement at 1 px
- * per mm, `ruler` the scale of the placed ruler points. The ruler's scale is used when there is
- * one, and each known size is checked against it. Without a ruler the known sizes give the scale
- * (combined when there are two, which are checked against each other). Undefined when nothing
- * gives a scale. `basis` says what gave it.
- */
+/** The ruler wins and the known sizes are checked against it; without one they give the scale and check each other. */
 export function resolveScale(
   px: BulletMeasurement,
   ruler: Scale | undefined,

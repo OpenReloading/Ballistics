@@ -1,8 +1,4 @@
-/**
- * The list fields a bullet record gives a design's row, as the API's list item gives them, and the
- * sectional density of the SD column. Apart from `bullet-rows.ts`, so the bullet list hands it to
- * `userBulletRows` and the other pages that list designs (the site search of every page) load none of it.
- */
+/** Apart from `bullet-rows.ts`, so the pages that list designs through the site search load none of it. */
 import { type Bullet, bulletListFields, toSi } from '@open-reloading/schema'
 import { present } from './directory.ts'
 
@@ -12,10 +8,7 @@ export function bulletSectionalDensity(b: { mass: number | null; diameter: numbe
   return toSi('mass', b.mass) / toSi('length', b.diameter) ** 2
 }
 
-/**
- * The list fields a bullet record gives a design's row as the API gives a catalogue item: the
- * first G1 and G7, tip, base, construction and lead-free.
- */
+/** As the API gives a catalogue item: the first G1 and G7, tip, base, construction and lead-free. */
 export function bulletKinds(
   b: Pick<Bullet, 'tip' | 'base' | 'construction' | 'ballisticCoefficients'>,
 ) {

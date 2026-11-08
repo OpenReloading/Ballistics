@@ -58,10 +58,7 @@ const labels: Record<string, Message> = Object.fromEntries(
   [...caseGroupFields, caseGroupCapacitySpec].map((s) => [s.key, s.label]),
 )
 
-/**
- * Why Save refuses a group of cases, as a sentence with the field label; undefined when the record
- * is valid. `name` is the record name, which must not be empty.
- */
+/** With the field label; undefined when valid. */
 export function caseGroupProblem(name: string, c: Case, t: Translator['t']): string | undefined {
   if (!name) return t('Enter a name.')
   if (!c.cartridge) return t('Choose the cartridge.')
@@ -83,12 +80,7 @@ export function groupCapacity(c: Case, records: readonly UserRecord[]): number |
   return r?.kind === 'caseCapacity' ? r.data.waterCapacity.value : undefined
 }
 
-/**
- * The group with its `capacity` naming the record of its measured capacity `m3` (water, SI): the
- * same record as the workbench's measured capacity of that cartridge and value, so a capacity is
- * stored once. Without `m3` the group keeps the reference it has, for a record this browser does
- * not hold; without a cartridge it names none.
- */
+/** The same record as the workbench's measured capacity, so a capacity is stored once. */
 export function withCapacity(c: Case, m3: number | undefined): Case {
   const { capacity: held, ...rest } = c
   if (!c.cartridge) return rest

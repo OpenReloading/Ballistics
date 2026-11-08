@@ -31,11 +31,7 @@ export const caseRows = (
     }
   })
 
-/**
- * The groups of cases among `records` as Mine rows: no manufacturer or product number, the measured
- * capacity, and the cartridge named by the catalogue (`cartridges`, by id) or by the user's own
- * cartridge record.
- */
+/** No maker or product number; the cartridge named by the catalogue or the user's own record. */
 export function userCaseRows(
   records: readonly UserRecord[],
   cartridges: ReadonlyMap<string, string>,

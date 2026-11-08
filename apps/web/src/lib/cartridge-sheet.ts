@@ -1,10 +1,7 @@
 import { type SpecValue, sheetId } from '@open-reloading/schema'
 import type { CartridgeDetail } from './api-types.ts'
 
-/**
- * What the cartridge drawing reads of a record: the id of its C.I.P. sheet revision (figure ids
- * are built from it), the standard, name, table and values.
- */
+/** Figure ids are built from the C.I.P. sheet revision id. */
 /** The sheet with the cartridge's case length L3 (mm) replaced: a length the user typed over the record's. */
 export const withCaseLength = <S extends { values: SpecValue[] }>(spec: S, mm: number): S => ({
   ...spec,

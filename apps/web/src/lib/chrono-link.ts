@@ -25,12 +25,7 @@ export function choiceLabel({ session, string }: StringChoice, t: Translator['t'
   })
 }
 
-/**
- * The shots with the shots of `choice` linked in order: the first included shot takes shot 0 of
- * the string, the next shot 1, and so on. A shot left out of the statistics takes no link and
- * does not use one up; a shot past the end of the string has none. Without a choice every link is
- * removed.
- */
+/** A shot left out of the statistics takes no link and uses none up. */
 export function linkString(shots: readonly GroupShot[], choice?: StringChoice): GroupShot[] {
   let next = 0
   const count = choice?.session.data.strings[choice.string]?.shots.length ?? 0

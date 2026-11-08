@@ -118,10 +118,7 @@ export async function readChrono(
   throw new Error(notExport)
 }
 
-/**
- * A file of the session summary: read with the unit the file names, and with `fallback` only when
- * the file names none (or one the importers do not know).
- */
+/** `fallback` only when the file names no unit the importers know. */
 export async function readSession(
   bytes: Uint8Array,
   fileName: string,
@@ -182,10 +179,7 @@ function shotRows(data: ChronoImport, unit: Unit): (string | number)[][] {
   ]
 }
 
-/**
- * The session summary as CSV: the statistics per string, an empty line, then every shot, velocities
- * in `unit` with 1 decimal. No notice: a download carries the data only.
- */
+/** No notice: a download carries the data only. */
 export function sessionCsv(data: ChronoImport, unit: Unit): string {
   return `${toCsv(statisticsRows(data, unit))}\n\n${toCsv(shotRows(data, unit))}\n`
 }

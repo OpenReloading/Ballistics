@@ -55,11 +55,7 @@ export function barrelDefaults(system: UnitSystem) {
   return { from: toSi(from), to: toSi(to), step: toSi(step) }
 }
 
-/**
- * A barrel length (m) in the Settings unit and then in the other units of the quantity, as
- * "78.74 in (2000 mm)": a field may show another unit than the Settings, and the message
- * about it stands outside the field.
- */
+/** As "78.74 in (2000 mm)": a field may show another unit than the Settings, and its message stands outside the field. */
 export function inEveryUnit(system: UnitSystem, length: number): string {
   const own = system.barrelLength
   const units = [own, ...Object.values(unitsOf.barrelLength).filter((u) => u.symbol !== own.symbol)]
@@ -70,10 +66,7 @@ export function inEveryUnit(system: UnitSystem, length: number): string {
   return others.length > 0 ? `${first} (${others.join(', ')})` : first
 }
 
-/**
- * The lengths of a range, m, lowest first; or the message of each field that gives none. `shown`
- * writes a length in the shown unit.
- */
+/** Lowest first, m; or the message of each field that gives none. */
 export function rangeLengths(
   from: number | undefined,
   to: number | undefined,
@@ -160,11 +153,7 @@ function rowFromLongerRun(
   }
 }
 
-/**
- * The rows of one step: a row per length of the range with travel above 0, and the current barrel
- * (the run's own readouts) among them. Lengths up to the current barrel are read from the run at
- * their travel, longer ones from `longer`, which carries the same load with more travel.
- */
+/** Lengths up to the current barrel come from the run at their travel, longer ones from `longer` (same load, more travel). */
 export function barrelRows({
   result,
   longer,
@@ -202,10 +191,7 @@ export function barrelRows({
   return [...others, here].sort((a, b) => a.length - b.length)
 }
 
-/**
- * The body of the longer run: the load of the run with `travel` (m), as a ladder of the run's
- * steps when it has several (the same charges, in the same order).
- */
+/** The run's load with `travel` (m), as a ladder of the same charges in the same order when the run has several steps. */
 export function longerBody(
   load: InteriorBody['load'],
   charges: number[],

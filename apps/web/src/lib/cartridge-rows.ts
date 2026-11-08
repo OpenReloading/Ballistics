@@ -100,10 +100,7 @@ export type PackedCartridge = [
   CartridgeRow['caseType'] | null,
 ]
 
-/**
- * A cartridge without values: none of the summary's G1, L3, L6 and Pmax (every record with
- * a value has one of them).
- */
+/** Every record with a value has one of G1, L3, L6 or Pmax. */
 export const noValues = (c: CartridgeRow) =>
   c.maxBulletDiameter === undefined &&
   c.caseLength === undefined &&
