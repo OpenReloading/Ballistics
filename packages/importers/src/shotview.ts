@@ -6,6 +6,7 @@ import { warnStatistics } from './statistics.ts'
 import {
   bracketed,
   isoDate,
+  joinQuotedLines,
   parseNumber,
   splitDelimited,
   splitLines,
@@ -26,24 +27,6 @@ export const isShotViewHeader = (cells: string[]): boolean =>
 /** Index of the `#` header row whose second cell names the velocity unit in brackets, or -1. */
 export function shotViewHeaderIndex(lines: string[]): number {
   return lines.findIndex((line) => isShotViewHeader(splitDelimited(line)))
-}
-
-/** Lines joined where a quoted cell holds a line break, so a note line is never read as a row. */
-function joinQuoted(lines: string[]): string[] {
-  const out: string[] = []
-  let open: string | undefined
-  let quotes = 0
-  for (const line of lines) {
-    open = open === undefined ? line : `${open}\n${line}`
-    quotes += line.split('"').length - 1
-    if (quotes % 2 === 0) {
-      out.push(open)
-      open = undefined
-      quotes = 0
-    }
-  }
-  if (open !== undefined) out.push(open)
-  return out
 }
 
 const months: Record<string, number> = {}
@@ -93,7 +76,9 @@ export function parseShotView(text: string, options: ChronoParserOptions = {}): 
     : withoutTrailingCommas(nameLine).trim()
 
   // only rows after the header can hold quoted line breaks; blank lines become empty rows
-  const rows = joinQuoted(lines.slice(h + 1)).map((l) => (l.trim() ? splitDelimited(l) : []))
+  const rows = joinQuotedLines(lines.slice(h + 1), ',').map(({ text: row }) =>
+    row.trim() ? splitDelimited(row) : [],
+  )
   // the first `-` row ends the shots
   const { shots, values, flags, footer } = readShotRows(rows, unitText, unit, (c) => c[0] === '-')
 
