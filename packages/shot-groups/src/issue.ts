@@ -53,5 +53,14 @@ export type HitIssue =
   | Diagnostic<'wanted-probability'>
   | Diagnostic<'zones'>
 
+/** Why the group statistics, an ellipse or a subtended angle refuse their input. */
+export type GroupStatisticsIssue =
+  | Diagnostic<'confidence-level'>
+  | Diagnostic<'distance'>
+  | Diagnostic<'shot-coordinates'>
+  | Diagnostic<'shot-velocity'>
+  | Diagnostic<'aim'>
+  | Diagnostic<'coverage'>
+
 /** Why a function of this package refuses its input. */
-export type Issue = GeometryIssue | RingFitIssue | ScoringIssue | HitIssue
+export type Issue = GeometryIssue | RingFitIssue | ScoringIssue | HitIssue | GroupStatisticsIssue

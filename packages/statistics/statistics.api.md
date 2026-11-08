@@ -124,6 +124,9 @@ export function seededUniforms(seed: number): () => number;
 export function shotsNeeded(relativeHalfWidth: number, level?: number): number;
 
 // @public
+export type StatisticsIssue = Diagnostic<'probabilityOutsideUnit'> | Diagnostic<'levelOutsideUnit'> | Diagnostic<'confidenceLevelOutsideUnit'> | Diagnostic<'degreesOfFreedomNotPositive'> | Diagnostic<'degreesOfFreedomNotPositiveWhole'> | Diagnostic<'maxIterationsNotPositiveInteger'> | Diagnostic<'maxConditionOutOfRange'> | Diagnostic<'velocitiesNotFinite'> | Diagnostic<'relativeHalfWidthBelowMinimum'> | Diagnostic<'relativeHalfWidthOutOfReach'>;
+
+// @public
 export function studentTwoSidedQuantile(level: number, df: number): number;
 
 // @public

@@ -346,8 +346,6 @@ const sources = [
       .filter((f) => f.endsWith('.ts'))
       .map((f) => `${pkg}/src/${f}`),
   ),
-  // the rest of shot-groups raises typed issues only
-  'shot-groups/src/group-statistics.ts',
 ]
 
 /** Files whose messages are no fixed text, each with the reason. */
@@ -490,6 +488,8 @@ function scan(sample: string): Found[] {
     for (const match of src.matchAll(calls)) {
       const where = `${file}:${src.slice(0, match.index).split('\n').length}`
       const arg = messageOf(src, match)
+      // a typed issue: `refusal-words.ts` words its code
+      if (arg?.includes("code: '")) continue
       const text = arg === undefined ? undefined : literalText(arg, sample)
       if (text !== undefined) found.push({ where, text })
       else if (

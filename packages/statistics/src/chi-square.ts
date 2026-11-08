@@ -5,7 +5,7 @@
  * samples do not underflow.
  */
 import { bisect } from './bisect.ts'
-import { need } from './errors.ts'
+import { need } from './issue.ts'
 
 /** ln Gamma(a + 1) for a whole or half-whole a >= 0: a finite product down to Gamma(1) or Gamma(3/2). */
 function lnGammaPlusOne(a: number): number {
@@ -21,7 +21,7 @@ function lnGammaPlusOne(a: number): number {
  * need about x/2 terms.
  */
 export function chiSquareCdf(x: number, df: number): number {
-  need(Number.isInteger(df) && df > 0, 'degrees of freedom must be a positive whole number')
+  need(Number.isInteger(df) && df > 0, { code: 'degreesOfFreedomNotPositiveWhole', params: {} })
   if (!(x > 0)) return 0
   const a = df / 2
   const z = x / 2
@@ -46,7 +46,7 @@ export function chiSquareCdf(x: number, df: number): number {
  * accuracy in the upper tail where `1 - chiSquareCdf` is 0.
  */
 export function chiSquareSurvival(x: number, df: number): number {
-  need(Number.isInteger(df) && df > 0, 'degrees of freedom must be a positive whole number')
+  need(Number.isInteger(df) && df > 0, { code: 'degreesOfFreedomNotPositiveWhole', params: {} })
   if (!(x > 0)) return 1
   if (x === Number.POSITIVE_INFINITY) return 0
   const a = df / 2
@@ -74,7 +74,7 @@ export function chiSquareSurvival(x: number, df: number): number {
 
 /** The `x` with `chiSquareCdf(x, df) = p`, p in (0, 1), by bisection. */
 export function chiSquareQuantile(p: number, df: number): number {
-  need(p > 0 && p < 1, 'probability must lie in (0, 1)')
+  need(p > 0 && p < 1, { code: 'probabilityOutsideUnit', params: {} })
   let hi = df + 10 * Math.sqrt(df) + 50
   while (chiSquareCdf(hi, df) < p) hi *= 2
   return bisect((x) => chiSquareCdf(x, df) < p, [0, hi], 200, true)

@@ -6,8 +6,8 @@
  */
 
 import { chiSquareQuantile } from './chi-square.ts'
-import { need } from './errors.ts'
 import type { Interval } from './interval.ts'
+import { need } from './issue.ts'
 
 /** Level of the intervals when none is given. */
 const defaultLevel = 0.95
@@ -54,8 +54,8 @@ export function velocityStatistics(
   velocities: readonly number[],
   level: number = defaultLevel,
 ): VelocityStatistics | undefined {
-  need(level > 0 && level < 1, 'confidence level must lie in (0, 1)')
-  need(velocities.every(Number.isFinite), 'velocities must be finite')
+  need(level > 0 && level < 1, { code: 'confidenceLevelOutsideUnit', params: {} })
+  need(velocities.every(Number.isFinite), { code: 'velocitiesNotFinite', params: {} })
   const n = velocities.length
   if (n === 0) return undefined
   const mean = velocities.reduce((a, x) => a + x, 0) / n
@@ -85,15 +85,15 @@ export function velocityStatistics(
  * falls with the shot count; at least 3 shots, `relativeHalfWidth` from 0.01 up.
  */
 export function shotsNeeded(relativeHalfWidth: number, level: number = defaultLevel): number {
-  need(level > 0 && level < 1, 'confidence level must lie in (0, 1)')
-  need(relativeHalfWidth >= 0.01, 'relative half-width must be at least 0.01')
+  need(level > 0 && level < 1, { code: 'confidenceLevelOutsideUnit', params: {} })
+  need(relativeHalfWidth >= 0.01, { code: 'relativeHalfWidthBelowMinimum', params: {} })
   const narrow = (n: number) => {
     const f = intervalFactors(n, level)
     return (f.upper - f.lower) / 2 <= relativeHalfWidth
   }
   let hi = minimumIntervalShots
   while (!narrow(hi) && hi < shotLimit) hi = Math.min(hi * 2, shotLimit)
-  need(narrow(hi), 'relative half-width needs more shots than the search covers')
+  need(narrow(hi), { code: 'relativeHalfWidthOutOfReach', params: {} })
   let lo = Math.max(minimumIntervalShots, hi / 2)
   // narrow(hi) holds; find the first n in (lo, hi] that holds
   if (narrow(lo)) return lo

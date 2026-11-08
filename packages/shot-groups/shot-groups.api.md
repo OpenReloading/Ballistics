@@ -362,6 +362,9 @@ export interface GroupStatistics {
 export function groupStatistics(input: GroupInput): GroupStatistics;
 
 // @public
+export type GroupStatisticsIssue = Diagnostic<'confidence-level'> | Diagnostic<'distance'> | Diagnostic<'shot-coordinates'> | Diagnostic<'shot-velocity'> | Diagnostic<'aim'> | Diagnostic<'coverage'>;
+
+// @public
 export function hitFactor(points: number, time: number): number;
 
 // @public
@@ -404,7 +407,7 @@ export function inv3(m: Matrix): Mat3 | undefined;
 export function invertMatrix(m: Matrix): Matrix;
 
 // @public
-export type Issue = GeometryIssue | RingFitIssue | ScoringIssue | HitIssue;
+export type Issue = GeometryIssue | RingFitIssue | ScoringIssue | HitIssue | GroupStatisticsIssue;
 
 // @public
 export const keepOnPhoto: (q: Point, before: Calibration, after: Calibration) => Point;

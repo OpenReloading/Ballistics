@@ -14,7 +14,7 @@ import {
   stringLadder,
 } from '@open-reloading/ballistics'
 import { InputError } from '@open-reloading/statistics'
-import { errorText } from './error-text.ts'
+import { refusalText } from './core-messages.ts'
 import { nth } from './nth.ts'
 import type {
   HandPoint,
@@ -106,7 +106,7 @@ export function answerPowderFit(q: PowderFitRequest, post: (r: PowderFitReply) =
     post(
       err instanceof PowderFitError
         ? { kind: 'refused', id, reason: err.reason, charge: err.charge }
-        : { kind: 'error', id, message: errorText(err) },
+        : { kind: 'error', id, message: refusalText(err) },
     )
   }
 }

@@ -4,6 +4,7 @@ export { type Diagnostic, InputError, need, nth } from './errors.ts'
 export { fQuantileTwoNumeratorDegrees } from './f-distribution.ts'
 export type { HuberLoss } from './huber.ts'
 export type { Interval } from './interval.ts'
+export type { StatisticsIssue } from './issue.ts'
 export {
   checkLogFitLimits,
   type Identifiability,

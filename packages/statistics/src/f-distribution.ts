@@ -4,12 +4,12 @@
  * 1.3.6.6.5); with second parameter 1 the regularized incomplete beta function is I_k(a, 1) = k^a
  * (DLMF 8.17.1 and 8.17.2 at b = 1: B_k(a, 1) = k^a / a, B(a, 1) = 1 / a), so the quantile is closed form.
  */
-import { need } from './errors.ts'
+import { need } from './issue.ts'
 
 /** The `x` at which the distribution function of F(2, m) is `p`; p in (0, 1), m above 0. */
 export function fQuantileTwoNumeratorDegrees(p: number, m: number): number {
-  need(p > 0 && p < 1, 'probability must lie in (0, 1)')
-  need(m > 0, 'degrees of freedom must be positive')
+  need(p > 0 && p < 1, { code: 'probabilityOutsideUnit', params: {} })
+  need(m > 0, { code: 'degreesOfFreedomNotPositive', params: {} })
   // expm1 keeps precision for large m, where (1 - p)^(-2/m) is close to 1
   return (m / 2) * Math.expm1((-2 / m) * Math.log1p(-p))
 }

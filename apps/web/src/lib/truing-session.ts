@@ -13,10 +13,9 @@ import {
 } from '@open-reloading/ballistics'
 import { type Truing, toSi, truing, type UserRecord, userRecord } from '@open-reloading/schema'
 import { formatNumber, parseNumber, untranslated } from '../i18n/number.ts'
-import { type Message, msg, type Translator } from '../i18n/translate.ts'
-import { translateMessage } from './core-messages.ts'
+import { type Message, msg, type Say, type Translator } from '../i18n/translate.ts'
+import { refusalText, translateMessage } from './core-messages.ts'
 import { localDay } from './dates.ts'
-import { errorText } from './error-text.ts'
 import { storedOf } from './firearm.ts'
 import { type UnitSystem, withUnit } from './units.ts'
 
@@ -77,14 +76,16 @@ function need(x: number | undefined, what: string, t: T, positive = false): numb
   return x
 }
 
-/** The message of a failed plan or fit in the language of `t`. */
-function problemOf(e: unknown, t: T): string {
-  if (e instanceof TruingError) {
-    const reason = translateMessage(e.reason, t)
-    if (reason !== e.reason) return reason
+/** Why a plan or a fit failed, worded where it is shown: a typed refusal follows the words when they arrive. */
+const problemOf =
+  (e: unknown): Say =>
+  (t) => {
+    if (e instanceof TruingError) {
+      const reason = translateMessage(e.reason, t)
+      if (reason !== e.reason) return reason
+    }
+    return translateMessage(refusalText(e), t)
   }
-  return translateMessage(errorText(e), t)
-}
 
 /** The rows that carry anything, with their position; a blank trailing row is not an error. */
 const filled = (rows: readonly TruingRow[]) =>
@@ -114,8 +115,8 @@ function planned(input: TruingInputs, t: T) {
 const clickOf = (input: TruingInputs, t: T) =>
   input.system.correction.toSi(need(numberOf(input.click), t('Click value'), t, true))
 
-/** Why the plan or the fit has no answer (its text in the language of the `t` it was made with), or the answer. */
-export type Attempt<T> = { answer: T } | { problem: string }
+/** Why the plan or the fit has no answer (a missing value in the language of the `t` it was made with), or the answer. */
+export type Attempt<T> = { answer: T } | { problem: Say }
 
 /**
  * The statuses and standard errors of the planned string: the rows' kinds, distances and shots, the
@@ -139,7 +140,7 @@ export function planSession(shot: TrajectoryInput, input: TruingInputs, t: T): A
     )
     return { answer: plan }
   } catch (e) {
-    return { problem: problemOf(e, t) }
+    return { problem: problemOf(e) }
   }
 }
 
@@ -187,7 +188,7 @@ export function fitSession(
       ),
     }
   } catch (e) {
-    return { problem: problemOf(e, t) }
+    return { problem: problemOf(e) }
   }
 }
 

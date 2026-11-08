@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react'
+import { setRefusalWords } from '../lib/core-messages.ts'
 import { storageName } from '../lib/edition.ts'
 import { setShownLanguage } from './shown.ts'
 import { type Catalogue, english as englishText, type Translator, translator } from './translate.ts'
@@ -22,6 +23,19 @@ const loaders: Record<Exclude<Language, 'en'>, () => Promise<{ default: Catalogu
 /** The table of package and API messages: loaded with any language but English, read by `translateMessage`. */
 const loadMessages = () =>
   import('../lib/core-message-table.ts').then((m) => m.installCoreMessages())
+
+/**
+ * The words of the typed refusals, loaded in every language once a page has started, so that no
+ * page carries them in its own JavaScript; the page renders again with them.
+ */
+const loadRefusalWords = () =>
+  import('../lib/refusal-words.ts').then(
+    (m) => {
+      setRefusalWords(m.refusalSentence)
+      publish({ ...current })
+    },
+    () => undefined,
+  )
 
 /** `localStorage` key of the chosen language. */
 const languageKey = storageName('language')
@@ -79,6 +93,7 @@ export function startLanguage() {
     stored = localStorage.getItem(languageKey)
   } catch {}
   void show(parse(stored))
+  void loadRefusalWords()
   const follow = (e: StorageEvent) => {
     if (e.key === languageKey) void show(parse(e.newValue))
   }
