@@ -121,6 +121,7 @@
     "promise/no-nesting": "error",
     "radix": "error",
     "regexp/no-super-linear-backtracking": "error",
+    "regexp/no-super-linear-move": "error",
     "typescript/adjacent-overload-signatures": "error",
     "typescript/ban-ts-comment": "error",
     "typescript/ban-types": "error",
@@ -263,7 +264,8 @@
     {
       "files": ["**/test/**"],
       "rules": {
-        "regexp/no-super-linear-backtracking": "off"
+        "regexp/no-super-linear-backtracking": "off",
+        "regexp/no-super-linear-move": "off"
       }
     }
   ]
