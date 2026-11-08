@@ -138,20 +138,27 @@ export function requiredMessages(root: string): string[] {
 }
 
 /**
- * What is wrong with `catalogue` of `language` against the English `source`: a `required` text
- * without a translation or left English, a key no message matches, an empty text, placeholders
- * other than its key's, and a plural that is no object of the language's categories. Other
- * untranslated messages show in English; `missing` lists them.
+ * What is wrong with `catalogue` of `language` against the English `source`: a text without a
+ * translation that `allowed` does not list (a `required` one always), a listed text that has one,
+ * a `required` text left English, a key no message matches, an empty text, placeholders other than
+ * its key's, and a plural that is no object of the language's categories.
  */
 export function problems(
   source: readonly string[],
   catalogue: Record<string, unknown>,
   language: string,
   required: readonly string[],
+  allowed: readonly string[] = [],
 ): string[] {
   const { untranslated, stale } = compare(source, catalogue)
+  // the allowed list only shrinks: a listed text that has its translation, or is gone, is a problem too
   const found = [
-    ...untranslated.filter((s) => required.includes(s)).map((s) => `untranslated: ${s}`),
+    ...untranslated
+      .filter((s) => required.includes(s) || !allowed.includes(s))
+      .map((s) => `untranslated: ${s}`),
+    ...allowed
+      .filter((s) => !untranslated.includes(s))
+      .map((s) => `listed as untranslated, but translated or gone: ${s}`),
     ...stale.map((k) => `no message has this key: ${k}`),
   ]
   const categories: string[] = new Intl.PluralRules(language).resolvedOptions().pluralCategories
@@ -370,11 +377,12 @@ if (import.meta.main) {
     }
   } else if (command === 'check' && code && /^[a-z]{2,3}$/.test(code)) {
     const catalogue = JSON.parse(readFileSync(path.join(webRoot, `src/i18n/${code}.json`), 'utf8'))
-    const found = problems(source, catalogue, code, requiredMessages(webRoot))
+    const read = (file: string) => JSON.parse(readFileSync(path.join(webRoot, file), 'utf8'))
+    const lint = read('scripts/i18n-lint.json')
+    const allowed: string[] = lint.untranslated[code] ?? []
+    const found = problems(source, catalogue, code, requiredMessages(webRoot), allowed)
     if (code === 'de') {
-      const read = (file: string) => JSON.parse(readFileSync(path.join(webRoot, file), 'utf8'))
       const table: TermTable = read('src/i18n/german-terms.json')
-      const lint = read('scripts/i18n-lint.json')
       const senses = {
         ...Object.fromEntries(lint.targetRecords.map((k: string) => [k, lint.targetSense])),
         ...lint.otherSense,
