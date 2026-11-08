@@ -26,7 +26,7 @@ The web app's language is a setting (Settings, General, Language). There is one 
 
 ## The interface base (`packages/ui`)
 
-The shared base keeps its own texts in Lingui catalogs, the format the rebuilt web app moves to: `packages/ui/src/locales/en.po` and `de.po`, each text with an explicit id (`frame.menu`). A text in `ui` is `i18n._({ id: 'frame.menu', message: 'Navigation' })`; `pnpm --filter @open-reloading/ui run messages` adds new texts to both catalogs, and a German one is written into `de.po` by hand. The build fails while a German text is missing, and `tsc` fails on an id the English catalog lacks. The app loads `uiMessages` of `@open-reloading/ui` beside its own texts.
+The shared base keeps its own texts in Lingui catalogs, the format the rebuilt web app moves to: `packages/ui/src/locales/en.po` and `de.po`, each text with an explicit id under `ui.` (`ui.frame.menu`). A text in `ui` is `i18n._({ id: 'ui.frame.menu', message: 'Navigation' })`; `pnpm --filter @open-reloading/ui run messages` adds new texts to both catalogs, and a German one is written into `de.po` by hand. The build fails while a German text is missing, and `tsc` fails on an id the English catalog lacks. The app loads `uiMessages` of `@open-reloading/ui` beside its own texts.
 
 ## Numbers, dates and country names
 

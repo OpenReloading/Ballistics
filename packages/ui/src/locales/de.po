@@ -9,15 +9,15 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/app-frame.tsx
-msgid "frame.close"
+msgid "ui.frame.close"
 msgstr "Navigation schließen"
 
 #. js-lingui-explicit-id
 #: src/app-frame.tsx
-msgid "frame.navigation"
+msgid "ui.frame.navigation"
 msgstr "Hauptnavigation"
 
 #. js-lingui-explicit-id
 #: src/app-frame.tsx
-msgid "frame.menu"
+msgid "ui.frame.menu"
 msgstr "Navigation"

@@ -7,16 +7,22 @@ import '../css/ui.css'
 declare const __STORY_WIDTH__: number | undefined
 const testWidth = typeof __STORY_WIDTH__ === 'number' ? __STORY_WIDTH__ : undefined
 
-const i18n = setupI18n({ locale: 'en', messages: { en: uiMessages.en } })
+// one instance per language, picked by the toolbar: activating inside the decorator would update the provider in render
+const i18n = {
+  en: setupI18n({ locale: 'en', messages: uiMessages }),
+  de: setupI18n({ locale: 'de', messages: uiMessages }),
+}
 
 export default {
-  ...(testWidth && {
-    initialGlobals: { viewport: { value: 'test' } },
-  }),
+  // the story tests run in English
+  initialGlobals: { locale: 'en', ...(testWidth && { viewport: { value: 'test' } }) },
+  globalTypes: {
+    locale: { description: 'Language', toolbar: { icon: 'globe', items: ['en', 'de'] } },
+  },
   // the scheme follows the system setting, which each test browser of vitest.config.ts emulates
   decorators: [
-    (Story) => (
-      <UiProvider i18n={i18n} defaultColorScheme="auto">
+    (Story, { globals }) => (
+      <UiProvider i18n={globals['locale'] === 'de' ? i18n.de : i18n.en} defaultColorScheme="auto">
         <Story />
       </UiProvider>
     ),

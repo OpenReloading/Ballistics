@@ -28,9 +28,9 @@ export function AppFrame({
 }: AppFrameProps): ReactElement {
   const { i18n } = useLingui()
   const labels = {
-    menu: i18n._({ id: 'frame.menu', message: 'Navigation' }),
-    navigation: i18n._({ id: 'frame.navigation', message: 'Main' }),
-    close: i18n._({ id: 'frame.close', message: 'Close navigation' }),
+    menu: i18n._({ id: 'ui.frame.menu', message: 'Navigation' }),
+    navigation: i18n._({ id: 'ui.frame.navigation', message: 'Main' }),
+    close: i18n._({ id: 'ui.frame.close', message: 'Close navigation' }),
   }
   const [opened, { toggle, close }] = useDisclosure(false)
   // the drawer is only hidden from 75em: left open there, its focus trap and scroll lock would stay
