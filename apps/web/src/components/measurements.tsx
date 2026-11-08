@@ -7,8 +7,8 @@ import Link from 'next/link'
 import { type Dispatch, type ReactNode, type SetStateAction, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
-import { msg, type Translator } from '../i18n/translate.ts'
-import { chronoErrorText, chronoFileBytes, readChrono } from '../lib/chrono.ts'
+import { msg, type Say, type Translator } from '../i18n/translate.ts'
+import { chronoFileBytes, readChrono } from '../lib/chrono.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { chronographGuide } from '../lib/docs-url.ts'
 import { errorText } from '../lib/error-text.ts'
@@ -186,14 +186,14 @@ async function readSession(
   return sessionOf(file.name, data, charges, { id, manufacturer: makers.get(named), now })
 }
 
-/** A file that was not read: too many sessions for the load, else the reader's error. */
-type Failure = { file: string; tooMany: true } | { file: string; error: unknown }
+/** A file that was not read: too many sessions for the load, else why, worded where it is shown. */
+type Failure = { file: string; tooMany: true } | { file: string; say: Say }
 
 /** The reason `f` gives for its file, in the language of `t`. */
 const failureText = (f: Failure, t: Translator['t']) =>
   'tooMany' in f
     ? t('{file}: a load keeps {max} sessions at most.', { file: f.file, max: maxSessions })
-    : `${f.file}: ${chronoErrorText(f.error, t)}`
+    : `${f.file}: ${f.say(t)}`
 
 /** `text` of a statistic when there is one, else nothing. */
 const when = <T,>(x: T | undefined, text: (x: T) => string) => (x === undefined ? '' : text(x))
@@ -317,7 +317,9 @@ export function Measurements({
       try {
         added.push(await readSession(file, unit, steps, makers, manufacturerRef))
       } catch (err) {
-        failed.push({ file: file.name, error: err })
+        // the readers' words load only when a file fails: the workbench carries none of them
+        const { chronoErrorText } = await import('../lib/chrono-diagnostics.ts')
+        failed.push({ file: file.name, say: (t) => chronoErrorText(err, t) })
       }
     }
     setSessions((s) => [...s, ...added])
