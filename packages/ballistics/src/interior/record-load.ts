@@ -1,5 +1,5 @@
-import { InputError, need } from '@open-reloading/statistics'
 import { type CartridgeSpecs, cartridgeBulletDiameterMm } from '../cartridge-specs.ts'
+import { InputError, need } from '../issue.ts'
 import { type ResistanceTerms, recordResistance } from './bore-resistance.ts'
 import { interiorLoad } from './load-file.ts'
 import type { InteriorLoad } from './model.ts'
@@ -66,7 +66,7 @@ export function recordLoad(r: RecordRun): InteriorLoad {
   const { cartridge, powder, bullet } = r
   const model = powderModelValues(powder)
   if (model === undefined || powder.interior === undefined)
-    throw new InputError('the powder has no interior model')
+    throw new InputError({ code: 'powderWithoutInteriorModel', params: {} })
   const area = chamberValue(cartridge, 'Q')
   const groove = chamberValue(cartridge, 'Z')
   const load = interiorLoad(
@@ -92,7 +92,10 @@ export function recordLoad(r: RecordRun): InteriorLoad {
     cartridge: { g1: cartridgeBulletDiameterMm(cartridge), z: groove },
     bulletLengthMm: bullet.lengthMm,
   })
-  need(missing.length === 0, `the bore resistance of the powder needs ${missing.join(' and ')}`)
+  need(missing.length === 0, {
+    code: 'boreResistanceNeedsValues',
+    params: { missing: [...missing] },
+  })
   const s = powder.temperatureSensitivity
   return {
     ...load,

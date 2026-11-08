@@ -57,9 +57,8 @@ import { measuredWaterCapacitySpec } from '../lib/case-capacity.ts'
 import { type OwnCase, ownCases } from '../lib/case-group.ts'
 import { cavityVolumeFraction } from '../lib/cavity-range.ts'
 import { powderIncomplete } from '../lib/complete-records.ts'
-import { translateMessage } from '../lib/core-messages.ts'
+import { refusalText, translateMessage } from '../lib/core-messages.ts'
 import { timeText } from '../lib/dates.ts'
-import { errorText } from '../lib/error-text.ts'
 import { loadExample } from '../lib/example-data.ts'
 import { exampleFields } from '../lib/examples.ts'
 import {
@@ -2699,8 +2698,7 @@ export function useWorkbenchState() {
       if ((firearmMoreFields as readonly string[]).includes(err.field)) setMore('firearm')
     }
     setOutcome(undefined)
-    const message = errorText(err)
-    setStatus({ say: (t) => translateMessage(message, t) })
+    setStatus({ say: (t) => translateMessage(refusalText(err), t) })
   }
 
   /** Shows the first step with a result and starts the request for its sampled band. */

@@ -6,7 +6,8 @@
  * charge. A simulation, not load data: the answer is the charge at which the model reaches the
  * target, not a charge to load.
  */
-import { need, nth } from '@open-reloading/statistics'
+import { nth } from '@open-reloading/statistics'
+import { need } from '../issue.ts'
 import type { Settings } from '../settings.ts'
 
 import { solidFillLimit } from './load-file.ts'
@@ -280,15 +281,18 @@ function illinoisRoot(
 
 /** Checks the target value and the bulk density, which the load ratio target needs. */
 function checkChargeTarget(target: ChargeTarget, bulkDensity: number | undefined): void {
-  need(Number.isFinite(target.value) && target.value > 0, 'target value must be above 0')
-  need(
-    bulkDensity === undefined || (Number.isFinite(bulkDensity) && bulkDensity > 0),
-    'bulk density must be above 0',
-  )
-  need(
-    target.kind !== 'loadRatio' || bulkDensity !== undefined,
-    'the load ratio target needs the bulk density',
-  )
+  need(Number.isFinite(target.value) && target.value > 0, {
+    code: 'targetValueNotPositive',
+    params: {},
+  })
+  need(bulkDensity === undefined || (Number.isFinite(bulkDensity) && bulkDensity > 0), {
+    code: 'bulkDensityNotPositive',
+    params: {},
+  })
+  need(target.kind !== 'loadRatio' || bulkDensity !== undefined, {
+    code: 'loadRatioTargetNeedsBulkDensity',
+    params: {},
+  })
 }
 
 /**

@@ -37,7 +37,7 @@ const own = translator(
     'zero range {range} m not reached ({stop})': 'Fleck {range} m verfehlt ({stop})',
     'Enter a number for {label}.': 'Zahl für {label}.',
     Pressure: 'Druck',
-    'ladder charge {n} kg must be above 0': 'Ladung {n} kg zu klein',
+    'ladder charge {charge} kg must be above 0': 'Ladung {charge} kg zu klein',
     'bullet {id} has no length': 'Geschoss {id} ohne Länge',
     'Error {status}.': 'Fehler {status}.',
     'Give a load or factory ammunition, not both.': 'Eine Munition genügt.',
@@ -505,9 +505,9 @@ const unmapped = (sample: string) =>
 describe('the messages of the packages', () => {
   it('reads the sources', () => {
     const texts = scan('7').map((f) => f.text)
-    expect(texts.length).toBeGreaterThan(100)
-    expect(texts).toContain('Firearm mass must be positive.')
-    expect(texts).toContain('ladder charge 7 kg must be above 0')
+    expect(texts.length).toBeGreaterThan(20)
+    expect(texts).toContain('Enter a number.')
+    expect(texts).toContain('ladder charge 7 g must be above 0')
     expect(texts).toContain('Unknown field')
   })
 

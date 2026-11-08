@@ -116,8 +116,30 @@ export type ExteriorIssue =
   /** A trajectory of a truing fit that ends before a range of the rows. */
   | Diagnostic<'rangeNotReached', { range: number }>
 
+/** Why an interior function, a fit, a ladder or the free recoil refuses its input. */
+export type InteriorIssue =
+  | Diagnostic<'gasVelocityFactorNegative'>
+  | Diagnostic<'muzzleVelocityNegative'>
+  | Diagnostic<'chargeMassNegative'>
+  | Diagnostic<'projectileMassNotPositive'>
+  | Diagnostic<'firearmMassNotPositive'>
+  | Diagnostic<'loadRatioTargetNeedsBulkDensity'>
+  | Diagnostic<'bulkDensityNotPositive'>
+  | Diagnostic<'targetValueNotPositive'>
+  | Diagnostic<'ladderLowestChargeNotPositive', { charge: number }>
+  | Diagnostic<'ladderAroundNeedsOddCount'>
+  | Diagnostic<'ladderStepCountInvalid'>
+  | Diagnostic<'ladderStepNotPositive'>
+  | Diagnostic<'ladderStartNotPositive'>
+  | Diagnostic<'boreResistanceNeedsValues', { missing: string[] }>
+  | Diagnostic<'powderWithoutInteriorModel'>
+  | Diagnostic<'bulletConstructionUnknown', { construction: string }>
+  | Diagnostic<'barrelNotPositive', { barrel: number }>
+  | Diagnostic<'dynamicVivacityRangeInvalid'>
+  | Diagnostic<'dynamicVivacityExponentNotOne'>
+
 /** Why a function of this package refuses its input. */
-export type BallisticsIssue = ExteriorIssue
+export type BallisticsIssue = ExteriorIssue | InteriorIssue
 
 /** `need` of `@open-reloading/statistics` with an issue of this package. */
 export const need: (ok: boolean, issue: BallisticsIssue) => void = needAny

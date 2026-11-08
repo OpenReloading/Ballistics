@@ -1,4 +1,4 @@
-import { need } from '@open-reloading/statistics'
+import { need } from './issue.ts'
 
 /**
  * Velocity of the propellant gas leaving the muzzle over the muzzle velocity of the projectile, by
@@ -40,14 +40,23 @@ export type FreeRecoil = {
  */
 export function freeRecoil(input: FreeRecoilInput): FreeRecoil {
   const { firearmMass, projectileMass, chargeMass, muzzleVelocity, gasFactor } = input
-  need(Number.isFinite(firearmMass) && firearmMass > 0, 'Firearm mass must be positive.')
-  need(Number.isFinite(projectileMass) && projectileMass > 0, 'Projectile mass must be positive.')
-  need(Number.isFinite(chargeMass) && chargeMass >= 0, 'Charge mass must not be negative.')
-  need(
-    Number.isFinite(muzzleVelocity) && muzzleVelocity >= 0,
-    'Muzzle velocity must not be negative.',
-  )
-  need(Number.isFinite(gasFactor) && gasFactor >= 0, 'Gas velocity factor must not be negative.')
+  need(Number.isFinite(firearmMass) && firearmMass > 0, {
+    code: 'firearmMassNotPositive',
+    params: {},
+  })
+  need(Number.isFinite(projectileMass) && projectileMass > 0, {
+    code: 'projectileMassNotPositive',
+    params: {},
+  })
+  need(Number.isFinite(chargeMass) && chargeMass >= 0, { code: 'chargeMassNegative', params: {} })
+  need(Number.isFinite(muzzleVelocity) && muzzleVelocity >= 0, {
+    code: 'muzzleVelocityNegative',
+    params: {},
+  })
+  need(Number.isFinite(gasFactor) && gasFactor >= 0, {
+    code: 'gasVelocityFactorNegative',
+    params: {},
+  })
   const momentum = projectileMass * muzzleVelocity + chargeMass * gasFactor * muzzleVelocity
   const velocity = momentum / firearmMass
   return { momentum, velocity, energy: 0.5 * firearmMass * velocity ** 2 }
