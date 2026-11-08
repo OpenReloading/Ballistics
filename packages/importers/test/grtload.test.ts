@@ -167,6 +167,26 @@ describe('readGrtLoad: the load', () => {
   })
 })
 
+describe('readGrtLoad: numbers', () => {
+  it('reads no hex, binary or infinite text as a number, with a warning', () => {
+    const text = grtFile({
+      sections: {
+        caliber: [
+          ['CaliberName', 'C'],
+          ['oal', '0x10', 'mm'],
+          ['caselen', '0b11', 'mm'],
+          ['Dz', 'Infinity', 'mm'],
+        ],
+      },
+    })
+    expect(read(text).warnings).toEqual([
+      { code: 'notConverted', params: { at: 'caliber.oal', value: '0x10', unit: 'mm' } },
+      { code: 'notConverted', params: { at: 'caliber.caselen', value: '0b11', unit: 'mm' } },
+      { code: 'notConverted', params: { at: 'caliber.Dz', value: 'Infinity', unit: 'mm' } },
+    ])
+  })
+})
+
 describe('readGrtLoad: fields, overflows and ids', () => {
   it('accounts for every field with a value: read, not read, or warned about', () => {
     const extra = [['odd', '1', 'furlong'] as Field]

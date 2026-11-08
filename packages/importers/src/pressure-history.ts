@@ -3,7 +3,7 @@
 import { type PressureDiagnostic, refuseTrace } from './diagnostics.ts'
 import { detectDelimiter, splitCells } from './generic.ts'
 import { psi } from './record-fields.ts'
-import { bracketed, splitLines } from './text.ts'
+import { bracketed, readDecimal, splitLines } from './text.ts'
 
 /** A pressure unit the trace importer recognises (any case in the file). */
 export type PressureUnit = 'bar' | 'mbar' | 'MPa' | 'kPa' | 'Pa' | 'psi' | 'kpsi'
@@ -67,17 +67,6 @@ export interface PressureHistoryImport {
   /** The low-pass applied, or absent. */
   lowPass?: { cutoff: number }
   warnings: PressureDiagnostic[]
-}
-
-/**
- * A number with a decimal point or comma and optional exponent (`1.0E-05`), NaN otherwise. A lone
- * comma is a decimal comma (`0,125`): the delimiter is a semicolon or a tab when cells hold one.
- */
-function reading(text: string): number {
-  const t = text.trim()
-  if (t.includes(',') && t.includes('.')) return Number.NaN
-  const s = t.replace(',', '.')
-  return /^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$/.test(s) ? Number(s) : Number.NaN
 }
 
 /** The text in `(...)` or `[...]` of a header cell, else undefined. */
@@ -167,7 +156,7 @@ function checkedCutoff(cutoff: number | undefined): number | undefined {
 /** Removes and returns the first row when its time cell is not a number: the header row. */
 function takeHeader(rows: string[][], tc: number): string[] | undefined {
   const [top] = rows
-  return top && Number.isNaN(reading(top[tc - 1] ?? '')) ? rows.shift() : undefined
+  return top && Number.isNaN(readDecimal(top[tc - 1] ?? '')) ? rows.shift() : undefined
 }
 
 /**
@@ -207,7 +196,7 @@ function readSamples(
 ): Sample[] {
   const samples: Sample[] = []
   rows.forEach((cells, i) => {
-    const [t, p] = [reading(cells[tc - 1] ?? ''), reading(cells[pc - 1] ?? '')]
+    const [t, p] = [readDecimal(cells[tc - 1] ?? ''), readDecimal(cells[pc - 1] ?? '')]
     const line = i + first
     if (Number.isNaN(t) || Number.isNaN(p)) refuseTrace('readingNotNumber', { line })
     const [seconds, bar] = [t * tf, p * pf]
