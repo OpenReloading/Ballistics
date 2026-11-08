@@ -103,15 +103,19 @@ describe('limits', () => {
   it('names the input that is outside the model', () => {
     const ok = standardAtmosphere(0)
     for (const temperature of [0, -10, Number.POSITIVE_INFINITY])
-      expect(() => checkAir({ ...ok, temperature })).toThrow(/^temperature/)
-    expect(() => checkAir({ ...ok, humidity: -0.1 })).toThrow(/^humidity/)
+      expect(() => checkAir({ ...ok, temperature })).toThrow('temperatureInvalid')
+    expect(() => checkAir({ ...ok, humidity: -0.1 })).toThrow('humidityOutsideUnit')
     expect(() => checkAir({ ...ok, pressure: Number.POSITIVE_INFINITY })).toThrow(
-      /^pressure Infinity Pa$/,
+      expect.objectContaining({
+        issue: { code: 'pressureInvalid', params: { pressure: Number.POSITIVE_INFINITY } },
+      }),
     )
     // below the vapour pressure, yet the mixture density is still positive
     const steam = { ...ok, temperature: 373.15, humidity: 1, pressure: 60000 }
     expect(airDensity(steam)).toBeGreaterThan(0)
-    expect(() => checkAir(steam)).toThrow(/^pressure 60000 Pa$/)
+    expect(() => checkAir(steam)).toThrow(
+      expect.objectContaining({ issue: { code: 'pressureInvalid', params: { pressure: 60000 } } }),
+    )
   })
 })
 
@@ -145,7 +149,9 @@ describe('checkAir density', () => {
     const air = { altitude: 0, pressure: 2.5e-13, temperature: 5e-324, humidity: 0 }
     expect(() => checkAir(air)).toThrow(InputError)
     expect(() => checkAir({ ...air, humidity: 0.5 })).toThrow(InputError)
-    expect(() => checkAir({ ...air, pressure: 1e-320, temperature: 1e10 })).toThrow(/density/)
+    expect(() => checkAir({ ...air, pressure: 1e-320, temperature: 1e10 })).toThrow(
+      'airDensityOutsideRange',
+    )
     expect(checkAir({ ...air, pressure: 101325, temperature: 288.15 }).pressure).toBe(101325)
   })
 })

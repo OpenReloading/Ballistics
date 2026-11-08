@@ -3,8 +3,9 @@
  * `apps/docs/docs/models/exterior-stability.md`. SI in and out; the empirical fits are
  * stated in customary units and converted here.
  */
-import { InputError } from '@open-reloading/statistics'
+
 import { conversions } from '@open-reloading/units'
+import { InputError } from '../issue.ts'
 import type { Air } from './atmosphere.ts'
 
 // SI per customary unit of the empirical fits
@@ -34,7 +35,7 @@ export interface MillerStabilityInput {
 export function millerStability(i: MillerStabilityInput): number {
   const { mass, diameter, length, twist, velocity, air } = i
   if (!(mass > 0 && diameter > 0 && length > 0 && twist > 0 && velocity > 0))
-    throw new InputError('mass, diameter, length, twist and velocity must be positive')
+    throw new InputError({ code: 'stabilityInputsNotPositive', params: {} })
   const t = twist / diameter
   const l = length / diameter
   const d = diameter / inch

@@ -24,7 +24,7 @@ const german = translator(de as Catalogue, 'de')
 const own = translator(
   {
     'range must be positive': 'Entfernung zu klein',
-    'range {n}': 'Entfernung {n}',
+    'range {range}': 'Entfernung {range}',
     '{kind} range': 'Entfernung von {kind}',
     'prior {name}': 'Prior {name}',
     'prior {name} must be positive': 'Prior {name} zu klein',
@@ -34,7 +34,7 @@ const own = translator(
     'range {n} m not reached': '{n} m verfehlt',
     'truing: {reason} ({detail})': 'Truing: {reason} ({detail})',
     apex: 'Scheitel',
-    'zero range {n} m not reached ({stop})': 'Fleck {n} m verfehlt ({stop})',
+    'zero range {range} m not reached ({stop})': 'Fleck {range} m verfehlt ({stop})',
     'Enter a number for {label}.': 'Zahl für {label}.',
     Pressure: 'Druck',
     'ladder charge {n} kg must be above 0': 'Ladung {n} kg zu klein',
@@ -511,7 +511,7 @@ const unmapped = (sample: string) =>
 describe('the messages of the packages', () => {
   it('reads the sources', () => {
     const texts = scan('7').map((f) => f.text)
-    expect(texts.length).toBeGreaterThan(200)
+    expect(texts.length).toBeGreaterThan(100)
     expect(texts).toContain('Firearm mass must be positive.')
     expect(texts).toContain('ladder charge 7 kg must be above 0')
     expect(texts).toContain('Unknown field')

@@ -820,7 +820,9 @@ describe('zeroing step budget', () => {
     expect(search).toBeGreaterThan(0)
     const capped = { used: 0, max: budget.used - 1 }
     expect(() => trajectory({ ...base, zero: { range: 300 } }, [1500], { budget: capped })).toThrow(
-      `more than ${budget.used - 1} integration steps in total`,
+      expect.objectContaining({
+        issue: { code: 'integrationBudgetExceeded', params: { max: budget.used - 1 } },
+      }),
     )
     expect(capped.used).toBe(capped.max)
     for (const bad of [
@@ -828,12 +830,12 @@ describe('zeroing step budget', () => {
       { used: Number.NaN, max: 10 },
       { used: 0, max: -1 },
     ])
-      expect(() => trajectory(base, [100], { budget: bad })).toThrow('step budget')
+      expect(() => trajectory(base, [100], { budget: bad })).toThrow('stepBudgetInvalid')
   })
 
   it('reports the user step limit when restarts use it up', () => {
     expect(() => trajectory(base, [1500], { maxSteps: 20 })).toThrow(
-      'more than 20 integration steps',
+      expect.objectContaining({ issue: { code: 'integrationStepsExceeded', params: { max: 20 } } }),
     )
   })
 })

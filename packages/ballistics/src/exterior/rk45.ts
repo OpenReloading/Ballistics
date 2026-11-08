@@ -3,7 +3,8 @@
  * (`apps/docs/docs/models/exterior-point-mass.md`, "Numerical method"; Dormand and Prince 1980; Hairer,
  * Norsett and Wanner 1993, sections II.4 to II.6). Generic over the state length.
  */
-import { InputError, nth } from '@open-reloading/statistics'
+import { nth } from '@open-reloading/statistics'
+import { InputError } from '../issue.ts'
 
 /** Unchecked read of a state vector the caller sizes and indexes by the same count (kept in this module so the integrator loops inline it). */
 const el = (a: Float64Array, i: number): number => a[i] ?? 0
@@ -342,9 +343,9 @@ function makeWork(n: number): Work {
 function checkStepLimits(steps: number, options: Rk45Options) {
   const { maxSteps, budget } = options
   if (steps + (options.stepsBefore ?? 0) >= maxSteps)
-    throw new InputError(`more than ${maxSteps} integration steps`)
+    throw new InputError({ code: 'integrationStepsExceeded', params: { max: maxSteps } })
   if (budget && budget.used >= budget.max)
-    throw new InputError(`more than ${budget.max} integration steps in total`)
+    throw new InputError({ code: 'integrationBudgetExceeded', params: { max: budget.max } })
 }
 
 /** The events whose function changed sign over the step, in the direction they watch. */
@@ -377,7 +378,8 @@ function growFactor(err: number, rejected: boolean) {
 
 /** The step size `h`, or `InputError` when it is below `minStep`. */
 function checkMinStep(h: number) {
-  if (h < minStep) throw new InputError(`step size ${h} s below ${minStep} s`)
+  if (h < minStep)
+    throw new InputError({ code: 'stepSizeBelowMinimum', params: { step: h, min: minStep } })
   return h
 }
 

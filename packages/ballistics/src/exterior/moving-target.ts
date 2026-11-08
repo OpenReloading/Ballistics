@@ -1,7 +1,7 @@
 /**
  * Lead for a moving target, `apps/docs/docs/models/exterior-moving-target.md`. SI in and out.
  */
-import { InputError } from '@open-reloading/statistics'
+import { InputError } from '../issue.ts'
 
 /** A target's motion: speed m/s and heading rad (0 away from the shooter, pi/2 crossing to the right). */
 export interface TargetMotion {
@@ -28,11 +28,13 @@ export function movingTargetLead(
   timeOfFlight: number,
 ): MovingTargetLead {
   if (!(Number.isFinite(target.speed) && target.speed >= 0))
-    throw new InputError('target speed must be 0 or more')
-  if (!Number.isFinite(target.heading)) throw new InputError('target heading must be a number')
-  if (!(range > 0 && Number.isFinite(range))) throw new InputError('range must be positive')
+    throw new InputError({ code: 'targetSpeedNegative', params: {} })
+  if (!Number.isFinite(target.heading))
+    throw new InputError({ code: 'targetHeadingNotNumber', params: {} })
+  if (!(range > 0 && Number.isFinite(range)))
+    throw new InputError({ code: 'rangeNotPositive', params: {} })
   if (!(timeOfFlight >= 0 && Number.isFinite(timeOfFlight)))
-    throw new InputError('time of flight must be 0 or more')
+    throw new InputError({ code: 'timeOfFlightNegative', params: {} })
   const lateral = target.speed * timeOfFlight * Math.sin(target.heading)
   return { lateral, angle: Math.atan2(lateral, range) }
 }

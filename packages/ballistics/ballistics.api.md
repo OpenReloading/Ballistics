@@ -4,6 +4,7 @@
 
 ```ts
 
+import { Diagnostic } from '@open-reloading/statistics';
 import { InputError } from '@open-reloading/statistics';
 import { LogFitFailure } from '@open-reloading/statistics';
 import { LogFitStop } from '@open-reloading/statistics';
@@ -58,6 +59,9 @@ export interface BallisticCoefficientBand {
     ballisticCoefficient: number;
     minVelocity: number;
 }
+
+// @public
+export type BallisticsIssue = ExteriorIssue;
 
 // @public
 export interface BoreAngles {
@@ -349,6 +353,58 @@ export function dynamicVivacity(burn: VivacityBurn, z: number): number;
 
 // @public
 export type EstimatedInput = 'axialInertia' | 'transverseInertia' | 'momentSlope';
+
+// @public
+export type ExteriorIssue = Diagnostic<'pressureInvalid', {
+    pressure: number;
+}> | Diagnostic<'humidityOutsideUnit', {
+    humidity: number;
+}> | Diagnostic<'temperatureInvalid', {
+    temperature: number;
+}> | Diagnostic<'altitudeOutsideRange', {
+    altitude: number;
+    low: number;
+    high: number;
+}> | Diagnostic<'timeOfFlightNegative'> | Diagnostic<'rangeNotPositive'> | Diagnostic<'targetHeadingNotNumber'> | Diagnostic<'targetSpeedNegative'> | Diagnostic<'muzzleVelocityNotConverged'> | Diagnostic<'measuredSpeedTooLow'> | Diagnostic<'distanceNotReached', {
+    distance: number;
+    stop: string;
+}> | Diagnostic<'velocityNotPositive'> | Diagnostic<'distanceNegative'> | Diagnostic<'outlineOutsideMethod'> | Diagnostic<'machNotPositive'> | Diagnostic<'diameterNotPositive'> | Diagnostic<'noseAndBoatTailExceedLength'> | Diagnostic<'bandDiameterBelowDiameter'> | Diagnostic<'meplatDiameterOutsideRange'> | Diagnostic<'baseDiameterNotPositive'> | Diagnostic<'boatTailLengthNegative'> | Diagnostic<'headShapeOutsideUnit'> | Diagnostic<'outlineLengthsNotPositive'> | Diagnostic<'muzzleVelocityNotPositive'> | Diagnostic<'stepSizeBelowMinimum', {
+    step: number;
+    min: number;
+}> | Diagnostic<'integrationBudgetExceeded', {
+    max: number;
+}> | Diagnostic<'integrationStepsExceeded', {
+    max: number;
+}> | Diagnostic<'stabilityInputsNotPositive'> | Diagnostic<'rangeInvalid', {
+    range: number;
+}> | Diagnostic<'zeroNotConverged', {
+    vertical: number;
+    horizontal: number;
+}> | Diagnostic<'zeroRangeNotReached', {
+    range: number;
+    stop: string;
+}> | Diagnostic<'momentSlopeNotPositive'> | Diagnostic<'momentSlopeNeedsLength'> | Diagnostic<'inertiaNotPositive'> | Diagnostic<'inertiaNeedsLength'> | Diagnostic<'modifiedPointMassNeedsLiftSlope'> | Diagnostic<'modifiedPointMassNeedsTwist'> | Diagnostic<'modifiedPointMassNeedsAerodynamics'> | Diagnostic<'coefficientTableMachNotRising', {
+    name: string;
+}> | Diagnostic<'coefficientTableNodeInvalid', {
+    name: string;
+}> | Diagnostic<'coefficientTableTooShort', {
+    name: string;
+}> | Diagnostic<'coefficientNotFinite', {
+    name: string;
+}> | Diagnostic<'modelUnknown', {
+    model: string;
+}> | Diagnostic<'zeroToleranceOrMaxYawNotPositive'> | Diagnostic<'gravityInvalid'> | Diagnostic<'stepBudgetInvalid'> | Diagnostic<'tolerancesInvalid'> | Diagnostic<'azimuthInvalid'> | Diagnostic<'latitudeInvalid'> | Diagnostic<'lookAngleOutsideRange'> | Diagnostic<'boreAnglesInvalid'> | Diagnostic<'zeroLookAngleOutsideRange'> | Diagnostic<'zeroRangeNotPositive'> | Diagnostic<'twistNotPositive'> | Diagnostic<'sightInvalid'> | Diagnostic<'lengthNotPositive'> | Diagnostic<'massNotPositive'> | Diagnostic<'dragInterpolationUnknown', {
+    interpolation: string;
+}> | Diagnostic<'dragCurveMachNotRising'> | Diagnostic<'dragCurveNodeInvalid'> | Diagnostic<'dragCurveTooShort'> | Diagnostic<'bcReferenceUnknown', {
+    reference: string;
+}> | Diagnostic<'bcBandsSameSpeed'> | Diagnostic<'bcBandInvalid'> | Diagnostic<'noBcBand'> | Diagnostic<'dragModelUnknown', {
+    model: string;
+}> | Diagnostic<'windSegmentsNotRising'> | Diagnostic<'windSegmentInvalid'> | Diagnostic<'airDensityOutsideRange', {
+    pressure: number;
+    temperature: number;
+    density: number;
+    max: number;
+}>;
 
 // @public
 export const fillLoadRatioLimit: (density: number, bulkDensity: number) => number;
