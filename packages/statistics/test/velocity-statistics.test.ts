@@ -62,12 +62,8 @@ describe('velocityStatistics', () => {
 
   it('names the field it rejects and accepts a level just inside (0, 1)', () => {
     for (const level of [0, 1, 1.5, -0.5])
-      expect(() => velocityStatistics([1, 2, 3], level)).toThrow(
-        'confidence level must lie in (0, 1)',
-      )
-    expect(() => velocityStatistics([1, Number.POSITIVE_INFINITY])).toThrow(
-      'velocities must be finite',
-    )
+      expect(() => velocityStatistics([1, 2, 3], level)).toThrow('confidenceLevelOutsideUnit')
+    expect(() => velocityStatistics([1, Number.POSITIVE_INFINITY])).toThrow('velocitiesNotFinite')
     expect(defined(velocityStatistics([1, 2, 3], 0.999)).standardDeviationInterval).toBeDefined()
   })
 })
@@ -130,12 +126,10 @@ describe('shotsNeeded', () => {
 
   it('names the field it rejects', () => {
     for (const level of [0, 1, 1.5, -0.5])
-      expect(() => shotsNeeded(0.2, level)).toThrow('confidence level must lie in (0, 1)')
-    expect(() => shotsNeeded(0.009)).toThrow('relative half-width must be at least 0.01')
+      expect(() => shotsNeeded(0.2, level)).toThrow('confidenceLevelOutsideUnit')
+    expect(() => shotsNeeded(0.009)).toThrow('relativeHalfWidthBelowMinimum')
     expect(shotsNeeded(0.01)).toBeGreaterThan(3)
     // 0.01 at this level needs more than the 100 000 shots the search covers
-    expect(() => shotsNeeded(0.01, 1 - 1e-9)).toThrow(
-      'relative half-width needs more shots than the search covers',
-    )
+    expect(() => shotsNeeded(0.01, 1 - 1e-9)).toThrow('relativeHalfWidthOutOfReach')
   })
 })

@@ -4,7 +4,7 @@
  * 26.7.4, `apps/docs/docs/models/groups.md`, "Student's t quantile") and bisection.
  */
 import { bisect } from './bisect.ts'
-import { need } from './errors.ts'
+import { need } from './issue.ts'
 
 /** P(|T| < t) for even `df` at theta = atan(t / sqrt(df)): sin(theta) times a series in cos^2 (A&S 26.7.3). */
 function evenMass(theta: number, df: number): number {
@@ -41,8 +41,8 @@ function centralMass(t: number, df: number): number {
 
 /** The `t`, not negative, at which the probability of |T| below `t` is `level`; level in (0, 1), `df` a positive whole number. */
 export function studentTwoSidedQuantile(level: number, df: number): number {
-  need(level > 0 && level < 1, 'level must lie in (0, 1)')
-  need(Number.isInteger(df) && df > 0, 'degrees of freedom must be a positive whole number')
+  need(level > 0 && level < 1, { code: 'levelOutsideUnit', params: {} })
+  need(Number.isInteger(df) && df > 0, { code: 'degreesOfFreedomNotPositiveWhole', params: {} })
   let hi = 2
   while (centralMass(hi, df) < level) hi *= 2
   return bisect((t) => centralMass(t, df) < level, [0, hi], 200, true)
