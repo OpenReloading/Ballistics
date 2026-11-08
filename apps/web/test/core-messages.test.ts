@@ -23,11 +23,11 @@ const german = translator(de as Catalogue, 'de')
 /** A catalogue of its own for the templates the matcher cases use: they check the matching, not de.json. */
 const own = translator(
   {
-    'range must be positive': 'Entfernung nicht positiv',
+    'range must be positive': 'Entfernung zu klein',
     'range {n}': 'Entfernung {n}',
     '{kind} range': 'Entfernung von {kind}',
     'prior {name}': 'Prior {name}',
-    'prior {name} must be positive': 'Prior {name} nicht positiv',
+    'prior {name} must be positive': 'Prior {name} zu klein',
     stuck: 'steckt',
     'interior: {reason}': 'Innen: {reason}',
     unreachable: 'unerreichbar',
@@ -40,7 +40,7 @@ const own = translator(
     'ladder charge {n} kg must be above 0': 'Ladung {n} kg zu klein',
     'bullet {id} has no length': 'Geschoss {id} ohne Länge',
     'Error {status}.': 'Fehler {status}.',
-    'Give a load or factory ammunition, not both.': 'Ladung oder Munition, nicht beides.',
+    'Give a load or factory ammunition, not both.': 'Eine Munition genügt.',
     '→ at {path}': '→ bei {path}',
   },
   'de',
@@ -105,7 +105,7 @@ describe('the message table', () => {
     const rule = 'Give a load or factory ammunition, not both.'
     expect(read.reason).toContain(`✖ ${rule}`)
     const shown = reasonText(read.reason, own)
-    expect(shown).toContain('✖ Ladung oder Munition, nicht beides.')
+    expect(shown).toContain('✖ Eine Munition genügt.')
     expect(shown).toContain('→ bei records[0].data')
   })
 
@@ -115,10 +115,10 @@ describe('the message table', () => {
   })
 
   it('prefers the most specific template', () => {
-    expect(translateMessage('range must be positive', own.t)).toBe('Entfernung nicht positiv')
+    expect(translateMessage('range must be positive', own.t)).toBe('Entfernung zu klein')
     expect(translateMessage('qx range', own.t)).toBe('Entfernung von qx')
     expect(translateMessage('range 12', own.t)).toBe('Entfernung 12')
-    expect(translateMessage('prior qx must be positive', own.t)).toBe('Prior qx nicht positiv')
+    expect(translateMessage('prior qx must be positive', own.t)).toBe('Prior qx zu klein')
   })
 
   it('fills the values: a code or a message inside a message, a label, a number, a status', () => {
