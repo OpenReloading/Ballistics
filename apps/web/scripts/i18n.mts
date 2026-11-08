@@ -92,12 +92,17 @@ export function extract(source: string, file = 'source'): string[] {
   return found
 }
 
-/** The messages of the table `src/lib/core-message-table.json`: its codes and the templates of every group. */
+/**
+ * The texts of the message table: the codes and templates of `src/lib/core-message-table.json`
+ * and the warning sentences that `src/lib/core-message-table.ts` marks.
+ */
 export function tableMessages(root: string): string[] {
   const { codes, templates } = JSON.parse(
     readFileSync(path.join(root, 'src/lib/core-message-table.json'), 'utf8'),
   ) as { codes: string[]; templates: Record<string, string[]> }
-  return [...codes, ...Object.values(templates).flat()]
+  const file = 'src/lib/core-message-table.ts'
+  const warnings = extract(readFileSync(path.join(root, file), 'utf8'), file)
+  return [...codes, ...Object.values(templates).flat(), ...warnings]
 }
 
 /** The distinct messages of every source under `src/` and of the message table, sorted. */
@@ -124,9 +129,10 @@ const placeholders = (s: string) =>
     .join()
 
 /**
- * What is wrong with `catalogue` of `language` against the English `source`: a message without a
- * text, a key no message matches, an empty text, placeholders other than its key's, a plural that is
- * no object of the language's categories, and a text of the message table (`table`) left English.
+ * What is wrong with `catalogue` of `language` against the English `source`: a text of the message
+ * table (`table`) without a translation or left English, a key no message matches, an empty text,
+ * placeholders other than its key's, and a plural that is no object of the language's categories.
+ * Other untranslated messages show in English; `missing` lists them.
  */
 export function problems(
   source: readonly string[],
@@ -136,7 +142,7 @@ export function problems(
 ): string[] {
   const { untranslated, stale } = compare(source, catalogue)
   const found = [
-    ...untranslated.map((s) => `untranslated: ${s}`),
+    ...untranslated.filter((s) => table.includes(s)).map((s) => `untranslated: ${s}`),
     ...stale.map((k) => `no message has this key: ${k}`),
   ]
   const categories: string[] = new Intl.PluralRules(language).resolvedOptions().pluralCategories
