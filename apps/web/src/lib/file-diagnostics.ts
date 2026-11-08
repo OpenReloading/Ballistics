@@ -90,9 +90,7 @@ const fileMessages: Record<FileDiagnostic['code'], Message> = {
     'not an XLS workbook: mini sector {sector} lies outside the mini stream',
   ),
   cfbNoRoot: msg('not an XLS workbook: the directory has no root entry'),
-  cfbEntryRepeated: msg(
-    'not an XLS workbook: directory entry {entry} is out of range or repeated',
-  ),
+  cfbEntryRepeated: msg('not an XLS workbook: directory entry {entry} is out of range or repeated'),
   cfbRootTooLarge: msg('not an XLS workbook: the root storage holds more than {max} entries'),
   xlsPhoneticNegative: msg('phonetic size is negative'),
   xlsStringMalformed: msg('string record is malformed'),

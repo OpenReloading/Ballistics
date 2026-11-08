@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { parseShotViewWorkbook, readWorkbook } from '../src/index.ts'
 import { maxCellCharacters, maxCells } from '../src/limits.ts'
 import { defined } from './defined.ts'
-import { rejection } from './refusal.ts'
 import { shotViewSheetEnglish, shotViewSheetGerman } from './fixtures.ts'
+import { rejection } from './refusal.ts'
 import {
   blank,
   bof,
@@ -243,21 +243,49 @@ describe('readWorkbook .xls refusals: compound files', () => {
   it('refuses malformed compound files', async () => {
     const short = new Uint8Array([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1, 0, 0])
     expect(await rejection(fail(short))).toEqual({ code: 'cfbTooShort', params: {} })
-    expect(await rejection(fail(patched((f) => f.writeUInt16LE(0xfeff, 0x1c))))).toEqual({ code: 'cfbByteOrder', params: {} })
-    expect(await rejection(fail(patched((f) => f.writeUInt16LE(12, 0x1e))))).toEqual({ code: 'cfbVersion', params: { version: 3, shift: 12 } })
-    expect(await rejection(fail(patched((f, l) => f.writeUInt32LE(start(l), l.fatEntry(start(l))))))).toMatchObject({ code: 'cfbChainLoops' })
-    expect(await rejection(fail(patched((f, l) => f.writeUInt32LE(0xfffffffe, l.fatEntry(start(l))))))).toEqual({ code: 'cfbChainEnds', params: {} })
-    expect(await rejection(fail(patched((f, l) => f.writeUInt32LE(100000, l.fatEntry(start(l))))))).toEqual({ code: 'cfbSectorOutside', params: { sector: 100000 } })
-    expect(await rejection(fail(patched((f, l) => f.writeUInt32LE(1, l.entry(1) + 0x48))))).toEqual({ code: 'cfbEntryRepeated', params: { entry: 1 } })
-    expect(await rejection(fail(patched((f, l) => f.writeUInt32LE(9437184, l.entry(1) + 0x78))))).toEqual({ code: 'cfbStreamTooLarge', params: { stream: 'Workbook', declared: 9437184, limit: 8388608 } })
+    expect(await rejection(fail(patched((f) => f.writeUInt16LE(0xfeff, 0x1c))))).toEqual({
+      code: 'cfbByteOrder',
+      params: {},
+    })
+    expect(await rejection(fail(patched((f) => f.writeUInt16LE(12, 0x1e))))).toEqual({
+      code: 'cfbVersion',
+      params: { version: 3, shift: 12 },
+    })
+    expect(
+      await rejection(fail(patched((f, l) => f.writeUInt32LE(start(l), l.fatEntry(start(l)))))),
+    ).toMatchObject({ code: 'cfbChainLoops' })
+    expect(
+      await rejection(fail(patched((f, l) => f.writeUInt32LE(0xfffffffe, l.fatEntry(start(l)))))),
+    ).toEqual({ code: 'cfbChainEnds', params: {} })
+    expect(
+      await rejection(fail(patched((f, l) => f.writeUInt32LE(100000, l.fatEntry(start(l)))))),
+    ).toEqual({ code: 'cfbSectorOutside', params: { sector: 100000 } })
+    expect(await rejection(fail(patched((f, l) => f.writeUInt32LE(1, l.entry(1) + 0x48))))).toEqual(
+      { code: 'cfbEntryRepeated', params: { entry: 1 } },
+    )
+    expect(
+      await rejection(fail(patched((f, l) => f.writeUInt32LE(9437184, l.entry(1) + 0x78)))),
+    ).toEqual({
+      code: 'cfbStreamTooLarge',
+      params: { stream: 'Workbook', declared: 9437184, limit: 8388608 },
+    })
   })
 })
 
 describe('readWorkbook .xls refusals: the mini stream, FAT and directory', () => {
   it('refuses a mini stream layout, FAT, directory or mini stream it cannot follow', async () => {
-    expect(await rejection(fail(patched((f) => f.writeUInt16LE(7, 0x20))))).toEqual({ code: 'cfbMiniLayout', params: {} })
-    expect(await rejection(fail(patched((f) => f.writeUInt32LE(8192, 0x38))))).toEqual({ code: 'cfbMiniLayout', params: {} })
-    expect(await rejection(fail(patched((f) => f.writeUInt32LE(100000, 0x2c))))).toEqual({ code: 'cfbFatListed', params: { listed: 0, count: 100000 } })
+    expect(await rejection(fail(patched((f) => f.writeUInt16LE(7, 0x20))))).toEqual({
+      code: 'cfbMiniLayout',
+      params: {},
+    })
+    expect(await rejection(fail(patched((f) => f.writeUInt32LE(8192, 0x38))))).toEqual({
+      code: 'cfbMiniLayout',
+      params: {},
+    })
+    expect(await rejection(fail(patched((f) => f.writeUInt32LE(100000, 0x2c))))).toEqual({
+      code: 'cfbFatListed',
+      params: { listed: 0, count: 100000 },
+    })
     // 237 FAT sectors need two DIFAT sectors; the first one names itself as the next
     const looped = xls(one, {
       fatSectors: 237,
@@ -268,18 +296,37 @@ describe('readWorkbook .xls refusals: the mini stream, FAT and directory', () =>
     })
     expect(await rejection(fail(looped))).toEqual({ code: 'cfbChainLoops', params: { sector: 0 } })
     const unlisted = xls(one, { fatSectors: 110, patch: (f) => f.writeUInt32LE(0xfffffffe, 0x44) })
-    expect(await rejection(fail(unlisted))).toEqual({ code: 'cfbFatListed', params: { listed: 109, count: 110 } })
+    expect(await rejection(fail(unlisted))).toEqual({
+      code: 'cfbFatListed',
+      params: { listed: 109, count: 110 },
+    })
     const beyondFat = compoundFile([{ name: 'Workbook', data: new Uint8Array(70000) }], {
       patch: (f) => f.writeUInt32LE(1, 0x2c),
     })
-    expect(await rejection(fail(new Uint8Array(beyondFat)))).toMatchObject({ code: 'cfbNoFatEntry' })
-    expect(await rejection(fail(
-        patched((f, l) => {
-          f[l.entry(0) + 0x42] = 1
-        }),
-      ))).toEqual({ code: 'cfbNoRoot', params: {} })
-    expect(await rejection(fail(miniPatched((f) => f.writeUInt32LE(0xffffffff, 0x3c))))).toEqual({ code: 'cfbNoMiniStream', params: {} })
-    expect(await rejection(fail(miniPatched((f, l) => f.writeUInt32LE(64, l.entry(0) + 0x78))))).toMatchObject({ code: 'cfbMiniSectorOutside' })
+    expect(await rejection(fail(new Uint8Array(beyondFat)))).toMatchObject({
+      code: 'cfbNoFatEntry',
+    })
+  })
+})
+
+describe('readWorkbook .xls refusals: the root entry and the mini stream', () => {
+  it('refuses a directory without root entry and a mini stream it cannot follow', async () => {
+    expect(
+      await rejection(
+        fail(
+          patched((f, l) => {
+            f[l.entry(0) + 0x42] = 1
+          }),
+        ),
+      ),
+    ).toEqual({ code: 'cfbNoRoot', params: {} })
+    expect(await rejection(fail(miniPatched((f) => f.writeUInt32LE(0xffffffff, 0x3c))))).toEqual({
+      code: 'cfbNoMiniStream',
+      params: {},
+    })
+    expect(
+      await rejection(fail(miniPatched((f, l) => f.writeUInt32LE(64, l.entry(0) + 0x78)))),
+    ).toMatchObject({ code: 'cfbMiniSectorOutside' })
   })
 })
 
@@ -292,14 +339,23 @@ describe('readWorkbook .xls refusals: storages and short sectors', () => {
     })
     expect(await rejection(fail(storage))).toEqual({ code: 'xlsNoWorkbookStream', params: {} })
     const empty = compoundFile([{ name: 'Workbook', data: new Uint8Array() }])
-    expect(await rejection(fail(new Uint8Array(empty)))).toEqual({ code: 'xlsNotBiff8', params: {} })
+    expect(await rejection(fail(new Uint8Array(empty)))).toEqual({
+      code: 'xlsNotBiff8',
+      params: {},
+    })
   })
 
   it('refuses a short last sector that cuts a stream or a directory entry', async () => {
     const file = xls(one)
-    expect(await rejection(fail(file.subarray(0, file.length - 511)))).toEqual({ code: 'cfbStreamPastEnd', params: { stream: 'Workbook' } })
+    expect(await rejection(fail(file.subarray(0, file.length - 511)))).toEqual({
+      code: 'cfbStreamPastEnd',
+      params: { stream: 'Workbook' },
+    })
     const mini = xls([{ name: 'S', rows }])
-    expect(await rejection(fail(mini.subarray(0, mini.length - 511)))).toEqual({ code: 'cfbStreamPastEnd', params: { stream: 'Workbook' } })
+    expect(await rejection(fail(mini.subarray(0, mini.length - 511)))).toEqual({
+      code: 'cfbStreamPastEnd',
+      params: { stream: 'Workbook' },
+    })
     let entry = 0
     let root = 0
     const cut = xls(one, {
@@ -308,59 +364,98 @@ describe('readWorkbook .xls refusals: storages and short sectors', () => {
         root = l.entry(0)
       },
     })
-    expect(await rejection(fail(cut.subarray(0, entry)))).toEqual({ code: 'cfbEndsBefore', params: { byte: entry + 128 } })
-    expect(await rejection(fail(cut.subarray(0, root + 0x40)))).toEqual({ code: 'cfbEndsBefore', params: { byte: root + 128 } })
+    expect(await rejection(fail(cut.subarray(0, entry)))).toEqual({
+      code: 'cfbEndsBefore',
+      params: { byte: entry + 128 },
+    })
+    expect(await rejection(fail(cut.subarray(0, root + 0x40)))).toEqual({
+      code: 'cfbEndsBefore',
+      params: { byte: root + 128 },
+    })
   })
 })
 
 describe('readWorkbook .xls refusals: missing streams, encryption and BIFF5', () => {
   it('refuses a file without a Workbook stream, an encrypted file and BIFF5', async () => {
     const data = workbookStream([{ name: 'S', rows }])
-    expect(await rejection(fail(compoundFile([{ name: 'Other', data }])))).toEqual({ code: 'xlsNoWorkbookStream', params: {} })
-    expect(await rejection(fail(compoundFile([{ name: 'EncryptedPackage', data }])))).toEqual({ code: 'xlsEncrypted', params: {} })
+    expect(await rejection(fail(compoundFile([{ name: 'Other', data }])))).toEqual({
+      code: 'xlsNoWorkbookStream',
+      params: {},
+    })
+    expect(await rejection(fail(compoundFile([{ name: 'EncryptedPackage', data }])))).toEqual({
+      code: 'xlsEncrypted',
+      params: {},
+    })
     const biff5 = workbookStream([{ name: 'S', rows }], { bofVersion: 0x0500 })
-    expect(await rejection(fail(compoundFile([{ name: 'Book', data: biff5 }])))).toEqual({ code: 'xlsNotBiff8', params: {} })
+    expect(await rejection(fail(compoundFile([{ name: 'Book', data: biff5 }])))).toEqual({
+      code: 'xlsNotBiff8',
+      params: {},
+    })
   })
 })
 
 describe('readWorkbook .xls refusals: BIFF8 records', () => {
   it('refuses malformed BIFF8 records', async () => {
-    expect(await rejection(fail(xls([{ name: 'S', rows }], { filePass: true })))).toEqual({ code: 'xlsEncrypted', params: {} })
+    expect(await rejection(fail(xls([{ name: 'S', rows }], { filePass: true })))).toEqual({
+      code: 'xlsEncrypted',
+      params: {},
+    })
     const cut = workbookStream([{ name: 'S', rows }])
-    expect(await rejection(fail(compoundFile([{ name: 'Workbook', data: cut.subarray(0, cut.length - 2) }])))).toMatchObject({ code: 'xlsRecordPastEnd' })
-    expect(await rejection(fail(xls([{ name: 'S', rows }], { noSheetEof: true })))).toEqual({ code: 'xlsWorksheetNoEof', params: { sheet: 1 } })
-    expect(await rejection(fail(xls([{ name: 'S', rows }], { positions: (p) => p.map((x) => x + 4) })))).toEqual({ code: 'xlsWorksheetNoBof', params: { sheet: 1 } })
-    expect(await rejection(fail(
-        xls(
-          [
-            { name: 'A', rows },
-            { name: 'B', rows },
-          ],
-          { positions: (p) => [defined(p[0]), defined(p[0])] },
+    expect(
+      await rejection(
+        fail(compoundFile([{ name: 'Workbook', data: cut.subarray(0, cut.length - 2) }])),
+      ),
+    ).toMatchObject({ code: 'xlsRecordPastEnd' })
+    expect(await rejection(fail(xls([{ name: 'S', rows }], { noSheetEof: true })))).toEqual({
+      code: 'xlsWorksheetNoEof',
+      params: { sheet: 1 },
+    })
+    expect(
+      await rejection(fail(xls([{ name: 'S', rows }], { positions: (p) => p.map((x) => x + 4) }))),
+    ).toEqual({ code: 'xlsWorksheetNoBof', params: { sheet: 1 } })
+    expect(
+      await rejection(
+        fail(
+          xls(
+            [
+              { name: 'A', rows },
+              { name: 'B', rows },
+            ],
+            { positions: (p) => [defined(p[0]), defined(p[0])] },
+          ),
         ),
-      ))).toEqual({ code: 'xlsWorksheetSameStart', params: { sheet: 2 } })
+      ),
+    ).toEqual({ code: 'xlsWorksheetSameStart', params: { sheet: 2 } })
     // worksheet B starts at the nested BOF inside A, so the padding is read twice
     const nested = [bof(0x0010), record(0, Buffer.alloc(1000)), record(EOF)]
-    expect(await rejection(fail(
-        xls([{ name: 'A', records: nested }, { name: 'B' }], {
-          positions: (p) => [defined(p[0]), defined(p[0]) + 20],
-        }),
-      ))).toEqual({ code: 'xlsSubstreamsOverlap', params: {} })
+    expect(
+      await rejection(
+        fail(
+          xls([{ name: 'A', records: nested }, { name: 'B' }], {
+            positions: (p) => [defined(p[0]), defined(p[0]) + 20],
+          }),
+        ),
+      ),
+    ).toEqual({ code: 'xlsSubstreamsOverlap', params: {} })
   })
 })
 
 describe('readWorkbook .xls refusals: nested worksheets and root entries', () => {
   it('refuses a worksheet that starts at a BOF nested in another worksheet', async () => {
     const chart = [record(0x005d, Buffer.alloc(4)), bof(0x0010), numberCell(0, 0, 1), record(EOF)]
-    expect(await rejection(fail(
-        xls(
-          [
-            { name: 'A', records: chart },
-            { name: 'B', rows: [['b', 'c', 'd', 'e']] },
-          ],
-          { positions: (p) => [defined(p[0]), defined(p[0]) + 28] },
+    expect(
+      await rejection(
+        fail(
+          xls(
+            [
+              { name: 'A', records: chart },
+              { name: 'B', rows: [['b', 'c', 'd', 'e']] },
+            ],
+            { positions: (p) => [defined(p[0]), defined(p[0]) + 28] },
+          ),
         ),
-      ))).toEqual({ code: 'xlsSubstreamsOverlap', params: {} })
+      ),
+    ).toEqual({ code: 'xlsSubstreamsOverlap', params: {} })
   })
 
   it('refuses a root storage with more than 65536 entries', async () => {
@@ -368,22 +463,45 @@ describe('readWorkbook .xls refusals: nested worksheets and root entries', () =>
       name: `s${k}`,
       data: new Uint8Array(),
     }))
-    expect(await rejection(fail(new Uint8Array(compoundFile(streams))))).toEqual({ code: 'cfbRootTooLarge', params: { max: 65536 } })
+    expect(await rejection(fail(new Uint8Array(compoundFile(streams))))).toEqual({
+      code: 'cfbRootTooLarge',
+      params: { max: 65536 },
+    })
   })
 })
 
 describe('readWorkbook .xls refusals: bad cells', () => {
   it('refuses bad cells as in XLSX', async () => {
-    expect(await rejection(readCells([labelSst(0, 0, 5)], ['a', 'b', 'c']))).toEqual({ code: 'sharedStringOutOfRange', params: { cell: 'A1', index: '5', count: 3, worksheet: 1 } })
-    expect(await rejection(readCells([numberCell(0, 256, 1)]))).toEqual({ code: 'cellBeyondColumnIV', params: { cell: 'IW1', worksheet: 1 } })
-    expect(await rejection(readCells([numberCell(0, 0, 1), numberCell(0, 0, 2)]))).toEqual({ code: 'cellOutOfOrder', params: { cell: 'A1', worksheet: 1 } })
-    expect(await rejection(readCells([numberCell(0, 0, Number.POSITIVE_INFINITY)]))).toEqual({ code: 'xlsNumberNotFinite', params: { cell: 'A1', worksheet: 1 } })
-    expect(await rejection(readCells([formula(0, 0, formulaOther(0)), numberCell(0, 1, 1)]))).toEqual({ code: 'xlsFormulaNoString', params: { cell: 'A1', worksheet: 1 } })
+    expect(await rejection(readCells([labelSst(0, 0, 5)], ['a', 'b', 'c']))).toEqual({
+      code: 'sharedStringOutOfRange',
+      params: { cell: 'A1', index: '5', count: 3, worksheet: 1 },
+    })
+    expect(await rejection(readCells([numberCell(0, 256, 1)]))).toEqual({
+      code: 'cellBeyondColumnIV',
+      params: { cell: 'IW1', worksheet: 1 },
+    })
+    expect(await rejection(readCells([numberCell(0, 0, 1), numberCell(0, 0, 2)]))).toEqual({
+      code: 'cellOutOfOrder',
+      params: { cell: 'A1', worksheet: 1 },
+    })
+    expect(await rejection(readCells([numberCell(0, 0, Number.POSITIVE_INFINITY)]))).toEqual({
+      code: 'xlsNumberNotFinite',
+      params: { cell: 'A1', worksheet: 1 },
+    })
+    expect(
+      await rejection(readCells([formula(0, 0, formulaOther(0)), numberCell(0, 1, 1)])),
+    ).toEqual({ code: 'xlsFormulaNoString', params: { cell: 'A1', worksheet: 1 } })
     const wrong = mulRk(0, 0, [rkInt(1), rkInt(2)])
     wrong.writeUInt16LE(5, wrong.length - 2)
     expect(await rejection(readCells([wrong]))).toMatchObject({ code: 'xlsCellsMismatch' })
-    expect(await rejection(readCells([mulRk(0, 0, [rkInt(1), 0x7ff00000])]))).toEqual({ code: 'xlsNumberNotFinite', params: { cell: 'B1', worksheet: 1 } })
-    expect(await rejection(readCells([boolErr(0, 0, 0x99, true)]))).toEqual({ code: 'xlsUnknownErrorCode', params: { cell: 'A1', code: 153, worksheet: 1 } })
+    expect(await rejection(readCells([mulRk(0, 0, [rkInt(1), 0x7ff00000])]))).toEqual({
+      code: 'xlsNumberNotFinite',
+      params: { cell: 'B1', worksheet: 1 },
+    })
+    expect(await rejection(readCells([boolErr(0, 0, 0x99, true)]))).toEqual({
+      code: 'xlsUnknownErrorCode',
+      params: { cell: 'A1', code: 153, worksheet: 1 },
+    })
   })
 })
 
@@ -394,17 +512,26 @@ describe('readWorkbook .xls refusals: shared strings and cell counts', () => {
     })
     // cstUnique follows the record header and cstTotal
     book.writeUInt32LE(3, book.indexOf(sst(['a', 'b'])) + 8)
-    expect(await rejection(fail(compoundFile([{ name: 'Workbook', data: book }])))).toEqual({ code: 'xlsSharedStringsEnd', params: { read: 2, unique: 3 } })
+    expect(await rejection(fail(compoundFile([{ name: 'Workbook', data: book }])))).toEqual({
+      code: 'xlsSharedStringsEnd',
+      params: { read: 2, unique: 3 },
+    })
   })
 
   it('counts cells and cell text over all worksheets', async () => {
     const wide = Array.from({ length: Math.ceil(maxCells / 256) }, (_, r) => numberCell(r, 255, 1))
-    expect(await rejection(fail(xls([{ name: 'S', records: wide }])))).toEqual({ code: 'tooManyCells', params: { max: maxCells, worksheet: 1 } })
+    expect(await rejection(fail(xls([{ name: 'S', records: wide }])))).toEqual({
+      code: 'tooManyCells',
+      params: { max: maxCells, worksheet: 1 },
+    })
     // a BIFF8 string holds at most 65535 characters (u16 count)
     const big = 'a'.repeat(65535)
     const refs = Array.from({ length: Math.floor(maxCellCharacters / big.length) + 1 }, (_, k) =>
       labelSst(Math.floor(k / 200), k % 200, 0),
     )
-    expect(await rejection(fail(xls([{ name: 'S', records: refs }], { strings: [big] })))).toEqual({ code: 'tooMuchCellText', params: { max: maxCellCharacters, worksheet: 1 } })
+    expect(await rejection(fail(xls([{ name: 'S', records: refs }], { strings: [big] })))).toEqual({
+      code: 'tooMuchCellText',
+      params: { max: maxCellCharacters, worksheet: 1 },
+    })
   })
 })

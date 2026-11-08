@@ -4,7 +4,7 @@
 // same rows of cell text as XLSX workbooks.
 import { type CellBudget, clean, placeCell, type Workbook, type Worksheet } from './cells.ts'
 import { compoundStreams } from './cfb.ts'
-import { type FileDiagnostic, locatedError, ReaderError, refuseFile } from './diagnostics.ts'
+import { locatedError, ReaderError, refuseFile } from './diagnostics.ts'
 import { maxCellCharacters, maxCells, maxPartSize } from './limits.ts'
 
 // record types (2.3)
@@ -27,7 +27,7 @@ const MULBLANK = 0x00be
 const cellRecords = new Set([LABELSST, LABEL, NUMBER, RK, MULRK, FORMULA, BOOLERR, BLANK, MULBLANK])
 
 /** Refusals that name their place in the Workbook stream, so a worksheet does not name it again. */
-const placed: readonly FileDiagnostic['code'][] = [
+const placed: readonly string[] = [
   'xlsRecordPastEnd',
   'xlsSubstreamsOverlap',
   'xlsRecordShort',
@@ -182,7 +182,8 @@ function readText(read: () => string): string {
   try {
     return read()
   } catch (e) {
-    if (e instanceof Short) throw new ReaderError({ code: 'xlsStringMalformed', params: {} }, { cause: e })
+    if (e instanceof Short)
+      throw new ReaderError({ code: 'xlsStringMalformed', params: {} }, { cause: e })
     throw e
   }
 }
@@ -383,7 +384,11 @@ function sharedCell(view: DataView, c: CellRecord, strings: string[]): string {
   const k = view.getUint32(c.o + 6, true)
   const text = strings[k]
   if (text === undefined) {
-    refuseFile('sharedStringOutOfRange', { cell: cellRef(c), index: String(k), count: strings.length })
+    refuseFile('sharedStringOutOfRange', {
+      cell: cellRef(c),
+      index: String(k),
+      count: strings.length,
+    })
   }
   return text
 }
