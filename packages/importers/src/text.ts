@@ -24,9 +24,6 @@ function utf16Order(bytes: Uint8Array): 'utf-16le' | 'utf-16be' | undefined {
   return undefined
 }
 
-/** The message of a caught error, or its text when something else was thrown. */
-export const errorMessage = (e: unknown): string => (e instanceof Error ? e.message : String(e))
-
 /** True for a character skipped before a cell: a space, or a tab unless tabs delimit. */
 const skippedBefore = (c: string | undefined, delimiter: string) =>
   c === ' ' || (c === '\t' && delimiter !== '\t')

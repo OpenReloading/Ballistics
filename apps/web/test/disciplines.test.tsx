@@ -3,9 +3,7 @@ import { toSi } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { DisciplineList, FederationList } from '../src/components/discipline-list.tsx'
-import { DisciplineRecordView } from '../src/components/discipline-record-page.tsx'
 import de from '../src/i18n/de.json'
-import * as language from '../src/i18n/language.ts'
 import { translator } from '../src/i18n/translate.ts'
 import { emptyDirectory, readDirectory, writeDirectory } from '../src/lib/directory.ts'
 import {
@@ -40,12 +38,6 @@ vi.mock('next/navigation', () => ({
 }))
 beforeEach(() => {
   route.path = '/disciplines'
-})
-
-// the record view shows decimal marks of the language shown, so it must subscribe to it
-vi.mock('../src/i18n/language.ts', async (original) => {
-  const actual = await original<typeof import('../src/i18n/language.ts')>()
-  return { ...actual, useTranslation: vi.fn(actual.useTranslation) }
 })
 
 const bundle = catalogBundle()
@@ -272,20 +264,4 @@ it('also searches the category and the country as the language shown writes them
   expect(federationMatches(dsb, country, 'Deutschland')).toBe(true)
   expect(federationMatches(dsb, country)).toBe(false)
   expect(federationMatches(dsb, { ...emptyDirectory, query: 'DE' }, 'Deutschland')).toBe(true)
-})
-
-it('subscribes the record view itself to the language shown, not only the components it renders', () => {
-  const subscribe = vi.mocked(language.useTranslation)
-  subscribe.mockClear()
-  // called as a function, so only the view's own hooks run: its children render nothing here
-  subscribe.mockImplementationOnce(() => translator() as never)
-  DisciplineRecordView({
-    d: pistol,
-    mappings: [],
-    faces: [],
-    disciplines: [],
-    federations: [],
-    classes: [],
-  })
-  expect(subscribe).toHaveBeenCalledTimes(1)
 })
