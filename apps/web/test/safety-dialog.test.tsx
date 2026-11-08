@@ -14,8 +14,8 @@ const buttons = (required: boolean) =>
           onClose={() => {}}
         />
       </MantineProvider>,
-    ).matchAll(/<span class="m_[^"]*">([^<]*)<\/span>/g),
-  ].map((m) => m[1])
+    ).matchAll(/<button[^>]*>([\s\S]*?)<\/button>/g),
+  ].map((m) => m[1]?.replace(/<[^>]+>/g, ''))
 
 it('a required notice offers Decline and I accept', () => {
   expect(buttons(true)).toEqual(['Decline', 'I accept'])
