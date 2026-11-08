@@ -160,7 +160,7 @@
     "rules": ["catalog-imports-schema-only"]
   },
   "packages/api/src/logic-catalog-schema.ts": {
-    "source": "import { waterDensity } from '@open-reloading/ballistics'\nimport { checkRecords } from '@open-reloading/catalog'\nimport { Load } from '@open-reloading/schema'\nimport Fastify from 'fastify'\nexport { waterDensity, checkRecords, Load, Fastify }",
+    "source": "import { waterDensity } from '@open-reloading/ballistics'\nimport { checkRecords } from '@open-reloading/catalog'\nimport { Load } from '@open-reloading/schema'\nimport { runTask } from '@open-reloading/use-cases'\nimport Fastify from 'fastify'\nexport { waterDensity, checkRecords, Load, runTask, Fastify }",
     "rules": []
   },
   "packages/api/src/importers.ts": {
@@ -184,7 +184,7 @@
     "rules": ["cli-imports-logic-catalog-drawing-schema-only"]
   },
   "packages/cli/src/api-entries.ts": {
-    "source": "import { runTask } from '@open-reloading/api/compute'\nimport { openCatalogue } from '@open-reloading/api/catalogue'\nexport { runTask, openCatalogue }",
+    "source": "import { operations } from '@open-reloading/api/compute'\nimport { openCatalogue } from '@open-reloading/api/catalogue'\nimport { runTask } from '@open-reloading/use-cases'\nexport { operations, openCatalogue, runTask }",
     "rules": []
   },
   "packages/cli/src/api-static.ts": {
@@ -200,7 +200,7 @@
     "rules": ["api-imports-logic-catalog-schema-only"]
   },
   "apps/web/src/lib/allowed.ts": {
-    "source": "import { checkSpec } from '@open-reloading/catalog/plausibility'\nimport { runTask } from '@open-reloading/api/compute'\nimport { openCatalogue } from '@open-reloading/api/catalogue'\nimport { waterDensity } from '@open-reloading/ballistics'\nimport { seating } from '@open-reloading/drawing/seating'\nexport { checkSpec, runTask, openCatalogue, waterDensity, seating }",
+    "source": "import { checkSpec } from '@open-reloading/catalog/plausibility'\nimport { runTask } from '@open-reloading/use-cases'\nimport { openCatalogue } from '@open-reloading/api/catalogue'\nimport { waterDensity } from '@open-reloading/ballistics'\nimport { seating } from '@open-reloading/drawing/seating'\nexport { checkSpec, runTask, openCatalogue, waterDensity, seating }",
     "rules": []
   },
   "apps/web/src/lib/alias.ts": {
@@ -382,5 +382,29 @@
   "packages/shot-groups/src/into-ballistics.ts": {
     "source": "import { trajectory } from '../../ballistics/src/index.ts'\nexport { trajectory }",
     "rules": ["shot-groups-imports-units-statistics-only"]
+  },
+  "packages/use-cases/src/logic.ts": {
+    "source": "import { trajectory } from '@open-reloading/ballistics'\nimport { bullet } from '@open-reloading/schema'\nimport type { Catalogue } from '@open-reloading/catalog'\nimport { z } from 'zod'\nexport type { Catalogue }\nexport { trajectory, bullet, z }",
+    "rules": []
+  },
+  "packages/use-cases/src/fastify.ts": {
+    "source": "import Fastify from 'fastify'\nexport { Fastify }",
+    "rules": ["use-cases-imports-logic-only"]
+  },
+  "packages/use-cases/src/api.ts": {
+    "source": "import { buildOpenApi } from '@open-reloading/api/openapi'\nexport { buildOpenApi }",
+    "rules": ["use-cases-imports-logic-only"]
+  },
+  "packages/use-cases/src/node-fs.ts": {
+    "source": "import { readFileSync } from 'node:fs'\nexport { readFileSync }",
+    "rules": ["use-cases-imports-logic-only"]
+  },
+  "packages/use-cases/src/dom.ts": {
+    "source": "export const h = () => window.innerHeight",
+    "rules": ["logic-no-dom"]
+  },
+  "packages/use-cases/src/into-api.ts": {
+    "source": "import { buildApp } from '../../api/src/app.ts'\nexport { buildApp }",
+    "rules": ["use-cases-imports-logic-only"]
   }
 }

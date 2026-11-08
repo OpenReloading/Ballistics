@@ -1,5 +1,5 @@
-/** Web Worker of the static site: runs one compute task of `@open-reloading/api/compute` per message. */
-import { runTask, serializeError, type Task } from '@open-reloading/api/compute'
+/** Web Worker of the static site: runs one compute task of `@open-reloading/use-cases` per message. */
+import { runTask, serializeError, type Task } from '@open-reloading/use-cases'
 
 self.onmessage = (e: MessageEvent<Task>) => {
   try {

@@ -1,6 +1,6 @@
+import { ComputeBusy, ComputeTimeout } from '@open-reloading/use-cases'
 import { describe, expect, it, vi } from 'vitest'
 import { createPool } from '../src/compute/pool.ts'
-import { ComputeBusy, ComputeTimeout } from '../src/compute/tasks.ts'
 
 /** Worker constructions (counted from 1) that throw like Node does when no thread can be created. */
 const fail = vi.hoisted(() => ({ on: new Set<number>(), count: 0 }))

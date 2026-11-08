@@ -1,8 +1,8 @@
 import { recordIdRegex } from '@open-reloading/schema'
+import type { ComputeRunner } from '@open-reloading/use-cases'
 import type { FastifyReply } from 'fastify'
 import { z } from 'zod'
 import type { Catalogue, Catalogued, CatalogueKind } from '../catalogue/types.ts'
-import type { ComputeRunner } from '../compute/tasks.ts'
 
 /** `pattern` of a query string value without a NUL character. */
 export const noNul = '^[^\\u0000]*$'

@@ -7,12 +7,12 @@ import {
 } from '@open-reloading/ballistics'
 import { type Powder, toSi } from '@open-reloading/schema'
 import { InputError } from '@open-reloading/statistics'
+import type { ComputeRunner, Results } from '@open-reloading/use-cases'
 import { notice, resolvedRecord, unprocessable } from './answer.ts'
 import type { ChargeBody } from './charge-schema.ts'
 import { bulkDensityBound, m3Options } from './interior-schema.ts'
 import { type CartridgeWithSpecs, type Limit, limitCheck } from './limits.ts'
 import { caps } from './schemas.ts'
-import type { ComputeRunner, Results } from './tasks.ts'
 import { responseUnits } from './units.ts'
 
 /** The compute runner and the record lookups of a charge-target request. Each lookup fails an unknown id with a 404 error. */

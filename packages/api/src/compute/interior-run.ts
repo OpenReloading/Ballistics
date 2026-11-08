@@ -8,11 +8,11 @@ import {
   type SampledBand,
   type SamplingOptions,
 } from '@open-reloading/ballistics'
+import { type ComputeRunner, ComputeTimeout, taskTimeoutMs } from '@open-reloading/use-cases'
 import { assertFinite, notice, unprocessable } from './answer.ts'
 import { type InteriorBody, m3Options, maxPoints, samplingDefaults } from './interior-schema.ts'
 import { type CartridgeWithSpecs, limitCheck, maximumCheck } from './limits.ts'
 import { caps } from './schemas.ts'
-import { type ComputeRunner, ComputeTimeout, taskTimeoutMs } from './tasks.ts'
 import { responseUnits } from './units.ts'
 
 /** Ladder steps submitted to the pool at once: within the queue of a one-worker pool (4 per worker). */

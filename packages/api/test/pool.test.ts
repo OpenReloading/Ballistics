@@ -1,8 +1,6 @@
-import { TruingError } from '@open-reloading/ballistics'
-import { InputError } from '@open-reloading/statistics'
+import { ComputeBusy, ComputeTimeout } from '@open-reloading/use-cases'
 import { describe, expect, it, vi } from 'vitest'
 import { createPool, type PoolOptions } from '../src/compute/pool.ts'
-import { ComputeBusy, ComputeTimeout, reviveError, serializeError } from '../src/compute/tasks.ts'
 
 /** The workers the pool created, last one last. */
 const workers = vi.hoisted(() => [] as import('node:worker_threads').Worker[])
@@ -77,44 +75,5 @@ describe('createPool', () => {
     expect((await running).message).toBe('compute pool closed')
     expect((await queued).message).toBe('compute pool closed')
     expect((await p.run({}).catch((e) => e)).message).toBe('compute pool closed')
-  })
-})
-
-describe('errors across the thread boundary', () => {
-  const roundTrip = (e: unknown) => reviveError(structuredClone(serializeError(e)))
-
-  it('rebuilds TruingError, InputError with its typed refusal, and Error', () => {
-    const truing = new TruingError('ill-conditioned', {
-      conditionNumber: Number.POSITIVE_INFINITY,
-      unresolved: [1],
-      direction: [0.6, 0.8],
-      detail: 'step limit',
-    })
-    const t = roundTrip(truing)
-    expect(t).toBeInstanceOf(TruingError)
-    expect(t).toMatchObject({
-      message: truing.message,
-      reason: 'ill-conditioned',
-      conditionNumber: Number.POSITIVE_INFINITY,
-      unresolved: [1],
-      direction: [0.6, 0.8],
-    })
-    const input = roundTrip(new InputError('step limit'))
-    expect(input).toBeInstanceOf(InputError)
-    expect(input).not.toBeInstanceOf(TruingError)
-    expect(input.message).toBe('step limit')
-    const typed = roundTrip(new InputError({ code: 'matrix-size', params: { entries: 8 } }))
-    expect(typed).toBeInstanceOf(InputError)
-    expect(typed).toMatchObject({
-      message: 'matrix-size',
-      issue: { code: 'matrix-size', params: { entries: 8 } },
-    })
-    const range = roundTrip(new RangeError('Invalid array length'))
-    expect(range).not.toBeInstanceOf(RangeError)
-    expect(range.message).toBe('Invalid array length')
-    // a thrown value that is not an Error arrives as an Error with its text
-    const thrown = roundTrip('plain text')
-    expect(thrown).toBeInstanceOf(Error)
-    expect(thrown.message).toBe('plain text')
   })
 })

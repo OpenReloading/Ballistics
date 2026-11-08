@@ -8,6 +8,7 @@ const allowed = [
   '@open-reloading/ballistics',
   '@open-reloading/schema',
   '@open-reloading/statistics',
+  '@open-reloading/use-cases',
   'zod',
 ]
 
@@ -35,7 +36,7 @@ function imports(entry: string) {
 }
 
 describe('compute entry', () => {
-  it('imports only ballistics, schema, statistics and zod, also through the modules it imports', () => {
+  it('imports only ballistics, schema, statistics, use-cases and zod, also through the modules it imports', () => {
     const { files, found } = imports('compute/browser.ts')
     expect(files.size).toBeGreaterThan(5)
     expect(found.filter((f) => !allowed.includes(defined(f.split(': ')[1])))).toEqual([])

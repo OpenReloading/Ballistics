@@ -22,6 +22,7 @@
     "@open-reloading/statistics": "workspace:*",
     "@open-reloading/tools": "workspace:*",
     "@open-reloading/units": "workspace:*",
+    "@open-reloading/use-cases": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {

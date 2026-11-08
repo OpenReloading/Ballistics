@@ -12,7 +12,7 @@ import {
   reviveError,
   type SerializedError,
   taskTimeoutMs,
-} from './tasks.ts'
+} from '@open-reloading/use-cases'
 
 /** Settings of `createPool`. */
 export interface PoolOptions {

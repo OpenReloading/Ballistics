@@ -1,4 +1,5 @@
 import { interior } from '@open-reloading/ballistics'
+import { inlineRunner } from '@open-reloading/use-cases'
 import { describe, expect, it } from 'vitest'
 import type { z } from 'zod'
 import {
@@ -6,7 +7,6 @@ import {
   interiorResponse,
   loadFileResponse,
 } from '../src/compute/interior-response.ts'
-import { inlineRunner } from '../src/compute/tasks.ts'
 import { API_PREFIX } from '../src/version.ts'
 import { file, m3Load, siValues } from './fixtures.ts'
 import { checkBody, withApi } from './setup.ts'
