@@ -432,6 +432,9 @@ export interface RangeStringsUnits extends TruingUnits {
 export const recordId: z.ZodString;
 
 // @public
+export function replyTo(task: Task): TaskReply;
+
+// @public
 export interface ResolvedRecord {
     // (undocumented)
     id: string;
@@ -569,6 +572,15 @@ export type Task = {
     load: InteriorLoad;
     target: ChargeTarget;
     options: ChargeSolverOptions;
+};
+
+// @public
+export type TaskReply = {
+    succeeded: true;
+    value: unknown;
+} | {
+    succeeded: false;
+    error: SerializedError;
 };
 
 // @public

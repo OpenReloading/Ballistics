@@ -4,9 +4,8 @@
 // same rows of cell text as XLSX workbooks.
 import { type CellBudget, clean, placeCell, type Workbook, type Worksheet } from './cells.ts'
 import { compoundStreams } from './cfb.ts'
-import { locatedError, ReaderError } from './diagnostics.ts'
+import { locatedError, ReaderError, refuseFile } from './diagnostics.ts'
 import { maxCellCharacters, maxCells, maxPartSize } from './limits.ts'
-import { errorMessage } from './text.ts'
 
 // record types (2.3)
 const BOF = 0x0809
@@ -27,9 +26,14 @@ const BLANK = 0x0201
 const MULBLANK = 0x00be
 const cellRecords = new Set([LABELSST, LABEL, NUMBER, RK, MULRK, FORMULA, BOOLERR, BLANK, MULBLANK])
 
-const encrypted = 'encrypted workbooks are not read; save the workbook without a password'
-const biff8Only =
-  'only BIFF8 .xls workbooks (Excel 97 to 2003) are read; save the workbook as .xlsx or export CSV'
+/** Refusals that name their place in the Workbook stream, so a worksheet does not name it again. */
+const placed: readonly string[] = [
+  'xlsRecordPastEnd',
+  'xlsSubstreamsOverlap',
+  'xlsRecordShort',
+  'xlsCellsMismatch',
+  'xlsWorksheetNoEof',
+]
 
 // BErr (2.5.198.2): the text an XLSX error cell holds
 const errors = new Map([
@@ -145,7 +149,7 @@ class Cursor {
     const flags = this.u8()
     const runs = flags & 8 ? this.u16() : 0
     const phonetic = flags & 4 ? this.u32() : 0
-    if (phonetic > 0x7fffffff) throw new Error('phonetic size is negative')
+    if (phonetic > 0x7fffffff) refuseFile('xlsPhoneticNegative')
     const text = this.characters(count, (flags & 1) === 1)
     this.skip(4 * runs + phonetic)
     return text
@@ -178,7 +182,8 @@ function readText(read: () => string): string {
   try {
     return read()
   } catch (e) {
-    if (e instanceof Short) throw new Error('string record is malformed', { cause: e })
+    if (e instanceof Short)
+      throw new ReaderError({ code: 'xlsStringMalformed', params: {} }, { cause: e })
     throw e
   }
 }
@@ -201,25 +206,19 @@ function recordReader(s: Uint8Array): RecordReader {
   // bytes read over all substreams; more than the stream means substreams overlap
   let scanned = 0
   const record = (at: number): Rec => {
-    if (at + 4 > s.length) {
-      throw new Error(`XLS record at byte ${at} runs past the end of the Workbook stream`)
-    }
+    if (at + 4 > s.length) refuseFile('xlsRecordPastEnd', { at })
     const type = view.getUint16(at, true)
     const end = at + 4 + view.getUint16(at + 2, true)
-    if (end > s.length) {
-      throw new Error(`XLS record at byte ${at} runs past the end of the Workbook stream`)
-    }
+    if (end > s.length) refuseFile('xlsRecordPastEnd', { at })
     // Continue records are checked and stepped over here; only string readers enter them
     let next = end
     while (next + 4 <= s.length && view.getUint16(next, true) === CONTINUE) {
       const e = next + 4 + view.getUint16(next + 2, true)
-      if (e > s.length) {
-        throw new Error(`XLS record at byte ${next} runs past the end of the Workbook stream`)
-      }
+      if (e > s.length) refuseFile('xlsRecordPastEnd', { at: next })
       next = e
     }
     scanned += next - at
-    if (scanned > s.length) throw new Error('XLS sheet substreams overlap')
+    if (scanned > s.length) refuseFile('xlsSubstreamsOverlap')
     return { type, at, end, next }
   }
   const isBof = (r: Rec, dt: number) =>
@@ -236,7 +235,7 @@ function whenShort<T>(r: Rec, read: () => T): T {
     return read()
   } catch (e) {
     if (!(e instanceof Short)) throw e
-    throw new Error(`XLS record at byte ${r.at} is too short`, { cause: e })
+    throw new ReaderError({ code: 'xlsRecordShort', params: { at: r.at } }, { cause: e })
   }
 }
 
@@ -260,16 +259,16 @@ function readWorkbookSubstream(reader: RecordReader): {
 } {
   const { s, record, isBof } = reader
   const head = s.length < 4 ? undefined : record(0)
-  if (!head || !isBof(head, 0x0005)) throw new Error(biff8Only)
+  if (!head || !isBof(head, 0x0005)) refuseFile('xlsNotBiff8')
   const bound: { position: number; type: number; name: string }[] = []
   let strings: string[] = []
   let p = head.next
   for (;;) {
-    if (p >= s.length) throw new Error('XLS workbook substream has no EOF record')
+    if (p >= s.length) refuseFile('xlsNoWorkbookEof')
     const r = record(p)
     p = r.next
     if (r.type === EOF) break
-    if (r.type === FILEPASS) throw new Error(encrypted)
+    if (r.type === FILEPASS) refuseFile('xlsEncrypted')
     if (r.type === BOUNDSHEET8) {
       bound.push(whenShort(r, () => boundSheet(new Cursor(s, r.at + 4, r.end))))
     } else if (r.type === SST) {
@@ -304,7 +303,7 @@ function put(st: SheetState, row: number, col: number, text: string): void {
 function checkNoPending(st: SheetState): void {
   if (!st.pending) return
   const ref = `${letters(st.pending.col + 1)}${st.pending.row + 1}`
-  throw new Error(`formula cell ${ref} has no String record`)
+  refuseFile('xlsFormulaNoString', { cell: ref })
 }
 
 /** How a record changes the nesting of substreams: a BOF opens one, an EOF closes one. */
@@ -327,25 +326,24 @@ interface CellRecord {
 const cellRef = (c: CellRecord, col = c.col) => `${letters(col + 1)}${c.row + 1}`
 
 function need(c: CellRecord, size: number): void {
-  if (c.d.length < size) throw new Error(`XLS record at byte ${c.r.at} is too short`)
+  if (c.d.length < size) refuseFile('xlsRecordShort', { at: c.r.at })
 }
 
 /** Byte `k` of the record's data; a record shorter than the fields it must hold is refused. */
 function dataByte(c: CellRecord, k: number): number {
   const b = c.d[k]
-  if (b === undefined) throw new Error(`XLS record at byte ${c.r.at} is too short`)
+  if (b === undefined) refuseFile('xlsRecordShort', { at: c.r.at })
   return b
 }
 
 function numberText(c: CellRecord, x: number, col = c.col): string {
-  if (!Number.isFinite(x))
-    throw new Error(`cell ${cellRef(c, col)} holds a number that is not finite`)
+  if (!Number.isFinite(x)) refuseFile('xlsNumberNotFinite', { cell: cellRef(c, col) })
   return String(x)
 }
 
 function errorText(c: CellRecord, code: number): string {
   const t = errors.get(code)
-  if (t === undefined) throw new Error(`cell ${cellRef(c)} holds an unknown error code ${code}`)
+  if (t === undefined) refuseFile('xlsUnknownErrorCode', { cell: cellRef(c), code })
   return t
 }
 
@@ -355,9 +353,8 @@ function putCellRun(reader: RecordReader, c: CellRecord, st: SheetState): void {
   const item = c.r.type === MULRK ? 6 : 2
   const last = view.getUint16(c.o + c.d.length - 2, true)
   const size = c.d.length - 6
-  if (last < c.col || size % item !== 0 || last - c.col + 1 !== size / item) {
-    throw new Error(`XLS record at byte ${c.r.at} does not hold the cells it names`)
-  }
+  if (last < c.col || size % item !== 0 || last - c.col + 1 !== size / item)
+    refuseFile('xlsCellsMismatch', { at: c.r.at })
   for (let k = 0; k <= last - c.col; k++) {
     const t =
       item === 6 ? numberText(c, rk(view.getUint32(c.o + 4 + 6 * k + 2, true)), c.col + k) : ''
@@ -378,7 +375,7 @@ function putFormula(reader: RecordReader, c: CellRecord, st: SheetState): void {
   else if (type === 1) put(st, c.row, c.col, dataByte(c, 8) ? '1' : '')
   else if (type === 2) put(st, c.row, c.col, errorText(c, dataByte(c, 8)))
   else if (type === 3) put(st, c.row, c.col, '')
-  else throw new Error(`formula cell ${cellRef(c)} holds an unknown value type ${type}`)
+  else refuseFile('xlsUnknownValueType', { cell: cellRef(c), type })
 }
 
 /** LabelSst (2.4.149): the shared string the cell refers to. */
@@ -387,7 +384,11 @@ function sharedCell(view: DataView, c: CellRecord, strings: string[]): string {
   const k = view.getUint32(c.o + 6, true)
   const text = strings[k]
   if (text === undefined) {
-    throw new Error(`cell ${cellRef(c)} refers to shared string ${k} of ${strings.length}`)
+    refuseFile('sharedStringOutOfRange', {
+      cell: cellRef(c),
+      index: k,
+      count: strings.length,
+    })
   }
   return text
 }
@@ -445,7 +446,7 @@ function readWorksheetCells(
   let depth = 1
   let end = 0
   for (let at = from; ; ) {
-    if (at >= s.length) throw new Error(`XLS worksheet ${n} has no EOF record`)
+    if (at >= s.length) refuseFile('xlsWorksheetNoEof', { sheet: n })
     const r = record(at)
     at = r.next
     depth += depthChange(r.type)
@@ -492,23 +493,16 @@ function assembleWorksheets(
   for (const sheet of bound.filter((b) => b.type === 0)) {
     const n = worksheets.length + 1
     const first = sheet.position + 4 <= s.length ? record(sheet.position) : undefined
-    if (!first || !isBof(first, 0x0010)) {
-      throw new Error(`XLS worksheet ${n} does not start with a worksheet BOF record`)
-    }
-    if (starts.has(sheet.position)) {
-      throw new Error(`XLS worksheet ${n} starts where an earlier worksheet starts`)
-    }
+    if (!first || !isBof(first, 0x0010)) refuseFile('xlsWorksheetNoBof', { sheet: n })
+    if (starts.has(sheet.position)) refuseFile('xlsWorksheetSameStart', { sheet: n })
     starts.add(sheet.position)
     try {
       const { rows, end } = readWorksheetCells(reader, { from: first.next, n }, strings, remaining)
       worksheets.push({ name: sheet.name, rows })
       ranges.push([sheet.position, end])
     } catch (e) {
-      if (e instanceof ReaderError) throw locatedError(e, { worksheet: n })
-      const message = errorMessage(e)
-      throw new Error(message.startsWith('XLS ') ? message : `XLS worksheet ${n}: ${message}`, {
-        cause: e,
-      })
+      const own = e instanceof ReaderError && placed.includes(e.diagnostic.code)
+      throw own ? e : locatedError(e, { worksheet: n })
     }
   }
   ranges.sort((a, b) => a[0] - b[0])
@@ -518,7 +512,7 @@ function assembleWorksheets(
       return before !== undefined && start < before[1]
     })
   ) {
-    throw new Error('XLS sheet substreams overlap')
+    refuseFile('xlsSubstreamsOverlap')
   }
   return worksheets
 }
@@ -528,8 +522,8 @@ export function readXls(bytes: Uint8Array): Workbook {
   const streams = compoundStreams(bytes, ['WORKBOOK', 'BOOK', 'ENCRYPTEDPACKAGE'])
   const read = streams.get('WORKBOOK') ?? streams.get('BOOK')
   if (!read) {
-    if (streams.has('ENCRYPTEDPACKAGE')) throw new Error(encrypted)
-    throw new Error('not an XLS workbook: no Workbook stream')
+    if (streams.has('ENCRYPTEDPACKAGE')) refuseFile('xlsEncrypted')
+    refuseFile('xlsNoWorkbookStream')
   }
   const reader = recordReader(read(maxPartSize))
   const { bound, strings, end } = readWorkbookSubstream(reader)
@@ -546,14 +540,12 @@ function sharedStrings(c: Cursor): string[] {
       strings.push(clean(c.richString()))
     } catch (e) {
       if (e instanceof Short) {
-        throw new Error(
-          `XLS shared string table ends after ${strings.length} of ${unique} strings`,
+        throw new ReaderError(
+          { code: 'xlsSharedStringsEnd', params: { read: strings.length, unique } },
           { cause: e },
         )
       }
-      throw new Error(`XLS shared string ${strings.length} is malformed: ${errorMessage(e)}`, {
-        cause: e,
-      })
+      throw locatedError(e, { sharedString: strings.length })
     }
   }
   return strings
