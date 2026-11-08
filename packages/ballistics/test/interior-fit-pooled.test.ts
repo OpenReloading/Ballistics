@@ -316,7 +316,9 @@ describe('fitPowderPooled refusals', () => {
       { value: Number.NaN, sigma: 0.05 },
     ])
       expect(() => fitPowderPooled(data, { priors: { B: { burnRate: prior } } })).toThrow(
-        'prior burnRate of B: value and sigma above 0',
+        expect.objectContaining({
+          issue: { code: 'groupPriorNotPositive', params: { kind: 'burnRate', group: 'B' } },
+        }),
       )
     expect(() =>
       fitPowderPooled(data, { priors: { D: { burnRate: { value: 0.5, sigma: 0.05 } } } }),
@@ -339,7 +341,9 @@ describe('fitPowderPooled refusals of runs, priors and points', () => {
     { value: 0.4, sigma: Number.POSITIVE_INFINITY },
   ])('refuses a burn coefficient prior of $value with sigma $sigma', (prior) => {
     expect(() => fitPowderPooled(data, { priors: { A: { burnRate: prior } } })).toThrow(
-      'prior burnRate of A: value and sigma above 0',
+      expect.objectContaining({
+        issue: { code: 'groupPriorNotPositive', params: { kind: 'burnRate', group: 'A' } },
+      }),
     )
   })
 
@@ -363,7 +367,7 @@ describe('fitPowderPooled refusals of runs, priors and points', () => {
           ladder: [{ ...point, peakPressure: 3e8, pressureSigma: 1e7, pressureBasis: 'piezo' }],
         },
       ]),
-    ).toThrow('velocities only')
+    ).toThrow('pooledFitVelocitiesOnly')
     const { velocitySigma: _, ...bare } = point
     expect(() => fitPowderPooled([{ ...s, ladder: [bare] }])).toThrow('velocitySigma')
   })

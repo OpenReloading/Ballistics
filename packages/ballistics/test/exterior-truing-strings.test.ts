@@ -371,9 +371,11 @@ describe('weakly identified parameters and more data', () => {
 
 describe('groups of entries', () => {
   it('rejects an impact and a dial entry of one group', () => {
-    expect(() => planWithChronograph([impactAt300, dialAt300])).toThrow(/share their shots/)
+    expect(() => planWithChronograph([impactAt300, dialAt300])).toThrow(
+      expect.objectContaining({ issue: { code: 'rangeGroupSharesShots', params: { range: 300 } } }),
+    )
     const s = strings(normals(1), { impacts: [300, 600], dials: [300] })
-    expect(() => fitTruingStrings(s)).toThrow(/share their shots/)
+    expect(() => fitTruingStrings(s)).toThrow('rangeGroupSharesShots')
     expect(() => fitTruingStrings(s)).toThrow(InputError)
   })
 
@@ -549,7 +551,12 @@ describe('errors in the input', () => {
         entries: [{ ...firstEntry, range: 5000 }],
         chronograph: undefined,
       }),
-    ).toThrow(/unreachable \(range 5000 m not reached\)/)
+    ).toThrow(
+      expect.objectContaining({
+        reason: 'unreachable',
+        detail: { code: 'rangeNotReached', params: { range: 5000 } },
+      }),
+    )
   })
 })
 
@@ -580,7 +587,11 @@ describe('errors in the options and plans', () => {
         },
         {},
       ),
-    ).toThrow(/velocity rounding/)
+    ).toThrow(
+      expect.objectContaining({
+        issue: { code: 'entryRoundingNegative', params: { kind: 'velocity' } },
+      }),
+    )
     expect(() =>
       planTruingStrings({
         shot: nominal,

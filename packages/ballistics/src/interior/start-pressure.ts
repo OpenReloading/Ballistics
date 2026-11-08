@@ -2,7 +2,7 @@
  * Default shot-start pressure of M3 (`apps/docs/docs/models/interior-m3.md`, "Shot start") when the load gives
  * none. Approximate: effective values of the load-table fit, not measurements of a bullet.
  */
-import { need } from '@open-reloading/statistics'
+import { need } from '../issue.ts'
 
 /** A default shot-start pressure with its interval and source. */
 export interface StartPressureDefault {
@@ -72,11 +72,11 @@ export function defaultStartPressure(
   barrel: number,
   construction?: BulletConstruction,
 ): StartPressureDefault {
-  need(Number.isFinite(barrel) && barrel > 0, `barrel ${barrel} m must be a positive number`)
-  need(
-    construction === undefined || Object.hasOwn(handguns, construction),
-    `unknown bullet construction ${construction}`,
-  )
+  need(Number.isFinite(barrel) && barrel > 0, { code: 'barrelNotPositive', params: { barrel } })
+  need(construction === undefined || Object.hasOwn(handguns, construction), {
+    code: 'bulletConstructionUnknown',
+    params: { construction: String(construction) },
+  })
   if (barrel < handgunBarrelLengthLimit) return handguns[construction ?? 'jacketed']
   return (construction && rifles[construction]) || rifle
 }

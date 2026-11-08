@@ -13,7 +13,7 @@ import {
   targetNumber,
   targetUnit,
 } from '../lib/charge-target.ts'
-import { translateMessage } from '../lib/core-messages.ts'
+import { refusalText as thrownText, translateMessage } from '../lib/core-messages.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import {
   type ColumnSort,
@@ -250,7 +250,7 @@ function PowderRow({
           {t('Not computed: {reason}', {
             reason: r.refusal
               ? refusalText(r.refusal, 'peakPressure', system, percent, t)
-              : reasonText(r.reason ?? '', t),
+              : reasonText(r, t),
           })}
         </td>
       )}
@@ -490,7 +490,7 @@ function messageText(message: CompareMessage, t: Translator['t']) {
       done: message.done,
       total: message.total,
     })
-  return translateMessage(message.text, t)
+  return translateMessage(thrownText(message.error), t)
 }
 
 /** Whether the row's charge is not the typed one (to a part in a billion). */
@@ -669,7 +669,7 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
           study.mode?.kind === 'target' && study.mode.percent,
           t,
         )
-      : reasonText(r.reason ?? '', t)
+      : reasonText(r, t)
   const csv = () => powderTableCsv(shown, target, system, t, reason)
   const { progress, running, message } = study
   const failed = study.rows.filter((r) => !r.values).length

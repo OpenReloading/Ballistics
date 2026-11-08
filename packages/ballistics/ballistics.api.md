@@ -61,7 +61,7 @@ export interface BallisticCoefficientBand {
 }
 
 // @public
-export type BallisticsIssue = ExteriorIssue;
+export type BallisticsIssue = ExteriorIssue | InteriorIssue | LoadFileIssue;
 
 // @public
 export interface BoreAngles {
@@ -368,7 +368,21 @@ export type ExteriorIssue = Diagnostic<'pressureInvalid', {
 }> | Diagnostic<'timeOfFlightNegative'> | Diagnostic<'rangeNotPositive'> | Diagnostic<'targetHeadingNotNumber'> | Diagnostic<'targetSpeedNegative'> | Diagnostic<'muzzleVelocityNotConverged'> | Diagnostic<'measuredSpeedTooLow'> | Diagnostic<'distanceNotReached', {
     distance: number;
     stop: string;
-}> | Diagnostic<'velocityNotPositive'> | Diagnostic<'distanceNegative'> | Diagnostic<'outlineOutsideMethod'> | Diagnostic<'machNotPositive'> | Diagnostic<'diameterNotPositive'> | Diagnostic<'noseAndBoatTailExceedLength'> | Diagnostic<'bandDiameterBelowDiameter'> | Diagnostic<'meplatDiameterOutsideRange'> | Diagnostic<'baseDiameterNotPositive'> | Diagnostic<'boatTailLengthNegative'> | Diagnostic<'headShapeOutsideUnit'> | Diagnostic<'outlineLengthsNotPositive'> | Diagnostic<'muzzleVelocityNotPositive'> | Diagnostic<'stepSizeBelowMinimum', {
+}> | Diagnostic<'velocityNotPositive'> | Diagnostic<'distanceNegative'> | Diagnostic<'outlineOutsideMethod'> | Diagnostic<'machNotPositive'> | Diagnostic<'diameterNotPositive'> | Diagnostic<'noseAndBoatTailExceedLength'> | Diagnostic<'bandDiameterBelowDiameter'> | Diagnostic<'meplatDiameterOutsideRange'> | Diagnostic<'baseDiameterNotPositive'> | Diagnostic<'boatTailLengthNegative'> | Diagnostic<'headShapeOutsideUnit'> | Diagnostic<'outlineLengthsNotPositive'> | Diagnostic<'noCandidate'> | Diagnostic<'dispersionNotPositive'> | Diagnostic<'entryValueInvalid'> | Diagnostic<'entryKindUnknown', {
+    kind: string;
+}> | Diagnostic<'noEntryOrChronograph'> | Diagnostic<'chronographMeanInvalid'> | Diagnostic<'entryRoundingNegative', {
+    kind: string;
+}> | Diagnostic<'entryStandardDeviationNotPositive', {
+    kind: string;
+}> | Diagnostic<'entryShotCountInvalid', {
+    kind: string;
+}> | Diagnostic<'entryRangeInvalid', {
+    kind: string;
+}> | Diagnostic<'maxRelativeStandardUncertaintyNotPositive'> | Diagnostic<'maxInflationNotAboveOne'> | Diagnostic<'residualConfidenceLevelOutsideUnit'> | Diagnostic<'confidenceLevelOptionOutsideUnit'> | Diagnostic<'zeroOffsetPriorWithoutFit'> | Diagnostic<'priorNotPositive', {
+    name: string;
+}> | Diagnostic<'priorUnknown', {
+    name: string;
+}> | Diagnostic<'clickValueNotPositive'> | Diagnostic<'maxZeroSigmaNotPositive'> | Diagnostic<'muzzleVelocityNotPositive'> | Diagnostic<'stepSizeBelowMinimum', {
     step: number;
     min: number;
 }> | Diagnostic<'integrationBudgetExceeded', {
@@ -399,11 +413,23 @@ export type ExteriorIssue = Diagnostic<'pressureInvalid', {
     reference: string;
 }> | Diagnostic<'bcBandsSameSpeed'> | Diagnostic<'bcBandInvalid'> | Diagnostic<'noBcBand'> | Diagnostic<'dragModelUnknown', {
     model: string;
-}> | Diagnostic<'windSegmentsNotRising'> | Diagnostic<'windSegmentInvalid'> | Diagnostic<'airDensityOutsideRange', {
+}> | Diagnostic<'windSegmentsNotRising'> | Diagnostic<'windSegmentInvalid'> | Diagnostic<'sessionWithoutObservation'> | Diagnostic<'noSession'> | Diagnostic<'knotsNeedSingleBandOrCurve'> | Diagnostic<'knotsNotRising'> | Diagnostic<'knotMachNotPositive'> | Diagnostic<'knotsTooFew'> | Diagnostic<'mixedObservationsNeedUncertainty'> | Diagnostic<'standardUncertaintyPartial'> | Diagnostic<'standardUncertaintyNotPositive'> | Diagnostic<'observationRangeInvalid', {
+    range: number;
+}> | Diagnostic<'observationValueInvalid'> | Diagnostic<'observationKindUnknown', {
+    kind: string;
+}> | Diagnostic<'noObservation'> | Diagnostic<'maxTotalStepsNotPositive'> | Diagnostic<'airDensityOutsideRange', {
     pressure: number;
     temperature: number;
     density: number;
     max: number;
+}> | Diagnostic<'groupSharesShots', {
+    group: string;
+}> | Diagnostic<'rangeGroupSharesShots', {
+    range: number;
+}>
+/** A trajectory of a truing fit that ends before a range of the rows. */
+| Diagnostic<'rangeNotReached', {
+    range: number;
 }>;
 
 // @public
@@ -568,6 +594,34 @@ export type InteriorInvalid = {
 };
 
 // @public
+export type InteriorIssue = Diagnostic<'gasVelocityFactorNegative'> | Diagnostic<'muzzleVelocityNegative'> | Diagnostic<'chargeMassNegative'> | Diagnostic<'projectileMassNotPositive'> | Diagnostic<'firearmMassNotPositive'> | Diagnostic<'loadRatioTargetNeedsBulkDensity'> | Diagnostic<'bulkDensityNotPositive'> | Diagnostic<'targetValueNotPositive'> | Diagnostic<'modelLeavesBarrelBeforeWindowEnd'> | Diagnostic<'traceWindowTooShort'> | Diagnostic<'traceNoPositivePressure'> | Diagnostic<'sigmaPartial'> | Diagnostic<'chargeNotPositive'> | Diagnostic<'noTrace'> | Diagnostic<'curveFitNeedsTwoStageVivacity'> | Diagnostic<'fallFractionOutsideUnit'> | Diagnostic<'exponentStartNotPositive'> | Diagnostic<'transitionStartNotBelowOne'> | Diagnostic<'formSlopeStartNotPositive'> | Diagnostic<'curveFitParametersInvalid'> | Diagnostic<'sigmaNotPositive'> | Diagnostic<'traceSensorUnknown'> | Diagnostic<'traceInvalid'> | Diagnostic<'traceNeverFalls'> | Diagnostic<'rangeWithoutWidth'> | Diagnostic<'countNotPositiveInteger'> | Diagnostic<'burnCoefficientOrEnergyNotPositive'> | Diagnostic<'noPoint'> | Diagnostic<'inputUncertaintyNegative', {
+    input: string;
+}> | Diagnostic<'noHeldOutString'> | Diagnostic<'velocitySigmaMissing'> | Diagnostic<'targetPowderNotInFit'> | Diagnostic<'velocitySigmaNegative'> | Diagnostic<'levelOutsideUnit'> | Diagnostic<'pooledFitNoCovariance'> | Diagnostic<'groupPriorNotPositive', {
+    kind: string;
+    group: string;
+}> | Diagnostic<'priorPowderNotInSessions'> | Diagnostic<'sessionsBurnKindDiffers'> | Diagnostic<'barrelOrTemperatureOnPoint'> | Diagnostic<'pooledFitVelocitiesOnly'> | Diagnostic<'ladderChargeOrVelocityNotPositive'> | Diagnostic<'propellantTemperatureNotPositive'> | Diagnostic<'barrelLengthNotPositive'> | Diagnostic<'sessionWithoutLadderPoint'> | Diagnostic<'rifleOrLotSigmaNotPositive'> | Diagnostic<'pooledFitParametersInvalid'> | Diagnostic<'noSession'> | Diagnostic<'priorParameterNotFitted'> | Diagnostic<'burnCoefficientNotFitted'> | Diagnostic<'stringWithoutVelocity'> | Diagnostic<'fitNoCovariance'> | Diagnostic<'boreDiameterNotPositive'> | Diagnostic<'startPressureTooLow'> | Diagnostic<'domainMarginOutsideRange'> | Diagnostic<'priorsNeedVelocitySigmas'> | Diagnostic<'huberThresholdNotPositive'> | Diagnostic<'temperatureFactorNeedsSensitivity'> | Diagnostic<'fitParametersInvalid', {
+    parameters: string[];
+}> | Diagnostic<'pressuresNeedVelocitySigmas'> | Diagnostic<'velocitySigmaPartial'> | Diagnostic<'pressureBasisUnknown', {
+    bases: string[];
+}> | Diagnostic<'pressureWithoutBasis'> | Diagnostic<'pressureWithoutSigma'> | Diagnostic<'pressureSigmaNotPositive'> | Diagnostic<'ladderPressureNotPositive'> | Diagnostic<'velocitySigmaNotPositive'> | Diagnostic<'ladderVelocityNotPositive'> | Diagnostic<'ladderChargeNotPositive'> | Diagnostic<'noLadderPoint'> | Diagnostic<'heightsOrVelocitiesNotFinite'> | Diagnostic<'shotWithoutHeightOrVelocity'> | Diagnostic<'chargeTooFewShots'> | Diagnostic<'slopeNotFinite'> | Diagnostic<'ladderTooFewCharges'> | Diagnostic<'ladderLowestChargeNotPositive', {
+    charge: number;
+}> | Diagnostic<'ladderAroundNeedsOddCount'> | Diagnostic<'ladderStepCountInvalid'> | Diagnostic<'ladderStepNotPositive'> | Diagnostic<'ladderStartNotPositive'> | Diagnostic<'boreResistanceNeedsValues', {
+    missing: ResistanceGap[];
+}> | Diagnostic<'powderWithoutInteriorModel'> | Diagnostic<'bulletConstructionUnknown', {
+    construction: string;
+}> | Diagnostic<'barrelNotPositive', {
+    barrel: number;
+}> | Diagnostic<'ladderTooFewStrings'> | Diagnostic<'chargesEqual'> | Diagnostic<'stringTooFewShots'> | Diagnostic<'standardDeviationNegative'> | Diagnostic<'meanNotFinite'> | Diagnostic<'dynamicVivacityRangeInvalid'> | Diagnostic<'dynamicVivacityExponentNotOne'> | Diagnostic<'priorValueOrSigmaNotPositive', {
+    name: string;
+}> | Diagnostic<'priorValueBelowFloorOrSigmaNotPositive', {
+    name: string;
+}>
+/** Pressure rows of one ladder on more than one basis, counted per basis. */
+| Diagnostic<'pressureBasesMixed', {
+    rows: Partial<Record<PressureBasis, number>>;
+}>;
+
+// @public
 export interface InteriorLoad {
     // (undocumented)
     barrel: {
@@ -636,7 +690,7 @@ export interface InteriorLoad {
 }
 
 // @public
-export function interiorLoad(values: Record<string, number | undefined>, label?: (key: string) => string, grooveDiameter?: number): InteriorLoad;
+export function interiorLoad(values: Record<string, number | undefined>, grooveDiameter?: number): InteriorLoad;
 
 // @public
 export interface InteriorOptions {
@@ -775,6 +829,15 @@ export function leastSpecValue(values: readonly {
     symbol: string;
     value?: number | null | undefined;
 }[], side: string, symbol: string): number | undefined;
+
+// @public
+export type LoadFileIssue = Diagnostic<'valueMissing', {
+    field: string;
+}> | Diagnostic<'valueNegative', {
+    field: string;
+}> | Diagnostic<'burnFormPartial', {
+    missing: string[];
+}> | Diagnostic<'valueNotNumber'> | Diagnostic<'valueNotPositive'> | Diagnostic<'valueBelowZero'> | Diagnostic<'engravingValueNeeded'>;
 
 // @public
 export type LoadNote = LotNote | SeatingNote | VelocityNote | RoundCountNote;
@@ -1383,7 +1446,7 @@ export interface RecordPowder {
 // @public
 export interface RecordResistance {
     // (undocumented)
-    missing: string[];
+    missing: ResistanceGap[];
     // (undocumented)
     resistance?: InteriorLoad['resistance'] | undefined;
 }
@@ -1417,6 +1480,9 @@ export interface RecordRun {
 
 // @public
 export function recordSensitivity(powder: SensitivityPowder): TakenSensitivity | undefined;
+
+// @public
+export type ResistanceGap = 'cartridgeRecord' | 'bulletLength';
 
 // @public
 export interface ResistanceRun {
@@ -1735,10 +1801,11 @@ export class TruingError extends InputError {
         unresolved?: number[] | undefined;
         direction?: number[] | undefined;
         estimate?: TruedParameter[] | undefined;
-        detail?: string | undefined;
+        detail?: Diagnostic<string, object> | undefined;
     });
     // (undocumented)
     readonly conditionNumber?: number | undefined;
+    readonly detail?: Diagnostic<string, object> | undefined;
     readonly direction?: number[] | undefined;
     // (undocumented)
     readonly estimate?: TruedParameter[] | undefined;
@@ -1807,7 +1874,7 @@ export interface TruingStringsInput {
 
 // @public
 export class ValueError extends InputError {
-    constructor(field: string, message: string);
+    constructor(field: string, issue: LoadFileIssue);
     // (undocumented)
     field: string;
 }

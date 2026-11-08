@@ -5,7 +5,8 @@
  * and out.
  */
 
-import { need, nth } from '@open-reloading/statistics'
+import { nth } from '@open-reloading/statistics'
+import { need } from '../issue.ts'
 import {
   fitPowder,
   type LadderPoint,
@@ -92,7 +93,7 @@ export function fitPowderSessions(
   sessions: readonly PowderSession[],
   options: PowderFitOptions = {},
 ): PowderSessionsFit {
-  need(sessions.length > 0, 'at least one session')
+  need(sessions.length > 0, { code: 'noSession', params: {} })
   const ladder = sessions.flatMap((s) =>
     s.ladder.map(
       (x): LadderPoint => ({
@@ -108,13 +109,13 @@ export function fitPowderSessions(
     ),
   )
   let parameters = options.parameters ?? ['burnRate']
-  need(parameters.includes('burnRate'), 'the burn coefficient is always fitted')
+  need(parameters.includes('burnRate'), { code: 'burnCoefficientNotFitted', params: {} })
   const requested = parameters
   need(
     Object.entries(options.priors ?? {}).every(
       ([name, prior]) => prior === undefined || (requested as readonly string[]).includes(name),
     ),
-    'a prior needs its parameter in parameters',
+    { code: 'priorParameterNotFitted', params: {} },
   )
   const held: HeldPowderParameter[] = []
   for (;;) {

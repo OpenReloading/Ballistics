@@ -157,7 +157,7 @@ describe('POST /exterior/range-strings/plan', () => {
       candidates: [{ entries: [] }],
     })
     expect(status).toBe(422)
-    expect(body.message).toMatch(/entry/)
+    expect(body.code).toBe('noEntryOrChronograph')
   })
 })
 
@@ -245,7 +245,10 @@ describe('POST /exterior/range-strings/fit', () => {
       entries: [entries[0], { ...entries[0], kind: 'dial', value: 10, standardDeviation: 2 }],
     })
     expect(status).toBe(422)
-    expect(body.message).toMatch(/group/)
+    expect(body).toMatchObject({
+      code: 'rangeGroupSharesShots',
+      params: { range: 300 },
+    })
   })
 
   it('answers 400 for a zero-offset prior without the option, 200 with it', async () => {

@@ -29,10 +29,14 @@ export function setRefusalWords(words: Sentence) {
   sentence = words
 }
 
+/** A typed refusal in its English sentence once the words have loaded, else its code. */
+export const issueText = (issue: Diagnostic<string, object>): string =>
+  sentence?.(issue) ?? issue.code
+
 /**
  * The message of a thrown value: a typed refusal (an `InputError` with an issue) in its English
  * sentence once the words have loaded, else the error's text. Called where the message is shown, it
  * shows the sentence from the render after the words arrive.
  */
 export const refusalText = (e: unknown): string =>
-  (e instanceof InputError && e.issue && sentence?.(e.issue)) || errorText(e)
+  e instanceof InputError && e.issue ? issueText(e.issue) : errorText(e)

@@ -422,5 +422,9 @@
   "packages/use-cases/src/into-api.ts": {
     "source": "import { buildApp } from '../../api/src/app.ts'\nexport { buildApp }",
     "rules": ["use-cases-imports-logic-only"]
+  },
+  "apps/web/src/lib/refusal-words.ts": {
+    "source": "import type { ExteriorIssue } from '@open-reloading/ballistics'\nimport { msg } from '../i18n/translate.ts'\nimport { gapWords } from './resistance-gaps.ts'\nimport { interiorFields } from './interior-input.ts'\nexport const words = [msg, gapWords, interiorFields]\nexport type Issue = ExteriorIssue",
+    "rules": ["refusal-words-imports"]
   }
 }

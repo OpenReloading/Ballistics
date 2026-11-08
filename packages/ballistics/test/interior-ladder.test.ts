@@ -55,14 +55,14 @@ describe('chargeLadder counts and checks', () => {
   it.each(
     (
       [
-        [0, 0.0001, 2, 'up', 'ladder start charge must be above 0'],
-        [-0.001, 0.0001, 2, 'up', 'ladder start charge must be above 0'],
-        [Number.NaN, 0.0001, 2, 'up', 'ladder start charge must be above 0'],
-        [Number.POSITIVE_INFINITY, 0.0001, 2, 'up', 'ladder start charge must be above 0'],
-        [0.0029, 0, 2, 'up', 'ladder step must be above 0'],
-        [0.0029, 0.0001, 0, 'up', 'ladder steps must be an integer of at least 1'],
-        [0.0029, 0.0001, 4, 'around', 'a ladder around the charge needs an odd count'],
-        [0.0002, 0.0001, 3, 'down', 'ladder charge 0 kg must be above 0'],
+        [0, 0.0001, 2, 'up', 'ladderStartNotPositive'],
+        [-0.001, 0.0001, 2, 'up', 'ladderStartNotPositive'],
+        [Number.NaN, 0.0001, 2, 'up', 'ladderStartNotPositive'],
+        [Number.POSITIVE_INFINITY, 0.0001, 2, 'up', 'ladderStartNotPositive'],
+        [0.0029, 0, 2, 'up', 'ladderStepNotPositive'],
+        [0.0029, 0.0001, 0, 'up', 'ladderStepCountInvalid'],
+        [0.0029, 0.0001, 4, 'around', 'ladderAroundNeedsOddCount'],
+        [0.0002, 0.0001, 3, 'down', 'ladderLowestChargeNotPositive'],
       ] as const
     ).map(([start, step, steps, direction, message]) => ({
       start,
@@ -73,5 +73,13 @@ describe('chargeLadder counts and checks', () => {
     })),
   )('names the field for start $start, step $step, $steps steps $direction', (c) => {
     expect(() => chargeLadder(c.start, c.step, c.steps, c.direction)).toThrow(c.message)
+  })
+
+  it('names the lowest charge of a ladder that reaches 0', () => {
+    expect(() => chargeLadder(0.0002, 0.0001, 3, 'down')).toThrow(
+      expect.objectContaining({
+        issue: { code: 'ladderLowestChargeNotPositive', params: { charge: 0 } },
+      }),
+    )
   })
 })
