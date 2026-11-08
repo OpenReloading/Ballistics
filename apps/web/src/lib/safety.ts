@@ -2,8 +2,8 @@ import { msg } from '../i18n/translate.ts'
 
 /**
  * The Safety section of README.md as plain text, and the one source of the dialog's English text:
- * test/safety.test.ts keeps README.md equal to it and the German catalogue holding a translation
- * of every line. English is the binding text.
+ * test/safety.test.ts keeps README.md equal to it, and the i18n lint requires a German text for
+ * every line. English is the binding text.
  */
 export const safety = {
   intro: msg(
