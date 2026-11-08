@@ -22,7 +22,7 @@ export type {
   ReaderDiagnostic,
 } from './diagnostics.ts'
 export { ReaderError } from './diagnostics.ts'
-export type { Column, ColumnMap, DelimitedOptions, Delimiter } from './generic.ts'
+export type { Column, ColumnMap, CommaRemedy, DelimitedOptions, Delimiter } from './generic.ts'
 export { parseDelimited } from './generic.ts'
 export type { GrtLoadRead, LoadDiagnostic } from './grtload.ts'
 export { readGrtLoad } from './grtload.ts'
