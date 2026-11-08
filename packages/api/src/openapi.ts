@@ -139,7 +139,7 @@ const errorBody: JsonSchema = {
     params: {
       type: 'object',
       description:
-        'A typed refusal or an unknown record id of a compute route: the values its message needs, named by `code`.',
+        'A typed refusal or an unknown record id of a compute route: the values its message needs, named by `code`. A number JSON cannot hold (`NaN`, `Infinity`) arrives as its text.',
     },
     detail: {
       type: 'object',

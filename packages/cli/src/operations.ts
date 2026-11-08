@@ -68,7 +68,9 @@ export const catalogueOf = (bundle: Bundle): Catalogue => openCatalogue(buildCat
 
 /** A message with the values after it; a typed refusal's message is its code, which the command line does not word. */
 function withParams(message: string, params: object): string {
-  const values = Object.entries(params).map(([k, v]) => `${k}: ${String(v)}`)
+  const values = Object.entries(params).map(
+    ([k, v]) => `${k}: ${typeof v === 'object' && v !== null ? JSON.stringify(v) : String(v)}`,
+  )
   return values.length === 0 ? message : `${message} (${values.join(', ')})`
 }
 
