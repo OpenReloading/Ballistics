@@ -13,8 +13,7 @@ import {
   chargeTargetBody,
   noComparableLimitText,
 } from '../lib/charge-target.ts'
-import { translateMessage } from '../lib/core-messages.ts'
-import { errorText } from '../lib/error-text.ts'
+import { refusalText, translateMessage } from '../lib/core-messages.ts'
 import type { InteriorBody } from '../lib/interior-input.ts'
 import {
   fetchManufacturerNames,
@@ -27,6 +26,7 @@ import {
   compareConcurrency,
   compareKey,
 } from '../lib/powder-compare.ts'
+import type { Gap } from '../lib/resistance-gaps.ts'
 import { percentOfPressureLimit } from '../lib/workbench.ts'
 import type { UseWorkbenchStateResult } from './use-workbench-load.ts'
 import { derived, stepFlag } from './workbench-outcome.ts'
@@ -48,10 +48,14 @@ const ownReasons: readonly Message[] = [
   noComparableLimitText,
 ]
 
-/** A row's reason in the language of `t`. */
-export function reasonText(reason: string, t: Translator['t']) {
+/** A row's reason in the language of `t`; a refusal it caught is worded here, where it is shown. */
+export function reasonText(
+  { reason, failure }: Pick<CompareRow, 'reason' | 'failure'>,
+  t: Translator['t'],
+) {
+  if (failure !== undefined) return translateMessage(refusalText(failure), t)
   const own = ownReasons.find((m) => m === reason)
-  return own ? t(own) : translateMessage(reason, t)
+  return own ? t(own) : translateMessage(reason ?? '', t)
 }
 
 /** One powder of the Powders tab. */
@@ -82,6 +86,8 @@ export type CompareRow = {
   flagText?: ((t: Translator['t']) => string | undefined) | undefined
   /** Why the powder has no values. */
   reason?: string | undefined
+  /** The error that stopped the row's load or run, worded where it is shown. */
+  failure?: unknown
   /** The solver's 422 answer of a target mode row, worded in the units shown by `refusalText`. */
   refusal?: ChargeTargetRefusal | undefined
 }
@@ -95,7 +101,7 @@ export function answerRow(
   req: {
     body: { load: InteriorBody['load'] }
     bulkDensity?: number | undefined
-    resistanceMissing?: { powder: string; missing: string[] } | undefined
+    resistanceMissing?: { powder: string; missing: Gap[] } | undefined
     castHardness?: number | undefined
   },
   charge: number,
@@ -128,7 +134,7 @@ export function answerRow(
       flagText: flag === undefined ? undefined : (t) => stepFlag(shown, t),
     }
   } catch (err) {
-    return { ...head, charge, reason: errorText(err) }
+    return { ...head, charge, failure: err }
   }
 }
 
@@ -136,8 +142,8 @@ export function answerRow(
 export type CompareMessage =
   | { kind: 'stopped' }
   | { kind: 'cancelled'; done: number; total: number }
-  /** The message of an error as it came, English. */
-  | { kind: 'error'; text: string }
+  /** The error that stopped the batch, worded where it is shown. */
+  | { kind: 'error'; error: unknown }
 
 /** The Powders tab's state: the rows, the progress of the batch and what the rows were computed for. */
 type PowderCompare = {
@@ -235,7 +241,7 @@ async function powderRow(
   try {
     req = cx.loadRequest({ powder: record, charge })
   } catch (err) {
-    return { ...head, charge, reason: errorText(err) }
+    return { ...head, charge, failure: err }
   }
   if (cx.mode.kind === 'target') return targetRow(cx, head, req, cx.mode)
   const run = await postInteriorRun(req.body, cx.batch)
@@ -318,7 +324,7 @@ function baseRequest(loadRequest: UseWorkbenchStateResult['loadRequest']) {
   try {
     return { base: loadRequest() }
   } catch (err) {
-    return { message: errorText(err) }
+    return { error: err }
   }
 }
 
@@ -344,7 +350,7 @@ export function usePowderCompare(
   async function compute() {
     controller.current?.abort()
     const built = baseRequest(loadRequest)
-    if ('message' in built) return setMessage({ kind: 'error', text: built.message })
+    if ('error' in built) return setMessage({ kind: 'error', error: built.error })
     const { base } = built
     const abort = new AbortController()
     controller.current = abort
@@ -387,7 +393,7 @@ export function usePowderCompare(
       const ended = endMessage(done, signal.aborted)
       if (ended && current()) setMessage(ended)
     } catch (err) {
-      if (!signal.aborted) setMessage({ kind: 'error', text: errorText(err) })
+      if (!signal.aborted) setMessage({ kind: 'error', error: err })
     } finally {
       clearTimeout(timer)
       if (current()) setRunning(false)

@@ -4,7 +4,8 @@
  * (`apps/docs/docs/models/interior-velocity-ladder.md`). SI throughout: charge kg, velocity m/s.
  */
 
-import { need, nth, studentTwoSidedQuantile } from '@open-reloading/statistics'
+import { nth, studentTwoSidedQuantile } from '@open-reloading/statistics'
+import { need } from '../issue.ts'
 
 /** One string of a ladder: the charge, the mean and sample standard deviation of its velocities, and its shot count. */
 export interface LadderStep {
@@ -48,18 +49,18 @@ export interface LadderFlatSpots {
 
 /** Checks one string of a ladder: a positive charge, a finite mean, a spread of at least 0 and two shots or more. */
 function checkLadderStep(s: LadderStep): void {
-  need(Number.isFinite(s.charge) && s.charge > 0, 'charge must be positive')
-  need(Number.isFinite(s.mean), 'mean must be finite')
-  need(
-    Number.isFinite(s.standardDeviation) && s.standardDeviation >= 0,
-    'standard deviation must be 0 or more',
-  )
-  need(Number.isInteger(s.count) && s.count >= 2, 'each string needs at least two shots')
+  need(Number.isFinite(s.charge) && s.charge > 0, { code: 'chargeNotPositive', params: {} })
+  need(Number.isFinite(s.mean), { code: 'meanNotFinite', params: {} })
+  need(Number.isFinite(s.standardDeviation) && s.standardDeviation >= 0, {
+    code: 'standardDeviationNegative',
+    params: {},
+  })
+  need(Number.isInteger(s.count) && s.count >= 2, { code: 'stringTooFewShots', params: {} })
 }
 
 /** The segment from string a to the next charge b: the slope of the mean velocity and its band at `level`. */
 function ladderSegment(a: LadderStep, b: LadderStep, level: number): LadderSegment {
-  need(b.charge > a.charge, 'charges must differ')
+  need(b.charge > a.charge, { code: 'chargesEqual', params: {} })
   const va = a.standardDeviation ** 2 / a.count
   const vb = b.standardDeviation ** 2 / b.count
   const df =
@@ -89,7 +90,7 @@ function ladderSegment(a: LadderStep, b: LadderStep, level: number): LadderSegme
  * ascending charge; each needs at least two shots.
  */
 export function ladderFlatSpots(steps: readonly LadderStep[], level = 0.95): LadderFlatSpots {
-  need(steps.length >= 2, 'a ladder needs at least two strings')
+  need(steps.length >= 2, { code: 'ladderTooFewStrings', params: {} })
   const sorted = steps.toSorted((a, b) => a.charge - b.charge)
   for (const s of sorted) checkLadderStep(s)
   const segments = sorted.slice(1).map((b, i) => ladderSegment(nth(sorted, i), b, level))

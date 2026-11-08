@@ -16,10 +16,10 @@ import {
   type LogFitResult,
   type LogFitStop,
   logLeastSquares,
-  need,
   nth,
   studentTwoSidedQuantile,
 } from '@open-reloading/statistics'
+import { type BallisticsIssue, need } from '../issue.ts'
 import type { Complete } from '../key-list.ts'
 import { positive, type Settings } from '../settings.ts'
 import {
@@ -340,11 +340,7 @@ export class MixedPressureBasisError extends InputError {
   readonly rows: Partial<Record<PressureBasis, number>>
 
   constructor(rows: Partial<Record<PressureBasis, number>>) {
-    super(
-      `pressure rows use more than one basis: ${Object.entries(rows)
-        .map(([basis, n]) => `${n} ${basis}`)
-        .join(', ')}`,
-    )
+    super({ code: 'pressureBasesMixed', params: { rows } } satisfies BallisticsIssue)
     this.name = 'MixedPressureBasisError'
     this.rows = rows
   }
@@ -364,37 +360,43 @@ type Valid = Extract<InteriorResult, { valid: true }>
 
 /** Checks the ladder points; returns how many carry `velocitySigma` (all or none). */
 function checkLadder(ladder: readonly LadderPoint[]): number {
-  need(ladder.length > 0, 'at least one ladder point')
+  need(ladder.length > 0, { code: 'noLadderPoint', params: {} })
   for (const x of ladder) {
-    need(x.charge !== undefined && positive(x.charge), 'ladder charge must be positive')
-    need(
-      x.muzzleVelocity !== undefined && positive(x.muzzleVelocity),
-      'ladder velocity must be positive',
-    )
-    need(positive(x.velocitySigma), 'velocitySigma must be positive')
-    need(positive(x.peakPressure), 'ladder pressure must be positive')
-    need(positive(x.pressureSigma), 'pressureSigma must be positive')
-    need(positive(x.barrelLength), 'barrelLength must be positive')
-    need(positive(x.propellantTemperature), 'propellantTemperature must be positive')
-    need(
-      (x.peakPressure === undefined) === (x.pressureSigma === undefined),
-      'peakPressure and pressureSigma together',
-    )
-    need(
-      (x.peakPressure === undefined) === (x.pressureBasis === undefined),
-      'peakPressure and pressureBasis together',
-    )
-    need(
-      x.pressureBasis === undefined || pressureBases.includes(x.pressureBasis),
-      `pressureBasis must be one of ${pressureBases.join(', ')}`,
-    )
+    need(x.charge !== undefined && positive(x.charge), {
+      code: 'ladderChargeNotPositive',
+      params: {},
+    })
+    need(x.muzzleVelocity !== undefined && positive(x.muzzleVelocity), {
+      code: 'ladderVelocityNotPositive',
+      params: {},
+    })
+    need(positive(x.velocitySigma), { code: 'velocitySigmaNotPositive', params: {} })
+    need(positive(x.peakPressure), { code: 'ladderPressureNotPositive', params: {} })
+    need(positive(x.pressureSigma), { code: 'pressureSigmaNotPositive', params: {} })
+    need(positive(x.barrelLength), { code: 'barrelLengthNotPositive', params: {} })
+    need(positive(x.propellantTemperature), {
+      code: 'propellantTemperatureNotPositive',
+      params: {},
+    })
+    need((x.peakPressure === undefined) === (x.pressureSigma === undefined), {
+      code: 'pressureWithoutSigma',
+      params: {},
+    })
+    need((x.peakPressure === undefined) === (x.pressureBasis === undefined), {
+      code: 'pressureWithoutBasis',
+      params: {},
+    })
+    need(x.pressureBasis === undefined || pressureBases.includes(x.pressureBasis), {
+      code: 'pressureBasisUnknown',
+      params: { bases: [...pressureBases] },
+    })
   }
   const withSigma = ladder.filter((x) => x.velocitySigma !== undefined).length
-  need(withSigma === 0 || withSigma === ladder.length, 'velocitySigma on all points or none')
-  need(
-    withSigma > 0 || ladder.every((x) => x.peakPressure === undefined),
-    'pressures need velocity sigmas',
-  )
+  need(withSigma === 0 || withSigma === ladder.length, { code: 'velocitySigmaPartial', params: {} })
+  need(withSigma > 0 || ladder.every((x) => x.peakPressure === undefined), {
+    code: 'pressuresNeedVelocitySigmas',
+    params: {},
+  })
   return withSigma
 }
 
@@ -493,7 +495,10 @@ function powderParameterMap(
 ) {
   const initial = parameters.map((p) => startValue(load, p))
   if (!parameters.every((p) => parameterNames.includes(p)))
-    throw new InputError(`parameters: ${parameterNames.join(', ')}, each at most once`)
+    throw new InputError({
+      code: 'fitParametersInvalid',
+      params: { parameters: [...parameterNames] },
+    } satisfies BallisticsIssue)
   const apply = (values: number[]): InteriorLoad =>
     parameters.reduce((l, name, k) => withParameter(load, l, name, nth(values, k)), load)
   // log parameters; the start pressure in ln((p_st - p_floor)/(p_st0 - p_floor)), so no step reaches the floor
@@ -523,13 +528,13 @@ function checkParameters(
     parameters.length > 0 &&
       new Set(parameters).size === parameters.length &&
       parameters.every((p) => parameterNames.includes(p)),
-    `parameters: ${parameterNames.join(', ')}, each at most once`,
+    { code: 'fitParametersInvalid', params: { parameters: [...parameterNames] } },
   )
   const sensitivity = load.propellant.temperatureSensitivity
   need(
     !parameters.includes('temperatureFactor') ||
       (sensitivity !== undefined && (sensitivity.cold !== 0 || sensitivity.hot !== 0)),
-    'temperatureFactor needs the load to carry a temperature sensitivity other than 0',
+    { code: 'temperatureFactorNeedsSensitivity', params: {} },
   )
   // a charge ladder at one length leaves the energy to the model error of every fixed input, so cut-down barrels are required
   const lengths = ladder.map((x) => x.barrelLength ?? load.barrel.length)
@@ -543,10 +548,10 @@ function checkSolverOptions(
   huberThreshold: number | undefined,
 ) {
   checkLogFitLimits(maxIterations, maxCondition)
-  need(
-    huberThreshold === undefined || (Number.isFinite(huberThreshold) && huberThreshold > 0),
-    'huberThreshold must be positive',
-  )
+  need(huberThreshold === undefined || (Number.isFinite(huberThreshold) && huberThreshold > 0), {
+    code: 'huberThresholdNotPositive',
+    params: {},
+  })
 }
 
 /** The checked inputs of a powder fit, with the defaults of its options. */
@@ -578,12 +583,12 @@ function givenPriors(
   )
   need(
     priors.every(({ name }) => (parameters as readonly string[]).includes(name)),
-    'a prior needs its parameter in parameters',
+    { code: 'priorParameterNotFitted', params: {} },
   )
-  need(
-    withSigma > 0 || (priors.length === 0 && options.huberThreshold === undefined),
-    'priors and huberThreshold need velocity sigmas',
-  )
+  need(withSigma > 0 || (priors.length === 0 && options.huberThreshold === undefined), {
+    code: 'priorsNeedVelocitySigmas',
+    params: {},
+  })
   return priors
 }
 
@@ -599,20 +604,20 @@ function checkPowderFit(
     maxCondition = 1e3,
     domainMargin = powderDomainMargin,
   } = options
-  need(
-    Number.isFinite(domainMargin) && domainMargin >= 0 && domainMargin < 1,
-    'domainMargin must lie in [0, 1)',
-  )
+  need(Number.isFinite(domainMargin) && domainMargin >= 0 && domainMargin < 1, {
+    code: 'domainMarginOutsideRange',
+    params: {},
+  })
   const withSigma = checkLadder(ladder)
   const pressureRows = pressureRowsPerBasis(ladder)
   checkParameters(load, ladder, parameters)
   checkSolverOptions(maxIterations, maxCondition, options.huberThreshold)
   const priors = givenPriors(options, parameters, withSigma)
   const floor = startPressureFloor(load)
-  need(
-    !parameters.includes('startPressure') || load.startPressure > floor,
-    'startPressure must be above the ignition pressure and the resistance at travel 0',
-  )
+  need(!parameters.includes('startPressure') || load.startPressure > floor, {
+    code: 'startPressureTooLow',
+    params: {},
+  })
   return {
     parameters,
     maxIterations,
@@ -642,7 +647,9 @@ function priorRows(setup: PowderFitSetup, map: PowderParameterMap): PriorRow[] {
         prior.value > base &&
         Number.isFinite(prior.sigma) &&
         prior.sigma > 0,
-      `prior ${name}: value above ${base === 0 ? '0' : 'the floor'}, sigma above 0`,
+      base === 0
+        ? { code: 'priorValueOrSigmaNotPositive', params: { name } }
+        : { code: 'priorValueBelowFloorOrSigmaNotPositive', params: { name } },
     )
     return {
       k,
@@ -911,11 +918,14 @@ export interface PowderPrediction {
 
 /** Checks the charge, the level and the conditions of a prediction. */
 function checkPrediction(charge: number, level: number, options: PowderPredictionOptions) {
-  need(Number.isFinite(charge) && charge > 0, 'charge must be positive')
-  need(level > 0 && level < 1, 'level must lie in (0, 1)')
-  need(positive(options.barrelLength), 'barrelLength must be positive')
-  need(positive(options.boreDiameter), 'boreDiameter must be positive')
-  need(positive(options.propellantTemperature), 'propellantTemperature must be positive')
+  need(Number.isFinite(charge) && charge > 0, { code: 'chargeNotPositive', params: {} })
+  need(level > 0 && level < 1, { code: 'levelOutsideUnit', params: {} })
+  need(positive(options.barrelLength), { code: 'barrelLengthNotPositive', params: {} })
+  need(positive(options.boreDiameter), { code: 'boreDiameterNotPositive', params: {} })
+  need(positive(options.propellantTemperature), {
+    code: 'propellantTemperatureNotPositive',
+    params: {},
+  })
 }
 
 /** `fitted` at `charge` and the barrel length, bore and temperature of the prediction. */
@@ -977,7 +987,8 @@ export function predictPowder(
   const { level = 0.9, barrelLength, boreDiameter } = options
   checkPrediction(charge, level, options)
   const { covariance } = fit
-  if (!covariance) throw new InputError('the fit has no covariance: add rows or velocity sigmas')
+  if (!covariance)
+    throw new InputError({ code: 'fitNoCovariance', params: {} } satisfies BallisticsIssue)
   const names = fit.parameters.map((p) => p.name)
   const { apply, q } = powderParameterMap(fit.load, names, startPressureFloor(fit.load))
   let runCount = 0

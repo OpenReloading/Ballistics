@@ -191,7 +191,7 @@ describe('zero offset maxZeroSigma', () => {
   it('rejects a limit that is not positive', () => {
     expect(() =>
       planTruingStrings({ ...zeroPlan, entries }, { ...offsetOptions, maxZeroSigma: 0 }),
-    ).toThrow(/maxZeroSigma/)
+    ).toThrow('maxZeroSigmaNotPositive')
   })
 })
 
@@ -256,8 +256,14 @@ describe('priors and the statuses', () => {
 
   it('are rejected when malformed', () => {
     const data = strings(base, () => 0)
-    expect(() => fitTruingStrings(data, { priors: { dragFactor: 0 } })).toThrow(/positive/)
-    expect(() => fitTruingStrings(data, { priors: { zeroOffset: 1e-4 } })).toThrow(/zeroOffset/)
+    expect(() => fitTruingStrings(data, { priors: { dragFactor: 0 } })).toThrow(
+      expect.objectContaining({
+        issue: { code: 'priorNotPositive', params: { name: 'dragFactor' } },
+      }),
+    )
+    expect(() => fitTruingStrings(data, { priors: { zeroOffset: 1e-4 } })).toThrow(
+      'zeroOffsetPriorWithoutFit',
+    )
   })
 })
 
@@ -367,7 +373,7 @@ describe('comparePlanCandidates', () => {
   })
 
   it('rejects an empty list', () => {
-    expect(() => comparePlanCandidates(candidateInput, [])).toThrow(/candidate/)
+    expect(() => comparePlanCandidates(candidateInput, [])).toThrow('noCandidate')
   })
 
   it('orders candidates by the width of the drag factor they promise', () => {

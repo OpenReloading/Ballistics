@@ -8,6 +8,7 @@ import { rampAtJump } from '../lib/interior-request.ts'
 import { limitShare } from '../lib/limit-text.ts'
 import { nth } from '../lib/nth.ts'
 import { rawWording } from '../lib/record-values.ts'
+import { type Gap, gapWords } from '../lib/resistance-gaps.ts'
 import type {
   LadderDirection,
   RunnableLadderKind,
@@ -86,7 +87,7 @@ export type Outcome =
       /** The powder has no temperature coefficient: `reference` is the temperature of its record's fit, K. */
       noCoefficient?: { reference: number } | undefined
       /** The record's bore-resistance law the run could not apply, with what was missing. */
-      resistanceMissing?: { powder: string; missing: string[] } | undefined
+      resistanceMissing?: { powder: string; missing: Gap[] } | undefined
       /** The rule of the range's volume tolerance from the capacity's source; none: the API's default. */
       volumeRule?: CapacityRule | undefined
       /** The seated jump the run's engraving ramp started at, m; none without a seating. */
@@ -217,7 +218,7 @@ export function derived(ok: Shown, t: Translator['t']) {
               'Simulation: the parameters of {name} were fitted with a bore-resistance law this run cannot apply (missing: {missing}); the results are biased.',
               {
                 name: ok.resistanceMissing.powder,
-                missing: ok.resistanceMissing.missing.join(', '),
+                missing: ok.resistanceMissing.missing.map((m) => t(gapWords[m])).join(', '),
               },
             ),
             name: t('bore resistance not applied'),

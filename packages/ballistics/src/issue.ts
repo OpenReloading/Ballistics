@@ -3,6 +3,8 @@ import {
   need as needAny,
   InputError as StatisticsInputError,
 } from '@open-reloading/statistics'
+import type { ResistanceGap } from './interior/bore-resistance.ts'
+import type { PressureBasis } from './interior/fit.ts'
 
 /** Why an exterior function refuses its input or stops. */
 export type ExteriorIssue =
@@ -29,6 +31,25 @@ export type ExteriorIssue =
   | Diagnostic<'boatTailLengthNegative'>
   | Diagnostic<'headShapeOutsideUnit'>
   | Diagnostic<'outlineLengthsNotPositive'>
+  | Diagnostic<'noCandidate'>
+  | Diagnostic<'dispersionNotPositive'>
+  | Diagnostic<'entryValueInvalid'>
+  | Diagnostic<'entryKindUnknown', { kind: string }>
+  | Diagnostic<'noEntryOrChronograph'>
+  | Diagnostic<'chronographMeanInvalid'>
+  | Diagnostic<'entryRoundingNegative', { kind: string }>
+  | Diagnostic<'entryStandardDeviationNotPositive', { kind: string }>
+  | Diagnostic<'entryShotCountInvalid', { kind: string }>
+  | Diagnostic<'entryRangeInvalid', { kind: string }>
+  | Diagnostic<'maxRelativeStandardUncertaintyNotPositive'>
+  | Diagnostic<'maxInflationNotAboveOne'>
+  | Diagnostic<'residualConfidenceLevelOutsideUnit'>
+  | Diagnostic<'confidenceLevelOptionOutsideUnit'>
+  | Diagnostic<'zeroOffsetPriorWithoutFit'>
+  | Diagnostic<'priorNotPositive', { name: string }>
+  | Diagnostic<'priorUnknown', { name: string }>
+  | Diagnostic<'clickValueNotPositive'>
+  | Diagnostic<'maxZeroSigmaNotPositive'>
   | Diagnostic<'muzzleVelocityNotPositive'>
   | Diagnostic<'stepSizeBelowMinimum', { step: number; min: number }>
   | Diagnostic<'integrationBudgetExceeded', { max: number }>
@@ -74,13 +95,138 @@ export type ExteriorIssue =
   | Diagnostic<'dragModelUnknown', { model: string }>
   | Diagnostic<'windSegmentsNotRising'>
   | Diagnostic<'windSegmentInvalid'>
+  | Diagnostic<'sessionWithoutObservation'>
+  | Diagnostic<'noSession'>
+  | Diagnostic<'knotsNeedSingleBandOrCurve'>
+  | Diagnostic<'knotsNotRising'>
+  | Diagnostic<'knotMachNotPositive'>
+  | Diagnostic<'knotsTooFew'>
+  | Diagnostic<'mixedObservationsNeedUncertainty'>
+  | Diagnostic<'standardUncertaintyPartial'>
+  | Diagnostic<'standardUncertaintyNotPositive'>
+  | Diagnostic<'observationRangeInvalid', { range: number }>
+  | Diagnostic<'observationValueInvalid'>
+  | Diagnostic<'observationKindUnknown', { kind: string }>
+  | Diagnostic<'noObservation'>
+  | Diagnostic<'maxTotalStepsNotPositive'>
   | Diagnostic<
       'airDensityOutsideRange',
       { pressure: number; temperature: number; density: number; max: number }
     >
+  | Diagnostic<'groupSharesShots', { group: string }>
+  | Diagnostic<'rangeGroupSharesShots', { range: number }>
+  /** A trajectory of a truing fit that ends before a range of the rows. */
+  | Diagnostic<'rangeNotReached', { range: number }>
+
+/** Why an interior function, a fit, a ladder or the free recoil refuses its input. */
+export type InteriorIssue =
+  | Diagnostic<'gasVelocityFactorNegative'>
+  | Diagnostic<'muzzleVelocityNegative'>
+  | Diagnostic<'chargeMassNegative'>
+  | Diagnostic<'projectileMassNotPositive'>
+  | Diagnostic<'firearmMassNotPositive'>
+  | Diagnostic<'loadRatioTargetNeedsBulkDensity'>
+  | Diagnostic<'bulkDensityNotPositive'>
+  | Diagnostic<'targetValueNotPositive'>
+  | Diagnostic<'modelLeavesBarrelBeforeWindowEnd'>
+  | Diagnostic<'traceWindowTooShort'>
+  | Diagnostic<'traceNoPositivePressure'>
+  | Diagnostic<'sigmaPartial'>
+  | Diagnostic<'chargeNotPositive'>
+  | Diagnostic<'noTrace'>
+  | Diagnostic<'curveFitNeedsTwoStageVivacity'>
+  | Diagnostic<'fallFractionOutsideUnit'>
+  | Diagnostic<'exponentStartNotPositive'>
+  | Diagnostic<'transitionStartNotBelowOne'>
+  | Diagnostic<'formSlopeStartNotPositive'>
+  | Diagnostic<'curveFitParametersInvalid'>
+  | Diagnostic<'sigmaNotPositive'>
+  | Diagnostic<'traceSensorUnknown'>
+  | Diagnostic<'traceInvalid'>
+  | Diagnostic<'traceNeverFalls'>
+  | Diagnostic<'rangeWithoutWidth'>
+  | Diagnostic<'countNotPositiveInteger'>
+  | Diagnostic<'burnCoefficientOrEnergyNotPositive'>
+  | Diagnostic<'noPoint'>
+  | Diagnostic<'inputUncertaintyNegative', { input: string }>
+  | Diagnostic<'noHeldOutString'>
+  | Diagnostic<'velocitySigmaMissing'>
+  | Diagnostic<'targetPowderNotInFit'>
+  | Diagnostic<'velocitySigmaNegative'>
+  | Diagnostic<'levelOutsideUnit'>
+  | Diagnostic<'pooledFitNoCovariance'>
+  | Diagnostic<'groupPriorNotPositive', { kind: string; group: string }>
+  | Diagnostic<'priorPowderNotInSessions'>
+  | Diagnostic<'sessionsBurnKindDiffers'>
+  | Diagnostic<'barrelOrTemperatureOnPoint'>
+  | Diagnostic<'pooledFitVelocitiesOnly'>
+  | Diagnostic<'ladderChargeOrVelocityNotPositive'>
+  | Diagnostic<'propellantTemperatureNotPositive'>
+  | Diagnostic<'barrelLengthNotPositive'>
+  | Diagnostic<'sessionWithoutLadderPoint'>
+  | Diagnostic<'rifleOrLotSigmaNotPositive'>
+  | Diagnostic<'pooledFitParametersInvalid'>
+  | Diagnostic<'noSession'>
+  | Diagnostic<'priorParameterNotFitted'>
+  | Diagnostic<'burnCoefficientNotFitted'>
+  | Diagnostic<'stringWithoutVelocity'>
+  | Diagnostic<'fitNoCovariance'>
+  | Diagnostic<'boreDiameterNotPositive'>
+  | Diagnostic<'startPressureTooLow'>
+  | Diagnostic<'domainMarginOutsideRange'>
+  | Diagnostic<'priorsNeedVelocitySigmas'>
+  | Diagnostic<'huberThresholdNotPositive'>
+  | Diagnostic<'temperatureFactorNeedsSensitivity'>
+  | Diagnostic<'fitParametersInvalid', { parameters: string[] }>
+  | Diagnostic<'pressuresNeedVelocitySigmas'>
+  | Diagnostic<'velocitySigmaPartial'>
+  | Diagnostic<'pressureBasisUnknown', { bases: string[] }>
+  | Diagnostic<'pressureWithoutBasis'>
+  | Diagnostic<'pressureWithoutSigma'>
+  | Diagnostic<'pressureSigmaNotPositive'>
+  | Diagnostic<'ladderPressureNotPositive'>
+  | Diagnostic<'velocitySigmaNotPositive'>
+  | Diagnostic<'ladderVelocityNotPositive'>
+  | Diagnostic<'ladderChargeNotPositive'>
+  | Diagnostic<'noLadderPoint'>
+  | Diagnostic<'heightsOrVelocitiesNotFinite'>
+  | Diagnostic<'shotWithoutHeightOrVelocity'>
+  | Diagnostic<'chargeTooFewShots'>
+  | Diagnostic<'slopeNotFinite'>
+  | Diagnostic<'ladderTooFewCharges'>
+  | Diagnostic<'ladderLowestChargeNotPositive', { charge: number }>
+  | Diagnostic<'ladderAroundNeedsOddCount'>
+  | Diagnostic<'ladderStepCountInvalid'>
+  | Diagnostic<'ladderStepNotPositive'>
+  | Diagnostic<'ladderStartNotPositive'>
+  | Diagnostic<'boreResistanceNeedsValues', { missing: ResistanceGap[] }>
+  | Diagnostic<'powderWithoutInteriorModel'>
+  | Diagnostic<'bulletConstructionUnknown', { construction: string }>
+  | Diagnostic<'barrelNotPositive', { barrel: number }>
+  | Diagnostic<'ladderTooFewStrings'>
+  | Diagnostic<'chargesEqual'>
+  | Diagnostic<'stringTooFewShots'>
+  | Diagnostic<'standardDeviationNegative'>
+  | Diagnostic<'meanNotFinite'>
+  | Diagnostic<'dynamicVivacityRangeInvalid'>
+  | Diagnostic<'dynamicVivacityExponentNotOne'>
+  | Diagnostic<'priorValueOrSigmaNotPositive', { name: string }>
+  | Diagnostic<'priorValueBelowFloorOrSigmaNotPositive', { name: string }>
+  /** Pressure rows of one ladder on more than one basis, counted per basis. */
+  | Diagnostic<'pressureBasesMixed', { rows: Partial<Record<PressureBasis, number>> }>
+
+/** Why a load file value is refused (`ValueError`, which names its field). */
+export type LoadFileIssue =
+  | Diagnostic<'valueMissing', { field: string }>
+  | Diagnostic<'valueNegative', { field: string }>
+  | Diagnostic<'burnFormPartial', { missing: string[] }>
+  | Diagnostic<'valueNotNumber'>
+  | Diagnostic<'valueNotPositive'>
+  | Diagnostic<'valueBelowZero'>
+  | Diagnostic<'engravingValueNeeded'>
 
 /** Why a function of this package refuses its input. */
-export type BallisticsIssue = ExteriorIssue
+export type BallisticsIssue = ExteriorIssue | InteriorIssue | LoadFileIssue
 
 /** `need` of `@open-reloading/statistics` with an issue of this package. */
 export const need: (ok: boolean, issue: BallisticsIssue) => void = needAny

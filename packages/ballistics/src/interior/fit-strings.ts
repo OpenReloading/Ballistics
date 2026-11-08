@@ -5,7 +5,8 @@
  * Velocities in m/s, charges in kg.
  */
 
-import { need, velocityStatistics } from '@open-reloading/statistics'
+import { velocityStatistics } from '@open-reloading/statistics'
+import { need } from '../issue.ts'
 import type { LadderPoint } from './fit.ts'
 
 /** One chronograph string: the shot velocities of one charge and the other values of its ladder point. */
@@ -39,7 +40,7 @@ export function pooledVelocitySd(strings: readonly ChronographString[]): number 
 export function stringLadder(strings: readonly ChronographString[]): LadderPoint[] {
   need(
     strings.every((s) => s.velocities.length > 0),
-    'every string needs at least one velocity',
+    { code: 'stringWithoutVelocity', params: {} },
   )
   const sd = pooledVelocitySd(strings)
   return strings.map(({ velocities, ...point }) => ({
