@@ -407,6 +407,10 @@
     "source": "import { checkRecords } from '@open-reloading/catalog'\nexport { checkRecords }",
     "rules": ["use-cases-imports-catalog-types"]
   },
+  "packages/use-cases/src/catalog-subpath.ts": {
+    "source": "import { checkSpec } from '@open-reloading/catalog/plausibility'\nexport { checkSpec }",
+    "rules": ["use-cases-imports-logic-only"]
+  },
   "packages/use-cases/src/fastify.ts": {
     "source": "import Fastify from 'fastify'\nexport { Fastify }",
     "rules": ["use-cases-imports-logic-only"]

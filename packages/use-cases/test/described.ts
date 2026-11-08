@@ -7,11 +7,11 @@ type Schema = Record<string, unknown>
 export function undescribed(schema: unknown, path = ''): string[] {
   if (!schema || typeof schema !== 'object') return []
   const s = schema as Schema
-  const own = Object.entries((s.properties ?? {}) as Record<string, Schema>).flatMap(
+  const own = Object.entries((s['properties'] ?? {}) as Record<string, Schema>).flatMap(
     ([key, value]) => {
       const at = `${path}.${key}`
       const missing =
-        typeof value.description === 'string' && value.description.trim() !== '' ? [] : [at]
+        typeof value['description'] === 'string' && value['description'].trim() !== '' ? [] : [at]
       return [...missing, ...undescribed(value, at)]
     },
   )

@@ -31,7 +31,6 @@
                   "!@open-reloading/shot-groups",
                   "!@open-reloading/shot-groups/**",
                   "!@open-reloading/catalog",
-                  "!@open-reloading/catalog/**",
                   "!@open-reloading/importers",
                   "!@open-reloading/importers/**"
                 ],
