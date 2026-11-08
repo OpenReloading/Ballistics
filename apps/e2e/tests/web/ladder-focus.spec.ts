@@ -1,7 +1,7 @@
 import { expect, type Locator, test } from '@playwright/test'
 import { storeUnits } from './units.ts'
 import { loadForm } from './workbench.ts'
-import { runExample } from './workbench-run.ts'
+import { runExample, runSettled } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
@@ -38,6 +38,8 @@ for (const width of [1280, 390])
     if (await results.isVisible()) await results.click()
     const steps = page.getByRole('group', { name: 'Charge ladder' }).getByRole('radio')
     await expect(steps).toHaveCount(5, { timeout: 15_000 })
+    // the strip shows the previous result's steps while the ladder runs, and its answer resets the selection
+    await runSettled(page)
     const chips = page.locator('.ladder-cells > .ladder-cell')
 
     // the selection alone draws no outline: only the focus does
