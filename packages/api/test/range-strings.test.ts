@@ -7,9 +7,8 @@ import {
   type TrajectoryInput,
   trajectory,
 } from '@open-reloading/ballistics'
-import { caps } from '@open-reloading/use-cases'
+import { caps, rangeStringsLimits } from '@open-reloading/use-cases'
 import { describe, expect, it } from 'vitest'
-import { rangeStringsLimits } from '../src/compute/strings-schema.ts'
 import { API_PREFIX } from '../src/version.ts'
 import { defined } from './defined.ts'
 import { withApi } from './setup.ts'

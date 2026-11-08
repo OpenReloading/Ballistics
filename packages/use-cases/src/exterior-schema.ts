@@ -1,6 +1,7 @@
-import { dragModels } from '@open-reloading/ballistics'
-import { caps, fitIterations, recordId, steps } from '@open-reloading/use-cases'
+import { type DragModel, dragModels } from '@open-reloading/ballistics'
 import { z } from 'zod'
+import type { Exact } from './exact.ts'
+import { caps, fitIterations, recordId, steps } from './schemas.ts'
 import { stabilityBounds } from './stability-schema.ts'
 
 /** An angle in rad strictly between -pi/2 and pi/2: a value in degrees falls outside. */
@@ -142,8 +143,152 @@ const wind = z
   )
   .max(20)
 
-/** The muzzle state of one trajectory: projectile, muzzle velocity, firearm, air, wind, site and zero. */
-export const shot = z
+/** The zod type of a constant, or pairs of Mach number and value. */
+export type CoefficientSchema = z.ZodUnion<
+  readonly [z.ZodNumber, z.ZodArray<z.ZodTuple<[z.ZodNumber, z.ZodNumber], null>>]
+>
+
+/** The zod type of the station air of a shot or a zero. */
+export type AirSchema = z.ZodObject<
+  { altitude: z.ZodNumber; pressure: z.ZodNumber; temperature: z.ZodNumber; humidity: z.ZodNumber },
+  z.core.$strict
+>
+/** The zod type of the wind segments of a shot or a zero. */
+export type WindSchema = z.ZodArray<
+  z.ZodObject<
+    {
+      endDistance: z.ZodNumber
+      speed: z.ZodNumber
+      fromDirection: z.ZodNumber
+      vertical: z.ZodOptional<z.ZodNumber>
+    },
+    z.core.$strict
+  >
+>
+/** The zod type of the aerodynamic coefficients of the modified point mass. */
+export type AerodynamicsSchema = z.ZodObject<
+  {
+    liftSlope: CoefficientSchema
+    momentSlope: z.ZodOptional<CoefficientSchema>
+    magnusForceSlope: z.ZodOptional<CoefficientSchema>
+    spinDamping: z.ZodOptional<CoefficientSchema>
+    axialInertia: z.ZodOptional<z.ZodNumber>
+    transverseInertia: z.ZodOptional<z.ZodNumber>
+  },
+  z.core.$strict
+>
+/** The zod type of how a drag table or curve is read between nodes. */
+export type InterpolationSchema = z.ZodOptional<
+  z.ZodEnum<{ linear: 'linear'; 'monotone-cubic': 'monotone-cubic' }>
+>
+
+/** The zod shape of `shot`, the muzzle state of one trajectory. */
+export type ShotShape = {
+  projectile: z.ZodUnion<
+    readonly [
+      z.ZodObject<
+        {
+          mass: z.ZodNumber
+          diameter: z.ZodNumber
+          length: z.ZodOptional<z.ZodNumber>
+          drag: z.ZodDiscriminatedUnion<
+            [
+              z.ZodObject<
+                {
+                  kind: z.ZodLiteral<'bc'>
+                  model: z.ZodEnum<{ [K in DragModel]: K }>
+                  bands: z.ZodArray<
+                    z.ZodObject<
+                      { ballisticCoefficient: z.ZodNumber; minVelocity: z.ZodNumber },
+                      z.core.$strict
+                    >
+                  >
+                  reference: z.ZodOptional<z.ZodEnum<{ icao: 'icao'; metro: 'metro' }>>
+                  interpolation: InterpolationSchema
+                },
+                z.core.$strict
+              >,
+              z.ZodObject<
+                {
+                  kind: z.ZodLiteral<'curve'>
+                  curve: z.ZodArray<z.ZodTuple<[z.ZodNumber, z.ZodNumber], null>>
+                  interpolation: InterpolationSchema
+                },
+                z.core.$strict
+              >,
+            ],
+            'kind'
+          >
+          aerodynamics: z.ZodOptional<AerodynamicsSchema>
+        },
+        z.core.$strict
+      >,
+      z.ZodObject<
+        {
+          bullet: z.ZodString
+          dragModel: z.ZodEnum<{ G1: 'G1'; G7: 'G7' }>
+          length: z.ZodOptional<z.ZodNumber>
+          aerodynamics: z.ZodOptional<AerodynamicsSchema>
+        },
+        z.core.$strict
+      >,
+    ]
+  >
+  muzzleVelocity: z.ZodNumber
+  firearm: z.ZodObject<
+    {
+      sightHeight: z.ZodNumber
+      sightOffset: z.ZodOptional<z.ZodNumber>
+      twist: z.ZodOptional<z.ZodNumber>
+      twistHand: z.ZodOptional<z.ZodEnum<{ right: 'right'; left: 'left' }>>
+    },
+    z.core.$strict
+  >
+  air: AirSchema
+  lookAngle: z.ZodOptional<z.ZodNumber>
+  wind: z.ZodOptional<WindSchema>
+  site: z.ZodOptional<
+    z.ZodObject<
+      { latitude: z.ZodOptional<z.ZodNumber>; azimuth: z.ZodOptional<z.ZodNumber> },
+      z.core.$strict
+    >
+  >
+  zero: z.ZodUnion<
+    readonly [
+      z.ZodObject<
+        {
+          range: z.ZodNumber
+          lookAngle: z.ZodOptional<z.ZodNumber>
+          air: z.ZodOptional<AirSchema>
+          wind: z.ZodOptional<WindSchema>
+        },
+        z.core.$strict
+      >,
+      z.ZodObject<{ elevationAngle: z.ZodNumber; windageAngle: z.ZodNumber }, z.core.$strict>,
+    ]
+  >
+}
+
+/** The zod shape of `exteriorOptions`, the integrator and model options of every exterior request. */
+export type ExteriorOptionsShape = {
+  relativeTolerance: z.ZodOptional<z.ZodNumber>
+  absoluteTolerance: z.ZodOptional<z.ZodNumber>
+  maxTime: z.ZodOptional<z.ZodNumber>
+  gravity: z.ZodOptional<z.ZodNumber>
+  coriolis: z.ZodOptional<z.ZodBoolean>
+  spinDrift: z.ZodOptional<z.ZodBoolean>
+  jump: z.ZodOptional<z.ZodBoolean>
+  zeroTolerance: z.ZodOptional<z.ZodNumber>
+  model: z.ZodOptional<
+    z.ZodEnum<{ 'point-mass': 'point-mass'; 'modified-point-mass': 'modified-point-mass' }>
+  >
+  maxYaw: z.ZodOptional<z.ZodNumber>
+}
+
+/** The zod shape of the options of one trajectory's integrations: those of every request and the step cap. */
+export type TrajectoryOptionsShape = ExteriorOptionsShape & { maxSteps: z.ZodOptional<z.ZodNumber> }
+
+const shotParser = z
   .strictObject({
     projectile: z
       .union([projectile, bulletRef])
@@ -210,8 +355,13 @@ export const shot = z
   })
   .describe('Projectile, muzzle velocity, firearm, air, wind, site and zero of the shot.')
 
-/** Integrator and model options of every exterior request. */
-export const exteriorOptions = z.strictObject({
+/** The muzzle state of one trajectory: projectile, muzzle velocity, firearm, air, wind, site and zero. */
+export const shot: z.ZodObject<ShotShape, z.core.$strict> = shotParser satisfies Exact<
+  typeof shot,
+  typeof shotParser
+>
+
+const exteriorOptionsParser = z.strictObject({
   relativeTolerance: z
     .number()
     .min(1e-12)
@@ -271,8 +421,11 @@ export const exteriorOptions = z.strictObject({
     .optional()
     .describe('Largest yaw of repose before a modified point mass run stops, rad, default 0.1.'),
 })
-/** Body of `POST /exterior/trajectory`: SI, rad, K. Request type: {@link TrajectoryRequest}. */
-export const trajectoryBody = z
+/** Integrator and model options of every exterior request. */
+export const exteriorOptions: z.ZodObject<ExteriorOptionsShape, z.core.$strict> =
+  exteriorOptionsParser satisfies Exact<typeof exteriorOptions, typeof exteriorOptionsParser>
+
+const trajectoryBodyParser = z
   .strictObject({
     shot,
     ranges: z
@@ -292,8 +445,17 @@ export const trajectoryBody = z
   })
   .describe('A shot and the slant ranges at which to report its trajectory. Units SI, rad, K.')
 
-/** Body of `POST /exterior/truing`: SI, rad, K. Request type: {@link TruingRequest}. */
-export const truingBody = z
+/** Body of `POST /exterior/trajectory`: SI, rad, K. Request type: {@link TrajectoryRequest}. */
+export const trajectoryBody: z.ZodObject<
+  {
+    shot: z.ZodObject<ShotShape, z.core.$strict>
+    ranges: z.ZodArray<z.ZodNumber>
+    options: z.ZodOptional<z.ZodObject<TrajectoryOptionsShape, z.core.$strict>>
+  },
+  z.core.$strict
+> = trajectoryBodyParser satisfies Exact<typeof trajectoryBody, typeof trajectoryBodyParser>
+
+const truingBodyParser = z
   .strictObject({
     shot,
     observations: z
@@ -365,6 +527,52 @@ export const truingBody = z
       .describe('Trajectory options of every evaluation and the limits of the fit.'),
   })
   .describe('A shot, observations and the parameters to fit to them. Units SI, rad, K.')
+
+/** Body of `POST /exterior/truing`: SI, rad, K. Request type: {@link TruingRequest}. */
+export const truingBody: z.ZodObject<
+  {
+    shot: z.ZodObject<ShotShape, z.core.$strict>
+    observations: z.ZodArray<
+      z.ZodObject<
+        {
+          kind: z.ZodEnum<{
+            height: 'height'
+            elevationHold: 'elevationHold'
+            velocity: 'velocity'
+          }>
+          range: z.ZodNumber
+          value: z.ZodNumber
+          standardUncertainty: z.ZodOptional<z.ZodNumber>
+        },
+        z.core.$strict
+      >
+    >
+    fit: z.ZodDiscriminatedUnion<
+      [
+        z.ZodObject<{ kind: z.ZodLiteral<'muzzleVelocity'> }, z.core.$strict>,
+        z.ZodObject<
+          {
+            kind: z.ZodLiteral<'drag'>
+            knots: z.ZodOptional<z.ZodArray<z.ZodNumber>>
+            fitMuzzleVelocity: z.ZodOptional<z.ZodBoolean>
+          },
+          z.core.$strict
+        >,
+      ],
+      'kind'
+    >
+    options: z.ZodOptional<
+      z.ZodObject<
+        TrajectoryOptionsShape & {
+          maxIterations: z.ZodOptional<z.ZodNumber>
+          maxCondition: z.ZodOptional<z.ZodNumber>
+        },
+        z.core.$strict
+      >
+    >
+  },
+  z.core.$strict
+> = truingBodyParser satisfies Exact<typeof truingBody, typeof truingBodyParser>
 
 /** A parsed `POST /exterior/trajectory` body, defaults applied. */
 export interface TrajectoryBody extends z.infer<typeof trajectoryBody> {}

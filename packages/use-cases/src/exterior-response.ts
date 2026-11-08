@@ -182,8 +182,9 @@ const trajectoryPoint = z.looseObject({
   ).optional(),
 })
 
+// the answer schemas are read as JSON Schema and to check answers, so their zod types stay unnamed
 /** 200 body of `POST /exterior/trajectory`. */
-export const trajectoryResponse = z.looseObject({
+export const trajectoryResponse: z.ZodType = z.looseObject({
   ...identity,
   units,
   result: z
@@ -213,7 +214,7 @@ const observationKind = z
   .describe('Quantity observed: height m, elevationHold rad or velocity m/s')
 
 /** 200 body of `POST /exterior/truing`. */
-export const truingResponse = z.looseObject({
+export const truingResponse: z.ZodType = z.looseObject({
   ...identity,
   units,
   result: z
@@ -326,7 +327,7 @@ const identification = {
 }
 
 /** 200 body of `POST /exterior/range-strings/plan`. */
-export const rangeStringsPlanResponse = z.looseObject({
+export const rangeStringsPlanResponse: z.ZodType = z.looseObject({
   ...identity,
   units,
   result: z
@@ -357,7 +358,7 @@ export const rangeStringsPlanResponse = z.looseObject({
 })
 
 /** 200 body of `POST /exterior/range-strings/fit`. */
-export const rangeStringsFitResponse = z.looseObject({
+export const rangeStringsFitResponse: z.ZodType = z.looseObject({
   ...identity,
   units,
   result: z
@@ -405,7 +406,7 @@ export const rangeStringsFitResponse = z.looseObject({
 })
 
 /** 200 body of `GET /exterior/stability`. */
-export const stabilityResponse = z.looseObject({
+export const stabilityResponse: z.ZodType = z.looseObject({
   ...identity,
   units,
   method: z.literal('miller').describe('Stability rule'),

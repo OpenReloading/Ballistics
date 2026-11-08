@@ -872,6 +872,9 @@ importers:
       '@open-reloading/ballistics':
         specifier: workspace:*
         version: link:../ballistics
+      '@open-reloading/catalog':
+        specifier: workspace:*
+        version: link:../catalog
       '@open-reloading/schema':
         specifier: workspace:*
         version: link:../schema

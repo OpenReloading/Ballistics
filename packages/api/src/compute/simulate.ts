@@ -30,6 +30,9 @@ import type { ComputeRunner, Results } from '@open-reloading/use-cases'
 import {
   assertFinite,
   type CartridgeWithSpecs,
+  findBullet,
+  findCartridge,
+  findPowder,
   type InteriorBody,
   interiorBody,
   notice,
@@ -54,7 +57,6 @@ import {
   readLoadFile,
   unknownKeyIssues,
 } from './load-file.ts'
-import { findBullet, findCartridge, findPowder } from './resolve.ts'
 
 /** Query of `POST /interior/load-file`: the body is the load file, so the query is the only option. */
 export const simulateQuery = z.strictObject({

@@ -5,12 +5,14 @@
 import { icao, millerStability } from '@open-reloading/ballistics'
 import type { Bullet } from '@open-reloading/schema'
 import { InputError } from '@open-reloading/statistics'
-import type { ComputeRunner } from '@open-reloading/use-cases'
-import { assertFinite, caps, resolvedRecord, responseUnits } from '@open-reloading/use-cases'
+import { assertFinite, resolvedRecord } from './answer.ts'
 import type { TrajectoryBody, TruingBody } from './exterior-schema.ts'
 import { bulletProjectile, bulletSi } from './resolve.ts'
+import { caps } from './schemas.ts'
 import { type StabilityQuery, stabilityBounds } from './stability-schema.ts'
 import type { RangeStringsFitBody, RangeStringsPlanBody } from './strings-schema.ts'
+import type { ComputeRunner } from './tasks.ts'
+import { responseUnits } from './units.ts'
 
 /** The compute runner and the bullet lookup of an exterior request. The lookup fails an unknown id with a 404 error. */
 export type ExteriorContext = {
@@ -168,16 +170,24 @@ function stabilityInputs(q: StabilityQuery, record: Bullet | undefined) {
     throw new InputError(`bullet ${q.bullet} has no diameter`)
   if (mass === undefined || diameter === undefined || length === undefined)
     throw new InputError(`bullet ${q.bullet} has no length`)
-  // request values have passed these bounds already; record values have not
-  for (const [key, value] of Object.entries({ mass, diameter, length })) {
-    const [lo, hi] = stabilityBounds[key as 'mass' | 'diameter' | 'length']
+  checkBounds(q.bullet, { mass, diameter, length })
+  return { mass, diameter, length, resolved }
+}
+
+/** Throws an `InputError` at the first value outside `stabilityBounds`: request values have passed them already, record values have not. */
+function checkBounds(
+  bullet: string | undefined,
+  values: { mass: number; diameter: number; length: number },
+) {
+  for (const key of ['mass', 'diameter', 'length'] as const) {
+    const value = values[key]
+    const [lo, hi] = stabilityBounds[key]
     const unit = key === 'mass' ? 'kg' : 'm'
     if (!(value >= lo && value <= hi))
       throw new InputError(
-        `bullet ${q.bullet} ${key} ${value} ${unit} must be within ${lo} and ${hi} ${unit}`,
+        `bullet ${bullet} ${key} ${value} ${unit} must be within ${lo} and ${hi} ${unit}`,
       )
   }
-  return { mass, diameter, length, resolved }
 }
 
 /** One stability query, in this thread (closed form): the body of the answer. */

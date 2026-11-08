@@ -1,6 +1,13 @@
-import { caps, fitIterations, steps } from '@open-reloading/use-cases'
 import { z } from 'zod'
-import { exteriorOptions, shot, trajectoryExample } from './exterior-schema.ts'
+import type { Exact } from './exact.ts'
+import {
+  exteriorOptions,
+  type ShotShape,
+  shot,
+  type TrajectoryOptionsShape,
+  trajectoryExample,
+} from './exterior-schema.ts'
+import { caps, fitIterations, steps } from './schemas.ts'
 
 /** Most entries of one candidate or fit, candidates of one plan. */
 export const rangeStringsLimits = { entries: 20, candidates: 10 } as const
@@ -162,11 +169,7 @@ const clickValue = z
   .max(1)
   .describe('Nominal click value of the sight, rad per click.')
 
-/**
- * Body of `POST /exterior/range-strings/plan`: SI, rad.
- * Request type: {@link RangeStringsPlanRequest}.
- */
-export const rangeStringsPlanBody = z
+const rangeStringsPlanBodyParser = z
   .strictObject({
     shot,
     clickValue,
@@ -196,11 +199,77 @@ export const rangeStringsPlanBody = z
   })
   .describe('A nominal shot and candidate range strings to plan. Units SI, rad.')
 
+/** The fields of a planned or measured distance. */
+export type RangeStringsEntryShape = {
+  kind: z.ZodEnum<{ impact: 'impact'; dial: 'dial' }>
+  range: z.ZodNumber
+  shotCount: z.ZodNumber
+  rounding: z.ZodOptional<z.ZodNumber>
+  group: z.ZodOptional<z.ZodString>
+}
+/** The fields of planned or measured muzzle velocity readings. */
+export type RangeStringsChronographShape = {
+  instrumentDistance: z.ZodOptional<z.ZodNumber>
+  shotCount: z.ZodNumber
+  standardDeviation: z.ZodNumber
+  rounding: z.ZodOptional<z.ZodNumber>
+}
+/** The zod type of the solver settings and identification thresholds of a range-strings request. */
+export type StringsOptionsSchema = z.ZodObject<
+  {
+    trajectoryOptions: z.ZodOptional<z.ZodObject<TrajectoryOptionsShape, z.core.$strict>>
+    fitZeroOffset: z.ZodOptional<z.ZodBoolean>
+    priors: z.ZodOptional<
+      z.ZodObject<
+        {
+          muzzleVelocity: z.ZodOptional<z.ZodNumber>
+          dragFactor: z.ZodOptional<z.ZodNumber>
+          clickValue: z.ZodOptional<z.ZodNumber>
+          zeroOffset: z.ZodOptional<z.ZodNumber>
+        },
+        z.core.$strict
+      >
+    >
+    maxIterations: z.ZodOptional<z.ZodNumber>
+    maxCondition: z.ZodOptional<z.ZodNumber>
+    confidenceLevel: z.ZodOptional<z.ZodNumber>
+    maxInflation: z.ZodOptional<z.ZodNumber>
+    maxRelativeStandardUncertainty: z.ZodOptional<z.ZodNumber>
+    maxZeroSigma: z.ZodOptional<z.ZodNumber>
+    residualConfidenceLevel: z.ZodOptional<z.ZodNumber>
+    scaleByResidual: z.ZodOptional<z.ZodBoolean>
+  },
+  z.core.$strict
+>
+
 /**
- * Body of `POST /exterior/range-strings/fit`: SI, rad.
- * Request type: {@link RangeStringsFitRequest}.
+ * Body of `POST /exterior/range-strings/plan`: SI, rad.
+ * Request type: {@link RangeStringsPlanRequest}.
  */
-export const rangeStringsFitBody = z
+export const rangeStringsPlanBody: z.ZodObject<
+  {
+    shot: z.ZodObject<ShotShape, z.core.$strict>
+    clickValue: z.ZodNumber
+    dispersion: z.ZodNumber
+    candidates: z.ZodArray<
+      z.ZodObject<
+        {
+          name: z.ZodOptional<z.ZodString>
+          entries: z.ZodArray<z.ZodObject<RangeStringsEntryShape, z.core.$strict>>
+          chronograph: z.ZodOptional<z.ZodObject<RangeStringsChronographShape, z.core.$strict>>
+        },
+        z.core.$strict
+      >
+    >
+    options: z.ZodOptional<StringsOptionsSchema>
+  },
+  z.core.$strict
+> = rangeStringsPlanBodyParser satisfies Exact<
+  typeof rangeStringsPlanBody,
+  typeof rangeStringsPlanBodyParser
+>
+
+const rangeStringsFitBodyParser = z
   .strictObject({
     shot,
     clickValue,
@@ -232,6 +301,31 @@ export const rangeStringsFitBody = z
     options: stringsOptions.optional(),
   })
   .describe('A nominal shot and measured range strings to fit. Units SI, rad.')
+
+/**
+ * Body of `POST /exterior/range-strings/fit`: SI, rad.
+ * Request type: {@link RangeStringsFitRequest}.
+ */
+export const rangeStringsFitBody: z.ZodObject<
+  {
+    shot: z.ZodObject<ShotShape, z.core.$strict>
+    clickValue: z.ZodNumber
+    entries: z.ZodArray<
+      z.ZodObject<
+        RangeStringsEntryShape & { value: z.ZodNumber; standardDeviation: z.ZodNumber },
+        z.core.$strict
+      >
+    >
+    chronograph: z.ZodOptional<
+      z.ZodObject<RangeStringsChronographShape & { mean: z.ZodNumber }, z.core.$strict>
+    >
+    options: z.ZodOptional<StringsOptionsSchema>
+  },
+  z.core.$strict
+> = rangeStringsFitBodyParser satisfies Exact<
+  typeof rangeStringsFitBody,
+  typeof rangeStringsFitBodyParser
+>
 
 /** A parsed `POST /exterior/range-strings/plan` body, defaults applied. */
 export interface RangeStringsPlanBody extends z.infer<typeof rangeStringsPlanBody> {}

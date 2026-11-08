@@ -1,8 +1,8 @@
 import { type TrajectoryInput, trajectory } from '@open-reloading/ballistics'
-import { inlineRunner } from '@open-reloading/use-cases'
-import { describe, expect, it } from 'vitest'
 import {
   type ExteriorContext,
+  findBullet,
+  inlineRunner,
   rangeStringsFitBody,
   rangeStringsPlanBody,
   runRangeStringsFit,
@@ -10,12 +10,12 @@ import {
   runStability,
   runTrajectory,
   runTruing,
-  simulate,
   stabilityQuery,
   trajectoryBody,
   truingBody,
-} from '../src/compute/browser.ts'
-import { findBullet } from '../src/compute/resolve.ts'
+} from '@open-reloading/use-cases'
+import { describe, expect, it } from 'vitest'
+import { simulate } from '../src/compute/simulate.ts'
 import { API_PREFIX } from '../src/version.ts'
 import { bundle, file, rifleShot, siValues } from './fixtures.ts'
 import { testCatalogue, withApi } from './setup.ts'

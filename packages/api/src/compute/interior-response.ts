@@ -5,9 +5,8 @@
  */
 import { advisoryIds } from '@open-reloading/ballistics'
 import { provenance } from '@open-reloading/schema'
-import { chargeTargetKinds, notice } from '@open-reloading/use-cases'
+import { chargeTargetKinds, identity, notice } from '@open-reloading/use-cases'
 import { z } from 'zod'
-import { identity } from './identity.ts'
 
 const num = (description: string) => z.number().describe(description)
 const int = (description: string) => z.int().describe(description)
