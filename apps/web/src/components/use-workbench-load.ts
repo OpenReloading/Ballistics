@@ -2581,7 +2581,7 @@ export function useWorkbenchState() {
     return
   }
 
-  /** The `POST /interior` body the Run and the charge target share, so both simulate one load; `as`: a Powders tab run. */
+  /** The `POST /interior` body the Run and the charge target share, so both simulate one load; `as`: a Powders tab run, whose rows `recordInputs` keys. */
   function loadRequest(as?: { powder: Powder; charge?: number }) {
     // every path that simulates (Run, auto-run, the charge target, the Powders tab) refuses it
     const refused = refusal(as)

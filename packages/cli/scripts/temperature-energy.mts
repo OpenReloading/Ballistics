@@ -1,4 +1,4 @@
-// The measured check of apps/docs/docs/research/propellant-temperature-energy.md; it prints aggregates only
+// The measured check of apps/docs/docs/research/propellant-temperature-energy.md, by the rule of #367; it prints aggregates only
 import { parseArgs } from 'node:util'
 import {
   fitPowder,
