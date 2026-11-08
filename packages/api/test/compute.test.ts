@@ -15,9 +15,8 @@ import {
   trueMuzzleVelocity,
 } from '@open-reloading/ballistics'
 import type { Cartridge } from '@open-reloading/schema'
-import { caps } from '@open-reloading/use-cases'
+import { caps, stabilityBounds } from '@open-reloading/use-cases'
 import { describe, expect, it } from 'vitest'
-import { stabilityBounds } from '../src/compute/stability-schema.ts'
 import { API_PREFIX } from '../src/version.ts'
 import { defined } from './defined.ts'
 import { bundle, m3Load, rifleProjectile as projectile, rifleShot as shot } from './fixtures.ts'

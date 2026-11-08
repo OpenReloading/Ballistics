@@ -1,10 +1,10 @@
 /** Database records to model inputs, with exact unit conversions. */
 import type { Aerodynamics, Projectile } from '@open-reloading/ballistics'
+import type { Catalogue, Catalogued } from '@open-reloading/catalog'
 import { type Bullet, toSi } from '@open-reloading/schema'
 import { InputError } from '@open-reloading/statistics'
-import type { CartridgeWithSpecs } from '@open-reloading/use-cases'
-import { type ResolvedRecord, resolvedRecord } from '@open-reloading/use-cases'
-import type { Catalogue } from '../catalogue/types.ts'
+import { type ResolvedRecord, resolvedRecord } from './answer.ts'
+import type { CartridgeWithSpecs } from './limits.ts'
 
 /**
  * `record`, or a 404 error naming the `kind` and `id` that were not found. Fastify answers it with
@@ -20,15 +20,19 @@ export const findCartridge = (catalogue: Catalogue, id: string): CartridgeWithSp
   found(catalogue.get('cartridge', id), 'cartridge', id)
 
 /** The bullet record `id`; a 404 error when unknown. */
-export const findBullet = (catalogue: Catalogue, id: string) =>
+export const findBullet = (catalogue: Catalogue, id: string): Catalogued<'bullet'> =>
   found(catalogue.get('bullet', id), 'bullet', id)
 
 /** The powder record `id`; a 404 error when unknown. */
-export const findPowder = (catalogue: Catalogue, id: string) =>
+export const findPowder = (catalogue: Catalogue, id: string): Catalogued<'powder'> =>
   found(catalogue.get('powder', id), 'powder', id)
 
 /** Record values in SI: mass kg, diameter and length m, each absent where the record has none. */
-export function bulletSi(record: Bullet) {
+export function bulletSi(record: Bullet): {
+  mass: number
+  diameter: number | undefined
+  length: number | undefined
+} {
   return {
     mass: toSi('mass', record.mass.value),
     diameter: record.diameter && toSi('length', record.diameter.value),
@@ -37,7 +41,7 @@ export function bulletSi(record: Bullet) {
 }
 
 /** Result of {@link bulletProjectile}: the projectile and the `resolved.bullet` part. */
-interface BulletProjectile {
+export interface BulletProjectile {
   projectile: Projectile
   bullet: ResolvedRecord & { dragModel: 'G1' | 'G7' }
 }

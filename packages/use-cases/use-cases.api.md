@@ -6,11 +6,15 @@
 
 import { AdvisoryId } from '@open-reloading/ballistics';
 import { AdvisoryRule } from '@open-reloading/ballistics';
-import type { Bullet } from '@open-reloading/schema';
+import type { Aerodynamics } from '@open-reloading/ballistics';
+import { Bullet } from '@open-reloading/schema';
 import { Cartridge } from '@open-reloading/schema';
+import type { Catalogue } from '@open-reloading/catalog';
+import type { Catalogued } from '@open-reloading/catalog';
 import { ChargeSolverOptions } from '@open-reloading/ballistics';
 import { ChargeTarget } from '@open-reloading/ballistics';
 import { comparePlanCandidates } from '@open-reloading/ballistics';
+import { DragModel } from '@open-reloading/ballistics';
 import { fitTruingStrings } from '@open-reloading/ballistics';
 import { InputError } from '@open-reloading/statistics';
 import { InteriorLoad } from '@open-reloading/ballistics';
@@ -19,6 +23,7 @@ import { InteriorResult } from '@open-reloading/ballistics';
 import { Powder } from '@open-reloading/schema';
 import { PressureRange } from '@open-reloading/ballistics';
 import { PressureTolerances } from '@open-reloading/ballistics';
+import type { Projectile } from '@open-reloading/ballistics';
 import type { Provenance } from '@open-reloading/schema';
 import { SampledBand } from '@open-reloading/ballistics';
 import { SamplingOptions } from '@open-reloading/ballistics';
@@ -42,7 +47,49 @@ export interface AdvisoryText {
 export const advisoryText: Readonly<Record<AdvisoryId, AdvisoryText>>;
 
 // @public
+export type AerodynamicsSchema = z.ZodObject<{
+    liftSlope: CoefficientSchema;
+    momentSlope: z.ZodOptional<CoefficientSchema>;
+    magnusForceSlope: z.ZodOptional<CoefficientSchema>;
+    spinDamping: z.ZodOptional<CoefficientSchema>;
+    axialInertia: z.ZodOptional<z.ZodNumber>;
+    transverseInertia: z.ZodOptional<z.ZodNumber>;
+}, z.core.$strict>;
+
+// @public
+export type AirSchema = z.ZodObject<{
+    altitude: z.ZodNumber;
+    pressure: z.ZodNumber;
+    temperature: z.ZodNumber;
+    humidity: z.ZodNumber;
+}, z.core.$strict>;
+
+// @public
 export function assertFinite<T>(response: T, allowed?: RegExp, infinite?: boolean): T;
+
+// @public
+export interface BulletProjectile {
+    // (undocumented)
+    bullet: ResolvedRecord & {
+        dragModel: 'G1' | 'G7';
+    };
+    // (undocumented)
+    projectile: Projectile;
+}
+
+// @public
+export function bulletProjectile(record: Bullet, ref: {
+    dragModel: 'G1' | 'G7';
+    length?: number | undefined;
+    aerodynamics?: Aerodynamics | undefined;
+}): BulletProjectile;
+
+// @public
+export function bulletSi(record: Bullet): {
+    mass: number;
+    diameter: number | undefined;
+    length: number | undefined;
+};
 
 // @public
 export type BurnSchema = z.ZodDiscriminatedUnion<[
@@ -150,6 +197,9 @@ export interface ChargeTargetRequest extends z.input<typeof chargeBody> {
 }
 
 // @public
+export type CoefficientSchema = z.ZodUnion<readonly [z.ZodNumber, z.ZodArray<z.ZodTuple<[z.ZodNumber, z.ZodNumber], null>>]>;
+
+// @public
 export class ComputeBusy extends Error {
     constructor(message: string, retryAfterSeconds: number, options?: ErrorOptions);
     retryAfterSeconds: number;
@@ -177,6 +227,29 @@ export function errorAnswer(error: unknown, input: {
     withNotice: boolean;
     truingDetails: boolean;
 }): ErrorAnswer | undefined;
+
+// @public
+export type ExteriorContext = {
+    compute: ComputeRunner;
+    findBullet: (id: string) => Bullet | Promise<Bullet>;
+};
+
+// @public
+export type ExteriorOptionsShape = {
+    relativeTolerance: z.ZodOptional<z.ZodNumber>;
+    absoluteTolerance: z.ZodOptional<z.ZodNumber>;
+    maxTime: z.ZodOptional<z.ZodNumber>;
+    gravity: z.ZodOptional<z.ZodNumber>;
+    coriolis: z.ZodOptional<z.ZodBoolean>;
+    spinDrift: z.ZodOptional<z.ZodBoolean>;
+    jump: z.ZodOptional<z.ZodBoolean>;
+    zeroTolerance: z.ZodOptional<z.ZodNumber>;
+    model: z.ZodOptional<z.ZodEnum<{
+        'point-mass': 'point-mass';
+        'modified-point-mass': 'modified-point-mass';
+    }>>;
+    maxYaw: z.ZodOptional<z.ZodNumber>;
+};
 
 // @public
 export interface ExteriorUnits {
@@ -259,7 +332,23 @@ export interface ExteriorUnits {
 }
 
 // @public
+export const findBullet: (catalogue: Catalogue, id: string) => Catalogued<'bullet'>;
+
+// @public
+export const findCartridge: (catalogue: Catalogue, id: string) => CartridgeWithSpecs;
+
+// @public
+export const findPowder: (catalogue: Catalogue, id: string) => Catalogued<'powder'>;
+
+// @public
 export const fitIterations: z.ZodOptional<z.ZodNumber>;
+
+// @public
+export const identity: {
+    inputHash: z.ZodString;
+    apiVersion: z.ZodString;
+    dataHash: z.ZodString;
+};
 
 // @public
 export const inlineRunner: ComputeRunner;
@@ -322,6 +411,12 @@ export const interiorExample: InteriorRequest;
 // @public
 export interface InteriorRequest extends z.input<typeof interiorBody> {
 }
+
+// @public
+export type InterpolationSchema = z.ZodOptional<z.ZodEnum<{
+    linear: 'linear';
+    'monotone-cubic': 'monotone-cubic';
+}>>;
 
 // @public
 export type M3LoadShape = {
@@ -421,6 +516,90 @@ export const notice = "simulation, not load data";
 export function powderBulkDensity(record: Powder): number | undefined;
 
 // @public
+export type QueryNumberSchema = z.ZodPipe<z.ZodPipe<z.ZodString, z.ZodTransform<number, string>>, z.ZodNumber>;
+
+// @public
+export type RangeStringsChronographShape = {
+    instrumentDistance: z.ZodOptional<z.ZodNumber>;
+    shotCount: z.ZodNumber;
+    standardDeviation: z.ZodNumber;
+    rounding: z.ZodOptional<z.ZodNumber>;
+};
+
+// @public
+export type RangeStringsEntryShape = {
+    kind: z.ZodEnum<{
+        impact: 'impact';
+        dial: 'dial';
+    }>;
+    range: z.ZodNumber;
+    shotCount: z.ZodNumber;
+    rounding: z.ZodOptional<z.ZodNumber>;
+    group: z.ZodOptional<z.ZodString>;
+};
+
+// @public
+export interface RangeStringsFitBody extends z.infer<typeof rangeStringsFitBody> {
+}
+
+// @public
+export const rangeStringsFitBody: z.ZodObject<{
+    shot: z.ZodObject<ShotShape, z.core.$strict>;
+    clickValue: z.ZodNumber;
+    entries: z.ZodArray<z.ZodObject<RangeStringsEntryShape & {
+        value: z.ZodNumber;
+        standardDeviation: z.ZodNumber;
+    }, z.core.$strict>>;
+    chronograph: z.ZodOptional<z.ZodObject<RangeStringsChronographShape & {
+        mean: z.ZodNumber;
+    }, z.core.$strict>>;
+    options: z.ZodOptional<StringsOptionsSchema>;
+}, z.core.$strict>;
+
+// @public
+export const rangeStringsFitExample: RangeStringsFitRequest;
+
+// @public
+export interface RangeStringsFitRequest extends z.input<typeof rangeStringsFitBody> {
+}
+
+// @public
+export const rangeStringsFitResponse: z.ZodType;
+
+// @public
+export const rangeStringsLimits: {
+    readonly entries: 20;
+    readonly candidates: 10;
+};
+
+// @public
+export interface RangeStringsPlanBody extends z.infer<typeof rangeStringsPlanBody> {
+}
+
+// @public
+export const rangeStringsPlanBody: z.ZodObject<{
+    shot: z.ZodObject<ShotShape, z.core.$strict>;
+    clickValue: z.ZodNumber;
+    dispersion: z.ZodNumber;
+    candidates: z.ZodArray<z.ZodObject<{
+        name: z.ZodOptional<z.ZodString>;
+        entries: z.ZodArray<z.ZodObject<RangeStringsEntryShape, z.core.$strict>>;
+        chronograph: z.ZodOptional<z.ZodObject<RangeStringsChronographShape, z.core.$strict>>;
+    }, z.core.$strict>>;
+    options: z.ZodOptional<StringsOptionsSchema>;
+}, z.core.$strict>;
+
+// @public
+export const rangeStringsPlanExample: RangeStringsPlanRequest;
+
+// @public
+export interface RangeStringsPlanRequest extends z.input<typeof rangeStringsPlanBody> {
+}
+
+// @public
+export const rangeStringsPlanResponse: z.ZodType;
+
+// @public
 export interface RangeStringsUnits extends TruingUnits {
     // (undocumented)
     readonly clickValue: 'rad';
@@ -505,7 +684,22 @@ export function runInterior(context: InteriorContext, body: InteriorBody, known?
 }>;
 
 // @public
+export function runRangeStringsFit(context: ExteriorContext, body: RangeStringsFitBody): Promise<Record<string, unknown>>;
+
+// @public
+export function runRangeStringsPlan(context: ExteriorContext, body: RangeStringsPlanBody): Promise<Record<string, unknown>>;
+
+// @public
+export function runStability(context: Pick<ExteriorContext, 'findBullet'>, q: StabilityQuery): Promise<Record<string, unknown>>;
+
+// @public
 export function runTask<T extends Task>(task: T): Results[T['kind']];
+
+// @public
+export function runTrajectory(context: ExteriorContext, body: TrajectoryBody): Promise<Record<string, unknown>>;
+
+// @public
+export function runTruing(context: ExteriorContext, body: TruingBody): Promise<Record<string, unknown>>;
 
 // @public
 export type SerializedError = {
@@ -521,6 +715,118 @@ export type SerializedError = {
 
 // @public
 export function serializeError(error: unknown): SerializedError;
+
+// @public
+export type ShotShape = {
+    projectile: z.ZodUnion<readonly [
+    z.ZodObject<{
+        mass: z.ZodNumber;
+        diameter: z.ZodNumber;
+        length: z.ZodOptional<z.ZodNumber>;
+        drag: z.ZodDiscriminatedUnion<[
+        z.ZodObject<{
+            kind: z.ZodLiteral<'bc'>;
+            model: z.ZodEnum<{
+                [K in DragModel]: K;
+            }>;
+            bands: z.ZodArray<z.ZodObject<{
+                ballisticCoefficient: z.ZodNumber;
+                minVelocity: z.ZodNumber;
+            }, z.core.$strict>>;
+            reference: z.ZodOptional<z.ZodEnum<{
+                icao: 'icao';
+                metro: 'metro';
+            }>>;
+            interpolation: InterpolationSchema;
+        }, z.core.$strict>,
+        z.ZodObject<{
+            kind: z.ZodLiteral<'curve'>;
+            curve: z.ZodArray<z.ZodTuple<[z.ZodNumber, z.ZodNumber], null>>;
+            interpolation: InterpolationSchema;
+        }, z.core.$strict>
+        ], 'kind'>;
+        aerodynamics: z.ZodOptional<AerodynamicsSchema>;
+    }, z.core.$strict>,
+    z.ZodObject<{
+        bullet: z.ZodString;
+        dragModel: z.ZodEnum<{
+            G1: 'G1';
+            G7: 'G7';
+        }>;
+        length: z.ZodOptional<z.ZodNumber>;
+        aerodynamics: z.ZodOptional<AerodynamicsSchema>;
+    }, z.core.$strict>
+    ]>;
+    muzzleVelocity: z.ZodNumber;
+    firearm: z.ZodObject<{
+        sightHeight: z.ZodNumber;
+        sightOffset: z.ZodOptional<z.ZodNumber>;
+        twist: z.ZodOptional<z.ZodNumber>;
+        twistHand: z.ZodOptional<z.ZodEnum<{
+            right: 'right';
+            left: 'left';
+        }>>;
+    }, z.core.$strict>;
+    air: AirSchema;
+    lookAngle: z.ZodOptional<z.ZodNumber>;
+    wind: z.ZodOptional<WindSchema>;
+    site: z.ZodOptional<z.ZodObject<{
+        latitude: z.ZodOptional<z.ZodNumber>;
+        azimuth: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$strict>>;
+    zero: z.ZodUnion<readonly [
+    z.ZodObject<{
+        range: z.ZodNumber;
+        lookAngle: z.ZodOptional<z.ZodNumber>;
+        air: z.ZodOptional<AirSchema>;
+        wind: z.ZodOptional<WindSchema>;
+    }, z.core.$strict>,
+    z.ZodObject<{
+        elevationAngle: z.ZodNumber;
+        windageAngle: z.ZodNumber;
+    }, z.core.$strict>
+    ]>;
+};
+
+// @public
+export interface StabilityBounds {
+    // (undocumented)
+    diameter: readonly [1e-3, 0.04];
+    // (undocumented)
+    length: readonly [1e-3, 0.2];
+    // (undocumented)
+    mass: readonly [1e-4, 0.2];
+    // (undocumented)
+    muzzleVelocity: readonly [1, 3000];
+    // (undocumented)
+    pressure: readonly [1e3, 2e5];
+    // (undocumented)
+    temperature: readonly [150, 400];
+    // (undocumented)
+    twist: readonly [0.01, 10];
+}
+
+// @public
+export const stabilityBounds: Readonly<StabilityBounds>;
+
+// @public
+export interface StabilityQuery extends z.infer<typeof stabilityQuery> {
+}
+
+// @public
+export const stabilityQuery: z.ZodObject<{
+    bullet: z.ZodOptional<z.ZodString>;
+    mass: z.ZodOptional<QueryNumberSchema>;
+    diameter: z.ZodOptional<QueryNumberSchema>;
+    length: z.ZodOptional<QueryNumberSchema>;
+    twist: QueryNumberSchema;
+    muzzleVelocity: QueryNumberSchema;
+    temperature: z.ZodOptional<QueryNumberSchema>;
+    pressure: z.ZodOptional<QueryNumberSchema>;
+}, z.core.$strict>;
+
+// @public
+export const stabilityResponse: z.ZodType;
 
 // @public
 export interface StepCaps {
@@ -541,6 +847,28 @@ export interface StepCaps {
 
 // @public
 export const steps: (max: number) => z.ZodOptional<z.ZodNumber>;
+
+// @public
+export type StringsOptionsSchema = z.ZodObject<{
+    trajectoryOptions: z.ZodOptional<z.ZodObject<{
+        maxSteps: z.ZodOptional<z.ZodNumber>;
+    } & ExteriorOptionsShape, z.core.$strict>>;
+    fitZeroOffset: z.ZodOptional<z.ZodBoolean>;
+    priors: z.ZodOptional<z.ZodObject<{
+        muzzleVelocity: z.ZodOptional<z.ZodNumber>;
+        dragFactor: z.ZodOptional<z.ZodNumber>;
+        clickValue: z.ZodOptional<z.ZodNumber>;
+        zeroOffset: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$strict>>;
+    maxIterations: z.ZodOptional<z.ZodNumber>;
+    maxCondition: z.ZodOptional<z.ZodNumber>;
+    confidenceLevel: z.ZodOptional<z.ZodNumber>;
+    maxInflation: z.ZodOptional<z.ZodNumber>;
+    maxRelativeStandardUncertainty: z.ZodOptional<z.ZodNumber>;
+    maxZeroSigma: z.ZodOptional<z.ZodNumber>;
+    residualConfidenceLevel: z.ZodOptional<z.ZodNumber>;
+    scaleByResidual: z.ZodOptional<z.ZodBoolean>;
+}, z.core.$strict>;
 
 // @public
 export type Task = {
@@ -575,6 +903,73 @@ export type Task = {
 export const taskTimeoutMs = 5000;
 
 // @public
+export interface TrajectoryBody extends z.infer<typeof trajectoryBody> {
+}
+
+// @public
+export const trajectoryBody: z.ZodObject<{
+    shot: z.ZodObject<ShotShape, z.core.$strict>;
+    ranges: z.ZodArray<z.ZodNumber>;
+    options: z.ZodOptional<z.ZodObject<ExteriorOptionsShape & {
+        maxSteps: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$strict>>;
+}, z.core.$strict>;
+
+// @public
+export const trajectoryExample: TrajectoryRequest;
+
+// @public
+export interface TrajectoryRequest extends z.input<typeof trajectoryBody> {
+}
+
+// @public
+export const trajectoryResponse: z.ZodType;
+
+// @public
+export interface TruingBody extends z.infer<typeof truingBody> {
+}
+
+// @public
+export const truingBody: z.ZodObject<{
+    shot: z.ZodObject<ShotShape, z.core.$strict>;
+    observations: z.ZodArray<z.ZodObject<{
+        kind: z.ZodEnum<{
+            height: 'height';
+            elevationHold: 'elevationHold';
+            velocity: 'velocity';
+        }>;
+        range: z.ZodNumber;
+        value: z.ZodNumber;
+        standardUncertainty: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$strict>>;
+    fit: z.ZodDiscriminatedUnion<[
+    z.ZodObject<{
+        kind: z.ZodLiteral<'muzzleVelocity'>;
+    }, z.core.$strict>,
+    z.ZodObject<{
+        kind: z.ZodLiteral<'drag'>;
+        knots: z.ZodOptional<z.ZodArray<z.ZodNumber>>;
+        fitMuzzleVelocity: z.ZodOptional<z.ZodBoolean>;
+    }, z.core.$strict>
+    ], 'kind'>;
+    options: z.ZodOptional<z.ZodObject<ExteriorOptionsShape & {
+        maxSteps: z.ZodOptional<z.ZodNumber>;
+        maxIterations: z.ZodOptional<z.ZodNumber>;
+        maxCondition: z.ZodOptional<z.ZodNumber>;
+    }, z.core.$strict>>;
+}, z.core.$strict>;
+
+// @public
+export const truingExample: TruingRequest;
+
+// @public
+export interface TruingRequest extends z.input<typeof truingBody> {
+}
+
+// @public
+export const truingResponse: z.ZodType;
+
+// @public
 export interface TruingUnits extends ExteriorUnits {
     // (undocumented)
     readonly dragFactor: '1';
@@ -603,6 +998,14 @@ export type Warning = {
 
 // @public
 export function warning(rule: AdvisoryRule, message: string, extra?: Pick<Warning, 'spec' | 'symbol' | 'variant' | 'method'>): Warning;
+
+// @public
+export type WindSchema = z.ZodArray<z.ZodObject<{
+    endDistance: z.ZodNumber;
+    speed: z.ZodNumber;
+    fromDirection: z.ZodNumber;
+    vertical: z.ZodOptional<z.ZodNumber>;
+}, z.core.$strict>>;
 
 // (No @packageDocumentation comment for this package)
 

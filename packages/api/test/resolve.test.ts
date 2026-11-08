@@ -1,14 +1,14 @@
 import { type Aerodynamics, lbPerSqInToKgPerSqM } from '@open-reloading/ballistics'
 import { type Bullet, toSi } from '@open-reloading/schema'
 import { InputError } from '@open-reloading/statistics'
-import { describe, expect, it } from 'vitest'
 import {
   bulletProjectile,
   bulletSi,
   findBullet,
   findCartridge,
   findPowder,
-} from '../src/compute/resolve.ts'
+} from '@open-reloading/use-cases'
+import { describe, expect, it } from 'vitest'
 import { defined } from './defined.ts'
 import { bundle } from './fixtures.ts'
 import { testCatalogue } from './setup.ts'
