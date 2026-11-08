@@ -38,9 +38,10 @@ for (const [what, text] of [
     await page.setViewportSize({ width: 1280, height: 900 })
     await runExample(page)
     const before = await resultLine(page).textContent()
+    await page.clock.install()
     await charge(page).fill(text)
-    // longer than the wait of 600 ms: a run would have started
-    await page.waitForTimeout(1500)
+    // past the wait of 600 ms: a run would have started
+    await page.clock.runFor(1500)
     await expect(stale(page)).toBeAttached()
     await expect(resultLine(page)).toHaveText(before ?? '')
   })
@@ -59,8 +60,9 @@ test('with Run automatically off, only Run runs', async ({ page }) => {
 
   await runExample(page)
   const before = await resultLine(page).textContent()
+  await page.clock.install()
   await lowerCharge(page)
-  await page.waitForTimeout(1500)
+  await page.clock.runFor(1500)
   await expect(stale(page)).toBeAttached()
   await expect(resultLine(page)).toHaveText(before ?? '')
   await charge(page).press('Control+Enter')
