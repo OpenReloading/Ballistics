@@ -26,6 +26,7 @@ import {
   compareConcurrency,
   compareKey,
 } from '../lib/powder-compare.ts'
+import type { Gap } from '../lib/resistance-gaps.ts'
 import { percentOfPressureLimit } from '../lib/workbench.ts'
 import type { UseWorkbenchStateResult } from './use-workbench-load.ts'
 import { derived, stepFlag } from './workbench-outcome.ts'
@@ -100,7 +101,7 @@ export function answerRow(
   req: {
     body: { load: InteriorBody['load'] }
     bulkDensity?: number | undefined
-    resistanceMissing?: { powder: string; missing: string[] } | undefined
+    resistanceMissing?: { powder: string; missing: Gap[] } | undefined
     castHardness?: number | undefined
   },
   charge: number,

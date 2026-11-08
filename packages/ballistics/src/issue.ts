@@ -3,6 +3,8 @@ import {
   need as needAny,
   InputError as StatisticsInputError,
 } from '@open-reloading/statistics'
+import type { ResistanceGap } from './interior/bore-resistance.ts'
+import type { PressureBasis } from './interior/fit.ts'
 
 /** Why an exterior function refuses its input or stops. */
 export type ExteriorIssue =
@@ -197,7 +199,7 @@ export type InteriorIssue =
   | Diagnostic<'ladderStepCountInvalid'>
   | Diagnostic<'ladderStepNotPositive'>
   | Diagnostic<'ladderStartNotPositive'>
-  | Diagnostic<'boreResistanceNeedsValues', { missing: string[] }>
+  | Diagnostic<'boreResistanceNeedsValues', { missing: ResistanceGap[] }>
   | Diagnostic<'powderWithoutInteriorModel'>
   | Diagnostic<'bulletConstructionUnknown', { construction: string }>
   | Diagnostic<'barrelNotPositive', { barrel: number }>
@@ -210,9 +212,21 @@ export type InteriorIssue =
   | Diagnostic<'dynamicVivacityExponentNotOne'>
   | Diagnostic<'priorValueOrSigmaNotPositive', { name: string }>
   | Diagnostic<'priorValueBelowFloorOrSigmaNotPositive', { name: string }>
+  /** Pressure rows of one ladder on more than one basis, counted per basis. */
+  | Diagnostic<'pressureBasesMixed', { rows: Partial<Record<PressureBasis, number>> }>
+
+/** Why a load file value is refused (`ValueError`, which names its field). */
+export type LoadFileIssue =
+  | Diagnostic<'valueMissing', { field: string }>
+  | Diagnostic<'valueNegative', { field: string }>
+  | Diagnostic<'burnFormPartial', { missing: string[] }>
+  | Diagnostic<'valueNotNumber'>
+  | Diagnostic<'valueNotPositive'>
+  | Diagnostic<'valueBelowZero'>
+  | Diagnostic<'engravingValueNeeded'>
 
 /** Why a function of this package refuses its input. */
-export type BallisticsIssue = ExteriorIssue | InteriorIssue
+export type BallisticsIssue = ExteriorIssue | InteriorIssue | LoadFileIssue
 
 /** `need` of `@open-reloading/statistics` with an issue of this package. */
 export const need: (ok: boolean, issue: BallisticsIssue) => void = needAny

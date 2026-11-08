@@ -4,9 +4,9 @@
  */
 import { icao, millerStability } from '@open-reloading/ballistics'
 import type { Bullet } from '@open-reloading/schema'
-import { InputError } from '@open-reloading/statistics'
 import { assertFinite, resolvedRecord } from './answer.ts'
 import type { TrajectoryBody, TruingBody } from './exterior-schema.ts'
+import { InputError } from './issue.ts'
 import { bulletProjectile, bulletSi } from './resolve.ts'
 import { caps } from './schemas.ts'
 import { type StabilityQuery, stabilityBounds } from './stability-schema.ts'
@@ -167,9 +167,9 @@ function stabilityInputs(q: StabilityQuery, record: Bullet | undefined) {
     ? fillFromRecord(q, record)
     : { ...q, resolved: undefined }
   if (diameter === undefined && length !== undefined)
-    throw new InputError(`bullet ${q.bullet} has no diameter`)
+    throw new InputError({ code: 'bulletWithoutDiameter', params: { bullet: String(q.bullet) } })
   if (mass === undefined || diameter === undefined || length === undefined)
-    throw new InputError(`bullet ${q.bullet} has no length`)
+    throw new InputError({ code: 'bulletWithoutLength', params: { bullet: String(q.bullet) } })
   checkBounds(q.bullet, { mass, diameter, length })
   return { mass, diameter, length, resolved }
 }
@@ -184,9 +184,10 @@ function checkBounds(
     const [lo, hi] = stabilityBounds[key]
     const unit = key === 'mass' ? 'kg' : 'm'
     if (!(value >= lo && value <= hi))
-      throw new InputError(
-        `bullet ${bullet} ${key} ${value} ${unit} must be within ${lo} and ${hi} ${unit}`,
-      )
+      throw new InputError({
+        code: 'bulletValueOutOfBounds',
+        params: { bullet: String(bullet), key, value, unit, low: lo, high: hi },
+      })
   }
 }
 

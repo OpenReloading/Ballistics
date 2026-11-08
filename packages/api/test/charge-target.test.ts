@@ -259,14 +259,16 @@ describe('POST /interior/charge-target', () => {
     const none = await post({ load, target, powder: 'example-b-slow' })
     expect(none.status).toBe(422)
     expect(none.body).toMatchObject({
-      message: 'powder example-b-slow has no bulk density',
+      code: 'powderWithoutBulkDensity',
+      params: { powder: 'example-b-slow' },
       notice,
     })
     const high = await post({ load, target, powder: 'example-a-dense' })
     expect(high.status).toBe(422)
-    expect(high.body.message).toBe(
-      'powder example-a-dense bulk density 6000 kg/m3 must be above 0 and at most 5000 kg/m3',
-    )
+    expect(high.body).toMatchObject({
+      code: 'powderBulkDensityOutOfRange',
+      params: { powder: 'example-a-dense', density: 6000, max: 5000 },
+    })
   })
 
   it('answers 404 for an unknown cartridge or powder', async () => {

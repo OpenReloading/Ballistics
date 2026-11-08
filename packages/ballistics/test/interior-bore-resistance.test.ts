@@ -85,13 +85,13 @@ describe('bore resistance of a record for a run', () => {
   it('names what the run lacks', () => {
     const { cartridge: _, bulletLengthMm: __, ...bare } = run
     expect(recordResistance(law, bare)).toEqual({
-      missing: ['a cartridge record', 'a bullet length'],
+      missing: ['cartridgeRecord', 'bulletLength'],
     })
     expect(recordResistance(law, { ...run, bulletLengthMm: undefined })).toEqual({
-      missing: ['a bullet length'],
+      missing: ['bulletLength'],
     })
     expect(recordResistance(law, { ...run, cartridge: undefined })).toEqual({
-      missing: ['a cartridge record'],
+      missing: ['cartridgeRecord'],
     })
   })
 

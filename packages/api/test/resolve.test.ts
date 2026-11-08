@@ -45,10 +45,12 @@ describe('record lookups', () => {
         try {
           find(catalogue, 'nope')
         } catch (e) {
-          return e as { statusCode: number; message: string }
+          return e as { issue: object }
         }
       })()
-      expect(error).toMatchObject({ statusCode: 404, message: `${kind} nope not found` })
+      expect(error).toMatchObject({
+        issue: { code: 'recordNotFound', params: { kind, id: 'nope' } },
+      })
     }
   })
 })
@@ -68,7 +70,9 @@ describe('bullet record to projectile', () => {
     const nameOnly = { ...rest, nameOnly: true as const }
     expect(bulletSi(nameOnly).diameter).toBeUndefined()
     expect(() => bulletProjectile(nameOnly, { dragModel: 'G1' })).toThrow(
-      new InputError('bullet example-a-1 has no diameter'),
+      expect.objectContaining({
+        issue: { code: 'bulletWithoutDiameter', params: { bullet: 'example-a-1' } },
+      }),
     )
   })
 
@@ -109,7 +113,9 @@ describe('bullet record to projectile', () => {
   it('refuses a record without a BC of the model or with two BCs of one start speed', () => {
     const plain = defined(bundle.bullets[0])
     expect(() => bulletProjectile(plain, { dragModel: 'G7' })).toThrow(
-      new InputError('bullet example-a-1 has no G7 ballistic coefficient'),
+      expect.objectContaining({
+        issue: { code: 'bulletWithoutCoefficient', params: { bullet: 'example-a-1', model: 'G7' } },
+      }),
     )
     expect(() =>
       bulletProjectile({ ...plain, ballisticCoefficients: undefined }, { dragModel: 'G1' }),
@@ -122,9 +128,12 @@ describe('bullet record to projectile', () => {
       ],
     }
     expect(() => bulletProjectile(twice, { dragModel: 'G1' })).toThrow(
-      new InputError(
-        'bullet example-a-1 has 2 G1 values without distinct velocity bands; send drag explicitly',
-      ),
+      expect.objectContaining({
+        issue: {
+          code: 'bulletCoefficientsWithoutBands',
+          params: { bullet: 'example-a-1', count: 2, model: 'G1' },
+        },
+      }),
     )
   })
 })

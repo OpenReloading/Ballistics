@@ -295,6 +295,6 @@ describe('POST /exterior/range-strings/fit', () => {
       options: { fitZeroOffset: true },
     })
     expect(status).toBe(422)
-    expect(body.message).toMatch(/non-finite/)
+    expect(body.code).toBe('resultNotFinite')
   })
 })

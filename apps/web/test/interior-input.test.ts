@@ -65,7 +65,9 @@ it('adds the cartridge only when one is chosen', () => {
 })
 
 it('names a missing field', () => {
-  expect(() => interiorBody({ ...values, charge: undefined })).toThrow('Charge mass')
+  expect(() => interiorBody({ ...values, charge: undefined })).toThrow(
+    expect.objectContaining({ field: 'charge' }),
+  )
 })
 
 it('sends the two-stage form when a, m, q and z1 are set, the constant form when none is', () => {
@@ -74,7 +76,9 @@ it('sends the two-stage form when a, m, q and z1 are set, the constant form when
     form: { kind: 'twoStage', a: 0.8, m: 0.5, q: 0.5, z1: 0.8 },
   })
   expect(interiorBody(values).load.propellant.burn).toMatchObject({ form: { kind: 'constant' } })
-  expect(() => interiorBody({ ...values, formA: 0.8 })).toThrow('m, q, z1')
+  expect(() => interiorBody({ ...values, formA: 0.8 })).toThrow(
+    expect.objectContaining({ field: 'formM' }),
+  )
 })
 
 it('flags the empty burn form fields of a partly filled form', () => {
