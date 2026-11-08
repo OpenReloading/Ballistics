@@ -10,7 +10,7 @@ import type { z } from 'zod'
 type ReadContext = { errors: string[]; sources?: SourceIndex; optional?: boolean }
 
 /** Parses the JSON file at `path`, or adds an `invalid JSON` error under `where`. */
-function readJsonFile(
+export function readJsonFile(
   path: string,
   where: string,
   errors: string[],
@@ -47,9 +47,13 @@ function readRecordFile<T>(
   const json = sources ? resolveRecord(read.json, sources, where, errors) : read.json
   const parsed = schema.safeParse(json)
   if (parsed.success) return parsed.data
-  for (const issue of parsed.error.issues) {
+  addIssues(where, parsed.error, errors)
+}
+
+/** Adds each issue of a failed parse to `errors` as `where: path: message`. */
+export function addIssues(where: string, error: z.ZodError, errors: string[]) {
+  for (const issue of error.issues)
     errors.push(`${where}: ${issue.path.join('.') || '(root)'}: ${issue.message}`)
-  }
 }
 
 /** The records of directory `dir` of every root, validated against `schema`. */

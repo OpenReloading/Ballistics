@@ -111,7 +111,7 @@ it('applies the bore resistance of the record from the cartridge, bullet length 
   // no G1: the bore diameter, as the fit
   const noG1 = recordResistance(powder, { ...run, cartridge: {}, bulletLengthMm: 30 })
   expect(noG1.resistance?.friction).toBeCloseTo((0.42e6 * Math.PI * 7.62 * 30) / 47.51, 3)
-  expect(recordResistance(powder, run).missing).toEqual(['a cartridge record', 'a bullet length'])
+  expect(recordResistance(powder, run).missing).toEqual(['cartridgeRecord', 'bulletLength'])
   expect(recordResistance({ ...powder, interior: undefined }, run)).toEqual({ missing: [] })
 })
 

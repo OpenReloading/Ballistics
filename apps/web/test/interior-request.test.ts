@@ -136,7 +136,7 @@ it('names the groove diameter of a cartridge record not loaded yet, and runs wit
     groove: { id: '223-rem', z: 5.69 },
     bulletLength: 30,
   })
-  expect(r.missing).toEqual(["the cartridge record's groove diameter (not loaded)"])
+  expect(r.missing).toEqual(['grooveNotLoaded'])
   expect(r.body.load.resistance).toBeUndefined()
 })
 

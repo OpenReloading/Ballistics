@@ -1,4 +1,9 @@
-import { burnFormKeys, type InteriorLoad, interiorLoad } from '@open-reloading/ballistics'
+import {
+  burnFormKeys,
+  type InteriorLoad,
+  interiorLoad,
+  ValueError,
+} from '@open-reloading/ballistics'
 import { msg, type Translator } from '../i18n/translate.ts'
 import type { FieldSpec } from './field-spec.ts'
 
@@ -374,17 +379,32 @@ export type InteriorBody = {
   pressureLimit?: number | undefined
 }
 
-/** The mapping is ballistics' `interiorLoad`, shared with `POST /interior/load-file`. */
+/** A refused value names its field by label, since the refusal words load apart from the page and hold no field table. */
+function labelledLoad(
+  values: Record<string, number | undefined>,
+  grooveDiameter: number | undefined,
+): InteriorLoad {
+  try {
+    return interiorLoad(values, grooveDiameter)
+  } catch (err) {
+    if (!(err instanceof ValueError)) throw err
+    const code = err.issue?.code
+    if (code !== 'valueMissing' && code !== 'valueNegative') throw err
+    const label = interiorFields.find((s) => s.key === err.field)?.label ?? err.field
+    throw new ValueError(err.field, { code, params: { field: label } })
+  }
+}
+
+/** SI field values; the mapping is ballistics' `interiorLoad`, shared with `POST /interior/load-file`; `grooveDiameter` (m) backs an empty bore area. */
 export function interiorBody(
   values: Record<string, number | undefined>,
   cartridge?: string | undefined,
   grooveDiameter?: number | undefined,
   pressureLimit?: number | undefined,
 ): InteriorBody {
-  const label = (key: string) => interiorFields.find((s) => s.key === key)?.label ?? key
   return {
     model: 'm3',
-    load: interiorLoad(values, label, grooveDiameter),
+    load: labelledLoad(values, grooveDiameter),
     ...(cartridge && { cartridge }),
     ...(pressureLimit !== undefined && { pressureLimit }),
   }

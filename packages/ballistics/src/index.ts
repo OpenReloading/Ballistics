@@ -96,6 +96,7 @@ export {
 export {
   boreArea,
   type RecordResistance,
+  type ResistanceGap,
   type ResistanceRun,
   type ResistanceTerms,
   recordBoreArea,
@@ -258,7 +259,7 @@ export {
   type WorkbenchValueKey,
   workbenchValueKeys,
 } from './interior/workbench-keys.ts'
-export type { BallisticsIssue, ExteriorIssue, InteriorIssue } from './issue.ts'
+export type { BallisticsIssue, ExteriorIssue, InteriorIssue, LoadFileIssue } from './issue.ts'
 export {
   type LoadNote,
   type LoadNoteRule,
