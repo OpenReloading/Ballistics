@@ -115,7 +115,8 @@ export function refuseTrace(
 /**
  * Why a file reader refuses the bytes or the text of a file: text decoding, the ZIP and XML of an
  * XLSX workbook, its cells, and the root of an XML load file. A `part` param names the XLSX part
- * and a `worksheet` param the XLS worksheet; the app words them before the message.
+ * and a `worksheet` param the XLS worksheet; the app words them before the message. A refused
+ * cell is named by its reference (`cell`), or by its column (`column`) when it has none.
  */
 export type FileDiagnostic = ReaderDiagnostic<
   | 'utf16OddBytes'

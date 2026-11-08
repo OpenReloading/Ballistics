@@ -98,7 +98,7 @@ describe('readWorkbook cells: refused cells', () => {
   it('names a cell without reference by its column in a refusal', async () => {
     expect(
       await rejection(readWorkbook(book({ [sheet]: ws(`<row>${'<c/>'.repeat(257)}</row>`) }))),
-    ).toEqual({ code: 'cellBeyondColumnIV', params: { cell: 'at column 257', part: sheet } })
+    ).toEqual({ code: 'cellBeyondColumnIV', params: { column: 257, part: sheet } })
     expect(
       await rejection(
         readWorkbook(
@@ -110,7 +110,7 @@ describe('readWorkbook cells: refused cells', () => {
       ),
     ).toEqual({
       code: 'sharedStringOutOfRange',
-      params: { cell: 'at column 1', index: '5', count: 0, part: sheet },
+      params: { column: 1, index: '5', count: 0, part: sheet },
     })
   })
 })

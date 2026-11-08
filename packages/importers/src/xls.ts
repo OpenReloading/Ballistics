@@ -295,7 +295,7 @@ function put(st: SheetState, row: number, col: number, text: string): void {
   }
   placeCell(
     cells,
-    { column: col + 1, text, name: () => `${letters(col + 1)}${row + 1}` },
+    { column: col + 1, text, at: () => ({ cell: `${letters(col + 1)}${row + 1}` }) },
     st.remaining,
   )
 }
