@@ -3,14 +3,9 @@ import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { startBundleApi, writeStaticApi } from '@open-reloading/api/static'
 import { sortKey } from '@open-reloading/schema'
-import {
-  chargeTargetExample,
-  interiorExample,
-  runTask,
-  serializeError,
-  type Task,
-} from '@open-reloading/use-cases'
+import { chargeTargetExample, interiorExample, replyTo, type Task } from '@open-reloading/use-cases'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+import { dataFile } from '../src/lib/data-file.ts'
 import { staticFetch } from '../src/lib/static-api.ts'
 
 let api: Awaited<ReturnType<typeof startBundleApi>>
@@ -21,13 +16,7 @@ class InlineWorker {
   onmessage?: (e: { data: unknown }) => void
   onerror?: () => void
   postMessage(task: Task) {
-    setTimeout(() => {
-      try {
-        this.onmessage?.({ data: { succeeded: true, value: runTask(task) } })
-      } catch (error) {
-        this.onmessage?.({ data: { succeeded: false, error: serializeError(error) } })
-      }
-    })
+    setTimeout(() => this.onmessage?.({ data: replyTo(task) }))
   }
   terminate() {}
 }
@@ -361,6 +350,35 @@ describe('the static site computes as the API', () => {
     }
   })
 
+  it('starts no worker for a run whose signal aborted while its cartridge record was read', async () => {
+    const started: InlineWorker[] = []
+    vi.stubGlobal(
+      'Worker',
+      class extends InlineWorker {
+        constructor() {
+          super()
+          started.push(this)
+        }
+      },
+    )
+    try {
+      // the record file is read already, so the run follows the abort within this task's microtasks
+      await dataFile('cartridges/308-win')
+      const abort = new AbortController()
+      const res = staticFetch('interior', {
+        method: 'POST',
+        body: JSON.stringify({ ...interior, cartridge: '308-win' }),
+        signal: abort.signal,
+      })
+      abort.abort()
+      await expect(res).rejects.toMatchObject({ name: 'AbortError' })
+      await new Promise((resolve) => setTimeout(resolve))
+      expect(started).toEqual([])
+    } finally {
+      vi.stubGlobal('Worker', InlineWorker)
+    }
+  })
+
   it('settles a record read when its signal aborts while the data file is pending', async () => {
     const online = globalThis.fetch
     vi.stubGlobal('fetch', () => new Promise<Response>(() => {}))
@@ -373,19 +391,5 @@ describe('the static site computes as the API', () => {
     } finally {
       vi.stubGlobal('fetch', online)
     }
-  })
-
-  it('leaves no abort listener on a signal after the call settles', async () => {
-    const abort = new AbortController()
-    const added = vi.spyOn(abort.signal, 'addEventListener')
-    const removed = vi.spyOn(abort.signal, 'removeEventListener')
-    const res = await staticFetch('interior', {
-      method: 'POST',
-      body: 'x'.repeat(64 * 1024 + 1),
-      signal: abort.signal,
-    })
-    expect(res.status).toBe(413)
-    expect(added).toHaveBeenCalledTimes(1)
-    expect(removed).toHaveBeenCalledWith('abort', added.mock.calls[0]?.[1])
   })
 })

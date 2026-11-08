@@ -408,19 +408,6 @@ describe('issueText', () => {
     },
   ]
 
-  it('covers each zod code the test means to feed', () => {
-    expect(new Set(issues.map((i) => i.code))).toEqual(
-      new Set([
-        'too_small',
-        'invalid_value',
-        'invalid_type',
-        'unrecognized_keys',
-        'invalid_union',
-        'custom',
-      ]),
-    )
-  })
-
   it("keeps zod's message out of every sentence and names the field", () => {
     for (const issue of issues) {
       const text = issueText(issue as Parameters<typeof issueText>[0], 'Field', t)

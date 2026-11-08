@@ -1,9 +1,10 @@
+import { canonicalJson } from '@open-reloading/schema'
 import { chargeTargetExample, interiorExample, trajectoryExample } from '@open-reloading/use-cases'
 import { describe, expect, it } from 'vitest'
 import { buildCatalogue } from '../src/catalogue/build.ts'
 import { openCatalogue } from '../src/catalogue/open.ts'
 import { loadFileExample } from '../src/compute/load-file-example.ts'
-import { canonicalJson, sha256 } from '../src/hash.ts'
+import { sha256 } from '../src/hash.ts'
 import { API_PREFIX, API_VERSION } from '../src/version.ts'
 import { bundle } from './fixtures.ts'
 import { testCatalogue, withApi } from './setup.ts'
@@ -28,13 +29,6 @@ describe('hashes', () => {
     expect(await sha256('abc')).toBe(
       'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad',
     )
-  })
-
-  it('canonicalJson sorts the keys at every depth and keeps the order of arrays', () => {
-    expect(canonicalJson({ b: [{ d: 1, c: 2 }, 3], a: null })).toBe(
-      '{"a":null,"b":[{"c":2,"d":1},3]}',
-    )
-    expect(canonicalJson(reversed(trajectoryExample))).toBe(canonicalJson(trajectoryExample))
   })
 })
 

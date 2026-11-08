@@ -1,11 +1,5 @@
 /** Worker entry of the compute pool: one task per message, one reply per task. */
 import { parentPort } from 'node:worker_threads'
-import { runTask, serializeError, type Task } from '@open-reloading/use-cases'
+import { replyTo, type Task } from '@open-reloading/use-cases'
 
-parentPort?.on('message', (task: Task) => {
-  try {
-    parentPort?.postMessage({ succeeded: true, value: runTask(task) })
-  } catch (error) {
-    parentPort?.postMessage({ succeeded: false, error: serializeError(error) })
-  }
-})
+parentPort?.on('message', (task: Task) => parentPort?.postMessage(replyTo(task)))

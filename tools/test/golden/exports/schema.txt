@@ -110,6 +110,7 @@
 . bulletOverrides
 . caliberClass
 . calibrationReference
+. canonicalJson
 . cartridge
 . cartridgeCase
 . cartridgeOverrides

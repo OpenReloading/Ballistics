@@ -1,5 +1,6 @@
 import { bulletWindow } from '@open-reloading/ballistics'
-import { canonicalJson, sha256 } from '../hash.ts'
+import { canonicalJson } from '@open-reloading/schema'
+import { sha256 } from '../hash.ts'
 import { revisionOf } from './derive.ts'
 import { select } from './list.ts'
 import {
