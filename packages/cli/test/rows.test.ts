@@ -69,7 +69,7 @@ describe('parseRows', () => {
   })
 
   it('rejects a long run of digits with a bad tail without stalling', () => {
-    expect(() => parseRows(`${head}\nc,b,p,"${'1'.repeat(100000)}x",800\n`, 'f.csv')).toThrow(
+    expect(() => parseRows(`${head}\nc,b,p,"${'1'.repeat(1_000_000)}x",800\n`, 'f.csv')).toThrow(
       'not a number',
     )
   })
