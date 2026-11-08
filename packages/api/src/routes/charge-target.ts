@@ -1,7 +1,7 @@
 import type { FastifyError, FastifyPluginAsync } from 'fastify'
 import { computeErrorHandler } from '../compute/answer.ts'
 import { chargeTarget } from '../compute/operations.ts'
-import type { ComputeContext } from './common.ts'
+import type { ComputeContext } from '../compute/tasks.ts'
 import { describeAnswers } from './identity.ts'
 
 /**
