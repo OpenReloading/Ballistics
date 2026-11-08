@@ -1,7 +1,4 @@
-/**
- * Notes on a target sheet: placeholders `{key.unit}`
- * that show a group's values, resolved on every render. No React, DOM or Next.js.
- */
+/** Placeholders `{key.unit}` resolved on every render; no React, DOM or Next.js. */
 import type { ShotGroup } from '@open-reloading/schema'
 import type { GroupStatistics } from '@open-reloading/shot-groups'
 import { formatNumber, plainNumber } from '../i18n/number.ts'
@@ -55,11 +52,7 @@ export const readoutUnitName = (u: Unit, system: UnitSystem) => unitNames[u](sys
 const readoutKeys = new Set<string>(readoutRows.map(([key]) => key))
 const plain = new Set(['name', 'shots', 'excluded', 'distance'])
 
-/**
- * `text` with each known placeholder replaced by the value of `group` now; "n/a" (written with
- * `t`) for a value the statistics leave out or without the group; other text, unknown tokens
- * included, as typed.
- */
+/** "n/a" for a value the statistics leave out; unknown tokens stay as typed. */
 export function resolveNote(
   text: string,
   group: ShotGroup | undefined,

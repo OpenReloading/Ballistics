@@ -3,12 +3,7 @@ import type { Message, Translator } from '../i18n/translate.ts'
 /** The values of the `{name}` placeholders of a message: text as shown, or a number the language writes. */
 type Values = Readonly<Record<string, string | number>>
 
-/**
- * A text that a server component or a data builder hands to the client for translation where it is
- * shown: a message of the catalogue (marked with `msg`), a text as it is published (a record's name,
- * a printed value: never translated) or a message with the values of its placeholders. All three
- * survive the step from server to client as data.
- */
+/** All three forms survive the server-to-client step as data; a verbatim text is never translated. */
 export type Wording = Message | { verbatim: string } | { message: Message; values: Values }
 
 /** A text shown as it is: a record's name or a printed value. */

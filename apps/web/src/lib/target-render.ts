@@ -19,11 +19,7 @@ const styleProps = [
   'display',
 ]
 
-/**
- * The SVG as standalone markup: an SVG drawn into a canvas loads no stylesheet, so each element's
- * computed style is written onto it; a stroke that keeps its screen width scales by `k` (view units
- * per px).
- */
+/** An SVG drawn into a canvas loads no stylesheet, so computed styles are inlined. */
 function standalone(svg: SVGSVGElement, k: number, size: { w: number; h: number }) {
   const clone = svg.cloneNode(true) as SVGSVGElement
   const walk = (a: Element, b: Element) => {

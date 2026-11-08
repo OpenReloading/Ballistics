@@ -35,10 +35,7 @@ const cartridgeBase = cartridge.omit({ aliases: true })
 
 const baseKey = (kind: string, id: string) => storageName(`openreloading-base:${kind}/${id}`)
 
-/**
- * The base last read from the API, kept in this browser; undefined without one or without storage.
- * A kept value that `schema` rejects (an older app's shape, a damaged entry) is forgotten.
- */
+/** A kept value the schema rejects (an older shape, a damaged entry) is forgotten. */
 function recalled<T>(key: string, schema: z.ZodType): T | undefined {
   try {
     const text = localStorage.getItem(key)
@@ -58,14 +55,7 @@ function remember(key: string, record: object | undefined) {
   } catch {}
 }
 
-/**
- * The catalogue record a variant is based on (`kind` as `bullets`). `missing` when the catalogue no
- * longer has it, `unreachable` when the API did not answer and this browser holds no earlier read,
- * so a record is never called gone for a network error. While the API does not answer, the base
- * last read stands in for it.
- * shortcut: a kept base is never removed for a deleted design, only replaced or dropped when its
- * record is gone from the catalogue; add a sweep if the entries pile up.
- */
+/** `unreachable` is never called gone for a network error; shortcut: a kept base is never removed for a deleted design, add a sweep if entries pile up. */
 async function readBase<T>(
   kind: 'bullets' | 'cartridges',
   schema: z.ZodType,
@@ -91,10 +81,7 @@ export const revisionOf = (record: object): string | undefined => {
   return typeof revision === 'string' ? revision : undefined
 }
 
-/**
- * Whether a base changed since the variant was saved: the revision kept at save (`saved`) differs
- * from the one the base has now. False without either revision.
- */
+/** False without either revision. */
 export function baseChanged(saved: string | undefined, base: Base<object>): boolean {
   if (saved === undefined || base.status !== 'found') return false
   const now = revisionOf(base.record)
@@ -187,12 +174,7 @@ export interface UserCartridgeView {
   resolved: ResolvedCartridge
 }
 
-/**
- * The bullet records of `records`, each resolved against the catalogue. A record whose base the
- * catalogue no longer has is left out: it has no values to list or seat, and opens read only in the
- * designer. A base the API did not answer keeps the record in, with the values of the base last
- * read, else those its overrides give.
- */
+/** A record whose base is gone is left out (it opens read-only in the designer); an unanswered base uses the last read. */
 export async function userBullets(records: readonly UserRecord[]): Promise<UserBulletView[]> {
   const names = withUserManufacturers(
     await fetchManufacturerNames().catch(() => noManufacturerNames),

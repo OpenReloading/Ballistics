@@ -30,8 +30,7 @@ export function reasonText(reason: string, { t, tn }: Pick<Translator, 't' | 'tn
     return t('The file is larger than {size} MB.', { size: maxFileBytes / 1e6 })
   if (reason === notJsonMessage) return t('The file is not JSON.')
   if (reason === notDataFileMessage) return t('The file is not an OpenReloading data file.')
-  // a refused record: zod's lines `✖ <message>` and `  → at <path>`, then `problemsText`'s count
-  // on the last line only (a key in the file may carry a line of its own into a message)
+  // zod's `✖` and `→ at` lines, with the problem count on the last line only.
   if (!reason.startsWith('✖ ')) return translateMessage(reason, t)
   return reason
     .replace(/^✖ (.+)$/gm, (_, message: string) => `✖ ${translateMessage(message, t)}`)
@@ -43,11 +42,7 @@ export function reasonText(reason: string, { t, tn }: Pick<Translator, 't' | 'tn
     )
 }
 
-/**
- * The text of a user data file holding `records` and the photos they point at (`files`). The
- * `invalid` records of the browser, as stored, are added under `invalid` (not part of the format
- * the schema reads: `parseUserDataFile` hands them on as they are).
- */
+/** Invalid records ride along under `invalid`, outside the format the schema reads. */
 export const userDataText = (
   records: UserRecord[],
   files?: EmbeddedFile[] | undefined,
@@ -122,11 +117,7 @@ export function checkedUserDataText(
   return checked.ok ? checked : { ok: false, reason: reasonOf(checked.diagnostic) }
 }
 
-/**
- * The text of an Export all file: `records` and the `invalid` ones with their photos in order
- * while the text stays under `maxFileBytes`, the ids of the photos left out (`left`), or why
- * Import would reject it.
- */
+/** Photos in order while the text stays under `maxFileBytes`; the ids left out in `left`. */
 export function exportAllText(
   records: UserRecord[],
   files: EmbeddedFile[] = [],
@@ -140,10 +131,7 @@ export function exportAllText(
   return all.ok ? all : { ok: false, reason: reasonOf(all.diagnostic) }
 }
 
-/**
- * JSON with sorted keys and without empty texts, so equal data compares equal whatever its key
- * order and whether an empty text is given or left out.
- */
+/** Sorted keys and no empty texts, so equal data compares equal. */
 export function canonicalJson(x: unknown): string {
   return JSON.stringify(x, function (_, v) {
     if (v === '' && !Array.isArray(this)) return
@@ -208,22 +196,13 @@ export function makerIdOf(record: UserRecord): string | undefined {
   return ref?.scope === 'user' ? ref.id : undefined
 }
 
-/**
- * The user manufacturer of `pool` that `record` names: what a file or link of that one record
- * carries, so the maker does not dangle where it is opened. None for another kind, a catalogue
- * manufacturer or a maker `pool` lacks.
- */
+/** So the maker does not dangle where a file or link of that one record opens. */
 export function makerRecordsOf(record: UserRecord, pool: readonly UserRecord[]): UserRecord[] {
   const id = makerIdOf(record)
   return id ? pool.filter((r) => r.kind === 'manufacturer' && r.id === id) : []
 }
 
-/**
- * The records of `pool` that `record` names by `user:<id>`, with the
- * user manufacturers they name, and the sessions of `pool` whose strings name `record`: what a
- * file of that record carries along, such as the cartridge, bullet, powder and measurement series
- * of a load read from another program's load file.
- */
+/** What a file of that record carries along, such as a load's records read from another program's load file. */
 export function linkedRecordsOf(record: UserRecord, pool: readonly UserRecord[]): UserRecord[] {
   // alone, every user reference of `record` dangles, so the check lists them all
   const ids = new Set(checkUserRefs([record]).map((d) => parseRef(d.target)?.id))
@@ -235,10 +214,7 @@ export function linkedRecordsOf(record: UserRecord, pool: readonly UserRecord[])
   return [...new Set([...linked, ...linked.flatMap((r) => makerRecordsOf(r, pool)), ...sessions])]
 }
 
-/**
- * The user manufacturer `record` names as a file or link carries it: the stored one, else the one
- * that came with the opened file or link (`carried`), which the store may lack or hold invalid.
- */
+/** The stored one, else the one carried with the opened file or link, which the store may lack or hold invalid. */
 export function makersToCarry(
   record: UserRecord,
   stored: readonly UserRecord[],
@@ -250,10 +226,7 @@ export function makersToCarry(
 
 const content = (r: UserRecord) => canonicalJson({ kind: r.kind, name: r.name, data: r.data })
 
-/**
- * Sorts incoming records against the stored ones by `id`: new, equal content, other content, and
- * `blocked` by an invalid stored record of the id in `invalid`, which nothing may overwrite.
- */
+/** `blocked` by an invalid stored record of the id, which nothing may overwrite. */
 export function planImport(
   incoming: UserRecord[],
   stored: UserRecord[],
@@ -275,10 +248,7 @@ export function planImport(
   return { added, equal, conflicts, blocked }
 }
 
-/**
- * The references of `opened` that point at no record of `opened` and `stored` (browser records
- * with another id), as one sentence; empty when all resolve.
- */
+/** Empty when all resolve. */
 export function refNote(opened: UserRecord[], stored: UserRecord[], t: Translator['t']): string {
   const ids = new Set(opened.map((r) => r.id))
   const name = new Map(opened.map((r) => [r.id, r.name]))

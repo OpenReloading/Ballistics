@@ -1,8 +1,4 @@
-/**
- * Pure helpers of the target photo editor: the sheet's frame, edits that
- * keep shots on their holes and overlay geometry in target coordinates. SI in and
- * out (m, rad); no React, DOM or Next.js.
- */
+/** SI in and out (m, rad); no React, DOM or Next.js. */
 import {
   type CalibrationReference,
   type ShotGroup,
@@ -38,10 +34,7 @@ const drawn: Frame = {
   toImage: [1 / mm, 0, 0, 0, -1 / mm, 0, 0, 0, 1],
 }
 
-/**
- * The frame of a sheet: the drawn target without a photo, the calibration with a photo and at
- * least one valid reference, else undefined (shots wait for a reference).
- */
+/** Shots wait for a valid reference on a photo. */
 export function frameOf(sheet: TargetSheet): Frame | undefined {
   if (sheet.photo === undefined) return drawn
   if (!sheet.references.length) return undefined
@@ -60,11 +53,7 @@ export function frameOf(sheet: TargetSheet): Frame | undefined {
 export const targetToView = (f: Frame, q: Point) => applyMatrix(f.toImage, q)
 export const viewToTarget = (f: Frame, p: Point) => applyMatrix(f.toTarget, p)
 
-/**
- * `next` with every shot, point of aim, ring mark and note re-expressed so it stays on its photo
- * point, after a change of references, rotation or origin (`keepOnPhoto`); unchanged when either
- * side has no calibration.
- */
+/** Every mark stays on its photo point (`keepOnPhoto`); unchanged without a calibration on either side. */
 export function rebase(before: TargetSheet, next: TargetSheet): TargetSheet {
   const a = frameOf(before)?.calibration
   const b = frameOf(next)?.calibration
@@ -100,11 +89,7 @@ function turnReferences(
   })
 }
 
-/**
- * `sheet` with its photo turned to `angle` (rad, counter-clockwise on screen) about the middle of
- * a `size` photo: references, origin and detection regions turn with the photo, the target axes
- * stay on the screen, and every shot, point of aim, ring mark and note stays on its hole.
- */
+/** Counter-clockwise on screen; target axes stay on the screen and every mark stays on its hole. */
 export function turnSheet(
   sheet: TargetSheet,
   size: { width: number; height: number },
@@ -174,11 +159,7 @@ export function newGroup(
   }
 }
 
-/**
- * `q` moved by `step` m in the screen direction (`dx`, `dy`), view y down: a key nudge follows the
- * screen whatever the rotation of the target axes. The view length of `step` along target x near
- * `q` sets the distance, so a perspective photo moves about `step`.
- */
+/** A nudge follows the screen whatever the axes' rotation; view length near `q` keeps it about `step` on a perspective photo. */
 export function screenNudge(f: Frame, q: Point, dx: number, dy: number, step: number): Point {
   const p = targetToView(f, q)
   const e = targetToView(f, { x: q.x + step, y: q.y })
@@ -186,11 +167,7 @@ export function screenNudge(f: Frame, q: Point, dx: number, dy: number, step: nu
   return viewToTarget(f, { x: p.x + dx * len, y: p.y + dy * len })
 }
 
-/**
- * Mean extreme spread of the groups at each ladder step of `charges` (kg) as an angle (rad), so
- * groups at different distances average fairly; `length` (m) only when every group is at one
- * distance. Steps without a group of two or more shots are left out.
- */
+/** As an angle so groups at different distances average fairly; `length` only at one distance. */
 export function ladderExtremeSpreads(groups: ShotGroup[], charges: number[]) {
   const sized = groups.flatMap((g) => {
     const es = g.ladderStep === undefined ? undefined : groupStatisticsOf(g).extremeSpread
@@ -274,11 +251,7 @@ export function axisEnds(s: GroupStatistics): [Point, Point] | undefined {
   ]
 }
 
-/**
- * Clicks of an optic that move the group centre onto the point of aim: the offset per axis as the
- * angle atan(offset / distance) (`apps/docs/docs/models/groups.md`, "Angles and pooling") over the click value, rounded,
- * with the dial direction (a group low and right needs up and left).
- */
+/** Offset as atan(offset / distance) over the click value (`apps/docs/docs/models/groups.md`, "Angles and pooling"); low right needs up left. */
 export function clicksToAim(offset: AimOffset, distance: number, click: number) {
   const count = (d: number) => Math.round(Math.atan(Math.abs(d) / distance) / click)
   return {

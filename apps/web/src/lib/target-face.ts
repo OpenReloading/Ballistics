@@ -1,10 +1,4 @@
-/**
- * Target face recognition on a photo: the black
- * area by a threshold sweep and an ellipse fit, the ring lines by Hessian ridges and a robust
- * ellipse fit per ring, the ring radii matched against the rule-book faces, and the face plane,
- * centre and scale from two or more concentric ellipses (the conic pencil). Pure: no React, DOM or
- * Next.js, so it runs in the Web Worker.
- */
+/** Face plane, centre and scale from two or more concentric ellipses (the conic pencil); pure, so it runs in the worker. */
 
 import type { TargetFace } from '@open-reloading/schema'
 import { seededUniforms } from '@open-reloading/statistics'
@@ -61,10 +55,7 @@ const SURE = 3
 /** A fit is applied without a question with this many rings matched and this score. */
 const SURE_RINGS = 4
 const SURE_SCORE = 2.5
-/**
- * Right and wrong first choices by the rings the first face matched, counted on real photos with
- * the true face known. Empty until such counts exist: a face's confidence is then undefined.
- */
+/** Empty until counts from real photos exist, so a face's confidence is undefined. */
 const FIRST_CHOICES: Readonly<Record<number, { right: number; wrong: number }>> = {}
 /** Numerals stand on the two axes within this many mm of them (the digits of the local 25 m faces are 4 to 9 mm tall), between the ring lines. */
 const NUMERAL_WIDTH = 6
@@ -95,11 +86,7 @@ function toGridEllipse(grid: Grid, e: Ellipse): Ellipse {
   }
 }
 
-/**
- * Ring lines around a black area: Hessian ridges in a crop of the photo around it, grouped by
- * their normalised radius (the fragments of one ring lie at one radius), one robust ellipse per
- * group. Returns the black edge refined on the finer grid too.
- */
+/** A ring's fragments lie at one normalised radius, so they group by it. */
 function ringLines(image: RgbaImage, black: Ellipse): { black: Ellipse; rings: Ring[] } {
   const half = REACH * meanRadius(black)
   // the crop is cut at the photo's edge; its longer side sets the block size
@@ -140,9 +127,7 @@ function ringLines(image: RgbaImage, black: Ellipse): { black: Ellipse; rings: R
     Math.max(12, Math.round(0.08 * rb)),
   )
   const first = fitRingGroups(fine, groupFragments(components, uOf), rb)
-  // under a steep perspective the outer rings are not concentric with the black edge's ellipse,
-  // so their radii by it spread into each other: group again by the radius on the face's plane.
-  // A sheet seen nearly square on keeps the first grouping: one ring's pencil is noisier there
+  // Under steep perspective outer rings drift off the black edge's ellipse, so regroup on the face plane; near square-on one ring's pencil is noisier.
   const tilted = blackFine.semiMinor / blackFine.semiMajor < 0.9
   const plane = tilted
     ? ringPlane(
@@ -163,11 +148,7 @@ function ringLines(image: RgbaImage, black: Ellipse): { black: Ellipse; rings: R
   return { black: toImageEllipse(fine, blackFine), rings }
 }
 
-/**
- * The map onto the face's plane where the black edge is the unit circle, from the conic pencil of
- * the black edge and the ring that gives the longest lever (its ratio agreeing with the mean radii's
- * within 6 %). Undefined without such a ring.
- */
+/** The ring with the longest lever whose ratio agrees within 6 %; undefined without one. */
 function ringPlane(black: Ellipse, rings: readonly Ellipse[]): Matrix | undefined {
   let best: Matrix | undefined
   let bestKey = 0
@@ -201,10 +182,7 @@ function ringBandMask(fine: Grid, uOf: RadiusOf): Uint8Array {
   return mask
 }
 
-/**
- * The ridge components that keep one normalised radius (spread within 6 % of it), grouped by
- * radius: the next fragment within 0.04 of the last joins its group. The points of each group.
- */
+/** Spread within 6 %; the next fragment within 0.04 joins the group. */
 function groupFragments(components: Point[][], uOf: RadiusOf): Point[][] {
   const frags = components
     .map((pts) => {
@@ -296,15 +274,7 @@ type FaceMatch = {
   matched: Array<{ ring: Ring; label: string; radius: number; error: number }>
 }
 
-/**
- * The faces ranked by how well the rings found around the black area fit their ring radii: the
- * black edge is the face's black diameter, so the scale is fixed, each ring found takes the
- * nearest ring of the face within 4 % of its radius, and rings expected between 0.15 and 2.9 black
- * radii that are not found count against a face a little. With the photo's `frame` (px), only a
- * ring with half its line in the photo is expected. A face with `photoSearch: false` is skipped.
- * With a known `scale` (image px per mm along the black area's long axis) a face whose black area
- * would have another size is skipped too.
- */
+/** The black edge fixes the scale; rings match within 4 %, missing expected rings count a little against, `photoSearch: false` faces are skipped. */
 export function matchFaces(
   black: Ellipse,
   rings: readonly Ring[],
@@ -384,10 +354,7 @@ function matchGreedily(pairs: readonly Pair[], list: readonly FaceRing[]): FaceM
   return matched
 }
 
-/**
- * The score of a match: each ring by its arc and its error, less 0.3 for each of the `missing`
- * rings expected and not matched and 0.1 for each of the `found` rings not matched.
- */
+/** Less 0.3 per expected ring missing and 0.1 per found ring unmatched. */
 function scoreMatch(matched: FaceMatch['matched'], missing: number, found: number): number {
   let score = 0
   for (const m of matched) score += (0.6 + 0.4 * m.ring.arc) * (1 - m.error / (2 * TOLERANCE))
@@ -521,12 +488,7 @@ function planePolylines(
   }
 }
 
-/**
- * The face plane from concentric ellipses of known radii (mm): the pair farthest apart in radius
- * (radii at least 1.3 apart, the arcs weighing in) gives the conic pencil, whose own radius ratio
- * must be the known one within 6 %; the others are checked on the plane. `outer` and `black` are
- * the radii of the outline drawn. Undefined without a usable pair.
- */
+/** The pair farthest apart in radius gives the pencil, whose ratio must match within 6 %; the others are checked on the plane. */
 function planeFromEllipses(members: Member[], outer: number, black: number): FacePlane | undefined {
   let best: { a: Member; plane: NonNullable<ReturnType<typeof concentricPlane>> } | undefined
   let bestKey = 0
@@ -544,10 +506,7 @@ function planeFromEllipses(members: Member[], outer: number, black: number): Fac
   return planeOf(best.plane.toPlane, best.plane.centre, ordered, outer, black, false)
 }
 
-/**
- * The plane of one ellipse taken as a circle of radius `radius` mm about its centre: the perspective
- * is not known, so the centre is biased under tilt (3.7 to 15.7 mm measured on tilted photos).
- */
+/** Without perspective the centre is biased under tilt (3.7 to 15.7 mm measured on tilted photos). */
 function planeFromOne(
   e: Ellipse,
   radius: number,
@@ -576,10 +535,7 @@ function planeFromOne(
   )
 }
 
-/**
- * A face fitted to the black edge and the rings matched. Undefined when the ellipses do not
- * rectify to circles of the face's radii (rms above 1.5 % of the black radius).
- */
+/** Undefined when the ellipses do not rectify to the face's circles (rms above 1.5 % of the black radius). */
 function fitFace(black: Ellipse, match: FaceMatch): FaceFit | undefined {
   const face = match.face
   const blackRadius = face.blackDiameter.value / 2
@@ -629,18 +585,9 @@ export type FaceSearch = {
   }>
   /** The fits of the best face and of the faces that fit as well (ratio twins), best first. */
   fits: FaceFit[]
-  /**
-   * The fits of the faces that match every ring the best face matches, whatever their score (a
-   * larger face is marked down for its outer rings the photo does not show), smallest first: an
-   * equal choice when there is more than one. Empty with a known scale, which has dropped the faces
-   * of another size.
-   */
+  /** Whatever their score, since a larger face loses points for outer rings off the photo; empty with a known scale. */
   alike: FaceFit[]
-  /**
-   * One face with at least four rings matched and a score of 2.5: the editor applies it without a
-   * question. Fewer rings are a coincidence of ratios often enough (rings at equal spacing) that the
-   * user confirms the face.
-   */
+  /** Applied without a question; fewer rings match equally spaced faces by coincidence often enough to ask. */
   sure: boolean
 }
 
@@ -712,10 +659,7 @@ export function searchFaces(
   return result
 }
 
-/**
- * The fit of a face the user picked from the ranking, from the search's black edge and rings: with
- * two rings matched the pencil gives the plane, else the black edge alone (approximate).
- */
+/** Two matched rings give the plane through the pencil, else the black edge alone (approximate). */
 export function fitPicked(search: FaceSearch, face: TargetFace): FaceFit | undefined {
   if (!search.black) return undefined
   const match = nth(matchFaces(search.black, search.rings, [face]), 0)
@@ -772,11 +716,7 @@ export function onPhoto(search: FaceSearch, k: number, x0: number, y0: number): 
   }
 }
 
-/**
- * The face as the hole detection sees it, on the px `toFace` maps from: the outer ring grown by
- * `hole` mm (a hole touching the outer ring still scores) as the region, and the black area as
- * the background of its own kind.
- */
+/** The outer ring grown by `hole` mm, since a hole touching it still scores. */
 export function faceLabel(g: FaceGeometry, hole: number): FaceLabel {
   const inv = inv3(g.toFace) ?? [1, 0, 0, 0, 1, 0, 0, 0, 1]
   const R = g.outer + hole / 2

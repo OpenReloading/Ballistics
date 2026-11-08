@@ -13,10 +13,7 @@ export const recordFileName = (name: string) =>
       .replace(/^-|-$/g, '') || 'record'
   }.json`
 
-/**
- * Whether a file's text holds record `id` and nothing else but the user manufacturer it names, so
- * a Save may write over it.
- */
+/** Only then may a Save write over it. */
 export function ownsFile(text: string | undefined, id: string) {
   if (text === undefined) return false
   const p = parseUserDataFile(text)

@@ -10,11 +10,7 @@ import {
   tuneTableKey,
 } from './powder-tune.ts'
 
-/**
- * The load the workbench handed over for load `load` (a reference), parsed as the workbench's run
- * parses its body; undefined when there is none or it is not valid. Apart from `powder-tune.ts`, so
- * the workbench, which writes it, does not load the schema of the run.
- */
+/** Apart from `powder-tune.ts`, so the workbench that writes it does not load the run's schema. */
 export function readTuneLoad(load: string) {
   try {
     const text = sessionStorage.getItem(tuneLoadKey(load))
@@ -61,11 +57,7 @@ export function readTuneAction(load: string) {
   }
 }
 
-/**
- * The CIP table of the cartridge record of the load handed over for load `load`: the table handed
- * over, else that of the cartridge record whose id was handed over while it was still loading,
- * fetched (as the workbench's run does); undefined when there is neither or the record has none.
- */
+/** The handed-over table, else fetched for a cartridge that was still loading, as the workbench's run does. */
 export async function tuneTable(load: string, signal?: AbortSignal) {
   const handed = readTuneTable(load)
   if (handed !== undefined) return handed

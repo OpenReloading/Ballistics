@@ -19,10 +19,7 @@ export type RunnableLadderKind = LadderKind
 export const runKindOf = (v: string | null | undefined): RunnableLadderKind =>
   v === 'seating' || v === 'temperature' ? v : 'charge'
 
-/**
- * Why the temperature ladder cannot run, or undefined when it can: the model varies the burn rate
- * with temperature only through the temperature sensitivity of the powder record.
- */
+/** The model varies the burn rate with temperature only through the powder record's sensitivity. */
 export function temperatureLadderBlockReason(
   powderLabel: string | undefined,
   hasSensitivity: boolean,
@@ -48,10 +45,7 @@ function ladderValues(start: number, step: number, steps: number, direction: Lad
   )
 }
 
-/**
- * The propellant temperatures of a temperature ladder from `start` (the Powder temperature field),
- * K, or the reason it cannot run. `show` writes a temperature in the page's unit with its symbol.
- */
+/** `show` writes a temperature in the page's unit with its symbol. */
 export function temperatureLadder(
   start: number | undefined,
   step: number,
@@ -81,20 +75,12 @@ export const seatingLengthName: Record<SeatingLengthKind, string> = {
   baseToOgive: 'CBTO',
 }
 
-/**
- * The seated bullet at another COAL or CBTO, from the seating preview (`seat` of
- * `@open-reloading/drawing/seating`): the length it seats by, its slider range and the values
- * behind the bullet at a length.
- */
+/** From the seating preview (`seat` of `@open-reloading/drawing/seating`). */
 export type SeatingLengths = {
   lengthKind: SeatingLengthKind
   /** Slider range of the length it seats by, m. */
   range: readonly [number, number]
-  /**
-   * Case volume behind the bullet (m³), bullet travel and jump (m) at `value` (m), absent without
-   * the record values; with a hollow base of assumed depth the bracket of the volume
-   * (`cavityRange`, m³).
-   */
+  /** Absent without the record values; a hollow base of assumed depth adds its volume bracket (`cavityRange`). */
   at: (value: number) => {
     volume?: number | undefined
     travel?: number | undefined
@@ -115,10 +101,7 @@ export type SeatingStep = {
   cavityRange?: CavityRange | undefined
 }
 
-/**
- * The steps of a seating ladder from `start`, or the reason it cannot run. `show` writes a length
- * in the page's unit with its symbol, so the messages name the unit the fields show.
- */
+/** `show` writes lengths in the page's unit, so the messages name the unit the fields show. */
 export function seatingLadder(
   seat: SeatingLengths,
   start: number | undefined,

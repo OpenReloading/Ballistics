@@ -242,10 +242,7 @@ function faceMessage(text: string, t: Translator['t']) {
   return needed ? t('at least {n} needed.', { n: Number(needed[1]) }) : text
 }
 
-/**
- * The face the draft builds as the tools use it, or the problems with the draft in the language of
- * `t`: those of a field carry its key, the others name the part of the face.
- */
+/** A field's problems carry its key; the others name the part of the face. */
 export function faceOf(
   d: Design,
   id: string,

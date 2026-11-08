@@ -4,12 +4,7 @@
 export const togglePick = (picked: readonly string[], id: string, max: number) =>
   picked.includes(id) ? picked.filter((x) => x !== id) : [...picked, id].slice(0, max)
 
-/**
- * `picked` after a click on the box of `id`. With an `anchor` (the box clicked before) that is in
- * `rows`, every row between the two, `can` permitting, takes the state the click gives `id`:
- * ticked rows are appended in row order up to `max`, unticked ones leave. Without a usable anchor
- * (none yet, or hidden by the search) it is a plain toggle.
- */
+/** Shift-range: rows between the anchor and `id` take the click's state; without a visible anchor it is a plain toggle. */
 export function pickRange<T extends { id: string }>(
   rows: readonly T[],
   picked: readonly string[],

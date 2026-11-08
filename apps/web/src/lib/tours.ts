@@ -1,10 +1,7 @@
 import { type Message, msg } from '../i18n/translate.ts'
 import { storageName } from './edition.ts'
 
-/**
- * One step of a page tour: the element it points at (CSS selectors, the first one shown is taken,
- * so a phone layout can name its own) and its short text.
- */
+/** The first shown selector is taken, so a phone layout can name its own target. */
 export type TourStep = { target: string; title: Message; text: Message }
 
 /** The tours of the pages that have one, by page. */
@@ -35,8 +32,7 @@ export const tours = {
       ),
     },
     {
-      // the menu itself has no box in the page bar: its Open button, not the disabled placeholder;
-      // below 75em the closed Page actions panel hides it, so its toggle
+      // The menu has no box of its own: its Open button, or below 75em the Page actions toggle that hides it.
       target: '.file-menu button:not(:disabled), .page-bar-toggle',
       title: msg('File'),
       text: msg(

@@ -11,10 +11,7 @@ interface YourDataKind {
   href: string
 }
 
-/**
- * The kinds of records the user owns, in the order of the Database tabs. There is no row for the
- * disciplines (no user record of that kind).
- */
+/** In Database tab order; no discipline row, since there is no user record of that kind. */
 const yourDataKinds: readonly YourDataKind[] = [
   { kind: 'cartridge', label: msg('Cartridges'), href: '/cartridges?src=user' },
   { kind: 'bullet', label: msg('Bullets'), href: '/bullets?src=user' },
@@ -34,10 +31,7 @@ function noteRows(records: readonly UserRecord[]) {
   ]
 }
 
-/**
- * One row per kind of {@link yourDataKinds} with the number of `records` of that kind (0 for none).
- * The firearms row adds the notes on firearms and on saved loads (`notes`).
- */
+/** The firearms row adds the firearm and saved-load notes. */
 export const yourDataRows = (records: readonly UserRecord[]) =>
   yourDataKinds.map((k) => ({
     ...k,

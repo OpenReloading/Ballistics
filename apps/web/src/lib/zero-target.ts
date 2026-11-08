@@ -1,9 +1,4 @@
-/**
- * The printable zero target: an A4 sheet in mm (y down from the top left) with four corner marks
- * whose centres span a known rectangle for the photo calibration, a 10 mm grid, a centre cross with
- * a black aiming square, a 100 mm check bar, a field row and a footer. Pure: no React, DOM or
- * Next.js.
- */
+/** An A4 sheet in mm, y down; four corner marks span a known rectangle for the photo calibration. */
 import type { ShotGroup } from '@open-reloading/schema'
 import { plainNumber } from '../i18n/number.ts'
 import type { Point } from './target-geometry.ts'
@@ -41,10 +36,7 @@ const white = '#fff'
 const markRadius = 5
 const squareSide = 25
 
-/**
- * The drawing of the sheet, mm. The marks are thin rings with a cross, the top left one with a
- * second ring inside, so no mark prints as a filled spot of a hole's size.
- */
+/** Marks are thin rings with a cross, so none prints as a filled spot of a hole's size. */
 export function zeroTargetShapes(): { lines: Line[]; rings: Ring[]; rects: Rect[] } {
   const lines: Line[] = []
   const rings: Ring[] = []

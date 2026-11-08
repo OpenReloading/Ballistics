@@ -10,10 +10,7 @@ export const faceIdPrefix = 'user-'
 /** The id of the face a record builds: `user-` and the record id, a UUID, which the face schema takes as it is. */
 export const userFaceId = (recordId: string) => `${faceIdPrefix}${recordId}`
 
-/**
- * The ids of a design's events: the name in lowercase letters and digits in groups joined by
- * hyphens, `event` where that is empty, and a number after a repeat so that every id is unique.
- */
+/** `event` where the name gives nothing, a number after a repeat, so every id is unique. */
 function eventIds(names: readonly string[]) {
   const used = new Set<string>()
   return names.map((name) => {

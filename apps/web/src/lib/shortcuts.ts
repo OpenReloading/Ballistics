@@ -3,12 +3,7 @@ import { type Message, msg } from '../i18n/translate.ts'
 
 type Shortcut = { action: Message; keys: readonly string[]; fields?: boolean }
 
-/**
- * The app's keyboard shortcuts: handlers, hints, the search's
- * command keys and the help dialog all read this table. A key is a `@mantine/hooks` hotkey (`mod`
- * is Ctrl or Cmd on every platform) or one character, which fires outside text fields only and on any
- * layout (so its shift state is not checked). `fields`: also fires while typing in a field.
- */
+/** One table for handlers, hints, command keys and help; a one-character key fires outside text fields on any layout, so shift is not checked. */
 const table = {
   search: { action: msg('Search'), keys: ['mod+K'], fields: true },
   help: { action: msg('Keyboard shortcuts'), keys: ['?'] },
@@ -69,10 +64,7 @@ const hits = (k: string, e: KeyboardEvent) => {
   return hit
 }
 
-/**
- * True when key event `e` is one of the keys of `id`. A single-character key matches only without
- * Ctrl, Meta or Alt.
- */
+/** A single-character key matches only without Ctrl, Meta or Alt. */
 export const shortcutMatches = (id: ShortcutId, e: KeyboardEvent) =>
   keysOf(id).some((k) =>
     k.length === 1 ? e.key === k && !e.ctrlKey && !e.metaKey && !e.altKey : hits(k, e),

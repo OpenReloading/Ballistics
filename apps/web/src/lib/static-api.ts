@@ -1,11 +1,4 @@
-/**
- * The API of the static site, in the browser. Reads answer from the data files the Pages build
- * writes under `<base>/api/` (`writeStaticApi` of `@open-reloading/api/static`): lists from the
- * catalogue over `catalogue/index.json`, the code the API's routes run, and records from
- * `<kind>/<id>.json`. `POST interior` and
- * `interior/charge-target` run the API's own validation and runs (`@open-reloading/use-cases`),
- * each compute task in a Web Worker of its own, terminated at the API's task deadline.
- */
+/** The API in the browser over the Pages data files, running the API's own code (`@open-reloading/use-cases`), each compute task in its own worker. */
 
 import { type Catalogue, type CatalogueIndex, openCatalogue } from '@open-reloading/api/catalogue'
 import { type Powder, primerCompounds, primerSizes, recordIdRegex } from '@open-reloading/schema'
@@ -68,10 +61,7 @@ const filters: Record<string, string[]> = {
 
 let opened: { index: CatalogueIndex; catalogue: Catalogue } | undefined
 
-/**
- * The catalogue over `catalogue/index.json`, the index every list is answered from.
- * shortcut: lists only, a record is read from its own data file; extend `records` when a caller needs `get`.
- */
+/** shortcut: lists only, a record is read from its own data file; extend `records` when a caller needs `get`. */
 export async function catalogue(): Promise<Catalogue> {
   const index = await dataFile<CatalogueIndex>('catalogue/index')
   if (!index) throw new Error('catalogue/index.json answered 404')
@@ -88,13 +78,7 @@ export async function catalogue(): Promise<Catalogue> {
   return opened.catalogue
 }
 
-/**
- * A list answer, from the catalogue as the API's routes answer it: the same paging, `q`, filters and
- * order, the refusals of its query schemas. Cartridges, bullets, powders, primers and cases page (`limit`, `offset`)
- * and search (`q`); the filters are `table` (cartridges), `manufacturer` (bullets, powders, primers, cases), `size` and `compound` (primers),
- * `cartridge` (bullets, cases), `federation` (disciplines) and `discipline` and `face` (target mappings).
- * Other keys are refused, as the API refuses them, and so is a `q` holding a control character.
- */
+/** Paging, `q`, filters, order and refusals as the API's routes, so the static site answers as the server does. */
 async function list(kind: string, query: URLSearchParams) {
   const p = listQuery(kind, query)
   if (!p) return refusal(400, 'Bad Request', 'querystring does not match the schema')
@@ -222,10 +206,7 @@ const findRecord =
     return record
   }
 
-/**
- * Runs each task in a Web Worker of its own, terminated after `taskTimeoutMs` (a `ComputeTimeout`,
- * as the API's pool) or when `signal` aborts.
- */
+/** Terminated after `taskTimeoutMs` with a `ComputeTimeout`, as the API's pool. */
 function workerRunner(signal: AbortSignal | undefined): ComputeRunner {
   return {
     run: (task) => {
