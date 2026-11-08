@@ -1,23 +1,11 @@
 import { type Aerodynamics, lbPerSqInToKgPerSqM } from '@open-reloading/ballistics'
 import { type Bullet, toSi } from '@open-reloading/schema'
 import { InputError } from '@open-reloading/statistics'
-import {
-  bulletProjectile,
-  bulletSi,
-  findBullet,
-  findCartridge,
-  findPowder,
-} from '@open-reloading/use-cases'
 import { describe, expect, it } from 'vitest'
-import { defined } from './defined.ts'
-import { bundle } from './fixtures.ts'
-import { testCatalogue } from './setup.ts'
-
-describe('stored to SI', () => {
-  it('uses the solver factor for the ballistic coefficient', () => {
-    expect(toSi('ballisticCoefficient', 1)).toBe(lbPerSqInToKgPerSqM)
-  })
-})
+import { bundle } from '../../catalog/test/bundle.ts'
+import { defined } from '../../catalog/test/defined.ts'
+import { bulletProjectile, bulletSi, findBullet, findCartridge, findPowder } from '../src/resolve.ts'
+import { testCatalogue } from './catalogue.ts'
 
 const g7: Bullet = {
   ...defined(bundle.bullets[0]),

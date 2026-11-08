@@ -403,6 +403,10 @@
     "source": "import { trajectory } from '@open-reloading/ballistics'\nimport { bullet } from '@open-reloading/schema'\nimport type { Catalogue } from '@open-reloading/catalog'\nimport { z } from 'zod'\nexport type { Catalogue }\nexport { trajectory, bullet, z }",
     "rules": []
   },
+  "packages/use-cases/src/catalog-value.ts": {
+    "source": "import { checkRecords } from '@open-reloading/catalog'\nexport { checkRecords }",
+    "rules": ["use-cases-imports-catalog-types"]
+  },
   "packages/use-cases/src/fastify.ts": {
     "source": "import Fastify from 'fastify'\nexport { Fastify }",
     "rules": ["use-cases-imports-logic-only"]

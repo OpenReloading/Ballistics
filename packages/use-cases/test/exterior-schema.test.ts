@@ -7,10 +7,10 @@ import {
   trajectoryExample,
   truingBody,
   truingExample,
-} from '@open-reloading/use-cases'
+} from '../src/index.ts'
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
-import { undescribed } from './setup.ts'
+import { undescribed } from './described.ts'
 
 const bodies = {
   trajectory: [trajectoryBody, trajectoryExample],

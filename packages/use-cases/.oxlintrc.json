@@ -8,7 +8,13 @@
         "no-restricted-imports": [
           "error",
           {
-            "paths": [],
+            "paths": [
+              {
+                "name": "@open-reloading/catalog",
+                "allowTypeImports": true,
+                "message": "use-cases-imports-catalog-types: packages/use-cases reads records through the Catalogue its caller passes, so it imports only types from catalog."
+              }
+            ],
             "patterns": [
               {
                 "group": [
