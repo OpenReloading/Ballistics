@@ -3,6 +3,7 @@
  * app). Errors cross the thread boundary as plain objects and are rebuilt into
  * `TruingError`, `InputError` or `Error`. No Node imports: the web app bundles this module.
  */
+
 import {
   type ChargeSolverOptions,
   type ChargeTarget,

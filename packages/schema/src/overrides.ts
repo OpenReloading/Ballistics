@@ -2,8 +2,8 @@ import { z } from 'zod'
 import { bullet } from './bullet.ts'
 import { cartridge } from './cartridge.ts'
 import type { Exact } from './exact.ts'
+import { isPlain, type Plain } from './plain.ts'
 import { type Powder, powder } from './powder.ts'
-import { isPlain, type Plain } from './shared.ts'
 import { specValue } from './standards.ts'
 
 /**

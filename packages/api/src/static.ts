@@ -11,7 +11,7 @@ import { buildCatalogue } from './catalogue/build.ts'
 import { openCatalogue } from './catalogue/open.ts'
 import type { Catalogue, CatalogueData, Catalogued, CatalogueKind } from './catalogue/types.ts'
 import { cartridgeAnswer } from './routes/cartridges.ts'
-import { originated, revised, stored } from './routes/common.ts'
+import { originated, revised, stored } from './routes/record-answers.ts'
 
 /** The records `writeStaticApi` writes, by the name of their route and the list of the index. */
 const recordFiles = [

@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import type { Exact } from './exact.ts'
+import { sha256 } from './fields.ts'
 import { recordId } from './ids.ts'
-import { sha256 } from './shared.ts'
 
 const provenanceKindParser = z.enum(['published', 'measured', 'derived', 'fitted', 'computed'])
 

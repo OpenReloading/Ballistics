@@ -4,6 +4,7 @@ import { parseShotViewWorkbook, readWorkbook } from '../src/index.ts'
 import { maxCellCharacters, maxCells } from '../src/limits.ts'
 import { defined } from './defined.ts'
 import { shotViewSheetEnglish, shotViewSheetGerman } from './fixtures.ts'
+import { rejection } from './refusal.ts'
 import {
   blank,
   bof,
@@ -444,12 +445,14 @@ describe('readWorkbook .xls refusals: bad cells', () => {
     await expect(readCells([labelSst(0, 0, 5)], ['a', 'b', 'c'])).rejects.toThrow(
       'XLS worksheet 1: cell A1 refers to shared string 5 of 3',
     )
-    await expect(readCells([numberCell(0, 256, 1)])).rejects.toThrow(
-      'XLS worksheet 1: cell IW1 lies beyond column IV',
-    )
-    await expect(readCells([numberCell(0, 0, 1), numberCell(0, 0, 2)])).rejects.toThrow(
-      'XLS worksheet 1: cell A1 is out of column order',
-    )
+    expect(await rejection(readCells([numberCell(0, 256, 1)]))).toEqual({
+      code: 'cellBeyondColumnIV',
+      params: { cell: 'IW1', worksheet: 1 },
+    })
+    expect(await rejection(readCells([numberCell(0, 0, 1), numberCell(0, 0, 2)]))).toEqual({
+      code: 'cellOutOfOrder',
+      params: { cell: 'A1', worksheet: 1 },
+    })
     await expect(readCells([numberCell(0, 0, Number.POSITIVE_INFINITY)])).rejects.toThrow(
       'XLS worksheet 1: cell A1 holds a number that is not finite',
     )
@@ -484,16 +487,18 @@ describe('readWorkbook .xls refusals: shared strings and cell counts', () => {
 
   it('counts cells and cell text over all worksheets', async () => {
     const wide = Array.from({ length: Math.ceil(maxCells / 256) }, (_, r) => numberCell(r, 255, 1))
-    await expect(fail(xls([{ name: 'S', records: wide }]))).rejects.toThrow(
-      `XLS worksheet 1: the worksheets hold more than ${maxCells} cells`,
-    )
+    expect(await rejection(fail(xls([{ name: 'S', records: wide }])))).toEqual({
+      code: 'tooManyCells',
+      params: { max: maxCells, worksheet: 1 },
+    })
     // a BIFF8 string holds at most 65535 characters (u16 count)
     const big = 'a'.repeat(65535)
     const refs = Array.from({ length: Math.floor(maxCellCharacters / big.length) + 1 }, (_, k) =>
       labelSst(Math.floor(k / 200), k % 200, 0),
     )
-    await expect(fail(xls([{ name: 'S', records: refs }], { strings: [big] }))).rejects.toThrow(
-      `XLS worksheet 1: the worksheets hold more than ${maxCellCharacters} characters of cell text`,
-    )
+    expect(await rejection(fail(xls([{ name: 'S', records: refs }], { strings: [big] })))).toEqual({
+      code: 'tooMuchCellText',
+      params: { max: maxCellCharacters, worksheet: 1 },
+    })
   })
 })

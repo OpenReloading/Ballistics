@@ -13,12 +13,14 @@
 . DelimitedOptions
 . Delimiter
 . FieldSpec
+. FileDiagnostic
 . GrtLoadRead
 . Inflate
 . KindScore
 . KindSuggestion
 . LoadDiagnostic
 . ParseChronoOptions
+. PressureDiagnostic
 . PressureHistoryImport
 . PressureHistoryOptions
 . PressureUnit

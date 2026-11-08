@@ -1,9 +1,9 @@
 import { z } from 'zod'
 import { baseTypes } from './bullet.ts'
 import type { Exact } from './exact.ts'
+import { text } from './fields.ts'
 import { catalogueRef, recordId, ref } from './ids.ts'
 import { type Provenance, provenance } from './provenance.ts'
-import { text } from './shared.ts'
 import { type QuantityKind, type QuantitySchema, quantity, units } from './units.ts'
 
 /** A solver value a load may override: a key of {@link analysisKinds}. */

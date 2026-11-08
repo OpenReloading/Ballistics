@@ -4,7 +4,7 @@
 // written from saved files of format 1.
 
 import type { SessionRecord } from '@open-reloading/schema'
-import type { Candidate } from './diagnostics.ts'
+import { type Candidate, refuseFile } from './diagnostics.ts'
 import {
   clip,
   elements,
@@ -165,9 +165,9 @@ function sessionsOf(
  */
 export function readCsrLoad(xml: string): GrtLoadRead {
   const root = parseXml(xml.replace(/^﻿/, ''))
-  if (root.name !== csrLoadRoot) throw new Error(`The root element is not ${csrLoadRoot}.`)
+  if (root.name !== csrLoadRoot) refuseFile('rootNotLoad', { root: csrLoadRoot })
   const input = elements(root).find((e) => e.name === 'load')
-  if (!input) throw new Error('The file holds no load.')
+  if (!input) refuseFile('noLoad')
   const read = readLoadInput(input)
   const format = root.attributes['format']
   const formatWarning: LoadDiagnostic = format

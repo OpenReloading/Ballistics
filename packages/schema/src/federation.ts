@@ -1,8 +1,8 @@
 import { z } from 'zod'
 import type { Exact } from './exact.ts'
+import { countryCode, positiveLength, sha256 } from './fields.ts'
 import { recordId } from './ids.ts'
 import { provenance } from './provenance.ts'
-import { countryCode, positiveLength, sha256 } from './shared.ts'
 import { type QuantitySchema, quantity, units } from './units.ts'
 
 const disciplineCategoryParser = z.enum([

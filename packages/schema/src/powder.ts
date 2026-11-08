@@ -1,8 +1,9 @@
 import { z } from 'zod'
+import { needsCountrySource } from './country-source.ts'
 import type { Exact } from './exact.ts'
+import { countryCode } from './fields.ts'
 import { recordId } from './ids.ts'
 import { provenance } from './provenance.ts'
-import { countryCode, needsCountrySource } from './shared.ts'
 import { type QuantityKind, type QuantitySchema, quantity, units } from './units.ts'
 
 /** A computed value with the extremes over the input ranges, in the unit of its quantity. */
