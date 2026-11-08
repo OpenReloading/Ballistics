@@ -129,21 +129,27 @@ const placeholders = (s: string) =>
     .sort((a, b) => a.localeCompare(b))
     .join()
 
+/** The texts that must be translated: the message table and the lines of the Safety notice. */
+export function requiredMessages(root: string): string[] {
+  const safety = 'src/lib/safety.ts'
+  return [...tableMessages(root), ...extract(readFileSync(path.join(root, safety), 'utf8'), safety)]
+}
+
 /**
- * What is wrong with `catalogue` of `language` against the English `source`: a text of the message
- * table (`table`) without a translation or left English, a key no message matches, an empty text,
- * placeholders other than its key's, and a plural that is no object of the language's categories.
- * Other untranslated messages show in English; `missing` lists them.
+ * What is wrong with `catalogue` of `language` against the English `source`: a `required` text
+ * without a translation or left English, a key no message matches, an empty text, placeholders
+ * other than its key's, and a plural that is no object of the language's categories. Other
+ * untranslated messages show in English; `missing` lists them.
  */
 export function problems(
   source: readonly string[],
   catalogue: Record<string, unknown>,
   language: string,
-  table: readonly string[],
+  required: readonly string[],
 ): string[] {
   const { untranslated, stale } = compare(source, catalogue)
   const found = [
-    ...untranslated.filter((s) => table.includes(s)).map((s) => `untranslated: ${s}`),
+    ...untranslated.filter((s) => required.includes(s)).map((s) => `untranslated: ${s}`),
     ...stale.map((k) => `no message has this key: ${k}`),
   ]
   const categories: string[] = new Intl.PluralRules(language).resolvedOptions().pluralCategories
@@ -161,7 +167,7 @@ export function problems(
         found.push(`placeholders differ: ${key}`)
     }
   }
-  for (const text of table) if (catalogue[text] === text) found.push(`left English: ${text}`)
+  for (const text of required) if (catalogue[text] === text) found.push(`left English: ${text}`)
   return found
 }
 
@@ -323,7 +329,7 @@ export function termUseProblems(
 }
 
 /**
- * Only the `approved` texts (the Safety notice and the disclaimers) say "safe" or "safety", and
+ * Only the `approved` texts (the Safety notice and the disclaimers) use a word that starts with "safe" (safe, safety, safely), and
  * each German text says "sicher" as often as its English says one of them.
  */
 export function safeWordingProblems(
@@ -334,7 +340,7 @@ export function safeWordingProblems(
   const found: string[] = []
   const count = (text: string, word: RegExp) => text.match(word)?.length ?? 0
   for (const s of source) {
-    const safe = count(s, /\bsafe(ty)?\b/gi)
+    const safe = count(s, /\bsafe/gi)
     if (safe === 0) continue
     if (!approved.includes(s)) found.push(`says safe without approval: ${s}`)
     const german = catalogue[s]
@@ -362,7 +368,7 @@ if (import.meta.main) {
     }
   } else if (command === 'check' && code && /^[a-z]{2,3}$/.test(code)) {
     const catalogue = JSON.parse(readFileSync(path.join(webRoot, `src/i18n/${code}.json`), 'utf8'))
-    const found = problems(source, catalogue, code, tableMessages(webRoot))
+    const found = problems(source, catalogue, code, requiredMessages(webRoot))
     if (code === 'de') {
       const read = (file: string) => JSON.parse(readFileSync(path.join(webRoot, file), 'utf8'))
       const table: TermTable = read('src/i18n/german-terms.json')

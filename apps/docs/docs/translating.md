@@ -53,7 +53,7 @@ pnpm --filter @open-reloading/web run i18n missing de   # English messages witho
 pnpm --filter @open-reloading/web run i18n messages     # every message in the sources
 ```
 
-`missing` also lists catalogue keys that no message matches (a text that was reworded in the source) and then exits with 1. `pnpm run lint` runs `i18n check de`, which fails on such a key, an empty text, placeholders other than the key's, a plural form the language lacks, and a text of the message table (`core-message-table.json` and the warning sentences of `core-message-table.ts`) without a translation or left in English.
+`missing` also lists catalogue keys that no message matches (a text that was reworded in the source) and then exits with 1. `pnpm run lint` runs `i18n check de`, which fails on such a key, an empty text, placeholders other than the key's, a plural form the language lacks, and a text of the message table (`core-message-table.json` and the warning sentences of `core-message-table.ts`) or a line of the Safety notice (`src/lib/safety.ts`) without a translation or left in English.
 
 ## Add a language
 
@@ -62,7 +62,7 @@ pnpm --filter @open-reloading/web run i18n messages     # every message in the s
 3. Run `missing <code>` until it lists nothing you want to translate.
 4. `pnpm --filter @open-reloading/web run i18n check <code>` checks the catalogue: no message-table text without a translation, no key without a message, equal placeholders, only categories of the language. Add it to the root `lint` script next to `check de`.
 
-The German catalogue follows the term table `apps/web/src/i18n/german-terms.json`. Only the texts in `safeTexts` of `apps/web/scripts/i18n-lint.json` (the Safety notice and the disclaimers) may say "safe", and their German says "sicher" as often. A verified or decided term is used as the table gives it. Another language has no table yet: add one with the same shape if the language needs one.
+The German catalogue follows the term table `apps/web/src/i18n/german-terms.json`. Only the texts in `safeTexts` of `apps/web/scripts/i18n-lint.json` (the Safety notice and the disclaimers) may use a word that starts with "safe" (safe, safety, safely), and their German says "sicher" as often. A verified or decided term is used as the table gives it. Another language has no table yet: add one with the same shape if the language needs one.
 
 A row has one of three statuses:
 - `verified`: one German term and its sources. `forms` lists the forms a string may write instead, for example `["Serie", "Serien"]` for a text about one series.

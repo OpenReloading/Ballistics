@@ -6,6 +6,7 @@ import {
   extract,
   messages,
   problems,
+  requiredMessages,
   safeWordingProblems,
   tableMessages,
   termUseProblems,
@@ -116,11 +117,14 @@ describe('the catalogue lint', () => {
       ),
     ).toEqual(['Case length: Hülse', 'Event date: Disziplin, a rejected candidate of Wettbewerb'])
     expect(
-      safeWordingProblems(['A safe load', 'Safety notice'], { 'Safety notice': 'Hinweis' }, [
-        'Safety notice',
-      ]),
+      safeWordingProblems(
+        ['A safe load', 'Handle it safely', 'Safety notice'],
+        { 'Safety notice': 'Hinweis' },
+        ['Safety notice'],
+      ),
     ).toEqual([
       'says safe without approval: A safe load',
+      'says safe without approval: Handle it safely',
       'says "sicher" other than "safe" 1 times: Safety notice',
     ])
   })
@@ -137,8 +141,16 @@ describe('the catalogue lint', () => {
         path.join(root, 'src/lib/core-message-table.ts'),
         "import { msg } from '../i18n/translate.ts'\nexport const w = [msg('A seeded warning.')]\n",
       )
+      writeFileSync(
+        path.join(root, 'src/lib/safety.ts'),
+        "import { msg } from '../i18n/translate.ts'\nexport const safety = { binding: msg('A seeded safety line.') }\n",
+      )
       const table = tableMessages(root)
       expect(table).toEqual(['busy', 'range {n}', 'A seeded warning.'])
+      // the lines of the Safety notice need German too
+      expect(problems(['A seeded safety line.'], {}, 'de', requiredMessages(root))).toEqual([
+        'untranslated: A seeded safety line.',
+      ])
       expect(
         problems(
           table,
