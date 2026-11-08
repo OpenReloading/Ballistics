@@ -39,9 +39,9 @@ describe('ZIP container: archives, comments and inflate functions', () => {
   })
 
   it('refuses bytes that are not an archive', async () => {
-    expect(await rejection(readWorkbook(new TextEncoder().encode('#,Speed (FPS)\n1,2800\n')))).toEqual(
-      { code: 'zipNoEnd', params: {} },
-    )
+    expect(
+      await rejection(readWorkbook(new TextEncoder().encode('#,Speed (FPS)\n1,2800\n'))),
+    ).toEqual({ code: 'zipNoEnd', params: {} })
   })
 
   it('refuses split and ZIP64 archives', async () => {
@@ -102,7 +102,10 @@ describe('ZIP container: data descriptors and refused entries', () => {
     const book = withSheet({ method: 0 })
     const at = Buffer.from(book).indexOf('<row r="3"')
     book[at + 8] = '4'.charCodeAt(0)
-    expect(await rejection(readWorkbook(book))).toEqual({ code: 'partCrc', params: { part: sheet } })
+    expect(await rejection(readWorkbook(book))).toEqual({
+      code: 'partCrc',
+      params: { part: sheet },
+    })
   })
 })
 

@@ -66,7 +66,8 @@ describe('parseXml: nesting, malformed markup, limits and encodings', () => {
       ['', { code: 'noRoot', params: {} }],
       ['<a><!-- x</a>', { code: 'unclosedComment', params: {} }],
     ]
-    for (const [xml, diagnostic] of refused) expect(refusal(() => parseXml(xml))).toEqual(diagnostic)
+    for (const [xml, diagnostic] of refused)
+      expect(refusal(() => parseXml(xml))).toEqual(diagnostic)
     const many = Array.from({ length: 257 }, (_, k) => `a${k}="1"`).join(' ')
     expect(refusal(() => parseXml(`<a ${many}/>`))).toEqual({
       code: 'tooManyAttributes',
