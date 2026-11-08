@@ -1,6 +1,6 @@
 import { shownLanguage } from '../i18n/shown.ts'
 
-/** ISO 3166-1 alpha-2, lower case, as CIP sheets print the country of origin; a record may name several. */
+/** ISO 3166-1 alpha-2 codes by the lower-cased name CIP sheets print as the country of origin; a record may name several. */
 const codes: Record<string, string> = {
   austria: 'AT',
   belgium: 'BE',

@@ -46,7 +46,7 @@ function boxHitsSegment(b: LabelBox, [p, q]: [Point, Point]): boolean {
   return true
 }
 
-/** Close to an anchor a crossing line beats a far place; the box is estimated at 0.6 font size per character. */
+/** Outward first, then turned in 45-degree steps, then farther; close to an anchor a crossing line beats a far place; the box is estimated at 0.6 font size per character. */
 export function placeLabel(
   scene: LabelScene,
   text: string,

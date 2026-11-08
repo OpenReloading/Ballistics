@@ -64,7 +64,7 @@ function groupFaceChoice(g: ShotGroup, found: FoundFace, scope: FaceScope): Shot
   return { ...g, face: { id: found.id, ...(event && { event }), ...(marks && { marks }) } }
 }
 
-/** Undefined when no federation shoots it there or several others do: no federation is guessed. */
+/** `distance` in m; undefined when no federation shoots it there or several others do: no federation is guessed. */
 function eventAt(distance: number, found: FoundFace, { federation }: FaceScope) {
   const near = (found.events ?? []).filter((e) => Math.abs(e.distance - distance) < 0.5)
   const of = (e: (typeof near)[number]) => e.federation ?? found.federation
@@ -74,7 +74,7 @@ function eventAt(distance: number, found: FoundFace, { federation }: FaceScope) 
   return new Set(near.map(of)).size === 1 ? nth(near, 0).id : undefined
 }
 
-/** Only where the face lies on the sheet as known; a face on a sheet calibrated otherwise is centred on an origin that may be anywhere. */
+/** Photo px to face mm, x right and y up from the face centre, only where the face lies on the sheet as known; a face on a sheet calibrated otherwise is centred on an origin that may be anywhere. */
 export function faceGeometry(o: {
   sheet: TargetSheet
   group: ShotGroup | undefined

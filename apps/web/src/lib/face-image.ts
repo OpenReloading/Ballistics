@@ -563,7 +563,7 @@ function paperSideHolds(at: (o: number) => number, o: number, span: number, mid:
   return above >= 0.7 * total
 }
 
-/** Undefined without a contrast or a crossing. */
+/** `t` in rad, within `span` grid px of the ellipse; undefined without a contrast or a crossing. */
 function edgeAlongRay(
   grid: Grid,
   start: Ellipse,

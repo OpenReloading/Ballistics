@@ -136,7 +136,7 @@ const labels: Record<string, Message> = {
 /** Zod issues of `firearm.safeParse(f)` in schema order, empty when valid. */
 export const firearmIssues = (f: Firearm) => firearm.safeParse(f).error?.issues ?? []
 
-/** With the field label and where it is; undefined when valid. */
+/** With the field label and where it is; undefined when valid; `name` must not be empty. */
 export function firearmProblem(
   name: string,
   f: Firearm,
@@ -270,7 +270,7 @@ export function landsFor(lands: LandsContact | undefined, bulletRef: string | un
   return { contact: same ? lands : undefined, other: lands !== undefined && !same }
 }
 
-/** SI values the workbench reads from a firearm. */
+/** What the workbench reads from a firearm: lengths in m, mass in kg. */
 export const gunValues = (f: Firearm) => ({
   twist: siOf('length', f.twist),
   barrelLength: siOf('length', f.barrelLength),
@@ -318,7 +318,7 @@ export const catalogueCartridgeId = (ref: string | undefined) => {
   return parsed?.scope === 'catalogue' ? parsed.id : undefined
 }
 
-/** A log entry has no snapshot to fall back on, so a dropped one would offer its rounds again (#928). */
+/** The schema's limit (`.max(5000)` in packages/schema/src/firearm.ts): a log entry has no snapshot to fall back on, so a dropped one would offer its rounds again (#928). */
 const maxCountedSessions = 5000
 
 /** A new firearm: no optics or configurations yet. */
@@ -381,7 +381,7 @@ export function withCountedRounds(
   })
 }
 
-/** `rounds`, else the ring series' shots when every series lists them. */
+/** `rounds`, else the ring series' shots when every series lists them; undefined when neither tells. */
 export function eventRounds(e: CompetitionEvent): number | undefined {
   if (e.rounds !== undefined) return e.rounds
   if (e.results.method !== 'rings' || e.results.series.length === 0) return undefined

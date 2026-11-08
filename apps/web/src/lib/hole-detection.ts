@@ -208,7 +208,7 @@ export function findHoles(input: HoleDetectionInput): {
   return { proposals: found?.proposals ?? [], flagged: [] }
 }
 
-/** Proposes the run with the most shots when its holes are alike (`apps/docs/docs/models/hole-detection.md`, "Detection without a picked hole"). */
+/** Proposes the run whose shots the other seed runs find most often, its holes alike (at least 2, sizes within 35 % of their median); undefined when none agrees, and the user picks a hole (`apps/docs/docs/models/hole-detection.md`, "Detection without a picked hole"). */
 export function autoDetect(raw: HoleDetectionInput): Found | undefined {
   // the coarse and the full pass each report from 0: only the rises count
   let seen = 0
@@ -269,7 +269,7 @@ function runSeeds(input: HoleDetectionInput, ctx: Ctx, seeds: (Peak | undefined)
   return runs
 }
 
-/** Marks at three places or more over all runs are print and leave every run. */
+/** Marks in the numeral zone at three places or more over all runs are print and leave every run. */
 function dropNumeralMarks(runs: SeedRun[], prior: number): boolean {
   const spots: Point[] = []
   for (const r of runs)
@@ -304,7 +304,7 @@ function refineWinner(input: HoleDetectionInput, ctx: Ctx, best: SeedRun, printe
   return fine && solved(input, fromImage(fine, toImage(ctx, best.at)), fine, true, true, printed)
 }
 
-/** The pick sets the colour axis only, not the size or the peaks' strength reference. */
+/** `at` in image px: the colour axis is the picked hole's against its ring, the size starts from its scale-space maximum (0.7 to 1.4 of `expectedHoleDiameter`) and the region's strongest peaks refine it (own rule); the pick never sets the peaks' strength reference. */
 export function detectFromExample(
   input: HoleDetectionInput,
   at: Point,
@@ -390,7 +390,7 @@ function estimateHoleSize(
   return { run, holeDiameter }
 }
 
-/** Edge marks and print go: dark on the black area, light on paper, and numeral or quarter marks repeated on `NUMERALS_MIN` axes. */
+/** Edge marks and print go: dark on the black area, light on paper, numeral-zone marks when `printed` or `NUMERALS_MIN` of them, and quarter marks standing on `NUMERALS_MIN` axes. */
 function dropPrintMarks(ctx: Ctx, run: Run, printed: boolean | undefined) {
   const dark = lumaOf(run.mu) < lumaOf(run.ring)
   // a line that meets the photo's edge leaves a blob there
@@ -429,7 +429,7 @@ function printAmong<T extends { shot: HoleProposal }>(ctx: Ctx, group: readonly 
   return group.filter((m) => m.shot.diameter <= alike || m.shot.diameter > SIZE_MAX * ctx.prior)
 }
 
-/** The angle most numeral-zone marks share, when `NUMERALS_MIN` do and two stand at one radius on two axes as ring numerals do; else 0. */
+/** The angle most numeral-zone marks share, when `NUMERALS_MIN` do and two stand at one radius (within 3 %) on two axes as ring numerals do; else 0. */
 function numeralRoll(face: FaceLabel | undefined, marks: readonly { c: Point }[]): number {
   const { numeral, quarter, polar } = face ?? {}
   if (!(numeral || quarter) || !polar) return 0

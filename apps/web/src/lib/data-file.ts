@@ -3,7 +3,7 @@ import { recordsCache } from './offline.ts'
 
 const files = new Map<string, Promise<unknown>>()
 
-/** The first visit's reads pass the worker by, so the page stores them itself once the worker is ready; failures are ignored. */
+/** The first visit's reads pass the worker by, so the page stores them itself once the worker is ready; the catalogue index is the worker's precache; failures are ignored. */
 function keepForOffline(name: string, url: string, res: Response) {
   if (name.startsWith('catalogue/') || !('serviceWorker' in navigator)) return
   navigator.serviceWorker.ready

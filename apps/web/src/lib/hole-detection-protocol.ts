@@ -36,7 +36,7 @@ export type WorkerRequest =
         /** Try hole sizes around `holeDiameter` (the bullet) and keep the one the holes show (`autoDetect`). */
         auto?: boolean
       })
-  /** `pxPerMm` and `holeDiameter` size the quality check's holes; `layout` is a hint for it. */
+  /** `pxPerMm` is the photo's known scale, `holeDiameter` (m) the bullet's, for the face search and the quality check's hole size; `layout` is a hint for the check. */
   | (Photo & {
       kind: 'face'
       faces: TargetFace[]

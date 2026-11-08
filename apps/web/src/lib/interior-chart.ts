@@ -150,7 +150,7 @@ type Limit = NonNullable<InteriorResponse['limits']>[number]
 /** Percentages of the limit that the reference lines mark. */
 const referenceLines = [85, 75] as const
 
-/** At the compared limit and its `referenceLines` percentages; never "safe". */
+/** At the compared limit and its `referenceLines` percentages, in display units, undefined without such a limit; never "safe". */
 export function limitLines(limits: Limit[] | undefined, system: UnitSystem, t: Translator['t']) {
   const l = pressureLimit(limits)
   if (l?.pressure === undefined) return

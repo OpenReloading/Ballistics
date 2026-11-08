@@ -6,7 +6,7 @@ import type { LadderDirection } from './seating-ladder.ts'
 import type { ManualKey, ShotKey, zeroKeys } from './trajectory-input.ts'
 import { kilogramsPerGrain, unitsOf, waterDensityGramsPerCm3 } from './units.ts'
 
-/** An invented load; `apps/web/test/examples.test.ts` checks the embedded values against the committed records. */
+/** An invented load; record values embedded as stored (mm, g, cm³, bar), which `apps/web/test/examples.test.ts` checks against the committed records. */
 export const exampleRecords = {
   /** The id, mass and G7 BC, then the shape fields as the seating preview reads them (`bulletDimensions`). */
   bullet: {
@@ -60,7 +60,7 @@ const { bullet, spec, case: brass, powder } = exampleRecords
 
 /** The invented load: start and maximum charge, g. Barrel, sight height and zero are example choices. */
 const published = { start: 2.4, max: 2.55 }
-/** The start charge, with 5 steps of 0.2 gr down; a common 24 in barrel. */
+/** Stored units: barrel and sight height mm, zero m, charge g; a common 24 in (609.6 mm) barrel. */
 const choices = {
   barrel: 609.6,
   sightHeight: 50,

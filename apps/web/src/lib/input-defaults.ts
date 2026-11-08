@@ -25,7 +25,7 @@ export type Suggestions = Partial<Record<FollowKey | 'barrelLength', Suggestion>
 
 type CartridgeClass = 'rifle' | 'pistol'
 
-/** Assumptions without a source (24 in, 4 in) for when neither a firearm nor the Settings give one. */
+/** m: assumptions without a source (24 in, 4 in) for when neither a firearm nor the Settings give one. */
 export const barrelLengthByClass: Record<CartridgeClass, number> = { rifle: 0.6096, pistol: 0.1016 }
 
 /** The CIP table that holds the pistol and revolver cartridges (table IV); all other tables count as rifle. */

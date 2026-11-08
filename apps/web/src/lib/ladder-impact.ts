@@ -49,7 +49,7 @@ function usableShots(group: ShotGroup, sessions: readonly SessionRecord[]) {
   return shots.length >= minShots ? shots : []
 }
 
-/** `none` until a velocity is linked, so nothing shows before the link is made. */
+/** `slopeAt` gives the drop slope in m per m/s; `none` until a velocity is linked, so nothing shows before the link is made. */
 export function ladderImpact(
   groups: readonly ShotGroup[],
   charges: readonly number[],

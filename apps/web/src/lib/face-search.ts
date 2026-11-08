@@ -12,7 +12,7 @@ const D_OVER_SIGMA = 2 * Math.SQRT2
 /** The holes are measured on a grid where the largest expected hole is about this many px across. */
 const HOLE_PX = 30
 
-/** On a grid of about 700 px; several fits are ratio twins that the event or distance tells apart, a known `scale` or `hole` drops other sizes. */
+/** `image` of any size runs on a grid of about 700 px; several fits are ratio twins the event or distance tells apart; a known `scale` (image px per mm) or `hole` (mm) drops other sizes. */
 export function findFace(
   image: RgbaImage,
   faces: readonly TargetFace[],
@@ -33,7 +33,7 @@ export function findFace(
   return scaled?.fits.length ? scaled : found
 }
 
-/** The holes show the backing; undefined when there is none. */
+/** Diameter in px of the strongest light blobs between `lo` and `hi` px, the holes, which show the backing; undefined when there is none. */
 function holeSize(image: RgbaImage, black: Ellipse, lo: number, hi: number) {
   const r = black.semiMajor
   const grid = grayGrid(image, Math.max(1, Math.floor(hi / HOLE_PX)), {

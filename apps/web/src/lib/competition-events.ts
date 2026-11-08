@@ -32,7 +32,7 @@ export const stateLabels: Record<CompetitionEvent['state'], Message> = {
   disqualified: msg('Disqualified'),
 }
 
-/** For the shooting log, without the event type's rules; undefined unless every stage has points. */
+/** For the shooting log, without the event type's rules: the series' rings, or the stage points when every stage has them; undefined otherwise. */
 function ownTotal(e: CompetitionEvent): number | undefined {
   if (e.results.method === 'rings')
     try {

@@ -42,7 +42,7 @@ export interface InteriorSources {
   jump?: number | undefined
 }
 
-/** 0 for a bullet touching or jammed into the lands; the friction stays. */
+/** `jump` in m, 0 for a bullet touching or jammed into the lands; the friction stays. */
 export function rampAtJump(
   resistance: InteriorLoad['resistance'],
   jump: number | undefined,
@@ -82,7 +82,7 @@ function resistanceFor(s: InteriorSources, body: InteriorBody) {
   })
 }
 
-/** Shared by the workbench and powder tuning; typed friction and engraving values replace the record's terms. */
+/** Shared by the workbench and powder tuning; typed friction and engraving values replace the record's terms, bulk density in kg/m³; throws on an invalid value. */
 export function interiorRequest(s: InteriorSources) {
   const { values, powder } = s
   const body = interiorBody(

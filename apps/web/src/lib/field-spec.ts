@@ -127,7 +127,7 @@ export function siValues(fields: Fields): Record<string, number | undefined> {
 /** A spec marks its texts as messages where it is defined, so the catalogue has them. */
 export const specText = (t: Translator['t'], text: string) => t(text as Message)
 
-/** Bounds inclusive in display units, as the HTML attributes; the message names the field's own unit, not the Settings. */
+/** Undefined when valid; bounds inclusive in display units, as the HTML attributes; the message names the field's own unit, not the Settings. */
 export function fieldError(
   spec: FieldSpec,
   value: FieldValue | undefined,

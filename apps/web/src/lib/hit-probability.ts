@@ -51,7 +51,7 @@ export interface ImpactSensitivity {
   verticalPerMetre: number
 }
 
-/** Windage hold per 1 m/s of crosswind times range, and the height's slope over neighbouring points; undefined below two points. */
+/** Windage hold per 1 m/s of crosswind (`windHold`, rad) times range, and the height's slope over neighbouring points; undefined below two points. */
 export function impactSensitivity(
   points: readonly TrajectoryPoint[],
   windHold: readonly number[],

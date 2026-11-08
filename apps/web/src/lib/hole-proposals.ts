@@ -8,7 +8,7 @@ import type { Point } from './target-geometry.ts'
 /** `HoleProposal` with an editor-assigned `id`, in photo px, not yet accepted as a shot. */
 export type EditorProposal = HoleProposal & { id: number }
 
-/** Below it a proposal is a maybe: shown, but left out of Accept sure and the sure count. */
+/** A starting value: below it a proposal is a maybe, shown but left out of Accept sure and the sure count. */
 const MAYBE_BELOW = 0.5
 
 /** True for a proposal below the confidence tier. */
@@ -23,7 +23,7 @@ type HoleSize = { diameter: number; source: 'typed' | 'learned' | 'bullet' | 'ma
 export const isNominal = (size: { source: string } | undefined): boolean =>
   size?.source === 'bullet' || size?.source === 'marker'
 
-/** Own rule (`apps/docs/docs/models/hole-detection.md`, "Hole size"): typed, else learned from confirmed shots, else bullet, else marker diameter. */
+/** In m, own rule (`apps/docs/docs/models/hole-detection.md`, "Hole size"): typed, else learned from confirmed shots, else bullet, else marker diameter. */
 export function expectedHoleSize(o: {
   typedDiameter?: number | undefined
   confirmedDiameters: readonly number[]
