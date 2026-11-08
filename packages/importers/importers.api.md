@@ -101,6 +101,9 @@ export interface ColumnUnit {
 }
 
 // @public
+export type CommaRemedy = 'quoteOrSemicolon' | 'nameDelimiter';
+
+// @public
 export function decodeText(bytes: Uint8Array): string;
 
 // @public
