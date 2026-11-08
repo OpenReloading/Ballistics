@@ -5,6 +5,7 @@
     "correctness": "error",
     "suspicious": "error"
   },
+  "jsPlugins": ["eslint-plugin-regexp"],
   "rules": {
     "array-callback-return": "error",
     "complexity": [
@@ -119,6 +120,7 @@
     "prefer-template": "error",
     "promise/no-nesting": "error",
     "radix": "error",
+    "regexp/no-super-linear-backtracking": "error",
     "typescript/adjacent-overload-signatures": "error",
     "typescript/ban-ts-comment": "error",
     "typescript/ban-types": "error",
@@ -256,6 +258,12 @@
             "message": "logic-no-dom: a logic package runs anywhere, so it reads no browser global."
           }
         ]
+      }
+    },
+    {
+      "files": ["**/test/**"],
+      "rules": {
+        "regexp/no-super-linear-backtracking": "off"
       }
     }
   ]
