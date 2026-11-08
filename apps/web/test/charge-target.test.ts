@@ -159,11 +159,8 @@ describe('the answer kept for a language change', () => {
     if (out.kind !== 'refused') throw new Error('expected a refusal')
     const en = out.text(english.t)
     expect(en).toBe('The search did not reach its tolerance.')
-    const own = translator(
-      { 'The search did not reach its tolerance.': 'Toleranz verfehlt.' },
-      'de',
-    )
-    expect(out.text(own.t)).toBe('Toleranz verfehlt.')
+    const own = translator({ 'The search did not reach its tolerance.': 'Suche verfehlt.' }, 'de')
+    expect(out.text(own.t)).toBe('Suche verfehlt.')
     expect(out.text(english.t)).toBe(en)
   })
 
