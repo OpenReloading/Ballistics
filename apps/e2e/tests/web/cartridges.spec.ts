@@ -1,4 +1,5 @@
-import { expect, type Page, test } from '@playwright/test'
+import { expect, type Locator, type Page, test } from '@playwright/test'
+import { isDark } from './luminance.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 
@@ -563,7 +564,9 @@ test('printed, the outline is to its stated scale with its stroke inside the cas
     mm((await drawing.evaluate((e) => e.getBoundingClientRect().width)) as number),
   ).toBeLessThanOrEqual(190)
   await expect(outline).toHaveAttribute('clip-path', /^url\(#.+-print-cartridge\)$/)
-  expect(await outline.evaluate((e) => getComputedStyle(e).stroke)).toBe('rgb(17, 17, 17)')
+  // printed in dark ink, the same with dark stored
+  const ink = await outline.evaluate((e) => getComputedStyle(e).stroke)
+  expect(isDark(ink)).toBe(true)
   // the chamber stroke outside the cavity: cut to the steel band, two polygons beside the bore
   const chamber = printed('Chamber').locator('.part-chamber path.outline')
   await expect(chamber).toHaveAttribute('clip-path', /^url\(#.+-print-steel\)$/)
@@ -572,7 +575,7 @@ test('printed, the outline is to its stated scale with its stroke inside the cas
   // with dark stored too
   await page.evaluate(() => localStorage.setItem('theme', 'dark'))
   await page.reload()
-  expect(await outline.evaluate((e) => getComputedStyle(e).stroke)).toBe('rgb(17, 17, 17)')
+  expect(await outline.evaluate((e) => getComputedStyle(e).stroke)).toBe(ink)
   await page.evaluate(() => localStorage.removeItem('theme'))
   const words = page
     .getByRole('region', { name: 'Cartridge', exact: true })
@@ -622,38 +625,74 @@ test('a table row and its drawn dimension mark each other on hover and focus, wi
   await gotoHydrated(page, '/cartridges/308-win')
   const drawn = (side: Side, symbol: string) =>
     figureOf(page, side).locator(`text[data-symbol="${symbol}"]`)
-  const marked = /\bis-hi\b/
+  // what a person sees of a mark: the colour of a drawn symbol, the background of a row's cells
+  const look = (l: Locator) =>
+    l.evaluate((e) => {
+      const s = getComputedStyle(e.tagName === 'TR' ? (e.firstElementChild ?? e) : e)
+      return `${s.fill} ${s.backgroundColor}`
+    })
+  const cartridgeP2 = drawn('Cartridge', 'P2')
+  const chamberP2 = drawn('Chamber', 'P2')
+  const chamberRowP2 = symbolRow(page, 'Chamber', 'P2')
+  const chamberL3 = drawn('Chamber', 'L3')
+  const chamberRowL3 = symbolRow(page, 'Chamber', 'L3')
+  const cartridgeRowL3 = symbolRow(page, 'Cartridge', 'L3')
+  const cartridgeL1 = drawn('Cartridge', 'L1')
+  const rowFe = symbolRow(page, 'Cartridge', 'Fe')
+  const rowDeltaL = symbolRow(page, 'Cartridge', 'δ L')
+  const cartridgeDelta = drawn('Cartridge', 'delta')
+  const atRest = new Map<Locator, string>()
+  for (const l of [
+    cartridgeP2,
+    chamberP2,
+    chamberRowP2,
+    chamberL3,
+    chamberRowL3,
+    cartridgeRowL3,
+    cartridgeL1,
+    rowFe,
+    rowDeltaL,
+    cartridgeDelta,
+  ])
+    atRest.set(l, await look(l))
+  const marked = (l: Locator) => expect.poll(() => look(l)).not.toBe(atRest.get(l))
+  const unmarked = (l: Locator) => expect.poll(() => look(l)).toBe(atRest.get(l))
   await symbolRow(page, 'Cartridge', 'P2').hover()
-  await expect(drawn('Cartridge', 'P2')).toHaveClass(marked)
-  await expect(figureOf(page, 'Cartridge').locator('.hi.is-hi')).toHaveCount(1)
+  await marked(cartridgeP2)
   // the chamber's P2 is not marked by the cartridge's
-  await expect(drawn('Chamber', 'P2')).not.toHaveClass(marked)
-  await expect(symbolRow(page, 'Chamber', 'P2')).not.toHaveClass(marked)
+  await unmarked(chamberP2)
+  await unmarked(chamberRowP2)
   // and back: the drawn L3 of the chamber marks its row, not the cartridge's
-  await drawn('Chamber', 'L3').hover()
-  await expect(symbolRow(page, 'Chamber', 'L3')).toHaveClass(marked)
-  await expect(symbolRow(page, 'Cartridge', 'L3')).not.toHaveClass(marked)
-  await expect(drawn('Cartridge', 'P2')).not.toHaveClass(marked)
+  await chamberL3.hover()
+  await marked(chamberRowL3)
+  await unmarked(cartridgeRowL3)
+  await unmarked(cartridgeP2)
   // by keyboard: focus marks, Enter keeps the mark after the focus leaves, Escape drops it
   await symbolRow(page, 'Cartridge', 'L1').locator('[tabindex]').focus()
-  await expect(drawn('Cartridge', 'L1')).toHaveClass(marked)
+  await marked(cartridgeL1)
   await page.keyboard.press('Enter')
   await page.keyboard.press('Tab')
   await page.mouse.move(0, 0)
-  await expect(drawn('Cartridge', 'L1')).toHaveClass(marked)
+  await marked(cartridgeL1)
   await page.keyboard.press('Escape')
   await page.mouse.move(1, 1)
-  await expect(drawn('Cartridge', 'L1')).not.toHaveClass(marked)
-  // a row whose symbol the drawing does not show links nothing
-  await symbolRow(page, 'Cartridge', 'Fe').hover()
-  await expect(page.locator('.is-hi')).toHaveCount(0)
-  // "δ L" is one symbol: it does not mark the drawn δ (the table named it "delta" and "L")
-  await symbolRow(page, 'Cartridge', 'δ L').hover()
-  await expect(page.locator('.is-hi')).toHaveCount(0)
-  // no mark in print
-  await symbolRow(page, 'Cartridge', 'P2').hover()
+  await unmarked(cartridgeL1)
+  // a row whose symbol the drawing does not show links nothing, so it stays as it is
+  await rowFe.hover()
+  await unmarked(rowFe)
+  // "δ L" is one symbol: it does not mark the drawn δ, and the row links nothing either
+  await rowDeltaL.hover()
+  await unmarked(cartridgeDelta)
+  await unmarked(rowDeltaL)
+  // no mark in print: the drawn symbol of a hovered row prints as it does at rest
+  await page.mouse.move(0, 0)
   await page.emulateMedia({ media: 'print' })
-  await expect(page.locator('.hi.is-hi:visible')).toHaveCount(0)
+  const printed = await look(cartridgeP2)
+  await page.emulateMedia({ media: 'screen' })
+  await symbolRow(page, 'Cartridge', 'P2').hover()
+  await marked(cartridgeP2)
+  await page.emulateMedia({ media: 'print' })
+  expect(await look(cartridgeP2)).toBe(printed)
 })
 
 test("the record's unit switch changes the drawings, the facts and the tables, not Settings", async ({
