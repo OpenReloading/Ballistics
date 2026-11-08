@@ -11,11 +11,11 @@ import {
   type GrtLoadRead,
   type LoadDiagnostic,
   named,
-  numberOf,
   readLoadInput,
   unescaped,
 } from './grtload.ts'
 import { idOfKey } from './record-ids.ts'
+import { readDecimal } from './text.ts'
 import { parseXml, type XmlElement } from './xml.ts'
 
 /** The root element of the file, which tells it apart from other XML. */
@@ -55,7 +55,7 @@ function shotsOf(c: XmlElement, at: string, unmapped: Set<string>, warnings: Loa
       continue
     }
     unreadAttributes(s, `${at}.shot`, unmapped)
-    const v = numberOf((s.attributes['velocity'] ?? '').trim())
+    const v = readDecimal((s.attributes['velocity'] ?? '').trim())
     if (Number.isFinite(v) && v > 0) shots.push({ velocity: { value: v } })
     else warnings.push({ code: 'shotWithoutVelocity', params: { at } })
   }
@@ -100,7 +100,7 @@ function stringOf(
 
 /** The mass of a charge in g from its `value` in kg, or undefined when that is not above 0. */
 function chargeGrams(c: XmlElement): number | undefined {
-  const kg = numberOf((c.attributes['value'] ?? '').trim())
+  const kg = readDecimal((c.attributes['value'] ?? '').trim())
   return Number.isFinite(kg) && kg > 0 ? Number((kg * 1000).toPrecision(12)) : undefined
 }
 

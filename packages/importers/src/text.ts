@@ -85,6 +85,17 @@ export function parseNumber(text: string): number {
   return Number.isFinite(n) ? n : Number.NaN
 }
 
+/**
+ * A number of a file whose lone mark is always the decimal mark: a point or a comma (`0,125`) and an
+ * optional exponent (`1.0E-05`); NaN for both marks or anything else (`0x10`, `Infinity`, empty).
+ */
+export function readDecimal(text: string): number {
+  const t = text.trim()
+  if (t.includes(',') && t.includes('.')) return Number.NaN
+  const s = t.replace(',', '.')
+  return /^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$/.test(s) ? Number(s) : Number.NaN
+}
+
 /** Text from the first `(` to the last `)` when it is not empty, else undefined; linear time. */
 export function bracketed(text: string): string | undefined {
   const a = text.indexOf('(')
