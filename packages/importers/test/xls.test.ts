@@ -474,7 +474,7 @@ describe('readWorkbook .xls refusals: bad cells', () => {
   it('refuses bad cells as in XLSX', async () => {
     expect(await rejection(readCells([labelSst(0, 0, 5)], ['a', 'b', 'c']))).toEqual({
       code: 'sharedStringOutOfRange',
-      params: { cell: 'A1', index: '5', count: 3, worksheet: 1 },
+      params: { cell: 'A1', index: 5, count: 3, worksheet: 1 },
     })
     expect(await rejection(readCells([numberCell(0, 256, 1)]))).toEqual({
       code: 'cellBeyondColumnIV',

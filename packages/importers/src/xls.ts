@@ -386,7 +386,7 @@ function sharedCell(view: DataView, c: CellRecord, strings: string[]): string {
   if (text === undefined) {
     refuseFile('sharedStringOutOfRange', {
       cell: cellRef(c),
-      index: String(k),
+      index: k,
       count: strings.length,
     })
   }
