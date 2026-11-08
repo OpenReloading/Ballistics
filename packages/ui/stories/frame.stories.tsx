@@ -17,7 +17,6 @@ export const Frame: Story = {
           Ballistics
         </Anchor>
       }
-      labels={{ menu: 'Menu', navigation: 'Main', close: 'Close navigation' }}
       navigation={
         // the story's links lead nowhere: a followed link would leave the test page
         <Stack gap={0} onClick={(event) => event.preventDefault()}>
@@ -55,7 +54,7 @@ export const Frame: Story = {
     // below 75em the links are in the drawer only, which Mantine renders into the document's body
     const page = within(canvasElement.ownerDocument.body)
     await expect(canvas.queryByRole('navigation', { name: 'Main' })).toBeNull()
-    const menu = canvas.getByRole('button', { name: 'Menu' })
+    const menu = canvas.getByRole('button', { name: 'Navigation' })
     await userEvent.click(menu)
     const drawer = await page.findByRole('dialog', { name: 'Main' })
     if (matchMedia('(pointer: coarse)').matches) {
