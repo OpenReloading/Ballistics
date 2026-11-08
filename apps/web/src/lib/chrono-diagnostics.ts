@@ -104,7 +104,7 @@ function shown(name: string, v: string | number | readonly string[], t: Translat
 }
 
 /** True for a diagnostic of a chronograph reader, which `chronoDiagnosticText` words. */
-export const isChronoDiagnostic = (d: { code: string }): d is ChronoDiagnostic =>
+const isChronoDiagnostic = (d: { code: string }): d is ChronoDiagnostic =>
   Object.hasOwn(chronoMessages, d.code)
 
 /** What a chronograph reader warned of or refused, in the language of `t`: the worksheet and row first where named. */
