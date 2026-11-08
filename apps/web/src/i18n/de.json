@@ -1750,7 +1750,7 @@
   "mass, diameter and length are required without bullet": "Ohne bullet (Geschoss) sind mass, diameter und length erforderlich",
   "mass, diameter, length, twist and velocity must be positive": "Masse, Durchmesser, Länge, Drall und Geschwindigkeit müssen positiv sein",
   "matching \"{query}\"": "Suche nach „{query}“",
-  "maxCondition must be finite and above 1": "maxCondition muss endlich und größer als 1 sein",
+  "maxCondition must be finite and at least 1": "maxCondition muss endlich und mindestens 1 sein",
   "maxInflation must exceed 1": "maxInflation muss größer als 1 sein",
   "maxIterations must be a positive integer": "maxIterations muss eine positive ganze Zahl sein",
   "maxRelativeStandardUncertainty must be positive": "maxRelativeStandardUncertainty muss positiv sein",

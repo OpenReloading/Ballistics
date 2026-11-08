@@ -189,14 +189,18 @@ export interface LogFitInput {
 
 /**
  * Throws an `InputError` unless `maxIterations` is a positive integer and `maxCondition` is finite
- * and above 1 (a condition number is at least 1); for callers that refuse their options before any run.
+ * and at least 1, the condition number of a one-parameter fit; for callers that refuse their options
+ * before any run.
  */
 export function checkLogFitLimits(maxIterations: number, maxCondition: number): void {
   need(
     Number.isInteger(maxIterations) && maxIterations > 0,
     'maxIterations must be a positive integer',
   )
-  need(Number.isFinite(maxCondition) && maxCondition > 1, 'maxCondition must be finite and above 1')
+  need(
+    Number.isFinite(maxCondition) && maxCondition >= 1,
+    'maxCondition must be finite and at least 1',
+  )
 }
 
 /** Solution of `logLeastSquares`. */

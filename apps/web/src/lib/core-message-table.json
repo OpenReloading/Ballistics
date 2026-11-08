@@ -319,7 +319,7 @@
       "residualConfidenceLevel must lie in (0, 1)",
       "maxInflation must exceed 1",
       "maxRelativeStandardUncertainty must be positive",
-      "maxCondition must be finite and above 1",
+      "maxCondition must be finite and at least 1",
       "group {key}: an impact and a dial entry share their shots, keep one or name two groups",
       "{kind} range",
       "{kind} shotCount must be a whole number of at least 1",
