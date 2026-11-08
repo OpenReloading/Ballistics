@@ -20,8 +20,11 @@ export async function runExample(page: Page) {
     .getByLabel(/^Charge mass/)
     .press('Control+Enter')
   await expect(page.getByText(/^Run \d/)).toBeAttached({ timeout: 15_000 })
-  // a record that arrives after Run marks the result stale until the automatic run replaces it
-  await expect(page.locator('.result[data-running], .result [data-stale]')).toHaveCount(0, {
+  await runSettled(page)
+}
+
+/** Waits until no run runs and the result is not stale: a later answer replaces the shown result and its selected step. */
+export const runSettled = (page: Page) =>
+  expect(page.locator('.result[data-running], .result [data-stale]')).toHaveCount(0, {
     timeout: 15_000,
   })
-}
