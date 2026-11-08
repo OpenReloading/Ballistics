@@ -63,7 +63,7 @@ const m3: M3Units = {
 }
 
 /** Unit per field name of a trajectory answer. */
-export interface ExteriorUnits {
+interface ExteriorUnits {
   readonly range: 'm'
   readonly distance: 'm'
   readonly altitude: 'm'
@@ -105,17 +105,17 @@ export interface ExteriorUnits {
   readonly azimuth: 'rad'
 }
 /** Unit per field name of a truing answer. */
-export interface TruingUnits extends ExteriorUnits {
+interface TruingUnits extends ExteriorUnits {
   readonly muzzleVelocity: 'm/s'
   readonly dragFactor: '1'
 }
 /** Unit per field name of a range-strings answer. */
-export interface RangeStringsUnits extends TruingUnits {
+interface RangeStringsUnits extends TruingUnits {
   readonly clickValue: 'rad'
   readonly zeroOffset: 'rad'
 }
 /** Unit per field name of an M3 interior answer. */
-export interface M3Units {
+interface M3Units {
   readonly time: 's'
   readonly travel: 'm'
   readonly velocity: 'm/s'

@@ -27,10 +27,11 @@ import {
   userDataFile,
   versionProblem,
 } from '@open-reloading/schema'
-import { notice, unprocessable } from '@open-reloading/use-cases'
 import { z } from 'zod'
+import { notice, unprocessable } from './answer.ts'
 
-type Path = PropertyKey[]
+/** A path into the load file, as zod issues give one. */
+export type Path = PropertyKey[]
 const issue = (path: Path, message: string): z.core.$ZodIssue => ({
   code: 'custom',
   path,
@@ -42,6 +43,7 @@ function unknownKeys(input: unknown, parsed: unknown, path: Path): Path[] {
   if (Array.isArray(input) && Array.isArray(parsed))
     return input.flatMap((x, i) => unknownKeys(x, parsed[i], [...path, i]))
   if (!input || !parsed || typeof input !== 'object' || typeof parsed !== 'object') return []
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- a parsed object, read by key
   const kept = parsed as Record<string, unknown>
   return Object.entries(input).flatMap(([k, v]) =>
     Object.hasOwn(kept, k) ? unknownKeys(v, kept[k], [...path, k]) : [[...path, k]],
@@ -64,6 +66,7 @@ export function readLoadFile(json: unknown): { path: Path; record: Load; name: s
       issue(['records'], `The file must hold exactly one load record, it has ${loads.length}`),
     )
   else {
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the one record of kind load
     const [i, r] = loads[0] as [number, { data: Load; name: string }]
     // user data stays in the browser: the server resolves catalogue records only
     for (const k of ['cartridge', 'bullet', 'powder'] as const) {
@@ -78,6 +81,7 @@ export function readLoadFile(json: unknown): { path: Path; record: Load; name: s
     }
   }
   if (unknown.length > 0) throw new z.ZodError(unknown)
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the one record of kind load
   const [i, r] = loads[0] as [number, { data: Load; name: string }]
   return { path: ['records', i, 'data'], record: r.data, name: r.name }
 }
@@ -97,6 +101,7 @@ export interface LoadRecords {
  */
 export function loadValues(data: Load, { powder, bullet }: LoadRecords): Record<string, number> {
   const typed = Object.entries(data.analysis?.overrides ?? {}).flatMap(([k, v]) =>
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the overrides schema holds only analysis keys
     v === undefined ? [] : [[k, toSi(analysisKinds[k as AnalysisKey], v)]],
   )
   return {
@@ -108,14 +113,19 @@ export function loadValues(data: Load, { powder, bullet }: LoadRecords): Record<
 }
 
 /** The bullet length the bore resistance law reads, mm: the typed `bulletLength`, else the record's. */
-export const bulletLengthMm = (values: Record<string, number>, bullet: Bullet | undefined) =>
-  values.bulletLength === undefined ? bullet?.length?.value : fromSi('length', values.bulletLength)
+export const bulletLengthMm = (
+  values: Record<string, number>,
+  bullet: Bullet | undefined,
+): number | undefined =>
+  values['bulletLength'] === undefined
+    ? bullet?.length?.value
+    : fromSi('length', values['bulletLength'])
 
 /** The catalogue record id of a `cartridge` or `bullet` of a load file, a plain id or a `catalogue:` reference. */
-export const catalogueIdOf = (target: string) => parseRef(target)?.id ?? target
+export const catalogueIdOf = (target: string): string => parseRef(target)?.id ?? target
 
 /** The issues of a strict-object error with one issue per unknown key, at the key's path. */
-export function unknownKeyIssues(error: z.ZodError) {
+export function unknownKeyIssues(error: z.ZodError): z.ZodError {
   return new z.ZodError(
     error.issues.flatMap((i) =>
       i.code === 'unrecognized_keys'
@@ -192,7 +202,7 @@ export function missingValuesAnswer(
   at: Path,
 ): MissingValuesAnswer | undefined {
   const keys = missingLoadKeys(values)
-  if (keys.length === 0) return
+  if (keys.length === 0) return undefined
   return {
     status: 422,
     payload: {
@@ -202,6 +212,7 @@ export function missingValuesAnswer(
       missing: keys.map((key) => ({
         key,
         path: valuePath(at, key),
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- a missing key other than the charge is an analysis key
         quantity: key === 'charge' ? 'mass' : analysisKinds[key as AnalysisKey],
       })),
       notice,

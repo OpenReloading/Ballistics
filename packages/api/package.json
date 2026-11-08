@@ -9,10 +9,6 @@
       "types": "./dist/openapi.d.ts",
       "default": "./dist/openapi.js"
     },
-    "./compute": {
-      "types": "./dist/compute/browser.d.ts",
-      "default": "./dist/compute/browser.js"
-    },
     "./catalogue": {
       "types": "./dist/catalogue/browser.d.ts",
       "default": "./dist/catalogue/browser.js"
@@ -35,13 +31,13 @@
     "@open-reloading/ballistics": "workspace:*",
     "@open-reloading/catalog": "workspace:*",
     "@open-reloading/schema": "workspace:*",
-    "@open-reloading/statistics": "workspace:*",
     "@open-reloading/use-cases": "workspace:*",
     "@scalar/fastify-api-reference": "1.75.1",
     "fastify": "^5.12.7",
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@open-reloading/statistics": "workspace:*",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "ajv": "catalog:",

@@ -10,12 +10,12 @@ import {
   runStability,
   runTrajectory,
   runTruing,
+  simulate,
   stabilityQuery,
   trajectoryBody,
   truingBody,
 } from '@open-reloading/use-cases'
 import { describe, expect, it } from 'vitest'
-import { simulate } from '../src/compute/simulate.ts'
 import { API_PREFIX } from '../src/version.ts'
 import { bundle, file, rifleShot, siValues } from './fixtures.ts'
 import { testCatalogue, withApi } from './setup.ts'

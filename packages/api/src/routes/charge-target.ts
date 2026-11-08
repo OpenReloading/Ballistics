@@ -1,14 +1,13 @@
+import { chargeTarget, type OperationContext } from '@open-reloading/use-cases'
 import type { FastifyError, FastifyPluginAsync } from 'fastify'
 import { computeErrorHandler } from '../compute/error-handler.ts'
-import { chargeTarget } from '../compute/operations.ts'
-import type { ComputeContext } from './compute.ts'
 import { describeAnswers } from './identity.ts'
 
 /**
  * The charge solver of the M3 model. Registered without
  * fastify-plugin, so its error handler applies to this route only; every answer carries the notice.
  */
-export const chargeTargetRoutes: FastifyPluginAsync<ComputeContext> = async (
+export const chargeTargetRoutes: FastifyPluginAsync<OperationContext> = async (
   app,
   { catalogue, compute },
 ) => {

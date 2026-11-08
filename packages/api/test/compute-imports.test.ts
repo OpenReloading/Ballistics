@@ -3,15 +3,6 @@ import { posix } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { defined } from './defined.ts'
 
-/** The packages `@open-reloading/api/compute` may import: it runs in the browser. */
-const allowed = [
-  '@open-reloading/ballistics',
-  '@open-reloading/schema',
-  '@open-reloading/statistics',
-  '@open-reloading/use-cases',
-  'zod',
-]
-
 /** The packages `@open-reloading/api/catalogue` may import: ballistics and schema, no Node API. */
 const catalogueAllowed = ['@open-reloading/ballistics', '@open-reloading/schema']
 
@@ -34,18 +25,6 @@ function imports(entry: string) {
   visit(entry)
   return { files, found }
 }
-
-describe('compute entry', () => {
-  it('imports only ballistics, schema, statistics, use-cases and zod, also through the modules it imports', () => {
-    const { files, found } = imports('compute/browser.ts')
-    expect(files.size).toBeGreaterThan(5)
-    expect(found.filter((f) => !allowed.includes(defined(f.split(': ')[1])))).toEqual([])
-  })
-
-  it('names a runtime import outside the allowed packages', () => {
-    expect(imports('app.ts').found).toContain('app.ts: fastify')
-  })
-})
 
 describe('catalogue entry', () => {
   it('imports only ballistics and schema, no Node API, also through the modules it imports', () => {
