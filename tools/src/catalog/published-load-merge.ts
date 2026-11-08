@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto'
 import {
+  canonicalJson,
   compareKeys,
   type PublishedLoad,
   type PublishedLoads,
@@ -85,21 +86,9 @@ export type MergeResult = { file: PublishedLoads; report: MergeReport; written: 
 const isObject = (v: unknown): v is Record<string, unknown> =>
   typeof v === 'object' && v !== null && !Array.isArray(v)
 
-/** JSON with the keys of every object sorted, so equal values compare equal. */
-function canonical(v: unknown): string {
-  if (Array.isArray(v)) return `[${v.map(canonical).join(',')}]`
-  if (isObject(v))
-    return `{${Object.keys(v)
-      .filter((k) => v[k] !== undefined)
-      .sort(compareKeys)
-      .map((k) => `${JSON.stringify(k)}:${canonical(v[k])}`)
-      .join(',')}}`
-  return JSON.stringify(v)
-}
-
 /** The dot paths at which `a` and `b` differ, leaves and missing keys. */
 function differences(a: unknown, b: unknown, path: string): string[] {
-  if (canonical(a) === canonical(b)) return []
+  if (canonicalJson(a) === canonicalJson(b)) return []
   const both = (Array.isArray(a) && Array.isArray(b)) || (isObject(a) && isObject(b))
   if (!both) return [path]
   const keys = new Set([...Object.keys(a as object), ...Object.keys(b as object)])
@@ -208,8 +197,8 @@ export function mergePublishedLoads(
   const sources = [...base.provenance.sources]
   const sourceIndex = (i: number) => {
     const s = incoming.provenance.sources[i]
-    const key = canonical(resolveSource(s))
-    const at = sources.findIndex((t) => canonical(resolveSource(t)) === key)
+    const key = canonicalJson(resolveSource(s))
+    const at = sources.findIndex((t) => canonicalJson(resolveSource(t)) === key)
     if (at >= 0) return at
     sources.push(s as (typeof sources)[number])
     return sources.length - 1

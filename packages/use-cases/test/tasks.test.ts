@@ -1,7 +1,7 @@
 import { TruingError } from '@open-reloading/ballistics'
 import { InputError } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
-import { reviveError, serializeError } from '../src/index.ts'
+import { replyTo, reviveError, serializeError, type Task } from '../src/index.ts'
 
 const roundTrip = (e: unknown) => reviveError(structuredClone(serializeError(e)))
 
@@ -39,5 +39,16 @@ describe('errors across the thread boundary', () => {
     const thrown = roundTrip('plain text')
     expect(thrown).toBeInstanceOf(Error)
     expect(thrown.message).toBe('plain text')
+  })
+})
+
+describe('a task from a worker message', () => {
+  it('runs only the kinds of the task table, not a name the table inherits', () => {
+    // a message of another shape than Task
+    const inherited = { kind: 'constructor' } as unknown as Task
+    expect(replyTo(inherited)).toEqual({
+      succeeded: false,
+      error: { name: 'Error', message: 'unknown compute task kind constructor' },
+    })
   })
 })

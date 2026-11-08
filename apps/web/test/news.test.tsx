@@ -66,7 +66,7 @@ describe('news', () => {
   })
 
   it('rejects a long title line without a link in linear time', () => {
-    const dir = folder({ '2026-10-01-a.md': `---\ntitle: a${' '.repeat(50_000)}b` })
+    const dir = folder({ '2026-10-01-a.md': `---\ntitle: a${' '.repeat(1_000_000)}b` })
     expect(() => newestNews(5, dir)).toThrow('news/2026-10-01-a.md: expected a title')
   })
 

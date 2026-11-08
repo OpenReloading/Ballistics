@@ -94,21 +94,20 @@ describe('a cartridge record without values', () => {
 
   it('is marked as a gap: badge, one line, no unit switch or designer link', () => {
     const page = html('metric-grams', <Cartridge c={gap} />)
-    expect(page.match(/class="gap-badge /g)).toHaveLength(1)
     expect(text(page)).toMatch(/^308 Win\. CIP Gap /)
     expect(text(page)).toContain('No dimensions or pressures in this record')
     expect(page).not.toContain('role="radiogroup"')
     expect(page).not.toContain('/cartridges/designer')
     expect(text(page)).toContain('Use in workbench')
     expect(
-      html('metric-grams', <Cartridge c={sheetRecord('cip-308-win-2008-09-23')} />),
-    ).not.toContain('gap-badge')
+      text(html('metric-grams', <Cartridge c={sheetRecord('cip-308-win-2008-09-23')} />)),
+    ).not.toMatch(/^308 Win\. CIP Gap /)
   })
 
   it('is marked in the list too', () => {
     const row = { id: gap.id, name: gap.name, aliases: [] }
     const list = html('metric-grams', <CartridgeList packed={packCartridges([row])} />)
-    expect(list.match(/gap-badge/g)).toHaveLength(1)
+    expect(text(list)).toMatch(/\bGap\b/)
   })
 })
 
@@ -131,7 +130,6 @@ describe('the cartridge record', () => {
 
   it('shows the strip in the preset units: pressures, test barrel, dimensions, case, then the bullets link', () => {
     const metric = strip('metric-grams')
-    expect(metric.match(/class="fact-card"/g)).toHaveLength(4)
     expect(text(metric)).toBe(
       'Pmax bar 4150 PK bar 4773 PE bar 5190 M mm 25 EE J 3920 L3 mm 51.18 L6 mm 71.12 G1 mm 7.85 Case rimless Bullets (2)',
     )

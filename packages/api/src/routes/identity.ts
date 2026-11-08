@@ -1,6 +1,7 @@
+import { canonicalJson } from '@open-reloading/schema'
 import type { FastifyInstance, FastifyRequest } from 'fastify'
 import type { Catalogue } from '../catalogue/types.ts'
-import { canonicalJson, sha256 } from '../hash.ts'
+import { sha256 } from '../hash.ts'
 import { API_VERSION } from '../version.ts'
 
 /**

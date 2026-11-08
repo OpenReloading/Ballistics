@@ -26,10 +26,10 @@ it('reads blanks around the parts and rejects malformed ranges', () => {
 
 it('rejects a long input that does not match without backtracking', () => {
   for (const text of [
-    `${'1'.repeat(50000)}x`,
-    `${' '.repeat(50000)}x`,
-    `1-${' '.repeat(50000)}x`,
-    `${'1.'.repeat(25000)}-g`,
+    `${'1'.repeat(1_000_000)}x`,
+    `${' '.repeat(1_000_000)}x`,
+    `1-${' '.repeat(1_000_000)}x`,
+    `${'1.'.repeat(500_000)}-g`,
   ]) {
     expect(massRange(text)).toBeUndefined()
   }
@@ -37,8 +37,8 @@ it('rejects a long input that does not match without backtracking', () => {
 
 it('rejects many points and long digit runs around a point in linear time', () => {
   for (const text of [
-    `${'.'.repeat(100000)}-g`,
-    `${'1'.repeat(100000)}.${'1'.repeat(100000)}.-g`,
+    `${'.'.repeat(1_000_000)}-g`,
+    `${'1'.repeat(1_000_000)}.${'1'.repeat(1_000_000)}.-g`,
   ]) {
     expect(massRange(text)).toBeUndefined()
   }
