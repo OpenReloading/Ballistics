@@ -1,4 +1,6 @@
+import { type Diagnostic, InputError } from '@open-reloading/statistics'
 import type { Translator } from '../i18n/translate.ts'
+import { errorText } from './error-text.ts'
 
 type Known = (text: string, t: Translator['t']) => string | undefined
 
@@ -17,3 +19,20 @@ export function setCoreMessages(translate: Known) {
 export function translateMessage(text: string, t: Translator['t']): string {
   return known?.(text, t) ?? text
 }
+
+type Sentence = (issue: Diagnostic<string, object>) => string | undefined
+
+let sentence: Sentence | undefined
+
+/** Sets the words of the typed refusals (`refusal-words.ts`), which the language module loads once a page has started. */
+export function setRefusalWords(words: Sentence) {
+  sentence = words
+}
+
+/**
+ * The message of a thrown value: a typed refusal (an `InputError` with an issue) in its English
+ * sentence once the words have loaded, else the error's text. Called where the message is shown, it
+ * shows the sentence from the render after the words arrive.
+ */
+export const refusalText = (e: unknown): string =>
+  (e instanceof InputError && e.issue && sentence?.(e.issue)) || errorText(e)

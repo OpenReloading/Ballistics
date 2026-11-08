@@ -14,10 +14,9 @@ import {
 import { type Truing, toSi, truing, type UserRecord, userRecord } from '@open-reloading/schema'
 import { formatNumber, parseNumber, untranslated } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
-import { translateMessage } from './core-messages.ts'
+import { refusalText, translateMessage } from './core-messages.ts'
 import { localDay } from './dates.ts'
 import { storedOf } from './firearm.ts'
-import { refusalErrorText } from './refusal-words.ts'
 import { type UnitSystem, withUnit } from './units.ts'
 
 /** One distance as typed: the texts are in the units the section shows (`system`), dial means in clicks. */
@@ -83,7 +82,7 @@ function problemOf(e: unknown, t: T): string {
     const reason = translateMessage(e.reason, t)
     if (reason !== e.reason) return reason
   }
-  return translateMessage(refusalErrorText(e), t)
+  return translateMessage(refusalText(e), t)
 }
 
 /** The rows that carry anything, with their position; a blank trailing row is not an error. */

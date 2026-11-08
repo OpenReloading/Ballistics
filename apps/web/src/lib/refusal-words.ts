@@ -1,9 +1,10 @@
 /**
  * The words of the typed refusals that statistics and the group statistics of shot-groups raise
  * (`InputError` of `@open-reloading/statistics` with an issue): the English sentence of each code.
- * The sentence stays English in state; `core-message-table.ts` reads these words as templates, so
- * `translateMessage` shows it in the language shown. Hit probability and ring scoring word their
- * own issues where they are shown.
+ * The language module loads them once a page has started, outside every page's own JavaScript, for
+ * `refusalText` of `core-messages.ts`; `core-message-table.ts` reads them as templates, so
+ * `translateMessage` shows a sentence in the language shown. Hit probability and ring scoring word
+ * their own issues where they are shown.
  */
 import type { GroupStatisticsIssue } from '@open-reloading/shot-groups'
 import { type Diagnostic, InputError, type StatisticsIssue } from '@open-reloading/statistics'
@@ -39,11 +40,11 @@ export const refusalWords: Readonly<Record<string, Message>> = {
 }
 
 /** The English sentence of a typed refusal; undefined for a code without words. */
-function refusalSentence({ code }: Diagnostic<string, object>): string | undefined {
+export function refusalSentence({ code }: Diagnostic<string, object>): string | undefined {
   const words = Object.hasOwn(refusalWords, code) ? refusalWords[code] : undefined
   return words && english.t(words)
 }
 
-/** The message of a thrown value, with a typed refusal as its English sentence. */
+/** The message of a thrown value, with a typed refusal as its English sentence: for a worker, which has the words at once. */
 export const refusalErrorText = (e: unknown): string =>
   (e instanceof InputError && e.issue && refusalSentence(e.issue)) || errorText(e)
