@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs'
-import { buildCatalogue, openCatalogue } from '@open-reloading/api/catalogue'
+import { buildCatalogue, type Catalogue, openCatalogue } from '@open-reloading/api/catalogue'
 import {
   errorAnswer,
   inlineRunner,
@@ -7,6 +7,7 @@ import {
   operation,
   operations,
 } from '@open-reloading/api/compute'
+import type { Bundle } from '@open-reloading/catalog'
 import { z } from 'zod'
 import { Refusal, UsageError } from './errors.ts'
 import { readBundle } from './records.ts'
@@ -61,6 +62,9 @@ function schemaError(error: z.ZodError) {
   )
 }
 
+/** The catalogue `run` answers over: the records read, opened in memory. */
+export const catalogueOf = (bundle: Bundle): Catalogue => openCatalogue(buildCatalogue(bundle))
+
 /** `run`: the answer of the operation `name` to the body of `input`, over the records of `roots`. */
 export async function runOperation(
   name: string,
@@ -77,7 +81,7 @@ export async function runOperation(
   const { bundle, errors } = readBundle(roots)
   if (errors.length > 0)
     warn(`${errors.length} problem(s) in the records; check them before relying on the result\n`)
-  const context = { catalogue: openCatalogue(buildCatalogue(bundle)), compute: inlineRunner }
+  const context = { catalogue: catalogueOf(bundle), compute: inlineRunner }
   let answer: { status: number; payload: unknown }
   try {
     answer = await op.run(context, body)

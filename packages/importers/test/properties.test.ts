@@ -5,6 +5,7 @@ import {
   chronoFormats,
   decodeText,
   parseChrono,
+  ReaderError,
   readWorkbook,
 } from '../src/index.ts'
 
@@ -12,15 +13,15 @@ import {
 const runs = { seed: 20261022, numRuns: 200 }
 
 /**
- * How `read` ends: `read`, or `refused` with a plain `Error`, the importers' own refusal; anything
- * else it throws comes back as it is (a `TypeError` or `RangeError` is a defect).
+ * How `read` ends: `read`, or `refused` with a `ReaderError` or a plain `Error`, the importers' own
+ * refusals; anything else it throws comes back as it is (a `TypeError` or `RangeError` is a defect).
  */
 async function outcome(read: () => unknown): Promise<unknown> {
   try {
     await read()
     return 'read'
   } catch (e) {
-    return Object.getPrototypeOf(e) === Error.prototype ? 'refused' : e
+    return e instanceof ReaderError || Object.getPrototypeOf(e) === Error.prototype ? 'refused' : e
   }
 }
 const readOrRefused = ['read', 'refused']

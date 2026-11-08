@@ -4,7 +4,6 @@ import { xlsx } from '../../../packages/importers/test/xlsx.ts'
 import { english } from '../src/i18n/translate.ts'
 import {
   chronoFileBytes,
-  chronoMessageText,
   exampleCsv,
   exampleSessionFileName,
   formatNames,
@@ -18,6 +17,7 @@ import {
   templateCsv,
   templateJson,
 } from '../src/lib/chrono.ts'
+import { chronoErrorText } from '../src/lib/chrono-diagnostics.ts'
 import { stringName } from '../src/lib/string-name.ts'
 import { stringStats } from '../src/lib/string-stats.ts'
 import { unitsOf } from '../src/lib/units.ts'
@@ -48,8 +48,8 @@ describe('readChrono', () => {
   })
 
   it('rejects files of no known format, naming the formats read and the export to make', async () => {
-    const error = await readChrono(bytes('a,b\n1,2'), {}).catch((e: Error) => e)
-    const text = chronoMessageText(String((error as Error).message), english.t)
+    const error = await readChrono(bytes('a,b\n1,2'), {}).catch((e: unknown) => e)
+    const text = chronoErrorText(error, english.t)
     expect(text).toContain('not a recognized')
     expect(text).toContain('Garmin Xero ShotView CSV')
     expect(text).not.toContain('delimited')
@@ -58,10 +58,12 @@ describe('readChrono', () => {
 
   it('names both units when the file contradicts the velocity unit of the caller', async () => {
     const session = ['string,velocity,velocityUnit', 'A,800,m/s', 'A,810,m/s'].join('\n')
-    await expect(
-      readChrono(bytes(session), { fileName: 'day1.csv', velocityUnit: 'ft/s' }),
-    ).rejects.toThrow(
-      /^row 2: velocity unit "m\/s" \(m\/s\) in the file differs from ft\/s named by the caller$/,
+    const error = await readChrono(bytes(session), {
+      fileName: 'day1.csv',
+      velocityUnit: 'ft/s',
+    }).catch((e: unknown) => e)
+    expect(chronoErrorText(error, english.t)).toBe(
+      'row 2: velocity unit "m/s" (m/s) in the file differs from ft/s named by the caller',
     )
   })
 })
@@ -161,14 +163,14 @@ describe('readSession', () => {
 
   it('keeps the first reason when the file names its unit', async () => {
     const text = 'string,velocity,velocityUnit\nA,812,m/s\nA,0,m/s'
-    const first = await readChrono(bytes(text), {}).catch((e: Error) => e.message)
-    await expect(readSession(bytes(text), 'a.csv', 'ft/s')).rejects.toThrow(first as string)
+    const error = await readSession(bytes(text), 'a.csv', 'ft/s').catch((e: unknown) => e)
+    expect(chronoErrorText(error, english.t)).toBe('row 3: velocity "0" is not positive')
   })
 
   it('names the reason of the read with the fallback unit when the file names no unit', async () => {
-    await expect(readSession(bytes('string,velocity\nA,0\nA,815'), 'a.csv', 'm/s')).rejects.toThrow(
-      'row 2: velocity "0" is not positive',
-    )
+    const text = 'string,velocity\nA,0\nA,815'
+    const error = await readSession(bytes(text), 'a.csv', 'm/s').catch((e: unknown) => e)
+    expect(chronoErrorText(error, english.t)).toBe('row 2: velocity "0" is not positive')
   })
 
   it('keeps the file name as the source of either read', async () => {

@@ -3,6 +3,7 @@ import { parseShotView } from '../src/index.ts'
 import { isShotViewHeader } from '../src/shotview.ts'
 import { complete } from './complete.ts'
 import { shotViewEnglish, shotViewGerman } from './fixtures.ts'
+import { refusal } from './refusal.ts'
 
 /** The English export with the bore flag cells of the first shot set to `clean` and `cold`. */
 const flagged = (clean: string, cold: string) =>
@@ -88,7 +89,7 @@ describe('parseShotView: the name line, a German export, dates and the footer', 
     expect(r.session.date).toBeUndefined()
     expect(r.missingPaths).toContain('date')
     expect(r.warnings).toEqual([
-      'footer date "QUARZ 04, 2026 10:00" is not recognised; enter the date',
+      { code: 'footerDateUnknown', params: { text: 'QUARZ 04, 2026 10:00' } },
     ])
     expect(complete(r).date).toBe('2026-03-01')
   })
@@ -96,12 +97,15 @@ describe('parseShotView: the name line, a German export, dates and the footer', 
   it('warns when the footer disagrees with the shots', () => {
     const r = parseShotView(shotViewEnglish.replace('AVERAGE SPEED,2802.0', 'AVERAGE SPEED,2812.0'))
     expect(r.warnings).toEqual([
-      'footer AVERAGE SPEED "2812.0" differs from 2802.0 computed from the shots',
+      {
+        code: 'statisticDiffers',
+        params: { label: 'AVERAGE SPEED', value: '2812.0', computed: expect.closeTo(2802, 1) },
+      },
     ])
   })
 })
 
-describe('parseShotView: units and refused files', () => {
+describe('parseShotView: units', () => {
   // spellings seen in exports; KPH, km/h, MPH assumed
   it('reads the unit token of each header spelling', () => {
     const cases: [string, string, number, string, string][] = [
@@ -124,29 +128,42 @@ describe('parseShotView: units and refused files', () => {
 
   it('refuses an unknown unit unless the caller names it', () => {
     const text = shotViewEnglish.replace('SPEED (FPS)', 'SPEED (KMH)')
-    expect(() => parseShotView(text)).toThrow('velocity unit "KMH" is unknown')
+    expect(refusal(() => parseShotView(text))).toEqual({
+      code: 'unknownUnit',
+      params: { text: 'KMH' },
+    })
     const r = parseShotView(text, { velocityUnit: 'm/s' })
     expect(r.session.strings[0]?.shots[0]?.velocity).toEqual({ value: 2800, raw: '2800.0 KMH' })
-    expect(r.warnings).toContain(
-      'velocity unit "KMH" in the file; using m/s as named by the caller',
-    )
+    expect(r.warnings).toContainEqual({
+      code: 'unknownUnitNamedByCaller',
+      params: { text: 'KMH', unit: 'm/s' },
+    })
     expect(r.velocityUnits).toEqual([{ unit: 'm/s', source: 'caller' }])
   })
+})
 
+describe('parseShotView: refused files', () => {
   it('refuses an empty file, a wrong shape and a file without shots', () => {
-    expect(() => parseShotView('')).toThrow('not a ShotView CSV')
-    expect(() => parseShotView('a,b,c\n1,2,3')).toThrow('not a ShotView CSV')
-    expect(() => parseShotView(shotViewEnglish.split('\n').slice(0, 2).join('\n'))).toThrow(
-      'no shots found',
-    )
+    const notShotView = { code: 'notShotView', params: {} }
+    expect(refusal(() => parseShotView(''))).toEqual(notShotView)
+    expect(refusal(() => parseShotView('a,b,c\n1,2,3'))).toEqual(notShotView)
+    expect(
+      refusal(() => parseShotView(shotViewEnglish.split('\n').slice(0, 2).join('\n'))),
+    ).toEqual({ code: 'noShots', params: {} })
   })
 
   it.each([
-    ['not a number', ' "2,810.5",', 'velocity "2,810.5" is not a number'],
-    ['a comma that may group thousands', ' "2,810",', 'velocity "2,810" is not a number'],
-    ['negative', ' -2810.5,', 'velocity "-2810.5" is not positive'],
-  ])('refuses a velocity: %s', (_, cell, message) => {
-    expect(() => parseShotView(shotViewEnglish.replace(' 2810.5,', cell))).toThrow(message)
+    ['not a number', ' "2,810.5",', { code: 'velocityNotNumber', params: { cell: '2,810.5' } }],
+    [
+      'a comma that may group thousands',
+      ' "2,810",',
+      { code: 'velocityNotNumber', params: { cell: '2,810' } },
+    ],
+    ['negative', ' -2810.5,', { code: 'velocityNotPositive', params: { cell: '-2810.5' } }],
+  ])('refuses a velocity: %s', (_, cell, diagnostic) => {
+    expect(refusal(() => parseShotView(shotViewEnglish.replace(' 2810.5,', cell)))).toEqual(
+      diagnostic,
+    )
   })
 })
 
@@ -176,12 +193,17 @@ describe('parseShotView: footers, quotes, line ends and hashes', () => {
 
   it('warns about a footer statistics row with the label only', () => {
     const r = parseShotView(shotViewEnglish.replace('STD DEV,6.3,,,,,,,', 'STD DEV'))
-    expect(r.warnings).toEqual(['footer STD DEV "" is not a number; not checked'])
+    expect(r.warnings).toEqual([
+      { code: 'statisticNotNumber', params: { label: 'STD DEV', value: '' } },
+    ])
   })
 
   it('refuses a shot row without a velocity cell', () => {
     const text = shotViewEnglish.replace('-,,,,,,', '4\n-,,,,,,')
-    expect(() => parseShotView(text)).toThrow('velocity "" is not a number')
+    expect(refusal(() => parseShotView(text))).toEqual({
+      code: 'velocityNotNumber',
+      params: { cell: '' },
+    })
   })
 
   it('reads lone CR line ends', () => {
@@ -192,9 +214,10 @@ describe('parseShotView: footers, quotes, line ends and hashes', () => {
   it('stores sha256 in lowercase and refuses a malformed one', () => {
     const r = parseShotView(shotViewEnglish, { sha256: 'A'.repeat(64) })
     expect(r.session.provenance.sources[0].sha256).toBe('a'.repeat(64))
-    expect(() => parseShotView(shotViewEnglish, { sha256: 'xyz' })).toThrow(
-      'sha256 must be 64 hex digits',
-    )
+    expect(refusal(() => parseShotView(shotViewEnglish, { sha256: 'xyz' }))).toEqual({
+      code: 'sha256Malformed',
+      params: {},
+    })
   })
 })
 
@@ -225,7 +248,7 @@ describe('ShotView CSV rows and footer dates', () => {
     for (const text of ['March 2026', '3, 2026']) {
       const r = dated(text)
       expect(r.session.date).toBeUndefined()
-      expect(r.warnings).toEqual([`footer date "${text}" is not recognised; enter the date`])
+      expect(r.warnings).toEqual([{ code: 'footerDateUnknown', params: { text } }])
     }
   })
 
@@ -265,19 +288,26 @@ describe('ShotView CSV name line, date row, bore flags and footer labels', () =>
       shotViewGerman.replace('STANDARDABWEICHUNG,"1,1"', 'STANDARDABWEICHUNG,"9,1"'),
     )
     expect(sd.warnings).toEqual([
-      'footer STANDARDABWEICHUNG "9,1" differs from 1.1 computed from the shots',
+      {
+        code: 'statisticDiffers',
+        params: { label: 'STANDARDABWEICHUNG', value: '9,1', computed: expect.closeTo(1.1, 1) },
+      },
     ])
     const spread = parseShotView(shotViewGerman.replace('STREUUNG,"2,5"', 'STREUUNG,"9,5"'))
     expect(spread.warnings).toEqual([
-      'footer STREUUNG "9,5" differs from 2.5 computed from the shots',
+      {
+        code: 'statisticDiffers',
+        params: { label: 'STREUUNG', value: '9,5', computed: expect.closeTo(2.5, 1) },
+      },
     ])
   })
 })
 
 describe('caller unit against the header unit', () => {
   it('refuses a caller unit that differs from the header unit', () => {
-    expect(() => parseShotView(shotViewEnglish, { velocityUnit: 'm/s' })).toThrow(
-      'velocity unit "FPS" (ft/s) in the file differs from m/s named by the caller',
-    )
+    expect(refusal(() => parseShotView(shotViewEnglish, { velocityUnit: 'm/s' }))).toEqual({
+      code: 'unitDiffersFromCaller',
+      params: { text: 'FPS', unit: 'ft/s', caller: 'm/s' },
+    })
   })
 })

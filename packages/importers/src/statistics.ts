@@ -1,4 +1,5 @@
 // Statistics rows printed by the devices, compared with the shots read.
+import type { ChronoDiagnostic } from './diagnostics.ts'
 
 // printed statistics come from unrounded device values; shots are printed to 0.1
 const statisticsTolerance = 0.2
@@ -50,9 +51,9 @@ function compareStatistics(
 }
 
 /**
- * Warns per printed statistics row (see `compareStatistics`) that is not a number or differs
- * from the shots, each warning starting with `prefix`, and `<notFound> not found` when no row is
- * found; no warning without values.
+ * Warns per printed footer statistics row (see `compareStatistics`) that is not a number or
+ * differs from the shots, each warning with the params of `at`, and once when no row is found; no
+ * warning without values.
  */
 export function warnStatistics(
   {
@@ -65,18 +66,19 @@ export function warnStatistics(
     readNumber: (cell: string) => number
   },
   values: number[],
-  { warnings, prefix, notFound }: { warnings: string[]; prefix: string; notFound: string },
+  { warnings, at }: { warnings: ChronoDiagnostic[]; at: { worksheet?: number } },
 ): void {
   if (values.length === 0) return
   const checks = compareStatistics(rows, values, rowLabels, readNumber)
   for (const { row, computed, withinTolerance, unreadable } of checks) {
-    if (unreadable) {
-      warnings.push(`${prefix}${row[0]} "${row[1] ?? ''}" is not a number; not checked`)
-    } else if (!withinTolerance) {
-      warnings.push(
-        `${prefix}${row[0]} "${row[1]}" differs from ${computed.toFixed(1)} computed from the shots`,
-      )
+    const printed = { ...at, label: row[0] ?? '', value: row[1] ?? '' }
+    if (unreadable) warnings.push({ code: 'statisticNotNumber', params: printed })
+    else if (!withinTolerance) {
+      warnings.push({
+        code: 'statisticDiffers',
+        params: { ...printed, computed },
+      })
     }
   }
-  if (checks.length === 0) warnings.push(`${notFound} not found; not checked`)
+  if (checks.length === 0) warnings.push({ code: 'footerStatisticsMissing', params: at })
 }

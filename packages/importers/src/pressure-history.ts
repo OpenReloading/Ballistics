@@ -1,5 +1,6 @@
 // A pressure-time trace of the user's own measurement: time and pressure columns, the units and the
 // sensor position named by the user or the file, an optional zero-phase low-pass.
+import { type PressureDiagnostic, refuseTrace } from './diagnostics.ts'
 import { detectDelimiter, splitCells } from './generic.ts'
 import { psi } from './record-fields.ts'
 import { bracketed, splitLines } from './text.ts'
@@ -28,6 +29,9 @@ const timeUnits: Record<TimeUnit, number> = { s: 1, ms: 1e-3, us: 1e-6 }
 export type SensorPosition = 'breech' | 'mean' | 'base'
 
 const sensors: readonly SensorPosition[] = ['breech', 'mean', 'base']
+
+/** Fewest samples of a trace. */
+const minSamples = 3
 
 /** Options of `parsePressureHistory`. */
 export interface PressureHistoryOptions {
@@ -62,7 +66,7 @@ export interface PressureHistoryImport {
   }
   /** The low-pass applied, or absent. */
   lowPass?: { cutoff: number }
-  warnings: string[]
+  warnings: PressureDiagnostic[]
 }
 
 /**
@@ -146,18 +150,17 @@ function checkedOptions(options: PressureHistoryOptions): {
   pc: number
   cutoff: number | undefined
 } {
-  if (!sensors.includes(options.sensor))
-    throw new Error('the sensor position is missing: name breech, mean or base')
+  if (!sensors.includes(options.sensor)) refuseTrace('sensorMissing', { sensors })
   const { time: tc = 1, pressure: pc = 2 } = options.columns ?? {}
   if (![tc, pc].every((c) => Number.isInteger(c) && c >= 1) || tc === pc)
-    throw new Error('columns: two different column numbers counted from 1')
+    refuseTrace('columnsNotDistinct')
   return { tc, pc, cutoff: checkedCutoff(options.lowPass?.cutoff) }
 }
 
 /** The low-pass cutoff, refused unless it is a frequency above 0 Hz. */
 function checkedCutoff(cutoff: number | undefined): number | undefined {
   if (cutoff !== undefined && !(Number.isFinite(cutoff) && cutoff > 0))
-    throw new Error('lowPass cutoff must be a frequency above 0 Hz')
+    refuseTrace('cutoffNotPositive')
   return cutoff
 }
 
@@ -175,20 +178,20 @@ function columnUnit<T extends string>(
   column: { name: string; header: string },
   table: Record<T, number>,
   caller: T | undefined,
-  warnings: string[],
+  warnings: PressureDiagnostic[],
 ): { unit: T; source: 'file' | 'caller' } {
   const named = namedUnit(table, column.header)
   const file = lookup(table, named)
   if (file && caller && file !== caller)
-    throw new Error(
-      `${column.name} unit "${named}" in the file differs from ${caller} named by the caller`,
-    )
+    refuseTrace('columnUnitDiffersFromCaller', { column: column.name, text: named ?? '', caller })
   const unit = file ?? caller
-  if (!unit) throw new Error(`${column.name} unit is missing: name the unit to import this file`)
-  if (!file && named)
-    warnings.push(
-      `${column.name} unit "${named}" in the file is unknown; using ${unit} as named by the caller`,
-    )
+  if (!unit) refuseTrace('columnUnitMissing', { column: column.name })
+  if (!file && named) {
+    warnings.push({
+      code: 'columnUnitNamedByCaller',
+      params: { column: column.name, text: named, unit },
+    })
+  }
   return { unit, source: file ? 'file' : 'caller' }
 }
 
@@ -205,13 +208,13 @@ function readSamples(
   const samples: Sample[] = []
   rows.forEach((cells, i) => {
     const [t, p] = [reading(cells[tc - 1] ?? ''), reading(cells[pc - 1] ?? '')]
-    if (Number.isNaN(t) || Number.isNaN(p))
-      throw new Error(`line ${i + first}: time or pressure is not a number`)
+    const line = i + first
+    if (Number.isNaN(t) || Number.isNaN(p)) refuseTrace('readingNotNumber', { line })
     const [seconds, bar] = [t * tf, p * pf]
     if (!Number.isFinite(seconds) || !Number.isFinite(bar))
-      throw new Error(`line ${i + first}: time or pressure is not finite`)
+      refuseTrace('readingNotFinite', { line })
     const before = samples.at(-1)
-    if (before && seconds <= before.time) throw new Error(`line ${i + first}: times must increase`)
+    if (before && seconds <= before.time) refuseTrace('timesNotIncreasing', { line })
     samples.push({ time: seconds, value: bar })
   })
   return samples
@@ -233,7 +236,7 @@ export function parsePressureHistory(
   const rows = lines.map((l) => splitCells(l, delimiter))
   const header = takeHeader(rows, tc)
   const headerCell = (c: number) => header?.[c - 1] ?? ''
-  const warnings: string[] = []
+  const warnings: PressureDiagnostic[] = []
   const timeUnit = columnUnit(
     { name: 'time', header: headerCell(tc) },
     timeUnits,
@@ -248,7 +251,7 @@ export function parsePressureHistory(
   )
   const factors = { tf: timeUnits[timeUnit.unit], pf: pressureUnits[pressureUnit.unit] }
   const samples = readSamples(rows, { tc, pc, first: header ? 2 : 1 }, factors)
-  if (samples.length < 3) throw new Error('a trace needs at least 3 samples')
+  if (samples.length < minSamples) refuseTrace('tooFewSamples', { min: minSamples })
   const time = samples.map((s) => s.time)
   const pressure = samples.map((s) => s.value)
   return {

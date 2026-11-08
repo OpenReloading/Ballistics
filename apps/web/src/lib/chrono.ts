@@ -6,13 +6,13 @@ import {
   decodeText,
   isWorkbook,
   parseChrono,
+  ReaderError,
   readWorkbook,
   stringifyOpenReloadingJson,
   type VelocityUnit,
 } from '@open-reloading/importers'
 import { formatNumber } from '../i18n/number.ts'
-import { english, type Message, msg, type Translator } from '../i18n/translate.ts'
-import { translateMessage } from './core-messages.ts'
+import { english, type Message, msg } from '../i18n/translate.ts'
 import { toCsv } from './csv.ts'
 import { stringName } from './string-name.ts'
 import { stringStats } from './string-stats.ts'
@@ -92,13 +92,8 @@ const notWorkbook = msg(
 const notExport = msg(
   "The file is not a recognized chronograph export. Reads {formats}: export the session from the device's app as CSV or XLSX.",
 )
-const ownMessages: readonly Message[] = [tooLarge, notWorkbook, notExport]
-
-/** The message of an error thrown here or by the importers, in the language of `t`. */
-export const chronoMessageText = (text: string, t: Translator['t']) => {
-  const own = ownMessages.find((m) => m === text)
-  return own ? t(own, { formats }) : translateMessage(text, t)
-}
+/** The refusals this module throws itself, worded by `chronoErrorText`. */
+export const chronoOwnMessages: readonly Message[] = [tooLarge, notWorkbook, notExport]
 
 /** The bytes of a chosen file, its size checked before reading, so a large file chosen by mistake is never loaded. */
 export async function chronoFileBytes(file: Blob) {
@@ -139,7 +134,7 @@ export async function readSession(
       return await readChrono(bytes, { fileName, velocityUnit: fallback })
     } catch (second) {
       // the file names its unit, so the first reason is the one that counts
-      throw second instanceof Error && second.message.includes('named by the caller')
+      throw second instanceof ReaderError && second.diagnostic.code === 'unitDiffersFromCaller'
         ? first
         : second
     }
