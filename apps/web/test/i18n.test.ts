@@ -1,9 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import de from '../src/i18n/de.json'
 import { chooseLanguage, startLanguage } from '../src/i18n/language.ts'
 import { msg, translator } from '../src/i18n/translate.ts'
 
-const german = translator(de, 'de')
+// a catalogue of its own: the cases check the translator, not the texts of de.json
+const german = translator(
+  {
+    Settings: 'Einstellungen',
+    Brass: 'Hülsen',
+    'material\u0004Brass': 'Messinghülse',
+    '{count} record|{count} records': { one: '{count} Datensatz', other: '{count} Datensätze' },
+  },
+  'de',
+)
 const english = translator()
 const count = ['{count} record', '{count} records'] as const
 

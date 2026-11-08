@@ -31,8 +31,8 @@ describe('the decimal mark', () => {
 
 describe('reading typed numbers', () => {
   it('rejects long text that is no number in linear time', () => {
-    expect(parseNumber(`${'1'.repeat(50_000)}x`).kind).toBe('invalid')
-    expect(parseNumber('.,'.repeat(25_000)).kind).toBe('invalid')
+    expect(parseNumber(`${'1'.repeat(1_000_000)}x`).kind).toBe('invalid')
+    expect(parseNumber('.,'.repeat(500_000)).kind).toBe('invalid')
   })
 
   it.each(['en', 'de'])('reads either mark in %s', (language) => {
