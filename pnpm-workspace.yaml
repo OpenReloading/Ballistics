@@ -53,3 +53,14 @@ allowBuilds:
   core-js: false
   esbuild: false
   vue-demi: false
+
+# eslint-plugin-regexp runs inside Oxlint (jsPlugins), which needs no ESLint: its ESLint peer stays out.
+packageExtensions:
+  eslint-plugin-regexp:
+    peerDependenciesMeta:
+      eslint:
+        optional: true
+  "@eslint-community/eslint-utils":
+    peerDependenciesMeta:
+      eslint:
+        optional: true
