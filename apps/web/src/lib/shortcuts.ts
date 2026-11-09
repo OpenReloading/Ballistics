@@ -3,7 +3,7 @@ import { type Message, msg } from '../i18n/translate.ts'
 
 type Shortcut = { action: Message; keys: readonly string[]; fields?: boolean }
 
-/** One table for handlers, hints, command keys and help; a one-character key fires outside text fields on any layout, so shift is not checked; `fields` also fires while typing. */
+/** One table for handlers, hints, command keys and help; a key is a `@mantine/hooks` hotkey (`mod` is Ctrl or Cmd on every platform) or one character, which fires outside text fields on any layout, so shift is not checked; `fields` also fires while typing. */
 const table = {
   search: { action: msg('Search'), keys: ['mod+K'], fields: true },
   help: { action: msg('Keyboard shortcuts'), keys: ['?'] },

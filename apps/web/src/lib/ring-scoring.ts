@@ -1,4 +1,4 @@
-/** Issues of packages/shot-groups/src/ring-scoring.ts become messages in the language shown. */
+/** Issues of the ring scoring of `@open-reloading/shot-groups` (packages/shot-groups/src/ring-scoring.ts) become messages in the language shown. */
 import {
   faceAlignment as alignFace,
   type FaceAlignment,
