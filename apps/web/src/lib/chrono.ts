@@ -173,7 +173,7 @@ function shotRows(data: ChronoImport, unit: Unit): (string | number)[][] {
         n + 1,
         v(shot.velocity.value),
         shot.coldBore ? 'yes' : '',
-        shot.excluded ?? '',
+        shot.excluded === true ? english.t('excluded at the range') : (shot.excluded ?? ''),
       ]),
     ),
   ]

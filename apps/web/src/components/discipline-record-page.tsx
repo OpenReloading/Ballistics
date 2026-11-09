@@ -18,6 +18,7 @@ import { DisciplineData, DisciplineStages, DisciplineStrip } from './discipline-
 import { MatchRounds } from './match-rounds.tsx'
 import { RecordPage } from './record-page.tsx'
 import { RecordViewWith } from './record-view.tsx'
+import { sourceTitle } from './source-link.tsx'
 import { TargetFaceDrawing } from './target-face-drawing.tsx'
 
 /** What the page reads besides the record: the stages with their faces, the other disciplines and federations, the caliber classes. */
@@ -102,7 +103,7 @@ function DisciplineRecordView({
           federation={{ id: d.federation, name: federation?.name ?? d.federation }}
           book={
             book && {
-              title: book.title,
+              title: sourceTitle(book, t),
               url: book.url,
               edition: book.edition,
               section: book.section,

@@ -8,12 +8,6 @@ import { type Unit, type UnitSystem, withUnit } from './units.ts'
 type SessionString = SessionRecord['data']['strings'][number]
 type Conditions = NonNullable<SessionString['conditions']>
 
-/** The source title of a session entered by hand. */
-const rangeSource = 'Entered at the range'
-
-/** The reason a shot excluded at the range carries. */
-export const rangeExcluded = 'excluded at the range'
-
 /** Largest velocity the range page accepts, m/s: a typo such as an extra digit is refused. */
 const maxVelocity = 3000
 
@@ -160,7 +154,7 @@ const changeString =
               date: localDate(context.now),
               device: { kind: 'other' },
               strings: [],
-              provenance: { kind: 'measured', sources: [{ title: rangeSource }] },
+              provenance: { kind: 'measured', sources: [{ entry: 'range' }] },
             },
           }
     const at = stringIndex(base, step)
@@ -237,7 +231,7 @@ export const setExcluded = (
         shots: s.shots.map((shot, i) => {
           if (i !== index) return shot
           const { excluded: _, ...rest } = shot
-          return excluded ? { ...rest, excluded: rangeExcluded } : rest
+          return excluded ? { ...rest, excluded: true } : rest
         }),
       }
     },

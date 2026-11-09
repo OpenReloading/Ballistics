@@ -18,7 +18,6 @@ import {
   parseVelocity,
   parseWeather,
   type RangeContext,
-  rangeExcluded,
   rangeSessionId,
   rangeStats,
   rangeSteps,
@@ -130,7 +129,7 @@ it('excludes a shot from the statistics and keeps it in the data, and takes the 
   const out = setExcluded(context, main, 2, true)(entered)
   const kept = nth(out.data.strings, 0)
   expect(kept.shots).toHaveLength(3)
-  expect(nth(kept.shots, 2).excluded).toBe(rangeExcluded)
+  expect(nth(kept.shots, 2).excluded).toBe(true)
   expect(rangeStats(kept)).toMatchObject({ count: 2, excluded: 1, max: 852, mean: 851 })
   const back = nth(setExcluded(context, main, 2, false)(out).data.strings, 0)
   expect(nth(back.shots, 2)).toEqual({ velocity: { value: 900 } })

@@ -9,9 +9,10 @@ const chronoShotParser = z.object({
   velocity: quantity('velocity').describe('Velocity of the shot, m/s.'),
   coldBore: z.boolean().describe('First shot from a cold or clean barrel.').optional(),
   excluded: z
-    .string()
-    .min(1)
-    .describe('Reason the shot is left out of statistics, for example a misread.')
+    .union([z.literal(true), z.string().min(1)])
+    .describe(
+      'The shot is left out of statistics: `true` when the user left it out at the range (the app names the reason in the reader language), else the reason, for example a misread.',
+    )
     .optional(),
 })
 
@@ -22,7 +23,7 @@ const chronoShotParser = z.object({
 export const chronoShot: z.ZodObject<{
   velocity: QuantitySchema
   coldBore: z.ZodOptional<z.ZodBoolean>
-  excluded: z.ZodOptional<z.ZodString>
+  excluded: z.ZodOptional<z.ZodUnion<readonly [z.ZodLiteral<true>, z.ZodString]>>
 }> = chronoShotParser satisfies Exact<typeof chronoShot, typeof chronoShotParser>
 
 const stringVariationParser = z.discriminatedUnion('kind', [
