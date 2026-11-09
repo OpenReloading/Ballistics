@@ -1,9 +1,4 @@
-/**
- * 3-D point-mass trajectory, described in `apps/docs/docs/models/exterior-point-mass.md`, and the modified point
- * mass of `apps/docs/docs/models/exterior-modified-point-mass.md`. SI in
- * and out; angles in rad. Integration in the local-level ground frame (x downrange horizontal,
- * y up, z right); the line of sight is an output projection (`apps/docs/docs/models/exterior-point-mass.md`, "Frames").
- */
+/** Point-mass (`apps/docs/docs/models/exterior-point-mass.md`) and modified point-mass (`apps/docs/docs/models/exterior-modified-point-mass.md`) trajectory in 3-D; SI in and out, angles in rad; integrated in the local-level ground frame (x downrange, y up, z right), the line of sight an output projection (`apps/docs/docs/models/exterior-point-mass.md`, "Frames"). */
 import { nth } from '@open-reloading/statistics'
 import { type DragModel, type DragTable, dragTables } from '../drag-tables.ts'
 import { InputError, need } from '../issue.ts'
@@ -63,10 +58,7 @@ export interface Firearm {
   sightOffset?: number | undefined
   /** Twist length per turn, m. */
   twist?: number | undefined
-  /**
-   * Direction of the twist. Spin drift and jump need it, and the modified point mass signs the
-   * spin by it.
-   */
+  /** Spin drift and jump need it, and the modified point mass signs the spin by it. */
   twistHand?: 'right' | 'left' | undefined
 }
 
@@ -154,10 +146,7 @@ export interface TrajectoryOptions {
   model: 'point-mass' | 'modified-point-mass'
   /** Largest yaw of repose before a modified point-mass run stops, rad (`apps/docs/docs/models/exterior-modified-point-mass.md`, "Yaw limit"). */
   maxYaw: number
-  /**
-   * Step count shared with other calls; every integration of the call (zero search, run, twin)
-   * adds to it.
-   */
+  /** Shared with other calls; every integration of the call (zero search, run, twin) adds to it. */
   budget?: StepBudget | undefined
 }
 
@@ -227,10 +216,7 @@ export type OmittedEffect =
   | 'spinDecay'
   | 'magnus'
 
-/**
- * Modified point-mass inputs that were estimated, not given
- * (`apps/docs/docs/models/exterior-modified-point-mass.md`, "Gyroscopic stability and the overturning-moment estimate").
- */
+/** Modified point-mass inputs that were estimated, not given (`apps/docs/docs/models/exterior-modified-point-mass.md`, "Gyroscopic stability and the overturning-moment estimate"). */
 export type EstimatedInput = 'axialInertia' | 'transverseInertia' | 'momentSlope'
 
 /** Result of `trajectory`. */
@@ -239,15 +225,9 @@ export interface Trajectory {
   points: TrajectoryPoint[]
   /** Bore angles of the run, from the zero or as given. */
   bore: BoreAngles
-  /**
-   * Gyroscopic stability at the muzzle: Miller's rule (point mass, absent without length or twist)
-   * or linear theory from the coefficients (modified point mass).
-   */
+  /** At the muzzle: Miller's rule (point mass, absent without length or twist) or linear theory from the coefficients (modified point mass). */
   stability?: number
-  /**
-   * Why the run ended: all ranges reached, apex of the flight, altitude outside the atmosphere
-   * model, `maxTime`, or the yaw limit `maxYaw` (modified point mass).
-   */
+  /** All ranges reached, apex of the flight, altitude outside the atmosphere model, `maxTime`, or the yaw limit `maxYaw` (modified point mass). */
   stop: 'done' | 'apex' | 'atmosphere' | 'maxTime' | 'yaw'
   /** Effects left out of this run. */
   omitted: OmittedEffect[]
@@ -264,11 +244,7 @@ export const radPerMrad = 1e-3
 /** Earth rotation rate, rad/s (WGS 84). */
 export const earthRotationRate = 7.292115e-5
 
-/**
- * Earth's angular velocity in the ground frame (x along the azimuth of fire, y up, z right),
- * rad/s. Without an azimuth only the vertical component is returned
- * (`apps/docs/docs/models/exterior-point-mass.md`, "Earth rotation").
- */
+/** In the ground frame (x along the azimuth of fire, y up, z right), rad/s; without an azimuth only the vertical component (`apps/docs/docs/models/exterior-point-mass.md`, "Earth rotation"). */
 export function earthRotation(latitude: number, azimuth?: number): [number, number, number] {
   const up = earthRotationRate * Math.sin(latitude)
   if (azimuth === undefined) return [0, up, 0]
@@ -366,14 +342,10 @@ function insideSegment(grid: DragTable, mi: number): number {
   return (nth(grid, mi)[0] + nth(grid, mi + 1)[0]) / 2
 }
 
-/**
- * Mach grid: the drag table nodes, merged with the coefficient table nodes in M2b. `seg[j][mi + 1]`
- * is the segment of `tables[j]` that holds grid segment mi; `held` marks segments read as held.
- */
+/** The drag table nodes, merged with the coefficient table nodes in M2b; `seg[j][mi + 1]` is the segment of `tables[j]` that holds grid segment mi, `held` marks those read as held. */
 function machGrid(table: DragTable, aero: Aero | undefined) {
   const tables: DragTable[] = [table]
-  // index in tables by role, not by array identity: a coefficient may be the same array as the
-  // drag curve or another coefficient, and then gets its own entry
+  // index in tables by role, not by array identity: a coefficient may be the same array as the drag curve or another coefficient, and then gets its own entry
   const register = (k: CoefficientOverMach) => (typeof k === 'number' ? -1 : tables.push(k) - 1)
   const liftAt = aero ? register(aero.liftSlope) : -1
   const momentAt = aero ? register(aero.momentSlope) : -1
@@ -466,10 +438,7 @@ function pointMassRhs(c: FlightContext): Rhs {
   }
 }
 
-/**
- * M2b: point-mass acceleration, yaw of repose from it, then lift, Magnus and spin decay; writes
- * dy/dt and returns the yaw vector.
- */
+/** Point-mass acceleration, yaw of repose from it, then lift, Magnus and spin decay; writes dy/dt and returns the yaw vector. */
 function modifiedPointMassRhs(c: FlightContext, pointMass: Rhs) {
   const { air, p } = c
   const { seg, held, liftAt, momentAt, magnusAt, dampingAt } = c.mg
@@ -643,10 +612,7 @@ function limitEvents(c: FlightContext, watch: Watch): KindEvent[] {
   return out
 }
 
-/**
- * Events of one integration from the current segments: the pending ranges, the segment
- * boundaries of wind, BC band and Mach grid, the apex, the yaw limit and the atmosphere limits.
- */
+/** The pending ranges, the segment boundaries of wind, BC band and Mach grid, the apex, the yaw limit and the atmosphere limits. */
 function flightEvents(
   c: FlightContext,
   watch: Watch,
@@ -687,10 +653,7 @@ function launchState(c: Conditions, bore: BoreAngles, ux: number, uy: number) {
   )
 }
 
-/**
- * Moves the segment indices of `fc` past the boundary a restart state at `y` lies beyond. The
- * state lies on either side of the crossed boundary; wind first, because the airspeed depends on it.
- */
+/** Moves the segment indices of `fc` past the boundary a restart state at `y` lies beyond (the state lies on either side of the crossed boundary); wind first, because the airspeed depends on it. */
 function restartSegments(
   fc: FlightContext,
   winds: readonly WindSegment[],
@@ -862,12 +825,7 @@ function settleWithoutCrossing(k: number, v: number, { lo, hi, edge }: Segments)
   return j
 }
 
-/**
- * Segment index after a restart at value v among `segments`. A crossing in direction d moves past the crossed boundary b and every further boundary within
- * |v - b| of b or at or beyond v (boundaries closer than the event resolution). Without a crossing
- * (d = 0) the index moves only past boundaries that v lies strictly beyond, whose events could no
- * longer fire.
- */
+/** The segment index after a restart at value v: a crossing in direction d moves past the crossed boundary b and every further one within |v - b| of b or at or beyond v (closer than the event resolution); without one (d = 0) only past boundaries that v lies strictly beyond, whose events could no longer fire. */
 function settle(k: number, d: -1 | 0 | 1, v: number, segments: Segments): number {
   const { lo, hi, edge } = segments
   let j = k
@@ -1156,13 +1114,7 @@ function spin(shot: TrajectoryInput, air: Air) {
   return { sg, hand: firearm.twistHand, calibres: p.length / p.diameter }
 }
 
-/**
- * Adds spin drift and jump (`apps/docs/docs/models/exterior-stability.md`, "Spin drift" and
- * "Aerodynamic jump") and the holds. In M2b the drift is part of the integration, `twin` maps
- * range to the windage of the point-mass twin run
- * (`apps/docs/docs/models/exterior-modified-point-mass.md`, "Spin drift column"), and the jump comes from linear
- * theory (`apps/docs/docs/models/exterior-modified-point-mass.md`, "Aerodynamic jump").
- */
+/** Adds spin drift and jump (`apps/docs/docs/models/exterior-stability.md`, "Spin drift" and "Aerodynamic jump") and the holds; in M2b the drift is integrated, `twin` maps range to the point-mass twin's windage, and the jump comes from linear theory (`apps/docs/docs/models/exterior-modified-point-mass.md`, "Spin drift column", "Aerodynamic jump"). */
 function correct(
   c: Conditions,
   raw: Raw[],

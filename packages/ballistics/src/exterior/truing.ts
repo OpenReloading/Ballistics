@@ -1,9 +1,4 @@
-/**
- * Truing: fits muzzle velocity and drag factors to observations of one session, or one drag
- * correction to several sessions, by weighted least squares,
- * `apps/docs/docs/models/exterior-truing.md`. Every evaluation is an
- * ordinary `trajectory` call with candidate inputs. SI in and out; angles in rad.
- */
+/** Fits muzzle velocity and drag factors to one session, or one drag correction to several, by weighted least squares (`apps/docs/docs/models/exterior-truing.md`), each evaluation an ordinary `trajectory` call; SI in and out, angles in rad. */
 
 import {
   checkLogFitLimits,
@@ -38,22 +33,13 @@ export interface Observation {
   standardUncertainty?: number | undefined
 }
 
-/**
- * Trajectory options of every evaluation (`budget` excluded: the fit sets it) and the limits of
- * the fit. The integrator defaults are relativeTolerance 1e-10, absoluteTolerance 1e-9 and zeroTolerance 1e-9.
- */
+/** `budget` is set by the fit; the integrator defaults are relativeTolerance 1e-10, absoluteTolerance 1e-9 and zeroTolerance 1e-9. */
 export interface TruingOptions extends Settings<Omit<TrajectoryOptions, 'budget'>> {
-  /**
-   * Levenberg-Marquardt iterations (accepted plus rejected steps) before the fit fails with reason
-   * `not-converged`; default 30.
-   */
+  /** Levenberg-Marquardt iterations (accepted plus rejected steps) before the fit fails with reason `not-converged`; default 30. */
   maxIterations?: number | undefined
   /** Largest condition number of the column-scaled Jacobian; default 1e3. */
   maxCondition?: number | undefined
-  /**
-   * Integration steps of all trajectories of the fit together, zero searches and point-mass twins
-   * included, before it fails with reason `step-budget`; positive, default no limit.
-   */
+  /** Integration steps of all the fit's trajectories, zero searches and point-mass twins included, before it fails with reason `step-budget`; positive, default no limit. */
   maxTotalSteps?: number | undefined
 }
 
@@ -69,10 +55,7 @@ export interface TruedParameter {
   initial: number
   /** Fitted value, same unit as `initial`. */
   value: number
-  /**
-   * Standard uncertainty; absent when it cannot be estimated (n = p without standard uncertainties); NaN when
-   * rounding leaves its covariance diagonal below 0.
-   */
+  /** Absent when it cannot be estimated (n = p without standard uncertainties); NaN when rounding leaves its covariance diagonal below 0. */
   standardUncertainty?: number
 }
 
@@ -100,10 +83,7 @@ export interface TruingResult {
   shot: TrajectoryInput
   /** Fitted parameters, in the order they were fitted. */
   parameters: TruedParameter[]
-  /**
-   * Absent like `standardUncertainty`; all NaN for an exact fit without standard uncertainties (chi-square 0,
-   * `apps/docs/docs/models/exterior-truing.md`, "Limits").
-   */
+  /** Absent like `standardUncertainty`; all NaN for an exact fit without standard uncertainties (chi-square 0, `apps/docs/docs/models/exterior-truing.md`, "Limits"). */
   correlation?: number[][]
   /** One row per observation, in input order. */
   residuals: TruingResidual[]
@@ -130,12 +110,7 @@ export type TruingReason =
   | 'not-converged'
   | 'step-budget'
 
-/**
- * Failure of a truing fit: `reason` is `underdetermined` (fewer observations than parameters),
- * `unresolved` or `ill-conditioned` (the observations do not separate the parameters),
- * `unreachable` (a trajectory misses an observed range), `not-converged` (`maxIterations` reached)
- * or `step-budget` (`maxTotalSteps` reached).
- */
+/** `reason` is `underdetermined` (fewer observations than parameters), `unresolved` or `ill-conditioned` (the observations do not separate the parameters), `unreachable` (a trajectory misses an observed range), `not-converged` (`maxIterations`) or `step-budget` (`maxTotalSteps`). */
 export class TruingError extends InputError {
   readonly reason: TruingReason
   readonly conditionNumber?: number | undefined
@@ -245,10 +220,7 @@ function parameterMap(specs: Spec[]): ParameterMap {
   return { q, estimate }
 }
 
-/**
- * Flies each session at the parameters `q(trial)` with the trajectory options `o`; a failure once
- * `budget` is spent throws `step-budget` with the estimate at `current`.
- */
+/** At the parameters `q(trial)` with the options `o`; a failure once `budget` is spent throws `step-budget` with the estimate at `current`. */
 function predictSessions(
   runs: readonly Run[],
   { q, estimate }: ParameterMap,
@@ -374,10 +346,7 @@ function solverPredict(
   }
 }
 
-/**
- * Levenberg-Marquardt on the log parameters over the stacked runs
- * (`apps/docs/docs/models/least-squares.md`, "Levenberg-Marquardt step"; `apps/docs/docs/models/exterior-truing.md`, "Observations and cost").
- */
+/** On the log parameters over the stacked runs (`apps/docs/docs/models/least-squares.md`, "Levenberg-Marquardt step"; `apps/docs/docs/models/exterior-truing.md`, "Observations and cost"). */
 function leastSquares(
   runs: readonly Run[],
   specs: Spec[],
@@ -481,11 +450,7 @@ const single = ({ shots, ...rest }: SessionsTruingResult): TruingResult => ({
   ...rest,
 })
 
-/**
- * The drag of a projectile with drag factors applied: one constant factor without knots, else one
- * factor per knot written as a custom curve
- * (`apps/docs/docs/models/exterior-truing.md`, "Mach-dependent drag factor"). Validates the knots.
- */
+/** One constant factor without knots, else one factor per knot as a custom curve (`apps/docs/docs/models/exterior-truing.md`, "Mach-dependent drag factor"); validates the knots. */
 export function dragCorrection(
   p: Projectile,
   knots?: readonly number[],
@@ -525,8 +490,7 @@ export function dragCorrection(
       ? dragCoefficient(drag.curve, m, drag.interpolation)
       : (dragCoefficient(base, m, drag.interpolation) * p.mass) /
         (nth(drag.bands, 0).ballisticCoefficient * p.diameter ** 2)
-  // a knot replaces a base node within 1e-9 relative: a closer pair makes the cubic's node slopes
-  // rounding noise
+  // a knot replaces a base node within 1e-9 relative: a closer pair makes the cubic's node slopes rounding noise
   const near = (m: number) => knots.some((k) => Math.abs(m - k) <= 1e-9 * k)
   const nodes = [...base.map((x) => x[0]).filter((m) => !near(m)), ...knots].toSorted(
     (a, b) => a - b,
@@ -546,11 +510,7 @@ const factorSpecs = (knots?: readonly number[]): Spec[] =>
     ? [{ name: 'dragFactor', initial: 1 }]
     : knots.map((m) => ({ name: 'dragFactor', mach: m, initial: 1 }))
 
-/**
- * Fits a constant drag factor (C_D times k), or factors at Mach knots written as a custom curve
- * (`apps/docs/docs/models/exterior-truing.md`, "Mach-dependent drag factor"), optionally together with the
- * muzzle velocity.
- */
+/** A constant drag factor (C_D times k), or factors at Mach knots as a custom curve, optionally with the muzzle velocity (`apps/docs/docs/models/exterior-truing.md`, "Mach-dependent drag factor"). */
 export function trueDrag(
   shot: TrajectoryInput,
   observations: readonly Observation[],
@@ -593,15 +553,7 @@ export interface TruingComparison {
   divergence: number
 }
 
-/**
- * Fits the same observations twice, the muzzle velocity alone and a constant drag factor together
- * with the muzzle velocity, and reports how far the two fitted shots disagree at the observed
- * ranges. Noiseless data from a muzzle velocity error alone give a divergence of 0 (the drag fit
- * finds a factor of 1); measurement noise gives a positive divergence without a drag error, and a
- * drag error the velocity fit has to absorb gives a positive one too
- * (`apps/docs/docs/models/exterior-truing.md`, "Divergence of the two fits").
- * Throws what either fit throws, so needs at least two observations that separate the two parameters.
- */
+/** The velocity fit against drag factor plus velocity: noiseless data with only a velocity error diverge 0 (a factor of 1), noise or a drag error the velocity fit absorbs diverge positive (`apps/docs/docs/models/exterior-truing.md`, "Divergence of the two fits"); throws what either fit throws, so needs two observations that separate the two parameters. */
 export function compareTruingFits(
   shot: TrajectoryInput,
   observations: readonly Observation[],
@@ -624,11 +576,7 @@ export function compareTruingFits(
   return { velocityFit, dragFit, differences, divergence }
 }
 
-/**
- * Fits one drag correction of the projectile, shared by all sessions, to the observations of
- * every session flown with its own conditions, and optionally each session's muzzle velocity
- * (`apps/docs/docs/models/exterior-truing.md`, "Observations and cost").
- */
+/** One drag correction shared by all sessions, each flown with its own conditions, optionally with each session's muzzle velocity (`apps/docs/docs/models/exterior-truing.md`, "Observations and cost"). */
 export function trueDragSessions(
   projectile: Projectile,
   sessions: readonly TruingSession[],

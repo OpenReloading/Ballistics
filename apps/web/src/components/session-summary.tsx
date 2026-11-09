@@ -338,7 +338,7 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
       <h2 id="session-result" className="visually-hidden">
         {t('Session')}
       </h2>
-      <Group gap={6} my="xs">
+      <Group gap="xs" my="xs">
         {badges.map((b) => (
           <Badge key={b} variant="light" color="gray" tt="none" size="sm" maw="100%" title={b}>
             {b}

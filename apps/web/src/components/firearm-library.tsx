@@ -315,7 +315,7 @@ function FirearmCard({
             {r.name}
           </UnstyledButton>
         ) : (
-          <Group gap={6} wrap="nowrap" miw={0}>
+          <Group gap="xs" wrap="nowrap" miw={0}>
             <UnstyledButton className="firearm-card-name" title={r.data.name} onClick={onView}>
               {r.data.name}
             </UnstyledButton>

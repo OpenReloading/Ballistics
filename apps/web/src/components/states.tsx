@@ -95,7 +95,7 @@ export function Loading({
       <Text size="sm" c="dimmed">
         {line}…
       </Text>
-      <Stack gap={6} mt={6} aria-hidden="true">
+      <Stack gap="xs" mt="xs" aria-hidden="true">
         {Array.from({ length: rows }, (_, k) => (
           <Skeleton key={k} height={28} />
         ))}

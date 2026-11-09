@@ -1,9 +1,4 @@
-/**
- * Zero-yaw drag coefficient estimated from the bullet outline, `apps/docs/docs/models/exterior-outline-drag.md`.
- * Source: R. L. McCoy, ARBRL-TR-02293, 1981. Equation numbers and page numbers below are those of the
- * report; "listing" is its appendix (pp. 63 to 64), which fixes the constants and the Mach cut-offs
- * that the text leaves out. Lengths in calibers inside, SI at the interface.
- */
+/** Zero-yaw drag from the bullet outline, `apps/docs/docs/models/exterior-outline-drag.md` (R. L. McCoy, ARBRL-TR-02293, 1981): equation and page numbers are the report's, "listing" its appendix (pp. 63 to 64) with the constants and Mach cut-offs; calibers inside, SI at the interface. */
 import { nth } from '@open-reloading/statistics'
 import type { DragTable } from '../drag-tables.ts'
 import { need } from '../issue.ts'
@@ -38,10 +33,7 @@ export interface OutlineDragInput {
   machNumbers?: readonly number[]
 }
 
-/**
- * Result warnings: diameter outside 4 to 400 mm, a Mach number outside 0.5 to 5, nose under 1
- * caliber, boat tail over 1.5 calibers, base under 0.65 caliber, or a negative base pressure ratio.
- */
+/** Diameter outside 4 to 400 mm, a Mach number outside 0.5 to 5, nose under 1 caliber, boat tail over 1.5 calibers, base under 0.65 caliber, or a negative base pressure ratio. */
 type OutlineDragWarning =
   | 'diameter-range'
   | 'mach-range'
@@ -128,10 +120,7 @@ function headTransonic(m: number, tau: number): number {
   return 0.368 * tau ** 1.8 + (1.6 * tau * (m * m - 1)) / (2.4 * m * m)
 }
 
-/**
- * Stagnation pressure on the meplat face, eq. 4 (p. 14); the leakage factor is 0.85 at
- * and above Mach 1.41 and blended from 0 at Mach 0.91 (listing p. 63; the text states 0.75).
- */
+/** Stagnation pressure on the meplat face, eq. 4 (p. 14); the leakage factor is 0.85 at and above Mach 1.41, blended from 0 at Mach 0.91 (listing p. 63; the text states 0.75). */
 function meplat(m: number, dM: number): number {
   const m2 = m * m
   const pitot = m <= 1 ? (1 + 0.2 * m2) ** 3.5 : (1.2 * m2) ** 3.5 * (6 / (7 * m2 - 1)) ** 2.5
@@ -266,11 +255,7 @@ function outlineWarnings(shape: Shape, machs: readonly number[], nodes: OutlineD
   return warnings
 }
 
-/**
- * Estimates the zero-yaw drag coefficient from the outline. Throws `InputError` for a
- * geometry the method cannot take; a geometry or Mach number outside its stated limits
- * (p. 3, p. 26) gives a result and a warning.
- */
+/** Throws `InputError` for a geometry the method cannot take; outside its stated limits (p. 3, p. 26) a result with a warning. */
 export function estimateDragFromOutline(input: OutlineDragInput): OutlineDragEstimate {
   const { shape, dM, dRB } = outlineShape(input)
   const { rtr, db } = shape
@@ -301,8 +286,7 @@ export function estimateDragFromOutline(input: OutlineDragInput): OutlineDragEst
     }
   })
 
-  // an outline the method cannot take (a step as boat tail, a nose of no length, Mach near 0) gives
-  // drag that is not finite or not positive: no estimate
+  // an outline the method cannot take (a step as boat tail, a nose of no length, Mach near 0) gives drag that is not finite or not positive: no estimate
   need(
     nodes.every((n) => Number.isFinite(n.dragCoefficient) && n.dragCoefficient > 0),
     { code: 'outlineOutsideMethod', params: {} },
