@@ -14,10 +14,7 @@ export const popoverWidth = {
   table: fitViewport('760px'),
 }
 
-/**
- * A `Popover` that returns the focus to its trigger and has the medium shadow. Mantine's own users
- * of `Popover` (Select, Menu) keep their defaults, so these are not theme defaults.
- */
+/** Focus returns to the trigger; not theme defaults, as Mantine's Select and Menu use `Popover` too. */
 export function AppPopover(props: PopoverProps) {
   return <Popover returnFocus shadow="md" {...props} />
 }

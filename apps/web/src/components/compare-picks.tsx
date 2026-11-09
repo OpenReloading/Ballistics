@@ -9,10 +9,7 @@ import { togglePick } from '../lib/selection.ts'
 import { controlSize } from '../lib/theme.ts'
 import { focusSearch } from './directory-table.tsx'
 
-/**
- * The rows ticked for Compare, in the order ticked, at most `max`, kept in the list's
- * URL as `pick`: ids that `known` does not hold are left out.
- */
+/** In the order ticked, at most `max`, kept in the URL as `pick`; ids that `known` does not hold are left out. */
 export function usePicks(
   max: number,
   pick: string | undefined,
@@ -28,11 +25,7 @@ export function usePicks(
   return [picked, toggle, replace] as const
 }
 
-/**
- * The picks for the page bar's status line, after the list's count: "2 selected (max 4)" and
- * Clear, which unticks them all; the ticked rows show which. One line of fixed height, so a pick
- * moves nothing.
- */
+/** One line of fixed height, so a pick moves nothing. */
 export function SelectionSummary({
   count,
   max,
@@ -71,11 +64,7 @@ export function SelectionSummary({
   )
 }
 
-/**
- * "Compare n" to `href` from `min` picks; below that a disabled button saying how many it needs.
- * `idle` names the button without picks (a page that opens empty). With `max`, the button keeps
- * the width of "Compare max", so the buttons beside it do not shift with a pick.
- */
+/** Disabled below `min`, saying how many it needs; with `max` it keeps the width of "Compare max", so the buttons beside it do not shift with a pick. */
 export function CompareButton({
   count,
   min,

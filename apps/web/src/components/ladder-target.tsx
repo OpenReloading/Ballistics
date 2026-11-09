@@ -36,12 +36,7 @@ const specs = [
   },
 ] as const satisfies readonly FieldSpec[]
 
-/**
- * The print sheet of a ladder: one aiming mark per step with the step's own value, each of an
- * angular size at the shooting distance, and a check ruler. The controls take the distance and the
- * size; the sheet renders into `body` and prints alone while `<html data-print="ladder-target">`
- * is set.
- */
+/** Each mark of an angular size at the shooting distance; the sheet renders into `body` and prints alone while `<html data-print="ladder-target">` is set. */
 export function LadderTarget({
   labels,
   system,

@@ -102,12 +102,7 @@ export const bulletKind: ChooserKind<BulletRow> = {
   incomplete: bulletIncomplete,
 }
 
-/**
- * The bullet picker of a workbench card: the record chooser over the whole catalogue and the
- * browser's own designs (several words in any order, a caliber such as 308, a weight such as 168
- * or 10.9g), with a mass range and `fit`, which keeps the bullets that fit the cartridge until its
- * chip is removed.
- */
+/** Words in any order, a caliber such as 308, a weight such as 168 or 10.9g; `fit` keeps the bullets that fit the cartridge until its chip is removed. */
 export function BulletSearchDialog({
   opened,
   onClose,

@@ -19,11 +19,7 @@ type SheetStep = {
   flag?: string | undefined
 }
 
-/**
- * The load to take to the bench: an overview page with the components and
- * every charge, then one page per charge with blanks to fill while loading and at the range. Rendered
- * into `body` and printed alone while `<html data-print="sheets">` is set (`printSheets`).
- */
+/** Rendered into `body` and printed alone while `<html data-print="sheets">` is set (`printSheets`). */
 export function LoadSheets({
   title,
   components,
@@ -224,8 +220,5 @@ export function LoadSheets({
   )
 }
 
-/**
- * Prints the sheets alone, the overview only or with a page per charge (`steps`): the attribute
- * switches the print rules until the dialog closes.
- */
+/** The attribute switches the print rules until the dialog closes; `steps` adds a page per charge. */
 export const printSheets = (steps: boolean) => printAlone(steps ? 'sheets-steps' : 'sheets')

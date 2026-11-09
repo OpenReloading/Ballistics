@@ -51,12 +51,7 @@ export function BoxLabelSheet({ label }: { label: BoxLabel }) {
   )
 }
 
-/**
- * Prints the box label of a saved load alone (`<html data-print="box-label">`), the names of the
- * records it refers to read from this browser and the API first. `show` puts the label into a
- * portal of `body` and takes it out after printing: no `react-dom/client` root of its own, which
- * would split the page's bootstrap chunk.
- */
+/** Prints the label alone (`<html data-print="box-label">`) from a portal of `body`, not a `react-dom/client` root of its own, which would split the page's bootstrap chunk. */
 export async function printBoxLabel(
   r: LoadRecord,
   system: UnitSystem,

@@ -14,10 +14,7 @@ import { deleteRecord, putRecords, storedRecords } from '../lib/user-store.ts'
 import { offerUndo } from './confirm.tsx'
 import { ErrorNote, Loading } from './states.tsx'
 
-/**
- * The Manufacturers section of Settings, General: the manufacturers typed in this browser, each
- * with the number of records that name it. One that nothing names is deleted at once, with Undo.
- */
+/** One that nothing names is deleted at once, with Undo. */
 export function ManufacturersForm() {
   const { t } = useTranslation()
   const [rows, setRows] = useState<ManufacturerUse[]>()

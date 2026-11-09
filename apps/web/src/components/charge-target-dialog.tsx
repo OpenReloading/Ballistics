@@ -35,10 +35,7 @@ function requestKey(loadRequest: () => { body: object; bulkDensity?: number | un
   }
 }
 
-/**
- * The charge at which the simulation reaches a target: the target and its value, the answer with
- * the pressure range at that charge, and Apply, which writes the charge into the field. It posts the load of the fields as Run does.
- */
+/** Posts the load of the fields as Run does; Apply writes the charge into the field. */
 export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClose: () => void }) {
   const { t } = useTranslation()
   const { system, cartridge, loadRequest, applyCharge, powderDesign, typedSpecFields } = useLoad()

@@ -14,11 +14,7 @@ const lotLabels = {
   case: msg('Case lot'),
 } as const
 
-/**
- * One lot of the load. The Notes tab and the place beside the component's choice show the same
- * value: `short` labels it Lot (the choice beside it names the component), `bare` gives it no
- * label and Lot in the field before the value; the accessible name is the full one in either case.
- */
+/** `short` labels it Lot beside the component's choice, `bare` puts Lot in the field; the accessible name is the full one in either case. */
 export function LotField({ lot, short, bare }: { lot: keyof Lots; short?: true; bare?: true }) {
   const { t } = useTranslation()
   const {
@@ -53,10 +49,7 @@ export function LoadLots() {
   )
 }
 
-/**
- * The notes of the load's sessions, or of `session` (a reference) alone. Each names the values it
- * compares and the sessions they come from; a note is dismissed for its session.
- */
+/** `session` (a reference) shows that session's alone; a note is dismissed for its session. */
 export function SessionNotes({ session }: { session?: string }) {
   const { t } = useTranslation()
   const { loadNotes, system } = useResult()

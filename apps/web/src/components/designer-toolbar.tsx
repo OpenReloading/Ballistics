@@ -13,10 +13,7 @@ type ToolbarAction =
   | { type: 'new'; system: UnitSystem }
   | { type: 'reset'; system: UnitSystem }
 
-/**
- * Undo, redo, new and reset of a designer, re-rendered only when one of them changes state. The
- * designers name the last two ("New bullet", "Reset to record").
- */
+/** Re-rendered only when one of them changes state; the designers name the last two ("New bullet", "Reset to record"). */
 export const DesignerToolbar = memo(function DesignerToolbar({
   undo,
   redo,

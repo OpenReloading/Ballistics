@@ -97,12 +97,7 @@ const themeTokens: Record<keyof ChartTheme, string> = {
   background: '--bg',
 }
 
-/**
- * The workbench interior chart: breech pressure,
- * velocity and energy on their own axes against travel or time, or one of them alone; one curve
- * per step with `selected` solid, event lines of the selected step, limit lines with pressure, a
- * tooltip with every value of the selected step (also by keyboard) and a collapsed data table.
- */
+/** Pressure, velocity and energy on their own axes; `selected` solid with its event lines, the tooltip also by keyboard, a collapsed data table. */
 export function InteriorChart({
   steps,
   selected,
@@ -233,8 +228,7 @@ export function InteriorChart({
   const named = quantityName(quantity, t)
   const chart = useRef<ECharts | null>(null)
   const redraw = useRef<() => void>(undefined)
-  // a new run or step whose option is the one drawn does not draw again, so no draw reports it: the
-  // drawing stands for the new run too (the workbench drops its report copy on every new run)
+  // a new run or step drawing the same option draws nothing, so no draw reports it: the drawing stands for it (the workbench drops its report copy on every new run)
   const drawnFor = useRef(option)
   useEffect(() => {
     if (chart.current && drawnFor.current === option) onRender?.(chart.current)

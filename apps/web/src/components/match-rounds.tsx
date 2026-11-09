@@ -16,10 +16,7 @@ const below: ('label' | 'input' | 'description' | 'error')[] = [
   'error',
 ]
 
-/**
- * The rounds a match of the discipline takes, against the rounds on hand typed. Nothing is
- * stored: the fields live while the page is open.
- */
+/** Nothing is stored: the fields live while the page is open. */
 export function MatchRounds({ course }: { course: MatchCourse }) {
   const { t } = useTranslation()
   const [shots, setShots] = useState<number | string>('')
@@ -91,10 +88,7 @@ export function MatchRounds({ course }: { course: MatchCourse }) {
   )
 }
 
-/**
- * The rounds needed as a readout, and with rounds on hand typed the rounds short (marked) or left
- * over. Empty while a field it needs is empty; a live region either way.
- */
+/** Empty while a field it needs is empty; a live region either way. */
 export function MatchReadout({ result }: { result: ReturnType<typeof matchRounds> }) {
   const { t } = useTranslation()
   const difference = result?.difference

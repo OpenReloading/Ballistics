@@ -64,11 +64,7 @@ function Neighbours({ title, rows }: { title: string; rows: Neighbour[] }) {
   )
 }
 
-/**
- * The powder's burn rate panel: global burn-rate order and mean dynamic vivacity with its interval,
- * the interval on the powder list's log scale beside them, five faster and five slower powders as
- * links; without a curve, the one sentence why.
- */
+/** The interval on the powder list's log scale; without a curve, the one sentence why. */
 export function BurnRateSummary({
   powder,
   place,

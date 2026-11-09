@@ -23,10 +23,7 @@ import US from 'country-flag-icons/react/3x2/US'
 import { useTranslation } from '../i18n/language.ts'
 import { countryName } from '../lib/countries.ts'
 
-/**
- * The flags of the codes the records use, one import each: the namespace import puts all 250 flags
- * in the browser bundle. `test/countries.test.ts` fails for a record code missing here.
- */
+/** One import per flag, as the namespace import puts all 250 flags in the browser bundle; `test/countries.test.ts` fails for a record code missing here. */
 export const flags: Record<string, typeof US> = {
   AT,
   AU,
@@ -50,10 +47,7 @@ export const flags: Record<string, typeof US> = {
   US,
 }
 
-/**
- * Countries as a spec strip item, each after its flag (country-flag-icons, MIT; the name beside it is
- * the flag's text alternative); a former state as text only.
- */
+/** Each after its flag (country-flag-icons, MIT), whose text alternative is the name beside it; a former state as text only. */
 export function Countries({
   items,
   title,

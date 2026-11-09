@@ -141,8 +141,7 @@ function firearmColumns(
     {
       key: 'name',
       label: msg('Name'),
-      // every column has a width: the table scrolls sideways before the name is squeezed; the
-      // widths add up to 72rem, which a 1280 px window holds
+      // every column has a width, so the table scrolls sideways before the name is squeezed; they add up to 72rem, which a 1280 px window holds
       width: '12.5rem',
       value: nameOf,
       cell: (r) =>
@@ -236,11 +235,7 @@ function firearmColumns(
   ]
 }
 
-/**
- * Open, Duplicate, Delete and, with saved loads, Print range cards of a stored firearm, Duplicate
- * only for the example; the disciplines that name the caliber class of its cartridge where the
- * cartridge is in one.
- */
+/** Duplicate only for the example, Print range cards only with saved loads; the disciplines that name the caliber class of its cartridge where it is in one. */
 function RowActions({
   record: r,
   tabIndex,
@@ -341,10 +336,7 @@ function FirearmCard({
   )
 }
 
-/**
- * Export CSV of the firearms in this browser; without one it says why in its tooltip, focusable
- * (aria-disabled, as a disabled button shows no tooltip).
- */
+/** Without firearms it says why in its tooltip, focusable (aria-disabled, as a disabled button shows no tooltip). */
 function ExportCsvButton({
   disabled,
   loaded,
@@ -406,8 +398,7 @@ function LibraryBody({
       </ErrorNote>
     )
   if (!loaded) return <Loading what="firearms" />
-  // no hint line under the list: the example row is always listed, and a search without a match
-  // shows the empty note
+  // no hint line under the list: the example row is always listed, a search without a match shows the empty note
   if (!cards) return table
   return cards.some(Boolean) ? <ul>{cards}</ul> : empty
 }
@@ -434,10 +425,7 @@ const cardsOf = (
   card: (r: FirearmRecord, stored: boolean) => ReactNode,
 ) => [exampleShown && card(exampleShown, false), ...(shown ?? []).map((r) => card(r, true))]
 
-/**
- * Print range cards of a firearm: the cards of its loads are computed in a chunk of their own, then
- * rendered and printed until the dialog closes.
- */
+/** The cards of its loads are computed in a chunk of their own, then rendered and printed until the dialog closes. */
 function useRangeCards(system: UnitSystem, setFailure: (message: string) => void) {
   const [shown, setShown] = useState<{ View: typeof FirearmRangeCards; cards: LoadRangeCard[] }>()
   const printCards = (r: FirearmRecord) =>
@@ -609,11 +597,7 @@ function ExampleView({
   )
 }
 
-/**
- * The firearm library: the firearms kept in this
- * browser as cards and an editor for one firearm in the tabs Firearm, Optics and Configurations,
- * saved and opened through the File menu of the user data files; print gives its data card.
- */
+/** Saved and opened through the File menu of the user data files; print gives the data card. */
 export function FirearmLibrary() {
   const tr = useTranslation()
   const { t, tn } = tr
@@ -638,8 +622,7 @@ export function FirearmLibrary() {
   const [generation, setGeneration] = useState(0)
   const manufacturers = useManufacturers()
   const menu = useRef<FileMenuHandle>(null)
-  // a row's link in a new tab: `?record=<id>` opens that firearm
-  // the alert line shows alerts only, not the reading of the linked record
+  // `?record=<id>` (a row's link in a new tab) opens that firearm; the alert line shows alerts only, not the reading of the linked record
   useRecordLink('firearm', menu, (m) => setLinkFailure(m === recordLoadingText ? undefined : m))
 
   /** The latest read: an older answer that arrives later is dropped. */

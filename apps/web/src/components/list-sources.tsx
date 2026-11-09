@@ -21,11 +21,7 @@ import { AppPopover } from './app-popover.tsx'
 import { confirmDialog } from './confirm.tsx'
 import type { DirectoryColumn } from './directory-table.tsx'
 
-/**
- * The user records of this browser, read after mounting; none while the store cannot be
- * read (again whenever `reread` changes). `remove` asks, as the File menu's list of browser records does, then deletes the record of
- * a list row and drops the row. `read`: the store has answered once.
- */
+/** Read after mounting (again on each `reread`), none while the store cannot be read; `remove` asks as the File menu's list does, `read`: the store has answered once. */
 export function useUserRecords(reread?: unknown) {
   const { t } = useTranslation()
   const [records, setRecords] = useState<UserRecord[]>([])
@@ -74,10 +70,7 @@ export function useUserRecords(reread?: unknown) {
   return [records, remove, read] as const
 }
 
-/**
- * `records` read into views by `read` (`userBullets`, `userCartridges`): the user variants resolved
- * against the catalogue after mounting, none until then.
- */
+/** The user variants resolved against the catalogue after mounting, none until then. */
 export function useResolved<V>(
   records: readonly UserRecord[],
   read: (records: readonly UserRecord[]) => Promise<V[]>,
@@ -96,11 +89,7 @@ export function useResolved<V>(
   return views
 }
 
-/**
- * The data source filter of every list: a button naming the sources shown, and a popover with one
- * checkbox per source of the list (`sources`) with its row count. The sources that are off are kept
- * in the URL by the list. The last one on cannot be turned off.
- */
+/** The sources that are off live in the list's URL; the last one on cannot be turned off. */
 export function SourceFilter({
   src,
   counts,
@@ -162,10 +151,7 @@ export function SourceFilter({
   )
 }
 
-/**
- * The Source column of the bullet and cartridge lists: a Mine row's badge and Delete. A catalogue
- * row is blank on screen and named for screen readers.
- */
+/** A catalogue row is blank on screen and named for screen readers. */
 export function sourceColumn<T extends { id: string; origin?: 'user' | undefined }>(
   name: (row: T) => string,
   onDelete: (rowId: string, name: string) => void,

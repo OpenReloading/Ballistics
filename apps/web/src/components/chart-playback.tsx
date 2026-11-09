@@ -52,12 +52,7 @@ const sentence = (x: Texts, t: Translator['t']) =>
     x,
   )
 
-/**
- * Playback outside React: time, factor and the frame loop. `draw` writes the page; `onPlaying`
- * is the only React update, on play and pause. With `reduce` Play shows the muzzle at once. A frame
- * lands on each of the `stops` (the events), so the marker is on an event line at the event time.
- * Play runs on `flight()` s past the muzzle time `end`, while the bullet flies out of view.
- */
+/** Outside React, so a frame writes the page without a render; a frame lands on each of `stops`, `reduce` shows the muzzle at once, Play runs `flight()` s past the muzzle time `end`. */
 function controller(
   end: number,
   stops: readonly number[],
@@ -199,12 +194,7 @@ function flightOut(
   )
 }
 
-/**
- * One row under the interior chart: Play, the speed, and the time slider on the barrel strip with
- * the events as marks; and the live values at the marker of the interior chart: the record's case in its chamber with the seated bullet and
- * the bore to the muzzle, to scale along the axis and stretched across to the row, the bullet moved by the simulated travel. Playback writes the
- * page through refs, not React state; the chart's marker shows once played or scrubbed.
- */
+/** Playback writes the page through refs, not React state; the strip is to scale along the axis and stretched across to the row, the marker shown once played or scrubbed. */
 export function ChartPlayback({
   r,
   strip,
@@ -231,10 +221,7 @@ export function ChartPlayback({
   rail: HTMLElement | null
   /** The plot's left and right edges in the chart box, px: the strip spans the plot. */
   plot: readonly [number, number]
-  /**
-   * Display x of a bullet travel (m), on the travel axis only: the strip then lies on the chart's
-   * x scale, the bullet under the marker. On the time axis the strip spans the plot.
-   */
+  /** Display x of a bullet travel (m), on the travel axis only, where the strip lies on the chart's x scale; on the time axis it spans the plot. */
   travelX?: ((travel: number) => number) | undefined
   /** Set here: draws the current time again, after the chart drew. */
   redraw: { current?: (() => void) | undefined }
@@ -255,8 +242,7 @@ export function ChartPlayback({
   const pointer = useRef(false)
   const at = useMemo(() => sampler(r.points), [r])
   const segment = useMemo(() => segmentAt(r.points), [r])
-  // the slider's scale follows the chart's x axis, so its thumb is under the marker on either: the
-  // bullet's travel on the travel axis, the time on the time axis
+  // the slider follows the chart's x axis (travel or time), so its thumb stays under the marker
   const byTravel = travelX !== undefined
   const scale = useMemo(
     () => (byTravel ? travelScrub(r.points) : timeScrub(end)),
@@ -290,11 +276,7 @@ export function ChartPlayback({
       nodes.current.get(`event-${e.key}`)?.toggleAttribute('data-passed', e.time <= time)
     placeMarker(chart.current, marker.current, segment, time, x, y)
   }
-  /**
-   * Places the strip and the time track from the chart's own scales, after each chart draw: the
-   * track spans ignition to the muzzle on the x axis, and on the travel axis the strip is to scale
-   * with it (its chamber behind travel 0, left of the plot), the bullet under the marker.
-   */
+  /** After each chart draw, from its own scales: on the travel axis the chamber lies behind travel 0, left of the plot, and the bullet under the marker. */
   const layout = () => placeTrack(chart.current, room.current, r.points, x, strip, travelX)
   /** Seconds after muzzle exit until the bullet base is past the right edge of the chart box. */
   const flight = () => flightOut(nodes.current.get('strip'), r.points, strip)
@@ -452,8 +434,7 @@ export function ChartPlayback({
                   onChange={(e) => {
                     const v = Number(e.target.value) / scrubSteps
                     const t = scale.time(v)
-                    // a pointer within 1 % of the axis of an event mark takes the event's time;
-                    // position 0 is ignition, not the shot start that is at the same position
+                    // within 1 % of the track of an event mark takes the event's time; position 0 is ignition, not the shot start at the same position
                     const near =
                       pointer.current &&
                       v > 0 &&

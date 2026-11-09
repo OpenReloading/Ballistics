@@ -106,8 +106,7 @@ export function BulletList({
   // the Type column's text, once per row and language: also its sort key
   const types = useMemo(() => new Map(items.map((b) => [b.id, bulletTypeText(t, b)])), [items, t])
   const typeOf = (b: BulletRow) => types.get(b.id) ?? bulletTypeText(t, b)
-  // the bullets ticked for Compare, in the order ticked: the compare view's columns. A bullet
-  // record's Compare (`compareFrom`) links with that bullet ticked
+  // the compare view's columns, in the order ticked; a bullet record's Compare (`compareFrom`) links with that bullet ticked
   const [picked, , replace] = usePicks(
     maxComparedBullets,
     state.compareIds,
@@ -212,8 +211,7 @@ export function BulletList({
     {
       key: 'type',
       label: msg('Type'),
-      // fits the longest catalogue values whole: "Teilmantelgeschoss, flach" (German) and
-      // "Full metal jacket, boat tail" (English)
+      // fits the longest catalogue values whole: "Teilmantelgeschoss, flach" and "Full metal jacket, boat tail"
       width: '12.5rem',
       wide: true,
       value: (b) => typeOf(b) || undefined,

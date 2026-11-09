@@ -41,10 +41,7 @@ function foreignKeys(type: BaseType | undefined) {
   )
 }
 
-/**
- * The base form of the bullet: the record's, or the one typed over it. A choice drops the typed
- * dimensions the new form cannot have, the record's own form again drops the typed form.
- */
+/** A new form drops the typed dimensions it cannot have; the record's own form drops the typed form. */
 export function BaseFormField() {
   const { bulletRecord, bulletBaseType, baseChanged, setTypedBullet, markChanged, resetKeys } =
     useLoad()

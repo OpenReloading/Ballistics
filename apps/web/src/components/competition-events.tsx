@@ -761,10 +761,7 @@ function EventSheet({
   )
 }
 
-/**
- * The one-confirm flow of the round count (#633) for a saved event: asks, and only a yes changes
- * the firearm. The line to show after it; empty when nothing was asked.
- */
+/** One confirm (#633), and only a yes changes the firearm; the line to show after it, empty when nothing was asked. */
 async function offerRounds(id: string, e: CompetitionEvent, { t, tn }: Translator) {
   const firearmId = userIdOf(e.firearm)
   const rounds = eventRounds(e)
@@ -805,10 +802,7 @@ async function offerRounds(id: string, e: CompetitionEvent, { t, tn }: Translato
     : t('The round count of {name} holds this event already.', { name })
 }
 
-/**
- * Stores the events of a user data file: the new ones, and after one question the ones that differ
- * from the browser's. The report line; a throw with the reason when the file is refused.
- */
+/** The new events, and after one question those that differ from the browser's; the report line, a throw with the reason when the file is refused. */
 async function importEvents(f: File, { t, tn }: Translator) {
   const parsed = parseUserDataFile(await f.text())
   if (!parsed.ok) throw new Error(reasonText(parsed.reason, { t, tn }))
@@ -1005,12 +999,7 @@ function useEventLink(data: EventsData | undefined, open: (r: EventRecord) => vo
   }, [data, open])
 }
 
-/**
- * Competition events of this browser: the list with date, name, type, level and total; the event
- * form with its ring series or practical stages scored by the event type; print of the open event
- * (or the list), CSV and JSON export and JSON import. Saving offers the event's rounds to the
- * firearm's round count, one confirm, never on its own.
- */
+/** Saving offers the event's rounds to the firearm's round count, one confirm, never on its own. */
 export function CompetitionEvents({ types }: { types: EventType[] }) {
   const tr = useTranslation()
   const { t } = tr

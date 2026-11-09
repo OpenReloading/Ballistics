@@ -233,12 +233,7 @@ function ValuesTable({
   )
 }
 
-/**
- * The tool: a photograph of a bullet beside a ruler, its scale from two spans of the ruler, the
- * bullet cut out (corrected with a brush, by pointer, touch or keys), outlined along its symmetry
- * axis and measured, each value with its uncertainty, in a worker. The photograph never leaves the
- * browser and is not stored.
- */
+/** Scale from two spans of the ruler, each value with its uncertainty, measured in a worker; the photograph never leaves the browser and is not stored. */
 function PhotoTool({
   system,
   record,

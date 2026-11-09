@@ -9,10 +9,7 @@ import { type Facet, type FacetOption, facetOptions, facetRows } from '../lib/fa
 import { controlSize } from '../lib/theme.ts'
 import { AppPopover } from './app-popover.tsx'
 
-/**
- * The rows `base` (the list after its search and source) that pass the choice filters of
- * `state`, and the options of each filter with the counts the other choices leave.
- */
+/** `base` is the list after its search and source; each option's count is what the other choices leave. */
 export function useFacets<T>(
   all: readonly T[],
   base: readonly T[],
@@ -31,11 +28,7 @@ export function useFacets<T>(
 
 const noChoice: Record<string, string[]> = {}
 
-/**
- * The choice filters of a list: one button per filter that has two values or more, naming the
- * choice, and a popover with a checkbox and a row count per option. Clear all is there while a
- * choice is set.
- */
+/** A button per filter with two values or more; Clear all while a choice is set. */
 export function FacetFilters<T>({
   facets,
   options,

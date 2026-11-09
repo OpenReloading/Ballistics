@@ -29,10 +29,7 @@ import { LinkButton, RecordActions } from './record-actions.tsx'
 import { DataError, EmptyNote, Loading } from './states.tsx'
 import { TechnicalDrawing } from './technical-drawing.tsx'
 
-/**
- * The compare view cannot show these ids: what is wrong and the way back to the list; `empty`, no
- * bullets chosen yet, is no error and has a neutral icon.
- */
+/** `empty` (no bullets chosen yet) is no error, so it has a neutral icon. */
 function Problem({
   title,
   text,
@@ -72,10 +69,7 @@ function Problem({
   )
 }
 
-/**
- * Every drawing at one text size and frame width, so at one scale, its lengths in `unit`; a reason
- * where one cannot draw.
- */
+/** Every drawing at one text size and frame width, so at one scale; lengths in `unit`, a reason where one cannot draw. */
 function drawings(
   records: (Bullet & { manufacturerName: string })[],
   unit: LengthUnit,
@@ -136,10 +130,7 @@ async function fetchBullets(ids: string[]): Promise<Fetched> {
   }
 }
 
-/**
- * The page bar of the compare page; the actions only where they act on bullets: the length unit of
- * the whole page (drawings and table, inside `RecordScope`), then Units, Copy link and Print.
- */
+/** The actions only where they act on bullets; the length unit sets the whole page (drawings and table, inside `RecordScope`). */
 export function CompareBar({ actions }: { actions: boolean }) {
   const { t } = useTranslation()
   return (

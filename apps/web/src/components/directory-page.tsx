@@ -11,10 +11,7 @@ import { LibraryTabs } from './library-tabs.tsx'
 import { SourceFilter } from './list-sources.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
 
-/**
- * A library list page: the page bar with the count of `shown` of `total`, the library tabs, the
- * search with the source filter and `filters`, then `table`.
- */
+/** The page bar counts `shown` of `total`; `filters` stand beside the search and the source filter. */
 export function DirectoryPage({
   title,
   noun,

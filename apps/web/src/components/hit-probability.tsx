@@ -78,11 +78,7 @@ type Load =
   | { status: 'ok'; face: TargetFace }
   | { status: 'error'; message: string }
 
-/**
- * The probability of a hit and the expected score on a target face at one of the trajectory's
- * table ranges, from the group's dispersion with the wind and range uncertainty added
- * (`apps/docs/docs/models/hit-probability.md`).
- */
+/** From the group's dispersion with the wind and range uncertainty added (`apps/docs/docs/models/hit-probability.md`). */
 export function HitProbability({
   points,
   windPerUnit,

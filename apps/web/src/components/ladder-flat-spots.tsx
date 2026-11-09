@@ -8,10 +8,7 @@ import { PanelTable } from './scroll-region.tsx'
 
 const columns = [msg('Charges'), msg('Shots'), msg('Slope'), msg('Band'), msg('Flat')] as const
 
-/**
- * Where the measured mean velocity changes least with charge, per series
- * (`apps/docs/docs/models/interior-velocity-ladder.md`).
- */
+/** Where the measured mean velocity changes least with charge, per series (`apps/docs/docs/models/interior-velocity-ladder.md`). */
 export function LadderFlatSpots({
   series,
   system,

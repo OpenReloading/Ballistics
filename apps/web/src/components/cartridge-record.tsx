@@ -87,11 +87,7 @@ function Clearance({ text, negative }: { text: string; negative: boolean }) {
   )
 }
 
-/**
- * A Dimensions row's two cells: the value right-aligned in a fixed width, then, in a column of its
- * own, a fixed slot for its tolerance or limit and, in the chamber table, the clearance, so the
- * decimals of a column line up and a unit switch moves nothing.
- */
+/** The value in a fixed width and its tolerance, limit or clearance in a fixed slot, so the decimals of a column line up and a unit switch moves nothing. */
 function SlotCells({
   v,
   clearance,
@@ -178,15 +174,7 @@ function pinRows(pinned: Link | undefined) {
     if (el.getAttribute('data-symbol') === pinned.symbol) el.classList.add('is-pin')
 }
 
-/**
- * A record page's client scope (cartridge, bullet): the length unit of the strip, the drawings and the
- * tables (not stored; it starts at the Settings unit and follows a change there), the shotshell
- * variant, and the linked hover. A table row and the drawn dimension of the same side with the same
- * `data-symbol` are marked together on hover and focus, within their own panel (the cartridge's R1
- * does not mark the chamber's); a click, Enter or Space keeps the mark, a second one or Escape drops
- * it. A row whose symbol the drawing does not show links nothing. The marks are classes set on the
- * elements, so nothing re-renders.
- */
+/** Length unit (from the Settings, not stored), shotshell variant and linked hover; a row and the drawn dimension with its `data-symbol` mark together within their panel, as classes, so nothing re-renders. */
 export function RecordScope({
   variants = [],
   children,
@@ -202,8 +190,7 @@ export function RecordScope({
   useEffect(() => setUnit(undefined), [choice])
   const root = useRef<HTMLDivElement>(null)
   const pinned = useRef<Link>(undefined)
-  // a touch on a table symbol opens its notes and marks nothing: any change to the page after the
-  // tap closes the notes again (the browser's emulated hover leaves); a tapped drawing dimension marks
+  // a touch on a table symbol opens its notes and marks nothing, as any change after the tap closes them again (the emulated hover leaves); a tapped dimension marks
   const touch = useRef(false)
   const linkAt = (t: EventTarget | null) => linkIn(root.current, t)
   const mark = (link: Link | undefined) => markLink(root.current, link)
@@ -288,15 +275,7 @@ const sideDimensions = {
   chamber: msg('Chamber dimensions'),
 } as const
 
-/**
- * The record's two sides (after the CIP data sheets): a panel for the
- * cartridge and one for the chamber, both always shown, each its drawing beside its table. A table
- * lists the symbol and the side's value with its tolerance in a fixed slot (cartridge maximum,
- * chamber minimum) in the unit of the record (Settings or the switch), the chamber's also the
- * clearance as a note after the value where both sides give one; what a symbol stands for is its hover. Rows follow the
- * drawing from the mouth to the head. Every row carries `data-symbol` for the linked hover. A
- * shotshell's drawings are those of the variant chosen in `VariantSelect`.
- */
+/** After the CIP data sheets: the cartridge's values are its maximum, the chamber's its minimum, each with its tolerance; the clearance a note where both sides give one; rows run from the mouth to the head. */
 export function CartridgeSides({
   pairs,
   rows,
@@ -553,14 +532,7 @@ const factMeanings = {
   method: msg('Method: the pressure measuring method'),
 }
 
-/**
- * The record's facts as cards under the page bar: Pressure (Pmax, PK, PE), Test barrel (M, EE),
- * Dimensions (the cartridge's L3, L6 and G1) and Case (derived case type), each fact a label over
- * its value, in the preset's units, what a symbol stands for on hover; then `children` (the link to
- * the fitting bullets). A card without facts is left out. Every fact keeps a fixed minimum width,
- * so the preset applying after mounting moves nothing. The standard's table, date, country and
- * measuring method are in the Sources panel (`StandardFacts`).
- */
+/** Each fact keeps a fixed minimum width, so the preset applying after mounting moves nothing; table, date, country and measuring method are in `StandardFacts`. */
 export function RecordFacts({
   values,
   notes,
@@ -621,11 +593,7 @@ export function RecordFacts({
   )
 }
 
-/**
- * The standard's facts over the sources of a cartridge record: the CIP table, the revision (else
- * publication) date, the country and the pressure measuring method, each named, those without a
- * value left out.
- */
+/** The revision date, else the publication date; a fact without a value is left out. */
 export function StandardFacts({
   table,
   date,

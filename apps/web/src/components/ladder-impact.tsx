@@ -6,12 +6,7 @@ import { formatQuantity, type UnitSystem as System } from '../lib/units.ts'
 import { LazyLineChart } from './lazy-chart.tsx'
 import { MessageSlot } from './states.tsx'
 
-/**
- * The point of impact per charge of a ladder: the note when the residual centre changes with the
- * charge, the warning about the simulated drop slope, and the chart of the centres with their
- * standard errors (`apps/docs/docs/models/interior-ladder-impact.md`). Before a velocity is linked
- * it shows nothing; afterwards, what is still missing.
- */
+/** Nothing before a velocity is linked, afterwards what is still missing (`apps/docs/docs/models/interior-ladder-impact.md`). */
 export function LadderImpactNote({ impact, system }: { impact: LadderImpact; system: System }) {
   const { t } = useTranslation()
   if (impact.status === 'none') return null

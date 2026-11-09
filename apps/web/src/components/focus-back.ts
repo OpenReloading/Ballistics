@@ -1,11 +1,6 @@
 type Target = HTMLElement | string | null | undefined
 
-/**
- * Puts the focus on the first control that shows, once the dialog or card that held it is gone
- * (the browser would drop it to the start of the page). A selector is looked up when the frame comes,
- * so a control the same render adds or shows is found; "Page actions" is the last target
- * where the control is in the phone panel, which is hidden again by then.
- */
+/** Once the dialog or card that held the focus is gone, as the browser would drop it to the page start; selectors are looked up in the next frame, so a control the same render adds is found; "Page actions" last, for a control in the phone panel, hidden by then. */
 export function focusBack(...targets: Target[]) {
   focusLater(false, targets)
 }

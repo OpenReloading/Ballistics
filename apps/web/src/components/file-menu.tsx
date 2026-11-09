@@ -169,10 +169,7 @@ const shareable: UserRecordKind[] = ['bullet', 'cartridge', 'load']
 const basedOnOf = (r: UserRecord) =>
   r.kind === 'bullet' || r.kind === 'cartridge' ? r.data.basedOn : undefined
 
-/**
- * What the menu holds about the record shown (its id, kept file and saved text), so a page with
- * several records open (the workbench tabs) puts it back when it shows that record again.
- */
+/** Kept per record, so a page with several open (the workbench tabs) puts it back when it shows that record again. */
 export interface FileState {
   id?: string | undefined
   handle?: FileSystemFileHandle | undefined
@@ -186,15 +183,7 @@ export interface FileState {
 
 /** What a page calls before it starts a new record (New, Reset, Example, a catalogue start). */
 export interface FileMenuHandle {
-  /**
-   * Asks before dropping unsaved changes (edits since the record was opened, saved or started);
-   * on yes the menu starts a new record: a new id, no file, not saved. False when the user keeps
-   * the changes, and the page then does nothing. `next` is the new record's data when the page
-   * knows it (a page with deferred data must pass it); else the data of the render after `then`,
-   * the page's own change, which runs on yes before that render (when `then` returns a promise,
-   * the render after it settles). The answer is a promise only when
-   * the dialog asks.
-   */
+  /** Asks before dropping unsaved changes, on yes a new record (a new id, no file, not saved), false when the user keeps them, a promise only when the dialog asks; `next` is the new data (a page with deferred data must pass it), else the render after `then`, which runs on yes (after the promise it returns settles). */
   startNew(next?: unknown, then?: () => unknown): true | Promise<boolean>
   /** Opens a browser record as the Open menu's saved records do; false when the user keeps the changes. */
   open(record: UserRecord): Promise<boolean>
@@ -322,11 +311,7 @@ function leavingLink(e: MouseEvent) {
   return a
 }
 
-/**
- * Unsaved work: the browser's leave-page prompt, a question before an in-app link or a router push
- * or replace, and a guard history entry with this URL, so Back and Forward ask too. Returns the
- * cleanup.
- */
+/** The leave-page prompt, a question before an in-app link or a router push or replace, and a guard history entry, so Back and Forward ask too; returns the cleanup. */
 function guardLeaving(say: (said: Said) => void, language: () => Translator['t']) {
   const { leave, leaving, asking } = createLeave(language)
   /** Set while a Back taken during the question is undone by a step forward. */
@@ -461,13 +446,7 @@ const savedIn = (t: string | undefined, recordId: string) => {
   return p?.ok ? p.records.find((r) => r.id === recordId)?.saved : undefined
 }
 
-/**
- * Writes the record's file: the kept file while it holds this record alone (not an Export all
- * file), else the workspace folder, else a file picked. `current` is the kept file's text.
- * 'newer' when the user keeps a newer copy, 'skipped' when Save would offer the picker for a kept
- * file that holds records of a kind this version does not know, undefined when the picker was
- * dismissed.
- */
+/** The kept file while it holds this record alone, else the workspace folder, else a picked one; 'newer' kept a newer copy, 'skipped' a kept file with kinds this version does not know, undefined when the picker was dismissed. */
 async function writeRecordFile(o: {
   handle: FileSystemFileHandle | undefined
   current: string | undefined
@@ -579,11 +558,7 @@ function ExampleItems({ examples }: { examples: FileMenuItem[] | undefined }) {
   )
 }
 
-/**
- * Unsaved work: nothing for a record kept in the browser on every change; for a saved one whether
- * it changed since (`dirty`); else whether the text differs from the one the record started with
- * (none yet counts as unchanged).
- */
+/** Never for a record kept in the browser on every change; a saved one by `dirty`, else whether the text differs from the start (none yet counts as unchanged). */
 function isUnsaved(
   autosaved: string | undefined,
   dirty: boolean | undefined,
@@ -595,10 +570,7 @@ function isUnsaved(
   return initial !== undefined && now !== initial
 }
 
-/**
- * Whether the failure shown is why Save refused the record (`problem`): set when it is shown,
- * reset when a file action starts; a changed problem (mended or another) clears that failure.
- */
+/** Whether the failure shown is why Save refused `problem`, reset when a file action starts; a changed problem clears that failure. */
 function useRefusal(problem: unknown, setFailure: () => void) {
   const said = useRef(false)
   const clear = useRef(setFailure)
@@ -907,10 +879,7 @@ function unsavedState(
 const allowedFolder = (f: { handle: FileSystemDirectoryHandle; allowed: boolean } | undefined) =>
   f?.allowed ? f.handle : undefined
 
-/**
- * The page bar's Open menu (the browser's records, a file, Import, Paste JSON, the page's examples)
- * and Save with its menu (Save as, share link, JSON, Export all, the optional workspace folder).
- */
+/** Open lists the browser's records, a file, Import, Paste JSON and the page's examples; Save's menu Save as, share link, JSON, Export all and the workspace folder. */
 function FileMenuOf<K extends UserRecordKind>({
   kind,
   name,
@@ -938,10 +907,7 @@ function FileMenuOf<K extends UserRecordKind>({
   name: string
   /** The page's current record data. */
   data: Of<K>['data']
-  /**
-   * The record as a file for the API reads it, every value resolved (the workbench): the Save
-   * options then offer Download and Copy JSON for the API. Never saved, never the browser copy.
-   */
+  /** The record as the API reads it, every value resolved (the workbench): Save then offers Download and Copy JSON for the API, never saved, never the browser copy. */
   apiData?: Of<K>['data']
   /** `record` is the opened or saved-as record (its id and saved time). */
   onOpen: (data: Of<K>['data'], name: string, record: Of<K>) => void
@@ -949,32 +915,19 @@ function FileMenuOf<K extends UserRecordKind>({
   note?: string | undefined
   /** Why the record cannot be saved, in the page's words; Save then writes nothing. */
   problem?: string | undefined
-  /**
-   * The name as far as it counts as a change (the workbench): what the user typed, empty for
-   * a generated name that follows the data. Renaming then is an unsaved change.
-   */
+  /** What the user typed, empty for a generated name that follows the data (the workbench), so renaming is an unsaved change. */
   nameKey?: string
   /** Called after Save, Import or Replace wrote records to the browser store. */
   onStored?: (() => void) | undefined
-  /**
-   * Writes Save's browser copy in place of a plain put (an autosaved record written only over the
-   * version the page read); false when the page kept it otherwise.
-   */
+  /** In place of Save's plain put (an autosaved record written only over the version the page read); false when the page kept it otherwise. */
   store?: (record: Of<K>) => Promise<boolean>
   /** Called after Export all wrote a file. */
   onExported?: () => void
   /** Called with whether the record has unsaved changes, when that changes. */
   onUnsaved?: (unsaved: boolean) => void
-  /**
-   * The id of a record the page keeps in the browser on every change (`/groups`): no leave
-   * questions, Save writes this id, Open keeps the opened record in the browser, Save as writes a
-   * copy with a new id that `onOpen` shows. The page lists its records itself.
-   */
+  /** The id of the record kept in the browser on every change (`/groups`), which Save writes: no leave questions, Open keeps the opened record, Save as writes a copy with a new id that `onOpen` shows. */
   autosaved?: string
-  /**
-   * With `autosaved`, the browser copy: `blank` before the first save (no state shown), `saving`
-   * while the last change is not yet in the browser, `failed` when the browser store refused it.
-   */
+  /** With `autosaved`: `blank` before the first save, `saving` while the last change is not in the browser yet, `failed` when the browser store refused it. */
   kept?: 'blank' | 'saving' | 'saved' | 'failed'
   /** No record is open (the firearm library before New or Open): the status shows messages only. */
   idle?: boolean
@@ -1029,8 +982,7 @@ function FileMenuOf<K extends UserRecordKind>({
   const named = nameKey !== undefined
   const keyOf = (d: unknown, n: string) => (named ? namedKey(d, n) : canonicalJson(d))
   const now = keyOf(data, nameKey ?? '')
-  // the record as first shown or started, so edits before any save count as unsaved work;
-  // undefined between startNew without `next` and the render that shows the new record
+  // as first shown or started, so edits before any save count; undefined between startNew without `next` and the render that shows the new record
   const initial = useRef<string | undefined>(now)
   const [started, setStarted] = useState(0)
   const { dirty, unsaved } = unsavedState(saved, now, autosaved, initial.current)
@@ -1199,8 +1151,7 @@ function FileMenuOf<K extends UserRecordKind>({
   /** Writes the file of a prepared save; undefined when none was written (a newer copy kept, or no file picked). */
   async function writeSave(as: boolean, { recordId, text }: { recordId: string; text: string }) {
     const allow = newerGuard(() => known.current, t)
-    // a failed read leaves the check to the file; the write reports the browser store failure; an
-    // autosaved record's browser copy is this page's own
+    // a failed read leaves the check to the file, the write reports the store failure; an autosaved record's browser copy is this page's own
     const stored = !as && !autosaved && (await storedRecord(recordId).catch(() => undefined))
     if (stored !== false && !(await allow(stored?.saved))) return keptNewer()
     const current = !as && handle.current ? await readHandleText(handle.current) : undefined
@@ -1378,11 +1329,7 @@ function FileMenuOf<K extends UserRecordKind>({
   /** The user manufacturer records that came with the opened record, for a Save while the store lacks them. */
   const carriedMakers = useRef<UserRecord[]>([])
 
-  /**
-   * `record` and the user manufacturer it names, as a file, Copy JSON and a share link carry them:
-   * the stored one (one keyed read; one the format rejects is left out), else the one that came
-   * with the opened file or link. A failed read stops the action unless the opened file has it.
-   */
+  /** The stored manufacturer (one keyed read, one the format rejects left out), else the one that came with the opened file or link; a failed read stops the action unless the file has it. */
   async function withMakers(record: UserRecord): Promise<UserRecord[]> {
     const id = makerIdOf(record)
     if (!id) return [record]
@@ -1437,8 +1384,7 @@ function FileMenuOf<K extends UserRecordKind>({
       if (!(await keepInBrowser(mine, parsed.files ?? [], t))) return
       onStored?.()
     }
-    // Save writes back only to a file of this record alone; the handle of another file is kept
-    // so Save sees at write time whether that file holds records this version would drop
+    // Save writes back only to a file of this record alone; another file's handle is kept to see at write time whether it holds records this version would drop
     // oxlint-disable-next-line react-hooks/rules-of-hooks -- use() here is this menu's open-and-keep function, not React's hook
     await use(mine, picked.file.name, picked.handle, readNote(parsed, t), parsed.records)
   }
@@ -1504,8 +1450,7 @@ function FileMenuOf<K extends UserRecordKind>({
   async function importFiles() {
     const picked = await pickFiles(true, ready, [...loadFileFormats, ...tableFormats])
     if (!picked.length) return
-    // a plain import() after the pick: the picker needs the click's activation, and next/dynamic
-    // would count the Import entry in the weight of every route with a File menu
+    // a plain import() after the pick: the picker needs the click's activation, and next/dynamic would count the Import entry in the weight of every route with a File menu
     const { routeImport } = await import('./import-entry.tsx')
     await routeImport(picked, setTables, importData)
   }
@@ -1515,8 +1460,7 @@ function FileMenuOf<K extends UserRecordKind>({
     const incoming = report.conflicts.map((c) => c.incoming)
     await storePhotos(report.files, incoming)
     await putRecords(incoming)
-    // a target sheet replaced with another photo leaves its old photo unreferenced; the page's
-    // record keeps its photo until the page shows the replaced one (`onStored`)
+    // a replaced sheet photo is left unreferenced; the page's record keeps its photo until the page shows the replaced one (`onStored`)
     const used = await storedPhotoIds()
     const left = droppedPhotos(
       report.conflicts.map((c) => c.stored),

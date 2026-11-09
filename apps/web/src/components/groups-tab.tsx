@@ -9,12 +9,7 @@ import { stepLabel } from '../lib/workbench.ts'
 import { TargetEditor } from './target-editor.tsx'
 import { useDropSlope } from './use-drop-slope.ts'
 
-/**
- * The workbench tab Groups: the target editor for the sheets of the saved load, compact (the
- * target and the key readouts) and as tall as the results column leaves room for from 62em, so the
- * column does not scroll. Expand shows the same editor over the whole window as a dialog: focus
- * stays inside, Esc or Close returns the focus to Expand; the editor is not mounted again.
- */
+/** From 62em as tall as the results column leaves room for, so the column does not scroll; Expand shows the same editor as a dialog, not mounted again, and Esc or Close returns the focus to Expand. */
 export function GroupsTab({
   ladder,
   trajectoryLoad,

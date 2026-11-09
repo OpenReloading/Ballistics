@@ -60,13 +60,7 @@ function ErrorBars({ x, y, bars }: { x: number[]; y: number[]; bars: number[] })
   )
 }
 
-/**
- * Line chart (ECharts) in display units on linear axes over nice ticks. `title` names the image
- * and `description` states what it shows; the table or readouts next to it carry the data.
- * `children` are SVG drawn over the chart and read its scales with `useChartScale`. `limits` are
- * labelled horizontal lines inside the y range; `include` are further y values the axis includes,
- * as for marks drawn by `children`. `integerX` keeps the x ticks on whole numbers.
- */
+/** The table or readouts beside it carry the data; `children` read its scales with `useChartScale`, `include` widens the y axis for their marks. */
 export function LineChart({
   x,
   y,
@@ -112,8 +106,7 @@ export function LineChart({
   const spread = bars ? y.flatMap((v, i) => [v - (bars[i] ?? 0), v + (bars[i] ?? 0)]) : []
   const yt = niceTicks(...extent([y, limits.map((l) => l.y), include, spread].flat()))
   const ok = x.length >= 2 && xt.length >= 2 && yt.length >= 2
-  // callers pass new arrays on each render: the option follows their values, so a render that
-  // changes nothing drawn does not redraw the chart
+  // callers pass new arrays on each render: the option follows their values, so a render that changes nothing drawn does not redraw the chart
   const data = JSON.stringify([x, y, limits, xt, yt])
   const option = useMemo(() => {
     if (!tokens || !ok) return {}

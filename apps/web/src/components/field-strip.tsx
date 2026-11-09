@@ -69,12 +69,7 @@ const cards = (items: StripItem[]) =>
     return all
   }, [])
 
-/**
- * A bullet or powder record's facts under the page bar, as the cartridge record's cards: a card
- * per value of `items` in the Settings units, the unit after the label, then the manufacturer's
- * country, then `children` (cards of the page's own, such as a case's cartridge), then `tags`
- * (line, caliber, product number) as badges at the right end from 48em.
- */
+/** As the cartridge record's cards: values in the Settings units, `children` the page's own cards, `tags` badges at the right end from 48em. */
 export function FieldStrip({
   items,
   country,
