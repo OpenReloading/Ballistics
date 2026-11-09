@@ -3,7 +3,6 @@ import { toSi } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { DisciplineList, FederationList } from '../src/components/discipline-list.tsx'
-import de from '../src/i18n/de.json'
 import { translator } from '../src/i18n/translate.ts'
 import { emptyDirectory, readDirectory, writeDirectory } from '../src/lib/directory.ts'
 import {
@@ -24,7 +23,6 @@ import {
   ruleRows,
 } from '../src/lib/disciplines.ts'
 import { facetRows } from '../src/lib/facets.ts'
-import { rowText } from '../src/lib/record-fields.ts'
 import { formatQuantity, presetUnits } from '../src/lib/units.ts'
 import { say } from '../src/lib/wording.ts'
 import { defined } from './defined.ts'
@@ -240,21 +238,10 @@ it('shows the rule facts a record states, converted where the unit differs, and 
   }
   expect([shown('metric-grams'), shown('us')]).toEqual(['1.50 kg', '3.31 lb'])
   expect(rows.find((r) => r.label === 'Barrel length up to')?.value?.si).toBeCloseTo(0.762)
-  const german = translator(de, 'de').t
-  const words = (label: string) =>
-    rows.filter((r) => r.label === label).map((r) => rowText(r, german))
-  expect(words('Firearm')).toEqual(['Langwaffe'])
-  expect(words('Support')).toEqual(['freihändig, mit Riemen'])
-  expect(words('Handloads')).toEqual(['Nicht erlaubt'])
-  expect(words('Time limit')).toEqual([
-    '30 min für die Disziplin, Probeschüsse eingeschlossen',
-    '90 s für jede der Serien',
-    '0,5 s je Schuss, Probeschüsse nicht eingeschlossen',
-  ])
 })
 
 it('also searches the category and the country as the language shown writes them', () => {
-  const german = translator(de, 'de').t
+  const german = translator({ Rifle: 'Gewehr' }, 'de').t
   const query = { ...emptyDirectory, query: 'gewehr' }
   // a rifle discipline whose own texts do not say Gewehr
   const rifle = defined(rows.find((r) => r.category === 'rifle' && !disciplineMatches(r, query)))

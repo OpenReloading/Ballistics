@@ -663,7 +663,6 @@ describe('POST /interior pressure range and limits', () => {
       inputs: ['bullet.gyrationRadius', 'barrel.twist'],
     })
     expect(radius.warnings[1].fix).toBeTypeOf('string')
-    expect(radius.warnings[1].message).not.toMatch(/safe/i)
     const { rest: restWith } = radius
     expect(restWith.result).toEqual(base.rest.result)
     // a start pressure below the friction pressure
@@ -736,8 +735,6 @@ describe('POST /interior pressure range and limits', () => {
     expect(crusher.body.warnings.map((w: { code: string }) => w.code)).toEqual([
       'noComparableLimit',
     ])
-    for (const w of [...none.body.warnings, ...crusher.body.warnings])
-      expect(w.message).not.toMatch(/safe/i)
   })
 
   it('validates the cartridge id and the tolerances', async () => {

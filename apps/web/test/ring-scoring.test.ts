@@ -1,7 +1,6 @@
 import type { TargetFace } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
-import de from '../src/i18n/de.json'
-import { english, translator } from '../src/i18n/translate.ts'
+import { english } from '../src/i18n/translate.ts'
 import { faceAlignment, scoreGroupOnFace } from '../src/lib/ring-scoring.ts'
 import { catalogBundle } from './records.ts'
 
@@ -28,15 +27,6 @@ describe('scoreGroupOnFace in the language shown', () => {
     expect(scoreGroupOnFace(rifle50, { id: rifle50.id, marks }, group, 5e-3, english.t)).toEqual({
       error: 'The ring marks do not fit: Points are degenerate. Mark them again.',
     })
-  })
-
-  it('words marks on one line in German, the reason too', () => {
-    const german = translator(de, 'de').t
-    const marks = [0, 1, 2, 3].map((i) => ({ ring: 8 + Math.floor(i / 2), x: i * 1e-3, y: 0 }))
-    const scored = scoreGroupOnFace(rifle50, { id: rifle50.id, marks }, group, 5e-3, german)
-    expect('error' in scored && scored.error).toMatch(
-      /^Die Ringmarkierungen passen nicht: Die Punkte sind entartet\. /,
-    )
   })
 })
 

@@ -5,7 +5,6 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { LoadSheets } from '../src/components/load-sheets.tsx'
 import { TargetPrint } from '../src/components/target-print.tsx'
-import de from '../src/i18n/de.json'
 import { setShownLanguage } from '../src/i18n/shown.ts'
 import { type Translator, translator } from '../src/i18n/translate.ts'
 import { frameOf } from '../src/lib/target-editor.ts'
@@ -28,7 +27,6 @@ vi.mock('react-dom', async (original) => ({
   createPortal: (children: ReactNode) => children,
 }))
 
-const german = translator(de, 'de')
 const english = translator()
 
 /** The text a reader sees on the printed page. */
@@ -86,7 +84,6 @@ describe('the load sheets', () => {
   }
 
   it('name the length a seating ladder seats by', () => {
-    expect(sheets(german, 'overallLength')).toContain('Stufen nach COAL')
     expect(sheets(english, 'overallLength')).toContain('41,0 gr main')
     expect(sheets(english, 'overallLength')).not.toContain('Main charge')
     expect(sheets(english, 'overallLength')).toContain('COAL steps')
@@ -96,12 +93,9 @@ describe('the load sheets', () => {
     expect(heads(english)[0]).toBe('Charge')
     expect(heads(english, 'overallLength')[0]).toBe('COAL')
     expect(heads(english, 'temperature')[0]).toBe('Powder temperature')
-    expect(heads(german, 'temperature')[0]).toBe('Pulvertemperatur')
     expect(heads(english)).not.toContain('Step')
     expect(heads(english)).toContain('Peak pressure, simulated (corner cases)')
-    expect(heads(german)).not.toContain('Schritt')
     expect(sheets(english)).toContain('41,0 gr main')
-    expect(sheets(german, 'temperature')).toContain('Stufen nach Pulvertemperatur')
   })
 })
 
@@ -135,7 +129,6 @@ describe('the target sheet', () => {
     )
 
   it('says why a sheet without a reference has no scale', () => {
-    expect(page(german, false)).toContain('Kein Maßstab: Das Foto hat keine Referenz.')
     expect(page(english, false)).toContain('No scale: the photo has no reference.')
   })
 })

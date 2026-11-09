@@ -16,7 +16,10 @@ const head = (name: string, unit: string) =>
   (unit ? `${name} (${unit})` : name).replaceAll('\u00AD', '')
 
 /** A time in s as the chart's data table shows it, in ms without the symbol. */
-const ms = (s: number) => plain(msText(s).replace(/\s*ms$/, ''))
+const ms = (s: number) => {
+  const text = msText(s)
+  return plain(text.endsWith('ms') ? text.slice(0, -2).trimEnd() : text)
+}
 
 /** With the chart data table's decimals; `mass` in kg. */
 export function curvesCsv(
