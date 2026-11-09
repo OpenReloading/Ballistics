@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.0.6](https://github.com/OpenReloading/Ballistics/compare/catalog-v0.0.5...catalog-v0.0.6) (2026-11-09)
+
+
+### Features
+
+* **schema:** store where the user entered a source and a range exclusion as values, not English text ([#1132](https://github.com/OpenReloading/Ballistics/issues/1132)) ([9b56a82](https://github.com/OpenReloading/Ballistics/commit/9b56a8248e79604ebea042916756732f0029d1b8))
+
+
+### Documentation
+
+* **packages:** one-line comments in packages api, catalog, importers and schema ([#1133](https://github.com/OpenReloading/Ballistics/issues/1133)) ([70c4da2](https://github.com/OpenReloading/Ballistics/commit/70c4da2e9370aee4ae358d1c3341b1ef48659022))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @open-reloading/schema bumped to 0.0.6
+
 ## [0.0.5](https://github.com/OpenReloading/Ballistics/compare/data-v0.0.4...data-v0.0.5) (2026-11-02)
 
 

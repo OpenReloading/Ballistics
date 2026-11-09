@@ -1,6 +1,6 @@
 {
   "name": "@open-reloading/catalog",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "OpenReloading catalogue records as one JSON bundle and the checks they pass.",
   "keywords": [
     "reloading",

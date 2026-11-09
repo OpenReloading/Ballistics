@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.0.2](https://github.com/OpenReloading/Ballistics/compare/cli-v0.0.1...cli-v0.0.2) (2026-11-09)
+
+
+### Features
+
+* **ballistics:** add the ballistics package with the exterior models ([#1024](https://github.com/OpenReloading/Ballistics/issues/1024)) ([6038aac](https://github.com/OpenReloading/Ballistics/commit/6038aac5d72c2bd6838f47ba301a2aea88691c12))
+* **ballistics:** move the interior model and the record helpers into ballistics ([#1038](https://github.com/OpenReloading/Ballistics/issues/1038)) ([1ac9bd7](https://github.com/OpenReloading/Ballistics/commit/1ac9bd721bbfaf47f9c042d9850242f70ed8e85d))
+* **schema:** store where the user entered a source and a range exclusion as values, not English text ([#1132](https://github.com/OpenReloading/Ballistics/issues/1132)) ([9b56a82](https://github.com/OpenReloading/Ballistics/commit/9b56a8248e79604ebea042916756732f0029d1b8))
+* **statistics:** add the statistics package and the test kit ([#1013](https://github.com/OpenReloading/Ballistics/issues/1013)) ([6a7ef0a](https://github.com/OpenReloading/Ballistics/commit/6a7ef0a5d0f2de689b39d822fa2505a72db25b67))
+* **statistics:** one check of the solver limits and one percentile; truing refuses unusable limits ([#1077](https://github.com/OpenReloading/Ballistics/issues/1077)) ([b181937](https://github.com/OpenReloading/Ballistics/commit/b18193777942846387df4a03e4b512c0edb9de13))
+* **units:** add the units package with the new-package gate profile ([#996](https://github.com/OpenReloading/Ballistics/issues/996)) ([fee565b](https://github.com/OpenReloading/Ballistics/commit/fee565bdccc35afb221db665c2526e7103eee004))
+* **use-cases:** add the use-cases package with the compute task protocol ([#1094](https://github.com/OpenReloading/Ballistics/issues/1094)) ([7e1441b](https://github.com/OpenReloading/Ballistics/commit/7e1441bb51998661ef6f37755505cfe4ce1961c0))
+
+
+### Documentation
+
+* long rationale comments move to the docs with one-line pointers ([#1113](https://github.com/OpenReloading/Ballistics/issues/1113)) ([7ea9a4f](https://github.com/OpenReloading/Ballistics/commit/7ea9a4f6658d85fa1d8b4d30aac98b5edac199f5))
+* one-line comments in tools, cli, the apps' scripts and tests, and the small packages ([#1135](https://github.com/OpenReloading/Ballistics/issues/1135)) ([a7ec598](https://github.com/OpenReloading/Ballistics/commit/a7ec5981642f3de5429bbd4b1b498d3652882870))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @open-reloading/api bumped to 0.0.6
+    * @open-reloading/catalog bumped to 0.0.6
+    * @open-reloading/drawing bumped to 0.0.5
+    * @open-reloading/schema bumped to 0.0.6
+
 ## 0.0.1 (2026-11-02)
 
 

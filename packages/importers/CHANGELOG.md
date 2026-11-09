@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.0.6](https://github.com/OpenReloading/Ballistics/compare/importers-v0.0.5...importers-v0.0.6) (2026-11-09)
+
+
+### Features
+
+* **schema:** store where the user entered a source and a range exclusion as values, not English text ([#1132](https://github.com/OpenReloading/Ballistics/issues/1132)) ([9b56a82](https://github.com/OpenReloading/Ballistics/commit/9b56a8248e79604ebea042916756732f0029d1b8))
+
+
+### Bug fixes
+
+* **importers:** a quoted line break stays in its row in delimited chronograph files ([#1112](https://github.com/OpenReloading/Ballistics/issues/1112)) ([560745a](https://github.com/OpenReloading/Ballistics/commit/560745a1523db330e9cb3af34cc8cf5bf290a23a))
+* **importers:** GRT and CSR load files read numbers without the Number() fallback ([#1098](https://github.com/OpenReloading/Ballistics/issues/1098)) ([6b6ef57](https://github.com/OpenReloading/Ballistics/commit/6b6ef57295552cab6ee60473c2e1c42d8aaa4926))
+
+
+### Documentation
+
+* **packages:** one-line comments in packages api, catalog, importers and schema ([#1133](https://github.com/OpenReloading/Ballistics/issues/1133)) ([70c4da2](https://github.com/OpenReloading/Ballistics/commit/70c4da2e9370aee4ae358d1c3341b1ef48659022))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @open-reloading/schema bumped to 0.0.6
+
 ## [0.0.5](https://github.com/OpenReloading/Ballistics/compare/importers-v0.0.4...importers-v0.0.5) (2026-11-02)
 
 
