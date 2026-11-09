@@ -1,8 +1,4 @@
-/**
- * Compute tasks run in a worker (a Node worker thread in the API, a Web Worker in the web
- * app). Errors cross the thread boundary as plain objects and are rebuilt into
- * `TruingError`, `InputError` or `Error`. No Node imports: the web app bundles this module.
- */
+/** Run in a worker (a Node worker thread in the API, a Web Worker in the web app); errors cross the thread boundary as plain objects, rebuilt into `TruingError`, `InputError` or `Error`; no Node imports, as the web app bundles this module. */
 
 import {
   type ChargeSolverOptions,

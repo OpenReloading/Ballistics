@@ -1,9 +1,4 @@
-/**
- * Geometry of a target photo: image pixels (x right, y down) to
- * target coordinates (x right, y up) from scale references, a known rectangle for perspective and
- * a rotation. Unit-free: target coordinates are in the unit of the reference lengths (the record
- * uses m; "mm" below reads as that unit). A refusal is an `InputError` (statistics) with a `GeometryIssue`.
- */
+/** Image pixels (x right, y down) to target coordinates (x right, y up) from scale references, a known rectangle for perspective and a rotation; unit-free, in the unit of the reference lengths (the record uses m; "mm" below reads as that unit); a refusal is an `InputError` (statistics) with a `GeometryIssue`. */
 
 import { InputError, nth } from '@open-reloading/statistics'
 
@@ -194,11 +189,7 @@ function backSubstitute(a: number[][], b: number[]): number[] {
   return x
 }
 
-/**
- * The homography that maps four points `from` onto four points `to`: the direct linear
- * transformation with the last entry fixed at 1, on normalized points (Hartley 2004,
- * chapter 4). Throws when three points of either set lie on one line.
- */
+/** The direct linear transformation with the last entry fixed at 1, on normalized points (Hartley 2004, chapter 4); throws when three points of either set lie on one line. */
 export function solveHomography(from: readonly Point[], to: readonly Point[]): Matrix {
   if (from.length !== 4 || to.length !== 4)
     throw new InputError({ code: 'four-point-pairs', params: {} })
@@ -275,12 +266,7 @@ function factor(r: Reference, base: Matrix): number {
   return known / measured
 }
 
-/**
- * Image pixels to target mm. With a rectangle (at most one) the photo is rectified onto it first;
- * every reference then gives a scale factor, and their mean scales the result. `origin` (image
- * pixels) maps to (0, 0); `rotation` (rad, counter-clockwise) is the angle of the target's x axis
- * on the photo, so target coordinates turn by minus that angle.
- */
+/** Image pixels to target mm: with a rectangle (at most one) the photo is rectified onto it first, and the mean of the references' scale factors scales the result; `origin` (image pixels) maps to (0, 0), `rotation` (rad, counter-clockwise) is the angle of the target's x axis on the photo, so target coordinates turn by minus that angle. */
 export function calibrate(
   references: readonly Reference[],
   rotation: number,
@@ -306,10 +292,7 @@ export function calibrate(
 export const toTarget = (c: Calibration, p: Point): Point => applyMatrix(c.toTarget, p)
 export const toImage = (c: Calibration, q: Point): Point => applyMatrix(c.toImage, q)
 
-/**
- * A target point re-expressed after the calibration, rotation or origin changed, so it stays on
- * the same photo point (the same hole).
- */
+/** Re-expressed after the calibration, rotation or origin changed, so it stays on the same photo point (the same hole). */
 export const keepOnPhoto = (q: Point, before: Calibration, after: Calibration): Point =>
   toTarget(after, toImage(before, q))
 

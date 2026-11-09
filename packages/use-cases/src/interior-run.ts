@@ -17,11 +17,7 @@ import { responseUnits } from './units.ts'
 
 /** Ladder steps submitted to the pool at once: within the queue of a one-worker pool (4 per worker). */
 const ladderBatch = 4
-/**
- * A ladder batch starts only if it can end, at its tasks' deadline, within this many ms of the
- * request: a ladder answers within 15 s, so a client that waits 20 s (`requestTimeout` of the web
- * app) never gives up first.
- */
+/** A ladder batch starts only if it can end, at its tasks' deadline, within this many ms of the request: a ladder answers within 15 s, so a client that waits 20 s (`requestTimeout` of the web app) never gives up first. */
 const ladderBudgetMs = 14_000
 /** Output points of a whole ladder at most: five runs at the point cap, about 25 MB of JSON. */
 const ladderPoints = 5 * maxPoints
@@ -125,11 +121,7 @@ const pointsOf = (steps: Run[]) =>
     0,
   )
 
-/**
- * One run per charge: each ladder step is its own pool task, with its own deadline; at most
- * `ladderBatch` at once, so a long ladder stays within the queue of a small pool. Stops after the
- * batch that brings the output above `ladderPoints`.
- */
+/** Each ladder step its own pool task with its own deadline, at most `ladderBatch` at once, so a long ladder stays within the queue of a small pool; stops after the batch that brings the output above `ladderPoints`. */
 async function runLadder(run: (charge: number) => Promise<Run>, charges: number[]) {
   const steps: ({ charge: number } & Run)[] = []
   const started = performance.now()

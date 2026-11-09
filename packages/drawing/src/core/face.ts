@@ -1,7 +1,4 @@
-/**
- * Constants of the technical face, in mm. Distances marked "at 1.6 em" are the old face's at its
- * 1.6 mm text and scale with the text size (`k = em / 1.6`).
- */
+/** Constants of the technical face, in mm; distances marked "at 1.6 em" are the old face's at its 1.6 mm text and scale with the text size (`k = em / 1.6`). */
 /** Filled arrowhead, length and full width. */
 export const arrow = { length: 1.1, width: 0.7 }
 /** A span under this many arrow lengths takes its arrows outside, on tails of `arrowTailLengths` arrows. */
@@ -24,28 +21,19 @@ export const breakLength = 2.4
 export const breakAmplitude = 0.7
 /** A length rule that ends beyond zMax times (1 + this value) is drawn broken. */
 export const breakAllowance = 0.2
-/**
- * At 1.6 em: length of a radius leader from its corner to its text, and the step of the callout
- * leader lengths, mm.
- */
+/** At 1.6 em: length of a radius leader from its corner to its text, and the step of the callout leader lengths, mm. */
 export const radiusLeaderLength = 5
 /** At 1.6 em: the radius of the delta and i arcs, mm. */
 export const smallArc = 4.2
 /** At 1.6 em: the length of the flanks of the delta and i arcs, mm. */
 export const smallFlank = 7.5
-/**
- * The alpha arc radius as a multiple of the vertex distance from L1, shortened where the flanks
- * would reach the texts of lane 0 or the arc's middle come nearer the head than 0.35 zMax.
- */
+/** A multiple of the vertex distance from L1, shortened where the flanks would reach the texts of lane 0 or the arc's middle come nearer the head than 0.35 zMax. */
 export const alphaArc = 1.6
 /** In em: the farthest an angle text without a leader sits from its arc. */
 export const nearArc = 3
 /** Space between the annotation box and the figure frame, mm. */
 export const frameMargin = 4
-/**
- * Width of the steel band drawn around the chamber cavity, mm; a drawing convention, not a barrel
- * wall thickness.
- */
+/** Width of the steel band around the chamber cavity, mm: a drawing convention, not a barrel wall thickness. */
 export const steelBandWidth = 3
 /** Screen: drawing px per mm before the column caps it; the narrowest column (390 px page). */
 export const pxPerMm = 8

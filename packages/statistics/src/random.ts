@@ -10,10 +10,7 @@ export function seededUniforms(seed: number): () => number {
   }
 }
 
-/**
- * Standard normal numbers drawn from `uniform` by Box-Muller, two uniforms each: the radius from
- * the first, the angle from the second.
- */
+/** Box-Muller from `uniform`, two uniforms each: the radius from the first, the angle from the second. */
 export function normalsFrom(uniform: () => number): () => number {
   return () => Math.sqrt(-2 * Math.log(1 - uniform())) * Math.cos(2 * Math.PI * uniform())
 }

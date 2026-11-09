@@ -27,12 +27,7 @@ type Hit = (weight?: number) => boolean
 /** What the steps of one layout share: the face at its text size, what is placed, the choice. */
 export type Placer = ReturnType<typeof createPlacer>
 
-/**
- * The placer of one side at text size `em` (mm) in the part frame: the face distances at that
- * size, the texts, lines and arrowheads placed so far (from the axis line over `axis`), and the
- * count of what a candidate runs into. `keepCorners` makes a diameter arrowhead in a radius
- * corner's room cost a little.
- */
+/** At text size `em` (mm) in the part frame: the face distances at that size, what is placed so far (from the axis line over `axis`) and the count of what a candidate runs into; `keepCorners` makes a diameter arrowhead in a radius corner's room cost a little. */
 export function createPlacer(
   part: Part,
   em: number,
@@ -120,13 +115,7 @@ export function createPlacer(
     return part.outer === undefined ? Math.abs(y) < r : Math.abs(y) > r && Math.abs(y) < part.outer
   }
   const leaderLength = face.radiusLeaderLength * k
-  /**
-   * What a radius leader costs: each line of another dimension, the outline or the axis it crosses
-   * from 0.4 of the face's leader on (the lines dimensioning its corner, such as a diameter beside
-   * it, pass nearer), and each face's leader of length past the first. Across the axis its text
-   * would sit at the mirrored corner: that weighs as 50 crossings, a last resort. (Weighing the
-   * crossings of angle leaders moves angle texts far out and widens the drawing.)
-   */
+  /** What a radius leader costs: each line of another dimension, the outline or the axis it crosses from 0.4 of the face's leader on (the lines of its own corner pass nearer), and each leader length past the first; across the axis it weighs as 50 crossings, a last resort (weighing angle leaders' crossings moves angle texts far out). */
   const crossings = (s: LineSegment, from: PartPoint) => {
     let crossed = 0
     for (const list of [outlineSegs, segs])
@@ -162,11 +151,7 @@ export function createPlacer(
       }
     }),
   )
-  /**
-   * The diameters are placed before the radii: each arrowhead from outside in another's corner
-   * room costs 0.01, below any conflict, so a clear place off the corner or arrows from inside
-   * win, and the radius keeps its short leader (which mostly runs outside the material).
-   */
+  /** Diameters are placed before radii: an arrowhead from outside in another's corner room costs 0.01, below any conflict, so a clear place or arrows from inside win and the radius keeps its short leader (mostly outside the material). */
   const cornerCosts = ({ across, tips: own = [] }: Candidate) =>
     across
       ? own.filter(
@@ -238,11 +223,7 @@ export function createPlacer(
         )
       )
     })
-  /**
-   * How many texts, lines and arrowheads a candidate runs into, 0 clear; counted up to `limit`.
-   * Arrowheads count against texts, so no text hides under one, and against each other at half
-   * weight, so two dimensions' arrowheads do not merge into one shape where a text stays clear.
-   */
+  /** Counted up to `limit`, 0 clear; arrowheads count against texts, so no text hides under one, and against each other at half weight, so two dimensions' arrowheads do not merge into one shape where a text stays clear. */
   const textConflicts = (
     { l, segs: own = [], tips: ownTips = [] }: Candidate,
     limit = Infinity,

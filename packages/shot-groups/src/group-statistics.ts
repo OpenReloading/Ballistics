@@ -1,11 +1,4 @@
-/**
- * Shot-group statistics, `apps/docs/docs/models/groups.md`: size and dispersion measures of one group,
- * chi-square confidence intervals by shot count, pooling of groups of one load in angle, the
- * dispersion and prediction ellipses for a stated coverage and the exact angle of a length at a
- * distance. SI in and out:
- * target-plane coordinates m (x right, y up), distance m, velocity m/s, angles rad. A value whose
- * minimum shot count is not met is `undefined`.
- */
+/** Size and dispersion of one group, chi-square intervals by shot count, pooling of a load's groups in angle, dispersion and prediction ellipses for a stated coverage and the exact angle of a length at a distance (`apps/docs/docs/models/groups.md`); SI in and out: target-plane coordinates m (x right, y up), distance m, velocity m/s, angles rad; a value whose minimum shot count is not met is `undefined`. */
 import {
   bisect,
   chiSquareQuantile,
@@ -45,12 +38,7 @@ export interface GroupInput {
   confidenceLevel?: number
 }
 
-/**
- * Chi-square intervals (`apps/docs/docs/models/groups.md`, "Confidence intervals by shot count"):
- * `standardDeviationX`, `standardDeviationY` with `axisDegreesOfFreedom` (n - 1); the circular
- * `sigma` (per-axis SD of a circular normal population), `radialStandardDeviation` (sqrt 2 sigma) and `cep`
- * (sqrt(2 ln 2) sigma) with `circularDegreesOfFreedom` (2 (n - 1)), valid for equal, uncorrelated axes.
- */
+/** `standardDeviationX`, `standardDeviationY` with `axisDegreesOfFreedom` (n - 1); the circular `sigma` (per-axis SD of a circular normal population), `radialStandardDeviation` (sqrt 2 sigma) and `cep` (sqrt(2 ln 2) sigma) with `circularDegreesOfFreedom` (2 (n - 1)), valid for equal, uncorrelated axes (`apps/docs/docs/models/groups.md`, "Confidence intervals by shot count"). */
 export interface GroupConfidence {
   confidenceLevel: number
   axisDegreesOfFreedom: number
@@ -94,10 +82,7 @@ export interface VelocityCorrelation {
   slope: number
 }
 
-/**
- * Values of one group, m unless stated; definitions, divisors and sources in
- * `apps/docs/docs/models/groups.md`. Dispersion values need two shots or more.
- */
+/** Values of one group, m unless stated, with definitions, divisors and sources in `apps/docs/docs/models/groups.md`; dispersion values need two shots or more. */
 export interface GroupStatistics {
   /** Included shots. */
   shotCount: number
@@ -154,11 +139,7 @@ export interface PooledValues {
   confidence: GroupConfidence
 }
 
-/**
- * Pooled values of several groups of one load, each group about its own centre, pooled in angle
- * (`apps/docs/docs/models/groups.md`, "Angles and pooling"). The length fields, m, are set only when every
- * pooled group has the same distance.
- */
+/** Each group about its own centre, pooled in angle (`apps/docs/docs/models/groups.md`, "Angles and pooling"); the length fields, m, only when every pooled group has the same distance. */
 export interface PooledGroupStatistics extends Partial<PooledValues> {
   /** Groups with at least 2 shots, the ones pooled. */
   groupCount: number
@@ -340,11 +321,7 @@ function eigenvalues(c: GroupCovariance): [number, number] {
   return [half + root, Math.max(half - root, 0)]
 }
 
-/**
- * Radius R about the centre that holds half of a centred bivariate normal with principal variances
- * l1 >= l2 (`apps/docs/docs/models/groups.md`, "Elliptical CEP"): in whitened polar coordinates the outside share is
- * (2/pi) int_0^{pi/2} exp(-R^2 / (2 (l1 cos^2 phi + l2 sin^2 phi))) dphi, solved for 1/2 by bisection.
- */
+/** Holding half of a centred bivariate normal with principal variances l1 >= l2: the outside share in whitened polar coordinates, (2/pi) int_0^{pi/2} exp(-R^2 / (2 (l1 cos^2 phi + l2 sin^2 phi))) dphi, solved for 1/2 by bisection (`apps/docs/docs/models/groups.md`, "Elliptical CEP"). */
 function ellipticalCep(c: GroupCovariance): number {
   const [l1, l2] = eigenvalues(c)
   if (l1 === 0) return 0
@@ -384,12 +361,7 @@ function ellipseAt(stats: GroupStatistics, k: number): GroupEllipse | undefined 
   }
 }
 
-/**
- * Ellipse about the centre that holds the fraction `coverage` of a bivariate normal population with
- * the sample covariance (`apps/docs/docs/models/groups.md`, "Dispersion and prediction ellipses"), a description of
- * the shots fired: semi-axes m, `angle` of the
- * major axis rad from +x (0 for equal variances); `undefined` below 2 shots.
- */
+/** Holding the fraction `coverage` of a bivariate normal population with the sample covariance, a description of the shots fired: semi-axes m, `angle` of the major axis rad from +x (0 for equal variances), `undefined` below 2 shots (`apps/docs/docs/models/groups.md`, "Dispersion and prediction ellipses"). */
 export function dispersionEllipse(
   stats: GroupStatistics,
   coverage: number,
@@ -398,11 +370,7 @@ export function dispersionEllipse(
   return ellipseAt(stats, Math.sqrt(-2 * Math.log(1 - coverage)))
 }
 
-/**
- * Prediction ellipse (`apps/docs/docs/models/groups.md`, "Dispersion and prediction ellipses"): holds a further shot from the same bivariate normal population
- * with probability `coverage`, mean and covariance estimated from the group; scale
- * k^2 = 2 (n^2 - 1) / (n (n - 2)) F(2, n - 2). Same axes as `dispersionEllipse`; `undefined` below 3 shots.
- */
+/** Holds a further shot from the same population with probability `coverage`, mean and covariance estimated from the group, scale k^2 = 2 (n^2 - 1) / (n (n - 2)) F(2, n - 2); axes as `dispersionEllipse`, `undefined` below 3 shots (`apps/docs/docs/models/groups.md`, "Dispersion and prediction ellipses"). */
 export function predictionEllipse(
   stats: GroupStatistics,
   coverage: number,
@@ -438,13 +406,7 @@ function pooledValues(
   }
 }
 
-/**
- * Pools groups of one load, each about its own centre and in angle at its own distance
- * (`apps/docs/docs/models/groups.md`, "Angles and pooling"):
- * `angular` always, the length fields only when the pooled groups share one distance (relative
- * difference below 1e-9). The intervals use `confidenceLevel`; the groups' own `confidenceLevel`
- * fields are ignored.
- */
+/** Each about its own centre and in angle at its own distance: `angular` always, the length fields only when the groups share one distance (relative difference below 1e-9); the intervals use `confidenceLevel`, the groups' own are ignored (`apps/docs/docs/models/groups.md`, "Angles and pooling"). */
 export function pooledGroupStatistics(
   groups: GroupInput[],
   confidenceLevel = 0.95,

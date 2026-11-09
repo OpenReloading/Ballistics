@@ -612,11 +612,7 @@ const interiorBaseParser = z
     'One run of the M3 interior model, or a charge ladder, in SI units. Results are simulations, not load data.',
   )
 
-/**
- * The fields of the M3 interior body and of the charge-target body
- * (`apps/docs/docs/models/interior-m3.md`): SI, `load.propellantTemperature` in K.
- * `interiorBody` adds the sampling field.
- */
+/** The M3 interior body and the charge-target body (`apps/docs/docs/models/interior-m3.md`): SI, `load.propellantTemperature` in K; `interiorBody` adds the sampling field. */
 export const interiorBase: z.ZodObject<InteriorBaseShape, z.core.$strict> =
   interiorBaseParser satisfies Exact<typeof interiorBase, typeof interiorBaseParser>
 

@@ -146,10 +146,7 @@ function splitDimensions(dims: Dimension[], zBreak: number) {
   return { stack, heads, far, acrossDims, below, front }
 }
 
-/**
- * The stack: shortest first, each in the innermost lane where its span and its label (outside
- * when it does not fit between the arrows) clear the others in that lane.
- */
+/** Shortest first, each in the innermost lane where its span and its label (outside when it does not fit between the arrows) clear the others in that lane. */
 function stackLanes(
   { lengthUnit, fixedDecimals, em, arrowLen, tailLen, zBreak, gap }: Placer,
   stack: Dimension[],
@@ -178,12 +175,7 @@ function stackLanes(
   return { lanes, laneOf }
 }
 
-/**
- * The lengths in their lanes (the stack on +r, S and the head lengths on -r), the head diameters
- * behind the face and a diameter past the mouth, then the datum: first every line whose place is
- * fixed, then their texts, so each text sees all of them. Returns what the diameters across the
- * part are placed past.
- */
+/** The lengths in their lanes (the stack on +r, S and the head lengths on -r), the head diameters behind the face, a diameter past the mouth, then the datum: every fixed line first, then their texts, so each text sees all of them; returns what the diameters across the part are placed past. */
 function layoutLanes(placer: Placer, frontOnAxis: boolean) {
   const { annotation, lengthUnit, fixedDecimals, em, lane0, pitch, rMax, zBreak, segs } = placer
   const dims = annotation.dimensions
@@ -365,8 +357,7 @@ function headDiameters(placer: Placer, pending: (() => void)[], below: Dimension
     const owner = d.symbol
     const r = d.radius as number
     const z = -(lane0 + n * pitch)
-    // a belt wider than the rim (or a rim behind a chamfer) is projected from where the outline
-    // first reaches it
+    // a belt wider than the rim (or a rim behind a chamfer) is projected from where the outline first reaches it
     const zFrom = reach(points, r)
     for (const s of [1, -1])
       segs.push({
@@ -469,9 +460,7 @@ function layoutDiameters(
     ] as const
     // in a crowded column the label moves along the axis, its line kinked before it
     const shifts = [0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6].map((n) => n * 1.15 * em)
-    // at each station arrows from outside, then from inside pointing out, taken where an outside
-    // one runs into another dimension or a radius corner's room (inside, the two arrowheads of a
-    // small diameter would meet)
+    // at each station arrows from outside, then from inside pointing out where an outside one runs into another dimension or a radius corner's room (inside, the two arrowheads of a small diameter would meet)
     const ways = (d.radius as number) > 1.5 * arrowLen ? [false, true] : [false]
     const zs = stations(points, d, annotation)
     place(
@@ -693,9 +682,7 @@ function angleShapes(
 ): { radius: number; thin: LineSegment[] }[] {
   const owner = a.symbol
   if (a.symbol === 'alpha' && onAxis) {
-    // the shoulder: an arc behind L1 at 1.6 times the vertex distance, at most so far that its
-    // flanks end before the texts of lane 0 and its middle stays 0.35 zMax off the head; the
-    // flanks run from the corners at L1 to just past the arc
+    // the shoulder: an arc behind L1 at 1.6 times the vertex distance, at most so far that its flanks end before the texts of lane 0 and its middle stays 0.35 zMax off the head; the flanks run from the corners at L1 to just past the arc
     const reachOut =
       (rMax + lane0 - em - 2 * gap) / Math.max(Math.abs(Math.sin(t0)), 1e-6) - 0.5 * k
     const radius = Math.max(
@@ -837,8 +824,7 @@ function layoutAngles(placer: Placer) {
         Array.from({ length: 21 }, (_, j) => (j % 2 ? 1 : -1) * Math.ceil(j / 2)).flatMap((m) => {
           const t = mid + m * 0.15
           const far = polar(v, radius + n * em, t)
-          // a leader along the axis would vanish in the dash-dot line: from an arc on the axis it
-          // starts on the arc toward either end and runs parallel to the axis
+          // a leader along the axis would vanish in the dash-dot line: from an arc on the axis it starts on the arc toward either end and runs parallel to the axis
           const along = onAxis && Math.abs(Math.sin(t)) < 0.1
           const from = along
             ? [t0 + 0.15 * (t1 - t0), t1 - 0.15 * (t1 - t0)]
@@ -860,9 +846,7 @@ function layoutAngles(placer: Placer) {
           )
         }),
       )
-      // within the part the nearest to the arc first; past it the nearest to the axis, as a text
-      // far out widens the drawing; a text without a leader stays within 2 em of its arc, so it
-      // reads as that arc's
+      // within the part the nearest to the arc first, past it the nearest to the axis, as a text far out widens the drawing; a text without a leader stays within 2 em of its arc, so it reads as that arc's
       const out = ({ l }: { l: Label }) => {
         const reach = Math.abs(l.c[1]) + Math.abs(l.dir[1] * l.w) / 2
         if (reach > rMax) return 1e6 + reach
@@ -969,11 +953,7 @@ function layoutBox(placer: Placer): [number, number, number, number] {
   return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)]
 }
 
-/**
- * Where a diameter can be dimensioned, nearest first: its station, then up to 3 mm along its own
- * segment (`toward`), where the outline stays within 0.01 mm of the stored radius, off a step and
- * off a convention.
- */
+/** Nearest first: its station, then up to 3 mm along its own segment (`toward`) where the outline stays within 0.01 mm of the stored radius, off a step and off a convention. */
 function stations(points: SectionPoint[], d: Dimension, annotation: Annotation) {
   const [z, r, s] = [d.from, d.radius as number, d.toward]
   const zEnd = Math.max(...points.map(([, pz]) => pz))

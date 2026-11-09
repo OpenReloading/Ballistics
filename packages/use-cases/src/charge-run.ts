@@ -54,11 +54,7 @@ const targetLimit = (found: Limit, pressure: number) => ({
   pressure,
 })
 
-/**
- * The target of the solver: the request's, or for a percentage target a share of the compared
- * limit, as the workbench's percent readout; a 422 body when there is no such limit or when the
- * compared limits of the cartridge's variants differ.
- */
+/** The request's, or for a percentage target a share of the compared limit, as the workbench's percent readout; a 422 body when there is no such limit or when the compared limits of the cartridge's variants differ. */
 function percentTarget(
   body: ChargeBody,
   cartridge: CartridgeWithSpecs | undefined,
@@ -150,11 +146,7 @@ function chargeAnswer({
   }
 }
 
-/**
- * The bulk density of a request (kg/m3), else of the powder record `id`, with the record's
- * `resolved.powder` part when `id` is set. A record value outside `bulkDensityBound` is an
- * `InputError`; a request value has passed that bound already.
- */
+/** The bulk density of the request (kg/m3), else of the powder record `id`, with the record's `resolved.powder` part; a record value outside `bulkDensityBound` is an `InputError`, a request value has passed that bound already. */
 async function resolvePowder(
   findPowder: (id: string) => Powder | Promise<Powder>,
   id: string | undefined,

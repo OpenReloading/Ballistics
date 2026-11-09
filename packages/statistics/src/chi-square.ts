@@ -1,9 +1,4 @@
-/**
- * Chi-square distribution function and quantile for whole degrees of freedom,
- * `apps/docs/docs/models/groups.md`, "Confidence intervals by shot count": the regularized incomplete gamma function P(df/2, x/2) by
- * its power series (DLMF 8.2.6, 8.7.1), each term formed in logarithms so that large pooled
- * samples do not underflow.
- */
+/** For whole degrees of freedom (`apps/docs/docs/models/groups.md`, "Confidence intervals by shot count"): P(df/2, x/2) by its power series (DLMF 8.2.6, 8.7.1), each term formed in logarithms so that large pooled samples do not underflow. */
 import { bisect } from './bisect.ts'
 import { need } from './issue.ts'
 
@@ -15,11 +10,7 @@ function lnGammaPlusOne(a: number): number {
   return t > 0 ? sum + Math.log(0.5) + 0.5 * Math.log(Math.PI) : sum
 }
 
-/**
- * Probability that a chi-square variable with `df` (a positive whole number) degrees of freedom is
- * at most `x`: the series below the mode, 1 minus `chiSquareSurvival` above, where the series would
- * need about x/2 terms.
- */
+/** `df` a positive whole number: the series below the mode, 1 minus `chiSquareSurvival` above, where the series would need about x/2 terms. */
 export function chiSquareCdf(x: number, df: number): number {
   need(Number.isInteger(df) && df > 0, { code: 'degreesOfFreedomNotPositiveWhole', params: {} })
   if (!(x > 0)) return 0
@@ -39,12 +30,7 @@ export function chiSquareCdf(x: number, df: number): number {
   return Math.min(sum, 1)
 }
 
-/**
- * Probability that a chi-square variable with `df` degrees of freedom exceeds `x`. Below the mode
- * it is 1 minus the series of `chiSquareCdf`; above, the continued fraction of the upper
- * incomplete gamma function (DLMF 8.9.2, https://dlmf.nist.gov/8.9#E2, contracted form) by the modified Lentz method, which keeps the relative
- * accuracy in the upper tail where `1 - chiSquareCdf` is 0.
- */
+/** Below the mode 1 minus the series of `chiSquareCdf`; above, the continued fraction of the upper incomplete gamma function (DLMF 8.9.2, https://dlmf.nist.gov/8.9#E2, contracted form) by the modified Lentz method, which keeps the relative accuracy in the upper tail where `1 - chiSquareCdf` is 0. */
 export function chiSquareSurvival(x: number, df: number): number {
   need(Number.isInteger(df) && df > 0, { code: 'degreesOfFreedomNotPositiveWhole', params: {} })
   if (!(x > 0)) return 1

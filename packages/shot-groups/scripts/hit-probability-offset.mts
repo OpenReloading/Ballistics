@@ -1,7 +1,4 @@
-// Offset of the point of impact and shots needed against a seeded Monte Carlo
-// (apps/docs/docs/research/hit-probability-offset-shots-needed.md).
-// Run: node packages/shot-groups/scripts/hit-probability-offset.mts
-// Synthetic case: a circular normal dispersion of 1 (all lengths in units of sigma).
+// Offset of the point of impact and shots needed against a seeded Monte Carlo (apps/docs/docs/research/hit-probability-offset-shots-needed.md); a synthetic case, a circular normal dispersion of 1 (all lengths in units of sigma)
 import { ellipseProbability, shotsToHit } from '../src/index.ts'
 import { normals } from './rng.mts'
 

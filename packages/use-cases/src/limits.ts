@@ -1,7 +1,4 @@
-/**
- * CIP Pmax of a cartridge against a simulated pressure range. Only values measured by transducer or piezo, or without a stated method, are
- * compared; crusher values are listed, never compared. No message says or implies that a load is safe.
- */
+/** CIP Pmax against a simulated pressure range: only values measured by transducer or piezo, or without a stated method, are compared, crusher values listed but never compared; no message says or implies that a load is safe. */
 import {
   type AdvisoryId,
   type AdvisoryLoad,
@@ -45,11 +42,7 @@ export type Limit = {
   nominalExceeded?: boolean
 }
 
-/**
- * A message of an interior response; `code` names the rule of the advisory registry, with its
- * `severity`, `inputs` and `fix`. `spec` is the id of the C.I.P. sheet it refers to, and `symbol`,
- * `variant` and `method` the limit of a `limitExceeded` message.
- */
+/** `code` names the rule of the advisory registry, with its `severity`, `inputs` and `fix`; `spec` is the id of the C.I.P. sheet, `symbol`, `variant` and `method` the limit of a `limitExceeded` message. */
 export type Warning = {
   code: AdvisoryId
   severity: AdvisoryRule['severity']
@@ -191,12 +184,7 @@ function exceededWarning(l: Limit, range: PressureRange, sheet: string | undefin
   })
 }
 
-/**
- * The Pmax limits of the C.I.P. sheet of `cartridge` against `range`, their warnings
- * (`noCartridge` without a cartridge, else `limitExceeded` per exceeded limit and
- * `noComparableLimit`) and the cartridge part of `resolved`. A typed pressure limit
- * (`pressureLimit`, Pa) is the one limit instead: the sheet's values are not compared.
- */
+/** The cartridge's Pmax limits against `range` with their warnings (`noCartridge` without a cartridge, else `limitExceeded` per exceeded limit and `noComparableLimit`) and the cartridge part of `resolved`; a typed pressure limit (`pressureLimit`, Pa) is the one limit instead, the sheet's values not compared. */
 function cartridgeLimits(
   range: PressureRange,
   cartridge: CartridgeWithSpecs | undefined,
@@ -265,11 +253,7 @@ interface ChargeRun {
   load: AdvisoryLoad & { ignitionPressure: number }
 }
 
-/**
- * Limits, warnings and the cartridge echo for a pressure range; `cartridge` undefined when no id
- * was given. `run` (M3 only) adds the charge-too-small check and the input rules of the registry.
- * `pressureLimit` (Pa) is a limit the caller typed in place of the cartridge's Pmax values.
- */
+/** `cartridge` undefined when no id was given; `run` (M3 only) adds the charge-too-small check and the input rules of the registry; `pressureLimit` (Pa) is a limit the caller typed in place of the cartridge's Pmax values. */
 export function limitCheck(
   range: PressureRange,
   cartridge: CartridgeWithSpecs | undefined,

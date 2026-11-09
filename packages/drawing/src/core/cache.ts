@@ -1,10 +1,7 @@
 import type { Medium } from './layout.ts'
 import type { LengthUnit } from './units.ts'
 
-/**
- * `lay` cached per figure object, medium, text size and unit: the screen text size search, the
- * width and the model lay out the same figure at the same size, once is enough.
- */
+/** Per figure object, medium, text size and unit: the screen text size search, the width and the model lay out the same figure at the same size, so once is enough. */
 export function layoutCache<F extends object, L>(
   lay: (figure: F, medium: Medium, em: number, unit: LengthUnit) => L,
 ) {

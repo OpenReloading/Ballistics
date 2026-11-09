@@ -8,8 +8,7 @@ export const jsonSchema = (schema: z.ZodType, io: 'input' | 'output' = 'input'):
   const { $schema: _, ...rest } = z.toJSONSchema(schema, {
     io,
     unrepresentable: 'any',
-    // a number in a query string is parsed from its text, the document shows the number it must be
-    // (zod leaves out the examples of a transformed input; they are the numbers too)
+    // a number in a query string is parsed from its text, so the document shows the number it must be (zod leaves out the examples of a transformed input; they are the numbers too)
     override: ({ zodSchema, jsonSchema: node }) => {
       // oxlint-disable-next-line no-underscore-dangle -- zod 4 gives a schema's definition only under `_zod`
       const def = zodSchema._zod.def

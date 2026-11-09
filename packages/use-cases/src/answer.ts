@@ -117,10 +117,7 @@ const jsonParams = (params: object) =>
 const numberAllowed = (n: number, path: string, allowed: RegExp | undefined, infinite: boolean) =>
   Number.isFinite(n) || ((infinite || Number.isNaN(n)) && allowed?.test(path) === true)
 
-/**
- * Path of the first non-finite number in a result, undefined if none (null is allowed). `allowed`
- * paths may hold NaN, and with `infinite` also an infinite number.
- */
+/** The path of the first non-finite number in a result, undefined if none (null is allowed); `allowed` paths may hold NaN, and with `infinite` also an infinite number. */
 function nonFinite(
   value: unknown,
   path: string,
@@ -137,10 +134,7 @@ function nonFinite(
   return undefined
 }
 
-/**
- * `response` unchanged; throws `InputError` (a 422) at its first non-finite number outside the
- * `allowed` paths (see `nonFinite`).
- */
+/** `response` unchanged; throws `InputError` (a 422) at its first non-finite number outside the `allowed` paths (`nonFinite`). */
 export function assertFinite<T>(response: T, allowed?: RegExp, infinite = false): T {
   const path = nonFinite(response, '', allowed, infinite)
   // extreme inputs inside the schema bounds can overflow, so this is answered as a client error

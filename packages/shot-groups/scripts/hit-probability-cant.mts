@@ -1,6 +1,4 @@
-// Rifle cant against its closed form and a seeded simulation
-// (apps/docs/docs/research/hit-probability-cant.md). Run: node packages/shot-groups/scripts/hit-probability-cant.mts
-// The drops are the issue's example figures (inches), a synthetic case.
+// Rifle cant against its closed form and a seeded simulation (apps/docs/docs/research/hit-probability-cant.md); the drops are the issue's example figures (inches), a synthetic case
 import { normals } from './rng.mts'
 
 const deg = Math.PI / 180

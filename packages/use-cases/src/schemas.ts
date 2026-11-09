@@ -1,9 +1,4 @@
-/**
- * Parts shared by the request schemas of the compute endpoints (`exterior-schema.ts`,
- * `strings-schema.ts`, `interior-schema.ts`, `charge-schema.ts`, `stability-schema.ts`) and the
- * step caps. Field names and units are those of the `@open-reloading/ballistics` inputs (SI, rad, K).
- * Objects are strict: a misspelled key is an error. zod 4 `z.number()` rejects Infinity and NaN.
- */
+/** Shared by the request schemas of the compute endpoints (`exterior-schema.ts`, `strings-schema.ts`, `interior-schema.ts`, `charge-schema.ts`, `stability-schema.ts`), with the step caps; names and units of the `@open-reloading/ballistics` inputs (SI, rad, K), objects strict so a misspelled key is an error; zod 4 `z.number()` rejects Infinity and NaN. */
 import { recordIdRegex } from '@open-reloading/schema'
 import { z } from 'zod'
 

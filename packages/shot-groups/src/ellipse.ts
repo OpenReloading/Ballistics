@@ -1,8 +1,4 @@
-/**
- * Conics and ellipses for the target face search: the direct
- * least-squares ellipse fit, a robust fit by random samples, and the conic pencil of two concentric
- * circles seen in perspective.
- */
+/** For the target face search: the direct least-squares ellipse fit, a robust fit by random samples, and the conic pencil of two concentric circles seen in perspective. */
 import { nth, seededUniforms } from '@open-reloading/statistics'
 import {
   apply3,
@@ -59,10 +55,7 @@ function cubicRoots(p: number, q: number, r: number): number[] {
   return [0, 1, 2].map((k) => m * Math.cos((t - 2 * Math.PI * k) / 3) + shift)
 }
 
-/**
- * Unit vector in the null space of the 3 x 3 matrix `m` (the cross product of its most independent
- * rows); NaN entries when its rank is below 2, which the callers' checks refuse.
- */
+/** The cross product of the most independent rows of the 3 x 3 matrix `m`, unit length; NaN entries when its rank is below 2, which the callers' checks refuse. */
 function nullVector(m: Mat3): Vector3 {
   const r0: Vector3 = [m[0], m[1], m[2]]
   const r1: Vector3 = [m[3], m[4], m[5]]
@@ -85,11 +78,7 @@ function nullVector(m: Mat3): Vector3 {
   return [best[0] / bestNorm, best[1] / bestNorm, best[2] / bestNorm]
 }
 
-/**
- * Direct least-squares ellipse fit (Fitzgibbon 1999) in the numerically stable form of Halir 1998:
- * the points are normalised, the 3 x 3 eigenproblem of the reduced scatter matrix is solved by the
- * roots of its characteristic cubic. Undefined for fewer than 6 points or no ellipse.
- */
+/** Fitzgibbon 1999 in the numerically stable form of Halir 1998: the points normalised, the 3 x 3 eigenproblem of the reduced scatter matrix solved by the roots of its characteristic cubic; undefined for fewer than 6 points or no ellipse. */
 export function fitEllipse(pts: readonly Point[]): Conic | undefined {
   if (pts.length < 6) return undefined
   const norm = normalisePoints(pts)
@@ -279,11 +268,7 @@ export type RobustOptions = {
 }
 type Candidate = { conic: Conic; ellipse: Ellipse; inliers: number[] }
 
-/**
- * Robust ellipse fit: random samples of 6 points fitted directly, the one with the most points
- * within `tolerance` (Sampson distance, px) refitted on its inliers until the set settles. Undefined when
- * no sample gives an ellipse with `minPoints` inliers.
- */
+/** Random samples of 6 points fitted directly, the one with the most points within `tolerance` (Sampson distance, px) refitted on its inliers until the set settles; undefined when no sample gives an ellipse with `minPoints` inliers. */
 export function ransacEllipse(
   pts: readonly Point[],
   o: RobustOptions,
@@ -399,15 +384,7 @@ function jacobi3(m: Mat3): [Eigenpair, Eigenpair, Eigenpair] {
   ]
 }
 
-/**
- * The plane of two concentric circles seen in perspective, from their image conics (the conic
- * pencil: the generalised eigenvalues of the pair are `r1^2 / r2^2` once and 1 twice, and the
- * eigenvector of the single one is the image of the common centre, Gurdjos 2006, and the affine
- * rectification by the vanishing line of the same pencil, Gurdjos 2002).
- * Returns the 3 x 3 matrix that maps an image point (homogeneous) onto the plane where the first
- * circle is the unit circle about the origin (up to a rotation and a reflection), and the image
- * of the centre. Undefined when the pair is degenerate or the radii are too alike.
- */
+/** From the image conics (the pencil's generalised eigenvalues are `r1^2 / r2^2` once and 1 twice, the single one's eigenvector the image of the common centre, Gurdjos 2006; affine rectification by the pencil's vanishing line, Gurdjos 2002): the 3 x 3 map of homogeneous image points onto the plane where the first circle is the unit circle about the origin (up to a rotation and a reflection), and the image of the centre; undefined when the pair is degenerate or the radii are too alike. */
 export function concentricPlane(
   c1: Conic,
   c2: Conic,
@@ -426,10 +403,7 @@ export function concentricPlane(
   }
 }
 
-/**
- * The image `v` of the common center of the pencil of `n1` and `n2`, and its single and double
- * eigenvalues; undefined when the pair is degenerate or the radii are too alike.
- */
+/** The image `v` of the common center of the pencil of `n1` and `n2`, and its single and double eigenvalues; undefined when the pair is degenerate or the radii are too alike. */
 function pencilCenter(
   n1: Mat3,
   n2: Mat3,
@@ -474,11 +448,7 @@ function pencilEigenvalues(N: Mat3): { single: number; double: number } {
   return { single, double: (tr - single) / 2 }
 }
 
-/**
- * The map of image points (homogeneous) onto the plane where the normalised conic `n1` is the unit
- * circle and the point `v` inside it is the origin; undefined when `n1` is no real ellipse or `v`
- * lies outside it.
- */
+/** Homogeneous image points onto the plane where the normalised conic `n1` is the unit circle and the point `v` inside it the origin; undefined when `n1` is no real ellipse or `v` lies outside it. */
 function planeMap(n1: Mat3, v: Readonly<Vector3>): Mat3 | undefined {
   // n1 = E^T diag(l) E: M0 = diag(sqrt|l|) E satisfies M0^T diag(1, 1, -1) M0 = n1
   const sorted = jacobi3(n1).toSorted((a, b) => b.value - a.value)
@@ -489,8 +459,7 @@ function planeMap(n1: Mat3, v: Readonly<Vector3>): Mat3 | undefined {
   )
   let u = apply3(M0, v)
   if (u[2] < 0) u = [-u[0], -u[1], -u[2]]
-  // normalise on the hyperboloid u_z^2 - u_x^2 - u_y^2 = 1; w^2 = -v^T n1 v is positive only for a
-  // centre inside the first circle
+  // normalise on the hyperboloid u_z^2 - u_x^2 - u_y^2 = 1; w^2 = -v^T n1 v is positive only for a centre inside the first circle
   const w = Math.sqrt(u[2] * u[2] - u[0] * u[0] - u[1] * u[1])
   if (!(w > 0)) return undefined
   const [ux, uy, uz] = [u[0] / w, u[1] / w, u[2] / w]

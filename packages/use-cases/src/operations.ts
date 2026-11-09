@@ -1,7 +1,4 @@
-/**
- * The compute operations of the `POST` routes. The routes and the contract document read their
- * texts, schemas and examples here, the command line runs them offline, so none can drift.
- */
+/** The routes and the contract document read their texts, schemas and examples here and the command line runs them offline, so none can drift. */
 
 import type { Catalogue } from '@open-reloading/catalog'
 import type { z } from 'zod'

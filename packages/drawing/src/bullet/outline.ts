@@ -525,12 +525,7 @@ function baseGeometry(
   return { t, rb, s, tTag, rbTag, tailKnown, baseKnown }
 }
 
-/**
- * The cavity of a hollow base, from its apex on the axis to its edge on the base face: a cone or a
- * half ellipsoid (a hemisphere when the depth is the radius). Without a given depth it is as deep as
- * its radius, the cone at a half angle of 45 degrees, an assumed shape drawn as an assumed one; a
- * given depth (`typed`) is drawn as given.
- */
+/** A cone or a half ellipsoid (a hemisphere when the depth is the radius); without a given depth as deep as its radius, the cone at a half angle of 45 degrees, an assumed shape drawn as one; a given depth (`typed`) is drawn as given. */
 interface Cavity {
   radius: number
   depth: number
@@ -698,10 +693,7 @@ function ogiveInputRefusal(
     )
 }
 
-/**
- * The Rt/R an ogive nose is drawn with (at most 1, 1 a tangent ogive) and the tag of its form;
- * assumed values are named in `notes`.
- */
+/** At most 1 (1 a tangent ogive), with the tag of its form; assumed values are named in `notes`. */
 function ogiveRatio(
   form: string | undefined,
   given: number | undefined,
@@ -793,11 +785,7 @@ function hybridNose(
   }
 }
 
-/**
- * The nose curve from the shank end at z0 = L - n to the meplat edge at radius m: a round nose,
- * a cone, a secant or tangent ogive of radius R = Rt / (Rt/R), or a hybrid of a blend arc and a
- * secant arc.
- */
+/** From the shank end at z0 = L - n to the meplat edge at radius m: a round nose, a cone, a secant or tangent ogive of radius R = Rt / (Rt/R), or a hybrid of a blend arc and a secant arc. */
 function noseCurve(b: BulletDimensions, n: number, m: number, notes: Note[]): NoseCurve | Refused {
   const L = b.length
   const a = b.diameter / 2
@@ -1007,11 +995,7 @@ function strokedRuns(points: SectionPoint[], edges: boolean[]) {
   return segments
 }
 
-/**
- * The outline points from the base centre (or the apex of the cavity) to the tip on the axis, each
- * with its tag and whether the edge reaching it is approximate, the stroked runs, the z ranges
- * drawn from an assumed shape and the index of the base face's edge.
- */
+/** From the base centre (or the apex of the cavity) to the tip on the axis, each with its tag and whether the edge reaching it is approximate, plus the stroked runs, the z ranges drawn from an assumed shape and the index of the base face's edge. */
 function assemblePoints(parts: Parts) {
   const { a, L, base, groove, z0, nTag, noseTag } = parts
   const { t } = base

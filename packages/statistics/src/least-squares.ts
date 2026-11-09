@@ -1,7 +1,4 @@
-/**
- * Weighted least squares on log parameters by Levenberg-Marquardt with central-difference
- * Jacobians, a conditioning check and the parameter covariance: `apps/docs/docs/models/least-squares.md`.
- */
+/** Weighted least squares on log parameters by Levenberg-Marquardt with central-difference Jacobians, a conditioning check and the parameter covariance (`apps/docs/docs/models/least-squares.md`). */
 
 import { nth } from './errors.ts'
 import { type HuberLoss, huberCost, huberRoots } from './huber.ts'
@@ -96,15 +93,7 @@ export interface Identifiability {
   direction: number[]
 }
 
-/**
- * Covariance, collinearity and conditioning of the parameters from a weighted Jacobian (rows:
- * observations, columns: parameters, none of them zero),
- * `apps/docs/docs/models/least-squares.md`, "Identifiability of a weighted Jacobian". The design is singular when the smallest eigenvalue of the column-scaled information
- * is at most 1e-12 of the largest. The eigenvalues are floored at that value for the correlations,
- * which stay finite; a parameter whose share of the null direction would then raise its variance
- * inflation above 1 (squared component above 1e-12 of the largest eigenvalue) gets Infinity for
- * `standardUncertainty` and `varianceInflation`, and the condition number is Infinity.
- */
+/** From a weighted Jacobian (rows observations, columns parameters, none zero; `apps/docs/docs/models/least-squares.md`, "Identifiability of a weighted Jacobian"): singular when the smallest eigenvalue of the column-scaled information is at most 1e-12 of the largest; eigenvalues floored there keep the correlations finite, and a parameter whose null-direction share would raise its variance inflation above 1 gets Infinity for `standardUncertainty` and `varianceInflation`, the condition number Infinity. */
 export function identifiability(j: number[][]): Identifiability {
   const f = transposeTimes(j, j)
   const d = f.map((row, i) => Math.sqrt(nth(row, i)))
@@ -139,10 +128,7 @@ export function identifiability(j: number[][]): Identifiability {
 /** Why a fit cannot continue; passed to `LogFitInput.fail`. */
 export type LogFitFailure = 'unresolved' | 'ill-conditioned' | 'unreachable' | 'not-converged'
 
-/**
- * The rule that ended a fit: `stalled` for an accepted step whose cost fell by less than the
- * tolerance (or to 0), `smallStep` for a step below 1e-8 in every log parameter.
- */
+/** `stalled`: an accepted step whose cost fell by less than the tolerance (or to 0); `smallStep`: a step below 1e-8 in every log parameter. */
 export type LogFitStop = 'stalled' | 'smallStep'
 
 /** Inputs of `logLeastSquares`. */
@@ -159,20 +145,13 @@ export interface LogFitInput {
   floor: readonly number[]
   /** Predicted values at theta = 0, from the caller's own first evaluation. */
   first: readonly number[]
-  /**
-   * Predicted values at `trial`, or null for a rejected candidate; `current` is the accepted
-   * iterate. With `run`, only that run's values; otherwise all runs stacked.
-   */
+  /** Null for a rejected candidate, `current` the accepted iterate; with `run` only that run's values, otherwise all runs stacked. */
   predict: (trial: number[], current: number[], run?: number) => readonly number[] | null
   /** Observation count of each run in stacking order; one run of all observations when absent. */
   runs?: readonly number[]
   /** Whether parameter `j` moves run `run`'s predictions; its Jacobian entries elsewhere are 0. */
   moves?: (j: number, run: number) => boolean
-  /**
-   * Huber loss on the first `count` observations (the rest stay quadratic): residuals beyond
-   * `threshold` sigmas count linearly, `apps/docs/docs/models/least-squares.md`, "Huber loss".
-   * Needs `weighted`.
-   */
+  /** On the first `count` observations (the rest stay quadratic): residuals beyond `threshold` sigmas count linearly; needs `weighted` (`apps/docs/docs/models/least-squares.md`, "Huber loss"). */
   huber?: HuberLoss
   /** Iterations before the fit fails with `'not-converged'`. */
   maxIterations: number
@@ -188,11 +167,7 @@ export interface LogFitInput {
   ) => never
 }
 
-/**
- * Throws an `InputError` unless `maxIterations` is a positive integer and `maxCondition` is finite
- * and at least 1, the condition number of a one-parameter fit; for callers that refuse their options
- * before any run.
- */
+/** Throws an `InputError` unless `maxIterations` is a positive integer and `maxCondition` is finite and at least 1, the condition number of a one-parameter fit; for callers that refuse their options before any run. */
 export function checkLogFitLimits(maxIterations: number, maxCondition: number): void {
   need(Number.isInteger(maxIterations) && maxIterations > 0, {
     code: 'maxIterationsNotPositiveInteger',
@@ -220,10 +195,7 @@ export interface LogFitResult {
   iterations: number
   /** The rule that ended the loop. */
   stop: LogFitStop
-  /**
-   * Whether the set of down-weighted rows (residual beyond the Huber threshold) was the same
-   * before and after the last accepted step; true without `huber` and without an accepted step.
-   */
+  /** Whether the down-weighted rows (residual beyond the Huber threshold) stayed the same over the last accepted step; true without `huber` and without an accepted step. */
   weightsSettled: boolean
   /** Covariance of theta; absent with n = p and no standard uncertainties. */
   covariance?: number[][]
@@ -262,11 +234,7 @@ function jacobian(fit: LogFitInput, stacking: Stacking, at: number[]): number[][
   return observed.map((_, i) => columns.map((c) => nth(c, i)))
 }
 
-/**
- * Unresolved columns and the condition number of the column-scaled normal matrix
- * (`apps/docs/docs/models/least-squares.md`, "Conditioning check"); calls `fit.fail` on either
- * finding, else returns the condition number.
- */
+/** Unresolved columns and the condition number of the column-scaled normal matrix (`apps/docs/docs/models/least-squares.md`, "Conditioning check"); calls `fit.fail` on either finding, else returns the condition number. */
 function checkConditioning(fit: LogFitInput, j: number[][], at: number[]): number {
   const { floor, maxCondition, fail } = fit
   const norms = at.map((_, k) => Math.hypot(...j.map((row) => nth(row, k))))
@@ -396,10 +364,7 @@ function sameRows(m: Model, a: number[], b: number[]) {
   return m.roots(a).every((w, i) => w < 1 === nth(wb, i) < 1)
 }
 
-/**
- * Moves to the `accepted` parameters, prediction and cost and lowers the damping; `stalled`
- * when the cost fell by less than `tolerance` of itself, else the Jacobian there.
- */
+/** Moves to the `accepted` parameters, prediction and cost and lowers the damping; `stalled` when the cost fell by less than `tolerance` of itself, else the Jacobian there. */
 function acceptStep(
   m: Model,
   s: State,
@@ -437,10 +402,7 @@ function iterate(m: Model, s: State, tolerance: number): LogFitStop | undefined 
   return undefined
 }
 
-/**
- * Levenberg-Marquardt on the log parameters, starting at theta = 0
- * (`apps/docs/docs/models/least-squares.md`, "Levenberg-Marquardt step").
- */
+/** Levenberg-Marquardt on the log parameters, starting at theta = 0 (`apps/docs/docs/models/least-squares.md`, "Levenberg-Marquardt step"). */
 export function logLeastSquares(fit: LogFitInput): LogFitResult {
   checkLogFitLimits(fit.maxIterations, fit.maxCondition)
   const m = modelOf(fit)
