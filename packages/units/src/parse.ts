@@ -45,10 +45,7 @@ function withOneMark(body: string, sep: string, own: DecimalMark): string[] {
     : [decimal]
 }
 
-/**
- * The canonical mantissas the digits and marks of `body` can be read as: none when they are no
- * number, two (the decimal reading first) when a mark could be a decimal mark or a group.
- */
+/** The canonical mantissas the digits and marks of `body` can be read as: none when they are no number, two (the decimal reading first) when a mark could be a decimal mark or a group. */
 function readings(body: string, own: DecimalMark): string[] {
   const dots = body.split('.').length - 1
   const commas = body.split(',').length - 1
@@ -68,23 +65,7 @@ function settle(decimal: ParsedNumber, asGroup: ParsedNumber, range: NumberRange
   return d ? decimal : asGroup
 }
 
-/**
- * Reads typed or pasted text. Both marks are accepted whatever the language: "1,5" and "1.5".
- * `own` is the decimal mark of the language the text was typed in.
- *
- * - Empty text is empty. Letters (a unit), spaces and anything else that is no number are invalid;
- *   an exponent ("1e-3", "1,5E3") is read.
- * - A leading mark (",5"), a trailing mark ("1,") and a sign are read.
- * - With both marks the last one is the decimal mark and the other must group digits in threes
- *   ("1.234,5", "1,234.5").
- * - A mark that repeats groups digits in threes, which the language's own decimal mark never does
- *   ("1.234.567" in German, "1,234,567" in English); else the text is invalid.
- * - The language's own mark, once, is the decimal mark: "1.234" in English and "1,234" in German
- *   are 1.234.
- * - The other mark, once, is a decimal mark ("1,5" in English). With exactly three digits after
- *   it and one to three before ("1,234" in English, "1.234" in German) it could also group: the
- *   reading that falls inside `range` is taken when only one does, else the text is ambiguous.
- */
+/** Typed or pasted text with either mark, `own` the decimal mark of the language it was typed in: empty text is empty, anything that is no number (a unit, spaces) invalid, an exponent, a leading or trailing mark and a sign are read, with both marks the other must group digits in threes, and a repeated mark groups in threes, which the language's own decimal mark never does; every rule and the ambiguous `1,234` in `apps/docs/docs/translating.md`, "What a typed number means". */
 export function parseNumber(
   input: string,
   own: DecimalMark,

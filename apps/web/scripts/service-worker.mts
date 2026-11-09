@@ -1,10 +1,4 @@
-/**
- * Writes out/sw.js after `next build`: the build id as `version`, the files of .next/static and the
- * catalogue index as `precache`, the base path (`PAGES_BASE_PATH`, `''` at a domain root) as `base`,
- * the pages' trailing slash as `slash`, the site's edition (`next` or empty) as `edition`, every
- * export of src/lib/offline.ts (Node strips their types, so their source is JavaScript), then
- * src/service-worker.js.
- */
+/** Writes out/sw.js after `next build`: the build id as `version`, the files of .next/static and the catalogue index as `precache`, the base path (`PAGES_BASE_PATH`, `''` at a domain root) as `base`, the trailing slash as `slash`, the edition (`next` or empty) as `edition`, every export of src/lib/offline.ts (Node strips their types, so their source is JavaScript), then src/service-worker.js. */
 import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import * as offline from '../src/lib/offline.ts'
 

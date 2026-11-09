@@ -1,9 +1,4 @@
-/**
- * The tests of `pnpm run check:changed`: the test jobs CI's plan (apps/web/scripts/ci-plan.mts) gives a pull request
- * whose base is the merge base with `origin/main`, with uncommitted and untracked files counted as changed. The plan
- * tests the workspaces a change reaches, every group for a change outside them (the lockfile, a root config), and none
- * for prose only.
- */
+/** The test jobs CI's plan (apps/web/scripts/ci-plan.mts) gives a pull request based on the merge base with `origin/main`, uncommitted and untracked files counted as changed: the workspaces a change reaches, every group for a change outside them (the lockfile, a root config), none for prose only. */
 import { execFileSync } from 'node:child_process'
 import path from 'node:path'
 import { executable } from './executable.ts'

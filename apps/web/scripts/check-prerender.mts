@@ -1,13 +1,4 @@
-/**
- * Checks that the export in `pages/` (`pnpm run pages:build`, `pnpm run static:build`) holds the page and
- * the data file of the cartridge, bullet, powder, case, primer, target face, discipline and federation
- * lists and of every record whose data file the export holds. With PRERENDER=sample (the same value as
- * for the build) the cartridge records are those of `src/lib/prerender-sample.ts`. A record page must
- * carry the record's own title, description, Open Graph and Twitter tags, with the values of its data
- * file: its HTML holds nothing else of the record, the browser renders the rest.
- *
- *   node scripts/check-prerender.mts
- */
+/** Checks that the export in `pages/` holds each list's page and data file and every record page whose data file it holds (PRERENDER=sample, the same value as for the build: the cartridges of `src/lib/prerender-sample.ts`), each record page must carry its own title, description, Open Graph and Twitter tags from its data file, as its HTML holds nothing else of the record; node scripts/check-prerender.mts */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { type ManufacturerNames, noManufacturerNames } from '../src/lib/manufacturers.ts'
@@ -88,10 +79,7 @@ function hasOwnHead(
   })
 }
 
-/**
- * The routes the export must hold, those of them with no `index.html` or no `index.txt`, and the
- * record pages whose HTML lacks one of the record's own head values.
- */
+/** The routes the export must hold that have no `index.html` or no `index.txt`, and the record pages whose HTML lacks one of the record's own head values. */
 export function checkPages(site: string, env: Record<string, string | undefined> = process.env) {
   const expected: string[] = []
   const records: { route: string; kind: RecordKind; id: string }[] = []

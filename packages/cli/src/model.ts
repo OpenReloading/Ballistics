@@ -61,11 +61,7 @@ function sharedFiles() {
   }
 }
 
-/**
- * The model selected by `spec`: `m3`, the installed core model, or the path of a module that
- * exports `interior(load, options?)` with the signature of the core function. Throws a `UsageError`
- * for a module that cannot be loaded or has no such export.
- */
+/** `m3` (the installed core model) or the path of a module that exports `interior(load, options?)` with the signature of the core function; throws a `UsageError` for a module that cannot be loaded or has no such export. */
 export async function loadModel(spec: string): Promise<Model> {
   const { statistics, ballistics, files } = sharedFiles()
   // this file is built as .js and tested as .ts: the estimator has the same extension

@@ -31,8 +31,7 @@ async function Bullets() {
         <ServerDataError what="Bullet" />
       </>
     )
-  // the list renders its own page bar: the count sits in the bar's status line
-  // the cartridges of the "Fits cartridge" filter; without them the list has no such filter
+  // the list renders its own page bar, the count in its status line; these are the cartridges of the "Fits cartridge" filter, without which the list has no such filter
   const cartridges = (c.status === 'ok' ? c.data : []).flatMap((x) => {
     const fit = fitOf(summaryFitSource(x))
     return fit ? [{ id: x.id, name: x.name, fit }] : []

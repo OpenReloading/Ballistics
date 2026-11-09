@@ -1,7 +1,4 @@
-// Writes the index of the research pages, `docs/research/**/*.md`, from their front matter to
-// static/research-index.json and static/llms.txt, and checks the front matter of the literature
-// notes (`docs/research/literature/`, research-index.test.mts). Run by `site:build` before
-// `docusaurus build`: `node scripts/research-index.mts`.
+// Writes the index of the research pages under `docs/research/` from their front matter to static/research-index.json and static/llms.txt, and checks the front matter of the literature notes (`docs/research/literature/`, research-index.test.mts); `site:build` runs it before `docusaurus build`
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { parse } from 'yaml'
 

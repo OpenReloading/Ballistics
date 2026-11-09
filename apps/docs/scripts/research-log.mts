@@ -1,6 +1,4 @@
-// Checks of the research log entries, `docs/research/*.md`, run by research-log.test.mts: every entry has
-// the sections of the template, the fields with a fixed answer start with one of the answers, and the
-// files named under "Where in the app" exist.
+// Checks of the research log entries (`docs/research/*.md`), run by research-log.test.mts: the sections of the template, fields with a fixed answer starting with one, and the files named under "Where in the app" existing
 import { readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 

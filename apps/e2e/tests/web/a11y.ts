@@ -6,12 +6,7 @@ import type { Page } from '@playwright/test'
 /** The longest a scan waits for the page to stop moving (ms): Playwright's default expect timeout. */
 const settleTimeout = 5000
 
-/**
- * The `AxeBuilder` of `@axe-core/playwright` that scans once no transition or finite animation of the page runs:
- * axe reads colors as painted, and a color midway through a transition (after a color scheme switch) fails
- * color-contrast. Endless animations (a loader) and paused ones do not hold the scan. Still moving after
- * `settleTimeout`: the scan fails and names what runs.
- */
+/** The `AxeBuilder` of `@axe-core/playwright`, scanning once no transition or finite animation runs, as axe reads colors as painted and a color midway through a transition fails color-contrast; endless and paused animations do not hold it, and still moving after `settleTimeout` the scan fails naming what runs. */
 export class AxeBuilder extends Base {
   readonly #page: Page
 
@@ -52,11 +47,7 @@ export class AxeBuilder extends Base {
   }
 }
 
-/**
- * An axe result listed in `a11y-lists.json`: `rule` is the axe rule id, `node` a part of the node's
- * selector or markup, which follow the `data-testid` of its closest marked ancestor, `where` the start of the
- * route or state name of the sweep, or several (every one when absent).
- */
+/** `rule` the axe rule id, `node` a part of the node's selector or markup (which follow the `data-testid` of its closest marked ancestor), `where` the start of the sweep's route or state name, or several (every one when absent). */
 type Entry = {
   rule: string
   node: string
@@ -65,11 +56,7 @@ type Entry = {
   workaround?: string
 }
 
-/**
- * `known`: failures not fixed yet (a violation, or a "needs review" result that review showed to
- * fail), each with its reason and the way round it. `reviewed`: "needs review" results a person has
- * read and found to pass, each with the reason.
- */
+/** `known`: failures not fixed yet (a violation, or a "needs review" result that review showed to fail), each with its reason and the way round it; `reviewed`: "needs review" results a person has read and found to pass, with the reason. */
 const lists: { known: Entry[]; reviewed: Entry[] } = JSON.parse(
   readFileSync(path.join(__dirname, 'a11y-lists.json'), 'utf8'),
 )
@@ -102,10 +89,7 @@ const why = (n: NodeResult) =>
     .map((c) => c.data?.messageKey ?? (c.data?.contrastRatio ? `${c.data.contrastRatio}:1` : c.id))
     .join(', ')
 
-/**
- * Runs axe on the page (or on `include`) and gives one line per violation and per "needs review"
- * result that `a11y-lists.json` does not list, naming rule and node.
- */
+/** One line per violation and per "needs review" result that `a11y-lists.json` does not list, naming rule and node. */
 export async function problems(page: Page, where: string, include?: string) {
   const builder = new AxeBuilder({ page }).withTags(tags)
   const { violations, incomplete } = await (include ? builder.include(include) : builder).analyze()

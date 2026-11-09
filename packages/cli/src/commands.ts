@@ -68,10 +68,7 @@ function readJson(path: string): unknown {
   }
 }
 
-/**
- * The source records of every root, by id, as the published load files resolve them. A source file
- * that does not read or parse is left out: the record check reports it.
- */
+/** As the published load files resolve them; a source file that does not read or parse is left out, as the record check reports it. */
 function sourcesOf(roots: readonly string[]) {
   const byId = new Map<string, SourceRecord>()
   for (const root of roots) {
@@ -86,10 +83,7 @@ function sourcesOf(roots: readonly string[]) {
   return { byId, cited: new Set<string>(), embedded: new Map<string, Set<string>>() }
 }
 
-/**
- * The rows of the catalogue's published load files (`catalogue`), or of the files of a folder laid
- * out as `records/loads/` only, their source references resolved from the records' sources.
- */
+/** Of the catalogue's published load files (`catalogue`), or of a folder laid out as `records/loads/` only, their source references resolved from the records' sources. */
 function catalogueRows(options: Options) {
   const folder = options.rows === 'catalogue' ? undefined : resolve(options.rows)
   if (folder !== undefined && basename(folder) !== 'loads')

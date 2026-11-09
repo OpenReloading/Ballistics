@@ -11,10 +11,7 @@ declare const marked: unique symbol
 /** An English text marked for extraction by {@link msg}: `t` takes it where the text is not a literal at the call. */
 export type Message = string & { readonly [marked]: true }
 
-/**
- * Marks an English text as a message of the catalogue (data such as page labels; `t` translates it
- * where it is shown). It returns the text itself.
- */
+/** Marks an English text as a message of the catalogue (data such as page labels, which `t` translates where shown) and returns the text itself. */
 // the brand has no runtime form: the text stays a plain string
 export const msg = (text: string) => text as Message
 
@@ -44,10 +41,7 @@ export interface Translator {
 const numberText = (language: string, n: number) =>
   new Intl.NumberFormat(language, { useGrouping: false, maximumFractionDigits: 20 }).format(n)
 
-/**
- * The English text of a key. A key may start with a context and U+0004 ('material\u0004Brass'),
- * so one English word with two senses has two catalogue entries; English shows the text after it.
- */
+/** A key may start with a context and U+0004 ('material\u0004Brass'), so one English word with two senses has two catalogue entries; English shows the text after it. */
 const englishOf = (text: string) => text.slice(text.indexOf('\u0004') + 1)
 
 const fill = (text: string, values: Values | undefined, language: string) =>
@@ -58,11 +52,7 @@ const fill = (text: string, values: Values | undefined, language: string) =>
       })
     : text
 
-/**
- * The translation functions for `catalogue` of `language`. A text the catalogue lacks is shown as
- * written in the source (English), so nothing is ever blank or a key; without a catalogue every
- * text is English.
- */
+/** A text the catalogue lacks is shown as written in the source (English), so nothing is ever blank or a key; without a catalogue every text is English. */
 export function translator(catalogue?: Catalogue, language = 'en'): Translator {
   const shown = catalogue ? language : 'en'
   const rules = new Intl.PluralRules(shown)
@@ -88,8 +78,5 @@ export function translator(catalogue?: Catalogue, language = 'en'): Translator {
 /** A text written with the translator where it is shown, so a stored one follows a language change. */
 export type Say = (t: Translator['t']) => string
 
-/**
- * The English functions: what a file, the clipboard or a link carries whatever language is shown,
- * and the text of a test.
- */
+/** What a file, the clipboard or a link carries whatever language is shown, and the text of a test. */
 export const english: Translator = translator()

@@ -1,6 +1,4 @@
-// Writes packages/drawing/src/core/advances.json: the advance of each drawing character in the drawing font
-// (src/app/fonts/Inter-Regular.woff2) in em, measured with canvas measureText in Chromium, kerning
-// off as in the drawing CSS. Run after changing the font: node scripts/glyph-advances.mts
+// Writes packages/drawing/src/core/advances.json: the advance of each drawing character in the drawing font (src/app/fonts/Inter-Regular.woff2) in em, by canvas measureText in Chromium, kerning off as in the drawing CSS; run after changing the font: node scripts/glyph-advances.mts
 import { readFileSync, writeFileSync } from 'node:fs'
 import { chromium } from '@playwright/test'
 

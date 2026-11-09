@@ -3,10 +3,7 @@ import type { Locator } from '@playwright/test'
 /** A keyboard stop: its name and its place in the visual order, `[block, y, x]`. */
 export type Stop = { name: string; key: number[] }
 
-/**
- * The steps of `stops` that go back in the visual order: to an earlier block, or in one block to a
- * line above, or on one line to the left. Centres within 8 px count as one line.
- */
+/** Steps that go back in the visual order: to an earlier block, in one block to a line above, or on one line to the left; centres within 8 px count as one line. */
 export function inversions(stops: Stop[]) {
   const back = (a: number[], b: number[]) => {
     for (let i = 0; i < a.length; i++) {
@@ -21,12 +18,7 @@ export function inversions(stops: Stop[]) {
   })
 }
 
-/**
- * Tabs through the workbench's load form from its first control and gives each stop until the focus
- * leaves it. The visual blocks: the pinned row, the card columns left to right (one flow where they
- * have no box) and the Run bar; `y` in the form's own coordinates, so a scroll between stops changes
- * nothing.
- */
+/** From the form's first control, each stop until the focus leaves it; the blocks are the pinned row, the card columns left to right (one flow where they have no box) and the Run bar, `y` in the form's own coordinates so a scroll between stops changes nothing. */
 export async function tabStops(form: Locator) {
   const page = form.page()
   await form.evaluate((f) => f.querySelector<HTMLElement>('input, button, [tabindex="0"]')?.focus())

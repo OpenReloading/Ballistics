@@ -3,10 +3,7 @@ import { basename, join } from 'node:path'
 import { resolveRecord, type SourceIndex } from '@open-reloading/catalog'
 import type { z } from 'zod'
 
-/**
- * Where reading adds its errors, the source records that resolve references, where given, and
- * whether the kind's directory may be missing from every root.
- */
+/** Where reading adds its errors, the source records that resolve references, where given, and whether the kind's directory may be missing from every root. */
 type ReadContext = { errors: string[]; sources?: SourceIndex; optional?: boolean }
 
 /** Parses the JSON file at `path`, or adds an `invalid JSON` error under `where`. */
@@ -32,10 +29,7 @@ function checkRecordId(id: string, where: string, owner: Map<string, string>, er
   }
 }
 
-/**
- * Parses and validates one record file, its source references resolved from `sources` where given,
- * or adds its errors and returns undefined.
- */
+/** Parses and validates one record file, its source references resolved from `sources` where given, or adds its errors and returns undefined. */
 function readRecordFile<T>(
   path: string,
   where: string,
@@ -64,9 +58,7 @@ export function readKind<T extends { id: string }>(
   context: ReadContext,
 ): T[] {
   const { errors, optional } = context
-  // Every kind has a directory in the first root (an empty one holds a .gitkeep): a missing one is an
-  // error, so a wrong or partial records root cannot pass as empty data. Further roots may lack it,
-  // and so may every root for an `optional` kind.
+  // Every kind has a directory in the first root (an empty one holds a .gitkeep), so a wrong or partial records root cannot pass as empty data; further roots may lack it, and so may every root for an `optional` kind.
   const records: T[] = []
   const owner = new Map<string, string>()
   roots.forEach((root, rootIndex) => {

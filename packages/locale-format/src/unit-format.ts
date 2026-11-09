@@ -1,11 +1,7 @@
 import type { Quantity, UnitSystem } from './display-units.ts'
 import { decimalMark, formatNumber } from './number.ts'
 
-/**
- * A formatted number in the unit `symbol`: inch values below 1 without the zero before the decimal
- * mark (".308", "-.25", as the drawings print them; English only: German writes the zero) and a
- * zero as "0"; other units unchanged. Takes the text with either mark.
- */
+/** Inch values below 1 without the zero before the decimal mark (".308", "-.25", as the drawings print them; English only, German writes the zero) and a zero as "0"; other units unchanged; takes the text with either mark. */
 export function inchText(text: string, symbol: string, language: string): string {
   if (symbol !== 'in') return text
   if (/^-?0[.,]0*$/.test(text)) return '0'

@@ -48,10 +48,7 @@ function readLoadTable(file: string, entry: unknown, tables: LoadTables, found: 
       found.push(`load-tables.json: ${[file, ...issue.path].join('.')}: ${issue.message}`)
 }
 
-/**
- * The load tables listed in `load-tables.json` of a records folder (none without it). An entry
- * that breaks `loadTable` is left out and adds its issues to `errors`; without `errors` it throws.
- */
+/** Listed in `load-tables.json` of a records folder (none without it); an entry that breaks `loadTable` is left out and adds its issues to `errors`, and without `errors` it throws. */
 export function readLoadTables(dir: string, errors?: string[]): LoadTables {
   const path = join(dir, 'load-tables.json')
   if (!existsSync(path)) return {}
@@ -83,11 +80,7 @@ function readRootsLoadTables(roots: readonly string[], errors: string[]): LoadTa
   return tables
 }
 
-/**
- * The published load files of every roots' `loads/<cartridge id>/` folder, source references
- * resolved. A missing `loads/` folder or a root without one is no error: the plain `Load` records
- * in `loads/` itself are another kind.
- */
+/** Of every root's `loads/<cartridge id>/` folder, source references resolved; a missing `loads/` folder is no error, as the plain `Load` records in `loads/` itself are another kind. */
 export function readPublishedLoads(
   roots: string[],
   sources: SourceIndex,
@@ -109,11 +102,7 @@ export function readPublishedLoads(
     )
 }
 
-/**
- * What {@link readRecords} returns: the records, the published load files and the error messages.
- * Valid data has no errors. The published loads stay out of the bundle: they are too many for it,
- * and the API serves them by cartridge.
- */
+/** What {@link readRecords} returns; valid data has no errors, and the published loads stay out of the bundle, as they are too many for it and the API serves them by cartridge. */
 export type ReadRecordsResult = {
   bundle: Bundle
   publishedLoads: PublishedLoads[]
@@ -154,11 +143,7 @@ function readBundle(
   return { bundle, published }
 }
 
-/**
- * Reads, validates and cross-checks every record under `root`, or under each of several roots read
- * as one set (the first holds every kind directory; the `load-tables.json` of every root lists
- * tables). Without `root` it reads the `records/` folder of the catalog package.
- */
+/** Under `root`, or under several roots read as one set (the first holds every kind directory, the `load-tables.json` of every root lists tables); without `root` the `records/` folder of the catalog package. */
 export function readRecords(root: string | readonly string[] = recordsDir): ReadRecordsResult {
   const roots = typeof root === 'string' ? [root] : [...root]
   if (roots.length === 0) throw new Error('readRecords needs at least one records root')

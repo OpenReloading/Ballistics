@@ -8,12 +8,7 @@ export interface RepoFacts {
 /** The widget's own request, the build's `fetch` unless a test passes one. */
 type Fetch = (url: string, init: RequestInit) => Promise<Response>
 
-/**
- * Stars, forks and the latest release tag (else the newest tag) of a GitHub repository, read at
- * build time so the site makes no request to GitHub from the browser. Any failure (offline, rate
- * limit, timeout) leaves that fact out and never fails the build. `token` lifts the anonymous
- * rate limit.
- */
+/** Read at build time so the site makes no request to GitHub from the browser; any failure (offline, rate limit, timeout) leaves that fact out and never fails the build; `token` lifts the anonymous rate limit. */
 export async function repoFacts(
   repo: string,
   token = process.env.GITHUB_TOKEN,

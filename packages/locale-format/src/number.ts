@@ -1,8 +1,4 @@
-/**
- * Numbers in a language. A number's canonical text has a point as the decimal mark and no
- * grouping, what `Number(text)` reads: it is what is stored, linked, exported and computed with.
- * Only text on screen carries the language's decimal mark.
- */
+/** A number's canonical text has a point as the decimal mark and no grouping, what `Number(text)` reads, and is stored, linked, exported and computed with; only text on screen carries the language's decimal mark. */
 
 const marks = new Map<string, '.' | ','>()
 
@@ -19,29 +15,19 @@ export function decimalMark(language: string): '.' | ',' {
   return mark
 }
 
-/**
- * A canonical number text on screen: its point written as the language's decimal mark. A text with
- * no point or more than one (not a number) stays as it is.
- */
+/** A canonical number text on screen: its point written as the language's decimal mark; a text with no point or more than one (not a number) stays as it is. */
 export function localizeNumber(text: string, language: string): string {
   const mark = decimalMark(language)
   return mark === '.' || text.split('.').length !== 2 ? text : text.replace('.', mark)
 }
 
-/**
- * Text made of numbers written with a point: each point between digits written as the language's
- * decimal mark. For text that is only numbers and their units: a name or an identifier such as
- * "2.21.1" is no such text.
- */
+/** Each point between digits written as the language's decimal mark, for text of only numbers and their units: a name or an identifier such as "2.21.1" is no such text. */
 export function localizeDecimals(text: string, language: string): string {
   const mark = decimalMark(language)
   return mark === '.' ? text : text.replace(/(?<=\d)\.(?=\d)/g, mark)
 }
 
-/**
- * Text of numbers and their units as shown on screen ("2,40 gr"), with each decimal mark between
- * digits written as a point, for a file or the clipboard: the inverse of {@link localizeDecimals}.
- */
+/** Each decimal mark between digits written as a point, for a file or the clipboard: the inverse of {@link localizeDecimals}. */
 export function canonicalNumberText(text: string, language: string): string {
   const mark = decimalMark(language)
   return mark === '.' ? text : text.replaceAll(new RegExp(`(?<=\\d)\\${mark}(?=\\d)`, 'g'), '.')

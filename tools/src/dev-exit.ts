@@ -1,9 +1,6 @@
 import type { ChildProcess } from 'node:child_process'
 
-/**
- * Resolves when a development server exits on its own with code 0 or after `stopped()` (a signal
- * was passed on to it); rejects on any other exit, such as a port already in use.
- */
+/** When a development server exits on its own with code 0 or after `stopped()` (a signal was passed on to it); rejects on any other exit, such as a port already in use. */
 export function devExit(child: ChildProcess, stopped: () => boolean): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     child
@@ -16,11 +13,7 @@ export function devExit(child: ChildProcess, stopped: () => boolean): Promise<vo
   })
 }
 
-/**
- * Registers SIGINT and SIGTERM handlers that mark the run as stopped and pass the signal on to the
- * process group `group()` returns, none while it returns `undefined` (before the server started).
- * A group that already exited is ignored, so cleanup still runs. Returns `stopped()`, which `devExit` takes, and the function that removes the handlers.
- */
+/** Registers SIGINT and SIGTERM handlers that mark the run stopped and pass the signal on to the process group `group()` returns, none while it returns `undefined` (before the server started), a group that already exited ignored so cleanup still runs; returns `stopped()` for `devExit` and the function that removes the handlers. */
 export function stopOnSignal(
   group: () => number | undefined,
   kill: (pid: number, signal: NodeJS.Signals) => unknown = process.kill,

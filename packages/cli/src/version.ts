@@ -31,10 +31,7 @@ export function inputsOf(rows: readonly Row[], files: readonly Uint8Array[], rec
   }
 }
 
-/**
- * The model version: SHA-256 over the sorted lines `<label> <sha256 of the file>` of the built
- * sources the evaluation reads (`model.files`), and the `rows` and `records` fingerprints.
- */
+/** SHA-256 over the sorted lines `<label> <sha256 of the file>` of the built sources the evaluation reads (`model.files`), and the `rows` and `records` fingerprints. */
 export function modelVersion(model: Model, inputs: ReturnType<typeof inputsOf>): string {
   const lines = model.files.map((f) => `${f.label} ${sha256(readFileSync(f.path))}`)
   return sha256(

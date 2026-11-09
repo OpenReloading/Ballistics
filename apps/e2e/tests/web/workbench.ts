@@ -12,18 +12,14 @@ export const formValues = (page: Page) =>
       els.map((e) => [e.getAttribute('aria-label') ?? '', (e as HTMLInputElement).value]),
     )
 
-/**
- * Clicks an item of the page bar's Open menu that starts a new load on the fresh workbench, named
- * `open` in the page's language.
- */
+/** An item of the page bar's Open menu that starts a new load on the fresh workbench, `open` named in the page's language. */
 async function openItem(page: Page, name: string | RegExp, open = 'Open') {
   const item = page.getByRole('menuitem', { name })
   // the new load replaces the start card, at once
   const startCard = page.locator('.start-card')
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' })
   await startCard.waitFor({ state: 'attached' })
-  // retried: the menu can close again before the item's click while an applied example still loads.
-  // A click that lands after its timeout has started the load: another would ask to discard it
+  // retried: the menu can close again before the item's click while an applied example still loads; a click that lands after its timeout has started the load, and another would ask to discard it
   await expect(async () => {
     if ((await startCard.count()) === 0) return
     if (!(await item.isVisible())) await (await barButton(page, open)).click({ timeout: 1000 })

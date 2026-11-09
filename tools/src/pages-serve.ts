@@ -1,8 +1,4 @@
-/**
- * Serves `pages/` (written by `pages.ts`) as a static host does, under `PAGES_BASE_PATH`, on
- * `PORT` (default 3003): a directory answers its `index.html`, a missing file the site's
- * `404.html` with status 404. For local review and the e2e project `pages`.
- */
+/** Serves `pages/` (written by `pages.ts`) as a static host does, under `PAGES_BASE_PATH` on `PORT` (default 3003): a directory answers its `index.html`, a missing file the site's `404.html` with status 404; for local review and the e2e project `pages`. */
 import { createReadStream, statSync } from 'node:fs'
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 import path from 'node:path'
@@ -24,10 +20,7 @@ const types: Record<string, string> = {
   '.webmanifest': 'application/manifest+json',
 }
 
-/**
- * The file or directory for a URL path under `base` in `root` (a path ending in its separator),
- * undefined outside them, for a malformed escape or when there is none.
- */
+/** Under `base` in `root` (a path ending in its separator); undefined outside them, for a malformed escape or when there is none. */
 export function find(urlPath: string, root: string, base: string) {
   if (urlPath !== base && !urlPath.startsWith(`${base}/`)) return
   let rest: string
@@ -56,10 +49,7 @@ function statOf(file: string) {
   }
 }
 
-/**
- * The request handler for `root` under `base`: 400 for a request target that is no path, the file,
- * else `404.html` with status 404, 500 where a found file cannot be read.
- */
+/** 400 for a request target that is no path, the file, else `404.html` with status 404, 500 where a found file cannot be read. */
 export const serve =
   (root: string, base: string) => (req: IncomingMessage, res: ServerResponse) => {
     const url = URL.parse(req.url ?? '/', 'http://localhost')

@@ -1,6 +1,4 @@
-// Checks of the bibliography and the model pages against the records and the code, run by
-// bibliography.test.mts: the sources the records cite, the code line under each display equation,
-// and the core files the model pages name.
+// Checks of the bibliography and the model pages against the records and the code, run by bibliography.test.mts: the cited sources, the code line under each display equation and the core files the model pages name
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -30,10 +28,7 @@ function entryIds(bibliography: string): Set<string> {
   return new Set([...bibliography.matchAll(/<a id="([^"]+)"><\/a>/g)].map((m) => m[1]))
 }
 
-/**
- * The sources without a bibliography entry. A source matches by URL or DOI; a C.I.P. sheet matches
- * the entry `cip-tdcc`; a source with neither URL nor DOI matches by its title.
- */
+/** A source matches by URL or DOI, a C.I.P. sheet the entry `cip-tdcc`, a source with neither by its title. */
 export function missingSources(sources: RecordSource[], bibliography: string): RecordSource[] {
   const urls = new Set((bibliography.match(urlPattern) ?? []).map(normalUrl))
   const entryDois = new Set(dois(bibliography))
@@ -72,11 +67,7 @@ export function recordSources(dir: string): RecordSource[] {
   return found
 }
 
-/**
- * Findings on the display equations of a page: each `$$` block must be followed by a line that
- * starts with `Code:` and names at least one file; the files must exist under `root`, and each other
- * backticked name on the line must occur in one of them.
- */
+/** Each `$$` block must be followed by a line starting with `Code:` that names at least one file, each existing under `root`, and every other backticked name on the line must occur in one of them. */
 export function equationErrors(page: string, root: string): string[] {
   const lines = page.split('\n')
   const errors: string[] = []

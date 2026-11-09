@@ -2,16 +2,10 @@ import type { Page } from '@playwright/test'
 
 const controls = 'main :is(button, [role=tab], input, label, dt, dd, .field-unit)'
 
-/**
- * Buttons, tabs, fields, labels, units and values whose text overflows their own box or whose box is
- * cut by an ancestor that clips; what a scroll container holds counts as scrolled, not cut.
- */
+/** Buttons, tabs, fields, labels, units and values whose text overflows their own box or whose box a clipping ancestor cuts; what a scroll container holds counts as scrolled, not cut. */
 export const cut = (page: Page) => cutIn(page, { strict: false, exempt: '', controls })
 
-/**
- * Every field and every element of `main` with text of its own that overflows its box sideways or
- * downwards or is cut by an ancestor, except inside what `exempt` matches.
- */
+/** Every field and every element of `main` with text of its own that overflows its box sideways or downwards or is cut by an ancestor, except inside what `exempt` matches. */
 export const cutText = (page: Page, exempt: string) =>
   cutIn(page, { strict: true, exempt, controls })
 

@@ -1,8 +1,4 @@
-/**
- * `pnpm audit` with an allowlist: fails on every high or critical advisory except those in
- * `allowed`. An allowed advisory fails again once a patched version exists, and an allowed
- * advisory pnpm no longer reports fails too, so the list cannot go stale.
- */
+/** Fails on every high or critical advisory except those in `allowed`, and on an allowed one again once a patched version exists or pnpm no longer reports it, so the list cannot go stale. */
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { executable } from './executable.ts'

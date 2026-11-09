@@ -4,10 +4,7 @@ import { storageName } from '../lib/edition.ts'
 import { setShownLanguage } from './shown.ts'
 import { type Catalogue, english as englishText, type Translator, translator } from './translate.ts'
 
-/**
- * The languages of the interface. English is the source text of the code and has no catalogue;
- * every other language names its file in `loaders`.
- */
+/** English is the source text of the code and has no catalogue; every other language names its file in `loaders`. */
 export const languages = [
   { code: 'en', name: 'English' },
   { code: 'de', name: 'Deutsch' },
@@ -24,10 +21,7 @@ const loaders: Record<Exclude<Language, 'en'>, () => Promise<{ default: Catalogu
 const loadMessages = () =>
   import('../lib/core-message-table.ts').then((m) => m.installCoreMessages())
 
-/**
- * The words of the typed refusals, loaded in every language once a page has started, so that no
- * page carries them in its own JavaScript; the page renders again with them.
- */
+/** Loaded in every language once a page has started, so that no page carries them in its own JavaScript; the page renders again with them. */
 const loadRefusalWords = () =>
   import('../lib/refusal-words.ts').then(
     (m) => {
@@ -83,10 +77,7 @@ export function chooseLanguage(code: Language) {
   void show(code)
 }
 
-/**
- * Applies the stored language and follows a change made in another tab. Called after mounting: the
- * server render and hydration are English, as the stored choice is unknown to them.
- */
+/** Called after mounting, as the server render and hydration are English and do not know the stored choice; follows a change made in another tab. */
 export function startLanguage() {
   let stored: string | null = null
   try {

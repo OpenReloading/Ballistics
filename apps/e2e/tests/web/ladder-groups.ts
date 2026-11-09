@@ -51,11 +51,7 @@ async function openTab(page: Page, name: string) {
   await expect(page.getByRole('tabpanel', { name })).toBeVisible()
 }
 
-/**
- * A ladder of five steps with three groups each, the shots linked to their chronograph strings
- * but those of the first group of each of the first three steps, on the Groups tab with its
- * ladder panel open.
- */
+/** Five steps with three groups each, the shots linked to their chronograph strings except those of the first group of each of the first three steps, on the Groups tab with its ladder panel open. */
 export async function openLadderGroups(page: Page) {
   await page.addInitScript(() => {
     ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>

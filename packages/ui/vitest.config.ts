@@ -14,10 +14,7 @@ const browsers = {
   touch: { browser: 'webkit', contextOptions: { hasTouch: true, isMobile: true } },
 } as const
 
-/**
- * Every story runs as a test, axe included, in a project per width: Storybook sizes each story's frame from its
- * viewport (1200 px by default), so the width reaches the stories as `__STORY_WIDTH__` (.storybook/preview.tsx).
- */
+/** Every story runs as a test, axe included, in a project per width: Storybook sizes each story's frame from its viewport (1200 px by default), so the width reaches the stories as `__STORY_WIDTH__` (.storybook/preview.tsx). */
 const stories = (width: number, schemes: (keyof typeof browsers)[]) => ({
   plugins: [storybookTest({ configDir })],
   define: { __STORY_WIDTH__: String(width) },

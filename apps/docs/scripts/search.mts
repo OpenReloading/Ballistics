@@ -1,15 +1,9 @@
-// Writes the Pagefind indexes of the built site: the docs pages and one record per operation of the
-// REST page (rest/, rendered in the browser, so its HTML has no text to index) to <outDir>/pagefind/,
-// the TypeDoc pages (library/) to <outDir>/pagefind-library/. Runs after `docusaurus build`
-// (postBuild in the config): `node scripts/search.mts <outDir>`.
+// Pagefind indexes of the built site: the docs pages and one record per REST operation (rest/ renders in the browser, so its HTML has no text) to <outDir>/pagefind/, the TypeDoc pages (library/) to <outDir>/pagefind-library/; postBuild runs `node scripts/search.mts <outDir>`
 import { readdirSync, readFileSync } from 'node:fs'
 import { join, sep } from 'node:path'
 import * as pagefind from 'pagefind'
 
-/**
- * Main content of each site, `site` its value in the `site` filter of the search box. `weight`
- * scales its words, with the merge weight of the library index (src/theme/SearchBar.tsx).
- */
+/** `site` is its value in the search box's `site` filter; `weight` scales its words, with the merge weight of the library index (src/theme/SearchBar.tsx). */
 const roots = [
   { prefix: 'library/', open: '<div class="col-content">', site: 'Library', weight: '0.5' },
   { prefix: '', open: '<div class="theme-doc-markdown markdown">', site: 'Docs', weight: '10' },
@@ -69,11 +63,7 @@ async function createIndex(): Promise<pagefind.PagefindIndex> {
   return index
 }
 
-/**
- * Indexes the site built into `outDir`. The library has its own index, which the search box merges
- * with a lower weight: its short generated pages, many times the docs pages in number, otherwise
- * rank above the model pages.
- */
+/** The library has its own index, merged at a lower weight, as its short generated pages, many times the docs pages in number, would otherwise rank above the model pages. */
 async function writeSearchIndex(outDir: string): Promise<void> {
   try {
     const site = await createIndex()

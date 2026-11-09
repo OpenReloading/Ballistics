@@ -36,11 +36,7 @@ interface Props {
   mobile?: boolean
 }
 
-/**
- * Navbar item like Material for MkDocs' source widget: git icon, repository name, and under it
- * the latest release tag, stars and forks, all one link. Static markup: the facts are as fresh as
- * the last build, and without them the link shows icon and name only.
- */
+/** Like Material for MkDocs' source widget, all one link; static markup, so the facts are as fresh as the last build, and without them the link shows icon and name only. */
 export default function RepoWidget({ repo, facts = {}, mobile }: Props): ReactNode {
   const link = (
     <a

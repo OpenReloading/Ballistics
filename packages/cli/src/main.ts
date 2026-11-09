@@ -214,10 +214,7 @@ function failure(error: unknown): {
   }
 }
 
-/**
- * The error of the command line `argv` on stderr: one JSON object for `--json` or a script, the
- * text line on a terminal; never a stack trace. Returns the exit code.
- */
+/** One JSON object for `--json` or a script, the text line on a terminal, never a stack trace; returns the exit code. */
 export function report(error: unknown, argv: string[], io: Io): number {
   const { kind, code, message, details } = failure(error)
   const json = argv.includes('--json') || !io.tty

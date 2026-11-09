@@ -21,10 +21,7 @@ const source = new URL('tokens/resolver.json', root)
 const darkScheme = ':root[data-mantine-color-scheme="dark"], :root[data-theme="dark"]'
 const systemScheme = ':root:not([data-mantine-color-scheme], [data-theme])'
 
-/**
- * WCAG 2.2 pairs, checked in each scheme: text at 4.5:1, and at 3:1 (`largeText`) the control edges and the accent as a
- * focus ring and a checked fill, which axe does not see.
- */
+/** WCAG 2.2 pairs, checked in each scheme: text at 4.5:1, and at 3:1 (`largeText`) the control edges and the accent as a focus ring and a checked fill, which axe does not see. */
 const contrastPairs = [
   ...[
     ['ink', 'page'],
@@ -159,17 +156,13 @@ function mantineTheme(tokens: TokenNormalizedSet, colors: Colors) {
       light: blueShade(colors.light['accent']),
       dark: blueShade(colors.dark['accent']),
     },
-    // no autoContrast: Mantine picks its text from the light shade in both schemes; the scheme's accent text is
-    // --mantine-primary-color-contrast (below), which `ui` gives the filled controls
+    // no autoContrast: Mantine picks its text from the light shade in both schemes; the scheme's accent text is --mantine-primary-color-contrast (below), which `ui` gives the filled controls
     white: colors.light['on-accent'],
     black: colors.dark['on-accent'],
   }
 }
 
-/**
- * The Mantine CSS variables that the theme cannot set, by the token role each takes. The input edges and fills and the
- * table borders read Mantine's gray and dark shades, which mix control edges and separators: `ui` sets those.
- */
+/** By the token role each takes; the input edges and fills and the table borders read Mantine's gray and dark shades, which mix control edges and separators, so `ui` sets those. */
 const mantineRoles = {
   '--mantine-color-body': 'page',
   '--mantine-color-text': 'ink',
