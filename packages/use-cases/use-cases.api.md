@@ -495,9 +495,6 @@ export interface RangeStringsFitRequest extends z.input<typeof rangeStringsFitBo
 }
 
 // @public
-export const rangeStringsFitResponse: z.ZodType;
-
-// @public
 export const rangeStringsLimits: {
     readonly entries: 20;
     readonly candidates: 10;
@@ -526,9 +523,6 @@ export const rangeStringsPlanExample: RangeStringsPlanRequest;
 // @public
 export interface RangeStringsPlanRequest extends z.input<typeof rangeStringsPlanBody> {
 }
-
-// @public
-export const rangeStringsPlanResponse: z.ZodType;
 
 // @public
 export class RecordNotFound extends Error {
@@ -862,9 +856,6 @@ export interface TrajectoryRequest extends z.input<typeof trajectoryBody> {
 }
 
 // @public
-export const trajectoryResponse: z.ZodType;
-
-// @public
 export interface TruingBody extends z.infer<typeof truingBody> {
 }
 
@@ -903,9 +894,6 @@ export const truingExample: TruingRequest;
 // @public
 export interface TruingRequest extends z.input<typeof truingBody> {
 }
-
-// @public
-export const truingResponse: z.ZodType;
 
 // @public
 export type UseCaseIssue = Diagnostic<'resultNotFinite', {

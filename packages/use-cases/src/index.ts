@@ -8,13 +8,7 @@ export {
   chargeTargetExample,
   chargeTargetKinds,
 } from './charge-schema.ts'
-export {
-  rangeStringsFitResponse,
-  rangeStringsPlanResponse,
-  stabilityResponse,
-  trajectoryResponse,
-  truingResponse,
-} from './exterior-response.ts'
+export { stabilityResponse } from './exterior-response.ts'
 export {
   type ExteriorContext,
   runRangeStringsFit,
