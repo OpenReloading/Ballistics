@@ -20,10 +20,7 @@ const plain = (x: number, digits: number) => formatNumber(x, digits, 'en')
 /** A heading with its unit: "Charge (gr)"; a soft hyphen of the German text stays out. */
 const head = (name: string, unit: string) => `${name} (${unit})`.replaceAll('\u00AD', '')
 
-/**
- * The Powders table as CSV: its columns with the units of its header, one row per powder in the
- * order shown. A powder not computed has its reason in the Flags column, as the table words it.
- */
+/** Units in the header, rows in the order shown; a powder not computed has its reason in the Flags column, as the table words it. */
 export function powderTableCsv(
   rows: readonly CompareRow[],
   target: boolean,
@@ -131,10 +128,7 @@ export function switchedTarget(
   return { targetText, targetKept: { text: targetText, si } }
 }
 
-/**
- * The tab's state as the load keeps it; none while every control has its first value. The
- * manufacturer filter is kept by reference: `idOf` gives the id of a manufacturer name.
- */
+/** None while every control has its first value; the manufacturer filter is kept by reference, `idOf` giving a name's id. */
 export function savedPowderTab(
   s: PowderTabState,
   system: UnitSystem,

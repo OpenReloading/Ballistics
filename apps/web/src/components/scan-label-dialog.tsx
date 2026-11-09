@@ -18,11 +18,7 @@ const frameInterval = 250
 /** The long side, in px, a camera frame is read at. */
 const frameSide = 800
 
-/**
- * Opens a saved load from its box label: a photo (taken or chosen, read in this browser and never
- * kept), the live camera, started only by its button, or the text printed under the code. A load
- * opens only in the browser and edition that saved it.
- */
+/** The photo is read in this browser and never kept, the camera starts only by its button; a load opens only in the browser and edition that saved it. */
 export function ScanLabelDialog({
   opened,
   onClose,
@@ -50,8 +46,7 @@ export function ScanLabelDialog({
     stream.stop()
     setCamera(undefined)
   }, [stream])
-  // every track stops when the dialog closes or goes; it opens again without the last message
-  // and text
+  // every track stops when the dialog closes or goes; it opens again without the last message and text
   useEffect(() => {
     if (!opened) {
       stopCamera()

@@ -15,11 +15,7 @@ import {
 } from '@phosphor-icons/react'
 import type { ReactNode } from 'react'
 
-/**
- * Phosphor icons (MIT, https://phosphoricons.com), the set Mantine recommends. No icon set
- * of that list draws a cartridge, a bullet or a rifle, so those three are drawn for the project in the same
- * stroke style.
- */
+/** Phosphor icons (MIT, https://phosphoricons.com), the set Mantine recommends; none of that list draws a cartridge, a bullet or a rifle, so those three are drawn here in the same stroke style. */
 const icons: Record<string, Icon> = {
   // the Library page: the Database
   database: Database,

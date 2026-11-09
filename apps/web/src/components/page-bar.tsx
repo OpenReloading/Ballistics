@@ -19,17 +19,10 @@ import { titleTemplate } from '../lib/title-template.ts'
 import { useBarEndSlot } from './bar-end.ts'
 import { SafetyBarButton } from './safety-dialog.tsx'
 
-/**
- * The status line of the page bar, for Open and Save among its actions (`FileMenu` portals its
- * state there): undefined outside a bar, null until the line is mounted.
- */
+/** `FileMenu` portals its state here; undefined outside a bar, null until the line is mounted. */
 export const BarStatus = createContext<HTMLElement | null | undefined>(undefined)
 
-/**
- * A list's count as the bar's live region, a status only once mounted: a streamed copy of the page
- * that React has not swapped in yet (a hidden `S:` segment) holds no second status. `widest`, the
- * longest text it can show, sets its width from 48em, so what follows it never moves.
- */
+/** A status only once mounted, as a streamed copy React has not swapped in yet (a hidden `S:` segment) holds no second status; `widest` sets its width from 48em, so what follows never moves. */
 export function BarCount({
   children,
   widest,
@@ -125,13 +118,7 @@ const barState = (open: boolean, actions: ReactNode, single: boolean, fold: Reac
   'data-fold': (actions && fold && !single) || undefined,
 })
 
-/**
- * The page's top bar: its only
- * `h1`, what follows the title (the open load, a record's badges), one status line and the page's
- * actions in the order primary action, Open, Save, Export, Units, Copy link, Print. Below 75em it
- * sits in the top bar and "Page actions" shows the same actions in a panel, each a row with its
- * text: one instance at every width, so no menu or form is mounted twice.
- */
+/** Actions in the order primary, Open, Save, Export, Units, Copy link, Print; below 75em "Page actions" shows them in a panel, one instance at every width, so no menu or form is mounted twice. */
 export function PageBar({
   title: given,
   translated,
@@ -147,28 +134,18 @@ export function PageBar({
 }: {
   /** The h1 for screen readers only: the home page shows the wordmark instead. */
   titleHidden?: boolean
-  /**
-   * The h1 below 48em, where the bar has room for little more than a name: a powder's name
-   * without its manufacturer, which the first card of the strip names.
-   */
+  /** The h1 below 48em, where the bar has room for little more than a name (a powder's without its manufacturer, which the strip's first card names). */
   short?: string | undefined
   /** Beside the title: the workbench's open loads, a record's standard badges. */
   after?: ReactNode
   /** The status line's own content, such as a list's count. */
   status?: ReactNode
   actions?: ReactNode
-  /**
-   * Actions before `actions` that fold behind "Page actions" from 48em to 75em, where `actions`
-   * (Open, Save, Units) stay in the bar: a designer's Undo, Redo and New. From 75em and on a phone
-   * they are actions like the others. One instance at every width.
-   */
+  /** Folded behind "Page actions" from 48em to 75em, where `actions` stay in the bar (a designer's Undo, Redo and New); one instance at every width. */
   fold?: ReactNode
   /** One action only: below 75em it shows as itself in the bar, not behind "Page actions". */
   single?: boolean
-  /**
-   * A loading bar that holds the box of the bar that replaces it, so nothing moves when it is replaced:
-   * the status row and the Page actions slot, empty and not shown.
-   */
+  /** Holds the box of the bar that replaces it, so nothing moves: the status row and the Page actions slot, empty and not shown. */
   reserve?: boolean | undefined
   /** The Safety button as an icon, as the workbench's other secondary actions. */
   compact?: boolean
@@ -278,8 +255,7 @@ export function PageBar({
             id={id}
             role="presentation"
             className="page-bar-actions"
-            // a chosen action closes it, also a menu item in its portal (React events bubble through
-            // portals); not a button that opens a menu or a dialog, which returns to it
+            // a chosen action closes it, a menu item in its portal too (React events bubble through portals), not a button that opens a menu or a dialog, which returns to it
             onClick={(e) => {
               const t =
                 e.target instanceof Element ? e.target.closest('button, [role="menuitem"]') : null

@@ -19,10 +19,7 @@ import {
 import { controlSize } from '../lib/theme.ts'
 import { printAlone } from './print.ts'
 
-/**
- * The names of the cartridges `refs` name: a design of this browser by its record name, a catalogue
- * cartridge as the API names it (each asked once), else the reference as stored.
- */
+/** A design of this browser by its record name, a catalogue cartridge as the API names it (each asked once), else the reference as stored. */
 function useCartridgeNames(refs: string[], records: readonly UserRecord[]) {
   const [names, setNames] = useState<Record<string, string>>({})
   const asked = useRef(new Set<string>())
@@ -154,11 +151,7 @@ function SummaryTables({ s, names }: { s: YearSummary; names: SummaryNames }) {
   )
 }
 
-/**
- * The yearly summary of the shooting log: per calendar year the rounds per firearm and per cartridge,
- * the entries per month and the competition events of the year, with its own print and CSV. It sums
- * the log; the firearm's round count stays the one counter.
- */
+/** It sums the log; the firearm's round count stays the one counter. */
 export function LogSummary({
   entries,
   records,

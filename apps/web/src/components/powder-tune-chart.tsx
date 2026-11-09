@@ -56,13 +56,7 @@ function Legend({ level }: { level: string }) {
   )
 }
 
-/**
- * Muzzle velocity against charge: the ladder's charge range shaded, the band and the curve of the
- * fit (the hand-tuned `curve` in its place when given), and each charge's measured mean with one
- * SD, with a legend of the four. Drawn as plain SVG at the box's width, so the 11 px axis text
- * stays 11 px on a phone, and the route loads no chart library. The Chart data table below it lists
- * the drawn curve and band per charge step.
- */
+/** Plain SVG at the box's width, so the 11 px axis text stays 11 px on a phone and the route loads no chart library; a hand-tuned `curve` takes the fit's place. */
 export function TuneChart({
   band,
   curve = band.map((p) => ({ charge: p.charge, velocity: p.velocity.value })),

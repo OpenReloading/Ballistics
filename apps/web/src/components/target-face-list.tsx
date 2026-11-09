@@ -34,10 +34,7 @@ import { DeleteRow, sourceColumn, useUserRecords } from './list-sources.tsx'
 import { EmptyList } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
 
-/**
- * The target face directory: name, federation or issuer, distances, outer diameter, rings,
- * disciplines. The face designs of this browser are Mine rows, opened in the face designer.
- */
+/** The face designs of this browser are Mine rows, opened in the face designer. */
 export function TargetFaceList({
   items: catalogue,
   disciplines,

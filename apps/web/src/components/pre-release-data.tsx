@@ -5,11 +5,7 @@ import { useTranslation } from '../i18n/language.ts'
 import { deleteDatabase, inStore, refusedEvent } from '../lib/user-db.ts'
 import { confirmDialog } from './confirm.tsx'
 
-/**
- * Offers to delete the browser's database of a pre-release version, which this version refuses
- * (`refusedEvent`): asked once per page load; Delete reloads the page with an empty database. The
- * page opens the database on mount, as a refusal in a worker never reaches this listener.
- */
+/** A pre-release database this version refuses (`refusedEvent`), asked once per page load; the page opens the database on mount, as a refusal in a worker never reaches this listener. */
 export function PreReleaseData() {
   const { t } = useTranslation()
   const asked = useRef(false)

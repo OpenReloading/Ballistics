@@ -111,10 +111,7 @@ function Section({ id, title, children }: { id: string; title: string; children:
   )
 }
 
-/**
- * The settings dialog's body: vertical tabs General, Units and Workbench, a row of tabs on a
- * phone. Loaded apart from the pages when the dialog first opens.
- */
+/** A row of tabs on a phone; loaded apart from the pages when the dialog first opens. */
 export function SettingsSections({
   tab,
   onTab,

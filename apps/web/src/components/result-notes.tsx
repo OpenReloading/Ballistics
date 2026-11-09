@@ -22,11 +22,7 @@ export const noteLooks: Record<
   note: { word: msg('Note'), group: msg('result\u0004Notes'), Icon: Info },
 }
 
-/**
- * The notes of the shown result in a box of fixed height, so a step, an input or the units that
- * change them move nothing below. Its list scrolls; More opens every entry with its reason (and the
- * guide on how close a result is, linked in its place when there is no More).
- */
+/** A box of fixed height, so a step, an input or a unit change moves nothing below; More opens each entry with its reason, the guide on how close a result is linked in its place without More. */
 export function ResultNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> }) {
   const { warnings, system } = useResult()
   const { t, tn } = useTranslation()

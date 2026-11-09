@@ -91,9 +91,7 @@ function CoversCell({ fields, kind }: { fields: string[] | undefined; kind: stri
   )
 }
 
-/**
- * One source as a row. `inGroup`: a row under its document's head row, headed by its page (or "No page stated"), the document's title, publisher, edition, terms and hash being in the head.
- */
+/** `inGroup`: under its document's head row, headed by its page (or "No page stated"), the document's own data being in the head. */
 function SourceRow({
   source: s,
   has,
@@ -166,10 +164,7 @@ export function groupSources(list: readonly Source[]): Source[][] {
   return [...groups.values()]
 }
 
-/**
- * A document cited at several pages: a head row with its title and data (a cell across the row: a
- * header there would head no data cell), a row per page under it.
- */
+/** The head row's data is one cell across the row, as a header there would head no data cell; a row per page under it. */
 function SourceGroup({
   sources,
   has,
@@ -207,14 +202,7 @@ function SourceGroup({
   )
 }
 
-/**
- * The sources of a record as a table, one row per source: the title (linked) with publisher,
- * edition, terms and hash (copyable) under it, the origin, the retrieval day, the license, the
- * record fields it covers (the list on hover; "whole record" beside a source with a field list),
- * its note; then the provenance note. A column no source fills is left out. The sources of one
- * document cited at several pages are one group: the document once, a row per page under it. Below 48em a source is a block, each value after its column's name
- * (`data-label`), so every table element carries its ARIA role.
- */
+/** A column no source fills is left out, a document cited at several pages is one group; below 48em a source is a block, each value after its column's name (`data-label`), so every table element carries its ARIA role. */
 export function Sources({
   provenance,
   kind,

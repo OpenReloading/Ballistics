@@ -333,11 +333,7 @@ function modeOf(
   return { kind: 'typed' }
 }
 
-/**
- * The target field: its unit, why the typed value is no target, and whether to show that. A share
- * of Pmax stays a share without a cartridge (a load opened before its cartridge record, or with a
- * design): it is not read as a pressure, and Compute waits for the cartridge.
- */
+/** A share of Pmax stays a share without a cartridge (a load opened before its cartridge record, or a design): it is not read as a pressure, and Compute waits for the cartridge. */
 function targetOf(
   text: number | string,
   left: boolean,
@@ -408,10 +404,7 @@ function useKeptFilters(first: PowderTabState, names: ReadonlyMap<string, string
   return { filters, setFilters, maker, setMaker }
 }
 
-/**
- * Writes the tab's state to the load as it changes. A tab only looked at keeps what the load kept,
- * to the digit, in any unit: a target typed in bar and shown in psi is not rounded into the file.
- */
+/** A tab only looked at keeps what the load kept, to the digit, in any unit: a target typed in bar and shown in psi is not rounded into the file. */
 function useKeptTab(
   now: PowderTabState,
   first: PowderTabState,
@@ -585,11 +578,7 @@ function ChargeInput({
   )
 }
 
-/**
- * Cancels the Powders tab's run when another powder is picked (a design's id before its powder's,
- * which a record and its designs share): its parameters go into the fields the later
- * rows read.
- */
+/** When another powder is picked (a design's id before its powder's, which a record and its designs share), as its parameters go into the fields the later rows read. */
 function useCancelOnPick(
   design: string | undefined,
   powder: string | undefined,
@@ -604,10 +593,7 @@ function useCancelOnPick(
   }, [picked, cancel])
 }
 
-/**
- * The Powders tab: every powder with model parameters for the load of the workbench. Nothing runs
- * until Compute.
- */
+/** Nothing runs until Compute. */
 export function PowderCompare({ system }: { system: UnitSystem }) {
   const { t } = useTranslation()
   const { loadRequest, powder, powderDesign, pickPowder, applyCharge, fields, cartridge } =

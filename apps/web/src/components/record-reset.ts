@@ -35,12 +35,7 @@ function writeRecordValue(key: string, si: number, a: ResetTargets) {
   a.clearError(key)
 }
 
-/**
- * Gives the changed values among `keys` the record's value again, the way each came to differ:
- * a typed Bullet card, cartridge sheet or powder value is dropped (the field then shows the
- * record's), a followed field follows its default again, the others are written with the record's
- * value as a record fills them. Returns how many it reset.
- */
+/** Each the way it came to differ: a typed Bullet card, cartridge sheet or powder value is dropped, a followed field follows its default again, the rest written as a record fills them; returns how many. */
 export function resetToRecord(keys: readonly string[], a: ResetTargets) {
   const reset = keys.filter((k) => a.changes[k] !== undefined)
   const typed = reset.filter((k) => a.bulletKeys.has(k))

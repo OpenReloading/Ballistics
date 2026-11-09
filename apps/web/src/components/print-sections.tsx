@@ -19,10 +19,7 @@ const printChoice = storedChoice(printSectionsKey, parsePrintChoice, (c) => JSON
 const setSection = (key: PrintSection, on: boolean) =>
   printChoice.set({ ...printChoice.read(), [key]: on })
 
-/**
- * The sections of the workbench report that print, remembered in this browser. While mounted,
- * `<html data-report-omit>` names the ones left out for the print rules (the chart copy).
- */
+/** Remembered in this browser; while mounted, `<html data-report-omit>` names those left out for the print rules (the chart copy). */
 export function usePrintChoice(): PrintChoice {
   const choice = useSyncExternalStore(printChoice.subscribe, printChoice.read, () => allSections)
   const omit = omittedSections(choice)

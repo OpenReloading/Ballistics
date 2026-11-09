@@ -175,8 +175,7 @@ async function readSession(
   })
   // string k takes step k's charge; the selects show the guess
   const charges = data.session.strings.map((_, i) => steps?.[i]?.charge)
-  // checked before the maker is stored: a file over the schema's caps would be stored as an
-  // invalid record
+  // checked before the maker is stored: a file over the schema's caps would be stored as an invalid record
   const now = new Date()
   const draft = sessionOf(file.name, data, charges, { id, now })
   const checked = chronoSession.safeParse(draft.data)
@@ -274,11 +273,7 @@ function TuneLink({ sessions }: { sessions: SessionRecord[] }) {
   )
 }
 
-/**
- * The Measurements tab: chronograph files read in the browser, strings mapped to the charges of the
- * last run, a table per series and charge and one chart over charge. `steps` is undefined before a
- * run. The sessions are user records the load references, stored as they change.
- */
+/** `steps` is undefined before a run; the sessions are user records the load references, stored as they change. */
 export function Measurements({
   steps,
   system,

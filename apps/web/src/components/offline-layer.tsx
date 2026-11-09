@@ -7,11 +7,7 @@ import { useTranslation } from '../i18n/language.ts'
 import { basePath } from '../lib/edition.ts'
 import { controlSize } from '../lib/theme.ts'
 
-/**
- * Registers the service worker of production builds, removes one in
- * development, and shows "New version" while a worker of a newer build waits. Reload lets it take
- * over and reloads this tab; nothing here touches the browser store of the user's records.
- */
+/** Production builds only (development removes one); Reload lets the waiting worker take over and reloads this tab, never touching the store of the user's records. */
 export function OfflineLayer() {
   const [waiting, setWaiting] = useState<ServiceWorker>()
   const wide = useMediaQuery('(min-width: 75em)')
@@ -46,9 +42,7 @@ export function OfflineLayer() {
     )
   }, [])
   if (!waiting) return null
-  // never over a page action: from 75em at the bottom right, below the page bar's actions
-  // and clear of the workbench's Run bar at the left; narrower under the top bar, where the open
-  // Page actions panel (z-index 101) lies over it
+  // never over a page action: from 75em at the bottom right, below the page bar's actions and clear of the Run bar; narrower under the top bar, below the open Page actions panel (z-index 101)
   return (
     <Affix
       position={wide ? { bottom: 16, right: 16 } : { top: 60, right: 16 }}

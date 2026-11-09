@@ -13,11 +13,7 @@ import { openShortcuts, useSingleKeys } from './shortcuts.tsx'
 /** A command of the search; `keys` names its shortcut, shown beside it. */
 export type Command = { label: string; run: () => void; keys?: string }
 
-/**
- * The search's groups of every page: the sidebar's pages, and the shell's commands
- * (settings, Safety, theme). Navigation goes through the router's guarded `push`, so a
- * page with unsaved work asks first (`navigation-guard.ts`).
- */
+/** Navigation goes through the router's guarded `push`, so a page with unsaved work asks first (`navigation-guard.ts`). */
 export function useShellActions(): { pages: Command[]; commands: Command[] } {
   const router = useRouter()
   const openSettings = useContext(SettingsDialog)

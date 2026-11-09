@@ -6,11 +6,7 @@ import { formatQuantity, roundedFieldText } from '../lib/units.ts'
 import { NumberField } from './number-field.tsx'
 import { useUnits } from './units-settings.tsx'
 
-/**
- * A number field on an SI value: the typed text while editing, the value's text otherwise. A valid
- * entry commits on each keystroke, or with `deferred` when the field is left or on Enter; an empty
- * required field never commits.
- */
+/** A valid entry commits on each keystroke, or with `deferred` when the field is left or on Enter; an empty required field never commits. */
 export function SiField({
   spec,
   si,

@@ -36,12 +36,7 @@ export const useSingleKeys = () =>
 const inField = (t: EventTarget | null) =>
   t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))
 
-/**
- * Binds the page's shortcuts of `lib/shortcuts.ts` while mounted and lists them in the help
- * dialog. `null` lists a shortcut handled elsewhere (the browser's print, an element's own keys).
- * A single key never fires from a text field; no shortcut runs while a modal dialog is open, and a
- * Ctrl one is then still kept from the browser, except Print.
- */
+/** `null` lists a shortcut handled elsewhere (the browser's print, an element's own keys); a single key never fires from a text field, and while a modal is open none runs but a Ctrl one is still kept from the browser, except Print. */
 export function useShortcuts(bind: Partial<Record<ShortcutId, (() => void) | null>>) {
   const latest = useRef(bind)
   latest.current = bind

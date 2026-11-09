@@ -11,10 +11,7 @@ import type { UnitSystem } from '../lib/units.ts'
 const saveCsv = (text: string, name: string) =>
   download(new Blob([text], { type: 'text/csv;charset=utf-8' }), name)
 
-/**
- * The downloads of the shown run: its curves, one row per time step, and its scalar results, as
- * CSV files with the units in the header. The files hold numbers only, no notice.
- */
+/** One row per time step, the units in the header; numbers only, no notice. */
 export function RunDownloads({
   body,
   charge,

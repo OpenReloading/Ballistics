@@ -6,10 +6,7 @@ import { isToolRoute } from '../lib/sections.ts'
 import { SiteHeader } from './site-header.tsx'
 import { useRoute } from './use-route.ts'
 
-/**
- * Routes laid out as one window-high frame from 62em: tools, lists whose table scrolls, the
- * designers and the burn-rate overlay, whose list of powders without a curve scrolls.
- */
+/** One window-high frame from 62em, as their own parts scroll: a list's table, the burn-rate overlay's powders without a curve. */
 const frameRoutes = new Set([
   '/workbench',
   '/groups',
@@ -25,12 +22,7 @@ const frameRoutes = new Set([
   '/powders/designer',
 ])
 
-/**
- * The Mantine app shell: the top bar across the whole window (52 px, 56 px from 75em), the
- * icon rail under it from 75em (4.5rem), and the page in `AppShell.Main`. Sets the page width (`data-width`)
- * and the workbench frame (`data-frame`) from the route, not from the page's content: a page left
- * by a client navigation stays hidden in the document (Cache Components).
- */
+/** Top bar 52 px (56 px from 75em), icon rail from 75em; `data-width` and `data-frame` come from the route, not the content, as a page left by a client navigation stays hidden in the document (Cache Components). */
 export function PageShell({ children }: { children: ReactNode }) {
   const route = useRoute()
   return (

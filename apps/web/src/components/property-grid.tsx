@@ -17,13 +17,7 @@ export function helpOf(el: Element) {
   return label && text ? `${label}: ${text}` : undefined
 }
 
-/**
- * The designers' property grid: a panel titled `title` (its sections then `h3`), compact
- * sections of label and field rows (`.prop-grid`),
- * an Accordion only on phones, and one reserved line at the foot that shows the focused field's
- * help (a tap focuses too; hover has the label's title and the flag's tooltip), else `message`.
- * The line keeps its height, so nothing moves.
- */
+/** An Accordion only on phones; the foot's reserved line shows the focused field's help (a tap focuses too), else `message`, and keeps its height, so nothing moves. */
 export function PropertyGrid({
   title,
   head,

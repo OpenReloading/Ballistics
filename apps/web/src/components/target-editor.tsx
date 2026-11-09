@@ -252,11 +252,7 @@ const blank = (
   }
 }
 
-/**
- * The face and event of `/groups?face=<id>&event=<event id>` (Open in shot groups of a face or a
- * discipline page), which opens a new sheet on them; none in the workbench tab (no `heading`) or
- * for a malformed id. An event name longer than any record's or with control characters is left out.
- */
+/** A new sheet opens on the face and event of `/groups?face=<id>&event=<event id>`; none in the workbench tab (no `heading`) or for a malformed id, and an event name longer than any record's or with control characters is left out. */
 function linkedFace(heading: string | undefined) {
   const url = new URL(window.location.href)
   const id = heading ? url.searchParams.get('face') : null
@@ -304,11 +300,7 @@ let restoring: Promise<string[]> | undefined
 /** Once per page load, also when an effect runs twice: the copy is the last page's. */
 const restoreWaiting = (t: Translator['t']) => (restoring ??= restoreCopy(t))
 
-/**
- * The sheets the last page left unsaved, each stored over the version it was edited from; a sheet
- * another tab saved since stays and the copy is kept as a sheet of its own (the names returned). A
- * copy is dropped once stored, so a failed write keeps it for the next page.
- */
+/** Each stored over the version it was edited from; one another tab saved since stays and the copy becomes a sheet of its own (names returned); a copy is dropped once stored, so a failed write keeps it for the next page. */
 async function restoreCopy(t: Translator['t']) {
   const kept: string[] = []
   let raw: string | null = null
@@ -1618,8 +1610,7 @@ function ToolPopover({
       transitionProps={{ duration: 0 }}
       opened={pop === p}
       onChange={(on) => setPop((x) => (on ? p : x === p ? undefined : x))}
-      // closed with the focus inside, it goes back to the button, also when the popover opened
-      // after a Calibrate tool (the focus was on the canvas marker then)
+      // closed with the focus inside, it goes back to the button, also after a Calibrate tool (the focus was on the canvas marker then)
       onClose={() =>
         requestAnimationFrame(() => {
           if (document.activeElement === document.body)
@@ -2580,10 +2571,7 @@ function statsOf(group: ShotGroup | undefined) {
   return { stats, keyValues }
 }
 
-/**
- * A failure or a limit shows over the hint; a routine message does not; the help of the focused
- * field shows over a routine message.
- */
+/** A failure or a limit shows over the hint, a routine message does not; the focused field's help shows over a routine message. */
 function hintOf(
   status: { text: string; alert: boolean },
   toolHint: string | undefined,
@@ -2649,10 +2637,7 @@ async function dropOrphans(
   for (const o of gone) if (!used.has(o.photo)) discardFile(o.photo)
 }
 
-/**
- * Writes the photos and the sheet of a deleted sheet back. Another tab may have saved the sheet
- * since the delete: it stays, and this one comes back as a copy (`put` false).
- */
+/** A sheet another tab saved since the delete stays, and this one comes back as a copy (`put` false). */
 async function putBack(
   r: TargetSheetRecord,
   files: { id: string; blob: Blob | undefined }[],
@@ -2722,12 +2707,7 @@ function keptOf(failed: boolean, saving: boolean, stored: boolean): Kept {
   return stored ? 'saved' : 'blank'
 }
 
-/**
- * The target photo editor: a sheet of the browser store (a photo
- * kept on the device, or a drawn target) with its calibration and shot groups, saved on every
- * change. On `/groups` it lists every sheet; in the workbench tab Groups the sheets of the saved
- * load `load`, each group linked to a ladder step and a chart of size against charge.
- */
+/** Saved on every change; on `/groups` every sheet, in the workbench tab those of the saved load `load`, each group linked to a ladder step and a chart of size against charge. */
 export function TargetEditor({
   load,
   charges,
@@ -2758,10 +2738,7 @@ export function TargetEditor({
   bulletDiameter?: number | undefined
   /** The optic of the workbench's firearm, for the clicks to the point of aim. */
   optic?: { label: string; click: number } | undefined
-  /**
-   * The workbench tab: compact (the target and the key readouts) until expanded over the
-   * workbench; `onChange` switches.
-   */
+  /** Compact (the target and the key readouts) until expanded over the workbench; `onChange` switches. */
   expand?: { expanded: boolean; onChange: (expanded: boolean) => void }
   /** The workbench's load and its simulated velocities, for the print sheet. */
   summary?: LoadSummary | undefined
@@ -2809,8 +2786,7 @@ export function TargetEditor({
   const printPhoto = useRef<HTMLImageElement>(null)
   // undo and redo are this editor's own keys (`onKeyDown`)
   useShortcuts(ownShortcuts(heading !== undefined))
-  // on /groups the browser's print command (Ctrl+P) prints the sheet, as Export > Print sheet does;
-  // the workbench tab leaves it to the workbench report
+  // on /groups the browser's print command (Ctrl+P) prints the sheet, as Export > Print sheet does; the workbench tab leaves it to the workbench report
   const ours = useRef(false)
   usePrintEvents(
     () => {
@@ -3020,8 +2996,7 @@ export function TargetEditor({
   /** A new sheet; `face`: the id of the target face its first group is scored on. */
   function create(list = sheets, face?: GroupFace) {
     flush()
-    // the units and the language may be read after the mount that calls this: the refs have the
-    // current ones
+    // the units and the language may be read after the mount that calls this, so the refs hold the current ones
     const t = tNow.current
     const empty = blank(load, bulletDiameter, newDistance.current, t, charges ? step : undefined)
     const data = face
@@ -3044,8 +3019,7 @@ export function TargetEditor({
     setPhoto(undefined)
   }
 
-  // a new sheet named before its language loaded takes the names of the language shown, until it
-  // is edited or stored
+  // a new sheet named before its language loaded takes the names of the language shown, until it is edited or stored
   useEffect(() => {
     const o = opened.current
     if (stored || !meta.id || sheet !== o.data || meta.name !== o.name) return
@@ -3078,10 +3052,7 @@ export function TargetEditor({
   const reloadLatest = useRef(reloadSheets)
   reloadLatest.current = reloadSheets
 
-  /**
-   * After the File menu wrote records: the list again, and the sheet shown when another writer
-   * (Import, Replace) changed it, so the next save does not write the old sheet over it.
-   */
+  /** Also the sheet shown when another writer (Import, Replace) changed it, so the next save does not write the old sheet over it. */
   const reloadStored = () => {
     void reloadSheets()
     const id = shown.current
@@ -3091,8 +3062,7 @@ export function TargetEditor({
         const now = showing.current
         const same = (x: { data: TargetSheet; name: string }) =>
           r.name === x.name && canonicalJson(r.data) === canonicalJson(x.data)
-        // the store holds what this editor opened or last saved (an edit may wait), or what it
-        // shows (File, Save): nothing to open
+        // the store holds what this editor opened or last saved (an edit may wait) or shows (File, Save): nothing to open
         if (same(opened.current) || same(now)) return void bases.current.set(id, r.saved)
         // the stored sheet wins: an edit still waiting would write the old one over it
         pendingSave.current = undefined
@@ -3170,10 +3140,7 @@ export function TargetEditor({
     }
   }, [sheet.photo])
 
-  /**
-   * Keeps `record` (an edit of `data`) as a sheet of its own after another tab saved the sheet
-   * since: that save stays.
-   */
+  /** After another tab saved the sheet since, whose save stays. */
   const keepOwn = useRef(async (record: TargetSheetRecord, data: TargetSheet) => {
     // a later save of the sheet keeps this edit with its own
     if (bases.current.get(record.id) !== record.saved) return
@@ -3291,14 +3258,10 @@ export function TargetEditor({
   // an edit still waiting is saved when the editor goes (a link, a load change) or the page does
   useEffect(() => {
     const flushNow = () => pendingSave.current?.()
-    // a write started when the page goes lands only if the page lives until it commits (lost when
-    // the next page answers at once, measured in the e2e Chromium): a synchronous copy of the waiting
-    // edit and of the saves not landed first, each saved on the next open when newer than the stored
-    // sheet
+    // a write started as the page goes lands only if the page lives until it commits (measured in the e2e Chromium), so the waiting edit and the saves not landed are copied synchronously, each saved on the next open when newer than the stored sheet
     const leave = () => {
       const waiting = new Map(inFlight.current)
-      // shortcut: a waiting edit's base is the save in flight; when that save is lost too, the next
-      // page keeps the edit as a copy (a duplicate, nothing lost), carry both bases if that shows up
+      // shortcut: a waiting edit's base is the save in flight; when that save is lost too, the next page keeps the edit as a copy (a duplicate, nothing lost); carry both bases if that shows up
       const record = pendingSave.current?.record?.()
       if (record) waiting.set(record.id, record)
       if (waiting.size) keepCopies([...waiting.values()])
@@ -3591,8 +3554,7 @@ export function TargetEditor({
 
   const deleteGroup = () => {
     if (!group) return
-    // no question first: Undo puts the group back at its place; deletes in a row (a double click)
-    // share one notice, whose Undo brings every one back
+    // no question first: Undo puts the group back at its place; deletes in a row (a double click) share one notice, whose Undo brings every one back
     const gone = group
     const at = sheet.groups.findIndex((g) => g.id === gone.id)
     const target = meta.id

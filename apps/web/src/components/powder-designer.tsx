@@ -173,14 +173,7 @@ function RecordPanel({
   )
 }
 
-/**
- * The powder designer: the fields of a powder record (name, aliases, grain form, propellant base,
- * composition, thermochemistry and the burn law of the interior model) with the provenance kind
- * the design is built with, the checks of the powder schema at the fields. The draft is kept in
- * this browser on every change (a record of kind `powder`); a draft that passes the schema is
- * offered by the workbench's Powder card as the user's own design. `?record=` opens a browser
- * record, the link of a Mine row of the powder list.
- */
+/** The draft is kept in this browser on every change (a record of kind `powder`), and once it passes the schema the workbench's Powder card offers it; `?record=` opens a browser record, a Mine row's link. */
 export function PowderDesigner() {
   const { t } = useTranslation()
   const { system } = useUnits()

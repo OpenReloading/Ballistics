@@ -52,10 +52,7 @@ function StandIn({
   )
 }
 
-/**
- * The service worker serves this page in place of a page never stored on this device, at that
- * page's address: the address and Retry name that page. At its own address it names no page.
- */
+/** Served at the address of a page never stored on this device, so the address and Retry name that page; at its own address it names none. */
 export function OfflineState({ links }: { links: PageLinks }) {
   const address = useSyncExternalStore(
     none,

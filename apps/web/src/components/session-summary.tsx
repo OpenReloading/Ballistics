@@ -40,11 +40,7 @@ import { UnitsIconButton, useUnits } from './units-settings.tsx'
 
 type Read = { fileName: string; data: ChronoImport; pick: number }
 
-/**
- * The session summary: the page bar with Units, Export JSON, Export CSV and Print, a one-row import
- * strip, then the session's badges, the statistics per string, the velocity-per-shot chart with a
- * tab per string in its panel's title row, and the shots of that string.
- */
+/** The velocity-per-shot chart has a tab per string in its panel's title row. */
 export function SessionSummary() {
   const { t, tn } = useTranslation()
   const { system } = useUnits()

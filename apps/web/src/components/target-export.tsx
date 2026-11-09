@@ -76,10 +76,7 @@ export function StatsBlock({
 export const extension = (type: string) =>
   type === 'image/jpeg' ? 'jpg' : (type.split('/')[1]?.replace(/\W[\s\S]*/, '') ?? 'img')
 
-/**
- * What one rendered image is made of, taken together at the click: a sheet switched while the
- * renderer loads changes neither the drawing nor the box, photo or file name.
- */
+/** Taken together at the click, so a sheet switched while the renderer loads changes neither the drawing nor the box, photo or file name. */
 export function renderJob(
   still: StillCanvas,
   box: ViewBox,
@@ -87,8 +84,7 @@ export function renderJob(
   turn: number,
   stem: string,
 ) {
-  // shortcut: iOS limits a canvas to about 16.7 MP (unverified on a device); a larger photo fails
-  // there; upgrade by scaling the export down past that size
+  // shortcut: iOS limits a canvas to about 16.7 MP (unverified on a device), so a larger photo fails there; upgrade by scaling the export down past that size
   // sizes as on a 1000 px wide screen, whatever the window and the zoom
   const k = box.w / 1000
   const type = photo ? 'image/jpeg' : 'image/png'
@@ -104,11 +100,7 @@ export function renderJob(
   }
 }
 
-/**
- * The Export menu: the original photo as stored, the rendered image of the fitted view at
- * the photo's pixel size, and the print sheet. Everything is made in the browser and downloaded;
- * nothing is sent.
- */
+/** Everything is made in the browser and downloaded; nothing is sent. */
 export function ExportMenu({
   name,
   photoId,

@@ -65,10 +65,7 @@ const typeLabels: Record<ReportType, Message> = {
   Idea: msg('Idea'),
 }
 
-/**
- * Report an issue: an icon left of the repository link in the top bar from 75em, a labelled row in
- * the phone drawer. Renders nothing without a repository URL.
- */
+/** An icon left of the repository link from 75em, a labelled row in the phone drawer; nothing without a repository URL. */
 export function ReportIssueButton({
   url,
   drawer,
@@ -122,10 +119,7 @@ function useContextNow(opened: boolean, route: string): ReportContext | undefine
   return context
 }
 
-/**
- * The report dialog: area, type, the text, the page's data boxes (unticked) and the text that
- * will be sent; Open on GitHub opens the repository's new-issue form with it in a new tab.
- */
+/** The page's data boxes start unticked; Open on GitHub opens the repository's new-issue form with the text shown, in a new tab. */
 export function ReportIssueDialog({
   repository,
   opened,

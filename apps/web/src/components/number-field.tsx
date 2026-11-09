@@ -36,10 +36,7 @@ import {
 } from '../lib/field-unit.ts'
 import { type Quantity, twistTyped, type Unit, type UnitSystem } from '../lib/units.ts'
 
-/**
- * A field's flag: the value follows the seated bullet, is the record's, is above a limit or refused,
- * differs from the record, or is derived by the drawing (the designers).
- */
+/** The value follows the seated bullet, is the record's, is above a limit or refused, differs from the record, or is derived by the drawing (the designers). */
 export type FieldFlag = {
   kind: 'seating' | 'record' | 'exceeded' | 'changed' | 'derived'
   text: string
@@ -54,10 +51,7 @@ const flagIcons = {
   derived: FunctionIcon,
 }
 
-/**
- * The unit suffix of a field, a quick switch of that field only: one click to the other unit
- * where the quantity has two, a menu where it has more. The Settings keep the stored units.
- */
+/** For this field only: one click where the quantity has two units, a menu where it has more; the Settings keep the stored units. */
 function UnitSwitch({
   q,
   unit,
@@ -163,10 +157,7 @@ function fieldLabel(text: string, unit: string): ReactNode {
   )
 }
 
-/**
- * The field's description: help, mark and flag; a flag that repeats the help is not said twice. An
- * error (`exceeded`) leads: the focused field's help line shows two lines, so a long help would hide it.
- */
+/** A flag that repeats the help is not said twice; an error (`exceeded`) leads, as the focused field's help line shows two lines and a long help would hide it. */
 const describedByOf = (
   help: string | undefined,
   mark: string | undefined,
@@ -218,8 +209,7 @@ function endProps({
           onPick={onPick}
         />
       ),
-    // a unit switch needs room for its 24 px target beside the text, a marker 1.5rem more, both
-    // 0.25rem after the value
+    // a unit switch needs room for its 24 px target beside the text, a marker 1.5rem more, both 0.25rem after the value
     rightSectionWidth: endWidth(switchable, symbol, longest, marker !== undefined),
     rightSectionPointerEvents: interactive ? ('all' as const) : ('none' as const),
   }
@@ -269,13 +259,7 @@ function FieldEnd({
   )
 }
 
-/**
- * A twist is "1:8" or "8": text, not a number. Under a decimal point a field that accepts negatives
- * is a native number input (it keeps the iOS minus key) and the others are `NumberInput`s. Under a
- * decimal comma every field is a text input read by `parseNumber`: a native number input and the
- * `NumberInput` take the point only from a key press, not from pasted, filled or composed text.
- * `onText` gets what a person typed (`typed`) or the canonical text of a `NumberInput`.
- */
+/** A twist ("1:8" or "8") is text; under a decimal point a field taking negatives is a native number input (the iOS minus key), under a comma every field is text read by `parseNumber`, as number inputs take the point only from a key press. */
 function FieldInput({
   common,
   quantity,
@@ -337,12 +321,7 @@ function FieldInput({
 
 const noValue: FieldValue = { text: '', si: undefined }
 
-/**
- * A labelled number field: the unit is its suffix and, for screen readers, part of its label; keeps
- * the typed text and its SI value. A
- * field that accepts negatives stays a native number input: `NumberInput` always sets
- * `inputMode="decimal"`, and the iOS decimal keypad has no minus key.
- */
+/** The unit is part of the label for screen readers; a field taking negatives stays a native number input, as `NumberInput` always sets `inputMode="decimal"` and the iOS decimal keypad has no minus key. */
 export function NumberField({
   spec,
   system,
@@ -368,10 +347,7 @@ export function NumberField({
   onBlur?: () => void
   /** Called on Enter in the field. */
   onEnter?: (() => void) | undefined
-  /**
-   * The message under the field; `true` marks the field invalid with the message elsewhere. A message
-   * naming a unit is a function of the units the field shows, as `fieldError(spec, value, shown)`.
-   */
+  /** `true` marks the field invalid with the message elsewhere; a message naming a unit is a function of the units shown, as `fieldError(spec, value, shown)`. */
   error?: OfShown<string | boolean | undefined>
   /** The message is the field's description for screen readers but not drawn: it stands elsewhere. */
   hiddenError?: boolean
@@ -379,10 +355,7 @@ export function NumberField({
   help?: ((shown: UnitSystem) => string) | undefined
   /** Shown under the field after the help, as where a default value comes from. */
   mark?: OfShown<string | undefined>
-  /**
-   * Where the value comes from or a limit it exceeds, as an icon inside the input: its text is
-   * the tooltip and part of the field's description for screen readers.
-   */
+  /** An icon inside the input, its text the tooltip and part of the field's description for screen readers. */
   flag?: FieldFlag | undefined
   /** An icon button inside the input, as "use seating"; it takes the flag's place. */
   action?: { kind: 'restore'; text: OfShown<string>; onClick: () => void } | undefined
@@ -390,19 +363,14 @@ export function NumberField({
   placeholder?: string | ((system: UnitSystem) => string | undefined) | undefined
   /** The value is a default: muted text (its source is the `mark`). */
   muted?: boolean
-  /**
-   * The unit suffix: a switch to the quantity's other units for this field only, plain text, or
-   * none where a column header names it (the designers follow the Settings preset); the label
-   * keeps it for screen readers.
-   */
+  /** `switch` for this field only, `none` where a column header names it (the designers follow the Settings preset); the label keeps it for screen readers. */
   unit?: 'switch' | 'text' | 'none' | undefined
 }) {
   const value = given ?? noValue
   // the language shown: the field writes its decimal mark and reads text in it
   const { t } = useTranslation()
   const specLabel = specText(t, spec.label)
-  // what was typed where it differs from the text shown for the value (a point under a decimal comma,
-  // text that is no number), until the field is left with a value; `text` is the state's text it gave
+  // typed text that differs from the value's text (a point under a decimal comma, no number) until the field is left with a value; `text` is the state's text it gave
   const [draft, setDraft] = useState<{ raw: string; text: string }>()
   // the message of a pasted text that could be read two ways
   const [refused, setRefused] = useState<string>()

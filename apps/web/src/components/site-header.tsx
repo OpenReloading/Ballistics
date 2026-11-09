@@ -57,12 +57,7 @@ const docs = docsUrl(process.env.NEXT_PUBLIC_DOCS_URL, undefined, process.env.NE
 
 type Section = (typeof sections)[number]
 
-/**
- * The home link: the wordmark of the theme in use, picked by CSS before hydration as in `ThemeSwitch`,
- * with the early-alpha badge laid over its foot, so it takes no room in the bar (globals.css); its
- * tooltip, by pointer and keyboard focus, says that breaking changes are to be expected. `full`: the
- * whole wordmark in the top bar (a page without a visible title), else cut to its mark.
- */
+/** The theme's wordmark picked by CSS before hydration as in `ThemeSwitch`, the alpha badge laid over its foot so it takes no room in the bar (globals.css); `full` shows the whole wordmark, else its mark. */
 function Brand({ onClick, full }: { onClick?: () => void; full?: boolean }) {
   const note = useId()
   const { t } = useTranslation()
@@ -210,14 +205,7 @@ function SectionLinks({
   )
 }
 
-/**
- * The site header: the top bar across the window at every
- * width, the banner, with the wordmark at the left, the page bar from 75em (page-bar.tsx) and the
- * Install, Safety and theme buttons at the right, and the burger that opens the drawer below 75em;
- * from 75em under it the icon rail (as Mantine UI's NavbarMinimal) with Search, the two
- * groups' links and Settings, and below 75em the drawer with the labelled links. Settings and Search open as dialogs over
- * the page, so the page and its inputs stay; Ctrl+K opens Search on every page.
- */
+/** Settings and Search open as dialogs over the page, so the page and its inputs stay, and Ctrl+K opens Search on every page; the rail follows Mantine UI's NavbarMinimal. */
 export function SiteHeader() {
   const route = useRoute()
   const { t } = useTranslation()
@@ -252,8 +240,7 @@ export function SiteHeader() {
     afterDrawer.current = then
     close()
   }
-  // from 75em the page bar sits in the top bar before these (globals.css): in its end slot they
-  // follow its actions in the keyboard order as on screen
+  // from 75em the page bar sits in the top bar before these (globals.css), so in its end slot they follow its actions in the keyboard order as on screen
   const shownEnd = useBarEnd()
   const barEnd = wide ? shownEnd : null
   const topEnd = (

@@ -13,12 +13,7 @@ import { WorkbenchSearch } from './workbench-search.tsx'
 
 const search = createSpotlight()
 
-/**
- * The site search of every page but the workbench: pages, the shell's commands and records,
- * a record opening its page, the browser's own bullet designs among the bullets (read again at each
- * opening, a design opens its designer). Loaded when it is first asked for (`SiteHeader`); each new `request`
- * opens it.
- */
+/** The browser's bullet designs are read again at each opening and open their designer; loaded when first asked for (`SiteHeader`), each new `request` opens it. */
 export function SiteSearch({ request }: { request: number }) {
   const router = useRouter()
   const { t } = useTranslation()

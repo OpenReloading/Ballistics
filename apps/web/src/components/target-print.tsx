@@ -29,12 +29,7 @@ function mPerUnit(frame: Frame, box: ViewBox) {
   return (along(1, 0) + along(0, 1)) / 2
 }
 
-/**
- * The print sheet of a target: the fitted view `box`, centred and unframed, at a round scale
- * with a ruler that measures true printed at 100 %, the statistics of each group, and in the
- * workbench the load and the simulated velocity. Rendered into `body`, printed alone while
- * `<html data-print="target-sheet">` is set (`printTargetSheet`).
- */
+/** At a round scale with a ruler that measures true printed at 100 %; rendered into `body`, printed alone while `<html data-print="target-sheet">` is set (`printTargetSheet`). */
 export function TargetPrint({
   name,
   sheet,

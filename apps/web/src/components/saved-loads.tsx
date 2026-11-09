@@ -122,11 +122,7 @@ const megabytes = (bytes: number) =>
 /** The field that replaces the button that was pressed takes the focus the button had. */
 const focusField = (field: HTMLInputElement | null) => field?.focus()
 
-/**
- * The saved loads of the browser store: search, grouped by cartridge; a row opens the load in
- * a tab, renames it, duplicates it, exports it to a file or deletes it. States whether the browser keeps the records and the
- * reminder to export.
- */
+/** States whether the browser keeps the records, with the reminder to export. */
 export function SavedLoads({
   opened,
   onClose,

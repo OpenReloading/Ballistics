@@ -37,10 +37,7 @@ export function EmptyNote({
   )
 }
 
-/**
- * What a loading line says, by what loads: a whole sentence each, as the word order of a language
- * is its own. A new `what` gets its line here.
- */
+/** A whole sentence each, as the word order of a language is its own; a new `what` gets its line here. */
 const loadingLines = {
   bullets: msg('Loading bullets'),
   cartridges: msg('Loading cartridges'),
@@ -80,10 +77,7 @@ const loadingLines = {
 /** What can load: a key of `loadingLines`. */
 export type Loadable = keyof typeof loadingLines
 
-/**
- * The one loading state: the text for screen readers and a skeleton of the rows to come. `inline`
- * is a bare line without skeleton and status role, for a place that must not change height.
- */
+/** `inline` is a bare line without skeleton and status role, for a place that must not change height. */
 export function Loading({
   what,
   rows = 3,
@@ -125,10 +119,7 @@ const severities = {
   error: { word: msg('Error'), color: 'red', Icon: WarningOctagon },
 } as const
 
-/**
- * The one message: icon, the severity's word and the text, so colour is never the only signal. An
- * error is announced at once (`role="alert"`), a note or warning politely (`role="status"`).
- */
+/** Icon, the severity's word and the text, so colour is never the only signal; an error is announced at once (`role="alert"`), a note or warning politely (`role="status"`). */
 export function Message({
   severity,
   title,
@@ -185,11 +176,7 @@ export function Message({
   )
 }
 
-/**
- * Whether a scroll area has more than its box shows, so it takes focus only then (a keyboard user
- * reaches the rest of its list) and is no empty tab stop otherwise. `ref` goes on the area; as a
- * callback it also follows an area that mounts later, as a popover's.
- */
+/** Focusable only then, so a keyboard user reaches the rest of its list and finds no empty tab stop; `ref` as a callback also follows an area that mounts later, as a popover's. */
 export function useScrolls() {
   const [el, ref] = useState<HTMLElement | null>(null)
   const [scrolls, setScrolls] = useState(false)
@@ -210,12 +197,7 @@ export function useScrolls() {
   return { ref, scrolls }
 }
 
-/**
- * A place for messages that keeps one size whether it holds none, one or many: a box of fixed
- * height whose list scrolls and takes focus once it has more than its box shows. `label` names the
- * region. It stays mounted as a polite live region, so a message that appears is announced and
- * nothing below moves.
- */
+/** A box of fixed height whose list scrolls and takes focus once it has more than its box shows; it stays mounted as a polite live region, so a new message is announced and nothing below moves. */
 export function MessageSlot({
   label,
   messages,
@@ -245,10 +227,7 @@ export function MessageSlot({
   )
 }
 
-/**
- * The one inline alert: what failed, and Retry with `onRetry`. `color` orange marks a warning
- * that is no failure.
- */
+/** `color` orange marks a warning that is no failure. */
 export function ErrorNote({
   title,
   children,
@@ -326,10 +305,7 @@ export function ServerDataError({ what }: { what: DataKind }) {
 /** Row widths of the list skeleton, in percent of the name column: uneven, so it reads as text. */
 const skeletonWidths = [62, 48, 70, 55, 66, 42, 58, 74, 50, 64, 46, 68]
 
-/**
- * What a list shows while its data loads, under the page bar: a filter row and the table's
- * frame, its head and rows where the records will be, so nothing moves when they arrive.
- */
+/** The filter row and the table's frame where the records will be, so nothing moves when they arrive. */
 export function ListLoading({ what }: { what: Loadable }) {
   const { t } = useTranslation()
   return (
@@ -369,10 +345,7 @@ const noMatchLines = {
   'target faces': msg('No targets match these filters.'),
 } as const
 
-/**
- * What a searched list shows when nothing matches. `filters` names the search and the choices set;
- * Clear filters with `onClear` resets them.
- */
+/** `filters` names the search and the choices set; Clear filters (`onClear`) resets them. */
 export function EmptyList({
   noun,
   filters,

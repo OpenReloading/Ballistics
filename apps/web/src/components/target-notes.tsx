@@ -31,12 +31,7 @@ function shownTexts(
   })
 }
 
-/**
- * The notes on the target: a box of text at its point in view units, `k` view units per
- * screen px, so the text is 12 screen px at any zoom. With Select a note is dragged; as a button
- * in the tab order the arrow keys move it by 1 mm (Shift: 10 mm), Delete removes it and Enter
- * opens its text field.
- */
+/** In view units, `k` view units per screen px, so the text is 12 screen px at any zoom; the arrow keys move a note by 1 mm (Shift: 10 mm), Delete removes it, Enter opens its text field. */
 export function NotesLayer({
   notes,
   groups,
@@ -219,10 +214,7 @@ function PlaceholderPicker({
   )
 }
 
-/**
- * The Notes panel: Add note, then per note its text, the group whose values it shows, a value
- * picker and Delete.
- */
+/** Add note, then per note its text, the group whose values it shows, a value picker and Delete. */
 export function NotesPanel({
   notes,
   groups,

@@ -13,11 +13,7 @@ import { printAlone, usePortalBody } from './print.ts'
 export const paperSizes = ['a6', 'a5', 'a4'] as const
 export type PaperSize = (typeof paperSizes)[number]
 
-/**
- * The range card of a trajectory result: rendered into `body`, never on
- * screen, printed alone while `<html data-print="range-card">` is set (`printRangeCard`). With the
- * result's `click` the holds are also given in clicks.
- */
+/** Never on screen, printed alone while `<html data-print="range-card">` is set (`printRangeCard`); with the result's `click` the holds come in clicks too. */
 export function RangeCard({
   result,
   system,
