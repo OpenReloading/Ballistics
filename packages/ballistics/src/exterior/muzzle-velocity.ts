@@ -1,7 +1,4 @@
-/**
- * Muzzle velocity from a speed measured downrange, `apps/docs/docs/models/exterior-drag.md`,
- * "Speed measured downrange". SI in and out.
- */
+/** Muzzle velocity from a speed measured downrange, `apps/docs/docs/models/exterior-drag.md`, "Speed measured downrange"; SI in and out. */
 import { nth } from '@open-reloading/statistics'
 import { InputError, need } from '../issue.ts'
 import { overlay, type Settings } from '../settings.ts'
@@ -28,12 +25,7 @@ export interface DownrangeReading {
 /** Largest change of the muzzle velocity between two passes at which the search ends, m/s. */
 const convergence = 1e-6
 
-/**
- * Muzzle velocity whose flown speed at `distance` equals the measured one, over the bullet's own
- * drag law in `trajectory` (horizontal bore, point mass, no wind, Earth rotation, spin drift or
- * jump). Each pass moves the guess by the miss; the flown speed rises with the muzzle velocity at a
- * slope near one, so the miss shrinks by a factor of about the relative loss per pass.
- */
+/** Over the bullet's own drag law in `trajectory` (horizontal bore, point mass, no wind, Earth rotation, spin drift or jump); each pass moves the guess by the miss; the flown speed rises with the muzzle velocity at a slope near one, so the miss shrinks by a factor of about the relative loss per pass. */
 export function muzzleVelocityFromDownrange(
   reading: DownrangeReading,
   options?: Settings<TrajectoryOptions>,

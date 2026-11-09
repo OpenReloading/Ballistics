@@ -135,10 +135,7 @@ export interface PowderInteriorRecord {
     | undefined
 }
 
-/**
- * The SI workbench field values a powder record's model parameters fill, by field key; undefined for
- * a record without them. A record without a start pressure gets the fit's rule for barrels from 300 mm.
- */
+/** SI, by field key; undefined for a record without them; a record without a start pressure gets the fit's rule for barrels from 300 mm. */
 export function powderModelValues(p: PowderInteriorRecord): Record<string, number> | undefined {
   const i = p.interior
   if (!i) return undefined

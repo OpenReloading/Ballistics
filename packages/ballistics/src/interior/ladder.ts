@@ -1,11 +1,7 @@
 import { nth } from '@open-reloading/statistics'
 import { need } from '../issue.ts'
 
-/**
- * Charges of a charge ladder in kg: the i-th (from 0) is `start + i * step` up or `start - i * step`
- * down, multiplied rather than summed so the last step carries no accumulated rounding. `around`
- * takes an odd count centred on `start`, lowest first: `start + (i - (steps - 1) / 2) * step`.
- */
+/** Charges in kg: `start + i * step` up or `start - i * step` down, multiplied so the last step carries no accumulated rounding; `around` takes an odd count centred on `start`, lowest first. */
 export function chargeLadder(
   start: number,
   step: number,
