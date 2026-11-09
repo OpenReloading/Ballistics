@@ -1,10 +1,10 @@
 /** The sample photo the tool offers and the known truth the tests measure against (`apps/docs/docs/models/bullet-photo.md`). */
 import { type BulletDimensions, bulletProfile } from '@open-reloading/drawing/bullet'
 import { toSi } from '@open-reloading/schema'
+import { clamp } from '@open-reloading/target-recognition'
 import type { ScaleSpan } from './bullet-photo.ts'
 import type { RgbaImage } from './image.ts'
 import { nth } from './nth.ts'
-import { clamp } from './raster-ops.ts'
 import type { Point } from './target-geometry.ts'
 
 /** The ruler along the bottom of the photograph, graduated in mm. */

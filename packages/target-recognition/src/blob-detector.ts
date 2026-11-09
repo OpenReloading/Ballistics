@@ -1,9 +1,10 @@
 /** Multi-scale blob detection on a float image: box-blur scale space, scale-normalised Hessian response, peaks. */
 
-import { nth } from './nth.ts'
+import { nth } from '@open-reloading/statistics'
 import { clamp } from './raster-ops.ts'
 
 // Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the loop bounds keep the index in range
 const f32 = (a: Float32Array, i: number) => a[i] as number
 
 /** Peaks closer than this (in D) are one. */
@@ -15,9 +16,7 @@ export type Peak = { x: number; y: number; response: number; sigma: number }
 /** Edge pixels repeat; `out` may be `src`. */
 export function boxBlur(
   src: Float32Array,
-  w: number,
-  h: number,
-  r: number,
+  { w, h, r }: { w: number; h: number; r: number },
   tmp: Float32Array,
   out: Float32Array,
 ): void {
@@ -55,7 +54,7 @@ export function boxBlur(
 const sigmaOf = (r: number) => Math.sqrt(((2 * r + 1) ** 2 - 1) / 4)
 
 /** The box radii of the scales `factors` times D, without repeats, smallest first. */
-export const radiiOf = (D: number, factors: number[]) => [
+export const radiiOf = (D: number, factors: number[]): number[] => [
   ...new Set(
     factors.map((f) => Math.max(1, Math.round((Math.sqrt(4 * (f * D) ** 2 + 1) - 1) / 2))),
   ),
@@ -65,9 +64,10 @@ export const radiiOf = (D: number, factors: number[]) => [
 function response(P: Float32Array, w: number, h: number, r: number): Float32Array {
   const tmp = new Float32Array(w * h)
   const B = new Float32Array(w * h)
-  boxBlur(P, w, h, r, tmp, B)
-  boxBlur(B, w, h, r, tmp, B)
-  boxBlur(B, w, h, r, tmp, B)
+  const blur = { w, h, r }
+  boxBlur(P, blur, tmp, B)
+  boxBlur(B, blur, tmp, B)
+  boxBlur(B, blur, tmp, B)
   const R = new Float32Array(w * h)
   const k = sigmaOf(r) ** 2
   for (let y = 1; y < h - 1; y++)
@@ -97,7 +97,7 @@ export const space = (P: Float32Array, w: number, h: number, radii: number[]): S
 })
 
 /** The scale of the strongest response at pixel i among the first `count`, refined by a parabola in log sigma. */
-export function sigmaAt(sp: Space, i: number, count = sp.radii.length): number {
+export function sigmaAt(sp: Space, i: number, count: number = sp.radii.length): number {
   const { radii, Rs } = sp
   let a = 0
   for (let k = 1; k < count; k++) if (f32(nth(Rs, k), i) > f32(nth(Rs, a), i)) a = k
@@ -114,7 +114,12 @@ export function sigmaAt(sp: Space, i: number, count = sp.radii.length): number {
 }
 
 /** Strongest first; maxima over space and the first `count` scales, one peak within 0.8 D. */
-export function peaksOf(sp: Space, inside: Uint8Array, D: number, count = sp.radii.length): Peak[] {
+export function peaksOf(
+  sp: Space,
+  inside: Uint8Array,
+  D: number,
+  count: number = sp.radii.length,
+): Peak[] {
   const { w, h, Rs } = sp
   const M = new Float32Array(w * h)
   for (let a = 0; a < count; a++) {

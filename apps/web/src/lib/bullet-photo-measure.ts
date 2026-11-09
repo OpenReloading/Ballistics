@@ -1,10 +1,10 @@
 /** Dimensions with standard uncertainties from a photographed outline (`apps/docs/docs/models/bullet-photo.md`); pure, so it runs in a worker. */
 import { fromSi } from '@open-reloading/schema'
+import { median1 } from '@open-reloading/target-recognition'
 import { msg } from '../i18n/translate.ts'
 import { type Scale, solve } from './bullet-photo.ts'
 import { edgeUncertainty, type Outline, sideTapers } from './bullet-photo-outline.ts'
 import type { ScaleBasis } from './bullet-photo-scale.ts'
-import { median1 } from './raster-ops.ts'
 import type { Wording } from './wording.ts'
 
 // Unchecked reads inside loops whose bounds keep the index in range; module-local so the calls inline.

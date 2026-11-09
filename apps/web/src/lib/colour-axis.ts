@@ -1,7 +1,7 @@
 /** The colour axis of hole detection: Fisher's linear discriminant of a hole against its ring, in log RGB. */
 
+import { clamp, median1 } from '@open-reloading/target-recognition'
 import { nth } from './nth.ts'
-import { clamp, median1 } from './raster-ops.ts'
 import type { Point } from './target-geometry.ts'
 
 // Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.

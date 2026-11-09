@@ -1,6 +1,7 @@
 /** Decodes and downscales the posted photo so a hole is about 32 px across (`apps/docs/docs/models/hole-detection.md`); nothing leaves the browser. */
 
 import { fromSi } from '@open-reloading/schema'
+import { clamp } from '@open-reloading/target-recognition'
 import { errorText } from './error-text.ts'
 import { findFace } from './face-search.ts'
 import {
@@ -14,7 +15,6 @@ import {
 } from './hole-detection.ts'
 import type { Photo, WorkerReply, WorkerRequest } from './hole-detection-protocol.ts'
 import { layoutOf, photoQuality } from './photo-quality.ts'
-import { clamp } from './raster-ops.ts'
 import { faceLabel, onPhoto } from './target-face.ts'
 import { mul3, type Point, turnedBox } from './target-geometry.ts'
 

@@ -1,14 +1,17 @@
 /** Raster operations on working images held as flat arrays, row by row: masks, morphology, distances, components. */
 
-import { nth } from './nth.ts'
-import type { Point } from './target-geometry.ts'
+import type { Point } from '@open-reloading/shot-groups'
+import { nth } from '@open-reloading/statistics'
 
 // Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the loop bounds keep the index in range
 const f32 = (a: Float32Array, i: number) => a[i] as number
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the loop bounds keep the index in range
 const f64 = (a: Float64Array, i: number) => a[i] as number
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the loop bounds keep the index in range
 const i32 = (a: Int32Array, i: number) => a[i] as number
 
-export const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v))
+export const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, v))
 
 export const rectangle = (r: { x: number; y: number; width: number; height: number }): Point[] => [
   { x: r.x, y: r.y },
@@ -33,32 +36,37 @@ export function insidePolygon(p: Point, poly: readonly Point[]): boolean {
 
 /** Median of `v`, 0 for none. */
 export function median1(v: readonly number[]): number {
-  const s = [...v].sort((a, b) => a - b)
-  return s.length
-    ? s.length % 2
-      ? nth(s, s.length >> 1)
-      : (nth(s, s.length / 2 - 1) + nth(s, s.length / 2)) / 2
-    : 0
+  const s = v.toSorted((a, b) => a - b)
+  if (!s.length) return 0
+  return s.length % 2
+    ? nth(s, s.length >> 1)
+    : (nth(s, s.length / 2 - 1) + nth(s, s.length / 2)) / 2
 }
 
-/** The upper middle value of `v`, which it sorts in place; throws for an empty `v`. */
-export const upperMedian = (v: number[]) =>
+/** The upper middle value of `v`; throws for an empty `v`. */
+export const upperMedian = (v: readonly number[]): number =>
   nth(
-    v.sort((a, b) => a - b),
+    v.toSorted((a, b) => a - b),
     v.length >> 1,
   )
 
 type Pick = (a: number, b: number) => number
+/** The scratch lines of `minMax`; `size`, 2k + 1, is both the window and the block length. */
+type Lines = {
+  line: Float32Array
+  g: Float32Array
+  f: Float32Array
+  res: Float32Array
+  k: number
+  size: number
+  pick: Pick
+}
+type Size = { w: number; h: number }
+/** `lines` lines of `len` pixels, `step` apart along a line and `stride` apart between lines. */
+type Walk = { len: number; lines: number; step: number; stride: number }
 
 /** The running extreme from the start of each block of `size` pixels in `g`, to its end in `f`. */
-function blockExtremes(
-  line: Float32Array,
-  len: number,
-  size: number,
-  pick: Pick,
-  g: Float32Array,
-  f: Float32Array,
-) {
+function blockExtremes({ line, size, pick, g, f }: Lines, len: number) {
   for (let i = 0; i < len; i++)
     g[i] = i % size === 0 ? f32(line, i) : pick(f32(g, i - 1), f32(line, i))
   for (let i = len - 1; i >= 0; i--)
@@ -66,15 +74,7 @@ function blockExtremes(
 }
 
 /** The extreme of each window of 2k + 1 pixels from the block extremes. */
-function windowExtremes(
-  len: number,
-  k: number,
-  size: number,
-  pick: Pick,
-  g: Float32Array,
-  f: Float32Array,
-  res: Float32Array,
-) {
+function windowExtremes({ k, size, pick, g, f, res }: Lines, len: number) {
   for (let i = 0; i < len; i++) {
     const lo = Math.max(0, i - k)
     const hi = Math.min(len - 1, i + k)
@@ -85,7 +85,7 @@ function windowExtremes(
 }
 
 /** Three comparisons per pixel whatever k (van Herk; Gil and Werman); the window is cut at the edge. */
-function minMax(src: Float32Array, w: number, h: number, k: number, max: boolean): Float32Array {
+function minMax(src: Float32Array, { w, h }: Size, k: number, max: boolean): Float32Array {
   const pick = max ? Math.max : Math.min
   const rows = new Float32Array(w * h)
   const out = new Float32Array(w * h)
@@ -96,42 +96,36 @@ function minMax(src: Float32Array, w: number, h: number, k: number, max: boolean
     new Float32Array(n),
     new Float32Array(n),
   ]
-  const pass = (
-    from: Float32Array,
-    to: Float32Array,
-    len: number,
-    lines: number,
-    step: number,
-    stride: number,
-  ) => {
-    const size = 2 * k + 1
+  const scratch: Lines = { line, g, f, res, k, size: 2 * k + 1, pick }
+  const pass = (from: Float32Array, to: Float32Array, { len, lines, step, stride }: Walk) => {
     for (let l = 0; l < lines; l++) {
       for (let i = 0; i < len; i++) line[i] = f32(from, l * stride + i * step)
-      blockExtremes(line, len, size, pick, g, f)
-      windowExtremes(len, k, size, pick, g, f, res)
+      blockExtremes(scratch, len)
+      windowExtremes(scratch, len)
       for (let i = 0; i < len; i++) to[l * stride + i * step] = f32(res, i)
     }
   }
-  pass(src, rows, w, h, 1, w)
-  pass(rows, out, h, w, w, 1)
+  pass(src, rows, { len: w, lines: h, step: 1, stride: w })
+  pass(rows, out, { len: h, lines: w, step: w, stride: 1 })
   return out
 }
 
 /** The image is first extended by k repeated edge pixels, so features at the edge keep their shape. */
-function morph(src: Float32Array, w: number, h: number, k: number, closing: boolean) {
+function morph(src: Float32Array, { w, h }: Size, k: number, closing: boolean) {
   const [pw, ph] = [w + 2 * k, h + 2 * k]
   const padded = new Float32Array(pw * ph)
   for (let y = 0; y < ph; y++)
     for (let x = 0; x < pw; x++)
       padded[y * pw + x] = f32(src, clamp(y - k, 0, h - 1) * w + clamp(x - k, 0, w - 1))
-  const out = minMax(minMax(padded, pw, ph, k, closing), pw, ph, k, !closing)
+  const size = { w: pw, h: ph }
+  const out = minMax(minMax(padded, size, k, closing), size, k, !closing)
   const res = new Float32Array(w * h)
   for (let y = 0; y < h; y++) res.set(out.subarray((y + k) * pw + k, (y + k) * pw + k + w), y * w)
   return res
 }
 
-export const open = (src: Float32Array, w: number, h: number, k: number) =>
-  morph(src, w, h, k, false)
+export const open = (src: Float32Array, w: number, h: number, k: number): Float32Array =>
+  morph(src, { w, h }, k, false)
 
 /** Where the parabola rooted at `q` overtakes the one rooted at `p`. */
 const crossing = (f: Float64Array, q: number, p: number) =>
@@ -159,8 +153,7 @@ function lowerEnvelope(f: Float64Array, len: number, v: Int32Array, z: Float64Ar
 function readEnvelope(
   f: Float64Array,
   len: number,
-  v: Int32Array,
-  z: Float64Array,
+  { v, z }: { v: Int32Array; z: Float64Array },
   out: Float64Array,
 ) {
   let j = 0
@@ -187,11 +180,12 @@ export function distanceSquared(
     new Int32Array(n),
     new Float64Array(n + 1),
   ]
+  const envelope = { v, z }
   const pass = (len: number, lines: number, step: number, stride: number) => {
     for (let l = 0; l < lines; l++) {
       for (let i = 0; i < len; i++) f[i] = f64(d, l * stride + i * step)
       lowerEnvelope(f, len, v, z)
-      readEnvelope(f, len, v, z, out)
+      readEnvelope(f, len, envelope, out)
       for (let i = 0; i < len; i++) d[l * stride + i * step] = f64(out, i)
     }
   }
@@ -204,22 +198,20 @@ export function distanceSquared(
 export function components(mask: Uint8Array, w: number, h: number): number[][] {
   const seen = new Uint8Array(w * h)
   const stack = new Int32Array(w * h)
+  const fill: Fill = { mask, w, h, seen, stack }
   const out: number[][] = []
   for (let start = 0; start < w * h; start++) {
     if (!mask[start] || seen[start]) continue
-    out.push(flood(start, mask, w, h, seen, stack))
+    out.push(flood(start, fill))
   }
   return out
 }
 
-function flood(
-  start: number,
-  mask: Uint8Array,
-  w: number,
-  h: number,
-  seen: Uint8Array,
-  stack: Int32Array,
-): number[] {
+/** The mask of `components` with the pixels its fills have reached and their stack. */
+type Fill = { mask: Uint8Array; w: number; h: number; seen: Uint8Array; stack: Int32Array }
+
+function flood(start: number, fill: Fill): number[] {
+  const { seen, stack } = fill
   const pixels: number[] = []
   let top = 0
   stack[top++] = start
@@ -227,16 +219,23 @@ function flood(
   while (top) {
     const i = i32(stack, --top)
     pixels.push(i)
-    const [x, y] = [i % w, Math.floor(i / w)]
-    for (let dy = -1; dy <= 1; dy++)
-      for (let dx = -1; dx <= 1; dx++) {
-        const [u, v] = [x + dx, y + dy]
-        const j = v * w + u
-        if (u >= 0 && u < w && v >= 0 && v < h && mask[j] && !seen[j]) {
-          seen[j] = 1
-          stack[top++] = j
-        }
-      }
+    top = pushNeighbors(fill, i, top)
   }
   return pixels
+}
+
+/** Pushes the unseen mask pixels around pixel i onto the stack above `top`; returns the new top. */
+function pushNeighbors({ mask, w, h, seen, stack }: Fill, i: number, top: number): number {
+  let t = top
+  const [x, y] = [i % w, Math.floor(i / w)]
+  for (let dy = -1; dy <= 1; dy++)
+    for (let dx = -1; dx <= 1; dx++) {
+      const [u, v] = [x + dx, y + dy]
+      const j = v * w + u
+      if (u >= 0 && u < w && v >= 0 && v < h && mask[j] && !seen[j]) {
+        seen[j] = 1
+        stack[t++] = j
+      }
+    }
+  return t
 }
