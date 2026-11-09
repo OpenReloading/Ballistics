@@ -1,7 +1,4 @@
-/**
- * The browser store of user records and target photos (IndexedDB); the workspace folder handle is
- * kept in the same database (`workspace-folder.ts`).
- */
+/** The workspace folder handle shares the database (`workspace-folder.ts`). */
 import type { EmbeddedFile, UserRecord } from '@open-reloading/schema'
 import { validRecords } from './user-data.ts'
 import { inStore } from './user-db.ts'
@@ -17,22 +14,14 @@ export const rawPhotoId = (raw: unknown) => {
   return typeof photo === 'string' ? photo : undefined
 }
 
-/**
- * Ids of the photos a stored target sheet points at, an invalid sheet's too: its photo stays
- * with it.
- */
+/** An invalid sheet's too: its photo stays with it. */
 export async function storedPhotoIds() {
   const { records, invalid } = await storedRecords()
   const raw = invalid.flatMap((i) => rawPhotoId(i.raw) ?? [])
   return new Set([...photoIds(records), ...raw])
 }
 
-/**
- * Stores the `invalid` entries of an Export all file as they are, each only where no stored
- * record has its id, so a valid record is never overwritten. Counts the entries stored (`added`),
- * left out for an id already in the store (`kept`) and without a text id, which no record has
- * (`unstorable`).
- */
+/** Each only where no record has its id, so a valid record is never overwritten. */
 export async function putInvalid(raw: unknown[]) {
   const n = { added: 0, kept: 0, unstorable: 0 }
   for (const r of raw) {
@@ -53,10 +42,7 @@ export const putRecords = (records: UserRecord[]) =>
     return
   })
 
-/**
- * Whether a writer that last read or wrote the record saved at `base` may replace `stored`: it is
- * absent, or no other writer saved it since. Without `base` only an absent record fits.
- */
+/** Absent, or no other writer saved it since `base`; without `base` only an absent record fits. */
 export const fits = (stored: { saved: string } | undefined, base: string | undefined) =>
   !stored || stored.saved === base
 
@@ -72,13 +58,7 @@ export async function putRecordIf(record: UserRecord, base: string | undefined) 
   return fits(stored, base)
 }
 
-/**
- * Replaces the stored record `id` by what `change` makes of it (the stored value as written,
- * unvalidated, undefined when absent), read and written in one transaction: two tabs changing one
- * record never lose each other's change. `change` returns undefined to leave the record as it is.
- * Resolves with the record written, undefined when `change` left it; rejects with what `change`
- * throws, the record left as it was.
- */
+/** Read and written in one transaction, so two tabs changing one record never lose each other's change; resolves with the record written, undefined when `change` left it, and rejects with what `change` throws. */
 export async function updateRecord(
   id: string,
   change: (stored: unknown) => UserRecord | undefined,
@@ -105,10 +85,7 @@ export async function updateRecord(
   return written
 }
 
-/**
- * Puts `record` unless the store holds a record, valid or not, with its id, read and written in
- * one transaction; false when it was left out.
- */
+/** One transaction; false when a record of that id, valid or not, was there. */
 export async function putRecordIfAbsent(record: UserRecord) {
   const stored = await inStore('records', 'readwrite', (s) => {
     const r = s.get(record.id)
@@ -129,10 +106,7 @@ const previousOf = (raw: unknown) => {
 
 const idOf = (ref: string) => ref.slice('user:'.length)
 
-/**
- * What a powder naming `named` names once the records of `gone` are deleted: the `previous` of a
- * deleted powder, through the deleted ones, up to a record that stays. Undefined to leave it.
- */
+/** Through the deleted ones up to a record that stays; undefined to leave it. */
 function relinked(named: string, gone: ReadonlyMap<string, unknown>) {
   let to = named
   const seen = new Set<string>()
@@ -146,11 +120,7 @@ function relinked(named: string, gone: ReadonlyMap<string, unknown>) {
   return to !== named && !gone.has(idOf(to)) ? to : undefined
 }
 
-/**
- * Deletes the records `ids`. In the same transaction a powder whose `fit.previous` names a
- * deleted powder takes that powder's own `previous` (through the deleted ones), so a chain of
- * refits stays whole and a load on an older fit still finds the newest.
- */
+/** In the same transaction refit chains are relinked, so a load on an older fit still finds the newest. */
 export const deleteRecords = (ids: string[]) =>
   inStore('records', 'readwrite', (s) => {
     const all = s.getAll()
@@ -187,9 +157,6 @@ export const storedPhoto = (id: string) =>
 export const deletePhoto = (id: string) => inStore('files', 'readwrite', (s) => s.delete(id))
 
 let persisted: Promise<boolean> | undefined
-/**
- * Asks once per page load for persistent storage, so the browser does not evict the
- * records under storage pressure; true where the API is missing.
- */
+/** So the browser does not evict the records under storage pressure; true where the API is missing. */
 export const requestPersistentStorage = () =>
   (persisted ??= (navigator.storage?.persist?.() ?? Promise.resolve(true)).catch(() => true))

@@ -12,10 +12,7 @@ const NMS = 0.8
 /** A blob peak: position (px), response and scale (px). */
 export type Peak = { x: number; y: number; response: number; sigma: number }
 
-/**
- * Box blur of radius r into `out` (which may be `src`), through the scratch buffer `tmp`; edge
- * pixels repeat.
- */
+/** Edge pixels repeat; `out` may be `src`. */
 export function boxBlur(
   src: Float32Array,
   w: number,
@@ -64,11 +61,7 @@ export const radiiOf = (D: number, factors: number[]) => [
   ),
 ]
 
-/**
- * Scale-normalised blob response at box radius r: sigma squared times the smaller magnitude
- * eigenvalue of the Hessian where both are negative (a bright blob), else 0, so a ring line
- * (one eigenvalue near 0) gives none.
- */
+/** sigma² times the smaller-magnitude eigenvalue where both are negative (a bright blob), so a ring line, with one eigenvalue near 0, gives none. */
 function response(P: Float32Array, w: number, h: number, r: number): Float32Array {
   const tmp = new Float32Array(w * h)
   const B = new Float32Array(w * h)
@@ -120,10 +113,7 @@ export function sigmaAt(sp: Space, i: number, count = sp.radii.length): number {
   )
 }
 
-/**
- * Blob peaks of a scale space inside `inside`, strongest first: maxima over space and the first
- * `count` scales, within 0.8 D one peak.
- */
+/** Strongest first; maxima over space and the first `count` scales, one peak within 0.8 D. */
 export function peaksOf(sp: Space, inside: Uint8Array, D: number, count = sp.radii.length): Peak[] {
   const { w, h, Rs } = sp
   const M = new Float32Array(w * h)

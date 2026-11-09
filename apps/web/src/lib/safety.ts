@@ -1,10 +1,6 @@
 import { msg } from '../i18n/translate.ts'
 
-/**
- * The Safety section of README.md as plain text, and the one source of the dialog's English text:
- * test/safety.test.ts keeps README.md equal to it, and the i18n lint requires a German text for
- * every line. English is the binding text.
- */
+/** test/safety.test.ts keeps README.md equal to it and the i18n lint requires German for every line; English is binding. */
 export const safety = {
   intro: msg(
     'Reloading ammunition is dangerous. This software helps you plan, simulate and document. It does not replace published load data, the instructions of your component and equipment makers, or safe practice.',

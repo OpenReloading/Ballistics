@@ -1,18 +1,11 @@
-/**
- * The values the user changed over what a record gives: the one rule of the changed mark, the
- * reset and, through `given` (`givenKeys` in `load-record.ts`), what a load saves as typed.
- */
+/** The one rule behind the changed mark, the reset and what a load saves as typed (`givenKeys` in `load-record.ts`). */
 
 import { followKeys, type Suggestions } from './input-defaults.ts'
 
 /** A field value equal to the record's, within 1e-9 relative. */
 const sameValue = (from: number, si: number) => Math.abs(si - from) <= 1e-9 * Math.abs(from)
 
-/**
- * The record value of each key in `values` that a record gives and the user changed: a value is
- * there, `given` (a record, a default or the seating gives it) does not hold it, and it differs
- * from the record's. SI.
- */
+/** Only values `given` does not hold and that differ from the record's; SI. */
 export function changedFromRecord(
   values: Record<string, number | undefined>,
   recordValues: Record<string, number | undefined>,
@@ -27,11 +20,7 @@ export function changedFromRecord(
   return changed
 }
 
-/**
- * The values the chosen records give, by key, SI: the powder's model values, the bullet's, the
- * sheet's and powder's specs, the defaults of the followed fields (the volume only while no seating
- * owns it) and the firearm's weight.
- */
+/** The volume default only while no seating owns it; SI. */
 export function recordValuesOf(a: {
   origin: Record<string, number> | undefined
   bullet: Record<string, number | undefined>

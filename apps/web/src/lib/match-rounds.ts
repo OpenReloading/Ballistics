@@ -18,11 +18,7 @@ function byStage<T extends { stage?: string | undefined }>(mappings: readonly T[
   return [...stages.values()]
 }
 
-/**
- * Shots and sighters per event. Mappings of one `stage` (or several without one, the whole
- * discipline) are alternative faces and count once; a stage's own sighters replace the
- * discipline's.
- */
+/** Mappings of one stage are alternative faces and count once; a stage's own sighters replace the discipline's. */
 export function matchCourse(
   mappings: readonly Pick<TargetMapping, 'stage' | 'shotCount' | 'sighters'>[],
   rules: Pick<DisciplineRules, 'sighters'> | undefined,
@@ -63,10 +59,7 @@ export interface MatchRounds {
   difference?: number | undefined
 }
 
-/**
- * ceil((shots + sighters) x events x (1 + reserve / 100)), and the difference with the rounds on
- * hand. No result while a field it needs is empty, negative or events is 0.
- */
+/** ceil((shots + sighters) x events x (1 + reserve / 100)); none while a field is empty, negative or events is 0. */
 export function matchRounds(input: MatchInput): MatchRounds | undefined {
   const { shots, sighters, events, reserve, onHand } = input
   if (shots === undefined || sighters === undefined || events === undefined) return undefined

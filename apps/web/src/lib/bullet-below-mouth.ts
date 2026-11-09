@@ -12,11 +12,7 @@ import type { Suggestion } from './input-defaults.ts'
 /** Why the bullet is not seated: the record has no length or diameter, its outline is refused, the cartridge has no case length, CBTO needs a base-to-ogive, no seating is entered. */
 export type Unseated = 'dimensions' | 'outline' | 'chamber' | 'cbto' | 'seating'
 
-/**
- * The bullet volume below the mouth of a bullet that is not seated, m³: with its interval and what
- * it rests on (`from`: the record's length, or its mass with a density; `coal`: the COAL entered or
- * L6 of the cartridge), or refused naming what is missing (English, for `t`).
- */
+/** Volume and interval in m³, with what it rests on, or refused naming what is missing (English, for `t`). */
 export type BelowMouth =
   | {
       kind: 'estimate'
@@ -58,12 +54,7 @@ const becauseText: Record<Unseated, Message> = {
 
 const coalText = { entered: msg('the COAL entered'), L6: msg('L6 of the cartridge') }
 
-/**
- * The volume default of a bullet that is not seated: the capacity less the estimated bullet volume
- * below the mouth, approximate, with the interval of the volume behind the bullet in its source;
- * none where the bullet volume is refused or leaves nothing. A seated bullet (no `unseated`)
- * leaves the capacity as it is.
- */
+/** Approximate, with the interval of the volume behind the bullet; a seated bullet leaves the capacity as it is. */
 export function lessBullet(
   capacity: Suggestion | undefined,
   unseated: BelowMouth | undefined,
@@ -146,15 +137,7 @@ function volumeOf(o: {
   return { ...si(e), from: density }
 }
 
-/**
- * The volume the bullet takes below the mouth when it is not seated
- * (`apps/docs/docs/models/case-capacity.md`, "Bullet without a seated outline"), at the COAL
- * entered, else at the cartridge's maximum overall length L6. With the `shape` of the record (its
- * outline is built, only the seating is missing) from that outline; a record with a length and no
- * diameter from its length at the cartridge's groove diameter Z; else from its diameter (the record,
- * typed, or Z), mass and the effective density of its construction class. A mass or a length that
- * is not positive counts as missing, and an outline refused for these lengths refuses the volume.
- */
+/** At the COAL entered, else at L6; from the outline, the length, or the mass and class density (`apps/docs/docs/models/case-capacity.md`, "Bullet without a seated outline"). */
 export function belowMouth(a: {
   /** The record with the typed values in place. */
   record: Partial<Bullet>

@@ -13,19 +13,7 @@ export type FigureView = 'cartridge' | 'chamber' | 'combined'
 /** A view's model with the annotation of the side it dimensions, the source of its values table. */
 type ViewModel = FigureModel & { annotation?: Annotation }
 
-/**
- * The models of the three views of the workbench's cartridge figure: Combined (`preview`, both
- * outlines without dimensions, once a bullet is seated) and each side's dimensioned record figure,
- * with `seated` the Cartridge side's L6 replaced by the seated COAL and the seated CBTO added.
- * All share the text size of the record figure and one frame, the union of their frames, and the
- * scale bar of the lowest, so the outline keeps its place and scale when a view hides or shows the
- * dimensions. Laid out for `medium`: upright on screen, level (head left) for print. Only the
- * `views` are built, and the shared frame is theirs.
- *
- * Built in two steps by what a slider move changes: the Combined and Chamber models and the text
- * size once, then each call for seated lengths lays out only the Cartridge side and shares the
- * frame again.
- */
+/** One frame and text size for all views, so the outline keeps its place and scale; a slider move relays only the Cartridge side. */
 export function figureViewBuilder(
   spec: Parameters<typeof recordFigures>[0],
   preview: Drawn | undefined,
@@ -77,13 +65,9 @@ function sharedFrame(models: [FigureView, ViewModel][]): Partial<Record<FigureVi
 /** COAL and CBTO of the seated bullet, mm; CBTO only with the bullet's base-to-ogive. */
 type SeatedLengths = { coal: number; cbto?: number | undefined }
 
-/**
- * The cartridge side as the workbench's Cartridge view draws it: the record figure with the seated
- * COAL in place of L6 and the seated CBTO added, from the head.
- */
+/** The record figure with the seated COAL in place of L6 and the seated CBTO added. */
 function seatedSide(d: Drawn[number], seated: SeatedLengths, unit: LengthUnit): Drawn[number] {
-  // a mm label to 0.01 mm, the record values' precision (an inch label has its own decimals); the
-  // line keeps the exact length
+  // A mm label to 0.01 mm, the record values' precision; the line keeps the exact length.
   const mm = (v: number) => (unit === 'mm' ? Math.round(v * 100) / 100 : v)
   const length = (symbol: string, v: number): Dimension => ({
     kind: 'length',

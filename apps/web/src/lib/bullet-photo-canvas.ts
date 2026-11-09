@@ -1,8 +1,4 @@
-/**
- * What the bullet photo tool draws on its canvas (browser only, no React): the photograph with
- * the cut-out tinted, the measured axis and the drawing of the measured values over it, the placed
- * scale points and the cursor.
- */
+/** What the bullet photo tool draws on its canvas; browser only, no React. */
 import type { Outline } from './bullet-photo-outline.ts'
 import type { Point } from './target-geometry.ts'
 

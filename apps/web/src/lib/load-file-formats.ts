@@ -11,11 +11,7 @@ import {
   tooLargeMessage,
 } from './user-data.ts'
 
-/**
- * A load-file format the File menu opens and imports: told by `detect`, read by `parse` into user
- * records that passed `@open-reloading/schema`, both from the file's bytes, so the extension plays
- * no part. A new format is its module plus one entry in `loadFileFormats`.
- */
+/** Detected and read from the bytes into records that passed `@open-reloading/schema` at runtime, so the extension plays no part; a new format is its module plus one entry here. */
 export interface LoadFileFormat {
   /** Shown in the open picker and on the Import entry's card. */
   name: string
@@ -29,11 +25,7 @@ export interface LoadFileFormat {
 /** The text of `bytes` as UTF-8, a byte order mark left out, as `File.text()` reads it. */
 const utf8 = (bytes: Uint8Array) => new TextDecoder().decode(bytes)
 
-/**
- * Every load-file format, detected in this order. The OpenReloading user data file, a JSON object
- * that names its format, comes first and also reads every file no entry claims, so its reasons name
- * what is wrong.
- */
+/** The user data file comes first and also reads every file no entry claims, so its reasons name what is wrong. */
 export const loadFileFormats: LoadFileFormat[] = [
   {
     name: 'OpenReloading data',

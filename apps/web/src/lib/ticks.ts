@@ -2,10 +2,7 @@ import { nth } from './nth.ts'
 
 const NICE_STEPS = [1, 2, 5, 10]
 
-/**
- * Axis ticks after Heckbert 1990: the span and then the step are rounded to 1, 2, 5 or 10 times a
- * power of ten.
- */
+/** After Heckbert 1990: span and step rounded to 1, 2, 5 or 10 times a power of ten. */
 function nice(x: number, round: boolean): number {
   const e = Math.floor(Math.log10(x))
   const f = x / 10 ** e

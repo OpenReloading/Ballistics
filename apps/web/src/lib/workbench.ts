@@ -20,11 +20,7 @@ export type InputPanel = (typeof panelOrder)[number]
 
 type Limit = NonNullable<InteriorResponse['limits']>[number]
 
-/**
- * The compared limit with a pressure that "Percent of maximum" and the chart's limit line use, as
- * the API's percentage target: undefined without one or when the compared limits of the
- * cartridge's variants differ.
- */
+/** Undefined without one or when the cartridge's variants compare different limits. */
 export function pressureLimit(limits: Limit[] | undefined) {
   const compared = limits?.filter((l) => l.compared && l.pressure !== undefined) ?? []
   const [first] = compared
@@ -43,10 +39,7 @@ export function bulletLeadTime(r: { muzzleTime: number; tenPercentPressureTime: 
   return r.tenPercentPressureTime > 0 ? r.muzzleTime - r.tenPercentPressureTime : undefined
 }
 
-/**
- * The warning of a charge above the solid fill limit, undefined within it; the workbench result and
- * its step flag show it. Charge kg, solid and bulk density kg/m³, volume m³.
- */
+/** Charge kg, densities kg/m³, volume m³. */
 export function solidFillWarning(
   charge: number,
   density: number,
@@ -77,20 +70,13 @@ export function solidFillWarning(
   }
 }
 
-/**
- * A ladder step's label relative to the main charge: the main charge is 0, lower
- * charges -1, -2 and higher ones +1, +2, with the minus sign U+2212. Step `i` of `steps` in the
- * order the API returns them: up and down start at the main charge, around is lowest first.
- */
+/** Minus as U+2212; up and down start at the main charge, around is lowest first. */
 export function stepLabel(i: number, steps: number, direction: LadderDirection) {
   const k = direction === 'around' ? i - (steps - 1) / 2 : direction === 'down' ? -i : i
   return k === 0 ? '0' : `${k > 0 ? '+' : '−'}${Math.abs(k)}`
 }
 
-/**
- * How many tabs of `widths` (px, in order) fit a row `room` px wide; the rest go into a More menu.
- * A row not measured yet (0) keeps them all.
- */
+/** `widths` and `room` in px; the rest go into More; a row not yet measured (0) keeps them all. */
 export function resultTabsFit(widths: number[], room: number) {
   if (room <= 0) return widths.length
   let used = 0
@@ -101,10 +87,7 @@ export function resultTabsFit(widths: number[], room: number) {
   return widths.length
 }
 
-/**
- * The run status: text, or a result's line (after `prefix`) written in the units shown now. A `say`
- * is written in the language shown now, a plain string stays as it was written.
- */
+/** A `say` follows the language shown now, a plain string stays as written. */
 export type Status = string | { say: Say } | { prefix: string | Say }
 
 /** The status text; `line` is the shown result's line in the units shown now, undefined without a result. */
@@ -129,10 +112,7 @@ function limitNumber(pa: number, system: UnitSystem, d: number) {
     : +u.fromSi(pa).toFixed(d)
 }
 
-/**
- * The decimals that keep simulated pressures on their side of a limit once both are rounded (the
- * API's rule in bar): the unit's, more while rounding would put one on or across the limit.
- */
+/** More decimals while rounding would put a pressure on or across the limit (the API's rule in bar). */
 function digitsAgainst(values: number[], limit: number, system: UnitSystem) {
   const u = system.pressure
   let d = u.decimals
@@ -154,11 +134,7 @@ function convertBarMessage(message: string, system: UnitSystem) {
       )
 }
 
-/**
- * An exceeded limit's warning written again from the limit `l`, its pressure `pressure` (Pa) and
- * the pressure range of `body`, its source as the standard with the sheet's date and the
- * measuring method.
- */
+/** `pressure` in Pa; its source as the standard with the sheet's date and the measuring method. */
 function limitExceededText(
   body: InteriorResponse,
   l: Limit,
@@ -232,13 +208,7 @@ const warnedLimit = (x: Limit, w: InteriorResponse['warnings'][number]) =>
   x.variant === w.variant &&
   x.method === w.method
 
-/**
- * The API's warnings of `body` in the pressure unit of `system`, each with its short name: an
- * exceeded limit (the warning's sheet, symbol, variant and method) is written again from the
- * limit and the pressure range, its source as the
- * standard with the sheet's date and the measuring method; bar values of the other lines are
- * converted.
- */
+/** An exceeded limit is written again from the limit and the range; bar values of other lines are converted. */
 export function shownWarnings(
   body: InteriorResponse,
   system: UnitSystem,
@@ -255,10 +225,7 @@ export function shownWarnings(
   })
 }
 
-/**
- * Why the range card is out of reach after a run: a missing bullet record at once; any other
- * reason once the Trajectory result has stayed away (`waited`), never during the wait for it.
- */
+/** A missing bullet record at once; other reasons only after the Trajectory result has stayed away, never during the wait. */
 export const rangeCardNote = (
   ran: boolean,
   bullet: string | undefined,
@@ -273,10 +240,7 @@ export const rangeCardNote = (
         ? t('The range card needs a Trajectory result: see the Trajectory tab.')
         : ''
 
-/**
- * The two values the phone range view leads with: the shown step's charge and muzzle
- * velocity in the page's units, and the step's label on a ladder.
- */
+/** In the page's units, with the step's label on a ladder. */
 export function rangeHero(
   system: UnitSystem,
   charge: number,
@@ -291,12 +255,7 @@ export function rangeHero(
   }
 }
 
-/**
- * The band of the peak pressure (Pa) and the muzzle velocity (m/s) a result shows: the 5th and 95th
- * percentile of the sampled band, else the corner-case range of the pressure and no velocity band.
- * `cornerOnly` (the printed report) always takes the corner-case range, so a print does not depend on
- * whether the sampling had answered.
- */
+/** Peak pressure (Pa) and muzzle velocity (m/s): 5th to 95th percentile of the sampled band, else the corner cases; `cornerOnly` so a print does not depend on sampling. */
 export function resultBand(body: InteriorResponse, cornerOnly = false) {
   const { sampled, pressureRange: range } = body
   const sample = sampled?.status === 'sampled' && !cornerOnly ? sampled : undefined
@@ -325,10 +284,7 @@ export function bandNotice(
   )
 }
 
-/**
- * The line under the key tiles of a result with a sampling answer: the velocity band and what the
- * bands cover, or why the corner-case range is shown instead; undefined without a sampling answer.
- */
+/** Undefined without a sampling answer. */
 export function bandLine(
   body: InteriorResponse,
   system: UnitSystem,

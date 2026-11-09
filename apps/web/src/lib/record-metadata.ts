@@ -1,11 +1,7 @@
 import type { Metadata, ResolvingMetadata } from 'next'
 import { type ManufacturerNames, noManufacturerNames, productLabel } from './manufacturers.ts'
 
-/**
- * The head tags of a record page: its own title and description, repeated in the Open Graph and
- * Twitter tags a link preview reads. A page's `openGraph` and `twitter` replace the layout's, so
- * those are spread from `parent` to keep the site image and the card type.
- */
+/** A page's `openGraph` and `twitter` replace the layout's, so they spread `parent` to keep the site image and card type. */
 export async function recordMetadata(
   parent: ResolvingMetadata,
   title: string,
@@ -61,11 +57,7 @@ export interface HeadSource {
 /** The id a `catalogue:<id>` reference names. */
 export const refId = (ref: string) => ref.slice(ref.indexOf(':') + 1)
 
-/**
- * The title and description of the record page of `kind`, shared by the route's metadata and the
- * prerender check. `names` holds the manufacturer names that a bullet, powder, case or primer's label
- * leads with.
- */
+/** Shared by the route's metadata and the prerender check. */
 export function recordHeadText(
   kind: RecordKind,
   r: HeadSource,

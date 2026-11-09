@@ -8,19 +8,13 @@ import { seatingLengthName } from './seating-ladder.ts'
 import { type UnitSystem, withUnit } from './units.ts'
 import type { InvalidRecord } from './user-data.ts'
 
-/**
- * The QR text of a saved load's box label: format version 1, kind `L` (a saved load) and the load's
- * record id. It names the load only, so an old label never goes stale (docs, Box label).
- */
+/** It names the load only, so an old label never goes stale (docs, Box label). */
 export const labelPayload = (id: string) => `OR1:L:${id}`
 
 const uuid = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 const payloadPattern = new RegExp(`OR(\\d+):([A-Z]):(${uuid})`, 'i')
 
-/**
- * The load id of a box label's text found anywhere in `text` (a scan, a web address that carries
- * it, the printed line), or the bare id alone. Another format version or kind gives none.
- */
+/** Found anywhere in `text` (a scan, a web address, the printed line); another format version or kind gives none. */
 export function readLabel(text: string): string | undefined {
   let plain = text
   try {
@@ -32,10 +26,7 @@ export function readLabel(text: string): string | undefined {
   return new RegExp(`^\\s*(${uuid})\\s*$`, 'i').exec(plain)?.[1]?.toLowerCase()
 }
 
-/**
- * The saved load of `id` in the browser store's `records`, `invalid` when the id is stored but
- * fails the schema, or `missing`.
- */
+/** `invalid` when the id is stored but fails the schema. */
 export function labelledLoad(
   id: string,
   stored: { records: readonly UserRecord[]; invalid: readonly InvalidRecord[] },
@@ -51,11 +42,7 @@ export const qrModules = (text: string) => encode(text, { ecc: 'M', border: 4 })
 /** What a box label prints: the load's name, label and value rows, and the QR text. */
 export type BoxLabel = { title: string; rows: [string, string][]; payload: string }
 
-/**
- * The box label of a saved load, from the stored record alone: the same record gives the same label
- * (the date is the day it was saved). A row without a value is left out, so a lot prints only when
- * typed.
- */
+/** From the stored record alone, so the same record gives the same label; a row without a value is left out. */
 export function boxLabel(
   r: LoadRecord,
   nameOf: NameOf,

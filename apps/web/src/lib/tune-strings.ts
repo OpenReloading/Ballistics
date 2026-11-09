@@ -3,13 +3,9 @@ import { parseNumber } from '../i18n/number.ts'
 import { sessionRef } from './measurements.ts'
 import { parseVelocities, sessionStrings, type TuneString } from './powder-tune.ts'
 
-// The parts of the tuning screen the workbench does not use, out of `powder-tune.ts`, which its
-// Measurements tab loads
+// The tuning screen's own parts, out of `powder-tune.ts`, which the workbench's Measurements tab loads.
 
-/**
- * The powders (references) of the saved loads of `records` that have strings mapped to a charge,
- * each once: the choices of the tuning route opened without a powder.
- */
+/** The choices of the tuning route opened without a powder. */
 export function powdersWithStrings(records: readonly UserRecord[]) {
   const sessions = new Map(
     records.flatMap((r) => (r.kind === 'session' ? [[sessionRef(r.id), r] as const] : [])),
@@ -23,11 +19,7 @@ export function powdersWithStrings(records: readonly UserRecord[]) {
   return [...new Set(powders)]
 }
 
-/**
- * The velocity residual of each of `strings`, in their order, from `residuals` of a fit of
- * `fitStrings(strings)`: undefined for a string the fit left out (no shot), and for every string
- * while the residuals belong to other strings (a fit of strings since changed).
- */
+/** Undefined for a string the fit left out, and for all while the residuals belong to strings since changed. */
 export function stringResiduals<R extends { kind: string; charge: number }>(
   strings: readonly TuneString[],
   residuals: readonly R[] | undefined,
@@ -56,11 +48,7 @@ export type StringForm = { charge: string; shots: string; temperature: string }
 /** The fields of `StringForm` that do not read: the charge, the velocities, the temperature. */
 export type StringFormErrors = Partial<Record<keyof StringForm, true>>
 
-/**
- * The string typed in `form`, in SI by the converters of the charge, velocity and temperature
- * units, or the fields that do not read: a charge and one or more velocities, each above 0, and a
- * temperature or none.
- */
+/** In SI by the unit converters, or the fields that do not read. */
 export function readStringForm(
   form: StringForm,
   units: {

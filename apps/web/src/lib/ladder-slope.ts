@@ -13,19 +13,10 @@ export interface DropSlopeLoad {
   dragFactor?: number | undefined
 }
 
-/**
- * Half the velocity step of the slope, m/s: wide enough that the integrator tolerance does not
- * show in the height difference, narrow enough that the height is linear in velocity across it.
- */
+/** m/s: wide enough to hide the integrator tolerance, narrow enough that height stays linear in velocity. */
 const half = 10
 
-/**
- * Change of the height of impact at `distance` m per m/s of muzzle velocity: two trajectories at
- * the muzzle velocity less and plus `half`, flown with the bore angles of the zero at the load's
- * muzzle velocity, in ICAO air without wind. Undefined when the load lacks a muzzle velocity, a
- * sight height or a zero range, or the solver refuses the shot.
- * (`apps/docs/docs/models/interior-ladder-impact.md`, "Drop slope".)
- */
+/** Height change at `distance` (m) per m/s of muzzle velocity: two trajectories ±`half` with the zero's bore angles, ICAO air, no wind; undefined without a muzzle velocity, sight height or zero range, or when the solver refuses (`apps/docs/docs/models/interior-ladder-impact.md`, "Drop slope"). */
 export function dropSlope(
   load: DropSlopeLoad,
   projectile: Projectile,

@@ -30,10 +30,7 @@ import { exportIds } from './prerender-sample.ts'
 
 type Fetched<T> = { status: 'ok'; data: T } | { status: 'notFound' }
 
-/**
- * GET `path` from API_URL, cached for days. 404 and 400 (an id the API rejects) give `notFound`;
- * any other failure throws, which fails the build.
- */
+/** Cached for days; 404 and 400 give `notFound`, any other failure throws and so fails the build. */
 async function apiGet<T>(path: string): Promise<Fetched<T>> {
   'use cache'
   const apiUrl = process.env.API_URL ?? 'http://localhost:3000'
@@ -105,10 +102,7 @@ export const listFederations = () => listItems<FederationListItem>('/federations
 export const listCaliberClasses = () => listItems<CaliberClassSummary>('/caliber-classes')
 export const listEventTypes = () => listItems<{ id: string }>('/event-types')
 
-/**
- * `generateStaticParams` of a detail route: every id of the list, or for `PRERENDER=sample` the
- * sample of `prerender-sample.ts` (`exportIds`). A missing list fails the build.
- */
+/** Every id of the list, or for `PRERENDER=sample` the sample of `prerender-sample.ts`; a missing list fails the build. */
 export async function staticIds(list: () => Promise<Fetched<{ id: string }[]>>, what: string) {
   const r = await list()
   if (r.status !== 'ok') throw new Error(`no ${what} list at build`)

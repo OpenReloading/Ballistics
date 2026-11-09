@@ -22,11 +22,7 @@ export type ChargeFill =
       compressed: boolean
     }
 
-/**
- * The charge fill of the case from the charge (kg), the powder's bulk density (kg/m³), the free
- * volume behind the seated bullet (m³) and the bullet base (mm from the head); without one of the
- * three inputs, what is missing.
- */
+/** `base` in mm from the head; charge kg, bulk density kg/m³, free volume m³; without one of the three inputs, what is missing. */
 export function chargeFill(o: {
   charge: number | undefined
   bulkDensity: number | undefined
@@ -46,8 +42,7 @@ export function chargeFill(o: {
     charge,
     ratio,
     loadingDensity: charge / volume,
-    // shortcut: the free volume is taken as even from the head to the bullet base (no case interior
-    // profile, web or taper), upgrade when the case interior is modelled
+    // shortcut: the free volume is even from head to bullet base (no case interior, web or taper), upgrade when the case interior is modelled.
     level: o.base * Math.min(ratio, 1),
     compressed: ratio > 1,
   }
@@ -56,10 +51,7 @@ export function chargeFill(o: {
 /** A row of the seating figure's values table: the name, the value and its unit. */
 type ValueRow = { name: string; value: string; unit: string }
 
-/**
- * The dimensions a figure draws, from the annotation of its side: lengths and diameters in the
- * page's length unit (`Dimension.value` is mm), angles in degrees, the ratio Rt/R as stored.
- */
+/** `Dimension.value` is mm; angles in degrees, Rt/R as stored. */
 function dimensionRows(annotation: Annotation, system: UnitSystem): ValueRow[] {
   const length = (mm: number) => formatQuantity('length', system, toSi('length', mm))
   return [
@@ -88,11 +80,7 @@ function dimensionRows(annotation: Annotation, system: UnitSystem): ValueRow[] {
 /** The case fill as the workbench's Case fill readout writes it, percent without the sign. */
 export const fillPercent = (ratio: number) => formatNumber(ratio * 100, 0)
 
-/**
- * The rows of the seating figure's values table: the dimensions the shown view draws (none in
- * Combined, which then lists COAL and CBTO), the seating depth and the volume behind the bullet,
- * then the charge, the case fill and the loading density the figure's powder fill draws.
- */
+/** Combined draws no dimensions and so lists COAL and CBTO. */
 export function seatingValueRows(
   o: {
     annotation: Annotation | undefined

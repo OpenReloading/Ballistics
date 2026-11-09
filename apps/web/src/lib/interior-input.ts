@@ -7,10 +7,7 @@ import {
 import { msg, type Translator } from '../i18n/translate.ts'
 import type { FieldSpec } from './field-spec.ts'
 
-/**
- * M3 load fields (`apps/docs/docs/models/interior-m3.md`). The load-defining ones start empty so
- * no value reads as a load; the workbench fills the ambient and secondary ones from `workbench-defaults.ts`.
- */
+/** `apps/docs/docs/models/interior-m3.md`; load-defining fields start empty so no value reads as a load. */
 export const interiorFields = [
   {
     key: 'volume',
@@ -255,12 +252,7 @@ export const interiorFields = [
   },
 ] as const satisfies readonly FieldSpec[]
 
-/**
- * The Bullet card's values a record gives and the user may type over it (`typedBullet` in `bullet.ts`).
- * Not interior inputs, so not in `interiorFields`: the diameter reaches the interior run only as the
- * default bore diameter, the length only through the bore resistance of a fitted powder, the base
- * dimensions only the drawing and the seating.
- */
+/** Not interior inputs: the diameter is only the default bore, the length only feeds a fitted powder's resistance. */
 export const bulletFields = [
   {
     key: 'bulletDiameter',
@@ -335,11 +327,7 @@ export const bulletFields = [
   },
 ] as const satisfies readonly FieldSpec[]
 
-/**
- * The cartridge sheet's and the powder record's values the user may type over them
- * (`record-specs.ts`). Not interior inputs: the Pmax is the limit the readouts, the chart and the
- * charge target compare with, the case length L3 the seating reads, the bulk density the load ratio.
- */
+/** Not interior inputs: Pmax is the compared limit, L3 the seating's, the bulk density the load ratio's. */
 export const specFields = [
   {
     key: 'pmax',
@@ -391,10 +379,7 @@ export type InteriorBody = {
   pressureLimit?: number | undefined
 }
 
-/**
- * `interiorLoad` of `values`; a refused value names its field by the field's label, as the refusal
- * words show it: their module loads apart from the page and holds no field table.
- */
+/** A refused value names its field by label, since the refusal words load apart from the page and hold no field table. */
 function labelledLoad(
   values: Record<string, number | undefined>,
   grooveDiameter: number | undefined,
@@ -410,10 +395,7 @@ function labelledLoad(
   }
 }
 
-/**
- * `POST /interior` body from SI field values; the mapping is `interiorLoad` of ballistics, shared with
- * `POST /interior/load-file`. `grooveDiameter` (m) is the fallback of an empty bore area.
- */
+/** SI field values; the mapping is ballistics' `interiorLoad`, shared with `POST /interior/load-file`; `grooveDiameter` (m) backs an empty bore area. */
 export function interiorBody(
   values: Record<string, number | undefined>,
   cartridge?: string | undefined,

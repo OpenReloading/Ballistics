@@ -25,10 +25,7 @@ export type CardPlan = { id: string; name: string } & (
   | { reason: Message }
 )
 
-/**
- * The mean of the shots kept in the latest session of `load` (by date, an undated one oldest), over
- * its strings of the load as it is: no variation, or the load's own charge. Undefined without one.
- */
+/** The latest session by date (undated oldest), over strings of the load as it is; undefined without one. */
 function measuredVelocity(
   load: LoadRecord,
   sessions: ReadonlyMap<string, SessionRecord>,
@@ -51,11 +48,7 @@ function measuredVelocity(
   }
 }
 
-/**
- * The saved loads of the firearm `firearmId` among `records`, by name, each with the catalogue
- * bullet, the measured velocity and the firearm's active sight its card is computed from, or the
- * reason it gets no card.
- */
+/** By name, each with what its card needs or the reason it gets none. */
 export function firearmCardPlans(records: readonly UserRecord[], firearmId: string): CardPlan[] {
   const sessions = new Map(
     records.flatMap((r) => (r.kind === 'session' ? [[sessionRef(r.id), r] as const] : [])),
@@ -82,10 +75,7 @@ export function firearmCardPlans(records: readonly UserRecord[], firearmId: stri
     })
 }
 
-/**
- * The SI inputs of a card as the Trajectory tab starts with them (its conditions and distances,
- * range defaults round in the shown range unit) with the load's velocity and the firearm's sight.
- */
+/** As the Trajectory tab starts, with the load's velocity and the firearm's sight. */
 function cardValues(velocity: number, sight: Sight, system: UnitSystem) {
   const values: Record<string, number | undefined> = Object.fromEntries(
     shotFields.map((s) => {
@@ -118,11 +108,7 @@ export type LoadCard = TrajectoryResult & {
   click?: NonNullable<Sight['click']>
 }
 
-/**
- * The range card of a planned load with its bullet record, as `RangeCard` takes it: the record's
- * G7 BC as the Trajectory tab starts with, else its G1. A message when the record's BC cannot be
- * used; throws the input and model errors of the computation.
- */
+/** G7 as the Trajectory tab starts with, else G1; throws the computation's input and model errors. */
 export function cardResult(
   plan: Extract<CardPlan, { bullet: string }>,
   record: Bullet,

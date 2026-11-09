@@ -1,7 +1,4 @@
-/**
- * The caliber class of a firearm's cartridge: the one class record whose `cartridges` names it
- * (each cartridge is in at most one class), for the link to the disciplines that name the class.
- */
+/** Each cartridge is in at most one class, which links the firearm to the disciplines naming it. */
 import type { CaliberClass } from '@open-reloading/schema'
 import { apiFetch, fetchRecord } from './api-fetch.ts'
 

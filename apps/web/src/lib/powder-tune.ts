@@ -41,28 +41,17 @@ export const tuneBaseKey = (load: string) => storageName(`tunePowder:${load}`)
 /** The session storage key of the CIP table of the cartridge record of the load handed over for load `load`, a reference. */
 export const tuneTableKey = (load: string) => storageName(`tuneTable:${load}`)
 
-/**
- * The session storage key of the id of the cartridge record of the load handed over for load
- * `load`, a reference, kept when the record was still loading, so the tuning route reads its table.
- */
+/** Kept when the record was still loading, so the tuning route reads its table. */
 export const tuneCartridgeKey = (load: string) => storageName(`tuneCartridge:${load}`)
 
 /** The session storage key of the `action` of the firearm the load links, handed over for load `load`, a reference. */
 export const tuneActionKey = (load: string) => storageName(`tuneAction:${load}`)
 
-/**
- * Whether the workbench holds the tuning link: a record the load may take values from (a bore
- * diameter from the cartridge record, say) is asked for and not loaded yet, so no load could be
- * handed over. A record that could not be fetched (`failed`) does not hold it.
- */
+/** A record still loading would leave nothing to hand over; one that failed (`failed`) does not hold the link. */
 export const tuneHeld = (asked: Record<string, { id: string; failed?: true } | undefined>) =>
   Object.values(asked).some((a) => a !== undefined && !a.failed)
 
-/**
- * The detail request of the chosen cartridge's record (groove, bore area) as `tuneHeld` reads it:
- * asked while `cartridge` is chosen and `loaded`, the id of the record loaded, is another;
- * `failed` once `failedId`, the id whose request failed, is that cartridge.
- */
+/** Asked while the chosen cartridge is not the loaded one; `failed` once its request failed. */
 export const tuneDetail = (
   cartridge: string | undefined,
   loaded: string | undefined,
@@ -72,13 +61,7 @@ export const tuneDetail = (
     ? { id: cartridge, ...(failedId === cartridge && { failed: true as const }) }
     : undefined
 
-/**
- * Hands `interior`, the load the workbench's run simulates, `powder`, its powder record, and
- * `table`, the CIP table of its cartridge record, to the tuning route for the strings of load
- * `load` (a reference); undefined removes one handed over before. `cartridge`, the id of a
- * cartridge record still loading, is handed over without a table, for the route to fetch it.
- * `action` is that of the firearm the load links, where its record states one.
- */
+/** A still-loading cartridge goes over by id for the route to fetch; undefined removes an earlier hand-over. */
 export function writeTuneLoad(
   load: string,
   interior: InteriorLoad | undefined,
@@ -100,12 +83,7 @@ export function writeTuneLoad(
   } catch {}
 }
 
-/**
- * Whether the fit of `load` gets the revolver note: the load has no leak area above 0, so a fit puts
- * the cylinder gap loss into the burn values, and it may be fired from a revolver: the `action` of
- * the firearm it links is `revolver`, or, where no firearm states its action, the cartridge record
- * is in the CIP table of the pistol and revolver cartridges (`table`, see `cartridgeClass`).
- */
+/** Without a leak area a fit puts the cylinder gap loss into the burn values; revolver by the firearm's `action`, else by `cartridgeClass`. */
 export const revolverLeakNote = (
   table: string | undefined,
   load: InteriorLoad | undefined,
@@ -144,11 +122,7 @@ export const sessionStrings = (sessions: readonly SessionRecord[]): TuneString[]
     }),
   )
 
-/**
- * The strings of `sessions` mapped to a charge, split by load: those of the load the first of them
- * names (`load`, a reference; none for a string fired before its load was saved) and those of other
- * loads, which the fit leaves out.
- */
+/** The load the first string names, which the fit keeps; other loads' strings are left out. */
 export function loadStrings(sessions: readonly SessionRecord[]) {
   const mapped = sessions.flatMap((s) =>
     s.data.strings.flatMap((str) => {
@@ -162,10 +136,6 @@ export function loadStrings(sessions: readonly SessionRecord[]) {
   return { load, strings: pick(true), left: pick(false) }
 }
 
-/**
- * The strings as the powder fit reads them: the velocities of the shots not excluded and the
- * temperature; a string without a shot is left out.
- */
 export const fitStrings = (strings: readonly TuneString[]): ChronographString[] =>
   strings.flatMap(({ charge, shots, temperature }) => {
     const velocities = shots.filter((s) => !s.excluded).map((s) => s.velocity.value)
@@ -173,10 +143,7 @@ export const fitStrings = (strings: readonly TuneString[]): ChronographString[] 
     return [{ charge, velocities, ...(temperature && { propellantTemperature: temperature }) }]
   })
 
-/**
- * Shot velocities typed in one field, separated by spaces or semicolons (a comma may be the
- * decimal mark), in the unit `toSi` reads; undefined when there is none or one is no positive number.
- */
+/** Spaces or semicolons separate, since a comma may be the decimal mark; undefined when none or one is no positive number. */
 export function parseVelocities(text: string, toSi: (x: number) => number) {
   const parts = text.split(/[\s;]+/).filter((p) => p !== '')
   const values = parts.map((p) => parseNumber(p, { min: 0 }))

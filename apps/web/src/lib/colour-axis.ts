@@ -32,11 +32,7 @@ type Axis = { w: LogRgb; mu: LogRgb; ring: LogRgb; sep: number }
 /** The picked hole (work px), or the hole colour in log RGB without a pick. */
 export type Seed = { at?: Point | undefined; mu?: LogRgb }
 
-/**
- * Fisher's linear discriminant in log RGB: the mean of the disc of 0.4 D at the pick (or the
- * backing colour) minus the median of the ring from 1.0 to 2.4 D (or of the region), times the
- * inverse ring covariance, normalised. Holes project high.
- */
+/** Fisher's linear discriminant in log RGB, pick disc against the 1.0 to 2.4 D ring; holes project high. */
 export function axisOf(
   ctx: WorkImage,
   holeDiameter: number,
@@ -51,10 +47,7 @@ export function axisOf(
   return fisherAxis(mu, rm, covariance3(ring), ctx.contrast)
 }
 
-/**
- * The hole colour (mean of the disc at the pick, else the seed's colour) and the ring samples per
- * channel; undefined when the disc holds no block.
- */
+/** Undefined when the disc holds no block. */
 function collectSamples(
   ctx: WorkImage,
   holeDiameter: number,
@@ -148,10 +141,7 @@ function covariance3(ring: Channels): Covariance {
 type Six = [number, number, number, number, number, number]
 type Covariance = { cov: Six; m: number }
 
-/**
- * The unit axis of `mu` minus the ring median `rm` times the inverse of the regularised ring
- * covariance; undefined when the separation along it is under `minSep`.
- */
+/** Regularised ring covariance; undefined when the separation is under `minSep`. */
 function fisherAxis(
   mu: LogRgb,
   rm: LogRgb,
@@ -190,10 +180,7 @@ function fisherAxis(
 /** Luma (BT.601 weights) of a colour, here of log RGB values. */
 export const lumaOf = (v: Readonly<LogRgb>) => 0.299 * v[0] + 0.587 * v[1] + 0.114 * v[2]
 
-/**
- * Per block, the BT.601 luma weights (0.299, 0.587, 0.114) applied to the log RGB of the working
- * image: the image whose strongest blobs seed the auto detection.
- */
+/** BT.601 luma weights (0.299, 0.587, 0.114) on log RGB: the image whose strongest blobs seed auto detection. */
 export function logLuma(ctx: WorkImage): Float32Array {
   const n = ctx.w * ctx.h
   return Float32Array.from(
@@ -205,11 +192,7 @@ export function logLuma(ctx: WorkImage): Float32Array {
   )
 }
 
-/**
- * The log RGB projected on the axis: the ring at 64 and a hole as separated from it as the picked
- * one at 192, cut to 0..255 (the scale comes from the axis, not from the region's statistics, so
- * blank paper stays flat).
- */
+/** Ring at 64, a hole like the picked one at 192; the scale comes from the axis, not the region, so blank paper stays flat. */
 export function project(
   ctx: WorkImage,
   axis: Axis,

@@ -1,8 +1,4 @@
-/**
- * The outline of a cut-out bullet (`apps/docs/docs/models/bullet-photo.md`): the axis found as the
- * symmetry line of both edges, and the half-width profile along it. Lengths are in photo px, y
- * down. Pure: no React, DOM or Next.js, so it can run in a Web Worker.
- */
+/** The axis as the symmetry line of both edges and the half-width profile (`apps/docs/docs/models/bullet-photo.md`); photo px, y down. */
 import { fromSi } from '@open-reloading/schema'
 import type { Cutout } from './bullet-photo.ts'
 import { median1 as median } from './raster-ops.ts'
@@ -163,10 +159,7 @@ function momentsOf(seg: Cutout): { x: number; y: number; theta: number } | undef
 
 const sum = (xs: readonly number[]) => xs.reduce((a, v) => a + v, 0)
 
-/**
- * The line `c = a + b s` through the middles of the two edges where the bullet is at least 0.3 of
- * its widest, `s` from the origin of the frame; `b` is 0 for a fixed axis. Undefined for fewer than 10 columns.
- */
+/** Through the edges' middles where the bullet is at least 0.3 of its widest; undefined below 10 columns. */
 function middleLine(seg: Cutout, o: Point, theta: number, fixed: boolean) {
   const f = frameOf(o, theta)
   const cols = columnsOf(seg, f, extents(seg, f))
@@ -233,8 +226,7 @@ function profileOf(seg: Cutout, axis: Axis, ambiguous: boolean, edge: number): O
   const e = extents(seg, f)
   const along = (s: number) => coverage(seg, f.ox + f.ux * s, f.oy + f.uy * s)
   const quarter = 0.25 * (e.sHi - e.sLo)
-  // a reflection or the mouth of a hollow point can leave the axis itself uncovered: an end the
-  // axis finds more than 3 px inside the extent of the cut-out is taken from the extent
+  // A reflection or a hollow point's mouth can leave the axis uncovered: an end over 3 px inside the cut-out's extent takes the extent.
   const [baseAxis, tipAxis] = [
     crossing(along, e.sLo - 3, e.sLo + quarter, 0.25),
     crossing(along, e.sHi + 3, e.sHi - quarter, 0.25),
@@ -275,10 +267,7 @@ const baseCount = 6
 
 type Line = { a: number; b: number }
 
-/**
- * Each side's shank line `a + b z`, px, from where the shank starts up to its middle (at least 10
- * samples), and the larger standard uncertainty of the two slopes; undefined without sides or a shank.
- */
+/** px, from the shank's start to its middle (at least 10 samples), with the larger slope uncertainty; undefined without sides or a shank. */
 function shankLines(o: Outline): { left: Line; right: Line; slopeError: number } | undefined {
   const sides = o.sides
   if (!sides || o.r.length < 40) return
@@ -310,11 +299,7 @@ function shankLines(o: Outline): { left: Line; right: Line; slopeError: number }
 /** A side's shank line at sample `i`. */
 const levelAt = (o: Outline, line: Line, i: number) => line.a + line.b * at(o.z, i)
 
-/**
- * How far each side's edge at the base lies inside the line of that side's shank, px (left, right),
- * with each side's shank line, the samples `base` (start, end) taken as the base and the larger
- * standard uncertainty of the two lines' slopes; undefined without sides or a shank.
- */
+/** Each side's base edge inside its shank line, px, with the lines, the base samples and the larger slope uncertainty; undefined without sides or a shank. */
 export function sideTapers(o: Outline) {
   const sides = o.sides
   const lines = sides && shankLines(o)
@@ -346,13 +331,7 @@ export function sideTapers(o: Outline) {
   return { left: taper(lineL, sides.left), right: taper(lineR, sides.right), base, slopeError }
 }
 
-/**
- * Whether a base end that reaches one side later than the other is a straight face at an angle (a
- * slanted base face, or the corner of a turned axis), not a shadow: the early side's corner is
- * sharp (from 0.5 to 0.9 of its shank line within `early` = 1 sample) and the late side ramps on
- * evenly, `lead` samples from 0.1 to 0.5 of its line and `tail` from 0.5 to 0.9, equal within one
- * sample and a tenth. A ramp of 2 samples or less tells the two apart no better than chance.
- */
+/** A slanted face has a sharp early corner and an even late ramp; a ramp of 2 samples or less tells it from a shadow no better than chance. */
 const straightFace = (early: number, lead: number, tail: number) =>
   early <= 1 && Math.max(lead, tail) >= 3 && Math.abs(lead - tail) <= 1 + 0.1 * Math.max(lead, tail)
 
@@ -396,11 +375,7 @@ function withoutOverhang(o: Outline): Outline {
   }
 }
 
-/**
- * The outline fitted again on the cut-out cleared behind a trimmed base (`withoutOverhang`): the
- * axis was settled with the overhang in the cut-out, which turns it towards the shadow. Undefined
- * where no outline is found.
- */
+/** The axis was settled with the overhang in the cut-out, which turns it towards the shadow. */
 function refitTrimmed(seg: Cutout, t: Outline): Outline | undefined {
   const f = frameOf(t.origin, t.angle)
   const { width: w } = seg
@@ -436,8 +411,7 @@ function withoutShadow(o: Outline): Outline {
   const clear = a < shank && Math.abs(rise(blurred) - rise(sharp)) <= tol / 2
   if (!clear) return { ...o, shadow: { side, removed: false } }
   const r = o.z.map((z, i) => Math.max(0, at(sharp, i) - (line.line.a + line.line.b * z) + a))
-  // beyond a flat tip the shadow alone can carry the cut-out on along the axis: the bullet ends
-  // where the sharp side does, half a sample past its last
+  // Past a flat tip the shadow alone can carry the cut-out on, so the bullet ends half a sample past the sharp side's last.
   const end = r.findLastIndex((v) => v > 0.5)
   const trimmed = end >= 0 && r.length - 1 - end >= 3
   const keep = trimmed ? end + 1 : r.length
@@ -466,12 +440,7 @@ function withoutShadow(o: Outline): Outline {
 /** A typed axis this many degrees or more from the shank's symmetry line is named, and never below three standard uncertainties of that angle. */
 const typedAxisTolerance = 1
 
-/**
- * The outline of an axis the user typed, with how far that axis is from the symmetry line of the
- * shank's two sides where it is `typedAxisTolerance` or more and three standard uncertainties of
- * the half difference (a short shank or a coarse edge gives an uncertain slope): the two shank
- * lines then run apart from the axis by equal and opposite slopes, half their difference the turn.
- */
+/** Flags a typed axis off the shank's symmetry line by `typedAxisTolerance` and three standard uncertainties. */
 function typedAxisOff(o: Outline): Outline {
   const t = sideTapers(o)
   if (!t) return o
@@ -480,13 +449,7 @@ function typedAxisOff(o: Outline): Outline {
   return off >= least ? { ...o, typedOff: off } : o
 }
 
-/**
- * The outline of the segmented bullet. The axis starts at the long axis of the pixels and is
- * turned and shifted until the middle of the two edges lies on it: the symmetry line of both
- * edges. The nose end is the end with the longer taper. A fixed `angle` is kept and only the offset
- * is fitted. A shadow that widens one side is taken out (`withoutShadow`) when the axis is found,
- * not fixed. Undefined without a bullet.
- */
+/** The axis is turned and shifted until the edges' middle lies on it; the nose is the longer taper; a fixed `angle` fits the offset only; undefined without a bullet. */
 export function fitOutline(seg: Cutout, opt: OutlineOptions = {}): Outline | undefined {
   const m = momentsOf(seg)
   if (!m) return
@@ -506,8 +469,7 @@ export function fitOutline(seg: Cutout, opt: OutlineOptions = {}): Outline | und
   if (checked.shadow?.removed) return { ...checked, shadow: { ...checked.shadow, removed: false } }
   // a base end softer on one side, not trimmed: the shadow is named
   if (over.length === o.length) return checked.shadow ? checked : over
-  // what a shadow on one side could not take out may be a shadow past the base: trimmed, the axis
-  // fitted again without it, and the rest checked again
+  // What the one-sided check could not take out may be a shadow past the base: trim, refit the axis, check again.
   const refit = refitTrimmed(seg, over) ?? over
   const again = withoutShadow(refit)
   return again.shadow ? again : { ...again, shadow: over.shadow }

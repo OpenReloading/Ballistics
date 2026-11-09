@@ -1,10 +1,4 @@
-/**
- * The rule-book target faces of the API (`apiFetch`), and the federations,
- * disciplines and target mappings that ring scoring picks them by: a few records, fetched once per
- * page load. Shared by ring scoring and the face search of hole detection. The face designs of
- * this browser come with the faces, read from the store on each call: a design saved in another
- * tab or page shows at once.
- */
+/** Fetched once per page load; designs are read from the store on each call, so one saved in another tab shows at once. */
 import type { TargetFace } from '@open-reloading/schema'
 import { apiFetch } from './api-fetch.ts'
 import type { FederationData } from './face-disciplines.ts'

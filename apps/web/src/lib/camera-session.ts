@@ -1,8 +1,4 @@
-/**
- * Holds the camera stream of a dialog. `stop` ends the session: a stream that a request of an
- * ended session answers with is stopped at once, so a dialog that closed or went while the browser
- * asked for the camera leaves no camera running.
- */
+/** A stream answering a request of an ended session stops at once, so a dialog that closed while the browser asked leaves no camera running. */
 export function cameraSession() {
   let session = 0
   let stream: MediaStream | undefined

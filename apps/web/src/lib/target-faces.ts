@@ -60,10 +60,7 @@ export function targetFaceRow(f: Face, mappings: readonly MappingSummary[]): Tar
   }
 }
 
-/**
- * The face designs among `records` as Mine rows: no federation or disciplines, the distances of the
- * events that have one.
- */
+/** No federation or disciplines; the distances of events that have one. */
 export function userFaceRows(records: readonly UserRecord[]): TargetFaceRow[] {
   return records.flatMap((r) => {
     if (r.kind !== 'targetFaceDesign') return []
@@ -89,10 +86,7 @@ export function userFaceRows(records: readonly UserRecord[]): TargetFaceRow[] {
 /** The URL keys of the face list's choice filters. */
 export const faceFacetKeys = ['org', 'discipline', 'dist', 'rings']
 
-/**
- * The face list's choice filters: federation (by abbreviation), discipline (named by
- * `disciplines`, by id), the distance of an event in m and the ring count.
- */
+/** Federation by abbreviation, discipline by id, event distance in m, ring count. */
 export function faceFacets(
   disciplines: ReadonlyMap<string, string>,
   /** The text of a distance in m: with the range unit shown. */

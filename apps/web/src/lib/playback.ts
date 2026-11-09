@@ -26,11 +26,7 @@ export function defaultFactor(duration: number): number {
 /** Positions of the time slider: k from 0 to `scrubSteps` is k / `scrubSteps` of the muzzle time. */
 export const scrubSteps = 1000
 
-/**
- * Index i of the interval with times[i] <= t < times[i + 1], from 0 to n - 2; equal times give the
- * last of them. Before the first time (and NaN) 0, at or after the last n - 2. One table cell per
- * point holds the index at the cell start, so a lookup walks only the few points of its cell.
- */
+/** times[i] <= t < times[i + 1], 0 to n - 2 (0 before the first time or for NaN), equal times the last; a table cell per point holds the index at its start, so a lookup walks only its cell. */
 export function timeIndex(times: readonly number[]): (t: number) => number {
   const n = times.length
   // no times: NaN, as arithmetic on a missing entry has it
@@ -50,11 +46,7 @@ export function timeIndex(times: readonly number[]): (t: number) => number {
   }
 }
 
-/**
- * The interval of time t and the fraction of it already passed: points i and i + 1 and f from 0 to
- * 1, so every value of the playback is a mix of the same two points. From the last point on both
- * are the last point and f is 0; before the first, the first.
- */
+/** Every playback value mixes the same two points by one fraction `f`. */
 export function segmentAt(points: readonly Point[]) {
   const index = timeIndex(points.map((p) => p.time))
   return (t: number): { a: Point; b: Point; f: number } => {
@@ -86,12 +78,7 @@ export function sampler(points: readonly Point[]): (t: number) => PlaybackSample
   }
 }
 
-/**
- * The point of the drawn curve at time t: `x` and `y` of the two neighbouring points of `segment`
- * mixed by the same fraction, so it lies on the segment the chart draws between them, also for a
- * `y` that is not linear in the sampled values (the energy, 0.5 m v^2). At a point's own time it
- * is that point's `[x, y]`.
- */
+/** Mixed by the segment's fraction, so the point lies on the drawn line even for a `y` not linear in the samples (0.5 m v^2). */
 export function curvePoint(
   segment: ReturnType<typeof segmentAt>,
   t: number,
@@ -108,12 +95,7 @@ type Scrub = { pos: (t: number) => number; time: (p: number) => number }
 /** Linear in time, from ignition to `end`: the slider's value k is k / `scrubSteps` of `end`. */
 export const timeScrub = (end: number): Scrub => ({ pos: (t) => t / end, time: (p) => p * end })
 
-/**
- * Linear in the bullet's travel, so the thumb is where the bullet is on a travel axis. Position 0
- * is ignition: the time before the shot starts has no travel, so the thumb stays at 0 from
- * ignition to the shot start and every position above 0 is a time of the bullet's motion. Position
- * 1 is the muzzle.
- */
+/** Linear in travel, so the thumb is where the bullet is; it stays at 0 from ignition to shot start. */
 export function travelScrub(points: readonly Point[]): Scrub {
   const segment = segmentAt(points)
   const start = nth(points, 0).travel
@@ -140,11 +122,7 @@ export function travelScrub(points: readonly Point[]): Scrub {
   }
 }
 
-/**
- * The time a playback frame shows: `t + dt`, at most `end`, but never past the next of the
- * `stops` (event times, ascending) after `t`: a frame lands on it, so the marker is on the event
- * line, and the playback goes on from it. A stop at `t` itself is passed.
- */
+/** `stops` ascending; a frame lands on the next stop, never past it, so the marker sits on the event line; a stop at `t` itself is passed. */
 export function advance(t: number, dt: number, end: number, stops: readonly number[]): number {
   const next = Math.min(end, t + dt)
   const stop = stops.find((s) => s > t + 1e-12)
@@ -194,10 +172,7 @@ const energyLabels = {
 /** Terms whose inputs the web form does not send, so 0 means not modelled. */
 const unsent: ReadonlySet<string> = new Set(['resistance', 'heat', 'leakage'])
 
-/**
- * Muzzle energy terms (J) with their share of the released energy, and their sum. Resistance, heat
- * and leakage of 0 are apart; spin is listed even at 0 (a bore without rifling).
- */
+/** Terms in J with their share of the released energy; resistance, heat and leakage of 0 are apart; spin is listed even at 0 (a bore without rifling). */
 export function energySplit(energy: PlaybackResult['energy']) {
   const keys = Object.keys(energyLabels) as (keyof typeof energyLabels)[]
   const total = keys.reduce((sum, k) => sum + energy[k], 0)
@@ -215,10 +190,7 @@ export function energySplit(energy: PlaybackResult['energy']) {
   }
 }
 
-/**
- * The first event after time t (direction 1) or the last before it (-1); a tolerance of 1e-12 s
- * keeps an event at t itself from being chosen again. Undefined past the last or before the first.
- */
+/** A 1e-12 s tolerance keeps an event at `t` from being chosen again. */
 export function eventStep(events: readonly PlaybackEvent[], t: number, direction: 1 | -1) {
   return direction > 0
     ? events.find((e) => e.time > t + 1e-12)

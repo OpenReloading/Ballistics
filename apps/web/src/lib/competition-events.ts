@@ -1,8 +1,4 @@
-/**
- * Competition events of this browser: a new event from its event type, the totals by the type's
- * scoring (shot-groups `ringEventTotals`, `practicalEventTotals`), the CSV and JSON export and the check
- * before Save. A self-recorded score is the person's own record, never an official result.
- */
+/** A self-recorded score is the person's own record, never an official result. */
 
 import {
   type CompetitionEvent,
@@ -36,10 +32,7 @@ export const stateLabels: Record<CompetitionEvent['state'], Message> = {
   disqualified: msg('Disqualified'),
 }
 
-/**
- * The total of `e` without its event type's rules, for the shooting log: the rings of its series,
- * or the sum of the typed stage points when every stage has them; undefined otherwise.
- */
+/** For the shooting log, without the event type's rules: the series' rings, or the stage points when every stage has them; undefined otherwise. */
 function ownTotal(e: CompetitionEvent): number | undefined {
   if (e.results.method === 'rings')
     try {
@@ -71,10 +64,7 @@ export const blankEvent = (type: EventType, now = new Date()): CompetitionEvent 
   results: emptyResults(type.scoring.method),
 })
 
-/**
- * `e` moved to `type`: its level where the type names it, else the type's lowest; its division
- * only where the type lists it; its results kept where the scoring method stays, else empty.
- */
+/** Results stay only where the scoring method stays. */
 export function withEventType(e: CompetitionEvent, type: EventType): CompetitionEvent {
   const { division, ...rest } = e
   const divisions = divisionsOf(type)
@@ -113,11 +103,7 @@ export const blankStage = (name: string): PracticalStage => ({
 export const typeOf = (e: CompetitionEvent, types: readonly EventType[]) =>
   types.find((t) => `catalogue:${t.id}` === e.eventType)
 
-/**
- * The totals of `e` by the scoring of its `type`: per series or stage its total or score, and the
- * event total where one exists. undefined where the type is unknown, the results are of another
- * method, or a value is out of range (the form says which).
- */
+/** Undefined for an unknown type, results of another method or a value out of range (the form says which). */
 export function eventTotals(e: CompetitionEvent, type: EventType | undefined) {
   if (!type || type.scoring.method !== e.results.method) return
   try {
@@ -157,10 +143,7 @@ export function cleanEvent(e: CompetitionEvent): CompetitionEvent {
   return out as unknown as CompetitionEvent
 }
 
-/**
- * Why `e` cannot be saved, in words the page translates; undefined when it can. `type` is the
- * event type it names; without it (catalogue unreachable) only the record's own checks run.
- */
+/** Without `type` (catalogue unreachable) only the record's own checks run. */
 export function eventProblem(
   e: CompetitionEvent,
   type: EventType | undefined,

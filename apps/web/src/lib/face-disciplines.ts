@@ -1,11 +1,4 @@
-/**
- * Disciplines for the group panel. A discipline record of a federation maps to the faces and face
- * events that score it (target mappings); its entry's value is the discipline id. A face event that
- * no mapping names is an entry of its own, labelled with the organization that publishes the face
- * (an event of another organization carries that organization in its name); its value is the face
- * id and the event id. A group stores the face and the event either way. A flat list: Mantine's
- * group headings are no listbox children, which axe reports (aria-required-children).
- */
+/** A flat list: Mantine's group headings are no listbox children, which axe reports (aria-required-children). */
 import {
   type Discipline,
   type Federation,
@@ -64,10 +57,7 @@ export function disciplineChoice(value: string, mappings: MappingSummary[] = [])
 export const mappedFace = (mappings: MappingSummary[], id: string) =>
   mappings.some((m) => m.face === id)
 
-/**
- * The entries of the Discipline list: the disciplines of `federation`, else of every federation
- * (by federation) followed by the face events no mapping names (by organization).
- */
+/** Face events no mapping names follow, by organization. */
 export function disciplineOptions(faces: Face[], data?: FederationData, federation?: string) {
   const { federations = [], disciplines: all = [], mappings = [] } = data ?? {}
   const listed = federations

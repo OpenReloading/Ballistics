@@ -11,10 +11,7 @@ export type BulletItem = BulletSummary & {
   manufacturerAliases?: string[]
 }
 
-/**
- * A bullet row of the list: a catalogue item, or a design of the browser (`origin: 'user'`) that
- * may have no mass and names its manufacturer as text only.
- */
+/** A design of the browser (`origin: 'user'`) may lack a mass and names its manufacturer as text only. */
 export type BulletRow = Omit<BulletItem, 'mass' | 'manufacturer'> & {
   manufacturer?: string | undefined
   mass: number | null
@@ -56,10 +53,7 @@ export const typedWords = (query: string) =>
     .split(/\s+/)
     .filter(Boolean)
 
-/**
- * Whether a bullet weighs what a typed number says: "168" and "168gr" grains, "10.9g" grams,
- * within half a unit of the last typed digit.
- */
+/** "168" and "168gr" are grains, "10.9g" grams, within half a unit of the last typed digit. */
 export function sameMass(b: BulletRow, number: string, unit: string | undefined) {
   if (b.mass === null) return false
   const half = 0.5 * 10 ** -(number.split('.')[1]?.length ?? 0)
@@ -67,10 +61,7 @@ export function sameMass(b: BulletRow, number: string, unit: string | undefined)
   return Math.abs(typed - Number(number)) <= half + 1e-9
 }
 
-/**
- * The schema's rank of the typed words in a bullet (`score`), `undefined` where a word is nowhere
- * in its `key`. A number with a unit is a weight the text does not hold: it must be the mass.
- */
+/** A number with a unit is a weight the text does not hold, so it must be the mass. */
 export function bulletScore(b: BulletRow, key: string, query: string): number | undefined {
   const words = typedWords(query)
   const weights = words.map(typedMass).filter((m) => m?.unit)
@@ -109,10 +100,7 @@ export function bulletCells(b: BulletRow, system: UnitSystem) {
 
 type BallisticCoefficient = { model: 'G1' | 'G7'; value: number }
 
-/**
- * The BC column: the manufacturer's published coefficient, G7 where given, else G1; `other` the
- * other model's.
- */
+/** G7 where published, else G1; `other` the other model's. */
 export function bulletBallisticCoefficient(
   b: Pick<BulletSummary, 'ballisticCoefficientG1' | 'ballisticCoefficientG7'>,
 ): (BallisticCoefficient & { other?: BallisticCoefficient }) | undefined {

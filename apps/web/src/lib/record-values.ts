@@ -5,12 +5,7 @@ import { verbatim, type Wording } from './wording.ts'
 export const titleFromKebab = (value: string) =>
   (value.charAt(0).toUpperCase() + value.slice(1)).replaceAll('-', ' ')
 
-/**
- * Stored values of the schema's enumerations that a record page shows as words, by the form the page
- * writes them in: as stored (`rawWording`), with spaces for hyphens (`spacedWording`) or capitalised
- * with spaces (`titleWording`). A value no message names (a later schema value, or one left
- * untranslated on purpose) shows as published, in the same form.
- */
+/** A value no message names shows as published, in the same form. */
 
 const raw: Readonly<Record<string, Message>> = {
   // bullet structure
@@ -50,8 +45,7 @@ const raw: Readonly<Record<string, Message>> = {
   triple: msg('triple'),
 }
 
-// "powder coat" and "compressed powder" are left out: the catalogue test requires the German word
-// for powder as the propellant in every text that says powder
+// "powder coat" and "compressed powder" are left out: the i18n lint requires the propellant's German word wherever a text says powder.
 const spaced: Readonly<Record<string, Message>> = {
   // jacket and core materials
   copper: msg('copper'),

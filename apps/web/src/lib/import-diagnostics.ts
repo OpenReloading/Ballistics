@@ -1,7 +1,4 @@
-/**
- * The reasons of a table import in words. The import worker gives `field` and `fields` as the
- * column labels (`labelled` in `import-entry.ts`), so this module carries no importer code.
- */
+/** The worker gives fields as column labels (`labelled` in `import-entry.ts`), so this module carries no importer code. */
 import type { TableDiagnostic } from '@open-reloading/importers'
 import type { Diagnostic } from '@open-reloading/statistics'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
@@ -41,10 +38,7 @@ const tableMessages: Record<TableDiagnostic['code'] | InvalidRecordDiagnostic['c
   invalidRecord: msg('{reason}. Fix the row or delete it.'),
 }
 
-/**
- * A value of a reason as shown: field labels, choices and a schema reason translated, lists joined;
- * numbers in the language's decimal mark, other text as the file has it.
- */
+/** Numbers in the language's decimal mark, other text as the file has it. */
 function shown(name: string, v: string | number | readonly string[], t: Translator['t']) {
   const word = (s: string) => t(s as Message)
   if (typeof v === 'number') return v

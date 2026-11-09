@@ -84,10 +84,7 @@ function windowExtremes(
   }
 }
 
-/**
- * Maximum (`max`) or minimum over a (2k + 1) square, rows then columns, three comparisons per
- * pixel whatever k (van Herk; Gil and Werman). The window is cut at the image edge.
- */
+/** Three comparisons per pixel whatever k (van Herk; Gil and Werman); the window is cut at the edge. */
 function minMax(src: Float32Array, w: number, h: number, k: number, max: boolean): Float32Array {
   const pick = max ? Math.max : Math.min
   const rows = new Float32Array(w * h)
@@ -120,11 +117,7 @@ function minMax(src: Float32Array, w: number, h: number, k: number, max: boolean
   return out
 }
 
-/**
- * Opening (`closing` false) or closing by a (2k + 1) square. The image is first extended by k pixels
- * that repeat its edge, so a square may reach past the edge and features at the edge keep their
- * shape.
- */
+/** The image is first extended by k repeated edge pixels, so features at the edge keep their shape. */
 function morph(src: Float32Array, w: number, h: number, k: number, closing: boolean) {
   const [pw, ph] = [w + 2 * k, h + 2 * k]
   const padded = new Float32Array(pw * ph)
@@ -177,10 +170,7 @@ function readEnvelope(
   }
 }
 
-/**
- * Squared Euclidean distance of every pixel to the nearest pixel whose mask value is `target`
- * (Felzenszwalb and Huttenlocher, lower envelope of parabolas, rows then columns).
- */
+/** Lower envelope of parabolas, rows then columns (Felzenszwalb and Huttenlocher). */
 export function distanceSquared(
   mask: Uint8Array,
   w: number,

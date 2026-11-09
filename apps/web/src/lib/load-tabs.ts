@@ -38,10 +38,7 @@ export function generatedName(
   return parts.filter(Boolean).join(', ') || t('New load')
 }
 
-/**
- * The load's name on the switcher: the one typed, else "cartridge · powder" (the powder's name
- * without its maker), else the generated name.
- */
+/** Typed, else "cartridge · powder" without the powder's maker, else the generated name. */
 export function shortName(p: {
   custom?: string | undefined
   cartridge?: string | undefined
@@ -73,12 +70,7 @@ export async function duplicateStored(r: LoadRecord, id: string) {
 export const cartridgeGroup = (cartridge: string | undefined) =>
   cartridge ? (catalogueIdOf(cartridge) ?? cartridge) : ''
 
-/**
- * The saved-loads list: records whose name and lots (of the load and of its session snapshots) have
- * every word of `query`, grouped by cartridge (groups by title, the group without a cartridge last),
- * newest first. A group is titled by the cartridge's
- * name from `cartridgeNames` (by id), by the id while the lookup lacks it.
- */
+/** Grouped by cartridge, the group without one last, newest first; titled by id while the name lookup lacks it. */
 export function loadGroups(
   records: LoadRecord[],
   query: string,

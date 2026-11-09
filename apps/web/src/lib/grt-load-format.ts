@@ -1,10 +1,7 @@
 /** The load-file format entry of GRT load files; its reader `grt-load-file.ts` loads with the first read. */
 import type { LoadFileFormat } from './load-file-formats.ts'
 
-/**
- * Whether the root element of `text` is `name`, past the processing instructions (the declaration
- * too) and comments the XML reader skips before it.
- */
+/** Past the declaration, processing instructions and comments the XML reader skips. */
 export function rootIs(text: string, name: string) {
   const root = `<${name}`
   let i = 0

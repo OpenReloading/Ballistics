@@ -1,19 +1,11 @@
 import { type Message, msg } from '../i18n/translate.ts'
 import { maxVolumeFraction } from './workbench.ts'
 
-/**
- * The pressure range's tolerance of the chamber volume from where the case capacity comes from
- * (`apps/docs/docs/models/case-capacity.md`, "Tolerance of the volume"): relative fractions of the
- * capacity, 1.
- */
+/** Relative to the capacity (`apps/docs/docs/models/case-capacity.md`, "Tolerance of the volume"). */
 export const capacityTolerance = Object.freeze({
   /** A measured capacity without its spread: assumption, half the former flat 1 %. */
   measured: 0.005,
-  /**
-   * A catalogue or case record capacity of one maker: assumption without a published source; a
-   * between-maker spread of about 1 % SD (.308, four makers, a magazine chart quoted in a forum) is
-   * unverified.
-   */
+  /** Assumption without a published source; a between-maker spread of about 1 % SD (.308, four makers, a forum-quoted chart) is unverified. */
   catalogue: 0.02,
 })
 
@@ -30,11 +22,7 @@ export const capacityRuleText: Record<CapacityRule, Message> = {
 /** A capacity record of the cartridge as the catalogue lists it: water (g) and the case's maker. */
 type Recorded = { waterCapacity: { value: number }; caseManufacturer?: string | undefined }
 
-/**
- * The tolerance of a capacity, relative to it, with its rule: a measured one with its spread
- * (standard deviation, g) as spread over capacity, without one 0.5 %; a record's as the standard
- * deviation over the mean of the cartridge's capacity records of two or more makers, else 2 %.
- */
+/** Measured: its spread (SD, g) over the capacity, else 0.5 %; a record: the spread over two or more makers' capacity records, else 2 %. */
 export function capacityFraction(a: {
   source: 'measured' | 'capacity' | 'case'
   grams: number
@@ -57,11 +45,7 @@ export function capacityFraction(a: {
   return { fraction: capacityTolerance.catalogue, rule: 'catalogue' }
 }
 
-/**
- * The run's tolerance of the volume behind the bullet, relative to it: the capacity's tolerance
- * moves the case volume (m3) by `fraction` of it, the bullet's length interval (`bullet`, relative
- * to the volume, from an estimated bullet volume) adds to it; at most the API's limit.
- */
+/** Relative to the volume behind the bullet (m³); the bullet length interval adds to the capacity's; at most the API's limit. */
 export function volumeFraction(a: {
   capacity: { fraction: number } | undefined
   caseVolume: number | undefined

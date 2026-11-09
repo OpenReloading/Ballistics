@@ -3,12 +3,7 @@ import { recordsCache } from './offline.ts'
 
 const files = new Map<string, Promise<unknown>>()
 
-/**
- * Keeps a data file read before a service worker controlled the page in the records cache, where
- * the worker keeps the files it saw: the first visit's reads pass it by, so the page stores them
- * itself once the worker is ready, and the record opens again offline. The catalogue index is the
- * worker's precache. Failures are ignored.
- */
+/** The first visit's reads pass the worker by, so the page stores them itself once the worker is ready; the catalogue index is the worker's precache; failures are ignored. */
 function keepForOffline(name: string, url: string, res: Response) {
   if (name.startsWith('catalogue/') || !('serviceWorker' in navigator)) return
   navigator.serviceWorker.ready
@@ -17,11 +12,7 @@ function keepForOffline(name: string, url: string, res: Response) {
     .catch(() => {})
 }
 
-/**
- * A data file of the export (`name` without `.json`, under `<base>/api/`), undefined when there is
- * none, kept for the page load. The record pages read their record here, the Pages API
- * (`static-api.ts`) reads its records and the catalogue index.
- */
+/** Under `<base>/api/`, kept for the page load; undefined when there is none. */
 export function dataFile<T>(name: string): Promise<T | undefined> {
   let file = files.get(name)
   if (!file) {

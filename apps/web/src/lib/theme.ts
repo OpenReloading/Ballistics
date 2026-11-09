@@ -4,20 +4,10 @@ import { storageName } from './edition.ts'
 /** `localStorage` key of the viewer's choice, `light` or `dark`; absent, the system setting applies. */
 export const colorSchemeKey = storageName('theme')
 
-/**
- * Inline `<head>` script: sets `data-mantine-color-scheme` to the stored choice, else the system setting, before the first paint.
- * Mantine's `ColorSchemeScript` skips the system setting when storage throws, so dark systems would see light first.
- */
+/** Mantine's `ColorSchemeScript` skips the system setting when storage throws, so dark systems would flash light. */
 export const colorSchemeScript = `var t;try{t=localStorage.getItem('${colorSchemeKey}')}catch(e){}document.documentElement.setAttribute('data-mantine-color-scheme',t==='light'||t==='dark'?t:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')`
 
-/**
- * The control size scale, Mantine sizes only: `bar` for the top bar, the page bars and the
- * toolbars (36 px; the theme's defaults below), `row` for dense rows: card heads, table rows,
- * filters, side panels and notes (30 px). Text buttons take `button`, icon buttons (square at the
- * same height) `icon`, segmented toggles `toggle`, inputs `input`. Below them the dense property
- * grids' fields (24 px, `--field-height` in globals.css) and above them 44 px touch targets.
- * Checkboxes, radios and switches are 16 px, close buttons 24 px (WCAG 2.2 target size), everywhere.
- */
+/** `bar` 36 px (top bar, page bars, toolbars), `row` 30 px (card heads, table rows, filters, side panels, notes); checkboxes, radios and switches 16 px, close buttons 24 px (WCAG 2.2 target size). */
 export const controlSize = {
   bar: { button: 'sm', icon: 'input-sm', toggle: 'sm', input: 'sm' },
   row: { button: 'xs', icon: 'input-xs', toggle: 'xs', input: 'xs' },
@@ -32,8 +22,7 @@ export const theme = createTheme({
   primaryColor: 'blue',
   // white text on filled buttons needs shade 8 for 4.5:1 (shade 6 gives about 3.5:1)
   primaryShade: 8,
-  // a dense desktop tool: 15 px body, tighter small spacing, small controls and tables
-  // square corners: every radius step 0; a circle only where it is the shape (globals.css)
+  // A dense desktop tool: 15 px body, small controls, square corners; a circle only where it is the shape (globals.css).
   defaultRadius: 0,
   radius: { xs: '0', sm: '0', md: '0', lg: '0', xl: '0' },
   // the only font sizes; globals.css reads them as --mantine-font-size-*
@@ -69,8 +58,7 @@ export const theme = createTheme({
   // no 1 px press offset on Button and ActionIcon: in the sidebar's scroll box it showed a scrollbar
   activeClassName: '',
   components: {
-    // inactive panels keep an inline `display: none` that print CSS can override; the default
-    // React `Activity` mode sets it with !important
+    // React `Activity` sets `display: none` with !important, which print CSS cannot override.
     Tabs: { defaultProps: { keepMountedMode: 'display-none' } },
     Accordion: { defaultProps: { keepMountedMode: 'display-none' } },
     Button: { defaultProps: { size: controlSize.bar.button } },
@@ -88,8 +76,7 @@ export const theme = createTheme({
     Badge: { defaultProps: { radius: 0 } },
     Pill: { defaultProps: { radius: 0 } },
     CloseButton: { defaultProps: { size: 24 } },
-    // hover help also on keyboard focus; a tooltip that holds help a touch user needs sets `touch`.
-    // `interactive` keeps it open while the pointer moves onto it (WCAG 1.4.13, hoverable)
+    // Also on keyboard focus; `interactive` keeps it open under the pointer (WCAG 1.4.13, hoverable).
     Tooltip: {
       defaultProps: {
         withArrow: true,

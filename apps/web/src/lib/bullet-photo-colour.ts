@@ -1,9 +1,4 @@
-/**
- * The cut-out for a bullet whose brightness is close to the background's but whose colour is not
- * (copper on grey, brass on green): the colour distance along the line from the background's
- * colour to the bullet's takes the place of the luma (`apps/docs/docs/models/bullet-photo.md`).
- * Pure: no React, DOM or Next.js, so it can run in a Web Worker.
- */
+/** Cuts by colour distance where luma barely separates bullet and background (`apps/docs/docs/models/bullet-photo.md`); pure, so it runs in a worker. */
 
 import { msg } from '../i18n/translate.ts'
 import {
@@ -83,14 +78,9 @@ function meanOf(sample: readonly Rgb[], takes: (c: Rgb) => boolean): Rgb | undef
   return count ? (sum.map((v) => v / count) as Rgb) : undefined
 }
 
-/**
- * The colour of the bullet: the mean of the samples furthest from the background `bg`, refined
- * over 3 assignments of each sample to the nearer of the two colours, leaving out the colours in
- * `avoid`. Undefined when no sample is 20 levels from `bg`.
- */
+/** Refined over 3 assignments, leaving out the `avoid` colours; undefined when no sample is 20 levels from `bg`. */
 function bulletColour(sample: readonly Rgb[], bg: Rgb, avoid: readonly Rgb[]): Rgb | undefined {
-  // a ruler is the furthest from the background in colour, often: its colours (where the user
-  // placed the scale points) are not the bullet's
+  // A ruler is often the furthest from the background in colour, so the scale points' colours are not the bullet's.
   const own = sample.filter((c) => avoid.every((a) => distance(c, a) > 0.4 * distance(a, bg)))
   const dist = own.map((c) => distance(c, bg)).sort((a, b) => a - b)
   const far = dist[Math.floor(0.98 * dist.length)] ?? 0
@@ -102,12 +92,7 @@ function bulletColour(sample: readonly Rgb[], bg: Rgb, avoid: readonly Rgb[]): R
   return fg && distance(fg, bg) >= 20 ? fg : undefined
 }
 
-/**
- * The photograph as the distance of each pixel's colour from the background's along the line to the
- * bullet's colour (the background's from the photograph's border, the bullet's by `bulletColour`),
- * with the background near `floor` and the bullet near `floor + span`. Undefined when the
- * photograph has one colour.
- */
+/** Background near `floor`, bullet near `floor + span`; undefined for a photograph of one colour. */
 function colourSeparation(img: RgbaImage, avoid: readonly Point[] = []): Gray | undefined {
   const n = img.width * img.height
   const stride = Math.max(1, Math.floor(Math.sqrt(n / 40000)))
@@ -186,14 +171,7 @@ function byColumns(known: Uint8Array, w: number, h: number): boolean {
   return xs.size > bodyShare * w && ys.size <= bodyShare * h
 }
 
-/**
- * How far each pixel is from the background of its line in luma, in either direction, or in chroma
- * (weighted), whichever is greater, with the background at `floor`. The background of a line is the
- * median of its pixels outside `known` (a first cut-out): of a row, or of a column when the bullet
- * lies across the rows. A bullet darker than the background on one side and brighter on the other
- * (a highlight) is one body in it, a pale copper side with the background's luma stands out by its
- * colour, and a background of two tones (wall and table) is the background in each.
- */
+/** Per-line background medians outside `known`, so a highlight, a pale copper side and a two-tone background all separate. */
 function deviation(img: RgbaImage, known: Uint8Array): Gray {
   const { width: w, height: h } = img
   const border = borderColour(img)
@@ -229,11 +207,7 @@ function takesIn(wide: Segmentation, luma: Segmentation): boolean {
   return shared >= 0.8 * n && overlap(wide.alpha, luma.alpha)[0] > 1.1 * n
 }
 
-/**
- * The boundary pixels of a cut-out per root of its area. A bullet's outline is smooth: 2 (L + d) /
- * sqrt(L d) for a body L long and d across, 7 at 10 diameters long. A patch of a textured surface
- * has a far longer edge.
- */
+/** A bullet's outline is smooth (7 at 10 diameters long); a patch of textured surface has a far longer edge. */
 function raggedness({ alpha, width: w, height: h }: Segmentation): number {
   const mask = alpha.map((v) => (v >= 128 ? 1 : 0))
   const box = { x0: w, y0: h, x1: -1, y1: -1 }
@@ -301,14 +275,7 @@ interface Pick {
   notes?: Wording[]
 }
 
-/**
- * The cut of `img` that separates the bullet best. A bullet within `lowContrast` grey levels of
- * the background in luma is cut by colour when that contrast is greater. A bullet with a part of
- * its surface brighter and a part darker than the background (copper with a highlight on grey) is
- * cut by the luma's distance from the background's, or by colour, when that takes in what the first
- * cut found and more. When the result has a ragged edge (a patch of the background's texture) the
- * largest of the other cut-outs with a smooth edge is taken; none, and the user is told.
- */
+/** Luma, then colour, then luma distance for a part-bright part-dark bullet; a ragged edge falls back to the largest smooth cut-out. */
 function pickCut(img: RgbaImage, exclude: readonly Point[]): Pick {
   const luma = byLuma(img, exclude, new Uint8Array(0)) as Segmentation
   const colour = byColour(img, exclude, luma.alpha)
@@ -367,10 +334,7 @@ function enlarged(small: Uint8Array, k: number, sw: number, [w, h]: [number, num
   return out
 }
 
-/**
- * The cut-out of a photograph. The way to cut it is chosen on a photograph reduced to
- * `chooseLong` px (`pickCut`), and the photograph itself is cut that way once.
- */
+/** The way is chosen on a reduced photograph (`pickCut`), then the photograph is cut that way once. */
 export function segmentPhoto(img: RgbaImage, exclude: readonly Point[] = []): Segmentation {
   const k = Math.max(1, Math.ceil(Math.max(img.width, img.height) / chooseLong))
   const small = k === 1 ? img : reduced(img, k)

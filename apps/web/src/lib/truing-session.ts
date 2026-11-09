@@ -120,10 +120,7 @@ const clickOf = (input: TruingInputs, t: T) =>
 /** Why the plan or the fit has no answer (a missing value in the language of the `t` it was made with), or the answer. */
 export type Attempt<T> = { answer: T } | { problem: Say }
 
-/**
- * The statuses and standard errors of the planned string: the rows' kinds, distances and shots, the
- * chronograph's shots and deviation, and the dispersion of one shot.
- */
+/** From the rows, the chronograph and one shot's dispersion. */
 export function planSession(shot: TrajectoryInput, input: TruingInputs, t: T): Attempt<TruingPlan> {
   try {
     const { entries, chronograph } = planned(input, t)
@@ -203,19 +200,10 @@ function storedParameter(name: RangeStringParameterName, si: number) {
 /** The stored truing schema's limits: rows of one result, shots of one row, results of one configuration. */
 export const truingLimits = { rows: 50, shots: 10000, results: 100 }
 
-/**
- * Why a fit was not stored: the firearm or its configuration is gone, the configuration holds
- * `truingLimits.results` results, the strings have more than `truingLimits.rows` rows, or a row or
- * the chronograph more than `truingLimits.shots` shots.
- */
+/** Each refusal is one of the `truingLimits` caps, or the firearm or configuration is gone. */
 export type StoreRefusal = 'missing' | 'full' | 'rows' | 'shots'
 
-/**
- * The truing result as a firearm configuration stores it: the strings as entered, the nominal
- * shot and the fitted parameters, in stored units. Only an identified parameter keeps its value
- * and interval. `input` is the one the fit was made from. 'rows' when there are more rows than
- * a result keeps, 'shots' when a row or the chronograph has more shots than one keeps.
- */
+/** Stored units; `input` must be the one the fit was made from; only an identified parameter keeps its value and interval. */
 export function truingEntry(
   nominal: { shot: TrajectoryInput; bullet: string; zeroRange: number },
   input: TruingInputs,
@@ -282,11 +270,7 @@ export function truingEntry(
   })
 }
 
-/**
- * The firearm record with `entry` appended to configuration `config`, saved at `now`; 'missing'
- * when `stored` is no valid firearm with that configuration, 'full' when the configuration holds
- * as many results as it keeps.
- */
+/** 'missing' without that valid configuration, 'full' at its result cap. */
 export function withTruing(
   stored: unknown,
   config: string,
@@ -380,10 +364,7 @@ function intervalText(p: RangeStringParameter, system: UnitSystem, t: T): string
   })
 }
 
-/**
- * The parameters of a plan or a fit as lines. Only an identified parameter has a value and an
- * interval; a weak or unresolved one says why.
- */
+/** A weak or unresolved parameter says why instead of a value. */
 export function parameterLines(
   parameters: readonly RangeStringParameter[],
   system: UnitSystem,
@@ -457,10 +438,7 @@ export const nominalLine = (
     range: withUnit('range', system, n.zeroRange),
   })
 
-/**
- * A stored truing result as the firearm editor lists it: the distances of its strings, the
- * chronograph readings and the identified values, in the units of `system`.
- */
+/** In the units of `system`. */
 export function truingSummary(entry: Truing, system: UnitSystem, t: T) {
   const strings = entry.rows
     .map((r) =>

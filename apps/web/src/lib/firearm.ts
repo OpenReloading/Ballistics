@@ -136,10 +136,7 @@ const labels: Record<string, Message> = {
 /** Zod issues of `firearm.safeParse(f)` in schema order, empty when valid. */
 export const firearmIssues = (f: Firearm) => firearm.safeParse(f).error?.issues ?? []
 
-/**
- * Why Save refuses a firearm, as a sentence with the field label and where it is; undefined when
- * the record is valid. `name` is the record name, which must not be empty.
- */
+/** With the field label and where it is; undefined when valid; an empty `name` is refused. */
 export function firearmProblem(
   name: string,
   f: Firearm,
@@ -267,19 +264,13 @@ export function landsOf(f: Firearm): LandsContact | undefined {
   return { bullet: f.landsBullet, baseToOgive, overallLength }
 }
 
-/**
- * The lands contact for the bullet in use: `contact` when it was measured with that bullet, else
- * `other` says a contact exists for another bullet, which the jump does not use.
- */
+/** A contact measured with another bullet is reported as `other` and not used for the jump. */
 export function landsFor(lands: LandsContact | undefined, bulletRef: string | undefined) {
   const same = lands !== undefined && lands.bullet === bulletRef
   return { contact: same ? lands : undefined, other: lands !== undefined && !same }
 }
 
-/**
- * What a firearm gives the workbench: twist, barrel length, measured bore and groove diameter and
- * freebore (m), mass (kg) and lands contact.
- */
+/** What the workbench reads from a firearm: lengths in m, mass in kg. */
 export const gunValues = (f: Firearm) => ({
   twist: siOf('length', f.twist),
   barrelLength: siOf('length', f.barrelLength),
@@ -305,10 +296,7 @@ const firearmRow = (id: string, name: string, f: Firearm): FirearmRow => ({
   twist: siOf('length', f.twist),
 })
 
-/**
- * The workbench's Gun picker: the browser's firearms, then the built-in example rifle, which is
- * never stored, so a fresh browser still has one to choose.
- */
+/** The built-in example rifle is never stored, so a fresh browser still has one to choose. */
 export const gunPicker = (
   stored: readonly { id: string; name: string; data: Firearm }[],
   example: { id: string; name: string; data: Record<string, unknown> },
@@ -330,10 +318,7 @@ export const catalogueCartridgeId = (ref: string | undefined) => {
   return parsed?.scope === 'catalogue' ? parsed.id : undefined
 }
 
-/**
- * The entries `countedSessions` holds at most (the schema's limit): a shooting log entry has no
- * snapshot to fall back on, so a dropped one would offer its rounds again (#928).
- */
+/** The schema's limit (`.max(5000)` in packages/schema/src/firearm.ts): a log entry has no snapshot to fall back on, so a dropped one would offer its rounds again (#928). */
 const maxCountedSessions = 5000
 
 /** A new firearm: no optics or configurations yet. */
@@ -345,22 +330,14 @@ export const blankFirearm = (): Firearm => ({
   configurations: [],
 })
 
-/**
- * `p` over `f`: a changed round count is dated to the local day of `now`, a cleared one loses its
- * date, and any other edit keeps the date, so it tells how old the count is, not the record.
- */
+/** Only a count change dates the count, so the date tells how old the count is, not the record. */
 export function firearmPatch(f: Firearm, p: Partial<Firearm>, now = new Date()): Firearm {
   const next = { ...f, ...p }
   if (!('roundCount' in p) || p.roundCount === f.roundCount) return next
   return { ...next, roundCountDate: p.roundCount === undefined ? undefined : localDay(now) }
 }
 
-/**
- * The rounds of the session `session` (`shots` shots, its snapshot recorded the count `base`) that
- * the count of `f` does not hold yet: the shots minus the rounds counted for the session, or for a
- * session without an entry in `countedSessions` all its shots unless the count is at least
- * `base + shots` already. 0 without a count, or without a base and an entry.
- */
+/** Without an entry in `countedSessions`, all shots unless the count already reaches `base + shots`. */
 export function roundsDue(f: Firearm, session: string, base: number | undefined, shots: number) {
   if (f.roundCount === undefined) return 0
   const counted = f.countedSessions?.find((c) => c.session === session)?.rounds
@@ -368,12 +345,7 @@ export function roundsDue(f: Firearm, session: string, base: number | undefined,
   return base === undefined || f.roundCount >= base + shots ? 0 : shots
 }
 
-/**
- * The stored firearm `record` with `n` rounds added to its count for the session `session`, dated
- * through `firearmPatch`, and the rounds counted for the session in `countedSessions` (the oldest
- * entry dropped at the limit). undefined, leaving the record, when it is no firearm or
- * {@link roundsDue} is 0 (the session was added, here or in another tab).
- */
+/** Undefined when {@link roundsDue} is 0, so a session added here or in another tab counts once. */
 export function withSessionRounds(
   record: UserRecord,
   session: string,
@@ -409,10 +381,7 @@ export function withCountedRounds(
   })
 }
 
-/**
- * The rounds a competition event adds to a firearm's count: its `rounds`, else the shots of its
- * ring series when every series lists them; undefined when neither tells.
- */
+/** `rounds`, else the ring series' shots when every series lists them; undefined when neither tells. */
 export function eventRounds(e: CompetitionEvent): number | undefined {
   if (e.rounds !== undefined) return e.rounds
   if (e.results.method !== 'rings' || e.results.series.length === 0) return undefined
@@ -428,12 +397,7 @@ export function eventRounds(e: CompetitionEvent): number | undefined {
 export const countedFor = (f: Firearm, keys: readonly string[]) =>
   (f.countedSessions ?? []).reduce((n, c) => (keys.includes(c.session) ? n + c.rounds : n), 0)
 
-/**
- * The rounds of the event `event` (its reference, `user:<id>`, with `rounds` rounds) that the
- * count of `f` does not hold yet: the rounds less those counted for the event before and for the
- * shooting log entries that link it (`entries`, their references: the same match, #919). 0 without
- * a count. The event shares `countedSessions` with the sessions, so it is counted once (#633).
- */
+/** Less what log entries of the same match counted (#919); events share `countedSessions` with sessions, so each counts once (#633). */
 export function eventRoundsDue(
   f: Firearm,
   event: string,
@@ -444,11 +408,7 @@ export function eventRoundsDue(
   return Math.max(0, rounds - countedFor(f, [event, ...entries]))
 }
 
-/**
- * The stored firearm `record` with `n` of the event's rounds added to its count, through the same
- * one-confirm flow as a session's rounds. undefined, leaving the record, when it is no firearm or
- * {@link eventRoundsDue} (with the linking `entries`) is 0.
- */
+/** The same one-confirm flow as a session's rounds; undefined when {@link eventRoundsDue} is 0. */
 export function withEventRounds(
   record: UserRecord,
   event: string,
@@ -504,10 +464,7 @@ export function zeroFill(m: OpticMount): Partial<SightFill> {
   }
 }
 
-/**
- * Every mounted optic of the firearms among `records`, configuration by configuration, the active
- * configuration of each firearm first.
- */
+/** The active configuration of each firearm first. */
 function* mountedOptics(records: UserRecord[]) {
   for (const r of records) {
     if (r.kind !== 'firearm') continue
@@ -536,10 +493,7 @@ const mountOption = (
       : `${r.name}, ${c.name}, ${optic}`,
 })
 
-/**
- * One option per mounted optic of every configuration of the firearms among `records`, the
- * active configuration of each firearm first.
- */
+/** The active configuration of each firearm first. */
 export function sightOptions(records: UserRecord[], t: Translator['t'] = untranslated()) {
   return [...mountedOptics(records)].map((x) => {
     const optic = x.f.optics.find((o) => o.id === x.m.optic)
@@ -560,10 +514,7 @@ export function sightOptions(records: UserRecord[], t: Translator['t'] = untrans
   })
 }
 
-/**
- * The Trajectory tab's sight choice: the sights of the browser's firearms, then those of the
- * built-in example rifle, which is never stored, and the label of the empty choice.
- */
+/** The built-in example rifle is never stored, so it follows the browser's firearms. */
 export function sightPicker(records: UserRecord[], example: UserRecord, t: Translator['t']) {
   return {
     options: [
@@ -579,10 +530,7 @@ export function sightPicker(records: UserRecord[], example: UserRecord, t: Trans
   }
 }
 
-/**
- * Optics of the library with a click value, for the clicks to the point of aim: each
- * configuration's mounted optics, the active configuration first.
- */
+/** Only optics with a click value; the active configuration first. */
 export function clickOptions(records: UserRecord[], t: Translator['t'] = untranslated()) {
   return [...mountedOptics(records)].flatMap((x) => {
     const o = x.f.optics.find((y) => y.id === x.m.optic)
@@ -636,10 +584,7 @@ function firstMount(f: Firearm) {
   return { i, config, mount, optic }
 }
 
-/**
- * The facts of a list card: barrel length and twist, and the first optic of the active
- * configuration (else the first) with its zero range.
- */
+/** The first optic of the active configuration, else the first. */
 export function cardFacts(f: Firearm, system: UnitSystem, t: Translator['t']) {
   const barrel = [
     f.barrelLength?.value
@@ -666,11 +611,7 @@ export function cardFacts(f: Firearm, system: UnitSystem, t: Translator['t']) {
   return { barrel: barrel || undefined, sight }
 }
 
-/**
- * The cells of a firearm's row in the library table, numbers in the units of `system` without
- * them. The optic and zero are those of the active configuration's first mount (else the first
- * configuration's), '' where nothing is entered.
- */
+/** Numbers without units; '' where nothing is entered. */
 export function firearmCells(f: Firearm, system: UnitSystem, t: Translator['t']) {
   const { i, config, mount, optic } = firstMount(f)
   return {

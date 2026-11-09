@@ -1,7 +1,4 @@
-/**
- * The saved loads the workbench opens in its tabs, and the newest saved loads of the browser store
- * read without the schema, for the home page.
- */
+/** The home page reads the newest without the schema. */
 import { storageName } from './edition.ts'
 import { inStore } from './user-db.ts'
 

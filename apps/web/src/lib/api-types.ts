@@ -233,10 +233,7 @@ interface SampledPercentiles {
   p95: number
 }
 
-/**
- * A step of a charge ladder answer: the fields of a single
- * answer at `charge`, or the `error` of a result the model reports as invalid.
- */
+/** A step of a charge ladder answer: the single answer's fields at `charge`, or the `error` of a run the model calls invalid. */
 type InteriorLadderStep = { charge: number } & (
   | Pick<InteriorResponse, 'result' | 'pressureRange' | 'limits' | 'warnings'>
   | { error: { message: string; reason?: string | undefined; field?: string } }

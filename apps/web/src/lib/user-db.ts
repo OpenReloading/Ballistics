@@ -1,8 +1,4 @@
-/**
- * The browser's IndexedDB of user records, target photos and the workspace folder handle: opening
- * and deleting it and running a request on one store, without the schema, so a page that only
- * lists stored values stays small.
- */
+/** Without the schema, so a page that only lists stored values stays small. */
 import { storageName } from './edition.ts'
 
 const request = <T>(r: IDBRequest<T>) =>

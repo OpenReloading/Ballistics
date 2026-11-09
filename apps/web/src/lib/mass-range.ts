@@ -5,10 +5,7 @@ import { kilogramsPerGrain } from './units.ts'
 /** Digits with at most one point, either part may be empty. */
 const isNumber = (s: string) => /^[\d.]*$/.test(s) && s.indexOf('.') === s.lastIndexOf('.')
 
-/**
- * A mass range of the text ("150-180gr", "9.5-g"), undefined when it does not parse or names no
- * known unit. Either bound may be left out.
- */
+/** Either bound may be left out; undefined without a known unit. */
 export function massRange(text: string) {
   const t = text.trim()
   const unit = (['gr', 'g'] as const).find((u) => t.endsWith(u))
