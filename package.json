@@ -29,9 +29,9 @@
     "postinstall": "node hooks/install.mjs"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.4",
+    "@biomejs/biome": "2.6.5",
     "eslint-plugin-regexp": "3.3.3",
-    "knip": "^6.43.0",
+    "knip": "^6.44.1",
     "oxlint": "catalog:"
   }
 }
