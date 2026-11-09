@@ -52,7 +52,7 @@ export const lowContrast = 60
 
 const rowOf = (a: number[][], i: number) => a[i] as number[]
 
-/** Gauss elimination with pivoting; undefined for a singular system. */
+/** Solves the `n` x `n` system `m x = b`, `m` row-major, by Gauss elimination with pivoting; undefined for a singular system. */
 export function solve(m: readonly number[], b: readonly number[], n: number): number[] | undefined {
   const a = Array.from({ length: n }, (_, i) => [...m.slice(i * n, i * n + n), at(b, i)])
   for (let c = 0; c < n; c++) {

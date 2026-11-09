@@ -58,7 +58,7 @@ export interface PhotoRow {
   differs: boolean
 }
 
-/** `differs` beyond three standard uncertainties and 2 %, so a manufacturing spread is no flag; the record is never changed. */
+/** `record`: the catalogue record's SI values; `differs` beyond three standard uncertainties and 2 %, so a manufacturing spread is no flag; the record is never changed. */
 export function photoRows(
   m: BulletMeasurement,
   record: Record<string, number | undefined> | undefined,

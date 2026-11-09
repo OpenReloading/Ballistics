@@ -58,7 +58,7 @@ const labels: Record<string, Message> = Object.fromEntries(
   [...caseGroupFields, caseGroupCapacitySpec].map((s) => [s.key, s.label]),
 )
 
-/** With the field label; undefined when valid; `name` must not be empty. */
+/** With the field label; undefined when valid; an empty `name` is refused. */
 export function caseGroupProblem(name: string, c: Case, t: Translator['t']): string | undefined {
   if (!name) return t('Enter a name.')
   if (!c.cartridge) return t('Choose the cartridge.')
