@@ -22,7 +22,7 @@ const config = async (): Promise<Config> => ({
   baseUrl,
   // the CLI's result schema at the address of its $id
   staticDirectories: ['static', '../../packages/cli/schema'],
-  // the project runs no link check: a broken link warns instead of the default throw
+  // broken links never fail the build; explicit, as onBrokenLinks defaults to throw (anchors in v4)
   onBrokenLinks: 'warn',
   onBrokenAnchors: 'warn',
   // .md files are plain Markdown, .mdx files are MDX
