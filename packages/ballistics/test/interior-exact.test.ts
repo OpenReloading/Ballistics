@@ -25,14 +25,7 @@ const exactLoad = (covolume: number, startPressure: number): InteriorLoad => ({
   startPressure,
 })
 
-/**
- * Exact solution of the constant-surface model with a Noble-Abel gas, a linear burn law, no
- * resistance and a uniform-density gas column (effective mass m_p + m_c / 3). Written in the
- * symbols of `apps/docs/docs/models/interior-m3.md`: with u = z - z0 the velocity is
- * A u / (m_e B) and the gas volume follows a linear first-order equation in u, which a fixed-step
- * Runge-Kutta rule integrates far below the tolerance of the tests. After burnout the gas energy
- * falls as V^-(k-1).
- */
+/** Constant surface, Noble-Abel gas, linear burn law, no resistance, uniform gas column (effective mass m_p + m_c / 3), in the symbols of `apps/docs/docs/models/interior-m3.md`: with u = z - z0 the velocity is A u / (m_e B) and the gas volume a linear first-order equation in u, integrated by fixed-step Runge-Kutta far below the tests' tolerance; after burnout the gas energy falls as V^-(k-1). */
 function exactSolution(load: InteriorLoad, covolume = load.propellant.covolume, steps = 4000) {
   const burn = load.propellant.burn
   if (burn.kind !== 'vivacity') throw new Error('vivacity form expected')
@@ -213,8 +206,7 @@ function slope(load: (x: number) => InteriorLoad, x: number, h = 0.005): number 
 }
 
 describe('chamber volume against barrel length', () => {
-  // d v / d V_c = -(L / V*) d v / d L at fixed everything else, V* the free volume at the start
-  // (constant-surface case, eta = 1/density; derived from the reduced variable A x / V*)
+  // d v / d V_c = -(L / V*) d v / d L at fixed everything else, V* the free volume at the start (constant-surface case, eta = 1/density; derived from the reduced variable A x / V*)
   const rifle: InteriorLoad = {
     ...m3Load,
     chamber: { ...m3Load.chamber, volume: 4.2e-6 },
@@ -276,9 +268,7 @@ const proxy203: InteriorLoad = {
 }
 
 describe('velocity elasticities of a gun-class load', () => {
-  // Typical figures for gun-class propellant loads, source unverified: a 1 % increase of the shell
-  // mass, the charge, the chamber volume or the shot travel changes the muzzle velocity by
-  // -0.4 %, +0.6 to 0.7 %, -0.25 % and +0.2 %. The pressure responses are not asserted.
+  // typical figures for gun-class propellant loads, source unverified: a 1 % rise of shell mass, charge, chamber volume or shot travel changes the muzzle velocity by -0.4 %, +0.6 to 0.7 %, -0.25 % and +0.2 %; the pressure responses are not asserted
   const h = 0.005
   const elasticity = (change: (x: number) => InteriorLoad): number => {
     const options = { outputStep: 2e-5 }

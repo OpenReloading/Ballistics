@@ -34,12 +34,7 @@ async function ladderTarget(page: Page) {
 
 const slotOf = (section: Locator) => section.getByRole('group', { name: 'Ladder target messages' })
 
-/**
- * The boxes of what the message slot must not move (the fields, the print button, the slot and what
- * follows), read in one go and taken from the section's top: filling a field may scroll the tab's
- * panel, and the lot rows above load later. What follows counts by where it starts, its height
- * follows those rows.
- */
+/** The boxes of what the message slot must not move (the fields, the print button, the slot and what follows), read in one go from the section's top, as filling a field may scroll the tab's panel and the lot rows above load later; what follows counts by where it starts, as its height follows those rows. */
 const positions = (section: Locator) =>
   section.evaluate((el) => {
     const round = (n: number) => Math.round(n * 10) / 10
@@ -117,8 +112,7 @@ test('the slot keeps its size with 1, 3 and 10 messages and its list is reached 
     }, count)
     await expect(slot.locator('.message')).toHaveCount(count)
     expect(await positions(section)).toEqual(before)
-    // a slot takes focus only where it scrolls; End then scrolls it to the last message, with an
-    // animation
+    // a slot takes focus only where it scrolls; End then scrolls it to the last message, with an animation
     if (count === 1) {
       await expect(slot).not.toHaveAttribute('tabindex')
       continue
@@ -201,8 +195,7 @@ test('the notice line and the notes keep their box through a result with warning
     below: (await box(line.locator('xpath=following-sibling::*[1]'))).top,
   })
   const idle = await seen()
-  // 2.4 g: a result without warnings; 2.8 g: a result over its limit with a warning; 60 g: the
-  // model refuses the load, an error in the line and in the results
+  // 2.4 g: a result without warnings; 2.8 g: a result over its limit with a warning; 60 g: the model refuses the load, an error in the line and in the results
   for (const [grams, outcome] of [
     ['2.4', /^Simulation done\. Step 0, 2\.40 g/],
     ['2.8', /^Simulation done\. Step 0, 2\.80 g/],

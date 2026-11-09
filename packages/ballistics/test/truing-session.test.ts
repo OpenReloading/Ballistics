@@ -144,8 +144,7 @@ describe('zero offset without information', () => {
 })
 
 describe('zero offset maxZeroSigma', () => {
-  // One impact at the zero range: the offset is the only column that moves, impact = 100 m * e.
-  // 4 shots of 1.6e-4 rad * 100 m give a standard uncertainty of 0.008 m, so 8e-5 rad on e.
+  // one impact at the zero range: the offset is the only column that moves, impact = 100 m * e; 4 shots of 1.6e-4 rad * 100 m give a standard uncertainty of 0.008 m, so 8e-5 rad on e
   const zeroPlan = { ...planOf([100], []), dispersion: 1.6e-4, chronograph: undefined }
   const entries = zeroPlan.entries.map((e) => ({ ...e, shotCount: 4 }))
   const sigma = 8e-5
@@ -211,8 +210,7 @@ describe('priors', () => {
   })
 
   it('raise the chi-square of the residual check above the one without priors', () => {
-    // the data-only fit minimizes the chi-square, so at the posterior mode it is at least as large
-    // at the same degrees of freedom: the check flags a fit with priors no less often
+    // the data-only fit minimizes the chi-square, so at the posterior mode it is at least as large at the same degrees of freedom: the check flags a fit with priors no less often
     const data = strings(base, normals(5))
     const plain = fitTruingStrings(data, { fitZeroOffset: true })
     const withPriors = fitTruingStrings(data, priorOptions)
@@ -301,12 +299,7 @@ describe('priors coverage', () => {
 })
 
 describe('priors maximum a posteriori center', () => {
-  // One impact at the zero range: the offset e is the only live column and the model is linear,
-  // impact = 100 m * e. 4 shots of 0.016 m make the standard uncertainty of the row 0.008 m, so
-  // the data say e = y / 100 with sigma_d = 8e-5 rad. With the prior e ~ N(0, s^2) the posterior
-  // is Gaussian with precision 1 / sigma_d^2 + 1 / s^2, centred on
-  //   e* = (y / 100) * s^2 / (s^2 + sigma_d^2)
-  // and with standard deviation sigma_d * s / sqrt(sigma_d^2 + s^2).
+  // one impact at the zero range, linear: impact = 100 m * e, 4 shots of 0.016 m give the row a standard uncertainty of 0.008 m, so e = y / 100 with sigma_d = 8e-5 rad; with the prior e ~ N(0, s^2) the posterior is Gaussian, precision 1 / sigma_d^2 + 1 / s^2, centre e* = (y / 100) * s^2 / (s^2 + sigma_d^2), SD sigma_d * s / sqrt(sigma_d^2 + s^2)
   const sigmaD = 8e-5
 
   it.each([
@@ -330,9 +323,7 @@ describe('priors maximum a posteriori center', () => {
   })
 
   it('covers the truth with the posterior centre and width, the data value does not', () => {
-    // truth drawn from the prior with s = sigma_d: the data value y / 100 has an error of
-    // sigma_d, the posterior centre one of sigma_d / sqrt(2), the posterior half-width is
-    // 1.96 sigma_d / sqrt(2): about 0.95 for the centre, about 0.83 for the data value.
+    // truth drawn from the prior with s = sigma_d: the data value y / 100 has an error of sigma_d, the posterior centre one of sigma_d / sqrt(2), the posterior half-width is 1.96 sigma_d / sqrt(2): about 0.95 for the centre, about 0.83 for the data value
     const seeds = 300
     let centre = 0
     let dataValue = 0

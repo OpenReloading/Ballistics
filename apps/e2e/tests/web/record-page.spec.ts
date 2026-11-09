@@ -1,10 +1,7 @@
 import { expect, type Page, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
 
-/**
- * A record page of every kind renders in the browser from its data file: the exported file holds the
- * head tags and a loading state. One record of each kind, all in the export's sample.
- */
+/** The exported file holds the head tags and a loading state, and the page renders from its data file in the browser; one record of each kind, all in the export's sample. */
 const records: {
   route: string
   data: string

@@ -5,8 +5,7 @@ import { DirectoryTable } from '../src/components/directory-table.tsx'
 import { PanelTable, ScrollRegion } from '../src/components/scroll-region.tsx'
 import { msg } from '../src/i18n/translate.ts'
 
-// the server HTML is a region and a tab stop: a box that overflows before hydration is reachable by
-// keyboard (axe scrollable-region-focusable); the observer drops both once the content fits
+// the server HTML is a region and a tab stop, so a box that overflows before hydration is reachable by keyboard (axe scrollable-region-focusable); the observer drops both once the content fits
 it('a scroll region starts as a named region and a tab stop', () => {
   const html = renderToStaticMarkup(
     <ScrollRegion label="Values">

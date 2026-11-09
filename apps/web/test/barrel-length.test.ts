@@ -134,9 +134,7 @@ describe('barrelRows', () => {
   })
 
   it('keeps the earlier points of a longer run equal to the points of the run', () => {
-    // the longer run read at each point of the run with travel (the points before the bullet moves
-    // have no barrel length): within 1e-5 of the run's muzzle velocity, peak pressure and barrel
-    // time, and of 1 in burnt fraction
+    // the longer run read at each point of the run with travel (points before the bullet moves have no barrel length): within 1e-5 of the run's muzzle velocity, peak pressure and barrel time, and of 1 in burnt fraction
     const peak = Math.max(...result.points.map((p) => p.breechPressure))
     const moving = result.points.filter((p) => p.travel > 0)
     expect(moving.length).toBeGreaterThan(100)

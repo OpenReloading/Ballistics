@@ -268,8 +268,7 @@ describe('parseDelimited: a detected comma that may cut a velocity after a heade
     const fps = { columns: { velocity: 'velocity' }, velocityUnit: 'ft/s' } as const
     const w = (t: string) => parseDelimited(t, fps).warnings.find(isCommaSplit)?.params
     expect(w('velocity,note\n2,800')).toMatchObject({ rows: ['2'], cells: '2,800' })
-    // limits: a thousands group after the velocity and a cut before it are not flagged;
-    // the plausibility check reports the first (2 ft/s)
+    // limits: a thousands group after the velocity and a cut before it are not flagged; the plausibility check reports the first (2 ft/s)
     expect(w('velocity,note\n2,800.0')).toBeUndefined()
     expect(
       parseDelimited('velocity,note\n2,800.0', fps).warnings.some((x) => x.code === 'outsideRange'),
@@ -281,8 +280,7 @@ describe('parseDelimited: a detected comma that may cut a velocity after a heade
       columns: { velocity: 'Velocity' },
     })
     expect(values(e)).toEqual([[853.44, 856.488]])
-    // 1 to 3 digits after an integer velocity are read as a column, with one warning;
-    // a named delimiter silences it
+    // 1 to 3 digits after an integer velocity are read as a column, with one warning; a named delimiter silences it
     const shots = 'Velocity,Shot\n2800,1\n2810,2'
     expect(values(parseDelimited(shots, fps))).toEqual([[853.44, 856.488]])
     expect(w(shots)).toMatchObject({ rows: ['2', '3'], cells: '2800,1' })

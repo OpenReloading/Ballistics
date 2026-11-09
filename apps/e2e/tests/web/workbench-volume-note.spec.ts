@@ -14,8 +14,7 @@ test('a record capacity and a volume typed over the measured capacity show the n
   test.setTimeout(60_000)
   await page.setViewportSize({ width: 1280, height: 650 })
   await runExample(page)
-  // the example's volume follows its brass record's stated capacity, an estimate; the print copies
-  // of the note are in the page too
+  // the example's volume follows its brass record's stated capacity, an estimate; the print copies of the note are in the page too
   const message = page.locator('.result-notes li', { hasText: note })
   await expect(message).toBeVisible()
   await loadForm(page)

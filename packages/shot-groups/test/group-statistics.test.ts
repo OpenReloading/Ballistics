@@ -20,8 +20,7 @@ const expectClose = (actual: number | undefined, expected: number, rel = 1e-12) 
 const shots = (points: [number, number][]): GroupShot[] =>
   points.map(([x, y]) => ({ x: x * mm, y: y * mm }))
 
-// Five shots, mm. Centre (2, 2); deviations (-2,-2) (0,-1) (2,2) (-1,1) (1,0).
-// Sxx = 10, Syy = 10, Sxy = 7; radii sqrt8, 1, sqrt8, sqrt2, 1 (sum of squares 20).
+// Five shots, mm: centre (2, 2); deviations (-2,-2) (0,-1) (2,2) (-1,1) (1,0); Sxx = 10, Syy = 10, Sxy = 7; radii sqrt8, 1, sqrt8, sqrt2, 1 (sum of squares 20).
 const five = shots([
   [0, 0],
   [2, 1],
@@ -62,8 +61,7 @@ const insideEllipse = (
   return u * u + v * v <= 1
 }
 
-// Each trial: a new group of n shots and one further shot; the prediction ellipse holds the
-// further shot with probability `coverage` over trials, the sample ellipse less often.
+// Each trial a new group of n shots and one further shot: the prediction ellipse holds the further shot with probability `coverage` over trials, the sample ellipse less often.
 const coverageTrials = (n: number, trials: number) => {
   const rng = seededUniforms(1000 + n)
   let predicted = 0

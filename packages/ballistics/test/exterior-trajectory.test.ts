@@ -68,10 +68,7 @@ const vacuumCase = {
   os: 0.01,
 }
 
-/**
- * The vacuum parabola of the vacuum case under the look angle `th` at the slant range `range`: time,
- * height and windage from the line of sight, squared speed and path angle.
- */
+/** The vacuum case's parabola under look angle `th` at slant range `range`: time, height and windage from the line of sight, squared speed and path angle. */
 function parabola(th: number, range: number) {
   const { v0, bore, hs, os } = vacuumCase
   const u = [Math.cos(th), Math.sin(th)]
@@ -290,8 +287,7 @@ describe('drag only, one dimension, on table nodes', () => {
 
 describe('drag only, one dimension, after a wind boundary', () => {
   it('takes the drag table segment of the new airspeed after a wind boundary', () => {
-    // Cd 0.3 up to Mach 1.8 and 0.6 from Mach 1.85; a 150 m/s headwind from 100 m lifts the
-    // airspeed onto the upper plateau, where va(t) = va0 / (1 + k va0 t) in one dimension
+    // Cd 0.3 up to Mach 1.8 and 0.6 from Mach 1.85; a 150 m/s headwind from 100 m lifts the airspeed onto the upper plateau, where va(t) = va0 / (1 + k va0 t) in one dimension
     const { mass, diameter } = base.projectile
     const k = (airDensity(base.air) * 0.6 * Math.PI * diameter ** 2) / (8 * mass)
     const w = 150
@@ -582,8 +578,7 @@ describe('Earth rotation', () => {
 
 describe('Earth rotation of a vertical shot and what it leaves out', () => {
   it('deflects a vertical shot fired north to the west', () => {
-    // a_z = -2 Omega cos(lat) (v0 - g t): z = -2 Omega cos(lat) (v0 t^2 / 2 - g t^3 / 6), which is
-    // -(2/3) Omega cos(lat) v0^3 / g^2 at the apex
+    // a_z = -2 Omega cos(lat) (v0 - g t): z = -2 Omega cos(lat) (v0 t^2 / 2 - g t^3 / 6), which is -(2/3) Omega cos(lat) v0^3 / g^2 at the apex
     const lat = 45 * deg
     const v0 = 300
     const shot: TrajectoryInput = {
@@ -628,8 +623,7 @@ describe('Earth rotation of a vertical shot and what it leaves out', () => {
 
 describe('Earth rotation with drag', () => {
   it('matches the first-order deflection with constant drag, damped by the co-rotating air', () => {
-    // gravity 0, constant Cd: x(t) = ln(1 + a t) / k with a = k v0; both deflections are
-    // 2 Omega_i (T X - integral of x dt) to first order in Omega
+    // gravity 0, constant Cd: x(t) = ln(1 + a t) / k with a = k v0; both deflections are 2 Omega_i (T X - integral of x dt) to first order in Omega
     const cd = 0.3
     const { mass, diameter } = base.projectile
     const k = (airDensity(base.air) * cd * Math.PI * diameter ** 2) / (8 * mass)
@@ -923,8 +917,7 @@ describe('outputs and stops', () => {
 
 describe('outputs along the drag table and stops', () => {
   it('follows the drag table while the Mach number rises', () => {
-    // dropped straight down at Mach 0.09; Cd steps from 0.1 below Mach 0.2 to 0.3 above Mach 0.25,
-    // so the speed stays below the terminal speed of Cd 0.3 in the thinnest air on the path
+    // dropped straight down at Mach 0.09; Cd steps from 0.1 below Mach 0.2 to 0.3 above Mach 0.25, so the speed stays below the terminal speed of Cd 0.3 in the thinnest air on the path
     const mass = 0.01
     const diameter = 0.0078
     const shot: TrajectoryInput = {
@@ -979,10 +972,7 @@ function nextDouble(x: number) {
   return nth(b, 0)
 }
 
-/**
- * The case of the boundaries closer than the event resolution: 11.34 g, 7.82 mm, a G1 BC of
- * 0.5 lb/in2, dry sea-level air, and options without the corrections.
- */
+/** Boundaries closer than the event resolution: 11.34 g, 7.82 mm, a G1 BC of 0.5 lb/in2, dry sea-level air, options without the corrections. */
 const nearCase = {
   mass: 0.01134,
   diameter: 0.00782,
@@ -1299,8 +1289,7 @@ describe('steep narrow drag segments', () => {
       if (m <= 1.1 || m >= 2.45) return
       for (const w of [1e-9, 1e-11]) {
         const shot = g1Shot({ kind: 'curve', curve: steppedG1(k, w) }, stepBore)
-        // absoluteTolerance 1e-10, unheld: at 1e-9, 8 runs exceeded 100000 steps and 4 were wrong or stopped short;
-        // at 1e-11, 1 exceeded 100000 steps
+        // absoluteTolerance 1e-10, unheld: at 1e-9, 8 runs exceeded 100000 steps and 4 were wrong or stopped short; at 1e-11, 1 exceeded 100000 steps
         const v = at1000(shot, { absoluteTolerance: 1e-10 }).velocity
         worst = Math.max(worst, Math.abs(v - at1000(shot, veryTight).velocity))
       }

@@ -2,8 +2,7 @@ import { expect, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 
-// The designers' rows and bar: the Units button on every designer, a field's own unit switch, the
-// fields filling their row, 44 px fields on a phone, and Open and Save in the bar down to 48em.
+// The designers' rows and bar: the Units button on every designer, a field's own unit switch, the fields filling their row, 44 px fields on a phone, and Open and Save in the bar down to 48em.
 
 const designers = ['bullets', 'cartridges', 'powders', 'targets']
 
@@ -142,8 +141,7 @@ test('a changed field goes back to the record value by its own button, and the r
   await storeUnits(page)
   await page.setViewportSize({ width: 1280, height: 650 })
   await gotoHydrated(page, '/bullets/designer?from=demo-bullet-168')
-  // the record loads after hydration, and a new bullet already shows the same diameter: an edit
-  // before the record arrives has no record value to go back to
+  // the record loads after hydration and a new bullet already shows the same diameter, so an edit before the record arrives has no record value to go back to
   await expect(page.getByText(/^Started from .*30 Cal 168 gr HPBT Demo\.$/)).toBeVisible()
   const diameter = page.getByRole('textbox', { name: /Diameter \(mm\)$/ })
   const record = await diameter.inputValue()

@@ -32,8 +32,7 @@ const stage = (p: Partial<PracticalStage>): PracticalStage => ({
   ...p,
 })
 
-// A worked event of three stages built from the scoring definitions of each rule book: one stage
-// clean, one with a procedural penalty, one with a no-shoot hit and metal targets.
+// A worked event of three stages built from each rule book's scoring definitions: one stage clean, one with a procedural penalty, one with a no-shoot hit and metal targets.
 const event: PracticalStage[] = [
   stage({ hits: { A: 8, C: 2, D: 0 }, time: 5 }),
   stage({ hits: { A: 12, C: 3, D: 1 }, procedurals: 1, time: 10 }),

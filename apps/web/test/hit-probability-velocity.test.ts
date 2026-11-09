@@ -1,5 +1,4 @@
-// The velocity term of shot-groups' pointDispersion against trajectories of core's solver with sampled
-// muzzle speeds: a check across two packages, so it runs in the app that holds both.
+// The velocity term of shot-groups' pointDispersion against trajectories of core's solver with sampled muzzle speeds: a check across two packages, so it runs in the app that holds both.
 
 import {
   lbPerSqInToKgPerSqM,

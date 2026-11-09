@@ -62,8 +62,7 @@ test("a firearm's lands contact gives the jump of the bullet it was measured wit
   await expect(row(page, 'Jump to the leade')).toBeVisible()
   await page.keyboard.press('Escape')
 
-  // seated at L6 71.12 mm with a base to ogive of 14.5 mm and a bullet of 30.5 mm: the bullet
-  // touches the lands at a CBTO of 57 mm, 1.88 mm further out than the seated 55.12 mm
+  // seated at L6 71.12 mm with a base to ogive of 14.5 mm and a bullet of 30.5 mm, the bullet touches the lands at a CBTO of 57 mm, 1.88 mm further out than the seated 55.12 mm
   await chooseFirearm(page, 'Lands rifle')
   await more.click()
   await expect(row(page, 'Jump to the lands')).toContainText('1.88')

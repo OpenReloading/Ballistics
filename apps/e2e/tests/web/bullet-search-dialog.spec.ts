@@ -3,8 +3,7 @@ import { gotoHydrated } from './nav.ts'
 import { putRecords } from './user-store.ts'
 import { loadForm } from './workbench.ts'
 
-// the Bullet card's search dialog, narrowed to the two invented demo bullets (both .308, 150 and 168 gr) by the word `demo`;
-// a .308 bullet of the browser's own keeps the list of every bullet longer than that, with or without other catalogue bullets
+// the Bullet card's search dialog, narrowed by the word `demo` to the two invented demo bullets (both .308, 150 and 168 gr); a .308 bullet of the browser's own keeps the list of every bullet longer than that, with or without other catalogue bullets
 
 test.beforeEach(async ({ page }) => {
   await gotoHydrated(page, '/workbench?cartridge=308-win')

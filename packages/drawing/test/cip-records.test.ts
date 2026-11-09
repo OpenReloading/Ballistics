@@ -82,10 +82,7 @@ function sweepSide(
   return [...codes, ...closed]
 }
 
-/**
- * Profiles both sides; pushes each broken invariant to failures and returns the codes per side,
- * closedFront last on the cartridge side.
- */
+/** Pushes each broken invariant to failures and returns the codes per side, closedFront last on the cartridge side. */
 function sweep(
   id: string,
   values: SpecValue[],
@@ -189,11 +186,7 @@ function angleFailures(
   return out
 }
 
-/**
- * What breaks the annotation rules of a drawn side: values stored or derived (L3 - L2 > 0), angle
- * vertices on both drawn flanks, radius corners and edges on the outline before rounding, nothing
- * dimensioned on a convention.
- */
+/** What breaks the annotation rules of a drawn side: values stored or derived (L3 - L2 > 0), angle vertices on both drawn flanks, radius corners and edges on the outline before rounding, nothing dimensioned on a convention. */
 function annotationFailures(
   p: Profile,
   values: SpecValue[],
@@ -457,8 +450,7 @@ it('draws the head and the belt from R1 and R3 where they differ', () => {
       .slice(0, 9)
       .map(([r, z]) => [Number(r.toFixed(9)), Number(z.toFixed(9))])
   }
-  // 30-378 Weath. Mag.: R1 14.71 at the head behind the f 0.3 mm, beta 45 degree chamfer, the belt
-  // at R3 15.33, then P1 14.78 at E 6.4
+  // 30-378 Weath. Mag.: R1 14.71 at the head behind the f 0.3 mm, beta 45 degree chamfer, the belt at R3 15.33, then P1 14.78 at E 6.4
   expect(points('cip-30-378-weath-mag-2002-05-15', 'cartridge')).toEqual([
     [0, 0],
     [7.055, 0],
@@ -566,12 +558,7 @@ it('keeps the chamber body around the cartridge body', () => {
     if (!(gap >= -0.01)) gaps.push([id, Number(gap.toFixed(3))])
   }
   expect(checked).toBe(512)
-  // Reviewed: chamber R, a minimum, is below cartridge R, a maximum, by 0.02 to 0.1 mm, so the
-  // stored rim is thicker than the stored recess; between the two R the rim (R1/2) meets the
-  // chamber body (P1/2). 22 BB Cap and 22 CB Cap: R 1.12 against 1.1, R1 7.06 against P1 5.76;
-  // 22 Extra Long: R 1.12 against 1.1, R1 7.06 against P1 5.78; 380 Long Rifle: R 1.32 against
-  // 1.3, R1 11.05 against P1 9.68; 4 mm Randz court and long: R 1.3 against 1.2, R1 6.1 against
-  // P1 4.7.
+  // Reviewed: chamber R (a minimum) is 0.02 to 0.1 mm below cartridge R (a maximum), so the rim (R1/2) meets the chamber body (P1/2) between them: 22 BB Cap and 22 CB Cap R 1.12 against 1.1, R1 7.06 against P1 5.76; 22 Extra Long R 1.12 against 1.1, R1 7.06 against P1 5.78; 380 Long Rifle R 1.32 against 1.3, R1 11.05 against P1 9.68; 4 mm Randz court and long R 1.3 against 1.2, R1 6.1 against P1 4.7
   expect(gaps).toEqual([
     ['cip-22-bb-cap-2000-06-07', -0.65],
     ['cip-22-cb-cap-2000-06-07', -0.65],
@@ -1038,8 +1025,7 @@ it('lays out every layer of every figure in both media clear of overlaps, inside
   expect({ longLeaders, acrossAxis, arrowheads: [...new Set(arrowheads)] }).toMatchSnapshot()
 })
 
-// the record page prints each side upright: the screen layout at the print text size; the
-// same checks in inches are in inch.test.ts, where the inch layouts are laid out once
+// the record page prints each side upright: the screen layout at the print text size; the same checks in inches are in inch.test.ts, where the inch layouts are laid out once
 const layoutsDrawn = {
   screen: (f: Figure) => (models.get(f) as { screen: FigureModel }).screen,
   print: (f: Figure) => (models.get(f) as { print: FigureModel }).print,
@@ -1154,8 +1140,7 @@ it('counts the chamber recess steps and lists the other outline features under 1
       const points = side === 'chamber' ? sharp.points.slice(1) : sharp.points
       return points.slice(1).flatMap(([r, z], k) => {
         const mm = Math.hypot(r - defined(points[k])[0], z - defined(points[k])[1])
-        // under the step of the stored values a segment is rounding, not a feature: 0.01 mm, and
-        // 0.005 mm for a radial step, half a diameter difference
+        // under the step of the stored values a segment is rounding, not a feature: 0.01 mm, and 0.005 mm for a radial step, half a diameter difference
         if (mm < (z === defined(points[k])[1] ? 0.005 : 0.01) - 1e-9 || mm * perMm >= 1) return []
         const recess = side === 'chamber' && table !== 'VII' && k === 1
         return [{ side, px: Number((mm * perMm).toFixed(2)), recess }]
@@ -1189,8 +1174,7 @@ it('counts the drawn sides per table and bounds text size, scale and frame', () 
   }
   expect({ figures: sizes.length, tables }).toEqual({
     figures: 587,
-    // chamber only: a closed front, or a cartridge without its base values; cartridge only: a
-    // chamber without them
+    // chamber only: a closed front, or a cartridge without its base values; cartridge only: a chamber without them
     tables: {
       I: { both: 215 },
       II: { both: 144, chamber: 2 },
@@ -1267,8 +1251,7 @@ it('dimensions every stored symbol or lists it as undimensioned', () => {
     const [kind, symbol] = key.split(': ') as [string, string]
     never.set(kind, [...(never.get(kind) ?? []), symbol].sort())
   }
-  // Reviewed: not dimensioned because no drawn feature carries them (such as L3+G, L4, L5, Q, Z)
-  // or because they are the bore (table VII chamber B where it equals H)
+  // Reviewed: not dimensioned because no drawn feature carries them (such as L3+G, L4, L5, Q, Z) or because they are the bore (table VII chamber B where it equals H)
   expect(
     Object.fromEntries([...never].map(([kind, symbols]) => [kind, symbols.join(', ')])),
   ).toMatchSnapshot()

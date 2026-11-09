@@ -3,11 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { ellipseProbability, hitProbability, type PointOffset, shotsToHit } from '../src/index.ts'
 import { issueOf } from './issue.ts'
 
-/**
- * 1 - Q1(d / s, r / s), the probability of a circle of radius r for a circular normal of standard
- * deviation s centred d away: the noncentral chi-square distribution of two degrees of freedom as a
- * Poisson mixture of central ones, whose distribution function is 1 - e^-u sum_{i<=j} u^i / i!.
- */
+/** 1 - Q1(d / s, r / s), the probability of a circle of radius r for a circular normal of SD s centred d away: the noncentral chi-square of two degrees of freedom as a Poisson mixture of central ones, whose distribution function is 1 - e^-u sum_{i<=j} u^i / i!. */
 function circleReference(d: number, r: number, s: number): number {
   const lambda = (d / s) ** 2 / 2
   const u = (r / s) ** 2 / 2

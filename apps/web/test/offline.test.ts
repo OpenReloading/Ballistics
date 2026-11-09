@@ -114,8 +114,7 @@ it('the shell holds every page route but the record pages, the manifest and its 
     .filter((f) => /(^|\/)page\.tsx$/.test(f) && !f.includes('['))
     .map((f) => `/${f.replace(/\/?page\.tsx$/, '')}`)
   expect(routes).toContain('/powders/tune')
-  // every page route without a `[...]` segment is in both the full and the sample export, so
-  // `cache.addAll` finds each shell page
+  // every page route without a `[...]` segment is in both the full and the sample export, so `cache.addAll` finds each shell page
   expect([...shellPages].sort()).toEqual(routes.sort())
   // Settings is a dialog, no page
   expect(shellPages).not.toContain('/settings')

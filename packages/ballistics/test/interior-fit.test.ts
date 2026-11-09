@@ -321,8 +321,7 @@ describe('powder fit failures', () => {
     )
     expect(same.reason).toBe('ill-conditioned')
     expect(same.conditionNumber).toBeGreaterThan(1e3)
-    // both parameters raise the velocity and the column-scaled columns are equal, so the weak
-    // direction is (1, -1)/sqrt(2) up to sign
+    // both parameters raise the velocity and the column-scaled columns are equal, so the weak direction is (1, -1)/sqrt(2) up to sign
     const direction = same.direction ?? []
     const d0 = nth(direction, 0)
     const d1 = nth(direction, 1)

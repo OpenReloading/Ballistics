@@ -9,8 +9,7 @@ import {
   type Row,
 } from './face-photos.ts'
 
-// Its rings stand in the ratios of three other faces: it is always offered with them. Per photo the
-// holes found of six and the proposals that are no hole.
+// Its rings stand in the ratios of three other faces, so it is always offered with them. Per photo the holes found of six and the proposals that are no hole.
 const holes: Record<PhotoKind, [number, number]> = {
   whole: [6, 0],
   insert: [5, 0],

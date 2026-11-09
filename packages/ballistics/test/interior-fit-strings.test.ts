@@ -6,8 +6,7 @@ import { load } from './powder-load.ts'
 import { normals } from './random.ts'
 
 describe('string ladder', () => {
-  // Means 800 and 810; squares about the means 8 (798, 800, 802) and 2 (809, 811); 3 degrees of
-  // freedom: pooled SD sqrt(10 / 3).
+  // Means 800 and 810; squares about the means 8 (798, 800, 802) and 2 (809, 811); 3 degrees of freedom: pooled SD sqrt(10 / 3).
   const strings: ChronographString[] = [
     { charge: 2.7e-3, velocities: [798, 800, 802] },
     { charge: 2.8e-3, velocities: [809, 811], barrelLength: 0.5 },
@@ -58,8 +57,7 @@ describe('string ladder fits', () => {
         charge,
         velocities: Array.from({ length: 5 }, () => nth(truth, i) + 4 * noise()),
       }))
-      // the fit reads only muzzle velocity and peak pressure, which the 10 times coarser curve
-      // spacing (also the largest step) moves by less than 1e-6 m/s here, at a sixth of the run time
+      // the fit reads only muzzle velocity and peak pressure, which the 10 times coarser curve spacing (also the largest step) moves by less than 1e-6 m/s here, at a sixth of the run time
       const fit = fitPowder(load(0.38), stringLadder(noisy), { options: { outputStep: 2e-5 } })
       const b = nth(fit.parameters, 0)
       if (Math.abs(b.value - 0.45) <= 2 * (b.standardUncertainty ?? 0)) inside++

@@ -159,8 +159,7 @@ test('a load of records keeps the charge and the travel, runs the powder at the 
   await (await barButton(page, 'Save')).click()
   await expect.poll(async () => (await storedLoads(page)).length).toBe(1)
   const { name, data } = defined((await storedLoads(page))[0])
-  // the powder record has no start pressure of its own: in a rifle it runs at the 30 MPa of its
-  // fit, the default a load file names, not at the 29.2 MPa of the jacketed bullet
+  // the powder record has no start pressure of its own: in a rifle it runs at the 30 MPa of its fit, the default a load file names, not at the 29.2 MPa of the jacketed bullet
   expect(data.analysis).toEqual({ overrides: { travel: 533.4 } })
   expect(data.charge).toEqual({ value: 2.4 })
 

@@ -181,8 +181,7 @@ describe('box label reader', () => {
     ).toEqual(record())
   })
 
-  // shortcut: a phone photo simulated from the render (small in the frame, turned, blurred, grey
-  // paper, JPEG), not a photo of a printed label; replace it with one when a device is at hand
+  // shortcut: a phone photo simulated from the render (small in the frame, turned, blurred, grey paper, JPEG), not a photo of a printed label; replace it with one when a device is at hand
   it('reads a small, turned and blurred label in a large photo-like picture', async () => {
     const code = await sharp(await labelCode(320))
       .rotate(8, { background: '#e8e4dc' })

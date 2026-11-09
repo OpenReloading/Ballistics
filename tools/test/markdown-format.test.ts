@@ -38,17 +38,12 @@ function format(text: string) {
 }
 
 it('formats Markdown without changing what it means', () => {
-  // Biome 2.6.2 merged a list that starts above 1 into the paragraph before it and dropped the
-  // space before a code span (biomejs/biome#12739, #12542)
+  // Biome 2.6.2 merged a list that starts above 1 into the paragraph before it and dropped the space before a code span (biomejs/biome#12739, #12542)
   const page = readFileSync(new URL('fixtures/markdown-meaning.md', import.meta.url), 'utf8')
   expect(tree(format(page))).toBe(tree(page))
 })
 
-/**
- * Whether the front matter of a page has an indented line. Biome 2.6 rewrites an indented block
- * (a nested map, an indented list, a block list followed by a key and a block scalar) into other
- * data, so front matter stays one key per line.
- */
+/** Biome 2.6 rewrites an indented block (a nested map, an indented list, a block list followed by a key and a block scalar) into other data, so front matter stays one key per line. */
 const indentedFrontMatter = (text: string) =>
   (/^---\n([\s\S]*?)\n---\n/.exec(text)?.[1] ?? '').split('\n').some((line) => /^\s+\S/.test(line))
 

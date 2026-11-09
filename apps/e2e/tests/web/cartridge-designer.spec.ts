@@ -146,8 +146,7 @@ const drawingTop = (page: Page) =>
 test('a change, a check and a refusal move no field and not the drawing', async ({ page }) => {
   await page.goto('/cartridges/designer?from=308-win')
   await expect(drawing(page)).toBeVisible()
-  // the seating controls come with their own chunk (`SeatingPreview`, client only) and add three
-  // inputs below the form: measured only once they are there, else a slow chunk moves the baseline
+  // the seating controls come with their own chunk (`SeatingPreview`, client only) and add three inputs below the form, so they are measured only once there, else a slow chunk moves the baseline
   await expect(field(page, 'Case capacity (H₂O)', 'cm³')).toBeVisible()
   const before = await places(page)
   const top = await drawingTop(page)
@@ -174,8 +173,7 @@ test('keyboard: arrow keys step the field, no slider, changes are announced', as
   )
   // for screen readers only: not shown and not printed
   expect((await status.boundingBox())?.width).toBeLessThanOrEqual(1)
-  // no unit menu in the grid: Tab goes to the changed field's way back to the record value (#796),
-  // then on to the chamber's L1 in the same row
+  // no unit menu in the grid: Tab goes to the changed field's way back to the record value (#796), then on to the chamber's L1 in the same row
   await page.keyboard.press('Tab')
   await expect(page.getByRole('button', { name: /^Back to the record value\./ })).toBeFocused()
   await page.keyboard.press('Tab')

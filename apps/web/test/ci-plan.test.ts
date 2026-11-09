@@ -214,8 +214,7 @@ it('tests every group for a change outside the workspaces, an unknown or empty s
   expect(plan(['CONTRIBUTING.md'], closure, []).tests).toEqual([])
 })
 
-// A test reads these workspaces' files without importing them; each reader declares the workspace it reads as a
-// devDependency, so pnpm selects the reader when the read workspace changes.
+// A test reads these workspaces' files without importing them; each reader declares the workspace it reads as a devDependency, so pnpm selects the reader when that workspace changes.
 it.each([
   ['catalog', 'shot-groups'], // the event types and target faces (shot-groups/test)
   ['catalog', 'drawing'], // the bullet records (drawing/test/bullet-outline.test.ts)

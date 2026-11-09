@@ -207,8 +207,7 @@ test('the zero air and drag factor of a mount fill the trajectory form with the 
   await runExample(page)
   await page.getByRole('tab', { name: 'Trajectory', exact: true }).click()
   await expect(page.getByRole('table', { name: /^Trajectory: / })).toBeVisible()
-  // the load's firearm fills the trajectory form's sight, zero air and drag factor
-  // anchored: the unit switch of a field is named after it too
+  // the load's firearm fills the trajectory form's sight, zero air and drag factor anchored, and a field's unit switch is named after it too
   const field = (name: string) =>
     page.getByLabel(new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`))
   const gun = page.getByRole('combobox', { name: 'Firearm from your library' })

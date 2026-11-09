@@ -175,9 +175,7 @@ describe('readWorkbook on .xls: strings across Continue records', () => {
       { text: 'both', runs: 2, phonetic: 30 },
       'tail',
     ]
-    // chunks of 24 bytes: the long string is split inside its characters, switches to two-byte
-    // characters and back, the runs of the rich string cross a chunk end, and the phonetic bytes
-    // of the string with runs and phonetic data cross one too
+    // chunks of 24 bytes: the long string splits inside its characters and switches to two-byte characters and back, the rich string's runs cross a chunk end, and so do the phonetic bytes of the string with runs and phonetic data
     const cells = strings.map((_, k) => labelSst(0, k, k))
     const stream = workbookStream([{ name: 'S', records: cells }], { strings, sstChunk: 24 })
     const r = await readWorkbook(new Uint8Array(compoundFile([{ name: 'Workbook', data: stream }])))

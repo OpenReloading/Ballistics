@@ -12,10 +12,7 @@ import {
 // fixed seed: the same inputs on every run
 const runs = { seed: 20261022, numRuns: 200 }
 
-/**
- * How `read` ends: `read`, or `refused` with a `ReaderError` or a plain `Error`, the importers' own
- * refusals; anything else it throws comes back as it is (a `TypeError` or `RangeError` is a defect).
- */
+/** How `read` ends: `read`, or `refused` with a `ReaderError` or plain `Error`, the importers' own refusals; anything else it throws comes back as it is (a `TypeError` or `RangeError` is a defect). */
 async function outcome(read: () => unknown): Promise<unknown> {
   try {
     await read()

@@ -6,8 +6,7 @@ import { runExample } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
-// the text spacing of WCAG 1.4.12 on every element, as its test method applies it: nothing may be
-// cut, the page and the inputs column may scroll
+// the text spacing of WCAG 1.4.12 on every element, as its test method applies it: nothing may be cut, the page and the inputs column may scroll
 const spacing = `* {
   line-height: 1.5 !important;
   letter-spacing: 0.12em !important;
@@ -15,8 +14,7 @@ const spacing = `* {
 }
 p { margin-bottom: 2em !important; }`
 
-// record names, the load title and the page bar's status line keep their ellipsis, with the full
-// text on hover, focus and tap
+// record names, the load title and the page bar's status line keep their ellipsis, with the full text on hover, focus and tap
 const names = '.load-switch, .load-identity, [role=combobox], .page-bar-status'
 
 /** Applies the spacing and expects nothing cut once the layout has settled. */

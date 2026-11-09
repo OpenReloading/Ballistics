@@ -4,8 +4,7 @@ import { showGerman } from './german.ts'
 import { exported, gotoHydrated } from './nav.ts'
 import { settingsEntry, storeUnits } from './units.ts'
 
-// Settings is a dialog only, no page: every entry is a button opening it over the page, on every
-// route
+// Settings is a dialog only, no page: every entry is a button opening it over the page, on every route
 
 test.beforeEach(({ page }) => storeUnits(page))
 

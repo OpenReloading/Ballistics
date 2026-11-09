@@ -250,10 +250,7 @@ const velocityObs = (range: number, value: number): Observation => ({
 
 const dot = (p: number[], q: number[]) => p.reduce((t, x, i) => t + x * nth(q, i), 0)
 
-/**
- * Sessions of a flat drag coefficient `cd` in one dimension, v = v0 exp(-k c x) in each air, read
- * at `xs` with sigma: each with the information on ln k after its muzzle velocity.
- */
+/** A flat drag coefficient `cd` in one dimension, v = v0 exp(-k c x) in each air, read at `xs` with sigma, each session with the information on ln k after its muzzle velocity. */
 function oneDimensionSessions(input: {
   cd: number
   sigma: number
@@ -559,9 +556,7 @@ describe('truing with the monotone cubic', () => {
   })
 
   it('reads the own coefficient with the cubic at a knot between base nodes', () => {
-    // knot 0.93 lies between G7 nodes and changes the neighbouring slopes of the cubic, so the fit
-    // on the BC's own observations returns factors slightly off 1
-    // (`apps/docs/docs/models/exterior-drag.md`, "Monotone cubic interpolation")
+    // knot 0.93 lies between G7 nodes and changes the neighbouring slopes of the cubic, so the fit on the BC's own observations returns factors slightly off 1 (`apps/docs/docs/models/exterior-drag.md`, "Monotone cubic interpolation")
     const obs = observe(withDrag(base, cubicBc), velocityRanges)
     const knots = [0.93, 1.5, 2]
     const r = trueDrag(withDrag(base, cubicBc), obs, { knots })

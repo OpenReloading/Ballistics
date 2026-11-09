@@ -97,8 +97,7 @@ it('prefills the rounds of each session chosen and keeps an edit within one sess
   r.setRounds('5')
   r = await settle()
   expect(r.rounds).toBe('5')
-  // another session with the same number of shots starts from its own shots; React renders
-  // again at once when the session is cleared, before the offer for the old one is read
+  // another session with the same number of shots starts from its own shots; React renders again at once when the session is cleared, before the offer for the old one is read
   r.choose(loadIds[1])
   h.rerender()
   r = await settle()

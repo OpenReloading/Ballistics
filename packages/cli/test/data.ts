@@ -3,14 +3,7 @@ import { rowsCsv, type Spec, writeRows } from './fixture.ts'
 const dp40 = 'demo-powder-dp40'
 const sp20 = 'demo-powder-sp20'
 
-/**
- * The synthetic set. The printed velocities are the model's, moved so that each used row has a
- * known absolute relative error:
- * - validation (cartridges 308-win and 30-30-win): errors 0.01, 0.02, 0.03, 0.04 and 0.10, two
- *   rows with a printed pressure at 0.1 and 0.2, and seven rows that cannot be used, one per reason;
- * - training (30-br, 308-match, 7-62-x-54-r): errors 0.01 to 0.10 in steps of 0.01;
- * - test (30-06-spring, 7-62-x-39): errors 0.02, 0.05 and 0.06.
- */
+/** Printed velocities are the model's, moved so each used row has a known absolute relative error: validation (308-win, 30-30-win) 0.01, 0.02, 0.03, 0.04 and 0.10, two printed pressures at 0.1 and 0.2 and seven unusable rows, one per reason; training (30-br, 308-match, 7-62-x-54-r) 0.01 to 0.10 in steps of 0.01; test (30-06-spring, 7-62-x-39) 0.02, 0.05 and 0.06. */
 const specs: Spec[] = [
   { cartridge: '308-win', charge: 2.0, velocity: 0.01, pressure: 0.1, table: 'tableOne' },
   { cartridge: '308-win', charge: 2.2, velocity: -0.02, pressure: 0.2, table: 'tableOne' },

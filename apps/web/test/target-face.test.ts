@@ -24,9 +24,7 @@ import {
   type Scene,
 } from './face-render.ts'
 
-// Face recognition on photos drawn from the records of packages/catalog/records/target-faces:
-// the face on a 1200 x 900 px photo, its rings 2.2 px wide, seen by a
-// pinhole camera at three views, with noise. The truth is the camera's homography.
+// Face recognition on photos drawn from packages/catalog/records/target-faces: the face on a 1200 x 900 px photo, its rings 2.2 px wide, seen by a pinhole camera at three views, with noise; the truth is the camera's homography.
 const W = 1200
 const H = 900
 
@@ -36,11 +34,7 @@ const views = [
   { name: 'tilt 40, yaw 20, rolled -30', tilt: 40, yaw: 20, roll: -30, noise: 3 },
 ]
 
-/**
- * Faces the photo cannot tell apart: their rings are in the same ratios, only the size differs.
- * The user sees the editor ask which face (the event or the distance tells them apart); for every
- * other face the editor applies the one fit without a question.
- */
+/** Faces the photo cannot tell apart: their rings are in the same ratios, only the size differs, so the editor asks which face (the event or the distance tells them apart); for every other face it applies the one fit without a question. */
 const twinGroups = [
   ['issf-300m-rifle', 'bdmp-nr1-100m', 'bdmp-nr1-50m', 'bdmp-nr1-25m', 'oesb-100m'],
   ['bdmp-nr6', 'bdmp-nr7', 'bds-z18-pg'],
@@ -49,12 +43,7 @@ const twinGroups = [
   ['bds-z2-50m-zf', 'bds-z4-100m-zf'],
   ['vdrbw-bw-nr2', 'vdrbw-bw-nr2-klein'],
 ]
-/**
- * Faces offered with one that is no ratio twin: the rings of Z21 (5 rings, steps of 1/5 of the
- * outer radius) are a subset of those of Nr. 5 (6 rings, steps of 1/6) relative to the black, so a
- * Z21 photo cannot exclude Nr. 5, while a Nr. 5 photo is sure. Nr. 8 and Z19 stand to the DSB
- * Nr. 6 as Z21 to Nr. 5.
- */
+/** Relative to the black, Z21's rings (5, steps of 1/5 of the outer radius) are a subset of Nr. 5's (6, steps of 1/6), so a Z21 photo cannot exclude Nr. 5 while a Nr. 5 photo is sure; Nr. 8 and Z19 stand to the DSB Nr. 6 as Z21 to Nr. 5. */
 const alsoOffered: Record<string, string[]> = {
   'bds-z21-25m-buechse': ['bdmp-nr5'],
   'bdmp-nr8': ['dsb-nr6-musket-50m'],

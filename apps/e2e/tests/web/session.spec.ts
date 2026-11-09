@@ -193,8 +193,7 @@ test('prints the summary and every chart without the import strip', async ({ pag
     const chart = page.getByRole('img', { name: `Velocity per shot, ${name}` })
     await expect(chart).toBeVisible()
     await expect(page.getByRole('table', { name: `Shots of ${name}` })).toBeVisible()
-    // the chart takes the print width on its next resize; main is read in the same poll, as the
-    // print layout may settle after the media change; a cold server also loads the chart code
+    // the chart takes the print width on its next resize; main is read in the same poll, as the print layout may settle after the media change, and a cold server also loads the chart code
     await expect
       .poll(
         async () => {

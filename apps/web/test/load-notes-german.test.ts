@@ -10,8 +10,7 @@ const german = translator(de, 'de')
 const name = (session: string) => (session === 'a' ? 'Alpha' : 'Beta')
 const base = { session: 'b', earlier: 'a' }
 
-// The core package exports the rules as a type only: this record lists every rule, so a new rule
-// fails the typecheck until its notes are added here.
+// The core package exports the rules as a type only, so this record lists every rule and a new rule fails the typecheck until its notes are added here.
 const notes = {
   powderLot: [
     { ...base, rule: 'powderLot', change: 'changed', now: 'P2', before: 'P1' },

@@ -406,8 +406,7 @@ describe('modified point mass reading of the drag table', () => {
 
 describe('modified point mass coefficients at the local Mach number', () => {
   it('evaluates coefficient tables at the local Mach number', () => {
-    // equal to the constant at Mach >= 2.3 (the muzzle), falling to the low value at Mach 1, which
-    // spans the flight (Mach 1.09 at 1000 m)
+    // equal to the constant at Mach >= 2.3 (the muzzle), falling to the low value at Mach 1, which spans the flight (Mach 1.09 at 1000 m)
     const cases = [
       ['momentSlope', 2.8, 1.4, (q: TrajectoryPoint) => q.spinDrift],
       ['magnusForceSlope', 0.5, 1.5, (q: TrajectoryPoint) => q.height],

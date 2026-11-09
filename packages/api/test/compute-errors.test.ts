@@ -12,8 +12,7 @@ import { API_PREFIX } from '../src/version.ts'
 import { m3Load, flatShot as shot } from './fixtures.ts'
 import { withApi } from './setup.ts'
 
-// millerStability by velocity: 1 throws an engine RangeError, 2 an InputError, 3 returns NaN,
-// 4 throws a typed InputError
+// millerStability by velocity: 1 throws an engine RangeError, 2 an InputError, 3 returns NaN, 4 throws a typed InputError
 vi.mock('@open-reloading/ballistics', async (importOriginal) => {
   const ballistics = await importOriginal<typeof import('@open-reloading/ballistics')>()
   const { InputError } = await import('@open-reloading/statistics')

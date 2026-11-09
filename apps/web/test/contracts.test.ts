@@ -6,11 +6,7 @@ import { readLink, shareLink } from '../src/lib/share-link.ts'
 import { parseUserDataFile, userDataText } from '../src/lib/user-data.ts'
 import { defined } from './defined.ts'
 
-// The current format version only: a user data file with a record of each kind and a second one that sets
-// every field the kind can have, which the current code reads and writes back as the same JSON value, and share
-// links of its records, one of them with text beyond ASCII. A new version replaces these files; no older one is
-// read. `pnpm run baselines` at the root rewrites the links from what the code writes; the file is edited by hand
-// when the format changes.
+// The current format version only (no older one is read): a user data file with a record of each kind and one setting every field, read and written back as the same JSON value, and share links of its records, one with text beyond ASCII; `pnpm run baselines` at the root rewrites the links, the file is edited by hand when the format changes.
 const golden = (name: string) => readFileSync(new URL(`golden/${name}`, import.meta.url), 'utf8')
 const page = 'https://example.org/bullets/designer'
 /** A share link with its fragment inflated back to the file text. */
@@ -52,8 +48,7 @@ describe('golden user data file of the current version', () => {
     expect(new Set(defined(file).records.map((r) => r.kind))).toEqual(new Set(kinds))
   })
 
-  // the fields of a record and of its data and imported block, which hold no union; deeper parts are in the
-  // records that have them, not checked here
+  // the fields of a record and of its data and imported block, which hold no union; deeper parts are in the records that have them, not checked here
   it('sets every field each kind can have, on the record and in its data', () => {
     const schema = JSON.parse(
       readFileSync(

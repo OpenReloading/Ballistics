@@ -63,8 +63,7 @@ describe('POST /exterior/range-strings/plan', () => {
       ),
     )
     expect(body.result[0].plan.conditionNumber).toBeNull()
-    // the single impact distance is singular: its errors and inflation are infinite, the
-    // correlations stay finite numbers
+    // the single impact distance is singular: its errors and inflation are infinite, the correlations stay finite numbers
     const [velocity] = body.result[0].plan.parameters
     expect(velocity).toMatchObject({
       relativeStandardUncertainty: null,

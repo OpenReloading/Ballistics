@@ -170,8 +170,7 @@ describe('turnSheet', () => {
 })
 
 describe('a photo with a 100 mm line, turned by 90 degrees, then a rectangle', () => {
-  // a 1600 x 1200 px photo: a 100 mm bar from (300, 1100) to (1300, 1100), a 100 mm square from
-  // (300, 100) to (1300, 1100), the origin at the photo centre
+  // a 1600 x 1200 px photo: a 100 mm bar from (300, 1100) to (1300, 1100), a 100 mm square from (300, 100) to (1300, 1100), the origin at the photo centre
   const line = {
     kind: 'line' as const,
     a: { x: 300, y: 1100 },

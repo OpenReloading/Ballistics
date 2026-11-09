@@ -7,8 +7,7 @@ import { runExample } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
-// from 1280 x 650 nothing scrolls and nothing is cut, with every panel in its default state; below
-// 75em only the inputs column scrolls
+// from 1280 x 650 nothing scrolls and nothing is cut, with every panel in its default state; below 75em only the inputs column scrolls
 
 /** Every scroll container of the page that has more content than room, and the page itself. */
 const overflowing = (page: Page) =>
@@ -61,8 +60,7 @@ const states = [
   ['a 5-step seating ladder', ['Seating', 5]],
 ] as const
 
-// the lowest window of each layout with every state, a 768 px laptop's window, the others with the
-// example
+// the lowest window of each layout with every state, a 768 px laptop's window, the others with the example
 for (const [width, height, shown] of [
   [1280, 650, states],
   [1366, 657, [states[0], states[2]]],

@@ -21,11 +21,7 @@ const slow = {
     absoluteTolerance: 1e-15,
   },
 }
-/**
- * Runs until its 3000 ms sampling budget ends, on any machine: 2000 draws of 36 ms each. The deadline of the
- * timeout test sits at half of that, and leaves the replacement worker its start (module load, 0.2 s and
- * more on a busy host) and a fast request.
- */
+/** Runs until its 3000 ms sampling budget ends on any machine (2000 draws of 36 ms); the timeout test's deadline at half of that leaves the replacement worker its start (module load, 0.2 s and more on a busy host) and a fast request. */
 const endless = { ...slow, sampling: { samples: 2000, budgetMs: 3000 } }
 const fast = {
   shot: flatShot,

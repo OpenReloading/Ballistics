@@ -1,7 +1,4 @@
-/**
- * Test worker for the pool: busy-waits `spin` ms, exits with `exit`, or throws `fail`, then replies.
- * Posts `{ started: true }` first, a message the pool ignores.
- */
+/** Test worker for the pool: busy-waits `spin` ms, exits with `exit` or throws `fail`, then replies; posts `{ started: true }` first, a message the pool ignores. */
 import { parentPort } from 'node:worker_threads'
 
 type SpinTask = { spin?: number; exit?: number; fail?: string; value?: unknown }

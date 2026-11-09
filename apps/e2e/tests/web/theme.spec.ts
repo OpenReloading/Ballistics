@@ -86,8 +86,7 @@ test('the switch is reachable by keyboard and exposes its name and pressed state
   await page.goto('/')
   // pressed only once hydrated: the server renders it not pressed
   await expect(themeSwitch(page)).toHaveAttribute('aria-pressed', 'true')
-  // from 75em the switch ends the page bar's row: after the sidebar, Safety, Report an issue and the
-  // repository link where the build has a repository URL (navigation.spec.ts checks that order)
+  // from 75em the switch ends the page bar's row: after the sidebar, Safety, Report an issue and the repository link where the build has a repository URL (navigation.spec.ts checks that order)
   for (let i = 0; i < 40; i++) {
     await page.keyboard.press('Tab')
     if (await themeSwitch(page).evaluate((e) => e === document.activeElement)) break

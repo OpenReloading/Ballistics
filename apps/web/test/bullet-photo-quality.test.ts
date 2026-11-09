@@ -195,9 +195,7 @@ describe('soft edges', () => {
 })
 
 describe('a drop shadow beside a product-style image', () => {
-  // the research evaluation's scenario F (`apps/docs/docs/research/bullet-photo-catalogue-geometry.md`):
-  // 450 px long, no ruler, scale from the diameter, the shadow offset 2 and 3 % of the length,
-  // blurred 2 %, depth 0.2
+  // the research evaluation's scenario F (`apps/docs/docs/research/bullet-photo-catalogue-geometry.md`): 450 px long, no ruler, scale from the diameter, the shadow offset 2 and 3 % of the length, blurred 2 %, depth 0.2
   const flat: Record<string, BulletDimensions> = {
     'a tangent rifle bullet': {
       diameter: 7.82,
@@ -331,8 +329,7 @@ describe('a shadow towards the base or far along the axis', () => {
       return { outline, m: measureOutline(outline, scale), hints }
     },
   )
-  // the research evaluation's drop shadow, offset towards the base instead of the tip, at 15 and
-  // 30 px per mm; and a pistol bullet's shadow 20 px along the axis and 6 across, blur 4
+  // the research evaluation's drop shadow, offset towards the base instead of the tip, at 15 and 30 px per mm; and a pistol bullet's shadow 20 px along the axis and 6 across, blur 4
   const cases: [string, BulletDimensions, number, NonNullable<PhotoSpec['shadow']>][] = [
     ['towards the base, 15 px/mm', rifle, 15, { dx: -9, dy: 13.5, blur: 9, depth: 0.2 }],
     ['towards the base, 30 px/mm', rifle, 30, { dx: -18, dy: 27, blur: 18, depth: 0.2 }],
@@ -357,8 +354,7 @@ describe('a shadow towards the base or far along the axis', () => {
     expect(outline.length).toBeLessThan(30 * 30 + 3)
   })
 
-  // the second reader's sweep (#934): a pistol bullet at 30 px per mm, the shadow 0.6 and 1.2 mm
-  // towards the base and 0.9 mm across, blur 0.6 mm; the second read 25 px long with no shadow named
+  // the second reader's sweep (#934): a pistol bullet at 30 px per mm, the shadow 0.6 and 1.2 mm towards the base and 0.9 mm across, blur 0.6 mm; the second read 25 px long with no shadow named
   for (const along of [0.6, 1.2])
     it(`a pistol bullet with a shadow ${along} mm towards the base and 0.9 mm across: the shadow named`, () => {
       const { outline, m, hints } = atDiameter([
@@ -382,8 +378,7 @@ describe('a shadow towards the base or far along the axis', () => {
     expect(Math.abs(outline.angle - (3 * Math.PI) / 180)).toBeLessThan((1 * Math.PI) / 180)
   })
 
-  // #963: a clean flat base cut at an angle (a slanted sprue cut) reaches one side later, as a
-  // shadow past the base does, but its late side ramps on evenly and its early corner is sharp
+  // #963: a clean flat base cut at an angle (a slanted sprue cut) reaches one side later, as a shadow past the base does, but its late side ramps on evenly and its early corner is sharp
   for (const [name, t, k, slant] of [
     ['pistol', pistol, 40, 2],
     ['pistol', pistol, 60, 5],

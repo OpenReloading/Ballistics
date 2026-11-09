@@ -13,8 +13,7 @@ import { replaceUntilStable } from './markup.ts'
 
 const shown = vi.hoisted(() => ({ t: undefined as Translator | undefined }))
 
-// the pages read the language through the hook and print into a portal of `body`, which a server
-// render has neither of
+// the pages read the language through the hook and print into a portal of `body`, neither of which a server render has
 vi.mock('../src/i18n/language.ts', () => ({
   useTranslation: () => shown.t,
 }))

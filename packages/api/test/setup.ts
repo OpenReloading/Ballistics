@@ -34,11 +34,7 @@ const emptyBundle: Bundle = {
 /** The catalogue of `data`, as the API opens it. */
 export const testCatalogue = (data: Bundle): Catalogue => openCatalogue(buildCatalogue(data))
 
-/**
- * An app on the catalogue of `seed` for the tests of a file or a describe block: built before
- * them, closed after them (`false`: no records). `load` replaces the app by one on another data
- * set, `compute` as `buildApp` takes it. `get` and `post` take the whole URL.
- */
+/** An app on the catalogue of `seed`, built before the tests of a file or describe block and closed after them (`false`: no records); `load` replaces it by one on another data set, `compute` as `buildApp` takes it, `get` and `post` take the whole URL. */
 export function withApi({
   seed = bundle,
   compute,
@@ -74,10 +70,7 @@ export function withApi({
 
 const ajv = new Ajv2020({ allErrors: true, strict: false, validateFormats: false })
 
-/**
- * Checks a 200 body against the zod schema and against its JSON Schema of the contract document;
- * returns that JSON Schema and its validator.
- */
+/** Checks a 200 body against the zod schema and its JSON Schema of the contract document; returns that JSON Schema and its validator. */
 export function checkBody(schema: z.ZodType, body: unknown) {
   schema.parse(body)
   const json = z.toJSONSchema(schema, { io: 'output', unrepresentable: 'any' })

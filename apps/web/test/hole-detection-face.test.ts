@@ -7,11 +7,7 @@ import { defined } from './defined.ts'
 import { photoScene } from './face-photos.ts'
 import { faceById, invert, project, render } from './face-render.ts'
 
-// Hole detection with the face label (`apps/docs/docs/models/hole-detection.md`): the
-// outline of the face is the region, the colour axis takes its surroundings from the same kind of
-// surface, and a dark mark on the black area or a light one on the paper is print.
-// An air rifle face (4.5 mm pellets, 22.75 mm outer radius) with its black area cut down to 12 mm,
-// 2.7 holes across: a black centre small enough to pass for holes.
+// With the face label (`apps/docs/docs/models/hole-detection.md`) the face outline is the region, the colour axis takes its surroundings from the same surface and a dark mark on black or light one on paper is print; an air rifle face (4.5 mm pellets, 22.75 mm outer radius) with its black cut to 12 mm, 2.7 holes across, small enough to pass for holes.
 const base = faceById('issf-10m-air-rifle')
 const face = { ...base, blackDiameter: { value: 12 } }
 const outer = defined(face.rings[0]).diameter.value / 2
@@ -106,8 +102,7 @@ const numeralMarks = gaps
   .flat()
   .map((m) => ({ ...m, grey: 226 }))
 
-// Ring numerals (`apps/docs/docs/models/hole-detection.md`): a 25 m pistol face, light holes on its black
-// area, and light numerals (bars of the size of a digit) between the rings on both axes.
+// Ring numerals (`apps/docs/docs/models/hole-detection.md`): a 25 m pistol face, light holes on its black area, and light numerals (bars of the size of a digit) between the rings on both axes.
 describe('hole detection with the numerals of the face', () => {
   const pistol = faceById('issf-25m-precision-50m-pistol')
   const size = 1400
@@ -164,9 +159,7 @@ async function viaJpeg(image: RgbaImage, quality: number): Promise<RgbaImage> {
   }
 }
 
-// Print that holes can hide in: a hole on a ring numeral stands where the numerals do, and the
-// quarter marks of the bull (light squares of 5 mm where the axes meet the black area's edge) look
-// like holes on the black area. Blur, noise and JPEG are part of the scenes.
+// Print that holes can hide in: a hole on a ring numeral stands where the numerals do, and the bull's quarter marks (light squares of 5 mm where the axes meet the black area's edge) look like holes; blur, noise and JPEG are part of the scenes.
 describe('hole detection with holes on the print of the face', () => {
   const pistol = faceById('issf-25m-precision-50m-pistol')
   const size = 1400
@@ -287,8 +280,7 @@ describe('hole detection with holes on the print of the face', () => {
   })
 })
 
-// Holes that stand at one angle from three axes, at three radii, are no numerals of a turned face:
-// the numerals of a ring stand at one radius on its axes.
+// Holes that stand at one angle from three axes, at three radii, are no numerals of a turned face, as a ring's numerals stand at one radius on its axes.
 describe('hole detection on a face with holes at one angle from the axes', () => {
   const face = faceById('issf-10m-air-pistol')
   const spots: [number, number][] = [

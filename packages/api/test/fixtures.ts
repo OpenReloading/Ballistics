@@ -64,12 +64,7 @@ export const siValues = {
 const reference = (id: unknown) =>
   typeof id === 'string' && !id.includes(':') ? `catalogue:${id}` : id
 
-/**
- * The data of a user load from SI values and plain catalogue ids, as the load file holds it: the
- * charge as a stored quantity, every other key under `analysis.overrides` in its stored unit (an
- * unknown key stays as given), the ladder with its step in the stored unit of its kind. Other
- * fields pass through.
- */
+/** The data of a user load as the load file holds it, from SI values and plain catalogue ids: the charge as a stored quantity, every other key under `analysis.overrides` in its stored unit (an unknown key as given), the ladder step in its kind's stored unit; other fields pass through. */
 export function loadData(data: {
   siValues?: Record<string, number | undefined>
   cartridge?: string

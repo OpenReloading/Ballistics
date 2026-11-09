@@ -5,18 +5,11 @@ import { recordFigures } from '../../../../packages/drawing/src/cartridge/figure
 import type { SpecValue } from '../../../../packages/drawing/src/core/types.ts'
 import { gotoHydrated } from './nav.ts'
 
-// The pixels depend on the fonts: this runs only in the Playwright image of the installed
-// version, in CI and locally (pnpm run drawing-baseline); DRAWING_BASELINE=full shoots the full set
-// on demand (pnpm run drawing-baseline:full)
+// the pixels depend on the fonts: this runs only in the Playwright image of the installed version, in CI and locally (pnpm run drawing-baseline); DRAWING_BASELINE=full shoots the full set on demand (pnpm run drawing-baseline:full)
 test.skip(!process.env.DRAWING_BASELINE, 'runs in the Playwright image: pnpm run drawing-baseline')
 const full = process.env.DRAWING_BASELINE === 'full'
 
-/**
- * The default baseline: the most common cartridge of each drawing case, then a record for a
- * geometry they do not draw. A shotshell is shot in one variant. The SVG markup of every sample and
- * verified figure is compared in Vitest (apps/web/test/drawing-markup.test.tsx); the pixels here
- * check what only a browser draws: fonts, CSS and the scaling of the figure.
- */
+/** The default baseline: the most common cartridge of each drawing case, then a record for a geometry they do not draw, a shotshell in one variant; Vitest compares the SVG markup of every sample and verified figure (apps/web/test/drawing-markup.test.tsx), these pixels what only a browser draws: fonts, CSS and the figure's scaling. */
 const common: { id: string; variant?: string }[] = [
   // I: rimless rifle; also dark and at 1280 px, and the style test below
   { id: 'cip-308-win-2008-09-23' },
@@ -92,10 +85,7 @@ const readFile = (file: string) => {
 const read = (id: string) =>
   readFile(`${id.replace(/^cip-/, '').replace(/-\d{4}-\d{2}-\d{2}$/, '')}.json`)
 
-/**
- * Every drawn side of a record (of one variant if given), in the given views: page, SVG id, name.
- * A figure with both sides drawn is two SVGs, `<figure id>-<side>`; the record page shows both.
- */
+/** Page, SVG id and name of every drawn side (of one variant if given) in the given views; a figure with both sides drawn is two SVGs, `<figure id>-<side>`, and the record page shows both. */
 const shotsOf = (r: Spec, views: View[], variant?: string) =>
   recordFigures(r)
     .filter((f) => variant === undefined || f.variant === variant)
@@ -111,8 +101,7 @@ const shotsOf = (r: Spec, views: View[], variant?: string) =>
       })),
     )
 
-// default: 390 px light; 308 Win. also dark (the colours of every part) and at 1280 px (the figure
-// beside its table). Full: the samples light and dark at 390 px, the verified records also at 1280 px
+// default: 390 px light, and 308 Win. also dark (the colours of every part) and at 1280 px (the figure beside its table); full: the samples light and dark at 390 px, the verified records also at 1280 px
 const shots = [
   ...common.flatMap(({ id, variant }) =>
     shotsOf(
@@ -167,8 +156,7 @@ for (const [title, { cartridge, svg, name, variant, width, colorScheme, at }] of
       await page.getByRole('option', { name: variant, exact: true }).click()
       await expect(figure).toBeVisible()
     }
-    // The default threshold 0.2 lets every pixel shift by about 52 gray levels (such as the
-    // page background behind the transparent figure); 0.04 lets it shift by about 10
+    // the default threshold 0.2 lets every pixel shift by about 52 gray levels (such as the page background behind the transparent figure); 0.04 lets it shift by about 10
     await expect(figure).toHaveScreenshot(`${name}-${colorScheme}${at.replace(' ', '-')}.png`, {
       maxDiffPixelRatio: 0.002,
       threshold: 0.04,

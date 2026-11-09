@@ -9,9 +9,7 @@ import {
   type Row,
 } from './face-photos.ts'
 
-// The insert card and the zoomed photo show only rings that the Z21 and Nr. 5 faces share: the
-// face is offered with them. The 640 x 480 JPEG shows the holes 6 px across. Per photo the holes
-// found of six and the proposals that are no hole.
+// The insert card and the zoomed photo show only rings the Z21 and Nr. 5 faces share, so it is offered with them; the 640 x 480 JPEG shows the holes 6 px across. Per photo the holes found of six and the proposals that are no hole.
 const sure: Record<PhotoKind, boolean> = {
   whole: true,
   insert: false,
