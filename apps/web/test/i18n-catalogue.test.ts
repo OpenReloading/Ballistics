@@ -56,22 +56,28 @@ describe('message extraction', () => {
 })
 
 describe('the catalogue lint', () => {
-  it('names a missing text, a stray key, other placeholders, a wrong plural and a table text left English', () => {
+  it('names an unlisted or required missing text, a listed text with German or new to the list, a stray key, other placeholders, a wrong plural and a table text left English', () => {
     const catalogue = {
       'Value {n}': 'Wert {m}',
       Stray: 'Streuner',
       '{count} row|{count} rows': { one: '{count} Zeile', few: '{count} Zeilen' },
       Busy: 'Busy',
+      Done: 'Fertig',
     }
     expect(
       problems(
-        ['Value {n}', 'Missing', 'Shown in English', '{count} row|{count} rows', 'Busy'],
+        ['Value {n}', 'Missing', 'Listed', 'New', '{count} row|{count} rows', 'Busy', 'Done'],
         catalogue,
         'de',
         ['Busy', 'Missing'],
+        ['Missing', 'Listed', 'Done'],
+        ['Missing', 'Done'],
       ),
     ).toEqual([
       'untranslated: Missing',
+      'untranslated: New',
+      'listed as untranslated, but translated or gone: Done',
+      'listed as untranslated, but the base does not list it: Listed',
       'no message has this key: Stray',
       'placeholders differ: Value {n}',
       'few is no plural category of de: {count} row|{count} rows',

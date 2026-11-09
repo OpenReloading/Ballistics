@@ -4,9 +4,12 @@
  *   node scripts/i18n.mts messages        every message, one per line
  *   node scripts/i18n.mts missing <code>  the messages `src/i18n/<code>.json` lacks, and its keys no
  *                                         message matches (exit 1 for such a key)
- *   node scripts/i18n.mts check <code>    the catalogue lint `pnpm run lint` runs: exit 1 for any
+ *   node scripts/i18n.mts check <code> [<base>]
+ *                                         the catalogue lint `pnpm run lint` runs: exit 1 for any
  *                                         problem `problems` names; for German also the term table,
- *                                         its use in the texts and the safe wording (`i18n-lint.json`)
+ *                                         its use in the texts and the safe wording (`i18n-lint.json`).
+ *                                         CI passes a pull request's base commit, whose untranslated
+ *                                         list must hold every listed text
  *
  * A message is the first argument of `t(...)` or `msg(...)` and the two forms of `tn(count, one,
  * other)`, as a string literal, in a file that imports from `src/i18n/`.
@@ -16,6 +19,7 @@
  */
 import { globSync, readFileSync } from 'node:fs'
 import path from 'node:path'
+import { git } from './ci-plan.mts'
 
 const webRoot = path.join(import.meta.dirname, '..')
 
@@ -138,20 +142,32 @@ export function requiredMessages(root: string): string[] {
 }
 
 /**
- * What is wrong with `catalogue` of `language` against the English `source`: a `required` text
- * without a translation or left English, a key no message matches, an empty text, placeholders
- * other than its key's, and a plural that is no object of the language's categories. Other
- * untranslated messages show in English; `missing` lists them.
+ * What is wrong with `catalogue` of `language` against the English `source`: a text without a
+ * translation that `allowed` does not list (a `required` one always), a listed text that has one
+ * or that `base` (the base commit's list) lacks, a `required` text left English, a key no message
+ * matches, an empty text, placeholders other than its key's, and a plural that is no object of
+ * the language's categories.
  */
 export function problems(
   source: readonly string[],
   catalogue: Record<string, unknown>,
   language: string,
   required: readonly string[],
+  allowed: readonly string[] = [],
+  base: readonly string[] = allowed,
 ): string[] {
   const { untranslated, stale } = compare(source, catalogue)
+  // the allowed list only shrinks: a listed text that has its translation, is gone or is new is a problem too
   const found = [
-    ...untranslated.filter((s) => required.includes(s)).map((s) => `untranslated: ${s}`),
+    ...untranslated
+      .filter((s) => required.includes(s) || !allowed.includes(s))
+      .map((s) => `untranslated: ${s}`),
+    ...allowed
+      .filter((s) => !untranslated.includes(s))
+      .map((s) => `listed as untranslated, but translated or gone: ${s}`),
+    ...allowed
+      .filter((s) => !base.includes(s))
+      .map((s) => `listed as untranslated, but the base does not list it: ${s}`),
     ...stale.map((k) => `no message has this key: ${k}`),
   ]
   const categories: string[] = new Intl.PluralRules(language).resolvedOptions().pluralCategories
@@ -364,7 +380,7 @@ export function safeWordingProblems(
 }
 
 if (import.meta.main) {
-  const [command, code] = process.argv.slice(2)
+  const [command, code, baseRef] = process.argv.slice(2)
   const source = messages()
   if (command === 'messages') console.log(source.join('\n'))
   else if (command === 'missing' && code && /^[a-z]{2,3}$/.test(code)) {
@@ -379,11 +395,16 @@ if (import.meta.main) {
     }
   } else if (command === 'check' && code && /^[a-z]{2,3}$/.test(code)) {
     const catalogue = JSON.parse(readFileSync(path.join(webRoot, `src/i18n/${code}.json`), 'utf8'))
-    const found = problems(source, catalogue, code, requiredMessages(webRoot))
+    const read = (file: string) => JSON.parse(readFileSync(path.join(webRoot, file), 'utf8'))
+    const lint = read('scripts/i18n-lint.json')
+    const allowed: string[] = lint.untranslated[code] ?? []
+    // a base without a list for the language compares nothing
+    const base: string[] | undefined = baseRef
+      ? JSON.parse(git('show', `${baseRef}:apps/web/scripts/i18n-lint.json`)).untranslated?.[code]
+      : undefined
+    const found = problems(source, catalogue, code, requiredMessages(webRoot), allowed, base)
     if (code === 'de') {
-      const read = (file: string) => JSON.parse(readFileSync(path.join(webRoot, file), 'utf8'))
       const table: TermTable = read('src/i18n/german-terms.json')
-      const lint = read('scripts/i18n-lint.json')
       const senses = {
         ...Object.fromEntries(lint.targetRecords.map((k: string) => [k, lint.targetSense])),
         ...lint.otherSense,
@@ -397,7 +418,9 @@ if (import.meta.main) {
     for (const p of found) console.error(`src/i18n/${code}.json: ${p}`)
     if (found.length > 0) process.exit(1)
   } else {
-    console.error('usage: i18n.mts messages | missing <language code> | check <language code>')
+    console.error(
+      'usage: i18n.mts messages | missing <language code> | check <language code> [<base commit>]',
+    )
     process.exit(2)
   }
 }

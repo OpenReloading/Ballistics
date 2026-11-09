@@ -484,6 +484,7 @@
   "Enter To.": "Geben Sie „Bis“ ein.",
   "Enter a burn-rate change.": "Geben Sie eine Änderung der Abbrandgeschwindigkeit ein.",
   "Enter a number for {field}.": "Geben Sie eine Zahl für {field} ein.",
+  "Enter a number for {label}.": "Geben Sie eine Zahl für {label} ein.",
   "Enter a number.": "Geben Sie eine Zahl ein.",
   "Enter a target above 0{unit}.": "Geben Sie eine Zielgröße über 0{unit} ein.",
   "Enter a target of at most {max}{unit}.": "Geben Sie eine Zielgröße von höchstens {max}{unit} ein.",
