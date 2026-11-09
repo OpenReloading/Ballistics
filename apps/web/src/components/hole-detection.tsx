@@ -83,10 +83,7 @@ const detectSteps = [
   msg('Review'),
 ] as const
 
-/**
- * What the worker throws that a person can reach, as the lib writes it: shown translated, any other
- * text as it is.
- */
+/** What the worker throws that a person can reach, as the lib writes it: shown translated, any other text as it is. */
 const workerErrors = [
   msg('The region is too large for holes this small; mark a smaller region'),
   msg('The hole must be at least 4 px across'),
@@ -95,10 +92,7 @@ const workerErrors = [
   msg('No canvas to read the photo.'),
 ]
 
-/**
- * What a run takes from the sheet and the group: the photo's turn, the group's choices, the
- * expected hole size, the face on the photo and the region searched.
- */
+/** Everything a run takes from the sheet and the group. */
 function detectionInputs(o: {
   sheet: TargetSheet
   group: ShotGroup | undefined
@@ -130,13 +124,7 @@ function detectionInputs(o: {
   return { turn, choices, size, geometry, region }
 }
 
-/**
- * Hole detection in the target editor (`apps/docs/docs/models/hole-detection.md`):
- * auto detection once a photo is added, its result in one line with Accept, else the guided
- * steps (rotate, scale, one example hole and the region, detect, review); a Web Worker run
- * with progress and cancel; the proposals, kept apart from the sheet in photo px until accepted, so
- * no statistic sees them.
- */
+/** The proposals stay apart from the sheet, in photo px, until accepted, so no statistic sees them; the steps are in `apps/docs/docs/models/hole-detection.md`. */
 export function useHoleDetection({
   sheet,
   sheetId,
@@ -319,10 +307,7 @@ export function useHoleDetection({
 
   const blocked = blockedReason(sheet.photo, photo, frame, size)
 
-  /**
-   * A run on the region (without one, on the target the module finds): `auto` takes the colour axis from the
-   * strongest blobs of the region; without it the choices of the example apply. `found` gets the proposal count.
-   */
+  /** Without a region, on the target the module finds; `auto` takes the colour axis from the region's strongest blobs, else the example's choices apply; `found` gets the proposal count. */
   async function run(auto: boolean, over?: Choices, found?: (n: number) => void) {
     const c = { ...choices, ...over }
     const hole0 = c.expectedHoleDiameter ?? size?.diameter
@@ -377,10 +362,7 @@ export function useHoleDetection({
       ? ` ${tn(f.length, '{count} area to place by hand (dashed box).', '{count} areas to place by hand (dashed box).')}`
       : ''
 
-  /**
-   * A run's proposals and flagged areas on the photo, the result line (`auto`) or step 5 when
-   * there are any; their count.
-   */
+  /** Shows the result line (`auto`) or step 5 when there are any; returns their count. */
   function show(
     m: { proposals: HoleProposal[]; flagged: FlaggedRegion[] },
     hole: number,
@@ -410,11 +392,7 @@ export function useHoleDetection({
     return list.length
   }
 
-  /**
-   * The face search over the whole photo: one face sets the scale, the centre and the group's
-   * ring scoring face (`thenDetect`: and the auto run follows); two or more that the rings cannot
-   * tell apart are a choice; none shows what was found (step 2).
-   */
+  /** One face sets the scale, the centre and the ring scoring face (`thenDetect`: the auto run follows); faces the rings cannot tell apart are a choice; none shows what was found (step 2). */
   async function recognise(thenDetect: boolean) {
     if (!photo) return
     setProgress(0)
@@ -526,10 +504,7 @@ export function useHoleDetection({
     applyFit(fit, false, event)
   }
 
-  /**
-   * The auto start: the face search, auto detection, else the hole size in the result line or the
-   * first guided step that needs the user.
-   */
+  /** Face search, then auto detection; else the result line asks the hole size, or the first guided step that needs the user shows. */
   function start() {
     setHeld(false)
     setSizeOpen(false)
@@ -549,10 +524,7 @@ export function useHoleDetection({
     say(t('Detection cancelled.'))
   }
 
-  /**
-   * Detection from the example hole under `at` (`detectFromExample`): the hole size the photo's holes
-   * show, the contrast, polarity and colour become the choices, and its proposals show.
-   */
+  /** The example's hole size, contrast, polarity and colour become the choices (`detectFromExample`), and its proposals show. */
   async function pickExample(at: Point) {
     const blob = await photoBlob()
     if (!blob || !photo || !frame?.calibration || !group) return
@@ -807,10 +779,7 @@ export function useHoleDetection({
   return { onPoint, hint, layer, panel, progressBar, photoAdded }
 }
 
-/**
- * The caliber candidates of the group (`caliberCandidates`) and the class picked while the hole
- * size is its diameter, else the one preselected; loaded for each group, face and event.
- */
+/** The class picked while the hole size is its diameter, else the one preselected; loaded for each group, face and event. */
 function useCaliberCandidates(
   group: ShotGroup | undefined,
   hole: { diameter: number; source: string } | undefined,
@@ -902,11 +871,7 @@ function faceFollowUp({ fits, alike, black }: FaceSearch, t: Translator['t']) {
   }
 }
 
-/**
- * A click of the region tool: the points so far, or the region once a rectangle has its two
- * corners or a polygon closes (a click on its first point or a second click on its last, Enter
- * twice, or 64 points).
- */
+/** A rectangle ends with its two corners, a polygon on a click of its first point, a second click on its last, Enter twice or 64 points. */
 function regionClick(
   shape: 'rectangle' | 'polygon',
   pending: Point[],
@@ -963,12 +928,7 @@ const sourceNames = {
 
 type FaceChoice = { value: string; label: string }
 
-/**
- * What to choose from: for the faces that fit (several are ratio twins) each face with its outer
- * diameter and each of its events and the distance, so the size, the event or the distance shot
- * tells them apart; faces that match the same rings come first, smallest first; without a fit the
- * ranking of the faces.
- */
+/** Fitting faces (several are ratio twins) each with its outer diameter, events and distance, so size, event or distance tells them apart; same-ring matches first, smallest first; without a fit the faces' ranking. */
 function faceChoices(
   found: FaceSearch | undefined,
   system: UnitSystem,
@@ -1031,10 +991,7 @@ function QualityNotes({ issues, held }: { issues: readonly QualityIssue[]; held:
   )
 }
 
-/**
- * The auto run's result in one line: the target, the scale, the holes proposed and the caliber
- * (the hole size, typed here when nothing gives it), each with a change link, then Accept.
- */
+/** Each with a change link, then Accept; the hole size is typed here when nothing gives it. */
 function ResultLine({
   target,
   references,

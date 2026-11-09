@@ -436,11 +436,7 @@ function designNameOf(design: Design, t: Translator['t']) {
   return design.origin ? t('design from {name}', { name: design.origin.title }) : t('new cartridge')
 }
 
-/**
- * The cartridge designer: a Symbol, Cartridge and Chamber grid of the CIP symbols, the
- * cartridge page's drawing on the design beside it, checks at the fields, derived values, undo and
- * redo; the last valid drawing stays while the input is refused.
- */
+/** The last valid drawing stays while the input is refused. */
 export function CartridgeDesigner() {
   const { t } = useTranslation()
   /** The view picked; Combined once both sides draw until one is picked. */
@@ -467,8 +463,7 @@ export function CartridgeDesigner() {
   // the drawing lays out after the fields have taken the input
   const drawn = useDeferredValue(e.spec ? e : lastGood.current)
 
-  // the bullet seats in the drawing shown, its values the case and chamber; the controls portal
-  // into the Seat a bullet section, the user's measured capacity stays here through a redraw
+  // the bullet seats in the drawing shown, its values the case and chamber; the controls portal into Seat a bullet, the user's measured capacity stays here through a redraw
   const [seatSlot, setSeatSlot] = useState<HTMLElement | null>(null)
   const [capacity, setCapacity] = useState<FieldValue>(noCapacity)
   useFieldUnits(

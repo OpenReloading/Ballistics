@@ -4,12 +4,7 @@ import { Modal, type ModalRootProps } from '@mantine/core'
 import type { ComponentProps, ReactNode } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 
-/**
- * A modal dialog assembled from Mantine's parts, with a `div` as header: a second `<header>` beside
- * the site header would be another banner landmark. `closeButton` is `false` for none or the props of
- * the close button (named Close when omitted); `bodyProps` go to the body, `footer` stands below it, outside the scrolling body.
- * Every other prop goes to `Modal.Root`.
- */
+/** The header is a `div`, as a second `<header>` beside the site header would be another banner landmark; `closeButton` false for none, `footer` outside the scrolling body. */
 export function AppModal({
   title,
   closeButton = {},

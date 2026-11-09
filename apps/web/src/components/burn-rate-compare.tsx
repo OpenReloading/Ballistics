@@ -117,14 +117,7 @@ function OverlayBody({
   )
 }
 
-/**
- * The burn-rate overlay: up to six powders picked in a searchable select, each pill with
- * its line sample; colour slots stay with their powder when another is removed. The picks live in
- * `?add=` only (a powder page sends its id, the powder list's Compare its picks), no preset and no
- * stored overlay; each burn law is fetched when its powder is picked, so the page carries
- * only the names. The powder designs of this browser with a curve are offered after the catalogue
- * as `user:<id>`, each marked as a user design.
- */
+/** Picks live in `?add=` only (no preset, no stored overlay) and each burn law loads when picked, so the page carries only names; a colour slot stays with its powder, designs come as `user:<id>`. */
 export function BurnRateCompare({ options }: { options: { value: string; label: string }[] }) {
   const { t } = useTranslation()
   const [picks, setPicks] = useState<OverlayPick[]>([])

@@ -21,11 +21,7 @@ const ms = (s: number | undefined) => (s === undefined ? null : s * 1e3)
 const msText = (s: number | undefined, t: Translator['t']) =>
   s === undefined ? t('not computed') : `${formatNumber(s * 1e3, 3)} ms`
 
-/**
- * Simulated barrel time against charge: the nominal run as a line and, between the shortest and the
- * longest barrel time of each charge's rows, a band for the powder lots `fraction` (a fraction)
- * above and below the burn rate. `target` (s) draws a line.
- */
+/** The band spans each charge's shortest to longest barrel time for lots `fraction` (a fraction) off the burn rate either way; `target` (s) draws a line. */
 export function LotChart({
   times,
   fraction,

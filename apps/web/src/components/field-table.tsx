@@ -46,11 +46,7 @@ export function arrowStops(e: KeyboardEvent<HTMLElement>, selector: string) {
   stops[to].focus()
 }
 
-/**
- * A value with notes: a button that shows them on hover, focus and touch; they stay its
- * description. `inline`: a row header's symbol (the cartridge record's dimensions tables), whose
- * notes are only its description and whose tab stop the table sets.
- */
+/** The notes show on hover, focus and touch and stay its description; `inline` (a row header's symbol) has them only as its description, its tab stop set by the table. */
 export function Noted({
   value,
   notes,
@@ -148,11 +144,7 @@ export function SymbolStop({ tabIndex, children }: { tabIndex: number; children:
   )
 }
 
-/**
- * A row of the symbol table: the drawing symbol (a tab stop when `tabbable`, the keyboard path of
- * the linked marking), the quantity, the value and its unit in their own columns. The unit takes
- * the room of its longest form, so a unit change moves nothing.
- */
+/** The symbol is a tab stop when `tabbable`, the keyboard path of the linked marking; the unit takes the room of its longest form, so a unit change moves nothing. */
 function SymbolRow({
   row,
   system,
@@ -189,12 +181,7 @@ function SymbolRow({
   )
 }
 
-/**
- * A record's values as Symbol, Quantity, Value and Unit, a heading row per group, every row with a
- * drawing symbol carrying it as `data-symbol` for the linked marking. One tab stop for the
- * symbols, the arrow keys move between them. Rows not in `on` are hidden on screen and printed.
- * Without `symbolColumn` (a record without a drawing: case, primer) the Symbol column is left out.
- */
+/** Each drawn symbol carries `data-symbol` for the linked marking, one tab stop with arrow keys between them; rows not in `on` are hidden on screen and printed. */
 function SymbolTable({
   label,
   groups,
@@ -290,12 +277,7 @@ export function searchGroups(
     .filter((g) => g.rows.length > 0)
 }
 
-/**
- * A titled panel of a record's values as a symbol table: a group filter (All and each group's
- * `filter` or title) in its title row where there are two filters or more, a search field over
- * symbols and names above the table where it has more than 20 rows. A search looks through every
- * group (the filter shows All while it has text); choosing a group clears it.
- */
+/** A group filter where there are two filters or more, a search above more than 20 rows; a search covers every group (the filter shows All meanwhile), a group choice clears it. */
 export function FieldPanel({
   id,
   title,
@@ -393,10 +375,7 @@ export function FieldPanel({
   )
 }
 
-/**
- * A bullet's ballistic coefficients: the drag model (with its velocity band), the value in the
- * viewer's unit, named in the header, and the record's note.
- */
+/** The drag model with its velocity band, the value in the viewer's unit, and the record's note. */
 export function CoefficientTable({ label, rows }: { label: Wording; rows: FieldRow[] }) {
   const { t } = useTranslation()
   const { system } = useUnits()
@@ -429,12 +408,7 @@ export function CoefficientTable({ label, rows }: { label: Wording; rows: FieldR
   )
 }
 
-/**
- * A record's values in one column, in the unit of the viewer's Settings preset (rounded to the
- * unit's decimals): no header row, a heading row per titled group, the text as printed and the
- * method of a computed value on hover. Named by the heading `labelledBy` names (whose text is
- * `caption`), else by `caption` as its caption.
- */
+/** In the viewer's preset unit, rounded to its decimals; named by the heading `labelledBy` names (text `caption`), else by `caption` as its caption. */
 export function FieldTable({
   caption,
   labelledBy,

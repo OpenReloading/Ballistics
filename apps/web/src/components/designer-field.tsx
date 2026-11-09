@@ -16,11 +16,7 @@ type RevertAction = { type: 'revert'; key: string; system: UnitSystem }
 export const revertOf = <A,>(design: { origin?: unknown }, dispatch: A) =>
   design.origin === undefined ? undefined : dispatch
 
-/**
- * A number field of a designer's property grid: no slider (arrow keys step the value), the
- * state as a flag on the input's edge and as its description; memoized on plain props, so a change
- * re-renders only the fields whose text or state changed.
- */
+/** No slider (arrow keys step), the state a flag on the input's edge and its description; memoized on plain props, so a change re-renders only the fields whose text or state changed. */
 export const DesignerField = memo(function DesignerField({
   spec,
   system,
@@ -42,23 +38,16 @@ export const DesignerField = memo(function DesignerField({
   flag?: FieldFlag['kind'] | undefined
   changed: boolean
   error?: string | undefined
-  /**
-   * The unit suffix: a one-click switch of this field to the quantity's other unit (the messages keep
-   * naming their own unit), plain text, or `none` where the grid's column header names the unit.
-   */
+  /** `switch` toggles this field to the quantity's other unit (the messages keep naming their own); `none` where the grid's column header names the unit. */
   unit?: 'switch' | 'text' | 'none' | undefined
   /** The drawing's symbol of the value, shown before the label; focus marks it in the drawing. */
   symbol?: string | undefined
-  /**
-   * Given while the design started from a record: a changed value's flag becomes "back to the record
-   * value", which dispatches this (the designer's dispatch, stable for the memo).
-   */
+  /** Given while the design started from a record, so a changed value's flag reverts it; the designer's dispatch, stable for the memo. */
   revert?: ((a: RevertAction) => void) | undefined
   dispatch: (a: FieldAction) => void
 }) {
   const { t } = useTranslation()
-  // the error and the help stay apart: the label's title is the help, the flag's tooltip the error
-  // while it applies, and the description for screen readers says both, each as its own sentence
+  // the label's title is the help, the flag's tooltip the error while it applies; screen readers hear both, each as its own sentence
   const marker = error
     ? { kind: 'exceeded' as const, text: error }
     : flag && { kind: flag, text: help }
@@ -84,8 +73,7 @@ export const DesignerField = memo(function DesignerField({
             ? {
                 kind: 'restore',
                 text: `${t('Back to the record value.')} ${help}`,
-                // ActionIcon passes the click: its target finds the field, also where a click
-                // does not focus the button (Safari, Firefox on macOS)
+                // the click's target finds the field, also where a click does not focus the button (Safari, Firefox on macOS)
                 onClick: (e?: { currentTarget: Element }) => {
                   // the button goes with the change: the field keeps the focus
                   const input = (e?.currentTarget ?? document.activeElement)

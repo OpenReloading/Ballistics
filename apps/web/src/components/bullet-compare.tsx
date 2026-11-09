@@ -84,15 +84,7 @@ function AddBullet({ ids }: { ids: string[] }) {
   )
 }
 
-/**
- * Bullets as columns: the bullet data in the groups of the bullet record (symbol, quantity, a value
- * per bullet, unit), the key values first; the head of each column the name, caliber, Use in
- * workbench and a remove button, Add bullet up to 4. A row whose values differ is tinted, the
- * largest and smallest of a numeric row marked, each value after the first with its difference to
- * the first bullet's, "n/a" where a record has no value. Then the drawings at one scale in one
- * panel. On a phone the tables scroll sideways inside their panels. The page's mm or in switch
- * (`RecordScope`, in the page bar) sets the drawings and the table.
- */
+/** Differing rows tinted, each later value with its difference to the first bullet's, "n/a" where a record has none; on a phone the tables scroll sideways inside their panels. */
 export function BulletCompare({
   bullets,
   drawings,

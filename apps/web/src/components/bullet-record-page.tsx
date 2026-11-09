@@ -102,11 +102,7 @@ function BulletRecord({ b, label, fits }: { b: Bullet; label: string; fits: Fits
   )
 }
 
-/**
- * The bullet record page: the record from its data file, rendered with its drawing in the browser.
- * `fits` (the cartridges the bullet fits by the CIP rule, `fitsOf`) comes from the page at build: the
- * API has no route that lists them, and the browser holds no fit code for it.
- */
+/** `fits` (the cartridges it fits by the CIP rule, `fitsOf`) comes from the build: the API has no route that lists them and the browser no fit code. */
 export function BulletRecordPage({ id, name, fits }: { id: string; name: string; fits: Fits }) {
   return (
     <RecordViewWith<Bullet, ManufacturerNames>

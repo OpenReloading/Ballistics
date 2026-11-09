@@ -35,10 +35,7 @@ function CardTitle({ href, label, icon }: { href: string; label: string; icon: s
   )
 }
 
-/**
- * The home page's content: a card per tool and per library page. `counts` holds the record count
- * of each list the build reads, by route; the firearms are the viewer's own.
- */
+/** `counts` holds the record count of each list the build reads, by route; the firearms are the viewer's own. */
 export function Home({ counts }: { counts: Record<string, ReactNode> }) {
   const { t } = useTranslation()
   const [tools, library] = sections

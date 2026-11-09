@@ -43,10 +43,7 @@ function reasonText(reason: string, t: Translator['t']) {
   return translateMessage(reason, t)
 }
 
-/**
- * The rows of the shown step, one per barrel length, the workbench barrel marked. Values up to the
- * barrel are read from the run, longer ones from the longer run.
- */
+/** Values up to the workbench barrel are read from the run, longer ones from the longer run. */
 export function BarrelTable({ study, system }: { study: BarrelStudy; system: UnitSystem }) {
   const { t } = useTranslation()
   const step = study.steps[study.selected]

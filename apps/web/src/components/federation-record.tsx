@@ -42,10 +42,7 @@ export function FederationRuleBooks({
   )
 }
 
-/**
- * The federation's own values and its links: country, the international body, homepage. The
- * abbreviation is the chip beside the page title.
- */
+/** The abbreviation is the chip beside the page title. */
 export function FederationData({
   country,
   member,
@@ -109,10 +106,7 @@ interface FederationDisciplineRow {
   faces: number
 }
 
-/**
- * A federation's disciplines, with the link to the discipline list filtered to it. The Number
- * column only where a discipline has one; the numeric columns aligned right, head and values.
- */
+/** The Number column only where a discipline has one; numeric columns aligned right, head and values. */
 export function FederationDisciplines({
   rows,
   listHref,

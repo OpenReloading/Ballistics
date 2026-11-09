@@ -51,10 +51,7 @@ const capacityIn = (c: Case, records: readonly UserRecord[] | undefined) => {
   return grams === undefined ? undefined : waterVolume(grams)
 }
 
-/**
- * The editor of one group of cases, the page a Mine row of the Cases list opens: a new group, or the
- * stored one that `?record=` names. The File menu saves and opens the browser's groups.
- */
+/** A new group, or the stored one that `?record=` names; the File menu saves and opens the browser's groups. */
 export function CaseGroupEditor() {
   const { t } = useTranslation()
   const { system } = useUnits()

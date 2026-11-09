@@ -2,10 +2,7 @@
 
 import { useEffect, useState, useSyncExternalStore } from 'react'
 
-/**
- * The page bars' end slots, the newest last. A page left by a client navigation stays hidden in
- * the document with its effects cleaned up, so the last one is the bar of the page shown.
- */
+/** Newest last: a page left by a client navigation stays hidden with its effects cleaned up, so the last slot is the shown page's. */
 const slots: HTMLElement[] = []
 const listeners = new Set<() => void>()
 const emit = () => {
@@ -16,10 +13,7 @@ const subscribe = (l: () => void) => {
   return () => listeners.delete(l)
 }
 
-/**
- * The page bar's end slot, empty, for the top bar's own buttons (site-header.tsx): from 75em the
- * bar sits in the top bar before them, so they follow its actions in the keyboard order too.
- */
+/** From 75em the page bar sits in the top bar before its own buttons (`site-header.tsx`), so its actions come first in the keyboard order too. */
 export function useBarEndSlot() {
   const [slot, setSlot] = useState<HTMLElement | null>(null)
   useEffect(() => {

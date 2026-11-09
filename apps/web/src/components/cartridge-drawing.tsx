@@ -49,14 +49,7 @@ const bothNotDrawn = {
 
 export type View = (typeof views)[number][0]
 
-/**
- * The technical drawing of a CIP record: one figure, a table VII shotshell one per variant of l,
- * all at the scale of the widest. SVG; with `side` one side alone (the record pages),
- * else both sides in one figure, the views Cartridge, Chamber and Combined switched by a
- * segmented control (the cartridge designer, which holds `view`; CSS on the figure's `data-view`);
- * the tables carry the data. The cartridge designer passes its own heading and the figures it laid
- * out already. Length texts in `unit` (the Settings length unit), the geometry in mm.
- */
+/** All at the scale of the widest (a table VII shotshell draws one per variant of l); `side` draws one side alone, else the views switch by CSS on `data-view`; length texts in `unit`, the geometry in mm. */
 export function CartridgeDrawing({
   spec,
   heading,
@@ -73,10 +66,7 @@ export function CartridgeDrawing({
   /** Replaces "Outline, <standard> <name>" in the title. */
   heading?: string | undefined
   list?: Figure[] | undefined
-  /**
-   * One side only: the record page draws cartridge and chamber in sections of their own, and
-   * `combined` both outlines with the region differences, screen only.
-   */
+  /** A side alone for the record page's sections; `combined` both outlines with the region differences, screen only. */
   side?: Side | 'combined' | undefined
   /** With `side`: the figure of this shotshell variant only, at the scale of all. */
   variant?: string | undefined
@@ -171,11 +161,7 @@ export function CartridgeDrawing({
   ))
 }
 
-/**
- * The record page's text size and frame width, one in both length units: the scale stays when the
- * unit changes (a switch, or the Settings unit read after hydration), and the text fitted to the
- * wider unit's frame renders 11 px in the phone column in either unit (`fitEm`).
- */
+/** One for both length units, so the scale stays on a unit switch and the text fitted to the wider unit's frame renders 11 px in the phone column (`fitEm`). */
 function recordScale(all: Figure[]) {
   const widest = (em: number) =>
     Math.max(...(['mm', 'in'] as const).flatMap((u) => all.map((f) => screenWidth(f.drawn, em, u))))
@@ -195,11 +181,7 @@ function sideModel(d: Drawn[number], em: number, across: number, unit: LengthUni
   return model
 }
 
-/**
- * The record page's Combined view: both outlines and the region differences of a figure
- * whose two sides draw, at the scale of the side figures (their em and width); on screen only, as
- * print gives each side upright. Each region callout carries the symbols it compares.
- */
+/** Screen only, as print gives each side upright; at the side figures' scale, each region callout carrying the symbols it compares. */
 function Combined({
   spec,
   list,
@@ -242,9 +224,7 @@ function Combined({
   ))
 }
 
-/**
- * Why nothing is drawn: for one side its own note (missing values, closed front), else every note.
- */
+/** For one side its own note (missing values, closed front), else every note. */
 function Undrawn({ list, side }: { list: Figure[]; side?: Side | undefined }) {
   const { t } = useTranslation()
   const notes = list
@@ -274,10 +254,7 @@ const printColumn = { width: 72, height: 160 }
 /** Life size, else the largest of these reductions that fits. */
 const reductions = [1, 0.8, 2 / 3, 0.5, 0.4, 1 / 3, 0.25]
 
-/**
- * One print scale for every drawing of a record: cartridge and chamber of a variant stacked in the
- * drawing column of the sheet.
- */
+/** One print scale for every drawing of a record: cartridge and chamber of a variant stack in the sheet's drawing column. */
 function printScale(split: { group: string; print: FigureModel }[]) {
   const heights = new Map<string, number>()
   for (const f of split) heights.set(f.group, (heights.get(f.group) ?? 0) + f.print.frame[3])
@@ -297,10 +274,7 @@ const scaleSentence = (k: number, t: Translator['t']) =>
         percent: Math.round(k * 100),
       })
 
-/**
- * A value in the description: symbol, value with its unit, then tolerance, limit or "derived";
- * lengths and their tolerances in `unit`, an angle in degrees.
- */
+/** Symbol, value with its unit, then tolerance, limit or "derived"; lengths and tolerances in `unit`, an angle in degrees. */
 function described(
   d: { symbol: string; value: number; derived?: true; stored?: SpecValue },
   unit: LengthUnit,
@@ -460,10 +434,7 @@ function ViewSwitch({
   )
 }
 
-/**
- * The print drawing shares the screen drawing's description; print ignores the view and gives each
- * drawn side dimensioned (`sides`, none for a figure without a switch).
- */
+/** Print ignores the view and dimensions each drawn side (`sides`, none for a figure without a switch); the description is the screen drawing's. */
 function PrintFigures({
   id,
   title,
@@ -501,10 +472,7 @@ function PrintFigures({
   ))
 }
 
-/**
- * The Combined view's line of the caption, one line: its definition in a tooltip (hover, focus and
- * tap) and as the line's name for screen readers.
- */
+/** Its definition in a tooltip (hover, focus and tap) and as the line's name for screen readers. */
 function CombinedCaption({ unit }: { unit: LengthUnit }) {
   const { t } = useTranslation()
   const definition =

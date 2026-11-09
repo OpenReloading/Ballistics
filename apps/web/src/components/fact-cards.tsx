@@ -7,11 +7,7 @@ import { Noted } from './field-table.tsx'
 /** The two unit systems a value can show: a tolerance slot, a fact and a matrix cell fit the longer text, so a unit change moves nothing. */
 export const slotUnits = [presetUnits('metric-grams'), presetUnits('us')]
 
-/**
- * A text that takes the room of its longest form: the visible one and the same fact in the metric
- * and in the US system, drawn as hidden pseudo-element text (`data-a`, `data-b`: no height, not in
- * the document text), so the preset applying after mounting, or a switch, moves nothing.
- */
+/** The metric and US forms as hidden pseudo-element text (`data-a`, `data-b`: no height, not in the document text), so the preset applying after mounting, or a switch, moves nothing. */
 export function Sized({ now, also }: { now: ReactNode; also: string[] }) {
   return (
     <span className="sized" data-a={also[0]} data-b={also[1]}>

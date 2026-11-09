@@ -308,10 +308,7 @@ function ReadNote({ c }: { c: Exclude<CardView, { header: string[] }> }) {
   return <Text size="sm">{[heldText(c.kinds, tn), note].filter(Boolean).join('. ')}</Text>
 }
 
-/**
- * The fields of an unfolded table card: its kind, the column mapping with Save mapping, and the
- * file's source.
- */
+/** An unfolded table card's kind, column mapping (with Save mapping) and source. */
 function tableFields(o: {
   e: Entry
   table: Extract<CardView, { header: string[] }>
@@ -518,11 +515,7 @@ interface ImportEntryIo {
   noteStorage: () => void
 }
 
-/**
- * The Import entry: a page of file cards over the File menu's page, one card per table file, read
- * and built in a worker, with one report and one Import button at the foot. `files` are the
- * tables of the pick that opened it.
- */
+/** One card per table file, read and built in a worker, with one report and one Import at the foot; `files` are the tables of the pick that opened it. */
 export function ImportEntry({
   files: picked,
   io,
@@ -772,10 +765,7 @@ export async function pickedBytes(file: Blob): Promise<ArrayBuffer | { refusal: 
   }
 }
 
-/**
- * Picked files split by content: a file the OpenReloading data format detects goes to the data file
- * import, every other file (a file over the size limit unread) to the Import entry's cards.
- */
+/** A file the OpenReloading data format detects goes to the data file import, every other (one over the size limit unread) to the Import entry's cards. */
 export async function splitImport<F extends { file: Blob }>(picked: F[]) {
   const data: F[] = []
   const tables: F[] = []

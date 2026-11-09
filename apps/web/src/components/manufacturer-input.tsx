@@ -5,15 +5,7 @@ import { memo, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import type { useManufacturers } from './use-manufacturers.ts'
 
-/**
- * A manufacturer field. `value` and `onChange` are the reference (`catalogue:<id>` or
- * `user:<id>`), reported with every keystroke so a save never lags the text: the manufacturer the
- * text names, else the reference of a new user manufacturer whose id is chosen when typing starts.
- * The record of a new one is stored when the field is left, an option is chosen or a save
- * shortcut is pressed in it, and the next typed name finds it. While the catalogue has not
- * answered, leaving the field asks it again; a name it cannot check gets no reference and the field
- * says so.
- */
+/** The reference goes out on every keystroke so a save never lags the text; a new one's id is chosen when typing starts, its record stored on leave, choice or save shortcut; a name the catalogue cannot check gets none. */
 export const ManufacturerInput = memo(function ManufacturerInput({
   label,
   value,

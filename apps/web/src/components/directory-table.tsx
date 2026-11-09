@@ -65,10 +65,7 @@ export interface DirectoryColumn<T> {
   head?: ReactNode
 }
 
-/**
- * Row checkboxes: the chosen ids in the order ticked, at most `max`; a row `can` refuses gets none.
- * A click on a box ticks or unticks its row, a shift click the rows from the box clicked before.
- */
+/** In the order ticked, at most `max`; a row `can` refuses gets no box, and a shift click ticks the rows from the box clicked before. */
 type Selection<T> = {
   ids: readonly string[]
   max: number
@@ -86,14 +83,7 @@ const focusableIn = (scope: ParentNode | null) =>
       )
     : undefined
 
-/**
- * Arrow keys in the rows: up and down to the row above or below in the same column (the name's link
- * when that cell holds nothing to focus), left and right to the neighbouring cell of the row that
- * holds something to focus. A cell is a `td[data-col]` or a phone row's action; cells that are not
- * rendered (hidden by the width) are skipped. The row above or below is the previous or next of
- * `rows` (the DOM neighbour of a row held outside the window is a window row); `reveal` renders it
- * when it is not in the DOM.
- */
+/** Up and down keep the column (the name's link where that cell holds nothing to focus); a cell is a `td[data-col]` or a phone row's action, hidden ones skipped; `reveal` renders a row outside the window. */
 function moveFocus(
   e: KeyboardEvent<HTMLElement>,
   rows: readonly { id: string }[],
@@ -162,13 +152,7 @@ const cellClass = <T,>(c: DirectoryColumn<T>, link: string, repeat = false) =>
 
 const noFacetKeys: readonly string[] = []
 
-/**
- * The list's filters and sort, kept in the URL with `history.replaceState`, and `clear`, which
- * resets every filter and keeps the sort. `facetKeys` are the URL keys of the list's choice filters
- * (`facets.ts`), a constant of the list. Read after mounting,
- * not with `useSearchParams`, so the page stays prerendered with its first rows (Next.js renders a
- * `useSearchParams` tree in the browser only).
- */
+/** Read after mounting, not with `useSearchParams`, so the page stays prerendered with its first rows (Next.js renders a `useSearchParams` tree in the browser only); `facetKeys` is a constant of the list. */
 export function useListState(facetKeys: readonly string[] = noFacetKeys) {
   const [state, setState] = useState<DirectoryState>(emptyDirectory)
   // oxlint-disable-next-line react-hooks/exhaustive-deps -- the keys of a list are fixed
@@ -224,11 +208,7 @@ const firstRows = 40
 /** Rows rendered beyond each edge of the view. */
 const overscan = 10
 
-/**
- * The rows in view of a fixed-row-height table body, in window coordinates, so one rule serves the
- * table's own scroll box (from 62em) and the page scroll (phones). A capture listener sees the
- * scroll of every box. Hand-written: about 30 lines against a dependency for one list.
- */
+/** In window coordinates, so one rule serves the table's own scroll box (from 62em) and the page scroll (phones); hand-written, about 30 lines against a dependency. */
 function useWindowedRows(count: number) {
   const body = useRef<HTMLTableSectionElement>(null)
   const [range, setRange] = useState({ start: 0, end: Math.min(count, firstRows), height: 0 })
@@ -274,10 +254,7 @@ const boxEnabled = <T extends { id: string }>(selection: Selection<T> | undefine
   (selection.can?.(row) ?? true) &&
   (selection.ids.includes(row.id) || selection.ids.length < selection.max)
 
-/**
- * Keeps one tab stop live: the remembered cell may hold nothing to focus or be hidden at this
- * width, then the row's link is the stop. Returns the cleanup of its resize listener.
- */
+/** The remembered cell may hold nothing to focus or be hidden at this width, then the row's link is the stop; returns the cleanup of its resize listener. */
 function keepStop(
   body: HTMLElement | null,
   stopId: string | undefined,
@@ -332,12 +309,7 @@ function scrollToTop(el: HTMLElement | null) {
   if (top < 0) window.scrollBy(0, top)
 }
 
-/**
- * A directory list: the table is the page's scroll box from 62em, the header sticks, the
- * whole row is its link, rows are windowed (the DOM holds the rows in view), headers sort
- * ascending, descending and back to the list order. Below 48em a row is the name over a muted
- * facts line. Print shows the first `printCap` rows and says so.
- */
+/** From 62em the table is the page's scroll box; rows are windowed (the DOM holds the rows in view), headers sort ascending, descending, then in list order; print shows the first `printCap` rows and says so. */
 export function DirectoryTable<T extends { id: string }>({
   rows,
   columns,
@@ -385,11 +357,9 @@ export function DirectoryTable<T extends { id: string }>({
   const [from, to] = printing ? [0, Math.min(shown.length, printCap)] : [start, end]
   const pad = (n: number) => (n > 0 && !printing ? n * (height || 32) : 0)
   const box = useRef<HTMLDivElement>(null)
-  // one tab stop for the rows (roving): the cell last focused, else the first rendered row's link
-  // (the checkbox only while enabled)
+  // one roving tab stop for the rows: the cell last focused, else the first rendered row's link (the checkbox only while enabled)
   const [nav, setNav] = useState<{ id: string; col: string } | null>(null)
-  // the row that holds focus stays rendered when a large scroll (PageDown, End) takes it out of the
-  // window: an unmounted focus falls to the body and keyboard scrolling stops
+  // kept rendered when a large scroll (PageDown, End) takes it out of the window: an unmounted focus falls to the body and keyboard scrolling stops
   const [held, setHeld] = useState(false)
   const pinned = held && !printing ? shown.findIndex((r) => r.id === nav?.id) : -1
   const visible = visibleIndexes(pinned, from, to, shown.length)
@@ -417,22 +387,16 @@ export function DirectoryTable<T extends { id: string }>({
     const remembered = nav?.id === row.id && (col !== 'select' || boxOn(row))
     return (remembered ? nav.col === col : col === link) ? 0 : -1
   }
-  // the remembered cell may hold nothing to focus or be hidden at this width (below 48em): then
-  // the row's link is the stop, so the table never has none
+  // a remembered cell with nothing to focus or hidden below 48em leaves the row's link as the stop, so the table never has none
   // oxlint-disable-next-line react-hooks/exhaustive-deps -- runs after every commit by design; keepStop sets state only when the stop moved
   useLayoutEffect(() => keepStop(body.current, stopId, link, setNav))
-  // the server rows are unfiltered (the URL is read after mounting): a tick before hydration
-  // would be replayed on a row the filters then hide, so the select cells swallow clicks until
-  // mounted (CSS on `data-booting`, nothing visible changes)
+  // the server rows are unfiltered (the URL is read after mounting), so a tick before hydration could land on a row the filters then hide: select cells swallow clicks until mounted (`data-booting`)
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
   // a region and a tab stop until measured, as ScrollRegion
   const [over, setOver] = useState(true)
   useEffect(() => (box.current ? watchOverflow(box.current, setOver) : undefined), [])
-  // a filter change shows the first matches: the table box from the top, and on a phone the page
-  // back to the table's top when it lies above the view; the same rows again (the URL read after
-  // mounting, a sort) move nothing; rows are the same by id, as a list rebuilds its row objects
-  // when the browser's records arrive
+  // a filter change shows the first matches (on a phone only when the table's top lies above the view); the same rows by id again (the URL read, a sort, the browser's records) move nothing
   const before = useRef(rows)
   useEffect(() => {
     const was = before.current
@@ -440,8 +404,7 @@ export function DirectoryTable<T extends { id: string }>({
     if (!sameIds(was, rows)) scrollToTop(box.current)
   }, [rows])
   return (
-    // a scroll box needs focus to scroll by keyboard: a named region while it overflows, with the
-    // row stop as its focus (a tab stop of its own only when there are no rows)
+    // a scroll box needs focus to scroll by keyboard: a named region while it overflows, focused through the row stop (a tab stop of its own only without rows)
     <div
       ref={box}
       className="directory-scroll page-panel page-panel-flush"
@@ -788,8 +751,7 @@ function SelectBox({
           tabIndex={tabIndex}
           checked={checked}
           disabled={full}
-          // a checkbox's change is its click, which carries the shift key; for Space the key's own
-          // state covers a browser that synthesizes that click without it
+          // a checkbox's change is its click, which carries the shift key; for Space the key's own state covers a browser that synthesizes that click without it
           onKeyDown={(e) => {
             space.current = e.key === ' ' && e.shiftKey
           }}
@@ -809,11 +771,7 @@ function SelectBox({
 /** A column as the phone's Sort select reads it. */
 export type SortColumn = { key: string; label: Message; num?: boolean; value?: unknown }
 
-/**
- * The phone's sort (below 48em only the name column shows its head), also shown when a tablet's
- * list box hides the wide columns: one option per sortable column and direction, cleared to the
- * list's own order.
- */
+/** Below 48em only the name column shows its head, and a tablet's list box may hide the wide columns: one option per sortable column and direction. */
 function SortSelect({
   columns,
   sort,
@@ -871,10 +829,7 @@ export const focusSearch = () =>
 /** A scope the page was opened with (a cartridge's fit, a federation): named, with a button that lifts it. */
 export type Scope = { label: string; onRemove: () => void }
 
-/**
- * The filter row: search with an icon and a clear button, the source choice (`children`), the scope
- * the page was opened with and the phone's Sort.
- */
+/** The source choice is `children`; the scope the page was opened with and the phone's Sort follow it. */
 export function DirectoryFilters({
   query,
   onQuery,

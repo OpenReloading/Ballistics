@@ -305,10 +305,7 @@ const printRows = (
   }),
 ]
 
-/**
- * The bullet designer: a property grid of the fields, a live technical drawing beside
- * it, undo and redo; the last valid drawing stays while the input is refused.
- */
+/** The last valid drawing stays while the input is refused. */
 export function BulletDesigner() {
   const { t } = useTranslation()
   const manufacturers = useManufacturers()

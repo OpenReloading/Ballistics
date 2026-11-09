@@ -56,11 +56,7 @@ export async function firearmCards(
   )
 }
 
-/**
- * The range cards of a firearm's loads, rendered into `body` and printed alone on A4 once they are
- * there, each after a line naming its load and its measured velocity; the loads without a card
- * follow, each with its reason. `onDone` runs when the print dialog closes.
- */
+/** Rendered into `body` and printed alone on A4 once there, the loads without a card each with its reason; `onDone` runs when the print dialog closes. */
 export function FirearmRangeCards({
   cards,
   system,

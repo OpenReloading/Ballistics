@@ -5,12 +5,7 @@ import { type DragEvent, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { tipEvents } from '../lib/theme.ts'
 
-/**
- * The chronograph file drop area, a label around a visually hidden file input. `box` is the
- * Measurements tab's tall area (several files, the hint says the file stays in the browser); `bar`
- * is the session page's one-line area (one file, `help` in a tooltip and for screen readers; with
- * `file`, its name and Replace in place of the hint). The callers read the files.
- */
+/** A label around a visually hidden file input: `box` takes several files, `bar` one (with `file`, its name and Replace in place of the hint); the callers read the files. */
 export function ChronoDropZone({
   id,
   label,

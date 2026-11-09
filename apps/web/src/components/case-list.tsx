@@ -28,11 +28,7 @@ import { DeleteRow, sourceColumn, useUserRecords } from './list-sources.tsx'
 import { EmptyList, EmptyNote } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
 
-/**
- * The case directory: manufacturer, name, cartridge, material, empty mass and the stated water
- * capacity of the catalogue's products, with the user's groups of cases as Mine rows (opened in the
- * case group editor, whose cartridge names come from `cartridgeNames`, by cartridge id).
- */
+/** The user's groups are Mine rows, opened in the case group editor, whose cartridge names come from `cartridgeNames` by cartridge id. */
 export function CaseList({
   rows: catalogue,
   cartridgeNames,

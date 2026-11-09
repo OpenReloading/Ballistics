@@ -32,10 +32,7 @@ const subscribe = (l: () => void) => {
   }
 }
 
-/**
- * The app's confirm dialog, callable from handlers and effects: true on the confirm button,
- * false on Cancel, Escape or a click outside. Questions asked together are shown one after another.
- */
+/** True on confirm, false on Cancel, Escape or a click outside; questions asked together are shown one after another. */
 export function confirmDialog(ask: Ask): Promise<boolean> {
   return new Promise((resolve) => {
     queue = [...queue, { ...ask, resolve }]
@@ -82,16 +79,14 @@ export function ConfirmHost() {
     () => offer,
     () => undefined,
   )
-  // the question shown: kept while it fades after its answer, the next one shown after that, so
-  // a double click or a held Enter answers one question only
+  // kept while it fades after its answer, so a double click or a held Enter answers one question only
   const [shown, setShown] = useState<Pending>()
   if (!shown && current) setShown(current)
   const open = shown !== undefined && shown === current
   const showing = useRef(shown)
   showing.current = shown
 
-  // Escape answers the question only, not a dialog under it (each Mantine modal closes on any
-  // Escape of the window): this listener is added first, as the host renders before the page
+  // a Mantine modal closes on any Escape of the window: this listener comes first (the host renders before the page), so Escape answers the question only
   useEffect(() => {
     const onEscape = (e: KeyboardEvent) => {
       if (e.key !== 'Escape' || e.isComposing || !queue.length) return

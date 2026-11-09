@@ -5,10 +5,7 @@ import { choiceLabel, linkedString, linkString, stringChoices } from '../lib/chr
 import { sessionRef } from '../lib/measurements.ts'
 import { controlSize } from '../lib/theme.ts'
 
-/**
- * One picker per ladder group of the open sheet: the chronograph string whose shots are linked, in
- * order, to the shots of the group. None removes the links.
- */
+/** Links the string's shots, in order, to the group's shots; None removes the links. */
 export function LadderChrono({
   groups,
   sessions,

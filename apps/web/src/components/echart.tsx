@@ -28,11 +28,7 @@ register([
 /** The distance between the first two ticks; NaN when there are fewer than two. */
 export const tickStep = (ticks: number[]) => (ticks[1] ?? Number.NaN) - (ticks[0] ?? Number.NaN)
 
-/**
- * The chart colours: each key's CSS custom property of the page (`globals.css`), read after the
- * colour scheme attribute is set and again on a scheme change; undefined before the first read.
- * `names` is a module constant.
- */
+/** Read after the colour scheme attribute is set and again on a scheme change, undefined before the first read; `names` is a module constant. */
 export function useChartTokens<K extends string>(names: Record<K, string>) {
   const scheme = useComputedColorScheme('light')
   const [tokens, setTokens] = useState<Record<K, string>>()
@@ -75,11 +71,7 @@ function columnWidth(node: HTMLElement) {
   return 0
 }
 
-/**
- * An ECharts chart on the SVG renderer: a named image with a description, `option` set as a
- * whole on each change, resized with its box. Arrow keys, Home and End move the tooltip along
- * series `focus`; `readout` gives the text a screen reader hears for that data index.
- */
+/** SVG renderer, `option` set as a whole on each change; arrow keys, Home and End move the tooltip along series `focus`, `readout` the text a screen reader hears. */
 export function EChart({
   option,
   height,
@@ -115,9 +107,7 @@ export function EChart({
   const rendered = useRef(onRender)
   rendered.current = onRender
 
-  // one chart per mount. A hidden tab measures 0 wide: the chart draws at the width of the column
-  // it shows in, so the report has its copy and the chart never overflows its box; with no column
-  // laid out it waits for its box
+  // one chart per mount; a hidden tab measures 0 wide, so it draws at the width of the column it shows in (the report has its copy, the chart never overflows) and, with none laid out, waits for its box
   useEffect(() => {
     const node = box.current
     if (!node) return
@@ -146,10 +136,7 @@ export function EChart({
       else start(node.clientWidth)
     })
     seen.observe(node)
-    // print lays the page out again without a resize: draw at the print width before the snapshot,
-    // at the box's width after it. `afterprint` can come while the print layout still holds, where
-    // the box is hidden or narrow and the observer sees no change on return: measure a frame later,
-    // and again when the print media stops matching
+    // print lays out again without a resize: draw at the print width before the snapshot; `afterprint` may come while the print layout holds, so measure a frame later and when print media stops matching
     const redraw = (width: number) => {
       if (!c) return
       c.resize({ width, height: tall() })

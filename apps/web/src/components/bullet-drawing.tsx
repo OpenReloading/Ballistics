@@ -18,10 +18,7 @@ import { TechnicalDrawing } from './technical-drawing.tsx'
 
 const nameOf = (symbol: string) => bulletSymbols.find((s) => s.symbol === symbol)?.name ?? symbol
 
-/**
- * One description: every dimension by name, symbol and value in `unit`, then what is assumed. The
- * dimension names come from the drawing package and stay English.
- */
+/** The dimension names come from the drawing package and stay English. */
 export function description(
   p: BulletProfile,
   unit: LengthUnit = 'mm',
@@ -41,11 +38,7 @@ export function description(
   )}${assumed}`
 }
 
-/**
- * The technical drawing of a bullet record in the face of the cartridge drawings: server-rendered
- * SVG, a life-size print drawing; a stated reason where the record cannot be drawn. Length texts
- * in `unit`; `label` names the bullet (manufacturer and name).
- */
+/** Server-rendered SVG and a life-size print drawing, as the cartridge drawings; length texts in `unit`, a stated reason where the record cannot be drawn. */
 export function BulletDrawing({
   record,
   label,

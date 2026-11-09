@@ -9,12 +9,7 @@ import { AppPopover } from './app-popover.tsx'
 
 type LoadTabItem = { key: string; title: string; active: boolean; unsaved: boolean }
 
-/**
- * The workbench's open loads: one switcher button (the shown load's number and short name, a dot
- * for unsaved changes) whose menu lists every open load (name, unsaved dot, check mark on the shown
- * one, Close), then Rename and Saved loads; a button for a new load beside it. Rename edits the
- * name in place: the field covers the switcher, so nothing moves; an empty name is the generated one.
- */
+/** The rename field covers the switcher, so nothing moves; an empty name is the generated one. */
 export function LoadTabs({
   items,
   label,

@@ -10,10 +10,7 @@ import { controlSize } from '../lib/theme.ts'
 import { Panel } from './panel.tsx'
 import { ScrollRegion } from './scroll-region.tsx'
 
-/**
- * The cartridges a bullet fits by their CIP values (`fitsOf` in `bullet-fit.ts`), by name, with a
- * filter over the names; nothing when none.
- */
+/** The cartridges the bullet fits by their CIP values (`fitsOf` in `bullet-fit.ts`); nothing when none. */
 export function BulletCartridges({ fits }: { fits: { id: string; name: string }[] }) {
   const [q, setQ] = useState('')
   const { t } = useTranslation()

@@ -26,11 +26,7 @@ export function TemplateLinks({ json, between }: { json?: string; between?: Reac
   )
 }
 
-/**
- * The chronograph file controls of the session summary and the workbench's Measurements tab: a drop
- * area holding the file input, the velocity unit for files that name none, the formats read and the
- * JSON and CSV templates. The callers read the files.
- */
+/** The velocity unit is for files that name none; the callers read the files. */
 export function ChronoFileInput({
   id,
   unitId,

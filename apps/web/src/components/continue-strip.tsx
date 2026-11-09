@@ -5,10 +5,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { openOnWorkbench, type RecentLoad, recentLoads } from '../lib/open-loads.ts'
 
-/**
- * The home page's Continue line: the three newest saved loads of this browser, each opening in the
- * workbench, else a hint. One line of fixed height from the first render, so the cards below never move.
- */
+/** One line of fixed height from the first render, so the cards below never move. */
 export function ContinueStrip() {
   const { t } = useTranslation()
   const [loads, setLoads] = useState<RecentLoad[]>()

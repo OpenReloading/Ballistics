@@ -209,11 +209,7 @@ function chartOption(
   }
 }
 
-/**
- * Muzzle velocity and energy against barrel length: a
- * line per ladder step and quantity, the selected step solid and the others dashed or dotted, each
- * named at its end, the workbench barrel marked. Velocity on the left axis, energy on the right.
- */
+/** Muzzle velocity (left axis) and energy (right axis) against barrel length per ladder step, the selected step solid, the workbench barrel marked. */
 export function BarrelChart({
   steps,
   selected,

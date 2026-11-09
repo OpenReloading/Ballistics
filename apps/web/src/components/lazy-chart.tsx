@@ -5,13 +5,7 @@ import dynamic from 'next/dynamic'
 const load = () => import('./line-chart.tsx').then((m) => m.LineChart)
 const loadInterior = () => import('./interior-chart.tsx').then((m) => m.InteriorChart)
 
-/**
- * `LineChart` and the workbench's `InteriorChart` loaded apart from the page, so pages that only
- * prefetch the calculator routes do not download the chart library. The Trajectory form calls
- * `preloadChart` on mount, the workbench `preloadInteriorChart` once its cards show and the page is
- * idle: a result never waits for the code, and a chunk outage after the page loaded does not
- * hide the chart.
- */
+/** Loaded apart, so pages that only prefetch the calculator routes skip the chart library; preloaded on mount or when idle, so a result never waits and a later chunk outage does not hide the chart. */
 export const LazyLineChart = dynamic(load, { ssr: false })
 export const LazyInteriorChart = dynamic(loadInterior, { ssr: false })
 
