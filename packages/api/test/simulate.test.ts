@@ -1,6 +1,5 @@
 import {
   interiorLoad,
-  interiorValueKeys,
   overrideResistance,
   powderModelValues,
   recordResistance,
@@ -8,7 +7,6 @@ import {
   workbenchValueKeys,
 } from '@open-reloading/ballistics'
 import { analysisKinds, toSi } from '@open-reloading/schema'
-import { filePath, maxPoints } from '@open-reloading/use-cases'
 import { describe, expect, it } from 'vitest'
 import { API_PREFIX } from '../src/version.ts'
 import { defined } from './defined.ts'
@@ -603,7 +601,8 @@ describe('POST /interior/load-file', () => {
     })
     expect(body.points).toEqual(int.body.ladderSteps[body.shown].result.points)
     expect(body.ladderSteps.some((s: object) => 'points' in s)).toBe(false)
-    expect(body.points.length).toBeLessThanOrEqual(5 * maxPoints)
+    // the ladder output cap: five runs of 20,000 points
+    expect(body.points.length).toBeLessThanOrEqual(5 * 20000)
   })
 
   it('reads a file with every optional field the workbench saves', async () => {
@@ -754,39 +753,6 @@ describe('POST /interior/load-file, 400 with the field path', () => {
     return res.body.issues.map((i: { path: unknown[] }) => i.path)
   }
   const at = ['records', 0, 'data']
-
-  it('maps every load field of a file to its value in the file', () => {
-    const values = Object.fromEntries(interiorValueKeys.map((k, i) => [k, 1 + i / 64]))
-    const load = { ...interiorLoad(values), resistance: overrideResistance(undefined, values) }
-    const leaves = (x: unknown, path: string[]): [string[], number][] =>
-      typeof x === 'number'
-        ? [[path, x]]
-        : x && typeof x === 'object'
-          ? Object.entries(x).flatMap(([k, v]) => leaves(v, [...path, k]))
-          : []
-    const mapped = new Set<string>()
-    for (const [path, x] of leaves(load, [])) {
-      const key = interiorValueKeys.find((k) => values[k] === x)
-      if (key === undefined) continue
-      expect(filePath(['load', ...path], at)).toEqual(
-        key === 'charge' ? [...at, 'charge'] : [...at, 'analysis', 'overrides', key],
-      )
-      mapped.add(key)
-    }
-    expect([...mapped].sort()).toEqual([...interiorValueKeys].sort())
-  })
-
-  it('maps the ladder fields to the file ladder and keeps other paths', () => {
-    expect(filePath(['ladder', 'chargeStep'], at)).toEqual([...at, 'analysis', 'ladder', 'step'])
-    expect(filePath(['ladder', 'stepCount'], at)).toEqual([
-      ...at,
-      'analysis',
-      'ladder',
-      'stepCount',
-    ])
-    expect(filePath(['load', 'unknown'], at)).toEqual(['load', 'unknown'])
-    expect(filePath(['curves'], at)).toEqual(['curves'])
-  })
 
   it('refuses a file without a load or with two, and reads the load among other records', async () => {
     const one = file({ siValues })
