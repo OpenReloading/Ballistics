@@ -1,10 +1,6 @@
 import type { InteriorLoad } from './model.ts'
 
-/**
- * Constants of the bore-resistance law of the load-table fit (`apps/docs/docs/models/interior-m3.md`,
- * "Bore resistance"): friction stress tau on the bullet side area, Pa; oversize coefficient c per percent;
- * engraving fraction f of the start pressure. 0 switches a term off.
- */
+/** Friction stress tau on the bullet side area, Pa; oversize coefficient c per percent; engraving fraction f of the start pressure; 0 switches a term off (`apps/docs/docs/models/interior-m3.md`, "Bore resistance"). */
 export interface ResistanceTerms {
   /** Friction stress tau on the bullet side area, Pa. */
   stress: number
@@ -24,13 +20,7 @@ export interface ResistanceCartridge {
   grooveDiameterMm?: number | undefined
 }
 
-/**
- * Bore area of a cartridge's chamber, in the square of the unit of the diameters: the C.I.P. area
- * Q (`area`) when the spec has it, else the circle of the mean of land diameter F and groove
- * diameter Z (`apps/docs/docs/models/interior-m3.md`, "Bore area"), else the circle of F. The load-table
- * fit, the load file and the workbench share it, so one cartridge gives one area (and one friction
- * pressure, which divides by it).
- */
+/** In the square of the diameters' unit: the C.I.P. area Q (`area`), else the circle of the mean of F and Z (`apps/docs/docs/models/interior-m3.md`, "Bore area"), else of F; the fit, the load file and the workbench share it, so one cartridge gives one area and one friction pressure. */
 export function boreArea(b: {
   area?: number | undefined
   boreDiameter: number
@@ -41,12 +31,7 @@ export function boreArea(b: {
   )
 }
 
-/**
- * The C.I.P. bore area `q` of a cartridge record where it applies to `boreDiameter`: Q describes
- * the record's land diameter `land`, so a bore diameter that differs from it (typed over the
- * record's) leaves no record area. A record without a land diameter, or no bore diameter yet,
- * keeps Q. `land` and `boreDiameter` in one unit.
- */
+/** Q describes the record's land diameter `land`, so a `boreDiameter` typed different from it leaves no record area; without a land diameter or a bore diameter yet Q stays; `land` and `boreDiameter` in one unit. */
 export function recordBoreArea(
   q: number | undefined,
   land: number | undefined,
@@ -59,10 +44,7 @@ export function recordBoreArea(
 /** Oversize above which the C.I.P. limits are taken as not comparable, percent. */
 const maxOversizePercent = 5
 
-/**
- * Bullet oversize over the groove diameter, 100 (G1 - Z) / Z in percent, 0 when negative;
- * undefined without Z or above `maxOversizePercent`. Both are C.I.P. tolerance limits, not measurements.
- */
+/** 100 (G1 - Z) / Z in percent, 0 when negative, undefined without Z or above `maxOversizePercent`; both C.I.P. tolerance limits, not measurements. */
 export function oversizePercent(
   c: Pick<ResistanceCartridge, 'bulletDiameterMm' | 'grooveDiameterMm'>,
 ): number | undefined {
@@ -71,11 +53,7 @@ export function oversizePercent(
   return o > maxOversizePercent ? undefined : Math.max(0, o)
 }
 
-/**
- * Bore resistance of the law (`apps/docs/docs/models/interior-m3.md`, "Bore resistance"): friction tau pi G1 L / A (1 + c o) and engraving
- * f p_st falling linearly to 0 over the bearing length L; undefined when both are 0. mm and mm2
- * in, Pa and m out.
- */
+/** Friction tau pi G1 L / A (1 + c o) and engraving f p_st falling linearly to 0 over the bearing length L, undefined when both are 0; mm and mm2 in, Pa and m out (`apps/docs/docs/models/interior-m3.md`, "Bore resistance"). */
 export function boreResistance(
   t: ResistanceTerms,
   c: ResistanceCartridge,
@@ -117,12 +95,7 @@ export interface RecordResistance {
   missing: ResistanceGap[]
 }
 
-/**
- * The record's bore resistance for a run (`apps/docs/docs/models/interior-m3.md`, "Bore resistance"): G1 of the
- * cartridge, else the bore diameter, and its groove diameter Z (none: no oversize term), as the
- * fit; the bullet record's length stands in for the bearing length. `missing` names what the run
- * lacks; both empty for a record without the law. Run values in SI.
- */
+/** G1 of the cartridge, else the bore diameter, with its Z (none: no oversize term) as the fit, the bullet record's length for the bearing length; `missing` names what the run lacks, both empty for a record without the law; run values in SI (`apps/docs/docs/models/interior-m3.md`, "Bore resistance"). */
 export function recordResistance(
   p: {
     interior?:

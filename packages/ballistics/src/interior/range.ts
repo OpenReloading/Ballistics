@@ -1,9 +1,4 @@
-/**
- * Peak-pressure range over input tolerances (`apps/docs/docs/models/interior-pressure-range.md`): each input
- * alone at both ends of its tolerance, then all inputs together at the pressure-raising and the
- * pressure-lowering ends. It covers input tolerances only, not model error, and is not a
- * confidence interval.
- */
+/** Each input alone at both ends of its tolerance, then all together at the pressure-raising and the pressure-lowering ends; input tolerances only, not model error and no confidence interval (`apps/docs/docs/models/interior-pressure-range.md`). */
 import type { Settings } from '../settings.ts'
 import { type InteriorLoad, type InteriorOptions, interior } from './model.ts'
 
@@ -51,10 +46,7 @@ export const pressureInputs: readonly PressureInput[] = [
 export interface PressureCase {
   /** The input moved, or `all` for every input at once. */
   input: PressureInput | 'all'
-  /**
-   * 1: the input raised by its tolerance, -1: lowered. For `all`: 1 moves every input to the end
-   * that raises the pressure, -1 to the end that lowers it.
-   */
+  /** 1: the input raised by its tolerance, -1: lowered; for `all`, 1 moves every input to the end that raises the pressure, -1 to the end that lowers it. */
   side: 1 | -1
   /** For `input: 'all'`: the side used per input, 0 for nominal. */
   sides?: Record<PressureInput, -1 | 0 | 1>
@@ -82,10 +74,7 @@ export interface PressureRange {
   cases: PressureCase[]
 }
 
-/**
- * Moves one input of a load by `side` times its tolerance, or returns a reason when that leaves
- * the model. The range passes 1 or -1 (the ends of the tolerance), the sampling any number.
- */
+/** Moves one input of a load by `side` times its tolerance, or returns a reason when that leaves the model; the range passes 1 or -1 (the ends of the tolerance), the sampling any number. */
 export type ApplyTolerance<L> = (load: L, side: number, tolerance: number) => L | string
 
 /** The peak of one moved load, or the reason it has none. */
@@ -119,11 +108,7 @@ const isSide = (x: number): x is Side => x === -1 || x === 0 || x === 1
 /** The product of two sides that are not 0. */
 const times = (a: 1 | -1, b: 1 | -1): 1 | -1 => (a === b ? 1 : -1)
 
-/**
- * The side of an input that raises the peak: the sign of the peak at its upper end less the peak at
- * its lower end, an end without a peak counted as `nominal`; 0 when neither end has one, and 0 for
- * a NaN difference, which only a NaN nominal gives.
- */
+/** The sign of the upper end's peak less the lower end's, an end without a peak counted as `nominal`; 0 when neither end has one, and for a NaN difference, which only a NaN nominal gives. */
 function risingSide(
   up: Pick<PressureCase, 'maxPressure'>,
   down: Pick<PressureCase, 'maxPressure'>,
@@ -175,10 +160,7 @@ function combinedCases<L>(
   })
 }
 
-/**
- * The range of the model's `peak` over the tolerance box of `load`. `peak` returns Pa or a reason for
- * an invalid run; `nominal` is `peak(load)`, computed by the caller.
- */
+/** The range of `peak` over the tolerance box of `load`; `peak` returns Pa or a reason for an invalid run, `nominal` is `peak(load)`, computed by the caller. */
 export function toleranceRange<L>(
   load: L,
   nominal: number,
@@ -222,11 +204,7 @@ function maximumClass(range: PressureRange, maximum: number): MaximumClass {
   return maximum > range.highPressure ? 'aboveRange' : 'inputPlausible'
 }
 
-/**
- * Places `maximum` (Pa) against `range` with no new run: below `lowPressure` is `modelDiscrepancy`,
- * above `highPressure` is `aboveRange`, else `inputPlausible`. The dominant input is read from the
- * range's single-input cases, an end that could not be computed counted as the nominal pressure.
- */
+/** `maximum` (Pa) against `range` with no new run: below `lowPressure` `modelDiscrepancy`, above `highPressure` `aboveRange`, else `inputPlausible`; the dominant input from the single-input cases, an end not computed counted as the nominal pressure. */
 export function placeMaximum(range: PressureRange, maximum: number): MaximumPlacement {
   const end = (input: PressureInput, side: 1 | -1) =>
     range.cases.find((c) => c.input === input && c.side === side)?.maxPressure ??

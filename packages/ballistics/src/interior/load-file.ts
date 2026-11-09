@@ -4,10 +4,7 @@ import { boreArea } from './bore-resistance.ts'
 import type { InteriorLoad } from './model.ts'
 import { burnFormKeys } from './workbench-keys.ts'
 
-/**
- * The M3 load of a workbench load file (`apps/docs/docs/models/interior-m3.md`, "Load file"): SI values per field key to
- * `InteriorLoad`. The workbench and `POST /interior/load-file` use this one mapping.
- */
+/** SI values per field key to `InteriorLoad` (`apps/docs/docs/models/interior-m3.md`, "Load file"); the workbench and `POST /interior/load-file` use this one mapping. */
 
 /** An `InputError` about the value of one field; `field` is its key. */
 export class ValueError extends InputError {
@@ -124,12 +121,7 @@ function optionalTerms(
   }
 }
 
-/**
- * `InteriorLoad` from SI field values. An empty bore area is the circle of the mean of the bore
- * diameter and `grooveDiameter` (m) where given, else of the bore diameter (`boreArea`; a rifled
- * bore is larger, so the field exists).
- * Throws `ValueError` for a missing required value or a partly filled burn form.
- */
+/** An empty bore area is the circle of the mean of the bore diameter and `grooveDiameter` (m), else of the bore diameter (`boreArea`; a rifled bore is larger, so the field exists); throws `ValueError` for a missing required value or a partly filled burn form. */
 export function interiorLoad(
   values: Record<string, number | undefined>,
   grooveDiameter?: number,
@@ -156,11 +148,7 @@ export function interiorLoad(
   }
 }
 
-/**
- * Throws `ValueError` for an override of the bore resistance outside what the solver takes: a
- * `boreFriction` or `engravingPressure` below 0, an `engravingLength` of 0 or below (the ramp's
- * travels must increase), or a value that is not a number. Needs no powder record.
- */
+/** Throws `ValueError` for a bore-resistance override the solver cannot take: `boreFriction` or `engravingPressure` below 0, an `engravingLength` of 0 or below (the ramp's travels must increase), or a value that is not a number; needs no powder record. */
 export function checkResistanceValues(values: Record<string, number | undefined>): void {
   for (const [key, min] of [
     ['boreFriction', 0],
@@ -180,10 +168,7 @@ export function checkResistanceValues(values: Record<string, number | undefined>
 
 type Engraving = NonNullable<InteriorLoad['resistance']>['engraving']
 
-/**
- * The engraving ramp the load file sets: its start pressure and length, the one not given taken from
- * the record's `engraving`. Throws `ValueError` when neither gives it.
- */
+/** The engraving ramp the load file sets: its start pressure and length, the one not given taken from the record's `engraving`; throws `ValueError` when neither gives it. */
 function overriddenRamp(
   engraving: Engraving,
   { engravingPressure, engravingLength }: Record<string, number | undefined>,
@@ -199,13 +184,7 @@ function overriddenRamp(
   ]
 }
 
-/**
- * The bore resistance of a run: the powder record's (`recordResistance`) with the terms the load
- * file overrides (`apps/docs/docs/models/interior-m3.md`, "Bore resistance"). `boreFriction` replaces the friction
- * pressure; `engravingPressure` and `engravingLength` replace the start and the length of the
- * engraving ramp, the other of the two staying the record's. No override: `record` itself.
- * Throws `ValueError` for one engraving value with no engraving to complete it.
- */
+/** `boreFriction` replaces the friction pressure, `engravingPressure` and `engravingLength` the start and length of the ramp (the other of the two staying the record's); no override returns `record` itself; throws `ValueError` for one engraving value with no engraving to complete it (`apps/docs/docs/models/interior-m3.md`, "Bore resistance"). */
 export function overrideResistance(
   record: InteriorLoad['resistance'],
   values: Record<string, number | undefined>,
@@ -229,10 +208,7 @@ export function loadRatio(
   return !bulkDensity || !(volume > 0) ? undefined : charge / bulkDensity / volume
 }
 
-/**
- * Solid fill, charge solid volume over the chamber volume behind the seated bullet, above which a
- * load is outside the range the interior model was built for (`apps/docs/docs/models/interior-m3.md`, "Load file").
- */
+/** Charge solid volume over the chamber volume behind the seated bullet, above which a load is outside the range the interior model was built for (`apps/docs/docs/models/interior-m3.md`, "Load file"). */
 export const solidFillLimit = 0.64
 
 /** Charge solid volume over the chamber volume; charge kg, solid density kg/m³, volume m³. */
