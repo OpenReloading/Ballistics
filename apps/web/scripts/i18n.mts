@@ -144,9 +144,10 @@ export function requiredMessages(root: string): string[] {
 /**
  * What is wrong with `catalogue` of `language` against the English `source`: a text without a
  * translation that `allowed` does not list (a `required` one always), a listed text that has one
- * or that `base` (the base commit's list) lacks, a `required` text left English, a key no message
- * matches, an empty text, placeholders other than its key's, and a plural that is no object of
- * the language's categories.
+ * or that `base` (the base commit's list) lacks, a text left English that has a letter outside its
+ * placeholders and that `same` does not list (a `required` one always), a text `same` lists that
+ * differs from English or is gone, a key no message matches, an empty text, placeholders other
+ * than its key's, and a plural that is no object of the language's categories.
  */
 export function problems(
   source: readonly string[],
@@ -155,6 +156,7 @@ export function problems(
   required: readonly string[],
   allowed: readonly string[] = [],
   base: readonly string[] = allowed,
+  same: readonly string[] = [],
 ): string[] {
   const { untranslated, stale } = compare(source, catalogue)
   // the allowed list only shrinks: a listed text that has its translation, is gone or is new is a problem too
@@ -185,7 +187,22 @@ export function problems(
         found.push(`placeholders differ: ${key}`)
     }
   }
-  for (const text of required) if (catalogue[text] === text) found.push(`left English: ${text}`)
+  const english = Object.entries(catalogue)
+    .filter(([key, entry]) => {
+      const texts = typeof entry === 'object' && entry !== null ? Object.values(entry) : [entry]
+      return texts.length > 0 && texts.every((text) => key.split('|').includes(text))
+    })
+    .map(([key]) => key)
+  // a text with no letter outside its placeholders reads the same in every language
+  const worded = (key: string) => /\p{L}/u.test(key.replace(/\{\w+\}/g, ''))
+  found.push(
+    ...english
+      .filter((k) => required.includes(k) || (worded(k) && !same.includes(k)))
+      .map((k) => `left English: ${k}`),
+    ...same
+      .filter((k) => !english.includes(k))
+      .map((k) => `listed as equal to English, but translated or gone: ${k}`),
+  )
   return found
 }
 
@@ -402,7 +419,8 @@ if (import.meta.main) {
     const base: string[] | undefined = baseRef
       ? JSON.parse(git('show', `${baseRef}:apps/web/scripts/i18n-lint.json`)).untranslated?.[code]
       : undefined
-    const found = problems(source, catalogue, code, requiredMessages(webRoot), allowed, base)
+    const same: string[] = lint.sameAsEnglish?.[code] ?? []
+    const found = problems(source, catalogue, code, requiredMessages(webRoot), allowed, base, same)
     if (code === 'de') {
       const table: TermTable = read('src/i18n/german-terms.json')
       const senses = {
