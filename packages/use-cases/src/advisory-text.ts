@@ -4,7 +4,11 @@
  * changes the situation. A message states facts about the inputs and the model only, never a
  * statement about the load.
  */
-import { type AdvisoryId, chargeTooSmallRatio } from '@open-reloading/ballistics'
+import {
+  type AdvisoryId,
+  chargeTooSmallRatio,
+  type ResistanceGap,
+} from '@open-reloading/ballistics'
 
 /** The English words of one rule. */
 export interface AdvisoryText {
@@ -73,4 +77,10 @@ export const advisoryText: Readonly<Record<AdvisoryId, AdvisoryText>> = {
       'The start pressure is above the bore resistance at travel 0 and above the ignition pressure, and the engraving pressure at travel 0 is not 0, so the projectile is held until the start pressure and then starts against the lower bore resistance at travel 0, after which the engraving profile applies.',
     fix: 'Set the start pressure to the bore resistance at travel 0 or below, or the engraving pressure at travel 0 to 0.',
   },
+}
+
+/** What a run lacks for a powder record's bore resistance, as the resistance warning names it. */
+export const resistanceGapText: Readonly<Record<ResistanceGap, string>> = {
+  cartridgeRecord: 'a cartridge record',
+  bulletLength: 'a bullet length',
 }

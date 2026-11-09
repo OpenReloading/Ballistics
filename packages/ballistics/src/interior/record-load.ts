@@ -82,7 +82,6 @@ export function recordLoad(r: RecordRun): InteriorLoad {
       // the powder record stores degrees Celsius; inline, as core cannot import the schema's units
       propellantTemperature: r.temperature ?? powder.interior.propellantTemperature.value + 273.15,
     },
-    undefined,
     groove === undefined ? undefined : groove * 1e-3,
   )
   const { resistance, missing } = recordResistance(powder, {

@@ -112,7 +112,7 @@ export function shippedPackages(
       seen.add(importer)
       continue
     }
-    const plain = version.replace(/\(.*$/, '')
+    const plain = version.split('(', 1)[0] ?? version
     const meta = lock.packages?.[`${name}@${plain}`]
     if (seen.has(`${name}@${version}`) || skip(name)) continue
     if (meta?.os || meta?.cpu || meta?.libc)

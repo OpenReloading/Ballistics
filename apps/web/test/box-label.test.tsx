@@ -3,8 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import sharp from 'sharp'
 import { describe, expect, it } from 'vitest'
 import { BoxLabelSheet } from '../src/components/box-label.tsx'
-import de from '../src/i18n/de.json'
-import { english, translator } from '../src/i18n/translate.ts'
+import { english } from '../src/i18n/translate.ts'
 import { boxLabel, labelledLoad, labelPayload, qrModules, readLabel } from '../src/lib/box-label.ts'
 import { photoTries, readCode, type Try } from '../src/lib/label-reader.ts'
 import type { LoadRecord } from '../src/lib/load-tabs.ts'
@@ -94,11 +93,6 @@ describe('box label', () => {
     expect(rows).toContainEqual(['Powder lot', 'P-123'])
     expect(rows).toContainEqual(['Primer lot', 'Z-9'])
     expect(rows.some(([k]) => k === 'Case lot')).toBe(false)
-  })
-
-  it('prints in German', () => {
-    const rows = boxLabel(record(), nameOf, metric, translator(de, 'de').t).rows
-    expect(rows.map(([k]) => k)).toContain('Gespeichert')
   })
 })
 

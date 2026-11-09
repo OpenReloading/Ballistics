@@ -340,11 +340,7 @@ export class MixedPressureBasisError extends InputError {
   readonly rows: Partial<Record<PressureBasis, number>>
 
   constructor(rows: Partial<Record<PressureBasis, number>>) {
-    super(
-      `pressure rows use more than one basis: ${Object.entries(rows)
-        .map(([basis, n]) => `${n} ${basis}`)
-        .join(', ')}`,
-    )
+    super({ code: 'pressureBasesMixed', params: { rows } } satisfies BallisticsIssue)
     this.name = 'MixedPressureBasisError'
     this.rows = rows
   }

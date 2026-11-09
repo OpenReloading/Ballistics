@@ -335,17 +335,7 @@ export function sideTapers(o: Outline) {
 const straightFace = (early: number, lead: number, tail: number) =>
   early <= 1 && Math.max(lead, tail) >= 3 && Math.abs(lead - tail) <= 1 + 0.1 * Math.max(lead, tail)
 
-/**
- * The outline with a shadow offset towards the base trimmed off: the shadow then carries the
- * cut-out on past the base face. There one side reaches half its shank line 3 or more samples
- * before the other; the late side is the shadow's edge until it meets the bullet's base face, which
- * it crosses within a fifth of those samples to 0.9 of its shank line (the corner of a turned axis
- * ramps on as far again). The bullet's base is there; the samples before it are left out, the
- * axis' origin moves to it and the shadow is named on the early side. Where one side is late by 3
- * or more samples but does not cross so, the base end is softer on that side: the outline is kept
- * and the shadow named, as not removed, unless it is a straight face at an angle (`straightFace`).
- * Unchanged otherwise.
- */
+/** The outline trimmed where a shadow carries it past the base: models/bullet-photo.md, "A shadow past the base". */
 function withoutOverhang(o: Outline): Outline {
   const sides = o.sides
   const lines = sides && shankLines(o)
@@ -400,20 +390,7 @@ function refitTrimmed(seg: Cutout, t: Outline): Outline | undefined {
 /** One side tapers at the base by more than this, px or share of the half width, while the other does not: a shadow, not a boat tail. */
 const oneSidedTaper = (halfWidth: number) => Math.max(2.5, 0.02 * halfWidth)
 
-/**
- * The outline with a one-sided shadow taken out. A body of revolution is symmetric about its axis;
- * a soft shadow beside it widens the cut-out on one side only, and where the shadow is offset along
- * the axis it leaves that side short at the base, so the base looks tapered on that side alone.
- * When one side's edge at the base lies inside its shank line by more than `oneSidedTaper` more
- * than the other's, the shadow is on that side. Where the shadow leaves the base clear, the base's
- * width plus the other (sharp) side's own taper is the shank's half width `a`. When both sides run
- * parallel over the base samples (the shadow's blurred end does not reach them) and `a` is below
- * the cut-out's shank half width (a shadow only widens it), the sharp side, taken from its shank
- * line, is measured for both sides, about the axis it gives, and where the shadow carries the
- * cut-out on past a flat tip the bullet ends with the sharp side. A flat tip with no such gap may
- * still carry the shadow in its length: the shadow is then named as not removed. Otherwise the
- * shadow is named and the outline kept.
- */
+/** The outline with a one-sided shadow taken out or named: models/bullet-photo.md, "A shadow on one side". */
 function withoutShadow(o: Outline): Outline {
   const t = sideTapers(o)
   if (!t || !o.sides) return o

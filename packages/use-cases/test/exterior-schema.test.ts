@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest'
+import { z } from 'zod'
 import {
   rangeStringsFitBody,
   rangeStringsFitExample,
@@ -7,10 +9,8 @@ import {
   trajectoryExample,
   truingBody,
   truingExample,
-} from '@open-reloading/use-cases'
-import { describe, expect, it } from 'vitest'
-import { z } from 'zod'
-import { undescribed } from './setup.ts'
+} from '../src/index.ts'
+import { undescribed } from './described.ts'
 
 const bodies = {
   trajectory: [trajectoryBody, trajectoryExample],
@@ -18,6 +18,8 @@ const bodies = {
   rangeStringsPlan: [rangeStringsPlanBody, rangeStringsPlanExample],
   rangeStringsFit: [rangeStringsFitBody, rangeStringsFitExample],
 } as const
+
+const zero = (elevationAngle: number, windageAngle = 0) => ({ elevationAngle, windageAngle })
 
 describe('exterior request schemas', () => {
   it.each(Object.entries(bodies))('the %s example is a valid body', (_, [body, example]) => {
@@ -35,7 +37,6 @@ describe('exterior request schemas', () => {
   // one value outside and one inside each bound; a unit slip (degrees, grams as kg) is refused
   const shot = trajectoryExample.shot
   const projectile = { ...shot.projectile, length: 0.0312 }
-  const zero = (elevationAngle: number, windageAngle = 0) => ({ elevationAngle, windageAngle })
   const cases = [
     ['muzzleVelocity', { muzzleVelocity: 1e12 }, { muzzleVelocity: 3000 }],
     ['muzzleVelocity', { muzzleVelocity: 0.5 }, { muzzleVelocity: 1 }],

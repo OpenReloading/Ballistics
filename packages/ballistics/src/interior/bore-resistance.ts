@@ -108,10 +108,13 @@ export interface ResistanceRun {
   bulletLengthMm?: number | undefined
 }
 
+/** What a run lacks for the bore resistance of a powder record. */
+export type ResistanceGap = 'cartridgeRecord' | 'bulletLength'
+
 /** Result of {@link recordResistance}: the law for the run, or what the run lacks in `missing`. */
 export interface RecordResistance {
   resistance?: InteriorLoad['resistance'] | undefined
-  missing: string[]
+  missing: ResistanceGap[]
 }
 
 /**
@@ -132,9 +135,9 @@ export function recordResistance(
 ): RecordResistance {
   const law = p.interior?.resistance
   if (!law) return { missing: [] }
-  const missing = [
-    ...(run.cartridge ? [] : ['a cartridge record']),
-    ...(run.bulletLengthMm ? [] : ['a bullet length']),
+  const missing: ResistanceGap[] = [
+    ...(run.cartridge ? [] : (['cartridgeRecord'] as const)),
+    ...(run.bulletLengthMm ? [] : (['bulletLength'] as const)),
   ]
   if (!run.cartridge || !run.bulletLengthMm) return { missing }
   const resistance = boreResistance(

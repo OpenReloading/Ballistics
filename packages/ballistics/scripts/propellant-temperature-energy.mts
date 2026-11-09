@@ -1,28 +1,4 @@
-/**
- * Study of the propellant-temperature term of the specific energy
- * (`apps/docs/docs/research/propellant-temperature-energy.md`). Synthetic loads and ladders only:
- * simulations, not load data. Run from the repository root, after `pnpm install`:
- *
- *   node packages/ballistics/scripts/propellant-temperature-energy.mts
- *
- * Prints the three tables of the entry as Markdown. Seeds are fixed, so a rerun prints the same
- * numbers. The rules below were set before the first run.
- *
- * Study 1: change of muzzle velocity and peak breech pressure for a step of `step` K above the
- * reference, from the burn-rate term alone, the energy term alone and both. Energy share =
- * change of the energy term alone / change of both together.
- *
- * Study 2: ladders from a truth at three temperatures, fitted with (A) the current model, whose
- * shared temperature factor is free, and (B) the same with the energy coefficient fixed at the
- * figure of the study. Metric: RMS of the residual against independently noisy held-out strings
- * (velocity in m/s, peak breech pressure in percent), pooled over the replicates, and the same
- * against the noise-free truth. Two spans: interpolating (fit on the outer two temperatures, hold
- * out the middle one) and extrapolating (fit on all three, hold out 20 K beyond the hottest).
- *
- * Rule: the option is supported when, with the term in the truth, (B) has an RMS at least 15 %
- * lower than (A) for velocity and pressure at both spans in both calibration arms, and, with no
- * term in the truth, (B) has an RMS at most 5 % above (A) in all of them.
- */
+// The study of apps/docs/docs/research/propellant-temperature-energy.md, which states its method, rule and command
 import { fitPowder, type InteriorLoad, interior, type LadderPoint } from '../src/index.ts'
 import { normals } from '../test/random.ts'
 

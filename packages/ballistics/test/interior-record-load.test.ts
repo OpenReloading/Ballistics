@@ -126,7 +126,7 @@ describe('recordLoad bore area, sensitivity and refusals', () => {
     expect(() => recordLoad({ ...run, powder: {} })).toThrow(InputError)
     expect(() => recordLoad({ ...run, bullet: { mass: 0.01 } })).toThrow(
       expect.objectContaining({
-        issue: { code: 'boreResistanceNeedsValues', params: { missing: ['a bullet length'] } },
+        issue: { code: 'boreResistanceNeedsValues', params: { missing: ['bulletLength'] } },
       }),
     )
   })

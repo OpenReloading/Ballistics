@@ -1,17 +1,16 @@
 import { interior } from '@open-reloading/ballistics'
-import {
-  chargeTargetResponse,
-  inlineRunner,
-  interiorResponse,
-  loadFileResponse,
-} from '@open-reloading/use-cases'
+import { inlineRunner, operations } from '@open-reloading/use-cases'
 import { describe, expect, it } from 'vitest'
 import type { z } from 'zod'
 import { API_PREFIX } from '../src/version.ts'
+import { defined } from './defined.ts'
 import { file, m3Load, siValues } from './fixtures.ts'
 import { checkBody, withApi } from './setup.ts'
 
 const api = withApi({ compute: inlineRunner })
+
+/** The 200 schema of the route `name`, as the app documents it. */
+const response = (name: string) => defined(operations.find((o) => o.name === name)).response
 
 /**
  * Checks a 200 body against the zod schema and against its JSON Schema of the contract document,
@@ -34,14 +33,14 @@ describe('interior response schemas', () => {
   it('match one run of POST /interior', async () => {
     const body = await post('/interior', { model: 'm3', load: m3Load })
     expect(body.result.points.length).toBeGreaterThan(0)
-    check(interiorResponse, body, 'result')
+    check(response('interior'), body, 'result')
   })
 
   it('match one run with a cartridge id, with limits', async () => {
     const body = await post('/interior', { model: 'm3', load: m3Load, cartridge: 'alpha-rifle' })
     expect(body.limits.length).toBeGreaterThan(0)
     expect(body.resolved.cartridge.id).toBe('alpha-rifle')
-    check(interiorResponse, body, 'pressureRange')
+    check(response('interior'), body, 'pressureRange')
   })
 
   it('match a ladder with a valid step and an invalid one', async () => {
@@ -54,7 +53,7 @@ describe('interior response schemas', () => {
     })
     expect(body.ladderSteps[0]).toHaveProperty('result')
     expect(body.ladderSteps[3]).toHaveProperty('error')
-    check(interiorResponse, body, 'resolved')
+    check(response('interior'), body, 'resolved')
   })
 
   it('match POST /interior/load-file without curves', async () => {
@@ -65,7 +64,7 @@ describe('interior response schemas', () => {
     expect(body).not.toHaveProperty('points')
     expect(body.resolved.powder.id).toBe('example-a-fast')
     expect(body.resolved.bullet.id).toBe('example-a-1')
-    check(loadFileResponse, body, 'summary')
+    check(response('interior/load-file'), body, 'summary')
   })
 
   it('match POST /interior/load-file with curves and a ladder', async () => {
@@ -79,7 +78,7 @@ describe('interior response schemas', () => {
     const body = res.json()
     expect(body.points.length).toBeGreaterThan(0)
     expect(body.ladderSteps).toHaveLength(3)
-    check(loadFileResponse, body, 'units')
+    check(response('interior/load-file'), body, 'units')
   })
 
   it('match POST /interior/charge-target', async () => {
@@ -93,6 +92,6 @@ describe('interior response schemas', () => {
     })
     expect(body.resolved.powder.id).toBe('example-a-fast')
     expect(body.limits.length).toBeGreaterThan(0)
-    check(chargeTargetResponse, body, 'result')
+    check(response('interior/charge-target'), body, 'result')
   })
 })

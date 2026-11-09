@@ -94,7 +94,6 @@
       "querystring does not match the schema",
       "params/id must match the record id",
       "{path} not found",
-      "{kind} {id} not found",
       "request body above 64 KiB",
       "Body is not valid JSON",
       "internal server error",
@@ -130,30 +129,13 @@
       "mass, diameter and length are required without bullet",
       "unit percentOfLimit applies to the peakPressure target only",
       "propellant.bulkDensity or powder is required for the loadRatio target",
-      "options.maxSteps must be at most {max} for the charge solver",
-      "bullet {id} has no length",
-      "bullet {id} has no diameter",
-      "bullet {id} {key} {value} {unit} must be within {low} and {high} {unit}",
-      "result holds a non-finite number at {path}",
-      "powder {id} bulk density {n} kg/m3 must be above 0 and at most {max} kg/m3",
-      "powder {id} has no bulk density",
-      "bullet {id} has no {model} ballistic coefficient",
-      "bullet {id} has {n} {model} values without distinct velocity bands; send drag explicitly"
+      "options.maxSteps must be at most {max} for the charge solver"
     ],
     "curve fit": [
       "traces {list} have the same charge",
       "the highest peak (trace {high}) is {ratio} times the lowest (trace {low}), below {limit}"
     ],
-    "ladders": ["ladder charge {n} g must be above 0", "Too big: expected number to be <={n}"],
-    "load file values": [
-      "Enter a number for {label}.",
-      "{label} must be at least 0.",
-      "Burn form: {list} needed with the others, or leave all four empty.",
-      "Enter a number.",
-      "Must be above 0.",
-      "Must be at least 0.",
-      "Needed with the other engraving value, or from a powder record."
-    ],
+    "ladders": ["Too big: expected number to be <={n}"],
     "advisory registry": [
       "The simulated peak pressure is above a CIP maximum pressure of the cartridge.",
       "The cartridge has no CIP Pmax measured by transducer or piezo.",

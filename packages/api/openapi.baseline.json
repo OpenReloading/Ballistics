@@ -27904,6 +27904,14 @@
           "code": {
             "type": "string"
           },
+          "params": {
+            "type": "object",
+            "description": "A typed refusal or an unknown record id of a compute route: the values its message needs, named by `code`. A number JSON cannot hold (`NaN`, `Infinity`) arrives as its text."
+          },
+          "detail": {
+            "type": "object",
+            "description": "A truing answer: the refusal of the trajectory that stopped the fit, its `code` and `params`."
+          },
           "issues": {
             "type": "array",
             "items": {
