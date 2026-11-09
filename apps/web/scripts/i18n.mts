@@ -279,7 +279,16 @@ const fold = (s: string) =>
     // a soft hyphen marks where a long compound may break
     .replace(/\u00ad/g, '')
 const wordPattern = (word: string) => new RegExp(`\\b${word}(e?s)?\\b`, 'i')
-const termWords = (english: string) => english.replace(/\s*\(.*\)/, '').split(', ')
+/** The words of a term, without a bracketed note such as "Bullet (projectile)". */
+function termWords(english: string) {
+  const open = english.indexOf('(')
+  const close = english.lastIndexOf(')')
+  const bare =
+    open >= 0 && close > open
+      ? english.slice(0, open).trimEnd() + english.slice(close + 1)
+      : english
+  return bare.split(', ')
+}
 const textOf = (entry: unknown) =>
   typeof entry === 'string' ? entry : Object.values(entry as Record<string, string>).join(' ')
 
