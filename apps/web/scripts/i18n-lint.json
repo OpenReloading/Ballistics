@@ -168,7 +168,6 @@
       "encrypted entries are not read",
       "encrypted workbooks are not read; save the workbook without a password",
       "end tag </{end}> does not match <{start}>",
-      "Enter a number for {label}.",
       "footer date \"{text}\" is not recognised; enter the date",
       "footer date row not found; enter the date",
       "footer statistics not found; not checked",
