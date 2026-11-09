@@ -25,22 +25,14 @@ export function linkReasonText(reason: string, tr: Pick<Translator, 't' | 'tn'>)
   return own ? tr.t(own) : reasonText(reason, tr)
 }
 
-/**
- * Why `record` has no share link: a load that refers to records of this browser (`user:<id>`: its
- * cartridge, bullet, firearm or case capacity) which the browser opening the link does not have.
- * Undefined for a record a link can carry. A design's user manufacturer travels in the link next
- * to the design.
- */
+/** A load referring to this browser's records (`user:<id>`) would not resolve where the link opens; a design's maker travels with it. */
 export function shareProblem(record: UserRecord): string | undefined {
   const fields = record.kind === 'load' ? userRefFields(record) : []
   if (fields.length > 0)
     return `the load refers to records of this browser (${fields.join(', ')}); another browser would not find them. Use a catalogue record or save the load and those records to a file.`
 }
 
-/**
- * Why a `kind` record has no share link when its link is over `maxLinkChars`. Nothing is dropped
- * from a powder's fit to make it fit: the message names the file route.
- */
+/** Nothing is dropped from a powder's fit to make it fit: the message names the file route. */
 export const tooLongText = (kind: UserRecord['kind'], t: Translator['t']) =>
   kind === 'powder'
     ? t('Too long for a link: save the powder to a file')

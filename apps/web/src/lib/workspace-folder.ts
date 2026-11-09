@@ -25,10 +25,7 @@ const flag = (set: boolean) => {
 }
 let checked = false
 
-/**
- * The workspace folder picked before, if any, or `lost` when reading it crashed the page last time
- * (seen in headless Chromium 153 with an origin-private handle); a lost folder is forgotten unread.
- */
+/** `lost` when reading it crashed the page last time (headless Chromium 153, origin-private handle); a lost folder is forgotten unread. */
 export async function restoreFolder(): Promise<FileSystemDirectoryHandle | 'lost' | undefined> {
   if (checked) return storedFolder()
   checked = true

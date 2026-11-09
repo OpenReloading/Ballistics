@@ -14,15 +14,7 @@ const constructionName = {
   monolithic: msg('monolithic'),
 }
 
-/**
- * The default of the start pressure field (`apps/docs/docs/models/interior-m3.md`, "Shot start"):
- * the construction rule of the chosen bullet and the firearm class (barrel under 300 mm or not)
- * with its 95 % interval, else the value the field held before the rule (the Settings default or
- * the cited one). A default
- * the user changed in Settings is kept. A powder model fitted without a start pressure of its own
- * (`fittedPowder`) ran at the rifle assumption on every rifle load of its fit, so a rifle barrel
- * keeps that value for it.
- */
+/** By bullet construction and barrel class (under 300 mm or not) with a 95 % interval; a fitted powder without its own start pressure ran at the rifle assumption, so a rifle barrel keeps it (`apps/docs/docs/models/interior-m3.md`, "Shot start"). */
 export function startPressureDefault(a: {
   barrel: number | undefined
   construction: StructureFields | undefined

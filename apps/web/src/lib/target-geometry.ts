@@ -1,5 +1,4 @@
-// The photo geometry of `@open-reloading/shot-groups` (packages/shot-groups/src/geometry.ts) for the
-// modules of the app that read it here.
+// The photo geometry of packages/shot-groups/src/geometry.ts for the app's modules.
 export {
   apply3,
   applyMatrix,

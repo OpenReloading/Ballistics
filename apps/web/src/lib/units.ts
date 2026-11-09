@@ -6,10 +6,7 @@ import { parseNumber } from '../i18n/number.ts'
 import { shownLanguage } from '../i18n/shown.ts'
 import { type Message, msg } from '../i18n/translate.ts'
 
-/**
- * The display unit tables and the unit formatting of `@open-reloading/locale-format`, in the
- * language shown, the factors the app converts with and the text of unit fields.
- */
+/** The locale-format unit tables in the language shown, with the app's factors and unit-field text. */
 export {
   localePreset,
   type PresetId,
@@ -79,19 +76,13 @@ export const percentText = (fraction: number) => locale.percentText(fraction, sh
 export const withUnit = (q: Quantity, system: UnitSystem, si: number) =>
   locale.withUnit(q, system, si, shownLanguage())
 
-/**
- * A twist as typed: "1:8", "1 in 8" or "8", one turn per
- * that many units of the field's length unit. Undefined for any other text.
- */
+/** "1:8", "1 in 8" or "8": one turn per that many units of the field's length unit. */
 export function parseTwist(text: string): number | undefined {
   const m = /^\s*(?:1\s*(?::|in)\s*)?(-?(?:\d+(?:\.\d+)?|\.\d+))\s*$/i.exec(text)
   return m ? Number(m[1]) : undefined
 }
 
-/**
- * The canonical text of a typed twist ("1:8,5" is "1:8.5", "8" and "1 in 8" as typed); undefined
- * when its number does not parse.
- */
+/** "1:8,5" becomes "1:8.5"; undefined when the number does not parse. */
 export function typedTwist(raw: string): string | undefined {
   const t = raw.trimEnd()
   const lead = /^\s*(?:1\s*(?::|in)\s*)?/i.exec(t)?.[0] ?? ''
@@ -114,10 +105,7 @@ export function exactFieldText(q: Quantity, system: UnitSystem, si: number): str
   return q === 'twist' ? twistLabel(text) : text
 }
 
-/**
- * An SI value as a workbench field shows it: `roundedFieldText` with its trailing zeros (37.0 gr,
- * 0.300 in), so the values of a card align by their decimals. A twist is as `roundedFieldText`.
- */
+/** Trailing zeros kept (37.0 gr, 0.300 in), so a card's values align by their decimals. */
 export function fixedFieldText(q: Quantity, system: UnitSystem, si: number): string {
   const { fromSi, decimals } = system[q]
   const x = fromSi(si)
@@ -126,12 +114,7 @@ export function fixedFieldText(q: Quantity, system: UnitSystem, si: number): str
   return x.toFixed(Math.min(d, 12))
 }
 
-/**
- * An SI value as a calculator field shows it (38.3 gr, not 38.2722): the
- * unit's display decimals, at least three significant digits, no trailing zeros. The field keeps
- * the exact SI value beside the text and a unit switch converts from it, so nothing drifts. The
- * designers use it too: no six-decimal inches beside a drawing in mm.
- */
+/** Display decimals, at least three significant digits (38.3 gr, not 38.2722); the field keeps the exact SI value beside the text, so a unit switch converts without drift. */
 export function roundedFieldText(q: Quantity, system: UnitSystem, si: number): string {
   const { fromSi, decimals } = system[q]
   const x = fromSi(si)

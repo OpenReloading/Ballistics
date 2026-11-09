@@ -17,10 +17,7 @@ export const originNames: Record<Origin, Message> = {
 export const originOf = (row: { origin?: 'user' | undefined }): Origin =>
   row.origin ?? 'openreloading'
 
-/**
- * The sources the `src` parameter turns on, of the sources a list has (`available`): all of them
- * when it is empty or names none of them.
- */
+/** All of them when it is empty or names none of them. */
 export function readOrigins(
   param: string | undefined,
   available: readonly Origin[] = origins,

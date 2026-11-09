@@ -141,12 +141,7 @@ export const routeOf = (pathname: string) => pathname.replace(/(.)\/$/, '$1')
 
 const pages = sections.flatMap((s): readonly PageEntry[] => s.pages)
 
-/**
- * Whether a listed page covers a route: its own route, one of its tabs, or a page under one of them
- * (`/bullets/designer` under the Bullets tab of the Database), without a link of its own in the
- * sidebar or drawer, and the routes it `covers`. The offline page answers for any page not stored,
- * so it belongs to none.
- */
+/** Pages without a sidebar link of their own count under their tab; the offline page answers for any page, so it belongs to none. */
 export const pageCoversRoute = (href: string, route: string) => {
   const page = pages.find((p) => p.href === href)
   const roots = [href, ...(page?.tabs?.map((t) => t.href) ?? []), ...(page?.covers ?? [])]

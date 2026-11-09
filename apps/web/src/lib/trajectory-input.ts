@@ -203,10 +203,7 @@ function zeroAir(values: Values, air: Air): Air | undefined {
   }
 }
 
-/**
- * The `TrajectoryInput` of ballistics from SI field values. The zero has no wind and the air of the shot unless
- * a zero air field is set; a drag factor multiplies the drag of the projectile, in the zero too.
- */
+/** The zero has no wind and the shot's air unless a zero air field is set; the drag factor applies in the zero too. */
 export function shotFromValues(
   values: Values,
   projectile: Projectile,
@@ -254,11 +251,7 @@ export function manualProjectile(values: Values, model: DragModel): Projectile {
   }
 }
 
-/**
- * The windage hold the shot needs per 1 m/s and per 1 mph of wind from the right at each of
- * `points`, as a difference to the shot without wind, rad. Magnitudes: wind from the left holds the
- * other way.
- */
+/** Per 1 m/s and per 1 mph of wind from the right, as a difference to the shot without wind, rad; wind from the left holds the other way. */
 function windPerUnit(shot: TrajectoryInput, points: readonly TrajectoryPoint[]) {
   const ranges = points.map((p) => p.range)
   const { wind: _, ...calm } = shot

@@ -1,7 +1,4 @@
-/**
- * The view of a target sheet as exported, printed and zoomed by touch. View units are photo px,
- * or target mm on a drawn target. No React, DOM or Next.js.
- */
+/** View units are photo px, or target mm on a drawn target; no React, DOM or Next.js. */
 import { fromSi } from '@open-reloading/schema'
 
 export type ViewBox = { x: number; y: number; w: number; h: number }
@@ -35,11 +32,7 @@ const round = (lo: number, hi: number) =>
 /** The printed target's largest size on the sheet, mm. */
 export const printArea = { width: 170, height: 140 }
 
-/**
- * The print size of a view `box` (view units) at `mPerUnit` m of target per view unit: the
- * largest round scale (printed mm per target mm) that fits `maxW` x `maxH` mm, and a ruler of a
- * round number of display units (`unit` m each) at most 60 mm and the image's width long.
- */
+/** The largest round scale (printed mm per target mm) that fits, with a ruler of round display units (`unit` m each) at most 60 mm and the image's width. */
 export function printLayout(
   box: { w: number; h: number },
   mPerUnit: number,
@@ -58,11 +51,7 @@ export function printLayout(
 /** The scale as text: "2:1", "1:5". */
 export const scaleText = (s: number) => (s >= 1 ? `${s}:1` : `1:${Math.round(1 / s)}`)
 
-/**
- * The view after a two-finger move: `box` and `k` (view units per screen px) at the start, `p` the
- * view point that was between the fingers, `m0` and `m1` the screen midpoints then and now, `f` the
- * start distance of the fingers over the current one. `p` stays under the fingers.
- */
+/** `box` and `k` (view units per screen px) at the start, `m0` and `m1` the screen midpoints then and now, `p` the view point between the fingers, which stays under them; `f` the start finger distance over the current one. */
 export function pinchView(box: ViewBox, k: number, p: Pt, m0: Pt, m1: Pt, f: number): ViewBox {
   return {
     x: p.x - (p.x - box.x) * f - (m1.x - m0.x) * k * f,

@@ -12,10 +12,7 @@ export function groupStatisticsInput(group: ShotGroup): GroupInput {
 
 const statsCache = new WeakMap<ShotGroup, GroupStatistics>()
 
-/**
- * The statistics of a group, computed once per group object: an edit makes a new group, so a
- * render that changes no group (a pointer move over the canvas) computes nothing.
- */
+/** An edit makes a new group object, so a render that changes no group computes nothing. */
 export function groupStatisticsOf(g: ShotGroup): GroupStatistics {
   const cached = statsCache.get(g)
   if (cached) return cached

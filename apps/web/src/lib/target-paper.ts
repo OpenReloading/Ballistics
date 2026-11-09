@@ -9,12 +9,7 @@ const f32 = (a: Float32Array, i: number) => a[i] as number
 const f64 = (a: Float64Array, i: number) => a[i] as number
 const u8 = (a: Uint8Array | Uint8ClampedArray, i: number) => a[i] as number
 
-/**
- * The target in a photo without a marked region (own rule): the convex hull of the largest light
- * area (luma above Otsu's threshold, on blocks of about 1/256 of the longer side), so the paper
- * with the face it holds; the whole photo when that area is under a tenth of it (a face that fills
- * the photo, a scan) or the two classes' mean lumas differ by less than 40 (one tone).
- */
+/** Own rule: the hull of the largest light area, or the whole photo when that is under a tenth or the two tones differ by less than 40. */
 export function paperOutline(image: RgbaImage): Point[] {
   const { width: W, height: H } = image
   const whole = rectangle({ x: 0, y: 0, width: W, height: H })

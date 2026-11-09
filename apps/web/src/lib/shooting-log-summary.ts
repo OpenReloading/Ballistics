@@ -1,9 +1,4 @@
-/**
- * The yearly summary of the shooting log: rounds per firearm and per cartridge, entries (range
- * days) per month, and the competition events of the year with the entries that link them, read from the entries of one
- * calendar year. The firearm's `roundCount` stays the one counter (#604): the summary is a sum of
- * the log, not a second total.
- */
+/** A sum of the log, not a second total: the firearm's `roundCount` stays the one counter (#604). */
 import type { ShootingLogRecord, UserRecord } from '@open-reloading/schema'
 import type { EventRecord } from './competition-events.ts'
 import { toCsv } from './csv.ts'
@@ -39,10 +34,7 @@ export interface YearSummary {
   events: { event: EventRecord; entries: ShootingLogRecord[] }[]
 }
 
-/**
- * The cartridge of a load: its own `cartridge`, else its firearm's. undefined when neither names one
- * or the load is not in `records`.
- */
+/** Its own `cartridge`, else its firearm's. */
 function cartridgeOfLoad(
   ref: string | undefined,
   loads: ReadonlyMap<string, LoadRecord>,
@@ -62,11 +54,7 @@ function add(rows: Map<string, SummaryRow>, ref: string, rounds: number) {
 
 const byRounds = (a: SummaryRow, b: SummaryRow) => b.rounds - a.rounds || a.ref.localeCompare(b.ref)
 
-/**
- * The summary of `year` from the log `entries` and the browser's `records` (for the cartridge of
- * each load, and the competition events): only the entries and events dated in that calendar year count. An entry without a load counts
- * under its firearm only; a load whose cartridge is unknown counts under `ref` ''.
- */
+/** An entry without a load counts under its firearm only; an unknown cartridge under `ref` ''. */
 export function yearSummary(
   entries: readonly ShootingLogRecord[],
   records: readonly UserRecord[],
@@ -129,13 +117,7 @@ export interface SummaryNames {
 export const monthKey = (year: string, index: number) =>
   `${year}-${String(index + 1).padStart(2, '0')}`
 
-/**
- * The summary as CSV rows: `Year`, then a header `Section`, `Name`, `Rounds`, `Entries` and one row
- * per total, the sections `Firearm`, `Cartridge`, `Without a load`, `Month` (named `YYYY-MM`, entries
- * only), `Competition` (a competition event of the year, named by its day and name, with the rounds
- * and entries of the log entries that link it) and `Total`;
- * documented in the shooting log guide.
- */
+/** The CSV the shooting log guide documents. */
 export function summaryRows(s: YearSummary, names: SummaryNames): (string | number)[][] {
   return [
     ['Year', s.year],

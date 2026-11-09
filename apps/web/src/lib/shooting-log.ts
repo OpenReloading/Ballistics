@@ -1,9 +1,4 @@
-/**
- * The shooting log (Schiessbuch): the entries of this browser, their filters, the CSV and JSON
- * export and the rounds an entry adds to its firearm's count through the one-confirm flow of the
- * sessions (#633). The log is the person's own record; nothing here says what a club or an
- * authority accepts.
- */
+/** The person's own record, counted through the sessions' one-confirm flow (#633); nothing here says what a club or authority accepts. */
 import {
   parseRef,
   type ShootingLogEntry,
@@ -125,10 +120,7 @@ export const logJson = (entries: readonly ShootingLogRecord[]) => userDataText([
 export const logFileName = (ext: 'csv' | 'json', now = new Date()) =>
   `openreloading-shooting-log-${localDay(now)}.${ext}`
 
-/**
- * Why `e` cannot be saved, in words the page translates; undefined when it can. Empty optional
- * texts are left out before the check, as Save writes them.
- */
+/** Empty optional texts are left out before the check, as Save writes them. */
 export function entryProblem(e: ShootingLogEntry): Message | undefined {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(e.date)) return msg('Enter the date.')
   if (e.confirmation?.date && !e.confirmation.by?.trim())
@@ -149,15 +141,7 @@ export function cleanEntry(e: ShootingLogEntry): ShootingLogEntry {
   return out as unknown as ShootingLogEntry
 }
 
-/**
- * The rounds of entry `id` (`rounds` rounds) that the count of the firearm record does not hold
- * yet: the rounds less those counted for the entry before and for the competition event it links
- * (`event`, the same match, #919). Of the event's counted rounds only the part that the other
- * entries linking it on this firearm (`siblings`) do not cover is taken off, so the order the
- * event and its entries are counted in does not change the total (#961). A sibling whose offer was
- * declined ({@link withEntryDeclined}) covers none (#974). 0 for a record that is no firearm or has
- * no count.
- */
+/** Less the linked event's rounds (#919) not covered by sibling entries, so counting order does not change the total (#961); a declined sibling covers none (#974). */
 export function entryRoundsDue(
   record: UserRecord,
   id: string,
@@ -177,11 +161,7 @@ export function entryRoundsDue(
   return Math.max(0, due - Math.max(0, countedFor(f, [event]) - covered))
 }
 
-/**
- * The firearm record with the entry's due rounds added to its count and noted in
- * `countedSessions` under the entry's reference, so a saved entry is counted once; undefined,
- * leaving the record, when nothing is due.
- */
+/** Noted in `countedSessions`, so a saved entry counts once. */
 export function withEntryRounds(
   record: UserRecord,
   id: string,
@@ -195,14 +175,7 @@ export function withEntryRounds(
   return withSessionRounds(record, entryRef(id), record.data.roundCount, rounds, due, now)
 }
 
-/**
- * The firearm record with a declined offer for entry `id` noted as 0 rounds under the entry's
- * reference in `countedSessions`, the count left as it is, so the entries linking the same event
- * share its rounds the same in either order (#974); undefined, leaving the record, when it is no
- * firearm, has no count or holds the entry already. shortcut: an entry counted before and declined
- * after a raise keeps its rounds and so still covers the event; a separate declined field would
- * tell them apart.
- */
+/** Noted as 0 rounds so linked entries share the event's rounds in either order (#974); shortcut: an entry counted before and declined after a raise still covers the event, a separate declined field would tell them apart. */
 export function withEntryDeclined(record: UserRecord, id: string, now = new Date()) {
   if (record.kind !== 'firearm') return
   if (record.data.countedSessions?.some((c) => c.session === entryRef(id))) return
