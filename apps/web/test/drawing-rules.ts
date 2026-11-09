@@ -1,5 +1,4 @@
-// Layout rules of the drawing checks on the verified records:
-// each takes one laid-out side and returns its broken rules, so a test can break one on purpose
+// Layout rules of the drawing checks on the verified records: each takes one laid-out side and returns its broken rules, so a test can break one on purpose
 
 import { readdirSync, readFileSync } from 'node:fs'
 import {

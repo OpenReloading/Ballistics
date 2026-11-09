@@ -1,14 +1,4 @@
-/**
- * Golden numbers of the interior model with its optional features off, and with each feature
- * present at its neutral value (`golden/interior-neutral.json`).
- *
- * Tolerance: every number matches its stored value to a relative 1e-8 (a stored 0 must be 0
- * exactly). That is far above the last-digit difference between machines and below the effect of
- * a model constant changed by 1e-6 relative.
- *
- * Regenerate after an intended change of the model, and review the diff of the JSON file:
- *   UPDATE_GOLDEN=1 pnpm exec vitest run test/interior-golden.test.ts
- */
+/** Golden numbers with the optional features off and each at its neutral value (`golden/interior-neutral.json`), matched to a relative 1e-8 (a stored 0 exactly), far above machine differences and below a model constant changed by 1e-6 relative; after an intended model change regenerate and review the JSON diff: UPDATE_GOLDEN=1 pnpm exec vitest run test/interior-golden.test.ts */
 /// <reference types="node" />
 import { readFileSync, writeFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'

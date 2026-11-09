@@ -15,11 +15,7 @@ const contractRows: ContractRow[] = [
   { name: 'Nosler 2', weight: 175, code: 'item 2' },
 ]
 
-/**
- * The behavior every data source shares, for a source made from `contractRows` that filters a column by equality and
- * sorts by each column's value. The device's index and the catalog read in chunks (W7) are to run it as well; it
- * moves to a package they can import when the first of them lands.
- */
+/** For a source made from `contractRows` that filters a column by equality and sorts by each column's value; the device's index and the catalog read in chunks (W7) are to run it too, and it moves to a package they can import when the first of them lands. */
 export function dataSourceContract(make: (rows: ContractRow[]) => DataSource<ContractRow>): void {
   const all = { start: 0, count: 100 }
   const sortedNames = async (sorting: { id: string; desc: boolean }[]) =>

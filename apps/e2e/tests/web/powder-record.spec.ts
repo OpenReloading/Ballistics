@@ -1,8 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
 
-// The powder record page: its name on a phone, the field names a source covers, the listed
-// cartridges as links and the burn-rate order shown once (the strip's card)
+// The powder record page: its name on a phone, the field names a source covers, the listed cartridges as links and the burn-rate order shown once (the strip's card)
 const path = '/powders/demo-powder-dp40/'
 
 test('names the powder alone on a phone, with its manufacturer from 48em', async ({ page }) => {

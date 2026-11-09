@@ -4,8 +4,7 @@ import { sections } from '../../../web/src/lib/sections.ts'
 import { exported, gotoHydrated } from './nav.ts'
 import { putRecords } from './user-store.ts'
 
-// Ctrl+K on every page: pages, the shell's commands and records; the workbench opens its own
-// search with the same pages and commands
+// Ctrl+K on every page: pages, the shell's commands and records; the workbench opens its own search with the same pages and commands
 
 const search = (page: Page) => page.getByRole('dialog').filter({ has: page.locator('input') })
 const field = (page: Page) =>

@@ -307,8 +307,7 @@ describe('POST /exterior/trajectory', () => {
   })
 
   it('writes the NaN spin drift beyond the point-mass twin run as null', async () => {
-    // steep line of sight, bore along it: the twin stops at its apex near 3666 m, the modified
-    // point mass (Magnus force below 0) reaches 3700 m
+    // steep line of sight, bore along it: the twin stops at its apex near 3666 m, the modified point mass (Magnus force below 0) reaches 3700 m
     const steep: TrajectoryInput = {
       ...shot,
       projectile: {

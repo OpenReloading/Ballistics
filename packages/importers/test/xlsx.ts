@@ -1,8 +1,7 @@
 /// <reference types="node" />
 import { crc32, deflateRawSync } from 'node:zlib'
 
-// Test archives written with node:zlib and DataView, independent of the reader under test.
-// Layout: PKWARE APPNOTE.TXT 6.3.10, sections 4.3.7, 4.3.9, 4.3.12 and 4.3.16.
+// Test archives written with node:zlib and DataView, independent of the reader under test; layout PKWARE APPNOTE.TXT 6.3.10, sections 4.3.7, 4.3.9, 4.3.12 and 4.3.16.
 
 export interface Part {
   name: string

@@ -14,8 +14,7 @@ import {
 import { photoScene } from './face-photos.ts'
 import { faceById, faces, render, type Scene } from './face-render.ts'
 
-// Photo quality on drawn photos: a clean photo of a face has no problem, and each degradation
-// (blur, low light, a reflection, a shadow, a slant, a small target, a cut black area) is named.
+// Photo quality on drawn photos: a clean photo of a face has no problem, and each degradation (blur, low light, a reflection, a shadow, a slant, a small target, a cut black area) is named.
 
 const pistol = 'issf-25m-precision-50m-pistol'
 const base = (id = pistol, kind: 'whole' | 'insert' = 'whole', bullet = 9) =>

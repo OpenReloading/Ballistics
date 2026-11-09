@@ -160,10 +160,7 @@ function expectHoles(found: HoleProposal[], truth: Point[], tol: number) {
   }
 }
 
-/**
- * Printed faces hold shapes that look like holes (the quarters of a bull, digits): the true holes
- * are the `truth.length` most confident proposals, each within `tol` bullet diameters of one hole.
- */
+/** Printed faces hold shapes that look like holes (a bull's quarters, digits), so the true holes are the `truth.length` most confident proposals, each within `tol` bullet diameters of one hole. */
 function expectTop(found: HoleProposal[], truth: Point[], tol: number) {
   const top = found.slice(0, truth.length)
   expect(top).toHaveLength(truth.length)
@@ -661,8 +658,7 @@ describe('the printed zero target', () => {
     for (const t of onPaper) s.hole(t, 60)
     const truth = [...inSquare, ...onPaper]
     const image = s.image()
-    // a run finds one polarity: the light holes in a region about the black square, then the dark
-    // ones on the whole sheet
+    // a run finds one polarity: the light holes in a region about the black square, then the dark ones on the whole sheet
     const square = { x: at(-20, 0).x, y: at(0, 20).y, width: 40 * pxPerMm, height: 40 * pxPerMm }
     const options = { image, pxPerM, expectedHoleDiameter: bullet }
     const found = [
@@ -672,8 +668,7 @@ describe('the printed zero target', () => {
     const near = (p: Point) => truth.some((t) => Math.hypot(p.x - t.x, p.y - t.y) < 0.5 * D)
     for (const t of truth)
       expect(found.some((p) => Math.hypot(p.x - t.x, p.y - t.y) < 0.2 * D)).toBe(true)
-    // no proposal on the print: the dark run reads the black square with the two light holes in it
-    // as print, and the marks, digits, cross and bar give none
+    // no proposal on the print: the dark run reads the black square with the two light holes in it as print, and the marks, digits, cross and bar give none
     expect(found.filter((p) => !near(p))).toEqual([])
   })
 })

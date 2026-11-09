@@ -57,13 +57,7 @@ describe('interiorLoad with throat wear', () => {
   })
 })
 
-/**
- * The 5.56x45 mm load of Vuong et al. 2026 (table 1): 1.8 g charge, 4 g projectile, 1.85 cm3
- * chamber, bore area 2.43e-5 m2, force 706079 J/kg, gamma 1.26, covolume 1e-3 m3/kg, primer 2.94
- * MPa, shot start 29.42 MPa. Constant form, the vivacity set so the new barrel peaks at the
- * authors' 350 MPa (their table 2); travel 0.312 m of the 0.361 m barrel. The worn barrel adds the
- * measured axial wear of 5.42 mm (54.62 - 49.20 mm).
- */
+/** The 5.56x45 mm load of Vuong et al. 2026 (table 1): 1.8 g charge, 4 g projectile, 1.85 cm3 chamber, bore area 2.43e-5 m2, force 706079 J/kg, gamma 1.26, covolume 1e-3 m3/kg, primer 2.94 MPa, shot start 29.42 MPa; constant form with the vivacity set so the new barrel peaks at their 350 MPa (table 2), travel 0.312 m of the 0.361 m barrel; the worn barrel adds the measured axial wear of 5.42 mm (54.62 - 49.20 mm). */
 describe('throat wear against Vuong et al. 2026', () => {
   const area = 2.43e-5
   const load = (volume: number): InteriorLoad => ({

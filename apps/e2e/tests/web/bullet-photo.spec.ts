@@ -2,9 +2,7 @@ import { expect, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 
-// The sample photograph of the From a photo tool is rendered in the browser: the tool cuts the made-up
-// bullet out in its worker, measures it with uncertainties and seeds the designer with the values
-// Metric (SI): mm
+// The sample photograph of the From a photo tool, rendered in the browser: the tool cuts the made-up bullet out in its worker, measures it with uncertainties and seeds the designer with the values, in Metric (SI): mm
 test.beforeEach(({ page }) => storeUnits(page))
 
 test('the sample photograph is measured and opened in the designer', async ({ page }) => {

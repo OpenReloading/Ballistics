@@ -142,8 +142,7 @@ test('in German the pressure range keeps its gap and the Powder card head its me
   await page.setViewportSize({ width: 1280, height: 650 })
   await runExample(page)
   await showGerman(page)
-  // the gap between the unit's text and the range's text, px: their boxes may overlap where the
-  // range is set flush right in a wider cell
+  // the gap between the unit's text and the range's text, px: their boxes may overlap where the range is set flush right in a wider cell
   const gap = await page.locator('.results-head .readout-keys .readout-wide').evaluate((tile) => {
     const textBox = (el: Element | null) => {
       if (!el) throw new Error('no peak pressure tile')
@@ -181,8 +180,7 @@ async function openTab(page: Page, name: string) {
       () => true,
       () => false,
     ))
-  // a click that lands after its timeout shows the panel: the More menu lists only the tabs that
-  // do not fit in the row
+  // a click that lands after its timeout shows the panel; the More menu lists only the tabs that do not fit in the row
   if (!clicked && !(await panel.isVisible())) {
     await more.click()
     await page.getByRole('menuitem', { name }).click()

@@ -100,8 +100,7 @@ describe('F distribution with 2 and m degrees of freedom', () => {
 
 describe('chi-square survival function', () => {
   it('keeps the upper tail where 1 minus the distribution function is 0', () => {
-    // two degrees of freedom: exp(-x / 2); four: exp(-x / 2) (1 + x / 2)
-    // the true tail is 1e-85
+    // two degrees of freedom: exp(-x / 2); four: exp(-x / 2) (1 + x / 2); the true tail is 1e-85
     expect(1 - chiSquareCdf(400, 4)).toBe(0)
     expect(chiSquareSurvival(100, 2)).toEqual(
       near(Math.exp(-50), { relative: 1e-12, absolute: 1e-18 }),

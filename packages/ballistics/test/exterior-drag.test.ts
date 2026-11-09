@@ -104,10 +104,7 @@ const slowShot = (drag: DragInput): TrajectoryInput => ({
 const monotoneCd = (table: DragTable, mach: number) =>
   dragCoefficient(table, mach, 'monotone-cubic')
 
-/**
- * Samples every segment of `table` 50 times: the samples that leave the node values or turn against
- * the secant of their segment.
- */
+/** 50 samples per segment of `table`: those that leave the node values or turn against the secant of their segment. */
 function shapeViolations(table: DragTable): string[] {
   const out: string[] = []
   for (let k = 0; k + 1 < table.length; k++) {
@@ -516,8 +513,7 @@ describe('drag table segments', () => {
   })
 
   it('weights the interior cubic slope by unequal node spacing', () => {
-    // secants 1/2 and 3/5 over widths 2 and 1: p = (1/2 + 6/5) / 3 = 17/30, slope 2 min(1/2, 3/5,
-    // 17/60) = 17/30; at the middle of the first segment 1/8 + 1/2 - 17/120 = 29/60
+    // secants 1/2 and 3/5 over widths 2 and 1: p = (1/2 + 6/5) / 3 = 17/30, slope 2 min(1/2, 3/5, 17/60) = 17/30; at the middle of the first segment 1/8 + 1/2 - 17/120 = 29/60
     const uneven: DragTable = [
       [1, 0],
       [3, 1],

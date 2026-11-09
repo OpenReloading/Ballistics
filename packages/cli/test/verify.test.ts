@@ -42,9 +42,7 @@ describe('verify on the validation split', () => {
     // training errors 0.01 to 0.10: the 90th percentile is 0.091
     expect(r.interval.trainingRows).toBe(10)
     expect(r.interval.halfWidth).toBeCloseTo(0.091, 9)
-    // the band is the model velocity times (1 +/- h): a printed velocity v is inside when
-    // |model - v| / model <= h. The row printed 10 % below the model is at 0.0909 of the model,
-    // inside; against the printed velocity its error is 0.10, outside.
+    // the band is the model velocity times (1 +/- h), so v is inside when |model - v| / model <= h: the row printed 10 % below the model is at 0.0909 of it, inside, while against the printed velocity its error is 0.10, outside
     expect(r.overall.interval?.coverage).toBeCloseTo(1, 12)
   })
 

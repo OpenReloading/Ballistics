@@ -7,8 +7,7 @@ import { autoDetect, detectFromExample, type HoleProposal } from '../src/lib/hol
 import { isMaybe } from '../src/lib/hole-proposals.ts'
 import type { RgbaImage } from '../src/lib/image.ts'
 
-// Recall on the committed synthetic photos (test/fixtures/target-photos, made by make.mts):
-// scanned and phone photos of light and dark faces whose holes show 0.7 to 0.8 of the bullet.
+// Recall on the committed synthetic photos (test/fixtures/target-photos, made by make.mts): scanned and phone photos of light and dark faces whose holes show 0.7 to 0.8 of the bullet.
 const dir = join(import.meta.dirname, 'fixtures', 'target-photos')
 type Fixture = {
   size: [number, number]
@@ -60,8 +59,7 @@ function expectTierKeeps(found: readonly HoleProposal[], f: Fixture) {
 }
 
 describe('hole detection on the fixture photos', () => {
-  // the result must not depend on the hole the user picks, and no region is marked (the
-  // module finds the target)
+  // the result must not depend on the hole the user picks, and no region is marked (the module finds the target)
   for (const [file, f] of fixtures)
     it(`finds the holes of ${file} whichever hole is the example`, async () => {
       const image = await load(file)
@@ -102,8 +100,7 @@ describe('hole detection on the fixture photos', () => {
     })
 })
 
-// A dark face with holes as dark as their backing (phone-night.jpg): the strongest light blobs of
-// the grain agree with each other, so the run that wins must not be theirs.
+// A dark face with holes as dark as their backing (phone-night.jpg): the strongest light blobs of the grain agree with each other, so the run that wins must not be theirs.
 describe('hole detection on a dark face with dark holes', () => {
   const fixture = fixtures.find(([file]) => file === 'phone-night.jpg')
 

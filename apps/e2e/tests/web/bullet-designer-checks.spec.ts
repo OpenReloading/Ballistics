@@ -2,8 +2,7 @@ import { expect, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 
-// The bullet designer's soft checks: a refusal writes its lengths in the page unit, a value far
-// outside a bullet's asks to check the unit without blocking, and the photograph dialog is narrow.
+// The bullet designer's soft checks: a refusal writes its lengths in the page unit, a value far outside a bullet's asks to check the unit without blocking, and the photograph dialog is narrow.
 
 test('a refusal writes its lengths in inches on an inch page', async ({ page }) => {
   await storeUnits(page, 'us')

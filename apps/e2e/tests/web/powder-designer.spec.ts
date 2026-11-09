@@ -5,9 +5,7 @@ import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
 import { loadForm } from './workbench.ts'
 
-// A powder entered in the designer is checked against the powder schema while it is typed, kept in
-// the browser, and chosen in the workbench's Powder card as the user's own design
-// Metric (SI): g/cm3, bar, degC, MJ/kg, cm3/g
+// A powder entered in the designer is checked against the powder schema while typed, kept in the browser and chosen in the workbench's Powder card as the user's own design, in Metric (SI): g/cm3, bar, degC, MJ/kg, cm3/g
 test.beforeEach(({ page }) => storeUnits(page))
 
 /** The burn law of an invented powder, as the fields show it. */

@@ -1,9 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
 
-// The bullet list's filters by construction, tip and base, kept in the URL, and its picks for
-// Compare. The filter values, counts and the leaving out of a one-value filter are Vitest tests
-// (`apps/web/test/directory.test.ts`).
+// The bullet list's filters by construction, tip and base, kept in the URL, and its picks for Compare; the filter values, counts and the leaving out of a one-value filter are Vitest tests (`apps/web/test/directory.test.ts`).
 test('a bullet list filtered by tip and base narrows the list, survives a reload and clears', async ({
   page,
 }) => {

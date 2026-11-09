@@ -3,9 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { verify } from '../src/commands.ts'
 import type { Metrics, VerifyResult } from '../src/result.ts'
 
-// A release step: reproduces the published results of the validation page on the load rows that are
-// not in the repository. It runs when VALIDATION_ROWS names the rows file, and is skipped otherwise;
-// BALLISTICS_RECORDS names the records roots of the run, as for the command line.
+// A release step: reproduces the validation page's published results on the load rows not in the repository, run when VALIDATION_ROWS names the rows file and skipped otherwise; BALLISTICS_RECORDS names the records roots, as for the command line.
 const rows = process.env.VALIDATION_ROWS
 const records = process.env.BALLISTICS_RECORDS?.split(':').filter(Boolean) ?? []
 

@@ -1,8 +1,4 @@
-/**
- * Synthetic target photos for the hole detection recall test: rendered faces with torn holes
- * smaller than the bullet, as paper shows them. `make.mts` writes the files and `holes.json`; the
- * test reads the files, so JPEG artefacts, blur and noise are part of the fixture.
- */
+/** For the hole detection recall test: rendered faces with torn holes smaller than the bullet, as paper shows them; `make.mts` writes the files and the test reads them, so JPEG artefacts, blur and noise are part of the fixture. */
 
 import { seededUniforms } from '@open-reloading/statistics'
 import { defined } from '../../defined.ts'

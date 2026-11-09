@@ -84,10 +84,7 @@ test("a firearm's measured bore diameter and freebore and a brass group's trim l
   )
 })
 
-/**
- * Adds a catalogue powder without burn values to the static API files the workbench reads: a row of
- * the catalogue index and its record, made from the demo powder DP15 without its `interior`.
- */
+/** A row of the catalogue index and its record in the static API files the workbench reads, made from the demo powder DP15 without its `interior`. */
 async function withBurnlessPowder(page: Page) {
   await page.route('**/api/catalogue/index.json', async (route) => {
     const response = await route.fetch()

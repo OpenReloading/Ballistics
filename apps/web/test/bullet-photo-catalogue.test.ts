@@ -1,14 +1,4 @@
-/**
- * Research evaluation of the bullet photo tool on catalogue bullets (research log:
- * `apps/docs/docs/research/bullet-photo-catalogue-geometry.md`). Bullet records with a length are
- * drawn, rendered as photographs of several kinds (own photograph beside a ruler, product-style
- * images of 1000, 500 and 250 px without a ruler, JPEG, a drop shadow, a tilt), measured with the
- * same steps as the tool's worker and compared with the drawing they were rendered from.
- *
- * Opt-in, it takes minutes: `BULLET_PHOTO_EVAL=<out.json> pnpm exec vitest run test/bullet-photo-catalogue.test.ts`
- * in `apps/web`, optionally with `BULLET_PHOTO_SCENARIO=<letter>` and `BULLET_PHOTO_PER_MAKER=<n>`.
- * It writes the summary per scenario and one row per photograph.
- */
+/** Opt-in research evaluation of the photo tool on catalogue bullets (`apps/docs/docs/research/bullet-photo-catalogue-geometry.md`), minutes long: `BULLET_PHOTO_EVAL=<out.json> pnpm exec vitest run test/bullet-photo-catalogue.test.ts` in `apps/web`, optionally `BULLET_PHOTO_SCENARIO=<letter>` and `BULLET_PHOTO_PER_MAKER=<n>`; records with a length rendered as own photographs beside a ruler or product images of 1000, 500 and 250 px, measured as the worker does and compared with their drawing. */
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import {
   type BulletDimensions,

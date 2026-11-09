@@ -9,8 +9,7 @@ import {
   type Row,
 } from './face-photos.ts'
 
-// No other face shares its rings: every photo is sure. The skewed photo's light ring lines read as
-// holes. Per photo the holes found of six and the proposals that are no hole.
+// No other face shares its rings, so every photo is sure; the skewed photo's light ring lines read as holes. Per photo the holes found of six and the proposals that are no hole.
 const holes: Record<PhotoKind, [number, number]> = {
   whole: [6, 4],
   insert: [6, 2],

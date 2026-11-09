@@ -70,10 +70,7 @@ const lists: [string, List, string[], number?][] = [
   ['event types', (c) => c.eventTypes(), ['test-championship']],
 ]
 
-/**
- * A record of the fixture bundle by kind and id, its revision, and its name where it has one. A
- * revision changes with any field of the stored record: update it with the fixture.
- */
+/** Kind, id, revision and name where it has one; a revision changes with any field of the stored record, so update it with the fixture. */
 const records: [CatalogueKind, string, string, string?][] = [
   ['cartridge', 'alpha-rifle', '1d2713937e50c5', 'Alpha Rifle'],
   ['manufacturer', 'example-a', '137c9d55f895bd', 'Example A'],

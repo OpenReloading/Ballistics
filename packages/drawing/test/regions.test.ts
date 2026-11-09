@@ -94,8 +94,7 @@ describe('regions', () => {
       checkBothSides(id, values)
     }
     expect(count).toBe(2549)
-    // Reviewed: the 6 rim records (chamber R, a minimum, below cartridge R, a maximum), P1 and H2
-    // pairs 0.01 to 0.02 mm the wrong way round, and 5,7 mm UCC Voere (table XI, not drawn)
+    // Reviewed: the 6 rim records (chamber R, a minimum, below cartridge R, a maximum), P1 and H2 pairs 0.01 to 0.02 mm the wrong way round, and 5,7 mm UCC Voere (table XI, not drawn)
     expect(conflicts).toEqual([
       'cip-22-bb-cap-2000-06-07 R -0.02',
       'cip-22-cb-cap-2000-06-07 R -0.02',

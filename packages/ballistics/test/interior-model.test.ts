@@ -603,8 +603,7 @@ describe('event location of the form functions', () => {
     expect(rel(three.peakBreechPressure, two.peakBreechPressure)).toBeLessThan(1e-9)
     expect(rel(three.muzzleVelocity, two.muzzleVelocity)).toBeLessThan(1e-9)
     expect(rel(three.barrelTime, two.barrelTime)).toBeLessThan(1e-9)
-    // two stages reach z = 1 along (1 - z)^q, where phi has an infinite slope, so their burnout
-    // event needs tight tolerances; the transformed third stage does not
+    // two stages reach z = 1 along (1 - z)^q, where phi has an infinite slope, so their burnout event needs tight tolerances; the transformed third stage does not
     const tight = { relativeTolerance: 1e-12, absoluteTolerance: 1e-14 }
     const twoTight = withForm({ kind: 'twoStage', a: 1.2, m: 0.4, q: 0.3, z1: 0.45 }, tight)
     if (!twoTight.valid || !twoTight.burnout || !three.burnout) throw new Error('no burnout')
@@ -1003,8 +1002,7 @@ describe('gas leakage refusals', () => {
   it('input errors and noShotStart', () => {
     for (const [field, load] of invalidLeakage)
       expect(interior(load)).toEqual({ valid: false, reason: 'input', field })
-    // constant form, n = 0.5: gas generation grows more slowly than outflow with pressure, so they
-    // balance below the start pressure
+    // constant form, n = 0.5: gas generation grows more slowly than outflow with pressure, so they balance below the start pressure
     const base = full()
     const slow: InteriorLoad = {
       ...base,

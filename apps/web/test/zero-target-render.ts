@@ -1,5 +1,4 @@
-// The printed zero target as a luminance function of sheet mm, read from the SVG markup itself, so a
-// synthetic photo shows what the sheet prints. Text is drawn as one outlined box per character.
+// The printed zero target as a luminance function of sheet mm, read from the SVG markup itself, so a synthetic photo shows what the sheet prints; text is drawn as one outlined box per character.
 import { type FieldValues, fieldKeys, zeroTargetSvg } from '../src/lib/zero-target.ts'
 
 const PAPER = 225

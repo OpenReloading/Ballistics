@@ -27,10 +27,7 @@ const steps: SimulatedStep[] = [
 ]
 
 describe('chargeRows', () => {
-  // hand calculation, velocities in m/s:
-  // 40 gr: 800, 810, 820 -> mean 810, SD sqrt((100 + 0 + 100) / 2) = 10, ES 20, diff 10, 1.25 %
-  // 41 gr: 815, 825 (and 790 excluded) -> mean 820, SD sqrt(50) = 7.0711, ES 10, diff 0, 0 %
-  // 42 gr: two strings pooled, 830, 834 and 838 -> mean 834, SD 4, ES 8, diff -6, -0.7143 %
+  // by hand, m/s: 40 gr 800, 810, 820: mean 810, SD sqrt((100 + 0 + 100) / 2) = 10, ES 20, diff 10, 1.25 %; 41 gr 815, 825 (790 excluded): mean 820, SD sqrt(50) = 7.0711, ES 10, diff 0, 0 %; 42 gr two strings pooled, 830, 834, 838: mean 834, SD 4, ES 8, diff -6, -0.7143 %
   const strings = [
     { charge: 40 * gr, shots: [shot(800), shot(810), shot(820)] },
     { charge: 41 * gr, shots: [shot(815), shot(790, 'flyer'), shot(825)] },

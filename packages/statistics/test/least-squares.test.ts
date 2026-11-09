@@ -114,8 +114,7 @@ describe('shared least-squares loop: stop rules and Huber weights', () => {
   })
 
   it('reports rows that changed weight over the last accepted step as not settled', () => {
-    // two rows at the start value and four far above it: the one accepted step moves the
-    // iterate so that the first two, within the threshold before it, lie beyond it after
+    // two rows at the start value and four far above it: the one accepted step moves the iterate so that the first two, within the threshold before it, lie beyond it after
     const r = outlierFit({
       observed: [1, 1, 1.04, 1.04, 1.04, 1.04],
       huber: { threshold: 0.8, count: 6 },
@@ -216,8 +215,7 @@ describe('shared least-squares loop: the solution', () => {
         throw new Error(reason)
       },
     })
-    // measured: 5 accepted candidates and 6 Jacobians of 4 calls; the sixth step is below 1e-8,
-    // calls nothing and leaves the Jacobian current, so none is recomputed at the solution
+    // measured: 5 accepted candidates and 6 Jacobians of 4 calls; the sixth step is below 1e-8, calls nothing and leaves the Jacobian current, so none is recomputed at the solution
     expect([r.iterations, calls]).toEqual([6, 29])
     expect(returned).toContain(r.predicted)
     expect(r.predicted).toEqual(model(r.theta))

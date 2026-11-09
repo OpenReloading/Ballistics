@@ -25,8 +25,7 @@ vi.mock('@open-reloading/tools/catalog', async (original) =>
   ),
 )
 
-// Test data, not maker data: the printed figures of these tables are the model's own results
-// for the demo records, moved by known errors, as the synthetic rows of `data.ts`.
+// Test data, not maker data: the printed figures of these tables are the model's own results for the demo records, moved by known errors, as the synthetic rows of `data.ts`.
 
 const source = {
   title: 'Synthetic published load table (test data)',

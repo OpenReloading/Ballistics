@@ -7,9 +7,7 @@ import { putRecords } from './user-store.ts'
 import { applyExampleLoad, loadForm } from './workbench.ts'
 import { runLine } from './workbench-run.ts'
 
-// The powder tuning route lists the chronograph strings of the open load per charge and takes more
-// typed in; the Measurements tab and the powder designer link to it
-// Metric (SI): g, m/s
+// The powder tuning route lists the open load's chronograph strings per charge and takes more typed in; the Measurements tab and the powder designer link to it, in Metric (SI): g, m/s
 test.beforeEach(({ page }) => storeUnits(page))
 
 const file = [
@@ -93,8 +91,7 @@ test('the Measurements tab opens the route with the load strings, and an added s
   }
 })
 
-// a cartridge chosen after the run: its record (groove, bore area Q) is held back, so the link waits
-// for it and shows once the record loads, or once its request fails (#966)
+// a cartridge chosen after the run: its record (groove, bore area Q) is held back, so the link waits for it and shows once the record loads, or once its request fails (#966)
 for (const answer of ['loads', 'fails'] as const)
   test(`the Measurements tab holds the tuning link while the cartridge record loads, and shows it once the record ${answer}`, async ({
     page,
@@ -132,10 +129,7 @@ for (const answer of ['loads', 'fails'] as const)
     await expect(link).toBeVisible()
   })
 
-/**
- * Milliseconds from each of `moves` arrow key presses on the first hand-tuning slider to the
- * redraw of the curve, measured in the page; half the moves go right, then back left.
- */
+/** Milliseconds from each of `moves` arrow key presses on the first hand-tuning slider to the curve's redraw, measured in the page; half the moves go right, then back left. */
 const redrawTimes = (page: Page, moves: number) =>
   page.evaluate(async (n) => {
     const thumb = document.querySelector('.hand-tune [role="slider"]')

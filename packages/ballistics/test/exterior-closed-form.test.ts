@@ -56,18 +56,14 @@ describe('flat-fire drop with a constant drag coefficient', () => {
           x * Math.tan(th) -
           (g * (Math.exp(2 * k * x) - 2 * k * x - 1)) / (4 * v0 ** 2 * Math.cos(th) ** 2 * k ** 2)
         expect(Math.abs(q.height / y - 1)).toBeLessThan(1e-3)
-        // the form takes all drag along the line of fire; at 1000 m the path is 2 deg steep and
-        // the speed differs by 1.04e-3
+        // the form takes all drag along the line of fire; at 1000 m the path is 2 deg steep and the speed differs by 1.04e-3
         expect(Math.abs(q.velocity / (v0 * Math.exp(-k * x)) - 1)).toBeLessThan(1.5e-3)
       }
     })
   }
 })
 
-/**
- * Time at which x = W t + ln(1 + k u0 t) / k reaches `range`, u0 = v0 - W, by Newton's method: the
- * flight of a constant drag coefficient in a range wind W.
- */
+/** x = W t + ln(1 + k u0 t) / k with u0 = v0 - W, the flight of a constant drag coefficient in a range wind W, solved for `range` by Newton's method. */
 function rangeWindTime(k: number, v0: number, w: number, range: number) {
   const u0 = v0 - w
   let t = range / v0
@@ -113,8 +109,7 @@ describe('range wind with a constant drag coefficient', () => {
   }
 
   it('shortens the flight time by W k t^2 to first order in a small range wind', () => {
-    // d/dW of the closed form at W = 0: the ground distance grows by W t a / (1 + a), a = k v0 t,
-    // and the speed there is v0 / (1 + a)
+    // d/dW of the closed form at W = 0: the ground distance grows by W t a / (1 + a), a = k v0 t, and the speed there is v0 / (1 + a)
     const w = 0.5
     const still = run(0, [300, 600, 1000])
     run(w, [300, 600, 1000]).forEach((q, i) => {

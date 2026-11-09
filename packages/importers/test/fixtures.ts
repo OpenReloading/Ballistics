@@ -46,10 +46,7 @@ export const template = [
   '42.5 gr,2831,fps,,',
 ].join('\n')
 
-/**
- * English ShotView XLSX worksheet in fps, as a read workbook gives it: session name in row 1,
- * title-case header, cells only in the columns that hold values, no `-` rows.
- */
+/** As a read workbook gives it, in fps: session name in row 1, title-case header, cells only in the columns that hold values, no `-` rows. */
 export const shotViewSheetEnglish = {
   name: 'Test load A 08_Mar@14-09',
   rows: [

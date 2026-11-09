@@ -108,8 +108,7 @@ it("takes the capacity's tolerance while the volume follows the seating, none fo
 })
 
 it('reads the cavity bracket and the seated values in the fields from the snapshot a run takes (#970)', () => {
-  // a hollow base of assumed cavity depth (invented demo values): the render before seated it 8 mm
-  // deep, its volume in the field
+  // a hollow base of assumed cavity depth (invented demo values): the render before seated it 8 mm deep, its volume in the field
   const before = {
     seated: { volume: 0.62e-6, depth: 8e-3, cavityRange: { low: 0.61e-6, high: 0.63e-6 } },
     fields: { volume: { text: '0.62', si: 0.62e-6 } },
@@ -125,8 +124,7 @@ it('reads the cavity bracket and the seated values in the fields from the snapsh
   expect(run.volumeFraction).toBeDefined()
   expect(run.volumeFraction).not.toBe(runSeatingOf(before).volumeFraction)
   expect(run.fromSeating).toEqual(['volume'])
-  // the render's state mixed with the form's values now: the field no longer holds the seated
-  // volume, so the bracket is dropped
+  // the render's state mixed with the form's values now: the field no longer holds the seated volume, so the bracket is dropped
   const mixed = runSeatingOf({ ...before, fields: arrived.fields })
   expect(mixed).toMatchObject({ volumeFraction: undefined, fromSeating: [] })
 })

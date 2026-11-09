@@ -2,10 +2,7 @@ import { InputError, nth } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
 import { estimateDragFromOutline, outlineDragMach } from '../src/exterior/outline-drag.ts'
 
-// Printed outputs of McCoy, ARBRL-TR-02293, Figures 26 to 28 (pp. 57 to 59), three decimals, so a
-// computed value matches within half a unit of the last printed digit plus 1e-5 for the constants
-// the report's listing rounds (0.4343, 1.2732, 1.4286, 3.1416). Columns: C_D0, C_DH, C_DSF,
-// C_DRB, C_DBT, C_DB, p_B / p_inf.
+// Printed outputs of McCoy, ARBRL-TR-02293, Figures 26 to 28 (pp. 57 to 59), three decimals, matched within half a unit of the last digit plus 1e-5 for the constants the report's listing rounds (0.4343, 1.2732, 1.4286, 3.1416); columns C_D0, C_DH, C_DSF, C_DRB, C_DBT, C_DB, p_B / p_inf.
 type Row = readonly [number, number, number, number, number, number, number]
 const half = 0.0005 + 1e-5
 

@@ -2,9 +2,7 @@ import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
 import { storeUnits } from './units.ts'
 
-// The workspace folder of the Save options menu
-// Headless Chromium 153 (Playwright's build) crashes the page reading an origin-private directory
-// handle back from IndexedDB, so the folder offered on the next visit is not run here.
+// The workspace folder of the Save options menu; headless Chromium 153 (Playwright's build) crashes the page reading an origin-private directory handle back from IndexedDB, so the folder offered on the next visit is not run here.
 
 test.beforeEach(async ({ page }) => {
   await storeUnits(page)

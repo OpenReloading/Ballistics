@@ -26,11 +26,7 @@ const browserSources = [
   ].map((p) => `packages/${p}/src`),
 ]
 
-/**
- * Built-ins that Chrome and Edge 111, Firefox 121 or Safari 16.4 lack (MDN browser compatibility
- * data), as each is called. The Set methods `union`, `intersection` and `difference` are left out:
- * zod's `z.union` would match.
- */
+/** Lacking in Chrome and Edge 111, Firefox 121 or Safari 16.4 (MDN browser compatibility data), as each is called; the Set methods `union`, `intersection` and `difference` are left out, as zod's `z.union` would match. */
 const newer: [name: string, pattern: RegExp][] = [
   ['URL.canParse', /\bURL\.canParse\b/],
   ['URL.parse', /\bURL\.parse\b/],

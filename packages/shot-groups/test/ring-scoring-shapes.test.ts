@@ -114,8 +114,7 @@ describe('scoreShot on an oval face, off the axes', () => {
   })
 })
 
-// 9: 100 wide, 160 high (half circle ends of radius 50 about y = +-30); 10: 40 wide, 100 high,
-// its inner ten 20 wide and 60 high
+// 9: 100 wide, 160 high (half circle ends of radius 50 about y = +-30); 10: 40 wide, 100 high, its inner ten 20 wide and 60 high
 const stadium = faceOf(
   [
     { value: 9, w: 100, h: 160, shape: 'stadium' },

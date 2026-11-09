@@ -1,8 +1,4 @@
-/**
- * React's hooks for one hook or component called as a plain function, for the tests without a DOM:
- * state and refs kept by call order across renders, effects run after each render when their
- * dependencies change, cleanups on the next run and on `unmount`. Mock `react` with `fakeHooks`.
- */
+/** React's hooks for a hook or component called as a plain function without a DOM: state and refs by call order across renders, effects after each render when their dependencies change, cleanups on the next run and on `unmount`; mock `react` with `fakeHooks`. */
 type Effect = { deps: readonly unknown[] | undefined; cleanup: (() => void) | undefined }
 
 let slots: unknown[] = []

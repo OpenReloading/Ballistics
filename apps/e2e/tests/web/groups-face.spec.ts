@@ -4,8 +4,7 @@ import { gotoHydrated } from './nav.ts'
 import { toolbarPopover } from './target.ts'
 import { storeUnits } from './units.ts'
 
-// The target face on a photo sets the scale, the centre and the face of the group, and the holes
-// are found once the photo is added, without a click
+// the target face on a photo sets the scale, the centre and the face of the group, and the holes are found once the photo is added, without a click
 test.beforeEach(async ({ page }) => {
   await storeUnits(page)
 })
@@ -17,10 +16,7 @@ const PX_PER_MM = 7.5
 /** Photo px of the face centre. */
 const C = { x: 700, y: 650 }
 
-/**
- * A photo drawn in the page from the record of a face: black area, ring lines and dark holes of
- * 4.5 mm at `holes` (face mm), 1400 x 1300 px at 7.5 px per mm, seen from the front.
- */
+/** Drawn in the page from a face record: black area, ring lines and dark holes of 4.5 mm at `holes` (face mm), 1400 x 1300 px at 7.5 px per mm, seen from the front. */
 async function facePng(
   page: Page,
   id: string,

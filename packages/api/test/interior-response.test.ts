@@ -12,10 +12,7 @@ const api = withApi({ compute: inlineRunner })
 /** The 200 schema of the route `name`, as the app documents it. */
 const response = (name: string) => defined(operations.find((o) => o.name === name)).response
 
-/**
- * Checks a 200 body against the zod schema and against its JSON Schema of the contract document,
- * also with a field added at the top and in the first object `extra` names.
- */
+/** Against the zod schema and its JSON Schema of the contract document, also with a field added at the top and in the first object `extra` names. */
 function check(schema: z.ZodType, body: Record<string, unknown>, extra: string) {
   const { json, validate } = checkBody(schema, body)
   expect(json).not.toHaveProperty('$defs')

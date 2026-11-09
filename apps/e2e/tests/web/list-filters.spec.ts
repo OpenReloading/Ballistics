@@ -1,8 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
 
-// The choice filters of the Database lists: kept in the URL, counted, cleared, and opened by a
-// link. The counting and the URL format are Vitest tests (`apps/web/test/facets.test.ts`).
+// The choice filters of the Database lists: kept in the URL, counted, cleared and opened by a link; the counting and the URL format are Vitest tests (`apps/web/test/facets.test.ts`).
 test('a discipline filtered by federation and a distance in yards survives a reload and clears', async ({
   page,
 }) => {

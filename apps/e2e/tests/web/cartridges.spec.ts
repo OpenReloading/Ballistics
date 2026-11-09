@@ -198,9 +198,7 @@ test('printed on A4, a name with its aliases takes at most two lines', async ({ 
   expect(Math.max(...heights)).toBeLessThanOrEqual(2 * Math.min(...heights))
 })
 
-// the cartridge record: RecordPage with the fact cards and the
-// two sides, a panel each for the cartridge and the chamber with its drawing beside its table, both
-// always shown, the rows and the drawn dimensions linked by symbol
+// the cartridge record: RecordPage with the fact cards and both sides always shown, cartridge and chamber in a panel each with the drawing beside the table, the rows and the drawn dimensions linked by symbol
 
 type Side = 'Cartridge' | 'Chamber'
 /** The side's panel: its drawing and its table. */

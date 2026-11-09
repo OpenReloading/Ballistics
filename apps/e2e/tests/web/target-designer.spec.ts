@@ -3,8 +3,7 @@ import { AxeBuilder } from './a11y.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 
-// A face entered in the designer is drawn at the entered diameters, kept in the browser and
-// offered by the shot groups
+// A face entered in the designer is drawn at the entered diameters, kept in the browser and offered by the shot groups
 test.beforeEach(async ({ page }) => {
   await storeUnits(page)
 })

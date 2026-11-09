@@ -18,8 +18,7 @@ test('the result chart returns to the panel width after printing', async ({ page
   // wider than the print width, so the print draws it narrower
   expect(before).toBeGreaterThan(680)
 
-  // the print dialog: `beforeprint` draws at the print width, and `afterprint` comes while the print
-  // layout still hides the panel, with no frame between in which the box could be seen to change
+  // the print dialog: `beforeprint` draws at the print width, and `afterprint` comes while the print layout still hides the panel, with no frame between in which the box could be seen to change
   await page.evaluate(() => {
     const panel = document.querySelector<HTMLElement>('.plain-chart')
     if (!panel) throw new Error('no result chart')

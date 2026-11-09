@@ -7,11 +7,7 @@ import {
   trajectory,
 } from '../src/index.ts'
 
-// A 168 gr, 0.308 in bullet of 3.98 calibres at 2600 ft/s in sea-level standard air, G7 ballistic
-// coefficient 0.218 lb/in2. The coefficients are chosen for this comparison, not measured: inertias
-// of 0.10 (axial) and 1.0 (transverse) times m d^2, a lift slope of 2.1, and an overturning-moment
-// slope of 1.81 at Mach 2.4 (a gyroscopic stability factor of 1.7 at the muzzle for the 12 in
-// twist) that rises linearly to 4.0 at Mach 0.8.
+// A 168 gr, 0.308 in bullet of 3.98 calibres at 2600 ft/s in sea-level standard air, G7 BC 0.218 lb/in2; chosen, not measured: inertias 0.10 (axial) and 1.0 (transverse) times m d^2, lift slope 2.1, overturning-moment slope 1.81 at Mach 2.4 (gyroscopic stability 1.7 at the muzzle for the 12 in twist) rising linearly to 4.0 at Mach 0.8.
 const yd = 0.9144
 const inch = 0.0254
 const mph = 0.44704
@@ -54,8 +50,7 @@ const drift = (twist: number, model: 'point-mass' | 'modified-point-mass') =>
 const jump = (twist: number, model: 'point-mass' | 'modified-point-mass') =>
   Math.abs(nth(trajectory(shot(twist, 10), ranges, { model }).points, 0).jump / inch)
 
-// Fit over modified point mass, spin drift at 600 and 1000 yd. The 1000 yd ratios are the ones the
-// fit comparison reports (11.56, 14.50 and 9.78 in over 9.32, 11.19 and 7.99 in).
+// Fit over modified point mass, spin drift at 600 and 1000 yd; the 1000 yd ratios are those the fit comparison reports (11.56, 14.50 and 9.78 in over 9.32, 11.19 and 7.99 in).
 const cases = [
   { twist: 10, fit: 14.5, ratio600: 1.38, ratio1000: 1.3 },
   { twist: 12, fit: 11.56, ratio600: 1.32, ratio1000: 1.24 },

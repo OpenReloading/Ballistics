@@ -71,8 +71,7 @@ describe('advance', () => {
     expect(advance(0.4, 0.1, 1, [0.5])).toBe(0.5)
   })
 
-  // frames from 1 ms of slowed-down time (50000 times) to 100 ms (the cap) at 1000 times: the
-  // simulated step is the wall time over the factor, 1.7e-8 to 1e-4 s
+  // frames from 1 ms of slowed-down time (50000 times) to 100 ms (the cap) at 1000 times: the simulated step is the wall time over the factor, 1.7e-8 to 1e-4 s
   for (const [name, lo, hi, seeds] of [
     ['short', 1.7e-8, 1e-7, 4],
     ['long', 1e-6, 1e-4, 200],

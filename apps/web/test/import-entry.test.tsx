@@ -282,8 +282,7 @@ it('folds a high-tier card to 2 tab stops and opens every control of it unfolded
   expect(shut).toContain('Table of bullets (high)')
   expect(shut).toContain('Kind and columns')
   const open = html(<FileCard e={{ ...entry, touched: true }} shared="" actions={noActions} />)
-  // Remove, the kind, field of the name column, field, unit and decimal mark of the two number
-  // columns, Save mapping as (Save mapping is disabled while it is empty), the source of the file
+  // Remove, the kind, field of the name column, field, unit and decimal mark of the two number columns, Save mapping as (Save mapping is disabled while it is empty), the source of the file
   expect(tabStops(open)).toHaveLength(1 + 1 + 1 + 3 + 3 + 1 + 1)
   expect(open).toContain('Table of bullets (chosen)')
   expect(open).toContain('Source of this file')

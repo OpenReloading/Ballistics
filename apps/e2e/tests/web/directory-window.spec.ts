@@ -25,8 +25,7 @@ test('scrolled to the end, the cartridge list renders the last row and still a b
 test('the records of the browser arriving after a scroll leave the list where it is', async ({
   page,
 }) => {
-  // the store's reads answer 1.5 s late, after the scroll below; `pending` counts the reads not yet
-  // answered, `answered` those answered, so both together tell that the chain of reads is over
+  // the store's reads answer 1.5 s late, after the scroll below; `pending` counts the reads not yet answered, `answered` those answered, so both together tell that the chain of reads is over
   await page.addInitScript(() => {
     const w = window as unknown as { pending: number; answered: number }
     w.pending = 0

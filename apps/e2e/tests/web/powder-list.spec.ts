@@ -2,8 +2,7 @@ import { expect, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
 import { putRecords } from './user-store.ts'
 
-// The powder list: the training rows a powder model rests on as a sortable count, and the browser's
-// own powders as Mine rows that the burn-rate overlay takes
+// The powder list: the training rows a powder model rests on as a sortable count, and the browser's own powders as Mine rows that the burn-rate overlay takes
 
 /** A powder design with a burn law, as the designer saves it, in stored units. */
 const design = {

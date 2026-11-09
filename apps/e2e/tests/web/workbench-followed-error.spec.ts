@@ -6,8 +6,7 @@ import { applyExampleLoad, loadForm } from './workbench.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
-// a reopened load's usable volume follows the seated bullet once the records are back; Run pressed
-// while it arrives keeps no "Enter a number" on the field that then holds it (#870)
+// a reopened load's usable volume follows the seated bullet once the records are back; Run pressed while it arrives keeps no "Enter a number" on the field that then holds it (#870)
 test('Run pressed while the seated volume arrives leaves no error on the volume', async ({
   page,
 }) => {
@@ -37,8 +36,7 @@ test('Run pressed while the seated volume arrives leaves no error on the volume'
   const volume = loadForm(page).getByRole('textbox', { name: /^Usable case volume/ })
   await expect(volume).toHaveValue('')
 
-  // once the bullet record shows, Ctrl+Enter again and again between the page's own tasks until the
-  // volume shows: one lands after the seated volume is written and before the page has drawn it
+  // once the bullet record shows, Ctrl+Enter again and again between the page's own tasks until the volume shows: one lands after the seated volume is written and before the page has drawn it
   await page.evaluate(() => {
     const form = document.querySelector('form[aria-label="Load"]') as HTMLFormElement
     const field = (label: string) => {

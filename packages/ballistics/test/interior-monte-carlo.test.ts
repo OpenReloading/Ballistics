@@ -66,9 +66,7 @@ describe('sampledBand', () => {
     const samples = 4000
     const band = sampledBand(toy, { apply: toyApply, run: closed }, t, sampling({ samples }))
     const p0 = closed(toy).pressure
-    // a tolerance is the 90 % interval, so the percentiles of a linear response sit at the ends of
-    // the tolerance; the 5th and 95th percentile of `samples` draws have a standard error of
-    // sqrt(0.05 * 0.95 / samples) / density(1.645 sigma) in sigmas
+    // a tolerance is the 90 % interval, so a linear response's percentiles sit at the tolerance's ends; the 5th and 95th percentile of `samples` draws have a standard error of sqrt(0.05 * 0.95 / samples) / density(1.645 sigma) in sigmas
     const sigma = 1 / 1.6448536269514722
     const density = Math.exp(-(1.6448536269514722 ** 2) / 2) / Math.sqrt(2 * Math.PI)
     const error = (Math.sqrt((0.05 * 0.95) / samples) / density) * sigma * t.burnRateFraction

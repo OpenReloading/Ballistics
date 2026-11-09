@@ -9,8 +9,7 @@ import { applyMatrix } from '../src/lib/target-geometry.ts'
 import { defined } from './defined.ts'
 import { type Camera, faceById, faces, project, render, type Scene } from './face-render.ts'
 
-// The photos people take of a sheet (`photoScene`): the face search and the hole detection on the
-// face it finds, as the editor runs them. One test file per face, so they run in parallel.
+// The photos people take of a sheet (`photoScene`): the face search and the hole detection on the face it finds, as the editor runs them; one test file per face, so they run in parallel.
 
 /** The photos people take of a sheet: the whole sheet, the insert card, zoomed in, off centre, cut at the edges, skewed, poor. */
 export const photoKinds = ['whole', 'insert', 'zoom', 'corner', 'cut', 'skewed', 'poor'] as const
@@ -74,11 +73,7 @@ const holeSpots: [number, number][] = [
   [-0.65, -0.25],
 ]
 
-/**
- * A sheet of `face` photographed as `kind`, 1200 x 900 px (`poor`: 640 x 480), with six holes of
- * `bullet` mm in its black area. `poor` has uneven light, a shadow, blur and noise; a test adds the
- * JPEG compression.
- */
+/** 1200 x 900 px (`poor`: 640 x 480 with uneven light, a shadow, blur and noise), six holes of `bullet` mm in the black area; a test adds the JPEG compression. */
 export function photoScene(face: TargetFace, kind: PhotoKind, bullet: number): Scene {
   const [W, H] = kind === 'poor' ? [640, 480] : [1200, 900]
   const outer = defined(face.rings[0]).diameter.value / 2
@@ -231,10 +226,7 @@ export async function measure(id: string, kind: PhotoKind, bullet: number): Prom
   return { ...row, holes: used.size, of: truth.length, extra: found.length - used.size }
 }
 
-/**
- * The face right, applied without a question (`sure`) or offered with the faces the photo cannot
- * tell apart, its centre within 0.6 % of the outer radius and its scale within 1 %.
- */
+/** Applied without a question (`sure`) or offered with the faces the photo cannot tell apart, its centre within 0.6 % of the outer radius and its scale within 1 %. */
 export function expectFace(row: Row, outer: number, sure: boolean) {
   expect(row.face).toMatch(sure ? /^right sure$/ : /^right ask \d+$/)
   expect(row.centreMm).toBeLessThan(0.006 * outer)

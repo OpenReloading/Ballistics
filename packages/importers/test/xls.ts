@@ -1,7 +1,6 @@
 /// <reference types="node" />
 
-// Test .xls files written with Buffer, independent of the reader under test: BIFF8 records
-// ([MS-XLS] 2.1.4, 2.4) in a compound file ([MS-CFB] 2.2 to 2.6).
+// Test .xls files written with Buffer, independent of the reader under test: BIFF8 records ([MS-XLS] 2.1.4, 2.4) in a compound file ([MS-CFB] 2.2 to 2.6).
 
 import { defined } from './defined.ts'
 
@@ -95,11 +94,7 @@ export const rkFloat = (x: number, x100 = false) => {
   return ((b.readUInt32LE(4) & 0xfffffffc) | (x100 ? 1 : 0)) >>> 0
 }
 
-/**
- * Writes record data that may continue in Continue records of at most `chunk` bytes. Fixed
- * fields stay in one record; characters that do not fit go on in the next record after a flag
- * byte; run and phonetic bytes are split anywhere.
- */
+/** Continue records of at most `chunk` bytes: fixed fields stay in one record, characters that do not fit go on in the next after a flag byte, run and phonetic bytes split anywhere. */
 class Records {
   private out: Buffer[] = []
   private current: number[] = []

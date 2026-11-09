@@ -1,5 +1,4 @@
-// Synthetic photos of the target faces of packages/catalog/records/target-faces for the face search:
-// the face drawn from its record, seen by a pinhole camera.
+// Synthetic photos of the target faces of packages/catalog/records/target-faces for the face search: the face drawn from its record, seen by a pinhole camera.
 import { readdirSync, readFileSync } from 'node:fs'
 import type { Federation, TargetFace } from '@open-reloading/schema'
 import { type Face, withOrganization } from '../src/lib/face-organization.ts'

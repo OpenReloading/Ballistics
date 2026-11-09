@@ -12,8 +12,7 @@ import { putRecords } from './user-store.ts'
 import { applyExampleLoad, loadForm } from './workbench.ts'
 import { runExample } from './workbench-run.ts'
 
-// The states a visitor reaches after a click: a record page of each `[id]` route, the workbench
-// after a run and every dialog or drawer. a11y-sweep.spec.ts has the pages as they load.
+// The states a visitor reaches after a click: a record page of each `[id]` route, the workbench after a run and every dialog or drawer; a11y-sweep.spec.ts has the pages as they load.
 
 test.beforeEach(({ page }) => storeUnits(page))
 

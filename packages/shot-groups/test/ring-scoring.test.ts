@@ -88,8 +88,7 @@ describe('scoreShot', () => {
 describe('scoreShot under the rules of an event', () => {
   it('counts the hole center only for a center-scored event, and gauges outward', () => {
     expect(scoredHoleDiameter({ id: 'black-powder', scoring: 'centre' }, 7 * mm)).toBe(0)
-    // on the 9 ring line (13.2 mm) with a 5.6 mm hole: 9 by touch; outward its far edge at 16 mm
-    // lies beyond the 9 ring, so 8
+    // on the 9 ring line (13.2 mm) with a 5.6 mm hole: 9 by touch; outward its far edge at 16 mm lies beyond the 9 ring, so 8
     expect(scoreShot(rifle50, at(13.2), 5.6 * mm).value).toBe(9)
     expect(scoreShot(rifle50, at(13.2), 5.6 * mm, true).value).toBe(8)
   })

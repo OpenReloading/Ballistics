@@ -4,8 +4,7 @@ import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
-// What the comment of src/url.d.ts relies on: its `var URL` conflicts with the DOM's and Node's instead of merging,
-// so the file must reach no compile that has them, and the build leaves it out of the package.
+// What the comment of src/url.d.ts relies on: its `var URL` conflicts with the DOM's and Node's instead of merging, so the file must reach no compile that has them, and the build leaves it out of the package.
 const tsc = createRequire(import.meta.url)
   .resolve('typescript/package.json')
   .replace(/package\.json$/, 'bin/tsc')

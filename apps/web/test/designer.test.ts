@@ -357,10 +357,7 @@ it('extreme typed values give a drawing or a reason, never a throw', () => {
 
 type Choices = readonly (readonly [ChoiceKey, readonly string[]])[]
 
-/**
- * Largest value a random edit types, SI: fixed for the diameter and mass, else in diameters
- * (rounded up to whole mm), widened by a larger present value.
- */
+/** SI: fixed for the diameter and mass, else in diameters (rounded up to whole mm), widened by a larger present value. */
 function editMax(key: string, design: Design): number {
   const d = toSi('length', Math.ceil(fromSi('length', defined(design.fields.diameter?.si))))
   const max: Record<string, number> = {
@@ -398,8 +395,7 @@ function randomAction(rnd: () => number, h: History, choices: Choices): Action {
   const max = metric[spec.quantity].fromSi(
     axial ? Math.min(editMax(key, h.present), length) : editMax(key, h.present),
   )
-  // clearing a field often, so the sequence leaves refused states again
-  // the required diameter stays a number here; its empty and invalid text is tested above
+  // clearing a field often, so the sequence leaves refused states again; the required diameter stays a number here, its empty and invalid text tested above
   const pick = key === 'diameter' ? 1 : rnd()
   const text = pick < 0.35 ? '' : pick < 0.38 ? 'x' : String(+(rnd() * max).toFixed(3))
   return type(key, text)

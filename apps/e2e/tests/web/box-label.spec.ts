@@ -6,8 +6,7 @@ import { storeUnits } from './units.ts'
 import { applyExampleLoad } from './workbench.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
-// the printed QR code is read from a screenshot: at 96 dpi a module is 2.9 px, which jsQR cannot
-// read for some codes; at 3 x it is 8.6 px
+// the printed QR code is read from a screenshot: at 96 dpi a module is 2.9 px, which jsQR cannot read for some codes; at 3 x it is 8.6 px
 test.use({ deviceScaleFactor: 3 })
 
 /** The label in each language: German row names are longer, the label must still hold them. */
@@ -20,8 +19,7 @@ for (const language of languages)
   test(`a saved load prints its box label of 90 x 60 mm with the QR code on A4 in ${language.name}`, async ({
     page,
   }, testInfo) => {
-    // neither dialog can be driven: the file goes to the origin private file system, and the page
-    // stays in its print state
+    // neither dialog can be driven: the file goes to the origin private file system, and the page stays in its print state
     await page.addInitScript(() => {
       ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
         (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
