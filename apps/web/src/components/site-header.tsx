@@ -245,8 +245,7 @@ export function SiteHeader() {
   const barEnd = wide ? shownEnd : null
   const topEnd = (
     <div className="top-end">
-      {/* a slot kept while nothing is offered, so an offer moves nothing; from 75em Install is
-          at the sidebar's foot, which leaves the page bar its width */}
+      {/* a slot kept while nothing is offered, so an offer moves nothing; from 75em Install is at the sidebar's foot, which leaves the page bar its width */}
       <Box hiddenFrom="lg" className="install-slot">
         <InstallButton position="bottom" />
       </Box>
@@ -277,9 +276,7 @@ export function SiteHeader() {
         </Group>
       </AppShellHeader>
       <AppShellNavbar component="div" visibleFrom="lg" p="sm" className="sidebar">
-        {/* hidden below 75em, so one navigation "Main" is in the tree at any width. The links scroll in
-            a window shorter than they are; the foot (Install, Settings) is outside that box, so it
-            stays in view and nothing pressed at the box's edge makes it scroll (globals.css) */}
+        {/* hidden below 75em, so one navigation "Main" is in the tree at any width; the foot (Install, Settings) sits outside the box of scrolling links, so it stays in view and nothing pressed at the box's edge makes it scroll (globals.css) */}
         <AppShellSection grow component="nav" aria-label={t('Main')} className="rail">
           <Stack gap="xs" className="rail-links">
             <Stack gap={0} align="center">

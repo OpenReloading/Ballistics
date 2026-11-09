@@ -875,8 +875,7 @@ function GroupPanel({ ed }: { ed: Ed }) {
   const colours = coloursOf(group, t)
   return (
     <div className="prop-grid">
-      {/* above the list: a delete that shortens the list moves neither button (a double click
-          deletes two groups) */}
+      {/* above the list: a delete that shortens the list moves neither button (a double click deletes two groups) */}
       <span className="row-buttons wide group-actions">
         <Button
           size={controlSize.row.button}
@@ -2506,8 +2505,7 @@ function SheetPageBar({ ed }: { ed: Ed }) {
       translated
       actions={
         <>
-          {/* from the sheet's id on: the menu never runs without autosave; a placeholder keeps
-              its place until then */}
+          {/* from the sheet's id on, as the menu never runs without autosave; a placeholder keeps its place until then */}
           {meta.id ? (
             <FileMenu
               kind="targetSheet"
@@ -3052,7 +3050,7 @@ export function TargetEditor({
   const reloadLatest = useRef(reloadSheets)
   reloadLatest.current = reloadSheets
 
-  /** Also the sheet shown when another writer (Import, Replace) changed it, so the next save does not write the old sheet over it. */
+  /** Reads the list again, and the sheet shown when another writer (Import, Replace) changed it, so the next save does not write the old sheet over it. */
   const reloadStored = () => {
     void reloadSheets()
     const id = shown.current
@@ -3140,7 +3138,7 @@ export function TargetEditor({
     }
   }, [sheet.photo])
 
-  /** After another tab saved the sheet since, whose save stays. */
+  /** Keeps `record` (an edit of `data`) as a sheet of its own after another tab saved the sheet; that save stays. */
   const keepOwn = useRef(async (record: TargetSheetRecord, data: TargetSheet) => {
     // a later save of the sheet keeps this edit with its own
     if (bases.current.get(record.id) !== record.saved) return

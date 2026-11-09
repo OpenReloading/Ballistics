@@ -2234,8 +2234,7 @@ function SeatingValues({ m, seating, chamber }: RowsProps) {
         </p>
       )}
       <dl>
-        {/* in the workbench's card the field shows the mode's length with its L6 flag and
-            this list the other one, so both modes keep one height */}
+        {/* in the workbench's card the field shows the mode's length with its L6 flag and this list the other one, so both modes keep one height */}
         {(!card || mode === 'baseToOgive') && <CoalRow {...rows} />}
         {(!card || mode !== 'baseToOgive') && <CbtoRow {...rows} />}
         <Row
@@ -2273,8 +2272,7 @@ function PreviewBody({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Cham
       <SeatingFigure m={m} spec={spec} chamber={chamber} />
       {seating &&
         put(slots, <SeatingValues m={m} seating={seating} chamber={chamber} />, slots?.cartridge)}
-      {/* in the workbench the notes (staying below L6 says nothing about pressure or safety) sit in
-          the Cartridge card's More, beside the further values */}
+      {/* in the workbench the notes (staying below L6 says nothing about pressure or safety) sit in the Cartridge card's More, beside the further values */}
       {slots?.more &&
         seating &&
         createPortal(

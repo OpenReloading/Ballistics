@@ -128,7 +128,7 @@ function endSection({
   return chevron ? <Combobox.Chevron /> : undefined
 }
 
-/** 300 ms after the last keystroke, the previous request aborted; `find` gives the matches instead, without the pause; Enter with no match highlighted chooses the only one. */
+/** Searches the API list of `kind` (`apiFetch`) 300 ms after the last keystroke, the previous request aborted; `find` gives the matches instead, without the pause; Enter with no match highlighted chooses the only one. */
 export function RecordSearch<T extends { id: string }>({
   kind,
   label,

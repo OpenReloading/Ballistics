@@ -578,7 +578,7 @@ function ChargeInput({
   )
 }
 
-/** When another powder is picked (a design's id before its powder's, which a record and its designs share), as its parameters go into the fields the later rows read. */
+/** Cancels the run when another powder is picked (a design's id before its powder's, which a record and its designs share), as its parameters go into the fields the later rows read. */
 function useCancelOnPick(
   design: string | undefined,
   powder: string | undefined,

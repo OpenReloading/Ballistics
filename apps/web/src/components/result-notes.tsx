@@ -55,9 +55,7 @@ export function ResultNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> }) {
           )
         })}
       </ul>
-      {/* More and the guide link share one cell as wide as the wider, the other hidden: a swap
-          between them changes no width, so the list cannot start and stop scrolling over it.
-          Without a docs site More is alone, and only there when needed. */}
+      {/* More and the guide link share one cell as wide as the wider, so a swap changes no width and the list cannot start and stop scrolling over it; without a docs site More is alone, and only there when needed. */}
       {(hasMore || howCloseGuide) && (
         <div className="result-notes-control">
           <Button

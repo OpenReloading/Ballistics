@@ -74,7 +74,7 @@ function Text({
   )
 }
 
-/** A table maps it, else the owner itself; not the note flags, detail letters, the axis, the outline and lengths the record does not give. */
+/** The symbol a dimension stands for (`data-symbol`): a table maps it, else the owner itself; not the note flags, detail letters, the axis, the outline and lengths the record does not give. */
 export type Linked = true | Record<string, string>
 const symbolOf = (linked: Linked | undefined, owner: string) =>
   linked === undefined
