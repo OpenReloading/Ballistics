@@ -71,7 +71,16 @@ describe('the catalogue lint', () => {
     const english = ['Wind', 'Open', '{a}: {b}', '{count} file|{count} files']
     expect(
       problems(
-        ['Value {n}', 'Missing', 'Listed', 'New', '{count} row|{count} rows', 'Busy', 'Done', ...english],
+        [
+          'Value {n}',
+          'Missing',
+          'Listed',
+          'New',
+          '{count} row|{count} rows',
+          'Busy',
+          'Done',
+          ...english,
+        ],
         catalogue,
         'de',
         ['Busy', 'Missing'],
