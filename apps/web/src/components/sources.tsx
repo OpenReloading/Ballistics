@@ -150,7 +150,9 @@ function SourceRow({
 
 /** The document a source cites: the sources of one document share these. */
 const documentKey = (s: Source) =>
-  [s.title, s.url, s.publisher, s.edition, s.sha256, s.terms].map((v) => v ?? '').join('\u0000')
+  [s.title, s.entry, s.url, s.publisher, s.edition, s.sha256, s.terms]
+    .map((v) => v ?? '')
+    .join('\u0000')
 
 /** The sources in their order, those of one document together at the place of its first. */
 export function groupSources(list: readonly Source[]): Source[][] {

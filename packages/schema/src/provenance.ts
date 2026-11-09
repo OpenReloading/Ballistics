@@ -150,10 +150,16 @@ export const source: z.ZodObject<{
   /** The fit run behind a `fitted` source: model version id the report names, report of its evaluation. */
   run: z.ZodOptional<z.ZodObject<{ version: z.ZodString; report: z.ZodString }>>
   note: z.ZodOptional<z.ZodString>
-}> = sourceParser.refine((s) => s.title !== undefined || s.entry !== undefined, {
-  message: 'a source needs a title or an entry',
-  path: ['title'],
-}) satisfies Exact<typeof source, typeof sourceParser>
+}> = sourceParser
+  .refine((s) => s.title !== undefined || s.entry !== undefined, {
+    message: 'a source needs a title or an entry',
+    path: ['title'],
+  })
+  // the JSON Schemas cannot carry the refine: they state the same rule
+  .meta({ anyOf: [{ required: ['title'] }, { required: ['entry'] }] }) satisfies Exact<
+  typeof source,
+  typeof sourceParser
+>
 
 const sourceRecordParser = sourceParser
   .omit({ page: true, fields: true, kind: true, run: true, entry: true })

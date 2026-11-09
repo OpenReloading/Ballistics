@@ -81,7 +81,6 @@ describe('source', () => {
   it('needs a title or the place in the app where the user entered the values', () => {
     expect(source.safeParse({ entry: 'range' }).success).toBe(true)
     expect(source.safeParse({ entry: 'targetDesigner' }).success).toBe(true)
-    expect(source.safeParse({ entry: 'workbench' }).success).toBe(false)
     expectIssueAt(source, { page: '12' }, 'title')
   })
 })

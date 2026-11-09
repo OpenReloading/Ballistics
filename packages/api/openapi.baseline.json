@@ -989,7 +989,15 @@
                                 "description": "Note on the source."
                               }
                             },
-                            "additionalProperties": false
+                            "additionalProperties": false,
+                            "anyOf": [
+                              {
+                                "required": ["title"]
+                              },
+                              {
+                                "required": ["entry"]
+                              }
+                            ]
                           },
                           "description": "The sources of the values, at least one."
                         },
@@ -1293,7 +1301,15 @@
                                 "description": "Note on the source."
                               }
                             },
-                            "additionalProperties": false
+                            "additionalProperties": false,
+                            "anyOf": [
+                              {
+                                "required": ["title"]
+                              },
+                              {
+                                "required": ["entry"]
+                              }
+                            ]
                           },
                           "description": "The sources of the values, at least one."
                         },
@@ -1799,7 +1815,15 @@
                                 "description": "Note on the source."
                               }
                             },
-                            "additionalProperties": false
+                            "additionalProperties": false,
+                            "anyOf": [
+                              {
+                                "required": ["title"]
+                              },
+                              {
+                                "required": ["entry"]
+                              }
+                            ]
                           },
                           "description": "The sources of the values, at least one."
                         },
@@ -1993,7 +2017,15 @@
                                       "description": "Note on the source."
                                     }
                                   },
-                                  "additionalProperties": false
+                                  "additionalProperties": false,
+                                  "anyOf": [
+                                    {
+                                      "required": ["title"]
+                                    },
+                                    {
+                                      "required": ["entry"]
+                                    }
+                                  ]
                                 },
                                 "description": "The sources of the values, at least one."
                               },
@@ -2586,7 +2618,15 @@
                                 "description": "Note on the source."
                               }
                             },
-                            "additionalProperties": false
+                            "additionalProperties": false,
+                            "anyOf": [
+                              {
+                                "required": ["title"]
+                              },
+                              {
+                                "required": ["entry"]
+                              }
+                            ]
                           },
                           "description": "The sources of the values, at least one."
                         },
@@ -3230,7 +3270,15 @@
                                 "description": "Note on the source."
                               }
                             },
-                            "additionalProperties": false
+                            "additionalProperties": false,
+                            "anyOf": [
+                              {
+                                "required": ["title"]
+                              },
+                              {
+                                "required": ["entry"]
+                              }
+                            ]
                           },
                           "description": "The sources of the values, at least one."
                         },
@@ -3755,7 +3803,15 @@
                                 "description": "Note on the source."
                               }
                             },
-                            "additionalProperties": false
+                            "additionalProperties": false,
+                            "anyOf": [
+                              {
+                                "required": ["title"]
+                              },
+                              {
+                                "required": ["entry"]
+                              }
+                            ]
                           },
                           "description": "The sources of the values, at least one."
                         },
@@ -4679,7 +4735,15 @@
                                         "description": "Note on the source."
                                       }
                                     },
-                                    "additionalProperties": false
+                                    "additionalProperties": false,
+                                    "anyOf": [
+                                      {
+                                        "required": ["title"]
+                                      },
+                                      {
+                                        "required": ["entry"]
+                                      }
+                                    ]
                                   },
                                   "description": "The sources of the values, at least one."
                                 },
@@ -6310,7 +6374,15 @@
                                         "description": "Note on the source."
                                       }
                                     },
-                                    "additionalProperties": false
+                                    "additionalProperties": false,
+                                    "anyOf": [
+                                      {
+                                        "required": ["title"]
+                                      },
+                                      {
+                                        "required": ["entry"]
+                                      }
+                                    ]
                                   },
                                   "description": "The sources of the values, at least one."
                                 },
@@ -7852,7 +7924,15 @@
                                         "description": "Note on the source."
                                       }
                                     },
-                                    "additionalProperties": false
+                                    "additionalProperties": false,
+                                    "anyOf": [
+                                      {
+                                        "required": ["title"]
+                                      },
+                                      {
+                                        "required": ["entry"]
+                                      }
+                                    ]
                                   },
                                   "description": "The sources of the values, at least one."
                                 },
@@ -8286,7 +8366,15 @@
                                         "description": "Note on the source."
                                       }
                                     },
-                                    "additionalProperties": false
+                                    "additionalProperties": false,
+                                    "anyOf": [
+                                      {
+                                        "required": ["title"]
+                                      },
+                                      {
+                                        "required": ["entry"]
+                                      }
+                                    ]
                                   },
                                   "description": "The sources of the values, at least one."
                                 },
@@ -10046,7 +10134,15 @@
                                         "description": "Note on the source."
                                       }
                                     },
-                                    "additionalProperties": false
+                                    "additionalProperties": false,
+                                    "anyOf": [
+                                      {
+                                        "required": ["title"]
+                                      },
+                                      {
+                                        "required": ["entry"]
+                                      }
+                                    ]
                                   },
                                   "description": "The sources of the values, at least one."
                                 },
@@ -11459,7 +11555,15 @@
                                 "description": "Note on the source."
                               }
                             },
-                            "additionalProperties": false
+                            "additionalProperties": false,
+                            "anyOf": [
+                              {
+                                "required": ["title"]
+                              },
+                              {
+                                "required": ["entry"]
+                              }
+                            ]
                           },
                           "description": "The sources of the values, at least one."
                         },
@@ -12371,7 +12475,15 @@
                                             "description": "Note on the source."
                                           }
                                         },
-                                        "additionalProperties": false
+                                        "additionalProperties": false,
+                                        "anyOf": [
+                                          {
+                                            "required": ["title"]
+                                          },
+                                          {
+                                            "required": ["entry"]
+                                          }
+                                        ]
                                       },
                                       "description": "The sources of the values, at least one."
                                     },
@@ -13295,7 +13407,15 @@
                                             "description": "Note on the source."
                                           }
                                         },
-                                        "additionalProperties": false
+                                        "additionalProperties": false,
+                                        "anyOf": [
+                                          {
+                                            "required": ["title"]
+                                          },
+                                          {
+                                            "required": ["entry"]
+                                          }
+                                        ]
                                       },
                                       "description": "The sources of the values, at least one."
                                     },
@@ -14992,7 +15112,15 @@
                                         "description": "Note on the source."
                                       }
                                     },
-                                    "additionalProperties": false
+                                    "additionalProperties": false,
+                                    "anyOf": [
+                                      {
+                                        "required": ["title"]
+                                      },
+                                      {
+                                        "required": ["entry"]
+                                      }
+                                    ]
                                   },
                                   "description": "The sources of the values, at least one."
                                 },
@@ -15147,7 +15275,15 @@
                                         "description": "Note on the source."
                                       }
                                     },
-                                    "additionalProperties": false
+                                    "additionalProperties": false,
+                                    "anyOf": [
+                                      {
+                                        "required": ["title"]
+                                      },
+                                      {
+                                        "required": ["entry"]
+                                      }
+                                    ]
                                   },
                                   "description": "The sources of the values, at least one."
                                 },
@@ -17137,7 +17273,15 @@
                                         "description": "Note on the source."
                                       }
                                     },
-                                    "additionalProperties": false
+                                    "additionalProperties": false,
+                                    "anyOf": [
+                                      {
+                                        "required": ["title"]
+                                      },
+                                      {
+                                        "required": ["entry"]
+                                      }
+                                    ]
                                   },
                                   "description": "The sources of the values, at least one."
                                 },
@@ -17297,7 +17441,15 @@
                                         "description": "Note on the source."
                                       }
                                     },
-                                    "additionalProperties": false
+                                    "additionalProperties": false,
+                                    "anyOf": [
+                                      {
+                                        "required": ["title"]
+                                      },
+                                      {
+                                        "required": ["entry"]
+                                      }
+                                    ]
                                   },
                                   "description": "The sources of the values, at least one."
                                 },
@@ -17463,7 +17615,15 @@
                                         "description": "Note on the source."
                                       }
                                     },
-                                    "additionalProperties": false
+                                    "additionalProperties": false,
+                                    "anyOf": [
+                                      {
+                                        "required": ["title"]
+                                      },
+                                      {
+                                        "required": ["entry"]
+                                      }
+                                    ]
                                   },
                                   "description": "The sources of the values, at least one."
                                 },
@@ -20766,7 +20926,15 @@
                                             "minLength": 1,
                                             "description": "Note on the source."
                                           }
-                                        }
+                                        },
+                                        "anyOf": [
+                                          {
+                                            "required": ["title"]
+                                          },
+                                          {
+                                            "required": ["entry"]
+                                          }
+                                        ]
                                       },
                                       "description": "The sources of the values, at least one."
                                     },
@@ -21593,7 +21761,15 @@
                                             "minLength": 1,
                                             "description": "Note on the source."
                                           }
-                                        }
+                                        },
+                                        "anyOf": [
+                                          {
+                                            "required": ["title"]
+                                          },
+                                          {
+                                            "required": ["entry"]
+                                          }
+                                        ]
                                       },
                                       "description": "The sources of the values, at least one."
                                     },
@@ -23383,7 +23559,15 @@
                                             "minLength": 1,
                                             "description": "Note on the source."
                                           }
-                                        }
+                                        },
+                                        "anyOf": [
+                                          {
+                                            "required": ["title"]
+                                          },
+                                          {
+                                            "required": ["entry"]
+                                          }
+                                        ]
                                       },
                                       "description": "The sources of the values, at least one."
                                     },
@@ -24647,7 +24831,15 @@
                                             "minLength": 1,
                                             "description": "Note on the source."
                                           }
-                                        }
+                                        },
+                                        "anyOf": [
+                                          {
+                                            "required": ["title"]
+                                          },
+                                          {
+                                            "required": ["entry"]
+                                          }
+                                        ]
                                       },
                                       "description": "The sources of the values, at least one."
                                     },
@@ -25460,7 +25652,15 @@
                                 "description": "Note on the source."
                               }
                             },
-                            "additionalProperties": false
+                            "additionalProperties": false,
+                            "anyOf": [
+                              {
+                                "required": ["title"]
+                              },
+                              {
+                                "required": ["entry"]
+                              }
+                            ]
                           },
                           "description": "The sources of the values, at least one."
                         },
@@ -26418,7 +26618,15 @@
                                 "description": "Note on the source."
                               }
                             },
-                            "additionalProperties": false
+                            "additionalProperties": false,
+                            "anyOf": [
+                              {
+                                "required": ["title"]
+                              },
+                              {
+                                "required": ["entry"]
+                              }
+                            ]
                           },
                           "description": "The sources of the values, at least one."
                         },
@@ -26880,7 +27088,15 @@
                                 "description": "Note on the source."
                               }
                             },
-                            "additionalProperties": false
+                            "additionalProperties": false,
+                            "anyOf": [
+                              {
+                                "required": ["title"]
+                              },
+                              {
+                                "required": ["entry"]
+                              }
+                            ]
                           },
                           "description": "The sources of the values, at least one."
                         },
@@ -27548,7 +27764,15 @@
                                 "description": "Note on the source."
                               }
                             },
-                            "additionalProperties": false
+                            "additionalProperties": false,
+                            "anyOf": [
+                              {
+                                "required": ["title"]
+                              },
+                              {
+                                "required": ["entry"]
+                              }
+                            ]
                           },
                           "description": "The sources of the values, at least one."
                         },
@@ -27947,7 +28171,15 @@
                                 "description": "Note on the source."
                               }
                             },
-                            "additionalProperties": false
+                            "additionalProperties": false,
+                            "anyOf": [
+                              {
+                                "required": ["title"]
+                              },
+                              {
+                                "required": ["entry"]
+                              }
+                            ]
                           },
                           "description": "The sources of the values, at least one."
                         },

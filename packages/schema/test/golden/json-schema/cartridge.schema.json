@@ -306,7 +306,19 @@
                 "minLength": 1,
                 "description": "Note on the source."
               }
-            }
+            },
+            "anyOf": [
+              {
+                "required": [
+                  "title"
+                ]
+              },
+              {
+                "required": [
+                  "entry"
+                ]
+              }
+            ]
           },
           "description": "The sources of the values, at least one."
         },
