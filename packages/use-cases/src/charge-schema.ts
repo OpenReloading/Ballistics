@@ -1,9 +1,4 @@
-/**
- * Request schema of `POST /interior/charge-target`: the M3 `POST /interior` body without `model`
- * and `ladder`, plus the target and `load.propellant.bulkDensity`. `load.charge` is required as
- * in `/interior` and ignored by the solver. `options.maxSteps` is capped at `caps.chargeSteps`:
- * the solver runs up to 152 times in one compute task.
- */
+/** The M3 `POST /interior` body without `model` and `ladder`, plus the target and `load.propellant.bulkDensity`; `load.charge` is required as in `/interior` and ignored, and `options.maxSteps` capped at `caps.chargeSteps`, as the solver runs up to 152 times in one compute task. */
 import { z } from 'zod'
 import type { Exact } from './exact.ts'
 import {

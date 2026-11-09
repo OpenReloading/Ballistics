@@ -1,8 +1,4 @@
-/**
- * Ring scoring of shots on a rule-book target face (`apps/docs/docs/models/ring-scoring.md`) and the fit of a
- * face to ring marks on a sheet. Shots and holes in target m relative to the face centre, as the
- * target sheet stores them; face records in mm. A refusal is a `RingFitIssue` or a `GroupIssue`.
- */
+/** Ring scoring on a rule-book target face and the fit of a face to ring marks on a sheet (`apps/docs/docs/models/ring-scoring.md`); shots and holes in target m from the face centre, as the sheet stores them, face records in mm; a refusal is a `RingFitIssue` or a `GroupIssue`. */
 import { type Diagnostic, nth } from '@open-reloading/statistics'
 import { fromSi, toSi } from '@open-reloading/units'
 import { type Point, solveLinear } from './geometry.ts'
@@ -74,10 +70,7 @@ const touch = 1e-12
 /** Radius in m of a face diameter in mm. */
 const radius = (d: FaceLength): number => toSi('length', d.value / 2)
 
-/**
- * The scored hole diameter in m: 0 where the event counts the hole centre, else the event's gauge,
- * else the bullet diameter (m).
- */
+/** The scored hole diameter in m: 0 where the event counts the hole centre, else the event's gauge, else the bullet diameter (m). */
 export function scoredHoleDiameter<B extends number | undefined>(
   event: FaceEvent | undefined,
   bullet: B,
@@ -90,10 +83,7 @@ export function scoredHoleDiameter<B extends number | undefined>(
 
 type Shape = Pick<FaceRing, 'diameter' | 'height' | 'shape'>
 
-/**
- * Distance in m from a point to the filled ellipse of semi-axes `a` and `b`, 0 inside: bisection
- * on the root of the closest-point condition (Eberly 2013, "Distance from a point to an ellipse").
- */
+/** Distance in m from a point to the filled ellipse of semi-axes `a` and `b`, 0 inside: bisection on the root of the closest-point condition (Eberly 2013, "Distance from a point to an ellipse"). */
 function ellipseGap(a: number, b: number, x: number, y: number): number {
   // the longer axis along the first coordinate
   const [e0, e1, y0, y1] =
@@ -116,12 +106,7 @@ function ellipseGap(a: number, b: number, x: number, y: number): number {
   return Math.hypot((r0 * y0) / (t + r0) - y0, y1 / (t + 1) - y1)
 }
 
-/**
- * The hole of radius `g` (m) touches the area a ring line bounds, with the hole centre `p` in m
- * from the area's centre: a circle by the centre distance, an oval by the distance to its
- * ellipse, a square by the distance to its square (rounded at the corners), a stadium by the
- * distance to the segment between the centres of its end half circles, less their radius.
- */
+/** Hole radius `g` (m) and centre `p` in m from the area's centre: a circle by the centre distance, an oval by the distance to its ellipse, a square by the distance to its square (rounded at the corners), a stadium by the distance to the segment between its end circles' centres, less their radius. */
 function touches(ring: Shape, p: Point, g: number): boolean {
   const w = radius(ring.diameter)
   if (ring.shape === 'square')
@@ -146,13 +131,7 @@ function nearestBull(face: ScoringFace, shot: Point): { centre: Point; zone?: st
   return best
 }
 
-/**
- * Score of a hole of diameter `hole` (m) centred at `shot` (m from the face centre): the bull
- * nearest to the shot, then the highest ring whose outer edge the hole touches (`outward`: the
- * highest circular ring the whole hole lies inside, its far edge short of the outer edge of the
- * line), tenths of that ring's width counted inward from the touching position, and the inner ten
- * by the face's rule.
- */
+/** A hole of diameter `hole` (m) at `shot` (m from the face centre): the nearest bull, then the highest ring whose outer edge the hole touches (`outward`: the highest circular ring the whole hole lies inside, short of the line's outer edge), tenths counted inward from the touching position, and the inner ten by the face's rule. */
 export function scoreShot(
   face: ScoringFace,
   shot: Point,
@@ -215,14 +194,7 @@ export type RingMarks = { diameter: number; points: readonly Point[] }
 /** A face placed by its ring marks: centre and scale, and the RMS of the radial misfit, in point units. */
 export type RingFit = { centre: Point; scale: number; rmsMisfit: number }
 
-/**
- * Centre and scale (point units per diameter unit) of a face from points marked on two or more of
- * its rings: |p - centre| = scale x diameter / 2 solved by linear least squares in the centre, the
- * squared scale and |centre|^2 taken as a free unknown (an algebraic circle fit, Kasa 1976, with
- * one radius per ring). `rms` is the root mean square of the radial misfit in point units.
- * shortcut: algebraic fit, no perspective, rotation or ring-line thickness; upgrade to a geometric
- * fit through the photo homography when the editor uses faces as calibration references.
- */
+/** Centre and scale (point units per diameter unit) from marks on two or more rings: |p - centre| = scale x diameter / 2 by linear least squares in the centre, the squared scale and a free |centre|^2 (algebraic circle fit, Kasa 1976, one radius per ring); `rms` is the radial misfit in point units. shortcut: algebraic fit, no perspective, rotation or ring-line thickness; upgrade to a geometric fit through the photo homography when the editor uses faces as calibration references. */
 export function fitRings(marks: readonly RingMarks[]): RingFit | { issue: RingFitIssue } {
   const all = marks.flatMap((m) => m.points.map((p) => ({ p, r: m.diameter / 2 })))
   if (new Set(marks.filter((m) => m.points.length).map((m) => m.diameter)).size < 2)
@@ -252,10 +224,7 @@ function normaliseMarks(all: readonly MarkedPoint[]): MarkNormalisation {
   return { mx, my, sp, sr }
 }
 
-/**
- * Centre and scale by the normal equations of the algebraic circle fit on the normalised marks;
- * undefined when they have no solution or no positive squared scale.
- */
+/** By the normal equations of the algebraic circle fit on the normalised marks; undefined when they have no solution or no positive squared scale. */
 function solveCircleFit(
   all: readonly MarkedPoint[],
   { mx, my, sp, sr }: MarkNormalisation,
@@ -295,11 +264,7 @@ export const onSheet = (a: FaceAlignment, q: Point): Point => ({
   y: a.centre.y + q.y * a.scale,
 })
 
-/**
- * The face fitted to marks on its rings (`fitRings` on target m with diameters in mm, so its scale
- * is target m per face mm, times 1e3 here), else centred on `aim` (or the origin) at the
- * calibrated scale.
- */
+/** `fitRings` on target m with diameters in mm, so its scale is target m per face mm, times 1e3 here; else centred on `aim` (or the origin) at the calibrated scale. */
 export function faceAlignment(
   face: ScoringFace,
   marks: readonly FaceMark[] | undefined,
@@ -341,10 +306,7 @@ export function ringPath(a: FaceAlignment, diameter: number): Point[] {
   })
 }
 
-/**
- * The 10 zone (innermost ring touched) is wider than one ring width, so its tenths are the
- * project's own rule, not the rule book's (`apps/docs/docs/models/ring-scoring.md`, "Tenth-ring value").
- */
+/** The 10 zone (innermost ring touched) is wider than one ring width, so its tenths are the project's own rule, not the rule book's (`apps/docs/docs/models/ring-scoring.md`, "Tenth-ring value"). */
 export function usesOwnTenthRule(face: ScoringFace, hole: number): boolean {
   // a face of one ring has no inner ring: both sides are NaN and the answer false
   const [outer = Number.NaN, inner = Number.NaN] = face.rings
@@ -364,12 +326,7 @@ export type FaceGroupScore = {
   score: GroupScore
 }
 
-/**
- * A group scored on its face: the hole from the event's gauge, else the gauge of the discipline's
- * mapping (`choice.gauge`, mm), else `bullet` (m); every shot's
- * score; total, tenths and inner tens over the included shots only. An issue when the hole
- * size is unknown or the marks do not fit.
- */
+/** The hole from the event's gauge, else the gauge of the discipline's mapping (`choice.gauge`, mm), else `bullet` (m); each shot's score, and total, tenths and inner tens over the included shots only; an issue when the hole size is unknown or the marks do not fit. */
 export function scoreGroupOnFace(
   face: ScoringFace,
   choice: {

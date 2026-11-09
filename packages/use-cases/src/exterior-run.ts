@@ -1,7 +1,4 @@
-/**
- * `POST /exterior/trajectory`, `/exterior/truing`, `/exterior/range-strings/plan` and `/fit` and
- * `GET /exterior/stability`: the answers, with the bullet of a `bullet` id resolved.
- */
+/** `POST /exterior/trajectory`, `/exterior/truing`, `/exterior/range-strings/plan` and `/fit` and `GET /exterior/stability`, with the bullet of a `bullet` id resolved. */
 import { icao, millerStability } from '@open-reloading/ballistics'
 import type { Bullet } from '@open-reloading/schema'
 import { assertFinite, resolvedRecord } from './answer.ts'
@@ -27,11 +24,7 @@ const nanPaths = {
   truing: /^\.result\.(parameters\.\d+\.standardUncertainty|correlation\.\d+\.\d+)$/,
 }
 
-/**
- * Result paths of the range strings answers where a singular design gives an infinite number:
- * the standard uncertainties, variance inflation and condition number of a parameter in
- * the null direction. The correlations stay finite.
- */
+/** The standard uncertainties, variance inflation and condition number of a parameter in the null direction of a singular design; the correlations stay finite. */
 const stringParameter = String.raw`parameters\.\d+\.(relativeStandardUncertainty|varianceInflation|standardUncertainty|posteriorSigma|prior\.ratio)`
 const infinitePaths = {
   plan: new RegExp(String.raw`^\.result\.\d+\.plan\.(conditionNumber|${stringParameter})$`),
@@ -158,10 +151,7 @@ function fillFromRecord(q: StabilityQuery, record: Bullet) {
   return { mass, diameter, length, resolved: { bullet: resolvedRecord(record, fields) } }
 }
 
-/**
- * Mass, diameter and length of a stability query, the missing ones from the bullet `record`, each
- * checked against `stabilityBounds`, with the record's `resolved.bullet` part.
- */
+/** The missing ones from the bullet `record`, each checked against `stabilityBounds`, with the record's `resolved.bullet` part. */
 function stabilityInputs(q: StabilityQuery, record: Bullet | undefined) {
   const { mass, diameter, length, resolved } = record
     ? fillFromRecord(q, record)

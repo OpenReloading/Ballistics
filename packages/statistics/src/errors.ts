@@ -4,12 +4,7 @@ export type Diagnostic<C extends string = string, P extends object = Record<stri
   params: P
 }
 
-/**
- * Error the logic packages raise on purpose: an input outside the model, or a computation that does
- * not finish within the limits its inputs set. It extends `RangeError`; other errors are defects.
- * The logic packages raise it with a typed `issue` (its code is the message) and word nothing; a
- * subclass with fields of its own (`TruingError`, `ValueError`) may still pass a message.
- */
+/** An input outside the model, or a computation that does not finish within the limits its inputs set; a `RangeError`, other errors are defects; raised with a typed `issue` (its code is the message) and no wording, though a subclass with fields of its own (`TruingError`, `ValueError`) may pass a message. */
 export class InputError extends RangeError {
   /** The typed refusal; undefined for one raised with an English message. */
   readonly issue: Diagnostic<string, object> | undefined
@@ -26,10 +21,7 @@ export function need(ok: boolean, refusal: string | Diagnostic<string, object>):
   if (!ok) throw new InputError(refusal)
 }
 
-/**
- * Entry `i` of `a`, for an index the caller's loop bounds or array sizes keep inside it. A missing
- * entry is a defect in the caller and throws instead of passing `undefined` into arithmetic.
- */
+/** For an index the caller's loop bounds or array sizes keep inside it; a missing entry is a defect in the caller and throws instead of passing `undefined` into arithmetic. */
 export function nth<T>(a: ArrayLike<T>, i: number): T {
   const v = a[i]
   if (v === undefined) throw new RangeError(`index ${i} outside an array of ${a.length}`)

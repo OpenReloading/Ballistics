@@ -127,10 +127,7 @@ interface M3Units {
   readonly mass: 'kg'
 }
 
-/**
- * Unit per field name and endpoint. Fields inside `energy` take the unit of that object (J); other
- * names take the entry their name ends with.
- */
+/** Fields inside `energy` take the unit of that object (J); other names take the entry their name ends with. */
 export interface ResponseUnits {
   exterior: ExteriorUnits
   truing: TruingUnits

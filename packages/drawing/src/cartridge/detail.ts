@@ -53,8 +53,7 @@ function headDetail(
   const r = (symbol: string) => at(symbol)?.radius
   const [R1, E1, R3, P1] = ['R1', 'E1', 'R3', 'P1'].map(r)
   const [R, E] = ['R', 'E'].map((s) => at(s)?.to)
-  // grooves and belts at least 6 px: the groove depth and its length to E, the belt step and
-  // length
+  // grooves and belts at least 6 px: the groove depth and its length to E, the belt step and length
   if (side === 'cartridge' && [R1, E1, R, E].every((x) => x !== undefined)) {
     sizes.push({
       mm: Math.min((R1 as number) - (E1 as number), (E as number) - (R as number)),

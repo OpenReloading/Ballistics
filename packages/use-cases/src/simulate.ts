@@ -104,10 +104,7 @@ function knownRecords(catalogue: Catalogue, record: Load) {
   }
 }
 
-/**
- * The cartridge, bullet and powder records the file names, in that order, and the powder's label
- * "<manufacturer name> <product name>"; 404 for an unknown id.
- */
+/** In that order, with the powder's label "<manufacturer name> <product name>"; 404 for an unknown id. */
 function loadFileRecords(catalogue: Catalogue, record: Load) {
   const bulletId = recordIdOf(record.bullet)
   const powderId = recordIdOf(record.powder)
@@ -216,11 +213,7 @@ function resolvedRecords(
   }
 }
 
-/**
- * The status and body of a simulation from the 200 payload of its interior run: the summary of the
- * shown step (the middle of a ladder around the charge, else the first valid one), its points when
- * asked, the ladder's summaries and the resolved records; 422 when no step is valid.
- */
+/** From the 200 payload of its interior run: the summary of the shown step (the middle of a ladder around the charge, else the first valid one), its points when asked, the ladder's summaries and the resolved records; 422 when no step is valid. */
 function simulateAnswer(
   payload: Record<string, unknown>,
   inputs: AnswerInputs,
@@ -270,10 +263,7 @@ function fileIssue(i: z.core.$ZodIssue, at: PropertyKey[]) {
   }
 }
 
-/**
- * Throws the `InputError` (a 422) of a ladder whose lowest charge (kg) is 0 or below, in the file's
- * grams: the core states it in kg.
- */
+/** Throws the `InputError` (a 422) of a ladder whose lowest charge (kg) is 0 or below, in the file's grams, as the core states it in kg. */
 function needChargesAboveZero(charge: number, ladder: InteriorBody['ladder']) {
   if (!ladder) return
   const below = { up: 0, down: ladder.stepCount - 1, around: (ladder.stepCount - 1) / 2 }
@@ -421,12 +411,10 @@ export async function simulate(
   if (refusal) return refusal
   const { cartridge, bullet, powder, powderLabel } = loadFileRecords(context.catalogue, record)
   fillBoreArea(load, cartridge, values)
-  // the temperature sensitivity of the powder record, its own or the default of its grain form, as
-  // the workbench adds it to a run
+  // the temperature sensitivity of the powder record, its own or the default of its grain form, as the workbench adds it to a run
   takeSensitivity(load, powder)
   const { resistance, missing } = powderResistance(load, { cartridge, bullet, powder, values })
-  // the powder record's resistance with the file's overrides: one engraving value alone completes
-  // the record's ramp, so the pair is only known here
+  // the powder record's resistance with the file's overrides: one engraving value alone completes the record's ramp, so the pair is only known here
   const applied = fileResistance(values, path, resistance)
   const { status, payload } = await runInterior(
     { compute: context.compute, findCartridge: (id) => findCartridge(context.catalogue, id) },

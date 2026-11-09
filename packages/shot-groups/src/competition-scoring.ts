@@ -1,10 +1,4 @@
-/**
- * Scoring of a person's own competition results: the stage points and hit factor of a practical
- * stage and the ring totals of series, with the points and penalties of the event type record
- * (`packages/catalog/records/event-types/`), never hard-coded. Model:
- * `apps/docs/docs/models/competition-scoring.md`. A self-recorded score is never an official result.
- * A refusal is an `InputError` of `@open-reloading/statistics` with a `ScoringIssue`.
- */
+/** The stage points and hit factor of a practical stage and the ring totals of series, with the points and penalties of the event type record (`packages/catalog/records/event-types/`), never hard-coded (`apps/docs/docs/models/competition-scoring.md`); a self-recorded score is never an official result, a refusal an `InputError` with a `ScoringIssue`. */
 
 import { InputError } from '@open-reloading/statistics'
 
@@ -51,10 +45,7 @@ const count = (n: number) => {
   return n
 }
 
-/**
- * The points of a stage: each hit at its zone's value for the stage's power factor, less each
- * miss, penalized no-shoot hit and procedural penalty at its value, and never below zero.
- */
+/** Each hit at its zone's value for the stage's power factor, less each miss, penalized no-shoot hit and procedural penalty at its value, never below zero. */
 export function stageRawPoints(stage: PracticalStage, rules: HitFactorRules): number {
   const z = rules.points[stage.powerFactor]
   const { hits } = stage
@@ -120,21 +111,14 @@ export interface EventTotals {
   parts: readonly number[] | readonly StageScore[]
 }
 
-/**
- * The totals of a ring event: each series and their sum. A disqualified event, or one without
- * series, has no total.
- */
+/** Each series and their sum; a disqualified event, or one without series, has no total. */
 export function ringEventTotals(series: readonly RingSeries[], state: ResultState): EventTotals {
   const parts = series.map(ringTotal)
   if (state === 'disqualified' || parts.length === 0) return { parts }
   return { total: parts.reduce((sum, p) => sum + Math.round(p * 10), 0) / 10, parts }
 }
 
-/**
- * The totals of a practical event: the score of each stage, and the sum of the typed stage points
- * when every stage has them (stage points need the best hit factor of all competitors, so only the
- * official result gives them). A disqualified event has no total.
- */
+/** The score of each stage, and the sum of the typed stage points when every stage has them (they need the best hit factor of all competitors, so only the official result gives them); a disqualified event has no total. */
 export function practicalEventTotals(
   stages: readonly PracticalStage[],
   rules: HitFactorRules,
@@ -174,11 +158,7 @@ export type EventMismatch =
   | { problem: 'division'; division: string }
   | { problem: 'major'; division: string; stage: number }
 
-/**
- * Where an event does not fit its event type: a level the type does not name, results of another
- * scoring method, a division the type does not name, or a stage scored major in a division without
- * a major rating. Empty when it fits. The scoring above trusts these; a caller checks first.
- */
+/** A level, scoring method or division the type does not name, or a stage scored major in a division without a major rating; empty when it fits, as the scoring above trusts these and a caller checks first. */
 export function eventMismatches(event: EventClaims, type: EventTypeOffer): EventMismatch[] {
   const found: EventMismatch[] = []
   if (!type.levels.includes(event.level)) found.push({ problem: 'level', level: event.level })

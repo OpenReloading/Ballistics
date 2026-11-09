@@ -1,10 +1,4 @@
-/**
- * `POST /interior/load-file` input: a load file (one record of kind `load`), read to the
- * `POST /interior` body. A value the workbench leaves out because its Settings, followed defaults
- * or seating give it (temperature, volume, bore diameter, twist, travel) is not filled here: the
- * route answers 422 with every such value. The field mapping is `interiorLoad` of core, as in the
- * workbench; this module adds the file check, the values of the referenced records and the lookups.
- */
+/** A load file (one record of kind `load`) read to the `POST /interior` body; a value the workbench takes from Settings, followed defaults or seating (temperature, volume, bore diameter, twist, travel) is not filled, so the route answers 422 with each; the field mapping is core's `interiorLoad`, this module adds the file check, the values of the referenced records and the lookups. */
 import {
   checkResistanceValues,
   type InteriorLoad,
@@ -50,10 +44,7 @@ function unknownKeys(input: unknown, parsed: unknown, path: Path): Path[] {
   )
 }
 
-/**
- * The one `load` record of a load file. Throws a `ZodError` with the path of each problem: an
- * unknown field, an invalid value, no or several loads, an unresolvable `user:` reference.
- */
+/** Throws a `ZodError` with the path of each problem: an unknown field, an invalid value, no or several loads, an unresolvable `user:` reference. */
 export function readLoadFile(json: unknown): { path: Path; record: Load; name: string } {
   const problem = versionProblem(json)
   if (problem) throw new z.ZodError([issue(['version'], problem)])
@@ -94,11 +85,7 @@ export interface LoadRecords {
   bullet?: Bullet | undefined
 }
 
-/**
- * The SI solver values of a load, by workbench key: the powder record's model parameters and the
- * bullet record's mass, then the load's overrides (stored units to SI), then its charge. A value no
- * record gives is absent.
- */
+/** By workbench key: the powder record's model parameters and the bullet record's mass, then the load's overrides (stored units to SI), then its charge; a value no record gives is absent. */
 export function loadValues(data: Load, { powder, bullet }: LoadRecords): Record<string, number> {
   const typed = Object.entries(data.analysis?.overrides ?? {}).flatMap(([k, v]) =>
     // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the overrides schema holds only analysis keys
@@ -220,10 +207,7 @@ export function missingValuesAnswer(
   }
 }
 
-/**
- * The path in the load file of an issue at `path` of the `/interior` body: `load.<field>` to the
- * file's value, `ladder.<key>` to the file's ladder, else the body path.
- */
+/** `load.<field>` to the file's value, `ladder.<key>` to the file's ladder, else the body path. */
 export function filePath(path: PropertyKey[], at: Path): Path {
   const [head, ...rest] = path.map(String)
   const key = head === 'load' ? siKey[rest.join('.')] : undefined

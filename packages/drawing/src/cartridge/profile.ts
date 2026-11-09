@@ -193,10 +193,7 @@ interface GrooveDepth {
   derivedE?: number | undefined
 }
 
-/**
- * The cartridge groove depth: the stored e, else outside table III (where delta is the belt cone)
- * one cone from E1 at R to P1 at E (grooveDerivedE), drawn as 0 when negative.
- */
+/** The stored e, else outside table III (where delta is the belt cone) one cone from E1 at R to P1 at E (grooveDerivedE), drawn as 0 when negative. */
 function grooveDepth({ side, v }: Draft, R: number, table?: string): GrooveDepth {
   const [P1, E, E1, storedE, delta] = [v('P1'), v('E'), v('E1'), v('e'), v('delta')]
   const validDelta = delta !== undefined && delta > 0 && delta < 90
@@ -294,10 +291,7 @@ function drawGroove({ v, marks, note, points }: Draft, c: GrooveShape) {
   }
 }
 
-/**
- * The cartridge extractor groove from E1 at R + e to P1 at E, through the belt from R3 to E
- * where table III gives one; returns the station of P1, E after a groove, else R.
- */
+/** From E1 at R + e to P1 at E, through the belt from R3 to E where table III gives one; returns the station of P1, E after a groove, else R. */
 function grooveAndBelt(d: Draft, R: number, { e, derivedE }: GrooveDepth, table?: string) {
   const { side, v, note } = d
   const R1 = v('R1') as number
@@ -406,10 +400,7 @@ function noteShoulderPartial({ v, note, name }: Draft, zP1: number) {
   )
 }
 
-/**
- * The shoulder from P2 at L1 to H1 at L2 with its fillets r1 and r2, where all four are stored and
- * in order; whether it is drawn.
- */
+/** From P2 at L1 to H1 at L2 with its fillets r1 and r2, where all four are stored and in order; whether it is drawn. */
 function shoulderProfile(d: Draft, zP1: number) {
   const { v, note, name } = d
   const [P1, L3, H2] = stored(v, 'P1', 'L3', 'H2')
@@ -452,10 +443,7 @@ function mouthConeLength(alpha1: number | undefined, H2: number, G1: number) {
   return alpha1 >= 180 ? 0 : Math.max(0, (H2 - G1) / 2 / Math.tan((alpha1 / 2) * deg))
 }
 
-/**
- * The chamber mouth from H2 at L3 to G1, by h or the alpha1 cone; returns the station of G1, none
- * without G1.
- */
+/** From H2 at L3 to G1, by h or the alpha1 cone; returns the station of G1, none without G1. */
 function chamberMouth(d: Draft): number | undefined {
   const { v, marks, note, points } = d
   const [L3, H2] = stored(v, 'L3', 'H2')
@@ -502,10 +490,7 @@ function chamberMouth(d: Draft): number | undefined {
   return zG1
 }
 
-/**
- * The chamber throat from G1 at `zG1`: the leade to F at L3 + G and a bore stub, or a G1 stub
- * without G or F.
- */
+/** From G1 at `zG1`: the leade to F at L3 + G and a bore stub, or a G1 stub without G or F. */
 function chamberThroat(d: Draft, zG1: number) {
   const { v, find, marks, note, points } = d
   const [L3, G1] = stored(v, 'L3', 'G1')
@@ -537,10 +522,7 @@ function chamberThroat(d: Draft, zG1: number) {
   marks.convention('boreStub', F / 2, zEnd, zEnd + 0.1 * L3)
 }
 
-/**
- * The leade from G1 to F at `zEnd`, at the angle i from s or back from L3 + G; a step without a
- * leade. Returns where the free bore at G1 ends.
- */
+/** From G1 to F at `zEnd`, at the angle i from s or back from L3 + G, a step without a leade; returns where the free bore at G1 ends. */
 function leadeProfile(d: Draft, zG1: number, zEnd: number): number {
   const { v, marks, note, points } = d
   const [L3, G1, G, F] = stored(v, 'L3', 'G1', 'G', 'F')
@@ -605,11 +587,7 @@ function leadeProfile(d: Draft, zG1: number, zEnd: number): number {
   return drawn
 }
 
-/**
- * The cartridge rim corner at the head face, from the head face to the rim side at r: a chamfer
- * where f and beta are stored (beta from the head face line, f along the axis, so the face ends
- * f / tan(beta) inside the rim), else a round of r0 where stored, else the sharp corner.
- */
+/** From the head face to the rim side at r: a chamfer where f and beta are stored (beta from the head face line, f along the axis, so the face ends f / tan(beta) inside the rim), else a round of r0 where stored, else the sharp corner. */
 function rimCorner({ side, v, marks, note }: Draft, head: number, R: number): SectionPoint[] {
   const corner: SectionPoint = [head / 2, 0]
   if (side !== 'cartridge') return [corner]
@@ -815,19 +793,13 @@ type ShotshellNames = [
   string,
 ]
 
-/**
- * The symbols of a shotshell side in the order rim, rim length, body start, body end, length,
- * cone start, cone end, cone start length, cone end length, cone angle.
- */
+/** In the order rim, rim length, body start, body end, length, cone start, cone end, cone start length, cone end length, cone angle. */
 const shotshellNames: Record<Side, ShotshellNames> = {
   chamber: ['G', 'T', 'D', 'H', 'L', 'D1', 'B', 'L1', 'L2', 'alpha1'],
   cartridge: ['g', 't', 'd', 'h', 'l', 'd', 'd2', 'l1', 'l2', 'alpha'],
 }
 
-/**
- * The body cone from the start diameter at l1 to the end diameter at l2, where both are stored
- * and in order; whether it is drawn.
- */
+/** From the start diameter at l1 to the end diameter at l2, where both are stored and in order; whether it is drawn. */
 function shotshellCone(o: Draft, names: ShotshellNames): boolean {
   const { side, v, points, marks, note, name } = o
   const chamber = side === 'chamber'

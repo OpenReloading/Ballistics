@@ -63,10 +63,7 @@ export function leadeContact(
   return { z: start + (g1 - d) / 2 / t }
 }
 
-/**
- * Input of `seat`: bullet dimensions, chamber and case values, water capacity (g), water density
- * (g/cm³), barrel length (mm) and the seating length entered as COAL or CBTO (mm).
- */
+/** Water capacity (g), water density (g/cm³), barrel length (mm) and the seating length as COAL or CBTO (mm), with the bullet dimensions and the chamber and case values. */
 interface SeatInput {
   bullet: BulletDimensions
   chamber: SeatingValues
@@ -200,10 +197,7 @@ export function seat({
   }
 }
 
-/**
- * The jump and the COAL of contact: from the measured lands contact (`touchBase`, the base position
- * at contact) when there is one, else from the leade contact of the chamber.
- */
+/** From the measured lands contact (`touchBase`, the base position at contact) when there is one, else from the leade contact of the chamber. */
 function jumpOf(o: {
   bullet: BulletDimensions
   outline: Outline
@@ -262,10 +256,7 @@ function seatLengths(bullet: BulletDimensions, by: SeatInput['by']) {
   return { base, coal, cbto }
 }
 
-/**
- * Case volume and volume behind the bullet, cm³, with the bullet `cut` mm below the mouth;
- * none without a water capacity.
- */
+/** Case volume and volume behind the bullet, cm³, with the bullet `cut` mm below the mouth; none without a water capacity. */
 function seatVolumes(
   outline: Outline,
   cut: number,
@@ -294,10 +285,7 @@ function volumeBehind(volume: Tagged | undefined, behindHead: boolean, notes: st
   return volume && !behindHead && volume.value > 0 ? volume : undefined
 }
 
-/**
- * The leade contact of the bullet from the head, what a derived jump lacks, and the notes on the
- * contact.
- */
+/** The leade contact of the bullet from the head, what a derived jump lacks, and the notes on the contact. */
 function landContact(
   chamber: SeatingValues,
   bullet: BulletDimensions,
@@ -329,10 +317,7 @@ function landContact(
  */
 export const bulletLengthTolerance = Object.freeze({ measured: 0.05, estimated: 0.15 })
 
-/**
- * Input of `intrusion`: bullet dimensions, case length to the mouth (mm), cartridge overall length
- * COAL (mm) and whether the bullet length is measured or estimated.
- */
+/** Case length to the mouth (mm), cartridge overall length COAL (mm) and whether the bullet length is measured or estimated, with the bullet dimensions. */
 interface IntrusionInput {
   bullet: BulletDimensions
   /** Case length to the mouth, mm: the water capacity is taken to the mouth. */

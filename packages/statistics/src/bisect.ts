@@ -1,9 +1,4 @@
-/**
- * Bisection on the bracket [low, high] for the point where `below` turns false: `below(x)` is true
- * while x lies below the root. Runs `iterations` halvings, with `stopAtEnds` it stops early once
- * the midpoint equals an end of the bracket; returns the last midpoint. Each caller keeps its own
- * count and stop rule.
- */
+/** `below(x)` is true while x lies below the root; runs `iterations` halvings, with `stopAtEnds` stopping once the midpoint equals an end of the bracket, and returns the last midpoint; each caller keeps its own count and stop rule. */
 export function bisect(
   below: (x: number) => boolean,
   bracket: readonly [low: number, high: number],

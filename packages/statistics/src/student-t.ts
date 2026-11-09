@@ -1,8 +1,4 @@
-/**
- * Two-sided quantile of Student's t distribution for whole degrees of freedom, from the closed
- * forms of the probability P(|T| < t) for odd and even degrees (Abramowitz and Stegun 26.7.3 and
- * 26.7.4, `apps/docs/docs/models/groups.md`, "Student's t quantile") and bisection.
- */
+/** For whole degrees of freedom: bisection on the closed forms of P(|T| < t) for odd and even degrees (Abramowitz and Stegun 26.7.3 and 26.7.4, `apps/docs/docs/models/groups.md`, "Student's t quantile"). */
 import { bisect } from './bisect.ts'
 import { need } from './issue.ts'
 

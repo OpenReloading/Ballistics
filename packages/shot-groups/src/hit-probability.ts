@@ -1,8 +1,4 @@
-/**
- * Probability of a hit and expected score on a target face from a point dispersion
- * (`apps/docs/docs/models/hit-probability.md`). SI throughout: lengths m, speeds m/s, angles rad.
- * A refusal is an `InputError` with a `HitIssue`.
- */
+/** From a point dispersion (`apps/docs/docs/models/hit-probability.md`); SI throughout: lengths m, speeds m/s, angles rad; a refusal is an `InputError` with a `HitIssue`. */
 
 import { chiSquareCdf, need, nth } from '@open-reloading/statistics'
 
@@ -63,23 +59,11 @@ export interface DispersionInput {
 
 /** The point dispersion with its parts: the group scaled to the distance, the wind, the range and the muzzle speed. */
 export interface DispersionResult extends PointDispersion {
-  /**
-   * The parts, m. `group` is the group scaled to the distance, without its muzzle speed part when
-   * the input has a speed spread; `wind` is along x, `range` and `velocity` along y, `velocity`
-   * present only with a speed spread.
-   */
+  /** The parts, m: `group` scaled to the distance, without its muzzle speed part when the input has a speed spread; `wind` along x, `range` and `velocity` along y, `velocity` only with a speed spread. */
   parts: { group: PointDispersion; wind: number; range: number; velocity?: number }
 }
 
-/**
- * The point dispersion of the group scaled linearly with distance, the crosswind uncertainty on the
- * horizontal axis and the range uncertainty on the vertical axis, added as independent variances.
- * The crosswind is `speed sin(from)`; its variance follows from the speed and direction
- * uncertainties to first order: `sin(from)^2 speedSd^2 + (speed cos(from) directionSd)^2`.
- * With a muzzle speed spread, the height part it already contributed to the group at the reference
- * distance is taken out of the vertical group before the linear scaling, and the part at the
- * distance is added: the height part grows faster than the distance.
- */
+/** The group scaled linearly with distance plus the crosswind (x) and range (y) uncertainties as independent variances, the crosswind `speed sin(from)` with variance `sin(from)^2 speedSd^2 + (speed cos(from) directionSd)^2` to first order; a muzzle speed spread's height part is taken out at the reference distance before scaling and added at the distance, as it grows faster than the distance. */
 export function pointDispersion(i: DispersionInput): DispersionResult {
   need(i.referenceDistance > 0 && i.distance > 0, { code: 'distances', params: {} })
   need(i.group.horizontal > 0 && i.group.vertical > 0, { code: 'group-dispersion', params: {} })
@@ -130,13 +114,7 @@ export interface PointOffset {
 /** Standard normal distribution function, from the chi-square distribution of one degree of freedom. */
 const normalCdf = (z: number) => 0.5 * (1 + Math.sign(z) * chiSquareCdf(z * z, 1))
 
-/**
- * Probability that a point from a bivariate normal distribution with standard deviations
- * `horizontal` and `vertical` and no correlation, centred on the aim point or on `offset` from it,
- * lies inside the ellipse of semi-axes `a` (x) and `b` (y) about the aim point: with x = a sin t the
- * integral of the density of x times the probability that y lies between -b cos t and b cos t is
- * smooth, and is truncated at 8 standard deviations of x about the centre.
- */
+/** A bivariate normal with SDs `horizontal` and `vertical` and no correlation, centred on the aim point or on `offset` from it, inside the ellipse of semi-axes `a` (x) and `b` (y) about the aim point: with x = a sin t the integrand is smooth, truncated at 8 standard deviations of x about the centre. */
 export function ellipseProbability(
   a: number,
   b: number,
@@ -180,11 +158,7 @@ export interface ShotsToHit {
   mean: number
 }
 
-/**
- * From the probability `p` of a hit with one shot, the smallest whole number n of independent shots
- * with `1 - (1 - p)^n >= wanted` (`ln(1 - wanted) / ln(1 - p)` rounded up), and the mean number of
- * shots to the first hit.
- */
+/** The smallest whole number n of independent shots with `1 - (1 - p)^n >= wanted` (`ln(1 - wanted) / ln(1 - p)` rounded up), and the mean number of shots to the first hit. */
 export function shotsToHit(p: number, wanted: number): ShotsToHit {
   need(p >= 0 && p <= 1, { code: 'hit-probability', params: {} })
   need(wanted > 0 && wanted < 1, { code: 'wanted-probability', params: {} })
@@ -205,11 +179,7 @@ export interface HitResult {
   zones: { value: number; probability: number }[]
 }
 
-/**
- * The hit probability and expected score of a point dispersion on nested zones, outermost first
- * (each inside the one before). A shot inside a zone and outside the next scores the value of the
- * first. `offset`: the centre of the point of impact against the aim point; absent: on the aim point.
- */
+/** On nested zones, outermost first, a shot inside a zone and outside the next scoring the value of the first; `offset` is the centre of the point of impact against the aim point, absent on the aim point. */
 export function hitProbability(
   zones: readonly ScoringZone[],
   d: PointDispersion,

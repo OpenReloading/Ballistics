@@ -35,10 +35,7 @@ export function labelText(
   return d.derived ? `(${text})` : text
 }
 
-/**
- * A length in mm to 2 decimals, rounded as its decimal text reads (2.675 to 2.68, where `toFixed`
- * rounds the binary value down), the zeros kept.
- */
+/** A length in mm to 2 decimals, rounded as its decimal text reads (2.675 to 2.68, where `toFixed` rounds the binary value down), the zeros kept. */
 function fixedMm(mm: number) {
   // a number written with an exponent (1e-7) has no decimal text to round
   if (String(mm).includes('e')) return mm.toFixed(2)

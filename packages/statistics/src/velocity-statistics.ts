@@ -1,9 +1,4 @@
-/**
- * Velocity statistics of one string, `apps/docs/docs/models/groups.md`, "Velocity strings": mean,
- * sample standard deviation, extreme spread and the chi-square interval of the standard deviation
- * (the one-axis form of "Confidence intervals by shot count"), and the shot count that gives the
- * interval a stated width. Velocities in m/s.
- */
+/** Mean, sample standard deviation, extreme spread and the chi-square interval of the standard deviation (the one-axis form of "Confidence intervals by shot count"), and the shot count for a stated interval width (`apps/docs/docs/models/groups.md`, "Velocity strings"); velocities in m/s. */
 
 import { chiSquareQuantile } from './chi-square.ts'
 import type { Interval } from './interval.ts'
@@ -45,11 +40,7 @@ function intervalFactors(n: number, level: number): Interval {
   }
 }
 
-/**
- * Statistics of the velocities of one string, m/s, finite values; `undefined` for no shot. The
- * interval of the standard deviation is sqrt((n - 1) s^2 / chi-square) at the two chi-square
- * quantiles of `level` (two-sided, in (0, 1), default 0.95).
- */
+/** Of the velocities of one string, m/s, finite values, `undefined` for no shot; the standard deviation's interval is sqrt((n - 1) s^2 / chi-square) at the two chi-square quantiles of `level` (two-sided, in (0, 1), default 0.95). */
 export function velocityStatistics(
   velocities: readonly number[],
   level: number = defaultLevel,
@@ -79,11 +70,7 @@ export function velocityStatistics(
   return out
 }
 
-/**
- * The smallest shot count whose interval of the standard deviation has the given relative
- * half-width, (upper - lower) / 2 over the sample value, at `level` (default 0.95). The half-width
- * falls with the shot count; at least 3 shots, `relativeHalfWidth` from 0.01 up.
- */
+/** The half-width is (upper - lower) / 2 over the sample value, at `level` (default 0.95), and falls with the shot count; at least 3 shots, `relativeHalfWidth` from 0.01 up. */
 export function shotsNeeded(relativeHalfWidth: number, level: number = defaultLevel): number {
   need(level > 0 && level < 1, { code: 'confidenceLevelOutsideUnit', params: {} })
   need(relativeHalfWidth >= 0.01, { code: 'relativeHalfWidthBelowMinimum', params: {} })
