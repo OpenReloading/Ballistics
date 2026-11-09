@@ -285,7 +285,7 @@ Cited by the manufacturer and case capacity records, grouped by maker, then the 
 - <a id="issf-home"></a>**ISSF.** International Shooting Sport Federation: _Homepage_. <https://www.issf-sports.org/>
 - <a id="hodgdon-2012"></a>**Hodgdon 2012.** Hodgdon Powder Co.: _Extreme Rifle Powders, test results for temperature sensitivity_, 13 July 2012. <https://hodgdonpowderco.com/wp-content/uploads/2023/04/hodgdon-extreme-series-powders-test-results-for-temperature-sensitivity-1.pdf>
 - <a id="layout-instability"></a>**Layout Instability.** W3C Web Platform Incubator Community Group: _Layout Instability API_. <https://wicg.github.io/layout-instability/>
-- <a id="longtasks"></a>**Long Tasks.** W3C: _Long Tasks API_. <https://w3c.github.io/longtasks/>
+- <a id="longtasks"></a>**Long Tasks.** W3C: _Long Tasks API_, Discontinued Draft, 20 October 2026. <https://www.w3.org/TR/longtasks-1/>
 - <a id="merrill-2017"></a>**Merrill 2017.** A. Merrill: _Goodbye, Brass?_ NRA Shooting Sports USA, 13 February 2017. <https://www.ssusa.org/articles/2017/2/13/goodbye-brass/>
 - <a id="nist-webbook"></a>**NIST WebBook.** P. J. Linstrom, W. G. Mallard (eds.): _NIST Chemistry WebBook_, NIST Standard Reference Database 69. NIST, Gaithersburg, MD. Condensed-phase thermochemistry of CAS 64-17-5, 84-74-2, 85-98-3, 121-14-2 and 611-92-7. doi:10.18434/T4D303. <https://webbook.nist.gov/chemistry/>
 - <a id="nist-sematech"></a>**NIST/SEMATECH.** National Institute of Standards and Technology, SEMATECH: _NIST/SEMATECH e-Handbook of Statistical Methods_. NIST, Gaithersburg, MD. <https://www.itl.nist.gov/div898/handbook/>
