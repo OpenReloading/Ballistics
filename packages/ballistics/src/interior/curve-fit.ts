@@ -1,10 +1,4 @@
-/**
- * Burn form and pressure exponent from a measured pressure-time trace: fits the burn coefficient,
- * the initial slope and transition point of a two-stage vivacity form and the pressure exponent of
- * the M3 interior model to the rising and falling side of one trace, together with the shift
- * between the trace's clock and the model's, or to several traces of one powder at different charges
- * with one shift each, `apps/docs/docs/models/interior-curve-fit.md`. SI in and out.
- */
+/** Fits the burn coefficient, the two-stage form's initial slope and transition and the M3 pressure exponent to the rise and fall of one trace with a clock shift, or to several traces of one powder at different charges with one shift each (`apps/docs/docs/models/interior-curve-fit.md`); SI in and out. */
 
 import {
   checkLogFitLimits,
@@ -41,11 +35,7 @@ export interface PressureHistory {
   sigma?: number | undefined
 }
 
-/**
- * Parameter of the curve fit, on the load's vivacity law with a two-stage form: the burn
- * coefficient (restated at the trace's peak pressure), the form parameter `a` that sets the
- * initial slope of the form function, its transition point `z1` and the pressure exponent.
- */
+/** On the load's vivacity law with a two-stage form: the burn coefficient (restated at the trace's peak pressure), the form parameter `a` (the initial slope), its transition point `z1` and the pressure exponent. */
 type CurveParameter = 'burnRate' | 'formSlope' | 'transition' | 'exponent'
 
 const sensors: readonly PressureSensor[] = ['breech', 'mean', 'base']
@@ -60,26 +50,17 @@ export interface CurveFitOptions {
   maxIterations?: number | undefined
   /** Largest condition number of the column-scaled Jacobian; default 1e3. */
   maxCondition?: number | undefined
-  /**
-   * Variance inflation above which a parameter is `weak` (collinear); default 10, and 100 in
-   * `fitPressureCurves` of traces at two or more charges without a `narrowPeaks` warning.
-   */
+  /** Above it a parameter is `weak` (collinear); default 10, and 100 in `fitPressureCurves` of traces at two or more charges without a `narrowPeaks` warning. */
   maxInflation?: number | undefined
   /** Relative standard uncertainty above which a parameter is `weak` (imprecise); default 0.25. */
   maxRelativeStandardUncertainty?: number | undefined
-  /**
-   * The fit window ends where the trace has fallen to this fraction of its peak, in (0, 1); default 0.5.
-   * The model must still be in the barrel there.
-   */
+  /** In (0, 1), default 0.5: the window ends where the trace has fallen to this fraction of its peak, where the model must still be in the barrel. */
   fallFraction?: number | undefined
   /** Integration settings of every `interior` run; default `interiorDefaults`. */
   options?: Settings<InteriorOptions> | undefined
 }
 
-/**
- * Why a parameter is `weak` or `fixed`; `inconsistent`: the exponents of the leave-one-trace-out
- * refits of a joint fit spread wider than its interval.
- */
+/** `inconsistent`: the exponents of the leave-one-trace-out refits of a joint fit spread wider than its interval. */
 type CurveReason = 'collinear' | 'imprecise' | 'unresolved' | 'ill-conditioned' | 'inconsistent'
 
 /** Identifiability of one parameter of the curve fit. */
@@ -92,26 +73,15 @@ export interface CurveParameterReport {
   initial: number
   /** Fitted value, same unit as `initial`; the start value when `fixed`. */
   value: number
-  /**
-   * Standard uncertainty with every other fitted parameter free, linearized at the solution; it
-   * holds the trace noise only, not model error. Absent when `fixed`, `Infinity` when the trace
-   * gives no covariance.
-   */
+  /** With every other fitted parameter free, linearized at the solution: the trace noise only, not model error; absent when `fixed`, `Infinity` when the trace gives no covariance. */
   standardUncertainty?: number
   /** Relative standard uncertainty, the standard error of the log parameter. */
   relativeStandardUncertainty?: number
   /** Variance inflation factor against the other fitted parameters (1: independent). */
   varianceInflation?: number
-  /**
-   * The exponent only, when fitted: an interval meant to cover the true exponent in 90 % of fits,
-   * `value` times `exp(±k u_rel)` with the coverage factor `k` of a synthetic study. It holds the
-   * trace noise only: missing physics biases the exponent outside it unseen.
-   */
+  /** Exponent only: meant to cover the true exponent in 90 % of fits, `value` times `exp(±k u_rel)` with `k` from a synthetic study; the trace noise only, so missing physics biases the exponent outside it unseen. */
   interval?: { low: number; high: number }
-  /**
-   * The exponent only, when fitted to three or more traces: the exponent refitted without each
-   * trace in turn, in input order. Absent when a refit fails or holds the exponent.
-   */
+  /** Exponent only, fitted to three or more traces: refitted without each trace in turn, in input order; absent when a refit fails or holds the exponent. */
   leaveOneOut?: number[]
   /** Empty when `identified`. */
   reasons: CurveReason[]
@@ -178,11 +148,7 @@ function parabola(t: readonly number[], v: readonly number[], at: number): [numb
   ]
 }
 
-/**
- * First time the series reaches `level` from below, or the first time when it starts above. The
- * linear crossing between two samples is refined on the parabola through them and the next sample:
- * a coarse trace would otherwise shift its rise by a fraction of the sample step.
- */
+/** First time the series reaches `level` from below, or the first time when it starts above; the linear crossing is refined on the parabola through its two samples and the next, as a coarse trace would otherwise shift its rise by a fraction of the sample step. */
 function riseTime(time: readonly number[], value: readonly number[], level: number): number {
   const i = value.findIndex((v) => v >= level)
   if (i === 0) return nth(time, 0)
@@ -313,11 +279,7 @@ function heldReport(name: CurveParameter, cause: Withheld, start: number): Curve
 /** Order in which an ill-conditioned fit gives up parameters: the exponent first. */
 const giveUp: readonly CurveParameter[] = ['exponent', 'formSlope', 'transition']
 
-/**
- * What a failed attempt on `current` holds fixed: the unresolved parameters, or on an
- * ill-conditioned fit the next of `giveUp`. Rethrows any other failure, and one that would leave
- * nothing to fit.
- */
+/** The unresolved parameters, or on an ill-conditioned fit the next of `giveUp`; rethrows any other failure, and one that would leave nothing to fit. */
 function withheld(e: unknown, current: readonly CurveParameter[]): Withheld {
   if (!(e instanceof PowderFitError)) throw e
   const reason = e.reason
@@ -340,11 +302,7 @@ export interface ChargedTrace {
   trace: PressureHistory
 }
 
-/**
- * An input check of a joint fit: `sameCharge` names traces fired at the same charge (repeat shots,
- * which add no pressure range), `narrowPeaks` a highest peak below 1.2 times the lowest, which
- * keeps the exponent's limit at that of one trace.
- */
+/** `sameCharge` names traces at the same charge (repeat shots add no pressure range), `narrowPeaks` a highest peak below 1.2 times the lowest, which keeps the exponent's limit at that of one trace. */
 interface CurveWarning {
   /** Which check. */
   reason: 'sameCharge' | 'narrowPeaks'
@@ -364,10 +322,7 @@ interface TraceResiduals {
 
 /** Result of `fitPressureCurves`; a simulation result, not load data. */
 export interface PressureCurvesFit extends Omit<PressureCurveFit, 'window' | 'residuals'> {
-  /**
-   * Pressure at which the fitted burn coefficient is stated, Pa: the geometric mean of the
-   * trace peaks.
-   */
+  /** Pressure at which the fitted burn coefficient is stated, Pa: the geometric mean of the trace peaks. */
   referencePressure: number
   /** One entry per requested parameter in `CurveParameter` order, then one time shift per trace in input order. */
   parameters: CurveParameterReport[]
@@ -430,10 +385,7 @@ export function fitPressureCurve(
   return { ...fit, window, residuals }
 }
 
-/**
- * Fits the burn coefficient, form and exponent of `load`'s vivacity law to several traces of the
- * same powder, rifle and sensor, each fired with its own charge, with one time shift per trace.
- */
+/** Same powder, rifle and sensor, each trace with its own charge and its own time shift. */
 export function fitPressureCurves(
   load: InteriorLoad,
   shots: readonly ChargedTrace[],
@@ -612,8 +564,7 @@ function curveProblem(
   const { maxInflation = resolvesExponent(traces, warnings) ? 100 : 10 } = options
   // the product of K-th roots is exact for one trace, where the mean of the logs is not
   const peak = peaks.reduce((a, b) => a * b ** (1 / traces.length), 1)
-  // M3 states the burn rate at a reference pressure: restating it at the traces' peak keeps the
-  // coefficient and the exponent from being collinear and gives the same model
+  // M3 states the burn rate at a reference pressure: restating it at the traces' peak keeps the coefficient and the exponent from being collinear and gives the same model
   const restated = burn.vivacity * (peak / burn.referencePressure) ** burn.exponent
   const law: CurveLaw = {
     load,
@@ -854,10 +805,7 @@ function attemptCurves(problem: CurveProblem, parameters: readonly CurveParamete
   }
 }
 
-/**
- * Fits `problem.wanted`, holding at its start value each parameter the traces do not resolve
- * instead of failing the fit; the burn coefficient is never dropped.
- */
+/** Holds at its start value each parameter the traces do not resolve instead of failing the fit; the burn coefficient is never dropped. */
 function fitHolding(problem: CurveProblem) {
   const held = new Map<CurveParameter, CurveParameterReport>()
   let current = [...problem.wanted]
@@ -940,11 +888,7 @@ function fitTraces(
   }
 }
 
-/**
- * With three or more traces and the exponent fitted, sets the leave-one-out exponents on its
- * report, and the reason `inconsistent` when their jackknife standard error on the log exponent
- * exceeds the full width of its interval.
- */
+/** With three or more traces and a fitted exponent, sets the leave-one-out exponents, and `inconsistent` when their jackknife standard error on the log exponent exceeds the full width of its interval. */
 function checkSpread(
   reports: CurveParameterReport[],
   start: InteriorLoad,
@@ -962,10 +906,7 @@ function checkSpread(
   }
 }
 
-/**
- * The exponent fitted from `start` to the traces without each one in turn, or undefined when a
- * refit fails or holds the exponent.
- */
+/** The exponent fitted from `start` without each trace in turn, or undefined when a refit fails or holds the exponent. */
 function refits(
   start: InteriorLoad,
   shots: readonly ChargedTrace[],

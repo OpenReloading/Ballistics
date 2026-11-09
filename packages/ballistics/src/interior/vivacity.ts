@@ -1,7 +1,4 @@
-/**
- * Dynamic vivacity of a vivacity burn law, `apps/docs/docs/models/interior-burn-forms.md`, "Dynamic vivacity": the burn rate per
- * pressure (1/p) dz/dt = B_a phi(z) / p_ref, in 1/(Pa s), for exponent 1.
- */
+/** The burn rate per pressure (1/p) dz/dt = B_a phi(z) / p_ref, in 1/(Pa s), for exponent 1 (`apps/docs/docs/models/interior-burn-forms.md`, "Dynamic vivacity"). */
 import { nth } from '@open-reloading/statistics'
 import { need } from '../issue.ts'
 import { type Burn, burnForm } from './form.ts'

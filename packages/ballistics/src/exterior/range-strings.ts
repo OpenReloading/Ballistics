@@ -1,9 +1,4 @@
-/**
- * Truing from range strings: plan which distances identify which of muzzle velocity, drag factor
- * and click value, and fit the three to measured impacts, dialled corrections and chronograph
- * readings, `apps/docs/docs/models/exterior-truing-strings.md`. Every evaluation is an ordinary
- * `trajectory` call. SI in and out; angles in rad, dialled corrections in clicks.
- */
+/** Plans which distances identify muzzle velocity, drag factor and click value and fits them to impacts, dialled corrections and chronograph readings (`apps/docs/docs/models/exterior-truing-strings.md`), each evaluation an ordinary `trajectory` call; SI in and out, angles in rad, dialled corrections in clicks. */
 
 import {
   checkLogFitLimits,
@@ -28,12 +23,7 @@ import {
 } from './trajectory.ts'
 import { dragCorrection, TruingError } from './truing.ts'
 
-/**
- * Fitted parameters: muzzle velocity (m/s), drag factor (multiplies C_D), click value (rad per
- * click) and, with `RangeStringOptions.fitZeroOffset`, the zero offset (rad: the angle by which the
- * impacts at the zero setting lie above the nominal zero, so an impact at range r is `r` times
- * the offset higher and a dial lower by the offset in rad over the click value).
- */
+/** Muzzle velocity (m/s), drag factor (multiplies C_D), click value (rad per click) and, with `RangeStringOptions.fitZeroOffset`, the zero offset (rad: the angle by which the impacts at the zero setting lie above the nominal zero). */
 export type RangeStringParameterName = 'muzzleVelocity' | 'dragFactor' | 'clickValue' | 'zeroOffset'
 const names: readonly RangeStringParameterName[] = [
   'muzzleVelocity',
@@ -44,10 +34,7 @@ const names: readonly RangeStringParameterName[] = [
 
 /** One distance of a range string. */
 export interface RangeStringEntry {
-  /**
-   * `impact`: height of the mean impact above the line of sight at the zero setting, m.
-   * `dial`: clicks dialled to centre the group from the zero setting, signed up.
-   */
+  /** `impact`: height of the mean impact above the line of sight at the zero setting, m; `dial`: clicks dialled from the zero setting to centre the group, signed up. */
   kind: 'impact' | 'dial'
   /** Slant range, m. */
   range: number
@@ -57,16 +44,9 @@ export interface RangeStringEntry {
   shotCount: number
   /** Standard deviation of one shot in the unit of `value`. */
   standardDeviation: number
-  /**
-   * Step of the reading in the unit of `value`; adds step / sqrt(12). Default: `defaultRounding`
-   * of the kind (a dial moves in whole clicks, 1; a measured impact has no step, 0).
-   */
+  /** In the unit of `value`, adding step / sqrt(12); default `defaultRounding` of the kind (a dial moves in whole clicks, 1; an impact has no step, 0). */
   rounding?: number | undefined
-  /**
-   * The group of shots behind the entry. An impact and a dial entry of one group count the same
-   * shots twice and are rejected. Default: the distance, so give distinct names to two groups
-   * shot at one distance.
-   */
+  /** An impact and a dial entry of one group count the same shots twice and are rejected; default the distance, so give two groups shot at one distance distinct names. */
   group?: string | undefined
 }
 
@@ -82,13 +62,7 @@ export interface Chronograph {
   rounding?: number | undefined
 }
 
-/**
- * Gaussian priors of the fit (`apps/docs/docs/models/exterior-truing-strings.md`, "Gaussian priors"). A prior is
- * centred on the nominal value of its parameter: its sigma is the standard deviation of ln q (muzzle
- * velocity, drag factor, click value) or of the offset in rad (zero offset). A prior narrows the
- * intervals of the parameters the data identifies. It never identifies a parameter: statuses
- * come from the data alone.
- */
+/** Centred on the nominal value, sigma the SD of ln q (muzzle velocity, drag factor, click value) or of the offset in rad (zero offset); a prior narrows intervals but never identifies a parameter, statuses come from the data alone (`apps/docs/docs/models/exterior-truing-strings.md`, "Gaussian priors"). */
 export interface RangeStringPriors {
   /** Standard deviation of ln(v0 / nominal). */
   muzzleVelocity?: number | undefined
@@ -110,10 +84,7 @@ export interface RangeStringOptions {
   maxZeroSigma?: number | undefined
   /** Options of every trajectory; default tolerances `relativeTolerance` 1e-10, `absoluteTolerance` 1e-9, `zeroTolerance` 1e-9. */
   trajectoryOptions?: Settings<Omit<TrajectoryOptions, 'budget'>> | undefined
-  /**
-   * Levenberg-Marquardt iterations (accepted plus rejected steps) before the fit of the current
-   * parameters fails with reason `not-converged`; default 30.
-   */
+  /** Levenberg-Marquardt iterations (accepted plus rejected steps) before the fit fails with reason `not-converged`; default 30. */
   maxIterations?: number | undefined
   /** Largest condition number of the fit; parameters beyond it are held; default 1e3. */
   maxCondition?: number | undefined
@@ -125,11 +96,7 @@ export interface RangeStringOptions {
   maxRelativeStandardUncertainty?: number | undefined
   /** Level of the chi-square test of the residuals; default 0.99. */
   residualConfidenceLevel?: number | undefined
-  /**
-   * Scale the standard errors in the intervals by the square root of the reduced chi-square
-   * and use Student's t instead of the normal quantile, for spreads that are not known; no effect
-   * at 0 degrees of freedom. Default false (`apps/docs/docs/models/exterior-truing-strings.md`, "Intervals").
-   */
+  /** Scales the standard errors by the square root of the reduced chi-square and uses Student's t, for spreads that are not known; no effect at 0 degrees of freedom; default false (`apps/docs/docs/models/exterior-truing-strings.md`, "Intervals"). */
   scaleByResidual?: boolean | undefined
 }
 
@@ -155,16 +122,10 @@ const rangeStringDefaults: Readonly<RangeStringDefaults> = {
   maxZeroSigma: 1e-4,
 }
 
-/**
- * Smallest `intervalScale`: a residual of 0 must not give an interval of zero width
- * (`apps/docs/docs/models/exterior-truing-strings.md`, "Intervals"; a chosen value).
- */
+/** A residual of 0 must not give an interval of zero width (`apps/docs/docs/models/exterior-truing-strings.md`, "Intervals"; a chosen value). */
 export const minIntervalScale = 1e-6
 
-/**
- * Rounding step of a row without `rounding`, in the unit of its value
- * (`apps/docs/docs/models/exterior-truing-strings.md`, "Uncertainty of a row").
- */
+/** In the unit of the row's value (`apps/docs/docs/models/exterior-truing-strings.md`, "Uncertainty of a row"). */
 const defaultRounding = { impact: 0, dial: 1, velocity: 0 }
 
 /** `fit-failed`: the iteration for this parameter failed (`RangeStringFit.failures`). */
@@ -176,53 +137,27 @@ export interface RangeStringParameter {
   name: RangeStringParameterName
   /** The value the fit started from and held when the parameter was not fitted. */
   nominal: number
-  /**
-   * `unresolved`: the data does not move it, or its fit failed. `weak`: one of the `reasons`
-   * applies. Else `identified`.
-   */
+  /** `unresolved`: the data does not move it, or its fit failed; `weak`: one of the `reasons` applies; else `identified`. */
   status: 'identified' | 'weak' | 'unresolved'
   /** Why the parameter is not identified; empty when it is. */
   reasons: WeakReason[]
-  /**
-   * Standard error of ln q with all parameters free, from the data alone; Infinity for a
-   * parameter in the null direction of a singular design. Absent for the zero offset, which
-   * has `standardUncertainty` (rad) instead.
-   */
+  /** SD of ln q with all parameters free, from the data alone; Infinity in the null direction of a singular design; absent for the zero offset, whose `standardUncertainty` is in rad. */
   relativeStandardUncertainty?: number
   /** Variance inflation factor against knowing the other parameters. */
   varianceInflation?: number
-  /**
-   * Standard error at the nominal (plan) or fitted value; first order. With priors, the posterior
-   * one (`posteriorSigma`).
-   */
+  /** At the nominal (plan) or fitted value, first order; with priors the posterior one (`posteriorSigma`). */
   standardUncertainty?: number
-  /**
-   * With priors: standard error of ln q (the zero offset: of the offset in rad) of the Laplace
-   * posterior, the data and all priors of the live parameters; absent without priors.
-   */
+  /** With priors: SD of ln q (the zero offset: of the offset in rad) of the Laplace posterior from the data and all priors of the live parameters; absent without priors. */
   posteriorSigma?: number
-  /**
-   * The prior on this parameter, when one is given: its sigma on the scale of `posteriorSigma` and
-   * the ratio posterior over prior sigma. A ratio near 1 means the prior decides the interval.
-   */
+  /** Its sigma on the scale of `posteriorSigma` and the ratio posterior over prior sigma; near 1 the prior decides the interval. */
   prior?: { sigma: number; ratio: number }
   /** Fitted value; only an identified parameter has one. */
   value?: number
-  /**
-   * Confidence interval of `value`; only an identified parameter has one. In a plan, the interval
-   * the fit would report around the nominal value (the zero offset: around 0), if the data
-   * behave as the plan states.
-   */
+  /** Only an identified parameter has one; in a plan, the interval the fit would report around the nominal value (the zero offset: around 0) if the data behave as the plan states. */
   interval?: { lower: number; upper: number; confidenceLevel: number }
-  /**
-   * Fit only: false when the residual check failed or the interval is conditional on a held
-   * parameter (`conditionalOn`), so it is not to be relied on (`apps/docs/docs/models/exterior-truing-strings.md`, "Residual check").
-   */
+  /** Fit only: false when the residual check failed or the interval is conditional on a held parameter (`conditionalOn`); see `apps/docs/docs/models/exterior-truing-strings.md`, "Residual check". */
   intervalsTrusted?: boolean
-  /**
-   * Fit, identified parameter only: the weak or failed parameters held at their nominal value
-   * while this one was fitted; absent when none. Its value and interval are conditional on them.
-   */
+  /** Fit, identified parameter only: the weak or failed parameters held at their nominal value while this one was fitted, so its value and interval are conditional on them; absent when none. */
   conditionalOn?: RangeStringParameterName[]
 }
 
@@ -268,11 +203,7 @@ export interface TruingPlanInput {
     | undefined
 }
 
-/**
- * Why a planned string cannot separate muzzle velocity from drag factor, whatever the numbers:
- * `single-range` (impacts or dials at one distance and no chronograph) and `velocity-only` (a
- * chronograph and no impact or dial).
- */
+/** Whatever the numbers: `single-range` (impacts or dials at one distance, no chronograph) and `velocity-only` (a chronograph, no impact or dial). */
 export type PlanRefusalId = 'single-range' | 'velocity-only'
 
 /** A plan the structure of the string rules out, with what to change. */
@@ -513,10 +444,7 @@ function checkChronograph(
   })
 }
 
-/**
- * Checks the entries and the chronograph of a plan or, with `measured`, of a fit, which adds the
- * entry values, their spreads and the chronograph mean.
- */
+/** Of a plan or, with `measured`, of a fit, which adds the entry values, their spreads and the chronograph mean. */
 function checkEntries(
   entries: readonly (PlanEntry & Partial<Pick<RangeStringEntry, 'value' | 'standardDeviation'>>)[],
   chronograph: (TruingPlanInput['chronograph'] & { mean?: number }) | undefined,
@@ -614,10 +542,7 @@ class Model {
     })
   }
 
-  /**
-   * Predicted values of all rows, or null when the trajectory fails or misses a range. With
-   * `strict` an `InputError` of the solver passes on (the nominal shot is invalid).
-   */
+  /** Null when the trajectory fails or misses a range; with `strict` an `InputError` of the solver passes on (the nominal shot is invalid). */
   predict(theta: readonly number[], strict = false): number[] | null {
     let t: ReturnType<typeof trajectory>
     try {
@@ -675,10 +600,7 @@ class Model {
   }
 }
 
-/**
- * Parameters whose column is zero, or below the noise floor everywhere
- * (`apps/docs/docs/models/exterior-truing-strings.md`, "Status of a parameter").
- */
+/** Column zero, or below the noise floor everywhere (`apps/docs/docs/models/exterior-truing-strings.md`, "Status of a parameter"). */
 function unresolved(model: Model, j: number[][], columns: readonly number[]): number[] {
   const norms = columns.map((_, c) => Math.hypot(...j.map((row) => nth(row, c))))
   const largest = Math.max(...norms)
@@ -727,10 +649,7 @@ function weakReasons(
   return reasons
 }
 
-/**
- * The standard errors of the resolved parameter `j`, column `k` of `info` and `post`: of the data
- * alone, its variance inflation, the one the interval uses, and the prior of the parameter.
- */
+/** Of resolved parameter `j`, column `k` of `info` and `post`: the data-alone error, its variance inflation, the one the interval uses, and the parameter's prior. */
 function resolvedErrors(input: StatusInput, j: number, k: number) {
   const { model, info, post } = input
   // standard error per unit parameter: of ln q, or of the zero offset in rad
@@ -790,10 +709,7 @@ function confoundedParameters(
     : []
 }
 
-/**
- * Laplace posterior: the data rows `full` and one pseudo-row 1 / sigma per prior of a live parameter;
- * null without such a prior. Statuses stay with the data alone; a prior narrows an interval, it identifies nothing.
- */
+/** The data rows `full` plus one pseudo-row 1 / sigma per prior of a live parameter, null without such a prior; statuses stay with the data alone, a prior identifies nothing. */
 function posterior(
   model: Model,
   full: number[][],
@@ -822,10 +738,7 @@ function correlations(
   return correlation
 }
 
-/**
- * Statuses of the resolved parameters from their weighted Jacobian at `theta`. With `fitted`, the
- * parameters of `kept` have the values of `theta`; one outside `kept` cannot be identified.
- */
+/** Statuses of the resolved parameters from their weighted Jacobian at `theta`; with `fitted` the parameters of `kept` have the values of `theta`, and one outside `kept` cannot be identified. */
 function analyse(
   model: Model,
   theta: readonly number[],
@@ -867,12 +780,7 @@ const unitSigma = (p: RangeStringParameter): number =>
   // NaN for a missing standard error (an identified parameter has both)
   Number.NaN
 
-/**
- * Standard errors and identifiability of muzzle velocity, drag factor and click value (and the
- * zero offset with `fitZeroOffset`) for the
- * distances and shot counts of a planned session, at the nominal parameters. Nothing is fitted;
- * the standard errors are those the fit would report for noise-free data.
- */
+/** At the nominal parameters, for the distances and shot counts of a planned session; nothing is fitted, the standard errors are those the fit would report for noise-free data. */
 export function planTruingStrings(
   input: TruingPlanInput,
   options: RangeStringOptions = {},
@@ -919,12 +827,7 @@ export interface CandidatePlan {
   plan: TruingPlan
 }
 
-/**
- * Plans each candidate string on the same nominal shot, click value, dispersion and options, in
- * the order given. Every plan carries the interval each identified parameter would get from
- * the fit (`RangeStringParameter.interval`), so candidates compare by predicted interval width and
- * shot count before any shot (`apps/docs/docs/models/exterior-truing-strings.md`).
- */
+/** In the order given, on the same nominal shot, click value, dispersion and options; each plan carries the intervals the fit would give, so candidates compare by interval width and shot count before any shot (`apps/docs/docs/models/exterior-truing-strings.md`). */
 export function comparePlanCandidates(
   input: Omit<TruingPlanInput, 'entries' | 'chronograph'>,
   candidates: readonly PlanCandidate[],
@@ -982,16 +885,9 @@ export interface RangeStringFit {
   pValue?: number
   /** Whether the residuals agree with the stated uncertainties at `residualConfidenceLevel`; absent at 0 dof. */
   consistent?: boolean
-  /**
-   * False when `consistent` is false, or when an identified parameter is conditional on a held
-   * one (`RangeStringParameter.conditionalOn`): the intervals are not to be relied on
-   * (`apps/docs/docs/models/exterior-truing-strings.md`, "Residual check").
-   */
+  /** False when `consistent` is false or an identified parameter is conditional on a held one (`RangeStringParameter.conditionalOn`); see `apps/docs/docs/models/exterior-truing-strings.md`, "Residual check". */
   intervalsTrusted: boolean
-  /**
-   * Factor on the standard errors in the intervals: sqrt(chiSquare / dof), at least
-   * `minIntervalScale`, with `scaleByResidual` and dof above 0, else 1.
-   */
+  /** sqrt(chiSquare / dof), at least `minIntervalScale`, with `scaleByResidual` and dof above 0; else 1. */
   intervalScale: number
   /** Failures of the iteration, in order; the parameters named are `unresolved` with reason `fit-failed`. */
   failures: RangeStringFailure[]
@@ -1013,10 +909,7 @@ export interface TruingStringsInput {
   chronograph?: Chronograph | undefined
 }
 
-/**
- * Parameters to fit at the nominal values: the resolved ones; while the information is singular
- * or there are fewer rows than parameters, the most collinear one is held at its nominal value.
- */
+/** The resolved ones; while the information is singular or there are fewer rows than parameters, the most collinear one is held at its nominal value. */
 function screenParameters(model: Model, maxCondition: number): number[] {
   const j0 = model.jacobian(zeros, model.active)
   if (!j0) throw new TruingError('unreachable', { detail: model.failure })
@@ -1041,10 +934,7 @@ interface StringsSolution {
   iterations: number
 }
 
-/**
- * Levenberg-Marquardt on the parameters `fitting`; the others stay at their nominal value.
- * `first` holds the predicted rows at the nominal values.
- */
+/** Levenberg-Marquardt on the parameters `fitting`, the others at their nominal value; `first` holds the predicted rows at the nominal values. */
 function solveStrings(
   model: Model,
   first: readonly number[],
@@ -1107,10 +997,7 @@ function failureParameters(e: TruingError, kept: readonly number[]) {
   return []
 }
 
-/**
- * The kept parameters after a failed fit: without those the failure names, or without all when it
- * names none, which `failures` records. Rethrows anything but a failure of the fit.
- */
+/** Without those the failure names, or without all when it names none, recorded in `failures`; rethrows anything but a failure of the fit. */
 function afterFailure(e: unknown, kept: number[], failures: RangeStringFailure[]): number[] {
   // a failure of the solver (its reasons) or an unreachable Jacobian at its solution
   if (!(e instanceof TruingError) || kept.length === 0 || !isFitFailure(e.reason)) throw e
@@ -1120,11 +1007,7 @@ function afterFailure(e: unknown, kept: number[], failures: RangeStringFailure[]
   return kept.filter((j) => !left.includes(j))
 }
 
-/**
- * Fits `kept`, then re-screens at the solution: a parameter kept in the fit that turns out weak is
- * held at its nominal value and the rest is fitted again, so the reported model is the fitted one.
- * A failure drops the parameters it names and fits again.
- */
+/** Re-screens at the solution: a kept parameter that turns out weak is held at its nominal value and the rest fitted again, so the reported model is the fitted one; a failure drops the parameters it names and fits again. */
 function refitUntilIdentified(
   model: Model,
   first: readonly number[],
@@ -1199,8 +1082,7 @@ function stringsFitResult(model: Model, options: RangeStringOptions, refit: Refi
   const { intervalScale, quantile } = intervalWidth(options, chiSquare, dof, level)
   const failed = failures.flatMap((f) => f.parameters)
   const final = a.parameters.map((q, j) => dropped.get(j) ?? q)
-  // A held parameter with information (weak or failed) shifts the fitted ones: their intervals
-  // hold the sampling error of the data, not the error of its nominal value.
+  // A held parameter with information (weak or failed) shifts the fitted ones: their intervals hold the sampling error of the data, not the error of its nominal value.
   const used = names.slice(0, model.active.length)
   const heldWithInformation = used.filter(
     (name, j) => !kept.includes(j) && (failed.includes(name) || nth(final, j).status === 'weak'),
@@ -1241,14 +1123,7 @@ function stringsFitResult(model: Model, options: RangeStringOptions, refit: Refi
   }
 }
 
-/**
- * Fits muzzle velocity, drag factor (C_D times k) and click value to the entries and the
- * chronograph, weighted by their stated uncertainties. A parameter the data cannot separate is
- * named weakly identified and returns no value; the others come with confidence intervals.
- * The values, `chiSquare`, `degreesOfFreedom` and `shot` are those of one model, in which the weakly
- * identified and the failed parameters are held at their nominal values
- * (`apps/docs/docs/models/exterior-truing-strings.md`, "Fit sequence").
- */
+/** Weighted by the stated uncertainties; a parameter the data cannot separate is named weakly identified and has no value, and the values, `chiSquare`, `degreesOfFreedom` and `shot` are of one model with the weak and failed ones held at nominal (`apps/docs/docs/models/exterior-truing-strings.md`, "Fit sequence"). */
 export function fitTruingStrings(
   input: TruingStringsInput,
   options: RangeStringOptions = {},

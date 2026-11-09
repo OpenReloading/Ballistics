@@ -1,14 +1,8 @@
-/**
- * Drag input and table lookup, BC reference atmosphere and monotone cubic interpolation,
- * `apps/docs/docs/models/exterior-drag.md`.
- */
+/** Drag input and table lookup, BC reference atmosphere and monotone cubic interpolation, `apps/docs/docs/models/exterior-drag.md`. */
 import { conversions } from '@open-reloading/units'
 import { type DragModel, type DragTable, dragTables } from '../drag-tables.ts'
 
-/**
- * The standard drag models, in the key order of the generated `dragTables` (a test pins it); a
- * literal, so a bundle that imports only other names from this module drops the tables.
- */
+/** In the key order of the generated `dragTables` (a test pins it); a literal, so a bundle that imports only other names from this module drops the tables. */
 export const dragModels: readonly DragModel[] = ['G1', 'G2', 'G5', 'G6', 'G7', 'G8', 'GI', 'GS']
 
 /** kg/m2 per lb/in2: converts a published ballistic coefficient to SI (exact). */
@@ -25,10 +19,7 @@ export interface BallisticCoefficientBand {
 /** How a drag table or curve is read between nodes; default `'linear'`. */
 export type DragInterpolation = 'linear' | 'monotone-cubic'
 
-/**
- * Drag input of a projectile: a ballistic coefficient in velocity bands against a standard model,
- * or the bullet's own drag coefficient curve.
- */
+/** A ballistic coefficient in velocity bands against a standard model, or the bullet's own drag coefficient curve. */
 export type DragInput =
   | {
       kind: 'bc'
@@ -123,10 +114,7 @@ export function dragCoefficient(
   return onSegment(table, node(table, mach), mach, interpolation)
 }
 
-/**
- * Segment k of the table that holds `mach` (`table[k][0] <= mach < table[k + 1][0]`); -1 below the
- * first node, table.length - 1 at or above the last.
- */
+/** Segment k that holds `mach` (`table[k][0] <= mach < table[k + 1][0]`); -1 below the first node, table.length - 1 at or above the last. */
 export function dragSegment(table: DragTable, mach: number): number {
   if (mach < entry(table, 0)[0]) return -1
   if (mach >= entry(table, table.length - 1)[0]) return table.length - 1
@@ -139,16 +127,12 @@ const narrowSegment = 1e-6
 /** Change per Mach, relative to the larger node value, above which a segment is held too. */
 const steepSegment = 100
 
-/**
- * True when segment k (see `dragSegment`) is held at its node values outside its nodes: narrower
- * than `narrowSegment`, or, with `slope`, steeper than `steepSegment`; false outside the table.
- */
+/** True when segment k (`dragSegment`) is held at its node values outside its nodes: narrower than `narrowSegment`, or with `slope` steeper than `steepSegment`; false outside the table. */
 export function heldSegment(table: DragTable, k: number, slope = true): boolean {
   if (k < 0 || k >= table.length - 1) return false
   const [m0, c0] = entry(table, k)
   const [m1, c1] = entry(table, k + 1)
-  // a narrow or steep drag segment's extension can reach zero drag within one trial step; a
-  // coefficient table may change sign, so only the width rule applies to it
+  // a narrow or steep drag segment's extension can reach zero drag within one trial step; a coefficient table may change sign, so only the width rule applies to it
   return (
     m1 - m0 < narrowSegment ||
     (slope && Math.abs(c1 - c0) > steepSegment * (m1 - m0) * Math.max(Math.abs(c0), Math.abs(c1)))
@@ -159,18 +143,11 @@ export function heldSegment(table: DragTable, k: number, slope = true): boolean 
 export interface SegmentReading {
   /** Default `linear`. */
   interpolation?: DragInterpolation | undefined
-  /**
-   * Whether the segment is held at its node values outside its nodes; default `heldSegment` with the
-   * slope rule, the reading of a drag table (a coefficient table passes `heldSegment(table, k, false)`).
-   */
+  /** Default `heldSegment` with the slope rule, the reading of a drag table; a coefficient table passes `heldSegment(table, k, false)`. */
   held?: boolean | undefined
 }
 
-/**
- * Drag coefficient on segment k (see `dragSegment`), extended past the segment's nodes as the same
- * line or cubic, or held at the node values when the reading holds it; the end value on the
- * segments outside the table. The integrator holds k fixed within a step.
- */
+/** On segment k (`dragSegment`), extended past its nodes as the same line or cubic, or held at the node values when the reading holds it; the end value outside the table; the integrator holds k fixed within a step. */
 export function segmentCoefficient(
   table: DragTable,
   k: number,

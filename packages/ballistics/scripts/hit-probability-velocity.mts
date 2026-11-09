@@ -1,9 +1,6 @@
-// Velocity-spread term of the hit probability against a seeded simulation of impact heights
-// (apps/docs/docs/research/hit-probability-velocity-term.md). Run: node packages/ballistics/scripts/hit-probability-velocity.mts
-// Synthetic loads only; every number is a simulation, not load data.
+// Velocity-spread term of the hit probability against a seeded simulation of impact heights (apps/docs/docs/research/hit-probability-velocity-term.md); synthetic loads only, every number a simulation, not load data
 
-// the generator of the other hit-probability scripts, so the seeds give the same draws
-// shortcut: an import from a sibling package; drop it when the scripts take the generator of statistics
+// the generator of the other hit-probability scripts, so the seeds give the same draws; shortcut: an import from a sibling package, drop it when the scripts take the generator of statistics
 import { normals } from '../../shot-groups/scripts/rng.mts'
 import {
   lbPerSqInToKgPerSqM,

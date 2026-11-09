@@ -1,8 +1,4 @@
-/**
- * Flat spots of a charge ladder: charge ranges where the mean velocity changes least with charge,
- * from the mean, spread and shot count of each string
- * (`apps/docs/docs/models/interior-velocity-ladder.md`). SI throughout: charge kg, velocity m/s.
- */
+/** Charge ranges where the mean velocity changes least with charge, from the mean, spread and shot count of each string (`apps/docs/docs/models/interior-velocity-ladder.md`); SI throughout: charge kg, velocity m/s. */
 
 import { nth, studentTwoSidedQuantile } from '@open-reloading/statistics'
 import { need } from '../issue.ts'
@@ -83,12 +79,7 @@ function ladderSegment(a: LadderStep, b: LadderStep, level: number): LadderSegme
   }
 }
 
-/**
- * The segments between neighbouring charges, each with the slope of the mean velocity and a
- * two-sided confidence band from Welch's standard error and t quantile (whole degrees of freedom,
- * rounded down), and the runs of neighbouring segments whose band includes zero. Steps are taken in
- * ascending charge; each needs at least two shots.
- */
+/** Each segment's slope of the mean velocity with a two-sided band from Welch's standard error and t quantile (whole degrees of freedom, rounded down), and the runs of segments whose band includes zero; steps ascending in charge, each with at least two shots. */
 export function ladderFlatSpots(steps: readonly LadderStep[], level = 0.95): LadderFlatSpots {
   need(steps.length >= 2, { code: 'ladderTooFewStrings', params: {} })
   const sorted = steps.toSorted((a, b) => a.charge - b.charge)
