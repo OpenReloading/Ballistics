@@ -28,12 +28,7 @@ import type { InvalidRecordDiagnostic } from './import-diagnostics.ts'
 import { type LoadFileFormat, loadFileFormats, loadFormatOf } from './load-file-formats.ts'
 import { type InvalidRecord, maxFileBytes, planImport, type WordedWarning } from './user-data.ts'
 
-/**
- * What a card shows of a read file: the refusal (with the load-file format that refused it and the
- * reader's own message as `detail`), the
- * load file's format, record count and what it did not read, or the table's header, samples and
- * kind suggestion.
- */
+/** A refusal carries the refusing load-file format and the reader's message as `detail`. */
 export type CardView =
   | { refusal: string; format?: string | undefined; detail?: string }
   | {
@@ -177,10 +172,7 @@ const oddBytes =
 const notText =
   'The file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again.'
 
-/**
- * One inspection of a file's bytes, its extension not read: the size, the load-file formats in
- * their order, a workbook by its signature, then the text as a JSON list or a delimited table.
- */
+/** The extension is not read: size, load-file formats in order, a workbook by signature, then JSON or delimited text. */
 async function readFile(bytes: Uint8Array, formats: LoadFileFormat[]): Promise<FileRead> {
   if (bytes.byteLength > maxFileBytes)
     return { refusal: 'The file is larger than 40 MB. Split it and import the parts.' }
@@ -216,10 +208,7 @@ const samplesOf = (t: { header: string[]; rows: string[][] }) =>
       .slice(0, 3),
   )
 
-/**
- * `built` against `stored`: rows with one id in the file collapse (same content) or keep the first
- * (other content); makers count only as written, never as changed.
- */
+/** Rows with one id collapse when equal and keep the first otherwise; makers count only as written, never as changed. */
 function planOf(built: Built, { records: stored, invalid }: Stored): Plan {
   const first = new Map<string, UserRecord>()
   let repeated = 0
@@ -266,10 +255,7 @@ const labelled = (i: RowIssue): ShownIssue => {
   return { ...i, reason: { ...i.reason, params } }
 }
 
-/**
- * The record of each candidate, saved at `saved`, parsed with the user record schema; a record it
- * refuses turns its row into a rejected one.
- */
+/** A record the schema refuses turns its row into a rejected one. */
 function checked(built: BuiltRecords, saved: string): Built {
   const entries: Built['entries'] = []
   const rejected: ShownIssue[] = built.rejected.map(labelled)
@@ -338,10 +324,7 @@ function cardOf(read: FileRead): CardView {
   }
 }
 
-/**
- * The worker's handler: reads, builds and writes the files of one Import entry by id, keeping
- * tables and records here so the page receives summaries only.
- */
+/** Tables and records stay in the worker, so the page receives summaries only. */
 export function importWorker(
   store: ImportStore,
   post: (r: ImportReply) => void,
@@ -474,10 +457,7 @@ export const mappingsFor = (saved: SavedMappings, header: readonly string[]) =>
     )
     .map(([name]) => name)
 
-/**
- * The first build of a read table: the last saved mapping made for its header, else the suggested
- * kind with the automatic map; none for a refused file, a load file or a table no kind reaches.
- */
+/** The last mapping saved for the header, else the suggested kind with the automatic map. */
 export function firstBuild(card: CardView, saved: SavedMappings) {
   if (!('header' in card)) return
   const name = mappingsFor(saved, card.header).at(-1)
@@ -493,10 +473,7 @@ interface CountedFile {
   source: string
 }
 
-/**
- * The rows an Import writes over `files`, and whether one of the files that writes rows has no
- * source: then the Import button stays disabled.
- */
+/** A file that writes rows without a source keeps the Import button disabled. */
 export function importCount(files: readonly CountedFile[], shared: string, replace: boolean) {
   let total = 0
   let missingSource = false

@@ -53,10 +53,7 @@ export type DisciplineRow = {
   faceIds: string[]
 }
 
-/**
- * The distance as the rule book prints it, one reading per unit it states: the metres of the
- * record, or for `yd` its yards; for `m/yd` the printed number is the same in each unit.
- */
+/** One reading per unit the rule book states; for `m/yd` the printed number is the same in each. */
 function distanceReadings(stored: number, unit: DisciplineRow['unit']) {
   // the SI conversion leaves float noise (12700 mm is 12.700000000000001 m)
   const metres = Number(stored.toPrecision(12))
@@ -115,11 +112,7 @@ export function disciplineRow(
 /** The URL keys of the discipline list's choice filters. */
 export const disciplineFacetKeys = ['org', 'category', 'dist', 'class', 'face']
 
-/**
- * The discipline list's choice filters: federation (by abbreviation), category, distance in the
- * rule book's unit (a row that states both is in either), caliber class and face. `faces` names
- * the faces by id; the classes are named by `rows`.
- */
+/** A row that states both distance units is in either. */
 export function disciplineFacets(
   rows: readonly DisciplineRow[],
   faces: ReadonlyMap<string, string>,
@@ -390,10 +383,7 @@ export function disciplineGroups(
   ]
 }
 
-/**
- * The rule book that defines a discipline: the source its `section` is read from, else its first
- * source, with the section and page of the record.
- */
+/** The source its `section` is read from, else its first source. */
 export function disciplineRuleBook(
   d: Pick<DisciplineRecord, 'section' | 'page' | 'provenance'>,
 ): (Source & { section: string; page: string }) | undefined {

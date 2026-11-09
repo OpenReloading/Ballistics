@@ -1,10 +1,6 @@
 import type { Translator } from '../i18n/translate.ts'
 
-/**
- * Defaults of the load-defining inputs that have a usable value without the user's own: per
- * field, the chosen firearm's value, else the chosen cartridge record's, else the user's Settings,
- * else a value by cartridge class. All SI.
- */
+/** Firearm, else cartridge record, else the Settings, else a value by cartridge class; SI. */
 
 /** A value with the words that say where it comes from ("Default: <source>."). */
 export type Suggestion = {
@@ -29,10 +25,7 @@ export type Suggestions = Partial<Record<FollowKey | 'barrelLength', Suggestion>
 
 type CartridgeClass = 'rifle' | 'pistol'
 
-/**
- * Barrel length by cartridge class, m: assumptions without a source (24 in, 4 in), used where
- * neither a firearm nor the Settings default gives one.
- */
+/** m: assumptions without a source (24 in, 4 in) for when neither a firearm nor the Settings give one. */
 export const barrelLengthByClass: Record<CartridgeClass, number> = { rifle: 0.6096, pistol: 0.1016 }
 
 /** The CIP table that holds the pistol and revolver cartridges (table IV); all other tables count as rifle. */
@@ -74,11 +67,7 @@ export type DefaultSources = {
 
 const positive = (x: number | undefined): x is number => x !== undefined && x > 0
 
-/**
- * Whether the chamber volume of a run is a measured case capacity: one was entered for the
- * cartridge and the volume field still holds a value that capacity gives (its followed default or
- * the seated bullet's), not a typed one. A record's capacity and a typed volume are estimates.
- */
+/** Only an entered capacity the volume field still follows; a record's capacity and a typed volume are estimates. */
 export function volumeMeasured(a: {
   measuredCapacity: number | undefined
   volume: number | undefined

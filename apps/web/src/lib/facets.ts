@@ -58,12 +58,7 @@ function countValues<T>(
   return counts
 }
 
-/**
- * The options of each filter: every value any of `all` has, with the rows of `base` (`all` after
- * the search) that pass the other filters and have the value, so a count of 0 is a choice that
- * leaves nothing. A filter that `all` gives fewer than two values is left out unless it has a
- * value chosen. Values chosen but absent from `all` stay, to be unchecked.
- */
+/** A count of 0 is a choice that leaves nothing; values chosen but absent stay, to be unchecked. */
 export function facetOptions<T>(
   all: readonly T[],
   base: readonly T[],

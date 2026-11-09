@@ -3,10 +3,7 @@ import type { SortDirection } from './lists.ts'
 
 export type DirectorySort = { column: string; dir: SortDirection } | undefined
 
-/**
- * A list's search, scope and sort as the URL keeps them: `query` search, `sort` a column key, "-"
- * first for descending.
- */
+/** As the URL keeps them; "-" before a sort key for descending. */
 export interface DirectoryState {
   /** Search text, URL key `q`. */
   query: string
@@ -64,10 +61,7 @@ export function readDirectory(search: string, facetKeys: readonly string[] = [])
   }
 }
 
-/**
- * `search` with the state's parameters replaced; other parameters (such as `units`) stay. The
- * parameters of `facetKeys` and of the facets in the state are replaced too.
- */
+/** Other parameters (such as `units`) stay. */
 export function writeDirectory(
   state: DirectoryState,
   search: string,

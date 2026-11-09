@@ -5,10 +5,7 @@ import { shownLanguage } from '../i18n/shown.ts'
 export const localDay = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 
-/**
- * A YYYY-MM-DD day as text in the language shown ("1 May 2026", "1. Mai 2026"), the same on server
- * and browser for one language; any other text as given.
- */
+/** The same on server and browser for one language; any other text as given. */
 export const dayText = (day: string, language = shownLanguage()) => locale.dayText(day, language)
 
 /** The month `index` (0 for January) by name in the language shown. */

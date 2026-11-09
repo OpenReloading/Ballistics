@@ -1,10 +1,4 @@
-/**
- * Bullet hole proposals on a target photo (`apps/docs/docs/models/hole-detection.md`): a colour axis from one
- * example hole (Fisher's linear discriminant of the hole against the ring around it, in log RGB),
- * a multi-scale Hessian blob detector on the projection, a top-hat against a 2 D opening for the
- * hole shape, and a count per connected part from its peaks and its area. Pure: no React, DOM or
- * Next.js, so it can run in a Web Worker.
- */
+/** Hole proposals from one example hole (`apps/docs/docs/models/hole-detection.md`); pure, so it runs in a worker. */
 import {
   boxBlur,
   type Peak,
@@ -55,30 +49,17 @@ export type HoleDetectionInput = {
   pxPerM: number
   /** Expected hole diameter, m (the bullet diameter, a typed or a learned hole size). */
   expectedHoleDiameter: number
-  /**
-   * Unitless sensitivity, default 0.15: the peak strength cutoff (`KEEP` times `minContrast / 0.15` of
-   * the median of the 5 strongest peaks, held to 0.05 to 0.9) and the least colour separation
-   * (`MIN_SEP` times `minContrast / 0.15`) scale with it.
-   */
+  /** Default 0.15; the peak cutoff and the least colour separation scale with it. */
   minContrast?: number
   /** Visible hole diameter over the bullet diameter. */
   holeScale?: number
-  /**
-   * Colour seen through a hole (0..255 per channel), picked by the user in one hole: the colour
-   * axis runs from the surroundings of the region to it. Absent: the axis comes from the strongest
-   * blobs of the region (`autoDetect`).
-   */
+  /** The axis runs from the region's surroundings to it; absent, `autoDetect` finds it. */
   backing?: { r: number; g: number; b: number }
   /** Holes darker (`dark`) or lighter (`light`) than their surroundings only; absent: both. */
   polarity?: 'dark' | 'light'
   /** Called with the share of the work done, 0..1, between the steps. */
   onProgress?: (done: number) => void
-  /**
-   * The target face found on the photo: its outline is the region when
-   * none is given, the colour axis of a hole takes its surroundings from the same kind of surface
-   * (black area or paper), and a run drops what its polarity cannot show: dark marks on the black
-   * area and light marks on the paper are print.
-   */
+  /** Dark marks on the black area and light marks on the paper are print, so a run drops them. */
   face?: FaceLabel | undefined
 }
 
@@ -88,15 +69,9 @@ export type FaceLabel = {
   outline: Point[]
   /** True for a point on the black area. */
   black: (p: Point) => boolean
-  /**
-   * True for a point where the ring numerals stand: on an axis turned by `roll` (rad), between two
-   * ring lines.
-   */
+  /** Between two ring lines on an axis turned by `roll` (rad). */
   numeral?: ((p: Point, roll?: number) => boolean) | undefined
-  /**
-   * True for a point where the quarter marks of the black area stand: on an axis turned by `roll`
-   * (rad), near the black area's edge.
-   */
+  /** Near the black area's edge on an axis turned by `roll` (rad). */
   quarter?: ((p: Point, roll?: number) => boolean) | undefined
   /** Distance of a point from the face centre (mm) and its angle from the face's x axis (rad). */
   polar?: (p: Point) => { radius: number; angle: number }
@@ -131,10 +106,7 @@ export const MAX_WORK_PIXELS = 2_000_000
 /** Least hole diameter in working px once the cap forces larger blocks. */
 const MIN_WORK_DIAMETER = 4
 
-/**
- * Image px per working px (block size) for a crop of `width` x `height` px with holes `holePx`
- * across; a RangeError when the cap leaves a hole fewer than 4 working px.
- */
+/** A RangeError when the cap leaves a hole fewer than 4 working px. */
 export function workBlockSize(
   holePx: number,
   width: number,
@@ -227,10 +199,7 @@ export type HoleExample = {
   polarity: 'dark' | 'light'
 }
 
-/**
- * Hole proposals without a picked hole: with a backing colour the colour axis runs from the
- * region's surroundings to it, else `autoDetect`'s.
- */
+/** Without a backing colour, `autoDetect`'s axis. */
 export function findHoles(input: HoleDetectionInput): {
   proposals: HoleProposal[]
   flagged: FlaggedRegion[]
@@ -239,11 +208,7 @@ export function findHoles(input: HoleDetectionInput): {
   return { proposals: found?.proposals ?? [], flagged: [] }
 }
 
-/**
- * Detection without a picked hole (`apps/docs/docs/models/hole-detection.md`, "Detection without a picked hole"): the strongest blobs of
- * each polarity seed a colour axis, and the run with the most shots is proposed when its holes are
- * alike (at least 2, sizes within 35 % of their median). Undefined otherwise: the user picks a hole.
- */
+/** Proposes the run whose shots the other seed runs find most often, its holes alike (at least 2, sizes within 35 % of their median); undefined when none agrees, and the user picks a hole (`apps/docs/docs/models/hole-detection.md`, "Detection without a picked hole"). */
 export function autoDetect(raw: HoleDetectionInput): Found | undefined {
   // the coarse and the full pass each report from 0: only the rises count
   let seen = 0
@@ -304,10 +269,7 @@ function runSeeds(input: HoleDetectionInput, ctx: Ctx, seeds: (Peak | undefined)
   return runs
 }
 
-/**
- * Whether the marks in the numeral zone are print: they stand at three places or more over all the
- * runs. Then they leave the shots of every run.
- */
+/** Marks in the numeral zone at three places or more over all runs are print and leave every run. */
 function dropNumeralMarks(runs: SeedRun[], prior: number): boolean {
   const spots: Point[] = []
   for (const r of runs)
@@ -342,12 +304,7 @@ function refineWinner(input: HoleDetectionInput, ctx: Ctx, best: SeedRun, printe
   return fine && solved(input, fromImage(fine, toImage(ctx, best.at)), fine, true, true, printed)
 }
 
-/**
- * Detection from the hole the user picked at `at` (image px): the colour axis is that of the hole
- * against the ring around it, and the hole size comes from its scale-space maximum, clamped to 0.7
- * to 1.4 of `expectedHoleDiameter`, then from the strongest peaks of the whole region (own
- * rule). The pick sets neither the size nor the strength reference of the peaks.
- */
+/** `at` in image px: the colour axis is the picked hole's against its ring, the size starts from its scale-space maximum (0.7 to 1.4 of `expectedHoleDiameter`) and the region's strongest peaks refine it (own rule); the pick never sets the peaks' strength reference. */
 export function detectFromExample(
   input: HoleDetectionInput,
   at: Point,
@@ -388,8 +345,7 @@ function solved(
   const sized = estimateHoleSize(ctx, seed, refine)
   if (!sized) return undefined
   const { holeDiameter } = sized
-  // the seed runs keep the filled print areas: a seed on the light holes of a filled area may only
-  // find the area at the seeds' scale, and the full pass the holes
+  // A seed on a filled area's light holes may find only the area at the seeds' scale, so the seed runs keep it.
   const run = last
     ? { ...sized.run, shots: sized.run.shots.filter((q) => !sized.run.filled?.includes(q)) }
     : sized.run
@@ -404,10 +360,7 @@ function solved(
   return { found, run: { ...run, shots: marks.map((m) => m.shot), zone }, holeDiameter }
 }
 
-/**
- * The hole diameter (work px) and the run at it: the prior, or the picked hole's size, clamped to
- * `SIZE_MIN` to `SIZE_MAX` of the prior; then once the size the strongest peaks of the run show.
- */
+/** `holeDiameter` in work px, clamped to `SIZE_MIN` to `SIZE_MAX` of the prior, then once by the run's strongest peaks. */
 function estimateHoleSize(
   ctx: Ctx,
   seed: Seed,
@@ -424,8 +377,7 @@ function estimateHoleSize(
   ctx.progress(0.3)
   let run = pipeline(ctx, holeDiameter, seed)
   if (!run) return undefined
-  // the strongest peaks of the region refine the size once; with a face, when the peaks of the run
-  // at the new size show the old size again, the estimate moves with D and the first run stays
+  // With a face, when the new size's peaks show the old size again, the estimate moves with D and the first run stays.
   const refined = clamp(run.size, lo, hi)
   if (refine && Math.abs(refined / holeDiameter - 1) > 0.12) {
     const second = pipeline(ctx, refined, seed)
@@ -438,13 +390,7 @@ function estimateHoleSize(
   return { run, holeDiameter }
 }
 
-/**
- * The shots of `run` with their image px, without the marks within half a hole of the working
- * image's edge and print: a dark mark on the black area and a light one on the paper, the marks
- * where the numerals stand when they are print (`printed`, or when there are `NUMERALS_MIN` or
- * more) and the quarter marks of the black area when they stand on `NUMERALS_MIN` axes or more.
- * `zone`: the shots where the numerals stand.
- */
+/** Edge marks and print go: dark on the black area, light on paper, numeral-zone marks when `printed` or `NUMERALS_MIN` of them, and quarter marks standing on `NUMERALS_MIN` axes. */
 function dropPrintMarks(ctx: Ctx, run: Run, printed: boolean | undefined) {
   const dark = lumaOf(run.mu) < lumaOf(run.ring)
   // a line that meets the photo's edge leaves a blob there
@@ -475,11 +421,7 @@ function quarterTurn(face: FaceLabel | undefined, c: Point, roll: number): numbe
   return ((turn % 4) + 4) % 4
 }
 
-/**
- * The marks of `group`, standing where print does, that are print: a mark whose disc diameter is
- * above `HOLE_ON_PRINT` times the lower median of the group's but no larger than a hole can be
- * (`SIZE_MAX` of the expected size) is a hole on the print. A larger part is print that merged.
- */
+/** A mark above `HOLE_ON_PRINT` times the group's lower median but within a hole's size is a hole on the print; a larger part is merged print. */
 function printAmong<T extends { shot: HoleProposal }>(ctx: Ctx, group: readonly T[]): T[] {
   if (!group.length) return []
   const sizes = group.map((m) => m.shot.diameter).sort((a, b) => a - b)
@@ -487,12 +429,7 @@ function printAmong<T extends { shot: HoleProposal }>(ctx: Ctx, group: readonly 
   return group.filter((m) => m.shot.diameter <= alike || m.shot.diameter > SIZE_MAX * ctx.prior)
 }
 
-/**
- * The turn of the face's axes on the photo (the face plane is found without it): the angle from the
- * nearest axis that most marks standing where numerals do share within `ROLL_SPREAD`, when
- * `NUMERALS_MIN` or more share it and two of them stand at one radius (within 3 %) on two axes, as
- * the numerals of a ring do; else 0.
- */
+/** The angle most numeral-zone marks share, when `NUMERALS_MIN` do and two stand at one radius (within 3 %) on two axes as ring numerals do; else 0. */
 function numeralRoll(face: FaceLabel | undefined, marks: readonly { c: Point }[]): number {
   const { numeral, quarter, polar } = face ?? {}
   if (!(numeral || quarter) || !polar) return 0
@@ -524,10 +461,7 @@ function numeralRoll(face: FaceLabel | undefined, marks: readonly { c: Point }[]
   return (numeral && rollOf(numeral)) ?? (quarter && rollOf(quarter)) ?? 0
 }
 
-/**
- * The marks inside the region as proposals in image px, most confident first, without strays
- * unless `fliers` (the region is a found face: a flier on it is a shot).
- */
+/** Most confident first; strays dropped unless `fliers`, where the region is a found face and a flier is a shot. */
 function toProposals(
   ctx: Ctx,
   marks: { shot: HoleProposal; c: Point }[],
@@ -651,12 +585,7 @@ function blockAverageLogRgb(
   return sum
 }
 
-/**
- * Takes the blocks of the face's region off that lie neither on its black nor on the sheet (the
- * hull of `paperOutline`): the outer rings of a face on an insert card run past the card onto the
- * table. A hull that leaves 5 % of the black out is no sheet but the lit part of one in a shadow,
- * and cuts nothing.
- */
+/** A face on an insert card runs past the card onto the table; a hull leaving 5 % of the black out is a lit patch, not the sheet, and cuts nothing. */
 function offSheet(ctx: Ctx, image: RgbaImage) {
   const sheet = paperOutline(image)
   const { w, h, inside, blackMask } = ctx
@@ -728,11 +657,7 @@ function around({ w, h }: { w: number; h: number }, p: Peak, r: number, f: (i: n
       if ((x - p.x) ** 2 + (y - p.y) ** 2 <= r * r) f(y * w + x)
 }
 
-/**
- * One pass at hole diameter `holeDiameter` (work px): axis, projection, blob peaks, top-hat shape,
- * the peak tests, and the shots per connected part. The strength and contrast references are the
- * median of the 5 strongest peaks of the region, never the picked hole.
- */
+/** `holeDiameter` in work px; the strength and contrast references are the median of the region's 5 strongest peaks, never the picked hole. */
 function pipeline(ctx: Ctx, holeDiameter: number, seed: Seed): Run | undefined {
   const { w, h, inside } = ctx
   const axis = axisOf(ctx, holeDiameter, seed)
@@ -795,10 +720,7 @@ function topHat(P: Float32Array, w: number, h: number, holeDiameter: number): Fl
   )
 }
 
-/**
- * The peak tests, strongest first until one is under `keep` of `r5`: strength, inscribed radius,
- * fill share. The kept peaks by the index of their part of `mask`.
- */
+/** Strongest first until one is under `keep` of `r5`; kept peaks by their part of `mask`. */
 function testPeaks(
   peaks: Peak[],
   mask: Uint8Array,
@@ -840,11 +762,7 @@ function estimateSize(kept: Map<number, Peak[]>, scales: Space, w: number): numb
     .map((p) => D_OVER_SIGMA * sigmaAt(scales, Math.round(p.y) * w + Math.round(p.x)))
 }
 
-/**
- * One shot per kept peak; the peaks of one part form a cluster, a part far larger than its holes is
- * print. `filled`: the shots of a filled print area with holes in it, a part thicker than a hole
- * (`THICK`, by `depth`, the squared distance to the nearest pixel off the mask) that `enclosesHoles`.
- */
+/** A part far larger than its holes is print; `filled` marks a print area thicker than a hole that `enclosesHoles`. */
 function shotsFromParts(
   kept: Map<number, Peak[]>,
   parts: number[][],
@@ -881,11 +799,7 @@ function shotsFromParts(
   return { shots, filled }
 }
 
-/**
- * Whether the areas off `part` (pixel indices of an image `w` wide) that it encloses are holes of
- * the other polarity: at least one of a hole's size, `SIZE_MIN` to `SIZE_MAX` of `holeDiameter`
- * across as a disc of its area, and none larger. A print line around paper encloses more.
- */
+/** At least one enclosed area of a hole's size and none larger: a print line around paper encloses more. */
 function enclosesHoles(part: readonly number[], w: number, holeDiameter: number): boolean {
   let [x0, y0, x1, y1] = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, -1, -1]
   for (const i of part) {
@@ -925,11 +839,7 @@ function enclosesHoles(part: readonly number[], w: number, holeDiameter: number)
   return across.some((d) => d >= SIZE_MIN) && across.every((d) => d <= SIZE_MAX)
 }
 
-/**
- * Own rule: `list` without the proposals whose nearest other proposal is farther than 4 times the
- * median of those nearest distances plus 2 hole diameters (`holePx`): print, stains and background
- * apart from the shots, not a flier near the group or a second group.
- */
+/** Own rule: farther than 4 median nearest distances plus 2 hole diameters is print, a stain or background, not a flier or a second group. */
 function dropStrays(list: HoleProposal[], holePx: number): HoleProposal[] {
   if (list.length < 4) return list
   const nearest = list.map((p) =>

@@ -1,7 +1,4 @@
-/**
- * Hole proposals in the target editor (`apps/docs/docs/models/hole-detection.md`): kept apart from
- * the sheet, in photo px, until the user accepts them as shots. No React, DOM or Next.js.
- */
+/** Kept apart from the sheet, in photo px, until the user accepts them as shots (`apps/docs/docs/models/hole-detection.md`). */
 import { type ShotGroup, toSi } from '@open-reloading/schema'
 import type { HoleProposal } from './hole-detection.ts'
 import { nth } from './nth.ts'
@@ -11,10 +8,7 @@ import type { Point } from './target-geometry.ts'
 /** `HoleProposal` with an editor-assigned `id`, in photo px, not yet accepted as a shot. */
 export type EditorProposal = HoleProposal & { id: number }
 
-/**
- * Confidence tier (a starting value): a proposal below it is a maybe, shown on the photo but left
- * out of Accept sure and the sure count.
- */
+/** A starting value: below it a proposal is a maybe, shown but left out of Accept sure and the sure count. */
 const MAYBE_BELOW = 0.5
 
 /** True for a proposal below the confidence tier. */
@@ -29,11 +23,7 @@ type HoleSize = { diameter: number; source: 'typed' | 'learned' | 'bullet' | 'ma
 export const isNominal = (size: { source: string } | undefined): boolean =>
   size?.source === 'bullet' || size?.source === 'marker'
 
-/**
- * Expected hole diameter, m (own rule, `apps/docs/docs/models/hole-detection.md`, "Hole size"): the size the user typed;
- * else the median of the measured holes of confirmed shots once there are `MIN_HOLES_TO_LEARN_SIZE` of them; else
- * the bullet diameter; else the marker diameter; else none.
- */
+/** In m, own rule (`apps/docs/docs/models/hole-detection.md`, "Hole size"): typed, else learned from confirmed shots, else bullet, else marker diameter. */
 export function expectedHoleSize(o: {
   typedDiameter?: number | undefined
   confirmedDiameters: readonly number[]
@@ -70,10 +60,7 @@ export function rectangleFromDiagonal(a: Point, b: Point): Point[] {
   ]
 }
 
-/**
- * Photo px per m near the middle of `region`: the mean photo length of 1 mm along target x and y
- * there, so a perspective calibration gives the local scale.
- */
+/** The mean photo length of 1 mm along x and y there, so a perspective calibration gives the local scale. */
 export function localPxPerM(frame: Frame, region: readonly Point[]): number {
   const xs = region.map((p) => p.x)
   const ys = region.map((p) => p.y)
@@ -100,10 +87,7 @@ export function proposalsClearOfShots(
   return list.filter((p) => shots.every((s) => Math.hypot(s.x - p.x, s.y - p.y) >= holePx / 2))
 }
 
-/**
- * `group` with `list` added as shots of placement `detected`, up to 1000 shots; a single hole keeps
- * its measured diameter (`pxPerM` near it) for the learned hole size.
- */
+/** Up to 1000 shots; a single hole keeps its measured diameter for the learned hole size. */
 export function acceptProposals(
   group: ShotGroup,
   list: EditorProposal[],

@@ -1,13 +1,7 @@
-/**
- * The labels of record fields as the record pages name them, by record kind: what a source's field
- * list (`provenance.sources[].fields`, dot paths of schema keys) reads as in the Sources table.
- */
+/** What a source's field list (dot paths of schema keys) reads as in the Sources table. */
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 
-/**
- * The labels that differ from the key in words, by record kind; every other key reads as its words
- * (`waterCapacity`: "Water capacity"), translated where the catalogue has that text.
- */
+/** Every other key reads as its words (`waterCapacity`: "Water capacity"). */
 const labels: Record<string, Record<string, Message>> = {
   powders: {
     grainForm: msg('Form'),
