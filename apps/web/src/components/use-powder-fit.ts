@@ -13,12 +13,7 @@ import { fitStrings, type TuneString } from '../lib/powder-tune.ts'
 const fitWorker = () =>
   new Worker(new URL('../lib/powder-fit.worker.ts', import.meta.url), { type: 'module' })
 
-/**
- * The fit of `strings` from `load` in a worker of the page, with each part as it arrives; `anyway`
- * lifts the thin and held rules. Strings at two or more temperatures fit the temperature factor
- * too where the load has a sensitivity. Every change asks again and drops the running answer; no
- * load, no fit.
- */
+/** `anyway` lifts the thin and held rules; strings at two or more temperatures fit the temperature factor where the load has a sensitivity; every change drops the running answer. */
 export function usePowderFit(
   load: InteriorLoad | undefined,
   strings: readonly TuneString[],
@@ -43,10 +38,7 @@ export function usePowderFit(
   return state
 }
 
-/**
- * The curve of `q`, the hand-tuned values, from a worker of the page; undefined without `q`. A
- * move while a run is out waits for it, and only the last move waiting runs next.
- */
+/** Undefined without `q`; a move while a run is out waits for it, and only the last move waiting runs next. */
 export function useHandCurve(q: Omit<PowderHandRequest, 'kind' | 'id'> | undefined) {
   const [curve, setCurve] = useState<HandPoint[]>()
   const runner = useRef<ReturnType<typeof handCurveRunner> | undefined>(undefined)

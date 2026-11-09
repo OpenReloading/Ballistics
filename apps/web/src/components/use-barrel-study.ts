@@ -156,11 +156,7 @@ const longerKey = (
     ? `${ok.id}|${single ? `${ok.selected}|` : ''}${travel}|${attempt}`
     : undefined
 
-/**
- * The study of the shown run: the range the user typed (the defaults until then), the longer run
- * for the lengths beyond the barrel, requested once the tab has been opened (`enabled`), and the
- * rows of every step.
- */
+/** The range typed (the defaults until then); the longer run for the lengths beyond the barrel is requested once the tab has been opened (`enabled`). */
 export function useBarrelStudy({
   ok,
   steps,

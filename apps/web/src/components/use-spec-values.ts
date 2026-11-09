@@ -5,13 +5,7 @@ import { effectiveSpecValues, recordSpecValues, type SpecValues } from '../lib/r
 import { fixedFieldText, type UnitSystem } from '../lib/units.ts'
 import { useFieldUnits } from './units-settings.tsx'
 
-/**
- * The cartridge sheet's Pmax and case length L3 and the powder's bulk density as the Cartridge and
- * Powder cards hold them: what the records give (`record`, SI), the values the user typed over them
- * (`typed`, by key, kept while the field is edited, also empty) and the values a run reads (`values`:
- * the records', then the typed ones). `values` stays one object while its numbers do.
- * Records give: Pmax in bar, L3 in mm, bulk density in g/cm3 as stored; `bulkDensity` in kg/m3.
- */
+/** `record` in SI, `typed` kept while edited (also empty), `values` the records' then the typed ones, one object while its numbers do; records give Pmax in bar, L3 in mm, bulk density in g/cm3, `bulkDensity` in kg/m3. */
 export function useSpecValues(
   system: UnitSystem,
   given: {

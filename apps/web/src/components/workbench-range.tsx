@@ -96,12 +96,7 @@ function PeakPressure({
   )
 }
 
-/**
- * The phone range view: the tab "Range" below 48em.
- * The shown step's charge and muzzle velocity first, the ladder strip with touch-sized cells, the
- * peak pressure with help a tap reaches, the chronograph import and the range card. It reads the
- * result context, so it shows what the Results tab shows.
- */
+/** Below 48em; it reads the result context, so it shows what the Results tab shows. */
 export function RangeView() {
   const { t } = useTranslation()
   const { ok, steps, stale, system, setSeen, chronoSessions, setChronoSessions } = useResult()

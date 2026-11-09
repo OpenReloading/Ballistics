@@ -35,11 +35,7 @@ interface DesignerSetup<D, A> {
   failText: Message
 }
 
-/**
- * The state the designers share: the undo history and its shortcuts, the file record (`fileMenu`),
- * the units, `start` (a catalogue record, also the `?from=` link of a record page) and the browser
- * record link.
- */
+/** `start` is a catalogue record, also the `?from=` link of a record page. */
 export function useDesigner<D, A extends { type: string }>(setup: DesignerSetup<D, A>) {
   const { reduce, kind, fileData } = setup
   const { system } = useUnits()

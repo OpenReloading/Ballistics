@@ -10,11 +10,7 @@ export type RecordState<T> =
   | { status: 'notFound' }
   | { status: 'error' }
 
-/**
- * The record `<kind>/<id>` of the export's data files (`kind` as `cartridges`), read in the browser
- * once the page mounts: the shared mechanism of the record pages, whose HTML holds only the head tags
- * and a loading state. `retry` reads again after a failure.
- */
+/** `kind` as `cartridges`; read in the browser once the page mounts, as the record pages' HTML holds only the head tags and a loading state; `retry` reads again after a failure. */
 export function useRecord<T>(kind: string, id: string) {
   const [state, setState] = useState<RecordState<T>>({ status: 'loading' })
   const [attempt, setAttempt] = useState(0)
@@ -36,11 +32,7 @@ export function useRecord<T>(kind: string, id: string) {
   return { state, retry }
 }
 
-/**
- * What a record page reads besides its record (lists, other records) through `load`, once per
- * attempt: the states of `useRecord` without `notFound`. `load` is not a dependency: it closes over
- * the record, which does not change while the page is mounted.
- */
+/** Once per attempt; `load` is not a dependency, as it closes over the record, which does not change while the page is mounted. */
 export function useRead<T>(load: (signal: AbortSignal) => Promise<T>) {
   const [state, setState] = useState<RecordState<T>>({ status: 'loading' })
   const [attempt, setAttempt] = useState(0)

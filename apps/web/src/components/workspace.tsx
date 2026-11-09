@@ -24,11 +24,7 @@ export type WorkspaceHandle = {
   showRange: () => void
 }
 
-/**
- * Calculator frame: inputs and results (the page's actions are in its `PageBar`). Below 48em the two are tabs with a readout
- * bar under the inputs; from 48em CSS hides the tab list and shows both panels, side by side from
- * 62em (`globals.css`).
- */
+/** Below 48em the two are tabs with a readout bar under the inputs; from 48em CSS hides the tab list and shows both panels, side by side from 62em (`globals.css`). */
 export function Workspace({
   inputs,
   results,
@@ -77,8 +73,7 @@ export function Workspace({
       show()
     }
     window.addEventListener('show-results', onShow)
-    // the link was pressed before this listener existed, or the page was opened at #results;
-    // out of the effect, as `flushSync` does not flush inside one
+    // the link was pressed before this listener existed, or the page was opened at #results; out of the effect, as `flushSync` does not flush inside one
     const frame = window.location.hash === '#results' ? requestAnimationFrame(show) : undefined
     return () => {
       window.removeEventListener('show-results', onShow)
@@ -120,10 +115,7 @@ export function Workspace({
   )
 }
 
-/**
- * Copy link: the inputs of `query` in the address bar's fragment and on the clipboard; `copied`
- * for 2 s. In the fragment they never reach the server or its logs.
- */
+/** In the address bar's fragment, which never reaches the server or its logs, and on the clipboard; `copied` for 2 s. */
 export function useCopyLink(query: () => string) {
   const clipboard = useClipboard({ timeout: 2000 })
   return {
@@ -137,10 +129,7 @@ export function useCopyLink(query: () => string) {
   }
 }
 
-/**
- * The workbench's page actions in the bar's order: `file` (Open and Save), `search`, Copy link,
- * then `after` (Print). From 75em Search, Copy link and Print show as icons, named by their text.
- */
+/** In the bar's order; from 75em Search, Copy link and Print show as icons, named by their text. */
 export function Toolbar({
   search,
   file,

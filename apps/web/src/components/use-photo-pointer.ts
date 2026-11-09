@@ -37,11 +37,7 @@ const arrows: Record<string, [number, number]> = {
 /** The cursor step of a key press, px: Shift one pixel, Control a large step. */
 const stepOf = (e: KeyboardEvent) => (e.shiftKey ? 1 : e.ctrlKey || e.metaKey ? 60 : 8)
 
-/**
- * Pointer, touch and key handling of the photograph canvas: a press places or drags a scale point
- * or paints with the brush, the arrow keys move a cursor and Enter does what a press does. `heard`
- * is the line a screen reader gets for a key action.
- */
+/** Enter does what a press does; `heard` is the line a screen reader gets for a key action. */
 export function usePhotoPointer({ size, tool, brush, points, setPoints, stamp }: PointerInput) {
   const [cursor, setCursor] = useState<Point>()
   const { t } = useTranslation()

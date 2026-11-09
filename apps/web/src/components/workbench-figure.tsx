@@ -74,10 +74,7 @@ export function CartridgeFigure({
   )
 }
 
-/**
- * The result tab Cartridge of a low desktop window: the place the cartridge figure moves to from
- * the inputs' second column. The one figure of the inputs is drawn here, so its seating stays.
- */
+/** Where the cartridge figure moves in a low desktop window; the one figure of the inputs is drawn here, so its seating stays. */
 export function FigureTab() {
   const { setFigureTab } = useLoad()
   return <div ref={setFigureTab} className="figure-tab" />

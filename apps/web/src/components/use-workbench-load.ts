@@ -264,10 +264,7 @@ type Kind = 'cartridge' | 'bullet' | 'powder' | 'capacity'
 type Asked = Partial<Record<Kind, { id: string; failed?: true }>>
 type Groove = { id: string; z?: number | undefined; record?: CartridgeDetail }
 
-/**
- * The chosen cartridge's loaded record: its groove diameter Z, m, the bore area Q, m2, an empty
- * Bore area takes first, and its CIP table.
- */
+/** Groove diameter Z, m, bore area Q, m2, which an empty Bore area takes first, and its CIP table. */
 function grooveValues(cartridge: CartridgeChoice | undefined, groove: Groove | undefined) {
   const loaded = cartridge && groove?.id === cartridge.id ? groove : undefined
   if (!loaded)
@@ -345,11 +342,7 @@ function ladderStepField(
   return [ladderSpec, steps.charge.ladderStep ?? emptyStep] as const
 }
 
-/**
- * The seating a file or link keeps, once one was stored or the user moved it away from its start
- * (the default start would mark an older file changed): the seated bullet's, else the one asked
- * for while it loads.
- */
+/** Once stored or moved away from its start, as the default start would mark an older file changed; the seated bullet's, else the one asked for while it loads. */
 function keptSeating(
   seated: Seated,
   start: Seating,
@@ -357,8 +350,7 @@ function keptSeating(
   system: UnitSystem,
 ): Seating {
   const now = seatingOf(seated)
-  // a move is a change of the seating field's text: the start typed back as shown is none (the
-  // slider snaps back onto the start itself)
+  // a move is a change of the seating field's text: the start typed back as shown is none (the slider snaps back onto the start itself)
   const moved =
     start !== undefined &&
     (now?.by !== start.by ||
@@ -561,10 +553,7 @@ const bcOf = (bullet: Partial<Bullet> | undefined) =>
 type LinkedBullet = NonNullable<RecordValues['bullet']> & { id: string }
 type LinkedPowder = NonNullable<RecordValues['powder']> & { id: string }
 
-/**
- * What Copy link carries of the bullet and powder records, SI, with their ids: the records'
- * values, else what the link that opened them carried.
- */
+/** SI, with their ids: the records' values, else what the link that opened them carried. */
 function recordLinkOf(a: {
   asked: Asked
   bullet: Bullet | undefined
@@ -652,11 +641,7 @@ function capacityRefsOf(
 const resultLineOf = (outcome: Outcome, system: UnitSystem, t: Translator['t']) =>
   outcome.kind === 'ok' ? resultLine(outcome, system, t) : undefined
 
-/**
- * The groove diameter Z (m) and the record's bore area Q (m2) a run reads: the firearm's measured
- * groove replaces the record's Z; Q holds while the bore diameter is the land diameter it describes
- * and the firearm measured neither bore nor groove (`suggestDefaults` drops it the same way).
- */
+/** Groove Z (m) and bore area Q (m2): the firearm's measured groove replaces Z; Q holds while the bore diameter is its land diameter and the firearm measured neither (`suggestDefaults` drops it the same way). */
 function boreOf(
   gun: { boreDiameter?: number | undefined; grooveDiameter?: number | undefined } | undefined,
   record: { recordGrooveM: number | undefined; qM: number | undefined; landM: number | undefined },
@@ -671,20 +656,13 @@ function boreOf(
   }
 }
 
-/**
- * The case length, mm: the chosen brass group's measured trim length (`brass`, with its name and
- * the sheet's L3), else the sheet's L3 (`cip`).
- */
+/** Case length, mm: the chosen brass group's measured trim length (`brass`), else the sheet's L3 (`cip`). */
 const caseLengthOf = (brass: OwnCase | undefined, cip: number | undefined) =>
   brass?.trimLength === undefined
     ? { mm: cip, brass: undefined }
     : { mm: brass.trimLength, brass: { name: brass.name, mm: brass.trimLength, cip } }
 
-/**
- * The bore resistance the powder record's law gives for the fields as they stand, under the keys
- * of the fields that can replace it: their placeholders. Undefined without the law, a loaded
- * cartridge record or a bore diameter and start pressure.
- */
+/** Under the keys of the fields that can replace it, as their placeholders; undefined without the law, a loaded cartridge record or a bore diameter and start pressure. */
 function recordBoreOf(o: {
   fields: Fields
   powder: Powder | undefined
@@ -770,11 +748,7 @@ const gunSource = (
 
 type PreviewFields = Partial<Record<PreviewKey, FieldValue | undefined>>
 
-/**
- * What the seated bullet changes of volume and travel: the fields to write (empty, or still the
- * last seated value; a volume that followed a seating without one is emptied) and the values that
- * follow it from now on.
- */
+/** The fields to write (empty, or still the last seated value; a volume that followed a seating without one is emptied) and the values that follow it from now on. */
 export function followPlan(
   values: Seated,
   now: Fields,
@@ -815,11 +789,7 @@ function seatedUpdate(next: PreviewFields, seatedText: PreviewFields, now: Field
   return update
 }
 
-/**
- * The seating owns the volume: its seated value, or none when the bullet is seated in a case of
- * known volume but leaves no valid volume behind it. The case volume default fills it only without
- * a seating.
- */
+/** None when the bullet seats in a case of known volume but leaves no valid volume behind it; the case volume default fills it only without a seating. */
 export const seatingOwnsVolume = (s: Seated) =>
   s.volume !== undefined || (s.overallLength !== undefined && s.caseVolume !== undefined)
 
@@ -832,10 +802,7 @@ type Form = Pick<
   'getValues' | 'setFieldValue' | 'clearFieldError'
 >
 
-/**
- * The fields the previous powder record filled and the user did not edit go back to a new load's
- * state: the cited default, else empty. The keys that got a default.
- */
+/** To the cited default, else empty, when the previous powder record filled them and the user did not edit them; returns the keys that got a default. */
 function revertRecordFill(
   form: Form,
   previous: Record<string, number>,
@@ -872,11 +839,7 @@ export function approximateVolumeTolerance(
   return Math.min(suggestion.halfWidth, maxVolumeFraction)
 }
 
-/**
- * The run's tolerance of the volume behind the bullet and the capacity's rule (`volume-tolerance.ts`):
- * the capacity's tolerance while the field holds the seated volume or the followed default, plus
- * the interval of an estimated bullet volume; none for a typed volume, which keeps the API's 1 %.
- */
+/** The capacity's tolerance while the field holds the seated volume or the followed default, plus an estimated bullet volume's interval; none for a typed volume, which keeps the API's 1 %. */
 export function runVolumeTolerance(a: {
   volume: number | undefined
   seated: Seated
@@ -946,11 +909,7 @@ export function noCoefficientOf(powder: Powder | undefined) {
   }
 }
 
-/**
- * The volume tolerance of a run: the approximate default volume's (`approximateVolumeTolerance`) and
- * the cavity bracket's (`cavityVolumeFraction`, which holds the default 1 %) added, at most
- * `maxVolumeFraction`; either alone as it is.
- */
+/** Both added, at most `maxVolumeFraction`, either alone as it is; `cavityVolumeFraction` holds the default 1 %. */
 function combinedVolumeFraction(
   approximate: number | undefined,
   cavity: number | undefined,
@@ -1013,10 +972,7 @@ function plannedLadder<S, T>(
   return plans.temperatureBlock ? { error: plans.temperatureBlock } : plans.temperature()
 }
 
-/**
- * The per-step overrides of a planned ladder's steps. A seating step has the volume tolerance of its
- * own cavity bracket, added to the approximate default volume's (`volumeTolerance`).
- */
+/** A seating step has the volume tolerance of its own cavity bracket, added to the approximate default volume's (`volumeTolerance`). */
 function planRows(
   kind: RunnableLadderKind,
   steps: SeatingStep[] | number[],
@@ -1082,10 +1038,7 @@ function planSteps(plan: Partial<Step>[], answers: Answer[], charge: number): St
   })
 }
 
-/**
- * The answer a run stands for and its steps: the one request, or the planned ladder's steps with
- * at most 4 in flight. Nothing when a change aborted it.
- */
+/** The planned ladder's steps at most 4 in flight; nothing when a change aborted it. */
 async function runRequest(
   plan: Partial<Step>[] | undefined,
   request: unknown,
@@ -1106,8 +1059,7 @@ async function runRequest(
     answers[i] = { res, json: await res.json().catch(() => undefined) }
   })
   if (signal.aborted) return
-  // a busy API or a step past its deadline (503) is a failed request, not a model error; the first
-  // answer stands for the run's status when no step has a result
+  // a busy API or a step past its deadline (503) is a failed request, not a model error; the first answer stands for the run's status when no step has a result
   const shown =
     answers.find((a) => a.res.status === 503) ?? answers.find((a) => !a.res.ok) ?? nth(answers, 0)
   return { ...shown, steps: shown.res.status === 503 ? [] : planSteps(plan, answers, charge) }
@@ -1162,11 +1114,7 @@ const moreHolding = (errors: Record<string, unknown>) =>
 /** The values a run reads, taken once: the fields, the seated bullet and the values the seating preview wrote. */
 type RunValues = { seated: Seated; fields: Fields; previewed: Partial<Record<PreviewKey, number>> }
 
-/**
- * What a run reads of the seating in `now`, so the request and the result read the same (#970): the
- * volume tolerance of the cavity bracket of a hollow base while the run's volume follows the seated
- * bullet, and the seated values still in the fields.
- */
+/** So the request and the result read the same (#970): a hollow base's cavity bracket tolerance while the volume follows the seated bullet, and the seated values still in the fields. */
 export function runSeatingOf(now: RunValues) {
   const fromSeating = fromSeatingOf(now.seated, now.fields, now.previewed)
   const volumeFraction = fromSeating.includes('volume')
@@ -1191,11 +1139,7 @@ function fetchBand(request: unknown, signal: AbortSignal): Promise<SampledBand> 
     .catch(() => failed)
 }
 
-/**
- * The peak breech pressure (Pa) of `body` at both ends of the cold sensitivity interval `interval`,
- * [low, high], as two runs of the same request (`coldPeakInterval` in ballistics does the same); none at
- * or above the reference, or when a run gives no result.
- */
+/** Peak breech pressure (Pa) at both ends of `interval`, [low, high], as two runs of the same request (`coldPeakInterval` in ballistics does the same); none at or above the reference, or without a result. */
 async function fetchColdPeak(
   body: { load: Parameters<typeof stepLoad>[0] },
   interval: readonly [number, number],
@@ -1245,10 +1189,7 @@ function withBand(o: Outcome | undefined, id: number, first: number, sampled: Sa
   }
 }
 
-/**
- * The error outcome of a run without a result, with its status text: a refusal when the model
- * reports every step as invalid, else the failed request's status.
- */
+/** A refusal when the model reports every step as invalid, else the failed request's status. */
 export function failedRun(steps: Step[], res: Response, json: Answer['json']) {
   // a ladder shows the first step's error; a step of a failed request (500) is no refusal
   const error = res.ok || res.status === 422 ? steps[0]?.error : undefined
@@ -1285,10 +1226,7 @@ function linkedFieldsOf(
   return { linked, missing }
 }
 
-/**
- * The bullet values a link's query or an opened file types: the fields it holds, none for the rest,
- * and the base form (a text) when it names one.
- */
+/** The fields it holds, none for the rest, and the base form (a text) when it names one. */
 const typedBulletOf = (query: URLSearchParams, system: UnitSystem): Fields => {
   const typed = Object.fromEntries(
     Object.entries(queryFields(query, bulletFields, system, fixedFieldText)).filter(
@@ -1309,10 +1247,7 @@ const typedSpecOf = (query: URLSearchParams, system: UnitSystem): Fields =>
     ),
   )
 
-/**
- * What the load's references give again of the specs: the sheet's Pmax and L3, the powder's bulk
- * density; a value the user typed stays theirs, even when it equals the record's (`typed`).
- */
+/** A value the user typed stays theirs, even when it equals the record's (`typed`). */
 function specsGiven(
   record: Record<string, number | undefined>,
   cartridgeRef: string | undefined,
@@ -1353,10 +1288,7 @@ const fieldErrorsOf = (linked: Fields, system: UnitSystem) =>
     }),
   )
 
-/**
- * The ladder of a link's query, when it fits. The step is a length for a seating ladder, a
- * temperature difference for a temperature ladder, a charge otherwise; all travel as `ladderStep`.
- */
+/** The step is a length for a seating ladder, a temperature difference for a temperature ladder, a charge otherwise, all as `ladderStep`. */
 function queryLadder(query: URLSearchParams, system: UnitSystem) {
   const steps = Number(query.get('ladderSteps'))
   const direction = directionOf(query.get('ladderDirection'))
@@ -1464,10 +1396,7 @@ const powderLabelOf = (
   names: ManufacturerNames,
 ) => labelOf(powder, names) ?? design?.name
 
-/**
- * The reference a load keeps: the record being loaded (`asked`, kept too when it did not resolve),
- * else a user design of this browser, else the catalogue record `id`.
- */
+/** The record being loaded (`asked`, kept too when it did not resolve), else a user design of this browser, else the catalogue record `id`. */
 const savedRef = (asked: string | undefined, design: string | undefined, id: string | undefined) =>
   asked ? catalogueRef(asked) : (design && userRef(design)) || (id ? catalogueRef(id) : undefined)
 
@@ -1563,8 +1492,7 @@ export function useWorkbenchState() {
   // a record fetched on mount arrives after the stored units apply: its fill reads the current ones
   const unitsNow = useRef(system)
   unitsNow.current = system
-  // one rule for the page's life, reading the units through the ref: the form rebuilds its
-  // validators on a new rule, and their closures kept every earlier render's result alive
+  // one rule for the page's life, reading the units through the ref: a new rule rebuilds the validators, whose closures kept every earlier render's result alive
   const validate = useCallback(
     (values: Fields) =>
       Object.fromEntries(
@@ -1585,10 +1513,7 @@ export function useWorkbenchState() {
     validate,
   })
   const [cartridge, setCartridgeRecord] = useState<CartridgeChoice | undefined>(undefined)
-  /**
-   * The user cartridge chosen in place of a record: it fills what its resolved values give, no
-   * limits, class or capacity record of its base.
-   */
+  /** It fills what its resolved values give: no limits, class or capacity record of its base. */
   const [cartridgeDesign, setCartridgeDesign] = useState<UserCartridgeView>()
   /** A catalogue cartridge replaces the design. */
   const setCartridge = (c: CartridgeChoice | undefined) => {
@@ -1644,10 +1569,7 @@ export function useWorkbenchState() {
     [loadExample.firearm, ...firearms].filter((r) => r.id === firearm) as UserRecord[],
   )[0]?.fill
   const sight = exampleSight(firearm, chosenSight, system)
-  /**
-   * Where the seating preview puts its controls, by name: the cards register their slots, the
-   * figure fills them.
-   */
+  /** By name: the cards register their slots, the figure fills them. */
   const [seatingSlots, setSeatingSlots] = useState<Partial<Record<SeatingSlotName, HTMLElement>>>(
     {},
   )
@@ -1682,8 +1604,7 @@ export function useWorkbenchState() {
   const readDesigns = () =>
     storedRecords()
       .then(async ({ records }) => {
-        // the firearms read the records only: set before the waits, so a tuning handoff that
-        // follows the opened load's firearm finds it
+        // the firearms read the records only: set before the waits, so a tuning handoff that follows the opened load's firearm finds it
         setFirearms(records.filter((r): r is (typeof firearms)[number] => r.kind === 'firearm'))
         const [bullets, cartridges] = await Promise.all([
           userBullets(records),
@@ -1804,8 +1725,7 @@ export function useWorkbenchState() {
   }>()
   /** SI values the preview wrote into the fields. */
   const [previewed, setPreviewedState] = useState<Previewed>({})
-  // the run reads the seating at once, as `seatedNow` (#938): a run pressed while a seating
-  // arrives plans the seating ladder from it, not from the render before
+  // the run reads the seating at once, as `seatedNow` (#938): a run pressed while a seating arrives plans the seating ladder from it, not from the render before
   const previewedNow = useRef(previewed)
   const setPreviewed = useCallback((next: Previewed | ((p: Previewed) => Previewed)) => {
     previewedNow.current = typeof next === 'function' ? next(previewedNow.current) : next
@@ -1813,8 +1733,7 @@ export function useWorkbenchState() {
   }, [])
   /** The seated bullet's values, SI, none while no bullet is seated: an emptied field takes them again. */
   const [seated, setSeatedState] = useState<Seated>({})
-  // the seating reports run in transitions: `seated` lags them, so an effect that must not write
-  // over a seated volume reads this mirror, which is current at once
+  // the seating reports run in transitions and `seated` lags them, so an effect that must not write over a seated volume reads this mirror, current at once
   const seatedNow = useRef(seated)
   const setSeated = useCallback((values: Seated) => {
     seatedNow.current = values
@@ -1852,11 +1771,7 @@ export function useWorkbenchState() {
     if (slot && reportCopy.current) slot.replaceChildren(reportCopy.current)
   }, [])
   const [notes, setNotes] = useState('')
-  /**
-   * The Measurements tab's chronograph sessions: user records of this browser, stored as they
-   * change. The load keeps their references (`sessionRefs`, in order, also those the store did not
-   * answer); links do not carry them.
-   */
+  /** Stored as they change; the load keeps their references (`sessionRefs`, in order, also those the store did not answer), links do not carry them. */
   const [chronoSessions, setSessionsState] = useState<SessionRecord[]>([])
   const [sessionRefs, setSessionRefs] = useState<string[]>([])
   /** The lots of the load and what it was at each session (`Load.snapshots`). */
@@ -1897,10 +1812,7 @@ export function useWorkbenchState() {
   /** The defaults the current load started from, and the fields still holding them. */
   const [defaults, setDefaults] = useState<WorkbenchDefaults>(() => parseDefaults(null))
   const [defaulted, setDefaulted] = useState<ReadonlySet<string>>(() => new Set(defaultKeys))
-  /**
-   * The fields that follow their default (`input-defaults.ts`) until typed: all of them in a new load,
-   * none in an opened file. The value the default wrote last, to tell it from a typed one.
-   */
+  /** All of them in a new load, none in an opened file; the value the default wrote last tells it from a typed one. */
   const [followed, setFollowed] = useState<ReadonlySet<FollowKey>>(() => new Set(followKeys))
   const written = useRef<Partial<Record<FollowKey, number>>>({})
   /** Charge ladder inputs; share links and load files carry them. */
@@ -1930,10 +1842,7 @@ export function useWorkbenchState() {
   const openingCapacity = useRef<string>(undefined)
   /** Whether the measured capacity field holds the value a chosen group of cases named, not a typed or loaded one. */
   const measuredFromGroup = useRef(false)
-  /**
-   * The Bullet card's diameter, length and BCs the user typed over the record's, by key. An entry
-   * stays while its field is edited (also empty); a field without one shows the record's value.
-   */
+  /** By key; an entry stays while its field is edited (also empty), a field without one shows the record's value. */
   const [typedBulletFields, setTypedBullet] = useState<Fields>({})
   /** The card whose changed values a record pick replaced, and how many: its one-line note. */
   const [replaced, setReplaced] = useState<{ panel: InputPanel; count: number }>()
@@ -1963,8 +1872,7 @@ export function useWorkbenchState() {
   const lastWarnings = useRef('')
   const inputs = useRef<HTMLFormElement>(null)
   const workspace = useRef<WorkspaceHandle>(null)
-  // setValues clears the errors; a unit switch keeps them, those of the update queue so far (a
-  // link's errors set in the same flush are not in this render's `form.errors` yet)
+  // setValues clears the errors; a unit switch keeps those of the update queue so far (a link's errors set in the same flush are not in this render's `form.errors` yet)
   useFieldUnits(
     interiorFields,
     system,
@@ -2003,17 +1911,11 @@ export function useWorkbenchState() {
     fixedFieldText,
   )
   const fields = form.values
-  /**
-   * The powder record without burn values while its model fields are not all typed: it cannot run.
-   * Its name, else undefined.
-   */
+  /** It cannot run while its model fields are not all typed; its name, else undefined. */
   const burnless = burnlessOf(powder, powderDesign, fields, powderLabel)
   const { grooveM, qUsed } = boreOf(gunData, { recordGrooveM, qM, landM }, fields.boreDiameter?.si)
 
-  /**
-   * Writes that complete the start of a new load (the defaults, the first seating) are no edit: a
-   * load nothing was changed in, with no record yet, stays unchanged for the File menu.
-   */
+  /** No edit, so a load nothing was changed in, with no record yet, stays unchanged for the File menu. */
   function keepClean(complete: boolean | undefined, write: () => void) {
     const menu = fileMenu.current
     const clean = complete && menu && menu.id() === undefined && !menu.snapshot().unsaved
@@ -2031,14 +1933,10 @@ export function useWorkbenchState() {
     setEdits((n) => n + 1)
   }
 
-  /**
-   * The seated bullet changed: volume and travel follow it while they are empty or still hold its
-   * last value (or already its new one, as the example's); a typed value stays.
-   */
+  /** Volume and travel follow while empty or still holding its last value (or already its new one, as the example's); a typed value stays. */
   function follow(values: Seated) {
     setSeated(values)
-    // the first seating reported is the start, also when the bullet seats without volume or travel;
-    // the preview reseating itself (a new bullet shape or range) starts again there
+    // the first seating reported is the start, also without volume or travel; the preview reseating itself (a new bullet shape or range) starts again there
     const reported = seatingOf(values)
     if (reported) setSeatingStart((s) => (values.atStart ? reported : (s ?? reported)))
     // no bullet seated for now (a record loading): what follows the seating keeps following it
@@ -2060,8 +1958,7 @@ export function useWorkbenchState() {
     setPreviewed(following)
   }
 
-  // the display decimals, travel in the workbench decimals, so a seated value fits
-  // its field; the SI value stays exact
+  // the display decimals, travel in the workbench decimals, so a seated value fits its field; the SI value stays exact
   const seatedField = (k: PreviewKey, v: number): FieldValue => ({
     text: k === 'volume' ? formatQuantity('capacity', system, v) : lengthText('travel', system, v),
     si: v,
@@ -2127,10 +2024,7 @@ export function useWorkbenchState() {
     return controller.signal
   }
 
-  /**
-   * Record ids asked for and not loaded yet, or not reachable (`failed`): the load keeps them, so
-   * a Save never drops an id only because its record could not be fetched.
-   */
+  /** Kept in the load, so a Save never drops an id only because its record could not be fetched. */
   const [asked, setAsked] = useState<Asked>({})
   const want = (k: Kind, id: string) => setAsked((a) => ({ ...a, [k]: { id } }))
   const got = (k: Kind) =>
@@ -2301,8 +2195,7 @@ export function useWorkbenchState() {
         g1: fit.g1,
       })
     }
-    // the earlier cartridge's seating is gone; fields that followed it take the new one's. The same
-    // cartridge keeps its preview and its initial seating, so it keeps the seating and its start
+    // the earlier cartridge's seating is gone and the fields that followed it take the new one's; the same cartridge keeps its preview, its seating and its start
     if (c.id !== cartridge?.id) {
       setPreviewInitial(undefined)
       setSeated({})
@@ -2325,10 +2218,7 @@ export function useWorkbenchState() {
       })
   }
 
-  /**
-   * Loads a bullet record; `fill` writes its mass into the Bullet mass field and, unless `keepTyped`
-   * (an opened load's own values), ends the diameter, length and BC typed over the earlier record.
-   */
+  /** `fill` writes its mass into the Bullet mass field and, unless `keepTyped` (an opened load's own values), ends the diameter, length and BC typed over the earlier record. */
   function chooseBullet(id: string, fill = true, keepTyped = false) {
     const signal = pick('bullets')
     want('bullet', id)
@@ -2356,10 +2246,7 @@ export function useWorkbenchState() {
       })
   }
 
-  /**
-   * `p`, a powder record or the powder a user design builds (`design`), in place of the earlier
-   * one; `fill` writes its model parameters into the fields, except the `keep` ones.
-   */
+  /** `p` is a powder record or the powder a user design builds (`design`); `fill` writes its model parameters into the fields, except the `keep` ones. */
   function takePowder(
     p: Powder,
     design: PowderDesign | undefined,
@@ -2373,8 +2260,7 @@ export function useWorkbenchState() {
     const previous = originNow.current
     setOrigin(values)
     if (fill && !values && previous) {
-      // a record without model parameters: what the previous record filled and the user did not
-      // edit goes back to a new load's state (the cited default, else empty)
+      // a record without model parameters: what the previous one filled and the user did not edit goes back to a new load's state (the cited default, else empty)
       const back = revertRecordFill(form, previous, defaults, unitsNow.current)
       setDefaulted((s) => new Set([...s, ...back]))
       setFollowed((s) => followingStart(s, back.has('startPressure')))
@@ -2418,10 +2304,7 @@ export function useWorkbenchState() {
       })
   }
 
-  /**
-   * Loads a powder record; `fill` writes its model parameters into the fields, except the `keep`
-   * ones (the values an opened load carries).
-   */
+  /** `fill` writes its model parameters into the fields, except the `keep` ones (the values an opened load carries). */
   function choosePowder(id: string, fill = true, keep: ReadonlySet<string> = new Set()) {
     const signal = pick('powders')
     want('powder', id)
@@ -2501,11 +2384,7 @@ export function useWorkbenchState() {
     return 'error' in plan ? plan.error : undefined
   }
 
-  /**
-   * Opens the groups that hold an invalid field, so focus can reach it: an invalid model parameter
-   * (on a phone), a powder field under More, and a refused typed bulk density, which sits in the
-   * Model parameters group when the record has none.
-   */
+  /** So focus can reach it: an invalid model parameter (on a phone), a powder field under More, a refused typed bulk density in Model parameters when the record has none. */
   function revealInvalid(errors: Record<string, unknown>, refused: string | undefined) {
     if (modelFields.some((k) => errors[k]) || refused === 'bulkDensity') setModelShown(true)
     const holding = moreHolding(errors)
@@ -2522,13 +2401,7 @@ export function useWorkbenchState() {
   /** Why no run can start: a refused typed spec, else a powder without burn values (not for a Powders tab row, `as`). */
   const refusal = (as: unknown) =>
     specError() ?? (as || !burnless ? undefined : burnlessText(burnless))
-  /**
-   * The values a run reads, taken once: the form's values and the seating now, not this render's: a
-   * run pressed after a seated volume was written and before it was drawn sends that volume, not an
-   * empty field's error (#870), and the seating that came with it (#938, #970). The Powders tab's
-   * rows (`as`) read the values of the render their batch started from, so every row of a batch
-   * simulates the same load whatever is typed meanwhile.
-   */
+  /** Taken once, not from this render: a run pressed after a seated volume was written and before it was drawn sends it (#870) and its seating (#938, #970); the Powders tab's rows (`as`) read their batch's start render, so a batch simulates one load. */
   const runValues = (as: unknown): RunValues =>
     as
       ? { seated, fields, previewed }
@@ -2557,8 +2430,7 @@ export function useWorkbenchState() {
       const focus = () =>
         inputs.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus()
       focus()
-      // a panel opening with motion stays display:none until Mantine's collapse starts in a frame
-      // callback; two frames later it has started, whatever order the callbacks were queued in
+      // a panel opening with motion stays display:none until Mantine's collapse starts in a frame callback, which it has two frames later in any queue order
       requestAnimationFrame(() => requestAnimationFrame(focus))
       return false
     }
@@ -2645,10 +2517,7 @@ export function useWorkbenchState() {
     }
   }
 
-  /**
-   * The Measurements tab's tuning link: the load this run simulates, handed to the route for the
-   * strings of this saved load; an unsaved edit hands over nothing, so no stale load is fitted.
-   */
+  /** Handed to the route for this saved load's strings; an unsaved edit hands over nothing, so no stale load is fitted. */
   function handTuneLoad() {
     const menu = fileMenu.current
     const id = menu?.id()
@@ -2658,8 +2527,7 @@ export function useWorkbenchState() {
     try {
       if (!menu?.snapshot().unsaved) load = loadRequest().body.load
     } catch {}
-    // a record still loading: the tuning route fetches its table; before the first answer only the
-    // catalogue id asked for is known (a user design's is not fetched)
+    // a record still loading: the tuning route fetches its table; before the first answer only the catalogue id asked for is known (a user design's is not fetched)
     const asking =
       !cartridge && !cartridgeDesign && asked.cartridge?.id
         ? catalogueIdOf(asked.cartridge.id)
@@ -2796,8 +2664,7 @@ export function useWorkbenchState() {
       return
     }
     const { body } = req
-    // a seating or temperature ladder is one single run per step, each with its own volume and
-    // travel, or its own propellant temperature
+    // a seating or temperature ladder is one single run per step, each with its own volume and travel or its own propellant temperature
     const planned = plannedLadder(ladderSteps, ladderKind, {
       seating: seatingPlan,
       temperature: temperaturePlan,
@@ -2921,10 +2788,7 @@ export function useWorkbenchState() {
     return () => clearTimeout(autoTimer.current)
   }, [edits])
 
-  /**
-   * The shown result of a load that comes back in its tab: put back once the records of the
-   * load have arrived, since each arriving record marks the load changed.
-   */
+  /** Put back once the records of the load have arrived, since each arriving record marks the load changed. */
   const restoring = useRef<{ outcome: Outcome | undefined; changed: boolean }>(undefined)
   const restoreResult = (outcome: Outcome | undefined, wasChanged: boolean) => {
     restoring.current = { outcome, changed: wasChanged }
@@ -2955,8 +2819,7 @@ export function useWorkbenchState() {
     }
     // a linked load is the record the page starts with, not unsaved work
     else if (link?.kind === 'values') asNewLoad(() => fill(query))()
-    // "Use in workbench" on a record page: a new load with the cartridge, filled from the bullet's
-    // mass and the powder's model parameters, unsaved only after edits to what the records filled
+    // "Use in workbench" on a record page: a new load with the cartridge, the bullet's mass and the powder's model parameters, unsaved only after edits to what the records filled
     else if (link?.kind === 'records')
       asNewLoad(() => {
         fill(new URLSearchParams())
@@ -2989,10 +2852,7 @@ export function useWorkbenchState() {
     })()
   }
 
-  /**
-   * Fills the form and the cartridge from a link's query or an opened file; a defaulted field a link
-   * leaves out gets the default, a file opens as saved.
-   */
+  /** A defaulted field a link leaves out gets the default; a file opens as saved. */
   function fill(query: URLSearchParams, withDefaults = true) {
     const d = readDefaults()
     const { linked, missing } = linkedFieldsOf(query, system, d, withDefaults)
@@ -3021,10 +2881,7 @@ export function useWorkbenchState() {
     setDirection(l.direction)
   }
 
-  /**
-   * The firearm, the measured case capacity and the seating of a link; the seated bullet takes the
-   * seating once its records load.
-   */
+  /** The seated bullet takes the seating once its records load. */
   function fillGunAndSeating(query: URLSearchParams) {
     // an id longer than the load file allows would make Save write a file Open rejects
     const firearmId = query.get('firearm')
@@ -3046,10 +2903,7 @@ export function useWorkbenchState() {
     if (by) setPreviewInitial({ seating: { by, value: Number(query.get(by)) } })
   }
 
-  /**
-   * The records of a link come without their fills: the linked values stay, and what the link
-   * carried of the records stands in for one that is missing.
-   */
+  /** Without their fills: the linked values stay, and what the link carried of the records stands in for one that is missing. */
   function fillRecords(query: URLSearchParams) {
     // an id that does not fit the schema is dropped, else every Save fails on it
     const bulletId = linkedId(query.get('bullet'))
@@ -3116,12 +2970,7 @@ export function useWorkbenchState() {
       })
   }
 
-  /**
-   * The case capacity `ref` of an opened load for the cartridge reference `forCartridge`: a
-   * catalogue record is chosen in the figure, a user record of that cartridge is the measured
-   * capacity and fills its field. A user record the store does not answer, or one of another
-   * cartridge, stays in the load as asked.
-   */
+  /** A catalogue record is chosen in the figure, a user record of that cartridge is the measured capacity and fills its field; one the store does not answer, or of another cartridge, stays in the load as asked. */
   function openCapacity(ref: string, forCartridge: string | undefined, fromGroup = false) {
     const target = parseRef(ref)
     if (!target) return
@@ -3153,10 +3002,7 @@ export function useWorkbenchState() {
       })
   }
 
-  /**
-   * The case `ref` of an opened load is chosen for the cartridge it names: a catalogue product, or
-   * a group of the user's cases. The group's measured capacity comes with the load's own capacity.
-   */
+  /** A catalogue product or a group of the user's cases; the group's measured capacity comes with the load's own capacity. */
   function openCase(ref: string | undefined, forCartridge: string | undefined) {
     const target = ref ? parseRef(ref) : undefined
     const cartridgeId = forCartridge && parseRef(forCartridge)?.id
@@ -3171,10 +3017,7 @@ export function useWorkbenchState() {
     setCaseChoice(choice)
   }
 
-  /**
-   * A group of the user's cases chosen in the figure: its measured capacity fills the measured
-   * capacity field, where it replaces the record's value and shows as measured.
-   */
+  /** Its measured capacity fills the measured capacity field, replacing the record's value and shown as measured. */
   function chooseOwnCase(id: string | undefined) {
     const cartridgeId = cartridge?.id
     if (!cartridgeId) return
@@ -3202,10 +3045,7 @@ export function useWorkbenchState() {
     setCapacityChoice(choice)
   }
 
-  /**
-   * A measured capacity typed in the field replaces the one the opened load still asks for; while
-   * the text is not a number yet the request stays in the load as not loaded.
-   */
+  /** Replaces the one the opened load still asks for; while the text is not a number yet the request stays in the load as not loaded. */
   function typeMeasured(value: FieldValue) {
     openingCapacity.current = undefined
     measuredFromGroup.current = false
@@ -3214,11 +3054,7 @@ export function useWorkbenchState() {
     setMeasured({ measuredWaterCapacity: value })
   }
 
-  /**
-   * The sessions `refs` of an opened load, read from the store. The load keeps every reference, so
-   * a Save never drops one only because its record is not in this browser (a catalogue session, or
-   * a session of another browser).
-   */
+  /** The load keeps every reference, so a Save never drops one only because its record is not in this browser (a catalogue session, or another browser's). */
   function openSessions(refs: string[]) {
     setSessionRefs(refs)
     openedRefs.current = refs
@@ -3242,10 +3078,7 @@ export function useWorkbenchState() {
       .catch(() => {})
   }
 
-  /**
-   * An opened load: the form from its typed values, the records it names from their own. A value
-   * the load does not carry follows the Settings, the records, the gun and the seating.
-   */
+  /** The form from its typed values, the records it names from their own; a value the load does not carry follows the Settings, the records, the gun and the seating. */
   function openLoad(d: Load) {
     reset()
     const { query, typed, sessions } = fromLoad(d)
@@ -3539,8 +3372,7 @@ export function useWorkbenchState() {
     ])
     chooseFirearm(id)
   }
-  // the measured capacity is a user record of its own, stored with the load (`storeLoad`); a
-  // reference asked for and not loaded stays until a capacity is typed or chosen
+  // the measured capacity is a user record of its own, stored with the load (`storeLoad`); a reference asked for and not loaded stays until a capacity is typed or chosen
   const { measuredCapacity, capacityRef } = capacityRefsOf(
     cartridgeRef,
     measuredWaterCapacity,
@@ -3563,8 +3395,7 @@ export function useWorkbenchState() {
         ...changed,
         merged,
       ])
-      // the page does not show a session another tab added: it stays unknown here, so every Save
-      // keeps it until the load is opened again
+      // a session another tab added stays unknown here, so every Save keeps it until the load is opened again
       openedRefs.current = record.kind === 'load' ? (record.data.sessions ?? []) : []
       // edits made while the store wrote are kept; the strings they mapped name the load too
       const latest = sessionsNow.current.map((s) => attachLoad(s, ref))
@@ -3630,16 +3461,12 @@ export function useWorkbenchState() {
     bullet: refOf(bullet),
     powder: refOf(powder),
   })
-  // the File menu's props stay the same objects while the load is unchanged, so its memo holds and
-  // its window listeners keep no earlier render, and with it no earlier result, alive
+  // the File menu's props stay the same objects while the load is unchanged, so its memo holds and its window listeners keep no earlier render, and so no earlier result, alive
   const fileKey = JSON.stringify(loadFile)
   const fileData = useMemo(() => JSON.parse(fileKey) as Load, [fileKey])
   const apiKey = JSON.stringify(apiFile)
   const apiData = useMemo(() => JSON.parse(apiKey) as Load, [apiKey])
-  /**
-   * A followed field's default or firearm value while it is the field's value; the seating owns the
-   * volume once a bullet is seated.
-   */
+  /** While it is the field's value; the seating owns the volume once a bullet is seated. */
   const defaultOf = (key: string) => {
     const k = followKeys.find((x) => x === key)
     if (!k || !followed.has(k) || (k === 'volume' && seatingOwnsVolume(seated))) return

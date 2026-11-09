@@ -13,11 +13,7 @@ import { confirmDialog } from './confirm.tsx'
 import type { FileState } from './file-menu.tsx'
 import type { UseWorkbenchStateResult } from './use-workbench-load.ts'
 
-/**
- * One open load. The shown tab is the live workbench; its entry here is the one it was
- * installed from. Every other entry is a snapshot: the load, its shown result and the File menu's
- * state, which `install` puts back.
- */
+/** The shown tab is the live workbench and its entry the one it was installed from; every other entry is a snapshot that `install` puts back. */
 type Tab = {
   key: string
   /** The saved record the tab was installed from, if any. */

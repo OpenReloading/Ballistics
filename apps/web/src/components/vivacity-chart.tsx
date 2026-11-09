@@ -111,8 +111,7 @@ function vivacityOption(
     // the bottom keeps room for the x axis name below its labels (containLabel counts labels only)
     grid: {
       left: 4,
-      // the label of a mark on the right edge is centred on its line: with the 1.4.12 letter
-      // spacing "burnout" reaches 14 px past it
+      // a label on the right edge is centred on its line: with the 1.4.12 letter spacing "burnout" reaches 14 px past it
       right: 20,
       top: small ? 16 : 28,
       bottom: small ? 18 : 24,
@@ -159,13 +158,7 @@ function vivacityOption(
   }
 }
 
-/**
- * Dynamic vivacity over burnt fraction (`apps/docs/docs/models/interior-burn-forms.md`, Dynamic
- * vivacity): one line per powder;
- * with one powder its interval as a band. `title` and `description` are the text alternative; the
- * data table next to the chart carries the values. Drawn with ECharts (`EChart`), the axis texts
- * kept inside the box, so a small chart beside the workbench readouts is not clipped.
- */
+/** One line per powder, a single powder's interval as a band; the axis texts kept inside the box, so a small chart beside the workbench readouts is not clipped (`apps/docs/docs/models/interior-burn-forms.md`). */
 export function VivacityChart({
   series,
   title,

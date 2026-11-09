@@ -5,12 +5,7 @@ import { fetchRecord } from '../lib/api-fetch.ts'
 import { bulletDrag } from '../lib/bullet.ts'
 import { type DropSlopeLoad, dropSlope } from '../lib/ladder-slope.ts'
 
-/**
- * The drop slope at a distance for the load of the Trajectory tab, m per m/s: its bullet record
- * read once per bullet, with the G7 ballistic coefficient the tab starts with, the G1 only for a bullet without a G7. A
- * function of the distance that gives undefined while the record is not read, for a bullet whose
- * coefficients need a choice, and for a load the trajectory cannot be flown for.
- */
+/** Drop slope, m per m/s, with the G7 coefficient the tab starts with (G1 only without a G7); undefined while the record is not read, when the coefficients need a choice, or for a load the trajectory cannot be flown for. */
 export function useDropSlope(
   load: DropSlopeLoad & { bullet?: string | undefined },
 ): (distance: number) => number | undefined {

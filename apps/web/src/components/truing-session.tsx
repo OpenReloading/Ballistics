@@ -42,10 +42,7 @@ export type TruingNominal = {
 
 const startRows = () => [blankRow(), blankRow(), blankRow()]
 
-/**
- * An answer with the nominal shot it was made for: a later change of the shot hides it. A problem
- * is text of the language it was made in (`t`), so it goes with a change of language.
- */
+/** A later change of the shot hides it; a problem is text of the language it was made in (`t`), so it goes with a change of language. */
 type Shown<T> = { shot: TrajectoryInput; t: Translator['t']; attempt: Attempt<T> }
 
 function Statuses({ lines, fit }: { lines: ParameterLine[]; fit: boolean }) {
@@ -176,13 +173,7 @@ const countText = (what: string, lines: ParameterLine[], t: Translator['t']) =>
     total: lines.length,
   })
 
-/**
- * Truing from range strings: plan a string of distances before shooting, enter the measured
- * strings, and read muzzle velocity, drag factor and click value with their intervals
- * (`apps/docs/docs/models/exterior-truing-strings.md`). The nominal shot is the Trajectory tab's.
- * A fit is stored only on request, with the strings, in the chosen firearm configuration; nothing
- * else is kept.
- */
+/** The nominal shot is the Trajectory tab's; a fit is stored only on request, with the strings, in the chosen firearm configuration, nothing else kept (`apps/docs/docs/models/exterior-truing-strings.md`). */
 export function TruingSession({ nominal, system }: { nominal: TruingNominal; system: UnitSystem }) {
   const { t } = useTranslation()
   const [rows, setRows] = useState<TruingRow[]>(startRows)

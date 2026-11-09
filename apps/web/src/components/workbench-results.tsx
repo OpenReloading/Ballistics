@@ -84,10 +84,7 @@ const heading = (v: ResultTab, t: Translator['t']) => {
   return <h2 className="print-only">{label && t(label)}</h2>
 }
 
-/**
- * The chosen powder's burn rate: beside the readouts, and in the inputs' second column of a low
- * desktop window (`shortFrame`), where its chart is taller.
- */
+/** Beside the readouts, and taller in the inputs' second column of a low desktop window (`shortFrame`). */
 export function BurnFigure() {
   const { t } = useTranslation()
   const { burn, powder, powderLabel, runMarks } = useResult()
@@ -399,8 +396,7 @@ function RunLine({
 
 /** Which tabs show and how many fit their row; the rest go into the More menu from 62em. */
 function useTabFit(tab: ResultTab, setTab: (tab: ResultTab) => void, hasOutcome: boolean) {
-  // from 62em the tabs that do not fit their row go into a More menu; narrower, the row
-  // scrolls sideways
+  // from 62em the tabs that do not fit their row go into a More menu; narrower, the row scrolls sideways
   const framed = useMediaQuery('screen and (min-width: 62em)')
   // in a low desktop window the burn-rate figure stands in the inputs' second column
   const short = useMediaQuery(shortFrame, false) ?? false
@@ -598,11 +594,7 @@ function ResultPanels({ short }: { short: boolean }) {
   )
 }
 
-/**
- * The results area: the load line, the notice, an error, the readouts or the checklist with the
- * burn rate, the warnings, the ladder strip and the result tabs. It reads the result context only,
- * so a keystroke in the inputs does not render it again.
- */
+/** It reads the result context only, so a keystroke in the inputs does not render it again. */
 export const ResultsArea = memo(function ResultsArea() {
   const { ok, outcome, identity, stale, system, todo, tab, setTab, setSeen, status, pending } =
     useResult()
@@ -628,8 +620,7 @@ export const ResultsArea = memo(function ResultsArea() {
   )
 
   return (
-    // one element whether or not a result is shown, so the tabs and the preview keep their state;
-    // a region "Result" only with a result
+    // one element whether or not a result is shown, so the tabs and the preview keep their state; a region "Result" only with a result
     <section
       aria-labelledby={ok ? 'interior-result' : undefined}
       className="result"

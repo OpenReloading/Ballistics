@@ -16,13 +16,7 @@ import {
 import { newId } from '../lib/new-id.ts'
 import { putRecords, storedRecords } from '../lib/user-store.ts'
 
-/**
- * The manufacturers a user can name: the catalogue's and the browser's, read after mounting.
- * `ensure` turns a typed name into a reference: the manufacturer it names, else a new user
- * manufacturer, stored here and found by the next typed name. While the catalogue has not
- * answered (`ready` false) a name that matches no user manufacturer gets no reference and no
- * record, so it cannot duplicate a catalogue manufacturer; `retry` asks the catalogue again.
- */
+/** While the catalogue has not answered (`ready` false) a name that matches no user manufacturer gets no reference and no record, so it cannot duplicate a catalogue manufacturer; `retry` asks again. */
 export function useManufacturers() {
   const [catalogue, setCatalogue] = useState<ManufacturerSummary[]>([])
   const [mine, setMine] = useState<UserRecord[]>([])
@@ -30,10 +24,7 @@ export function useManufacturers() {
   const loaded = useRef(false)
   // new names typed and not stored yet: the store does not hold them
   const drafts = useRef(new Set<string>())
-  /**
-   * Reads the browser's manufacturers again, after a record brought some along or Settings deleted
-   * one. Only the drafts stay of what was held.
-   */
+  /** After a record brought some along or Settings deleted one; only the drafts stay of what was held. */
   const reload = useCallback(
     () =>
       storedRecords().then(
@@ -73,11 +64,7 @@ export function useManufacturers() {
   )
   const seen = useRef({ catalogue, mine })
   seen.current = { catalogue, mine }
-  /**
-   * The reference `typed` stands for, `id` the UUID of a new manufacturer. A new one is kept as a
-   * draft (its name is known to `nameOf`, nothing is stored) that the next call for `id` replaces
-   * or drops.
-   */
+  /** `id` is the UUID of a new one, kept as a draft known to `nameOf` (nothing stored) that the next call for `id` replaces or drops. */
   const preview = useCallback((typed: string, id: string) => {
     const to = referTo(
       knownManufacturers(

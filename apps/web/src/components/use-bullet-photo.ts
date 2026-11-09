@@ -38,10 +38,7 @@ const empty: FieldValue = { text: '', si: undefined }
 
 type Without<T> = T extends unknown ? Omit<T, 'id'> : never
 
-/**
- * Asks the worker of the tool, started on the first request; an answer matched by its request id.
- * A worker that failed to load or died ends what waits with an error reply, the next request starts a new one.
- */
+/** Started on the first request, answers matched by request id; a worker that failed to load or died ends what waits with an error reply, the next request starts a new one. */
 export function useWorker(onError: (message: string) => void) {
   const worker = useRef<Worker | undefined>(undefined)
   const waiting = useRef(new Map<number, (r: WorkerReply) => void>())
@@ -98,11 +95,7 @@ interface Found {
   made: MeasuredInputs
 }
 
-/**
- * The state of the bullet photo tool: the working photograph, the scale points, the cut-out, the
- * outline and measurement the worker returns, and what they become in the designer. The photograph
- * and its tint live in canvases kept in refs, outside React state.
- */
+/** The photograph and its tint live in canvases kept in refs, outside React state. */
 export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
   const photo = useRef<HTMLCanvasElement | null>(null)
   const tint = useRef<HTMLCanvasElement | null>(null)

@@ -24,11 +24,7 @@ type Found = {
   powders: PowderSummary[]
 }
 
-/**
- * The search of each record kind, 8 matches each: cartridges and powders by the API, bullets by
- * the browser's ranking (`findBullets`, the card's field and dialog) over `designs` and the
- * catalogue, kept to those that fit `fit`.
- */
+/** 8 matches per kind: cartridges and powders by the API, bullets by the browser's ranking (`findBullets`) over `designs` and the catalogue, kept to those that fit `fit`. */
 export async function paletteSearch(
   text: string,
   designs: readonly BulletRow[],
@@ -58,13 +54,7 @@ const noneFound = (commands: number, records: Found | undefined) =>
   commands === 0 &&
   (!records || records.cartridges.length + records.bullets.length + records.powders.length === 0)
 
-/**
- * Record search of the workbench (`@mantine/spotlight`): Ctrl+K (Cmd+K), also from a field, or
- * `spotlight.open()`; groups Pages, Commands (the page's, then the shell's), Cartridges, Bullets
- * (those that fit `bulletFit`; named by `bulletsLabel`) and Powders. Ctrl+Enter in the search
- * closes it and runs. The site search of every other page (`site-search.tsx`) is this one on
- * a store of its own (`search`), opened by the shell, without `onRun`.
- */
+/** Ctrl+Enter in the search closes it and runs; the site search of every other page (`site-search.tsx`) is this one on a store of its own (`search`), opened by the shell, without `onRun`. */
 export function WorkbenchSearch({
   commands: pageCommands,
   onRun,
@@ -109,8 +99,7 @@ export function WorkbenchSearch({
     }
   }, [own])
   const [query, setQuery] = useState('')
-  // a command or Ctrl+Enter runs once the search has closed and returned focus, so a run that
-  // focuses an invalid field keeps that focus
+  // a command or Ctrl+Enter runs once the search has closed and returned focus, so a run that focuses an invalid field keeps that focus
   const after = useRef<(() => void) | undefined>(undefined)
   const [text] = useDebouncedValue(query.trim(), 200)
   const [found, setFound] = useState<Found | 'error' | undefined>(undefined)

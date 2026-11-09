@@ -47,10 +47,7 @@ export type Step = {
   volumeFraction?: number | undefined
 }
 
-/**
- * The run's load at step `s`: its charge, with a seating ladder its volume and travel, with a
- * temperature ladder its propellant temperature.
- */
+/** Its charge, with a seating ladder its volume and travel, with a temperature ladder its propellant temperature. */
 export const stepLoad = (load: InteriorBody['load'], s: Step): InteriorBody['load'] => ({
   ...load,
   charge: s.charge,
@@ -96,10 +93,7 @@ export type Outcome =
       castHardness?: number | undefined
       /** Rounds fired through the chosen firearm's barrel, its record's `roundCount`. */
       roundCount?: number | undefined
-      /**
-       * The powder record has no temperature coefficient and the run took the default of its grain
-       * form; `coldPeak`: the peak breech pressure over the cold sensitivity interval, Pa, below the reference.
-       */
+      /** No temperature coefficient, so the run took the default of its grain form; `coldPeak`: the peak breech pressure over the cold sensitivity interval, Pa, below the reference. */
       sensitivityDefault?:
         | {
             form: string
@@ -178,10 +172,7 @@ export const needsNetwork = msg(
   'Simulations run in this browser. Offline use requires the needed records to be cached.',
 )
 
-/**
- * The barrel strip's figure at the shown step: a seating ladder's step seats the bullet at its own
- * depth, so its base is the barrel less the step's travel (mm), as the Barrel length study reads it.
- */
+/** A seating ladder's step seats the bullet at its own depth, so its base is the barrel less the step's travel (mm), as the Barrel length study reads it. */
 export function stripFigureOf(ok: Extract<Outcome, { kind: 'ok' }>) {
   const { figure, barrel } = ok.printed.seated
   const travel = ok.load.barrel.length
@@ -190,10 +181,7 @@ export function stripFigureOf(ok: Extract<Outcome, { kind: 'ok' }>) {
   return { ...figure, base: fromSi('length', barrel - travel) }
 }
 
-/**
- * A seating or temperature ladder varies one thing at one charge, so what follows the charge (the
- * longer barrel run, the measured strings, the groups) reads the shown step alone.
- */
+/** A seating or temperature ladder varies one thing at one charge, so the longer barrel run, the measured strings and the groups read the shown step alone. */
 export const singleCharge = (ok: Extract<Outcome, { kind: 'ok' }> | undefined) =>
   ok !== undefined && ok.ladder.kind !== 'charge'
 
@@ -260,10 +248,7 @@ export function warningLines(
   return [...shownWarnings(ok.body, system, t), ...derived(ok, t).own]
 }
 
-/**
- * The cartridge's name when the powder record lists the cartridges its manufacturer names and this
- * one is not among them; a powder without a list says nothing.
- */
+/** When the powder record lists the cartridges its manufacturer names and this one is not among them; a powder without a list says nothing. */
 export const unlistedCartridge = (
   powder: { listedCartridges?: string[] | undefined } | undefined,
   cartridge: { id: string; name: string } | undefined,
@@ -322,10 +307,7 @@ function temperatureMessage(
   ]
 }
 
-/**
- * Everything the result panel says about the shown step, warnings first, then messages, then
- * notes, each in the order of its source.
- */
+/** Warnings first, then messages, then notes, each in the order of its source. */
 export function resultNotes(
   ok: Extract<Outcome, { kind: 'ok' }>,
   warnings: { text: string; name?: string | undefined }[],
@@ -437,10 +419,7 @@ export function resultNotes(
   return noteKinds.flatMap((kind) => notes.filter((n) => n.kind === kind))
 }
 
-/**
- * The shown step's peak, percent of its limit and muzzle velocity, as the status says them after a
- * run and a step change.
- */
+/** Peak, percent of its limit and muzzle velocity, as the status says them after a run and a step change. */
 export function resultLine(
   ok: Extract<Outcome, { kind: 'ok' }>,
   system: UnitSystem,
@@ -477,8 +456,7 @@ const modelCodes = ['rangeIncomplete', 'chargeTooSmall']
 /** The flag of a step, worded as a simulation result. */
 export function stepFlag(ok: Shown, t: Translator['t']) {
   const { limits, warnings } = ok.body
-  // exceeded: the upper end of the pressure range; nominalExceeded: the peak itself. The flag names
-  // its maximum
+  // exceeded: the upper end of the pressure range, nominalExceeded: the peak itself; the flag names its maximum
   const name = (l: NonNullable<typeof limits>[number]) => `CIP ${l.symbol}`
   const peak = limits?.find((l) => l.nominalExceeded)
   if (peak) return peak.typed ? t('above your Pmax') : t('above {name}', { name: name(peak) })

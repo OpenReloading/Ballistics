@@ -22,11 +22,7 @@ import type { ResultTab } from './workbench-results.tsx'
 /** The load: fields, records, seating, ladder and the actions; read by the input cards. */
 export const LoadContext = createContext<UseWorkbenchStateResult | null>(null)
 
-/**
- * What the result side shows: the outcome, its steps, the step choice and the chart view. Its
- * value stays the same object while a keystroke changes no part of it, so the memoized results do
- * not render again.
- */
+/** The same object while a keystroke changes no part of it, so the memoized results do not render again. */
 export type ResultState = {
   ok: Extract<Outcome, { kind: 'ok' }> | undefined
   outcome: Outcome | undefined

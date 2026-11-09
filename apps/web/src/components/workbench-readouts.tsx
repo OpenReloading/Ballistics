@@ -383,10 +383,7 @@ function PeakLimits({
   )
 }
 
-/**
- * The readouts of the selected step: the key values peak pressure (with its share of the limit and
- * the limits table one click away), muzzle velocity and energy, then the list of the others.
- */
+/** Peak pressure with its share of the limit and the limits table one click away, muzzle velocity and energy, then the others. */
 export function Readouts({
   ok,
   system,
@@ -551,10 +548,7 @@ function notComparedReason(reason: string | undefined, t: Translator['t']) {
   return known ? t(known) : translateMessage(reason, t)
 }
 
-/**
- * The pressure range of the result on a bar from 0 with its nominal and the compared limit
- * (`pressureLimit`, as the chart's limit line); nothing without that limit.
- */
+/** On a bar from 0 with its nominal and the compared limit (`pressureLimit`, as the chart's limit line); nothing without that limit. */
 function LimitRange({ body, system }: { body: InteriorResponse; system: UnitSystem }) {
   const { t } = useTranslation()
   const limit = pressureLimit(body.limits)
@@ -611,10 +605,7 @@ function LimitRange({ body, system }: { body: InteriorResponse; system: UnitSyst
   )
 }
 
-/**
- * Pressure limits table and their source line; with `system` the range bar between them (the
- * popover). On screen the line links the cartridge record's sources; on paper it names the record.
- */
+/** With `system` the range bar between them (the popover); on screen the line links the cartridge record's sources, on paper it names the record. */
 export function LimitsView({
   body,
   system,

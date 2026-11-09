@@ -10,11 +10,7 @@ import { storedRecords } from '../lib/user-store.ts'
 import { yourDataRows } from '../lib/your-data.ts'
 import { ErrorNote, Loading } from './states.tsx'
 
-/**
- * The Your data section of Settings, General: one row per kind of record in this browser with its
- * number, linked to the list that shows them. `onNavigate` closes the dialog for a link that stays
- * on the page's route.
- */
+/** `onNavigate` closes the dialog for a link that stays on the page's route. */
 export function YourDataForm({ onNavigate }: { onNavigate: () => void }) {
   const [rows, setRows] = useState<ReturnType<typeof yourDataRows>>()
   const { t } = useTranslation()
