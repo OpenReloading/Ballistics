@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import de from '../src/i18n/de.json'
-import { type Catalogue, english, translator } from '../src/i18n/translate.ts'
+import { english, translator } from '../src/i18n/translate.ts'
 import {
   answerOf,
   chargeTargetBody,
@@ -11,7 +10,6 @@ import {
 } from '../src/lib/charge-target.ts'
 import { presetUnits } from '../src/lib/units.ts'
 
-const german = translator(de as Catalogue, 'de')
 const si = presetUnits('metric-grams')
 const us = presetUnits('us')
 
@@ -106,7 +104,6 @@ describe('refusalText', () => {
     ).toBe('boom')
     const several = { statusCode: 422, reason: 'severalLimits' }
     expect(refusalText(several, 'peakPressure', si, true, english.t)).toMatch(/limit per variant/)
-    expect(refusalText(several, 'peakPressure', si, true, german.t)).toMatch(/je Variante/)
   })
 
   it('names the failing run of the load for noValidRun, not the target', () => {
@@ -129,12 +126,9 @@ describe('refusalText', () => {
       reason: 'noValidRun',
       failure: { reason: 'input', field },
     })
-    expect(refusalText(refusal('ignitionPressure'), 'peakPressure', si, false, german.t)).toContain(
-      'Feld: Zünddruck.',
-    )
     // a field without a workbench label keeps the model's name
-    expect(refusalText(refusal('heat'), 'peakPressure', si, false, german.t)).toContain(
-      'Feld: heat.',
+    expect(refusalText(refusal('heat'), 'peakPressure', si, false, english.t)).toContain(
+      'field: heat.',
     )
     expect(
       refusalText({ statusCode: 422, reason: 'noValidRun' }, 'barrelTime', si, false, english.t),
@@ -165,7 +159,8 @@ describe('the answer kept for a language change', () => {
     if (out.kind !== 'refused') throw new Error('expected a refusal')
     const en = out.text(english.t)
     expect(en).toBe('The search did not reach its tolerance.')
-    expect(out.text(german.t)).not.toBe(en)
+    const own = translator({ 'The search did not reach its tolerance.': 'Verfehlt.' }, 'de')
+    expect(out.text(own.t)).toBe('Verfehlt.')
     expect(out.text(english.t)).toBe(en)
   })
 

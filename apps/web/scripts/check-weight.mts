@@ -1,23 +1,4 @@
-/**
- * Fails when the JavaScript a route of the built web app loads grows past the budget of its group in
- * `weight-budget.json`, and prints a table of the change per route against the recorded values and the
- * headroom left under the budget (to $GITHUB_STEP_SUMMARY too, when set). A route with less than
- * `nearShare` of its budget left gets a warning line, which does not fail the check.
- *
- * Read from `.next` after the export build (`pnpm run static:build`, which leaves it in
- * place): the routes of `app-path-routes-manifest.json`,
- * for each its client reference manifest (client component chunks, `entryJSFiles`), the root main and polyfill
- * files of `build-manifest.json` and the `react-loadable-manifest.json` of the page (lazy `next/dynamic` chunks).
- * Counted per route, in bytes of gzip level 9, each file once:
- *   initial  the files a first visit loads: root main, polyfill, the client chunks of the page and its layouts
- *   total    initial plus the lazy chunks the page can load on demand
- * Content only, so the number does not depend on the API, `PRERENDER`, the clock or the build directory.
- *
- * A route in no group, or a group route the build does not have, fails: a new route needs a budget in the pull
- * request. Raising a number is an edit of `weight-budget.json` that review sees.
- *
- *   node scripts/check-weight.mts
- */
+// Fails when a route's JavaScript outgrows its group's budget: apps/docs/docs/ci-tools.md#web-javascript-budget
 import { appendFileSync, existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { gzipSync } from 'node:zlib'

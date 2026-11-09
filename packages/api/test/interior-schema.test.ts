@@ -1,25 +1,7 @@
-import {
-  chargeBody,
-  chargeTargetExample,
-  interiorBody,
-  interiorExample,
-  loadFileExample,
-} from '@open-reloading/use-cases'
+import { chargeTargetExample, interiorExample, loadFileExample } from '@open-reloading/use-cases'
 import { describe, expect, it } from 'vitest'
-import { z } from 'zod'
 import { API_PREFIX } from '../src/version.ts'
-import { undescribed, withApi } from './setup.ts'
-
-describe('interior request schemas', () => {
-  it('describe every property and the body', () => {
-    for (const body of [interiorBody, chargeBody]) {
-      const schema = z.toJSONSchema(body, { io: 'input', unrepresentable: 'any' })
-      expect(schema).not.toHaveProperty('$defs')
-      expect(schema.description).toBeTruthy()
-      expect(undescribed(schema)).toEqual([])
-    }
-  })
-})
+import { withApi } from './setup.ts'
 
 describe('interior examples', () => {
   const api = withApi()

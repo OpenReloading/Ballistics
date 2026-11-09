@@ -199,9 +199,6 @@ export interface ChargeTargetRequest extends z.input<typeof chargeBody> {
 }
 
 // @public
-export const chargeTargetResponse: z.ZodType;
-
-// @public
 export type CoefficientSchema = z.ZodUnion<readonly [z.ZodNumber, z.ZodArray<z.ZodTuple<[z.ZodNumber, z.ZodNumber], null>>]>;
 
 // @public
@@ -255,9 +252,6 @@ export type ExteriorOptionsShape = {
     }>>;
     maxYaw: z.ZodOptional<z.ZodNumber>;
 };
-
-// @public
-export function filePath(path: PropertyKey[], at: Path): Path;
 
 // @public
 export const findBullet: (catalogue: Catalogue, id: string) => Catalogued<'bullet'>;
@@ -331,9 +325,6 @@ export interface InteriorRequest extends z.input<typeof interiorBody> {
 }
 
 // @public
-export const interiorResponse: z.ZodType;
-
-// @public
 export type InterpolationSchema = z.ZodOptional<z.ZodEnum<{
     linear: 'linear';
     'monotone-cubic': 'monotone-cubic';
@@ -351,9 +342,6 @@ export const loadFileExample: LoadFileRequest;
 // @public
 export interface LoadFileRequest extends z.input<typeof userDataFile> {
 }
-
-// @public
-export const loadFileResponse: z.ZodType;
 
 // @public
 export type M3LoadShape = {
@@ -422,9 +410,6 @@ export type M3LoadShape = {
 };
 
 // @public
-export const maxPoints = 20000;
-
-// @public
 export interface Operation {
     body: z.ZodType;
     description: string;
@@ -460,9 +445,6 @@ export interface OperationContext {
 
 // @public
 export const operations: readonly Operation[];
-
-// @public
-export type Path = PropertyKey[];
 
 // @public
 export type QueryNumberSchema = z.ZodPipe<z.ZodPipe<z.ZodString, z.ZodTransform<number, string>>, z.ZodNumber>;
