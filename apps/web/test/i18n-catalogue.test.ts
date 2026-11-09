@@ -66,9 +66,10 @@ describe('the catalogue lint', () => {
       Wind: 'Wind',
       Open: 'Open',
       '{a}: {b}': '{a}: {b}',
+      '"{a}"': '"{a}"',
       '{count} file|{count} files': { other: '{count} files', one: '{count} file' },
     }
-    const english = ['Wind', 'Open', '{a}: {b}', '{count} file|{count} files']
+    const english = ['Wind', 'Open', '{a}: {b}', '"{a}"', '{count} file|{count} files']
     expect(
       problems(
         [
@@ -86,7 +87,7 @@ describe('the catalogue lint', () => {
         ['Busy', 'Missing'],
         ['Missing', 'Listed', 'Done'],
         ['Missing', 'Done'],
-        ['Wind', 'Busy', 'Done'],
+        ['Wind', 'Busy', 'Done', '{a}: {b}', 'Wind'],
       ),
     ).toEqual([
       'untranslated: Missing',
@@ -98,8 +99,11 @@ describe('the catalogue lint', () => {
       'few is no plural category of de: {count} row|{count} rows',
       'left English: Busy',
       'left English: Open',
+      'left English: "{a}"',
       'left English: {count} file|{count} files',
       'listed as equal to English, but translated or gone: Done',
+      'listed as equal to English, but needs no entry or is listed twice: {a}: {b}',
+      'listed as equal to English, but needs no entry or is listed twice: Wind',
     ])
   })
 

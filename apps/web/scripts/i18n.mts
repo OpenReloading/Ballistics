@@ -144,10 +144,11 @@ export function requiredMessages(root: string): string[] {
 /**
  * What is wrong with `catalogue` of `language` against the English `source`: a text without a
  * translation that `allowed` does not list (a `required` one always), a listed text that has one
- * or that `base` (the base commit's list) lacks, a text left English that has a letter outside its
- * placeholders and that `same` does not list (a `required` one always), a text `same` lists that
- * differs from English or is gone, a key no message matches, an empty text, placeholders other
- * than its key's, and a plural that is no object of the language's categories.
+ * or that `base` (the base commit's list) lacks, a text left English that has a letter or quote
+ * mark outside its placeholders and that `same` does not list (a `required` one always), a text
+ * `same` lists that differs from English, is gone, needs no entry or is listed twice, a key no
+ * message matches, an empty text, placeholders other than its key's, and a plural that is no
+ * object of the language's categories.
  */
 export function problems(
   source: readonly string[],
@@ -193,15 +194,18 @@ export function problems(
       return texts.length > 0 && texts.every((text) => key.split('|').includes(text))
     })
     .map(([key]) => key)
-  // a text with no letter outside its placeholders reads the same in every language
-  const worded = (key: string) => /\p{L}/u.test(key.replace(/\{\w+\}/g, ''))
+  // a text with no letter or quote mark outside its placeholders reads the same in every language
+  const translatable = (key: string) => /[\p{L}\p{Pi}\p{Pf}"']/u.test(key.replace(/\{\w+\}/g, ''))
   found.push(
     ...english
-      .filter((k) => required.includes(k) || (worded(k) && !same.includes(k)))
+      .filter((k) => required.includes(k) || (translatable(k) && !same.includes(k)))
       .map((k) => `left English: ${k}`),
     ...same
       .filter((k) => !english.includes(k))
       .map((k) => `listed as equal to English, but translated or gone: ${k}`),
+    ...same
+      .filter((k, i) => !translatable(k) || same.indexOf(k) !== i)
+      .map((k) => `listed as equal to English, but needs no entry or is listed twice: ${k}`),
   )
   return found
 }
