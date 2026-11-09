@@ -309,10 +309,7 @@ const item = (x: unknown) =>
     ? gapWords[x as keyof typeof gapWords]
     : String(x)
 
-/**
- * A param as the sentence shows it: a list joined by commas, the pressure rows counted per basis, a
- * number as JavaScript writes it. A load file field arrives labelled (`interior-input.ts`).
- */
+/** A list joined by commas, the pressure rows counted per basis, a number as JavaScript writes it; a load file field arrives labelled (`interior-input.ts`). */
 function shown(name: string, v: unknown): string {
   if (Array.isArray(v)) return v.map(item).join(', ')
   if (name === 'rows' && typeof v === 'object' && v !== null)

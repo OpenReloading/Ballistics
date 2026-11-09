@@ -16,7 +16,7 @@ export function momentumUnit(system: UnitSystem) {
 export const momentumText = (system: UnitSystem, si: number) =>
   formatNumber(momentumUnit(system).fromSi(si), 2)
 
-/** The gas's share is the rest of `FreeRecoil.momentum`. */
+/** SI: `bulletMass` kg, `muzzleVelocity` m/s, the parts kg·m/s; the gas's share is the rest of `FreeRecoil.momentum`. */
 export function momentumParts(recoil: FreeRecoil, bulletMass: number, muzzleVelocity: number) {
   const bullet = bulletMass * muzzleVelocity
   return { total: recoil.momentum, bullet, gas: recoil.momentum - bullet }

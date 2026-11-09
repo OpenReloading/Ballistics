@@ -62,7 +62,7 @@ export const fitMark = (
         { date: day(localDay(new Date(date))) },
       )
 
-/** Compared as the fields write them; undefined for a powder not saved from a fit. */
+/** `origin`: the record values the fit filled, `values`: the SI field values, compared as the fields write them in `s`; undefined for a powder not saved from a fit. */
 export function loadFitMark(
   design: { powder: Powder; fit?: UserPowderFit | undefined } | undefined,
   origin: Record<string, number> | undefined,

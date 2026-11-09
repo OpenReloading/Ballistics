@@ -184,7 +184,7 @@ const smooth = (p: readonly number[]) =>
     return w.reduce((a, b) => a + b, 0) / w.length
   })
 
-/** Profiles on 120 normal rays aligned at their steepest point: the 10 to 90 % width of a Gaussian edge; undefined without a step. */
+/** In image px: profiles on 120 normal rays aligned at their steepest point: the 10 to 90 % width of a Gaussian edge; undefined without a step. */
 function edgeWidth(image: RgbaImage, e: Ellipse): number | undefined {
   const [span, step, rays] = [clamp(0.1 * ((e.semiMajor + e.semiMinor) / 2), 6, 30), 0.25, 120]
   const n = Math.round((2 * span) / step) + 1
@@ -265,7 +265,7 @@ function quarterLight(grid: ReturnType<typeof grayGrid>): number | undefined {
   return levels.filter((v) => v >= LIT).length >= 3 ? sidesDifference(levels) : undefined
 }
 
-/** A white zone inside the black area does not count; without one in frame, the photo's 95th percentile, darkest 5 % and quarters. */
+/** A white zone inside the black area does not count; exposure (95th percentile) and dark (darkest 5 %) are always the whole photo's; without the black area's ring in frame, glare reads the whole photo and the light its quarters. */
 function gridMeasures(image: RgbaImage, black: Ellipse | undefined, s: number) {
   const grid = grayGrid(image, s)
   const whole = Array.from(grid.grey)
