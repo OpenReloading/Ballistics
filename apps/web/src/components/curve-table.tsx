@@ -16,7 +16,7 @@ import { ScrollRegion } from './scroll-region.tsx'
 
 const f = (v: number | undefined) => (v === undefined ? '' : formatNumber(v, 2))
 
-/** Burnt fraction 0 to 1 in steps of 0.1: value, low and high for one powder, one value column per powder for several. */
+/** Dynamic vivacity at burnt fraction 0 to 1 in steps of 0.1: value, low and high for one powder, one value column per powder for several. */
 export function CurveTable({ powders, caption }: { powders: FittedPowder[]; caption: string }) {
   const { t } = useTranslation()
   const only = powders.length === 1 ? powders[0] : undefined

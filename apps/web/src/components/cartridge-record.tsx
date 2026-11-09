@@ -275,7 +275,7 @@ const sideDimensions = {
   chamber: msg('Chamber dimensions'),
 } as const
 
-/** After the CIP data sheets: the cartridge's tolerance is its maximum, the chamber's its minimum, the clearance a note where both sides give one; rows run from the mouth to the head. */
+/** After the CIP data sheets: the cartridge's values are its maximum, the chamber's its minimum, each with its tolerance; the clearance a note where both sides give one; rows run from the mouth to the head. */
 export function CartridgeSides({
   pairs,
   rows,

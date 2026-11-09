@@ -362,7 +362,7 @@ export function useHoleDetection({
       ? ` ${tn(f.length, '{count} area to place by hand (dashed box).', '{count} areas to place by hand (dashed box).')}`
       : ''
 
-  /** Shows the result line (`auto`) or step 5 when there are any; returns their count. */
+  /** Shows a run's proposals and flagged areas on the photo, and the result line (`auto`) or step 5 when there are any; returns their count. */
   function show(
     m: { proposals: HoleProposal[]; flagged: FlaggedRegion[] },
     hole: number,

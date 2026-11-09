@@ -5,7 +5,7 @@ import { memo, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import type { useManufacturers } from './use-manufacturers.ts'
 
-/** The reference goes out on every keystroke so a save never lags the text; a new one's id is chosen when typing starts, its record stored on leave, choice or save shortcut; a name the catalogue cannot check gets none. */
+/** `value` and `onChange` carry the reference (`catalogue:<id>` or `user:<id>`), sent on every keystroke so a save never lags the text; a new one's id is chosen when typing starts, its record stored on leave, choice or save shortcut; a name the catalogue cannot check gets none. */
 export const ManufacturerInput = memo(function ManufacturerInput({
   label,
   value,

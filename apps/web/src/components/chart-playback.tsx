@@ -434,7 +434,7 @@ export function ChartPlayback({
                   onChange={(e) => {
                     const v = Number(e.target.value) / scrubSteps
                     const t = scale.time(v)
-                    // within 1 % of an event mark takes the event's time; position 0 is ignition, not the shot start at the same position
+                    // within 1 % of the track of an event mark takes the event's time; position 0 is ignition, not the shot start at the same position
                     const near =
                       pointer.current &&
                       v > 0 &&

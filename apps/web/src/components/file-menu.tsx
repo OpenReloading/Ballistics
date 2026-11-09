@@ -183,7 +183,7 @@ export interface FileState {
 
 /** What a page calls before it starts a new record (New, Reset, Example, a catalogue start). */
 export interface FileMenuHandle {
-  /** Asks before dropping unsaved changes, false when the user keeps them, a promise only when the dialog asks; `next` is the new data (a page with deferred data must pass it), else the render after `then`, which runs on yes. */
+  /** Asks before dropping unsaved changes, on yes a new record (a new id, no file, not saved), false when the user keeps them, a promise only when the dialog asks; `next` is the new data (a page with deferred data must pass it), else the render after `then`, which runs on yes (after the promise it returns settles). */
   startNew(next?: unknown, then?: () => unknown): true | Promise<boolean>
   /** Opens a browser record as the Open menu's saved records do; false when the user keeps the changes. */
   open(record: UserRecord): Promise<boolean>
@@ -925,9 +925,9 @@ function FileMenuOf<K extends UserRecordKind>({
   onExported?: () => void
   /** Called with whether the record has unsaved changes, when that changes. */
   onUnsaved?: (unsaved: boolean) => void
-  /** Kept in the browser on every change (`/groups`): no leave questions, Open keeps the opened record, Save as writes a copy with a new id that `onOpen` shows. */
+  /** The id of the record kept in the browser on every change (`/groups`), which Save writes: no leave questions, Open keeps the opened record, Save as writes a copy with a new id that `onOpen` shows. */
   autosaved?: string
-  /** `blank` before the first save, `saving` while the last change is not in the browser yet, `failed` when the browser store refused it. */
+  /** With `autosaved`: `blank` before the first save, `saving` while the last change is not in the browser yet, `failed` when the browser store refused it. */
   kept?: 'blank' | 'saving' | 'saved' | 'failed'
   /** No record is open (the firearm library before New or Open): the status shows messages only. */
   idle?: boolean
