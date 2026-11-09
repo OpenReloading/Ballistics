@@ -1,8 +1,4 @@
-/**
- * The advisory registry: every rule that tells a user something about a run (`apps/docs/docs/models/interior-m3.md`,
- * "Advisories"). An `error` blocks a run; a `warn` or `info` never changes a result. A rule is a code, a severity and
- * the inputs it reads; its words live with the API, which writes them.
- */
+/** Every rule that tells a user something about a run (`apps/docs/docs/models/interior-m3.md`, "Advisories"): an `error` blocks a run, a `warn` or `info` never changes a result; the words live with the API. */
 import type { InteriorLoad } from './interior/model.ts'
 import type { Complete } from './key-list.ts'
 
@@ -97,12 +93,7 @@ function resistanceAtStart(resistance: AdvisoryLoad['resistance']) {
   return { engraving, floor: (resistance?.friction ?? 0) + engraving }
 }
 
-/**
- * The input rules that fire for `load`: a start pressure at or below the bore resistance at travel 0
- * (the friction plus the engraving pressure there; a start pressure of 0 counts as not given), a
- * radius of gyration with a twist of 0, and a start pressure above both that resistance and the ignition
- * pressure (else the shot starts at once) with an engraving pressure at travel 0 that is not 0. Reads the load and changes nothing.
- */
+/** A start pressure at or below the bore resistance at travel 0 (0 counts as not given), a radius of gyration with a twist of 0, and a start pressure above that resistance and the ignition pressure (else the shot starts at once) with an engraving pressure at travel 0; changes nothing. */
 export function interiorAdvisories(load: AdvisoryLoad): AdvisoryRule[] {
   const { startPressure, ignitionPressure, barrel, bullet } = load
   const { engraving, floor } = resistanceAtStart(load.resistance)

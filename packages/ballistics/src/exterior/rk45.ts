@@ -1,8 +1,4 @@
-/**
- * Dormand-Prince 5(4) integrator with error control, dense output and event location
- * (`apps/docs/docs/models/exterior-point-mass.md`, "Numerical method"; Dormand and Prince 1980; Hairer,
- * Norsett and Wanner 1993, sections II.4 to II.6). Generic over the state length.
- */
+/** Dormand-Prince 5(4) with error control, dense output and event location, generic over the state length (`apps/docs/docs/models/exterior-point-mass.md`, "Numerical method"; Dormand and Prince 1980; Hairer, Norsett and Wanner 1993, sections II.4 to II.6). */
 import { nth } from '@open-reloading/statistics'
 import { InputError } from '../issue.ts'
 
@@ -124,10 +120,7 @@ function crosses(g0: number, g1: number, direction: -1 | 0 | 1): boolean {
   return rising || falling
 }
 
-/**
- * Root of f on [0, 1] with f(0) = f0 and f(1) = f1 on opposite sides (Illinois method); returns
- * a point on the side of f1, so the state there has crossed.
- */
+/** Illinois method on [0, 1] with f(0) = f0 and f(1) = f1 on opposite sides; returns a point on the side of f1, so the state there has crossed. */
 function root(f: (x: number) => number, f0: number, f1: number, tol: number): number {
   if (f1 === 0) return 1
   let lo = 0
@@ -189,10 +182,7 @@ interface Integration {
   options: Rk45Options
 }
 
-/**
- * One Dormand-Prince step of size h from (t, y) with `work.k1` = f(t, y); writes the fifth-order
- * state into `work.out`, f there into `work.k7`, and returns the error norm.
- */
+/** Step h from (t, y) with `work.k1` = f(t, y): the fifth-order state into `work.out`, f there into `work.k7`; returns the error norm. */
 function dormandPrinceStep(run: Integration, t: number, y: Float64Array, h: number): number {
   const { f, work } = run
   const { relativeTolerance, absoluteTolerance } = run.options
@@ -293,10 +283,7 @@ interface DenseStep {
   dense: (s: number) => Float64Array
 }
 
-/**
- * Roots of the crossed events on the step: the non-terminal roots before the first terminal root, in
- * time order, and that terminal root as a step fraction.
- */
+/** The non-terminal roots before the first terminal root, in time order, and that terminal root as a step fraction. */
 function locateEvents(
   events: readonly Rk45Event[],
   { crossed, before, after }: Crossings,

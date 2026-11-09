@@ -1,6 +1,4 @@
-/**
- * Lead for a moving target, `apps/docs/docs/models/exterior-moving-target.md`. SI in and out.
- */
+/** Lead for a moving target, `apps/docs/docs/models/exterior-moving-target.md`; SI in and out. */
 import { InputError } from '../issue.ts'
 
 /** A target's motion: speed m/s and heading rad (0 away from the shooter, pi/2 crossing to the right). */
@@ -15,13 +13,7 @@ export interface MovingTargetLead {
   angle: number
 }
 
-/**
- * The lead for a target at `range` m (along the line of sight) that moves during the time of flight
- * `timeOfFlight` s of the bullet to that range. The lateral lead is the target's displacement across
- * the line of sight, positive to the right; the angle is the lead divided by the range, as an
- * arctangent. The range and the time of flight stay those of the trajectory: the part of the motion
- * along the line of sight changes neither.
- */
+/** `range` m along the line of sight, `timeOfFlight` s to it; the lateral lead is positive to the right and the angle its arctangent over the range, as the motion along the line of sight changes neither. */
 export function movingTargetLead(
   target: TargetMotion,
   range: number,

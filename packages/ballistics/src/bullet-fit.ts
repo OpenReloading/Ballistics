@@ -1,10 +1,4 @@
-/**
- * Which bullet diameters fit a cartridge, from its C.I.P. values only: the
- * bullet is larger than the middle of the land and groove diameters and at most the
- * projectile diameter G1 of the cartridge drawing. C.I.P. prints G1 as a maximum without a
- * tolerance; the middle of F and Z is the tightest lower bound from C.I.P. values that keeps a
- * bullet for every cartridge (Z lies above G1 for 303 British and 6,5 x 55 SE).
- */
+/** From C.I.P. values only: larger than the middle of F and Z, at most G1, which C.I.P. prints as a maximum without tolerance; the middle of F and Z is the tightest lower bound that keeps a bullet for every cartridge (Z lies above G1 for 303 British and 6,5 x 55 SE). */
 
 /** The C.I.P. values the fit reads, mm, the records' stored unit. */
 export type CartridgeDiameters = {

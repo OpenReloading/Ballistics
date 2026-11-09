@@ -37,11 +37,7 @@ export function cartridgeGrooveDiameterMm(c: CartridgeSpecs): number | undefined
     ?.value
 }
 
-/**
- * The values of a cartridge record that `bulletFits` reads, mm: the smallest cartridge-side G1 and
- * chamber-side F and Z of its CIP sheet, as `GET /cartridges` gives them; undefined when
- * one is missing.
- */
+/** The values `bulletFits` reads, mm: the smallest cartridge-side G1 and chamber-side F and Z of the CIP sheet, as `GET /cartridges` gives them; undefined when one is missing. */
 export function cartridgeDiameters(c: CartridgeSpecs): CartridgeDiameters | undefined {
   const [g1, land, groove] = [
     leastSpecValue(c.values, 'cartridge', 'G1'),
