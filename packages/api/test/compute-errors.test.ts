@@ -79,7 +79,7 @@ describe('compute error mapping', () => {
   it('answers 422 for a NaN outside the documented NaN fields', async () => {
     const { status, body } = await stability(3)
     expect(status).toBe(422)
-    expect(body.message).toBe('result holds a non-finite number at result')
+    expect(body).toMatchObject({ code: 'resultNotFinite', params: { path: 'result' } })
   })
 })
 
@@ -130,7 +130,7 @@ describe('NaN result fields', () => {
     vi.mocked(trajectory).mockImplementationOnce(nanDrift)
     const pm = await post(`${API_PREFIX}/exterior/trajectory`, { shot, ranges: [100] })
     expect(pm.status).toBe(422)
-    expect(pm.body.message).toBe('result holds a non-finite number at result.points.0.spinDrift')
+    expect(pm.body.params).toEqual({ path: 'result.points.0.spinDrift' })
   })
 
   it('writes NaN truing standard uncertainty and correlation as null', async () => {
@@ -211,26 +211,26 @@ describe('non-finite fields of the range strings routes', () => {
   })
 
   it('answers 422 for a non-finite number at any other path', async () => {
-    const message = (path: string) => `result holds a non-finite number at ${path}`
+    const at = (path: string) => ({ path })
     vi.mocked(comparePlanCandidates).mockImplementationOnce(() =>
       planResult({ interval: { lower: 1, upper: Infinity, confidenceLevel: 0.95 } }),
     )
     const planned = await post(`${API_PREFIX}/exterior/range-strings/plan`, planBody)
     expect(planned.status).toBe(422)
-    expect(planned.body.message).toBe(message('result.0.plan.parameters.0.interval.upper'))
+    expect(planned.body.params).toEqual(at('result.0.plan.parameters.0.interval.upper'))
     vi.mocked(comparePlanCandidates).mockImplementationOnce(() =>
       planResult({}, { correlation: { 'a:b': Infinity } }),
     )
     const correlated = await post(`${API_PREFIX}/exterior/range-strings/plan`, planBody)
     expect(correlated.status).toBe(422)
-    expect(correlated.body.message).toBe(message('result.0.plan.correlation.a:b'))
+    expect(correlated.body.params).toEqual(at('result.0.plan.correlation.a:b'))
     vi.mocked(fitTruingStrings).mockImplementationOnce(() => fitResult({}, { chiSquare: Infinity }))
     const fitted = await post(`${API_PREFIX}/exterior/range-strings/fit`, fitBody)
     expect(fitted.status).toBe(422)
-    expect(fitted.body.message).toBe(message('result.chiSquare'))
+    expect(fitted.body.params).toEqual(at('result.chiSquare'))
     vi.mocked(fitTruingStrings).mockImplementationOnce(() => fitResult({ value: Infinity }))
-    expect((await post(`${API_PREFIX}/exterior/range-strings/fit`, fitBody)).body.message).toBe(
-      message('result.parameters.0.value'),
+    expect((await post(`${API_PREFIX}/exterior/range-strings/fit`, fitBody)).body.params).toEqual(
+      at('result.parameters.0.value'),
     )
   })
 })

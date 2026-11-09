@@ -127,7 +127,7 @@ const tagOf = (url: string) => {
 /**
  * The body of every error answer: Fastify's (with `code`, for example `FST_ERR_VALIDATION`), the
  * schema 400 (`issues`), the compute answers (`reason`, `missing`, `notice` and more; a typed refusal
- * with its `code` and `params`) and the 500 (`requestId`, the `reqId` of the server log line).
+ * and an unknown record id with their `code` and `params`) and the 500 (`requestId`, the `reqId` of the server log line).
  */
 const errorBody: JsonSchema = {
   type: 'object',
@@ -139,7 +139,12 @@ const errorBody: JsonSchema = {
     params: {
       type: 'object',
       description:
-        'A typed refusal of a compute route: the values its message needs, named by `code`.',
+        'A typed refusal or an unknown record id of a compute route: the values its message needs, named by `code`. A number JSON cannot hold (`NaN`, `Infinity`) arrives as its text.',
+    },
+    detail: {
+      type: 'object',
+      description:
+        'A truing answer: the refusal of the trajectory that stopped the fit, its `code` and `params`.',
     },
     issues: {
       type: 'array',

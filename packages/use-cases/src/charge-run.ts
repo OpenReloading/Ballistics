@@ -6,10 +6,10 @@ import {
   pressureToleranceDefaults,
 } from '@open-reloading/ballistics'
 import { type Powder, toSi } from '@open-reloading/schema'
-import { InputError } from '@open-reloading/statistics'
 import { notice, resolvedRecord, unprocessable } from './answer.ts'
 import type { ChargeBody } from './charge-schema.ts'
 import { bulkDensityBound, m3Options } from './interior-schema.ts'
+import { InputError } from './issue.ts'
 import { type CartridgeWithSpecs, type Limit, limitCheck } from './limits.ts'
 import { caps } from './schemas.ts'
 import type { ComputeRunner, Results } from './tasks.ts'
@@ -166,9 +166,10 @@ async function resolvePowder(
   const density = bulkDensity ?? powderBulkDensity(record)
   const powder = resolvedRecord(record, fromRecord && density !== undefined ? ['bulkDensity'] : [])
   if (density !== undefined && !bulkDensityBound.safeParse(density).success)
-    throw new InputError(
-      `powder ${id} bulk density ${density} kg/m3 must be above 0 and at most ${bulkDensityBound.maxValue} kg/m3`,
-    )
+    throw new InputError({
+      code: 'powderBulkDensityOutOfRange',
+      params: { powder: id, density, max: bulkDensityBound.maxValue ?? Number.POSITIVE_INFINITY },
+    })
   return { bulkDensity: density, powder }
 }
 
@@ -188,7 +189,10 @@ export async function runChargeTarget(
   const { bulkDensity: requested, ...propellant } = body.load.propellant
   const { bulkDensity, powder } = await resolvePowder(context.findPowder, body.powder, requested)
   if (body.target.kind === 'loadRatio' && bulkDensity === undefined)
-    throw new InputError(`powder ${body.powder} has no bulk density`)
+    throw new InputError({
+      code: 'powderWithoutBulkDensity',
+      params: { powder: String(body.powder) },
+    })
 
   const chosen = percentTarget(body, cartridge)
   if ('refusal' in chosen) return { status: 422, payload: chosen.refusal }

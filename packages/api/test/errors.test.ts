@@ -64,6 +64,22 @@ describe('error bodies', () => {
         error: 'Bad Request',
         message: 'querystring/limit must be <= 200',
       })
+      const broken = await app.inject({
+        method: 'POST',
+        url: `${API_PREFIX}/exterior/trajectory`,
+        headers: { 'content-type': 'application/json' },
+        payload: '{',
+      })
+      expect(broken.statusCode).toBe(400)
+      expect(broken.json()).toMatchObject({ code: 'FST_ERR_CTP_INVALID_JSON_BODY' })
+    } finally {
+      await app.close()
+    }
+  })
+
+  it('answers an unknown record id of a compute route with its code and params', async () => {
+    const app = buildApp({ catalogue: testCatalogue(bundle), compute: inlineRunner })
+    try {
       const unknown = await app.inject({
         url: `${API_PREFIX}/exterior/stability?bullet=nope&twist=0.254&muzzleVelocity=800`,
       })
@@ -71,7 +87,9 @@ describe('error bodies', () => {
       expect(unknown.json()).toEqual({
         statusCode: 404,
         error: 'Not Found',
-        message: 'bullet nope not found',
+        message: 'recordNotFound',
+        code: 'recordNotFound',
+        params: { kind: 'bullet', id: 'nope' },
       })
     } finally {
       await app.close()

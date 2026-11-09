@@ -1,20 +1,4 @@
-/**
- * Builds the Pages site into `pages/` at the repository root: the web app
- * as a static export under `PAGES_BASE_PATH` (`''`, the site root, when unset), every record page prerendered from the API over the
- * catalogue built from the data bundle (`@open-reloading/api/static`), the catalogue index and the
- * records as data files under `api/`, the docs site under `docs/`, LICENSE, NOTICE, the data
- * license (`data/LICENSE`) and `.nojekyll`.
- * `PAGES_EDITION` is `stable` (default) or `next`: `next` is built to be served under `<base>/next`, the app's
- * base path then, and its browser store (database, local storage keys, caches) has names of its own, because
- * both editions share one origin.
- * `PAGES_URL` (the site's origin) sets the docs' `url` and the app's `metadataBase`. Needs
- * `pnpm run build` at the root first.
- * `--sample`: only the cartridge pages of `apps/web/src/lib/prerender-sample.ts` prerendered (the
- * data files stay complete) and no docs site, for the review and e2e loop.
- * `--no-docs`: no docs site, every record prerendered (the e2e job's full export).
- * `apps/web/.next` stays after the build: the Turbopack cache a CI run restores and the manifests
- * `check-weight` reads.
- */
+// Builds the Pages site into `pages/`; settings and flags: apps/docs/docs/release.md#pages-site
 import { spawn } from 'node:child_process'
 import { cpSync, rmSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
