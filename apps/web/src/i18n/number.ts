@@ -7,7 +7,7 @@ import {
 import { shownLanguage } from './shown.ts'
 import { type Translator, translator } from './translate.ts'
 
-/** In the language shown; inside the app a number is its canonical text (a point as the decimal mark, no grouping, what `Number(text)` reads), stored, linked, exported and sent to the packages as such: only the screen writes the language's mark, and only what a person types or pastes is read through {@link parseNumber}. */
+/** The formatting of `@open-reloading/locale-format` in the language shown; inside the app a number is its canonical text (a point as the decimal mark, no grouping, what `Number(text)` reads), stored, linked, exported and sent to the packages as such: only the screen writes the language's mark, and only what a person types or pastes is read through {@link parseNumber}. */
 
 export type { NumberRange, ParsedNumber }
 

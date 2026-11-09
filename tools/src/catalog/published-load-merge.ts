@@ -109,7 +109,7 @@ function citing(load: PublishedLoad, index: number): PublishedLoad {
   return out as PublishedLoad
 }
 
-/** `bullet.record`, `powder.record`, and the primer's `records`, `size` and `magnum` where both print the same primer; curated in the repository, so a collector that does not set them keeps them. */
+/** `l` with the catalogue links of the stored load `old` that it lacks: `bullet.record`, `powder.record`, and the primer's `records`, `size` and `magnum` where both print the same primer; curated in the repository, so a collector that does not set them keeps them. */
 function withStoredLinks(old: PublishedLoad, l: PublishedLoad): PublishedLoad {
   const record = <T>(incoming: T | undefined, stored: T | undefined) =>
     (incoming ?? stored) === undefined ? {} : { record: incoming ?? stored }
@@ -122,7 +122,7 @@ function withStoredLinks(old: PublishedLoad, l: PublishedLoad): PublishedLoad {
   }
 }
 
-/** Against the repository's `old`; returns the load to write, `l` with the links of `old` it lacks, or undefined where nothing is written. */
+/** Adds incoming load `l` to `report` against the repository's `old`; returns the load to write, `l` with the links of `old` it lacks, or undefined where nothing is written. */
 function classify(
   old: PublishedLoad | undefined,
   l: PublishedLoad,

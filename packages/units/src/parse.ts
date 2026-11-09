@@ -45,7 +45,7 @@ function withOneMark(body: string, sep: string, own: DecimalMark): string[] {
     : [decimal]
 }
 
-/** None when they are no number, two (the decimal reading first) when a mark could be a decimal mark or a group. */
+/** The canonical mantissas the digits and marks of `body` can be read as: none when they are no number, two (the decimal reading first) when a mark could be a decimal mark or a group. */
 function readings(body: string, own: DecimalMark): string[] {
   const dots = body.split('.').length - 1
   const commas = body.split(',').length - 1

@@ -6,7 +6,7 @@ import type { Page } from '@playwright/test'
 /** The longest a scan waits for the page to stop moving (ms): Playwright's default expect timeout. */
 const settleTimeout = 5000
 
-/** Scans once no transition or finite animation runs, as axe reads colors as painted and a color midway through a transition fails color-contrast; endless and paused animations do not hold it, and still moving after `settleTimeout` the scan fails naming what runs. */
+/** The `AxeBuilder` of `@axe-core/playwright`, scanning once no transition or finite animation runs, as axe reads colors as painted and a color midway through a transition fails color-contrast; endless and paused animations do not hold it, and still moving after `settleTimeout` the scan fails naming what runs. */
 export class AxeBuilder extends Base {
   readonly #page: Page
 

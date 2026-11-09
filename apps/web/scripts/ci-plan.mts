@@ -115,7 +115,7 @@ export function recordClosure(root = repoRoot) {
   return { files, packages }
 }
 
-/** Of `e2e` only the unit tests run (`test:unit`), in `packages`; a test that reads another workspace's files declares it as a devDependency, so pnpm's selection reaches it. */
+/** The test jobs of ci.yml and their workspaces; of `e2e` only the unit tests run (`test:unit`), in `packages`; a test that reads another workspace's files declares it as a devDependency, so pnpm's selection reaches it. */
 export const testGroups: Record<string, string[]> = {
   drawing: ['drawing'],
   web: ['web'],

@@ -1,4 +1,4 @@
-/** That the export in `pages/` holds each list's page and data file and every record page whose data file it holds (PRERENDER=sample: the cartridges of `src/lib/prerender-sample.ts`), each record page must carry its own title, description, Open Graph and Twitter tags from its data file, as its HTML holds nothing else of the record; node scripts/check-prerender.mts */
+/** Checks that the export in `pages/` holds each list's page and data file and every record page whose data file it holds (PRERENDER=sample, the same value as for the build: the cartridges of `src/lib/prerender-sample.ts`), each record page must carry its own title, description, Open Graph and Twitter tags from its data file, as its HTML holds nothing else of the record; node scripts/check-prerender.mts */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { type ManufacturerNames, noManufacturerNames } from '../src/lib/manufacturers.ts'

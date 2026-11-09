@@ -13,7 +13,7 @@ export function devExit(child: ChildProcess, stopped: () => boolean): Promise<vo
   })
 }
 
-/** Mark the run stopped and pass the signal on to the process group `group()` returns, none while it returns `undefined` (before the server started), a group that already exited ignored so cleanup still runs; returns `stopped()` for `devExit` and the function that removes the handlers. */
+/** Registers SIGINT and SIGTERM handlers that mark the run stopped and pass the signal on to the process group `group()` returns, none while it returns `undefined` (before the server started), a group that already exited ignored so cleanup still runs; returns `stopped()` for `devExit` and the function that removes the handlers. */
 export function stopOnSignal(
   group: () => number | undefined,
   kill: (pid: number, signal: NodeJS.Signals) => unknown = process.kill,

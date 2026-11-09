@@ -67,7 +67,7 @@ export function recordSources(dir: string): RecordSource[] {
   return found
 }
 
-/** Each `58529` block must be followed by a line starting with `Code:` that names at least one file, each existing under `root`, and every other backticked name on the line must occur in one of them. */
+/** Each `$$` block must be followed by a line starting with `Code:` that names at least one file, each existing under `root`, and every other backticked name on the line must occur in one of them. */
 export function equationErrors(page: string, root: string): string[] {
   const lines = page.split('\n')
   const errors: string[] = []

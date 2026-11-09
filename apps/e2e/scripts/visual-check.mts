@@ -1,4 +1,4 @@
-// Screenshots for a person to look at before landing a UI change: each page at 390 and 1280 px, light and dark, against WEB_URL (it starts no server), plus one contact sheet in visual-check-out/ (VISUAL_OUT for another folder); pnpm run visual-check [--preset drawing|calculators] [/path ...]; VISUAL_LANGUAGE=de waits by structure, /workbench takes VISUAL_LADDER, VISUAL_DEFAULTS and VISUAL_LOADS
+// Screenshots for a person to look at before landing a UI change: each page at 390 and 1280 px, light and dark, against WEB_URL (it starts no server), written to visual-check-out/shots/<page>__<theme>__<width>.png plus one contact sheet, visual-check-out/sheet.png (VISUAL_OUT for another folder); pnpm run visual-check [--preset drawing|calculators] [/path ...]; VISUAL_LANGUAGE=de for the German interface (pages waited for by structure, not English text), /workbench takes VISUAL_LADDER, VISUAL_DEFAULTS and VISUAL_LOADS
 import { mkdirSync, readFileSync, rmSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'

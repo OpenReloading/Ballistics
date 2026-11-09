@@ -102,7 +102,7 @@ export function readPublishedLoads(
     )
 }
 
-/** Valid data has no errors; the published loads stay out of the bundle, as they are too many for it and the API serves them by cartridge. */
+/** What {@link readRecords} returns; valid data has no errors, and the published loads stay out of the bundle, as they are too many for it and the API serves them by cartridge. */
 export type ReadRecordsResult = {
   bundle: Bundle
   publishedLoads: PublishedLoads[]

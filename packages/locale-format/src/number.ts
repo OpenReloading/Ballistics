@@ -15,7 +15,7 @@ export function decimalMark(language: string): '.' | ',' {
   return mark
 }
 
-/** Its point written as the language's decimal mark; a text with no point or more than one (not a number) stays as it is. */
+/** A canonical number text on screen: its point written as the language's decimal mark; a text with no point or more than one (not a number) stays as it is. */
 export function localizeNumber(text: string, language: string): string {
   const mark = decimalMark(language)
   return mark === '.' || text.split('.').length !== 2 ? text : text.replace('.', mark)

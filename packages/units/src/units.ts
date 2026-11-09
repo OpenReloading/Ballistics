@@ -63,7 +63,7 @@ export const units: Readonly<StoredUnits> = {
 /** Name of a quantity: a key of {@link units}. */
 export type QuantityKind = keyof StoredUnits
 
-/** Every stored unit, plus the customary units that published fits, imported files and the display units are written in. */
+/** A unit of {@link conversions}: every stored unit, plus the customary units that published fits, imported files and the display units are written in. */
 export type UnitId =
   | StoredUnits[QuantityKind]
   | 'in'
@@ -94,7 +94,11 @@ const foot = 0.3048
 /** Standard gravity, m/s2 (exact), which defines the pound-force. */
 const gravity = 9.80665
 
-/** Percent is a fraction in SI, the ballistic coefficient kg/m2 and temperature K; customary factors are the exact definitions (NIST SP 811, appendix B), except the conventional inch of mercury. */
+/**
+ * The map to SI of each unit. Percent is a fraction in SI, the ballistic coefficient kg/m2 and
+ * temperature K. Customary factors are the exact definitions (NIST SP 811, appendix B), except the
+ * conventional inch of mercury.
+ */
 export const conversions: Readonly<Record<UnitId, SiMap>> = {
   mm: scale(1e-3),
   mm2: scale(1e-6),

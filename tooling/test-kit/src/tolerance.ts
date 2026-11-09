@@ -17,7 +17,7 @@ export interface Near {
   toAsymmetricMatcher(): string
 }
 
-/** Also inside objects and arrays: `expect(result).toEqual({ mean: near(812.3, { relative: 1e-12 }) })`; throws a `RangeError` for a non-finite `expected` or a tolerance part that is negative or not a number, which no number could match. */
+/** Matches a finite number within `tolerance` of `expected`, also inside objects and arrays: `expect(result).toEqual({ mean: near(812.3, { relative: 1e-12 }) })`; throws a `RangeError` for a non-finite `expected` or a tolerance part that is negative or not a number, which no number could match. */
 export function near(expected: number, tolerance: Tolerance): Near {
   const { relative = 0, absolute = 0 } = tolerance
   if (!Number.isFinite(expected) || !(relative >= 0) || !(absolute >= 0))
