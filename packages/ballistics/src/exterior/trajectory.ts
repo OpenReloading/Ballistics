@@ -1,4 +1,4 @@
-/** Point-mass (`apps/docs/docs/models/exterior-point-mass.md`) and modified point-mass (`apps/docs/docs/models/exterior-modified-point-mass.md`) trajectory in 3-D; SI in and out, angles in rad; integrated in the local-level ground frame (x downrange, y up, z right), the line of sight an output projection ("Frames"). */
+/** Point-mass (`apps/docs/docs/models/exterior-point-mass.md`) and modified point-mass (`apps/docs/docs/models/exterior-modified-point-mass.md`) trajectory in 3-D; SI in and out, angles in rad; integrated in the local-level ground frame (x downrange, y up, z right), the line of sight an output projection (`apps/docs/docs/models/exterior-point-mass.md`, "Frames"). */
 import { nth } from '@open-reloading/statistics'
 import { type DragModel, type DragTable, dragTables } from '../drag-tables.ts'
 import { InputError, need } from '../issue.ts'
@@ -653,7 +653,7 @@ function launchState(c: Conditions, bore: BoreAngles, ux: number, uy: number) {
   )
 }
 
-/** The restart state lies on either side of the crossed boundary; wind first, because the airspeed depends on it. */
+/** Moves the segment indices of `fc` past the boundary a restart state at `y` lies beyond (the state lies on either side of the crossed boundary); wind first, because the airspeed depends on it. */
 function restartSegments(
   fc: FlightContext,
   winds: readonly WindSegment[],
@@ -825,7 +825,7 @@ function settleWithoutCrossing(k: number, v: number, { lo, hi, edge }: Segments)
   return j
 }
 
-/** A crossing in direction d moves past the crossed boundary b and every further one within |v - b| of b or at or beyond v (closer than the event resolution); without one (d = 0) only past boundaries that v lies strictly beyond, whose events could no longer fire. */
+/** The segment index after a restart at value v: a crossing in direction d moves past the crossed boundary b and every further one within |v - b| of b or at or beyond v (closer than the event resolution); without one (d = 0) only past boundaries that v lies strictly beyond, whose events could no longer fire. */
 function settle(k: number, d: -1 | 0 | 1, v: number, segments: Segments): number {
   const { lo, hi, edge } = segments
   let j = k
@@ -1114,7 +1114,7 @@ function spin(shot: TrajectoryInput, air: Air) {
   return { sg, hand: firearm.twistHand, calibres: p.length / p.diameter }
 }
 
-/** Adds spin drift, jump (`apps/docs/docs/models/exterior-stability.md`) and the holds; in M2b the drift is integrated, `twin` maps range to the point-mass twin's windage, and the jump comes from linear theory (`apps/docs/docs/models/exterior-modified-point-mass.md`, "Spin drift column", "Aerodynamic jump"). */
+/** Adds spin drift and jump (`apps/docs/docs/models/exterior-stability.md`, "Spin drift" and "Aerodynamic jump") and the holds; in M2b the drift is integrated, `twin` maps range to the point-mass twin's windage, and the jump comes from linear theory (`apps/docs/docs/models/exterior-modified-point-mass.md`, "Spin drift column", "Aerodynamic jump"). */
 function correct(
   c: Conditions,
   raw: Raw[],

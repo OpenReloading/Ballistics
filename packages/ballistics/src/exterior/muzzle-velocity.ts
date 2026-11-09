@@ -25,7 +25,7 @@ export interface DownrangeReading {
 /** Largest change of the muzzle velocity between two passes at which the search ends, m/s. */
 const convergence = 1e-6
 
-/** Over the bullet's own drag law in `trajectory` (horizontal bore, point mass, no wind, Earth rotation, spin drift or jump); each pass moves the guess by the miss, which shrinks by about the relative loss per pass, as the slope is near one. */
+/** Over the bullet's own drag law in `trajectory` (horizontal bore, point mass, no wind, Earth rotation, spin drift or jump); each pass moves the guess by the miss; the flown speed rises with the muzzle velocity at a slope near one, so the miss shrinks by a factor of about the relative loss per pass. */
 export function muzzleVelocityFromDownrange(
   reading: DownrangeReading,
   options?: Settings<TrajectoryOptions>,

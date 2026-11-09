@@ -93,7 +93,7 @@ function resistanceAtStart(resistance: AdvisoryLoad['resistance']) {
   return { engraving, floor: (resistance?.friction ?? 0) + engraving }
 }
 
-/** A start pressure at or below the bore resistance at travel 0 (0 counts as not given), a radius of gyration with a twist of 0, and a start pressure above that resistance and the ignition pressure (else the shot starts at once) with an engraving pressure at travel 0; changes nothing. */
+/** The rules that fire for `load`: a start pressure at or below the bore resistance at travel 0 (0 counts as not given), a radius of gyration with a twist of 0, and a start pressure above that resistance and the ignition pressure (else the shot starts at once) with an engraving pressure at travel 0; reads the load and changes nothing. */
 export function interiorAdvisories(load: AdvisoryLoad): AdvisoryRule[] {
   const { startPressure, ignitionPressure, barrel, bullet } = load
   const { engraving, floor } = resistanceAtStart(load.resistance)

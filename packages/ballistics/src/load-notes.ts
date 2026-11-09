@@ -1,4 +1,4 @@
-/** The rules and thresholds of `apps/docs/docs/models/load-notes.md`: a note says what differs between two sessions and where the values come from, no verdict about a load and no charge. */
+/** The rules and thresholds of `apps/docs/docs/models/load-notes.md`: a note says what differs between two sessions and where the values come from; it is no verdict about a load and recommends no charge. */
 
 /** The rule behind a note: a lot, the seating, the mean velocity or the firearm's round count. */
 export type LoadNoteRule =

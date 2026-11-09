@@ -110,7 +110,7 @@ export type TruingReason =
   | 'not-converged'
   | 'step-budget'
 
-/** `underdetermined` (fewer observations than parameters), `unresolved` or `ill-conditioned` (the observations do not separate the parameters), `unreachable` (a trajectory misses an observed range), `not-converged` (`maxIterations`) or `step-budget` (`maxTotalSteps`). */
+/** `reason` is `underdetermined` (fewer observations than parameters), `unresolved` or `ill-conditioned` (the observations do not separate the parameters), `unreachable` (a trajectory misses an observed range), `not-converged` (`maxIterations`) or `step-budget` (`maxTotalSteps`). */
 export class TruingError extends InputError {
   readonly reason: TruingReason
   readonly conditionNumber?: number | undefined

@@ -738,7 +738,7 @@ function correlations(
   return correlation
 }
 
-/** From their weighted Jacobian at `theta`; with `fitted` the parameters of `kept` have the values of `theta`, and one outside `kept` cannot be identified. */
+/** Statuses of the resolved parameters from their weighted Jacobian at `theta`; with `fitted` the parameters of `kept` have the values of `theta`, and one outside `kept` cannot be identified. */
 function analyse(
   model: Model,
   theta: readonly number[],
@@ -934,7 +934,7 @@ interface StringsSolution {
   iterations: number
 }
 
-/** The others stay at their nominal value; `first` holds the predicted rows at the nominal values. */
+/** Levenberg-Marquardt on the parameters `fitting`, the others at their nominal value; `first` holds the predicted rows at the nominal values. */
 function solveStrings(
   model: Model,
   first: readonly number[],
