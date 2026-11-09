@@ -1,23 +1,17 @@
 import { type Aerodynamics, lbPerSqInToKgPerSqM } from '@open-reloading/ballistics'
 import { type Bullet, toSi } from '@open-reloading/schema'
 import { InputError } from '@open-reloading/statistics'
+import { describe, expect, it } from 'vitest'
+import { bundle } from '../../catalog/test/bundle.ts'
+import { defined } from '../../catalog/test/defined.ts'
 import {
   bulletProjectile,
   bulletSi,
   findBullet,
   findCartridge,
   findPowder,
-} from '@open-reloading/use-cases'
-import { describe, expect, it } from 'vitest'
-import { defined } from './defined.ts'
-import { bundle } from './fixtures.ts'
-import { testCatalogue } from './setup.ts'
-
-describe('stored to SI', () => {
-  it('uses the solver factor for the ballistic coefficient', () => {
-    expect(toSi('ballisticCoefficient', 1)).toBe(lbPerSqInToKgPerSqM)
-  })
-})
+} from '../src/resolve.ts'
+import { testCatalogue } from './catalogue.ts'
 
 const g7: Bullet = {
   ...defined(bundle.bullets[0]),
@@ -41,21 +35,16 @@ describe('record lookups', () => {
       [findPowder, 'powder'],
       [findCartridge, 'cartridge'],
     ] as const) {
-      const error = (() => {
-        try {
-          find(catalogue, 'nope')
-        } catch (e) {
-          return e as { issue: object }
-        }
-      })()
-      expect(error).toMatchObject({
-        issue: { code: 'recordNotFound', params: { kind, id: 'nope' } },
-      })
+      expect(() => find(catalogue, 'nope')).toThrow(
+        expect.objectContaining({
+          issue: { code: 'recordNotFound', params: { kind, id: 'nope' } },
+        }),
+      )
     }
   })
 })
 
-describe('bullet record to projectile', () => {
+describe('bullet record to SI', () => {
   it('converts mass, diameter and length to SI and leaves out a missing length', () => {
     expect(bulletSi(g7)).toEqual({
       mass: toSi('mass', 10.89),
@@ -75,7 +64,9 @@ describe('bullet record to projectile', () => {
       }),
     )
   })
+})
 
+describe('bullet record to projectile', () => {
   it('takes the bands of the drag model, a band without a start speed from 0', () => {
     const { projectile, bullet } = bulletProjectile(g7, { dragModel: 'G7' })
     expect(projectile).toEqual({
@@ -109,7 +100,9 @@ describe('bullet record to projectile', () => {
     expect(none.projectile).not.toHaveProperty('aerodynamics')
     expect(none.bullet.suppliedFields).toEqual(['mass', 'diameter', 'ballisticCoefficients'])
   })
+})
 
+describe('bullet record refused as a projectile', () => {
   it('refuses a record without a BC of the model or with two BCs of one start speed', () => {
     const plain = defined(bundle.bullets[0])
     expect(() => bulletProjectile(plain, { dragModel: 'G7' })).toThrow(

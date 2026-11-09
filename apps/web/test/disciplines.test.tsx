@@ -3,7 +3,6 @@ import { toSi } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { DisciplineList, FederationList } from '../src/components/discipline-list.tsx'
-import de from '../src/i18n/de.json'
 import { translator } from '../src/i18n/translate.ts'
 import { emptyDirectory, readDirectory, writeDirectory } from '../src/lib/directory.ts'
 import {
@@ -242,7 +241,7 @@ it('shows the rule facts a record states, converted where the unit differs, and 
 })
 
 it('also searches the category and the country as the language shown writes them', () => {
-  const german = translator(de, 'de').t
+  const german = translator({ Rifle: 'Gewehr' }, 'de').t
   const query = { ...emptyDirectory, query: 'gewehr' }
   // a rifle discipline whose own texts do not say Gewehr
   const rifle = defined(rows.find((r) => r.category === 'rifle' && !disciplineMatches(r, query)))
