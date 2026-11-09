@@ -1,9 +1,4 @@
-/**
- * Chronograph strings to ladder points of the powder fit: the mean of each string, weighted by the
- * pooled standard deviation of all shots about their string means over the root of the string's
- * shot count, `apps/docs/docs/models/interior-powder-fit.md`, "Strings and their weights".
- * Velocities in m/s, charges in kg.
- */
+/** The mean of each string, weighted by the pooled standard deviation of all shots about their string means over the root of its shot count (`apps/docs/docs/models/interior-powder-fit.md`, "Strings and their weights"); velocities in m/s, charges in kg. */
 
 import { velocityStatistics } from '@open-reloading/statistics'
 import { need } from '../issue.ts'
@@ -15,11 +10,7 @@ export interface ChronographString extends Omit<LadderPoint, 'muzzleVelocity' | 
   velocities: readonly number[]
 }
 
-/**
- * Pooled sample standard deviation of the shots about their string means, m/s:
- * sqrt(sum (n - 1) s^2 / sum (n - 1)) over the strings of n shots, n at least 2; `undefined` when no string
- * has 2 shots.
- */
+/** Pooled sample standard deviation of the shots about their string means, m/s: sqrt(sum (n - 1) s^2 / sum (n - 1)) over strings of n at least 2 shots; `undefined` when no string has 2 shots. */
 export function pooledVelocitySd(strings: readonly ChronographString[]): number | undefined {
   let squares = 0
   let dof = 0
@@ -32,11 +23,7 @@ export function pooledVelocitySd(strings: readonly ChronographString[]): number 
   return dof === 0 ? undefined : Math.sqrt(squares / dof)
 }
 
-/**
- * Ladder points of the strings in input order: the string mean as `muzzleVelocity` and the pooled
- * standard deviation over the root of the string's shot count as `velocitySigma`. Without a pooled
- * value above 0 the points carry no `velocitySigma`, and `fitPowder` fits them unweighted.
- */
+/** In input order: the string mean as `muzzleVelocity`, the pooled standard deviation over the root of its shot count as `velocitySigma`; without a pooled value above 0 no `velocitySigma`, and `fitPowder` fits them unweighted. */
 export function stringLadder(strings: readonly ChronographString[]): LadderPoint[] {
   need(
     strings.every((s) => s.velocities.length > 0),

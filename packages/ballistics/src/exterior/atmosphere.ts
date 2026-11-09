@@ -1,7 +1,4 @@
-/**
- * Atmosphere for the exterior model, described in `apps/docs/docs/models/exterior-atmosphere.md`.
- * SI throughout: altitude m, pressure Pa (absolute station pressure), temperature K, humidity 0..1.
- */
+/** SI throughout: altitude m, pressure Pa (absolute station pressure), temperature K, humidity 0..1 (`apps/docs/docs/models/exterior-atmosphere.md`). */
 import { InputError } from '../issue.ts'
 
 /** Air at one point: altitude above mean sea level, station pressure, temperature, humidity. */
@@ -77,11 +74,7 @@ export function standardAtmosphere(altitude: number, humidity = 0): Air {
   return checkAir({ altitude, pressure, temperature, humidity })
 }
 
-/**
- * Air at `height` m above a station: temperature falls at the ICAO lapse rate from the station
- * temperature, pressure follows hydrostatically, relative humidity is held
- * (`apps/docs/docs/models/exterior-atmosphere.md`, "Air along the trajectory").
- */
+/** `height` m above the station: the ICAO lapse rate from the station temperature, pressure hydrostatic, relative humidity held (`apps/docs/docs/models/exterior-atmosphere.md`, "Air along the trajectory"). */
 export function airAt(station: Air, height: number): Air {
   const temperature = station.temperature - icao.lapseRate * height
   return {
@@ -92,11 +85,7 @@ export function airAt(station: Air, height: number): Air {
   }
 }
 
-/**
- * Density altitude, m: the altitude of the ICAO standard atmosphere that has the density of `air`
- * (`apps/docs/docs/models/exterior-atmosphere.md`, "Density altitude"). Its tropospheric law is
- * extended past the tropopause.
- */
+/** Density altitude, m, of the ICAO standard atmosphere with the density of `air`, its tropospheric law extended past the tropopause (`apps/docs/docs/models/exterior-atmosphere.md`, "Density altitude"). */
 export function densityAltitude(air: Air): number {
   const ratio = airDensity(air) / airDensity(standardAtmosphere(0))
   // density follows (T / T0) ** (n - 1) in the troposphere
@@ -111,10 +100,7 @@ export function airDensity(air: Air): number {
   )
 }
 
-/**
- * Speed of sound in moist air as an ideal mixture of rigid ideal gases, m/s
- * (`apps/docs/docs/models/exterior-atmosphere.md`, "Speed of sound in moist air").
- */
+/** Speed of sound in moist air as an ideal mixture of rigid ideal gases, m/s (`apps/docs/docs/models/exterior-atmosphere.md`, "Speed of sound in moist air"). */
 export function speedOfSound(air: Air): number {
   const x = (air.humidity * saturationVapourPressure(air.temperature)) / air.pressure
   // mixture gas constant Rd / (molar mass ratio); cp/R is 3.5 for dry air and 4 for vapour

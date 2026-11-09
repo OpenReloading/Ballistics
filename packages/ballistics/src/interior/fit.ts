@@ -1,13 +1,4 @@
-/**
- * Powder fit: fits the burn coefficient and, on request, the start pressure, a correction factor
- * of the chamber volume, the specific energy and a factor on the temperature sensitivities of the
- * M3 interior model to a chronograph ladder, or to ladders at several barrel lengths and powder
- * temperatures, by weighted least squares, with optional Gaussian priors and a Huber loss, and the
- * prediction band of the fitted load at any charge,
- * `apps/docs/docs/models/interior-powder-fit.md`.
- * Every evaluation runs `interior` once per distinct charge, barrel length and temperature. SI in
- * and out.
- */
+/** Fits the burn coefficient and on request the start pressure, a chamber volume factor, the specific energy and a temperature-sensitivity factor of M3 to one ladder or several (barrel lengths, temperatures) by weighted least squares, with optional Gaussian priors and Huber loss, and predicts the band at any charge (`apps/docs/docs/models/interior-powder-fit.md`); one `interior` run per distinct charge, barrel length and temperature; SI in and out. */
 
 import {
   checkLogFitLimits,
@@ -30,10 +21,7 @@ import {
   interior,
 } from './model.ts'
 
-/**
- * What a peak pressure was measured with: the `pressureMethod` vocabulary of the cartridge records.
- * Values on different bases are not converted into each other.
- */
+/** The `pressureMethod` vocabulary of the cartridge records; values on different bases are not converted into each other. */
 export type PressureBasis = 'transducer' | 'piezo' | 'case-contact' | 'crusher' | 'energy'
 
 const pressureBases: readonly string[] = [
@@ -76,14 +64,7 @@ const parameterNames: readonly PowderParameter[] = parameterList satisfies Compl
   typeof parameterList
 >
 
-/**
- * Parameter of the fit: the burn coefficient (or vivacity, by the load's burn kind), the start
- * pressure, Pa, the factor that multiplies the chamber volume (1 leaves it as given), the specific
- * energy of the propellant, J/kg, and the factor that multiplies both temperature sensitivities of
- * the load (1 leaves them as given; the load must carry them). Energy and the temperature factor
- * are resolved only by ladders at several barrel lengths or several temperatures
- * (`apps/docs/docs/models/interior-powder-fit.md`, "Several barrel lengths and temperatures").
- */
+/** The burn coefficient (or vivacity, by the burn kind), the start pressure, Pa, a chamber volume factor (1 leaves it as given), the specific energy, J/kg, and a factor on both temperature sensitivities (1 leaves them; the load must carry them); energy and temperature factor need ladders at several barrel lengths or temperatures (`apps/docs/docs/models/interior-powder-fit.md`, "Several barrel lengths and temperatures"). */
 export type PowderParameter =
   | 'burnRate'
   | 'startPressure'
@@ -91,16 +72,9 @@ export type PowderParameter =
   | 'energy'
   | 'temperatureFactor'
 
-/**
- * Gaussian prior of one fitted parameter in its log parameter
- * (`apps/docs/docs/models/interior-powder-fit.md`, "Prior and robust loss").
- */
+/** Gaussian prior of one fitted parameter in its log parameter (`apps/docs/docs/models/interior-powder-fit.md`, "Prior and robust loss"). */
 export interface PowderPrior {
-  /**
-   * Centre of the prior, in the unit of the parameter. Burn coefficient and volume factor: above 0
-   * (a volume factor prior is centred on 1 where the volume is a record's nominal one). Start
-   * pressure: above the floor of the shot start, as the fitted value is.
-   */
+  /** In the unit of the parameter: burn coefficient and volume factor above 0 (a volume factor prior centred on 1 where the volume is a record's nominal one), start pressure above the floor of the shot start, as the fitted value is. */
   value: number
   /** Standard deviation of the log parameter: of ln(value) for the burn coefficient and the volume factor, of ln(value - floor) for the start pressure. */
   sigma: number
@@ -108,36 +82,19 @@ export interface PowderPrior {
 
 /** Options of `fitPowder`. */
 export interface PowderFitOptions {
-  /**
-   * Default ['burnRate']; `startPressure` is resolved only with measured pressures. `volumeFactor`
-   * corrects the load's chamber volume; a ladder too narrow to separate it from the burn rate
-   * needs a prior on it or measured pressures (`apps/docs/docs/models/interior-powder-fit.md`,
-   * "Identifiability").
-   */
+  /** Default ['burnRate']; `startPressure` needs measured pressures, and `volumeFactor` on a ladder too narrow to separate it from the burn rate needs a prior on it or measured pressures (`apps/docs/docs/models/interior-powder-fit.md`, "Identifiability"). */
   parameters?: readonly PowderParameter[] | undefined
-  /**
-   * Levenberg-Marquardt iterations (accepted plus rejected steps) before the fit fails with reason
-   * `not-converged`; default 30.
-   */
+  /** Levenberg-Marquardt iterations (accepted plus rejected steps) before the fit fails with reason `not-converged`; default 30. */
   maxIterations?: number | undefined
   /** Largest condition number of the column-scaled Jacobian; default 1e3. */
   maxCondition?: number | undefined
-  /**
-   * Priors on fitted parameters; none by default. The fit then returns the maximum of the
-   * posterior. Needs `velocitySigma` on the ladder.
-   */
+  /** None by default; with priors the fit returns the maximum of the posterior; needs `velocitySigma` on the ladder. */
   priors?: Partial<Record<PowderParameter, PowderPrior | undefined>>
-  /**
-   * Threshold of a Huber loss in sigmas of the ladder rows; none by default, quadratic loss. Needs
-   * `velocitySigma` on the ladder.
-   */
+  /** In sigmas of the ladder rows; none by default (quadratic loss); needs `velocitySigma` on the ladder. */
   huberThreshold?: number | undefined
   /** Integration settings of every `interior` run; default `interiorDefaults`. */
   options?: Settings<InteriorOptions> | undefined
-  /**
-   * Relative margin that widens each axis of the fit's `domain`, in [0, 1); default
-   * `powderDomainMargin`.
-   */
+  /** Relative margin that widens each axis of the fit's `domain`, in [0, 1); default `powderDomainMargin`. */
   domainMargin?: number | undefined
 }
 
@@ -161,10 +118,7 @@ export interface PowderAxisRange {
   max: number
 }
 
-/**
- * Where a fit holds: the span of the fitted data on each axis, widened by `margin`, the upper end of
- * bore diameter and barrel length by at least 2.5 % (a value at the widened end is inside). `pressure` is absent without measured pressures.
- */
+/** The span of the fitted data on each axis widened by `margin`, the upper end of bore diameter and barrel length by at least 2.5 % (a value at the widened end is inside); `pressure` absent without measured pressures. */
 export interface PowderDomain {
   /** Relative margin that widened each range. */
   margin: number
@@ -243,10 +197,7 @@ export interface PowderFit {
   parameters: FittedPowderParameter[]
   /** Absent like `standardUncertainty`. */
   correlation?: number[][]
-  /**
-   * Covariance of the log parameters of `PowderParameter` order (the fit's theta, relative to each
-   * parameter's initial value); absent like `standardUncertainty`. `predictPowder` propagates it.
-   */
+  /** Of the log parameters in `PowderParameter` order (theta, relative to each parameter's initial value); absent like `standardUncertainty`; `predictPowder` propagates it. */
   covariance?: number[][]
   /** Whether the ladder carried velocity uncertainties; without them the covariance is scaled by the residual. */
   weighted: boolean
@@ -293,11 +244,7 @@ export type PowderFitReason =
   | 'invalid'
   | 'not-converged'
 
-/**
- * Failure of `fitPowder`: `reason` is `underdetermined` (fewer ladder rows than parameters),
- * `unresolved` or `ill-conditioned` (the ladder does not separate the parameters), `invalid` (an
- * `interior` run at a ladder charge is not valid) or `not-converged` (`maxIterations` reached).
- */
+/** `reason` is `underdetermined` (fewer ladder rows than parameters), `unresolved` or `ill-conditioned` (the ladder does not separate the parameters), `invalid` (an `interior` run at a ladder charge is not valid) or `not-converged` (`maxIterations`). */
 export class PowderFitError extends InputError {
   readonly reason: PowderFitReason
   readonly conditionNumber?: number | undefined
@@ -484,10 +431,7 @@ function withParameter(
     : withPropellant(l, { temperatureSensitivity: { ...t, cold: t.cold * v, hot: t.hot * v } })
 }
 
-/**
- * Maps the fitted parameters onto the load: start values, the load at given values, and the
- * values at log parameters theta.
- */
+/** Start values, the load at given values, and the values at log parameters theta. */
 function powderParameterMap(
   load: InteriorLoad,
   parameters: readonly PowderParameter[],
@@ -569,10 +513,7 @@ interface PowderFitSetup {
   floor: number
 }
 
-/**
- * The given priors in the order of `options.priors`; each needs its parameter among the fitted
- * ones, and priors and a Huber loss need velocity sigmas.
- */
+/** In the order of `options.priors`; each needs its parameter among the fitted ones, and priors and a Huber loss need velocity sigmas. */
 function givenPriors(
   options: PowderFitOptions,
   parameters: readonly PowderParameter[],
@@ -795,11 +736,7 @@ const ladderResiduals = (rows: readonly LadderRow[], predicted: readonly number[
     }
   })
 
-/**
- * Fits burn coefficient and optionally start pressure, chamber volume factor, specific energy and
- * temperature factor of `load` to the ladder. Points with another `barrelLength` or
- * `propellantTemperature` are fired from another barrel or at another temperature.
- */
+/** Points with another `barrelLength` or `propellantTemperature` are fired from another barrel or at another temperature. */
 export function fitPowder(
   load: InteriorLoad,
   ladder: readonly LadderPoint[],
@@ -907,10 +844,7 @@ export interface PowderPrediction {
   velocity: PowderPredictionBand
   /** Peak breech pressure. */
   pressure: PowderPredictionBand
-  /**
-   * The axes on which the prediction lies outside the fit's `domain`, each with its side; absent
-   * when it lies inside on all of them. The velocity and pressure axes check the predicted values.
-   */
+  /** Each axis on which the prediction lies outside the fit's `domain`, with its side, absent when inside on all; the velocity and pressure axes check the predicted values. */
   extrapolation?: PowderExtrapolation
   /** `interior` runs of the prediction. */
   runCount: number
@@ -973,12 +907,7 @@ function predictionBand(
   }
 }
 
-/**
- * Muzzle velocity and peak breech pressure of a fitted powder at `charge`, with the standard
- * uncertainty and the interval that the covariance of the fitted parameters gives
- * (`apps/docs/docs/models/interior-powder-fit.md`, "Prediction at a charge"). Needs the covariance
- * of the fit: a ladder with more rows than parameters or with velocity sigmas.
- */
+/** Muzzle velocity and peak breech pressure of a fitted powder at `charge`, with the standard uncertainty and interval the covariance of the fitted parameters gives (`apps/docs/docs/models/interior-powder-fit.md`, "Prediction at a charge"), which needs a ladder with more rows than parameters or with velocity sigmas. */
 export function predictPowder(
   fit: PowderFit,
   charge: number,

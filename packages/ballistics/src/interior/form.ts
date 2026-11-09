@@ -1,7 +1,4 @@
-/**
- * Burn laws and form functions of the Noble-Abel interior model,
- * `apps/docs/docs/models/interior-burn-forms.md`. Dimensions in m.
- */
+/** Burn laws and form functions of the Noble-Abel interior model, `apps/docs/docs/models/interior-burn-forms.md`; dimensions in m. */
 
 import { bisect } from '@open-reloading/statistics'
 
@@ -60,12 +57,7 @@ export function lensArea(r1: number, r2: number, d: number): number {
   return r1 * r1 * a1 + r2 * r2 * a2 - k / 2
 }
 
-/**
- * Cross-section of the twelve slivers of a seven-perforated grain after the web phase, at
- * perforation radius rho, outer radius r and perforation spacing s
- * (`apps/docs/docs/models/interior-burn-forms.md`, "Geometric grains"). Each area is found by inclusion and
- * exclusion over the triangle or 60 degree wedge that holds one sliver.
- */
+/** The twelve slivers of a seven-perforated grain after the web phase, at perforation radius rho, outer radius r and spacing s, each area by inclusion and exclusion over the triangle or 60 degree wedge that holds one sliver (`apps/docs/docs/models/interior-burn-forms.md`, "Geometric grains"). */
 export function sliverArea(rho: number, r: number, s: number): { inner: number; outer: number } {
   const halfLens =
     rho * rho * Math.acos(s / (2 * rho)) - (s / 2) * Math.sqrt(rho * rho - (s * s) / 4)
@@ -171,10 +163,7 @@ const grainShapes: { [S in Grain['shape']]: FormEntry<Extract<Grain, { shape: S 
   },
 }
 
-/**
- * Forms of a vivacity law: f = z, except in the third stage of `threeStage`
- * (`apps/docs/docs/models/interior-burn-forms.md`, "Vivacity forms").
- */
+/** f = z, except in the third stage of `threeStage` (`apps/docs/docs/models/interior-burn-forms.md`, "Vivacity forms"). */
 const vivacityForms: {
   [K in VivacityForm['kind']]: FormEntry<Extract<VivacityForm, { kind: K }>>
 } = {
@@ -211,8 +200,7 @@ const vivacityForms: {
     form: ({ a, m, q, z1, z2, r }) => {
       const phi1 = (1 + a * z1) ** m
       const phi2 = phi1 * ((1 - z2) / (1 - z1)) ** q
-      // third stage in f = z2 + (1 - z2) (1 - w^(1 - r)) / (1 - r), w = (1 - z)/(1 - z2): df/dt has the
-      // constant factor phi2, so burnout is a linear crossing at f = end; in z it is reached as (t_b - t)^(1/(1 - r))
+      // third stage in f = z2 + (1 - z2) (1 - w^(1 - r)) / (1 - r), w = (1 - z)/(1 - z2): df/dt has the constant factor phi2, so burnout is a linear crossing at f = end; in z it is reached as (t_b - t)^(1/(1 - r))
       const k = 1 / (1 - r)
       const u = (f: number) => 1 - (f - z2) / ((1 - z2) * k)
       return {

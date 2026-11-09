@@ -1,12 +1,6 @@
 import { need } from './issue.ts'
 
-/**
- * Velocity of the propellant gas leaving the muzzle over the muzzle velocity of the projectile, by
- * firearm type: 1.75 for high-powered rifles, 1.50 for pistols and revolvers (SAAMI, Gun Recoil -
- * Technical, Free Recoil Energy, Rev. 7/9/2018,
- * https://saami.org/wp-content/uploads/2025/03/Gun-Recoil-Formulae-2018-07-9.pdf; the sheet traces
- * them to the British Text Book of Small Arms, 1929). `apps/docs/docs/models/free-recoil.md`.
- */
+/** Gas velocity at the muzzle over the projectile's muzzle velocity, by firearm type (SAAMI, Gun Recoil - Technical, Free Recoil Energy, Rev. 7/9/2018, https://saami.org/wp-content/uploads/2025/03/Gun-Recoil-Formulae-2018-07-9.pdf, after the British Text Book of Small Arms, 1929; `apps/docs/docs/models/free-recoil.md`). */
 export const gasVelocityFactor = { rifle: 1.75, pistol: 1.5 } as const
 
 /** Input of `freeRecoil`, SI units; masses and velocities must be finite. */
@@ -33,11 +27,7 @@ export type FreeRecoil = {
   energy: number
 }
 
-/**
- * Free recoil of an unrestrained firearm by conservation of momentum: the firearm's momentum is
- * that of the projectile plus that of the powder gas, which leaves at `gasFactor` times the
- * muzzle velocity. Muzzle brakes and suppressors that redirect the gas are not covered.
- */
+/** By conservation of momentum: the projectile's plus that of the powder gas, which leaves at `gasFactor` times the muzzle velocity; muzzle brakes and suppressors that redirect the gas are not covered. */
 export function freeRecoil(input: FreeRecoilInput): FreeRecoil {
   const { firearmMass, projectileMass, chargeMass, muzzleVelocity, gasFactor } = input
   need(Number.isFinite(firearmMass) && firearmMass > 0, {

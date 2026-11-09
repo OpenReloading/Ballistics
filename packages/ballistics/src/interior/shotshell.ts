@@ -1,14 +1,8 @@
-/**
- * Experimental shotshell interior model, `apps/docs/docs/models/interior-shotshell.md`: a shotshell load
- * mapped onto the M3 model `interior`. SI in and out, temperatures in K.
- */
+/** Experimental shotshell interior model, `apps/docs/docs/models/interior-shotshell.md`: a shotshell load mapped onto the M3 model `interior`; SI in and out, temperatures in K. */
 import type { Settings } from '../settings.ts'
 import { type InteriorLoad, type InteriorOptions, type InteriorResult, interior } from './model.ts'
 
-/**
- * Shotshell load, SI units: the `InteriorLoad` fields except chamber, barrel, bullet and start
- * pressure.
- */
+/** SI units: the `InteriorLoad` fields except chamber, barrel, bullet and start pressure. */
 export interface ShotshellLoad
   extends Omit<InteriorLoad, 'chamber' | 'barrel' | 'bullet' | 'startPressure'> {
   chamber: {
@@ -30,10 +24,7 @@ export interface ShotshellLoad
 /** Result of `shotshellInterior`: an `InteriorResult` marked experimental. */
 export type ShotshellResult = InteriorResult & { experimental: true }
 
-/**
- * The M3 load of a shotshell load (`apps/docs/docs/models/interior-shotshell.md`, "Mapping onto M3");
- * inputs as `shotshellInterior` checks them.
- */
+/** As `apps/docs/docs/models/interior-shotshell.md`, "Mapping onto M3"; inputs as `shotshellInterior` checks them. */
 function shotshellInteriorLoad(load: ShotshellLoad): InteriorLoad {
   const { chamber, wadTravel, shotMass, wadMass, crimpPressure, ...rest } = load
   return {

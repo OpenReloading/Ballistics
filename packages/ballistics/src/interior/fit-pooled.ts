@@ -1,10 +1,4 @@
-/**
- * Pooled powder fit: the burn coefficient and, on request, the temperature factor of each powder,
- * a velocity offset per rifle and a burn offset per lot, fitted to the chronograph sessions of many
- * rifles, powders and lots at once, with prediction intervals that hold a model-error term,
- * `apps/docs/docs/models/interior-powder-fit.md`, "Pooled fit over rifles, powders and lots".
- * Velocities only. SI in and out.
- */
+/** A burn coefficient (and on request a temperature factor) per powder, a velocity offset per rifle and a burn offset per lot, fitted to many sessions at once with prediction intervals that hold a model-error term (`apps/docs/docs/models/interior-powder-fit.md`, "Pooled fit over rifles, powders and lots"); velocities only, SI in and out. */
 
 import {
   checkLogFitLimits,
@@ -26,10 +20,7 @@ export interface PooledSession {
   rifle: string
   /** Name of the powder lot; absent where the session records none. */
   lot?: string | undefined
-  /**
-   * The rifle, components and fixed inputs of the session. The burn coefficient of a powder's first
-   * session starts the fit and replaces that of its other sessions; all share one burn kind.
-   */
+  /** The burn coefficient of a powder's first session starts the fit and replaces that of its other sessions; all share one burn kind. */
   load: InteriorLoad
   /** Projectile travel to the muzzle of the barrel fired, m; default the load's. */
   barrelLength?: number | undefined
@@ -52,12 +43,7 @@ type PooledPriors = Readonly<
 
 /** Options of `fitPowderPooled`. */
 export interface PooledFitOptions {
-  /**
-   * Per-powder parameters, default ['burnRate'], which must be among them. The temperature factor
-   * is fitted for each powder whose sessions span two or more temperatures and whose load carries
-   * a sensitivity, and listed in `held` for the others. `exponent` and `form` are refused with
-   * reason `unresolved`: velocities do not resolve them.
-   */
+  /** Default ['burnRate'], which must be among them; the temperature factor is fitted where a powder's sessions span two or more temperatures and its load carries a sensitivity, else listed in `held`; `exponent` and `form` are refused with `unresolved`, as velocities do not resolve them. */
   parameters?: readonly PooledRequest[] | undefined
   /** Priors on the per-powder parameters: from a powder record, its thermochemistry or `similarPowdersPrior`. */
   priors?: PooledPriors | undefined
@@ -73,16 +59,10 @@ export interface PooledFitOptions {
   options?: Settings<InteriorOptions> | undefined
 }
 
-/**
- * Default spreads of the random effects (assumptions): a rifle moves the velocity by about 1 %, a
- * lot the burn coefficient by about 3 %.
- */
+/** Assumptions: a rifle moves the velocity by about 1 %, a lot the burn coefficient by about 3 %. */
 const pooledDefaults = { rifleSigma: 0.01, lotSigma: 0.03 }
 
-/**
- * Kind of a pooled parameter: the burn coefficient or temperature factor of a powder, the velocity
- * factor of a rifle, the factor of a lot on its powder's burn coefficient.
- */
+/** A powder's burn coefficient or temperature factor, a rifle's velocity factor, a lot's factor on its powder's burn coefficient. */
 type PooledParameterKind = 'burnRate' | 'temperatureFactor' | 'rifle' | 'lot'
 
 /** A fitted parameter of the pooled fit. Factors start at 1. */
@@ -137,10 +117,7 @@ export interface PooledPowderFit {
   degreesOfFreedom: number
   /** One per ladder point, sessions in input order. */
   residuals: PooledResidual[]
-  /**
-   * Relative standard deviation of the model error: 0 from `fitPowderPooled`, estimated by
-   * `calibratePooled` from held-out strings.
-   */
+  /** Relative standard deviation of the model error: 0 from `fitPowderPooled`, estimated by `calibratePooled` from held-out strings. */
   modelError: number
   /** Held-out strings `modelError` was estimated from; 0 before `calibratePooled`. */
   calibrationStrings: number
@@ -543,15 +520,7 @@ function pooledFitResult(
   }
 }
 
-/**
- * Fits the burn coefficient (and, on request, the temperature factor) of each powder, a velocity
- * factor per rifle and a burn factor per lot to many sessions at once
- * (`apps/docs/docs/models/interior-powder-fit.md`, "Pooled fit over rifles, powders and lots").
- * Rifle and lot factors are random effects: Gaussian priors on their logs, centred on 0 with
- * `rifleSigma` and `lotSigma`. They are fitted only where the sessions hold two or more rifles, or
- * two or more lots of a powder. Throws a `PowderFitError` as `fitPowder` does, and `unresolved`
- * for a powder whose sessions hold a single charge.
- */
+/** Rifle and lot factors are random effects (Gaussian priors on their logs, centred on 0 with `rifleSigma` and `lotSigma`), fitted only where the sessions hold two or more rifles, or lots of a powder; throws a `PowderFitError` as `fitPowder` does, and `unresolved` for a powder with a single charge (`apps/docs/docs/models/interior-powder-fit.md`, "Pooled fit over rifles, powders and lots"). */
 export function fitPowderPooled(
   sessions: readonly PooledSession[],
   options: PooledFitOptions = {},
@@ -580,10 +549,7 @@ export function fitPowderPooled(
 export interface PooledPredictionOptions {
   /** Coverage of the interval, in (0, 1); default 0.9. */
   level?: number | undefined
-  /**
-   * Standard uncertainty of the predicted string mean, m/s: the spread of its shots over the root
-   * of their count; default 0, the interval of the true mean.
-   */
+  /** Of the predicted string mean, m/s: the spread of its shots over the root of their count; default 0, the interval of the true mean. */
   velocitySigma?: number | undefined
   /** Integration settings of the `interior` runs; use the fit's own. */
   options?: Settings<InteriorOptions> | undefined
@@ -632,10 +598,7 @@ function checkPooledPrediction(
   )
 }
 
-/**
- * Variance of the velocity `v` from the parameter covariance along `gradient`, plus the spread of
- * a rifle or lot the fit has not seen.
- */
+/** From the parameter covariance along `gradient`, plus the spread of a rifle or lot the fit has not seen. */
 function pooledVariance(
   fit: PooledPowderFit,
   target: PooledTarget,
@@ -657,12 +620,7 @@ function pooledVariance(
   return variance
 }
 
-/**
- * Mean muzzle velocity of `target` at `charge` with the prediction interval of the pooled fit
- * (`apps/docs/docs/models/interior-powder-fit.md`, "Pooled fit over rifles, powders and lots"): the
- * parameter covariance, the model error and the string's own uncertainty. A rifle or lot the fit
- * has not seen adds the spread of its random effect. The powder must be one of the fit.
- */
+/** Mean muzzle velocity of `target` at `charge` with the pooled fit's prediction interval (parameter covariance, model error and the string's own uncertainty; an unseen rifle or lot adds its random effect's spread); the powder must be one of the fit (`apps/docs/docs/models/interior-powder-fit.md`, "Pooled fit over rifles, powders and lots"). */
 export function predictPooled(
   fit: PooledPowderFit,
   target: PooledTarget,
@@ -712,13 +670,7 @@ export function predictPooled(
   }
 }
 
-/**
- * The fit with its `modelError` estimated from strings it was not fitted to
- * (`apps/docs/docs/models/interior-powder-fit.md`, "Pooled fit over rifles, powders and lots"):
- * the mean squared relative residual beyond the variance of the prediction without model error
- * (parameters, string, and an unseen rifle or lot), at least 0. Each point needs its
- * `velocitySigma`.
- */
+/** `modelError` from strings it was not fitted to: the mean squared relative residual beyond the prediction variance without model error (parameters, string, an unseen rifle or lot), at least 0; each point needs its `velocitySigma` (`apps/docs/docs/models/interior-powder-fit.md`, "Pooled fit over rifles, powders and lots"). */
 export function calibratePooled(
   fit: PooledPowderFit,
   heldOut: readonly PooledSession[],

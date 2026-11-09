@@ -54,14 +54,7 @@ function chamberMetres(c: CartridgeSpecs, symbol: string) {
   return mm === undefined ? undefined : mm * 1e-3
 }
 
-/**
- * The M3 run of a load that names records (`apps/docs/docs/models/interior-m3.md`, "Load from records"): the
- * powder record's model parameters, the cartridge's chamber diameter F, twist u and bore area Q
- * (else the circle of F and Z), the bore resistance of the powder's fit, the propellant temperature
- * (K) and the powder's temperature sensitivity, as the workbench fills them.
- * Throws `InputError` for a powder without an interior model or without the inputs of its bore
- * resistance, and `ValueError` for a value the records and the run lack.
- */
+/** As the workbench fills them: the powder record's model parameters, the cartridge's F, twist u and bore area Q (else the circle of F and Z), the powder fit's bore resistance, the propellant temperature (K) and the temperature sensitivity (`apps/docs/docs/models/interior-m3.md`, "Load from records"); throws `InputError` for a powder without an interior model or its bore-resistance inputs, `ValueError` for a value the records and the run lack. */
 export function recordLoad(r: RecordRun): InteriorLoad {
   const { cartridge, powder, bullet } = r
   const model = powderModelValues(powder)

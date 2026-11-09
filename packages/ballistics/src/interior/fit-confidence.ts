@@ -1,10 +1,4 @@
-/**
- * Uncertainty of a powder fit beyond its own covariance: the peak-pressure range that the inputs
- * the fit holds fixed add to it, a prior from similar powders, and the confidence label of the
- * range, `apps/docs/docs/models/interior-powder-fit.md` ("Pressure range from the fixed inputs",
- * "Prior from similar powders", "Confidence label"). The range and the label describe the
- * simulation's uncertainty, not a load. SI in and out.
- */
+/** The peak-pressure range the fixed inputs add, a prior from similar powders and the confidence label (`apps/docs/docs/models/interior-powder-fit.md`, "Pressure range from the fixed inputs", "Prior from similar powders", "Confidence label"), describing the simulation's uncertainty, not a load; SI in and out. */
 
 import { nth } from '@open-reloading/statistics'
 import { need } from '../issue.ts'
@@ -48,11 +42,7 @@ interface InputDefault {
   estimated: number
 }
 
-/**
- * Standard uncertainties used where the caller states none, one row per input; assumptions stated on
- * the model page. Inputs not listed here (ignition pressure, gamma, covolume, bullet mass)
- * contribute only when the caller states an uncertainty.
- */
+/** Where the caller states none, assumptions on the model page; inputs not listed (ignition pressure, gamma, covolume, bullet mass) count only with a stated uncertainty. */
 const powderInputDefaults: Readonly<Partial<Record<PowderInput, Readonly<InputDefault>>>> =
   Object.freeze({
     caseCapacity: Object.freeze({ unit: 'relative', measured: 0.005, estimated: 0.03 }),
@@ -307,10 +297,7 @@ interface RangeRefit {
   names: readonly PowderParameter[]
 }
 
-/**
- * Peak pressures at the points after the input of `shift` is moved by `d` and the ladder fitted
- * again from the solution, so every refit starts near its answer.
- */
+/** After the input of `shift` moves by `d` and the ladder is fitted again from the solution, so every refit starts near its answer. */
 function refitPeaks(refit: RangeRefit, shift: Shift, d: number): number[] {
   const { fit, ladder, fitOptions, points } = refit
   const dT = shift.unit === 'K' ? d : 0
@@ -397,14 +384,7 @@ const outsidePoints = (fit: PowderFit, points: readonly PowderRangePoint[]) =>
       ).length > 0,
   )
 
-/**
- * Peak-pressure range of a powder fit at each point: the fit's own uncertainty combined with the
- * change that each fixed input makes when it is moved by its standard uncertainty and the ladder
- * is fitted again (`apps/docs/docs/models/interior-powder-fit.md`, "Pressure range from the fixed
- * inputs"). `ladder` is the one `fit` was made from, `options.fit` the options it ran with. An
- * input that is a fitted parameter is skipped: the covariance holds it. Needs the covariance of
- * the fit and a single fit, not sessions at several barrel lengths.
- */
+/** The fit's own uncertainty with each fixed input moved by its standard uncertainty and refitted (`apps/docs/docs/models/interior-powder-fit.md`, "Pressure range from the fixed inputs"); `ladder` and `options.fit` are those `fit` ran with, a fitted input is skipped as the covariance holds it; needs the covariance and a single fit, not sessions at several barrel lengths. */
 export function powderPressureRange(
   fit: PowderFit,
   ladder: readonly LadderPoint[],
@@ -475,12 +455,7 @@ export interface SimilarPowdersPrior {
   weak: boolean
 }
 
-/**
- * Prior on the burn coefficient from the powders nearest to `target` in ln(burn coefficient) and
- * ln(energy): the mean of their ln(burn coefficient) and its sample standard deviation
- * (`apps/docs/docs/models/interior-powder-fit.md`, "Prior from similar powders"). `candidates`
- * are the powders of the same burn law, without the target itself.
- */
+/** From the powders nearest to `target` in ln(burn coefficient) and ln(energy): the mean of their ln(burn coefficient) and its sample standard deviation (`apps/docs/docs/models/interior-powder-fit.md`, "Prior from similar powders"); `candidates` share the burn law, without the target. */
 export function similarPowdersPrior(
   target: SimilarPowder,
   candidates: readonly SimilarPowder[],
@@ -571,11 +546,7 @@ export interface PowderConfidenceOptions {
   similar?: SimilarPowdersPrior | undefined
 }
 
-/**
- * Whether the velocity residuals, ordered by charge, run in one sign block or two while they
- * exceed their uncertainties (chi-square per row above 1): the model misses a trend, not noise.
- * Only a fit with velocity sigmas is tested.
- */
+/** Velocity residuals ordered by charge in one or two sign blocks while above their uncertainties (chi-square per row above 1): the model misses a trend, not noise; only a fit with velocity sigmas is tested. */
 function hasResidualTrend(fit: PowderFit): boolean {
   const velocities = fit.residuals
     .filter((r) => r.kind === 'velocity')
@@ -646,11 +617,7 @@ function labelOf(w: number, rules: PowderConfidenceRules): PowderFitLabel {
   return w <= rules.moderate ? 'moderate' : 'loose'
 }
 
-/**
- * Label of a fit's pressure range by its relative half-width, with the reasons that apply
- * (`apps/docs/docs/models/interior-powder-fit.md`, "Confidence label"). The label describes the
- * simulation's uncertainty, not a load.
- */
+/** Label of a fit's pressure range by its relative half-width, with the reasons that apply (`apps/docs/docs/models/interior-powder-fit.md`, "Confidence label"); it describes the simulation's uncertainty, not a load. */
 export function powderConfidence(
   fit: PowderFit,
   range: PowderPressureRange,

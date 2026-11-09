@@ -1,8 +1,4 @@
-/**
- * Gyroscopic and dynamic stability, spin drift and aerodynamic jump,
- * `apps/docs/docs/models/exterior-stability.md`. SI in and out; the empirical fits are
- * stated in customary units and converted here.
- */
+/** Gyroscopic and dynamic stability, spin drift and aerodynamic jump, `apps/docs/docs/models/exterior-stability.md`; SI in and out, the empirical fits stated in customary units and converted here. */
 
 import { conversions } from '@open-reloading/units'
 import { InputError } from '../issue.ts'
@@ -28,10 +24,7 @@ export interface MillerStabilityInput {
   air: Air
 }
 
-/**
- * Miller's gyroscopic stability factor with the velocity and atmosphere corrections: mass kg,
- * diameter, length and twist m (twist per turn), velocity m/s, air at the muzzle.
- */
+/** With the velocity and atmosphere corrections: mass kg, diameter, length and twist m (twist per turn), velocity m/s, air at the muzzle. */
 export function millerStability(i: MillerStabilityInput): number {
   const { mass, diameter, length, twist, velocity, air } = i
   if (!(mass > 0 && diameter > 0 && length > 0 && twist > 0 && velocity > 0))
@@ -58,11 +51,7 @@ export interface DynamicStabilityInput {
   transverseInertia: number
 }
 
-/**
- * Dynamic stability factor of linear theory from aerodynamic coefficients (McCoy): lift-force
- * slope, drag, Magnus-moment slope, pitch-damping sum (Cmq + Cm-alpha-dot), mass kg, diameter m,
- * axial and transverse moments of inertia kg m2.
- */
+/** Linear theory (McCoy): lift-force slope, drag, Magnus-moment slope, pitch-damping sum (Cmq + Cm-alpha-dot), mass kg, diameter m, axial and transverse moments of inertia kg m2. */
 export function dynamicStabilityFactor(c: DynamicStabilityInput): number {
   const md2 = c.mass * c.diameter ** 2
   return (
@@ -76,22 +65,13 @@ export function isStable(sg: number, sd: number): boolean {
   return sg > 1 && 1 / sg < sd * (2 - sd)
 }
 
-/**
- * Litz's spin-drift fit (B. Litz, Applied Ballistics for Long Range Shooting, 3rd edition,
- * Applied Ballistics, LLC, 2015), m, positive toward the twist hand's side (right for right-hand
- * twist).
- */
+/** Litz's spin-drift fit (B. Litz, Applied Ballistics for Long Range Shooting, 3rd edition, Applied Ballistics, LLC, 2015), m, positive toward the twist hand's side (right for right-hand twist). */
 export function spinDrift(sg: number, time: number, hand: 'right' | 'left'): number {
   const drift = 1.25 * (sg + 1.2) * time ** 1.83 * inch
   return hand === 'right' ? drift : -drift
 }
 
-/**
- * Litz's aerodynamic-jump fit (B. Litz, Applied Ballistics for Long Range Shooting, 3rd edition,
- * Applied Ballistics, LLC, 2015) as a vertical angle, rad, positive up. `crosswind` m/s is positive
- * when the wind blows to the right (comes from the left), which lowers a right-hand-twist bullet
- * (McCoy, BRL-MR-3877 eq. (12), as `linearJump`).
- */
+/** Litz's aerodynamic-jump fit (B. Litz, Applied Ballistics for Long Range Shooting, 3rd edition, Applied Ballistics, LLC, 2015), rad, positive up; `crosswind` m/s positive when blowing to the right, which lowers a right-hand-twist bullet (McCoy, BRL-MR-3877 eq. (12), as `linearJump`). */
 export function aerodynamicJump(
   sg: number,
   lengthCalibres: number,
