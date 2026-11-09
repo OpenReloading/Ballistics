@@ -4,10 +4,7 @@ import type { ChronoDiagnostic } from './diagnostics.ts'
 // printed statistics come from unrounded device values; shots are printed to 0.1
 const statisticsTolerance = 0.2
 
-/**
- * Mean, population standard deviation (divides by n, as the devices print it) and extreme
- * spread of `values`, which must not be empty.
- */
+/** Population standard deviation (divides by n, as the devices print it); `values` must not be empty. */
 function shotStatistics(values: number[]): {
   mean: number
   standardDeviation: number
@@ -23,11 +20,7 @@ function shotStatistics(values: number[]): {
   return { mean, standardDeviation, extremeSpread }
 }
 
-/**
- * Mean, standard deviation and extreme spread of `values` compared with the printed values in
- * the rows labelled (upper case) `rowLabels[0]`, `rowLabels[1]` and `rowLabels[2]`, as read by
- * `readNumber`.
- */
+/** Against the printed values in the rows labelled (upper case) `rowLabels[0]`, `rowLabels[1]` and `rowLabels[2]`, as read by `readNumber`. */
 function compareStatistics(
   rows: string[][],
   values: number[],
@@ -50,11 +43,7 @@ function compareStatistics(
   })
 }
 
-/**
- * Warns per printed footer statistics row (see `compareStatistics`) that is not a number or
- * differs from the shots, each warning with the params of `at`, and once when no row is found; no
- * warning without values.
- */
+/** Per printed footer statistics row (`compareStatistics`) that is not a number or differs from the shots, each with the params of `at`, and once when no row is found; no warning without values. */
 export function warnStatistics(
   {
     rows,

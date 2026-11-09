@@ -52,7 +52,7 @@ const both: Side[] = ['cartridge', 'chamber']
 const cartridge: Side[] = ['cartridge']
 const chamber: Side[] = ['chamber']
 
-/** The typical largest value sets the length limit (2.5 times it, 50 mm for a diameter); not read for an angle. */
+/** The CIP symbols the outline reads (`cipProfile` of `@open-reloading/drawing/cartridge`): the typical largest value sets the length limit (2.5 times it, 50 mm for a diameter); not read for an angle. */
 const symbols: [string, string, Side[], Group, number, 'length' | 'angle'][] = [
   ['R1', 'rim diameter at the head', both, 'head', 35, 'length'],
   ['R', 'rim thickness', both, 'head', 10, 'length'],

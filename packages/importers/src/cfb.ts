@@ -1,8 +1,4 @@
-// Compound files ([MS-CFB] Compound File Binary File Format, revision 12.0,
-// https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-cfb/53989ce4-7b05-4f8d-829b-d08d6148375b;
-// section numbers below refer to it), read only as far as the streams under the root storage.
-// Every loop is bounded by the file's sector count, and no buffer is sized from a declared value
-// before that value has been checked against a limit.
+// Compound files ([MS-CFB] Compound File Binary File Format, revision 12.0, https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-cfb/53989ce4-7b05-4f8d-829b-d08d6148375b; section numbers refer to it), read only as far as the streams under the root storage; every loop is bounded by the file's sector count, and no buffer is sized from a declared value before that value passed a limit
 
 import { refuseFile } from './diagnostics.ts'
 
@@ -98,10 +94,7 @@ function readDifat(file: CompoundFile, fat: number[], fatCount: number): void {
   }
 }
 
-/**
- * The next sector of `n` from the table (FAT or mini FAT) held in the sectors `table`, read in
- * place (2.3); `missing` is the refusal of a sector the table does not reach.
- */
+/** From the table (FAT or mini FAT) held in the sectors `table`, read in place (2.3); `missing` is the refusal of a sector the table does not reach. */
 function tableNext(
   file: CompoundFile,
   table: number[],
@@ -114,10 +107,7 @@ function tableNext(
   }
 }
 
-/**
- * The sectors of a chain from `start`: `count` sectors, or up to its end when undefined; loops
- * and early ends are refused, and with `inFile` each sector must lie in the file.
- */
+/** `count` sectors, or up to the end when undefined; loops and early ends are refused, and with `inFile` each sector must lie in the file. */
 function readChain(
   file: CompoundFile,
   { step, inFile }: Chain,
@@ -136,11 +126,7 @@ function readChain(
   return out
 }
 
-/**
- * A reader of the stream `name` that starts at sector `start` and declares `declared` bytes;
- * streams under 4096 bytes lie in the mini stream of the root entry at `root`. The reader refuses
- * a stream that declares more than its `limit`.
- */
+/** Streams under 4096 bytes lie in the mini stream of the root entry at `root`; the reader refuses a stream that declares more than its `limit`. */
 function streamReader(
   file: CompoundFile,
   fatChain: Chain,
@@ -195,10 +181,7 @@ function entrySize(file: CompoundFile, at: number): number {
   return file.u32(at + 0x78) + (file.version === 4 ? file.u32(at + 0x7c) * 2 ** 32 : 0)
 }
 
-/**
- * The directory (2.6, 128-byte entries in the directory chain): a reader for each stream named in
- * `wanted` among the children of the root storage.
- */
+/** The directory (2.6, 128-byte entries in the directory chain): a reader for each stream named in `wanted` among the children of the root storage. */
 function readDirectory(
   file: CompoundFile,
   fatChain: Chain,
@@ -234,10 +217,7 @@ function readDirectory(
   return streams
 }
 
-/**
- * The streams named in `wanted` (upper case) directly under the root storage of a compound file;
- * each call reads the stream's bytes and refuses a stream that declares more than `limit` bytes.
- */
+/** Directly under the root storage, names in upper case; each call reads the stream's bytes and refuses a stream that declares more than `limit` bytes. */
 export function compoundStreams(
   bytes: Uint8Array,
   wanted: readonly string[],

@@ -33,10 +33,7 @@ export interface PlacedCell {
   at: () => CellPlace
 }
 
-/**
- * Places the cell's text at its column after the row's cells, gaps as empty text, counting the
- * budgets; refuses a column beyond IV or not after the previous cell.
- */
+/** After the row's cells, gaps as empty text, counting the budgets; refuses a column beyond IV or not after the previous cell. */
 export function placeCell(
   cells: string[],
   { column, text, at }: PlacedCell,

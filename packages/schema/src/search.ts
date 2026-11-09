@@ -1,8 +1,4 @@
-/**
- * One matcher and one ranker for every list and picker (API, browser). A row's
- * search key is built once; a query is matched word by word, so the order of the words does not
- * matter.
- */
+/** One matcher and one ranker for every list and picker (API, browser): a row's search key is built once and a query matched word by word, so the order of the words does not matter. */
 
 const SEP = '\u0001'
 
@@ -47,10 +43,7 @@ function wholeNumber(key: string, at: number, length: number) {
   return !(isDigit(after) || (after === '.' && isDigit(afterThat)))
 }
 
-/**
- * 2 where the best occurrence of `alternative` starts a word of the key, 1 elsewhere, 0 if none;
- * with `whole` only occurrences that are a whole number count.
- */
+/** 2 where the best occurrence of `alternative` starts a word of the key, 1 elsewhere, 0 if none; with `whole` only occurrences that are a whole number count. */
 function occurrence(key: string, alternative: string, whole: boolean) {
   let found = 0
   for (let at = key.indexOf(alternative); at >= 0; at = key.indexOf(alternative, at + 1)) {

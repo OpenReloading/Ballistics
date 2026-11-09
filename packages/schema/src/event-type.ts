@@ -5,10 +5,7 @@ import { recordId } from './ids.ts'
 import { provenance } from './provenance.ts'
 import type { QuantitySchema } from './units.ts'
 
-/**
- * Points of one scoring hit in each zone, for one power factor: the paper zones A, C and D and a
- * scoring metal target (popper or plate).
- */
+/** For one power factor: the paper zones A, C and D and a scoring metal target (popper or plate). */
 const zonePoints = z.strictObject({
   A: z.int().nonnegative(),
   C: z.int().nonnegative(),
@@ -16,10 +13,7 @@ const zonePoints = z.strictObject({
   metal: z.int().nonnegative(),
 })
 
-/**
- * The least power factor of one division for a score to count (`minor`) and to be scored as
- * major (`major`; absent where the division has no major rating).
- */
+/** `minor` for a score to count, `major` to be scored as major (absent where the division has no major rating). */
 const powerFactorFloor = z
   .strictObject({
     division: z.string().min(1),
@@ -116,11 +110,7 @@ export const eventScoring: z.ZodDiscriminatedUnion<
   'method'
 > = eventScoringParser satisfies Exact<typeof eventScoring, typeof eventScoringParser>
 
-/**
- * A magazine limit of one division: the most rounds in a magazine (from the start signal on, as
- * the rule book times it: IPSC at the signal, USPSA after it), the greatest magazine length, or
- * both. `powerFactor`: the limit applies to that power factor only.
- */
+/** The most rounds in a magazine (from the start signal on, as the rule book times it: IPSC at the signal, USPSA after it), the greatest magazine length, or both; with `powerFactor` it applies to that power factor only. */
 const magazineLimit = z
   .strictObject({
     division: z.string().min(1),

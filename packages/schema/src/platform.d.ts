@@ -1,6 +1,4 @@
-// The parts of the web platform the user data file and share link codec use, which every runtime
-// this package targets has and its ES library lacks: only what the package calls. The file stays in
-// this package's compile: it is not emitted, and test/tsconfig.json, which has Node's types, leaves it out.
+// The parts of the web platform the user data file and share link codec call, which every runtime this package targets has and its ES library lacks; the file stays in this package's compile, is not emitted, and test/tsconfig.json, which has Node's types, leaves it out
 // oxlint-disable-next-line no-redeclare -- an interface and a `var` of one name are one declaration
 interface TextEncoder {
   encode(input: string): Uint8Array<ArrayBuffer>

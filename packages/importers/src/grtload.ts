@@ -1,5 +1,4 @@
-// The load files of Gordon's Reloading Tool (`.grtload`, XML) as record candidates. The mapping and
-// its reasons: `apps/docs/docs/data/grt-load-files.md`. It was written from saved files.
+// The load files of Gordon's Reloading Tool (`.grtload`, XML) as record candidates; mapping and reasons in `apps/docs/docs/data/grt-load-files.md`, written from saved files
 
 import { type Candidate, type ReaderDiagnostic, refuseFile } from './diagnostics.ts'
 import { idOfKey } from './record-ids.ts'
@@ -303,10 +302,7 @@ function loadOf(
 /** The id the app gives a candidate, which the other candidates of its read refer to. */
 const idOf = (c: Candidate | undefined) => c && idOfKey(c.key)
 
-/**
- * The candidates of the load input element of a file of this layout (GRT's, also written by other
- * programs): the cartridge, the bullet after its maker, the powder, then the load last.
- */
+/** Of the load input element of this layout (GRT's, also written by other programs): the cartridge, the bullet after its maker, the powder, then the load last. */
 export function readLoadInput(input: XmlElement): GrtLoadRead {
   const r = readInput(input)
   const cartridgeName = clip(r.texts['caliber.CaliberName'])

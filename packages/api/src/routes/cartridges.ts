@@ -23,8 +23,7 @@ const cartridgeQuery = listQuery({
   },
 })
 
-// response bodies for the contract document (`openapi.ts`), from the record schemas
-// a record without aliases answers an empty list
+// response bodies for the contract document (`openapi.ts`) from the record schemas; a record without aliases answers an empty list
 const aliases = z.array(cartridge.shape.aliases.unwrap().element)
 const mm = z.number().optional()
 

@@ -2,11 +2,7 @@ import type { EventType, Federation } from '@open-reloading/schema'
 import { type Lookup, lookupOf } from './federations.ts'
 import type { Bundle } from './records.ts'
 
-/**
- * A division listed twice among the power factors, and a magazine limit of a division without a
- * power factor, or for a major rating the division lacks. Ring scoring has no divisions, so every
- * magazine limit of a ring event type is an error.
- */
+/** A division listed twice among the power factors, a magazine limit of a division without a power factor or for a major rating the division lacks; ring scoring has no divisions, so every magazine limit of a ring event type is an error. */
 function checkDivisions(t: EventType, where: string, errors: string[]) {
   const floors =
     t.scoring.method === 'hit-factor'
@@ -47,11 +43,7 @@ function checkDiscipline(
   return []
 }
 
-/**
- * The references of event types: the federation is a record and lists the event type's rule book,
- * a ring scoring's discipline is a discipline of that federation, no division is listed twice and
- * every division of a magazine limit has a power factor.
- */
+/** The federation is a record and lists the rule book, a ring scoring's discipline is one of that federation, no division is listed twice and every division of a magazine limit has a power factor. */
 export function checkEventTypes(
   bundle: Pick<Bundle, 'eventTypes' | 'federations' | 'disciplines'>,
 ): string[] {

@@ -39,11 +39,7 @@ function readQuoted(line: string, from: number): { cell: string; next: number } 
   return { cell, next: i + 1 }
 }
 
-/**
- * Cells split at `delimiter`; quotes may follow spaces, `""` is a quote inside a quoted cell, and
- * text between a closing quote and the delimiter is kept. Tabs before a cell are skipped only
- * when the delimiter is not a tab.
- */
+/** Quotes may follow spaces, `""` is a quote inside a quoted cell, and text between a closing quote and the delimiter is kept; tabs before a cell are skipped only when the delimiter is not a tab. */
 export function splitDelimited(line: string, delimiter: ',' | ';' | '\t' = ','): string[] {
   const cells: string[] = []
   let i = 0
@@ -80,10 +76,7 @@ function endsInQuote(line: string, delimiter: string, open: boolean): boolean {
   return quoted
 }
 
-/**
- * Lines joined where a quoted cell holds a line break, each with the index of its first line, so
- * `splitDelimited` reads the joined text as one row. A quote that never closes joins nothing.
- */
+/** Joined where a quoted cell holds a line break, each with the index of its first line, so `splitDelimited` reads the joined text as one row; a quote that never closes joins nothing. */
 export function joinQuotedLines(
   lines: string[],
   delimiter: ',' | ';' | '\t',
@@ -109,11 +102,7 @@ export function splitLines(text: string): string[] {
     .split(/\r\n|\r|\n/)
 }
 
-/**
- * A number with a decimal point or a decimal comma; NaN for anything else, including both
- * a lone comma before exactly three digits (`2,800`), which may be a thousands separator,
- * and a digit run too long for a finite number.
- */
+/** A decimal point or a decimal comma; NaN for anything else, including a lone comma before exactly three digits (`2,800`), which may be a thousands separator, and a digit run too long for a finite number. */
 export function parseNumber(text: string): number {
   const t = text.trim()
   if (t.includes(',') && t.includes('.')) return Number.NaN
@@ -123,10 +112,7 @@ export function parseNumber(text: string): number {
   return Number.isFinite(n) ? n : Number.NaN
 }
 
-/**
- * A number of a file whose lone mark is always the decimal mark: a point or a comma (`0,125`) and an
- * optional exponent (`1.0E-05`); NaN for both marks or anything else (`0x10`, `Infinity`, empty).
- */
+/** The lone mark is always the decimal mark: a point or a comma (`0,125`) and an optional exponent (`1.0E-05`); NaN for both marks or anything else (`0x10`, `Infinity`, empty). */
 export function readDecimal(text: string): number {
   const t = text.trim()
   if (t.includes(',') && t.includes('.')) return Number.NaN

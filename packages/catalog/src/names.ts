@@ -6,10 +6,7 @@ export type LocatedFinding = Finding & { file: string }
 
 type Named = { file: string; scope: string; names: string[] }
 
-/**
- * Lower-case letters and digits only, accents removed: `P-140` and `p140` are one name. A decimal
- * point between digits stays, so `6.5x55` and `65x55` differ.
- */
+/** Lower-case letters and digits only, accents removed, so `P-140` and `p140` are one name; a decimal point between digits stays, so `6.5x55` and `65x55` differ. */
 export function normaliseName(name: string): string {
   return name
     .normalize('NFKD')
@@ -135,12 +132,7 @@ function otherNames(bundle: Pick<Bundle, 'cases' | 'rangeFirings' | 'targetFaces
   ]
 }
 
-/**
- * Reports records that share a name, exactly or after `normaliseName`, with an earlier record of
- * their kind and scope. Scopes: none for cartridges, manufacturers and powder aliases, manufacturer id
- * for powders, primers and bullets, manufacturer and cartridge for cases, the report for range
- * records, federation id for target faces.
- */
+/** Exactly or after `normaliseName`, against an earlier record of their kind and scope: none for cartridges, manufacturers and powder aliases, the manufacturer id for powders, primers and bullets, manufacturer and cartridge for cases, the report for range records, the federation id for target faces. */
 export function checkNames(
   bundle: Pick<
     Bundle,

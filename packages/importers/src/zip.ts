@@ -1,5 +1,4 @@
-// ZIP container reading for XLSX workbooks: PKWARE APPNOTE.TXT 6.3.10,
-// https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT (section numbers below refer to it).
+// ZIP container reading for XLSX workbooks: PKWARE APPNOTE.TXT 6.3.10, https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT (section numbers refer to it).
 import { type FileDiagnostic, refuseFile } from './diagnostics.ts'
 import { maxPartSize, maxTotalSize } from './limits.ts'
 
@@ -123,10 +122,7 @@ function addEntry(entries: Map<string, ZipEntry>, entry: ZipEntry): void {
   entries.set(key, entry)
 }
 
-/**
- * Entries from the central directory (4.3.12), keyed by lower-case name; directories are left
- * out. Split, ZIP64 and malformed archives and repeated names, also in another case, are refused.
- */
+/** From the central directory (4.3.12), keyed by lower-case name, directories left out; split, ZIP64 and malformed archives and repeated names, also in another case, are refused. */
 export function zipEntries(bytes: Uint8Array): Map<string, ZipEntry> {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
   const end = findEnd(bytes, view)
@@ -142,10 +138,7 @@ export function zipEntries(bytes: Uint8Array): Map<string, ZipEntry> {
   return entries
 }
 
-/**
- * The entry count and offset of the central directory, from the end record at `end` (4.3.16);
- * ZIP64 and split archives and a directory past the end record are refused.
- */
+/** From the end record at `end` (4.3.16); ZIP64 and split archives and a directory past the end record are refused. */
 function centralDirectory(view: DataView, end: number): { total: number; directoryOffset: number } {
   const disk = view.getUint16(end + 4, true)
   const directoryDisk = view.getUint16(end + 6, true)
@@ -173,8 +166,7 @@ function spendDeclared(
   if (entry.size > limit) part('partTooLarge', { size: entry.size, limit })
   if (entry.size > budget.left) refuseFile('partsTooLarge', { max: maxTotalSize })
   budget.left -= entry.size
-  // assumed bound, not a cited one: literal-only fixed Huffman blocks code a byte in at most 9
-  // bits (RFC 1951 3.2.6); the margin keeps a too-small declared size refused as an overrun below
+  // assumed bound, not a cited one: literal-only fixed Huffman blocks code a byte in at most 9 bits (RFC 1951 3.2.6); the margin keeps a too-small declared size refused as an overrun below
   const maxCompressed = entry.size + (entry.size >>> 3) + 65536
   if (entry.method === 8 && entry.compressedSize > maxCompressed) {
     part('partCompressedTooLarge', { compressed: entry.compressedSize, size: entry.size })
@@ -184,8 +176,7 @@ function spendDeclared(
 /** The compressed data of an entry, located through its local header. */
 function entryData(bytes: Uint8Array, entry: ZipEntry, part: Refuse): Uint8Array<ArrayBuffer> {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
-  // local header (4.3.7): only its name and extra field lengths locate the data; sizes come
-  // from the central directory, since a data descriptor (4.3.9) leaves them zero here
+  // local header (4.3.7): only its name and extra field lengths locate the data; sizes come from the central directory, since a data descriptor (4.3.9) leaves them zero here
   const at = entry.offset
   if (at + 30 > bytes.length || view.getUint32(at, true) !== 0x04034b50) part('partNoLocalHeader')
   const start = at + 30 + view.getUint16(at + 26, true) + view.getUint16(at + 28, true)
@@ -199,11 +190,7 @@ export interface Archive {
   inflate: Inflate
 }
 
-/**
- * The bytes of one entry: stored (method 0) or deflated (method 8), checked against the declared
- * size and CRC-32. `budget.left` is the declared size the workbook may still read; `limit` is
- * the largest declared size of this part.
- */
+/** Stored (method 0) or deflated (method 8), checked against the declared size and CRC-32; `budget.left` is the declared size the workbook may still read, `limit` the largest declared size of this part. */
 export async function readEntry(
   { bytes, inflate }: Archive,
   entry: ZipEntry,

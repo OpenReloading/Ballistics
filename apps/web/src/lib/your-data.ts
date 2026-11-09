@@ -31,7 +31,7 @@ function noteRows(records: readonly UserRecord[]) {
   ]
 }
 
-/** The firearms row adds the firearm and saved-load notes. */
+/** One row per kind of {@link yourDataKinds} with its number of `records` (0 for none); the firearms row adds the firearm and saved-load notes. */
 export const yourDataRows = (records: readonly UserRecord[]) =>
   yourDataKinds.map((k) => ({
     ...k,

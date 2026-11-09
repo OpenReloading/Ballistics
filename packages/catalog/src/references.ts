@@ -2,8 +2,7 @@ import { parseRef } from '@open-reloading/schema'
 import type { LoadTables } from './load-tables.ts'
 import type { Bundle } from './records.ts'
 
-// Federation, discipline and target mapping references are checked with their other rules in
-// checkFederations (federations.ts).
+// Federation, discipline and target mapping references are checked with their other rules in checkFederations (federations.ts).
 
 /** The ids a record may reference, by kind. */
 type RecordIds = {
@@ -25,10 +24,7 @@ export function recordIds(
   }
 }
 
-/**
- * The cartridge of every case, capacity, load and firing series, and the cartridges a powder is
- * listed for.
- */
+/** The cartridge of every case, capacity, load and firing series, and the cartridges a powder is listed for. */
 export function checkCartridgeReferences(
   bundle: Pick<Bundle, 'cartridges' | 'cases' | 'capacities' | 'loads' | 'firings' | 'powders'>,
   ids: RecordIds,
@@ -177,11 +173,7 @@ function checkComponentMakers(
     )
 }
 
-/**
- * The manufacturer of every powder, primer, bullet, case and listed load table, the case manufacturer of a
- * capacity, the device manufacturer of a chronograph session and the manufacturers a load names
- * (a described bullet or powder and the case).
- */
+/** Of every powder, primer, bullet, case and listed load table, the case manufacturer of a capacity, the device manufacturer of a chronograph session and the manufacturers a load names (a described bullet or powder and the case). */
 export function checkManufacturerReferences(
   bundle: Pick<
     Bundle,

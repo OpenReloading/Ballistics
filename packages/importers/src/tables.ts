@@ -42,10 +42,7 @@ const isBlank = (row: string[]) => row.every((x) => x.trim() === '')
 const lineBreakLength = (text: string, i: number) =>
   text.charAt(i) === '\r' && text.charAt(i + 1) === '\n' ? 2 : 1
 
-/**
- * Rows of cells of `text` split at `delimiter`, with quoted cells (a quoted cell may follow spaces and span lines); blank rows are left out.
- * Cells past `maxColumn + 1` in a row are dropped and splitting stops past `maxCells` cells, enough for the size refusal.
- */
+/** A quoted cell may follow spaces and span lines, blank rows are left out; cells past `maxColumn + 1` in a row are dropped and splitting stops past `maxCells` cells, enough for the size refusal. */
 function splitRows(text: string, delimiter: TableDelimiter): string[][] {
   const rows: string[][] = []
   let row: string[] = []
@@ -94,11 +91,7 @@ function splitRows(text: string, delimiter: TableDelimiter): string[][] {
   return rows
 }
 
-/**
- * The delimiter that gives the most rows as wide as the first, which must be two cells or more
- * and repeat in a second row; none when no delimiter makes a table.
- * Tab is tried first and wins a tie, as cell text holds commas far more often than tabs.
- */
+/** The one that gives most rows as wide as the first, which must be two cells or more and repeat in a second row; none when no delimiter makes a table; tab is tried first and wins a tie, as cell text holds commas far more often than tabs. */
 function detectDelimiter(text: string): TableDelimiter | undefined {
   const sample = text.slice(0, 20_000)
   let best: { d: TableDelimiter; score: number } | undefined

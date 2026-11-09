@@ -54,7 +54,7 @@ const noneFound = (commands: number, records: Found | undefined) =>
   commands === 0 &&
   (!records || records.cartridges.length + records.bullets.length + records.powders.length === 0)
 
-/** Ctrl+Enter in the search closes it and runs; the site search of every other page (`site-search.tsx`) is this one on a store of its own (`search`), opened by the shell, without `onRun`. */
+/** Record search of the workbench (`@mantine/spotlight`); Ctrl+Enter in the search closes it and runs; the site search of every other page (`site-search.tsx`) is this one on a store of its own (`search`), opened by the shell, without `onRun`. */
 export function WorkbenchSearch({
   commands: pageCommands,
   onRun,

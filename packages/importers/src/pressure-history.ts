@@ -1,5 +1,4 @@
-// A pressure-time trace of the user's own measurement: time and pressure columns, the units and the
-// sensor position named by the user or the file, an optional zero-phase low-pass.
+// A pressure-time trace of the user's own measurement: time and pressure columns, the units and the sensor position named by the user or the file, an optional zero-phase low-pass.
 import { type PressureDiagnostic, refuseTrace } from './diagnostics.ts'
 import { detectDelimiter, splitCells } from './generic.ts'
 import { psi } from './record-fields.ts'
@@ -90,10 +89,7 @@ function namedUnit(table: Record<string, number>, cell: string): string {
   return (bracketedUnit(cell) ?? (lookup(table, word) ? word : '')).trim()
 }
 
-/**
- * The unit of `table` that `text` names: the exact spelling, else any case when the text is all
- * lower or all upper case (`mPa` and `Mbar` name no unit of the table, they are not `MPa`, `mbar`).
- */
+/** The exact spelling, else any case when the text is all lower or all upper case (`mPa` and `Mbar` name no unit of the table, they are not `MPa`, `mbar`). */
 function lookup<T extends string>(table: Record<T, number>, text: string): T | undefined {
   const key = text.replace('µ', 'u').replace('μ', 'u')
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the keys of the table are its units
@@ -159,10 +155,7 @@ function takeHeader(rows: string[][], tc: number): string[] | undefined {
   return top && Number.isNaN(readDecimal(top[tc - 1] ?? '')) ? rows.shift() : undefined
 }
 
-/**
- * The unit of a column: the one its header cell names, else the caller's; refused when the two
- * differ or neither names one, and a warning when the header names an unknown unit.
- */
+/** The one its header cell names, else the caller's; refused when the two differ or neither names one, a warning when the header names an unknown unit. */
 function columnUnit<T extends string>(
   column: { name: string; header: string },
   table: Record<T, number>,
@@ -184,11 +177,7 @@ function columnUnit<T extends string>(
   return { unit, source: file ? 'file' : 'caller' }
 }
 
-/**
- * The samples of the rows in s and bar, with the factors of the time and pressure units;
- * refused for a cell that is not a finite number and for times that do not increase. `first` is
- * the line number of the first row.
- */
+/** The samples of the rows in s and bar, with the factors of the time and pressure units; refused for a cell that is not a finite number and for times that do not increase; `first` is the line number of the first row. */
 function readSamples(
   rows: string[][],
   { tc, pc, first }: { tc: number; pc: number; first: number },

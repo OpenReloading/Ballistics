@@ -57,8 +57,7 @@ export function buildApp({
     ...options,
   })
   if (onRoute) app.addHook('onRoute', onRoute)
-  // While closing, a keep-alive connection whose response was in flight closes after that
-  // response instead of staying open for keepAliveTimeout (Fastify default 72 s)
+  // While closing, a keep-alive connection with a response in flight closes after that response instead of staying open for keepAliveTimeout (Fastify default 72 s)
   let closing = false
   app.addHook('preClose', async () => {
     closing = true
@@ -70,8 +69,7 @@ export function buildApp({
   const runner = compute ?? createComputeRunner(poolDefaults)
   if (!compute) app.addHook('onClose', () => runner.close())
   app.register(sensible)
-  // the route handlers rethrow what they do not answer: a 4xx keeps Fastify's answer, anything
-  // else is a 500 without the error's text (a read error carries file paths), logged with the request id
+  // the route handlers rethrow what they do not answer: a 4xx keeps Fastify's answer, anything else is a 500 without the error's text (a read error carries file paths), logged with the request id
   app.setErrorHandler<FastifyError>((error, request, reply) => {
     const status = error.statusCode ?? 500
     if (status >= 400 && status < 500) throw error

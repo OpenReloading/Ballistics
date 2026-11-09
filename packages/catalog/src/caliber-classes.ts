@@ -39,11 +39,7 @@ function checkMember(
   return errors
 }
 
-/**
- * The caliber classes against the C.I.P. records and the disciplines: every member is a cartridge
- * record, in one class only, with G1 of its sheet within 0.15 mm of the class's nominal diameter;
- * every class a discipline names is a record.
- */
+/** Every member a cartridge record in one class only, with G1 of its sheet within 0.15 mm of the class's nominal diameter; every class a discipline names is a record. */
 export function checkCaliberClasses(bundle: CaliberBundle): string[] {
   const errors: string[] = []
   const members: Members = {

@@ -121,10 +121,7 @@ function checkSourceCoverage(bundle: Bundle, errors: string[]) {
   }
 }
 
-/**
- * A round of a report belongs to one projectile: the same round number of the same report (its one
- * source, by sha256) in two range records is a copy error.
- */
+/** The same round number of the same report (its one source, by sha256) in two range records is a copy error, as a round belongs to one projectile. */
 function checkRangeRounds(records: RangeFirings[], errors: string[]) {
   const roundOwner = new Map<string, string>()
   for (const r of records) {
