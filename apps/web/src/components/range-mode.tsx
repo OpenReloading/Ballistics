@@ -102,7 +102,7 @@ function LoadChoice({ r }: { r: ReturnType<typeof useRangeMode> }) {
         <div className="range-load-summary" data-load-summary style={{ minHeight: '2.875rem' }}>
           {summary.map((line, i) => (
             // oxlint-disable-next-line react/no-array-index-key -- at most two lines in a fixed order
-            <Text key={i} size="sm" c="dimmed" mt={4}>
+            <Text key={i} size="sm" c="dimmed">
               {line}
             </Text>
           ))}
@@ -124,7 +124,7 @@ function RangeStats({ r, step }: { r: ReturnType<typeof useRangeMode>; step: str
         style={{
           display: 'grid',
           gridTemplateColumns: 'auto 1fr',
-          gap: '0 1rem',
+          gap: '0 var(--mantine-spacing-md)',
           margin: 0,
         }}
       >

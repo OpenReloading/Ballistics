@@ -79,7 +79,7 @@ export function ManufacturersForm() {
       ) : rows.length === 0 ? (
         <Text size="sm">{t('No manufacturers of your own in this browser.')}</Text>
       ) : (
-        <Stack component="ul" gap={6} m={0} p={0} style={{ listStyle: 'none' }}>
+        <Stack component="ul" gap="xs" m={0} p={0} style={{ listStyle: 'none' }}>
           {rows.map((row) => (
             <Group component="li" key={row.record.id} justify="space-between" wrap="nowrap">
               <span>

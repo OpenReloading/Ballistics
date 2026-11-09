@@ -112,7 +112,7 @@ const stepSeries = (c: SeriesContext, q: 'velocity' | 'energy', axisIndex: numbe
     // a ladder names each step at the end of its velocity line
     endLabel:
       ladder && axisIndex === 0
-        ? { show: true, formatter: step.label, color: theme[q], fontSize: 11 }
+        ? { show: true, formatter: step.label, ...axisText(theme[q]) }
         : undefined,
     markLine:
       own && axisIndex === 0 && c.current ? currentMark(theme, system, c.current, c.t) : undefined,
