@@ -2,7 +2,7 @@
 
 Read before changing the e2e job of `.github/workflows/ci.yml`, `apps/e2e/scripts/baseline.sh` or the `@playwright/test` version.
 
-- CI runs the e2e tests and the drawing baseline in `PLAYWRIGHT_IMAGE` (`ci.yml` env), the official image pinned by digest. It holds the browsers and the fonts they render with; the runner installs no browser.
+- CI runs the e2e tests, the drawing baseline and its paired contact sheet in `PLAYWRIGHT_IMAGE` (`ci.yml` env), the official image pinned by digest. It holds the browsers and the fonts they render with; the runner installs no browser.
 - A `@playwright/test` update (catalog in `pnpm-workspace.yaml`) changes in the same pull request:
   - `playwright` in the same catalog, which the story tests of `packages/ui` run in the same image.
   - `PLAYWRIGHT_IMAGE` in `ci.yml`, tag and digest. The digest of a tag: `curl -sSI -H 'Accept: application/vnd.oci.image.index.v1+json' https://mcr.microsoft.com/v2/playwright/manifests/v<version>-noble | grep -i docker-content-digest`.
