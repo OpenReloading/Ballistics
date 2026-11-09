@@ -1,8 +1,4 @@
-/**
- * Notes on a saved load for the sessions it was shot in: the rules and thresholds of
- * `apps/docs/docs/models/load-notes.md`. A note says what differs between two sessions and where
- * the values come from. It is no verdict about a load and recommends no charge.
- */
+/** The rules and thresholds of `apps/docs/docs/models/load-notes.md`: a note says what differs between two sessions and where the values come from; it is no verdict about a load and recommends no charge. */
 
 /** The rule behind a note: a lot, the seating, the mean velocity or the firearm's round count. */
 export type LoadNoteRule =
@@ -175,11 +171,7 @@ function sessionNotes(
   return notes.filter((n) => !s.dismissed?.includes(n.rule))
 }
 
-/**
- * The notes on the sessions of a load: each session against the one before it. The sessions are
- * ordered by date when all have one, else as given. `roundCountThreshold` is the count the user
- * set on the firearm; without it there is no round count note.
- */
+/** Each session against the one before it, by date when all have one, else as given; without `roundCountThreshold` (the count the user set on the firearm) no round count note. */
 export function loadNotes(
   sessions: readonly SessionReading[],
   roundCountThreshold?: number,

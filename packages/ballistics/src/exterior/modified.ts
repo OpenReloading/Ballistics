@@ -1,8 +1,4 @@
-/**
- * Helpers of the static modified point-mass model (M2b), described in
- * `apps/docs/docs/models/exterior-modified-point-mass.md` (Lieske and Reiter, BRL
- * Report 1314, after Kneubuehl 2018, section 5.5.2.3; McCoy 1999). SI in and out; angles in rad.
- */
+/** Helpers of the static modified point-mass model (M2b), `apps/docs/docs/models/exterior-modified-point-mass.md` (Lieske and Reiter, BRL Report 1314, after Kneubuehl 2018, section 5.5.2.3; McCoy 1999); SI in and out, angles in rad. */
 import type { DragTable } from '../drag-tables.ts'
 import { dragCoefficient } from './drag.ts'
 
@@ -33,11 +29,7 @@ export function coefficientAt(c: CoefficientOverMach, mach: number): number {
   return typeof c === 'number' ? c : dragCoefficient(c, mach)
 }
 
-/**
- * Static yaw of repose, rad, as a vector perpendicular to the air-relative velocity `va`:
- * -2 Ix p (va x accel) / (rho A d CMa V^4), with `accel` the point-mass acceleration
- * (`apps/docs/docs/models/exterior-modified-point-mass.md`, "Yaw of repose").
- */
+/** Static yaw of repose, rad, perpendicular to the air-relative velocity `va`: -2 Ix p (va x accel) / (rho A d CMa V^4), `accel` the point-mass acceleration (`apps/docs/docs/models/exterior-modified-point-mass.md`, "Yaw of repose"). */
 export function yawOfRepose(
   va: Vec3,
   accel: Vec3,
@@ -78,10 +70,7 @@ export interface GyroscopicStabilityInput {
   momentSlope: number
 }
 
-/**
- * Gyroscopic stability factor of linear theory: 2 Ix^2 p^2 / (pi Iy rho V^2 d^3 CMa)
- * (Kneubuehl 2018, Eq. 5.6:10; McCoy 1999).
- */
+/** Gyroscopic stability factor of linear theory: 2 Ix^2 p^2 / (pi Iy rho V^2 d^3 CMa) (Kneubuehl 2018, Eq. 5.6:10; McCoy 1999). */
 export function gyroscopicStability(i: GyroscopicStabilityInput): number {
   return (
     (2 * i.axialInertia ** 2 * i.spin ** 2) /
@@ -114,13 +103,7 @@ export interface LinearJumpInput {
   crosswind: number
 }
 
-/**
- * Vertical aerodynamic jump from a crosswind at the muzzle by linear theory, rad, positive up:
- * -(Ix p / (m d V)) (CLa / CMa) (W / V)
- * (`apps/docs/docs/models/exterior-modified-point-mass.md`, "Aerodynamic jump"; ČOS 109001 eq. (17)). `spin` is
- * signed by the twist hand and `crosswind` m/s is positive when the wind blows to the right, so
- * right-hand twist with wind from the left gives a downward jump.
- */
+/** Vertical jump from a crosswind at the muzzle by linear theory, rad, positive up: -(Ix p / (m d V)) (CLa / CMa) (W / V) (`apps/docs/docs/models/exterior-modified-point-mass.md`, "Aerodynamic jump"; ČOS 109001 eq. (17)); `spin` signed by the twist hand, `crosswind` m/s positive when blowing to the right. */
 export function linearJump(i: LinearJumpInput): number {
   return (
     -((i.axialInertia * i.spin) / (i.mass * i.diameter * i.speed)) *
