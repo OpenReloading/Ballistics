@@ -1,4 +1,4 @@
-/** FIFO queue and a wall-clock deadline per task; a worker posts `{ succeeded, ... }` replies, other messages (Node's `--watch` posts its own) are ignored. */
+/** Worker-thread pool with a FIFO queue and a wall-clock deadline per task; a worker posts `{ succeeded, ... }` replies, other messages (Node's `--watch` posts its own) are ignored. */
 import { availableParallelism } from 'node:os'
 import { Worker } from 'node:worker_threads'
 import {

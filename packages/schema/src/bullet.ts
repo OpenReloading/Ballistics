@@ -499,7 +499,7 @@ function shankEnd(b: BulletFields): number | undefined {
   return b.length && b.length.value - (b.noseLength?.value ?? 0)
 }
 
-/** As far as the record gives the cannelure's ends; the drawing checks the ends the record leaves out. */
+/** Refuses a cannelure that leaves the shank, as far as the record gives its ends; the drawing checks the ends the record leaves out. */
 function cannelureOnShank(b: BulletFields, issue: Issue) {
   const groove = b.cannelure
   if (!groove) return

@@ -183,7 +183,7 @@ function readText(read: () => string): string {
 interface RecordReader {
   s: Uint8Array
   view: DataView
-  /** With the Continue records after it; throws when it runs past the stream or when the bytes read over all calls exceed the stream (substreams overlap). */
+  /** The record at byte `at` with the Continue records after it; throws when it runs past the stream or when the bytes read over all calls exceed the stream (substreams overlap). */
   record: (at: number) => Rec
   /** True when the record is a BOF of BIFF8 with substream type `dt` (2.4.21). */
   isBof: (r: Rec, dt: number) => boolean
@@ -416,7 +416,7 @@ function putCell(reader: RecordReader, r: Rec, strings: string[], st: SheetState
   }
 }
 
-/** From `from`, after its BOF, to the position after its EOF record; cells are placed and counted against `remaining`. */
+/** The rows of worksheet `n` from `from`, after its BOF, and the position after its EOF record; cells are placed and counted against `remaining`. */
 function readWorksheetCells(
   reader: RecordReader,
   { from, n }: { from: number; n: number },

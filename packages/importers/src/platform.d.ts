@@ -1,7 +1,4 @@
-// The parts of the web platform this package uses, which every runtime it targets has and the ES library of
-// this package lacks: only what the package calls. The file stays in this package's compile: it is not
-// emitted, and test/tsconfig.json leaves it out because its `var`s would conflict with Node's. The type URL
-// is named by zod's declarations.
+// The parts of the web platform this package calls, which every runtime it targets has and its ES library lacks, and the type URL zod's declarations name; the file stays in this package's compile, is not emitted, and test/tsconfig.json leaves it out because its `var`s would conflict with Node's
 // oxlint-disable-next-line typescript/no-empty-interface -- zod's declarations need the name only
 interface URL {}
 

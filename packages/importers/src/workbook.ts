@@ -42,7 +42,7 @@ export function isWorkbook(bytes: Uint8Array): boolean {
 const elements = (e: XmlElement | undefined, name: string) =>
   (e?.children ?? []).filter((c): c is XmlElement => typeof c !== 'string' && c.name === name)
 
-/** The `t` children of a shared string `si` or an inline string `is` at depth `d` and the `t` of its `r` runs; phonetic runs (`rPh`) and other children are left out. */
+/** True when the text event at `path` is a `t` child of a shared string `si` or an inline string `is` at depth `d`, or the `t` of its `r` runs; phonetic runs (`rPh`) and other children are left out. */
 const richTextAt = (path: readonly string[], d: number) =>
   (path.length === d + 2 && path[d + 1] === 't') ||
   (path.length === d + 3 && path[d + 1] === 'r' && path[d + 2] === 't')
