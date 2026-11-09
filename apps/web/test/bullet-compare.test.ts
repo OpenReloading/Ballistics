@@ -1,7 +1,6 @@
 import { bulletProfile } from '@open-reloading/drawing/bullet'
 import type { Bullet } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
-import de from '../src/i18n/de.json'
 import { translator } from '../src/i18n/translate.ts'
 import {
   compareGroups,
@@ -212,7 +211,14 @@ it('raises the shared text size until the tallest drawing fits its height with 1
 })
 
 it('shows the values and the marks of a row in the language of the translator', () => {
-  const german = translator(de, 'de').t
+  const german = translator(
+    {
+      Twist: 'Drall',
+      'Recommended twist': 'Empfohlener Drall',
+      '1 turn in {length}': '1 Umdrehung auf {length}',
+    },
+    'de',
+  ).t
   const a = record({ recommendedTwist: { value: 254 } } as Partial<Bullet>)
   const b = record({ id: 'y', recommendedTwist: { value: 203.2 } } as Partial<Bullet>)
   const twist = defined(
