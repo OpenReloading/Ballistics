@@ -88,10 +88,7 @@ const rangeDefaults = (allFields as readonly FieldSpec[]).filter(
   (s) => s.quantity === 'range' && s.initial !== undefined,
 )
 
-/**
- * The start values. Range defaults are round in the shown range unit:
- * 100 yd, not 109.361 yd.
- */
+/** Range defaults are round in the shown range unit: 100 yd, not 109.361 yd. */
 function startFields(system: UnitSystem): Fields {
   return Object.fromEntries(
     (allFields as readonly FieldSpec[]).map((s) => {
@@ -125,10 +122,7 @@ const stopText: Record<Exclude<Trajectory['stop'], 'done'>, Message> = {
 
 type T = Translator['t']
 
-/**
- * `design`: the name of the user bullet design the bullet values came from; `si`: the SI
- * inputs of the result, so a later edit does not relabel its range card.
- */
+/** `design` names the user bullet design the values came from; `si` holds the SI inputs of the result, so a later edit does not relabel its range card. */
 type Result = TrajectoryResult & {
   /** The bullet's description in the language shown. */
   bulletText: string
@@ -1071,12 +1065,7 @@ function useLastResult(attempt: Attempt) {
   return { result, stale, clearLast: () => setLast(undefined) }
 }
 
-/**
- * The trajectory calculator of the workbench's Trajectory tab, the only trajectory UI. It takes the
- * muzzle velocity (m/s), bullet record id, twist and sight of the load; what the load does not
- * supply (a bullet record, a firearm) it offers itself, as the former page did. A workbench link
- * with `tab=trajectory` fills it once from its `tab.` keys.
- */
+/** The only trajectory UI: muzzle velocity (m/s), bullet, twist and sight come from the load, what it lacks is offered here; a link with `tab=trajectory` fills it once from its `tab.` keys. */
 export function TrajectoryForm({
   load,
   ref,
@@ -1137,9 +1126,7 @@ export function TrajectoryForm({
   /** The bullet design the manual bullet values came from; an edit of one of them leaves it. */
   const [design, setDesign] = useState<UserBulletView>()
   const loading = useRef<AbortController | null>(null)
-  // when the stored or linked units replace the first render's, a range default not edited becomes
-  // the round default of the shown unit (runs after useFieldUnits' conversion); a later unit switch
-  // converts it like any value, so the result does not change
+  // a range default not edited becomes the round default of the stored or linked unit (after useFieldUnits' conversion); a later switch converts it like any value, so the result does not change
   const firstRange = useRef(system.range)
   useEffect(() => {
     const before = firstRange.current
@@ -1250,10 +1237,7 @@ export function TrajectoryForm({
     setDesign(undefined)
   }
 
-  /**
-   * Sets the zero air and drag factor fields from a firearm's mount; a mount without them empties
-   * the fields, so no other firearm's factor stays applied.
-   */
+  /** A mount without them empties the fields, so no other firearm's factor stays applied. */
   function fillZero(get: (key: (typeof zeroKeys)[number]) => number | undefined, source?: string) {
     for (const key of zeroKeys) {
       const si = get(key)
@@ -1415,8 +1399,7 @@ export function TrajectoryForm({
   const [loadFactor, loadFactorSource] = [load.dragFactor, load.dragFactorSource]
   useEffect(() => {
     if (loadSight !== undefined) {
-      // a firearm without them leaves typed or linked values alone, unless they are another
-      // firearm's
+      // a firearm without them leaves typed or linked values alone, unless they are another firearm's
       const has = zeroKeys.some((key) => load[key] !== undefined)
       if (has || zeroFromLoad.current) fillZero((key) => load[key], loadFactorSource)
       zeroFromLoad.current = has
@@ -1437,8 +1420,7 @@ export function TrajectoryForm({
   useEffect(() => {
     const before = lastBullet.current
     lastBullet.current = loadBullet
-    // the load's record left the load (none, or a user design): it goes and the tab's own bullet
-    // inputs show; on mount a linked record stays
+    // the load's record left the load (none, or a user design): it goes and the tab's own bullet inputs show; on mount a linked record stays
     if (!loadBullet) {
       if (!before) return
       loading.current?.abort()
@@ -1565,8 +1547,7 @@ export function TrajectoryForm({
     </form>
   )
 
-  // before the first result with the tab's own bullet: what is missing, or the example; with
-  // the load's bullet the prompt alone
+  // before the first result with the tab's own bullet, what is missing or the example; with the load's bullet the prompt alone
   const emptyState = own && !result && attempt.kind !== 'ok'
   const needed = neededOf(source, record, fields)
 
@@ -1588,8 +1569,7 @@ export function TrajectoryForm({
   const staleLine = stale && <p className="stale-line">{staleText}</p>
   const printButton = <RangeCardMenu setPaper={setPaper} />
 
-  // one view at every width: the holds and Print range card, the inputs, then the notes,
-  // the chart and the table; from 62em the chart takes the height the results column leaves
+  // one view at every width; from 62em the chart takes the height the results column leaves
   return (
     <div className="embedded-calculator trajectory-view">
       {statusLine}

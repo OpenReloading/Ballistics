@@ -51,11 +51,7 @@ export type LotRows = {
   rows?: { fraction: number; steps: Record<Lot, ShownStep[]>; times: BarrelTimes[] } | undefined
 }
 
-/**
- * The answers of the two lots, one request after the other and none after a failed one: a ladder asks
- * for several pool tasks at once, so two ladders at once fill the queue of a small pool and the API
- * answers busy.
- */
+/** One after the other, none after a failed one: a ladder asks for several pool tasks at once, so two ladders at once fill the queue of a small pool and the API answers busy. */
 async function askLots(
   ok: Extract<Outcome, { kind: 'ok' }>,
   charges: number[],
@@ -118,11 +114,7 @@ function lotRowsOf(
   return { fraction: current.fraction, steps, times }
 }
 
-/**
- * The lot rows of the shown run: two ladder requests, one per lot, at the burn rate raised and
- * lowered by the typed change, asked once the tab or a print wants them (`enabled`). A new change
- * waits for a pause; the rows of the last answer stay until the next one arrives.
- */
+/** At the burn rate raised and lowered by the typed change, asked once the tab or a print wants them (`enabled`); a new change waits for a pause, the last rows staying until the next answer. */
 export function useLotRows({
   ok,
   system,

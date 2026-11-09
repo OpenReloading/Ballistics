@@ -176,12 +176,7 @@ export const firearmMassSpec = {
   positive: true,
 } as const satisfies FieldSpec
 
-/**
- * Input groups from 75em: Cartridge and below it the cartridge figure in the first column, Powder,
- * Bullet and Gun in the second. In a window lower than 45em the burn-rate figure takes the cartridge
- * figure's place, which is then the result tab Cartridge (`FigureTab`). Below 75em the columns have
- * no box: one flow in this order.
- */
+/** In a window lower than 45em the burn-rate figure takes the cartridge figure's place, which moves to the result tab Cartridge (`FigureTab`); below 75em the columns have no box, one flow in this order. */
 const panelColumns: InputPanel[][] = [['cartridge'], ['powder', 'bullet', 'firearm']]
 
 /** The desktop frame of a window lower than 45em (`panelColumns`). */
@@ -214,10 +209,7 @@ export type CartridgeChoice = {
   groove?: number | undefined
 }
 
-/**
- * A record's value as a read-only row of its card: what the simulation reads, not typed; the unit
- * in its own column, as the fields'.
- */
+/** What the simulation reads, not typed; the unit in its own column, as the fields'. */
 const recordRow = (label: string, value: ReactNode, unit?: string) =>
   value != null && (
     <div key={label} className="record-row wide">
@@ -613,10 +605,7 @@ export function InputCards() {
   )
 }
 
-/**
- * The pinned row above the cards: the cartridge search, then the choices that depend on it in that
- * order, primer and its lot, brass record and its lot and case capacity record (the `choices` slot).
- */
+/** The cartridge search, then the choices that depend on it in that order; brass and capacity record go in the `choices` slot. */
 function LoadRow() {
   const { primerId, setPrimerChoice, system } = useLoad()
   return (
@@ -633,11 +622,7 @@ function LoadRow() {
 export const seatingSlotNames = ['cartridge', 'gun', 'choices', 'more', 'moreValues'] as const
 export type SeatingSlotName = (typeof seatingSlotNames)[number]
 
-/**
- * A named place for the seating preview's controls: the case capacity, seating and its values
- * (`cartridge`), the barrel length (`gun`), the brass and capacity record choices of the pinned row
- * (`choices`), the notes (`more`) and further values (`moreValues`, a `dl`).
- */
+/** `cartridge` holds capacity and seating, `gun` the barrel length, `choices` the brass and capacity records, `more` the notes, `moreValues` a `dl` of further values. */
 function SeatingSlot({ name }: { name: SeatingSlotName }) {
   const { slotRefs } = useLoad()
   if (name === 'moreValues') return <dl ref={slotRefs[name]} className="seating-more wide" />
@@ -942,11 +927,7 @@ const fieldsOf = (keys: readonly string[]) => keys.map((k) => <LoadField key={k}
 
 type BulletKey = (typeof bulletFields)[number]['key']
 
-/**
- * A Bullet card value the record or design gives: its value in muted text until the user types
- * over it, an emptied field gives the record's value again. A BC of a record with several bands
- * has no single value, so the field is empty until one replaces them.
- */
+/** Muted until the user types over it, an emptied field gives the record's value again; a BC of a record with several bands has no single value, so the field is empty until one replaces them. */
 function BulletValueField({ name: key }: { name: BulletKey }) {
   const {
     system,
@@ -1007,11 +988,7 @@ function BulletValueField({ name: key }: { name: BulletKey }) {
   )
 }
 
-/**
- * A value of the cartridge sheet or the powder record that the user may type over it: the record's
- * value in muted text until typed, an emptied field gives the record's value again. A typed Pmax is
- * the user's own limit, no CIP value.
- */
+/** Muted until typed, an emptied field gives the record's value again; a typed Pmax is the user's own limit, no CIP value. */
 function SpecValueField({ name: key }: { name: SpecKey }) {
   const {
     system,
@@ -1094,11 +1071,7 @@ function SpecValueFields({ keys, chosen }: { keys: readonly SpecKey[]; chosen: b
     .map((k) => <SpecValueField key={k} name={k} />)
 }
 
-/**
- * The Bullet card's value rows (the card's height is fixed by the window of 1280 x 650): diameter,
- * length and the first BC row of the drag models the record lists or the user typed (G7 before G1).
- * The second BC row is the card's More popover's (`more`).
- */
+/** BC rows G7 before G1; the card's height is fixed by the window of 1280 x 650, so the second BC row is the More popover's (`more`). */
 function BulletValueFields({ more }: { more?: boolean }) {
   const { bulletRecord, typedBulletFields } = useLoad()
   const shown = (key: BulletKey) => {
@@ -1115,11 +1088,7 @@ function BulletValueFields({ more }: { more?: boolean }) {
   return keys.map((s) => s && <BulletValueField key={s.key} name={s.key} />)
 }
 
-/**
- * The bullet's base form in the card's More popover (the card itself is as high as the window of
- * 1280 x 650 allows), with the boat-tail length and base face diameter, and for a hollow base the
- * cavity diameter. A flat base has no dimension row.
- */
+/** In the More popover, as the card is as high as the window of 1280 x 650 allows; a flat base has no dimension row. */
 function BaseFormFields() {
   const { bulletRecord, bulletBaseType } = useLoad()
   const type = bulletBaseType ?? bulletRecord?.base?.type
@@ -1753,12 +1722,7 @@ const slotsOf = (s: ReturnType<typeof useLoad>['seatingSlots']) => ({
   moreValues: s.moreValues ?? null,
 })
 
-/**
- * The cartridge figure with the seated bullet, once a cartridge is chosen, drawn into `host`: the
- * card of the inputs' second column or the result tab Cartridge. One node moves between them, so
- * the preview and its seating stay; without a host it is out of the page and keeps filling the
- * cards' slots.
- */
+/** One node moves between hosts, so the preview and its seating stay; without a host it is out of the page and keeps filling the cards' slots. */
 function LoadFigure({ host }: { host: HTMLElement | null }) {
   const {
     cartridge,
@@ -1797,8 +1761,7 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
     caseLengthBrass,
   } = useLoad()
   const { ok, stale } = useResult()
-  // the figure draws the record's shape at the typed diameter and base; its other dimensions are the
-  // record's, so a typed length (which they would no longer add up to) stays out
+  // the figure draws the record's shape at the typed diameter and base; its other dimensions are the record's, so a typed length, which they would no longer add up to, stays out
   const {
     bulletDiameter,
     bulletBaseLength,
@@ -1817,9 +1780,7 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
     [bulletDiameter, bulletBaseLength, bulletBaseDiameter, bulletCavityDiameter, bulletCavityDepth],
   )
   const ladderStep = ladderStepOf(ok, stale)
-  // a card moved or left out of a layout drops the seating controls it held: development says so
-  // once the page has settled. The More slots attach only while the Cartridge card's More is open
-  // (its kept dropdown is a hidden Activity, which detaches refs)
+  // a card moved or left out of a layout drops the seating controls it held, which development reports once settled; the More slots attach only while the Cartridge card's More is open (a hidden Activity detaches refs)
   const [missing, setMissing] = useState<string[]>([])
   const [node, setNode] = useState<HTMLDivElement>()
   useEffect(() => {

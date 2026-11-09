@@ -10,11 +10,7 @@ import { CurveTable } from './curve-table.tsx'
 import { LazyVivacityChart } from './lazy-vivacity-chart.tsx'
 import { Panel } from './panel.tsx'
 
-/**
- * A fitted powder's Dynamic vivacity panel: the curve with its band and the burn form's `z1` as a
- * marked line, the legend and the model caption, and the curve values behind the Curve values
- * button in the title row (printed open).
- */
+/** The curve values sit behind the Curve values button in the title row and print open. */
 export function VivacityPanel({ powder, z1 }: { powder: FittedPowder; z1?: number | undefined }) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)

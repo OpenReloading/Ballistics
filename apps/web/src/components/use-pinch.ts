@@ -66,12 +66,7 @@ function pinchUp(st: PinchState, e: PointerEvent) {
   if (st.touches.size < 2) st.start = undefined
 }
 
-/**
- * Two-finger zoom and pan on an SVG view: while two touches are down the view follows them
- * (`pinchView`), and their pointer events stop at the SVG, so the page's handlers see no drag or
- * tap; a finger of a pinch stays swallowed until it lifts, also after the other one did. The second
- * touch calls `cancel`, which drops what the first one started.
- */
+/** The two touches' pointer events stop at the SVG, so the page sees no drag or tap; a pinch finger stays swallowed until it lifts, and the second touch calls `cancel` to drop what the first one started. */
 export function usePinch(
   svg: RefObject<SVGSVGElement | null>,
   now: { box: ViewBox; k: number },

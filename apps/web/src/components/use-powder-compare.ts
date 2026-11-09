@@ -92,10 +92,7 @@ export type CompareRow = {
   refusal?: ChargeTargetRefusal | undefined
 }
 
-/**
- * The values of a row from the answer of a run at `charge` (kg) of the request `req`; a row that
- * cannot be built is one powder not computed, not the end of the batch.
- */
+/** At `charge` (kg); a row that cannot be built is one powder not computed, not the end of the batch. */
 export function answerRow(
   head: Pick<CompareRow, 'id' | 'manufacturerName' | 'name' | 'base' | 'form'>,
   req: {
@@ -250,14 +247,7 @@ async function powderRow(
   return answerRow(head, req, charge, run.answer)
 }
 
-/**
- * The rows of the Powders tab: every powder of the API for the load `base` under `mode`, in batches
- * of `compareConcurrency` requests, by place in the powder list. `on.start` gets the number of
- * powders, `on.done` the count done and the rows so far after each answer. Undefined when `signal`
- * aborted before the batch started; an answer that arrives after it aborted is dropped. In the
- * target mode the first answer that the cartridge has no comparable limit (a percentage target)
- * ends the batch: every powder without a row has that reason (`noLimit`).
- */
+/** By place in the powder list, in batches of `compareConcurrency`; undefined when `signal` aborted before the batch started, a later answer dropped; in the target mode a first answer with no comparable limit ends the batch (`noLimit`). */
 export async function computeRows(
   loadRequest: UseWorkbenchStateResult['loadRequest'],
   base: ReturnType<UseWorkbenchStateResult['loadRequest']>,
@@ -328,11 +318,7 @@ function baseRequest(loadRequest: UseWorkbenchStateResult['loadRequest']) {
   }
 }
 
-/**
- * Computes every powder with model parameters for the load of the workbench, in batches of
- * `compareConcurrency` requests to `POST /interior`, and keeps the rows. Each powder is the load with
- * its record chosen, so a row is the Run of that choice (`loadRequest` of the workbench).
- */
+/** Each powder is the load with its record chosen, so a row is the Run of that choice (`loadRequest` of the workbench). */
 export function usePowderCompare(
   loadRequest: UseWorkbenchStateResult['loadRequest'],
   mode: CompareMode,

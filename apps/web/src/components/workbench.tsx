@@ -607,10 +607,7 @@ function usePrintWhenReady({
   edits: number
   setPrinting: (printing: boolean) => void
 }) {
-  // The report prints with the longer run's values or its reason. A new run, load, range or edit
-  // of the inputs drops the request. `print()` is called from a frame, not from this effect:
-  // `flushSync` of the `beforeprint` handler does nothing inside a commit, and the print state
-  // (every tab, the print-only fields) must be in the document when the browser takes its snapshot.
+  // `print()` runs from a frame, not this effect: `flushSync` in the `beforeprint` handler does nothing inside a commit, and the print state must be in the document at the browser's snapshot; a new run, load, range or edit drops the request
   useEffect(() => {
     if (!printAsked) return
     if (printAsked.key !== barrel.key || printAsked.lot !== lot.key || printAsked.edits !== edits)
@@ -833,10 +830,7 @@ function bulletsLabelOf(
   })
 }
 
-/**
- * The barrel length study and the lot rows, each requested once its tab was opened or a print asked
- * for it, and the print request that waits for both.
- */
+/** Each requested once its tab was opened or a print asked for it, and the print request that waits for both. */
 function useLongerRuns({
   ok,
   steps,
@@ -1061,12 +1055,7 @@ function chargeTextOf(
 /** The load's name as far as Save counts it: the typed name, empty for a generated one. */
 const customNameKey = (name: string | undefined) => (name?.trim() ? name : '')
 
-/**
- * The load workbench: panels Cartridge, Bullet, Powder and Firearm
- * with the Run bar on the left; notice, warnings, readouts, the ladder strip and the result tabs in
- * the centre, the tabs after Results in an aside from 88em. The state lives in `useWorkbenchState`;
- * the cards read it through `LoadContext`, the result side through `ResultContext`.
- */
+/** The state lives in `useWorkbenchState`; the cards read it through `LoadContext`, the result side through `ResultContext`; the tabs after Results go in an aside from 88em. */
 export function Workbench() {
   const { t } = useTranslation()
   const load = useWorkbenchState()
@@ -1148,8 +1137,7 @@ export function Workbench() {
   const designRows = useMemo(() => userBulletRows(designs), [designs])
 
   useIdlePreload(fresh)
-  // the cards replace the start card, and with it the button the visitor pressed; a saved load that
-  // opens by itself on arrival leaves the focus where it is
+  // the cards replace the start card and with it the button pressed; a saved load that opens by itself on arrival leaves the focus where it is
   const wasFresh = useRef(fresh)
   const startCardUsed = useRef(false)
   const markStartCardUsed = useCallback(() => {
@@ -1341,8 +1329,7 @@ export function Workbench() {
     listOpener.current = '.load-switch'
     setListOpen(true)
   }, [])
-  // the Open menu's Examples keep their identity, so the File menu's memo holds; they run the
-  // actions of the latest render
+  // the Open menu's Examples keep their identity, so the File menu's memo holds; they run the actions of the latest render
   const starts = useRef({ asNewLoad, fillExample, reset })
   starts.current = { asNewLoad, fillExample, reset }
   const examples = useMemo(() => {
@@ -1482,8 +1469,7 @@ export function Workbench() {
               opened={listOpen}
               onClose={() => {
                 setListOpen(false)
-                // the menu item that opened it is gone: the load switcher it came from, else Open,
-                // or Page actions
+                // the menu item that opened it is gone: the load switcher it came from, else Open, or Page actions
                 const opener = listOpener.current
                 listOpener.current = undefined
                 focusBack(opener, '.file-menu button', '.page-bar .page-bar-toggle')

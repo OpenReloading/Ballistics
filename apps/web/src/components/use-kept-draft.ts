@@ -5,11 +5,7 @@ import { putRecords, requestPersistentStorage } from '../lib/user-store.ts'
 /** What the browser holds of the draft shown: nothing yet, a write under way, done or refused. */
 export type Kept = 'blank' | 'saving' | 'saved' | 'failed'
 
-/**
- * Keeps the draft of a designer in this browser: written 400 ms after the last change, and when
- * the page is hidden or goes. `stored` holds what the browser has for the record shown, or the
- * record opened, so opening a record is no change to save. `key` stands for the name and the data.
- */
+/** Written 400 ms after the last change and when the page is hidden or goes; `stored` is what the browser has for the record shown, so opening a record is no change to save; `key` stands for the name and the data. */
 export function useKeptDraft<K extends 'powder' | 'targetFaceDesign'>(
   kind: K,
   fallbackName: string,

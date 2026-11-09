@@ -9,13 +9,7 @@ import {
 } from '../lib/bullet.ts'
 import type { Fields } from '../lib/field-spec.ts'
 
-/**
- * The bullet the Bullet card holds: the catalogue record, else the design of this browser
- * (`record`), the values a run reads (`values`: the record's, the mass field's, the typed ones), the
- * record with them and the typed base form (`baseType`) in place (`now`) and the values a reference gives again on opening (`given`: those
- * of the catalogue record, or of a design the load can name). `values` stays one object while its
- * numbers do.
- */
+/** `values` (the record's, the mass field's, the typed ones) is what a run reads and stays one object while its numbers do; `now` has them and `baseType` in place, `given` is what a reference gives again on opening. */
 export function useBulletValues(
   bullet: Bullet | undefined,
   design: { record?: Partial<Bullet> | undefined } | undefined,

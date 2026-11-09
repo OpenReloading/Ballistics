@@ -33,10 +33,7 @@ async function stored(id: string | undefined) {
   return r.success ? r.data : undefined
 }
 
-/**
- * What the sheet's fields are filled from: the load's firearm and cartridge, the group and the day
- * of the session its shots name. A record not found leaves its field blank.
- */
+/** A record not found leaves its field blank. */
 async function sourceOf(
   sheet: TargetSheet,
   group: ShotGroup | undefined,
@@ -63,11 +60,7 @@ async function sourceOf(
   }
 }
 
-/**
- * The page bar's Zero target menu: an A4 grid target with four corner marks for the photo
- * calibration, its fields filled from the open sheet or blank, printed alone while
- * `<html data-print="zero-target">` is set, or saved as SVG.
- */
+/** Four corner marks for the photo calibration, its fields from the open sheet or blank; printed alone while `<html data-print="zero-target">` is set, or saved as SVG. */
 export function ZeroTargetMenu({
   sheet,
   group,

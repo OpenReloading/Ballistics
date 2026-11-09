@@ -7,11 +7,7 @@ import type { FileMenuHandle } from './file-menu.tsx'
 /** The status while a linked record is read. */
 export const recordLoadingText = msg('Loading the record…')
 
-/**
- * `?record=<id>` of a designer: the browser record is read, checked against the schema and
- * the designer's kind, and opened as the saved records listed by Open do, so Save
- * writes that record. Read once on mount; `say` gets the status message, undefined to clear it.
- */
+/** Checked against the schema and the designer's kind and opened as Open's saved records, so Save writes that record; read once on mount, `say` gets the status message, undefined to clear it. */
 export function useRecordLink(
   kind: UserRecordKind,
   menu: RefObject<FileMenuHandle | null>,

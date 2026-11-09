@@ -58,10 +58,7 @@ export interface RangeLoad {
   data: Load
 }
 
-/**
- * The names of the records `load` names: a record of this browser from the store, a catalogue record
- * from the API; none for a reference that cannot be read (offline, or deleted).
- */
+/** A browser record from the store, a catalogue record from the API; none for a reference that cannot be read (offline, or deleted). */
 async function componentNames(load: Load) {
   const names = new Map<string, string>()
   // each record read once, so the manufacturer of two components too
@@ -132,10 +129,7 @@ async function linkSession(load: RangeLoad, ref: string, t: Translator['t']) {
   })
 }
 
-/**
- * The rounds of a session the firearm's round count does not hold yet (`shots`), of the session's
- * `total` shots; `base` is the count when the session began.
- */
+/** `shots` of the session's `total` that the round count does not hold yet; `base` is the count when the session began. */
 type RoundOffer = {
   firearm: string
   name: string
@@ -145,10 +139,7 @@ type RoundOffer = {
   shots: number
 }
 
-/**
- * The offer for the session `ref` of `load`, read from the store: undefined for a firearm not of
- * this browser, without a count, or that holds the session's shots already.
- */
+/** Undefined for a firearm not of this browser, without a count, or that holds the session's shots already. */
 async function roundOfferOf(load: RangeLoad, ref: string, shots: number) {
   const id = firearmIdOf(load)
   if (!id || shots < 1) return
@@ -194,12 +185,7 @@ function writeDraft(key: string, draft: { weather: WeatherText; note: string } |
   } catch {}
 }
 
-/**
- * The state and actions of the range page: the saved loads of this browser, the load and ladder step
- * chosen, the entry text and the session of the day. The session record is the entry itself: each
- * action is written to the browser store (one transaction that reads the stored record and applies
- * the change to it) and shown once that write has committed.
- */
+/** The session record is the entry itself: each action is one store transaction that reads the stored record and applies the change, shown once that write has committed. */
 export function useRangeMode() {
   const { t } = useTranslation()
   const { system } = useUnits()

@@ -51,11 +51,7 @@ type Units = {
 
 const initial: UnitChoice = { preset: 'metric-grains', overrides: {} }
 
-/**
- * The units as a store behind a context whose value never changes. A context value that changed
- * after mounting made React client-render the streamed Suspense boundary of a page still waiting
- * for its reveal, which left a hidden server copy of the page in the DOM.
- */
+/** A context whose value never changes: a changed one made React client-render the streamed Suspense boundary of a page still waiting for its reveal, which left a hidden server copy of the page in the DOM. */
 type UnitsStore = {
   get: () => Units
   /** The snapshot of the server render and of hydration. */
@@ -107,10 +103,7 @@ function createUnitsStore() {
   return { store, set }
 }
 
-/**
- * The display units of every page. Server and first render use "Metric, grains"; after mounting a
- * link's `units` applies (not stored), else the stored choice, else the locale's preset.
- */
+/** Server and first render use "Metric, grains"; after mounting a link's `units` (not stored), else the stored choice, else the locale's preset. */
 export function UnitsProvider({ children }: { children: ReactNode }) {
   const [{ store, set }] = useState(createUnitsStore)
   useEffect(() => {
@@ -142,8 +135,7 @@ export function UnitsProvider({ children }: { children: ReactNode }) {
       if (next && hasOverrides(next)) set({ custom: next })
     }
     window.addEventListener('storage', follow)
-    // a change of language makes a new `UnitSystem` of the same units: every view that formats a
-    // number with it (also the memoised results) writes it again in the language shown
+    // a change of language makes a new `UnitSystem` of the same units, so every view that formats with it (the memoised results too) writes it again in the language shown
     const unlisten = onLanguageChange(() => set({ choice: store.get().choice }))
     return () => {
       window.removeEventListener('storage', follow)
@@ -155,13 +147,7 @@ export function UnitsProvider({ children }: { children: ReactNode }) {
 
 const noSubscription = () => () => {}
 
-/**
- * The units, read from the store. A render has the live units, or the server's while hydrating
- * (`useSyncExternalStore` tells the two apart and corrects a late hydration); a change then arrives
- * as a state update, in the lane of the effect that made it. Not `useSyncExternalStore`'s own
- * updates: they are urgent and no longer batch with the other updates of the effects that run on
- * mounting, which a form's unit switch relies on.
- */
+/** Changes arrive as state updates in the lane of the effect that made them, not as `useSyncExternalStore`'s own urgent updates, which no longer batch with the mount effects' updates that a form's unit switch relies on. */
 export function useUnits() {
   const s = useContext(UnitsContext)
   const first = useSyncExternalStore(noSubscription, s.get, () => s.server)
@@ -171,10 +157,7 @@ export function useUnits() {
   return later?.from === s ? later.units : first
 }
 
-/**
- * The units of the Settings with the length unit replaced inside it, not stored: the cartridge
- * record's drawing unit switch, so its drawing, strip and table agree.
- */
+/** Not stored: the cartridge record's drawing unit switch, so its drawing, strip and table agree. */
 export function LengthOverride({
   unit,
   children,
@@ -331,10 +314,7 @@ function useUnitsName() {
   return { name, preset }
 }
 
-/**
- * Units in every page bar: a button with the preset's name, named "Units: <preset>", that name on
- * hover and focus; in the phone panel the row shows the whole name (globals.css).
- */
+/** Named "Units: <preset>", shown on hover and focus; the phone panel's row shows the whole name (globals.css). */
 export function UnitsIconButton() {
   const open = useContext(SettingsDialog)
   const { name, preset } = useUnitsName()

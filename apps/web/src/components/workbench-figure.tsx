@@ -32,8 +32,7 @@ export function CartridgeFigure({
   const [full, setFull] = useState(false)
   return (
     <section aria-label={t('Cartridge figure')} className="cartridge-figure">
-      {/* the cartridge with the seated bullet, the chamber alone, or both: one panel
-          whose value follows the tab, so one preview keeps its seating across the tabs */}
+      {/* the cartridge with the seated bullet, the chamber alone, or both: one panel whose value follows the tab, so one preview keeps its seating across the tabs */}
       <div className="figure-view">
         <div className="figure-head">
           <SegmentedControl
@@ -74,10 +73,7 @@ export function CartridgeFigure({
   )
 }
 
-/**
- * The result tab Cartridge of a low desktop window: the place the cartridge figure moves to from
- * the inputs' second column. The one figure of the inputs is drawn here, so its seating stays.
- */
+/** Where the cartridge figure moves in a low desktop window; the one figure of the inputs is drawn here, so its seating stays. */
 export function FigureTab() {
   const { setFigureTab } = useLoad()
   return <div ref={setFigureTab} className="figure-tab" />
