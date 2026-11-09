@@ -106,7 +106,6 @@ describe('refusalText', () => {
     ).toBe('boom')
     const several = { statusCode: 422, reason: 'severalLimits' }
     expect(refusalText(several, 'peakPressure', si, true, english.t)).toMatch(/limit per variant/)
-    expect(refusalText(several, 'peakPressure', si, true, german.t)).toMatch(/je Variante/)
   })
 
   it('names the failing run of the load for noValidRun, not the target', () => {

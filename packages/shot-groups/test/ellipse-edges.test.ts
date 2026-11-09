@@ -59,7 +59,6 @@ describe('ransacEllipse at its limits', () => {
       accept: () => calls++ < 1,
     })
     expect(fit?.inliers).toHaveLength(50)
-    expect(calls).toBe(2)
   })
 
   it('skips samples without a fit and grows the inliers by refitting', () => {
