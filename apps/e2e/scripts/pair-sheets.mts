@@ -1,7 +1,4 @@
-// Pairs the screenshots of two drawing runs by sheet id, theme and width (the note
-// codes in the file names may differ) and tiles them before | after, 3 pairs by 6 per sheet:
-// node scripts/pair-sheets.mts <before> <after> <out>, each a shots folder or a folder holding one
-// <out>/<table>__<theme>__<width>__<n>.png; shots without a partner are listed, not drawn
+// Pairs the screenshots of two drawing runs by sheet id, theme and width (note codes may differ) and tiles them before | after, 3 pairs by 6 per sheet: node scripts/pair-sheets.mts <before> <after> <out> (each a shots folder or one holding it; out as <table>__<theme>__<width>__<n>.png); shots without a partner are listed, not drawn
 import { existsSync, mkdirSync, readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { chromium } from '@playwright/test'

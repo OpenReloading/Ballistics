@@ -63,10 +63,7 @@ export function parseMergeArgs(
   }
 }
 
-/**
- * `json` written the way the records are: two spaces, formatted by the repository's Biome (which
- * keeps every object on its own lines and puts a short array on one), and a final newline.
- */
+/** The way the records are written: two spaces, formatted by the repository's Biome (every object on its own lines, a short array on one), and a final newline. */
 export function formatRecord(json: unknown) {
   const run = spawnSync(
     process.execPath,
@@ -134,10 +131,7 @@ const resolving = (sources: SourceIndex) => (entry: unknown) =>
     }
   ).provenance.sources[0]
 
-/**
- * Reads and checks every incoming file against `publishedLoads`, its ids set by the id rule and
- * its source references resolved from the records' sources. Nothing is merged when one fails.
- */
+/** Against `publishedLoads`, its ids set by the id rule and its source references resolved from the records' sources; nothing is merged when one fails. */
 function readIncoming(options: MergeOptions, sources: SourceIndex, errors: string[]) {
   const read: { path: string; file: IncomingLoads }[] = []
   for (const path of incomingFiles(options.incoming)) {
@@ -168,11 +162,7 @@ function readStored(path: string): PublishedLoads | undefined {
   }
 }
 
-/**
- * Merges every incoming file into the records' `loads/` folder (see {@link mergePublishedLoads}).
- * A file whose cartridge folder is no cartridge record is not written and is reported as waiting.
- * With `dryRun`, or when a file fails the schema, nothing is written.
- */
+/** Into the records' `loads/` folder ({@link mergePublishedLoads}); a file whose cartridge folder is no cartridge record is reported as waiting, not written, and with `dryRun` or when a file fails the schema nothing is written. */
 export function mergeLoadFolder(options: MergeOptions): MergeRun {
   const errors: string[] = []
   const sources = sourceIndex(

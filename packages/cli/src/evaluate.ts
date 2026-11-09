@@ -128,8 +128,7 @@ export function predict(row: Row, records: Records, model: InteriorModel): Predi
   if (typeof load === 'string') return { reason: load }
   try {
     const result = model(load)
-    // a velocity or pressure that is not a finite number would turn every statistic into null, and
-    // a velocity at or below 0 would make the interval distance negative (inside every interval)
+    // a velocity or pressure that is not a finite number would turn every statistic into null, and a velocity at or below 0 would make the interval distance negative (inside every interval)
     if (
       !result.valid ||
       !Number.isFinite(result.muzzleVelocity) ||
@@ -144,11 +143,7 @@ export function predict(row: Row, records: Records, model: InteriorModel): Predi
   }
 }
 
-/**
- * The drag of a bullet record for the flight to the measuring point: its G7 ballistic coefficients
- * as velocity bands, else its G1 ones; undefined without one, or with two of one model that share a
- * band start (alternatives, not bands).
- */
+/** Its G7 ballistic coefficients as velocity bands, else its G1 ones; undefined without one, or with two of one model that share a band start (alternatives, not bands). */
 function projectileOf(bullet: Bullet | undefined): Projectile | undefined {
   if (!bullet?.diameter) return undefined
   for (const model of ['G7', 'G1'] as const) {
@@ -171,12 +166,7 @@ function projectileOf(bullet: Bullet | undefined): Projectile | undefined {
 /** Air of the flight to the measuring point: the ICAO standard atmosphere at sea level. */
 const seaLevel = standardAtmosphere(0)
 
-/**
- * `row` with its printed velocity corrected to the muzzle where it was printed at a distance
- * (`muzzleDistance` above 0), with `muzzleVelocityFromDownrange` of core over the bullet record's
- * drag in the standard atmosphere at sea level; `noBulletDrag` without a drag to fly. A row without
- * a distance is a muzzle value and stays as it is.
- */
+/** A velocity printed at a distance (`muzzleDistance` above 0) corrected with core's `muzzleVelocityFromDownrange` over the bullet record's drag in the standard atmosphere at sea level, `noBulletDrag` without a drag to fly; a row without a distance is a muzzle value and stays as it is. */
 export function atMuzzle(row: Row, records: Records): Row | { reason: 'noBulletDrag' } {
   if (row.muzzleDistance === undefined || row.muzzleDistance === 0) return row
   const projectile = projectileOf(records.bullets.get(row.bullet))

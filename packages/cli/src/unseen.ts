@@ -13,12 +13,7 @@ type Interior = NonNullable<Powder['interior']>
 
 const median = (values: number[]) => percentile(values, 0.5) as number
 
-/**
- * The record `powder` stands for as a powder not in the fitted set: each field its fit moved
- * (`interior.fitted`) is the median of that field over `others` of its family, or over all `others`
- * when its family has none; its fixed inputs stay its own. Undefined without `interior` or without
- * another powder that has one.
- */
+/** Each field its fit moved (`interior.fitted`) becomes the median of that field over `others` of its family, else over all `others`, its fixed inputs staying its own; undefined without `interior` or without another powder that has one. */
 export function unseenPowder(powder: Powder, others: readonly Powder[]): Powder | undefined {
   const own = powder.interior
   const fitted = others.flatMap((p) => (p.interior && p.id !== powder.id ? [p] : []))

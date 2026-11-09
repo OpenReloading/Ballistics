@@ -2,10 +2,7 @@
 
 import { useTranslation } from '../i18n/language.ts'
 
-/**
- * An error in the root layout: replaces the whole document, so it carries its own html and body
- * and no app styles, theme or shell.
- */
+/** Replaces the whole document, so it carries its own html and body and no app styles, theme or shell. */
 export default function GlobalError({
   error,
   retry,

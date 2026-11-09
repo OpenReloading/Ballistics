@@ -1,10 +1,4 @@
-// Screenshots of pages for a person to look at before landing a UI change: each page at 390 and
-// 1280 px in light and dark against WEB_URL (it starts no server), then one contact sheet.
-// pnpm run visual-check [--preset drawing|calculators] [/path ...]
-// Output: visual-check-out/shots/<page>__<theme>__<width>.png and visual-check-out/sheet.png
-// (VISUAL_OUT for another folder; VISUAL_LANGUAGE=de for the German interface, whose pages are
-// waited for by their structure, not by English text, and the workbench by its page bar in that
-// language; /workbench: VISUAL_LADDER, VISUAL_DEFAULTS, VISUAL_LOADS)
+// Screenshots for a person to look at before landing a UI change: each page at 390 and 1280 px, light and dark, against WEB_URL (it starts no server), plus one contact sheet in visual-check-out/ (VISUAL_OUT for another folder); pnpm run visual-check [--preset drawing|calculators] [/path ...]; VISUAL_LANGUAGE=de waits by structure, /workbench takes VISUAL_LADDER, VISUAL_DEFAULTS and VISUAL_LOADS
 import { mkdirSync, readFileSync, rmSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -103,10 +97,7 @@ async function withoutDefaults(page: Page) {
   if ((await powder.getAttribute('aria-expanded')) !== 'true') await powder.click()
 }
 
-/**
- * VISUAL_LOADS=<n>: n open loads (the example in each), made at 1280 px where the strip is shown
- * (below 75em it is hidden), then the window back at its width.
- */
+/** VISUAL_LOADS=<n>: n open loads (the example in each), made at 1280 px where the strip is shown (below 75em it is hidden), then the window back at its width. */
 async function openLoads(page: Page, loads: number) {
   const size = page.viewportSize()
   await page.setViewportSize({ width: 1280, height: size?.height ?? 844 })
@@ -124,8 +115,7 @@ async function workbenchReady(page: Page) {
   if (process.env.VISUAL_DEFAULTS) await withoutDefaults(page)
   const loads = Number(process.env.VISUAL_LOADS)
   if (loads > 1) await openLoads(page, loads)
-  // VISUAL_LADDER=<steps>: a charge ladder of that many steps of 0.5 gr (both default presets weigh
-  // the charge in grains) on the example
+  // VISUAL_LADDER=<steps>: a charge ladder of that many steps of 0.5 gr on the example (both default presets weigh the charge in grains)
   const steps = process.env.VISUAL_LADDER
   if (steps) {
     await page.getByLabel(/^Ladder steps/).fill(steps)
@@ -160,8 +150,7 @@ async function ready(page: Page, url: string) {
     await workbenchReady(page)
     return
   }
-  // the burn-rate chart code loads apart from the route; a powder without fitted parameters and an
-  // overlay without picks have none
+  // the burn-rate chart code loads apart from the route; a powder without fitted parameters and an overlay without picks have none
   if (url.startsWith('/powders/') && (await page.getByText(inLanguage(fittedCaption)).count()))
     await page
       .locator('.echart svg')
@@ -274,8 +263,7 @@ if (import.meta.main) {
           await page.screenshot({ path: file, fullPage: true, ...(await clip(page, url)) })
           tiles.push({ file, caption: `${url}<br>${theme}, ${width} px` })
           console.log(file)
-          // VISUAL_TALL=<height>: one more shot in a window that tall, where a tool page's regions
-          // show what they otherwise scroll
+          // VISUAL_TALL=<height>: one more shot in a window that tall, where a tool page's regions show what they otherwise scroll
           const tall = Number(process.env.VISUAL_TALL)
           if (tall) {
             await page.setViewportSize({ width, height: tall })

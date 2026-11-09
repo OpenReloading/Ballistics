@@ -3,11 +3,7 @@ import path from 'node:path'
 
 const read = (file: string) => readFileSync(file, 'utf8').trim()
 
-/**
- * The short commit of the checkout at `root`, read from its git files so a build needs no `git`
- * program on the path. Follows a worktree's `.git` file and a ref in `packed-refs`; `''` when
- * there is no checkout or it cannot be read.
- */
+/** Read from its git files so a build needs no `git` program on the path; follows a worktree's `.git` file and a ref in `packed-refs`, `''` when there is no checkout or it cannot be read. */
 export function shortCommit(root: string): string {
   try {
     let dir = path.join(root, '.git')

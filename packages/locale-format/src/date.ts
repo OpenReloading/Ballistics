@@ -3,10 +3,7 @@ const dayFormats = new Map<string, Intl.DateTimeFormat>()
 /** English dates read day, month, year: the locale of English text is en-GB. */
 const localeOf = (language: string) => (language === 'en' ? 'en-GB' : language)
 
-/**
- * A YYYY-MM-DD day as text in `language` ("1 May 2026", "1. Mai 2026"), the same in every time
- * zone; any other text as given.
- */
+/** A YYYY-MM-DD day as text in `language` ("1 May 2026", "1. Mai 2026"), the same in every time zone; any other text as given. */
 export function dayText(day: string, language: string): string {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || Number.isNaN(Date.parse(day))) return day
   let format = dayFormats.get(language)

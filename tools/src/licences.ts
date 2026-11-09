@@ -1,11 +1,4 @@
-/**
- * Licence policy of the production dependencies of the API image and the web app, read from
- * pnpm-lock.yaml and the licenses pnpm reads from the installed packages: fails on a package whose
- * licence is not in `allow-licenses` of .github/dependency-review-config.yml (the list the
- * dependency review step reads) and not excepted there by `allow-dependencies-licenses`, and on a
- * package without a declared licence. Fails too when the generated list of shipped packages in
- * NOTICE differs. `--write` rewrites that list. The licence table goes to the job summary.
- */
+/** For the production dependencies of the API image and the web app (pnpm-lock.yaml and the licenses pnpm reads): fails on a licence outside `allow-licenses` of .github/dependency-review-config.yml and not excepted by `allow-dependencies-licenses`, on a package without a declared licence, and when the generated list in NOTICE differs (`--write` rewrites it); the licence table goes to the job summary. */
 import { execFileSync } from 'node:child_process'
 import { appendFileSync, readFileSync, writeFileSync } from 'node:fs'
 import { posix } from 'node:path'
@@ -89,12 +82,7 @@ const stepsOf = (
     .filter(([name]) => !optional[name]?.optional)
     .map(([name, v]): Step => ({ name, version: typeof v === 'string' ? v : v.version, from }))
 
-/**
- * Every third-party package installed for the production dependencies of the shipped workspaces;
- * an optional peer that the lock resolved from elsewhere in the workspace is not installed for it.
- * Throws on a platform package (`os`, `cpu` or `libc` in the lock) that `skip` does not name: which
- * one is installed differs per machine, so the list cannot hold it.
- */
+/** For the production dependencies of the shipped workspaces, an optional peer the lock resolved from elsewhere not counted; throws on a platform package (`os`, `cpu` or `libc` in the lock) that `skip` does not name, as which one is installed differs per machine. */
 export function shippedPackages(
   lock: Lock,
   licenses: Licenses,

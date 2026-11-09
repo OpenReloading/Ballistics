@@ -17,12 +17,7 @@ export type IncomingLoads = Omit<PublishedLoads, 'loads'> & { loads: IncomingLoa
 const figure = (f: { value?: number | undefined; raw: string } | undefined) =>
   f === undefined ? null : (f.value ?? f.raw)
 
-/**
- * The natural key of a load: maker, cartridge, printed bullet text and mass, COAL (with its limit),
- * printed powder, the set of charge kinds, barrel length and twist, and the marks of each charge.
- * A figure counts by its stored value, so `55 gr` and `55 grs` are one key. Edition, page, charge,
- * velocity, pressure, primer and case are not part of it, so a newer edition finds its older load.
- */
+/** Maker, cartridge, printed bullet text and mass, COAL (with its limit), printed powder, the set of charge kinds, barrel length and twist and the marks of each charge, a figure by its stored value (`55 gr` and `55 grs` are one key); edition, page, charge, velocity, pressure, primer and case are not in it, so a newer edition finds its older load. */
 function naturalKey(file: Pick<PublishedLoads, 'maker' | 'cartridge'>, load: IncomingLoad) {
   const marks = load.charges.flatMap((c) =>
     [...(c.marks ?? []), ...(c.printedMarks ?? [])].map((m) => `${c.kind}:${m}`),
@@ -42,13 +37,7 @@ function naturalKey(file: Pick<PublishedLoads, 'maker' | 'cartridge'>, load: Inc
   ])
 }
 
-/**
- * The id of a load in its file: the first 10 hex digits of the SHA-1 of its natural key (maker,
- * cartridge, printed bullet text and mass, COAL, printed powder, charge kinds, barrel, marks; see
- * the docs page Published loads). `occurrence` counts loads of equal key in the order the table
- * prints them, from 1: the first has the bare hash, the second `<hash>-2` and so on. The same
- * load gets the same id in every edition, whatever its page, charges, velocity or pressure.
- */
+/** The first 10 hex digits of the SHA-1 of its natural key (`apps/docs/docs/data/published-loads.md`, "Import and re-import"); `occurrence` counts loads of equal key as the table prints them, from 1 (the bare hash, then `<hash>-2`), so a load has the same id in every edition. */
 export function loadId(
   file: Pick<PublishedLoads, 'maker' | 'cartridge'>,
   load: IncomingLoad,
@@ -120,11 +109,7 @@ function citing(load: PublishedLoad, index: number): PublishedLoad {
   return out as PublishedLoad
 }
 
-/**
- * `l` with the catalogue links of the stored load `old` that it lacks: `bullet.record`,
- * `powder.record`, and the primer's `records`, `size` and `magnum` where both print the same primer.
- * The links are curated in the repository, so a collector that does not set them keeps them.
- */
+/** `bullet.record`, `powder.record`, and the primer's `records`, `size` and `magnum` where both print the same primer; curated in the repository, so a collector that does not set them keeps them. */
 function withStoredLinks(old: PublishedLoad, l: PublishedLoad): PublishedLoad {
   const record = <T>(incoming: T | undefined, stored: T | undefined) =>
     (incoming ?? stored) === undefined ? {} : { record: incoming ?? stored }
@@ -137,10 +122,7 @@ function withStoredLinks(old: PublishedLoad, l: PublishedLoad): PublishedLoad {
   }
 }
 
-/**
- * Adds incoming load `l` to `report` against the repository's `old`; returns the load to write,
- * `l` with the links of `old` it lacks, or undefined where nothing is written.
- */
+/** Against the repository's `old`; returns the load to write, `l` with the links of `old` it lacks, or undefined where nothing is written. */
 function classify(
   old: PublishedLoad | undefined,
   l: PublishedLoad,
@@ -162,26 +144,7 @@ function classify(
   return accepted ? linked : undefined
 }
 
-/**
- * Merges an incoming edition of a table into the file in the repository, by load id:
- * - a load the repository lacks is created;
- * - a load with equal content (all but `id`, `source`, `page` and `url`) stays as it is, citing the
- *   edition that printed it;
- * - a load with other content is listed with the changed field paths and replaced only where its
- *   id is in `accept`, or `accept` is `'all'`;
- * - a catalogue link of a stored load (`bullet.record`, `powder.record`, the primer's `records`,
- *   `size` and `magnum`) that the incoming load lacks is no change and stays on an accepted load;
- *   one the incoming load sets otherwise is a change;
- * - a repository load the incoming edition does not print is kept and listed as absent.
- *
- * A created or accepted load cites the incoming source, appended to `provenance.sources` unless
- * already there (sources compare as JSON). The incoming loads get their ids from
- * {@link withLoadIds}, replacing any they carry. The loads come out sorted by id. The file's other
- * fields stay those of the repository; with no file there, the incoming file is the start.
- * `written` is false when the repository file is left as it is. `resolveSource` turns a source
- * entry into the form two entries compare in, so a source record reference and the same source
- * written out are one source.
- */
+/** By load id, as `apps/docs/docs/data/published-loads.md`, "Import and re-import" states: new loads created, equal ones kept, changed ones listed and replaced only when in `accept` (or `'all'`), stored links kept, absent ones kept and listed, ids from {@link withLoadIds}, sorted by id; `written` is false when the repository file is left as it is, `resolveSource` gives the form two source entries compare in. */
 export function mergePublishedLoads(
   existing: PublishedLoads | undefined,
   incoming: IncomingLoads,

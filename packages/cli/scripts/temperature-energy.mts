@@ -113,10 +113,7 @@ function sharedBasis(rows: readonly Row[]): PressureBasis | undefined {
 
 type Entry = { row: Row; load: InteriorLoad; fitTemperature: number }
 
-/**
- * `load` with a temperature sensitivity: the record's, else the assumed one about the temperature of
- * the powder's fit, the temperature its specific energy belongs to (`fitTemperature`, K).
- */
+/** With the record's temperature sensitivity, else the assumed one about the temperature of the powder's fit, where its specific energy belongs (`fitTemperature`, K). */
 function entryOf(load: InteriorLoad, row: Row, records: Records): Entry {
   const fit = records.powders.get(row.powder)?.interior?.propellantTemperature.value
   const fitTemperature = fit === undefined ? load.propellantTemperature : kelvin(fit)
@@ -133,10 +130,7 @@ function entryOf(load: InteriorLoad, row: Row, records: Records): Entry {
   }
 }
 
-/**
- * The load a fit starts from: the energy coefficient set, the specific energy moved so it holds at
- * the powder's fit temperature, since core scales it about the sensitivity's reference.
- */
+/** The energy coefficient set and the specific energy moved so it holds at the powder's fit temperature, since core scales it about the sensitivity's reference. */
 function startOf({ load, fitTemperature }: Entry, energy: number): InteriorLoad {
   const reference = load.propellant.temperatureSensitivity?.reference ?? fitTemperature
   return {
@@ -195,11 +189,7 @@ function predictAt(model: InteriorLoad, load: InteriorLoad) {
     : undefined
 }
 
-/**
- * Adds the residuals of a held-out row to `sums` for both models, only where both are valid. The
- * pressure counts where its basis is one the model is compared on and, when the fit used pressures,
- * the fit's own basis.
- */
+/** For both models, only where both are valid; the pressure counts where its basis is one the model is compared on and, when the fit used pressures, the fit's own basis. */
 function addRow(
   sums: Record<Model, Sums>,
   models: Record<Model, InteriorLoad>,

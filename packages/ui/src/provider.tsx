@@ -28,11 +28,7 @@ const variantColorResolver: VariantColorsResolver = (input) => {
 const uiTheme = createTheme({ ...theme, variantColorResolver })
 const resolver: CSSVariablesResolver = () => cssVariables
 
-/**
- * Mantine on the design tokens, with the app's messages: the generated theme, the scheme colors it cannot set, and
- * `i18n`, which holds `uiMessages` beside the app's own. It takes only the color scheme besides: Mantine's theme,
- * class and variable props would undo ui.css or the tokens. Load `@open-reloading/ui/ui.css` with it.
- */
+/** The generated theme, the scheme colors it cannot set and `i18n` holding `uiMessages` beside the app's own; only the color scheme besides, as Mantine's theme, class and variable props would undo ui.css or the tokens; load `@open-reloading/ui/ui.css` with it. */
 export function UiProvider({
   i18n,
   ...props

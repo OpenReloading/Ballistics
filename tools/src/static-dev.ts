@@ -1,10 +1,4 @@
-/**
- * The web app's dev server on data files: writes the data files of the
- * static site (`writeStaticApi`) into the git-ignored `apps/web/public/api`, which the dev server
- * serves, and starts `next dev` at the site root (`PAGES_BASE_PATH=''`). Its server-side reads go
- * to the API over the catalogue of the data bundle, in this process for the length of the run:
- * there is no API to start. Port 3000, `PORT` for another. Needs `pnpm run build` at the root first.
- */
+/** Writes the static site's data files (`writeStaticApi`) into the git-ignored `apps/web/public/api` and starts `next dev` at the site root (`PAGES_BASE_PATH=''`); its server-side reads go to the API over the bundle's catalogue in this process, so there is no API to start; port 3000 (`PORT` for another), needs `pnpm run build` at the root first. */
 import { type ChildProcess, spawn } from 'node:child_process'
 import { rmSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'

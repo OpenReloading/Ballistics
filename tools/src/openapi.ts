@@ -1,10 +1,4 @@
-/**
- * Writes the contract document of the current routes (`buildOpenApi`) for oasdiff (`api-check`,
- * `api-baseline`) and Schemathesis (`api-conformance`). The destination is fixed in code, never
- * taken from an argument: `baseline` writes `packages/api/openapi.baseline.json`, no argument
- * writes `openapi.json` in the temporary directory (`TMPDIR`).
- * Needs `pnpm run build` at the root.
- */
+/** Writes the contract document of the current routes (`buildOpenApi`) for oasdiff (`api-check`, `api-baseline`) and Schemathesis (`api-conformance`) to a destination fixed in code, never an argument: `baseline` writes `packages/api/openapi.baseline.json`, no argument `openapi.json` in `TMPDIR`; needs `pnpm run build` at the root. */
 import { writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'

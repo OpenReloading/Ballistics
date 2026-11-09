@@ -19,18 +19,14 @@ const webInputs = [
 
 /** Changes that no check reads: prose outside the documents the app, its tests and the tools read, and GitHub's templates. */
 const docsOnly = [
-  // the docs site's pages are checked by the docs tests (bibliography and code lines), the home page
-  // prerenders the news items, the build compares a package's API report (`*.api.md`)
+  // the docs site's pages are checked by the docs tests (bibliography and code lines), the home page prerenders the news items, the build compares a package's API report (`*.api.md`)
   /^(?!README\.md$)(?!apps\/docs\/docs\/)(?!apps\/web\/news\/)(?!.*\.api\.md$).*\.md$/,
   // the web tests read the user report template, the licence check the generated block of NOTICE
   /^\.github\/(ISSUE_TEMPLATE\/(?!user-report\.yml$)|pull_request_template\.md$)/,
   /^(LICENSE|\.coderabbit\.yaml)$/,
 ]
 
-/**
- * Files the e2e job reads besides those that feed the web build: its specs, the compose stack that runs
- * the API, the build context of its image and the scripts that build and serve the export.
- */
+/** Besides those that feed the web build: its specs, the compose stack that runs the API, the build context of its image and the scripts that build and serve the export. */
 const e2eInputs = [
   /^apps\/e2e\//,
   /^(compose\.yaml|\.dockerignore)$/,
@@ -119,10 +115,7 @@ export function recordClosure(root = repoRoot) {
   return { files, packages }
 }
 
-/**
- * The test jobs of ci.yml and their workspaces; of `e2e` only the unit tests run (`test:unit`), in `packages`. A test
- * that reads another workspace's files declares it as a devDependency, so pnpm's selection reaches it.
- */
+/** Of `e2e` only the unit tests run (`test:unit`), in `packages`; a test that reads another workspace's files declares it as a devDependency, so pnpm's selection reaches it. */
 export const testGroups: Record<string, string[]> = {
   drawing: ['drawing'],
   web: ['web'],
@@ -151,10 +144,7 @@ export const testGroups: Record<string, string[]> = {
 /** One test job: its group, the pnpm filters of its workspaces to test, whether it runs the e2e unit tests. */
 export type TestJob = { name: string; filter: string; e2eUnit: boolean }
 
-/**
- * The test jobs for the workspaces in `affected` (names without the scope); every group's for undefined and for a
- * workspace no group lists (a new one), which the completeness test of `testGroups` then names.
- */
+/** Every group's for undefined and for a workspace no group lists (a new one), which the completeness test of `testGroups` then names. */
 export function testJobs(affected?: string[]): TestJob[] {
   const listed = Object.values(testGroups).flat()
   const only = affected?.every((m) => listed.includes(m)) ? affected : undefined
@@ -183,20 +173,14 @@ const everything = (reason: string): Plan => ({
   reason,
 })
 
-/**
- * A file of a workspace (a folder with a `package.json`): pnpm finds the workspaces a change reaches from these alone.
- * The catalog reader of tools is not one: it writes the bundle that the web and API tests read, which pnpm does not see.
- */
+/** A folder with a `package.json`, from which pnpm finds the workspaces a change reaches; the catalog reader of tools is not one: it writes the bundle the web and API tests read, which pnpm does not see. */
 const inWorkspace = (file: string) => {
   if (/^tools\/src\/catalog\//.test(file)) return false
   const folder = /^((packages|apps|tooling)\/[^/]+|tools)\//.exec(file)?.[1]
   return folder !== undefined && existsSync(path.join(repoRoot, folder, 'package.json'))
 }
 
-/**
- * The plan for the changed files `all`; `affected` are the workspaces pnpm selects for them (names
- * without the scope), undefined when unknown. Unknown, or none for a code change, tests every group.
- */
+/** `affected` are the workspaces pnpm selects for them (names without the scope), undefined when unknown; unknown, or none for a code change, tests every group. */
 export function plan(all: string[], closure = recordClosure(), affected?: string[]): Plan {
   if (all.length === 0) return everything('no changed files found')
   const code = all.filter((f) => !docsOnly.some((re) => re.test(f)))
@@ -239,10 +223,7 @@ const pnpmPath = [path.dirname(process.execPath), '/usr/local/bin', '/usr/bin', 
   .map((d) => `${d}/pnpm`)
   .find(existsSync)
 
-/**
- * The workspaces (names without the scope) pnpm selects with `filter`, such as `...[<base>]`: the changed ones and
- * every workspace that depends on them, devDependencies included; undefined when pnpm fails.
- */
+/** With `filter`, such as `...[<base>]`: the changed ones and every workspace that depends on them, devDependencies included; undefined when pnpm fails. */
 export function selected(filter: string): string[] | undefined {
   try {
     if (pnpmPath === undefined) return

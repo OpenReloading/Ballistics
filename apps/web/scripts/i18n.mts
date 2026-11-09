@@ -1,22 +1,4 @@
-/**
- * The English messages of the web app's sources and how a language's catalogue compares with them.
- *
- *   node scripts/i18n.mts messages        every message, one per line
- *   node scripts/i18n.mts missing <code>  the messages `src/i18n/<code>.json` lacks, and its keys no
- *                                         message matches (exit 1 for such a key)
- *   node scripts/i18n.mts check <code> [<base>]
- *                                         the catalogue lint `pnpm run lint` runs: exit 1 for any
- *                                         problem `problems` names; for German also the term table,
- *                                         its use in the texts and the safe wording (`i18n-lint.json`).
- *                                         CI passes a pull request's base commit, whose untranslated
- *                                         list must hold every listed text
- *
- * A message is the first argument of `t(...)` or `msg(...)` and the two forms of `tn(count, one,
- * other)`, as a string literal, in a file that imports from `src/i18n/`.
- * shortcut: a text scan, not a parse. A call that spans a comma inside its first argument of `tn`
- * is read by bracket depth; a template literal with `${` is refused. Upgrade to the TypeScript API
- * if a source needs more.
- */
+/** The web app's English messages and a language's catalogue against them: `messages` lists every message, `missing <code>` what `src/i18n/<code>.json` lacks and its keys no message matches (exit 1 for such a key), `check <code> [<base>]` the lint `pnpm run lint` runs (with the term table and safe wording for German; CI passes the pull request's base, whose untranslated list must hold every listed text); a message is the literal first argument of `t` or `msg` or both forms of `tn` in a file importing from `src/i18n/`. shortcut: a text scan, not a parse (`tn` read by bracket depth, a template literal with `${` refused); upgrade to the TypeScript API if a source needs more. */
 import { globSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { git } from './ci-plan.mts'
@@ -97,11 +79,7 @@ export function extract(source: string, file = 'source'): string[] {
   return found
 }
 
-/**
- * The texts of the message table: the codes and templates of `src/lib/core-message-table.json`,
- * the warning sentences that `src/lib/core-message-table.ts` marks and the refusal words of
- * `src/lib/refusal-words.ts`.
- */
+/** The codes and templates of `src/lib/core-message-table.json`, the warning sentences that `src/lib/core-message-table.ts` marks and the refusal words of `src/lib/refusal-words.ts`. */
 export function tableMessages(root: string): string[] {
   const { codes, templates } = JSON.parse(
     readFileSync(path.join(root, 'src/lib/core-message-table.json'), 'utf8'),
@@ -141,13 +119,7 @@ export function requiredMessages(root: string): string[] {
   return [...tableMessages(root), ...extract(readFileSync(path.join(root, safety), 'utf8'), safety)]
 }
 
-/**
- * What is wrong with `catalogue` of `language` against the English `source`: a text without a
- * translation that `allowed` does not list (a `required` one always), a listed text that has one
- * or that `base` (the base commit's list) lacks, a `required` text left English, a key no message
- * matches, an empty text, placeholders other than its key's, and a plural that is no object of
- * the language's categories.
- */
+/** Against the English `source`: a text without a translation that `allowed` does not list (a `required` one always), a listed text that has one or that `base` (the base commit's list) lacks, a `required` text left English, a key no message matches, an empty text, placeholders other than its key's, and a plural that is no object of the language's categories. */
 export function problems(
   source: readonly string[],
   catalogue: Record<string, unknown>,
@@ -301,11 +273,7 @@ function termWords(english: string) {
 const textOf = (entry: unknown) =>
   typeof entry === 'string' ? entry : Object.values(entry as Record<string, string>).join(' ')
 
-/**
- * Where `catalogue` writes a term other than the table: a verified word or a decided phrase whose
- * English occurs in a key without its German, or a rejected candidate of a decided term. `senses`
- * lists the keys where the English word has another sense; each must be a text of `source`.
- */
+/** A verified word or a decided phrase whose English occurs in a key without its German, or a rejected candidate of a decided term; `senses` lists the keys where the English word has another sense, each must be a text of `source`. */
 export function termUseProblems(
   catalogue: Record<string, unknown>,
   table: TermTable,
@@ -355,10 +323,7 @@ export function termUseProblems(
   return found
 }
 
-/**
- * Only the `approved` texts (the Safety notice and the disclaimers) use a word that starts with "safe" (safe, safety, safely), and
- * each German text says "sicher" as often as its English says one of them.
- */
+/** Only the `approved` texts (the Safety notice and the disclaimers) use a word that starts with "safe" (safe, safety, safely), and each German text says "sicher" as often as its English says one of them. */
 export function safeWordingProblems(
   source: readonly string[],
   catalogue: Record<string, unknown>,

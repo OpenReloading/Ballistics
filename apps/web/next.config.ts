@@ -5,10 +5,7 @@ import packageJson from './package.json' with { type: 'json' }
 import { shortCommit } from './scripts/git-head.ts'
 import { type Build, buildLine, buildTag } from './src/lib/build-line.ts'
 
-/**
- * The static export, served under this path (`''` at a domain root, `/Ballistics` on a project
- * site). Its data files and compute run in the browser.
- */
+/** `''` at a domain root, `/Ballistics` on a project site; its data files and compute run in the browser. */
 const basePath = process.env.PAGES_BASE_PATH ?? ''
 
 const edition = process.env.PAGES_EDITION === 'next' ? 'next' : ''
@@ -41,8 +38,7 @@ const nextConfig: NextConfig = {
   experimental: {
     // `'use cache'` of `src/lib/api.ts` without Cache Components
     useCache: true,
-    // static generation workers, 8 at most. Full build, 15 workers: 149 to 192 s, peak 11.5 to 14.5 cores, 6.3 GB;
-    // 8 workers: 186 to 190 s, peak 10.5 cores, 4.3 GB (shared host, load varied). BUILD_WORKERS=<n> for another number
+    // static generation workers, 8 at most: a full build took 149 to 192 s with 15 workers (peak 11.5 to 14.5 cores, 6.3 GB) and 186 to 190 s with 8 (peak 10.5 cores, 4.3 GB; shared host, load varied); BUILD_WORKERS=<n> for another number
     cpus: Math.min(os.availableParallelism() - 1, Number(process.env.BUILD_WORKERS) || 8),
   },
 }

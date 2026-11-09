@@ -1,11 +1,4 @@
-/**
- * The npm tarball of each published library, as `pnpm pack --dry-run` lists it after the build: fails
- * when the README or an entry point of `exports`, `main` or `types` is missing (a `*` pattern: no
- * packed file matches it), or when the list holds a test file, a source map without its sources, a
- * file outside the `files` field, or a bare import in a packed `.js` or `.d.ts` file of a package
- * that is not in `dependencies` or `peerDependencies`. Fails too on a dependency on a private
- * workspace package, which npm never gets, so the published tarball would not install.
- */
+/** The npm tarball of each published library, as `pnpm pack --dry-run` lists it after the build: fails on a missing README or entry of `exports`, `main` or `types` (a `*` pattern matching no file), a test file, a source map without its sources, a file outside `files`, a bare import in a packed `.js` or `.d.ts` not in `dependencies` or `peerDependencies`, or a dependency on a private workspace package, which npm never gets. */
 import { execFileSync } from 'node:child_process'
 import { globSync, readFileSync } from 'node:fs'
 import { isBuiltin } from 'node:module'
@@ -122,10 +115,7 @@ const privateDependencyProblems = (manifest: Manifest, privates: Set<string>) =>
     .filter((name) => privates.has(name))
     .map((name) => `depends on ${name}, a private workspace package that npm does not have`)
 
-/**
- * What is wrong with the tarball of the package in `dir`, one line each. `privates` are the
- * names of the unpublished workspace packages, which no published package may depend on.
- */
+/** One line each; `privates` are the names of the unpublished workspace packages, which no published package may depend on. */
 export function packProblems(dir: string, privates = new Set<string>()): string[] {
   const manifest = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8')) as Manifest
   const pack = packOf(dir)

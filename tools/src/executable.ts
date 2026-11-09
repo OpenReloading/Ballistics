@@ -1,10 +1,7 @@
 import { existsSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 
-/**
- * The absolute path of a program, looked up in the directory of the running Node (where npm and pnpm
- * lives) and the system directories, never through `PATH`.
- */
+/** Looked up in the directory of the running Node (where npm and pnpm live) and the system directories, never through `PATH`. */
 export function executable(name: string): string {
   const found = [dirname(process.execPath), '/usr/local/bin', '/usr/bin', '/bin']
     .map((dir) => join(dir, name))

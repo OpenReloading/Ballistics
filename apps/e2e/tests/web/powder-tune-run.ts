@@ -12,10 +12,7 @@ const ladder = [
   ),
 ].join('\n')
 
-/**
- * Saves the example load with a ladder of strings and opens the tuning route from its Measurements
- * tab, once the fit is shown; the fit may take up to 60 s after the run, the save and the navigation.
- */
+/** Saves the example load with a ladder of strings and opens the tuning route from its Measurements tab once the fit is shown, which may take up to 60 s after the run, the save and the navigation. */
 export async function openFit(page: Page) {
   // a native picker cannot be driven: the file goes to the origin private file system
   await page.addInitScript(() => {

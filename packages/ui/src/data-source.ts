@@ -59,10 +59,7 @@ function matching<Row>(rows: readonly Row[], columns: ArrayColumns<Row>, query: 
   return keyed.map(({ row }) => row)
 }
 
-/**
- * A data source over rows in memory, for small tables and as the reference of the contract. The rows that pass the
- * filters, sorted, are kept for the next query with the same filter and sort arrays, which a scrolling table asks.
- */
+/** For small tables and as the reference of the contract; the rows that pass the filters, sorted, are kept for the next query with the same filter and sort arrays, which a scrolling table asks. */
 export function arraySource<Row>(
   rows: readonly Row[],
   columns: ArrayColumns<Row>,

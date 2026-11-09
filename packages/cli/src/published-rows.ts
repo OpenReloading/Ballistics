@@ -23,17 +23,7 @@ const id = (ref: string) => parseRef(ref)?.id ?? ref
 export const standInId = (cartridge: string, mass: number) =>
   `stand-in-${cartridge}-${Math.round(mass * 1000)}mg`
 
-/**
- * One row per printed charge with a velocity value, of the maker tables only: a table customers
- * sent (`producedBy: customer`) is never read. A load without a powder record and a file whose
- * cartridge is not in `cartridges` (where given) give no row. The row takes:
- * - `charge`, `velocity` (as printed, at the printed point) and `coal` from their `value`;
- * - `pressure` only with a value in bar, so a crusher figure gives a row with its velocity only,
- *   and `pressureBasis` from the pressure's `method`, `unstated` without one;
- * - `muzzleDistance` (m) from `velocity.point.distance`; a velocity without a distance is a muzzle value;
- * - `barrel` from `barrel.length`, `bullet` from `bullet.record`, else the stand-in of
- *   {@link standInId} with the printed mass as `bulletMass`, and `table`, the file id; `line` is the position of the charge in its file.
- */
+/** Maker tables only, never one customers sent (`producedBy: customer`), and no row for a load without a powder record or a cartridge outside `cartridges`: `charge`, `velocity` (as printed, at the printed point) and `coal` from their `value`, `pressure` only with a value in bar (a crusher figure keeps its velocity only) and `pressureBasis` from its `method` (`unstated` without), `muzzleDistance` (m) from `velocity.point.distance`, `barrel` and `bullet` (else {@link standInId} with the printed mass as `bulletMass`), `table` the file id, `line` the charge's position in its file. */
 export function rowsFromPublished(
   files: readonly PublishedLoads[],
   cartridges?: ReadonlySet<string>,
@@ -114,11 +104,7 @@ type Vector = [number, number, number]
 const det = ([a0, a1, a2]: Vector, [b0, b1, b2]: Vector, [c0, c1, c2]: Vector) =>
   a0 * (b1 * c2 - b2 * c1) - b0 * (a1 * c2 - a2 * c1) + c0 * (a1 * b2 - a2 * b1)
 
-/**
- * The bullet length (mm) the bullet records give for a mass (g) and diameter (mm): the log-linear
- * least-squares fit ln L = a + b ln m + c ln d over every bullet record with a length, solved from
- * the normal equations; undefined with fewer than 3 such records or a singular system.
- */
+/** The bullet length (mm) for a mass (g) and diameter (mm): the log-linear least-squares fit ln L = a + b ln m + c ln d over every bullet record with a length, from the normal equations; undefined with fewer than 3 such records or a singular system. */
 export function lengthModel(bullets: Iterable<Bullet>) {
   const points = [...bullets].flatMap((b) =>
     b.length && b.diameter
@@ -149,15 +135,7 @@ export function lengthModel(bullets: Iterable<Bullet>) {
     Math.exp(a + b * Math.log(mass) + c * Math.log(diameter))
 }
 
-/**
- * The inputs published rows do not carry, as `apps/docs/docs/models/validation.md` takes them:
- * - a stand-in bullet record per cartridge and printed mass (the id of {@link standInId}): the
- *   cartridge's G1 (the smallest cartridge-side value) as diameter, the printed mass, and the length of {@link lengthModel}; no
- *   construction, no drag, so a stand-in row printed at a distance is not corrected;
- * - a row without a barrel length takes the median printed barrel of its cartridge, else 610 mm for
- *   a case (L3) longer than 33 mm and 120 mm for a shorter one.
- * Returns the rows and adds the stand-ins to `records.bullets`.
- */
+/** As `apps/docs/docs/models/validation.md` takes them: a stand-in bullet per cartridge and printed mass ({@link standInId}: the cartridge's smallest G1, the printed mass and the length of {@link lengthModel}; no construction or drag, so a stand-in row printed at a distance stays uncorrected), and a row without a barrel length the median printed barrel of its cartridge, else 610 mm for a case (L3) longer than 33 mm and 120 mm for a shorter one; adds the stand-ins to `records.bullets`. */
 export function fillInputs(rows: readonly Row[], records: Records): Row[] {
   const length = lengthModel(records.bullets.values())
   for (const row of rows) {

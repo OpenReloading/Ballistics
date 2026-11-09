@@ -18,11 +18,7 @@ interface Pagefind {
   configureInstance(name: string, options: object): void
 }
 
-/**
- * The navbar search over the index of the built site (scripts/search.mts), Pagefind's elements
- * loaded by the config's `scripts`. The elements rewrite their own children, so they are set
- * after hydration, outside React. The index exists after `docusaurus build` only.
- */
+/** Pagefind's elements (loaded by the config's `scripts`) rewrite their own children, so they are set after hydration, outside React; the index exists after `docusaurus build` only. */
 export default function SearchBar(): ReactNode {
   const box = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -33,8 +29,7 @@ export default function SearchBar(): ReactNode {
     const base = script?.src.replace(/pagefind\/[^/]+$/, '')
     const pagefind = (window as { PagefindComponents?: Pagefind }).PagefindComponents
     if (base && pagefind && !pagefind.getInstanceManager().hasInstance('default'))
-      // with the word weights of scripts/search.mts: a docs page first for a topic, the library
-      // page of a function name next to its model page
+      // with the word weights of scripts/search.mts: a docs page first for a topic, the library page of a function name next to its model page
       pagefind.configureInstance('default', {
         bundlePath: `${base}pagefind/`,
         mergeIndex: [{ bundlePath: `${base}pagefind-library/`, indexWeight: 0.1 }],

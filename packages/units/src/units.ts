@@ -63,10 +63,7 @@ export const units: Readonly<StoredUnits> = {
 /** Name of a quantity: a key of {@link units}. */
 export type QuantityKind = keyof StoredUnits
 
-/**
- * A unit of {@link conversions}: every stored unit, plus the customary units that published fits,
- * imported files and the display units are written in.
- */
+/** Every stored unit, plus the customary units that published fits, imported files and the display units are written in. */
 export type UnitId =
   | StoredUnits[QuantityKind]
   | 'in'
@@ -97,11 +94,7 @@ const foot = 0.3048
 /** Standard gravity, m/s2 (exact), which defines the pound-force. */
 const gravity = 9.80665
 
-/**
- * The map to SI of each unit. Percent is a fraction in SI, the ballistic coefficient kg/m2 and
- * temperature K. Customary factors are the exact definitions (NIST SP 811, appendix B), except the
- * conventional inch of mercury.
- */
+/** Percent is a fraction in SI, the ballistic coefficient kg/m2 and temperature K; customary factors are the exact definitions (NIST SP 811, appendix B), except the conventional inch of mercury. */
 export const conversions: Readonly<Record<UnitId, SiMap>> = {
   mm: scale(1e-3),
   mm2: scale(1e-6),
@@ -136,11 +129,7 @@ export const conversions: Readonly<Record<UnitId, SiMap>> = {
   MOA: scale(Math.PI / 10800),
 }
 
-/**
- * Water at 20 °C, g/cm³ (998.2067 kg/m³ from the table of Tanaka et al., Metrologia 38 (2001)
- * 301, https://doi.org/10.1088/0026-1394/38/4/3; the table value is unverified, not re-read from
- * the paper); turns a case water capacity in g or gr into a volume.
- */
+/** Water at 20 °C, g/cm³ (998.2067 kg/m³ from the table of Tanaka et al., Metrologia 38 (2001) 301, https://doi.org/10.1088/0026-1394/38/4/3; the table value is unverified, not re-read from the paper): turns a case water capacity in g or gr into a volume. */
 export const waterDensityGramsPerCm3 = 0.9982
 
 /** The map to SI of each quantity's stored unit: the conversion of `units[kind]`. */
@@ -177,10 +166,7 @@ export type Si<K extends QuantityKind> = number & { readonly siUnitOf: K }
 
 // toSi and fromSi read `conversions`, not `siMaps`, so a bundle that never imports `siMaps` drops it
 
-/**
- * A value of quantity `kind` in its stored unit, in SI. A value already in SI, or stored for another
- * kind, is refused.
- */
+/** A value of quantity `kind` in its stored unit, in SI; a value already in SI, or stored for another kind, is refused. */
 export const toSi = <K extends QuantityKind>(
   kind: K,
   stored: number & { readonly siUnitOf?: never; readonly storedUnitOf?: NoInfer<K> },
@@ -190,10 +176,7 @@ export const toSi = <K extends QuantityKind>(
   return (stored * factor + offset) as Si<K>
 }
 
-/**
- * A value of quantity `kind` in SI, in its stored unit: the inverse of {@link toSi}. A value already
- * in its stored unit, or in SI for another kind, is refused.
- */
+/** From SI to its stored unit, the inverse of {@link toSi}; a value already in its stored unit, or in SI for another kind, is refused. */
 export const fromSi = <K extends QuantityKind>(
   kind: K,
   si: number & { readonly storedUnitOf?: never; readonly siUnitOf?: NoInfer<K> },

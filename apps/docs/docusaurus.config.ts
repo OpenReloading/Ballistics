@@ -46,8 +46,7 @@ const config = async (): Promise<Config> => ({
       },
     ],
     ['@docusaurus/plugin-sitemap', {} satisfies SitemapOptions],
-    // the search index of the built site, docs and both reference sites (scripts/search.mts), in
-    // its own process: the config loader cannot require the ESM-only pagefind package
+    // the search index of the built site, docs and both reference sites (scripts/search.mts), in its own process, as the config loader cannot require the ESM-only pagefind package
     ({ siteDir }) => ({
       name: 'search-index',
       postBuild: ({ outDir }) => {
@@ -65,8 +64,7 @@ const config = async (): Promise<Config> => ({
         { type: 'docSidebar', sidebarId: 'models', label: 'Models', position: 'left' },
         { type: 'docSidebar', sidebarId: 'data', label: 'Data', position: 'left' },
         { type: 'docSidebar', sidebarId: 'contributing', label: 'Contributing', position: 'left' },
-        // static sites outside the docs routes: TypeDoc (static/library/, typedoc.config.mjs) and the
-        // REST page (static/rest/, scripts/openapi.mts)
+        // static sites outside the docs routes: TypeDoc (static/library/, typedoc.config.mjs) and the REST page (static/rest/, scripts/openapi.mts)
         { to: 'pathname:///library/', label: 'Library', position: 'left', target: '_self' },
         { to: 'pathname:///rest/', label: 'REST API', position: 'left', target: '_self' },
         ...(appUrl

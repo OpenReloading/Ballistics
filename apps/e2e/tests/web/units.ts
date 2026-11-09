@@ -2,10 +2,7 @@ import { expect, type Page } from '@playwright/test'
 
 const defaultOverrides: Record<string, string> = { lineOfSightOffset: 'cm' }
 
-/**
- * Stores a unit choice before every page load unless one is stored, so the specs do not depend on
- * the browser locale. Metric (SI) with drop in cm shows the units of the old metric switch.
- */
+/** Before every page load unless one is stored, so the specs do not depend on the browser locale; Metric (SI) with drop in cm shows the units of the old metric switch. */
 export const storeUnits = (page: Page, preset = 'metric-grams', overrides = defaultOverrides) =>
   page.addInitScript(
     ([p, o]) => {
@@ -40,10 +37,7 @@ async function openSettings(page: Page) {
   return settings
 }
 
-/**
- * Chooses a preset in the settings dialog of a second tab and closes it. The preset is a segmented
- * control: its radio inputs are hidden behind their labels.
- */
+/** In the settings dialog of a second tab, then closed; the preset is a segmented control whose radio inputs are hidden behind their labels. */
 export async function choosePreset(page: Page, name: string) {
   const settings = await openSettings(page)
   await settings
