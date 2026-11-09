@@ -111,7 +111,7 @@ export function capacityRecord(cartridge: string, m3: number, now: Date): UserRe
   return {
     kind: 'caseCapacity',
     id: measuredCapacityId(cartridge, m3),
-    name: `Measured case capacity ${value} g water`,
+    name: `${value} g`,
     saved: now.toISOString(),
     data: { origin: 'user', cartridge, waterCapacity: { value } },
   }
