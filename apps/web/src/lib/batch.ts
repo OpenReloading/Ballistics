@@ -1,9 +1,4 @@
-/**
- * Runs `task` over `items` with at most `limit` in flight, in item order of start. Nothing new
- * starts once `signal` aborts; a task in flight settles itself (its request carries the signal).
- * `onDone` is called after each task with its index, its result and how many are done. A task that
- * throws ends its worker only: the others finish, then the first error is thrown.
- */
+/** A throwing task ends its worker only: the others finish, then the first error is thrown; on abort nothing new starts, and a task in flight must carry `signal` itself. */
 export async function runBatch<T, R>(
   items: readonly T[],
   limit: number,

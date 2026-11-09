@@ -1,8 +1,4 @@
-/**
- * Web Worker of the bullet photo tool: keeps the working image the tool posts (nothing
- * leaves the browser), cuts the bullet out of it and outlines and measures a cut-out
- * (`apps/docs/docs/models/bullet-photo.md`), so the page stays responsive on a large photograph.
- */
+/** Keeps the posted image (nothing leaves the browser) so the page stays responsive on a large photograph (`apps/docs/docs/models/bullet-photo.md`). */
 import { msg } from '../i18n/translate.ts'
 import { segmentPhoto } from './bullet-photo-colour.ts'
 import { measureOutline } from './bullet-photo-measure.ts'

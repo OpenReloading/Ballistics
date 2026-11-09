@@ -1,8 +1,4 @@
-/**
- * Caliber candidates of the photo flow (`apps/docs/docs/models/hole-detection.md`, "Caliber
- * candidates"): the caliber classes of the group's discipline, ordered by the hole size and the
- * user's own firearms and loads, read through the API and the browser store.
- */
+/** The photo flow's caliber candidates (`apps/docs/docs/models/hole-detection.md`, "Caliber candidates"). */
 import {
   type CaliberClass,
   type Discipline,
@@ -28,14 +24,7 @@ const HOLE_SIZE_RESOLUTION = toSi('length', 0.5)
 /** A hole fits a class within this share of its diameter: the detector's band (`SIZE_MIN`, `SIZE_MAX`). */
 const HOLE_BAND = [0.7, 1.4] as const
 
-/**
- * `classes` as candidates for the hole size `hole`. A nominal size (bullet, marker): the classes
- * sharing the nearest class's hole size first, then by distance to it; the nearest is preselected
- * when no other shares its hole size. A typed, learned or measured size (a hole in paper shows
- * smaller than its bullet): the classes it fits within `HOLE_BAND` first, then by its ratio to
- * their diameter, none preselected. The user's classes (a member in `mine`, cartridge record ids)
- * come first among equals.
- */
+/** A hole in paper shows smaller than its bullet, so a measured size matches within `HOLE_BAND` and preselects nothing; the user's classes first among equals. */
 export function caliberCandidates(
   classes: readonly CandidateClass[],
   hole: { diameter: number; source: string } | undefined,
@@ -69,10 +58,7 @@ export function caliberCandidates(
   return { candidates, preselected }
 }
 
-/**
- * The caliber classes of the discipline that the group's face event scores, else of every
- * discipline mapped to its face (the face list's `caliberClasses`).
- */
+/** The face event's discipline, else every discipline mapped to the face. */
 export async function caliberClassesOf(face: Pick<GroupFace, 'id' | 'event'>) {
   const { mappings } = await fetchFederationData()
   const discipline = mappingOf(mappings, face)?.discipline

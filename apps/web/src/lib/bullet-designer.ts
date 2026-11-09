@@ -50,10 +50,7 @@ export type Group = keyof typeof groups
 export interface DesignerSpec extends FieldSpec {
   label: Message
   group: Group
-  /**
-   * SI range of a plausible bullet value: outside it the field asks to check the unit, a soft
-   * flag that blocks nothing (the ranges of issue #788).
-   */
+  /** SI range; outside it the field asks to check the unit, a soft flag that blocks nothing (the ranges of issue #788). */
   plausible?: [number, number]
 }
 
@@ -242,11 +239,7 @@ function fromOrigin(origin: Origin, system: UnitSystem): Design {
   }
 }
 
-/**
- * The design of a saved user bullet: the resolved record's values, measured against its base (the
- * origin) so each field says whether it follows the catalogue or is changed. A base that is not
- * there gives a read only design that Save leaves as stored.
- */
+/** Measured against its base, so each field says whether it follows the catalogue; a missing base gives a read-only design. */
 export function fromUser(
   data: UserBullet,
   { base, record, problem, changed }: ResolvedBullet,
@@ -299,12 +292,7 @@ function choiceOverrides(
   }
 }
 
-/**
- * The user bullet a design saves: its manufacturer, the base and the overrides, which are the
- * fields that differ from the base (a field cleared against a base value is `null`). Without a base
- * every given field is an override. The overrides it was opened with stay for every field the
- * designer has no input for. A read only design gives its stored data back.
- */
+/** The overrides are the fields that differ from the base (`null` for one cleared); fields without an input keep their opened overrides. */
 export function fileData({
   manufacturer,
   name,
@@ -330,10 +318,7 @@ export function fileData({
   }
 }
 
-/**
- * A user bullet's resolved record as the shape the seating preview seats (mm), as the designer
- * draws it; undefined without a length or drawing.
- */
+/** As the designer draws it, mm; undefined without a length or drawing. */
 export function designShape(
   { base, record, problem }: ResolvedBullet,
   system: UnitSystem,
@@ -398,10 +383,7 @@ export function reduce(h: History, a: Action): History {
   }
 }
 
-/**
- * Where a field's value comes from: the catalogue record, entered (`changed` when the record has
- * another value or none), or, for an empty field, derived or assumed by the drawing.
- */
+/** `changed`: entered where the record has another value or none. */
 export type FieldState =
   | { kind: 'record' }
   | { kind: 'entered'; changed: boolean; record?: number | undefined }
@@ -486,10 +468,7 @@ function validateInputs(
     }
 }
 
-/**
- * The length (assumed as `assumedLengthDiameters` diameters without one) and the nose length (from
- * the ogive radius when not given), stored units.
- */
+/** The length assumed as `assumedLengthDiameters` diameters when missing, the nose length from the ogive radius. */
 function completeShape(v: StoredValues, choices: Choices) {
   const d = v.diameter as number
   const form = choices['ogive.form']
@@ -578,10 +557,7 @@ function shapeFromValues(
   }
 }
 
-/**
- * Values the drawing derived or assumed for each field, stored units, with the basis of an
- * assumption where one is stated.
- */
+/** Stored units, with the basis of an assumption where one is stated. */
 function derivedFills(
   o: BulletProfile['outline'],
   v: StoredValues,
@@ -661,11 +637,7 @@ function ogiveFills(
   fill['ogive.radiusRatio'] = [q, assumed]
 }
 
-/**
- * The drawing, the field states and the computed values of a design. `last` is the field edited
- * last: a refusal naming it shows there, in the language of `t`. Invalid field text and refused
- * dimensions give no drawing, so the page keeps its last one.
- */
+/** A refusal naming `last` shows at that field; invalid text gives no drawing, so the page keeps its last one. */
 export function evaluate(
   design: Design,
   system: UnitSystem,

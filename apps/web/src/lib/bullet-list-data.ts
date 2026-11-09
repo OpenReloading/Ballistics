@@ -1,8 +1,4 @@
-/**
- * The bullet list page's own data: the packed page props, the Diameter, SD, G1, G7 and Type cells,
- * the construction names and the choice filters. Apart from `bullet-rows.ts`, which the site search
- * of every page loads.
- */
+/** The bullet list page's own data, apart from `bullet-rows.ts`, which the site search of every page loads. */
 import { toSi } from '@open-reloading/schema'
 import { formatNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
@@ -66,10 +62,7 @@ export function bulletTypeText(t: Translator['t'], b: Pick<BulletRow, 'tipType' 
 /** URL keys of the bullet list's choice filters. */
 export const bulletFacetKeys = ['construction', 'tip', 'base', 'leadfree']
 
-/**
- * The bullet list's choice filters: construction, tip, base and lead-free, each over the values
- * the rows have. A filter whose rows give it one value only is left out (`facetOptions`).
- */
+/** A filter whose rows give it one value only is left out (`facetOptions`). */
 export function bulletFacets(t: Translator['t']): Facet<BulletRow>[] {
   return [
     {

@@ -1,8 +1,4 @@
-/**
- * Burn-rate charts from fitted M3 parameters (`apps/docs/docs/models/interior-burn-forms.md`,
- * "Dynamic vivacity"): dynamic vivacity in 1/(MPa s), interval plus and minus `uncertaintyFactor`
- * standard uncertainties of the fitted vivacity.
- */
+/** Dynamic vivacity in 1/(MPa s) from fitted M3 parameters (`apps/docs/docs/models/interior-burn-forms.md`, "Dynamic vivacity"), interval ± `uncertaintyFactor` standard uncertainties. */
 
 import { dynamicVivacity, meanDynamicVivacity, type VivacityBurn } from '@open-reloading/ballistics'
 import { type Powder, toSi } from '@open-reloading/schema'
@@ -153,10 +149,7 @@ export function classifyPowder(
 
 export const isFitted = (p: FittedPowder | UnfittedPowder): p is FittedPowder => 'burn' in p
 
-/**
- * The burn law of typed model parameters (SI field values), as the workbench sends them: no
- * interval, no record. Undefined while a value the curve needs is missing.
- */
+/** SI field values as the workbench sends them: no interval, no record; undefined while a value is missing. */
 export function typedBurn(
   v: Partial<Record<string, number>>,
   t: Translator['t'] = english,
@@ -329,10 +322,7 @@ export function orderPowders(
   return rows
 }
 
-/**
- * The order of powder `id` among the placed rows (1 the fastest) with up to `n` faster and `n`
- * slower powders, nearest first; undefined for a powder without an order.
- */
+/** 1 is the fastest; nearest first, undefined for a powder without an order. */
 export function neighbours(rows: readonly PowderRow[], id: string, n = 5) {
   const placed = rows
     .filter((r) => r.burnRateOrder !== undefined)

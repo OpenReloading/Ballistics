@@ -1,9 +1,4 @@
-/**
- * The bullet in a photograph (`apps/docs/docs/models/bullet-photo.md`): the bullet cut out of the
- * background, and the scale of the photograph from spans of a ruler. Lengths are in photo px, y
- * down, a pixel (i, j) covering [i, i + 1) x [j, j + 1). Pure: no React, DOM or Next.js, so it can
- * run in a Web Worker.
- */
+/** Cut-out and ruler scale of a bullet photograph (`apps/docs/docs/models/bullet-photo.md`); photo px, y down, pixel (i, j) covering [i, i + 1) x [j, j + 1); pure, so it runs in a worker. */
 import { msg } from '../i18n/translate.ts'
 import type { RgbaImage } from './image.ts'
 import { nth } from './nth.ts'
@@ -57,10 +52,7 @@ export const lowContrast = 60
 
 const rowOf = (a: number[][], i: number) => a[i] as number[]
 
-/**
- * Solves the `n` x `n` system `m x = b` (row-major `m`) by Gauss elimination with pivoting;
- * undefined for a singular system.
- */
+/** Solves the `n` x `n` system `m x = b`, `m` row-major, by Gauss elimination with pivoting; undefined for a singular system. */
 export function solve(m: readonly number[], b: readonly number[], n: number): number[] | undefined {
   const a = Array.from({ length: n }, (_, i) => [...m.slice(i * n, i * n + n), at(b, i)])
   for (let c = 0; c < n; c++) {
@@ -255,11 +247,7 @@ function boxOf(pixels: number[], w: number, h: number): Box & { edge: boolean } 
   return { ...box, edge: box.x0 === 0 || box.y0 === 0 || box.x1 === w - 1 || box.y1 === h - 1 }
 }
 
-/**
- * Clears the bars along the photograph's edges that are mostly mask (a letterbox or a ruler strip
- * that Otsu's threshold puts on the bullet's side): from each edge inward while at least 90 % of a
- * row or column is mask, at most a quarter of the photograph.
- */
+/** A letterbox or ruler strip that Otsu puts on the bullet's side: rows or columns at least 90 % mask, at most a quarter in. */
 function clearBars(inside: Uint8Array, w: number, h: number): void {
   const line = (k: number, vertical: boolean) => {
     let n = 0
@@ -281,12 +269,7 @@ function clearBars(inside: Uint8Array, w: number, h: number): void {
     }
 }
 
-/**
- * The mean grey of the pixels flagged in `rim` within `radius` of each pixel of the box (the radius
- * doubled up to eight times where fewer than 9 are in reach, `fallback` beyond). The rim is the
- * bullet's own colour at its edge, so the coverage of a pale part (a bright copper tip) is told
- * from the background by that part's grey and not by the shank's.
- */
+/** The rim's own grey near each pixel, so a pale tip is told from the background by its grey, not the shank's. */
 function localLevels(
   flat: Float32Array,
   w: number,
@@ -329,13 +312,7 @@ function localLevels(
 export const morphN = (mask: Uint8Array, w: number, box: Box, erode: boolean, n: number) =>
   Array.from({ length: n }).reduce<Uint8Array>((m) => morph3(m, w, box, erode), mask)
 
-/**
- * The width the grey takes to go from the background to the bullet at the edge of `mask`, px: the
- * contrast over the steepest slope, its upper quartile along the boundary (a shadow lies along one
- * side only). A step blurred by a Gaussian of standard deviation s has its 10 to 90 % rise over
- * about 2.5 s, which is that ratio; a sharp edge reads 1 to 2 px, a shadow or an out-of-focus edge
- * much more.
- */
+/** px: contrast over steepest slope, upper quartile (a shadow lies along one side); a Gaussian step of standard deviation s px rises 10 to 90 % over about 2.5 s. */
 function edgeSpreadOf(
   flat: Float32Array,
   mask: Uint8Array,
@@ -414,12 +391,7 @@ const padded = (p: Box, k: number, w: number, h: number): Box => ({
   y1: Math.min(h - 1, p.y1 + k),
 })
 
-/**
- * The two passes of the cut-out. The first keeps every pixel a quarter of the way to the bullet's
- * mean grey and takes the bars of the photograph's edges off; its part, and the grey of its rim,
- * give the bullet's own grey near each pixel (a pale tip is not the shank's grey). The second keeps
- * the pixels at half coverage of that grey.
- */
+/** The first pass gives the bullet's own grey near each pixel, so a pale tip is not judged by the shank's grey. */
 function coverOf(
   flat: Float32Array,
   [bg, fg]: [number, number],
@@ -458,14 +430,7 @@ function coverOf(
   )
 }
 
-/**
- * Cuts the bullet out of the photograph: the lighting plane is taken off, Otsu's threshold splits
- * the greys, the background is the side the photo's border lies on, and the bullet is the largest
- * connected part that does not touch the photo's edge and lies away from `exclude` (the points the
- * user clicked on the ruler, which is a part of its own), found at the bullet's own grey near each
- * pixel (`coverOf`). Holes (glare) are filled. A band of 2 px along the edge keeps the partial
- * coverage of the grey, so the edge has sub-pixel position.
- */
+/** Otsu on the plane-levelled greys, the largest part off the edge and away from `exclude` (the ruler); a 2 px band keeps sub-pixel edges. */
 export function segment(g: Gray, exclude: readonly Point[] = []): Segmentation {
   const { width: w, height: h } = g
   const none = (warning: Wording): Segmentation => ({
@@ -552,11 +517,7 @@ export interface Scale {
 /** Standard uncertainty of one placed point, px (the user's aim and the ruler's own tick width). */
 export const pointUncertainty = 1
 
-/**
- * The scale from one or two spans on the ruler. Each span's two points carry `pointUncertainty`;
- * with two spans the mean is taken and half of the disagreement between them, as a rectangular
- * distribution (divided by the root of 3), joins the placement terms in quadrature.
- */
+/** Two spans: the mean, with half their disagreement as a rectangular term (divided by root 3) in quadrature. */
 export function scaleOf(spans: readonly ScaleSpan[]): Scale | undefined {
   const each = spans.map((s) => {
     const px = Math.hypot(s.b.x - s.a.x, s.b.y - s.a.y)

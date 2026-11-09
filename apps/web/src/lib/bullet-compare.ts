@@ -79,10 +79,7 @@ function mergeRows(
   }
 }
 
-/**
- * The rows compared first, in this order, from the group they are taken out of: each by the start
- * of its key (a coefficient's key goes on with its band), the label it takes in the Key group.
- */
+/** Each by the start of its key (a coefficient's key goes on with its band), with its label in the Key group. */
 const keyRows: { group: Wording; key: string }[] = [
   { group: msg('Size'), key: 'Mass#' },
   { group: msg('Size'), key: 'Diameter#' },
@@ -114,10 +111,7 @@ function takeCoefficients(groups: Map<string, Map<string, CompareRow>>, ids: str
   })
 }
 
-/**
- * The Key group: mass, diameter and length taken out of Size, the coefficient rows `bc` (moved
- * whole, their band kept) and the sectional density out of Computed.
- */
+/** Mass, diameter and length out of Size, the `bc` rows moved whole with their band, sectional density out of Computed. */
 function keyGroup(
   groups: Map<string, Map<string, CompareRow>>,
   bc: string[],
@@ -129,10 +123,7 @@ function keyGroup(
   ])
 }
 
-/**
- * The merged row keys (`mergeRows`) of each bullet's first coefficient of each of `keyModels`,
- * G1 before G7, each once: a band of its own is a row of its own.
- */
+/** G1 before G7, each once: a band of its own is a row of its own. */
 function keyCoefficients(bullets: Bullet[], system: UnitSystem): string[] {
   return keyModels.flatMap((model) => [
     ...new Set(
@@ -146,12 +137,7 @@ function keyCoefficients(bullets: Bullet[], system: UnitSystem): string[] {
   ])
 }
 
-/**
- * The bullets' data tables merged: the Key group (mass, diameter, length, BC G1 and G7, sectional
- * density), then the rest of the groups of the bullet record's data table and the ballistic
- * coefficients, each row once in the order first met (a repeated label once per repeat), a value
- * per bullet where its record has the row.
- */
+/** The Key group first, then the record's groups, each row once in the order first met. */
 export function compareGroups(
   bullets: Bullet[],
   system: UnitSystem,
@@ -195,11 +181,7 @@ export const rowDiffers = (values: readonly (string | undefined)[]) => new Set(v
 /** The text before a twist's length per turn in the language of `t`. */
 export const turnPrefixOf = (t: Translator['t']) => t('1 turn in {length}', { length: '' })
 
-/**
- * The largest and smallest of a row's shown values, compared as shown (so two values that read
- * the same are equal), a twist by its length per turn after `turnPrefix`. A decimal comma reads
- * as a point. Nothing where fewer than two values show or all are the same.
- */
+/** Compared as shown, so two values that read the same are equal; a decimal comma reads as a point. */
 export function differenceMarks(
   shown: readonly (string | undefined)[],
   turnPrefix = turnPrefixOf(translator().t),
@@ -222,11 +204,7 @@ const shownNumber = (s: string, turnPrefix: string) => {
   return text === '' || /[.,].*[.,]/.test(text) ? Number.NaN : Number(text.replace(',', '.'))
 }
 
-/**
- * The difference of each value to the first bullet's, as shown: signed (minus U+2212, ±0 where
- * equal), in the decimals of the longer of the two, with the decimal mark the values use. None for
- * the first column, an absent or a non-numeric value.
- */
+/** Signed (minus U+2212, ±0 where equal), in the longer value's decimals and the values' decimal mark. */
 export function differenceToFirst(
   shown: readonly (string | undefined)[],
   turnPrefix = turnPrefixOf(translator().t),
@@ -247,18 +225,10 @@ export function differenceToFirst(
   return shown.map((s, i) => difference(s, i))
 }
 
-/**
- * Height in CSS px the tallest drawing gets at 1280 x 800: the window less `--drawing-chrome` of
- * `.compare-view` (30rem: the bar, the drawings panel's head and names, and the first rows of the
- * table below it).
- */
+/** 800 px less `--drawing-chrome` of `.compare-view` (30rem): the tallest drawing's height at 1280 x 800. */
 const compareDrawingPx = 800 - 30 * 16
 
-/**
- * One text size and one frame width for every drawing, so one scale on screen: the largest of
- * their own sizes, raised until the tallest frame fitted to `fitPx` still shows 11 px text (a long
- * bullet beside short ones would otherwise need more height than the window has).
- */
+/** One text size and frame width, so one scale on screen, raised until the tallest frame still shows 11 px text. */
 export function sharedScale(
   profiles: readonly BulletProfile[],
   fitPx = compareDrawingPx,

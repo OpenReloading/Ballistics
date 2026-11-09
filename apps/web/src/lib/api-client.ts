@@ -12,10 +12,7 @@ export const requestTimeout = 20_000
 
 const records = new Map<string, Powder>()
 
-/**
- * A powder record through `apiFetch`, kept for the session; undefined when not found
- * (404), a throw for any other refusal.
- */
+/** Kept for the session; undefined on 404, a throw for any other refusal. */
 export async function fetchPowder(id: string, signal?: AbortSignal): Promise<Powder | undefined> {
   const known = records.get(id)
   if (known) return known
@@ -53,10 +50,7 @@ const wait = (ms: number, signal: AbortSignal) =>
 /** The answer, the reason there is none (`refusal`: the body of a 422), or undefined after an abort. */
 type Posted<T> = { answer: T } | { reason: string; refusal?: ErrorBody | undefined } | undefined
 
-/**
- * One POST. A busy pool (503 `busy`) gives its `retry-after` (s, at least 1) while `retry` holds;
- * every other refusal, a deadline and a lost connection give the reason.
- */
+/** A busy pool (503 `busy`) gives its `retry-after` (s, at least 1) while `retry` holds; anything else gives the reason. */
 async function postOnce<T>(
   path: string,
   body: object,
@@ -104,11 +98,7 @@ async function retryWhenBusy<T>(
   }
 }
 
-/**
- * One POST: the answer, or the reason it gave none (`refusal`: the body of a 422). A busy pool (503
- * `busy`) is asked again after its `retry-after`, as the pool frees; every other refusal, a
- * deadline and a lost connection end the powder's row. Undefined when `signal` aborted.
- */
+/** A busy pool is asked again after its `retry-after`; any other refusal ends the powder's row. Undefined once `signal` aborted. */
 export function postJson<T>(path: string, body: object, signal: AbortSignal): Promise<Posted<T>> {
   return retryWhenBusy<T>((retry) => postOnce<T>(path, body, signal, retry), signal)
 }

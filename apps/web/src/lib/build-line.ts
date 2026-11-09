@@ -10,10 +10,7 @@ export interface Build {
   day: string
 }
 
-/**
- * The one line naming the running build, for a bug report: `web 0.0.4, abc1234, 2026-10-30`, in the
- * next edition `next abc1234, after web 0.0.4, 2026-10-30`. The same in every language, so a report reads alike.
- */
+/** The same in every language, so bug reports read alike. */
 export function buildLine({ edition, version, commit, day }: Build): string {
   const web = `web ${version}`
   const parts =
@@ -25,12 +22,7 @@ export function buildLine({ edition, version, commit, day }: Build): string {
   return [...parts, day].filter(Boolean).join(', ')
 }
 
-/**
- * The short build name on a printed report, so a filed sheet traces to the build that computed it:
- * `Ballistics 0.0.4`, in the next edition `Ballistics next abc1234`, in a local build
- * `Ballistics development abc1234`, the version where a build has no commit. The same in every language, like the
- * build line.
- */
+/** On a printed report, so a filed sheet traces to the build that computed it; the same in every language. */
 export function buildTag({ edition, version, commit }: Build): string {
   const parts = edition === 'release' ? [version] : [edition, commit || version]
   return ['Ballistics', ...parts].join(' ')

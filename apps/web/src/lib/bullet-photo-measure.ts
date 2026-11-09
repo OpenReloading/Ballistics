@@ -1,9 +1,4 @@
-/**
- * The dimensions of a bullet from its outline in a photograph, each with a standard uncertainty
- * (`apps/docs/docs/models/bullet-photo.md`): the shank from the widest parallel run, the boat tail
- * from a line, the nose from a circle (tangent or secant), the cannelure from a dip of the shank.
- * Pure: no React, DOM or Next.js, so it can run in a Web Worker.
- */
+/** Dimensions with standard uncertainties from a photographed outline (`apps/docs/docs/models/bullet-photo.md`); pure, so it runs in a worker. */
 import { fromSi } from '@open-reloading/schema'
 import { msg } from '../i18n/translate.ts'
 import { type Scale, solve } from './bullet-photo.ts'
@@ -114,11 +109,7 @@ interface Lsq {
   sigma: number
 }
 
-/**
- * Levenberg-Marquardt least squares of `n` residuals. `row(p, i)` gives the residual and its
- * gradient. The covariance is sigma^2 (J'J)^-1 with sigma the residual rms, not below the edge
- * uncertainty.
- */
+/** Levenberg-Marquardt; covariance sigma^2 (J'J)^-1 with sigma the residual rms, not below the edge uncertainty. */
 function lsq(
   p0: number[],
   n: number,
@@ -183,12 +174,7 @@ interface Pt {
   r: number
 }
 
-/**
- * The circle through the nose points by minimising the distance of each point to it (geometric
- * fit, Coope 1993; the algebraic fit of Kasa 1976 starts it). `tangent` keeps the circle tangent to
- * the shank of radius `a`: its centre then lies at `a - rho` from the axis. Parameters: `[rc, zc,
- * rho]`, or `[zc, rho]` when tangent.
- */
+/** Geometric fit (Coope 1993) started by the algebraic one (Kasa 1976); tangent keeps the centre at `a - rho` from the axis. */
 function circle(pts: Pt[], a: number, tangent: boolean): Lsq | undefined {
   const zm = pts.reduce((s, q) => s + q.z, 0) / pts.length
   const q = pts.map((p) => ({ z: p.z - zm, r: p.r }))
@@ -242,10 +228,7 @@ function noseOf(p: number[], tangent: boolean, zRough: number) {
   return { rc, zc, rho, zj, m, n, k, ratio: (n * n + k * k) / (2 * k * rho) }
 }
 
-/**
- * The secant circle when it fits the points better than the tangent one by more than the edge
- * noise explains (likelihood ratio above 9, three standard deviations); else the tangent circle.
- */
+/** Secant only when it beats tangent by more than edge noise explains (likelihood ratio above 9, three standard deviations). */
 function chooseNose(free: Lsq, tang: Lsq, count: number) {
   const sigma2 = Math.max(free.rss / Math.max(count - 3, 1), edgeUncertainty ** 2)
   return (tang.rss - free.rss) / sigma2 > 9
@@ -399,13 +382,7 @@ function cannelureOf(o: Outline, s: Shank, put: Put) {
   )
 }
 
-/**
- * The dimensions in the outline `o` at `scale`: the length from the two ends on the axis; the
- * diameter from the widest parallel run; the boat tail from a line through the cone; the nose from
- * a circle fitted to the edge past the shank, tangent or secant; the cannelure from a dip of the
- * shank. A value that cannot be told is left out and `notes` says why. Uncertainties combine the
- * edge uncertainty and the fit's covariance first-order, then the scale's relative uncertainty.
- */
+/** A value that cannot be told is left out with a note; uncertainties join edge and fit first-order, then the scale's. */
 export function measureOutline(o: Outline, scale: Scale): BulletMeasurement {
   const m: BulletMeasurement = { values: {}, baseType: 'flat', notes: [] }
   if (o.z.length < 20) {

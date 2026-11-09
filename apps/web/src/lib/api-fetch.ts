@@ -1,8 +1,4 @@
-/**
- * One API call of the browser, `path` the API path without its version prefix and with its query
- * (`cartridges/308-win`, `powders?limit=200`): answered from the static data files and the compute
- * worker (`static-api.ts`), with the API's statuses and bodies.
- */
+/** The browser's API: `path` without the version prefix, answered from the static data files and the compute worker (`static-api.ts`). */
 export async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
   const { staticFetch } = await import('./static-api.ts')
   const res = await staticFetch(path, init)
@@ -17,10 +13,7 @@ const isTyped = (body: unknown): body is { code: string; params: object } =>
   typeof (body as { params?: unknown }).params === 'object' &&
   (body as { params?: unknown }).params !== null
 
-/**
- * `res` with the English sentence of a typed refusal as its message, as the app holds every other
- * message; the words load only for such an answer.
- */
+/** A typed refusal gets its English sentence, as the app holds every other message; the words load only for such an answer. */
 async function worded(res: Response): Promise<Response> {
   const body: unknown = await res
     .clone()
@@ -34,10 +27,7 @@ async function worded(res: Response): Promise<Response> {
   return new Response(JSON.stringify({ ...body, message }), { status, statusText, headers })
 }
 
-/**
- * A record by id through `apiFetch` (`kind` as `bullets`): undefined when the API knows no such id
- * (404, or 400 for an id it cannot be), a throw for any other refusal.
- */
+/** Undefined when the API knows no such id (404, or 400 for an id it cannot be); a throw for any other refusal. */
 export async function fetchRecord<T>(
   kind: string,
   id: string,

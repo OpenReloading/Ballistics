@@ -52,11 +52,7 @@ const both: Side[] = ['cartridge', 'chamber']
 const cartridge: Side[] = ['cartridge']
 const chamber: Side[] = ['chamber']
 
-/**
- * The CIP symbols the outline reads (`cipProfile` of `@open-reloading/drawing/cartridge`), outside
- * table VII: meaning, sides, group and a typical largest value in mm or degrees, which sets the
- * length limit (2.5 times it, 50 mm for a diameter) and is not read for an angle.
- */
+/** The typical largest value sets the length limit (2.5 times it, 50 mm for a diameter); not read for an angle. */
 const symbols: [string, string, Side[], Group, number, 'length' | 'angle'][] = [
   ['R1', 'rim diameter at the head', both, 'head', 35, 'length'],
   ['R', 'rim thickness', both, 'head', 10, 'length'],
@@ -201,11 +197,7 @@ const originOf = (c: Pick<CartridgeDetail, 'id' | 'name' | 'table' | 'values'>):
   si: siOf(c.values),
 })
 
-/**
- * The design of a saved user cartridge: the resolved values, measured against its base (the
- * origin) so each field says whether it follows the record or is changed. A base that is not there
- * gives a read only design that Save leaves as stored.
- */
+/** Measured against its base, so each field says whether it follows the record; a missing base gives a read-only design. */
 export function fromUser(
   data: UserCartridge,
   { base, record, problem, changed }: ResolvedCartridge,
@@ -224,13 +216,7 @@ export function fromUser(
   }
 }
 
-/**
- * The user cartridge a design saves: its base and the overrides, the table where it differs and the
- * values that differ from the base (a value cleared against the base is one with `null`). Without
- * a base the table and every given value. What the design was opened with stays where the designer
- * has no field: the values of a variant or without a side, and every other override key. A read
- * only design gives its stored data back.
- */
+/** Overrides are what differs from the base (`null` for one cleared); what the designer has no field for keeps its opened value. */
 export function fileData(design: Design): UserCartridge {
   if (design.locked) return design.locked.data
   const { origin, basedOn, table } = design
@@ -279,11 +265,7 @@ export function newDesign(from?: Design): Design {
 const storedFieldValue = (s: CartridgeFieldSpec, si: number) =>
   Number(siToStored(s.quantity as 'length' | 'angle', si).toPrecision(12))
 
-/**
- * The values of a design: a value still equal to the record's is the record's own object (printed
- * text, tolerance, limit), a changed one carries the entered value only, a cleared one is left
- * out; values with a variant or without a field stay, values without a side (pressures) go.
- */
+/** An unchanged value stays the record's own object (printed text, tolerance, limit); values without a side (pressures) go. */
 function draftValues({ fields, origin }: Design): SpecValue[] {
   const out: SpecValue[] = []
   const seen = new Set<string>()
@@ -324,11 +306,7 @@ function keptValue(
   return close(si, was) ? v : enteredValue(s, si)
 }
 
-/**
- * The values a design overrides: a field entered where the base has another value or none, and a
- * field cleared against a base value as the entry with `null`. A value the design left out of its
- * fields (a variant, a pressure) is the base's and not listed.
- */
+/** A value outside the fields (a variant, a pressure) is the base's and not listed. */
 function valueOverrides({ fields, origin }: Design): NonNullable<CartridgeOverrides['values']> {
   const out: NonNullable<CartridgeOverrides['values']> = []
   for (const s of fieldSpecs) {
@@ -390,10 +368,7 @@ export function reduce(h: History, a: Action): History {
   }
 }
 
-/**
- * Where a field's value comes from: the record, entered (`changed` against the record, with its
- * value), cleared against the record, derived by the drawing, not printed in the record, or not given.
- */
+/** `changed`: entered against a record, whose value `record` carries. */
 export type FieldState =
   | { kind: 'record' }
   | { kind: 'entered'; changed: boolean; record?: number | undefined }
@@ -489,10 +464,7 @@ function refuseInvalid(
   if (bad) return { reason: bad[1] as string, field: bad[0] }
 }
 
-/**
- * The figures of `spec` and those with a drawn side, or the refusal when the page's screen layout
- * cannot lay them out or no side draws.
- */
+/** Or the refusal when the screen layout cannot lay them out or no side draws. */
 function refuseUnlayable(
   spec: DraftSpec,
   { fields }: Design,
@@ -586,11 +558,7 @@ function outlineNotes(shown: Figure[]): Evaluation['notes'] {
   return notes
 }
 
-/**
- * The drawing, field states, checks and derived values of a design. `last` is the field edited
- * last: a refusal naming it shows there. Invalid field text and designs no side draws give no
- * drawing, so the page keeps its last one. Its texts are in the language of `t`.
- */
+/** A refusal naming `last` shows at that field; a design no side draws gives no drawing, so the page keeps its last one. */
 export function evaluate(
   design: Design,
   system: UnitSystem,
@@ -678,10 +646,7 @@ function derivedAngles(figure: Figure, values: SpecValue[], t: Translator['t']):
   return out
 }
 
-/**
- * Case volume of the drawn cartridge, approximate: its outline less a wall from the head end to the
- * mouth, stored values (mm, degrees) in, SI out; none without a drawn cartridge.
- */
+/** Approximate: the outline less a wall from head to mouth; mm and degrees in, SI out. */
 function approximateCaseVolume(
   figure: Figure,
   values: SpecValue[],
@@ -723,10 +688,7 @@ function approximateCaseVolume(
   }
 }
 
-/**
- * Neck length, shoulder angle and body taper per drawn side, and the case volume of the drawn
- * cartridge, all from stored values in mm and degrees; SI out.
- */
+/** Stored values in mm and degrees, SI out. */
 function derive(figure: Figure, values: SpecValue[], t: Translator['t']): Derived[] {
   const volume = approximateCaseVolume(figure, values, t)
   return [...derivedAngles(figure, values, t), ...(volume ? [volume] : [])]
@@ -736,12 +698,7 @@ function derive(figure: Figure, values: SpecValue[], t: Translator['t']): Derive
 export const designFileName = (d: Pick<Design, 'name' | 'origin'>, fallback = 'Cartridge design') =>
   d.name?.trim() || d.origin?.title || fallback
 
-/**
- * What a saved cartridge design gives the workbench: the spec its preview draws and seats in, the
- * bore diameter (chamber F) and the approximate case volume, SI, all from the design's resolved
- * values (its base with the overrides applied). Undefined where the design does not draw, is a shotshell (table
- * VII) or lacks the cartridge L3 the seating needs.
- */
+/** SI, from the resolved values; undefined where the design does not draw, is a shotshell (table VII) or lacks the L3 the seating needs. */
 export function workbenchDesign(
   d: UserCartridge,
   resolved: ResolvedCartridge,

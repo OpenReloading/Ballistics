@@ -1,8 +1,4 @@
-/**
- * The bullet picker's search, the dialog's, the card's field's and Ctrl+K's: the schema's word
- * matcher over each bullet's text (`bulletScore`), the picker's filters, results ordered by how well
- * each bullet matches the typed words, and the whole catalogue read once per page load.
- */
+/** One search for the picker, its dialog, the card's field and Ctrl+K; the catalogue is read once per page load. */
 import { bulletFits, type CartridgeDiameters } from '@open-reloading/ballistics'
 import { compareKeys, fold, sortKey } from '@open-reloading/schema'
 import { apiFetch } from './api-fetch.ts'
@@ -83,11 +79,7 @@ function bareCaliber(label: string) {
   return digits.endsWith('mm') ? digits.slice(0, -2).trimEnd() : digits
 }
 
-/**
- * What the typed words are worth beyond the schema's rank, per word: the bullet's weight or
- * caliber 3, a word of the product name 2 when exact and 1 at its start (the name counts more than
- * the manufacturer).
- */
+/** Weight or caliber 3, an exact name word 2, a name word's start 1: the name counts more than the maker. */
 function bonus(b: BulletRow, e: Entry, words: readonly string[]): number {
   let total = 0
   for (const word of words) {
@@ -124,11 +116,7 @@ function compareValues(kx: number | null | undefined, ky: number | null | undefi
   return kx == null ? 1 : -1
 }
 
-/**
- * The bullets that pass `filters` and match every typed word, best match first, ties and the other
- * sorts by manufacturer and name; the heaviest or the highest BC first for `mass` and
- * `ballisticCoefficient`, rows without a value last.
- */
+/** Best match first, ties by maker and name; rows without the sorted value last. */
 export function searchBullets<R extends BulletRow>(
   rows: readonly R[],
   query: string,
@@ -163,12 +151,7 @@ export function searchBullets<R extends BulletRow>(
 const bc = (b: Pick<BulletSummary, 'ballisticCoefficientG1' | 'ballisticCoefficientG7'>) =>
   b.ballisticCoefficientG7 ?? b.ballisticCoefficientG1
 
-/**
- * The first `limit` bullets that match `text` best among `designs` and the catalogue, with the
- * count of all that match: the answer of the card's field, in the shape of the API's lists. `fit`
- * keeps the bullets of the cartridge. Under 2 characters only `designs` are searched, so the
- * catalogue is not read for a first key.
- */
+/** Under 2 characters only `designs` are searched, so a first key does not read the catalogue. */
 export async function findBullets(
   designs: readonly BulletRow[],
   text: string,
@@ -192,10 +175,7 @@ export async function findBullets(
 
 let catalogue: Promise<BulletItem[]> | undefined
 
-/**
- * Every catalogue bullet with its manufacturer's name and aliases, through `apiFetch` in pages of
- * 200 (the route's limit; the pages after the first together), once per page load; retried after a failure.
- */
+/** Pages of 200 (the route's limit), once per page load; retried after a failure. */
 export function fetchBulletCatalogue(): Promise<BulletItem[]> {
   catalogue ??= (async () => {
     const get = async <T>(path: string) => {
