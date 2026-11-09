@@ -42,12 +42,12 @@ const sourceParser = z.object({
   title: z
     .string()
     .min(1)
-    .describe('Title of the source: the document, or the site and table. Absent with `entry`.')
+    .describe('Title of the source: the document, or the site and table.')
     .optional(),
   entry: z
     .enum(['range', 'targetDesigner'])
     .describe(
-      'Where the user entered the values in the app: `range` (range mode) or `targetDesigner`. The app names the source in the language of the reader.',
+      'Where the user entered the values in the app, in place of a title: `range` (range mode) or `targetDesigner`. The app names the source in the language of the reader.',
     )
     .optional(),
   publisher: z

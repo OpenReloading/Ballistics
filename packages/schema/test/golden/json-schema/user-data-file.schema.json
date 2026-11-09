@@ -3348,6 +3348,14 @@
                               "minLength": 1,
                               "description": "Title of the source: the document, or the site and table."
                             },
+                            "entry": {
+                              "type": "string",
+                              "enum": [
+                                "range",
+                                "targetDesigner"
+                              ],
+                              "description": "Where the user entered the values in the app, in place of a title: `range` (range mode) or `targetDesigner`. The app names the source in the language of the reader."
+                            },
                             "publisher": {
                               "type": "string",
                               "minLength": 1,
@@ -3443,10 +3451,7 @@
                               "minLength": 1,
                               "description": "Note on the source."
                             }
-                          },
-                          "required": [
-                            "title"
-                          ]
+                          }
                         },
                         "description": "The sources of the values, at least one."
                       },
@@ -4264,6 +4269,14 @@
                               "minLength": 1,
                               "description": "Title of the source: the document, or the site and table."
                             },
+                            "entry": {
+                              "type": "string",
+                              "enum": [
+                                "range",
+                                "targetDesigner"
+                              ],
+                              "description": "Where the user entered the values in the app, in place of a title: `range` (range mode) or `targetDesigner`. The app names the source in the language of the reader."
+                            },
                             "publisher": {
                               "type": "string",
                               "minLength": 1,
@@ -4359,10 +4372,7 @@
                               "minLength": 1,
                               "description": "Note on the source."
                             }
-                          },
-                          "required": [
-                            "title"
-                          ]
+                          }
                         },
                         "description": "The sources of the values, at least one."
                       },
@@ -6201,9 +6211,17 @@
                                 "description": "First shot from a cold or clean barrel."
                               },
                               "excluded": {
-                                "type": "string",
-                                "minLength": 1,
-                                "description": "Reason the shot is left out of statistics, for example a misread."
+                                "anyOf": [
+                                  {
+                                    "type": "boolean",
+                                    "const": true
+                                  },
+                                  {
+                                    "type": "string",
+                                    "minLength": 1
+                                  }
+                                ],
+                                "description": "The shot is left out of statistics: `true` when the user left it out at the range (the app names the reason in the reader language), else the reason, for example a misread."
                               }
                             },
                             "required": [
@@ -6248,6 +6266,14 @@
                               "type": "string",
                               "minLength": 1,
                               "description": "Title of the source: the document, or the site and table."
+                            },
+                            "entry": {
+                              "type": "string",
+                              "enum": [
+                                "range",
+                                "targetDesigner"
+                              ],
+                              "description": "Where the user entered the values in the app, in place of a title: `range` (range mode) or `targetDesigner`. The app names the source in the language of the reader."
                             },
                             "publisher": {
                               "type": "string",
@@ -6344,10 +6370,7 @@
                               "minLength": 1,
                               "description": "Note on the source."
                             }
-                          },
-                          "required": [
-                            "title"
-                          ]
+                          }
                         },
                         "description": "The sources of the values, at least one."
                       },
@@ -7681,6 +7704,14 @@
                               "minLength": 1,
                               "description": "Title of the source: the document, or the site and table."
                             },
+                            "entry": {
+                              "type": "string",
+                              "enum": [
+                                "range",
+                                "targetDesigner"
+                              ],
+                              "description": "Where the user entered the values in the app, in place of a title: `range` (range mode) or `targetDesigner`. The app names the source in the language of the reader."
+                            },
                             "publisher": {
                               "type": "string",
                               "minLength": 1,
@@ -7776,10 +7807,7 @@
                               "minLength": 1,
                               "description": "Note on the source."
                             }
-                          },
-                          "required": [
-                            "title"
-                          ]
+                          }
                         },
                         "description": "The sources of the values, at least one."
                       },
