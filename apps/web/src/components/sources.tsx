@@ -10,7 +10,7 @@ import { Day } from './day.tsx'
 import { Noted } from './field-table.tsx'
 import { CopyHash } from './record-actions.tsx'
 import { ScrollRegion } from './scroll-region.tsx'
-import { SourceLink } from './source-link.tsx'
+import { SourceLink, sourceTitle } from './source-link.tsx'
 
 /** A record note without its notice: a page carries one model note at most, prints none. */
 const note = (text: string) => text.replaceAll(', not load data', '')
@@ -150,7 +150,9 @@ function SourceRow({
 
 /** The document a source cites: the sources of one document share these. */
 const documentKey = (s: Source) =>
-  [s.title, s.url, s.publisher, s.edition, s.sha256, s.terms].map((v) => v ?? '').join('\u0000')
+  [s.title, s.entry, s.url, s.publisher, s.edition, s.sha256, s.terms]
+    .map((v) => v ?? '')
+    .join('\u0000')
 
 /** The sources in their order, those of one document together at the place of its first. */
 export function groupSources(list: readonly Source[]): Source[][] {
@@ -176,6 +178,7 @@ function SourceGroup({
   span: number
   kind: string | undefined
 }) {
+  const { t } = useTranslation()
   const first = sources[0] as Source
   // a page can be cited twice with other fields: the key counts repeats of the same content
   const seen = new Map<string, number>()
@@ -190,7 +193,7 @@ function SourceGroup({
       <TableTr role="row">
         <TableTd role="cell" colSpan={span} className="source-document">
           <span className="source-title">
-            {first.url ? <a href={first.url}>{first.title}</a> : first.title}
+            {first.url ? <a href={first.url}>{sourceTitle(first, t)}</a> : sourceTitle(first, t)}
           </span>
           <SourceMeta source={first} />
         </TableTd>

@@ -39,7 +39,17 @@ const parsesAsUrl = (text: string) => {
 }
 
 const sourceParser = z.object({
-  title: z.string().min(1).describe('Title of the source: the document, or the site and table.'),
+  title: z
+    .string()
+    .min(1)
+    .describe('Title of the source: the document, or the site and table.')
+    .optional(),
+  entry: z
+    .enum(['range', 'targetDesigner'])
+    .describe(
+      'Where the user entered the values in the app, in place of a title: `range` (range mode) or `targetDesigner`. The app names the source in the language of the reader.',
+    )
+    .optional(),
   publisher: z
     .string()
     .min(1)
@@ -104,7 +114,9 @@ const sourceParser = z.object({
  * Inferred type: {@link Source}.
  */
 export const source: z.ZodObject<{
-  title: z.ZodString
+  title: z.ZodOptional<z.ZodString>
+  /** Where the user entered the values in the app; the app names such a source in the reader's language. */
+  entry: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'range' | 'targetDesigner'>>>
   /** Who issued the data: a maker, a standards body or the authors ("Example Bullets Inc."). */
   publisher: z.ZodOptional<z.ZodString>
   /** Edition, print or date as the document states it. */
@@ -138,11 +150,20 @@ export const source: z.ZodObject<{
   /** The fit run behind a `fitted` source: model version id the report names, report of its evaluation. */
   run: z.ZodOptional<z.ZodObject<{ version: z.ZodString; report: z.ZodString }>>
   note: z.ZodOptional<z.ZodString>
-}> = sourceParser satisfies Exact<typeof source, typeof sourceParser>
+}> = sourceParser
+  .refine((s) => s.title !== undefined || s.entry !== undefined, {
+    message: 'a source needs a title or an entry',
+    path: ['title'],
+  })
+  // the JSON Schemas cannot carry the refine: they state the same rule
+  .meta({ anyOf: [{ required: ['title'] }, { required: ['entry'] }] }) satisfies Exact<
+  typeof source,
+  typeof sourceParser
+>
 
-const sourceRecordParser = source
-  .omit({ page: true, fields: true, kind: true, run: true })
-  .extend({ id: recordId })
+const sourceRecordParser = sourceParser
+  .omit({ page: true, fields: true, kind: true, run: true, entry: true })
+  .extend({ id: recordId, title: sourceParser.shape.title.unwrap() })
   .strict()
 
 /**
@@ -151,11 +172,14 @@ const sourceRecordParser = source
  * Inferred type: {@link SourceRecord}.
  */
 export const sourceRecord: z.ZodObject<
-  Omit<(typeof source)['shape'], 'page' | 'fields' | 'kind' | 'run'> & { id: typeof recordId },
+  Omit<(typeof source)['shape'], 'page' | 'fields' | 'kind' | 'run' | 'entry' | 'title'> & {
+    id: typeof recordId
+    title: z.ZodString
+  },
   z.core.$strict
 > = sourceRecordParser satisfies Exact<typeof sourceRecord, typeof sourceRecordParser>
 
-const sourceReferenceParser = source
+const sourceReferenceParser = sourceParser
   .pick({
     page: true,
     url: true,

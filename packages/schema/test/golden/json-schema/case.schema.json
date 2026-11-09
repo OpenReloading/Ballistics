@@ -258,6 +258,14 @@
                 "minLength": 1,
                 "description": "Title of the source: the document, or the site and table."
               },
+              "entry": {
+                "type": "string",
+                "enum": [
+                  "range",
+                  "targetDesigner"
+                ],
+                "description": "Where the user entered the values in the app, in place of a title: `range` (range mode) or `targetDesigner`. The app names the source in the language of the reader."
+              },
               "publisher": {
                 "type": "string",
                 "minLength": 1,
@@ -354,8 +362,17 @@
                 "description": "Note on the source."
               }
             },
-            "required": [
-              "title"
+            "anyOf": [
+              {
+                "required": [
+                  "title"
+                ]
+              },
+              {
+                "required": [
+                  "entry"
+                ]
+              }
             ]
           },
           "description": "The sources of the values, at least one."

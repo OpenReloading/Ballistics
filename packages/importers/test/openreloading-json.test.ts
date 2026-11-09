@@ -25,7 +25,8 @@ const file = {
         { velocity: 700, excluded: 'flyer' },
       ],
     },
-    { shots: [{ velocity: 862.9 }] },
+    // a shot left out in range mode
+    { shots: [{ velocity: 862.9 }, { velocity: 701, excluded: true }] },
   ],
 }
 const text = JSON.stringify(file)

@@ -3,7 +3,7 @@ import { type Interval, velocityStatistics } from '@open-reloading/statistics'
 /** The part of a shot the statistics read: velocity in m/s and the reason it is excluded. */
 interface StatShot {
   velocity: { value: number }
-  excluded?: string | undefined
+  excluded?: string | true | undefined
 }
 
 /** Statistics of one string of a session. */

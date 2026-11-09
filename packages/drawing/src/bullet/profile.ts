@@ -49,7 +49,7 @@ export interface BulletValues {
         mouthDiameter?: StoredQuantity | undefined
       }
     | undefined
-  provenance: { sources: { title: string; fields?: string[] | undefined }[] }
+  provenance: { sources: { title?: string | undefined; fields?: string[] | undefined }[] }
 }
 
 /** A dimensioned field of a bullet drawing. */
