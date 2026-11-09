@@ -15,5 +15,4 @@ visual-check-out
 /.claude/skills/
 /.benchkeeper/
 coverage
-.lycheecache
 packages/ui/src/locales/*.json
