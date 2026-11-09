@@ -141,7 +141,7 @@ export function cleanEntry(e: ShootingLogEntry): ShootingLogEntry {
   return out as unknown as ShootingLogEntry
 }
 
-/** Less the linked event's rounds (#919) not covered by sibling entries, so counting order does not change the total (#961); a declined sibling covers none (#974). */
+/** The rounds of entry `id` that the firearm's count does not hold yet: less those counted for it before and the linked event's rounds (#919) not covered by sibling entries, so counting order does not change the total (#961); a declined sibling ({@link withEntryDeclined}) covers none (#974); 0 for a record that is no firearm or has no count. */
 export function entryRoundsDue(
   record: UserRecord,
   id: string,

@@ -1,4 +1,4 @@
-/** English sentences of the typed refusals and `RecordNotFound`, loaded once a page has started, outside every page's own JavaScript; `core-message-table.ts` reads them as templates. */
+/** English sentences of the typed refusals (`InputError` of `@open-reloading/statistics` with an issue) and `RecordNotFound`, loaded once a page has started, outside every page's own JavaScript; `core-message-table.ts` reads them as templates. */
 import type { ExteriorIssue, InteriorIssue, LoadFileIssue } from '@open-reloading/ballistics'
 import type { GroupStatisticsIssue } from '@open-reloading/shot-groups'
 import type { Diagnostic, StatisticsIssue } from '@open-reloading/statistics'

@@ -62,7 +62,7 @@ const colourOptions = (part: 'fill' | 'line', t: Translator['t']) => [
   }),
 ]
 
-/** The draft is kept in this browser on every change (a record of kind `targetFaceDesign`), and once it passes the schema the shot groups and hit probability tools offer it; `?record=` opens a browser record, a Mine row's link. */
+/** The face is drawn by `@open-reloading/drawing` while its fields change; the draft is kept in this browser on every change (a record of kind `targetFaceDesign`), and once it passes the schema the shot groups and hit probability tools offer it; `?record=` opens a browser record, a Mine row's link. */
 export function TargetDesigner() {
   const { t, tn } = useTranslation()
   const { system } = useUnits()

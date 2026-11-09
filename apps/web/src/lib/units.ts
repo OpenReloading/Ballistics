@@ -6,7 +6,7 @@ import { parseNumber } from '../i18n/number.ts'
 import { shownLanguage } from '../i18n/shown.ts'
 import { type Message, msg } from '../i18n/translate.ts'
 
-/** The locale-format unit tables in the language shown, with the app's factors and unit-field text. */
+/** The display unit tables and unit formatting of `@open-reloading/locale-format` in the language shown, with the app's factors and unit-field text. */
 export {
   localePreset,
   type PresetId,

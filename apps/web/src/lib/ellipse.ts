@@ -1,4 +1,4 @@
-// For the app's face search (packages/shot-groups/src/ellipse.ts).
+// The conics and ellipses of `@open-reloading/shot-groups` (packages/shot-groups/src/ellipse.ts) for the app's face search.
 export {
   concentricPlane,
   conicOf,
