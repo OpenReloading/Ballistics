@@ -136,7 +136,7 @@ const labels: Record<string, Message> = {
 /** Zod issues of `firearm.safeParse(f)` in schema order, empty when valid. */
 export const firearmIssues = (f: Firearm) => firearm.safeParse(f).error?.issues ?? []
 
-/** With the field label and where it is; undefined when valid; `name` must not be empty. */
+/** With the field label and where it is; undefined when valid; an empty `name` is refused. */
 export function firearmProblem(
   name: string,
   f: Firearm,

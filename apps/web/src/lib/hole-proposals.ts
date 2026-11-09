@@ -1,4 +1,4 @@
-/** Kept apart from the sheet until the user accepts them as shots (`apps/docs/docs/models/hole-detection.md`). */
+/** Kept apart from the sheet, in photo px, until the user accepts them as shots (`apps/docs/docs/models/hole-detection.md`). */
 import { type ShotGroup, toSi } from '@open-reloading/schema'
 import type { HoleProposal } from './hole-detection.ts'
 import { nth } from './nth.ts'

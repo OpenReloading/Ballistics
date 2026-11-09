@@ -360,7 +360,7 @@ function solved(
   return { found, run: { ...run, shots: marks.map((m) => m.shot), zone }, holeDiameter }
 }
 
-/** Clamped to `SIZE_MIN` to `SIZE_MAX` of the prior, then once by the run's strongest peaks. */
+/** `holeDiameter` in work px, clamped to `SIZE_MIN` to `SIZE_MAX` of the prior, then once by the run's strongest peaks. */
 function estimateHoleSize(
   ctx: Ctx,
   seed: Seed,
@@ -657,7 +657,7 @@ function around({ w, h }: { w: number; h: number }, p: Peak, r: number, f: (i: n
       if ((x - p.x) ** 2 + (y - p.y) ** 2 <= r * r) f(y * w + x)
 }
 
-/** The strength and contrast references are the region's 5 strongest peaks, never the picked hole. */
+/** `holeDiameter` in work px; the strength and contrast references are the median of the region's 5 strongest peaks, never the picked hole. */
 function pipeline(ctx: Ctx, holeDiameter: number, seed: Seed): Run | undefined {
   const { w, h, inside } = ctx
   const axis = axisOf(ctx, holeDiameter, seed)

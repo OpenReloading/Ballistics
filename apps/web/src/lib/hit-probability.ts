@@ -33,7 +33,7 @@ export function hitFailureText(e: unknown, t: Translator['t']): string {
   return translateMessage(refusalText(e), t)
 }
 
-/** Each ring grown by the hole's radius, as `scoreShot` counts a touched ring; an oval keeps its height. */
+/** `hole` diameter in m; each ring grown by the hole's radius, as `scoreShot` counts a touched ring; an oval keeps its height. */
 export function faceZones(face: TargetFace, hole: number): ScoringZone[] {
   const g = hole / 2
   return face.rings.map((r) => ({

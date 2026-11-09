@@ -23,7 +23,7 @@ const FACE_LONG = 2000
 
 const post = (m: WorkerReply) => self.postMessage(m)
 
-/** Orientation applied as the browser shows it, white outside the photo; `k` below 1 resizes while decoding. */
+/** `x0` to `y1` in photo px; orientation applied as the browser shows it, white outside the photo; `k` below 1 resizes while decoding. */
 async function pixels(p: Photo, x0: number, y0: number, x1: number, y1: number, k = 1) {
   const width = Math.round(p.width * k)
   let bitmap = await createImageBitmap(p.photo, {

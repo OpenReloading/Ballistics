@@ -702,7 +702,7 @@ type Ridges = {
   components: Point[][]
 }
 
-/** Both sides of a line must differ from it, so a step edge gives none; hysteresis, then components of at least `minLength`. */
+/** `sigmas` in grid px, `minLength` in px; both sides of a line must differ from it, so a step edge gives none; hysteresis, then components of at least `minLength`. */
 export function ridges(
   grid: Grid,
   searchMask: Uint8Array,
