@@ -797,9 +797,7 @@ export function LadderStrip({
                 disabled={!s.body}
                 onChange={() => select(s.n - 1)}
               />
-              {/* a selector: the readouts and the Ladder table give each step's values; the cell
-                  shows what the step varies, its step number is for screen readers and the
-                  main charge's tooltip */}
+              {/* a selector: the readouts and the Ladder table give each step's values; the cell shows what the step varies, its step number is for screen readers and the main charge's tooltip */}
               <span className="visually-hidden">
                 {s.label === '0'
                   ? t('Step {label}, main:', { label: s.label })

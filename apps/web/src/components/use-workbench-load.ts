@@ -789,7 +789,7 @@ function seatedUpdate(next: PreviewFields, seatedText: PreviewFields, now: Field
   return update
 }
 
-/** None when the bullet seats in a case of known volume but leaves no valid volume behind it; the case volume default fills it only without a seating. */
+/** True while the seating owns the volume: its seated value, or none when the bullet seats in a case of known volume but leaves no valid volume behind it; the case volume default fills it only without a seating. */
 export const seatingOwnsVolume = (s: Seated) =>
   s.volume !== undefined || (s.overallLength !== undefined && s.caseVolume !== undefined)
 
@@ -1038,7 +1038,7 @@ function planSteps(plan: Partial<Step>[], answers: Answer[], charge: number): St
   })
 }
 
-/** The planned ladder's steps at most 4 in flight; nothing when a change aborted it. */
+/** The one request, or the planned ladder's steps with at most 4 in flight; nothing when a change aborted it. */
 async function runRequest(
   plan: Partial<Step>[] | undefined,
   request: unknown,
@@ -1911,7 +1911,7 @@ export function useWorkbenchState() {
     fixedFieldText,
   )
   const fields = form.values
-  /** It cannot run while its model fields are not all typed; its name, else undefined. */
+  /** The powder record without burn values cannot run while its model fields are not all typed; its name, else undefined. */
   const burnless = burnlessOf(powder, powderDesign, fields, powderLabel)
   const { grooveM, qUsed } = boreOf(gunData, { recordGrooveM, qM, landM }, fields.boreDiameter?.si)
 
@@ -3466,7 +3466,7 @@ export function useWorkbenchState() {
   const fileData = useMemo(() => JSON.parse(fileKey) as Load, [fileKey])
   const apiKey = JSON.stringify(apiFile)
   const apiData = useMemo(() => JSON.parse(apiKey) as Load, [apiKey])
-  /** While it is the field's value; the seating owns the volume once a bullet is seated. */
+  /** A followed field's default or firearm value while it is the field's value; the seating owns the volume once a bullet is seated. */
   const defaultOf = (key: string) => {
     const k = followKeys.find((x) => x === key)
     if (!k || !followed.has(k) || (k === 'volume' && seatingOwnsVolume(seated))) return

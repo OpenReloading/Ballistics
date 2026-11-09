@@ -64,7 +64,7 @@ export function useManufacturers() {
   )
   const seen = useRef({ catalogue, mine })
   seen.current = { catalogue, mine }
-  /** `id` is the UUID of a new one, kept as a draft known to `nameOf` (nothing stored) that the next call for `id` replaces or drops. */
+  /** The reference `typed` stands for (the manufacturer it names, else a new user manufacturer); `id` is the UUID of a new one, kept as a draft known to `nameOf` (nothing stored) that the next call for `id` replaces or drops. */
   const preview = useCallback((typed: string, id: string) => {
     const to = referTo(
       knownManufacturers(

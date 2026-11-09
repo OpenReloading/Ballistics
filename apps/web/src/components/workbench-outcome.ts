@@ -248,7 +248,7 @@ export function warningLines(
   return [...shownWarnings(ok.body, system, t), ...derived(ok, t).own]
 }
 
-/** When the powder record lists the cartridges its manufacturer names and this one is not among them; a powder without a list says nothing. */
+/** The cartridge's name when the powder record lists the cartridges its manufacturer names and this one is not among them; a powder without a list says nothing. */
 export const unlistedCartridge = (
   powder: { listedCartridges?: string[] | undefined } | undefined,
   cartridge: { id: string; name: string } | undefined,

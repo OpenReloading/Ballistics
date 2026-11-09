@@ -1071,7 +1071,7 @@ function SpecValueFields({ keys, chosen }: { keys: readonly SpecKey[]; chosen: b
     .map((k) => <SpecValueField key={k} name={k} />)
 }
 
-/** The card's height is fixed by the window of 1280 x 650, so the second BC row (G7 before G1) is the More popover's (`more`). */
+/** BC rows G7 before G1; the card's height is fixed by the window of 1280 x 650, so the second BC row is the More popover's (`more`). */
 function BulletValueFields({ more }: { more?: boolean }) {
   const { bulletRecord, typedBulletFields } = useLoad()
   const shown = (key: BulletKey) => {

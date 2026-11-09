@@ -639,8 +639,7 @@ export const ResultsArea = memo(function ResultsArea() {
               {t('Result')}
             </h2>
           )}
-          {/* one line: the load and the notice; the run's time and the stale mark are in the page
-              bar's status, and the status, which the readouts repeat, is for screen readers */}
+          {/* one line: the load and the notice; the run's time and the stale mark are in the page bar's status, and the status, which the readouts repeat, is for screen readers */}
           <RunLine ok={ok} identity={identity} status={status} echoed={echoed} />
           <ResultsHead
             outcome={outcome}
