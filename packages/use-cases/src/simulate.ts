@@ -104,7 +104,7 @@ function knownRecords(catalogue: Catalogue, record: Load) {
   }
 }
 
-/** In that order, with the powder's label "<manufacturer name> <product name>"; 404 for an unknown id. */
+/** The cartridge, bullet and powder records the file names, with the powder's label "<manufacturer name> <product name>"; 404 for an unknown id. */
 function loadFileRecords(catalogue: Catalogue, record: Load) {
   const bulletId = recordIdOf(record.bullet)
   const powderId = recordIdOf(record.powder)

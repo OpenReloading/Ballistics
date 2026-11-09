@@ -151,7 +151,7 @@ function fillFromRecord(q: StabilityQuery, record: Bullet) {
   return { mass, diameter, length, resolved: { bullet: resolvedRecord(record, fields) } }
 }
 
-/** The missing ones from the bullet `record`, each checked against `stabilityBounds`, with the record's `resolved.bullet` part. */
+/** Mass, diameter and length of a stability query, the missing ones from the bullet `record`, each checked against `stabilityBounds`, with the record's `resolved.bullet` part. */
 function stabilityInputs(q: StabilityQuery, record: Bullet | undefined) {
   const { mass, diameter, length, resolved } = record
     ? fillFromRecord(q, record)

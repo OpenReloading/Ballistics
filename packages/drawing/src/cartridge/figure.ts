@@ -160,7 +160,7 @@ export function figureModel(
   return model
 }
 
-/** Their letters laid out in a second pass that keeps the frame and every other mark, and their windows. */
+/** Adds the detail views of each side to a screen model: their letters laid out in a second pass that keeps the frame and every other mark, and their windows. */
 function addDetails(model: FigureModel, drawn: Drawn, unit: LengthUnit) {
   const { layers, em, medium, axis } = model
   for (const { side, p } of drawn) {

@@ -146,7 +146,7 @@ function chargeAnswer({
   }
 }
 
-/** Of the request (kg/m3), else of the powder record `id`, with the record's `resolved.powder` part; a record value outside `bulkDensityBound` is an `InputError`, a request value has passed that bound already. */
+/** The bulk density of the request (kg/m3), else of the powder record `id`, with the record's `resolved.powder` part; a record value outside `bulkDensityBound` is an `InputError`, a request value has passed that bound already. */
 async function resolvePowder(
   findPowder: (id: string) => Powder | Promise<Powder>,
   id: string | undefined,

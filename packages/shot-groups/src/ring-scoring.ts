@@ -106,7 +106,7 @@ function ellipseGap(a: number, b: number, x: number, y: number): number {
   return Math.hypot((r0 * y0) / (t + r0) - y0, y1 / (t + 1) - y1)
 }
 
-/** Hole radius `g` (m) and centre `p` in m from the area's centre: a circle by the centre distance, an oval by the distance to its ellipse, a square by the distance to its square (rounded at the corners), a stadium by the distance to the segment between its end circles' centres, less their radius. */
+/** Whether the hole of radius `g` (m), centred at `p` in m from the area's centre, touches the area a ring line bounds: a circle by the centre distance, an oval by the distance to its ellipse, a square by the distance to its square (rounded at the corners), a stadium by the distance to the segment between its end circles' centres, less their radius. */
 function touches(ring: Shape, p: Point, g: number): boolean {
   const w = radius(ring.diameter)
   if (ring.shape === 'square')

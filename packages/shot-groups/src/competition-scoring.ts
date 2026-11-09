@@ -1,4 +1,4 @@
-/** The stage points and hit factor of a practical stage and the ring totals of series, with the points and penalties of the event type record (`packages/catalog/records/event-types/`), never hard-coded (`apps/docs/docs/models/competition-scoring.md`); a self-recorded score is never an official result, a refusal an `InputError` with a `ScoringIssue`. */
+/** The stage points and hit factor of a practical stage and the ring totals of series, with the points and penalties of the event type record (`packages/catalog/records/event-types/`), never hard-coded (`apps/docs/docs/models/competition-scoring.md`); a self-recorded score is never an official result, a refusal an `InputError` of `@open-reloading/statistics` with a `ScoringIssue`. */
 
 import { InputError } from '@open-reloading/statistics'
 

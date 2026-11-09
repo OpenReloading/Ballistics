@@ -115,7 +115,7 @@ export function createPlacer(
     return part.outer === undefined ? Math.abs(y) < r : Math.abs(y) > r && Math.abs(y) < part.outer
   }
   const leaderLength = face.radiusLeaderLength * k
-  /** Each line of another dimension, the outline or the axis it crosses from 0.4 of the face's leader on (the lines of its own corner pass nearer), and each leader length past the first; across the axis it weighs as 50 crossings, a last resort (weighing angle leaders' crossings moves angle texts far out). */
+  /** What a radius leader costs: each line of another dimension, the outline or the axis it crosses from 0.4 of the face's leader on (the lines of its own corner pass nearer), and each leader length past the first; across the axis it weighs as 50 crossings, a last resort (weighing angle leaders' crossings moves angle texts far out). */
   const crossings = (s: LineSegment, from: PartPoint) => {
     let crossed = 0
     for (const list of [outlineSegs, segs])

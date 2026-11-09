@@ -184,7 +184,7 @@ function exceededWarning(l: Limit, range: PressureRange, sheet: string | undefin
   })
 }
 
-/** With their warnings (`noCartridge` without a cartridge, else `limitExceeded` per exceeded limit and `noComparableLimit`) and the cartridge part of `resolved`; a typed pressure limit (`pressureLimit`, Pa) is the one limit instead, the sheet's values not compared. */
+/** The cartridge's Pmax limits against `range` with their warnings (`noCartridge` without a cartridge, else `limitExceeded` per exceeded limit and `noComparableLimit`) and the cartridge part of `resolved`; a typed pressure limit (`pressureLimit`, Pa) is the one limit instead, the sheet's values not compared. */
 function cartridgeLimits(
   range: PressureRange,
   cartridge: CartridgeWithSpecs | undefined,

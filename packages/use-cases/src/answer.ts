@@ -117,7 +117,7 @@ const jsonParams = (params: object) =>
 const numberAllowed = (n: number, path: string, allowed: RegExp | undefined, infinite: boolean) =>
   Number.isFinite(n) || ((infinite || Number.isNaN(n)) && allowed?.test(path) === true)
 
-/** Undefined if none (null is allowed); `allowed` paths may hold NaN, and with `infinite` also an infinite number. */
+/** The path of the first non-finite number in a result, undefined if none (null is allowed); `allowed` paths may hold NaN, and with `infinite` also an infinite number. */
 function nonFinite(
   value: unknown,
   path: string,
