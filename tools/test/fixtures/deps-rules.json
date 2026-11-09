@@ -403,6 +403,14 @@
     "source": "import { trajectory } from '@open-reloading/ballistics'\nimport { bullet } from '@open-reloading/schema'\nimport type { Catalogue } from '@open-reloading/catalog'\nimport { z } from 'zod'\nexport type { Catalogue }\nexport { trajectory, bullet, z }",
     "rules": []
   },
+  "packages/use-cases/src/catalog-value.ts": {
+    "source": "import { checkRecords } from '@open-reloading/catalog'\nexport { checkRecords }",
+    "rules": ["use-cases-imports-catalog-types"]
+  },
+  "packages/use-cases/src/catalog-subpath.ts": {
+    "source": "import { checkSpec } from '@open-reloading/catalog/plausibility'\nexport { checkSpec }",
+    "rules": ["use-cases-imports-logic-only"]
+  },
   "packages/use-cases/src/fastify.ts": {
     "source": "import Fastify from 'fastify'\nexport { Fastify }",
     "rules": ["use-cases-imports-logic-only"]
@@ -422,5 +430,9 @@
   "packages/use-cases/src/into-api.ts": {
     "source": "import { buildApp } from '../../api/src/app.ts'\nexport { buildApp }",
     "rules": ["use-cases-imports-logic-only"]
+  },
+  "apps/web/src/lib/refusal-words.ts": {
+    "source": "import type { ExteriorIssue } from '@open-reloading/ballistics'\nimport { msg } from '../i18n/translate.ts'\nimport { gapWords } from './resistance-gaps.ts'\nimport { interiorFields } from './interior-input.ts'\nexport const words = [msg, gapWords, interiorFields]\nexport type Issue = ExteriorIssue",
+    "rules": ["refusal-words-imports"]
   }
 }

@@ -10,6 +10,7 @@ import {
   type InteriorLoad,
   loadRatio,
   type PressureRange,
+  type ResistanceGap,
   recordBoreArea,
   recordResistance,
   recordSensitivity,
@@ -26,12 +27,13 @@ import {
   toSi,
   userDataFile,
 } from '@open-reloading/schema'
-import { InputError } from '@open-reloading/statistics'
 import { z } from 'zod'
+import { resistanceGapText } from './advisory-text.ts'
 import { assertFinite, notice, resolvedRecord, unprocessable } from './answer.ts'
 import { powderBulkDensity } from './charge-run.ts'
 import { runInterior } from './interior-run.ts'
 import { type InteriorBody, interiorBody } from './interior-schema.ts'
+import { InputError } from './issue.ts'
 import { type CartridgeWithSpecs, type Warning, warning } from './limits.ts'
 import {
   bulletLengthMm,
@@ -132,7 +134,7 @@ type SummaryInputs = {
   /** Solid density of the propellant, kg/m3. */
   density: number
   powderLabel: string | undefined
-  missing: string[]
+  missing: ResistanceGap[]
 }
 
 /** The summary of a valid step, with the solid-fill and resistance warnings of a simulation. */
@@ -146,7 +148,7 @@ function summarizeStep(
     warnings.push(
       warning(
         advisoryRule.resistanceNotApplied,
-        `Simulation: the parameters of ${powderLabel} were fitted with a bore-resistance law this run cannot apply (missing: ${missing.join(', ')}); the results are biased.`,
+        `Simulation: the parameters of ${powderLabel} were fitted with a bore-resistance law this run cannot apply (missing: ${missing.map((m) => resistanceGapText[m]).join(', ')}); the results are biased.`,
       ),
     )
   const fill = solidFill(s.charge, density, chamberVolume)
@@ -276,7 +278,8 @@ function needChargesAboveZero(charge: number, ladder: InteriorBody['ladder']) {
   if (!ladder) return
   const below = { up: 0, down: ladder.stepCount - 1, around: (ladder.stepCount - 1) / 2 }
   const lowest = charge - below[ladder.direction ?? 'up'] * ladder.chargeStep
-  if (lowest <= 0) throw new InputError(`ladder charge ${grams(lowest)} g must be above 0`)
+  if (lowest <= 0)
+    throw new InputError({ code: 'ladderChargeNotAboveZero', params: { charge: grams(lowest) } })
 }
 
 /** The bulk density of the run, kg/m3: the file's own, else the powder record's. */

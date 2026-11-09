@@ -9,6 +9,7 @@ import {
 import { type Powder, toSi } from '@open-reloading/schema'
 import { type InteriorBody, interiorBody } from './interior-input.ts'
 import type { RecordValues } from './query.ts'
+import type { Gap } from './resistance-gaps.ts'
 
 /** What a link carried of a powder record that is not loaded, SI. */
 type LinkedPowder = NonNullable<RecordValues['powder']>
@@ -71,7 +72,7 @@ function resistanceFor(s: InteriorSources, body: InteriorBody) {
       missing: [],
     }
   if (cartridge && groove?.id !== cartridge.id)
-    return { missing: ["the cartridge record's groove diameter (not loaded)"] }
+    return { resistance: undefined, missing: ['grooveNotLoaded'] as Gap[] }
   return recordResistance(powder, {
     boreDiameter: body.load.chamber.boreDiameter,
     boreArea: body.load.chamber.boreArea,

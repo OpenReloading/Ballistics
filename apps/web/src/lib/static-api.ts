@@ -9,6 +9,7 @@ import {
   chargeBody,
   errorAnswer,
   interiorBody,
+  RecordNotFound,
   reviveError,
   runChargeTarget,
   runInterior,
@@ -191,8 +192,6 @@ async function get(path: string) {
     : answer(200, record)
 }
 
-/** An unknown record id of a compute body: the API answers it 404. */
-class RecordNotFound extends Error {}
 /** A record file of a compute body not read (offline, not cached): thrown as a failed API request is. */
 class RecordUnread extends Error {}
 
@@ -202,7 +201,7 @@ const findRecord =
     const record = await dataFile<T>(`${kind}/${id}`).catch((cause: unknown) => {
       throw new RecordUnread(`${kind}/${id}.json not read`, { cause })
     })
-    if (record === undefined) throw new RecordNotFound(`${kind.replace(/s$/, '')} ${id} not found`)
+    if (record === undefined) throw new RecordNotFound(kind.replace(/s$/, ''), id)
     return record
   }
 
@@ -278,7 +277,6 @@ async function post(path: string, init: RequestInit | undefined) {
 function failure(error: unknown, signal: AbortSignal | undefined) {
   if (signal?.aborted) throw signal.reason
   if (error instanceof RecordUnread) throw error
-  if (error instanceof RecordNotFound) return refusal(404, 'Not Found', error.message)
   const known = errorAnswer(error, { withNotice: true, truingDetails: false })
   if (known) return answer(known.status, known.body)
   return refusal(500, 'Internal Server Error', 'internal server error')

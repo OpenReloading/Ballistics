@@ -41,7 +41,6 @@ export {
   truingExample,
   type WindSchema,
 } from './exterior-schema.ts'
-export { chargeTargetResponse, interiorResponse, loadFileResponse } from './interior-response.ts'
 export { type InteriorContext, runInterior } from './interior-run.ts'
 export {
   type BurnSchema,
@@ -51,11 +50,10 @@ export {
   interiorBody,
   interiorExample,
   type M3LoadShape,
-  maxPoints,
 } from './interior-schema.ts'
+export { RecordNotFound, type RecordNotFoundIssue, type UseCaseIssue } from './issue.ts'
 export { type JsonSchema, jsonSchema } from './json-schema.ts'
 export { type CartridgeWithSpecs } from './limits.ts'
-export { filePath, type Path } from './load-file.ts'
 export { type LoadFileRequest, loadFileExample } from './load-file-example.ts'
 export {
   chargeTarget,

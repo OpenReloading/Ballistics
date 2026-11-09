@@ -1,4 +1,5 @@
 import { InputError, nth } from '@open-reloading/statistics'
+import type { LoadFileIssue } from '../issue.ts'
 import { boreArea } from './bore-resistance.ts'
 import type { InteriorLoad } from './model.ts'
 import { burnFormKeys } from './workbench-keys.ts'
@@ -11,8 +12,8 @@ import { burnFormKeys } from './workbench-keys.ts'
 /** An `InputError` about the value of one field; `field` is its key. */
 export class ValueError extends InputError {
   field: string
-  constructor(field: string, message: string) {
-    super(message)
+  constructor(field: string, issue: LoadFileIssue) {
+    super(issue)
     this.field = field
   }
 }
@@ -43,13 +44,13 @@ export const missingLoadKeys = (values: Record<string, number | undefined>): str
 
 type FieldReader = (key: string) => number
 
-/** A reader of the required field values: throws `ValueError` for a missing or non-finite one, named by `label`. */
+/** A reader of the required field values: throws `ValueError` for a missing or non-finite one. */
 const fieldReader =
-  (values: Record<string, number | undefined>, label: (key: string) => string): FieldReader =>
+  (values: Record<string, number | undefined>): FieldReader =>
   (key) => {
     const x = values[key]
     if (x === undefined || !Number.isFinite(x))
-      throw new ValueError(key, `Enter a number for ${label(key)}.`)
+      throw new ValueError(key, { code: 'valueMissing', params: { field: key } })
     return x
   }
 
@@ -57,15 +58,15 @@ const fieldReader =
 function leakAndWear(
   values: Record<string, number | undefined>,
   v: FieldReader,
-  label: (key: string) => string,
 ): { leakArea: number | undefined; wear: number } {
   // 0 is a leak that never opens: the solver takes it
   const leakArea = values['leakArea'] === undefined ? undefined : v('leakArea')
   if (leakArea !== undefined && leakArea < 0)
-    throw new ValueError('leakArea', `${label('leakArea')} must be at least 0.`)
+    throw new ValueError('leakArea', { code: 'valueNegative', params: { field: 'leakArea' } })
   // a worn throat adds its length times the bore area behind the bullet (`apps/docs/docs/models/interior-m3.md`, "Throat wear")
   const wear = values['throatWear'] === undefined ? 0 : v('throatWear')
-  if (wear < 0) throw new ValueError('throatWear', `${label('throatWear')} must be at least 0.`)
+  if (wear < 0)
+    throw new ValueError('throatWear', { code: 'valueNegative', params: { field: 'throatWear' } })
   return { leakArea, wear }
 }
 
@@ -74,10 +75,10 @@ function burnFormGiven(values: Record<string, number | undefined>): boolean {
   const form = Object.entries(burnFormKeys).filter(([k]) => values[k] !== undefined)
   if (form.length > 0 && form.length < 4) {
     const missing = Object.entries(burnFormKeys).filter(([k]) => values[k] === undefined)
-    throw new ValueError(
-      nth(missing, 0)[0],
-      `Burn form: ${missing.map(([, n]) => n).join(', ')} needed with the others, or leave all four empty.`,
-    )
+    throw new ValueError(nth(missing, 0)[0], {
+      code: 'burnFormPartial',
+      params: { missing: missing.map(([, n]) => n) },
+    })
   }
   return form.length === 4
 }
@@ -126,17 +127,16 @@ function optionalTerms(
 /**
  * `InteriorLoad` from SI field values. An empty bore area is the circle of the mean of the bore
  * diameter and `grooveDiameter` (m) where given, else of the bore diameter (`boreArea`; a rifled
- * bore is larger, so the field exists). `label` names a field in an error.
+ * bore is larger, so the field exists).
  * Throws `ValueError` for a missing required value or a partly filled burn form.
  */
 export function interiorLoad(
   values: Record<string, number | undefined>,
-  label: (key: string) => string = (key) => key,
   grooveDiameter?: number,
 ): InteriorLoad {
-  const v = fieldReader(values, label)
+  const v = fieldReader(values)
   const boreDiameter = v('boreDiameter')
-  const { leakArea, wear } = leakAndWear(values, v, label)
+  const { leakArea, wear } = leakAndWear(values, v)
   const twoStage = burnFormGiven(values)
   return {
     chamber: {
@@ -169,12 +169,12 @@ export function checkResistanceValues(values: Record<string, number | undefined>
   ] as const) {
     const x = values[key]
     if (x === undefined) continue
-    if (!Number.isFinite(x)) throw new ValueError(key, 'Enter a number.')
+    if (!Number.isFinite(x)) throw new ValueError(key, { code: 'valueNotNumber', params: {} })
     if (key === 'engravingLength' ? x <= min : x < min)
-      throw new ValueError(
-        key,
-        key === 'engravingLength' ? 'Must be above 0.' : 'Must be at least 0.',
-      )
+      throw new ValueError(key, {
+        code: key === 'engravingLength' ? 'valueNotPositive' : 'valueBelowZero',
+        params: {},
+      })
   }
 }
 
@@ -190,7 +190,7 @@ function overriddenRamp(
 ): Engraving {
   const pressure = engravingPressure ?? engraving?.[0]?.pressure
   const length = engravingLength ?? engraving?.at(-1)?.travel
-  const needed = 'Needed with the other engraving value, or from a powder record.'
+  const needed = { code: 'engravingValueNeeded', params: {} } as const
   if (pressure === undefined) throw new ValueError('engravingPressure', needed)
   if (length === undefined) throw new ValueError('engravingLength', needed)
   return [

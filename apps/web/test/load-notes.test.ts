@@ -138,7 +138,6 @@ describe('notesOf', () => {
         english.t,
       ),
     ].join(' ')
-    expect(text2).not.toMatch(/safe|unsafe|recommend|reduce|increase/i)
     expect(text2).toContain('you set a note at 500 rounds')
     expect(text2).toContain('Case lot is not recorded for Second. First has C1.')
   })

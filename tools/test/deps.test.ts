@@ -6,6 +6,7 @@ import {
   mkdtempSync,
   readFileSync,
   rmSync,
+  symlinkSync,
   writeFileSync,
 } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -44,6 +45,10 @@ beforeAll(() => {
     writeFileSync(join(mirror, file), `${source}\n`)
   }
   for (const config of configs) copyFileSync(join(root, config), join(mirror, config))
+  // the configs load the regexp rules as a JS plugin, resolved from node_modules
+  const plugin = 'node_modules/eslint-plugin-regexp'
+  mkdirSync(join(mirror, 'node_modules'))
+  symlinkSync(join(root, plugin), join(mirror, plugin), 'dir')
 })
 
 afterAll(() => rmSync(mirror, { recursive: true, force: true }))

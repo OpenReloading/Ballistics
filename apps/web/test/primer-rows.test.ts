@@ -1,6 +1,5 @@
 import type { Primer } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
-import de from '../src/i18n/de.json'
 import { translator } from '../src/i18n/translate.ts'
 import type { PrimerSummary } from '../src/lib/api-types.ts'
 import { primerMatches, primerRows } from '../src/lib/primer-rows.ts'
@@ -80,7 +79,7 @@ it('the properties hold the number, flag, cup, use and published figures', () =>
 
 it('also finds a primer by its size and compound as the language shown writes them', () => {
   const row = defined(rows[0])
-  const { t } = translator(de, 'de')
+  const { t } = translator({ 'Large rifle': 'Büchse, groß', 'Lead free': 'Bleifrei' }, 'de')
   for (const q of ['büchse groß', 'bleifrei']) expect(primerMatches(row, q, t), q).toBe(true)
   expect(primerMatches(row, 'büchse groß')).toBe(false)
 })

@@ -1,21 +1,4 @@
-/**
- * Decides which CI jobs a run needs and how much of the web app it builds, from the files changed
- * since a base commit. Prints `check=true|false` (lint, build, types and unit tests), `e2e=true|false`
- * (the API's conformance run and the e2e tests on the static export),
- * `prerender=full|sample` (every record page or the cartridge sample of `src/lib/prerender-sample.ts`)
- * and `tests=` (the test jobs as JSON: each group of workspaces that the change reaches, by pnpm's
- * `--filter "...[<base>]"`, which adds every workspace that depends on a changed one) as lines for
- * $GITHUB_OUTPUT; the reason goes to stderr.
- *
- * Fail closed: anything but a pull request, a missing base commit, a failed git call or an empty change
- * list gives every job, every test group and `prerender=full`; a change outside the workspaces (the
- * lockfile, a root config, a workflow) or a failed pnpm call gives every test group.
- *
- *   node scripts/ci-plan.mts                      CI: EVENT_NAME and BASE_SHA from the environment
- *   node scripts/ci-plan.mts --stamp FILE         local: changes since the build recorded in FILE
- *   node scripts/ci-plan.mts --stamp FILE --require full   same, for a run that needs every record page
- *   node scripts/ci-plan.mts --write-stamp FILE --prerender full|sample   record a finished build (clean tree only)
- */
+// The CI jobs and test groups a change needs, failing closed: apps/docs/docs/ci-tools.md#which-jobs-a-pull-request-runs
 import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
