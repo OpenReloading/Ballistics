@@ -244,7 +244,7 @@ export type PowderFitReason =
   | 'invalid'
   | 'not-converged'
 
-/** `underdetermined` (fewer ladder rows than parameters), `unresolved` or `ill-conditioned` (the ladder does not separate the parameters), `invalid` (an `interior` run at a ladder charge is not valid) or `not-converged` (`maxIterations`). */
+/** `reason` is `underdetermined` (fewer ladder rows than parameters), `unresolved` or `ill-conditioned` (the ladder does not separate the parameters), `invalid` (an `interior` run at a ladder charge is not valid) or `not-converged` (`maxIterations`). */
 export class PowderFitError extends InputError {
   readonly reason: PowderFitReason
   readonly conditionNumber?: number | undefined
@@ -907,7 +907,7 @@ function predictionBand(
   }
 }
 
-/** With the standard uncertainty and interval the covariance of the fitted parameters gives (`apps/docs/docs/models/interior-powder-fit.md`, "Prediction at a charge"), which needs a ladder with more rows than parameters or with velocity sigmas. */
+/** Muzzle velocity and peak breech pressure of a fitted powder at `charge`, with the standard uncertainty and interval the covariance of the fitted parameters gives (`apps/docs/docs/models/interior-powder-fit.md`, "Prediction at a charge"), which needs a ladder with more rows than parameters or with velocity sigmas. */
 export function predictPowder(
   fit: PowderFit,
   charge: number,

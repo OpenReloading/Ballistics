@@ -168,7 +168,7 @@ export function checkResistanceValues(values: Record<string, number | undefined>
 
 type Engraving = NonNullable<InteriorLoad['resistance']>['engraving']
 
-/** Its start pressure and length, the one not given taken from the record's `engraving`; throws `ValueError` when neither gives it. */
+/** The engraving ramp the load file sets: its start pressure and length, the one not given taken from the record's `engraving`; throws `ValueError` when neither gives it. */
 function overriddenRamp(
   engraving: Engraving,
   { engravingPressure, engravingLength }: Record<string, number | undefined>,

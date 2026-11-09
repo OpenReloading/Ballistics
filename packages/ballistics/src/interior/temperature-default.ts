@@ -1,4 +1,4 @@
-/** By grain form, for a powder without its own (`apps/docs/docs/models/interior-m3.md`, "Default by grain form"); approximate: a value of the grain form, not of the powder. */
+/** Default burn-rate temperature sensitivity by grain form, for a powder without its own (`apps/docs/docs/models/interior-m3.md`, "Default by grain form"); approximate: a value of the grain form, not of the powder. */
 import { type InteriorLoad, interior } from './model.ts'
 
 /** Grain forms of a powder record (`grainForm`). */
@@ -101,7 +101,7 @@ export interface TakenSensitivity {
   fallback?: SensitivityDefault
 }
 
-/** K and 1/K: the record's own, else the default of its grain form with the reference of the record's fit (else {@link sensitivityReferenceDefault}), `form` naming the grain form then; none for a powder without either. */
+/** The temperature sensitivity a run of `powder` takes, K and 1/K: the record's own, else the default of its grain form with the reference of the record's fit (else {@link sensitivityReferenceDefault}), `form` naming the grain form then; none for a powder without either. */
 export function recordSensitivity(powder: SensitivityPowder): TakenSensitivity | undefined {
   const own = powder.temperatureSensitivity
   if (own)

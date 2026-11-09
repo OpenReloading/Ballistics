@@ -620,7 +620,7 @@ function pooledVariance(
   return variance
 }
 
-/** With the pooled fit's prediction interval (parameter covariance, model error and the string's own uncertainty; an unseen rifle or lot adds its random effect's spread); the powder must be one of the fit (`apps/docs/docs/models/interior-powder-fit.md`, "Pooled fit over rifles, powders and lots"). */
+/** Mean muzzle velocity of `target` at `charge` with the pooled fit's prediction interval (parameter covariance, model error and the string's own uncertainty; an unseen rifle or lot adds its random effect's spread); the powder must be one of the fit (`apps/docs/docs/models/interior-powder-fit.md`, "Pooled fit over rifles, powders and lots"). */
 export function predictPooled(
   fit: PooledPowderFit,
   target: PooledTarget,

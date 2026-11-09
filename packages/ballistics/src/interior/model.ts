@@ -458,7 +458,7 @@ function leakageOf(load: InteriorLoad, mc: number) {
 
 type Leakage = ReturnType<typeof leakageOf>
 
-/** Rising; a point at the muzzle would fire before the muzzle event and hide it. */
+/** Travels before the muzzle `xe` where resistance or leak area has a kink, rising; a point at the muzzle would fire before the muzzle event and hide it. */
 const kinksBefore = (points: readonly { travel: number }[], xe: number) =>
   [...new Set(points.map((pt) => pt.travel))].filter((x) => x < xe).toSorted((a, b) => a - b)
 
@@ -744,7 +744,7 @@ function energyBalance(s: Scaling, gas: Gas, y: Float64Array): InteriorEnergy {
   }
 }
 
-/** A burnout also sets the burnt state at the end of the form function; true for a burnout. */
+/** Moves the phase past the event, a burnout also setting the burnt state at the end of the form function; true for a burnout. */
 function applyEvent(
   { s, phase }: RunModel,
   { kind, index }: { kind: EventKind; index: number },

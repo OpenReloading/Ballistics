@@ -617,7 +617,7 @@ function labelOf(w: number, rules: PowderConfidenceRules): PowderFitLabel {
   return w <= rules.moderate ? 'moderate' : 'loose'
 }
 
-/** By its relative half-width, with the reasons that apply (`apps/docs/docs/models/interior-powder-fit.md`, "Confidence label"); it describes the simulation's uncertainty, not a load. */
+/** Label of a fit's pressure range by its relative half-width, with the reasons that apply (`apps/docs/docs/models/interior-powder-fit.md`, "Confidence label"); it describes the simulation's uncertainty, not a load. */
 export function powderConfidence(
   fit: PowderFit,
   range: PowderPressureRange,

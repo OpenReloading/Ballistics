@@ -1,4 +1,4 @@
-/** When the load gives none; approximate: effective values of the load-table fit, not measurements of a bullet (`apps/docs/docs/models/interior-m3.md`, "Shot start"). */
+/** Default shot-start pressure of M3 when the load gives none; approximate: effective values of the load-table fit, not measurements of a bullet (`apps/docs/docs/models/interior-m3.md`, "Shot start"). */
 import { need } from '../issue.ts'
 
 /** A default shot-start pressure with its interval and source. */

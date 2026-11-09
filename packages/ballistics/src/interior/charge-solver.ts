@@ -318,7 +318,7 @@ function solveInRange(
   return typeof root === 'string' ? refuse(root) : done(root)
 }
 
-/** Or a refusal with the reason and the values the allowed charges reach; `load.charge` is ignored, and the target `loadRatio` needs `bulkDensity`. */
+/** The charge at which `interior` reaches `target`, or a refusal with the reason and the values the allowed charges reach; `load.charge` is ignored, and the target `loadRatio` needs `bulkDensity`. */
 export function solveCharge(
   load: InteriorLoad,
   target: ChargeTarget,

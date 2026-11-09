@@ -148,7 +148,7 @@ function parabola(t: readonly number[], v: readonly number[], at: number): [numb
   ]
 }
 
-/** Or the first time when it starts above; the linear crossing is refined on the parabola through it and the next sample, as a coarse trace would otherwise shift its rise by a fraction of the sample step. */
+/** First time the series reaches `level` from below, or the first time when it starts above; the linear crossing is refined on the parabola through its two samples and the next, as a coarse trace would otherwise shift its rise by a fraction of the sample step. */
 function riseTime(time: readonly number[], value: readonly number[], level: number): number {
   const i = value.findIndex((v) => v >= level)
   if (i === 0) return nth(time, 0)

@@ -29,7 +29,7 @@ function varianceRatio(between: number, pooled: number): number {
   return between > 0 ? Number.POSITIVE_INFINITY : 0
 }
 
-/** Removes `slope` (m per m/s, from two flown trajectories) times each shot's velocity less the ladder's mean, then tests heterogeneity across charges at `level` (default 0.99), approximate with few degrees of freedom (about the level at 5 shots and 9 charges, model page, Limits); needs three or more charges with at least two shots each. */
+/** Removes `slope` (m per m/s, from two flown trajectories) times each shot's velocity less the ladder's mean, then tests heterogeneity across charges at `level` (default 0.99), approximate with few degrees of freedom (the false-alarm rate is about the level at 5 shots per charge and 9 charges, model page, Limits); needs three or more charges with at least two shots each. */
 export function ladderImpactResiduals(
   charges: readonly ImpactStep[],
   slope: number,

@@ -74,7 +74,7 @@ export interface PressureRange {
   cases: PressureCase[]
 }
 
-/** Or a reason when that leaves the model; the range passes 1 or -1 (the ends of the tolerance), the sampling any number. */
+/** Moves one input of a load by `side` times its tolerance, or returns a reason when that leaves the model; the range passes 1 or -1 (the ends of the tolerance), the sampling any number. */
 export type ApplyTolerance<L> = (load: L, side: number, tolerance: number) => L | string
 
 /** The peak of one moved load, or the reason it has none. */
@@ -160,7 +160,7 @@ function combinedCases<L>(
   })
 }
 
-/** Over the tolerance box of `load`; `peak` returns Pa or a reason for an invalid run, `nominal` is `peak(load)`, computed by the caller. */
+/** The range of `peak` over the tolerance box of `load`; `peak` returns Pa or a reason for an invalid run, `nominal` is `peak(load)`, computed by the caller. */
 export function toleranceRange<L>(
   load: L,
   nominal: number,
