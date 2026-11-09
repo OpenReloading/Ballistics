@@ -136,7 +136,7 @@ export function fitTables(p: Powder): FitTable[] {
       // one table: the record's own count of the fit's rows and cartridges
       const own = all.length === 1 ? p.interior : undefined
       return {
-        title: s.title,
+        title: s.title ?? '',
         ...(rows
           ? { trainingRows: Number(rows) }
           : own?.trainingRows !== undefined && { trainingRows: own.trainingRows }),

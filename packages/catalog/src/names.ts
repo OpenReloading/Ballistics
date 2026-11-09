@@ -119,7 +119,7 @@ function otherNames(bundle: Pick<Bundle, 'cases' | 'rangeFirings' | 'targetFaces
       return [
         {
           file: fileOf('range', r.id),
-          scope: source.sha256 ?? source.url ?? source.title,
+          scope: source.sha256 ?? source.url ?? source.title ?? r.id,
           names: [r.projectile],
         },
       ]

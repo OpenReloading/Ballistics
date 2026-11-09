@@ -446,7 +446,7 @@ export function Measurements({
           charge: charge(r.charge),
           speed: speed(e.velocity),
           unit: v.symbol,
-          reason: translateMessage(e.reason, t),
+          reason: e.reason === true ? t('excluded at the range') : translateMessage(e.reason, t),
         }),
       ),
     ),

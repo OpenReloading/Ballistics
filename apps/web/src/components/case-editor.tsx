@@ -91,7 +91,7 @@ export function CaseEditor({
           {data.name || t('New brass group')}
         </h2>
         {data.cartridge && (
-          <Group gap={2} wrap="nowrap">
+          <Group gap={0} wrap="nowrap">
             <Text c="dimmed" size="sm" truncate="end">
               {cartridgeName(data.cartridge)}
             </Text>

@@ -4376,5 +4376,8 @@
   "{at}: the charge {label} has no mass; its string varies nothing.": "{at}: Die Treibladung {label} hat keine Masse; ihre Schussreihe variiert nichts.",
   "{at}: {count} charges ({shots} shots) of the series beyond the limit of {max} are left out.": "{at}: {count} Treibladungen ({shots} Schüsse) der Serie über der Grenze von {max} werden weggelassen.",
   "The file is of format \"{format}\"; the reader is written for format {expected}. Check every value.": "Die Datei hat das Format „{format}“; der Leser ist für Format {expected} geschrieben. Prüfen Sie jeden Wert.",
-  "The file is of format unknown; the reader is written for format {expected}. Check every value.": "Das Format der Datei ist unbekannt; der Leser ist für Format {expected} geschrieben. Prüfen Sie jeden Wert."
+  "The file is of format unknown; the reader is written for format {expected}. Check every value.": "Das Format der Datei ist unbekannt; der Leser ist für Format {expected} geschrieben. Prüfen Sie jeden Wert.",
+  "Entered at the range": "Auf dem Schießstand erfasst",
+  "Entered in the target designer": "Im Scheiben-Editor erfasst",
+  "excluded at the range": "auf dem Schießstand ausgeschlossen"
 }

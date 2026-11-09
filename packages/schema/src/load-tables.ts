@@ -5,7 +5,7 @@ import { source } from './provenance.ts'
 
 const loadTableParser = z.strictObject({
   manufacturer: recordId,
-  title: source.shape.title,
+  title: source.shape.title.unwrap(),
   url: source.shape.url,
   retrieved: z.iso.date(),
 })

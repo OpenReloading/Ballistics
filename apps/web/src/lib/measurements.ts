@@ -88,7 +88,7 @@ export interface ChargeRow {
   /** Over the pooled shots of every string mapped to the charge; undefined when every shot is excluded. */
   velocityStats: StringStats | undefined
   /** m/s, with the importer's reason. */
-  excludedShots: { velocity: number; reason: string }[]
+  excludedShots: { velocity: number; reason: string | true }[]
   /** Simulated muzzle velocity of the step at this charge, m/s. */
   simulatedVelocity: number | undefined
   /** Measured mean minus simulated, m/s. */

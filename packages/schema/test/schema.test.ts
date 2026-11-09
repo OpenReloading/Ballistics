@@ -6,6 +6,7 @@ import {
   cartridge,
   caseTypes,
   chronoSession,
+  chronoShot,
   firingSeries,
   leadFree,
   load,
@@ -76,6 +77,12 @@ describe('source', () => {
     for (const link of ['http://', 'https://a b'])
       expect(acceptsSource({ terms: link })).toBe(false)
   })
+
+  it('needs a title or the place in the app where the user entered the values', () => {
+    expect(source.safeParse({ entry: 'range' }).success).toBe(true)
+    expect(source.safeParse({ entry: 'targetDesigner' }).success).toBe(true)
+    expectIssueAt(source, { page: '12' }, 'title')
+  })
 })
 
 describe('load', () => {
@@ -106,6 +113,13 @@ describe('chronoSession', () => {
 
   it('rejects an invalid date', () => {
     expectIssueAt(chronoSession, { ...validSession, date: '2026-13-01' }, 'date')
+  })
+
+  it('leaves a shot out with a reason or as left out at the range, never as false', () => {
+    const shot = { velocity: { value: 800 } }
+    expect(chronoShot.safeParse({ ...shot, excluded: true }).success).toBe(true)
+    expect(chronoShot.safeParse({ ...shot, excluded: 'misread' }).success).toBe(true)
+    expectIssueAt(chronoShot, { ...shot, excluded: false }, 'excluded')
   })
 })
 

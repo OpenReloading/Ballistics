@@ -267,6 +267,12 @@
                 "velocity": {
                   "value": 805
                 }
+              },
+              {
+                "velocity": {
+                  "value": 760
+                },
+                "excluded": true
               }
             ]
           }
@@ -275,7 +281,7 @@
           "kind": "measured",
           "sources": [
             {
-              "title": "Day 1"
+              "entry": "range"
             }
           ]
         }

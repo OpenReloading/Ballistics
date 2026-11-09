@@ -173,8 +173,7 @@ export function LineChart({
                 label: {
                   formatter: l.label,
                   position: 'insideEndTop',
-                  color: tokens.muted,
-                  fontSize: 11,
+                  ...axisText(tokens.muted),
                 },
               })),
             ],

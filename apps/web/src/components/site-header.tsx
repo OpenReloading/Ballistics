@@ -182,7 +182,7 @@ function SectionLinks({
       <Stack
         component="ul"
         aria-labelledby={id}
-        gap={2}
+        gap={0}
         m={0}
         p={0}
         align={rail ? 'center' : 'stretch'}

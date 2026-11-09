@@ -435,7 +435,7 @@ export interface ChronoShot extends z.infer<typeof chronoShot> {
 export const chronoShot: z.ZodObject<{
     velocity: QuantitySchema;
     coldBore: z.ZodOptional<z.ZodBoolean>;
-    excluded: z.ZodOptional<z.ZodString>;
+    excluded: z.ZodOptional<z.ZodUnion<readonly [z.ZodLiteral<true>, z.ZodString]>>;
 }>;
 
 // @public
@@ -1565,7 +1565,8 @@ export interface Source extends z.infer<typeof source> {
 
 // @public
 export const source: z.ZodObject<{
-    title: z.ZodString;
+    title: z.ZodOptional<z.ZodString>;
+    entry: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'range' | 'targetDesigner'>>>;
     publisher: z.ZodOptional<z.ZodString>;
     edition: z.ZodOptional<z.ZodString>;
     page: z.ZodOptional<z.ZodString>;
@@ -1595,8 +1596,9 @@ export interface SourceRecord extends z.infer<typeof sourceRecord> {
 }
 
 // @public
-export const sourceRecord: z.ZodObject<Omit<(typeof source)['shape'], 'page' | 'fields' | 'kind' | 'run'> & {
+export const sourceRecord: z.ZodObject<Omit<(typeof source)['shape'], 'page' | 'fields' | 'kind' | 'run' | 'entry' | 'title'> & {
     id: typeof recordId;
+    title: z.ZodString;
 }, z.core.$strict>;
 
 // @public

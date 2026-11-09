@@ -95,9 +95,10 @@ function readShot(shot: unknown, p: string): ChronoShot {
     if (shot['coldBore']) out.coldBore = true
   }
   if (shot['excluded'] !== undefined) {
-    if (typeof shot['excluded'] !== 'string' || shot['excluded'] === '')
-      fail(`${p}.excluded`, 'excludedNotText')
-    out.excluded = shot['excluded']
+    const excluded = shot['excluded']
+    if (excluded === true || (typeof excluded === 'string' && excluded !== ''))
+      out.excluded = excluded
+    else fail(`${p}.excluded`, 'excludedNotText')
   }
   return out
 }
