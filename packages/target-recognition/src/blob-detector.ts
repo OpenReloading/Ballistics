@@ -87,8 +87,9 @@ function response(P: Float32Array, w: number, h: number, r: number): Float32Arra
   return R
 }
 
-/** The responses of `P` at the box radii `radii`. */
+/** One response image of w x h px per box radius. */
 export type Space = { w: number; h: number; radii: number[]; Rs: Float32Array[] }
+/** The responses of `P` at the box radii `radii`. */
 export const space = (P: Float32Array, w: number, h: number, radii: number[]): Space => ({
   w,
   h,

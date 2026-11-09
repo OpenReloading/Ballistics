@@ -163,7 +163,7 @@ function readEnvelope(
   }
 }
 
-/** Lower envelope of parabolas, rows then columns (Felzenszwalb and Huttenlocher). */
+/** Squared distance in px from each pixel to the nearest pixel whose mask value is `target`; lower envelope of parabolas, rows then columns (Felzenszwalb and Huttenlocher). */
 export function distanceSquared(
   mask: Uint8Array,
   w: number,

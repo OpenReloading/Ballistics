@@ -64,7 +64,7 @@ export type Space = {
     Rs: Float32Array[];
 };
 
-// @public (undocumented)
+// @public
 export const space: (P: Float32Array, w: number, h: number, radii: number[]) => Space;
 
 // @public

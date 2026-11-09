@@ -5,8 +5,8 @@ Finds shapes on target photos for the web app's hole detection and face search, 
 ```js
 import { peaksOf, radiiOf, space } from '@open-reloading/target-recognition'
 
-// bright blobs about D px across on a grey image of w x h px, sigma 0.25 to 0.5 D, strongest first
-const sp = space(grey, w, h, radiiOf(D, [0.25, 0.35, 0.5]))
+// bright blobs about D px across on a gray image of w x h px, sigma 0.25 to 0.5 D, strongest first
+const sp = space(gray, w, h, radiiOf(D, [0.25, 0.35, 0.5]))
 const peaks = peaksOf(sp, new Uint8Array(w * h).fill(1), D) // [{ x, y, response, sigma }, ...]
 ```
 
