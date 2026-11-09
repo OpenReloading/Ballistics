@@ -1,9 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-/**
- * Prints one part alone: `<html data-print={mode}>` switches the print rules (globals.css) until the
- * dialog closes, then `done` runs.
- */
+/** `<html data-print={mode}>` switches the print rules (globals.css) until the dialog closes, then `done` runs. */
 export function printAlone(mode: string, done?: () => void) {
   const html = document.documentElement
   html.dataset.print = mode
@@ -16,10 +13,7 @@ export function printAlone(mode: string, done?: () => void) {
   print()
 }
 
-/**
- * Runs the latest `before` on `beforeprint` and `after` on `afterprint` while `on`. The browser takes
- * its print snapshot right after `beforeprint`: a state change there needs `flushSync`.
- */
+/** The browser takes its print snapshot right after `beforeprint`, so a state change there needs `flushSync`. */
 export function usePrintEvents(before: () => void, after: () => void, on = true) {
   const latest = useRef({ before, after })
   latest.current = { before, after }

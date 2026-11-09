@@ -10,10 +10,7 @@ export interface Segment<T extends string> {
   reason?: string | undefined
 }
 
-/**
- * A row of equal segments over native radios, so the arrow keys move the choice. An unavailable
- * segment stays focusable and shows its reason on hover, focus and touch.
- */
+/** Native radios, so the arrow keys move the choice; an unavailable segment stays focusable and shows its reason on hover, focus and touch. */
 export function SegmentedRow<T extends string>({
   legend,
   name,

@@ -64,10 +64,7 @@ const shownMatches = 20
 /** The matches read for an `arrange`, which may leave some out. */
 const arrangedPage = 100
 
-/**
- * The first matches after `arrange`, the total less the ones it left out. shortcut: a match left
- * out beyond the page read still counts in the total; a list query parameter would make it exact.
- */
+/** The total less the ones `arrange` left out. shortcut: a match left out beyond the page read still counts in the total; a list query parameter would make it exact. */
 function arranged<T>(state: State<T>, arrange: ((items: T[]) => T[]) | undefined): State<T> {
   if (state.status !== 'ok' || !arrange) return state
   const kept = arrange(state.items)
@@ -92,11 +89,7 @@ function statusLine<T>(
     : t('{total} found', { total: state.total })
 }
 
-/**
- * The end of the field: the clear button while a record is chosen, else the browse button, else
- * the loader, else the select's chevron. One button at a time keeps the middle of a narrow field
- * free for a click.
- */
+/** Clear while a record is chosen, else browse, else the loader, else the chevron: one button at a time keeps the middle of a narrow field free for a click. */
 function endSection({
   loading,
   browse,
@@ -135,11 +128,7 @@ function endSection({
   return chevron ? <Combobox.Chevron /> : undefined
 }
 
-/**
- * Search box over the API list of `kind` (`apiFetch`), 300 ms after the last keystroke; the
- * previous request is aborted. With `find` the matches come from it instead, without the pause. Matches open in a list box: arrow keys move, Enter or a click chooses;
- * Enter with no match highlighted chooses the only one.
- */
+/** Searches the API list of `kind` (`apiFetch`) 300 ms after the last keystroke, the previous request aborted; `find` gives the matches instead, without the pause; Enter with no match highlighted chooses the only one. */
 export function RecordSearch<T extends { id: string }>({
   kind,
   label,
@@ -166,10 +155,7 @@ export function RecordSearch<T extends { id: string }>({
   unreachableText: string
   /** Extra query parameters, for example `&cartridge=308-win`. */
   params?: string
-  /**
-   * The chosen record, or the picker's prompt: a compact picker with a search icon, the
-   * label left to screen readers, this text in the empty field.
-   */
+  /** The chosen record, or the picker's prompt in the empty field of a compact picker whose label is left to screen readers. */
   chosen?: string | undefined
   /** `chosen` names a record, not the prompt: drawn in the text colour. */
   picked?: boolean
@@ -282,8 +268,7 @@ export function RecordSearch<T extends { id: string }>({
             }}
             onClick={() => combobox.openDropdown()}
             onBlur={() => combobox.closeDropdown()}
-            // Enter chooses the highlighted match, else the only one; it must not submit the form.
-            // Ctrl+Enter (Cmd+Enter) stays free for the calculator's run shortcut.
+            // Enter chooses the highlighted match, else the only one, and must not submit the form; Ctrl+Enter (Cmd+Enter) stays free for the calculator's run shortcut
             onKeyDown={(e) => {
               if (e.key !== 'Enter' || e.ctrlKey || e.metaKey) return
               e.preventDefault()
@@ -331,10 +316,7 @@ export function RecordSearch<T extends { id: string }>({
   )
 }
 
-/**
- * A picker's chooser dialog: opened with the field's text, the focus back on its opener when it
- * closes, since a dialog opened before its code has loaded mounts open and cannot return it itself.
- */
+/** The focus goes back to its opener on close, as a dialog opened before its code has loaded mounts open and cannot return it itself. */
 export function useChooser() {
   const [dialog, setDialog] = useState({ text: '', opened: false })
   const opener = useRef<HTMLElement | null>(null)

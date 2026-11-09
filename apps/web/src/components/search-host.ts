@@ -1,7 +1,4 @@
-/**
- * The page's own search, set while the workbench is mounted (its search adds records to the load
- * and runs its commands): the shell's Search and Ctrl+K open it instead of the site search.
- */
+/** Set while the workbench is mounted, whose search adds records to the load and runs its commands: the shell's Search and Ctrl+K open it instead of the site search. */
 export const searchHost: {
   page?: (() => void) | undefined
   /** Asked for on the workbench before its search mounted: it opens when it does. */

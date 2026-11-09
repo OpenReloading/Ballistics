@@ -74,10 +74,7 @@ function Text({
   )
 }
 
-/**
- * The symbol a dimension stands for (`data-symbol`): a table maps it, else the owner itself,
- * but not the note flags, detail letters, the axis, the outline and lengths the record does not give.
- */
+/** The symbol a dimension stands for (`data-symbol`): a table maps it, else the owner itself; not the note flags, detail letters, the axis, the outline and lengths the record does not give. */
 export type Linked = true | Record<string, string>
 const symbolOf = (linked: Linked | undefined, owner: string) =>
   linked === undefined
@@ -88,10 +85,7 @@ const symbolOf = (linked: Linked | undefined, owner: string) =>
         : owner
       : linked[owner]
 
-/**
- * Each linked dimension's lines and arrowheads once more, hidden until the page marks it (CSS
- * `.is-hi`): the drawn paths stay one per kind, so the figure renders as before.
- */
+/** Hidden until the page marks it (CSS `.is-hi`), so the drawn paths stay one per kind and the figure renders as before. */
 function Marks({ layout, linked }: { layout: Layout; linked: Linked }) {
   const owners = [...new Set(layout.labels.map((l) => l.owner))].flatMap((owner) => {
     const symbol = symbolOf(linked, owner)
@@ -165,11 +159,7 @@ function fitWidth(model: FigureModel | BulletModel, tallest = model.frame[3]) {
   return `max(calc((100svh - var(--drawing-chrome, 7rem)) * ${(model.frame[2] / tallest).toFixed(4)}), ${readableWidth(model)})`
 }
 
-/**
- * The box both figures fit, as the drawing's minimum size: the wider of the two widths on screen
- * (each fitted and capped by its column, `100cqw`), at the taller of the two aspects, so the box is
- * the same in either length unit.
- */
+/** The wider of the two widths on screen (each capped by its column, `100cqw`) at the taller aspect, so the box is the same in either length unit. */
 function reserved(
   own: { model: FigureModel | BulletModel; tallest?: number | undefined },
   other: { model: FigureModel; tallest: number },
@@ -266,15 +256,7 @@ function DrawingParts({ id, model }: { id: string; model: FigureModel | BulletMo
   )
 }
 
-/**
- * One SVG of a figure, server-rendered: the chamber in its steel band (with the gap shown in the
- * Combined view), the cartridge section, or the bullet section with its assumed parts dashed, the
- * axis, one dimension group per side, the region callouts of Combined, the scale bar. On screen a group, the part turned -90 deg inside the SVG
- * at 8 px per mm, capped by the column and fitted to the window height (no smaller than 11 px
- * text); in print an image, unturned and life size, or with `printScale` the turned model at that
- * scale. With `level` a model laid out for print is drawn on screen as it lies, head left. The view
- * inputs of the figure show and hide the groups.
- */
+/** On screen turned -90 deg at 8 px per mm, capped by the column and fitted to the window height (no smaller than 11 px text); in print unturned and life size, or turned at `printScale`; `level` draws a print layout on screen as it lies, head left. */
 export function TechnicalDrawing({
   id,
   title,
@@ -307,10 +289,7 @@ export function TechnicalDrawing({
   reserve?: { model: FigureModel; tallest: number } | undefined
   /** Screen: the model is laid out level (medium print), shown with `data-level`. */
   level?: boolean
-  /**
-   * Screen: the page sizes the drawing itself (the cartridge designer) and keeps its text 11 px with
-   * the width `--readable` and the height to width `--aspect` the drawing states.
-   */
+  /** The page sizes the drawing itself (the cartridge designer) and keeps its text 11 px with the stated width `--readable` and the height to width `--aspect`. */
   readable?: boolean | undefined
 }) {
   const { medium, em, frame, scale } = model

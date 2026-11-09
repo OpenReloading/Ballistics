@@ -23,11 +23,7 @@ export function watchOverflow(box: HTMLElement, set: (over: boolean) => void) {
   return () => observer.disconnect()
 }
 
-/**
- * The props of a box that scrolls by itself (spread them on it; `box` also receives the element): a
- * named region and a tab stop for keyboard scrolling only while its content overflows, as
- * `ScrollRegion` does.
- */
+/** Spread them on the box (`box` also receives it): a named region and a tab stop only while its content overflows, as `ScrollRegion`. */
 export function useScrollFocus<E extends HTMLElement>(label: string, box?: RefObject<E | null>) {
   const [node, setNode] = useState<E | null>(null)
   const [over, setOver] = useState(true)
@@ -42,12 +38,7 @@ export function useScrollFocus<E extends HTMLElement>(label: string, box?: RefOb
   return { ref, ...(over && { role: 'region', 'aria-label': label, tabIndex: 0 }) }
 }
 
-/**
- * A wide table's container: narrow screens scroll it, not the page. While its content overflows it
- * is a named region and a tab stop for keyboard scrolling; otherwise neither, so a table that fits
- * adds no stop and no landmark. Both from the server HTML on: a box that overflows before hydration
- * stays reachable; the observer drops them once the content fits.
- */
+/** A region and tab stop only while the content overflows, so a table that fits adds no stop or landmark; both from the server HTML on, so a box that overflows before hydration stays reachable. */
 export function ScrollRegion({ label, children }: { label: string; children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null)
   const [over, setOver] = useState(true)
@@ -94,11 +85,7 @@ const tableRoles: Record<string, string> = {
   td: 'cell',
 }
 
-/**
- * `node` with the ARIA role of every table element in it (through fragments, not into cells or
- * components): WebKit drops the table semantics of an element whose CSS `display` changes, as the
- * stacked phone tables do. A header cell is a row header with `scope="row"` or in the body.
- */
+/** Through fragments, not into cells or components: WebKit drops the table semantics of an element whose CSS `display` changes, as the stacked phone tables do; a header cell is a row header with `scope="row"` or in the body. */
 export function withTableRoles(node: ReactNode, inBody = false): ReactNode {
   return Children.map(node, (c) => {
     if (!isValidElement<{ children?: ReactNode | undefined; scope?: string | undefined }>(c))
@@ -118,10 +105,7 @@ function cellRole(type: string | undefined, scope: string | undefined, inBody: b
   return scope === 'row' || (scope !== 'col' && inBody) ? 'rowheader' : 'columnheader'
 }
 
-/**
- * A panel's value table in a ScrollRegion (`withTableRoles`): its caption, one header row of `columns` (`numeric`:
- * every header cell `num`; a column given as `{ label, num: true }`: that header cell) and the body rows as children.
- */
+/** `numeric` makes every header cell `num`, a column `{ label, num: true }` that one; the body rows are the children. */
 export function PanelTable({
   label,
   className,

@@ -16,11 +16,7 @@ const PrimerChooser = dynamic(() => import('./record-choosers.tsx').then((m) => 
   ssr: false,
 })
 
-/**
- * The primer picker of the workbench's pinned row: every primer product of the catalogue in the
- * field and the dialog, the load names the chosen one. `id` is the chosen primer's record id; one
- * the list lacks stays chosen under a generic label, so a saved reference is never dropped.
- */
+/** An `id` the list lacks stays chosen under a generic label, so a saved reference is never dropped. */
 export function PrimerChoice({
   id,
   onChange,

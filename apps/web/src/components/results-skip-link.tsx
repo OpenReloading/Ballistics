@@ -23,8 +23,7 @@ export function ResultsSkipLink() {
       className="skip-link"
       href="#results"
       onClick={(e) => {
-        // unhandled until `Workspace` hydrates (after the layout): then the link goes to #results
-        // and `Workspace` shows the results on mount
+        // unhandled until `Workspace` hydrates (after the layout): then the link goes to #results and `Workspace` shows the results on mount
         if (!window.dispatchEvent(new Event('show-results', { cancelable: true })))
           e.preventDefault()
       }}

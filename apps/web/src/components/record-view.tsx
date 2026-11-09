@@ -51,11 +51,7 @@ interface RecordRef {
   what: DataKind
 }
 
-/**
- * The shared body of a record page: the page's HTML holds the head tags (the route's metadata) and
- * a loading state under the record's name; the record is read from its data file in the browser and
- * `children` renders it, the drawings and tables included.
- */
+/** The page's HTML holds the head tags and a loading state under the record's name; the record is read from its data file in the browser. */
 export function RecordView<T>({
   kind,
   id,
@@ -84,10 +80,7 @@ function Extras<X>({
   return <Pending name={name} what={what} state={state} retry={retry} />
 }
 
-/**
- * `RecordView` of a record whose page also reads `extras` (lists and other records through
- * `apiFetch`): the loading state stays until both are read.
- */
+/** The loading state stays until the record and `extras` are both read. */
 export function RecordViewWith<T, X>({
   extras,
   children,

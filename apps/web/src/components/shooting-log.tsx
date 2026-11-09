@@ -422,10 +422,7 @@ function RowActions({
   )
 }
 
-/**
- * The one-confirm flow of the round count (#633) for a saved entry: asks, and only a yes changes
- * the firearm. The line to show after it; empty when nothing was asked.
- */
+/** One confirm (#633), and only a yes changes the firearm; the line to show after it, empty when nothing was asked. */
 async function offerRounds(id: string, entry: ShootingLogEntry, { t, tn }: Translator) {
   const firearmId = userIdOf(entry.firearm)
   if (!firearmId || entry.rounds < 1) return ''
@@ -479,10 +476,7 @@ async function offerRounds(id: string, entry: ShootingLogEntry, { t, tn }: Trans
     : t('The round count of {name} holds this entry already.', { name })
 }
 
-/**
- * Stores the entries of a user data file: the new ones, and after one question the ones that
- * differ from the browser's. The report line; a throw with the reason when the file is refused.
- */
+/** The new entries, and after one question those that differ from the browser's; the report line, a throw with the reason when the file is refused. */
 async function importEntries(f: File, { t, tn }: Translator) {
   const parsed = parseUserDataFile(await f.text())
   if (!parsed.ok) throw new Error(reasonText(parsed.reason, { t, tn }))
@@ -813,12 +807,7 @@ function LogBody({
   )
 }
 
-/**
- * The shooting log (Schiessbuch): the entries of this browser by date with filters by firearm,
- * year and a day range, an entry form, print of the shown entries with a blank signature column,
- * and CSV and JSON export. Saving an entry offers to add its rounds to the firearm's round count,
- * one confirm, never on its own.
- */
+/** The Schiessbuch: print gives a blank signature column, and saving offers the entry's rounds to the firearm's round count, one confirm, never on its own. */
 export function ShootingLog() {
   const tr = useTranslation()
   const { t } = tr

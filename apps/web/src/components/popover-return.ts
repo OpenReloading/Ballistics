@@ -1,10 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-/**
- * A point tool started from a control in a popover: once the tool ends (`tool` back to `select`),
- * `reopen` opens the popover again and the focus goes back to the control `find` gives for the
- * name passed to the returned function when the tool started.
- */
+/** Once the tool is back to `select`, `reopen` opens the popover again and the focus goes to the control `find` gives for the name passed when the tool started. */
 export function usePopoverReturn(
   tool: string,
   reopen: () => void,

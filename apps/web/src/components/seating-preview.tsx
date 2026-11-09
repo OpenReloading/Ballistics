@@ -113,19 +113,12 @@ const tagText: Record<Tagged['tag'], Message> = {
   approximate: msg('approximate'),
 }
 
-/**
- * A cartridge as designed instead of a catalogue record: its values give the case and the
- * chamber. What the design lacks is shown as not given, and no seating starts by itself.
- */
+/** Its values give the case and the chamber; what it lacks is shown as not given, and no seating starts by itself. */
 export interface DraftCartridge {
   spec: ReturnType<typeof drawable>
   /** Names the design in the drawing's title and description. */
   title: string
-  /**
-   * The workbench's card: the page's fields show what the rows leave out and the figure draws the
-   * design itself, with the cartridge and chamber views. Without it the page is the designer, whose
-   * own drawing is above.
-   */
+  /** The page's fields show what the rows leave out and the figure draws the design with the cartridge and chamber views; without it the page is the designer, whose own drawing is above. */
   card?: true
 }
 
@@ -314,20 +307,14 @@ type PreviewProps = {
   barrelDefault?: Suggestion | undefined
   /** Volume (m³) and travel (m) of the seated bullet, on every change: the interior fields follow them. */
   onSeated: (values: Seated) => void
-  /**
-   * The chosen firearm's lands contact measured with the bullet seated, m: the jump follows it
-   * instead of the C.I.P. chamber. `landsOther`: the firearm has a contact of another bullet, not used.
-   */
+  /** Measured with the bullet seated, m: the jump follows it instead of the C.I.P. chamber; `landsOther` marks a contact of another bullet, not used. */
   lands?: LandsContact | undefined
   landsOther?: boolean | undefined
   /** The chosen firearm's measured freebore, m: the leade starts there past the chamber L3 instead of at the CIP s. */
   freebore?: number | undefined
   /** The seating at another length, for a seating ladder; undefined while no bullet is seated. */
   onSeatLadder?: (seatAt: SeatingLengths | undefined) => void
-  /**
-   * The user's measured case capacity (water to the mouth, m³), held by the page so a remount keeps
-   * it: replaces the record's.
-   */
+  /** Water to the mouth, m³, held by the page so a remount keeps it; replaces the record's. */
   measuredWaterCapacity?: FieldValue | undefined
   onMeasuredWaterCapacity?: (value: FieldValue) => void
   /** The capacity record chosen, held by the page so a load keeps it; without it the choice is the figure's own. */
@@ -342,10 +329,7 @@ type PreviewProps = {
   ownCases?: readonly OwnCase[] | undefined
   ownCaseId?: string | undefined
   onOwnCaseId?: (id: string | undefined) => void
-  /**
-   * The bullet record or design of the page's own bullet input: the preview seats it and
-   * shows no bullet search or design choice of its own.
-   */
+  /** The preview seats it and shows no bullet search or design choice of its own. */
   linked?: {
     bullet?: string | undefined
     design?: string | undefined
@@ -358,10 +342,7 @@ type PreviewProps = {
     /** The name of the brass whose trim length `caseLength` is; none: the length was typed. */
     caseLengthBrass?: string | undefined
   }
-  /**
-   * Where the controls go instead of beside the drawing: case capacity, seating and the
-   * values in `cartridge`, the barrel length in `gun`; the figure keeps the drawing.
-   */
+  /** Case capacity, seating and the values go in `cartridge`, the barrel length in `gun`; the figure keeps the drawing. */
   slots?: {
     cartridge: HTMLElement | null
     gun: HTMLElement | null
@@ -376,10 +357,7 @@ type PreviewProps = {
   ladderStep?: { by: Mode; value: number } | undefined
   /** The figure's full view: the same drawing in a modal at the window's height. */
   fullView?: { opened: boolean; onClose: () => void }
-  /**
-   * The load's charge (kg) and its powder's bulk density (kg/m³): the figure draws the powder fill.
-   * A page without a charge leaves it out and shows no fill.
-   */
+  /** Charge (kg) and bulk density (kg/m³) for the powder fill; a page without a charge shows no fill. */
   powder?: { charge: number | undefined; bulkDensity: number | undefined } | undefined
 }
 
@@ -752,10 +730,7 @@ function cardViewsOf(
   return spec && !designer ? figureViewBuilder(spec, drawn, unit) : noViews
 }
 
-/**
- * The workbench card also draws the figure level, shown where its panel is wider than tall; a
- * design draws it level only, in the room under its own drawing, framed to the combined view.
- */
+/** Level where the card's panel is wider than tall; a design draws it level only, in the room under its own drawing, framed to the combined view. */
 function levelViewsOf(
   spec: Spec | undefined,
   drawIt: boolean,
@@ -811,10 +786,7 @@ const figureOf = (spec: Spec | undefined, seating: Seating | undefined) =>
       }
     : undefined
 
-/**
- * The tolerance of the capacity in use (`capacityFraction`): a measured one with the spread of the
- * chosen brass group when the measured value is the group's.
- */
+/** A measured capacity takes the spread of the chosen brass group when the measured value is the group's. */
 function capacityOf(
   water: { grams: number; source: 'measured' | 'capacity' | 'case' } | undefined,
   records: readonly Capacity[],
@@ -873,11 +845,7 @@ function seatedReport(o: {
 /** The wait after the last slider move before the page gets the seated values, ms. */
 const slideWait = 150
 
-/**
- * The interior fields follow the seated bullet, derived from COAL. The page recomputes from the
- * report, so it goes in a transition, the next slider move first. While the slider moves only the
- * last report is sent, after `slideWait` ms or at once when the slider is released.
- */
+/** The page recomputes from the report, so it goes in a transition behind the next slider move; while sliding only the last report goes, after `slideWait` ms or at once on release. */
 function useReportSeated(
   onSeated: (values: Seated) => void,
   o: Parameters<typeof seatedReport>[0],
@@ -1133,9 +1101,7 @@ function useSeatingModel(p: PreviewProps) {
     setStarted,
   })
 
-  // the slider and the field follow the pointer; what is computed from the position (the
-  // seating, the drawing, the values the page follows) renders after them and gives way to the
-  // next move, with the mode in step so a seating never mixes the two
+  // the slider and field follow the pointer; what the position computes renders after them and gives way to the next move, the mode in step so a seating never mixes the two
   const { pos: seatPos, mode: seatMode } = useDeferredValue(
     useMemo(() => ({ pos, mode }), [pos, mode]),
   )
@@ -1171,10 +1137,7 @@ function useSeatingModel(p: PreviewProps) {
   const figureSeating = useLadderSeating(seatBy, ladderStep, seatMode, seating)
   /** Set by the slider's moves, cleared by its release. */
   const [sliding, setSliding] = useState(false)
-  // Combined without dimensions, each side's record figure with them, as on the cartridge page;
-  // one frame for all, which reaches the longest COAL, so the bullet tip stays in view and the
-  // outline stays put when the view changes; the bullet goes on top. In the workbench card the
-  // Cartridge view's L6 is the seated COAL, with the seated CBTO added
+  // Combined without dimensions, each side's figure with them, as on the cartridge page; one frame reaching the longest COAL keeps the tip in view and the outline put; in the card the Cartridge view's L6 is the seated COAL, plus CBTO
   const inCard = isCard(slots, designer)
   const drawn = fixed?.drawn
   const cardViews = useMemo(
@@ -1185,8 +1148,7 @@ function useSeatingModel(p: PreviewProps) {
     () => levelViewsOf(spec, inCard || designer, designer, drawn, unit),
     [spec, inCard, designer, drawn, unit],
   )
-  // the dimension layout is the costly part of a move: while the slider moves the lengths on the
-  // drawing follow when it rests, the bullet itself follows each move
+  // the dimension layout is the costly part of a move: while sliding the lengths follow when the slider rests, the bullet each move
   const { coal: shownCoal, cbto: shownCbto } = useRestedLengths(figureSeating, sliding)
   const models = useMemo(
     () => cardViews(inCard ? coalOf(shownCoal, shownCbto) : undefined),
@@ -1549,10 +1511,7 @@ function BulletStatus({ m }: { m: Model }) {
   )
 }
 
-/**
- * The brass of the cartridge in the field and the dialog: the user's groups of cases (an id with
- * `user:`) and the case products. Choosing a product makes its stated capacity the default.
- */
+/** The user's groups of cases (`user:` ids) and the case products; a product's stated capacity becomes the default. */
 function CaseChoice({ m }: { m: Model }) {
   const { t } = useTranslation()
   const dialog = useChooser()
@@ -2275,8 +2234,7 @@ function SeatingValues({ m, seating, chamber }: RowsProps) {
         </p>
       )}
       <dl>
-        {/* in the workbench's card the field shows the mode's length with its L6 flag and
-            this list the other one, so both modes keep one height */}
+        {/* in the workbench's card the field shows the mode's length with its L6 flag and this list the other one, so both modes keep one height */}
         {(!card || mode === 'baseToOgive') && <CoalRow {...rows} />}
         {(!card || mode !== 'baseToOgive') && <CbtoRow {...rows} />}
         <Row
@@ -2314,8 +2272,7 @@ function PreviewBody({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Cham
       <SeatingFigure m={m} spec={spec} chamber={chamber} />
       {seating &&
         put(slots, <SeatingValues m={m} seating={seating} chamber={chamber} />, slots?.cartridge)}
-      {/* in the workbench the notes (staying below L6 says nothing about pressure or safety) sit in
-          the Cartridge card's More, beside the further values */}
+      {/* in the workbench the notes (staying below L6 says nothing about pressure or safety) sit in the Cartridge card's More, beside the further values */}
       {slots?.more &&
         seating &&
         createPortal(
@@ -2335,11 +2292,7 @@ function PreviewBody({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Cham
   )
 }
 
-/**
- * Live half-section of the chosen cartridge's case (CIP maximum, interior not shown) in its
- * chamber (CIP minimum) with the bullet seated by COAL or CBTO; seating depth, volume behind the
- * bullet, travel and jump follow the slider and the number field (`@open-reloading/drawing/seating`).
- */
+/** Case at CIP maximum, chamber at CIP minimum; seating depth, volume behind the bullet, travel and jump follow the slider and the field (`@open-reloading/drawing/seating`). */
 export function SeatingPreview(props: PreviewProps) {
   const m = useSeatingModel(props)
   const { t } = useTranslation()

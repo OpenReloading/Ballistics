@@ -608,10 +608,7 @@ function Backdrop({
 const extentKeyOf = (photo: { url: string } | undefined, sheet: TargetSheet) =>
   `${photo?.url ?? sheet.photo ?? 'drawn'} ${sheet.photoRotation ?? 0}`
 
-/**
- * The box shown (the fixed one, else the zoomed view, else the extent) and `k`, its view units
- * per screen px (the box is fitted with `meet`).
- */
+/** The fixed box, else the zoomed view, else the extent; `k` is its view units per screen px (the box fitted with `meet`). */
 function shownView(
   still: { box: ViewBox; k: number } | undefined,
   view: ViewBox | undefined,
@@ -626,11 +623,7 @@ function shownView(
 const showsAxes = (frame: Frame | undefined, sheet: TargetSheet, still: object | undefined) =>
   Boolean(frame?.calibration && sheet.targetOrigin && !still)
 
-/**
- * The drawing of a target sheet: the photo (or a drawn target), references, points of aim, shots
- * and the switchable overlays, all mapped from target m to the view through `frame`; pointer and
- * keyboard edits are reported to the editor.
- */
+/** All mapped from target m to the view through `frame`; pointer and keyboard edits are reported to the editor. */
 export function TargetCanvas({
   sheet,
   frame,

@@ -8,10 +8,7 @@ export interface ComparedString {
   stats: StringStats | undefined
 }
 
-/**
- * The strings two by two by the SD intervals: the string with the smaller SD, or that the
- * difference is smaller than the uncertainty, or that a string has too few shots to compare.
- */
+/** By the SD intervals: the string with the smaller SD, or that the difference is smaller than the uncertainty, or that a string has too few shots to compare. */
 export function StringComparison({ strings }: { strings: readonly ComparedString[] }) {
   const { t } = useTranslation()
   const kept = strings.flatMap((s) => (s.stats ? [{ name: s.name, stats: s.stats }] : []))

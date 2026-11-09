@@ -86,12 +86,7 @@ export function SafetyActions({
   )
 }
 
-/**
- * The README Safety text as a disclaimer dialog. On the first visit it must be accepted (no close
- * button, Escape or outside click); Decline leaves the site. `openSafety` shows it again. In another
- * language than English the translation stands beside the English text (below it on a narrow
- * screen), each with the line that the English text is binding.
- */
+/** On the first visit it must be accepted (no close button, Escape or outside click), Decline leaves the site; a translation stands beside the English text, each with the line that the English text is binding. */
 export function SafetyDialog() {
   const { t, language } = useTranslation()
   const translated = language !== 'en'
@@ -139,8 +134,7 @@ export function SafetyDialog() {
           <NavIcon name="safety" /> {t('Safety notice and disclaimer')}
         </>
       }
-      // the first focus: on the text, not on a button that Enter would press; focusable so the
-      // keys scroll it
+      // the first focus is on the text, not on a button that Enter would press, and focusable so the keys scroll it
       bodyProps={{ tabIndex: 0, 'data-autofocus': true, className: 'safety-text' }}
       footer={
         <SafetyActions
@@ -159,11 +153,7 @@ export function SafetyDialog() {
   )
 }
 
-/**
- * The yellow Safety button of the top bar (light yellow: the caution
- * tokens of `.safety-light` in globals.css, about 8:1): labelled with its icon in the page bar from
- * 75em, icon only in the phone top bar; screen only.
- */
+/** Light yellow from the caution tokens of `.safety-light` in globals.css (about 8:1); labelled from 75em, icon only in the phone top bar, screen only. */
 export function SafetyBarButton({
   iconOnly = false,
   className,

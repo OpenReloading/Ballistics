@@ -5,11 +5,7 @@ import type { ReactNode } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import type { Message } from '../i18n/translate.ts'
 
-/**
- * A titled panel of the page template: one border and radius, a title row of at most 28 px
- * with the panel's own controls at its right, the content below. Flat on phones (no border or
- * padding), flat in print (no border, radius or background) and never split across pages.
- */
+/** A title row of at most 28 px; flat on phones (no border or padding) and in print (no border, radius or background), never split across pages. */
 export function Panel({
   id,
   title: given,

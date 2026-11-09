@@ -62,10 +62,7 @@ function place(
   }
 }
 
-/**
- * What the page reads besides the record: the manufacturer names, for a fitted powder its place in
- * the burn-rate order, and the names of the cartridges the manufacturer lists it for.
- */
+/** Besides the record: the manufacturer names, a fitted powder's place in the burn-rate order, the cartridges the manufacturer lists it for. */
 interface Extras {
   names: ManufacturerNames
   placed: BurnRatePlace | undefined

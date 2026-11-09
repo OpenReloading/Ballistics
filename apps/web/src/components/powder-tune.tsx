@@ -193,10 +193,7 @@ export const saveFailures = {
   ),
 }
 
-/**
- * Saves the fit as a user powder: always the fitted values, so the record is the fit, and a
- * line says so while sliders are off the fit.
- */
+/** Always the fitted values, so the record is the fit; a line says so while sliders are off the fit. */
 function SaveFit({
   state,
   strings,
@@ -326,12 +323,7 @@ function useHandTuning(fit: PowderFitState['fit']) {
   return { setHand, tuned, values, curve }
 }
 
-/**
- * The fit's result: the pressure range's label and its reasons, the fitted values with their
- * intervals, hand tuning, the curve and band with the band's numbers at both ends, and the save.
- * Each is its own element of the page's grid (`.tune-layout`), which sets the chart beside the rest
- * from 64em and after the hand tuning below that.
- */
+/** Each part its own element of the page's grid (`.tune-layout`), which sets the chart beside the rest from 64em and after the hand tuning below that. */
 function FitResult({
   state,
   rows,
@@ -553,11 +545,7 @@ function FitResult({
   )
 }
 
-/**
- * A row of `TuneStrings`: `fitted`, the table has the fit's columns; `remove`, its Remove button,
- * null for a string not added on the page and undefined where the table has no such column. A
- * plain function, not a component, so `PanelTable` gives its row and cells their roles.
- */
+/** `remove` null for a string not added on the page, undefined where the table has no such column; a plain function, so `PanelTable` gives its row and cells their roles. */
 function stringRow(
   {
     key,
@@ -620,12 +608,7 @@ function stringRow(
   )
 }
 
-/**
- * The strings, one row each: charge, powder temperature (empty for the load's), shots, mean and SD,
- * and once a fit of them is shown its simulated velocity and residual. `fault`, kg, marks the
- * charge the model cannot run; the strings from `removable` on, those added on the page, have a
- * Remove button.
- */
+/** Powder temperature empty for the load's; `fault` (kg) marks the charge the model cannot run; the strings from `removable` on were added on the page and have Remove. */
 export function TuneStrings({
   strings,
   fault,
@@ -702,11 +685,7 @@ const formErrors: Record<keyof StringForm, Marked> = {
   temperature: msg('A number, or empty'),
 }
 
-/**
- * The form that adds a string, under the strings table: charge, shot velocities and powder
- * temperature, each with its error on the field. `oneTemperature`: the note that the temperature
- * factor needs strings at two temperatures or more, beside the temperature field.
- */
+/** Each error on its field; `oneTemperature` notes that the temperature factor needs strings at two temperatures or more. */
 export function AddString({
   onAdd,
   oneTemperature = false,
@@ -789,10 +768,7 @@ export function AddString({
   )
 }
 
-/**
- * What the screen says of the load the strings name: save it first, open it on the workbench when
- * no load was handed over, the strings of another load left out, and the fit once it runs.
- */
+/** Save the load first, open it on the workbench when no load was handed over, another load's strings left out, then the fit. */
 export function TuneNotes({
   loaded,
   interior,
@@ -926,11 +902,7 @@ function usePowderNames(refs: readonly string[], records: readonly UserRecord[])
   return names
 }
 
-/**
- * The way in without a load: a powder select over the powders of the saved loads with strings,
- * then the saved loads of the chosen powder, each opened in the workbench, whose Measurements link
- * fits the powder.
- */
+/** The powders of the saved loads with strings, then the chosen one's saved loads, each opened in the workbench, whose Measurements link fits the powder. */
 function PowderChoice({
   records,
   powder,
@@ -991,12 +963,7 @@ function PowderChoice({
   )
 }
 
-/**
- * The powder tuning screen: the chronograph strings of the sessions the link names (`?session=`)
- * and those added here, one row each, with the residuals of the fit from the load the workbench
- * handed over for their load. Without sessions it offers the powders of the saved loads with
- * strings (`?powder=` picks one) and lists that powder's saved loads.
- */
+/** The strings of `?session=` and those added here, with the fit's residuals from the load the workbench handed over; without sessions the powders of saved loads with strings (`?powder=` picks one). */
 export function PowderTune() {
   const { t, tn } = useTranslation()
   const { system } = useUnits()

@@ -73,12 +73,7 @@ function NoPowders() {
   )
 }
 
-/**
- * The powder directory: manufacturer, name, form, base and the burn rate in one cell (the
- * mean dynamic vivacity, its interval and both on one log scale for every row); powders with a
- * curve are ticked for the burn-rate overlay of `/powders/burn-rates`. The powders of this browser
- * are Mine rows, opened in the powder designer.
- */
+/** Every row's interval on one log scale; powders with a curve are ticked for the overlay of `/powders/burn-rates`; this browser's powders are Mine rows, opened in the powder designer. */
 export function PowderList({ packed }: { packed: PackedPowder[] }) {
   const { t, tn } = useTranslation()
   const [records, removeRow, read] = useUserRecords()

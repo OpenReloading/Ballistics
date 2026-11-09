@@ -62,14 +62,7 @@ const colourOptions = (part: 'fill' | 'line', t: Translator['t']) => [
   }),
 ]
 
-/**
- * The target face designer: the rings, inner ten, black area and events of a face as fields, the
- * face drawn from them by `@open-reloading/drawing` while they change, the checks of the target
- * face schema at the fields. The draft is kept in this browser on every change (a record of kind
- * `targetFaceDesign`); a face that passes the schema is offered by the shot groups and hit
- * probability tools as the user's own. `?record=` opens a browser record, the link of a Mine row of
- * the target list.
- */
+/** The draft is kept in this browser on every change (a record of kind `targetFaceDesign`), and once it passes the schema the shot groups and hit probability tools offer it; `?record=` opens a browser record, a Mine row's link. */
 export function TargetDesigner() {
   const { t, tn } = useTranslation()
   const { system } = useUnits()

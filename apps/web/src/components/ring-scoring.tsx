@@ -267,10 +267,7 @@ function EventSelect({
   )
 }
 
-/**
- * Label boxes of the shot values of a group, view units: outward from the group centre, clear of
- * the shot marks, their numbers and each other (`placeLabel`).
- */
+/** In view units, outward from the group centre, clear of the shot marks, their numbers and each other (`placeLabel`). */
 function shotLabels(
   frame: Frame,
   markerDiameter: number | undefined,
@@ -305,8 +302,7 @@ function shotLabels(
     x: pts.reduce((t, p) => t + p.x, 0) / (pts.length || 1),
     y: pts.reduce((t, p) => t + p.y, 0) / (pts.length || 1),
   }
-  // shortcut: placeLabel grows with the square of the shots; above 50 the values sit at a fixed
-  // offset (bench groups are far smaller); memoize the placement if large groups need it
+  // shortcut: placeLabel grows with the square of the shots, so above 50 the values sit at a fixed offset (bench groups are far smaller); memoize the placement if large groups need it
   if (pts.length > 50) return pts.map((p) => ({ x: p.x + 7 * k, y: p.y + 5 * k, w: 0, h: 0 }))
   return pts.map((p, i) => placeLabel(scene, shotText(nth(r.score.shots, i)), [p], c))
 }
@@ -728,10 +724,7 @@ function ScorePanel(p: PanelProps) {
   )
 }
 
-/**
- * The group's face choice, its discipline and the federation of the Discipline list: the one
- * picked, else the one of the group's discipline.
- */
+/** The one picked, else the one of the group's discipline. */
 function useDisciplineChoice(group: ShotGroup | undefined, data: FederationData | undefined) {
   /** The federation picked for the Discipline list; undefined: the one of the group's discipline. */
   const [federation, setFederation] = useState<string>()
@@ -752,11 +745,7 @@ function faceOf(choice: GroupFace | undefined, faces: Record<string, Face | 'err
   return { face, record: face && face !== 'error' ? face : undefined }
 }
 
-/**
- * Ring scoring in the target editor (`apps/docs/docs/models/ring-scoring.md`): the face and event of
- * the active group, its alignment (centred on the point of aim, or fitted to points marked on its
- * rings with the tool `rings`), the rings and values on the canvas, and every group's score.
- */
+/** Alignment centred on the point of aim or fitted to points marked on its rings with the tool `rings` (`apps/docs/docs/models/ring-scoring.md`). */
 export function useRingScoring({
   sheet,
   frame,

@@ -1,12 +1,7 @@
 /** Space between the fixed top bar and a popover beside its target, px. */
 const barGap = 8
 
-/**
- * Keeps a popover placed beside its target (driver.js places it after this hook, and again on a
- * scroll or resize) below the fixed top bar: beside a target that starts under the bar it would
- * cover the page actions. A popover above or below its target, beside a target in the bar itself,
- * is left; it moves no further than the window's foot.
- */
+/** driver.js places it after this hook and again on a scroll or resize; beside a target that starts under the fixed top bar it would cover the page actions; above or below its target, or beside one in the bar, it is left, and never moves past the window's foot. */
 export function keepBelowTopBar(wrapper: HTMLElement) {
   const place = () => {
     if (!/driver-popover-side-(left|right)/.test(wrapper.className)) return

@@ -130,10 +130,7 @@ export function emptyListNote(
   return { title: texts.empty, text: msg('Remove a filter or a word.') }
 }
 
-/**
- * One record kind of the chooser dialog: its texts, catalogue, filters, sorts, ranking, columns
- * and the facts of its preview.
- */
+/** One record kind of the chooser dialog: texts, catalogue, filters, sorts, ranking, columns and the facts of its preview. */
 export interface ChooserKind<R extends ChooserRow> {
   texts: ChooserTexts
   /** The whole catalogue, read once per page load; without it the page gives the rows (`catalogue`). */
@@ -147,10 +144,7 @@ export interface ChooserKind<R extends ChooserRow> {
   facts: (row: R, system: UnitSystem, t: Translator['t']) => [Message, string | undefined][]
   /** The page of a catalogue record, if it has one. */
   href?: (row: R) => string | undefined
-  /**
-   * A record with values missing (`complete-records.ts`): the filter "Complete records only"
-   * hides it, else it follows the complete ones with a mark.
-   */
+  /** Values missing (`complete-records.ts`): "Complete records only" hides it, else it follows the complete ones with a mark. */
   incomplete?: (row: R) => boolean
 }
 
@@ -353,14 +347,7 @@ interface ChooserProps<R extends ChooserRow> {
   catalogue?: readonly R[]
 }
 
-/**
- * The record picker of a workbench card as a dialog, for one record `kind`: a search box over the
- * whole catalogue and the browser's own designs, filters, a result list and a preview of the
- * highlighted record. The search box keeps the focus: arrow keys highlight, Enter or a click
- * chooses. `filters` and `chips` hold a kind's own filters, which `kind.search` reads; `count` is
- * how many of them are set. `catalogue` gives the rows of a kind without `load`, such as the
- * user's firearms.
- */
+/** The search box keeps the focus (arrow keys highlight, Enter or a click chooses); `filters` and `chips` hold the kind's own filters for `kind.search`, `count` how many are set, `catalogue` the rows of a kind without `load`. */
 export function RecordChooser<R extends ChooserRow>(props: ChooserProps<R>) {
   const { kind, opened, onClose, catalogue: given } = props
   const { t } = useTranslation()

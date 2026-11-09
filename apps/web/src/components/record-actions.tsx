@@ -29,10 +29,7 @@ import { AppPopover, popoverWidth } from './app-popover.tsx'
 import { TourButton } from './tour-button.tsx'
 import { UnitsIconButton } from './units-settings.tsx'
 
-/**
- * A link among the page bar's buttons with its icon, drawn as a default Mantine button, or filled
- * as the page's one primary action.
- */
+/** Drawn as a default Mantine button, or filled as the page's one primary action. */
 export function LinkButton({
   href,
   size,
@@ -62,12 +59,7 @@ export function LinkButton({
   )
 }
 
-/**
- * Every record page's actions, one component so they cannot drift: Use in
- * workbench or Open in shot groups (filled, the primary action), Open in designer, Compare, Tune from strings, each where the record has
- * one, then the record pages' Tour, Units, Copy link and Print as icon buttons with their names on
- * hover and focus. The bullet comparison shows the icon buttons alone.
- */
+/** One component, so the record pages' actions cannot drift: each where the record has one, the icon buttons named on hover and focus; the bullet comparison shows the icon buttons alone. */
 export function RecordActions({
   compare,
   workbench,
@@ -141,10 +133,7 @@ export function CopyStatus({ copied, error }: { copied: boolean; error: Error | 
   )
 }
 
-/**
- * Print in a page bar: an icon button named Print, the name (or `hint`, what the print holds) on
- * hover and focus, as the other icon actions of the bars.
- */
+/** Its name (or `hint`, what the print holds) on hover and focus, as the bars' other icon actions. */
 export function PrintButton({
   onClick = () => window.print(),
   disabled,

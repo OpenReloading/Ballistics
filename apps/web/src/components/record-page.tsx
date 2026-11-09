@@ -10,13 +10,7 @@ import { RecordActions } from './record-actions.tsx'
 import { provenanceKinds, Sources } from './sources.tsx'
 import { MutedBadge } from './standard-badge.tsx'
 
-/**
- * The frame of a record page (the cartridge and powder records build on it): the page bar with
- * the name, the badges after it and the actions (Use in workbench, Open in designer, Compare, Units, Copy
- * link, Print), then from 62em a fixed grid of figure, values, and the side column with the
- * sources below it. On a phone one column in document order: figure, values, side,
- * sources.
- */
+/** From 62em a fixed grid of figure, values and the side column over the sources; on a phone one column in document order. */
 export function RecordPage({
   title,
   short,

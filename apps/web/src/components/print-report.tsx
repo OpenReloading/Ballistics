@@ -4,10 +4,7 @@ import { type ReactNode, type Ref, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { usePortalBody } from './print.ts'
 
-/**
- * A copy of a drawn chart's SVG that scales to the paper. Sized from the SVG's own width and height,
- * which a chart in a hidden tab keeps (its box measures 0).
- */
+/** Sized from the SVG's own width and height, which a chart in a hidden tab keeps (its box measures 0). */
 export function chartCopy(svg: SVGSVGElement): SVGSVGElement {
   const clone = svg.cloneNode(true) as SVGSVGElement
   const w = Number(svg.getAttribute('width')) || svg.clientWidth
@@ -21,11 +18,7 @@ export function chartCopy(svg: SVGSVGElement): SVGSVGElement {
   return clone
 }
 
-/**
- * A page's print view: rendered into `body`, never on screen, printed alone
- * while it is mounted and shown (`<html data-report>`) and no other print mode (`<html data-print>`)
- * is set. `chartSlot` receives the chart slot, which the page fills with a `chartCopy` after each draw.
- */
+/** Never on screen, printed alone while mounted and shown (`<html data-report>`) with no other print mode (`<html data-print>`); the page fills `chartSlot` with a `chartCopy` after each draw. */
 export function PrintReport({
   children,
   after,

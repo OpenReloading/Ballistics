@@ -31,10 +31,7 @@ const specs = [
   },
 ] as const satisfies readonly FieldSpec[]
 
-/**
- * The lead of a moving target at each range of the trajectory table, from the time of flight of
- * the trajectory (`apps/docs/docs/models/exterior-moving-target.md`).
- */
+/** From the trajectory's time of flight (`apps/docs/docs/models/exterior-moving-target.md`). */
 export function MovingTarget({
   points,
   system,
