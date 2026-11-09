@@ -11655,7 +11655,7 @@ main .page-bar h1 {
 
 .rate-ticks text {
   fill: var(--muted);
-  font-size: 11px;
+  font-size: var(--mantine-font-size-xs);
   font-weight: 400;
 }
 
@@ -13041,7 +13041,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 
 .tune-chart {
   display: block;
-  font-size: 11px;
+  font-size: var(--mantine-font-size-xs);
   fill: var(--fg);
 }
 
