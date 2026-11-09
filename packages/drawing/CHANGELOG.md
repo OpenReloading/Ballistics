@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.0.5](https://github.com/OpenReloading/Ballistics/compare/drawing-v0.0.4...drawing-v0.0.5) (2026-11-09)
+
+
+### Features
+
+* **schema:** store where the user entered a source and a range exclusion as values, not English text ([#1132](https://github.com/OpenReloading/Ballistics/issues/1132)) ([9b56a82](https://github.com/OpenReloading/Ballistics/commit/9b56a8248e79604ebea042916756732f0029d1b8))
+
+
+### Documentation
+
+* **packages:** one-line comments in packages drawing, use-cases, shot-groups and statistics ([#1134](https://github.com/OpenReloading/Ballistics/issues/1134)) ([7018981](https://github.com/OpenReloading/Ballistics/commit/70189813987e2602aee95e73a43c5ff62a075afd))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @open-reloading/catalog bumped to 0.0.6
+
 ## [0.0.4](https://github.com/OpenReloading/Ballistics/compare/drawing-v0.0.3...drawing-v0.0.4) (2026-11-02)
 
 

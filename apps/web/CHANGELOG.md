@@ -1,5 +1,56 @@
 # Changelog
 
+## [0.0.6](https://github.com/OpenReloading/Ballistics/compare/web-v0.0.5...web-v0.0.6) (2026-11-09)
+
+
+### Features
+
+* **ballistics:** add the ballistics package with the exterior models ([#1024](https://github.com/OpenReloading/Ballistics/issues/1024)) ([6038aac](https://github.com/OpenReloading/Ballistics/commit/6038aac5d72c2bd6838f47ba301a2aea88691c12))
+* **ballistics:** move the interior model and the record helpers into ballistics ([#1038](https://github.com/OpenReloading/Ballistics/issues/1038)) ([1ac9bd7](https://github.com/OpenReloading/Ballistics/commit/1ac9bd721bbfaf47f9c042d9850242f70ed8e85d))
+* **ballistics:** move the powder and pressure-curve fits into ballistics ([#1049](https://github.com/OpenReloading/Ballistics/issues/1049)) ([225670f](https://github.com/OpenReloading/Ballistics/commit/225670fdb60a8e5c3a9742cd254c464334fd1607))
+* **design-tokens:** add the design-tokens package with the Brand palette and the Mantine theme ([#1066](https://github.com/OpenReloading/Ballistics/issues/1066)) ([4f89af4](https://github.com/OpenReloading/Ballistics/commit/4f89af4e9f7449096d3a662d5dfbfa399be1a551))
+* **locale-format:** add the locale-format package for Intl formatting and display units ([#1010](https://github.com/OpenReloading/Ballistics/issues/1010)) ([5791255](https://github.com/OpenReloading/Ballistics/commit/579125550369889b1a761325a93d0a3774a646fc))
+* **schema:** store where the user entered a source and a range exclusion as values, not English text ([#1132](https://github.com/OpenReloading/Ballistics/issues/1132)) ([9b56a82](https://github.com/OpenReloading/Ballistics/commit/9b56a8248e79604ebea042916756732f0029d1b8))
+* **shot-groups:** add the shot-groups package for photo geometry, ellipses, ring and competition scoring ([#1020](https://github.com/OpenReloading/Ballistics/issues/1020)) ([0170b0b](https://github.com/OpenReloading/Ballistics/commit/0170b0be5c6f43d8266fa48e330978b27f5dc85c))
+* **shot-groups:** hit probability on statistics, with statistics' InputError carrying the typed issue ([#1025](https://github.com/OpenReloading/Ballistics/issues/1025)) ([ee3a36b](https://github.com/OpenReloading/Ballistics/commit/ee3a36bbe399f9c70fa55716eb0182a483df30ae))
+* **statistics:** add the statistics package and the test kit ([#1013](https://github.com/OpenReloading/Ballistics/issues/1013)) ([6a7ef0a](https://github.com/OpenReloading/Ballistics/commit/6a7ef0a5d0f2de689b39d822fa2505a72db25b67))
+* **statistics:** one check of the solver limits and one percentile; truing refuses unusable limits ([#1077](https://github.com/OpenReloading/Ballistics/issues/1077)) ([b181937](https://github.com/OpenReloading/Ballistics/commit/b18193777942846387df4a03e4b512c0edb9de13))
+* **ui:** add the ui package with Mantine on the design tokens and Storybook ([#1070](https://github.com/OpenReloading/Ballistics/issues/1070)) ([4f700ac](https://github.com/OpenReloading/Ballistics/commit/4f700acf14f04e5d756ebc908beccb2495713683))
+* **units:** add the units package with the new-package gate profile ([#996](https://github.com/OpenReloading/Ballistics/issues/996)) ([fee565b](https://github.com/OpenReloading/Ballistics/commit/fee565bdccc35afb221db665c2526e7103eee004))
+* **use-cases:** add the use-cases package with the compute task protocol ([#1094](https://github.com/OpenReloading/Ballistics/issues/1094)) ([7e1441b](https://github.com/OpenReloading/Ballistics/commit/7e1441bb51998661ef6f37755505cfe4ce1961c0))
+* **web:** say when the catalogue has no powders, and where a powder comes from instead ([#1046](https://github.com/OpenReloading/Ballistics/issues/1046)) ([cdc8462](https://github.com/OpenReloading/Ballistics/commit/cdc846238fd3b5714fdac4e46ec7c82a0c312b84))
+
+
+### Bug fixes
+
+* **web:** German Undo and score decimal marks; error token in import notes ([#1067](https://github.com/OpenReloading/Ballistics/issues/1067)) ([e6585a0](https://github.com/OpenReloading/Ballistics/commit/e6585a0f6476ec3f715e63977cea800771313c55))
+* **web:** the tab title follows the language shown ([#1073](https://github.com/OpenReloading/Ballistics/issues/1073)) ([571a38b](https://github.com/OpenReloading/Ballistics/commit/571a38babf856196e9ceb8a8cf5734fd3b0823e8))
+
+
+### Documentation
+
+* long rationale comments move to the docs with one-line pointers ([#1113](https://github.com/OpenReloading/Ballistics/issues/1113)) ([7ea9a4f](https://github.com/OpenReloading/Ballistics/commit/7ea9a4f6658d85fa1d8b4d30aac98b5edac199f5))
+* one-line comments in tools, cli, the apps' scripts and tests, and the small packages ([#1135](https://github.com/OpenReloading/Ballistics/issues/1135)) ([a7ec598](https://github.com/OpenReloading/Ballistics/commit/a7ec5981642f3de5429bbd4b1b498d3652882870))
+* **web:** one-line comments in apps/web/src/components, app-modal to match-rounds ([#1122](https://github.com/OpenReloading/Ballistics/issues/1122)) ([99474c4](https://github.com/OpenReloading/Ballistics/commit/99474c4df058ccb18cfed692660c78a207a1bb70))
+* **web:** one-line comments in apps/web/src/components, measurements to tour-placement ([#1123](https://github.com/OpenReloading/Ballistics/issues/1123)) ([1481385](https://github.com/OpenReloading/Ballistics/commit/1481385377bc5349dc3da84d5d33a9e36a3bd12a))
+* **web:** one-line comments in apps/web/src/components, trajectory-form to zero-target ([#1124](https://github.com/OpenReloading/Ballistics/issues/1124)) ([b9cef7a](https://github.com/OpenReloading/Ballistics/commit/b9cef7ac74b6bfb1ea8a68a25d47d15d08799ea8))
+* **web:** one-line comments in apps/web/src/lib, any-signal to chrono ([#1115](https://github.com/OpenReloading/Ballistics/issues/1115)) ([894ea4e](https://github.com/OpenReloading/Ballistics/commit/894ea4e48cbf841135ff73a72587ecfb9628cc96))
+* **web:** one-line comments in apps/web/src/lib, colour-axis to ladder-impact ([#1116](https://github.com/OpenReloading/Ballistics/issues/1116)) ([dda7108](https://github.com/OpenReloading/Ballistics/commit/dda71081b9c23e123359344e12b40f40612c1b9d))
+* **web:** one-line comments in apps/web/src/lib, ladder-slope to safety ([#1117](https://github.com/OpenReloading/Ballistics/issues/1117)) ([5136f92](https://github.com/OpenReloading/Ballistics/commit/5136f929d58842b63e1bc7f4f87aae3c950646f1))
+* **web:** one-line comments in apps/web/src/lib, seating-ladder to zero-target ([#1118](https://github.com/OpenReloading/Ballistics/issues/1118)) ([4d43885](https://github.com/OpenReloading/Ballistics/commit/4d4388503aaee7ab2a29420cbb1ef68e0b9b3b4c))
+* **web:** twelve sweep comments get back the package name or link their rewrite dropped ([#1136](https://github.com/OpenReloading/Ballistics/issues/1136)) ([b3f26a3](https://github.com/OpenReloading/Ballistics/commit/b3f26a3e0604f2123bd00d21ac4ba1cc1db7be3e))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @open-reloading/api bumped to 0.0.6
+    * @open-reloading/catalog bumped to 0.0.6
+    * @open-reloading/drawing bumped to 0.0.5
+    * @open-reloading/importers bumped to 0.0.6
+    * @open-reloading/schema bumped to 0.0.6
+
 ## [0.0.5](https://github.com/OpenReloading/Ballistics/compare/web-v0.0.4...web-v0.0.5) (2026-11-02)
 
 
