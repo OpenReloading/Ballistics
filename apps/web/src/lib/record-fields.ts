@@ -37,10 +37,7 @@ type Translate = Translator['t']
 /** Without a catalogue every text is English: what the record functions give when no translation is passed. */
 const english = translator().t
 
-/**
- * One row of a record's value table: a text, or a quantity in SI that the table shows in the
- * viewer's unit; the text as printed and how a computed value is computed show on hover.
- */
+/** A quantity in SI shows in the viewer's unit; the printed text and how a computed value is computed show on hover. */
 export interface FieldRow {
   /** A message (`msg`), or `verbatim(name)` for a name as published (a drag model, a composition's substance). */
   label: Wording
@@ -145,10 +142,7 @@ const capitalised = (text: string) => text.charAt(0).toUpperCase() + text.slice(
 export const structureText = (structure: string, t: Translator['t']) =>
   capitalised(say(t, rawWording(structure)).replaceAll('-', ' '))
 
-/**
- * The construction in a few words: the structure, the core and jacket materials, the surface; a
- * wording with no structured field as printed. The manufacturer's wording shows as the printed text.
- */
+/** The manufacturer's wording shows as the printed text. */
 export function constructionRows(c: Bullet['construction'], t: Translator['t']): FieldRow[] {
   if (!c) return []
   const material = (value: string) => say(t, spacedWording(value))
@@ -220,10 +214,7 @@ const stored =
 const length = stored('length', 'mm')
 const twist = stored('twist', 'mm')
 
-/**
- * The build as one row per structured field (structure, jacket, core, surface), the manufacturer's
- * wording as printed on the first; the wording alone where nothing is structured.
- */
+/** The manufacturer's wording as printed on the first row. */
 export function buildRows(c: Bullet['construction']): FieldRow[] {
   if (!c) return []
   const material = (m: string) => m.replaceAll('-', ' ')
@@ -255,11 +246,7 @@ export function buildRows(c: Bullet['construction']): FieldRow[] {
   return rows.map((row, i) => (i === 0 ? { ...row, printed: c.raw } : row))
 }
 
-/**
- * The bullet data in groups (Size, Shape, Tip and base, Build, Twist, Computed), in record order,
- * each dimension with its drawing symbol; absent fields and empty groups are left out. The
- * manufacturer, product number, line and caliber are the page's title and badges.
- */
+/** Record order; maker, product number, line and caliber are the page's title and badges. */
 export function bulletDataGroups(b: Bullet): FieldGroup[] {
   const angle = b.base?.angle
   return [
@@ -362,10 +349,7 @@ function listedRows(
   ]
 }
 
-/**
- * The groups of a powder page's Properties table, in record order; absent fields are left out.
- * Manufacturer, form, base, bulk density and country are the cards of `powderStrip`.
- */
+/** Maker, form, base, bulk density and country are the cards of `powderStrip`. */
 export function powderRowGroups(
   p: Powder,
   cartridgeNames: ReadonlyMap<string, string> = new Map(),
@@ -414,11 +398,7 @@ export function powderRowGroups(
   ]
 }
 
-/**
- * A fitted value with its interval `half` (plus and minus) as text: the interval to two significant
- * digits, the value to the same decimal place, and the interval in percent (whole from 10 %).
- * Without an interval the value as stored. No-break spaces, so it wraps only before the percent.
- */
+/** Interval to two significant digits, value to the same place, the interval also in percent (whole from 10 %); no-break spaces so it wraps only before the percent. */
 export function intervalText(value: number, half: number | undefined): string {
   if (half === undefined || !(half > 0)) return `${value}`
   const digits = Math.max(0, 1 - Math.floor(Math.log10(half)))
@@ -434,11 +414,7 @@ const fittedNote = (k: number) =>
     { k },
   )
 
-/**
- * The fitted parameters of a powder's model fit with their intervals of plus and minus `k`
- * standard uncertainties; `ratio`: the fitted energy over the thermochemistry energy and the
- * median of the powders that have one.
- */
+/** `ratio`: fitted over thermochemistry energy, with the median of powders that have one. */
 export function fittedParameterRows(
   p: Powder,
   k: number,
@@ -588,10 +564,7 @@ export function burnFormRows(p: Powder): FieldRow[] {
   ]
 }
 
-/**
- * The Model parameters table of a fitted powder: the fitted values first (`fittedParameterRows`
- * with `k` and `ratio`), then the fixed inputs and the burn form, both under the filter Fixed inputs.
- */
+/** Fitted values first, then fixed inputs and the burn form under the Fixed inputs filter. */
 export function powderParameterGroups(
   p: Powder,
   k: number,
@@ -655,10 +628,6 @@ const bulletType = (b: Bullet): FieldRow[] => {
     : [{ label: msg('Type'), text: parts.join(', '), words: parts.map((p) => rawWording(p)) }]
 }
 
-/**
- * The bullet strip: diameter, mass, length, the BCs G1 and G7 (one card), the sectional density
- * and the type (tip and base); only what the record has.
- */
 export function bulletStrip(b: Bullet): StripItem[] {
   const bcs = b.ballisticCoefficients ?? []
   const shown = ['G1', 'G7'].flatMap((m) => {
@@ -684,10 +653,7 @@ export function bulletStrip(b: Bullet): StripItem[] {
 const stripItem = (icon: StripItem['icon'], label: Message, rows: FieldRow[]): StripItem[] =>
   rows[0] ? [{ icon, label: say(english, label), words: label, row: rows[0] }] : []
 
-/**
- * The powder strip: manufacturer (`manufacturerName`), form, base, the burn-rate position (when
- * fitted), the solid density of the model and the bulk density.
- */
+/** The burn-rate position only when fitted. */
 export function powderStrip(
   p: Powder,
   place?: { order: number; total: number },
@@ -751,10 +717,6 @@ const capacityRow = (c: Pick<Case, 'waterCapacity'>): FieldRow[] =>
       ]
     : []
 
-/**
- * The case strip: manufacturer (`manufacturerName`), material, empty mass and the stated water
- * capacity; only what the record has.
- */
 export function caseStrip(c: Case, manufacturerName?: string): StripItem[] {
   return [
     ...stripItem(
@@ -772,10 +734,6 @@ export function caseStrip(c: Case, manufacturerName?: string): StripItem[] {
   ]
 }
 
-/**
- * The primer strip: manufacturer (`manufacturerName`), size and priming compound; only what the
- * record has.
- */
 export function primerStrip(p: Primer, manufacturerName?: string): StripItem[] {
   return [
     ...stripItem(
@@ -801,11 +759,7 @@ export function primerStrip(p: Primer, manufacturerName?: string): StripItem[] {
   ]
 }
 
-/**
- * The groups of a primer page's Properties table: product number, magnum flag, cup metal and
- * thickness, intended use and the published figures, each as the source prints it. Manufacturer,
- * size and compound are the cards of `primerStrip`.
- */
+/** Each as the source prints it; maker, size and compound are the cards of `primerStrip`. */
 export function primerRowGroups(p: Primer): FieldGroup[] {
   return [
     {
@@ -836,11 +790,7 @@ const pocketWords = (p: NonNullable<Case['primerPocket']>) => [
 const pocketText = (p: NonNullable<Case['primerPocket']>) =>
   [titleFromKebab(p.type), p.size].filter(Boolean).join(', ')
 
-/**
- * The groups of a case page's Properties table: product number, headstamp, primer pocket, flash
- * hole and whether it is annealed. Manufacturer, material, mass and
- * capacity are the cards of `caseStrip`.
- */
+/** Maker, material, mass and capacity are the cards of `caseStrip`. */
 export function caseRowGroups(c: Case): FieldGroup[] {
   return [
     {

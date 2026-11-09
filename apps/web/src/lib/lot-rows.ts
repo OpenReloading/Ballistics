@@ -17,11 +17,7 @@ export const lots: readonly Lot[] = ['low', 'high']
 
 const side: Record<Lot, -1 | 1> = { low: -1, high: 1 }
 
-/**
- * The load at another powder lot: the burn rate scaled by `fraction` up (`high`) or down (`low`),
- * the coefficient of a geometric burn law or the vivacity of a vivacity law. The pressure range
- * moves the burn rate the same way for its tolerance.
- */
+/** The burn rate scaled by `fraction`, as the pressure range moves it for its tolerance. */
 export function lotLoad(load: InteriorLoad, lot: Lot, fraction: number): InteriorLoad {
   const moved = interiorApply.burnRateFraction(load, side[lot], fraction)
   // the burn-rate move returns a reason only for an input another key refuses
@@ -92,10 +88,7 @@ export function barrelTimes(
   }))
 }
 
-/**
- * The band of a charge: the shortest and longest barrel time of its rows, s. Undefined unless both
- * lots and the nominal row have a result, so a band never spans fewer rows than it names.
- */
+/** Shortest and longest barrel time, s; undefined unless both lots and the nominal row have a result, so a band never spans fewer rows than it names. */
 export function barrelTimeBand(t: BarrelTimes): [number, number] | undefined {
   if (t.nominal === undefined || t.low === undefined || t.high === undefined) return
   return [Math.min(t.nominal, t.low, t.high), Math.max(t.nominal, t.low, t.high)]

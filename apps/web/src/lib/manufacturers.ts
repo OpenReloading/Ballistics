@@ -1,8 +1,4 @@
-/**
- * Manufacturer names for the powders and bullets that name their manufacturer by id: from
- * `GET /manufacturers` through `apiFetch`, one request per page load, or at build time
- * from `getManufacturerNames` (`api.ts`).
- */
+/** One request per page load, or at build time from `getManufacturerNames` (`api.ts`). */
 
 import { checkUserRefs, fold, type UserRecord, userIdRegex } from '@open-reloading/schema'
 import { apiFetch } from './api-fetch.ts'
@@ -17,10 +13,7 @@ export const noManufacturerNames: ManufacturerNames = new Map()
 export const manufacturerNames = (items: readonly ManufacturerSummary[]): ManufacturerNames =>
   new Map(items.map((m) => [m.id, m.name]))
 
-/**
- * The name of a manufacturer reference (`catalogue:<id>` or `user:<id>`) in `names`, which holds
- * catalogue ids and `user:<id>` references (`withUserManufacturers`); empty for none or an unknown one.
- */
+/** Empty for none or an unknown reference. */
 export const refName = (names: ManufacturerNames, ref: string | undefined) =>
   (ref?.startsWith('catalogue:')
     ? names.get(ref.slice('catalogue:'.length))
@@ -61,11 +54,7 @@ export const knownManufacturers = (
 const sameName = (a: string, b: string) =>
   fold(a).replace(/[\s-]+/g, '') === fold(b).replace(/[\s-]+/g, '')
 
-/**
- * The manufacturer a typed name names: one whose name or other name is the same text, ignoring
- * case, accents, spaces and hyphens. The first in `known` wins, so a catalogue manufacturer is
- * found before a user one of the same name.
- */
+/** Ignoring case, accents, spaces and hyphens; the first in `known` wins, so a catalogue maker beats a user one. */
 export const findManufacturer = (known: readonly KnownManufacturer[], typed: string) =>
   typed.trim() === ''
     ? undefined
@@ -80,13 +69,7 @@ export const newManufacturerRecord = (id: string, typed: string, now: Date): Use
   data: { origin: 'user' },
 })
 
-/**
- * The reference a typed name stands for: the manufacturer it names, else that of a new user
- * manufacturer, whose record is `created` for the caller to store (and to add to `known` so the
- * next typed name finds it). Undefined for an empty text, and for a name nothing matches while the
- * catalogue is not known (`catalogueKnown` false): the catalogue may hold it, and a user
- * manufacturer made now would stay a duplicate of it.
- */
+/** The caller stores `created` and adds it to `known`, or the reference dangles and the next name duplicates it; undefined for an unmatched name while the catalogue is unknown. */
 export function referTo(
   known: readonly KnownManufacturer[],
   typed: string,
@@ -114,12 +97,7 @@ export const shownManufacturerRefs = new Map<object, string>()
 /** Fired on `window` after Settings deleted or restored a user manufacturer, for the fields' lists to read the store again. */
 export const manufacturersChanged = 'user-manufacturers-changed'
 
-/**
- * The user manufacturers of `records` by name, each with the number of places that name it: a
- * bullet's or firearm's `manufacturer`, a capacity's `caseManufacturer`, an invalid record's text
- * (read as it is stored, so a record the format rejects keeps its maker) and the record open on a page
- * (`shown`, from `shownManufacturerRefs`). One that nothing names can be deleted.
- */
+/** Invalid records are read as stored, so one the format rejects keeps its maker; one nothing names can be deleted. */
 export function manufacturerUses(
   records: readonly UserRecord[],
   invalid: readonly InvalidRecord[],
@@ -144,11 +122,7 @@ export function manufacturerUses(
     .sort((a, b) => a.record.name.localeCompare(b.record.name))
 }
 
-/**
- * The label of a powder or bullet: "<manufacturer name> <product name>". A catalogue record names
- * its manufacturer by id, looked up in `names` (left out while the name is not known); a list row
- * or a design carries `manufacturerName`.
- */
+/** The maker's name is left out while it is not known. */
 export function productLabel(
   r: { name: string; manufacturer?: string | undefined; manufacturerName?: string },
   names: ManufacturerNames = noManufacturerNames,
@@ -163,10 +137,7 @@ type ManufacturerAliases = ReadonlyMap<string, string[]>
 export const manufacturerAliases = (items: readonly ManufacturerSummary[]): ManufacturerAliases =>
   new Map(items.flatMap((m) => (m.aliases?.length ? [[m.id, m.aliases]] : [])))
 
-/**
- * `rows` with the name of each row's manufacturer (empty while the name is not known) and its
- * aliases where `aliases` has them.
- */
+/** Empty while the name is not known. */
 export const withManufacturerName = <T extends { manufacturer: string }>(
   rows: readonly T[],
   names: ManufacturerNames,

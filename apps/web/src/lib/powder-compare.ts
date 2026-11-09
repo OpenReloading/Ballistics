@@ -3,11 +3,7 @@ import { type Powder, toSi } from '@open-reloading/schema'
 import type { InteriorBody } from './interior-input.ts'
 import { type SortDirection, sortRows } from './lists.ts'
 
-/**
- * The charge of the Powders tab: the typed one, a fraction of each powder's case fill, or the one at
- * which each powder reaches a peak pressure: `value` in Pa, or in percent of the cartridge's
- * compared CIP limit with `percent`.
- */
+/** `fill` is a fraction of the case fill, `value` a peak pressure in Pa, or with `percent` in percent of the cartridge's compared CIP limit. */
 export type CompareMode =
   | { kind: 'typed' }
   | { kind: 'fill'; fill: number }
@@ -19,10 +15,7 @@ export const caseFillPercentRange = { min: 10, max: 120, initial: 100 } as const
 /** Powders in flight at once: within the API pool, which also serves the user's own Run. */
 export const compareConcurrency = 3
 
-/**
- * The charge (kg) of a powder: `typed`, or `mode.fill` of the free volume at the record's bulk
- * density; undefined for a fill without a bulk density.
- */
+/** kg; undefined for a fill without a bulk density. */
 export function compareCharge(
   mode: CompareMode,
   typed: number,
@@ -44,13 +37,7 @@ export function recordFill(p: Powder) {
   return Object.fromEntries(Object.entries(all).filter(([k]) => k !== 'startPressure'))
 }
 
-/**
- * The SI field values of a run: the fields, with the model parameters of the record `as.powder` laid
- * over them unless it is the powder `current` of the fields (their edited or opened values stand),
- * and `as.charge` (kg) when given. A record without a start pressure of its own runs at
- * `startDefault` (SI), the default for a powder fitted without one, not at the start pressure of
- * the current powder.
- */
+/** SI, `as.charge` in kg; the current powder's fields stand as edited, and a record without its own start pressure runs at `startDefault` (SI), not the current one's. */
 export function powderValues(
   fields: Record<string, number | undefined>,
   current: { id: string } | undefined,
@@ -68,12 +55,7 @@ export function powderValues(
   }
 }
 
-/**
- * What the rows were computed for: the whole load but the charge (the current powder's row reads
- * the fields as they stand, the other rows read them under their record), the chosen powder, what
- * the bore resistance of a record reads besides the body (`recordInputs` of `loadRequest`), the
- * cartridge, and the typed charge, the fill or the target. A change of any of these marks the rows.
- */
+/** A change of any part marks the rows as stale. */
 export function compareKey(
   body: InteriorBody,
   mode: CompareMode,

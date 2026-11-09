@@ -1,8 +1,4 @@
-/**
- * The workbench state as a `Load` of the schema and back. The state holds SI values, the load
- * stored units (`packages/units/src/units.ts`); a value goes through `storedOf`, which rounds to
- * 12 significant digits, so saving what was opened gives the same load again.
- */
+/** Values round to 12 significant digits (`storedOf`), so saving what was opened gives the same load (`packages/units/src/units.ts`). */
 import {
   type AnalysisKey,
   analysisKinds,
@@ -49,10 +45,7 @@ export interface Givers {
   gunMass: boolean
 }
 
-/**
- * The keys of `values` the user did not type: a record, the Settings, a followed default, the
- * seating or the firearm gives them again when the load opens. The other keys are the typed ones.
- */
+/** What a record, the Settings, a default, the seating or the firearm gives again when the load opens. */
 export function givenKeys(values: Record<string, number | undefined>, g: Givers) {
   const given = new Set<string>()
   for (const [key, si] of Object.entries(values)) {
@@ -74,11 +67,7 @@ export function givenKeys(values: Record<string, number | undefined>, g: Givers)
 /** The grams of a measured capacity as the schema stores it, rounded like every stored value. */
 const gramsOf = (m3: number) => Number(waterGrams(m3).toPrecision(12))
 
-/**
- * The id of the user capacity record that holds the measured capacity `m3` (water to the mouth,
- * m3) of `cartridge` (a reference): a version 8 UUID derived from both, so the same measurement
- * is one record and a changed value is a record of its own, which a load saved earlier keeps.
- */
+/** `m3` is the water to the mouth, m³; a UUID v8 from both, so one measurement is one record and a changed value a new one that older loads keep. */
 export function measuredCapacityId(cartridge: string, m3: number): string {
   let [a, b, c, d] = [1779033703, 3144134277, 1013904242, 2773480762]
   for (const ch of `${cartridge}|${gramsOf(m3)}`) {
@@ -99,10 +88,7 @@ export function measuredCapacityId(cartridge: string, m3: number): string {
 export const measuredCapacityRef = (cartridge: string, m3: number) =>
   `user:${measuredCapacityId(cartridge, m3)}`
 
-/**
- * The water capacity (g) of the stored record `raw` when it is a case capacity of `cartridge`
- * (a reference), else undefined: a record of another cartridge is no capacity of this load.
- */
+/** Water capacity in g; a record of another cartridge is no capacity of this load. */
 export function capacityOfRecord(raw: unknown, cartridge: string): number | undefined {
   const r = userRecord.safeParse(raw)
   return r.success && r.data.kind === 'caseCapacity' && r.data.data.cartridge === cartridge
@@ -110,11 +96,7 @@ export function capacityOfRecord(raw: unknown, cartridge: string): number | unde
     : undefined
 }
 
-/**
- * The case capacity reference a load saves: the measured capacity's record, else the reference
- * asked for and not loaded, else the catalogue capacity chosen. A choice clears the request
- * (`got`), so it never stays behind a dangling `user:` reference.
- */
+/** A choice clears the request (`got`), so it never stays behind a dangling `user:` reference. */
 export function savedCapacityRef(
   measured: string | undefined,
   asked: string | undefined,
@@ -247,13 +229,7 @@ function caseOf(record: string | undefined, lots: Lots | undefined): Load['case'
   return { ...(record && { record }), ...(lot && { lot }) } as NonNullable<Load['case']>
 }
 
-/**
- * The load file for the API: every solver value of the moment is typed (the API invents none), the
- * cartridge, bullet and powder are the catalogue references in `catalogue` or absent (a user
- * record, or an id no record answers, is not on the server), and what the API does not read is
- * left out: the firearm, the capacity, the chronograph sessions and a seating or temperature ladder,
- * which the route does not run.
- */
+/** Every solver value typed (the API invents none); user records and what the route does not run are left out. */
 export function toApiLoad(
   p: LoadParts,
   catalogue: {

@@ -21,11 +21,7 @@ const ms = (s: number) => {
   return plain(text.endsWith('ms') ? text.slice(0, -2).trimEnd() : text)
 }
 
-/**
- * The curves of a run as CSV, one row per time step of the result: time, travel, breech pressure,
- * velocity, bullet energy and burnt fraction, the units in the header and the decimals of the
- * chart's data table. `mass` is the bullet mass, kg.
- */
+/** With the chart data table's decimals; `mass` in kg. */
 export function curvesCsv(
   points: readonly PlaybackSample[],
   mass: number,
@@ -52,10 +48,7 @@ export function curvesCsv(
   ])
 }
 
-/**
- * The scalar results of a run as CSV: one row per value with its unit, the decimals of the
- * readouts. `charge` is the run's charge, kg.
- */
+/** With the readouts' decimals; `charge` in kg. */
 export function resultsCsv(body: InteriorResponse, charge: number, system: UnitSystem, t: T) {
   const r = body.result
   const range = body.pressureRange

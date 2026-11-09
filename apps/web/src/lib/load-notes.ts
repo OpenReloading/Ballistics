@@ -56,10 +56,7 @@ export function snapshotOf(session: string, now: LoadMoment): SessionSnapshot {
   }
 }
 
-/**
- * One snapshot per session in `refs`, in that order: the stored one, else the load as it is now
- * (it becomes stored when the load is saved).
- */
+/** The stored one, else the load as it is now, which becomes stored when the load is saved. */
 export function effectiveSnapshots(
   refs: readonly string[],
   stored: readonly SessionSnapshot[],
@@ -68,10 +65,7 @@ export function effectiveSnapshots(
   return refs.map((ref) => stored.find((s) => s.session === ref) ?? snapshotOf(ref, now))
 }
 
-/**
- * The stored snapshots with `rule` dismissed for `session`: only that session's snapshot (its
- * `effective` one) becomes stored, the other sessions stay as live as they were.
- */
+/** Only that session's snapshot becomes stored; the others stay stored or live as they were. */
 export function dismissed(
   stored: readonly SessionSnapshot[],
   effective: readonly SessionSnapshot[],
@@ -84,10 +78,7 @@ export function dismissed(
   return [...stored.filter((s) => s.session !== session), next]
 }
 
-/**
- * The velocity statistics of the strings of `record` mapped to `charge` (kg), the load's own
- * charge; none without such a string or counted shot.
- */
+/** `charge` in kg; none without such a string or counted shot. */
 function velocityOf(record: SessionRecord | undefined, charge: number | undefined) {
   if (!record || charge === undefined) return
   const shots = record.data.strings

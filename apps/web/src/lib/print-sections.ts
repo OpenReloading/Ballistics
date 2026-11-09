@@ -22,10 +22,7 @@ export const allSections: PrintChoice = Object.fromEntries(
 /** The browser storage key of the choice. */
 export const printSectionsKey = 'workbench-print-sections'
 
-/**
- * The stored choice read leniently: a section the text does not name as `false` prints, so a
- * section added later prints until it is unticked, and unreadable text prints them all.
- */
+/** Lenient: a section added later prints until unticked, and unreadable text prints them all. */
 export function parsePrintChoice(text: string | null | undefined): PrintChoice {
   if (!text) return allSections
   try {

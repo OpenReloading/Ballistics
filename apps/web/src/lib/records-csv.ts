@@ -12,10 +12,7 @@ type Kind = 'cartridges' | 'firearms' | 'bullets' | 'powders' | 'primers'
 /** The name of the record `ref` names, else the reference as stored; empty without a reference. */
 export type NameOf = (kind: Kind, ref: string | undefined) => string
 
-/**
- * Header and one row per saved load in stored units: charge in g, seating length in mm, the last
- * session as YYYY-MM-DD.
- */
+/** Stored units: charge g, seating length mm, last session YYYY-MM-DD. */
 export function loadRows(records: readonly UserRecord[], nameOf: NameOf): (string | number)[][] {
   const { loads } = loadUse(records)
   return [

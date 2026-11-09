@@ -37,10 +37,7 @@ export function queryFields(
   )
 }
 
-/**
- * A workbench link with a result tab's inputs: `tab` names the tab, its keys (but `units`) follow
- * under `tab.`, since the forms share keys such as `twist`.
- */
+/** Keys go under `tab.` because the forms share keys such as `twist`. */
 export function withTab(query: string, tab: string, inputs: string): string {
   const out = new URLSearchParams(query)
   out.set('tab', tab)
@@ -70,12 +67,7 @@ export const droppedIds = (query: URLSearchParams) =>
     return raw && !linkedId(raw) ? [`${k} ${raw}`] : []
   })
 
-/**
- * What a workbench link opens: `values`, a copied load (`units` and field values; its `bullet` and
- * `powder` records come without their fills), `records`, a new load from a cartridge, bullet or
- * powder record page (`cartridge`, `bullet`, `powder` without `units`, filled from the records), or
- * nothing.
- */
+/** A copied load (`units`), a new load from a record page, or nothing. */
 export function linkedLoad(query: URLSearchParams):
   | { kind: 'values' }
   | {
@@ -102,13 +94,7 @@ export function linkedLoad(query: URLSearchParams):
 export const workbenchHref = (kind: 'cartridge' | 'bullet' | 'powder', id: string) =>
   `/workbench?${new URLSearchParams({ [kind]: id })}`
 
-/**
- * What a run reads from the bullet and powder records, SI: the names, the bullet length, the bulk
- * density, the powder record's bore resistance under the keys of the fields that replace it, and for
- * a powder without its own temperature coefficient its grain form and the reference of the default
- * (`sensitivityReference`, K). A workbench link carries it under `record.`, so the load runs the
- * same where a record is missing.
- */
+/** SI (`sensitivityReference` in K); a workbench link carries these under `record.`, so the load runs the same where a record is missing. */
 export type RecordValues = {
   bullet?: { name?: string | undefined; length?: number | undefined } | undefined
   powder?:
@@ -184,10 +170,7 @@ export function recordValues(query: URLSearchParams): RecordValues {
   return { ...(some(bullet) && { bullet }), ...(some(powder) && { powder }) }
 }
 
-/**
- * The parameters of a workbench link: the fragment's when it holds a copied load (`units`), else the
- * query's (the record pages' "Use in workbench", `preset`, `tab`).
- */
+/** The fragment's when it holds a copied load (`units`), else the query's. */
 export function linkParams(location: { search: string; hash: string }): URLSearchParams {
   const fragment = new URLSearchParams(location.hash.slice(1))
   return fragment.has('units') ? fragment : new URLSearchParams(location.search)

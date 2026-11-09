@@ -23,11 +23,7 @@ export function withCharge(s: SessionString, kg: number | undefined): SessionStr
     : { ...rest, variation: { kind: 'charge', value: { value: storedMass(kg) } } }
 }
 
-/**
- * A read file as the session record the Measurements tab holds: string `i` with its label and the
- * charge `charges[i]` (kg) it is mapped to, `manufacturer` the reference of the device's maker.
- * Texts are cut to the schema's caps.
- */
+/** `charges[i]` in kg; texts are cut to the schema's caps. */
 export function sessionOf(
   name: string,
   data: ChronoImport,
@@ -62,10 +58,7 @@ export function sessionOf(
   }
 }
 
-/**
- * `session` with the load `load` named by every string that is mapped to a charge and names no
- * load yet; the same session when none does.
- */
+/** Only strings mapped to a charge that name no load yet. */
 export function attachLoad(session: SessionRecord, load: string | undefined): SessionRecord {
   if (!load) return session
   const strings = session.data.strings.map((s) => (s.variation && !s.load ? { ...s, load } : s))

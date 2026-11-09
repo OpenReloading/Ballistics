@@ -1,8 +1,4 @@
-/**
- * `PRERENDER=sample` (development, agent builds, pull request builds without record changes) prerenders
- * only the records below on the cartridge detail route; the export leaves every other cartridge page out (`exportIds`).
- * Unset or any other value prerenders every record (releases, default branch).
- */
+/** `PRERENDER=sample` (development and PR builds without record changes) prerenders only these cartridges; unset prerenders all. */
 export const sampleIds: Record<string, readonly string[]> = {
   // the records the e2e specs and the smoke set open, so their tests meet prerendered pages
   cartridge: [
@@ -45,10 +41,7 @@ export function isSampling(env: Record<string, string | undefined> = process.env
   return env.PRERENDER === 'sample'
 }
 
-/**
- * The ids of `what` (`cartridge`, `bullet`, `powder`, `case`, `primer`, `target-face`, `discipline` or `federation`) to prerender: all of `ids` unless sampling, else
- * those of the sample that exist, or the first id when none does (Cache Components need one per route).
- */
+/** The first id when none of the sample exists, because Cache Components need one per route. */
 export function pickIds(
   what: string,
   ids: string[],
@@ -60,10 +53,7 @@ export function pickIds(
   return picked.length > 0 ? picked : ids.slice(0, 1)
 }
 
-/**
- * The ids of `what` the static site prerenders. A page the export leaves out answers 404 and the
- * links to it log that, so the sample cuts the cartridge pages only (about 85 % of the export).
- */
+/** Left-out pages answer 404 and their links log it, so only the cartridge pages (about 85 % of the export) are cut. */
 export function exportIds(
   what: string,
   ids: string[],

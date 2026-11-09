@@ -11,10 +11,7 @@ import { english, type Translator } from '../i18n/translate.ts'
 import { fitStrings, type TuneString } from './powder-tune.ts'
 import { userRef } from './variants.ts'
 
-/**
- * The name and `fit.previous` of a refit of `base`, a user powder saved with a `fit`: "<name>
- * (fit 2)", then 3 and on. Undefined for a catalogue powder or a user powder without a fit.
- */
+/** "<name> (fit 2)", then 3 and on; undefined without a user fit. */
 export function refitOf(
   base: Powder | undefined,
   fit: UserPowderFit | undefined,
@@ -59,11 +56,7 @@ interface FittedPowderInput {
   previous?: string | undefined
 }
 
-/**
- * The user powder of a fit: the fitted load's burn law and temperature sensitivity in stored units
- * with the fitted values, the base powder's other fields and the `fit` block. Undefined for a load
- * whose burn law a powder record cannot hold (no two-stage vivacity form).
- */
+/** Undefined for a burn law a powder record cannot hold (no two-stage vivacity form). */
 export function fittedPowder(
   f: FittedPowderInput,
 ): Extract<UserRecord, { kind: 'powder' }> | undefined {

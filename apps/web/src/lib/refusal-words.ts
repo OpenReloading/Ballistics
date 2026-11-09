@@ -1,12 +1,4 @@
-/**
- * The words of the typed refusals that statistics, the group statistics of shot-groups, ballistics
- * and use-cases raise (`InputError` of `@open-reloading/statistics` with an issue), and of an
- * unknown record id (`RecordNotFound`): the English sentence of each code, `{name}` where a param
- * stands. The language module loads them once a page has started, outside every page's own
- * JavaScript, for `refusalText` of `core-messages.ts`; `core-message-table.ts` reads them as
- * templates, so `translateMessage` shows a sentence in the language shown. Hit probability and ring
- * scoring word their own issues where they are shown.
- */
+/** English sentences of the typed refusals and `RecordNotFound`, loaded once a page has started, outside every page's own JavaScript; `core-message-table.ts` reads them as templates. */
 import type { ExteriorIssue, InteriorIssue, LoadFileIssue } from '@open-reloading/ballistics'
 import type { GroupStatisticsIssue } from '@open-reloading/shot-groups'
 import type { Diagnostic, StatisticsIssue } from '@open-reloading/statistics'
@@ -317,10 +309,7 @@ const item = (x: unknown) =>
     ? gapWords[x as keyof typeof gapWords]
     : String(x)
 
-/**
- * A param as the sentence shows it: a list joined by commas, the pressure rows counted per basis, a
- * number as JavaScript writes it. A load file field arrives labelled (`interior-input.ts`).
- */
+/** A list joined by commas, the pressure rows counted per basis, a number as JavaScript writes it; a load file field arrives labelled (`interior-input.ts`). */
 function shown(name: string, v: unknown): string {
   if (Array.isArray(v)) return v.map(item).join(', ')
   if (name === 'rows' && typeof v === 'object' && v !== null)

@@ -31,10 +31,7 @@ export function bandCharges({ min, max }: PowderFit['chargeRange'], n = 25) {
   return Array.from({ length: n }, (_, i) => lo + ((hi - lo) * i) / (n - 1))
 }
 
-/**
- * Fewest distinct charges and smallest spread (largest over smallest charge, less 1) to fit the
- * values of `thinRule.values` besides the burn coefficient.
- */
+/** A ladder below these charges and spread leaves `values` out of the fit. */
 const thinRule = {
   charges: 3,
   spread: 0.1,
@@ -61,14 +58,7 @@ function heldFit(fit: PowderFit) {
   )
 }
 
-/**
- * Answers `q` through `post`: the fit and band as soon as they are known, then the slow pressure
- * range. Unless `anyway`, a thin ladder leaves out the values of `thinRule.values`, and the burn
- * coefficient is fitted alone when a value asked for besides it moves with it (`held`): the model
- * fits such a value without refusing. On 2 charges every extra value moves with it, pressures or
- * not, so `anyway` lifts both rules. A temperature factor the strings do not resolve is held at 1
- * by `fitPowderSessions` (`temperature`) instead of refusing the fit.
- */
+/** The model fits a value that moves with the burn coefficient without refusing, so such values are held unless `anyway`. */
 export function answerPowderFit(q: PowderFitRequest, post: (r: PowderFitReply) => void) {
   const { id } = q
   try {
@@ -111,10 +101,7 @@ export function answerPowderFit(q: PowderFitRequest, post: (r: PowderFitReply) =
   }
 }
 
-/**
- * The fitted load of `fit` at `values`, one per fitted parameter in its order. The fitted load
- * already carries the fitted factors, so a factor scales it by its ratio to the fitted one.
- */
+/** The fitted load carries the fitted factors, so a factor scales it by its ratio to the fitted one. */
 export function handLoad(fit: PowderHandRequest['fit'], values: readonly number[]): InteriorLoad {
   let l = fit.load
   fit.parameters.forEach((p, k) => {
@@ -150,10 +137,7 @@ export function handLoad(fit: PowderHandRequest['fit'], values: readonly number[
   return l
 }
 
-/**
- * Output step of the hand-tuned runs, s: 10 times the default, which moves the muzzle velocity by
- * less than 1e-6 m/s and runs about 6 times faster, so the curve follows a slider on a slow device.
- */
+/** s, 10 times the default: under 1e-6 m/s of muzzle velocity, about 6 times faster, so the curve follows a slider on a slow device. */
 const handOutputStep = 2e-5
 
 /** The muzzle velocity of the hand-tuned load at each charge of `q`; a charge that does not run is left out. */
