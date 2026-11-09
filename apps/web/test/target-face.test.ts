@@ -34,7 +34,7 @@ const views = [
   { name: 'tilt 40, yaw 20, rolled -30', tilt: 40, yaw: 20, roll: -30, noise: 3 },
 ]
 
-/** Their rings are in the same ratios, only the size differs, so the editor asks which face (the event or the distance tells them apart); for every other face it applies the one fit without a question. */
+/** Faces the photo cannot tell apart: their rings are in the same ratios, only the size differs, so the editor asks which face (the event or the distance tells them apart); for every other face it applies the one fit without a question. */
 const twinGroups = [
   ['issf-300m-rifle', 'bdmp-nr1-100m', 'bdmp-nr1-50m', 'bdmp-nr1-25m', 'oesb-100m'],
   ['bdmp-nr6', 'bdmp-nr7', 'bds-z18-pg'],

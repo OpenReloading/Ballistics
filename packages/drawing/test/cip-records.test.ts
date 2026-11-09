@@ -186,7 +186,7 @@ function angleFailures(
   return out
 }
 
-/** Values stored or derived (L3 - L2 > 0), angle vertices on both drawn flanks, radius corners and edges on the outline before rounding, nothing dimensioned on a convention. */
+/** What breaks the annotation rules of a drawn side: values stored or derived (L3 - L2 > 0), angle vertices on both drawn flanks, radius corners and edges on the outline before rounding, nothing dimensioned on a convention. */
 function annotationFailures(
   p: Profile,
   values: SpecValue[],

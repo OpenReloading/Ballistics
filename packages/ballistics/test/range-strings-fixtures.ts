@@ -63,7 +63,7 @@ function trueShot(truth: Truth): TrajectoryInput {
   }
 }
 
-/** For `truth` with its zero offset, plus noise from `noise`; dials rounded to whole clicks with a dial's default rounding, unless `exact`. */
+/** Strings the solver gives for `truth` with its zero offset, plus noise from `noise`; dials rounded to whole clicks with a dial's default rounding, unless `exact`. */
 export function strings(
   truth: Truth,
   noise: () => number,
@@ -114,7 +114,7 @@ export const find = (r: { parameters: { name: string }[] }, name: string): Range
 /** Binomial tolerance of a coverage of 0.95 over `n` runs: three standard deviations. */
 export const tolerance = (n: number): number => 3 * Math.sqrt((0.95 * 0.05) / n)
 
-/** Over seeds 1 to `seeds`, truths from `truthOf`: per parameter the fits whose interval holds the true value, and the fits the residual check flags; every parameter must be identified. */
+/** Fits the noisy strings of seeds 1 to `seeds`, truths from `truthOf`: per parameter the count of fits whose interval holds the true value, and the count the residual check flags; every parameter must be identified. */
 export function coverage(
   truthOf: (seed: number) => Truth,
   options: RangeStringOptions,

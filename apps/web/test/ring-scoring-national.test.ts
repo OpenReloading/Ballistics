@@ -19,7 +19,7 @@ const mm = 1e-3
 const off = 1e-6
 const at = (d: number) => ({ x: d * mm, y: 0 })
 
-/** Ring 10 first, in mm as the cited rule-book page prints them; a ring scores for a hole whose edge touches its line (the touch rule of the DSB, BDS, BDMP and VdRBw, and of the DSU outside black powder, which counts the centre: see the black-powder test), so a hole of diameter `hole` at d = R + hole / 2 scores it and a hair further the ring outside, or 0 outside the outermost. */
+/** Ring diameters, ring 10 first, in mm as the cited rule-book page prints them; a ring scores for a hole whose edge touches its line (the touch rule of the DSB, BDS, BDMP and VdRBw, and of the DSU outside black powder, which counts the centre: see the black-powder test), so a hole of diameter `hole` at d = R + hole / 2 scores it and a hair further the ring outside, or 0 outside the outermost. */
 function boundaries(id: string, printed: number[], hole: number) {
   const f = face(id)
   expect(f.rings.map((r) => r.diameter.value)).toEqual(printed.toReversed())

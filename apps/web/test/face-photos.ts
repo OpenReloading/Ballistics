@@ -226,7 +226,7 @@ export async function measure(id: string, kind: PhotoKind, bullet: number): Prom
   return { ...row, holes: used.size, of: truth.length, extra: found.length - used.size }
 }
 
-/** Applied without a question (`sure`) or offered with the faces the photo cannot tell apart, its centre within 0.6 % of the outer radius and its scale within 1 %. */
+/** The face right, applied without a question (`sure`) or offered with the faces the photo cannot tell apart, its centre within 0.6 % of the outer radius and its scale within 1 %. */
 export function expectFace(row: Row, outer: number, sure: boolean) {
   expect(row.face).toMatch(sure ? /^right sure$/ : /^right ask \d+$/)
   expect(row.centreMm).toBeLessThan(0.006 * outer)

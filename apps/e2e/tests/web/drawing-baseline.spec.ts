@@ -9,7 +9,7 @@ import { gotoHydrated } from './nav.ts'
 test.skip(!process.env.DRAWING_BASELINE, 'runs in the Playwright image: pnpm run drawing-baseline')
 const full = process.env.DRAWING_BASELINE === 'full'
 
-/** The most common cartridge of each drawing case, then a record for a geometry they do not draw, a shotshell in one variant; Vitest compares the SVG markup (apps/web/test/drawing-markup.test.tsx), these pixels what only a browser draws: fonts, CSS and the figure's scaling. */
+/** The default baseline: the most common cartridge of each drawing case, then a record for a geometry they do not draw, a shotshell in one variant; Vitest compares the SVG markup of every sample and verified figure (apps/web/test/drawing-markup.test.tsx), these pixels what only a browser draws: fonts, CSS and the figure's scaling. */
 const common: { id: string; variant?: string }[] = [
   // I: rimless rifle; also dark and at 1280 px, and the style test below
   { id: 'cip-308-win-2008-09-23' },

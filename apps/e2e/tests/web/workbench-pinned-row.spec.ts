@@ -23,7 +23,7 @@ const names = row.map(([, name]) => name)
 const rowControls = (page: Page) =>
   row.map(([role, name]) => loadForm(page).getByRole(role, { name, exact: true }))
 
-/** Visual order by centre, then left, reversed against the list; centres, not tops, as a field's buttons are not as high as the field. */
+/** Pairs of `controls` whose visual order (centre, then left) is the reverse of their order in the list; centres, not tops, as a field's buttons are not as high as the field. */
 async function inversions(controls: Locator[]) {
   const boxes = await Promise.all(controls.map(async (c) => (await c.boundingBox()) ?? undefined))
   const middle = (b: { y: number; height: number }) => b.y + b.height / 2

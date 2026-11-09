@@ -8,7 +8,7 @@ import { loadForm } from './workbench.ts'
 // Metric (SI): lengths in mm
 test.beforeEach(({ page }) => storeUnits(page))
 
-/** As the designer saves it (no base record, so every value is an override): a record's side values without the chamber's bore diameter F, bore area Q and twist u. */
+/** A cartridge design in the browser store, as the designer saves it (no base record, so every value is an override): a record's side values without the chamber's bore diameter F, bore area Q and twist u. */
 async function seedDesign(page: Page) {
   const record = await page.evaluate(async () =>
     (await fetch('/api/cartridges/308-win.json')).json(),

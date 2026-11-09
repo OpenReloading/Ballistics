@@ -9,7 +9,7 @@ import {
 import { renderToStaticMarkup } from 'react-dom/server'
 import type { TechnicalDrawing } from '../src/components/technical-drawing.tsx'
 
-/** By golden file name; the caller passes its `TechnicalDrawing`, imported after it mocked `next/font/local`. */
+/** The screen and print SVG of every drawn figure of a cartridge spec, by golden file name; the caller passes its `TechnicalDrawing`, imported after it mocked `next/font/local`. */
 export function figureSvgs(
   Drawing: typeof TechnicalDrawing,
   spec: Parameters<typeof recordFigures>[0],

@@ -1,4 +1,4 @@
-/** Opt-in research evaluation of the photo tool on catalogue bullets (`apps/docs/docs/research/bullet-photo-catalogue-geometry.md`), minutes long: `BULLET_PHOTO_EVAL=<out.json> pnpm exec vitest run test/bullet-photo-catalogue.test.ts` in `apps/web`, optionally `BULLET_PHOTO_SCENARIO=<letter>` and `BULLET_PHOTO_PER_MAKER=<n>`; records with a length rendered as own photographs beside a ruler or product images of 1000, 500 and 250 px, measured as the worker does and compared with their drawing. */
+/** Opt-in research evaluation of the photo tool on catalogue bullets (`apps/docs/docs/research/bullet-photo-catalogue-geometry.md`), minutes long: `BULLET_PHOTO_EVAL=<out.json> pnpm exec vitest run test/bullet-photo-catalogue.test.ts` in `apps/web`, optionally `BULLET_PHOTO_SCENARIO=<letter>` and `BULLET_PHOTO_PER_MAKER=<n>`; records with a length rendered as own photographs beside a ruler or product images of 1000, 500 and 250 px, measured as the worker does and compared with their drawing; writes the summary per scenario and one row per photograph. */
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import {
   type BulletDimensions,

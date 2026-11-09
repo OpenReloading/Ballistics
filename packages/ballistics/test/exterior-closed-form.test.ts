@@ -63,7 +63,7 @@ describe('flat-fire drop with a constant drag coefficient', () => {
   }
 })
 
-/** x = W t + ln(1 + k u0 t) / k with u0 = v0 - W, the flight of a constant drag coefficient in a range wind W, solved for `range` by Newton's method. */
+/** The time at which x = W t + ln(1 + k u0 t) / k, u0 = v0 - W, reaches `range`, by Newton's method: the flight of a constant drag coefficient in a range wind W. */
 function rangeWindTime(k: number, v0: number, w: number, range: number) {
   const u0 = v0 - w
   let t = range / v0

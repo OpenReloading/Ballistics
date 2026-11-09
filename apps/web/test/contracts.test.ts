@@ -6,7 +6,7 @@ import { readLink, shareLink } from '../src/lib/share-link.ts'
 import { parseUserDataFile, userDataText } from '../src/lib/user-data.ts'
 import { defined } from './defined.ts'
 
-// The current format version only (no older one is read): a user data file with a record of each kind and one setting every field, read and written back as the same JSON value, and share links of its records, one with text beyond ASCII; `pnpm run baselines` rewrites the links, the file is edited by hand when the format changes.
+// The current format version only (no older one is read): a user data file with a record of each kind and one setting every field, read and written back as the same JSON value, and share links of its records, one with text beyond ASCII; `pnpm run baselines` at the root rewrites the links, the file is edited by hand when the format changes.
 const golden = (name: string) => readFileSync(new URL(`golden/${name}`, import.meta.url), 'utf8')
 const page = 'https://example.org/bullets/designer'
 /** A share link with its fragment inflated back to the file text. */

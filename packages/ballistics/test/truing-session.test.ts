@@ -299,7 +299,7 @@ describe('priors coverage', () => {
 })
 
 describe('priors maximum a posteriori center', () => {
-  // one impact at the zero range, linear: impact = 100 m * e, 4 shots of 0.016 m give the row 0.008 m, so e = y / 100 with sigma_d = 8e-5 rad; with the prior e ~ N(0, s^2) the posterior is Gaussian, precision 1 / sigma_d^2 + 1 / s^2, centre e* = (y / 100) * s^2 / (s^2 + sigma_d^2), SD sigma_d * s / sqrt(sigma_d^2 + s^2)
+  // one impact at the zero range, linear: impact = 100 m * e, 4 shots of 0.016 m give the row a standard uncertainty of 0.008 m, so e = y / 100 with sigma_d = 8e-5 rad; with the prior e ~ N(0, s^2) the posterior is Gaussian, precision 1 / sigma_d^2 + 1 / s^2, centre e* = (y / 100) * s^2 / (s^2 + sigma_d^2), SD sigma_d * s / sqrt(sigma_d^2 + s^2)
   const sigmaD = 8e-5
 
   it.each([

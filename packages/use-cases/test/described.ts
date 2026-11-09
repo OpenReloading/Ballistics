@@ -1,6 +1,6 @@
 type Schema = Record<string, unknown>
 
-/** At any depth of `schema`: under `properties`, `items`, `additionalProperties`, `anyOf`, `oneOf`, `allOf` and `prefixItems`. */
+/** Paths of the JSON Schema properties without a non-empty description, at any depth of `schema`: under `properties`, `items`, `additionalProperties`, `anyOf`, `oneOf`, `allOf` and `prefixItems`. */
 export function undescribed(schema: unknown, path = ''): string[] {
   if (!schema || typeof schema !== 'object') return []
   const s = schema as Schema

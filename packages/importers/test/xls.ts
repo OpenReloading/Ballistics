@@ -94,7 +94,7 @@ export const rkFloat = (x: number, x100 = false) => {
   return ((b.readUInt32LE(4) & 0xfffffffc) | (x100 ? 1 : 0)) >>> 0
 }
 
-/** Continue records of at most `chunk` bytes: fixed fields stay in one record, characters that do not fit go on in the next after a flag byte, run and phonetic bytes split anywhere. */
+/** Writes record data that may continue in Continue records of at most `chunk` bytes: fixed fields stay in one record, characters that do not fit go on in the next after a flag byte, run and phonetic bytes split anywhere. */
 class Records {
   private out: Buffer[] = []
   private current: number[] = []
