@@ -229,6 +229,8 @@ describe('help', () => {
       {
         cwd: root,
         encoding: 'utf8',
+        // the operations listing with its JSON Schemas is over the default 1 MiB
+        maxBuffer: 16 * 1024 * 1024,
       },
     )
     expect(ran.stderr).toBe('')
