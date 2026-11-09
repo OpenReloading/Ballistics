@@ -1,4 +1,4 @@
-/** Only a burst's last value is sent, so a drag costs one send with the exact end. */
+/** `wait` in ms; only a burst's last value is sent, so a drag costs one send with the exact end. */
 export function trailing<T>(send: (value: T) => void, wait: number) {
   let timer: ReturnType<typeof setTimeout> | undefined
   let held: { value: T } | undefined

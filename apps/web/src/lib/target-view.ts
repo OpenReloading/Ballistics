@@ -51,7 +51,7 @@ export function printLayout(
 /** The scale as text: "2:1", "1:5". */
 export const scaleText = (s: number) => (s >= 1 ? `${s}:1` : `1:${Math.round(1 / s)}`)
 
-/** `p` stays under the fingers; `f` is the start finger distance over the current one. */
+/** `box` and `k` (view units per screen px) at the start, `m0` and `m1` the screen midpoints then and now, `p` the view point between the fingers, which stays under them; `f` the start finger distance over the current one. */
 export function pinchView(box: ViewBox, k: number, p: Pt, m0: Pt, m1: Pt, f: number): ViewBox {
   return {
     x: p.x - (p.x - box.x) * f - (m1.x - m0.x) * k * f,

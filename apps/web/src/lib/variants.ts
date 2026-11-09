@@ -55,7 +55,7 @@ function remember(key: string, record: object | undefined) {
   } catch {}
 }
 
-/** `unreachable`, not gone, when the API did not answer and no earlier read is kept, while a kept base stands in; shortcut: a kept base is never removed for a deleted design, add a sweep if entries pile up. */
+/** `unreachable`, not gone, when the API did not answer and no earlier read is kept, else the kept base stands in; shortcut: a kept base is never removed for a deleted design, add a sweep if entries pile up. */
 async function readBase<T>(
   kind: 'bullets' | 'cartridges',
   schema: z.ZodType,

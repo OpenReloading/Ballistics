@@ -1,4 +1,4 @@
-/** For `useSyncExternalStore`; other tabs follow a change, and where storage refuses, the last choice holds for the page. */
+/** For `useSyncExternalStore`; other tabs follow a change, and where storage refuses, the last choice holds for the page; `write` returns null to remove the key. */
 export function storedChoice<T>(
   key: string,
   parse: (text: string | null) => T,

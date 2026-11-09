@@ -4,7 +4,7 @@
 export const togglePick = (picked: readonly string[], id: string, max: number) =>
   picked.includes(id) ? picked.filter((x) => x !== id) : [...picked, id].slice(0, max)
 
-/** Shift-range: rows between the anchor and `id` take the click's state; without a visible anchor it is a plain toggle. */
+/** Shift-range: rows between the anchor and `id` that `can` permits take the click's state, ticked ones appended in row order up to `max`; without a visible anchor it is a plain toggle. */
 export function pickRange<T extends { id: string }>(
   rows: readonly T[],
   picked: readonly string[],
