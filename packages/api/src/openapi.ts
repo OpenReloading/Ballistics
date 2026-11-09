@@ -14,10 +14,7 @@ declare module 'fastify' {
     query?: z.ZodType
     /** zod schema of the 200 body, read by `buildOpenApi`; absent: any JSON object. */
     response?: z.ZodType
-    /**
-     * Error statuses of the route's own code (404, 422, 503), read by `buildOpenApi`, which adds
-     * the statuses of Fastify (400, 413, 414, 415) and 500.
-     */
+    /** The route's own (404, 422, 503), read by `buildOpenApi`, which adds those of Fastify (400, 413, 414, 415) and 500. */
     errors?: number[]
     /** One line on what the route answers. */
     summary?: string
@@ -124,11 +121,7 @@ const tagOf = (url: string) => {
   return tag.name
 }
 
-/**
- * The body of every error answer: Fastify's (with `code`, for example `FST_ERR_VALIDATION`), the
- * schema 400 (`issues`), the compute answers (`reason`, `missing`, `notice` and more; a typed refusal
- * and an unknown record id with their `code` and `params`) and the 500 (`requestId`, the `reqId` of the server log line).
- */
+/** Fastify's (with `code`, for example `FST_ERR_VALIDATION`), the schema 400 (`issues`), the compute answers (`reason`, `missing`, `notice` and more; a typed refusal and an unknown record id with their `code` and `params`) and the 500 (`requestId`, the `reqId` of the server log line). */
 const errorBody: JsonSchema = {
   type: 'object',
   properties: {
@@ -178,12 +171,7 @@ const errorBody: JsonSchema = {
   required: ['statusCode', 'error', 'message'],
 }
 
-/**
- * The statuses of a route: 200; 400 when Fastify or zod validates its input (an undeclared query
- * parameter included); its own `errors`; 413 (`bodyLimit`) and 415 (no JSON content type) when it
- * takes a body; 414 when it has a path parameter (the router's `maxParamLength`, 100 characters);
- * 500.
- */
+/** 200; 400 when Fastify or zod validates the input (an undeclared query parameter included); its own `errors`; 413 (`bodyLimit`) and 415 (no JSON content type) with a body; 414 with a path parameter (the router's `maxParamLength`, 100 characters); 500. */
 function responses(
   route: RouteOptions,
   url: string,

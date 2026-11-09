@@ -6,12 +6,7 @@ import { provenance } from './provenance.ts'
 import { pressureMethod } from './standards.ts'
 import { type QuantityKind, units } from './units.ts'
 
-/**
- * A figure as the table prints it: `raw` is the printed token with its unit (`55 gr`, `13,600 PSI`,
- * `3,30 g / 50 grs`), always present. `value` is the printed number in the stored unit of `kind`,
- * converted with the exact factor and kept to 7 significant digits. A value is never rounded to a
- * nicer figure and never read from another table.
- */
+/** `raw` is the printed token with its unit (`55 gr`, `13,600 PSI`, `3,30 g / 50 grs`), always present; `value` the printed number in the stored unit of `kind` by the exact factor, to 7 significant digits, never rounded to a nicer figure and never read from another table. */
 const printedValue = (kind: QuantityKind, value: z.ZodNumber = z.number()) =>
   z.strictObject({
     value: value.describe(`In ${units[kind]}.`),

@@ -50,12 +50,7 @@ function warnDate(
   }
 }
 
-/**
- * Keeps the worksheets of the `date` option (all without it), reads their strings and sets the
- * date when every kept string has the same one. Warnings of other days are not added. The `date`
- * option also keeps the worksheets without a date and is the session date; when some worksheet
- * has a date, each one without a date warns that the option's date was taken.
- */
+/** Keeps the worksheets of the `date` option (all without it) and sets the date when every kept string has the same one, other days adding no warning; the option also keeps undated worksheets and is the session date, each undated one warning that it was taken when some worksheet has a date. */
 export function collectWorksheetStrings(
   found: FoundWorksheet[],
   options: WorkbookOptions,
@@ -91,10 +86,7 @@ function checkDateOption(found: FoundWorksheet[], date: string | undefined, fill
     refuse('noStringOnDate', { date, dates: datesOf(found) })
 }
 
-/**
- * The session date: the `date` option, else the one date every read worksheet has; warns when
- * the read worksheets have several.
- */
+/** The `date` option, else the one date every read worksheet has; warns when the read worksheets have several. */
 function commonDate(
   read: FoundWorksheet[],
   option: string | undefined,

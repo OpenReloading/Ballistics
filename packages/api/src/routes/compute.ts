@@ -36,8 +36,7 @@ export const computeRoutes: FastifyPluginAsync<OperationContext> = async (
 
   const exterior: ExteriorContext = { compute, findBullet: (id) => findBullet(catalogue, id) }
 
-  // `config` carries the zod schema of the request and the error statuses to the contract
-  // document (`openapi.ts`): 404 for an unknown id, 422 from the error handler, 503 from the pool
+  // `config` carries the zod schema of the request and the error statuses to the contract document (`openapi.ts`): 404 for an unknown id, 422 from the error handler, 503 from the pool
   const errors = [404, 422, 503]
   const docs = ({ body, response, example, summary, description }: Operation) => ({
     body,

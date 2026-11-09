@@ -73,10 +73,7 @@ type MappedEvent = {
   d: Discipline | undefined
 }
 
-/**
- * A mapped face event has at most one mapping (`mapped`: face event to mapping id), is listed by the
- * discipline's federation and has the mapping's gauge.
- */
+/** At most one mapping (`mapped`: face event to mapping id), listed by the discipline's federation, with the mapping's gauge. */
 function checkMappedEvent(
   m: Mapping,
   { face, event, d }: MappedEvent,
@@ -115,12 +112,7 @@ function checkMappings(mappings: Bundle['targetMappings'], lookup: Lookup, error
   for (const m of mappings) errors.push(...checkMapping(m, lookup, mapped))
 }
 
-/**
- * The references of federations, disciplines, target faces and target mappings: every id names a record, a
- * discipline's international equivalent belongs to an international federation, a mapping names an
- * event of its face listed by the discipline's federation, with the event's gauge, every face
- * event has at most one mapping and every discipline at least one.
- */
+/** Every id names a record; a discipline's international equivalent belongs to an international federation; a mapping names an event of its face that the discipline's federation lists, with that event's gauge; each face event has at most one mapping, each discipline at least one. */
 export function checkFederations(
   bundle: Pick<Bundle, 'federations' | 'disciplines' | 'targetMappings' | 'targetFaces'>,
 ): string[] {

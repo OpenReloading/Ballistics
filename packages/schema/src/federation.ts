@@ -107,20 +107,14 @@ export interface Federation extends z.infer<typeof federation> {}
 /** Number of sighting shots a rule book allows: a count, or `unlimited` where it states any number. */
 const sighters = z.union([z.int().nonnegative(), z.literal('unlimited')])
 
-/**
- * A time the rule book allows and what it covers. `includesSighters`: the time also covers the
- * sighting shots; absent: not stated.
- */
+/** `includesSighters`: the time also covers the sighting shots; absent: not stated. */
 const timeLimit = z.strictObject({
   duration: quantity('time', z.number().positive()),
   covers: z.enum(['discipline', 'stage', 'series', 'shot']),
   includesSighters: z.boolean().optional(),
 })
 
-/**
- * The course of fire facts a rule book states for a whole discipline or for one stage of it. A
- * stage value replaces the discipline's.
- */
+/** For a whole discipline or for one stage of it; a stage value replaces the discipline's. */
 const courseOfFire = {
   sighters: sighters.optional(),
   seriesShots: z.int().positive().optional(),

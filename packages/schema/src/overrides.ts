@@ -96,12 +96,7 @@ function describedFields(schema: z.ZodObject, record: string, path: string[]): z
   )
 }
 
-/**
- * The schema of the overrides of `schema`, a part of a `record`: every field optional and nullable,
- * nested objects likewise. Rules across fields (`superRefine`) are dropped, since an override is a
- * part of a record. Arrays and leaves keep their schema. A field without a description gets one
- * from its path. With `bare`, a number has no bounds (the draft of a record in the making).
- */
+/** Every field optional and nullable, nested objects likewise; rules across fields (`superRefine`) are dropped, as an override is a part of a record; a field without a description gets one from its path; with `bare` a number has no bounds (the draft of a record in the making). */
 function overridesOf(
   schema: z.ZodType,
   record: string,

@@ -1,6 +1,4 @@
-// Minimal XML 1.0 reader for workbook parts (https://www.w3.org/TR/xml/, section numbers below
-// refer to it): one left-to-right pass, no document type declarations, so no entity can be
-// declared, expanded or fetched.
+// Minimal XML 1.0 reader for workbook parts (https://www.w3.org/TR/xml/, section numbers refer to it): one left-to-right pass and no document type declarations, so no entity can be declared, expanded or fetched
 import { refuseFile } from './diagnostics.ts'
 
 export interface XmlElement {
@@ -38,10 +36,7 @@ function replacementOf(name: string): string {
   return String.fromCodePoint(code)
 }
 
-/**
- * Text with the five predefined entities (4.6) and character references (4.1) replaced. Pieces
- * are joined in batches, so memory stays near the size of the text for any number of references.
- */
+/** The five predefined entities (4.6) and character references (4.1) replaced; pieces are joined in batches, so memory stays near the size of the text for any number of references. */
 function references(text: string): string {
   let amp = text.indexOf('&')
   if (amp < 0) return text
@@ -267,11 +262,7 @@ function readMarkup(text: string, lt: number, st: ScanState): number {
   return readElement(text, lt, st)
 }
 
-/**
- * Reads `text` left to right and reports its elements and text to `events`; throws on markup
- * this reader does not accept. `remaining` is counted down before each element or text is
- * reported, so several parts can share one budget. Errors thrown by `events` are not caught.
- */
+/** Throws on markup this reader does not accept; `remaining` is counted down before each element or text is reported, so several parts can share one budget; errors thrown by `events` are not caught. */
 export function scanXml(text: string, events: XmlEvents, remaining?: XmlBudget): void {
   const st: ScanState = { events, remaining, qnames: [], path: [], rooted: false }
   let i = 0

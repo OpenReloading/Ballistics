@@ -4,10 +4,7 @@ import type { Catalogue } from '../catalogue/types.ts'
 import { sha256 } from '../hash.ts'
 import { API_VERSION } from '../version.ts'
 
-/**
- * What an answer is a function of: the body, the query of a request without a body, both where a
- * request has both and a non-empty query.
- */
+/** The body, the query of a request without a body, both where a request has both and a non-empty query. */
 function inputOf({ body, query }: FastifyRequest) {
   if (body === undefined) return query
   return Object.keys(query ?? {}).length > 0 ? { body, query } : body

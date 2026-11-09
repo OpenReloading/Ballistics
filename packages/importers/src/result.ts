@@ -130,10 +130,7 @@ function missingPaths(session: Omit<SessionCandidate, 'provenance'>, source: Sou
   return missing
 }
 
-/**
- * Assembles the result and lists every field the file could not supply. `labels` names the
- * strings of `session` and `warnings` holds what the parser warned of so far.
- */
+/** Lists every field the file could not supply; `labels` names the strings of `session`, `warnings` holds what the parser warned of so far. */
 export function buildChronoImport(
   format: ChronoFormatId,
   session: Omit<SessionCandidate, 'provenance'>,

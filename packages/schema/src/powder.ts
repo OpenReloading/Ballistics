@@ -21,10 +21,7 @@ function estimate(kind: QuantityKind) {
     .meta({ unit: units[kind] })
 }
 
-/**
- * Ingredients as the safety data sheet prints them, in mass %. Several printed classes of one
- * ingredient are stored as their union; "<x" is closed at x.
- */
+/** As the safety data sheet prints them, in mass %; several printed classes of one ingredient are stored as their union, "<x" closed at x. */
 const powderComposition = z
   .array(
     z
@@ -43,11 +40,7 @@ const powderComposition = z
   )
   .min(1)
 
-/**
- * Constant-volume burning at `loadingDensity` from the composition: value at
- * the mean composition, min and max over the composition ranges. The specific energy of the M3
- * interior model is impetus / (gamma - 1).
- */
+/** Constant-volume burning at `loadingDensity`: the value at the mean composition, min and max over the composition ranges; the specific energy of M3 is impetus / (gamma - 1). */
 const powderThermochemistry = z.object({
   loadingDensity: quantity('density'),
   flameTemperature: computedRange('absoluteTemperature'),
@@ -57,11 +50,7 @@ const powderThermochemistry = z.object({
   covolume: computedRange('specificVolume'),
 })
 
-/**
- * M3 interior parameters (`apps/docs/docs/models/interior-m3.md`, vivacity law with a two-stage form)
- * fitted to load tables, with the fixed inputs of the fit.
- * Effective values of the model version: not load data.
- */
+/** Fitted to load tables, with the fixed inputs of the fit (`apps/docs/docs/models/interior-m3.md`, vivacity law with a two-stage form); effective values of the model version, not load data. */
 const powderInterior = z.object({
   model: z.literal('m3'),
   fitted: z.array(z.enum(['vivacity', 'energy', 'form.a'])).min(1),
@@ -97,11 +86,7 @@ const powderInterior = z.object({
   trainingCartridges: z.number().int().positive().optional(),
 })
 
-/**
- * Burn-rate temperature sensitivity of the M3 interior model (`apps/docs/docs/models/interior-m3.md`,
- * "Temperature of the propellant"): the burn rate is scaled by exp(sensitivity (T - reference)), with
- * `cold` below the reference temperature and `hot` at and above it.
- */
+/** The burn rate scales by exp(sensitivity (T - reference)), with `cold` below the reference temperature and `hot` at and above it (`apps/docs/docs/models/interior-m3.md`, "Temperature of the propellant"). */
 const powderTemperatureSensitivity = z.object({
   reference: quantity('absoluteTemperature', z.number().positive()),
   cold: quantity('inverseTemperature'),

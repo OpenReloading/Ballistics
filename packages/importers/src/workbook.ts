@@ -1,6 +1,4 @@
-// XLSX workbooks (ECMA-376 Part 1 SpreadsheetML, Part 2 Open Packaging Conventions;
-// https://ecma-international.org/publications-and-standards/standards/ecma-376/) read into rows
-// of cell text: no styles, number formats or formulas are applied.
+// XLSX workbooks (ECMA-376 Part 1 SpreadsheetML, Part 2 Open Packaging Conventions; https://ecma-international.org/publications-and-standards/standards/ecma-376/) read into rows of cell text, no styles, number formats or formulas applied
 import {
   type CellBudget,
   type CellPlace,
@@ -28,8 +26,7 @@ import {
   zipEntries,
 } from './zip.ts'
 
-// assumed bound, not a cited one, for the relationships and workbook parts read into an element
-// tree
+// assumed bound, not a cited one, for the relationships and workbook parts read into an element tree
 const maxTreePartSize = 1024 * 1024
 
 const zipSignature = [0x50, 0x4b, 0x03, 0x04]
@@ -45,11 +42,7 @@ export function isWorkbook(bytes: Uint8Array): boolean {
 const elements = (e: XmlElement | undefined, name: string) =>
   (e?.children ?? []).filter((c): c is XmlElement => typeof c !== 'string' && c.name === name)
 
-/**
- * True when a text event at `path` belongs to the rich text of the element at depth `d` (a shared
- * string `si` or an inline string `is`): text of its `t` children and of the `t` of its `r` runs;
- * phonetic runs (`rPh`) and other children are left out.
- */
+/** True when the text event at `path` is a `t` child of a shared string `si` or an inline string `is` at depth `d`, or the `t` of its `r` runs; phonetic runs (`rPh`) and other children are left out. */
 const richTextAt = (path: readonly string[], d: number) =>
   (path.length === d + 2 && path[d + 1] === 't') ||
   (path.length === d + 3 && path[d + 1] === 'r' && path[d + 2] === 't')
@@ -79,10 +72,7 @@ function sharedString(text: string, strings: string[], at: () => CellPlace): str
   return shared
 }
 
-/**
- * Text of a cell from its type, the text of its first `v` and of its first `is`. `at` places the
- * cell, built only for a refusal.
- */
+/** From its type, the text of its first `v` and of its first `is`; `at` places the cell, built only for a refusal. */
 function cellText({ t, v, is }: CellState, strings: string[], at: () => CellPlace): string {
   let text: string
   if (t === 'inlineStr') {
@@ -157,12 +147,7 @@ function closeCell(
 /** The element at each depth of a worksheet the scan reads: the sheet data, a row, a cell. */
 const sheetPath = ['sheetData', 'row', 'c']
 
-/**
- * Rows of cell text, read in one pass: the `row` children of the first `sheetData` child of the
- * root and their `c` children. `remaining` counts down the cells (gaps included) and characters every
- * worksheet of the workbook may still produce; a shared string counts at each cell that refers
- * to it. Each cell is placed when its element closes.
- */
+/** One pass over the `row` children of the root's first `sheetData` and their `c` children; `remaining` counts down the cells (gaps included) and characters every worksheet may still produce, a shared string at each cell that refers to it; each cell is placed when its element closes. */
 function sheetRows(
   text: string,
   strings: string[],
@@ -225,10 +210,7 @@ function exhausted(xmlRemaining: XmlBudget, part: string): FileDiagnostic | unde
   return undefined
 }
 
-/**
- * A part reader over the `entries` of the archive; `budget.left` is the declared size the workbook
- * may still read and `xmlRemaining` the XML budget, both shared by all parts.
- */
+/** `budget.left` is the declared size the workbook may still read, `xmlRemaining` the XML budget, both shared by all parts. */
 function partReader(
   archive: Archive & { entries: Map<string, ZipEntry> },
   budget: { left: number },
@@ -257,10 +239,7 @@ interface Relationship {
   target: string
 }
 
-/**
- * The internal relationships of the part `source` (`''` for the package) with resolved targets,
- * read as an element tree by `tree`; a repeated relationship id is refused.
- */
+/** Of the part `source` (`''` for the package), targets resolved, read as an element tree by `tree`; a repeated relationship id is refused. */
 async function readRelationships(
   tree: (name: string) => Promise<XmlElement>,
   source: string,
@@ -290,10 +269,7 @@ interface WorkbookPart {
   rels: Relationship[]
 }
 
-/**
- * The worksheets the `sheet` elements of the workbook part `office` list, in that order, each
- * part read at most once; chart and dialog sheets are left out.
- */
+/** Those the `sheet` elements of the workbook part `office` list, in that order, each part read at most once; chart and dialog sheets are left out. */
 async function readWorksheets(
   part: ReadPart,
   { office, sheetList, rels }: WorkbookPart,

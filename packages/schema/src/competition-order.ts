@@ -1,8 +1,4 @@
-/**
- * The default order of federations, disciplines, target faces, face events and target mappings in
- * every list (API answers, directories, pickers). Federations number their disciplines in their
- * own way, so the key of a discipline reads the code the way its federation prints it.
- */
+/** The default order of federations, disciplines, target faces, face events and target mappings in every list; a discipline's key reads its code the way its federation prints it, as federations number their disciplines their own way. */
 import {
   type Discipline,
   disciplineCategory,
@@ -34,11 +30,7 @@ export type DisciplineKey = Pick<Discipline, 'federation' | 'name' | 'number' | 
   distanceMm: number
 }
 
-/**
- * The first code of a number, split into the text before the digits, the numeric segments and the
- * text after them. `x` in BDS group codes (`73xx`) stands for a digit, so it is read as 0: `73xx`
- * is 7300, after `4110`.
- */
+/** The text before the digits, the numeric segments and the text after them; `x` in BDS group codes (`73xx`) stands for a digit and reads as 0, so `73xx` is 7300, after `4110`. */
 function codeParts(number: string) {
   const first = number.split('/')[0] ?? ''
   // Three anchored steps: one pattern with `\D*` and a trailing `.*` backtracks quadratically.

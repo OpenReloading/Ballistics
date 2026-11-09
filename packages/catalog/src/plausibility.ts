@@ -164,10 +164,7 @@ function checkCoefficientRanges(ballisticCoefficients: BallisticCoefficients): F
   })
 }
 
-/**
- * One G1 and one G7 for the same bullet: the G7 is 0.43 to 0.55 times the G1 for every pair in the
- * records; outside 0.35 to 0.65 one of the two is wrong.
- */
+/** The G7 is 0.43 to 0.55 times the G1 for every pair in the records; outside 0.35 to 0.65 one of the two is wrong. */
 function checkG7G1Ratio(ballisticCoefficients: BallisticCoefficients): Finding[] {
   const g1Coefficients = ballisticCoefficients.filter((b) => b.dragModel === 'G1' && !b.minVelocity)
   const g7Coefficients = ballisticCoefficients.filter((b) => b.dragModel === 'G7' && !b.minVelocity)
@@ -313,10 +310,7 @@ function checkBulkDensity(powder: Powder): Finding[] {
   ]
 }
 
-/**
- * Loading density below the solid density, flame temperature inside the solver's bracket, molar
- * mass above the lightest species, impetus against the ideal gas, gamma and covolume positive.
- */
+/** Loading density below the solid density, flame temperature inside the solver's bracket, molar mass above the lightest species, impetus against the ideal gas, gamma and covolume positive. */
 function checkThermochemistry(thermochemistry: NonNullable<Powder['thermochemistry']>): Finding[] {
   const findings: Finding[] = []
   const load = thermochemistry.loadingDensity.value
@@ -379,10 +373,7 @@ export const airTemperatureRange: Readonly<{ min: number; max: number }> = Objec
   min: -89.2,
   max: 56.7,
 })
-/**
- * Station pressure, bar: the sea-level extremes of WMO 2025 (870 and 1089.1 hPa) carried to 9000 m
- * and to -500 m in an isothermal column at the coldest air temperature give 0.1635 and 1.1951 bar.
- */
+/** Station pressure, bar: the sea-level extremes of WMO 2025 (870 and 1089.1 hPa) carried to 9000 m and to -500 m in an isothermal column at the coldest air temperature give 0.1635 and 1.1951 bar. */
 const stationPressureRange = Object.freeze({ min: 0.16, max: 1.2 })
 
 /** Propellant temperature not below the coldest air recorded, every velocity positive. */

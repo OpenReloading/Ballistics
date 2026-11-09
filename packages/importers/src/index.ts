@@ -113,9 +113,7 @@ function withoutFormatOptions(options: ParseChronoOptions): ChronoParserOptions 
 const anyRow = (book: Workbook, test: (cells: string[]) => boolean) =>
   book.worksheets.some((s) => s.rows.some(test))
 
-// the literal list, with each id and what it reads in the type: `detectFormat` and `detectWorkbookFormat`
-// fail to compile on an id that `ChronoFormatId` or `WorkbookFormatId` lacks, and formats.test.ts on one
-// they have and the list does not
+// the literal list, with each id and what it reads in the type: `detectFormat` and `detectWorkbookFormat` fail to compile on an id that `ChronoFormatId` or `WorkbookFormatId` lacks, formats.test.ts on one they have and the list does not
 const formats: readonly [
   TextChronoFormat & { id: 'openreloading-json' },
   TextChronoFormat & { id: 'shotview-csv' },

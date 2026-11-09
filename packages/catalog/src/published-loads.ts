@@ -56,12 +56,7 @@ const readings = (text: string) => {
   return [...plain, ...commas, ...decimal]
 }
 
-/**
- * Whether `value` follows the printed `raw` of a figure of `kind`: some number printed in `raw`,
- * read in the unit printed next to it (or the assumed unit for the first number), gives `value`
- * to 7 significant digits. A text that prints no number or no known unit (`Flush`) is not checked.
- * A twist `1:12"` is its second number.
- */
+/** Some number printed in `raw`, read in the unit printed next to it (or the assumed unit for the first number), gives `value` to 7 significant digits; a text that prints no number or no known unit (`Flush`) is not checked, and a twist `1:12"` is its second number. */
 function follows(
   kind: Printed,
   figure: { value: number; raw: string; assumedUnit?: string | undefined },

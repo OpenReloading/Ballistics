@@ -1,7 +1,4 @@
-// Legacy Excel workbooks: BIFF8 records ([MS-XLS] Excel Binary File Format (.xls) Structure,
-// v20250819, https://learn.microsoft.com/en-us/openspecs/office_file_formats/ms-xls/cd03cb5f-ca02-4934-a391-bb674cb8aa06;
-// section numbers below refer to it) in the Workbook stream of a compound file, read into the
-// same rows of cell text as XLSX workbooks.
+// Legacy Excel workbooks: BIFF8 records ([MS-XLS] Excel Binary File Format (.xls) Structure, v20250819, https://learn.microsoft.com/en-us/openspecs/office_file_formats/ms-xls/cd03cb5f-ca02-4934-a391-bb674cb8aa06; section numbers refer to it) in the Workbook stream of a compound file, read into the same rows of cell text as XLSX workbooks
 import { type CellBudget, clean, placeCell, type Workbook, type Worksheet } from './cells.ts'
 import { compoundStreams } from './cfb.ts'
 import { locatedError, ReaderError, refuseFile } from './diagnostics.ts'
@@ -59,10 +56,7 @@ interface Rec {
 /** End of data inside a string read; turned into a message by the caller. */
 class Short extends Error {}
 
-/**
- * A cursor over the data of a record and of the Continue records after it (2.1.4), read from the
- * stream in place: a Continue header is read when the cursor reaches the end of a chunk.
- */
+/** Over a record and its Continue records (2.1.4), read in place; a Continue header is read when the cursor reaches the end of a chunk. */
 class Cursor {
   private s: Uint8Array
   private at: number
@@ -108,10 +102,7 @@ class Cursor {
       left -= step
     }
   }
-  /**
-   * `count` characters with high-byte flag `high`; a chunk that ends while characters remain is
-   * followed by one starting with a new flag byte (2.5.293). Built 4096 code units at a time.
-   */
+  /** A chunk that ends while characters remain is followed by one starting with a new flag byte (2.5.293); built 4096 code units at a time. */
   characters(count: number, high: boolean): string {
     let text = ''
     let left = count
@@ -192,10 +183,7 @@ function readText(read: () => string): string {
 interface RecordReader {
   s: Uint8Array
   view: DataView
-  /**
-   * The record at byte `at` with the Continue records after it; throws when it runs past the
-   * stream or when the bytes read over all calls exceed the stream (substreams overlap).
-   */
+  /** The record at byte `at` with the Continue records after it; throws when it runs past the stream or when the bytes read over all calls exceed the stream (substreams overlap). */
   record: (at: number) => Rec
   /** True when the record is a BOF of BIFF8 with substream type `dt` (2.4.21). */
   isBof: (r: Rec, dt: number) => boolean
@@ -248,10 +236,7 @@ function boundSheet(c: Cursor): { position: number; type: number; name: string }
   return { position, type, name: c.characters(count, (c.u8() & 1) === 1) }
 }
 
-/**
- * The workbook substream (2.1.7.20.3) from byte 0: the BoundSheet8 entries, the shared strings,
- * and the position after its EOF record.
- */
+/** From byte 0 (2.1.7.20.3): the BoundSheet8 entries, the shared strings, and the position after its EOF record. */
 function readWorkbookSubstream(reader: RecordReader): {
   bound: { position: number; type: number; name: string }[]
   strings: string[]
@@ -431,10 +416,7 @@ function putCell(reader: RecordReader, r: Rec, strings: string[], st: SheetState
   }
 }
 
-/**
- * Rows of the worksheet `n` whose records start at `from`, after its BOF, and the position after
- * its EOF record; cells are placed and counted against `remaining`.
- */
+/** The rows of worksheet `n` from `from`, after its BOF, and the position after its EOF record; cells are placed and counted against `remaining`. */
 function readWorksheetCells(
   reader: RecordReader,
   { from, n }: { from: number; n: number },
@@ -471,11 +453,7 @@ function readWorksheetCells(
   return { rows: [...st.rows].toSorted((a, b) => a[0] - b[0]).map(([, cells]) => cells), end }
 }
 
-/**
- * The worksheets (type 0) of the BoundSheet8 entries in workbook order; a worksheet that does not
- * start with a worksheet BOF, starts where another does, or lies inside another substream
- * (`workbookEnd` ends the workbook substream) is refused.
- */
+/** Type 0 of the BoundSheet8 entries, in workbook order; one that does not start with a worksheet BOF, starts where another does, or lies inside another substream (`workbookEnd` ends the workbook substream) is refused. */
 function assembleWorksheets(
   reader: RecordReader,
   bound: { position: number; type: number; name: string }[],
@@ -485,8 +463,7 @@ function assembleWorksheets(
   const { s, record, isBof } = reader
   const remaining: CellBudget = { cells: maxCells, characters: maxCellCharacters }
   const starts = new Set<number>()
-  // byte ranges of the substreams read; a worksheet inside another substream (for example at a
-  // BOF nested in a chart) is refused once all are read
+  // byte ranges of the substreams read; a worksheet inside another substream (for example at a BOF nested in a chart) is refused once all are read
   const ranges: [number, number][] = [[0, workbookEnd]]
   const worksheets: Worksheet[] = []
   // only worksheets (and dialog sheets); macro, chart and VBA module sheets hold no cells
