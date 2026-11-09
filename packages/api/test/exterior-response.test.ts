@@ -1,12 +1,5 @@
 import { type TrajectoryInput, trajectory } from '@open-reloading/ballistics'
-import {
-  inlineRunner,
-  rangeStringsFitResponse,
-  rangeStringsPlanResponse,
-  stabilityResponse,
-  trajectoryResponse,
-  truingResponse,
-} from '@open-reloading/use-cases'
+import { inlineRunner, operation, stabilityResponse } from '@open-reloading/use-cases'
 import { describe, expect, it } from 'vitest'
 import { API_PREFIX } from '../src/version.ts'
 import { defined } from './defined.ts'
@@ -14,6 +7,13 @@ import { rifleProjectile as projectile, rifleShot } from './fixtures.ts'
 import { checkBody, withApi } from './setup.ts'
 
 const api = withApi({ compute: inlineRunner })
+
+/** The 200 schema of the route `name`, as the app documents it. */
+const response = (name: string) => defined(operation(name)).response
+const trajectoryResponse = response('exterior/trajectory')
+const truingResponse = response('exterior/truing')
+const rangeStringsPlanResponse = response('exterior/range-strings/plan')
+const rangeStringsFitResponse = response('exterior/range-strings/fit')
 
 async function post(path: string, payload: unknown) {
   const res = await api.post(`${API_PREFIX}${path}`, payload)
