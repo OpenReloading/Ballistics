@@ -13,7 +13,7 @@ export interface MovingTargetLead {
   angle: number
 }
 
-/** `range` m along the line of sight and `timeOfFlight` s to it stay those of the trajectory, as the target's motion along the line of sight changes neither; the lateral lead is the target's displacement across it, positive to the right, the angle atan(lead / range). */
+/** `range` m along the line of sight and `timeOfFlight` s to it stay those of the trajectory: the target's motion along the line of sight, which changes both, is left out (`apps/docs/docs/models/exterior-moving-target.md`, "Limits"); the lateral lead is the target's displacement across it, positive to the right, the angle atan(lead / range). */
 export function movingTargetLead(
   target: TargetMotion,
   range: number,
