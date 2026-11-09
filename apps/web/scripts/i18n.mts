@@ -17,9 +17,9 @@
  * is read by bracket depth; a template literal with `${` is refused. Upgrade to the TypeScript API
  * if a source needs more.
  */
-import { execFileSync } from 'node:child_process'
 import { globSync, readFileSync } from 'node:fs'
 import path from 'node:path'
+import { git } from './ci-plan.mts'
 
 const webRoot = path.join(import.meta.dirname, '..')
 
@@ -400,11 +400,7 @@ if (import.meta.main) {
     const allowed: string[] = lint.untranslated[code] ?? []
     // a base without a list for the language compares nothing
     const base: string[] | undefined = baseRef
-      ? JSON.parse(
-          execFileSync('git', ['show', `${baseRef}:apps/web/scripts/i18n-lint.json`], {
-            encoding: 'utf8',
-          }),
-        ).untranslated?.[code]
+      ? JSON.parse(git('show', `${baseRef}:apps/web/scripts/i18n-lint.json`)).untranslated?.[code]
       : undefined
     const found = problems(source, catalogue, code, requiredMessages(webRoot), allowed, base)
     if (code === 'de') {

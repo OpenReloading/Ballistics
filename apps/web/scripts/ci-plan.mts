@@ -262,7 +262,7 @@ export function selected(filter: string): string[] | undefined {
   }
 }
 
-function git(...args: string[]) {
+export function git(...args: string[]) {
   if (gitPath === undefined) throw new Error('git not found in the system directories')
   return execFileSync(gitPath, args, {
     cwd: repoRoot,
