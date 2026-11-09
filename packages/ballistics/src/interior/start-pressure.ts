@@ -1,7 +1,4 @@
-/**
- * Default shot-start pressure of M3 (`apps/docs/docs/models/interior-m3.md`, "Shot start") when the load gives
- * none. Approximate: effective values of the load-table fit, not measurements of a bullet.
- */
+/** When the load gives none; approximate: effective values of the load-table fit, not measurements of a bullet (`apps/docs/docs/models/interior-m3.md`, "Shot start"). */
 import { need } from '../issue.ts'
 
 /** A default shot-start pressure with its interval and source. */
@@ -61,13 +58,7 @@ const handguns: Record<BulletConstruction, StartPressureDefault> = {
   monolithic: handgun(50.0, 33.8, 65.3),
 }
 
-/**
- * Default start pressure for a barrel length in m and the bullet construction: the fitted value of
- * the construction and the firearm class (a barrel under `handgunBarrelLengthLimit` is a handgun). A
- * handgun without a construction counts as jacketed; a rifle without one, and a rifle plated bullet
- * (no rifle rows), takes the rifle assumption. Throws `InputError` for a barrel that is not a
- * positive number and for an unknown construction.
- */
+/** Barrel length in m, a handgun under `handgunBarrelLengthLimit`; a handgun without a construction counts as jacketed, a rifle without one or with a plated bullet (no rifle rows) takes the rifle assumption; throws `InputError` for a barrel that is not a positive number and for an unknown construction. */
 export function defaultStartPressure(
   barrel: number,
   construction?: BulletConstruction,
@@ -86,11 +77,7 @@ export interface StructureFields {
   structure?: string | undefined
 }
 
-/**
- * The class of a bullet's effective density, mass over the volume of the cylinder of its diameter
- * and length, by which the web app estimates the volume of a bullet without a length
- * (`apps/docs/docs/models/case-capacity.md`, "Bullet without a length"); `unknown` is the pooled class.
- */
+/** Effective density is mass over the volume of the cylinder of diameter and length, by which the web app estimates a bullet's volume without a length (`apps/docs/docs/models/case-capacity.md`, "Bullet without a length"); `unknown` is the pooled class. */
 export type DensityClass = 'cast' | 'monolithic' | 'jacketed' | 'unknown'
 
 /** A bullet structure's construction, when it has one, and its density class. */
@@ -99,11 +86,7 @@ export interface BulletStructure {
   density: DensityClass
 }
 
-/**
- * Each `construction.structure` of a bullet record: the construction its start pressure is fitted
- * for and the class of its effective density. Swaged is lead for the start pressure, of unknown
- * density: the cast class was measured on cast bullets only. A frangible bullet has no construction.
- */
+/** Swaged is lead for the start pressure but of unknown density, as the cast class was measured on cast bullets only; a frangible bullet has no construction. */
 export const bulletStructures: Readonly<Record<string, BulletStructure>> = {
   'cup-and-core': { construction: 'jacketed', density: 'jacketed' },
   bonded: { construction: 'jacketed', density: 'jacketed' },
@@ -121,11 +104,7 @@ export const structureOf = (structure: string | undefined): BulletStructure | un
     ? bulletStructures[structure]
     : undefined
 
-/**
- * The construction of a bullet record's `construction` (`bulletStructures`). A frangible bullet and
- * a construction without a structure count as jacketed, `assumed`. Undefined where the record gives
- * no construction at all.
- */
+/** A frangible bullet and a construction without a structure count as jacketed, `assumed`; undefined where the record gives no construction at all. */
 export function constructionOf(
   fields: StructureFields | undefined,
 ): { construction: BulletConstruction; assumed: boolean } | undefined {
@@ -140,12 +119,7 @@ export interface StartPressureRule extends StartPressureDefault {
   assumed?: true
 }
 
-/**
- * The default start pressure for a barrel length in m and a bullet's `construction` record: the
- * value of its construction and firearm class. A handgun without a construction counts as jacketed
- * (assumed, as in `defaultStartPressure`). Without a barrel length, or for a rifle without a
- * construction, it is the rifle assumption.
- */
+/** Barrel length in m; a handgun without a construction counts as jacketed (assumed, as in `defaultStartPressure`); without a barrel length, or for a rifle without a construction, the rifle assumption. */
 export function startPressureOf(
   barrel: number | undefined,
   fields: StructureFields | undefined,

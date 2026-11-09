@@ -1,8 +1,4 @@
-/**
- * Default burn-rate temperature sensitivity of a powder without its own, by grain form
- * (`apps/docs/docs/models/interior-m3.md`, "Default by grain form"). Approximate: a value of the grain
- * form, not of the powder.
- */
+/** By grain form, for a powder without its own (`apps/docs/docs/models/interior-m3.md`, "Default by grain form"); approximate: a value of the grain form, not of the powder. */
 import { type InteriorLoad, interior } from './model.ts'
 
 /** Grain forms of a powder record (`grainForm`). */
@@ -26,10 +22,7 @@ export interface SensitivityDefault {
 /** Reference temperature of a default without a fitted powder temperature, K (21 °C, the split of Boulkadid 2016). */
 export const sensitivityReferenceDefault = 294.15
 
-/**
- * Cold-side sensitivity interval, 1/K: the measured cold burn-rate sensitivity of ball powders,
- * 0.0012, and no significant cold change of the peak pressure (Boulkadid 2016) span it.
- */
+/** Cold-side sensitivity interval, 1/K, spanned by the measured cold burn-rate sensitivity of ball powders, 0.0012, and no significant cold change of the peak pressure (Boulkadid 2016). */
 const coldInterval = [0, 0.003] as const
 
 const ball: SensitivityDefault = {
@@ -63,11 +56,7 @@ export function defaultSensitivity(form: string | undefined): SensitivityDefault
   return form !== undefined && isGrainForm(form) ? defaults[form] : undefined
 }
 
-/**
- * The peak breech pressure of `load` (Pa) at both ends of a cold sensitivity interval, the load's
- * other inputs as they are: [low, high]. Undefined without a sensitivity, at or above its reference,
- * or when a run is invalid.
- */
+/** Peak breech pressure (Pa) at both ends of a cold sensitivity interval, the other inputs as they are: [low, high]; undefined without a sensitivity, at or above its reference, or when a run is invalid. */
 export function coldPeakInterval(
   load: InteriorLoad,
   interval: readonly [number, number],
@@ -112,11 +101,7 @@ export interface TakenSensitivity {
   fallback?: SensitivityDefault
 }
 
-/**
- * The temperature sensitivity a run of `powder` takes, K and 1/K: the record's own, else the default
- * of its grain form with the reference of the record's fit (else {@link sensitivityReferenceDefault});
- * `form` names the grain form when the default was taken. None for a powder without either.
- */
+/** K and 1/K: the record's own, else the default of its grain form with the reference of the record's fit (else {@link sensitivityReferenceDefault}), `form` naming the grain form then; none for a powder without either. */
 export function recordSensitivity(powder: SensitivityPowder): TakenSensitivity | undefined {
   const own = powder.temperatureSensitivity
   if (own)

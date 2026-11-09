@@ -1,11 +1,4 @@
-/**
- * Charge finder for the M3 `interior` model: the charge at which one run reaches a target
- * (`apps/docs/docs/models/interior-charge-solver.md`). A scan over the charges the case allows brackets the
- * target, then a bracketed root find (Illinois false position, bisection when a step leaves the
- * bracket) runs `interior` at the candidate charges. The returned run is the run at the returned
- * charge. A simulation, not load data: the answer is the charge at which the model reaches the
- * target, not a charge to load.
- */
+/** The charge at which one `interior` run reaches a target (`apps/docs/docs/models/interior-charge-solver.md`): a scan over the charges the case allows brackets it, then Illinois false position (bisection when a step leaves the bracket); the returned run is the one at the returned charge, a simulation, not a charge to load. */
 import { nth } from '@open-reloading/statistics'
 import { need } from '../issue.ts'
 import type { Settings } from '../settings.ts'
@@ -19,10 +12,7 @@ import {
   interior,
 } from './model.ts'
 
-/**
- * Quantity of a run to reach: peak pressure (Pa), muzzle velocity (m/s), load ratio
- * (charge over bulk density times chamber volume), barrel time or bullet lead time (s).
- */
+/** Peak pressure (Pa), muzzle velocity (m/s), load ratio (charge over bulk density times chamber volume), barrel time or bullet lead time (s). */
 export type ChargeTargetKind =
   | 'peakPressure'
   | 'muzzleVelocity'
@@ -258,10 +248,7 @@ function narrow({ a, b, fa, fb, side }: IllinoisState, p: Point, fc: number): Il
   return { a: p, b, fa: fc, fb: side === 1 ? fb / 2 : fb, side: 1 }
 }
 
-/**
- * Illinois false position inside the bracket, bisection where the false position charge gives no
- * valid run; the run within tolerance of the target value, or the refusal.
- */
+/** Bisection where the false position charge gives no valid run; the run within tolerance of the target value, or the refusal. */
 function illinoisRoot(
   bracket: [Point, Point],
   target: number,
@@ -295,11 +282,7 @@ function checkChargeTarget(target: ChargeTarget, bulkDensity: number | undefined
   })
 }
 
-/**
- * The solution over the valid points of the scan: refused outside the values they reach and where
- * the value is not monotone in the charge, else a scan point within tolerance or the root of the
- * one bracket.
- */
+/** Over the valid points of the scan: refused outside the values they reach and where the value is not monotone in the charge, else a scan point within tolerance or the root of the one bracket. */
 function solveInRange(
   scan: readonly (Point | undefined)[],
   valid: Point[],
@@ -335,10 +318,7 @@ function solveInRange(
   return typeof root === 'string' ? refuse(root) : done(root)
 }
 
-/**
- * The charge at which `interior` reaches `target`, or a refusal with the reason and the values the
- * charges allowed reach. `load.charge` is ignored. The target `loadRatio` needs `bulkDensity`.
- */
+/** Or a refusal with the reason and the values the allowed charges reach; `load.charge` is ignored, and the target `loadRatio` needs `bulkDensity`. */
 export function solveCharge(
   load: InteriorLoad,
   target: ChargeTarget,

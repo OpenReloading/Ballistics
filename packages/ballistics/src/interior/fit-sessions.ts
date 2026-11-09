@@ -1,9 +1,4 @@
-/**
- * Powder fit over chronograph sessions that differ in barrel length or powder temperature, with
- * the parameters the sessions do not resolve held at their input values,
- * `apps/docs/docs/models/interior-powder-fit.md`, "Several barrel lengths and temperatures". SI in
- * and out.
- */
+/** Over sessions that differ in barrel length or powder temperature, holding the parameters they do not resolve at their input values (`apps/docs/docs/models/interior-powder-fit.md`, "Several barrel lengths and temperatures"); SI in and out. */
 
 import { nth } from '@open-reloading/statistics'
 import { need } from '../issue.ts'
@@ -64,10 +59,7 @@ function namedIndex(error: PowderFitError, open: readonly number[]): number | un
 const isHeldReason = (reason: PowderFitReason): reason is HeldPowderParameter['reason'] =>
   reason === 'underdetermined' || reason === 'unresolved' || reason === 'ill-conditioned'
 
-/**
- * The parameter to give up after `error`, never the burn coefficient, with the failure's reason;
- * undefined where none is left.
- */
+/** The parameter to give up after `error`, never the burn coefficient, with the failure's reason; undefined where none is left. */
 function giveUp(
   error: PowderFitError,
   parameters: readonly PowderParameter[],
@@ -80,14 +72,7 @@ function giveUp(
     : { name: nth(parameters, named), reason }
 }
 
-/**
- * Fits the powder parameters of `load` to ladders fired at several barrel lengths and powder
- * temperatures with shared parameters (`apps/docs/docs/models/interior-powder-fit.md`, "Several
- * barrel lengths and temperatures"). A requested parameter other than the burn coefficient that
- * the sessions do not resolve is dropped one at a time and listed in `held`; the fit then runs
- * again without it. The burn coefficient must be among `options.parameters` (default only it),
- * and failures that name no other parameter are thrown as `fitPowder` throws them.
- */
+/** Shared parameters over ladders at several barrel lengths and temperatures (`apps/docs/docs/models/interior-powder-fit.md`, "Several barrel lengths and temperatures"); a requested parameter the sessions do not resolve, other than the burn coefficient, is dropped one at a time into `held` and the fit run again; the burn coefficient must be among `options.parameters` (default only it), and failures naming no other parameter are thrown as `fitPowder` throws them. */
 export function fitPowderSessions(
   load: InteriorLoad,
   sessions: readonly PowderSession[],

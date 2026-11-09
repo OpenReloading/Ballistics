@@ -1,7 +1,4 @@
-/**
- * A published barrel-wear measurement with its source (`apps/docs/docs/models/interior-m3.md`, "Throat
- * wear"), kept apart from the solver so a bundle of the model does not carry it.
- */
+/** Kept apart from the solver so a bundle of the model does not carry it (`apps/docs/docs/models/interior-m3.md`, "Throat wear"). */
 
 /** A published barrel-wear measurement with its source. */
 export interface WearMeasurement {
@@ -15,14 +12,7 @@ export interface WearMeasurement {
   modelChange: Readonly<{ peakPressure: number; muzzleVelocity: number }>
 }
 
-/**
- * Measured muzzle velocity of one 5.56x45 mm barrel (361 mm) over its round count, 10-shot means,
- * and its chamber length by coordinate measuring machine new and after 16000 rounds. Vuong, Nguyen,
- * Khuong, Nguyen, "Interior ballistics modelling of a rifled barrel with cumulative wear effects",
- * Military Technical Courier (Vojnotehnički glasnik) 74(1), 2026, doi:10.5937/vojtehg75-64184,
- * licence CC BY 4.0; the velocities from its table 3 (the first count is shots 1 to 10),
- * the chamber lengths from its CMM section, the model results from its table 2.
- */
+/** One 5.56x45 mm barrel (361 mm): muzzle velocity over its round count in 10-shot means, chamber length by coordinate measuring machine new and after 16000 rounds (Vuong, Nguyen, Khuong, Nguyen, "Interior ballistics modelling of a rifled barrel with cumulative wear effects", Military Technical Courier (Vojnotehnički glasnik) 74(1), 2026, doi:10.5937/vojtehg75-64184, licence CC BY 4.0; velocities from its table 3, the first count shots 1 to 10, lengths from its CMM section, model results from its table 2). */
 export const vuong2026: WearMeasurement = Object.freeze({
   source: Object.freeze({
     authors: 'Vuong D. T., Nguyen V. H., Khuong T. L., Nguyen V. D.',

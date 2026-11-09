@@ -1,9 +1,4 @@
-/**
- * Pressure and velocity bands from sampled input tolerances (`apps/docs/docs/models/interior-sampled-band.md`):
- * every input of a load is drawn from a normal distribution around its nominal value, the model runs once per
- * draw and the 5th, 50th and 95th percentiles of the peak pressure and the muzzle velocity are reported.
- * It covers input tolerances only, not model error.
- */
+/** Every input drawn from a normal distribution around its nominal value, one run per draw, the 5th, 50th and 95th percentiles of peak pressure and muzzle velocity reported; input tolerances only, not model error (`apps/docs/docs/models/interior-sampled-band.md`). */
 
 import { normalsFrom, percentile, seededUniforms } from '@open-reloading/statistics'
 import type { Settings } from '../settings.ts'
@@ -49,11 +44,7 @@ interface SampledRun {
   velocity: number
 }
 
-/**
- * The result of sampling one load. `sampled` has the percentiles; `overBudget` is a run that did
- * not finish its draws within the budget, and has none (a part of the draws would depend on the
- * speed of the machine); `invalid` is a run in which no draw stayed in the model.
- */
+/** `overBudget`: the draws did not finish within the budget, so no percentiles (a part of them would depend on the speed of the machine); `invalid`: no draw stayed in the model. */
 export interface SampledBand {
   /** What the run produced. */
   status: 'sampled' | 'overBudget' | 'invalid'
@@ -86,10 +77,7 @@ export interface SampledModel<L> {
   run: (load: L) => SampledRun | string
 }
 
-/**
- * The load of one draw: one standard normal number per input of `pressureInputs`, in that order,
- * applied where the input has a tolerance; or the reason a move left the model.
- */
+/** One standard normal number per input of `pressureInputs`, in that order, applied where the input has a tolerance; or the reason a move left the model. */
 function drawnLoad<L>(
   load: L,
   apply: Record<PressureInput, ApplyTolerance<L>>,
@@ -105,11 +93,7 @@ function drawnLoad<L>(
   return moved
 }
 
-/**
- * The percentiles of `run` over draws of the inputs of `load`. Draw `i` takes one standard normal
- * number per input of `pressureInputs`, in that order, whether or not the input has a tolerance, so
- * the draws depend on the seed only. `run` returns the two outputs, or a reason for an invalid run.
- */
+/** Draw `i` takes one standard normal number per input of `pressureInputs`, in that order, tolerance or not, so the draws depend on the seed only; `run` returns the two outputs, or a reason for an invalid run. */
 export function sampledBand<L>(
   load: L,
   { apply, run }: SampledModel<L>,

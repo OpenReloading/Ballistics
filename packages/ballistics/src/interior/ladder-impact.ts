@@ -1,8 +1,4 @@
-/**
- * Point of impact per charge in a ladder: the height of each charge's shots with the effect of
- * their velocity removed, and a test of whether the remaining heights differ between charges
- * (`apps/docs/docs/models/interior-ladder-impact.md`). SI throughout: charge kg, height m, velocity m/s.
- */
+/** Each charge's shot heights with the effect of their velocity removed, and a test whether the remaining heights differ between charges (`apps/docs/docs/models/interior-ladder-impact.md`); SI throughout: charge kg, height m, velocity m/s. */
 
 import { chiSquareQuantile, nth } from '@open-reloading/statistics'
 import { need } from '../issue.ts'
@@ -17,11 +13,7 @@ export interface ImpactStep {
 
 /** Result of {@link ladderImpactResiduals}. */
 export interface LadderImpact {
-  /**
-   * Per charge: the mean height after the velocity correction (`mean`) and the sample standard
-   * deviation of the corrected heights, ascending in charge. The shape of {@link LadderStep}, so
-   * `ladderFlatSpots` finds the flat runs of the residual.
-   */
+  /** The corrected mean and the sample standard deviation per charge, ascending in charge, in the shape of {@link LadderStep} so `ladderFlatSpots` finds the flat runs of the residual. */
   steps: LadderStep[]
   /** Between-charge sum of squares over the pooled variance of one corrected height. */
   statistic: number
@@ -37,14 +29,7 @@ function varianceRatio(between: number, pooled: number): number {
   return between > 0 ? Number.POSITIVE_INFINITY : 0
 }
 
-/**
- * The height of impact of each shot minus `slope` times its velocity less the mean velocity of the
- * ladder, averaged per charge, and a heterogeneity test across charges at `level` (default 0.99).
- * `slope` is the change of height per velocity, m per m/s, from two flown trajectories. The
- * chi-square reference is approximate when the pooled variance has few degrees of freedom; at 5
- * shots per charge and 9 charges the false-alarm rate is about the level (model page, Limits).
- * It needs three or more charges with at least two shots each.
- */
+/** Removes `slope` (m per m/s, from two flown trajectories) times each shot's velocity less the ladder's mean, then tests heterogeneity across charges at `level` (default 0.99), approximate with few degrees of freedom (about the level at 5 shots and 9 charges, model page, Limits); needs three or more charges with at least two shots each. */
 export function ladderImpactResiduals(
   charges: readonly ImpactStep[],
   slope: number,

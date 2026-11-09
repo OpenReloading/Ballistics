@@ -1,7 +1,4 @@
-/**
- * M3 interior model with Noble-Abel gas, described in
- * `apps/docs/docs/models/interior-m3.md`. SI in and out, temperatures in K.
- */
+/** M3 interior model with Noble-Abel gas, `apps/docs/docs/models/interior-m3.md`; SI in and out, temperatures in K. */
 
 import { bisect, InputError, nth } from '@open-reloading/statistics'
 
@@ -29,10 +26,7 @@ export interface InteriorLoad {
     boreArea: number
     /** Bore diameter, m: heat-loss area and the default radius of gyration. */
     boreDiameter: number
-    /**
-     * Throat wear, m: length a worn throat adds behind the bullet; the run adds it times the bore
-     * area to `volume` (`apps/docs/docs/models/interior-m3.md`, "Throat wear"). Default 0.
-     */
+    /** Throat wear, m: the length a worn throat adds behind the bullet, times the bore area added to `volume`; default 0 (`apps/docs/docs/models/interior-m3.md`, "Throat wear"). */
     throatWear?: number | undefined
   }
   barrel: {
@@ -60,17 +54,9 @@ export interface InteriorLoad {
     covolume: number
     /** Burn law and its grain or form function. */
     burn: Burn
-    /**
-     * Burn-rate temperature sensitivity, 1/K, below (cold) and above (hot) the reference, K
-     * (`apps/docs/docs/models/interior-m3.md`, "Temperature of the propellant").
-     */
+    /** Burn-rate temperature sensitivity, 1/K, below (cold) and above (hot) the reference, K (`apps/docs/docs/models/interior-m3.md`, "Temperature of the propellant"). */
     temperatureSensitivity?: { reference: number; cold: number; hot: number } | undefined
-    /**
-     * Sensitivity of the specific energy to the propellant temperature, 1/K; default 0. The energy
-     * is scaled by exp(energyTemperature (T - reference)) with the reference of
-     * `temperatureSensitivity`, which a nonzero value needs
-     * (`apps/docs/docs/models/interior-m3.md`, "Temperature of the propellant").
-     */
+    /** Sensitivity of the specific energy to the propellant temperature, 1/K, default 0: the energy scales by exp(energyTemperature (T - reference)) with the reference of `temperatureSensitivity`, which a nonzero value needs (`apps/docs/docs/models/interior-m3.md`, "Temperature of the propellant"). */
     energyTemperature?: number | undefined
   }
   /** Propellant temperature, K. */
@@ -90,10 +76,7 @@ export interface InteriorLoad {
     | undefined
   /** Pressure-gradient coefficients (`apps/docs/docs/models/interior-m3.md`, "Pressure gradient"); default `lagrangeGradient`. */
   gradient?: { energy: number; breech: number } | undefined
-  /**
-   * Heat loss to the bore (`apps/docs/docs/models/interior-leakage-heat.md`, "Convective heat loss"); default none.
-   * Omitted fields take `convectiveDefaults`.
-   */
+  /** Heat loss to the bore, default none, omitted fields from `convectiveDefaults` (`apps/docs/docs/models/interior-leakage-heat.md`, "Convective heat loss"). */
   heat?:
     | undefined
     | { model: 'none' }
@@ -125,11 +108,7 @@ export interface InteriorLoad {
 /** Defaults of the convective heat model (`apps/docs/docs/models/interior-leakage-heat.md`, "Convective heat loss"): K, Pa s, 1. */
 export const convectiveDefaults = { wallTemperature: 300, viscosity: 6e-5, prandtl: 0.69 }
 
-/**
- * Flow factor of quasi-steady isentropic orifice flow at pressure ratio p_a / p_0
- * (`apps/docs/docs/models/interior-leakage-heat.md`, "Flow through the leak"): psi_k when choked, the subsonic factor
- * above the critical ratio, 0 from ratio 1.
- */
+/** Quasi-steady isentropic orifice flow at pressure ratio p_a / p_0: psi_k when choked, the subsonic factor above the critical ratio, 0 from ratio 1 (`apps/docs/docs/models/interior-leakage-heat.md`, "Flow through the leak"). */
 export function leakFlowFactor(gamma: number, ratio: number): number {
   const k = gamma
   if (!(ratio < 1)) return 0
@@ -204,11 +183,7 @@ export interface InteriorEnergy {
   leakage: number
 }
 
-/**
- * Why a run is invalid (`apps/docs/docs/models/interior-m3.md`, "Limits"): `input` (see `field`), solid volume or covolume of the gas
- * not below the chamber volume, burnout before the projectile moves, projectile velocity back to
- * 0, integrator failure (step size or `maxSteps`), or `maxTime` reached before the muzzle.
- */
+/** `input` (see `field`), solid volume or gas covolume not below the chamber volume, burnout before the projectile moves, projectile velocity back to 0, integrator failure (step size or `maxSteps`), or `maxTime` reached before the muzzle (`apps/docs/docs/models/interior-m3.md`, "Limits"). */
 export type InteriorReason =
   | 'input'
   | 'chamberVolume'
@@ -336,10 +311,7 @@ const engravingValid = (profile: readonly { travel: number; pressure: number }[]
       nonNeg(p.travel) && nonNeg(p.pressure) && (i === 0 || p.travel > nth(profile, i - 1).travel),
   )
 
-/**
- * Whether the heat loss inputs hold: none, or a positive flame temperature with positive wall
- * temperature, viscosity and Prandtl number where given and a factor of at least 0.
- */
+/** None, or a positive flame temperature with positive wall temperature, viscosity and Prandtl number where given and a factor of at least 0. */
 function heatValid(heat: InteriorLoad['heat']): boolean {
   if (heat === undefined || heat.model === 'none') return true
   return (
@@ -406,11 +378,7 @@ function burnCoefficient(load: InteriorLoad, form: ReturnType<typeof burnForm>):
     : (burn.vivacity * tauT) / burn.referencePressure ** n
 }
 
-/**
- * Constants of one load and the scales of the state (`apps/docs/docs/models/interior-m3.md`,
- * "Scaled state and integration"): effective mass, burn-law coefficient, reference velocity vr and
- * time ts; `chamberVolume` when solid or covolume fill the chamber.
- */
+/** Effective mass, burn-law coefficient, reference velocity vr and time ts; `chamberVolume` when solid or covolume fill the chamber (`apps/docs/docs/models/interior-m3.md`, "Scaled state and integration"). */
 function scaleInteriorLoad(load: InteriorLoad) {
   const { chamber, barrel, bullet, propellant } = load
   const vc = wornVolume(chamber.volume, chamber.boreArea, chamber.throatWear ?? 0)
@@ -476,10 +444,7 @@ function resistanceForce(load: InteriorLoad, area: number) {
   return (x: number) => area * (friction + profileAt(profile, (pt) => pt.pressure, x))
 }
 
-/**
- * The gas leakage of a load (`apps/docs/docs/models/interior-leakage-heat.md`): whether it leaks, the
- * leak area over travel, back pressure, discharge coefficient and the charge mass lost at a state.
- */
+/** Whether it leaks, the leak area over travel, back pressure, discharge coefficient and the charge mass lost at a state (`apps/docs/docs/models/interior-leakage-heat.md`). */
 function leakageOf(load: InteriorLoad, mc: number) {
   const leak = load.leakage !== undefined
   return {
@@ -493,10 +458,7 @@ function leakageOf(load: InteriorLoad, mc: number) {
 
 type Leakage = ReturnType<typeof leakageOf>
 
-/**
- * Travels before the muzzle `xe` where resistance or leak area has a kink, rising; a point at the
- * muzzle would fire before the muzzle event and hide it.
- */
+/** Rising; a point at the muzzle would fire before the muzzle event and hide it. */
 const kinksBefore = (points: readonly { travel: number }[], xe: number) =>
   [...new Set(points.map((pt) => pt.travel))].filter((x) => x < xe).toSorted((a, b) => a - b)
 
@@ -565,19 +527,13 @@ function heatFluxOf(
   }
 }
 
-/**
- * Base pressure from mean pressure and resistance force while moving
- * (`apps/docs/docs/models/interior-m3.md`, "Pressure gradient").
- */
+/** Base pressure from mean pressure and resistance force while moving (`apps/docs/docs/models/interior-m3.md`, "Pressure gradient"). */
 const basePressureOf =
   ({ area, mc, mpr, delta }: Scaling) =>
   (p: number, fr: number) =>
     (p + (delta * mc * fr) / (area * mpr)) / (1 + (delta * mc) / mpr)
 
-/**
- * The leak rates of a scaled state: writes the scaled leak mass and enthalpy rates into el(dy, 5),
- * el(dy, 6) (`apps/docs/docs/models/interior-leakage-heat.md`, "Flow through the leak" and "Energy carried out").
- */
+/** Writes the scaled leak mass and enthalpy rates into el(dy, 5), el(dy, 6) (`apps/docs/docs/models/interior-leakage-heat.md`, "Flow through the leak" and "Energy carried out"). */
 function leakRatesOf(s: Scaling, leakage: Leakage, freeVolume: FreeVolume, phase: Phase) {
   const { xe, mc, k, eta, e0, form, ts } = s
   const { leakPoints, pa, cd, lostMass } = leakage
@@ -598,10 +554,7 @@ function leakRatesOf(s: Scaling, leakage: Leakage, freeVolume: FreeVolume, phase
   }
 }
 
-/**
- * Mean, base and breech pressure of a scaled state (`apps/docs/docs/models/interior-m3.md`, "Pressure
- * gradient"); equal while the projectile is at rest.
- */
+/** Mean, base and breech pressure of a scaled state, equal while the projectile is at rest (`apps/docs/docs/models/interior-m3.md`, "Pressure gradient"). */
 function pressuresOf(
   s: Scaling,
   phase: Phase,
@@ -621,10 +574,7 @@ function pressuresOf(
   }
 }
 
-/**
- * Gas state of the scaled state: bore resistance, leakage, pressure, temperature, heat flux, base
- * and breech pressure, and the leak rates.
- */
+/** Bore resistance, leakage, pressure, temperature, heat flux, base and breech pressure, and the leak rates of the scaled state. */
 function gasState(load: InteriorLoad, s: Scaling, phase: Phase) {
   const { area, xe, mc, k } = s
   const resistance = resistanceForce(load, area)
@@ -699,11 +649,7 @@ type AddEvent = (
   index?: number,
 ) => void
 
-/**
- * Rates of the three pressures along the flow, central difference in tau. rk45 calls the three
- * peak events with the same state, so the rates are kept for the last state; a new list is made
- * at each restart, when `moving` or `burning` may change.
- */
+/** Central difference in tau; rk45 calls the three peak events with the same state, so the rates are kept for the last state, and a new list is made at each restart, when `moving` or `burning` may change. */
 function peakSlopes({ gas, rhs }: RunModel, size: number) {
   const { pressures } = gas
   const fd = new Float64Array(size)
@@ -759,10 +705,7 @@ function addMovingEvents(
   for (const q of [0, 1, 2]) add('peak', slope(q), -1)
 }
 
-/**
- * Event list of the next integration from state y: shot start, form-function breaks, burnout,
- * resistance and leak kinks, muzzle, stall, the three pressure peaks and the onset of leak flow.
- */
+/** From state y: shot start, form-function breaks, burnout, resistance and leak kinks, muzzle, stall, the three pressure peaks and the onset of leak flow. */
 function interiorEvents(m: RunModel, size: number, closed: boolean) {
   const { phase } = m
   const { leak, pa, pressures, startG } = m.gas
@@ -801,10 +744,7 @@ function energyBalance(s: Scaling, gas: Gas, y: Float64Array): InteriorEnergy {
   }
 }
 
-/**
- * Moves the phase past the event; a burnout also sets the burnt state at the end of the form
- * function. True for a burnout.
- */
+/** A burnout also sets the burnt state at the end of the form function; true for a burnout. */
 function applyEvent(
   { s, phase }: RunModel,
   { kind, index }: { kind: EventKind; index: number },
@@ -951,10 +891,7 @@ function pointOf(s: Scaling, gas: Gas) {
   }
 }
 
-/**
- * Driver: from ignition in chunks of `outputStep`, restarted at every terminal event, until the
- * muzzle (closed vessel: burnout).
- */
+/** From ignition in chunks of `outputStep`, restarted at every terminal event, until the muzzle (closed vessel: burnout). */
 function runInterior(
   load: InteriorLoad,
   options: InteriorOptions,
@@ -1027,16 +964,10 @@ function simulate(
 const peak = (points: InteriorPoint[], key: 'meanPressure' | 'basePressure' | 'breechPressure') =>
   points.reduce((best, pt) => (pt[key] > best[key] ? pt : best), nth(points, 0))
 
-/**
- * Peak mean pressure over the hold pressure, max(start pressure, ignition pressure), below which the
- * charge is too small for the model (`apps/docs/docs/models/interior-m3.md`, "Limits").
- */
+/** Peak mean pressure over the hold pressure, max(start pressure, ignition pressure), below which the charge is too small for the model (`apps/docs/docs/models/interior-m3.md`, "Limits"). */
 export const chargeTooSmallRatio = 2.2
 
-/**
- * Charge-too-small rule (`apps/docs/docs/models/interior-m3.md`, "Limits"): the peak mean pressure is below
- * `chargeTooSmallRatio` times the larger of the start and the ignition pressure. Pa.
- */
+/** The peak mean pressure below `chargeTooSmallRatio` times the larger of the start and the ignition pressure, Pa (`apps/docs/docs/models/interior-m3.md`, "Limits"). */
 export function chargeTooSmall(
   peakMeanPressure: number,
   startPressure: number,
