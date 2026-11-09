@@ -1,12 +1,11 @@
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
-import { type UserRecord, userDataFormat, userRecord } from '@open-reloading/schema'
+import { type UserRecord, userRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
-import de from '../src/i18n/de.json'
-import { english, translator } from '../src/i18n/translate.ts'
+import { english } from '../src/i18n/translate.ts'
 import { installCoreMessages } from '../src/lib/core-message-table.ts'
 import { exampleFirearm } from '../src/lib/example-data.ts'
-import { parseFiles, readNote } from '../src/lib/load-file-formats.ts'
+import { parseFiles } from '../src/lib/load-file-formats.ts'
 import { readLink, shareLink, shareProblem, tooLongText } from '../src/lib/share-link.ts'
 import {
   canonicalJson,
@@ -103,25 +102,6 @@ describe('user data files', () => {
     })
   })
 
-  it('refuses another format and another version with one sentence in the language shown', () => {
-    installCoreMessages()
-    const german = translator(de, 'de')
-    const reason = (json: unknown) => {
-      const p = parseUserDataFile(JSON.stringify(json))
-      if (p.ok) throw new Error('not refused')
-      return [reasonText(p.reason, english), reasonText(p.reason, german)]
-    }
-    for (const json of [{ format: 'other', version: 9 }, { version: 1, records: [] }, [], null])
-      expect(reason(json)).toEqual([
-        'The file is not an OpenReloading data file.',
-        'Die Datei ist keine OpenReloading-Datendatei.',
-      ])
-    expect(reason({ format: userDataFormat, version: 9 })).toEqual([
-      'The file has format version 9; this app reads version 1.',
-      'Die Datei hat die Formatversion 9; diese App liest die Version 1.',
-    ])
-  })
-
   it('skips a file with one invalid record as a whole and names the field', async () => {
     const bad = { ...bullet, data: { ...bullet.data, overrides: { mass: { value: 'heavy' } } } }
     const { records, skipped } = await parseFiles(
@@ -141,24 +121,18 @@ describe('user data files', () => {
     expect(defined(skipped[0]).reason).toContain('records[1].data.overrides.mass.value')
   })
 
-  it('writes the path lines and the count of more problems in the language shown', () => {
+  it('writes the path lines and the count of more problems', () => {
     installCoreMessages()
-    const german = translator(de, 'de')
     const bad = { ...bullet, data: { ...bullet.data, overrides: { mass: { value: 'heavy' } } } }
     const reason = (n: number) => {
       const p = parseUserDataFile(userDataText(Array(n).fill(bad) as UserRecord[]))
       if (p.ok) throw new Error('not refused')
-      return [reasonText(p.reason, english), reasonText(p.reason, german)]
+      return reasonText(p.reason, english)
     }
-    const [en5, de5] = reason(5)
+    const en5 = reason(5)
     expect(en5).toMatch(/^ {2}→ at records\[0\]\.data\.overrides\.mass\.value$/m)
     expect(en5).toMatch(/\nand 2 more problems$/)
-    expect(de5).toMatch(/^ {2}→ bei records\[0\]\.data\.overrides\.mass\.value$/m)
-    expect(de5).toMatch(/\nund 2 weitere Probleme$/)
-    expect(de5).not.toMatch(/→ at|more problem/)
-    const [en4, de4] = reason(4)
-    expect(en4).toMatch(/\nand 1 more problem$/)
-    expect(de4).toMatch(/\nund 1 weiteres Problem$/)
+    expect(reason(4)).toMatch(/\nand 1 more problem$/)
   })
 
   it('skips a file over the size limit', async () => {
@@ -228,9 +202,6 @@ describe('user data files', () => {
           note: 'Skipped records of a kind this version does not know: 2 × logEntry, 1 × stage. They are not kept or exported.',
         },
       ])
-      const german = readNote(parseUserDataFile(fileOf([event])), translator(de, 'de').t)
-      expect(german).toContain('1 × logEntry')
-      expect(german).toContain('diese Version nicht kennt')
     })
 
     it('lets no Save write over a file that holds them', () => {

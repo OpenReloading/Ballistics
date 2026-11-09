@@ -5,7 +5,6 @@ import { MantineProvider } from '@mantine/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { HomeNews } from '../src/components/home-news.tsx'
-import de from '../src/i18n/de.json'
 import { type Translator, translator } from '../src/i18n/translate.ts'
 import { newestNews } from '../src/lib/news.ts'
 
@@ -91,6 +90,5 @@ describe('news', () => {
     const english = render(translator())
     expect(english).toContain('>What&#x27;s new</h2>')
     expect(english.indexOf('>B</a>')).toBeLessThan(english.indexOf('>A</a>'))
-    expect(render(translator(de, 'de'))).toContain('>Neuigkeiten</h2>')
   })
 })

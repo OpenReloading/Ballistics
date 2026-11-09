@@ -16,6 +16,7 @@
     "correctness": "off"
   },
   "ignorePatterns": ["**/test/golden/**", "**/next-env.d.ts"],
+  "jsPlugins": ["eslint-plugin-regexp"],
   "rules": {
     "array-callback-return": "error",
     "complexity": [
@@ -183,6 +184,8 @@
     "react/jsx-no-target-blank": "error",
     "react/jsx-no-useless-fragment": "error",
     "react/void-dom-elements-no-children": "error",
+    "regexp/no-super-linear-backtracking": "error",
+    "regexp/no-super-linear-move": "error",
     "require-yield": "error",
     "typescript/adjacent-overload-signatures": "error",
     "typescript/ban-ts-comment": "error",
@@ -708,6 +711,13 @@
             ]
           }
         ]
+      }
+    },
+    {
+      "files": ["**/test/**", "**/*.test.*", "**/*.spec.*"],
+      "rules": {
+        "regexp/no-super-linear-backtracking": "off",
+        "regexp/no-super-linear-move": "off"
       }
     }
   ]

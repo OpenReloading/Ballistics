@@ -16,7 +16,10 @@ const head = (name: string, unit: string) =>
   (unit ? `${name} (${unit})` : name).replaceAll('\u00AD', '')
 
 /** A time in s as the chart's data table shows it, in ms without the symbol. */
-const ms = (s: number) => plain(msText(s).replace(/\s*ms$/, ''))
+const ms = (s: number) => {
+  const text = msText(s)
+  return plain(text.endsWith('ms') ? text.slice(0, -2).trimEnd() : text)
+}
 
 /**
  * The curves of a run as CSV, one row per time step of the result: time, travel, breech pressure,
