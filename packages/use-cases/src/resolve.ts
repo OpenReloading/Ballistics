@@ -2,16 +2,13 @@
 import type { Aerodynamics, Projectile } from '@open-reloading/ballistics'
 import type { Catalogue, Catalogued } from '@open-reloading/catalog'
 import { type Bullet, toSi } from '@open-reloading/schema'
-import { InputError } from '@open-reloading/statistics'
 import { type ResolvedRecord, resolvedRecord } from './answer.ts'
+import { InputError, RecordNotFound } from './issue.ts'
 import type { CartridgeWithSpecs } from './limits.ts'
 
-/**
- * `record`, or a 404 error naming the `kind` and `id` that were not found. Fastify answers it with
- * its `statusCode`.
- */
+/** `record`, or a `RecordNotFound` naming the `kind` and `id` that were not found. */
 function found<T>(record: T | undefined, kind: string, id: string): T {
-  if (!record) throw Object.assign(new Error(`${kind} ${id} not found`), { statusCode: 404 })
+  if (!record) throw new RecordNotFound(kind, id)
   return record
 }
 
@@ -66,14 +63,19 @@ export function bulletProjectile(
       minVelocity: c.minVelocity?.value ?? 0,
     }))
   if (bands.length === 0)
-    throw new InputError(`bullet ${record.id} has no ${ref.dragModel} ballistic coefficient`)
+    throw new InputError({
+      code: 'bulletWithoutCoefficient',
+      params: { bullet: record.id, model: ref.dragModel },
+    })
   // records can list alternative BCs (tip, test range) that are not velocity bands
   if (new Set(bands.map((b) => b.minVelocity)).size < bands.length)
-    throw new InputError(
-      `bullet ${record.id} has ${bands.length} ${ref.dragModel} values without distinct velocity bands; send drag explicitly`,
-    )
+    throw new InputError({
+      code: 'bulletCoefficientsWithoutBands',
+      params: { bullet: record.id, count: bands.length, model: ref.dragModel },
+    })
   const si = bulletSi(record)
-  if (si.diameter === undefined) throw new InputError(`bullet ${record.id} has no diameter`)
+  if (si.diameter === undefined)
+    throw new InputError({ code: 'bulletWithoutDiameter', params: { bullet: record.id } })
   const length = ref.length ?? si.length
   const projectile: Projectile = {
     mass: si.mass,

@@ -69,20 +69,14 @@ describe('ladderFlatSpots flat runs and checks', () => {
 
   it('names the field it rejects', () => {
     const ok = step(1, 701)
-    expect(() => ladderFlatSpots([ok])).toThrow('a ladder needs at least two strings')
+    expect(() => ladderFlatSpots([ok])).toThrow('ladderTooFewStrings')
     for (const charge of [0, -0.001, Number.NaN, Number.POSITIVE_INFINITY])
-      expect(() => ladderFlatSpots([{ ...step(0, 700), charge }, ok])).toThrow(
-        'charge must be positive',
-      )
-    expect(() => ladderFlatSpots([step(0, Number.NaN), ok])).toThrow('mean must be finite')
+      expect(() => ladderFlatSpots([{ ...step(0, 700), charge }, ok])).toThrow('chargeNotPositive')
+    expect(() => ladderFlatSpots([step(0, Number.NaN), ok])).toThrow('meanNotFinite')
     for (const sd of [-1, Number.NaN, Number.POSITIVE_INFINITY])
-      expect(() => ladderFlatSpots([step(0, 700, 5, sd), ok])).toThrow(
-        'standard deviation must be 0 or more',
-      )
+      expect(() => ladderFlatSpots([step(0, 700, 5, sd), ok])).toThrow('standardDeviationNegative')
     for (const count of [1, 2.5])
-      expect(() => ladderFlatSpots([step(0, 700, count), ok])).toThrow(
-        'each string needs at least two shots',
-      )
-    expect(() => ladderFlatSpots([step(1, 700), ok])).toThrow('charges must differ')
+      expect(() => ladderFlatSpots([step(0, 700, count), ok])).toThrow('stringTooFewShots')
+    expect(() => ladderFlatSpots([step(1, 700), ok])).toThrow('chargesEqual')
   })
 })

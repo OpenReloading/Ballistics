@@ -13,6 +13,7 @@ import type { Catalogued } from '@open-reloading/catalog';
 import { ChargeSolverOptions } from '@open-reloading/ballistics';
 import { ChargeTarget } from '@open-reloading/ballistics';
 import { comparePlanCandidates } from '@open-reloading/ballistics';
+import { Diagnostic } from '@open-reloading/statistics';
 import { DragModel } from '@open-reloading/ballistics';
 import { fitTruingStrings } from '@open-reloading/ballistics';
 import { InputError } from '@open-reloading/statistics';
@@ -32,6 +33,7 @@ import { trajectory } from '@open-reloading/ballistics';
 import { TruedParameter } from '@open-reloading/ballistics';
 import { trueDrag } from '@open-reloading/ballistics';
 import { trueMuzzleVelocity } from '@open-reloading/ballistics';
+import { TruingError } from '@open-reloading/ballistics';
 import { TruingReason } from '@open-reloading/ballistics';
 import { userDataFile } from '@open-reloading/schema';
 import { z } from 'zod';
@@ -547,6 +549,19 @@ export interface RangeStringsPlanRequest extends z.input<typeof rangeStringsPlan
 export const rangeStringsPlanResponse: z.ZodType;
 
 // @public
+export class RecordNotFound extends Error {
+    constructor(kind: string, id: string);
+    // (undocumented)
+    readonly issue: RecordNotFoundIssue;
+}
+
+// @public
+export type RecordNotFoundIssue = Diagnostic<'recordNotFound', {
+    kind: string;
+    id: string;
+}>;
+
+// @public
 export function replyTo(task: Task): TaskReply;
 
 // @public
@@ -627,6 +642,7 @@ export type SerializedError = {
     unresolved?: number[] | undefined;
     direction?: number[] | undefined;
     estimate?: TruedParameter[] | undefined;
+    detail?: TruingError['detail'];
     issue?: InputError['issue'];
 };
 
@@ -908,6 +924,37 @@ export interface TruingRequest extends z.input<typeof truingBody> {
 
 // @public
 export const truingResponse: z.ZodType;
+
+// @public
+export type UseCaseIssue = Diagnostic<'resultNotFinite', {
+    path: string;
+}> | Diagnostic<'powderBulkDensityOutOfRange', {
+    powder: string;
+    density: number;
+    max: number;
+}> | Diagnostic<'powderWithoutBulkDensity', {
+    powder: string;
+}> | Diagnostic<'bulletWithoutDiameter', {
+    bullet: string;
+}> | Diagnostic<'bulletWithoutLength', {
+    bullet: string;
+}> | Diagnostic<'bulletValueOutOfBounds', {
+    bullet: string;
+    key: string;
+    value: number;
+    unit: string;
+    low: number;
+    high: number;
+}> | Diagnostic<'bulletWithoutCoefficient', {
+    bullet: string;
+    model: string;
+}> | Diagnostic<'bulletCoefficientsWithoutBands', {
+    bullet: string;
+    count: number;
+    model: string;
+}> | Diagnostic<'ladderChargeNotAboveZero', {
+    charge: number;
+}>;
 
 // @public
 export type WindSchema = z.ZodArray<z.ZodObject<{

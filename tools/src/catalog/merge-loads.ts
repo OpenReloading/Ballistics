@@ -15,7 +15,7 @@ import {
   mergePublishedLoads,
   withLoadIds,
 } from './published-load-merge.ts'
-import { readKind } from './read-kind.ts'
+import { addIssues, readJsonFile, readKind } from './read-kind.ts'
 
 const repository = join(import.meta.dirname, '..', '..', '..')
 
@@ -141,13 +141,9 @@ const resolving = (sources: SourceIndex) => (entry: unknown) =>
 function readIncoming(options: MergeOptions, sources: SourceIndex, errors: string[]) {
   const read: { path: string; file: IncomingLoads }[] = []
   for (const path of incomingFiles(options.incoming)) {
-    let json: IncomingLoads
-    try {
-      json = JSON.parse(readFileSync(join(options.incoming, path), 'utf8'))
-    } catch (e) {
-      errors.push(`${path}: invalid JSON: ${(e as Error).message}`)
-      continue
-    }
+    const file = readJsonFile(join(options.incoming, path), path, errors)
+    if (!file) continue
+    const json = file.json as IncomingLoads
     const before = errors.length
     let withIds: unknown = json
     try {
@@ -156,9 +152,7 @@ function readIncoming(options: MergeOptions, sources: SourceIndex, errors: strin
       // a load too broken for the id rule: the schema below names what is missing
     }
     const parsed = publishedLoads.safeParse(resolveRecord(withIds, sources, path, errors))
-    if (!parsed.success)
-      for (const issue of parsed.error.issues)
-        errors.push(`${path}: ${issue.path.join('.') || '(root)'}: ${issue.message}`)
+    if (!parsed.success) addIssues(path, parsed.error, errors)
     else errors.push(...placement(path, parsed.data))
     if (errors.length === before) read.push({ path, file: json })
   }

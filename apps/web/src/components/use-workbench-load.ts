@@ -57,9 +57,8 @@ import { measuredWaterCapacitySpec } from '../lib/case-capacity.ts'
 import { type OwnCase, ownCases } from '../lib/case-group.ts'
 import { cavityVolumeFraction } from '../lib/cavity-range.ts'
 import { powderIncomplete } from '../lib/complete-records.ts'
-import { translateMessage } from '../lib/core-messages.ts'
+import { refusalText, translateMessage } from '../lib/core-messages.ts'
 import { timeText } from '../lib/dates.ts'
-import { errorText } from '../lib/error-text.ts'
 import { loadExample } from '../lib/example-data.ts'
 import { exampleFields } from '../lib/examples.ts'
 import {
@@ -2582,16 +2581,7 @@ export function useWorkbenchState() {
     return
   }
 
-  /**
-   * The `POST /interior` body of the fields with the powder record's bore resistance, its bulk
-   * density (g/cm3) and the resistance parameters it lacks; throws on an invalid field. The Run and
-   * the charge target dialog both read it, so both simulate the same load. `as` is the load with
-   * another powder record chosen (its model parameters over the fields, as `choosePowder` writes
-   * them) and optionally another charge (kg): the Powders tab's runs. The chosen powder itself keeps
-   * the fields as they stand (edited or opened parameters). `recordInputs` lists what the records'
-   * bore resistance reads besides the body, and the start pressure default a compared powder without
-   * its own runs at: the key of the Powders tab's rows.
-   */
+  /** The `POST /interior` body the Run and the charge target share, so both simulate one load; `as`: a Powders tab run, whose rows `recordInputs` keys. */
   function loadRequest(as?: { powder: Powder; charge?: number }) {
     // every path that simulates (Run, auto-run, the charge target, the Powders tab) refuses it
     const refused = refusal(as)
@@ -2694,13 +2684,12 @@ export function useWorkbenchState() {
   function loadFailed(err: unknown) {
     // engraving values that need each other: the empty one shows the message
     if (err instanceof ValueError) {
-      form.setFieldError(err.field, err.message)
+      form.setFieldError(err.field, refusalText(err))
       if ((powderMoreFields as readonly string[]).includes(err.field)) setMore('powder')
       if ((firearmMoreFields as readonly string[]).includes(err.field)) setMore('firearm')
     }
     setOutcome(undefined)
-    const message = errorText(err)
-    setStatus({ say: (t) => translateMessage(message, t) })
+    setStatus({ say: (t) => translateMessage(refusalText(err), t) })
   }
 
   /** Shows the first step with a result and starts the request for its sampled band. */
@@ -2914,7 +2903,8 @@ export function useWorkbenchState() {
     try {
       loadRequest()
     } catch (err) {
-      if (err instanceof ValueError) form.setFieldError(err.field, err.message)
+      // a field error is a string: worded when it is set, long after the words loaded
+      if (err instanceof ValueError) form.setFieldError(err.field, refusalText(err))
       return
     }
     void send()

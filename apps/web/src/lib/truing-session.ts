@@ -14,7 +14,7 @@ import {
 import { type Truing, toSi, truing, type UserRecord, userRecord } from '@open-reloading/schema'
 import { formatNumber, parseNumber, untranslated } from '../i18n/number.ts'
 import { type Message, msg, type Say, type Translator } from '../i18n/translate.ts'
-import { refusalText, translateMessage } from './core-messages.ts'
+import { issueText, refusalText, translateMessage } from './core-messages.ts'
 import { localDay } from './dates.ts'
 import { storedOf } from './firearm.ts'
 import { type UnitSystem, withUnit } from './units.ts'
@@ -83,6 +83,8 @@ const problemOf =
     if (e instanceof TruingError) {
       const reason = translateMessage(e.reason, t)
       if (reason !== e.reason) return reason
+      // the message holds only the code of the trajectory refusal that stopped the fit
+      if (e.detail) return `truing: ${e.reason} (${issueText(e.detail)})`
     }
     return translateMessage(refusalText(e), t)
   }

@@ -13,9 +13,9 @@ import {
   identifiability,
   type LogFitResult,
   logLeastSquares,
-  need,
   nth,
 } from '@open-reloading/statistics'
+import { type BallisticsIssue, need } from '../issue.ts'
 import type { Settings } from '../settings.ts'
 import { PowderFitError } from './fit.ts'
 import {
@@ -204,7 +204,7 @@ function traceWindow(trace: PressureHistory, peak: number, fall: number) {
   const start = riseTime(time, pressure, peakLevel * peak)
   const top = pressure.indexOf(peak)
   const down = pressure.findIndex((v, i) => i > top && v <= fall * peak)
-  need(down > 0, 'the trace never falls to the fall fraction of its peak after the peak')
+  need(down > 0, { code: 'traceNeverFalls', params: {} })
   const [t0, t1, v0, v1] = [
     nth(time, down - 1),
     nth(time, down),
@@ -228,10 +228,13 @@ function checkTrace({ time, pressure, sigma, sensor }: PressureHistory) {
       time.length > 1 &&
       time.every((t, i) => Number.isFinite(t) && (i === 0 || t > nth(time, i - 1))) &&
       pressure.every(Number.isFinite),
-    'trace: equal numbers of finite, strictly increasing times and finite pressures, at least 2',
+    { code: 'traceInvalid', params: {} },
   )
-  need(sensors.includes(sensor), 'trace.sensor: breech, mean or base')
-  need(sigma === undefined || (Number.isFinite(sigma) && sigma > 0), 'sigma must be positive')
+  need(sensors.includes(sensor), { code: 'traceSensorUnknown', params: {} })
+  need(sigma === undefined || (Number.isFinite(sigma) && sigma > 0), {
+    code: 'sigmaNotPositive',
+    params: {},
+  })
 }
 
 const isTwoStage = (burn: InteriorLoad['propellant']['burn']): burn is TwoStageBurn =>
@@ -244,11 +247,20 @@ function wantedParameters(burn: TwoStageBurn, options: CurveFitOptions) {
     wanted.length > 0 &&
       new Set(wanted).size === wanted.length &&
       wanted.every((p) => order.includes(p)),
-    'parameters: burnRate, formSlope, transition and exponent, each at most once',
+    { code: 'curveFitParametersInvalid', params: {} },
   )
-  need(!wanted.includes('formSlope') || burn.form.a > 0, 'formSlope needs a start value above 0')
-  need(!wanted.includes('transition') || burn.form.z1 < 1, 'transition needs a start value below 1')
-  need(!wanted.includes('exponent') || burn.exponent > 0, 'exponent needs a start value above 0')
+  need(!wanted.includes('formSlope') || burn.form.a > 0, {
+    code: 'formSlopeStartNotPositive',
+    params: {},
+  })
+  need(!wanted.includes('transition') || burn.form.z1 < 1, {
+    code: 'transitionStartNotBelowOne',
+    params: {},
+  })
+  need(!wanted.includes('exponent') || burn.exponent > 0, {
+    code: 'exponentStartNotPositive',
+    params: {},
+  })
   return wanted
 }
 
@@ -258,7 +270,7 @@ function checkSolverOptions(options: CurveFitOptions) {
   checkLogFitLimits(maxIterations, maxCondition)
   need(
     options.fallFraction === undefined || (options.fallFraction > 0 && options.fallFraction < 1),
-    'fallFraction must lie in (0, 1)',
+    { code: 'fallFractionOutsideUnit', params: {} },
   )
 }
 
@@ -267,7 +279,10 @@ function checkInput(load: InteriorLoad, trace: PressureHistory, options: CurveFi
   checkTrace(trace)
   const burn = load.propellant.burn
   if (!isTwoStage(burn))
-    throw new InputError('a curve fit needs a vivacity burn law with a two-stage form')
+    throw new InputError({
+      code: 'curveFitNeedsTwoStageVivacity',
+      params: {},
+    } satisfies BallisticsIssue)
   const wanted = wantedParameters(burn, options)
   checkSolverOptions(options)
   return { burn, wanted }
@@ -516,15 +531,15 @@ function curveLoad(
 
 /** Checks the charges and that the traces carry a sigma on all or none. */
 function checkShots(shots: readonly ChargedTrace[]) {
-  need(shots.length > 0, 'at least one trace')
+  need(shots.length > 0, { code: 'noTrace', params: {} })
   need(
     shots.every((s) => Number.isFinite(s.charge) && s.charge > 0),
-    'charge must be positive',
+    { code: 'chargeNotPositive', params: {} },
   )
   need(
     shots.every((s) => s.trace.sigma === undefined) ||
       shots.every((s) => s.trace.sigma !== undefined),
-    'sigma: on every trace or on none',
+    { code: 'sigmaPartial', params: {} },
   )
 }
 
@@ -532,7 +547,7 @@ function checkShots(shots: readonly ChargedTrace[]) {
 function windowTraces(shots: readonly ChargedTrace[], fallFraction: number): WindowTrace[] {
   return shots.map(({ charge, trace }) => {
     const peak = maxOf(trace.pressure)
-    need(peak > 0, 'the trace has no positive pressure')
+    need(peak > 0, { code: 'traceNoPositivePressure', params: {} })
     const window = traceWindow(trace, peak, fallFraction)
     return {
       charge,
@@ -587,7 +602,7 @@ function curveProblem(
   const weighted = nth(shots, 0).trace.sigma !== undefined
   const traces = windowTraces(shots, fallFraction)
   const observed = traces.flatMap((t) => t.observed)
-  need(observed.length > wanted.length + traces.length, 'too few trace samples in the window')
+  need(observed.length > wanted.length + traces.length, { code: 'traceWindowTooShort', params: {} })
   const peaks = traces.map((t) => t.peak)
   const warnings = curveWarnings(
     traces.map((t) => t.charge),
@@ -708,9 +723,10 @@ function solveCurves(
   const first = evaluateCurves(problem, parameters, zero)
   if (!first) {
     if (problem.rejected === 'window' || problem.rejected === undefined)
-      throw new InputError(
-        'the model at the start values leaves the barrel before the end of the trace window; start closer or raise fallFraction',
-      )
+      throw new InputError({
+        code: 'modelLeavesBarrelBeforeWindowEnd',
+        params: {},
+      } satisfies BallisticsIssue)
     throw new PowderFitError('invalid', { result: problem.rejected })
   }
   const { traces, samples, limits } = problem

@@ -16,6 +16,7 @@
     "correctness": "off"
   },
   "ignorePatterns": ["**/test/golden/**", "**/next-env.d.ts"],
+  "jsPlugins": ["eslint-plugin-regexp"],
   "rules": {
     "array-callback-return": "error",
     "complexity": [
@@ -183,6 +184,8 @@
     "react/jsx-no-target-blank": "error",
     "react/jsx-no-useless-fragment": "error",
     "react/void-dom-elements-no-children": "error",
+    "regexp/no-super-linear-backtracking": "error",
+    "regexp/no-super-linear-move": "error",
     "require-yield": "error",
     "typescript/adjacent-overload-signatures": "error",
     "typescript/ban-ts-comment": "error",
@@ -690,6 +693,31 @@
       "files": ["apps/e2e/tests/web/a11y.ts"],
       "rules": {
         "no-restricted-imports": "off"
+      }
+    },
+    {
+      "files": ["apps/web/src/lib/refusal-words.ts"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [],
+            "patterns": [
+              {
+                "group": ["*", "!../i18n/translate.ts", "!./*-gaps.ts", "!./*-words.ts"],
+                "allowTypeImports": true,
+                "message": "refusal-words-imports: refusal-words.ts loads in its own chunk once a page has started; it imports types, translate.ts and word modules only, so no page carries it or what it imports."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["**/test/**", "**/*.test.*", "**/*.spec.*"],
+      "rules": {
+        "regexp/no-super-linear-backtracking": "off",
+        "regexp/no-super-linear-move": "off"
       }
     }
   ]

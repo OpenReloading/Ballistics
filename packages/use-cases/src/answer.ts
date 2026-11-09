@@ -3,6 +3,7 @@ import { TruingError } from '@open-reloading/ballistics'
 import type { Bullet, Powder, Provenance } from '@open-reloading/schema'
 import { InputError } from '@open-reloading/statistics'
 import { z } from 'zod'
+import { RecordNotFound, InputError as UseCaseInputError } from './issue.ts'
 import { ComputeBusy, ComputeTimeout } from './tasks.ts'
 
 /** The text every interior answer carries. */
@@ -34,10 +35,10 @@ export type ErrorAnswer = { status: number; body: Record<string, unknown>; retry
 
 /**
  * The answer of a compute error: 503 for a compute deadline (`timeout`) or a full pool (`busy`,
- * with `retryAfter`), 400 with `issues` for a zod error, 422 for an `InputError`, with the
- * `TruingError` fields where `truingDetails` is set and with the `code` and `params` of a typed
- * refusal. `withNotice` adds the notice (a `TruingError` answer never has it). Undefined for any
- * other error.
+ * with `retryAfter`), 400 with `issues` for a zod error, 404 with the `code` and `params` of a
+ * `RecordNotFound`, 422 for an `InputError`, with the `TruingError` fields where `truingDetails` is
+ * set and with the `code` and `params` of a typed refusal. `withNotice` adds the notice (a
+ * `TruingError` or `RecordNotFound` answer never has it). Undefined for any other error.
  */
 export function errorAnswer(
   error: unknown,
@@ -66,28 +67,51 @@ export function errorAnswer(
         ...extra,
       },
     }
-  if (truingDetails && error instanceof TruingError) {
-    const { message, reason, conditionNumber, unresolved, direction, estimate } = error
-    return {
-      status: 422,
-      body: {
-        ...unprocessable,
-        message,
-        reason,
-        conditionNumber,
-        unresolved,
-        direction,
-        estimate,
-      },
-    }
-  }
+  if (error instanceof RecordNotFound) return notFoundAnswer(error)
+  if (truingDetails && error instanceof TruingError) return truingAnswer(error)
   if (error instanceof InputError) {
     const { issue } = error
-    const typed = issue === undefined ? {} : { code: issue.code, params: issue.params }
+    const typed = issue === undefined ? {} : { code: issue.code, params: jsonParams(issue.params) }
     return { status: 422, body: { ...unprocessable, message: error.message, ...typed, ...extra } }
   }
   return undefined
 }
+
+/** The 404 answer of an unknown record id, with its `code` and `params`. */
+function notFoundAnswer(error: RecordNotFound): ErrorAnswer {
+  const { code, params } = error.issue
+  return {
+    status: 404,
+    body: { statusCode: 404, error: 'Not Found', message: error.message, code, params },
+  }
+}
+
+/** The 422 answer of a `TruingError` with its fields and the trajectory refusal that stopped it. */
+function truingAnswer(error: TruingError): ErrorAnswer {
+  const { message, reason, conditionNumber, unresolved, direction, estimate, detail } = error
+  return {
+    status: 422,
+    body: {
+      ...unprocessable,
+      message,
+      reason,
+      conditionNumber,
+      unresolved,
+      direction,
+      estimate,
+      ...(detail && { detail: { code: detail.code, params: jsonParams(detail.params) } }),
+    },
+  }
+}
+
+/** `params` with a number JSON cannot hold (NaN, an infinity) written as JavaScript writes it. */
+const jsonParams = (params: object) =>
+  Object.fromEntries(
+    Object.entries(params).map(([k, v]) => [
+      k,
+      typeof v === 'number' && !Number.isFinite(v) ? String(v) : v,
+    ]),
+  )
 
 /** Whether the number `n` at `path` may stand: finite, or NaN (with `infinite` also infinite) at an `allowed` path. */
 const numberAllowed = (n: number, path: string, allowed: RegExp | undefined, infinite: boolean) =>
@@ -121,6 +145,6 @@ export function assertFinite<T>(response: T, allowed?: RegExp, infinite = false)
   const path = nonFinite(response, '', allowed, infinite)
   // extreme inputs inside the schema bounds can overflow, so this is answered as a client error
   if (path !== undefined)
-    throw new InputError(`result holds a non-finite number at ${path.slice(1)}`)
+    throw new UseCaseInputError({ code: 'resultNotFinite', params: { path: path.slice(1) } })
   return response
 }

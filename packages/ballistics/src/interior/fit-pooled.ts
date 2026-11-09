@@ -9,12 +9,11 @@
 import {
   checkLogFitLimits,
   chiSquareQuantile,
-  InputError,
   type LogFitResult,
   logLeastSquares,
-  need,
   nth,
 } from '@open-reloading/statistics'
+import { InputError, need } from '../issue.ts'
 import { positive, type Settings } from '../settings.ts'
 import { type LadderPoint, PowderFitError, type PowderPrior } from './fit.ts'
 import { type InteriorLoad, type InteriorOptions, interior } from './model.ts'
@@ -230,16 +229,16 @@ function checkPooled(
   limits: { rifleSigma: number; lotSigma: number; maxIterations: number; maxCondition: number },
 ) {
   const { rifleSigma, lotSigma, maxIterations, maxCondition } = limits
-  need(sessions.length > 0, 'at least one session')
+  need(sessions.length > 0, { code: 'noSession', params: {} })
   const names: readonly string[] = requested
   if (names.includes('exponent') || names.includes('form')) throw new PowderFitError('unresolved')
   need(
     requested.includes('burnRate') &&
       requested.every((p) => p === 'burnRate' || p === 'temperatureFactor') &&
       new Set(requested).size === requested.length,
-    'parameters: burnRate, temperatureFactor, each at most once, burnRate always',
+    { code: 'pooledFitParametersInvalid', params: {} },
   )
-  need(rifleSigma > 0 && lotSigma > 0, 'rifleSigma and lotSigma must be positive')
+  need(rifleSigma > 0 && lotSigma > 0, { code: 'rifleOrLotSigmaNotPositive', params: {} })
   checkLogFitLimits(maxIterations, maxCondition)
   checkSessions(sessions)
 }
@@ -247,20 +246,26 @@ function checkPooled(
 /** Checks each session and its ladder points: velocities with sigmas only, conditions per session. */
 function checkSessions(sessions: readonly PooledSession[]) {
   for (const s of sessions) {
-    need(s.ladder.length > 0, 'at least one ladder point per session')
-    need(positive(s.barrelLength), 'barrelLength must be positive')
-    need(positive(s.propellantTemperature), 'propellantTemperature must be positive')
+    need(s.ladder.length > 0, { code: 'sessionWithoutLadderPoint', params: {} })
+    need(positive(s.barrelLength), { code: 'barrelLengthNotPositive', params: {} })
+    need(positive(s.propellantTemperature), {
+      code: 'propellantTemperatureNotPositive',
+      params: {},
+    })
     for (const x of s.ladder) {
-      need(positive(x.charge) && positive(x.muzzleVelocity), 'ladder charge and velocity positive')
-      need(
-        x.velocitySigma !== undefined && positive(x.velocitySigma),
-        'velocitySigma on every point',
-      )
-      need(x.peakPressure === undefined, 'the pooled fit takes velocities only')
-      need(
-        x.barrelLength === undefined && x.propellantTemperature === undefined,
-        'barrel length and temperature per session',
-      )
+      need(positive(x.charge) && positive(x.muzzleVelocity), {
+        code: 'ladderChargeOrVelocityNotPositive',
+        params: {},
+      })
+      need(x.velocitySigma !== undefined && positive(x.velocitySigma), {
+        code: 'velocitySigmaMissing',
+        params: {},
+      })
+      need(x.peakPressure === undefined, { code: 'pooledFitVelocitiesOnly', params: {} })
+      need(x.barrelLength === undefined && x.propellantTemperature === undefined, {
+        code: 'barrelOrTemperatureOnPoint',
+        params: {},
+      })
     }
   }
 }
@@ -286,11 +291,11 @@ function pooledParameters(
   const first = (powder: string) => nth(of(powder), 0).load
   need(
     sessions.every((s) => s.load.propellant.burn.kind === first(s.powder).propellant.burn.kind),
-    'the sessions of a powder share one burn kind',
+    { code: 'sessionsBurnKindDiffers', params: {} },
   )
   need(
     Object.keys(priors).every((p) => powders.includes(p)),
-    'a prior needs its powder in the sessions',
+    { code: 'priorPowderNotInSessions', params: {} },
   )
 
   const parameters: Omit<PooledPowderParameter, 'value' | 'standardUncertainty'>[] = []
@@ -340,7 +345,7 @@ function priorRowsOf(
         prior.value > 0 &&
         Number.isFinite(prior.sigma) &&
         prior.sigma > 0,
-      `prior ${p.kind} of ${p.group}: value and sigma above 0`,
+      { code: 'groupPriorNotPositive', params: { kind: p.kind, group: p.group } },
     )
     return [{ k, centre: Math.log(prior.value / p.initial), sigma: prior.sigma }]
   })
@@ -506,7 +511,7 @@ function pooledFitResult(
   const { covariance, correlation, standardUncertainty } = fit
   // weighted, with at least the burn coefficient per powder: logLeastSquares always gives them
   if (!covariance || !correlation || !standardUncertainty)
-    throw new InputError('the pooled fit has no covariance')
+    throw new InputError({ code: 'pooledFitNoCovariance', params: {} })
   const residuals = pooledResiduals(problem.rows, fit.predicted)
   return {
     parameters: problem.parameters.map((p, k) => {
@@ -615,12 +620,15 @@ function checkPooledPrediction(
   charge: number,
   { level, velocitySigma }: { level: number; velocitySigma: number },
 ) {
-  need(Number.isFinite(charge) && charge > 0, 'charge must be positive')
-  need(level > 0 && level < 1, 'level must lie in (0, 1)')
-  need(Number.isFinite(velocitySigma) && velocitySigma >= 0, 'velocitySigma must be 0 or above')
+  need(Number.isFinite(charge) && charge > 0, { code: 'chargeNotPositive', params: {} })
+  need(level > 0 && level < 1, { code: 'levelOutsideUnit', params: {} })
+  need(Number.isFinite(velocitySigma) && velocitySigma >= 0, {
+    code: 'velocitySigmaNegative',
+    params: {},
+  })
   need(
     fit.sessions.some((s) => s.powder === target.powder),
-    'the powder of the target must be one of the fit',
+    { code: 'targetPowderNotInFit', params: {} },
   )
 }
 
@@ -719,15 +727,15 @@ export function calibratePooled(
   const base = { ...fit, modelError: 0 }
   const excess = heldOut.flatMap((s) =>
     s.ladder.map((x) => {
-      need(
-        x.velocitySigma !== undefined && positive(x.velocitySigma),
-        'velocitySigma on every point',
-      )
+      need(x.velocitySigma !== undefined && positive(x.velocitySigma), {
+        code: 'velocitySigmaMissing',
+        params: {},
+      })
       const p = predictPooled(base, s, x.charge, { ...options, velocitySigma: x.velocitySigma })
       return ((x.muzzleVelocity - p.value) ** 2 - p.standardUncertainty ** 2) / p.value ** 2
     }),
   )
-  need(excess.length > 0, 'at least one held-out string')
+  need(excess.length > 0, { code: 'noHeldOutString', params: {} })
   const mean = excess.reduce((a, b) => a + b, 0) / excess.length
   return { ...fit, modelError: Math.sqrt(Math.max(mean, 0)), calibrationStrings: excess.length }
 }
