@@ -334,7 +334,10 @@ jobs:
           }
           put before "$BASE"
           put after HEAD
-          pnpm --filter @open-reloading/e2e run pair-sheets "$PWD/sheet/before" "$PWD/sheet/after" "$PWD/sheet/out"
+          # in the image, as the runner installs no browser
+          docker run --rm --init --ipc=host --user "$(id -u):$(id -g)" --env HOME=/tmp --volume "$PWD:$PWD" \
+            --workdir "$PWD/apps/e2e" "$PLAYWRIGHT_IMAGE" \
+            node scripts/pair-sheets.mts "$PWD/sheet/before" "$PWD/sheet/after" "$PWD/sheet/out"
           echo "made=1" >> "$GITHUB_OUTPUT"
       - name: Keep the paired contact sheet for review
         if: steps.sheet.outputs.made == '1'
