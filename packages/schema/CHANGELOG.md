@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.0.6](https://github.com/OpenReloading/Ballistics/compare/schema-v0.0.5...schema-v0.0.6) (2026-11-09)
+
+
+### Features
+
+* **schema,data:** manufacturers name their country and website ([#1047](https://github.com/OpenReloading/Ballistics/issues/1047)) ([16a6c59](https://github.com/OpenReloading/Ballistics/commit/16a6c59203b22abdee4211f59c34750061404b7c))
+* **schema:** one canonicalJson for the API hashes and the published-load merge ([#1093](https://github.com/OpenReloading/Ballistics/issues/1093)) ([6bb8f3f](https://github.com/OpenReloading/Ballistics/commit/6bb8f3f025364cf7477363f1e79f6e387ce0aadf))
+* **schema:** store where the user entered a source and a range exclusion as values, not English text ([#1132](https://github.com/OpenReloading/Ballistics/issues/1132)) ([9b56a82](https://github.com/OpenReloading/Ballistics/commit/9b56a8248e79604ebea042916756732f0029d1b8))
+* **units:** add the units package with the new-package gate profile ([#996](https://github.com/OpenReloading/Ballistics/issues/996)) ([fee565b](https://github.com/OpenReloading/Ballistics/commit/fee565bdccc35afb221db665c2526e7103eee004))
+* **use-cases:** add the use-cases package with the compute task protocol ([#1094](https://github.com/OpenReloading/Ballistics/issues/1094)) ([7e1441b](https://github.com/OpenReloading/Ballistics/commit/7e1441bb51998661ef6f37755505cfe4ce1961c0))
+
+
+### Documentation
+
+* **packages:** one-line comments in packages api, catalog, importers and schema ([#1133](https://github.com/OpenReloading/Ballistics/issues/1133)) ([70c4da2](https://github.com/OpenReloading/Ballistics/commit/70c4da2e9370aee4ae358d1c3341b1ef48659022))
+
 ## [0.0.5](https://github.com/OpenReloading/Ballistics/compare/schema-v0.0.4...schema-v0.0.5) (2026-11-02)
 
 

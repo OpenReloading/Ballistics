@@ -1,6 +1,6 @@
 {
   "name": "@open-reloading/importers",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Parsers of chronograph exports, pressure histories and reloading record tables.",
   "keywords": [
     "reloading",
