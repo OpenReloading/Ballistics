@@ -118,10 +118,7 @@ function unitOf(
   return { unit: best.unit, from: best.fit > 0 ? 'values' : 'default' }
 }
 
-/**
- * The unit whose reading of the sample puts most values in `range`, ties broken by `typical`;
- * `first` with no fit when the sample has no number.
- */
+/** The unit whose reading puts most sample values in `range`, ties broken by `typical`; `first` with no fit when the sample has no number. */
 function bestFit(
   units: ColumnUnit[],
   first: ColumnUnit,

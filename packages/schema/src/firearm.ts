@@ -5,10 +5,7 @@ import { ref } from './ids.ts'
 import { type QuantitySchema, quantity } from './units.ts'
 
 const length = () => quantity('length', z.number().nonnegative())
-/**
- * Runs a cross-field check while `keys` are valid, also when other fields are not; never on a value
- * that is not an object (an issue without a path).
- */
+/** While `keys` are valid, also when other fields are not; never on a value that is not an object (an issue without a path). */
 const whileValid = (...keys: string[]) => ({
   when: (p: z.core.ParsePayload) =>
     !p.issues.some((i) => !i.path?.length || keys.includes(String(i.path[0]))),

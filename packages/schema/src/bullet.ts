@@ -34,10 +34,7 @@ export const ballisticCoefficient: z.ZodObject<{
 /** Core materials of a bullet that contain lead. */
 const leadCoreMaterials = ['lead', 'lead-alloy'] as const
 
-/**
- * Core materials a record can name. `compressed-powder` is a consolidated metal powder whose metals
- * the wording does not state, so it says nothing about lead.
- */
+/** `compressed-powder` is a consolidated metal powder whose metals the wording does not state, so it says nothing about lead. */
 const coreMaterials = z.enum([
   ...leadCoreMaterials,
   'copper',
@@ -365,14 +362,7 @@ const bulletOgive = z
 /** Slack of the cannelure checks, mm, for a groove that ends exactly on a shank end. */
 const lengthTolerance = 1e-9
 
-/**
- * Cannelure, a groove around the shank. `start` is the distance from the base of the bullet to the
- * groove's rear edge, the edge nearer the base: forensic work measures a cannelure's position as its
- * height above the base of the bullet, from the base of the bullet to the base of the groove
- * (Hudson, Proceedings of the American Academy of Forensic Sciences, 2018, abstract B129). The
- * bullet designer's cannelure start has the same datum and unit, so a record seeds it unchanged.
- * `width` is the axial extent of the groove and `depth` its radial depth where the source gives one.
- */
+/** `start` runs from the bullet's base to the groove's rear edge, the datum forensic work measures a cannelure from (Hudson, Proceedings of the American Academy of Forensic Sciences, 2018, abstract B129) and the bullet designer shares, so a record seeds it unchanged; `width` axial, `depth` radial where the source gives one. */
 const bulletCannelure = z.object({
   start: quantity('length', z.number().positive()),
   width: quantity('length', z.number().positive()),
@@ -509,10 +499,7 @@ function shankEnd(b: BulletFields): number | undefined {
   return b.length && b.length.value - (b.noseLength?.value ?? 0)
 }
 
-/**
- * Refuses a cannelure that leaves the shank, as far as the record gives its ends. The drawing checks
- * the ends the record leaves out.
- */
+/** As far as the record gives the cannelure's ends; the drawing checks the ends the record leaves out. */
 function cannelureOnShank(b: BulletFields, issue: Issue) {
   const groove = b.cannelure
   if (!groove) return

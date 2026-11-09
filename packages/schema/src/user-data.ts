@@ -365,10 +365,7 @@ const practicalStage = z.strictObject({
 /** Whether `v` is a whole number of tenths, within the rounding of a decimal number. */
 const inTenths = (v: number) => Math.abs(v * 10 - Math.round(v * 10)) < 1e-6
 
-/**
- * One ring series: the ring value of each shot (whole rings or tenths), or its total, or both
- * when they agree, and the target sheet it was scored on.
- */
+/** The ring value of each shot (whole rings or tenths), or its total, or both when they agree, and the target sheet it was scored on. */
 const ringSeries = z
   .strictObject({
     shots: z
@@ -796,10 +793,7 @@ export function userRefFields(r: RecordOfUser): string[] {
   )
 }
 
-/**
- * A reference of a record to another user record: the field, its text, the kind the record must
- * have and whether only a `user:` reference counts (a plain text names a catalogue record).
- */
+/** The field, its text, the kind the target record must have and whether only a `user:` reference counts (a plain text names a catalogue record). */
 type UserRef = [field: string, target: string | undefined, kind: UserRecordKind, userOnly: boolean]
 
 /** The references of a record to other user records. */

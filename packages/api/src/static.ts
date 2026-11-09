@@ -1,7 +1,4 @@
-/**
- * The API over the catalogue of the data bundle, and the data files the web app
- * serves instead of an API (`@open-reloading/api/static`, used at build time only).
- */
+/** The API over the catalogue of the data bundle, and the data files the web app serves in its place (`@open-reloading/api/static`, build time only). */
 import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { inlineRunner } from '@open-reloading/use-cases'
@@ -29,10 +26,7 @@ const recordFiles = [
   ['event-types', 'eventType', 'eventTypes'],
 ] as const satisfies readonly (readonly [string, CatalogueKind, keyof CatalogueData['index']])[]
 
-/**
- * Starts the API on 127.0.0.1 at a free port over the catalogue of the bundle, compute in this
- * thread. `url` is its origin, `close` stops it, `data` the catalogue's index and records.
- */
+/** On 127.0.0.1 at a free port, compute in this thread; `url` is its origin, `close` stops it, `data` the catalogue's index and records. */
 export async function startBundleApi() {
   const data = buildCatalogue(loadBundle())
   const app = buildApp({ catalogue: openCatalogue(data), compute: inlineRunner })
@@ -49,11 +43,7 @@ function recordAnswer(catalogue: Catalogue, kind: CatalogueKind, id: string) {
   return kind === 'case' ? originated(found) : stored(found)
 }
 
-/**
- * Writes the data files of the static site under `dir`: `catalogue/index.json` (the catalogue
- * index, which the browser opens with `openCatalogue` and answers every list from) and
- * `<kind>/<id>.json` for each record, the body of the API's `GET /<kind>/<id>`.
- */
+/** `catalogue/index.json` (the index the browser opens with `openCatalogue` and answers every list from) and `<kind>/<id>.json` per record, the body of the API's `GET /<kind>/<id>`. */
 export async function writeStaticApi(data: CatalogueData, dir: string) {
   const catalogue = openCatalogue(data)
   const write = async (file: string, value: unknown) => {

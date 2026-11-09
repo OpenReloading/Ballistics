@@ -1,8 +1,4 @@
-/**
- * Worker-thread pool with a FIFO queue and a wall-clock deadline per task.
- * A worker posts `{ succeeded, ... }` replies; other messages
- * (Node's `--watch` posts its own) are ignored.
- */
+/** FIFO queue and a wall-clock deadline per task; a worker posts `{ succeeded, ... }` replies, other messages (Node's `--watch` posts its own) are ignored. */
 import { availableParallelism } from 'node:os'
 import { Worker } from 'node:worker_threads'
 import {
@@ -84,8 +80,7 @@ export function createPool({ filename, workerCount, maxQueue, timeoutMs }: PoolO
   }
 
   function spawn() {
-    // the heaviest request the schemas allow peaks near 64 MB of heap: four times that, so a worker
-    // fails with ERR_WORKER_OUT_OF_MEMORY long before the machine runs out
+    // the heaviest request the schemas allow peaks near 64 MB of heap: four times that, so a worker fails with ERR_WORKER_OUT_OF_MEMORY long before the machine runs out
     const worker = new Worker(filename, { resourceLimits: { maxOldGenerationSizeMb: 256 } })
     // the server's socket keeps the process alive, an idle worker does not
     worker.unref()
@@ -114,8 +109,7 @@ export function createPool({ filename, workerCount, maxQueue, timeoutMs }: PoolO
       try {
         worker = idle.pop() ?? spawn()
       } catch (cause) {
-        // `new Worker` throws ERR_WORKER_INIT_FAILED (EAGAIN) when no thread can be created
-        // every queued job gets the same answer now instead of waiting for its deadline
+        // `new Worker` throws ERR_WORKER_INIT_FAILED (EAGAIN) when no thread can be created: every queued job gets the same answer now instead of waiting for its deadline
         settle(job).reject(
           new ComputeBusy('no compute worker could be started', retryAfterSeconds, { cause }),
         )

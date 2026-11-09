@@ -53,10 +53,7 @@ export const splitCells = (line: string, d: Delimiter): string[] =>
 /** True when `d` separates cells of the line outside quoted cells. */
 const splits = (line: string, d: Delimiter) => splitCells(line, d).length > 1
 
-/**
- * Tab, `;` or `,`, the first that separates cells in every non-empty line (outside quotes),
- * else the first that does in any line, else one column.
- */
+/** The first that separates cells in every non-empty line (outside quotes), else the first that does in any line, else one column. */
 export function detectDelimiter(lines: string[]): Delimiter {
   const filled = lines.filter((l) => l.trim())
   return (
@@ -88,10 +85,7 @@ interface Row {
 
 type MappedColumn = [keyof ColumnMap, Column]
 
-/**
- * What reading the data rows of one file shares: the cell index of each mapped column, the unit
- * token and text of the velocity header, the options, and the warnings so far.
- */
+/** Shared by the data rows of one file: the cell index of each mapped column, the unit token and text of the velocity header, the options, and the warnings so far. */
 interface RowContext {
   index: Partial<Record<keyof ColumnMap, number>>
   token: string | undefined
@@ -120,10 +114,7 @@ export function parseDelimited(text: string, options: DelimitedOptions): ChronoI
   return parseDelimitedRows('delimited', text, options)
 }
 
-/**
- * The mapped columns; throws on a column number below 1, empty header text, or a `skipRows` that
- * is not a whole number or comes with a header-text column.
- */
+/** Throws on a column number below 1, empty header text, or a `skipRows` that is not a whole number or comes with a header-text column. */
 function validateColumns(options: DelimitedOptions): MappedColumn[] {
   const columns = Object.entries(options.columns).filter(
     (column): column is MappedColumn => column[1] !== undefined,
@@ -156,11 +147,7 @@ function columnIndex(
   return index
 }
 
-/**
- * The delimiter named by the user, else, with header-text columns, the first under which the
- * header row is found and splits into cells, else one detected from the lines (after the header
- * row or the skipped rows).
- */
+/** The user's, else with header-text columns the first under which the header row is found and splits into cells, else one detected from the lines after the header row or the skipped rows. */
 function chooseDelimiter(
   lines: string[],
   named: Delimiter | undefined,
@@ -185,10 +172,7 @@ function chooseDelimiter(
   return delimiter ?? detectDelimiter(lines.slice(skip))
 }
 
-/**
- * The header row holding every name (lower case), the text of a header-text velocity column, and
- * the rows after the header; all rows are data without names.
- */
+/** Holding every name (lower case), with the text of a header-text velocity column and the rows after it; all rows are data without names. */
 function findHeader(
   rows: Row[],
   names: string[],
@@ -209,13 +193,7 @@ function findHeader(
   return { header, headerText, data: rows.slice(h + 1) }
 }
 
-/**
- * Cell counts against the header (or the first row without one), and velocities a detected comma
- * may have split. `2,800`, `2,800.0` or `812,5` split at a detected comma would cut the velocity
- * silently. Without a header row such a row throws. After a header row only an integer velocity
- * followed by 1 to 3 digits in an unmapped column is suspicious and adds one warning naming the
- * rows; mapped columns and the cell before the velocity (often a shot number) are read as they are.
- */
+/** A detected comma would cut `2,800`, `2,800.0` or `812,5` silently: without a header such a row throws; after a header only an integer velocity followed by 1 to 3 digits in an unmapped column adds one warning naming the rows, as mapped columns and the cell before the velocity (often a shot number) are read as they are. */
 function checkRows(
   data: Row[],
   header: string[] | undefined,
@@ -243,10 +221,7 @@ function checkRows(
   }
 }
 
-/**
- * Throws for a row with more cells than the header, for a velocity a comma may have cut in a file
- * without a header (`pair`), and for a row whose cell count differs from the first row's there.
- */
+/** Throws for a row with more cells than the header, for a velocity a comma may have cut in a file without a header (`pair`), and for a row whose cell count differs from the first row's there. */
 function checkRow(
   r: Row,
   header: string[] | undefined,
@@ -295,10 +270,7 @@ function commaPair(
   return undefined
 }
 
-/**
- * The unit text of a row's velocity: a non-empty unit cell wins over the header `token`; refused
- * when both name different units.
- */
+/** A non-empty unit cell wins over the header `token`; refused when both name different units. */
 function velocityUnitText(
   unitCell: string | undefined,
   token: string | undefined,
@@ -325,10 +297,7 @@ function isColdBore(text: string | undefined): boolean {
   return refuse('coldBoreUnknown', { text, choices: [...truthy, ...falsy.slice(1)] })
 }
 
-/**
- * The shot of one row from its mapped cells (`cell` returns undefined for an unmapped column):
- * a non-empty unit cell wins over the header token, the token over the caller's unit.
- */
+/** `cell` returns undefined for an unmapped column; a non-empty unit cell wins over the header token, the token over the caller's unit. */
 function readRowShot(
   cell: (key: keyof ColumnMap) => string | undefined,
   { token, headerText, options, warnings }: RowContext,
@@ -378,10 +347,7 @@ function filledRows(lines: string[], delimiter: Delimiter, skip: number): Row[] 
     .filter((r) => r.cells.some((c) => c !== ''))
 }
 
-/**
- * Reads delimited text with `options.columns` as `format`. `detected`: the delimiter in
- * `options` was detected, not named by the user.
- */
+/** With `options.columns` as `format`; `detected`: the delimiter in `options` was detected, not named by the user. */
 export function parseDelimitedRows(
   format: ChronoFormatId,
   text: string,

@@ -1,7 +1,4 @@
-/**
- * One list order for the API and the browser: a precomputed key per row, compared by code unit, so the
- * order does not depend on the runtime's locale data.
- */
+/** A precomputed key per row compared by code unit, so the API and the browser order alike, whatever the runtime's locale data. */
 import { fold } from './search.ts'
 
 const padDigits = (s: string) => s.replace(/\d+/g, (run) => run.padStart(8, '0'))

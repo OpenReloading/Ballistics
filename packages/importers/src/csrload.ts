@@ -1,7 +1,4 @@
-// The load files of ChamberSim Reloaded (`.csrload`, XML) as record candidates. The load input has the
-// layout of a GRT load file, read by `readLoadInput`; this file adds the format check and the
-// measurement series. The mapping and its reasons: `apps/docs/docs/data/grt-load-files.md`. It was
-// written from saved files of format 1.
+// The load files of ChamberSim Reloaded (`.csrload`, XML) as record candidates: the load input has the layout of a GRT load file (`readLoadInput`), this file adds the format check and the measurement series; mapping and reasons in `apps/docs/docs/data/grt-load-files.md`, written from saved files of format 1
 
 import type { SessionRecord } from '@open-reloading/schema'
 import { type Candidate, refuseFile } from './diagnostics.ts'
@@ -62,10 +59,7 @@ function shotsOf(c: XmlElement, at: string, unmapped: Set<string>, warnings: Loa
   return shots
 }
 
-/**
- * One charge of a series as a shot string: velocities in m/s, the charge from kg to g. Undefined,
- * with a warning, when no shot has a velocity.
- */
+/** Velocities in m/s, the charge from kg to g; undefined, with a warning, when no shot has a velocity. */
 function stringOf(
   c: XmlElement,
   at: string,

@@ -1,5 +1,4 @@
-// Shot rows of the ShotView layout, read by the ShotView CSV and workbook parsers and by other
-// workbook layouts of the same shape.
+// Shot rows of the ShotView layout, read by the ShotView CSV and workbook parsers and by other workbook layouts of the same shape.
 import type { ChronoShot } from '@open-reloading/schema'
 import { parseNumber } from './text.ts'
 import { parseVelocity, type VelocityUnit } from './units.ts'
@@ -14,11 +13,7 @@ function boreFlagText(cells: string[]): string {
     .join(' and ')
 }
 
-/**
- * Shot rows after a header row, until the first row for which `footerStarts` holds; that row and
- * the non-empty rows after it are the footer. Velocity in column 2, CLEAN BORE and COLD BORE by
- * position (columns 7 and 8), read by `isSet`.
- */
+/** Until the first row for which `footerStarts` holds, that row and the non-empty rows after it being the footer; velocity in column 2, CLEAN BORE and COLD BORE by position (columns 7 and 8), read by `isSet`. */
 export function readShotRows(
   rows: string[][],
   unitText: string | undefined,

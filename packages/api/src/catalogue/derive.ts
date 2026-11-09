@@ -124,10 +124,7 @@ export const manufacturerRow = (m: Manufacturer): IndexRow<ManufacturerItem> => 
   search: searchKey([m.name, ...(m.aliases ?? [])]),
 })
 
-/**
- * The key a component is ordered and searched by: the manufacturer's name or one of its aliases
- * followed by the product name (and the product's own aliases).
- */
+/** The manufacturer's name or one of its aliases followed by the product name (and the product's own aliases). */
 function componentKeys(m: Manufacturer, c: { name: string; aliases?: string[] | undefined }) {
   const names = [m.name, ...(m.aliases ?? [])]
   const products = [c.name, ...(c.aliases ?? [])]
@@ -140,10 +137,7 @@ function componentKeys(m: Manufacturer, c: { name: string; aliases?: string[] | 
   }
 }
 
-/**
- * The part of the M3 parameters of a powder that the burn-rate curve reads, with the training rows
- * and cartridges of the fit and the day its fitted sources were read (the latest of them).
- */
+/** The M3 parameters the burn-rate curve reads, with the training rows and cartridges of the fit and the latest day its fitted sources were read. */
 function interiorItem({ interior, provenance }: Powder): PowderItem['interior'] {
   if (!interior) return
   const {
