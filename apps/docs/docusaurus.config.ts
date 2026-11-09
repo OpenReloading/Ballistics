@@ -22,10 +22,11 @@ const config = async (): Promise<Config> => ({
   baseUrl,
   // the CLI's result schema at the address of its $id
   staticDirectories: ['static', '../../packages/cli/schema'],
-  onBrokenLinks: 'throw',
-  onBrokenAnchors: 'throw',
+  // the project runs no link check: a broken link warns instead of the default throw
+  onBrokenLinks: 'warn',
+  onBrokenAnchors: 'warn',
   // .md files are plain Markdown, .mdx files are MDX
-  markdown: { format: 'detect', hooks: { onBrokenMarkdownLinks: 'throw' } },
+  markdown: { format: 'detect', hooks: { onBrokenMarkdownLinks: 'warn' } },
   stylesheets: [`${baseUrl}pagefind/pagefind-component-ui.css`],
   // the search box of src/theme/SearchBar.tsx: it reads the index next to this script
   scripts: [{ src: `${baseUrl}pagefind/pagefind-component-ui.js`, defer: true }],
