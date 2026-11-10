@@ -25367,6 +25367,9 @@
                               },
                               "required": ["date", "rounds"],
                               "additionalProperties": false,
+                              "not": {
+                                "required": ["load", "ammunition"]
+                              },
                               "description": "An entry of the shooting log, the person's own record."
                             }
                           },

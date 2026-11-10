@@ -525,6 +525,7 @@ const shootingLogEntryParser = z
     (e) => e.load === undefined || e.ammunition === undefined,
     'Give a load or factory ammunition, not both.',
   )
+  .meta({ not: { required: ['load', 'ammunition'] } })
 
 /**
  * One entry of the shooting log (Schiessbuch): a range day of the person, as their own record.
