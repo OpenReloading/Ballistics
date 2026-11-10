@@ -38,7 +38,10 @@ describe('predict', () => {
 
   it('moves with the temperature of the run', () => {
     const cold = predict({ ...row, temperature: -30 }, records, interior)
-    expect(cold).not.toEqual(predict(row, records, interior))
+    const fit = predict(row, records, interior)
+    if ('reason' in cold) throw new Error(cold.reason)
+    if ('reason' in fit) throw new Error(fit.reason)
+    expect(cold.velocity).toBeLessThan(fit.velocity)
   })
 
   it('uses the COAL of the row', () => {

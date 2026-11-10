@@ -118,9 +118,10 @@ describe('recordLoad bore area, sensitivity and refusals', () => {
   })
 
   it('takes the default of the grain form for a powder without its own sensitivity', () => {
-    const ball = { ...powder, grainForm: 'ball' }
+    const fitAt15 = { ...powder.interior, propellantTemperature: { value: 15 } }
+    const ball = { ...powder, interior: fitAt15, grainForm: 'ball' } as RecordPowder
     expect(recordLoad({ ...run, powder: ball }).propellant.temperatureSensitivity).toEqual({
-      reference: 294.15,
+      reference: 288.15,
       cold: 0.0012,
       hot: 0.0027,
     })

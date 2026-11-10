@@ -38,16 +38,17 @@ Improved. Adopted: a default by grain form (ball, extruded, flake; none for othe
 
 ## Data basis
 
-Public. Boulkadid 2016, Table 6 and the Hodgdon 2012 maker table through the model on stand-in loads.
+Public. Boulkadid 2016 (Table 6) and the Hodgdon 2012 maker table through the model on stand-in loads.
 
 ## Where in the app
 
 - `packages/ballistics/src/interior/temperature-default.ts`, `defaultSensitivity`, `coldPeakInterval`.
 - `packages/ballistics/scripts/powder-temperature-default.mts`, the derivation.
+- `packages/ballistics/src/interior/record-load.ts`, `recordLoad`, the record runs of the command line.
 - `apps/web/src/lib/interior-request.ts`, the default in the run.
 - `apps/web/src/components/workbench-outcome.ts`, the notes.
 - Model page: [M3, default by grain form](../models/interior-m3.md#default-by-grain-form).
 
 ## Confidence
 
-Low: the extruded value moves with the stand-in load. The ball figures were re-read from the paper's Table 6 on 2026-11-10 and match.
+Low: the extruded value moves with the stand-in load.
