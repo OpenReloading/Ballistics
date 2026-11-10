@@ -12028,6 +12028,29 @@ main .page-bar h1 {
   }
 }
 
+/* the datatable trial (datatable-trial.tsx): the box above the row's link, the head and footer in the list's colors */
+.directory-table .mantine-datatable-row-selector-cell {
+  position: relative;
+  z-index: 1;
+}
+
+.mantine-datatable {
+  --mantine-datatable-background-color-light: var(--bg);
+  --mantine-datatable-background-color-dark: var(--bg);
+  --mantine-datatable-color-light: var(--fg);
+  --mantine-datatable-color-dark: var(--fg);
+}
+
+/* the head sticks in the package's own scroll box, not under the app bar */
+.mantine-datatable .directory-table thead :is(th, td) {
+  top: 0;
+}
+
+.directory-scroll .mantine-datatable-pagination {
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
 /* bullets side by side: the drawings in one panel at one scale, standing on their bases, then the
    data table with a column per bullet. A phone scrolls the panels sideways, not the page */
 .compare-view {

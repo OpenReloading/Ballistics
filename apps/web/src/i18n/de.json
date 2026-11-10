@@ -3949,6 +3949,12 @@
     "other": "{count} Datensätze anderer Arten ausgelassen; der Import eines Datei-Menüs liest sie."
   },
   "{from} to {to}": "{from} bis {to}",
+  "{from} to {to} of {total}": "{from} bis {to} von {total}",
+  "First page": "Erste Seite",
+  "Last page": "Letzte Seite",
+  "Previous page": "Vorherige Seite",
+  "Next page": "Nächste Seite",
+  "Page {number}": "Seite {number}",
   "{name} has no round count; set one on the Firearms page to add the log to it.": "{name} hat keine Schusszahl; legen Sie auf der Seite Schusswaffen eine fest, um das Schießbuch hinzuzurechnen.",
   "{shown} of {count} entry|{shown} of {count} entries": {
     "one": "{shown} von {count} Eintrag",

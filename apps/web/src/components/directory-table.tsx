@@ -137,7 +137,7 @@ function sideTarget(key: string, row: HTMLElement, cell: HTMLElement) {
   return focusableIn(cells[at] ?? null)
 }
 
-const cellClass = <T,>(c: DirectoryColumn<T>, link: string, repeat = false) =>
+export const cellClass = <T,>(c: DirectoryColumn<T>, link: string, repeat = false) =>
   c.key === link
     ? 'name-cell'
     : [
@@ -173,7 +173,7 @@ export function useListState(facetKeys: readonly string[] = noFacetKeys) {
 }
 
 /** True while the page prints (the print dialog or print media), rendered before the snapshot. */
-function usePrinting() {
+export function usePrinting() {
   const [printing, setPrinting] = useState(false)
   const fromMedia = () => flushSync(() => setPrinting(matchMedia('print').matches))
   usePrintEvents(() => flushSync(() => setPrinting(true)), fromMedia)
@@ -187,7 +187,7 @@ function usePrinting() {
 }
 
 /** The note under a printed list: whole sentences, one per kind. */
-const printedLines: Record<ListNoun, Message> = {
+export const printedLines: Record<ListNoun, Message> = {
   bullets: msg('Printed: the first {limit} of {total} bullets.'),
   cartridges: msg('Printed: the first {limit} of {total} cartridges.'),
   cases: msg('Printed: the first {limit} of {total} brass.'),
@@ -202,7 +202,7 @@ const printedLines: Record<ListNoun, Message> = {
 }
 
 /** Rows printed at most. */
-const printCap = 200
+export const printCap = 200
 /** Rows rendered before the first measurement: the prerendered HTML holds these. */
 const firstRows = 40
 /** Rows rendered beyond each edge of the view. */
@@ -240,7 +240,11 @@ function useWindowedRows(count: number) {
 }
 
 /** Sorts the rows by the sort's column when it has a value, else keeps the list order. */
-function sortedRows<T>(rows: readonly T[], columns: DirectoryColumn<T>[], sort: DirectorySort) {
+export function sortedRows<T>(
+  rows: readonly T[],
+  columns: DirectoryColumn<T>[],
+  sort: DirectorySort,
+) {
   const by = columns.find((c) => c.key === sort?.column)
   const { compare } = by ?? {}
   if (sort && compare)
@@ -695,7 +699,7 @@ function openInPage(e: ReactMouseEvent<HTMLAnchorElement>, open: () => void) {
 }
 
 /** A cell's content; an empty cell shows the app's missing-value marker. */
-function Cell({ children }: { children: ReactNode }) {
+export function Cell({ children }: { children: ReactNode }) {
   const { t } = useTranslation()
   return children === '' || children == null ? (
     <span className="missing">
@@ -708,7 +712,7 @@ function Cell({ children }: { children: ReactNode }) {
 }
 
 /** A header's label with its unit in a muted line of its own. */
-function HeadLabel<T>({ column: { label, unit } }: { column: DirectoryColumn<T> }) {
+export function HeadLabel<T>({ column: { label, unit } }: { column: DirectoryColumn<T> }) {
   const { t } = useTranslation()
   return (
     <span className="th-label">

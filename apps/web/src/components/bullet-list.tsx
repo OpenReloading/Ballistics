@@ -43,8 +43,9 @@ import {
 import type { UnitSystem } from '../lib/units.ts'
 import { userBullets } from '../lib/variants.ts'
 import { CompareButton, SelectionSummary, usePicks } from './compare-picks.tsx'
+import { DatatableTrial } from './datatable-trial.tsx'
 import { DirectoryPage } from './directory-page.tsx'
-import { type DirectoryColumn, DirectoryTable, useListState } from './directory-table.tsx'
+import { type DirectoryColumn, useListState } from './directory-table.tsx'
 import { FacetFilters, useFacets } from './facet-filters.tsx'
 import { DeleteRow, sourceColumn, useResolved, useUserRecords } from './list-sources.tsx'
 import { MissingMark } from './missing-mark.tsx'
@@ -286,7 +287,7 @@ export function BulletList({
         />
       }
       table={
-        <DirectoryTable
+        <DatatableTrial
           rows={shown}
           columns={columns}
           link="name"
