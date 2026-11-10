@@ -133,6 +133,6 @@ describe('the uncertainty of a fit', () => {
       { cartridge: '30-br', charge: 2.0, velocity: 0 },
       { cartridge: '308-match', charge: 2.2, velocity: 0 },
     ]
-    expect((await fitted(specs, 0.03))?.chiSquarePerDegree).not.toBeNull()
+    expect((await fitted(specs, 0.03))?.chiSquarePerDegree).toBeTypeOf('number')
   })
 })
