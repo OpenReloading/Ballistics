@@ -103,3 +103,36 @@ describe('verify with --params fit-on-training', () => {
     expect(fitted.inputs).toEqual(recorded.inputs)
   })
 })
+
+describe('the uncertainty of a fit', () => {
+  /** The fitted dp40 of `specs`, printed from the fixture records, at `velocitySigma`. */
+  const fitted = async (specs: Spec[], velocitySigma: number) => {
+    const rows = writeRows(rowsCsv(specs))
+    return (await fit({ ...options, rows, velocitySigma })).powders[dp40]
+  }
+  const ladder = (offsets: number[]) =>
+    [2.0, 2.2, 2.4, 2.6].map((charge, i) => ({
+      cartridge: '30-br',
+      charge,
+      velocity: offsets[i] ?? 0,
+    }))
+  const ratio = async (specs: Spec[]) =>
+    ((await fitted(specs, 0.02))?.vivacity.standardUncertainty ?? Number.NaN) /
+    ((await fitted(specs, 0.01))?.vivacity.standardUncertainty ?? Number.NaN)
+
+  it('follows the velocity sigma when the rows fit within it', async () => {
+    expect(await ratio(ladder([0, 0, 0, 0]))).toBeCloseTo(2, 6)
+  })
+
+  it('follows the residuals when they are far above the velocity sigma', async () => {
+    expect(await ratio(ladder([0.05, -0.05, 0.05, -0.05]))).toBeCloseTo(1, 6)
+  })
+
+  it('counts the prior rows of the rifle effects in the degrees of freedom', async () => {
+    const specs = [
+      { cartridge: '30-br', charge: 2.0, velocity: 0 },
+      { cartridge: '308-match', charge: 2.2, velocity: 0 },
+    ]
+    expect((await fitted(specs, 0.03))?.chiSquarePerDegree).not.toBeNull()
+  })
+})

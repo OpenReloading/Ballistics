@@ -2955,7 +2955,7 @@
         },
         "model": {
           "type": "string",
-          "description": "The model the fit runs: the installed core model."
+          "description": "The name or module path the model was selected by."
         },
         "modelVersion": {
           "type": "string",

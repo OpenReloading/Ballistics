@@ -179,7 +179,7 @@ const fitResult = z.object({
   command: z.literal('fit'),
   inputs,
   published,
-  model: z.string().describe('The model the fit runs: the installed core model.'),
+  model: z.string().describe('The name or module path the model was selected by.'),
   modelVersion: z
     .string()
     .describe(
