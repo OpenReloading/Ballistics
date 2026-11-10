@@ -51,6 +51,7 @@ Failures by kind: 7 of the 12 throwaway checks fail, all of behavior (tab stops,
 ## Result
 
 worse. Not adopted: `DirectoryTable` stays on every list.
+
 - The weight alone fails the gate: the build adds 27.2 kB to `/bullets` against 10.8 kB of total headroom (the forecast before the build was 16.6 kB for the package alone, unmeasured; the rest is presumably the Mantine components it pulls in), and the trial may not raise `weight-budget.json`.
 - In the trial the package gave a sortable head `role="button"` and handled Enter only, set no `aria-sort` after a sort (Chromium), gave every row control a tab stop, and labeled its sort icons in English. Fixing these means a patch or an upstream change; none was made.
 - The trial reuses the existing table styles, so it removes no code; a full swap would remove the 901 lines only if every list moved.
