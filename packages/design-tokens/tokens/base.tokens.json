@@ -14,11 +14,17 @@
   },
   "space": {
     "$type": "dimension",
+    "2xs": {
+      "$value": { "value": 0.25, "unit": "rem" }
+    },
     "xs": {
       "$value": { "value": 0.5, "unit": "rem" }
     },
     "sm": {
       "$value": { "value": 0.625, "unit": "rem" }
+    },
+    "sm-md": {
+      "$value": { "value": 0.75, "unit": "rem" }
     },
     "md": {
       "$value": { "value": 1, "unit": "rem" }
