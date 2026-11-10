@@ -44,7 +44,8 @@ function resolve(set: Variables, name: string): string | undefined {
     .replace(/^#(\w)(\w)(\w)$/, '#$1$1$2$2$3$3')
 }
 
-const system = '@(prefers-color-scheme: dark) :root:not([data-mantine-color-scheme], [data-theme])'
+const system =
+  '@screen and (prefers-color-scheme: dark) :root:not([data-mantine-color-scheme], [data-theme])'
 const pages: Record<Scheme, Record<'device' | 'docusaurus' | 'buildguide', string[]>> = {
   light: {
     device: [':root'],
@@ -53,7 +54,7 @@ const pages: Record<Scheme, Record<'device' | 'docusaurus' | 'buildguide', strin
   },
   dark: {
     device: [':root', system],
-    docusaurus: [':root', ':root[data-theme="dark"]', ':root[data-theme]'],
+    docusaurus: [':root', '@screen :root[data-theme="dark"]', ':root[data-theme]'],
     buildguide: [':root', system, ':root .ag-guide'],
   },
 }
