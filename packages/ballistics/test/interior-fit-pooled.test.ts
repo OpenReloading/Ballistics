@@ -268,6 +268,22 @@ describe('fitPowderPooled temperature factors, priors and burn laws', () => {
     expect(parameter(free, 'burnRate', 'C').value).toBeCloseTo(0.55, 2)
   })
 
+  it('fits the burn coefficient to peak pressures where the velocities carry no weight', () => {
+    const ladder = charges.map((charge): LadderPoint => {
+      const r = interior({ ...load(0.55), charge })
+      if (!r.valid) throw new Error(r.reason)
+      return {
+        charge,
+        muzzleVelocity: r.muzzleVelocity,
+        velocitySigma: 1e6,
+        peakPressure: r.peakBreechPressure,
+        pressureSigma: 0.01 * r.peakBreechPressure,
+      }
+    })
+    const fit = fitPowderPooled([{ powder: 'B', rifle: 'r2', load: load(0.5), ladder }])
+    expect(parameter(fit, 'burnRate', 'B').value / 0.5).toBeCloseTo(1.1, 4)
+  })
+
   it('fits the burn rate coefficient of a geometric burn law', () => {
     const ladder = charges.map((charge): LadderPoint => {
       const r = interior({ ...geometric(7e-9), charge })
@@ -357,17 +373,12 @@ describe('fitPowderPooled refusals of runs, priors and points', () => {
     expect((prediction as PowderFitError).reason).toBe('invalid')
   })
 
-  it('refuses pressures and points without a velocity sigma', () => {
+  it('refuses a pressure without its sigma and points without a velocity sigma', () => {
     const s = nth(data, 0)
     const point = nth(s.ladder, 0)
-    expect(() =>
-      fitPowderPooled([
-        {
-          ...s,
-          ladder: [{ ...point, peakPressure: 3e8, pressureSigma: 1e7, pressureBasis: 'piezo' }],
-        },
-      ]),
-    ).toThrow('pooledFitVelocitiesOnly')
+    expect(() => fitPowderPooled([{ ...s, ladder: [{ ...point, peakPressure: 3e8 }] }])).toThrow(
+      expect.objectContaining({ issue: { code: 'pressureWithoutSigma', params: {} } }),
+    )
     const { velocitySigma: _, ...bare } = point
     expect(() => fitPowderPooled([{ ...s, ladder: [bare] }])).toThrow('velocitySigma')
   })

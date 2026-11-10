@@ -136,3 +136,55 @@ describe('the uncertainty of a fit', () => {
     expect((await fitted(specs, 0.03))?.chiSquarePerDegree).toBeTypeOf('number')
   })
 })
+
+describe('the pressure rows of a fit', () => {
+  /** Rows of dp40 and sp20 printed from the fixture records, the pressure of case-contact rows times 0.9 and of transducer rows times 1.1. */
+  const printed = (cartridges: string[]): Spec[] =>
+    [dp40, sp20].flatMap((powder) =>
+      cartridges.flatMap((cartridge, k) =>
+        [2.0, 2.2, 2.4].map((charge) => ({
+          cartridge,
+          powder,
+          charge,
+          velocity: 0,
+          ...(k % 2 === 0
+            ? { pressure: 1 / 0.9 - 1, pressureBasis: 'case-contact' }
+            : { pressure: 1 / 1.1 - 1, pressureBasis: 'transducer' }),
+        })),
+      ),
+    )
+  const training = printed(['30-br', '308-match'])
+  const rows = writeRows(rowsCsv(training))
+
+  it('finds a factor per basis and leaves the burn coefficients at the record values', async () => {
+    const r = await fit({ ...options, rows, pressureSigma: 0.05 })
+    expect(r.pressure?.factors['case-contact']?.factor).toBeCloseTo(0.9, 3)
+    expect(r.pressure?.factors.transducer?.factor).toBeCloseTo(1.1, 3)
+    expect(r.powders[dp40]?.factor).toBeCloseTo(1, 3)
+    expect(r.powders[sp20]?.factor).toBeCloseTo(1, 3)
+    expect(r.pressure?.converged).toBe(true)
+  })
+
+  it('compares the held-out pressures with the model peak times the factor of their basis', async () => {
+    const withValidation = writeRows(rowsCsv([...training, ...printed(['308-win', '308-win'])]))
+    const run = { ...options, rows: withValidation, params: 'fit-on-training' } as const
+    const scaled = await verify({ ...run, pressureSigma: 0.05 })
+    expect(scaled.overall.pressure?.median).toBeCloseTo(0, 3)
+    const plain = await verify(run)
+    expect(plain.overall.pressure?.median).toBeGreaterThan(0.05)
+  })
+
+  it('reads no pressure without the option', async () => {
+    const r = await fit({ ...options, rows })
+    const bare = writeRows(rowsCsv(training.map(({ pressure: _, pressureBasis: __, ...s }) => s)))
+    const velocities = await fit({ ...options, rows: bare })
+    expect(r).not.toHaveProperty('pressure')
+    for (const id of [dp40, sp20]) {
+      expect(r.powders[id]?.vivacity.value).toBeCloseTo(
+        velocities.powders[id]?.vivacity.value ?? Number.NaN,
+        6,
+      )
+      expect(r.powders[id]?.factor).toBeCloseTo(velocities.powders[id]?.factor ?? Number.NaN, 6)
+    }
+  })
+})

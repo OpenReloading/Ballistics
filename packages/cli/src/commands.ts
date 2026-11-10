@@ -4,8 +4,8 @@ import { fileURLToPath } from 'node:url'
 import { compareKeys, type SourceRecord, sourceRecord } from '@open-reloading/schema'
 import { readPublishedLoads } from '@open-reloading/tools/catalog'
 import { Refusal, UsageError } from './errors.ts'
-import { type InteriorModel, outcomes } from './evaluate.ts'
-import { fitPowders, notFittedReasons, withFit } from './fit.ts'
+import { type InteriorModel, type Outcome, outcomes } from './evaluate.ts'
+import { basisOf, fitPowders, notFittedReasons, withFit } from './fit.ts'
 import { changeOf, evaluate, type Grouping, metricsOf } from './metrics.ts'
 import { builtInName, fitFiles, loadModel, type Model } from './model.ts'
 import { fillInputs, rowsFromPublished } from './published-rows.ts'
@@ -42,10 +42,12 @@ export interface Options {
   params?: 'records' | 'fit-on-training' | undefined
   /** Of the fit, a fraction of the velocity; default 0.03. */
   velocitySigma?: number | undefined
+  /** Fits with the printed pressures, this sigma a fraction of the pressure, and a factor per basis; none without it. */
+  pressureSigma?: number | undefined
 }
 
 /** What `fit` reads. */
-type FitOptions = Pick<Options, 'rows' | 'records' | 'warn' | 'velocitySigma'>
+type FitOptions = Pick<Options, 'rows' | 'records' | 'warn' | 'velocitySigma' | 'pressureSigma'>
 
 type Inputs = VerifyResult['inputs']
 
@@ -145,7 +147,8 @@ type Prepared = ReturnType<typeof prepare>
 function fitOf(options: FitOptions, data: Prepared, model: Model) {
   // load tables print no spread; ANSI/SAAMI Z299.4-2025 expects tested ammunition within 90 fps of the table, about 3 %
   const velocitySigma = options.velocitySigma ?? 0.03
-  const fit = fitPowders(data.rows, data.records, model.interior, velocitySigma)
+  const { pressureSigma } = options
+  const fit = fitPowders(data.rows, data.records, model.interior, velocitySigma, pressureSigma)
   const reasons = Object.values(fit.notFitted)
   const notFitted = Object.fromEntries(
     notFittedReasons.flatMap((reason) => {
@@ -157,8 +160,13 @@ function fitOf(options: FitOptions, data: Prepared, model: Model) {
     ...fit,
     velocitySigma,
     records: withFit(data.records, fit),
-    params: `params fit-on-training velocity-sigma ${velocitySigma}`,
-    summary: { velocitySigma, powders: Object.keys(fit.powders).length, notFitted },
+    params: `params fit-on-training velocity-sigma ${velocitySigma}${pressureSigma === undefined ? '' : ` pressure-sigma ${pressureSigma}`}`,
+    summary: {
+      velocitySigma,
+      powders: Object.keys(fit.powders).length,
+      notFitted,
+      ...('pressure' in fit && { pressure: fit.pressure }),
+    },
   }
 }
 
@@ -190,13 +198,32 @@ function leftOut({ rows, records }: Prepared, model: InteriorModel, split: Split
   return { items, powders: inSplit.length }
 }
 
+/** `items` with the model's peak pressure of each used row times the factor of its basis, 1 for a basis without one. */
+function withBasisFactors(items: Outcome[], pressure: FitResult['pressure']): Outcome[] {
+  if (!pressure) return items
+  return items.map((o) =>
+    'pressure' in o.prediction
+      ? {
+          ...o,
+          prediction: {
+            ...o.prediction,
+            pressure: o.prediction.pressure * (pressure.factors[basisOf(o.row)]?.factor ?? 1),
+          },
+        }
+      : o,
+  )
+}
+
 /** What the model selected by `spec` gives on the split, with the burn coefficients fitted under it in a `fit-on-training` run; refuses a split with no evaluable row. */
 async function evaluateModel(spec: string, options: Options, data: Prepared): Promise<Evaluation> {
   const model = await loadModel(spec)
   const fitted = options.params === 'fit-on-training' ? fitOf(options, data, model) : undefined
   const records = fitted?.records ?? data.records
   const wanted: Split[] = options.split === 'training' ? ['training'] : [options.split, 'training']
-  const all = outcomes(data.rows, records, model.interior, wanted)
+  const all = withBasisFactors(
+    outcomes(data.rows, records, model.interior, wanted),
+    fitted?.summary.pressure,
+  )
   const evaluation = evaluate(
     all.filter((o) => o.split === options.split),
     all.filter((o) => o.split === 'training'),
@@ -340,6 +367,7 @@ export async function fit(options: FitOptions, spec = builtInName): Promise<FitR
     modelVersion: versionOf(model, data, fitted),
     split: 'training',
     velocitySigma: fitted.velocitySigma,
+    ...(fitted.summary.pressure && { pressure: fitted.summary.pressure }),
     powders: fitted.powders,
     notFitted: fitted.notFitted,
   }

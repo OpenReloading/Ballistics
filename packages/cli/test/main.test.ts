@@ -65,6 +65,8 @@ describe('the JSON result', () => {
       ['compare', ...data, '--baseline', 'm3', '--candidate', worse],
       ['fit', ...data],
       ['verify', ...data, '--params', 'fit-on-training'],
+      ['fit', ...data, '--pressure-sigma', '0.05'],
+      ['verify', ...data, '--params', 'fit-on-training', '--pressure-sigma', '0.05'],
     ]) {
       const { code, stdout } = await cli(args)
       expect(code).toBe(0)

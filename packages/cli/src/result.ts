@@ -53,6 +53,36 @@ const metrics = z.object({
 /** Metrics of one group. */
 export type Metrics = z.infer<typeof metrics>
 
+const pressureFit = z
+  .object({
+    sigma: fraction.describe(
+      'Pressure sigma of each row, a fraction of its printed pressure over the factor of its basis.',
+    ),
+    rounds: count.describe('Fits of the basis loop, at most 5.'),
+    converged: z
+      .boolean()
+      .describe('Whether every log factor moved by less than 0.001 in the last round.'),
+    factors: z
+      .record(
+        z.string(),
+        z.object({
+          factor: z
+            .number()
+            .describe(
+              'The model peak pressure times this is what the basis reads: the exponential of the mean log of printed over model peak pressure of its rows after the last fit.',
+            ),
+          rows: count.describe('Pressure rows of the basis in the powders fitted.'),
+        }),
+      )
+      .describe(
+        'By pressure basis of the training rows (`unstated` without one); a basis without a row of a fitted powder is left out.',
+      ),
+  })
+  .optional()
+  .describe(
+    'With `--pressure-sigma`: the printed pressures of the training rows joined the fit, each over the factor of its basis.',
+  )
+
 const evaluation = z.object({
   model: z.string().describe('The name or module path the model was selected by.'),
   modelVersion: z
@@ -93,10 +123,11 @@ const evaluation = z.object({
       notFitted: z
         .partialRecord(z.enum(notFittedReasons), count)
         .describe('Powders not fitted, by reason; a reason without powders is left out.'),
+      pressure: pressureFit,
     })
     .optional()
     .describe(
-      'With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`.',
+      "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`. With `--pressure-sigma`, the pressure errors compare the model peak pressure times the factor of the row's basis (1 for a basis without one) with the printed pressure.",
     ),
 })
 
@@ -187,6 +218,7 @@ const fitResult = z.object({
     ),
   split: z.literal('training').describe('The split whose rows the fit reads.'),
   velocitySigma: fraction.describe('Velocity sigma of each row, a fraction of its velocity.'),
+  pressure: pressureFit,
   powders: z
     .record(
       z.string(),
@@ -211,6 +243,9 @@ const fitResult = z.object({
             'Chi square of every row, data and the prior rows of the rifle and lot effects, over all rows minus all parameters; null where that count is not above 0.',
           ),
         iterations: count.describe('Iterations of the solver.'),
+        pressureRows: count
+          .optional()
+          .describe('With `--pressure-sigma`: used training rows that print a pressure.'),
       }),
     )
     .describe('By powder id: each powder fitted on its own.'),
