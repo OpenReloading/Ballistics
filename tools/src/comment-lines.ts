@@ -164,20 +164,21 @@ function multiLine(comments: Comment[]) {
 }
 
 function kept(was: Comment[], now: Comment[]): Finding[] {
-  const left = new Set(now.flatMap(({ text }) => flat(text).match(references) ?? []))
+  const refs = (comments: Comment[]) =>
+    new Set(comments.flatMap(({ text }) => flat(text).match(references) ?? []))
+  const left = refs(now)
+  // a changed link or a deleted comment is a decision to read, a reworded comment that loses one is a slip
+  const replaced = [...left].some((reference) => !refs(was).has(reference))
   const findings = new Map<string, Finding>()
   for (const comment of was) {
     const line = now.find(({ anchor }) => anchor >= comment.anchor)?.line ?? comment.line
-    const here = new Set(
-      now
-        .filter(({ anchor }) => anchor === comment.anchor)
-        .flatMap(({ text }) => text.toLowerCase().match(contracts) ?? []),
-    )
+    const at = now.filter(({ anchor }) => anchor === comment.anchor)
+    const here = new Set(at.flatMap(({ text }) => text.toLowerCase().match(contracts) ?? []))
     for (const reference of flat(comment.text).match(references) ?? [])
       if (!left.has(reference))
         findings.set(reference, {
           line,
-          error: true,
+          error: at.length > 0 && !replaced,
           message: `${reference} of the old comments is gone: a comment-only change keeps every reference`,
         })
     for (const word of comment.text.toLowerCase().match(contracts) ?? [])
@@ -192,8 +193,7 @@ function kept(was: Comment[], now: Comment[]): Finding[] {
 }
 
 function check(changes: Change[]): Finding[][] {
-  return parse(changes).map(([was, now], i) => {
-    const { base, head } = changes[i] ?? { base: '', head: '' }
+  return parse(changes).map(([was, now]) => {
     const old = new Set(multiLine(was.comments).map(({ key }) => key))
     const findings = multiLine(now.comments)
       .filter(({ comment, key }) => !comment.published && !old.has(key))
@@ -202,7 +202,7 @@ function check(changes: Change[]): Finding[][] {
         error: true,
         message: 'new multi-line comment: make it one line, the why',
       }))
-    if (base === '' || base === head || was.code !== now.code) return findings
+    if (was.code !== now.code) return findings
     return [...findings, ...kept(was.comments, now.comments)]
   })
 }
@@ -215,11 +215,11 @@ if (import.meta.main) {
     execFileSync(executable('git'), args, { cwd: root, encoding: 'utf8', maxBuffer: 1 << 28 })
   const base = process.argv[2] ?? git('merge-base', 'origin/main', 'HEAD').trim()
   const changes: Change[] = []
-  for (const [status = 'D', from = '', file = from] of [
+  for (const [status, from = '', file = from] of [
     ...git('-c', 'core.quotePath=false', 'diff', '--name-status', '--find-renames', base)
       .split('\n')
       .map((entry) => entry.split('\t')),
-    ...git('ls-files', '--others', '--exclude-standard')
+    ...git('-c', 'core.quotePath=false', 'ls-files', '--others', '--exclude-standard')
       .split('\n')
       .map((untracked) => ['A', untracked]),
   ])
