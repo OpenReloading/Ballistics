@@ -94,7 +94,9 @@ const evaluation = z.object({
         .partialRecord(z.enum(notFittedReasons), count)
         .describe('Powders not fitted, by reason; a reason without powders is left out.'),
       energy: z
-        .object({ loss: z.number().describe('The loss factor the prior energies were scaled by.') })
+        .object({
+          loss: z.number().describe('The loss factor the prior impetus values were scaled by.'),
+        })
         .optional()
         .describe('With `--energy prior`.'),
     })
@@ -219,11 +221,13 @@ const fitResult = z.object({
           .object({
             value: z
               .number()
-              .describe('Specific energy, J/kg: the prior times the loss factor of `energy.loss`.'),
+              .describe(
+                "Specific energy laid over the record, J/kg: the prior impetus times the loss factor of `energy.loss`, over the record's `interior.gamma` minus 1.",
+              ),
             prior: z
               .enum(['own', 'base', 'pooled'])
               .describe(
-                "Where the prior came from: `own`, the powder's thermochemistry (impetus / (gamma - 1)); `base`, the median of the own priors of its propellant base; `pooled`, the median of all own priors.",
+                "Where the prior impetus came from: `own`, the powder's thermochemistry; `base`, the median of the own impetus values of its propellant base; `pooled`, the median of all own impetus values.",
               ),
           })
           .optional()
@@ -248,11 +252,13 @@ const fitResult = z.object({
       pressureRows: count.describe('Rows of the objective at the chosen loss factor.'),
       priors: z
         .object({ own: count, byBase: count, pooled: count })
-        .describe('How many powders took each kind of prior.'),
+        .describe(
+          'How many powders took each kind of prior, of the powders the rows name that have interior parameters, fitted or not.',
+        ),
     })
     .optional()
     .describe(
-      "With `--energy prior`: each powder's energy is its prior times one loss factor shared by all powders, chosen on the training pressures; per powder only the burn coefficient is fitted.",
+      "With `--energy prior`: each powder's energy is its prior impetus times one loss factor shared by all powders, over its `interior.gamma` minus 1, chosen on the training pressures; per powder only the burn coefficient is fitted.",
     ),
 })
 

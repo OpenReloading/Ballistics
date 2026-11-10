@@ -21,7 +21,7 @@ import {
 } from './result.ts'
 import { type Row, readRows } from './rows.ts'
 import { type Split, splitOf } from './split.ts'
-import { inputsOf, modelVersion } from './version.ts'
+import { inputsOf, modelVersion, sha256 } from './version.ts'
 
 /** What `verify` and `compare` read: the rows, the records, the split and the sealed-split switch. */
 export interface Options {
@@ -159,13 +159,17 @@ function fitOf(options: FitOptions, data: Prepared, model: Model) {
       return n > 0 ? [[reason, n]] : []
     }),
   )
+  // the priors come from records the rows may not name, which the records lines of the version leave out
+  const energyLine = prior
+    ? ` energy prior ${sha256(prior.priorLines.toSorted(compareKeys).join('\n'))}`
+    : ''
   return {
     powders: fit.powders,
     notFitted: fit.notFitted,
     energy: prior?.energy,
     velocitySigma,
     records: withFit(data.records, fit),
-    params: `params fit-on-training velocity-sigma ${velocitySigma}${prior ? ' energy prior' : ''}`,
+    params: `params fit-on-training velocity-sigma ${velocitySigma}${energyLine}`,
     summary: {
       velocitySigma,
       powders: Object.keys(fit.powders).length,

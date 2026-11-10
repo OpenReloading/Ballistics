@@ -57,7 +57,7 @@
       "value": 3700000,
       "standardUncertainty": 190000
     },
-    "gamma": 1.215,
+    "gamma": 1.25,
     "covolume": {
       "value": 0.00097
     },

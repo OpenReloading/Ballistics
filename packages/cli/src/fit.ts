@@ -33,11 +33,11 @@ interface PowderFitValue {
   cartridges: number
   chiSquarePerDegree: number | null
   iterations: number
-  /** With `--energy prior`: the specific energy laid over the record, J/kg, and where its prior came from. */
+  /** With `--energy prior`: the specific energy laid over the record, J/kg, and where its prior impetus came from. */
   energy?: { value: number; prior: PriorKind }
 }
 
-/** Where a powder's prior energy came from: its own thermochemistry, the median of its propellant base, or the median of all. */
+/** Where a powder's prior impetus came from: its own thermochemistry, the median of its propellant base, or the median of all. */
 type PriorKind = 'own' | 'base' | 'pooled'
 
 /** The sessions of one powder's used training rows: one per load without its charge. */
@@ -140,37 +140,36 @@ export function fitPowders(
   return { powders, notFitted }
 }
 
-/** The specific energy of a powder's thermochemistry as M3 takes it, J/kg; undefined without one. */
-const ownPrior = ({ thermochemistry: t }: Powder) => t && t.impetus.value / (t.gamma.value - 1)
-
-/** The prior energy of a powder of `records` and its kind; a `UsageError` without a powder with a thermochemistry. */
+/** The prior impetus of a powder of `records`, J/kg, and its kind; a `UsageError` without a powder with a thermochemistry. */
 function priorsOf(records: Records) {
-  const own = [...records.powders.values()].flatMap((p) => {
-    const energy = ownPrior(p)
-    return energy === undefined ? [] : [{ base: p.propellantBase, energy }]
-  })
+  const own = [...records.powders.values()].flatMap((p) =>
+    p.thermochemistry ? [{ base: p.propellantBase, impetus: p.thermochemistry.impetus.value }] : [],
+  )
   const pooled = percentile(
-    own.map((o) => o.energy),
+    own.map((o) => o.impetus),
     0.5,
   )
   if (pooled === undefined)
     throw new UsageError('--energy prior needs a powder record with a thermochemistry')
   return (powder: Powder): { value: number; prior: PriorKind } => {
-    const energy = ownPrior(powder)
-    if (energy !== undefined) return { value: energy, prior: 'own' }
+    const impetus = powder.thermochemistry?.impetus.value
+    if (impetus !== undefined) return { value: impetus, prior: 'own' }
     const ofBase = own.filter((o) => o.base !== undefined && o.base === powder.propellantBase)
     const base = percentile(
-      ofBase.map((o) => o.energy),
+      ofBase.map((o) => o.impetus),
       0.5,
     )
     return base === undefined ? { value: pooled, prior: 'pooled' } : { value: base, prior: 'base' }
   }
 }
 
+// the model's impetus is (gamma - 1) times its energy, so the prior fixes the impetus and the model's own gamma turns it into the energy
+const energyOf = (loss: number, impetus: number, gamma: number) => (loss * impetus) / (gamma - 1)
+
 // the gas does not turn all of its thermochemical energy into the model's work (heat lost to the bore, what the lumped model leaves out)
 const lossGrid = Array.from({ length: 9 }, (_, i) => (60 + 5 * i) / 100)
 
-/** As {@link fitPowders}, with each powder's energy its prior times one loss factor of `lossGrid`, the one whose fitted peak pressures are nearest the printed ones of the training rows (median absolute log ratio); a `UsageError` without a training row that prints a pressure. */
+/** As {@link fitPowders}, with each powder's energy from its prior impetus times one loss factor of `lossGrid`, the one whose fitted peak pressures are nearest the printed ones of the training rows (median absolute log ratio); a `UsageError` without a training row that prints a pressure. */
 export function fitPowdersWithPrior(
   rows: readonly Row[],
   records: Records,
@@ -187,7 +186,7 @@ export function fitPowdersWithPrior(
   const runs = lossGrid.map((loss) => {
     const powders = new Map(records.powders)
     for (const { powder, interior, prior } of named) {
-      const energy = loss * prior.value
+      const energy = energyOf(loss, prior.value, interior.gamma)
       // more energy needs a slower burn for the same velocity; 3.5 is about the ratio of the velocity's sensitivities to energy and burn rate (0.55 / 0.15), enough to start near
       const vivacity = interior.vivacity.value * (interior.energy.value / energy) ** 3.5
       powders.set(powder.id, {
@@ -219,6 +218,10 @@ export function fitPowdersWithPrior(
   for (const [i, o] of objective.entries())
     if (o !== null && (best === undefined || o <= (objective[best] ?? o))) best = i
   const chosen = best === undefined ? undefined : runs[best]
+  if (everFitted.size === 0)
+    throw new Refusal(
+      '--energy prior: no powder was fitted at any loss factor; fit without --energy lists the powders not fitted at the record energy',
+    )
   if (!chosen)
     throw new Refusal(
       '--energy prior: no fitted powder has a training row with a pressure to compare',
@@ -231,13 +234,18 @@ export function fitPowdersWithPrior(
     powders[id] = {
       ...p,
       factor: p.vivacity.value / n.interior.vivacity.value,
-      energy: { value: chosen.loss * n.prior.value, prior: n.prior.prior },
+      energy: {
+        value: energyOf(chosen.loss, n.prior.value, n.interior.gamma),
+        prior: n.prior.prior,
+      },
     }
   }
   const took = (kind: PriorKind) => named.filter((n) => n.prior.prior === kind).length
   return {
     powders,
     notFitted: chosen.fit.notFitted,
+    /** `<powder id>=<prior impetus>` of each powder the rows name that has interior parameters, for the model version. */
+    priorLines: named.map((n) => `${n.powder.id}=${n.prior.value}`),
     energy: {
       loss: chosen.loss,
       grid: lossGrid,

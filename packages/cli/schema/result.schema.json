@@ -926,7 +926,7 @@
               "properties": {
                 "loss": {
                   "type": "number",
-                  "description": "The loss factor the prior energies were scaled by."
+                  "description": "The loss factor the prior impetus values were scaled by."
                 }
               },
               "required": ["loss"],
@@ -1887,7 +1887,7 @@
                   "properties": {
                     "loss": {
                       "type": "number",
-                      "description": "The loss factor the prior energies were scaled by."
+                      "description": "The loss factor the prior impetus values were scaled by."
                     }
                   },
                   "required": ["loss"],
@@ -2764,7 +2764,7 @@
                   "properties": {
                     "loss": {
                       "type": "number",
-                      "description": "The loss factor the prior energies were scaled by."
+                      "description": "The loss factor the prior impetus values were scaled by."
                     }
                   },
                   "required": ["loss"],
@@ -3062,12 +3062,12 @@
                 "properties": {
                   "value": {
                     "type": "number",
-                    "description": "Specific energy, J/kg: the prior times the loss factor of `energy.loss`."
+                    "description": "Specific energy laid over the record, J/kg: the prior impetus times the loss factor of `energy.loss`, over the record's `interior.gamma` minus 1."
                   },
                   "prior": {
                     "type": "string",
                     "enum": ["own", "base", "pooled"],
-                    "description": "Where the prior came from: `own`, the powder's thermochemistry (impetus / (gamma - 1)); `base`, the median of the own priors of its propellant base; `pooled`, the median of all own priors."
+                    "description": "Where the prior impetus came from: `own`, the powder's thermochemistry; `base`, the median of the own impetus values of its propellant base; `pooled`, the median of all own impetus values."
                   }
                 },
                 "required": ["value", "prior"],
@@ -3105,7 +3105,7 @@
           "description": "By powder id, why a powder with interior parameters that the rows name got no value: the reason of the fit, or `noUsableRow` without a used training row."
         },
         "energy": {
-          "description": "With `--energy prior`: each powder's energy is its prior times one loss factor shared by all powders, chosen on the training pressures; per powder only the burn coefficient is fitted.",
+          "description": "With `--energy prior`: each powder's energy is its prior impetus times one loss factor shared by all powders, over its `interior.gamma` minus 1, chosen on the training pressures; per powder only the burn coefficient is fitted.",
           "type": "object",
           "properties": {
             "loss": {
@@ -3153,7 +3153,7 @@
               },
               "required": ["own", "byBase", "pooled"],
               "additionalProperties": false,
-              "description": "How many powders took each kind of prior."
+              "description": "How many powders took each kind of prior, of the powders the rows name that have interior parameters, fitted or not."
             }
           },
           "required": ["loss", "grid", "objective", "pressureRows", "priors"],

@@ -1,3 +1,6 @@
+import { cpSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { describe, expect, it, vi } from 'vitest'
 import { fit, verify } from '../src/commands.ts'
 import { UsageError } from '../src/errors.ts'
@@ -124,8 +127,12 @@ describe('--energy prior', () => {
     }
     return { ...records, powders }
   }
-  /** Energy 0.8 times the prior: sp30's own 4.0e6 J/kg, the single-base median 4.2e6 for sp20, the pooled median 4.2e6 for the double-base dp40. */
-  const truth = plant({ [sp30]: [3.2e6, 0.8], [sp20]: [3.36e6, 0.7], [dp40]: [3.36e6, 1.0] })
+  /** Energy 0.8 times the prior impetus over gamma - 1: sp30's own 1.0e6 J/kg over 0.25, the single-base median 1.05e6 over 0.215 for sp20, the pooled median 1.05e6 over 0.215 for the double-base dp40. */
+  const truth = plant({
+    [sp30]: [3.2e6, 0.8],
+    [sp20]: [3906976.744, 0.7],
+    [dp40]: [3906976.744, 1.0],
+  })
   const training = (powder: string) =>
     [
       ['30-br', 2.0],
@@ -145,8 +152,10 @@ describe('--energy prior', () => {
     expect(r.energy?.loss).toBe(0.8)
     expect(r.energy?.priors).toEqual({ own: 1, byBase: 1, pooled: 1 })
     expect(r.powders[sp30]?.energy).toEqual({ value: 3.2e6, prior: 'own' })
-    expect(r.powders[sp20]?.energy).toEqual({ value: 3.36e6, prior: 'base' })
-    expect(r.powders[dp40]?.energy).toEqual({ value: 3.36e6, prior: 'pooled' })
+    expect(r.powders[sp20]?.energy?.prior).toBe('base')
+    expect(r.powders[sp20]?.energy?.value).toBeCloseTo(3906976.744, 2)
+    expect(r.powders[dp40]?.energy?.prior).toBe('pooled')
+    expect(r.powders[dp40]?.energy?.value).toBeCloseTo(3906976.744, 2)
     expect(r.powders[sp30]?.vivacity.value.toPrecision(3)).toBe('0.800')
     expect(r.powders[sp20]?.vivacity.value.toPrecision(3)).toBe('0.700')
     expect(r.powders[dp40]?.vivacity.value.toPrecision(3)).toBe('1.00')
@@ -185,6 +194,27 @@ describe('--energy prior', () => {
     await expect(
       fit({ ...options, rows, records: [recordRoots[0] as string], energy: 'prior' }),
     ).rejects.toThrow(UsageError)
+  })
+
+  it('has another model version when a prior from a powder the rows do not name changes', async () => {
+    const rows = writeRows(rowsCsv(training(sp20), truth))
+    const root = mkdtempSync(join(tmpdir(), 'cli-records-'))
+    cpSync(recordRoots[1] as string, root, { recursive: true })
+    const path = join(root, 'powders/demo-powder-sp31.json')
+    const sp31 = JSON.parse(readFileSync(path, 'utf8'))
+    // impetus and flame temperature scale together, so the record keeps impetus = R T / M
+    for (const key of ['impetus', 'flameTemperature'])
+      for (const end of ['value', 'min', 'max']) sp31.thermochemistry[key][end] *= 1.1
+    writeFileSync(path, JSON.stringify(sp31))
+    const a = await fit({ ...options, rows, energy: 'prior' })
+    const b = await fit({
+      ...options,
+      rows,
+      records: [recordRoots[0] as string, root],
+      energy: 'prior',
+    })
+    expect(b.inputs).toEqual(a.inputs)
+    expect(b.modelVersion).not.toBe(a.modelVersion)
   })
 })
 
