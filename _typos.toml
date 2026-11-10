@@ -69,8 +69,8 @@ extend-ignore-re = [
   "Interior ballistics modelling of a rifled barrel",
   # column aliases the table import accepts, listed in the table import page
   "caliber, calibre, cal, kaliber",
-  # CSS classes, module files, a finding code and a record id that keep their UK spelling
-  "\\{colours\\}|burn-neighbours|face-colours|workbench-centre|colour-row|colour-axis|bullet-photo-colour|ov-centre|duplicate-normalised-name|centre-fire-pistol",
+  # a message placeholder and CSS classes that keep their UK spelling
+  "\\{colours\\}|burn-neighbours|face-colours|workbench-centre|colour-row|ov-centre",
 ]
 
 # Code names keep their UK spelling (record fields, enum values, the public API, the CLI and API output). In TypeScript
@@ -126,12 +126,7 @@ axe = "axe"
 iy = "iy"
 ba = "ba"
 
-# File names that keep their UK spelling: a published docs page and the script ci.yml runs. A file of this type
-# loses the rules of its own type, so it repeats the Markdown ones.
+# File names that keep their UK spelling: a published docs page and the script ci.yml runs.
 [type.uk-file-names]
 extend-glob = ["licences.ts", "licences.test.ts", "hole-detection-target-centre.md"]
 check-filename = false
-extend-ignore-re = [
-  "(?s)```.*?```",
-  "`[^`\\n]*`",
-]

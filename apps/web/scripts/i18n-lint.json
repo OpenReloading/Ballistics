@@ -169,7 +169,6 @@
       "encrypted entries are not read",
       "encrypted workbooks are not read; save the workbook without a password",
       "end tag </{end}> does not match <{start}>",
-      "footer date \"{text}\" is not recognized; enter the date",
       "footer date row not found; enter the date",
       "footer statistics not found; not checked",
       "footer {label} \"{value}\" differs from {computed} computed from the shots",
