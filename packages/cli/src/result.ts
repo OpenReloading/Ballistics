@@ -95,7 +95,9 @@ const evaluation = z.object({
         .describe('Powders not fitted, by reason; a reason without powders is left out.'),
       energy: z
         .object({
-          loss: z.number().describe('The loss factor the prior impetus values were scaled by.'),
+          factor: z
+            .number()
+            .describe('The energy-level factor the prior impetus values were scaled by.'),
         })
         .optional()
         .describe('With `--energy prior`.'),
@@ -222,7 +224,7 @@ const fitResult = z.object({
             value: z
               .number()
               .describe(
-                "Specific energy laid over the record, J/kg: the prior impetus times the loss factor of `energy.loss`, over the record's `interior.gamma` minus 1.",
+                "Specific energy laid over the record, J/kg: the prior impetus times the energy-level factor of `energy.factor`, over the record's `interior.gamma` minus 1.",
               ),
             prior: z
               .enum(['own', 'base', 'pooled'])
@@ -242,14 +244,18 @@ const fitResult = z.object({
     ),
   energy: z
     .object({
-      loss: z.number().describe('The chosen loss factor, the grid value with the least objective.'),
-      grid: z.array(z.number()).describe('The loss factors tried, one fit each.'),
+      factor: z
+        .number()
+        .describe('The chosen energy-level factor, the grid value with the least objective.'),
+      grid: z.array(z.number()).describe('The energy-level factors tried, one fit each.'),
       objective: z
         .array(z.number().nullable())
         .describe(
-          'Per grid value, the median of |ln(model peak / printed pressure)| over the used training rows that print a pressure in bar; null where the value did not enter the choice (fewer than 90 % of the powders fitted at any value were fitted, or no such row).',
+          'Per grid value, the median of |ln(model peak / printed pressure)| over the same rows at every value that takes part: the training rows that print a pressure in bar and have a model peak at every such value, so only rows of powders fitted at all of them. A value takes part when at least 90 % of the powders fitted at any value are fitted at it; null where it does not.',
         ),
-      pressureRows: count.describe('Rows of the objective at the chosen loss factor.'),
+      pressureRows: count.describe(
+        'Rows of the objective, the same at every factor that takes part.',
+      ),
       priors: z
         .object({ own: count, byBase: count, pooled: count })
         .describe(
@@ -258,7 +264,7 @@ const fitResult = z.object({
     })
     .optional()
     .describe(
-      "With `--energy prior`: each powder's energy is its prior impetus times one loss factor shared by all powders, over its `interior.gamma` minus 1, chosen on the training pressures; per powder only the burn coefficient is fitted.",
+      "With `--energy prior`: each powder's energy is its prior impetus times one energy-level factor shared by all powders, over its `interior.gamma` minus 1, chosen on the training pressures; per powder only the burn coefficient is fitted.",
     ),
 })
 

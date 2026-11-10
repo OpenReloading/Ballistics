@@ -39,8 +39,8 @@ options:
                      fit and --params fit-on-training: velocity sigma of a row, a fraction
                      of its velocity (default 0.03)
   --energy prior     fit and --params fit-on-training: each powder's energy is its prior
-                     from thermochemistry times one loss factor chosen on the training
-                     pressures; only the burn coefficient is fitted per powder
+                     from thermochemistry times one energy-level factor chosen on the
+                     training pressures; only the burn coefficient is fitted per powder
   --json | --table   output format (default: JSON unless stdout is a terminal)
   -h, --help         this text
   --version          the version

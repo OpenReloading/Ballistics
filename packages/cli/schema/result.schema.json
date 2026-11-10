@@ -924,12 +924,12 @@
               "description": "With `--energy prior`.",
               "type": "object",
               "properties": {
-                "loss": {
+                "factor": {
                   "type": "number",
-                  "description": "The loss factor the prior impetus values were scaled by."
+                  "description": "The energy-level factor the prior impetus values were scaled by."
                 }
               },
-              "required": ["loss"],
+              "required": ["factor"],
               "additionalProperties": false
             }
           },
@@ -1885,12 +1885,12 @@
                   "description": "With `--energy prior`.",
                   "type": "object",
                   "properties": {
-                    "loss": {
+                    "factor": {
                       "type": "number",
-                      "description": "The loss factor the prior impetus values were scaled by."
+                      "description": "The energy-level factor the prior impetus values were scaled by."
                     }
                   },
-                  "required": ["loss"],
+                  "required": ["factor"],
                   "additionalProperties": false
                 }
               },
@@ -2762,12 +2762,12 @@
                   "description": "With `--energy prior`.",
                   "type": "object",
                   "properties": {
-                    "loss": {
+                    "factor": {
                       "type": "number",
-                      "description": "The loss factor the prior impetus values were scaled by."
+                      "description": "The energy-level factor the prior impetus values were scaled by."
                     }
                   },
-                  "required": ["loss"],
+                  "required": ["factor"],
                   "additionalProperties": false
                 }
               },
@@ -3062,7 +3062,7 @@
                 "properties": {
                   "value": {
                     "type": "number",
-                    "description": "Specific energy laid over the record, J/kg: the prior impetus times the loss factor of `energy.loss`, over the record's `interior.gamma` minus 1."
+                    "description": "Specific energy laid over the record, J/kg: the prior impetus times the energy-level factor of `energy.factor`, over the record's `interior.gamma` minus 1."
                   },
                   "prior": {
                     "type": "string",
@@ -3105,32 +3105,32 @@
           "description": "By powder id, why a powder with interior parameters that the rows name got no value: the reason of the fit, or `noUsableRow` without a used training row."
         },
         "energy": {
-          "description": "With `--energy prior`: each powder's energy is its prior impetus times one loss factor shared by all powders, over its `interior.gamma` minus 1, chosen on the training pressures; per powder only the burn coefficient is fitted.",
+          "description": "With `--energy prior`: each powder's energy is its prior impetus times one energy-level factor shared by all powders, over its `interior.gamma` minus 1, chosen on the training pressures; per powder only the burn coefficient is fitted.",
           "type": "object",
           "properties": {
-            "loss": {
+            "factor": {
               "type": "number",
-              "description": "The chosen loss factor, the grid value with the least objective."
+              "description": "The chosen energy-level factor, the grid value with the least objective."
             },
             "grid": {
               "type": "array",
               "items": {
                 "type": "number"
               },
-              "description": "The loss factors tried, one fit each."
+              "description": "The energy-level factors tried, one fit each."
             },
             "objective": {
               "type": "array",
               "items": {
                 "type": ["number", "null"]
               },
-              "description": "Per grid value, the median of |ln(model peak / printed pressure)| over the used training rows that print a pressure in bar; null where the value did not enter the choice (fewer than 90 % of the powders fitted at any value were fitted, or no such row)."
+              "description": "Per grid value, the median of |ln(model peak / printed pressure)| over the same rows at every value that takes part: the training rows that print a pressure in bar and have a model peak at every such value, so only rows of powders fitted at all of them. A value takes part when at least 90 % of the powders fitted at any value are fitted at it; null where it does not."
             },
             "pressureRows": {
               "type": "integer",
               "minimum": 0,
               "maximum": 9007199254740991,
-              "description": "Rows of the objective at the chosen loss factor."
+              "description": "Rows of the objective, the same at every factor that takes part."
             },
             "priors": {
               "type": "object",
@@ -3156,7 +3156,7 @@
               "description": "How many powders took each kind of prior, of the powders the rows name that have interior parameters, fitted or not."
             }
           },
-          "required": ["loss", "grid", "objective", "pressureRows", "priors"],
+          "required": ["factor", "grid", "objective", "pressureRows", "priors"],
           "additionalProperties": false
         }
       },

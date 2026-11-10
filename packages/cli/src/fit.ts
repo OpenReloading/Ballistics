@@ -6,7 +6,7 @@ import {
 } from '@open-reloading/ballistics'
 import { compareKeys, fromSi, type Powder, toSi } from '@open-reloading/schema'
 import { Refusal, UsageError } from './errors.ts'
-import { type InteriorModel, loadOf, outcomes } from './evaluate.ts'
+import { type InteriorModel, loadOf, outcomes, predict } from './evaluate.ts'
 import type { Records } from './records.ts'
 import type { Row } from './rows.ts'
 import { splitOf } from './split.ts'
@@ -164,12 +164,12 @@ function priorsOf(records: Records) {
 }
 
 // the model's impetus is (gamma - 1) times its energy, so the prior fixes the impetus and the model's own gamma turns it into the energy
-const energyOf = (loss: number, impetus: number, gamma: number) => (loss * impetus) / (gamma - 1)
+const energyOf = (level: number, impetus: number, gamma: number) => (level * impetus) / (gamma - 1)
 
-// the gas does not turn all of its thermochemical energy into the model's work (heat lost to the bore, what the lumped model leaves out)
-const lossGrid = Array.from({ length: 9 }, (_, i) => (60 + 5 * i) / 100)
+// an effective energy-level factor: it takes whatever separates the thermochemical impetus from the level the model needs (heat to the bore, what the lumped model leaves out, how the pressures were measured)
+const levels = Array.from({ length: 9 }, (_, i) => (60 + 5 * i) / 100)
 
-/** As {@link fitPowders}, with each powder's energy from its prior impetus times one loss factor of `lossGrid`, the one whose fitted peak pressures are nearest the printed ones of the training rows (median absolute log ratio); a `UsageError` without a training row that prints a pressure. */
+/** As {@link fitPowders}, with each powder's energy from its prior impetus times one energy-level factor of `levels`, the one whose fitted peak pressures are nearest the printed ones of the training rows (median absolute log ratio over the same rows at every factor that takes part); a `UsageError` without a training row that prints a pressure. */
 export function fitPowdersWithPrior(
   rows: readonly Row[],
   records: Records,
@@ -177,16 +177,19 @@ export function fitPowdersWithPrior(
   velocitySigma: number,
 ) {
   const priorOf = priorsOf(records)
-  if (!rows.some((r) => r.pressure !== undefined && splitOf(r.cartridge) === 'training'))
+  const pressured = rows.filter(
+    (r) => r.pressure !== undefined && splitOf(r.cartridge) === 'training',
+  )
+  if (pressured.length === 0)
     throw new UsageError('--energy prior needs training rows that print a pressure in bar')
   const named = [...new Set(rows.map((r) => r.powder))].flatMap((id) => {
     const powder = records.powders.get(id)
     return powder?.interior ? [{ powder, interior: powder.interior, prior: priorOf(powder) }] : []
   })
-  const runs = lossGrid.map((loss) => {
+  const runs = levels.map((level) => {
     const powders = new Map(records.powders)
     for (const { powder, interior, prior } of named) {
-      const energy = energyOf(loss, prior.value, interior.gamma)
+      const energy = energyOf(level, prior.value, interior.gamma)
       // more energy needs a slower burn for the same velocity; 3.5 is about the ratio of the velocity's sensitivities to energy and burn rate (0.55 / 0.15), enough to start near
       const vivacity = interior.vivacity.value * (interior.energy.value / energy) ** 3.5
       powders.set(powder.id, {
@@ -200,32 +203,47 @@ export function fitPowdersWithPrior(
     }
     const start = { ...records, powders }
     const fit = fitPowders(rows, start, model, velocitySigma)
-    // a powder not fitted loses its interior parameters in withFit, so only fitted powders' rows give a peak
-    const logRatios = outcomes(rows, withFit(start, fit), model, ['training']).flatMap((o) =>
-      'velocity' in o.prediction && o.row.pressure !== undefined
-        ? [Math.abs(Math.log(fromSi('pressure', o.prediction.pressure) / o.row.pressure))]
-        : [],
-    )
-    return { loss, fit, logRatios }
+    const fitted = withFit(start, fit)
+    // by position in `pressured`; a powder not fitted loses its interior parameters in withFit, so its rows give no peak
+    const logRatios = pressured.map((row) => {
+      const p = predict(row, fitted, model)
+      return 'velocity' in p && row.pressure !== undefined
+        ? Math.abs(Math.log(fromSi('pressure', p.pressure) / row.pressure))
+        : undefined
+    })
+    return { level, fit, logRatios }
   })
   const everFitted = new Set(runs.flatMap((r) => Object.keys(r.fit.powders)))
-  const objective = runs.map((r) =>
-    Object.keys(r.fit.powders).length >= 0.9 * everFitted.size
-      ? (percentile(r.logRatios, 0.5) ?? null)
+  if (everFitted.size === 0)
+    throw new Refusal(
+      '--energy prior: no powder was fitted at any energy-level factor; fit without --energy lists the powders not fitted at the record energy',
+    )
+  const takesPart = runs.map((r) => Object.keys(r.fit.powders).length >= 0.9 * everFitted.size)
+  if (!takesPart.includes(true))
+    throw new Refusal(
+      '--energy prior: no energy-level factor has 90 % of the powders fitted at any factor fitted',
+    )
+  // the same rows at every factor, so a factor cannot win by losing the rows of a powder it fails to fit
+  const common = pressured.flatMap((_, i) =>
+    runs.every((r, k) => !takesPart[k] || r.logRatios[i] !== undefined) ? [i] : [],
+  )
+  if (common.length === 0)
+    throw new Refusal(
+      '--energy prior: no fitted powder has a training row with a pressure to compare',
+    )
+  const objective = runs.map((r, k) =>
+    takesPart[k]
+      ? (percentile(
+          common.map((i) => r.logRatios[i] as number),
+          0.5,
+        ) ?? null)
       : null,
   )
   let best: number | undefined
   for (const [i, o] of objective.entries())
     if (o !== null && (best === undefined || o <= (objective[best] ?? o))) best = i
   const chosen = best === undefined ? undefined : runs[best]
-  if (everFitted.size === 0)
-    throw new Refusal(
-      '--energy prior: no powder was fitted at any loss factor; fit without --energy lists the powders not fitted at the record energy',
-    )
-  if (!chosen)
-    throw new Refusal(
-      '--energy prior: no fitted powder has a training row with a pressure to compare',
-    )
+  if (!chosen) throw new Error('a factor that takes part has no objective')
   const byId = new Map(named.map((n) => [n.powder.id, n]))
   const powders: Record<string, PowderFitValue> = {}
   for (const [id, p] of Object.entries(chosen.fit.powders)) {
@@ -235,7 +253,7 @@ export function fitPowdersWithPrior(
       ...p,
       factor: p.vivacity.value / n.interior.vivacity.value,
       energy: {
-        value: energyOf(chosen.loss, n.prior.value, n.interior.gamma),
+        value: energyOf(chosen.level, n.prior.value, n.interior.gamma),
         prior: n.prior.prior,
       },
     }
@@ -247,10 +265,10 @@ export function fitPowdersWithPrior(
     /** `<powder id>=<prior impetus>` of each powder the rows name that has interior parameters, for the model version. */
     priorLines: named.map((n) => `${n.powder.id}=${n.prior.value}`),
     energy: {
-      loss: chosen.loss,
-      grid: lossGrid,
+      factor: chosen.level,
+      grid: levels,
       objective,
-      pressureRows: chosen.logRatios.length,
+      pressureRows: common.length,
       priors: { own: took('own'), byBase: took('base'), pooled: took('pooled') },
     },
   }

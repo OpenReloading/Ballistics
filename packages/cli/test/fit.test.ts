@@ -108,7 +108,8 @@ describe('verify with --params fit-on-training', () => {
   })
 })
 
-describe('--energy prior', () => {
+// each run fits every powder at nine factors
+describe('--energy prior', { timeout: 120_000 }, () => {
   const sp30 = 'demo-powder-sp30'
   /** The fixture records with each powder's energy and burn coefficient set as given. */
   const plant = (values: Record<string, [energy: number, vivacity: number]>) => {
@@ -146,10 +147,10 @@ describe('--energy prior', () => {
       pressure: 0,
     }))
 
-  it('takes the loss factor of the planted energies from the training pressures', async () => {
+  it('takes the energy-level factor of the planted energies from the training pressures', async () => {
     const rows = writeRows(rowsCsv([sp30, sp20, dp40].flatMap(training), truth))
     const r = await fit({ ...options, rows, energy: 'prior' })
-    expect(r.energy?.loss).toBe(0.8)
+    expect(r.energy?.factor).toBe(0.8)
     expect(r.energy?.priors).toEqual({ own: 1, byBase: 1, pooled: 1 })
     expect(r.powders[sp30]?.energy).toEqual({ value: 3.2e6, prior: 'own' })
     expect(r.powders[sp20]?.energy?.prior).toBe('base')
@@ -159,6 +160,57 @@ describe('--energy prior', () => {
     expect(r.powders[sp30]?.vivacity.value.toPrecision(3)).toBe('0.800')
     expect(r.powders[sp20]?.vivacity.value.toPrecision(3)).toBe('0.700')
     expect(r.powders[dp40]?.vivacity.value.toPrecision(3)).toBe('1.00')
+  })
+
+  it('leaves out a factor at which fewer than 90 % of the powders are fitted', async () => {
+    const limit = new URL('./fixtures/burn-limit-model.mjs', import.meta.url).pathname
+    const rows = writeRows(rowsCsv([sp30, sp20, dp40].flatMap(training), truth))
+    const r = await fit({ ...options, rows, energy: 'prior' }, limit)
+    expect(r.energy?.objective.map((o) => o !== null)).toEqual([
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+    ])
+    expect(r.energy?.factor).toBe(0.8)
+  })
+
+  it('compares every factor on the rows of the powders fitted at all of them', async () => {
+    const at = (impetus: number, gamma: number) => (0.8 * impetus) / (gamma - 1)
+    const ten = plant({
+      'demo-powder-dp15': [at(1.05e6, 1.225), 0.7],
+      'demo-powder-dp30': [at(1.05e6, 1.22), 0.7],
+      [dp40]: [at(1.05e6, 1.215), 1.0],
+      'demo-powder-dp70': [at(1.05e6, 1.24), 0.7],
+      [sp20]: [at(1.05e6, 1.215), 0.7],
+      'demo-powder-sp21': [at(1.05e6, 1.215), 0.7],
+      'demo-powder-sp22': [at(1.05e6, 1.215), 0.7],
+      'demo-powder-sp25': [at(1.05e6, 1.215), 0.7],
+      [sp30]: [at(1.0e6, 1.25), 0.7],
+      'demo-powder-sp31': [at(1.1e6, 1.25), 0.7],
+    })
+    const specs = [...ten.powders.keys()]
+      .filter((id) => /^demo-powder-(dp|sp)\d/.test(id))
+      .flatMap((powder) =>
+        [2.0, 2.4].map((charge) => ({
+          cartridge: '30-br',
+          powder,
+          charge,
+          velocity: 0,
+          pressure: 0,
+        })),
+      )
+    const rows = writeRows(rowsCsv(specs, ten))
+    const r = await fit({ ...options, rows, energy: 'prior' })
+    // dp40 is not resolved at 0.60 and 0.65, which still take part with 9 of 10 powders
+    expect(r.energy?.objective.every((o) => o !== null)).toBe(true)
+    expect(r.energy?.pressureRows).toBe(18)
+    expect(r.energy?.factor).toBe(0.8)
   })
 
   it('evaluates the held-out rows with the energy and burn coefficient of the fit', async () => {

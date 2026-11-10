@@ -42,7 +42,7 @@ export interface Options {
   params?: 'records' | 'fit-on-training' | undefined
   /** Of the fit, a fraction of the velocity; default 0.03. */
   velocitySigma?: number | undefined
-  /** `prior`: each powder's energy is its prior times one loss factor chosen on the training pressures; default the record's. */
+  /** `prior`: each powder's energy is its prior times one energy-level factor chosen on the training pressures; default the record's. */
   energy?: 'prior' | undefined
 }
 
@@ -174,7 +174,7 @@ function fitOf(options: FitOptions, data: Prepared, model: Model) {
       velocitySigma,
       powders: Object.keys(fit.powders).length,
       notFitted,
-      ...(prior && { energy: { loss: prior.energy.loss } }),
+      ...(prior && { energy: { factor: prior.energy.factor } }),
     },
   }
 }

@@ -107,7 +107,7 @@ export function fitTable(r: FitResult): string {
     `model ${r.model}  version ${r.modelVersion}`,
     ...(e
       ? [
-          `energy: loss ${e.loss} from ${e.pressureRows} pressure rows; priors own ${e.priors.own}, by base ${e.priors.byBase}, pooled ${e.priors.pooled}`,
+          `energy: factor ${e.factor} from ${e.pressureRows} pressure rows; priors own ${e.priors.own}, by base ${e.priors.byBase}, pooled ${e.priors.pooled}`,
         ]
       : []),
     table(
