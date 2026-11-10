@@ -1,4 +1,4 @@
-/** Multi-scale blob detection on a float image: box-blur scale space, scale-normalised Hessian response, peaks. */
+/** Multi-scale blob detection on a float image: box-blur scale space, scale-normalized Hessian response, peaks. */
 
 import { nth } from '@open-reloading/statistics'
 import { clamp } from './raster-ops.ts'
@@ -146,7 +146,7 @@ export function peaksOf(
   return out
 }
 
-/** The pixels inside the mask whose positive response no neighbour beats (ties go to the lower index). */
+/** The pixels inside the mask whose positive response no neighbor beats (ties go to the lower index). */
 function localMaxima(
   M: Float32Array,
   inside: Uint8Array,
@@ -172,7 +172,7 @@ function isTop(M: Float32Array, i: number, w: number, v: number): boolean {
   return true
 }
 
-/** Sub-pixel position from the parabola through the neighbours. */
+/** Sub-pixel position from the parabola through the neighbors. */
 function parabolaShift(m: number, c0: number, p: number) {
   const den = m - 2 * c0 + p
   return den < 0 ? clamp((0.5 * (m - p)) / den, -0.5, 0.5) : 0
