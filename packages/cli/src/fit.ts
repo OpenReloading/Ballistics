@@ -191,7 +191,10 @@ function familyExponents(
 ) {
   const fits = exponentGrid.map(fitAt)
   const entered = ids.filter((id) => fits.every((f) => typeof f.get(id) === 'object'))
-  if (entered.length === 0) throw new Refusal('no powder was fitted at every exponent of the grid')
+  if (entered.length === 0)
+    throw new Refusal(
+      'no powder was fitted at every exponent of the grid, so none can be chosen; fit without --exponent lists the powders not fitted at the record exponent',
+    )
   const sums = (of: readonly string[]) =>
     fits.map((f) => of.reduce((s, id) => s + (f.get(id) as Fitted).chiSquare, 0))
   const mean = sums(entered).map((s) => s / entered.length)
