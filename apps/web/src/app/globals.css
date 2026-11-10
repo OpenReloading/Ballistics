@@ -1354,7 +1354,7 @@ td.nowrap {
     padding-right: var(--space-2xs);
     /* a focused field stays above the help line */
     scroll-padding-bottom: 3rem;
-    scroll-padding-top: var(--space-xl);
+    scroll-padding-top: 1.75rem;
   }
 
   /* the Parameters panel at least as high as its column, its foot level with the drawing's */
@@ -3741,7 +3741,7 @@ main .library-head.page-panel-head > .page-panel-title {
   flex-wrap: nowrap;
   gap: var(--space-2xs);
   overflow-x: auto;
-  padding: var(--space-2xs);
+  padding: 0.3125rem;
 }
 
 .ladder-cells > .ladder-cell {
@@ -4073,7 +4073,7 @@ main .library-head.page-panel-head > .page-panel-title {
      space around, so the strip is no taller than its chips */
   .ladder-cells {
     gap: var(--space-2xs);
-    margin-block: calc(-1 * var(--space-2xs));
+    margin-block: -0.3125rem;
     scrollbar-width: thin;
   }
 
@@ -4325,7 +4325,7 @@ main .library-head.page-panel-head > .page-panel-title {
   flex-wrap: wrap;
   grid-column: 1 / -1;
   align-items: flex-end;
-  gap: var(--space-2xs) var(--space-2xs);
+  gap: var(--space-2xs);
   margin-bottom: var(--space-2xs);
 }
 
@@ -4597,7 +4597,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .workbench .panel-head .search .mantine-Input-input {
-  padding-inline-end: var(--space-lg);
+  padding-inline-end: 1.5rem;
 }
 
 .workbench .panel-head > .panel-title {
@@ -5959,7 +5959,7 @@ main .library-head.page-panel-head > .page-panel-title {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(5.25rem, auto) 2.625rem;
     align-items: center;
-    column-gap: var(--space-2xs);
+    column-gap: 0.375rem;
   }
 
   .workbench .workspace-inputs .mantine-InputWrapper-root > .mantine-InputWrapper-label,
@@ -6067,7 +6067,7 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 
   .workbench .workspace-inputs .pair-row .ladder-steps .mantine-Input-input {
-    padding-inline-end: var(--space-2xs);
+    padding-inline-end: 0.375rem;
   }
 
   /* the step size's end is its unit column alone (phone too), so four decimals fit */
@@ -6190,7 +6190,7 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 
   .workbench .workspace-inputs .pair-row .ladder-steps .mantine-Input-input {
-    padding-inline-end: var(--space-2xs);
+    padding-inline-end: 0.375rem;
   }
 
   .workbench .workspace-inputs :is(.panel-fields, .seating-slot) .field-unit {
@@ -6223,12 +6223,12 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 }
 
-/* the input columns from 75em: two of 288 px with 6 px between them, then 12 px, then the results.
+/* the input columns from 75em: two of 288 px with 4 px between them, then 12 px, then the results.
    Column A Cartridge and the cartridge figure filling the rest, column B Powder, Bullet and Gun. In
    a window lower than 45em the burn-rate figure takes the cartridge figure's place */
 @media screen and (min-width: 75em) {
   .workbench .workspace-tabs {
-    grid-template-columns: 36.375rem minmax(0, 1fr);
+    grid-template-columns: 36.25rem minmax(0, 1fr);
     gap: var(--space-sm-md);
   }
 
@@ -6511,7 +6511,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .limits-popover table.limits :is(th, td) {
-  padding: var(--space-2xs) var(--space-2xs);
+  padding: var(--space-2xs);
   border: 0;
   border-bottom: 1px solid var(--hair);
   background: none;
@@ -6771,7 +6771,7 @@ main .library-head.page-panel-head > .page-panel-title {
     gap: 0 var(--space-2xs);
     min-width: 0;
     min-height: 3.75rem;
-    padding: var(--space-2xs) var(--space-xs) var(--space-2xs);
+    padding: var(--space-2xs) var(--space-xs);
     border: 1px solid var(--line);
     background: var(--page);
   }
@@ -9837,7 +9837,7 @@ main .session-shots th:nth-child(-n + 2) {
   margin-top: 0;
 }
 
-/* the designers' groups: the same room above each heading but the first, 6 px to its rows */
+/* the designers' groups: the same room above each heading but the first, 4 px to its rows */
 .designer .prop-form .prop-head {
   margin: var(--space-md) 0 var(--space-2xs);
 }
@@ -10921,7 +10921,7 @@ main .page-bar h1 {
     justify-content: flex-start;
     gap: var(--space-2xs);
     width: auto;
-    padding-inline: var(--space-xs) var(--space-md);
+    padding-inline: 0.45rem 1.125rem;
     font-size: var(--mantine-font-size-sm);
     font-weight: 600;
     white-space: nowrap;
