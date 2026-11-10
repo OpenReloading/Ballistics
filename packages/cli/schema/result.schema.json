@@ -919,6 +919,18 @@
                 "maximum": 9007199254740991
               },
               "description": "Powders not fitted, by reason; a reason without powders is left out."
+            },
+            "energy": {
+              "description": "With `--energy prior`.",
+              "type": "object",
+              "properties": {
+                "loss": {
+                  "type": "number",
+                  "description": "The loss factor the prior energies were scaled by."
+                }
+              },
+              "required": ["loss"],
+              "additionalProperties": false
             }
           },
           "required": ["velocitySigma", "powders", "notFitted"],
@@ -1868,6 +1880,18 @@
                     "maximum": 9007199254740991
                   },
                   "description": "Powders not fitted, by reason; a reason without powders is left out."
+                },
+                "energy": {
+                  "description": "With `--energy prior`.",
+                  "type": "object",
+                  "properties": {
+                    "loss": {
+                      "type": "number",
+                      "description": "The loss factor the prior energies were scaled by."
+                    }
+                  },
+                  "required": ["loss"],
+                  "additionalProperties": false
                 }
               },
               "required": ["velocitySigma", "powders", "notFitted"],
@@ -2733,6 +2757,18 @@
                     "maximum": 9007199254740991
                   },
                   "description": "Powders not fitted, by reason; a reason without powders is left out."
+                },
+                "energy": {
+                  "description": "With `--energy prior`.",
+                  "type": "object",
+                  "properties": {
+                    "loss": {
+                      "type": "number",
+                      "description": "The loss factor the prior energies were scaled by."
+                    }
+                  },
+                  "required": ["loss"],
+                  "additionalProperties": false
                 }
               },
               "required": ["velocitySigma", "powders", "notFitted"],
@@ -3019,6 +3055,23 @@
                 "minimum": 0,
                 "maximum": 9007199254740991,
                 "description": "Iterations of the solver."
+              },
+              "energy": {
+                "description": "With `--energy prior`.",
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "number",
+                    "description": "Specific energy, J/kg: the prior times the loss factor of `energy.loss`."
+                  },
+                  "prior": {
+                    "type": "string",
+                    "enum": ["own", "base", "pooled"],
+                    "description": "Where the prior came from: `own`, the powder's thermochemistry (impetus / (gamma - 1)); `base`, the median of the own priors of its propellant base; `pooled`, the median of all own priors."
+                  }
+                },
+                "required": ["value", "prior"],
+                "additionalProperties": false
               }
             },
             "required": [
@@ -3050,6 +3103,61 @@
             ]
           },
           "description": "By powder id, why a powder with interior parameters that the rows name got no value: the reason of the fit, or `noUsableRow` without a used training row."
+        },
+        "energy": {
+          "description": "With `--energy prior`: each powder's energy is its prior times one loss factor shared by all powders, chosen on the training pressures; per powder only the burn coefficient is fitted.",
+          "type": "object",
+          "properties": {
+            "loss": {
+              "type": "number",
+              "description": "The chosen loss factor, the grid value with the least objective."
+            },
+            "grid": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "description": "The loss factors tried, one fit each."
+            },
+            "objective": {
+              "type": "array",
+              "items": {
+                "type": ["number", "null"]
+              },
+              "description": "Per grid value, the median of |ln(model peak / printed pressure)| over the used training rows that print a pressure in bar; null where the value did not enter the choice (fewer than 90 % of the powders fitted at any value were fitted, or no such row)."
+            },
+            "pressureRows": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "description": "Rows of the objective at the chosen loss factor."
+            },
+            "priors": {
+              "type": "object",
+              "properties": {
+                "own": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "byBase": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "pooled": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["own", "byBase", "pooled"],
+              "additionalProperties": false,
+              "description": "How many powders took each kind of prior."
+            }
+          },
+          "required": ["loss", "grid", "objective", "pressureRows", "priors"],
+          "additionalProperties": false
         }
       },
       "required": [

@@ -97,7 +97,7 @@ A powder without rows gets no value, not an estimate, as the app refuses a powde
 
 ## Fit
 
-`fit --rows <path> [--model m3|<module>] [--velocity-sigma <fraction>]` fits the burn coefficient (`interior.vivacity`) of each powder the rows name that has interior parameters, and writes the fitted values with their uncertainties. It fits nothing else: the energy, the pressure exponent and the form constants stay the record's.
+`fit --rows <path> [--model m3|<module>] [--velocity-sigma <fraction>] [--energy prior]` fits the burn coefficient (`interior.vivacity`) of each powder the rows name that has interior parameters, and writes the fitted values with their uncertainties. It fits nothing else: the energy (unless `--energy prior`, [below](#energy-from-a-prior)), the pressure exponent and the form constants stay the record's.
 
 - Rows: those of the training split only that the model can run with the record's values, velocities corrected to the muzzle ([above](#muzzle-distance)). Rows of the validation and test split are never read.
 - Fit: `fitPowderPooled` of `@open-reloading/ballistics` running the model of `--model` (default `m3`) ([model page](models/interior-powder-fit.md#pooled-fit-over-rifles-powders-and-lots)), one powder at a time, so a powder that fails does not stop the others. A session is the rows of one load without its charge (cartridge, bullet, barrel, COAL, temperature, session, rifle, lot and table); its rifle is the row's `rifle`, else one test barrel per cartridge, barrel and table; its lot is the row's `lot`. Rifle and lot effects keep the library's default spreads.
@@ -109,6 +109,17 @@ A powder that is not fitted is listed in `notFitted` with its reason: the reason
 
 `verify` and `compare` with `--params fit-on-training` run the fit and evaluate with the fitted burn coefficients. A powder not fitted gets no value: its rows count as `noPowderModel`. Each evaluation carries `fit` with the velocity sigma, the number of powders fitted and those not fitted by reason. `inputs` stay those of the records as read, so a saved `--params records` result is a valid baseline for a `fit-on-training` candidate. The two sides do not cover the same rows: a powder that is not fitted (also `noUsableRow`) has no value on the fit side only, so its rows count as `noPowderModel` there and the medians are taken over different rows; `change.usedRows` (overall and per group) shows by how many rows the sides differ. Each evaluation fits under its own model: in `compare` a live baseline and the candidate each get their own fit, a saved baseline is used as it is. The interval's half width comes from the training rows, which the fit has seen, so it is narrower than an interval from rows the fit has not seen, and the coverage of a `fit-on-training` run is not comparable with that of a `--params records` run.
 
+### Energy from a prior
+
+Velocity rows fix one combination of a powder's burn coefficient and specific energy and leave the pressure level free: along that direction the velocity barely moves while the peak pressure moves strongly ([powder fit](models/interior-powder-fit.md#identifiability)). A powder fitted to velocities alone therefore keeps an energy the data did not choose. `fit --energy prior`, and `verify` or `compare` with `--params fit-on-training --energy prior`, take the energy from thermochemistry instead (`fitPowdersWithPrior`, `src/fit.ts`):
+
+- Prior of a powder, J/kg: `thermochemistry.impetus.value / (thermochemistry.gamma.value - 1)` of its record; without a thermochemistry, the median of those priors over the powders of the records with the same `propellantBase`; without a base or without such a powder, the median of all of them. Records without a powder with a thermochemistry are bad input.
+- Loss factor: one for all powders, on the grid 0.60, 0.65, ..., 1.00, because the gas does not turn all of its thermochemical energy into the model's work. For each value, every powder gets the energy prior times factor and its burn coefficient is fitted to its training velocities as above, from the record's burn coefficient times (record energy / new energy)^3.5.
+- Choice: for each value, the median of |ln(model peak / printed pressure)| over the used training rows that print a pressure in bar, with the fitted values. Only values at which at least 90 % of the powders fitted at any value are fitted take part; the least median wins, a tie goes to the larger factor. Rows without a training row that prints a pressure are bad input; a run in which no value has such a row with a fitted powder is refused.
+- Result: each powder's burn coefficient fitted at the chosen factor, and `energy` with its `value` (prior times factor) and `prior` (`own`, `base` or `pooled`); `factor` stays the fitted over the record burn coefficient. A powder not fitted at the chosen factor is in `notFitted`. The result's `energy` holds `loss` (the chosen factor), `grid`, `objective` (the median per grid value, null where the value did not take part), `pressureRows` (the rows of that median at the chosen factor) and `priors` (how many powders took each kind of prior). The evaluation's `fit` gains `energy.loss`; the table gains one `energy:` line.
+
+No powder's own pressures decide its own values: the factor is shared and the burn coefficient comes from velocities. So the held-out pressure error of such a run is a masked test: it says how well the model does on the pressure of a powder without pressure rows. Its limits: one factor for all powders and cartridges; the prior of a powder without a thermochemistry is a median of other powders; printed pressures of different bases (`pressure_basis`) are pooled in the choice.
+
 ## Model version
 
 Every result carries `modelVersion`, the SHA-256 over the sorted lines:
@@ -116,15 +127,15 @@ Every result carries `modelVersion`, the SHA-256 over the sorted lines:
 - `<kind>/<id> <sha256>` of the stored JSON of every cartridge, bullet, powder, capacity and case record the rows name;
 - `rows <sha256>` over the SHA-256 of each rows file.
 
-A `fit` run and a `--params fit-on-training` evaluation add the built files of the fit (`interior/fit-pooled.js` of ballistics, its solver `least-squares.js` of statistics and `fit.js` of the CLI, each with the files they import by a relative path) and the line `params fit-on-training velocity-sigma <value>`.
+A `fit` run and a `--params fit-on-training` evaluation add the built files of the fit (`interior/fit-pooled.js` of ballistics, its solver `least-squares.js` of statistics and `fit.js` of the CLI, each with the files they import by a relative path) and the line `params fit-on-training velocity-sigma <value>`, followed by ` energy prior` with `--energy prior`.
 
-`inputs.rows` and `inputs.records` in a result are the last two parts. The version changes with the model, the records or the rows, not with the split; `--params fit-on-training` and its `--velocity-sigma` do change it.
+`inputs.rows` and `inputs.records` in a result are the last two parts. The version changes with the model, the records or the rows, not with the split; `--params fit-on-training`, its `--velocity-sigma` and `--energy prior` do change it.
 
 The code of the evaluation itself (rows, split, the metrics and the percentiles, the interval) is not in the hash: a change to it is a change of the evaluation, not of the model, and moves the metrics of an unchanged `modelVersion`. Compare a baseline and a candidate only with one build of the CLI.
 
 ## Commands
 
-`verify` takes no `--baseline` or `--candidate`, `compare` takes no `--model`, `fit` takes only `--rows`, `--records`, `--model`, `--velocity-sigma`, `--json` and `--table`: another option is bad input, as is `--velocity-sigma` in a `verify` or `compare` without `--params fit-on-training`.
+`verify` takes no `--baseline` or `--candidate`, `compare` takes no `--model`, `fit` takes only `--rows`, `--records`, `--model`, `--velocity-sigma`, `--energy`, `--json` and `--table`: another option is bad input, as is `--velocity-sigma` or `--energy` in a `verify` or `compare` without `--params fit-on-training`. `--energy` takes `prior` only.
 
 `verify --rows <path> [--model m3|<module>]` evaluates one model on the split. `m3` is the model of the installed `@open-reloading/ballistics`; a module path is a file that exports `interior(load, options?)` with the signature of its `interior`.
 

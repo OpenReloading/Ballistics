@@ -93,6 +93,10 @@ const evaluation = z.object({
       notFitted: z
         .partialRecord(z.enum(notFittedReasons), count)
         .describe('Powders not fitted, by reason; a reason without powders is left out.'),
+      energy: z
+        .object({ loss: z.number().describe('The loss factor the prior energies were scaled by.') })
+        .optional()
+        .describe('With `--energy prior`.'),
     })
     .optional()
     .describe(
@@ -211,6 +215,19 @@ const fitResult = z.object({
             'Chi square of every row, data and the prior rows of the rifle and lot effects, over all rows minus all parameters; null where that count is not above 0.',
           ),
         iterations: count.describe('Iterations of the solver.'),
+        energy: z
+          .object({
+            value: z
+              .number()
+              .describe('Specific energy, J/kg: the prior times the loss factor of `energy.loss`.'),
+            prior: z
+              .enum(['own', 'base', 'pooled'])
+              .describe(
+                "Where the prior came from: `own`, the powder's thermochemistry (impetus / (gamma - 1)); `base`, the median of the own priors of its propellant base; `pooled`, the median of all own priors.",
+              ),
+          })
+          .optional()
+          .describe('With `--energy prior`.'),
       }),
     )
     .describe('By powder id: each powder fitted on its own.'),
@@ -218,6 +235,24 @@ const fitResult = z.object({
     .record(z.string(), z.enum(notFittedReasons))
     .describe(
       'By powder id, why a powder with interior parameters that the rows name got no value: the reason of the fit, or `noUsableRow` without a used training row.',
+    ),
+  energy: z
+    .object({
+      loss: z.number().describe('The chosen loss factor, the grid value with the least objective.'),
+      grid: z.array(z.number()).describe('The loss factors tried, one fit each.'),
+      objective: z
+        .array(z.number().nullable())
+        .describe(
+          'Per grid value, the median of |ln(model peak / printed pressure)| over the used training rows that print a pressure in bar; null where the value did not enter the choice (fewer than 90 % of the powders fitted at any value were fitted, or no such row).',
+        ),
+      pressureRows: count.describe('Rows of the objective at the chosen loss factor.'),
+      priors: z
+        .object({ own: count, byBase: count, pooled: count })
+        .describe('How many powders took each kind of prior.'),
+    })
+    .optional()
+    .describe(
+      "With `--energy prior`: each powder's energy is its prior times one loss factor shared by all powders, chosen on the training pressures; per powder only the burn coefficient is fitted.",
     ),
 })
 

@@ -5,7 +5,7 @@ import { compareKeys, type SourceRecord, sourceRecord } from '@open-reloading/sc
 import { readPublishedLoads } from '@open-reloading/tools/catalog'
 import { Refusal, UsageError } from './errors.ts'
 import { type InteriorModel, outcomes } from './evaluate.ts'
-import { fitPowders, notFittedReasons, withFit } from './fit.ts'
+import { fitPowders, fitPowdersWithPrior, notFittedReasons, withFit } from './fit.ts'
 import { changeOf, evaluate, type Grouping, metricsOf } from './metrics.ts'
 import { builtInName, fitFiles, loadModel, type Model } from './model.ts'
 import { fillInputs, rowsFromPublished } from './published-rows.ts'
@@ -42,10 +42,12 @@ export interface Options {
   params?: 'records' | 'fit-on-training' | undefined
   /** Of the fit, a fraction of the velocity; default 0.03. */
   velocitySigma?: number | undefined
+  /** `prior`: each powder's energy is its prior times one loss factor chosen on the training pressures; default the record's. */
+  energy?: 'prior' | undefined
 }
 
 /** What `fit` reads. */
-type FitOptions = Pick<Options, 'rows' | 'records' | 'warn' | 'velocitySigma'>
+type FitOptions = Pick<Options, 'rows' | 'records' | 'warn' | 'velocitySigma' | 'energy'>
 
 type Inputs = VerifyResult['inputs']
 
@@ -145,7 +147,11 @@ type Prepared = ReturnType<typeof prepare>
 function fitOf(options: FitOptions, data: Prepared, model: Model) {
   // load tables print no spread; ANSI/SAAMI Z299.4-2025 expects tested ammunition within 90 fps of the table, about 3 %
   const velocitySigma = options.velocitySigma ?? 0.03
-  const fit = fitPowders(data.rows, data.records, model.interior, velocitySigma)
+  const prior =
+    options.energy === 'prior'
+      ? fitPowdersWithPrior(data.rows, data.records, model.interior, velocitySigma)
+      : undefined
+  const fit = prior ?? fitPowders(data.rows, data.records, model.interior, velocitySigma)
   const reasons = Object.values(fit.notFitted)
   const notFitted = Object.fromEntries(
     notFittedReasons.flatMap((reason) => {
@@ -154,11 +160,18 @@ function fitOf(options: FitOptions, data: Prepared, model: Model) {
     }),
   )
   return {
-    ...fit,
+    powders: fit.powders,
+    notFitted: fit.notFitted,
+    energy: prior?.energy,
     velocitySigma,
     records: withFit(data.records, fit),
-    params: `params fit-on-training velocity-sigma ${velocitySigma}`,
-    summary: { velocitySigma, powders: Object.keys(fit.powders).length, notFitted },
+    params: `params fit-on-training velocity-sigma ${velocitySigma}${prior ? ' energy prior' : ''}`,
+    summary: {
+      velocitySigma,
+      powders: Object.keys(fit.powders).length,
+      notFitted,
+      ...(prior && { energy: { loss: prior.energy.loss } }),
+    },
   }
 }
 
@@ -342,5 +355,6 @@ export async function fit(options: FitOptions, spec = builtInName): Promise<FitR
     velocitySigma: fitted.velocitySigma,
     powders: fitted.powders,
     notFitted: fitted.notFitted,
+    ...(fitted.energy && { energy: fitted.energy }),
   }
 }

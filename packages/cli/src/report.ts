@@ -102,8 +102,14 @@ export function compareTable(r: CompareResult): string {
 /** `fit` as text: the version, one line per fitted powder and the powders not fitted. */
 export function fitTable(r: FitResult): string {
   const notFitted = Object.entries(r.notFitted).map(([k, reason]) => `${k} ${reason}`)
+  const e = r.energy
   return [
     `model ${r.model}  version ${r.modelVersion}`,
+    ...(e
+      ? [
+          `energy: loss ${e.loss} from ${e.pressureRows} pressure rows; priors own ${e.priors.own}, by base ${e.priors.byBase}, pooled ${e.priors.pooled}`,
+        ]
+      : []),
     table(
       ['powder', 'rows', 'cartridges', 'vivacity', 'u', 'chi2/dof'],
       Object.entries(r.powders).map(([k, p]) => [
