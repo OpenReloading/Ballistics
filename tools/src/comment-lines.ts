@@ -51,9 +51,9 @@ const bodies = new Set<SyntaxKind>([
 ])
 const directive = /^\/[/*]+\s*(<reference|oxlint-|biome-ignore|@ts-|eslint-|@?vitest-environment)/
 const references =
-  /https?:\/\/[^\s)>\]'"`]*[^\s)>\]'"`.,;:]|\b10\.\d{4,9}\/[^\s)>\]'"`]*[^\s)>\]'"`.,;:]|#\d+\b|\bD\d+\b|[$@][\w./-]*\w/g
+  /https?:\/\/[^\s)>\]'"`]*[^\s)>\]'"`.,;:]|\b10\.\d{4,9}\/[^\s)>\]'"`]*[^\s)>\]'"`.,;:]|#[1-9]\d*\b|\bD\d+\b/g
 const contracts =
-  /\b(throws?|undefined when|must|never|ascending|in order)\b|(?<=\d\s?)(mm|cm|km|m|in|ft|gr|g|kg|ms|s|pa|kpa|mpa|bar|psi|j|n|k|px|rem|fps|moa|mil|mrad)\b|%|°|`[^`\n]+`/g
+  /\b(throws?|undefined when|must|never|ascending|in order)\b|(?<=\d\s?)(mm|cm|km|m|in|ft|gr|g|kg|ms|s|pa|kpa|mpa|bar|psi|j|n|k|px|rem|fps|moa|mil|mrad)\b|%|°|`[^`\n]+`|[$@][\w./-]*\w/g
 // the line breaks and stars of a doc comment are no part of a reference
 const flat = (text: string) => text.replace(/\n[\t ]*\*?/g, ' ').replace(/\s+/g, ' ')
 
