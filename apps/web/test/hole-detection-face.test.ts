@@ -1,6 +1,10 @@
+import {
+  autoDetect,
+  detectFromExample,
+  type HoleProposal,
+} from '@open-reloading/target-recognition'
 import sharp from 'sharp'
 import { beforeAll, describe, expect, it } from 'vitest'
-import { autoDetect, detectFromExample, type HoleProposal } from '../src/lib/hole-detection.ts'
 import type { RgbaImage } from '../src/lib/image.ts'
 import { faceLabel } from '../src/lib/target-face.ts'
 import { defined } from './defined.ts'

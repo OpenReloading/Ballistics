@@ -2,6 +2,7 @@
 
 import type { TargetFace } from '@open-reloading/schema'
 import { seededUniforms } from '@open-reloading/statistics'
+import type { FaceLabel } from '@open-reloading/target-recognition'
 import {
   concentricPlane,
   conicOf,
@@ -20,7 +21,6 @@ import {
   refineEdge,
   ridges,
 } from './face-image.ts'
-import type { FaceLabel } from './hole-detection.ts'
 import type { RgbaImage } from './image.ts'
 import { nth } from './nth.ts'
 import { applyMatrix, inv3, type Matrix, mapMatrix, mul3, type Point } from './target-geometry.ts'

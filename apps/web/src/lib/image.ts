@@ -1,2 +1,2 @@
-/** RGBA pixels, row by row, as in the `ImageData` of a canvas. */
-export type RgbaImage = { width: number; height: number; data: Uint8ClampedArray }
+// The image buffer of `@open-reloading/target-recognition` (packages/target-recognition/src/image.ts) for the app's modules.
+export type { RgbaImage } from '@open-reloading/target-recognition'

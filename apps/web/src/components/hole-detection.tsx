@@ -8,6 +8,7 @@ import {
   type TargetSheet,
   toSi,
 } from '@open-reloading/schema'
+import type { FlaggedRegion, HoleProposal } from '@open-reloading/target-recognition'
 import { ArrowClockwise, ArrowCounterClockwise, X } from '@phosphor-icons/react'
 import {
   type KeyboardEvent,
@@ -32,7 +33,6 @@ import { ellipsePoint } from '../lib/ellipse.ts'
 import { errorText } from '../lib/error-text.ts'
 import { fetchAllFaces, fetchFace } from '../lib/face-records.ts'
 import { type FoundFace, faceGeometry } from '../lib/face-sheet.ts'
-import type { FlaggedRegion, HoleProposal } from '../lib/hole-detection.ts'
 import type { Rgb, WorkerReply, WorkerRequest } from '../lib/hole-detection-protocol.ts'
 import {
   acceptProposals,
