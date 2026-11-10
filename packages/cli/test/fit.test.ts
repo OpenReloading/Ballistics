@@ -112,8 +112,8 @@ describe('a model that refuses a load by throwing', () => {
   })
 })
 
-// each run fits every powder at seven exponents
-describe('fit --exponent family', { timeout: 120_000 }, () => {
+// each run fits every powder at seven exponents; the eight-powder case took 114 s on the CI runner, which measures coverage
+describe('fit --exponent family', { timeout: 300_000 }, () => {
   /** The fixture records with the pressure exponent and the burn coefficient of each powder of `truth` replaced. */
   const plant = (truth: Record<string, [number, number]>) => ({
     ...records,
