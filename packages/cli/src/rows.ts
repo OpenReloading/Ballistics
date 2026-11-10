@@ -29,7 +29,7 @@ export interface Row {
   bearing?: number | undefined
   /** Distance of the measuring point from the muzzle, m: the printed velocity is corrected to the muzzle. */
   muzzleDistance?: number | undefined
-  /** Session, rifle and lot ids (free text), carried, not read yet. */
+  /** Session, rifle and lot ids (free text): the fit groups the rows into sessions by them. */
   session?: string | undefined
   rifle?: string | undefined
   lot?: string | undefined

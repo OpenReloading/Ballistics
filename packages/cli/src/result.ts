@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { reasons } from './evaluate.ts'
+import { notFittedReasons } from './fit.ts'
 import { groupings } from './metrics.ts'
 import { skipReasons } from './published-rows.ts'
 import { splits } from './split.ts'
@@ -85,6 +86,18 @@ const evaluation = z.object({
     .describe(
       'Powder not in the fitted set, with `--leave-one-powder-out`: the rows of each powder that has interior parameters, run without them. A powder without rows has no value, so its rows count as `noPowderModel` (a row with an unknown cartridge or bullet as `unknownCartridge` or `unknownBullet`, which are checked first) and the errors and the coverage are null.',
     ),
+  fit: z
+    .object({
+      velocitySigma: fraction.describe('Velocity sigma of the fit, a fraction of the velocity.'),
+      powders: count.describe('Powders fitted.'),
+      notFitted: z
+        .partialRecord(z.enum(notFittedReasons), count)
+        .describe('Powders not fitted, by reason; a reason without powders is left out.'),
+    })
+    .optional()
+    .describe(
+      'With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`.',
+    ),
 })
 
 /** What one model gave on one split. */
@@ -160,5 +173,56 @@ const compareResult = z.object({
 /** The result of `compare`. */
 export type CompareResult = z.infer<typeof compareResult>
 
+const fitResult = z.object({
+  schemaVersion: z.literal(schemaVersion),
+  notice: z.literal(notice),
+  command: z.literal('fit'),
+  inputs,
+  published,
+  model: z.string().describe('The name or module path the model was selected by.'),
+  modelVersion: z
+    .string()
+    .describe(
+      'SHA-256 over the model and fit sources, the params line, the records the rows name and the rows bytes.',
+    ),
+  split: z.literal('training').describe('The split whose rows the fit reads.'),
+  velocitySigma: fraction.describe('Velocity sigma of each row, a fraction of its velocity.'),
+  powders: z
+    .record(
+      z.string(),
+      z.object({
+        vivacity: z
+          .object({
+            value: z.number().describe('Fitted burn coefficient, in the unit of the record.'),
+            standardUncertainty: z
+              .number()
+              .describe(
+                'Of the fit, scaled by the root of the chi square per degree of freedom where that is above 1.',
+              ),
+          })
+          .describe('The record burn coefficient times `factor`.'),
+        factor: z.number().describe('Fitted over record burn coefficient.'),
+        rows: count.describe('Used training rows of the powder.'),
+        cartridges: count.describe('Their distinct cartridges.'),
+        chiSquarePerDegree: z
+          .number()
+          .nullable()
+          .describe(
+            'Chi square of every row, data and the prior rows of the rifle and lot effects, over all rows minus all parameters; null where that count is not above 0.',
+          ),
+        iterations: count.describe('Iterations of the solver.'),
+      }),
+    )
+    .describe('By powder id: each powder fitted on its own.'),
+  notFitted: z
+    .record(z.string(), z.enum(notFittedReasons))
+    .describe(
+      'By powder id, why a powder with interior parameters that the rows name got no value: the reason of the fit, or `noUsableRow` without a used training row.',
+    ),
+})
+
+/** The result of `fit`. */
+export type FitResult = z.infer<typeof fitResult>
+
 /** The JSON shape of every result. */
-export const result = z.discriminatedUnion('command', [verifyResult, compareResult])
+export const result = z.discriminatedUnion('command', [verifyResult, compareResult, fitResult])
