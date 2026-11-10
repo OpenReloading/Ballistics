@@ -61,6 +61,19 @@ function sharedFiles() {
   }
 }
 
+/** The built files a `fit-on-training` run adds to its model: the pooled fit of ballistics, its solver and the CLI's fit module, each with its relative imports. */
+export function fitFiles() {
+  const { statistics, ballistics } = sharedFiles()
+  const here = fileURLToPath(import.meta.url)
+  const cli = dirname(here)
+  return [
+    ...closure(join(ballistics, 'interior/fit-pooled.js'), ballistics, 'ballistics'),
+    // the Levenberg-Marquardt solver, which the pooled fit imports from another package
+    ...closure(join(statistics, 'least-squares.js'), statistics, 'statistics'),
+    ...closure(join(cli, `fit${extname(here)}`), cli, 'cli'),
+  ]
+}
+
 /** `m3` (the installed core model) or the path of a module that exports `interior(load, options?)` with the signature of the core function; throws a `UsageError` for a module that cannot be loaded or has no such export. */
 export async function loadModel(spec: string): Promise<Model> {
   const { statistics, ballistics, files } = sharedFiles()

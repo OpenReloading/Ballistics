@@ -5,13 +5,15 @@ import { compareKeys, type SourceRecord, sourceRecord } from '@open-reloading/sc
 import { readPublishedLoads } from '@open-reloading/tools/catalog'
 import { Refusal, UsageError } from './errors.ts'
 import { type InteriorModel, outcomes } from './evaluate.ts'
+import { fitPowders, notFittedReasons, withFit } from './fit.ts'
 import { changeOf, evaluate, type Grouping, metricsOf } from './metrics.ts'
-import { builtInName, loadModel } from './model.ts'
+import { builtInName, fitFiles, loadModel, type Model } from './model.ts'
 import { fillInputs, rowsFromPublished } from './published-rows.ts'
 import { loadRecords, type Records } from './records.ts'
 import {
   type CompareResult,
   type Evaluation,
+  type FitResult,
   notice,
   schemaVersion,
   type VerifyResult,
@@ -36,7 +38,14 @@ export interface Options {
   leaveOnePowderOut?: boolean | undefined
   /** Gets a note about the inputs; the result stays on stdout. */
   warn?: ((text: string) => void) | undefined
+  /** `fit-on-training` evaluates with the burn coefficients fitted to the training rows; default `records`. */
+  params?: 'records' | 'fit-on-training' | undefined
+  /** Of the fit, a fraction of the velocity; default 0.03. */
+  velocitySigma?: number | undefined
 }
+
+/** What `fit` reads. */
+type FitOptions = Pick<Options, 'rows' | 'records' | 'warn' | 'velocitySigma'>
 
 type Inputs = VerifyResult['inputs']
 
@@ -84,7 +93,7 @@ function sourcesOf(roots: readonly string[]) {
 }
 
 /** Of the catalogue's published load files (`catalogue`), or of a folder laid out as `records/loads/` only, their source references resolved from the records' sources. */
-function catalogueRows(options: Options) {
+function catalogueRows(options: FitOptions) {
   const folder = options.rows === 'catalogue' ? undefined : resolve(options.rows)
   if (folder !== undefined && basename(folder) !== 'loads')
     throw new UsageError('a --rows folder of published loads is named loads, as records/loads/')
@@ -107,8 +116,8 @@ function catalogueRows(options: Options) {
   return { rows: fillInputs(rows, records), files: bytes, records, published }
 }
 
-/** The data both commands evaluate models on. */
-function prepare(options: Options) {
+/** The data the commands evaluate models on and fit to. */
+function prepare(options: FitOptions) {
   const catalogue = options.rows === 'catalogue' || isPublishedFolder(options.rows)
   const read: { rows: Row[]; files: Uint8Array[]; records: Records; published?: Published } =
     catalogue
@@ -132,6 +141,37 @@ type Published = NonNullable<VerifyResult['published']>
 
 type Prepared = ReturnType<typeof prepare>
 
+/** The fit of a run under `model`, the records with its values laid over, its version line and its summary for an evaluation. */
+function fitOf(options: FitOptions, data: Prepared, model: Model) {
+  // load tables print no spread; ANSI/SAAMI Z299.4-2025 expects tested ammunition within 90 fps of the table, about 3 %
+  const velocitySigma = options.velocitySigma ?? 0.03
+  const fit = fitPowders(data.rows, data.records, model.interior, velocitySigma)
+  const reasons = Object.values(fit.notFitted)
+  const notFitted = Object.fromEntries(
+    notFittedReasons.flatMap((reason) => {
+      const n = reasons.filter((r) => r === reason).length
+      return n > 0 ? [[reason, n]] : []
+    }),
+  )
+  return {
+    ...fit,
+    velocitySigma,
+    records: withFit(data.records, fit),
+    params: `params fit-on-training velocity-sigma ${velocitySigma}`,
+    summary: { velocitySigma, powders: Object.keys(fit.powders).length, notFitted },
+  }
+}
+
+type Fitted = ReturnType<typeof fitOf>
+
+/** The version of `model` on the data, with the fit's files and its params line in a fit run. */
+const versionOf = (model: Model, data: Prepared, fitted: Fitted | undefined) =>
+  modelVersion(
+    fitted ? { ...model, files: [...model.files, ...fitFiles()] } : model,
+    data.inputs,
+    fitted?.params,
+  )
+
 /** The outcomes of the rows of `split` of each powder with interior parameters, predicted as a powder not in the fitted set (without its parameters, so without a value), and the number of those powders. */
 function leftOut({ rows, records }: Prepared, model: InteriorModel, split: Split) {
   const fitted = [...new Set(rows.map((r) => r.powder))].flatMap((id) => {
@@ -150,11 +190,13 @@ function leftOut({ rows, records }: Prepared, model: InteriorModel, split: Split
   return { items, powders: inSplit.length }
 }
 
-/** What the model selected by `spec` gives on the split; refuses a split with no evaluable row. */
+/** What the model selected by `spec` gives on the split, with the burn coefficients fitted under it in a `fit-on-training` run; refuses a split with no evaluable row. */
 async function evaluateModel(spec: string, options: Options, data: Prepared): Promise<Evaluation> {
   const model = await loadModel(spec)
+  const fitted = options.params === 'fit-on-training' ? fitOf(options, data, model) : undefined
+  const records = fitted?.records ?? data.records
   const wanted: Split[] = options.split === 'training' ? ['training'] : [options.split, 'training']
-  const all = outcomes(data.rows, data.records, model.interior, wanted)
+  const all = outcomes(data.rows, records, model.interior, wanted)
   const evaluation = evaluate(
     all.filter((o) => o.split === options.split),
     all.filter((o) => o.split === 'training'),
@@ -164,10 +206,11 @@ async function evaluateModel(spec: string, options: Options, data: Prepared): Pr
     throw new Refusal(
       `no row of the ${options.split} split could be evaluated (${evaluation.overall.rows.inSplit} in the split)`,
     )
-  const unseen = options.leaveOnePowderOut && leftOut(data, model.interior, options.split)
+  const unseen =
+    options.leaveOnePowderOut && leftOut({ ...data, records }, model.interior, options.split)
   return {
     model: model.name,
-    modelVersion: modelVersion(model, data.inputs),
+    modelVersion: versionOf(model, data, fitted),
     ...evaluation,
     ...(unseen && {
       notInFittedSet: {
@@ -175,6 +218,7 @@ async function evaluateModel(spec: string, options: Options, data: Prepared): Pr
         powders: unseen.powders,
       },
     }),
+    ...(fitted && { fit: fitted.summary }),
   }
 }
 
@@ -278,5 +322,25 @@ export async function compare(
         ),
       }),
     },
+  }
+}
+
+/** `fit`: the burn coefficient of each powder fitted under one model to its training rows, with its uncertainty. */
+export async function fit(options: FitOptions, spec = builtInName): Promise<FitResult> {
+  const data = prepare(options)
+  const model = await loadModel(spec)
+  const fitted = fitOf(options, data, model)
+  return {
+    schemaVersion,
+    notice,
+    command: 'fit',
+    inputs: data.inputs,
+    ...(data.published && { published: data.published }),
+    model: model.name,
+    modelVersion: versionOf(model, data, fitted),
+    split: 'training',
+    velocitySigma: fitted.velocitySigma,
+    powders: fitted.powders,
+    notFitted: fitted.notFitted,
   }
 }

@@ -1,6 +1,7 @@
 import { icao, startPressureOf } from '@open-reloading/ballistics'
 import { seat } from '@open-reloading/drawing/seating'
 import { fromSi, toSi } from '@open-reloading/schema'
+import { english, type Translator } from '../i18n/translate.ts'
 import type { InteriorKey } from './interior-input.ts'
 import type { LadderDirection } from './seating-ladder.ts'
 import type { ManualKey, ShotKey, zeroKeys } from './trajectory-input.ts'
@@ -58,8 +59,8 @@ export const exampleRecords = {
 
 const { bullet, spec, case: brass, powder } = exampleRecords
 
-/** The invented load: start and maximum charge, g. Barrel, sight height and zero are example choices. */
-const published = { start: 2.4, max: 2.55 }
+/** The invented load: start charge, g. Barrel, sight height and zero are example choices. */
+const published = { start: 2.4 }
 /** Stored units: barrel and sight height mm, zero m, charge g; a common 24 in (609.6 mm) barrel. */
 const choices = {
   barrel: 609.6,
@@ -152,58 +153,44 @@ export const exampleTrajectory = {
   rangeStep: 100,
 } satisfies Record<Exclude<ShotKey, (typeof zeroKeys)[number]> | ManualKey, number>
 
-/** Source lines shown next to each button. */
-export const trajectorySources = [
-  `Bullet: ${bullet.id} (mass, diameter, length, G7 BC ${bullet.g7})`,
-  `Twist: ${spec.id} (u ${spec.u} mm)`,
-  `Muzzle velocity: ${exampleMuzzleVelocity} m/s, simulated for the interior example (${choices.barrel} mm barrel)`,
-  'Air: ICAO standard atmosphere at sea level, no wind',
-  `Example choices: sight height ${choices.sightHeight} mm, zero ${choices.zero} m`,
-]
+/** Built in, never stored: the firearm library lists it read-only; its names follow the language shown. */
+export const exampleFirearmIn = (t: Translator['t']) => {
+  const name = t('Example rifle, 308 Win.')
+  return {
+    kind: 'firearm',
+    id: '3b7e6d1c-5a2f-4e0b-8c94-1d6f0a9b2e57',
+    name,
+    saved: '2026-10-14T00:00:00.000Z',
+    data: {
+      origin: 'user',
+      name,
+      cartridge: `catalogue:${exampleRecords.cartridge.id}`,
+      barrelLength: { value: choices.barrel },
+      twist: { value: spec.u },
+      twistHand: 'right',
+      firearmMass: { value: fromSi('mass', exampleFirearmMass) },
+      // a scope at the example's sight height and zero, so the Trajectory tab has a result
+      optics: [{ id: 'scope', kind: 'scope', name: t('Example scope') }],
+      configurations: [
+        {
+          id: 'example',
+          name: t('Example'),
+          mounts: [
+            {
+              optic: 'scope',
+              sightHeight: { value: choices.sightHeight },
+              zeroRange: { value: fromSi('length', choices.zero) },
+            },
+          ],
+        },
+      ],
+      active: 'example',
+    },
+  } as const
+}
 
-export const interiorSources = [
-  `Load: invented, 308 Win., ${powder.name}, ${bullet.id}, COAL ${spec.L6} mm: start ${published.start} g, maximum ${published.max} g`,
-  `Bullet: ${bullet.id} (mass, length), invented values`,
-  `Powder: ${powder.id}, invented model parameters and bore resistance`,
-  `Bore diameter F, bore area Q, twist u, L3, L6, Pmax ${spec.Pmax} bar: ${spec.id}`,
-  `Chamber volume: water capacity ${brass.water} g of ${brass.id} at ${waterDensityGramsPerCm3} g/cm³ minus the bullet seated at COAL ${spec.L6} mm (its shape from ${bullet.id})`,
-  `Travel: barrel ${choices.barrel} mm minus the bullet base at COAL ${spec.L6} mm`,
-  'Propellant temperature: ICAO 15 °C',
-  `Charge ladder: 5 steps of 0.2 gr down from the start charge ${published.start} g (example choice)`,
-]
-
-/** Built in, never stored: the firearm library lists it read-only. */
-export const exampleFirearm = {
-  kind: 'firearm',
-  id: '3b7e6d1c-5a2f-4e0b-8c94-1d6f0a9b2e57',
-  name: 'Example rifle, 308 Win.',
-  saved: '2026-10-14T00:00:00.000Z',
-  data: {
-    origin: 'user',
-    name: 'Example rifle, 308 Win.',
-    cartridge: `catalogue:${exampleRecords.cartridge.id}`,
-    barrelLength: { value: choices.barrel },
-    twist: { value: spec.u },
-    twistHand: 'right',
-    firearmMass: { value: fromSi('mass', exampleFirearmMass) },
-    // a scope at the example's sight height and zero, so the Trajectory tab has a result
-    optics: [{ id: 'scope', kind: 'scope', name: 'Example scope' }],
-    configurations: [
-      {
-        id: 'example',
-        name: 'Example',
-        mounts: [
-          {
-            optic: 'scope',
-            sightHeight: { value: choices.sightHeight },
-            zeroRange: { value: fromSi('length', choices.zero) },
-          },
-        ],
-      },
-    ],
-    active: 'example',
-  },
-} as const
+/** English: the File menu resolves a reference to the example against it. */
+export const exampleFirearm = exampleFirearmIn(english.t)
 
 /** The example of the load workbench and the trajectory page: records, fit values and a published load. */
 type LoadExample = {
@@ -224,10 +211,8 @@ type LoadExample = {
     >,
     number
   >
-  interiorSources: readonly string[]
   /** Trajectory form values, SI, keyed like `shotFields` and `manualBulletFields`. */
   trajectory: Record<Exclude<ShotKey, (typeof zeroKeys)[number]> | ManualKey, number>
-  trajectorySources: readonly string[]
   ladder: { steps: number; step: number; direction: LadderDirection }
   seating: { bullet: string; barrel: number; seating: { by: 'overallLength'; value: number } }
   /** The case record the Cartridge card chooses, and the seating ladder's step size, m. */
@@ -245,15 +230,13 @@ type LoadExample = {
   }
 }
 
-/** The 308 Win. example load: records, form values in SI and source lines. */
+/** The 308 Win. example load: records and form values in SI. */
 export const loadExample: LoadExample = {
   cartridge: { ...exampleRecords.cartridge, g1: spec.G1, land: spec.F, groove: spec.Z },
   bulletId: bullet.id,
   powderId: powder.id,
   interior: exampleInterior,
-  interiorSources,
   trajectory: exampleTrajectory,
-  trajectorySources,
   ladder: exampleLadder,
   seating: exampleSeating,
   caseId: brass.id,
