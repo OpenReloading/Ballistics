@@ -62,6 +62,12 @@ describe('the JSON result', () => {
       ...[2.0, 2.2].map((charge) => ({ cartridge: '308-win', charge, velocity: 0.01 })),
     ]
     const few = ['--rows', writeRows(rowsCsv(specs)), ...data.slice(2)]
+    const printed = [
+      { cartridge: '30-br', charge: 2.0 },
+      { cartridge: '30-br', charge: 2.2 },
+      { cartridge: '308-win', charge: 2.0 },
+    ].map((s) => ({ ...s, velocity: 0, pressure: 0, pressureBasis: 'transducer' }))
+    const pressures = ['--rows', writeRows(rowsCsv(printed)), ...data.slice(2)]
     for (const args of [
       ['verify', ...data],
       ['verify', ...data, '--split', 'test', '--final'],
@@ -73,6 +79,8 @@ describe('the JSON result', () => {
       ['verify', ...data, '--params', 'fit-on-training'],
       ['fit', ...few, '--exponent', 'family'],
       ['verify', ...few, '--params', 'fit-on-training', '--exponent', 'family'],
+      ['fit', ...pressures, '--pressure-sigma', '0.05'],
+      ['verify', ...pressures, '--params', 'fit-on-training', '--pressure-sigma', '0.05'],
     ]) {
       const { code, stdout } = await cli(args)
       expect(code).toBe(0)
@@ -163,6 +171,7 @@ describe('exit codes', () => {
     [['verify', ...data, '--final']],
     [['verify', ...data, '--split', 'training', '--final']],
     [['compare', ...data, '--baseline', 'm3', '--candidate', 'm3', '--final']],
+    [['fit', ...data, '--exponent', 'family', '--pressure-sigma', '0.05']],
   ])('is 2 for bad input: %j', async (args) => {
     const { code, stdout } = await cli(args)
     expect(code).toBe(2)

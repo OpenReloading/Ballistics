@@ -53,6 +53,32 @@ const metrics = z.object({
 /** Metrics of one group. */
 export type Metrics = z.infer<typeof metrics>
 
+const pressureFit = z
+  .object({
+    sigma: fraction.describe(
+      'Pressure sigma of each row, a fraction of its printed pressure over the factor of its basis.',
+    ),
+    factors: z
+      .record(
+        z.string(),
+        z.object({
+          factor: z
+            .number()
+            .describe(
+              'The model peak pressure times this is what the basis reads: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only.',
+            ),
+          rows: count.describe('Pressure rows of the basis of the powders fitted to velocities.'),
+        }),
+      )
+      .describe(
+        'By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its training pressures are not read.',
+      ),
+  })
+  .optional()
+  .describe(
+    'With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its basis.',
+  )
+
 const evaluation = z.object({
   model: z.string().describe('The name or module path the model was selected by.'),
   modelVersion: z
@@ -104,10 +130,11 @@ const evaluation = z.object({
         })
         .optional()
         .describe('With `--exponent family`: the pressure exponents of the fit.'),
+      pressure: pressureFit,
     })
     .optional()
     .describe(
-      'With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`.',
+      "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`. With `--pressure-sigma`, `pressure` holds the basis factors of the fit; the pressure errors still compare the model's peak pressure as it is with the printed pressure.",
     ),
 })
 
@@ -225,6 +252,7 @@ const fitResult = z.object({
     .describe(
       'With `--exponent family`: the pressure exponent each powder family chose; each powder is fitted at the exponent of its family.',
     ),
+  pressure: pressureFit,
   powders: z
     .record(
       z.string(),
@@ -258,6 +286,11 @@ const fitResult = z.object({
           .optional()
           .describe(
             'With `--exponent family`: the exponent of its family, the value fitted at it.',
+          ),
+        pressureRows: count
+          .optional()
+          .describe(
+            'With `--pressure-sigma`: used training rows whose printed pressure the fit read, those of a basis with a factor.',
           ),
       }),
     )

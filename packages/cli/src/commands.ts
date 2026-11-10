@@ -42,12 +42,17 @@ export interface Options {
   params?: 'records' | 'fit-on-training' | undefined
   /** Of the fit, a fraction of the velocity; default 0.03. */
   velocitySigma?: number | undefined
+  /** Fits with the printed pressures, this sigma a fraction of the pressure, and a factor per basis; none without it. */
+  pressureSigma?: number | undefined
   /** `family` fits each burn coefficient at the pressure exponent its powder family chooses; default the record's. */
   exponent?: 'family' | undefined
 }
 
 /** What `fit` reads. */
-type FitOptions = Pick<Options, 'rows' | 'records' | 'warn' | 'velocitySigma' | 'exponent'>
+type FitOptions = Pick<
+  Options,
+  'rows' | 'records' | 'warn' | 'velocitySigma' | 'pressureSigma' | 'exponent'
+>
 
 type Inputs = VerifyResult['inputs']
 
@@ -147,7 +152,14 @@ type Prepared = ReturnType<typeof prepare>
 function fitOf(options: FitOptions, data: Prepared, model: Model) {
   // load tables print no spread; ANSI/SAAMI Z299.4-2025 expects tested ammunition within 90 fps of the table, about 3 %
   const velocitySigma = options.velocitySigma ?? 0.03
-  const fit = fitPowders(data.rows, data.records, model.interior, velocitySigma, options.exponent)
+  const { exponent, pressureSigma } = options
+  // with pressure rows in the chi squares the family choice would measure something no study has covered
+  if (exponent !== undefined && pressureSigma !== undefined)
+    throw new UsageError('--exponent and --pressure-sigma do not combine')
+  const fit = fitPowders(data.rows, data.records, model.interior, velocitySigma, {
+    exponent,
+    pressureSigma,
+  })
   const reasons = Object.values(fit.notFitted)
   const notFitted = Object.fromEntries(
     notFittedReasons.flatMap((reason) => {
@@ -159,12 +171,12 @@ function fitOf(options: FitOptions, data: Prepared, model: Model) {
     ...fit,
     velocitySigma,
     records: withFit(data.records, fit),
-    params: `params fit-on-training velocity-sigma ${velocitySigma}${fit.exponent ? ' exponent family' : ''}`,
+    params: `params fit-on-training velocity-sigma ${velocitySigma}${'exponent' in fit ? ' exponent family' : ''}${pressureSigma === undefined ? '' : ` pressure-sigma ${pressureSigma}`}`,
     summary: {
       velocitySigma,
       powders: Object.keys(fit.powders).length,
       notFitted,
-      ...(fit.exponent && {
+      ...('exponent' in fit && {
         exponent: {
           pooled: fit.exponent.pooled,
           families: Object.fromEntries(
@@ -172,6 +184,7 @@ function fitOf(options: FitOptions, data: Prepared, model: Model) {
           ),
         },
       }),
+      ...('pressure' in fit && { pressure: fit.pressure }),
     },
   }
 }
@@ -354,7 +367,8 @@ export async function fit(options: FitOptions, spec = builtInName): Promise<FitR
     modelVersion: versionOf(model, data, fitted),
     split: 'training',
     velocitySigma: fitted.velocitySigma,
-    ...(fitted.exponent && { exponent: fitted.exponent }),
+    ...('exponent' in fitted && { exponent: fitted.exponent }),
+    ...(fitted.summary.pressure && { pressure: fitted.summary.pressure }),
     powders: fitted.powders,
     notFitted: fitted.notFitted,
   }

@@ -887,7 +887,7 @@
           "additionalProperties": false
         },
         "fit": {
-          "description": "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`.",
+          "description": "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`. With `--pressure-sigma`, `pressure` holds the basis factors of the fit; the pressure errors still compare the model's peak pressure as it is with the printed pressure.",
           "type": "object",
           "properties": {
             "velocitySigma": {
@@ -940,6 +940,42 @@
                 }
               },
               "required": ["pooled", "families"],
+              "additionalProperties": false
+            },
+            "pressure": {
+              "description": "With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its basis.",
+              "type": "object",
+              "properties": {
+                "sigma": {
+                  "type": "number",
+                  "description": "Pressure sigma of each row, a fraction of its printed pressure over the factor of its basis."
+                },
+                "factors": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "factor": {
+                        "type": "number",
+                        "description": "The model peak pressure times this is what the basis reads: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only."
+                      },
+                      "rows": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Pressure rows of the basis of the powders fitted to velocities."
+                      }
+                    },
+                    "required": ["factor", "rows"],
+                    "additionalProperties": false
+                  },
+                  "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its training pressures are not read."
+                }
+              },
+              "required": ["sigma", "factors"],
               "additionalProperties": false
             }
           },
@@ -1858,7 +1894,7 @@
               "additionalProperties": false
             },
             "fit": {
-              "description": "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`.",
+              "description": "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`. With `--pressure-sigma`, `pressure` holds the basis factors of the fit; the pressure errors still compare the model's peak pressure as it is with the printed pressure.",
               "type": "object",
               "properties": {
                 "velocitySigma": {
@@ -1911,6 +1947,42 @@
                     }
                   },
                   "required": ["pooled", "families"],
+                  "additionalProperties": false
+                },
+                "pressure": {
+                  "description": "With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its basis.",
+                  "type": "object",
+                  "properties": {
+                    "sigma": {
+                      "type": "number",
+                      "description": "Pressure sigma of each row, a fraction of its printed pressure over the factor of its basis."
+                    },
+                    "factors": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "factor": {
+                            "type": "number",
+                            "description": "The model peak pressure times this is what the basis reads: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only."
+                          },
+                          "rows": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "description": "Pressure rows of the basis of the powders fitted to velocities."
+                          }
+                        },
+                        "required": ["factor", "rows"],
+                        "additionalProperties": false
+                      },
+                      "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its training pressures are not read."
+                    }
+                  },
+                  "required": ["sigma", "factors"],
                   "additionalProperties": false
                 }
               },
@@ -2745,7 +2817,7 @@
               "additionalProperties": false
             },
             "fit": {
-              "description": "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`.",
+              "description": "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`. With `--pressure-sigma`, `pressure` holds the basis factors of the fit; the pressure errors still compare the model's peak pressure as it is with the printed pressure.",
               "type": "object",
               "properties": {
                 "velocitySigma": {
@@ -2798,6 +2870,42 @@
                     }
                   },
                   "required": ["pooled", "families"],
+                  "additionalProperties": false
+                },
+                "pressure": {
+                  "description": "With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its basis.",
+                  "type": "object",
+                  "properties": {
+                    "sigma": {
+                      "type": "number",
+                      "description": "Pressure sigma of each row, a fraction of its printed pressure over the factor of its basis."
+                    },
+                    "factors": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "factor": {
+                            "type": "number",
+                            "description": "The model peak pressure times this is what the basis reads: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only."
+                          },
+                          "rows": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "description": "Pressure rows of the basis of the powders fitted to velocities."
+                          }
+                        },
+                        "required": ["factor", "rows"],
+                        "additionalProperties": false
+                      },
+                      "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its training pressures are not read."
+                    }
+                  },
+                  "required": ["sigma", "factors"],
                   "additionalProperties": false
                 }
               },
@@ -3083,6 +3191,42 @@
           "required": ["grid", "shrinkage", "pooled", "families"],
           "additionalProperties": false
         },
+        "pressure": {
+          "description": "With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its basis.",
+          "type": "object",
+          "properties": {
+            "sigma": {
+              "type": "number",
+              "description": "Pressure sigma of each row, a fraction of its printed pressure over the factor of its basis."
+            },
+            "factors": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "factor": {
+                    "type": "number",
+                    "description": "The model peak pressure times this is what the basis reads: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only."
+                  },
+                  "rows": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991,
+                    "description": "Pressure rows of the basis of the powders fitted to velocities."
+                  }
+                },
+                "required": ["factor", "rows"],
+                "additionalProperties": false
+              },
+              "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its training pressures are not read."
+            }
+          },
+          "required": ["sigma", "factors"],
+          "additionalProperties": false
+        },
         "powders": {
           "type": "object",
           "propertyNames": {
@@ -3136,6 +3280,12 @@
               "pressureExponent": {
                 "description": "With `--exponent family`: the exponent of its family, the value fitted at it.",
                 "type": "number"
+              },
+              "pressureRows": {
+                "description": "With `--pressure-sigma`: used training rows whose printed pressure the fit read, those of a basis with a factor.",
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
               }
             },
             "required": [

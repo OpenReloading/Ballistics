@@ -7,7 +7,7 @@ import {
 import { compareKeys, type Powder, toSi } from '@open-reloading/schema'
 import { InputError, nth } from '@open-reloading/statistics'
 import { Refusal } from './errors.ts'
-import { type InteriorModel, loadOf, outcomes } from './evaluate.ts'
+import { type InteriorModel, loadOf, outcomes, predict } from './evaluate.ts'
 import type { Records } from './records.ts'
 import type { Row } from './rows.ts'
 import { percentile } from './stats.ts'
@@ -36,6 +36,8 @@ interface PowderFitValue {
   iterations: number
   /** With `--exponent family`: the exponent of its family, which the value was fitted at. */
   pressureExponent?: number
+  /** With pressure rows: its used rows that print a pressure. */
+  pressureRows?: number
 }
 
 /** A fitted value with the chi square of its fit, data and prior rows. */
@@ -47,8 +49,33 @@ const exponentGrid = [7, 8, 9, 10, 11, 12, 13].map((k) => k / 10)
 /** Weight of the pooled term in a family's choice, in powders; fixed before any result on real rows. */
 const shrinkage = 5
 
-/** The sessions of one powder's used training rows: one per load without its charge. */
-function sessionsOf(powder: string, rows: readonly Row[], records: Records, velocitySigma: number) {
+/** The pressure rows of a fit: the sigma, a fraction of the observed pressure, and the factor per basis (1 where absent). */
+interface PressureRun {
+  sigma: number
+  factors: Readonly<Record<string, number>>
+}
+
+/** The basis a row's printed pressure is grouped by, as the metrics group it. */
+export const basisOf = (row: Row) => row.pressureBasis ?? 'unstated'
+
+/** The factor of a row's printed pressure, undefined without a pressure or without a factor of its basis. */
+function factorOf(pressure: PressureRun | undefined, row: Row) {
+  const basis = basisOf(row)
+  // own keys only: a basis named like an Object.prototype member has no factor
+  if (!pressure || row.pressure === undefined || !Object.hasOwn(pressure.factors, basis)) return
+  return pressure.factors[basis]
+}
+
+/** The model a fit runs and the sigmas of its rows. */
+type FitRun = { model: InteriorModel; velocitySigma: number; pressure?: PressureRun | undefined }
+
+/** The sessions of one powder's used training rows, one per load without its charge; with `pressure`, a printed pressure over its basis factor is a point's peak pressure. */
+function sessionsOf(
+  powder: string,
+  rows: readonly Row[],
+  records: Records,
+  sigmas: { velocity: number; pressure?: PressureRun | undefined },
+) {
   const groups = new Map<string, Row[]>()
   for (const r of rows) {
     const key = JSON.stringify([
@@ -75,11 +102,17 @@ function sessionsOf(powder: string, rows: readonly Row[], records: Records, velo
       rifle: row.rifle ?? [row.cartridge, row.barrel, row.table].join('/'),
       lot: row.lot,
       load,
-      ladder: group.map((r) => ({
-        charge: toSi('mass', r.charge),
-        muzzleVelocity: r.velocity,
-        velocitySigma: velocitySigma * r.velocity,
-      })),
+      ladder: group.map((r) => {
+        const point = {
+          charge: toSi('mass', r.charge),
+          muzzleVelocity: r.velocity,
+          velocitySigma: sigmas.velocity * r.velocity,
+        }
+        const factor = factorOf(sigmas.pressure, r)
+        if (!sigmas.pressure || factor === undefined) return point
+        const peak = toSi('pressure', r.pressure as number) / factor
+        return { ...point, peakPressure: peak, pressureSigma: sigmas.pressure.sigma * peak }
+      }),
     }
   })
 }
@@ -103,11 +136,14 @@ function fitOne(
   vivacity: { record: number; start: number },
   rows: readonly Row[],
   records: Records,
-  run: { model: InteriorModel; velocitySigma: number },
+  run: FitRun,
 ): Fitted | NotFitted {
   if (rows.length === 0) return 'noUsableRow'
   try {
-    const sessions = sessionsOf(id, rows, records, run.velocitySigma)
+    const sessions = sessionsOf(id, rows, records, {
+      velocity: run.velocitySigma,
+      pressure: run.pressure,
+    })
     const fit = fitPowderPooled(sessions, { interior: refusedAsInvalid(run.model) })
     const burn = fit.parameters.find((p) => p.kind === 'burnRate' && p.group === id)
     if (!burn) throw new Error(`no burn coefficient in the fit of ${id}`)
@@ -130,6 +166,9 @@ function fitOne(
       cartridges: new Set(rows.map((r) => r.cartridge)).size,
       chiSquarePerDegree: perDegree,
       iterations: fit.iterations,
+      ...(run.pressure && {
+        pressureRows: rows.filter((r) => factorOf(run.pressure, r) !== undefined).length,
+      }),
       chiSquare: fit.chiSquare,
     }
   } catch (error) {
@@ -146,7 +185,7 @@ function fitEach(
   ids: readonly string[],
   used: readonly Used[],
   records: Records,
-  run: { model: InteriorModel; velocitySigma: number },
+  run: FitRun,
   n?: number,
 ) {
   return new Map(
@@ -232,13 +271,54 @@ function familyExponents(
   }
 }
 
-/** The burn coefficient of each powder with interior parameters the rows name, fitted under `model` to its training rows that model can run, velocities corrected to the muzzle; `velocitySigma` is a fraction of the velocity; `exponent` `family` fits each at the pressure exponent its family chooses. */
+/** The fitted values and the reasons of the powders not fitted, from the fits of `fitEach`. */
+function fittedAndNot(fits: ReturnType<typeof fitEach>) {
+  const powders: Record<string, PowderFitValue> = {}
+  const notFitted: Record<string, NotFitted> = {}
+  for (const [id, fit] of fits) {
+    if (typeof fit === 'string') notFitted[id] = fit
+    else {
+      const { chiSquare: _, ...value } = fit
+      powders[id] = value
+    }
+  }
+  return { powders, notFitted }
+}
+
+/** Per basis of the `used` rows that print a pressure, of the powders `fit` holds, the exponential of the median log of printed over model peak pressure under that fit, and their number, bases sorted. */
+function basisFactors(
+  used: readonly Used[],
+  records: Records,
+  model: InteriorModel,
+  fit: ReturnType<typeof fittedAndNot>,
+) {
+  const fitted = withFit(records, fit)
+  const bases = new Map<string, number[]>()
+  for (const { row: r } of used) {
+    if (r.pressure === undefined || !Object.hasOwn(fit.powders, r.powder)) continue
+    const p = predict(r, fitted, model)
+    if (!('pressure' in p)) continue
+    const log = Math.log(toSi('pressure', r.pressure) / p.pressure)
+    bases.set(basisOf(r), [...(bases.get(basisOf(r)) ?? []), log])
+  }
+  // the median: a misprinted row or a powder with a minority of the basis's rows does not move the factor of the others
+  return Object.fromEntries(
+    [...bases]
+      .toSorted(([a], [b]) => compareKeys(a, b))
+      .map(([basis, list]) => [
+        basis,
+        { factor: Math.exp(percentile(list, 0.5) as number), rows: list.length },
+      ]),
+  )
+}
+
+/** The burn coefficient of each powder with interior parameters the rows name, fitted under `model` to its training rows that model can run, velocities corrected to the muzzle; `velocitySigma` is a fraction of the velocity; `exponent` `family` fits each at the pressure exponent its family chooses; with `pressureSigma`, a fraction of the pressure, the printed pressures over the factor of their basis join a second fit. */
 export function fitPowders(
   rows: readonly Row[],
   records: Records,
   model: InteriorModel,
   velocitySigma: number,
-  exponent?: 'family',
+  options: { exponent?: 'family' | undefined; pressureSigma?: number | undefined } = {},
 ) {
   const used = outcomes(rows, records, model, ['training']).flatMap((o) =>
     'velocity' in o.prediction ? [{ row: o.row, pressure: o.prediction.pressure }] : [],
@@ -247,17 +327,21 @@ export function fitPowders(
     .toSorted(compareKeys)
     .filter((id) => records.powders.get(id)?.interior)
   const fitAt = (n?: number) => fitEach(ids, used, records, { model, velocitySigma }, n)
-  const family = exponent === 'family' ? familyExponents(ids, records, fitAt) : undefined
-  const powders: Record<string, PowderFitValue> = {}
-  const notFitted: Record<string, NotFitted> = {}
-  for (const [id, fit] of family?.fits ?? fitAt()) {
-    if (typeof fit === 'string') notFitted[id] = fit
-    else {
-      const { chiSquare: _, ...value } = fit
-      powders[id] = value
-    }
+  if (options.exponent === 'family') {
+    const family = familyExponents(ids, records, fitAt)
+    return { ...fittedAndNot(family.fits), exponent: family.summary }
   }
-  return { powders, notFitted, ...(family && { exponent: family.summary }) }
+  const velocities = fittedAndNot(fitAt())
+  const { pressureSigma } = options
+  if (pressureSigma === undefined) return velocities
+  // the factor is what the basis has in common against the model fitted to velocities (the measuring method, the source, what the model lacks), so the pressure rows move a powder's burn coefficient only by its own deviation from the median of its basis; fitted together with the pressures, the burn coefficients would take part of that common offset
+  const factors = basisFactors(used, records, model, velocities)
+  const pressure = {
+    sigma: pressureSigma,
+    factors: Object.fromEntries(Object.entries(factors).map(([b, f]) => [b, f.factor])),
+  }
+  const fit = fittedAndNot(fitEach(ids, used, records, { model, velocitySigma, pressure }))
+  return { ...fit, pressure: { sigma: pressureSigma, factors } }
 }
 
 /** `records` with each fitted burn coefficient (and exponent) laid over its powder and without the interior parameters of a powder not fitted, whose rows then count as `noPowderModel`. */

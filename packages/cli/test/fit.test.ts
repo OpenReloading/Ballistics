@@ -11,6 +11,7 @@ vi.mock('@open-reloading/tools/catalog', async (original) =>
 
 const dp40 = 'demo-powder-dp40'
 const sp20 = 'demo-powder-sp20'
+const sp21 = 'demo-powder-sp21'
 
 const record = records.powders.get(dp40)
 if (!record?.interior) throw new Error(`${dp40} has no interior parameters`)
@@ -232,5 +233,66 @@ describe('the uncertainty of a fit', () => {
       { cartridge: '308-match', charge: 2.2, velocity: 0 },
     ]
     expect((await fitted(specs, 0.03))?.chiSquarePerDegree).toBeTypeOf('number')
+  })
+})
+
+describe('the pressure rows of a fit', () => {
+  /** Rows of dp40 and sp20 printed from the fixture records, the pressure of case-contact rows times 0.9 and of transducer rows times 1.1. */
+  const printed = (cartridges: string[]): Spec[] =>
+    [dp40, sp20].flatMap((powder) =>
+      cartridges.flatMap((cartridge, k) =>
+        [2.0, 2.2, 2.4].map((charge) => ({
+          cartridge,
+          powder,
+          charge,
+          velocity: 0,
+          ...(k % 2 === 0
+            ? { pressure: 1 / 0.9 - 1, pressureBasis: 'case-contact' }
+            : { pressure: 1 / 1.1 - 1, pressureBasis: 'transducer' }),
+        })),
+      ),
+    )
+  const training = printed(['30-br', '308-match'])
+  const rows = writeRows(rowsCsv(training))
+
+  it('finds a factor per basis and leaves the burn coefficients at the record values', async () => {
+    const r = await fit({ ...options, rows, pressureSigma: 0.05 })
+    expect(r.pressure?.factors['case-contact']?.factor).toBeCloseTo(0.9, 3)
+    expect(r.pressure?.factors.transducer?.factor).toBeCloseTo(1.1, 3)
+    expect(r.powders[dp40]?.factor).toBeCloseTo(1, 3)
+    expect(r.powders[sp20]?.factor).toBeCloseTo(1, 3)
+  })
+
+  it('moves the burn coefficient of a powder whose pressures are off its basis, and not the factor', async () => {
+    const off = ['308-match'].flatMap((cartridge) =>
+      [2.0, 2.2, 2.4].map((charge) => ({
+        cartridge,
+        powder: sp21,
+        charge,
+        velocity: 0,
+        pressure: 1 / (1.1 * 1.3) - 1,
+        pressureBasis: 'transducer',
+      })),
+    )
+    const r = await fit({
+      ...options,
+      rows: writeRows(rowsCsv([...training, ...off])),
+      pressureSigma: 0.05,
+    })
+    expect(r.pressure?.factors.transducer?.factor).toBeCloseTo(1.1, 3)
+    expect(r.powders[sp21]?.factor).toBeGreaterThan(1.03)
+  })
+
+  it('reports the factors in the evaluation and compares the held-out pressures with the model peak as it is', async () => {
+    const withValidation = writeRows(rowsCsv([...training, ...printed(['308-win', '308-win'])]))
+    const r = await verify({
+      ...options,
+      rows: withValidation,
+      params: 'fit-on-training',
+      pressureSigma: 0.05,
+    })
+    expect(r.fit?.pressure?.factors['case-contact']?.factor).toBeCloseTo(0.9, 3)
+    expect(r.fit?.pressure?.factors.transducer?.factor).toBeCloseTo(1.1, 3)
+    expect(r.overall.pressure?.median).toBeCloseTo(0.101, 3)
   })
 })
