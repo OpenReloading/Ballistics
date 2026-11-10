@@ -23,6 +23,7 @@ The competition events page (**Competition events**, `/events`, linked from the 
 | Notes                            | Plain text.                                                                                                      |
 
 The event type sets how the event is scored ([Competition scoring](../models/competition-scoring.md)):
+
 - **Ring series** (DSB): each series holds its ring values ("10 9 10.5", tenths where the discipline scores them) or only its total, and may name a saved target sheet. The event total is the sum of the series.
 - **Practical stages** (IPSC, USPSA): each stage holds its hits per zone (A, C, D, metal), misses, no-shoots, procedurals, time and power factor; the page shows its points and hit factor. Major is offered only in a division the type gives a major rating. Stage points need the best hit factor of all competitors, so the event total is the sum of the stage points you type from the official result, and it shows only when every stage has them.
 
@@ -35,6 +36,7 @@ Saving an event with a firearm that has a round count asks once whether to add t
 ## Print and export
 
 With an event open, Print, Export CSV and Export JSON take that event; with none open, the list of events.
+
 - **Print** of an open event gives its facts, one line per series or stage with its total or points and hit factor, and the event total.
 - **Export CSV** writes `openreloading-events-<day>.csv`, UTF-8 with a byte order mark, one row per series or stage (an event without results has one row), the event's columns repeated on each:
 
@@ -60,4 +62,5 @@ With an event open, Print, Export CSV and Export JSON take that event; with none
 | `Stage points`                       | As typed from the official result.                                      |
 
 A text a spreadsheet would read as a formula starts with an apostrophe.
+
 - **Export JSON** writes `openreloading-events-<day>.json`, a user data file with the events. **Import JSON** reads it back: new events are added, equal ones left, and events that differ from the browser's are replaced after one question. The firearms, loads and target sheets the events name are not in the file.

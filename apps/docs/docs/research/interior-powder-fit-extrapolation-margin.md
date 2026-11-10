@@ -13,6 +13,7 @@ description: How the coverage of the powder fit interval falls with the distance
 ## Method
 
 Synthetic ladders from the [M3 model](../models/interior-m3.md), fitted with `fitPowder` and predicted with `predictPowder` and `powderPressureRange`, 200 replicates per world with fixed seeds. Measured on the default branch before every axis had a domain (only the charge was flagged).
+
 - Load: the synthetic rifle-like load of the core powder fit tests (0.6 m barrel, 6.9 mm bore), burn coefficient 0.45 1/s as truth. The fit starts at 0.38 and fits the burn coefficient only (the default).
 - Ladders: "narrow", 5 charges from 2.2 to 2.6 g, velocity noise 4 m/s (1 sigma, given as `velocitySigma`, so the normal quantile at level 0.9); "narrow+p", the same with pressure rows of 5 % uncertainty; "wide", 6 charges from 1.9 to 2.7 g; "two-barrels", the narrow charges at 0.5 and 0.6 m.
 - Truth worlds, applied to the data and to the true values:

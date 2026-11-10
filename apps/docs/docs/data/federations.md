@@ -7,6 +7,7 @@ description: The records of shooting sport federations, the disciplines their ru
 # Federations, disciplines and target mappings
 
 Three record kinds describe who defines a discipline, what the discipline is and which target scores it. Ring scoring starts from them: a federation, then a discipline, then the target (see [Ring scoring](../models/ring-scoring.md)).
+
 - Every value is read from a rule book that the target records already cite, with its section and page. A value the rule book does not state stays absent.
 - Schemas: `packages/schema/src/federation.ts`.
 - Records: `packages/catalog/records/federations/`, `disciplines/`, `target-mappings/` and `caliber-classes/`.
@@ -92,6 +93,7 @@ Disciplines with the fact set, of the disciplines of each federation (stage valu
 | `timeLimits`                 | 58         | 72        | 27       | 62       | 11        | 8        | 13       | 2        | 3       | 15         |
 
 A gap is a fact the rule books leave open, or a fact that one record cannot hold:
+
 - **Open in all ten rule books:** minimum muzzle energy, minimum and maximum bullet mass (stated only for the few disciplines counted above), and handload rules outside the disciplines counted. Limits written as a power factor, a momentum or a maximum energy have no stored quantity and are not recorded.
 - **Barrel length:** stated for handgun disciplines; the rifle tables of the German rule books print the length of the whole system, which is no barrel length.
 - **Free or as issued:** where a rule book says "any" or "as the original" for trigger weight, firearm mass or magnification, the field is absent.
@@ -110,6 +112,7 @@ Muzzle-loading disciplines carry no caliber classes: the classes group cartridge
 ## Target mapping
 
 `records/target-mappings/<id>.json`, schema `targetMapping`. One record per target event:
+
 - the discipline, the target and the id of the target event that scores it
 - where the rule book states them: the `stage` (a discipline with a precision and a rapid-fire part has one mapping per target; a discipline whose caliber groups shoot on different targets has one mapping per target with the groups as its `stage`), the scoring `gauge` the number of record shots `shotCount` (sighters not counted) and the stage's own `sighters`, `seriesShots` and `timeLimits` (as in [Rule facts](#rule-facts))
 
@@ -126,6 +129,7 @@ A target with `photoSearch: false` is skipped by the photo target search. The us
 ## Validation
 
 `pnpm run data:validate` (`packages/catalog/src/federations.ts`, `checkFederations`) reports:
+
 - a discipline whose `federation` names no record
 - an `internationalFederation` or `internationalDiscipline` link to a record that is not of an international federation, or to no record
 - a mapping whose discipline, target or target event does not exist, whose event belongs to another federation than the discipline's, or whose gauge differs from the event's
@@ -174,6 +178,7 @@ A discipline without a number follows the numbered ones of its federation and is
 ## Ring scoring
 
 The group panel of `/groups` (`apps/web/src/components/ring-scoring.tsx`, `apps/web/src/lib/face-disciplines.ts`) has these lists:
+
 1. Federation: All, or one federation, by abbreviation.
 2. Discipline: the disciplines of that federation in the default order. With All, every federation in turn, then the target events no mapping names by federation and name.
 3. Target: the targets of the discipline's mappings with their stage, in the order of the stages, else every target by name. With only a federation chosen, the targets its disciplines map to and the targets it publishes.

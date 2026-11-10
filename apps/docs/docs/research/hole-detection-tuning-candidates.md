@@ -13,6 +13,7 @@ Hole detection: does a change of one detector setting (or the confidence tier) b
 ## Method
 
 Decided before the runs.
+
 - Tuning set: 566 third-party target photos that earlier measurements have already scored. Every candidate is measured on it, and it decides which candidates go on.
 - Holdout, first batch: 62 new target photos from 39 source posts that no earlier measurement or candidate has used. A cropped re-post of a tuning photo, and photos of the same shooter and setup as a tuning photo, were left out. They are stratified by target type and photo quality and sealed. No candidate reads them until a person has checked their labels. A candidate set may look at them at most three times in total, with the aggregates logged after each look.
 - Holdout label check: a person checked every proposed mark on a phone page, moved or added marks and marked photos as unusable. The corrected marks (proposed marks with moved ones at their new place, plus added marks) are the ground truth, and unusable photos are not scored. An unresolved region the person resolved by adding marks counts as resolved. The verdict counts of the check are not a measure of the annotating model.
@@ -111,7 +112,7 @@ measured. Third-party target photos, model-made annotations, the runner and per-
 
 ## Where in the app
 
-- `apps/web/src/lib/hole-detection.ts` (the detector constants; unchanged).
+- `packages/target-recognition/src/hole-detection.ts` (the detector constants; unchanged).
 - `apps/web/src/lib/hole-proposals.ts` (the confidence tier; unchanged).
 - [Hole detection](../models/hole-detection.md), Quality bar: no measured result meets the default bar.
 

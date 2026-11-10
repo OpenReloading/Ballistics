@@ -1,12 +1,15 @@
 /** The target paper in a photo without a marked region: its light area by Otsu's threshold, as a convex hull. */
-import { clamp, components, rectangle } from '@open-reloading/target-recognition'
+import type { Point } from '@open-reloading/shot-groups'
+import { nth } from '@open-reloading/statistics'
 import type { RgbaImage } from './image.ts'
-import { nth } from './nth.ts'
-import type { Point } from './target-geometry.ts'
+import { clamp, components, rectangle } from './raster-ops.ts'
 
 // Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the loop bounds keep the index in range
 const f32 = (a: Float32Array, i: number) => a[i] as number
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the loop bounds keep the index in range
 const f64 = (a: Float64Array, i: number) => a[i] as number
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the loop bounds keep the index in range
 const u8 = (a: Uint8Array | Uint8ClampedArray, i: number) => a[i] as number
 
 /** Own rule: the hull of the largest light area, or the whole photo when that is under a tenth or the two tones differ by less than 40. */
@@ -15,7 +18,7 @@ export function paperOutline(image: RgbaImage): Point[] {
   const whole = rectangle({ x: 0, y: 0, width: W, height: H })
   const s = Math.max(1, Math.ceil(Math.max(W, H) / 256))
   const [w, h] = [Math.ceil(W / s), Math.ceil(H / s)]
-  const lum = luminance(image, 0, 0, W, H, s, w, h)
+  const lum = luminance(image, { x0: 0, y0: 0, x1: W, y1: H }, { s, w, h })
   const hist = new Float64Array(256)
   for (const v of lum) {
     const bin = Math.round(clamp(v, 0, 255))
@@ -32,7 +35,11 @@ export function paperOutline(image: RgbaImage): Point[] {
   const parts = components(light, w, h)
   const paper = parts.reduce((a, b) => (b.length > a.length ? b : a), [] as number[])
   if (paper.length < 0.1 * w * h) return whole
-  // per row its first and last block, as image px at the outer block edges
+  return convexHull(rowEnds(paper, w, s)).map((p) => ({ x: clamp(p.x, 0, W), y: clamp(p.y, 0, H) }))
+}
+
+/** Per row of blocks its first and last block of `paper`, as image px at the outer block edges. */
+function rowEnds(paper: readonly number[], w: number, s: number): Point[] {
   const ends = new Map<number, [number, number]>()
   for (const i of paper) {
     const [x, y] = [i % w, Math.floor(i / w)]
@@ -42,25 +49,28 @@ export function paperOutline(image: RgbaImage): Point[] {
   const pts: Point[] = []
   for (const [y, [a, b]] of ends)
     for (const yy of [y, y + 1]) pts.push({ x: a * s, y: yy * s }, { x: (b + 1) * s, y: yy * s })
-  return convexHull(pts).map((p) => ({ x: clamp(p.x, 0, W), y: clamp(p.y, 0, H) }))
+  return pts
+}
+
+const cross = (o: Point, a: Point, b: Point) =>
+  (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x)
+
+/** One chain of the hull of the sorted `list`, without its last point. */
+function half(list: Point[]): Point[] {
+  const out: Point[] = []
+  for (const q of list) {
+    while (out.length >= 2 && cross(nth(out, out.length - 2), nth(out, out.length - 1), q) <= 0)
+      out.pop()
+    out.push(q)
+  }
+  out.pop()
+  return out
 }
 
 /** Convex hull, counter-clockwise (y down: clockwise on screen), by the monotone chain (A. M. Andrew, 1979). */
 function convexHull(points: Point[]): Point[] {
-  const p = [...points].sort((a, b) => a.x - b.x || a.y - b.y)
-  const cross = (o: Point, a: Point, b: Point) =>
-    (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x)
-  const half = (list: Point[]) => {
-    const out: Point[] = []
-    for (const q of list) {
-      while (out.length >= 2 && cross(nth(out, out.length - 2), nth(out, out.length - 1), q) <= 0)
-        out.pop()
-      out.push(q)
-    }
-    out.pop()
-    return out
-  }
-  return [...half(p), ...half([...p].reverse())]
+  const p = points.toSorted((a, b) => a.x - b.x || a.y - b.y)
+  return [...half(p), ...half(p.toReversed())]
 }
 
 /** Otsu's threshold of a histogram of `n` values: the last bin of the lower class. */
@@ -83,13 +93,8 @@ export function otsu(hist: Float64Array, n: number): number {
 /** Luma (ITU-R BT.601 weights, 0..255) of the crop, averaged over s x s blocks. */
 function luminance(
   img: RgbaImage,
-  x0: number,
-  y0: number,
-  x1: number,
-  y1: number,
-  s: number,
-  w: number,
-  h: number,
+  { x0, y0, x1, y1 }: { x0: number; y0: number; x1: number; y1: number },
+  { s, w, h }: { s: number; w: number; h: number },
 ) {
   const sum = new Float32Array(w * h)
   const count = new Float32Array(w * h)

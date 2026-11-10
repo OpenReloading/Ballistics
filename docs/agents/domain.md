@@ -1,6 +1,7 @@
 # Domain Docs
 
 Single context: one glossary for the whole monorepo. Skills that explore the codebase read, when present:
+
 - `GLOSSARY.md` at the repository root.
 - `docs/adr/`: ADRs that touch the area being changed.
 

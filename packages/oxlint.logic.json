@@ -180,6 +180,8 @@
           "assertType",
           "expectClose",
           "expectIssueAt",
+          "expectHoles",
+          "expectTop",
           "rejectsAt",
           "rejectsWith",
           "accepts"

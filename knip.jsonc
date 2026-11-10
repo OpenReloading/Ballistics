@@ -17,8 +17,7 @@
       "entry": ["src/index.ts"]
     },
     "packages/ui": {
-      // the Lingui CLI reads its configuration
-      "entry": ["src/index.ts", "lingui.config.ts", "test/message-ids.ts"],
+      "entry": ["src/index.ts", "test/message-ids.ts"],
       // css/ui.css imports it, and knip reads no CSS
       "ignoreDependencies": ["@fontsource-variable/inter"]
     },
@@ -49,7 +48,7 @@
       "entry": ["src/index.ts", "src/advisory-text.ts"]
     },
     "packages/target-recognition": {
-      "entry": ["src/index.ts"]
+      "entry": ["src/index.ts", "test/fixtures/target-photos/make.mts"]
     },
     "packages/drawing": {
       // the bullet records of data are read by path in the tests, declared so the CI plan tests drawing with them
@@ -102,8 +101,7 @@
         "scripts/glyph-advances.mts",
         "src/service-worker.js",
         // scripts/service-worker.mts copies every export into out/sw.js through a namespace import
-        "src/lib/offline.ts",
-        "test/fixtures/target-photos/make.mts"
+        "src/lib/offline.ts"
       ]
     },
     "apps/e2e": {

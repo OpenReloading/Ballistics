@@ -68,6 +68,7 @@ Shots needed for a relative half-width of the interval:
 ## Result
 
 improved. Adopted with a caveat, as described in [Groups](../models/groups.md#velocity-strings):
+
 - The chi-square interval, not a bootstrap: it is exact for normal strings and uses the existing quantile. Caveat shown with it: it assumes roughly normal velocities; a stray shot or a skewed string makes it too narrow, so the real level is lower than the stated one (simulated: 76 to 90 percent for a stated 95 percent at 10 to 30 shots on such strings).
 - 95 percent by default (the default level of the group intervals), the level stated next to the interval.
 - Too few shots to rank below 10 shots: two strings whose intervals do not overlap are ranked only when each has 10 shots or more. Overlapping intervals read as a difference smaller than the uncertainty at any count. At 10 shots the intervals of two strings separate only when their standard deviations differ by a factor of 2.7 (1.83 / 0.69). No interval below 3 shots.

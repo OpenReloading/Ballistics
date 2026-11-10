@@ -13,6 +13,7 @@ Truing: do `trueMuzzleVelocity` and `trueDrag` recover the parameters that gener
 ## Method
 
 The tests generate observations with `trajectory` at tight tolerances ($10^{-10}$ relative) and fit them back. Accept limits, set in the tests:
+
 - Round trip: muzzle velocity 2 percent above and drag 5 percent below a 790 m/s, G7 0.3 shot; three heights (300, 600, 700 m) and one velocity (800 m). Both parameters within $10^{-6}$ relative at fixed bore angles, within $10^{-4}$ when every candidate is re-zeroed at 100 m. The modified point mass fit of the muzzle velocity alone within $10^{-6}$.
 - Vacuum parabola: no drag, no Coriolis term, one height of -0.4 m at 500 m with a 0.01 rad bore angle and 0.05 m sight height. The fitted velocity within $10^{-9}$ relative of the closed form.
 - One dimension: no gravity, a flat drag curve with $c_d$ 0.3 scaled by 1.1. Two exact velocities at 200 and 700 m: the factor within $10^{-8}$. Five velocities at 100 to 900 m with fixed noise and $\sigma$ = 2 m/s: factor and its standard uncertainty within $10^{-3}$ of the weighted regression of $\ln v$ on distance. Five exact velocities: the standard uncertainty within $10^{-6}$ of its closed form.

@@ -74,6 +74,7 @@ User records (browser and files) use the same shape and stored units as catalogu
 Properties that matter for ballistics: barrel length, twist and hand, chamber (through the cartridge), bore and groove diameter where known, mass (recoil), sight height (optic mount, typed by the user). Gas system, receiver, handguard and stock are descriptive parts, not numbers.
 
 Rules:
+
 - Ids are slugs and never change. A renamed maker or model keeps its id, the old name goes to `aliases`.
 - A model sold under different names in different regions is one model with the names as aliases.
 - A variant has one chamber: a model made in three calibers has three variants. A variant offered in two barrel lengths has two variants.
@@ -114,6 +115,7 @@ Rules:
 ## Follow-up issues
 
 Proposed, in order, each with acceptance criteria a test can check.
+
 1. **schema: firearm model and variant records.** Add `firearmModel`, `firearmVariant`, `manufacturer.country`. Accept: a valid example of each parses; `chamber.cartridge` is optional; twist and length are stored in mm, mass in g, years as counts; a variant without `model` is rejected; `verification` is required; the JSON Schema is written; `pnpm run docs:check` passes for the exports.
 2. **data: read and validate the new kinds.** Accept: `readRecords` reads `firearm-models` and `firearm-variants` folders; `data:validate` fails for a variant naming no model, a model naming no manufacturer, a `chamber.cartridge` naming no cartridge, a duplicate alias per manufacturer and a duplicate designation per model; demo records with invented names validate.
 3. **api: list and get endpoints.** Accept: `GET /v1/firearm-models` and `/v1/firearm-variants` with `q`, `manufacturer`, `cartridge`, paging, and `GET .../:id`; `pnpm run api:check` passes with the baseline rewritten in the same pull request; a test fixes the search order; the static API output (`writeStaticApi`) includes both lists.
@@ -127,6 +129,7 @@ Proposed, in order, each with acceptance criteria a test can check.
 ## Decision brief
 
 **Scope of the first release.** Recommended: **B**.
+
 - **A. Names only.** Keep the user firearm as it is; offer the manufacturer list in the editor as a suggestion. Smallest; the shooter still types barrel length and twist.
 - **B. Models and variants, build as a user record (recommended).** The schema of this page without barrel records, copy into the library, parts list on the user firearm. Delivers barrel length, twist, chamber and mass with the gun; later steps follow without breaking files.
 - **C. B plus barrel, receiver, handguard, stock and optic as catalogue records.** Far more sources to find and maintain; only the barrel carries ballistic data.

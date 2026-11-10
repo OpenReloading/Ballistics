@@ -91,6 +91,7 @@ $$
 Code: `packages/ballistics/src/exterior/drag.ts`, `onSegment`.
 
 A segment with $c_k = c_{k+1}$ returns $c_k$. The slope limit keeps $\lvert d_j\rvert \le 2\min(\lvert\Delta_{j-1}\rvert, \lvert\Delta_j\rvert)$, inside the monotonicity region of the cubic Hermite form. So:
+
 - the cubic stays within its two node values,
 - a local extremum at a node keeps slope 0,
 - a curve of non-negative nodes stays non-negative.

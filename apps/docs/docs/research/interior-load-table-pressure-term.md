@@ -15,6 +15,7 @@ Interior ballistics, load-table powder fit: can an assumed peak pressure at the 
 The overshoot was measured on 19457 maximum-load rows of the training and validation cartridges as the simulated peak breech pressure over the C.I.P. maximum pressure $p_\text{max}$ of the cartridge. Of 223 fitted powders, 85 have no printed pressure in their tables.
 
 Each powder was refitted on the training rows (vivacity and energy, the energy with a log-normal prior) with one added term per training maximum-load row:
+
 - (a) a pseudo-observation of the peak at $p_\text{max} - 50$ bar or at $0.9\, p_\text{max}$, relative sigma 10 %;
 - (b) a one-sided cap that only penalizes a peak above $p_\text{max}$, sigma 10 % or 3 %.
 
