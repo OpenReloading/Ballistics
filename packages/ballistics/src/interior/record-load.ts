@@ -3,6 +3,7 @@ import { InputError, need } from '../issue.ts'
 import { type ResistanceTerms, recordResistance } from './bore-resistance.ts'
 import { interiorLoad } from './load-file.ts'
 import type { InteriorLoad } from './model.ts'
+import { recordSensitivity } from './temperature-default.ts'
 import { type PowderInteriorRecord, powderModelValues } from './workbench-keys.ts'
 
 /** The powder record values {@link recordLoad} reads, in stored units. */
@@ -14,6 +15,8 @@ export interface RecordPowder {
         resistance?: ({ stress: { value: number } } & Omit<ResistanceTerms, 'stress'>) | undefined
       })
     | undefined
+  /** Grain form; its default sensitivity applies without `temperatureSensitivity`. */
+  grainForm?: string | undefined
   /** Burn-rate sensitivity: `reference` in K, `cold` and `hot` in 1/K. */
   temperatureSensitivity?:
     | { reference: { value: number }; cold: { value: number }; hot: { value: number } }
@@ -88,19 +91,12 @@ export function recordLoad(r: RecordRun): InteriorLoad {
     code: 'boreResistanceNeedsValues',
     params: { missing: [...missing] },
   })
-  const s = powder.temperatureSensitivity
+  const temperatureSensitivity = recordSensitivity(powder)?.sensitivity
   return {
     ...load,
     ...(resistance && { resistance }),
-    ...(s && {
-      propellant: {
-        ...load.propellant,
-        temperatureSensitivity: {
-          reference: s.reference.value,
-          cold: s.cold.value,
-          hot: s.hot.value,
-        },
-      },
+    ...(temperatureSensitivity && {
+      propellant: { ...load.propellant, temperatureSensitivity },
     }),
   }
 }
