@@ -25,11 +25,21 @@ describe('makerRows', () => {
     expect(rows).toEqual({ bullets: [{ id: 'b1' }, { id: 'b2' }] })
   })
 
-  it('decides by the sources alone: a derived powder that cites a maker leaves, a fitted one that does not stays', () => {
+  it('lists a record that cites a maker or a fitted source without an origin, and keeps the others', () => {
+    const open = { title: 'Fit to public data', origin: 'public' }
     const rows = makerRows(
-      bundleOf({ powders: [cited('p1', 'derived', maker), cited('p2', 'fitted', book)] }),
+      bundleOf({
+        powders: [
+          cited('p1', 'derived', maker),
+          cited('p2', 'fitted', open),
+          cited('p3', 'fitted', book),
+          cited('p4', 'derived', { title: 'Fit', kind: 'fitted' }, open),
+          cited('p5', 'derived', book),
+          cited('p6', 'fitted', open, { title: 'Country page', kind: 'published' }),
+        ],
+      }),
     )
-    expect(rows).toEqual({ powders: [{ id: 'p1' }] })
+    expect(rows).toEqual({ powders: [{ id: 'p1' }, { id: 'p3' }, { id: 'p4' }] })
   })
 
   it('keeps manufacturer records as identity records', () => {

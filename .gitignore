@@ -10,9 +10,10 @@ visual-check-out
 .schemathesis/
 /pages/
 /apps/web/public/api/
-# agent skills and setup state, installed per checkout
+# agent skills and setup state, installed per checkout, except the committed mantine-form skill
 /.agents/skills/
-/.claude/skills/
+/.claude/skills/*
+!/.claude/skills/mantine-form/
 /.benchkeeper/
 coverage
 packages/ui/src/locales/*.json

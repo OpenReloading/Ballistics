@@ -1,4 +1,4 @@
-import type { Change, CompareResult, Metrics, VerifyResult } from './result.ts'
+import type { Change, CompareResult, FitResult, Metrics, VerifyResult } from './result.ts'
 
 /** A fraction as percent with one decimal, `-` for none. */
 const pct = (x: number | null | undefined) => (x == null ? '-' : `${(100 * x).toFixed(1)}`)
@@ -96,5 +96,52 @@ export function compareTable(r: CompareResult): string {
       metricHead.map((h, i) => (i === 1 ? 'used' : h)),
       groups,
     ),
+  ].join('\n')
+}
+
+/** The line of the pressure rows of a fit, none without them. */
+function pressureLines(p: FitResult['pressure']) {
+  if (!p) return []
+  const bases = Object.entries(p.factors).map(
+    ([k, f]) => `, ${k} factor ${f.factor.toFixed(3)} (${f.rows} rows)`,
+  )
+  return [`pressure: sigma ${p.sigma}${bases.join('')}`]
+}
+
+/** `fit` as text: the version, one line per fitted powder, the exponents of `--exponent family`, the pressure rows and the powders not fitted. */
+export function fitTable(r: FitResult): string {
+  const notFitted = Object.entries(r.notFitted).map(([k, reason]) => `${k} ${reason}`)
+  const families = Object.entries(r.exponent?.families ?? {}).map(([k, f]) => `${k} ${f.exponent}`)
+  const e = r.energy
+  return [
+    `model ${r.model}  version ${r.modelVersion}`,
+    ...(e
+      ? [
+          `energy: factor ${e.factor} from ${e.pressureRows} pressure rows; priors own ${e.priors.own}, by base ${e.priors.byBase}, pooled ${e.priors.pooled}`,
+        ]
+      : []),
+    table(
+      [
+        'powder',
+        'rows',
+        'cartridges',
+        'vivacity',
+        'u',
+        'chi2/dof',
+        ...(r.exponent ? ['exponent'] : []),
+      ],
+      Object.entries(r.powders).map(([k, p]) => [
+        k,
+        `${p.rows}`,
+        `${p.cartridges}`,
+        p.vivacity.value.toPrecision(5),
+        p.vivacity.standardUncertainty.toPrecision(2),
+        p.chiSquarePerDegree === null ? '-' : p.chiSquarePerDegree.toFixed(2),
+        ...(r.exponent ? [`${p.pressureExponent}`] : []),
+      ]),
+    ),
+    ...(r.exponent ? [`exponent: pooled ${r.exponent.pooled}; ${families.join(', ')}`] : []),
+    ...pressureLines(r.pressure),
+    ...(notFitted.length > 0 ? [`not fitted: ${notFitted.join(', ')}`] : []),
   ].join('\n')
 }

@@ -157,6 +157,17 @@ export {
   type SkippedInput,
 } from './interior/fit-confidence.ts'
 export {
+  fitPowderPooled,
+  type PooledFitOptions,
+  type PooledParameterKind,
+  type PooledPowderFit,
+  type PooledPowderParameter,
+  type PooledPriors,
+  type PooledRequest,
+  type PooledResidual,
+  type PooledSession,
+} from './interior/fit-pooled.ts'
+export {
   fitPowderSessions,
   type HeldPowderParameter,
   type PowderSession,

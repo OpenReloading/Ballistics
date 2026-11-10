@@ -885,6 +885,114 @@
           },
           "required": ["rows", "velocity", "pressure", "pressureByBasis", "interval", "powders"],
           "additionalProperties": false
+        },
+        "fit": {
+          "description": "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`. With `--pressure-sigma`, `pressure` holds the basis factors of the fit; the pressure errors still compare the model's peak pressure as it is with the printed pressure.",
+          "type": "object",
+          "properties": {
+            "velocitySigma": {
+              "type": "number",
+              "description": "Velocity sigma of the fit, a fraction of the velocity."
+            },
+            "powders": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "description": "Powders fitted."
+            },
+            "notFitted": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string",
+                "enum": [
+                  "unresolved",
+                  "invalid",
+                  "not-converged",
+                  "ill-conditioned",
+                  "underdetermined",
+                  "noUsableRow"
+                ]
+              },
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "description": "Powders not fitted, by reason; a reason without powders is left out."
+            },
+            "exponent": {
+              "description": "With `--exponent family`: the pressure exponents of the fit.",
+              "type": "object",
+              "properties": {
+                "pooled": {
+                  "type": "number",
+                  "description": "The exponent of least mean chi square over all powders that entered."
+                },
+                "families": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "description": "By powder family, the exponent it chose."
+                }
+              },
+              "required": ["pooled", "families"],
+              "additionalProperties": false
+            },
+            "pressure": {
+              "description": "With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its basis.",
+              "type": "object",
+              "properties": {
+                "sigma": {
+                  "type": "number",
+                  "description": "Pressure sigma of each row, a fraction of its printed pressure over the factor of its basis."
+                },
+                "factors": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "factor": {
+                        "type": "number",
+                        "description": "The model peak pressure times this is what the basis reads: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only."
+                      },
+                      "rows": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Pressure rows of the basis of the powders fitted to velocities."
+                      }
+                    },
+                    "required": ["factor", "rows"],
+                    "additionalProperties": false
+                  },
+                  "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its training pressures are not read."
+                }
+              },
+              "required": ["sigma", "factors"],
+              "additionalProperties": false
+            },
+            "energy": {
+              "description": "With `--energy prior`.",
+              "type": "object",
+              "properties": {
+                "factor": {
+                  "type": "number",
+                  "description": "The energy-level factor the prior impetus values were scaled by."
+                }
+              },
+              "required": ["factor"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["velocitySigma", "powders", "notFitted"],
+          "additionalProperties": false
         }
       },
       "required": [
@@ -1796,6 +1904,114 @@
                 "powders"
               ],
               "additionalProperties": false
+            },
+            "fit": {
+              "description": "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`. With `--pressure-sigma`, `pressure` holds the basis factors of the fit; the pressure errors still compare the model's peak pressure as it is with the printed pressure.",
+              "type": "object",
+              "properties": {
+                "velocitySigma": {
+                  "type": "number",
+                  "description": "Velocity sigma of the fit, a fraction of the velocity."
+                },
+                "powders": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991,
+                  "description": "Powders fitted."
+                },
+                "notFitted": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string",
+                    "enum": [
+                      "unresolved",
+                      "invalid",
+                      "not-converged",
+                      "ill-conditioned",
+                      "underdetermined",
+                      "noUsableRow"
+                    ]
+                  },
+                  "additionalProperties": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "description": "Powders not fitted, by reason; a reason without powders is left out."
+                },
+                "exponent": {
+                  "description": "With `--exponent family`: the pressure exponents of the fit.",
+                  "type": "object",
+                  "properties": {
+                    "pooled": {
+                      "type": "number",
+                      "description": "The exponent of least mean chi square over all powders that entered."
+                    },
+                    "families": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": "number"
+                      },
+                      "description": "By powder family, the exponent it chose."
+                    }
+                  },
+                  "required": ["pooled", "families"],
+                  "additionalProperties": false
+                },
+                "pressure": {
+                  "description": "With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its basis.",
+                  "type": "object",
+                  "properties": {
+                    "sigma": {
+                      "type": "number",
+                      "description": "Pressure sigma of each row, a fraction of its printed pressure over the factor of its basis."
+                    },
+                    "factors": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "factor": {
+                            "type": "number",
+                            "description": "The model peak pressure times this is what the basis reads: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only."
+                          },
+                          "rows": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "description": "Pressure rows of the basis of the powders fitted to velocities."
+                          }
+                        },
+                        "required": ["factor", "rows"],
+                        "additionalProperties": false
+                      },
+                      "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its training pressures are not read."
+                    }
+                  },
+                  "required": ["sigma", "factors"],
+                  "additionalProperties": false
+                },
+                "energy": {
+                  "description": "With `--energy prior`.",
+                  "type": "object",
+                  "properties": {
+                    "factor": {
+                      "type": "number",
+                      "description": "The energy-level factor the prior impetus values were scaled by."
+                    }
+                  },
+                  "required": ["factor"],
+                  "additionalProperties": false
+                }
+              },
+              "required": ["velocitySigma", "powders", "notFitted"],
+              "additionalProperties": false
             }
           },
           "required": ["model", "modelVersion", "interval", "overall", "byFamily", "byPowder"],
@@ -2623,6 +2839,114 @@
                 "powders"
               ],
               "additionalProperties": false
+            },
+            "fit": {
+              "description": "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`. With `--pressure-sigma`, `pressure` holds the basis factors of the fit; the pressure errors still compare the model's peak pressure as it is with the printed pressure.",
+              "type": "object",
+              "properties": {
+                "velocitySigma": {
+                  "type": "number",
+                  "description": "Velocity sigma of the fit, a fraction of the velocity."
+                },
+                "powders": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991,
+                  "description": "Powders fitted."
+                },
+                "notFitted": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string",
+                    "enum": [
+                      "unresolved",
+                      "invalid",
+                      "not-converged",
+                      "ill-conditioned",
+                      "underdetermined",
+                      "noUsableRow"
+                    ]
+                  },
+                  "additionalProperties": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "description": "Powders not fitted, by reason; a reason without powders is left out."
+                },
+                "exponent": {
+                  "description": "With `--exponent family`: the pressure exponents of the fit.",
+                  "type": "object",
+                  "properties": {
+                    "pooled": {
+                      "type": "number",
+                      "description": "The exponent of least mean chi square over all powders that entered."
+                    },
+                    "families": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": "number"
+                      },
+                      "description": "By powder family, the exponent it chose."
+                    }
+                  },
+                  "required": ["pooled", "families"],
+                  "additionalProperties": false
+                },
+                "pressure": {
+                  "description": "With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its basis.",
+                  "type": "object",
+                  "properties": {
+                    "sigma": {
+                      "type": "number",
+                      "description": "Pressure sigma of each row, a fraction of its printed pressure over the factor of its basis."
+                    },
+                    "factors": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "factor": {
+                            "type": "number",
+                            "description": "The model peak pressure times this is what the basis reads: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only."
+                          },
+                          "rows": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "description": "Pressure rows of the basis of the powders fitted to velocities."
+                          }
+                        },
+                        "required": ["factor", "rows"],
+                        "additionalProperties": false
+                      },
+                      "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its training pressures are not read."
+                    }
+                  },
+                  "required": ["sigma", "factors"],
+                  "additionalProperties": false
+                },
+                "energy": {
+                  "description": "With `--energy prior`.",
+                  "type": "object",
+                  "properties": {
+                    "factor": {
+                      "type": "number",
+                      "description": "The energy-level factor the prior impetus values were scaled by."
+                    }
+                  },
+                  "required": ["factor"],
+                  "additionalProperties": false
+                }
+              },
+              "required": ["velocitySigma", "powders", "notFitted"],
+              "additionalProperties": false
             }
           },
           "required": ["model", "modelVersion", "interval", "overall", "byFamily", "byPowder"],
@@ -2773,6 +3097,347 @@
         "baseline",
         "candidate",
         "change"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "notice": {
+          "type": "string",
+          "const": "simulation, not load data"
+        },
+        "command": {
+          "type": "string",
+          "const": "fit"
+        },
+        "inputs": {
+          "type": "object",
+          "properties": {
+            "rows": {
+              "type": "string",
+              "description": "SHA-256 over the SHA-256 of each rows file."
+            },
+            "records": {
+              "type": "string",
+              "description": "SHA-256 over the records the rows name."
+            }
+          },
+          "required": ["rows", "records"],
+          "additionalProperties": false
+        },
+        "published": {
+          "description": "With `--rows catalogue` or a folder of published loads: what the files gave.",
+          "type": "object",
+          "properties": {
+            "files": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "description": "Published load files read."
+            },
+            "rows": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "description": "Rows they gave: one per printed charge with a velocity."
+            },
+            "skipped": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string",
+                "enum": ["noVelocity", "customerTable", "noPowderRecord", "noCartridge"]
+              },
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "description": "Printed charges that gave no row, by reason; a reason without charges is left out."
+            }
+          },
+          "required": ["files", "rows", "skipped"],
+          "additionalProperties": false
+        },
+        "model": {
+          "type": "string",
+          "description": "The name or module path the model was selected by."
+        },
+        "modelVersion": {
+          "type": "string",
+          "description": "SHA-256 over the model and fit sources, the params line, the records the rows name and the rows bytes."
+        },
+        "split": {
+          "type": "string",
+          "const": "training",
+          "description": "The split whose rows the fit reads."
+        },
+        "velocitySigma": {
+          "type": "number",
+          "description": "Velocity sigma of each row, a fraction of its velocity."
+        },
+        "exponent": {
+          "description": "With `--exponent family`: the pressure exponent each powder family chose; each powder is fitted at the exponent of its family.",
+          "type": "object",
+          "properties": {
+            "grid": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "description": "The exponents chosen from."
+            },
+            "shrinkage": {
+              "type": "number",
+              "description": "Weight of the pooled term in a family's choice, in powders."
+            },
+            "pooled": {
+              "type": "number",
+              "description": "The exponent of least mean chi square over all powders that entered."
+            },
+            "families": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "exponent": {
+                    "type": "number",
+                    "description": "The exponent of least sum of its powders' chi squares plus `shrinkage` times the mean over all powders that entered."
+                  },
+                  "powders": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991,
+                    "description": "Its powders that entered the sum."
+                  }
+                },
+                "required": ["exponent", "powders"],
+                "additionalProperties": false
+              },
+              "description": "By powder family, `<propellant base>/<grain form>` of the powder record. A powder enters the sums when it was fitted at every exponent of the grid."
+            }
+          },
+          "required": ["grid", "shrinkage", "pooled", "families"],
+          "additionalProperties": false
+        },
+        "pressure": {
+          "description": "With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its basis.",
+          "type": "object",
+          "properties": {
+            "sigma": {
+              "type": "number",
+              "description": "Pressure sigma of each row, a fraction of its printed pressure over the factor of its basis."
+            },
+            "factors": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "factor": {
+                    "type": "number",
+                    "description": "The model peak pressure times this is what the basis reads: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only."
+                  },
+                  "rows": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991,
+                    "description": "Pressure rows of the basis of the powders fitted to velocities."
+                  }
+                },
+                "required": ["factor", "rows"],
+                "additionalProperties": false
+              },
+              "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its training pressures are not read."
+            }
+          },
+          "required": ["sigma", "factors"],
+          "additionalProperties": false
+        },
+        "powders": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "vivacity": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "number",
+                    "description": "Fitted burn coefficient, in the unit of the record."
+                  },
+                  "standardUncertainty": {
+                    "type": "number",
+                    "description": "Of the fit, scaled by the root of the chi square per degree of freedom where that is above 1."
+                  }
+                },
+                "required": ["value", "standardUncertainty"],
+                "additionalProperties": false,
+                "description": "The record burn coefficient times `factor`."
+              },
+              "factor": {
+                "type": "number",
+                "description": "Fitted over record burn coefficient; with another exponent than the record it also holds the change of the meaning of the coefficient."
+              },
+              "rows": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991,
+                "description": "Used training rows of the powder."
+              },
+              "cartridges": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991,
+                "description": "Their distinct cartridges."
+              },
+              "chiSquarePerDegree": {
+                "description": "Chi square of every row, data and the prior rows of the rifle and lot effects, over all rows minus all parameters; null where that count is not above 0.",
+                "type": ["number", "null"]
+              },
+              "iterations": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991,
+                "description": "Iterations of the solver."
+              },
+              "pressureExponent": {
+                "description": "With `--exponent family`: the exponent of its family, the value fitted at it.",
+                "type": "number"
+              },
+              "pressureRows": {
+                "description": "With `--pressure-sigma`: used training rows whose printed pressure the fit read, those of a basis with a factor.",
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "energy": {
+                "description": "With `--energy prior`.",
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "number",
+                    "description": "Specific energy laid over the record, J/kg: the prior impetus times the energy-level factor of `energy.factor`, over the record's `interior.gamma` minus 1."
+                  },
+                  "prior": {
+                    "type": "string",
+                    "enum": ["own", "base", "pooled"],
+                    "description": "Where the prior impetus came from: `own`, the powder's thermochemistry; `base`, the median of the own impetus values of its propellant base; `pooled`, the median of all own impetus values."
+                  }
+                },
+                "required": ["value", "prior"],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "vivacity",
+              "factor",
+              "rows",
+              "cartridges",
+              "chiSquarePerDegree",
+              "iterations"
+            ],
+            "additionalProperties": false
+          },
+          "description": "By powder id: each powder fitted on its own."
+        },
+        "notFitted": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "string",
+            "enum": [
+              "unresolved",
+              "invalid",
+              "not-converged",
+              "ill-conditioned",
+              "underdetermined",
+              "noUsableRow"
+            ]
+          },
+          "description": "By powder id, why a powder with interior parameters that the rows name got no value: the reason of the fit (with `--exponent family`, of the fit at the exponent of its family), or `noUsableRow` without a used training row."
+        },
+        "energy": {
+          "description": "With `--energy prior`: each powder's energy is its prior impetus times one energy-level factor shared by all powders, over its `interior.gamma` minus 1, chosen on the training pressures; per powder only the burn coefficient is fitted.",
+          "type": "object",
+          "properties": {
+            "factor": {
+              "type": "number",
+              "description": "The chosen energy-level factor, the grid value with the least objective."
+            },
+            "grid": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "description": "The energy-level factors tried, one fit each."
+            },
+            "objective": {
+              "type": "array",
+              "items": {
+                "type": ["number", "null"]
+              },
+              "description": "Per grid value, the median of |ln(model peak / printed pressure)| over the same rows at every value that takes part: the training rows that print a pressure in bar and have a model peak at every such value, so only rows of powders fitted at all of them. A value takes part when at least 90 % of the powders fitted at any value are fitted at it; null where it does not."
+            },
+            "pressureRows": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "description": "Rows of the objective, the same at every factor that takes part."
+            },
+            "priors": {
+              "type": "object",
+              "properties": {
+                "own": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "byBase": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "pooled": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["own", "byBase", "pooled"],
+              "additionalProperties": false,
+              "description": "How many powders took each kind of prior, of the powders the rows name that have interior parameters, fitted or not."
+            }
+          },
+          "required": ["factor", "grid", "objective", "pressureRows", "priors"],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "notice",
+        "command",
+        "inputs",
+        "model",
+        "modelVersion",
+        "split",
+        "velocitySigma",
+        "powders",
+        "notFitted"
       ],
       "additionalProperties": false
     }

@@ -1,4 +1,4 @@
-/** A burn coefficient (and on request a temperature factor) per powder, a velocity offset per rifle and a burn offset per lot, fitted to many sessions at once with prediction intervals that hold a model-error term (`apps/docs/docs/models/interior-powder-fit.md`, "Pooled fit over rifles, powders and lots"); velocities only, SI in and out. */
+/** A burn coefficient (and on request a temperature factor) per powder, a velocity offset per rifle and a burn offset per lot, fitted to many sessions at once with prediction intervals that hold a model-error term (`apps/docs/docs/models/interior-powder-fit.md`, "Pooled fit over rifles, powders and lots"); velocities and, where a point carries one, peak pressures; SI in and out. */
 
 import {
   checkLogFitLimits,
@@ -26,7 +26,7 @@ export interface PooledSession {
   barrelLength?: number | undefined
   /** Propellant temperature of the session, K; default the load's. */
   propellantTemperature?: number | undefined
-  /** Charges with mean velocities and `velocitySigma` on every point; no pressures. */
+  /** Charges with mean velocities and `velocitySigma` on every point; a point may add `peakPressure` with its `pressureSigma`, compared with the peak breech pressure; a point's `pressureBasis` is not read, so the caller passes pressures of one basis or scales them itself. */
   ladder: readonly LadderPoint[]
 }
 
@@ -37,7 +37,7 @@ export type PooledTarget = Omit<PooledSession, 'ladder'>
 export type PooledRequest = 'burnRate' | 'temperatureFactor'
 
 /** Gaussian priors of the per-powder parameters, by powder name, in the form of `PowderPrior`. */
-type PooledPriors = Readonly<
+export type PooledPriors = Readonly<
   Record<string, Partial<Record<PooledRequest, PowderPrior | undefined>> | undefined>
 >
 
@@ -57,16 +57,18 @@ export interface PooledFitOptions {
   maxCondition?: number | undefined
   /** Integration settings of every `interior` run; default `interiorDefaults`. */
   options?: Settings<InteriorOptions> | undefined
+  /** The model every run of the fit calls, default the core `interior`; `predictPooled` and `calibratePooled` run the core model. */
+  interior?: typeof interior | undefined
 }
 
 /** Assumptions: a rifle moves the velocity by about 1 %, a lot the burn coefficient by about 3 %. */
 const pooledDefaults = { rifleSigma: 0.01, lotSigma: 0.03 }
 
 /** A powder's burn coefficient or temperature factor, a rifle's velocity factor, a lot's factor on its powder's burn coefficient. */
-type PooledParameterKind = 'burnRate' | 'temperatureFactor' | 'rifle' | 'lot'
+export type PooledParameterKind = 'burnRate' | 'temperatureFactor' | 'rifle' | 'lot'
 
 /** A fitted parameter of the pooled fit. Factors start at 1. */
-interface PooledPowderParameter {
+export interface PooledPowderParameter {
   /** Which parameter. */
   kind: PooledParameterKind
   /** The powder (burn coefficient, temperature factor, lot) or the rifle it belongs to. */
@@ -81,17 +83,19 @@ interface PooledPowderParameter {
   standardUncertainty: number
 }
 
-/** Observed and predicted velocity of one ladder point after the fit. */
-interface PooledResidual {
+/** Observed and predicted velocity or peak pressure of one data row after the fit. */
+export interface PooledResidual {
   /** Index of the session in the input. */
   session: number
   /** Charge mass, kg. */
   charge: number
-  /** Measured mean velocity, m/s. */
+  /** The muzzle velocity (m/s) or the peak pressure (Pa) of the point. */
+  kind: 'velocity' | 'pressure'
+  /** Measured mean velocity or peak pressure. */
   observed: number
-  /** Velocity of the fitted model, m/s. */
+  /** Of the fitted model: the velocity, or the peak breech pressure. */
   predicted: number
-  /** Predicted minus observed, m/s. */
+  /** Predicted minus observed. */
   residual: number
 }
 
@@ -111,11 +115,11 @@ export interface PooledPowderFit {
   conditionNumber: number
   /** Sum of squared weighted residuals of the ladder points and the prior rows. */
   chiSquare: number
-  /** The ladder points' share of `chiSquare`. */
+  /** The data rows' share of `chiSquare`: velocities and pressures. */
   dataChiSquare: number
-  /** Ladder points minus parameters. */
+  /** Data rows, velocities and pressures, minus parameters. */
   degreesOfFreedom: number
-  /** One per ladder point, sessions in input order. */
+  /** One per data row: each ladder point's velocity, then its pressure, sessions in input order. */
   residuals: PooledResidual[]
   /** Relative standard deviation of the model error: 0 from `fitPowderPooled`, estimated by `calibratePooled` from held-out strings. */
   modelError: number
@@ -220,7 +224,7 @@ function checkPooled(
   checkSessions(sessions)
 }
 
-/** Checks each session and its ladder points: velocities with sigmas only, conditions per session. */
+/** Checks each session and its ladder points: velocities with sigmas, a pressure with its sigma, conditions per session. */
 function checkSessions(sessions: readonly PooledSession[]) {
   for (const s of sessions) {
     need(s.ladder.length > 0, { code: 'sessionWithoutLadderPoint', params: {} })
@@ -238,7 +242,12 @@ function checkSessions(sessions: readonly PooledSession[]) {
         code: 'velocitySigmaMissing',
         params: {},
       })
-      need(x.peakPressure === undefined, { code: 'pooledFitVelocitiesOnly', params: {} })
+      need(positive(x.peakPressure), { code: 'ladderPressureNotPositive', params: {} })
+      need(positive(x.pressureSigma), { code: 'pressureSigmaNotPositive', params: {} })
+      need((x.peakPressure === undefined) === (x.pressureSigma === undefined), {
+        code: 'pressureWithoutSigma',
+        params: {},
+      })
       need(x.barrelLength === undefined && x.propellantTemperature === undefined, {
         code: 'barrelOrTemperatureOnPoint',
         params: {},
@@ -331,11 +340,14 @@ function priorRowsOf(
 /** The start of a pooled parameter: its kind, group and initial value. */
 type PooledStart = Omit<PooledPowderParameter, 'value' | 'standardUncertainty'>
 
-/** One ladder point of a session, with the indices of its parameters. */
+/** The velocity or the pressure of one ladder point of a session, with the indices of the parameters that move it. */
 interface PooledRow {
   session: number
   x: LadderPoint
-  /** Its velocity sigma, m/s; `checkSessions` makes every point carry one. */
+  kind: PooledResidual['kind']
+  /** Its velocity (m/s) or pressure (Pa). */
+  observed: number
+  /** Its sigma; `checkSessions` makes every velocity and pressure carry one. */
   sigma: number
   indices: ReturnType<typeof sessionIndices>
 }
@@ -347,14 +359,16 @@ interface PooledProblem {
   priorRows: ReturnType<typeof priorRowsOf>
   rows: PooledRow[]
   options: Settings<InteriorOptions> | undefined
-  /** Last interior velocity per session and charge; a rifle step reuses it. */
-  cache: Map<string, { burn: number; factor: number; velocity: number }>
+  /** The model the runs call. */
+  interior: typeof interior
+  /** Last interior run per session and charge; a rifle step and a point's pressure reuse it. */
+  cache: Map<string, { burn: number; factor: number; velocity: number; pressure: number }>
   /** Model runs so far. */
   runCount: number
 }
 
-/** Velocity of `row` at `theta`, or null when its run is invalid. */
-function pooledVelocity(
+/** Velocity or pressure of `row` at `theta`, or null when its run is invalid. */
+function pooledValue(
   problem: PooledProblem,
   row: PooledRow,
   theta: readonly number[],
@@ -367,12 +381,12 @@ function pooledVelocity(
   let hit = problem.cache.get(key)
   if (hit?.burn !== b || hit.factor !== factor) {
     problem.runCount++
-    const r = interior(targetLoad(s, row.x.charge, b, factor), problem.options)
+    const r = problem.interior(targetLoad(s, row.x.charge, b, factor), problem.options)
     if (!r.valid) return null
-    hit = { burn: b, factor, velocity: r.muzzleVelocity }
+    hit = { burn: b, factor, velocity: r.muzzleVelocity, pressure: r.peakBreechPressure }
     problem.cache.set(key, hit)
   }
-  return hit.velocity * Math.exp(at(theta, rifle))
+  return row.kind === 'pressure' ? hit.pressure : hit.velocity * Math.exp(at(theta, rifle))
 }
 
 /** Prediction of row `run` at `theta`, or of its prior pseudo-row after the rows. */
@@ -384,7 +398,7 @@ function predictPooledRun(
   const row = problem.rows[run]
   return row === undefined
     ? nth(theta, nth(problem.priorRows, run - problem.rows.length).k)
-    : pooledVelocity(problem, row, theta)
+    : pooledValue(problem, row, theta)
 }
 
 /** Predictions of every row and pseudo-row, or of `run` alone; null when a run is invalid. */
@@ -413,7 +427,7 @@ function pooledMoves(problem: PooledProblem, j: number, run: number): boolean {
   return Object.values(row.indices).includes(j)
 }
 
-/** The least-squares fit of the velocities and the prior pseudo-rows. */
+/** The least-squares fit of the velocities, the pressures and the prior pseudo-rows. */
 function solvePooled(
   problem: PooledProblem,
   limits: { maxIterations: number; maxCondition: number },
@@ -424,11 +438,11 @@ function solvePooled(
   if (!start) throw new PowderFitError('invalid')
   return logLeastSquares({
     parameterCount: parameters.length,
-    observed: [...rows.map((r) => r.x.muzzleVelocity), ...priorRows.map((p) => p.centre)],
+    observed: [...rows.map((r) => r.observed), ...priorRows.map((p) => p.centre)],
     standardUncertainty: [...rows.map((r) => r.sigma), ...priorRows.map((p) => p.sigma)],
     weighted: true,
     // as in fitPowder: a Jacobian entry below 1e-6 of the observation per unit log parameter is noise
-    floor: [...rows.map((r) => (1e-6 * r.x.muzzleVelocity) / r.sigma), ...priorRows.map(() => 0)],
+    floor: [...rows.map((r) => (1e-6 * r.observed) / r.sigma), ...priorRows.map(() => 0)],
     first: start,
     predict: (theta, _current, run) => predictPooledRows(problem, theta, run),
     runs: [...rows, ...priorRows].map(() => 1),
@@ -441,39 +455,58 @@ function solvePooled(
   })
 }
 
-/** The velocity residual of each ladder point. */
+/** The residual of each data row. */
 const pooledResiduals = (rows: readonly PooledRow[], predicted: readonly number[]) =>
   rows.map((r, i): PooledResidual => {
     const value = nth(predicted, i)
     return {
       session: r.session,
       charge: r.x.charge,
-      observed: r.x.muzzleVelocity,
+      kind: r.kind,
+      observed: r.observed,
       predicted: value,
-      residual: value - r.x.muzzleVelocity,
+      residual: value - r.observed,
     }
   })
+
+/** The velocity row of a ladder point, then its pressure row, which the rifle's velocity factor does not move. */
+function pointRows(session: number, x: LadderPoint, indices: PooledRow['indices']): PooledRow[] {
+  const velocity: PooledRow = {
+    session,
+    x,
+    kind: 'velocity',
+    observed: x.muzzleVelocity,
+    sigma: x.velocitySigma ?? Number.NaN,
+    indices,
+  }
+  if (x.peakPressure === undefined) return [velocity]
+  const pressure: PooledRow = {
+    session,
+    x,
+    kind: 'pressure',
+    observed: x.peakPressure,
+    sigma: x.pressureSigma ?? Number.NaN,
+    indices: { ...indices, rifle: -1 },
+  }
+  return [velocity, pressure]
+}
 
 /** The rows of `sessions` and the prior pseudo-rows of a pooled fit of `parameters`. */
 function pooledProblem(
   sessions: readonly PooledSession[],
   parameters: readonly PooledStart[],
   priorRows: PooledProblem['priorRows'],
-  options: Settings<InteriorOptions> | undefined,
+  options: Pick<PooledFitOptions, 'options' | 'interior'>,
 ): PooledProblem {
   return {
     sessions,
     parameters,
     priorRows,
     rows: sessions.flatMap((s, session) =>
-      s.ladder.map((x) => ({
-        session,
-        x,
-        sigma: x.velocitySigma ?? Number.NaN,
-        indices: sessionIndices(parameters, s),
-      })),
+      s.ladder.flatMap((x) => pointRows(session, x, sessionIndices(parameters, s))),
     ),
-    options,
+    options: options.options,
+    interior: options.interior ?? interior,
     cache: new Map(),
     runCount: 0,
   }
@@ -539,7 +572,7 @@ export function fitPowderPooled(
     sessions,
     parameters,
     priorRowsOf(parameters, priors, rifleSigma, lotSigma),
-    options.options,
+    options,
   )
   const fit = solvePooled(problem, { maxIterations, maxCondition })
   return pooledFitResult(problem, fit, { held, rifleSigma, lotSigma })

@@ -3,6 +3,10 @@
   // The `exports` of the packages point into `dist`, which knip cannot map back to `src` (the build
   // uses another `rootDir` than `tsconfig.json`), so every entry file is listed with its source path.
   "workspaces": {
+    ".": {
+      // .mcp.json starts it with node -e, which knip does not read
+      "ignoreDependencies": ["@mantine/mcp-server"]
+    },
     "packages/units": {
       "entry": ["src/index.ts"]
     },
