@@ -82,7 +82,7 @@ type Stage = Stages['stages'][number]
 
 /** On screen, in print and in the docs: the score is the person's, not an official result. */
 const ownRecordLine = msg(
-  'Your own record, not an official result. The organiser publishes the official one.',
+  'Your own record, not an official result. The organizer publishes the official one.',
 )
 
 /** What the browser holds for the events: the events and the records they can link. */

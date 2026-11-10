@@ -1,24 +1,24 @@
 ---
 
 title: Blob detector against an area-count hole detector
-description: Why the hole detector on target photos uses a click-calibrated colour axis with a multi-scale blob detector, and which variants of automatic detection were dropped.
+description: Why the hole detector on target photos uses a click-calibrated color axis with a multi-scale blob detector, and which variants of automatic detection were dropped.
 ---
 
 # Blob detector against an area-count hole detector
 
 ## Question
 
-[Hole detection](../models/hole-detection.md): does a multi-scale blob detector on a click-calibrated colour axis find more holes than a morphological area-count detector, across the hole picked as the example and across photos, and which variants of automatic detection raise recall without more false proposals?
+[Hole detection](../models/hole-detection.md): does a multi-scale blob detector on a click-calibrated color axis find more holes than a morphological area-count detector, across the hole picked as the example and across photos, and which variants of automatic detection raise recall without more false proposals?
 
 ## Method
 
 Both detectors ran on the same photos with each marked hole in turn as the example, a marked region, and 0.75 of the hand-marked hole size as the bullet size. Metric: shots found at the worst example and at the median example per photo.
 
-Variants of automatic detection (8 seed runs, the 4 strongest blob peaks of each polarity) were tried on the photos not in the repository: (a) the union of the shots of all seed runs; (b) seeds restricted to the surface kind (black area or paper); (c) the size refinement that runs again at the refined hole size, without a recognised face.
+Variants of automatic detection (8 seed runs, the 4 strongest blob peaks of each polarity) were tried on the photos not in the repository: (a) the union of the shots of all seed runs; (b) seeds restricted to the surface kind (black area or paper); (c) the size refinement that runs again at the refined hole size, without a recognized face.
 
 ## Formulas
 
-Blobs are peaks of the scale-normalised Hessian response at scales tied to the expected hole diameter $D$, $\sigma = f D$ ([hole detection, blob response](../models/hole-detection.md#blob-response); after [Lindeberg 1998](../bibliography.md#lindeberg-1998)). The area-count detector divided the area of each connected dark part by the area of one expected hole.
+Blobs are peaks of the scale-normalized Hessian response at scales tied to the expected hole diameter $D$, $\sigma = f D$ ([hole detection, blob response](../models/hole-detection.md#blob-response); after [Lindeberg 1998](../bibliography.md#lindeberg-1998)). The area-count detector divided the area of each connected dark part by the area of one expected hole.
 
 ## Numbers
 

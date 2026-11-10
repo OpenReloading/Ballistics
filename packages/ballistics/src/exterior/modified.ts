@@ -17,7 +17,7 @@ export interface Aerodynamics {
   spinDamping?: CoefficientOverMach | undefined
   /** Axial moment of inertia, kg m2; uniform-cylinder estimate when absent. */
   axialInertia?: number | undefined
-  /** Transverse moment of inertia about the centre of mass, kg m2; estimated when absent. */
+  /** Transverse moment of inertia about the center of mass, kg m2; estimated when absent. */
   transverseInertia?: number | undefined
 }
 

@@ -55,7 +55,7 @@ Verdicts: place option 1 (existing pages) passes; option 2 (an overview page) an
 ## Result
 
 no change. Nothing was built; the review recommends:
-- Place: columns, notes, a link, prints and CSV on the existing pages. The filter becomes a link from the firearm's row to the discipline list with its caliber class filter set, so the discipline list gets no new control. It is labelled as the disciplines that name the class, not as the disciplines the firearm may shoot, because 172 disciplines state no class. A firearm whose cartridge is in no class (or is the user's own cartridge) gets no link.
+- Place: columns, notes, a link, prints and CSV on the existing pages. The filter becomes a link from the firearm's row to the discipline list with its caliber class filter set, so the discipline list gets no new control. It is labeled as the disciplines that name the class, not as the disciplines the firearm may shoot, because 172 disciplines state no class. A firearm whose cartridge is in no class (or is the user's own cartridge) gets no link.
 - Order: the Saved loads line and firearm list column (firearm, sessions, last session), gap and cartridge mismatch notes, CSV export, the discipline link, the dope card per firearm. Loads side by side and the data quality notes wait for the owner: the first is a new page, the second has no defined set of fields yet.
 - No stored field: the firearm keeps its cartridge and no category. A category stays additive if the list's category filter proves too coarse in use.
 

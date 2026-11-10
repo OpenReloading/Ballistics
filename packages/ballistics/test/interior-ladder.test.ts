@@ -20,7 +20,7 @@ describe('chargeLadder', () => {
     expect(chargeLadder(0.001, 0.0001, 5, 'up')[4]).toBe(0.001 + 4 * 0.0001)
   })
 
-  it('centres an odd count on the start charge, lowest first', () => {
+  it('centers an odd count on the start charge, lowest first', () => {
     const c = chargeLadder(0.0029, 0.0001, 5, 'around')
     for (const [i, v] of [0.0027, 0.0028, 0.0029, 0.003, 0.0031].entries())
       expect(Math.abs(nth(c, i) - v) / v).toBeLessThan(1e-14)

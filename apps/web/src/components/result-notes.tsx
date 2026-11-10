@@ -12,7 +12,7 @@ import { useScrolls } from './states.tsx'
 import { useResult } from './workbench-context.ts'
 import { type NoteKind, type Outcome, resultNotes } from './workbench-outcome.ts'
 
-/** The icon and word of each kind, so colour is never the only cue, and its group's heading. */
+/** The icon and word of each kind, so color is never the only cue, and its group's heading. */
 export const noteLooks: Record<
   NoteKind,
   { word: ReturnType<typeof msg>; group: ReturnType<typeof msg>; Icon: typeof Info }

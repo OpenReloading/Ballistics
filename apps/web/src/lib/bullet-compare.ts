@@ -99,7 +99,7 @@ function take(groups: Map<string, Map<string, CompareRow>>, group: Wording, star
   return [[found, row] as const]
 }
 
-/** The coefficient rows `ids`, taken out of the Ballistic coefficients group, labelled "BC G1", "BC G7". */
+/** The coefficient rows `ids`, taken out of the Ballistic coefficients group, labeled "BC G1", "BC G7". */
 function takeCoefficients(groups: Map<string, Map<string, CompareRow>>, ids: string[]) {
   const coefficients = groups.get(keyOf(msg('Ballistic coefficients')))
   return ids.flatMap((id) => {

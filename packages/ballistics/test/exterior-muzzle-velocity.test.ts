@@ -72,7 +72,7 @@ describe('muzzle velocity from a speed measured downrange', () => {
 })
 
 describe('muzzle velocity from downrange over seeded shots', () => {
-  it('has no mean bias over seeded shots across calibres, bullets and speeds through the transonic range', () => {
+  it('has no mean bias over seeded shots across calibers, bullets and speeds through the transonic range', () => {
     const next = seededUniforms(371)
     const calibres = [5.7, 6.17, 7.23, 7.85, 9.12, 10.57, 11.63]
     const bullets: [number, 'G1' | 'G7', number][] = [

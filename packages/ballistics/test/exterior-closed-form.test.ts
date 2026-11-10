@@ -239,7 +239,7 @@ describe('linear-theory stability', () => {
 })
 
 describe('linear-theory stability: damping exponents of the 168 gr case from the characteristic equation', () => {
-  // 168 gr, 0.308 in, sea-level density; per calibre of travel, xi'' + (H - iP) xi' - (M + iPT) xi = 0
+  // 168 gr, 0.308 in, sea-level density; per caliber of travel, xi'' + (H - iP) xi' - (M + iPT) xi = 0
   const mass = 168 * 6.479891e-5
   const d = 0.308 * 0.0254
   const c = (1.225 * (Math.PI / 4) * d ** 3) / (2 * mass)
@@ -292,7 +292,7 @@ describe('linear-theory stability: yaw modes of the rifle-scale case', () => {
     diameter: d,
     momentSlope: 3.0,
   }
-  // turning rates in rad per calibre of travel
+  // turning rates in rad per caliber of travel
   const pp = (i.axialInertia / i.transverseInertia) * ((i.spin * d) / v)
   const m =
     (i.density * (Math.PI / 4) * d ** 2 * d ** 3 * i.momentSlope) / (2 * i.transverseInertia)

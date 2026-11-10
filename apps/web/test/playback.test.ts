@@ -66,7 +66,7 @@ it('clamps before the first and after the last time', () => {
   expect(at(1)).toBe(r.points.at(-1))
 })
 
-it('interpolates linearly in time between neighbouring points', () => {
+it('interpolates linearly in time between neighboring points', () => {
   const at = sampler(r.points)
   const i = 100
   const [a = missing(), b = missing()] = [r.points[i], r.points[i + 1]]
@@ -143,7 +143,7 @@ it('gives the muzzle energy terms as shares of the released energy, unsent terms
   expect(e.shown.reduce((sum, t) => sum + t.share, 0)).toBeCloseTo(1, 12)
   expect(defined(e.shown[0]).value / r.muzzleEnergy).toBeCloseTo(1, 12)
 
-  // without rifling the spin term is 0 but modelled, so it stays listed
+  // without rifling the spin term is 0 but modeled, so it stays listed
   const smooth = energySplit(run({ twist: 0 }).energy)
   expect(smooth.shown.map((t) => [t.key, t.value === 0])).toEqual([
     ['translation', false],

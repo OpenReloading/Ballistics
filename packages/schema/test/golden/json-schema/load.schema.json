@@ -525,7 +525,7 @@
                     19,
                     21
                   ],
-                  "description": "Number of ladder steps, odd so the steps centre on the charge."
+                  "description": "Number of ladder steps, odd so the steps center on the charge."
                 },
                 "step": {
                   "type": "number",
@@ -535,7 +535,7 @@
                 "direction": {
                   "type": "string",
                   "const": "around",
-                  "description": "Steps centred on the charge (or seating length)."
+                  "description": "Steps centered on the charge (or seating length)."
                 }
               },
               "required": [
@@ -606,7 +606,7 @@
           "description": "Powders tab mode and filters (GLOSSARY `powders`)."
         }
       },
-      "description": "The typed solver values and the ladder the load is analysed with."
+      "description": "The typed solver values and the ladder the load is analyzed with."
     },
     "sessions": {
       "maxItems": 50,

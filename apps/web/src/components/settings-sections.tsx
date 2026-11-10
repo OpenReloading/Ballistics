@@ -45,7 +45,7 @@ function Appearance() {
   )
 }
 
-/** The language of the interface, labelled by its section's title. The names are each language's own, so one can be found from any. */
+/** The language of the interface, labeled by its section's title. The names are each language's own, so one can be found from any. */
 function LanguageChoice() {
   const { chosen } = useTranslation()
   return (

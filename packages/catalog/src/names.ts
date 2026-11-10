@@ -38,7 +38,7 @@ function duplicateOf(
     found = {
       file,
       finding: `duplicate-normalised-name:${norm}`,
-      message: `"${name}" normalises like a name of ${similar}`,
+      message: `"${name}" normalizes like a name of ${similar}`,
     }
     reported.add(norm)
   }

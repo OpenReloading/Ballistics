@@ -9,7 +9,7 @@ import { type ManufacturerNames, productLabel } from './manufacturers.ts'
 import { nth } from './nth.ts'
 import { say, type Wording, worded } from './wording.ts'
 
-/** Dash pattern per colour slot of the burn-rate charts: identity is not carried by colour alone. */
+/** Dash pattern per color slot of the burn-rate charts: identity is not carried by color alone. */
 export const dashes = ['', '8 4', '2 3', '12 3 3 3', '4 4', '6 2 1 2'] as const
 
 /** Number of standard uncertainties in the vivacity interval (2). */
@@ -118,7 +118,7 @@ const burnLawOf = (
   form: VivacityBurn['form'],
 ): VivacityBurn => ({ kind: 'vivacity', vivacity, exponent: 1, referencePressure, form })
 
-/** The powder's burn law, or the reason it has no curve; labelled with the name from `names`. */
+/** The powder's burn law, or the reason it has no curve; labeled with the name from `names`. */
 export function classifyPowder(
   p: BurnSource,
   names?: ManufacturerNames,
@@ -340,10 +340,10 @@ export function neighbours(rows: readonly PowderRow[], id: string, n = 5) {
 /** Powders in the overlay at once. */
 export const maxOverlay = 6
 
-/** A powder of the overlay and its colour slot. */
+/** A powder of the overlay and its color slot. */
 export type OverlayPick = { id: string; slot: number }
 
-/** The overlay of the URL's `?add=`: its ids in order, deduplicated, at most `max`, colour slots by place. */
+/** The overlay of the URL's `?add=`: its ids in order, deduplicated, at most `max`, color slots by place. */
 export function overlayFrom(search: string, max: number): OverlayPick[] {
   const add = (new URLSearchParams(search).get('add') ?? '').split(',').filter(Boolean)
   return [...new Set(add)].slice(0, max).map((id, slot) => ({ id, slot }))

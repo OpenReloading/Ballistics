@@ -54,7 +54,7 @@ describe('spansOf', () => {
 })
 
 describe('temperatureEnergyCheck', () => {
-  it('prints aggregates only and favours the fixed coefficient beyond the calibrated range when the truth has it', () => {
+  it('prints aggregates only and favors the fixed coefficient beyond the calibrated range when the truth has it', () => {
     const rows = [...truthRows([-10, 10, 30]), { ...base, charge: 2, velocity: 800, line: 9 }]
     const result = temperatureEnergyCheck(rows, records)
     expect(result).toMatchObject({ ladders: 1, rows: 9, skipped: { noTemperature: 1 } })

@@ -20,7 +20,7 @@ Four checks, accept rules fixed before the work:
 
 ## Formulas
 
-With the projectile held, the Noble-Abel energy balance gives the mean pressure from the burnt fraction ([closed vessel against closed forms](interior-closed-vessel-closed-forms.md)). With the normalised charge density $D = m_c / (V_c \rho_s)$ it reads
+With the projectile held, the Noble-Abel energy balance gives the mean pressure from the burnt fraction ([closed vessel against closed forms](interior-closed-vessel-closed-forms.md)). With the normalized charge density $D = m_c / (V_c \rho_s)$ it reads
 
 $$
 \bar p(z) = \frac{\Phi z}{1 + \chi z}, \qquad \Phi = \frac{(k - 1) Q \rho_s D}{1 - D}, \qquad \chi = \frac{(1 - \eta \rho_s) D}{1 - D}

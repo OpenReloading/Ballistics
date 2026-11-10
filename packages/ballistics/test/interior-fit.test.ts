@@ -457,7 +457,7 @@ describe('powder fit prior and robust loss', () => {
     expect(r.loss).toBe(r.chiSquare)
     const none = fitPowder(load(0.38), points)
     expect([none.priorChiSquare, none.dataChiSquare]).toEqual([0, none.chiSquare])
-    // a prior pulls the fit toward its centre
+    // a prior pulls the fit toward its center
     expect(Math.abs(Math.log(nth(r.parameters, 0).value / 0.3))).toBeLessThan(
       Math.abs(Math.log(nth(none.parameters, 0).value / 0.3)),
     )
@@ -539,7 +539,7 @@ const limitedTo = (axis: 'velocity' | 'pressure', range: { min: number; max: num
   predictPowder({ ...bandFit, domain: { ...domain, [axis]: range } }, 2.8e-3).extrapolation
 
 describe('powder fit prediction bands', () => {
-  it('is wider outside the fired range than at its centre and marks the extrapolation', () => {
+  it('is wider outside the fired range than at its center and marks the extrapolation', () => {
     const centre = predictPowder(bandFit, 2.8e-3)
     const below = predictPowder(bandFit, 2.4e-3)
     const above = predictPowder(bandFit, 3.2e-3)
@@ -777,7 +777,7 @@ describe('powder fit chamber volume factor with noise, priors and the start pres
     expect(Math.abs(f.value - 1.08)).toBeLessThan(3 * (f.standardUncertainty ?? 0))
   })
 
-  it('pulls the factor toward a prior centred on 1', () => {
+  it('pulls the factor toward a prior centered on 1', () => {
     const points = ladder(scaled(1.08), 3, 0, 1)
     const free = fitPowder(load(0.4), points, { parameters: pair })
     const held = fitPowder(load(0.4), points, {

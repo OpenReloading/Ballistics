@@ -38,7 +38,7 @@ export type Homography = readonly [
 export type Camera = {
   width: number
   height: number
-  /** Image px per face mm at the face centre, seen from the front. */
+  /** Image px per face mm at the face center, seen from the front. */
   pxPerMm: number
   /** Tilt of the face about the horizontal axis, degrees. */
   tilt?: number
@@ -46,13 +46,13 @@ export type Camera = {
   yaw?: number
   /** Roll of the photo, degrees. */
   roll?: number
-  /** Image position of the face centre, px; default the middle. */
+  /** Image position of the face center, px; default the middle. */
   at?: Point | undefined
   /** Distance of the camera in focal lengths of the 1 px/mm view: smaller is more perspective. */
   depth?: number
 }
 
-/** The homography of a pinhole camera that looks at the face centre. */
+/** The homography of a pinhole camera that looks at the face center. */
 function camera(c: Camera): Homography {
   const rad = Math.PI / 180
   const [tx, ty, tz] = [(c.tilt ?? 0) * rad, (c.yaw ?? 0) * rad, (c.roll ?? 0) * rad]
@@ -122,7 +122,7 @@ export type Scene = {
   /** Holes: face mm, diameter mm; drawn with this grey (default the paper's). */
   holes?: Array<{ x: number; y: number; diameter: number }>
   holeGrey?: number
-  /** Print marks (numerals): boxes centred at face mm, width and height in mm, drawn with this grey. */
+  /** Print marks (numerals): boxes centered at face mm, width and height in mm, drawn with this grey. */
   marks?: Array<{ x: number; y: number; width: number; height: number; grey: number }> | undefined
   /** Dark patches in image px: [x0, y0, x1, y1], grey. */
   patches?: Array<{ box: [number, number, number, number]; grey: number }>

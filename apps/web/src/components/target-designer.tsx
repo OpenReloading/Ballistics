@@ -172,7 +172,7 @@ export function TargetDesigner() {
             }
             title={
               part === 'fill'
-                ? t('Colour of the zone this ring line bounds on the outside.')
+                ? t('Color of the zone this ring line bounds on the outside.')
                 : undefined
             }
             data={colourOptions(part, t)}

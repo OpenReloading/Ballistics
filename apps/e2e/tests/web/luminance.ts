@@ -1,4 +1,4 @@
-/** Whether a computed `rgb(...)` colour looks dark: its relative luminance below middle grey (0.18). */
+/** Whether a computed `rgb(...)` color looks dark: its relative luminance below middle grey (0.18). */
 export function isDark(color: string): boolean {
   const [r = 0, g = 0, b = 0] = (color.match(/[\d.]+/g) ?? []).map(Number)
   const linear = (c: number) => {

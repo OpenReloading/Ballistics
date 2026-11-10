@@ -82,7 +82,7 @@ describe('drawing tokens', () => {
           variant,
         ).toBeGreaterThanOrEqual(4.5)
     })
-  // a token's colour: a hex value, or the `color-mix(in srgb, …)` of two tokens that --input-border is
+  // a token's color: a hex value, or the `color-mix(in srgb, …)` of two tokens that --input-border is
   const colour = (tokens: Map<string | undefined, string>, name: string): string => {
     const value = tokens.get(name) ?? missing()
     const mix = value.match(/^color-mix\(in srgb, var\((--[\w-]+)\) (\d+)%, var\((--[\w-]+)\)\)$/)
@@ -115,7 +115,7 @@ describe('drawing tokens', () => {
         for (const edge of ['--focus', '--input-border'])
           expect(ratio(colour(tokens, edge), ground), edge).toBeGreaterThanOrEqual(3)
       })
-  it('gives shot groups the light chart series colours', () => {
+  it('gives shot groups the light chart series colors', () => {
     const series = new Set([1, 2, 3, 4, 5, 6].map((k) => light.get(`--series-${k}`)))
     for (const colour of groupColours) expect(series.has(colour), colour).toBe(true)
   })

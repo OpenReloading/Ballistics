@@ -176,9 +176,11 @@ const loadAnalysisParser = z.object({
         kind: ladderKind,
         stepCount: z
           .literal([3, 5, 7, 9, 11, 13, 15, 17, 19, 21])
-          .describe('Number of ladder steps, odd so the steps centre on the charge.'),
+          .describe('Number of ladder steps, odd so the steps center on the charge.'),
         step: ladderStep,
-        direction: z.literal('around').describe('Steps centred on the charge (or seating length).'),
+        direction: z
+          .literal('around')
+          .describe('Steps centered on the charge (or seating length).'),
       }),
     ])
     .describe('The ladder of the load: step count, step size and direction.')
@@ -198,7 +200,7 @@ const loadAnalysisParser = z.object({
 })
 
 /**
- * What the load is analysed with: the typed solver values and the ladder.
+ * What the load is analyzed with: the typed solver values and the ladder.
  * Inferred type: {@link LoadAnalysis}.
  */
 export const loadAnalysis: z.ZodObject<{
@@ -360,7 +362,7 @@ const loadShape = z.object({
     .optional(),
   note: text(10000).describe('Notes of the load, plain text.').optional(),
   analysis: loadAnalysis
-    .describe('The typed solver values and the ladder the load is analysed with.')
+    .describe('The typed solver values and the ladder the load is analyzed with.')
     .optional(),
   sessions: z
     .array(ref('session'))
@@ -537,7 +539,7 @@ export const catalogueLoad: z.ZodType<CatalogueLoad> = load.refine(
 
 /** The solver values a load overrides, in stored units. */
 export interface AnalysisOverrides extends z.infer<typeof analysisOverrides> {}
-/** What a load is analysed with. */
+/** What a load is analyzed with. */
 export interface LoadAnalysis extends z.infer<typeof loadAnalysis> {}
 /** A cartridge recipe in stored units: references to its records, charge, seating and analysis. */
 export interface Load extends z.infer<typeof load> {}

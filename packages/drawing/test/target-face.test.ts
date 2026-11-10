@@ -59,7 +59,7 @@ describe('targetFaceFigure', () => {
     expect(lines[0]).not.toHaveProperty('square')
   })
 
-  it('fills the black area, or each ring in its colour when the rings have one', () => {
+  it('fills the black area, or each ring in its color when the rings have one', () => {
     expect(targetFaceFigure(flat).zones.map((z) => [z.colour, z.rx])).toEqual([
       ['white', 50],
       ['black', 30],
@@ -71,7 +71,7 @@ describe('targetFaceFigure', () => {
     expect(coloured.zones.map((z) => z.colour)).toEqual(['white', 'white', 'white', 'black'])
   })
 
-  it('draws a ring line white on the black zone and the ring line colour where given', () => {
+  it('draws a ring line white on the black zone and the ring line color where given', () => {
     const colours = (f: FaceShape) => targetFaceFigure(f).lines.map((l) => l.colour)
     expect(colours(flat)).toEqual(['black', 'black', 'white', 'white'])
     const red = {

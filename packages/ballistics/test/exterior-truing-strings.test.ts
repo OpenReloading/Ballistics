@@ -303,7 +303,7 @@ describe('weakly identified parameters in the reported model', () => {
 })
 
 describe('weakly identified parameters by the kind of entry', () => {
-  it('leaves the click value out when there are no dialled corrections', () => {
+  it('leaves the click value out when there are no dialed corrections', () => {
     const plan = planTruingStrings({
       shot: nominal,
       clickValue: click,
@@ -329,7 +329,7 @@ describe('weakly identified parameters by the kind of entry', () => {
     expect(plan.parameters.map((p) => p.status)).toEqual(['unresolved', 'unresolved', 'unresolved'])
   })
 
-  it('flags dialled corrections alone: the click value trades against the velocity', () => {
+  it('flags dialed corrections alone: the click value trades against the velocity', () => {
     const plan = planTruingStrings({
       shot: nominal,
       clickValue: click,

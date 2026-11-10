@@ -126,7 +126,7 @@ test('both sides are drawn at one scale', async ({ page }) => {
 test('a tall figure fits the window, no smaller than 11 px text', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 })
   await page.goto('/cartridges/12-7-x-108')
-  // the figure is in millimetres until the page has read the stored units
+  // the figure is in millimeters until the page has read the stored units
   await page.waitForLoadState('networkidle')
   const cip = page.locator('main')
   const drawing = cip

@@ -119,7 +119,7 @@ describe('checkNames', () => {
     ])
   })
 
-  it('skips the normalised comparison for names without ASCII letters or digits', () => {
+  it('skips the normalized comparison for names without ASCII letters or digits', () => {
     expect(lines({ cartridges: [cartridge('a', 'Винтовка'), cartridge('b', 'Патрон')] })).toEqual(
       [],
     )

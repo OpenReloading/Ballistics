@@ -11,7 +11,7 @@ export interface Model {
   /** The name or module path it was selected by. */
   name: string
   interior: InteriorModel
-  /** Absolute files of the model, labelled for the version hash. */
+  /** Absolute files of the model, labeled for the version hash. */
   files: { label: string; path: string }[]
 }
 

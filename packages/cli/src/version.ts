@@ -5,7 +5,8 @@ import type { Model } from './model.ts'
 import type { Records } from './records.ts'
 import type { Row } from './rows.ts'
 
-const sha256 = (data: string | Uint8Array) => createHash('sha256').update(data).digest('hex')
+/** The hex SHA-256 of `data`, the encoding of every hash of a model version. */
+export const sha256 = (data: string | Uint8Array) => createHash('sha256').update(data).digest('hex')
 
 /** The records the rows name, with the capacity or case the run takes for each cartridge, as `<kind>/<id>` lines. */
 function recordLines(rows: readonly Row[], records: Records): string[] {

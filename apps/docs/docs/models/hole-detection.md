@@ -1,14 +1,14 @@
 ---
 
 title: Hole detection
-description: Bullet hole proposals on a target photo from a colour axis, a multi-scale blob detector, a top-hat shape test and a count per connected part.
+description: Bullet hole proposals on a target photo from a color axis, a multi-scale blob detector, a top-hat shape test and a count per connected part.
 ---
 
 # Hole detection
 
 Proposes bullet holes on a target photo, inside a region or the printed target found on the photo:
-1. A colour axis separates the colour seen through a hole from its surroundings.
-2. A scale-normalised Hessian detector finds blobs on the projection onto that axis, at scales tied to the expected hole diameter.
+1. A color axis separates the color seen through a hole from its surroundings.
+2. A scale-normalized Hessian detector finds blobs on the projection onto that axis, at scales tied to the expected hole diameter.
 3. A top-hat against a morphological opening gives the hole shape. Three tests keep the real peaks.
 4. Each connected part of the hole mask counts as many shots as it holds peaks.
 
@@ -60,7 +60,7 @@ $$
 
 Code: `apps/web/src/lib/hole-detection.ts`, `workBlockSize`, `WORK_DIAMETER`, `MAX_WORK_PIXELS`.
 
-Each block holds the logarithm of its mean colour per channel $c \in \{R, G, B\}$:
+Each block holds the logarithm of its mean color per channel $c \in \{R, G, B\}$:
 
 $$
 F_c = \ln(\bar I_c + 8)
@@ -76,9 +76,9 @@ $$
 
 Code: `apps/web/src/lib/hole-proposals.ts`, `localPxPerM`.
 
-### Colour axis
+### Color axis
 
-The axis is Fisher's linear discriminant of the hole against the ring around it, in log RGB. The hole colour $\mu$ is the mean of the disc of radius $0.4 D$ at the picked hole ($0.28 D$ while the size is not known yet: $0.4$ times the smallest size $0.7 D$), or the logarithm of the backing colour an earlier example hole stored. The surroundings are the pixels from $1.0 D$ to $2.4 D$ around the pick on the same kind of surface (black area or paper), or a sample of the region. With their per-channel median $m$ and covariance $\Sigma$ (regularised on the diagonal):
+The axis is Fisher's linear discriminant of the hole against the ring around it, in log RGB. The hole color $\mu$ is the mean of the disc of radius $0.4 D$ at the picked hole ($0.28 D$ while the size is not known yet: $0.4$ times the smallest size $0.7 D$), or the logarithm of the backing color an earlier example hole stored. The surroundings are the pixels from $1.0 D$ to $2.4 D$ around the pick on the same kind of surface (black area or paper), or a sample of the region. With their per-channel median $m$ and covariance $\Sigma$ (regularized on the diagonal):
 
 $$
 w = \frac{(\Sigma + \epsilon I)^{-1} (\mu - m)}{\lVert (\Sigma + \epsilon I)^{-1} (\mu - m) \rVert}, \qquad \epsilon = \frac{0.02 \operatorname{tr}\Sigma}{3} + 10^{-5}
@@ -106,7 +106,7 @@ $$
 
 Code: `apps/web/src/lib/blob-detector.ts`, `sigmaOf`, `radiiOf`.
 
-The scales are $\sigma = f D$, with $f \in \{0.12, 0.17, 0.24, 0.34\}$ to find peaks plus $0.48$ to size holes, each realised by the nearest whole box radius of at least 1 (repeats dropped). The Hessian of the smoothed image $B$ comes from central differences. The scale-normalised response keeps blobs brighter than their surroundings in both directions. A ring line, with one eigenvalue near 0, gives none:
+The scales are $\sigma = f D$, with $f \in \{0.12, 0.17, 0.24, 0.34\}$ to find peaks plus $0.48$ to size holes, each realized by the nearest whole box radius of at least 1 (repeats dropped). The Hessian of the smoothed image $B$ comes from central differences. The scale-normalized response keeps blobs brighter than their surroundings in both directions. A ring line, with one eigenvalue near 0, gives none:
 
 $$
 \lambda_\mathrm{max} = \frac{L_{xx} + L_{yy}}{2} + \sqrt{\left(\frac{L_{xx} - L_{yy}}{2}\right)^2 + L_{xy}^2}, \qquad \mathcal{R} = \begin{cases} -\sigma^2 \lambda_\mathrm{max} & \lambda_\mathrm{max} \lt 0 \\ 0 & \text{otherwise} \end{cases}
@@ -114,7 +114,7 @@ $$
 
 Code: `apps/web/src/lib/blob-detector.ts`, `response`, `space`.
 
-Peaks are local maxima over space of the largest response over the scales, one per $0.8 D$, placed to sub-pixel by a parabola through the neighbours. A disc of radius $\rho$ gives its strongest response at $\sigma = \rho / \sqrt 2$, so the hole diameter at a peak is
+Peaks are local maxima over space of the largest response over the scales, one per $0.8 D$, placed to sub-pixel by a parabola through the neighbors. A disc of radius $\rho$ gives its strongest response at $\sigma = \rho / \sqrt 2$, so the hole diameter at a peak is
 
 $$
 D_\mathrm{hole} = 2\sqrt{2}\, \sigma^\ast
@@ -122,7 +122,7 @@ $$
 
 Code: `apps/web/src/lib/blob-detector.ts`, `peaksOf`, `sigmaAt`. `apps/web/src/lib/hole-detection.ts`, `D_OVER_SIGMA`.
 
-with $\sigma^\ast$ the scale of the strongest response, refined by a parabola in $\ln\sigma$ through the neighbouring scales.
+with $\sigma^\ast$ the scale of the strongest response, refined by a parabola in $\ln\sigma$ through the neighboring scales.
 
 ### Hole shape and tests
 
@@ -240,7 +240,7 @@ A mark within half a hole of the working image's edge leaves a run: a ring line 
 - the marks where the ring numerals stand, when the run or the seed runs hold three or more there. They stand on the target's axes, between two ring lines, within $\min(6\ \text{mm}, 0.3 g)$ of an axis, with $g$ the ring spacing;
 - the marks where the quarter marks of the black area stand, when three or more stand on different axes: on an axis within $0.5$ hole diameters of it and within one hole diameter of the black area's edge. The numerals' evidence from the other runs does not count for them.
 
-A hole on a numeral or a quarter mark makes a larger part than the print beside it. Of the marks where one kind of print stands, a mark whose part has a disc diameter $D_\mathrm{part}$ (the part's area per peak, as in the count per part) above 1.2 times the lower median of those of the group but within $1.4 D$ is a hole and stays. A larger part is print that merged with a neighbour, and the others are print:
+A hole on a numeral or a quarter mark makes a larger part than the print beside it. Of the marks where one kind of print stands, a mark whose part has a disc diameter $D_\mathrm{part}$ (the part's area per peak, as in the count per part) above 1.2 times the lower median of those of the group but within $1.4 D$ is a hole and stays. A larger part is print that merged with a neighbor, and the others are print:
 
 $$
 1.2\, \operatorname{median}_\mathrm{low} D_\mathrm{part} \lt D_\mathrm{part} \le 1.4\, D \Rightarrow \text{kept}
@@ -258,7 +258,7 @@ Code: `apps/web/src/lib/hole-detection.ts`, `dropPrintMarks`, `numeralRoll`, `RO
 
 ### Target area
 
-Without a marked region or a found target, the target is the convex hull of the largest light part of the photo. The luma of blocks of about 1/256 of the longer side is split at Otsu's threshold, the bin $t$ that maximises the between-class variance:
+Without a marked region or a found target, the target is the convex hull of the largest light part of the photo. The luma of blocks of about 1/256 of the longer side is split at Otsu's threshold, the bin $t$ that maximizes the between-class variance:
 
 $$
 Y = 0.299 R + 0.587 G + 0.114 B, \qquad t = \arg\max_t\, \omega_0(t)\, \omega_1(t) \left(\mu_0(t) - \mu_1(t)\right)^2
@@ -274,8 +274,8 @@ Code: `apps/web/src/lib/hole-detection.ts`, `offSheet`.
 
 ### Target
 
-The target search runs on the whole photo before a detection (`findFace`) and gives the scale, the centre and the target record:
-1. Black area: the grey levels on a grid of about 500 pixels on the longer side are cut at nine thresholds between their 2nd and 98th percentile. Each compact grey component is filled and fitted by a robust ellipse through its outline. A component the photo's edge cuts is fitted to its outline inside the photo only, and is kept when half of the ellipse and its centre lie in the photo. A candidate needs paper about it: at least 60 % of the points 1.1 to 1.3 times out from its ellipse that lie in the photo are lighter than its threshold, so a disc inside the black area bounded by a light ring line is no candidate.
+The target search runs on the whole photo before a detection (`findFace`) and gives the scale, the center and the target record:
+1. Black area: the grey levels on a grid of about 500 pixels on the longer side are cut at nine thresholds between their 2nd and 98th percentile. Each compact grey component is filled and fitted by a robust ellipse through its outline. A component the photo's edge cuts is fitted to its outline inside the photo only, and is kept when half of the ellipse and its center lie in the photo. A candidate needs paper about it: at least 60 % of the points 1.1 to 1.3 times out from its ellipse that lie in the photo are lighter than its threshold, so a disc inside the black area bounded by a light ring line is no candidate.
 2. Ring lines: Hessian ridges on a crop of up to 2.8 black radii, averaged so the black area is at most about 500 pixels across (a zoomed photo's thick lines stay lines), grouped by their radius relative to the black edge, one robust ellipse per group. When the black edge's ellipse is flatter than 0.9 (a sheet seen at a slant), the outer rings are not concentric with it on the photo and their relative radii run into each other: the conic pencil of the black edge and the ring farthest from it in radius (its ratio within 6 % of the mean radii's) maps the photo onto the target's plane, and the ridges are grouped again by their radius there.
 3. Targets: a target record with `photoSearch: false` is skipped. With a known scale (a calibrated sheet gives the photo's pixels per mm, `pxPerMm`) a target is skipped when the pixels per mm its black diameter needs for the black area's long semi-axis differ from that scale by more than 20 % (`SCALE_TOLERANCE`): targets with the same ring ratios at another size drop out. The black edge is the target's black diameter, which fixes a scale $s$ per target. A ring found at radius $\rho_j$ matches the target ring $r_i$ when $\lvert s r_i / \rho_j - 1 \rvert \le 0.03$, closest pairs first. A target ring is expected when it lies between 0.15 and 2.9 black radii and half of its line falls inside the photo: outer rings cut off by the photo's edge or beyond an insert card do not count against a target. With $a_j$ the share of the ring's ellipse its line covers, $e_j$ that relative error, $n_\mathrm{miss}$ the target rings expected and not found and $n_\mathrm{extra}$ the rings found that match none:
 
@@ -300,7 +300,7 @@ Code: `apps/web/src/lib/face-search.ts`, `findFace`, `holeSize`. `apps/web/src/l
 
 ### Detection without a picked hole
 
-1. The log luma is rescaled from its 0.5th to its 99.8th percentile in the region. Its four strongest blobs of each polarity each seed a colour axis and a run.
+1. The log luma is rescaled from its 0.5th to its 99.8th percentile in the region. Its four strongest blobs of each polarity each seed a color axis and a run.
 2. A run is kept when it finds at least two shots of alike size: no more than a quarter of the sizes lie off their median by more than 35 %, and that median is at least half the expected hole size. Grain of the photo, on a dark target with dark holes the strongest light blobs, gives alike blobs far below that size, and runs of them agree with each other more than the holes' runs do.
 3. The run whose shots the other runs find again most often (within $0.5 D$) is proposed, then run again on the full working image. The seed runs use a working image with holes of about 12 pixels (0.75 times 16).
 
@@ -310,7 +310,7 @@ Code: `apps/web/src/lib/hole-detection.ts`, `autoDetect`, `runSeeds`, `SEED_MIN_
 
 The target search also checks the photo, resized to 2000 px on its longer side, for what makes holes hard to find, and says what to change when retaking it. A problem has a level: fair (a note) or bad. A photo with a bad problem is below the minimum quality: when the target search finds exactly one sure fit, the run on an added photo applies the target and waits, and the button reads Detect anyway. With several fits or none the run goes on in the guided steps, which show no Detect anyway. Every other problem is a note beside the run. The check never says that a photo is good or that a detection is right. Taking a photo that passes these checks: [Taking a photo the app can score](../photo-guide.md). Where the app has a docs site, the Photo panel links that page and each note links the rule of it that matches its problem (`guideRule`): framing and no edge found to One target, all of it; tilt to Straight from above; contrast, brightness, glare and uneven light to Even light; hole size to Close enough; sharpness to Steady.
 
-With the black area found (ellipse axes $a \ge b$, centre $c$), the measures are:
+With the black area found (ellipse axes $a \ge b$, center $c$), the measures are:
 
 $$
 \theta = \arccos\frac{b}{a}, \qquad s_\mathrm{in} = \frac{\text{area of the ellipse inside the photo}}{\text{area of the ellipse}}
@@ -318,7 +318,7 @@ $$
 
 Code: `apps/web/src/lib/photo-quality.ts`, `photoQuality`. `apps/web/src/lib/face-image.ts`, `shareInside`.
 
-The paper level $P$ is the 75th percentile of the grey blocks in the ring from 1.12 to 1.4 radii of the ellipse, the black level $K$ the 20th percentile of the blocks inside 0.8 radii (a white zone inside the black area does not raise it), and the contrast is $P - K$. Without paper blocks in the frame (the black area fills it) there is no contrast. The grey blocks come from a grid of about 700 blocks on the longer side. Glare is the share of the ring's lit blocks (grey of 120 or more) that are saturated (250 or more), counted only while the median of the other lit blocks is at most 232, so a white scan is not glare. Uneven light is the spread of the median grey levels $m_j$ of the ring's four sides, left and right, above and below the centre (three sides suffice), relative to the largest:
+The paper level $P$ is the 75th percentile of the grey blocks in the ring from 1.12 to 1.4 radii of the ellipse, the black level $K$ the 20th percentile of the blocks inside 0.8 radii (a white zone inside the black area does not raise it), and the contrast is $P - K$. Without paper blocks in the frame (the black area fills it) there is no contrast. The grey blocks come from a grid of about 700 blocks on the longer side. Glare is the share of the ring's lit blocks (grey of 120 or more) that are saturated (250 or more), counted only while the median of the other lit blocks is at most 232, so a white scan is not glare. Uneven light is the spread of the median grey levels $m_j$ of the ring's four sides, left and right, above and below the center (three sides suffice), relative to the largest:
 
 $$
 u = \frac{\max_j m_j - \min_j m_j}{\max_j m_j}
@@ -335,7 +335,7 @@ The hole diameter on the photo as taken is $D_\mathrm{px} / k$ for the resize fa
 | Problem                                        | Fair from                 | Bad from                                              | Message and fix                                                                                                                                        |
 | ---------------------------------------------- | ------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Tilt, with the black area at least 0.9 inside  | $\theta > 30^\circ$       | $55^\circ$                                            | "The target is photographed at a slant of about N degrees." Retake from straight above, with the camera parallel to the paper.                         |
-| Framing, with no target selected or recognised | $s_\mathrm{in} < 0.9$     | $0.5$                                                 | "The black area of the target is cut off by the edge of the photo." Retake with the whole target and some paper around it in the frame.                |
+| Framing, with no target selected or recognized | $s_\mathrm{in} < 0.9$     | $0.5$                                                 | "The black area of the target is cut off by the edge of the photo." Retake with the whole target and some paper around it in the frame.                |
 | Sharpness                                      | $w / D_\mathrm{px} > 0.3$ | $0.6$                                                 | "The photo is soft: the edges of the target are blurred." Hold the camera steady or rest it on something, let it focus on the target and retake.       |
 | Hole size                                      | under 6 px                | 3.5 px                                                | "A bullet hole is only about N px across in this photo." Move closer so the target fills more of the frame, or use the full resolution of the camera.  |
 | Contrast, with a black area                    | $P - K < 80$              | $45$                                                  | "The black area and the paper are close in brightness." Retake with more light on the target and without a photo filter.                               |
@@ -345,7 +345,7 @@ The hole diameter on the photo as taken is $D_\mathrm{px} / k$ for the resize fa
 
 Without a black area and with no edge of a target or a hole found, the photo is reported at the bad level with "No edge of a target or a hole was found in this photo." and the fix "Retake with the target in the frame, in even light and held steady, or set the scale by hand." (the run is not held: with no target applied it already asks for the scale). With edges, a target without a black area (all white, or rings only) is not told that something is missing. Its size message reads "The photo is only N px on its longer side." with the hole size's fix, judged as a hole of one eightieth of the longer side (fair under 480 px, bad under 280 px).
 
-A selected target (the group's target record, or the target found for sure) is a hint, never a requirement: the photo may show only its centre, cut through its rings or show the whole sheet, so no ring, outer border or size is expected and none is warned about. The one thing used is whether a ring's fill is black (`layoutOf`; a record with no fills gives none, as do most records today). With a black zone, a photo with no black area found (it may fill the frame) is not judged by its brightness, and its darkest 5 % above grey level 110 (fair) or 150 (bad) says "The black zones of the target look grey." With a target without a black zone, a dark photo is at the bad level; without a target it stays at the fair level, since a photo filled by a black zone looks the same. The framing note is left out as soon as a target is known, and tilt is not given for a black area the frame cuts.
+A selected target (the group's target record, or the target found for sure) is a hint, never a requirement: the photo may show only its center, cut through its rings or show the whole sheet, so no ring, outer border or size is expected and none is warned about. The one thing used is whether a ring's fill is black (`layoutOf`; a record with no fills gives none, as do most records today). With a black zone, a photo with no black area found (it may fill the frame) is not judged by its brightness, and its darkest 5 % above grey level 110 (fair) or 150 (bad) says "The black zones of the target look grey." With a target without a black zone, a dark photo is at the bad level; without a target it stays at the fair level, since a photo filled by a black zone looks the same. The framing note is left out as soon as a target is known, and tilt is not given for a black area the frame cuts.
 
 Code: `apps/web/src/lib/photo-quality.ts`, `photoQuality`, `belowMinimum`, `layoutOf`, `limits`, `edgeWidth`, `edgeSharpness`, `gridMeasures`. `apps/web/src/lib/hole-detection.worker.ts`, `handleFace`. `apps/web/src/components/hole-detection.tsx`, `QualityNotes`.
 
@@ -359,15 +359,15 @@ Code: `apps/web/src/lib/photo-quality.ts`, `photoQuality`, `belowMinimum`, `layo
 | $D_\mathrm{px}$, $D$                    | Expected hole diameter in photo and in working pixels                                                                                | no kind     | px                 |
 | $b$                                     | Block size, photo pixels per working pixel                                                                                           | 1           | 1                  |
 | $W$, $H$                                | Width and height of the region with its margin                                                                                       | no kind     | px                 |
-| $\bar I_c$, $F_c$                       | Mean colour of a block (0 to 255) and its logarithm                                                                                  | no kind     | 1                  |
-| $\mu$, $m$, $\Sigma$                    | Hole colour, median and covariance of the surroundings in log RGB                                                                    | no kind     | 1                  |
-| $w$, $\Delta$                           | Unit colour axis and the separation of hole and surroundings along it                                                                | no kind     | 1                  |
+| $\bar I_c$, $F_c$                       | Mean color of a block (0 to 255) and its logarithm                                                                                   | no kind     | 1                  |
+| $\mu$, $m$, $\Sigma$                    | Hole color, median and covariance of the surroundings in log RGB                                                                     | no kind     | 1                  |
+| $w$, $\Delta$                           | Unit color axis and the separation of hole and surroundings along it                                                                 | no kind     | 1                  |
 | $\theta$, $s_\mathrm{in}$               | Tilt of the black area's plane and its share inside the photo                                                                        | degree, 1   | degree, 1          |
 | $P$, $K$, $u$                           | Paper level, black level (0 to 255) and the relative difference of the light between the paper's four sides                          | no kind     | 1                  |
-| $P$                                     | Projection onto the colour axis, 0 to 255                                                                                            | no kind     | 1                  |
+| $P$                                     | Projection onto the color axis, 0 to 255                                                                                             | no kind     | 1                  |
 | $r$, $\sigma$, $f$                      | Box radius, scale, scale over hole diameter                                                                                          | no kind     | px, px, 1          |
 | $L_{xx}, L_{yy}, L_{xy}$                | Second differences of the smoothed projection                                                                                        | no kind     | 1/px²              |
-| $\mathcal{R}$                           | Scale-normalised blob response                                                                                                       | no kind     | 1                  |
+| $\mathcal{R}$                           | Scale-normalized blob response                                                                                                       | no kind     | 1                  |
 | $D_\mathrm{hole}$, $D_\mathrm{part}$    | Hole diameter at a peak, disc diameter per shot of a part                                                                            | no kind     | px                 |
 | $r_5$, $c_5$                            | Median response and median top-hat contrast of the five strongest peaks                                                              | no kind     | 1                  |
 | $\kappa$                                | Share of $r_5$ a peak must reach                                                                                                     | 1           | 1                  |
@@ -388,7 +388,7 @@ Code: `apps/web/src/lib/photo-quality.ts`, `photoQuality`, `belowMinimum`, `layo
 
 ## Assumptions
 
-- A hole shows one colour, the backing seen through it, that differs from the paper or the black area around it along one direction in log RGB.
+- A hole shows one color, the backing seen through it, that differs from the paper or the black area around it along one direction in log RGB.
 - Holes are round blobs about the expected size, within 0.7 to 1.4 of it.
 - Overlapping holes form one connected part whose area is shared equally by its peaks.
 - With a found target, a dark mark on the black area and a light mark on the paper are print unless their confidence reaches 0.8, and marks where the ring numerals or the quarter marks of the black area stand are print when they appear at three or more places and are no larger than the print there (section Print on the target).
@@ -410,18 +410,18 @@ Code: `apps/web/src/lib/photo-quality.ts`, `photoQuality`, `belowMinimum`, `layo
 - The holes set the scale only when they stand on the black area and show lighter than it.
 - The target search does not read the ring numerals: on a photo of an insert card the targets whose inner rings stand in the same ratios are offered for the user to choose.
 - The photo scale comes from the sheet's calibration near the middle of the region. Perspective across the region is not corrected per hole.
-- On the printed zero target (Shot groups, Zero target) a run finds one polarity: the light holes in the black square need a region about the square, the dark holes on the paper a second run. The dark run over the whole sheet proposes nothing on the black square while the light holes in it lie inside it (0 proposals on the print of a synthetic render with five holes near the centre); the corner marks, the digits, the cross and the check bar give none. A light hole that cuts the square's edge encloses no area, so the dark run can still propose spots of the square near it (3 on a synthetic render with one such hole). Light holes in the square that merge into an area larger than a hole leave the square in the dark run too. A tight group of overlapping holes of either polarity around a hole-sized patch it leaves unshot is dropped as print when the group is thicker than $0.92 D$.
-- Research log: [blob detector against an area-count detector](../research/hole-detection-blob-detector.md), [target centre on a tilted photo](../research/hole-detection-target-centre.md), [rings needed to apply a target](../research/hole-detection-ring-match-count.md).
+- On the printed zero target (Shot groups, Zero target) a run finds one polarity: the light holes in the black square need a region about the square, the dark holes on the paper a second run. The dark run over the whole sheet proposes nothing on the black square while the light holes in it lie inside it (0 proposals on the print of a synthetic render with five holes near the center); the corner marks, the digits, the cross and the check bar give none. A light hole that cuts the square's edge encloses no area, so the dark run can still propose spots of the square near it (3 on a synthetic render with one such hole). Light holes in the square that merge into an area larger than a hole leave the square in the dark run too. A tight group of overlapping holes of either polarity around a hole-sized patch it leaves unshot is dropped as print when the group is thicker than $0.92 D$.
+- Research log: [blob detector against an area-count detector](../research/hole-detection-blob-detector.md), [target center on a tilted photo](../research/hole-detection-target-centre.md), [rings needed to apply a target](../research/hole-detection-ring-match-count.md).
 
 ## Sources
 
 - [Fisher 1936](../bibliography.md#fisher-1936): linear discriminant of two classes, pp. 179 to 188, equation numbers unverified.
-- [Lindeberg 1998](../bibliography.md#lindeberg-1998): scale-normalised derivatives and blob detection with automatic scale selection, section numbers unverified.
+- [Lindeberg 1998](../bibliography.md#lindeberg-1998): scale-normalized derivatives and blob detection with automatic scale selection, section numbers unverified.
 - [Serra 1982](../bibliography.md#serra-1982): erosion, dilation, opening and the top-hat, chapter numbers unverified.
 - [van Herk 1992](../bibliography.md#van-herk-1992), pp. 517 to 521, and [Gil 1993](../bibliography.md#gil-1993), pp. 504 to 507: running minimum and maximum with three comparisons per pixel.
 - [Felzenszwalb 2012](../bibliography.md#felzenszwalb-2012), pp. 415 to 428: Euclidean distance transform by the lower envelope of parabolas.
-- [Otsu 1979](../bibliography.md#otsu-1979), pp. 62 to 66: threshold that maximises the between-class variance.
+- [Otsu 1979](../bibliography.md#otsu-1979), pp. 62 to 66: threshold that maximizes the between-class variance.
 - [Andrew 1979](../bibliography.md#andrew-1979), pp. 216 to 219: convex hull by the monotone chain.
 - [ITU-R BT.601](../bibliography.md#itu-r-bt-601): luma weights, section number unverified.
 - [Fitzgibbon 1999](../bibliography.md#fitzgibbon-1999), pp. 476 to 480, in the form of [Halir 1998](../bibliography.md#halir-1998), pp. 125 to 132: direct least-squares ellipse fit.
-- [Gurdjos 2006](../bibliography.md#gurdjos-2006), pp. 238 to 252, and [Gurdjos 2002](../bibliography.md#gurdjos-2002), pp. 252 to 266: the centre and the plane of concentric circles seen in perspective.
+- [Gurdjos 2006](../bibliography.md#gurdjos-2006), pp. 238 to 252, and [Gurdjos 2002](../bibliography.md#gurdjos-2002), pp. 252 to 266: the center and the plane of concentric circles seen in perspective.

@@ -195,7 +195,7 @@ it('groups the powders without a curve by reason', () => {
   )
 })
 
-it('builds the overlay from ?add= only: no preset, the ids in order, colour slots by place', () => {
+it('builds the overlay from ?add= only: no preset, the ids in order, color slots by place', () => {
   expect(overlayFrom('', 6)).toEqual([])
   expect(overlayFrom('?add=x', 6)).toEqual([{ id: 'x', slot: 0 }])
   expect(overlayFrom('?add=a,b,a,,c', 6)).toEqual([

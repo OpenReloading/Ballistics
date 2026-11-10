@@ -11,7 +11,7 @@ Run them in the dev container (`.devcontainer/`): `devcontainer exec --workspace
 - Typecheck `pnpm run typecheck`, lint `pnpm run lint`, format and safe fixes `pnpm run format`.
 - Tests: `pnpm test` (all but the browser tests). End-to-end: `pnpm run static:build`; then, each left running, `pnpm run pages:serve` (the export, port 3003) and `pnpm --filter @open-reloading/api start` (the API, port 3000); then `pnpm run test:e2e`.
 - Records `pnpm run data:validate`; API contract `pnpm run api:check`, and `pnpm run api:conformance` against a running API.
-- Changed-files check: `pnpm run check:changed` (after `git fetch origin`): build, typecheck, lint and knip, then the tests CI's plan ([`apps/web/scripts/ci-plan.mts`](apps/web/scripts/ci-plan.mts)) picks for the changes since `origin/main`, uncommitted ones included: the workspaces changed and those that depend on them, every test group for a change outside the workspaces, none for prose.
+- Changed-files check: `pnpm run check:changed` (after `git fetch origin`): build, typecheck, lint, knip and the comment check, then the tests CI's plan ([`apps/web/scripts/ci-plan.mts`](apps/web/scripts/ci-plan.mts)) picks for the changes since `origin/main`, uncommitted ones included: the workspaces changed and those that depend on them, every test group for a change outside the workspaces, none for prose.
 
 ## Before you push
 
@@ -23,7 +23,7 @@ Run them in the dev container (`.devcontainer/`): `devcontainer exec --workspace
 
 - Reuse before reimplementing: before you write new logic, look for code that already does it, and extend or generalize that instead of building a parallel version.
 - Don't reinvent the wheel: when a well-maintained open-source package solves the problem (recent releases, a license in `allow-licenses` of [`.github/dependency-review-config.yml`](.github/dependency-review-config.yml), a size that fits the [weight budget](apps/web/weight-budget.json)), use it instead of writing our own, and name it and the reason in the pull request. A few lines of our own still beat a new dependency.
-- Comments only where the code cannot say it: one line, the why, not the how.
+- Comments only where the code cannot say it: one line, the why, not the how. `pnpm run check:changed` and CI fail a new multi-line comment outside the doc comments of the published API, and a reworded comment that drops a link, issue or decision reference ([`tools/src/comment-lines.ts`](tools/src/comment-lines.ts)).
 - Names: never call a file, folder or module `utils`, `helpers`, `common`, `misc` or `shared`. Name it after what it contains. A file that wants such a name has more than one job: split it.
 - UI: colors, spacing and sizes come from the tokens, the CSS custom properties of [`apps/web/src/app/globals.css`](apps/web/src/app/globals.css) and the control sizes of [`apps/web/src/lib/theme.ts`](apps/web/src/lib/theme.ts), on Mantine components. No new colors, font sizes, spacing or shadows when a token already covers the role.
 - Wording: results are simulations, not load data. No text calls a load or a result safe.

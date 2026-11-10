@@ -37,7 +37,7 @@ Before (main) and after, 32 photographs per scenario, median / P90 of the absolu
 | Lengths within 3 u            | 32          | 32            |
 | With a warning                | 24          | 31            |
 
-Scenarios A to E, G and H: every column unchanged (no one-sided taper found). The lengths above 1 % in F after the change are three squat pistol bullets 340, 395 and 315 px across: 1.96 % (3 u = 9.0 %, shadow named), 3.02 % (3 u = 7.9 %, no warning: the axis of a bullet 1.14 calibres long turns about 11 degrees with the shadow, and no side is clear) and 1.57 % (3 u = 10 %, shadow named). The stated length uncertainty on F stays about 3 to 11 % of the length: the soft edge still raises every edge position's uncertainty.
+Scenarios A to E, G and H: every column unchanged (no one-sided taper found). The lengths above 1 % in F after the change are three squat pistol bullets 340, 395 and 315 px across: 1.96 % (3 u = 9.0 %, shadow named), 3.02 % (3 u = 7.9 %, no warning: the axis of a bullet 1.14 calibers long turns about 11 degrees with the shadow, and no side is clear) and 1.57 % (3 u = 10 %, shadow named). The stated length uncertainty on F stays about 3 to 11 % of the length: the soft edge still raises every edge position's uncertainty.
 
 ## Result
 

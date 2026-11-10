@@ -16,7 +16,7 @@ The overshoot was measured on 19457 maximum-load rows of the training and valida
 
 Each powder was refitted on the training rows (vivacity and energy, the energy with a log-normal prior) with one added term per training maximum-load row:
 - (a) a pseudo-observation of the peak at $p_\text{max} - 50$ bar or at $0.9\, p_\text{max}$, relative sigma 10 %;
-- (b) a one-sided cap that only penalises a peak above $p_\text{max}$, sigma 10 % or 3 %.
+- (b) a one-sided cap that only penalizes a peak above $p_\text{max}$, sigma 10 % or 3 %.
 
 Sample: 21 powders without pressure rows (the 10 with the highest overshoot, 10 drawn with a fixed seed, 1 other), of which 14 converged in every variant and have validation maximum-load rows, plus 5 powders with 20 or more pressure rows as a control. Scored on the validation split: median absolute velocity error, mean velocity error, peak over $p_\text{max}$.
 

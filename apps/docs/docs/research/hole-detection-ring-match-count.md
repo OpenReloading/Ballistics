@@ -1,18 +1,18 @@
 ---
 
-title: Rings needed to apply a recognised target without a question
-description: How many matched rings a target recognised on a photo needs before the app applies it without the user confirming it.
+title: Rings needed to apply a recognized target without a question
+description: How many matched rings a target recognized on a photo needs before the app applies it without the user confirming it.
 ---
 
-# Rings needed to apply a recognised target without a question
+# Rings needed to apply a recognized target without a question
 
 ## Question
 
-[Hole detection](../models/hole-detection.md), recognised target: how many rings matched to a target record does a recognition need before the app applies it automatically, without asking the user?
+[Hole detection](../models/hole-detection.md), recognized target: how many rings matched to a target record does a recognition need before the app applies it automatically, without asking the user?
 
 ## Method
 
-Ring lines from a Hessian ridge detector, grouped by normalised radius, one robust ellipse per group; each ring matched to the nearest ring of a target record within 3 % of its radius (true matches lay within 1.7 %). Seven photos not in the repository: three 25 m pistol targets and four others.
+Ring lines from a Hessian ridge detector, grouped by normalized radius, one robust ellipse per group; each ring matched to the nearest ring of a target record within 3 % of its radius (true matches lay within 1.7 %). Seven photos not in the repository: three 25 m pistol targets and four others.
 
 ## Formulas
 

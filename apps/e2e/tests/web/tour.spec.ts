@@ -84,7 +84,7 @@ for (const [width, height] of [
     const dot = page.locator('.page-bar .mantine-Indicator-indicator')
     await expect(dot).toBeVisible()
     const [b, d] = [await box(tour), await box(dot)]
-    // the dot's centre on the button's top right corner, within the dot's size
+    // the dot's center on the button's top right corner, within the dot's size
     expect(Math.abs(d.x + d.width / 2 - (b.x + b.width))).toBeLessThanOrEqual(8)
     expect(Math.abs(d.y + d.height / 2 - b.y)).toBeLessThanOrEqual(8)
   })

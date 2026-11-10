@@ -159,7 +159,6 @@ export type InteriorIssue =
   | Diagnostic<'priorPowderNotInSessions'>
   | Diagnostic<'sessionsBurnKindDiffers'>
   | Diagnostic<'barrelOrTemperatureOnPoint'>
-  | Diagnostic<'pooledFitVelocitiesOnly'>
   | Diagnostic<'ladderChargeOrVelocityNotPositive'>
   | Diagnostic<'propellantTemperatureNotPositive'>
   | Diagnostic<'barrelLengthNotPositive'>

@@ -22,9 +22,9 @@ In-app note: none. The check cannot see writing, drawings or anything covering t
 
 ![Good: one whole target with paper around it. Bad: the target cut off by the left edge of the photo, with a second target beside it.](photo-guide/one-target.svg)
 
-Frame one target with a strip of paper around it, and cover or fold away a neighbouring target. A photo with several possible targets goes on in the guided steps instead of detecting at once.
+Frame one target with a strip of paper around it, and cover or fold away a neighboring target. A photo with several possible targets goes on in the guided steps instead of detecting at once.
 
-In-app note: "The black area of the target is cut off by the edge of the photo." It is shown only while no target is selected or recognised, since a photo may show only the centre of a known target. The check does not see a second target in the frame.
+In-app note: "The black area of the target is cut off by the edge of the photo." It is shown only while no target is selected or recognized, since a photo may show only the center of a known target. The check does not see a second target in the frame.
 
 In-app note: "No edge of a target or a hole was found in this photo." It is shown for a photo with no black area and no edge to measure. A target of thin rings only, with no hole yet, gives it even when the whole target is in the frame: set the scale by hand instead of retaking.
 
@@ -32,13 +32,13 @@ In-app note: "No edge of a target or a hole was found in this photo." It is show
 
 ![Good: a square sheet with round rings. Bad: the sheet drawn as a trapezoid with the rings squeezed into flat ellipses, from a camera held at a slant.](photo-guide/straight-from-above.svg)
 
-Hold the camera parallel to the paper, straight above the centre of the target. A slant squeezes the rings and moves the holes.
+Hold the camera parallel to the paper, straight above the center of the target. A slant squeezes the rings and moves the holes.
 
 In-app note: "The target is photographed at a slant of about N degrees."
 
 ## 4. Even light, no reflection
 
-![Good: an evenly lit target. Bad: a white reflection covering the black centre and a dark shadow across one corner.](photo-guide/even-light.svg)
+![Good: an evenly lit target. Bad: a white reflection covering the black center and a dark shadow across one corner.](photo-guide/even-light.svg)
 
 Light the target from the side or with daylight, with no flash straight on and no shadow of your hand or phone on the sheet.
 

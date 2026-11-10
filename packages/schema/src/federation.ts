@@ -246,7 +246,7 @@ export interface DisciplineRules extends z.infer<typeof disciplineRules> {}
 const distanceUnitParser = z.enum(['m', 'yd', 'm/yd'])
 
 /**
- * The unit a rule book states a discipline's distance in: metres, yards, or both
+ * The unit a rule book states a discipline's distance in: meters, yards, or both
  * ("50 Meter/Yards"), where the same number applies to each.
  */
 export const distanceUnit: z.ZodEnum<z.core.util.ToEnum<'m' | 'yd' | 'm/yd'>> =

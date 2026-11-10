@@ -427,13 +427,13 @@ export interface SimilarPowder {
 
 /** Rules of the choice of similar powders and of the prior they give. */
 interface SimilarPowderRules {
-  /** Neighbours taken. */
+  /** Neighbors taken. */
   count: number
-  /** Fewest neighbours for a prior from their spread; fewer give a weak prior. */
+  /** Fewest neighbors for a prior from their spread; fewer give a weak prior. */
   minimum: number
   /** Standard deviation of ln(burn coefficient) of a weak prior. */
   weakSigma: number
-  /** Smallest standard deviation of a prior from a spread, so near-equal neighbours do not fix the fit. */
+  /** Smallest standard deviation of a prior from a spread, so near-equal neighbors do not fix the fit. */
   minimumSigma: number
 }
 
@@ -449,9 +449,9 @@ const similarPowderRules: Readonly<SimilarPowderRules> = Object.freeze({
 export interface SimilarPowdersPrior {
   /** The prior, to pass as `priors.burnRate`. */
   prior: PowderPrior
-  /** Neighbours the prior is built from. */
+  /** Neighbors the prior is built from. */
   count: number
-  /** Fewer neighbours than `similarPowderRules.minimum`: the prior is centred on the target's own value with `weakSigma`. */
+  /** Fewer neighbors than `similarPowderRules.minimum`: the prior is centered on the target's own value with `weakSigma`. */
   weak: boolean
 }
 

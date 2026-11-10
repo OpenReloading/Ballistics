@@ -34,7 +34,7 @@ const rifle300 = face('issf-300m-rifle')
 const rapidFire = face('issf-25m-rapid-fire-pistol')
 const precision25 = face('issf-25m-precision-50m-pistol')
 
-/** A shot `d` mm from the centre at `deg` degrees, in target m. */
+/** A shot `d` mm from the center at `deg` degrees, in target m. */
 const at = (d: number, deg = 0) => ({
   x: d * 1e-3 * Math.cos((deg * Math.PI) / 180),
   y: d * 1e-3 * Math.sin((deg * Math.PI) / 180),
@@ -242,7 +242,7 @@ describe('face on the sheet (target m) and face m', () => {
     }
   })
 
-  it('centres the face on the point of aim at the calibrated scale without marks', () => {
+  it('centers the face on the point of aim at the calibrated scale without marks', () => {
     expect(faceAlignment(rifle50, undefined, { x: 0.002, y: 0.003 })).toEqual({
       centre: { x: 0.002, y: 0.003 },
       scale: 1,

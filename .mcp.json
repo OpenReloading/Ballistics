@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "mantine": {
+      "command": "node",
+      "args": ["-e", "require('@mantine/mcp-server')"]
+    }
+  }
+}

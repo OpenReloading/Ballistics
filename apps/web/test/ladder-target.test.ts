@@ -11,7 +11,7 @@ describe('ladder target', () => {
     expect(markDiameterMm(50, 1e-3)).toBeCloseTo(50, 4)
   })
 
-  it('measures the ruler in millimetres', () => {
+  it('measures the ruler in millimeters', () => {
     expect(cssMm(rulerMm)).toBe('100mm')
     expect(cssMm(29.0888)).toBe('29.09mm')
   })

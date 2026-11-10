@@ -39,7 +39,7 @@ function shotshellInteriorLoad(load: ShotshellLoad): InteriorLoad {
 const pos = (v: number) => Number.isFinite(v) && v > 0
 const nonNeg = (v: number) => Number.isFinite(v) && v >= 0
 
-/** Runs `interior` on the mapped load; every result is labelled experimental. */
+/** Runs `interior` on the mapped load; every result is labeled experimental. */
 export function shotshellInterior(
   load: ShotshellLoad,
   options: Settings<InteriorOptions> = {},

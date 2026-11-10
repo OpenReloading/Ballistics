@@ -28,7 +28,7 @@ beforeEach(() => {
 })
 afterEach(() => vi.unstubAllGlobals())
 
-/** A field labelled `label` and described by the ids `describedBy`. */
+/** A field labeled `label` and described by the ids `describedBy`. */
 const input = (label: string | undefined, describedBy: string | null) =>
   ({
     labels: label === undefined ? [] : [{ textContent: label }],

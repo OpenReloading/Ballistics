@@ -14,7 +14,7 @@ const none = () => () => {}
 
 type PageLinks = readonly { href: string; label: Message }[]
 
-/** A page that stands in for another: centred, its icon, title, text, one action and page links. */
+/** A page that stands in for another: centered, its icon, title, text, one action and page links. */
 function StandIn({
   icon: Glyph,
   title,
