@@ -68,9 +68,8 @@
   --mantine-color-disabled-color: var(--muted);
 }
 
-/* Breakpoint scale of every width query: Mantine's xs 36, sm 48, md 62, lg 75, xl 88em (lib/theme.ts) plus our 2xs 22.5em and
-   2xl 108em. A max-width is its step minus 0.01em (47.99em), so no width falls between a min and a max query; the 2xs
-   max-width stays at 22.5em, which keeps the 360 px phones in. The one exception is the load switch's 79.99em. */
+/* width queries on Mantine's scale (lib/theme.ts) plus 2xs 22.5em and 2xl 108em; a max-width is its step minus
+   0.01em, except 2xs (keeps 360 px phones) and the load switch's 79.99em */
 
 /* dark on screen only, so print keeps the light values above; the head script resolves the system setting */
 @media screen {
@@ -7749,7 +7748,7 @@ main .field-table tr.field-group > th {
 }
 
 /* the two sides: a panel each, its drawing beside its table; one column
-   below 80em, the table above the drawing on phones */
+   in a box under 70rem, the table above the drawing on phones */
 @media screen {
   .cartridge-sides {
     display: grid;
@@ -11164,7 +11163,7 @@ main .page-bar h1 {
 }
 
 /* up to 80em the two icons leave the workbench's bar too little room: its load switcher gives it,
-   the load's name cut with an ellipsis; off the scale because 75em overflows the bar and 88em cuts the name at 1280px */
+   the load's name cut with an ellipsis; off the scale: 75em overflows the bar, 88em cuts the name at 1280 px */
 @media screen and (min-width: 75em) and (max-width: 79.99em) {
   :root:has(.report-issue) .load-switch {
     width: 7.75rem;
