@@ -323,7 +323,7 @@ function useHandTuning(fit: PowderFitState['fit']) {
   return { setHand, tuned, values, curve }
 }
 
-/** Each part its own element of the page's grid (`.tune-layout`), which sets the chart beside the rest from 64em and after the hand tuning below that. */
+/** Each part its own element of the page's grid (`.tune-layout`), which sets the chart beside the rest from 62em and after the hand tuning below that. */
 function FitResult({
   state,
   rows,

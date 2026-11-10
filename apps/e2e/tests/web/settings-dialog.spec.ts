@@ -226,7 +226,7 @@ test('Settings turns the single-key shortcuts off: "/" and "?" do nothing, the c
   await expect(help).toBeVisible()
 })
 
-test('the Units button shows its preset from 105em, an icon below, and its name in German', async ({
+test('the Units button shows its preset from 108em, an icon below, and its name in German', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 650 })
