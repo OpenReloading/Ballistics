@@ -1,7 +1,7 @@
 ---
 
 title: Command line
-description: One compute operation of the API offline, the list of operations with their schemas, held-out evaluation of the interior model on a file of load rows, and a comparison of two model versions.
+description: One compute operation of the API offline, the list of operations with their schemas, held-out evaluation of the interior model on a file of load rows, a comparison of two model versions, and a fit of powder burn coefficients to those rows.
 ---
 
 # Command line
@@ -13,6 +13,8 @@ pnpm run build
 node packages/cli/dist/bin.js verify --rows rows.csv --records /path/to/records
 node packages/cli/dist/bin.js compare --rows rows.csv --records /path/to/records --baseline verify.json --candidate ./my-model.mjs
 node packages/cli/dist/bin.js verify --rows catalogue --split validation
+node packages/cli/dist/bin.js fit --rows rows.csv --records /path/to/records
+node packages/cli/dist/bin.js verify --rows rows.csv --records /path/to/records --params fit-on-training
 ```
 
 `--help` (or `-h`), alone or after a command, prints the usage and exits 0. `run --help` and `operations --help` print the help of that command with an example that runs on a committed synthetic body.
@@ -49,7 +51,7 @@ One CSV file, or a folder of `.csv` files read in name order, with a header line
 | `coal_mm`                               | Cartridge overall length, mm; default the sheet's L6                                                                                  | no       |
 | `pressure_basis`                        | The basis the pressure was measured on (`transducer`, `case-contact`, ...); pressure errors are grouped by it, `unstated` without one | no       |
 | `muzzle_distance_m`                     | Distance of the measuring point from the muzzle, m; the velocity is corrected to the muzzle ([below](#muzzle-distance))               | no       |
-| `bearing_mm`, `session`, `rifle`, `lot` | What a later model may read: carried with the row, unused                                                                             | no       |
+| `bearing_mm`, `session`, `rifle`, `lot` | `session`, `rifle` and `lot` group the rows into sessions of the [fit](#fit); `bearing_mm` is carried, unused                         | no       |
 | `table`                                 | A free label of the source table: carried, never part of a result                                                                     | no       |
 
 A problem in the file is reported as file, line and column with a reason, never with the value, and the exit code is 2. Fields may be double-quoted. A number is a plain decimal or exponent form (`0.5`, `2.5e1`); `0x1F` and `0b11` are not numbers.
@@ -85,13 +87,27 @@ A pressure is compared only with pressures of its own basis: `pressureByBasis` o
 
 A row with a muzzle distance above 0 (a velocity printed at `V5`, for example) is compared at the muzzle: its printed velocity is turned into the muzzle velocity whose flown speed at that distance equals it, with `muzzleVelocityFromDownrange` of ballistics ([model page](models/exterior-drag.md#speed-measured-downrange)), over the bullet record's G7 ballistic coefficients (else its G1 ones) in the ICAO standard atmosphere at sea level, before the error and the interval. A bullet without a coefficient, such as a stand-in, or with two of one model that share a band start, gives `noBulletDrag`. A row without a distance is a muzzle value and is not corrected.
 
-The powder parameters are those of the records (`--params records`, the only mode).
+The powder parameters are those of the records (`--params records`, the default), or the records with the burn coefficients fitted to the training rows (`--params fit-on-training`, [below](#fit)).
 
 ### Powder not in the fitted set
 
-`verify --leave-one-powder-out` adds `notInFittedSet`, the line "powder not in the fitted set: no data". The fitted set is the powders the rows name (any split) whose record has interior parameters; their record values are the fit, nothing is fitted from rows. Each powder of that set with rows in the run's split is left out in turn and run without its interior parameters, as a powder without rows: it gets no value, so its rows count as `noPowderModel` (a row with an unknown cartridge or bullet as `unknownCartridge` or `unknownBullet`, which are checked first) and the line's velocity, pressure and coverage are null. The line carries the rows of all left-out powders and `powders`, their number, the count of powders without a value. Its rows of the split are only those of the run's split, so the test split stays sealed for the line too.
+`verify --leave-one-powder-out` adds `notInFittedSet`, the line "powder not in the fitted set: no data". The fitted set is the powders the rows name (any split) whose record has interior parameters; their record values are the fit (with `--params fit-on-training`, only the powders fitted, with their fitted values). Each powder of that set with rows in the run's split is left out in turn and run without its interior parameters, as a powder without rows: it gets no value, so its rows count as `noPowderModel` (a row with an unknown cartridge or bullet as `unknownCartridge` or `unknownBullet`, which are checked first) and the line's velocity, pressure and coverage are null. The line carries the rows of all left-out powders and `powders`, their number, the count of powders without a value. Its rows of the split are only those of the run's split, so the test split stays sealed for the line too.
 
 A powder without rows gets no value, not an estimate, as the app refuses a powder without interior parameters. A family median estimate (each field of `interior.fitted` replaced by the median over the other powders of its family) measured a median velocity error of 15.7 %, a P90 of 61.7 % and an interval coverage of 31.9 % on a local run, too weak to show. Its code (`src/unseen.ts`) stays with its tests; no command calls it.
+
+## Fit
+
+`fit --rows <path> [--model m3|<module>] [--velocity-sigma <fraction>]` fits the burn coefficient (`interior.vivacity`) of each powder the rows name that has interior parameters, and writes the fitted values with their uncertainties. It fits nothing else: the energy, the pressure exponent and the form constants stay the record's.
+
+- Rows: those of the training split only that the model can run with the record's values, velocities corrected to the muzzle ([above](#muzzle-distance)). Rows of the validation and test split are never read.
+- Fit: `fitPowderPooled` of `@open-reloading/ballistics` running the model of `--model` (default `m3`) ([model page](models/interior-powder-fit.md#pooled-fit-over-rifles-powders-and-lots)), one powder at a time, so a powder that fails does not stop the others. A session is the rows of one load without its charge (cartridge, bullet, barrel, COAL, temperature, session, rifle, lot and table); its rifle is the row's `rifle`, else one test barrel per cartridge, barrel and table; its lot is the row's `lot`. Rifle and lot effects keep the library's default spreads.
+- Value: the record's burn coefficient times `factor`, the fitted over the record value.
+- Uncertainty: the fit's relative standard uncertainty, times the root of `chiSquarePerDegree` where that is above 1, times the fitted value. `chiSquarePerDegree` is the chi square of every row, the data and the one prior row of each rifle and lot effect, over all rows minus all parameters, null where that count is not above 0.
+- `--velocity-sigma` is the standard deviation of a row's velocity, a fraction of it above 0 and below 1, default 0.03. Load tables print no spread; ANSI/SAAMI Z299.4-2025 (page 5) expects tested ammunition within 90 fps of the tabulated velocity, about 3 % at 3000 fps ([SAAMI Z299.4](https://saami.org/wp-content/uploads/2026/04/SAAMI-Z299.4-CFR-2025-Centerfire-Rifle-Approved-2-10-2025-2026-04-27.pdf)). That plus or minus 90 fps is a tolerance, not a standard deviation, so taking it as the sigma is a choice on the large side.
+
+A powder that is not fitted is listed in `notFitted` with its reason: the reason of the fit (`unresolved`, the rows do not resolve the burn coefficient, for example training rows of one charge only; `invalid`, `not-converged`, `ill-conditioned`, `underdetermined`), or `noUsableRow`: every powder with interior parameters that any row names and that has no usable training row, so powder ids of the other splits can appear there; their rows are not read. A powder without interior parameters has no start value and is not listed.
+
+`verify` and `compare` with `--params fit-on-training` run the fit and evaluate with the fitted burn coefficients. A powder not fitted gets no value: its rows count as `noPowderModel`. Each evaluation carries `fit` with the velocity sigma, the number of powders fitted and those not fitted by reason. `inputs` stay those of the records as read, so a saved `--params records` result is a valid baseline for a `fit-on-training` candidate. Each evaluation fits under its own model: in `compare` a live baseline and the candidate each get their own fit, a saved baseline is used as it is. The interval's half width comes from the training rows, which the fit has seen, so it is narrower than an interval from rows the fit has not seen, and the coverage of a `fit-on-training` run is not comparable with that of a `--params records` run.
 
 ## Model version
 
@@ -100,13 +116,15 @@ Every result carries `modelVersion`, the SHA-256 over the sorted lines:
 - `<kind>/<id> <sha256>` of the stored JSON of every cartridge, bullet, powder, capacity and case record the rows name;
 - `rows <sha256>` over the SHA-256 of each rows file.
 
-`inputs.rows` and `inputs.records` in a result are the last two parts. The version changes with the model, the records or the rows, not with the split or the options.
+A `fit` run and a `--params fit-on-training` evaluation add the built files of the fit (`interior/fit-pooled.js` of ballistics, its solver `least-squares.js` of statistics and `fit.js` of the CLI, each with the files they import by a relative path) and the line `params fit-on-training velocity-sigma <value>`.
+
+`inputs.rows` and `inputs.records` in a result are the last two parts. The version changes with the model, the records or the rows, not with the split; `--params fit-on-training` and its `--velocity-sigma` do change it.
 
 The code of the evaluation itself (rows, split, the metrics and the percentiles, the interval) is not in the hash: a change to it is a change of the evaluation, not of the model, and moves the metrics of an unchanged `modelVersion`. Compare a baseline and a candidate only with one build of the CLI.
 
 ## Commands
 
-`verify` takes no `--baseline` or `--candidate`, `compare` takes no `--model`: such an option is bad input.
+`verify` takes no `--baseline` or `--candidate`, `compare` takes no `--model`, `fit` takes only `--rows`, `--records`, `--model`, `--velocity-sigma`, `--json` and `--table`: another option is bad input, as is `--velocity-sigma` in a `verify` or `compare` without `--params fit-on-training`.
 
 `verify --rows <path> [--model m3|<module>]` evaluates one model on the split. `m3` is the model of the installed `@open-reloading/ballistics`; a module path is a file that exports `interior(load, options?)` with the signature of its `interior`.
 
@@ -114,7 +132,7 @@ The code of the evaluation itself (rows, split, the metrics and the percentiles,
 
 ## Output
 
-JSON when stdout is not a terminal or with `--json`, a table with `--table` or on a terminal. The JSON of `verify` and `compare` carries `schemaVersion` (1) and `notice: "simulation, not load data"`, the label of the API's answers. It is described by `packages/cli/schema/result.schema.json`, written from the zod definition in `src/result.ts` by `pnpm --filter @open-reloading/cli run schema`; a test validates real output of both commands against it. The schema's `$id`, `https://openreloading.github.io/Ballistics/docs/result.schema.json`, is where the build of this site copies it.
+JSON when stdout is not a terminal or with `--json`, a table with `--table` or on a terminal. The JSON of `verify`, `compare` and `fit` carries `schemaVersion` (1) and `notice: "simulation, not load data"`, the label of the API's answers. It is described by `packages/cli/schema/result.schema.json`, written from the zod definition in `src/result.ts` by `pnpm --filter @open-reloading/cli run schema`; a test validates real output of these commands against it. The schema's `$id`, `https://openreloading.github.io/Ballistics/docs/result.schema.json`, is where the build of this site copies it.
 
 `--version` prints `ballistics <version>` and exits 0.
 
