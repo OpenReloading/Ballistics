@@ -18,6 +18,9 @@ catalogs:
     '@mantine/hooks':
       specifier: 9.7.4
       version: 9.7.4
+    '@mantine/mcp-server':
+      specifier: 9.7.4
+      version: 9.7.4
     '@mantine/spotlight':
       specifier: 9.7.4
       version: 9.7.4
@@ -92,6 +95,9 @@ importers:
       '@biomejs/biome':
         specifier: 2.6.4
         version: 2.6.4
+      '@mantine/mcp-server':
+        specifier: 'catalog:'
+        version: 9.7.4
       eslint-plugin-regexp:
         specifier: 3.3.3
         version: 3.3.3
@@ -2939,6 +2945,11 @@ packages:
     peerDependencies:
       react: ^19.2.0
 
+  '@mantine/mcp-server@9.7.4':
+    resolution: {integrity: sha512-2r2M7lXep8idt9t7rsvcMZoHtIAJ+hh44oQE1fZ1sAieV9hKoU/w5w1+g6vTqNatCjGaVJHZMzUjRoAJVlVFfw==}
+    engines: {node: '>=22'}
+    hasBin: true
+
   '@mantine/spotlight@9.7.4':
     resolution: {integrity: sha512-BZ/kizwjAFiw4LxyW6a1MmdbuO3PKmx0V5q7jkWpXWEL0DbD/V9tBxBN5ZIXlMzB0GpMU5uANUazoBqznfsIKw==}
     peerDependencies:
@@ -2984,6 +2995,14 @@ packages:
 
   '@microsoft/tsdoc@0.17.1':
     resolution: {integrity: sha512-VHyYyyoH63jFoO3shpw9Zfijk5v/9p/VrClW35z0/q6ooK7sSmxpzOkS4iZPxs3vO4XtBW4H38HRAKkAMIK7DA==}
+
+  '@modelcontextprotocol/core@2.1.0':
+    resolution: {integrity: sha512-YdFj5gMRHr0gYNAhTbQDgjLHiEJdIAUYxomhKseUNye7ZGlISQmUoLh2sveFFCiQ7j2YMffT1kgSND0FSfIFjQ==}
+    engines: {node: '>=20'}
+
+  '@modelcontextprotocol/server@2.1.0':
+    resolution: {integrity: sha512-FdvwZU5N03O77Suh35JqjAqq5R1ZTEPFtwu6N4BgBq28qrQtrCnpbLL5U2pwYCuE194jAw0xnlOVmIqhfoYuUQ==}
+    engines: {node: '>=20'}
 
   '@napi-rs/wasm-runtime@1.2.6':
     resolution: {integrity: sha512-mRyDmEw9/fCDXCGfL1sbgIw/GUK0PVxRW4YwgPN61F3LQ+fSyoBFarJVzgGyhF6kRzEQZ0FejDqm4WLXSeqQmw==}
@@ -12303,6 +12322,11 @@ snapshots:
     dependencies:
       react: 19.3.1
 
+  '@mantine/mcp-server@9.7.4':
+    dependencies:
+      '@modelcontextprotocol/server': 2.1.0
+      zod: 4.6.7
+
   '@mantine/spotlight@9.7.4(@mantine/core@9.7.4(@mantine/hooks@9.7.4(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(@mantine/hooks@9.7.4(react@19.3.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
       '@mantine/core': 9.7.4(@mantine/hooks@9.7.4(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -12393,6 +12417,15 @@ snapshots:
       resolve: 1.22.13
 
   '@microsoft/tsdoc@0.17.1': {}
+
+  '@modelcontextprotocol/core@2.1.0':
+    dependencies:
+      zod: 4.6.7
+
+  '@modelcontextprotocol/server@2.1.0':
+    dependencies:
+      '@modelcontextprotocol/core': 2.1.0
+      zod: 4.6.7
 
   '@napi-rs/wasm-runtime@1.2.6(@emnapi/core@1.11.0)(@emnapi/runtime@1.11.0)':
     dependencies:

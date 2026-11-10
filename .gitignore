@@ -12,7 +12,8 @@ visual-check-out
 /apps/web/public/api/
 # agent skills and setup state, installed per checkout
 /.agents/skills/
-/.claude/skills/
+/.claude/skills/*
+!/.claude/skills/mantine-form/
 /.benchkeeper/
 coverage
 packages/ui/src/locales/*.json
