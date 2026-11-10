@@ -7,6 +7,7 @@ description: Pressure-dependent burn laws of the M3 interior model, the form fun
 # Burn laws and form functions
 
 The burn law gives the rate at which the charge of the [M3 interior model](interior-m3.md) burns at the current mean pressure.
+
 - Geometric law: the regression rate of the grain surface. The grain shape turns the burnt depth into a burnt fraction.
 - Vivacity law: the rate of the burnt fraction itself, with a form function for the burning surface relative to the initial one.
 

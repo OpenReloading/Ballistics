@@ -13,6 +13,7 @@ Modified point mass and stability: is the inertia of a bullet integrated from it
 ## Method
 
 Fixed before the run.
+
 - Moments: relative error of both moments, cylinder estimate and outline integral, against a reference. Build when on every bullet the transverse error of the outline is below half the cylinder error, the axial error below 5 percent and the transverse error below 15 percent.
 - Data: no bullet with published measured moments and a dimensioned outline could be taken into the repository (see Data basis). The quadrature is checked against an independent integral of the drawing polygon of the demo 168 grain record, and the rule on one stated reference only (168 grain, 7.62 mm class: axial 7.23e-8 kg m2, transverse 5.38e-7 kg m2: author-derived values with no source page, unverified). No measured-error claim is made.
 - Stability from the geometry: the factor with the overturning-moment slope from the outline, over twelve rifle outlines (length 3.4 to 5.4 calibers, Rt/R 1, 0.7 and 0.4, boat tail 0.3 or 0.5 caliber) and two pistol outlines, with the twist that gives Miller's factor 1.5 at 2800 ft/s in standard air. Pass when every ratio to Miller's factor is from 0.6 to 1.0 and none exceeds it by more than 10 percent. Both factors scale with the mass, so the ratio does not depend on the outline density.

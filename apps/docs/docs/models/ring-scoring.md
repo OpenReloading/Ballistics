@@ -7,6 +7,7 @@ description: Ring value, tenth-ring value and inner ten of a shot on a rule-book
 # Ring scoring
 
 For each shot on a target:
+
 - the value of the highest ring its hole touches, or under outward gauging the highest ring it lies wholly inside
 - the tenth-ring value, where the target's rules allow it
 - whether it is an inner ten
@@ -71,6 +72,7 @@ A far edge within $\varepsilon$ of the outer edge of the line counts as on the l
 ### Inner ten
 
 The inner ten counts only for a shot in the innermost ring. With the inner-ten radius $R_X$ and $d = \lvert p' \rvert$:
+
 - `cover`: the hole covers the inner-ten circle completely.
 - `touch`, or no rule on the record (the rule book does not state one): the hole touches it. An oval inner ten (`height`) uses the oval distance above, and the inner ten of a stadium target is a stadium.
 

@@ -7,6 +7,7 @@ description: The spread of the simulated peak pressure when charge, chamber volu
 # Peak-pressure range over input tolerances
 
 `interiorPressureRange` runs the [M3 model](interior-m3.md) at the ends of the tolerances of six inputs. It reports the lowest and highest peak pressure next to the nominal one. The [sampled band](interior-sampled-band.md) draws the same inputs from distributions instead of moving them to their ends. The limit check of a result reads this range, not the sampled band.
+
 1. Each input moves alone to both ends of its tolerance.
 2. All inputs move together, to the ends that raise the pressure and to the ends that lower it.
 
@@ -35,6 +36,7 @@ s_q = \operatorname{sign}\bigl(p_q^{+} - p_q^{-}\bigr)
 $$
 
 Code: `packages/ballistics/src/interior/range.ts`, `toleranceRange` (`sides`).
+
 - $s_q = 0$ when both ends are invalid or the tolerance is 0.
 - The two combined cases move every input at once: to the side $s_q$ for the pressure-raising case, to $-s_q$ for the pressure-lowering case.
 - Inputs are applied in the order charge, volume, bullet mass, burn coefficient, temperature, start pressure. Once one move leaves the model, the remaining inputs are not applied and are reported with side 0.

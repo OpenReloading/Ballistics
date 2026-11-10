@@ -13,6 +13,7 @@ Each file is told by its bytes, its extension is not read. An OpenReloading data
 ## Limits
 
 A file over a limit is not imported. The card or the status line says which limit it met.
+
 - 40 MB per file (`maxUserDataBytes` in `packages/schema/src/user-data-file.ts`): a larger file is refused before it is read, with "The file is larger than 40 MB."
 - 256 columns (`maxColumn` in `packages/importers/src/limits.ts`): a wider table is refused, with "The table has more than 256 columns." Remove the extra columns or choose another file.
 - 1,000,000 cells, columns times rows (`maxCells` in `packages/importers/src/limits.ts`): a larger table is refused, with "The table has more than 1000000 cells." Split it into smaller files.
@@ -71,6 +72,7 @@ A grain form or base not in the list is a warning: the value is left out and the
 ## Units and decimal mark
 
 Each number column has its own unit and decimal mark, both changeable on the card.
+
 - Unit: named in the header, in brackets or after a slash, underscore or space (`Weight (gr)`, `Diameter_in`, `Weight grains`; inch and grains are read as in and gr). A unit in brackets or after a slash or underscore that the field does not take rejects the rows of the column until a unit is chosen on the card. A last word after a space that is no unit of the field counts as part of the name. Without a unit in the header, the unit whose conversion puts the most values in the usual range is taken, and the card says the unit was guessed from the values. MPa and kpsi are never guessed: their values fall in the bar range too. Without a fit, the stored unit.
 - Decimal mark: point or comma, whichever more cells use. A column of cells such as `1,500` that could also be grouped integers is marked as a guess.
 - A value in another unit than the stored one keeps its text as written next to the converted value.

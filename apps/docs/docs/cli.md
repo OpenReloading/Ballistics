@@ -60,6 +60,7 @@ A problem in the file is reported as file, line and column with a reason, never 
 ### Published loads
 
 `--rows catalogue` reads the [published load files](data/published-loads.md) of the records instead of a CSV file; `--rows <folder>` does the same for a folder laid out as `records/loads/` (named `loads`, with one folder per cartridge): only the files of that folder are read, their source references resolved from the source records of `--records`, and a file that fails is left out with a note on stderr. Each printed charge with a velocity `value` of a maker table is one row (`rowsFromPublished`, `src/published-rows.ts`):
+
 - `charge`, `velocity` (as printed, at the printed point), `coal` and `barrel` (`barrel.length`) from their `value`; `pressure` only with a value in bar, so a crusher figure (CUP, LUP) gives a row with its velocity only; the pressure basis is the figure's `method`, `unstated` without one; the muzzle distance is `velocity.point.distance`, and a velocity without one is a muzzle value;
 - `bullet` is the bullet record, else a stand-in record per cartridge and printed mass: the cartridge's G1 as diameter, the printed mass, and the length of a least-squares fit of ln length on ln mass and ln diameter over the bullet records with a length; it has no ballistic coefficient;
 - a row without a barrel length takes the median printed barrel of its cartridge, else 610 mm for a case (L3) longer than 33 mm and 120 mm for a shorter one, as on the [validation page](models/validation.md).
@@ -150,6 +151,7 @@ No powder's own pressures decide its own values: the factor is shared and the bu
 ## Model version
 
 Every result carries `modelVersion`, the SHA-256 over the sorted lines:
+
 - `<label> <sha256>` of each built source file the model's result depends on: the files `@open-reloading/units` builds for the unit conversion (`toSi`, `fromSi`, the conversion table and the water density that turns a capacity into a chamber volume), the files `@open-reloading/statistics` builds for the input checks (`need`, `InputError`) and the bisection the interior model solves with, the files `@open-reloading/ballistics` builds for `interior/model.js` and `interior/record-load.js`, the files `@open-reloading/schema` builds for its unit entry and the water capacity of a case or capacity record, the files `@open-reloading/drawing` builds for its seating and bullet entries, each with the files they import by a relative path (a candidate module adds itself and its relative imports, because it may call the installed interior model; imports of other packages are not followed), and the family median estimator (`unseen.js` of the CLI with its relative imports), which no run calls, kept so that published versions stay valid;
 - `<kind>/<id> <sha256>` of the stored JSON of every cartridge, bullet, powder, capacity and case record the rows name;
 - `rows <sha256>` over the SHA-256 of each rows file.

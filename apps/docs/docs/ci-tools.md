@@ -49,6 +49,7 @@ Not used: a hosted coverage service (Codecov), jscpd, Trivy (its action tags wer
 ## Which jobs a pull request runs
 
 `apps/web/scripts/ci-plan.mts` decides from the files changed since a base commit and writes these lines to `$GITHUB_OUTPUT` (the reason goes to stderr):
+
 - `check=true|false`: lint, build, types and unit tests.
 - `e2e=true|false`: the API's conformance run and the e2e tests on the static export.
 - `prerender=full|sample`: every record page, or the cartridge sample of `src/lib/prerender-sample.ts`.
@@ -63,10 +64,12 @@ CI reads `EVENT_NAME` and `BASE_SHA` from the environment. Locally, `--stamp FIL
 `apps/web/scripts/check-weight.mts` fails when the JavaScript a route of the built web app loads grows past the budget of its group in `apps/web/weight-budget.json`. It prints a table per route (also to `$GITHUB_STEP_SUMMARY`): the change against the recorded values and the headroom left. A route with less than `nearShare` of its budget left gets a warning line, which does not fail the check.
 
 It reads `.next` after `pnpm run static:build`:
+
 - the routes of `app-path-routes-manifest.json`;
 - for each route, its client reference manifest (client component chunks, `entryJSFiles`), the root main and polyfill files of `build-manifest.json`, and the page's `react-loadable-manifest.json` (lazy `next/dynamic` chunks).
 
 Each route is counted in bytes of gzip level 9, each file once:
+
 - `initial`: what a first visit loads (root main, polyfill, the client chunks of the page and its layouts);
 - `total`: `initial` plus the lazy chunks the page can load on demand.
 
@@ -75,6 +78,7 @@ Only file content counts, so the numbers do not depend on the API, `PRERENDER`, 
 ## Lint rules without an Oxlint counterpart
 
 Oxlint replaced Biome's lint of JavaScript and TypeScript. These rules of Biome's set had no counterpart:
+
 - No Oxlint rule: `noSvgWithoutTitle`, `noEmptyTypeParameters`, `noFlatMapIdentity`, `noThisInStatic`, `noUselessContinue`, `noUselessStringRaw`, `noUselessUndefinedInitialization`, `useSimpleNumberKeys`, `noStringCaseMismatch`, `noVoidTypeReturn`, `noDynamicNamespaceImportAccess`, `noImplicitAnyLet` (TypeScript's `noImplicitAny` covers most), `noRedundantUseStrict`, `noSuspiciousSemicolonInJsx`.
 - Cognitive complexity (`noExcessiveCognitiveComplexity`, limit 15): Oxlint has none. Its cyclomatic `complexity` (classic, at most 20) runs on the whole repository instead, without exceptions; `packages/units`, `packages/locale-format`, `packages/schema`, `packages/statistics`, `packages/ballistics`, `packages/shot-groups`, `packages/importers`, `packages/catalog`, `packages/target-recognition`, `packages/use-cases`, `packages/design-tokens` and `tooling/test-kit` hold the stricter simplicity rules of `packages/oxlint.logic.json` (complexity 10 and the others), which their `.oxlintrc.json` extends.
 - Typed rules, which only a typed run reads (as in `packages/units`): `useLiteralKeys` (`typescript/dot-notation`), `useOptionalChain` (`typescript/prefer-optional-chain`), `useExportType` (`typescript/consistent-type-exports`), `useArraySortCompare` (`typescript/require-array-sort-compare`), `useAwait` (`typescript/require-await`; the untyped `require-await` also flags a concise async arrow such as `async () => run()`, which Biome's rule passes: about 40 of its 52 findings here).

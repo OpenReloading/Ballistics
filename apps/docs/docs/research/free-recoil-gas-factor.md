@@ -17,6 +17,7 @@ Planned: compare each form by relative error with measured free recoil (recoil v
 ## Formulas
 
 The momentum of projectile and gas in the [free recoil model](../models/free-recoil.md) is $I = (m_p + f\, m_c)\, v_0$, with the energy $E_g = I^2 / (2 m_g)$, so for a fixed firearm the energy ratio of two forms is the square of their momentum ratio. Forms of $f$ compared, after [SAAMI 2018](../bibliography.md#saami-2018) for today's factor and a table of mean gas speed over muzzle velocity that falls from about 3 at 400 m/s to about 1 at 1400 m/s (a nearly constant mean gas speed of 1200 to 1330 m/s, source unverified here):
+
 - today: $f = 1.75$ (rifle), $f = 1.50$ (pistol);
 - constant gas speed: $f = V_{gas} / v_0$ with $V_{gas} = 1250$ m/s;
 - the same as an increment on the in-bore gas momentum: $f = 0.5 + V_{gas} / v_0$;

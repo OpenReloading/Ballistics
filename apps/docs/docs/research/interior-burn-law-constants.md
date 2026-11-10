@@ -17,6 +17,7 @@ The [validation protocol](../models/validation.md): rows split by `splitOf` of t
 Accept rule, committed before any result: on the validation split the median velocity error falls by at least 0.1 percentage points and by more than twice the bootstrap standard error of the paired change of the median (resampling the validation cartridges, 2,000 draws, fixed seed), the P90 does not rise, used rows fall by less than 1 %, and for a fitted law the burn rate is positive, the vivacity monotone over the first stage and fewer than 1 % of perturbed held-out loads (charge +2 %, barrel -10 %) move the velocity the wrong way. Pressure is reported and never decides.
 
 Candidates:
+
 - Control: the vivacity of each powder refitted at the present exponent 1.
 - Pressure exponent per powder family, from a grid of 0.7 to 1.3, chosen on the training error, with the vivacity of each powder refitted at that exponent.
 - A residual correction of the velocity, linear in the logarithms of charge-to-bullet mass ratio and loading density (3 constants in all).

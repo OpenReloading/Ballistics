@@ -34,6 +34,7 @@ The shared base keeps its own texts in Lingui catalogs, the format the rebuilt w
 These follow the language shown and need no catalogue text. Under German a decimal is written with a comma (`2,5`), a date and a country name come from `Intl`. English is unchanged.
 
 What the app stores and exports never changes: field values, URLs, share links, saved loads, your data files, CSV, JSON, downloads and the table copied as CSV keep the point (`2.5`).
+
 - Write a number on screen with `formatNumber`, `fixedNumber`, `plainNumber` or `localizeNumber` (a canonical text) from `src/i18n/number.ts`. Never `toFixed`, `String(n)` or a number in a template string. A number inside a `t` placeholder is already written with the language's mark.
 - A number inside text that a server build wrote takes `<Decimal text>` or a `numeric` field row; a date `dayText` and a country `countryName`.
 - A file or the clipboard writes the canonical form: pass `'en'` to `formatNumber`, or `canonicalNumberText` for text that came from the screen.
@@ -42,6 +43,7 @@ What the app stores and exports never changes: field values, URLs, share links, 
 ### What a typed number means
 
 Surrounding spaces and the minus sign U+2212 are tolerated. An empty text is empty. The rest must be an optional sign, digits with `.` or `,`, and an optional exponent (`e5`, `E-3`). A unit, a letter, a space inside the number, an apostrophe, `0x10` and `Infinity` are invalid. A leading (`,5`) or trailing (`1,`) mark is read.
+
 - Both marks present: the last one is the decimal mark and the other must group digits in threes (`1.234,5` in German, `1,234.5` in English). Anything else is invalid.
 - One mark, the language's own (the comma in German, the point in English): a decimal mark, always. `2.800` in English and `2,800` in German are 2.8.
 - One mark, the other one: a decimal mark (`1,5` in English is 1.5, `2.5` in German is 2,5), with one exception. When exactly three digits follow and the whole part has one to three digits and does not start with 0 (`1,234` in English, `1.234` in German) it may be a thousands group. The reading that lies inside the field's range and whole-number rule is taken when only one does. When both fit, the text is ambiguous: it is refused with a message that asks for `1,234` as a decimal or `1234` as a whole number. When neither fits, the decimal reading stands and the range error follows.
@@ -55,6 +57,7 @@ pnpm --filter @open-reloading/web run i18n messages     # every message in the s
 ```
 
 `missing` also lists catalogue keys that no message matches (a text that was reworded in the source) and then exits with 1. `pnpm run lint` runs `i18n check de`, which fails on:
+
 - such a key, an empty text, placeholders other than the key's, or a plural form the language lacks;
 - a message without German that `untranslated.de` of `apps/web/scripts/i18n-lint.json` does not list. A new text needs its German text in the same change;
 - a listed message that has German now or is gone, and in CI one that the pull request's base does not list, so the list only shrinks. It holds the file readers' messages that had no German when the check became strict;
@@ -71,11 +74,13 @@ pnpm --filter @open-reloading/web run i18n messages     # every message in the s
 The German catalogue follows the term table `apps/web/src/i18n/german-terms.json`. Only the texts in `safeTexts` of `apps/web/scripts/i18n-lint.json` (the Safety notice and the disclaimers) may use a word that starts with "safe" (safe, safety, safely), and their German says "sicher" as often. A verified or decided term is used as the table gives it. Another language has no table yet: add one with the same shape if the language needs one.
 
 A row has one of three statuses:
+
 - `verified`: one German term and its sources. `forms` lists the forms a string may write instead, for example `["Serie", "Serien"]` for a text about one series.
 - `decided`: the sources disagree. `german` holds the chosen candidate, `candidates` keeps all of them with their sources, and `decision` names the rule that chose. Changing the choice means changing `german` and `decision` and the catalogue strings that write the term; `i18n check de` (part of `pnpm run lint`) fails for a string that writes a rejected candidate where the English word occurs, and for one that lacks a verified term. A key where the English word has another sense goes into `otherSense` of `apps/web/scripts/i18n-lint.json`, with the sense.
 - `unverified`: no source found. The row keeps its candidate or none and the note starts "Accepted as candidate for 1.0".
 
 The rules for a decided row, applied in this order:
+
 1. Target-shooting group: a candidate that a statute or federation rule book uses wins over one that only a maker text uses.
 2. Components and procedures groups: a candidate that a maker manual or a cartridge dimension table uses wins over one that only a rule book uses.
 3. The candidate with the most distinct sources (a document and a place count once).

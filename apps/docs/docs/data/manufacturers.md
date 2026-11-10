@@ -7,6 +7,7 @@ description: The manufacturer records that powder, bullet, case capacity and loa
 # Manufacturers
 
 Who names a manufacturer, and how:
+
 - by the id of a manufacturer record: a powder, primer or bullet (`manufacturer`), a case capacity record (`caseManufacturer`) and a load table (`manufacturer`);
 - by a `catalogue:<id>` reference: a chronograph session (`device.manufacturer`), and a load for a described bullet, powder or case (`manufacturer`);
 - by a `catalogue:<id>` or `user:<id>` reference: a user bullet and a firearm.
@@ -41,6 +42,7 @@ The id is the slug of the name without the legal form: "Demo Powder Co." becomes
 ## API
 
 Served under `/v1` (`packages/api/src/routes/components.ts`):
+
 - `GET /manufacturers`: `{ total, items: [{ id, name, aliases?, website? }] }`, ordered by name; `GET /manufacturers/:id`: the record.
 - `GET /powders` and `GET /bullets` filter by `manufacturer=<id>` and order by manufacturer name, product name and id; `q` matches the manufacturer name or one of its aliases followed by the product name.
 

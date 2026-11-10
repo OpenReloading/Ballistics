@@ -19,6 +19,7 @@ User records: which of eight inventory and lifecycle ideas (stock overview, batc
 ## Formulas
 
 No model equations. The two quantities the ideas would compute:
+
 - Remaining amount of a lot: the sum of its dated entries (purchase positive, use in a batch, discard and correction signed), computed, never stored, so it cannot disagree with its entries.
 - Cost of one round: the sum over the components of pack price over pack size times the amount per round (one bullet, one primer, one case over its firings, the charge over the pack mass for the powder).
 

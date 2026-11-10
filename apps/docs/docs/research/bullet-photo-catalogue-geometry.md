@@ -13,6 +13,7 @@ Seated volume and bullet records: can the [bullet from a photo](../models/bullet
 ## Method
 
 Fixed before the run.
+
 - **Data coverage.** Count the bullet records (`packages/catalog/records/bullets/`, 1,686 files on 2026-11-01) by maker and by geometry field.
 - **Accuracy.** Truth: the drawing (`bulletDimensions`, `bulletOutline`) of up to six records with a length per maker, taken in name order at a step of the maker's count over six (fewer than twelve: the first six; six or fewer: all): Cutting Edge, Hammer, Lehigh and Missouri Bullet six each, Berger 2, Nosler 1 and the two demo records, 29 bullets and three boat tails of the existing photo tests, 32 bullets from 10.5 to 58 mm long. A record with a boat-tail length and no base type (Berger) is drawn as a boat tail. Each bullet is rendered with `renderPhoto` in eight scenarios and measured with the tool's worker steps (`segmentPhoto`, `fitOutline`, `outlineHints`, `resolveScale`, `measureOutline`):
   - A: own photograph beside a ruler, 24 px per mm, scale from the ruler.
@@ -48,6 +49,7 @@ In millimeters the length P90 is 0.050 (A), 0.14 (C), 0.27 (D), 4.3 (F) and 0.69
 **Pressure.** The length P90 converted at 1.9 % per 0.5 mm (rifle, 31 mm bullet) and 9.9 % per 0.5 mm (9 x 19 mm, 15 mm bullet): A 0.25 and 0.6 %, C 0.4 and 1.1 %, D 0.9 and 2.2 %, H 2.2 and 5.6 %, F above 14 and 30 %. A caliper reading (0.05 mm, `bulletLengthTolerance.measured`) gives 0.19 and 1.0 %; the regression 7 to 8 and 17 to 30 %.
 
 **Online sources** (20 records, pages read 2026-11-01):
+
 - No product page or current catalogue of Hornady, Sierra, Sellier & Bellot, Sako, Missouri Bullet or Lapua prints a bullet length, nose length, boat tail, meplat or a dimensioned drawing for these bullets; none publishes CAD. Sierra's load data prints the cartridge length per bullet, Sako's reloading PDF weight, BC and cartridge length. Lehigh's old store interface had length and ogive-length fields (the source of its 121 records with a length); the domain now redirects to Wilson Combat, whose pages show neither.
 - Images: Hornady product images are 600 x 624 px side-view renders filling the frame; the 162 gr 7 mm and the 220 gr .30 ELD-X give the same L/D (5.217) and the same height in pixels, so they are fitted to the frame, not drawn to scale. Sierra has 540 x 600 px side views on white without a scale; Sellier & Bellot a group photograph of boxes and bullets; Sako mood photographs at an angle; Lehigh/Wilson Combat a box and three bullets in perspective; Lapua real photographs without a scale (not used, see below). No image of any maker carries a ruler or a grid.
 - The Hornady 2026 catalogue's small side-view pictures (about 100 to 170 by 23 to 34 px) give a picture height over printed diameter of about 101.8 px per inch, within about 1 %, from .243 to .338: they may share one scale. At about 0.25 mm per pixel that would be about 1 to 2 % of the length, unverified against any bullet of known length.

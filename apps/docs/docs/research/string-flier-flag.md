@@ -68,6 +68,7 @@ improved. Rule met: the false-flag rate is inside 0.5 to 1.5 percent for every $
 The count of flags on real strings is not part of this entry: it waits for measured strings (issue 278). If real strings are flagged far more than 1 percent (heavy tails), the SD interval of the [Groups](../models/groups.md) assumes a normal string and the flag is not shown.
 
 Web wiring, not built (at most ten lines):
+
 - In the velocity statistics of a string of 10 to 30 shots, when `flierScreen` flags a shot, a line under the standard deviation: "Shot N (value) is far from the others (D standard deviations of the rest; a clean normal string shows this about once in a hundred). Standard deviation with it: A, without it: B." The shot stays in all numbers; the shot table marks it.
 - No flag, no line, for fewer than 10 or more than 30 shots; the line says nothing about cause (a cold-bore shot is a real effect).
 - The flag never sets `excluded` and never changes the extreme spread or the standard deviation shown first.

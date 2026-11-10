@@ -7,6 +7,7 @@ description: Interior ballistics with one gas state, a Noble-Abel gas, a pressur
 # M3 interior model
 
 The M3 model computes pressure, travel and velocity of a projectile in the barrel from ignition to muzzle exit.
+
 - One Noble-Abel gas state stands for the whole space behind the projectile.
 - The energy of the burning charge goes into gas, projectile motion, rotation, gas motion, bore resistance and heat.
 - A two-coefficient gradient gives the base and breech pressures from the mean pressure.
@@ -176,6 +177,7 @@ Code: `packages/ballistics/src/interior/model.ts`, `gasState` (`startG`).
 The second term of $g_\text{start}$ is a choice of the model.
 
 Without a start pressure, a caller can take `defaultStartPressure`:
+
 - Barrel of 0.3 m and longer: one value per bullet construction (lead 30.0, jacketed 29.2, monolithic 35.3 MPa), fitted by the load-table powder fit. Plated bullets have no rifle rows and a construction not given takes an assumed 30 MPa.
 - Shorter barrel: one value per bullet construction, fitted by the same fit: lead 24.3 MPa, plated 30.9 MPa, jacketed 30.8 MPa, monolithic 50.0 MPa ([research entry](../research/interior-start-pressure-rules.md)). A construction not given counts as jacketed, an unknown name is an input error.
 
@@ -226,6 +228,7 @@ p_f = \tau_f\, \frac{\pi G_1 L}{A} \left(1 + c\, o\right), \qquad o = \max\left(
 $$
 
 Code: `packages/ballistics/src/interior/bore-resistance.ts`, `boreResistance`, `oversizePercent`, `recordResistance`.
+
 - $o$ is taken as 0 without $Z$ and above `maxOversizePercent` (5 %).
 - $G_1$ and $Z$ are C.I.P. tolerance limits, not measurements. A run reads $G_1$ from the cartridge record, else the bore diameter.
 - The workbench keeps the record's $Z$ in $o$ when the chosen firearm has a measured groove diameter: $G_1$ stays a nominal limit, and a measured $Z$ against it would give an oversize no bullet was measured for. A bullet below the measured groove diameter gets a note, as gas passing the bullet is not in the model.
@@ -329,6 +332,7 @@ $$
 Code: `packages/ballistics/src/interior/model.ts`, `scaleInteriorLoad` (`vr`, `ts`), `interiorRhs`.
 
 With leakage the state has two more components ([leakage and heat loss](interior-leakage-heat.md)). The system is integrated in $\tau$ with the Dormand-Prince 5(4) method of the [point-mass page](exterior-point-mass.md), in chunks of `outputStep`. A curve point falls at each chunk end and at each event. Defaults (`interiorDefaults`):
+
 - relative tolerance $10^{-9}$, absolute tolerance $10^{-11}$ on the scaled state
 - output step $2\times10^{-6}$ s
 - $2\times10^{5}$ steps
@@ -390,6 +394,7 @@ Code: `packages/ballistics/src/interior/model.ts`, `interior` (`tenPercentPressu
 The level of 10 % in $t_{10}$ is a choice of the model, not taken from a source.
 
 `peakBreechPressure` is the peak breech pressure, the pressure a chamber transducer measures. The result also carries:
+
 - the peak base and mean pressures, and the three pressures at the muzzle
 - shot-start time, barrel time from shot start to muzzle, burnout time and travel
 - the burnt fraction at the muzzle
@@ -421,6 +426,7 @@ $$
 $$
 
 Code: `packages/ballistics/src/interior/load-file.ts`, `solidFillLimit`, `fillLoadRatioLimit`.
+
 - The limit needs no bulk density, so it applies to every run. With a bulk density the API and the workbench state it as the load ratio $\Lambda_\text{max}$ of the powder.
 - The [charge solver](interior-charge-solver.md) stops at $\varphi_\text{max}$.
 - The `chamberVolume` rule of `interior` stops where the solid volume or the covolume of the charge fills $V_c$, at $\varphi = \min\left(1,\ 1/(\eta \rho_s)\right)$. With $\eta$ = 1 cm3/g and $\rho_s$ = 1.6 g/cm3 that is 0.625, below $\varphi_\text{max}$.
@@ -542,6 +548,7 @@ $$
 Code: `packages/ballistics/src/interior/model.ts`, `chargeTooSmall`.
 
 Central differences at 5 % of $p_h$ over a charge ladder of five made-up loads (rifle, rifle with bore resistance, magnum with the two-stage form, pistol, lead-bullet pistol) give:
+
 - Without bore resistance, $E_p$ is close to one function of $r = \bar p_\text{max} / p_h$ for every load: 0.68 to 0.70 at $r = 1.5$, 0.5 at $r$ = 2.18 to 2.39, 1/3 at $r$ = 3.7 to 4.3.
 - With $p_\text{st} = 0$, where $p_i$ is the hold pressure, $E_p$ is 0.5 at $r$ = 2.1 to 2.3.
 - $E_v$ is below $E_p$ except near a projectile that stops.
@@ -569,6 +576,7 @@ p_0 = p_f + p_e(0)
 $$
 
 Code: `packages/ballistics/src/advisories.ts`, `advisoryRule`, `interiorAdvisories`. `packages/use-cases/src/advisory-text.ts`, `advisoryText`. `packages/use-cases/src/limits.ts`, `warning`, `limitCheck`.
+
 - `startPressureBelowResistance`: $0 \lt p_\text{st} \le p_0$. The start condition of [shot start](#shot-start) is then decided by the second term, so the start pressure has no effect. A start pressure of 0 counts as not given.
 - `gyrationRadiusWithoutTwist`: a radius of gyration is given and $L_\text{tw} = 0$. The [effective mass](#effective-mass) then has no rotational term, so the radius is ignored.
 - `startPressureHeldOnce`: $p_\text{st} \gt p_0$, $p_\text{st} \gt p_\text{i}$ (the ignition pressure) and $p_e(0) \gt 0$. The projectile is held until the pressure reaches $p_\text{st}$ and then starts against $p_0$, which is lower. $p_0$ is the resistance at shot start only: the engraving profile can rise with travel, so the resistance later in the motion can exceed $p_0$ and $p_\text{st}$. With $p_\text{i} \ge p_\text{st}$ the [shot start](#shot-start) condition holds at ignition and there is no hold.

@@ -113,6 +113,7 @@ In the study the check named 20 of 700 noise-only fits with three or five traces
 ### Holding parameters fixed
 
 A trace often fixes the burn coefficient and the shape of the rise but not the exponent: the pressure exponent and the form parameters move the same part of the curve. The fit therefore holds parameters at their start values and reports why:
+
 - A `weak` exponent is held fixed with the reasons of the attempt that showed it, and the fit repeats without it. A fit of the exponent alone keeps it and reports it `weak`. The reason `inconsistent` of the [leave-one-trace-out check](#leave-one-trace-out-check) comes after the fit and does not hold it.
 - An `unresolved` failure of the loop holds the parameters it names.
 - An `ill-conditioned` failure holds the next of the exponent, the form slope and the transition point that is still fitted.
@@ -139,6 +140,7 @@ Code: `packages/ballistics/src/interior/curve-fit.ts`, `fitPressureCurves` (`pea
 Each trace has its own window, sensor and $\sigma_k$, found as for one trace. Either every trace gives `sigma` or none does. A time shift moves only its own trace's residuals, so its Jacobian columns are zero elsewhere. The parameters are held and reported as for one trace, with one `timeShift` entry per trace in input order. With one trace the result is that of `fitPressureCurve`.
 
 A trace at a higher peak sees the burn rate change as $(p/p_\text{ref})^n$, while the form function and the time shift do not change with the charge, so the traces together separate the exponent from the shape of the rise. On synthetic traces two or more charges whose highest peak is 1.2 to 1.5 times the lowest gave the exponent a variance inflation of 17 to 83 against 125 to 365 for one trace ([research log](../research/interior-curve-fit-exponent.md)). The default `maxInflation` is therefore 100 when the traces come from at least two charges and the highest peak is at least 1.2 times the lowest, and 10 otherwise. The input checks are listed in `warnings`, each with the traces it names:
+
 - `sameCharge`: traces at the same charge (within a relative $10^{-6}$). Repeat shots add no pressure range but keep the limit of the other charges.
 - `narrowPeaks`: the highest peak is below 1.2 times the lowest. The exponent is then held under the limit of one trace.
 

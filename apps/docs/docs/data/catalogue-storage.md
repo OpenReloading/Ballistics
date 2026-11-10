@@ -13,6 +13,7 @@ The catalogue (the records of `packages/catalog`) is read only, rebuilt from git
 No server database for the catalogue. A typed index and a record file are built at build time and opened in process through one `Catalogue` interface (`@open-reloading/catalog`), used by the API server, the Pages build, the browser, the CLI and the tests. User data stays in the browser ([Record model](record-model.md)).
 
 Speed does not decide it (every option answers in under 3 ms at this size). These do:
+
 1. **Parity.** One implementation of list, filter, search, ranking and order runs in Node and in the browser: the API through the catalogue, the browser through `openCatalogue` over `catalogue/index.json`, the web lists through `matchesQuery` (`apps/web/src/lib/lists.ts`). A `q` of spaces only is no query. The bullet list's own word-start rule (`bulletMatches`) stays until the record pickers use the ranker.
 2. **What a database did not fix.** PostgreSQL's JIT cost at default settings. The two sort orders between the API and the data files and the word-order dependent search it had are fixed by the shared `sortKey` and matcher below.
 3. **Less to run.** No SQL layer, database service, `DATABASE_URL` or database packages in code, containers or CI.
@@ -35,6 +36,7 @@ The load tables of the makers are `records/loads/<cartridge id>/<maker>.json`, o
 ## The module
 
 `packages/api/src/catalogue/`, read by the routes, the compute record lookups, the server and the static build:
+
 - `derive.ts`: one index row per record, `{ item, sortKey, search }`. `item` is the list item the route answers (the cartridge's sheet minima and case head, a bullet's first G1 and G7 coefficient, a target's caliber classes), `sortKey` and `search` come from the schema package's `sortKey` and `searchKey`. Also the revision: a synchronous 53-bit hash of the record's JSON text, the same in Node and the browser, for change detection only.
 - `build.ts`: `buildCatalogue(records)` returns the typed index (`CatalogueIndex`, every list in its default order) and the record file (every record by id, one map per kind). Both start with the header `format` and `derive`, see below. Pure, so the build, the tests and a browser can all run it. The files hold the records as they are: `kind`, `origin` and `revision` are added when a record is read.
 - `open.ts`: `openCatalogue({ index, records })` returns the `Catalogue` interface, which `@open-reloading/catalog` defines (`src/catalogue.ts`) and this entry passes on: `cartridges`, `powders`, `primers`, `bullets` and `cases` (with `q`, `table`, `manufacturer`, `cartridge`, `limit`, `offset`), `manufacturers`, `targetFaces`, `federations`, `disciplines`, `targetMappings`, `caliberClasses`, `capacities` and `get(kind, id)`. The record file may be a function, read on the first `get`. A file whose header does not match is refused.
@@ -74,6 +76,7 @@ The API default order, the browser lists and the web tables (`sortRows` in `apps
 ## One matcher and ranker
 
 `packages/schema/src/search.ts`:
+
 - `fold(s)`: Unicode NFD, combining marks removed, lower case, a decimal comma between digits written as a point.
 - `searchKey(texts, name?)`: the folded texts, the same text with spaces and hyphens removed, and the folded name (default: the first text), joined by U+0001. Built once per row.
 - `score(key, query)`: the query is split into words. Each word must occur in the key, as written, without spaces and hyphens, or (for a word that starts with a point and a digit) without the point. A word scores 2 where the best occurrence starts a word of the key and 1 inside one. A word that is a number (digits, an optional decimal part, an optional leading point) must match a whole number of the key: no digit before or after it and not a part of a longer decimal. `7.8` finds neither `17.82` nor `7.82`, `168` neither `1682` nor `168.5`, `82` not `17.82`. A number is therefore found only once typed in full (`16` does not list `168`), the same in the list routes, the field, the dialog and the palette. The whole query equal to the name (ignoring a point that ends a word) adds 4. `undefined` means no match, an empty query ranks 0. The order of a ranked list is score descending, then `sortKey`, then id.
