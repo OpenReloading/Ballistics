@@ -51,12 +51,63 @@ async function cli(
 
 const data = ['--rows', rowsPath, ...recordRoots.flatMap((r) => ['--records', r])]
 
+/** Two training rows of one powder that print a pressure, so that `--energy prior` would run on them. */
+const pressured = [
+  '--rows',
+  writeRows(
+    rowsCsv(
+      [2.0, 2.4].map((charge) => ({
+        cartridge: '30-br',
+        powder: 'demo-powder-sp30',
+        charge,
+        velocity: 0,
+        pressure: 0,
+      })),
+    ),
+  ),
+  ...data.slice(2),
+]
+
 const ajv = new Ajv2020({ allErrors: true, strict: false })
 const validate = ajv.compile(JSON.parse(readFileSync(schemaPath, 'utf8')))
 
 describe('the JSON result', () => {
-  it('validates against the committed schema, for both commands', async () => {
+  // the runs with a fit run the model many times, and the CI runner measures coverage: the default 30 s is too short there
+  it('validates against the committed schema, for both commands', {
+    timeout: 120_000,
+  }, async () => {
+    const priorRows = writeRows(
+      rowsCsv(
+        [
+          ['30-br', 2.0],
+          ['30-br', 2.4],
+          ['308-match', 2.2],
+          ['308-win', 2.0],
+        ].map(([cartridge, charge]) => ({
+          cartridge: cartridge as string,
+          powder: 'demo-powder-sp30',
+          charge: charge as number,
+          velocity: 0,
+          pressure: 0,
+        })),
+      ),
+    )
+    const prior = ['--rows', priorRows, ...data.slice(2), '--energy', 'prior']
+    // a run with `--exponent family` fits every powder of the rows seven times, so it gets few rows of one powder
+    const specs = [
+      ...[2.0, 2.2, 2.4].map((charge) => ({ cartridge: '30-br', charge, velocity: 0.01 })),
+      ...[2.0, 2.2].map((charge) => ({ cartridge: '308-win', charge, velocity: 0.01 })),
+    ]
+    const few = ['--rows', writeRows(rowsCsv(specs)), ...data.slice(2)]
+    const printed = [
+      { cartridge: '30-br', charge: 2.0 },
+      { cartridge: '30-br', charge: 2.2 },
+      { cartridge: '308-win', charge: 2.0 },
+    ].map((s) => ({ ...s, velocity: 0, pressure: 0, pressureBasis: 'transducer' }))
+    const pressures = ['--rows', writeRows(rowsCsv(printed)), ...data.slice(2)]
     for (const args of [
+      ['fit', ...prior],
+      ['verify', ...prior, '--params', 'fit-on-training'],
       ['verify', ...data],
       ['verify', ...data, '--split', 'test', '--final'],
       ['verify', ...data, '--group-by', 'construction', '--params', 'records'],
@@ -65,6 +116,10 @@ describe('the JSON result', () => {
       ['compare', ...data, '--baseline', 'm3', '--candidate', worse],
       ['fit', ...data],
       ['verify', ...data, '--params', 'fit-on-training'],
+      ['fit', ...few, '--exponent', 'family'],
+      ['verify', ...few, '--params', 'fit-on-training', '--exponent', 'family'],
+      ['fit', ...pressures, '--pressure-sigma', '0.05'],
+      ['verify', ...pressures, '--params', 'fit-on-training', '--pressure-sigma', '0.05'],
     ]) {
       const { code, stdout } = await cli(args)
       expect(code).toBe(0)
@@ -155,6 +210,9 @@ describe('exit codes', () => {
     [['verify', ...data, '--final']],
     [['verify', ...data, '--split', 'training', '--final']],
     [['compare', ...data, '--baseline', 'm3', '--candidate', 'm3', '--final']],
+    [['fit', ...data, '--exponent', 'family', '--pressure-sigma', '0.05']],
+    [['fit', ...pressured, '--energy', 'prior', '--exponent', 'family']],
+    [['fit', ...pressured, '--energy', 'prior', '--pressure-sigma', '0.05']],
   ])('is 2 for bad input: %j', async (args) => {
     const { code, stdout } = await cli(args)
     expect(code).toBe(2)

@@ -158,6 +158,8 @@ export interface Design {
   baseChanged?: boolean
   /** The overrides as saved: Save keeps those of a field the designer has no input for. */
   kept?: UserBullet['overrides']
+  /** What the photograph the values were measured from gave, kept through files. */
+  photo?: NonNullable<UserBullet['photo']>
   /** Why the design is read only (its base is not there), with the record as stored, which Save keeps as it is. */
   locked?: { reason: string; data: UserBullet }
 }
@@ -257,6 +259,7 @@ export function fromUser(
     ...(data.basedOn && { basedOn: data.basedOn }),
     ...(changed && { baseChanged: true }),
     ...(data.overrides && { kept: data.overrides }),
+    ...(data.photo && { photo: data.photo }),
     ...(problem && { locked: { reason: problem, data } }),
   }
 }
@@ -301,6 +304,7 @@ export function fileData({
   origin,
   basedOn,
   kept,
+  photo,
   locked,
 }: Design): UserBullet {
   if (locked) return locked.data
@@ -315,6 +319,7 @@ export function fileData({
     ...(basedOn && { basedOn }),
     ...(basedOn && origin?.revision && { basedOnRevision: origin.revision }),
     ...(Object.keys(overrides).length > 0 && { overrides: overrides as UserBullet['overrides'] }),
+    ...(photo && { photo }),
   }
 }
 

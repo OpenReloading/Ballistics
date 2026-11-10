@@ -1,4 +1,5 @@
 /** Caliper sizes give the scale without a ruler and check it with one (`apps/docs/docs/models/bullet-photo.md`); pure, so it runs in a worker. */
+import type { UserBullet } from '@open-reloading/schema'
 import { type Message, msg } from '../i18n/translate.ts'
 import type { Scale } from './bullet-photo.ts'
 import type { BulletMeasurement } from './bullet-photo-measure.ts'
@@ -81,7 +82,7 @@ const againstEach = (a: Estimate, b: Estimate) =>
   )
 
 /** What gives the scale: the ruler's points, or the sizes entered without a ruler. */
-export type ScaleBasis = 'ruler' | 'diameter' | 'length' | 'diameter+length'
+export type ScaleBasis = NonNullable<NonNullable<UserBullet['photo']>['scaleBasis']>
 
 /** A bullet turned 10 degrees shows its length 1.5 % short, so scales over 2 % apart are flagged (`apps/docs/docs/research/bullet-photo-catalogue-geometry.md`). */
 export function basisNote(basis: ScaleBasis | undefined): Message | undefined {

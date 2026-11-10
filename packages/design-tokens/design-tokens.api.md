@@ -136,6 +136,7 @@ export const theme: {
     };
     readonly white: "#ffffff";
     readonly black: "#10121b";
+    readonly respectReducedMotion: true;
 };
 
 // (No @packageDocumentation comment for this package)

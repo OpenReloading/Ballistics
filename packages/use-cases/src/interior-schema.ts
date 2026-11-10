@@ -224,6 +224,13 @@ const m3Load = z
             'Throat wear, m: length a worn throat adds behind the bullet; the run adds it times the bore area to the volume. Default 0.',
           )
           .optional(),
+        area: z
+          .number()
+          .positive()
+          .describe(
+            'Cross-section area of the chamber body, m2, at least the bore area. Given, the pressure gradient takes its chambrage form and gradient must be absent; default a chamber of the bore area.',
+          )
+          .optional(),
       })
       .describe('Chamber and bore.'),
     barrel: z
@@ -452,6 +459,7 @@ export type M3LoadShape = {
       boreArea: z.ZodNumber
       boreDiameter: z.ZodNumber
       throatWear: z.ZodOptional<z.ZodNumber>
+      area: z.ZodOptional<z.ZodNumber>
     },
     z.core.$strict
   >

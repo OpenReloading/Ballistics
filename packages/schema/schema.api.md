@@ -1870,6 +1870,17 @@ export const userBullet: z.ZodObject<{
     basedOn: z.ZodOptional<z.ZodString>;
     basedOnRevision: z.ZodOptional<z.ZodString>;
     overrides: z.ZodOptional<typeof bulletOverrides>;
+    photo: z.ZodOptional<z.ZodObject<{
+        width: z.ZodInt;
+        height: z.ZodInt;
+        pxPerMm: z.ZodNumber;
+        relativeStandardUncertainty: z.ZodNumber;
+        scaleBasis: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'ruler' | 'diameter' | 'length' | 'diameter+length'>>>;
+        values: z.ZodRecord<z.ZodEnum<z.core.util.ToEnum<'length' | 'diameter' | 'bearingLength' | 'noseLength' | 'meplatDiameter' | 'ogive.radius' | 'ogive.radiusRatio' | 'base.length' | 'base.diameter' | 'base.angle' | 'cannelure.start' | 'cannelure.width' | 'cannelure.depth'>> & z.core.$partial, z.ZodObject<{
+            value: z.ZodNumber;
+            standardUncertainty: z.ZodNumber;
+        }, z.core.$strict>>;
+    }, z.core.$strict>>;
 }, z.core.$strict>;
 
 // @public

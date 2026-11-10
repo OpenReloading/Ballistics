@@ -115,9 +115,11 @@ type Entry = { row: Row; load: InteriorLoad; fitTemperature: number }
 
 /** With the record's temperature sensitivity, else the assumed one about the temperature of the powder's fit, where its specific energy belongs (`fitTemperature`, K). */
 function entryOf(load: InteriorLoad, row: Row, records: Records): Entry {
-  const fit = records.powders.get(row.powder)?.interior?.propellantTemperature.value
+  const powder = records.powders.get(row.powder)
+  const fit = powder?.interior?.propellantTemperature.value
   const fitTemperature = fit === undefined ? load.propellantTemperature : kelvin(fit)
-  if (load.propellant.temperatureSensitivity) return { row, load, fitTemperature }
+  // recordLoad also gives the grain form's default, which this check does not start from
+  if (powder?.temperatureSensitivity) return { row, load, fitTemperature }
   const sensitivity = {
     reference: fitTemperature,
     cold: assumedSensitivity,

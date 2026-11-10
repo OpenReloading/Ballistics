@@ -117,6 +117,16 @@ describe('recordLoad bore area, sensitivity and refusals', () => {
     })
   })
 
+  it('takes the default of the grain form for a powder without its own sensitivity', () => {
+    const fitAt15 = { ...powder.interior, propellantTemperature: { value: 15 } }
+    const ball = { ...powder, interior: fitAt15, grainForm: 'ball' } as RecordPowder
+    expect(recordLoad({ ...run, powder: ball }).propellant.temperatureSensitivity).toEqual({
+      reference: 288.15,
+      cold: 0.0012,
+      hot: 0.0027,
+    })
+  })
+
   it('refuses a missing value, a powder without a model and a resistance law without a bullet length', () => {
     const noF = { values: cartridge.values.filter((v) => v.symbol !== 'F' || v.variant) }
     expect(() => recordLoad({ ...run, cartridge: noF })).toThrow(
