@@ -1,6 +1,6 @@
 import type { Bundle } from './records.ts'
 
-/** A record the public catalogue may not hold: it cites a manufacturer-origin source or a fitted source without an origin. */
+/** A record the public catalog may not hold: it cites a manufacturer-origin source or a fitted source without an origin. */
 export interface MakerRow {
   id: string
 }
