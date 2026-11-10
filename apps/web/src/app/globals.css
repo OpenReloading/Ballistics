@@ -620,10 +620,6 @@ td.nowrap {
   white-space: nowrap;
 }
 
-.break {
-  overflow-wrap: anywhere;
-}
-
 /* data pages: sortable tables, record summary, spec panels, units switch */
 .sort-button {
   display: inline-flex;

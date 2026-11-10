@@ -107,6 +107,48 @@ Setting $\varepsilon$ equal to the Sébert factor is a choice of the model, not 
 
 While the projectile is at rest, $p_b = p_\text{br} = \bar p$.
 
+#### Chambrage
+
+The Lagrange coefficients treat the space behind the projectile as a cylinder of the bore area. In a bottleneck cartridge the case body is wider: over the 208 cartridges of the repository's C.I.P. table I records that state the chamber diameters $P_1$ and $P_2$ and the bore area $Q$, the circle of the mean of $P_1$ and $P_2$ is 1.68 to 3.78 times $Q$ (10th to 90th percentile, median 2.78). Gas in a wide chamber moves slowly, so it carries less kinetic energy and, near the peak pressure, builds a smaller difference between breech and base pressure. Late in the bore the difference is larger than the Lagrange one, about 3 % at the muzzle of the load below. With `chamber.area` given, the gradient takes its chambrage form; without it the Lagrange gradient above applies unchanged.
+
+The assumptions are those of the Lagrange gradient: the charge is spread with uniform density over the volume behind the projectile, and the gas moves so that the density stays uniform. That volume is now a chamber of cross-section $\chi A$ and volume $V_0$ (the volume behind the seated bullet without throat wear), followed by the bore of area $A$. A worn throat counts as bore, so with wear $f$ is below 1 at $x = 0$:
+
+$$
+\chi = \frac{A_\text{ch}}{A}, \qquad g = 1 - \frac{1}{\chi^2}, \qquad V = V_0' + A x, \qquad f = \frac{V_0}{V}
+$$
+
+Code: `packages/ballistics/src/interior/model.ts`, `chambrageOf` (`g`, `f`).
+
+At the volume coordinate $V_s$, counted from the breech, the gas moves at $u = (V_s / V)(A / A(s))\, v$, with $A(s)$ the cross-section there. Inside a part of constant area the convective term cancels the change of the profile, as in the Lagrange problem. At the step from the chamber into the bore the gas speeds up from $f v / \chi$ to $f v$, which costs the Bernoulli pressure drop $\tfrac{1}{2} (m_c / V)\, g f^2 v^2$. The coefficients and the effective mass become functions of travel:
+
+$$
+\delta(x) = \tfrac{1}{3}\left(1 - g f^3\right), \qquad \varepsilon(x) = \tfrac{1}{2}\left(1 - g f^2\right), \qquad m_e(x) = m_p' + \delta(x)\, m_c
+$$
+
+Code: `packages/ballistics/src/interior/model.ts`, `chambrageOf` (`delta`, `eps`, `me`).
+
+The gas kinetic energy is $\tfrac{1}{2}\delta(x)\, m_c v^2$, and the mean pressure follows from the energy balance with $m_e(x)$. The motion gains a term:
+
+$$
+m_e(x) \frac{dv}{dt} = A \bar p - F_r - \tfrac{1}{2} m_c\, g f^3 \frac{A}{V} v^2
+$$
+
+Code: `packages/ballistics/src/interior/model.ts`, `chambrageOf` (`motion`).
+
+The last term is $\tfrac{1}{2} m_c (d\delta/dx)\, v^2$: the inertia grows as gas moves from the chamber into the bore. With it $\tfrac{d}{dt}\left(\tfrac{1}{2} m_e v^2\right) = v (A \bar p - F_r)$, so the energy balance stays closed. Base and breech pressure, with the acceleration $a$:
+
+$$
+p_b = \frac{m_p' a + F_r}{A}, \qquad p_\text{br} = p_b + \varepsilon(x)\, \frac{m_c a}{A} + \frac{m_c}{2V}\, g f^2 v^2
+$$
+
+Code: `packages/ballistics/src/interior/model.ts`, `chambrageOf` (`motion`), `pressuresOf`.
+
+As a check, the volume mean of the pressure field is $p_b + \delta(x)\, m_c a / A + (m_c / 2V)\, g f^3 v^2$; with $p_b$ from the base it gives the same equation of motion as the energy route. $\chi = 1$ gives the Lagrange gradient. Far down the bore ($f \to 0$) the coefficients return to $1/3$ and $1/2$; without throat wear they are $1/(3\chi^2)$ and $1/(2\chi^2)$ at $x = 0$. While the projectile is at rest the three pressures are equal, as above.
+
+On the load of the test (bore area 47.6 mm², 3.6 cm³ behind the bullet, 10.8 g bullet, 2.8 g charge, 550 mm travel) with an unchanged burn coefficient, $\chi = 2.5$ lowers the simulated muzzle velocity by 1.3 % (797.8 to 787.2 m/s) and the peak breech pressure by 5.9 % (278.8 to 262.5 MPa) ([research log](../research/interior-chambrage-gradient.md)).
+
+The derivation is this project's own and has not been compared with a published chambrage gradient (unverified). The chamber is one cylinder, with no shoulder cone and no neck, and the burn rate still follows the mean pressure. The step from the chamber into the bore is taken without loss (Bernoulli): a sudden contraction loses more pressure and a cone shoulder comes close to the lossless case, and the size of that loss is not modeled (unverified). The heat loss keeps the geometry of a bore cylinder (`heatFluxOf`): its area and gas speed do not change with `chamber.area`. The chambrage form takes no `gradient`; a run with both is invalid. No record or load file sets `chamber.area`.
+
 ### Ignition
 
 With no gas and $v = 0$ the pressure is 0 and the burn rate is 0. The run therefore starts from the burnt fraction $z_0$ that gives the ignition pressure $p_i$ in the closed chamber (the energy balance with $v = 0$, $W_r = E_h = 0$, solved for $z$):
@@ -398,6 +440,7 @@ Code: `packages/ballistics/src/interior/record-load.ts`, `recordLoad`.
 | $V_c$                           | Chamber volume behind the seated projectile base                      | no kind     | m3             |
 | $V_f$                           | Free volume of the gas                                                | no kind     | m3             |
 | $A$                             | Bore area                                                             | mm2         | m2             |
+| $A_\text{ch}$, $\chi$           | Chamber body area, its ratio to the bore area                         | no kind     | m2, 1          |
 | $Q_\text{CIP}$                  | C.I.P. bore area Q of the cartridge                                   | mm2         | mm2            |
 | $F$, $Z$                        | C.I.P. land and groove diameter                                       | mm          | mm             |
 | $G_1$                           | C.I.P. bullet diameter                                                | mm          | mm             |
@@ -458,6 +501,7 @@ Code: `packages/ballistics/src/interior/record-load.ts`, `recordLoad`.
 - The temperature term of the gas energy is not adopted: on synthetic loads it carries about a fifth of the muzzle-velocity change for a temperature step, and the fitted temperature factor absorbs it inside the calibrated temperature range (simulations, [research log](../research/propellant-temperature-energy.md)). The check on measured temperature ladders is pending.
 - Temperature of ball powder: 75 K below the reference, the model gives a peak pressure 13.0 % lower (unverified) where a measurement gives 1.65 % lower: 0.022 %/K over 75 K ([Boulkadid 2016](../bibliography.md#boulkadid-2016), Table 6, spherical, 21 to -54 °C), not significant at its uncertainty of ±0.043 %/K. The temperature sensitivity of single-base powders spreads from 0.013 to 0.074 %/K (unverified), as wide as the spread between bases, and the fitted temperature factor already holds the share of the gas energy ([research log](../research/propellant-temperature-energy.md)).
 - The Lagrange coefficients assume a gas column of uniform density. Against the self-similar column of an isentropic gas with linear velocity (all of the charge burnt, ratio of specific heats 1.24 to 1.26, [Corner 1950](../bibliography.md#corner-1950), pages unverified) they put the breech and mean pressures over the base pressure high by 0.2 % at $m_c/m_p' = 0.28$, 0.6 to 0.7 % at 0.51 and 1.8 to 2.1 % at 1.03 (breech over base 1.515 against 1.489, mean over base 1.343 against 1.315). The error grows with a heavy charge behind a light projectile ([research log](../research/interior-lagrange-gradient-size.md)).
+- By default the gradient takes the space behind the projectile as a cylinder of the bore area. The option `chamber.area` gives the [chambrage](#chambrage) form for a wider case body, a derivation of this project with one cylindrical chamber and no shoulder or neck that has not been compared with a published one (unverified). It is not the default for record runs: that needs a held-out comparison in which each form refits its burn coefficients ([research log](../research/interior-chambrage-gradient.md)).
 - The primer enters only through the ignition pressure $p_i$. On the load-file example of the API ($p_\text{st}$ = 100 bar), $p_i$ from 5 to 100 bar leaves the muzzle velocity at 824.774 m/s, because the projectile is held until $p_\text{st}$. Above $p_\text{st}$, $p_i$ becomes the hold pressure: 200 bar gives 836.635 m/s, 1.44 % more ([charge too small](#charge-too-small), [research log](../research/interior-primer-ignition-pressure.md)).
   - Primer output: in open air, [Courtney 2014](../bibliography.md#courtney-2014) measured blast pressures of 2908 kPa (Fed 210M), 3811 kPa (Fed 215M), 2561 kPa (CCI 200) and 3587 kPa (CCI 250); an ignition pressure anywhere from 3 to 20 MPa (unverified) changes nothing while it stays below the start pressure. The lead-free KVB-7E gave 1186 kPa, 59 % below the Fed 210M, and 19 of 20 small DDNP primers misfired after hot and humid storage (same source); neither is a quantity of the interior model.
   - Primer energy has no source. In the model, 10 J more (unverified) raises the muzzle velocity by 0.05 % on a rifle load and 0.38 % on a handgun load; the one correlation found (R = 0.92, unverified) relates the total primer mass to the mass of priming compound, not to an energy.
@@ -475,7 +519,7 @@ Code: `packages/ballistics/src/interior/record-load.ts`, `recordLoad`.
 - Neck pull and crimp are not inputs: the start pressure is fitted. The minimum bullet pull of 35 lbf (156 N) for 5.56 mm M193 ([MIL-C-9963F](../bibliography.md#mil-c-9963f)) is about 6.1 MPa on the base of a 5.56 mm bullet; other military rounds are given up to 267 N and 5.6 to 7.9 MPa (unverified). All lie inside the fitted start pressure. In the model, one MPa more start pressure moves a .308 load by +0.53 % peak pressure and +0.11 % velocity (unverified); no force by crimp class was found.
 - The heat model is the only term that depends on the size of the gun. Without it, peak pressure and velocity against travel in calibres are unchanged when every length is multiplied by $s$, volumes, masses and the charge by $s^3$, areas by $s^2$ and grain dimensions by $s$, and times scale with $s$ ([research log](../research/interior-exact-scaling-sensitivity.md)). With the convective heat loss (flame temperature 2800 K, factor 1) on the seven-perforation rifle load of the research entry, $s$ from 0.5 to 5 moved peak pressure by -0.35 to +0.66 % and muzzle velocity by -0.64 to +1.2 %.
 - Validity reasons of an invalid result: `input` with the first invalid field, `chamberVolume` (solid volume or covolume of the charge not below $V_c$), `noShotStart` (burnout before the projectile moves), `stuck` (velocity back to 0), `integration` (step size or step count), `maxTime` (run time reached before the muzzle).
-- Input checks: all values finite, volumes, areas, lengths, masses, energies, densities, temperatures and $p_i$ positive, $k \gt 1$, $\eta \ge 0$, $L_\text{tw} \ge 0$, $p_\text{st} \ge 0$, profile travels strictly increasing.
+- Input checks: all values finite, volumes, areas, lengths, masses, energies, densities, temperatures and $p_i$ positive, $k \gt 1$, $\eta \ge 0$, $L_\text{tw} \ge 0$, $p_\text{st} \ge 0$, profile travels strictly increasing, $A_\text{ch} \ge A$ and no `gradient` with `chamber.area`.
 - `tenPercentPressureTime` is linear between curve points and depends on the output step.
 - A projectile that slows before the muzzle without stopping is a valid run with no note: when the gas force falls below the bore friction late in the bore, the slowdown shows only in the curve. The interior test load with a charge of 0.6 g, a 1.5 m barrel and a friction pressure of 5 MPa leaves the muzzle at 189.4 m/s after 195.6 m/s in the bore. On printed load rows it occurs in 0.19 % of runs (muzzle velocity below 0.99 of the highest), all slow loads with high friction, so no note flags it ([research log](../research/interior-plausibility-notes.md)).
 - Reference values, not limits: on 52,391 runs of printed load rows, the ratio of the equivalent constant pressure $(m_p + m_c/2) v_e^2 / (2 A L)$ to the peak breech pressure lies between 0.12 and 0.67 and the efficiency $\eta_b$ between 0.076 and 0.49 for 99 % of runs, the expansion ratio $(V_c + A L)/V_c$ between 5.5 and 15.7 for 90 %. The bands are too wide to catch a doubled chamber volume or a halved bullet mass, so no note uses them ([research log](../research/interior-plausibility-notes.md)).
@@ -484,7 +528,7 @@ Code: `packages/ballistics/src/interior/record-load.ts`, `recordLoad`.
 - Solid fill above 0.64 (`solidFillLimit`): the API (`loadRatioHigh`) and the workbench warn ([load file](#load-file)).
 - Inputs the run ignores or holds once: the API and the workbench say so ([advisories](#advisories)).
 - How close a result is to measured loads, with the held-out error by rifle and handgun: [How close a result is](../how-close.md).
-- Research log: [constant-surface closed form](../research/interior-constant-surface-closed-form.md), [closed vessel](../research/interior-closed-vessel-closed-forms.md), [published worked example](../research/interior-published-worked-example.md), [internal consistency checks](../research/interior-internal-consistency-checks.md), [Sébert factor](../research/interior-sebert-factor-choice.md), [charge too small](../research/interior-charge-too-small-bound.md), [solid fill limit](../research/interior-solid-fill-limit.md), [Lagrange gradient size](../research/interior-lagrange-gradient-size.md), [primer and ignition pressure](../research/interior-primer-ignition-pressure.md), [powder ageing and moisture](../research/interior-powder-ageing-moisture.md), [plausibility notes](../research/interior-plausibility-notes.md).
+- Research log: [constant-surface closed form](../research/interior-constant-surface-closed-form.md), [closed vessel](../research/interior-closed-vessel-closed-forms.md), [published worked example](../research/interior-published-worked-example.md), [internal consistency checks](../research/interior-internal-consistency-checks.md), [Sébert factor](../research/interior-sebert-factor-choice.md), [charge too small](../research/interior-charge-too-small-bound.md), [solid fill limit](../research/interior-solid-fill-limit.md), [Lagrange gradient size](../research/interior-lagrange-gradient-size.md), [chambrage gradient](../research/interior-chambrage-gradient.md), [primer and ignition pressure](../research/interior-primer-ignition-pressure.md), [powder ageing and moisture](../research/interior-powder-ageing-moisture.md), [plausibility notes](../research/interior-plausibility-notes.md).
 - Research log, choices fitted to load tables: [engraving ramp](../research/interior-engraving-ramp.md), [start pressure by construction and class](../research/interior-start-pressure-rules.md), [bullet material](../research/interior-bore-resistance-material.md), [magnum primer factor](../research/interior-magnum-primer-term.md).
 
 ### Charge too small

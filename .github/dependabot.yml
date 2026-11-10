@@ -3,7 +3,8 @@
 # entry in minimumReleaseAgeExclude of pnpm-workspace.yaml. Three days of cooldown let a broken or malicious release be pulled first
 # (.github/zizmor.yml tells zizmor, whose audit expects seven). The npm ecosystem reads pnpm-lock.yaml
 # and the catalog of pnpm-workspace.yaml; .github/pnpm pins the pnpm of the workflows and images
-# (.devcontainer/Dockerfile installs the same version, bumped by hand).
+# (.devcontainer/Dockerfile installs the same version, bumped by hand). A @mantine/* update also copies
+# .claude/skills/mantine-form anew from github.com/mantinedev/skills (now at 607846dbc328b6ddc85106d8aad3c080f9f57a1d).
 version: 2
 updates:
   - package-ecosystem: npm
