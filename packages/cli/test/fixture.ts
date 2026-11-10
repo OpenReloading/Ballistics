@@ -25,10 +25,12 @@ export interface Spec {
   velocity: number
   /** The same for the peak pressure; none prints no pressure. */
   pressure?: number
+  pressureBasis?: string
   table?: string
 }
 
-const columns = 'cartridge,bullet,powder,charge_g,velocity_ms,pressure_bar,barrel_mm,table'
+const columns =
+  'cartridge,bullet,powder,charge_g,velocity_ms,pressure_bar,pressure_basis,barrel_mm,table'
 
 /** The CSV text of `specs`, printed by `model` from `truth`; a row the model refuses prints 800 m/s. */
 export function rowsCsv(
@@ -58,6 +60,7 @@ export function rowsCsv(
       s.charge,
       velocity,
       pressure,
+      s.pressureBasis ?? '',
       barrel ?? '',
       s.table ?? '',
     ].join(',')

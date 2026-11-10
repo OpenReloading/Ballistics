@@ -192,7 +192,6 @@ const interiorWords = {
   priorPowderNotInSessions: msg('a prior needs its powder in the sessions'),
   sessionsBurnKindDiffers: msg('the sessions of a powder share one burn kind'),
   barrelOrTemperatureOnPoint: msg('barrel length and temperature per session'),
-  pooledFitVelocitiesOnly: msg('the pooled fit takes velocities only'),
   ladderChargeOrVelocityNotPositive: msg('ladder charge and velocity positive'),
   propellantTemperatureNotPositive: msg('propellantTemperature must be positive'),
   barrelLengthNotPositive: msg('barrelLength must be positive'),
