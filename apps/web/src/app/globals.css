@@ -6614,7 +6614,7 @@ main .library-head.page-panel-head > .page-panel-title {
     grid-column: 1 / -1;
     grid-template: "label share" auto "value range" auto "bar bar" auto / minmax(0, 1fr) auto;
     align-items: baseline;
-    gap: 0.125rem 0.5rem;
+    gap: 0.125rem var(--space-xs);
   }
 
   .workbench .readout-keys .readout-big {
@@ -6637,7 +6637,7 @@ main .library-head.page-panel-head > .page-panel-title {
   .workbench .readouts.readout-list {
     grid-template-columns: minmax(0, 1fr);
     gap: 0;
-    margin-top: 0.5rem;
+    margin-top: var(--space-xs);
   }
 
   .workbench .readouts.readout-list > div {
@@ -6645,7 +6645,7 @@ main .library-head.page-panel-head > .page-panel-title {
     flex-wrap: wrap;
     align-items: baseline;
     justify-content: space-between;
-    gap: 0 0.5rem;
+    gap: 0 var(--space-xs);
     min-height: 2.25rem;
     padding: 0.375rem 0;
     border: 0;
@@ -6707,7 +6707,7 @@ main .library-head.page-panel-head > .page-panel-title {
     align-items: center;
     gap: 0.3125rem;
     min-height: 2.75rem;
-    padding: 0 0.75rem;
+    padding: 0 var(--space-sm-md);
   }
 
   .workbench .ladder-cells > .ladder-cell > .flag {
@@ -6774,7 +6774,7 @@ main .library-head.page-panel-head > .page-panel-title {
     gap: 0 0.375rem;
     min-width: 0;
     min-height: 3.75rem;
-    padding: 0.3125rem 0.5rem 0.375rem;
+    padding: 0.3125rem var(--space-xs) 0.375rem;
     border: 1px solid var(--line);
     background: var(--page);
   }
@@ -6783,7 +6783,7 @@ main .library-head.page-panel-head > .page-panel-title {
      range and the share take what is left */
   .workbench .readouts.readout-keys > .readout-wide {
     grid-template-columns: max-content minmax(0, 1fr);
-    column-gap: 0.5rem;
+    column-gap: var(--space-xs);
   }
 
   .workbench .readouts.readout-keys dt {
@@ -6840,7 +6840,7 @@ main .library-head.page-panel-head > .page-panel-title {
     grid-template-rows: repeat(5, 1.5rem);
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-auto-flow: column;
-    gap: 0 1rem;
+    gap: 0 var(--space-md);
     margin: 0;
   }
 
@@ -6848,7 +6848,7 @@ main .library-head.page-panel-head > .page-panel-title {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.5rem;
+    gap: var(--space-xs);
     min-width: 0;
     padding: 0;
     border: 0;
@@ -6891,7 +6891,7 @@ main .library-head.page-panel-head > .page-panel-title {
   .workbench .results-head > .burn-figure {
     grid-area: burn;
     min-width: 0;
-    padding: 0.25rem 0.5rem;
+    padding: var(--space-2xs) var(--space-xs);
     border: 1px solid var(--line);
   }
 
@@ -6959,7 +6959,7 @@ main .library-head.page-panel-head > .page-panel-title {
   /* the result tabs as one card: the tab bar on the surface color, the shown panel under it */
   .workbench .result-tabbar {
     height: 2.125rem;
-    padding: 0 0.25rem;
+    padding: 0 var(--space-2xs);
     border: 1px solid var(--line);
     background: var(--surface);
   }
@@ -6975,7 +6975,7 @@ main .library-head.page-panel-head > .page-panel-title {
   /* the selected tab changes color and underline only: a bolder label would widen the tab */
   .workbench .result-tablist .mantine-Tabs-tab {
     height: 100%;
-    padding: 0 0.625rem;
+    padding: 0 var(--space-sm);
     border-bottom-width: 2px;
     color: var(--muted);
     font-size: var(--mantine-font-size-sm);
@@ -6988,7 +6988,7 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 
   .workbench .result-tabs > .workbench-centre > [role="tabpanel"] {
-    padding: 0.375rem 0.5rem 0.5rem;
+    padding: 0.375rem var(--space-xs) var(--space-xs);
     border: 1px solid var(--line);
     border-top: 0;
   }
@@ -7025,7 +7025,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
 /* the record frame (record-page.tsx): section headings as small captions in sentence case */
 main .record-heading {
-  margin: 0 0 0.25rem;
+  margin: 0 0 var(--space-2xs);
   color: var(--muted);
   font-size: var(--mantine-font-size-xs);
   font-weight: 600;
@@ -7038,7 +7038,7 @@ main .record-heading {
 
 /* the badges beside the title from 75em, a muted line under the bar below it */
 .record-facts {
-  margin: 0 0 0.75rem;
+  margin: 0 0 var(--space-sm-md);
   color: var(--muted);
   font-size: var(--mantine-font-size-sm);
 }
@@ -7071,7 +7071,7 @@ main .record-heading {
 
 .record-grid section + section,
 .record-note {
-  margin-top: 1rem;
+  margin-top: var(--space-md);
 }
 
 .record-note {
@@ -7086,7 +7086,7 @@ main .record-heading {
 /* the sources: a table set quieter than the data, the title over its publisher, edition, terms
    and hash */
 .record-sources {
-  margin-top: 1rem;
+  margin-top: var(--space-md);
   color: var(--muted);
   font-size: var(--mantine-font-size-sm);
 }
@@ -7101,7 +7101,7 @@ main .record-sources .sources tbody th {
 }
 
 .record-sources .scroll + p {
-  margin: 0.5rem 0 0;
+  margin: var(--space-xs) 0 0;
 }
 
 /* a document cited at several pages: its title and data once in a head row, a row per page under
@@ -7167,15 +7167,15 @@ main .record-sources .sources th.source-page {
 .hash {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
 }
 
 .hash-copy {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
   min-height: 1.5rem;
-  padding: 0 0.25rem;
+  padding: 0 var(--space-2xs);
   color: inherit;
   font-size: inherit;
 }
@@ -7321,8 +7321,8 @@ main .record-sources .sources th.source-page {
 .record-links {
   display: grid;
   grid-template-columns: max-content 1fr;
-  gap: 0.25rem 1rem;
-  margin: 1rem 0 0;
+  gap: var(--space-2xs) var(--space-md);
+  margin: var(--space-md) 0 0;
   font-size: var(--mantine-font-size-sm);
 }
 
@@ -7337,7 +7337,7 @@ main .record-sources .sources th.source-page {
 .stage-face {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-xs);
 }
 
 .stage-face .target-face-drawing {
@@ -7414,8 +7414,8 @@ main .record-sources .sources th.source-page {
 .burn-neighbours {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 0 1rem;
-  margin-top: 0.5rem;
+  gap: 0 var(--space-md);
+  margin-top: var(--space-xs);
   font-size: var(--mantine-font-size-xs);
   line-height: 1.5rem;
 }
@@ -7432,7 +7432,7 @@ main .record-sources .sources th.source-page {
 
 .burn-neighbours li {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--space-xs);
   justify-content: space-between;
   white-space: nowrap;
 }
@@ -7452,7 +7452,7 @@ main .record-sources .sources th.source-page {
 .burn-rate-body {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 1.5rem;
+  gap: var(--space-xs) 1.5rem;
   align-items: center;
 }
 
@@ -7467,8 +7467,8 @@ main .record-sources .sources th.source-page {
 .curve-legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem 1rem;
-  margin: 0.25rem 0 0;
+  gap: var(--space-2xs) var(--space-md);
+  margin: var(--space-2xs) 0 0;
   padding: 0;
   list-style: none;
   color: var(--muted);
@@ -7477,7 +7477,7 @@ main .record-sources .sources th.source-page {
 
 .curve-legend li {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--space-xs);
   align-items: center;
 }
 
@@ -7497,7 +7497,7 @@ main .record-sources .sources th.source-page {
 }
 
 .curve-values {
-  margin-top: 0.5rem;
+  margin-top: var(--space-xs);
 }
 
 @media screen {
@@ -7523,11 +7523,11 @@ main .record-sources .sources th.source-page {
 
 .burn-neighbours .record-note {
   grid-column: 1 / -1;
-  margin-top: 0.5rem;
+  margin-top: var(--space-xs);
 }
 
 .record-figure .record-note {
-  margin: 0.25rem 0 0;
+  margin: var(--space-2xs) 0 0;
 }
 
 /* rows, groups and names a filter or search leaves out: hidden on screen, printed; the filters
@@ -7568,7 +7568,7 @@ main :is(.symbol-table, .coefficient-table, .record-sources .sources) {
 
   /* narrow cell padding, so the unit column fits at 320 px */
   :is(.record-chart, .bullet-record) .field-table :is(th, td) {
-    padding-inline: 0.25rem;
+    padding-inline: var(--space-2xs);
   }
 
   /* a fitted value breaks before its percent (no-break spaces inside) */
@@ -7593,7 +7593,7 @@ main :is(.symbol-table, .coefficient-table, .record-sources .sources) {
 }
 
 main .field-table tr.field-group > th {
-  padding-top: 0.5rem;
+  padding-top: var(--space-xs);
   color: var(--muted);
   font-size: var(--mantine-font-size-xs);
   font-weight: 600;
@@ -7618,7 +7618,7 @@ main .field-table tr.field-group > th {
 }
 
 .drawing-notes p {
-  margin: 0 0 0.5rem;
+  margin: 0 0 var(--space-xs);
   font-size: var(--mantine-font-size-sm);
 }
 
@@ -7729,14 +7729,14 @@ main .field-table tr.field-group > th {
 
   .cartridge-record .record-grid .cartridge-sides > .side-panel {
     margin-top: 0;
-    padding-bottom: 0.25rem;
+    padding-bottom: var(--space-2xs);
   }
 
   .side-body {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: 0.5rem;
-    padding-top: 0.25rem;
+    gap: var(--space-xs);
+    padding-top: var(--space-2xs);
   }
 
   .side-figure .drawing.screen-only {
@@ -7997,8 +7997,8 @@ main .field-table tr.field-group > th {
 .fact-cards {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 0 0 0.5rem;
+  gap: var(--space-xs);
+  margin: 0 0 var(--space-xs);
 }
 
 .fact-card {
@@ -8006,7 +8006,7 @@ main .field-table tr.field-group > th {
   flex: 0 1 auto;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.375rem 0.5rem;
+  padding: 0.375rem var(--space-xs);
   border: 1px solid var(--line);
   background: var(--page);
 }
@@ -8023,7 +8023,7 @@ main .field-table tr.field-group > th {
   flex: 1 1 auto;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: 0 0.75rem;
+  gap: 0 var(--space-sm-md);
   margin: 0;
 }
 
@@ -8133,8 +8133,8 @@ main .field-table tr.field-group > th {
 .standard-facts {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem 1.5rem;
-  margin: 0 0 0.5rem;
+  gap: var(--space-2xs) 1.5rem;
+  margin: 0 0 var(--space-xs);
 }
 
 .standard-facts > div {
@@ -8154,7 +8154,7 @@ main .field-table tr.field-group > th {
 
 :is(.fact, .standard-facts) .countries {
   display: inline-flex;
-  gap: 0.75rem;
+  gap: var(--space-sm-md);
 }
 
 :is(.fact, .standard-facts) .country {
@@ -8551,17 +8551,17 @@ main .field-table tr.field-group > th {
 
 /* trajectory empty state and range card */
 .trajectory-empty h2 {
-  margin: 0 0 0.5rem;
+  margin: 0 0 var(--space-xs);
   font-size: var(--mantine-font-size-lg);
 }
 
 .trajectory-empty ul {
-  margin: 0.25rem 0 0.75rem;
-  padding-left: 1rem;
+  margin: var(--space-2xs) 0 var(--space-sm-md);
+  padding-left: var(--space-md);
 }
 
 .range-card-button {
-  margin-top: 0.75rem;
+  margin-top: var(--space-sm-md);
 }
 
 .range-card {
@@ -8682,7 +8682,7 @@ main .field-table tr.field-group > th {
    icon and the word, so color is never the only signal. Set here, not through Alert's variables,
    which Mantine writes inline */
 .message {
-  padding: 0.25rem 0.5rem;
+  padding: var(--space-2xs) var(--space-xs);
   border: 1px solid var(--message-fg);
   border-inline-start-width: 4px;
   background-color: var(--message-bg);
@@ -8707,7 +8707,7 @@ main .field-table tr.field-group > th {
 }
 
 .message .mantine-Alert-wrapper {
-  gap: 0.5rem;
+  gap: var(--space-xs);
 }
 
 .message .mantine-Alert-icon {
@@ -8726,10 +8726,10 @@ main .field-table tr.field-group > th {
 .message-slot {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
   height: 3.25rem;
   min-width: 0;
-  margin: 0 0 0.5rem;
+  margin: 0 0 var(--space-xs);
   padding: 0;
   overflow-y: auto;
   border: 0;
@@ -8782,8 +8782,8 @@ main .field-table tr.field-group > th {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(9rem, 12rem));
   align-items: end;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-xs);
 }
 
 .ladder-target {
@@ -8870,7 +8870,7 @@ main .field-table tr.field-group > th {
 }
 
 .settings-foot {
-  padding: 0.5rem var(--mantine-spacing-md) var(--mantine-spacing-md);
+  padding: var(--space-xs) var(--mantine-spacing-md) var(--mantine-spacing-md);
   border-top: 1px solid var(--line);
 }
 
@@ -8879,7 +8879,7 @@ main .field-table tr.field-group > th {
   .workbench-defaults .mantine-InputWrapper-root {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 12rem;
-    column-gap: 1rem;
+    column-gap: var(--space-md);
     align-items: center;
   }
 
@@ -8904,15 +8904,15 @@ main .field-table tr.field-group > th {
 .chrono-import {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0.5rem 1rem;
+  gap: var(--space-xs) var(--space-md);
   align-items: end;
-  margin-block: 0.5rem;
+  margin-block: var(--space-xs);
 }
 
 .drop-zone {
   display: grid;
   gap: 0.125rem;
-  padding: 1rem;
+  padding: var(--space-md);
   border: 1px dashed var(--muted);
   background: var(--surface);
   text-align: center;
@@ -8961,11 +8961,11 @@ main .field-table tr.field-group > th {
 .session-import .drop-zone {
   flex: 0 1 28rem;
   display: flex;
-  gap: 0.25rem 0.75rem;
+  gap: var(--space-2xs) var(--space-sm-md);
   align-items: baseline;
   justify-content: center;
   min-width: 0;
-  padding: 0.5rem 0.75rem;
+  padding: var(--space-xs) var(--space-sm-md);
 }
 
 /* one line: the file name gives way first, a hint longer than the box wraps */
@@ -9000,7 +9000,7 @@ main .field-table tr.field-group > th {
 }
 
 .session-import > a {
-  padding-block: 0.5rem;
+  padding-block: var(--space-xs);
   font-size: var(--mantine-font-size-sm);
 }
 
@@ -9009,11 +9009,11 @@ main .field-table tr.field-group > th {
 }
 
 .session-velocity .mantine-Tabs-list {
-  gap: 0.25rem;
+  gap: var(--space-2xs);
 }
 
 .session-velocity .mantine-Tabs-tab {
-  padding: 0.125rem 0.5rem;
+  padding: 0.125rem var(--space-xs);
   font-size: var(--mantine-font-size-xs);
 }
 
@@ -9040,7 +9040,7 @@ main .session-shots th:nth-child(-n + 2) {
 /* a phone: the seven statistics columns fit the width */
 @media screen and (max-width: 47.99em) {
   .session-result .session-strings :is(th, td) {
-    padding-inline: 0.25rem;
+    padding-inline: var(--space-2xs);
   }
 }
 
@@ -9050,7 +9050,7 @@ main .session-shots th:nth-child(-n + 2) {
   }
 
   .session-result :is(.session-strings, .session-shots) :is(th, td) {
-    padding-block: 0.25rem;
+    padding-block: var(--space-2xs);
   }
 }
 
@@ -9108,12 +9108,12 @@ main .session-shots th:nth-child(-n + 2) {
 }
 
 .session-string {
-  padding-top: 0.5rem;
+  padding-top: var(--space-xs);
 }
 
 .session-compare {
-  margin: 0.5rem 0 0;
-  padding-left: 1.25rem;
+  margin: var(--space-xs) 0 0;
+  padding-left: var(--space-lg);
 }
 
 .session-compare,
@@ -9123,7 +9123,7 @@ main .session-shots th:nth-child(-n + 2) {
 }
 
 .session-strings-note {
-  margin: 0.25rem 0 0;
+  margin: var(--space-2xs) 0 0;
 }
 
 .session-headline dt {
@@ -9188,7 +9188,7 @@ main .session-shots th:nth-child(-n + 2) {
   display: flex;
   flex: 1 1 0;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
   min-height: 0;
   container-type: inline-size;
 }
@@ -9197,12 +9197,12 @@ main .session-shots th:nth-child(-n + 2) {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
 }
 
 /* under the page bar as the other pages' first row; the overlay count badge stays inside */
 .groups-page .target-toolbar {
-  padding-top: 0.5rem;
+  padding-top: var(--space-xs);
 }
 
 .target-toolbar .toolbar-gap {
@@ -9230,7 +9230,7 @@ main .session-shots th:nth-child(-n + 2) {
 }
 
 .overlay-legend {
-  margin-bottom: 0.25rem;
+  margin-bottom: var(--space-2xs);
   font-size: var(--mantine-font-size-sm);
   font-weight: 600;
 }
@@ -9247,19 +9247,19 @@ main .session-shots th:nth-child(-n + 2) {
 }
 
 .toolbar-pop .prop-head {
-  margin: 0 0 0.25rem;
+  margin: 0 0 var(--space-2xs);
   font-size: var(--mantine-font-size-sm);
   font-weight: 600;
 }
 
 .toolbar-pop .note {
-  margin: 0 0 0.5rem;
+  margin: 0 0 var(--space-xs);
   color: var(--muted);
   font-size: var(--mantine-font-size-xs);
 }
 
 .toolbar-pop .overlay-list + .prop-grid {
-  margin-top: 0.5rem;
+  margin-top: var(--space-xs);
 }
 
 /* the tool hint and the last message on the canvas: top right, clear of the statistics box
@@ -9271,7 +9271,7 @@ main .session-shots th:nth-child(-n + 2) {
   right: 0.25rem;
   max-width: calc(100% - 0.5rem);
   margin: 0;
-  padding: 0.125rem 0.5rem;
+  padding: 0.125rem var(--space-xs);
   overflow: hidden;
   background: var(--page);
   color: var(--ink);
@@ -9297,9 +9297,9 @@ main .session-shots th:nth-child(-n + 2) {
   left: 50%;
   display: grid;
   justify-items: center;
-  gap: 0.5rem;
+  gap: var(--space-xs);
   width: min(22rem, calc(100% - 1rem));
-  padding: 0.75rem 1rem;
+  padding: var(--space-sm-md) var(--space-md);
   border: 1px solid var(--line);
   background: var(--page);
   font-size: var(--mantine-font-size-sm);
@@ -9315,7 +9315,7 @@ main .session-shots th:nth-child(-n + 2) {
   display: grid;
   flex: 1 1 0;
   grid-template-columns: minmax(0, 1fr) 14.5rem;
-  gap: 0.5rem;
+  gap: var(--space-xs);
   min-height: 0;
 }
 
@@ -9340,17 +9340,17 @@ main .session-shots th:nth-child(-n + 2) {
 
 .target-tabs > .target-side {
   flex: 1 1 0;
-  padding-top: 0.25rem;
+  padding-top: var(--space-2xs);
 }
 
 .target-tabs .mantine-Tabs-tab {
-  padding: 0.25rem 0.25rem;
+  padding: var(--space-2xs) var(--space-2xs);
   font-size: var(--mantine-font-size-xs);
 }
 
 .target-summary {
   flex: none;
-  padding-top: 0.25rem;
+  padding-top: var(--space-2xs);
   border-top: 1px solid var(--line);
 }
 
@@ -9737,7 +9737,7 @@ main .session-shots th:nth-child(-n + 2) {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.125rem;
-  margin: 0 0 0.25rem;
+  margin: 0 0 var(--space-2xs);
   padding: 0;
   list-style: none;
 }
@@ -9748,7 +9748,7 @@ main .session-shots th:nth-child(-n + 2) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  padding: 0 0.25rem;
+  padding: 0 var(--space-2xs);
   border: 1px solid var(--line);
   background: none;
   color: inherit;
@@ -9782,14 +9782,14 @@ main .session-shots th:nth-child(-n + 2) {
 .detect-nav {
   display: flex;
   justify-content: space-between;
-  margin-top: 0.25rem;
+  margin-top: var(--space-2xs);
 }
 
 .target-canvas .stats-box {
   position: absolute;
   display: flex;
   flex-direction: column;
-  padding: 0.25rem 0.5rem;
+  padding: var(--space-2xs) var(--space-xs);
   border: 1px solid var(--line);
   background: color-mix(in srgb, var(--page) 88%, transparent);
   font-size: var(--mantine-font-size-xs);
@@ -9802,13 +9802,13 @@ main .session-shots th:nth-child(-n + 2) {
   right: 0.25rem;
   bottom: 0.25rem;
   display: flex;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
 }
 
 .target-canvas .canvas-zoom button {
   min-width: 1.75rem;
   height: 1.75rem;
-  padding: 0 0.25rem;
+  padding: 0 var(--space-2xs);
   border: 1px solid var(--line);
   background: var(--page);
   color: var(--ink);
@@ -9821,7 +9821,7 @@ main .session-shots th:nth-child(-n + 2) {
   bottom: 0.25rem;
   left: 0.25rem;
   margin: 0;
-  padding: 0.125rem 0.5rem;
+  padding: 0.125rem var(--space-xs);
   /* left of the zoom buttons (about 6.25rem); a long note wraps upward */
   max-width: calc(100% - 7rem);
   background: var(--page);
@@ -9829,7 +9829,7 @@ main .session-shots th:nth-child(-n + 2) {
 }
 
 :is(.target-side, .prop-form, .target-summary) .prop-head {
-  margin: 0.5rem 0 0.25rem;
+  margin: var(--space-xs) 0 var(--space-2xs);
   padding-bottom: 0.125rem;
   border-bottom: 1px solid var(--line);
   font-size: var(--mantine-font-size-sm);
@@ -9842,7 +9842,7 @@ main .session-shots th:nth-child(-n + 2) {
 
 /* the designers' groups: the same room above each heading but the first, 6 px to its rows */
 .designer .prop-form .prop-head {
-  margin: 1rem 0 0.375rem;
+  margin: var(--space-md) 0 0.375rem;
 }
 
 .designer .prop-form > :not(:has(> .prop-head)) + :has(> .prop-head) > .prop-head {
@@ -9852,7 +9852,7 @@ main .session-shots th:nth-child(-n + 2) {
 /* Add ring, Add event, Add ingredient: apart from the rows above and the next heading */
 .designer :is(.prop-grid, .side-grid) > .mantine-Button-root {
   justify-self: start;
-  margin: 0.5rem 0 0.75rem;
+  margin: var(--space-xs) 0 var(--space-sm-md);
 }
 
 .prop-grid {
@@ -9871,7 +9871,7 @@ main .session-shots th:nth-child(-n + 2) {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 7.5rem;
   align-items: center;
-  column-gap: 0.5rem;
+  column-gap: var(--space-xs);
   min-height: 1.6875rem;
 }
 
@@ -9926,7 +9926,7 @@ main .session-shots th:nth-child(-n + 2) {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
 }
 
 .prop-grid .prop-value {
@@ -9937,7 +9937,7 @@ main .session-shots th:nth-child(-n + 2) {
 .prop-grid .row-buttons {
   display: flex;
   justify-content: flex-end;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
 }
 
 .prop-grid .review-help {
@@ -9960,7 +9960,7 @@ main .session-shots th:nth-child(-n + 2) {
 }
 
 .target-side .note {
-  margin: 0.25rem 0;
+  margin: var(--space-2xs) 0;
   color: var(--muted);
   font-size: var(--mantine-font-size-sm);
 }
@@ -9969,7 +9969,7 @@ main .session-shots th:nth-child(-n + 2) {
   display: grid;
   gap: 0.125rem;
   max-height: 10.5rem;
-  margin-bottom: 0.25rem;
+  margin-bottom: var(--space-2xs);
   overflow-y: auto;
 }
 
@@ -9977,9 +9977,9 @@ main .session-shots th:nth-child(-n + 2) {
   display: grid;
   grid-template-columns: 0.75rem minmax(0, 1fr) auto;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
   min-height: 1.6875rem;
-  padding: 0 0.25rem;
+  padding: 0 var(--space-2xs);
   border: 1px solid transparent;
   background: none;
   color: var(--ink);
@@ -10044,8 +10044,8 @@ main .session-shots th:nth-child(-n + 2) {
   display: grid;
   grid-template-columns: repeat(4, auto);
   justify-content: space-between;
-  gap: 0.5rem;
-  margin: 0 0 0.25rem;
+  gap: var(--space-xs);
+  margin: 0 0 var(--space-2xs);
 }
 
 .stat-head dt {
@@ -10094,7 +10094,7 @@ main .session-shots th:nth-child(-n + 2) {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: var(--space-xs);
 }
 
 .section-head .prop-head {
@@ -10114,13 +10114,13 @@ main .session-shots th:nth-child(-n + 2) {
 
 .target-side .section-head .prop-head,
 .target-side .section-head + .shots-body {
-  margin-top: 0.5rem;
+  margin-top: var(--space-xs);
 }
 
 .head-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
   padding: 0;
   border: 0;
   background: none;
@@ -10132,14 +10132,14 @@ main .session-shots th:nth-child(-n + 2) {
 /* the Statistics rows beyond the key values, on request */
 .stats-side .stats-more {
   align-self: flex-start;
-  margin-top: 0.25rem;
+  margin-top: var(--space-2xs);
   color: var(--link);
   font-size: var(--mantine-font-size-xs);
 }
 
 .overlay-list {
   display: grid;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
   margin: 0;
   padding: 0;
   border: 0;
@@ -10154,7 +10154,7 @@ main .session-shots th:nth-child(-n + 2) {
 
 :is(.readout-table, .shot-table) :is(th, td) {
   height: 1.5rem;
-  padding: 0 0.25rem;
+  padding: 0 var(--space-2xs);
   /* rules between rows only, as the record tables */
   border: 0;
   border-bottom: 1px solid var(--line);
@@ -10182,7 +10182,7 @@ main .session-shots th:nth-child(-n + 2) {
 :is(.shot-table, .aim-fields) input:is([type="number"], [type="text"]) {
   width: 5rem;
   height: 1.375rem;
-  padding: 0 0.25rem;
+  padding: 0 var(--space-2xs);
   border: 1px solid var(--line);
   background: var(--page);
   color: var(--ink);
@@ -10218,14 +10218,14 @@ main .session-shots th:nth-child(-n + 2) {
 .prop-grid .aim-fields {
   display: flex;
   flex: 1 1 11rem;
-  gap: 0.5rem;
+  gap: var(--space-xs);
 }
 
 .prop-grid .aim-axis {
   display: flex;
   flex: 1 1 0;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
   min-width: 0;
 }
 
@@ -10238,7 +10238,7 @@ main .session-shots th:nth-child(-n + 2) {
 }
 
 .shots-panel > .scroll {
-  margin-top: 0.25rem;
+  margin-top: var(--space-2xs);
 }
 
 .shot-table tbody tr {
@@ -10294,9 +10294,9 @@ main .session-shots th:nth-child(-n + 2) {
   display: flex;
   flex: none;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-xs);
   height: 2.75rem;
-  padding: 0 0.5rem;
+  padding: 0 var(--space-xs);
   border: 0;
   background: var(--surface);
   color: var(--ink);
@@ -10325,7 +10325,7 @@ main .session-shots th:nth-child(-n + 2) {
   flex: 1 1 0;
   flex-direction: column;
   min-height: 0;
-  padding: 0 0.5rem;
+  padding: 0 var(--space-xs);
 }
 
 .sheet-body > .target-tabs {
@@ -10372,7 +10372,7 @@ main .session-shots th:nth-child(-n + 2) {
   }
 
   .designer .workspace-results .mantine-EmptyState-root {
-    margin-block: 0.5rem;
+    margin-block: var(--space-xs);
   }
 }
 
@@ -10432,19 +10432,19 @@ main .session-shots th:nth-child(-n + 2) {
 }
 
 .ladder-groups .note {
-  margin: 0.25rem 0;
+  margin: var(--space-2xs) 0;
 }
 
 .ladder-chrono {
   display: grid;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
 }
 
 /* the note and the warning together */
 .ladder-impact .message-slot {
   height: 13.5rem;
-  margin-top: 0.5rem;
+  margin-top: var(--space-xs);
 }
 
 @media (max-width: 47.99em) {
@@ -10489,7 +10489,7 @@ main .session-shots th:nth-child(-n + 2) {
 }
 
 .key-side .shots-panel {
-  margin-top: 0.25rem;
+  margin-top: var(--space-2xs);
 }
 
 .key-side table {
@@ -10501,7 +10501,7 @@ main .session-shots th:nth-child(-n + 2) {
   position: fixed;
   z-index: 200;
   inset: 0;
-  padding: 0.5rem;
+  padding: var(--space-xs);
   background: var(--page);
 }
 
@@ -10539,7 +10539,7 @@ main .session-shots th:nth-child(-n + 2) {
 .notes-panel {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
 }
 
 .notes-panel > .mantine-Button-root {
@@ -10549,7 +10549,7 @@ main .session-shots th:nth-child(-n + 2) {
 .note-row {
   display: grid;
   gap: 0.125rem;
-  padding-left: 0.25rem;
+  padding-left: var(--space-2xs);
 }
 
 .note-row[data-selected] {
@@ -10559,7 +10559,7 @@ main .session-shots th:nth-child(-n + 2) {
 .note-tools {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
 }
 
 .note-tools .mantine-NativeSelect-root {
@@ -10658,10 +10658,10 @@ main .session-shots th:nth-child(-n + 2) {
   display: flex;
   flex: none;
   align-items: center;
-  gap: 0.5rem 0.75rem;
+  gap: var(--space-xs) var(--space-sm-md);
   min-width: 0;
   height: 2.5rem;
-  margin: 0.25rem 0 0.5rem;
+  margin: var(--space-2xs) 0 var(--space-xs);
   border-bottom: 1px solid var(--line);
 }
 
@@ -10669,7 +10669,7 @@ main .session-shots th:nth-child(-n + 2) {
   display: flex;
   flex: 0 1 auto;
   align-items: center;
-  gap: 0.25rem 0.5rem;
+  gap: var(--space-2xs) var(--space-xs);
   min-width: 0;
 }
 
@@ -10715,13 +10715,13 @@ main .page-bar h1 {
 
 /* the workbench's result beside the file status, one line below 75em */
 .page-bar-status > .bar-result + :not(:empty) {
-  margin-inline-start: 0.75rem;
+  margin-inline-start: var(--space-sm-md);
 }
 
 /* beside the file status (the firearm library); a file status whose parts are all empty is none */
 .page-bar-status > :not(:empty, .file-status:not(:has(> :not(:empty)))) + .bar-count,
 .page-bar-status > .bar-count + :not(:empty, .file-status:not(:has(> :not(:empty)))) {
-  margin-inline-start: 0.75rem;
+  margin-inline-start: var(--space-sm-md);
 }
 
 @media screen and (min-width: 48em) {
@@ -10760,8 +10760,8 @@ main .page-bar h1 {
 }
 
 .page-bar-status:has(> .bar-count) > .file-status:has(> :not(:empty)) {
-  margin-inline-start: 0.75rem;
-  padding-inline-start: 0.75rem;
+  margin-inline-start: var(--space-sm-md);
+  padding-inline-start: var(--space-sm-md);
   border-inline-start: 1px solid var(--line);
 }
 
@@ -10769,7 +10769,7 @@ main .page-bar h1 {
   display: flex;
   flex: none;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
 }
 
 /* the actions' wrappers (a tool's button group, the File menu, the folded actions) are no boxes of
@@ -10831,10 +10831,10 @@ main .page-bar h1 {
     display: grid;
     grid-template: "title toggle" auto "status toggle" auto / minmax(0, 1fr) auto;
     align-content: center;
-    gap: 0 0.5rem;
+    gap: 0 var(--space-xs);
     height: auto;
     min-height: 2.25rem;
-    margin: 0.25rem 0 0.5rem;
+    margin: var(--space-2xs) 0 var(--space-xs);
     border: 0;
   }
 
@@ -10900,7 +10900,7 @@ main .page-bar h1 {
     flex-direction: column;
     align-items: stretch;
     min-width: 12rem;
-    padding: 0.5rem;
+    padding: var(--space-xs);
     border: 1px solid var(--line);
     background: var(--mantine-color-body);
     box-shadow: var(--mantine-shadow-sm);
@@ -10922,7 +10922,7 @@ main .page-bar h1 {
 
   .page-bar:not([data-single]) .page-bar-actions .mantine-ActionIcon-root {
     justify-content: flex-start;
-    gap: 0.25rem;
+    gap: var(--space-2xs);
     width: auto;
     padding-inline: 0.45rem 1.125rem;
     font-size: var(--mantine-font-size-sm);
@@ -11002,9 +11002,9 @@ main .page-bar h1 {
     display: none;
     flex-direction: column;
     align-items: stretch;
-    gap: 0.25rem;
+    gap: var(--space-2xs);
     min-width: 12rem;
-    padding: 0.5rem;
+    padding: var(--space-xs);
     border: 1px solid var(--line);
     background: var(--mantine-color-body);
     box-shadow: var(--mantine-shadow-sm);
@@ -11109,14 +11109,14 @@ main .page-bar h1 {
   }
 
   .page-bar {
-    column-gap: 0.5rem;
+    column-gap: var(--space-xs);
   }
 
   /* the bar is out of the flow: the page starts one step below the top bar's rule; the step is the
      margin the bar had, so it merges with the first element's own top margin */
   .page-top > main::before {
     display: block;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-xs);
     content: "";
   }
 
@@ -11235,7 +11235,7 @@ main .page-bar h1 {
   align-items: center;
   gap: 0.125rem;
   max-width: 100%;
-  padding: 0 0.125rem 0 0.5rem;
+  padding: 0 0.125rem 0 var(--space-xs);
   border: 1px solid var(--link);
   background: color-mix(in srgb, var(--link) 8%, var(--page));
   color: var(--ink);
@@ -11299,7 +11299,7 @@ main .page-bar h1 {
   display: flex;
   align-items: center;
   height: 2rem;
-  padding: 0 0.5rem;
+  padding: 0 var(--space-xs);
   border-bottom: 1px solid var(--line);
 }
 
@@ -11308,7 +11308,7 @@ main .page-bar h1 {
 .selection-summary {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-xs);
   vertical-align: middle;
 }
 
@@ -11395,7 +11395,7 @@ main .page-bar h1 {
 
 .directory-table :is(th, td) {
   overflow: hidden;
-  padding: 0 0.5rem;
+  padding: 0 var(--space-xs);
   border-width: 0 0 1px;
   border-style: solid;
   border-color: var(--line);
@@ -11418,7 +11418,7 @@ main .page-bar h1 {
   top: 0;
   z-index: 1;
   height: 2.5rem;
-  padding-block: 0.25rem;
+  padding-block: var(--space-2xs);
   border-bottom: 1px solid color-mix(in srgb, var(--muted) 55%, var(--line));
   background: var(--surface);
   color: var(--muted);
@@ -11436,7 +11436,7 @@ main .page-bar h1 {
 .directory-table .sort-button {
   min-height: 24px;
   align-items: flex-end;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
   font-weight: inherit;
   text-align: inherit;
 }
@@ -11596,7 +11596,7 @@ main .page-bar h1 {
 .rate-cell {
   display: grid;
   grid-template-columns: 2.75rem 1fr auto;
-  gap: 0.5rem;
+  gap: var(--space-xs);
   align-items: center;
   font-variant-numeric: tabular-nums;
 }
@@ -11796,7 +11796,7 @@ main .page-bar h1 {
 .inline-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0 1rem;
+  gap: 0 var(--space-md);
   padding: 0;
   list-style: none;
   line-height: 1.5rem;
@@ -11815,8 +11815,8 @@ main .page-bar h1 {
 .truing-session {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 0.5rem;
-  padding-block: 0.5rem;
+  gap: var(--space-xs);
+  padding-block: var(--space-xs);
 }
 
 .truing-fields,
@@ -11824,11 +11824,11 @@ main .page-bar h1 {
   display: flex;
   flex-wrap: wrap;
   align-items: end;
-  gap: 0.5rem 1rem;
+  gap: var(--space-xs) var(--space-md);
 }
 
 .truing-table td {
-  padding: 0 0.25rem 0.25rem 0;
+  padding: 0 var(--space-2xs) var(--space-2xs) 0;
 }
 
 /* the calculator grid puts a field's label beside it: here a field stands alone in its cell */
@@ -11954,7 +11954,7 @@ main .page-bar h1 {
   }
 
   .directory-table :is(th, td) {
-    padding: 0.1rem 0.25rem;
+    padding: 0.1rem var(--space-2xs);
     white-space: normal;
   }
 
@@ -12024,7 +12024,7 @@ main .page-bar h1 {
   display: grid;
   grid-template-columns: repeat(var(--n, 2), minmax(9rem, 1fr));
   align-items: end;
-  gap: 1rem;
+  gap: var(--space-md);
 }
 
 .compare-drawings figure {
@@ -12080,7 +12080,7 @@ main .compare-table {
 }
 
 .compare-legend {
-  margin: 0.25rem 0 0;
+  margin: var(--space-2xs) 0 0;
   color: var(--muted);
   font-size: var(--mantine-font-size-xs);
 }
@@ -12104,8 +12104,8 @@ main .compare-table {
 .compare-workbench {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  margin-top: 0.25rem;
+  gap: var(--space-2xs);
+  margin-top: var(--space-2xs);
   font-size: var(--mantine-font-size-xs);
   font-weight: 400;
   overflow-wrap: normal;
@@ -12150,7 +12150,7 @@ main .compare-table {
 }
 
 .record-variants {
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--space-xs);
 }
 
 @media screen {
@@ -12164,15 +12164,15 @@ main .compare-table {
    comparison, the designers, the shot groups' side columns and the firearm library), one spacing
    token, the icon spec strip. Flat on phones and in print; the workbench has none. */
 :root {
-  --panel-gap: 0.75rem;
-  --panel-pad: 0.625rem;
+  --panel-gap: var(--space-sm-md);
+  --panel-pad: var(--space-sm);
 }
 
 .page-panel-head {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.25rem 0.5rem;
+  gap: var(--space-2xs) var(--space-xs);
   min-height: 1.75rem;
 }
 
@@ -12197,7 +12197,7 @@ main .page-panel-head > .page-panel-title {
   }
 
   .page-panel > .page-panel-head {
-    margin: 0 calc(-1 * var(--panel-pad)) 0.25rem;
+    margin: 0 calc(-1 * var(--panel-pad)) var(--space-2xs);
     padding: 0 var(--panel-pad);
     border-bottom: 1px solid var(--line);
   }
@@ -12248,7 +12248,7 @@ main .page-panel-head > .page-panel-title {
   }
 
   main .side-values :is(th, td) {
-    padding-inline: 0.25rem;
+    padding-inline: var(--space-2xs);
   }
 
   main .side-values td.num {
@@ -12266,7 +12266,7 @@ main .page-panel-head > .page-panel-title {
 }
 
 .page-bar .mantine-Button-section[data-position="left"] {
-  margin-inline-end: 0.25rem;
+  margin-inline-end: var(--space-2xs);
 }
 
 .page-bar .mantine-Button-section > svg {
@@ -12284,7 +12284,7 @@ main .page-panel-head > .page-panel-title {
 
 /* a record without values: the one line where the panels would be */
 .record-gap {
-  margin: 0 0 0.5rem;
+  margin: 0 0 var(--space-xs);
   color: var(--muted);
 }
 
@@ -12311,7 +12311,7 @@ main .page-panel-head > .page-panel-title {
 
 /* the record's primary action on a phone and tablet, where the bar keeps it behind Page actions */
 .phone-action {
-  margin: 0 0 0.5rem;
+  margin: 0 0 var(--space-xs);
 }
 
 @media (min-width: 75em) {
@@ -12384,7 +12384,7 @@ main .symbol-table tbody th {
 }
 
 .field-search {
-  margin: 0.25rem 0 0.5rem;
+  margin: var(--space-2xs) 0 var(--space-xs);
 }
 
 .coefficient-table .field-note-cell {
@@ -12397,7 +12397,7 @@ main .symbol-table tbody th {
 .bullet-cartridges ul {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
-  column-gap: 1rem;
+  column-gap: var(--space-md);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -12467,7 +12467,7 @@ main .cartridge-values .dim-value {
 main .cartridge-values .dim-slot {
   display: inline-block;
   width: calc((var(--slot, 4) + 0.5) * 1ch + 0.25rem);
-  padding-left: 0.25rem;
+  padding-left: var(--space-2xs);
   text-align: left;
 }
 
@@ -12540,7 +12540,7 @@ main .cartridge-values td.dim-slot-cell {
 .trajectory-top {
   display: flex;
   align-items: flex-start;
-  gap: 0.5rem;
+  gap: var(--space-xs);
 }
 
 .trajectory-top > .readouts {
@@ -12550,7 +12550,7 @@ main .cartridge-values td.dim-slot-cell {
 
 .trajectory-top > .range-card-button {
   flex: none;
-  margin: 0.5rem 0 0;
+  margin: var(--space-xs) 0 0;
 }
 
 .trajectory-chart {
@@ -12563,7 +12563,7 @@ main .cartridge-values td.dim-slot-cell {
   right: 0;
   z-index: 1;
   margin: 0;
-  padding: 0 0.25rem;
+  padding: 0 var(--space-2xs);
   background: var(--page);
 }
 
@@ -12596,7 +12596,7 @@ main .cartridge-values td.dim-slot-cell {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 7.5rem;
     align-items: center;
-    column-gap: 0.5rem;
+    column-gap: var(--space-xs);
   }
 
   .workbench .trajectory-view .twist-hand > .segment-label {
@@ -12610,7 +12610,7 @@ main .cartridge-values td.dim-slot-cell {
   }
 
   .workbench .trajectory-view :is(th, td) {
-    padding: 0 0.25rem;
+    padding: 0 var(--space-2xs);
     line-height: 1.25;
   }
 
@@ -12628,7 +12628,7 @@ main .cartridge-values td.dim-slot-cell {
     display: grid;
     grid-template-rows: auto auto 1fr auto;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    column-gap: 0.75rem;
+    column-gap: var(--space-sm-md);
   }
 
   .workbench .trajectory-view > *,
@@ -12690,7 +12690,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 .bd {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-xs);
   height: min(40rem, calc(100dvh - 9rem));
 }
 
@@ -12706,7 +12706,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 .bd-filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: var(--space-xs);
   align-items: end;
 }
 
@@ -12721,7 +12721,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 
 .bd-mass {
   display: flex;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
   align-items: end;
   margin: 0;
   padding: 0;
@@ -12745,7 +12745,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 .bd-body {
   display: flex;
   flex: 1;
-  gap: 0.75rem;
+  gap: var(--space-sm-md);
   min-height: 0;
 }
 
@@ -12762,8 +12762,8 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 .bd-row {
   display: grid;
   grid-template-columns: var(--bd-columns);
-  gap: 0.5rem;
-  padding: 0.25rem 0.5rem;
+  gap: var(--space-xs);
+  padding: var(--space-2xs) var(--space-xs);
 }
 
 .bd-head {
@@ -12808,25 +12808,25 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 .bd-preview {
   flex: 0 0 15rem;
   overflow-y: auto;
-  padding: 0.5rem 0.75rem;
+  padding: var(--space-xs) var(--space-sm-md);
   border: 1px solid var(--line);
   font-size: var(--mantine-font-size-sm);
 }
 
 .bd-preview-title {
-  margin: 0 0 0.5rem;
+  margin: 0 0 var(--space-xs);
   font-weight: 700;
   overflow-wrap: anywhere;
 }
 
 .bd-preview dl {
-  margin: 0 0 0.5rem;
+  margin: 0 0 var(--space-xs);
 }
 
 .bd-preview dl > div {
   display: flex;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: var(--space-xs);
   padding: 0.125rem 0;
 }
 
@@ -12859,7 +12859,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
   /* the columns stack under the name */
   .bd-row {
     grid-template-columns: 1fr auto auto;
-    gap: 0.25rem 0.75rem;
+    gap: var(--space-2xs) var(--space-sm-md);
   }
 
   .bd-row .bd-name {
@@ -12893,11 +12893,11 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 
   /* the readout rows and columns keep narrower gaps, for the longer labels and phrases */
   :lang(de) .workbench .readouts.readout-list {
-    column-gap: 0.5rem;
+    column-gap: var(--space-xs);
   }
 
   :lang(de) .workbench .readouts.readout-list > div {
-    gap: 0.25rem;
+    gap: var(--space-2xs);
   }
 }
 
@@ -12936,7 +12936,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 }
 
 .tune-add {
-  margin: 0.5rem 0;
+  margin: var(--space-xs) 0;
 }
 
 /* level with the fields, under their one-line labels */
@@ -12952,8 +12952,8 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 /* the pressure range's label: neutral, no traffic-light color, which would read as a verdict */
 .powder-fit-state .fit-label {
   display: inline-block;
-  margin: 0.5rem 0 0;
-  padding: 0.125rem 0.5rem;
+  margin: var(--space-xs) 0 0;
+  padding: 0.125rem var(--space-xs);
   border: 1px solid var(--line);
   border-radius: 4px;
   background: var(--surface);
@@ -12961,19 +12961,19 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 }
 
 .fit-reasons h2 {
-  margin: 0.5rem 0 0.25rem;
+  margin: var(--space-xs) 0 var(--space-2xs);
   font-size: var(--mantine-font-size-sm);
 }
 
 .fit-reasons ul {
-  margin: 0 0 0.5rem;
+  margin: 0 0 var(--space-xs);
 }
 
 .hand-tune {
   display: grid;
-  gap: 0.5rem;
+  gap: var(--space-xs);
   max-width: 40rem;
-  margin: 0.5rem 0;
+  margin: var(--space-xs) 0;
   border: 1px solid var(--line);
   border-radius: 4px;
   justify-items: stretch;
@@ -12993,7 +12993,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
   display: flex;
   justify-content: space-between;
   min-height: 1.25rem;
-  margin-top: 0.25rem;
+  margin-top: var(--space-2xs);
   color: var(--muted);
   font-size: var(--mantine-font-size-xs);
 }
@@ -13018,8 +13018,8 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 .tune-legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem 1rem;
-  margin: 0.5rem 0 0.25rem;
+  gap: var(--space-2xs) var(--space-md);
+  margin: var(--space-xs) 0 var(--space-2xs);
   padding: 0;
   font-size: var(--mantine-font-size-xs);
   list-style: none;
