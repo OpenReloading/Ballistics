@@ -15,12 +15,14 @@ Interior curve fit: which factor on the relative standard uncertainty of the pre
 The shipped `fitPressureCurves` at its default limits, with the traces, truths and start values of the [study of the exponent](interior-curve-fit-exponent.md), fall fraction 0.5.
 
 Grid, 40 replicates per cell, seeds $1000\,(r + 1) + 16\,k$ for replicate $r$ and trace $k$:
+
 - Noise only: $K$ = 2, 3, 5 traces at charges evenly spaced from 2.4 to 3.0 g, exponent 0.3, 0.5, 0.8, noise 0.1, 0.5 and 2 % of the peak (27 cells).
 - Model error: convective heat loss (flame temperature 2800 K, factor 0.5) and bore friction (2.5 MPa) in the truth, which the fitted model lacks, $K$ = 2, 3, 5, exponent 0.5, noise 0.5 %.
 
 Each run records the fitted over the true exponent, its relative standard uncertainty $u_\text{rel}$, its status and the exponents of the leave-one-out refits. Only runs with the exponent fitted (not `fixed`, no failure) count.
 
 Rules:
+
 - Coverage factor: the 90th percentile of $\lvert \ln(\hat n / n) \rvert / u_\text{rel}$ over the noise-only runs of the even replicates, rounded to one decimal, checked on the odd replicates. The split was fixed before the run.
 - Check: the threshold was chosen from the table below after the run, as the comparison with the interval that names about 3 % of the noise-only fits. The check is said to show model error only when it names clearly more of the model-error fits than of the noise-only fits.
 

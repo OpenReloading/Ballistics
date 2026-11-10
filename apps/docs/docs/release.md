@@ -36,6 +36,7 @@ The web app's home page lists the newest five items of `apps/web/news/`, newest 
 ## Pages site
 
 `pages.yml` builds one site from two sources and deploys it in one deployment (a deployment replaces the whole site):
+
 - The root shows the latest release: the checkout of the newest GitHub Release's tag, built with `pnpm run pages:build`.
 - `/next/` shows `main`, built with `PAGES_EDITION=next` (`tools/src/pages.ts`).
 - Until the first release exists the root is a page that forwards to `/next/`.
@@ -45,10 +46,12 @@ It runs on every push to `main`, when a release is published and on `workflow_di
 Both editions share one origin, so the next edition keeps its data under other names: its IndexedDB database, local storage keys and caches are prefixed `next:`, and its service worker has the scope `<site>/next/`. What the next edition stores in the browser is not carried over to the stable edition, and a database that a pre-release version wrote is not read: the app offers to delete it. The stable edition's service worker leaves `/next/` to the network.
 
 `pnpm run pages:build` (`tools/src/pages.ts`, after `pnpm run build`) writes the site into `pages/`:
+
 - the web app as a static export under `PAGES_BASE_PATH`, with every record page prerendered from the API over the catalogue built from the data bundle;
 - the catalogue index and the records as data files under `api/`, the docs site under `docs/`, LICENSE, NOTICE, the data license (`data/LICENSE`) and `.nojekyll`.
 
 Settings:
+
 - `PAGES_EDITION`: `stable` (default) or `next`. The next edition is built for `<base>/next`, with browser store names of its own.
 - `PAGES_URL`: the site's origin, which sets the docs' `url` and the app's `metadataBase`.
 - `--sample`: only the cartridge pages of `apps/web/src/lib/prerender-sample.ts` prerendered and no docs site, for the review and e2e loop. The data files stay complete.
@@ -64,6 +67,7 @@ Settings:
 ## npm packages
 
 Publishing is off until the settings below exist, `pnpm run pack:check` passes and the repository variable `NPM_PUBLISH` is set to `true`. `pnpm run pack:check` fails while a published library depends on a private workspace package that npm does not have: today `schema` depends on `@open-reloading/units` and `@open-reloading/statistics`, and `importers` on both as well. Settings outside the repository, once per library (see the [npm documentation on trusted publishers](https://docs.npmjs.com/trusted-publishers)):
+
 1. The npm organization `open-reloading` exists. If npm offers trusted publishing only for an existing package, publish the first version by hand from a clean checkout of `main`: `pnpm install && pnpm run build`, then `pnpm --filter @open-reloading/<name> publish` for `schema`, `drawing`, `importers` and `catalog`, signed in with two-factor authentication. The `publish` job skips that version.
 2. On npmjs.com, package Settings, Trusted Publisher, GitHub Actions: organization `OpenReloading`, repository `Ballistics`, workflow `release.yml`.
 3. Publishing access: "Require two-factor authentication and disallow tokens".
@@ -73,6 +77,7 @@ Publishing is off until the settings below exist, `pnpm run pack:check` passes a
 ## Contract baselines
 
 The stored and published contracts besides the API each have a committed baseline that a test compares with the build (`pnpm test`, the CI `test` groups `packages` and `web`):
+
 - The JSON Schemas the schema build writes: `packages/schema/test/golden/json-schema/`.
 - The export list (values and types) of each published package: `tools/test/golden/exports/<name>.txt`, one line per entry point and name.
 - The user data file of the current format version (`user-data-v<version>.json`, replaced when the version changes; no older version is read): a file with a record of each kind, which the current code must read and write back unchanged, and which the next version refuses as a whole; share links of its records, one with text beyond ASCII (`share-link-v<version>.txt`, `share-link-text-v<version>.txt`): `apps/web/test/golden/`.

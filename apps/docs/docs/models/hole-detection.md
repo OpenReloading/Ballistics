@@ -7,6 +7,7 @@ description: Bullet hole proposals on a target photo from a color axis, a multi-
 # Hole detection
 
 Proposes bullet holes on a target photo, inside a region or the printed target found on the photo:
+
 1. A color axis separates the color seen through a hole from its surroundings.
 2. A scale-normalized Hessian detector finds blobs on the projection onto that axis, at scales tied to the expected hole diameter.
 3. A top-hat against a morphological opening gives the hole shape. Three tests keep the real peaks.
@@ -32,6 +33,7 @@ The counts are asserted in `apps/e2e/tests/web/groups-face.spec.ts` (the known a
 ## Quality bar
 
 For face search and hole detection on a set of photos with reference holes:
+
 - Usable photo: a photo with no bad-level problem (Photo quality). Photos held by one are counted per set as held and reported beside the corrections.
 - Matching: a proposal at or above the confidence tier matches a reference hole when the two lie within half a hole diameter, one to one, nearest pairs first. Found: a matched proposal. False: a proposal without a reference hole. Missed: a reference hole without a proposal.
 - Corrections per usable photo: the adds, moves and deletes that turn the proposals into the reference holes, $\max(n_\mathrm{false}, n_\mathrm{missed})$, since a false hole paired with a missed one is one move.
@@ -145,6 +147,7 @@ $$
 Code: `packages/target-recognition/src/hole-detection.ts`, `pipeline` (`testPeaks`, `threshold`, `standsOut`), `KEEP`, `INSCRIBED`, `FILL`, `HAT`, `FLOOR`. `packages/target-recognition/src/raster-ops.ts`, `distanceSquared`.
 
 with:
+
 - $\kappa = 0.35$ at the default contrast setting
 - $\delta$ the inscribed radius: Euclidean distance of a mask pixel to the nearest pixel outside the mask
 - the last ratio: filled share of the disc of radius $0.5 D$
@@ -236,6 +239,7 @@ With a found target and no region drawn, the region is the target, and a flier o
 ### Print on the target
 
 A mark within half a hole of the working image's edge leaves a run: a ring line or the sheet's edge meets the photo's edge there. With a found target, these marks are print and leave it too:
+
 - a dark mark on the black area or a light one on the paper whose confidence is below 0.8;
 - the marks where the ring numerals stand, when the run or the seed runs hold three or more there. They stand on the target's axes, between two ring lines, within $\min(6\ \text{mm}, 0.3 g)$ of an axis, with $g$ the ring spacing;
 - the marks where the quarter marks of the black area stand, when three or more stand on different axes: on an axis within $0.5$ hole diameters of it and within one hole diameter of the black area's edge. The numerals' evidence from the other runs does not count for them.
@@ -275,6 +279,7 @@ Code: `packages/target-recognition/src/hole-detection.ts`, `offSheet`.
 ### Target
 
 The target search runs on the whole photo before a detection (`findFace`) and gives the scale, the center and the target record:
+
 1. Black area: the grey levels on a grid of about 500 pixels on the longer side are cut at nine thresholds between their 2nd and 98th percentile. Each compact grey component is filled and fitted by a robust ellipse through its outline. A component the photo's edge cuts is fitted to its outline inside the photo only, and is kept when half of the ellipse and its center lie in the photo. A candidate needs paper about it: at least 60 % of the points 1.1 to 1.3 times out from its ellipse that lie in the photo are lighter than its threshold, so a disc inside the black area bounded by a light ring line is no candidate.
 2. Ring lines: Hessian ridges on a crop of up to 2.8 black radii, averaged so the black area is at most about 500 pixels across (a zoomed photo's thick lines stay lines), grouped by their radius relative to the black edge, one robust ellipse per group. When the black edge's ellipse is flatter than 0.9 (a sheet seen at a slant), the outer rings are not concentric with it on the photo and their relative radii run into each other: the conic pencil of the black edge and the ring farthest from it in radius (its ratio within 6 % of the mean radii's) maps the photo onto the target's plane, and the ridges are grouped again by their radius there.
 3. Targets: a target record with `photoSearch: false` is skipped. With a known scale (a calibrated sheet gives the photo's pixels per mm, `pxPerMm`) a target is skipped when the pixels per mm its black diameter needs for the black area's long semi-axis differ from that scale by more than 20 % (`SCALE_TOLERANCE`): targets with the same ring ratios at another size drop out. The black edge is the target's black diameter, which fixes a scale $s$ per target. A ring found at radius $\rho_j$ matches the target ring $r_i$ when $\lvert s r_i / \rho_j - 1 \rvert \le 0.03$, closest pairs first. A target ring is expected when it lies between 0.15 and 2.9 black radii and half of its line falls inside the photo: outer rings cut off by the photo's edge or beyond an insert card do not count against a target. With $a_j$ the share of the ring's ellipse its line covers, $e_j$ that relative error, $n_\mathrm{miss}$ the target rings expected and not found and $n_\mathrm{extra}$ the rings found that match none:

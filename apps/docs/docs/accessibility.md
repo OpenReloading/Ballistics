@@ -38,6 +38,7 @@ An agent drove the app with Playwright and read the browser's accessibility tree
 ### Sample
 
 Structured sample:
+
 - 23 routes without a dynamic segment (every `page.tsx` under `apps/web/src/app` without `[`), at 320, 390 and 1280 px in light and dark.
 - One record page per record kind: cartridge (308 Win.), bullet, powder, case, primer, target, discipline, federation.
 - States: the first-visit Safety dialog, the workbench start card, the workbench after the example run with every result tab, the Open menu and Saved loads drawer, Chart data, the bullet search dialog, Settings (General, with its shortcut choice), Keyboard shortcuts, site search, the Safety notice, the photo tool with its sample photograph, the Import entry with a table and a refused file, the Page actions panel at 320 and 390 px, range mode with a saved load, a typed invalid number, a refused run, an unreadable chronograph file, tooltips by hover and by focus.
@@ -177,6 +178,7 @@ Set up: a release candidate build, a fresh browser profile (so the Safety dialog
 ### 5. Range mode on a phone width
 
 Use a phone or a 390 px window. With a keyboard if there is one; with VoiceOver on iOS (swipe right to read, double tap to activate) and TalkBack on Android where available.
+
 1. Open Session summary, open Page actions, choose Range mode.
 2. Choose a saved load in the Saved load select. Type a velocity and press Enter (on a phone, the number pad buttons then Add): "Shot n saved on this device" is announced.
 3. Add ten shots. Use the exclude control of one shot: its state is announced.

@@ -172,6 +172,3 @@ function value(text: string, t: Translator['t']): string {
 
 /** Makes `translateMessage` translate the messages of this table. */
 export const installCoreMessages = () => setCoreMessages(translated)
-
-/** The text in the language of `t` when `text` is a message of this table, else `text`. */
-export const translateKnown = (text: string, t: Translator['t']) => translated(text, t) ?? text

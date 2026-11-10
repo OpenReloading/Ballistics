@@ -9,6 +9,7 @@ description: The 5th, 50th and 95th percentile of the simulated peak pressure an
 `interiorSampledBand` draws the six inputs of the [peak-pressure range](interior-pressure-range.md) at random from their tolerances, runs the [M3 model](interior-m3.md) once per draw and reports the 5th, 50th and 95th percentile of the peak breech pressure and of the muzzle velocity. With several inputs varying the band is narrower than the corner-case range, which moves every input to its end at once, because few draws put every input near its end.
 
 The method is the propagation of distributions by Monte Carlo sampling of [JCGM 101:2008](../bibliography.md#jcgm-101-2008). The band covers input tolerances only and is not a confidence interval.
+
 - The draws depend on the seed only (same seed, same band) and their number is fixed by the request.
 - The run has a time budget. When the draws do not finish within it, no band is reported: the answer keeps the corner-case range and says the sampling went over budget. A band from part of the draws would depend on the speed of the machine.
 - A draw that leaves the model is counted as failed and left out of the percentiles.

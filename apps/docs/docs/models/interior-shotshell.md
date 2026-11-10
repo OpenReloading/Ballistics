@@ -25,6 +25,7 @@ The powder space $V_c$, the wad travel $x_e$ and every other input (charge, prop
 ### Crimp
 
 M3 holds the projectile until the mean pressure reaches $p_\text{st}$ (see [shot start](interior-m3.md)).
+
 - A crimp opening force $F_c$ measured on a hull converts to the opening pressure $p_c = F_c / A$.
 - Resistance while the crimp folds straighten, wad friction, the forcing cone and the choke are resistance pressures over travel of M3.
 - Gas that blows past the wad before it seals is the leak area of M3 (see [leakage and heat loss](interior-leakage-heat.md)).
@@ -32,6 +33,7 @@ M3 holds the projectile until the mean pressure reaches $p_\text{st}$ (see [shot
 ### Input checks
 
 `shotshellInterior` returns an invalid result with reason `input` and the shotshell field name when:
+
 - the bore diameter, the travel or the shot mass is not a positive finite number
 - the wad mass or the crimp pressure is not a non-negative finite number
 
