@@ -42,10 +42,12 @@ export interface Options {
   params?: 'records' | 'fit-on-training' | undefined
   /** Of the fit, a fraction of the velocity; default 0.03. */
   velocitySigma?: number | undefined
+  /** `family` fits each burn coefficient at the pressure exponent its powder family chooses; default the record's. */
+  exponent?: 'family' | undefined
 }
 
 /** What `fit` reads. */
-type FitOptions = Pick<Options, 'rows' | 'records' | 'warn' | 'velocitySigma'>
+type FitOptions = Pick<Options, 'rows' | 'records' | 'warn' | 'velocitySigma' | 'exponent'>
 
 type Inputs = VerifyResult['inputs']
 
@@ -145,7 +147,7 @@ type Prepared = ReturnType<typeof prepare>
 function fitOf(options: FitOptions, data: Prepared, model: Model) {
   // load tables print no spread; ANSI/SAAMI Z299.4-2025 expects tested ammunition within 90 fps of the table, about 3 %
   const velocitySigma = options.velocitySigma ?? 0.03
-  const fit = fitPowders(data.rows, data.records, model.interior, velocitySigma)
+  const fit = fitPowders(data.rows, data.records, model.interior, velocitySigma, options.exponent)
   const reasons = Object.values(fit.notFitted)
   const notFitted = Object.fromEntries(
     notFittedReasons.flatMap((reason) => {
@@ -157,8 +159,20 @@ function fitOf(options: FitOptions, data: Prepared, model: Model) {
     ...fit,
     velocitySigma,
     records: withFit(data.records, fit),
-    params: `params fit-on-training velocity-sigma ${velocitySigma}`,
-    summary: { velocitySigma, powders: Object.keys(fit.powders).length, notFitted },
+    params: `params fit-on-training velocity-sigma ${velocitySigma}${fit.exponent ? ' exponent family' : ''}`,
+    summary: {
+      velocitySigma,
+      powders: Object.keys(fit.powders).length,
+      notFitted,
+      ...(fit.exponent && {
+        exponent: {
+          pooled: fit.exponent.pooled,
+          families: Object.fromEntries(
+            Object.entries(fit.exponent.families).map(([name, f]) => [name, f.exponent]),
+          ),
+        },
+      }),
+    },
   }
 }
 
@@ -340,6 +354,7 @@ export async function fit(options: FitOptions, spec = builtInName): Promise<FitR
     modelVersion: versionOf(model, data, fitted),
     split: 'training',
     velocitySigma: fitted.velocitySigma,
+    ...(fitted.exponent && { exponent: fitted.exponent }),
     powders: fitted.powders,
     notFitted: fitted.notFitted,
   }

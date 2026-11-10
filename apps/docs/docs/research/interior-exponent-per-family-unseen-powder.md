@@ -64,6 +64,7 @@ Measured: load rows that are not in the repository, aggregates per powder family
 - `packages/ballistics/src/interior/workbench-keys.ts`, `powderModelValues`, which passes the record exponent to the model.
 - `packages/cli/src/unseen.ts`, `familyOf` and `unseenPowder`.
 - `packages/cli/src/commands.ts`, `verify` and `compare`.
+- `packages/cli/src/fit.ts`, `fit --exponent family`: an exponent per family, with small families pulled toward the pooled exponent ([command line](../cli.md#pressure-exponent-per-family)).
 - Model pages: [M3](../models/interior-m3.md), [burn laws and form functions](../models/interior-burn-forms.md), [powder fit](../models/interior-powder-fit.md), [validation](../models/validation.md).
 
 ## Confidence

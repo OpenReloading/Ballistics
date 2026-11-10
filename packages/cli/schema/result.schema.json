@@ -919,6 +919,28 @@
                 "maximum": 9007199254740991
               },
               "description": "Powders not fitted, by reason; a reason without powders is left out."
+            },
+            "exponent": {
+              "description": "With `--exponent family`: the pressure exponents of the fit.",
+              "type": "object",
+              "properties": {
+                "pooled": {
+                  "type": "number",
+                  "description": "The exponent of least mean chi square over all powders that entered."
+                },
+                "families": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "description": "By powder family, the exponent it chose."
+                }
+              },
+              "required": ["pooled", "families"],
+              "additionalProperties": false
             }
           },
           "required": ["velocitySigma", "powders", "notFitted"],
@@ -1868,6 +1890,28 @@
                     "maximum": 9007199254740991
                   },
                   "description": "Powders not fitted, by reason; a reason without powders is left out."
+                },
+                "exponent": {
+                  "description": "With `--exponent family`: the pressure exponents of the fit.",
+                  "type": "object",
+                  "properties": {
+                    "pooled": {
+                      "type": "number",
+                      "description": "The exponent of least mean chi square over all powders that entered."
+                    },
+                    "families": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": "number"
+                      },
+                      "description": "By powder family, the exponent it chose."
+                    }
+                  },
+                  "required": ["pooled", "families"],
+                  "additionalProperties": false
                 }
               },
               "required": ["velocitySigma", "powders", "notFitted"],
@@ -2733,6 +2777,28 @@
                     "maximum": 9007199254740991
                   },
                   "description": "Powders not fitted, by reason; a reason without powders is left out."
+                },
+                "exponent": {
+                  "description": "With `--exponent family`: the pressure exponents of the fit.",
+                  "type": "object",
+                  "properties": {
+                    "pooled": {
+                      "type": "number",
+                      "description": "The exponent of least mean chi square over all powders that entered."
+                    },
+                    "families": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": "number"
+                      },
+                      "description": "By powder family, the exponent it chose."
+                    }
+                  },
+                  "required": ["pooled", "families"],
+                  "additionalProperties": false
                 }
               },
               "required": ["velocitySigma", "powders", "notFitted"],
@@ -2970,6 +3036,53 @@
           "type": "number",
           "description": "Velocity sigma of each row, a fraction of its velocity."
         },
+        "exponent": {
+          "description": "With `--exponent family`: the pressure exponent each powder family chose; each powder is fitted at the exponent of its family.",
+          "type": "object",
+          "properties": {
+            "grid": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "description": "The exponents chosen from."
+            },
+            "shrinkage": {
+              "type": "number",
+              "description": "Weight of the pooled term in a family's choice, in powders."
+            },
+            "pooled": {
+              "type": "number",
+              "description": "The exponent of least mean chi square over all powders that entered."
+            },
+            "families": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "exponent": {
+                    "type": "number",
+                    "description": "The exponent of least sum of its powders' chi squares plus `shrinkage` times the mean over all powders that entered."
+                  },
+                  "powders": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991,
+                    "description": "Its powders that entered the sum."
+                  }
+                },
+                "required": ["exponent", "powders"],
+                "additionalProperties": false
+              },
+              "description": "By powder family, `<propellant base>/<grain form>` of the powder record. A powder enters the sums when it was fitted at every exponent of the grid."
+            }
+          },
+          "required": ["grid", "shrinkage", "pooled", "families"],
+          "additionalProperties": false
+        },
         "powders": {
           "type": "object",
           "propertyNames": {
@@ -2996,7 +3109,7 @@
               },
               "factor": {
                 "type": "number",
-                "description": "Fitted over record burn coefficient."
+                "description": "Fitted over record burn coefficient; with another exponent than the record it also holds the change of the meaning of the coefficient."
               },
               "rows": {
                 "type": "integer",
@@ -3019,6 +3132,10 @@
                 "minimum": 0,
                 "maximum": 9007199254740991,
                 "description": "Iterations of the solver."
+              },
+              "pressureExponent": {
+                "description": "With `--exponent family`: the exponent of its family, the value fitted at it.",
+                "type": "number"
               }
             },
             "required": [
@@ -3049,7 +3166,7 @@
               "noUsableRow"
             ]
           },
-          "description": "By powder id, why a powder with interior parameters that the rows name got no value: the reason of the fit, or `noUsableRow` without a used training row."
+          "description": "By powder id, why a powder with interior parameters that the rows name got no value: the reason of the fit (with `--exponent family`, of the fit at the exponent of its family), or `noUsableRow` without a used training row."
         }
       },
       "required": [
