@@ -35,7 +35,7 @@ jobs:
       images: ${{ steps.images.outputs.matrix }}
       libraries: ${{ steps.libraries.outputs.names }}
     steps:
-      # The release pull request is opened as the organisation's release GitHub App, so its required checks run
+      # The release pull request is opened as the organization's release GitHub App, so its required checks run
       # without anyone approving them (a pull request opened with GITHUB_TOKEN waits for that approval). GitHub signs
       # the App's API commits, which main requires. Without the App (variable or installation missing) the step is
       # skipped, GITHUB_TOKEN opens the pull request and the owner approves its workflow runs.
