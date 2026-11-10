@@ -255,7 +255,7 @@ describe('stepLabel', () => {
   it('counts down from the main charge', () => {
     expect(labels(3, 'down')).toEqual(['0', '−1', '−2'])
   })
-  it('centres around the main charge, lowest first', () => {
+  it('centers around the main charge, lowest first', () => {
     expect(labels(5, 'around')).toEqual(['−2', '−1', '0', '+1', '+2'])
   })
   it('gives the one step 0', () => {

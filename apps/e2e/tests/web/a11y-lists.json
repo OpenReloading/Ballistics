@@ -235,13 +235,13 @@
       "rule": "color-contrast",
       "node": "class=\"source-count\"",
       "where": "Database list filter",
-      "reason": "Option count of a single digit, which axe cannot judge as text. It sits on the popover surface in the text colour, 17:1 in light and 15:1 in dark (--fg on --bg, the popover's body colour)."
+      "reason": "Option count of a single digit, which axe cannot judge as text. It sits on the popover surface in the text color, 17:1 in light and 15:1 in dark (--fg on --bg, the popover's body color)."
     },
     {
       "rule": "color-contrast",
       "node": "mantine-Group-root > span:nth-child(1)",
       "where": "Database list filter",
-      "reason": "Option name below the visible part of the popover's scroll box, which axe reports as covered. It sits on the popover surface in the text colour, 17:1 in light and 15:1 in dark (--fg on --bg)."
+      "reason": "Option name below the visible part of the popover's scroll box, which axe reports as covered. It sits on the popover surface in the text color, 17:1 in light and 15:1 in dark (--fg on --bg)."
     },
     {
       "rule": "color-contrast",
@@ -259,7 +259,7 @@
       "rule": "color-contrast",
       "node": "id=\"driver-popover-description\"",
       "where": ["Page tour"],
-      "reason": "Text of the page tour's popover, which axe cannot match to a background because the popover's arrow overlaps it. It is the text colour on the page background: 17.4:1 light, 15.3:1 dark by measurement."
+      "reason": "Text of the page tour's popover, which axe cannot match to a background because the popover's arrow overlaps it. It is the text color on the page background: 17.4:1 light, 15.3:1 dark by measurement."
     },
     {
       "rule": "label-content-name-mismatch",
@@ -270,13 +270,13 @@
     {
       "rule": "color-contrast",
       "node": "-tab-\\/",
-      "reason": "Tab of the library strip that scrolls sideways on a phone: the tab at the strip's edge is partly cut, so axe cannot match it to a background. The label is the tab text colour on the page background, unchanged by the scrolling, 5:1 or more in both themes."
+      "reason": "Tab of the library strip that scrolls sideways on a phone: the tab at the strip's edge is partly cut, so axe cannot match it to a background. The label is the tab text color on the page background, unchanged by the scrolling, 5:1 or more in both themes."
     },
     {
       "rule": "color-contrast",
       "node": "",
       "where": ["Settings"],
-      "reason": "Text of the Settings dialog at the edge of its scrolling tab area, partly clipped by the box or the pinned footer, so axe cannot match it to a background. It is the text or muted colour on the dialog background, 5:1 or more in both themes."
+      "reason": "Text of the Settings dialog at the edge of its scrolling tab area, partly clipped by the box or the pinned footer, so axe cannot match it to a background. It is the text or muted color on the dialog background, 5:1 or more in both themes."
     }
   ]
 }

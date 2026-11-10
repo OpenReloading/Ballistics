@@ -661,7 +661,7 @@ describe('fillet', () => {
   })
 
   it('sweeps the short way round a corner whose arc crosses the -x direction', () => {
-    // lines to the right of the corner: the arc lies left of its centre, angles 3/4 pi to -3/4 pi
+    // lines to the right of the corner: the arc lies left of its center, angles 3/4 pi to -3/4 pi
     const arc = fillet([1, 1], [0, 0], [1, -1], 0.5) as SectionPoint[]
     expectTangent(arc, 0.5, [1, 1], [0, 0], [1, -1])
     // its middle sample is the point nearest the corner, r sqrt(2) - r from it on the bisector

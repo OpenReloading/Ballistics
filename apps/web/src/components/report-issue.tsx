@@ -65,7 +65,7 @@ const typeLabels: Record<ReportType, Message> = {
   Idea: msg('Idea'),
 }
 
-/** An icon left of the repository link from 75em, a labelled row in the phone drawer; nothing without a repository URL. */
+/** An icon left of the repository link from 75em, a labeled row in the phone drawer; nothing without a repository URL. */
 export function ReportIssueButton({
   url,
   drawer,

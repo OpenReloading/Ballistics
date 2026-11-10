@@ -150,7 +150,7 @@ Code: `packages/ballistics/src/interior/curve-fit.ts`, `curveWarnings`, `minPeak
 
 ### Trace import
 
-`parsePressureHistory` reads delimited text with one sample per row, an optional header row, and the time and pressure columns (default the first and second). The units come from the header, as the text in `(...)` or `[...]` or the last word of the header cell (`time (ms)`, `pressure [MPa]`), or from the caller. A header cell without a unit names none. Exponent notation (`1.0E-05`) is read. A unit spelling is matched exactly, or in any case when it is all lower or all upper case, so `mPa` and `Mbar` are not read as `MPa` or `mbar`. A unit that is neither throws `pressure unit is missing: name the unit to import this file` (`time unit ...` likewise), and a recognised unit in the file that differs from the caller's throws. The sensor position (breech, mean or base) is always asked from the caller: the file cannot tell it. Pressures are returned in bar (`pressureBar`) and times in s. Times must increase, and the file needs at least 3 samples.
+`parsePressureHistory` reads delimited text with one sample per row, an optional header row, and the time and pressure columns (default the first and second). The units come from the header, as the text in `(...)` or `[...]` or the last word of the header cell (`time (ms)`, `pressure [MPa]`), or from the caller. A header cell without a unit names none. Exponent notation (`1.0E-05`) is read. A unit spelling is matched exactly, or in any case when it is all lower or all upper case, so `mPa` and `Mbar` are not read as `MPa` or `mbar`. A unit that is neither throws `pressure unit is missing: name the unit to import this file` (`time unit ...` likewise), and a recognized unit in the file that differs from the caller's throws. The sensor position (breech, mean or base) is always asked from the caller: the file cannot tell it. Pressures are returned in bar (`pressureBar`) and times in s. Times must increase, and the file needs at least 3 samples.
 
 Code: `packages/importers/src/pressure-history.ts`, `parsePressureHistory`.
 
@@ -195,8 +195,8 @@ The two passes have a combined response of $\lvert H \rvert^2$ with $\lvert H \r
 ## Assumptions
 
 - The M3 load and its two-stage vivacity law describe the powder, rifle and conditions of the trace. Only the four parameters and the time shift change between candidates.
-- The sensor position is the caller's: the trace is compared with the model's breech, space-mean or base pressure, and the difference between them is a modelling choice, not a measurement.
-- Samples are independent with one standard uncertainty. A sensor offset, a gain error or a resonance is not modelled.
+- The sensor position is the caller's: the trace is compared with the model's breech, space-mean or base pressure, and the difference between them is a modeling choice, not a measurement.
+- Samples are independent with one standard uncertainty. A sensor offset, a gain error or a resonance is not modeled.
 - The start values are close enough to the trace that the model reaches the end of the window inside the barrel.
 
 ## Limits

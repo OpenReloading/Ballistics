@@ -1,7 +1,7 @@
 ---
 
 title: Modified point mass
-description: Static modified point-mass trajectory of a spin-stabilised bullet, with the yaw of repose, lift, Magnus force, spin decay and the jump of linear theory.
+description: Static modified point-mass trajectory of a spin-stabilized bullet, with the yaw of repose, lift, Magnus force, spin decay and the jump of linear theory.
 ---
 
 # Modified point mass
@@ -155,7 +155,7 @@ Code: `packages/ballistics/src/exterior/trajectory.ts`, `fly` (`yawAt`), `trajec
 | $A$                 | Reference area                                                  | mm2         | m2             |
 | $T$                 | Twist length per turn                                           | mm          | m              |
 | $p$, $p_0$          | Axial spin rate, at the muzzle                                  | no kind     | rad/s          |
-| $I_x$, $I_y$        | Axial and transverse moment of inertia about the centre of mass | no kind     | kg m2          |
+| $I_x$, $I_y$        | Axial and transverse moment of inertia about the center of mass | no kind     | kg m2          |
 | $\vec a_\text{PM}$  | Point-mass acceleration                                         | no kind     | m/s2           |
 | $\vec\alpha_R$      | Yaw of repose                                                   | deg         | rad            |
 | $\alpha_\text{max}$ | Yaw at which the run stops                                      | deg         | rad            |
@@ -174,7 +174,7 @@ Code: `packages/ballistics/src/exterior/trajectory.ts`, `fly` (`yawAt`), `trajec
 - The yaw is quasi-steady: its rate and acceleration are neglected, so it depends on the state alone.
 - The yaw of repose uses the point-mass acceleration, not the acceleration including lift and Magnus force.
 - Small-yaw linear aerodynamics: forces proportional to the yaw, no cubic or higher terms.
-- $C_{M\alpha} > 0$ at every Mach node: a spin-stabilised bullet. A non-positive value is refused.
+- $C_{M\alpha} > 0$ at every Mach node: a spin-stabilized bullet. A non-positive value is refused.
 - The Magnus and spin-damping coefficients refer to the non-dimensional spin $p d / V$.
 - Wind is constant within each segment, so the rate of change of $\vec v_a$ equals that of $\vec v$.
 - Zero-yaw drag is the projectile's drag input, as in the point mass.

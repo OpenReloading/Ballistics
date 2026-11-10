@@ -153,7 +153,7 @@ export function SafetyDialog() {
   )
 }
 
-/** Light yellow from the caution tokens of `.safety-light` in globals.css (about 8:1); labelled from 75em, icon only in the phone top bar, screen only. */
+/** Light yellow from the caution tokens of `.safety-light` in globals.css (about 8:1); labeled from 75em, icon only in the phone top bar, screen only. */
 export function SafetyBarButton({
   iconOnly = false,
   className,

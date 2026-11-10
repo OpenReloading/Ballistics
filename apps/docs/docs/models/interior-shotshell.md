@@ -61,7 +61,7 @@ M3 holds the projectile until the mean pressure reaches $p_\text{st}$ (see [shot
 
 ## Limits
 
-- Not modelled: collapse of the wad cushion, compression of the shot column, pellet deformation and pellet contact with the bore, a crimp opening law over time or travel, hull expansion, hull and wad material properties.
+- Not modeled: collapse of the wad cushion, compression of the shot column, pellet deformation and pellet contact with the bore, a crimp opening law over time or travel, hull expansion, hull and wad material properties.
 - Crimp-fold resistance, wad friction, forcing-cone and choke resistance and the leak area past the wad are inputs without defaults. No reusable value or law for them was found in the sources below.
 - Crimp forces measured on hulls are quasi-static, not forces during firing.
 - Discrete and finite element models of the wad and the individual pellets show wad deformation and pellet interaction during the barrel travel. A model with one gas state does not represent them.
@@ -71,5 +71,5 @@ M3 holds the projectile until the mean pressure reaches $p_\text{st}$ (see [shot
 
 ## Sources
 
-- [Bilenko 2011](../bibliography.md#bilenko-2011): crimp opening forces of 12 gauge roll and fold crimps measured quasi-statically, and the statement that gas leakage past the wad is not modelled in the literature it reviews (pages unverified).
+- [Bilenko 2011](../bibliography.md#bilenko-2011): crimp opening forces of 12 gauge roll and fold crimps measured quasi-statically, and the statement that gas leakage past the wad is not modeled in the literature it reviews (pages unverified).
 - [Deng 2022](../bibliography.md#deng-2022): discrete element model of wad, shot cup and pellets in a shotgun barrel (full text not read, unverified).

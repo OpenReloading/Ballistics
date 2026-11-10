@@ -119,7 +119,7 @@ const severities = {
   error: { word: msg('Error'), color: 'red', Icon: WarningOctagon },
 } as const
 
-/** Icon, the severity's word and the text, so colour is never the only signal; an error is announced at once (`role="alert"`), a note or warning politely (`role="status"`). */
+/** Icon, the severity's word and the text, so color is never the only signal; an error is announced at once (`role="alert"`), a note or warning politely (`role="status"`). */
 export function Message({
   severity,
   title,

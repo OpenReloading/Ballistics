@@ -111,7 +111,7 @@ export interface Annotation {
   conventions: Convention[]
 }
 
-/** A text box: centre, unit direction of the text, width and height (one em), its dimension. */
+/** A text box: center, unit direction of the text, width and height (one em), its dimension. */
 export interface Label {
   text: string
   c: PartPoint

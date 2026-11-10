@@ -101,7 +101,7 @@ const shotsOf = (r: Spec, views: View[], variant?: string) =>
       })),
     )
 
-// default: 390 px light, and 308 Win. also dark (the colours of every part) and at 1280 px (the figure beside its table); full: the samples light and dark at 390 px, the verified records also at 1280 px
+// default: 390 px light, and 308 Win. also dark (the colors of every part) and at 1280 px (the figure beside its table); full: the samples light and dark at 390 px, the verified records also at 1280 px
 const shots = [
   ...common.flatMap(({ id, variant }) =>
     shotsOf(

@@ -58,7 +58,7 @@ export function segmentAt(points: readonly Point[]) {
   }
 }
 
-/** Values at time t, linear between the neighbouring points; before the first and from the last point the end values. */
+/** Values at time t, linear between the neighboring points; before the first and from the last point the end values. */
 export function sampler(points: readonly Point[]): (t: number) => PlaybackSample {
   const segment = segmentAt(points)
   return (t) => {
@@ -169,7 +169,7 @@ const energyLabels = {
   },
 }
 
-/** Terms whose inputs the web form does not send, so 0 means not modelled. */
+/** Terms whose inputs the web form does not send, so 0 means not modeled. */
 const unsent: ReadonlySet<string> = new Set(['resistance', 'heat', 'leakage'])
 
 /** Terms in J with their share of the released energy; resistance, heat and leakage of 0 are apart; spin is listed even at 0 (a bore without rifling). */

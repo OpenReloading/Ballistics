@@ -16,7 +16,7 @@ export const controlSize = {
 /** Width of the page container of header, main and footer: the page type's token in globals.css. */
 export const pageWidth = 'var(--page-width)'
 
-// Colours stay CSS custom properties in globals.css, shared with the drawing; Mantine reads them there.
+// Colors stay CSS custom properties in globals.css, shared with the drawing; Mantine reads them there.
 export const theme = createTheme({
   fontFamily: 'var(--font-ui), system-ui, sans-serif',
   primaryColor: 'blue',

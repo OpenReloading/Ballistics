@@ -18,7 +18,7 @@ export type LoadSummary = { load: string; velocities: (string | undefined)[] }
 
 const pxPerMm = 96 / 25.4
 
-/** Target m per view unit at the centre of `box`: exact for line and ring references. */
+/** Target m per view unit at the center of `box`: exact for line and ring references. */
 function mPerUnit(frame: Frame, box: ViewBox) {
   const c = { x: box.x + box.w / 2, y: box.y + box.h / 2 }
   const o = viewToTarget(frame, c)

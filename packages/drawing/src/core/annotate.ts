@@ -335,7 +335,7 @@ function headLengths(placer: Placer, pending: (() => void)[], heads: Dimension[]
   })
 }
 
-/** Head diameters behind the face, smallest radius innermost; texts centred or beside. */
+/** Head diameters behind the face, smallest radius innermost; texts centered or beside. */
 function headDiameters(placer: Placer, pending: (() => void)[], below: Dimension[]) {
   const {
     points,
@@ -656,7 +656,7 @@ function ledCandidate(
     em / 2 / Math.max(Math.abs(u[0] * dy - u[1] * dx), 1e-9),
   )
   const c = add(end, u, gap + reach)
-  // a text across the axis stays centred on it where the leader still meets the text
+  // a text across the axis stays centered on it where the leader still meets the text
   const across = (Math.abs(dy) * w) / 2 + (Math.abs(dx) * em) / 2
   if (along && Math.abs(start[1]) <= across - em / 4) c[1] = 0
   const leader: LineSegment = { a: start, b: end, kind: 'thin', owner, leader: true }
@@ -805,7 +805,7 @@ function layoutAngles(placer: Placer) {
       const [hx, hy] = horizontal
       const around = Array.from({ length: 24 }, (_, j) => (j * Math.PI) / 12).flatMap((t) => {
         const u: PartPoint = [Math.cos(t), Math.sin(t)]
-        // from the text's centre to its box edge along u
+        // from the text's center to its box edge along u
         const half = Math.min(
           w / 2 / Math.max(Math.abs(u[0] * hx + u[1] * hy), 1e-9),
           em / 2 / Math.max(Math.abs(u[0] * hy - u[1] * hx), 1e-9),

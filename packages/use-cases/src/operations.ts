@@ -140,7 +140,7 @@ export const operations: readonly Operation[] = [
     name: 'exterior/range-strings/fit',
     summary: 'Fit range strings',
     description:
-      'Fits muzzle velocity, drag factor, click value and optionally a zero offset to the mean impacts or dialled corrections of strings at known ranges and an optional chronograph string. Answers each parameter with identifiability status, value and confidence interval, the residuals with their chi-square test and the condition of the fit.',
+      'Fits muzzle velocity, drag factor, click value and optionally a zero offset to the mean impacts or dialed corrections of strings at known ranges and an optional chronograph string. Answers each parameter with identifiability status, value and confidence interval, the residuals with their chi-square test and the condition of the fit.',
     body: rangeStringsFitBody,
     response: rangeStringsFitResponse,
     example: rangeStringsFitExample,

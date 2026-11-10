@@ -74,7 +74,7 @@ function eventAt(distance: number, found: FoundFace, { federation }: FaceScope) 
   return new Set(near.map(of)).size === 1 ? nth(near, 0).id : undefined
 }
 
-/** Photo px to face mm, x right and y up from the face centre, only where the face lies on the sheet as known; a face on a sheet calibrated otherwise is centred on an origin that may be anywhere. */
+/** Photo px to face mm, x right and y up from the face center, only where the face lies on the sheet as known; a face on a sheet calibrated otherwise is centered on an origin that may be anywhere. */
 export function faceGeometry(o: {
   sheet: TargetSheet
   group: ShotGroup | undefined

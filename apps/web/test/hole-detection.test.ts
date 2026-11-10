@@ -28,7 +28,7 @@ const BLACK = 35
 
 class Scene {
   lum: Float32Array
-  /** Pixels painted in colour (R, G, B); the others are grey with the tint of `image`. */
+  /** Pixels painted in color (R, G, B); the others are grey with the tint of `image`. */
   colour = new Map<number, [number, number, number]>()
   rnd = seededUniforms(7)
   constructor(
@@ -67,7 +67,7 @@ class Scene {
   disc(cx: number, cy: number, r: number, v: number) {
     this.ring(cx, cy, r / 2, r, v)
   }
-  /** A hole with a torn, wavy edge; `backing` is what shows through it; white fibres on its rim. */
+  /** A hole with a torn, wavy edge; `backing` is what shows through it; white fibers on its rim. */
   hole(c: Point, backing: number, diameter = D) {
     const r = diameter / 2
     const [p1, p2] = [this.rnd() * 6, this.rnd() * 6]
@@ -88,7 +88,7 @@ class Scene {
       this.disc(c.x + 1.03 * r * Math.cos(a), c.y + 1.03 * r * Math.sin(a), 0.06 * diameter, PAPER)
     }
   }
-  /** A hole through which a backing of colour `rgb` shows, round, `diameter` px across. */
+  /** A hole through which a backing of color `rgb` shows, round, `diameter` px across. */
   colourHole(c: Point, rgb: [number, number, number], diameter = D) {
     const r = diameter / 2
     for (let y = Math.floor(c.y - r); y <= Math.ceil(c.y + r); y++)
@@ -202,7 +202,7 @@ describe('detectFromExample', () => {
     )
   })
 
-  it('reports the polarity, the colour and the size of the picked hole', () => {
+  it('reports the polarity, the color and the size of the picked hole', () => {
     const s = new Scene(700, 500)
     const truth = [
       { x: 150, y: 140 },
@@ -318,7 +318,7 @@ describe('detectFromExample', () => {
     expect(from(s, { x: 9000, y: 200 })).toBeUndefined()
   })
 
-  it('proposes only holes whose centre is inside the region', () => {
+  it('proposes only holes whose center is inside the region', () => {
     const s = new Scene(800, 600)
     const inside = { x: 300, y: 300 }
     const nearEdge = { x: 300, y: 300 - 0.9 * D }
@@ -411,7 +411,7 @@ describe('autoDetect and findHoles', () => {
     ).toEqual([])
   })
 
-  it('with a backing colour looks for that colour only', () => {
+  it('with a backing color looks for that color only', () => {
     const s = new Scene(900, 900)
     s.face(450, 450)
     const mm = pxPerMm
@@ -428,7 +428,7 @@ describe('autoDetect and findHoles', () => {
       expect(Math.min(...found.map((p) => Math.hypot(p.x - t.x, p.y - t.y))) / D).toBeLessThan(0.12)
   })
 
-  it('refuses a backing colour channel that is not a number from 0 to 255', () => {
+  it('refuses a backing color channel that is not a number from 0 to 255', () => {
     const s = new Scene(200, 200)
     const ok = { image: s.image(), region: all(s), pxPerM, expectedHoleDiameter: bullet }
     for (const backing of [
@@ -650,7 +650,7 @@ describe('the printed zero target', () => {
     const ink = sheetInk(sheetSvg({ rifle: 'Rifle 1', distance: '100', group: 'Group 1' }))
     for (let y = 0; y < s.height; y++)
       for (let x = 0; x < s.width; x++) s.lum[y * s.width + x] = ink(x / pxPerMm, y / pxPerMm)
-    // sheet mm right and up of the centre to photo px
+    // sheet mm right and up of the center to photo px
     const at = (x: number, y: number) => ({ x: (105 + x) * pxPerMm, y: (148.5 - y) * pxPerMm })
     const inSquare = [at(-6, 5), at(5, -6)]
     const onPaper = [at(30, 10), at(-25, 18), at(20, -30)]

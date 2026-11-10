@@ -3136,7 +3136,7 @@
                                 "value": {
                                   "type": "number",
                                   "exclusiveMinimum": 0,
-                                  "description": "Centre, in the stored unit of the parameter: burn coefficient 1/s, start pressure bar, energy J/kg, factors 1."
+                                  "description": "Center, in the stored unit of the parameter: burn coefficient 1/s, start pressure bar, energy J/kg, factors 1."
                                 },
                                 "sigma": {
                                   "type": "number",
@@ -4174,7 +4174,7 @@
                                   19,
                                   21
                                 ],
-                                "description": "Number of ladder steps, odd so the steps centre on the charge."
+                                "description": "Number of ladder steps, odd so the steps center on the charge."
                               },
                               "step": {
                                 "type": "number",
@@ -4184,7 +4184,7 @@
                               "direction": {
                                 "type": "string",
                                 "const": "around",
-                                "description": "Steps centred on the charge (or seating length)."
+                                "description": "Steps centered on the charge (or seating length)."
                               }
                             },
                             "required": [
@@ -4255,7 +4255,7 @@
                         "description": "Powders tab mode and filters (GLOSSARY `powders`)."
                       }
                     },
-                    "description": "The typed solver values and the ladder the load is analysed with."
+                    "description": "The typed solver values and the ladder the load is analyzed with."
                   },
                   "sessions": {
                     "maxItems": 50,
@@ -4989,7 +4989,7 @@
                                   "value"
                                 ],
                                 "unit": "mm",
-                                "description": "Bore axis to optic centre."
+                                "description": "Bore axis to optic center."
                               },
                               "lateralOffset": {
                                 "type": "object",
@@ -5008,7 +5008,7 @@
                                   "value"
                                 ],
                                 "unit": "mm",
-                                "description": "Optic centre to the right of the bore. Negative to the left."
+                                "description": "Optic center to the right of the bore. Negative to the left."
                               },
                               "cant": {
                                 "type": "object",
@@ -5388,7 +5388,7 @@
                                         "kind": {
                                           "type": "string",
                                           "const": "dial",
-                                          "description": "Clicks dialled to hit at the distance."
+                                          "description": "Clicks dialed to hit at the distance."
                                         },
                                         "range": {
                                           "type": "object",
@@ -5419,7 +5419,7 @@
                                         "mean": {
                                           "type": "number",
                                           "unit": "1",
-                                          "description": "Mean of the clicks dialled."
+                                          "description": "Mean of the clicks dialed."
                                         },
                                         "deviation": {
                                           "type": "number",
@@ -6674,7 +6674,7 @@
                             "kind": {
                               "type": "string",
                               "const": "ringCentre",
-                              "description": "A ring of known diameter: its centre and a point on it."
+                              "description": "A ring of known diameter: its center and a point on it."
                             },
                             "centre": {
                               "type": "object",
@@ -6992,7 +6992,7 @@
                         "colour": {
                           "type": "string",
                           "pattern": "^#[0-9a-fA-F]{6}$",
-                          "description": "Colour of the group, `#rrggbb`."
+                          "description": "Color of the group, `#rrggbb`."
                         },
                         "distance": {
                           "type": "number",
@@ -7135,7 +7135,7 @@
                             "backing": {
                               "type": "string",
                               "pattern": "^#[0-9a-fA-F]{6}$",
-                              "description": "Colour seen through a hole, picked in one, `#rrggbb`. Absent: off."
+                              "description": "Color seen through a hole, picked in one, `#rrggbb`. Absent: off."
                             },
                             "minContrast": {
                               "type": "number",
@@ -7197,7 +7197,7 @@
                                   "y"
                                 ]
                               },
-                              "description": "Points marked on the face's rings in target m, on two rings at least. Absent: centred on the point of aim."
+                              "description": "Points marked on the face's rings in target m, on two rings at least. Absent: centered on the point of aim."
                             }
                           },
                           "required": [
@@ -7412,7 +7412,7 @@
                           "exclusiveMinimum": 0
                         },
                         "fill": {
-                          "description": "Colour of the zone the ring line bounds outside.",
+                          "description": "Color of the zone the ring line bounds outside.",
                           "type": "string",
                           "enum": [
                             "black",
@@ -7427,7 +7427,7 @@
                           ]
                         },
                         "line": {
-                          "description": "Colour of the ring line.",
+                          "description": "Color of the ring line.",
                           "type": "string",
                           "enum": [
                             "black",

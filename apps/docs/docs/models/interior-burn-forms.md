@@ -62,7 +62,7 @@ $$
 
 Code: `packages/ballistics/src/interior/form.ts`, `grainShapes` (`tube`).
 
-Seven-perforated grain of outer diameter $D$, perforation $d_p$ and length $L$: one perforation at the centre and six on a hexagon of centre spacing $s$, with a uniform web $w$. With the burnt depth $y = e_1 f$ and the initial cross-section $A_0$:
+Seven-perforated grain of outer diameter $D$, perforation $d_p$ and length $L$: one perforation at the center and six on a hexagon of center spacing $s$, with a uniform web $w$. With the burnt depth $y = e_1 f$ and the initial cross-section $A_0$:
 
 $$
 w = \frac{D - 3 d_p}{4}, \qquad e_1 = \frac{w}{2}, \qquad s = d_p + w, \qquad A_0 = \frac{\pi}{4}\left(D^2 - 7 d_p^2\right)
@@ -78,7 +78,7 @@ $$
 
 Code: `packages/ballistics/src/interior/form.ts`, `sevenPerf` (`area`).
 
-At $f = 1$ the perforation circles touch each other and the outer surface, and twelve slivers remain. Sliver phase, $1 \lt f \le f_s$, with perforation radius $\varrho = d_p/2 + y$ and outer radius $R = D/2 - y$. Half the overlap of two perforation circles at centre spacing $s$:
+At $f = 1$ the perforation circles touch each other and the outer surface, and twelve slivers remain. Sliver phase, $1 \lt f \le f_s$, with perforation radius $\varrho = d_p/2 + y$ and outer radius $R = D/2 - y$. Half the overlap of two perforation circles at center spacing $s$:
 
 $$
 \ell(\varrho) = \varrho^2 \arccos\frac{s}{2\varrho} - \frac{s}{2}\sqrt{\varrho^2 - \frac{s^2}{4}}
@@ -86,7 +86,7 @@ $$
 
 Code: `packages/ballistics/src/interior/form.ts`, `sliverArea` (`halfLens`).
 
-Six inner slivers, each in the triangle of the centre and two neighbouring outer perforation centres, until the three circles meet at $\varrho = s/\sqrt{3}$:
+Six inner slivers, each in the triangle of the center and two neighboring outer perforation centers, until the three circles meet at $\varrho = s/\sqrt{3}$:
 
 $$
 A_\text{in} = \frac{\sqrt{3}}{4} s^2 - \frac{\pi}{2}\varrho^2 + 3\,\ell(\varrho)
@@ -94,7 +94,7 @@ $$
 
 Code: `packages/ballistics/src/interior/form.ts`, `sliverArea` (`inner`).
 
-Six outer slivers, each in the 60 degree sector of the outer circle between two neighbouring outer perforation centres and outside that triangle, with $\Lambda$ the overlap of the outer circle with one outer perforation circle:
+Six outer slivers, each in the 60 degree sector of the outer circle between two neighboring outer perforation centers and outside that triangle, with $\Lambda$ the overlap of the outer circle with one outer perforation circle:
 
 $$
 A_\text{out} = \frac{\pi}{6} R^2 - \frac{\sqrt{3}}{4} s^2 - \Lambda(R, \varrho, s) + \frac{\pi}{3}\varrho^2 + \ell(\varrho)
@@ -102,7 +102,7 @@ $$
 
 Code: `packages/ballistics/src/interior/form.ts`, `sliverArea` (`outer`, `lensArea`).
 
-Overlap area of two disks of radii $r_1$, $r_2$ at centre distance $c$ (0 when they do not meet, the smaller disk when one holds the other):
+Overlap area of two disks of radii $r_1$, $r_2$ at center distance $c$ (0 when they do not meet, the smaller disk when one holds the other):
 
 $$
 \Lambda = r_1^2 \alpha_1 + r_2^2 \alpha_2 - \tfrac{1}{2}\sqrt{(r_1 + r_2 - c)(c + r_1 - r_2)(c - r_1 + r_2)(c + r_1 + r_2)}, \qquad \alpha_1 = \arccos\frac{c^2 + r_1^2 - r_2^2}{2 c r_1}, \qquad \alpha_2 = \arccos\frac{c^2 + r_2^2 - r_1^2}{2 c r_2}
@@ -206,7 +206,7 @@ The range 0.1 to 0.9 and the 64 intervals of $\bar L_d$ are choices of the model
 
 `dynamicVivacity` rejects an exponent other than 1, because the rate per pressure then depends on the pressure. The constant and two-stage forms are accepted. The type of its argument excludes the three-stage form, because its third stage is integrated in another variable.
 
-$L_d$ is not the quantity read from a measured closed-vessel curve, $L = \dot p / (\bar p\, p_\text{max})$. With the Noble-Abel pressure of the closed vessel, $\bar p = \Phi z / (1 + \chi z)$ at normalised charge density $D = m_c / (V_c \rho_s)$ and $\chi = (1 - \eta \rho_s) D / (1 - D)$, the two differ by a factor that depends on $z$ and on the loading density, $L(z) = L_d(z)\,(1 + \chi)/(1 + \chi z)^2$. The factor is 1 only for $\chi = 0$. For the demo powder ($\eta = 0.97 \cdot 10^{-3}$ m³/kg, $\rho_s = 1600$ kg/m³) it runs from 0.86 at $z = 0$ to 1.16 at $z = 1$ at $D = 0.2$, and from 0.45 to 2.23 at $D = 0.5$, a cartridge-like loading density. Every vivacity, $B_a$ and $\bar L_d$ of this page and of the powder records uses the definition $L_d$. A closed-vessel vivacity taken from elsewhere is converted with the factor before it is compared ([burn law checks](../research/interior-burn-law-checks.md)).
+$L_d$ is not the quantity read from a measured closed-vessel curve, $L = \dot p / (\bar p\, p_\text{max})$. With the Noble-Abel pressure of the closed vessel, $\bar p = \Phi z / (1 + \chi z)$ at normalized charge density $D = m_c / (V_c \rho_s)$ and $\chi = (1 - \eta \rho_s) D / (1 - D)$, the two differ by a factor that depends on $z$ and on the loading density, $L(z) = L_d(z)\,(1 + \chi)/(1 + \chi z)^2$. The factor is 1 only for $\chi = 0$. For the demo powder ($\eta = 0.97 \cdot 10^{-3}$ m³/kg, $\rho_s = 1600$ kg/m³) it runs from 0.86 at $z = 0$ to 1.16 at $z = 1$ at $D = 0.2$, and from 0.45 to 2.23 at $D = 0.5$, a cartridge-like loading density. Every vivacity, $B_a$ and $\bar L_d$ of this page and of the powder records uses the definition $L_d$. A closed-vessel vivacity taken from elsewhere is converted with the factor before it is compared ([burn law checks](../research/interior-burn-law-checks.md)).
 
 The burn law checks keep the pressure exponent at $n = 1$. The laws accept another exponent, and `fitPressureCurves` fits it by default ([curve fit](interior-curve-fit.md)). With a fixed form function, the integral of $\bar p^n$ over a common range of burnt fraction is the same for every charge of one powder. A closed vessel ignites at a burnt fraction $z_0$ that depends on the loading density, so the range starts above the $z_0$ of every curve, not at ignition. Closed-vessel curves of one powder at four or more loading densities would show the exponent at which that integral varies least. The data has no such curves ([burn law checks](../research/interior-burn-law-checks.md)).
 
@@ -232,7 +232,7 @@ The burn law checks keep the pressure exponent at $n = 1$. The laws accept anoth
 | $\tau_T$                             | Temperature factor on the burn rate                           | 1           | 1              |
 | $D$, $d_p$, $L$                      | Grain diameter, perforation diameter, grain length            | mm          | m              |
 | $w$                                  | Web                                                           | mm          | m              |
-| $s$                                  | Centre spacing of the perforations                            | mm          | m              |
+| $s$                                  | Center spacing of the perforations                            | mm          | m              |
 | $\varrho$, $R$                       | Perforation radius and outer radius during the sliver phase   | mm          | m              |
 | $A_0$, $A_\text{in}$, $A_\text{out}$ | Initial cross-section, area of one inner and one outer sliver | mm2         | m2             |
 | $\ell$, $\Lambda$                    | Half overlap of two perforation circles, overlap of two disks | mm2         | m2             |
@@ -253,7 +253,7 @@ The burn law checks keep the pressure exponent at $n = 1$. The laws accept anoth
 - Valid input of the two-stage form: finite values, $0 \lt z_1 \le 1$, $1 + a z_1 \gt 0$, $q \ge 0$, and $q \lt 1$ when $z_1 \lt 1$. With $q \ge 1$ the charge reaches $z = 1$ only asymptotically.
 - Valid input of the three-stage form: finite values, $0 \lt z_1 \lt z_2 \lt 1$, $1 + a z_1 \gt 0$, $q \ge 0$ and $0 \le r \lt 1$. With $r \ge 1$ the charge never burns out.
 - Code: `packages/ballistics/src/interior/form.ts`, `burnError`. An invalid law gives the invalid reason `input` with the field name.
-- Grains with different inner and outer webs, deterrent coatings that change the burn rate with depth, and a spread of grain sizes are not modelled. The parameter $a$ of the two-stage form is the only proxy for a coating: the first stage is degressive when $a m \lt 0$, constant when $a m = 0$ and progressive when $a m \gt 0$. The powder records hold no coating, so the effect of a coating was not measured ([burn law checks](../research/interior-burn-law-checks.md)).
+- Grains with different inner and outer webs, deterrent coatings that change the burn rate with depth, and a spread of grain sizes are not modeled. The parameter $a$ of the two-stage form is the only proxy for a coating: the first stage is degressive when $a m \lt 0$, constant when $a m = 0$ and progressive when $a m \gt 0$. The powder records hold no coating, so the effect of a coating was not measured ([burn law checks](../research/interior-burn-law-checks.md)).
   - Deterrent coatings: for a deterred ball powder with a measured penetration depth of 0.056 mm, the burn coefficient of the deterred layer is about 0.35 to 0.45 of the undeterred one by three burn laws (ratios of the published coefficients, [Micković 2010](../bibliography.md#mickovic-2010)). A coated layer needs the grain diameter and the penetration depth, which are not fields of a powder record.
 - The two-stage and three-stage forms do not reproduce the infinite slope of the surface after the web of a seven-perforated grain burns through. The geometric form has it.
 - Research log: [fitted parameters of the load-table fit](../research/interior-load-table-fit-parameters.md) (the form parameter is not identified from velocities).

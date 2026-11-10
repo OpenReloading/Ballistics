@@ -47,7 +47,7 @@ export type HoleDetectionInput = {
   pxPerM: number
   /** Expected hole diameter, m (the bullet diameter, a typed or a learned hole size). */
   expectedHoleDiameter: number
-  /** Default 0.15; the peak cutoff and the least colour separation scale with it. */
+  /** Default 0.15; the peak cutoff and the least color separation scale with it. */
   minContrast?: number
   /** Visible hole diameter over the bullet diameter. */
   holeScale?: number
@@ -71,7 +71,7 @@ export type FaceLabel = {
   numeral?: ((p: Point, roll?: number) => boolean) | undefined
   /** Near the black area's edge on an axis turned by `roll` (rad). */
   quarter?: ((p: Point, roll?: number) => boolean) | undefined
-  /** Distance of a point from the face centre (mm) and its angle from the face's x axis (rad). */
+  /** Distance of a point from the face center (mm) and its angle from the face's x axis (rad). */
   polar?: (p: Point) => { radius: number; angle: number }
 }
 
@@ -129,7 +129,7 @@ const SIZE_MAX = 1.4
 /** Blob scales (sigma over the hole diameter D), and the wider set that sizes a picked hole. */
 const SIGMAS = [0.12, 0.17, 0.24, 0.34]
 const WIDE = [0.12, 0.17, 0.24, 0.34, 0.48]
-/** A disc of radius r peaks the scale-normalised Hessian at sigma = r / sqrt 2: D = 2 sqrt 2 sigma. */
+/** A disc of radius r peaks the scale-normalized Hessian at sigma = r / sqrt 2: D = 2 sqrt 2 sigma. */
 const D_OVER_SIGMA = 2 * Math.SQRT2
 /** Peak tests (own thresholds, a starting point from a prototype): strength against the strongest, inscribed radius, fill share. */
 const KEEP = 0.35
@@ -137,7 +137,7 @@ const INSCRIBED = 0.2
 const FILL = 0.3
 /** The top-hat is thresholded at this share of the median contrast of the 5 strongest peaks. */
 const HAT = 0.35
-/** Least separation of a hole from its ring along the colour axis, in log RGB units. */
+/** Least separation of a hole from its ring along the color axis, in log RGB units. */
 const MIN_SEP = 0.02
 /** The opening of the top-hat runs on the working image shrunk by this factor. */
 const OPEN_SHRINK = 2
@@ -191,13 +191,13 @@ type SeedRun = { found: Found; run: Run; at: Point; holeDiameter: number }
 export type HoleExample = {
   /** Visible hole diameter, image px. */
   diameter: number
-  /** The hole's colour. */
+  /** The hole's color. */
   backing: { r: number; g: number; b: number }
   /** Darker or lighter than its surroundings. */
   polarity: 'dark' | 'light'
 }
 
-/** Without a backing colour, `autoDetect`'s axis. */
+/** Without a backing color, `autoDetect`'s axis. */
 export function findHoles(input: HoleDetectionInput): {
   proposals: HoleProposal[]
   flagged: FlaggedRegion[]
@@ -302,7 +302,7 @@ function refineWinner(input: HoleDetectionInput, ctx: Ctx, best: SeedRun, printe
   return fine && solved(input, fromImage(fine, toImage(ctx, best.at)), fine, true, true, printed)
 }
 
-/** `at` in image px: the colour axis is the picked hole's against its ring, the size starts from its scale-space maximum (0.7 to 1.4 of `expectedHoleDiameter`) and the region's strongest peaks refine it (own rule); the pick never sets the peaks' strength reference. */
+/** `at` in image px: the color axis is the picked hole's against its ring, the size starts from its scale-space maximum (0.7 to 1.4 of `expectedHoleDiameter`) and the region's strongest peaks refine it (own rule); the pick never sets the peaks' strength reference. */
 export function detectFromExample(
   input: HoleDetectionInput,
   at: Point,
@@ -537,7 +537,7 @@ function validateInput(input: HoleDetectionInput): { holePx: number; poly: Point
   if (![pxPerM, expectedHoleDiameter, holeScale, minContrast].every(Number.isFinite))
     throw new RangeError('Scale, bullet diameter, hole scale and contrast must be finite')
   if (backing && ![backing.r, backing.g, backing.b].every((c) => c >= 0 && c <= 255))
-    throw new RangeError('A backing colour channel must be a number from 0 to 255')
+    throw new RangeError('A backing color channel must be a number from 0 to 255')
   const holePx = expectedHoleDiameter * pxPerM * holeScale
   if (!(holePx >= 4)) throw new Error('The hole must be at least 4 px across')
   const r = region ?? input.face?.outline ?? paperOutline(image)

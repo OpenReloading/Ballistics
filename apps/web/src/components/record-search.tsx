@@ -157,7 +157,7 @@ export function RecordSearch<T extends { id: string }>({
   params?: string
   /** The chosen record, or the picker's prompt in the empty field of a compact picker whose label is left to screen readers. */
   chosen?: string | undefined
-  /** `chosen` names a record, not the prompt: drawn in the text colour. */
+  /** `chosen` names a record, not the prompt: drawn in the text color. */
   picked?: boolean
   /** Local options listed first, matched by the typed text, such as the browser's bullet designs. */
   extra?: { id: string; label: string }[]

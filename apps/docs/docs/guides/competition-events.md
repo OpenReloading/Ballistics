@@ -6,7 +6,7 @@ description: The competition events page of the web app, how it scores ring seri
 
 # Competition events
 
-The competition events page (**Competition events**, `/events`, linked from the shooting log) keeps the events you shot in this browser, each with your own scores and their totals. These are your own records, not official results (the organiser publishes those); the page says so on screen and in print.
+The competition events page (**Competition events**, `/events`, linked from the shooting log) keeps the events you shot in this browser, each with your own scores and their totals. These are your own records, not official results (the organizer publishes those); the page says so on screen and in print.
 
 ## An event
 

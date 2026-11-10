@@ -57,9 +57,9 @@ export const optic: z.ZodObject<{
 
 const opticMountParser = z.object({
   optic: localId.describe('Id of the optic of the firearm.'),
-  sightHeight: length().describe('Bore axis to optic centre.'),
+  sightHeight: length().describe('Bore axis to optic center.'),
   lateralOffset: quantity('length')
-    .describe('Optic centre to the right of the bore. Negative to the left.')
+    .describe('Optic center to the right of the bore. Negative to the left.')
     .optional(),
   cant: quantity('angle').describe('Cant of the optic, clockwise as seen from behind.').optional(),
   zeroRange: quantity('length', z.number().positive()).describe('Range of the zero.'),
@@ -116,17 +116,17 @@ const truingRowParser = z.discriminatedUnion('kind', [
     ),
   }),
   z.object({
-    kind: z.literal('dial').describe('Clicks dialled to hit at the distance.'),
+    kind: z.literal('dial').describe('Clicks dialed to hit at the distance.'),
     range: quantity('length', z.number().positive()).describe('Distance of the row.'),
     shots: shots().describe('Shots of the row.'),
-    mean: clicks(z.number()).describe('Mean of the clicks dialled.'),
+    mean: clicks(z.number()).describe('Mean of the clicks dialed.'),
     deviation: clicks(z.number().positive()).describe('Standard deviation of one shot, clicks.'),
   }),
 ])
 
 /**
  * One distance of a truing string: the mean and the deviation of one shot, as the height above
- * the line of sight of the impacts or as clicks dialled.
+ * the line of sight of the impacts or as clicks dialed.
  * Inferred type: {@link TruingRow}.
  */
 export const truingRow: z.ZodDiscriminatedUnion<

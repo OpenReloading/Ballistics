@@ -7,7 +7,7 @@ description: Size and dispersion of shot groups on a target, confidence interval
 # Shot groups
 
 Statistics of one group on a target:
-- the centre of impact
+- the center of impact
 - sizes such as extreme spread and mean radius
 - standard deviations per axis and the circular error probable (CEP), with chi-square confidence intervals by shot count
 - the covariance with its principal axis
@@ -15,11 +15,11 @@ Statistics of one group on a target:
 
 Chronograph strings have their own statistics, see [Velocity strings](#velocity-strings).
 
-Several groups of one load are pooled in angle, each about its own centre. Excluded shots enter only their count and the offset of their centre. A value whose minimum shot count is not met is undefined.
+Several groups of one load are pooled in angle, each about its own center. Excluded shots enter only their count and the offset of their center. A value whose minimum shot count is not met is undefined.
 
 ## Equations
 
-### Centre and sums of squares
+### Center and sums of squares
 
 For the $n$ shots that are not excluded, at $(x_i, y_i)$ in the target plane ($x$ right, $y$ up):
 
@@ -35,7 +35,7 @@ $$
 
 Code: `packages/shot-groups/src/group-statistics.ts`, `sums`.
 
-The offset of the centre from the point of aim $(x_a, y_a)$ is $(\bar x - x_a, \bar y - y_a)$. Its compass point (N up, E right) is the nearest of eight sectors of 45 degrees, or the centre below $10^{-9}$ m:
+The offset of the center from the point of aim $(x_a, y_a)$ is $(\bar x - x_a, \bar y - y_a)$. Its compass point (N up, E right) is the nearest of eight sectors of 45 degrees, or the center below $10^{-9}$ m:
 
 $$
 \beta = \operatorname{atan2}(\Delta x, \Delta y), \qquad q = \left(\operatorname{round}\frac{\beta}{\pi/4} + 8\right) \bmod 8
@@ -45,7 +45,7 @@ Code: `packages/shot-groups/src/group-statistics.ts`, `compassOf`.
 
 ### Sizes
 
-Extreme spread, smallest pair distance and mean pair distance over all $n(n-1)/2$ pairs of shots, centre to centre:
+Extreme spread, smallest pair distance and mean pair distance over all $n(n-1)/2$ pairs of shots, center to center:
 
 $$
 \mathrm{ES} = \max_{i \lt j} d_{ij}, \qquad d_{\min} = \min_{i \lt j} d_{ij}, \qquad \bar d = \frac{2}{n(n-1)} \sum_{i \lt j} d_{ij}, \qquad d_{ij} = \sqrt{(x_i - x_j)^2 + (y_i - y_j)^2}
@@ -105,7 +105,7 @@ Code: `packages/shot-groups/src/group-statistics.ts`, `axisAngle`.
 
 ### Elliptical CEP
 
-The elliptical CEP is the radius $R$ of the circle about the centre that holds half of a centred bivariate normal distribution with the sample covariance. Along the principal axes a shot is $(\sqrt{\lambda_1}\rho\cos\varphi, \sqrt{\lambda_2}\rho\sin\varphi)$ with $\varphi$ uniform and $\rho^2$ chi-square with 2 degrees of freedom, so the share outside the circle is
+The elliptical CEP is the radius $R$ of the circle about the center that holds half of a centered bivariate normal distribution with the sample covariance. Along the principal axes a shot is $(\sqrt{\lambda_1}\rho\cos\varphi, \sqrt{\lambda_2}\rho\sin\varphi)$ with $\varphi$ uniform and $\rho^2$ chi-square with 2 degrees of freedom, so the share outside the circle is
 
 $$
 P_\mathrm{out}(R) = \frac{2}{\pi} \int_0^{\pi/2} \exp\!\left(-\frac{R^2}{2(\lambda_1 \cos^2\varphi + \lambda_2 \sin^2\varphi)}\right) d\varphi = \frac{1}{2}
@@ -241,7 +241,7 @@ with the sums of squares and products about the means of these shots. With all t
 
 ### Angles and pooling
 
-The angle a segment of length $L$ centred on the line of sight subtends at distance $D$:
+The angle a segment of length $L$ centered on the line of sight subtends at distance $D$:
 
 $$
 \alpha = 2 \arctan\frac{L}{2D}
@@ -249,7 +249,7 @@ $$
 
 Code: `packages/shot-groups/src/group-statistics.ts`, `subtendedAngle`.
 
-Groups $j$ with $n_j \ge 2$ are pooled about their own centres, each in angle at its own distance $D_j$ as the small angle $L/D_j$, which differs from $\alpha$ by less than 0.01 % below 30 mrad:
+Groups $j$ with $n_j \ge 2$ are pooled about their own centers, each in angle at its own distance $D_j$ as the small angle $L/D_j$, which differs from $\alpha$ by less than 0.01 % below 30 mrad:
 
 $$
 s_x^2 = \frac{\sum_j S_{xx,j} / D_j^2}{\sum_j (n_j - 1)}, \qquad s_y^2 = \frac{\sum_j S_{yy,j} / D_j^2}{\sum_j (n_j - 1)}, \qquad \hat\sigma^2 = \frac{s_x^2 + s_y^2}{2}
@@ -265,10 +265,10 @@ The intervals use $\nu = \sum_j (n_j - 1)$ per axis and $2\sum_j (n_j - 1)$ for 
 | ----------------------------- | -------------------------------------------------------------------------------- | ----------- | -------------- |
 | $n$                           | Shots not excluded                                                               | 1           | 1              |
 | $x_i, y_i$                    | Shot position in the target plane, $x$ right, $y$ up                             | mm          | m              |
-| $\bar x, \bar y$              | Centre of impact                                                                 | mm          | m              |
+| $\bar x, \bar y$              | Center of impact                                                                 | mm          | m              |
 | $x_a, y_a$                    | Point of aim                                                                     | mm          | m              |
-| $\Delta x, \Delta y$          | Centre minus point of aim                                                        | mm          | m              |
-| $S_{xx}, S_{yy}, S_{xy}$      | Sums of squares and products about the centre                                    | no kind     | m²             |
+| $\Delta x, \Delta y$          | Center minus point of aim                                                        | mm          | m              |
+| $S_{xx}, S_{yy}, S_{xy}$      | Sums of squares and products about the center                                    | no kind     | m²             |
 | $d_{ij}$                      | Distance between shots $i$ and $j$                                               | mm          | m              |
 | $\mathrm{ES}$, $W$, $H$       | Extreme spread, width, height                                                    | mm          | m              |
 | $r_i$, $\bar r$, $s_r$        | Radius of shot $i$, mean radius, standard deviation of the radii                 | mm          | m              |
@@ -297,13 +297,13 @@ The intervals use $\nu = \sum_j (n_j - 1)$ per axis and $2\sum_j (n_j - 1)$ for 
 
 - The shots of a group come from one bivariate normal population. The chi-square intervals of $\sigma$, the radial standard deviation and the CEP assume equal, uncorrelated axes (circular normal). The per-axis intervals assume normal dispersion along that axis.
 - The velocities of a string are independent draws from one normal population. Drift over the string (barrel heat) and the rounding of the chronograph make them less so.
-- Every variance divides by $n - 1$. The mean radius and the centre divide by $n$.
-- Pooled groups share one population in angle: each group is reduced about its own centre and scaled by its own distance.
+- Every variance divides by $n - 1$. The mean radius and the center divide by $n$.
+- Pooled groups share one population in angle: each group is reduced about its own center and scaled by its own distance.
 - The prediction ellipse covers a further shot with probability $p$ on average over groups, not for every group.
 
 ## Limits
 
-- Minimum shot counts: the centre and the aim offset need 1 shot, every dispersion value and the dispersion ellipse 2, the prediction ellipse 3, the velocity correlation 3 shots with a velocity, not all of one velocity or one height.
+- Minimum shot counts: the center and the aim offset need 1 shot, every dispersion value and the dispersion ellipse 2, the prediction ellipse 3, the velocity correlation 3 shots with a velocity, not all of one velocity or one height.
 - The interval of a velocity standard deviation holds its level only for normal velocities. In simulated strings of 10 to 30 shots from skewed, heavy-tailed or stray-shot populations, an interval stated at 95 % covered the true value 76 to 90 % of the time, and it is too narrow, not too wide. A percentile bootstrap covered less at these shot counts and is not used. ([research log](../research/velocity-sd-interval.md)) The extreme spread of a string carries no interval.
 - Mean radius, extreme spread, width, height, the pair distances and the elliptical CEP carry no interval. Their small-sample distributions exist only as tables.
 - The circular CEP overstates the CEP of an elongated group, by 6.9 % at an axis ratio of 2, 14.2 % at 3 and at most 23.5 % ([research log](../research/group-cep-circular-vs-elliptical.md)). The elliptical CEP holds for any axis ratio and equals the circular one for equal, uncorrelated axes.
@@ -313,7 +313,7 @@ The intervals use $\nu = \sum_j (n_j - 1)$ per axis and $2\sum_j (n_j - 1)$ for 
 
 ## Sources
 
-- [Grubbs 1991](../bibliography.md#grubbs-1991): centre of impact p. 3, sample variances pp. 4 to 6, eqs. (1) and (6), CEP p. 9, range of the coordinates p. 10, eq. (7), radial standard deviation pp. 15 to 17, eq. (9), mean radius pp. 18 and 19, extreme spread p. 19, mean extreme spread of several groups (note after the preface).
+- [Grubbs 1991](../bibliography.md#grubbs-1991): center of impact p. 3, sample variances pp. 4 to 6, eqs. (1) and (6), CEP p. 9, range of the coordinates p. 10, eq. (7), radial standard deviation pp. 15 to 17, eq. (9), mean radius pp. 18 and 19, extreme spread p. 19, mean extreme spread of several groups (note after the preface).
 - [Carlson 2021](../bibliography.md#carlson-2021): CEP of a circular normal spread, sections 1.4.2.1 and 1.4.2.2, pp. 4 to 7, and the CEP of a bivariate normal as a disc integral found by iteration, section 1.4.2.3, p. 7.
 - [Hoover 1984](../bibliography.md#hoover-1984): coverage of the covariance ellipse, section 2.5, p. 7.
 - [NIST/SEMATECH](../bibliography.md#nist-sematech): 1.3.5.6 (measures of scale), 1.3.5.8 (chi-square interval for the variance), 1.3.6.6.5 (F distribution), 1.3.6.6.6 (chi-square distribution), 4.4.3.1 (least-squares slope), 6.5.4.1 and 6.5.4.2 (mean vector, covariance, correlation), 6.5.4.3.3 and 6.5.4.3.4 (limit for a further observation, the prediction ellipse), 6.5.5.1 (principal components).

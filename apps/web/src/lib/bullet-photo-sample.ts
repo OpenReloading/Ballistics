@@ -26,7 +26,7 @@ export interface PhotoSpec {
   pxPerMm: number
   width: number
   height: number
-  /** Where the base centre lies, photo px. */
+  /** Where the base center lies, photo px. */
   base: Point
   /** The direction of the axis from base to tip, rad (y down). */
   angle: number
@@ -52,7 +52,7 @@ export interface PhotoSpec {
   tip?: { from: number; grey: number } | undefined
   /** Black bars of this width at the left and right edges of the photograph. */
   bars?: number | undefined
-  /** The bullet's red is raised and its blue lowered by this many grey levels at the same luma, so it differs from the paper by colour more than by brightness. */
+  /** The bullet's red is raised and its blue lowered by this many grey levels at the same luma, so it differs from the paper by color more than by brightness. */
   chroma?: number | undefined
 }
 

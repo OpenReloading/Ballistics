@@ -7,7 +7,7 @@ import {
   trajectory,
 } from '../src/index.ts'
 
-// A 168 gr, 0.308 in bullet of 3.98 calibres at 2600 ft/s in sea-level standard air, G7 BC 0.218 lb/in2; chosen, not measured: inertias 0.10 (axial) and 1.0 (transverse) times m d^2, lift slope 2.1, overturning-moment slope 1.81 at Mach 2.4 (gyroscopic stability 1.7 at the muzzle for the 12 in twist) rising linearly to 4.0 at Mach 0.8.
+// A 168 gr, 0.308 in bullet of 3.98 calibers at 2600 ft/s in sea-level standard air, G7 BC 0.218 lb/in2; chosen, not measured: inertias 0.10 (axial) and 1.0 (transverse) times m d^2, lift slope 2.1, overturning-moment slope 1.81 at Mach 2.4 (gyroscopic stability 1.7 at the muzzle for the 12 in twist) rising linearly to 4.0 at Mach 0.8.
 const yd = 0.9144
 const inch = 0.0254
 const mph = 0.44704

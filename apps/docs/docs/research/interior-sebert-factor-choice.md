@@ -37,7 +37,7 @@ No change. Documented as a choice of the model, not taken from a source: setting
 
 ## Data basis
 
-Analytic: a modelling choice with algebraic checks, no measured data.
+Analytic: a modeling choice with algebraic checks, no measured data.
 
 ## Where in the app
 

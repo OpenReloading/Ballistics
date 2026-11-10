@@ -54,7 +54,7 @@ export interface ChooserSelect<R> {
   keep: (row: R, value: string) => boolean
 }
 
-/** The options of the values `of` the rows give, each labelled by `label` with its number of rows. */
+/** The options of the values `of` the rows give, each labeled by `label` with its number of rows. */
 export function countedOptions<R>(
   rows: readonly R[],
   of: (row: R) => string | undefined,

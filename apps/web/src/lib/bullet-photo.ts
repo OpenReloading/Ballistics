@@ -430,7 +430,7 @@ function coverOf(
   )
 }
 
-/** Otsu on the plane-levelled greys, the largest part off the edge and away from `exclude` (the ruler); a 2 px band keeps sub-pixel edges. */
+/** Otsu on the plane-leveled greys, the largest part off the edge and away from `exclude` (the ruler); a 2 px band keeps sub-pixel edges. */
 export function segment(g: Gray, exclude: readonly Point[] = []): Segmentation {
   const { width: w, height: h } = g
   const none = (warning: Wording): Segmentation => ({

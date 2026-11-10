@@ -1,4 +1,4 @@
-/** For the production dependencies of the API image and the web app (pnpm-lock.yaml and the licenses pnpm reads): fails on a licence outside `allow-licenses` of .github/dependency-review-config.yml and not excepted by `allow-dependencies-licenses`, on a package without a declared licence, and when the generated list in NOTICE differs (`--write` rewrites it); the licence table goes to the job summary. */
+/** For the production dependencies of the API image and the web app (pnpm-lock.yaml and the licenses pnpm reads): fails on a license outside `allow-licenses` of .github/dependency-review-config.yml and not excepted by `allow-dependencies-licenses`, on a package without a declared license, and when the generated list in NOTICE differs (`--write` rewrites it); the license table goes to the job summary. */
 import { execFileSync } from 'node:child_process'
 import { appendFileSync, readFileSync, writeFileSync } from 'node:fs'
 import { posix } from 'node:path'
@@ -11,7 +11,7 @@ const images = ['packages/api', 'apps/web']
 
 /** Packages installed for a shipped workspace that no shipped file contains, by name or name prefix (`*`), with why. */
 export const notShipped: Record<string, string> = {
-  sharp: 'the static export has no image optimisation, so the site holds no sharp code',
+  sharp: 'the static export has no image optimization, so the site holds no sharp code',
   '@img/*': 'the sharp binaries: the static export holds none',
   '@next/swc-*': 'the Next.js compiler, a build tool: the static export holds no native code',
 }
@@ -42,14 +42,14 @@ export interface Lock {
   snapshots?: Record<string, Entry>
 }
 
-/** One shipped package and the licence the lock declares for it. */
+/** One shipped package and the license the lock declares for it. */
 export interface Shipped {
   name: string
   version: string
   license: string | undefined
 }
 
-/** The licence policy of the configuration file. */
+/** The license policy of the configuration file. */
 export interface Policy {
   allow: Set<string>
   excepted: Set<string>
@@ -136,7 +136,7 @@ export function installedLicenses(root: string): Licenses {
   return licenses
 }
 
-/** Whether an SPDX licence expression is met by `allowed` (OR: one side, AND: both, WITH: its licence). Throws when unreadable. */
+/** Whether an SPDX license expression is met by `allowed` (OR: one side, AND: both, WITH: its license). Throws when unreadable. */
 export function satisfies(expression: string, allowed: ReadonlySet<string>): boolean {
   const tokens = expression.match(/[()]|[^\s()]+/g) ?? []
   let at = 0
@@ -148,7 +148,7 @@ export function satisfies(expression: string, allowed: ReadonlySet<string>): boo
       return inner
     }
     if (token === undefined || token === ')' || ['AND', 'OR', 'WITH'].includes(token))
-      throw new Error(`cannot read the licence expression "${expression}"`)
+      throw new Error(`cannot read the license expression "${expression}"`)
     const ok = allowed.has(token)
     if (tokens[at] === 'WITH') at += 2
     return ok
@@ -170,7 +170,7 @@ export function satisfies(expression: string, allowed: ReadonlySet<string>): boo
     return ok
   }
   const ok = or()
-  if (at !== tokens.length) throw new Error(`cannot read the licence expression "${expression}"`)
+  if (at !== tokens.length) throw new Error(`cannot read the license expression "${expression}"`)
   return ok
 }
 
@@ -203,7 +203,7 @@ export function problems(packages: Shipped[], policy: Policy) {
   for (const { name, version, license } of packages) {
     const id = `${name}@${version}`
     if (policy.excepted.has(name)) continue
-    if (!license) lines.push(`${id}: no licence declared`)
+    if (!license) lines.push(`${id}: no license declared`)
     else
       try {
         if (!satisfies(license, policy.allow))
@@ -220,7 +220,7 @@ export function noticeBlock(packages: Shipped[]) {
   const rows = packages.map((p) => `${p.name} ${p.version} ${p.license ?? 'UNDECLARED'}`)
   return [
     begin,
-    'Third-party packages installed for the API image and the web app, by name, version and the licence',
+    'Third-party packages installed for the API image and the web app, by name, version and the license',
     'the package declares. Written by `node tools/src/licences.ts --write`.',
     '',
     ...rows,
@@ -230,7 +230,7 @@ export function noticeBlock(packages: Shipped[]) {
 
 const blockPattern = new RegExp(`${begin}[\\s\\S]*?${end}`)
 
-/** The job summary: a table of licences, then the list. */
+/** The job summary: a table of licenses, then the list. */
 export function summary(packages: Shipped[], excepted: Set<string>) {
   const count = new Map<string, number>()
   for (const p of packages)
@@ -238,9 +238,9 @@ export function summary(packages: Shipped[], excepted: Set<string>) {
   const table = [...count].sort((a, b) => b[1] - a[1]).map(([l, n]) => `| ${l} | ${n} |`)
   const named = packages.filter((p) => excepted.has(p.name)).map((p) => `${p.name} ${p.version}`)
   return [
-    '### Licences of the production dependencies of the API image and the web app',
+    '### Licenses of the production dependencies of the API image and the web app',
     '',
-    '| Licence | Packages |',
+    '| License | Packages |',
     '| --- | --- |',
     ...table,
     '',
@@ -287,5 +287,5 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary(packages, policy.excepted))
   for (const line of found) console.error(line)
   if (found.length) process.exit(1)
-  console.log(`licences: ${packages.length} shipped packages within the policy, NOTICE in step`)
+  console.log(`licenses: ${packages.length} shipped packages within the policy, NOTICE in step`)
 }

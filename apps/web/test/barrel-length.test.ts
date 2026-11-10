@@ -51,7 +51,7 @@ describe('barrelRows', () => {
     })
   })
 
-  it('takes a grid length within a micrometre of the barrel for the barrel, one row', () => {
+  it('takes a grid length within a micrometer of the barrel for the barrel, one row', () => {
     const rows = barrelRows({
       result,
       mass,

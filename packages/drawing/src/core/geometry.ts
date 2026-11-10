@@ -83,7 +83,7 @@ export function segsCross(p: PartPoint, q: PartPoint, r: PartPoint, s: PartPoint
 
 /**
  * The four corners of a label's text box in the part frame, mm, in the order (+w/2, +h/2),
- * (+w/2, -h/2), (-w/2, -h/2), (-w/2, +h/2) from its centre, w along its direction, h across it.
+ * (+w/2, -h/2), (-w/2, -h/2), (-w/2, +h/2) from its center, w along its direction, h across it.
  */
 export const labelCorners = (l: Label): PartPoint[] => {
   const signs: [number, number][] = [

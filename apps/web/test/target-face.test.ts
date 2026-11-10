@@ -67,7 +67,7 @@ function scene(face: TargetFace, v: (typeof views)[number], extra: Partial<Scene
   }
 }
 
-/** Where a fit puts the truth: the centre, and the distances of points about the centre, in mm. */
+/** Where a fit puts the truth: the center, and the distances of points about the center, in mm. */
 function error(fit: FaceFit, h: Homography, outer: number) {
   const at = (p: { x: number; y: number }) => {
     const i = project(h, p)
@@ -104,7 +104,7 @@ function memo<T>(make: (id: string, v: number) => T) {
 describe('findFace on drawn faces', () => {
   for (const face of faces.filter((f) => f.photoSearch !== false))
     for (const [i, v] of views.entries())
-      it(`${face.id}, ${v.name}: the face, its centre and its scale`, () => {
+      it(`${face.id}, ${v.name}: the face, its center and its scale`, () => {
         const { h = missing(), found } = searched(face.id, i)
         const fit = found.fits.find((f) => f.face.id === face.id)
         expect(fit).toBeDefined()
@@ -125,7 +125,7 @@ describe('findFace on drawn faces', () => {
         expect(e.radial).toBeLessThan(0.007 * outer)
         expect(fit.approximate).toBe(false)
         expect(fit.rms).toBeLessThan(0.01 * (face.blackDiameter.value / 2))
-        // the scale at the centre: the camera's px per mm there
+        // the scale at the center: the camera's px per mm there
         const i0 = project(h, { x: 0, y: 0 })
         const ex = project(h, { x: 1, y: 0 })
         const ey = project(h, { x: 0, y: 1 })
@@ -145,7 +145,7 @@ describe('findFace on drawn faces', () => {
     expect(found.fits[0]?.face.id).toBe(face.id)
   })
 
-  it('rectifies: under tilt the black ellipse centre is off by millimetres, the fit centre is not', () => {
+  it('rectifies: under tilt the black ellipse center is off by millimeters, the fit center is not', () => {
     const { h, found } = searched('issf-25m-rapid-fire-pistol', 2)
     const fit = found.fits[0]
     expect(fit && found.black).toBeTruthy()
@@ -187,7 +187,7 @@ describe('findFace on drawn faces', () => {
 
   it('proposes two faces whose rings the photo cannot tell apart', () => {
     const base = faceById('issf-25m-precision-50m-pistol')
-    // a neighbour whose rings and black area are 1.6 % larger
+    // a neighbor whose rings and black area are 1.6 % larger
     const scale = (v: { value: number }) => ({ ...v, value: v.value * 1.016 })
     const twin: TargetFace = {
       ...base,
@@ -370,7 +370,7 @@ describe('findFace without a face', () => {
     expect(found.fits).toEqual([])
   })
 
-  it('does not take a coloured band for the black area', () => {
+  it('does not take a colored band for the black area', () => {
     const photo = drawn('issf-25m-precision-50m-pistol', 0).image
     const image = { ...photo, data: photo.data.slice() }
     // the black area becomes red
@@ -404,7 +404,7 @@ describe('a face the user picks', () => {
     const fit = found.fits[0]
     expect(fit).toBeDefined()
     if (!fit) return
-    // a ring of the right size whose centre is off by a tenth of its radius, with the most points
+    // a ring of the right size whose center is off by a tenth of its radius, with the most points
     const ring = defined(found.rings[3])
     const r = meanRadius(ring.ellipse)
     const bogus = {
@@ -500,7 +500,7 @@ describe('on the photo and as a label', () => {
     expect(label.black(at(95, 0))).toBe(true)
     expect(label.black(at(105, 0))).toBe(false)
     expect(label.black(at(0, -180))).toBe(false)
-    // every outline point is 253 mm from the centre
+    // every outline point is 253 mm from the center
     for (const p of label.outline) {
       const q = apply3(fit.toFace, [p.x, p.y, 1])
       expect(Math.hypot(q[0] / q[2], q[1] / q[2])).toBeCloseTo(253, 3)

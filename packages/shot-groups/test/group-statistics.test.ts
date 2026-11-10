@@ -20,7 +20,7 @@ const expectClose = (actual: number | undefined, expected: number, rel = 1e-12) 
 const shots = (points: [number, number][]): GroupShot[] =>
   points.map(([x, y]) => ({ x: x * mm, y: y * mm }))
 
-// Five shots, mm: centre (2, 2); deviations (-2,-2) (0,-1) (2,2) (-1,1) (1,0); Sxx = 10, Syy = 10, Sxy = 7; radii sqrt8, 1, sqrt8, sqrt2, 1 (sum of squares 20).
+// Five shots, mm: center (2, 2); deviations (-2,-2) (0,-1) (2,2) (-1,1) (1,0); Sxx = 10, Syy = 10, Sxy = 7; radii sqrt8, 1, sqrt8, sqrt2, 1 (sum of squares 20).
 const five = shots([
   [0, 0],
   [2, 1],
@@ -34,7 +34,7 @@ const aimCompass = (dx: number, dy: number) =>
   groupStatistics({ shots: [{ x: dx, y: dy }], distance: 100, aim: { x: 0, y: 0 } }).aimOffset
     ?.compass
 
-// bivariate normal: axis SDs 10 mm and 4 mm, major axis at 30 degrees, centre (5, -3) mm (Box-Muller)
+// bivariate normal: axis SDs 10 mm and 4 mm, major axis at 30 degrees, center (5, -3) mm (Box-Muller)
 const drawShots = (random: () => number, count: number): GroupShot[] => {
   const theta = Math.PI / 6
   const out: GroupShot[] = []
@@ -107,7 +107,7 @@ const shareInside = (r: number, q: number) => {
 describe('groupStatistics: hand calculation', () => {
   const s = groupStatistics({ shots: five, distance: 100 })
 
-  it('centre, sizes and radii', () => {
+  it('center, sizes and radii', () => {
     expect(s.shotCount).toBe(5)
     expect(s.excludedCount).toBe(0)
     expectClose(s.centre?.x, 2 * mm)
@@ -207,7 +207,7 @@ describe('groupStatistics: excluded shots and aim', () => {
     expect(s.shotCount).toBe(5)
     expect(s.excludedCount).toBe(2)
     expectClose(s.extremeSpread, Math.sqrt(32) * mm)
-    // excluded centre (11, 8) minus group centre (2, 2)
+    // excluded center (11, 8) minus group center (2, 2)
     expectClose(s.excludedOffset?.x, 9 * mm)
     expectClose(s.excludedOffset?.y, 6 * mm)
     expectClose(s.aimOffset?.dx, 2 * mm)
@@ -216,7 +216,7 @@ describe('groupStatistics: excluded shots and aim', () => {
     expect(s.aimOffset?.compass).toBe('NE')
   })
 
-  it('names the 8 compass points and the centre', () => {
+  it('names the 8 compass points and the center', () => {
     expect(aimCompass(0, 0.01)).toBe('N')
     expect(aimCompass(0.01, 0.01)).toBe('NE')
     expect(aimCompass(0.01, 0)).toBe('E')
@@ -229,7 +229,7 @@ describe('groupStatistics: excluded shots and aim', () => {
     expect(aimCompass(Math.sin((22 * Math.PI) / 180), Math.cos((22 * Math.PI) / 180))).toBe('N')
     expect(aimCompass(Math.sin((23 * Math.PI) / 180), Math.cos((23 * Math.PI) / 180))).toBe('NE')
     expect(aimCompass(0, 0)).toBe('centre')
-    // a mean that rounds next to the aim is still the centre
+    // a mean that rounds next to the aim is still the center
     const s = groupStatistics({
       shots: shots([
         [0.1, 0],
@@ -262,7 +262,7 @@ describe('groupStatistics: boundary cases', () => {
     expect(s.excludedOffset).toBeUndefined()
   })
 
-  it('one shot: centre only', () => {
+  it('one shot: center only', () => {
     const s = groupStatistics({ shots: shots([[3, -4]]), distance: 100 })
     expectClose(s.centre?.x, 3 * mm)
     expectClose(s.centre?.y, -4 * mm)
@@ -427,7 +427,7 @@ describe('velocity correlation', () => {
 })
 
 describe('pooling', () => {
-  it('two groups with the same shots relative to their centres', () => {
+  it('two groups with the same shots relative to their centers', () => {
     const shifted = five.map((p) => ({ x: p.x + 0.05, y: p.y - 0.03 }))
     const one = groupStatistics({ shots: five, distance: 100 })
     const pooled = pooledGroupStatistics([
@@ -520,7 +520,7 @@ describe('pooling: empty and mixed distances', () => {
 })
 
 describe('subtendedAngle', () => {
-  it('exact angle of a segment centred on the line of sight', () => {
+  it('exact angle of a segment centered on the line of sight', () => {
     expectClose(subtendedAngle(0.1, 100), 2 * Math.atan(0.0005))
     expectClose(subtendedAngle(2, 1), Math.PI / 2)
     expect(() => subtendedAngle(0.1, 0)).toThrow(InputError)
@@ -557,7 +557,7 @@ describe('ellipse and CEP coverage (seeded simulation)', () => {
   }
 
   it('the elliptical CEP holds half of further shots, the circular one more', () => {
-    if (!s.centre) throw new Error('no centre')
+    if (!s.centre) throw new Error('no center')
     const { x: cx, y: cy } = s.centre
     const share = (r: number) =>
       fresh.filter(({ x, y }) => Math.hypot(x - cx, y - cy) <= r).length / count
@@ -640,7 +640,7 @@ describe('groupStatistics: inputs, signs and limits', () => {
     })
     expectClose(s.width, 3 * mm)
     expectClose(s.height, 6 * mm)
-    // centre (19/3, 29/3) mm
+    // center (19/3, 29/3) mm
     expectClose(s.aimOffset?.dx, (19 / 3 - 1) * mm)
     expectClose(s.aimOffset?.dy, (29 / 3 - 3) * mm)
   })
@@ -655,7 +655,7 @@ describe('groupStatistics: limits', () => {
     expect('velocityCorrelation' in s).toBe(false)
   })
 
-  it('brackets the elliptical CEP of a spread above one metre', () => {
+  it('brackets the elliptical CEP of a spread above one meter', () => {
     // variance 6 m2 on both axes: the elliptical CEP equals the circular one
     const s = groupStatistics({
       shots: [

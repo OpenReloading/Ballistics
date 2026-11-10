@@ -184,7 +184,7 @@ const oneDShot = (cd: number): TrajectoryInput => ({
   zero: { elevationAngle: 0, windageAngle: 0 },
 })
 const oneDOptions = { gravity: 0, coriolis: false }
-/** The drag constant per metre of the base projectile with a drag coefficient of 0.3. */
+/** The drag constant per meter of the base projectile with a drag coefficient of 0.3. */
 const flatK = (airDensity(base.air) * 0.3 * Math.PI * 0.00782 ** 2) / (8 * 0.01134)
 
 const velocityRanges = [200, 400, 600, 800, 1000, 1200].map((x): [Observation['kind'], number] => [
@@ -556,7 +556,7 @@ describe('truing with the monotone cubic', () => {
   })
 
   it('reads the own coefficient with the cubic at a knot between base nodes', () => {
-    // knot 0.93 lies between G7 nodes and changes the neighbouring slopes of the cubic, so the fit on the BC's own observations returns factors slightly off 1 (`apps/docs/docs/models/exterior-drag.md`, "Monotone cubic interpolation")
+    // knot 0.93 lies between G7 nodes and changes the neighboring slopes of the cubic, so the fit on the BC's own observations returns factors slightly off 1 (`apps/docs/docs/models/exterior-drag.md`, "Monotone cubic interpolation")
     const obs = observe(withDrag(base, cubicBc), velocityRanges)
     const knots = [0.93, 1.5, 2]
     const r = trueDrag(withDrag(base, cubicBc), obs, { knots })
