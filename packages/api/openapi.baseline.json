@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "OpenReloading API",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "description": "Records of cartridges, components and competitions, and the exterior and interior ballistics models. Quantities are SI (m, kg, s, Pa, K, rad) unless a field names another unit. Results are simulations, not load data."
   },
   "tags": [
@@ -486,7 +486,18 @@
                           "unit": "1"
                         }
                       },
-                      "additionalProperties": false
+                      "additionalProperties": false,
+                      "anyOf": [
+                        {
+                          "required": ["form"]
+                        },
+                        {
+                          "required": ["radius"]
+                        },
+                        {
+                          "required": ["radiusRatio"]
+                        }
+                      ]
                     },
                     "cannelure": {
                       "type": "object",
@@ -3689,7 +3700,15 @@
                           }
                         },
                         "required": ["division"],
-                        "additionalProperties": false
+                        "additionalProperties": false,
+                        "anyOf": [
+                          {
+                            "required": ["maxRounds"]
+                          },
+                          {
+                            "required": ["maxLength"]
+                          }
+                        ]
                       }
                     },
                     "movingTargets": {

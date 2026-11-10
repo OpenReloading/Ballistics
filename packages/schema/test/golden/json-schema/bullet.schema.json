@@ -246,7 +246,24 @@
           ],
           "unit": "1"
         }
-      }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "form"
+          ]
+        },
+        {
+          "required": [
+            "radius"
+          ]
+        },
+        {
+          "required": [
+            "radiusRatio"
+          ]
+        }
+      ]
     },
     "cannelure": {
       "type": "object",
