@@ -26,7 +26,7 @@ export interface PooledSession {
   barrelLength?: number | undefined
   /** Propellant temperature of the session, K; default the load's. */
   propellantTemperature?: number | undefined
-  /** Charges with mean velocities and `velocitySigma` on every point; a point may add `peakPressure` with its `pressureSigma`, compared with the peak breech pressure. */
+  /** Charges with mean velocities and `velocitySigma` on every point; a point may add `peakPressure` with its `pressureSigma`, compared with the peak breech pressure; a point's `pressureBasis` is not read, so the caller passes pressures of one basis or scales them itself. */
   ladder: readonly LadderPoint[]
 }
 
@@ -90,7 +90,7 @@ export interface PooledResidual {
   /** Charge mass, kg. */
   charge: number
   /** The muzzle velocity (m/s) or the peak pressure (Pa) of the point. */
-  quantity: 'velocity' | 'pressure'
+  kind: 'velocity' | 'pressure'
   /** Measured mean velocity or peak pressure. */
   observed: number
   /** Of the fitted model: the velocity, or the peak breech pressure. */
@@ -344,7 +344,7 @@ type PooledStart = Omit<PooledPowderParameter, 'value' | 'standardUncertainty'>
 interface PooledRow {
   session: number
   x: LadderPoint
-  quantity: PooledResidual['quantity']
+  kind: PooledResidual['kind']
   /** Its velocity (m/s) or pressure (Pa). */
   observed: number
   /** Its sigma; `checkSessions` makes every velocity and pressure carry one. */
@@ -386,7 +386,7 @@ function pooledValue(
     hit = { burn: b, factor, velocity: r.muzzleVelocity, pressure: r.peakBreechPressure }
     problem.cache.set(key, hit)
   }
-  return row.quantity === 'pressure' ? hit.pressure : hit.velocity * Math.exp(at(theta, rifle))
+  return row.kind === 'pressure' ? hit.pressure : hit.velocity * Math.exp(at(theta, rifle))
 }
 
 /** Prediction of row `run` at `theta`, or of its prior pseudo-row after the rows. */
@@ -462,7 +462,7 @@ const pooledResiduals = (rows: readonly PooledRow[], predicted: readonly number[
     return {
       session: r.session,
       charge: r.x.charge,
-      quantity: r.quantity,
+      kind: r.kind,
       observed: r.observed,
       predicted: value,
       residual: value - r.observed,
@@ -474,7 +474,7 @@ function pointRows(session: number, x: LadderPoint, indices: PooledRow['indices'
   const velocity: PooledRow = {
     session,
     x,
-    quantity: 'velocity',
+    kind: 'velocity',
     observed: x.muzzleVelocity,
     sigma: x.velocitySigma ?? Number.NaN,
     indices,
@@ -483,7 +483,7 @@ function pointRows(session: number, x: LadderPoint, indices: PooledRow['indices'
   const pressure: PooledRow = {
     session,
     x,
-    quantity: 'pressure',
+    kind: 'pressure',
     observed: x.peakPressure,
     sigma: x.pressureSigma ?? Number.NaN,
     indices: { ...indices, rifle: -1 },

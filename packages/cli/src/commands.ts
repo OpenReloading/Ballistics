@@ -4,8 +4,8 @@ import { fileURLToPath } from 'node:url'
 import { compareKeys, type SourceRecord, sourceRecord } from '@open-reloading/schema'
 import { readPublishedLoads } from '@open-reloading/tools/catalog'
 import { Refusal, UsageError } from './errors.ts'
-import { type InteriorModel, type Outcome, outcomes } from './evaluate.ts'
-import { basisOf, fitPowders, notFittedReasons, withFit } from './fit.ts'
+import { type InteriorModel, outcomes } from './evaluate.ts'
+import { fitPowders, notFittedReasons, withFit } from './fit.ts'
 import { changeOf, evaluate, type Grouping, metricsOf } from './metrics.ts'
 import { builtInName, fitFiles, loadModel, type Model } from './model.ts'
 import { fillInputs, rowsFromPublished } from './published-rows.ts'
@@ -198,32 +198,13 @@ function leftOut({ rows, records }: Prepared, model: InteriorModel, split: Split
   return { items, powders: inSplit.length }
 }
 
-/** `items` with the model's peak pressure of each used row times the factor of its basis, 1 for a basis without one. */
-function withBasisFactors(items: Outcome[], pressure: FitResult['pressure']): Outcome[] {
-  if (!pressure) return items
-  return items.map((o) =>
-    'pressure' in o.prediction
-      ? {
-          ...o,
-          prediction: {
-            ...o.prediction,
-            pressure: o.prediction.pressure * (pressure.factors[basisOf(o.row)]?.factor ?? 1),
-          },
-        }
-      : o,
-  )
-}
-
 /** What the model selected by `spec` gives on the split, with the burn coefficients fitted under it in a `fit-on-training` run; refuses a split with no evaluable row. */
 async function evaluateModel(spec: string, options: Options, data: Prepared): Promise<Evaluation> {
   const model = await loadModel(spec)
   const fitted = options.params === 'fit-on-training' ? fitOf(options, data, model) : undefined
   const records = fitted?.records ?? data.records
   const wanted: Split[] = options.split === 'training' ? ['training'] : [options.split, 'training']
-  const all = withBasisFactors(
-    outcomes(data.rows, records, model.interior, wanted),
-    fitted?.summary.pressure,
-  )
+  const all = outcomes(data.rows, records, model.interior, wanted)
   const evaluation = evaluate(
     all.filter((o) => o.split === options.split),
     all.filter((o) => o.split === 'training'),

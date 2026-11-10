@@ -185,12 +185,16 @@ describe('the pressure rows of a fit', () => {
     expect(r.powders[sp21]?.factor).toBeGreaterThan(1.03)
   })
 
-  it('compares the held-out pressures with the model peak times the factor of their basis', async () => {
+  it('reports the factors in the evaluation and compares the held-out pressures with the model peak as it is', async () => {
     const withValidation = writeRows(rowsCsv([...training, ...printed(['308-win', '308-win'])]))
-    const run = { ...options, rows: withValidation, params: 'fit-on-training' } as const
-    const scaled = await verify({ ...run, pressureSigma: 0.05 })
-    expect(scaled.overall.pressure?.median).toBeCloseTo(0, 3)
-    const plain = await verify(run)
-    expect(plain.overall.pressure?.median).toBeGreaterThan(0.05)
+    const r = await verify({
+      ...options,
+      rows: withValidation,
+      params: 'fit-on-training',
+      pressureSigma: 0.05,
+    })
+    expect(r.fit?.pressure?.factors['case-contact']?.factor).toBeCloseTo(0.9, 3)
+    expect(r.fit?.pressure?.factors.transducer?.factor).toBeCloseTo(1.1, 3)
+    expect(r.overall.pressure?.median).toBeCloseTo(0.101, 3)
   })
 })

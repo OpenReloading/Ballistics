@@ -151,6 +151,24 @@ const geometric = (coefficient: number): InteriorLoad => ({
   },
 })
 
+/** A session of powder B in `rifle` at the exact velocities of vivacity 0.45 times `high` and its exact peak pressures. */
+const inRifle = (rifle: string, high: number): PooledSession => ({
+  powder: 'B',
+  rifle,
+  load: load(0.5),
+  ladder: charges.map((charge): LadderPoint => {
+    const r = interior({ ...load(0.45), charge })
+    if (!r.valid) throw new Error(r.reason)
+    return {
+      charge,
+      muzzleVelocity: r.muzzleVelocity * high,
+      velocitySigma: sigma,
+      peakPressure: r.peakBreechPressure,
+      pressureSigma: 0.01 * r.peakBreechPressure,
+    }
+  }),
+})
+
 describe('fitPowderPooled', () => {
   it('recovers the burn coefficient per powder and the factor per rifle within 3 standard uncertainties', () => {
     const fit = exact
@@ -268,6 +286,18 @@ describe('fitPowderPooled temperature factors, priors and burn laws', () => {
     expect(parameter(free, 'burnRate', 'C').value).toBeCloseTo(0.55, 2)
   })
 
+  it('fits the burn rate coefficient of a geometric burn law', () => {
+    const ladder = charges.map((charge): LadderPoint => {
+      const r = interior({ ...geometric(7e-9), charge })
+      if (!r.valid) throw new Error(r.reason)
+      return { charge, muzzleVelocity: r.muzzleVelocity, velocitySigma: sigma }
+    })
+    const fit = fitPowderPooled([{ powder: 'G', rifle: 'r1', load: geometric(6e-9), ladder }])
+    expect(parameter(fit, 'burnRate', 'G').value).toBeCloseTo(7e-9, 12)
+  })
+})
+
+describe('fitPowderPooled pressure rows', () => {
   it('fits the burn coefficient to peak pressures where the velocities carry no weight', () => {
     const ladder = charges.map((charge): LadderPoint => {
       const r = interior({ ...load(0.55), charge })
@@ -284,14 +314,10 @@ describe('fitPowderPooled temperature factors, priors and burn laws', () => {
     expect(parameter(fit, 'burnRate', 'B').value / 0.5).toBeCloseTo(1.1, 4)
   })
 
-  it('fits the burn rate coefficient of a geometric burn law', () => {
-    const ladder = charges.map((charge): LadderPoint => {
-      const r = interior({ ...geometric(7e-9), charge })
-      if (!r.valid) throw new Error(r.reason)
-      return { charge, muzzleVelocity: r.muzzleVelocity, velocitySigma: sigma }
-    })
-    const fit = fitPowderPooled([{ powder: 'G', rifle: 'r1', load: geometric(6e-9), ladder }])
-    expect(parameter(fit, 'burnRate', 'G').value).toBeCloseTo(7e-9, 12)
+  it('leaves the pressures out of the velocity factor of a rifle', () => {
+    const fit = fitPowderPooled([inRifle('r1', 1), inRifle('r2', 1.02)])
+    expect(parameter(fit, 'burnRate', 'B').value / 0.45).toBeCloseTo(1, 3)
+    expect(parameter(fit, 'rifle', 'r2').value).toBeGreaterThan(parameter(fit, 'rifle', 'r1').value)
   })
 })
 

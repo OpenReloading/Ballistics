@@ -1038,9 +1038,9 @@ export type PooledRequest = 'burnRate' | 'temperatureFactor';
 // @public
 export interface PooledResidual {
     charge: number;
+    kind: 'velocity' | 'pressure';
     observed: number;
     predicted: number;
-    quantity: 'velocity' | 'pressure';
     residual: number;
     session: number;
 }

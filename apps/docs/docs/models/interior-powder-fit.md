@@ -323,7 +323,7 @@ $$
 
 Code: `packages/ballistics/src/interior/fit-pooled.ts`, `fitPowderPooled` (`pointRows`, `pooledValue`).
 
-The fit takes no pressure basis: the caller passes the pressure it wants compared with the model's peak. `residuals` holds each point's velocity and then its pressure, with its `quantity`, and `dataChiSquare` and `degreesOfFreedom` count both; `predictPooled` and `calibratePooled` predict velocities only.
+The fit takes no pressure basis: the caller passes the pressure it wants compared with the model's peak. `residuals` holds each point's velocity and then its pressure, with its `kind`, and `dataChiSquare` and `degreesOfFreedom` count both; `predictPooled` and `calibratePooled` predict velocities only.
 
 The rows, Jacobian and conditioning check are those of the single fit. Each velocity or pressure is one row; a parameter moves only the rows of its sessions, so a Jacobian column runs `interior` only there, and a rifle step and a point's pressure reuse the last run. The fit fails as `fitPowder` does: `ill-conditioned` above the condition limit (for example a temperature factor between two temperatures that differ by a hundredth of a kelvin), `not-converged`, `invalid`, and `unresolved` for a powder whose sessions hold a single charge, where its burn coefficient and the rifle factors cannot be told apart. The result reports the covariance and correlation of all parameters and the condition number. A pooled fit of one session fits the burn coefficient alone and gives the value and standard uncertainty of `fitPowder` on its ladder, within a relative $10^{-9}$ in the tests.
 

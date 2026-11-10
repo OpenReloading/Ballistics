@@ -123,7 +123,7 @@ const evaluation = z.object({
     })
     .optional()
     .describe(
-      "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`. With `--pressure-sigma`, the pressure errors compare the model peak pressure times the factor of the row's basis (1 for a basis without one) with the printed pressure.",
+      "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`. With `--pressure-sigma`, `pressure` holds the basis factors of the fit; the pressure errors still compare the model's peak pressure as it is with the printed pressure.",
     ),
 })
 
