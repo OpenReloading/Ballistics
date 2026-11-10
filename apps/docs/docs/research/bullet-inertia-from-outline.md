@@ -15,12 +15,12 @@ Modified point mass and stability: is the inertia of a bullet integrated from it
 Fixed before the run.
 - Moments: relative error of both moments, cylinder estimate and outline integral, against a reference. Build when on every bullet the transverse error of the outline is below half the cylinder error, the axial error below 5 percent and the transverse error below 15 percent.
 - Data: no bullet with published measured moments and a dimensioned outline could be taken into the repository (see Data basis). The quadrature is checked against an independent integral of the drawing polygon of the demo 168 grain record, and the rule on one stated reference only (168 grain, 7.62 mm class: axial 7.23e-8 kg m2, transverse 5.38e-7 kg m2: author-derived values with no source page, unverified). No measured-error claim is made.
-- Stability from the geometry: the factor with the overturning-moment slope from the outline, over twelve rifle outlines (length 3.4 to 5.4 calibres, Rt/R 1, 0.7 and 0.4, boat tail 0.3 or 0.5 calibre) and two pistol outlines, with the twist that gives Miller's factor 1.5 at 2800 ft/s in standard air. Pass when every ratio to Miller's factor is from 0.6 to 1.0 and none exceeds it by more than 10 percent. Both factors scale with the mass, so the ratio does not depend on the outline density.
+- Stability from the geometry: the factor with the overturning-moment slope from the outline, over twelve rifle outlines (length 3.4 to 5.4 calibers, Rt/R 1, 0.7 and 0.4, boat tail 0.3 or 0.5 caliber) and two pistol outlines, with the twist that gives Miller's factor 1.5 at 2800 ft/s in standard air. Pass when every ratio to Miller's factor is from 0.6 to 1.0 and none exceeds it by more than 10 percent. Both factors scale with the mass, so the ratio does not depend on the outline density.
 - Effect: spin drift of the demo bullet in the modified point mass (G7 coefficient 0.221, 790 m/s, twist 254 mm, zero at 100 m) with cylinder and outline inertias, the moment slope from Miller's rule in both.
 
 ## Formulas
 
-For a body of revolution of uniform density $\rho$ with radius profile $r(z)$ from the base ($z = 0$) to the tip ($z = l$), with the volume $V_\mathrm{vol} = \pi \int r^2 \, dz$ and the centre of mass $z_\mathrm{cm} = \pi \int r^2 z \, dz / V_\mathrm{vol}$ (textbook definitions for a solid of revolution, derived by the author; related reading [Kneubuehl 2018](../bibliography.md#kneubuehl-2018), section 2.2, page not verified):
+For a body of revolution of uniform density $\rho$ with radius profile $r(z)$ from the base ($z = 0$) to the tip ($z = l$), with the volume $V_\mathrm{vol} = \pi \int r^2 \, dz$ and the center of mass $z_\mathrm{cm} = \pi \int r^2 z \, dz / V_\mathrm{vol}$ (textbook definitions for a solid of revolution, derived by the author; related reading [Kneubuehl 2018](../bibliography.md#kneubuehl-2018), section 2.2, page not verified):
 
 $$
 I_x = \frac{\pi \rho}{2} \int r^4 \, dz, \qquad I_y = \rho \int \left( \frac{\pi r^4}{4} + \pi r^2 (z - z_\mathrm{cm})^2 \right) dz, \qquad \rho = \frac{m}{V_\mathrm{vol}}
@@ -43,7 +43,7 @@ Quadrature, demo 168 grain outline (7.823 mm, 30.5 mm, nose 16 mm, Rt/R 0.55, me
 | Quantity          | Relative difference |
 | ----------------- | ------------------- |
 | Volume            | 1.3e-4              |
-| Centre of mass    | 9.4e-5              |
+| Center of mass    | 9.4e-5              |
 | Axial moment      | 5.0e-5              |
 | Transverse moment | 1.1e-4              |
 

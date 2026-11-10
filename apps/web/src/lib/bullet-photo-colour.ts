@@ -1,4 +1,4 @@
-/** Cuts by colour distance where luma barely separates bullet and background (`apps/docs/docs/models/bullet-photo.md`); pure, so it runs in a worker. */
+/** Cuts by color distance where luma barely separates bullet and background (`apps/docs/docs/models/bullet-photo.md`); pure, so it runs in a worker. */
 
 import { msg } from '../i18n/translate.ts'
 import {
@@ -46,7 +46,7 @@ const colourAt = (img: RgbaImage, i: number): Rgb => [
   img.data[4 * i + 2] ?? 0,
 ]
 
-/** The median colour of the 5 x 5 pixels about `p`. */
+/** The median color of the 5 x 5 pixels about `p`. */
 function patchColour(img: RgbaImage, p: Point): Rgb {
   const px = (dx: number, dy: number) =>
     colourAt(
@@ -63,7 +63,7 @@ const distance = (a: Rgb, b: Rgb) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] -
 /** The grey level the background takes in the projection, so noise below it is not cut off at 0. */
 const floor = 30
 
-/** The span of grey levels the bullet's colour is spread over in the projection. */
+/** The span of grey levels the bullet's color is spread over in the projection. */
 const span = 200
 
 /** The mean of the samples `takes` chooses; undefined for none. */
@@ -78,9 +78,9 @@ function meanOf(sample: readonly Rgb[], takes: (c: Rgb) => boolean): Rgb | undef
   return count ? (sum.map((v) => v / count) as Rgb) : undefined
 }
 
-/** Refined over 3 assignments, leaving out the `avoid` colours; undefined when no sample is 20 levels from `bg`. */
+/** Refined over 3 assignments, leaving out the `avoid` colors; undefined when no sample is 20 levels from `bg`. */
 function bulletColour(sample: readonly Rgb[], bg: Rgb, avoid: readonly Rgb[]): Rgb | undefined {
-  // A ruler is often the furthest from the background in colour, so the scale points' colours are not the bullet's.
+  // A ruler is often the furthest from the background in color, so the scale points' colors are not the bullet's.
   const own = sample.filter((c) => avoid.every((a) => distance(c, a) > 0.4 * distance(a, bg)))
   const dist = own.map((c) => distance(c, bg)).sort((a, b) => a - b)
   const far = dist[Math.floor(0.98 * dist.length)] ?? 0
@@ -92,7 +92,7 @@ function bulletColour(sample: readonly Rgb[], bg: Rgb, avoid: readonly Rgb[]): R
   return fg && distance(fg, bg) >= 20 ? fg : undefined
 }
 
-/** Background near `floor`, bullet near `floor + span`; undefined for a photograph of one colour. */
+/** Background near `floor`, bullet near `floor + span`; undefined for a photograph of one color. */
 function colourSeparation(img: RgbaImage, avoid: readonly Point[] = []): Gray | undefined {
   const n = img.width * img.height
   const stride = Math.max(1, Math.floor(Math.sqrt(n / 40000)))
@@ -117,7 +117,7 @@ function colourSeparation(img: RgbaImage, avoid: readonly Point[] = []): Gray | 
 /** The weight of the chroma's distance from the background's against the luma's in `deviation`. */
 const chromaWeight = 1.5
 
-/** The colour's departure from grey: each channel less the mean of the three. */
+/** The color's departure from grey: each channel less the mean of the three. */
 const chromaOf = ([r, g, b]: Rgb): Rgb => {
   const m = (r + g + b) / 3
   return [r - m, g - m, b - m]
@@ -134,7 +134,7 @@ const lineOf = (img: RgbaImage, line: number, column: boolean): number[] =>
     ? Array.from({ length: img.height }, (_, y) => y * img.width + line)
     : Array.from({ length: img.width }, (_, x) => line * img.width + x)
 
-/** The luma and the chroma of the colours of a line outside `known`, by median; the border's for a line with few of them. */
+/** The luma and the chroma of the colors of a line outside `known`, by median; the border's for a line with few of them. */
 function lineBackground(
   img: RgbaImage,
   line: readonly number[],
@@ -275,7 +275,7 @@ interface Pick {
   notes?: Wording[]
 }
 
-/** Luma, then colour, then luma distance for a part-bright part-dark bullet; a ragged edge falls back to the largest smooth cut-out. */
+/** Luma, then color, then luma distance for a part-bright part-dark bullet; a ragged edge falls back to the largest smooth cut-out. */
 function pickCut(img: RgbaImage, exclude: readonly Point[]): Pick {
   const luma = byLuma(img, exclude, new Uint8Array(0)) as Segmentation
   const colour = byColour(img, exclude, luma.alpha)
@@ -343,7 +343,7 @@ export function segmentPhoto(img: RgbaImage, exclude: readonly Point[] = []): Se
     exclude.map((p) => ({ x: p.x / k, y: p.y / k })),
   )
   const known = picked.known && enlarged(picked.known, k, small.width, [img.width, img.height])
-  // a cut that finds nothing at full size (its colour is judged on a sample) falls back to luma, of the photograph's size
+  // a cut that finds nothing at full size (its color is judged on a sample) falls back to luma, of the photograph's size
   const seg =
     k === 1
       ? picked.seg

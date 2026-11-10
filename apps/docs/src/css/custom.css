@@ -44,7 +44,7 @@
   --doc-sidebar-width: 21rem;
 }
 
-/* the colours of the web app (apps/web/src/app/globals.css): link blue, text, page and surface */
+/* the colors of the web app (apps/web/src/app/globals.css): link blue, text, page and surface */
 :root {
   --ifm-color-primary: #0b57d0;
   --ifm-color-primary-dark: #0a4ebb;
@@ -75,7 +75,7 @@
   overflow-y: hidden;
 }
 
-/* the search modal (src/theme/SearchBar.tsx) in the site's colours, light and dark */
+/* the search modal (src/theme/SearchBar.tsx) in the site's colors, light and dark */
 html[data-theme] {
   --pf-background: var(--ifm-background-surface-color);
   --pf-text: var(--ifm-font-color-base);

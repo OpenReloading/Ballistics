@@ -4,7 +4,7 @@ import { conversions } from '@open-reloading/units'
 import { type ChronoDiagnostic, refuse } from './diagnostics.ts'
 import { parseNumber } from './text.ts'
 
-/** A velocity unit the importers recognise. Parsed velocities are stored in m/s. */
+/** A velocity unit the importers recognize. Parsed velocities are stored in m/s. */
 export type VelocityUnit = 'ft/s' | 'm/s' | 'km/h' | 'mph'
 
 /** `fps`, `ft/s`, `mps`, `m/s`, `kph`, `km/h` or `mph` in any case, else undefined. */
@@ -28,7 +28,7 @@ const toMps: Record<VelocityUnit, number> = {
 /** `x` rounded to 1e-6, which drops binary float noise of a unit conversion. */
 const roundToMillionths = (x: number) => Math.round(x * 1e6) / 1e6
 
-/** Throws when the caller names a unit other than the recognised `unit` the file names as `text`. */
+/** Throws when the caller names a unit other than the recognized `unit` the file names as `text`. */
 function checkCallerUnit(
   text: string,
   unit: VelocityUnit,

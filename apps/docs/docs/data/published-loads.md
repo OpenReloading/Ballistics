@@ -69,7 +69,7 @@ A bar or psi figure has a `value` in bar. A crusher figure has none, and a crush
 
 ## Sources
 
-Maker data carries no project licence. A table's source names the maker as `publisher`, the URL and the retrieval date, and has `origin: manufacturer`: data the maker published or supplied. The maker's own terms go in `terms` where it states any, with a `license` of the form `LicenseRef-<name>`. A published load source with a project licence (an SPDX id) fails validation. Fitted parameters derived from these rows are the project's own data under the data licence.
+Maker data carries no project license. A table's source names the maker as `publisher`, the URL and the retrieval date, and has `origin: manufacturer`: data the maker published or supplied. The maker's own terms go in `terms` where it states any, with a `license` of the form `LicenseRef-<name>`. A published load source with a project license (an SPDX id) fails validation. Fitted parameters derived from these rows are the project's own data under the data license.
 
 A table that several files cite is a source record (`records/sources/`). The raw download stays out of the repository; the source record keeps its `sha256`.
 
@@ -105,7 +105,7 @@ The command prints per file and in total the created, changed (and how many not 
 - a bullet, powder or primer a load names that is no record;
 - a printed primer size or magnum that differs from the primer record;
 - a `value` that does not follow its `raw`;
-- a source without publisher, URL, retrieval date or origin, a kind other than `published`, and a project licence on maker data.
+- a source without publisher, URL, retrieval date or origin, a kind other than `published`, and a project license on maker data.
 
 It also prints plausibility warnings, each with the file, the load id and a finding id (`checkPublishedLoadPlausibility`). A printed value that looks wrong is still the maker's value: a warning never removes or changes a row and does not fail the validation, which exits 0 when there are only warnings.
 

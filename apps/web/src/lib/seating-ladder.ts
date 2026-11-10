@@ -36,7 +36,7 @@ export function temperatureLadderBlockReason(
       )
 }
 
-/** The values of a ladder: `start + i * step` up or down, or an odd count centred on `start`, lowest first. */
+/** The values of a ladder: `start + i * step` up or down, or an odd count centered on `start`, lowest first. */
 function ladderValues(start: number, step: number, steps: number, direction: LadderDirection) {
   return Array.from({ length: steps }, (_, i) =>
     direction === 'around'
@@ -117,7 +117,7 @@ export function seatingLadder(
   const lengths = ladderValues(start, step, steps, direction)
   const [lo, hi] = [Math.min(...lengths), Math.max(...lengths)]
   const [from, to] = seat.range
-  // a millionth of a millimetre: a step that lands on the range's end is inside it
+  // a millionth of a millimeter: a step that lands on the range's end is inside it
   if (lo < from - 1e-9 || hi > to + 1e-9)
     return {
       error: t(

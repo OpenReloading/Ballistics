@@ -4,7 +4,7 @@ import { plainNumber } from '../i18n/number.ts'
 import type { Point } from './target-geometry.ts'
 
 export const page = { width: 210, height: 297 }
-/** Distance of the corner mark centres across and down, mm. */
+/** Distance of the corner mark centers across and down, mm. */
 export const markSpacing = { width: 160, height: 240 }
 export const gridPitch = 10
 export const targetId = 'zero-a4'
@@ -18,7 +18,7 @@ const top = centre.y - markSpacing.height / 2
 const right = left + markSpacing.width
 const bottom = top + markSpacing.height
 
-/** Centres of the corner marks, mm: top left, top right, bottom right, bottom left. */
+/** Centers of the corner marks, mm: top left, top right, bottom right, bottom left. */
 export const markCentres: readonly [Point, Point, Point, Point] = [
   { x: left, y: top },
   { x: right, y: top },
@@ -51,7 +51,7 @@ export function zeroTargetShapes(): { lines: Line[]; rings: Ring[]; rects: Rect[
     lines.push({ x1: x, y1: y0, x2: x, y2: y1, width: 0.15, colour: grey })
   for (let y = y0; y <= y1 + 1e-9; y += gridPitch)
     lines.push({ x1: x0, y1: y, x2: x1, y2: y, width: 0.15, colour: grey })
-  // the cross runs up to the square: its arms point at the centre
+  // the cross runs up to the square: its arms point at the center
   lines.push({ x1: x0, y1: centre.y, x2: x1, y2: centre.y, width: 0.5, colour: black })
   lines.push({ x1: centre.x, y1: y0, x2: centre.x, y2: y1, width: 0.5, colour: black })
   const half = squareSide / 2

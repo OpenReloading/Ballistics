@@ -3,7 +3,7 @@ import type { Locator } from '@playwright/test'
 /** A keyboard stop: its name and its place in the visual order, `[block, y, x]`. */
 export type Stop = { name: string; key: number[] }
 
-/** Steps that go back in the visual order: to an earlier block, in one block to a line above, or on one line to the left; centres within 8 px count as one line. */
+/** Steps that go back in the visual order: to an earlier block, in one block to a line above, or on one line to the left; centers within 8 px count as one line. */
 export function inversions(stops: Stop[]) {
   const back = (a: number[], b: number[]) => {
     for (let i = 0; i < a.length; i++) {

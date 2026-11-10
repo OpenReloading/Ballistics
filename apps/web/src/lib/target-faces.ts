@@ -107,7 +107,7 @@ export function faceFacets(
     {
       key: 'dist',
       label: msg('Distance'),
-      // keyed by the metres to 0.01 m, so a selection in the URL holds in either range unit
+      // keyed by the meters to 0.01 m, so a selection in the URL holds in either range unit
       values: (r) => [...new Set(r.distances.map((m) => String(Number(m.toFixed(2)))))],
       text: (v) => distance(Number(v)),
       order: (a, b) => Number(a) - Number(b),
@@ -145,7 +145,7 @@ const innerTenRule: Record<'touch' | 'cover', Message> = {
   cover: msg('Counts when covered'),
 }
 
-/** A ring's recorded colours after its label: " (black, line white)". */
+/** A ring's recorded colors after its label: " (black, line white)". */
 const ringColours = (t: Translate, r: TargetFace['rings'][number]) => {
   const parts = [
     r.fill && colourWord(t, r.fill),
@@ -154,7 +154,7 @@ const ringColours = (t: Translate, r: TargetFace['rings'][number]) => {
   return parts.length > 0 ? parts.join(', ') : undefined
 }
 
-/** A ring's label: its value and, where recorded, its colours. */
+/** A ring's label: its value and, where recorded, its colors. */
 const ringLabel = (t: Translate, r: TargetFace['rings'][number]) => {
   const colours = ringColours(t, r)
   return verbatim(
@@ -218,7 +218,7 @@ export function targetFaceGroups(f: Omit<TargetFace, 'provenance'>, t: Translate
               },
             ]
           : []),
-        ...text(msg('Scoring centres on the sheet'), f.bulls && String(f.bulls.length)),
+        ...text(msg('Scoring centers on the sheet'), f.bulls && String(f.bulls.length)),
       ],
     },
     {
@@ -249,7 +249,7 @@ export type FaceEventRow = {
   /** The discipline's name, else the event's. */
   discipline: string
   stage?: string
-  /** As the rule book prints it, else the metres. */
+  /** As the rule book prints it, else the meters. */
   distance: { raw?: string | undefined; metres: number }
   /** Gauge diameter, mm. */
   gauge?: number

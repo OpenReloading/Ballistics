@@ -72,7 +72,7 @@ const exampleShots: [string, number[]][] = [
   ['Example C', [2862, 2855, 2869, 2858, 2871, 2864, 2860, 2866, 2884, 2859]],
 ]
 
-/** The example session of the session summary: three strings of ten made-up shots, labelled as an example. */
+/** The example session of the session summary: three strings of ten made-up shots, labeled as an example. */
 export const exampleCsv = `${[
   'string,velocity,velocityUnit,coldBore,excluded',
   ...exampleShots.flatMap(([label, shots]) =>

@@ -1,6 +1,6 @@
-# Licence policy. Read by the `dependency-review` step of ci.yml (a pull request that adds a package
-# under another licence fails) and by tools/src/licences.ts (the production dependencies of the images).
-# Review of a licence outside the list: a person adds the package to allow-dependencies-licenses with
+# License policy. Read by the `dependency-review` step of ci.yml (a pull request that adds a package
+# under another license fails) and by tools/src/licences.ts (the production dependencies of the images).
+# Review of a license outside the list: a person adds the package to allow-dependencies-licenses with
 # the reason on its line. The review step matches the package by name, any version.
 allow-licenses:
   - MIT
@@ -21,7 +21,7 @@ allow-licenses:
 allow-dependencies-licenses:
   - pkg:npm/caniuse-lite # CC-BY-4.0, a browser-support data table without code
   - pkg:npm/@fontsource-variable/inter # OFL-1.1, the font files of the interface's typeface
-  # the dependency graph reads these as AND or with an extra licence; their package.json says otherwise
+  # the dependency graph reads these as AND or with an extra license; their package.json says otherwise
   - pkg:npm/json-schema # (AFL-2.1 OR BSD-3-Clause), read as AND
   - pkg:npm/path-is-inside # (WTFPL OR MIT), read as AND
   - pkg:npm/unicode-match-property-value-ecmascript # MIT, read with LicenseRef-scancode-unicode

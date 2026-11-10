@@ -19,7 +19,7 @@ const mm = 1e-3
 const off = 1e-6
 const at = (d: number) => ({ x: d * mm, y: 0 })
 
-/** Ring diameters, ring 10 first, in mm as the cited rule-book page prints them; a ring scores for a hole whose edge touches its line (the touch rule of the DSB, BDS, BDMP and VdRBw, and of the DSU outside black powder, which counts the centre: see the black-powder test), so a hole of diameter `hole` at d = R + hole / 2 scores it and a hair further the ring outside, or 0 outside the outermost. */
+/** Ring diameters, ring 10 first, in mm as the cited rule-book page prints them; a ring scores for a hole whose edge touches its line (the touch rule of the DSB, BDS, BDMP and VdRBw, and of the DSU outside black powder, which counts the center: see the black-powder test), so a hole of diameter `hole` at d = R + hole / 2 scores it and a hair further the ring outside, or 0 outside the outermost. */
 function boundaries(id: string, printed: number[], hole: number) {
   const f = face(id)
   expect(f.rings.map((r) => r.diameter.value)).toEqual(printed.toReversed())
@@ -97,7 +97,7 @@ describe('BDMP Sportordnung 24.02.2026, B.11.2 BDMP-Scheibe Nr. 1', () => {
 })
 
 describe('BDMP Sportordnung 24.02.2026, A.3.21.4.1 black-powder disciplines', () => {
-  it('counts the hole centre in PVDG 1, PHDG 1, PFG 1 and SDG 1, and keeps SPPDG 1 on touch', () => {
+  it('counts the hole center in PVDG 1, PHDG 1, PFG 1 and SDG 1, and keeps SPPDG 1 on touch', () => {
     const pistol = face('issf-25m-precision-50m-pistol')
     const rifle = face('issf-300m-rifle')
     const event = (f: TargetFace, key: string) => f.events.find((e) => e.name.includes(key))
@@ -110,14 +110,14 @@ describe('BDMP Sportordnung 24.02.2026, A.3.21.4.1 black-powder disciplines', ()
       expect(event(f, key)?.scoring).toBe('centre')
     expect(event(pistol, 'SPPDG 1')?.scoring).toBe('touch')
 
-    // ten ring R = 25 mm, 10 mm bullet: the centre at 27.5 mm lies on the 9, the edge touches the 10
+    // ten ring R = 25 mm, 10 mm bullet: the center at 27.5 mm lies on the 9, the edge touches the 10
     const centred = scoredHoleDiameter(event(pistol, 'PVDG 1'), 10 * mm)
     const touched = scoredHoleDiameter(event(pistol, 'SPPDG 1'), 10 * mm)
     expect(centred).toBe(0)
     expect(touched).toBe(10 * mm)
     expect(scoreShot(pistol, at(27.5), centred).value).toBe(9)
     expect(scoreShot(pistol, at(27.5), touched).value).toBe(10)
-    // the centre on the ring line counts the ring
+    // the center on the ring line counts the ring
     expect(scoreShot(pistol, at(25), centred).value).toBe(10)
     expect(scoreShot(pistol, at(25 + off), centred).value).toBe(9)
   })
@@ -125,21 +125,21 @@ describe('BDMP Sportordnung 24.02.2026, A.3.21.4.1 black-powder disciplines', ()
 
 describe('DSU Sporthandbuch 2018, DSU-Scheibe 200 Meter Präzision (Seite 19, PDF p. 21)', () => {
   it('draws the French military face: ten 80 mm, spacing 40 mm, scoring area 800 mm', () => {
-    // the ring lines by touch with a 15 mm hole; the black-powder event counts the centre, below
+    // the ring lines by touch with a 15 mm hole; the black-powder event counts the center, below
     boundaries('dsu-french-military-200m', [80, 160, 240, 320, 400, 480, 560, 640, 720, 800], 15)
     expect(face('dsu-french-military-200m').blackDiameter.value).toBe(400)
   })
 
-  it('counts the hole centre in the black-powder events (Kapitel 4, PDF p. 126), not the edge', () => {
+  it('counts the hole center in the black-powder events (Kapitel 4, PDF p. 126), not the edge', () => {
     const f = face('dsu-french-military-200m')
     const event = f.events.find((e) => e.name.startsWith('SVSM'))
     expect(event?.scoring).toBe('centre')
     const hole = scoredHoleDiameter(event, 15 * mm)
     expect(hole).toBe(0)
-    // d = 47.5 mm with a 15 mm hole: the edge touches the 10 ring (R = 40 mm), the centre lies on the 9
+    // d = 47.5 mm with a 15 mm hole: the edge touches the 10 ring (R = 40 mm), the center lies on the 9
     expect(scoreShot(f, at(47.5), 15 * mm).value).toBe(10)
     expect(scoreShot(f, at(47.5), hole).value).toBe(9)
-    // the centre on the ring line counts the ring, a hair outside it does not
+    // the center on the ring line counts the ring, a hair outside it does not
     expect(scoreShot(f, at(40), hole).value).toBe(10)
     expect(scoreShot(f, at(40 + off), hole).value).toBe(9)
     expect(scoreShot(f, at(400), hole).value).toBe(1)
@@ -156,7 +156,7 @@ describe('DSU Sporthandbuch 2018, DSU-Scheibe 200 Meter Präzision (Seite 19, PD
     if (!('error' in scored)) expect(scored.score.total).toBe(9)
   })
 
-  it('stores the centre rule on every DSU, BDMP and DSB black-powder event and the DSB Ordonnanzgewehr, and on no other', () => {
+  it('stores the center rule on every DSU, BDMP and DSB black-powder event and the DSB Ordonnanzgewehr, and on no other', () => {
     const names = faces.flatMap((f) =>
       f.events.filter((e) => e.scoring === 'centre').map((e) => e.name),
     )

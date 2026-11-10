@@ -95,7 +95,7 @@ describe('ransacEllipse', () => {
 })
 
 describe('largestGap', () => {
-  it('is the largest angle without a point around the centre', () => {
+  it('is the largest angle without a point around the center', () => {
     const half = ring(
       { centreX: 0, centreY: 0, semiMajor: 10, semiMinor: 10, angle: 0 },
       50,
@@ -132,7 +132,7 @@ const circleImage = (r: number) => {
 }
 
 describe('concentricPlane', () => {
-  it('finds the centre and the radius ratio of two concentric circles seen in perspective', () => {
+  it('finds the center and the radius ratio of two concentric circles seen in perspective', () => {
     const outer = circleImage(250)
     const inner = circleImage(100)
     const plane = concentricPlane(outer, inner)
@@ -141,7 +141,7 @@ describe('concentricPlane', () => {
     const centre = image(0, 0)
     expect(Math.hypot(plane.centre.x - centre.x, plane.centre.y - centre.y)).toBeLessThan(0.05)
     expect(plane.ratio).toBeCloseTo(2.5, 2)
-    // the centre of the ellipses is not the image of the centre
+    // the center of the ellipses is not the image of the center
     const e = ellipseOf(outer)
     expect(e && Math.hypot(e.centreX - centre.x, e.centreY - centre.y)).toBeGreaterThan(5)
   })

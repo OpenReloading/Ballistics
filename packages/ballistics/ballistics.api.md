@@ -211,7 +211,7 @@ export type ChargeRefusal =
 | 'aboveRange'
 /** The curve crosses the target more than once, so no charge is unique. */
 | 'notMonotone'
-/** The target lies in the range, but no two neighbouring valid runs enclose it. */
+/** The target lies in the range, but no two neighboring valid runs enclose it. */
 | 'bracketFailed'
 /** `maxIterations` runs did not reach the tolerance. */
 | 'toleranceNotReached';

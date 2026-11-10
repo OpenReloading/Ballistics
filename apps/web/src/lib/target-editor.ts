@@ -140,7 +140,7 @@ export const withoutRegions = <S extends Pick<TargetSheet, 'groups'>>(sheet: S):
   }),
 })
 
-/** Group colours in order of creation: the light chart series colours (`--series-*`). */
+/** Group colors in order of creation: the light chart series colors (`--series-*`). */
 export const groupColours = ['#2a78d6', '#eb6834', '#19a371', '#c18300', '#e46494', '#7c4dcc']
 
 export function newGroup(
@@ -220,10 +220,10 @@ export function shotExtentCorners(shots: ShotGroup['shots']): Point[] | undefine
   ]
 }
 
-/** Ellipse coverages drawn, labelled by their coverage (`apps/docs/docs/models/groups.md`, "Dispersion and prediction ellipses"). */
+/** Ellipse coverages drawn, labeled by their coverage (`apps/docs/docs/models/groups.md`, "Dispersion and prediction ellipses"). */
 export const coverages = [0.5, 0.95] as const
 
-/** Ellipse `e` about the group centre as `n` points in target m; undefined without either. */
+/** Ellipse `e` about the group center as `n` points in target m; undefined without either. */
 export function ellipsePoints(
   s: GroupStatistics,
   e: GroupEllipse | undefined,
@@ -239,7 +239,7 @@ export function ellipsePoints(
   })
 }
 
-/** Ends of the principal axis through the centre, as long as the 95 % dispersion ellipse. */
+/** Ends of the principal axis through the center, as long as the 95 % dispersion ellipse. */
 export function axisEnds(s: GroupStatistics): [Point, Point] | undefined {
   const e = dispersionEllipse(s, nth(coverages, coverages.length - 1))
   if (!e || !s.centre || s.principalAxisAngle === undefined) return undefined

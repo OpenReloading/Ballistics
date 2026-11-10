@@ -50,7 +50,7 @@ Code: `packages/drawing/src/seating/seating.ts`, `seat` (`basePosition`, `depthV
 
 ### Bullet volume below the mouth
 
-The bullet outline is a half profile $r(z)$, a polyline through points $(r_k, z_k)$ that `bulletOutline` builds from the bullet's dimensions, closed along the axis. It starts at the base centre, or at the apex of the cavity of a hollow base, and ends at the tip. The volume below the mouth is the sum of the frustums of revolution of its segments up to $c = \min(\max(s, 0), L_b)$. A segment running up adds its frustum and a segment running down, the wall of a cavity, takes it off:
+The bullet outline is a half profile $r(z)$, a polyline through points $(r_k, z_k)$ that `bulletOutline` builds from the bullet's dimensions, closed along the axis. It starts at the base center, or at the apex of the cavity of a hollow base, and ends at the tip. The volume below the mouth is the sum of the frustums of revolution of its segments up to $c = \min(\max(s, 0), L_b)$. A segment running up adds its frustum and a segment running down, the wall of a cavity, takes it off:
 
 $$
 V_b = \sum_k \sigma_k \frac{\pi}{3} (z'_\mathrm{hi} - z_\mathrm{lo}) \left(r_\mathrm{lo}^2 + r_\mathrm{lo} r'_\mathrm{hi} + {r'_\mathrm{hi}}^2\right), \qquad z'_\mathrm{hi} = \min(z_\mathrm{hi}, c)
@@ -222,7 +222,7 @@ The workbench matches the contact to the chosen bullet in `landsFor` (`apps/web/
 
 ### Seating ladder
 
-A seating ladder runs the interior model at seating lengths spaced by $\Delta$ up, down or centred on the start, each with its own $V_c$ and $x_e$:
+A seating ladder runs the interior model at seating lengths spaced by $\Delta$ up, down or centered on the start, each with its own $V_c$ and $x_e$:
 
 $$
 \ell_i = \begin{cases} \ell_0 + i\,\Delta & \text{up} \\ \ell_0 - i\,\Delta & \text{down} \\ \ell_0 + \left(i - \frac{N - 1}{2}\right) \Delta & \text{around} \end{cases} \qquad i = 0, \dots, N - 1
@@ -290,7 +290,7 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
   - Bullet materials: the capacity uses the outline, not mass and density. A jacket share of 0.15 to 0.35 of the bullet mass moves the density of the bullet mix by ±2.6 % (unverified); no published jacket share was found.
   - Firings: 49.14 gr of water after one firing and 49.05 gr after four (n = 50), 0.18 % less capacity and 0.34 % more pressure (forum figures, unverified).
   - Plating: +0.33 % pressure at 5 µm (unverified). Case mass: a standard deviation of 0.41 gr (unverified) is 0.0031 cm³ of brass at 8.5 g/cm³, about 0.10 % of the 3.19 cm³ that 49.14 gr of water fill.
-  - Case material: the only capacity claim found is a maker's statement, relayed by [Merrill 2017](../bibliography.md#merrill-2017), that a nickel-alloy 9 mm case with an aluminium head holds about 2 % more than brass (unverified). The `material` values of a case record have no nickel alloy.
+  - Case material: the only capacity claim found is a maker's statement, relayed by [Merrill 2017](../bibliography.md#merrill-2017), that a nickel-alloy 9 mm case with an aluminum head holds about 2 % more than brass (unverified). The `material` values of a case record have no nickel alloy.
 
 ## Sources
 

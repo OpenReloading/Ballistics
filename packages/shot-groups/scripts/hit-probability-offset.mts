@@ -50,12 +50,12 @@ for (const dOverR of [0.5, 1, 1.5, 2, 3]) {
   )
 }
 
-console.log('size of the centred assumption: probability with the offset over the centred one')
+console.log('size of the centered assumption: probability with the offset over the centered one')
 for (const r of radii) {
   const centred = ellipseProbability(r, r, sigma)
   const shifted = ellipseProbability(r, r, sigma, { dx: 0.5, dy: 0 })
   console.log(
-    `R/sigma ${r}: centred ${centred.toFixed(4)}, d = 0.5 sigma ${shifted.toFixed(4)}, ratio ${(shifted / centred).toFixed(4)}, difference ${(100 * (shifted - centred)).toFixed(2)} pp`,
+    `R/sigma ${r}: centered ${centred.toFixed(4)}, d = 0.5 sigma ${shifted.toFixed(4)}, ratio ${(shifted / centred).toFixed(4)}, difference ${(100 * (shifted - centred)).toFixed(2)} pp`,
   )
 }
 

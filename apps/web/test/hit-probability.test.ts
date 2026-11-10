@@ -47,7 +47,7 @@ describe('impactSensitivity', () => {
     { range: 300, height: -0.4 },
   ] as TrajectoryPoint[]
 
-  it('takes the displacement from the windage hold and the slope from the neighbours', () => {
+  it('takes the displacement from the windage hold and the slope from the neighbors', () => {
     const s = impactSensitivity(points, [0.00001, 0.00002, 0.00003], 1)
     expect(s?.perCrosswind).toBeCloseTo(0.004, 12)
     expect(s?.verticalPerMetre).toBeCloseTo(-0.002, 12)

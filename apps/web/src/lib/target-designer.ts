@@ -24,7 +24,7 @@ import {
 import { roundedFieldText, type UnitSystem } from './units.ts'
 import { buildFace } from './user-faces.ts'
 
-/** Colours a ring zone or line can take, the face schema's. */
+/** Colors a ring zone or line can take, the face schema's. */
 export const colours = faceColour.options
 
 export type InnerRule = '' | 'touch' | 'cover'
@@ -42,7 +42,7 @@ interface Event {
   name: string
 }
 
-/** The draft: texts and colours as entered, numbers as fields (`black.*` and `inner.*` for the areas). */
+/** The draft: texts and colors as entered, numbers as fields (`black.*` and `inner.*` for the areas). */
 export interface Design {
   name: string
   rows: Row[]
@@ -82,7 +82,7 @@ const eventKeys = (id: string) => ['distance', 'gauge'].map((k) => `event.${id}.
 
 const empty = (d: Design, keys: string[]) => keys.every((k) => fieldAt(d, k).text.trim() === '')
 
-/** A ring row with no number, colour or line entered: it is not part of the face. */
+/** A ring row with no number, color or line entered: it is not part of the face. */
 const blankRing = (d: Design, r: Row) => empty(d, ringKeys(r.id)) && !r.fill && !r.line
 const blankEvent = (d: Design, e: Event) => empty(d, eventKeys(e.id)) && e.name.trim() === ''
 

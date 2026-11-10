@@ -138,7 +138,7 @@ describe('fit of the typed strings', () => {
 
 describe('a parameter the data cannot separate', () => {
   it('is named weak or unresolved and shows no value', () => {
-    // one impact distance: no clicks dialled, and speed and drag cannot be told apart
+    // one impact distance: no clicks dialed, and speed and drag cannot be told apart
     const input = { ...measured([300], []), chrono: blankChrono }
     const fit = fitSession(nominal, input, english.t)
     if (!('answer' in fit)) throw new Error(fit.problem(english.t))

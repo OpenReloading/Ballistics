@@ -97,7 +97,7 @@ Measurement data imported as values carry their license: public domain in the US
 - <a id="steffen-1990"></a>**Steffen 1990.** M. Steffen: "A simple method for monotonic interpolation in one dimension". _Astronomy and Astrophysics_ 239, 1990, 443-450.
 - <a id="tanaka-2001"></a>**Tanaka 2001.** M. Tanaka, G. Girard, R. Davis, A. Peuto, N. Bignell: _Recommended table for the density of water between 0 °C and 40 °C based on recent experimental reports_. Metrologia 38(4), 301-309, 2001. doi:10.1088/0026-1394/38/4/3. <https://doi.org/10.1088/0026-1394/38/4/3>
 - <a id="van-herk-1992"></a>**van Herk 1992.** M. van Herk: _A fast algorithm for local minimum and maximum filters on rectangular and octagonal kernels_. Pattern Recognition Letters 13(7), 517-521, 1992. doi:10.1016/0167-8655(92)90069-C. <https://doi.org/10.1016/0167-8655(92)90069-C>
-- <a id="vuong-2026"></a>**Vuong 2026.** T. D. Vuong, V. H. Nguyen, T. L. Khuong, V. D. Nguyen: _Interior ballistics modelling of a rifled barrel with cumulative wear effects_. Military Technical Courier (Vojnotehnički glasnik) 74(1), 2026, online first. doi:10.5937/vojtehg75-64184. Licence CC BY 4.0. <https://doi.org/10.5937/vojtehg75-64184>
+- <a id="vuong-2026"></a>**Vuong 2026.** T. D. Vuong, V. H. Nguyen, T. L. Khuong, V. D. Nguyen: _Interior ballistics modelling of a rifled barrel with cumulative wear effects_. Military Technical Courier (Vojnotehnički glasnik) 74(1), 2026, online first. doi:10.5937/vojtehg75-64184. License CC BY 4.0. <https://doi.org/10.5937/vojtehg75-64184>
 - <a id="winterton-1998"></a>**Winterton 1998.** R. H. S. Winterton: _Where did the Dittus and Boelter equation come from?_ International Journal of Heat and Mass Transfer 41, 1998, pp. 809-810. doi:10.1016/S0017-9310(97)00177-4. <https://doi.org/10.1016/S0017-9310(97)00177-4>
 
 ## Standards, rule books and technical sheets
@@ -131,7 +131,7 @@ Measurement data imported as values carry their license: public domain in the US
 
 ## Component data sources
 
-Cited by the manufacturer and case capacity records, grouped by maker, then the project's own methods and the Wikipedia pages (CC BY-SA 4.0) that case capacities cite. The makers hold the rights to their publications, and the records carry no project licence on what the makers published (`packages/catalog/LICENSE`). The records may keep selected source wording in fields such as `raw` and `note`; no source table or figure is copied.
+Cited by the manufacturer and case capacity records, grouped by maker, then the project's own methods and the Wikipedia pages (CC BY-SA 4.0) that case capacities cite. The makers hold the rights to their publications, and the records carry no project license on what the makers published (`packages/catalog/LICENSE`). The records may keep selected source wording in fields such as `raw` and `note`; no source table or figure is copied.
 
 ### ADI World Class Powders
 

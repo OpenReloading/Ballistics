@@ -12,7 +12,7 @@ Exterior ballistics: how far apart are the two reference atmospheres a BC can na
 
 ## Method
 
-Density: ICAO sea-level density from the constants of `icao` against 0.075126 lb/ft³ converted with the exact pound and foot. Sound speed: 1120.27 ft/s against the dry ICAO value. Curvature: a throwaway copy of the compiled solver whose gravity points from the bullet to the Earth's centre, $R$ = 6357 km, constant magnitude, against the unchanged solver. G7 BC 0.3 lb/in², 11.3 g, 7.82 mm, 850 m/s, sight height 50 mm, zero at 100 m, ICAO sea level, no Coriolis. Accept rule decided in advance: add curvature numbers to the model only if the height at 1000 m moves by more than 0.1 mrad.
+Density: ICAO sea-level density from the constants of `icao` against 0.075126 lb/ft³ converted with the exact pound and foot. Sound speed: 1120.27 ft/s against the dry ICAO value. Curvature: a throwaway copy of the compiled solver whose gravity points from the bullet to the Earth's center, $R$ = 6357 km, constant magnitude, against the unchanged solver. G7 BC 0.3 lb/in², 11.3 g, 7.82 mm, 850 m/s, sight height 50 mm, zero at 100 m, ICAO sea level, no Coriolis. Accept rule decided in advance: add curvature numbers to the model only if the height at 1000 m moves by more than 0.1 mrad.
 
 ## Formulas
 

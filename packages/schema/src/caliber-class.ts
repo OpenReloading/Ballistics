@@ -30,8 +30,8 @@ export const caliberClass: z.ZodObject<
     /**
      * Nominal bullet diameter. For cartridges it is the maximum projectile diameter G1 of the
      * cartridge side of the CIP sheet (the heading "Projectile" of the sheet layout); .22 rimfire
-     * takes the calibre 5.6 mm of the rule books, since G1 of the .22 Long Rifle sheet equals the case
-     * diameter H2 (heeled bullet). Airgun pellets carry the calibre of the rule book.
+     * takes the caliber 5.6 mm of the rule books, since G1 of the .22 Long Rifle sheet equals the case
+     * diameter H2 (heeled bullet). Airgun pellets carry the caliber of the rule book.
      */
     diameter: QuantitySchema
     /** Ids of the cartridge records in the class; empty where the class has no CIP cartridge. */

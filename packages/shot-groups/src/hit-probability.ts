@@ -43,7 +43,7 @@ export interface DispersionInput {
   range?: {
     /** Standard deviation of the range to the target, m. */
     sd: number
-    /** Change of the height of impact per metre of range at the distance, m/m. */
+    /** Change of the height of impact per meter of range at the distance, m/m. */
     verticalPerMetre: number
   }
   /** Spread of the muzzle speed; absent: none, and the group is scaled as a whole. */
@@ -105,7 +105,7 @@ export function pointDispersion(i: DispersionInput): DispersionResult {
 /** Points of the composite Simpson rule of {@link ellipseProbability}, even. */
 const simpsonIntervals = 2000
 
-/** The mean of the point of impact against the aim point: group centre minus point of aim, m (x right, y up). */
+/** The mean of the point of impact against the aim point: group center minus point of aim, m (x right, y up). */
 export interface PointOffset {
   dx: number
   dy: number
@@ -114,7 +114,7 @@ export interface PointOffset {
 /** Standard normal distribution function, from the chi-square distribution of one degree of freedom. */
 const normalCdf = (z: number) => 0.5 * (1 + Math.sign(z) * chiSquareCdf(z * z, 1))
 
-/** A bivariate normal with SDs `horizontal` and `vertical` and no correlation, centred on the aim point or on `offset` from it, inside the ellipse of semi-axes `a` (x) and `b` (y) about the aim point: with x = a sin t the integrand is smooth, truncated at 8 standard deviations of x about the centre. */
+/** A bivariate normal with SDs `horizontal` and `vertical` and no correlation, centered on the aim point or on `offset` from it, inside the ellipse of semi-axes `a` (x) and `b` (y) about the aim point: with x = a sin t the integrand is smooth, truncated at 8 standard deviations of x about the center. */
 export function ellipseProbability(
   a: number,
   b: number,
@@ -179,7 +179,7 @@ export interface HitResult {
   zones: { value: number; probability: number }[]
 }
 
-/** On nested zones, outermost first, a shot inside a zone and outside the next scoring the value of the first; `offset` is the centre of the point of impact against the aim point, absent on the aim point. */
+/** On nested zones, outermost first, a shot inside a zone and outside the next scoring the value of the first; `offset` is the center of the point of impact against the aim point, absent on the aim point. */
 export function hitProbability(
   zones: readonly ScoringZone[],
   d: PointDispersion,

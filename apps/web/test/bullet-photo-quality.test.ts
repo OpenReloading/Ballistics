@@ -53,7 +53,7 @@ function once<A, R>(f: (a: A) => R): (a: A) => R {
   }
 }
 
-/** The photograph of `s` cut out (by luma, or by colour where luma does not tell), outlined and measured, with the exact scale of its ruler. */
+/** The photograph of `s` cut out (by luma, or by color where luma does not tell), outlined and measured, with the exact scale of its ruler. */
 const measured = once((s: PhotoSpec) => {
   const photo = renderPhoto(s)
   const span = defined(photo.span)
@@ -98,7 +98,7 @@ describe('a photograph that is hard to cut out', () => {
     expect(Math.abs(r.outline.length / r.scale.pxPerMm - 30)).toBeLessThan(0.2)
   })
 
-  it('tells a bullet from a background of the same brightness by colour', () => {
+  it('tells a bullet from a background of the same brightness by color', () => {
     const r = measured(spec({ bullet: 190, chroma: 40 }))
     expect(segment(grayOf(r.photo.image)).warnings.length).toBeGreaterThan(0)
     expect(Math.abs(r.outline.length / r.scale.pxPerMm - 30)).toBeLessThan(0.2)

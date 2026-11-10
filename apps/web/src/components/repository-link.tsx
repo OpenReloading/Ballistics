@@ -5,7 +5,7 @@ import { msg } from '../i18n/translate.ts'
 
 const label = msg('Source code on GitHub')
 
-/** An icon next to the theme switch from 75em, a labelled row in the phone drawer; nothing without a URL. */
+/** An icon next to the theme switch from 75em, a labeled row in the phone drawer; nothing without a URL. */
 export function RepositoryLink({
   url,
   drawer,

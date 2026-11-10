@@ -18,7 +18,7 @@ Partial heats (kJ/kg, liquid water): nitrocellulose 3358 at 11.5 % N, 3944 at 12
 
 Compositions: the powder records with a published composition range (not in the repository), mean of the range vertices, nitrogen 13.0 %, records with the same composition counted once. Selection: those whose ingredients without a listed partial heat sum to at most 5 % at their upper bounds; those ingredients are removed and the rest renormalised for both sides. The cut was widened to 5 % after a first pass at 2.5 %, with repeated compositions kept, had shown its gaps and gave only three distinct compositions. Seven distinct compositions qualify (ten were asked for).
 
-Computed heat: a local calculation (the equilibrium of [thermochemistry reference case](thermochemistry-reference-case.md)) at 100 kg/m3, composition frozen at 1500 K, products cooled to 298.15 K with water liquid (vaporisation 44.0 kJ/mol). Metric: sum over computed heat minus one. Rule: within 2 % passes; above 5 % the convention gap is documented.
+Computed heat: a local calculation (the equilibrium of [thermochemistry reference case](thermochemistry-reference-case.md)) at 100 kg/m3, composition frozen at 1500 K, products cooled to 298.15 K with water liquid (vaporization 44.0 kJ/mol). Metric: sum over computed heat minus one. Rule: within 2 % passes; above 5 % the convention gap is documented.
 
 ## Formulas
 
@@ -26,7 +26,7 @@ Heat of explosion: the energy of the ingredients at 298.15 K minus the energy of
 
 ## Numbers
 
-Gap per composition, percent: -3.34, -3.13, -2.71, -1.65, -1.00, -0.23, +0.10. Maximum 3.34 %, median 1.65 %. Removed share 0 to 2.5 %. Single-base compositions with stabiliser and plasticiser show the largest gaps; double-base ones are within 1 %.
+Gap per composition, percent: -3.34, -3.13, -2.71, -1.65, -1.00, -0.23, +0.10. Maximum 3.34 %, median 1.65 %. Removed share 0 to 2.5 %. Single-base compositions with stabilizer and plasticizer show the largest gaps; double-base ones are within 1 %.
 
 Checks of the computed heat: nitroglycerine 6767 kJ/kg, nitrocellulose 4437 kJ/kg at 13.3 % N and 4006 kJ/kg at 12.5 % N.
 

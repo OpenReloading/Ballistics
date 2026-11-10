@@ -10,7 +10,7 @@ export const minGroups = 3
 /** Shots with a velocity a group needs to enter the note. */
 export const minShots = 5
 
-/** One charge of the note: the residual centre, its standard error and the shots behind it, m. */
+/** One charge of the note: the residual center, its standard error and the shots behind it, m. */
 interface ImpactPoint {
   charge: number
   centre: number

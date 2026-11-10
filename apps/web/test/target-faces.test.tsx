@@ -185,7 +185,7 @@ it('draws the face: the black area, a line per ring and the inner ten, white ins
   for (const [, r, colour] of lines) expect(colour).toBe(Number(r) <= 100 ? 'white' : 'black')
 })
 
-it('draws recorded zone colours: a white ten inside a black ring, its lines white on the black', () => {
+it('draws recorded zone colors: a white ten inside a black ring, its lines white on the black', () => {
   const out = renderToStaticMarkup(<TargetFaceDrawing face={faceById('vdrbw-bw-nr2')} />)
   expect(out).toContain('<ellipse rx="50" ry="50" fill="white"')
   expect(out).toContain('<ellipse rx="100" ry="100" fill="black"')

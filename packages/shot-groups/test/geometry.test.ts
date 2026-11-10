@@ -104,7 +104,7 @@ describe('linear systems', () => {
 })
 
 describe('turning the photo', () => {
-  it('turns a point about a centre, counter-clockwise on screen with y down', () => {
+  it('turns a point about a center, counter-clockwise on screen with y down', () => {
     const p = turnPoint({ x: 3, y: 1 }, { x: 1, y: 1 }, Math.PI / 2)
     expect(p.x).toBeCloseTo(1, 12)
     expect(p.y).toBeCloseTo(-1, 12)
@@ -178,7 +178,7 @@ describe('solveHomography', () => {
 })
 
 describe('circleThrough', () => {
-  it('finds centre and radius', () => {
+  it('finds center and radius', () => {
     const c = circleThrough({ x: 15, y: 2 }, { x: 10, y: 7 }, { x: 5, y: 2 })
     expect(dist(c.centre, { x: 10, y: 2 })).toBeLessThan(1e-12)
     expect(c.radius).toBeCloseTo(5, 12)
@@ -215,7 +215,7 @@ describe('calibrate', () => {
     expect(dist(toImage(c, { x: 1, y: 2 }), { x: 1010, y: 780 })).toBeLessThan(1e-9)
   })
 
-  it('scales from a ring centre and a point on it, or three points on it', () => {
+  it('scales from a ring center and a point on it, or three points on it', () => {
     const centre = { x: 500, y: 500 }
     const byCentre = calibrate(
       [{ kind: 'ringCentre', centre, edge: ringPoint(1), diameter: 50 }],

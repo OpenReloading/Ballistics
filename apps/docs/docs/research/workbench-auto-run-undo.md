@@ -1,7 +1,7 @@
 ---
 
 title: Automatic run and undo on the workbench
-description: Run times of the workbench in Chromium at CPU throttle 1, 4 and 6, four ways to start a run, the layout shift each gives, and the step rules and shortcut behaviour of an undo history for the load inputs.
+description: Run times of the workbench in Chromium at CPU throttle 1, 4 and 6, four ways to start a run, the layout shift each gives, and the step rules and shortcut behavior of an undo history for the load inputs.
 ---
 
 # Automatic run and undo on the workbench
@@ -50,7 +50,7 @@ Variants (single charge unless named). Layout shift of the input column, the met
 
 | Variant                                | `4x` typed (the field keeps `4`)        | Two edits in a row | Edit during a run                                                    | Stale marker                              | Verdict                                                                                     |
 | -------------------------------------- | --------------------------------------- | ------------------ | -------------------------------------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Run only                               | no run                                  | no run             | not applicable                                                       | stays until Run                           | passes, today's behaviour                                                                   |
+| Run only                               | no run                                  | no run             | not applicable                                                       | stays until Run                           | passes, today's behavior                                                                    |
 | Automatic after a pause                | runs with 4 gr after the pause          | one run            | ladder: cancelled, one run follows; single charge: the run had ended | shown in the pause, cleared by the result | fails the half-typed rule (the retained 4 starts a run); blocks input on the phone stand-in |
 | Automatic as a setting, off by default | off: as Run only; on: as after a pause  | on: one run        | on: as after a pause                                                 | as after a pause                          | as after a pause when on                                                                    |
 | Automatic for the plain run only       | plain: as after a pause; ladder: no run | plain: one run     | plain: the run had ended                                             | plain: cleared; ladder: stays             | as after a pause for the plain load, Run only for a ladder                                  |

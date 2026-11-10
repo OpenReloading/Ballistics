@@ -80,7 +80,7 @@ type Note = string | ((length: LengthText) => string)
 export interface Outline {
   /**
    * Half profile [r, z] to the tip on the axis, closed along the axis. It starts at the base
-   * centre (z = 0), or at the apex of a hollow base's cavity, which the profile follows down to the
+   * center (z = 0), or at the apex of a hollow base's cavity, which the profile follows down to the
    * base face (`baseEdge`); from there z never falls.
    */
   points: SectionPoint[]
@@ -105,7 +105,7 @@ export interface Outline {
   volume: number
   /** Area of the full axial section, mm². */
   area: number
-  /** z of the centre of the section area, mm. */
+  /** z of the center of the section area, mm. */
   areaCentreZ: number
   /** z where a polymer tip leaves the jacket. */
   tipStart?: number
@@ -817,7 +817,7 @@ function noseCurve(b: BulletDimensions, n: number, m: number, notes: Note[]): No
   const zSteps = Array.from({ length: steps }, (_, j) => z0 + (n * (j + 1)) / steps)
   // a vanishing Rt/R is the cone; a secant circle of radius near 1e12 mm loses precision
   if (used < 1e-6) return { rAt: (z) => a - (k * (z - z0)) / n, zs: zSteps, extra: [], formTag }
-  // circle of radius R through the shank end and the meplat edge, centre on the axis side
+  // circle of radius R through the shank end and the meplat edge, center on the axis side
   const R = rt / used
   if (form === 'hybrid') return hybridNose({ L, a, z0, m, rt, R }, zSteps, formTag, notes)
   const c = Math.hypot(k, n)
@@ -976,7 +976,7 @@ function addNose({ L, z0, noseTag, samples, rAt, m, mTag }: Parts, add: AddPoint
   }
 }
 
-/** The hollow-point mouth and the meplat's centre on the meplat line. */
+/** The hollow-point mouth and the meplat's center on the meplat line. */
 function addMeplat({ L, given, m, mTag, mouth, mouthTag }: Parts, add: AddPoint) {
   if (mouth > 0 && mouth < m)
     add([mouth, L], mouthTag, mTag === 'approximate' || mouthTag === 'approximate')
@@ -995,7 +995,7 @@ function strokedRuns(points: SectionPoint[], edges: boolean[]) {
   return segments
 }
 
-/** From the base centre (or the apex of the cavity) to the tip on the axis, each with its tag and whether the edge reaching it is approximate, plus the stroked runs, the z ranges drawn from an assumed shape and the index of the base face's edge. */
+/** From the base center (or the apex of the cavity) to the tip on the axis, each with its tag and whether the edge reaching it is approximate, plus the stroked runs, the z ranges drawn from an assumed shape and the index of the base face's edge. */
 function assemblePoints(parts: Parts) {
   const { a, L, base, groove, z0, nTag, noseTag } = parts
   const { t } = base
@@ -1029,7 +1029,7 @@ function assemblePoints(parts: Parts) {
   return { points, tags, segments, approximate, baseEdge }
 }
 
-/** Area of the full axial section, mm², and the z of its centre, mm, of a half profile closed along the axis. */
+/** Area of the full axial section, mm², and the z of its center, mm, of a half profile closed along the axis. */
 function sectionProperties(points: SectionPoint[]) {
   let half = 0
   let moment = 0

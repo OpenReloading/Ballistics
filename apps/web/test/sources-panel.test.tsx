@@ -70,7 +70,7 @@ it('is a table of source, retrieval day, license and the fields it covers, a col
     /Source<\/th><th[^>]*>Origin<\/th><th[^>]*>Retrieved<\/th><th[^>]*>License<\/th><th[^>]*>Covers<\/th><\/tr>/,
   )
   expect(html).toContain('2 fields')
-  // no kind: the keys humanised
+  // no kind: the keys humanized
   expect(html).toContain('Diameter, Mass')
   expect(render(sheet)).not.toContain('Origin')
   expect(render(sheet)).not.toContain('Covers')
@@ -86,7 +86,7 @@ it('is a table of source, retrieval day, license and the fields it covers, a col
   expect(both).toContain('1 field')
 })
 
-it("names the fields a source covers by the record kind's field labels, a key without one humanised", () => {
+it("names the fields a source covers by the record kind's field labels, a key without one humanized", () => {
   const html = renderToStaticMarkup(
     <MantineProvider>
       <Sources

@@ -299,7 +299,7 @@ describe('priors coverage', () => {
 })
 
 describe('priors maximum a posteriori center', () => {
-  // one impact at the zero range, linear: impact = 100 m * e, 4 shots of 0.016 m give the row a standard uncertainty of 0.008 m, so e = y / 100 with sigma_d = 8e-5 rad; with the prior e ~ N(0, s^2) the posterior is Gaussian, precision 1 / sigma_d^2 + 1 / s^2, centre e* = (y / 100) * s^2 / (s^2 + sigma_d^2), SD sigma_d * s / sqrt(sigma_d^2 + s^2)
+  // one impact at the zero range, linear: impact = 100 m * e, 4 shots of 0.016 m give the row a standard uncertainty of 0.008 m, so e = y / 100 with sigma_d = 8e-5 rad; with the prior e ~ N(0, s^2) the posterior is Gaussian, precision 1 / sigma_d^2 + 1 / s^2, center e* = (y / 100) * s^2 / (s^2 + sigma_d^2), SD sigma_d * s / sqrt(sigma_d^2 + s^2)
   const sigmaD = 8e-5
 
   it.each([
@@ -322,8 +322,8 @@ describe('priors maximum a posteriori center', () => {
     expect(p.value as number).toBeGreaterThan(0)
   })
 
-  it('covers the truth with the posterior centre and width, the data value does not', () => {
-    // truth drawn from the prior with s = sigma_d: the data value y / 100 has an error of sigma_d, the posterior centre one of sigma_d / sqrt(2), the posterior half-width is 1.96 sigma_d / sqrt(2): about 0.95 for the centre, about 0.83 for the data value
+  it('covers the truth with the posterior center and width, the data value does not', () => {
+    // truth drawn from the prior with s = sigma_d: the data value y / 100 has an error of sigma_d, the posterior center one of sigma_d / sqrt(2), the posterior half-width is 1.96 sigma_d / sqrt(2): about 0.95 for the center, about 0.83 for the data value
     const seeds = 300
     let centre = 0
     let dataValue = 0

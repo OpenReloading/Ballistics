@@ -47,7 +47,7 @@ export interface BurnForm {
 
 const one = () => 1
 
-/** Area of the intersection of two disks of radii r1, r2 with centre distance d. */
+/** Area of the intersection of two disks of radii r1, r2 with center distance d. */
 export function lensArea(r1: number, r2: number, d: number): number {
   if (d >= r1 + r2) return 0
   if (d <= Math.abs(r1 - r2)) return Math.PI * Math.min(r1, r2) ** 2

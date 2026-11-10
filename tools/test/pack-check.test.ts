@@ -169,7 +169,7 @@ it('reads a files entry with a trailing slash as its folder', () => {
   expect(packProblems(dir)).toEqual([])
 })
 
-it('packs a licence without an extension and a source map without sources', () => {
+it('packs a license without an extension and a source map without sources', () => {
   const dir = pkg(
     { ...manifest, files: ['dist'] },
     { LICENSE: 'MIT', 'dist/index.js': '', 'dist/index.d.ts': '', 'dist/index.js.map': '{}' },
@@ -196,7 +196,7 @@ it('finds the sources of a source map under its source root', () => {
 })
 
 it('counts only whole names as always packed', () => {
-  // `main` is packed whatever `files` says; neither name is a licence
+  // `main` is packed whatever `files` says; neither name is a license
   for (const main of ['licenses.js', 'docs/old-readme.md']) {
     const dir = pkg(
       { ...manifest, main },

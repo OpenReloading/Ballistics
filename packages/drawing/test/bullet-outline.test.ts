@@ -32,7 +32,7 @@ const reason = (b: BulletDimensions) => {
 const nose = (o: Outline) =>
   o.points.filter(([r, z]) => z > (o.points.at(-1)?.[1] ?? 0) - o.noseLength && r > 0)
 
-/** Centre and radius of the circle through three points, [r, z]. */
+/** Center and radius of the circle through three points, [r, z]. */
 function circle([p, q, s]: [SectionPoint, SectionPoint, SectionPoint]): {
   c: SectionPoint
   r: number
@@ -88,7 +88,7 @@ const base: BulletDimensions = {
 const tangentRadius = (n: number, k: number) => (n ** 2 + k ** 2) / (2 * k)
 
 describe('nose forms', () => {
-  it('tangent: every nose point lies on the circle of radius Rt centred level with the shank end', () => {
+  it('tangent: every nose point lies on the circle of radius Rt centered level with the shank end', () => {
     const b = { ...base, meplatDiameter: 1, ogive: { form: 'tangent' } }
     const o = drawn(b)
     const k = a - 0.5
@@ -133,7 +133,7 @@ describe('nose forms', () => {
     expect(reason({ ...base, ogive: { radius: 2 * rt, radiusRatio: 0.7 } })).toMatch(/Rt\/R/)
   })
 
-  it('cone at Rt/R 0: volume and area centre of a cylinder and a cone', () => {
+  it('cone at Rt/R 0: volume and area center of a cylinder and a cone', () => {
     const [s, n] = [12.497, 20.193]
     const o = drawn({ ...base, meplatDiameter: 0, ogive: { radiusRatio: 0 } })
     for (const [r, z] of nose(o)) expect(r).toBeCloseTo(a * (1 - (z - s) / n), 9)
