@@ -45,7 +45,7 @@ writeFileSync(
     <link rel="stylesheet" href="./tokens.css" />
     <style>
       body { margin: 0; background: var(--surface); }
-      .bar { margin: 0; padding: 0.5rem 1rem; font: 14px/1.4 system-ui, sans-serif; color: var(--ink); background: var(--surface); border-bottom: 1px solid var(--line); }
+      .bar { margin: 0; padding: 0.5rem 1rem; font: 14px/1.4 var(--font-family-system); color: var(--ink); background: var(--surface); border-bottom: 1px solid var(--line); }
       .bar a { color: var(--link); }
     </style>
     <script>
