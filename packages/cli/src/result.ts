@@ -53,6 +53,32 @@ const metrics = z.object({
 /** Metrics of one group. */
 export type Metrics = z.infer<typeof metrics>
 
+const pressureFit = z
+  .object({
+    sigma: fraction.describe(
+      'Pressure sigma of each row, a fraction of its printed pressure over the factor of its basis.',
+    ),
+    factors: z
+      .record(
+        z.string(),
+        z.object({
+          factor: z
+            .number()
+            .describe(
+              'The model peak pressure times this is what the basis reads: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only.',
+            ),
+          rows: count.describe('Pressure rows of the basis of the powders fitted to velocities.'),
+        }),
+      )
+      .describe(
+        'By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its training pressures are not read.',
+      ),
+  })
+  .optional()
+  .describe(
+    'With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its basis.',
+  )
+
 const evaluation = z.object({
   model: z.string().describe('The name or module path the model was selected by.'),
   modelVersion: z
@@ -93,6 +119,18 @@ const evaluation = z.object({
       notFitted: z
         .partialRecord(z.enum(notFittedReasons), count)
         .describe('Powders not fitted, by reason; a reason without powders is left out.'),
+      exponent: z
+        .object({
+          pooled: z
+            .number()
+            .describe('The exponent of least mean chi square over all powders that entered.'),
+          families: z
+            .record(z.string(), z.number())
+            .describe('By powder family, the exponent it chose.'),
+        })
+        .optional()
+        .describe('With `--exponent family`: the pressure exponents of the fit.'),
+      pressure: pressureFit,
       energy: z
         .object({
           factor: z
@@ -104,7 +142,7 @@ const evaluation = z.object({
     })
     .optional()
     .describe(
-      'With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`.',
+      "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`. With `--pressure-sigma`, `pressure` holds the basis factors of the fit; the pressure errors still compare the model's peak pressure as it is with the printed pressure.",
     ),
 })
 
@@ -195,6 +233,34 @@ const fitResult = z.object({
     ),
   split: z.literal('training').describe('The split whose rows the fit reads.'),
   velocitySigma: fraction.describe('Velocity sigma of each row, a fraction of its velocity.'),
+  exponent: z
+    .object({
+      grid: z.array(z.number()).describe('The exponents chosen from.'),
+      shrinkage: z.number().describe("Weight of the pooled term in a family's choice, in powders."),
+      pooled: z
+        .number()
+        .describe('The exponent of least mean chi square over all powders that entered.'),
+      families: z
+        .record(
+          z.string(),
+          z.object({
+            exponent: z
+              .number()
+              .describe(
+                "The exponent of least sum of its powders' chi squares plus `shrinkage` times the mean over all powders that entered.",
+              ),
+            powders: count.describe('Its powders that entered the sum.'),
+          }),
+        )
+        .describe(
+          'By powder family, `<propellant base>/<grain form>` of the powder record. A powder enters the sums when it was fitted at every exponent of the grid.',
+        ),
+    })
+    .optional()
+    .describe(
+      'With `--exponent family`: the pressure exponent each powder family chose; each powder is fitted at the exponent of its family.',
+    ),
+  pressure: pressureFit,
   powders: z
     .record(
       z.string(),
@@ -209,7 +275,11 @@ const fitResult = z.object({
               ),
           })
           .describe('The record burn coefficient times `factor`.'),
-        factor: z.number().describe('Fitted over record burn coefficient.'),
+        factor: z
+          .number()
+          .describe(
+            'Fitted over record burn coefficient; with another exponent than the record it also holds the change of the meaning of the coefficient.',
+          ),
         rows: count.describe('Used training rows of the powder.'),
         cartridges: count.describe('Their distinct cartridges.'),
         chiSquarePerDegree: z
@@ -219,6 +289,17 @@ const fitResult = z.object({
             'Chi square of every row, data and the prior rows of the rifle and lot effects, over all rows minus all parameters; null where that count is not above 0.',
           ),
         iterations: count.describe('Iterations of the solver.'),
+        pressureExponent: z
+          .number()
+          .optional()
+          .describe(
+            'With `--exponent family`: the exponent of its family, the value fitted at it.',
+          ),
+        pressureRows: count
+          .optional()
+          .describe(
+            'With `--pressure-sigma`: used training rows whose printed pressure the fit read, those of a basis with a factor.',
+          ),
         energy: z
           .object({
             value: z
@@ -240,7 +321,7 @@ const fitResult = z.object({
   notFitted: z
     .record(z.string(), z.enum(notFittedReasons))
     .describe(
-      'By powder id, why a powder with interior parameters that the rows name got no value: the reason of the fit, or `noUsableRow` without a used training row.',
+      'By powder id, why a powder with interior parameters that the rows name got no value: the reason of the fit (with `--exponent family`, of the fit at the exponent of its family), or `noUsableRow` without a used training row.',
     ),
   energy: z
     .object({

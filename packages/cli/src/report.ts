@@ -99,9 +99,19 @@ export function compareTable(r: CompareResult): string {
   ].join('\n')
 }
 
-/** `fit` as text: the version, one line per fitted powder and the powders not fitted. */
+/** The line of the pressure rows of a fit, none without them. */
+function pressureLines(p: FitResult['pressure']) {
+  if (!p) return []
+  const bases = Object.entries(p.factors).map(
+    ([k, f]) => `, ${k} factor ${f.factor.toFixed(3)} (${f.rows} rows)`,
+  )
+  return [`pressure: sigma ${p.sigma}${bases.join('')}`]
+}
+
+/** `fit` as text: the version, one line per fitted powder, the exponents of `--exponent family`, the pressure rows and the powders not fitted. */
 export function fitTable(r: FitResult): string {
   const notFitted = Object.entries(r.notFitted).map(([k, reason]) => `${k} ${reason}`)
+  const families = Object.entries(r.exponent?.families ?? {}).map(([k, f]) => `${k} ${f.exponent}`)
   const e = r.energy
   return [
     `model ${r.model}  version ${r.modelVersion}`,
@@ -111,7 +121,15 @@ export function fitTable(r: FitResult): string {
         ]
       : []),
     table(
-      ['powder', 'rows', 'cartridges', 'vivacity', 'u', 'chi2/dof'],
+      [
+        'powder',
+        'rows',
+        'cartridges',
+        'vivacity',
+        'u',
+        'chi2/dof',
+        ...(r.exponent ? ['exponent'] : []),
+      ],
       Object.entries(r.powders).map(([k, p]) => [
         k,
         `${p.rows}`,
@@ -119,8 +137,11 @@ export function fitTable(r: FitResult): string {
         p.vivacity.value.toPrecision(5),
         p.vivacity.standardUncertainty.toPrecision(2),
         p.chiSquarePerDegree === null ? '-' : p.chiSquarePerDegree.toFixed(2),
+        ...(r.exponent ? [`${p.pressureExponent}`] : []),
       ]),
     ),
+    ...(r.exponent ? [`exponent: pooled ${r.exponent.pooled}; ${families.join(', ')}`] : []),
+    ...pressureLines(r.pressure),
     ...(notFitted.length > 0 ? [`not fitted: ${notFitted.join(', ')}`] : []),
   ].join('\n')
 }

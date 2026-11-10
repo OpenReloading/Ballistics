@@ -1407,7 +1407,6 @@
   "Typed model parameters, no powder record": "Eingegebene Modellparameter, kein Treibladungspulver-Datensatz",
   "Typed. The powder record gives {value} {unit}.": "Eingegeben. Der Treibladungspulver-Datensatz gibt {value} {unit} vor.",
   "the pooled fit has no covariance": "Die gemeinsame Anpassung hat keine Kovarianz",
-  "the pooled fit takes velocities only": "Die gemeinsame Anpassung nimmt nur Geschwindigkeiten",
   "the powder of the target must be one of the fit": "Das Treibladungspulver der Zielsitzung muss eines der Anpassung sein",
   "the sessions of a powder share one burn kind": "Die Sitzungen eines Treibladungspulvers teilen eine Abbrandart",
   "upward": "aufwärts",

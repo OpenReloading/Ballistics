@@ -602,7 +602,7 @@ export type InteriorIssue = Diagnostic<'gasVelocityFactorNegative'> | Diagnostic
 }> | Diagnostic<'noHeldOutString'> | Diagnostic<'velocitySigmaMissing'> | Diagnostic<'targetPowderNotInFit'> | Diagnostic<'velocitySigmaNegative'> | Diagnostic<'levelOutsideUnit'> | Diagnostic<'pooledFitNoCovariance'> | Diagnostic<'groupPriorNotPositive', {
     kind: string;
     group: string;
-}> | Diagnostic<'priorPowderNotInSessions'> | Diagnostic<'sessionsBurnKindDiffers'> | Diagnostic<'barrelOrTemperatureOnPoint'> | Diagnostic<'pooledFitVelocitiesOnly'> | Diagnostic<'ladderChargeOrVelocityNotPositive'> | Diagnostic<'propellantTemperatureNotPositive'> | Diagnostic<'barrelLengthNotPositive'> | Diagnostic<'sessionWithoutLadderPoint'> | Diagnostic<'rifleOrLotSigmaNotPositive'> | Diagnostic<'pooledFitParametersInvalid'> | Diagnostic<'noSession'> | Diagnostic<'priorParameterNotFitted'> | Diagnostic<'burnCoefficientNotFitted'> | Diagnostic<'stringWithoutVelocity'> | Diagnostic<'fitNoCovariance'> | Diagnostic<'boreDiameterNotPositive'> | Diagnostic<'startPressureTooLow'> | Diagnostic<'domainMarginOutsideRange'> | Diagnostic<'priorsNeedVelocitySigmas'> | Diagnostic<'huberThresholdNotPositive'> | Diagnostic<'temperatureFactorNeedsSensitivity'> | Diagnostic<'fitParametersInvalid', {
+}> | Diagnostic<'priorPowderNotInSessions'> | Diagnostic<'sessionsBurnKindDiffers'> | Diagnostic<'barrelOrTemperatureOnPoint'> | Diagnostic<'ladderChargeOrVelocityNotPositive'> | Diagnostic<'propellantTemperatureNotPositive'> | Diagnostic<'barrelLengthNotPositive'> | Diagnostic<'sessionWithoutLadderPoint'> | Diagnostic<'rifleOrLotSigmaNotPositive'> | Diagnostic<'pooledFitParametersInvalid'> | Diagnostic<'noSession'> | Diagnostic<'priorParameterNotFitted'> | Diagnostic<'burnCoefficientNotFitted'> | Diagnostic<'stringWithoutVelocity'> | Diagnostic<'fitNoCovariance'> | Diagnostic<'boreDiameterNotPositive'> | Diagnostic<'startPressureTooLow'> | Diagnostic<'domainMarginOutsideRange'> | Diagnostic<'priorsNeedVelocitySigmas'> | Diagnostic<'huberThresholdNotPositive'> | Diagnostic<'temperatureFactorNeedsSensitivity'> | Diagnostic<'fitParametersInvalid', {
     parameters: string[];
 }> | Diagnostic<'pressuresNeedVelocitySigmas'> | Diagnostic<'velocitySigmaPartial'> | Diagnostic<'pressureBasisUnknown', {
     bases: string[];
@@ -1039,6 +1039,7 @@ export type PooledRequest = 'burnRate' | 'temperatureFactor';
 // @public
 export interface PooledResidual {
     charge: number;
+    kind: 'velocity' | 'pressure';
     observed: number;
     predicted: number;
     residual: number;
