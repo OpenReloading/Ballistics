@@ -132,7 +132,13 @@ describe('fit --exponent family', { timeout: 120_000 }, () => {
     'demo-powder-dp30': 3.95,
     'demo-powder-dp40': 2.81,
     'demo-powder-dp70': 1.75,
-    'demo-powder-sp20': 2.3,
+  }
+  /** Burn coefficients of the single/ball powders at the exponent 1.1, near the record value times (2000 bar / reference pressure)^-0.1. */
+  const at11: Record<string, number> = {
+    'demo-powder-sp20': 0.233,
+    'demo-powder-sp21': 0.243,
+    'demo-powder-sp22': 0.223,
+    'demo-powder-sp25': 0.28,
   }
   /** Rows of `powder` in `cartridge` at `charges`. */
   const ladder = (powder: string, cartridge: string, charges: number[]) =>
@@ -142,19 +148,26 @@ describe('fit --exponent family', { timeout: 120_000 }, () => {
     ...ladder(powder, '30-br', charges),
     ...ladder(powder, '308-match', charges),
   ]
-  const truth = plant(Object.fromEntries(Object.entries(at08).map(([id, b]) => [id, [0.8, b]])))
+  const truth = plant({
+    ...Object.fromEntries(Object.entries(at08).map(([id, b]) => [id, [0.8, b]])),
+    ...Object.fromEntries(Object.entries(at11).map(([id, b]) => [id, [1.1, b]])),
+  })
 
-  it('finds the planted exponent and burn coefficients', async () => {
-    const specs = Object.keys(at08).flatMap((powder) =>
+  it('lets a family of four powders outweigh the pooled exponent', async () => {
+    const specs = [...Object.keys(at08), ...Object.keys(at11)].flatMap((powder) =>
       powder === 'demo-powder-dp15' ? training(powder, [1.0, 1.4, 1.8]) : training(powder),
     )
     const r = await fit({ ...options, rows: writeRows(rowsCsv(specs, truth)), exponent: 'family' })
-    expect(r.exponent?.pooled).toBe(0.8)
-    expect(Object.values(r.exponent?.families ?? {}).map((f) => f.exponent)).toEqual([
-      0.8, 0.8, 0.8, 0.8, 0.8,
-    ])
-    for (const [id, b] of Object.entries(at08)) {
-      expect(r.powders[id]?.pressureExponent).toBe(0.8)
+    expect(r.exponent?.pooled).toBe(1)
+    expect(r.exponent?.families).toEqual({
+      'double/ball': { exponent: 1, powders: 1 },
+      'double/extruded': { exponent: 1, powders: 1 },
+      'double/flake': { exponent: 1, powders: 1 },
+      'single/ball': { exponent: 1.1, powders: 4 },
+      'single/extruded': { exponent: 1, powders: 1 },
+    })
+    for (const [id, b] of Object.entries(at11)) {
+      expect(r.powders[id]?.pressureExponent).toBe(1.1)
       expect(r.powders[id]?.vivacity.value.toPrecision(4)).toBe(b.toPrecision(4))
     }
     expect(r.notFitted).toEqual({})
