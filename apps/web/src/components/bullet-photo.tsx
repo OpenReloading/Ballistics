@@ -310,7 +310,7 @@ function PhotoTool({
             display: size ? 'block' : 'none',
             touchAction: 'none',
             cursor: tool === 'scale' ? 'crosshair' : 'none',
-            border: '1px solid var(--mantine-color-default-border)',
+            border: '1px solid var(--line)',
           }}
         />
         <p id={`${id}-keys`} className="visually-hidden">

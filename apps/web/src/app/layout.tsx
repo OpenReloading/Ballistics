@@ -58,8 +58,10 @@ import '@mantine/core/styles/ColorSwatch.layer.css'
 import '@mantine/core/styles/Indicator.layer.css'
 import '@mantine/core/styles/Slider.layer.css'
 import '@mantine/spotlight/styles.layer.css'
+import '@open-reloading/design-tokens/tokens.css'
 import './globals.css'
 import { Container, mantineHtmlProps } from '@mantine/core'
+import { colors } from '@open-reloading/design-tokens'
 import type { Metadata, Viewport } from 'next'
 import { OfflineLayer } from '../components/offline-layer.tsx'
 import { PageShell } from '../components/page-shell.tsx'
@@ -89,11 +91,11 @@ export const metadata: Metadata = {
   }),
 }
 
-/** The window bar of the installed app follows the system theme (--bg of globals.css). */
+/** The window bar of the installed app follows the system theme (--page of the tokens). */
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#161616' },
+    { media: '(prefers-color-scheme: light)', color: colors.light.page },
+    { media: '(prefers-color-scheme: dark)', color: colors.dark.page },
   ],
 }
 

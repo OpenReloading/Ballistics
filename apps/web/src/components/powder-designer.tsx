@@ -434,7 +434,7 @@ export function PowderDesigner() {
                 />
               ))}
               {fittedError && (
-                <Text fz="sm" c="var(--error-fg)">
+                <Text fz="sm" c="var(--error-text)">
                   {fittedError}
                 </Text>
               )}
