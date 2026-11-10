@@ -1,13 +1,20 @@
 /** Hole proposals from one example hole (`apps/docs/docs/models/hole-detection.md`); pure, so it runs in a worker. */
 import {
   boxBlur,
+  clamp,
+  components,
+  distanceSquared,
+  insidePolygon,
+  median1,
+  open,
   type Peak,
   peaksOf,
   radiiOf,
+  rectangle,
   type Space,
   sigmaAt,
   space,
-} from './blob-detector.ts'
+} from '@open-reloading/target-recognition'
 import {
   axisOf,
   DISC,
@@ -21,15 +28,6 @@ import {
 } from './colour-axis.ts'
 import type { RgbaImage } from './image.ts'
 import { nth } from './nth.ts'
-import {
-  clamp,
-  components,
-  distanceSquared,
-  insidePolygon,
-  median1,
-  open,
-  rectangle,
-} from './raster-ops.ts'
 import type { Point } from './target-geometry.ts'
 import { paperOutline } from './target-paper.ts'
 
@@ -699,7 +697,7 @@ function pipeline(ctx: Ctx, holeDiameter: number, seed: Seed): Run | undefined {
 /** Top-hat of `P` (blurred by radius 1) against its opening by a square of 2 D, on a copy shrunk by `OPEN_SHRINK`. */
 function topHat(P: Float32Array, w: number, h: number, holeDiameter: number): Float32Array {
   const smooth = new Float32Array(w * h)
-  boxBlur(P, w, h, 1, new Float32Array(w * h), smooth)
+  boxBlur(P, { w, h, r: 1 }, new Float32Array(w * h), smooth)
   // the background changes slowly, so the opening runs on a copy shrunk by OPEN_SHRINK
   const f = OPEN_SHRINK
   const [w2, h2] = [Math.ceil(w / f), Math.ceil(h / f)]

@@ -1,7 +1,7 @@
 /** The target paper in a photo without a marked region: its light area by Otsu's threshold, as a convex hull. */
+import { clamp, components, rectangle } from '@open-reloading/target-recognition'
 import type { RgbaImage } from './image.ts'
 import { nth } from './nth.ts'
-import { clamp, components, rectangle } from './raster-ops.ts'
 import type { Point } from './target-geometry.ts'
 
 // Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
