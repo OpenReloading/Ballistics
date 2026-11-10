@@ -112,7 +112,7 @@ A powder that is not fitted is listed in `notFitted` with its reason: the reason
 
 ### Pressure exponent per family
 
-`--exponent family`, with `fit` or with `--params fit-on-training`, chooses the pressure exponent (`interior.pressureExponent`) per powder family and fits each powder's burn coefficient at the exponent of its family. A study of this repository found that this lowers the held-out velocity error, and that a family of four powders gives an unstable exponent ([research entry](research/interior-exponent-per-family-unseen-powder.md)).
+`--exponent family`, with `fit` or with `--params fit-on-training`, chooses the pressure exponent (`interior.pressureExponent`) per powder family and fits each powder's burn coefficient at the exponent of its family. A study of this repository found that an exponent chosen per family by the summed squared log velocity error, leaving the predicted powder out, lowers the held-out velocity error, and that a family of four powders gives an unstable exponent ([research entry](research/interior-exponent-per-family-unseen-powder.md)). The rule of this option, a chi square with a pooled term, is another one; the study did not measure it.
 
 - Grid: the exponents 0.7, 0.8, ..., 1.3.
 - Fit per exponent: every powder is fitted as above at each exponent $n$ of the grid, starting from $B_\text{record} (p_\text{typ} / p_\text{ref})^{n_\text{record} - n}$, where $p_\text{ref}$ is the record's reference pressure and $p_\text{typ}$ half the median of the peak pressures the model predicts for the powder's used training rows at the record values. The rate is $B (p / p_\text{ref})^n$, so a coefficient fitted at one exponent is far off at another.
