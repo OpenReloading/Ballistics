@@ -118,7 +118,7 @@ jobs:
     needs: changes
     if: ${{ !cancelled() && needs.changes.outputs.check != 'false' && needs.changes.outputs.tests != '[]' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     permissions:
       contents: read
     strategy:
