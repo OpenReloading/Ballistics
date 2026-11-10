@@ -1,4 +1,4 @@
-import type { Change, CompareResult, Metrics, VerifyResult } from './result.ts'
+import type { Change, CompareResult, FitResult, Metrics, VerifyResult } from './result.ts'
 
 /** A fraction as percent with one decimal, `-` for none. */
 const pct = (x: number | null | undefined) => (x == null ? '-' : `${(100 * x).toFixed(1)}`)
@@ -96,5 +96,25 @@ export function compareTable(r: CompareResult): string {
       metricHead.map((h, i) => (i === 1 ? 'used' : h)),
       groups,
     ),
+  ].join('\n')
+}
+
+/** `fit` as text: the version, one line per fitted powder and the powders not fitted. */
+export function fitTable(r: FitResult): string {
+  const notFitted = Object.entries(r.notFitted).map(([k, reason]) => `${k} ${reason}`)
+  return [
+    `model ${r.model}  version ${r.modelVersion}`,
+    table(
+      ['powder', 'rows', 'cartridges', 'vivacity', 'u', 'chi2/dof'],
+      Object.entries(r.powders).map(([k, p]) => [
+        k,
+        `${p.rows}`,
+        `${p.cartridges}`,
+        p.vivacity.value.toPrecision(5),
+        p.vivacity.standardUncertainty.toPrecision(2),
+        p.chiSquarePerDegree === null ? '-' : p.chiSquarePerDegree.toFixed(2),
+      ]),
+    ),
+    ...(notFitted.length > 0 ? [`not fitted: ${notFitted.join(', ')}`] : []),
   ].join('\n')
 }

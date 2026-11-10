@@ -3,7 +3,7 @@ import { type ParseArgsConfig, parseArgs } from 'node:util'
 import type { Options } from './commands.ts'
 import { Refusal, UsageError } from './errors.ts'
 import type { Grouping } from './metrics.ts'
-import { compareTable, verifyTable } from './report.ts'
+import { compareTable, fitTable, verifyTable } from './report.ts'
 import { type Split, splits } from './split.ts'
 
 /** Where a run writes and whether stdout is a terminal. */
@@ -17,6 +17,7 @@ export interface Io {
 const usage = `usage:
   ballistics verify  --rows <path> [--model m3|<module>] [options]
   ballistics compare --rows <path> --baseline <m3|module|verify.json> --candidate <m3|module> [options]
+  ballistics fit     --rows <path> [--model m3|<module>] [--velocity-sigma <fraction>] [--records <dir>] [--json | --table]
   ballistics run <operation> --input <file|-> [--records <dir>]
   ballistics operations
   ballistics --help | --version
@@ -31,7 +32,12 @@ options:
   --group-by <key>   also group by powder, family, cartridge, bullet or construction
   --leave-one-powder-out
                      verify: add the line of the powder not in the fitted set
-  --params records   the powder parameters of the records (the only mode so far)
+  --params records|fit-on-training
+                     the powder parameters of the records (default), or the burn
+                     coefficients fitted to the training rows
+  --velocity-sigma <fraction>
+                     fit and --params fit-on-training: velocity sigma of a row, a fraction
+                     of its velocity (default 0.03)
   --json | --table   output format (default: JSON unless stdout is a terminal)
   -h, --help         this text
   --version          the version
@@ -82,15 +88,36 @@ function checkChoices(
   if (values.json && values.table) throw new UsageError('--json and --table exclude each other')
   if (by !== undefined && !groupings.includes(by as Grouping))
     throw new UsageError(`--group-by is one of ${groupings.join(', ')}`)
-  if (values.params === 'fit-on-training')
-    throw new UsageError('--params fit-on-training is not available yet: only --params records')
-  if (values.params !== undefined && values.params !== 'records')
-    throw new UsageError('--params is records')
+  if (
+    values.params !== undefined &&
+    values.params !== 'records' &&
+    values.params !== 'fit-on-training'
+  )
+    throw new UsageError('--params is records or fit-on-training')
 }
+
+/** The `--velocity-sigma` fraction, undefined without it; bad input outside (0, 1). */
+function velocitySigmaOf(value: string | undefined) {
+  if (value === undefined) return
+  const sigma = Number(value)
+  if (!Number.isFinite(sigma) || sigma <= 0 || sigma >= 1)
+    throw new UsageError('--velocity-sigma is a fraction above 0 and below 1')
+  return sigma
+}
+
+/** The commands that evaluate or fit on rows. */
+type Command = 'verify' | 'compare' | 'fit'
+
+/** The options each command does not take. */
+const foreignOptions = {
+  verify: ['baseline', 'candidate'],
+  compare: ['model', 'leave-one-powder-out'],
+  fit: ['split', 'final', 'baseline', 'candidate', 'group-by', 'params', 'leave-one-powder-out'],
+} as const
 
 /** The options of the command line, with the environment's defaults. */
 function optionsOf(
-  command: 'verify' | 'compare',
+  command: Command,
   args: string[],
   env: NodeJS.ProcessEnv,
   warn: Io['stderr'],
@@ -112,13 +139,17 @@ function optionsOf(
       'group-by': { type: 'string' },
       params: { type: 'string' },
       'leave-one-powder-out': { type: 'boolean' },
+      'velocity-sigma': { type: 'string' },
     },
   })
-  const foreign =
-    command === 'verify'
-      ? (['baseline', 'candidate'] as const).filter((o) => values[o] !== undefined)
-      : (['model', 'leave-one-powder-out'] as const).filter((o) => values[o] !== undefined)
+  const foreign = foreignOptions[command].filter((o) => values[o] !== undefined)
   if (foreign.length > 0) throw new UsageError(`${command} takes no --${foreign.join(' or --')}`)
+  if (
+    command !== 'fit' &&
+    values['velocity-sigma'] !== undefined &&
+    values.params !== 'fit-on-training'
+  )
+    throw new UsageError('--velocity-sigma is for fit and --params fit-on-training')
   const rows = values.rows ?? env.BALLISTICS_ROWS
   if (!rows) throw new UsageError('give --rows <path> or set BALLISTICS_ROWS')
   const split = values.split ?? 'validation'
@@ -133,24 +164,25 @@ function optionsOf(
     leaveOnePowderOut: values['leave-one-powder-out'] === true,
     warn,
     ...(by !== undefined && { groupBy: by as Grouping }),
+    params: values.params as Options['params'],
+    velocitySigma: velocitySigmaOf(values['velocity-sigma']),
   }
   return { options, values }
 }
 
 /** Runs `command` with its options and returns the text of the result. */
-async function execute(
-  command: 'verify' | 'compare',
-  args: string[],
-  env: NodeJS.ProcessEnv,
-  io: Io,
-) {
+async function execute(command: Command, args: string[], env: NodeJS.ProcessEnv, io: Io) {
   // the libraries load after --help and --version have answered
-  const [{ compare, verify }, { groupings }] = await Promise.all([
+  const [{ compare, fit, verify }, { groupings }] = await Promise.all([
     import('./commands.ts'),
     import('./metrics.ts'),
   ])
   const { options, values } = optionsOf(command, args, env, io.stderr, groupings)
   const json = values.json === true || (values.table !== true && !io.tty)
+  if (command === 'fit') {
+    const result = await fit(options, values.model)
+    return json ? JSON.stringify(result, null, 2) : fitTable(result)
+  }
   if (command === 'verify') {
     const result = await verify(options, values.model)
     return json ? JSON.stringify(result, null, 2) : verifyTable(result)
@@ -244,7 +276,7 @@ export async function run(argv: string[], env: NodeJS.ProcessEnv, io: Io): Promi
       io.stdout(`${JSON.stringify(await operate(command, args, env, io), null, 2)}\n`)
       return 0
     }
-    if (command !== 'verify' && command !== 'compare') {
+    if (command !== 'verify' && command !== 'compare' && command !== 'fit') {
       parse({ args: argv, strict: true, allowPositionals: true, options: {} })
       throw new UsageError(usage)
     }
