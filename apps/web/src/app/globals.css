@@ -2335,7 +2335,7 @@ td.nowrap {
   }
 }
 
-/* paper: light colors whatever the screen preference; controls hidden, inputs and results kept */
+/* paper: controls hidden, inputs and results kept (the colors are light in print: tokens.css) */
 @media print {
   .skip-link,
   .update-notice,
