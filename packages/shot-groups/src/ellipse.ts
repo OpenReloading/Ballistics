@@ -16,7 +16,7 @@ import {
 
 /** a x^2 + b x y + c y^2 + d x + e y + f = 0. */
 export type Conic = readonly [number, number, number, number, number, number]
-/** Centre, semi-axes (`semiMajor >= semiMinor`) and `angle` of the major axis (rad, image coordinates), image px. */
+/** Center, semi-axes (`semiMajor >= semiMinor`) and `angle` of the major axis (rad, image coordinates), image px. */
 export type Ellipse = {
   centreX: number
   centreY: number
@@ -78,7 +78,7 @@ function nullVector(m: Mat3): Vector3 {
   return [best[0] / bestNorm, best[1] / bestNorm, best[2] / bestNorm]
 }
 
-/** Fitzgibbon 1999 in the numerically stable form of Halir 1998: the points normalised, the 3 x 3 eigenproblem of the reduced scatter matrix solved by the roots of its characteristic cubic; undefined for fewer than 6 points or no ellipse. */
+/** Fitzgibbon 1999 in the numerically stable form of Halir 1998: the points normalized, the 3 x 3 eigenproblem of the reduced scatter matrix solved by the roots of its characteristic cubic; undefined for fewer than 6 points or no ellipse. */
 export function fitEllipse(pts: readonly Point[]): Conic | undefined {
   if (pts.length < 6) return undefined
   const norm = normalisePoints(pts)
@@ -128,7 +128,7 @@ function normalisePoints(pts: readonly Point[]): Normalisation {
   return { mx, my, s }
 }
 
-/** Scatter matrices of the normalised points: quadratic terms S1, mixed S2, linear S3. */
+/** Scatter matrices of the normalized points: quadratic terms S1, mixed S2, linear S3. */
 function scatterMatrices(
   pts: readonly Point[],
   { mx, my, s }: Normalisation,
@@ -164,7 +164,7 @@ function addOuter(S: Matrix9, u: Vector3, v: Vector3) {
   S[8] += u[2] * v[2]
 }
 
-/** A conic of normalised coordinates back in image coordinates. */
+/** A conic of normalized coordinates back in image coordinates. */
 function denormaliseConic([a, b, c, d, e, f]: Conic, { mx, my, s }: Normalisation): Conic {
   const k = 1 / s
   const A = a * k * k
@@ -177,7 +177,7 @@ function denormaliseConic([a, b, c, d, e, f]: Conic, { mx, my, s }: Normalisatio
   return [A, B, C, D, E, F]
 }
 
-/** Centre, semi-axes and angle of a conic; undefined unless it is a real ellipse. */
+/** Center, semi-axes and angle of a conic; undefined unless it is a real ellipse. */
 export function ellipseOf(c: Conic): Ellipse | undefined {
   const [a, b, cc, d, e, f] = c
   const det = 4 * a * cc - b * b
@@ -384,7 +384,7 @@ function jacobi3(m: Mat3): [Eigenpair, Eigenpair, Eigenpair] {
   ]
 }
 
-/** From the image conics (the pencil's generalised eigenvalues are `r1^2 / r2^2` once and 1 twice, the single one's eigenvector the image of the common centre, Gurdjos 2006; affine rectification by the pencil's vanishing line, Gurdjos 2002): the 3 x 3 map of homogeneous image points onto the plane where the first circle is the unit circle about the origin (up to a rotation and a reflection), and the image of the centre; undefined when the pair is degenerate or the radii are too alike. */
+/** From the image conics (the pencil's generalized eigenvalues are `r1^2 / r2^2` once and 1 twice, the single one's eigenvector the image of the common center, Gurdjos 2006; affine rectification by the pencil's vanishing line, Gurdjos 2002): the 3 x 3 map of homogeneous image points onto the plane where the first circle is the unit circle about the origin (up to a rotation and a reflection), and the image of the center; undefined when the pair is degenerate or the radii are too alike. */
 export function concentricPlane(
   c1: Conic,
   c2: Conic,
@@ -448,7 +448,7 @@ function pencilEigenvalues(N: Mat3): { single: number; double: number } {
   return { single, double: (tr - single) / 2 }
 }
 
-/** Homogeneous image points onto the plane where the normalised conic `n1` is the unit circle and the point `v` inside it the origin; undefined when `n1` is no real ellipse or `v` lies outside it. */
+/** Homogeneous image points onto the plane where the normalized conic `n1` is the unit circle and the point `v` inside it the origin; undefined when `n1` is no real ellipse or `v` lies outside it. */
 function planeMap(n1: Mat3, v: Readonly<Vector3>): Mat3 | undefined {
   // n1 = E^T diag(l) E: M0 = diag(sqrt|l|) E satisfies M0^T diag(1, 1, -1) M0 = n1
   const sorted = jacobi3(n1).toSorted((a, b) => b.value - a.value)
@@ -459,7 +459,7 @@ function planeMap(n1: Mat3, v: Readonly<Vector3>): Mat3 | undefined {
   )
   let u = apply3(M0, v)
   if (u[2] < 0) u = [-u[0], -u[1], -u[2]]
-  // normalise on the hyperboloid u_z^2 - u_x^2 - u_y^2 = 1; w^2 = -v^T n1 v is positive only for a centre inside the first circle
+  // normalize on the hyperboloid u_z^2 - u_x^2 - u_y^2 = 1; w^2 = -v^T n1 v is positive only for a center inside the first circle
   const w = Math.sqrt(u[2] * u[2] - u[0] * u[0] - u[1] * u[1])
   if (!(w > 0)) return undefined
   const [ux, uy, uz] = [u[0] / w, u[1] / w, u[2] / w]

@@ -89,7 +89,7 @@ const aerodynamics = z
       .number()
       .optional()
       .describe(
-        'Transverse moment of inertia about the centre of mass, kg m2, estimated when absent.',
+        'Transverse moment of inertia about the center of mass, kg m2, estimated when absent.',
       ),
   })
   .describe('Aerodynamic coefficients of the modified point mass, ignored by the point mass model.')
@@ -580,7 +580,7 @@ export interface TrajectoryBody extends z.infer<typeof trajectoryBody> {}
 /** A body of `POST /exterior/trajectory` as a client sends it, before defaults. */
 export interface TrajectoryRequest extends z.input<typeof trajectoryBody> {}
 
-/** A valid body of `POST /exterior/trajectory`: a .30 calibre bullet of 11.34 g, G7 BC 0.243 lb/in2. */
+/** A valid body of `POST /exterior/trajectory`: a .30 caliber bullet of 11.34 g, G7 BC 0.243 lb/in2. */
 export const trajectoryExample: TrajectoryRequest = {
   shot: {
     projectile: {

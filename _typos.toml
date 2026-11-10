@@ -9,6 +9,8 @@ extend-exclude = [
   "packages/catalog/records/",
   # generated or copied byte for byte from a tool
   "pnpm-lock.yaml",
+  # the API contract as last released, rewritten only for a breaking change
+  "packages/api/openapi.baseline.json",
   ".github/pnpm/package-lock.json",
   "*.snap",
   "**/*-snapshots/",
@@ -18,6 +20,8 @@ extend-exclude = [
 ]
 
 [default]
+# D29: US spelling
+locale = "en-us"
 # Each pattern is one German string or citation, so a misspelling elsewhere still fails.
 extend-ignore-re = [
   # commit hashes in the generated CHANGELOG.md links
@@ -61,11 +65,68 @@ extend-ignore-re = [
   "Prüfen Sie die Einheit der Spalte\\.",
   # German umlaut folded to its transliteration by the table import
   "replaceAll\\('ü', 'ue'\\)",
+  # titles of cited papers as their authors spelled them
+  "the centre circle constraint",
+  "Interior ballistics modelling of a rifled barrel",
+  # column aliases the table import accepts, listed in the table import page
+  "caliber, calibre, cal, kaliber",
+  # CSS classes, module files, a finding code and a record id that keep their UK spelling
+  "\\{colours\\}|burn-neighbours|face-colours|workbench-centre|colour-row|colour-axis|bullet-photo-colour|ov-centre|duplicate-normalised-name|centre-fire-pistol",
+]
+
+# Code names keep their spelling (record fields, the public API, the CLI and API output), so TypeScript allows them;
+# its comments and messages are still checked for every other word.
+[type.ts]
+extend-ignore-identifiers-re = [
+  # camelCase and PascalCase compounds such as centreX and MarkNormalisation
+  "^[A-Za-z][a-z0-9]*[A-Z][A-Za-z0-9]*$",
+]
+
+[type.ts.extend-identifiers]
+Aluminium = "Aluminium"
+aluminium = "aluminium"
+analyse = "analyse"
+calibre = "calibre"
+calibres = "calibres"
+capitalised = "capitalised"
+centre = "centre"
+centred = "centred"
+centres = "centres"
+colour = "colour"
+coloured = "coloured"
+colours = "colours"
+humanised = "humanised"
+Labeller = "Labeller"
+labelled = "labelled"
+LICENCE = "LICENCE"
+licence = "licence"
+metres = "metres"
+millimetres = "millimetres"
+modelled = "modelled"
+Neighbour = "Neighbour"
+Neighbours = "Neighbours"
+neighbours = "neighbours"
+Normalisation = "Normalisation"
+normalised = "normalised"
+recognise = "recognise"
+
+# Code in Markdown names fields and values of the records and the code, which keep their spelling.
+[type.md]
+extend-ignore-re = [
+  "(?s)```.*?```",
+  "`[^`\\n]*`",
 ]
 
 [default.extend-words]
 # English verb of gyrodynamics (the spin axis precesses)
 precess = "precess"
+# axe-core, the accessibility checker of the tests
+axe = "axe"
 # symbols of the equations in packages/ballistics: transverse moment of inertia, burn rate factor
 iy = "iy"
 ba = "ba"
+
+# File names that keep their UK spelling: a published docs page and the script ci.yml runs.
+[type.uk-file-names]
+extend-glob = ["licences.ts", "licences.test.ts", "hole-detection-target-centre.md"]
+check-filename = false

@@ -76,7 +76,7 @@ describe('targetFace outward gauging', () => {
     events: [{ ...face.events[0], ...(scoring && { scoring }) }],
   })
 
-  it('accepts an outward event and parses touch, centre and no rule unchanged', () => {
+  it('accepts an outward event and parses touch, center and no rule unchanged', () => {
     for (const scoring of [undefined, 'touch', 'centre', 'outward']) {
       const record = withScoring(scoring)
       expect(targetFace.parse(record)).toEqual(record)
@@ -115,7 +115,7 @@ const faceWith = (extra: object) => ({
 const ok = (extra: object) => targetFace.safeParse(faceWith(extra))
 
 describe('targetFace extended geometry', () => {
-  it('accepts colours, a sheet, bulls and the numerals flag', () => {
+  it('accepts colors, a sheet, bulls and the numerals flag', () => {
     const r = ok({
       paper: { format: 'A4', width: mm(210), height: mm(297) },
       bulls: [

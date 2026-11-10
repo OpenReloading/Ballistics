@@ -24,7 +24,7 @@ Residual water in rolled powder about 1 % by mass, stabilizer typically 1.5 to 2
 
 ## Result
 
-No change. Documented as a limit: ageing and moisture are not modelled ([M3](../models/interior-m3.md#limits)), and a fitted burn coefficient does not hold for old or damp powder ([powder fit](../models/interior-powder-fit.md#limits)).
+No change. Documented as a limit: ageing and moisture are not modeled ([M3](../models/interior-m3.md#limits)), and a fitted burn coefficient does not hold for old or damp powder ([powder fit](../models/interior-powder-fit.md#limits)).
 
 ## Data basis
 

@@ -1,16 +1,16 @@
 ---
 
 title: Velocity flat spots of a charge ladder
-description: The slope of mean velocity against charge between neighbouring ladder strings, its confidence band by string count, and the charge ranges whose band includes zero.
+description: The slope of mean velocity against charge between neighboring ladder strings, its confidence band by string count, and the charge ranges whose band includes zero.
 ---
 
 # Velocity flat spots of a charge ladder
 
-The analysis takes the mean, sample standard deviation and shot count of each string of a charge ladder and returns the slope of mean velocity against charge between neighbouring charges with a confidence band, and the charge ranges where that band includes zero. The result is a statistical observation about the strings fired, not a recommendation of a charge.
+The analysis takes the mean, sample standard deviation and shot count of each string of a charge ladder and returns the slope of mean velocity against charge between neighboring charges with a confidence band, and the charge ranges where that band includes zero. The result is a statistical observation about the strings fired, not a recommendation of a charge.
 
 ## Equations
 
-For neighbouring strings $a$ and $b$ with charges $c_a \lt c_b$, means $\bar v$, sample standard deviations $s$ and shot counts $n$, the slope is
+For neighboring strings $a$ and $b$ with charges $c_a \lt c_b$, means $\bar v$, sample standard deviations $s$ and shot counts $n$, the slope is
 
 $$
 m = \frac{\bar v_b - \bar v_a}{c_b - c_a}
@@ -34,7 +34,7 @@ $$
 
 Code: `packages/ballistics/src/interior/velocity-ladder.ts`, `ladderFlatSpots` (`df`).
 
-The segment is flat when $|m| \le h$, that is when its band $m \pm h$ includes zero. A flat spot is a run of neighbouring flat segments. It spans the charges from the lowest to the highest string of the run.
+The segment is flat when $|m| \le h$, that is when its band $m \pm h$ includes zero. A flat spot is a run of neighboring flat segments. It spans the charges from the lowest to the highest string of the run.
 
 Code: `packages/ballistics/src/interior/velocity-ladder.ts`, `ladderFlatSpots` (`flat`, `flatSpots`).
 
@@ -60,7 +60,7 @@ Code: `packages/ballistics/src/interior/velocity-ladder.ts`, `ladderFlatSpots` (
 ## Limits
 
 - Each string needs at least two shots, and the standard deviation of two shots is itself very uncertain. The band is wide for few shots: a flat segment can mean only that the strings were too short to tell.
-- Neighbouring segments are tested one by one at the stated level, with no correction for the number of segments, so a ladder of many steps shows a flat segment by chance more often than the level suggests.
+- Neighboring segments are tested one by one at the stated level, with no correction for the number of segments, so a ladder of many steps shows a flat segment by chance more often than the level suggests.
 - A flat spot is where the mean velocity did not change measurably over the strings fired. It says nothing about pressure, accuracy or whether a charge may be loaded.
 - The ladder shows velocity only. The point of impact of its shot groups per charge is a separate note ([point of impact per charge in a ladder](interior-ladder-impact.md)) that needs groups linked to chronograph shots.
 

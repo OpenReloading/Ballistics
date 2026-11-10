@@ -250,7 +250,7 @@ describe('powder fit over sessions, conditions of the points', () => {
 
   it('keeps the temperature a point states itself over its session', () => {
     const list = sessions([0.6], temperatures, 1)
-    // one session labelled at the reference temperature, its points at their own
+    // one session labeled at the reference temperature, its points at their own
     const mislabelled = [
       {
         propellantTemperature: 294.15,

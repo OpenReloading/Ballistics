@@ -25,7 +25,7 @@ Reproduce: `node tools/research/muzzle-velocity-correction.ts` from the reposito
 
 The speed along a flat path falls with distance as $\mathrm{d}v/\mathrm{d}s = -\tfrac{\pi}{8}\,\rho\,C_D(M)\,(d^2/m)\,v$, the point-mass equation of motion with the drag acceleration of the [drag page](../models/exterior-drag.md) ([McCoy 1999](../bibliography.md#mccoy-1999), chapter unverified). For a constant $C_D$ this gives $v(s) = v_0\,e^{-ks}$ with $k = \pi\rho C_D d^2/(8m)$. The inversion needs no closed form: the flown speed at $s$ rises with $v_0$ at a slope near one, so $v_0 \leftarrow v_0 + (v_\mathrm{measured} - v(s; v_0))$ shrinks the miss by about the relative loss per pass.
 
-Since $d^2/m$ is the inverse of the sectional density, the relative loss depends on the bullet's sectional density and drag function, not on the calibre alone. To first order it is proportional to the distance.
+Since $d^2/m$ is the inverse of the sectional density, the relative loss depends on the bullet's sectional density and drag function, not on the caliber alone. To first order it is proportional to the distance.
 
 ## Numbers
 
@@ -39,7 +39,7 @@ Test 2, speed lost to the screen and the error after the correction:
 | 68 gr, 6.17 mm, G7 0.15  | 2.44         | 975                   | 972.291     | 2.709      | $-3.5\times10^{-12}$        | 2.971                     |
 | 175 gr, 7.82 mm, G7 0.27 | 4.0          | 800                   | 797.749     | 2.251      | $-1.1\times10^{-11}$        | 2.494                     |
 
-Test 3, correction at 5 m. The percent is the same for every calibre of a bullet type (spread 0 over the 12 diameters). The last two columns give the closed form over the inversion: with the drag coefficient of the standard function at the launch Mach number, and with a fixed 0.3.
+Test 3, correction at 5 m. The percent is the same for every caliber of a bullet type (spread 0 over the 12 diameters). The last two columns give the closed form over the inversion: with the drag coefficient of the standard function at the launch Mach number, and with a fixed 0.3.
 
 | bullet type | muzzle velocity (m/s) | correction (m/s) | percent | closed form, local Cd | closed form, Cd 0.3 |
 | ----------- | --------------------- | ---------------- | ------- | --------------------- | ------------------- |
@@ -62,7 +62,7 @@ With the loss proportional to distance, 0.1 percent is reached at about 1.6 m fo
 
 Improved. Rule: the correction at 5 m is 0.31 to 0.72 percent of the velocity in every case, above the 0.1 percent limit, so the simulation alone suggests the correction may be worth building, pending a verified limit and measured sessions. The inversion gives the flown muzzle velocity back to $10^{-7}$ m/s on a bullet with a standard drag function and to $2\times10^{-4}$ m/s against the exact solution of a constant coefficient, and both named cases agree within 0.3 m/s by a wide margin. Adopted as a core function `muzzleVelocityFromDownrange` (`packages/ballistics/src/exterior/muzzle-velocity.ts`, [model page](../models/exterior-drag.md#speed-measured-downrange)) with unit tests for test 1 and test 2. The command line corrects published rows printed at a distance with it ([command line](../cli.md#muzzle-distance)).
 
-Wiring for the web app, not built: in `chargeRows` (`apps/web/src/lib/measurements.ts`), when a session has a muzzle distance above zero and the saved load gives the bullet's mass, diameter and drag, call the function on the mean gate velocity and show the result as its own number next to the gate reading. The switch is off by default and switches the number off again. The comparison with the simulated muzzle velocity uses the corrected number only while the switch is on. Without a load there is no corrected number and no field is added to the session. The summary shows the corrected number labelled as a simulation.
+Wiring for the web app, not built: in `chargeRows` (`apps/web/src/lib/measurements.ts`), when a session has a muzzle distance above zero and the saved load gives the bullet's mass, diameter and drag, call the function on the mean gate velocity and show the result as its own number next to the gate reading. The switch is off by default and switches the number off again. The comparison with the simulated muzzle velocity uses the corrected number only while the switch is on. Without a load there is no corrected number and no field is added to the session. The summary shows the corrected number labeled as a simulation.
 
 ## Data basis
 

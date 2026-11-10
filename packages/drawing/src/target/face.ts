@@ -28,8 +28,8 @@ export interface FaceShape {
 }
 
 /**
- * An ellipse, or a rectangle when `square`, or a stadium when `stadium`, centred on the scoring
- * centre, radii in mm.
+ * An ellipse, or a rectangle when `square`, or a stadium when `stadium`, centered on the scoring
+ * center, radii in mm.
  */
 export interface FaceEllipse {
   rx: number
@@ -40,7 +40,7 @@ export interface FaceEllipse {
   stadium?: true
   /** Ring value of the ring the ellipse is drawn for; absent for the paper, the black area and the inner ten. */
   ring?: number
-  /** A colour name of the face record, or `white` and `black`. */
+  /** A color name of the face record, or `white` and `black`. */
   colour: string
 }
 
@@ -48,7 +48,7 @@ export interface FaceEllipse {
 export interface FaceFigure {
   /** Frame in mm: the outer ring and a margin. */
   frame: { x: number; y: number; width: number; height: number }
-  /** Paper inside the outer ring, then the coloured zones (or the black area), filled. */
+  /** Paper inside the outer ring, then the colored zones (or the black area), filled. */
   zones: FaceEllipse[]
   /** Ring lines outer to inner, then the inner ten, stroked. */
   lines: FaceEllipse[]
@@ -71,10 +71,10 @@ const ellipse = (
 
 /**
  * A target face laid out from its record: the paper inside the outer ring, the zones in their
- * recorded colours (else the black area), the ring lines and the inner ten. Radii are the half
+ * recorded colors (else the black area), the ring lines and the inner ten. Radii are the half
  * of the recorded diameters and heights. A ring line on a black zone is white, else black or the
- * ring's own line colour.
- * shortcut: one scoring centre and no sheet; a record with `bulls` or `paper` draws its first
+ * ring's own line color.
+ * shortcut: one scoring center and no sheet; a record with `bulls` or `paper` draws its first
  * bull only, draw the sheet once a record has one.
  */
 export function targetFaceFigure(face: FaceShape): FaceFigure {

@@ -22,7 +22,7 @@ const calibrationReferenceParser = z.discriminatedUnion('kind', [
   z.object({
     kind: z
       .literal('ringCentre')
-      .describe('A ring of known diameter: its centre and a point on it.'),
+      .describe('A ring of known diameter: its center and a point on it.'),
     centre: imagePoint,
     edge: imagePoint,
     diameter: positiveMeters().describe('Ring diameter, m.'),
@@ -128,7 +128,7 @@ export const groupShot: z.ZodObject<{
 const shotGroupParser = z.object({
   id: localId.describe('Id of the group, unique in the sheet.'),
   name: z.string().min(1).max(200).describe('Name of the group.'),
-  colour: hexColour.describe('Colour of the group, `#rrggbb`.'),
+  colour: hexColour.describe('Color of the group, `#rrggbb`.'),
   distance: positiveMeters().describe('Muzzle to target, m.'),
   aim: z
     .object({
@@ -157,7 +157,7 @@ const shotGroupParser = z.object({
         )
         .optional(),
       backing: hexColour
-        .describe('Colour seen through a hole, picked in one, `#rrggbb`. Absent: off.')
+        .describe('Color seen through a hole, picked in one, `#rrggbb`. Absent: off.')
         .optional(),
       minContrast: z
         .number()
@@ -194,7 +194,7 @@ const shotGroupParser = z.object({
         .max(64)
         .refine((ms) => new Set(ms.map((x) => x.ring)).size >= 2, 'Marks on two rings at least')
         .describe(
-          "Points marked on the face's rings in target m, on two rings at least. Absent: centred on the point of aim.",
+          "Points marked on the face's rings in target m, on two rings at least. Absent: centered on the point of aim.",
         )
         .optional(),
     })

@@ -9,7 +9,7 @@ export const maxMarkMm = 120
 export const markDiameterMm = (distance: number, angle: number) =>
   fromSi('length', distance * Math.tan(angle))
 
-/** A CSS length that prints as `mm` millimetres at 100 % print scale. */
+/** A CSS length that prints as `mm` millimeters at 100 % print scale. */
 export const cssMm = (mm: number) => `${Math.round(mm * 100) / 100}mm`
 
 /** One aiming mark of the printed ladder target: the step's own value and the mark's printed diameter, mm. */

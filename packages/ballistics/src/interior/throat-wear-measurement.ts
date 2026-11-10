@@ -2,7 +2,7 @@
 
 /** A published barrel-wear measurement with its source. */
 export interface WearMeasurement {
-  /** Authors, title, journal, DOI and licence of the source. */
+  /** Authors, title, journal, DOI and license of the source. */
   source: Readonly<Record<'authors' | 'title' | 'journal' | 'doi' | 'licence', string>>
   /** Round count and measured muzzle velocity, m/s. */
   velocity: readonly (readonly [number, number])[]
@@ -12,7 +12,7 @@ export interface WearMeasurement {
   modelChange: Readonly<{ peakPressure: number; muzzleVelocity: number }>
 }
 
-/** One 5.56x45 mm barrel (361 mm): muzzle velocity over its round count in 10-shot means, chamber length by coordinate measuring machine new and after 16000 rounds (Vuong, Nguyen, Khuong, Nguyen, "Interior ballistics modelling of a rifled barrel with cumulative wear effects", Military Technical Courier (Vojnotehnički glasnik) 74(1), 2026, doi:10.5937/vojtehg75-64184, licence CC BY 4.0; velocities from its table 3, the first count shots 1 to 10, lengths from its CMM section, model results from its table 2). */
+/** One 5.56x45 mm barrel (361 mm): muzzle velocity over its round count in 10-shot means, chamber length by coordinate measuring machine new and after 16000 rounds (Vuong, Nguyen, Khuong, Nguyen, "Interior ballistics modelling of a rifled barrel with cumulative wear effects", Military Technical Courier (Vojnotehnički glasnik) 74(1), 2026, doi:10.5937/vojtehg75-64184, license CC BY 4.0; velocities from its table 3, the first count shots 1 to 10, lengths from its CMM section, model results from its table 2). */
 export const vuong2026: WearMeasurement = Object.freeze({
   source: Object.freeze({
     authors: 'Vuong D. T., Nguyen V. H., Khuong T. L., Nguyen V. D.',

@@ -1966,7 +1966,7 @@ function SeatingFigure({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Ch
       {drawnSeating && (
         <p className="seating-legend">
           {t(
-            'Dashed in the flag colour: approximate geometry. Faint: the bullet inside the case. Dashed ticks: approximate leade contact.',
+            'Dashed in the flag color: approximate geometry. Faint: the bullet inside the case. Dashed ticks: approximate leade contact.',
           )}
         </p>
       )}

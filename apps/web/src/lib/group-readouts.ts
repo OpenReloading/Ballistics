@@ -29,23 +29,23 @@ export const readoutRows = [
   [
     'extremeSpread',
     msg('ES'),
-    msg('Extreme spread: largest distance between two shots, centre to centre.'),
+    msg('Extreme spread: largest distance between two shots, center to center.'),
   ],
   ['width', msg('Width'), msg('Range of the horizontal coordinates.')],
   ['height', msg('Height'), msg('Range of the vertical coordinates.')],
-  ['meanRadius', msg('Mean radius'), msg('Mean distance of the shots from the group centre.')],
+  ['meanRadius', msg('Mean radius'), msg('Mean distance of the shots from the group center.')],
   [
     'minPairDistance',
     msg('Min. pair'),
     msg(
-      'Smallest distance between two shots, centre to centre; describes the shots fired, no interval.',
+      'Smallest distance between two shots, center to center; describes the shots fired, no interval.',
     ),
   ],
   [
     'meanPairDistance',
     msg('Mean pair'),
     msg(
-      'Mean distance over all pairs of shots, centre to centre; describes the shots fired, no interval.',
+      'Mean distance over all pairs of shots, center to center; describes the shots fired, no interval.',
     ),
   ],
   ['standardDeviationX', msg('SD horiz.'), msg('Sample standard deviation of x (divisor n - 1).')],
@@ -59,7 +59,7 @@ export const readoutRows = [
     'cepElliptical',
     msg('CEP'),
     msg(
-      'Circular error probable: radius about the group centre holding half of a normal spread with the sample covariance, for any ratio and direction of the axes.',
+      'Circular error probable: radius about the group center holding half of a normal spread with the sample covariance, for any ratio and direction of the axes.',
     ),
   ],
 ] as const

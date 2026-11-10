@@ -30,7 +30,7 @@ it('rejects an expression it cannot read', () => {
     expect(() => satisfies(bad, allowed), bad).toThrow()
 })
 
-it('reads every licence expression of the installed packages', () => {
+it('reads every license expression of the installed packages', () => {
   for (const license of installedLicenses('..').values())
     if (license !== undefined) expect(() => satisfies(license, allowed), license).not.toThrow()
 })
@@ -73,7 +73,7 @@ it('lists the production closure: links followed, both versions, no optional pee
   ])
 })
 
-it('fails on a licence outside the list and on no licence, not on an excepted package', () => {
+it('fails on a license outside the list and on no license, not on an excepted package', () => {
   const packages = [
     { name: 'ok', version: '1.0.0', license: 'MIT' },
     { name: 'gpl', version: '1.0.0', license: 'GPL-3.0-only' },
@@ -86,8 +86,8 @@ it('fails on a licence outside the list and on no licence, not on an excepted pa
   )
   expect(problems(packages, policy)).toEqual([
     'gpl@1.0.0: GPL-3.0-only is not in allow-licenses',
-    'none@1.0.0: no licence declared',
-    'odd@1.0.0: cannot read the licence expression "MIT AND"',
+    'none@1.0.0: no license declared',
+    'odd@1.0.0: cannot read the license expression "MIT AND"',
   ])
 })
 
@@ -103,7 +103,7 @@ const permissive = new Set([
   ...['CC0-1.0', 'Unlicense', 'BlueOak-1.0.0', 'Python-2.0'],
 ])
 
-it('keeps no exception in the review configuration without a reason, and no copyleft licence beyond MPL and LGPL', () => {
+it('keeps no exception in the review configuration without a reason, and no copyleft license beyond MPL and LGPL', () => {
   const text = readFileSync('../.github/dependency-review-config.yml', 'utf8')
   expect(withoutReason(text)).toEqual([])
   const { allow } = readPolicy(text)
@@ -119,14 +119,14 @@ it('writes the NOTICE block with one line per package', () => {
   expect(block.split('\n').at(-2)).toBe('a 1.0.0 UNDECLARED')
 })
 
-it('names an unbalanced bracket and an operator or bracket where a licence belongs', () => {
+it('names an unbalanced bracket and an operator or bracket where a license belongs', () => {
   expect(() => satisfies('(MIT', allowed)).toThrow('unbalanced brackets in "(MIT"')
   expect(() => satisfies('MIT MIT', allowed)).toThrow(
-    'cannot read the licence expression "MIT MIT"',
+    'cannot read the license expression "MIT MIT"',
   )
   for (const bad of ['AND MIT', 'MIT OR AND', 'MIT OR OR', 'MIT AND WITH', ')', 'MIT OR )'])
     expect(() => satisfies(bad, allowed), bad).toThrow(
-      `cannot read the licence expression "${bad}"`,
+      `cannot read the license expression "${bad}"`,
     )
 })
 
@@ -206,7 +206,7 @@ it('writes the NOTICE block between its markers with its preamble', () => {
   expect(noticeBlock([{ name: 'a', version: '1.0.0', license: 'MIT' }])).toBe(
     [
       'BEGIN GENERATED: shipped packages',
-      'Third-party packages installed for the API image and the web app, by name, version and the licence',
+      'Third-party packages installed for the API image and the web app, by name, version and the license',
       'the package declares. Written by `node tools/src/licences.ts --write`.',
       '',
       'a 1.0.0 MIT',
@@ -215,7 +215,7 @@ it('writes the NOTICE block between its markers with its preamble', () => {
   )
 })
 
-it('sums the job summary by licence, most used first, and names the excepted packages', () => {
+it('sums the job summary by license, most used first, and names the excepted packages', () => {
   const packages = [
     { name: 'a', version: '1.0.0', license: 'MIT' },
     { name: 'b', version: '1.0.0', license: undefined },
@@ -224,9 +224,9 @@ it('sums the job summary by licence, most used first, and names the excepted pac
     { name: 'e', version: '1.0.0', license: undefined },
   ]
   expect(summary(packages, new Set(['c', 'd'])).split('\n')).toEqual([
-    '### Licences of the production dependencies of the API image and the web app',
+    '### Licenses of the production dependencies of the API image and the web app',
     '',
-    '| Licence | Packages |',
+    '| License | Packages |',
     '| --- | --- |',
     '| UNDECLARED | 2 |',
     '| ISC | 2 |',

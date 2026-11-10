@@ -63,7 +63,7 @@ export function placeLabel(
       for (const turn of [0, 1, -1, 2, -2, 3, -3, 4]) {
         const t = (turn * Math.PI) / 4
         const [dx, dy] = [ux * Math.cos(t) - uy * Math.sin(t), ux * Math.sin(t) + uy * Math.cos(t)]
-        // the box centre, so that the box edge toward the anchor is `gap` + step / 2 lines away
+        // the box center, so that the box edge toward the anchor is `gap` + step / 2 lines away
         const r = gap + Math.abs(dx) * (w / 2) + Math.abs(dy) * (h / 2) + (step * h) / 2
         const box = { x: a.x + dx * r - w / 2, y: a.y + dy * r - h / 2, w, h }
         candidates.push({ box, near: step <= 4 })

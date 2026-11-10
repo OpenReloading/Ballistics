@@ -121,7 +121,7 @@ The extension of such a segment can reach zero or negative drag within one trial
 
 ### Speed measured downrange
 
-A screen some metres from the muzzle reads a speed the drag has already lowered. Along a flat path, with a drag coefficient $C_D$ on area $\pi d^2/4$, the speed falls with distance $s$ as
+A screen some meters from the muzzle reads a speed the drag has already lowered. Along a flat path, with a drag coefficient $C_D$ on area $\pi d^2/4$, the speed falls with distance $s$ as
 
 $$
 \frac{\mathrm{d}v}{\mathrm{d}s} = -\frac{\pi}{8}\,\frac{\rho\,C_D(M)\,d^2}{m}\,v

@@ -850,7 +850,7 @@ describe('POST /interior charge ladder', () => {
     expect(body.ladderSteps).toBeUndefined()
   })
 
-  it('centres an odd ladder on the charge and answers 400 for an even one around it', async () => {
+  it('centers an odd ladder on the charge and answers 400 for an even one around it', async () => {
     const around = await post(`${API_PREFIX}/interior`, {
       model: 'm3',
       load: m3Load,

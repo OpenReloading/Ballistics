@@ -20,7 +20,7 @@ import { defined, missing } from './defined.ts'
 const metric = presetUnits('metric-grams')
 const us = presetUnits('us')
 
-/** A pistol-sized face with oval-free rings, a coloured black zone, an inner ten and two events. */
+/** A pistol-sized face with oval-free rings, a colored black zone, an inner ten and two events. */
 const club: TargetFaceDesign = {
   rings: [
     { value: 1, diameter: 150, fill: 'white', line: 'black' },
@@ -144,7 +144,7 @@ describe('the draft file', () => {
     expect(fileData(bad).rings[0]).not.toHaveProperty('diameter')
   })
 
-  it('stores a diameter typed in mm or in inches as millimetres', () => {
+  it('stores a diameter typed in mm or in inches as millimeters', () => {
     const d = draft()
     const key = `ring.${defined(d.rows[0]).id}.diameter`
     const typed = (system: typeof metric, text: string) =>
@@ -200,7 +200,7 @@ describe('reduce', () => {
     expect(Object.keys(removed.fields).some((k) => k.includes(id))).toBe(false)
   })
 
-  it('gives back every size to the hundredth of a millimetre, in either unit', () => {
+  it('gives back every size to the hundredth of a millimeter, in either unit', () => {
     // 0.05 mm steps, as entered in mm and as the same size entered in inches
     for (let i = 1; i <= 6000; i++) {
       const mm = Number((i * 0.05).toFixed(2))

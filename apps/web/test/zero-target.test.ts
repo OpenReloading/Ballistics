@@ -15,7 +15,7 @@ import { defined } from './defined.ts'
 import { sheetInk, sheetSvg } from './zero-target-render.ts'
 
 describe('zero target geometry', () => {
-  it('puts the mark centres 160 x 240 mm apart, top left, top right, bottom right, bottom left', () => {
+  it('puts the mark centers 160 x 240 mm apart, top left, top right, bottom right, bottom left', () => {
     const [tl, tr, br, bl] = markCentres
     expect(tr.x - tl.x).toBeCloseTo(160, 2)
     expect(br.x - bl.x).toBeCloseTo(160, 2)
@@ -24,7 +24,7 @@ describe('zero target geometry', () => {
     expect(tl).toEqual({ x: 25, y: 28.5 })
     expect(tr.y).toBe(tl.y)
     expect(br.x).toBe(tr.x)
-    // the svg draws each mark at its centre
+    // the svg draws each mark at its center
     const svg = sheetSvg()
     for (const c of markCentres) expect(svg).toContain(`cx="${c.x}" cy="${c.y}" r="5"`)
     // the top left mark alone has a second ring
@@ -32,7 +32,7 @@ describe('zero target geometry', () => {
     expect(zeroTargetShapes().rings).toHaveLength(5)
   })
 
-  it('draws the grid at a 10 mm pitch through the page centre', () => {
+  it('draws the grid at a 10 mm pitch through the page center', () => {
     const thin = zeroTargetShapes().lines.filter((l) => l.width === 0.15)
     const xs = thin.filter((l) => l.x1 === l.x2).map((l) => l.x1)
     const ys = thin.filter((l) => l.y1 === l.y2).map((l) => l.y1)
@@ -110,7 +110,7 @@ describe('zero target fields', () => {
 })
 
 describe('a photo of the printed sheet', () => {
-  it('calibrated on the four mark centres reads the crossing 50 mm right and up within 1 mm', () => {
+  it('calibrated on the four mark centers reads the crossing 50 mm right and up within 1 mm', () => {
     // a photo taken at an angle: sheet mm to photo px through a perspective
     const corners = [
       { x: 0, y: 0 },
@@ -135,7 +135,7 @@ describe('a photo of the printed sheet', () => {
         const inside = p.x >= 0 && p.x <= page.width && p.y >= 0 && p.y <= page.height
         lum[y * width + x] = inside ? ink(p.x, p.y) : 60
       }
-    // a mark's centre on the photo: the centroid of its dark pixels near where it was printed
+    // a mark's center on the photo: the centroid of its dark pixels near where it was printed
     const centreOf = (c: Point) => {
       const guess = applyMatrix(toPhoto, c)
       let [sx, sy, n] = [0, 0, 0]

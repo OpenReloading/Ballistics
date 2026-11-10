@@ -50,16 +50,16 @@ export const minAltitude = -5000
 
 /** Universal gas constant of the ICAO atmosphere, J/(mol K). */
 const universalGas = 8.31432
-/** Molar mass of water vapour, kg/mol. */
+/** Molar mass of water vapor, kg/mol. */
 const vapourMolarMass = 0.01801528
-/** Specific gas constant of water vapour, J/(kg K). */
+/** Specific gas constant of water vapor, J/(kg K). */
 const vapourGas = universalGas / vapourMolarMass
-/** Molar mass of water vapour over that of dry air. */
+/** Molar mass of water vapor over that of dry air. */
 const vapourRatio = vapourMolarMass / (universalGas / icao.gasConstant)
 /** Exponent of the tropospheric pressure law, g0 / (Rd L). */
 const pressureExponent = icao.gravity / (icao.gasConstant * icao.lapseRate)
 
-/** Saturation vapour pressure over water, Pa, Magnus form of WMO-No. 8 (temperature in K). */
+/** Saturation vapor pressure over water, Pa, Magnus form of WMO-No. 8 (temperature in K). */
 export function saturationVapourPressure(temperature: number): number {
   // the Magnus form takes degrees Celsius; inline, as this package cannot import the schema's units
   const t = temperature - 273.15
@@ -92,7 +92,7 @@ export function densityAltitude(air: Air): number {
   return (icao.temperature * (1 - ratio ** (1 / (pressureExponent - 1)))) / icao.lapseRate
 }
 
-/** Density of moist air as an ideal mixture of dry air and water vapour, kg/m3. */
+/** Density of moist air as an ideal mixture of dry air and water vapor, kg/m3. */
 export function airDensity(air: Air): number {
   const e = air.humidity * saturationVapourPressure(air.temperature)
   return (
@@ -103,7 +103,7 @@ export function airDensity(air: Air): number {
 /** Speed of sound in moist air as an ideal mixture of rigid ideal gases, m/s (`apps/docs/docs/models/exterior-atmosphere.md`, "Speed of sound in moist air"). */
 export function speedOfSound(air: Air): number {
   const x = (air.humidity * saturationVapourPressure(air.temperature)) / air.pressure
-  // mixture gas constant Rd / (molar mass ratio); cp/R is 3.5 for dry air and 4 for vapour
+  // mixture gas constant Rd / (molar mass ratio); cp/R is 3.5 for dry air and 4 for vapor
   const gas = icao.gasConstant / (1 - x + x * vapourRatio)
   const cp = 3.5 + 0.5 * x
   return Math.sqrt((cp / (cp - 1)) * gas * air.temperature)

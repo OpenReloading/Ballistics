@@ -74,7 +74,7 @@ export type PowderParameter =
 
 /** Gaussian prior of one fitted parameter in its log parameter (`apps/docs/docs/models/interior-powder-fit.md`, "Prior and robust loss"). */
 export interface PowderPrior {
-  /** In the unit of the parameter: burn coefficient and volume factor above 0 (a volume factor prior centred on 1 where the volume is a record's nominal one), start pressure above the floor of the shot start, as the fitted value is. */
+  /** In the unit of the parameter: burn coefficient and volume factor above 0 (a volume factor prior centered on 1 where the volume is a record's nominal one), start pressure above the floor of the shot start, as the fitted value is. */
   value: number
   /** Standard deviation of the log parameter: of ln(value) for the burn coefficient and the volume factor, of ln(value - floor) for the start pressure. */
   sigma: number
@@ -211,7 +211,7 @@ export interface PowderFit {
   chiSquare: number
   /** The ladder rows' share of `chiSquare`, whatever the loss. */
   dataChiSquare: number
-  /** The priors' share of `chiSquare`: the squared distance of each log parameter from its prior centre in prior sigmas; 0 without priors. */
+  /** The priors' share of `chiSquare`: the squared distance of each log parameter from its prior center in prior sigmas; 0 without priors. */
   priorChiSquare: number
   /** The minimized cost: `chiSquare`, or with `huberThreshold` the Huber loss of the rows plus `priorChiSquare`. */
   loss: number
@@ -571,7 +571,7 @@ function checkPowderFit(
   }
 }
 
-/** A prior as a pseudo-row after the data: observed log centre, predicted theta `k`, its sigma. */
+/** A prior as a pseudo-row after the data: observed log center, predicted theta `k`, its sigma. */
 interface PriorRow {
   k: number
   sigma: number

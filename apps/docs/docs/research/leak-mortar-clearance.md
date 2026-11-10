@@ -12,7 +12,7 @@ Interior ballistics, gas leakage: for a smooth-bore 81 mm mortar proxy with an a
 
 ## Method
 
-Reference figures, from the issue text: unverified targets for a plausibility comparison (the source report was not found). A muzzle-velocity loss of 1.5 to 1.7 ft/s (0.46 to 0.52 m/s) per 0.001 in (25 micrometres) of clearance on the diameter, reduced to 80 mm, in three independent trial series of 60 to 105 mm mortars, with no trend with the charge (five charges of the 60 mm mortar: 1.3 to 1.8 ft/s). The same data fit a loss of $c$ times the ratio of leak area to bore area with $c$ about 610 to 760 m/s, and the leak flowing at about 0.83 of the ideal orifice value.
+Reference figures, from the issue text: unverified targets for a plausibility comparison (the source report was not found). A muzzle-velocity loss of 1.5 to 1.7 ft/s (0.46 to 0.52 m/s) per 0.001 in (25 micrometers) of clearance on the diameter, reduced to 80 mm, in three independent trial series of 60 to 105 mm mortars, with no trend with the charge (five charges of the 60 mm mortar: 1.3 to 1.8 ft/s). The same data fit a loss of $c$ times the ratio of leak area to bore area with $c$ about 610 to 760 m/s, and the leak flowing at about 0.83 of the ideal orifice value.
 
 Every number below is a simulation of synthetic proxy loads, not load data. Inputs of the 81 mm mortar proxy:
 
@@ -28,7 +28,7 @@ Every number below is a simulation of synthetic proxy loads, not load data. Inpu
 | Burn coefficient                  | $10^{-8}$ m s⁻¹ Pa⁻¹ (the proxy of the verdict, named first before any run), and $3\cdot10^{-9}$ as a sensitivity                      |
 | Heat, back pressure               | none, the ICAO sea-level pressure                                                                                                      |
 
-For each target muzzle velocity of 100, 150, 200 and 250 m/s the charge comes from `solveCharge` on the load without a leak. The load is then run again at that charge with a leak area constant over the whole travel: bore area times $2c/d$ with the clearance $c$ of 0.001 in (25.4 micrometres), at discharge 0.83 and at discharge 1. Half the clearance is run too, to check linearity. The loss is the difference of the muzzle velocities, in ft/s, multiplied by 81/80 to reduce it to 80 mm (the loss scales with $2c/d$, so the same absolute clearance on an 81 mm bore counts for less than on 80 mm).
+For each target muzzle velocity of 100, 150, 200 and 250 m/s the charge comes from `solveCharge` on the load without a leak. The load is then run again at that charge with a leak area constant over the whole travel: bore area times $2c/d$ with the clearance $c$ of 0.001 in (25.4 micrometers), at discharge 0.83 and at discharge 1. Half the clearance is run too, to check linearity. The loss is the difference of the muzzle velocities, in ft/s, multiplied by 81/80 to reduce it to 80 mm (the loss scales with $2c/d$, so the same absolute clearance on an 81 mm bore counts for less than on 80 mm).
 
 Accept rule: pass when, with discharge 0.83, the loss lies within 30 percent of 1.6 ft/s (1.12 to 2.08 ft/s) for every load of 100 to 250 m/s, and discharge 1 lies outside that band for at least one load. The default discharge is kept whatever the result.
 
@@ -42,7 +42,7 @@ $$
 \frac{A_\ell}{A} = \frac{d^2 - (d - c)^2}{d^2} \approx \frac{2c}{d}
 $$
 
-and the loss is summarised by $\Delta v = c_\ell\, A_\ell / A$ with the coefficient $c_\ell$ in m/s, which for the reference is 610 to 760 m/s.
+and the loss is summarized by $\Delta v = c_\ell\, A_\ell / A$ with the coefficient $c_\ell$ in m/s, which for the reference is 610 to 760 m/s.
 
 ## Numbers
 

@@ -186,7 +186,7 @@ describe('solveCharge branches, with an injected run', () => {
     expect(s.evaluationCount).toBe(32)
   })
 
-  it('refuses as bracketFailed where no two neighbouring valid runs enclose the target', () => {
+  it('refuses as bracketFailed where no two neighboring valid runs enclose the target', () => {
     // no valid run between the charges 10 and 20 of the scan
     const gap = synthetic(gapCurve)
     const s = solveCharge(base, target(5), { run: gap })

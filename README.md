@@ -29,7 +29,7 @@ To host the web app, run `pnpm run pages:build` (set `PAGES_BASE_PATH` to the pa
 
 ## Data
 
-The records in `packages/catalog/records/` hold one cartridge record per C.I.P. sheet, target faces, shooting federations and their disciplines, bullets, powders, case capacities and manufacturers. Bullet, powder and manufacturer records cite the maker's own publication, case capacity records cite Wikipedia (CC BY-SA 4.0); powders carry model parameters fitted to the makers' load tables. Data a maker published carries no project licence, the fitted parameters are under the data licence (`packages/catalog/LICENSE`). The demo bullet, powder, case, primer and manufacturer records are invented, for the example load and the tests.
+The records in `packages/catalog/records/` hold one cartridge record per C.I.P. sheet, target faces, shooting federations and their disciplines, bullets, powders, case capacities and manufacturers. Bullet, powder and manufacturer records cite the maker's own publication, case capacity records cite Wikipedia (CC BY-SA 4.0); powders carry model parameters fitted to the makers' load tables. Data a maker published carries no project license, the fitted parameters are under the data license (`packages/catalog/LICENSE`). The demo bullet, powder, case, primer and manufacturer records are invented, for the example load and the tests.
 
 ## Safety
 
@@ -52,5 +52,5 @@ Reloading and shooting are done at your own risk. This software comes without wa
 ## License
 
 - Code: MIT, see [LICENSE](LICENSE).
-- Data records (`packages/catalog/records/`): an entry with a `license` field uses that licence, an entry without one is CC BY 4.0, except data a maker published (a source with `origin` `manufacturer`), which carries no project licence (see [packages/catalog/LICENSE](packages/catalog/LICENSE)).
+- Data records (`packages/catalog/records/`): an entry with a `license` field uses that license, an entry without one is CC BY 4.0, except data a maker published (a source with `origin` `manufacturer`), which carries no project license (see [packages/catalog/LICENSE](packages/catalog/LICENSE)).
 - The Ballistics logo: from the OpenReloading Artwork repository (MIT), see [NOTICE](NOTICE).

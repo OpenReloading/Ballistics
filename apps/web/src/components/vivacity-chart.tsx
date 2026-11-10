@@ -14,7 +14,7 @@ import {
 import { niceTicks, tickDecimals } from '../lib/ticks.ts'
 import { axisText, chartTooltip, EChart, tickStep, useChartTokens } from './echart.tsx'
 
-// the named colours and the series slots 1 to 6
+// the named colors and the series slots 1 to 6
 type Tokens = Record<'muted' | 'border' | 'bg' | 'fg' | `${number}`, string>
 
 const vivacityTokens: Tokens = {
@@ -25,7 +25,7 @@ const vivacityTokens: Tokens = {
   ...Object.fromEntries([1, 2, 3, 4, 5, 6].map((k) => [k, `--series-${k}`])),
 }
 
-/** One powder of the chart and its colour slot (0 to 5, `--series-<slot + 1>` in globals.css). */
+/** One powder of the chart and its color slot (0 to 5, `--series-<slot + 1>` in globals.css). */
 interface Series {
   powder: FittedPowder
   slot: number
@@ -111,7 +111,7 @@ function vivacityOption(
     // the bottom keeps room for the x axis name below its labels (containLabel counts labels only)
     grid: {
       left: 4,
-      // a label on the right edge is centred on its line: with the 1.4.12 letter spacing "burnout" reaches 14 px past it
+      // a label on the right edge is centered on its line: with the 1.4.12 letter spacing "burnout" reaches 14 px past it
       right: 20,
       top: small ? 16 : 28,
       bottom: small ? 18 : 24,

@@ -332,7 +332,7 @@ test('a chosen bullet seats at the entered COAL in the designed case, and the se
   await expect(seated).toHaveAccessibleDescription(/seated at COAL 71\.00 mm/)
   for (const colorScheme of ['light', 'dark'] as const) {
     await page.emulateMedia({ colorScheme })
-    // retried: the controls' colours fade to the new scheme
+    // retried: the controls' colors fade to the new scheme
     await expect
       .poll(async () => {
         const { violations } = await new AxeBuilder({ page })

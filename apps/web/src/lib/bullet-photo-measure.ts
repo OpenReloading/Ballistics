@@ -152,13 +152,13 @@ function line(xs: number[], ys: number[]): Lsq | undefined {
   ])
 }
 
-/** The points (z, r) the circle fits are the nose's: a circle in the (r, z) plane, centre (rc, zc). */
+/** The points (z, r) the circle fits are the nose's: a circle in the (r, z) plane, center (rc, zc). */
 interface Pt {
   z: number
   r: number
 }
 
-/** Geometric fit (Coope 1993) started by the algebraic one (Kasa 1976); tangent keeps the centre at `a - rho` from the axis. */
+/** Geometric fit (Coope 1993) started by the algebraic one (Kasa 1976); tangent keeps the center at `a - rho` from the axis. */
 function circle(pts: Pt[], a: number, tangent: boolean): Lsq | undefined {
   const zm = pts.reduce((s, q) => s + q.z, 0) / pts.length
   const q = pts.map((p) => ({ z: p.z - zm, r: p.r }))

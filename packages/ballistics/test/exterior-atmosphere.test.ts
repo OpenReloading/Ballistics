@@ -66,11 +66,11 @@ describe('humid air', () => {
   it('gives the ideal-mixture density and speed of sound of humid air', () => {
     const air = { altitude: 0, pressure: 95000, temperature: 303.15, humidity: 0.8 }
     const e = 0.8 * 611.2 * Math.exp((17.62 * 30) / 273.12)
-    // dry air with Rd, water vapour with R* / Mv, R* = 8.31432 J/(mol K), Mv = 0.01801528 kg/mol
+    // dry air with Rd, water vapor with R* / Mv, R* = 8.31432 J/(mol K), Mv = 0.01801528 kg/mol
     const rv = 8.31432 / 0.01801528
     const density = (95000 - e) / (287.05287 * 303.15) + e / (rv * 303.15)
     expect(rel(airDensity(air), density)).toBeLessThan(1e-12)
-    // mole fraction x, molar mass ratio Mv / Md, cp / R* = 3.5 (dry) and 4 (vapour)
+    // mole fraction x, molar mass ratio Mv / Md, cp / R* = 3.5 (dry) and 4 (vapor)
     const x = e / 95000
     const gas = 287.05287 / (1 - x + (x * 0.01801528 * 287.05287) / 8.31432)
     const cp = 3.5 * (1 - x) + 4 * x
@@ -110,7 +110,7 @@ describe('limits', () => {
         issue: { code: 'pressureInvalid', params: { pressure: Number.POSITIVE_INFINITY } },
       }),
     )
-    // below the vapour pressure, yet the mixture density is still positive
+    // below the vapor pressure, yet the mixture density is still positive
     const steam = { ...ok, temperature: 373.15, humidity: 1, pressure: 60000 }
     expect(airDensity(steam)).toBeGreaterThan(0)
     expect(() => checkAir(steam)).toThrow(

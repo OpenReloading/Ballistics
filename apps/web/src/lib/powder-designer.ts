@@ -91,7 +91,7 @@ const burn = (
   kind: QuantityKind = 'dimensionless',
 ): PowderSpec => spec(key, label, quantity, kind, 'burn', help)
 
-/** The three numbers of a computed range of the thermochemistry, labelled value, min and max. */
+/** The three numbers of a computed range of the thermochemistry, labeled value, min and max. */
 const range = (
   name: string,
   labels: readonly [Message, Message, Message],
