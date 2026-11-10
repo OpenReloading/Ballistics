@@ -221,6 +221,7 @@ const cartridgeValueOverrideParser = z
   .refine((v) => v.value !== undefined || v.raw !== undefined, {
     message: 'a value needs value or raw',
   })
+  .meta({ anyOf: [{ required: ['value'] }, { required: ['raw'] }] })
 
 /**
  * One entry of the `values` of {@link cartridgeOverrides}: a whole spec value that replaces the one

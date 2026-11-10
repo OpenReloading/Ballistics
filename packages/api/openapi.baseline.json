@@ -1696,7 +1696,15 @@
                           }
                         },
                         "required": ["symbol", "quantity"],
-                        "additionalProperties": false
+                        "additionalProperties": false,
+                        "anyOf": [
+                          {
+                            "required": ["value"]
+                          },
+                          {
+                            "required": ["raw"]
+                          }
+                        ]
                       }
                     },
                     "exceptions": {
@@ -19544,7 +19552,15 @@
                                                 "description": "Footnote numbers printed next to the symbol."
                                               }
                                             },
-                                            "required": ["symbol", "quantity"]
+                                            "required": ["symbol", "quantity"],
+                                            "anyOf": [
+                                              {
+                                                "required": ["value"]
+                                              },
+                                              {
+                                                "required": ["raw"]
+                                              }
+                                            ]
                                           }
                                         },
                                         {
@@ -25064,7 +25080,15 @@
                                                 "description": "Reference `user:<UUID>` to a target sheet of the user."
                                               }
                                             },
-                                            "additionalProperties": false
+                                            "additionalProperties": false,
+                                            "anyOf": [
+                                              {
+                                                "required": ["shots"]
+                                              },
+                                              {
+                                                "required": ["total"]
+                                              }
+                                            ]
                                           },
                                           "description": "Series in the order shot."
                                         }

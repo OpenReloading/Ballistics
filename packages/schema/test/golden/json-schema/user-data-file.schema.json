@@ -1836,6 +1836,18 @@
                               "required": [
                                 "symbol",
                                 "quantity"
+                              ],
+                              "anyOf": [
+                                {
+                                  "required": [
+                                    "value"
+                                  ]
+                                },
+                                {
+                                  "required": [
+                                    "raw"
+                                  ]
+                                }
                               ]
                             }
                           },
@@ -8082,7 +8094,19 @@
                                   "description": "Reference `user:<UUID>` to a target sheet of the user."
                                 }
                               },
-                              "additionalProperties": false
+                              "additionalProperties": false,
+                              "anyOf": [
+                                {
+                                  "required": [
+                                    "shots"
+                                  ]
+                                },
+                                {
+                                  "required": [
+                                    "total"
+                                  ]
+                                }
+                              ]
                             },
                             "description": "Series in the order shot."
                           }
