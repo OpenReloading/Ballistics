@@ -56,6 +56,12 @@ const validate = ajv.compile(JSON.parse(readFileSync(schemaPath, 'utf8')))
 
 describe('the JSON result', () => {
   it('validates against the committed schema, for both commands', async () => {
+    const few = [
+      { cartridge: '30-br', charge: 2.0 },
+      { cartridge: '30-br', charge: 2.2 },
+      { cartridge: '308-win', charge: 2.0 },
+    ].map((s) => ({ ...s, velocity: 0, pressure: 0, pressureBasis: 'transducer' }))
+    const pressures = ['--rows', writeRows(rowsCsv(few)), ...data.slice(2)]
     for (const args of [
       ['verify', ...data],
       ['verify', ...data, '--split', 'test', '--final'],
@@ -65,8 +71,8 @@ describe('the JSON result', () => {
       ['compare', ...data, '--baseline', 'm3', '--candidate', worse],
       ['fit', ...data],
       ['verify', ...data, '--params', 'fit-on-training'],
-      ['fit', ...data, '--pressure-sigma', '0.05'],
-      ['verify', ...data, '--params', 'fit-on-training', '--pressure-sigma', '0.05'],
+      ['fit', ...pressures, '--pressure-sigma', '0.05'],
+      ['verify', ...pressures, '--params', 'fit-on-training', '--pressure-sigma', '0.05'],
     ]) {
       const { code, stdout } = await cli(args)
       expect(code).toBe(0)

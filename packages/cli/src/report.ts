@@ -105,7 +105,7 @@ function pressureLines(p: FitResult['pressure']) {
   const bases = Object.entries(p.factors).map(
     ([k, f]) => `, ${k} factor ${f.factor.toFixed(3)} (${f.rows} rows)`,
   )
-  return [`pressure: sigma ${p.sigma}${bases.join('')}; rounds ${p.rounds}`]
+  return [`pressure: sigma ${p.sigma}${bases.join('')}`]
 }
 
 /** `fit` as text: the version, one line per fitted powder, the pressure rows and the powders not fitted. */

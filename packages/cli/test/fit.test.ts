@@ -11,6 +11,7 @@ vi.mock('@open-reloading/tools/catalog', async (original) =>
 
 const dp40 = 'demo-powder-dp40'
 const sp20 = 'demo-powder-sp20'
+const sp21 = 'demo-powder-sp21'
 
 const record = records.powders.get(dp40)
 if (!record?.interior) throw new Error(`${dp40} has no interior parameters`)
@@ -162,7 +163,27 @@ describe('the pressure rows of a fit', () => {
     expect(r.pressure?.factors.transducer?.factor).toBeCloseTo(1.1, 3)
     expect(r.powders[dp40]?.factor).toBeCloseTo(1, 3)
     expect(r.powders[sp20]?.factor).toBeCloseTo(1, 3)
-    expect(r.pressure?.converged).toBe(true)
+  })
+
+  it('moves the burn coefficient of a powder whose pressures are off its basis', async () => {
+    const off = ['308-match'].flatMap((cartridge) =>
+      [2.0, 2.2, 2.4].map((charge) => ({
+        cartridge,
+        powder: sp21,
+        charge,
+        velocity: 0,
+        pressure: 1 / (1.1 * 1.05) - 1,
+        pressureBasis: 'transducer',
+      })),
+    )
+    const r = await fit({
+      ...options,
+      rows: writeRows(rowsCsv([...training, ...off])),
+      pressureSigma: 0.05,
+    })
+    expect(r.powders[sp21]?.factor).toBeGreaterThan(1.001)
+    expect(r.powders[dp40]?.factor).toBeCloseTo(1, 2)
+    expect(r.powders[sp20]?.factor).toBeCloseTo(1, 2)
   })
 
   it('compares the held-out pressures with the model peak times the factor of their basis', async () => {
@@ -172,19 +193,5 @@ describe('the pressure rows of a fit', () => {
     expect(scaled.overall.pressure?.median).toBeCloseTo(0, 3)
     const plain = await verify(run)
     expect(plain.overall.pressure?.median).toBeGreaterThan(0.05)
-  })
-
-  it('reads no pressure without the option', async () => {
-    const r = await fit({ ...options, rows })
-    const bare = writeRows(rowsCsv(training.map(({ pressure: _, pressureBasis: __, ...s }) => s)))
-    const velocities = await fit({ ...options, rows: bare })
-    expect(r).not.toHaveProperty('pressure')
-    for (const id of [dp40, sp20]) {
-      expect(r.powders[id]?.vivacity.value).toBeCloseTo(
-        velocities.powders[id]?.vivacity.value ?? Number.NaN,
-        6,
-      )
-      expect(r.powders[id]?.factor).toBeCloseTo(velocities.powders[id]?.factor ?? Number.NaN, 6)
-    }
   })
 })

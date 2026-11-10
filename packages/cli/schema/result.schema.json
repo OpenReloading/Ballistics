@@ -921,22 +921,12 @@
               "description": "Powders not fitted, by reason; a reason without powders is left out."
             },
             "pressure": {
-              "description": "With `--pressure-sigma`: the printed pressures of the training rows joined the fit, each over the factor of its basis.",
+              "description": "With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its basis.",
               "type": "object",
               "properties": {
                 "sigma": {
                   "type": "number",
                   "description": "Pressure sigma of each row, a fraction of its printed pressure over the factor of its basis."
-                },
-                "rounds": {
-                  "type": "integer",
-                  "minimum": 0,
-                  "maximum": 9007199254740991,
-                  "description": "Fits of the basis loop, at most 5."
-                },
-                "converged": {
-                  "type": "boolean",
-                  "description": "Whether every log factor moved by less than 0.001 in the last round."
                 },
                 "factors": {
                   "type": "object",
@@ -948,22 +938,22 @@
                     "properties": {
                       "factor": {
                         "type": "number",
-                        "description": "The model peak pressure times this is what the basis reads: the exponential of the mean log of printed over model peak pressure of its rows after the last fit."
+                        "description": "The model peak pressure times this is what the basis reads: the exponential of the mean log of printed over model peak pressure of its rows under the fit to velocities only."
                       },
                       "rows": {
                         "type": "integer",
                         "minimum": 0,
                         "maximum": 9007199254740991,
-                        "description": "Pressure rows of the basis in the powders fitted."
+                        "description": "Pressure rows of the basis of the powders fitted to velocities."
                       }
                     },
                     "required": ["factor", "rows"],
                     "additionalProperties": false
                   },
-                  "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a fitted powder is left out."
+                  "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its rows are compared as they are."
                 }
               },
-              "required": ["sigma", "rounds", "converged", "factors"],
+              "required": ["sigma", "factors"],
               "additionalProperties": false
             }
           },
@@ -1916,22 +1906,12 @@
                   "description": "Powders not fitted, by reason; a reason without powders is left out."
                 },
                 "pressure": {
-                  "description": "With `--pressure-sigma`: the printed pressures of the training rows joined the fit, each over the factor of its basis.",
+                  "description": "With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its basis.",
                   "type": "object",
                   "properties": {
                     "sigma": {
                       "type": "number",
                       "description": "Pressure sigma of each row, a fraction of its printed pressure over the factor of its basis."
-                    },
-                    "rounds": {
-                      "type": "integer",
-                      "minimum": 0,
-                      "maximum": 9007199254740991,
-                      "description": "Fits of the basis loop, at most 5."
-                    },
-                    "converged": {
-                      "type": "boolean",
-                      "description": "Whether every log factor moved by less than 0.001 in the last round."
                     },
                     "factors": {
                       "type": "object",
@@ -1943,22 +1923,22 @@
                         "properties": {
                           "factor": {
                             "type": "number",
-                            "description": "The model peak pressure times this is what the basis reads: the exponential of the mean log of printed over model peak pressure of its rows after the last fit."
+                            "description": "The model peak pressure times this is what the basis reads: the exponential of the mean log of printed over model peak pressure of its rows under the fit to velocities only."
                           },
                           "rows": {
                             "type": "integer",
                             "minimum": 0,
                             "maximum": 9007199254740991,
-                            "description": "Pressure rows of the basis in the powders fitted."
+                            "description": "Pressure rows of the basis of the powders fitted to velocities."
                           }
                         },
                         "required": ["factor", "rows"],
                         "additionalProperties": false
                       },
-                      "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a fitted powder is left out."
+                      "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its rows are compared as they are."
                     }
                   },
-                  "required": ["sigma", "rounds", "converged", "factors"],
+                  "required": ["sigma", "factors"],
                   "additionalProperties": false
                 }
               },
@@ -2827,22 +2807,12 @@
                   "description": "Powders not fitted, by reason; a reason without powders is left out."
                 },
                 "pressure": {
-                  "description": "With `--pressure-sigma`: the printed pressures of the training rows joined the fit, each over the factor of its basis.",
+                  "description": "With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its basis.",
                   "type": "object",
                   "properties": {
                     "sigma": {
                       "type": "number",
                       "description": "Pressure sigma of each row, a fraction of its printed pressure over the factor of its basis."
-                    },
-                    "rounds": {
-                      "type": "integer",
-                      "minimum": 0,
-                      "maximum": 9007199254740991,
-                      "description": "Fits of the basis loop, at most 5."
-                    },
-                    "converged": {
-                      "type": "boolean",
-                      "description": "Whether every log factor moved by less than 0.001 in the last round."
                     },
                     "factors": {
                       "type": "object",
@@ -2854,22 +2824,22 @@
                         "properties": {
                           "factor": {
                             "type": "number",
-                            "description": "The model peak pressure times this is what the basis reads: the exponential of the mean log of printed over model peak pressure of its rows after the last fit."
+                            "description": "The model peak pressure times this is what the basis reads: the exponential of the mean log of printed over model peak pressure of its rows under the fit to velocities only."
                           },
                           "rows": {
                             "type": "integer",
                             "minimum": 0,
                             "maximum": 9007199254740991,
-                            "description": "Pressure rows of the basis in the powders fitted."
+                            "description": "Pressure rows of the basis of the powders fitted to velocities."
                           }
                         },
                         "required": ["factor", "rows"],
                         "additionalProperties": false
                       },
-                      "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a fitted powder is left out."
+                      "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its rows are compared as they are."
                     }
                   },
-                  "required": ["sigma", "rounds", "converged", "factors"],
+                  "required": ["sigma", "factors"],
                   "additionalProperties": false
                 }
               },
@@ -3109,22 +3079,12 @@
           "description": "Velocity sigma of each row, a fraction of its velocity."
         },
         "pressure": {
-          "description": "With `--pressure-sigma`: the printed pressures of the training rows joined the fit, each over the factor of its basis.",
+          "description": "With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its basis.",
           "type": "object",
           "properties": {
             "sigma": {
               "type": "number",
               "description": "Pressure sigma of each row, a fraction of its printed pressure over the factor of its basis."
-            },
-            "rounds": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 9007199254740991,
-              "description": "Fits of the basis loop, at most 5."
-            },
-            "converged": {
-              "type": "boolean",
-              "description": "Whether every log factor moved by less than 0.001 in the last round."
             },
             "factors": {
               "type": "object",
@@ -3136,22 +3096,22 @@
                 "properties": {
                   "factor": {
                     "type": "number",
-                    "description": "The model peak pressure times this is what the basis reads: the exponential of the mean log of printed over model peak pressure of its rows after the last fit."
+                    "description": "The model peak pressure times this is what the basis reads: the exponential of the mean log of printed over model peak pressure of its rows under the fit to velocities only."
                   },
                   "rows": {
                     "type": "integer",
                     "minimum": 0,
                     "maximum": 9007199254740991,
-                    "description": "Pressure rows of the basis in the powders fitted."
+                    "description": "Pressure rows of the basis of the powders fitted to velocities."
                   }
                 },
                 "required": ["factor", "rows"],
                 "additionalProperties": false
               },
-              "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a fitted powder is left out."
+              "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its rows are compared as they are."
             }
           },
-          "required": ["sigma", "rounds", "converged", "factors"],
+          "required": ["sigma", "factors"],
           "additionalProperties": false
         },
         "powders": {

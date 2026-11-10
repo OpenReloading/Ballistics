@@ -58,10 +58,6 @@ const pressureFit = z
     sigma: fraction.describe(
       'Pressure sigma of each row, a fraction of its printed pressure over the factor of its basis.',
     ),
-    rounds: count.describe('Fits of the basis loop, at most 5.'),
-    converged: z
-      .boolean()
-      .describe('Whether every log factor moved by less than 0.001 in the last round.'),
     factors: z
       .record(
         z.string(),
@@ -69,18 +65,18 @@ const pressureFit = z
           factor: z
             .number()
             .describe(
-              'The model peak pressure times this is what the basis reads: the exponential of the mean log of printed over model peak pressure of its rows after the last fit.',
+              'The model peak pressure times this is what the basis reads: the exponential of the mean log of printed over model peak pressure of its rows under the fit to velocities only.',
             ),
-          rows: count.describe('Pressure rows of the basis in the powders fitted.'),
+          rows: count.describe('Pressure rows of the basis of the powders fitted to velocities.'),
         }),
       )
       .describe(
-        'By pressure basis of the training rows (`unstated` without one); a basis without a row of a fitted powder is left out.',
+        'By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its rows are compared as they are.',
       ),
   })
   .optional()
   .describe(
-    'With `--pressure-sigma`: the printed pressures of the training rows joined the fit, each over the factor of its basis.',
+    'With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its basis.',
   )
 
 const evaluation = z.object({

@@ -5,8 +5,7 @@ import {
   type PowderFitReason,
 } from '@open-reloading/ballistics'
 import { compareKeys, toSi } from '@open-reloading/schema'
-import { nth } from '@open-reloading/statistics'
-import { type InteriorModel, loadOf, outcomes } from './evaluate.ts'
+import { type InteriorModel, loadOf, outcomes, predict } from './evaluate.ts'
 import type { Records } from './records.ts'
 import type { Row } from './rows.ts'
 
@@ -44,7 +43,7 @@ interface PressureRun {
 /** The basis a row's printed pressure is grouped by, as the metrics group it. */
 export const basisOf = (row: Row) => row.pressureBasis ?? 'unstated'
 
-/** The sessions of one powder's used training rows, one per load without its charge, and their rows in ladder order; with `pressure`, a printed pressure over its basis factor is a point's peak pressure. */
+/** The sessions of one powder's used training rows, one per load without its charge; with `pressure`, a printed pressure over its basis factor is a point's peak pressure. */
 function sessionsOf(
   powder: string,
   rows: readonly Row[],
@@ -66,7 +65,7 @@ function sessionsOf(
     ])
     groups.set(key, [...(groups.get(key) ?? []), r])
   }
-  const sessions = [...groups.values()].map((group): PooledSession => {
+  return [...groups.values()].map((group): PooledSession => {
     const row = group[0] as Row
     const load = loadOf(row, records)
     // a used outcome had its load built, so this never holds
@@ -90,38 +89,26 @@ function sessionsOf(
       }),
     }
   })
-  return { sessions, ordered: [...groups.values()].flat() }
 }
 
 /** The model a fit runs and the sigmas of its rows. */
 type FitRun = { model: InteriorModel; velocitySigma: number; pressure?: PressureRun | undefined }
 
-/** Per pressure row of a fit, its basis and the log of the printed pressure over the model's peak. */
-type PressureLog = { basis: string; log: number }
-
-/** The fit of one powder under `model` whose record burn coefficient is `vivacity`, independent of the other powders, with its pressure logs, or why it failed. */
+/** The fit of one powder under `model` whose record burn coefficient is `vivacity`, independent of the other powders, or why it failed. */
 function fitOne(
   id: string,
   vivacity: number,
   rows: readonly Row[],
   records: Records,
   run: FitRun,
-): { value: PowderFitValue; logs: PressureLog[] } | NotFitted {
+): PowderFitValue | NotFitted {
   if (rows.length === 0) return 'noUsableRow'
   try {
-    const { sessions, ordered } = sessionsOf(id, rows, records, {
+    const sessions = sessionsOf(id, rows, records, {
       velocity: run.velocitySigma,
       pressure: run.pressure,
     })
     const fit = fitPowderPooled(sessions, { interior: run.model })
-    const peaks = fit.residuals.filter((r) => r.quantity === 'pressure')
-    const printed = run.pressure
-      ? ordered.flatMap((r) => (r.pressure === undefined ? [] : [{ r, pressure: r.pressure }]))
-      : []
-    const logs = printed.map(({ r, pressure }, i) => ({
-      basis: basisOf(r),
-      log: Math.log(toSi('pressure', pressure) / nth(peaks, i).predicted),
-    }))
     const burn = fit.parameters.find((p) => p.kind === 'burnRate' && p.group === id)
     if (!burn) throw new Error(`no burn coefficient in the fit of ${id}`)
     const factor = burn.value / burn.initial
@@ -133,7 +120,7 @@ function fitOne(
     const perDegree = degrees > 0 ? fit.chiSquare / degrees : null
     // the usual scaling of a covariance when the residuals are larger than the assumed sigma
     const scale = Math.sqrt(Math.max(1, perDegree ?? 1))
-    const result: PowderFitValue = {
+    return {
       vivacity: {
         value,
         standardUncertainty: (burn.standardUncertainty / burn.value) * scale * value,
@@ -143,38 +130,45 @@ function fitOne(
       cartridges: new Set(rows.map((r) => r.cartridge)).size,
       chiSquarePerDegree: perDegree,
       iterations: fit.iterations,
-      ...(run.pressure && { pressureRows: logs.length }),
+      ...(run.pressure && { pressureRows: rows.filter((r) => r.pressure !== undefined).length }),
     }
-    return { value: result, logs }
   } catch (error) {
     if (error instanceof PowderFitError) return error.reason
     throw error
   }
 }
 
-/** One fit of each powder the rows name that has interior parameters, to its `used` rows, with the pressure logs of the powders fitted. */
+/** One fit of each powder the rows name that has interior parameters, to its `used` rows. */
 function fitEach(ids: readonly string[], used: readonly Row[], records: Records, run: FitRun) {
   const powders: Record<string, PowderFitValue> = {}
   const notFitted: Record<string, NotFitted> = {}
-  const logs: PressureLog[] = []
   for (const id of ids) {
     const vivacity = records.powders.get(id)?.interior?.vivacity.value
     if (vivacity === undefined) continue
     const own = used.filter((r) => r.powder === id)
     const fit = fitOne(id, vivacity, own, records, run)
     if (typeof fit === 'string') notFitted[id] = fit
-    else {
-      powders[id] = fit.value
-      logs.push(...fit.logs)
-    }
+    else powders[id] = fit
   }
-  return { powders, notFitted, logs }
+  return { powders, notFitted }
 }
 
-/** Per basis of `logs`, the exponential of their mean and their number, bases sorted. */
-function basisFactors(logs: readonly PressureLog[]) {
+/** Per basis of the `used` rows that print a pressure, of the powders `fit` holds, the exponential of the mean log of printed over model peak pressure under that fit, and their number, bases sorted. */
+function basisFactors(
+  used: readonly Row[],
+  records: Records,
+  model: InteriorModel,
+  fit: ReturnType<typeof fitEach>,
+) {
+  const fitted = withFit(records, fit)
   const bases = new Map<string, number[]>()
-  for (const { basis, log } of logs) bases.set(basis, [...(bases.get(basis) ?? []), log])
+  for (const r of used) {
+    if (r.pressure === undefined || !(r.powder in fit.powders)) continue
+    const p = predict(r, fitted, model)
+    if (!('pressure' in p)) continue
+    const log = Math.log(toSi('pressure', r.pressure) / p.pressure)
+    bases.set(basisOf(r), [...(bases.get(basisOf(r)) ?? []), log])
+  }
   return Object.fromEntries(
     [...bases]
       .toSorted(([a], [b]) => compareKeys(a, b))
@@ -185,7 +179,7 @@ function basisFactors(logs: readonly PressureLog[]) {
   )
 }
 
-/** The burn coefficient of each powder with interior parameters the rows name, fitted under `model` to its training rows that model can run, velocities corrected to the muzzle; `velocitySigma` is a fraction of the velocity; with `pressureSigma`, a fraction of the pressure, the printed pressures join the fit with one factor per basis. */
+/** The burn coefficient of each powder with interior parameters the rows name, fitted under `model` to its training rows that model can run, velocities corrected to the muzzle; `velocitySigma` is a fraction of the velocity; with `pressureSigma`, a fraction of the pressure, the printed pressures over the factor of their basis join a second fit. */
 export function fitPowders(
   rows: readonly Row[],
   records: Records,
@@ -197,31 +191,20 @@ export function fitPowders(
     .filter((o) => 'velocity' in o.prediction)
     .map((o) => o.row)
   const ids = [...new Set(rows.map((r) => r.powder))].toSorted(compareKeys)
-  if (pressureSigma === undefined) {
-    const { logs: _, ...fit } = fitEach(ids, used, records, { model, velocitySigma })
-    return fit
+  const velocities = fitEach(ids, used, records, { model, velocitySigma })
+  if (pressureSigma === undefined) return velocities
+  // the factor is what the basis has in common against the model fitted to velocities (the measuring method, the source, what the model lacks), so the pressure rows move a powder's burn coefficient only by its own deviation from its basis; fitted together with the pressures, the burn coefficients would take part of that common offset
+  const factors = basisFactors(used, records, model, velocities)
+  const pressure = {
+    sigma: pressureSigma,
+    factors: Object.fromEntries(Object.entries(factors).map(([b, f]) => [b, f.factor])),
   }
-  // the factor takes what the whole basis has in common (the measuring method, the source, and what the model lacks), so a powder's burn coefficient follows its velocities and only its own deviation from the basis
-  let factors: ReturnType<typeof basisFactors> = {}
-  for (let rounds = 1; ; rounds++) {
-    const pressure = {
-      sigma: pressureSigma,
-      factors: Object.fromEntries(Object.entries(factors).map(([b, f]) => [b, f.factor])),
-    }
-    const { logs, ...fit } = fitEach(ids, used, records, { model, velocitySigma, pressure })
-    const next = basisFactors(logs)
-    const moved = Object.keys({ ...factors, ...next }).map((b) =>
-      Math.abs(Math.log((next[b]?.factor ?? 1) / (factors[b]?.factor ?? 1))),
-    )
-    const converged = moved.every((m) => m < 0.001)
-    factors = next
-    if (converged || rounds === 5)
-      return { ...fit, pressure: { sigma: pressureSigma, rounds, converged, factors } }
-  }
+  const fit = fitEach(ids, used, records, { model, velocitySigma, pressure })
+  return { ...fit, pressure: { sigma: pressureSigma, factors } }
 }
 
 /** `records` with each fitted burn coefficient laid over its powder and without the interior parameters of a powder not fitted, whose rows then count as `noPowderModel`. */
-export function withFit(records: Records, fit: ReturnType<typeof fitPowders>): Records {
+export function withFit(records: Records, fit: ReturnType<typeof fitEach>): Records {
   const powders = new Map(records.powders)
   for (const [id, fitted] of Object.entries(fit.powders)) {
     const powder = records.powders.get(id)
