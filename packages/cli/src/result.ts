@@ -131,6 +131,14 @@ const evaluation = z.object({
         .optional()
         .describe('With `--exponent family`: the pressure exponents of the fit.'),
       pressure: pressureFit,
+      energy: z
+        .object({
+          factor: z
+            .number()
+            .describe('The energy-level factor the prior impetus values were scaled by.'),
+        })
+        .optional()
+        .describe('With `--energy prior`.'),
     })
     .optional()
     .describe(
@@ -292,6 +300,21 @@ const fitResult = z.object({
           .describe(
             'With `--pressure-sigma`: used training rows whose printed pressure the fit read, those of a basis with a factor.',
           ),
+        energy: z
+          .object({
+            value: z
+              .number()
+              .describe(
+                "Specific energy laid over the record, J/kg: the prior impetus times the energy-level factor of `energy.factor`, over the record's `interior.gamma` minus 1.",
+              ),
+            prior: z
+              .enum(['own', 'base', 'pooled'])
+              .describe(
+                "Where the prior impetus came from: `own`, the powder's thermochemistry; `base`, the median of the own impetus values of its propellant base; `pooled`, the median of all own impetus values.",
+              ),
+          })
+          .optional()
+          .describe('With `--energy prior`.'),
       }),
     )
     .describe('By powder id: each powder fitted on its own.'),
@@ -299,6 +322,30 @@ const fitResult = z.object({
     .record(z.string(), z.enum(notFittedReasons))
     .describe(
       'By powder id, why a powder with interior parameters that the rows name got no value: the reason of the fit (with `--exponent family`, of the fit at the exponent of its family), or `noUsableRow` without a used training row.',
+    ),
+  energy: z
+    .object({
+      factor: z
+        .number()
+        .describe('The chosen energy-level factor, the grid value with the least objective.'),
+      grid: z.array(z.number()).describe('The energy-level factors tried, one fit each.'),
+      objective: z
+        .array(z.number().nullable())
+        .describe(
+          'Per grid value, the median of |ln(model peak / printed pressure)| over the same rows at every value that takes part: the training rows that print a pressure in bar and have a model peak at every such value, so only rows of powders fitted at all of them. A value takes part when at least 90 % of the powders fitted at any value are fitted at it; null where it does not.',
+        ),
+      pressureRows: count.describe(
+        'Rows of the objective, the same at every factor that takes part.',
+      ),
+      priors: z
+        .object({ own: count, byBase: count, pooled: count })
+        .describe(
+          'How many powders took each kind of prior, of the powders the rows name that have interior parameters, fitted or not.',
+        ),
+    })
+    .optional()
+    .describe(
+      "With `--energy prior`: each powder's energy is its prior impetus times one energy-level factor shared by all powders, over its `interior.gamma` minus 1, chosen on the training pressures; per powder only the burn coefficient is fitted.",
     ),
 })
 

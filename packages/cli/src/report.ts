@@ -112,8 +112,14 @@ function pressureLines(p: FitResult['pressure']) {
 export function fitTable(r: FitResult): string {
   const notFitted = Object.entries(r.notFitted).map(([k, reason]) => `${k} ${reason}`)
   const families = Object.entries(r.exponent?.families ?? {}).map(([k, f]) => `${k} ${f.exponent}`)
+  const e = r.energy
   return [
     `model ${r.model}  version ${r.modelVersion}`,
+    ...(e
+      ? [
+          `energy: factor ${e.factor} from ${e.pressureRows} pressure rows; priors own ${e.priors.own}, by base ${e.priors.byBase}, pooled ${e.priors.pooled}`,
+        ]
+      : []),
     table(
       [
         'powder',

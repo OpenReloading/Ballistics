@@ -1,5 +1,9 @@
+import { cpSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { describe, expect, it, vi } from 'vitest'
 import { fit, verify } from '../src/commands.ts'
+import { UsageError } from '../src/errors.ts'
 import { loadModel } from '../src/model.ts'
 import { recordRoots, records, rowsCsv, type Spec, writeRows } from './fixture.ts'
 
@@ -102,6 +106,168 @@ describe('verify with --params fit-on-training', () => {
     const fitted = await verify({ ...options, params: 'fit-on-training' })
     expect(fitted.modelVersion).not.toBe(recorded.modelVersion)
     expect(fitted.inputs).toEqual(recorded.inputs)
+  })
+})
+
+// each run fits every powder at nine factors
+describe('--energy prior', { timeout: 120_000 }, () => {
+  const sp30 = 'demo-powder-sp30'
+  /** The fixture records with each powder's energy and burn coefficient set as given. */
+  const plant = (values: Record<string, [energy: number, vivacity: number]>) => {
+    const powders = new Map(records.powders)
+    for (const [id, [energy, vivacity]] of Object.entries(values)) {
+      const p = records.powders.get(id)
+      if (!p?.interior) throw new Error(`${id} has no interior parameters`)
+      powders.set(id, {
+        ...p,
+        interior: {
+          ...p.interior,
+          energy: { ...p.interior.energy, value: energy },
+          vivacity: { ...p.interior.vivacity, value: vivacity },
+        },
+      })
+    }
+    return { ...records, powders }
+  }
+  /** Energy 0.8 times the prior impetus over gamma - 1: sp30's own 1.0e6 J/kg over 0.25, the single-base median 1.05e6 over 0.215 for sp20, the pooled median 1.05e6 over 0.215 for the double-base dp40. */
+  const truth = plant({
+    [sp30]: [3.2e6, 0.8],
+    [sp20]: [3906976.744, 0.7],
+    [dp40]: [3906976.744, 1.0],
+  })
+  const training = (powder: string) =>
+    [
+      ['30-br', 2.0],
+      ['30-br', 2.4],
+      ['308-match', 2.2],
+    ].map(([cartridge, charge]) => ({
+      cartridge: cartridge as string,
+      powder,
+      charge: charge as number,
+      velocity: 0,
+      pressure: 0,
+    }))
+
+  it('takes the energy-level factor of the planted energies from the training pressures', async () => {
+    const rows = writeRows(rowsCsv([sp30, sp20, dp40].flatMap(training), truth))
+    const r = await fit({ ...options, rows, energy: 'prior' })
+    expect(r.energy?.factor).toBe(0.8)
+    expect(r.energy?.priors).toEqual({ own: 1, byBase: 1, pooled: 1 })
+    expect(r.powders[sp30]?.energy).toEqual({ value: 3.2e6, prior: 'own' })
+    expect(r.powders[sp20]?.energy?.prior).toBe('base')
+    expect(r.powders[sp20]?.energy?.value).toBeCloseTo(3906976.744, 2)
+    expect(r.powders[dp40]?.energy?.prior).toBe('pooled')
+    expect(r.powders[dp40]?.energy?.value).toBeCloseTo(3906976.744, 2)
+    expect(r.powders[sp30]?.vivacity.value.toPrecision(3)).toBe('0.800')
+    expect(r.powders[sp20]?.vivacity.value.toPrecision(3)).toBe('0.700')
+    expect(r.powders[dp40]?.vivacity.value.toPrecision(3)).toBe('1.00')
+  })
+
+  it('leaves out a factor at which fewer than 90 % of the powders are fitted', async () => {
+    const limit = new URL('./fixtures/burn-limit-model.mjs', import.meta.url).pathname
+    const rows = writeRows(rowsCsv([sp30, sp20, dp40].flatMap(training), truth))
+    const r = await fit({ ...options, rows, energy: 'prior' }, limit)
+    expect(r.energy?.objective.map((o) => o !== null)).toEqual([
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+    ])
+    expect(r.energy?.factor).toBe(0.8)
+  })
+
+  it('compares every factor on the rows of the powders fitted at all of them', async () => {
+    const at = (impetus: number, gamma: number) => (0.8 * impetus) / (gamma - 1)
+    const ten = plant({
+      'demo-powder-dp15': [at(1.05e6, 1.225), 0.7],
+      'demo-powder-dp30': [at(1.05e6, 1.22), 0.7],
+      [dp40]: [at(1.05e6, 1.215), 1.0],
+      'demo-powder-dp70': [at(1.05e6, 1.24), 0.7],
+      [sp20]: [at(1.05e6, 1.215), 0.7],
+      'demo-powder-sp21': [at(1.05e6, 1.215), 0.7],
+      'demo-powder-sp22': [at(1.05e6, 1.215), 0.7],
+      'demo-powder-sp25': [at(1.05e6, 1.215), 0.7],
+      [sp30]: [at(1.0e6, 1.25), 0.7],
+      'demo-powder-sp31': [at(1.1e6, 1.25), 0.7],
+    })
+    const specs = [...ten.powders.keys()]
+      .filter((id) => /^demo-powder-(dp|sp)\d/.test(id))
+      .flatMap((powder) =>
+        [2.0, 2.4].map((charge) => ({
+          cartridge: '30-br',
+          powder,
+          charge,
+          velocity: 0,
+          pressure: 0,
+        })),
+      )
+    const rows = writeRows(rowsCsv(specs, ten))
+    const r = await fit({ ...options, rows, energy: 'prior' })
+    // dp40 is not resolved at 0.60 and 0.65, which still take part with 9 of 10 powders
+    expect(r.energy?.objective.every((o) => o !== null)).toBe(true)
+    expect(r.energy?.pressureRows).toBe(18)
+    expect(r.energy?.factor).toBe(0.8)
+  })
+
+  it('evaluates the held-out rows with the energy and burn coefficient of the fit', async () => {
+    const rows = writeRows(
+      rowsCsv(
+        [
+          ...training(sp30),
+          { cartridge: '308-win', powder: sp30, charge: 2.0, velocity: 0, pressure: 0 },
+          { cartridge: '308-win', powder: sp30, charge: 2.3, velocity: 0, pressure: 0 },
+        ],
+        truth,
+      ),
+    )
+    const prior = await verify({ ...options, rows, params: 'fit-on-training', energy: 'prior' })
+    expect(prior.overall.velocity?.median).toBeCloseTo(0, 4)
+    expect(prior.overall.pressure?.median).toBeCloseTo(0, 4)
+    const record = await verify({ ...options, rows, params: 'fit-on-training' })
+    expect(record.overall.pressure?.median).toBeGreaterThan(0.02)
+  })
+
+  it('is bad input without a training row that prints a pressure', async () => {
+    const rows = writeRows(
+      rowsCsv(
+        training(sp30).map(({ pressure: _, ...s }) => s),
+        truth,
+      ),
+    )
+    await expect(fit({ ...options, rows, energy: 'prior' })).rejects.toThrow(UsageError)
+  })
+
+  it('is bad input without a powder record with a thermochemistry', async () => {
+    const rows = writeRows(rowsCsv(training(dp40), truth))
+    await expect(
+      fit({ ...options, rows, records: [recordRoots[0] as string], energy: 'prior' }),
+    ).rejects.toThrow(UsageError)
+  })
+
+  it('has another model version when a prior from a powder the rows do not name changes', async () => {
+    const rows = writeRows(rowsCsv(training(sp20), truth))
+    const root = mkdtempSync(join(tmpdir(), 'cli-records-'))
+    cpSync(recordRoots[1] as string, root, { recursive: true })
+    const path = join(root, 'powders/demo-powder-sp31.json')
+    const sp31 = JSON.parse(readFileSync(path, 'utf8'))
+    // impetus and flame temperature scale together, so the record keeps impetus = R T / M
+    for (const key of ['impetus', 'flameTemperature'])
+      for (const end of ['value', 'min', 'max']) sp31.thermochemistry[key][end] *= 1.1
+    writeFileSync(path, JSON.stringify(sp31))
+    const a = await fit({ ...options, rows, energy: 'prior' })
+    const b = await fit({
+      ...options,
+      rows,
+      records: [recordRoots[0] as string, root],
+      energy: 'prior',
+    })
+    expect(b.inputs).toEqual(a.inputs)
+    expect(b.modelVersion).not.toBe(a.modelVersion)
   })
 })
 

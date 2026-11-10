@@ -18,7 +18,7 @@ const usage = `usage:
   ballistics verify  --rows <path> [--model m3|<module>] [options]
   ballistics compare --rows <path> --baseline <m3|module|verify.json> --candidate <m3|module> [options]
   ballistics fit     --rows <path> [--model m3|<module>] [--velocity-sigma <fraction>] [--exponent family]
-                     [--pressure-sigma <fraction>] [--records <dir>] [--json | --table]
+                     [--pressure-sigma <fraction>] [--energy prior] [--records <dir>] [--json | --table]
   ballistics run <operation> --input <file|-> [--records <dir>]
   ballistics operations
   ballistics --help | --version
@@ -44,6 +44,9 @@ options:
   --pressure-sigma <fraction>
                      fit and --params fit-on-training: fit the printed pressures too, with
                      this sigma, a fraction of the pressure, and one factor per pressure basis
+  --energy prior     fit and --params fit-on-training: each powder's energy is its prior
+                     from thermochemistry times one energy-level factor chosen on the
+                     training pressures; only the burn coefficient is fitted per powder
   --json | --table   output format (default: JSON unless stdout is a terminal)
   -h, --help         this text
   --version          the version
@@ -89,6 +92,7 @@ function checkChoices(
     table?: boolean | undefined
     params?: string | undefined
     exponent?: string | undefined
+    energy?: string | undefined
   },
   split: string,
   by: string | undefined,
@@ -107,6 +111,8 @@ function checkChoices(
     throw new UsageError('--params is records or fit-on-training')
   if (values.exponent !== undefined && values.exponent !== 'family')
     throw new UsageError('--exponent is family')
+  if (values.energy !== undefined && values.energy !== 'prior')
+    throw new UsageError('--energy takes prior only')
 }
 
 /** The fraction of the sigma option `name`, undefined without it; bad input outside (0, 1). */
@@ -155,11 +161,12 @@ function optionsOf(
       'velocity-sigma': { type: 'string' },
       exponent: { type: 'string' },
       'pressure-sigma': { type: 'string' },
+      energy: { type: 'string' },
     },
   })
   const foreign = foreignOptions[command].filter((o) => values[o] !== undefined)
   if (foreign.length > 0) throw new UsageError(`${command} takes no --${foreign.join(' or --')}`)
-  for (const option of ['velocity-sigma', 'exponent', 'pressure-sigma'] as const)
+  for (const option of ['velocity-sigma', 'exponent', 'pressure-sigma', 'energy'] as const)
     if (command !== 'fit' && values[option] !== undefined && values.params !== 'fit-on-training')
       throw new UsageError(`--${option} is for fit and --params fit-on-training`)
   const rows = values.rows ?? env.BALLISTICS_ROWS
@@ -180,6 +187,7 @@ function optionsOf(
     velocitySigma: sigmaOf('velocity-sigma', values['velocity-sigma']),
     exponent: values.exponent as Options['exponent'],
     pressureSigma: sigmaOf('pressure-sigma', values['pressure-sigma']),
+    energy: values.energy as Options['energy'],
   }
   return { options, values }
 }

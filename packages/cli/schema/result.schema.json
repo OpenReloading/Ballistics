@@ -977,6 +977,18 @@
               },
               "required": ["sigma", "factors"],
               "additionalProperties": false
+            },
+            "energy": {
+              "description": "With `--energy prior`.",
+              "type": "object",
+              "properties": {
+                "factor": {
+                  "type": "number",
+                  "description": "The energy-level factor the prior impetus values were scaled by."
+                }
+              },
+              "required": ["factor"],
+              "additionalProperties": false
             }
           },
           "required": ["velocitySigma", "powders", "notFitted"],
@@ -1984,6 +1996,18 @@
                   },
                   "required": ["sigma", "factors"],
                   "additionalProperties": false
+                },
+                "energy": {
+                  "description": "With `--energy prior`.",
+                  "type": "object",
+                  "properties": {
+                    "factor": {
+                      "type": "number",
+                      "description": "The energy-level factor the prior impetus values were scaled by."
+                    }
+                  },
+                  "required": ["factor"],
+                  "additionalProperties": false
                 }
               },
               "required": ["velocitySigma", "powders", "notFitted"],
@@ -2907,6 +2931,18 @@
                   },
                   "required": ["sigma", "factors"],
                   "additionalProperties": false
+                },
+                "energy": {
+                  "description": "With `--energy prior`.",
+                  "type": "object",
+                  "properties": {
+                    "factor": {
+                      "type": "number",
+                      "description": "The energy-level factor the prior impetus values were scaled by."
+                    }
+                  },
+                  "required": ["factor"],
+                  "additionalProperties": false
                 }
               },
               "required": ["velocitySigma", "powders", "notFitted"],
@@ -3286,6 +3322,23 @@
                 "type": "integer",
                 "minimum": 0,
                 "maximum": 9007199254740991
+              },
+              "energy": {
+                "description": "With `--energy prior`.",
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "number",
+                    "description": "Specific energy laid over the record, J/kg: the prior impetus times the energy-level factor of `energy.factor`, over the record's `interior.gamma` minus 1."
+                  },
+                  "prior": {
+                    "type": "string",
+                    "enum": ["own", "base", "pooled"],
+                    "description": "Where the prior impetus came from: `own`, the powder's thermochemistry; `base`, the median of the own impetus values of its propellant base; `pooled`, the median of all own impetus values."
+                  }
+                },
+                "required": ["value", "prior"],
+                "additionalProperties": false
               }
             },
             "required": [
@@ -3317,6 +3370,61 @@
             ]
           },
           "description": "By powder id, why a powder with interior parameters that the rows name got no value: the reason of the fit (with `--exponent family`, of the fit at the exponent of its family), or `noUsableRow` without a used training row."
+        },
+        "energy": {
+          "description": "With `--energy prior`: each powder's energy is its prior impetus times one energy-level factor shared by all powders, over its `interior.gamma` minus 1, chosen on the training pressures; per powder only the burn coefficient is fitted.",
+          "type": "object",
+          "properties": {
+            "factor": {
+              "type": "number",
+              "description": "The chosen energy-level factor, the grid value with the least objective."
+            },
+            "grid": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "description": "The energy-level factors tried, one fit each."
+            },
+            "objective": {
+              "type": "array",
+              "items": {
+                "type": ["number", "null"]
+              },
+              "description": "Per grid value, the median of |ln(model peak / printed pressure)| over the same rows at every value that takes part: the training rows that print a pressure in bar and have a model peak at every such value, so only rows of powders fitted at all of them. A value takes part when at least 90 % of the powders fitted at any value are fitted at it; null where it does not."
+            },
+            "pressureRows": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "description": "Rows of the objective, the same at every factor that takes part."
+            },
+            "priors": {
+              "type": "object",
+              "properties": {
+                "own": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "byBase": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "pooled": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["own", "byBase", "pooled"],
+              "additionalProperties": false,
+              "description": "How many powders took each kind of prior, of the powders the rows name that have interior parameters, fitted or not."
+            }
+          },
+          "required": ["factor", "grid", "objective", "pressureRows", "priors"],
+          "additionalProperties": false
         }
       },
       "required": [
