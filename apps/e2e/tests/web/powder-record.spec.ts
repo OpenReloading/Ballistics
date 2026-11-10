@@ -35,6 +35,6 @@ test('shows the burn-rate order once, in the strip', async ({ page }) => {
   const panel = page.getByRole('region', { name: 'Burn rate (model output)' })
   await expect(panel.getByText('Mean vivacity')).toBeVisible()
   await expect(panel.getByRole('rowheader', { name: 'Burn-rate order' })).toHaveCount(0)
-  // the neighbour lists name the unit once, in their headings
+  // the neighbor lists name the unit once, in their headings
   await expect(panel.getByRole('heading', { name: 'Faster (1/(MPa·s))' })).toBeVisible()
 })

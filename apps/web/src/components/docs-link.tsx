@@ -5,7 +5,7 @@ import { msg } from '../i18n/translate.ts'
 
 const label = msg('Documentation')
 
-/** An icon named by its tooltip in the sidebar's foot, a labelled row in the phone drawer; nothing without a URL. */
+/** An icon named by its tooltip in the sidebar's foot, a labeled row in the phone drawer; nothing without a URL. */
 export function DocsLink({
   url,
   drawer,

@@ -42,11 +42,11 @@ Baseline, `ballistics verify` on the validation split: median velocity error 3.3
 | Residual correction, 3 constants              | 3.12 %          | 8.58 %       | 14.94 %         | 38.15 %      | 0.13 %          | fail                 |
 | Pressure exponent per family + vivacity refit | 2.85 %          | 7.19 %       | 13.09 %         | 33.72 %      | 0.11 %          | pass                 |
 | Richer form, 4 constants per powder           | 2.81 %          | 7.11 %       | 32.48 %         | 123.75 %     | 0.19 %          | pass, pressure worse |
-| ML corrector, gradient-boosted trees          | 2.62 %          | 6.79 %       | not modelled    | not modelled | 6.22 %          | fail                 |
-| ML corrector, small network                   | 2.56 %          | 6.99 %       | not modelled    | not modelled | 5.60 %          | fail                 |
-| ML corrector, Gaussian process                | 3.19 %          | 8.75 %       | not modelled    | not modelled | 0.13 %          | fail                 |
-| ML stand-alone, gradient-boosted trees        | 2.90 %          | 7.73 %       | not modelled    | not modelled | 11.67 %         | fail                 |
-| ML stand-alone, small network                 | 2.99 %          | 8.57 %       | not modelled    | not modelled | 11.47 %         | fail                 |
+| ML corrector, gradient-boosted trees          | 2.62 %          | 6.79 %       | not modeled     | not modeled  | 6.22 %          | fail                 |
+| ML corrector, small network                   | 2.56 %          | 6.99 %       | not modeled     | not modeled  | 5.60 %          | fail                 |
+| ML corrector, Gaussian process                | 3.19 %          | 8.75 %       | not modeled     | not modeled  | 0.13 %          | fail                 |
+| ML stand-alone, gradient-boosted trees        | 2.90 %          | 7.73 %       | not modeled     | not modeled  | 11.67 %         | fail                 |
+| ML stand-alone, small network                 | 2.99 %          | 8.57 %       | not modeled     | not modeled  | 11.47 %         | fail                 |
 
 Twice the standard error of the paired change: 0.28 (control), 0.26 (residual), 0.34 (exponent), 0.50 (richer form), 0.46, 0.36, 0.20, 0.52 and 0.34 percentage points (learners in table order). The exponent chosen per family: 0.8 for the double base ball and extruded families and the extruded powders of unstated base, 0.9 for single base extruded and most others.
 

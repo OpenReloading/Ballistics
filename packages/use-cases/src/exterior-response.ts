@@ -55,7 +55,7 @@ const aerodynamics = z
     spinDamping: coefficient('Spin-damping coefficient, 1').optional(),
     axialInertia: num('Axial moment of inertia, kg m2').optional(),
     transverseInertia: num(
-      'Transverse moment of inertia about the centre of mass, kg m2',
+      'Transverse moment of inertia about the center of mass, kg m2',
     ).optional(),
   })
   .describe('Coefficients of the modified point mass')

@@ -20,7 +20,7 @@ $$
 
 Code: `packages/shot-groups/src/hit-probability.ts`, `pointDispersion` (`crosswindSd`).
 
-With $S_c$ the lateral displacement of the point of impact per 1 m/s of crosswind at the distance and $S_R$ the change of its height per metre of range, both from the trajectory, and $\sigma_R$ the standard deviation of the range, the standard deviations of the point of impact are
+With $S_c$ the lateral displacement of the point of impact per 1 m/s of crosswind at the distance and $S_R$ the change of its height per meter of range, both from the trajectory, and $\sigma_R$ the standard deviation of the range, the standard deviations of the point of impact are
 
 $$
 \sigma_x = \sqrt{\sigma_{g,x}^2 + \left(S_c\,\sigma_c\right)^2}, \qquad \sigma_y = \sqrt{\sigma_{g,y}^2 + \left(S_R\,\sigma_R\right)^2}
@@ -42,7 +42,7 @@ The height part grows faster than the distance (with constant speed as the squar
 
 ### Probability inside a zone
 
-The point of impact is a bivariate normal variable centred on the aim point, with no correlation. A zone is an ellipse of semi-axes $a$ (along $x$) and $b$ (along $y$); a circle has $a = b$. With $x = a \sin t$ the probability inside it is the integral over $t$ of the density of $x$ times the probability that $\lvert y \rvert$ stays below $b \cos t$:
+The point of impact is a bivariate normal variable centered on the aim point, with no correlation. A zone is an ellipse of semi-axes $a$ (along $x$) and $b$ (along $y$); a circle has $a = b$. With $x = a \sin t$ the probability inside it is the integral over $t$ of the density of $x$ times the probability that $\lvert y \rvert$ stays below $b \cos t$:
 
 $$
 P(a, b) = \int_{-t_0}^{t_0} \frac{e^{-x^2/(2\sigma_x^2)}}{\sigma_x \sqrt{2\pi}}\ \operatorname{erf}\!\left(\frac{b \cos t}{\sigma_y \sqrt{2}}\right) a \cos t\ \mathrm{d}t, \qquad x = a \sin t
@@ -54,7 +54,7 @@ The integral is cut at $\lvert x \rvert = 8\sigma_x$. For a circular zone of rad
 
 ### Offset of the point of impact
 
-Optionally the point of impact is centred at $(\delta_x, \delta_y)$ from the aim point, for example the measured group centre minus the point of aim ([shot groups](groups.md)). The density of $x$ is then centred at $\delta_x$, the probability for $y$ is the normal probability between $-b\cos t$ and $b\cos t$ about $\delta_y$, and the integral runs over $x \in [-a, a] \cap [\delta_x - 8\sigma_x, \delta_x + 8\sigma_x]$, empty (probability 0) when the zone lies beyond that:
+Optionally the point of impact is centered at $(\delta_x, \delta_y)$ from the aim point, for example the measured group center minus the point of aim ([shot groups](groups.md)). The density of $x$ is then centered at $\delta_x$, the probability for $y$ is the normal probability between $-b\cos t$ and $b\cos t$ about $\delta_y$, and the integral runs over $x \in [-a, a] \cap [\delta_x - 8\sigma_x, \delta_x + 8\sigma_x]$, empty (probability 0) when the zone lies beyond that:
 
 $$
 P(a, b) = \int \frac{e^{-(x-\delta_x)^2/(2\sigma_x^2)}}{\sigma_x \sqrt{2\pi}}\left[\Phi\!\left(\frac{b \cos t - \delta_y}{\sigma_y}\right) - \Phi\!\left(\frac{-b \cos t - \delta_y}{\sigma_y}\right)\right] a \cos t\ \mathrm{d}t
@@ -98,14 +98,14 @@ The zones of a target are its rings, grown by the radius of the scored hole as i
 | $\phi$, $\sigma_\phi$      | Direction the wind comes from, its standard deviation                                  | deg         | rad                   |
 | $\sigma_c$                 | Standard deviation of the crosswind                                                    | m/s         | m/s                   |
 | $S_c$                      | Lateral displacement per 1 m/s of crosswind                                            | no kind     | m per m/s             |
-| $S_R$, $\sigma_R$          | Height change per metre of range, standard deviation of the range                      | no kind, m  | m/m, m                |
+| $S_R$, $\sigma_R$          | Height change per meter of range, standard deviation of the range                      | no kind, m  | m/m, m                |
 | $\sigma_v$                 | Standard deviation of the muzzle speed                                                 | m/s         | m/s                   |
 | $S_v$, $S_{v,0}$           | Height change per 1 m/s of muzzle speed, at the distance and at the reference distance | no kind     | m per m/s             |
 | $\sigma_x$, $\sigma_y$     | Standard deviations of the point of impact                                             | mm          | m                     |
 | $a$, $b$                   | Semi-axes of a scoring zone                                                            | mm          | m                     |
 | $P$, $p_k$                 | Probability inside a zone, inside a zone and outside the next                          | 1           | 1                     |
 | $v_k$                      | Value of zone $k$                                                                      | 1           | 1                     |
-| $\delta_x$, $\delta_y$     | Offset of the centre of the point of impact from the aim point                         | mm          | m                     |
+| $\delta_x$, $\delta_y$     | Offset of the center of the point of impact from the aim point                         | mm          | m                     |
 | $n$, $\bar n$, $P_w$       | Shots needed, mean shots to the first hit, wanted chance of a hit                      | 1           | 1                     |
 
 ## Assumptions
@@ -113,7 +113,7 @@ The zones of a target are its rings, grown by the radius of the scored hole as i
 - The group is a sample of the same distribution as the shots to be fired: the same rifle, load and shooter, the dispersion circular unless two standard deviations are given. Hold and aim errors beyond the group are not included.
 - Dispersion grows linearly with distance, which holds for the dispersion of a group in angle and not for a drift that grows faster than the distance.
 - The sensitivities $S_c$ and $S_R$ are taken at the nominal wind and range and held for the whole spread (first order). A wind of changing speed along the path is one wind.
-- The point of impact is centred on the aim point unless an offset is given: without one, the zero is right. With one, it is the same for every shot.
+- The point of impact is centered on the aim point unless an offset is given: without one, the zero is right. With one, it is the same for every shot.
 - The shots are independent, with the same probability of a hit, for the number of shots needed.
 - The speed spread, when given, is a first-order effect on the height only (the sensitivity $S_v$ is held for the whole spread), independent of the rest of the group.
 - The wind and range errors are independent of each other and of the group.
@@ -121,11 +121,11 @@ The zones of a target are its rings, grown by the radius of the scored hole as i
 ## Limits
 
 - The standard deviation of a group of a few shots is itself uncertain; the probability inherits it. A group of 5 shots gives a standard deviation known to about a third.
-- Targets whose zones are not nested ellipses about one centre (several bulls per sheet, scoring areas that are no ellipse) are outside the model.
-- An offset is the same for every shot. A centre that changes from group to group, and an offset that is not measured, are not modelled.
+- Targets whose zones are not nested ellipses about one center (several bulls per sheet, scoring areas that are no ellipse) are outside the model.
+- An offset is the same for every shot. A center that changes from group to group, and an offset that is not measured, are not modeled.
 - The speed spread acts on the height only; the spin drift is not varied with it.
 - The zones follow the touch rule on every target: a target whose events are scored by outward gauging ([ring scoring](ring-scoring.md)) gets zones too large by the hole diameter.
-- Cant and aiming errors are not modelled: a rifle rolled by 1 degree moves the impact 5.2 in at 1000 yd, in proportion to the drop.
+- Cant and aiming errors are not modeled: a rifle rolled by 1 degree moves the impact 5.2 in at 1000 yd, in proportion to the drop.
 - A very small dispersion against a large zone gives a probability of 1 to the precision of the integration.
 - Research log: [closed form for a circular zone](../research/hit-probability-closed-form.md), [speed spread](../research/hit-probability-velocity-term.md), [rifle cant](../research/hit-probability-cant.md), [offset and shots needed](../research/hit-probability-offset-shots-needed.md).
 

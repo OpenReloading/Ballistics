@@ -53,4 +53,4 @@ Analytic. A closed form and a synthetic case; the drops are figures of the quest
 
 ## Confidence
 
-High for the geometry and the simulation; low for the claim that no cant standard deviation is knowable by a shooter, which is a judgement without data.
+High for the geometry and the simulation; low for the claim that no cant standard deviation is knowable by a shooter, which is a judgment without data.

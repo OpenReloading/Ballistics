@@ -55,4 +55,4 @@ Analytic: made-up loads and the model's own elasticities, no measured data.
 
 ## Confidence
 
-Medium: the five loads are made up, and the bound of 0.5 is a judgement about how much of a hold-pressure error is acceptable. Real loads may sit differently on the curve.
+Medium: the five loads are made up, and the bound of 0.5 is a judgment about how much of a hold-pressure error is acceptable. Real loads may sit differently on the curve.

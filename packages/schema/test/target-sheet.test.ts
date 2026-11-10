@@ -188,7 +188,7 @@ describe('targetSheet issues, polarity and units', () => {
 })
 
 describe('targetSheet detection and alignment', () => {
-  it('refuses detection choices out of range: a region of 2 points, a hole size of zero, a backing that is no colour, a contrast above 1', () => {
+  it('refuses detection choices out of range: a region of 2 points, a hole size of zero, a backing that is no color, a contrast above 1', () => {
     const g = sheet.groups[0]
     for (const [detection, field] of [
       [{ region: g?.detection?.region.slice(0, 2) }, 'region'],

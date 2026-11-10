@@ -16,7 +16,7 @@ const stringsEntryBase = {
   kind: z
     .enum(['impact', 'dial'])
     .describe(
-      'impact: height of the mean impact above the line of sight at the zero setting, m. dial: clicks dialled from the zero setting to centre the group, signed up.',
+      'impact: height of the mean impact above the line of sight at the zero setting, m. dial: clicks dialed from the zero setting to center the group, signed up.',
     ),
   range: z.number().positive().max(1e5).describe('Slant range, m.'),
   shotCount: z
@@ -104,7 +104,7 @@ const stringsOptions = z
           .describe('Standard deviation of the zero offset, rad. It needs fitZeroOffset.'),
       })
       .optional()
-      .describe('Gaussian priors centred on the nominal parameter values, default none.'),
+      .describe('Gaussian priors centered on the nominal parameter values, default none.'),
     maxIterations: fitIterations,
     maxCondition: z
       .number()

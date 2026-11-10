@@ -28,7 +28,7 @@ register([
 /** The distance between the first two ticks; NaN when there are fewer than two. */
 export const tickStep = (ticks: number[]) => (ticks[1] ?? Number.NaN) - (ticks[0] ?? Number.NaN)
 
-/** Read after the colour scheme attribute is set and again on a scheme change, undefined before the first read; `names` is a module constant. */
+/** Read after the color scheme attribute is set and again on a scheme change, undefined before the first read; `names` is a module constant. */
 export function useChartTokens<K extends string>(names: Record<K, string>) {
   const scheme = useComputedColorScheme('light')
   const [tokens, setTokens] = useState<Record<K, string>>()
@@ -44,7 +44,7 @@ export function useChartTokens<K extends string>(names: Record<K, string>) {
   return tokens
 }
 
-/** The axis tooltip frame of the charts in the page's colours. */
+/** The axis tooltip frame of the charts in the page's colors. */
 export const chartTooltip = (c: { bg: string; border: string; fg: string }) => ({
   trigger: 'axis',
   // kept inside the chart: `.chart` clips overflow, so a tooltip past its edge was cut

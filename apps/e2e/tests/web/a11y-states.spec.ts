@@ -516,7 +516,7 @@ for (const width of widths) {
   })
 }
 
-test('the selected segment of a segmented control has a border in forced colours', async ({
+test('the selected segment of a segmented control has a border in forced colors', async ({
   page,
 }) => {
   await page.emulateMedia({ forcedColors: 'active' })
@@ -524,6 +524,6 @@ test('the selected segment of a segmented control has a border in forced colours
   await applyExampleLoad(page)
   const indicator = loadForm(page).locator('.mantine-SegmentedControl-indicator').first()
   await expect(indicator).toBeVisible()
-  // forced colours remove the fill: the border is all that marks the segment
+  // forced colors remove the fill: the border is all that marks the segment
   await expect(indicator).toHaveCSS('border-top-width', '2px')
 })

@@ -1,4 +1,4 @@
-/** Face plane, centre and scale from two or more concentric ellipses (the conic pencil); pure, so it runs in the worker. */
+/** Face plane, center and scale from two or more concentric ellipses (the conic pencil); pure, so it runs in the worker. */
 
 import type { TargetFace } from '@open-reloading/schema'
 import { seededUniforms } from '@open-reloading/statistics'
@@ -40,7 +40,7 @@ const COARSE = 500
 const FINE = 1400
 /** The black area is at most about this many grid px across on the crop for the ring lines. */
 const BLACK_PX = 500
-/** Rings of a face reach at most this many black radii from the centre (2.61 on the air pistol face). */
+/** Rings of a face reach at most this many black radii from the center (2.61 on the air pistol face). */
 const REACH = 2.8
 /** A ring matches a face ring within this share of its radius (3 %; the true matches on the local photos are within 1.7 %). */
 const TOLERANCE = 0.03
@@ -86,7 +86,7 @@ function toGridEllipse(grid: Grid, e: Ellipse): Ellipse {
   }
 }
 
-/** A ring's fragments lie at one normalised radius, so they group by it. */
+/** A ring's fragments lie at one normalized radius, so they group by it. */
 function ringLines(image: RgbaImage, black: Ellipse): { black: Ellipse; rings: Ring[] } {
   const half = REACH * meanRadius(black)
   // the crop is cut at the photo's edge; its longer side sets the block size
@@ -106,7 +106,7 @@ function ringLines(image: RgbaImage, black: Ellipse): { black: Ellipse; rings: R
   const blackFine = refineBlackEdge(fine, black)
   const conic = conicOf(blackFine)
   const rb = meanRadius(blackFine)
-  // the normalised radius of a point: 1 on the black edge
+  // the normalized radius of a point: 1 on the black edge
   const uOf = (x: number, y: number) =>
     Math.sqrt(
       Math.max(
@@ -171,7 +171,7 @@ function refineBlackEdge(fine: Grid, black: Ellipse): Ellipse {
   return edge ? edge.ellipse : start
 }
 
-/** The band of normalised radii 0.12 to `REACH` that holds the rings, not the middle of the bull. */
+/** The band of normalized radii 0.12 to `REACH` that holds the rings, not the middle of the bull. */
 function ringBandMask(fine: Grid, uOf: RadiusOf): Uint8Array {
   const mask = new Uint8Array(fine.width * fine.height)
   for (let y = 0; y < fine.height; y++)
@@ -307,7 +307,7 @@ export function matchFaces(
   return out.sort((a, b) => b.score - a.score)
 }
 
-/** Share of 24 points of the ellipse `e` grown `k` times about its centre that lie in the frame. */
+/** Share of 24 points of the ellipse `e` grown `k` times about its center that lie in the frame. */
 function shareInFrame(e: Ellipse, k: number, frame: { width: number; height: number }): number {
   const grown = { ...e, semiMajor: k * e.semiMajor, semiMinor: k * e.semiMinor }
   let inside = 0
@@ -361,7 +361,7 @@ function scoreMatch(matched: FaceMatch['matched'], missing: number, found: numbe
   return score - 0.3 * missing - 0.1 * (found - matched.length)
 }
 
-/** The target face on a photo: photo px to face mm (x right, y up from its centre), its radii in mm. */
+/** The target face on a photo: photo px to face mm (x right, y up from its center), its radii in mm. */
 export type FaceGeometry = {
   toFace: Matrix
   outer: number
@@ -372,11 +372,11 @@ export type FaceGeometry = {
 
 /** The face plane on the photo. */
 export type FacePlane = {
-  /** Face centre, image px. */
+  /** Face center, image px. */
   centre: Point
-  /** Image px to face mm (x right, y up from the centre), the perspective included. */
+  /** Image px to face mm (x right, y up from the center), the perspective included. */
   toFace: Matrix
-  /** Image px per mm of the face at its centre. */
+  /** Image px per mm of the face at its center. */
   pxPerMm: number
   /** Root mean square of the ellipses' radial misfit on the face plane, mm. */
   rms: number
@@ -389,7 +389,7 @@ export type FacePlane = {
   blackOutline: Point[]
   /** Ellipses that gave the plane. */
   ellipses: number
-  /** One ellipse gave the plane: the centre is the ellipse's, biased under tilt. */
+  /** One ellipse gave the plane: the center is the ellipse's, biased under tilt. */
   approximate: boolean
 }
 
@@ -506,7 +506,7 @@ function planeFromEllipses(members: Member[], outer: number, black: number): Fac
   return planeOf(best.plane.toPlane, best.plane.centre, ordered, outer, black, false)
 }
 
-/** Without perspective the centre is biased under tilt (3.7 to 15.7 mm measured on tilted photos). */
+/** Without perspective the center is biased under tilt (3.7 to 15.7 mm measured on tilted photos). */
 function planeFromOne(
   e: Ellipse,
   radius: number,

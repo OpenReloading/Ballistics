@@ -16,4 +16,4 @@ console.log(revolutionVolume([[0, 0], [4, 0], [4, 10], [0, 10]], 10).toFixed(1))
 
 Documentation: https://openreloading.github.io/Ballistics/docs/libraries/drawing/
 
-Licence: MIT
+License: MIT

@@ -250,7 +250,7 @@ describe('the inputs published rows do not carry', () => {
     velocity: 800,
   }
 
-  it('builds a stand-in bullet of the cartridge G1, the printed mass and the modelled length', () => {
+  it('builds a stand-in bullet of the cartridge G1, the printed mass and the modeled length', () => {
     const own = loadRecords(recordRoots)
     const id = standInId('308-win', 9.72)
     const [row] = fillInputs([{ ...base, bullet: id, bulletMass: 9.72, barrel: 600 }], own)

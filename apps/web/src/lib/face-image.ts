@@ -1,8 +1,8 @@
 /** Image steps of the target face search; pure, no React, DOM or Next.js. */
+import { clamp, upperMedian } from '@open-reloading/target-recognition'
 import { conicOf, type Ellipse, ellipsePoint, meanRadius, ransacEllipse } from './ellipse.ts'
 import type { RgbaImage } from './image.ts'
 import { nth } from './nth.ts'
-import { clamp, upperMedian } from './raster-ops.ts'
 import type { Point } from './target-geometry.ts'
 
 // Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
@@ -25,7 +25,7 @@ export type Grid = {
   chroma: Float32Array
 }
 
-/** Grid px centre to image px and back (a block of `blockSize` px has its centre at (i + 0.5) `blockSize` - 0.5). */
+/** Grid px center to image px and back (a block of `blockSize` px has its center at (i + 0.5) `blockSize` - 0.5). */
 export const gridToImage = (grid: Grid, p: Point): Point => ({
   x: grid.left + (p.x + 0.5) * grid.blockSize - 0.5,
   y: grid.top + (p.y + 0.5) * grid.blockSize - 0.5,
@@ -145,7 +145,7 @@ function growComponent(
   return { n, box: b }
 }
 
-/** Labels the unlabelled mask pixels around (x, y) and pushes them on the stack; the new stack top. */
+/** Labels the unlabeled mask pixels around (x, y) and pushes them on the stack; the new stack top. */
 function pushUnlabelled(
   x: number,
   y: number,
@@ -194,7 +194,7 @@ type Blob = {
   rough?: boolean
 }
 
-/** The dark pixels of a black area differ in colour by at most this much between their channels. */
+/** The dark pixels of a black area differ in color by at most this much between their channels. */
 const MAX_CHROMA = 50
 /** A black area's minor over its major axis is at least this (a face tilted by about 70 degrees). */
 const MIN_ASPECT = 0.3
@@ -292,10 +292,10 @@ function momentsOf(f: Filled) {
 
 type Moments = ReturnType<typeof momentsOf>
 
-/** Whether the component is grey, not coloured, and its moment ellipse a compact one. */
+/** Whether the component is grey, not colored, and its moment ellipse a compact one. */
 function isBlackArea(grid: Grid, { lab, k, box: b, area }: Component, m: Moments): boolean {
   const w = grid.width
-  // black is not a colour: a red or green band is no black area
+  // black is not a color: a red or green band is no black area
   let chromaSum = 0
   for (let y = b.y0; y <= b.y1; y++)
     for (let x = b.x0; x <= b.x1; x++)
@@ -324,7 +324,7 @@ function rimDarkness(grid: Grid, t: number, f: Filled, e: Ellipse): number {
   return total ? darkRim / total : 0
 }
 
-/** A component the grid's border cuts needs half its ellipse and its centre inside, and has no moment ellipse. */
+/** A component the grid's border cuts needs half its ellipse and its center inside, and has no moment ellipse. */
 function blobOf(grid: Grid, t: number, f: Filled, m: Moments): Blob | undefined {
   const { n } = m
   const { width: w, height: h } = grid
@@ -334,7 +334,7 @@ function blobOf(grid: Grid, t: number, f: Filled, m: Moments): Blob | undefined 
   const outline = cut
     ? m.outline.filter((p) => p.x > 0 && p.y > 0 && p.x < w - 1 && p.y < h - 1)
     : m.outline
-  // a shadow or a neighbour joined to the black area leaves most of the outline on the ellipse
+  // a shadow or a neighbor joined to the black area leaves most of the outline on the ellipse
   const r0 = Math.sqrt(n / Math.PI)
   // about 300 outline points are enough for the fit
   const step = Math.max(1, Math.floor(outline.length / 300))
@@ -442,7 +442,7 @@ function refineRough(grid: Grid, all: readonly Blob[]): Blob[] {
   return out
 }
 
-/** Two ellipses of one black area: centres within 8 % and mean radii within 12 % of each other. */
+/** Two ellipses of one black area: centers within 8 % and mean radii within 12 % of each other. */
 function sameEllipse(a: Ellipse, b: Ellipse): boolean {
   const r = meanRadius(a)
   return (
@@ -784,7 +784,7 @@ function accumulateScale(
   }
 }
 
-/** Whether either neighbour is stronger than `v`. */
+/** Whether either neighbor is stronger than `v`. */
 const exceeds = (v: number, a: number, b: number) => a > v || b > v
 
 /** A line, not a step: both sides at distance `d` along the normal are lower (bright) or higher (dark). */

@@ -81,7 +81,7 @@ function chartTitle(v: Pick<ChartView, 'x' | 'quantity'>, t: Translator['t']) {
   })
 }
 
-/** The chart colours from the page's tokens (`globals.css`). */
+/** The chart colors from the page's tokens (`globals.css`). */
 const themeTokens: Record<keyof ChartTheme, string> = {
   pressure: '--series-2',
   pressureText: '--series-2-text',
@@ -405,7 +405,7 @@ export function InteriorChart({
         </PanelTable>
         {energy.zero.length > 0 && (
           <p className="note">
-            {t('Not modelled with these inputs: {terms}.', {
+            {t('Not modeled with these inputs: {terms}.', {
               terms: energy.zero.map((term) => t(term.lower)).join(', '),
             })}
           </p>

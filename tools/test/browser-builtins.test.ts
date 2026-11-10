@@ -23,6 +23,7 @@ const browserSources = [
     'importers',
     'catalog',
     'use-cases',
+    'target-recognition',
   ].map((p) => `packages/${p}/src`),
 ]
 

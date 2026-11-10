@@ -32,7 +32,7 @@ $$
 
 Code: `packages/ballistics/src/exterior/atmosphere.ts`, `airAt`.
 
-### Saturation vapour pressure
+### Saturation vapor pressure
 
 Magnus form over water, with $t = T - 273.15$ in degC:
 
@@ -44,7 +44,7 @@ Code: `packages/ballistics/src/exterior/atmosphere.ts`, `saturationVapourPressur
 
 ### Density of moist air
 
-Partial pressure of dry air over its gas constant plus partial pressure of the vapour over its gas constant:
+Partial pressure of dry air over its gas constant plus partial pressure of the vapor over its gas constant:
 
 $$
 \rho = \frac{p - e}{R_d T} + \frac{e}{R_v T}, \qquad R_v = \frac{R^*}{M_v}
@@ -54,7 +54,7 @@ Code: `packages/ballistics/src/exterior/atmosphere.ts`, `airDensity` (`vapourGas
 
 ### Speed of sound in moist air
 
-With the vapour mole fraction $x_v = e/p$, the mixture gas constant follows from the mean molar mass, and the molar heat capacity at constant pressure is the mole-weighted mean of rigid diatomic dry air ($3.5\,R^_$) and rigid triatomic vapour ($4\,R^_$):
+With the vapor mole fraction $x_v = e/p$, the mixture gas constant follows from the mean molar mass, and the molar heat capacity at constant pressure is the mole-weighted mean of rigid diatomic dry air ($3.5\,R^_$) and rigid triatomic vapor ($4\,R^_$):
 
 $$
 R_m = \frac{R_d}{1 - x_v + x_v M_v/M_d}, \qquad \frac{c_p}{R^*} = 3.5 + 0.5\,x_v, \qquad a = \sqrt{\frac{c_p}{c_p - R^*}\,R_m T}
@@ -90,12 +90,12 @@ $\rho$ is the density of moist air of the entered temperature, station pressure 
 | $g_0$            | Standard gravity, 9.80665 m/s²                                   | no kind     | m/s²            |
 | $R_d$            | Specific gas constant of dry air, 287.05287 J/(kg K)             | no kind     | J/(kg K)        |
 | $R^*$            | Universal gas constant of the ICAO atmosphere, 8.31432 J/(mol K) | no kind     | J/(mol K)       |
-| $M_v$            | Molar mass of water vapour, 0.01801528 kg/mol                    | kg/kmol     | kg/mol          |
+| $M_v$            | Molar mass of water vapor, 0.01801528 kg/mol                     | kg/kmol     | kg/mol          |
 | $M_d$            | Molar mass of dry air, $R^*/R_d$                                 | kg/kmol     | kg/mol          |
-| $R_v$, $R_m$     | Gas constant of water vapour, of the mixture                     | no kind     | J/(kg K)        |
+| $R_v$, $R_m$     | Gas constant of water vapor, of the mixture                      | no kind     | J/(kg K)        |
 | $\phi$           | Relative humidity                                                | %           | fraction 0 to 1 |
-| $e_s$, $e$       | Saturation vapour pressure, vapour pressure                      | bar         | Pa              |
-| $x_v$            | Mole fraction of water vapour                                    | 1           | 1               |
+| $e_s$, $e$       | Saturation vapor pressure, vapor pressure                        | bar         | Pa              |
+| $x_v$            | Mole fraction of water vapor                                     | 1           | 1               |
 | $c_p$            | Molar heat capacity of the mixture at constant pressure          | no kind     | J/(mol K)       |
 | $\rho$, $\rho_0$ | Air density, ICAO sea-level density                              | g/cm3       | kg/m³           |
 | $H_\rho$         | Density altitude                                                 | mm          | m               |
@@ -105,15 +105,15 @@ $\rho$ is the density of moist air of the entered temperature, station pressure 
 
 - Only the tropospheric layer of the ICAO atmosphere, with a constant lapse rate. Altitudes are geopotential.
 - Moist air is an ideal mixture of ideal gases. The compressibility factor of the CIPM-2007 density formula (close to 1 at ambient conditions) is left out.
-- Water vapour and dry air have the heat capacities of rigid molecules, independent of temperature.
-- The enhancement factor of water vapour in air is left out of the saturation vapour pressure.
+- Water vapor and dry air have the heat capacities of rigid molecules, independent of temperature.
+- The enhancement factor of water vapor in air is left out of the saturation vapor pressure.
 - The density altitude extends the tropospheric law above the tropopause and below `minAltitude`.
 - Along the path the relative humidity is held, not the mixing ratio. The hydrostatic pressure uses the dry-air gas constant (no virtual-temperature correction).
 
 ## Limits
 
 - Altitudes from -5000 m (`minAltitude`) to 11000 m (the tropopause). A trajectory that leaves this band stops with the reason `atmosphere`.
-- `checkAir` rejects a temperature at or below 0 K, a relative humidity outside 0 to 1, a pressure at or below the vapour pressure, non-finite values, and a pressure and temperature whose air density is not above 0 and at most 1000 kg/m³, `maxDensity` (the density overflows for a temperature near the smallest floating-point number and underflows for a pressure near it).
+- `checkAir` rejects a temperature at or below 0 K, a relative humidity outside 0 to 1, a pressure at or below the vapor pressure, non-finite values, and a pressure and temperature whose air density is not above 0 and at most 1000 kg/m³, `maxDensity` (the density overflows for a temperature near the smallest floating-point number and underflows for a pressure near it).
 - The Magnus constants are those for water. Below 0 degC the formula still gives the pressure over water, not over ice.
 - The older US Army reference atmosphere has a sea-level density of 1.2034 kg/m³ against the ICAO 1.2250 kg/m³ ([drag](exterior-drag.md#ballistic-coefficient-and-drag-curve)) and a sea-level speed of sound of 1120.27 ft/s (341.46 m/s, unverified), 0.34 % above the dry ICAO value of 340.294 m/s. A BC carries its reference, but the air along the path is always this model's.
 
@@ -121,7 +121,7 @@ $\rho$ is the density of moist air of the entered temperature, station pressure 
 
 - [ICAO 1993](../bibliography.md#icao-1993): defining constants of the standard atmosphere and the tropospheric temperature and pressure laws.
 - [Kneubuehl 2018](../bibliography.md#kneubuehl-2018), section 5.2.2.2 (ICAO atmosphere) and section 5.2.3 (real conditions, the air along the path in 5.2.3.1).
-- [WMO-No. 8](../bibliography.md#wmo-no-8), Annex 4.B: Magnus formula for the saturation vapour pressure over water (edition and constants unverified against the current edition).
+- [WMO-No. 8](../bibliography.md#wmo-no-8), Annex 4.B: Magnus formula for the saturation vapor pressure over water (edition and constants unverified against the current edition).
 - [Picard 2008](../bibliography.md#picard-2008): CIPM-2007 density of moist air, the real-gas form the model simplifies.
 - [Cramer 1993](../bibliography.md#cramer-1993): speed of sound and ratio of specific heats in humid air, the real-gas form the model simplifies.
 - Research log: [reference air density and Earth curvature](../research/exterior-reference-air-earth-curvature.md).

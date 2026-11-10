@@ -434,5 +434,33 @@
   "apps/web/src/lib/refusal-words.ts": {
     "source": "import type { ExteriorIssue } from '@open-reloading/ballistics'\nimport { msg } from '../i18n/translate.ts'\nimport { gapWords } from './resistance-gaps.ts'\nimport { interiorFields } from './interior-input.ts'\nexport const words = [msg, gapWords, interiorFields]\nexport type Issue = ExteriorIssue",
     "rules": ["refusal-words-imports"]
+  },
+  "packages/target-recognition/src/logic.ts": {
+    "source": "import { applyMatrix } from '@open-reloading/shot-groups'\nimport { nth } from '@open-reloading/statistics'\nexport { applyMatrix, nth }",
+    "rules": []
+  },
+  "packages/target-recognition/src/schema.ts": {
+    "source": "import { quantity } from '@open-reloading/schema'\nexport { quantity }",
+    "rules": ["target-recognition-imports-shot-groups-statistics-only"]
+  },
+  "packages/target-recognition/src/node-fs.ts": {
+    "source": "import { readFileSync } from 'node:fs'\nexport { readFileSync }",
+    "rules": ["target-recognition-imports-shot-groups-statistics-only"]
+  },
+  "packages/target-recognition/src/dom.ts": {
+    "source": "export const h = () => window.innerHeight",
+    "rules": ["logic-no-dom"]
+  },
+  "packages/target-recognition/src/into-shot-groups.ts": {
+    "source": "import { ringScore } from '../../shot-groups/src/index.ts'\nexport { ringScore }",
+    "rules": ["target-recognition-imports-shot-groups-statistics-only"]
+  },
+  "packages/ballistics/src/into-target-recognition.ts": {
+    "source": "import { peaksOf } from '../../target-recognition/src/index.ts'\nexport { peaksOf }",
+    "rules": ["ballistics-imports-units-and-statistics"]
+  },
+  "packages/api/src/into-target-recognition.ts": {
+    "source": "import { peaksOf } from '../../target-recognition/src/index.ts'\nexport { peaksOf }",
+    "rules": ["api-imports-logic-catalog-schema-only"]
   }
 }

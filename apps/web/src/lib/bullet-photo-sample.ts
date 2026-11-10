@@ -1,10 +1,10 @@
 /** The sample photo the tool offers and the known truth the tests measure against (`apps/docs/docs/models/bullet-photo.md`). */
 import { type BulletDimensions, bulletProfile } from '@open-reloading/drawing/bullet'
 import { toSi } from '@open-reloading/schema'
+import { clamp } from '@open-reloading/target-recognition'
 import type { ScaleSpan } from './bullet-photo.ts'
 import type { RgbaImage } from './image.ts'
 import { nth } from './nth.ts'
-import { clamp } from './raster-ops.ts'
 import type { Point } from './target-geometry.ts'
 
 /** The ruler along the bottom of the photograph, graduated in mm. */
@@ -26,7 +26,7 @@ export interface PhotoSpec {
   pxPerMm: number
   width: number
   height: number
-  /** Where the base centre lies, photo px. */
+  /** Where the base center lies, photo px. */
   base: Point
   /** The direction of the axis from base to tip, rad (y down). */
   angle: number
@@ -52,7 +52,7 @@ export interface PhotoSpec {
   tip?: { from: number; grey: number } | undefined
   /** Black bars of this width at the left and right edges of the photograph. */
   bars?: number | undefined
-  /** The bullet's red is raised and its blue lowered by this many grey levels at the same luma, so it differs from the paper by colour more than by brightness. */
+  /** The bullet's red is raised and its blue lowered by this many grey levels at the same luma, so it differs from the paper by color more than by brightness. */
   chroma?: number | undefined
 }
 

@@ -7,7 +7,7 @@ import { defined } from './defined.ts'
 import { photoScene } from './face-photos.ts'
 import { faceById, invert, project, render } from './face-render.ts'
 
-// With the face label (`apps/docs/docs/models/hole-detection.md`) the face outline is the region, the colour axis takes its surroundings from the same surface and a dark mark on black or light one on paper is print; an air rifle face (4.5 mm pellets, 22.75 mm outer radius) with its black cut to 12 mm, 2.7 holes across, small enough to pass for holes.
+// With the face label (`apps/docs/docs/models/hole-detection.md`) the face outline is the region, the color axis takes its surroundings from the same surface and a dark mark on black or light one on paper is print; an air rifle face (4.5 mm pellets, 22.75 mm outer radius) with its black cut to 12 mm, 2.7 holes across, small enough to pass for holes.
 const base = faceById('issf-10m-air-rifle')
 const face = { ...base, blackDiameter: { value: 12 } }
 const outer = defined(face.rings[0]).diameter.value / 2
@@ -15,7 +15,7 @@ const W = 1000
 const pxPerMm = (0.45 * W) / outer
 const holeMm = 4.5
 
-// six dark holes on the paper, 8 to 20 mm from the centre, and one far outside the face
+// six dark holes on the paper, 8 to 20 mm from the center, and one far outside the face
 const rnd = (() => {
   let s = 9
   return () => {
@@ -55,7 +55,7 @@ const score = (found: readonly HoleProposal[]) => ({
 })
 
 describe('hole detection with the face label', () => {
-  it('without it a black centre of 2.7 holes across is proposed as holes (the known risk)', () => {
+  it('without it a black center of 2.7 holes across is proposed as holes (the known risk)', () => {
     const s = score(autoDetect({ ...input, region: label.outline })?.proposals ?? [])
     expect(s.hits).toBe(6)
     expect(s.extra).toBeGreaterThanOrEqual(2)
@@ -145,7 +145,7 @@ describe('hole detection with the numerals of the face', () => {
   })
 })
 
-/** The photo as a JPEG of `quality` read back, so its artefacts are part of the scene. */
+/** The photo as a JPEG of `quality` read back, so its artifacts are part of the scene. */
 async function viaJpeg(image: RgbaImage, quality: number): Promise<RgbaImage> {
   const raw = Buffer.from(image.data.buffer, image.data.byteOffset, image.data.length)
   const jpeg = await sharp(raw, { raw: { width: image.width, height: image.height, channels: 4 } })

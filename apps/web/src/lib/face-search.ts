@@ -1,13 +1,13 @@
 /** Apart from `target-face.ts` because only the worker runs it, which keeps the blob detector out of the pages' bundles. */
 import type { TargetFace } from '@open-reloading/schema'
-import { peaksOf, radiiOf, space } from './blob-detector.ts'
+import { peaksOf, radiiOf, space } from '@open-reloading/target-recognition'
 import { conicOf, type Ellipse } from './ellipse.ts'
 import { grayGrid, gridToImage } from './face-image.ts'
 import type { RgbaImage } from './image.ts'
 import { nth } from './nth.ts'
 import { type FaceSearch, SCALE_TOLERANCE, searchFaces } from './target-face.ts'
 
-/** A disc of radius r peaks the scale-normalised Hessian at sigma = r / sqrt 2: D = 2 sqrt 2 sigma. */
+/** A disc of radius r peaks the scale-normalized Hessian at sigma = r / sqrt 2: D = 2 sqrt 2 sigma. */
 const D_OVER_SIGMA = 2 * Math.SQRT2
 /** The holes are measured on a grid where the largest expected hole is about this many px across. */
 const HOLE_PX = 30

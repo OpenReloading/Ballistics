@@ -47,7 +47,7 @@ $$
 
 Code: `packages/ballistics/src/interior/charge-solver.ts`, `scanCharges` (`scanPoints`, `scanSpan`).
 
-The lowest and highest values over the valid scanned runs, each with its charge, are the reachable range. Neighbouring valid scan points with values on opposite sides of the target form a bracket. A scanned run already within the tolerance is returned when there is at most one bracket.
+The lowest and highest values over the valid scanned runs, each with its charge, are the reachable range. Neighboring valid scan points with values on opposite sides of the target form a bracket. A scanned run already within the tolerance is returned when there is at most one bracket.
 
 ### Root find
 
@@ -74,7 +74,7 @@ or after 60 iterations. An iteration runs `interior` twice where the false-posit
 - `noValidRun`: no scanned charge gives a valid run with the target defined. The refusal carries the reason and field of the first invalid run.
 - `belowRange`, `aboveRange`: the target lies outside the reachable range.
 - `notMonotone`: more than one bracket, so the scan crosses the target more than once.
-- `bracketFailed`: the target lies in the range but no two neighbouring valid scan points enclose it, or the midpoint run inside the bracket is not valid.
+- `bracketFailed`: the target lies in the range but no two neighboring valid scan points enclose it, or the midpoint run inside the bracket is not valid.
 - `toleranceNotReached`: 60 iterations did not reach the tolerance.
 
 The target value must be above 0, and the load ratio target needs a bulk density.
@@ -95,12 +95,12 @@ The target value must be above 0, and the load ratio target needs a bulk density
 
 ## Assumptions
 
-- The target quantity is a continuous function of the charge between neighbouring scan points.
+- The target quantity is a continuous function of the charge between neighboring scan points.
 - The load's other inputs (chamber, bullet, propellant, temperature, resistance) stay fixed. `load.charge` is ignored.
 
 ## Limits
 
-- A curve that crosses the target twice between two neighbouring scan points is not detected as not monotone.
+- A curve that crosses the target twice between two neighboring scan points is not detected as not monotone.
 - The scan covers charges from $10^{-3}\,m_\text{max}$ up, so a target reached only below that is refused.
 - The tolerance is on the target value, not on the charge.
 - The answer inherits every limit of the [M3 interior model](interior-m3.md).

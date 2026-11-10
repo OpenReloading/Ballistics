@@ -324,7 +324,7 @@ describe('a target of any pattern', () => {
   })
 
   it('expects black zones of a selected black target: a photo filled by them is not dark', () => {
-    // the centre of an all black target: no paper in the frame, the black not found as an area
+    // the center of an all black target: no paper in the frame, the black not found as an area
     const p = patterns['all black circles']
     const centre = draw({ ...p, zones: [{ r: 3000, grey: 30 }], lines: rings(190, 120, 260) })
     const view0 = { image: centre, scale: 1, holePx: 18 }
@@ -341,7 +341,7 @@ describe('a target of any pattern', () => {
     const mix = patterns['a mix of black and white zones']
     const rimmed = { ...mix, black: undefined }
 
-    it('shows only its centre (a zoomed photo with the black area cut by the frame)', () => {
+    it('shows only its center (a zoomed photo with the black area cut by the frame)', () => {
       const image = draw(mix, { zoom: 2 })
       const cut = {
         ...view(mix, image, layout),
@@ -381,7 +381,7 @@ describe('a target of any pattern', () => {
     })
   })
 
-  it('reads the zone colours of a face record, or none', () => {
+  it('reads the zone colors of a face record, or none', () => {
     const ring = (fill?: 'black' | 'white') => ({
       value: 1,
       diameter: { value: 1, unit: 'mm' as const },

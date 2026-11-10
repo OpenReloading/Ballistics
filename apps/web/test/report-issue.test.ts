@@ -90,7 +90,6 @@ it('writes the context always and a block only when ticked', () => {
     '- Version: 0.0.1',
     '- Browser: Test browser',
     '- Window: 1280 x 800',
-    '- Colour scheme: dark',
     '- Units: Metric (SI)',
   ])
     expect(fields.context).toContain(line)

@@ -81,7 +81,7 @@ const exteriorWords = {
   rangeInvalid: msg('range {range}'),
   zeroNotConverged: msg('zero did not converge (miss {vertical} m, {horizontal} m)'),
   zeroRangeNotReached: msg('zero range {range} m not reached ({stop})'),
-  momentSlopeNotPositive: msg('momentSlope must be positive (spin-stabilised bullet)'),
+  momentSlopeNotPositive: msg('momentSlope must be positive (spin-stabilized bullet)'),
   momentSlopeNeedsLength: msg('a missing momentSlope needs the length'),
   inertiaNotPositive: msg('moments of inertia must be positive'),
   inertiaNeedsLength: msg('a missing moment of inertia needs the length'),
@@ -308,7 +308,7 @@ const item = (x: unknown) =>
     ? gapWords[x as keyof typeof gapWords]
     : String(x)
 
-/** A list joined by commas, the pressure rows counted per basis, a number as JavaScript writes it; a load file field arrives labelled (`interior-input.ts`). */
+/** A list joined by commas, the pressure rows counted per basis, a number as JavaScript writes it; a load file field arrives labeled (`interior-input.ts`). */
 function shown(name: string, v: unknown): string {
   if (Array.isArray(v)) return v.map(item).join(', ')
   if (name === 'rows' && typeof v === 'object' && v !== null)

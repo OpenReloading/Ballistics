@@ -78,7 +78,7 @@ describe('parseShotViewWorkbook: the footer and worksheets without shots', () =>
     expect(refusal(() => parseShotViewWorkbook(book()))).toEqual(noShotsFound)
   })
 
-  it('warns about a missing or unrecognised footer date and footer statistics', () => {
+  it('warns about a missing or unrecognized footer date and footer statistics', () => {
     const noDate = edit(shotViewSheetGerman, (c) => c[0] === 'DATUM', [])
     const r = parseShotViewWorkbook(book(shotViewSheetEnglish, noDate))
     expect(r.session.date).toBeUndefined()

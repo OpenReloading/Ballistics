@@ -102,7 +102,7 @@ function fittingSpan(
   )
 }
 
-/** Does a text of height em centred at radius r reach past the box's top or bottom? */
+/** Does a text of height em centered at radius r reach past the box's top or bottom? */
 const outsideBox = (r: number, em: number, box: Lanes['box']) =>
   r + em / 2 > box[3] || r - em / 2 < box[1]
 

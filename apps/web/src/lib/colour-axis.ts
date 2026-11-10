@@ -1,7 +1,7 @@
-/** The colour axis of hole detection: Fisher's linear discriminant of a hole against its ring, in log RGB. */
+/** The color axis of hole detection: Fisher's linear discriminant of a hole against its ring, in log RGB. */
 
+import { clamp, median1 } from '@open-reloading/target-recognition'
 import { nth } from './nth.ts'
-import { clamp, median1 } from './raster-ops.ts'
 import type { Point } from './target-geometry.ts'
 
 // Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
@@ -17,7 +17,7 @@ export type WorkImage = {
   h: number
   logRgb: Float32Array
   inside: Uint8Array
-  /** Least separation of a hole from its ring along the colour axis (log RGB units). */
+  /** Least separation of a hole from its ring along the color axis (log RGB units). */
   contrast: number
   /** 1 on the black area of the printed face, else 0; absent without a face. */
   blackMask?: Uint8Array
@@ -27,9 +27,9 @@ export type WorkImage = {
 export type LogRgb = [number, number, number]
 /** The samples of each channel. */
 type Channels = [number[], number[], number[]]
-/** Unit axis `w` in log RGB, the hole colour `mu`, the ring median `ring` and their separation along `w`. */
+/** Unit axis `w` in log RGB, the hole color `mu`, the ring median `ring` and their separation along `w`. */
 type Axis = { w: LogRgb; mu: LogRgb; ring: LogRgb; sep: number }
-/** The picked hole (work px), or the hole colour in log RGB without a pick. */
+/** The picked hole (work px), or the hole color in log RGB without a pick. */
 export type Seed = { at?: Point | undefined; mu?: LogRgb }
 
 /** Fisher's linear discriminant in log RGB, pick disc against the 1.0 to 2.4 D ring; holes project high. */
@@ -141,7 +141,7 @@ function covariance3(ring: Channels): Covariance {
 type Six = [number, number, number, number, number, number]
 type Covariance = { cov: Six; m: number }
 
-/** Regularised ring covariance; undefined when the separation is under `minSep`. */
+/** Regularized ring covariance; undefined when the separation is under `minSep`. */
 function fisherAxis(
   mu: LogRgb,
   rm: LogRgb,
@@ -177,7 +177,7 @@ function fisherAxis(
   return { w: axis, mu, ring: rm, sep }
 }
 
-/** Luma (BT.601 weights) of a colour, here of log RGB values. */
+/** Luma (BT.601 weights) of a color, here of log RGB values. */
 export const lumaOf = (v: Readonly<LogRgb>) => 0.299 * v[0] + 0.587 * v[1] + 0.114 * v[2]
 
 /** BT.601 luma weights (0.299, 0.587, 0.114) on log RGB: the image whose strongest blobs seed auto detection. */

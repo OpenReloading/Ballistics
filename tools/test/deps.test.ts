@@ -34,6 +34,7 @@ const configs = [
   'packages/importers/.oxlintrc.json',
   'packages/catalog/.oxlintrc.json',
   'packages/use-cases/.oxlintrc.json',
+  'packages/target-recognition/.oxlintrc.json',
 ]
 
 let mirror = ''

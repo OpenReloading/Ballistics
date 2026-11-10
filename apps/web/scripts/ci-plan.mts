@@ -9,7 +9,7 @@ const repoRoot = path.join(webRoot, '../..')
 /** Files whose change feeds the web build: without one, only the checks and the jobs of `e2eInputs` run. */
 const webInputs = [
   /^apps\/web\//,
-  /^packages\/(units|locale-format|statistics|ballistics|shot-groups|schema|importers|drawing|catalog|use-cases|api)\//,
+  /^packages\/(units|locale-format|statistics|ballistics|shot-groups|schema|importers|drawing|catalog|target-recognition|use-cases|api)\//,
   // the catalog reader that writes the bundle the API serves
   /^tools\/src\/catalog\//,
   /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|tsconfig\.base\.json|\.nvmrc)$/,
@@ -21,7 +21,7 @@ const webInputs = [
 const docsOnly = [
   // the docs site's pages are checked by the docs tests (bibliography and code lines), the home page prerenders the news items, the build compares a package's API report (`*.api.md`)
   /^(?!README\.md$)(?!apps\/docs\/docs\/)(?!apps\/web\/news\/)(?!.*\.api\.md$).*\.md$/,
-  // the web tests read the user report template, the licence check the generated block of NOTICE
+  // the web tests read the user report template, the license check the generated block of NOTICE
   /^\.github\/(ISSUE_TEMPLATE\/(?!user-report\.yml$)|pull_request_template\.md$)/,
   /^(LICENSE|\.coderabbit\.yaml)$/,
 ]
@@ -129,6 +129,7 @@ export const testGroups: Record<string, string[]> = {
     'schema',
     'importers',
     'catalog',
+    'target-recognition',
     'use-cases',
     'api',
     'cli',

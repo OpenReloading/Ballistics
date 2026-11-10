@@ -1,5 +1,5 @@
 # Build context: repository root (docker build -f apps/docs/Dockerfile .)
-FROM docker.io/library/node:26-bookworm-slim@sha256:28147155d47dc31abe0a46e0d12b59b2fb3d0a2dcc5dc65fce76a074180b16fe AS build
+FROM docker.io/library/node:26-bookworm-slim@sha256:add5c17c14752c54d2f3d519ec46a3815684d41c33f198bcb09fb998f7dcbf68 AS build
 # pnpm as .github/pnpm/package-lock.json pins it; its native binary comes as an optional dependency, so no install script runs
 COPY .github/pnpm /opt/pnpm
 RUN cd /opt/pnpm && npm ci --ignore-scripts --no-audit --no-fund && ln -s /opt/pnpm/node_modules/.bin/pnpm /usr/local/bin/pnpm
@@ -16,6 +16,7 @@ COPY packages/schema/package.json packages/schema/
 COPY packages/importers/package.json packages/importers/
 COPY packages/catalog/package.json packages/catalog/
 COPY packages/use-cases/package.json packages/use-cases/
+COPY packages/target-recognition/package.json packages/target-recognition/
 COPY packages/api/package.json packages/api/
 COPY packages/drawing/package.json packages/drawing/
 COPY packages/cli/package.json packages/cli/

@@ -1,11 +1,11 @@
 /** Says what the photo makes hard for detection, never that a detection is right (`apps/docs/docs/models/hole-detection.md`, Photo quality). */
 import { fromSi, type TargetFace } from '@open-reloading/schema'
+import { clamp } from '@open-reloading/target-recognition'
 import { type Message, msg } from '../i18n/translate.ts'
 import type { Ellipse } from './ellipse.ts'
 import { grayGrid, shareInside } from './face-image.ts'
 import type { RgbaImage } from './image.ts'
 import { nth } from './nth.ts'
-import { clamp } from './raster-ops.ts'
 
 /** What is wrong with the photo. */
 type QualityProblem =
@@ -55,9 +55,9 @@ export type QualityIssue = {
   fix: Message
 }
 
-/** The photo may show only the centre or cut the rings, so only the presence of a black zone is used, never a ring, size or extent. */
+/** The photo may show only the center or cut the rings, so only the presence of a black zone is used, never a ring, size or extent. */
 export type TargetLayout = {
-  /** Whether the target has a black zone; absent when the record does not give the zone colours. */
+  /** Whether the target has a black zone; absent when the record does not give the zone colors. */
   dark?: boolean | undefined
 }
 
@@ -236,7 +236,7 @@ function sidesDifference(levels: readonly number[]): number | undefined {
   return sides.length >= 3 && top > 0 ? (top - Math.min(...sides)) / top : undefined
 }
 
-/** The ring's four sides, left and right, above and below the centre, by their median grey level. */
+/** The ring's four sides, left and right, above and below the center, by their median grey level. */
 const ringSides = (ring: readonly Spot[], at: Ellipse) =>
   [0, 1, 2, 3].map((k) =>
     median(
@@ -382,7 +382,7 @@ function lightIssues(
     )
 }
 
-/** A black area cut by the frame gives no tilt, and with a known target no framing note: the photo may show only the centre. */
+/** A black area cut by the frame gives no tilt, and with a known target no framing note: the photo may show only the center. */
 function shapeIssues(add: Add, black: Ellipse, image: RgbaImage, layout: TargetLayout | undefined) {
   const framed = shareInside(black, image.width, image.height)
   if (framed >= limits.framing[0]) {

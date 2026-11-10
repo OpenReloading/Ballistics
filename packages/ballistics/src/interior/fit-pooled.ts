@@ -314,7 +314,7 @@ function pooledParameters(
   return { parameters, held }
 }
 
-/** Prior pseudo-rows after the data: the parameter they hold, its log centre and sigma. */
+/** Prior pseudo-rows after the data: the parameter they hold, its log center and sigma. */
 function priorRowsOf(
   parameters: readonly Omit<PooledPowderParameter, 'value' | 'standardUncertainty'>[],
   priors: PooledPriors,
@@ -553,7 +553,7 @@ function pooledFitResult(
   }
 }
 
-/** Rifle and lot factors are random effects (Gaussian priors on their logs, centred on 0 with `rifleSigma` and `lotSigma`), fitted only where the sessions hold two or more rifles, or lots of a powder; throws a `PowderFitError` as `fitPowder` does, and `unresolved` for a powder with a single charge (`apps/docs/docs/models/interior-powder-fit.md`, "Pooled fit over rifles, powders and lots"). */
+/** Rifle and lot factors are random effects (Gaussian priors on their logs, centered on 0 with `rifleSigma` and `lotSigma`), fitted only where the sessions hold two or more rifles, or lots of a powder; throws a `PowderFitError` as `fitPowder` does, and `unresolved` for a powder with a single charge (`apps/docs/docs/models/interior-powder-fit.md`, "Pooled fit over rifles, powders and lots"). */
 export function fitPowderPooled(
   sessions: readonly PooledSession[],
   options: PooledFitOptions = {},

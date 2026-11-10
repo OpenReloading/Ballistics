@@ -215,7 +215,7 @@ describe('the Cal. 12 variants matrix', () => {
     )
   const bodyRows = [...table.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/g)].slice(1).map(([, r]) => r)
 
-  it('has a column per variant and a row per value, labelled with its unit', () => {
+  it('has a column per variant and a row per value, labeled with its unit', () => {
     expect(cells('th', table.match(/<thead[\s\S]*<\/thead>/)?.[0] ?? '')).toHaveLength(10)
     expect(bodyRows.map((r) => cells('th', defined(r))[0])).toEqual([
       'Pmax (bar)',

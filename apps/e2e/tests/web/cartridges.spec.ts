@@ -623,7 +623,7 @@ test('a table row and its drawn dimension mark each other on hover and focus, wi
   await gotoHydrated(page, '/cartridges/308-win')
   const drawn = (side: Side, symbol: string) =>
     figureOf(page, side).locator(`text[data-symbol="${symbol}"]`)
-  // what a person sees of a mark: the colour of a drawn symbol, the background of a row's cells
+  // what a person sees of a mark: the color of a drawn symbol, the background of a row's cells
   const look = (l: Locator) =>
     l.evaluate((e) => {
       const s = getComputedStyle(e.tagName === 'TR' ? (e.firstElementChild ?? e) : e)

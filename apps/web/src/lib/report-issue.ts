@@ -126,7 +126,7 @@ const contextLines = (r: Report) => {
     `- Version: ${c.version}`,
     `- Browser: ${c.userAgent}`,
     `- Window: ${c.window}`,
-    `- Colour scheme: ${c.colourScheme}`,
+    `- Color scheme: ${c.colourScheme}`,
     `- Units: ${c.units}`,
   ]
 }

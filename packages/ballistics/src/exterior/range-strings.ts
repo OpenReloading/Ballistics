@@ -1,4 +1,4 @@
-/** Plans which distances identify muzzle velocity, drag factor and click value and fits them to impacts, dialled corrections and chronograph readings (`apps/docs/docs/models/exterior-truing-strings.md`), each evaluation an ordinary `trajectory` call; SI in and out, angles in rad, dialled corrections in clicks. */
+/** Plans which distances identify muzzle velocity, drag factor and click value and fits them to impacts, dialed corrections and chronograph readings (`apps/docs/docs/models/exterior-truing-strings.md`), each evaluation an ordinary `trajectory` call; SI in and out, angles in rad, dialed corrections in clicks. */
 
 import {
   checkLogFitLimits,
@@ -34,7 +34,7 @@ const names: readonly RangeStringParameterName[] = [
 
 /** One distance of a range string. */
 export interface RangeStringEntry {
-  /** `impact`: height of the mean impact above the line of sight at the zero setting, m; `dial`: clicks dialled from the zero setting to centre the group, signed up. */
+  /** `impact`: height of the mean impact above the line of sight at the zero setting, m; `dial`: clicks dialed from the zero setting to center the group, signed up. */
   kind: 'impact' | 'dial'
   /** Slant range, m. */
   range: number
@@ -62,7 +62,7 @@ export interface Chronograph {
   rounding?: number | undefined
 }
 
-/** Centred on the nominal value, sigma the SD of ln q (muzzle velocity, drag factor, click value) or of the offset in rad (zero offset); a prior narrows intervals but never identifies a parameter, statuses come from the data alone (`apps/docs/docs/models/exterior-truing-strings.md`, "Gaussian priors"). */
+/** Centered on the nominal value, sigma the SD of ln q (muzzle velocity, drag factor, click value) or of the offset in rad (zero offset); a prior narrows intervals but never identifies a parameter, statuses come from the data alone (`apps/docs/docs/models/exterior-truing-strings.md`, "Gaussian priors"). */
 export interface RangeStringPriors {
   /** Standard deviation of ln(v0 / nominal). */
   muzzleVelocity?: number | undefined
@@ -486,7 +486,7 @@ function applied(shot: TrajectoryInput, theta: readonly number[]): TrajectoryInp
 
 const zeros = [0, 0, 0, 0]
 
-/** A Gaussian prior on parameter `j`, centred on its nominal value: the pseudo-row theta_j = 0. */
+/** A Gaussian prior on parameter `j`, centered on its nominal value: the pseudo-row theta_j = 0. */
 interface Prior {
   j: number
   sigma: number

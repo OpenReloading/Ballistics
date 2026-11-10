@@ -63,7 +63,7 @@ export type ChargeRefusal =
   | 'aboveRange'
   /** The curve crosses the target more than once, so no charge is unique. */
   | 'notMonotone'
-  /** The target lies in the range, but no two neighbouring valid runs enclose it. */
+  /** The target lies in the range, but no two neighboring valid runs enclose it. */
   | 'bracketFailed'
   /** `maxIterations` runs did not reach the tolerance. */
   | 'toleranceNotReached'
@@ -210,7 +210,7 @@ function reachableRange(valid: readonly Point[]): ChargeRange {
 const within = (value: number, target: number) =>
   Math.abs(value - target) <= chargeSolverTolerance * target
 
-/** Neighbouring valid scan points on opposite sides of the target value. */
+/** Neighboring valid scan points on opposite sides of the target value. */
 function findBrackets(scan: readonly (Point | undefined)[], target: number): [Point, Point][] {
   const brackets: [Point, Point][] = []
   for (let i = 1; i < scan.length; i++) {
