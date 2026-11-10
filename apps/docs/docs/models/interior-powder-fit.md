@@ -308,7 +308,7 @@ $$
 B_P = B_{P,0}\, e^{\theta_{B,P}}, \quad r_R = e^{\theta_R}, \quad \ell_L = e^{\theta_L}, \quad f_{T,P} = e^{\theta_{T,P}}
 $$
 
-Code: `packages/ballistics/src/interior/fit-pooled.ts`, `fitPowderPooled` (`velocity`, `targetLoad`).
+Code: `packages/ballistics/src/interior/fit-pooled.ts`, `fitPowderPooled` (`pooledValue`, `targetLoad`).
 - $B_P$, the burn coefficient of powder $P$, is shared by all its sessions. The burn coefficient of the powder's first session is the start $B_{P,0}$ and replaces that of its other sessions. On request the temperature factor $f_{T,P}$ of the powder is fitted too, where its sessions span two or more temperatures and its load carries a sensitivity; otherwise it is listed in `held` and stays 1.
 - $r_R$, the velocity factor of rifle $R$, holds what the rifle changes beyond its load: bore, throat, chronograph. It is fitted only where the sessions hold two or more rifles. With one rifle it is absorbed by the burn coefficients.
 - $\ell_L$, the factor of lot $L$ on its powder's burn coefficient, is fitted for each named lot of a powder whose sessions hold two or more lots (a session without a lot counts as one, without a factor).

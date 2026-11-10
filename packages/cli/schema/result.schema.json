@@ -938,7 +938,7 @@
                     "properties": {
                       "factor": {
                         "type": "number",
-                        "description": "The model peak pressure times this is what the basis reads: the exponential of the mean log of printed over model peak pressure of its rows under the fit to velocities only."
+                        "description": "The model peak pressure times this is what the basis reads: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only."
                       },
                       "rows": {
                         "type": "integer",
@@ -950,7 +950,7 @@
                     "required": ["factor", "rows"],
                     "additionalProperties": false
                   },
-                  "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its rows are compared as they are."
+                  "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its training pressures are not read."
                 }
               },
               "required": ["sigma", "factors"],
@@ -1923,7 +1923,7 @@
                         "properties": {
                           "factor": {
                             "type": "number",
-                            "description": "The model peak pressure times this is what the basis reads: the exponential of the mean log of printed over model peak pressure of its rows under the fit to velocities only."
+                            "description": "The model peak pressure times this is what the basis reads: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only."
                           },
                           "rows": {
                             "type": "integer",
@@ -1935,7 +1935,7 @@
                         "required": ["factor", "rows"],
                         "additionalProperties": false
                       },
-                      "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its rows are compared as they are."
+                      "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its training pressures are not read."
                     }
                   },
                   "required": ["sigma", "factors"],
@@ -2824,7 +2824,7 @@
                         "properties": {
                           "factor": {
                             "type": "number",
-                            "description": "The model peak pressure times this is what the basis reads: the exponential of the mean log of printed over model peak pressure of its rows under the fit to velocities only."
+                            "description": "The model peak pressure times this is what the basis reads: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only."
                           },
                           "rows": {
                             "type": "integer",
@@ -2836,7 +2836,7 @@
                         "required": ["factor", "rows"],
                         "additionalProperties": false
                       },
-                      "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its rows are compared as they are."
+                      "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its training pressures are not read."
                     }
                   },
                   "required": ["sigma", "factors"],
@@ -3096,7 +3096,7 @@
                 "properties": {
                   "factor": {
                     "type": "number",
-                    "description": "The model peak pressure times this is what the basis reads: the exponential of the mean log of printed over model peak pressure of its rows under the fit to velocities only."
+                    "description": "The model peak pressure times this is what the basis reads: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only."
                   },
                   "rows": {
                     "type": "integer",
@@ -3108,7 +3108,7 @@
                 "required": ["factor", "rows"],
                 "additionalProperties": false
               },
-              "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its rows are compared as they are."
+              "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its training pressures are not read."
             }
           },
           "required": ["sigma", "factors"],
@@ -3165,7 +3165,7 @@
                 "description": "Iterations of the solver."
               },
               "pressureRows": {
-                "description": "With `--pressure-sigma`: used training rows that print a pressure.",
+                "description": "With `--pressure-sigma`: used training rows whose printed pressure the fit read, those of a basis with a factor.",
                 "type": "integer",
                 "minimum": 0,
                 "maximum": 9007199254740991

@@ -8,6 +8,7 @@ import { compareKeys, toSi } from '@open-reloading/schema'
 import { type InteriorModel, loadOf, outcomes, predict } from './evaluate.ts'
 import type { Records } from './records.ts'
 import type { Row } from './rows.ts'
+import { percentile } from './stats.ts'
 
 /** Why a powder with interior parameters got no fitted value. */
 export const notFittedReasons = [
@@ -42,6 +43,14 @@ interface PressureRun {
 
 /** The basis a row's printed pressure is grouped by, as the metrics group it. */
 export const basisOf = (row: Row) => row.pressureBasis ?? 'unstated'
+
+/** The factor of a row's printed pressure, undefined without a pressure or without a factor of its basis. */
+function factorOf(pressure: PressureRun | undefined, row: Row) {
+  const basis = basisOf(row)
+  // own keys only: a basis named like an Object.prototype member has no factor
+  if (!pressure || row.pressure === undefined || !Object.hasOwn(pressure.factors, basis)) return
+  return pressure.factors[basis]
+}
 
 /** The sessions of one powder's used training rows, one per load without its charge; with `pressure`, a printed pressure over its basis factor is a point's peak pressure. */
 function sessionsOf(
@@ -82,10 +91,10 @@ function sessionsOf(
           muzzleVelocity: r.velocity,
           velocitySigma: sigmas.velocity * r.velocity,
         }
-        const { pressure } = sigmas
-        if (!pressure || r.pressure === undefined) return point
-        const peak = toSi('pressure', r.pressure) / (pressure.factors[basisOf(r)] ?? 1)
-        return { ...point, peakPressure: peak, pressureSigma: pressure.sigma * peak }
+        const factor = factorOf(sigmas.pressure, r)
+        if (!sigmas.pressure || factor === undefined) return point
+        const peak = toSi('pressure', r.pressure as number) / factor
+        return { ...point, peakPressure: peak, pressureSigma: sigmas.pressure.sigma * peak }
       }),
     }
   })
@@ -130,7 +139,9 @@ function fitOne(
       cartridges: new Set(rows.map((r) => r.cartridge)).size,
       chiSquarePerDegree: perDegree,
       iterations: fit.iterations,
-      ...(run.pressure && { pressureRows: rows.filter((r) => r.pressure !== undefined).length }),
+      ...(run.pressure && {
+        pressureRows: rows.filter((r) => factorOf(run.pressure, r) !== undefined).length,
+      }),
     }
   } catch (error) {
     if (error instanceof PowderFitError) return error.reason
@@ -153,7 +164,7 @@ function fitEach(ids: readonly string[], used: readonly Row[], records: Records,
   return { powders, notFitted }
 }
 
-/** Per basis of the `used` rows that print a pressure, of the powders `fit` holds, the exponential of the mean log of printed over model peak pressure under that fit, and their number, bases sorted. */
+/** Per basis of the `used` rows that print a pressure, of the powders `fit` holds, the exponential of the median log of printed over model peak pressure under that fit, and their number, bases sorted. */
 function basisFactors(
   used: readonly Row[],
   records: Records,
@@ -163,18 +174,19 @@ function basisFactors(
   const fitted = withFit(records, fit)
   const bases = new Map<string, number[]>()
   for (const r of used) {
-    if (r.pressure === undefined || !(r.powder in fit.powders)) continue
+    if (r.pressure === undefined || !Object.hasOwn(fit.powders, r.powder)) continue
     const p = predict(r, fitted, model)
     if (!('pressure' in p)) continue
     const log = Math.log(toSi('pressure', r.pressure) / p.pressure)
     bases.set(basisOf(r), [...(bases.get(basisOf(r)) ?? []), log])
   }
+  // the median: a misprinted row or a powder with a minority of the basis's rows does not move the factor of the others
   return Object.fromEntries(
     [...bases]
       .toSorted(([a], [b]) => compareKeys(a, b))
       .map(([basis, list]) => [
         basis,
-        { factor: Math.exp(list.reduce((a, b) => a + b, 0) / list.length), rows: list.length },
+        { factor: Math.exp(percentile(list, 0.5) as number), rows: list.length },
       ]),
   )
 }
@@ -193,7 +205,7 @@ export function fitPowders(
   const ids = [...new Set(rows.map((r) => r.powder))].toSorted(compareKeys)
   const velocities = fitEach(ids, used, records, { model, velocitySigma })
   if (pressureSigma === undefined) return velocities
-  // the factor is what the basis has in common against the model fitted to velocities (the measuring method, the source, what the model lacks), so the pressure rows move a powder's burn coefficient only by its own deviation from its basis; fitted together with the pressures, the burn coefficients would take part of that common offset
+  // the factor is what the basis has in common against the model fitted to velocities (the measuring method, the source, what the model lacks), so the pressure rows move a powder's burn coefficient only by its own deviation from the median of its basis; fitted together with the pressures, the burn coefficients would take part of that common offset
   const factors = basisFactors(used, records, model, velocities)
   const pressure = {
     sigma: pressureSigma,

@@ -165,14 +165,14 @@ describe('the pressure rows of a fit', () => {
     expect(r.powders[sp20]?.factor).toBeCloseTo(1, 3)
   })
 
-  it('moves the burn coefficient of a powder whose pressures are off its basis', async () => {
+  it('moves the burn coefficient of a powder whose pressures are off its basis, and not the factor', async () => {
     const off = ['308-match'].flatMap((cartridge) =>
       [2.0, 2.2, 2.4].map((charge) => ({
         cartridge,
         powder: sp21,
         charge,
         velocity: 0,
-        pressure: 1 / (1.1 * 1.05) - 1,
+        pressure: 1 / (1.1 * 1.3) - 1,
         pressureBasis: 'transducer',
       })),
     )
@@ -181,9 +181,8 @@ describe('the pressure rows of a fit', () => {
       rows: writeRows(rowsCsv([...training, ...off])),
       pressureSigma: 0.05,
     })
-    expect(r.powders[sp21]?.factor).toBeGreaterThan(1.001)
-    expect(r.powders[dp40]?.factor).toBeCloseTo(1, 2)
-    expect(r.powders[sp20]?.factor).toBeCloseTo(1, 2)
+    expect(r.pressure?.factors.transducer?.factor).toBeCloseTo(1.1, 3)
+    expect(r.powders[sp21]?.factor).toBeGreaterThan(1.03)
   })
 
   it('compares the held-out pressures with the model peak times the factor of their basis', async () => {

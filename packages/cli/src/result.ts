@@ -65,13 +65,13 @@ const pressureFit = z
           factor: z
             .number()
             .describe(
-              'The model peak pressure times this is what the basis reads: the exponential of the mean log of printed over model peak pressure of its rows under the fit to velocities only.',
+              'The model peak pressure times this is what the basis reads: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only.',
             ),
           rows: count.describe('Pressure rows of the basis of the powders fitted to velocities.'),
         }),
       )
       .describe(
-        'By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its rows are compared as they are.',
+        'By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its training pressures are not read.',
       ),
   })
   .optional()
@@ -241,7 +241,9 @@ const fitResult = z.object({
         iterations: count.describe('Iterations of the solver.'),
         pressureRows: count
           .optional()
-          .describe('With `--pressure-sigma`: used training rows that print a pressure.'),
+          .describe(
+            'With `--pressure-sigma`: used training rows whose printed pressure the fit read, those of a basis with a factor.',
+          ),
       }),
     )
     .describe('By powder id: each powder fitted on its own.'),
