@@ -390,13 +390,14 @@ function burnCoefficient(load: InteriorLoad, form: ReturnType<typeof burnForm>):
     : (burn.vivacity * tauT) / burn.referencePressure ** n
 }
 
-/** The chambrage gradient over travel x with g = 1 - (A / A_chamber)^2 and f = V_0 / V, null without `chamber.area` (`apps/docs/docs/models/interior-m3.md`, "Chambrage"). */
+/** The chambrage gradient over travel x with g = 1 - (A / A_chamber)^2 and f = V_0 / V (V_0 without throat wear), null without `chamber.area` (`apps/docs/docs/models/interior-m3.md`, "Chambrage"). */
 function chambrageOf(load: InteriorLoad, vc: number, mpr: number) {
-  const { area: chamberArea, boreArea: area } = load.chamber
+  const { area: chamberArea, boreArea: area, volume: caseVolume } = load.chamber
   if (chamberArea === undefined) return null
   const mc = load.charge
   const g = 1 - (area / chamberArea) ** 2
-  const f = (x: number) => vc / (vc + area * x)
+  // a worn throat counts as bore: the step into the bore sits at the case volume
+  const f = (x: number) => caseVolume / (vc + area * x)
   const delta = (x: number) => (1 - g * f(x) ** 3) / 3
   const eps = (x: number) => (1 - g * f(x) ** 2) / 2
   const me = (x: number) => mpr + delta(x) * mc
@@ -443,8 +444,28 @@ function scaleInteriorLoad(load: InteriorLoad) {
   // scaled state [f, x/xe, v/vr, Wr/E0, Eh/E0], with leakage also [ml/mc, El/E0], and time tau = t / ts
   const vr = Math.sqrt((2 * e0) / mp)
   const ts = xe / vr
-  const scales = { vc, area, d, xe, mp, mc, k, eta, solid, e0, mpr, delta, eps, me, form, n, coef }
-  return { ...scales, vr, ts, chambrage: chambrageOf(load, vc, mpr) }
+  return {
+    vc,
+    area,
+    d,
+    xe,
+    mp,
+    mc,
+    k,
+    eta,
+    solid,
+    e0,
+    mpr,
+    delta,
+    eps,
+    me,
+    form,
+    n,
+    coef,
+    vr,
+    ts,
+    chambrage: chambrageOf(load, vc, mpr),
+  }
 }
 
 type Scaling = Exclude<ReturnType<typeof scaleInteriorLoad>, InteriorInvalid>

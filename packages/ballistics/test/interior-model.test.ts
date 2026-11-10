@@ -452,32 +452,33 @@ describe('pressure gradient checks', () => {
   })
 })
 
-describe('chambrage gradient', () => {
-  const load: InteriorLoad = {
-    chamber: { volume: 3.6e-6, boreArea: 4.76e-5, boreDiameter: 7.62e-3, area: 1.19e-4 },
-    barrel: { length: 0.55, twist: 0 },
-    bullet: { mass: 0.0108 },
-    charge: 0.0028,
-    propellant: {
-      specificEnergy: 3.9e6,
-      gamma: 1.24,
-      density: 1600,
-      covolume: 1e-3,
-      burn: {
-        kind: 'vivacity',
-        vivacity: 0.55,
-        exponent: 1,
-        referencePressure: 1e5,
-        form: { kind: 'constant' },
-      },
+/** The reference load of the chambrage tests, chi = 2.5. */
+const chambrageLoad: InteriorLoad = {
+  chamber: { volume: 3.6e-6, boreArea: 4.76e-5, boreDiameter: 7.62e-3, area: 1.19e-4 },
+  barrel: { length: 0.55, twist: 0 },
+  bullet: { mass: 0.0108 },
+  charge: 0.0028,
+  propellant: {
+    specificEnergy: 3.9e6,
+    gamma: 1.24,
+    density: 1600,
+    covolume: 1e-3,
+    burn: {
+      kind: 'vivacity',
+      vivacity: 0.55,
+      exponent: 1,
+      referencePressure: 1e5,
+      form: { kind: 'constant' },
     },
-    propellantTemperature: 294.15,
-    ignitionPressure: 5e6,
-    startPressure: 3e7,
-  }
+  },
+  propellantTemperature: 294.15,
+  ignitionPressure: 5e6,
+  startPressure: 3e7,
+}
 
+describe('chambrage gradient', () => {
   it('follows the chambrage equations at chi = 2.5', () => {
-    const r = interior(load)
+    const r = interior(chambrageLoad)
     if (!r.valid) throw new Error(r.reason)
     // from an independent fixed-step RK4 integration of the chambrage equations (step 4e-9 s, events by bisection)
     const expected = {
@@ -492,13 +493,32 @@ describe('chambrage gradient', () => {
     expect(rel(r.energy.gasKinetic, 288.729021)).toBeLessThan(1e-6)
   })
 
+  it('counts a worn throat as bore', () => {
+    const r = interior({
+      ...chambrageLoad,
+      chamber: { ...chambrageLoad.chamber, throatWear: 0.003 },
+    })
+    if (!r.valid) throw new Error(r.reason)
+    // from the same independent integration as above, extended by the worn throat
+    const expected = {
+      muzzleVelocity: 774.304243,
+      peakBreechPressure: 245758460,
+      maxBasePressure: 220773093,
+      maxMeanPressure: 239419791,
+    }
+    for (const [key, value] of Object.entries(expected))
+      expect(rel(r[key as keyof typeof expected], value), key).toBeLessThan(1e-6)
+  })
+
   it('refuses a chamber narrower than the bore and an explicit gradient', () => {
-    expect(interior({ ...load, chamber: { ...load.chamber, area: 4e-5 } })).toEqual({
+    expect(
+      interior({ ...chambrageLoad, chamber: { ...chambrageLoad.chamber, area: 4e-5 } }),
+    ).toEqual({
       valid: false,
       reason: 'input',
       field: 'chamber.area',
     })
-    expect(interior({ ...load, gradient: { energy: 1 / 3, breech: 1 / 2 } })).toEqual({
+    expect(interior({ ...chambrageLoad, gradient: { energy: 1 / 3, breech: 1 / 2 } })).toEqual({
       valid: false,
       reason: 'input',
       field: 'gradient',

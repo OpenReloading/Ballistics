@@ -12,7 +12,7 @@ Interior ballistics, pressure gradient: does a chambrage form of the gradient, f
 
 ## Method
 
-Derive the gradient from the Lagrange assumptions (uniform gas density behind the projectile, density kept uniform as the gas moves) for a cylindrical chamber of area $\chi A$ followed by the bore of area $A$. Check the derivation two ways: the equation of motion from the energy balance against the one from the volume mean of the pressure field, and $\chi = 1$ against the present model. Integrate the equations independently of the model's code (fixed-step Runge-Kutta of fourth order, step 4e-9 s, events by bisection) on one synthetic rifle load and compare. Accept rule, set in advance: the model with `chamber.area` matches the independent integration to a relative 1e-6 on muzzle velocity, the three peak pressures, the muzzle breech pressure and the gas kinetic energy, and every result without `chamber.area` stays bit-identical.
+Derive the gradient from the Lagrange assumptions (uniform gas density behind the projectile, density kept uniform as the gas moves) for a cylindrical chamber of area $\chi A$ followed by the bore of area $A$. Check the derivation two ways: the equation of motion from the energy balance against the one from the volume mean of the pressure field, and $\chi = 1$ against the present model. Integrate the equations independently of the model's code (fixed-step Runge-Kutta of fourth order, step 4e-9 s, events by bisection) on one synthetic rifle load, also with a worn throat that counts as bore, and compare. Accept rule, set in advance: the model with `chamber.area` matches the independent integration to a relative 1e-6 on muzzle velocity, the three peak pressures, the muzzle breech pressure and the gas kinetic energy, and every result without `chamber.area` stays bit-identical.
 
 ## Formulas
 
@@ -32,12 +32,14 @@ The gas speeds up from $f v / \chi$ to $f v$ at the step into the bore, which gi
 
 Synthetic load: $V_0$ = 3.6 cm³, $A$ = 47.6 mm², chamber body 119 mm² ($\chi$ = 2.5), 550 mm travel, 10.8 g bullet without twist, 2.8 g charge, $Q$ = 3.9 MJ/kg, $k$ = 1.24, $\rho_s$ = 1600 kg/m³, $\eta$ = 1 cm³/g, vivacity 0.55 1/s at 1 bar with exponent 1 and constant form, $p_i$ = 5 MPa, $p_\text{st}$ = 30 MPa, no resistance, heat loss or leakage.
 
+For scale, real area ratios: over the 208 cartridges of the repository's C.I.P. table I records that state the chamber diameters $P_1$ and $P_2$ and the bore area $Q$, the circle of the mean of $P_1$ and $P_2$ over $Q$ has a 10th percentile of 1.68, a median of 2.78 and a 90th percentile of 3.78.
+
 | Simulated value      | Lagrange  | Chambrage, $\chi$ = 2.5 | Change |
 | -------------------- | --------- | ----------------------- | ------ |
 | Muzzle velocity      | 797.8 m/s | 787.2 m/s               | −1.3 % |
 | Peak breech pressure | 278.8 MPa | 262.5 MPa               | −5.9 % |
 
-The independent integration gives 787.162323 m/s, peak breech 262.522077 MPa, peak base 236.232459 MPa, peak mean 256.063051 MPa, muzzle breech 67.6094451 MPa and a gas kinetic energy of 288.729021 J at the muzzle; the model matches each to a relative 2e-9 or better. With $\chi$ = 1 the integration matches the present model to 2e-9. The burn coefficient is the same in both columns; a refit would take back part of the change.
+The independent integration gives 787.162323 m/s, peak breech 262.522077 MPa, peak base 236.232459 MPa, peak mean 256.063051 MPa, muzzle breech 67.6094451 MPa and a gas kinetic energy of 288.729021 J at the muzzle; the model matches the independent integration to a relative 2e-9 or better at area ratios 1, 1.5, 2.5 and 4 on the muzzle velocity, the three peak pressures, the muzzle breech pressure and the gas kinetic energy. An extension of the integration by a constant friction pressure and a twist agrees to 3e-11 at ratio 2.5, and with ratio 1 the integration matches the model as it was before this change to 2e-9. The burn coefficient is the same in both columns; a refit would take back part of the change.
 
 ## Result
 

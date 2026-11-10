@@ -109,12 +109,12 @@ While the projectile is at rest, $p_b = p_\text{br} = \bar p$.
 
 #### Chambrage
 
-The Lagrange coefficients treat the space behind the projectile as a cylinder of the bore area. In a bottleneck cartridge the case body is wider: for the C.I.P. rifle cartridges its area is 1.6 to 3.8 times the bore area (unverified). Gas in a wide chamber moves slowly, so it carries less kinetic energy and builds a smaller difference between breech and base pressure. With `chamber.area` given, the gradient takes its chambrage form; without it the Lagrange gradient above applies unchanged.
+The Lagrange coefficients treat the space behind the projectile as a cylinder of the bore area. In a bottleneck cartridge the case body is wider: over the 208 cartridges of the repository's C.I.P. table I records that state the chamber diameters $P_1$ and $P_2$ and the bore area $Q$, the circle of the mean of $P_1$ and $P_2$ is 1.68 to 3.78 times $Q$ (10th to 90th percentile, median 2.78). Gas in a wide chamber moves slowly, so it carries less kinetic energy and, near the peak pressure, builds a smaller difference between breech and base pressure. Late in the bore the difference is larger than the Lagrange one, about 3 % at the muzzle of the load below. With `chamber.area` given, the gradient takes its chambrage form; without it the Lagrange gradient above applies unchanged.
 
-The assumptions are those of the Lagrange gradient: the charge is spread with uniform density over the volume behind the projectile, and the gas moves so that the density stays uniform. That volume is now a chamber of cross-section $\chi A$ and volume $V_0$ (the volume behind the seated bullet with [throat wear](#throat-wear)), followed by the bore of area $A$:
+The assumptions are those of the Lagrange gradient: the charge is spread with uniform density over the volume behind the projectile, and the gas moves so that the density stays uniform. That volume is now a chamber of cross-section $\chi A$ and volume $V_0$ (the volume behind the seated bullet without throat wear), followed by the bore of area $A$. A worn throat counts as bore, so with wear $f$ is below 1 at $x = 0$:
 
 $$
-\chi = \frac{A_\text{ch}}{A}, \qquad g = 1 - \frac{1}{\chi^2}, \qquad V = V_0 + A x, \qquad f = \frac{V_0}{V}
+\chi = \frac{A_\text{ch}}{A}, \qquad g = 1 - \frac{1}{\chi^2}, \qquad V = V_0' + A x, \qquad f = \frac{V_0}{V}
 $$
 
 Code: `packages/ballistics/src/interior/model.ts`, `chambrageOf` (`g`, `f`).
@@ -143,11 +143,11 @@ $$
 
 Code: `packages/ballistics/src/interior/model.ts`, `chambrageOf` (`motion`), `pressuresOf`.
 
-As a check, the volume mean of the pressure field is $p_b + \delta(x)\, m_c a / A + (m_c / 2V)\, g f^3 v^2$; with $p_b$ from the base it gives the same equation of motion as the energy route. $\chi = 1$ gives the Lagrange gradient. Far down the bore ($f \to 0$) the coefficients return to $1/3$ and $1/2$; at $x = 0$ they are $1/(3\chi^2)$ and $1/(2\chi^2)$. While the projectile is at rest the three pressures are equal, as above.
+As a check, the volume mean of the pressure field is $p_b + \delta(x)\, m_c a / A + (m_c / 2V)\, g f^3 v^2$; with $p_b$ from the base it gives the same equation of motion as the energy route. $\chi = 1$ gives the Lagrange gradient. Far down the bore ($f \to 0$) the coefficients return to $1/3$ and $1/2$; without throat wear they are $1/(3\chi^2)$ and $1/(2\chi^2)$ at $x = 0$. While the projectile is at rest the three pressures are equal, as above.
 
 On the load of the test (bore area 47.6 mm², 3.6 cm³ behind the bullet, 10.8 g bullet, 2.8 g charge, 550 mm travel) with an unchanged burn coefficient, $\chi = 2.5$ lowers the simulated muzzle velocity by 1.3 % (797.8 to 787.2 m/s) and the peak breech pressure by 5.9 % (278.8 to 262.5 MPa) ([research log](../research/interior-chambrage-gradient.md)).
 
-The derivation is this project's own and has not been compared with a published chambrage gradient (unverified). The chamber is one cylinder, with no shoulder cone and no neck, and the burn rate still follows the mean pressure. The chambrage form takes no `gradient`; a run with both is invalid. No record or load file sets `chamber.area`.
+The derivation is this project's own and has not been compared with a published chambrage gradient (unverified). The chamber is one cylinder, with no shoulder cone and no neck, and the burn rate still follows the mean pressure. The step from the chamber into the bore is taken without loss (Bernoulli): a sudden contraction loses more pressure and a cone shoulder comes close to the lossless case, and the size of that loss is not modeled (unverified). The heat loss keeps the geometry of a bore cylinder (`heatFluxOf`): its area and gas speed do not change with `chamber.area`. The chambrage form takes no `gradient`; a run with both is invalid. No record or load file sets `chamber.area`.
 
 ### Ignition
 
