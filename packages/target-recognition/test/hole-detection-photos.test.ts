@@ -77,7 +77,7 @@ describe('hole detection on the fixture photos', () => {
         ).toBeLessThan(0.25)
         const s = score(found.proposals, f)
         expect(s.recall).toBeGreaterThanOrEqual(0.8)
-        // a black centre of about 2.7 holes across reads as a cluster of holes (scan-light.jpg, phone-light.jpg)
+        // a black center of about 2.7 holes across reads as a cluster of holes (scan-light.jpg, phone-light.jpg)
         expect(s.false).toBeLessThanOrEqual(7)
         expectTierKeeps(found.proposals, f)
       }

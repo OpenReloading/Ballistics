@@ -1,4 +1,4 @@
-/** Synthetic target photos for the hole detection recall test: rendered faces with torn holes smaller than the bullet, as paper shows them; `make.mts` writes the files and the test reads them, so JPEG artefacts, blur and noise are part of the fixture. */
+/** Synthetic target photos for the hole detection recall test: rendered faces with torn holes smaller than the bullet, as paper shows them; `make.mts` writes the files and the test reads them, so JPEG artifacts, blur and noise are part of the fixture. */
 
 import { seededUniforms } from '@open-reloading/statistics'
 import { defined } from '../../defined.ts'
@@ -16,7 +16,7 @@ export type Scene = {
   /** Visible hole diameter over the bullet diameter. */
   visible: number
   face: 'rings' | 'dark' | 'night' | 'orange'
-  /** Hole centres in scene px (before the tilt). */
+  /** Hole centers in scene px (before the tilt). */
   holes: { x: number; y: number }[]
   /** Photo tilt, degrees counter-clockwise. */
   tilt: number
@@ -39,7 +39,7 @@ export const scenes: Scene[] = [
   {
     file: 'scan-light.jpg',
     about:
-      'scan of a light face with black rings and a black centre, dark backing, 0.8 of the bullet',
+      'scan of a light face with black rings and a black center, dark backing, 0.8 of the bullet',
     width: 560,
     height: 560,
     pxPerMm: 8,
@@ -161,7 +161,7 @@ export const scenes: Scene[] = [
   },
 ]
 
-/** The face colour at scene point (x, y), holes left out. */
+/** The face color at scene point (x, y), holes left out. */
 function faceAt(s: Scene, x: number, y: number): Rgb {
   const [cx, cy] = [s.width / 2, s.height / 2]
   const r = Math.hypot(x - cx, y - cy) / s.pxPerMm
@@ -191,8 +191,8 @@ function darkFaceAt(r: number): Rgb {
   return BLACK
 }
 
-/** The colour of a hole at distance `d` from its centre with the torn `edge`, `rv` the mean radius; undefined outside. */
-function holeColourAt(s: Scene, d: number, edge: number, rv: number): Rgb | undefined {
+/** The color of a hole at distance `d` from its center with the torn `edge`, `rv` the mean radius; undefined outside. */
+function holeColorAt(s: Scene, d: number, edge: number, rv: number): Rgb | undefined {
   if (d <= edge) return throughHole(s.face)
   // bullet wipe on paper, a burnt rim on the orange face
   if (s.face === 'rings' && d <= edge + 0.12 * rv) return [90, 88, 86]
@@ -209,7 +209,7 @@ function throughHole(face: Scene['face']): Rgb {
   return [240, 234, 214]
 }
 
-/** The scene colour at (x, y): face, holes with torn edges and their rims. */
+/** The scene color at (x, y): face, holes with torn edges and their rims. */
 function sceneAt(s: Scene, x: number, y: number, phase: number[]): Rgb {
   const rv = (s.caliberMm * s.visible * s.pxPerMm) / 2
   for (let i = 0; i < s.holes.length; i++) {
@@ -222,8 +222,8 @@ function sceneAt(s: Scene, x: number, y: number, phase: number[]): Rgb {
       (1 +
         0.06 * Math.sin(5 * a + defined(phase[2 * i])) +
         0.03 * Math.sin(11 * a + defined(phase[2 * i + 1])))
-    const colour = holeColourAt(s, d, edge, rv)
-    if (colour) return colour
+    const color = holeColorAt(s, d, edge, rv)
+    if (color) return color
   }
   return faceAt(s, x, y)
 }

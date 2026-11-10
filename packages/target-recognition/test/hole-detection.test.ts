@@ -28,8 +28,8 @@ type Box = [x0: number, y0: number, x1: number, y1: number]
 
 class Scene {
   lum: Float32Array
-  /** Pixels painted in colour (R, G, B); the others are grey with the tint of `image`. */
-  colour = new Map<number, [number, number, number]>()
+  /** Pixels painted in color (R, G, B); the others are grey with the tint of `image`. */
+  color = new Map<number, [number, number, number]>()
   rnd = seededUniforms(7)
   readonly width: number
   readonly height: number
@@ -58,7 +58,7 @@ class Scene {
   disc(cx: number, cy: number, r: number, v: number) {
     this.ring({ x: cx, y: cy }, r / 2, r, v)
   }
-  /** A hole with a torn, wavy edge; `backing` is what shows through it; white fibres on its rim. */
+  /** A hole with a torn, wavy edge; `backing` is what shows through it; white fibers on its rim. */
   hole(c: Point, backing: number, diameter = D) {
     const r = diameter / 2
     const [p1, p2] = [this.rnd() * 6, this.rnd() * 6]
@@ -76,12 +76,12 @@ class Scene {
       this.disc(c.x + 1.03 * r * Math.cos(a), c.y + 1.03 * r * Math.sin(a), 0.06 * diameter, PAPER)
     }
   }
-  /** A hole through which a backing of colour `rgb` shows, round, `diameter` px across. */
-  colourHole(c: Point, rgb: [number, number, number], diameter = D) {
+  /** A hole through which a backing of color `rgb` shows, round, `diameter` px across. */
+  colorHole(c: Point, rgb: [number, number, number], diameter = D) {
     const r = diameter / 2
     for (let y = Math.floor(c.y - r); y <= Math.ceil(c.y + r); y++)
       for (let x = Math.floor(c.x - r); x <= Math.ceil(c.x + r); x++)
-        if (Math.hypot(x - c.x, y - c.y) <= r) this.colour.set(y * this.width + x, rgb)
+        if (Math.hypot(x - c.x, y - c.y) <= r) this.color.set(y * this.width + x, rgb)
   }
   /** A hole on a dark area whose torn paper shows as a light ring around a dark middle. */
   tornHole(c: Point, middle: number, rim: number) {
@@ -126,7 +126,7 @@ class Scene {
         const g = Math.sqrt(-2 * Math.log(1 - this.rnd())) * Math.cos(2 * Math.PI * this.rnd())
         const f = gradient ? gradient(x, y) : 1
         const v = defined(this.lum[i]) * f + noise * g
-        const c = this.colour.get(i)
+        const c = this.color.get(i)
         data.set(
           c
             ? [c[0] * f + noise * g, c[1] * f + noise * g, c[2] * f + noise * g, 255]
@@ -193,7 +193,7 @@ describe('detectFromExample', () => {
     )
   })
 
-  it('reports the polarity, the colour and the size of the picked hole', () => {
+  it('reports the polarity, the color and the size of the picked hole', () => {
     const s = new Scene(700, 500)
     const truth = [
       { x: 150, y: 140 },
@@ -314,7 +314,7 @@ describe('detectFromExample and the region', () => {
     expect(from(s, { x: 9000, y: 200 })).toBeUndefined()
   })
 
-  it('proposes only holes whose centre is inside the region', () => {
+  it('proposes only holes whose center is inside the region', () => {
     const s = new Scene(800, 600)
     const inside = { x: 300, y: 300 }
     const nearEdge = { x: 300, y: 300 - 0.9 * D }
@@ -408,7 +408,7 @@ describe('autoDetect and findHoles on print, a stain and a backing color', () =>
     ).toEqual([])
   })
 
-  it('with a backing colour looks for that colour only', () => {
+  it('with a backing color looks for that color only', () => {
     const s = new Scene(900, 900)
     s.face(450, 450)
     const mm = pxPerMm
@@ -418,7 +418,7 @@ describe('autoDetect and findHoles on print, a stain and a backing color', () =>
       { x: 450 - 27 * mm, y: 450 + 28 * mm },
       { x: 450 + 28 * mm, y: 450 + 28 * mm },
     ]
-    for (const t of truth) s.colourHole(t, yellow)
+    for (const t of truth) s.colorHole(t, yellow)
     const options = { image: s.image(), region: all(s), pxPerM, expectedHoleDiameter: bullet }
     const found = detectHoles({ ...options, backing: { r: yellow[0], g: yellow[1], b: yellow[2] } })
     for (const t of truth)
@@ -427,7 +427,7 @@ describe('autoDetect and findHoles on print, a stain and a backing color', () =>
 })
 
 describe('findHoles with a bad backing color and without a region', () => {
-  it('refuses a backing colour channel that is not a number from 0 to 255', () => {
+  it('refuses a backing color channel that is not a number from 0 to 255', () => {
     const s = new Scene(200, 200)
     const ok = { image: s.image(), region: all(s), pxPerM, expectedHoleDiameter: bullet }
     for (const backing of [

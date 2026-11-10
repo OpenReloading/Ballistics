@@ -84,7 +84,7 @@ $$
 w = \frac{(\Sigma + \epsilon I)^{-1} (\mu - m)}{\lVert (\Sigma + \epsilon I)^{-1} (\mu - m) \rVert}, \qquad \epsilon = \frac{0.02 \operatorname{tr}\Sigma}{3} + 10^{-5}
 $$
 
-Code: `packages/target-recognition/src/colour-axis.ts`, `axisOf`, `fisherAxis`. `packages/target-recognition/src/hole-detection.ts`, `MIN_SEP`.
+Code: `packages/target-recognition/src/color-axis.ts`, `axisOf`, `fisherAxis`. `packages/target-recognition/src/hole-detection.ts`, `MIN_SEP`.
 
 The axis is refused when the separation $\Delta = w^\top (\mu - m)$ is below 0.02 (scaled by the contrast setting) or when fewer than 30 surrounding pixels are sampled.
 
@@ -94,7 +94,7 @@ $$
 P = \operatorname{clamp}\left(64 + 128\, \frac{w^\top F - w^\top m}{\Delta},\, 0,\, 255\right)
 $$
 
-Code: `packages/target-recognition/src/colour-axis.ts`, `project`.
+Code: `packages/target-recognition/src/color-axis.ts`, `project`.
 
 ### Blob response
 
@@ -304,7 +304,7 @@ Code: `apps/web/src/lib/face-search.ts`, `findFace`, `holeSize`. `apps/web/src/l
 2. A run is kept when it finds at least two shots of alike size: no more than a quarter of the sizes lie off their median by more than 35 %, and that median is at least half the expected hole size. Grain of the photo, on a dark target with dark holes the strongest light blobs, gives alike blobs far below that size, and runs of them agree with each other more than the holes' runs do.
 3. The run whose shots the other runs find again most often (within $0.5 D$) is proposed, then run again on the full working image. The seed runs use a working image with holes of about 12 pixels (0.75 times 16).
 
-Code: `packages/target-recognition/src/hole-detection.ts`, `autoDetect`, `runSeeds`, `SEED_MIN_SIZE`. `packages/target-recognition/src/colour-axis.ts`, `rescale`, `logLuma`.
+Code: `packages/target-recognition/src/hole-detection.ts`, `autoDetect`, `runSeeds`, `SEED_MIN_SIZE`. `packages/target-recognition/src/color-axis.ts`, `rescale`, `logLuma`.
 
 ### Photo quality
 

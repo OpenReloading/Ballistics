@@ -45,7 +45,7 @@
     "oxlint": "catalog:",
     "oxlint-tsgolint": "catalog:",
     "publint": "catalog:",
-    "sharp": "^0.35.5",
+    "sharp": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }
