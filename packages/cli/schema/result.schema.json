@@ -885,6 +885,44 @@
           },
           "required": ["rows", "velocity", "pressure", "pressureByBasis", "interval", "powders"],
           "additionalProperties": false
+        },
+        "fit": {
+          "description": "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`.",
+          "type": "object",
+          "properties": {
+            "velocitySigma": {
+              "type": "number",
+              "description": "Velocity sigma of the fit, a fraction of the velocity."
+            },
+            "powders": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "description": "Powders fitted."
+            },
+            "notFitted": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string",
+                "enum": [
+                  "unresolved",
+                  "invalid",
+                  "not-converged",
+                  "ill-conditioned",
+                  "underdetermined",
+                  "noUsableRow"
+                ]
+              },
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "description": "Powders not fitted, by reason; a reason without powders is left out."
+            }
+          },
+          "required": ["velocitySigma", "powders", "notFitted"],
+          "additionalProperties": false
         }
       },
       "required": [
@@ -1796,6 +1834,44 @@
                 "powders"
               ],
               "additionalProperties": false
+            },
+            "fit": {
+              "description": "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`.",
+              "type": "object",
+              "properties": {
+                "velocitySigma": {
+                  "type": "number",
+                  "description": "Velocity sigma of the fit, a fraction of the velocity."
+                },
+                "powders": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991,
+                  "description": "Powders fitted."
+                },
+                "notFitted": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string",
+                    "enum": [
+                      "unresolved",
+                      "invalid",
+                      "not-converged",
+                      "ill-conditioned",
+                      "underdetermined",
+                      "noUsableRow"
+                    ]
+                  },
+                  "additionalProperties": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "description": "Powders not fitted, by reason; a reason without powders is left out."
+                }
+              },
+              "required": ["velocitySigma", "powders", "notFitted"],
+              "additionalProperties": false
             }
           },
           "required": ["model", "modelVersion", "interval", "overall", "byFamily", "byPowder"],
@@ -2623,6 +2699,44 @@
                 "powders"
               ],
               "additionalProperties": false
+            },
+            "fit": {
+              "description": "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`.",
+              "type": "object",
+              "properties": {
+                "velocitySigma": {
+                  "type": "number",
+                  "description": "Velocity sigma of the fit, a fraction of the velocity."
+                },
+                "powders": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991,
+                  "description": "Powders fitted."
+                },
+                "notFitted": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string",
+                    "enum": [
+                      "unresolved",
+                      "invalid",
+                      "not-converged",
+                      "ill-conditioned",
+                      "underdetermined",
+                      "noUsableRow"
+                    ]
+                  },
+                  "additionalProperties": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "description": "Powders not fitted, by reason; a reason without powders is left out."
+                }
+              },
+              "required": ["velocitySigma", "powders", "notFitted"],
+              "additionalProperties": false
             }
           },
           "required": ["model", "modelVersion", "interval", "overall", "byFamily", "byPowder"],
@@ -2773,6 +2887,182 @@
         "baseline",
         "candidate",
         "change"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "number",
+          "const": 1
+        },
+        "notice": {
+          "type": "string",
+          "const": "simulation, not load data"
+        },
+        "command": {
+          "type": "string",
+          "const": "fit"
+        },
+        "inputs": {
+          "type": "object",
+          "properties": {
+            "rows": {
+              "type": "string",
+              "description": "SHA-256 over the SHA-256 of each rows file."
+            },
+            "records": {
+              "type": "string",
+              "description": "SHA-256 over the records the rows name."
+            }
+          },
+          "required": ["rows", "records"],
+          "additionalProperties": false
+        },
+        "published": {
+          "description": "With `--rows catalogue` or a folder of published loads: what the files gave.",
+          "type": "object",
+          "properties": {
+            "files": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "description": "Published load files read."
+            },
+            "rows": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "description": "Rows they gave: one per printed charge with a velocity."
+            },
+            "skipped": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string",
+                "enum": ["noVelocity", "customerTable", "noPowderRecord", "noCartridge"]
+              },
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "description": "Printed charges that gave no row, by reason; a reason without charges is left out."
+            }
+          },
+          "required": ["files", "rows", "skipped"],
+          "additionalProperties": false
+        },
+        "model": {
+          "type": "string",
+          "description": "The name or module path the model was selected by."
+        },
+        "modelVersion": {
+          "type": "string",
+          "description": "SHA-256 over the model and fit sources, the params line, the records the rows name and the rows bytes."
+        },
+        "split": {
+          "type": "string",
+          "const": "training",
+          "description": "The split whose rows the fit reads."
+        },
+        "velocitySigma": {
+          "type": "number",
+          "description": "Velocity sigma of each row, a fraction of its velocity."
+        },
+        "powders": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "vivacity": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "number",
+                    "description": "Fitted burn coefficient, in the unit of the record."
+                  },
+                  "standardUncertainty": {
+                    "type": "number",
+                    "description": "Of the fit, scaled by the root of the chi square per degree of freedom where that is above 1."
+                  }
+                },
+                "required": ["value", "standardUncertainty"],
+                "additionalProperties": false,
+                "description": "The record burn coefficient times `factor`."
+              },
+              "factor": {
+                "type": "number",
+                "description": "Fitted over record burn coefficient."
+              },
+              "rows": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991,
+                "description": "Used training rows of the powder."
+              },
+              "cartridges": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991,
+                "description": "Their distinct cartridges."
+              },
+              "chiSquarePerDegree": {
+                "description": "Chi square of every row, data and the prior rows of the rifle and lot effects, over all rows minus all parameters; null where that count is not above 0.",
+                "type": ["number", "null"]
+              },
+              "iterations": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991,
+                "description": "Iterations of the solver."
+              }
+            },
+            "required": [
+              "vivacity",
+              "factor",
+              "rows",
+              "cartridges",
+              "chiSquarePerDegree",
+              "iterations"
+            ],
+            "additionalProperties": false
+          },
+          "description": "By powder id: each powder fitted on its own."
+        },
+        "notFitted": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "string",
+            "enum": [
+              "unresolved",
+              "invalid",
+              "not-converged",
+              "ill-conditioned",
+              "underdetermined",
+              "noUsableRow"
+            ]
+          },
+          "description": "By powder id, why a powder with interior parameters that the rows name got no value: the reason of the fit, or `noUsableRow` without a used training row."
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "notice",
+        "command",
+        "inputs",
+        "model",
+        "modelVersion",
+        "split",
+        "velocitySigma",
+        "powders",
+        "notFitted"
       ],
       "additionalProperties": false
     }
