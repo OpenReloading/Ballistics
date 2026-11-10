@@ -22,7 +22,7 @@ describe('disciplines', () => {
     .find((f) => f.id === 'vdrbw-bw-nr2')
     ?.events.find((e) => e.name === 'VdRBw G-RM 1 Militär-Repetiergewehr')?.id
 
-  it('lists every event of every face once, labelled with its organization', () => {
+  it('lists every event of every face once, labeled with its organization', () => {
     expect(items).toHaveLength(faces.reduce((n, f) => n + f.events.length, 0))
     expect(new Set(items.map((i) => i.value)).size).toBe(items.length)
     for (const f of faces)

@@ -12,11 +12,11 @@ Truing from range strings: does `fitTruingStrings` recover muzzle velocity, drag
 
 ## Method
 
-Strings come from `trajectory` with true factors of 1.015 on the muzzle velocity (790 m/s nominal), 0.96 on the drag and 1.02 on the 0.1 mrad click value. Impacts at 300, 600 and 900 m, dialled corrections at 400, 700 and 1000 m, 5 shots per entry with 0.2 mrad dispersion, and a chronograph string. Accept rules, set in the tests:
+Strings come from `trajectory` with true factors of 1.015 on the muzzle velocity (790 m/s nominal), 0.96 on the drag and 1.02 on the 0.1 mrad click value. Impacts at 300, 600 and 900 m, dialed corrections at 400, 700 and 1000 m, 5 shots per entry with 0.2 mrad dispersion, and a chronograph string. Accept rules, set in the tests:
 - Exact strings: all three parameters identified and within $10^{-6}$ relative, standardized residuals below $10^{-5}$, the residual check passed.
 - Coverage: 300 seeded noise draws, with and without the zero offset fitted. Each 95 percent interval covers the truth in a share within 3 binomial standard deviations of 0.95; the residual check at 0.99 rejects fewer than 1 percent plus 3 binomial standard deviations of the fits.
 - Plan against fit: the relative standard uncertainty the plan gives for each parameter within 10 percent of the one a noisy fit reports.
-- Identifiability: strings at one distance, two distances alike in effect, a chronograph with one close distance, and dialled corrections alone must name the parameters they cannot separate as weak or unresolved.
+- Identifiability: strings at one distance, two distances alike in effect, a chronograph with one close distance, and dialed corrections alone must name the parameters they cannot separate as weak or unresolved.
 
 ## Formulas
 

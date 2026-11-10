@@ -17,7 +17,7 @@ The burn form and the pressure exponent are fitted to a measured pressure-time t
 
 ### Ladder charges
 
-`chargeLadder` builds the charges of a ladder of $N$ steps from a start charge $m_0$ and a step $\Delta m$, upward, downward or centred on $m_0$ (odd $N$, lowest first):
+`chargeLadder` builds the charges of a ladder of $N$ steps from a start charge $m_0$ and a step $\Delta m$, upward, downward or centered on $m_0$ (odd $N$, lowest first):
 
 $$
 m_i = m_0 \pm i\,\Delta m, \qquad
@@ -105,7 +105,7 @@ A candidate with an invalid run at any charge is a rejected step.
 
 ### Prior and robust loss
 
-A prior on a fitted parameter is a Gaussian on its log parameter with centre $\mu_j$ and standard deviation $s_j$. The centre is given as a value $q_j^\ast$ of the parameter, for example from the powder's record or its family, and mapped like the fit's own start value. It enters the fit as one pseudo-row after the ladder rows, with observed value $\mu_j$, predicted value $\theta_j$ and standard deviation $s_j$. The fit then minimizes the negative log posterior up to a constant, the maximum a posteriori estimate ([Gelman 2013](../bibliography.md#gelman-2013), chapter unverified):
+A prior on a fitted parameter is a Gaussian on its log parameter with center $\mu_j$ and standard deviation $s_j$. The center is given as a value $q_j^\ast$ of the parameter, for example from the powder's record or its family, and mapped like the fit's own start value. It enters the fit as one pseudo-row after the ladder rows, with observed value $\mu_j$, predicted value $\theta_j$ and standard deviation $s_j$. The fit then minimizes the negative log posterior up to a constant, the maximum a posteriori estimate ([Gelman 2013](../bibliography.md#gelman-2013), chapter unverified):
 
 $$
 \mu_j = \ln\frac{q_j^\ast - o_j}{q_{j,0} - o_j}, \qquad
@@ -114,7 +114,7 @@ $$
 
 Code: `packages/ballistics/src/interior/fit.ts`, `fitPowder` (`priorRows`, `priorChiSquare`, `dataChiSquare`).
 
-The burn coefficient and the volume factor need $q_j^\ast \gt 0$ and the start pressure $q_j^\ast \gt p_\text{floor}$, with $s_j \gt 0$ in both. A volume factor prior is centred on 1, with a standard deviation that states how far the load's volume may be from the real one, for example the spread of the capacity of a fired case; its width is the caller's choice and no default is built in. A prior on a parameter that is not fitted is refused. The checks for unresolved and ill-conditioned parameters see the prior rows too. A ladder whose velocities barely separate the burn coefficient and the start pressure therefore fits with priors where it fails as `ill-conditioned` without them, and a prior keeps its parameter from counting as `unresolved`. The reported uncertainty is then the posterior one, and its size against $s_j$ shows how much the ladder added. The degrees of freedom still count the ladder rows only. A prior with a very large $s_j$ leaves the fit unchanged.
+The burn coefficient and the volume factor need $q_j^\ast \gt 0$ and the start pressure $q_j^\ast \gt p_\text{floor}$, with $s_j \gt 0$ in both. A volume factor prior is centered on 1, with a standard deviation that states how far the load's volume may be from the real one, for example the spread of the capacity of a fired case; its width is the caller's choice and no default is built in. A prior on a parameter that is not fitted is refused. The checks for unresolved and ill-conditioned parameters see the prior rows too. A ladder whose velocities barely separate the burn coefficient and the start pressure therefore fits with priors where it fails as `ill-conditioned` without them, and a prior keeps its parameter from counting as `unresolved`. The reported uncertainty is then the posterior one, and its size against $s_j$ shows how much the ladder added. The degrees of freedom still count the ladder rows only. A prior with a very large $s_j$ leaves the fit unchanged.
 
 The Huber loss of the [least-squares page](least-squares.md) with threshold $k$ (option `huberThreshold`, in sigmas of the rows) applies to the ladder rows only, not to the prior rows. $\chi^2$ in the result stays the plain sum, so a downweighted string still shows its full residual, and `loss` holds the minimized cost:
 
@@ -224,7 +224,7 @@ The caller states per input whether it is measured or estimated and may give its
 
 ### Prior from similar powders
 
-A prior on the burn coefficient comes from `similarPowdersPrior`: the powders of the same burn law that lie nearest the target in the natural logarithm of the burn coefficient and of the specific energy (Euclidean distance in the two logarithms, the five nearest). The prior of [the section above](#prior-and-robust-loss) is centred on the geometric mean of their burn coefficients, with the sample standard deviation of their logarithms as $s$:
+A prior on the burn coefficient comes from `similarPowdersPrior`: the powders of the same burn law that lie nearest the target in the natural logarithm of the burn coefficient and of the specific energy (Euclidean distance in the two logarithms, the five nearest). The prior of [the section above](#prior-and-robust-loss) is centered on the geometric mean of their burn coefficients, with the sample standard deviation of their logarithms as $s$:
 
 $$
 \mu = \frac1n\sum_i \ln B_i, \qquad
@@ -234,7 +234,7 @@ $$
 
 Code: `packages/ballistics/src/interior/fit-confidence.ts`, `similarPowdersPrior`, `similarPowderRules`.
 
-With fewer than 3 neighbours the prior is weak: it is centred on the target's own value with $s = 1$, and `weak` is set. The floor of 0.05 keeps neighbours with nearly equal coefficients from fixing the fit. The caller passes plain values of the powders and takes the prior from the result into `priors.burnRate`. Core reads no records. A prior from one known powder is a `PowderPrior` the caller builds from that powder's value and the spread it states. The fit states its basis: `refined` when a prior on the burn coefficient was given, else `from-scratch`. A prior pulls a short ladder toward its centre by its weight $1/s^2$ against the ladder rows.
+With fewer than 3 neighbors the prior is weak: it is centered on the target's own value with $s = 1$, and `weak` is set. The floor of 0.05 keeps neighbors with nearly equal coefficients from fixing the fit. The caller passes plain values of the powders and takes the prior from the result into `priors.burnRate`. Core reads no records. A prior from one known powder is a `PowderPrior` the caller builds from that powder's value and the spread it states. The fit states its basis: `refined` when a prior on the burn coefficient was given, else `from-scratch`. A prior pulls a short ladder toward its center by its weight $1/s^2$ against the ladder rows.
 
 ### Confidence label
 
@@ -258,7 +258,7 @@ The reasons do not change the label. They say what the range rests on or does no
 | `residual-trend`            | with velocity uncertainties, at least 5 velocity rows, the residuals ordered by charge change sign at most once, and $\chi^2_\text{data}$ per row is above 1 |
 | `start-pressure-correlated` | the start pressure is fitted and its correlation with the burn coefficient is above 0.9 in magnitude                                                         |
 | `weak-prior`                | the prior from `similarPowdersPrior` is weak                                                                                                                 |
-| `outside-similar-powders`   | the fitted burn coefficient lies more than 2 standard deviations of the prior from its centre                                                                |
+| `outside-similar-powders`   | the fitted burn coefficient lies more than 2 standard deviations of the prior from its center                                                                |
 | `extrapolated`              | a point of the range lies outside the fit's domain on the charge or barrel length axis                                                                       |
 | `input-refit-failed`        | the refit for an input failed, so the input is not in the range                                                                                              |
 
@@ -268,7 +268,7 @@ The thresholds are assumptions, to be tuned against real sessions. A `tight` lab
 
 On a velocity-only ladder a higher burn coefficient and a higher start pressure both raise the early pressure and the muzzle velocity. The ratio of the two effects changes little over the ladder. Their Jacobian columns are nearly parallel and the correlation of the two parameters is near $-1$. The condition check does not reject such a fit, but the start-pressure uncertainty is large. Measured peak pressures and wider ladders separate the two. A fitted burn coefficient absorbs the errors of every fixed input that moves the velocity: energy, isentropic exponent, covolume, chamber volume, form function, exponent, bore resistance and heat loss.
 
-The volume factor and the burn coefficient act alike on the velocity: a larger volume lowers the pressure as a slower powder does. A ladder over a wide charge span still separates them, because the volume changes the pressure with the charge differently than the burn rate does, and measured peak pressures separate them better. On a ladder too narrow to separate them, for example two charges a few milligrams apart, their Jacobian columns are nearly parallel and the fit fails (`ill-conditioned`, `unresolved` or `not-converged`). A prior on the factor, centred on 1, or measured peak pressures then resolve it, and the reported uncertainty of both is the posterior one. A factor fitted without a prior is a correction of the volume only as far as no other fixed input is wrong in the same direction: its value is the volume that makes the model match the ladder, not a measurement of the case.
+The volume factor and the burn coefficient act alike on the velocity: a larger volume lowers the pressure as a slower powder does. A ladder over a wide charge span still separates them, because the volume changes the pressure with the charge differently than the burn rate does, and measured peak pressures separate them better. On a ladder too narrow to separate them, for example two charges a few milligrams apart, their Jacobian columns are nearly parallel and the fit fails (`ill-conditioned`, `unresolved` or `not-converged`). A prior on the factor, centered on 1, or measured peak pressures then resolve it, and the reported uncertainty of both is the posterior one. A factor fitted without a prior is a correction of the volume only as far as no other fixed input is wrong in the same direction: its value is the volume that makes the model match the ladder, not a measurement of the case.
 
 ### Several barrel lengths and temperatures
 
@@ -278,7 +278,7 @@ The muzzle velocity against barrel length depends on how much of the charge is b
 
 Code: `packages/ballistics/src/interior/fit.ts`, `fitPowder` (`conditions`, `evaluate`), `checkParameters` (`minLengthSpan`).
 
-`fitPowderSessions` takes the sessions (a barrel length, a temperature and a ladder each), joins their points and requests the parameters of `options.parameters`, which must hold the burn coefficient. When the fit fails as `unresolved`, it drops the unresolved requested parameter other than the burn coefficient. When it fails as `ill-conditioned`, it drops the one with the largest component in the direction of the smallest eigenvalue. When it fails as `underdetermined`, it drops the last. It then fits again, until a fit passes or no parameter other than the burn coefficient is left (the failure is then thrown). A prior on a dropped parameter is dropped too. The result lists the `resolved` parameters, the fitted ones in the order of the fit, and the `held` ones with the reason of the failure. A held parameter is not in `parameters`: it keeps the value of the input load, so the caller sets the prior centre of a parameter it wants held there as the load's value. A parameter that a prior resolves counts as resolved, with the posterior uncertainty, as in the single-ladder fit.
+`fitPowderSessions` takes the sessions (a barrel length, a temperature and a ladder each), joins their points and requests the parameters of `options.parameters`, which must hold the burn coefficient. When the fit fails as `unresolved`, it drops the unresolved requested parameter other than the burn coefficient. When it fails as `ill-conditioned`, it drops the one with the largest component in the direction of the smallest eigenvalue. When it fails as `underdetermined`, it drops the last. It then fits again, until a fit passes or no parameter other than the burn coefficient is left (the failure is then thrown). A prior on a dropped parameter is dropped too. The result lists the `resolved` parameters, the fitted ones in the order of the fit, and the `held` ones with the reason of the failure. A held parameter is not in `parameters`: it keeps the value of the input load, so the caller sets the prior center of a parameter it wants held there as the load's value. A parameter that a prior resolves counts as resolved, with the posterior uncertainty, as in the single-ladder fit.
 
 Code: `packages/ballistics/src/interior/fit-sessions.ts`, `fitPowderSessions` (`giveUp`).
 
@@ -308,14 +308,24 @@ $$
 B_P = B_{P,0}\, e^{\theta_{B,P}}, \quad r_R = e^{\theta_R}, \quad \ell_L = e^{\theta_L}, \quad f_{T,P} = e^{\theta_{T,P}}
 $$
 
-Code: `packages/ballistics/src/interior/fit-pooled.ts`, `fitPowderPooled` (`velocity`, `targetLoad`).
+Code: `packages/ballistics/src/interior/fit-pooled.ts`, `fitPowderPooled` (`pooledValue`, `targetLoad`).
 - $B_P$, the burn coefficient of powder $P$, is shared by all its sessions. The burn coefficient of the powder's first session is the start $B_{P,0}$ and replaces that of its other sessions. On request the temperature factor $f_{T,P}$ of the powder is fitted too, where its sessions span two or more temperatures and its load carries a sensitivity; otherwise it is listed in `held` and stays 1.
 - $r_R$, the velocity factor of rifle $R$, holds what the rifle changes beyond its load: bore, throat, chronograph. It is fitted only where the sessions hold two or more rifles. With one rifle it is absorbed by the burn coefficients.
 - $\ell_L$, the factor of lot $L$ on its powder's burn coefficient, is fitted for each named lot of a powder whose sessions hold two or more lots (a session without a lot counts as one, without a factor).
 
-Rifle and lot factors are random effects: each has a Gaussian prior on its log, centred on 0, with the spread `rifleSigma` (default 0.01) or `lotSigma` (default 0.03). The defaults are assumptions, to be tuned on measured sessions. A per-powder prior (`priors`, by powder, on the burn coefficient or the temperature factor, as a `PowderPrior`) comes from a powder record, its thermochemistry or the [similar powders](#prior-from-similar-powders). All priors are pseudo-rows, as in the single fit, so the result is the maximum of the posterior, and its covariance is the posterior one (first-order Laplace approximation). There is no global parameter of the powder model: velocities alone resolve neither the exponent nor the form parameters. A request for `exponent` or `form` fails as `unresolved` before any run, and the pooled fit takes no pressures.
+Rifle and lot factors are random effects: each has a Gaussian prior on its log, centered on 0, with the spread `rifleSigma` (default 0.01) or `lotSigma` (default 0.03). The defaults are assumptions, to be tuned on measured sessions. A per-powder prior (`priors`, by powder, on the burn coefficient or the temperature factor, as a `PowderPrior`) comes from a powder record, its thermochemistry or the [similar powders](#prior-from-similar-powders). All priors are pseudo-rows, as in the single fit, so the result is the maximum of the posterior, and its covariance is the posterior one (first-order Laplace approximation). There is no global parameter of the powder model: velocities alone resolve neither the exponent nor the form parameters. A request for `exponent` or `form` fails as `unresolved` before any run.
 
-The rows, Jacobian and conditioning check are those of the single fit. Each ladder point is one row; a parameter moves only the rows of its sessions, so a Jacobian column runs `interior` only there, and a rifle step reuses the last run. The fit fails as `fitPowder` does: `ill-conditioned` above the condition limit (for example a temperature factor between two temperatures that differ by a hundredth of a kelvin), `not-converged`, `invalid`, and `unresolved` for a powder whose sessions hold a single charge, where its burn coefficient and the rifle factors cannot be told apart. The result reports the covariance and correlation of all parameters and the condition number. A pooled fit of one session fits the burn coefficient alone and gives the value and standard uncertainty of `fitPowder` on its ladder, within a relative $10^{-9}$ in the tests.
+A ladder point may carry a measured peak pressure $p_{s}(m)$ with its `pressureSigma` $\sigma_p$ (one without the other fails as `pressureWithoutSigma`). It adds a row whose prediction is the peak breech pressure of the same run, which the burn coefficient, the temperature factor and the lot factor move and the rifle's velocity factor does not:
+
+$$
+\hat p_s(m) = p_\text{M3}\bigl(m;\ B_{P(s)}\, \ell_{L(s)},\ f_{T,P(s)}\bigr), \qquad r = \frac{\hat p_s(m) - p_s(m)}{\sigma_p}
+$$
+
+Code: `packages/ballistics/src/interior/fit-pooled.ts`, `fitPowderPooled` (`pointRows`, `pooledValue`).
+
+The fit takes no pressure basis: the caller passes the pressure it wants compared with the model's peak. `residuals` holds each point's velocity and then its pressure, with its `kind`, and `dataChiSquare` and `degreesOfFreedom` count both; `predictPooled` and `calibratePooled` predict velocities only.
+
+The rows, Jacobian and conditioning check are those of the single fit. Each velocity or pressure is one row; a parameter moves only the rows of its sessions, so a Jacobian column runs `interior` only there, and a rifle step and a point's pressure reuse the last run. The fit fails as `fitPowder` does: `ill-conditioned` above the condition limit (for example a temperature factor between two temperatures that differ by a hundredth of a kelvin), `not-converged`, `invalid`, and `unresolved` for a powder whose sessions hold a single charge, where its burn coefficient and the rifle factors cannot be told apart. The result reports the covariance and correlation of all parameters and the condition number. A pooled fit of one session fits the burn coefficient alone and gives the value and standard uncertainty of `fitPowder` on its ladder, within a relative $10^{-9}$ in the tests.
 
 `predictPooled` gives the mean velocity of a target (a session without a ladder) at any charge with an interval. Its variance sums the parameter term of the [prediction at a charge](#prediction-at-a-charge), over the parameters that move the target, the model error and the uncertainty of the string to be predicted:
 
@@ -372,7 +382,7 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 | $p_f$                                       | Bore friction pressure                                                                                             | bar                    | Pa                     |
 | $p_e(0)$                                    | Engraving pressure at travel 0                                                                                     | bar                    | Pa                     |
 | $\theta_j$                                  | Log parameter                                                                                                      | 1                      | 1                      |
-| $q_j^\ast$, $\mu_j$, $s_j$                  | Prior centre as a value, in log parameter, and its standard deviation                                              | as the parameter, 1, 1 | as the parameter, 1, 1 |
+| $q_j^\ast$, $\mu_j$, $s_j$                  | Prior center as a value, in log parameter, and its standard deviation                                              | as the parameter, 1, 1 | as the parameter, 1, 1 |
 | $L_k$, $k$                                  | Huber loss of a weighted residual, its threshold in sigmas                                                         | 1                      | 1                      |
 | $\chi^2_\text{data}$, $\chi^2_\text{prior}$ | Shares of $\chi^2$ of the ladder rows and of the priors                                                            | 1                      | 1                      |
 | $P$                                         | Parameters with a prior                                                                                            | no kind                | no kind                |
@@ -397,7 +407,7 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 
 - The M3 load describes the rifle, components and conditions of the ladder. Only the fitted parameters change between candidates.
 - Velocities are mean muzzle velocities. A chronograph reading at a distance from the muzzle is converted to the muzzle by the caller, for example with [truing](exterior-truing.md).
-- A pressure row is compared with the peak breech pressure. The gauge position is not modelled. All pressure rows are on the one stated basis; the model does not correct for the basis, so the caller states the basis its pressures were measured on.
+- A pressure row is compared with the peak breech pressure. The gauge position is not modeled. All pressure rows are on the one stated basis; the model does not correct for the basis, so the caller states the basis its pressures were measured on.
 - Observations are independent, with the stated standard uncertainties.
 - The inputs of the range are independent, each with the stated standard uncertainty. The default uncertainties are assumptions, not measurements.
 - A prior describes the powder's parameter, not this ladder: it comes from a record or a family of powders. A prior far from the data drags the fit, and the result then shows a large $\chi^2_\text{prior}$.
@@ -415,7 +425,7 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 - Each prediction costs one `interior` run per distinct charge, barrel length and temperature, and each Jacobian two predictions per parameter.
 - A crusher pressure is a conventional value, not an absolute pressure: the compression of the copper cylinder depends on the rise time of the pressure and on the cylinder type. A pressure step drives an undamped elastic gauge to twice the deflection of the same static pressure ($x(t) = x_s (1 - \cos \omega t)$), so a fast rise reads differently from a slow one. No single factor converts crusher readings to transducer readings, which is why a fit refuses mixed bases and converts none ([research log](../research/interior-crusher-conventional-pressure.md)).
 - A fitted energy is an effective value, not the thermochemical one. On the 30 powder records with both, the fitted specific energy over the thermochemical value (impetus over $k - 1$) has a median of 0.78, and 27 lie between 0.6 and 0.95 ([research log](../research/interior-plausibility-notes.md)).
-- The fitted burn coefficient holds for the powder as fired. Ageing and moisture are not modelled in [M3](interior-m3.md#limits), so a fit on fresh powder does not hold for old or damp powder of the same lot, and the reverse.
+- The fitted burn coefficient holds for the powder as fired. Ageing and moisture are not modeled in [M3](interior-m3.md#limits), so a fit on fresh powder does not hold for old or damp powder of the same lot, and the reverse.
 - Research log: [fitted parameters of the load-table fit](../research/interior-load-table-fit-parameters.md), [assumed peak pressure for powders without printed pressures](../research/interior-load-table-pressure-term.md).
 
 ## Sources

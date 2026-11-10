@@ -1,12 +1,12 @@
 ---
 
 title: Truing from range strings
-description: Plan and fit of muzzle velocity, drag factor, click value and an optional zero offset from impacts, dialled corrections and chronograph readings, with identifiability statuses and intervals.
+description: Plan and fit of muzzle velocity, drag factor, click value and an optional zero offset from impacts, dialed corrections and chronograph readings, with identifiability statuses and intervals.
 ---
 
 # Truing from range strings
 
-A range string is a set of measurements at known distances: the mean impact above the line of sight at the zero setting, or the clicks dialled to centre the group, plus optional chronograph readings.
+A range string is a set of measurements at known distances: the mean impact above the line of sight at the zero setting, or the clicks dialed to center the group, plus optional chronograph readings.
 - `fitTruingStrings` fits the muzzle velocity, a constant drag factor, the click value of the sight and, with `fitZeroOffset`, a zero offset, weighting every row by its stated uncertainty. A parameter the data cannot separate is named weak or unresolved, returns no value and keeps its nominal value in the reported model. Identified parameters get confidence intervals; a chi-square test checks the residuals.
 - `planTruingStrings` gives the statuses and standard errors of a planned string before any shot, and the refusals of its structure.
 - `comparePlanCandidates` does so for several candidate strings.
@@ -118,7 +118,7 @@ One drop moves $v_0$ and $k$ along the same direction. A chronograph at the muzz
 
 ### Gaussian priors
 
-A prior with standard deviation $s_j$ on $\theta_j$ (on $e$ in rad) is centred on the nominal value. It enters the iteration as one pseudo-row with observed value 0, predicted value $\theta_j$ and standard deviation $s_j$, so the iteration minimizes
+A prior with standard deviation $s_j$ on $\theta_j$ (on $e$ in rad) is centered on the nominal value. It enters the iteration as one pseudo-row with observed value 0, predicted value $\theta_j$ and standard deviation $s_j$, so the iteration minimizes
 
 $$
 \chi^2_\text{prior} = \sum_i r_i^2 + \sum_{j \in P} \frac{\theta_j^2}{s_j^2}
@@ -190,7 +190,7 @@ The intervals are flagged as not to be relied on (`intervalsTrusted` false) when
 | $\theta_v$, $\theta_k$, $\theta_c$ | Log parameters                                                                       | 1                    | 1                                |
 | $s_i$                              | Slant range of row $i$, for the chronograph the distance from the muzzle             | mm                   | m                                |
 | $y_i$, $\hat y_i$                  | Measured and predicted mean impact above the line of sight at the zero setting       | mm                   | m                                |
-| $n_i$, $\hat n_i$                  | Measured and predicted clicks from the zero setting to centre the group, positive up | 1                    | 1                                |
+| $n_i$, $\hat n_i$                  | Measured and predicted clicks from the zero setting to center the group, positive up | 1                    | 1                                |
 | $\bar v$, $\hat v_i$               | Measured mean and predicted chronograph speed                                        | m/s                  | m/s                              |
 | $h$, $\alpha$, $v$                 | Height above the line of sight, elevation hold, ground speed of the trajectory       | mm, deg, m/s         | m, rad, m/s                      |
 | $m_i$                              | Shots behind the mean of row $i$                                                     | 1                    | 1                                |
@@ -208,13 +208,13 @@ The intervals are flagged as not to be relied on (`intervalsTrusted` false) when
 
 ## Assumptions
 
-- Rows are independent with the stated standard uncertainties and about normal errors. Impact means at different distances share the aim point, and a common error of it is not modelled.
+- Rows are independent with the stated standard uncertainties and about normal errors. Impact means at different distances share the aim point, and a common error of it is not modeled.
 - One group of shots gives one row. An impact and a dial entry of the same group measure the same shots in two units and are rejected (`checkGroups`). The group of an entry is its name, or its distance when it has none.
 - The drag is the nominal drag times one constant factor.
-- The click value is constant over the dialled range. The dialled clicks are exact apart from the stated step.
+- The click value is constant over the dialed range. The dialed clicks are exact apart from the stated step.
 - Everything not fitted is correct: air, wind, look angle, sight height, ballistic coefficient reference, and without `fitZeroOffset` the zero. Impacts are taken at the zero setting.
 - The zero offset is one constant angle, added after the trajectory in the small-angle form.
-- Priors are Gaussian in $\ln q$ and in $e$ and centred on the nominal values.
+- Priors are Gaussian in $\ln q$ and in $e$ and centered on the nominal values.
 
 ## Limits
 
@@ -223,7 +223,7 @@ The intervals are flagged as not to be relied on (`intervalsTrusted` false) when
 - Without `fitZeroOffset`, an error of the zero aliases into muzzle velocity, drag factor and click value. Only the residual check can show it, and not at 0 degrees of freedom.
 - With priors the data chi-square is taken at the posterior mode while the degrees of freedom ignore the priors, so the check fails more often than without priors.
 - The limits 10, 0.05, $10^{-4}$ rad, the component 0.3, the noise floor $10^{-6}$, the residual level 0.99 and the smallest interval scale $10^{-6}$ are chosen values.
-- Mach-dependent drag factors, several sessions with different air, impacts measured with a correction dialled, and wind or range estimation are not part of this fit.
+- Mach-dependent drag factors, several sessions with different air, impacts measured with a correction dialed, and wind or range estimation are not part of this fit.
 
 ## Sources
 

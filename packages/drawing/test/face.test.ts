@@ -60,7 +60,7 @@ describe('annotate', () => {
     expect(datum?.a[1]).toBeLessThan(Math.min(...rule(l, 'S').map((s) => s.a[1])))
   })
 
-  it('centres the alpha arc on the drawn shoulder vertex', () => {
+  it('centers the alpha arc on the drawn shoulder vertex', () => {
     const arc = l.arcs.find((a) => a.owner === 'alpha')
     expect(arc?.c[0]).toBeCloseTo(55.458, 3)
     expect(arc?.c[1]).toBe(0)

@@ -13,7 +13,7 @@ import {
   sampson,
 } from '../src/ellipse.ts'
 
-// The refusals and special cases of the conic code: degenerate, imaginary and centred conics.
+// The refusals and special cases of the conic code: degenerate, imaginary and centered conics.
 
 const unitCircle: Conic = [1, 0, 1, 0, 0, -1]
 const circle = (centreX: number, centreY: number, r: number): Conic =>

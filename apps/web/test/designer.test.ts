@@ -75,7 +75,7 @@ describe('start', () => {
     expect(defined(newDesign(metric).fields.diameter).si).toBeCloseTo(0.308 * 25.4e-3, 12)
   })
 
-  it('a new bullet keeps only the calibre and mass, and draws with an assumed length of 4 d', () => {
+  it('a new bullet keeps only the caliber and mass, and draws with an assumed length of 4 d', () => {
     const from = fromRecord(targetBullet, metric)
     const d = newDesign(metric, from)
     expect(d.fields.diameter).toEqual(from.fields.diameter)

@@ -8,7 +8,7 @@ const names: Record<string, Message> = {
   'Nickel plated brass': msg('Nickel plated brass'),
   'Lacquered steel': msg('Lacquered steel'),
   'Polymer coated steel': msg('Polymer coated steel'),
-  Aluminium: msg('Aluminium'),
+  Aluminium: msg('Aluminum'),
   'Small rifle': msg('Small rifle'),
   'Large rifle': msg('Large rifle'),
   'Small pistol': msg('Small pistol'),

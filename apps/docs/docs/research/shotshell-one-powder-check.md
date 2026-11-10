@@ -12,7 +12,7 @@ Interior ballistics, [shotshell model](../models/interior-shotshell.md): does M3
 
 ## Method
 
-Assumed 12 gauge load: bore 18.41 mm, barrel 762 mm, wad base 10 mm plus the powder space, wad 2.5 g, crimp opening pressure 2 MPa, ignition 1 MPa, bulk density 0.55 g/cm³, energy 3.9 MJ/kg, $k = 1.23$, vivacity law with the two-stage form, 293.15 K, no heat loss, friction or leak. Vivacity 1.625 s⁻¹, calibrated to 366 m/s at the design centre (37 g of shot, 1.65 g charge). Then 29 published lead-shot reference loads, each with the charge solved to its reference velocity, compared with the maximum average pressure of the published standard and the C.I.P. maximum pressure.
+Assumed 12 gauge load: bore 18.41 mm, barrel 762 mm, wad base 10 mm plus the powder space, wad 2.5 g, crimp opening pressure 2 MPa, ignition 1 MPa, bulk density 0.55 g/cm³, energy 3.9 MJ/kg, $k = 1.23$, vivacity law with the two-stage form, 293.15 K, no heat loss, friction or leak. Vivacity 1.625 s⁻¹, calibrated to 366 m/s at the design center (37 g of shot, 1.65 g charge). Then 29 published lead-shot reference loads, each with the charge solved to its reference velocity, compared with the maximum average pressure of the published standard and the C.I.P. maximum pressure.
 
 ## Formulas
 

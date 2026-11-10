@@ -180,7 +180,7 @@ const plotBottom = 24
 /** One source for the grid and the playback strip: 56 px of pressure labels, 72 px for Play and the speed (`globals.css` `.play-controls`). */
 export const plotEdges = (shown: number): readonly [number, number] => [56, shown > 1 ? 100 : 72]
 
-/** Colours of the chart, read from the page's tokens so light and dark match the app. */
+/** Colors of the chart, read from the page's tokens so light and dark match the app. */
 export type ChartTheme = Record<
   | ChartQuantity
   | `${ChartQuantity}Text`
@@ -200,7 +200,7 @@ const axisNames: Record<ChartQuantity, string> = {
   velocity: 'Velocity',
   energy: 'Energy',
 }
-/** The marker at each selected curve's end, as in the readouts' and the toolbar's keys, so colour is never the only key. */
+/** The marker at each selected curve's end, as in the readouts' and the toolbar's keys, so color is never the only key. */
 const curveMarkers: Record<ChartQuantity, 'circle' | 'rect' | 'diamond'> = {
   pressure: 'circle',
   velocity: 'rect',
@@ -326,7 +326,7 @@ function stepCurve(
     symbol: look.symbol,
     silent: !own,
     z: look.z,
-    // the selected energy curve dashed, so colour is not the only key between velocity and energy
+    // the selected energy curve dashed, so color is not the only key between velocity and energy
     lineStyle: {
       color: theme[q],
       width: own && q !== 'pressure' ? 2 : look.width,
@@ -370,7 +370,7 @@ function xAxisOption(
       padding: [8, 0, 0, 0],
     },
     axisLine: axisLine(theme.border),
-    // the muted ink: a label takes the axis line's colour (the border) unless one is given
+    // the muted ink: a label takes the axis line's color (the border) unless one is given
     axisLabel: { formatter: plain, showMaxLabel: false, color: theme.muted },
     splitLine: { lineStyle: { color: theme.grid } },
   }
@@ -414,7 +414,7 @@ function yAxisOptions(
     nameTextStyle: {
       color: theme[`${q}Text`],
       align: i === 0 ? ('right' as const) : ('left' as const),
-      // 8 px off the axis line: a peak label close to the left edge centres on its line
+      // 8 px off the axis line: a peak label close to the left edge centers on its line
       padding: i === 0 ? [0, 8, 0, 0] : [0, 0, 0, 4],
     },
     nameLocation: 'end' as const,

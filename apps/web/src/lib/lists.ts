@@ -93,7 +93,7 @@ export function countText(tr: Translator, shown: number, total: number, noun: Li
 export const widestCount = (tr: Translator, total: number, noun: ListNoun) =>
   countLines[noun].some(tr.tn, total, total)
 
-/** The filters set, as the no-match note names them: a sentence of the named filters, the first capitalised. */
+/** The filters set, as the no-match note names them: a sentence of the named filters, the first capitalized. */
 export function filterText(named: readonly (string | false | undefined)[]) {
   const text = named.filter(Boolean).join(', ')
   return text && `${text.charAt(0).toUpperCase()}${text.slice(1)}.`

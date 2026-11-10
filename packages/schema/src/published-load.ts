@@ -332,7 +332,7 @@ const publishedLoadsParser = z
           if (!s.license.startsWith('LicenseRef-') || s.terms === undefined)
             issue(
               ['sources', i, 'license'],
-              "maker data has no project licence: only the maker's own terms, as LicenseRef-<name> with terms",
+              "maker data has no project license: only the maker's own terms, as LicenseRef-<name> with terms",
             )
         }
       })
@@ -352,7 +352,7 @@ const publishedLoadsParser = z
 /**
  * The load rows of one table for one cartridge: `records/loads/<cartridge id>/<id>.json`. A maker's
  * own table has the maker's id as `id`, a table of loads its customers sent `<maker>-customer`.
- * Maker data carries no project licence: a source states the maker as `publisher`, and the maker's
+ * Maker data carries no project license: a source states the maker as `publisher`, and the maker's
  * terms where it states any.
  * Inferred type: {@link PublishedLoads}.
  */

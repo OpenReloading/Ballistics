@@ -91,6 +91,11 @@ jobs:
           pnpm --filter @open-reloading/web run i18n check de "$BASE_SHA"
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      # a pull request adds no multi-line comment and keeps the references of the comments it only rewords; the i18n step above fetched the base
+      - if: github.event_name == 'pull_request'
+        run: node tools/src/comment-lines.ts "$BASE_SHA"
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
       - run: pnpm run knip
       - run: pnpm run docs:check
       - run: pnpm run data:validate
@@ -101,7 +106,7 @@ jobs:
       - name: Breaking changes of the API document (oasdiff)
         run: docker run --rm -v "$PWD:/repo:ro" -v "$RUNNER_TEMP:/doc:ro" -w /repo "$OASDIFF_IMAGE" breaking packages/api/openapi.baseline.json /doc/openapi.json --fail-on ERR
       - run: node tools/src/audit.ts
-      # licences of the production dependencies of the images and the generated list in NOTICE
+      # licenses of the production dependencies of the images and the generated list in NOTICE
       - run: node tools/src/licences.ts
 
   # One job per group of workspaces (the drawing and web suites being the slow ones), each testing the workspaces of

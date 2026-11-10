@@ -62,7 +62,7 @@ const frameOf = (o: Point, theta: number): Frame => ({
   uy: Math.sin(theta),
 })
 
-/** The coverage of `alpha` (0..1) at a point, bilinear between pixel centres; 0 outside. */
+/** The coverage of `alpha` (0..1) at a point, bilinear between pixel centers; 0 outside. */
 function coverage(seg: Cutout, x: number, y: number): number {
   const { width: w, height: h, alpha } = seg
   const [fx, fy] = [x - 0.5, y - 0.5]
@@ -217,7 +217,7 @@ function orient(seg: Cutout, axis: Axis): (Axis & { ambiguous: boolean }) | unde
   }
 }
 
-/** How far the end of a cut-out lies beyond its extreme pixel centre along the axis, px (half a pixel's reach, a pixel being 1 px square). */
+/** How far the end of a cut-out lies beyond its extreme pixel center along the axis, px (half a pixel's reach, a pixel being 1 px square). */
 const extentReach = 0.35
 
 /** The profile along the axis, from where it crosses the base to where it leaves the tip. */

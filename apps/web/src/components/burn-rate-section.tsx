@@ -20,7 +20,7 @@ import { FieldTable } from './field-table.tsx'
 import { Panel } from './panel.tsx'
 import { RateBar, RateTicks } from './rate-scale.tsx'
 
-/** A powder of the burn-rate order as a neighbour link; `label` leaves out the page powder's manufacturer. */
+/** A powder of the burn-rate order as a neighbor link; `label` leaves out the page powder's manufacturer. */
 export type Neighbour = { id: string; label: string; order: number; rate?: number | undefined }
 
 /** The powder's place in the burn-rate order of all fitted powders (`neighbours` in `burn-rate.ts`). */
@@ -33,7 +33,7 @@ export interface BurnRatePlace {
   domain: RateDomain
 }
 
-/** A neighbour list: the unit of the mean vivacities once, in the heading. */
+/** A neighbor list: the unit of the mean vivacities once, in the heading. */
 function Neighbours({ title, rows }: { title: string; rows: Neighbour[] }) {
   const { t } = useTranslation()
   return (
@@ -113,7 +113,7 @@ export function BurnRateSummary({
               </div>
             )}
           </div>
-          {/* the only fitted powder has no neighbours: no "None" twice */}
+          {/* the only fitted powder has no neighbors: no "None" twice */}
           {place && place.faster.length + place.slower.length > 0 && (
             <div className="burn-neighbours">
               <Neighbours
@@ -126,7 +126,7 @@ export function BurnRateSummary({
               />
               <p className="record-note">
                 {t(
-                  'A neighbour is a candidate, not a substitute: it needs a new charge workup before it replaces this powder.',
+                  'A neighbor is a candidate, not a substitute: it needs a new charge workup before it replaces this powder.',
                 )}
               </p>
             </div>

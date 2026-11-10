@@ -1,6 +1,7 @@
 import { compareKeys, fromSi } from '@open-reloading/schema'
 import type { Outcome } from './evaluate.ts'
 import { reasons } from './evaluate.ts'
+import { basisOf } from './fit.ts'
 import type { Change, Evaluation, Metrics } from './result.ts'
 import { percentile } from './stats.ts'
 
@@ -42,7 +43,7 @@ export function metricsOf(items: readonly Outcome[], halfWidth: number | null): 
   for (const o of used) {
     const error = pressureError(o)
     if (error === undefined) continue
-    const basis = o.row.pressureBasis ?? 'unstated'
+    const basis = basisOf(o.row)
     bases.set(basis, [...(bases.get(basis) ?? []), error])
   }
   return {

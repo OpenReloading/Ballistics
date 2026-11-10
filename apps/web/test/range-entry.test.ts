@@ -53,7 +53,7 @@ const session = (r: unknown) => {
   return parsed
 }
 
-it('lists the rungs of a charge ladder lowest first, centred, up or down from the charge', () => {
+it('lists the rungs of a charge ladder lowest first, centered, up or down from the charge', () => {
   const around = rangeSteps(load({ ladder: { stepCount: 3, step: 0.5, direction: 'around' } }))
   expect(around.map((s) => s.charge)).toEqual([42, 42.5, 43])
   expect(around.map((s) => s.offset)).toEqual([-1, 0, 1])

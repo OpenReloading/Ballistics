@@ -75,7 +75,7 @@
   overflow-y: hidden;
 }
 
-/* the search modal (src/theme/SearchBar.tsx) in the site's colours, light and dark */
+/* the search modal (src/theme/SearchBar.tsx) in the site's colors, light and dark */
 html[data-theme] {
   --pf-background: var(--ifm-background-surface-color);
   --pf-text: var(--ifm-font-color-base);

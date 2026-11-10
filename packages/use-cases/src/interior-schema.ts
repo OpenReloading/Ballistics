@@ -158,7 +158,7 @@ const ladder = z
       .number()
       .positive()
       .max(0.01)
-      .describe('Charge difference between neighbouring steps, kg.'),
+      .describe('Charge difference between neighboring steps, kg.'),
     stepCount: z
       .number()
       .int()

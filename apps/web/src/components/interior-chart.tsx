@@ -405,7 +405,7 @@ export function InteriorChart({
         </PanelTable>
         {energy.zero.length > 0 && (
           <p className="note">
-            {t('Not modelled with these inputs: {terms}.', {
+            {t('Not modeled with these inputs: {terms}.', {
               terms: energy.zero.map((term) => t(term.lower)).join(', '),
             })}
           </p>

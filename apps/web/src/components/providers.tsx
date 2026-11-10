@@ -60,7 +60,7 @@ function SettingsDialogProvider({ children }: { children: ReactNode }) {
   )
 }
 
-/** Client boundary for the Mantine, units and settings dialog providers: the colour scheme manager holds functions. */
+/** Client boundary for the Mantine, units and settings dialog providers: the color scheme manager holds functions. */
 export function Providers({ children }: { children: React.ReactNode }) {
   // the ready signal of the e2e specs: `html[data-hydrated]` once React has attached the handlers
   useEffect(() => {

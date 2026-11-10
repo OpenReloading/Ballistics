@@ -47,11 +47,11 @@ export function faceZones(face: TargetFace, hole: number): ScoringZone[] {
 export interface ImpactSensitivity {
   /** Lateral displacement per 1 m/s of crosswind, m. */
   perCrosswind: number
-  /** Change of the height of impact per metre of range, m/m. */
+  /** Change of the height of impact per meter of range, m/m. */
   verticalPerMetre: number
 }
 
-/** Windage hold per 1 m/s of crosswind (`windHold`, rad) times range, and the height's slope over neighbouring points; undefined below two points. */
+/** Windage hold per 1 m/s of crosswind (`windHold`, rad) times range, and the height's slope over neighboring points; undefined below two points. */
 export function impactSensitivity(
   points: readonly TrajectoryPoint[],
   windHold: readonly number[],

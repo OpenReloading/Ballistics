@@ -218,7 +218,7 @@ const userPowderFitParser = z.strictObject({
               .number()
               .positive()
               .describe(
-                'Centre, in the stored unit of the parameter: burn coefficient 1/s, start pressure bar, energy J/kg, factors 1.',
+                'Center, in the stored unit of the parameter: burn coefficient 1/s, start pressure bar, energy J/kg, factors 1.',
               ),
             sigma: z.number().positive().describe('Standard deviation of the log parameter, 1.'),
           }),
@@ -366,8 +366,8 @@ const targetFaceDesignParser = z.object({
         value: z.int().positive().optional().describe('Ring value.'),
         diameter: designLength.optional().describe('Width of the ring, mm.'),
         height: designLength.optional().describe('Height of an oval ring, mm.'),
-        fill: faceColour.optional().describe('Colour of the zone the ring line bounds outside.'),
-        line: faceColour.optional().describe('Colour of the ring line.'),
+        fill: faceColour.optional().describe('Color of the zone the ring line bounds outside.'),
+        line: faceColour.optional().describe('Color of the ring line.'),
       }),
     )
     .max(40)

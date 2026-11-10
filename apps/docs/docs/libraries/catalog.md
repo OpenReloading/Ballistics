@@ -7,7 +7,7 @@ description: The catalogue records as one bundle and the checks they pass.
 
 # `@open-reloading/catalog`
 
-The catalogue records of this repository as one JSON bundle and the checks the records pass. The package reads no files. The code is MIT. Each record entry states its licence in its `license` field; entries without one are CC BY 4.0, except data a maker published (a source with `origin` `manufacturer`), which carries no project licence (see `packages/catalog/LICENSE`). The [Data](../data/federations.md) pages describe the records and their sources.
+The catalogue records of this repository as one JSON bundle and the checks the records pass. The package reads no files. The code is MIT. Each record entry states its license in its `license` field; entries without one are CC BY 4.0, except data a maker published (a source with `origin` `manufacturer`), which carries no project license (see `packages/catalog/LICENSE`). The [Data](../data/federations.md) pages describe the records and their sources.
 
 ## Install
 

@@ -36,7 +36,7 @@ $$
 \frac{\partial v}{\partial V_c} = -\frac{L}{V^*}\,\frac{\partial v}{\partial L}
 $$
 
-Geometric scaling: with pressures, energies and densities kept, the dimensionless equations of the model do not change, so pressure and velocity against travel in calibres are the same and times scale with $s$. The heat-transfer coefficient depends on size, so the heat model breaks this.
+Geometric scaling: with pressures, energies and densities kept, the dimensionless equations of the model do not change, so pressure and velocity against travel in calibers are the same and times scale with $s$. The heat-transfer coefficient depends on size, so the heat model breaks this.
 
 ## Numbers
 

@@ -37,7 +37,7 @@ $$
 \text{coverage} = \frac{1}{n} \sum_{i=1}^{n} \mathbf{1}\big(|e_i| \le k\,u_i\big), \qquad k_{90} = Q_{0.9}\!\left(\frac{|e_i|}{u_i}\right)
 $$
 
-$k_{90}$ is the factor that would cover 90 % of the replicates; a calibrated interval has $k_{90} \approx 1.645$. The relative distance of a value $x$ outside the fitted range $[x_\min, x_\max]$ is $x / x_\max - 1$ above and $x / x_\min - 1$ below. With 200 replicates the standard error of a coverage near 90 % is about 2 points. The grid points of one replicate share its noise, so neighbouring cells are not independent.
+$k_{90}$ is the factor that would cover 90 % of the replicates; a calibrated interval has $k_{90} \approx 1.645$. The relative distance of a value $x$ outside the fitted range $[x_\min, x_\max]$ is $x / x_\max - 1$ above and $x / x_\min - 1$ below. With 200 replicates the standard error of a coverage near 90 % is about 2 points. The grid points of one replicate share its noise, so neighboring cells are not independent.
 
 ## Numbers
 
@@ -107,7 +107,7 @@ Pressure, velocity-only ladder:
 | `powderPressureRange`, charge -25 % to +25 %  |      100 | 90 to 93 |       0 to 100 |  0 to 100 |
 | `predictPowder`, charge -25 % to +25 %        | 91 to 92 |  7 to 30 |              0 |         0 |
 | `powderPressureRange`, barrel -75 % to +100 % |      100 |       93 |              0 |         0 |
-- With the right model (`exact`) the intervals hold at every tested distance on every axis (92 % at 90 % nominal, charge to ±25 %, barrel to +100 %, bore to ±30 %): the linearised covariance is not the problem.
+- With the right model (`exact`) the intervals hold at every tested distance on every axis (92 % at 90 % nominal, charge to ±25 %, barrel to +100 %, bore to ±30 %): the linearized covariance is not the problem.
 - Any model error makes the coverage fall from the first per cent outside the range, with no plateau that a margin could mark. The loss is steepest on the charge axis (more above than below) and above the fitted bore.
 - Inside the range the velocity interval already holds too little when the fixed inputs carry their assumed uncertainties (`inputs`: 79 %, 61 % for the wide ladder). The velocity interval has no fixed-input term; the pressure range has one and holds 90 to 93 % at every distance on every axis in `inputs`.
 - Under structural error neither pressure interval covers, inside or outside: the pressure is biased low (11 to 15 % in one replicate of `structure`), and the 0 to 100 % across the charge is the bias crossing the interval, not a coverage that varies with the distance. Pressure rows of 5 % in the ladder do not change this.

@@ -88,7 +88,7 @@ export function ZeroTargetMenu({
       values: zeroTargetValues(source),
       check: t('Print at 100 %, not fitted to the page. Check the bar with a ruler.'),
       footer: t(
-        'Zero target {id}, version {version}, plain corner marks, mark centres {width} x {height} mm, grid {pitch} mm',
+        'Zero target {id}, version {version}, plain corner marks, mark centers {width} x {height} mm, grid {pitch} mm',
         {
           id: targetId,
           version: formatVersion,

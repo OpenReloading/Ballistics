@@ -27,7 +27,7 @@ export const categoryWord = (t: Translate, value: string) => {
   return word ? t(word) : kebabName(value)
 }
 
-/** The printed colours of a ring zone or line. */
+/** The printed colors of a ring zone or line. */
 const colours: Record<string, Message> = {
   black: msg('black'),
   white: msg('white'),
@@ -40,7 +40,7 @@ const colours: Record<string, Message> = {
   brown: msg('brown'),
 }
 
-/** A ring colour in the language of `t`. */
+/** A ring color in the language of `t`. */
 export const colourWord = (t: Translate, value: string) => {
   const word = colours[value]
   return word ? t(word) : value

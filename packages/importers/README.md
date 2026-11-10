@@ -15,4 +15,4 @@ console.log(result.session.strings[0].shots.map((shot) => shot.velocity.value)) 
 
 Documentation: https://openreloading.github.io/Ballistics/docs/libraries/importers/
 
-Licence: MIT
+License: MIT

@@ -35,7 +35,7 @@ import { LinkButton } from './record-actions.tsx'
 import { EmptyNote, ErrorNote, Loading } from './states.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 
-/** Line sample of a colour slot, for the pills. */
+/** Line sample of a color slot, for the pills. */
 function Swatch({ slot }: { slot: number }) {
   return (
     <svg width="28" height="10" aria-hidden="true" className="swatch">
@@ -117,7 +117,7 @@ function OverlayBody({
   )
 }
 
-/** Picks live in `?add=` only (no preset, no stored overlay) and each burn law loads when picked, so the page carries only names; a colour slot stays with its powder, designs come as `user:<id>`. */
+/** Picks live in `?add=` only (no preset, no stored overlay) and each burn law loads when picked, so the page carries only names; a color slot stays with its powder, designs come as `user:<id>`. */
 export function BurnRateCompare({ options }: { options: { value: string; label: string }[] }) {
   const { t } = useTranslation()
   const [picks, setPicks] = useState<OverlayPick[]>([])

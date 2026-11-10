@@ -131,7 +131,7 @@ describe('the log scale of the burn rates', () => {
   })
 })
 
-describe('the neighbours of a powder in the burn-rate order', () => {
+describe('the neighbors of a powder in the burn-rate order', () => {
   // orders 1 to 12, listed out of order, and one powder without an order
   const rows: PowderRow[] = [
     ...Array.from({ length: 12 }, (_, i) => ({

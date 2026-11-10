@@ -142,7 +142,7 @@ describe('drawing tokens', () => {
         for (const edge of ['--accent', '--control-line'])
           expect(ratio(tokens.get(edge) as string, ground), edge).toBeGreaterThanOrEqual(3)
       })
-  it('gives shot groups the light chart series colours', () => {
+  it('gives shot groups the light chart series colors', () => {
     const series = new Set([1, 2, 3, 4, 5, 6].map((k) => light.get(`--series-${k}`)))
     for (const colour of groupColours) expect(series.has(colour), colour).toBe(true)
   })

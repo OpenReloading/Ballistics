@@ -84,7 +84,7 @@ describe('parseShotView: the name line, a German export, dates and the footer', 
     expect(r.missingPaths).toContain('device.manufacturer')
   })
 
-  it('leaves an unrecognised date to the user', () => {
+  it('leaves an unrecognized date to the user', () => {
     const r = parseShotView(shotViewGerman.replace('M\u00C4RZ', 'QUARZ'))
     expect(r.session.date).toBeUndefined()
     expect(r.missingPaths).toContain('date')

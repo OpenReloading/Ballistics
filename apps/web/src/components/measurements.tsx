@@ -60,7 +60,7 @@ const maxSessions = 50
 const tableName = msg('Measured against simulated velocity per charge')
 const chartName = msg('Measured mean velocity and simulated muzzle velocity against charge')
 
-/** Marker shapes per series, so series differ by more than colour. */
+/** Marker shapes per series, so series differ by more than color. */
 const shapes = ['circle', 'square', 'triangle', 'diamond'] as const
 type Shape = (typeof shapes)[number]
 
@@ -84,7 +84,7 @@ function Marker({
   return <polygon points={points.join(' ')} />
 }
 
-/** Series colour beside the shape: the chart palette after the first colour. */
+/** Series color beside the shape: the chart palette after the first color. */
 const colour = (k: number) => `var(--series-${(k % shapes.length) + 2})`
 
 function LegendShape({ shape, k }: { shape: Shape; k: number }) {

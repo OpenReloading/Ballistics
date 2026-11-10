@@ -6,7 +6,7 @@ import { Decimal } from './decimal.tsx'
 export const scaleWidth = 160
 const x = (d: RateDomain, v: number) => 12 + rateAt(d, v) * (scaleWidth - 24)
 
-/** The labelled ticks: the powers of ten only where all of them would crowd the width. */
+/** The labeled ticks: the powers of ten only where all of them would crowd the width. */
 const labelTicks = (domain: RateDomain) => {
   const all = rateTicks(domain)
   return all.length > 5 ? all.filter((t) => /^10*$/.test(String(t).replace(/^0\.0*/, ''))) : all
@@ -39,7 +39,7 @@ export function RateBar({
 }) {
   return (
     <svg width={scaleWidth} height="28" aria-hidden="true">
-      {/* a ruler under every row, one path: the header's labelled ticks long, the 5 steps short */}
+      {/* a ruler under every row, one path: the header's labeled ticks long, the 5 steps short */}
       <path
         d={rateTicks(domain)
           .filter(

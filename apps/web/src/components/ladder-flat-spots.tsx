@@ -33,7 +33,7 @@ export function LadderFlatSpots({
       <h3>{t('Velocity flat spots')}</h3>
       <p className="note">
         {t(
-          'A flat spot is a statistical observation of the strings fired: neighbouring charges whose slope of mean velocity has a {level} % band that includes zero. Few shots make wide bands. It is not a safety statement and not a charge to load.',
+          'A flat spot is a statistical observation of the strings fired: neighboring charges whose slope of mean velocity has a {level} % band that includes zero. Few shots make wide bands. It is not a safety statement and not a charge to load.',
           { level: Math.round(first.result.level * 100) },
         )}
       </p>
@@ -59,7 +59,7 @@ export function LadderFlatSpots({
             label={t('Velocity slope per charge, {name}', { name })}
             className="limits"
             caption={t(
-              'Slope of mean velocity against charge between neighbouring strings ({velocity} per {charge})',
+              'Slope of mean velocity against charge between neighboring strings ({velocity} per {charge})',
               { velocity: system.velocity.symbol, charge: system.charge.symbol },
             )}
             columns={columns.map((c) => t(c))}

@@ -40,7 +40,7 @@ function frontFit() {
 }
 
 describe('faceSheet', () => {
-  it('calibrates the sheet on the face: scale, perspective, centre and axes of the photo', () => {
+  it('calibrates the sheet on the face: scale, perspective, center and axes of the photo', () => {
     // seen from the front, the face's axes are the photo's: x right, y up
     const { h, fit } = frontFit()
     expect(fit).toBeDefined()
@@ -173,7 +173,7 @@ describe('faceGeometry', () => {
     ).toBeUndefined()
   })
 
-  it('centres the face on the point of aim the user set', () => {
+  it('centers the face on the point of aim the user set', () => {
     const aim = { x: 0.12, y: -0.07 }
     const sheet: TargetSheet = {
       ...base(),
@@ -196,7 +196,7 @@ describe('faceGeometry', () => {
     expect([g.outer, g.black]).toEqual([250, 100])
   })
 
-  it('takes a sheet calibrated on the face: the origin is the centre, the aim is ignored', () => {
+  it('takes a sheet calibrated on the face: the origin is the center, the aim is ignored', () => {
     const { h, fit } = frontFit()
     expect(fit).toBeDefined()
     if (!fit) return

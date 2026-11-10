@@ -4,7 +4,7 @@ import { Badge } from '@mantine/core'
 import type { ReactNode } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 
-/** The standard as text in an outlined badge; the colour (`--standard-cip`) only repeats it. */
+/** The standard as text in an outlined badge; the color (`--standard-cip`) only repeats it. */
 export function StandardBadge({ label }: { label: string }) {
   const tone = label === 'CIP' ? 'cip' : 'other'
   return (

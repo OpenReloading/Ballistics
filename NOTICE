@@ -177,7 +177,7 @@ SOFTWARE.
 ---
 
 BEGIN GENERATED: shipped packages
-Third-party packages installed for the API image and the web app, by name, version and the licence
+Third-party packages installed for the API image and the web app, by name, version and the license
 the package declares. Written by `node tools/src/licences.ts --write`.
 
 @fastify/ajv-compiler 4.0.6 MIT

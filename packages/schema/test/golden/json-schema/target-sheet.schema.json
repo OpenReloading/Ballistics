@@ -81,7 +81,7 @@
               "kind": {
                 "type": "string",
                 "const": "ringCentre",
-                "description": "A ring of known diameter: its centre and a point on it."
+                "description": "A ring of known diameter: its center and a point on it."
               },
               "centre": {
                 "type": "object",
@@ -399,7 +399,7 @@
           "colour": {
             "type": "string",
             "pattern": "^#[0-9a-fA-F]{6}$",
-            "description": "Colour of the group, `#rrggbb`."
+            "description": "Color of the group, `#rrggbb`."
           },
           "distance": {
             "type": "number",
@@ -542,7 +542,7 @@
               "backing": {
                 "type": "string",
                 "pattern": "^#[0-9a-fA-F]{6}$",
-                "description": "Colour seen through a hole, picked in one, `#rrggbb`. Absent: off."
+                "description": "Color seen through a hole, picked in one, `#rrggbb`. Absent: off."
               },
               "minContrast": {
                 "type": "number",
@@ -604,7 +604,7 @@
                     "y"
                   ]
                 },
-                "description": "Points marked on the face's rings in target m, on two rings at least. Absent: centred on the point of aim."
+                "description": "Points marked on the face's rings in target m, on two rings at least. Absent: centered on the point of aim."
               }
             },
             "required": [

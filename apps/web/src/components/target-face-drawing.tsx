@@ -25,7 +25,7 @@ const Outline = ({ e, ...paint }: { e: FaceEllipse } & Paint) =>
     <ellipse rx={e.rx} ry={e.ry} {...paint} />
   )
 
-/** Face mm as SVG units; paper colours in both themes, as it shows the printed face. */
+/** Face mm as SVG units; paper colors in both themes, as it shows the printed face. */
 export function TargetFaceFigure({ shape, label }: { shape: FaceShape; label: string }) {
   const { frame, zones, lines } = targetFaceFigure(shape)
   return (

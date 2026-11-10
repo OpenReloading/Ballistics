@@ -37,7 +37,7 @@ import { RecordPage } from './record-page.tsx'
 import { RecordViewWith } from './record-view.tsx'
 import { VivacityPanel } from './vivacity-panel.tsx'
 
-/** The powder's burn-rate order among all fitted powders and its neighbours; undefined without one. */
+/** The powder's burn-rate order among all fitted powders and its neighbors; undefined without one. */
 function place(
   list: PowderSummary[],
   names: ManufacturerNames,
@@ -48,7 +48,7 @@ function place(
   if (!n) return undefined
   const link = (r: (typeof n.faster)[number]): Neighbour => ({
     id: r.id,
-    // a neighbour of the same manufacturer by its name alone: the page names the manufacturer
+    // a neighbor of the same manufacturer by its name alone: the page names the manufacturer
     label: r.manufacturer === p.manufacturer ? r.name : productLabel(r),
     order: r.burnRateOrder ?? 0,
     rate: r.meanVivacity,

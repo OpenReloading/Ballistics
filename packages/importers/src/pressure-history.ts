@@ -4,10 +4,10 @@ import { detectDelimiter, splitCells } from './generic.ts'
 import { psi } from './record-fields.ts'
 import { bracketed, readDecimal, splitLines } from './text.ts'
 
-/** A pressure unit the trace importer recognises (any case in the file). */
+/** A pressure unit the trace importer recognizes (any case in the file). */
 export type PressureUnit = 'bar' | 'mbar' | 'MPa' | 'kPa' | 'Pa' | 'psi' | 'kpsi'
 
-/** A time unit the trace importer recognises (`µs` reads as `us`). */
+/** A time unit the trace importer recognizes (`µs` reads as `us`). */
 export type TimeUnit = 's' | 'ms' | 'us'
 
 /** Factor of each pressure unit to the stored unit, bar. */

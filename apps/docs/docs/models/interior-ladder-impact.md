@@ -10,7 +10,7 @@ The analysis takes the height of each shot above the point of aim and its veloci
 
 ## Equations
 
-For shot $j$ of charge $i$ with height $y_{ij}$ and velocity $v_{ij}$, $b$ the change of height per velocity and $\bar v$ the mean velocity of all shots of the ladder, the corrected height and the residual centre of the charge are
+For shot $j$ of charge $i$ with height $y_{ij}$ and velocity $v_{ij}$, $b$ the change of height per velocity and $\bar v$ the mean velocity of all shots of the ladder, the corrected height and the residual center of the charge are
 
 $$
 z_{ij} = y_{ij} - b \left( v_{ij} - \bar v \right), \qquad r_i = \bar z_i = \frac{1}{n_i} \sum_j z_{ij}
@@ -26,7 +26,7 @@ $$
 
 Code: `packages/ballistics/src/interior/ladder-impact.ts`, `ladderImpactResiduals` (`between`, `within`, `pooled`, `statistic`).
 
-The note is raised when $Q$ exceeds the chi-square quantile at level $\gamma$ (0.99 by default) with $m - 1$ degrees of freedom. When every shot of every charge has one height, $Q$ is 0 if the centres agree and infinite otherwise.
+The note is raised when $Q$ exceeds the chi-square quantile at level $\gamma$ (0.99 by default) with $m - 1$ degrees of freedom. When every shot of every charge has one height, $Q$ is 0 if the centers agree and infinite otherwise.
 
 Code: `packages/ballistics/src/interior/ladder-impact.ts`, `ladderImpactResiduals` (`degrees`, `varies`). The quantile is `chiSquareQuantile` of the [shot group](groups.md) statistics.
 
@@ -52,7 +52,7 @@ Code: `apps/web/src/lib/ladder-impact.ts`, `ladderImpact` (`usableShots`, `steps
 | $v$      | Velocity of a shot                      | m/s         | m/s            |
 | $b$      | Change of height per velocity           | no kind     | m per m/s      |
 | $z$      | Height with the velocity effect removed | mm          | m              |
-| $r_i$    | Residual centre of charge $i$           | mm          | m              |
+| $r_i$    | Residual center of charge $i$           | mm          | m              |
 | $n_i$    | Shots of charge $i$                     | 1           | 1              |
 | $Q$      | Heterogeneity statistic                 | 1           | 1              |
 | $\gamma$ | Level of the test, 0.99 by default      | 1           | 1              |
@@ -70,7 +70,7 @@ Code: `apps/web/src/lib/ladder-impact.ts`, `ladderImpact` (`usableShots`, `steps
 - The chi-square reference is approximate because the pooled variance is itself estimated.
 - A trend of the residual with the charge can come from a wrong slope as well as from the rifle. The slope is a simulation of the load's bullet, zero and standard air, not a measurement of the rifle; it is not given for a load without a sight height or a zero range.
 - The link between a group's shots and a chronograph string is by order: it holds while the shots of the group are not added, removed or reordered after it is set.
-- The test says the centres differ. It names no charge as better or worse and does not say whether a load may be fired.
+- The test says the centers differ. It names no charge as better or worse and does not say whether a load may be fired.
 
 ## Sources
 

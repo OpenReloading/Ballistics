@@ -18,7 +18,7 @@ const faceColourParser = z.enum([
   'brown',
 ])
 
-/** Printed colour of a ring zone or ring line. */
+/** Printed color of a ring zone or ring line. */
 export const faceColour: z.ZodEnum<
   z.core.util.ToEnum<
     'black' | 'white' | 'grey' | 'red' | 'orange' | 'yellow' | 'green' | 'blue' | 'brown'
@@ -254,8 +254,8 @@ export const targetFace: z.ZodObject<{
    * straight vertical sides and a half circle of the radius `diameter / 2` at each end, so its
    * `height` is at least its `diameter`; a face has stadium rings on all rings or on none, and its
    * inner ten and black area are stadiums too.
-   * `fill` is the colour of the zone that the ring line bounds on the outside (the area up to the
-   * next ring, for the innermost ring the whole disc), `line` the colour of the ring line.
+   * `fill` is the color of the zone that the ring line bounds on the outside (the area up to the
+   * next ring, for the innermost ring the whole disc), `line` the color of the ring line.
    */
   rings: z.ZodArray<
     z.ZodObject<{
@@ -299,8 +299,8 @@ export const targetFace: z.ZodObject<{
         gauge: z.ZodOptional<QuantitySchema>
         /**
          * `touch`: the hole counts a ring when it touches the ring line. `centre`: only when the
-         * centre of the hole lies on its line or inside it (black-powder events); the hole size is
-         * ignored. `outward`: only when the hole edge furthest from the centre stays inside the
+         * center of the hole lies on its line or inside it (black-powder events); the hole size is
+         * ignored. `outward`: only when the hole edge furthest from the center stays inside the
          * outer edge of the ring line; a hole touching the outside of the line takes the lower
          * value (outward gauging, circular rings and whole rings only). Absent: the rule book does
          * not state it; scored as `touch`.
@@ -328,7 +328,7 @@ export const targetFace: z.ZodObject<{
     }>
   >
   /**
-   * Several scoring centres on one sheet: position of each centre from the sheet centre (x right,
+   * Several scoring centers on one sheet: position of each center from the sheet center (x right,
    * y up), all with the rings of this record. Two scoring zones on one card are two entries with
    * a `zone` label each. Absent: one bull.
    */
