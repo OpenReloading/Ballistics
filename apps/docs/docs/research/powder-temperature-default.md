@@ -12,7 +12,7 @@ Interior ballistics, propellant temperature: can a powder record without its own
 
 ## Method
 
-Ball: the closed-vessel burn-rate sensitivities of [Boulkadid 2016](../bibliography.md#boulkadid-2016) for deterred ball powders with about 10 % nitroglycerin, as quoted in issue #842 (the paper's tables were not re-read). Extruded and flake: the velocities at 70 and 125 °F of the 17 powders outside the Extreme line in [Hodgdon 2012](../bibliography.md#hodgdon-2012) (three of them ball: Win 748, AA 2520, AA 2460), each converted to a hot sensitivity $\sigma_h$ by bisection on three stand-in rifle loads (seven-perforated grain, 10.9 g, charges 2.4, 2.8 and 3.2 g, each set to peak at 380 MPa at 294.15 K) so that +30.56 K moves the muzzle velocity as the powder did. Script: `node packages/ballistics/scripts/powder-temperature-default.mts`. Decided in advance: the default is the mean of the 14 extruded powders on the middle load, the interval spans the loads' mean ± 1 SD, and the cold-side peak pressure is shown as an interval over $\sigma_c$ from 0 to 0.0030, never as a point.
+Ball: the closed-vessel burn-rate sensitivities of [Boulkadid 2016](../bibliography.md#boulkadid-2016) for deterred ball powders with about 10 % nitroglycerin, as quoted in issue #842 and re-read from the paper's Table 6 (journal page 1018) on 2026-11-10, where they match. Extruded and flake: the velocities at 70 and 125 °F of the 17 powders outside the Extreme line in [Hodgdon 2012](../bibliography.md#hodgdon-2012) (three of them ball: Win 748, AA 2520, AA 2460), each converted to a hot sensitivity $\sigma_h$ by bisection on three stand-in rifle loads (seven-perforated grain, 10.9 g, charges 2.4, 2.8 and 3.2 g, each set to peak at 380 MPa at 294.15 K) so that +30.56 K moves the muzzle velocity as the powder did. Script: `node packages/ballistics/scripts/powder-temperature-default.mts`. Decided in advance: the default is the mean of the 14 extruded powders on the middle load, the interval spans the loads' mean ± 1 SD, and the cold-side peak pressure is shown as an interval over $\sigma_c$ from 0 to 0.0030, never as a point.
 
 ## Formulas
 
@@ -20,7 +20,7 @@ $\tau_T = \exp(\sigma (T_p - T_\text{ref}))$ with $\sigma = \sigma_h$ above and 
 
 ## Numbers
 
-Ball (Boulkadid 2016 as quoted): burn-rate sensitivity spherical 0.305 ± 0.016 %/K and flattened 0.229 ± 0.028 %/K above 21 °C, 0.121 ± 0.006 and 0.115 ± 0.008 %/K below; peak pressure coefficient hot 0.429 ± 0.102 and 0.239 ± 0.110 %/K, cold 0.022 ± 0.043 and 0.037 ± 0.052 %/K. Default $\sigma_h$ 0.0027 (0.0023 to 0.0031), $\sigma_c$ 0.0012.
+Ball (Boulkadid 2016, Table 6): burn-rate sensitivity spherical 0.305 ± 0.016 %/K and flattened 0.229 ± 0.028 %/K above 21 °C, 0.121 ± 0.006 and 0.115 ± 0.008 %/K below; peak pressure coefficient hot 0.429 ± 0.102 and 0.239 ± 0.110 %/K, cold 0.022 ± 0.043 and 0.037 ± 0.052 %/K. Default $\sigma_h$ 0.0027 (0.0023 to 0.0031), $\sigma_c$ 0.0012.
 
 Hodgdon 2012, 17 powders: velocity change mean 0.0427 %/K, SD 0.0350, range -0.0164 to 0.1001 %/K. Through the model:
 
@@ -38,7 +38,7 @@ Improved. Adopted: a default by grain form (ball, extruded, flake; none for othe
 
 ## Data basis
 
-Public. Boulkadid 2016 (as quoted, unverified here) and the Hodgdon 2012 maker table through the model on stand-in loads.
+Public. Boulkadid 2016, Table 6 and the Hodgdon 2012 maker table through the model on stand-in loads.
 
 ## Where in the app
 
@@ -50,4 +50,4 @@ Public. Boulkadid 2016 (as quoted, unverified here) and the Hodgdon 2012 maker t
 
 ## Confidence
 
-Low: the extruded value moves with the stand-in load and the ball figures were not re-read from the paper.
+Low: the extruded value moves with the stand-in load. The ball figures were re-read from the paper's Table 6 on 2026-11-10 and match.

@@ -36,9 +36,9 @@ describe('predict', () => {
     expect(p.pressure).toBeGreaterThan(1e8)
   })
 
-  it('moves with the temperature of the run only for a powder with a temperature sensitivity', () => {
+  it('moves with the temperature of the run', () => {
     const cold = predict({ ...row, temperature: -30 }, records, interior)
-    expect(cold).toEqual(predict(row, records, interior))
+    expect(cold).not.toEqual(predict(row, records, interior))
   })
 
   it('uses the COAL of the row', () => {
