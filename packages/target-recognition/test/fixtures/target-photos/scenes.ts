@@ -201,7 +201,7 @@ function holeColourAt(s: Scene, d: number, edge: number, rv: number): Rgb | unde
   return undefined
 }
 
-/** The colour that shows through a hole in the face. */
+/** The color that shows through a hole in the face. */
 function throughHole(face: Scene['face']): Rgb {
   if (face === 'rings') return [58, 56, 54]
   if (face === 'dark') return [226, 224, 216]

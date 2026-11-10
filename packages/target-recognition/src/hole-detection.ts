@@ -365,7 +365,7 @@ function solved(
   return { found, run: { ...run, shots: marks.map((m) => m.shot), zone }, holeDiameter }
 }
 
-/** The pick, or the backing colour in log RGB without a pick. */
+/** The pick, or the backing color in log RGB without a pick. */
 function seedOf(at: Point | undefined, backing: HoleDetectionInput['backing']): Seed {
   return at || !backing
     ? { at }

@@ -240,7 +240,6 @@ describe('detectFromExample on a printed face', () => {
   })
 
   it('finds holes under a curled-paper brightness gradient', () => {
-    expect.hasAssertions()
     const s = new Scene(900, 900)
     s.face(450, 450)
     const mm = pxPerMm
@@ -316,7 +315,6 @@ describe('detectFromExample and the region', () => {
   })
 
   it('proposes only holes whose centre is inside the region', () => {
-    expect.hasAssertions()
     const s = new Scene(800, 600)
     const inside = { x: 300, y: 300 }
     const nearEdge = { x: 300, y: 300 - 0.9 * D }
@@ -354,7 +352,6 @@ describe('autoDetect and findHoles', () => {
   })
 
   it('finds light holes on a dark area without a pick', () => {
-    expect.hasAssertions()
     const s = new Scene(900, 900)
     s.rect([0, 0, 900, 900], BLACK)
     const truth = [
@@ -384,9 +381,8 @@ describe('autoDetect and findHoles', () => {
   })
 })
 
-describe('autoDetect and findHoles on print, a stain and a backing colour', () => {
+describe('autoDetect and findHoles on print, a stain and a backing color', () => {
   it('does not take the ends of a printed bar, a third of a hole wide, for holes', () => {
-    expect.hasAssertions()
     const s = new Scene(1300, 700)
     s.rect([200, 590, 1100, 610], BLACK)
     const truth = [
@@ -430,7 +426,7 @@ describe('autoDetect and findHoles on print, a stain and a backing colour', () =
   })
 })
 
-describe('findHoles with a bad backing colour and without a region', () => {
+describe('findHoles with a bad backing color and without a region', () => {
   it('refuses a backing colour channel that is not a number from 0 to 255', () => {
     const s = new Scene(200, 200)
     const ok = { image: s.image(), region: all(s), pxPerM, expectedHoleDiameter: bullet }
@@ -479,7 +475,6 @@ describe('paperOutline and stray proposals', () => {
   })
 
   it('drops a proposal far from the group but keeps a flier and a second group', () => {
-    expect.hasAssertions()
     const s = new Scene(1600, 1000)
     const group = [
       { x: 300, y: 300 },

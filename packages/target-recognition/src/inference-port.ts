@@ -16,7 +16,7 @@ export type ProposalRequest = HoleDetectionInput & {
   auto?: boolean | undefined
 }
 
-/** Image px of the request's image; `holeDiameter` (m) and `example` come from an example or auto run only. */
+/** The run's proposals and flagged regions in image px of the request's image; `holeDiameter` (m) and `example` come from an example or auto run only. */
 export type Proposals = {
   proposals: HoleProposal[]
   flagged: FlaggedRegion[]
@@ -26,11 +26,11 @@ export type Proposals = {
 
 /** One method from an image buffer to hole proposals; asynchronous because a model runtime answers so. */
 export interface InferencePort {
-  /** Resolves to the proposals of the request's run, none when the run finds no agreeing holes; rejects with the detector's `RangeError` or `Error` for invalid input. */
+  /** Resolves to the run's proposals in image px, none when an example or auto run finds no holes; rejects with the detector's `RangeError` or `Error` for invalid input. */
   propose(request: ProposalRequest): Promise<Proposals>
 }
 
-/** The classical detector of this package, known-weak: it misses the default accuracy bar on the holdout photos and stays until a learned model meets the bar set by two human labelers on 30 holdout photos (`apps/docs/docs/models/hole-detection.md`, "Quality bar"). */
+/** The classical detector of this package, known-weak: it misses the default bar on the holdout photos and stays until a learned model meets an accuracy bar that is not measured yet (`apps/docs/docs/models/hole-detection.md`, "Quality bar"). */
 export const holeDetector: InferencePort = {
   propose: async (request) => classical(request),
 }

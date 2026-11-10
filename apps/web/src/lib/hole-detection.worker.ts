@@ -151,7 +151,7 @@ async function handleDetect(
   return toPhotoPx(found, k, x0, y0)
 }
 
-/** The example, auto or plain run on the working image. */
+/** The request of the example, auto or plain run on the working image. */
 function requestOf(
   r: Extract<WorkerRequest, { kind: 'detect' | 'example' }>,
   input: HoleDetectionInput,

@@ -14,7 +14,7 @@ Proposes bullet holes on a target photo, inside a region or the printed target f
 
 Detection starts when a photo is added to the sheet: the target search, then the run on the target found. Its result is one line with the target, the scale, the number of holes proposed (sure and maybe) and the caliber (the bullet's caliber and diameter, else the hole size and its source), each with a change link to its editor, and Accept sure. Where no bullet, marker, typed or learned size gives the hole size, the line holds the hole size field and the run follows once it is entered. A run without holes and a photo without one sure target go on in the guided steps. A photo below the minimum quality waits for Detect anyway (Photo quality).
 
-The proposals stay apart from the shots until the user accepts them. The code is in `packages/target-recognition/src/hole-detection.ts` and `apps/web/src/lib/hole-proposals.ts`. The web app's worker runs the detector through the inference port, `packages/target-recognition/src/inference-port.ts` (`holeDetector`), on an image buffer of `packages/target-recognition/src/image.ts`.
+The proposals stay apart from the shots until the user accepts them. The code is in `packages/target-recognition/src/hole-detection.ts` and `apps/web/src/lib/hole-proposals.ts`. The web app's worker runs the detector through the inference port, `packages/target-recognition/src/inference-port.ts` (`holeDetector`), which takes an RGBA image buffer (`packages/target-recognition/src/image.ts`).
 
 Cancelling detection, changing the photo, sheet or group, or rotating the photo invalidates pending photo and target reads. Their results and errors cannot start a worker, apply a target or change the detection status.
 
@@ -38,7 +38,7 @@ For face search and hole detection on a set of photos with reference holes:
 - Face search per set: right first choice, wrong first choice, found but not first, not found, each split by whether the first choice is sure. A sure wrong first choice is the worst case.
 - Statistics: the median and the 90th percentile of the corrections. A 90th percentile needs 20 or more usable photos in the set; below that the maximum is given with the set size.
 
-The default bar: a median of 1 correction or fewer, a 90th percentile of 3 or fewer, the right first choice on 90 % of usable photos and a wrong one on 2 % or fewer. On the sealed holdout of real target photos the measured corrections miss them in two looks, and the face-search rates were not measured there ([Hole detection tuning candidates](../research/hole-detection-tuning-candidates.md)). Meeting the bar never means that a photo is good or a detection right. The classical detector (`holeDetector`) therefore ships as known-weak: it stays until a learned model meets the accuracy bar set by two human labelers on 30 holdout photos.
+The default bar: a median of 1 correction or fewer, a 90th percentile of 3 or fewer, the right first choice on 90 % of usable photos and a wrong one on 2 % or fewer. On the sealed holdout of real target photos the measured corrections miss them in two looks, and the face-search rates were not measured there ([Hole detection tuning candidates](../research/hole-detection-tuning-candidates.md)). Meeting the bar never means that a photo is good or a detection right. The classical detector (`holeDetector`) misses the default bar and ships as known-weak: it stays until a learned model meets an accuracy bar that is not measured yet.
 
 ## Equations
 
