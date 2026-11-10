@@ -40,9 +40,11 @@
   --size-control-row: 1.875rem;
   --size-field: 1.5rem;
   --size-target: 1.5rem;
+  --space-2xs: 0.25rem;
   --space-lg: 1.25rem;
   --space-md: 1rem;
   --space-sm: 0.625rem;
+  --space-sm-md: 0.75rem;
   --space-xl: 2rem;
   --space-xs: 0.5rem;
   --surface: #f6f8fc;
