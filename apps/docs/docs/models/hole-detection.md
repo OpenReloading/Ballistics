@@ -104,7 +104,7 @@ $$
 \sigma = \sqrt{\frac{(2r + 1)^2 - 1}{4}}
 $$
 
-Code: `apps/web/src/lib/blob-detector.ts`, `sigmaOf`, `radiiOf`.
+Code: `packages/target-recognition/src/blob-detector.ts`, `sigmaOf`, `radiiOf`.
 
 The scales are $\sigma = f D$, with $f \in \{0.12, 0.17, 0.24, 0.34\}$ to find peaks plus $0.48$ to size holes, each realized by the nearest whole box radius of at least 1 (repeats dropped). The Hessian of the smoothed image $B$ comes from central differences. The scale-normalized response keeps blobs brighter than their surroundings in both directions. A ring line, with one eigenvalue near 0, gives none:
 
@@ -112,7 +112,7 @@ $$
 \lambda_\mathrm{max} = \frac{L_{xx} + L_{yy}}{2} + \sqrt{\left(\frac{L_{xx} - L_{yy}}{2}\right)^2 + L_{xy}^2}, \qquad \mathcal{R} = \begin{cases} -\sigma^2 \lambda_\mathrm{max} & \lambda_\mathrm{max} \lt 0 \\ 0 & \text{otherwise} \end{cases}
 $$
 
-Code: `apps/web/src/lib/blob-detector.ts`, `response`, `space`.
+Code: `packages/target-recognition/src/blob-detector.ts`, `response`, `space`.
 
 Peaks are local maxima over space of the largest response over the scales, one per $0.8 D$, placed to sub-pixel by a parabola through the neighbors. A disc of radius $\rho$ gives its strongest response at $\sigma = \rho / \sqrt 2$, so the hole diameter at a peak is
 
@@ -120,7 +120,7 @@ $$
 D_\mathrm{hole} = 2\sqrt{2}\, \sigma^\ast
 $$
 
-Code: `apps/web/src/lib/blob-detector.ts`, `peaksOf`, `sigmaAt`. `apps/web/src/lib/hole-detection.ts`, `D_OVER_SIGMA`.
+Code: `packages/target-recognition/src/blob-detector.ts`, `peaksOf`, `sigmaAt`. `apps/web/src/lib/hole-detection.ts`, `D_OVER_SIGMA`.
 
 with $\sigma^\ast$ the scale of the strongest response, refined by a parabola in $\ln\sigma$ through the neighboring scales.
 
@@ -132,7 +132,7 @@ $$
 \mathrm{hat} = P_\mathrm{s} - (P_\mathrm{s} \ominus Q) \oplus Q
 $$
 
-Code: `apps/web/src/lib/hole-detection.ts`, `pipeline` (`topHat`). `apps/web/src/lib/raster-ops.ts`, `open`, `morph`, `minMax`.
+Code: `apps/web/src/lib/hole-detection.ts`, `pipeline` (`topHat`). `packages/target-recognition/src/raster-ops.ts`, `open`, `morph`, `minMax`.
 
 with erosion $\ominus$ and dilation $\oplus$ by the square $Q$, each a running minimum or maximum with three comparisons per pixel whatever the size.
 
@@ -142,7 +142,7 @@ $$
 \mathrm{mask} = \mathrm{hat} \gt 0.35\, c_5, \qquad \mathcal{R} \ge \kappa\, r_5, \qquad \sqrt{\max_{0.3 D} \delta^2} \ge 0.2 D, \qquad \frac{A_\mathrm{mask}(0.5 D)}{A(0.5 D)} \ge 0.3
 $$
 
-Code: `apps/web/src/lib/hole-detection.ts`, `pipeline` (`testPeaks`, `threshold`, `standsOut`), `KEEP`, `INSCRIBED`, `FILL`, `HAT`, `FLOOR`. `apps/web/src/lib/raster-ops.ts`, `distanceSquared`.
+Code: `apps/web/src/lib/hole-detection.ts`, `pipeline` (`testPeaks`, `threshold`, `standsOut`), `KEEP`, `INSCRIBED`, `FILL`, `HAT`, `FLOOR`. `packages/target-recognition/src/raster-ops.ts`, `distanceSquared`.
 
 with:
 - $\kappa = 0.35$ at the default contrast setting
@@ -159,7 +159,7 @@ $$
 D_\mathrm{part} = \sqrt{\frac{4 A}{\pi k}}, \qquad D_\mathrm{part} \gt 3 D \Rightarrow \text{dropped}, \qquad \text{confidence} = \operatorname{clamp}\left(\frac{\mathcal{R}}{r_5}, 0, 1\right)
 $$
 
-Code: `apps/web/src/lib/hole-detection.ts`, `pipeline`, `shotsFromParts`, `MAX_PART`. `apps/web/src/lib/raster-ops.ts`, `components`.
+Code: `apps/web/src/lib/hole-detection.ts`, `pipeline`, `shotsFromParts`, `MAX_PART`. `packages/target-recognition/src/raster-ops.ts`, `components`.
 
 A part is also print when it is a filled area with holes of the other polarity in it. It must be thicker than holes: a disc of radius $0.92 D$ fits inside it (the distance to the nearest pixel off the mask exceeds $0.92 D$ somewhere). On the drawn test photos a single hole, or holes joined by ring lines, is about $0.5 D$ thick, a part of merged holes and ring lines up to $0.85 D$, and the filled square of the zero target $0.99 D$. And of the areas off the mask that it encloses (not reached by a fill from the edge of its bounding box), at least one is the size of a hole and none is larger. An area counts as the size of a hole when a disc of its area is $0.7 D$ to $1.4 D$ across, the hole sizes a run takes. Paper inside a printed ring line is far larger, so a hole joined to a ring line keeps its part. The thickness keeps the holes in the black area of a face, which ring lines join into a part that encloses hole-sized patches of the black area between them. This drops a filled black square with light holes shot into it, which the opening by $2 D$ cannot remove once the holes leave no room for the square $Q$. The seed runs of the detection without a picked hole keep such a part, so the run chosen does not change: a seed on a light hole of the square can find only the square on the coarse copy, while its run on the full working image finds the holes.
 

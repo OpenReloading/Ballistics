@@ -1,0 +1,51 @@
+{
+  "name": "@open-reloading/target-recognition",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Recognition on target photos: raster operations on working images and a multi-scale blob detector.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenReloading/Ballistics.git",
+    "directory": "packages/target-recognition"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.map",
+    "!dist/*.tsbuildinfo",
+    "!dist/api-extractor",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json && api-extractor run",
+    "typecheck": "tsc --noEmit && tsc -p test",
+    "lint": "oxlint --type-aware --deny-warnings --report-unused-disable-directives",
+    "test": "vitest run --coverage && publint --strict && attw --pack . --profile esm-only"
+  },
+  "dependencies": {
+    "@open-reloading/shot-groups": "workspace:*",
+    "@open-reloading/statistics": "workspace:*"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "catalog:",
+    "@microsoft/api-extractor": "catalog:",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "oxlint": "catalog:",
+    "oxlint-tsgolint": "catalog:",
+    "publint": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

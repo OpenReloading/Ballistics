@@ -1,8 +1,8 @@
 /** Cut-out and ruler scale of a bullet photograph (`apps/docs/docs/models/bullet-photo.md`); photo px, y down, pixel (i, j) covering [i, i + 1) x [j, j + 1); pure, so it runs in a worker. */
+import { clamp, components } from '@open-reloading/target-recognition'
 import { msg } from '../i18n/translate.ts'
 import type { RgbaImage } from './image.ts'
 import { nth } from './nth.ts'
-import { clamp, components } from './raster-ops.ts'
 import type { Point } from './target-geometry.ts'
 import { otsu } from './target-paper.ts'
 import { type Wording, worded } from './wording.ts'
