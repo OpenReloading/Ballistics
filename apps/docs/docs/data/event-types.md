@@ -7,6 +7,7 @@ description: The records of competition event types, their rule books, scoring r
 # Event types
 
 An event type is a kind of competition event of one federation as its rule book defines it: IPSC Handgun, USPSA Handgun and PCC, a DSB championship. It holds the scoring method with its points and penalties, the power factor floors, the level names, the magazine limits and whether moving targets are allowed. A person's own event and scores (the event user record) build on it; a score recorded by the person is never an official result.
+
 - Every fact is read from the current edition of the federation's own rule book and cited with its section and page (`fields` in the provenance). Rules are described in our own words; no rule book text is copied, and the rule books are not in the repository. A fact from any other source would be marked unverified in its source note; the records hold none.
 - Schema: `packages/schema/src/event-type.ts` (JSON Schema `event-type.schema.json`).
 - Records: `packages/catalog/records/event-types/`, with the federations in `federations/` and the rule books as source records in `sources/`.
@@ -53,6 +54,7 @@ One entry of `magazine`: `division`, `powerFactor` where the limit holds for one
 ## Checks
 
 `pnpm run data:validate` (`packages/catalog/src/event-types.ts`) checks that
+
 - the federation is a record and lists the event type's rule book,
 - a ring scoring's `discipline` is a discipline of that federation,
 - no division appears twice among the power factors, every magazine limit names a division with a power factor (so a ring event type has none) and a limit for `major` only names a division with a major rating,

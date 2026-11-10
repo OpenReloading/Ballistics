@@ -21,6 +21,7 @@ User records: which of the views planned from the link between a load and a fire
 ## Formulas
 
 No model equations. The one sum the planner computes, never stored:
+
 - Rounds needed: the shots that count per event (summed over the stages of the discipline), times the number of events, plus the sighters per event times the events, then raised by the reserve in percent and rounded up. The result is compared with the rounds on hand the user types: a positive difference is reported as short by that many rounds, a negative one as that many over.
 
 ## Numbers

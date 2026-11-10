@@ -13,6 +13,7 @@ Charge ladder: with 3 or 4 five-shot groups per charge over 4 grains in half-gra
 ## Method
 
 The first three items fix what the issue leaves open.
+
 - Ladder: 9 charges over 4 grains in half-grain steps; 25 ft/s per grain from 2800 ft/s; velocity standard deviation of a shot 8 ft/s; vertical standard deviation of a shot 0.06 in. The height of a shot is the drop slope 0.04 in per 30 ft/s times its velocity less the mean velocity of the ladder, plus the injected oscillation, plus the vertical scatter. The slope is known exactly in the main rows and wrong by 20 percent in one row.
 - Oscillation: amplitude 0.1 in, exactly one cycle over the charge range, phase uniformly random for each ladder. A row with 0.05 in and rows without oscillation are run for the false notes.
 - Statistic: for each charge the mean of the corrected shot heights (the residual center) with the standard deviation of those heights; the note is shown when the heterogeneity statistic over the charges exceeds the chi-square quantile at the 99 percent level with 8 degrees of freedom. A false flag is a note shown with no oscillation injected.
@@ -55,6 +56,7 @@ Not explored: oscillation amplitudes below 0.05 in, periods other than one cycle
 improved. Rule met on the stated assumptions: the phase is recovered in 100 percent of 20 000 ladders at 3 groups per charge (limit 70 percent), false notes are 1.4 percent with an exact slope (limit 5 percent). With a slope 20 percent off false notes are 6.6 percent, above the limit; slope errors in between were not tested. Adopted in a reduced form: a note on the ladder with the warning that it needs 3 to 4 groups per charge and a drop slope. The function `ladderImpactResiduals(charges, slope, level)` (per charge the residual center, its standard deviation and shot count in the shape of `LadderStep`, the heterogeneity statistic, its degrees of freedom and the flag; SI units) and its tests are on the unmerged branch `research/group-statistics`, ready to cherry-pick. The test requires the note in more than 99 percent of 400 ladders with a 0.1 in oscillation and in under 5 percent of 400 without, and covers the input checks.
 
 Web wiring, not built (at most ten lines):
+
 - On the ladder view, only for a ladder whose target-sheet groups carry the same `ladderStep` set with at least 3 groups of 5 shots per charge and a velocity for each shot, build the `ImpactStep`s and the slope from two flown trajectories (`verticalPerMetre` in `apps/web/src/lib/hit-probability.ts`).
 - Call `ladderImpactResiduals`; when `varies` is false show nothing.
 - When it is true show one note under the ladder: "The vertical center of the groups changes with the charge by more than the drop from velocity explains (chart of the residual center per charge with its standard error)." Mark the flat runs of `ladderFlatSpots(result.steps)` on that chart.

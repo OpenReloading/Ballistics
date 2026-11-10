@@ -7,6 +7,7 @@ description: Gas leakage past the projectile and convective heat loss to the bor
 # Leakage and heat loss
 
 Two optional terms of the [M3 interior model](interior-m3.md):
+
 - Gas leakage: propellant gas escapes past the projectile through a leak area that can change with travel, as in a worn bore or a projectile that does not seal. The gas takes its mass and its enthalpy with it, which lowers pressure and velocity.
 - Convective heat loss: heat flows from the gas to the bore wall by a pipe-flow correlation.
 

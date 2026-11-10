@@ -65,6 +65,7 @@ $$
 Code: `packages/statistics/src/least-squares.ts`, `logLeastSquares` (`damped`, `delta`, `lambda0`), `packages/statistics/src/huber.ts`, `huberRoots`.
 
 Without a Huber loss $W$ is the identity. With it, $W$ is the weight of iteratively reweighted least squares at the current residuals: it is the slope of the loss over $2r$, so the step uses the gradient of the cost.
+
 - The damping starts at $\lambda = 10^{-3}$.
 - A candidate $\theta + \delta$ that lowers the cost ($\chi^2$ without a Huber loss) is accepted, and $\lambda$ is divided by 10.
 - A candidate with a higher $\chi^2$, or one the caller rejects (no predicted values), multiplies $\lambda$ by 10.
@@ -126,6 +127,7 @@ $$
 Code: `packages/statistics/src/least-squares.ts`, `logLeastSquares`, `checkConditioning` (`unresolved`).
 
 The caller sets the floor of each row. The check runs at the start, at the solution and after `maxIterations`. The fit fails with:
+
 - `unresolved`, naming the parameters
 - `ill-conditioned` when $\kappa$ exceeds `maxCondition`, carrying $\kappa$ and the eigenvector of $\mu_\text{min}$ (the parameter combination the data cannot separate)
 

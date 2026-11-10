@@ -44,6 +44,7 @@ A charge has `charge`, `velocity` (with `point`, the symbol the table prints for
 ## Printed figures
 
 A figure is `{ value?, raw }`. `raw` is the printed text with its unit (`55 gr`, `13,600 PSI`, `3,30 g / 50 grs`) and is always present. `value` is the printed number in the stored unit, converted with the exact factor and kept to 7 significant digits: 13,600 psi is 937.687 bar, 55 gr is 3.563940 g.
+
 - A figure with no stored unit has `raw` only: a crusher pressure (CUP, LUP) is not converted to bar, `Flush` has no number.
 - A table that prints a figure without a unit has `assumedUnit` next to `raw`, and `value` rests on it.
 - `data:validate` reads the numbers and units printed in `raw` (a decimal comma, thousands commas, a pair such as `g / grs`, a twist `1:12"`) and fails a `value` that matches none of them to 7 significant digits.
@@ -88,6 +89,7 @@ pnpm --filter @open-reloading/tools run loads:merge <incoming folder> [--accept 
 The id of a load is the first 10 hex digits of the SHA-1 of its natural key: maker, cartridge, printed bullet text and bullet mass, COAL with its limit, printed powder, the set of charge kinds, barrel length and twist, and the marks of each charge. A figure counts by its `value` (its `raw` where it has none), so `55 gr` and `55 grs` are one key. Loads of equal key are counted in printed order: the first has the bare hash, the second `<hash>-2`, and so on. Edition, page, charge, velocity, pressure, primer and case are not in the key, so a newer edition finds its older load. An id the incoming file carries is replaced. Code: `loadId` and `mergePublishedLoads` in `tools/src/catalog/published-load-merge.ts`.
 
 By load id, the merge:
+
 - creates a load the repository does not have;
 - leaves a load whose content (everything but `id`, `source`, `page` and `url`) is equal as it is, so it keeps citing the edition and page that printed it;
 - lists a load with other content as changed, with the field paths that differ, and writes it only when its id follows `--accept` or with `--accept-all`;
@@ -100,6 +102,7 @@ The command prints per file and in total the created, changed (and how many not 
 ## Validation
 
 `pnpm run data:validate` reports:
+
 - a file whose cartridge is not its folder, names no cartridge record or a maker that is no manufacturer record, or whose name is not the maker's id (`<maker>-customer` for `producedBy: customer`);
 - a duplicate load id and loads that are not sorted by id;
 - a bullet, powder or primer a load names that is no record;

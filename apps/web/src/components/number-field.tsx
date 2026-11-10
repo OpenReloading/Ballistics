@@ -321,7 +321,7 @@ function FieldInput({
 
 const noValue: FieldValue = { text: '', si: undefined }
 
-/** The unit is part of the label for screen readers; a field taking negatives stays a native number input, as `NumberInput` always sets `inputMode="decimal"` and the iOS decimal keypad has no minus key. */
+/** The unit is part of the label for screen readers; a field taking negatives stays a native number input, as `NumberInput` defaults to `inputMode="decimal"` and the iOS decimal keypad has no minus key. */
 export function NumberField({
   spec,
   system,

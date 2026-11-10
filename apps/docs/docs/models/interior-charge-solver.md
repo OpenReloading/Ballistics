@@ -7,6 +7,7 @@ description: The charge at which one M3 interior run reaches a target peak press
 # Charge for a target value
 
 `solveCharge` finds the charge at which one [M3](interior-m3.md) run reaches a target value of one quantity: peak breech pressure, muzzle velocity, load ratio, barrel time or bullet lead time.
+
 1. A scan over the charges the case allows brackets the target.
 2. A bracketed root find runs `interior` at candidate charges until the run's value lies within a relative tolerance of the target.
 

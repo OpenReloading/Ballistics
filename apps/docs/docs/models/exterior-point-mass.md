@@ -71,6 +71,7 @@ $$
 $$
 
 Code: `packages/ballistics/src/exterior/trajectory.ts`, `earthRotation`, `earthRotationRate`, `pointMassRhs`.
+
 - The vertical component $\Omega_E\sin\varphi$ deflects the bullet sideways (right in the northern hemisphere).
 - The horizontal component gives the Eotvos effect: fire to the east rises, fire to the west drops.
 - The acceleration is integrated with the other terms, so the air turning with the Earth also damps the deflection through the drag.

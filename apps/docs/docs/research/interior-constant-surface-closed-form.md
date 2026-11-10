@@ -15,6 +15,7 @@ Interior ballistics: does the numerical run of the [M3 model](../models/interior
 A synthetic rifle case with a constant form function, pressure exponent 1, covolume equal to the inverse of the solid density, no bore resistance, no twist and a Sébert gradient (a single factor $s$ for both coefficients): chamber volume $3.4 \cdot 10^{-6}$ m³, bore area $3.75 \cdot 10^{-5}$ m², travel 0.6 m, projectile 0.0095 kg, charge 0.0028 kg, specific energy $3.9 \cdot 10^{6}$ J/kg, $k = 1.23$, solid density 1600 kg/m³, vivacity 0.56 at a reference pressure of 98066.5 Pa and $s = 0.5$.
 
 Accept rules, set in the test:
+
 - relative difference below $10^{-5}$ for peak pressure, travel of the peak, burnout travel and muzzle velocity, at an ignition pressure of 100 Pa;
 - along the barrel, for every point with a burnt fraction $z \ge 0.1$, relative difference below $2 \cdot 10^{-6}/z$ in velocity, and in mean pressure up to burnout (the ignition gas shifts the numerical solution by a multiple of $z_0/z$);
 - the largest deviation of peak pressure and muzzle velocity falls by a factor of more than 5 at each step of the ignition pressure through $10^{5}$, $10^{4}$, $10^{3}$ and $10^{2}$ Pa.

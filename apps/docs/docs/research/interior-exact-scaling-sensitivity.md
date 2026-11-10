@@ -13,6 +13,7 @@ Interior model: does `interior` agree with the exact solution of the constant-su
 ## Method
 
 Four checks in `packages/ballistics/test/interior-exact.test.ts`:
+
 1. The exact solution below, integrated with a fixed-step Runge-Kutta rule (4000 steps, changing by less than $10^{-12}$ at 8000), against peak mean pressure, burnout travel and muzzle velocity of `interior`, for covolume 0, 1.0 and 1.2 $\cdot 10^{-3}$ m³/kg and start pressure 25 and 40 MPa (ignition pressure 1 MPa). Accept: relative difference below $10^{-8}$.
 2. A rifle load with a seven-perforation grain, engraving and friction resistance, twist and a start pressure, scaled by $s$ = 0.5, 2 and 5, heat model off. Accept: peak pressure and muzzle velocity within $10^{-6}$ relative to $s = 1$, barrel time within $10^{-6}$ of $s$ times the $s = 1$ value.
 3. Central differences ($\pm$ 0.5 %) of the muzzle velocity against chamber volume and against barrel length for the fixture load and a second rifle load. Accept: the slope against volume within 5 % of the relation below.

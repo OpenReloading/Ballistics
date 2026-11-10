@@ -19,6 +19,7 @@ User records: where do the derived load and firearm views go (columns, notes and
 ## Formulas
 
 No model equations. The filter keeps a discipline $d$ for a firearm $f$ when
+
 - $k(c_f) \in K_d$, with $c_f$ the cartridge of the firearm, $k$ the one caliber class whose member list names it, and $K_d$ the caliber classes the discipline states.
 
 A cartridge in no class has no $k$, and a discipline that states no class has no $K_d$: neither is matched, and neither is shown as not allowed.
@@ -55,6 +56,7 @@ Verdicts: place option 1 (existing pages) passes; option 2 (an overview page) an
 ## Result
 
 no change. Nothing was built; the review recommends:
+
 - Place: columns, notes, a link, prints and CSV on the existing pages. The filter becomes a link from the firearm's row to the discipline list with its caliber class filter set, so the discipline list gets no new control. It is labeled as the disciplines that name the class, not as the disciplines the firearm may shoot, because 172 disciplines state no class. A firearm whose cartridge is in no class (or is the user's own cartridge) gets no link.
 - Order: the Saved loads line and firearm list column (firearm, sessions, last session), gap and cartridge mismatch notes, CSV export, the discipline link, the dope card per firearm. Loads side by side and the data quality notes wait for the owner: the first is a new page, the second has no defined set of fields yet.
 - No stored field: the firearm keeps its cartridge and no category. A category stays additive if the list's category filter proves too coarse in use.

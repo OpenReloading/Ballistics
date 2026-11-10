@@ -1,11 +1,10 @@
-/// <reference types="node" />
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import sharp from 'sharp'
 import { describe, expect, it } from 'vitest'
-import { autoDetect, detectFromExample, type HoleProposal } from '../src/lib/hole-detection.ts'
-import { isMaybe } from '../src/lib/hole-proposals.ts'
-import type { RgbaImage } from '../src/lib/image.ts'
+import type { HoleProposal } from '../src/hole-detection.ts'
+import type { RgbaImage } from '../src/image.ts'
+import { holeDetector } from '../src/inference-port.ts'
 
 // Recall on the committed synthetic photos (test/fixtures/target-photos, made by make.mts): scanned and phone photos of light and dark faces whose holes show 0.7 to 0.8 of the bullet.
 const dir = join(import.meta.dirname, 'fixtures', 'target-photos')
@@ -37,7 +36,7 @@ function score(found: readonly HoleProposal[], f: Fixture) {
   const pairs = f.holes
     .flatMap((h, i) => found.map((p, j) => ({ i, j, d: Math.hypot(p.x - h.x, p.y - h.y) })))
     .filter((q) => q.d <= f.visibleDiameterPx / 2)
-    .sort((a, b) => a.d - b.d)
+    .toSorted((a, b) => a.d - b.d)
   const [holes, props] = [new Set<number>(), new Set<number>()]
   for (const q of pairs) {
     if (holes.has(q.i) || props.has(q.j)) continue
@@ -50,8 +49,9 @@ function score(found: readonly HoleProposal[], f: Fixture) {
 /** The proposals at or above the confidence tier lose no hole and add no false proposal. */
 function expectTierKeeps(found: readonly HoleProposal[], f: Fixture) {
   const all = score(found, f)
+  // under 0.5 is the web app's maybe tier
   const sure = score(
-    found.filter((p) => !isMaybe(p)),
+    found.filter((p) => !(p.confidence < 0.5)),
     f,
   )
   expect(sure.recall).toBe(all.recall)
@@ -65,13 +65,16 @@ describe('hole detection on the fixture photos', () => {
       const image = await load(file)
       const pxPerM = f.pxPerMm * 1000
       for (const at of f.holes) {
-        const found = detectFromExample(
-          { image, pxPerM, expectedHoleDiameter: f.caliberMm / 1000 },
+        const found = await holeDetector.propose({
+          image,
+          pxPerM,
+          expectedHoleDiameter: f.caliberMm / 1000,
           at,
-        )
-        expect(found).toBeDefined()
-        if (!found) return
-        expect(Math.abs(found.holeDiameter / (f.visibleDiameterPx / pxPerM) - 1)).toBeLessThan(0.25)
+        })
+        expect(found.holeDiameter).toBeDefined()
+        expect(
+          Math.abs((found.holeDiameter ?? 0) / (f.visibleDiameterPx / pxPerM) - 1),
+        ).toBeLessThan(0.25)
         const s = score(found.proposals, f)
         expect(s.recall).toBeGreaterThanOrEqual(0.8)
         // a black center of about 2.7 holes across reads as a cluster of holes (scan-light.jpg, phone-light.jpg)
@@ -83,19 +86,19 @@ describe('hole detection on the fixture photos', () => {
   // auto detection without a picked hole, on light and dark faces
   for (const [file, f] of fixtures)
     it(`auto detection finds the holes of ${file}`, async () => {
-      const found = autoDetect({
+      const found = await holeDetector.propose({
         image: await load(file),
         pxPerM: f.pxPerMm * 1000,
         expectedHoleDiameter: f.caliberMm / 1000,
+        auto: true,
       })
-      expect(found).toBeDefined()
-      if (!found) return
+      expect(found.holeDiameter).toBeDefined()
       const s = score(found.proposals, f)
       expect(s.recall).toBeGreaterThanOrEqual(0.8)
       expect(s.false).toBeLessThanOrEqual(7)
       expectTierKeeps(found.proposals, f)
       expect(
-        Math.abs(found.holeDiameter / (f.visibleDiameterPx / (f.pxPerMm * 1000)) - 1),
+        Math.abs((found.holeDiameter ?? 0) / (f.visibleDiameterPx / (f.pxPerMm * 1000)) - 1),
       ).toBeLessThan(0.25)
     })
 })
@@ -109,12 +112,13 @@ describe('hole detection on a dark face with dark holes', () => {
     expect(file && f).toBeTruthy()
     if (!(file && f)) return
     expect(f.holes).toHaveLength(10)
-    const found = autoDetect({
+    const found = await holeDetector.propose({
       image: await load(file),
       pxPerM: f.pxPerMm * 1000,
       expectedHoleDiameter: f.caliberMm / 1000,
+      auto: true,
     })
-    const s = score(found?.proposals ?? [], f)
+    const s = score(found.proposals, f)
     expect(s.recall).toBeGreaterThanOrEqual(0.8)
     expect(s.false).toBe(0)
   })

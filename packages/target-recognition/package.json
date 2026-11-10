@@ -2,7 +2,7 @@
   "name": "@open-reloading/target-recognition",
   "version": "0.0.0",
   "private": true,
-  "description": "Recognition on target photos: raster operations on working images and a multi-scale blob detector.",
+  "description": "Hole proposals on target photos through an inference port, with the raster operations and the blob detector they are built on.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -45,6 +45,7 @@
     "oxlint": "catalog:",
     "oxlint-tsgolint": "catalog:",
     "publint": "catalog:",
+    "sharp": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

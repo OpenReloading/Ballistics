@@ -13,6 +13,7 @@ Exterior ballistics, [stability](../models/exterior-stability.md): the trajector
 ## Method
 
 Three comparisons on the same flights, fixed before the run.
+
 1. Named cases: two .224 in loads that the warning flagged, three .308 in and 7.82 mm loads, and a 9.5 g 7.82 mm case. An unstated bullet length is solved from the stated Miller value at the muzzle (standard sea-level air), and the G7 ballistic coefficient so that the stated speed or along-path value is reproduced; where nothing is stated, both are assumed and marked.
 2. A synthetic grid of 144 bullets: calibers .224, .243, .264, .284, .308 and .338 in, sectional density 0.15, 0.20, 0.25 and 0.30 lb/in², twist 30, 40 and 54 calibers per turn, muzzle speed 2400 and 3300 ft/s. Mass is sectional density times squared caliber; length is mass over (7600 kg/m³ times the cross-section), the effective density of a jacketed lead-core boat-tail bullet; the G7 coefficient is sectional density over a form factor of 1.1. Each bullet is flown over 0 to 1500 m in 25 m steps at standard sea-level air, zeroed at 100 m, once with the coefficient as stated and once at 80 and 120 percent of it.
 3. The factor of the modified point mass ([modified point mass](../models/exterior-modified-point-mass.md)), with the constant moment slope it estimates from Miller's muzzle value, a spin damping coefficient of $-0.012$ and the speed, spin and air density of each point, against the along-path Miller value. The mean absolute difference is taken over 0 to 1000 m in 25 m steps.
