@@ -13,12 +13,10 @@ strictPeerDependencies: true
 # Exact versions, except zod: the published libraries depend on it, and `pnpm pack` writes the catalog's range.
 catalog:
   "@arethetypeswrong/cli": 0.18.5
-  # every @mantine package, so one upgrade moves them together: the MCP server of .mcp.json too, and the same
-  # upgrade copies .claude/skills/mantine-form anew from github.com/mantinedev/skills (now at commit 607846d)
+  # every @mantine package, so one upgrade moves them together
   "@mantine/core": 9.7.4
   "@mantine/form": 9.7.4
   "@mantine/hooks": 9.7.4
-  "@mantine/mcp-server": 9.7.4
   "@mantine/spotlight": 9.7.4
   "@microsoft/api-extractor": 7.60.1
   "@playwright/test": 1.64.1
