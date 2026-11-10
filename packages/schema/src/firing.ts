@@ -23,7 +23,8 @@ const firingSeriesParser = z
       })
       .refine((v) => v.mean !== undefined || v.shots !== undefined, {
         message: 'a mean or single shots',
-      }),
+      })
+      .meta({ anyOf: [{ required: ['mean'] }, { required: ['shots'] }] }),
     pressure: z
       .object({
         method: pressureMethod,

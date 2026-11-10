@@ -358,6 +358,9 @@ const bulletOgive = z
   .refine((o) => Boolean(o.form || o.radius || o.radiusRatio), {
     message: 'needs a form, a radius or Rt/R',
   })
+  .meta({
+    anyOf: [{ required: ['form'] }, { required: ['radius'] }, { required: ['radiusRatio'] }],
+  })
 
 /** Slack of the cannelure checks, mm, for a groove that ends exactly on a shank end. */
 const lengthTolerance = 1e-9

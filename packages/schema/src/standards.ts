@@ -65,6 +65,7 @@ const specValueParser = z
   .refine((v) => v.value !== undefined || v.raw !== undefined, {
     message: 'a value needs value or raw',
   })
+  .meta({ anyOf: [{ required: ['value'] }, { required: ['raw'] }] })
 
 /**
  * One value as a standard publishes it: a dimension, a pressure, an energy or a measuring position.

@@ -122,6 +122,7 @@ const magazineLimit = z
   .refine((m) => m.maxRounds !== undefined || m.maxLength !== undefined, {
     message: 'a magazine limit needs maxRounds or maxLength',
   })
+  .meta({ anyOf: [{ required: ['maxRounds'] }, { required: ['maxLength'] }] })
 
 const eventTypeParser = z.strictObject({
   id: recordId,
