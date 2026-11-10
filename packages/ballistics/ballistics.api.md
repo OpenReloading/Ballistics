@@ -639,6 +639,7 @@ export interface InteriorLoad {
         boreArea: number;
         boreDiameter: number;
         throatWear?: number | undefined;
+        area?: number | undefined;
     };
     charge: number;
     gradient?: {

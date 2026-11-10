@@ -28,6 +28,8 @@ export interface InteriorLoad {
     boreDiameter: number
     /** Throat wear, m: the length a worn throat adds behind the bullet, times the bore area added to `volume`; default 0 (`apps/docs/docs/models/interior-m3.md`, "Throat wear"). */
     throatWear?: number | undefined
+    /** Cross-section area of the chamber body, m2: given, the pressure gradient takes its chambrage form; absent, the chamber counts as a cylinder of the bore area (`apps/docs/docs/models/interior-m3.md`, "Chambrage"). */
+    area?: number | undefined
   }
   barrel: {
     /** Projectile travel from the seated position to the muzzle, m. */
@@ -321,13 +323,23 @@ function heatValid(heat: InteriorLoad['heat']): boolean {
   )
 }
 
-/** Checks of the bullet's resistance, the gas gradient and the heat loss. */
+/** Checks of the bullet's resistance, the chamber area, the gas gradient and the heat loss. */
 function resistanceChecks(load: InteriorLoad): Check[] {
-  const { resistance, gradient, heat } = load
+  const { resistance, chamber, gradient, heat } = load
   return [
     ['resistance.friction', resistance?.friction === undefined || nonNeg(resistance.friction)],
     ['resistance.engraving', engravingValid(resistance?.engraving ?? [])],
-    ['gradient', gradient === undefined || (nonNeg(gradient.energy) && nonNeg(gradient.breech))],
+    [
+      'chamber.area',
+      chamber.area === undefined ||
+        (Number.isFinite(chamber.area) && chamber.area >= chamber.boreArea),
+    ],
+    // the chambrage form exists for the Lagrange coefficients only
+    [
+      'gradient',
+      gradient === undefined ||
+        (chamber.area === undefined && nonNeg(gradient.energy) && nonNeg(gradient.breech)),
+    ],
     ['heat', heatValid(heat)],
   ]
 }
@@ -378,6 +390,29 @@ function burnCoefficient(load: InteriorLoad, form: ReturnType<typeof burnForm>):
     : (burn.vivacity * tauT) / burn.referencePressure ** n
 }
 
+/** The chambrage gradient over travel x with g = 1 - (A / A_chamber)^2 and f = V_0 / V, null without `chamber.area` (`apps/docs/docs/models/interior-m3.md`, "Chambrage"). */
+function chambrageOf(load: InteriorLoad, vc: number, mpr: number) {
+  const { area: chamberArea, boreArea: area } = load.chamber
+  if (chamberArea === undefined) return null
+  const mc = load.charge
+  const g = 1 - (area / chamberArea) ** 2
+  const f = (x: number) => vc / (vc + area * x)
+  const delta = (x: number) => (1 - g * f(x) ** 3) / 3
+  const eps = (x: number) => (1 - g * f(x) ** 2) / 2
+  const me = (x: number) => mpr + delta(x) * mc
+  /** Acceleration, base and breech pressure at mean pressure p, resistance force fr, travel x and velocity v. */
+  const motion = (p: number, fr: number, x: number, v: number) => {
+    const volume = vc + area * x
+    // (1/2) m_c (d delta / dx) v^2: the inertia grows as gas moves from the chamber into the bore
+    const a = (area * p - fr - 0.5 * mc * g * f(x) ** 3 * (area / volume) * v * v) / me(x)
+    const base = (mpr * a + fr) / area
+    // the gas speeds up at the step into the bore: a Bernoulli drop behind the base
+    const breech = base + (eps(x) * mc * a) / area + 0.5 * (mc / volume) * g * f(x) ** 2 * v * v
+    return { a, base, breech }
+  }
+  return { delta, me, motion }
+}
+
 /** Effective mass, burn-law coefficient, reference velocity vr and time ts; `chamberVolume` when solid or covolume fill the chamber (`apps/docs/docs/models/interior-m3.md`, "Scaled state and integration"). */
 function scaleInteriorLoad(load: InteriorLoad) {
   const { chamber, barrel, bullet, propellant } = load
@@ -408,7 +443,8 @@ function scaleInteriorLoad(load: InteriorLoad) {
   // scaled state [f, x/xe, v/vr, Wr/E0, Eh/E0], with leakage also [ml/mc, El/E0], and time tau = t / ts
   const vr = Math.sqrt((2 * e0) / mp)
   const ts = xe / vr
-  return { vc, area, d, xe, mp, mc, k, eta, solid, e0, mpr, delta, eps, me, form, n, coef, vr, ts }
+  const scales = { vc, area, d, xe, mp, mc, k, eta, solid, e0, mpr, delta, eps, me, form, n, coef }
+  return { ...scales, vr, ts, chambrage: chambrageOf(load, vc, mpr) }
 }
 
 type Scaling = Exclude<ReturnType<typeof scaleInteriorLoad>, InteriorInvalid>
@@ -472,7 +508,7 @@ function gasConstantOf(load: InteriorLoad, k: number) {
 
 /** The free volume behind the bullet, the mean pressure and the gas temperature of a scaled state. */
 function gasOf(s: Scaling, { leak, lostMass }: Leakage, gasR: number) {
-  const { vc, area, xe, mc, k, eta, solid, e0, me, form, vr } = s
+  const { vc, area, xe, mc, k, eta, solid, e0, form, vr, chambrage } = s
   // the leak terms are separate summands, exactly 0 without leakage, so those results stay bit-identical
   const freeVolume = (z: number, x: number, lost: number) =>
     vc + area * x - solid * (1 - z) - eta * mc * z + eta * lost
@@ -480,6 +516,7 @@ function gasOf(s: Scaling, { leak, lostMass }: Leakage, gasR: number) {
     const z = form.z(el(y, 0))
     const v = el(y, 2) * vr
     const leaked = leak ? el(y, 6) : 0
+    const me = chambrage ? chambrage.me(el(y, 1) * xe) : s.me
     return (
       ((k - 1) * (e0 * (z - el(y, 3) - el(y, 4) - leaked) - 0.5 * me * v * v)) /
       freeVolume(z, el(y, 1) * xe, lostMass(y))
@@ -564,11 +601,15 @@ function pressuresOf(
     basePressure: (p: number, fr: number) => number
   },
 ) {
-  const { area, xe, mc, eps, me } = s
+  const { area, xe, mc, eps, me, vr, chambrage } = s
   return (y: Float64Array): [number, number, number] => {
     const p = f.pressure(y)
     if (!phase.moving) return [p, p, p]
     const fr = f.resistance(el(y, 1) * xe)
+    if (chambrage) {
+      const { base, breech } = chambrage.motion(p, fr, el(y, 1) * xe, el(y, 2) * vr)
+      return [p, base, breech]
+    }
     const pb = f.basePressure(p, fr)
     return [p, pb, pb + (eps * mc * ((area * p - fr) / me)) / area]
   }
@@ -613,7 +654,7 @@ type Gas = ReturnType<typeof gasState>
 
 /** Right-hand side of the scaled state (`apps/docs/docs/models/interior-m3.md`, "Scaled state and integration"). */
 function interiorRhs(s: Scaling, gas: Gas, phase: Phase): Rhs {
-  const { area, xe, e0, me, form, n, coef, vr, ts } = s
+  const { area, xe, e0, me, form, n, coef, vr, ts, chambrage } = s
   const { pressure, resistance, heatFlux, basePressure, leakRates, leak } = gas
   return (_t, y, dy) => {
     const p = pressure(y)
@@ -626,11 +667,12 @@ function interiorRhs(s: Scaling, gas: Gas, phase: Phase): Rhs {
     const x = el(y, 1) * xe
     const v = el(y, 2) * vr
     const fr = resistance(x)
+    const m = chambrage?.motion(p, fr, x, v)
     dy[1] = el(y, 2)
-    dy[2] = (((area * p - fr) / me) * ts) / vr
+    dy[2] = m ? (m.a * ts) / vr : (((area * p - fr) / me) * ts) / vr
     dy[3] = (fr * v * ts) / e0
     dy[4] = (heatFlux(y, p) * ts) / e0
-    if (leak) leakRates(y, p, basePressure(p, fr), dy)
+    if (leak) leakRates(y, p, m ? m.base : basePressure(p, fr), dy)
   }
 }
 
@@ -729,10 +771,11 @@ function interiorEvents(m: RunModel, size: number, closed: boolean) {
 
 /** Energy split at the final state y (`InteriorEnergy`). */
 function energyBalance(s: Scaling, gas: Gas, y: Float64Array): InteriorEnergy {
-  const { xe, mp, mc, k, e0, mpr, delta, form, vr } = s
+  const { xe, mp, mc, k, e0, mpr, form, vr, chambrage } = s
   const { pressure, freeVolume, lostMass, leak } = gas
   const p = pressure(y)
   const v = el(y, 2) * vr
+  const delta = chambrage ? chambrage.delta(el(y, 1) * xe) : s.delta
   return {
     gas: (p * freeVolume(form.z(el(y, 0)), el(y, 1) * xe, lostMass(y))) / (k - 1),
     translation: 0.5 * mp * v * v,
