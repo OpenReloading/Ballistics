@@ -29,10 +29,10 @@
     "postinstall": "node hooks/install.mjs"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.4",
-    "@mantine/mcp-server": "9.7.4",
+    "@biomejs/biome": "2.6.6",
+    "@mantine/mcp-server": "9.7.5",
     "eslint-plugin-regexp": "3.3.3",
-    "knip": "^6.43.0",
+    "knip": "^6.44.2",
     "oxlint": "catalog:"
   }
 }
