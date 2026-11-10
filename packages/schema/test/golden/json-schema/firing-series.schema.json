@@ -113,6 +113,18 @@
       },
       "required": [
         "point"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "mean"
+          ]
+        },
+        {
+          "required": [
+            "shots"
+          ]
+        }
       ]
     },
     "pressure": {
