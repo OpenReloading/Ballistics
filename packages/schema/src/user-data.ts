@@ -473,6 +473,7 @@ const ringSeries = z
         Math.round(shots.reduce((sum, v) => sum + v * 10, 0)) === Math.round(total * 10)),
     'A series needs its shots or its total, in tenths at most, agreeing when both are given.',
   )
+  .meta({ anyOf: [{ required: ['shots'] }, { required: ['total'] }] })
 
 const method = 'Scoring method of the event type.'
 
@@ -611,6 +612,7 @@ const shootingLogEntryParser = z
     (e) => e.load === undefined || e.ammunition === undefined,
     'Give a load or factory ammunition, not both.',
   )
+  .meta({ not: { required: ['load', 'ammunition'] } })
 
 /**
  * One entry of the shooting log (Schiessbuch): a range day of the person, as their own record.

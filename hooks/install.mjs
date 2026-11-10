@@ -1,8 +1,4 @@
-// Installs `hooks/pre-commit` into the hooks folder of this repository (root `postinstall`).
-// The hook is a stub that runs the script of the checkout it is called in, so one install serves
-// every git worktree. It never sets `core.hooksPath` and never overwrites a hook it did not write:
-// a contributor's own hooks path or pre-commit hook (an edited stub too) wins, with a one-line
-// message. Never fails the install.
+// Installs `hooks/pre-commit` into this repository's hooks folder (root `postinstall`) as a stub that runs the script of the checkout it is called in, so one install serves every git worktree; it never sets `core.hooksPath`, never overwrites a hook it did not write (a contributor's own hooks path or pre-commit hook, an edited stub too, wins with a one-line message) and never fails the install.
 import { execFileSync } from 'node:child_process'
 import {
   chmodSync,

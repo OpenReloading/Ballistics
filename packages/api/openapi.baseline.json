@@ -486,7 +486,18 @@
                           "unit": "1"
                         }
                       },
-                      "additionalProperties": false
+                      "additionalProperties": false,
+                      "anyOf": [
+                        {
+                          "required": ["form"]
+                        },
+                        {
+                          "required": ["radius"]
+                        },
+                        {
+                          "required": ["radiusRatio"]
+                        }
+                      ]
                     },
                     "cannelure": {
                       "type": "object",
@@ -1685,7 +1696,15 @@
                           }
                         },
                         "required": ["symbol", "quantity"],
-                        "additionalProperties": false
+                        "additionalProperties": false,
+                        "anyOf": [
+                          {
+                            "required": ["value"]
+                          },
+                          {
+                            "required": ["raw"]
+                          }
+                        ]
                       }
                     },
                     "exceptions": {
@@ -3689,7 +3708,15 @@
                           }
                         },
                         "required": ["division"],
-                        "additionalProperties": false
+                        "additionalProperties": false,
+                        "anyOf": [
+                          {
+                            "required": ["maxRounds"]
+                          },
+                          {
+                            "required": ["maxLength"]
+                          }
+                        ]
                       }
                     },
                     "movingTargets": {
@@ -19604,7 +19631,15 @@
                                                 "description": "Footnote numbers printed next to the symbol."
                                               }
                                             },
-                                            "required": ["symbol", "quantity"]
+                                            "required": ["symbol", "quantity"],
+                                            "anyOf": [
+                                              {
+                                                "required": ["value"]
+                                              },
+                                              {
+                                                "required": ["raw"]
+                                              }
+                                            ]
                                           }
                                         },
                                         {
@@ -25124,7 +25159,15 @@
                                                 "description": "Reference `user:<UUID>` to a target sheet of the user."
                                               }
                                             },
-                                            "additionalProperties": false
+                                            "additionalProperties": false,
+                                            "anyOf": [
+                                              {
+                                                "required": ["shots"]
+                                              },
+                                              {
+                                                "required": ["total"]
+                                              }
+                                            ]
                                           },
                                           "description": "Series in the order shot."
                                         }
@@ -25403,6 +25446,9 @@
                               },
                               "required": ["date", "rounds"],
                               "additionalProperties": false,
+                              "not": {
+                                "required": ["load", "ammunition"]
+                              },
                               "description": "An entry of the shooting log, the person's own record."
                             }
                           },
