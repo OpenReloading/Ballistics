@@ -37,7 +37,7 @@ export type PooledTarget = Omit<PooledSession, 'ladder'>
 export type PooledRequest = 'burnRate' | 'temperatureFactor'
 
 /** Gaussian priors of the per-powder parameters, by powder name, in the form of `PowderPrior`. */
-type PooledPriors = Readonly<
+export type PooledPriors = Readonly<
   Record<string, Partial<Record<PooledRequest, PowderPrior | undefined>> | undefined>
 >
 
@@ -57,16 +57,18 @@ export interface PooledFitOptions {
   maxCondition?: number | undefined
   /** Integration settings of every `interior` run; default `interiorDefaults`. */
   options?: Settings<InteriorOptions> | undefined
+  /** The model every run of the fit calls, default the core `interior`; `predictPooled` and `calibratePooled` run the core model. */
+  interior?: typeof interior | undefined
 }
 
 /** Assumptions: a rifle moves the velocity by about 1 %, a lot the burn coefficient by about 3 %. */
 const pooledDefaults = { rifleSigma: 0.01, lotSigma: 0.03 }
 
 /** A powder's burn coefficient or temperature factor, a rifle's velocity factor, a lot's factor on its powder's burn coefficient. */
-type PooledParameterKind = 'burnRate' | 'temperatureFactor' | 'rifle' | 'lot'
+export type PooledParameterKind = 'burnRate' | 'temperatureFactor' | 'rifle' | 'lot'
 
 /** A fitted parameter of the pooled fit. Factors start at 1. */
-interface PooledPowderParameter {
+export interface PooledPowderParameter {
   /** Which parameter. */
   kind: PooledParameterKind
   /** The powder (burn coefficient, temperature factor, lot) or the rifle it belongs to. */
@@ -82,7 +84,7 @@ interface PooledPowderParameter {
 }
 
 /** Observed and predicted velocity of one ladder point after the fit. */
-interface PooledResidual {
+export interface PooledResidual {
   /** Index of the session in the input. */
   session: number
   /** Charge mass, kg. */
@@ -347,6 +349,8 @@ interface PooledProblem {
   priorRows: ReturnType<typeof priorRowsOf>
   rows: PooledRow[]
   options: Settings<InteriorOptions> | undefined
+  /** The model the runs call. */
+  interior: typeof interior
   /** Last interior velocity per session and charge; a rifle step reuses it. */
   cache: Map<string, { burn: number; factor: number; velocity: number }>
   /** Model runs so far. */
@@ -367,7 +371,7 @@ function pooledVelocity(
   let hit = problem.cache.get(key)
   if (hit?.burn !== b || hit.factor !== factor) {
     problem.runCount++
-    const r = interior(targetLoad(s, row.x.charge, b, factor), problem.options)
+    const r = problem.interior(targetLoad(s, row.x.charge, b, factor), problem.options)
     if (!r.valid) return null
     hit = { burn: b, factor, velocity: r.muzzleVelocity }
     problem.cache.set(key, hit)
@@ -459,7 +463,7 @@ function pooledProblem(
   sessions: readonly PooledSession[],
   parameters: readonly PooledStart[],
   priorRows: PooledProblem['priorRows'],
-  options: Settings<InteriorOptions> | undefined,
+  options: Pick<PooledFitOptions, 'options' | 'interior'>,
 ): PooledProblem {
   return {
     sessions,
@@ -473,7 +477,8 @@ function pooledProblem(
         indices: sessionIndices(parameters, s),
       })),
     ),
-    options,
+    options: options.options,
+    interior: options.interior ?? interior,
     cache: new Map(),
     runCount: 0,
   }
@@ -539,7 +544,7 @@ export function fitPowderPooled(
     sessions,
     parameters,
     priorRowsOf(parameters, priors, rifleSigma, lotSigma),
-    options.options,
+    options,
   )
   const fit = solvePooled(problem, { maxIterations, maxCondition })
   return pooledFitResult(problem, fit, { held, rifleSigma, lotSigma })

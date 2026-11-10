@@ -38,7 +38,7 @@ import { fetchRecord } from '../lib/api-fetch.ts'
 import type { BulletSummary } from '../lib/api-types.ts'
 import { type BulletValues, bulletDrag, typedBullet } from '../lib/bullet.ts'
 import { refusalText, translateMessage } from '../lib/core-messages.ts'
-import { loadExample as exampleData } from '../lib/example-data.ts'
+import { loadExample as exampleData, exampleFirearmIn } from '../lib/example-data.ts'
 import { exampleFields } from '../lib/examples.ts'
 import {
   type FieldSpec,
@@ -1113,7 +1113,9 @@ export function TrajectoryForm({
   const [twistHand, setTwistHand] = useState<'right' | 'left'>('right')
   // from 62em the chart fills the results column's height
   const wide = useMediaQuery('(min-width: 62em)')
-  const [sights, setSights] = useState(() => sightPicker([], exampleData.firearm as UserRecord, t))
+  const [sights, setSights] = useState(() =>
+    sightPicker([], exampleFirearmIn(t) as unknown as UserRecord, t),
+  )
   const [sight, setSight] = useState('')
   const [paper, setPaper] = useState<PaperSize>('a4')
   /** The chosen firearm was gone when the list was read again. */
@@ -1282,7 +1284,7 @@ export function TrajectoryForm({
   const readSights = () => {
     storedRecords()
       .then(({ records }) => {
-        const picker = sightPicker(records, exampleData.firearm as UserRecord, t)
+        const picker = sightPicker(records, exampleFirearmIn(t) as unknown as UserRecord, t)
         setSights(picker)
         if (sight && !picker.options.some((o) => o.value === sight)) {
           setSight('')

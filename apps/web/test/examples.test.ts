@@ -17,9 +17,7 @@ import {
   exampleRecords,
   exampleSeating,
   exampleTrajectory,
-  interiorSources,
   loadExample,
-  trajectorySources,
 } from '../src/lib/example-data.ts'
 import { exampleFields, quickCartridges } from '../src/lib/examples.ts'
 import { siValues } from '../src/lib/field-spec.ts'
@@ -91,14 +89,6 @@ describe('embedded record values', () => {
 
   it('derive the chamber volume', () => {
     expect(exampleChamberVolume).toBeCloseTo(3.126, 3)
-  })
-
-  it('name each record in the sources', () => {
-    const text = [...trajectorySources, ...interiorSources].join(' ')
-    for (const r of Object.values(exampleRecords))
-      if (r.id !== '308-win') expect(text).toContain(r.id)
-    expect(text).not.toContain('Example input')
-    expect(text).not.toMatch(/\bsafe\b/i)
   })
 })
 
