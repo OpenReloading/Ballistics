@@ -195,7 +195,7 @@
     "workbench": {
       "budget": {
         "initial": 643000,
-        "total": 1060000
+        "total": 1061000
       },
       "routes": {
         "/workbench": {

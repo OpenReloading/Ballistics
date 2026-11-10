@@ -29,6 +29,7 @@
     "@open-reloading/schema": "workspace:*",
     "@open-reloading/shot-groups": "workspace:*",
     "@open-reloading/statistics": "workspace:*",
+    "@open-reloading/target-recognition": "workspace:*",
     "@open-reloading/units": "workspace:*",
     "@open-reloading/use-cases": "workspace:*",
     "@phosphor-icons/react": "2.1.10",
