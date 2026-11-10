@@ -39,7 +39,7 @@ import { bulletIncomplete, completeFirst, powderIncomplete } from '../lib/comple
 import { translateMessage } from '../lib/core-messages.ts'
 import { dayText } from '../lib/dates.ts'
 import { capacityGuide } from '../lib/docs-url.ts'
-import { loadExample } from '../lib/example-data.ts'
+import { exampleFirearmIn } from '../lib/example-data.ts'
 import { quickCartridges } from '../lib/examples.ts'
 import {
   type FieldSpec,
@@ -1536,7 +1536,7 @@ function GunPicker() {
   const { t } = useTranslation()
   const dialog = useChooser()
   const { rows, placeholder } = useMemo(
-    () => gunPicker(firearms, loadExample.firearm, t),
+    () => gunPicker(firearms, exampleFirearmIn(t), t),
     [firearms, t],
   )
   const find = useMemo(

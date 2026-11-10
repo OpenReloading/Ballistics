@@ -26,6 +26,8 @@ Each library has its own [Semantic Versioning](../release.md#versions) version.
 
 The JSON Schemas are part of the published contract: a change to them follows the [versioning rules](../release.md#versions) of the package.
 
+The JSON Schemas carry the fields, their types and bounds, and the rules of which fields must or must not be present together. Rules between values (a series total that must equal its shots) and conditional rules (a field allowed only for one base type) are checked by the Zod schemas alone.
+
 ## Example
 
 ```js

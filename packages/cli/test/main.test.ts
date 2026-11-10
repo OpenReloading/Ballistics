@@ -63,6 +63,8 @@ describe('the JSON result', () => {
       ['verify', ...data, '--leave-one-powder-out'],
       ['compare', ...data, '--group-by', 'family', '--baseline', 'm3', '--candidate', worse],
       ['compare', ...data, '--baseline', 'm3', '--candidate', worse],
+      ['fit', ...data],
+      ['verify', ...data, '--params', 'fit-on-training'],
     ]) {
       const { code, stdout } = await cli(args)
       expect(code).toBe(0)
@@ -143,7 +145,6 @@ describe('exit codes', () => {
     [['compare', ...data, '--baseline', 'm3']],
     [['verify', ...data, '--model', '/nonexistent/model.mjs']],
     [['verify', ...data, '--group-by', 'rifle']],
-    [['verify', ...data, '--params', 'fit-on-training']],
     [['verify', ...data, '--params', 'other']],
     [['verify', '--rows', rowsPath, '--records', '/nonexistent/records']],
     [['verify', ...data, '--records', rowsPath]],

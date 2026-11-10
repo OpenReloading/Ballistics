@@ -453,6 +453,9 @@ export interface FiringSite {
 export function fitPowder(load: InteriorLoad, ladder: readonly LadderPoint[], options?: PowderFitOptions): PowderFit;
 
 // @public
+export function fitPowderPooled(sessions: readonly PooledSession[], options?: PooledFitOptions): PooledPowderFit;
+
+// @public
 export function fitPowderSessions(load: InteriorLoad, sessions: readonly PowderSession[], options?: PowderFitOptions): PowderSessionsFit;
 
 // @public
@@ -977,6 +980,80 @@ export type PlanRefusalId = 'single-range' | 'velocity-only';
 
 // @public
 export function planTruingStrings(input: TruingPlanInput, options?: RangeStringOptions): TruingPlan;
+
+// @public
+export interface PooledFitOptions {
+    interior?: typeof interior | undefined;
+    lotSigma?: number | undefined;
+    maxCondition?: number | undefined;
+    maxIterations?: number | undefined;
+    options?: Settings<InteriorOptions> | undefined;
+    parameters?: readonly PooledRequest[] | undefined;
+    priors?: PooledPriors | undefined;
+    rifleSigma?: number | undefined;
+}
+
+// @public
+export type PooledParameterKind = 'burnRate' | 'temperatureFactor' | 'rifle' | 'lot';
+
+// @public
+export interface PooledPowderFit {
+    calibrationStrings: number;
+    chiSquare: number;
+    conditionNumber: number;
+    correlation: number[][];
+    covariance: number[][];
+    dataChiSquare: number;
+    degreesOfFreedom: number;
+    held: {
+        powder: string;
+        name: 'temperatureFactor';
+    }[];
+    iterations: number;
+    lotSigma: number;
+    modelError: number;
+    parameters: PooledPowderParameter[];
+    residuals: PooledResidual[];
+    rifleSigma: number;
+    runCount: number;
+    sessions: Pick<PooledSession, 'powder' | 'rifle' | 'lot'>[];
+}
+
+// @public
+export interface PooledPowderParameter {
+    group: string;
+    initial: number;
+    kind: PooledParameterKind;
+    lot?: string;
+    standardUncertainty: number;
+    value: number;
+}
+
+// @public
+export type PooledPriors = Readonly<Record<string, Partial<Record<PooledRequest, PowderPrior | undefined>> | undefined>>;
+
+// @public
+export type PooledRequest = 'burnRate' | 'temperatureFactor';
+
+// @public
+export interface PooledResidual {
+    charge: number;
+    observed: number;
+    predicted: number;
+    residual: number;
+    session: number;
+}
+
+// @public
+export interface PooledSession {
+    barrelLength?: number | undefined;
+    ladder: readonly LadderPoint[];
+    load: InteriorLoad;
+    lot?: string | undefined;
+    powder: string;
+    propellantTemperature?: number | undefined;
+    rifle: string;
+}
 
 // @public
 export type PowderAxis = 'charge' | 'velocity' | 'pressure' | 'boreDiameter' | 'barrelLength';

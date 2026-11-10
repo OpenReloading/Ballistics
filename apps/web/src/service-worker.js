@@ -1,7 +1,4 @@
-// The service worker of the offline layer. `scripts/service-worker.mts`
-// writes it to out/sw.js after `next build`, preceded by
-// `version` (the build id), `precache` (the static output), `base` and `slash` (`appUrl`), `edition` and the
-// exports of src/lib/offline.ts. It never opens IndexedDB.
+// The service worker of the offline layer, never opening IndexedDB: `scripts/service-worker.mts` writes it to out/sw.js after `next build`, preceded by `version` (the build id), `precache` (the static output), `base` and `slash` (`appUrl`), `edition` and the exports of src/lib/offline.ts.
 
 const shell = shellCache(version, edition)
 const records = recordsCache(edition)
@@ -27,8 +24,7 @@ function store(event, name, key, res) {
 }
 
 async function fromShell(event) {
-  // this build's shell first: the manifest and icons keep their names across builds; the previous
-  // shell then answers the chunks of tabs still on that build
+  // this build's shell first, as the manifest and icons keep their names across builds; then the previous shell, for the chunks of tabs still on that build
   const cached =
     (await (await caches.open(shell)).match(event.request, { ignoreSearch: true })) ??
     (await caches.match(event.request, { ignoreSearch: true }))
