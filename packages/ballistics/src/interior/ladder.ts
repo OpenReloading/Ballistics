@@ -1,7 +1,7 @@
 import { nth } from '@open-reloading/statistics'
 import { need } from '../issue.ts'
 
-/** Charges in kg: `start + i * step` up or `start - i * step` down, multiplied so the last step carries no accumulated rounding; `around` takes an odd count centred on `start`, lowest first. */
+/** Charges in kg: `start + i * step` up or `start - i * step` down, multiplied so the last step carries no accumulated rounding; `around` takes an odd count centered on `start`, lowest first. */
 export function chargeLadder(
   start: number,
   step: number,

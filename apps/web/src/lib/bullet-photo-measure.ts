@@ -1,5 +1,5 @@
 /** Dimensions with standard uncertainties from a photographed outline (`apps/docs/docs/models/bullet-photo.md`); pure, so it runs in a worker. */
-import { fromSi } from '@open-reloading/schema'
+import { fromSi, type UserBullet } from '@open-reloading/schema'
 import { median1 } from '@open-reloading/target-recognition'
 import { msg } from '../i18n/translate.ts'
 import { type Scale, solve } from './bullet-photo.ts'
@@ -16,24 +16,8 @@ export interface Measured {
   uncertainty: number
 }
 
-/** The designer's record paths of the values a photograph gives. */
-export const photoFields = [
-  'length',
-  'diameter',
-  'bearingLength',
-  'noseLength',
-  'meplatDiameter',
-  'ogive.radius',
-  'ogive.radiusRatio',
-  'base.length',
-  'base.diameter',
-  'base.angle',
-  'cannelure.start',
-  'cannelure.width',
-  'cannelure.depth',
-] as const
-
-export type PhotoField = (typeof photoFields)[number]
+/** The designer's record paths of the values a photograph gives: the keys of a user bullet's `photo.values`. */
+export type PhotoField = keyof NonNullable<UserBullet['photo']>['values']
 
 /** What a photograph gave: the values, the forms found and what could not be told. */
 export interface BulletMeasurement {
@@ -168,13 +152,13 @@ function line(xs: number[], ys: number[]): Lsq | undefined {
   ])
 }
 
-/** The points (z, r) the circle fits are the nose's: a circle in the (r, z) plane, centre (rc, zc). */
+/** The points (z, r) the circle fits are the nose's: a circle in the (r, z) plane, center (rc, zc). */
 interface Pt {
   z: number
   r: number
 }
 
-/** Geometric fit (Coope 1993) started by the algebraic one (Kasa 1976); tangent keeps the centre at `a - rho` from the axis. */
+/** Geometric fit (Coope 1993) started by the algebraic one (Kasa 1976); tangent keeps the center at `a - rho` from the axis. */
 function circle(pts: Pt[], a: number, tangent: boolean): Lsq | undefined {
   const zm = pts.reduce((s, q) => s + q.z, 0) / pts.length
   const q = pts.map((p) => ({ z: p.z - zm, r: p.r }))

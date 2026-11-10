@@ -307,7 +307,7 @@ export function useHoleDetection({
 
   const blocked = blockedReason(sheet.photo, photo, frame, size)
 
-  /** Without a region, on the target the module finds; `auto` takes the colour axis from the region's strongest blobs, else the example's choices apply; `found` gets the proposal count. */
+  /** Without a region, on the target the module finds; `auto` takes the color axis from the region's strongest blobs, else the example's choices apply; `found` gets the proposal count. */
   async function run(auto: boolean, over?: Choices, found?: (n: number) => void) {
     const c = { ...choices, ...over }
     const hole0 = c.expectedHoleDiameter ?? size?.diameter
@@ -392,7 +392,7 @@ export function useHoleDetection({
     return list.length
   }
 
-  /** One face sets the scale, the centre and the ring scoring face (`thenDetect`: the auto run follows); faces the rings cannot tell apart are a choice; none shows what was found (step 2). */
+  /** One face sets the scale, the center and the ring scoring face (`thenDetect`: the auto run follows); faces the rings cannot tell apart are a choice; none shows what was found (step 2). */
   async function recognise(thenDetect: boolean) {
     if (!photo) return
     setProgress(0)
@@ -524,7 +524,7 @@ export function useHoleDetection({
     say(t('Detection cancelled.'))
   }
 
-  /** The example's hole size, contrast, polarity and colour become the choices (`detectFromExample`), and its proposals show. */
+  /** The example's hole size, contrast, polarity and color become the choices (`detectFromExample`), and its proposals show. */
   async function pickExample(at: Point) {
     const blob = await photoBlob()
     if (!blob || !photo || !frame?.calibration || !group) return
@@ -553,7 +553,7 @@ export function useHoleDetection({
             t('No holes found from there: click the middle of a hole clear of print.'),
             true,
           )
-        // one undo step: the example's colour, size and polarity, and the default threshold
+        // one undo step: the example's color, size and polarity, and the default threshold
         setChoice(
           {
             backing: ex.backing && hex(ex.backing),

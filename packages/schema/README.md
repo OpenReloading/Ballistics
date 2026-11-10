@@ -18,4 +18,4 @@ console.log(parseRef('catalogue:308-winchester')) // { scope: 'catalogue', id: '
 
 Documentation: https://openreloading.github.io/Ballistics/docs/libraries/schema/
 
-Licence: MIT
+License: MIT

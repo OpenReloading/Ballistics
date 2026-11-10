@@ -19,7 +19,7 @@ export type Photo = {
 type Search = {
   /** The marked region; absent: the target face, else the target the module finds in the whole turned photo. */
   region?: Point[]
-  /** The face recognised or chosen: its outline is the region and its black area the background. */
+  /** The face recognized or chosen: its outline is the region and its black area the background. */
   face?: FaceGeometry
   pxPerM: number
   /** Expected hole diameter, m. */

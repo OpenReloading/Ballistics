@@ -5,7 +5,8 @@ import type { Model } from './model.ts'
 import type { Records } from './records.ts'
 import type { Row } from './rows.ts'
 
-const sha256 = (data: string | Uint8Array) => createHash('sha256').update(data).digest('hex')
+/** The hex SHA-256 of `data`, the encoding of every hash of a model version. */
+export const sha256 = (data: string | Uint8Array) => createHash('sha256').update(data).digest('hex')
 
 /** The records the rows name, with the capacity or case the run takes for each cartridge, as `<kind>/<id>` lines. */
 function recordLines(rows: readonly Row[], records: Records): string[] {
@@ -31,9 +32,14 @@ export function inputsOf(rows: readonly Row[], files: readonly Uint8Array[], rec
   }
 }
 
-/** SHA-256 over the sorted lines `<label> <sha256 of the file>` of the built sources the evaluation reads (`model.files`), and the `rows` and `records` fingerprints. */
-export function modelVersion(model: Model, inputs: ReturnType<typeof inputsOf>): string {
+/** SHA-256 over the sorted lines `<label> <sha256 of the file>` of the built sources the evaluation reads (`model.files`) with the `params` line of a fit run, and the `rows` and `records` fingerprints. */
+export function modelVersion(
+  model: Model,
+  inputs: ReturnType<typeof inputsOf>,
+  params?: string,
+): string {
   const lines = model.files.map((f) => `${f.label} ${sha256(readFileSync(f.path))}`)
+  if (params !== undefined) lines.push(params)
   return sha256(
     [...lines.toSorted(compareKeys), `rows ${inputs.rows}`, `records ${inputs.records}`].join('\n'),
   )

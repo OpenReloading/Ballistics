@@ -172,7 +172,7 @@ function standIn(id: string, mass: number, diameter: number, length: number): Bu
     provenance: {
       kind: 'derived',
       sources: [
-        { title: 'Stand-in of the command line: cartridge G1, printed mass, modelled length' },
+        { title: 'Stand-in of the command line: cartridge G1, printed mass, modeled length' },
       ],
     },
   } as Bullet

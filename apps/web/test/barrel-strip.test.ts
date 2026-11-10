@@ -20,7 +20,7 @@ describe('stripModel', () => {
     expect(m?.muzzle).toBeCloseTo(660, 9)
   })
 
-  it('frames the strip from 1 mm behind the head over the muzzle plus 2 mm, centred on the axis', () => {
+  it('frames the strip from 1 mm behind the head over the muzzle plus 2 mm, centered on the axis', () => {
     const m = stripModel(figure, 0.6)
     if (!m) throw new Error('no model')
     const [x, y, width, height] = m.view

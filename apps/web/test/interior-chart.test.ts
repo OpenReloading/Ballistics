@@ -311,7 +311,7 @@ describe('interiorOption', () => {
     const counts = o.yAxis.map((a) => a.max / a.interval)
     expect(new Set(counts).size).toBe(1)
     expect(o.xAxis.name).toBe('in')
-    // the tick labels are text, not the border colour of the axis line
+    // the tick labels are text, not the border color of the axis line
     expect(o.xAxis.axisLabel.color).toBe(theme.muted)
     expect(o.series).toHaveLength(6)
     const own = o.series.filter((s) => s.lineStyle.opacity === 1)
@@ -510,7 +510,7 @@ describe('eventLabelRows', () => {
   })
 
   it('ends the muzzle label at its line', () => {
-    // muzzle "muzzle" 0.118 wide spans [0.882, 1]; burnout 0.136 wide centred at 0.85 spans [0.782, 0.918]
+    // muzzle "muzzle" 0.118 wide spans [0.882, 1]; burnout 0.136 wide centered at 0.85 spans [0.782, 0.918]
     const rows = eventLabelRows([ev('burnout', 0.85), ev('muzzle', 1)], 1)
     expect([rows.get('muzzle'), rows.get('burnout')]).toEqual([0, undefined])
     expect(eventLabelRows([ev('burnout', 0.7), ev('muzzle', 1)], 1).get('burnout')).toBe(0)

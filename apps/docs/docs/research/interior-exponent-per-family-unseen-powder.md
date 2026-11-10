@@ -14,7 +14,7 @@ description: Whether a per-family pressure exponent still lowers the held-out ve
 
 The [validation protocol](../models/validation.md): rows split by `splitOf` of the [command line](../cli.md#split), every constant fitted on training rows only, validation rows only predicted, the test split not run. Load rows that are not in the repository, converted to the command line columns as on the validation page.
 
-For each powder and each exponent of the grid 0.7 to 1.3 (step 0.1), the vivacity factor was fitted on the powder's training rows, minimising the summed squared log error of the velocity. For a powder P of family F (base and grain form of the record), the exponent is the grid value with the least summed error over the other powders of F; P's vivacity factor is the one fitted at that exponent. A family is too small when the other powders number fewer than 3 or their training rows come from fewer than 5 cartridges; the fallback is the exponent chosen over all other powders pooled.
+For each powder and each exponent of the grid 0.7 to 1.3 (step 0.1), the vivacity factor was fitted on the powder's training rows, minimizing the summed squared log error of the velocity. For a powder P of family F (base and grain form of the record), the exponent is the grid value with the least summed error over the other powders of F; P's vivacity factor is the one fitted at that exponent. A family is too small when the other powders number fewer than 3 or their training rows come from fewer than 5 cartridges; the fallback is the exponent chosen over all other powders pooled.
 
 Accept rule, committed before any result, as in the earlier study: on the validation split the median velocity error falls by at least 0.1 percentage points and by more than twice the bootstrap standard error of the paired change of the median (resampling the validation cartridges, 2,000 draws, fixed seed), the P90 does not rise, used rows fall by less than 1 %, the fitted vivacity stays positive and fewer than 1 % of perturbed held-out loads (charge +2 %, barrel -10 %) move the velocity the wrong way. Pressure is reported and never decides. The candidate was measured with `ballistics compare --candidate`; a per-row dump of the same rows gave the bootstrap and the direction check.
 
@@ -52,7 +52,7 @@ Exponent choices: 17 of 223 powders get another exponent when their own rows are
 
 ## Result
 
-Improved, not adopted yet. Choosing the exponent without the powder's own rows passes the rule (median 3.32 to 2.88 %, P90 8.87 to 7.24 %, pressure better too) and loses only 0.03 percentage points of median against the in-sample choice, so the gain is not an artefact of fitting the predicted powder. Families with fewer than 3 other powders or 5 training cartridges take the pooled exponent; a family of 4 powders already gives an unstable exponent, so the size rule of a build should be stricter or shrink small families toward the pooled value. A powder without rows remains poorly predicted (median 13.4 %) and its change is within the bootstrap noise.
+Improved, not adopted yet. Choosing the exponent without the powder's own rows passes the rule (median 3.32 to 2.88 %, P90 8.87 to 7.24 %, pressure better too) and loses only 0.03 percentage points of median against the in-sample choice, so the gain is not an artifact of fitting the predicted powder. Families with fewer than 3 other powders or 5 training cartridges take the pooled exponent; a family of 4 powders already gives an unstable exponent, so the size rule of a build should be stricter or shrink small families toward the pooled value. A powder without rows remains poorly predicted (median 13.4 %) and its change is within the bootstrap noise.
 
 ## Data basis
 
@@ -64,6 +64,7 @@ Measured: load rows that are not in the repository, aggregates per powder family
 - `packages/ballistics/src/interior/workbench-keys.ts`, `powderModelValues`, which passes the record exponent to the model.
 - `packages/cli/src/unseen.ts`, `familyOf` and `unseenPowder`.
 - `packages/cli/src/commands.ts`, `verify` and `compare`.
+- `packages/cli/src/fit.ts`, `fit --exponent family`: an exponent per family, with small families pulled toward the pooled exponent ([command line](../cli.md#pressure-exponent-per-family)).
 - Model pages: [M3](../models/interior-m3.md), [burn laws and form functions](../models/interior-burn-forms.md), [powder fit](../models/interior-powder-fit.md), [validation](../models/validation.md).
 
 ## Confidence

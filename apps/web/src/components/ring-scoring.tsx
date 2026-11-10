@@ -69,13 +69,13 @@ const disciplineHelp = msg(
   'Sets the target, the event and with it the scored hole. Search by name, number or federation.',
 )
 const eventHelp = msg(
-  "A target no discipline names: the event's gauge is the scored hole, as the rule book says; a black-powder event scores the hole centre. Bullet: the bullet diameter of the load, else Marker.",
+  "A target no discipline names: the event's gauge is the scored hole, as the rule book says; a black-powder event scores the hole center. Bullet: the bullet diameter of the load, else Marker.",
 )
 const ringHelp = msg(
   'The ring the next marks lie on; mark the outer edge of its line. Fit needs 4 marks on 2 rings.',
 )
 const ownRuleNote = msg(
-  'Tenths in the 10 zone of this target: own rule. The 10 zone is wider than one ring and the rule book does not divide it; tenths of the ring width are counted inward from the touching edge, 10.9 for the rest of the centre.',
+  'Tenths in the 10 zone of this target: own rule. The 10 zone is wider than one ring and the rule book does not divide it; tenths of the ring width are counted inward from the touching edge, 10.9 for the rest of the center.',
 )
 
 /** A shot's value as shown: tenths where the face has them, X for an inner ten. */
@@ -142,7 +142,7 @@ function scoreStatus(o: {
       : t('Targets need the network: {id} could not be loaded.', { id: choice.id })
   if (current && typeof current === 'object' && 'error' in current) return current.error
   if (!result) return t('Loading the target…')
-  if (!choice.marks) return t('Centred on the point of aim (or the origin) at the sheet scale.')
+  if (!choice.marks) return t('Centered on the point of aim (or the origin) at the sheet scale.')
   const misfit = mmLength(system, fromSi('length', result.alignment.rms ?? 0))
   return t('Fitted to {count} marks, misfit {misfit}, scale {scale} %.', {
     count: choice.marks.length,
@@ -267,7 +267,7 @@ function EventSelect({
   )
 }
 
-/** In view units, outward from the group centre, clear of the shot marks, their numbers and each other (`placeLabel`). */
+/** In view units, outward from the group center, clear of the shot marks, their numbers and each other (`placeLabel`). */
 function shotLabels(
   frame: Frame,
   markerDiameter: number | undefined,
@@ -464,7 +464,7 @@ function fitFace(o: {
   }
 }
 
-/** The fitted face as a scale reference: its outermost marked ring, centre and edge on the photo. */
+/** The fitted face as a scale reference: its outermost marked ring, center and edge on the photo. */
 function referenceOf(
   frame: Frame | undefined,
   record: Face | undefined,
@@ -579,7 +579,7 @@ function AlignRow(p: PanelProps) {
           size={controlSize.row.button}
           variant={choice && !choice.marks ? 'filled' : 'default'}
           disabled={!record}
-          title={t('Centre the target on the point of aim (or the origin) at the sheet scale')}
+          title={t('Center the target on the point of aim (or the origin) at the sheet scale')}
           onClick={() => p.onFaceEdit((x) => x && { id: x.id, ...(x.event && { event: x.event }) })}
         >
           {t('On aim')}
@@ -599,7 +599,7 @@ function AlignRow(p: PanelProps) {
           variant="default"
           disabled={tool !== 'rings' || !canFit}
           aria-label={t('Fit target')}
-          title={t("Fit the target's centre and scale to the marks")}
+          title={t("Fit the target's center and scale to the marks")}
           onClick={p.onFit}
         >
           {t('Fit')}
@@ -745,7 +745,7 @@ function faceOf(choice: GroupFace | undefined, faces: Record<string, Face | 'err
   return { face, record: face && face !== 'error' ? face : undefined }
 }
 
-/** Alignment centred on the point of aim or fitted to points marked on its rings with the tool `rings` (`apps/docs/docs/models/ring-scoring.md`). */
+/** Alignment centered on the point of aim or fitted to points marked on its rings with the tool `rings` (`apps/docs/docs/models/ring-scoring.md`). */
 export function useRingScoring({
   sheet,
   frame,
@@ -823,7 +823,7 @@ export function useRingScoring({
   const { face, record } = faceOf(choice, faces)
   const current = group && of(group.id)
   const result = scoredOnly(current)
-  /** The ring the next mark lies on: chosen, else the third ring from the centre. */
+  /** The ring the next mark lies on: chosen, else the third ring from the center. */
   const ringValue = ring ?? record?.rings.at(-3)?.value
   /** One undo step per run of face edits of a group. */
   const setFace = (f: (x: GroupFace | undefined) => GroupFace | undefined) =>

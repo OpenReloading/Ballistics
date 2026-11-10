@@ -56,7 +56,7 @@ it('puts the text as printed and the method behind a button that keeps them as i
   expect(html([{ rows: [diameter] }])).not.toContain('<button')
 })
 
-it('is named by its caption, or by the heading it is labelled by', () => {
+it('is named by its caption, or by the heading it is labeled by', () => {
   expect(html([{ rows: [diameter] }])).toContain('<caption')
   const labelled = html([{ rows: [diameter] }], 'record-data')
   expect(labelled).not.toContain('<caption')

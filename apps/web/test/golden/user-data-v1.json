@@ -494,7 +494,24 @@
             "angle": null
           }
         },
-        "basedOnRevision": "3f9a1c07b2e4d6"
+        "basedOnRevision": "3f9a1c07b2e4d6",
+        "photo": {
+          "width": 1300,
+          "height": 640,
+          "pxPerMm": 28.04,
+          "relativeStandardUncertainty": 0.0012,
+          "scaleBasis": "ruler",
+          "values": {
+            "length": {
+              "value": 31.49,
+              "standardUncertainty": 0.05
+            },
+            "ogive.radiusRatio": {
+              "value": 1,
+              "standardUncertainty": 0.03
+            }
+          }
+        }
       },
       "imported": {
         "source": "Range notebook export",

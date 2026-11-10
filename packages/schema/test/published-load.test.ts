@@ -255,7 +255,7 @@ describe('publishedLoads charges, sources and provenance', () => {
 })
 
 describe('publishedLoads terms and primers', () => {
-  it('gives maker data no project licence, only the maker own terms', () => {
+  it('gives maker data no project license, only the maker own terms', () => {
     const own = {
       ...source,
       license: 'LicenseRef-Example-Powder',

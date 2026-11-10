@@ -139,7 +139,7 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
               value={value}
               decimalScale={unit.decimals}
               onChange={(v) => {
-                // blur normalises the text ("0.80" to 0.8) and calls this again: the same number keeps the answer
+                // blur normalizes the text ("0.80" to 0.8) and calls this again: the same number keeps the answer
                 if (!Object.is(targetNumber(v), targetNumber(value))) reset()
                 setValue(v)
               }}

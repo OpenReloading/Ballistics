@@ -204,7 +204,7 @@ describe('prior from similar powders', () => {
     expect(r.prior.sigma).toBeCloseTo(sd, 12)
   })
 
-  it('gives a weak prior on the target value below three neighbours and floors the spread', () => {
+  it('gives a weak prior on the target value below three neighbors and floors the spread', () => {
     expect(similarPowdersPrior(target, neighbours.slice(0, 2))).toEqual({
       prior: { value: 0.45, sigma: 1 },
       count: 2,

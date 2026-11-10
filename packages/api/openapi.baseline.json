@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "OpenReloading API",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "description": "Records of cartridges, components and competitions, and the exterior and interior ballistics models. Quantities are SI (m, kg, s, Pa, K, rad) unless a field names another unit. Results are simulations, not load data."
   },
   "tags": [
@@ -486,7 +486,18 @@
                           "unit": "1"
                         }
                       },
-                      "additionalProperties": false
+                      "additionalProperties": false,
+                      "anyOf": [
+                        {
+                          "required": ["form"]
+                        },
+                        {
+                          "required": ["radius"]
+                        },
+                        {
+                          "required": ["radiusRatio"]
+                        }
+                      ]
                     },
                     "cannelure": {
                       "type": "object",
@@ -1685,7 +1696,15 @@
                           }
                         },
                         "required": ["symbol", "quantity"],
-                        "additionalProperties": false
+                        "additionalProperties": false,
+                        "anyOf": [
+                          {
+                            "required": ["value"]
+                          },
+                          {
+                            "required": ["raw"]
+                          }
+                        ]
                       }
                     },
                     "exceptions": {
@@ -3689,7 +3708,15 @@
                           }
                         },
                         "required": ["division"],
-                        "additionalProperties": false
+                        "additionalProperties": false,
+                        "anyOf": [
+                          {
+                            "required": ["maxRounds"]
+                          },
+                          {
+                            "required": ["maxLength"]
+                          }
+                        ]
                       }
                     },
                     "movingTargets": {
@@ -3887,7 +3914,7 @@
         "operationId": "postExteriorRangeStringsFit",
         "tags": ["Exterior"],
         "summary": "Fit range strings",
-        "description": "Fits muzzle velocity, drag factor, click value and optionally a zero offset to the mean impacts or dialled corrections of strings at known ranges and an optional chronograph string. Answers each parameter with identifiability status, value and confidence interval, the residuals with their chi-square test and the condition of the fit.",
+        "description": "Fits muzzle velocity, drag factor, click value and optionally a zero offset to the mean impacts or dialed corrections of strings at known ranges and an optional chronograph string. Answers each parameter with identifiability status, value and confidence interval, the residuals with their chi-square test and the condition of the fit.",
         "parameters": [],
         "responses": {
           "200": {
@@ -4363,7 +4390,7 @@
                                     },
                                     "transverseInertia": {
                                       "type": "number",
-                                      "description": "Transverse moment of inertia about the centre of mass, kg m2"
+                                      "description": "Transverse moment of inertia about the center of mass, kg m2"
                                     }
                                   },
                                   "required": ["liftSlope"],
@@ -4958,7 +4985,7 @@
                                 },
                                 "transverseInertia": {
                                   "type": "number",
-                                  "description": "Transverse moment of inertia about the centre of mass, kg m2"
+                                  "description": "Transverse moment of inertia about the center of mass, kg m2"
                                 }
                               },
                               "required": ["liftSlope"],
@@ -5287,7 +5314,7 @@
                                     "type": "number"
                                   },
                                   "transverseInertia": {
-                                    "description": "Transverse moment of inertia about the centre of mass, kg m2, estimated when absent.",
+                                    "description": "Transverse moment of inertia about the center of mass, kg m2, estimated when absent.",
                                     "type": "number"
                                   }
                                 },
@@ -5433,7 +5460,7 @@
                                     "type": "number"
                                   },
                                   "transverseInertia": {
-                                    "description": "Transverse moment of inertia about the centre of mass, kg m2, estimated when absent.",
+                                    "description": "Transverse moment of inertia about the center of mass, kg m2, estimated when absent.",
                                     "type": "number"
                                   }
                                 },
@@ -5665,7 +5692,7 @@
                         "kind": {
                           "type": "string",
                           "enum": ["impact", "dial"],
-                          "description": "impact: height of the mean impact above the line of sight at the zero setting, m. dial: clicks dialled from the zero setting to centre the group, signed up."
+                          "description": "impact: height of the mean impact above the line of sight at the zero setting, m. dial: clicks dialed from the zero setting to center the group, signed up."
                         },
                         "range": {
                           "type": "number",
@@ -5821,7 +5848,7 @@
                         "type": "boolean"
                       },
                       "priors": {
-                        "description": "Gaussian priors centred on the nominal parameter values, default none.",
+                        "description": "Gaussian priors centered on the nominal parameter values, default none.",
                         "type": "object",
                         "properties": {
                           "muzzleVelocity": {
@@ -6597,7 +6624,7 @@
                                 },
                                 "transverseInertia": {
                                   "type": "number",
-                                  "description": "Transverse moment of inertia about the centre of mass, kg m2"
+                                  "description": "Transverse moment of inertia about the center of mass, kg m2"
                                 }
                               },
                               "required": ["liftSlope"],
@@ -6926,7 +6953,7 @@
                                     "type": "number"
                                   },
                                   "transverseInertia": {
-                                    "description": "Transverse moment of inertia about the centre of mass, kg m2, estimated when absent.",
+                                    "description": "Transverse moment of inertia about the center of mass, kg m2, estimated when absent.",
                                     "type": "number"
                                   }
                                 },
@@ -7072,7 +7099,7 @@
                                     "type": "number"
                                   },
                                   "transverseInertia": {
-                                    "description": "Transverse moment of inertia about the centre of mass, kg m2, estimated when absent.",
+                                    "description": "Transverse moment of inertia about the center of mass, kg m2, estimated when absent.",
                                     "type": "number"
                                   }
                                 },
@@ -7322,7 +7349,7 @@
                               "kind": {
                                 "type": "string",
                                 "enum": ["impact", "dial"],
-                                "description": "impact: height of the mean impact above the line of sight at the zero setting, m. dial: clicks dialled from the zero setting to centre the group, signed up."
+                                "description": "impact: height of the mean impact above the line of sight at the zero setting, m. dial: clicks dialed from the zero setting to center the group, signed up."
                               },
                               "range": {
                                 "type": "number",
@@ -7466,7 +7493,7 @@
                         "type": "boolean"
                       },
                       "priors": {
-                        "description": "Gaussian priors centred on the nominal parameter values, default none.",
+                        "description": "Gaussian priors centered on the nominal parameter values, default none.",
                         "type": "object",
                         "properties": {
                           "muzzleVelocity": {
@@ -8589,7 +8616,7 @@
                                 },
                                 "transverseInertia": {
                                   "type": "number",
-                                  "description": "Transverse moment of inertia about the centre of mass, kg m2"
+                                  "description": "Transverse moment of inertia about the center of mass, kg m2"
                                 }
                               },
                               "required": ["liftSlope"],
@@ -8918,7 +8945,7 @@
                                     "type": "number"
                                   },
                                   "transverseInertia": {
-                                    "description": "Transverse moment of inertia about the centre of mass, kg m2, estimated when absent.",
+                                    "description": "Transverse moment of inertia about the center of mass, kg m2, estimated when absent.",
                                     "type": "number"
                                   }
                                 },
@@ -9064,7 +9091,7 @@
                                     "type": "number"
                                   },
                                   "transverseInertia": {
-                                    "description": "Transverse moment of inertia about the centre of mass, kg m2, estimated when absent.",
+                                    "description": "Transverse moment of inertia about the center of mass, kg m2, estimated when absent.",
                                     "type": "number"
                                   }
                                 },
@@ -9637,7 +9664,7 @@
                                     },
                                     "transverseInertia": {
                                       "type": "number",
-                                      "description": "Transverse moment of inertia about the centre of mass, kg m2"
+                                      "description": "Transverse moment of inertia about the center of mass, kg m2"
                                     }
                                   },
                                   "required": ["liftSlope"],
@@ -10357,7 +10384,7 @@
                                 },
                                 "transverseInertia": {
                                   "type": "number",
-                                  "description": "Transverse moment of inertia about the centre of mass, kg m2"
+                                  "description": "Transverse moment of inertia about the center of mass, kg m2"
                                 }
                               },
                               "required": ["liftSlope"],
@@ -10686,7 +10713,7 @@
                                     "type": "number"
                                   },
                                   "transverseInertia": {
-                                    "description": "Transverse moment of inertia about the centre of mass, kg m2, estimated when absent.",
+                                    "description": "Transverse moment of inertia about the center of mass, kg m2, estimated when absent.",
                                     "type": "number"
                                   }
                                 },
@@ -10832,7 +10859,7 @@
                                     "type": "number"
                                   },
                                   "transverseInertia": {
-                                    "description": "Transverse moment of inertia about the centre of mass, kg m2, estimated when absent.",
+                                    "description": "Transverse moment of inertia about the center of mass, kg m2, estimated when absent.",
                                     "type": "number"
                                   }
                                 },
@@ -13558,6 +13585,11 @@
                             "type": "number",
                             "minimum": 0,
                             "description": "Throat wear, m: length a worn throat adds behind the bullet; the run adds it times the bore area to the volume. Default 0."
+                          },
+                          "area": {
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "description": "Cross-section area of the chamber body, m2, at least the bore area. Given, the pressure gradient takes its chambrage form and gradient must be absent; default a chamber of the bore area."
                           }
                         },
                         "required": ["volume", "boreArea", "boreDiameter"],
@@ -14141,7 +14173,7 @@
                         "type": "number",
                         "exclusiveMinimum": 0,
                         "maximum": 0.01,
-                        "description": "Charge difference between neighbouring steps, kg."
+                        "description": "Charge difference between neighboring steps, kg."
                       },
                       "stepCount": {
                         "type": "integer",
@@ -15428,6 +15460,11 @@
                             "type": "number",
                             "minimum": 0,
                             "description": "Throat wear, m: length a worn throat adds behind the bullet; the run adds it times the bore area to the volume. Default 0."
+                          },
+                          "area": {
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "description": "Cross-section area of the chamber body, m2, at least the bore area. Given, the pressure gradient takes its chambrage form and gradient must be absent; default a chamber of the bore area."
                           }
                         },
                         "required": ["volume", "boreArea", "boreDiameter"],
@@ -19208,6 +19245,85 @@
                                     }
                                   },
                                   "description": "The fields that differ from the base record, or all fields without one. A `null` removes a field of the base."
+                                },
+                                "photo": {
+                                  "type": "object",
+                                  "properties": {
+                                    "width": {
+                                      "type": "integer",
+                                      "exclusiveMinimum": 0,
+                                      "maximum": 9007199254740991,
+                                      "description": "Width of the photograph, px."
+                                    },
+                                    "height": {
+                                      "type": "integer",
+                                      "exclusiveMinimum": 0,
+                                      "maximum": 9007199254740991,
+                                      "description": "Height of the photograph, px."
+                                    },
+                                    "pxPerMm": {
+                                      "type": "number",
+                                      "exclusiveMinimum": 0,
+                                      "description": "Scale of the photograph, px per mm."
+                                    },
+                                    "relativeStandardUncertainty": {
+                                      "type": "number",
+                                      "minimum": 0,
+                                      "description": "Relative standard uncertainty of the scale, 1 (0.001 is 0.1 %)."
+                                    },
+                                    "scaleBasis": {
+                                      "type": "string",
+                                      "enum": ["ruler", "diameter", "length", "diameter+length"],
+                                      "description": "What gave the scale: two points on a ruler, or without one the diameter, the overall length or both entered from a caliper."
+                                    },
+                                    "values": {
+                                      "type": "object",
+                                      "propertyNames": {
+                                        "type": "string",
+                                        "enum": [
+                                          "length",
+                                          "diameter",
+                                          "bearingLength",
+                                          "noseLength",
+                                          "meplatDiameter",
+                                          "ogive.radius",
+                                          "ogive.radiusRatio",
+                                          "base.length",
+                                          "base.diameter",
+                                          "base.angle",
+                                          "cannelure.start",
+                                          "cannelure.width",
+                                          "cannelure.depth"
+                                        ]
+                                      },
+                                      "additionalProperties": {
+                                        "type": "object",
+                                        "properties": {
+                                          "value": {
+                                            "type": "number",
+                                            "description": "Value in the stored unit of its field: mm, degrees, 1 for `ogive.radiusRatio`."
+                                          },
+                                          "standardUncertainty": {
+                                            "type": "number",
+                                            "minimum": 0,
+                                            "description": "Standard uncertainty, in the unit of the value."
+                                          }
+                                        },
+                                        "required": ["value", "standardUncertainty"],
+                                        "additionalProperties": false
+                                      },
+                                      "description": "The values measured, by the path of the bullet field, each with its standard uncertainty."
+                                    }
+                                  },
+                                  "required": [
+                                    "width",
+                                    "height",
+                                    "pxPerMm",
+                                    "relativeStandardUncertainty",
+                                    "values"
+                                  ],
+                                  "additionalProperties": false,
+                                  "description": "Measured from a photograph: its size, its scale and the values with their standard uncertainties. No image is stored. Absent: not measured from one."
                                 }
                               },
                               "required": ["origin"],
@@ -19525,7 +19641,15 @@
                                                 "description": "Footnote numbers printed next to the symbol."
                                               }
                                             },
-                                            "required": ["symbol", "quantity"]
+                                            "required": ["symbol", "quantity"],
+                                            "anyOf": [
+                                              {
+                                                "required": ["value"]
+                                              },
+                                              {
+                                                "required": ["raw"]
+                                              }
+                                            ]
                                           }
                                         },
                                         {
@@ -20563,7 +20687,7 @@
                                               "value": {
                                                 "type": "number",
                                                 "exclusiveMinimum": 0,
-                                                "description": "Centre, in the stored unit of the parameter: burn coefficient 1/s, start pressure bar, energy J/kg, factors 1."
+                                                "description": "Center, in the stored unit of the parameter: burn coefficient 1/s, start pressure bar, energy J/kg, factors 1."
                                               },
                                               "sigma": {
                                                 "type": "number",
@@ -21481,7 +21605,7 @@
                                             "stepCount": {
                                               "type": "number",
                                               "enum": [3, 5, 7, 9, 11, 13, 15, 17, 19, 21],
-                                              "description": "Number of ladder steps, odd so the steps centre on the charge."
+                                              "description": "Number of ladder steps, odd so the steps center on the charge."
                                             },
                                             "step": {
                                               "type": "number",
@@ -21491,7 +21615,7 @@
                                             "direction": {
                                               "type": "string",
                                               "const": "around",
-                                              "description": "Steps centred on the charge (or seating length)."
+                                              "description": "Steps centered on the charge (or seating length)."
                                             }
                                           },
                                           "required": ["stepCount", "direction"]
@@ -21553,7 +21677,7 @@
                                       "description": "Powders tab mode and filters (GLOSSARY `powders`)."
                                     }
                                   },
-                                  "description": "The typed solver values and the ladder the load is analysed with."
+                                  "description": "The typed solver values and the ladder the load is analyzed with."
                                 },
                                 "sessions": {
                                   "maxItems": 50,
@@ -22200,7 +22324,7 @@
                                               },
                                               "required": ["value"],
                                               "unit": "mm",
-                                              "description": "Bore axis to optic centre."
+                                              "description": "Bore axis to optic center."
                                             },
                                             "lateralOffset": {
                                               "type": "object",
@@ -22217,7 +22341,7 @@
                                               },
                                               "required": ["value"],
                                               "unit": "mm",
-                                              "description": "Optic centre to the right of the bore. Negative to the left."
+                                              "description": "Optic center to the right of the bore. Negative to the left."
                                             },
                                             "cant": {
                                               "type": "object",
@@ -22565,7 +22689,7 @@
                                                       "kind": {
                                                         "type": "string",
                                                         "const": "dial",
-                                                        "description": "Clicks dialled to hit at the distance."
+                                                        "description": "Clicks dialed to hit at the distance."
                                                       },
                                                       "range": {
                                                         "type": "object",
@@ -22594,7 +22718,7 @@
                                                       "mean": {
                                                         "type": "number",
                                                         "unit": "1",
-                                                        "description": "Mean of the clicks dialled."
+                                                        "description": "Mean of the clicks dialed."
                                                       },
                                                       "deviation": {
                                                         "type": "number",
@@ -23707,7 +23831,7 @@
                                           "kind": {
                                             "type": "string",
                                             "const": "ringCentre",
-                                            "description": "A ring of known diameter: its centre and a point on it."
+                                            "description": "A ring of known diameter: its center and a point on it."
                                           },
                                           "centre": {
                                             "type": "object",
@@ -23981,7 +24105,7 @@
                                       "colour": {
                                         "type": "string",
                                         "pattern": "^#[0-9a-fA-F]{6}$",
-                                        "description": "Colour of the group, `#rrggbb`."
+                                        "description": "Color of the group, `#rrggbb`."
                                       },
                                       "distance": {
                                         "type": "number",
@@ -24107,7 +24231,7 @@
                                           "backing": {
                                             "type": "string",
                                             "pattern": "^#[0-9a-fA-F]{6}$",
-                                            "description": "Colour seen through a hole, picked in one, `#rrggbb`. Absent: off."
+                                            "description": "Color seen through a hole, picked in one, `#rrggbb`. Absent: off."
                                           },
                                           "minContrast": {
                                             "type": "number",
@@ -24162,7 +24286,7 @@
                                               },
                                               "required": ["ring", "x", "y"]
                                             },
-                                            "description": "Points marked on the face's rings in target m, on two rings at least. Absent: centred on the point of aim."
+                                            "description": "Points marked on the face's rings in target m, on two rings at least. Absent: centered on the point of aim."
                                           }
                                         },
                                         "required": ["id"],
@@ -24350,7 +24474,7 @@
                                         "exclusiveMinimum": 0
                                       },
                                       "fill": {
-                                        "description": "Colour of the zone the ring line bounds outside.",
+                                        "description": "Color of the zone the ring line bounds outside.",
                                         "type": "string",
                                         "enum": [
                                           "black",
@@ -24365,7 +24489,7 @@
                                         ]
                                       },
                                       "line": {
-                                        "description": "Colour of the ring line.",
+                                        "description": "Color of the ring line.",
                                         "type": "string",
                                         "enum": [
                                           "black",
@@ -25045,7 +25169,15 @@
                                                 "description": "Reference `user:<UUID>` to a target sheet of the user."
                                               }
                                             },
-                                            "additionalProperties": false
+                                            "additionalProperties": false,
+                                            "anyOf": [
+                                              {
+                                                "required": ["shots"]
+                                              },
+                                              {
+                                                "required": ["total"]
+                                              }
+                                            ]
                                           },
                                           "description": "Series in the order shot."
                                         }
@@ -25324,6 +25456,9 @@
                               },
                               "required": ["date", "rounds"],
                               "additionalProperties": false,
+                              "not": {
+                                "required": ["load", "ammunition"]
+                              },
                               "description": "An entry of the shooting log, the person's own record."
                             }
                           },

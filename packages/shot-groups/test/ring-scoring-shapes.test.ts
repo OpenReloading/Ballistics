@@ -24,7 +24,7 @@ function faceOf(
   }
 }
 
-/** A shot at x, y mm from the face centre, in target m. */
+/** A shot at x, y mm from the face center, in target m. */
 const shot = (x: number, y: number) => ({ x: x * mm, y: y * mm })
 
 // 9: 100 wide, 60 high; 10: 40 wide, 20 high
@@ -34,7 +34,7 @@ const ovalFace = faceOf([
 ])
 
 describe('scoreShot on an oval face', () => {
-  it('counts a hole centre on the ring line as inside along both axes', () => {
+  it('counts a hole center on the ring line as inside along both axes', () => {
     expect(scoreShot(ovalFace, shot(50, 0), 0).value).toBe(9)
     expect(scoreShot(ovalFace, shot(-50, 0), 0).value).toBe(9)
     expect(scoreShot(ovalFace, shot(0, 30), 0).value).toBe(9)
@@ -43,7 +43,7 @@ describe('scoreShot on an oval face', () => {
     expect(scoreShot(ovalFace, shot(0, 10), 0).value).toBe(10)
   })
 
-  it('counts a hole centre just inside and just outside along both axes', () => {
+  it('counts a hole center just inside and just outside along both axes', () => {
     expect(scoreShot(ovalFace, shot(50 - off, 0), 0).value).toBe(9)
     expect(scoreShot(ovalFace, shot(50 + off, 0), 0).value).toBe(0)
     expect(scoreShot(ovalFace, shot(0, 30 - off), 0).value).toBe(9)
@@ -55,7 +55,7 @@ describe('scoreShot on an oval face', () => {
   })
 
   it('scores by height on the vertical axis, not by the width', () => {
-    // 40 mm above the centre is inside a circle of the width and outside the oval
+    // 40 mm above the center is inside a circle of the width and outside the oval
     expect(scoreShot(ovalFace, shot(0, 40), 0).value).toBe(0)
     expect(scoreShot(ovalFace, shot(40, 0), 0).value).toBe(9)
   })
@@ -93,7 +93,7 @@ describe('scoreShot on an oval face, off the axes', () => {
     }
   })
 
-  it('finds the gap to a wide and a tall oval off the axes to well below a micrometre', () => {
+  it('finds the gap to a wide and a tall oval off the axes to well below a micrometer', () => {
     // `gap` mm out along the normal of the ellipse point at parameter `t`: the gap is exactly that
     for (const [w, h, gap] of [
       [100, 60, 5],
@@ -124,7 +124,7 @@ const stadium = faceOf(
 )
 
 describe('scoreShot on a stadium face', () => {
-  it('counts a hole centre on the straight sides and the ends as inside', () => {
+  it('counts a hole center on the straight sides and the ends as inside', () => {
     // the straight side holds for every height up to the end of the straight part
     for (const y of [0, 15, 30, -30]) expect(scoreShot(stadium, shot(50, y), 0).value).toBe(9)
     expect(scoreShot(stadium, shot(0, 80), 0).value).toBe(9)
@@ -162,7 +162,7 @@ describe('scoreShot on a stadium face, with the hole', () => {
     expect(scoreShot(stadium, shot(52 + off, 0), hole).value).toBe(0)
     expect(scoreShot(stadium, shot(0, 82), hole).value).toBe(9)
     expect(scoreShot(stadium, shot(0, 82 + off), hole).value).toBe(0)
-    // a hole beside the end reaches the half circle at its radius from the circle's centre (0, 30)
+    // a hole beside the end reaches the half circle at its radius from the circle's center (0, 30)
     const k = 52 * Math.SQRT1_2
     expect(scoreShot(stadium, shot(k, 30 + k), hole).value).toBe(9)
     expect(scoreShot(stadium, shot(k + off, 30 + k + off), hole).value).toBe(0)
@@ -269,7 +269,7 @@ describe('scoreShot with a square area', () => {
     { value: 5, w: 60 },
   ])
 
-  it('counts a hole centre on the edge as inside and just outside as outside', () => {
+  it('counts a hole center on the edge as inside and just outside as outside', () => {
     for (const [x, y] of [
       [50, 0],
       [-50, 10],
@@ -285,7 +285,7 @@ describe('scoreShot with a square area', () => {
   })
 
   it('counts the corner of the square, not a circle through it', () => {
-    // 70 mm from the centre: outside the circle of the edge, inside the square
+    // 70 mm from the center: outside the circle of the edge, inside the square
     expect(scoreShot(square, shot(49, 49), 0).value).toBe(4)
   })
 

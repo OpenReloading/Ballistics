@@ -59,7 +59,7 @@ import { cavityVolumeFraction } from '../lib/cavity-range.ts'
 import { powderIncomplete } from '../lib/complete-records.ts'
 import { refusalText, translateMessage } from '../lib/core-messages.ts'
 import { timeText } from '../lib/dates.ts'
-import { loadExample } from '../lib/example-data.ts'
+import { exampleFirearmIn, loadExample } from '../lib/example-data.ts'
 import { exampleFields } from '../lib/examples.ts'
 import {
   type FieldSpec,
@@ -1557,7 +1557,7 @@ export function useWorkbenchState() {
   const [customName, setCustomName] = useState<string>()
   const [figureView, setFigureView] = useState<FigureView>('cartridge')
   /** The library, then the example's built-in rifle (`gunPicker`). */
-  const firearmList = [...firearms, loadExample.firearm].map((r) => ({
+  const firearmList = [...firearms, exampleFirearmIn(t)].map((r) => ({
     id: r.id,
     name: r.name,
     data: gunValues((r as FirearmRecord).data),

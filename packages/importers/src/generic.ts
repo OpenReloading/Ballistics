@@ -70,7 +70,7 @@ const headerIndex = (rows: string[][], names: string[]) =>
     return names.every((name) => lower.includes(name))
   })
 
-/** The unit token of a header cell: its recognised bracketed text (`SPEED (FPS)`), else a recognised last word (`v fps`). */
+/** The unit token of a header cell: its recognized bracketed text (`SPEED (FPS)`), else a recognized last word (`v fps`). */
 function unitToken(cell: string): string | undefined {
   const inside = bracketed(cell)
   if (parseVelocityUnit(inside)) return inside
@@ -284,7 +284,7 @@ function velocityUnitText(
       header: headerText ?? '',
     })
   }
-  // an unknown unit cell does not hide a recognised header token
+  // an unknown unit cell does not hide a recognized header token
   return fromCell || !fromHeader ? unitCell || token : token
 }
 

@@ -257,7 +257,7 @@ function errorsOf(t: BulletDimensions, m: BulletMeasurement, warnings: number): 
   const d = drawn(m)
   const o = d && bulletOutline(d, 'entered')
   const shape = o && !('reason' in o) ? o : undefined
-  // seated at a fixed COAL: one calibre deep, half the length for a bullet under 2.5 calibres
+  // seated at a fixed COAL: one caliber deep, half the length for a bullet under 2.5 calibers
   const depth = t.length / t.diameter < 2.5 ? 0.5 * t.length : t.diameter
   const seated = revolutionVolume(truth.points, depth)
   const errLength = L ? L.value - t.length : nan

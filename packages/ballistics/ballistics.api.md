@@ -211,7 +211,7 @@ export type ChargeRefusal =
 | 'aboveRange'
 /** The curve crosses the target more than once, so no charge is unique. */
 | 'notMonotone'
-/** The target lies in the range, but no two neighbouring valid runs enclose it. */
+/** The target lies in the range, but no two neighboring valid runs enclose it. */
 | 'bracketFailed'
 /** `maxIterations` runs did not reach the tolerance. */
 | 'toleranceNotReached';
@@ -453,6 +453,9 @@ export interface FiringSite {
 export function fitPowder(load: InteriorLoad, ladder: readonly LadderPoint[], options?: PowderFitOptions): PowderFit;
 
 // @public
+export function fitPowderPooled(sessions: readonly PooledSession[], options?: PooledFitOptions): PooledPowderFit;
+
+// @public
 export function fitPowderSessions(load: InteriorLoad, sessions: readonly PowderSession[], options?: PowderFitOptions): PowderSessionsFit;
 
 // @public
@@ -599,7 +602,7 @@ export type InteriorIssue = Diagnostic<'gasVelocityFactorNegative'> | Diagnostic
 }> | Diagnostic<'noHeldOutString'> | Diagnostic<'velocitySigmaMissing'> | Diagnostic<'targetPowderNotInFit'> | Diagnostic<'velocitySigmaNegative'> | Diagnostic<'levelOutsideUnit'> | Diagnostic<'pooledFitNoCovariance'> | Diagnostic<'groupPriorNotPositive', {
     kind: string;
     group: string;
-}> | Diagnostic<'priorPowderNotInSessions'> | Diagnostic<'sessionsBurnKindDiffers'> | Diagnostic<'barrelOrTemperatureOnPoint'> | Diagnostic<'pooledFitVelocitiesOnly'> | Diagnostic<'ladderChargeOrVelocityNotPositive'> | Diagnostic<'propellantTemperatureNotPositive'> | Diagnostic<'barrelLengthNotPositive'> | Diagnostic<'sessionWithoutLadderPoint'> | Diagnostic<'rifleOrLotSigmaNotPositive'> | Diagnostic<'pooledFitParametersInvalid'> | Diagnostic<'noSession'> | Diagnostic<'priorParameterNotFitted'> | Diagnostic<'burnCoefficientNotFitted'> | Diagnostic<'stringWithoutVelocity'> | Diagnostic<'fitNoCovariance'> | Diagnostic<'boreDiameterNotPositive'> | Diagnostic<'startPressureTooLow'> | Diagnostic<'domainMarginOutsideRange'> | Diagnostic<'priorsNeedVelocitySigmas'> | Diagnostic<'huberThresholdNotPositive'> | Diagnostic<'temperatureFactorNeedsSensitivity'> | Diagnostic<'fitParametersInvalid', {
+}> | Diagnostic<'priorPowderNotInSessions'> | Diagnostic<'sessionsBurnKindDiffers'> | Diagnostic<'barrelOrTemperatureOnPoint'> | Diagnostic<'ladderChargeOrVelocityNotPositive'> | Diagnostic<'propellantTemperatureNotPositive'> | Diagnostic<'barrelLengthNotPositive'> | Diagnostic<'sessionWithoutLadderPoint'> | Diagnostic<'rifleOrLotSigmaNotPositive'> | Diagnostic<'pooledFitParametersInvalid'> | Diagnostic<'noSession'> | Diagnostic<'priorParameterNotFitted'> | Diagnostic<'burnCoefficientNotFitted'> | Diagnostic<'stringWithoutVelocity'> | Diagnostic<'fitNoCovariance'> | Diagnostic<'boreDiameterNotPositive'> | Diagnostic<'startPressureTooLow'> | Diagnostic<'domainMarginOutsideRange'> | Diagnostic<'priorsNeedVelocitySigmas'> | Diagnostic<'huberThresholdNotPositive'> | Diagnostic<'temperatureFactorNeedsSensitivity'> | Diagnostic<'fitParametersInvalid', {
     parameters: string[];
 }> | Diagnostic<'pressuresNeedVelocitySigmas'> | Diagnostic<'velocitySigmaPartial'> | Diagnostic<'pressureBasisUnknown', {
     bases: string[];
@@ -639,6 +642,7 @@ export interface InteriorLoad {
         boreArea: number;
         boreDiameter: number;
         throatWear?: number | undefined;
+        area?: number | undefined;
     };
     charge: number;
     gradient?: {
@@ -977,6 +981,81 @@ export type PlanRefusalId = 'single-range' | 'velocity-only';
 
 // @public
 export function planTruingStrings(input: TruingPlanInput, options?: RangeStringOptions): TruingPlan;
+
+// @public
+export interface PooledFitOptions {
+    interior?: typeof interior | undefined;
+    lotSigma?: number | undefined;
+    maxCondition?: number | undefined;
+    maxIterations?: number | undefined;
+    options?: Settings<InteriorOptions> | undefined;
+    parameters?: readonly PooledRequest[] | undefined;
+    priors?: PooledPriors | undefined;
+    rifleSigma?: number | undefined;
+}
+
+// @public
+export type PooledParameterKind = 'burnRate' | 'temperatureFactor' | 'rifle' | 'lot';
+
+// @public
+export interface PooledPowderFit {
+    calibrationStrings: number;
+    chiSquare: number;
+    conditionNumber: number;
+    correlation: number[][];
+    covariance: number[][];
+    dataChiSquare: number;
+    degreesOfFreedom: number;
+    held: {
+        powder: string;
+        name: 'temperatureFactor';
+    }[];
+    iterations: number;
+    lotSigma: number;
+    modelError: number;
+    parameters: PooledPowderParameter[];
+    residuals: PooledResidual[];
+    rifleSigma: number;
+    runCount: number;
+    sessions: Pick<PooledSession, 'powder' | 'rifle' | 'lot'>[];
+}
+
+// @public
+export interface PooledPowderParameter {
+    group: string;
+    initial: number;
+    kind: PooledParameterKind;
+    lot?: string;
+    standardUncertainty: number;
+    value: number;
+}
+
+// @public
+export type PooledPriors = Readonly<Record<string, Partial<Record<PooledRequest, PowderPrior | undefined>> | undefined>>;
+
+// @public
+export type PooledRequest = 'burnRate' | 'temperatureFactor';
+
+// @public
+export interface PooledResidual {
+    charge: number;
+    kind: 'velocity' | 'pressure';
+    observed: number;
+    predicted: number;
+    residual: number;
+    session: number;
+}
+
+// @public
+export interface PooledSession {
+    barrelLength?: number | undefined;
+    ladder: readonly LadderPoint[];
+    load: InteriorLoad;
+    lot?: string | undefined;
+    powder: string;
+    propellantTemperature?: number | undefined;
+    rifle: string;
+}
 
 // @public
 export type PowderAxis = 'charge' | 'velocity' | 'pressure' | 'boreDiameter' | 'barrelLength';
@@ -1419,6 +1498,7 @@ export function recordLoad(r: RecordRun): InteriorLoad;
 
 // @public
 export interface RecordPowder {
+    grainForm?: string | undefined;
     // (undocumented)
     interior?: (NonNullable<PowderInteriorRecord['interior']> & {
         propellantTemperature: {

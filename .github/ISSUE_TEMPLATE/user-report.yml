@@ -46,7 +46,7 @@ body:
     id: context
     attributes:
       label: Context
-      description: Page, version, browser, window, colour scheme and units.
+      description: Page, version, browser, window, color scheme and units.
   - type: textarea
     id: data
     attributes:

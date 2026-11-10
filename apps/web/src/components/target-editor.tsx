@@ -335,12 +335,12 @@ async function restoreCopy(t: Translator['t']) {
   return kept
 }
 
-/** Names of the group colours (`groupColours`), for the swatches' accessible names. */
+/** Names of the group colors (`groupColours`), for the swatches' accessible names. */
 const colourNames = [
   msg('Blue'),
   msg('Orange'),
   msg('Green'),
-  msg('Ochre'),
+  msg('Ocher'),
   msg('Pink'),
   msg('Purple'),
 ]
@@ -427,7 +427,7 @@ function CoordInput({
   )
 }
 
-/** A labelled row of the property grid that is not a field. */
+/** A labeled row of the property grid that is not a field. */
 function Row({
   label,
   help,
@@ -835,7 +835,7 @@ function ScalePanel({ ed }: { ed: Ed }) {
   )
 }
 
-/** The colours offered: the series colours and a stored colour that is not one of them. */
+/** The colors offered: the series colors and a stored color that is not one of them. */
 function coloursOf(group: ShotGroup | undefined, t: Translator['t']) {
   if (!group) return []
   return [
@@ -956,7 +956,7 @@ function GroupPanel({ ed }: { ed: Ed }) {
             size={controlSize.row.input}
             name={`${uid}-colour`}
             value={group.colour}
-            onChange={(colour) => onGroup((g) => ({ ...g, colour }), `colour ${group.id}`)}
+            onChange={(colour) => onGroup((g) => ({ ...g, colour }), `color ${group.id}`)}
           >
             <Flex wrap="wrap" justify="flex-end">
               {colours.map((c) => (

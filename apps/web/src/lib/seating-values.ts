@@ -42,7 +42,7 @@ export function chargeFill(o: {
     charge,
     ratio,
     loadingDensity: charge / volume,
-    // shortcut: the free volume is even from head to bullet base (no case interior, web or taper), upgrade when the case interior is modelled.
+    // shortcut: the free volume is even from head to bullet base (no case interior, web or taper), upgrade when the case interior is modeled.
     level: o.base * Math.min(ratio, 1),
     compressed: ratio > 1,
   }

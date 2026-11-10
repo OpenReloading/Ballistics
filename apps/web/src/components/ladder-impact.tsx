@@ -38,7 +38,7 @@ export function LadderImpactNote({ impact, system }: { impact: LadderImpact; sys
                 {
                   severity: 'info' as const,
                   text: t(
-                    'The vertical centre changes with the charge by more than the simulated drop explains ({level} % test).',
+                    'The vertical center changes with the charge by more than the simulated drop explains ({level} % test).',
                     { level: plainNumber(level * 100) },
                   ),
                 },
@@ -57,8 +57,8 @@ export function LadderImpactNote({ impact, system }: { impact: LadderImpact; sys
         y={points.map((p) => len.fromSi(p.centre))}
         bars={points.map((p) => len.fromSi(p.standardError))}
         xLabel={t('Charge ({unit})', { unit: system.charge.symbol })}
-        yLabel={t('Residual centre ({unit})', { unit: len.symbol })}
-        title={t('Vertical centre of the groups against charge, velocity effect removed')}
+        yLabel={t('Residual center ({unit})', { unit: len.symbol })}
+        title={t('Vertical center of the groups against charge, velocity effect removed')}
         description={t(
           'Mean shot height above the point of aim per charge, velocity effect removed, with a bar of one standard error; the table lists the values.',
         )}
@@ -66,12 +66,12 @@ export function LadderImpactNote({ impact, system }: { impact: LadderImpact; sys
         points
       />
       <Table className="readout-table" withRowBorders horizontalSpacing={4} verticalSpacing={0}>
-        <caption className="visually-hidden">{t('Residual centre per charge')}</caption>
+        <caption className="visually-hidden">{t('Residual center per charge')}</caption>
         <Table.Thead>
           <Table.Tr>
             <Table.Th scope="col">{system.charge.symbol}</Table.Th>
             <Table.Th scope="col">{t('Shots')}</Table.Th>
-            <Table.Th scope="col">{t('Centre ({unit})', { unit: len.symbol })}</Table.Th>
+            <Table.Th scope="col">{t('Center ({unit})', { unit: len.symbol })}</Table.Th>
             <Table.Th scope="col">{t('Standard error ({unit})', { unit: len.symbol })}</Table.Th>
           </Table.Tr>
         </Table.Thead>

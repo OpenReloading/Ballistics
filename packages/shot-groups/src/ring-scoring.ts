@@ -1,4 +1,4 @@
-/** Ring scoring on a rule-book target face and the fit of a face to ring marks on a sheet (`apps/docs/docs/models/ring-scoring.md`); shots and holes in target m from the face centre, as the sheet stores them, face records in mm; a refusal is a `RingFitIssue` or a `GroupIssue`. */
+/** Ring scoring on a rule-book target face and the fit of a face to ring marks on a sheet (`apps/docs/docs/models/ring-scoring.md`); shots and holes in target m from the face center, as the sheet stores them, face records in mm; a refusal is a `RingFitIssue` or a `GroupIssue`. */
 import { type Diagnostic, nth } from '@open-reloading/statistics'
 import { fromSi, toSi } from '@open-reloading/units'
 import { type Point, solveLinear } from './geometry.ts'
@@ -70,7 +70,7 @@ const touch = 1e-12
 /** Radius in m of a face diameter in mm. */
 const radius = (d: FaceLength): number => toSi('length', d.value / 2)
 
-/** The scored hole diameter in m: 0 where the event counts the hole centre, else the event's gauge, else the bullet diameter (m). */
+/** The scored hole diameter in m: 0 where the event counts the hole center, else the event's gauge, else the bullet diameter (m). */
 export function scoredHoleDiameter<B extends number | undefined>(
   event: FaceEvent | undefined,
   bullet: B,
@@ -106,7 +106,7 @@ function ellipseGap(a: number, b: number, x: number, y: number): number {
   return Math.hypot((r0 * y0) / (t + r0) - y0, y1 / (t + 1) - y1)
 }
 
-/** Whether the hole of radius `g` (m), centred at `p` in m from the area's centre, touches the area a ring line bounds: a circle by the centre distance, an oval by the distance to its ellipse, a square by the distance to its square (rounded at the corners), a stadium by the distance to the segment between its end circles' centres, less their radius. */
+/** Whether the hole of radius `g` (m), centered at `p` in m from the area's center, touches the area a ring line bounds: a circle by the center distance, an oval by the distance to its ellipse, a square by the distance to its square (rounded at the corners), a stadium by the distance to the segment between its end circles' centers, less their radius. */
 function touches(ring: Shape, p: Point, g: number): boolean {
   const w = radius(ring.diameter)
   if (ring.shape === 'square')
@@ -119,7 +119,7 @@ function touches(ring: Shape, p: Point, g: number): boolean {
   return Math.hypot(p.x, p.y) <= w + g + touch
 }
 
-/** The bull a shot belongs to: the nearest centre (the first of the record on a tie). */
+/** The bull a shot belongs to: the nearest center (the first of the record on a tie). */
 function nearestBull(face: ScoringFace, shot: Point): { centre: Point; zone?: string | undefined } {
   let best = { centre: { x: 0, y: 0 }, zone: undefined as string | undefined }
   let bestD = Number.POSITIVE_INFINITY
@@ -131,7 +131,7 @@ function nearestBull(face: ScoringFace, shot: Point): { centre: Point; zone?: st
   return best
 }
 
-/** A hole of diameter `hole` (m) at `shot` (m from the face centre): the nearest bull, then the highest ring whose outer edge the hole touches (`outward`: the highest circular ring the whole hole lies inside, short of the line's outer edge), tenths counted inward from the touching position, and the inner ten by the face's rule. */
+/** A hole of diameter `hole` (m) at `shot` (m from the face center): the nearest bull, then the highest ring whose outer edge the hole touches (`outward`: the highest circular ring the whole hole lies inside, short of the line's outer edge), tenths counted inward from the touching position, and the inner ten by the face's rule. */
 export function scoreShot(
   face: ScoringFace,
   shot: Point,
@@ -143,7 +143,7 @@ export function scoreShot(
   return zone ? { ...score, zone } : score
 }
 
-/** `scoreShot` for one bull: `shot` in m from its centre. */
+/** `scoreShot` for one bull: `shot` in m from its center. */
 function scoreOnBull(face: ScoringFace, shot: Point, hole: number, outward: boolean): RingScore {
   const d = Math.hypot(shot.x, shot.y)
   const g = hole / 2
@@ -191,10 +191,10 @@ export function scoreGroup(
 /** Points marked on one ring of a face, and the ring's diameter. */
 export type RingMarks = { diameter: number; points: readonly Point[] }
 
-/** A face placed by its ring marks: centre and scale, and the RMS of the radial misfit, in point units. */
+/** A face placed by its ring marks: center and scale, and the RMS of the radial misfit, in point units. */
 export type RingFit = { centre: Point; scale: number; rmsMisfit: number }
 
-/** Centre and scale (point units per diameter unit) from marks on two or more rings: |p - centre| = scale x diameter / 2 by linear least squares in the centre, the squared scale and a free |centre|^2 (algebraic circle fit, Kasa 1976, one radius per ring); `rms` is the radial misfit in point units. shortcut: algebraic fit, no perspective, rotation or ring-line thickness; upgrade to a geometric fit through the photo homography when the editor uses faces as calibration references. */
+/** Center and scale (point units per diameter unit) from marks on two or more rings: |p - center| = scale x diameter / 2 by linear least squares in the center, the squared scale and a free |center|^2 (algebraic circle fit, Kasa 1976, one radius per ring); `rms` is the radial misfit in point units. shortcut: algebraic fit, no perspective, rotation or ring-line thickness; upgrade to a geometric fit through the photo homography when the editor uses faces as calibration references. */
 export function fitRings(marks: readonly RingMarks[]): RingFit | { issue: RingFitIssue } {
   const all = marks.flatMap((m) => m.points.map((p) => ({ p, r: m.diameter / 2 })))
   if (new Set(marks.filter((m) => m.points.length).map((m) => m.diameter)).size < 2)
@@ -215,7 +215,7 @@ type MarkedPoint = { p: Point; r: number }
 /** Centroid (`mx`, `my`) and mean distance `sp` from it of the points, mean radius `sr`. */
 type MarkNormalisation = { mx: number; my: number; sp: number; sr: number }
 
-/** Normalisation of the marks: points around their centroid at mean distance 1, radii at mean 1. */
+/** Normalization of the marks: points around their centroid at mean distance 1, radii at mean 1. */
 function normaliseMarks(all: readonly MarkedPoint[]): MarkNormalisation {
   const mx = all.reduce((s, { p }) => s + p.x, 0) / all.length
   const my = all.reduce((s, { p }) => s + p.y, 0) / all.length
@@ -224,7 +224,7 @@ function normaliseMarks(all: readonly MarkedPoint[]): MarkNormalisation {
   return { mx, my, sp, sr }
 }
 
-/** By the normal equations of the algebraic circle fit on the normalised marks; undefined when they have no solution or no positive squared scale. */
+/** By the normal equations of the algebraic circle fit on the normalized marks; undefined when they have no solution or no positive squared scale. */
 function solveCircleFit(
   all: readonly MarkedPoint[],
   { mx, my, sp, sr }: MarkNormalisation,
@@ -248,23 +248,23 @@ function solveCircleFit(
   return { centre: { x: mx + cx * sp, y: my + cy * sp }, scale: (Math.sqrt(u) * sp) / sr }
 }
 
-/** Where a face lies on the sheet: its centre in target m and target m per face m (1 when true). */
+/** Where a face lies on the sheet: its center in target m and target m per face m (1 when true). */
 export type FaceAlignment = { centre: Point; scale: number; rms?: number }
 /** A point marked on ring `ring` (its value) of a face, in target m. */
 export type FaceMark = { ring: number; x: number; y: number }
 
-/** A sheet point (target m) in face m from the face centre. */
+/** A sheet point (target m) in face m from the face center. */
 export const onFace = (a: FaceAlignment, p: Point): Point => ({
   x: (p.x - a.centre.x) / a.scale,
   y: (p.y - a.centre.y) / a.scale,
 })
-/** A face point (face m from its centre) on the sheet, target m. */
+/** A face point (face m from its center) on the sheet, target m. */
 export const onSheet = (a: FaceAlignment, q: Point): Point => ({
   x: a.centre.x + q.x * a.scale,
   y: a.centre.y + q.y * a.scale,
 })
 
-/** `fitRings` on target m with diameters in mm, so its scale is target m per face mm, times 1e3 here; else centred on `aim` (or the origin) at the calibrated scale. */
+/** `fitRings` on target m with diameters in mm, so its scale is target m per face mm, times 1e3 here; else centered on `aim` (or the origin) at the calibrated scale. */
 export function faceAlignment(
   face: ScoringFace,
   marks: readonly FaceMark[] | undefined,

@@ -57,10 +57,10 @@ export interface GroupCovariance {
   yy: number
 }
 
-/** Direction of the group centre from the point of aim, N up; `centre` when they coincide. */
+/** Direction of the group center from the point of aim, N up; `centre` when they coincide. */
 export type CompassPoint = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW' | 'centre'
 
-/** Group centre minus point of aim, m; `compass` with N up, `centre` below 1e-9 m. */
+/** Group center minus point of aim, m; `compass` with N up, `centre` below 1e-9 m. */
 export interface AimOffset {
   /** Horizontal offset, m, x right. */
   dx: number
@@ -90,17 +90,17 @@ export interface GroupStatistics {
   excludedCount: number
   /** Mean position of the included shots. */
   centre?: GroupPoint
-  /** Largest distance between two shots, centre to centre. */
+  /** Largest distance between two shots, center to center. */
   extremeSpread?: number
-  /** Smallest distance between two shots, centre to centre; descriptive, no interval. */
+  /** Smallest distance between two shots, center to center; descriptive, no interval. */
   minPairDistance?: number
   /** Mean distance over all pairs of shots; descriptive, no interval. */
   meanPairDistance?: number
-  /** Horizontal extent of the shot centres. */
+  /** Horizontal extent of the shot centers. */
   width?: number
-  /** Vertical extent of the shot centres. */
+  /** Vertical extent of the shot centers. */
   height?: number
-  /** Mean distance of the shots from the centre. */
+  /** Mean distance of the shots from the center. */
   meanRadius?: number
   /** Horizontal SD, divisor n - 1. */
   standardDeviationX?: number
@@ -108,19 +108,19 @@ export interface GroupStatistics {
   standardDeviationY?: number
   /** sqrt(standardDeviationX^2 + standardDeviationY^2), divisor n - 1. */
   radialStandardDeviation?: number
-  /** SD of the distances of the shots from the centre, divisor n - 1. */
+  /** SD of the distances of the shots from the center, divisor n - 1. */
   radiusStandardDeviation?: number
   /** Circular-normal estimate sqrt(2 ln 2) sqrt((standardDeviationX^2 + standardDeviationY^2) / 2); `confidence.cep` is its interval. */
   cep?: number
-  /** Radius about the centre holding half of the bivariate normal with the sample covariance; unequal or correlated axes allowed, no interval. */
+  /** Radius about the center holding half of the bivariate normal with the sample covariance; unequal or correlated axes allowed, no interval. */
   cepElliptical?: number
   /** Sample covariance of the shot positions. */
   covariance?: GroupCovariance
   /** Major axis of the covariance, rad from +x counterclockwise, in (-pi/2, pi/2]; `undefined` for equal variances without covariance. */
   principalAxisAngle?: number
-  /** Centre of the excluded shots minus the group centre. */
+  /** Center of the excluded shots minus the group center. */
   excludedOffset?: GroupPoint
-  /** Group centre minus point of aim; present when the input gives an aim. */
+  /** Group center minus point of aim; present when the input gives an aim. */
   aimOffset?: AimOffset
   /** Present with at least 3 included shots with a velocity that vary in both position and velocity. */
   velocityCorrelation?: VelocityCorrelation
@@ -139,7 +139,7 @@ export interface PooledValues {
   confidence: GroupConfidence
 }
 
-/** Each group about its own centre, pooled in angle (`apps/docs/docs/models/groups.md`, "Angles and pooling"); the length fields, m, only when every pooled group has the same distance. */
+/** Each group about its own center, pooled in angle (`apps/docs/docs/models/groups.md`, "Angles and pooling"); the length fields, m, only when every pooled group has the same distance. */
 export interface PooledGroupStatistics extends Partial<PooledValues> {
   /** Groups with at least 2 shots, the ones pooled. */
   groupCount: number
@@ -159,7 +159,7 @@ function centreOf(points: GroupPoint[]): GroupPoint {
   return { x: mean(points.map((p) => p.x)), y: mean(points.map((p) => p.y)) }
 }
 
-/** Sums of squares and products about the centre. */
+/** Sums of squares and products about the center. */
 function sums(points: GroupPoint[], c: GroupPoint) {
   let xx = 0
   let yy = 0
@@ -228,7 +228,7 @@ function checkInput(input: GroupInput): void {
 
 function compassOf(dx: number, dy: number, distance: number): CompassPoint {
   if (distance < 1e-9) return 'centre'
-  // bearing clockwise from up, 8 sectors of 45 degrees centred on N, NE, ...
+  // bearing clockwise from up, 8 sectors of 45 degrees centered on N, NE, ...
   const bearing = Math.atan2(dx, dy)
   return nth(compassPoints, (Math.round(bearing / (Math.PI / 4)) + 8) % 8)
 }
@@ -250,7 +250,7 @@ function velocityCorrelationOf(shots: GroupShot[]): VelocityCorrelation | undefi
   return { shotCount: withV.length, correlation: vy / Math.sqrt(vv * yy), slope: vy / vv }
 }
 
-/** The offset of the group centre `c` from the aim point, with its compass point. */
+/** The offset of the group center `c` from the aim point, with its compass point. */
 function aimOffsetOf(c: GroupPoint, aim: GroupPoint): AimOffset {
   const dx = c.x - aim.x
   const dy = c.y - aim.y
@@ -321,7 +321,7 @@ function eigenvalues(c: GroupCovariance): [number, number] {
   return [half + root, Math.max(half - root, 0)]
 }
 
-/** Holding half of a centred bivariate normal with principal variances l1 >= l2: the outside share in whitened polar coordinates, (2/pi) int_0^{pi/2} exp(-R^2 / (2 (l1 cos^2 phi + l2 sin^2 phi))) dphi, solved for 1/2 by bisection (`apps/docs/docs/models/groups.md`, "Elliptical CEP"). */
+/** Holding half of a centered bivariate normal with principal variances l1 >= l2: the outside share in whitened polar coordinates, (2/pi) int_0^{pi/2} exp(-R^2 / (2 (l1 cos^2 phi + l2 sin^2 phi))) dphi, solved for 1/2 by bisection (`apps/docs/docs/models/groups.md`, "Elliptical CEP"). */
 function ellipticalCep(c: GroupCovariance): number {
   const [l1, l2] = eigenvalues(c)
   if (l1 === 0) return 0
@@ -339,7 +339,7 @@ function ellipticalCep(c: GroupCovariance): number {
   return bisect((r) => outside(r) > 0.5, [0, 1.2 * Math.sqrt(l1)], 100, true)
 }
 
-/** Ellipse about the group centre. */
+/** Ellipse about the group center. */
 export interface GroupEllipse {
   /** Semi-major axis, m. */
   semiMajor: number
@@ -349,7 +349,7 @@ export interface GroupEllipse {
   angle: number
 }
 
-/** Covariance ellipse about the centre scaled by `k`; `undefined` without covariance. */
+/** Covariance ellipse about the center scaled by `k`; `undefined` without covariance. */
 function ellipseAt(stats: GroupStatistics, k: number): GroupEllipse | undefined {
   const c = stats.covariance
   if (!c) return undefined
@@ -384,7 +384,7 @@ export function predictionEllipse(
   )
 }
 
-/** Exact angle, rad, of a segment of `length` centred on the line of sight at `distance` (m): 2 atan(L / 2D). */
+/** Exact angle, rad, of a segment of `length` centered on the line of sight at `distance` (m): 2 atan(L / 2D). */
 export function subtendedAngle(length: number, distance: number): number {
   need(distance > 0, { code: 'distance', params: {} })
   return 2 * Math.atan(length / (2 * distance))
@@ -406,7 +406,7 @@ function pooledValues(
   }
 }
 
-/** Each about its own centre and in angle at its own distance: `angular` always, the length fields only when the groups share one distance (relative difference below 1e-9); the intervals use `confidenceLevel`, the groups' own are ignored (`apps/docs/docs/models/groups.md`, "Angles and pooling"). */
+/** Each about its own center and in angle at its own distance: `angular` always, the length fields only when the groups share one distance (relative difference below 1e-9); the intervals use `confidenceLevel`, the groups' own are ignored (`apps/docs/docs/models/groups.md`, "Angles and pooling"). */
 export function pooledGroupStatistics(
   groups: GroupInput[],
   confidenceLevel = 0.95,

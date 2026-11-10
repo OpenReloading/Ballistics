@@ -20,7 +20,7 @@ function shotStatistics(values: number[]): {
   return { mean, standardDeviation, extremeSpread }
 }
 
-/** Against the printed values in the rows labelled (upper case) `rowLabels[0]`, `rowLabels[1]` and `rowLabels[2]`, as read by `readNumber`. */
+/** Against the printed values in the rows labeled (upper case) `rowLabels[0]`, `rowLabels[1]` and `rowLabels[2]`, as read by `readNumber`. */
 function compareStatistics(
   rows: string[][],
   values: number[],

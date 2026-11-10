@@ -1072,7 +1072,7 @@ function flagFailures(figure: Figure, medium: string, model: FigureModel) {
     const owners = new Set((model.layers[side] as Layout).labels.map((l) => l.owner))
     for (const { symbol } of [...dimensions, ...angles, ...radii])
       if (['delta', 'beta', 'r0', 'f'].includes(symbol) && !owners.has(symbol))
-        failures.push(what(`${side} ${symbol} not labelled`))
+        failures.push(what(`${side} ${symbol} not labeled`))
   }
   return failures
 }

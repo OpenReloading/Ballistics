@@ -65,7 +65,7 @@ describe('geometric form functions', () => {
   })
 })
 
-/** Counted on an n by n grid inside the outer circle: the uncovered cross-section of a seven-perforated grain burnt by y, perforation diameter dp, centre spacing s, outer radius r0. */
+/** Counted on an n by n grid inside the outer circle: the uncovered cross-section of a seven-perforated grain burnt by y, perforation diameter dp, center spacing s, outer radius r0. */
 const gridArea = (y: number, { dp, s, r0 }: { dp: number; s: number; r0: number }, n = 400) => {
   const rho = dp / 2 + y
   const r = r0 - y

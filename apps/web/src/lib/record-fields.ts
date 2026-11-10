@@ -582,7 +582,7 @@ export function powderParameterGroups(
   ].filter((g) => g.rows.length > 0)
 }
 
-/** One value of a record's spec strip: a labelled row, in the viewer's unit where it is a quantity. */
+/** One value of a record's spec strip: a labeled row, in the viewer's unit where it is a quantity. */
 export type StripItem = {
   icon:
     | 'manufacturer'

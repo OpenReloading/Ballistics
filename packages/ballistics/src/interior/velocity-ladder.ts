@@ -11,7 +11,7 @@ export interface LadderStep {
   count: number
 }
 
-/** The slope of mean velocity against charge between two neighbouring steps. */
+/** The slope of mean velocity against charge between two neighboring steps. */
 export interface LadderSegment {
   /** Charges of the two steps, kg. */
   from: number
@@ -26,7 +26,7 @@ export interface LadderSegment {
   counts: [number, number]
 }
 
-/** A run of neighbouring flat segments. */
+/** A run of neighboring flat segments. */
 export interface FlatSpot {
   /** Lowest and highest charge of the run, kg. */
   from: number

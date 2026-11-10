@@ -185,7 +185,7 @@ export function refusalText(
   }
   const reasons: Record<string, Message> = {
     notMonotone: msg('The value crosses the target at more than one charge.'),
-    bracketFailed: msg('No two neighbouring charges with a valid run enclose the target.'),
+    bracketFailed: msg('No two neighboring charges with a valid run enclose the target.'),
     toleranceNotReached: msg('The search did not reach its tolerance.'),
     noValidRun: msg('No charge in the range gives a valid run with this value.'),
     noComparableLimit: noComparableLimitText,

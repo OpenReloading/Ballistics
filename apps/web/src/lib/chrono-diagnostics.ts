@@ -51,7 +51,7 @@ const chronoMessages: Record<ChronoDiagnostic['code'], Message> = {
   noVelocity: msg('no velocity; skipped'),
   stringReturns: msg('string "{label}" returns after another string; read as a new string'),
   notShotView: msg('not a ShotView CSV: no "#" header row with a velocity unit'),
-  footerDateUnknown: msg('footer date "{text}" is not recognised; enter the date'),
+  footerDateUnknown: msg('footer date "{text}" is not recognized; enter the date'),
   footerDateMissing: msg('footer date row not found; enter the date'),
   noShotViewHeader: msg('no ShotView header row; skipped'),
   statisticNotNumber: msg('footer {label} "{value}" is not a number; not checked'),

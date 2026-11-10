@@ -77,7 +77,7 @@ const title: Readonly<Record<string, Message>> = {
   'nickel-plated-brass': msg('Nickel plated brass'),
   'lacquered-steel': msg('Lacquered steel'),
   'polymer-coated-steel': msg('Polymer coated steel'),
-  aluminium: msg('Aluminium'),
+  aluminium: msg('Aluminum'),
   // primer sizes and compounds
   'small-rifle': msg('Small rifle'),
   'large-rifle': msg('Large rifle'),
@@ -95,7 +95,7 @@ export const rawWording = (value: string): Wording => raw[value] ?? verbatim(val
 export const spacedWording = (value: string): Wording =>
   spaced[value] ?? verbatim(value.replaceAll('-', ' '))
 
-/** A value capitalised, hyphens as spaces ("Nickel plated brass"). */
+/** A value capitalized, hyphens as spaces ("Nickel plated brass"). */
 export const titleWording = (value: string): Wording =>
   title[value] ?? verbatim(titleFromKebab(value))
 
@@ -118,6 +118,6 @@ const methods: Readonly<Record<string, Message>> = {
 /** The pressure measuring method of a cartridge record. */
 export const methodWording = (value: string): Wording => methods[value] ?? verbatim(value)
 
-/** A yes or no value, lower case as the bullet table writes it, or capitalised as the case and primer tables do. */
+/** A yes or no value, lower case as the bullet table writes it, or capitalized as the case and primer tables do. */
 export const yesNo = (value: boolean, capitalised = false): Wording =>
   capitalised ? (value ? msg('Yes') : msg('No')) : value ? msg('yes') : msg('no')

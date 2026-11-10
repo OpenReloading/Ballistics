@@ -130,7 +130,7 @@ function verticalTarget(
   )
 }
 
-/** The focusable of the neighbouring cell of the row that holds something to focus. */
+/** The focusable of the neighboring cell of the row that holds something to focus. */
 function sideTarget(key: string, row: HTMLElement, cell: HTMLElement) {
   const cells = [...row.querySelectorAll<HTMLElement>('[data-col]')].filter(focusableIn)
   const at = cells.indexOf(cell) + (key === 'ArrowRight' ? 1 : -1)
@@ -687,7 +687,7 @@ function DirectoryRow<T extends { id: string }>({
   )
 }
 
-/** A plain click opens the row in the page; a modified one keeps the link's own behaviour. */
+/** A plain click opens the row in the page; a modified one keeps the link's own behavior. */
 function openInPage(e: ReactMouseEvent<HTMLAnchorElement>, open: () => void) {
   if (e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
   e.preventDefault()

@@ -350,6 +350,7 @@ export type M3LoadShape = {
         boreArea: z.ZodNumber;
         boreDiameter: z.ZodNumber;
         throatWear: z.ZodOptional<z.ZodNumber>;
+        area: z.ZodOptional<z.ZodNumber>;
     }, z.core.$strict>;
     barrel: z.ZodObject<{
         length: z.ZodNumber;

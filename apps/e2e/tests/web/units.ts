@@ -24,7 +24,7 @@ async function settingsDialog(page: Page) {
   const dialog = page.getByRole('dialog', { name: 'Settings' })
   // the form shows once the stored choice is read
   await dialog.getByRole('radiogroup', { name: 'Preset' }).waitFor()
-  // checks during the transition would read half-transparent colours
+  // checks during the transition would read half-transparent colors
   await expect(dialog).toHaveCSS('opacity', '1')
   return dialog
 }

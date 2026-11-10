@@ -26,7 +26,7 @@ describe('properties', () => {
     )
   })
 
-  it('never scores a hole farther from the centre higher', () => {
+  it('never scores a hole farther from the center higher', () => {
     fc.assert(
       fc.property(finite(0, 0.06), finite(0, 0.06), finite(0, 2 * Math.PI), (a, b, angle) => {
         const [near, far] = a <= b ? [a, b] : [b, a]

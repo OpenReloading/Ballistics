@@ -170,7 +170,7 @@ describe('turnSheet', () => {
 })
 
 describe('a photo with a 100 mm line, turned by 90 degrees, then a rectangle', () => {
-  // a 1600 x 1200 px photo: a 100 mm bar from (300, 1100) to (1300, 1100), a 100 mm square from (300, 100) to (1300, 1100), the origin at the photo centre
+  // a 1600 x 1200 px photo: a 100 mm bar from (300, 1100) to (1300, 1100), a 100 mm square from (300, 100) to (1300, 1100), the origin at the photo center
   const line = {
     kind: 'line' as const,
     a: { x: 300, y: 1100 },
@@ -237,7 +237,7 @@ describe('overlays', () => {
     expect(shotExtentCorners(group.shots)?.[2]).toEqual({ x: 0.014, y: 0.002 })
   })
 
-  it('puts ellipse points at the covariance semi-axes and the axis through the centre', () => {
+  it('puts ellipse points at the covariance semi-axes and the axis through the center', () => {
     const s = groupStatisticsOf(group)
     const pts = ellipsePoints(s, dispersionEllipse(s, 0.95), 4)
     const c = s.centre
@@ -305,7 +305,7 @@ describe('overlays', () => {
       gap: 3 * k,
     }
     const s = groupStatisticsOf(g)
-    if (!s.centre || !s.excludedOffset) throw new Error('no centre')
+    if (!s.centre || !s.excludedOffset) throw new Error('no center')
     const c = v(s.centre)
     const outlines = [predictionEllipse, dispersionEllipse].flatMap((at) =>
       coverages.map((p) => (ellipsePoints(s, at(s, p)) ?? []).map(v)),

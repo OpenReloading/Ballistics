@@ -505,7 +505,7 @@ _Avoid_: cd
 A record of kind `target-faces`: a printed face as a rule book defines it, with `name`, `federation`, `rings`, `innerTen`, `blackDiameter`, `blackHeight`, `decimal`, `events`, `paper`, `bulls`, `numerals`. Its list item carries `caliberClasses` and `categories`.
 
 **Ring**:
-One entry of `rings`, outer to inner: `value` (the score, one above the ring outside it), `diameter` (width to the outside edge of the ring line, mm), `height` of an oval ring (mm), `fill` (colour of the zone the ring line bounds outside) and `line` (colour of the ring line). `rings` is also an overlay switch.
+One entry of `rings`, outer to inner: `value` (the score, one above the ring outside it), `diameter` (width to the outside edge of the ring line, mm), `height` of an oval ring (mm), `fill` (color of the zone the ring line bounds outside) and `line` (color of the ring line). `rings` is also an overlay switch.
 
 **Inner ten**:
 `innerTen`: the inner ten of a face, `diameter`, `height` (oval faces) and `rule`: `touch` counts a hole that touches its circle, `cover` only a hole that covers it.
@@ -523,8 +523,8 @@ One entry of `events` of a face: `id`, `name`, `distance`, `gauge`, `scoring`, `
 **Gauge**:
 `gauge`: diameter of the hole as scored, mm: a face event's gauge, or the one a target mapping fixes for a discipline. A target mapping list item carries `gaugeMm`.
 
-**Centre scoring**:
-`scoring`: `centre` when a ring counts only if the centre of the hole lies on or inside its line, whatever the hole size.
+**Center scoring**:
+`scoring`: `centre` when a ring counts only if the center of the hole lies on or inside its line, whatever the hole size.
 
 **Discipline category**:
 `category`: kind of firearm a discipline or face event is shot with, for example `rifle` or `service-pistol`. `categories` on a target face list item.
@@ -534,7 +534,7 @@ One entry of `events` of a face: `id`, `name`, `distance`, `gauge`, `scoring`, `
 _Avoid_: sheet, sheetFormat
 
 **Bull**:
-One entry of `bulls`: a scoring centre of a face with several, `x` and `y` from the sheet centre (x right, y up, mm) and the `zone` label of a card with two scoring zones.
+One entry of `bulls`: a scoring center of a face with several, `x` and `y` from the sheet center (x right, y up, mm) and the `zone` label of a card with two scoring zones.
 
 **Printed numerals**:
 `numerals`: the ring values are printed on the face.
@@ -613,7 +613,7 @@ _Avoid_: workbenchLoad
 One entry of `files`: a photo with `id`, media `type` and base64 `data`.
 
 **Bullet design**:
-A user record of kind `bullet`: `origin` (`user`), the `manufacturer` reference, the `basedOn` catalogue reference and the `overrides` of the bullet fields, in stored units.
+A user record of kind `bullet`: `origin` (`user`), the `manufacturer` reference, the `basedOn` catalogue reference, the `overrides` of the bullet fields, in stored units, and `photo`, what a photograph the values were measured from gave: its `width` and `height` (px), its scale `pxPerMm` with its `relativeStandardUncertainty`, the `scaleBasis` and the `values`, each with its `standardUncertainty`. No image is stored; unlike the `photo` of a target sheet, it names no embedded file.
 
 **Cartridge design**:
 A user record of kind `cartridge`: `origin` (`user`), the `basedOn` catalogue reference and `overrides` of the `table` and the spec `values`.
@@ -700,7 +700,7 @@ _Avoid_: click
 One entry of `configurations`: the optics mounted on a firearm between `mounted` and `removed` (ISO dates), with `id`, `name` and 1 to 4 `mounts`.
 
 **Optic mount**:
-One entry of `mounts`: `optic` (local id), `sightHeight` (mm), `lateralOffset` (optic centre right of the bore, mm), `cant` (clockwise as seen from behind, degrees), `zeroRange` (mm), `zeroNotes`, the optional air of the zero (`zeroTemperature` degC, `zeroPressure` bar, `zeroHumidity` %) and an optional `dragFactor` with its `dragFactorSource`.
+One entry of `mounts`: `optic` (local id), `sightHeight` (mm), `lateralOffset` (optic center right of the bore, mm), `cant` (clockwise as seen from behind, degrees), `zeroRange` (mm), `zeroNotes`, the optional air of the zero (`zeroTemperature` degC, `zeroPressure` bar, `zeroHumidity` %) and an optional `dragFactor` with its `dragFactorSource`.
 _Avoid_: `offset` (of a mount)
 
 **Sight height**:
@@ -718,7 +718,7 @@ A user record of kind `targetSheet`: a `photo` (local id of an embedded file) or
 One entry of `references`: a scale or perspective reference on the photo, by `kind`: `line` (points `a` and `b` a known `length` apart), `ringCentre` (`centre` and a point on the `edge` of a ring of known `diameter`), `ringEdge` (three `points` on such a ring), `rectangle` (`corners` of a known `width` and `height`). Points in photo px, lengths in m.
 
 **Position**:
-`x` and `y`: a point. On the target in m, x right, y up (group shots, point of aim, notes, ring marks). On the photo in px, x right, y down. On a face's `bulls` in mm from the sheet centre.
+`x` and `y`: a point. On the target in m, x right, y up (group shots, point of aim, notes, ring marks). On the photo in px, x right, y down. On a face's `bulls` in mm from the sheet center.
 
 **Target rotation**:
 `targetRotation`: angle of the target's x axis on the photo, counter-clockwise, rad.
@@ -749,7 +749,7 @@ One entry of a group's `shots`: `x`, `y`, `excluded`, `placement` (`detected` or
 _Avoid_: `origin` (of a shot), hole
 
 **Hole detection**:
-`detection`: the choices of hole detection kept for the next run: `region` (photo polygon searched), `expectedHoleDiameter` (m), `backing` (colour seen through a hole), `minContrast` (least contrast as a fraction of the local paper white) and `polarity` (`dark` or `light`).
+`detection`: the choices of hole detection kept for the next run: `region` (photo polygon searched), `expectedHoleDiameter` (m), `backing` (color seen through a hole), `minContrast` (least contrast as a fraction of the local paper white) and `polarity` (`dark` or `light`).
 _Avoid_: holeSize
 
 **Ring marks**:

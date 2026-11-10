@@ -18,7 +18,7 @@ import { shownLength } from './shown-length.tsx'
 /** How an event scores a hole, by the stored value. */
 const scoredBy = {
   touch: msg('Hole edge'),
-  centre: msg('Hole centre'),
+  centre: msg('Hole center'),
   outward: msg('Hole edge, outward'),
 }
 

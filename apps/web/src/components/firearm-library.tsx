@@ -43,7 +43,7 @@ import {
 } from '../lib/caliber-class-of.ts'
 import { dayText } from '../lib/dates.ts'
 import { errorText } from '../lib/error-text.ts'
-import { loadExample } from '../lib/example-data.ts'
+import { exampleFirearm, exampleFirearmIn } from '../lib/example-data.ts'
 import {
   blankFirearm,
   cardFacts,
@@ -84,8 +84,8 @@ import { recordLoadingText, useRecordLink } from './use-record-link.ts'
 
 type FirearmRecord = Extract<UserRecord, { kind: 'firearm' }>
 
-/** The example load's rifle: listed last, opened read-only; Copy to edit and Duplicate make an editable copy. */
-const example = loadExample.firearm as FirearmRecord
+/** The example load's rifle is listed last, opened read-only; Copy to edit and Duplicate make an editable copy. Its names follow the language, so it is found by id. */
+const isExample = (r: FirearmRecord) => r.id === exampleFirearm.id
 
 function ExampleBadge() {
   const { t } = useTranslation()
@@ -103,10 +103,10 @@ function ExampleBadge() {
   )
 }
 
-const nameOf = (r: FirearmRecord) => (r === example ? r.data.name : r.name)
+const nameOf = (r: FirearmRecord) => (isExample(r) ? r.data.name : r.name)
 
 const rowHref = (r: FirearmRecord) =>
-  r === example ? '/firearms' : `/firearms?record=${encodeURIComponent(r.id)}`
+  isExample(r) ? '/firearms' : `/firearms?record=${encodeURIComponent(r.id)}`
 
 const tableCaption = (t: Translator['t'], named: unknown[]) =>
   named.length > 0
@@ -145,7 +145,7 @@ function firearmColumns(
       width: '12.5rem',
       value: nameOf,
       cell: (r) =>
-        r === example ? (
+        isExample(r) ? (
           <>
             {nameOf(r)} <ExampleBadge />
           </>
@@ -257,7 +257,7 @@ function RowActions({
   onPrintCards: () => void
 }) {
   const { t } = useTranslation()
-  const stored = r !== example
+  const stored = !isExample(r)
   return (
     <Menu position="bottom-end" withinPortal>
       <Menu.Target>
@@ -410,7 +410,11 @@ const opticNameIn = (f: Firearm, t: Translator['t']) => (id: string) => {
 }
 
 /** The listed firearms and the example that the search keeps. */
-function matching(list: FirearmRecord[] | undefined, matches: (r: FirearmRecord) => boolean) {
+function matching(
+  list: FirearmRecord[] | undefined,
+  example: FirearmRecord,
+  matches: (r: FirearmRecord) => boolean,
+) {
   const shown = list?.filter(matches)
   const exampleShown = matches(example) ? example : undefined
   // the browser's firearms first, the example last under the group rule
@@ -520,6 +524,7 @@ const nameOfCartridge = (
 function PrintCards({
   editing,
   viewing,
+  example,
   data,
   cartridgeName,
   bulletName,
@@ -530,6 +535,7 @@ function PrintCards({
 }: {
   editing: boolean
   viewing: boolean
+  example: FirearmRecord
   data: Firearm
   cartridgeName: (ref: string | undefined) => string | undefined
   bulletName: (ref: string | undefined) => string | undefined
@@ -564,11 +570,13 @@ function PrintCards({
 
 /** The example open read-only: its data card and Copy to edit. */
 function ExampleView({
+  example,
   cartridge,
   system,
   opticName,
   onCopy,
 }: {
+  example: FirearmRecord
   cartridge: string | undefined
   system: UnitSystem
   opticName: (id: string) => string
@@ -601,6 +609,7 @@ function ExampleView({
 export function FirearmLibrary() {
   const tr = useTranslation()
   const { t, tn } = tr
+  const example = useMemo(() => exampleFirearmIn(t) as unknown as FirearmRecord, [t])
   const { system } = useUnits()
   const [data, setData] = useState<Firearm>(blankFirearm)
   const [list, setList] = useState<FirearmRecord[]>()
@@ -755,7 +764,7 @@ export function FirearmLibrary() {
     return [cartridgeName(r.data.cartridge), facts.barrel, facts.sight]
   }
   const matches = (r: FirearmRecord) => matchesQuery([r.name, ...lines(r)], filters.query)
-  const { shown, exampleShown, rows } = matching(list, matches)
+  const { shown, exampleShown, rows } = matching(list, example, matches)
   const named = namedFilters(t, filters.query)
   const duplicate = (r: FirearmRecord) => start({ ...r.data, name: copyName(r.data.name) })
   const { printCards, rangeCards } = useRangeCards(system, setFailure)
@@ -882,7 +891,7 @@ export function FirearmLibrary() {
                 columns={columns}
                 link="name"
                 href={rowHref}
-                onOpen={(r) => (r === example ? view() : menu.current?.open(r))}
+                onOpen={(r) => (isExample(r) ? view() : menu.current?.open(r))}
                 facts={facts}
                 label={nameOf}
                 caption={tableCaption(t, named)}
@@ -890,7 +899,7 @@ export function FirearmLibrary() {
                 sort={filters.sort}
                 onSort={(sort) => setFilters({ sort })}
                 phoneAction={(r, tabIndex) => actionsMenu(r, tabIndex)}
-                breakBefore={filters.sort ? undefined : (r) => r === example}
+                breakBefore={filters.sort ? undefined : isExample}
                 empty={
                   <EmptyList noun="firearms" filters={filterText(named)} onClear={clearFilters} />
                 }
@@ -901,6 +910,7 @@ export function FirearmLibrary() {
 
         {viewing && (
           <ExampleView
+            example={example}
             cartridge={cartridgeName(example.data.cartridge)}
             system={system}
             opticName={exampleOpticName}
@@ -933,6 +943,7 @@ export function FirearmLibrary() {
       <PrintCards
         editing={editing}
         viewing={viewing}
+        example={example}
         data={data}
         cartridgeName={cartridgeName}
         bulletName={bulletName}

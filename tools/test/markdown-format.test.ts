@@ -56,7 +56,11 @@ it('finds an indented line in front matter, not a blank one', () => {
 })
 
 it('keeps the front matter of every page one key per line, which Biome leaves as it is', () => {
-  const pages = execFileSync('git', ['ls-files', '*.md'], { cwd: root, encoding: 'utf8' })
+  // Biome skips .claude (biome.json), where skills are copied from upstream unchanged
+  const pages = execFileSync('git', ['ls-files', '*.md', ':!.claude'], {
+    cwd: root,
+    encoding: 'utf8',
+  })
     .split('\n')
     .filter(Boolean)
   expect(pages.length).toBeGreaterThan(100)

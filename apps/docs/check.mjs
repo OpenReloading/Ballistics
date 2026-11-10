@@ -1,7 +1,4 @@
-// Runs TypeDoc on every package without writing output: an undocumented export, a TypeDoc
-// warning or an exported variable or function whose rendered type is too long (`scripts/type-length.mts`)
-// fails the run.
-// Needs the packages built first: the packages import each other's dist/.
+// Runs TypeDoc on every package without writing output, after the packages are built (they import each other's dist/): an undocumented export, a TypeDoc warning or an exported variable or function whose rendered type is too long (`scripts/type-length.mts`) fails the run.
 import { join } from 'node:path'
 import {
   Application,

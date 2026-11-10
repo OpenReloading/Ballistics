@@ -103,7 +103,7 @@ test('the buttons of the Safety notice pass the axe contrast check in light and 
     await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', colorScheme)
     const dialog = page.getByRole('dialog', { name: /Safety notice and disclaimer/ })
     await expect(dialog.getByRole('button', { name: 'I accept' })).toBeVisible()
-    // the opening transition ends at full opacity: axe measures the final colours
+    // the opening transition ends at full opacity: axe measures the final colors
     await expect(dialog).toHaveCSS('opacity', '1')
     const { violations, passes } = await new AxeBuilder({ page })
       .include('[role="dialog"] .mantine-Group-root')
@@ -129,7 +129,7 @@ test('the Safety buttons pass the axe contrast check in light and dark at 1280 a
         .withRules(['color-contrast'])
         .analyze()
       expect(violations.map((v) => `${colorScheme} ${width}: ${v.id}`)).toEqual([])
-      // the labelled button's text was checked, not skipped
+      // the labeled button's text was checked, not skipped
       if (width === 1280) expect(passes.map((p) => p.id)).toContain('color-contrast')
     }
 })

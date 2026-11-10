@@ -111,7 +111,7 @@ Where E stops: the whole-list read is linear, so 10,000 rows per kind cost about
 
 Decision 1, the shape of the search:
 - **A. Improved inline combobox**: word matching in any order, ranking, grouped results. Smallest change. No filters, no weight or caliber range, no preview, and the phone list stays short; thousands of records stay a typing exercise.
-- **B. A dialog only**, opened from the card: query, filters, sortable result, preview. Best for browsing. The common case "I know the name" costs one more step, and the card head changes its behaviour.
+- **B. A dialog only**, opened from the card: query, filters, sortable result, preview. Best for browsing. The common case "I know the name" costs one more step, and the card head changes its behavior.
 - **C. Both (recommended)**: the card's field keeps typing for a quick pick, a button at its end opens the dialog with the typed text.
 
 Decision 2, where matching runs: D, E (recommended up to about 10,000 rows per kind) or F.

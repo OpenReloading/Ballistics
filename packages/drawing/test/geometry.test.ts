@@ -23,9 +23,9 @@ const label = (c: PartPoint, dir: PartPoint = [1, 0], w = 4, h = 2): Label => ({
   h,
   owner: 'o',
 })
-/** A box off the origin and turned off the axes: its centre (10, 5), its direction (0.6, 0.8). */
+/** A box off the origin and turned off the axes: its center (10, 5), its direction (0.6, 0.8). */
 const turned = label([10, 5], [0.6, 0.8])
-/** The point `u` along the direction of `l` and `v` across it from its centre. */
+/** The point `u` along the direction of `l` and `v` across it from its center. */
 const at = (l: Label, u: number, v: number): PartPoint => [
   l.c[0] + u * l.dir[0] - v * l.dir[1],
   l.c[1] + u * l.dir[1] + v * l.dir[0],
@@ -149,7 +149,7 @@ describe('boxesOverlap', () => {
   })
 
   it('separates on the cross axis of either box where no other axis does', () => {
-    // a small square at 45 degrees to the turned box, 1 + 0.354 mm from its centre line at most
+    // a small square at 45 degrees to the turned box, 1 + 0.354 mm from its center line at most
     const r = Math.SQRT1_2
     const small = (v: number) =>
       label(at(turned, 0, v), [(0.6 - 0.8) * r, (0.8 + 0.6) * r], 0.5, 0.5)
@@ -366,7 +366,7 @@ describe('fillet', () => {
   })
 
   it('draws the quarter arc whose angles cross the negative axis in either direction', () => {
-    // centre [0.5, 0.5]: from 180 to 270 degrees, the short way across +-180
+    // center [0.5, 0.5]: from 180 to 270 degrees, the short way across +-180
     const forward = defined(fillet([0, 1], [0, 0], [1, 0], 0.5, 2) ?? undefined)
     near(forward, [
       [0, 0.5],
