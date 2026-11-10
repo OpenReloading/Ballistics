@@ -55,7 +55,10 @@ const ajv = new Ajv2020({ allErrors: true, strict: false })
 const validate = ajv.compile(JSON.parse(readFileSync(schemaPath, 'utf8')))
 
 describe('the JSON result', () => {
-  it('validates against the committed schema, for both commands', async () => {
+  // the runs with a fit run the model many times, and the CI runner measures coverage: the default 30 s is too short there
+  it('validates against the committed schema, for both commands', {
+    timeout: 120_000,
+  }, async () => {
     const pressures = writeRows(
       rowsCsv(
         [
