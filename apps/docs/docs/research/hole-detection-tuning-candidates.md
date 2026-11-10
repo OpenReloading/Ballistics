@@ -111,7 +111,7 @@ measured. Third-party target photos, model-made annotations, the runner and per-
 
 ## Where in the app
 
-- `apps/web/src/lib/hole-detection.ts` (the detector constants; unchanged).
+- `packages/target-recognition/src/hole-detection.ts` (the detector constants; unchanged).
 - `apps/web/src/lib/hole-proposals.ts` (the confidence tier; unchanged).
 - [Hole detection](../models/hole-detection.md), Quality bar: no measured result meets the default bar.
 

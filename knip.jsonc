@@ -49,7 +49,7 @@
       "entry": ["src/index.ts", "src/advisory-text.ts"]
     },
     "packages/target-recognition": {
-      "entry": ["src/index.ts"]
+      "entry": ["src/index.ts", "test/fixtures/target-photos/make.mts"]
     },
     "packages/drawing": {
       // the bullet records of data are read by path in the tests, declared so the CI plan tests drawing with them
@@ -102,8 +102,7 @@
         "scripts/glyph-advances.mts",
         "src/service-worker.js",
         // scripts/service-worker.mts copies every export into out/sw.js through a namespace import
-        "src/lib/offline.ts",
-        "test/fixtures/target-photos/make.mts"
+        "src/lib/offline.ts"
       ]
     },
     "apps/e2e": {

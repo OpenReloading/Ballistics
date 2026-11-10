@@ -192,18 +192,21 @@ function darkFaceAt(r: number): Rgb {
 }
 
 /** The color of a hole at distance `d` from its center with the torn `edge`, `rv` the mean radius; undefined outside. */
-function holeColourAt(s: Scene, d: number, edge: number, rv: number): Rgb | undefined {
-  if (d <= edge) {
-    if (s.face === 'rings') return [58, 56, 54]
-    if (s.face === 'dark') return [226, 224, 216]
-    if (s.face === 'night') return NIGHT_HOLE
-    return [240, 234, 214]
-  }
+function holeColorAt(s: Scene, d: number, edge: number, rv: number): Rgb | undefined {
+  if (d <= edge) return throughHole(s.face)
   // bullet wipe on paper, a burnt rim on the orange face
   if (s.face === 'rings' && d <= edge + 0.12 * rv) return [90, 88, 86]
   if (s.face === 'night' && d <= edge + 0.15 * rv) return NIGHT_RIM
   if (s.face === 'orange' && d <= edge + 0.2 * rv) return [46, 34, 26]
   return undefined
+}
+
+/** The color that shows through a hole in the face. */
+function throughHole(face: Scene['face']): Rgb {
+  if (face === 'rings') return [58, 56, 54]
+  if (face === 'dark') return [226, 224, 216]
+  if (face === 'night') return NIGHT_HOLE
+  return [240, 234, 214]
 }
 
 /** The scene color at (x, y): face, holes with torn edges and their rims. */
@@ -219,14 +222,18 @@ function sceneAt(s: Scene, x: number, y: number, phase: number[]): Rgb {
       (1 +
         0.06 * Math.sin(5 * a + defined(phase[2 * i])) +
         0.03 * Math.sin(11 * a + defined(phase[2 * i + 1])))
-    const colour = holeColourAt(s, d, edge, rv)
-    if (colour) return colour
+    const color = holeColorAt(s, d, edge, rv)
+    if (color) return color
   }
   return faceAt(s, x, y)
 }
 
 /** Scene point to photo point: the tilt about the middle, counter-clockwise on screen. */
-export function tilted(s: Scene, p: { x: number; y: number }, inverse = false) {
+export function tilted(
+  s: Scene,
+  p: { x: number; y: number },
+  inverse = false,
+): { x: number; y: number } {
   const a = ((inverse ? -1 : 1) * s.tilt * Math.PI) / 180
   const [cx, cy] = [s.width / 2, s.height / 2]
   const [dx, dy] = [p.x - cx, p.y - cy]

@@ -7,6 +7,9 @@
 import type { Point } from '@open-reloading/shot-groups';
 
 // @public
+export function autoDetect(raw: HoleDetectionInput): Found | undefined;
+
+// @public
 export function boxBlur(src: Float32Array, input: {
     w: number;
     h: number;
@@ -20,16 +23,111 @@ export const clamp: (v: number, lo: number, hi: number) => number;
 export function components(mask: Uint8Array, w: number, h: number): number[][];
 
 // @public
+export function detectFromExample(input: HoleDetectionInput, at: Point): (Found & {
+    example: HoleExample;
+}) | undefined;
+
+// @public
 export function distanceSquared(mask: Uint8Array, w: number, h: number, target: number): Float64Array;
 
 // @public
+export type FaceLabel = {
+    outline: Point[];
+    black: (p: Point) => boolean;
+    numeral?: ((p: Point, roll?: number) => boolean) | undefined;
+    quarter?: ((p: Point, roll?: number) => boolean) | undefined;
+    polar?: (p: Point) => {
+        radius: number;
+        angle: number;
+    };
+};
+
+// @public
+export function findHoles(input: HoleDetectionInput): {
+    proposals: HoleProposal[];
+    flagged: FlaggedRegion[];
+};
+
+// @public
+export type FlaggedRegion = {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    holeAreas: number;
+};
+
+// @public
+export type Found = {
+    proposals: HoleProposal[];
+    flagged: FlaggedRegion[];
+    holeDiameter: number;
+};
+
+// @public
+export type HoleDetectionInput = {
+    image: RgbaImage;
+    region?: Region;
+    pxPerM: number;
+    expectedHoleDiameter: number;
+    minContrast?: number;
+    holeScale?: number;
+    backing?: {
+        r: number;
+        g: number;
+        b: number;
+    };
+    polarity?: 'dark' | 'light';
+    onProgress?: (done: number) => void;
+    face?: FaceLabel | undefined;
+};
+
+// @public
+export const holeDetector: InferencePort;
+
+// @public
+export type HoleExample = {
+    diameter: number;
+    backing: {
+        r: number;
+        g: number;
+        b: number;
+    };
+    polarity: 'dark' | 'light';
+};
+
+// @public
+export type HoleProposal = {
+    x: number;
+    y: number;
+    confidence: number;
+    clusterSize: number;
+    clusterId: number;
+    diameter: number;
+};
+
+// @public
+export interface InferencePort {
+    propose(request: ProposalRequest): Promise<Proposals>;
+}
+
+// @public
 export function insidePolygon(p: Point, poly: readonly Point[]): boolean;
+
+// @public
+export const MAX_WORK_PIXELS = 2000000;
 
 // @public
 export function median1(v: readonly number[]): number;
 
 // @public (undocumented)
 export const open: (src: Float32Array, w: number, h: number, k: number) => Float32Array;
+
+// @public
+export function otsu(hist: Float64Array, n: number): number;
+
+// @public
+export function paperOutline(image: RgbaImage): Point[];
 
 // @public
 export type Peak = {
@@ -43,6 +141,20 @@ export type Peak = {
 export function peaksOf(sp: Space, inside: Uint8Array, D: number, count?: number): Peak[];
 
 // @public
+export type ProposalRequest = HoleDetectionInput & {
+    at?: Point | undefined;
+    auto?: boolean | undefined;
+};
+
+// @public
+export type Proposals = {
+    proposals: HoleProposal[];
+    flagged: FlaggedRegion[];
+    holeDiameter?: number;
+    example?: HoleExample;
+};
+
+// @public
 export const radiiOf: (D: number, factors: number[]) => number[];
 
 // @public (undocumented)
@@ -52,6 +164,21 @@ export const rectangle: (r: {
     width: number;
     height: number;
 }) => Point[];
+
+// @public
+export type Region = readonly Point[] | {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+};
+
+// @public
+export type RgbaImage = {
+    width: number;
+    height: number;
+    data: Uint8ClampedArray;
+};
 
 // @public
 export function sigmaAt(sp: Space, i: number, count?: number): number;
@@ -69,6 +196,12 @@ export const space: (P: Float32Array, w: number, h: number, radii: number[]) => 
 
 // @public
 export const upperMedian: (v: readonly number[]) => number;
+
+// @public
+export const WORK_DIAMETER = 16;
+
+// @public
+export function workBlockSize(holePx: number, width: number, height: number, work?: number): number;
 
 // (No @packageDocumentation comment for this package)
 
