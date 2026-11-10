@@ -97,6 +97,10 @@ it('runs the e2e job for the scripts that build and serve the export', () => {
     expect(plan([f], closure), f).toMatchObject({ check: true, e2e: true })
 })
 
+it('runs the e2e job for a change of the design tokens, whose palette the web app loads', () => {
+  expect(plan(['packages/design-tokens/tokens/base.tokens.json'], closure).e2e).toBe(true)
+})
+
 it('builds with the sample when the web app changed outside the record pages', () => {
   expect(plan(['apps/web/src/components/workbench.tsx'], closure)).toMatchObject({
     prerender: 'sample',

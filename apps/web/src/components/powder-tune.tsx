@@ -576,7 +576,7 @@ function stringRow(
     <tr key={key} className={fault ? 'string-fault' : undefined}>
       <td className="num">
         {fault && (
-          <Badge variant="outline" color="var(--warn-fg)" mr="xs">
+          <Badge variant="outline" color="var(--warn-text)" mr="xs">
             {t('Cannot run')}
           </Badge>
         )}

@@ -12,9 +12,9 @@ import { axisText, chartTooltip, EChart, tickStep, useChartTokens } from './echa
 const tokens = {
   line: '--series-1',
   muted: '--muted',
-  border: '--border',
-  bg: '--bg',
-  fg: '--fg',
+  border: '--line',
+  bg: '--page',
+  fg: '--ink',
 }
 
 const ms = (s: number | undefined) => (s === undefined ? null : s * 1e3)

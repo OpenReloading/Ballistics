@@ -81,7 +81,7 @@ function chartTitle(v: Pick<ChartView, 'x' | 'quantity'>, t: Translator['t']) {
   })
 }
 
-/** The chart colors from the page's tokens (`globals.css`). */
+/** The chart colors from the page's tokens (`tokens.css` of `@open-reloading/design-tokens` and `globals.css`). */
 const themeTokens: Record<keyof ChartTheme, string> = {
   pressure: '--series-2',
   pressureText: '--series-2-text',
@@ -90,11 +90,11 @@ const themeTokens: Record<keyof ChartTheme, string> = {
   grid: '--grid',
   velocity: '--series-1',
   energy: '--series-3',
-  foreground: '--fg',
+  foreground: '--ink',
   muted: '--muted',
-  border: '--border',
-  warning: '--warn-fg',
-  background: '--bg',
+  border: '--line',
+  warning: '--warn-text',
+  background: '--page',
 }
 
 /** Pressure, velocity and energy on their own axes; `selected` solid with its event lines, the tooltip also by keyboard, a collapsed data table. */
