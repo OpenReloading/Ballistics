@@ -23,7 +23,7 @@ Run them in the dev container (`.devcontainer/`): `devcontainer exec --workspace
 
 - Reuse before reimplementing: before you write new logic, look for code that already does it, and extend or generalize that instead of building a parallel version.
 - Don't reinvent the wheel: when a well-maintained open-source package solves the problem (recent releases, a license in `allow-licenses` of [`.github/dependency-review-config.yml`](.github/dependency-review-config.yml), a size that fits the [weight budget](apps/web/weight-budget.json)), use it instead of writing our own, and name it and the reason in the pull request. A few lines of our own still beat a new dependency.
-- Comments only where the code cannot say it: one line, the why, not the how.
+- Comments only where the code cannot say it: one line, the why, not the how. `pnpm run check:changed` and CI fail a new multi-line comment outside the doc comments of the published API ([`tools/src/comment-lines.ts`](tools/src/comment-lines.ts)).
 - Names: never call a file, folder or module `utils`, `helpers`, `common`, `misc` or `shared`. Name it after what it contains. A file that wants such a name has more than one job: split it.
 - UI: colors, spacing and sizes come from the tokens, the CSS custom properties of [`apps/web/src/app/globals.css`](apps/web/src/app/globals.css) and the control sizes of [`apps/web/src/lib/theme.ts`](apps/web/src/lib/theme.ts), on Mantine components. No new colors, font sizes, spacing or shadows when a token already covers the role.
 - Wording: results are simulations, not load data. No text calls a load or a result safe.
