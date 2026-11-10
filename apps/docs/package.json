@@ -33,6 +33,7 @@
     "@docusaurus/plugin-sitemap": "3.10.2",
     "@docusaurus/theme-classic": "3.10.2",
     "@open-reloading/api": "workspace:*",
+    "@open-reloading/design-tokens": "workspace:*",
     "@scalar/api-reference": "1.77.0",
     "katex": "0.19.1",
     "pagefind": "1.6.0",

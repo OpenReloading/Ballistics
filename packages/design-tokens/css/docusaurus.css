@@ -45,6 +45,8 @@
   --ifm-navbar-shadow: none;
   --ifm-menu-color: var(--ink);
   --ifm-menu-color-active: var(--link);
+  /* the active breadcrumb sits on the hover overlay, where the light accent falls under 4.5:1 */
+  --ifm-breadcrumb-color-active: var(--link);
   --ifm-footer-background-color: var(--page);
   --ifm-footer-color: var(--ink);
   --ifm-footer-link-color: var(--ink);

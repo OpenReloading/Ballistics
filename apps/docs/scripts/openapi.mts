@@ -1,4 +1,4 @@
-// Writes the REST reference page to static/rest/ (openapi.json of the current routes, the Scalar viewer scalar.js and the page loading both); needs `pnpm run build` at the root, API_URL is the API its reference sends requests to, unset (GitHub Pages) the page links to none
+// Writes the REST reference page to static/rest/ (openapi.json of the current routes, the Scalar viewer scalar.js, the palette tokens.css and the page loading them); needs `pnpm run build` at the root, API_URL is the API its reference sends requests to, unset (GitHub Pages) the page links to none
 import { copyFileSync, mkdirSync, writeFileSync } from 'node:fs'
 import { buildOpenApi } from '@open-reloading/api/openapi'
 
@@ -13,6 +13,10 @@ writeFileSync(new URL('openapi.json', out), `${JSON.stringify(await buildOpenApi
 // the package exports no path to its browser build: it sits next to its entry, dist/index.js
 const scalar = new URL('browser/standalone.js', import.meta.resolve('@scalar/api-reference'))
 copyFileSync(scalar, new URL('scalar.js', out))
+copyFileSync(
+  new URL(import.meta.resolve('@open-reloading/design-tokens/tokens.css')),
+  new URL('tokens.css', out),
+)
 
 /** The viewer reads the document only: no requests, no fonts, chat or telemetry from other origins. */
 const configuration = {
@@ -26,8 +30,8 @@ const configuration = {
   mcp: { disabled: true },
   showDeveloperTools: 'never',
   documentDownloadType: 'json',
-  // the primary colors of the docs site (src/css/custom.css)
-  customCss: '.light-mode{--scalar-color-accent:#0b57d0}.dark-mode{--scalar-color-accent:#8ab4f8}',
+  // the link color of the tokens (tokens.css next to the page)
+  customCss: '.light-mode,.dark-mode{--scalar-color-accent:var(--link)}',
 }
 
 writeFileSync(
@@ -38,12 +42,11 @@ writeFileSync(
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>REST API | OpenReloading Ballistics</title>
+    <link rel="stylesheet" href="./tokens.css" />
     <style>
-      :root { --bar-bg: #f2f4f7; --bar-fg: #1a1a1a; --bar-line: #c9cfd8; --bar-link: #0b57d0; }
-      :root[data-theme='dark'] { --bar-bg: #20242b; --bar-fg: #ececec; --bar-line: #3d434d; --bar-link: #8ab4f8; }
-      body { margin: 0; background: var(--bar-bg); }
-      .bar { margin: 0; padding: 0.5rem 1rem; font: 14px/1.4 system-ui, sans-serif; color: var(--bar-fg); background: var(--bar-bg); border-bottom: 1px solid var(--bar-line); }
-      .bar a { color: var(--bar-link); }
+      body { margin: 0; background: var(--surface); }
+      .bar { margin: 0; padding: 0.5rem 1rem; font: 14px/1.4 system-ui, sans-serif; color: var(--ink); background: var(--surface); border-bottom: 1px solid var(--line); }
+      .bar a { color: var(--link); }
     </style>
     <script>
       // the color mode of the docs site (its "theme" key), else the system's
