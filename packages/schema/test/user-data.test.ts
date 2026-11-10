@@ -405,6 +405,35 @@ describe('userDataFile variants', () => {
   })
 })
 
+const measuredBullet = (photo: object) => ({
+  ...bulletRecord,
+  data: { ...bulletRecord.data, photo },
+})
+
+describe('userDataFile bullet photo', () => {
+  it('keeps what a photograph gave a bullet and refuses an unknown field, a negative uncertainty, a fractional size and an extra key', () => {
+    const photo = {
+      width: 1300,
+      height: 640,
+      pxPerMm: 28.04,
+      relativeStandardUncertainty: 0.0012,
+      scaleBasis: 'diameter',
+      values: {
+        length: { value: 31.49, standardUncertainty: 0.05 },
+        'ogive.radiusRatio': { value: 1, standardUncertainty: 0.03 },
+      },
+    }
+    expect(userRecord.parse(measuredBullet(photo))).toEqual(measuredBullet(photo))
+    for (const bad of [
+      { ...photo, values: { mass: { value: 10.9, standardUncertainty: 0.1 } } },
+      { ...photo, values: { length: { value: 31.49, standardUncertainty: -0.05 } } },
+      { ...photo, width: 1300.5 },
+      { ...photo, image: 'photo-1' },
+    ])
+      expect(userRecord.safeParse(measuredBullet(bad)).success).toBe(false)
+  })
+})
+
 describe('userDataFile overrides and older kinds', () => {
   it('keeps the overrides through a round trip, including a null and a removed value', () => {
     const removed = {

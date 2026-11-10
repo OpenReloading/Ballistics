@@ -441,7 +441,7 @@ function PhotoTool({
           </Button>
           <Text fz="sm" c="dimmed">
             {t(
-              "Opens the designer with these values; the design's note says they are measured, with their uncertainties. The photograph is not stored.",
+              'Opens the designer with these values; the design keeps them as measured from a photograph, with their uncertainties. The photograph is not stored.',
             )}
           </Text>
         </Flex>

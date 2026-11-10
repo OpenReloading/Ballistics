@@ -33,6 +33,7 @@ import {
   newDesign,
   reduce,
 } from '../lib/bullet-designer.ts'
+import { photoText } from '../lib/bullet-photo-design.ts'
 import { bulletGuide } from '../lib/docs-url.ts'
 import { fieldError } from '../lib/field-spec.ts'
 import { fetchManufacturerNames, noManufacturerNames, productLabel } from '../lib/manufacturers.ts'
@@ -398,7 +399,8 @@ export function BulletDesigner() {
   const labelOf = (d: Design) =>
     productLabel({ name: d.name, manufacturerName: manufacturers.nameOf(d.manufacturer) })
   const title = t('Outline, {name}', { name: labelOf(design) || t('new bullet') })
-  const { assumed, notes } = drawingNotes(drawing, t)
+  const { assumed, notes: drawn } = drawingNotes(drawing, t)
+  const notes = design.photo ? [...drawn, ...photoText(design.photo, system, t)] : drawn
 
   const root = useRef<HTMLDivElement>(null)
   const mark = (t: Element | null) => markDimension(root.current, t)

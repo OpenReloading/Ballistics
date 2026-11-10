@@ -613,7 +613,7 @@ _Avoid_: workbenchLoad
 One entry of `files`: a photo with `id`, media `type` and base64 `data`.
 
 **Bullet design**:
-A user record of kind `bullet`: `origin` (`user`), the `manufacturer` reference, the `basedOn` catalogue reference and the `overrides` of the bullet fields, in stored units.
+A user record of kind `bullet`: `origin` (`user`), the `manufacturer` reference, the `basedOn` catalogue reference, the `overrides` of the bullet fields, in stored units, and `photo`, what a photograph the values were measured from gave: its `width` and `height` (px), its scale `pxPerMm` with its `relativeStandardUncertainty`, the `scaleBasis` and the `values`, each with its `standardUncertainty`. No image is stored; unlike the `photo` of a target sheet, it names no embedded file.
 
 **Cartridge design**:
 A user record of kind `cartridge`: `origin` (`user`), the `basedOn` catalogue reference and `overrides` of the `table` and the spec `values`.

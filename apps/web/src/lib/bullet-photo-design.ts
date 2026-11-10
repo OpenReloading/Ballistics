@@ -1,25 +1,17 @@
 /** What a photograph's measurements become in the bullet designer (`apps/docs/docs/models/bullet-photo.md`). */
 
 import { fixedNumber } from '../i18n/number.ts'
+import type { Translator } from '../i18n/translate.ts'
 import { type Design, type DesignerSpec, designerSpecs } from './bullet-designer.ts'
 import type { Scale } from './bullet-photo.ts'
-import {
-  type BulletMeasurement,
-  type Measured,
-  type PhotoField,
-  photoFields,
-} from './bullet-photo-measure.ts'
+// types only: the designer imports this module, and the image maths stays out of its first load
+import type { BulletMeasurement, Measured, PhotoField } from './bullet-photo-measure.ts'
 import { basisNote } from './bullet-photo-scale.ts'
 import { fieldOf, siToStored, storedToSi } from './field-spec.ts'
 import type { UnitSystem } from './units.ts'
 
 type StoredQuantity = Parameters<typeof storedToSi>[0]
 const quantityOf = (s: DesignerSpec) => s.quantity as StoredQuantity
-
-const isPhotoField = (k: string): k is PhotoField => (photoFields as readonly string[]).includes(k)
-
-/** The designer fields a photograph gives, in the designer's order. */
-const specs: DesignerSpec[] = designerSpecs.filter((s) => isPhotoField(s.key))
 
 /** Decimals that show a standard uncertainty at two significant digits. */
 const decimalsFor = (u: number, fallback: number) =>
@@ -63,7 +55,7 @@ export function photoRows(
   m: BulletMeasurement,
   record: Record<string, number | undefined> | undefined,
 ): PhotoRow[] {
-  return specs.flatMap((spec): PhotoRow[] => {
+  return designerSpecs.flatMap((spec): PhotoRow[] => {
     const value = m.values[spec.key as PhotoField]
     if (!value) return []
     const si = record?.[spec.key]
@@ -96,33 +88,43 @@ export const measuredFor = (made: MeasuredInputs, now: MeasuredInputs): boolean 
   made.known === now.known &&
   made.axis === now.axis
 
-/** What the note says about the photograph: its size and scale, never its file. */
+/** What the design keeps of the photograph: its size and scale, never its file. */
 export interface PhotoFacts {
   width: number
   height: number
   scale: Scale
 }
 
-const noteUnits: Partial<Record<DesignerSpec['quantity'], string>> = { length: 'mm', angle: '°' }
-
-/** Each value with its standard uncertainty in stored units; no image is stored. */
-export function photoNote(m: BulletMeasurement, facts: PhotoFacts): string {
-  const parts = specs.flatMap((s) => {
-    const v = m.values[s.key as PhotoField]
-    if (!v) return []
-    const d = decimalsFor(v.uncertainty, 3)
-    const unit = noteUnits[s.quantity]
-    return [
-      `${s.label.toLowerCase()} ${v.value.toFixed(d)} ± ${v.uncertainty.toFixed(d)}${unit ? ` ${unit}` : ''}`,
-    ]
+/** The stored measurement in the language and units shown: size and scale of the photograph, what the scale rests on, each value with its standard uncertainty. */
+export function photoText(
+  photo: NonNullable<Design['photo']>,
+  system: UnitSystem,
+  t: Translator['t'],
+): string[] {
+  const basis = basisNote(photo.scaleBasis)
+  const values = designerSpecs.flatMap((s) => {
+    const v = photo.values[s.key as PhotoField]
+    return v
+      ? [
+          `${t(s.label)} ${valueText(s, system, { value: v.value, uncertainty: v.standardUncertainty })}`,
+        ]
+      : []
   })
-  const { width, height, scale } = facts
-  const basis = basisNote(m.scaleBasis)
   return [
-    `Measured from a photograph (${width} × ${height} px, ${scale.pxPerMm.toFixed(2)} px/mm ± ${(100 * scale.relUncertainty).toFixed(2)} %, no image stored).`,
-    ...(basis ? [basis] : []),
-    `Values with standard uncertainty: ${parts.join('; ')}.`,
-  ].join(' ')
+    t(
+      'Measured from a photograph ({width} × {height} px, {scale} px/mm ± {uncertainty} %, no image stored).',
+      {
+        width: photo.width,
+        height: photo.height,
+        scale: fixedNumber(photo.pxPerMm, 2),
+        uncertainty: fixedNumber(100 * photo.relativeStandardUncertainty, 2),
+      },
+    ),
+    ...(basis ? [t(basis)] : []),
+    ...(values.length > 0
+      ? [t('Values with standard uncertainty: {values}.', { values: values.join('; ') })]
+      : []),
+  ]
 }
 
 /** A tangent nose carries Rt/R 1 and a secant nose its radius; the designer derives the other, so the two never disagree. */
@@ -137,6 +139,18 @@ export function photoDesign(m: BulletMeasurement, facts: PhotoFacts, system: Uni
     name: '',
     choices: { 'base.type': m.baseType, 'ogive.form': m.ogiveForm ?? '', 'tip.type': '' },
     fields: Object.fromEntries(designerSpecs.map((s) => [s.key, fieldOf(system, s, given(s))])),
-    kept: { note: photoNote(m, facts) },
+    photo: {
+      width: facts.width,
+      height: facts.height,
+      pxPerMm: facts.scale.pxPerMm,
+      relativeStandardUncertainty: facts.scale.relUncertainty,
+      ...(m.scaleBasis && { scaleBasis: m.scaleBasis }),
+      values: Object.fromEntries(
+        Object.entries(m.values).map(([k, v]) => [
+          k,
+          { value: v.value, standardUncertainty: v.uncertainty },
+        ]),
+      ),
+    },
   }
 }

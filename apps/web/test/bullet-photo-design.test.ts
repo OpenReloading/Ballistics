@@ -1,17 +1,16 @@
 import type { BulletDimensions } from '@open-reloading/drawing/bullet'
 import { applyOverrides, type Bullet, bullet, userBullet } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
-import { designerSpecs, evaluate, fileData } from '../src/lib/bullet-designer.ts'
+import { designerSpecs, evaluate, fileData, fromUser } from '../src/lib/bullet-designer.ts'
 import { grayOf, scaleOf, segment } from '../src/lib/bullet-photo.ts'
 import {
   measuredFor,
   photoDesign,
-  photoNote,
   photoRows,
   storedText,
   valueText,
 } from '../src/lib/bullet-photo-design.ts'
-import { measureOutline } from '../src/lib/bullet-photo-measure.ts'
+import { type BulletMeasurement, measureOutline } from '../src/lib/bullet-photo-measure.ts'
 import { fitOutline } from '../src/lib/bullet-photo-outline.ts'
 import { renderPhoto, sampleShape } from '../src/lib/bullet-photo-sample.ts'
 import { presetUnits } from '../src/lib/units.ts'
@@ -61,7 +60,7 @@ describe('the design a photograph seeds', () => {
       ogive: { form: 'secant', radiusRatio: 0.7 },
     },
   }))
-    it(`draws ${name} without a refusal and keeps the uncertainties in a note`, () => {
+    it(`draws ${name} without a refusal and keeps the measurement as its photo, not as a note`, () => {
       const { m, facts } = measure(shape)
       const design = photoDesign(m, facts, system)
       const e = evaluate(design, system)
@@ -69,11 +68,43 @@ describe('the design a photograph seeds', () => {
       expect(e.drawing).toBeDefined()
       expect(design.fields.mass?.si).toBeUndefined()
       const saved = fileData(design)
-      const note = defined(saved.overrides?.note)
-      expect(note).toMatch(/Measured from a photograph/)
-      expect(note).toMatch(/length \d+\.\d+ ± \d+\.\d+ mm/)
-      expect(note).toMatch(/no image stored/)
+      expect(saved.overrides?.note).toBeUndefined()
+      const photo = defined(saved.photo)
+      expect(photo).toMatchObject({ width: 1300, height: 640 })
+      expect(photo.pxPerMm).toBeCloseTo(28, 0)
+      const length = defined(photo.values.length)
+      expect(length.value).toBeCloseTo(shape.length, 0)
+      expect(length.standardUncertainty).toBeGreaterThan(0)
+      expect(length.standardUncertainty).toBeLessThan(0.1)
     })
+
+  it('stores the size, the scale, its basis and each value with its standard uncertainty, and opens them again', () => {
+    const m: BulletMeasurement = {
+      values: {
+        length: { value: 31.49, uncertainty: 0.05 },
+        'ogive.radiusRatio': { value: 1, uncertainty: 0.03 },
+      },
+      ogiveForm: 'tangent',
+      baseType: 'boat-tail',
+      notes: [],
+      scaleBasis: 'diameter',
+    }
+    const facts = { width: 1300, height: 640, scale: { pxPerMm: 28.04, relUncertainty: 0.0012 } }
+    const saved = fileData(photoDesign(m, facts, system))
+    expect(saved.photo).toEqual({
+      width: 1300,
+      height: 640,
+      pxPerMm: 28.04,
+      relativeStandardUncertainty: 0.0012,
+      scaleBasis: 'diameter',
+      values: {
+        length: { value: 31.49, standardUncertainty: 0.05 },
+        'ogive.radiusRatio': { value: 1, standardUncertainty: 0.03 },
+      },
+    })
+    const opened = fromUser(saved, { base: { status: 'none' }, record: {} }, system)
+    expect(fileData(opened).photo).toEqual(saved.photo)
+  })
 
   it('takes the nose form and the base type the photograph shows', () => {
     const { m, facts } = measure()
@@ -93,7 +124,7 @@ describe('the design a photograph seeds', () => {
 })
 
 describe('the values table', () => {
-  const { m, facts } = measure()
+  const { m } = measure()
 
   it('shows each value with its uncertainty in the unit of the preset', () => {
     const rows = photoRows(m, undefined)
@@ -115,24 +146,13 @@ describe('the values table', () => {
     expect(defined(far.find((r) => r.spec.key === 'diameter')).differs).toBe(false)
     expect(storedText(spec('length'), system, 36)).toBe('36.00 mm')
   })
-
-  it('says the scale and that no image is stored', () => {
-    expect(photoNote(m, facts)).toMatch(/28\.\d+ px\/mm ± 0\.\d+ %/)
-    expect(photoNote(m, facts)).not.toMatch(/Scale from/)
-  })
-
-  it('keeps what a scale from the diameter alone rests on', () => {
-    const note = photoNote({ ...m, scaleBasis: 'diameter' }, facts)
-    expect(note).toMatch(/no image stored\)\. Scale from the diameter entered, no ruler/)
-    expect(note).toMatch(/1\.5 % short.*Values with standard uncertainty/)
-  })
 })
 
-it('saves a user bullet the schema accepts, and over a base a record it accepts', () => {
+it('saves a user bullet the schema accepts, and over a base a record it accepts with the note of the base', () => {
   const { m, facts } = measure()
   const saved = userBullet.parse(fileData(photoDesign(m, facts, system)))
   const resolved = bullet.parse(applyOverrides<Bullet>(targetBullet, saved.overrides ?? {}))
-  expect(resolved.note).toMatch(/Measured from a photograph/)
+  expect(resolved.note).toBe('A made-up record.')
 })
 
 describe('measuredFor', () => {
