@@ -1,5 +1,5 @@
 /** Dimensions with standard uncertainties from a photographed outline (`apps/docs/docs/models/bullet-photo.md`); pure, so it runs in a worker. */
-import { fromSi } from '@open-reloading/schema'
+import { fromSi, type UserBullet } from '@open-reloading/schema'
 import { msg } from '../i18n/translate.ts'
 import { type Scale, solve } from './bullet-photo.ts'
 import { edgeUncertainty, type Outline, sideTapers } from './bullet-photo-outline.ts'
@@ -16,24 +16,8 @@ export interface Measured {
   uncertainty: number
 }
 
-/** The designer's record paths of the values a photograph gives. */
-export const photoFields = [
-  'length',
-  'diameter',
-  'bearingLength',
-  'noseLength',
-  'meplatDiameter',
-  'ogive.radius',
-  'ogive.radiusRatio',
-  'base.length',
-  'base.diameter',
-  'base.angle',
-  'cannelure.start',
-  'cannelure.width',
-  'cannelure.depth',
-] as const
-
-export type PhotoField = (typeof photoFields)[number]
+/** The designer's record paths of the values a photograph gives: the keys of a user bullet's `photo.values`. */
+export type PhotoField = keyof NonNullable<UserBullet['photo']>['values']
 
 /** What a photograph gave: the values, the forms found and what could not be told. */
 export interface BulletMeasurement {

@@ -1489,6 +1489,93 @@
                       }
                     },
                     "description": "The fields that differ from the base record, or all fields without one. A `null` removes a field of the base."
+                  },
+                  "photo": {
+                    "type": "object",
+                    "properties": {
+                      "width": {
+                        "type": "integer",
+                        "exclusiveMinimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Width of the photograph, px."
+                      },
+                      "height": {
+                        "type": "integer",
+                        "exclusiveMinimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Height of the photograph, px."
+                      },
+                      "pxPerMm": {
+                        "type": "number",
+                        "exclusiveMinimum": 0,
+                        "description": "Scale of the photograph, px per mm."
+                      },
+                      "relativeStandardUncertainty": {
+                        "type": "number",
+                        "minimum": 0,
+                        "description": "Relative standard uncertainty of the scale, 1 (0.001 is 0.1 %)."
+                      },
+                      "scaleBasis": {
+                        "type": "string",
+                        "enum": [
+                          "ruler",
+                          "diameter",
+                          "length",
+                          "diameter+length"
+                        ],
+                        "description": "What gave the scale: two points on a ruler, or without one the diameter, the overall length or both entered from a caliper."
+                      },
+                      "values": {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string",
+                          "enum": [
+                            "length",
+                            "diameter",
+                            "bearingLength",
+                            "noseLength",
+                            "meplatDiameter",
+                            "ogive.radius",
+                            "ogive.radiusRatio",
+                            "base.length",
+                            "base.diameter",
+                            "base.angle",
+                            "cannelure.start",
+                            "cannelure.width",
+                            "cannelure.depth"
+                          ]
+                        },
+                        "additionalProperties": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": "number",
+                              "description": "Value in the stored unit of its field: mm, degrees, 1 for `ogive.radiusRatio`."
+                            },
+                            "standardUncertainty": {
+                              "type": "number",
+                              "minimum": 0,
+                              "description": "Standard uncertainty, in the unit of the value."
+                            }
+                          },
+                          "required": [
+                            "value",
+                            "standardUncertainty"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "description": "The values measured, by the path of the bullet field, each with its standard uncertainty."
+                      }
+                    },
+                    "required": [
+                      "width",
+                      "height",
+                      "pxPerMm",
+                      "relativeStandardUncertainty",
+                      "values"
+                    ],
+                    "additionalProperties": false,
+                    "description": "Measured from a photograph: its size, its scale and the values with their standard uncertainties. No image is stored. Absent: not measured from one."
                   }
                 },
                 "required": [

@@ -34,6 +34,16 @@ const basedOnRevision = z
     'The `revision` of the base record when saved. A different revision on opening means the base changed.',
   )
 
+const photoValue = z.strictObject({
+  value: z
+    .number()
+    .describe('Value in the stored unit of its field: mm, degrees, 1 for `ogive.radiusRatio`.'),
+  standardUncertainty: z
+    .number()
+    .min(0)
+    .describe('Standard uncertainty, in the unit of the value.'),
+})
+
 const userBulletParser = z.strictObject({
   origin: z.literal('user').describe('Where the record lives: `user`.'),
   manufacturer: ref('manufacturer').optional(),
@@ -42,6 +52,48 @@ const userBulletParser = z.strictObject({
   overrides: bulletOverrides
     .describe(
       'The fields that differ from the base record, or all fields without one. A `null` removes a field of the base.',
+    )
+    .optional(),
+  photo: z
+    .strictObject({
+      width: z.int().positive().describe('Width of the photograph, px.'),
+      height: z.int().positive().describe('Height of the photograph, px.'),
+      pxPerMm: z.number().positive().describe('Scale of the photograph, px per mm.'),
+      relativeStandardUncertainty: z
+        .number()
+        .min(0)
+        .describe('Relative standard uncertainty of the scale, 1 (0.001 is 0.1 %).'),
+      scaleBasis: z
+        .enum(['ruler', 'diameter', 'length', 'diameter+length'])
+        .describe(
+          'What gave the scale: two points on a ruler, or without one the diameter, the overall length or both entered from a caliper.',
+        )
+        .optional(),
+      values: z
+        .partialRecord(
+          z.enum([
+            'length',
+            'diameter',
+            'bearingLength',
+            'noseLength',
+            'meplatDiameter',
+            'ogive.radius',
+            'ogive.radiusRatio',
+            'base.length',
+            'base.diameter',
+            'base.angle',
+            'cannelure.start',
+            'cannelure.width',
+            'cannelure.depth',
+          ]),
+          photoValue,
+        )
+        .describe(
+          'The values measured, by the path of the bullet field, each with its standard uncertainty.',
+        ),
+    })
+    .describe(
+      'Measured from a photograph: its size, its scale and the values with their standard uncertainties. No image is stored. Absent: not measured from one.',
     )
     .optional(),
 })
@@ -58,6 +110,41 @@ export const userBullet: z.ZodObject<
     basedOn: z.ZodOptional<z.ZodString>
     basedOnRevision: z.ZodOptional<z.ZodString>
     overrides: z.ZodOptional<typeof bulletOverrides>
+    photo: z.ZodOptional<
+      z.ZodObject<
+        {
+          width: z.ZodInt
+          height: z.ZodInt
+          pxPerMm: z.ZodNumber
+          relativeStandardUncertainty: z.ZodNumber
+          scaleBasis: z.ZodOptional<
+            z.ZodEnum<z.core.util.ToEnum<'ruler' | 'diameter' | 'length' | 'diameter+length'>>
+          >
+          values: z.ZodRecord<
+            z.ZodEnum<
+              z.core.util.ToEnum<
+                | 'length'
+                | 'diameter'
+                | 'bearingLength'
+                | 'noseLength'
+                | 'meplatDiameter'
+                | 'ogive.radius'
+                | 'ogive.radiusRatio'
+                | 'base.length'
+                | 'base.diameter'
+                | 'base.angle'
+                | 'cannelure.start'
+                | 'cannelure.width'
+                | 'cannelure.depth'
+              >
+            > &
+              z.core.$partial,
+            z.ZodObject<{ value: z.ZodNumber; standardUncertainty: z.ZodNumber }, z.core.$strict>
+          >
+        },
+        z.core.$strict
+      >
+    >
   },
   z.core.$strict
 > = userBulletParser satisfies Exact<typeof userBullet, typeof userBulletParser>
