@@ -16,8 +16,8 @@ interface Cited {
     | undefined
 }
 
-/** True when `record` cites a manufacturer-origin source, or a fitted source that does not say whose data it was fitted to. */
-const citesMaker = (record: Cited) =>
+/** True when `record` may hold maker data: it cites a manufacturer-origin source, or a fitted source that does not say whose data it was fitted to. */
+const mayHoldMakerData = (record: Cited) =>
   (record.provenance?.sources ?? []).some(
     (s) =>
       s.origin === 'manufacturer' ||
@@ -32,7 +32,7 @@ export function makerRows(bundle: Bundle): Record<string, MakerRow[]> {
   const out: Record<string, MakerRow[]> = {}
   for (const [kind, records] of Object.entries(bundle)) {
     if (kind === 'manufacturers' || !Array.isArray(records)) continue
-    const rows = (records as Cited[]).flatMap((r) => (citesMaker(r) ? [{ id: r.id }] : []))
+    const rows = (records as Cited[]).flatMap((r) => (mayHoldMakerData(r) ? [{ id: r.id }] : []))
     if (rows.length > 0) out[kind] = rows
   }
   return out

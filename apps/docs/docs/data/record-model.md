@@ -53,6 +53,8 @@ A user record is `{id, kind, name, saved, data}`; the entity, with its `origin`,
 
 The finer standing of a citation (manufacturer, public, community) is `provenance.sources[].origin`. `manufacturer` is data the maker supplied or published: terms it states go in `terms`, and such a source carries no project licence ([Published loads](published-loads.md#sources)).
 
+A fitted source names the data the values were fitted to, and its `origin` says whose data that is. The public catalogue holds no record with a fitted source that states no origin or the origin `manufacturer`: the check is `makerRows` of `@open-reloading/catalog`, run over the committed records by `tools/test/catalog/maker-rows.test.ts`. A source without its own `kind` takes the kind of the record's provenance, so on a record whose provenance kind is `fitted` a source for other values (a name, a country) states its own `kind`.
+
 ## References and ids
 
 - A reference is a string `"<scope>:<id>"` with scope `catalogue` or `user`: `ref(kind)` in `packages/schema/src/ids.ts` is `"catalogue:<record id>"` or `"user:<UUID>"`, and `parseRef` splits one into scope and id. The kind only names the entity in the description: the text carries no kind. One string fits URL parameters, form fields and database keys.

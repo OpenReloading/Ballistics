@@ -35,6 +35,7 @@ describe('makerRows', () => {
           cited('p3', 'fitted', book),
           cited('p4', 'derived', { title: 'Fit', kind: 'fitted' }, open),
           cited('p5', 'derived', book),
+          cited('p6', 'fitted', open, { title: 'Country page', kind: 'published' }),
         ],
       }),
     )
