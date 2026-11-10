@@ -15,6 +15,7 @@ node packages/cli/dist/bin.js compare --rows rows.csv --records /path/to/records
 node packages/cli/dist/bin.js verify --rows catalogue --split validation
 node packages/cli/dist/bin.js fit --rows rows.csv --records /path/to/records
 node packages/cli/dist/bin.js verify --rows rows.csv --records /path/to/records --params fit-on-training
+node packages/cli/dist/bin.js fit --rows rows.csv --records /path/to/records --exponent family
 ```
 
 `--help` (or `-h`), alone or after a command, prints the usage and exits 0. `run --help` and `operations --help` print the help of that command with an example that runs on a committed synthetic body.
@@ -97,12 +98,12 @@ A powder without rows gets no value, not an estimate, as the app refuses a powde
 
 ## Fit
 
-`fit --rows <path> [--model m3|<module>] [--velocity-sigma <fraction>] [--pressure-sigma <fraction>]` fits the burn coefficient (`interior.vivacity`) of each powder the rows name that has interior parameters, and writes the fitted values with their uncertainties. It fits nothing else: the energy, the pressure exponent and the form constants stay the record's.
+`fit --rows <path> [--model m3|<module>] [--velocity-sigma <fraction>] [--exponent family] [--pressure-sigma <fraction>]` fits the burn coefficient (`interior.vivacity`) of each powder the rows name that has interior parameters, and writes the fitted values with their uncertainties. It fits nothing else: the energy, the pressure exponent and the form constants stay the record's, unless `--exponent family` chooses the exponent ([below](#pressure-exponent-per-family)).
 
 - Rows: those of the training split only that the model can run with the record's values, velocities corrected to the muzzle ([above](#muzzle-distance)). Rows of the validation and test split are never read.
-- Fit: `fitPowderPooled` of `@open-reloading/ballistics` running the model of `--model` (default `m3`) ([model page](models/interior-powder-fit.md#pooled-fit-over-rifles-powders-and-lots)), one powder at a time, so a powder that fails does not stop the others. A session is the rows of one load without its charge (cartridge, bullet, barrel, COAL, temperature, session, rifle, lot and table); its rifle is the row's `rifle`, else one test barrel per cartridge, barrel and table; its lot is the row's `lot`. Rifle and lot effects keep the library's default spreads.
+- Fit: `fitPowderPooled` of `@open-reloading/ballistics` running the model of `--model` (default `m3`) ([model page](models/interior-powder-fit.md#pooled-fit-over-rifles-powders-and-lots)), one powder at a time, so a powder that fails does not stop the others. A session is the rows of one load without its charge (cartridge, bullet, barrel, COAL, temperature, session, rifle, lot and table); its rifle is the row's `rifle`, else one test barrel per cartridge, barrel and table; its lot is the row's `lot`. Rifle and lot effects keep the library's default spreads. A model that refuses a load by throwing an `InputError` gives an invalid run there, so the powder is listed as `invalid` and the run goes on.
 - Value: the record's burn coefficient times `factor`, the fitted over the record value.
-- Uncertainty: the fit's relative standard uncertainty, times the root of `chiSquarePerDegree` where that is above 1, times the fitted value. `chiSquarePerDegree` is the chi square of every row, the data and the one prior row of each rifle and lot effect, over all rows minus all parameters, null where that count is not above 0.
+- Uncertainty: the fit's relative standard uncertainty, times the root of `chiSquarePerDegree` where that is above 1, times the fitted value; with `--exponent family` it holds the chosen exponent fixed and does not count the choice. `chiSquarePerDegree` is the chi square of every row, the data and the one prior row of each rifle and lot effect, over all rows minus all parameters, null where that count is not above 0.
 - `--velocity-sigma` is the standard deviation of a row's velocity, a fraction of it above 0 and below 1, default 0.03. Load tables print no spread; ANSI/SAAMI Z299.4-2025 (page 5) expects tested ammunition within 90 fps of the tabulated velocity, about 3 % at 3000 fps ([SAAMI Z299.4](https://saami.org/wp-content/uploads/2026/04/SAAMI-Z299.4-CFR-2025-Centerfire-Rifle-Approved-2-10-2025-2026-04-27.pdf)). That plus or minus 90 fps is a tolerance, not a standard deviation, so taking it as the sigma is a choice on the large side.
 
 A powder that is not fitted is listed in `notFitted` with its reason: the reason of the fit (`unresolved`, the rows do not resolve the burn coefficient, for example training rows of one charge only; `invalid`, `not-converged`, `ill-conditioned`, `underdetermined`), or `noUsableRow`: every powder with interior parameters that any row names and that has no usable training row, so powder ids of the other splits can appear there; their rows are not read. A powder without interior parameters has no start value and is not listed.
@@ -121,6 +122,19 @@ A powder that is not fitted is listed in `notFitted` with its reason: the reason
 
 The burn coefficient is the only value fitted per powder, so pressure rows pull it away from the value the velocities alone give. The option is for studies: the records keep velocity fits until a held-out comparison says otherwise.
 
+### Pressure exponent per family
+
+`--exponent family`, with `fit` or with `--params fit-on-training`, chooses the pressure exponent (`interior.pressureExponent`) per powder family and fits each powder's burn coefficient at the exponent of its family. A study of this repository found that an exponent chosen per family by the summed squared log velocity error, leaving the predicted powder out, lowers the held-out velocity error, and that a family of four powders gives an unstable exponent ([research entry](research/interior-exponent-per-family-unseen-powder.md)). The rule of this option, a chi square with a pooled term, is another one; the study did not measure it. The option is for studies: the powder records keep their exponent until a held-out comparison on real rows shows that another one predicts better.
+
+- Grid: the exponents 0.7, 0.8, ..., 1.3.
+- Fit per exponent: every powder is fitted as above at each exponent $n$ of the grid, starting from $B_\text{record} (p_\text{typ} / p_\text{ref})^{n_\text{record} - n}$, where $p_\text{ref}$ is the record's reference pressure and $p_\text{typ}$ half the median of the peak pressures the model predicts for the powder's used training rows at the record values. The rate is $B (p / p_\text{ref})^n$, so a coefficient fitted at one exponent is far off at another.
+- Objective of a powder $q$ at $n$: $S_q(n)$, the chi square of its fit at $n$, data and prior rows.
+- Choice: only powders fitted at every exponent of the grid enter. A family $F$ (`<propellant base>/<grain form>` of the record) takes $n_F = \arg\min_n \left[\sum_{q \in F} S_q(n) + m_0 \bar S(n)\right]$, where $\bar S(n)$ is the mean of $S_q(n)$ over all powders that entered and $m_0 = 5$, fixed before any result on real rows. The pooled exponent is the one of least $\bar S(n)$. A tie goes to the exponent nearer the pooled one, then to the smaller.
+- A family of few powders: the second term weighs like five powders that choose the pooled exponent, so a family of one or two powders with few rows mostly takes the pooled exponent, and a family of many powders or many rows its own. A family with no powder that entered takes the pooled exponent.
+- Each powder gets the exponent of its family and the burn coefficient fitted at it (`pressureExponent`, `vivacity`); a powder whose fit at that exponent failed is listed in `notFitted` with that fit's reason. `factor` stays the fitted over the record burn coefficient, so with another exponent it also holds the change of the coefficient's meaning. A run where no powder was fitted at every exponent is refused, because no exponent can be chosen; `fit` without the option lists the powders not fitted at the record exponent.
+- The `fit` result carries `exponent`: the `grid`, `shrinkage` (5), the `pooled` exponent and per family its `exponent` and `powders`, the powders that entered its sum. The `fit` of an evaluation carries `exponent` with the pooled exponent and the exponent per family. The table adds a column with each powder's exponent and the line `exponent: pooled <n>; <family> <n>, ...`.
+- A run fits every powder at each of the seven exponents, so it runs the fit seven times.
+
 ## Model version
 
 Every result carries `modelVersion`, the SHA-256 over the sorted lines:
@@ -128,15 +142,15 @@ Every result carries `modelVersion`, the SHA-256 over the sorted lines:
 - `<kind>/<id> <sha256>` of the stored JSON of every cartridge, bullet, powder, capacity and case record the rows name;
 - `rows <sha256>` over the SHA-256 of each rows file.
 
-A `fit` run and a `--params fit-on-training` evaluation add the built files of the fit (`interior/fit-pooled.js` of ballistics, its solver `least-squares.js` of statistics and `fit.js` of the CLI, each with the files they import by a relative path) and the line `params fit-on-training velocity-sigma <value>`, followed by ` pressure-sigma <value>` with `--pressure-sigma`.
+A `fit` run and a `--params fit-on-training` evaluation add the built files of the fit (`interior/fit-pooled.js` of ballistics, its solver `least-squares.js` of statistics and `fit.js` of the CLI, each with the files they import by a relative path) and the line `params fit-on-training velocity-sigma <value>`, followed by ` exponent family` with `--exponent family` or by ` pressure-sigma <value>` with `--pressure-sigma`.
 
-`inputs.rows` and `inputs.records` in a result are the last two parts. The version changes with the model, the records or the rows, not with the split; `--params fit-on-training` and its `--velocity-sigma` and `--pressure-sigma` do change it.
+`inputs.rows` and `inputs.records` in a result are the last two parts. The version changes with the model, the records or the rows, not with the split; `--params fit-on-training` with its `--velocity-sigma`, `--exponent` and `--pressure-sigma` do change it.
 
 The code of the evaluation itself (rows, split, the metrics and the percentiles, the interval) is not in the hash: a change to it is a change of the evaluation, not of the model, and moves the metrics of an unchanged `modelVersion`. Compare a baseline and a candidate only with one build of the CLI.
 
 ## Commands
 
-`verify` takes no `--baseline` or `--candidate`, `compare` takes no `--model`, `fit` takes only `--rows`, `--records`, `--model`, `--velocity-sigma`, `--pressure-sigma`, `--json` and `--table`: another option is bad input, as is `--velocity-sigma` or `--pressure-sigma` in a `verify` or `compare` without `--params fit-on-training`.
+`verify` takes no `--baseline` or `--candidate`, `compare` takes no `--model`, `fit` takes only `--rows`, `--records`, `--model`, `--velocity-sigma`, `--exponent`, `--pressure-sigma`, `--json` and `--table`: another option is bad input, as is `--velocity-sigma`, `--exponent` or `--pressure-sigma` in a `verify` or `compare` without `--params fit-on-training`. `--exponent` takes `family` only. `--exponent` and `--pressure-sigma` do not combine: a run with both is bad input.
 
 `verify --rows <path> [--model m3|<module>]` evaluates one model on the split. `m3` is the model of the installed `@open-reloading/ballistics`; a module path is a file that exports `interior(load, options?)` with the signature of its `interior`.
 
@@ -148,11 +162,11 @@ JSON when stdout is not a terminal or with `--json`, a table with `--table` or o
 
 `--version` prints `ballistics <version>` and exits 0.
 
-| Exit code | Meaning                                                                                                                                                       | `kind`     |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| 0         | A result was written                                                                                                                                          |            |
-| 1         | A refused run: the test split without `--final`, a baseline of another split or data, a split without a row the model could run, a 422 answer of an operation | `refused`  |
-| 2         | Bad input: the rows file, an option, the records, a model module (also one that throws), an operation body or an unknown record id                            | `usage`    |
-| 3         | An internal error of the CLI                                                                                                                                  | `internal` |
+| Exit code | Meaning                                                                                                                                                                                                                                      | `kind`     |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| 0         | A result was written                                                                                                                                                                                                                         |            |
+| 1         | A refused run: the test split without `--final`, a baseline of another split or data, a split without a row the model could run, a `--exponent family` run with no powder fitted at every exponent of the grid, a 422 answer of an operation | `refused`  |
+| 2         | Bad input: the rows file, an option, the records, a model module (also one that throws), an operation body or an unknown record id                                                                                                           | `usage`    |
+| 3         | An internal error of the CLI                                                                                                                                                                                                                 | `internal` |
 
 An error goes to stderr. With `--json`, or when stdout is not a terminal, it is one JSON object on one line, `{"error":{"kind":"usage","message":"..."}}`, for `run` with `issues` or `answer`; on a terminal it is a text line. It never carries a stack trace.
