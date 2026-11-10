@@ -1,4 +1,4 @@
-/** Writes the synthetic target photos of `scenes.ts` and `holes.json` (hole centres in photo px); run from apps/web: node test/fixtures/target-photos/make.mts */
+/** Writes the synthetic target photos of `scenes.ts` and `holes.json` (hole centres in photo px); run from packages/target-recognition: node test/fixtures/target-photos/make.mts */
 import { writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import sharp from 'sharp'

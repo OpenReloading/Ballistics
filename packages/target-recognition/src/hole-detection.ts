@@ -1,20 +1,15 @@
 /** Hole proposals from one example hole (`apps/docs/docs/models/hole-detection.md`); pure, so it runs in a worker. */
+import type { Point } from '@open-reloading/shot-groups'
+import { nth } from '@open-reloading/statistics'
 import {
   boxBlur,
-  clamp,
-  components,
-  distanceSquared,
-  insidePolygon,
-  median1,
-  open,
   type Peak,
   peaksOf,
   radiiOf,
-  rectangle,
   type Space,
   sigmaAt,
   space,
-} from '@open-reloading/target-recognition'
+} from './blob-detector.ts'
 import {
   axisOf,
   DISC,
@@ -27,19 +22,31 @@ import {
   type WorkImage,
 } from './colour-axis.ts'
 import type { RgbaImage } from './image.ts'
-import { nth } from './nth.ts'
-import type { Point } from './target-geometry.ts'
+import {
+  clamp,
+  components,
+  distanceSquared,
+  insidePolygon,
+  median1,
+  open,
+  rectangle,
+} from './raster-ops.ts'
 import { paperOutline } from './target-paper.ts'
 
 // Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the loop bounds keep the index in range
 const f32 = (a: Float32Array, i: number) => a[i] as number
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the loop bounds keep the index in range
 const f64 = (a: Float64Array, i: number) => a[i] as number
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the loop bounds keep the index in range
 const i32 = (a: Int32Array, i: number) => a[i] as number
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the loop bounds keep the index in range
 const u8 = (a: Uint8Array | Uint8ClampedArray, i: number) => a[i] as number
 
 /** A polygon or a rectangle in image px. */
-type Region = readonly Point[] | { x: number; y: number; width: number; height: number }
+export type Region = readonly Point[] | { x: number; y: number; width: number; height: number }
 
+/** The image buffer of a detection run and its options. */
 export type HoleDetectionInput = {
   image: RgbaImage
   region?: Region
@@ -75,6 +82,7 @@ export type FaceLabel = {
   polar?: (p: Point) => { radius: number; angle: number }
 }
 
+/** A hole the run proposes. */
 export type HoleProposal = {
   /** Image px. */
   x: number
@@ -109,7 +117,7 @@ export function workBlockSize(
   holePx: number,
   width: number,
   height: number,
-  work = WORK_DIAMETER,
+  work: number = WORK_DIAMETER,
 ): number {
   const s = Math.max(
     1,
@@ -121,7 +129,8 @@ export function workBlockSize(
   return s
 }
 
-type Found = { proposals: HoleProposal[]; flagged: FlaggedRegion[]; holeDiameter: number }
+/** The proposals of a run (image px) and the hole diameter it found, m. */
+export type Found = { proposals: HoleProposal[]; flagged: FlaggedRegion[]; holeDiameter: number }
 
 /** The hole size of a run stays within these multiples of the expected size. */
 const SIZE_MIN = 0.7
@@ -188,6 +197,7 @@ type Ctx = WorkImage & {
 /** A seed run of the auto detection. */
 type SeedRun = { found: Found; run: Run; at: Point; holeDiameter: number }
 
+/** The picked hole as the run measured it. */
 export type HoleExample = {
   /** Visible hole diameter, image px. */
   diameter: number
@@ -254,9 +264,9 @@ function runSeeds(input: HoleDetectionInput, ctx: Ctx, seeds: (Peak | undefined)
     if (!peak) continue
     ctx.progress(0.1 + (0.9 * i) / seeds.length)
     const at = { x: peak.x, y: peak.y }
-    const got = solved(input, at, ctx, false, false)
+    const got = solved(input, at, { shared: ctx, last: false, refine: false })
     if (!got || got.run.shots.length < 2) continue
-    const sizes = [...got.run.sizes].sort((a, b) => a - b)
+    const sizes = got.run.sizes.toSorted((a, b) => a - b)
     // no sizes: NaN, as arithmetic on a missing entry has it
     const mid = sizes[sizes.length >> 1] ?? Number.NaN
     if (mid < SEED_MIN_SIZE * ctx.prior) continue
@@ -299,8 +309,11 @@ function chooseAgreeingRun(runs: SeedRun[], ctx: Ctx): (SeedRun & { score: numbe
 /** The winner on the full working image, with the size its strongest peaks show. */
 function refineWinner(input: HoleDetectionInput, ctx: Ctx, best: SeedRun, printed: boolean) {
   const fine = prepare(input)
-  return fine && solved(input, fromImage(fine, toImage(ctx, best.at)), fine, true, true, printed)
+  return fine && solved(input, fromImage(fine, toImage(ctx, best.at)), { shared: fine, printed })
 }
+
+/** An RGB channel of a log(RGB + 8) value. */
+const rgb = (v: number) => Math.min(255, Math.max(0, Math.round(Math.exp(v) - 8)))
 
 /** `at` in image px: the colour axis is the picked hole's against its ring, the size starts from its scale-space maximum (0.7 to 1.4 of `expectedHoleDiameter`) and the region's strongest peaks refine it (own rule); the pick never sets the peaks' strength reference. */
 export function detectFromExample(
@@ -309,10 +322,9 @@ export function detectFromExample(
 ): (Found & { example: HoleExample }) | undefined {
   const ctx = prepare(input)
   if (!ctx || !(Number.isFinite(at.x) && Number.isFinite(at.y))) return undefined
-  const got = solved(input, fromImage(ctx, at), ctx)
+  const got = solved(input, fromImage(ctx, at), { shared: ctx })
   if (!got) return undefined
   const { found, run } = got
-  const rgb = (v: number) => Math.min(255, Math.max(0, Math.round(Math.exp(v) - 8)))
   return {
     ...found,
     example: {
@@ -323,24 +335,24 @@ export function detectFromExample(
   }
 }
 
+/** The options of `solved`: the working image to reuse, whether this is the last run, whether the size is refined. */
+type Solve = {
+  shared?: Ctx
+  last?: boolean
+  refine?: boolean
+  /** The marks where the ring numerals stand are print: set from the runs of all seeds; absent: when there are three or more. */
+  printed?: boolean
+}
+
 /** Sizes the hole, runs the pipeline and maps the shots to the image; undefined without a result. */
 function solved(
   input: HoleDetectionInput,
   at: Point | undefined,
-  shared?: Ctx,
-  last = true,
-  refine = true,
-  /** The marks where the ring numerals stand are print: set from the runs of all seeds; absent: when there are three or more. */
-  printed?: boolean,
+  { shared, last = true, refine = true, printed }: Solve = {},
 ): { found: Found; run: Run; holeDiameter: number } | undefined {
   const ctx = shared ?? prepare(input)
   if (!ctx) return undefined
-  const { backing } = input
-  const seed: Seed =
-    at || !backing
-      ? { at }
-      : { mu: [Math.log(backing.r + 8), Math.log(backing.g + 8), Math.log(backing.b + 8)] }
-  const sized = estimateHoleSize(ctx, seed, refine)
+  const sized = estimateHoleSize(ctx, seedOf(at, input.backing), refine)
   if (!sized) return undefined
   const { holeDiameter } = sized
   // A seed on a filled area's light holes may find only the area at the seeds' scale, so the seed runs keep it.
@@ -348,14 +360,31 @@ function solved(
     ? { ...sized.run, shots: sized.run.shots.filter((q) => !sized.run.filled?.includes(q)) }
     : sized.run
   const { marks, zone } = dropPrintMarks(ctx, run, printed)
-  const found: Found = {
+  const found = foundOf(ctx, input, marks, holeDiameter)
+  if (last) ctx.progress(1)
+  return { found, run: { ...run, shots: marks.map((m) => m.shot), zone }, holeDiameter }
+}
+
+/** The pick, or the backing colour in log RGB without a pick. */
+function seedOf(at: Point | undefined, backing: HoleDetectionInput['backing']): Seed {
+  return at || !backing
+    ? { at }
+    : { mu: [Math.log(backing.r + 8), Math.log(backing.g + 8), Math.log(backing.b + 8)] }
+}
+
+/** The run's marks as proposals in image px, and its hole diameter in m. */
+function foundOf(
+  ctx: Ctx,
+  input: HoleDetectionInput,
+  marks: { shot: HoleProposal; c: Point }[],
+  holeDiameter: number,
+): Found {
+  return {
     // on a face without a drawn region the region is the face: a flier on it is a shot
     proposals: toProposals(ctx, marks, holeDiameter, !!ctx.face && !input.region),
     flagged: [],
     holeDiameter: (holeDiameter * ctx.blockSize) / input.pxPerM / (input.holeScale ?? 1),
   }
-  if (last) ctx.progress(1)
-  return { found, run: { ...run, shots: marks.map((m) => m.shot), zone }, holeDiameter }
 }
 
 /** `holeDiameter` in work px, clamped to `SIZE_MIN` to `SIZE_MAX` of the prior, then once by the run's strongest peaks. */
@@ -373,19 +402,26 @@ function estimateHoleSize(
     holeDiameter = clamp(first, lo, hi)
   }
   ctx.progress(0.3)
-  let run = pipeline(ctx, holeDiameter, seed)
+  const run = pipeline(ctx, holeDiameter, seed)
   if (!run) return undefined
+  return refine ? resized(ctx, seed, { run, holeDiameter }, [lo, hi]) : { run, holeDiameter }
+}
+
+/** The run again at the size the first run's peaks show, when it differs by more than 12 %. */
+function resized(
+  ctx: Ctx,
+  seed: Seed,
+  first: { run: Run; holeDiameter: number },
+  [lo, hi]: [number, number],
+): { run: Run; holeDiameter: number } {
+  const refined = clamp(first.run.size, lo, hi)
+  if (!(Math.abs(refined / first.holeDiameter - 1) > 0.12)) return first
+  const second = pipeline(ctx, refined, seed)
+  const again = second && clamp(second.size, lo, hi)
   // With a face, when the new size's peaks show the old size again, the estimate moves with D and the first run stays.
-  const refined = clamp(run.size, lo, hi)
-  if (refine && Math.abs(refined / holeDiameter - 1) > 0.12) {
-    const second = pipeline(ctx, refined, seed)
-    const again = second && clamp(second.size, lo, hi)
-    if (!(ctx.face && again && Math.abs(again - holeDiameter) < Math.abs(again - refined))) {
-      holeDiameter = refined
-      run = second ?? run
-    }
-  }
-  return { run, holeDiameter }
+  if (ctx.face && again && Math.abs(again - first.holeDiameter) < Math.abs(again - refined))
+    return first
+  return { run: second ?? first.run, holeDiameter: refined }
 }
 
 /** Edge marks and print go: dark on the black area, light on paper, numeral-zone marks when `printed` or `NUMERALS_MIN` of them, and quarter marks standing on `NUMERALS_MIN` axes. */
@@ -422,7 +458,7 @@ function quarterTurn(face: FaceLabel | undefined, c: Point, roll: number): numbe
 /** A mark above `HOLE_ON_PRINT` times the group's lower median but within a hole's size is a hole on the print; a larger part is merged print. */
 function printAmong<T extends { shot: HoleProposal }>(ctx: Ctx, group: readonly T[]): T[] {
   if (!group.length) return []
-  const sizes = group.map((m) => m.shot.diameter).sort((a, b) => a - b)
+  const sizes = group.map((m) => m.shot.diameter).toSorted((a, b) => a - b)
   const alike = HOLE_ON_PRINT * nth(sizes, (sizes.length - 1) >> 1)
   return group.filter((m) => m.shot.diameter <= alike || m.shot.diameter > SIZE_MAX * ctx.prior)
 }
@@ -519,15 +555,21 @@ function prepare(input: HoleDetectionInput, work = WORK_DIAMETER): Ctx | undefin
 
 /** The hole diameter in image px and the region polygon; a RangeError or Error for invalid input. */
 function validateInput(input: HoleDetectionInput): { holePx: number; poly: Point[] } {
-  const {
-    image,
-    region,
-    pxPerM,
-    expectedHoleDiameter,
-    minContrast = 0.15,
-    holeScale = 1,
-    backing,
-  } = input
+  checkScales(input)
+  const { image, region, pxPerM, expectedHoleDiameter, holeScale = 1 } = input
+  const holePx = expectedHoleDiameter * pxPerM * holeScale
+  if (!(holePx >= 4)) throw new Error('The hole must be at least 4 px across')
+  const r = region ?? input.face?.outline ?? paperOutline(image)
+  const poly = 'width' in r ? rectangle(r) : [...r]
+  if (poly.length < 3) throw new Error('A region needs at least 3 points')
+  if (!poly.every((p) => Number.isFinite(p.x) && Number.isFinite(p.y)))
+    throw new RangeError('The region points must be finite')
+  return { holePx, poly }
+}
+
+/** A RangeError for an image other than width x height RGBA pixels, a scale that is not finite or a backing channel outside 0 to 255. */
+function checkScales(input: HoleDetectionInput): void {
+  const { image, pxPerM, expectedHoleDiameter, minContrast = 0.15, holeScale = 1, backing } = input
   if (
     !Number.isInteger(image.width) ||
     !Number.isInteger(image.height) ||
@@ -538,14 +580,6 @@ function validateInput(input: HoleDetectionInput): { holePx: number; poly: Point
     throw new RangeError('Scale, bullet diameter, hole scale and contrast must be finite')
   if (backing && ![backing.r, backing.g, backing.b].every((c) => c >= 0 && c <= 255))
     throw new RangeError('A backing colour channel must be a number from 0 to 255')
-  const holePx = expectedHoleDiameter * pxPerM * holeScale
-  if (!(holePx >= 4)) throw new Error('The hole must be at least 4 px across')
-  const r = region ?? input.face?.outline ?? paperOutline(image)
-  const poly = 'width' in r ? rectangle(r) : [...r]
-  if (poly.length < 3) throw new Error('A region needs at least 3 points')
-  if (!poly.every((p) => Number.isFinite(p.x) && Number.isFinite(p.y)))
-    throw new RangeError('The region points must be finite')
-  return { holePx, poly }
 }
 
 /** The bounding box of `poly` grown by `margin`, whole px, cut at the image edge. */
@@ -589,11 +623,16 @@ function offSheet(ctx: Ctx, image: RgbaImage) {
   const { w, h, inside, blackMask } = ctx
   const onSheet = (j: number) =>
     insidePolygon(toImage(ctx, { x: j % w, y: Math.floor(j / w) }), sheet)
+  if (leavesBlackOut(ctx, onSheet)) return
+  for (let j = 0; j < w * h; j++) if (inside[j] && !blackMask?.[j] && !onSheet(j)) inside[j] = 0
+}
+
+/** More than 5 % of the black area off the sheet. */
+function leavesBlackOut({ w, h, blackMask }: Ctx, onSheet: (j: number) => boolean): boolean {
   let [black, out] = [0, 0]
   for (let j = 0; j < w * h; j++)
     if (blackMask?.[j]) [black, out] = [black + 1, out + (onSheet(j) ? 0 : 1)]
-  if (out > 0.05 * black) return
-  for (let j = 0; j < w * h; j++) if (inside[j] && !blackMask?.[j] && !onSheet(j)) inside[j] = 0
+  return out > 0.05 * black
 }
 
 /** 1 for a block whose middle is inside `poly`, else 0. */
@@ -687,12 +726,16 @@ function pipeline(ctx: Ctx, holeDiameter: number, seed: Seed): Run | undefined {
   for (let i = 0; i < w * h; i++) mask[i] = f32(hat, i) > threshold && inside[i] ? 1 : 0
   const parts = components(mask, w, h)
   const depth = distanceSquared(mask, w, h, 0)
-  const kept = testPeaks(peaks, mask, depth, parts, { w, h, keep: ctx.keep, r5, holeDiameter })
+  const masks = { mask, depth, parts }
+  const kept = testPeaks(peaks, masks, { w, h, keep: ctx.keep, r5, holeDiameter })
   run.sizes = estimateSize(kept, scales, w)
   run.size = run.sizes.length ? median1(run.sizes) : holeDiameter
-  Object.assign(run, shotsFromParts(kept, parts, depth, r5, holeDiameter, w))
+  Object.assign(run, shotsFromParts(kept, masks, { r5, holeDiameter, w }))
   return run
 }
+
+/** The hole mask, its squared distance to the nearest pixel off it, and its parts. */
+type Masks = { mask: Uint8Array; depth: Float64Array; parts: number[][] }
 
 /** Top-hat of `P` (blurred by radius 1) against its opening by a square of 2 D, on a copy shrunk by `OPEN_SHRINK`. */
 function topHat(P: Float32Array, w: number, h: number, holeDiameter: number): Float32Array {
@@ -702,28 +745,35 @@ function topHat(P: Float32Array, w: number, h: number, holeDiameter: number): Fl
   const f = OPEN_SHRINK
   const [w2, h2] = [Math.ceil(w / f), Math.ceil(h / f)]
   const small = new Float32Array(w2 * h2)
+  const cells = { w, h, f }
   for (let y = 0; y < h2; y++)
-    for (let x = 0; x < w2; x++) {
-      let [sum, n] = [0, 0]
-      for (let v = y * f; v < Math.min(h, (y + 1) * f); v++)
-        for (let u = x * f; u < Math.min(w, (x + 1) * f); u++) {
-          sum += f32(smooth, v * w + u)
-          n++
-        }
-      small[y * w2 + x] = sum / n
-    }
+    for (let x = 0; x < w2; x++) small[y * w2 + x] = cellMean(smooth, cells, x, y)
   const opened = open(small, w2, h2, Math.max(1, Math.round(holeDiameter / f)))
   return smooth.map(
     (v, i) => v - f32(opened, Math.floor(Math.floor(i / w) / f) * w2 + Math.floor((i % w) / f)),
   )
 }
 
+/** The mean of the `f` x `f` cell (x, y) of a `w` x `h` image, cut at its edge. */
+function cellMean(
+  src: Float32Array,
+  { w, h, f }: { w: number; h: number; f: number },
+  x: number,
+  y: number,
+): number {
+  let [sum, n] = [0, 0]
+  for (let v = y * f; v < Math.min(h, (y + 1) * f); v++)
+    for (let u = x * f; u < Math.min(w, (x + 1) * f); u++) {
+      sum += f32(src, v * w + u)
+      n++
+    }
+  return sum / n
+}
+
 /** Strongest first until one is under `keep` of `r5`; kept peaks by their part of `mask`. */
 function testPeaks(
   peaks: Peak[],
-  mask: Uint8Array,
-  depth: Float64Array,
-  parts: number[][],
+  { mask, depth, parts }: Masks,
   o: { w: number; h: number; keep: number; r5: number; holeDiameter: number },
 ): Map<number, Peak[]> {
   const { w, h, holeDiameter } = o
@@ -755,7 +805,7 @@ function testPeaks(
 function estimateSize(kept: Map<number, Peak[]>, scales: Space, w: number): number[] {
   return [...kept.values()]
     .flat()
-    .sort((a, b) => b.response - a.response)
+    .toSorted((a, b) => b.response - a.response)
     .slice(0, 5)
     .map((p) => D_OVER_SIGMA * sigmaAt(scales, Math.round(p.y) * w + Math.round(p.x)))
 }
@@ -763,11 +813,8 @@ function estimateSize(kept: Map<number, Peak[]>, scales: Space, w: number): numb
 /** A part far larger than its holes is print; `filled` marks a print area thicker than a hole that `enclosesHoles`. */
 function shotsFromParts(
   kept: Map<number, Peak[]>,
-  parts: number[][],
-  depth: Float64Array,
-  r5: number,
-  holeDiameter: number,
-  w: number,
+  { parts, depth }: Masks,
+  { r5, holeDiameter, w }: { r5: number; holeDiameter: number; w: number },
 ): { shots: HoleProposal[]; filled: HoleProposal[] } {
   const shots: HoleProposal[] = []
   const filled: HoleProposal[] = []
@@ -808,6 +855,17 @@ function enclosesHoles(part: readonly number[], w: number, holeDiameter: number)
   // 1: the part, 2: reached from the edge
   const box = new Uint8Array(bw * bh)
   for (const i of part) box[(Math.floor(i / w) - y0) * bw + (i % w) - x0] = 1
+  fillFromEdges(box, bw, bh)
+  const across = components(
+    box.map((v) => (v ? 0 : 1)),
+    bw,
+    bh,
+  ).map((c) => Math.sqrt((4 * c.length) / Math.PI) / holeDiameter)
+  return across.some((d) => d >= SIZE_MIN) && across.every((d) => d <= SIZE_MAX)
+}
+
+/** Sets to 2 the 0 pixels of the `bw` x `bh` box that a 4-connected fill from its edge reaches. */
+function fillFromEdges(box: Uint8Array, bw: number, bh: number): void {
   const stack: number[] = []
   const visit = (j: number) => {
     if (box[j]) return
@@ -829,12 +887,6 @@ function enclosesHoles(part: readonly number[], w: number, holeDiameter: number)
     if (j >= bw) visit(j - bw)
     if (j < (bh - 1) * bw) visit(j + bw)
   }
-  const across = components(
-    box.map((v) => (v ? 0 : 1)),
-    bw,
-    bh,
-  ).map((c) => Math.sqrt((4 * c.length) / Math.PI) / holeDiameter)
-  return across.some((d) => d >= SIZE_MIN) && across.every((d) => d <= SIZE_MAX)
 }
 
 /** Own rule: farther than 4 median nearest distances plus 2 hole diameters is print, a stain or background, not a flier or a second group. */
@@ -844,7 +896,7 @@ function dropStrays(list: HoleProposal[], holePx: number): HoleProposal[] {
     Math.min(...list.filter((q) => q !== p).map((q) => Math.hypot(q.x - p.x, q.y - p.y))),
   )
   const m = nth(
-    [...nearest].sort((a, b) => a - b),
+    nearest.toSorted((a, b) => a - b),
     nearest.length >> 1,
   )
   return list.filter((_, i) => nth(nearest, i) <= 4 * m + 2 * holePx)

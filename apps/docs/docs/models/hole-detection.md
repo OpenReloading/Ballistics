@@ -14,7 +14,7 @@ Proposes bullet holes on a target photo, inside a region or the printed target f
 
 Detection starts when a photo is added to the sheet: the target search, then the run on the target found. Its result is one line with the target, the scale, the number of holes proposed (sure and maybe) and the caliber (the bullet's caliber and diameter, else the hole size and its source), each with a change link to its editor, and Accept sure. Where no bullet, marker, typed or learned size gives the hole size, the line holds the hole size field and the run follows once it is entered. A run without holes and a photo without one sure target go on in the guided steps. A photo below the minimum quality waits for Detect anyway (Photo quality).
 
-The proposals stay apart from the shots until the user accepts them. The code is in `apps/web/src/lib/hole-detection.ts` and `apps/web/src/lib/hole-proposals.ts`.
+The proposals stay apart from the shots until the user accepts them. The code is in `packages/target-recognition/src/hole-detection.ts` and `apps/web/src/lib/hole-proposals.ts`. The web app's worker runs the detector through the inference port, `packages/target-recognition/src/inference-port.ts` (`holeDetector`), on an image buffer of `packages/target-recognition/src/image.ts`.
 
 Cancelling detection, changing the photo, sheet or group, or rotating the photo invalidates pending photo and target reads. Their results and errors cannot start a worker, apply a target or change the detection status.
 
@@ -38,7 +38,7 @@ For face search and hole detection on a set of photos with reference holes:
 - Face search per set: right first choice, wrong first choice, found but not first, not found, each split by whether the first choice is sure. A sure wrong first choice is the worst case.
 - Statistics: the median and the 90th percentile of the corrections. A 90th percentile needs 20 or more usable photos in the set; below that the maximum is given with the set size.
 
-The default bar: a median of 1 correction or fewer, a 90th percentile of 3 or fewer, the right first choice on 90 % of usable photos and a wrong one on 2 % or fewer. On the sealed holdout of real target photos the measured corrections miss them in two looks, and the face-search rates were not measured there ([Hole detection tuning candidates](../research/hole-detection-tuning-candidates.md)). Meeting the bar never means that a photo is good or a detection right.
+The default bar: a median of 1 correction or fewer, a 90th percentile of 3 or fewer, the right first choice on 90 % of usable photos and a wrong one on 2 % or fewer. On the sealed holdout of real target photos the measured corrections miss them in two looks, and the face-search rates were not measured there ([Hole detection tuning candidates](../research/hole-detection-tuning-candidates.md)). Meeting the bar never means that a photo is good or a detection right. The classical detector (`holeDetector`) therefore ships as known-weak: it stays until a learned model meets the accuracy bar set by two human labelers on 30 holdout photos.
 
 ## Equations
 
@@ -50,7 +50,7 @@ $$
 D_\mathrm{px} = d_b \, k_\mathrm{px}\, h
 $$
 
-Code: `apps/web/src/lib/hole-detection.ts`, `validateInput` (`holePx`), `prepare`.
+Code: `packages/target-recognition/src/hole-detection.ts`, `validateInput` (`holePx`), `prepare`.
 
 The region with a margin of $3 D_\mathrm{px}$ is averaged over square blocks of $b$ pixels, so a hole is about 16 working pixels across and the working image holds at most $2 \times 10^6$ pixels:
 
@@ -58,7 +58,7 @@ $$
 b = \max\left(1,\, \operatorname{round}\frac{D_\mathrm{px}}{16},\, \left\lceil \sqrt{\frac{W H}{2 \times 10^6}} \right\rceil\right), \qquad D = \frac{D_\mathrm{px}}{b} \ge 4
 $$
 
-Code: `apps/web/src/lib/hole-detection.ts`, `workBlockSize`, `WORK_DIAMETER`, `MAX_WORK_PIXELS`.
+Code: `packages/target-recognition/src/hole-detection.ts`, `workBlockSize`, `WORK_DIAMETER`, `MAX_WORK_PIXELS`.
 
 Each block holds the logarithm of its mean colour per channel $c \in \{R, G, B\}$:
 
@@ -66,7 +66,7 @@ $$
 F_c = \ln(\bar I_c + 8)
 $$
 
-Code: `apps/web/src/lib/hole-detection.ts`, `prepare`, `blockAverageLogRgb`.
+Code: `packages/target-recognition/src/hole-detection.ts`, `prepare`, `blockAverageLogRgb`.
 
 The local photo scale is the mean photo length of 1 mm along the target $x$ and $y$ axes at the middle of the region, so a perspective calibration gives the scale near the holes:
 
@@ -84,7 +84,7 @@ $$
 w = \frac{(\Sigma + \epsilon I)^{-1} (\mu - m)}{\lVert (\Sigma + \epsilon I)^{-1} (\mu - m) \rVert}, \qquad \epsilon = \frac{0.02 \operatorname{tr}\Sigma}{3} + 10^{-5}
 $$
 
-Code: `apps/web/src/lib/colour-axis.ts`, `axisOf`, `fisherAxis`. `apps/web/src/lib/hole-detection.ts`, `MIN_SEP`.
+Code: `packages/target-recognition/src/colour-axis.ts`, `axisOf`, `fisherAxis`. `packages/target-recognition/src/hole-detection.ts`, `MIN_SEP`.
 
 The axis is refused when the separation $\Delta = w^\top (\mu - m)$ is below 0.02 (scaled by the contrast setting) or when fewer than 30 surrounding pixels are sampled.
 
@@ -94,7 +94,7 @@ $$
 P = \operatorname{clamp}\left(64 + 128\, \frac{w^\top F - w^\top m}{\Delta},\, 0,\, 255\right)
 $$
 
-Code: `apps/web/src/lib/colour-axis.ts`, `project`.
+Code: `packages/target-recognition/src/colour-axis.ts`, `project`.
 
 ### Blob response
 
@@ -120,7 +120,7 @@ $$
 D_\mathrm{hole} = 2\sqrt{2}\, \sigma^\ast
 $$
 
-Code: `packages/target-recognition/src/blob-detector.ts`, `peaksOf`, `sigmaAt`. `apps/web/src/lib/hole-detection.ts`, `D_OVER_SIGMA`.
+Code: `packages/target-recognition/src/blob-detector.ts`, `peaksOf`, `sigmaAt`. `packages/target-recognition/src/hole-detection.ts`, `D_OVER_SIGMA`.
 
 with $\sigma^\ast$ the scale of the strongest response, refined by a parabola in $\ln\sigma$ through the neighbouring scales.
 
@@ -132,7 +132,7 @@ $$
 \mathrm{hat} = P_\mathrm{s} - (P_\mathrm{s} \ominus Q) \oplus Q
 $$
 
-Code: `apps/web/src/lib/hole-detection.ts`, `pipeline` (`topHat`). `packages/target-recognition/src/raster-ops.ts`, `open`, `morph`, `minMax`.
+Code: `packages/target-recognition/src/hole-detection.ts`, `pipeline` (`topHat`). `packages/target-recognition/src/raster-ops.ts`, `open`, `morph`, `minMax`.
 
 with erosion $\ominus$ and dilation $\oplus$ by the square $Q$, each a running minimum or maximum with three comparisons per pixel whatever the size.
 
@@ -142,7 +142,7 @@ $$
 \mathrm{mask} = \mathrm{hat} \gt 0.35\, c_5, \qquad \mathcal{R} \ge \kappa\, r_5, \qquad \sqrt{\max_{0.3 D} \delta^2} \ge 0.2 D, \qquad \frac{A_\mathrm{mask}(0.5 D)}{A(0.5 D)} \ge 0.3
 $$
 
-Code: `apps/web/src/lib/hole-detection.ts`, `pipeline` (`testPeaks`, `threshold`, `standsOut`), `KEEP`, `INSCRIBED`, `FILL`, `HAT`, `FLOOR`. `packages/target-recognition/src/raster-ops.ts`, `distanceSquared`.
+Code: `packages/target-recognition/src/hole-detection.ts`, `pipeline` (`testPeaks`, `threshold`, `standsOut`), `KEEP`, `INSCRIBED`, `FILL`, `HAT`, `FLOOR`. `packages/target-recognition/src/raster-ops.ts`, `distanceSquared`.
 
 with:
 - $\kappa = 0.35$ at the default contrast setting
@@ -159,11 +159,11 @@ $$
 D_\mathrm{part} = \sqrt{\frac{4 A}{\pi k}}, \qquad D_\mathrm{part} \gt 3 D \Rightarrow \text{dropped}, \qquad \text{confidence} = \operatorname{clamp}\left(\frac{\mathcal{R}}{r_5}, 0, 1\right)
 $$
 
-Code: `apps/web/src/lib/hole-detection.ts`, `pipeline`, `shotsFromParts`, `MAX_PART`. `packages/target-recognition/src/raster-ops.ts`, `components`.
+Code: `packages/target-recognition/src/hole-detection.ts`, `pipeline`, `shotsFromParts`, `MAX_PART`. `packages/target-recognition/src/raster-ops.ts`, `components`.
 
 A part is also print when it is a filled area with holes of the other polarity in it. It must be thicker than holes: a disc of radius $0.92 D$ fits inside it (the distance to the nearest pixel off the mask exceeds $0.92 D$ somewhere). On the drawn test photos a single hole, or holes joined by ring lines, is about $0.5 D$ thick, a part of merged holes and ring lines up to $0.85 D$, and the filled square of the zero target $0.99 D$. And of the areas off the mask that it encloses (not reached by a fill from the edge of its bounding box), at least one is the size of a hole and none is larger. An area counts as the size of a hole when a disc of its area is $0.7 D$ to $1.4 D$ across, the hole sizes a run takes. Paper inside a printed ring line is far larger, so a hole joined to a ring line keeps its part. The thickness keeps the holes in the black area of a face, which ring lines join into a part that encloses hole-sized patches of the black area between them. This drops a filled black square with light holes shot into it, which the opening by $2 D$ cannot remove once the holes leave no room for the square $Q$. The seed runs of the detection without a picked hole keep such a part, so the run chosen does not change: a seed on a light hole of the square can find only the square on the coarse copy, while its run on the full working image finds the holes.
 
-Code: `apps/web/src/lib/hole-detection.ts`, `shotsFromParts`, `enclosesHoles`, `solved`, `THICK`, `SIZE_MIN`, `SIZE_MAX`.
+Code: `packages/target-recognition/src/hole-detection.ts`, `shotsFromParts`, `enclosesHoles`, `solved`, `THICK`, `SIZE_MIN`, `SIZE_MAX`.
 
 A proposal with a confidence below 0.5 is shown as "maybe": the user accepts it on the photo or with Accept maybes in the Review step; Accept sure leaves it out, and the counts name the sure and the maybe proposals apart. On the drawn test photos every true hole scores at least 0.63, so the tier loses none of them.
 
@@ -177,7 +177,7 @@ $$
 D' = \operatorname{clamp}\left(\operatorname{median}_{5} D_\mathrm{hole},\, 0.7 D_0,\, 1.4 D_0\right)
 $$
 
-Code: `apps/web/src/lib/hole-detection.ts`, `estimateHoleSize`, `pickedSize`, `estimateSize`, `SIZE_MIN`, `SIZE_MAX`.
+Code: `packages/target-recognition/src/hole-detection.ts`, `estimateHoleSize`, `pickedSize`, `estimateSize`, `SIZE_MIN`, `SIZE_MAX`.
 
 The expected hole size, first match:
 
@@ -229,7 +229,7 @@ $$
 \min_{j \ne i} \lvert p_i - p_j \rvert \gt 4\, \operatorname{median}_k \min_{j \ne k} \lvert p_k - p_j \rvert + 2 b D
 $$
 
-Code: `apps/web/src/lib/hole-detection.ts`, `dropStrays`, `toProposals`.
+Code: `packages/target-recognition/src/hole-detection.ts`, `dropStrays`, `toProposals`.
 
 With a found target and no region drawn, the region is the target, and a flier on it is a shot: no proposal is dropped as a stray. A drawn region keeps the stray rule.
 
@@ -246,7 +246,7 @@ $$
 1.2\, \operatorname{median}_\mathrm{low} D_\mathrm{part} \lt D_\mathrm{part} \le 1.4\, D \Rightarrow \text{kept}
 $$
 
-Code: `apps/web/src/lib/hole-detection.ts`, `printAmong`, `HOLE_ON_PRINT`, `SIZE_MAX`.
+Code: `packages/target-recognition/src/hole-detection.ts`, `printAmong`, `HOLE_ON_PRINT`, `SIZE_MAX`.
 
 The target plane is found without a turn of its own, so the axes are turned by the angle $\phi$ from the nearest axis that most marks in the numeral rings share within 2 degrees (when those give none, the marks where the quarter marks stand), the axes repeating every quarter turn. It needs three marks at least, two of them at one radius (within 3 %) on two axes as the numerals of a ring stand, else it is 0:
 
@@ -254,7 +254,7 @@ $$
 \phi = \arg\max_{\phi_i} \#\left\{ j : \left\lvert \phi_j - \phi_i \right\rvert_{\mathrm{mod}\ 90^\circ} \le 2^\circ \right\}
 $$
 
-Code: `apps/web/src/lib/hole-detection.ts`, `dropPrintMarks`, `numeralRoll`, `ROLL_SPREAD`, `polar`, `PRINT_CONFIDENCE`, `NUMERALS_MIN`. `apps/web/src/lib/target-face.ts`, `faceLabel`, `QUARTER_WIDTH`, `QUARTER_REACH`.
+Code: `packages/target-recognition/src/hole-detection.ts`, `dropPrintMarks`, `numeralRoll`, `ROLL_SPREAD`, `polar`, `PRINT_CONFIDENCE`, `NUMERALS_MIN`. `apps/web/src/lib/target-face.ts`, `faceLabel`, `QUARTER_WIDTH`, `QUARTER_REACH`.
 
 ### Target area
 
@@ -264,13 +264,13 @@ $$
 Y = 0.299 R + 0.587 G + 0.114 B, \qquad t = \arg\max_t\, \omega_0(t)\, \omega_1(t) \left(\mu_0(t) - \mu_1(t)\right)^2
 $$
 
-Code: `apps/web/src/lib/target-paper.ts`, `paperOutline`, `otsu`, `luminance`, `convexHull`.
+Code: `packages/target-recognition/src/target-paper.ts`, `paperOutline`, `otsu`, `luminance`, `convexHull`.
 
 The whole photo is used when the light part covers less than a tenth of it or the class means differ by less than 40.
 
 With a found target and no marked region, it is the target's outer ring grown by half a hole, without the parts that lie neither on its black area nor in that hull: the outer rings of a target on an insert card run past the card onto the table. A hull that leaves more than 5 % of the black area out is the lit part of a sheet in a shadow and cuts nothing.
 
-Code: `apps/web/src/lib/hole-detection.ts`, `offSheet`.
+Code: `packages/target-recognition/src/hole-detection.ts`, `offSheet`.
 
 ### Target
 
@@ -304,7 +304,7 @@ Code: `apps/web/src/lib/face-search.ts`, `findFace`, `holeSize`. `apps/web/src/l
 2. A run is kept when it finds at least two shots of alike size: no more than a quarter of the sizes lie off their median by more than 35 %, and that median is at least half the expected hole size. Grain of the photo, on a dark target with dark holes the strongest light blobs, gives alike blobs far below that size, and runs of them agree with each other more than the holes' runs do.
 3. The run whose shots the other runs find again most often (within $0.5 D$) is proposed, then run again on the full working image. The seed runs use a working image with holes of about 12 pixels (0.75 times 16).
 
-Code: `apps/web/src/lib/hole-detection.ts`, `autoDetect`, `runSeeds`, `SEED_MIN_SIZE`. `apps/web/src/lib/colour-axis.ts`, `rescale`, `logLuma`.
+Code: `packages/target-recognition/src/hole-detection.ts`, `autoDetect`, `runSeeds`, `SEED_MIN_SIZE`. `packages/target-recognition/src/colour-axis.ts`, `rescale`, `logLuma`.
 
 ### Photo quality
 

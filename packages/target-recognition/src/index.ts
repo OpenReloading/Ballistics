@@ -1,2 +1,6 @@
 export * from './blob-detector.ts'
+export * from './hole-detection.ts'
+export * from './image.ts'
+export * from './inference-port.ts'
 export * from './raster-ops.ts'
+export * from './target-paper.ts'

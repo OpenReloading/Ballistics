@@ -1,13 +1,16 @@
 # @open-reloading/target-recognition
 
-Finds shapes on target photos for the web app's hole detection and face search, without I/O: raster operations on working images held as flat arrays, row by row (`open`, `distanceSquared`, `components`, `insidePolygon`, `median1`, `upperMedian`), and a multi-scale blob detector (`space`, `peaksOf`, `sigmaAt`, `boxBlur`). Its dependencies are `@open-reloading/shot-groups` (for `Point`) and `@open-reloading/statistics`. Private to this repository: it is not published.
+Proposes the bullet holes on a target photo for the web app's hole detection, without I/O. Callers go through the inference port, `holeDetector.propose`, which takes an RGBA image buffer and resolves to hole proposals in image px. Its dependencies are `@open-reloading/shot-groups` (for `Point`) and `@open-reloading/statistics`. Private to this repository: it is not published.
+
+- `holeDetector`: the classical detector, known-weak. It misses the default accuracy bar on the holdout photos and stays until a learned model meets the bar set by two human labelers on 30 holdout photos ([Quality bar](../../apps/docs/docs/models/hole-detection.md#quality-bar)).
+- The detector's parts, also used by the web app's face search, photo quality and bullet photo: raster operations on working images held as flat arrays, row by row (`open`, `distanceSquared`, `components`, `insidePolygon`, `median1`, `upperMedian`), a multi-scale blob detector (`space`, `peaksOf`, `sigmaAt`, `boxBlur`) and the paper outline (`paperOutline`, `otsu`).
 
 ```js
-import { peaksOf, radiiOf, space } from '@open-reloading/target-recognition'
+import { holeDetector } from '@open-reloading/target-recognition'
 
-// bright blobs about D px across on a gray image of w x h px, sigma 0.25 to 0.5 D, strongest first
-const sp = space(gray, w, h, radiiOf(D, [0.25, 0.35, 0.5]))
-const peaks = peaksOf(sp, new Uint8Array(w * h).fill(1), D) // [{ x, y, response, sigma }, ...]
+// image: { width, height, data } as in a canvas ImageData; 8 px/mm, 7.62 mm bullets
+const { proposals } = await holeDetector.propose({ image, pxPerM: 8000, expectedHoleDiameter: 0.00762, auto: true })
+// proposals: [{ x, y, confidence, clusterSize, clusterId, diameter }, ...], most confident first
 ```
 
 License: MIT

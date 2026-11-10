@@ -49,7 +49,7 @@ Measured; the measurements are not in the repository.
 
 ## Where in the app
 
-- `apps/web/src/lib/hole-detection.ts`.
+- `packages/target-recognition/src/hole-detection.ts`.
 - `packages/target-recognition/src/blob-detector.ts`.
 - Model page: [hole detection](../models/hole-detection.md).
 

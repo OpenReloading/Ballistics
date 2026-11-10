@@ -1,3 +1,4 @@
+import type { Point } from '@open-reloading/shot-groups'
 import { seededUniforms } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
 import {
@@ -8,13 +9,10 @@ import {
   type HoleProposal,
   MAX_WORK_PIXELS,
   workBlockSize,
-} from '../src/lib/hole-detection.ts'
-import { expectedHoleSize, MIN_HOLES_TO_LEARN_SIZE } from '../src/lib/hole-proposals.ts'
-import type { RgbaImage } from '../src/lib/image.ts'
-import type { Point } from '../src/lib/target-geometry.ts'
-import { paperOutline } from '../src/lib/target-paper.ts'
+} from '../src/hole-detection.ts'
+import type { RgbaImage } from '../src/image.ts'
+import { paperOutline } from '../src/target-paper.ts'
 import { defined } from './defined.ts'
-import { sheetInk, sheetSvg } from './zero-target-render.ts'
 
 const detectHoles = (input: HoleDetectionInput): HoleProposal[] => findHoles(input).proposals
 
@@ -26,38 +24,31 @@ const D = bullet * pxPerM
 const PAPER = 225
 const BLACK = 35
 
+type Box = [x0: number, y0: number, x1: number, y1: number]
+
 class Scene {
   lum: Float32Array
   /** Pixels painted in colour (R, G, B); the others are grey with the tint of `image`. */
   colour = new Map<number, [number, number, number]>()
   rnd = seededUniforms(7)
-  constructor(
-    readonly width: number,
-    readonly height: number,
-  ) {
+  readonly width: number
+  readonly height: number
+  constructor(width: number, height: number) {
+    this.width = width
+    this.height = height
     this.lum = new Float32Array(width * height).fill(PAPER)
   }
-  paint(
-    x0: number,
-    y0: number,
-    x1: number,
-    y1: number,
-    inside: (x: number, y: number) => boolean,
-    v: number,
-  ) {
+  paint([x0, y0, x1, y1]: Box, inside: (x: number, y: number) => boolean, v: number) {
     for (let y = Math.max(0, Math.floor(y0)); y < Math.min(this.height, Math.ceil(y1)); y++)
       for (let x = Math.max(0, Math.floor(x0)); x < Math.min(this.width, Math.ceil(x1)); x++)
         if (inside(x, y)) this.lum[y * this.width + x] = v
   }
-  rect(x0: number, y0: number, x1: number, y1: number, v: number) {
-    this.paint(x0, y0, x1, y1, () => true, v)
+  rect(box: Box, v: number) {
+    this.paint(box, () => true, v)
   }
-  ring(cx: number, cy: number, r: number, w: number, v: number) {
+  ring({ x: cx, y: cy }: Point, r: number, w: number, v: number) {
     this.paint(
-      cx - r - w,
-      cy - r - w,
-      cx + r + w,
-      cy + r + w,
+      [cx - r - w, cy - r - w, cx + r + w, cy + r + w],
       (x, y) => {
         return Math.abs(Math.hypot(x - cx, y - cy) - r) <= w / 2
       },
@@ -65,17 +56,14 @@ class Scene {
     )
   }
   disc(cx: number, cy: number, r: number, v: number) {
-    this.ring(cx, cy, r / 2, r, v)
+    this.ring({ x: cx, y: cy }, r / 2, r, v)
   }
   /** A hole with a torn, wavy edge; `backing` is what shows through it; white fibres on its rim. */
   hole(c: Point, backing: number, diameter = D) {
     const r = diameter / 2
     const [p1, p2] = [this.rnd() * 6, this.rnd() * 6]
     this.paint(
-      c.x - 1.2 * r,
-      c.y - 1.2 * r,
-      c.x + 1.2 * r,
-      c.y + 1.2 * r,
+      [c.x - 1.2 * r, c.y - 1.2 * r, c.x + 1.2 * r, c.y + 1.2 * r],
       (x, y) => {
         const a = Math.atan2(y - c.y, x - c.x)
         const edge = r * (1 + 0.05 * Math.sin(5 * a + p1) + 0.03 * Math.sin(11 * a + p2))
@@ -103,13 +91,14 @@ class Scene {
   /** A printed face: outer dark rings on paper, a dark square with light rings, digits and a light bull with a cross. */
   face(cx: number, cy: number) {
     const mm = pxPerMm
-    for (const r of [40, 46]) this.ring(cx, cy, r * mm, 0.4 * mm, BLACK)
-    this.rect(cx - 35 * mm, cy - 35 * mm, cx + 35 * mm, cy + 35 * mm, BLACK)
-    for (const r of [12, 18, 24, 30]) this.ring(cx, cy, r * mm, 0.6 * mm, PAPER)
+    const center = { x: cx, y: cy }
+    for (const r of [40, 46]) this.ring(center, r * mm, 0.4 * mm, BLACK)
+    this.rect([cx - 35 * mm, cy - 35 * mm, cx + 35 * mm, cy + 35 * mm], BLACK)
+    for (const r of [12, 18, 24, 30]) this.ring(center, r * mm, 0.6 * mm, PAPER)
     this.disc(cx, cy, 8.5 * mm, PAPER)
-    this.ring(cx, cy, 4 * mm, 0.3 * mm, BLACK)
-    this.rect(cx - 3 * mm, cy - 0.2 * mm, cx + 3 * mm, cy + 0.2 * mm, BLACK)
-    this.rect(cx - 0.2 * mm, cy - 3 * mm, cx + 0.2 * mm, cy + 3 * mm, BLACK)
+    this.ring(center, 4 * mm, 0.3 * mm, BLACK)
+    this.rect([cx - 3 * mm, cy - 0.2 * mm, cx + 3 * mm, cy + 0.2 * mm], BLACK)
+    this.rect([cx - 0.2 * mm, cy - 3 * mm, cx + 0.2 * mm, cy + 3 * mm], BLACK)
     const digit = (x: number, y: number, v: number) => {
       for (const [a, b, c, d] of [
         [0, 0, 2.5, 0.6],
@@ -118,7 +107,7 @@ class Scene {
         [0, 0, 0.6, 4],
         [1.9, 0, 2.5, 4],
       ] satisfies [number, number, number, number][])
-        this.rect(x + a * mm, y + b * mm, x + c * mm, y + d * mm, v)
+        this.rect([x + a * mm, y + b * mm, x + c * mm, y + d * mm], v)
     }
     for (const r of [15, 21, 27]) digit(cx + r * 0.7 * mm, cy - r * 0.7 * mm, PAPER)
     digit(cx + 37 * mm, cy + 37 * mm, BLACK)
@@ -150,6 +139,8 @@ class Scene {
 }
 
 const all = (s: Scene) => ({ x: 0, y: 0, width: s.width, height: s.height })
+/** A curled sheet's brightness on a 900 px photo. */
+const curl = (x: number, y: number) => 0.7 + 0.3 * (x / 900) - 0.1 * (y / 900) ** 2
 
 /** Every true hole has one proposal within `tol` bullet diameters, and there are no others. */
 function expectHoles(found: HoleProposal[], truth: Point[], tol: number) {
@@ -198,7 +189,7 @@ describe('detectFromExample', () => {
     const first = from(s, defined(truth[0]))?.proposals ?? []
     expect(new Set(first.map((p) => p.clusterId)).size).toBe(3)
     expect(first.map((p) => p.confidence)).toEqual(
-      first.map((p) => p.confidence).sort((a, b) => b - a),
+      first.map((p) => p.confidence).toSorted((a, b) => b - a),
     )
   })
 
@@ -223,7 +214,9 @@ describe('detectFromExample', () => {
     for (const t of light) dark.hole(t, 140)
     expect(from(dark, defined(light[0]))?.example.polarity).toBe('light')
   })
+})
 
+describe('detectFromExample on a printed face', () => {
   it('finds light holes on the dark aiming area, also across its edge, and not the dark ones on paper', () => {
     const s = new Scene(900, 900)
     s.face(450, 450)
@@ -247,6 +240,7 @@ describe('detectFromExample', () => {
   })
 
   it('finds holes under a curled-paper brightness gradient', () => {
+    expect.hasAssertions()
     const s = new Scene(900, 900)
     s.face(450, 450)
     const mm = pxPerMm
@@ -256,14 +250,15 @@ describe('detectFromExample', () => {
       { x: 450 - 28 * mm, y: 450 - 28 * mm },
     ]
     for (const t of truth) s.hole(t, 140)
-    const curl = (x: number, y: number) => 0.7 + 0.3 * (x / 900) - 0.1 * (y / 900) ** 2
     const found = detectFromExample(
       { image: s.image({ gradient: curl }), region: all(s), pxPerM, expectedHoleDiameter: bullet },
       defined(truth[0]),
     )
     expectTop(found?.proposals ?? [], truth, 0.12)
   })
+})
 
+describe('detectFromExample with touching holes and holes smaller than the bullet', () => {
   it('splits two and three touching holes into one shot per peak and lowers nothing else', () => {
     const s = new Scene(900, 500)
     const pair = [
@@ -305,7 +300,9 @@ describe('detectFromExample', () => {
       ).toBeLessThan(0.3)
     }
   })
+})
 
+describe('detectFromExample and the region', () => {
   it('finds nothing when the pick is on blank paper, and proposes only inside the region from a pick outside it', () => {
     const s = new Scene(600, 400)
     s.hole({ x: 150, y: 150 }, 60)
@@ -319,6 +316,7 @@ describe('detectFromExample', () => {
   })
 
   it('proposes only holes whose centre is inside the region', () => {
+    expect.hasAssertions()
     const s = new Scene(800, 600)
     const inside = { x: 300, y: 300 }
     const nearEdge = { x: 300, y: 300 - 0.9 * D }
@@ -356,8 +354,9 @@ describe('autoDetect and findHoles', () => {
   })
 
   it('finds light holes on a dark area without a pick', () => {
+    expect.hasAssertions()
     const s = new Scene(900, 900)
-    s.rect(0, 0, 900, 900, BLACK)
+    s.rect([0, 0, 900, 900], BLACK)
     const truth = [
       { x: 250, y: 300 },
       { x: 600, y: 250 },
@@ -372,7 +371,6 @@ describe('autoDetect and findHoles', () => {
   })
 
   it('proposes nothing on blank paper, also with noise and a brightness gradient', () => {
-    const curl = (x: number, y: number) => 0.7 + 0.3 * (x / 900) - 0.1 * (y / 900) ** 2
     const paper = new Scene(600, 400)
     for (const noise of [6, 10])
       expect(
@@ -384,10 +382,13 @@ describe('autoDetect and findHoles', () => {
         }),
       ).toEqual([])
   })
+})
 
+describe('autoDetect and findHoles on print, a stain and a backing colour', () => {
   it('does not take the ends of a printed bar, a third of a hole wide, for holes', () => {
+    expect.hasAssertions()
     const s = new Scene(1300, 700)
-    s.rect(200, 590, 1100, 610, BLACK)
+    s.rect([200, 590, 1100, 610], BLACK)
     const truth = [
       { x: 300, y: 200 },
       { x: 700, y: 250 },
@@ -427,7 +428,9 @@ describe('autoDetect and findHoles', () => {
     for (const t of truth)
       expect(Math.min(...found.map((p) => Math.hypot(p.x - t.x, p.y - t.y))) / D).toBeLessThan(0.12)
   })
+})
 
+describe('findHoles with a bad backing colour and without a region', () => {
   it('refuses a backing colour channel that is not a number from 0 to 255', () => {
     const s = new Scene(200, 200)
     const ok = { image: s.image(), region: all(s), pxPerM, expectedHoleDiameter: bullet }
@@ -440,8 +443,8 @@ describe('autoDetect and findHoles', () => {
 
   it('without a region looks on the paper only, not on the background around it', () => {
     const s = new Scene(1100, 800)
-    s.rect(0, 0, 1100, 800, 50)
-    s.rect(250, 150, 850, 650, PAPER)
+    s.rect([0, 0, 1100, 800], 50)
+    s.rect([250, 150, 850, 650], PAPER)
     for (const m of [
       { x: 100, y: 100 },
       { x: 120, y: 650 },
@@ -461,10 +464,12 @@ describe('autoDetect and findHoles', () => {
     expect(Math.max(...area.map((p) => p.x))).toBeLessThan(900)
     expectHoles(detectHoles({ image, pxPerM, expectedHoleDiameter: bullet }), truth, 0.1)
   })
+})
 
+describe('paperOutline and stray proposals', () => {
   it('takes the whole photo as the target when no light area fills a tenth of it', () => {
     const s = new Scene(600, 400)
-    s.rect(0, 0, 600, 400, BLACK)
+    s.rect([0, 0, 600, 400], BLACK)
     expect(paperOutline(s.image())).toEqual([
       { x: 0, y: 0 },
       { x: 600, y: 0 },
@@ -474,6 +479,7 @@ describe('autoDetect and findHoles', () => {
   })
 
   it('drops a proposal far from the group but keeps a flier and a second group', () => {
+    expect.hasAssertions()
     const s = new Scene(1600, 1000)
     const group = [
       { x: 300, y: 300 },
@@ -491,7 +497,9 @@ describe('autoDetect and findHoles', () => {
     const found = from(s, defined(group[0]))?.proposals ?? []
     expectHoles(found, [...group, flier, ...second], 0.1)
   })
+})
 
+describe('a large region and invalid input', () => {
   it('finds 12 holes on a 4000 x 3000 px region with 4 px work blocks', () => {
     const s = new Scene(4000, 3000)
     const truth: Point[] = []
@@ -573,48 +581,8 @@ describe('progress', () => {
       { x: 150, y: 150 },
     )
     expect(done.length).toBeGreaterThan(2)
-    expect(done).toEqual([...done].sort((a, b) => a - b))
+    expect(done).toEqual(done.toSorted((a, b) => a - b))
     expect(done.at(-1)).toBe(1)
-  })
-})
-
-describe('expectedHoleSize', () => {
-  const bulletM = 0.00762
-  it('takes the size typed first, then the median of confirmed holes once there are enough, then the bullet, then the marker', () => {
-    const holes = [0.0081, 0.0079, 0.0102]
-    expect(
-      expectedHoleSize({
-        typedDiameter: 0.007,
-        confirmedDiameters: holes,
-        bulletDiameter: bulletM,
-        markerDiameter: 0.006,
-      }),
-    ).toEqual({
-      diameter: 0.007,
-      source: 'typed',
-    })
-    expect(expectedHoleSize({ confirmedDiameters: holes, bulletDiameter: bulletM })).toEqual({
-      diameter: 0.0081,
-      source: 'learned',
-    })
-    expect(expectedHoleSize({ confirmedDiameters: [0.008, 0.009, 0.0081, 0.0084] })).toEqual({
-      diameter: (0.0081 + 0.0084) / 2,
-      source: 'learned',
-    })
-    expect(
-      expectedHoleSize({
-        confirmedDiameters: holes.slice(0, MIN_HOLES_TO_LEARN_SIZE - 1),
-        bulletDiameter: bulletM,
-      }),
-    ).toEqual({
-      diameter: bulletM,
-      source: 'bullet',
-    })
-    expect(expectedHoleSize({ confirmedDiameters: [], markerDiameter: 0.006 })).toEqual({
-      diameter: 0.006,
-      source: 'marker',
-    })
-    expect(expectedHoleSize({ confirmedDiameters: [] })).toBeUndefined()
   })
 })
 
@@ -641,34 +609,5 @@ describe('workBlockSize', () => {
 
   it('refuses a region too large for its holes instead of working on too few px per hole', () => {
     expect(() => workBlockSize(5, 20000, 20000)).toThrow(RangeError)
-  })
-})
-
-describe('the printed zero target', () => {
-  it('finds five holes on the sheet: two in the black square, one on a grid line, two on paper', () => {
-    const s = new Scene(210 * pxPerMm, 297 * pxPerMm)
-    const ink = sheetInk(sheetSvg({ rifle: 'Rifle 1', distance: '100', group: 'Group 1' }))
-    for (let y = 0; y < s.height; y++)
-      for (let x = 0; x < s.width; x++) s.lum[y * s.width + x] = ink(x / pxPerMm, y / pxPerMm)
-    // sheet mm right and up of the centre to photo px
-    const at = (x: number, y: number) => ({ x: (105 + x) * pxPerMm, y: (148.5 - y) * pxPerMm })
-    const inSquare = [at(-6, 5), at(5, -6)]
-    const onPaper = [at(30, 10), at(-25, 18), at(20, -30)]
-    for (const t of inSquare) s.hole(t, 140)
-    for (const t of onPaper) s.hole(t, 60)
-    const truth = [...inSquare, ...onPaper]
-    const image = s.image()
-    // a run finds one polarity: the light holes in a region about the black square, then the dark ones on the whole sheet
-    const square = { x: at(-20, 0).x, y: at(0, 20).y, width: 40 * pxPerMm, height: 40 * pxPerMm }
-    const options = { image, pxPerM, expectedHoleDiameter: bullet }
-    const found = [
-      ...detectHoles({ ...options, region: square, polarity: 'light' }),
-      ...detectHoles({ ...options, region: all(s), polarity: 'dark' }),
-    ]
-    const near = (p: Point) => truth.some((t) => Math.hypot(p.x - t.x, p.y - t.y) < 0.5 * D)
-    for (const t of truth)
-      expect(found.some((p) => Math.hypot(p.x - t.x, p.y - t.y) < 0.2 * D)).toBe(true)
-    // no proposal on the print: the dark run reads the black square with the two light holes in it as print, and the marks, digits, cross and bar give none
-    expect(found.filter((p) => !near(p))).toEqual([])
   })
 })

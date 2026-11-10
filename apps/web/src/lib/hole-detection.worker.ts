@@ -1,18 +1,16 @@
 /** Decodes and downscales the posted photo so a hole is about 32 px across (`apps/docs/docs/models/hole-detection.md`); nothing leaves the browser. */
 
 import { fromSi } from '@open-reloading/schema'
-import { clamp } from '@open-reloading/target-recognition'
+import {
+  clamp,
+  type HoleDetectionInput,
+  holeDetector,
+  type ProposalRequest,
+  type Proposals,
+  WORK_DIAMETER,
+} from '@open-reloading/target-recognition'
 import { errorText } from './error-text.ts'
 import { findFace } from './face-search.ts'
-import {
-  autoDetect,
-  detectFromExample,
-  type FlaggedRegion,
-  findHoles,
-  type HoleExample,
-  type HoleProposal,
-  WORK_DIAMETER,
-} from './hole-detection.ts'
 import type { Photo, WorkerReply, WorkerRequest } from './hole-detection-protocol.ts'
 import { layoutOf, photoQuality } from './photo-quality.ts'
 import { faceLabel, onPhoto } from './target-face.ts'
@@ -149,35 +147,27 @@ async function handleDetect(
     minContrast: r.minContrast,
     onProgress: (done: number) => post({ kind: 'progress', done: 0.2 + 0.8 * done }),
   }
-  const found = runDetection(r, input, toWork)
+  const found = await holeDetector.propose(requestOf(r, input, toWork))
   return toPhotoPx(found, k, x0, y0)
 }
 
-/** The example, auto or plain detection on the working image. */
-function runDetection(
+/** The example, auto or plain run on the working image. */
+function requestOf(
   r: Extract<WorkerRequest, { kind: 'detect' | 'example' }>,
-  input: Parameters<typeof findHoles>[0],
+  input: HoleDetectionInput,
   toWork: (p: Point) => Point,
-): Found {
-  if (r.kind === 'example')
-    return detectFromExample(input, toWork(r.at)) ?? { proposals: [], flagged: [] }
-  if (r.auto) return autoDetect(input) ?? { proposals: [], flagged: [] }
-  return findHoles({
+): ProposalRequest {
+  if (r.kind === 'example') return { ...input, at: toWork(r.at) }
+  if (r.auto) return { ...input, auto: true }
+  return {
     ...input,
     ...(r.backing && { backing: r.backing }),
     ...(r.polarity && { polarity: r.polarity }),
-  })
-}
-
-type Found = {
-  proposals: HoleProposal[]
-  flagged: FlaggedRegion[]
-  holeDiameter?: number
-  example?: HoleExample
+  }
 }
 
 /** The reply with the run's working px mapped back to photo px: `k` times the photo, from (x0, y0). */
-function toPhotoPx(found: Found, k: number, x0: number, y0: number): WorkerReply {
+function toPhotoPx(found: Proposals, k: number, x0: number, y0: number): WorkerReply {
   return {
     kind: 'proposals',
     proposals: found.proposals.map((p) => ({
