@@ -44,7 +44,7 @@
   --doc-sidebar-width: 21rem;
 }
 
-/* the colours of the web app (apps/web/src/app/globals.css): link blue, text, page and surface */
+/* link blue, text, page and surface of the docs; the web app takes its own from tokens.css of @open-reloading/design-tokens */
 :root {
   --ifm-color-primary: #0b57d0;
   --ifm-color-primary-dark: #0a4ebb;

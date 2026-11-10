@@ -30,6 +30,36 @@ describe('drawing tokens', () => {
   // the palette of tokens.css under the app's own values, as the page cascades them
   const palette = (scheme: keyof typeof colors) =>
     Object.entries(colors[scheme]).map(([k, v]) => [`--${k}`, v as string] as const)
+  it('prints the light values of tokens.css for every color its dark block sets', () => {
+    const tokens = readFileSync(
+      new URL(import.meta.resolve('@open-reloading/design-tokens/tokens.css')),
+      'utf8',
+    )
+    const declarations = (text: string, selector: string, from = 0) => {
+      const start = text.indexOf(`${selector} {\n`, from)
+      expect(start, selector).toBeGreaterThanOrEqual(0)
+      const body = text.slice(start + selector.length + 2, text.indexOf('}', start))
+      return new Map(
+        [...body.matchAll(/(--[\w-]+):\s*([^;]+);/g)].map(
+          ([, k, v = missing()]) => [k, v.trim()] as const,
+        ),
+      )
+    }
+    const printed = declarations(
+      css,
+      ':root[data-mantine-color-scheme]',
+      css.indexOf('@media print {'),
+    )
+    const lightTokens = declarations(tokens, ':root')
+    const darkTokens = declarations(
+      tokens,
+      ':root[data-mantine-color-scheme="dark"], :root[data-theme="dark"]',
+    )
+    for (const name of darkTokens.keys())
+      expect(printed.get(name), name).toBe(lightTokens.get(name))
+    for (const [name, value] of printed) expect(value, name).toBe(lightTokens.get(name))
+  })
+
   const light = new Map([...palette('light'), ...block(':root')])
   const dark = new Map([
     ...palette('dark'),
