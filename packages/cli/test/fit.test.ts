@@ -108,7 +108,7 @@ describe('a model that refuses a load by throwing', () => {
   it('lists the powder and goes on', async () => {
     const refusing = new URL('./fixtures/refusing-model.mjs', import.meta.url).pathname
     const r = await fit(options, refusing)
-    expect(r.notFitted[dp40]).toBeTypeOf('string')
+    expect(r.notFitted[dp40]).toBe('invalid')
   })
 })
 
@@ -133,27 +133,22 @@ describe('fit --exponent family', { timeout: 120_000 }, () => {
     'demo-powder-dp40': 2.81,
     'demo-powder-dp70': 1.75,
     'demo-powder-sp20': 2.3,
-    'demo-powder-sp21': 2.4,
-    'demo-powder-sp22': 2.2,
-    'demo-powder-sp25': 2.75,
   }
   /** Rows of `powder` in `cartridge` at `charges`. */
   const ladder = (powder: string, cartridge: string, charges: number[]) =>
     charges.map((charge) => ({ cartridge, powder, charge, velocity: 0 }))
-  /** Three charges in each of two training cartridges per powder, and two validation rows. */
-  const specs = Object.keys(at08).flatMap((powder) => {
-    const charges = powder === 'demo-powder-dp15' ? [1.0, 1.4, 1.8] : [1.4, 1.8, 2.2]
-    return [
-      ...ladder(powder, '30-br', charges),
-      ...ladder(powder, '308-match', charges),
-      ...ladder(powder, '308-win', [1.2, 1.6]),
-    ]
-  })
+  /** Three charges in each of two training cartridges. */
+  const training = (powder: string, charges = [1.4, 1.8, 2.2]) => [
+    ...ladder(powder, '30-br', charges),
+    ...ladder(powder, '308-match', charges),
+  ]
   const truth = plant(Object.fromEntries(Object.entries(at08).map(([id, b]) => [id, [0.8, b]])))
-  const rows = writeRows(rowsCsv(specs, truth))
 
   it('finds the planted exponent and burn coefficients', async () => {
-    const r = await fit({ ...options, rows, exponent: 'family' })
+    const specs = Object.keys(at08).flatMap((powder) =>
+      powder === 'demo-powder-dp15' ? training(powder, [1.0, 1.4, 1.8]) : training(powder),
+    )
+    const r = await fit({ ...options, rows: writeRows(rowsCsv(specs, truth)), exponent: 'family' })
     expect(r.exponent?.pooled).toBe(0.8)
     expect(Object.values(r.exponent?.families ?? {}).map((f) => f.exponent)).toEqual([
       0.8, 0.8, 0.8, 0.8, 0.8,
@@ -166,6 +161,8 @@ describe('fit --exponent family', { timeout: 120_000 }, () => {
   })
 
   it('evaluates the validation split at the fitted exponent and burn coefficient', async () => {
+    const specs = [...training(dp40), ...ladder(dp40, '308-win', [1.2, 1.6])]
+    const rows = writeRows(rowsCsv(specs, truth))
     const chosen = await verify({ ...options, rows, params: 'fit-on-training', exponent: 'family' })
     expect(chosen.overall.velocity?.median).toBeCloseTo(0, 6)
     const record = await verify({ ...options, rows, params: 'fit-on-training' })
@@ -174,12 +171,7 @@ describe('fit --exponent family', { timeout: 120_000 }, () => {
 
   it('pulls a family of one powder with two rows toward the pooled exponent', async () => {
     const dp15 = ladder('demo-powder-dp15', '30-br', [1.0, 1.4])
-    const others = Object.keys(at08)
-      .filter((id) => id !== 'demo-powder-dp15')
-      .flatMap((powder) => [
-        ...ladder(powder, '30-br', [1.4, 1.8, 2.2]),
-        ...ladder(powder, '308-match', [1.4, 1.8, 2.2]),
-      ])
+    const others = [...training(dp40), ...training('demo-powder-dp70')]
     const truth = plant({ 'demo-powder-dp15': [0.8, 14.7] })
     const all = await fit({
       ...options,

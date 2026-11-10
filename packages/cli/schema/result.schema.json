@@ -926,7 +926,7 @@
               "properties": {
                 "pooled": {
                   "type": "number",
-                  "description": "The exponent all powders pooled choose."
+                  "description": "The exponent of least mean chi square over all powders that entered."
                 },
                 "families": {
                   "type": "object",
@@ -1897,7 +1897,7 @@
                   "properties": {
                     "pooled": {
                       "type": "number",
-                      "description": "The exponent all powders pooled choose."
+                      "description": "The exponent of least mean chi square over all powders that entered."
                     },
                     "families": {
                       "type": "object",
@@ -2784,7 +2784,7 @@
                   "properties": {
                     "pooled": {
                       "type": "number",
-                      "description": "The exponent all powders pooled choose."
+                      "description": "The exponent of least mean chi square over all powders that entered."
                     },
                     "families": {
                       "type": "object",
@@ -3065,7 +3065,7 @@
                 "properties": {
                   "exponent": {
                     "type": "number",
-                    "description": "The exponent of least sum of its powders' chi squares plus `shrinkage` times the mean over all powders."
+                    "description": "The exponent of least sum of its powders' chi squares plus `shrinkage` times the mean over all powders that entered."
                   },
                   "powders": {
                     "type": "integer",

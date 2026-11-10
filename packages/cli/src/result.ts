@@ -95,7 +95,9 @@ const evaluation = z.object({
         .describe('Powders not fitted, by reason; a reason without powders is left out.'),
       exponent: z
         .object({
-          pooled: z.number().describe('The exponent all powders pooled choose.'),
+          pooled: z
+            .number()
+            .describe('The exponent of least mean chi square over all powders that entered.'),
           families: z
             .record(z.string(), z.number())
             .describe('By powder family, the exponent it chose.'),
@@ -210,7 +212,7 @@ const fitResult = z.object({
             exponent: z
               .number()
               .describe(
-                "The exponent of least sum of its powders' chi squares plus `shrinkage` times the mean over all powders.",
+                "The exponent of least sum of its powders' chi squares plus `shrinkage` times the mean over all powders that entered.",
               ),
             powders: count.describe('Its powders that entered the sum.'),
           }),
