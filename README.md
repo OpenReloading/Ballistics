@@ -34,6 +34,7 @@ The records in `packages/catalog/records/` hold one cartridge record per C.I.P. 
 ## Safety
 
 Reloading ammunition is dangerous. This software helps you plan, simulate and document. It does not replace published load data, the instructions of your component and equipment makers, or safe practice.
+
 - Results are simulations, not load data. Never use a result as a charge weight or as proof that a load is safe. Start from load data published by the powder or bullet maker for your exact components.
 - Simulated pressures carry model and input uncertainty. The shown ranges do not include model error. The absence of a warning does not mean a load is safe.
 - Component lots, cases, chambers and barrels differ. Measured pressure and velocity can differ from any simulation.

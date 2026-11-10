@@ -97,6 +97,10 @@ it('runs the e2e job for the scripts that build and serve the export', () => {
     expect(plan([f], closure), f).toMatchObject({ check: true, e2e: true })
 })
 
+it('runs the e2e job for a change of the design tokens, whose palette the web app loads', () => {
+  expect(plan(['packages/design-tokens/tokens/base.tokens.json'], closure).e2e).toBe(true)
+})
+
 it('builds with the sample when the web app changed outside the record pages', () => {
   expect(plan(['apps/web/src/components/workbench.tsx'], closure)).toMatchObject({
     prerender: 'sample',
@@ -137,10 +141,10 @@ it('prerenders every record when record data, page code or shared parts changed'
 })
 
 const packages =
-  '--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/design-tokens --filter @open-reloading/statistics --filter @open-reloading/ballistics --filter @open-reloading/shot-groups --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/catalog --filter @open-reloading/use-cases --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools --filter @open-reloading/test-kit'
+  '--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/design-tokens --filter @open-reloading/statistics --filter @open-reloading/ballistics --filter @open-reloading/shot-groups --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/catalog --filter @open-reloading/target-recognition --filter @open-reloading/use-cases --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools --filter @open-reloading/test-kit'
 /** The workspaces of the packages group that a change of units reaches. */
 const reachedByUnits =
-  '--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/ballistics --filter @open-reloading/shot-groups --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/catalog --filter @open-reloading/use-cases --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools'
+  '--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/ballistics --filter @open-reloading/shot-groups --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/catalog --filter @open-reloading/target-recognition --filter @open-reloading/use-cases --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools'
 
 it('tests every workspace of every group without a list of affected ones', () => {
   expect(testJobs()).toEqual([
@@ -167,6 +171,7 @@ it('tests the workspaces a change reaches and leaves out the groups it does not'
     'catalog',
     'importers',
     'use-cases',
+    'target-recognition',
   ]
   expect(plan(['packages/units/src/units.ts'], closure, units).tests).toEqual([
     { name: 'web', filter: '--filter @open-reloading/web', e2eUnit: false },

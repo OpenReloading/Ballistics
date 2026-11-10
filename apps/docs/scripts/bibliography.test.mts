@@ -76,7 +76,13 @@ test('every source file of the model packages is named on a model page', () => {
     'parse.ts',
     'settings.ts',
   ])
-  const unnamed = ['units', 'statistics', 'ballistics', 'shot-groups'].flatMap((name) =>
+  const unnamed = [
+    'units',
+    'statistics',
+    'ballistics',
+    'shot-groups',
+    'target-recognition',
+  ].flatMap((name) =>
     filesUnder(`${root}packages/${name}/src`).filter(
       (f) => !internal.has(f) && !text.includes(`packages/${name}/src/${f}`),
     ),

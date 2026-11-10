@@ -17,6 +17,7 @@ Sessions are ordered by date when every session has one, otherwise in the order 
 ## Rules
 
 Lot (powder, primer, case):
+
 - A lot that is not recorded in a session gets a note, also in the first session.
 - A lot that differs from the earlier session's, both recorded, gets a note. Lots are compared as typed, without leading and trailing spaces.
 

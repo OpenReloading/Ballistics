@@ -13,6 +13,7 @@ Ring scoring: does `scoreShot` change the ring value, the tenth-ring value and t
 ## Method
 
 For each face the test places a hole on the boundary the rule implies and $10^{-6}$ mm inside and outside it (the scoring tolerance is $10^{-9}$ mm) and checks the value on both sides. The faces and rules come from the target face records, which cite the rule books. Accept rule, set in the tests: the exact expected value on each side of every boundary.
+
 - ISSF 10 m air rifle, 10 m air pistol, 25 m rapid fire, 50 m rifle, 300 m rifle: 10 ring, inner ten, outermost ring, gauge diameter in place of the bullet, tenth-ring values.
 - National faces: DSB Scheibe Nr. 2 and Nr. 8, BDS Z19, BDMP Nr. 1 at 100, 50 and 25 m, DSU 200 m Präzision and the oval and stadium faces b2 to b5, VdRBw 10.3, and the events that score by the hole center.
 - Oval rings: the touching gap checked against a brute-force search over 200,001 points of the ellipse, and against holes placed a known distance out along the ellipse normal.

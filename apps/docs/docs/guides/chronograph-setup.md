@@ -16,6 +16,7 @@ The app reads chronograph velocities for two fits: the [powder fit](../powder-tu
 ## Distance to the muzzle
 
 The app does not correct velocities to the muzzle. The Measurements tab says so, and names the distance a chronograph file records. A velocity read a few meters in front of the muzzle is lower than the muzzle velocity by the drag over that distance, and the fits take it as the muzzle velocity.
+
 - Put the chronograph as close to the muzzle as its maker allows. A radar or a muzzle-mounted device reads at or near the muzzle.
 - Optical screens need distance from the muzzle blast. Keep the distance the same for every string you compare, and record it in the session's note.
 - Truing models the chronograph at the muzzle: a reading taken downrange is fitted as if it were at the muzzle.

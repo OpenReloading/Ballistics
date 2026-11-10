@@ -7,6 +7,7 @@ description: Size and dispersion of shot groups on a target, confidence interval
 # Shot groups
 
 Statistics of one group on a target:
+
 - the center of impact
 - sizes such as extreme spread and mean radius
 - standard deviations per axis and the circular error probable (CEP), with chi-square confidence intervals by shot count
@@ -152,6 +153,7 @@ $$
 Code: `packages/shot-groups/src/group-statistics.ts`, `confidenceOf`.
 
 with:
+
 - one axis: $S = S_{xx}$ or $S_{yy}$, $\nu = n - 1$
 - circular $\sigma$: $S = S_{xx} + S_{yy}$, $\nu = 2(n - 1)$
 - radial standard deviation and CEP: the interval of $\sigma$ times $\sqrt{2}$ and $\sqrt{2 \ln 2}$

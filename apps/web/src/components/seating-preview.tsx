@@ -114,7 +114,7 @@ const tagText: Record<Tagged['tag'], Message> = {
 }
 
 /** Its values give the case and the chamber; what it lacks is shown as not given, and no seating starts by itself. */
-export interface DraftCartridge {
+interface DraftCartridge {
   spec: ReturnType<typeof drawable>
   /** Names the design in the drawing's title and description. */
   title: string

@@ -21,6 +21,7 @@ Assumed figures, none with a source in the [bibliography](../bibliography.md), a
 Study 1. Six loads: the golden rifle load, the same with bore resistance and convective heat loss, a 203 mm gun load, two further charges of the rifle load and a pistol load (charge to bullet mass 0.05 to 0.35). Each is run at the reference and 5.6 K above it, with the burn term alone, the energy term alone and both. Energy share: the change from the energy term alone divided by the change from both.
 
 Study 2. A truth load with a vivacity burn law and the energy term, three charges per temperature, ladders at 274.15, 294.15 and 314.15 K, 50 replicates with independent noise (seeds 1000 to 1049 for the ladder, 5000 to 5049 for the held-out strings). Fit (A): `fitPowder` with the burn rate and the temperature factor free, the load as it is today. Fit (B): the same with the energy coefficient fixed at 0.0003 1/K. Both start from a burn rate 12 % low and sensitivities 25 % low. Two held-out spans:
+
 - interpolating: fit on 274.15 and 314.15 K, hold out 294.15 K;
 - extrapolating: fit on all three, hold out 334.15 K (20 K above the hottest).
 

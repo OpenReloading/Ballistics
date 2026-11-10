@@ -13,6 +13,7 @@ Interior ballistics, [M3 model](../models/interior-m3.md): can a note from the s
 ## Method
 
 Each M3 run is one printed load row: 57,536 rows of published load tables that are not in the repository, with the powder records fitted to them, the cartridge records of the repository and the seated geometry and bore resistance of the load-table fit. 52,391 runs are valid; 5,145 are refused with `chamberVolume` and left out. The seeded errors are the same rows with the charge times 10, the charge times 2, the chamber volume times 2 and the bullet mass times 0.5. Accept rules:
+
 1. Mean-to-peak ratio and efficiency: a band of each from the unmodified runs, a note outside either band. Adopted only if the band flags at least 90 % of each seeded error and under 2 % of the unmodified runs.
 2. Velocity ratio: the muzzle velocity over the highest velocity of the curve, a note below 0.99. Adopted only if every flagged run is dominated by bore friction and no ordinary load row is flagged.
 3. Curve shape: for each row with a printed peak pressure (not CUP), barrel length and muzzle velocity, the simulated peak position, velocity at the peak and muzzle pressure against the three empirical relations below. Adopted as a reference only if at least 80 % of rows lie within 15 % on all three.

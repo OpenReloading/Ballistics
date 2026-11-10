@@ -9,6 +9,7 @@ description: Weighted least-squares fit of the M3 burn coefficient and optional 
 The burn form and the pressure exponent are fitted to a measured pressure-time trace on the [curve fit page](interior-curve-fit.md).
 
 `fitPowder` fits the burn coefficient of one [M3](interior-m3.md) load and, on request, its shot-start pressure, a factor on its chamber volume, its specific energy and a factor on its temperature sensitivities to a ladder: charges with their mean muzzle velocities and, optionally, measured peak pressures. Points fired from another barrel length or at another powder temperature resolve the energy and the temperature factor ([below](#several-barrel-lengths-and-temperatures)). The fit works on log parameters with the Levenberg-Marquardt loop of the [least-squares page](least-squares.md). It reports the fitted values with their uncertainty, correlation and covariance, the residuals, $\chi^2$ split into the ladder's and the priors' share, the degrees of freedom and the condition number. The fitted values describe the ladder's rifle, powder lot, components and model version over the ladder's charge range, barrel lengths and temperatures. They are not powder data and not load data.
+
 - `fitPowderSessions` takes such ladders as sessions and holds the parameters they do not resolve.
 - `fitPowderPooled` fits the sessions of many rifles, powders and lots at once ([below](#pooled-fit-over-rifles-powders-and-lots)), with prediction intervals that hold a model error.
 - `predictPowder` gives the muzzle velocity and the peak pressure at any charge with an interval, and names each axis on which a prediction lies outside the data of the fit.
@@ -309,6 +310,7 @@ B_P = B_{P,0}\, e^{\theta_{B,P}}, \quad r_R = e^{\theta_R}, \quad \ell_L = e^{\t
 $$
 
 Code: `packages/ballistics/src/interior/fit-pooled.ts`, `fitPowderPooled` (`pooledValue`, `targetLoad`).
+
 - $B_P$, the burn coefficient of powder $P$, is shared by all its sessions. The burn coefficient of the powder's first session is the start $B_{P,0}$ and replaces that of its other sessions. On request the temperature factor $f_{T,P}$ of the powder is fitted too, where its sessions span two or more temperatures and its load carries a sensitivity; otherwise it is listed in `held` and stays 1.
 - $r_R$, the velocity factor of rifle $R$, holds what the rifle changes beyond its load: bore, throat, chronograph. It is fitted only where the sessions hold two or more rifles. With one rifle it is absorbed by the burn coefficients.
 - $\ell_L$, the factor of lot $L$ on its powder's burn coefficient, is fitted for each named lot of a powder whose sessions hold two or more lots (a session without a lot counts as one, without a factor).
@@ -351,6 +353,7 @@ On held-out measured sessions the targets of median 1 % and P90 2 % velocity err
 ### Failures
 
 `fitPowder` throws a `PowderFitError` with one of these reasons:
+
 - `underdetermined`: fewer rows than parameters, before any run.
 - `invalid`: an `interior` run at the start values or in a Jacobian is invalid. The error names the charge and the run's reason.
 - `unresolved`: a parameter does not measurably change any prediction, for example a start pressure carried to the floor, or `energy` where the barrel lengths do not differ by 5 %.

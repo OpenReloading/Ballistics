@@ -13,6 +13,7 @@ Groups: how large is the extreme spread of a group of $n$ shots in units of the 
 ## Method
 
 Decided before the run.
+
 - Seeded simulation of circular normal groups (the same $\sigma$ on both axes, no correlation), with the generator and seeds fixed in the script: 1 000 000 groups for each $n$ from 2 to 20 (the rule asks for at least 200 000), the mean extreme spread and its 5th and 95th percentile.
 - Coverage: the range from the 5th to the 95th percentile is applied to 200 000 further groups of an independent seed for each $n$; it should hold 90 percent of them within 2 points.
 - Series: 4 000 000 five-shot groups are cut into series of $k$ = 8, 12 and 20 groups; the mean of the largest and of the smallest group of a series is given relative to the expected extreme spread of one group and relative to the mean of its own series.
@@ -67,6 +68,7 @@ Proposed text for the Limits of [Groups](../models/groups.md), replacing the sen
 > Mean radius, width, height, the pair distances and the elliptical CEP carry no interval. The extreme spread carries none either, but its expected size for 2 to 20 shots and the range that holds 90 percent of single groups are given in units of $\sigma$ (table from a seeded simulation of circular normal groups).
 
 Web wiring, not built (at most ten lines):
+
 - In the groups tab, next to the extreme spread of a group of $n$ shots with $2 \le n \le 20$ and a per-axis $\sigma$ estimate (a radial standard deviation is divided by $\sqrt{2}$ first), a line: "For this shot count a group of this load is typically X to Y (mean Z), 90 percent range" with $X$, $Y$, $Z$ the table values times the per-axis $\sigma$.
 - Where groups of different shot counts are compared, one line: "Groups of 3 shots average 0.79 of groups of 5 shots from the same rifle; compare groups of the same shot count." The ratio is `mean(n) / mean(m)` of the table.
 - Where several groups of one load are listed, one line: "The largest of 8 five-shot groups is about 1.4 times the mean, the smallest about 0.6 times, from chance alone." The numbers come from this entry for $k$ = 8, 12, 20 and are static text.

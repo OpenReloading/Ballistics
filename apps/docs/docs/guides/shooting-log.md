@@ -32,6 +32,7 @@ Saving an entry with a firearm that has a round count asks once whether to add t
 ## Filters, print and export
 
 The firearm and year filters are kept in the address; From and To narrow the entries to a day range. Print, Export CSV and Export JSON take the entries the filters show.
+
 - **Print** gives one line per entry with a blank Signature column for the club's confirmation, the firearm and period the filters name, and the number of entries and rounds. It leaves out the notes and writes the confirmation's name and day in one column.
 - **Export CSV** writes `openreloading-shooting-log-<day>.csv`, UTF-8 with a byte order mark, one row per entry in the order of the dates:
 
@@ -49,11 +50,13 @@ The firearm and year filters are kept in the address; From and To narrow the ent
 | `Confirmed on`       | Day, `YYYY-MM-DD`.                                                             |
 
 A text a spreadsheet would read as a formula starts with an apostrophe.
+
 - **Export JSON** writes `openreloading-shooting-log-<day>.json`, a user data file with the entries. **Import JSON** reads it back: new entries are added, equal ones left, and entries that differ from the browser's are replaced after one question. An entry whose id another record of the browser holds is not imported, and the report counts it. The firearms and loads the entries name are not in the file; in another browser their names show as not in this browser.
 
 ## Yearly summary
 
 Under the entries, **Yearly summary** adds up the entries of one calendar year: the year the year filter names, else the latest year with entries; **Summary year** picks another until the year filter changes. It does not change the firearm's round count.
+
 - **Rounds per firearm**: the rounds and entries of each firearm, most rounds first. Entries without a firearm count on a row of their own.
 - **Rounds per cartridge**: the cartridge of the entry's saved load, or of the load's firearm when the load names no cartridge. An entry without a saved load (factory ammunition) counts under its firearm only, and a line under the table gives its rounds.
 - **Range days per month**: the entries of each month.

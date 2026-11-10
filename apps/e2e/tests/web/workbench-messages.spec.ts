@@ -161,8 +161,8 @@ test('each severity paints its own fill and text, axe clean in light and dark', 
           }
           const text = el.querySelector('.mantine-Alert-message') as Element
           return {
-            fill: [getComputedStyle(el).backgroundColor, colour(`--${token}-bg`)],
-            text: [getComputedStyle(text).color, colour(`--${token}-fg`)],
+            fill: [getComputedStyle(el).backgroundColor, colour(`--${token}-fill`)],
+            text: [getComputedStyle(text).color, colour(`--${token}-text`)],
           }
         },
         [severity, token],

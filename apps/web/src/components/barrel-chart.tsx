@@ -14,9 +14,9 @@ const tokens = {
   velocity: '--series-1',
   energy: '--series-3',
   muted: '--muted',
-  border: '--border',
-  bg: '--bg',
-  fg: '--fg',
+  border: '--line',
+  bg: '--page',
+  fg: '--ink',
 }
 
 /** The rows with values: the points of a curve. */

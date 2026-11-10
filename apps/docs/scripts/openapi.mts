@@ -26,7 +26,7 @@ const configuration = {
   mcp: { disabled: true },
   showDeveloperTools: 'never',
   documentDownloadType: 'json',
-  // the primary colors of the docs site, the link blue of the web app
+  // the primary colors of the docs site (src/css/custom.css)
   customCss: '.light-mode{--scalar-color-accent:#0b57d0}.dark-mode{--scalar-color-accent:#8ab4f8}',
 }
 

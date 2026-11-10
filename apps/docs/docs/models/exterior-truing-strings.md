@@ -7,6 +7,7 @@ description: Plan and fit of muzzle velocity, drag factor, click value and an op
 # Truing from range strings
 
 A range string is a set of measurements at known distances: the mean impact above the line of sight at the zero setting, or the clicks dialed to center the group, plus optional chronograph readings.
+
 - `fitTruingStrings` fits the muzzle velocity, a constant drag factor, the click value of the sight and, with `fitZeroOffset`, a zero offset, weighting every row by its stated uncertainty. A parameter the data cannot separate is named weak or unresolved, returns no value and keeps its nominal value in the reported model. Identified parameters get confidence intervals; a chi-square test checks the residuals.
 - `planTruingStrings` gives the statuses and standard errors of a planned string before any shot, and the refusals of its structure.
 - `comparePlanCandidates` does so for several candidate strings.
@@ -176,6 +177,7 @@ Code: `packages/ballistics/src/exterior/range-strings.ts`, `stringsFitResult` (`
 $K$ is the set of fitted parameters, $n$ the number of data rows. Prior rows are not counted. The level 0.99 is the option `residualConfidenceLevel`. The p-value is the upper tail of the chi-square distribution ([groups](groups.md)). Without degrees of freedom there is no check.
 
 The intervals are flagged as not to be relied on (`intervalsTrusted` false) when:
+
 - the check fails, or
 - an identified parameter was fitted while a weak or failed parameter with information was held at its nominal value (`conditionalOn`). A held parameter shifts the fitted ones by an amount the covariance does not contain, and the residual check does not see that shift.
 

@@ -1,10 +1,11 @@
 /** The color axis of hole detection: Fisher's linear discriminant of a hole against its ring, in log RGB. */
 
-import { nth } from './nth.ts'
+import type { Point } from '@open-reloading/shot-groups'
+import { nth } from '@open-reloading/statistics'
 import { clamp, median1 } from './raster-ops.ts'
-import type { Point } from './target-geometry.ts'
 
 // Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the loop bounds keep the index in range
 const f32 = (a: Float32Array, i: number) => a[i] as number
 
 /** The example disc and the ring around it (in D). */
@@ -37,7 +38,7 @@ export function axisOf(
   ctx: WorkImage,
   holeDiameter: number,
   seed: Seed,
-  disc = DISC * holeDiameter,
+  disc: number = DISC * holeDiameter,
 ): Axis | undefined {
   const samples = collectSamples(ctx, holeDiameter, seed, disc)
   if (!samples) return undefined
@@ -59,7 +60,7 @@ function collectSamples(
     scatterRing(ctx, ring)
     return { mu: seed.mu, ring }
   }
-  const mu = discAndRing(ctx, holeDiameter, seed.at, disc, ring)
+  const mu = discAndRing(ctx, { holeDiameter, disc }, seed.at, ring)
   return mu ? { mu, ring } : undefined
 }
 
@@ -80,9 +81,8 @@ function pushPixel(ring: Channels, logRgb: Float32Array, n: number, i: number) {
 /** The mean log RGB of the disc at the pick, undefined when the disc holds no block; fills `ring`. */
 function discAndRing(
   ctx: WorkImage,
-  holeDiameter: number,
+  { holeDiameter, disc }: { holeDiameter: number; disc: number },
   { x: cx, y: cy }: Point,
-  disc: number,
   ring: Channels,
 ): LogRgb | undefined {
   const { logRgb, w, h, blackMask } = ctx
@@ -116,9 +116,10 @@ function discAndRing(
   return count ? [sum[0] / count, sum[1] / count, sum[2] / count] : undefined
 }
 
+const average = (v: number[]) => v.reduce((a, b) => a + b, 0) / v.length
+
 /** Sums `cov` of the products of the deviations from the channel means (xx yy zz xy xz yz), and the count `m`. */
 function covariance3(ring: Channels): Covariance {
-  const average = (v: number[]) => v.reduce((a, b) => a + b, 0) / v.length
   const mean: LogRgb = [average(ring[0]), average(ring[1]), average(ring[2])]
   const cov: Six = [0, 0, 0, 0, 0, 0] // xx yy zz xy xz yz
   const m = ring[0].length
@@ -178,7 +179,7 @@ function fisherAxis(
 }
 
 /** Luma (BT.601 weights) of a color, here of log RGB values. */
-export const lumaOf = (v: Readonly<LogRgb>) => 0.299 * v[0] + 0.587 * v[1] + 0.114 * v[2]
+export const lumaOf = (v: Readonly<LogRgb>): number => 0.299 * v[0] + 0.587 * v[1] + 0.114 * v[2]
 
 /** BT.601 luma weights (0.299, 0.587, 0.114) on log RGB: the image whose strongest blobs seed auto detection. */
 export function logLuma(ctx: WorkImage): Float32Array {
@@ -227,7 +228,7 @@ export function rescale(P: Float32Array, inside: Uint8Array): Float32Array {
   const sample: number[] = []
   for (let i = 0; i < P.length; i += step) if (inside[i]) sample.push(f32(P, i))
   if (sample.length < 16) for (let i = 0; i < P.length; i += step) sample.push(f32(P, i))
-  const sorted = Float32Array.from(sample).sort()
+  const sorted = Float32Array.from(sample).toSorted()
   const lo = f32(sorted, Math.floor(0.005 * sorted.length))
   const span = Math.max(
     1e-6,

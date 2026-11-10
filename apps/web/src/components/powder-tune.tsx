@@ -323,7 +323,7 @@ function useHandTuning(fit: PowderFitState['fit']) {
   return { setHand, tuned, values, curve }
 }
 
-/** Each part its own element of the page's grid (`.tune-layout`), which sets the chart beside the rest from 64em and after the hand tuning below that. */
+/** Each part its own element of the page's grid (`.tune-layout`), which sets the chart beside the rest from 62em and after the hand tuning below that. */
 function FitResult({
   state,
   rows,
@@ -576,7 +576,7 @@ function stringRow(
     <tr key={key} className={fault ? 'string-fault' : undefined}>
       <td className="num">
         {fault && (
-          <Badge variant="outline" color="var(--warn-fg)" mr="xs">
+          <Badge variant="outline" color="var(--warn-text)" mr="xs">
             {t('Cannot run')}
           </Badge>
         )}

@@ -1,8 +1,8 @@
 /** Image steps of the target face search; pure, no React, DOM or Next.js. */
+import { clamp, upperMedian } from '@open-reloading/target-recognition'
 import { conicOf, type Ellipse, ellipsePoint, meanRadius, ransacEllipse } from './ellipse.ts'
 import type { RgbaImage } from './image.ts'
 import { nth } from './nth.ts'
-import { clamp, upperMedian } from './raster-ops.ts'
 import type { Point } from './target-geometry.ts'
 
 // Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.

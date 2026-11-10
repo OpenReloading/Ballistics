@@ -7,6 +7,7 @@ description: Fit of the muzzle velocity and of drag factors to measured heights,
 # Truing
 
 Truing adjusts inputs of the trajectory so that its predictions match measured values. Every evaluation is an ordinary `trajectory` call with candidate inputs, so truing runs on the [point-mass](exterior-point-mass.md) and the [modified point-mass](exterior-modified-point-mass.md) model with every trajectory option. The fit is the [least squares on log parameters](least-squares.md).
+
 - `trueMuzzleVelocity` fits the muzzle velocity.
 - `trueDrag` fits a drag correction, with or without the muzzle velocity.
 - `trueDragSessions` fits one drag correction of one projectile, shared by several sessions flown with their own conditions.
@@ -119,6 +120,7 @@ With a zero range, every candidate is zeroed again at that range by `trajectory`
 ### Failure modes
 
 A failed fit throws `TruingError`, an `InputError`, with one of these reasons and the last estimate:
+
 - `underdetermined`: fewer observations than parameters, before any trajectory.
 - `unresolved`: a parameter the observations do not move (a height at the zero range, a Mach knot no flight reaches).
 - `ill-conditioned`: the condition number exceeds `maxCondition` (default $10^3$), with the parameter combination the data cannot separate.
@@ -127,6 +129,7 @@ A failed fit throws `TruingError`, an `InputError`, with one of these reasons an
 - `step-budget`: the integration steps of all trajectories of the fit, zero searches included, reach `maxTotalSteps`.
 
 Malformed inputs throw a plain `InputError` before any trajectory (`checkObservations`, `dragCorrection`, `fitDrag`):
+
 - a standard deviation on some observations only, or not above 0,
 - observations of different kinds without standard deviations,
 - a height or hold at range 0,

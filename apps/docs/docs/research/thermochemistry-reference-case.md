@@ -51,6 +51,7 @@ The energy-scale shift is 90.7 kJ/kg (36.60 mol/kg of gaseous elements) and move
 ## Result
 
 no change; documented as a limit. Two causes explain the gaps:
+
 - Temperature and force: the 39 K gap is the size of the shift between the enthalpy and the energy scale of the input. The base run is the consistent one (condensed reactants at their enthalpy of formation, gas products at enthalpy minus R T); the reference matches the energy-scale run within 0.1 %, so it most likely takes -2150 kJ/kg as an energy of formation.
 - Covolume: the 2.4 % gap is the five-species sum. With OH, H, O, O2 and NO counted the covolume agrees within 0.04 % (base) and 0.3 % (energy scale).
 

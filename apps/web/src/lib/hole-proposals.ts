@@ -1,6 +1,6 @@
 /** Kept apart from the sheet, in photo px, until the user accepts them as shots (`apps/docs/docs/models/hole-detection.md`). */
 import { type ShotGroup, toSi } from '@open-reloading/schema'
-import type { HoleProposal } from './hole-detection.ts'
+import type { HoleProposal } from '@open-reloading/target-recognition'
 import { nth } from './nth.ts'
 import { type Frame, targetToView, viewToTarget } from './target-editor.ts'
 import type { Point } from './target-geometry.ts'
@@ -15,7 +15,7 @@ const MAYBE_BELOW = 0.5
 export const isMaybe = (p: Pick<HoleProposal, 'confidence'>): boolean => p.confidence < MAYBE_BELOW
 
 /** Confirmed holes needed before their sizes set the expected hole size. */
-export const MIN_HOLES_TO_LEARN_SIZE = 3
+const MIN_HOLES_TO_LEARN_SIZE = 3
 
 type HoleSize = { diameter: number; source: 'typed' | 'learned' | 'bullet' | 'marker' }
 

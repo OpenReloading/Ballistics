@@ -27,6 +27,7 @@ The test split is run once per model version, at release, with the model version
 ### Metrics
 
 All errors are absolute relative errors. For the muzzle velocity the error of a row is $|v_\text{model} - v_\text{printed}| / v_\text{printed}$, and the same for the peak pressure of rows that carry one.
+
 - Median and 90th percentile (P90) of the error, over the rows the model gave a result for.
 - Rows the model did not run are counted by reason, next to the metrics. A model that refuses rows would otherwise look better.
 - Interval coverage: the share of rows whose printed value lies inside the 90 % interval the model states for it.
@@ -76,6 +77,7 @@ Not measured: the sealed test split (so the command line tool does not reproduce
 ### Pooled powder fit
 
 A local run of the [pooled fit](interior-powder-fit.md#pooled-fit-over-rifles-powders-and-lots) on the same kind of load rows, outside the repository. The split was fixed before any result was seen, and the sealed test split was not read.
+
 - Sessions: the rows of one table, cartridge, powder, bullet mass and type, barrel and overall length. Rifle: table, cartridge and barrel. Lot: table.
 - Fit: 516 training-split sessions (952 rows) of 100 powders, 356 parameters. Each powder has a burn coefficient prior centered on its record value, log sigma 0.3. Without it, powders whose velocity barely moves with the burn coefficient left the fit `unresolved`.
 - Calibration of the model error: 329 other training-split sessions (627 rows). Every row has a velocity sigma of 1 % (an assumption: the rows print no spread).
@@ -87,7 +89,6 @@ A local run of the [pooled fit](interior-powder-fit.md#pooled-fit-over-rifles-po
 | Record parameters, same rows | 343      | 633  | 3.02 %                | 7.83 %             | not stated             |
 
 The targets of median 1 % and P90 2 % are not met. The estimated relative model error is 5.3 %, and it dominates the intervals.
-
 
 ## Decisions
 
@@ -111,6 +112,7 @@ May say, with the numbers of a run and nothing else added:
 Where X, Y, N, F and H are the values of one `verify` result on one split. A result on the test split says so.
 
 May not say:
+
 - "Accurate", "reliable" or "validated" without the numbers beside the word.
 - "Safe", in any form, with or without numbers.
 - That a result is "within" a bound for a particular load, charge, rifle or lot.
