@@ -57,10 +57,10 @@ export interface GroupCovariance {
   yy: number
 }
 
-/** Direction of the group center from the point of aim, N up; `center` when they coincide. */
+/** Direction of the group center from the point of aim, N up; `centre` when they coincide. */
 export type CompassPoint = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW' | 'centre'
 
-/** Group center minus point of aim, m; `compass` with N up, `center` below 1e-9 m. */
+/** Group center minus point of aim, m; `compass` with N up, `centre` below 1e-9 m. */
 export interface AimOffset {
   /** Horizontal offset, m, x right. */
   dx: number

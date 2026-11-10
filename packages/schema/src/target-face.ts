@@ -298,7 +298,7 @@ export const targetFace: z.ZodObject<{
         /** Diameter of the hole as scored: a gauge's measuring edge, or its equivalent hole. */
         gauge: z.ZodOptional<QuantitySchema>
         /**
-         * `touch`: the hole counts a ring when it touches the ring line. `center`: only when the
+         * `touch`: the hole counts a ring when it touches the ring line. `centre`: only when the
          * center of the hole lies on its line or inside it (black-powder events); the hole size is
          * ignored. `outward`: only when the hole edge furthest from the center stays inside the
          * outer edge of the ring line; a hole touching the outside of the line takes the lower

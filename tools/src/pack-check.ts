@@ -27,7 +27,7 @@ interface Packed {
 }
 
 /** Packed whatever `files` says. */
-const alwaysPacked = /^(package\.json|(readme|license|license|changelog)([.-][^/]*)?)$/i
+const alwaysPacked = /^(package\.json|(readme|license|licence|changelog)([.-][^/]*)?)$/i
 const code = /\.(?:[cm]?js|d\.[cm]?ts)$/
 /** The specifier of a static or dynamic `import`, an `export ... from` or a `require` (not text such as `from "${x}"`). */
 const specifier = /(?:\bfrom|\bimport|\brequire)\s*(?:\(\s*)?(['"])([^'"\s${}]+)\1/g

@@ -11,6 +11,8 @@ extend-exclude = [
   "pnpm-lock.yaml",
   # the API contract as last released, rewritten only for a breaking change
   "packages/api/openapi.baseline.json",
+  # generated from the commit titles of released versions
+  "**/CHANGELOG.md",
   ".github/pnpm/package-lock.json",
   "*.snap",
   "**/*-snapshots/",
@@ -20,12 +22,9 @@ extend-exclude = [
 ]
 
 [default]
-# D29: US spelling
 locale = "en-us"
 # Each pattern is one German string or citation, so a misspelling elsewhere still fails.
 extend-ignore-re = [
-  # commit hashes in the generated CHANGELOG.md links
-  "\\(\\[[0-9a-f]{7}\\]",
   # German month names of the ShotView export, a German CSV fixture line and a German stage label
   "januar februar m\\\\u00E4rz april mai juni juli august september oktober november dezember",
   "8\\. Februar 2026",
@@ -74,12 +73,13 @@ extend-ignore-re = [
   "\\{colours\\}|burn-neighbours|face-colours|workbench-centre|colour-row|colour-axis|bullet-photo-colour|ov-centre|duplicate-normalised-name|centre-fire-pistol",
 ]
 
-# Code names keep their spelling (record fields, the public API, the CLI and API output), so TypeScript allows them;
-# its comments and messages are still checked for every other word.
+# Code names keep their UK spelling (record fields, enum values, the public API, the CLI and API output). In TypeScript
+# the names with a UK stem are skipped, and the bare words below are allowed in comments and messages too.
 [type.ts]
-extend-ignore-identifiers-re = [
-  # camelCase and PascalCase compounds such as centreX and MarkNormalisation
-  "^[A-Za-z][a-z0-9]*[A-Z][A-Za-z0-9]*$",
+extend-ignore-re = [
+  # camelCase and PascalCase names with a UK stem, such as centreX, faceColour and MarkNormalisation
+  "\\b\\w*[a-z0-9](Centre|Colour|Neighbour|Normalis|Labell|Unlabell|Metre|Vapour|Calibre|Modell|Licence|Aluminium)\\w*",
+  "\\b(centre|colour|colours|labelled|normalise|neighbours|vapour|capitalised|metres|modelled)[A-Z0-9_]\\w*",
 ]
 
 [type.ts.extend-identifiers]
@@ -126,7 +126,12 @@ axe = "axe"
 iy = "iy"
 ba = "ba"
 
-# File names that keep their UK spelling: a published docs page and the script ci.yml runs.
+# File names that keep their UK spelling: a published docs page and the script ci.yml runs. A file of this type
+# loses the rules of its own type, so it repeats the Markdown ones.
 [type.uk-file-names]
 extend-glob = ["licences.ts", "licences.test.ts", "hole-detection-target-centre.md"]
 check-filename = false
+extend-ignore-re = [
+  "(?s)```.*?```",
+  "`[^`\\n]*`",
+]

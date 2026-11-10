@@ -23,7 +23,7 @@ import { RateBar, RateTicks } from './rate-scale.tsx'
 /** A powder of the burn-rate order as a neighbor link; `label` leaves out the page powder's manufacturer. */
 export type Neighbour = { id: string; label: string; order: number; rate?: number | undefined }
 
-/** The powder's place in the burn-rate order of all fitted powders (`neighbors` in `burn-rate.ts`). */
+/** The powder's place in the burn-rate order of all fitted powders (`neighbours` in `burn-rate.ts`). */
 export interface BurnRatePlace {
   order: number
   total: number
