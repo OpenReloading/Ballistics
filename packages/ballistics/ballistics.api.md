@@ -1497,6 +1497,7 @@ export function recordLoad(r: RecordRun): InteriorLoad;
 
 // @public
 export interface RecordPowder {
+    grainForm?: string | undefined;
     // (undocumented)
     interior?: (NonNullable<PowderInteriorRecord['interior']> & {
         propellantTemperature: {
