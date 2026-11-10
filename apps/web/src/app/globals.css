@@ -112,7 +112,7 @@ body {
 .top-end {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-xs);
   margin-inline-start: auto;
 }
 
@@ -181,11 +181,11 @@ body {
 
   .rail-links,
   .rail-foot {
-    gap: 0.25rem;
+    gap: var(--space-2xs);
   }
 
   .rail-foot {
-    padding-top: 0.25rem;
+    padding-top: var(--space-2xs);
   }
 }
 
@@ -247,7 +247,7 @@ body {
   }
 
   main h1 {
-    margin: 1rem 0 0.5rem;
+    margin: var(--space-md) 0 var(--space-xs);
     font-size: var(--mantine-h1-font-size);
     font-weight: 650;
     line-height: 1.25;
@@ -267,20 +267,20 @@ body {
 
   table {
     border-collapse: collapse;
-    margin: 0.5rem 0 1.5rem;
+    margin: var(--space-xs) 0 1.5rem;
     font-variant-numeric: tabular-nums;
   }
 
   caption {
     text-align: left;
     font-weight: 600;
-    padding: 0.25rem 0;
+    padding: var(--space-2xs) 0;
   }
 
   th,
   td {
     border: 1px solid var(--line);
-    padding: 0.25rem 0.5rem;
+    padding: var(--space-2xs) var(--space-xs);
     text-align: left;
     vertical-align: top;
   }
@@ -313,8 +313,8 @@ body {
 .update-notice {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.25rem 0.25rem 0.25rem 0.75rem;
+  gap: var(--space-xs);
+  padding: var(--space-2xs) var(--space-2xs) var(--space-2xs) var(--space-sm-md);
 }
 
 .skip-link {
@@ -322,7 +322,7 @@ body {
   z-index: 1000;
   left: 16px;
   top: -4rem;
-  padding: 0.5rem 0.75rem;
+  padding: var(--space-xs) var(--space-sm-md);
   border: 1px solid var(--line);
   background: var(--page);
   white-space: nowrap;
@@ -338,8 +338,8 @@ body {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.75rem 1rem;
-  margin-top: 1rem;
+  gap: var(--space-sm-md) var(--space-md);
+  margin-top: var(--space-md);
   margin-bottom: var(--panel-gap);
 }
 
@@ -356,7 +356,7 @@ body {
 .home-continue {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-sm-md);
   min-height: 1.5rem;
   margin-bottom: var(--panel-gap);
   font-size: var(--mantine-font-size-sm);
@@ -376,7 +376,7 @@ body {
 
 .home-continue ul {
   display: flex;
-  gap: 1rem;
+  gap: var(--space-md);
   min-width: 0;
   margin: 0;
   padding: 0;
@@ -408,7 +408,7 @@ body {
   flex-direction: column;
   align-items: flex-start;
   gap: 0.375rem;
-  padding: 0.75rem;
+  padding: var(--space-sm-md);
 }
 
 .home-cards li + li {
@@ -418,7 +418,7 @@ body {
 main .home-cards h3 {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-xs);
   margin: 0;
   font-size: var(--mantine-font-size-md);
 }
@@ -483,8 +483,8 @@ main .home-cards h3 {
 .home-news li {
   display: grid;
   grid-template-columns: 6.5rem 1fr;
-  gap: 0.75rem;
-  padding: 0.5rem 0.75rem;
+  gap: var(--space-sm-md);
+  padding: var(--space-xs) var(--space-sm-md);
 }
 
 .home-news li + li {
@@ -508,7 +508,7 @@ main .home-cards h3 {
 /* the tab bar of the Database, between the page bar and the list */
 .library-tabs {
   flex: none;
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--space-xs);
 }
 
 @media print {
@@ -535,7 +535,7 @@ main .home-cards h3 {
   }
 
   .home-cards li {
-    padding: 0.75rem 0;
+    padding: var(--space-sm-md) 0;
   }
 
   .home-cards li + li {
@@ -546,7 +546,7 @@ main .home-cards h3 {
   .home-news li {
     grid-template-columns: 1fr;
     gap: 0.125rem;
-    padding: 0.5rem 0;
+    padding: var(--space-xs) 0;
   }
 }
 
@@ -619,7 +619,7 @@ td.nowrap {
 
   .record :is(th, td) {
     border-width: 0 0 1px;
-    padding: 0.25rem 0.5rem;
+    padding: var(--space-2xs) var(--space-xs);
   }
 
   .record thead th {
@@ -680,14 +680,14 @@ td.nowrap {
 
   table.limits tr {
     border: 1px solid var(--line);
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-xs);
   }
 
   /* the label floats in the left padding, so the value keeps its own column */
   table.limits td {
     display: flow-root;
     border: 0;
-    padding: 0.25rem 0.5rem 0.25rem 10.5em;
+    padding: var(--space-2xs) var(--space-xs) var(--space-2xs) 10.5em;
     text-align: left;
   }
 
@@ -710,14 +710,14 @@ td.nowrap {
 
 /* charts (ECharts): the tooltip box must not widen the page */
 .chart {
-  margin: 0.5rem 0 1rem;
+  margin: var(--space-xs) 0 var(--space-md);
   overflow-x: clip;
 }
 
 .overlay-legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem 1rem;
+  gap: var(--space-2xs) var(--space-md);
   padding: 0;
   list-style: none;
 }
@@ -725,7 +725,7 @@ td.nowrap {
 .overlay-legend li {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
 }
 
 /* workbench interior chart: switches above, tooltip values, collapsed data table */
@@ -736,7 +736,7 @@ td.nowrap {
 .chart-tooltip dl {
   display: grid;
   grid-template-columns: auto auto;
-  gap: 0 0.75rem;
+  gap: 0 var(--space-sm-md);
   margin: 0;
   font-size: var(--mantine-font-size-sm);
 }
@@ -767,17 +767,17 @@ td.nowrap {
 /* calculator workspace: toolbar, then inputs and results; tabs below 48em, columns from 62em */
 
 .toolbar {
-  margin: 0.5rem 0 0.75rem;
+  margin: var(--space-xs) 0 var(--space-sm-md);
 }
 
 .workspace-tablist {
-  margin-bottom: 0.75rem;
+  margin-bottom: var(--space-sm-md);
 }
 
 .panel-fields {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(14rem, 100%), 1fr));
-  gap: 0.75rem 1rem;
+  gap: var(--space-sm-md) var(--space-md);
   align-items: start;
 }
 
@@ -837,8 +837,8 @@ td.nowrap {
   align-items: stretch;
   align-self: stretch;
   height: 100%;
-  gap: 0.25rem;
-  padding-inline-start: 0.25rem;
+  gap: var(--space-2xs);
+  padding-inline-start: var(--space-2xs);
 }
 
 .field-end > .field-flag,
@@ -896,18 +896,18 @@ td.nowrap {
 }
 
 .segment-label {
-  margin: 0 0 0.25rem;
+  margin: 0 0 var(--space-2xs);
   font-size: var(--mantine-font-size-sm);
   font-weight: 500;
 }
 
 .status {
   min-height: 1.5em;
-  margin: 0 0 0.5rem;
+  margin: 0 0 var(--space-xs);
 }
 
 .search-status {
-  margin: 0.25rem 0 0;
+  margin: var(--space-2xs) 0 0;
   color: var(--muted);
   font-size: var(--mantine-font-size-sm);
 }
@@ -951,12 +951,12 @@ td.nowrap {
 .readouts {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(9.5rem, 100%), 1fr));
-  gap: 0.5rem;
-  margin: 0.5rem 0 0.75rem;
+  gap: var(--space-xs);
+  margin: var(--space-xs) 0 var(--space-sm-md);
 }
 
 .readouts > div {
-  padding: 0.5rem 0.5rem;
+  padding: var(--space-xs) var(--space-xs);
   border: 1px solid var(--line);
   background: var(--surface);
 }
@@ -973,19 +973,19 @@ td.nowrap {
 }
 
 .result-tabs {
-  margin-top: 1rem;
+  margin-top: var(--space-md);
 }
 
 .result-tabs > [role="tabpanel"] {
-  padding-top: 0.75rem;
+  padding-top: var(--space-sm-md);
 }
 
 .run-bar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem 0.75rem;
-  margin-bottom: 0.75rem;
+  gap: var(--space-xs) var(--space-sm-md);
+  margin-bottom: var(--space-sm-md);
 }
 
 .run-bar > p {
@@ -1022,9 +1022,9 @@ td.nowrap {
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
-  margin-top: 1rem;
-  padding: 0.5rem 0.75rem;
+  gap: var(--space-sm-md);
+  margin-top: var(--space-md);
+  padding: var(--space-xs) var(--space-sm-md);
   border: 1px solid var(--line);
   background: var(--page);
   font-variant-numeric: tabular-nums;
@@ -1083,7 +1083,7 @@ td.nowrap {
     flex-wrap: nowrap;
     min-height: 4.25rem;
     margin: 0 -1rem;
-    padding: 0.75rem 1rem;
+    padding: var(--space-sm-md) var(--space-md);
     border-width: 1px 0 0;
   }
 
@@ -1144,7 +1144,7 @@ td.nowrap {
 .range-view {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-sm-md);
   min-width: 0;
 }
 
@@ -1152,7 +1152,7 @@ td.nowrap {
 .range-peak dl {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
+  gap: var(--space-sm-md);
   margin: 0;
 }
 
@@ -1185,7 +1185,7 @@ td.nowrap {
 .range-peak {
   display: flex;
   align-items: flex-start;
-  gap: 0.5rem;
+  gap: var(--space-xs);
   min-height: 4.5rem;
 }
 
@@ -1213,7 +1213,7 @@ td.nowrap {
 
 .range-bottom {
   display: grid;
-  gap: 0.5rem;
+  gap: var(--space-xs);
   margin-top: auto;
 }
 
@@ -1226,7 +1226,7 @@ td.nowrap {
 .range-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
+  gap: var(--space-xs);
 }
 
 .range-needs {
@@ -1248,7 +1248,7 @@ td.nowrap {
 /* a label wraps at 360 px instead of being cut */
 .range-actions .mantine-Button-root {
   height: auto;
-  padding-block: 0.25rem;
+  padding-block: var(--space-2xs);
 }
 
 .range-actions .mantine-Button-label {
@@ -1259,10 +1259,10 @@ td.nowrap {
 .range-view .ladder-cell {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
   min-width: 2.75rem;
   min-height: 2.75rem;
-  padding: 0.25rem 0.75rem;
+  padding: var(--space-2xs) var(--space-sm-md);
 }
 
 @media print {
@@ -1277,7 +1277,7 @@ td.nowrap {
     position: sticky;
     top: 0;
     z-index: 1;
-    padding: 0.25rem 0;
+    padding: var(--space-2xs) 0;
     background: var(--page);
   }
 }
@@ -1298,7 +1298,7 @@ td.nowrap {
   .workspace-scroll {
     max-height: calc(100vh - 2rem);
     overflow-y: auto;
-    padding-right: 0.25rem;
+    padding-right: var(--space-2xs);
   }
 }
 
@@ -1321,7 +1321,7 @@ td.nowrap {
   .designer .workspace-scroll {
     max-height: calc(100vh - 2rem);
     overflow-y: auto;
-    padding-right: 0.25rem;
+    padding-right: var(--space-2xs);
   }
 }
 
@@ -1336,7 +1336,7 @@ td.nowrap {
 
   /* the window-high frame has no step under the bar: the 8 px the other pages have above their panels */
   .designer {
-    margin-top: 0.5rem;
+    margin-top: var(--space-xs);
   }
 
   .designer .workspace-tabs {
@@ -1351,7 +1351,7 @@ td.nowrap {
     position: relative;
     min-height: 0;
     overflow-y: auto;
-    padding-right: 0.25rem;
+    padding-right: var(--space-2xs);
     /* a focused field stays above the help line */
     scroll-padding-bottom: 3rem;
     scroll-padding-top: 1.75rem;
@@ -1464,7 +1464,7 @@ td.nowrap {
 .designer .seating-preview {
   display: block;
   flex: none;
-  margin-top: 0.75rem;
+  margin-top: var(--space-sm-md);
 }
 
 .designer .seating-figure .drawing {
@@ -1559,7 +1559,7 @@ td.nowrap {
 
   /* inside the scroll box: the line spans the content, not the frame */
   .designer-panel-head {
-    margin-bottom: 0.25rem;
+    margin-bottom: var(--space-2xs);
     border-bottom: 1px solid var(--line);
   }
 }
@@ -1583,7 +1583,7 @@ td.nowrap {
 /* the cartridge designer's Seat a bullet block in the rows of the designer grid
    (`.prop-grid.designer-grid`): label in the label track, field after it, its help below the field */
 .designer-seat {
-  padding-top: 0.75rem;
+  padding-top: var(--space-sm-md);
 }
 
 .designer-seat .seating-controls {
@@ -1595,7 +1595,7 @@ td.nowrap {
   display: grid;
   grid-template-columns: minmax(0, var(--label-column)) minmax(0, 1fr);
   align-items: center;
-  column-gap: 0.5rem;
+  column-gap: var(--space-xs);
   min-height: 1.6875rem;
 }
 
@@ -1641,7 +1641,7 @@ td.nowrap {
   /* as wide as its rows, not the column (a flex item) */
   align-self: flex-start;
   width: auto;
-  margin-top: 0.25rem;
+  margin-top: var(--space-2xs);
 }
 
 .designer .derived-table caption {
@@ -1653,7 +1653,7 @@ td.nowrap {
 }
 
 .designer .derived-table :is(th, td) {
-  padding: 0.0625rem 1rem 0.0625rem 0;
+  padding: 0.0625rem var(--space-md) 0.0625rem 0;
   border: 0;
 }
 
@@ -1691,14 +1691,14 @@ td.nowrap {
   position: sticky;
   bottom: 0;
   z-index: 2;
-  margin: 0.25rem 0 0;
+  margin: var(--space-2xs) 0 0;
   background: var(--page);
   color: var(--muted);
   font-size: var(--mantine-font-size-xs);
 }
 
 .prop-form .search {
-  margin-bottom: 0.25rem;
+  margin-bottom: var(--space-2xs);
 }
 
 /* a record search's list of matches over the page: its own edge and a shadow */
@@ -1752,7 +1752,7 @@ td.nowrap {
 .side-row {
   display: grid;
   grid-template-columns: 3rem minmax(0, 1fr) minmax(0, 1fr);
-  gap: 0 0.5rem;
+  gap: 0 var(--space-xs);
   align-items: center;
   min-height: 1.75rem;
 }
@@ -1777,7 +1777,7 @@ td.nowrap {
 .face-row {
   display: grid;
   grid-template-columns: 3.25rem repeat(2, minmax(0, 1fr)) 1.75rem;
-  gap: 0 0.5rem;
+  gap: 0 var(--space-xs);
   align-items: center;
   min-height: 1.75rem;
 }
@@ -1815,8 +1815,8 @@ td.nowrap {
 .face-colours {
   display: flex;
   flex-wrap: wrap;
-  gap: 0 0.5rem;
-  margin: 0.125rem 2.25rem 0.5rem 3.75rem;
+  gap: 0 var(--space-xs);
+  margin: 0.125rem 2.25rem var(--space-xs) 3.75rem;
 }
 
 .face-colours > * {
@@ -1825,7 +1825,7 @@ td.nowrap {
 }
 
 .face-designer .side-grid > button {
-  margin-top: 0.25rem;
+  margin-top: var(--space-2xs);
 }
 
 @media screen and (min-width: 62em) {
@@ -1853,7 +1853,7 @@ td.nowrap {
 .powder-row {
   display: grid;
   grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(0, 1fr));
-  gap: 0 0.5rem;
+  gap: 0 var(--space-xs);
   align-items: center;
   min-height: 1.75rem;
 }
@@ -1890,7 +1890,7 @@ td.nowrap {
   }
 
   .powder-row + .powder-row {
-    margin-top: 0.25rem;
+    margin-top: var(--space-2xs);
   }
 
   .powder-ingredient {
@@ -1903,11 +1903,11 @@ td.nowrap {
 }
 
 .powder-designer .side-grid > button {
-  margin-top: 0.25rem;
+  margin-top: var(--space-2xs);
 }
 
 .powder-designer .powder-fit-link {
-  margin: 0 0 0.25rem;
+  margin: 0 0 var(--space-2xs);
   font-size: var(--mantine-font-size-sm);
 }
 
@@ -1931,7 +1931,7 @@ td.nowrap {
 
 .powder-problems {
   margin: 0;
-  padding-left: 1.25rem;
+  padding-left: var(--space-lg);
 }
 
 .powder-designer .message {
@@ -1985,7 +1985,7 @@ td.nowrap {
   display: block;
   max-width: 100%;
   height: auto;
-  margin: 0.5rem 0 1rem;
+  margin: var(--space-xs) 0 var(--space-md);
 }
 
 /* no kerning and unhinted advances, so a text is as wide as the glyph table of lib/drawing says */
@@ -2074,7 +2074,7 @@ td.nowrap {
 /* the designer's views of a figure, a segmented control: Cartridge, Chamber, Combined (outlines and
    gap), on the figure's data-view */
 .views-reason {
-  margin: 0.25rem 0 0;
+  margin: var(--space-2xs) 0 0;
   color: var(--muted);
 }
 
@@ -2106,7 +2106,7 @@ td.nowrap {
 }
 
 .drawing-figure {
-  margin: 1rem 0;
+  margin: var(--space-md) 0;
 }
 
 /* sheet tables on screen: rules between rows, Mantine spacing and type scale; print keeps
@@ -2151,7 +2151,7 @@ td.nowrap {
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-rows: auto 1fr;
   grid-template-areas: "controls figure" "values figure";
-  gap: 0.75rem 1.5rem;
+  gap: var(--space-sm-md) 1.5rem;
   align-items: start;
 }
 
@@ -2159,7 +2159,7 @@ td.nowrap {
   grid-area: controls;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr));
-  gap: 0.75rem 1rem;
+  gap: var(--space-sm-md) var(--space-md);
 }
 
 .seating-controls > :is(.search, .record, p, .segmented-row, .seating-slider) {
@@ -2176,7 +2176,7 @@ td.nowrap {
 
 .seating-legend {
   max-width: 16rem;
-  margin: 0.5rem 0 0;
+  margin: var(--space-xs) 0 0;
   color: var(--muted);
   font-size: 0.875em;
 }
@@ -2203,16 +2203,16 @@ td.nowrap {
 
 .seating-values dl {
   display: grid;
-  gap: 0.25rem;
-  margin: 0.5rem 0;
+  gap: var(--space-2xs);
+  margin: var(--space-xs) 0;
 }
 
 .seating-row {
   display: grid;
   grid-template-columns: minmax(9rem, 14rem) minmax(0, 1fr);
-  gap: 0 1rem;
+  gap: 0 var(--space-md);
   border-bottom: 1px solid var(--line);
-  padding-bottom: 0.25rem;
+  padding-bottom: var(--space-2xs);
 }
 
 .seating-values dt {
@@ -2259,7 +2259,7 @@ td.nowrap {
 }
 
 .seating-notes {
-  padding-left: 1rem;
+  padding-left: var(--space-md);
   color: var(--muted);
 }
 
@@ -2306,7 +2306,7 @@ td.nowrap {
 }
 
 .figure-values {
-  margin-top: 0.5rem;
+  margin-top: var(--space-xs);
   font-size: 0.875em;
 }
 
@@ -2319,7 +2319,7 @@ td.nowrap {
   display: inline-block;
   width: 1.5rem;
   height: 0.75rem;
-  margin-right: 0.25rem;
+  margin-right: var(--space-2xs);
   vertical-align: -0.1rem;
   border: 1px solid var(--line);
 }
@@ -2761,7 +2761,7 @@ td.nowrap {
   display: flex;
   flex: none;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-xs);
 }
 
 .load-switch-wrap {
@@ -2770,7 +2770,7 @@ td.nowrap {
 
 .load-switch {
   width: 12.25rem;
-  padding-inline: 0.5rem;
+  padding-inline: var(--space-xs);
   font-weight: 400;
 }
 
@@ -2810,7 +2810,7 @@ td.nowrap {
   position: absolute;
   inset: 0;
   min-width: 0;
-  padding: 0 0.5rem;
+  padding: 0 var(--space-xs);
   color: inherit;
   font: inherit;
   background: var(--mantine-color-body);
@@ -2822,9 +2822,9 @@ td.nowrap {
 .load-menu-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem;
-  margin-top: 0.25rem;
-  padding-top: 0.25rem;
+  gap: var(--space-2xs);
+  margin-top: var(--space-2xs);
+  padding-top: var(--space-2xs);
   border-top: 1px solid var(--line);
 }
 
@@ -2844,12 +2844,12 @@ td.nowrap {
    Print as icons named by their text */
 @media screen and (min-width: 75em) {
   .page-bar:has(.load-strip) {
-    gap: 0.5rem;
+    gap: var(--space-xs);
   }
 
   main .page-bar:has(.load-strip) h1 {
     flex: 0 1 auto;
-    margin-right: 0.5rem;
+    margin-right: var(--space-xs);
     font-size: var(--mantine-font-size-lg);
     line-height: 1.1;
   }
@@ -2930,8 +2930,8 @@ td.nowrap {
 .load-row {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.125rem 0.25rem;
+  gap: var(--space-2xs);
+  padding: 0.125rem var(--space-2xs);
 }
 
 .load-row[data-active] {
@@ -2944,7 +2944,7 @@ td.nowrap {
   align-items: center;
   gap: 0.375rem;
   min-width: 0;
-  padding: 0.25rem;
+  padding: var(--space-2xs);
   color: inherit;
   font: inherit;
   font-size: var(--mantine-font-size-sm);
@@ -2978,7 +2978,7 @@ td.nowrap {
 }
 
 .load-row .load-close {
-  padding: 0.25rem;
+  padding: var(--space-2xs);
 }
 
 /* the title keeps its width */
@@ -3002,7 +3002,7 @@ td.nowrap {
 }
 
 .saved-loads ul {
-  margin: 0 0 0.75rem;
+  margin: 0 0 var(--space-sm-md);
   padding: 0;
   list-style: none;
 }
@@ -3012,13 +3012,13 @@ td.nowrap {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0 0.25rem;
-  margin-bottom: 0.25rem;
+  gap: 0 var(--space-2xs);
+  margin-bottom: var(--space-2xs);
 }
 
 .saved-loads li .file-reason {
   flex: 1 1 0;
-  padding-left: 0.625rem;
+  padding-left: var(--space-sm);
 }
 
 .saved-loads li .saved-use {
@@ -3039,7 +3039,7 @@ td.nowrap {
   flex: 1 1 100%;
   min-width: 0;
   height: 1.625rem;
-  padding: 0 0.5rem;
+  padding: 0 var(--space-xs);
   color: inherit;
   font: inherit;
   font-size: var(--mantine-font-size-sm);
@@ -3052,13 +3052,13 @@ td.nowrap {
 }
 
 .saved-storage {
-  margin-top: 0.75rem;
+  margin-top: var(--space-sm-md);
   color: var(--muted);
   font-size: var(--mantine-font-size-sm);
 }
 
 .saved-storage p {
-  margin: 0 0 0.25rem;
+  margin: 0 0 var(--space-2xs);
 }
 
 .ladder-note {
@@ -3069,7 +3069,7 @@ td.nowrap {
 
 /* File menu: the record's file state beside the menu */
 .file-menu {
-  margin: 0 0 0.75rem;
+  margin: 0 0 var(--space-sm-md);
   flex-wrap: wrap;
 }
 
@@ -3081,7 +3081,7 @@ td.nowrap {
 }
 
 .file-error {
-  margin: 0.25rem 0 0.75rem;
+  margin: var(--space-2xs) 0 var(--space-sm-md);
   color: var(--muted);
   font-size: var(--mantine-font-size-sm);
   white-space: pre-wrap;
@@ -3094,7 +3094,7 @@ td.nowrap {
 
 .file-skipped,
 .file-records {
-  padding-left: 1rem;
+  padding-left: var(--space-md);
   overflow-wrap: anywhere;
 }
 
@@ -3110,7 +3110,7 @@ td.nowrap {
 }
 
 .import-column {
-  padding-block: 0.25rem;
+  padding-block: var(--space-2xs);
   border-bottom: 1px solid var(--line);
 }
 
@@ -3121,13 +3121,13 @@ td.nowrap {
 
 .import-rejected {
   margin: 0;
-  padding-left: 1rem;
+  padding-left: var(--space-md);
   font-size: var(--mantine-font-size-sm);
 }
 
 .import-foot {
   max-width: 60rem;
-  padding: 0.75rem 1rem 1rem;
+  padding: var(--space-sm-md) var(--space-md) var(--space-md);
   border-top: 1px solid var(--line);
 }
 
@@ -3152,7 +3152,7 @@ td.nowrap {
 
 .event-parts {
   display: grid;
-  gap: 0.75rem;
+  gap: var(--space-sm-md);
   justify-items: start;
 }
 
@@ -3160,13 +3160,13 @@ td.nowrap {
   width: 100%;
   min-width: 0;
   margin: 0;
-  padding: 0.5rem 0.75rem 0.75rem;
+  padding: var(--space-xs) var(--space-sm-md) var(--space-sm-md);
   border: 1px solid var(--line);
   border-radius: var(--mantine-radius-sm);
 }
 
 .event-part legend {
-  padding-inline: 0.25rem;
+  padding-inline: var(--space-2xs);
   font-weight: 600;
 }
 
@@ -3219,7 +3219,7 @@ td.nowrap {
 }
 
 .log-summary {
-  margin-top: 2rem;
+  margin-top: var(--space-xl);
 }
 
 .log-summary-table caption {
@@ -3317,7 +3317,7 @@ td.nowrap {
 
 .library-list ul {
   display: grid;
-  gap: 0.5rem;
+  gap: var(--space-xs);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -3338,7 +3338,7 @@ td.nowrap {
 /* label left, 28 px inputs; the error sits in a reserved slot under the input, so it moves nothing */
 /* the editor's title row as a panel's: the firearm's name on one line, the line under it */
 .library-head {
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--space-xs);
   border-bottom: 1px solid var(--line);
 }
 
@@ -3376,7 +3376,7 @@ main .library-head.page-panel-head > .page-panel-title {
   display: grid;
   grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
   align-items: center;
-  column-gap: 0.5rem;
+  column-gap: var(--space-xs);
 }
 
 .firearm-row > * {
@@ -3428,7 +3428,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .firearm-table :is(th, td) {
-  padding: 0 0.25rem 0.875rem;
+  padding: 0 var(--space-2xs) 0.875rem;
   border: 0;
   vertical-align: top;
 }
@@ -3442,7 +3442,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .firearm-table th {
-  padding-bottom: 0.25rem;
+  padding-bottom: var(--space-2xs);
   font-size: var(--mantine-font-size-xs);
   font-weight: 500;
   white-space: nowrap;
@@ -3494,7 +3494,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .band-line {
-  margin: 0.25rem 0 0;
+  margin: var(--space-2xs) 0 0;
   color: var(--muted);
   font-size: var(--mantine-font-size-xs);
 }
@@ -3503,7 +3503,7 @@ main .library-head.page-panel-head > .page-panel-title {
 .run-line {
   display: flex;
   align-items: baseline;
-  gap: 0.75rem;
+  gap: var(--space-sm-md);
   min-width: 0;
   min-height: 1.25rem;
   font-size: var(--mantine-font-size-sm);
@@ -3532,7 +3532,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .burn-rate p {
-  margin: 0.25rem 0 0;
+  margin: var(--space-2xs) 0 0;
   color: var(--muted);
   font-size: var(--mantine-font-size-sm);
 }
@@ -3543,7 +3543,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .workbench-centre > * + * {
-  margin-top: 0.5rem;
+  margin-top: var(--space-xs);
 }
 
 /* a search command's shortcut */
@@ -3561,7 +3561,7 @@ main .library-head.page-panel-head > .page-panel-title {
   align-items: flex-start;
   --notes-height: 2.25rem;
 
-  gap: 0.5rem;
+  gap: var(--space-xs);
   height: var(--notes-height);
   min-width: 0;
   margin: 0;
@@ -3585,7 +3585,7 @@ main .library-head.page-panel-head > .page-panel-title {
 .result-notes li {
   display: flex;
   align-items: baseline;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
   line-height: 1.125rem;
 }
 
@@ -3609,7 +3609,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .workbench-centre > .result-notes {
-  margin-top: 0.25rem;
+  margin-top: var(--space-2xs);
 }
 
 .result-notes li > svg {
@@ -3635,17 +3635,17 @@ main .library-head.page-panel-head > .page-panel-title {
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  margin: 0.75rem 0 0.25rem;
+  margin: var(--space-sm-md) 0 var(--space-2xs);
   font-size: var(--mantine-font-size-md);
 }
 
 .result-notes-group ul {
   margin: 0;
-  padding-left: 1.25rem;
+  padding-left: var(--space-lg);
 }
 
 .result-notes-group .result-note-reason {
-  margin: 0.125rem 0 0.5rem;
+  margin: 0.125rem 0 var(--space-xs);
 }
 
 @media (max-width: 47.99em) {
@@ -3655,7 +3655,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .flag > svg {
-  margin-right: 0.25rem;
+  margin-right: var(--space-2xs);
   vertical-align: -1px;
 }
 
@@ -3664,7 +3664,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .workbench .readouts > div {
-  padding: 0.25rem 0.5rem;
+  padding: var(--space-2xs) var(--space-xs);
 }
 
 .workbench .readouts dd {
@@ -3685,7 +3685,7 @@ main .library-head.page-panel-head > .page-panel-title {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 0.25rem 0.75rem;
+  gap: var(--space-2xs) var(--space-sm-md);
   min-width: 0;
   margin: 0;
   padding: 0;
@@ -3712,7 +3712,7 @@ main .library-head.page-panel-head > .page-panel-title {
 /* "Copy as CSV" above the ladder table, at its right end */
 .copy-csv {
   display: flex;
-  margin: 0 0 0.25rem auto;
+  margin: 0 0 var(--space-2xs) auto;
 }
 
 /* phones: the sticky Run bar is the run bar, the form's own one is not shown and not focusable
@@ -3739,7 +3739,7 @@ main .library-head.page-panel-head > .page-panel-title {
 .ladder-cells {
   display: flex;
   flex-wrap: nowrap;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
   overflow-x: auto;
   padding: 0.3125rem;
 }
@@ -3752,7 +3752,7 @@ main .library-head.page-panel-head > .page-panel-title {
    against an outer box it widened the page, and a click scrolled the page to it */
 .ladder-cell {
   position: relative;
-  padding: 0.125rem 0.5rem;
+  padding: 0.125rem var(--space-xs);
   border: 1px solid var(--line);
   font-variant-numeric: tabular-nums;
   line-height: 1.35;
@@ -3800,16 +3800,16 @@ main .library-head.page-panel-head > .page-panel-title {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(9rem, 12rem));
   align-items: end;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-xs);
 }
 
 .lot-rows h3 {
-  margin: 0.5rem 0;
+  margin: var(--space-xs) 0;
 }
 
 .lot-note {
-  margin: 0 0 1rem;
+  margin: 0 0 var(--space-md);
 }
 
 /* the Barrel length tab: the range fields and the table or chart switch in one row */
@@ -3818,8 +3818,8 @@ main .library-head.page-panel-head > .page-panel-title {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(9rem, 12rem));
   align-items: end;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-xs);
 }
 
 .barrel-range {
@@ -3827,8 +3827,8 @@ main .library-head.page-panel-head > .page-panel-title {
   grid-template-columns: repeat(3, minmax(0, 9rem)) auto;
   align-items: end;
   justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-xs);
 }
 
 /* a field's message that the page shows elsewhere stays its description and takes no room */
@@ -3841,7 +3841,7 @@ main .library-head.page-panel-head > .page-panel-title {
   display: flex;
   align-items: center;
   height: 1.5rem;
-  margin: 0 0 0.25rem;
+  margin: 0 0 var(--space-2xs);
   font-size: var(--mantine-font-size-xs);
   line-height: 1.5rem;
   color: var(--muted);
@@ -3876,8 +3876,8 @@ main .library-head.page-panel-head > .page-panel-title {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.25rem;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-2xs);
 }
 
 /* a phone: the charge modes on one row, the value, % Pmax and Compute under them */
@@ -3905,8 +3905,8 @@ main .library-head.page-panel-head > .page-panel-title {
 .powder-filters {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.5rem;
-  margin-bottom: 0.25rem;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-2xs);
 }
 
 /* from 48em the table is nine dense columns in the width of the results; below it the limits table's cards */
@@ -3994,7 +3994,7 @@ main .library-head.page-panel-head > .page-panel-title {
   display: grid;
   grid-template-columns: 1fr 6rem;
   align-items: center;
-  column-gap: 0.75rem;
+  column-gap: var(--space-sm-md);
 }
 
 .ladder-steps > .mantine-InputWrapper-error {
@@ -4024,8 +4024,8 @@ main .library-head.page-panel-head > .page-panel-title {
     display: grid;
     grid-template-columns: 11rem auto minmax(0, 1fr);
     align-items: baseline;
-    gap: 0 0.5rem;
-    padding: 0.25rem 0;
+    gap: 0 var(--space-xs);
+    padding: var(--space-2xs) 0;
     border: 0;
     border-bottom: 1px solid var(--line);
     background: none;
@@ -4104,7 +4104,7 @@ main .library-head.page-panel-head > .page-panel-title {
   .workbench .readouts > .readout-wide {
     grid-template-columns: max-content max-content minmax(0, 1fr);
     /* the range never runs into the unit of the value ("40919 psi38368 bis 43679") */
-    column-gap: 0.5rem;
+    column-gap: var(--space-xs);
   }
 
   .workbench .readouts > .readout-wide dd.readout-note {
@@ -4120,15 +4120,15 @@ main .library-head.page-panel-head > .page-panel-title {
 
 /* unbuilt features and not-run results: quiet, outlined, never a control */
 .empty-state {
-  margin: 0.5rem 0;
-  padding: 0.5rem 0.75rem;
+  margin: var(--space-xs) 0;
+  padding: var(--space-xs) var(--space-sm-md);
   border: 1px dashed var(--line);
   font-size: var(--mantine-font-size-sm);
 }
 
 .result-group h3,
 .result-group caption {
-  margin: 0 0 0.5rem;
+  margin: 0 0 var(--space-xs);
   font-size: var(--mantine-h3-font-size);
 }
 
@@ -4150,20 +4150,20 @@ main .library-head.page-panel-head > .page-panel-title {
 
 .workbench .result-group > .note,
 .limit-sources {
-  margin: 0.5rem 0 0;
+  margin: var(--space-xs) 0 0;
 }
 
 /* the input groups as fixed cards: a heading row with icon and title, then the fields */
 .workbench .panel {
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--space-xs);
 }
 
 .workbench .panel-head {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-xs);
   margin: 0;
-  padding: 0.25rem 0.5rem;
+  padding: var(--space-2xs) var(--space-xs);
   border-bottom: 1px solid var(--line);
   background: var(--surface);
   font-size: var(--mantine-font-size-sm);
@@ -4171,7 +4171,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .workbench .panel > :not(.panel-head) {
-  padding: 0.5rem;
+  padding: var(--space-xs);
 }
 
 /* below 48em the limits tables are cards with their own cell padding */
@@ -4181,21 +4181,21 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 
   .workbench table.limits :is(th, td) {
-    padding: 0.125rem 0.25rem;
+    padding: 0.125rem var(--space-2xs);
   }
 }
 
 /* from 62em the inputs are a property grid: label beside its field, help and errors below */
 @media screen and (min-width: 62em) {
   .workbench .workspace-inputs .panel-fields {
-    gap: 0.25rem 1rem;
+    gap: var(--space-2xs) var(--space-md);
   }
 
   .workbench .workspace-inputs .panel-fields > .mantine-InputWrapper-root {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 9.5rem;
     align-items: center;
-    column-gap: 0.5rem;
+    column-gap: var(--space-xs);
   }
 
   .workbench .workspace-inputs .panel-fields > .mantine-InputWrapper-root > * {
@@ -4226,7 +4226,7 @@ main .library-head.page-panel-head > .page-panel-title {
   .workbench .panels {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0 1rem;
+    gap: 0 var(--space-md);
     align-items: start;
   }
 }
@@ -4250,7 +4250,7 @@ main .library-head.page-panel-head > .page-panel-title {
     flex-direction: column;
     width: 100%;
     min-height: 0;
-    padding-bottom: 0.5rem;
+    padding-bottom: var(--space-xs);
   }
 
   .workbench {
@@ -4263,7 +4263,7 @@ main .library-head.page-panel-head > .page-panel-title {
   .workbench .workspace-tabs {
     flex: 1 1 0;
     grid-template-columns: 20rem minmax(0, 1fr);
-    gap: 1rem;
+    gap: var(--space-md);
     align-items: stretch;
     min-height: 0;
   }
@@ -4274,7 +4274,7 @@ main .library-head.page-panel-head > .page-panel-title {
     position: relative;
     min-height: 0;
     overflow-y: auto;
-    padding-right: 0.25rem;
+    padding-right: var(--space-2xs);
   }
 
   .workbench .workspace-results {
@@ -4325,7 +4325,7 @@ main .library-head.page-panel-head > .page-panel-title {
   flex-wrap: wrap;
   grid-column: 1 / -1;
   align-items: flex-end;
-  gap: 0.25rem 0.375rem;
+  gap: var(--space-2xs) 0.375rem;
   margin-bottom: 0.375rem;
 }
 
@@ -4388,7 +4388,7 @@ main .library-head.page-panel-head > .page-panel-title {
   .workbench .panels {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0 1rem;
+    gap: 0 var(--space-md);
     align-items: start;
   }
 
@@ -4429,13 +4429,13 @@ main .library-head.page-panel-head > .page-panel-title {
 
 /* Measurements tab */
 .measured-series {
-  margin: 0 0 0.75rem;
+  margin: 0 0 var(--space-sm-md);
 }
 
 .series-name {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
 }
 
 :is(.measured-marks, .series-shape) :is(circle, rect, polygon) {
@@ -4458,7 +4458,7 @@ main .library-head.page-panel-head > .page-panel-title {
 .chart-legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem 1rem;
+  gap: var(--space-2xs) var(--space-md);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -4468,7 +4468,7 @@ main .library-head.page-panel-head > .page-panel-title {
 .chart-legend li {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
 }
 
 .legend-line {
@@ -4482,25 +4482,25 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .load-lots {
-  margin: 0 0 0.75rem;
+  margin: 0 0 var(--space-sm-md);
 }
 
 .load-lots .field-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-  gap: 0.5rem;
+  gap: var(--space-xs);
 }
 
 .session-notes {
-  margin: 0.5rem 0;
+  margin: var(--space-xs) 0;
 }
 
 .measured-series .field {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 0.5rem;
-  margin: 0.25rem 0;
+  gap: var(--space-xs);
+  margin: var(--space-2xs) 0;
 }
 
 /* the figure fills the free height of its column: the form, the cards' grid, the figure's tabs
@@ -4630,7 +4630,7 @@ main .library-head.page-panel-head > .page-panel-title {
 :is(.workbench, .more-fields) .record-row {
   display: flex;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: var(--space-xs);
   font-size: var(--mantine-font-size-sm);
   font-variant-numeric: tabular-nums;
 }
@@ -4669,7 +4669,7 @@ main .library-head.page-panel-head > .page-panel-title {
   max-width: 18rem;
   height: auto;
   margin: 2px 0 0;
-  padding: 0.25rem 0.5rem;
+  padding: var(--space-2xs) var(--space-xs);
   overflow: visible;
   border: 1px solid var(--mantine-color-error);
   background: var(--page);
@@ -4689,7 +4689,7 @@ main .library-head.page-panel-head > .page-panel-title {
 .more-fields .seating-slot :is(.seating-controls, .seating-values) > *,
 .more-fields .seating-more > * {
   margin: 0;
-  padding: 0.25rem 0;
+  padding: var(--space-2xs) 0;
   border-bottom: 1px solid var(--line);
 }
 
@@ -4701,7 +4701,7 @@ main .library-head.page-panel-head > .page-panel-title {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 9rem;
   align-items: center;
-  column-gap: 0.5rem;
+  column-gap: var(--space-xs);
 }
 
 .more-fields .mantine-InputWrapper-root > * {
@@ -4728,7 +4728,7 @@ main .library-head.page-panel-head > .page-panel-title {
 .more-fields .seating-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0 0.5rem;
+  gap: 0 var(--space-xs);
   font-size: var(--mantine-font-size-sm);
 }
 
@@ -4744,7 +4744,7 @@ main .library-head.page-panel-head > .page-panel-title {
 .workbench .model-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-xs);
   font-size: var(--mantine-font-size-sm);
 }
 
@@ -4762,7 +4762,7 @@ main .library-head.page-panel-head > .page-panel-title {
   .workbench .seating-slot > :not(.seating-controls, .seating-values),
   .workbench .seating-slot :is(.seating-controls, .seating-values) > * {
     margin: 0;
-    padding: 0.1875rem 0.5rem;
+    padding: 0.1875rem var(--space-xs);
     border-bottom: 1px solid var(--line);
   }
 
@@ -4770,7 +4770,7 @@ main .library-head.page-panel-head > .page-panel-title {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 8rem;
     align-items: center;
-    column-gap: 0.5rem;
+    column-gap: var(--space-xs);
   }
 
   .workbench .seating-slot .mantine-InputWrapper-root > * {
@@ -4795,7 +4795,7 @@ main .library-head.page-panel-head > .page-panel-title {
   .workbench .seating-slot .seating-row {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    gap: 0 0.5rem;
+    gap: 0 var(--space-xs);
     padding: 0.125rem 0;
     font-size: var(--mantine-font-size-sm);
   }
@@ -4806,20 +4806,20 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .cartridge-figure .mantine-SegmentedControl-root {
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--space-xs);
 }
 
 /* the cartridge figure: the upright drawing with the seated bullet; the preview's controls
    and values sit in the cards' seating slots */
 .cartridge-figure {
-  margin-top: 0.75rem;
-  padding-top: 0.5rem;
+  margin-top: var(--space-sm-md);
+  padding-top: var(--space-xs);
   border-top: 1px solid var(--line);
   font-size: var(--mantine-font-size-sm);
 }
 
 .cartridge-figure .seating-preview {
-  gap: 0.5rem 0.75rem;
+  gap: var(--space-xs) var(--space-sm-md);
 }
 
 /* the upright drawing at a fixed height, its width from its view box */
@@ -4856,7 +4856,7 @@ main .library-head.page-panel-head > .page-panel-title {
 @media (min-width: 62em) {
   .results-head {
     display: grid;
-    gap: 0.5rem 1rem;
+    gap: var(--space-xs) var(--space-md);
   }
 
   .results-head:has(.burn-figure) {
@@ -4866,7 +4866,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .workbench .result-tablist .mantine-Tabs-tab {
-  padding: 0.25rem 0.5rem;
+  padding: var(--space-2xs) var(--space-xs);
 }
 
 .load-identity {
@@ -4940,7 +4940,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .quantity-option > .series-key {
-  margin-right: 0.25rem;
+  margin-right: var(--space-2xs);
 }
 
 /* paper drops backgrounds: the key would be gone */
@@ -4961,7 +4961,7 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 
   .workbench .workspace-results {
-    padding-left: 1rem;
+    padding-left: var(--space-md);
     border-left: 1px solid var(--line);
   }
 
@@ -4973,7 +4973,7 @@ main .library-head.page-panel-head > .page-panel-title {
   .workbench .panel > :not(.panel-head, .panel-fields),
   .workbench .workspace-inputs .panel-fields > * {
     margin: 0;
-    padding: 0.1875rem 0.5rem;
+    padding: 0.1875rem var(--space-xs);
     border-bottom: 1px solid var(--line);
   }
 
@@ -5026,7 +5026,7 @@ main .library-head.page-panel-head > .page-panel-title {
     bottom: 0;
     z-index: 1;
     margin: 0;
-    padding: 0.25rem 0;
+    padding: var(--space-2xs) 0;
     border-top: 1px solid var(--line);
     background: var(--page);
   }
@@ -5038,7 +5038,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
 @media screen and (min-width: 75em) {
   .workbench .panels {
-    gap: 0 0.75rem;
+    gap: 0 var(--space-sm-md);
   }
 
   .workbench .seating-preview[data-split] .seating-figure {
@@ -5073,9 +5073,9 @@ main .library-head.page-panel-head > .page-panel-title {
 .start-card {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-sm-md);
   max-width: 40rem;
-  padding: 1rem;
+  padding: var(--space-md);
 }
 
 .start-card h2 {
@@ -5096,7 +5096,7 @@ main .library-head.page-panel-head > .page-panel-title {
 .start-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: var(--space-xs);
 }
 
 /* before the first run only what has content: the figure's Cartridge tab of a low window */
@@ -5121,8 +5121,8 @@ main .library-head.page-panel-head > .page-panel-title {
 
 .next-steps ol {
   display: grid;
-  gap: 0.25rem;
-  margin: 0.5rem 0;
+  gap: var(--space-2xs);
+  margin: var(--space-xs) 0;
   padding: 0;
   list-style: none;
 }
@@ -5132,7 +5132,7 @@ main .library-head.page-panel-head > .page-panel-title {
   place-items: center;
   width: 1.5rem;
   height: 1.5rem;
-  margin-right: 0.25rem;
+  margin-right: var(--space-2xs);
   border: 1px solid var(--muted);
   border-radius: 50%;
   font-size: var(--mantine-font-size-xs);
@@ -5166,7 +5166,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
 .safety-dialog .mantine-Modal-title {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--space-xs);
   align-items: center;
   font-weight: 700;
 }
@@ -5178,12 +5178,12 @@ main .library-head.page-panel-head > .page-panel-title {
 /* the English text and its translation: side by side from 48em, stacked below */
 .safety-columns {
   display: grid;
-  gap: 1rem 2rem;
+  gap: var(--space-md) var(--space-xl);
 }
 
 .safety-columns > :nth-child(2) {
   border-top: 1px solid var(--line);
-  padding-top: 1rem;
+  padding-top: var(--space-md);
 }
 
 .safety-binding {
@@ -5198,7 +5198,7 @@ main .library-head.page-panel-head > .page-panel-title {
   .safety-columns > :nth-child(2) {
     border-top: 0;
     border-left: 1px solid var(--line);
-    padding: 0 0 0 2rem;
+    padding: 0 0 0 var(--space-xl);
   }
 }
 
@@ -5222,26 +5222,26 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 
   .workbench .workspace-tabs {
-    gap: 0.75rem;
+    gap: var(--space-sm-md);
   }
 
   .workbench .workspace-results {
-    padding-left: 0.75rem;
+    padding-left: var(--space-sm-md);
   }
 
   .results-head:has(.burn-figure) {
     grid-template-columns: minmax(0, 1fr) 9rem;
-    column-gap: 0.75rem;
+    column-gap: var(--space-sm-md);
   }
 
   .workbench .readouts {
-    column-gap: 0.75rem;
+    column-gap: var(--space-sm-md);
   }
 
   /* the readouts as two columns of label and value rows, the notes under the values: tiles
      took a third more height */
   .workbench .readouts {
-    gap: 0 1rem;
+    gap: 0 var(--space-md);
   }
 
   .workbench .readouts > div {
@@ -5266,7 +5266,7 @@ main .library-head.page-panel-head > .page-panel-title {
   /* the chart controls on one row */
   .workbench .chart-controls {
     flex-wrap: nowrap;
-    gap: 0.25rem;
+    gap: var(--space-2xs);
   }
 
   /* rows without padding, so the Powder card with its model parameters fits 800 px; the inputs
@@ -5531,7 +5531,7 @@ main .library-head.page-panel-head > .page-panel-title {
   left: 0.375rem;
   display: grid;
   grid-template-columns: auto auto;
-  gap: 0 0.5rem;
+  gap: 0 var(--space-xs);
   margin: 0;
   padding: 0.125rem 0.375rem;
   border: 1px solid var(--line);
@@ -5566,7 +5566,7 @@ main .library-head.page-panel-head > .page-panel-title {
   .workbench .embedded-calculator .panels {
     display: block;
     columns: 2;
-    column-gap: 0.75rem;
+    column-gap: var(--space-sm-md);
   }
 
   .workbench .embedded-calculator .mantine-Accordion-item {
@@ -5574,7 +5574,7 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 
   .workbench .embedded-calculator .mantine-Accordion-control {
-    padding: 0.125rem 0.25rem;
+    padding: 0.125rem var(--space-2xs);
     font-size: var(--mantine-font-size-sm);
     font-weight: 600;
   }
@@ -5584,7 +5584,7 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 
   .workbench .embedded-calculator .mantine-Accordion-content {
-    padding: 0 0.25rem 0.25rem;
+    padding: 0 var(--space-2xs) var(--space-2xs);
   }
 
   .workbench .embedded-calculator .panel-fields {
@@ -5599,7 +5599,7 @@ main .library-head.page-panel-head > .page-panel-title {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 7.5rem;
     align-items: center;
-    column-gap: 0.5rem;
+    column-gap: var(--space-xs);
     padding: 0;
   }
 
@@ -5647,8 +5647,8 @@ main .library-head.page-panel-head > .page-panel-title {
   .workbench .embedded-calculator .summary {
     display: flex;
     flex-wrap: wrap;
-    gap: 0 1rem;
-    margin: 0.25rem 0;
+    gap: 0 var(--space-md);
+    margin: var(--space-2xs) 0;
     padding: 0;
     list-style: none;
     font-size: var(--mantine-font-size-sm);
@@ -5733,7 +5733,7 @@ main .library-head.page-panel-head > .page-panel-title {
     flex-wrap: nowrap;
     gap: 0.375rem;
     height: 2rem;
-    padding: 0 0.25rem 0 0.5rem;
+    padding: 0 var(--space-2xs) 0 var(--space-xs);
   }
 
   .workbench .panel-head > .panel-title {
@@ -5806,7 +5806,7 @@ main .library-head.page-panel-head > .page-panel-title {
     box-sizing: border-box;
     min-height: 1.75rem;
     margin: 0;
-    padding: 0 0.5rem;
+    padding: 0 var(--space-xs);
     border-bottom: 1px solid var(--hair);
   }
 
@@ -6052,7 +6052,7 @@ main .library-head.page-panel-head > .page-panel-title {
   /* the ladder's count and step size in one row: 44 and 54 px fields, one unit */
   .workbench .workspace-inputs .pair-row {
     grid-template-columns: minmax(0, 1fr) 2.75rem minmax(3.375rem, auto) 2.625rem;
-    column-gap: 0.25rem;
+    column-gap: var(--space-2xs);
   }
 
   .workbench .workspace-inputs .pair-row > .mantine-InputWrapper-root {
@@ -6099,7 +6099,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
   .workbench .workspace-inputs .seating-slider {
     min-height: 1.375rem;
-    padding: 0 0.625rem;
+    padding: 0 var(--space-sm);
   }
 
   .workbench .workspace-inputs .model-row > button:nth-child(2) {
@@ -6136,7 +6136,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
   .workbench .panel-head {
     height: 2.75rem;
-    padding: 0 0.25rem 0 0.75rem;
+    padding: 0 var(--space-2xs) 0 var(--space-sm-md);
   }
 
   .workbench .panel-head > :is(.search, .mantine-Select-root) {
@@ -6199,7 +6199,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
   .workbench .workspace-inputs .segmented-row {
     min-height: 2.75rem;
-    padding: 0 0.75rem;
+    padding: 0 var(--space-sm-md);
   }
 
   .workbench .workspace-inputs .segmented-row > fieldset {
@@ -6208,7 +6208,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
   .workbench .workspace-inputs .seating-slider {
     min-height: 2.75rem;
-    padding: 0 0.75rem;
+    padding: 0 var(--space-sm-md);
   }
 
   .workbench .workspace-inputs .model-row {
@@ -6229,7 +6229,7 @@ main .library-head.page-panel-head > .page-panel-title {
 @media screen and (min-width: 75em) {
   .workbench .workspace-tabs {
     grid-template-columns: 36.375rem minmax(0, 1fr);
-    gap: 0.75rem;
+    gap: var(--space-sm-md);
   }
 
   .workbench .workspace-inputs {
@@ -6266,7 +6266,7 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 
   .workbench .panel-column > .burn-figure {
-    padding: 0.25rem 0.5rem;
+    padding: var(--space-2xs) var(--space-xs);
     border: 1px solid var(--line);
   }
 }
@@ -6279,7 +6279,7 @@ main .library-head.page-panel-head > .page-panel-title {
 .figure-head {
   display: flex;
   align-items: flex-start;
-  gap: 0.25rem;
+  gap: var(--space-2xs);
 }
 
 .figure-head > .mantine-SegmentedControl-root {
@@ -6313,7 +6313,7 @@ main .library-head.page-panel-head > .page-panel-title {
     flex: none;
     align-items: center;
     height: 2rem;
-    padding: 0 0.25rem;
+    padding: 0 var(--space-2xs);
     border-bottom: 1px solid var(--line);
     background: var(--surface);
   }
@@ -6336,7 +6336,7 @@ main .library-head.page-panel-head > .page-panel-title {
     position: relative;
     flex: 1;
     min-height: 0;
-    margin: 0.5rem;
+    margin: var(--space-xs);
   }
 
   .workbench .figure-host .figure-panel > .seating-preview {
@@ -6347,7 +6347,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
   .workbench :is(.figure-host, .figure-tab) .seating-figure {
     display: flex;
-    gap: 0.5rem;
+    gap: var(--space-xs);
     justify-content: flex-start;
   }
 
@@ -6419,7 +6419,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
 .figure-tab .seating-figure {
   flex: 1;
-  gap: 1rem;
+  gap: var(--space-md);
   width: 100%;
   min-height: 0;
 }
@@ -6457,7 +6457,7 @@ main .library-head.page-panel-head > .page-panel-title {
 .workbench .run-line {
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.375rem 0.5rem;
+  gap: 0.375rem var(--space-xs);
 }
 
 .workbench .run-line > .notice-text {
@@ -6465,7 +6465,7 @@ main .library-head.page-panel-head > .page-panel-title {
   flex: none;
   align-items: center;
   height: 1.625rem;
-  padding: 0 0.625rem;
+  padding: 0 var(--space-sm);
   background: var(--caution-bg);
   color: var(--caution-fg);
   font-weight: 600;
@@ -6500,7 +6500,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
 /* the limits popover: a compact table with rules between rows, the range bar, the sources */
 .limits-popover caption {
-  margin-bottom: 0.25rem;
+  margin-bottom: var(--space-2xs);
   font-size: var(--mantine-font-size-sm);
   font-weight: 600;
   text-align: left;
@@ -6511,7 +6511,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .limits-popover table.limits :is(th, td) {
-  padding: 0.25rem 0.375rem;
+  padding: var(--space-2xs) 0.375rem;
   border: 0;
   border-bottom: 1px solid var(--hair);
   background: none;
@@ -6534,7 +6534,7 @@ main .library-head.page-panel-head > .page-panel-title {
 .limit-range {
   position: relative;
   height: 2.75rem;
-  margin: 0.25rem 0.5rem 0;
+  margin: var(--space-2xs) var(--space-xs) 0;
   background: linear-gradient(var(--line), var(--line)) 0 50% / 100% 6px no-repeat;
   font-size: var(--mantine-font-size-xs);
 }
@@ -6567,7 +6567,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
 .limit-range-text {
   top: 0;
-  padding: 0 0.25rem;
+  padding: 0 var(--space-2xs);
   color: var(--muted);
   line-height: 0.875rem;
   white-space: nowrap;
