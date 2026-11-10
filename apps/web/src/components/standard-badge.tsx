@@ -12,7 +12,7 @@ export function StandardBadge({ label }: { label: string }) {
       component="span"
       variant="outline"
       tt="none"
-      color={`var(--standard-${tone}, var(--fg))`}
+      color={`var(--standard-${tone}, var(--ink))`}
       className="standard-badge"
     >
       {label}

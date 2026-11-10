@@ -78,19 +78,19 @@
       "rule": "color-contrast",
       "node": "li[data-kind=",
       "where": "workbench after the example run",
-      "reason": "Entry of the result notes, a scroll box of fixed height: the part outside the box counts as covered, and the More button beside it as overlapping. Measured against the page and panel background the warning, message and note text has 6.5:1 or more in both themes."
+      "reason": "Entry of the result notes, a scroll box of fixed height: the part outside the box counts as covered, and the More button beside it as overlapping. Measured against the page and panel background the warning, message and note text has 6.4:1 or more in both themes."
     },
     {
       "rule": "color-contrast",
       "node": "result-note",
       "where": ["Result notes"],
-      "reason": "Group heading and reason of the result notes dialog, reported as overlapping other boxes because different page content lies under each line, behind the overlay. They are --fg on the dialog's opaque surface, held at 4.5:1 or more in both themes by drawing-tokens.test.ts."
+      "reason": "Group heading and reason of the result notes dialog, reported as overlapping other boxes because different page content lies under each line, behind the overlay. They are --ink on the dialog's opaque surface, held at 4.5:1 or more in both themes by drawing-tokens.test.ts."
     },
     {
       "rule": "color-contrast",
       "node": "dialog-title ",
       "where": ["Confirm dialog", "Load export dialog"],
-      "reason": "Title of a dialog that wraps to two or more lines, reported as overlapping other boxes because different page content lies under each line, behind the overlay. Every line is inside the dialog's opaque header: 17.4:1 in light and 15.3:1 in dark by measurement."
+      "reason": "Title of a dialog that wraps to two or more lines, reported as overlapping other boxes because different page content lies under each line, behind the overlay. Every line is inside the dialog's opaque header: 16.0:1 in light and 15.7:1 in dark (--ink on --page)."
     },
     {
       "rule": "color-contrast",
@@ -193,13 +193,13 @@
       "rule": "color-contrast",
       "node": "session-strings tr:nth-child(3) > .num:nth-child(7)",
       "where": "Session summary",
-      "reason": "Min of the third string in the strings table, at the edge of its horizontal scroll box at 320 px and partly clipped, which axe cannot resolve. It is body text on the panel background: 17.4:1 in light and 15.3:1 in dark by measurement."
+      "reason": "Min of the third string in the strings table, at the edge of its horizontal scroll box at 320 px and partly clipped, which axe cannot resolve. It is body text on the panel background: 16.0:1 in light and 15.7:1 in dark (--ink on --page)."
     },
     {
       "rule": "color-contrast",
       "node": "session-strings tr:nth-child(3) > .num:nth-child(8)",
       "where": "Session summary",
-      "reason": "Max of the third string in the strings table, at the edge of its horizontal scroll box at 320 px and partly clipped, which axe cannot resolve. It is body text on the panel background: 17.4:1 in light and 15.3:1 in dark by measurement."
+      "reason": "Max of the third string in the strings table, at the edge of its horizontal scroll box at 320 px and partly clipped, which axe cannot resolve. It is body text on the panel background: 16.0:1 in light and 15.7:1 in dark (--ink on --page)."
     },
     {
       "rule": "th-has-data-cells",
@@ -235,31 +235,31 @@
       "rule": "color-contrast",
       "node": "class=\"source-count\"",
       "where": "Database list filter",
-      "reason": "Option count of a single digit, which axe cannot judge as text. It sits on the popover surface in the text colour, 17:1 in light and 15:1 in dark (--fg on --bg, the popover's body colour)."
+      "reason": "Option count of a single digit, which axe cannot judge as text. It sits on the popover surface in the text color, 16.0:1 in light and 15.7:1 in dark (--ink on --page, the popover's body color)."
     },
     {
       "rule": "color-contrast",
       "node": "mantine-Group-root > span:nth-child(1)",
       "where": "Database list filter",
-      "reason": "Option name below the visible part of the popover's scroll box, which axe reports as covered. It sits on the popover surface in the text colour, 17:1 in light and 15:1 in dark (--fg on --bg)."
+      "reason": "Option name below the visible part of the popover's scroll box, which axe reports as covered. It sits on the popover surface in the text color, 16.0:1 in light and 15.7:1 in dark (--ink on --page)."
     },
     {
       "rule": "color-contrast",
       "node": "import-refusal",
       "where": "Import entry",
-      "reason": "Refusal reason of a file card in the Import entry at the narrow widths, reported as overlapping another box; nothing covers it. On the dialog surface it has 4.5:1 in light and 7.8:1 in dark, by measurement."
+      "reason": "Refusal reason of a file card in the Import entry at the narrow widths, reported as overlapping another box; nothing covers it. On the dialog surface it has 5.5:1 in light and 10.2:1 in dark (--error-text on --page)."
     },
     {
       "rule": "color-contrast",
       "node": "import-rights",
       "where": "Import entry",
-      "reason": "Rights note of the Import entry at the narrow widths, reported as overlapping another box; nothing covers it. On the dialog surface it has 7.4:1 in light and 7.6:1 in dark, by measurement."
+      "reason": "Rights note of the Import entry at the narrow widths, reported as overlapping another box; nothing covers it. On the dialog surface it has 6.8:1 in light and 8.7:1 in dark (--muted on --page)."
     },
     {
       "rule": "color-contrast",
       "node": "id=\"driver-popover-description\"",
       "where": ["Page tour"],
-      "reason": "Text of the page tour's popover, which axe cannot match to a background because the popover's arrow overlaps it. It is the text colour on the page background: 17.4:1 light, 15.3:1 dark by measurement."
+      "reason": "Text of the page tour's popover, which axe cannot match to a background because the popover's arrow overlaps it. It is the text color on the page background: 16.0:1 light, 15.7:1 dark (--ink on --page)."
     },
     {
       "rule": "label-content-name-mismatch",

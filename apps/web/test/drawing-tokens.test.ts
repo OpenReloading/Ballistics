@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { colors } from '@open-reloading/design-tokens'
 import { describe, expect, it } from 'vitest'
 import { groupColours } from '../src/lib/target-editor.ts'
 import { missing } from './defined.ts'
@@ -26,14 +27,20 @@ describe('drawing tokens', () => {
     const [x = missing(), y = missing()] = [luminance(a), luminance(b)].sort((p, q) => q - p)
     return (x + 0.05) / (y + 0.05)
   }
-  const light = block(':root')
-  const dark = block('@media screen {\n  :root[data-mantine-color-scheme="dark"]')
+  // the palette of tokens.css under the app's own values, as the page cascades them
+  const palette = (scheme: keyof typeof colors) =>
+    Object.entries(colors[scheme]).map(([k, v]) => [`--${k}`, v as string] as const)
+  const light = new Map([...palette('light'), ...block(':root')])
+  const dark = new Map([
+    ...palette('dark'),
+    ...block('@media screen {\n  :root[data-mantine-color-scheme="dark"]'),
+  ])
   for (const [theme, tokens] of [
     ['light', light],
     ['dark', dark],
   ] as const)
-    it(`reaches 3:1 for every line and 4.5:1 for the text against --bg in ${theme}`, () => {
-      const bg = tokens.get('--bg') as string
+    it(`reaches 3:1 for every line and 4.5:1 for the text against --page in ${theme}`, () => {
+      const bg = tokens.get('--page') as string
       for (const line of ['--draw-outline', '--draw-edge', '--draw-rule', '--draw-ext'])
         expect(ratio(tokens.get(line) as string, bg), line).toBeGreaterThanOrEqual(3)
       expect(ratio(tokens.get('--draw-text') as string, bg)).toBeGreaterThanOrEqual(4.5)
@@ -44,8 +51,8 @@ describe('drawing tokens', () => {
     ['light', light],
     ['dark', dark],
   ] as const)
-    it(`gives every chart series 3:1 against the chart background (--bg) in ${theme}`, () => {
-      const bg = tokens.get('--bg') as string
+    it(`gives every chart series 3:1 against the chart background (--page) in ${theme}`, () => {
+      const bg = tokens.get('--page') as string
       for (let k = 1; k <= 6; k++)
         expect(
           ratio(tokens.get(`--series-${k}`) as string, bg),
@@ -78,42 +85,32 @@ describe('drawing tokens', () => {
     it(`gives each message variant 4.5:1 for its text on its fill in ${theme}`, () => {
       for (const variant of ['info', 'warn', 'error'])
         expect(
-          ratio(tokens.get(`--${variant}-fg`) as string, tokens.get(`--${variant}-bg`) as string),
+          ratio(
+            tokens.get(`--${variant}-text`) as string,
+            tokens.get(`--${variant}-fill`) as string,
+          ),
           variant,
         ).toBeGreaterThanOrEqual(4.5)
     })
-  // a token's colour: a hex value, or the `color-mix(in srgb, …)` of two tokens that --input-border is
-  const colour = (tokens: Map<string | undefined, string>, name: string): string => {
-    const value = tokens.get(name) ?? missing()
-    const mix = value.match(/^color-mix\(in srgb, var\((--[\w-]+)\) (\d+)%, var\((--[\w-]+)\)\)$/)
-    if (!mix) return value
-    const [, a = missing(), percent = missing(), b = missing()] = mix
-    const from = colour(tokens, a)
-    const to = colour(tokens, b)
-    const channel = (hex: string, k: number) => Number.parseInt(hex.slice(k, k + 2), 16)
-    const share = Number(percent) / 100
-    return `#${[1, 3, 5]
-      .map((k) =>
-        Math.round(channel(from, k) * share + channel(to, k) * (1 - share))
-          .toString(16)
-          .padStart(2, '0'),
-      )
-      .join('')}`
-  }
-  // outside the literal tokens: it is mixed from --fg and --bg
-  const inputBorder = css.match(/--input-border:\s*([^;]+);/)?.[1] ?? missing()
   // the page and the panels, cards and table heads that sit on --surface
   for (const [theme, tokens] of [
-    ['light', new Map([...light, ['--input-border', inputBorder]])],
-    ['dark', new Map([...light, ...dark, ['--input-border', inputBorder]])],
+    ['light', light],
+    ['dark', new Map([...light, ...dark])],
   ] as const)
-    for (const surface of ['--bg', '--surface'])
+    for (const surface of ['--page', '--surface'])
       it(`gives text 4.5:1, the focus ring and the field border 3:1 on ${surface} in ${theme}`, () => {
-        const ground = colour(tokens, surface)
-        for (const text of ['--fg', '--muted', '--link', '--standard-cip'])
-          expect(ratio(colour(tokens, text), ground), text).toBeGreaterThanOrEqual(4.5)
-        for (const edge of ['--focus', '--input-border'])
-          expect(ratio(colour(tokens, edge), ground), edge).toBeGreaterThanOrEqual(3)
+        const ground = tokens.get(surface) as string
+        for (const text of [
+          '--ink',
+          '--muted',
+          '--link',
+          '--standard-cip',
+          '--error-text',
+          '--warn-text',
+        ])
+          expect(ratio(tokens.get(text) as string, ground), text).toBeGreaterThanOrEqual(4.5)
+        for (const edge of ['--accent', '--control-line'])
+          expect(ratio(tokens.get(edge) as string, ground), edge).toBeGreaterThanOrEqual(3)
       })
   it('gives shot groups the light chart series colours', () => {
     const series = new Set([1, 2, 3, 4, 5, 6].map((k) => light.get(`--series-${k}`)))

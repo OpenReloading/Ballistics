@@ -6,7 +6,7 @@ import { formatNumber } from '../i18n/number.ts'
 import { niceTicks, tickDecimals } from '../lib/ticks.ts'
 import { axisText, chartTooltip, EChart, tickStep, useChartTokens } from './echart.tsx'
 
-const lineTokens = { muted: '--muted', border: '--border', link: '--link', bg: '--bg', fg: '--fg' }
+const lineTokens = { muted: '--muted', border: '--line', link: '--link', bg: '--page', fg: '--ink' }
 
 /** Smallest and largest value; a loop, as a spread of a long array can overflow the call stack. */
 function extent(values: number[]): [number, number] {

@@ -1,23 +1,13 @@
 :root {
-  --bg: #ffffff;
-  --fg: #1a1a1a;
-  --muted: #555555;
-  --border: #c9cfd8;
-  --link: #0b57d0;
-  --focus: #0b57d0;
-  --warn-bg: #fff9db;
-  --warn-fg: #7a4f00;
   /* the result notice: yellow, a shade apart from the amber result warnings; 8:1 contrast */
   --caution-bg: #fff3bf;
   --caution-fg: #5c4400;
   /* message variants (Message in states.tsx): text on its own fill, at least 4.5:1 */
-  --info-bg: #e8f0fe;
-  --info-fg: #0a3f9c;
-  --error-bg: #fdecea;
-  --error-fg: #9b1c1c;
-  --surface: #f2f4f7;
+  --info-fill: #e8f0fe;
+  --info-text: #0a3f9c;
+  --error-fill: #fdecea;
   /* burn-rate chart series, slots 1 to 6 (apps/docs/docs/models/interior-burn-forms.md); each slot
-     also has a dash pattern; light steps at least 3:1 against --bg, the chart background
+     also has a dash pattern; light steps at least 3:1 against --page, the chart background
      (test/drawing-tokens.test.ts) */
   --series-1: #2a78d6;
   --series-2: #eb6834;
@@ -34,7 +24,6 @@
   --copper: #b8693e;
   --copper-hi: #efc09e;
   --powder: #5c4a32;
-  color-scheme: light;
   /* drawing: outline, edge lines, dimension rules and text in one accent ink, extension lines;
      fills of the section, the steel band and the gap; flag and highlight for later views */
   --draw-outline: #111111;
@@ -44,26 +33,26 @@
   --draw-ext: #808080;
   --draw-steel: #e4e6e8;
   --draw-gap: #d3e3f3;
-  --draw-fill: var(--bg);
-  --draw-flag: var(--warn-fg);
+  --draw-fill: var(--page);
+  --draw-flag: var(--warn-text);
   --draw-highlight: var(--link);
   --draw-bullet: #f0d6bd;
-  /* standard badges: text colours at least 4.5:1 on --bg and --surface */
+  /* standard badges: text colors at least 4.5:1 on --page and --surface */
   --standard-cip: #0a4fa8;
   /* Mantine reads the same tokens, so its components follow the theme and print light */
-  --mantine-color-body: var(--bg);
-  --mantine-color-text: var(--fg);
+  --mantine-color-body: var(--page);
+  --mantine-color-text: var(--ink);
   --mantine-color-dimmed: var(--muted);
   /* placeholders: Mantine's pale default gives about 2:1, and some fields are named by theirs alone */
   --mantine-color-placeholder: var(--muted);
   --input-placeholder-color: var(--muted);
   --mantine-color-anchor: var(--link);
-  --mantine-color-default: var(--bg);
-  --mantine-color-default-hover: var(--surface);
-  --mantine-color-default-color: var(--fg);
-  --mantine-color-default-border: var(--border);
+  --mantine-color-default: var(--page);
+  --mantine-color-default-hover: var(--surface-alt);
+  --mantine-color-default-color: var(--ink);
+  --mantine-color-default-border: var(--control-line);
   /* field errors: Mantine's red gives about 3.3:1 on white */
-  --mantine-color-error: var(--error-fg);
+  --mantine-color-error: var(--error-text);
   /* disabled text: Mantine's grey gives about 1.8:1 on its disabled fill */
   --mantine-color-disabled-color: var(--muted);
 }
@@ -71,21 +60,11 @@
 /* dark on screen only, so print keeps the light values above; the head script resolves the system setting */
 @media screen {
   :root[data-mantine-color-scheme="dark"] {
-    --bg: #161616;
-    --fg: #ececec;
-    --muted: #a8a8a8;
-    --border: #3d434d;
-    --link: #8ab4f8;
-    --focus: #8ab4f8;
-    --warn-bg: #33290a;
-    --warn-fg: #ffe066;
     --caution-bg: #3a3000;
     --caution-fg: #ffe066;
-    --info-bg: #1b2a44;
-    --info-fg: #b5d0ff;
-    --error-bg: #3d1717;
-    --error-fg: #ffb4ab;
-    --surface: #20242b;
+    --info-fill: #1b2a44;
+    --info-text: #b5d0ff;
+    --error-fill: #3d1717;
     --series-1: #3987e5;
     --series-2: #d95926;
     --series-3: #199e70;
@@ -110,7 +89,6 @@
     --draw-gap: #1d3247;
     --draw-bullet: #5c4130;
     --standard-cip: #8ab4f8;
-    color-scheme: dark;
   }
 }
 
@@ -118,22 +96,16 @@ body {
   line-height: 1.5;
 }
 
-/* the border of a field: at least 3:1 against --bg and --surface (WCAG 1.4.11), mixed from the
-   tokens, so it follows both themes */
-:root {
-  --input-border: color-mix(in srgb, var(--fg) 55%, var(--bg));
-}
-
 /* Mantine's field border is gray-4, about 1.5:1 on white; an error or success field keeps its state border */
 :root[data-mantine-color-scheme]
   .mantine-Input-wrapper[data-variant="default"]:not([data-error]):not([data-success]) {
-  --input-bd: var(--input-border);
+  --input-bd: var(--control-line);
 }
 
 /* an unchecked box or radio takes the field border too: Mantine's gray-4 is about 1.5:1 on white */
 .mantine-Checkbox-input:not(:checked, [data-indeterminate], :disabled, [data-error]),
 .mantine-Radio-radio:not(:checked, :disabled, [data-error]) {
-  border-color: var(--input-border);
+  border-color: var(--control-line);
 }
 
 /* the top bar's right end: Install slot, Safety, theme switch */
@@ -307,7 +279,7 @@ body {
 
   th,
   td {
-    border: 1px solid var(--border);
+    border: 1px solid var(--line);
     padding: 0.25rem 0.5rem;
     text-align: left;
     vertical-align: top;
@@ -332,7 +304,7 @@ body {
 }
 
 :focus-visible {
-  outline: 3px solid var(--focus);
+  outline: 3px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -351,8 +323,8 @@ body {
   left: 16px;
   top: -4rem;
   padding: 0.5rem 0.75rem;
-  border: 1px solid var(--border);
-  background: var(--bg);
+  border: 1px solid var(--line);
+  background: var(--page);
   white-space: nowrap;
 }
 
@@ -440,7 +412,7 @@ body {
 }
 
 .home-cards li + li {
-  border-left: 1px solid var(--border);
+  border-left: 1px solid var(--line);
 }
 
 main .home-cards h3 {
@@ -516,7 +488,7 @@ main .home-cards h3 {
 }
 
 .home-news li + li {
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--line);
 }
 
 .home-news time,
@@ -567,7 +539,7 @@ main .home-cards h3 {
   }
 
   .home-cards li + li {
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--line);
     border-left: 0;
   }
 
@@ -689,7 +661,7 @@ td.nowrap {
 }
 
 .exceeded {
-  color: var(--warn-fg);
+  color: var(--warn-text);
 }
 
 /* seven columns do not fit a phone: one labelled card per limit; `table.limits` outranks the
@@ -711,7 +683,7 @@ td.nowrap {
   }
 
   table.limits tr {
-    border: 1px solid var(--border);
+    border: 1px solid var(--line);
     margin-bottom: 0.5rem;
   }
 
@@ -844,7 +816,7 @@ td.nowrap {
 .readout-limits {
   color: inherit;
   font: inherit;
-  text-decoration: underline dotted color-mix(in srgb, var(--fg) 35%, var(--bg));
+  text-decoration: underline dotted color-mix(in srgb, var(--ink) 35%, var(--page));
   text-underline-offset: 0.2em;
 }
 
@@ -889,7 +861,7 @@ td.nowrap {
 }
 
 .field-flag-seating {
-  color: var(--warn-fg);
+  color: var(--warn-text);
 }
 
 .field-flag-record {
@@ -897,7 +869,7 @@ td.nowrap {
 }
 
 .field-flag-exceeded {
-  color: var(--danger, var(--warn-fg));
+  color: var(--danger, var(--warn-text));
 }
 
 .field-action {
@@ -918,7 +890,7 @@ td.nowrap {
   padding: 0 0.125rem;
   color: inherit;
   font: inherit;
-  text-decoration: underline dotted color-mix(in srgb, var(--fg) 35%, var(--bg));
+  text-decoration: underline dotted color-mix(in srgb, var(--ink) 35%, var(--page));
   text-underline-offset: 0.2em;
 }
 
@@ -953,7 +925,7 @@ td.nowrap {
 }
 
 .stale-line {
-  color: var(--warn-fg);
+  color: var(--warn-text);
   font-weight: 600;
 }
 
@@ -989,7 +961,7 @@ td.nowrap {
 
 .readouts > div {
   padding: 0.5rem 0.5rem;
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   background: var(--surface);
 }
 
@@ -1057,8 +1029,8 @@ td.nowrap {
   gap: 0.75rem;
   margin-top: 1rem;
   padding: 0.5rem 0.75rem;
-  border: 1px solid var(--border);
-  background: var(--bg);
+  border: 1px solid var(--line);
+  background: var(--page);
   font-variant-numeric: tabular-nums;
 }
 
@@ -1138,7 +1110,7 @@ td.nowrap {
   }
 
   .workbench .bar-state .bar-result[data-stale] {
-    color: var(--warn-fg);
+    color: var(--warn-text);
   }
 
   .workbench .bar-values {
@@ -1310,7 +1282,7 @@ td.nowrap {
     top: 0;
     z-index: 1;
     padding: 0.25rem 0;
-    background: var(--bg);
+    background: var(--page);
   }
 }
 
@@ -1475,8 +1447,8 @@ td.nowrap {
     top: var(--app-shell-header-offset, 0rem);
     z-index: 3;
     order: -1;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    background: var(--page);
   }
 
   .designer .workspace-scroll {
@@ -1564,7 +1536,7 @@ td.nowrap {
 /* a value changed against the record, as a bar inside the input's edge so nothing moves; the flag
    and the description say so in words */
 .designer-field[data-changed] .mantine-Input-input {
-  box-shadow: inset 3px 0 0 var(--warn-fg);
+  box-shadow: inset 3px 0 0 var(--warn-text);
 }
 
 /* the bullet designer: each field's drawing symbol in a column before its label */
@@ -1572,7 +1544,7 @@ td.nowrap {
   content: var(--symbol, "");
   display: inline-block;
   width: 2.25rem;
-  color: var(--fg);
+  color: var(--ink);
   font-weight: 600;
   text-indent: 0;
 }
@@ -1592,7 +1564,7 @@ td.nowrap {
   /* inside the scroll box: the line spans the content, not the frame */
   .designer-panel-head {
     margin-bottom: 0.25rem;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--line);
   }
 }
 
@@ -1724,7 +1696,7 @@ td.nowrap {
   bottom: 0;
   z-index: 2;
   margin: 0.25rem 0 0;
-  background: var(--bg);
+  background: var(--page);
   color: var(--muted);
   font-size: var(--mantine-font-size-xs);
 }
@@ -1735,7 +1707,7 @@ td.nowrap {
 
 /* a record search's list of matches over the page: its own edge and a shadow */
 .record-search-list {
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   box-shadow: var(--mantine-shadow-md);
 }
 
@@ -1752,7 +1724,7 @@ td.nowrap {
     position: sticky;
     top: 0;
     z-index: 3;
-    background: var(--bg);
+    background: var(--page);
   }
 
   .designer .prop-form:has(> .designer-start) .side-head {
@@ -1790,7 +1762,7 @@ td.nowrap {
 }
 
 .side-head {
-  background: var(--bg);
+  background: var(--page);
   color: var(--muted);
   font-size: var(--mantine-font-size-xs);
   font-weight: 600;
@@ -1836,7 +1808,7 @@ td.nowrap {
 }
 
 .face-head {
-  background: var(--bg);
+  background: var(--page);
   color: var(--muted);
   font-size: var(--mantine-font-size-xs);
   font-weight: 600;
@@ -1895,7 +1867,7 @@ td.nowrap {
 }
 
 .powder-head {
-  background: var(--bg);
+  background: var(--page);
   color: var(--muted);
   font-size: var(--mantine-font-size-xs);
   font-weight: 600;
@@ -2243,7 +2215,7 @@ td.nowrap {
   display: grid;
   grid-template-columns: minmax(9rem, 14rem) minmax(0, 1fr);
   gap: 0 1rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--line);
   padding-bottom: 0.25rem;
 }
 
@@ -2271,7 +2243,7 @@ td.nowrap {
 .flag:where(:not(svg)) {
   display: inline-block;
   padding: 0 0.45em;
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   font-size: 0.8em;
   line-height: 1.4;
   color: var(--muted);
@@ -2285,9 +2257,9 @@ td.nowrap {
 
 .flag-approximate {
   border-style: dashed;
-  border-color: var(--warn-fg);
-  background: var(--warn-bg);
-  color: var(--warn-fg);
+  border-color: var(--warn-text);
+  background: var(--warn-fill);
+  color: var(--warn-text);
 }
 
 .seating-notes {
@@ -2353,7 +2325,7 @@ td.nowrap {
   height: 0.75rem;
   margin-right: 0.25rem;
   vertical-align: -0.1rem;
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
 }
 
 @media print {
@@ -2366,26 +2338,25 @@ td.nowrap {
 
 /* paper: light colours whatever the screen preference; controls hidden, inputs and results kept */
 @media print {
-  :root {
-    --bg: #ffffff;
-    --fg: #1a1a1a;
-    --muted: #555555;
-    --border: #c9cfd8;
-    --link: #0b57d0;
-    --focus: #0b57d0;
-    --warn-bg: #fff9db;
-    --warn-fg: #7a4f00;
-    --caution-bg: #fff3bf;
-    --caution-fg: #5c4400;
-    --info-bg: #e8f0fe;
-    --info-fg: #0a3f9c;
-    --error-bg: #fdecea;
-    --error-fg: #9b1c1c;
-    --surface: #f2f4f7;
-    --gas: #e8590c;
-    --copper: #b8693e;
-    --copper-hi: #efc09e;
-    --powder: #5c4a32;
+  /* the light values of tokens.css (@open-reloading/design-tokens), whose dark block also applies to print */
+  :root[data-mantine-color-scheme] {
+    --page: #fff;
+    --ink: #1d2130;
+    --muted: #555a6d;
+    --line: #dcdfe9;
+    --link: var(--accent-hover);
+    --link-hover: var(--ink);
+    --accent: #1971c2;
+    --accent-hover: #1864ab;
+    --accent-tint: #e7f5ff;
+    --on-accent: #fff;
+    --control-line: #7b7f91;
+    --surface: #f6f8fc;
+    --surface-alt: #eef0f6;
+    --warn-border: #e0b84a;
+    --warn-fill: #fff6db;
+    --warn-text: #7a4f00;
+    --error-text: #c92a2a;
     color-scheme: light;
   }
 
@@ -2729,7 +2700,7 @@ td.nowrap {
 
 /* the chart's keyboard stop is hidden: its focus shows on the chart */
 .echart:has(> .echart-keys:focus-visible) > [role="img"] {
-  outline: 3px solid var(--focus);
+  outline: 3px solid var(--accent);
 }
 
 /* visually hidden like .visually-hidden (without its margin, border and padding); each selector keeps
@@ -2824,7 +2795,7 @@ td.nowrap {
   justify-content: center;
   width: 1.25rem;
   height: 1.25rem;
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   border-radius: 50%;
   background: var(--surface);
   font-size: var(--mantine-font-size-xs);
@@ -2858,7 +2829,7 @@ td.nowrap {
   gap: 0.25rem;
   margin-top: 0.25rem;
   padding-top: 0.25rem;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--line);
 }
 
 .load-close {
@@ -2920,12 +2891,12 @@ td.nowrap {
   }
 
   .page-bar .bar-result {
-    color: var(--fg);
+    color: var(--ink);
     font-weight: 600;
   }
 
   .page-bar .bar-result[data-stale] {
-    color: var(--warn-fg);
+    color: var(--warn-text);
   }
 
   /* the root class beats the bar's left-section padding below, so the icon sits in the middle */
@@ -3144,7 +3115,7 @@ td.nowrap {
 
 .import-column {
   padding-block: 0.25rem;
-  border-bottom: 1px solid var(--mantine-color-default-border);
+  border-bottom: 1px solid var(--line);
 }
 
 .import-column-head {
@@ -3161,7 +3132,7 @@ td.nowrap {
 .import-foot {
   max-width: 60rem;
   padding: 0.75rem 1rem 1rem;
-  border-top: 1px solid var(--mantine-color-default-border);
+  border-top: 1px solid var(--line);
 }
 
 /* Shooting log: the own-record line and the entry form above the table; on paper the sheet alone,
@@ -3194,7 +3165,7 @@ td.nowrap {
   min-width: 0;
   margin: 0;
   padding: 0.5rem 0.75rem 0.75rem;
-  border: 1px solid var(--mantine-color-default-border);
+  border: 1px solid var(--line);
   border-radius: var(--mantine-radius-sm);
 }
 
@@ -3372,14 +3343,14 @@ td.nowrap {
 /* the editor's title row as a panel's: the firearm's name on one line, the line under it */
 .library-head {
   margin-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--line);
 }
 
 main .library-head.page-panel-head > .page-panel-title {
   flex: 0 1 auto;
   min-width: 0;
   overflow: hidden;
-  color: var(--fg);
+  color: var(--ink);
   font-size: var(--mantine-font-size-lg);
   letter-spacing: 0;
   text-overflow: ellipsis;
@@ -3652,12 +3623,12 @@ main .library-head.page-panel-head > .page-panel-title {
 
 .result-notes li[data-kind="warning"],
 .result-notes-group[data-kind="warning"] h3 > svg {
-  color: var(--warn-fg);
+  color: var(--warn-text);
 }
 
 .result-notes li[data-kind="message"],
 .result-notes-group[data-kind="message"] h3 > svg {
-  color: var(--info-fg);
+  color: var(--info-text);
 }
 
 .result-notes :is(li[data-kind="note"], .result-notes-none) {
@@ -3738,7 +3709,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
 .ladder-strip .flag,
 .ladder-table .flag {
-  color: var(--warn-fg);
+  color: var(--warn-text);
   font-weight: 600;
 }
 
@@ -3786,7 +3757,7 @@ main .library-head.page-panel-head > .page-panel-title {
 .ladder-cell {
   position: relative;
   padding: 0.125rem 0.5rem;
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   font-variant-numeric: tabular-nums;
   line-height: 1.35;
   cursor: pointer;
@@ -3800,7 +3771,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .ladder-cell:has(input:focus-visible) {
-  outline: 3px solid var(--focus);
+  outline: 3px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -3820,7 +3791,7 @@ main .library-head.page-panel-head > .page-panel-title {
 /* the lot rows of a charge: the slower lot first, set off from the charge before it */
 @media (min-width: 48em) {
   .ladder-table tr[data-lot="low"] td {
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--line);
   }
 }
 
@@ -4060,7 +4031,7 @@ main .library-head.page-panel-head > .page-panel-title {
     gap: 0 0.5rem;
     padding: 0.25rem 0;
     border: 0;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--line);
     background: none;
   }
 
@@ -4155,7 +4126,7 @@ main .library-head.page-panel-head > .page-panel-title {
 .empty-state {
   margin: 0.5rem 0;
   padding: 0.5rem 0.75rem;
-  border: 1px dashed var(--border);
+  border: 1px dashed var(--line);
   font-size: var(--mantine-font-size-sm);
 }
 
@@ -4197,7 +4168,7 @@ main .library-head.page-panel-head > .page-panel-title {
   gap: 0.5rem;
   margin: 0;
   padding: 0.25rem 0.5rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--line);
   background: var(--surface);
   font-size: var(--mantine-font-size-sm);
   font-weight: 600;
@@ -4473,12 +4444,12 @@ main .library-head.page-panel-head > .page-panel-title {
 
 :is(.measured-marks, .series-shape) :is(circle, rect, polygon) {
   fill: currentColor;
-  stroke: var(--fg);
+  stroke: var(--ink);
   stroke-width: 1;
 }
 
 .error-bar {
-  stroke: var(--fg);
+  stroke: var(--ink);
   stroke-width: 1.5;
 }
 
@@ -4649,7 +4620,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
 .workbench .panel-head[data-chosen] .mantine-Input-input::placeholder,
 .search[data-picked] .mantine-Input-input::placeholder {
-  color: var(--fg);
+  color: var(--ink);
   opacity: 1;
 }
 
@@ -4705,7 +4676,7 @@ main .library-head.page-panel-head > .page-panel-title {
   padding: 0.25rem 0.5rem;
   overflow: visible;
   border: 1px solid var(--mantine-color-error);
-  background: var(--bg);
+  background: var(--page);
   box-shadow: var(--mantine-shadow-sm);
   font-size: var(--mantine-font-size-xs);
   white-space: normal;
@@ -4723,7 +4694,7 @@ main .library-head.page-panel-head > .page-panel-title {
 .more-fields .seating-more > * {
   margin: 0;
   padding: 0.25rem 0;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--line);
 }
 
 .more-fields :is(.seating-slot, .seating-slot .seating-controls) {
@@ -4796,7 +4767,7 @@ main .library-head.page-panel-head > .page-panel-title {
   .workbench .seating-slot :is(.seating-controls, .seating-values) > * {
     margin: 0;
     padding: 0.1875rem 0.5rem;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--line);
   }
 
   .workbench .seating-slot .mantine-InputWrapper-root {
@@ -4847,7 +4818,7 @@ main .library-head.page-panel-head > .page-panel-title {
 .cartridge-figure {
   margin-top: 0.75rem;
   padding-top: 0.5rem;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--line);
   font-size: var(--mantine-font-size-sm);
 }
 
@@ -4995,7 +4966,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
   .workbench .workspace-results {
     padding-left: 1rem;
-    border-left: 1px solid var(--border);
+    border-left: 1px solid var(--line);
   }
 
   /* each card a table: one row per field or note */
@@ -5007,7 +4978,7 @@ main .library-head.page-panel-head > .page-panel-title {
   .workbench .workspace-inputs .panel-fields > * {
     margin: 0;
     padding: 0.1875rem 0.5rem;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--line);
   }
 
   .workbench .workspace-inputs .panel-fields {
@@ -5026,14 +4997,14 @@ main .library-head.page-panel-head > .page-panel-title {
     font-size: var(--mantine-font-size-xs);
   }
 
-  /* a value cell: Mantine's input with square corners and its whole border (--input-border), as
+  /* a value cell: Mantine's input with square corners and its whole border (--control-line), as
      table cells (no lone bottom rule) */
   .workbench
     .workspace-inputs
     :is(.panel-fields, .seating-slot, .embedded-calculator)
     .mantine-Input-input,
   .workbench .embedded-calculator .mantine-Input-input {
-    background: var(--bg);
+    background: var(--page);
   }
 
   .workbench
@@ -5041,12 +5012,12 @@ main .library-head.page-panel-head > .page-panel-title {
     :is(.panel-fields, .seating-slot)
     .mantine-Input-input:where(:not([data-error])),
   .workbench .embedded-calculator .mantine-Input-input:where(:not([data-error])) {
-    border-color: var(--input-border);
+    border-color: var(--control-line);
   }
 
   .workbench .workspace-inputs :is(.panel-fields, .seating-slot) .mantine-Input-input:focus,
   .workbench .embedded-calculator .mantine-Input-input:focus {
-    border-color: var(--focus);
+    border-color: var(--accent);
   }
 
   /* the Run bar stays at the foot of the inputs; focus scrolls above it (WCAG 2.4.11) */
@@ -5060,8 +5031,8 @@ main .library-head.page-panel-head > .page-panel-title {
     z-index: 1;
     margin: 0;
     padding: 0.25rem 0;
-    border-top: 1px solid var(--border);
-    background: var(--bg);
+    border-top: 1px solid var(--line);
+    background: var(--page);
   }
 
   .workbench .run-bar > button {
@@ -5215,7 +5186,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .safety-columns > :nth-child(2) {
-  border-top: 1px solid var(--mantine-color-default-border);
+  border-top: 1px solid var(--line);
   padding-top: 1rem;
 }
 
@@ -5230,7 +5201,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
   .safety-columns > :nth-child(2) {
     border-top: 0;
-    border-left: 1px solid var(--mantine-color-default-border);
+    border-left: 1px solid var(--line);
     padding: 0 0 0 2rem;
   }
 }
@@ -5480,9 +5451,9 @@ main .library-head.page-panel-head > .page-panel-title {
   box-sizing: border-box;
   width: 6px;
   height: 28px;
-  border: 1px solid var(--bg);
+  border: 1px solid var(--page);
   background: var(--gas);
-  box-shadow: 0 0 0 1px var(--fg);
+  box-shadow: 0 0 0 1px var(--ink);
   appearance: none;
 }
 
@@ -5490,14 +5461,14 @@ main .library-head.page-panel-head > .page-panel-title {
   box-sizing: border-box;
   width: 6px;
   height: 28px;
-  border: 1px solid var(--bg);
+  border: 1px solid var(--page);
   background: var(--gas);
-  box-shadow: 0 0 0 1px var(--fg);
+  box-shadow: 0 0 0 1px var(--ink);
 }
 
 /* inside the row, which clips what lies beyond it */
 .play-time input:focus-visible {
-  outline: 2px solid var(--focus);
+  outline: 2px solid var(--accent);
   outline-offset: -2px;
 }
 
@@ -5522,7 +5493,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .play-marks li[data-passed] {
-  background: var(--fg);
+  background: var(--ink);
 }
 
 .chart-stage {
@@ -5552,7 +5523,7 @@ main .library-head.page-panel-head > .page-panel-title {
   left: -7px;
   width: 12px;
   height: 12px;
-  border: 2px solid var(--bg);
+  border: 2px solid var(--page);
   border-radius: 50%;
   background: var(--gas);
 }
@@ -5567,8 +5538,8 @@ main .library-head.page-panel-head > .page-panel-title {
   gap: 0 0.5rem;
   margin: 0;
   padding: 0.125rem 0.375rem;
-  border: 1px solid var(--border);
-  background: var(--bg);
+  border: 1px solid var(--line);
+  background: var(--page);
   font-size: var(--mantine-font-size-xs);
   line-height: 1.3;
   font-variant-numeric: tabular-nums;
@@ -5728,7 +5699,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
   .workbench .workspace-inputs .mantine-InputWrapper-label[title] {
     cursor: help;
-    text-decoration: underline dotted color-mix(in srgb, var(--fg) 35%, var(--bg));
+    text-decoration: underline dotted color-mix(in srgb, var(--ink) 35%, var(--page));
     text-underline-offset: 0.2em;
   }
 
@@ -5819,8 +5790,8 @@ main .library-head.page-panel-head > .page-panel-title {
 
   .workbench .panel-head .mantine-Input-input,
   .workbench .panel-head .mantine-Input-input:not(:focus) {
-    border-color: var(--border);
-    background: var(--bg);
+    border-color: var(--line);
+    background: var(--page);
     font-size: var(--mantine-font-size-sm);
     font-weight: 400;
   }
@@ -5858,7 +5829,7 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 
   .workbench .workspace-inputs :is(.record-row, .seating-row) > :first-child {
-    color: var(--fg);
+    color: var(--ink);
   }
 
   .workbench .workspace-inputs :is(.record-row, .seating-row) > :last-child {
@@ -5909,12 +5880,12 @@ main .library-head.page-panel-head > .page-panel-title {
     .workspace-inputs
     :is(.panel-fields, .seating-slot)
     .mantine-Input-input:where(:not([data-error])):hover {
-    border-color: var(--border);
+    border-color: var(--line);
   }
 
   .workbench .workspace-inputs :is(.panel-fields, .seating-slot) .mantine-Input-input:focus {
-    border-color: var(--focus);
-    outline: 1px solid var(--focus);
+    border-color: var(--accent);
+    outline: 1px solid var(--accent);
     outline-offset: -2px;
   }
 
@@ -5934,7 +5905,7 @@ main .library-head.page-panel-head > .page-panel-title {
   height: 1.75rem;
   margin: 0;
   padding: 2px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   background: var(--surface);
 }
 
@@ -5966,15 +5937,15 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .segmented-row label:has(input:checked) {
-  background: var(--bg);
-  box-shadow: 0 0 0 1px var(--border);
-  color: var(--fg);
+  background: var(--page);
+  box-shadow: 0 0 0 1px var(--line);
+  color: var(--ink);
 }
 
 /* outside the segment, as Mantine's SegmentedControl draws it: inside, it merged with the
    selected segment's edge */
 .segmented-row label:has(input:focus-visible) {
-  outline: 2px solid var(--focus);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -5997,7 +5968,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
   .workbench .workspace-inputs .mantine-InputWrapper-root > .mantine-InputWrapper-label,
   .workbench .workspace-inputs :is(.record-row, .seating-row, .pair-row) > :first-child {
-    color: var(--fg);
+    color: var(--ink);
     font-weight: 400;
   }
 
@@ -6300,7 +6271,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
   .workbench .panel-column > .burn-figure {
     padding: 0.25rem 0.5rem;
-    border: 1px solid var(--border);
+    border: 1px solid var(--line);
   }
 }
 
@@ -6338,7 +6309,7 @@ main .library-head.page-panel-head > .page-panel-title {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    border: 1px solid var(--border);
+    border: 1px solid var(--line);
   }
 
   .workbench .figure-host .figure-head {
@@ -6347,7 +6318,7 @@ main .library-head.page-panel-head > .page-panel-title {
     align-items: center;
     height: 2rem;
     padding: 0 0.25rem;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--line);
     background: var(--surface);
   }
 
@@ -6515,7 +6486,7 @@ main .library-head.page-panel-head > .page-panel-title {
   height: 0.25rem;
   margin: 0;
   overflow: hidden;
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   background: var(--surface);
 }
 
@@ -6552,7 +6523,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .limits-popover table.limits th {
-  border-bottom-color: var(--border);
+  border-bottom-color: var(--line);
   color: var(--muted);
   font-size: var(--mantine-font-size-xs);
   font-weight: 600;
@@ -6568,7 +6539,7 @@ main .library-head.page-panel-head > .page-panel-title {
   position: relative;
   height: 2.75rem;
   margin: 0.25rem 0.5rem 0;
-  background: linear-gradient(var(--border), var(--border)) 0 50% / 100% 6px no-repeat;
+  background: linear-gradient(var(--line), var(--line)) 0 50% / 100% 6px no-repeat;
   font-size: var(--mantine-font-size-xs);
 }
 
@@ -6588,14 +6559,14 @@ main .library-head.page-panel-head > .page-panel-title {
   width: 2px;
   height: 18px;
   margin-left: -1px;
-  background: var(--fg);
+  background: var(--ink);
 }
 
 .limit-range-limit {
   top: calc(50% - 13px);
   height: 26px;
   margin-left: -1px;
-  border-left: 2px dashed var(--warn-fg);
+  border-left: 2px dashed var(--warn-text);
 }
 
 .limit-range-text {
@@ -6616,7 +6587,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .limit-range-name {
-  color: var(--warn-fg);
+  color: var(--warn-text);
   font-weight: 600;
 }
 
@@ -6679,7 +6650,7 @@ main .library-head.page-panel-head > .page-panel-title {
     min-height: 2.25rem;
     padding: 0.375rem 0;
     border: 0;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--line);
     background: none;
   }
 
@@ -6805,8 +6776,8 @@ main .library-head.page-panel-head > .page-panel-title {
     min-width: 0;
     min-height: 3.75rem;
     padding: 0.3125rem 0.5rem 0.375rem;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--line);
+    background: var(--page);
   }
 
   /* the peak pressure's value keeps its width and 0.5 rem before the range, in any font: the
@@ -6922,7 +6893,7 @@ main .library-head.page-panel-head > .page-panel-title {
     grid-area: burn;
     min-width: 0;
     padding: 0.25rem 0.5rem;
-    border: 1px solid var(--border);
+    border: 1px solid var(--line);
   }
 
   .workbench .burn-figure h3 {
@@ -6949,8 +6920,8 @@ main .library-head.page-panel-head > .page-panel-title {
     gap: 0.3125rem;
     height: 1.75rem;
     padding: 0 0.5625rem;
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--line);
+    background: var(--page);
     font-size: var(--mantine-font-size-sm);
   }
 
@@ -6965,7 +6936,7 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 
   .workbench .ladder-cells > .ladder-cell:has(.flag) {
-    border-color: var(--warn-fg);
+    border-color: var(--warn-text);
   }
 
   /* the flag's icon leads the chip */
@@ -6978,7 +6949,7 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 
   .workbench .ladder-cells > .ladder-cell:has(input:focus-visible) {
-    outline: 2px solid var(--focus);
+    outline: 2px solid var(--accent);
     outline-offset: 1px;
   }
 
@@ -6990,7 +6961,7 @@ main .library-head.page-panel-head > .page-panel-title {
   .workbench .result-tabbar {
     height: 2.125rem;
     padding: 0 0.25rem;
-    border: 1px solid var(--border);
+    border: 1px solid var(--line);
     background: var(--surface);
   }
 
@@ -7014,12 +6985,12 @@ main .library-head.page-panel-head > .page-panel-title {
   .workbench .result-tablist .mantine-Tabs-tab[data-active] {
     border-bottom-color: var(--mantine-primary-color-filled);
     background: none;
-    color: var(--fg);
+    color: var(--ink);
   }
 
   .workbench .result-tabs > .workbench-centre > [role="tabpanel"] {
     padding: 0.375rem 0.5rem 0.5rem;
-    border: 1px solid var(--border);
+    border: 1px solid var(--line);
     border-top: 0;
   }
 
@@ -7162,7 +7133,7 @@ main .record-sources .sources th.source-page {
   }
 
   .record-sources .sources :is(tr + tr, tbody + tbody) {
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--line);
   }
 
   main .record-sources .sources :is(th, td) {
@@ -7185,7 +7156,7 @@ main .record-sources .sources th.source-page {
 
 .source-title {
   display: block;
-  color: var(--fg);
+  color: var(--ink);
 }
 
 .source-meta {
@@ -7611,7 +7582,7 @@ main :is(.symbol-table, .coefficient-table, .record-sources .sources) {
     position: sticky;
     left: 0;
     z-index: 1;
-    background: var(--bg);
+    background: var(--page);
   }
 }
 
@@ -7797,10 +7768,10 @@ main .field-table tr.field-group > th {
 @media screen {
   .side-body > .scroll {
     background:
-      linear-gradient(var(--bg) 30%, color-mix(in srgb, var(--bg) 0%, transparent)) top / 100%
+      linear-gradient(var(--page) 30%, color-mix(in srgb, var(--page) 0%, transparent)) top / 100%
       1.5rem no-repeat local,
-      linear-gradient(color-mix(in srgb, var(--bg) 0%, transparent), var(--bg) 70%) bottom / 100%
-      1.5rem no-repeat local,
+      linear-gradient(color-mix(in srgb, var(--page) 0%, transparent), var(--page) 70%) bottom /
+      100% 1.5rem no-repeat local,
       radial-gradient(
         farthest-side at 50% 0,
         color-mix(in srgb, var(--muted) 35%, transparent),
@@ -8037,8 +8008,8 @@ main .field-table tr.field-group > th {
   align-items: center;
   gap: 0.375rem;
   padding: 0.375rem 0.5rem;
-  border: 1px solid var(--border);
-  background: var(--bg);
+  border: 1px solid var(--line);
+  background: var(--page);
 }
 
 .fact-icon {
@@ -8196,7 +8167,7 @@ main .field-table tr.field-group > th {
 :is(.fact, .standard-facts) .flag {
   width: auto;
   height: 0.875em;
-  box-shadow: 0 0 0 1px var(--border);
+  box-shadow: 0 0 0 1px var(--line);
 }
 
 @media print {
@@ -8722,18 +8693,18 @@ main .field-table tr.field-group > th {
 }
 
 .message[data-severity="info"] {
-  --message-bg: var(--info-bg);
-  --message-fg: var(--info-fg);
+  --message-bg: var(--info-fill);
+  --message-fg: var(--info-text);
 }
 
 .message[data-severity="warning"] {
-  --message-bg: var(--warn-bg);
-  --message-fg: var(--warn-fg);
+  --message-bg: var(--warn-fill);
+  --message-fg: var(--warn-text);
 }
 
 .message[data-severity="error"] {
-  --message-bg: var(--error-bg);
-  --message-fg: var(--error-fg);
+  --message-bg: var(--error-fill);
+  --message-fg: var(--error-text);
 }
 
 .message .mantine-Alert-wrapper {
@@ -8901,7 +8872,7 @@ main .field-table tr.field-group > th {
 
 .settings-foot {
   padding: 0.5rem var(--mantine-spacing-md) var(--mantine-spacing-md);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--line);
 }
 
 /* workbench defaults: the label and its note left, the field right */
@@ -8955,7 +8926,7 @@ main .field-table tr.field-group > th {
 }
 
 .drop-zone:has(input:focus-visible) {
-  outline: 3px solid var(--focus);
+  outline: 3px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -9134,7 +9105,7 @@ main .session-shots th:nth-child(-n + 2) {
   position: sticky;
   top: 0;
   z-index: 1;
-  background: var(--bg);
+  background: var(--page);
 }
 
 .session-string {
@@ -9303,8 +9274,8 @@ main .session-shots th:nth-child(-n + 2) {
   margin: 0;
   padding: 0.125rem 0.5rem;
   overflow: hidden;
-  background: var(--bg);
-  color: var(--fg);
+  background: var(--page);
+  color: var(--ink);
   font-size: var(--mantine-font-size-sm);
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -9330,8 +9301,8 @@ main .session-shots th:nth-child(-n + 2) {
   gap: 0.5rem;
   width: min(22rem, calc(100% - 1rem));
   padding: 0.75rem 1rem;
-  border: 1px solid var(--border);
-  background: var(--bg);
+  border: 1px solid var(--line);
+  background: var(--page);
   font-size: var(--mantine-font-size-sm);
   text-align: center;
   transform: translate(-50%, -50%);
@@ -9381,13 +9352,13 @@ main .session-shots th:nth-child(-n + 2) {
 .target-summary {
   flex: none;
   padding-top: 0.25rem;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--line);
 }
 
 .target-stage {
   position: relative;
   min-height: 10rem;
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   background: var(--surface);
 }
 
@@ -9490,7 +9461,7 @@ main .session-shots th:nth-child(-n + 2) {
 .target-canvas text {
   fill: currentColor;
   paint-order: stroke;
-  stroke: var(--bg);
+  stroke: var(--page);
   /* of the font size (11 screen px), so the halo stays about 3 screen px at any zoom */
   stroke-width: 0.3em;
   font-weight: 600;
@@ -9531,7 +9502,7 @@ main .session-shots th:nth-child(-n + 2) {
 }
 
 .target-canvas .refs .handle {
-  fill: var(--bg);
+  fill: var(--page);
   stroke-width: 2px;
   cursor: move;
 }
@@ -9555,18 +9526,18 @@ main .session-shots th:nth-child(-n + 2) {
 }
 
 .target-canvas .axes line {
-  stroke: var(--fg);
+  stroke: var(--ink);
   stroke-width: 1px;
   vector-effect: non-scaling-stroke;
 }
 
 .target-canvas .axes text {
-  fill: var(--fg);
+  fill: var(--ink);
 }
 
 .target-canvas .drawn-target :is(circle, line) {
   fill: none;
-  stroke: var(--border);
+  stroke: var(--line);
   stroke-width: 1px;
 }
 
@@ -9576,14 +9547,14 @@ main .session-shots th:nth-child(-n + 2) {
 
 .target-canvas .loupe-halo {
   fill: none;
-  stroke: var(--bg);
+  stroke: var(--page);
   stroke-width: 4px;
   vector-effect: non-scaling-stroke;
 }
 
 .target-canvas .loupe-ring {
   fill: none;
-  stroke: var(--fg);
+  stroke: var(--ink);
   stroke-width: 1.5px;
   vector-effect: non-scaling-stroke;
 }
@@ -9606,17 +9577,17 @@ main .session-shots th:nth-child(-n + 2) {
 }
 
 .target-canvas .detect-corner {
-  fill: var(--bg);
+  fill: var(--page);
   stroke-dasharray: none;
 }
 
 .target-canvas .proposal {
   fill: transparent;
-  stroke: var(--fg);
+  stroke: var(--ink);
   stroke-width: 2px;
   stroke-dasharray: 4 3;
   vector-effect: non-scaling-stroke;
-  filter: drop-shadow(0 0 1.5px var(--bg));
+  filter: drop-shadow(0 0 1.5px var(--page));
   cursor: grab;
 }
 
@@ -9633,14 +9604,14 @@ main .session-shots th:nth-child(-n + 2) {
 }
 
 .target-canvas .proposal-label {
-  fill: var(--fg);
+  fill: var(--ink);
   pointer-events: none;
 }
 
 /* an area detection does not count: the user places its shots by hand */
 .target-canvas .detect-flag rect {
-  fill: color-mix(in srgb, var(--warn-fg) 12%, transparent);
-  stroke: var(--warn-fg);
+  fill: color-mix(in srgb, var(--warn-text) 12%, transparent);
+  stroke: var(--warn-text);
   stroke-width: 2px;
   stroke-dasharray: 6 3;
   vector-effect: non-scaling-stroke;
@@ -9649,7 +9620,7 @@ main .session-shots th:nth-child(-n + 2) {
 }
 
 .target-canvas .detect-flag-label {
-  fill: var(--warn-fg);
+  fill: var(--warn-text);
   pointer-events: none;
 }
 
@@ -9671,7 +9642,7 @@ main .session-shots th:nth-child(-n + 2) {
 
 /* a drawn target shows the face, its aiming black under the rings, instead of the plain rings */
 .target-canvas .face-rings .face-black {
-  fill: color-mix(in srgb, var(--fg) 14%, transparent);
+  fill: color-mix(in srgb, var(--ink) 14%, transparent);
   stroke: none;
 }
 
@@ -9779,7 +9750,7 @@ main .session-shots th:nth-child(-n + 2) {
   text-overflow: ellipsis;
   white-space: nowrap;
   padding: 0 0.25rem;
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   background: none;
   color: inherit;
   font: inherit;
@@ -9790,7 +9761,7 @@ main .session-shots th:nth-child(-n + 2) {
 .detect-steps button[aria-current="step"] {
   border-color: var(--link);
   background: var(--link);
-  color: var(--bg);
+  color: var(--page);
 }
 
 /* as tall as the tallest step (Review, its help in the 17rem column), so Back and Next stay put */
@@ -9820,8 +9791,8 @@ main .session-shots th:nth-child(-n + 2) {
   display: flex;
   flex-direction: column;
   padding: 0.25rem 0.5rem;
-  border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--page) 88%, transparent);
   font-size: var(--mantine-font-size-xs);
   cursor: move;
   touch-action: none;
@@ -9839,9 +9810,9 @@ main .session-shots th:nth-child(-n + 2) {
   min-width: 1.75rem;
   height: 1.75rem;
   padding: 0 0.25rem;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--fg);
+  border: 1px solid var(--line);
+  background: var(--page);
+  color: var(--ink);
   font-size: var(--mantine-font-size-sm);
 }
 
@@ -9854,14 +9825,14 @@ main .session-shots th:nth-child(-n + 2) {
   padding: 0.125rem 0.5rem;
   /* left of the zoom buttons (about 6.25rem); a long note wraps upward */
   max-width: calc(100% - 7rem);
-  background: var(--bg);
+  background: var(--page);
   font-size: var(--mantine-font-size-sm);
 }
 
 :is(.target-side, .prop-form, .target-summary) .prop-head {
   margin: 0.5rem 0 0.25rem;
   padding-bottom: 0.125rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--line);
   font-size: var(--mantine-font-size-sm);
   font-weight: 600;
 }
@@ -9943,7 +9914,7 @@ main .session-shots th:nth-child(-n + 2) {
 .prop-grid :is(.mantine-InputWrapper-label[title], .prop-label[title]),
 .side-row > .prop-label[title] {
   cursor: help;
-  text-decoration: underline dotted color-mix(in srgb, var(--fg) 35%, var(--bg));
+  text-decoration: underline dotted color-mix(in srgb, var(--ink) 35%, var(--page));
   text-underline-offset: 0.2em;
 }
 
@@ -9985,7 +9956,7 @@ main .session-shots th:nth-child(-n + 2) {
   width: 100%;
   height: 1.5rem;
   padding: 0;
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   background: none;
 }
 
@@ -10012,7 +9983,7 @@ main .session-shots th:nth-child(-n + 2) {
   padding: 0 0.25rem;
   border: 1px solid transparent;
   background: none;
-  color: var(--fg);
+  color: var(--ink);
   font: inherit;
   font-size: var(--mantine-font-size-xs);
   text-align: left;
@@ -10020,12 +9991,12 @@ main .session-shots th:nth-child(-n + 2) {
 }
 
 .group-item:focus-visible {
-  outline: 2px solid var(--focus);
+  outline: 2px solid var(--accent);
   outline-offset: -2px;
 }
 
 .group-item[aria-checked="true"] {
-  border-color: var(--border);
+  border-color: var(--line);
   background: var(--surface);
   font-weight: 600;
 }
@@ -10061,11 +10032,11 @@ main .session-shots th:nth-child(-n + 2) {
 }
 
 .swatch-card[aria-checked="true"] {
-  border-color: var(--fg);
+  border-color: var(--ink);
 }
 
 .swatch-card:focus-visible {
-  outline: 2px solid var(--focus);
+  outline: 2px solid var(--accent);
   outline-offset: 1px;
 }
 
@@ -10187,7 +10158,7 @@ main .session-shots th:nth-child(-n + 2) {
   padding: 0 0.25rem;
   /* rules between rows only, as the record tables */
   border: 0;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--line);
   text-align: right;
 }
 
@@ -10213,9 +10184,9 @@ main .session-shots th:nth-child(-n + 2) {
   width: 5rem;
   height: 1.375rem;
   padding: 0 0.25rem;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--fg);
+  border: 1px solid var(--line);
+  background: var(--page);
+  color: var(--ink);
   font: inherit;
   text-align: right;
 }
@@ -10296,8 +10267,8 @@ main .session-shots th:nth-child(-n + 2) {
   left: 0;
   display: flex;
   flex-direction: column;
-  border-top: 1px solid var(--border);
-  background: var(--bg);
+  border-top: 1px solid var(--line);
+  background: var(--page);
 }
 
 /* the panels open: the photo fits the width above them, and the page scrolls */
@@ -10317,7 +10288,7 @@ main .session-shots th:nth-child(-n + 2) {
 
 .target-sheet[data-open] {
   height: 55%;
-  box-shadow: 0 -4px 12px color-mix(in srgb, var(--fg) 15%, transparent);
+  box-shadow: 0 -4px 12px color-mix(in srgb, var(--ink) 15%, transparent);
 }
 
 .sheet-strip {
@@ -10329,7 +10300,7 @@ main .session-shots th:nth-child(-n + 2) {
   padding: 0 0.5rem;
   border: 0;
   background: var(--surface);
-  color: var(--fg);
+  color: var(--ink);
   font: inherit;
   font-size: var(--mantine-font-size-sm);
   text-align: left;
@@ -10532,7 +10503,7 @@ main .session-shots th:nth-child(-n + 2) {
   z-index: 200;
   inset: 0;
   padding: 0.5rem;
-  background: var(--bg);
+  background: var(--page);
 }
 
 /* notes, exports and the print sheet of shot groups */
@@ -10541,7 +10512,7 @@ main .session-shots th:nth-child(-n + 2) {
 }
 
 .target-canvas .note-box {
-  fill: color-mix(in srgb, var(--bg) 88%, transparent);
+  fill: color-mix(in srgb, var(--page) 88%, transparent);
   stroke: currentColor;
   stroke-width: 1px;
   vector-effect: non-scaling-stroke;
@@ -10556,12 +10527,12 @@ main .session-shots th:nth-child(-n + 2) {
 }
 
 .target-canvas .sheet-note:focus-visible .note-box {
-  stroke: var(--focus);
+  stroke: var(--accent);
   stroke-width: 3px;
 }
 
 .target-canvas .note-text {
-  fill: var(--fg);
+  fill: var(--ink);
   stroke: none;
   font-weight: 500;
 }
@@ -10692,7 +10663,7 @@ main .session-shots th:nth-child(-n + 2) {
   min-width: 0;
   height: 2.5rem;
   margin: 0.25rem 0 0.5rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--line);
 }
 
 .page-bar-title {
@@ -10792,7 +10763,7 @@ main .page-bar h1 {
 .page-bar-status:has(> .bar-count) > .file-status:has(> :not(:empty)) {
   margin-inline-start: 0.75rem;
   padding-inline-start: 0.75rem;
-  border-inline-start: 1px solid var(--border);
+  border-inline-start: 1px solid var(--line);
 }
 
 .page-bar-actions {
@@ -10931,7 +10902,7 @@ main .page-bar h1 {
     align-items: stretch;
     min-width: 12rem;
     padding: 0.5rem;
-    border: 1px solid var(--border);
+    border: 1px solid var(--line);
     background: var(--mantine-color-body);
     box-shadow: var(--mantine-shadow-sm);
   }
@@ -11035,7 +11006,7 @@ main .page-bar h1 {
     gap: 0.25rem;
     min-width: 12rem;
     padding: 0.5rem;
-    border: 1px solid var(--border);
+    border: 1px solid var(--line);
     background: var(--mantine-color-body);
     box-shadow: var(--mantine-shadow-sm);
   }
@@ -11267,8 +11238,8 @@ main .page-bar h1 {
   max-width: 100%;
   padding: 0 0.125rem 0 0.5rem;
   border: 1px solid var(--link);
-  background: color-mix(in srgb, var(--link) 8%, var(--bg));
-  color: var(--fg);
+  background: color-mix(in srgb, var(--link) 8%, var(--page));
+  color: var(--ink);
   font-size: var(--mantine-font-size-xs);
 }
 
@@ -11282,17 +11253,17 @@ main .page-bar h1 {
 .directory-filters > .source-filter[data-set],
 .directory-filters > .sort-select .mantine-Input-input[placeholder]:not(:placeholder-shown) {
   border-color: var(--link);
-  background: color-mix(in srgb, var(--link) 8%, var(--bg));
+  background: color-mix(in srgb, var(--link) 8%, var(--page));
 }
 
 /* its look is the Source button's: the page background and the text colour, also as placeholder */
 .directory-filters > .sort-select .mantine-Input-input {
-  background: var(--bg);
-  color: var(--fg);
+  background: var(--page);
+  color: var(--ink);
 }
 
 .directory-filters > .sort-select .mantine-Input-input::placeholder {
-  color: var(--fg);
+  color: var(--ink);
   opacity: 1;
 }
 
@@ -11321,7 +11292,7 @@ main .page-bar h1 {
 
 .list-skeleton-head {
   height: 2.5rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--muted) 55%, var(--border));
+  border-bottom: 1px solid color-mix(in srgb, var(--muted) 55%, var(--line));
   background: var(--surface);
 }
 
@@ -11330,7 +11301,7 @@ main .page-bar h1 {
   align-items: center;
   height: 2rem;
   padding: 0 0.5rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--line);
 }
 
 /* the rows picked for Compare, also those a filter hides: "2 selected (max 4)" and Clear in the
@@ -11428,7 +11399,7 @@ main .page-bar h1 {
   padding: 0 0.5rem;
   border-width: 0 0 1px;
   border-style: solid;
-  border-color: var(--border);
+  border-color: var(--line);
   vertical-align: middle;
   text-align: left;
   white-space: nowrap;
@@ -11449,7 +11420,7 @@ main .page-bar h1 {
   z-index: 1;
   height: 2.5rem;
   padding-block: 0.25rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--muted) 55%, var(--border));
+  border-bottom: 1px solid color-mix(in srgb, var(--muted) 55%, var(--line));
   background: var(--surface);
   color: var(--muted);
   font-size: var(--mantine-font-size-xs);
@@ -11460,7 +11431,7 @@ main .page-bar h1 {
 }
 
 .directory-table thead th[aria-sort] {
-  color: var(--fg);
+  color: var(--ink);
 }
 
 .directory-table .sort-button {
@@ -11472,7 +11443,7 @@ main .page-bar h1 {
 }
 
 .directory-table .sort-button:hover {
-  color: var(--fg);
+  color: var(--ink);
 }
 
 .directory-table .th-label {
@@ -11498,7 +11469,7 @@ main .page-bar h1 {
 }
 
 .directory-table th .sort-mark[data-dir] {
-  color: var(--fg);
+  color: var(--ink);
   opacity: 1;
 }
 
@@ -11515,7 +11486,7 @@ main .page-bar h1 {
   }
 
   .directory-table col[data-sorted] {
-    background: color-mix(in srgb, var(--fg) 3%, var(--bg));
+    background: color-mix(in srgb, var(--ink) 3%, var(--page));
   }
 }
 
@@ -11555,7 +11526,7 @@ main .page-bar h1 {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: var(--fg);
+  color: var(--ink);
   font-weight: 600;
   text-decoration: none;
   text-underline-offset: 0.2em;
@@ -11588,8 +11559,8 @@ main .page-bar h1 {
 .directory-table :is(th, td).sticky-end {
   position: sticky;
   right: 0;
-  background: var(--bg);
-  box-shadow: inset 1px 0 0 var(--border);
+  background: var(--page);
+  box-shadow: inset 1px 0 0 var(--line);
 }
 
 .directory-table thead :is(th, td).sticky-end {
@@ -11604,16 +11575,16 @@ main .page-bar h1 {
 /* a group of rows ends: the heavier rule of the record's tables (the browser's own rows end before
    the catalogue's) */
 .directory-table tr[data-break] > td {
-  border-top: 2px solid color-mix(in srgb, var(--muted) 55%, var(--border));
+  border-top: 2px solid color-mix(in srgb, var(--muted) 55%, var(--line));
 }
 
 @media screen {
   .directory-table tr[data-picked] {
-    background: color-mix(in srgb, var(--link) 12%, var(--bg));
+    background: color-mix(in srgb, var(--link) 12%, var(--page));
   }
 
   .directory-table tr[data-picked]:hover {
-    background: color-mix(in srgb, var(--link) 18%, var(--bg));
+    background: color-mix(in srgb, var(--link) 18%, var(--page));
   }
 
   .directory-table .select-cell input {
@@ -11761,7 +11732,7 @@ main .page-bar h1 {
       inset -2px 0 0 var(--link),
       inset 0 2px 0 var(--link),
       inset 0 -2px 0 var(--link),
-      inset 1px 0 0 var(--border);
+      inset 1px 0 0 var(--line);
   }
 
   .directory-table tr[data-row]:has(> td.sticky-end) td.name-cell a:focus-visible::after {
@@ -11818,8 +11789,8 @@ main .page-bar h1 {
 /* an unchecked row box has the field border (3:1): the native one is nearly invisible in dark */
 .directory-table td .row-action input:not(:checked, :disabled) {
   box-sizing: border-box;
-  border: 1px solid var(--input-border);
-  background: var(--bg);
+  border: 1px solid var(--control-line);
+  background: var(--page);
   appearance: none;
 }
 
@@ -12163,7 +12134,7 @@ main .compare-table {
     left: 2.5rem;
     z-index: 1;
     width: 7.5rem;
-    background: var(--bg);
+    background: var(--page);
   }
 }
 
@@ -12214,8 +12185,8 @@ main .page-panel-head > .page-panel-title {
 @media screen and (min-width: 48em) {
   :is(.page-panel, .designer .workspace-results, .library-list, .library-editor) {
     padding: 0 var(--panel-pad) var(--panel-pad);
-    border: 1px solid var(--border);
-    background: var(--bg);
+    border: 1px solid var(--line);
+    background: var(--page);
   }
 
   .page-panel.page-panel-flush {
@@ -12229,7 +12200,7 @@ main .page-panel-head > .page-panel-title {
   .page-panel > .page-panel-head {
     margin: 0 calc(-1 * var(--panel-pad)) 0.25rem;
     padding: 0 var(--panel-pad);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--line);
   }
 
   :is(.designer .workspace-results, .library-list, .library-editor) {
@@ -12525,7 +12496,7 @@ main .cartridge-values td.dim-slot-cell {
 
 /* the groups are one tbody each (named for a screen reader): a heavier rule above the next group */
 .side-values tbody + tbody > tr:first-child > :is(th, td) {
-  border-top: 2px solid color-mix(in srgb, var(--muted) 55%, var(--border));
+  border-top: 2px solid color-mix(in srgb, var(--muted) 55%, var(--line));
 }
 
 /* the linked hover: colour only, so nothing reflows; screen only and without transition */
@@ -12594,7 +12565,7 @@ main .cartridge-values td.dim-slot-cell {
   z-index: 1;
   margin: 0;
   padding: 0 0.25rem;
-  background: var(--bg);
+  background: var(--page);
 }
 
 @media screen and (min-width: 62em) {
@@ -12785,7 +12756,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
   flex-direction: column;
   min-width: 0;
   min-height: 0;
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
 }
 
 .bd-head,
@@ -12797,7 +12768,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 }
 
 .bd-head {
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--line);
   background: var(--surface);
   color: var(--muted);
   font-size: var(--mantine-font-size-xs);
@@ -12813,7 +12784,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 
 .bd-row {
   cursor: pointer;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--line);
   font-size: var(--mantine-font-size-sm);
 }
 
@@ -12839,7 +12810,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
   flex: 0 0 15rem;
   overflow-y: auto;
   padding: 0.5rem 0.75rem;
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   font-size: var(--mantine-font-size-sm);
 }
 
@@ -12976,7 +12947,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 
 /* the string whose charge the model cannot run, named in the refusal */
 .powder-tune .string-fault td {
-  background: var(--warn-bg);
+  background: var(--warn-fill);
 }
 
 /* the pressure range's label: neutral, no traffic-light colour, which would read as a verdict */
@@ -12984,7 +12955,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
   display: inline-block;
   margin: 0.5rem 0 0;
   padding: 0.125rem 0.5rem;
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   border-radius: 4px;
   background: var(--surface);
   font-weight: 600;
@@ -13004,7 +12975,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
   gap: 0.5rem;
   max-width: 40rem;
   margin: 0.5rem 0;
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   border-radius: 4px;
   justify-items: stretch;
 }
@@ -13042,7 +13013,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 .tune-chart {
   display: block;
   font-size: var(--mantine-font-size-xs);
-  fill: var(--fg);
+  fill: var(--ink);
 }
 
 .tune-legend {
@@ -13063,16 +13034,16 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 
 .tune-swatch {
   flex: none;
-  fill: var(--fg);
+  fill: var(--ink);
 }
 
 /* a share of the text colour: visible on the light and the dark background alike */
 :is(.tune-chart, .tune-swatch) .ladder-range {
-  fill: color-mix(in srgb, var(--fg) 12%, transparent);
+  fill: color-mix(in srgb, var(--ink) 12%, transparent);
 }
 
 .tune-chart .grid {
-  stroke: var(--border);
+  stroke: var(--line);
 }
 
 :is(.tune-chart, .tune-swatch) .band {
@@ -13087,7 +13058,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 }
 
 :is(.tune-chart, .tune-swatch) .measured line {
-  stroke: var(--fg);
+  stroke: var(--ink);
   stroke-width: 1.5;
 }
 
@@ -13133,15 +13104,15 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 /* the page tour's popover (driver.js) in the app's colours, light and dark */
 .driver-popover.tour-popover {
   font-family: inherit;
-  color: var(--fg);
-  background: var(--bg);
-  border: 1px solid var(--border);
+  color: var(--ink);
+  background: var(--page);
+  border: 1px solid var(--line);
   border-radius: 0;
 }
 
 .tour-popover :is(.driver-popover-title, .driver-popover-description) {
   font-family: inherit;
-  color: var(--fg);
+  color: var(--ink);
 }
 
 .tour-popover .driver-popover-progress-text {
@@ -13152,14 +13123,14 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
   font: inherit;
   font-size: var(--mantine-font-size-sm);
   text-shadow: none;
-  color: var(--fg);
+  color: var(--ink);
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   border-radius: 0;
 }
 
 .tour-popover :is(.driver-popover-footer button, .driver-popover-close-btn):focus-visible {
-  outline: 2px solid var(--focus);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -13168,5 +13139,5 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 }
 
 .tour-popover .driver-popover-arrow {
-  border-color: var(--bg);
+  border-color: var(--page);
 }

@@ -228,6 +228,9 @@ importers:
       '@open-reloading/catalog':
         specifier: workspace:*
         version: link:../../packages/catalog
+      '@open-reloading/design-tokens':
+        specifier: workspace:*
+        version: link:../../packages/design-tokens
       '@open-reloading/drawing':
         specifier: workspace:*
         version: link:../../packages/drawing

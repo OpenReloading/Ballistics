@@ -9,7 +9,7 @@ const repoRoot = path.join(webRoot, '../..')
 /** Files whose change feeds the web build: without one, only the checks and the jobs of `e2eInputs` run. */
 const webInputs = [
   /^apps\/web\//,
-  /^packages\/(units|locale-format|statistics|ballistics|shot-groups|schema|importers|drawing|catalog|use-cases|api)\//,
+  /^packages\/(units|locale-format|statistics|ballistics|shot-groups|schema|importers|drawing|catalog|use-cases|api|design-tokens)\//,
   // the catalog reader that writes the bundle the API serves
   /^tools\/src\/catalog\//,
   /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|tsconfig\.base\.json|\.nvmrc)$/,

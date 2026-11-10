@@ -1880,7 +1880,7 @@ function CalibrateTool({ ed }: { ed: Ed }) {
           disabled={!unscaled}
           size={9}
           offset={3}
-          color="var(--warn-fg)"
+          color="var(--warn-text)"
           withBorder
           className="tool-indicator"
           data-unscaled={unscaled || undefined}

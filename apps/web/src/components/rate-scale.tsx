@@ -50,7 +50,7 @@ export function RateBar({
             return `M${x(domain, t).toFixed(1)} ${major ? 4 : 10}V${major ? 24 : 18}`
           })
           .join('')}
-        stroke="var(--border)"
+        stroke="var(--line)"
         strokeWidth="1"
         fill="none"
       />
@@ -69,7 +69,7 @@ export function RateBar({
         cy="14"
         r="4"
         fill="var(--link)"
-        stroke="var(--bg)"
+        stroke="var(--page)"
         strokeWidth="2"
       />
     </svg>

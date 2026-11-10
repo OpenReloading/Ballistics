@@ -19,9 +19,9 @@ type Tokens = Record<'muted' | 'border' | 'bg' | 'fg' | `${number}`, string>
 
 const vivacityTokens: Tokens = {
   muted: '--muted',
-  border: '--border',
-  bg: '--bg',
-  fg: '--fg',
+  border: '--line',
+  bg: '--page',
+  fg: '--ink',
   ...Object.fromEntries([1, 2, 3, 4, 5, 6].map((k) => [k, `--series-${k}`])),
 }
 
