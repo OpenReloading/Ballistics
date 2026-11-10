@@ -94,7 +94,8 @@ export const theme = {
     "dark": 4
   },
   "white": "#ffffff",
-  "black": "#10121b"
+  "black": "#10121b",
+  "respectReducedMotion": true
 } as const
 
 /** The scheme colors Mantine derives from its own palette, set to the tokens: for `cssVariablesResolver`. */

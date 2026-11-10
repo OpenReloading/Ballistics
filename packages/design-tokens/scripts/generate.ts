@@ -159,6 +159,8 @@ function mantineTheme(tokens: TokenNormalizedSet, colors: Colors) {
     // no autoContrast: Mantine picks its text from the light shade in both schemes; the scheme's accent text is --mantine-primary-color-contrast (below), which `ui` gives the filled controls
     white: colors.light['on-accent'],
     black: colors.dark['on-accent'],
+    // Mantine's default is false: transitions would run under prefers-reduced-motion
+    respectReducedMotion: true,
   }
 }
 
