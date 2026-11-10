@@ -104,6 +104,99 @@ describe('verify with --params fit-on-training', () => {
   })
 })
 
+describe('a model that refuses a load by throwing', () => {
+  it('lists the powder and goes on', async () => {
+    const refusing = new URL('./fixtures/refusing-model.mjs', import.meta.url).pathname
+    const r = await fit(options, refusing)
+    expect(r.notFitted[dp40]).toBeTypeOf('string')
+  })
+})
+
+// each run fits every powder at seven exponents
+describe('fit --exponent family', { timeout: 120_000 }, () => {
+  /** The fixture records with the pressure exponent and the burn coefficient of each powder of `truth` replaced. */
+  const plant = (truth: Record<string, [number, number]>) => ({
+    ...records,
+    powders: new Map(
+      [...records.powders].map(([id, p]) => {
+        const [n, value] = truth[id] ?? []
+        if (n === undefined || value === undefined || !p.interior) return [id, p]
+        const interior = { ...p.interior, pressureExponent: n, vivacity: { value } }
+        return [id, { ...p, interior }]
+      }),
+    ),
+  })
+  /** Burn coefficients at the exponent 0.8, near the record value times (2000 bar / reference pressure)^0.2. */
+  const at08: Record<string, number> = {
+    'demo-powder-dp15': 14.7,
+    'demo-powder-dp30': 3.95,
+    'demo-powder-dp40': 2.81,
+    'demo-powder-dp70': 1.75,
+    'demo-powder-sp20': 2.3,
+    'demo-powder-sp21': 2.4,
+    'demo-powder-sp22': 2.2,
+    'demo-powder-sp25': 2.75,
+  }
+  /** Rows of `powder` in `cartridge` at `charges`. */
+  const ladder = (powder: string, cartridge: string, charges: number[]) =>
+    charges.map((charge) => ({ cartridge, powder, charge, velocity: 0 }))
+  /** Three charges in each of two training cartridges per powder, and two validation rows. */
+  const specs = Object.keys(at08).flatMap((powder) => {
+    const charges = powder === 'demo-powder-dp15' ? [1.0, 1.4, 1.8] : [1.4, 1.8, 2.2]
+    return [
+      ...ladder(powder, '30-br', charges),
+      ...ladder(powder, '308-match', charges),
+      ...ladder(powder, '308-win', [1.2, 1.6]),
+    ]
+  })
+  const truth = plant(Object.fromEntries(Object.entries(at08).map(([id, b]) => [id, [0.8, b]])))
+  const rows = writeRows(rowsCsv(specs, truth))
+
+  it('finds the planted exponent and burn coefficients', async () => {
+    const r = await fit({ ...options, rows, exponent: 'family' })
+    expect(r.exponent?.pooled).toBe(0.8)
+    expect(Object.values(r.exponent?.families ?? {}).map((f) => f.exponent)).toEqual([
+      0.8, 0.8, 0.8, 0.8, 0.8,
+    ])
+    for (const [id, b] of Object.entries(at08)) {
+      expect(r.powders[id]?.pressureExponent).toBe(0.8)
+      expect(r.powders[id]?.vivacity.value.toPrecision(4)).toBe(b.toPrecision(4))
+    }
+    expect(r.notFitted).toEqual({})
+  })
+
+  it('evaluates the validation split at the fitted exponent and burn coefficient', async () => {
+    const chosen = await verify({ ...options, rows, params: 'fit-on-training', exponent: 'family' })
+    expect(chosen.overall.velocity?.median).toBeCloseTo(0, 6)
+    const record = await verify({ ...options, rows, params: 'fit-on-training' })
+    expect(record.overall.velocity?.median).toBeGreaterThan(0.001)
+  })
+
+  it('pulls a family of one powder with two rows toward the pooled exponent', async () => {
+    const dp15 = ladder('demo-powder-dp15', '30-br', [1.0, 1.4])
+    const others = Object.keys(at08)
+      .filter((id) => id !== 'demo-powder-dp15')
+      .flatMap((powder) => [
+        ...ladder(powder, '30-br', [1.4, 1.8, 2.2]),
+        ...ladder(powder, '308-match', [1.4, 1.8, 2.2]),
+      ])
+    const truth = plant({ 'demo-powder-dp15': [0.8, 14.7] })
+    const all = await fit({
+      ...options,
+      rows: writeRows(rowsCsv([...dp15, ...others], truth)),
+      exponent: 'family',
+    })
+    expect(all.exponent?.families['double/flake']?.exponent).toBe(1)
+    expect(all.exponent?.pooled).toBe(1)
+    const alone = await fit({
+      ...options,
+      rows: writeRows(rowsCsv(dp15, truth)),
+      exponent: 'family',
+    })
+    expect(alone.exponent?.families['double/flake']?.exponent).toBe(0.8)
+  })
+})
+
 describe('the uncertainty of a fit', () => {
   /** The fitted dp40 of `specs`, printed from the fixture records, at `velocitySigma`. */
   const fitted = async (specs: Spec[], velocitySigma: number) => {
