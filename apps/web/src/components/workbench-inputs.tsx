@@ -180,7 +180,7 @@ export const firearmMassSpec = {
 const panelColumns: InputPanel[][] = [['cartridge'], ['powder', 'bullet', 'firearm']]
 
 /** The desktop frame of a window lower than 45em (`panelColumns`). */
-export const shortFrame = '(min-width: 75em) and (max-height: 44.99em)'
+export const shortFrame = '(width >= 75em) and (height < 45em)'
 const panelTitles: Record<InputPanel, Message> = {
   cartridge: msg('Cartridge'),
   bullet: msg('Bullet'),
