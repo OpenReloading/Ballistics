@@ -109,16 +109,16 @@ jobs:
       # licenses of the production dependencies of the images and the generated list in NOTICE
       - run: node tools/src/licences.ts
 
-  # One job per group of workspaces (the ballistics and cli suites being the slowest, each in another group), each
-  # testing the workspaces of its group that the plan selects; together all groups are what the root `pnpm test`
-  # runs. The workspaces import each other's dist/, so each job builds. A failed `changes` job leaves the outputs
-  # empty, so every group runs (the fallback is testJobs() of the plan, which apps/web/test/ci-plan.test.ts compares).
+  # One job per group of workspaces, each testing the workspaces of its group that the plan selects; together all
+  # groups are what the root `pnpm test` runs. The workspaces import each other's dist/, so each job builds. A failed
+  # `changes` job leaves the outputs empty, so every group runs (the fallback is testJobs() of the plan, which
+  # apps/web/test/ci-plan.test.ts compares).
   test:
     name: test (${{ matrix.name }})
     needs: changes
     if: ${{ !cancelled() && needs.changes.outputs.check != 'false' && needs.changes.outputs.tests != '[]' }}
     runs-on: ubuntu-latest
-    # about three times the run of the slowest groups (packages and web, 7 to 8 minutes)
+    # about three times the median run of the slowest group (packages, about 8 minutes)
     timeout-minutes: 25
     permissions:
       contents: read
@@ -179,7 +179,7 @@ jobs:
           echo "$TYPOS_SHA256  $RUNNER_TEMP/typos.tar.gz" | sha256sum --check
           tar --extract --gzip --file "$RUNNER_TEMP/typos.tar.gz" --directory "$RUNNER_TEMP" ./typos
           "$RUNNER_TEMP/typos"
-          # the web app's English messages on their own: in a source file the UK words of the code names pass
+          # the English messages apart, without the UK words of code names; a file, as a pipe hides a failed list
           node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON apps/web/scripts/i18n.mts messages > "$RUNNER_TEMP/messages.txt"
           "$RUNNER_TEMP/typos" - < "$RUNNER_TEMP/messages.txt"
       - name: Results of the other jobs
