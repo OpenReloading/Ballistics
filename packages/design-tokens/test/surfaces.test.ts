@@ -27,13 +27,13 @@ function cssOf(files: string[], context: string[]): Variables {
   return set
 }
 
-/** The custom properties MantineProvider sets for the theme and the resolver of the package. */
-function mantineOf(scheme: Scheme): Variables {
+/** The custom properties MantineProvider sets for the theme and the resolver of the package, on a page with `tokens`. */
+function mantineOf(scheme: Scheme, tokens: Variables): Variables {
   const resolved = deepMerge(
     defaultCssVariablesResolver(mergeMantineTheme(DEFAULT_THEME, theme)),
     cssVariables,
   )
-  return { ...resolved.variables, ...resolved[scheme] }
+  return { ...tokens, ...resolved.variables, ...resolved[scheme] }
 }
 
 /** The value of `name` with every var() replaced, and short hex colors written out. */
@@ -46,17 +46,27 @@ function resolve(set: Variables, name: string): string | undefined {
 
 const system =
   '@screen and (prefers-color-scheme: dark) :root:not([data-mantine-color-scheme], [data-theme])'
-const pages: Record<Scheme, Record<'device' | 'docusaurus' | 'buildguide', string[]>> = {
-  light: {
-    device: [':root'],
-    docusaurus: [':root', ':root[data-theme]'],
-    buildguide: [':root', ':root .ag-guide'],
-  },
+const light = {
+  device: [':root'],
+  docusaurus: [':root', ':root[data-theme]'],
+  buildguide: [':root', ':root .ag-guide'],
+}
+/** The rules that apply per page; `print` is a page printed with the dark scheme on, where no screen rule applies. */
+const pages: Record<Scheme | 'print', typeof light & { mantine: Scheme }> = {
+  light: { ...light, mantine: 'light' },
   dark: {
     device: [':root', system],
     docusaurus: [':root', '@screen :root[data-theme="dark"]', ':root[data-theme]'],
     buildguide: [':root', system, ':root .ag-guide'],
+    mantine: 'dark',
   },
+  print: { ...light, mantine: 'dark' },
+}
+/** The page and its text per page, which every surface must show. */
+const expected = {
+  light: ['#ffffff', '#1d2130'],
+  dark: ['#10121b', '#e9ebf1'],
+  print: ['#ffffff', '#1d2130'],
 }
 
 const steps = ['xs', 'sm', 'md', 'lg', 'xl']
@@ -87,13 +97,15 @@ const roles: (string | undefined)[][] = [
   [undefined, '--font-family-system', undefined, '--ag-font'],
 ]
 
-it.each(['light', 'dark'] as const)(
-  'the Mantine theme and the CSS outputs agree in the %s scheme',
-  (scheme) => {
-    const page = pages[scheme]
+it.each(['light', 'dark', 'print'] as const)(
+  'the Mantine theme and the CSS outputs agree on a %s page',
+  (kind) => {
+    const page = pages[kind]
+    const device = cssOf(['tokens.css'], page.device)
+    expect([resolve(device, '--page'), resolve(device, '--ink')]).toEqual(expected[kind])
     const surfaces = [
-      mantineOf(scheme),
-      cssOf(['tokens.css'], page.device),
+      mantineOf(page.mantine, device),
+      device,
       cssOf(['tokens.css', 'docusaurus.css'], page.docusaurus),
       cssOf(['tokens.css', 'buildguide.css'], page.buildguide),
     ]
@@ -106,3 +118,9 @@ it.each(['light', 'dark'] as const)(
     }
   },
 )
+
+it('a Docusaurus page printed with the dark theme on shows a warning in the light colors', () => {
+  const page = cssOf(['docusaurus.css'], ['@print :root[data-theme="dark"]'])
+  expect(page['--ifm-color-warning-contrast-background']).toBe('rgb(255, 248, 230)')
+  expect(page['--ifm-color-warning-contrast-foreground']).toBe('rgb(77, 56, 0)')
+})

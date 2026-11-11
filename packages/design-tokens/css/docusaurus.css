@@ -67,3 +67,25 @@
   --pf-skeleton-shine: var(--surface);
   --pf-font: var(--ifm-font-family-base);
 }
+
+/* Print is light (tokens.css), also with the dark theme on: the dark values of Infima that the mapping above leaves,
+   as Infima sets them in its light theme (the admonition colors, the icon filters). Code blocks keep the dark theme's
+   colors, which Docusaurus writes inline. */
+@media print {
+  :root[data-theme="dark"] {
+    --ifm-menu-link-sublist-icon-filter: none;
+    --ifm-breadcrumb-separator-filter: none;
+    --ifm-color-primary-contrast-background: rgb(235, 242, 252);
+    --ifm-color-primary-contrast-foreground: rgb(16, 36, 69);
+    --ifm-color-secondary-contrast-background: rgb(253, 253, 254);
+    --ifm-color-secondary-contrast-foreground: rgb(71, 71, 72);
+    --ifm-color-success-contrast-background: rgb(230, 246, 230);
+    --ifm-color-success-contrast-foreground: rgb(0, 49, 0);
+    --ifm-color-info-contrast-background: rgb(238, 249, 253);
+    --ifm-color-info-contrast-foreground: rgb(25, 60, 71);
+    --ifm-color-warning-contrast-background: rgb(255, 248, 230);
+    --ifm-color-warning-contrast-foreground: rgb(77, 56, 0);
+    --ifm-color-danger-contrast-background: rgb(255, 235, 236);
+    --ifm-color-danger-contrast-foreground: rgb(75, 17, 19);
+  }
+}
