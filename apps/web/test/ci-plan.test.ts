@@ -141,16 +141,17 @@ it('prerenders every record when record data, page code or shared parts changed'
 })
 
 const packages =
-  '--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/design-tokens --filter @open-reloading/statistics --filter @open-reloading/ballistics --filter @open-reloading/shot-groups --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/catalog --filter @open-reloading/target-recognition --filter @open-reloading/use-cases --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools --filter @open-reloading/test-kit'
+  '--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/design-tokens --filter @open-reloading/statistics --filter @open-reloading/ballistics --filter @open-reloading/shot-groups --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/catalog --filter @open-reloading/target-recognition --filter @open-reloading/use-cases --filter @open-reloading/api --filter @open-reloading/docs --filter @open-reloading/tools --filter @open-reloading/test-kit'
 /** The workspaces of the packages group that a change of units reaches. */
 const reachedByUnits =
-  '--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/ballistics --filter @open-reloading/shot-groups --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/catalog --filter @open-reloading/target-recognition --filter @open-reloading/use-cases --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools'
+  '--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/ballistics --filter @open-reloading/shot-groups --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/catalog --filter @open-reloading/target-recognition --filter @open-reloading/use-cases --filter @open-reloading/api --filter @open-reloading/docs --filter @open-reloading/tools'
 
 it('tests every workspace of every group without a list of affected ones', () => {
   expect(testJobs()).toEqual([
     { name: 'drawing', filter: '--filter @open-reloading/drawing', e2eUnit: false },
     { name: 'web', filter: '--filter @open-reloading/web', e2eUnit: false },
     { name: 'packages', filter: packages, e2eUnit: true },
+    { name: 'cli', filter: '--filter @open-reloading/cli', e2eUnit: false },
     { name: 'ui', filter: '--filter @open-reloading/ui', e2eUnit: false },
   ])
 })
@@ -176,12 +177,13 @@ it('tests the workspaces a change reaches and leaves out the groups it does not'
   expect(plan(['packages/units/src/units.ts'], closure, units).tests).toEqual([
     { name: 'web', filter: '--filter @open-reloading/web', e2eUnit: false },
     { name: 'packages', filter: reachedByUnits, e2eUnit: false },
+    { name: 'cli', filter: '--filter @open-reloading/cli', e2eUnit: false },
   ])
   expect(plan(['packages/drawing/src/index.ts'], closure, ['drawing', 'web', 'cli']).tests).toEqual(
     [
       { name: 'drawing', filter: '--filter @open-reloading/drawing', e2eUnit: false },
       { name: 'web', filter: '--filter @open-reloading/web', e2eUnit: false },
-      { name: 'packages', filter: '--filter @open-reloading/cli', e2eUnit: false },
+      { name: 'cli', filter: '--filter @open-reloading/cli', e2eUnit: false },
     ],
   )
   expect(plan(['apps/e2e/tests/web/groups.spec.ts'], closure, ['e2e']).tests).toEqual([

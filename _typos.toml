@@ -1,5 +1,7 @@
 # Spell check of code, comments, docs and UI text (typos, run by ci.yml `check`).
 # Locally: `typos` from https://github.com/crate-ci/typos, or `docker run`-free: any 1.51 binary on the PATH.
+# The web app's English messages on their own, without the UK words that [type.ts] passes for the code names:
+# `node apps/web/scripts/i18n.mts messages | typos -`.
 
 [files]
 ignore-hidden = false
@@ -70,7 +72,7 @@ extend-ignore-re = [
   # column aliases the table import accepts, listed in the table import page
   "caliber, calibre, cal, kaliber",
   # a message placeholder and CSS classes that keep their UK spelling
-  "\\{colours\\}|burn-neighbours|face-colours|workbench-centre|colour-row|ov-centre",
+  "\\{colours?\\}|burn-neighbours|face-colours|workbench-centre|colour-row|ov-centre",
 ]
 
 # Code names keep their UK spelling (record fields, enum values, the public API, the CLI and API output). In TypeScript

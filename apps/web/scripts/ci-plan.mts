@@ -132,12 +132,13 @@ export const testGroups: Record<string, string[]> = {
     'target-recognition',
     'use-cases',
     'api',
-    'cli',
     'docs',
     'tools',
     'test-kit',
     'e2e',
   ],
+  // its suite takes as long as that of ballistics, the slowest of `packages`
+  cli: ['cli'],
   // its job also runs the stories as browser tests (ci.yml)
   ui: ['ui'],
 }
