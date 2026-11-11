@@ -284,7 +284,7 @@ function faceRings(face: PrintedFace): FaceRing[] {
     .toSorted((a, b) => b.radius - a.radius)
 }
 
-export type FaceMatch<F extends PrintedFace = PrintedFace> = {
+type FaceMatch<F extends PrintedFace = PrintedFace> = {
   face: F
   /** Higher is better; ties are faces whose rings the photo cannot tell apart. */
   score: number

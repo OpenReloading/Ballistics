@@ -6,16 +6,13 @@ export * from './image.ts'
 export * from './inference-port.ts'
 export * from './raster-ops.ts'
 export {
-  confidenceOf,
   type FaceFit,
   type FaceGeometry,
-  type FaceMatch,
   type FacePlane,
   type FaceSearch,
   faceLabel,
   fitDiameter,
   fitPicked,
-  matchFaces,
   onPhoto,
   type PrintedFace,
   type Ring,

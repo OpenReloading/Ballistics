@@ -26,12 +26,6 @@ export const clamp: (v: number, lo: number, hi: number) => number;
 export function components(mask: Uint8Array, w: number, h: number): number[][];
 
 // @public
-export function confidenceOf(matched: number, counts?: Readonly<Record<number, {
-    right: number;
-    wrong: number;
-}>>): number | undefined;
-
-// @public
 export function detectFromExample(input: HoleDetectionInput, at: Point): (Found & {
     example: HoleExample;
 }) | undefined;
@@ -66,18 +60,6 @@ export type FaceLabel = {
 
 // @public
 export function faceLabel(g: FaceGeometry, hole: number): FaceLabel;
-
-// @public (undocumented)
-export type FaceMatch<F extends PrintedFace = PrintedFace> = {
-    face: F;
-    score: number;
-    matched: Array<{
-        ring: Ring;
-        label: string;
-        radius: number;
-        error: number;
-    }>;
-};
 
 // @public
 export type FacePlane = {
@@ -209,15 +191,6 @@ export interface InferencePort {
 
 // @public
 export function insidePolygon(p: Point, poly: readonly Point[]): boolean;
-
-// @public
-export function matchFaces<F extends PrintedFace = PrintedFace>(black: Ellipse, rings: readonly Ring[], faces: readonly F[], input?: {
-    frame?: {
-        width: number;
-        height: number;
-    };
-    scale?: number | undefined;
-}): FaceMatch<F>[];
 
 // @public
 export const MAX_WORK_PIXELS = 2000000;
