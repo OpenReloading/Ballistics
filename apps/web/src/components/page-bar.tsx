@@ -183,7 +183,7 @@ export function PageBar({
   const id = useId()
   const foldId = `${id}-fold`
   // from 48em to 75em only the folded actions are behind the toggle (globals.css `data-fold`)
-  const foldShown = useMediaQuery('screen and (min-width: 48em) and (max-width: 74.99em)', false, {
+  const foldShown = useMediaQuery('screen and (width >= 48em) and (width < 75em)', false, {
     getInitialValueInEffect: true,
   })
   const folds = Boolean(fold) && foldShown
