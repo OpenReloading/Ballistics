@@ -270,7 +270,7 @@ body {
 
   table {
     border-collapse: collapse;
-    margin: var(--space-xs) 0 1.5rem;
+    margin: var(--space-xs) 0 var(--space-lg);
     font-variant-numeric: tabular-nums;
   }
 
@@ -410,7 +410,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.375rem;
+  gap: var(--space-2xs);
   padding: var(--space-sm-md);
 }
 
@@ -1289,7 +1289,7 @@ td.nowrap {
   .workspace-tabs {
     display: grid;
     grid-template-columns: 5fr 7fr;
-    gap: 1.5rem;
+    gap: var(--space-lg);
     align-items: start;
   }
 
@@ -1312,7 +1312,7 @@ td.nowrap {
   .designer .workspace-tabs {
     display: grid;
     grid-template-columns: minmax(20rem, 5fr) 7fr;
-    gap: 1.5rem;
+    gap: var(--space-lg);
     align-items: start;
   }
 
@@ -2154,7 +2154,7 @@ td.nowrap {
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-rows: auto 1fr;
   grid-template-areas: "controls figure" "values figure";
-  gap: var(--space-sm-md) 1.5rem;
+  gap: var(--space-sm-md) var(--space-lg);
   align-items: start;
 }
 
@@ -2923,7 +2923,7 @@ td.nowrap {
   display: flex;
   flex: 1 1 auto;
   align-items: center;
-  gap: 0.375rem;
+  gap: var(--space-2xs);
   min-width: 0;
   padding: var(--space-2xs);
   color: inherit;
@@ -3257,7 +3257,7 @@ td.nowrap {
 .library {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 1.5rem;
+  gap: var(--space-lg);
 }
 
 @media (min-width: 62em) {
@@ -3409,7 +3409,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .firearm-table :is(th, td) {
-  padding: 0 var(--space-2xs) 0.875rem;
+  padding: 0 var(--space-2xs) var(--space-sm-md);
   border: 0;
   vertical-align: top;
 }
@@ -3470,7 +3470,7 @@ main .library-head.page-panel-head > .page-panel-title {
   display: inline-flex;
   flex: none;
   align-items: center;
-  gap: 0.375rem;
+  gap: var(--space-2xs);
   white-space: nowrap;
 }
 
@@ -3615,7 +3615,7 @@ main .library-head.page-panel-head > .page-panel-title {
 .result-notes-group h3 {
   display: flex;
   align-items: center;
-  gap: 0.375rem;
+  gap: var(--space-2xs);
   margin: var(--space-sm-md) 0 var(--space-2xs);
   font-size: var(--mantine-font-size-md);
 }
@@ -3997,7 +3997,7 @@ main .library-head.page-panel-head > .page-panel-title {
 @media (min-width: 62em) {
   .workbench .readouts {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0 1.5rem;
+    gap: 0 var(--space-lg);
   }
 
   /* label, value, note: the note stays right of the value and wraps only in its own column */
@@ -4053,7 +4053,7 @@ main .library-head.page-panel-head > .page-panel-title {
      with the word on hover and for screen readers; the focus ring's padding reaches into the
      space around, so the strip is no taller than its chips */
   .ladder-cells {
-    gap: 0.375rem;
+    gap: var(--space-2xs);
     margin-block: -0.3125rem;
     scrollbar-width: thin;
   }
@@ -4306,8 +4306,8 @@ main .library-head.page-panel-head > .page-panel-title {
   flex-wrap: wrap;
   grid-column: 1 / -1;
   align-items: flex-end;
-  gap: var(--space-2xs) 0.375rem;
-  margin-bottom: 0.375rem;
+  gap: var(--space-2xs);
+  margin-bottom: var(--space-2xs);
 }
 
 .workbench .pinned-row > *,
@@ -4870,7 +4870,7 @@ main .library-head.page-panel-head > .page-panel-title {
   flex: none;
   width: 1.125rem;
   height: 0.5rem;
-  margin-right: 0.375rem;
+  margin-right: var(--space-2xs);
 }
 
 .series-key::before {
@@ -5514,7 +5514,7 @@ main .library-head.page-panel-head > .page-panel-title {
   grid-template-columns: auto auto;
   gap: 0 var(--space-xs);
   margin: 0;
-  padding: 0.125rem 0.375rem;
+  padding: 0.125rem var(--space-2xs);
   border: 1px solid var(--line);
   background: var(--page);
   font-size: var(--mantine-font-size-xs);
@@ -5703,16 +5703,16 @@ main .library-head.page-panel-head > .page-panel-title {
    derived value is muted text; choices are segmented rows. On a phone the same rows, 44 px high */
 @media screen and (max-width: 47.99em), screen and (min-width: 62em) {
   .workbench .panel {
-    margin-bottom: 0.375rem;
+    margin-bottom: var(--space-2xs);
   }
 
   .workbench .panels {
-    column-gap: 0.375rem;
+    column-gap: var(--space-2xs);
   }
 
   .workbench .panel-head {
     flex-wrap: nowrap;
-    gap: 0.375rem;
+    gap: var(--space-2xs);
     height: 2rem;
     padding: 0 var(--space-2xs) 0 var(--space-xs);
   }
@@ -5802,7 +5802,7 @@ main .library-head.page-panel-head > .page-panel-title {
     display: grid;
     grid-template-columns: minmax(0, 1fr) var(--field-column, 9rem);
     align-items: center;
-    column-gap: 0.375rem;
+    column-gap: var(--space-2xs);
   }
 
   .workbench .workspace-inputs :is(.record-row, .seating-row) > :first-child {
@@ -5996,7 +5996,7 @@ main .library-head.page-panel-head > .page-panel-title {
     width: 100%;
     min-height: var(--field-height);
     height: var(--field-height);
-    padding-inline: 0.375rem 3.375rem;
+    padding-inline: var(--space-2xs) 3.375rem;
   }
 
   .workbench .workspace-inputs :is(.panel-fields, .seating-slot) .field-unit {
@@ -6204,12 +6204,12 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 }
 
-/* the input columns from 75em: two of 288 px with 6 px between them, then 12 px, then the results.
+/* the input columns from 75em: two of 288 px with 4 px between them, then 12 px, then the results.
    Column A Cartridge and the cartridge figure filling the rest, column B Powder, Bullet and Gun. In
    a window lower than 45em the burn-rate figure takes the cartridge figure's place */
 @media screen and (min-width: 75em) {
   .workbench .workspace-tabs {
-    grid-template-columns: 36.375rem minmax(0, 1fr);
+    grid-template-columns: 36.25rem minmax(0, 1fr);
     gap: var(--space-sm-md);
   }
 
@@ -6225,14 +6225,14 @@ main .library-head.page-panel-head > .page-panel-title {
   .workbench .panels {
     grid-template-columns: repeat(2, 18rem);
     grid-template-rows: auto minmax(0, 1fr);
-    column-gap: 0.375rem;
+    column-gap: var(--space-2xs);
     align-items: stretch;
   }
 
   .workbench .panels > .panel-column {
     display: flex;
     flex-direction: column;
-    gap: 0.375rem;
+    gap: var(--space-2xs);
   }
 
   .workbench .panel {
@@ -6364,7 +6364,7 @@ main .library-head.page-panel-head > .page-panel-title {
 .figure-tab .cartridge-figure {
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
+  gap: var(--space-2xs);
   height: 100%;
   margin: 0;
   padding: 0;
@@ -6375,7 +6375,7 @@ main .library-head.page-panel-head > .page-panel-title {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 0.375rem;
+  gap: var(--space-2xs);
   min-height: 0;
 }
 
@@ -6438,7 +6438,7 @@ main .library-head.page-panel-head > .page-panel-title {
 .workbench .run-line {
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.375rem var(--space-xs);
+  gap: var(--space-2xs) var(--space-xs);
 }
 
 .workbench .run-line > .notice-text {
@@ -6492,7 +6492,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .limits-popover table.limits :is(th, td) {
-  padding: var(--space-2xs) 0.375rem;
+  padding: var(--space-2xs);
   border: 0;
   border-bottom: 1px solid var(--hair);
   background: none;
@@ -6625,7 +6625,7 @@ main .library-head.page-panel-head > .page-panel-title {
     justify-content: space-between;
     gap: 0 var(--space-xs);
     min-height: 2.25rem;
-    padding: 0.375rem 0;
+    padding: var(--space-2xs) 0;
     border: 0;
     border-bottom: 1px solid var(--line);
     background: none;
@@ -6650,7 +6650,7 @@ main .library-head.page-panel-head > .page-panel-title {
 @media screen and (max-width: 47.99em) {
   .workbench .run-line {
     flex-wrap: wrap;
-    row-gap: 0.375rem;
+    row-gap: var(--space-2xs);
   }
 
   .workbench .run-line > .load-identity {
@@ -6683,7 +6683,7 @@ main .library-head.page-panel-head > .page-panel-title {
   .workbench .ladder-cells > .ladder-cell {
     display: inline-flex;
     align-items: center;
-    gap: 0.3125rem;
+    gap: var(--space-2xs);
     min-height: 2.75rem;
     padding: 0 var(--space-sm-md);
   }
@@ -6711,7 +6711,7 @@ main .library-head.page-panel-head > .page-panel-title {
   .workbench .results-head {
     display: grid;
     grid-template: "keys keys" auto "list burn" auto / minmax(0, 1fr) var(--burn-width, 11.5rem);
-    gap: 0.375rem;
+    gap: var(--space-2xs);
     align-items: stretch;
   }
 
@@ -6740,7 +6740,7 @@ main .library-head.page-panel-head > .page-panel-title {
     display: grid;
     grid-area: keys;
     grid-template-columns: minmax(0, 2fr) repeat(2, minmax(max-content, 1fr));
-    gap: 0.375rem;
+    gap: var(--space-2xs);
   }
 
   .workbench .readouts.readout-keys > div {
@@ -6749,10 +6749,10 @@ main .library-head.page-panel-head > .page-panel-title {
     grid-template: "label share" auto "value range" auto "bar bar" auto / minmax(0, 1fr) auto;
     align-content: space-between;
     /* at 1280 px the peak pressure's label and its share of the limit fit one line */
-    gap: 0 0.375rem;
+    gap: 0 var(--space-2xs);
     min-width: 0;
     min-height: 3.75rem;
-    padding: 0.3125rem var(--space-xs) 0.375rem;
+    padding: var(--space-2xs) var(--space-xs);
     border: 1px solid var(--line);
     background: var(--page);
   }
@@ -6883,7 +6883,7 @@ main .library-head.page-panel-head > .page-panel-title {
   /* the ladder steps: a label, then chips of the charge (bold) and its share (muted) */
   .workbench .ladder-strip {
     align-items: center;
-    gap: 0.375rem;
+    gap: var(--space-2xs);
   }
 
   .workbench .ladder-legend {
@@ -6894,9 +6894,9 @@ main .library-head.page-panel-head > .page-panel-title {
   .workbench .ladder-cells > .ladder-cell {
     display: inline-flex;
     align-items: center;
-    gap: 0.3125rem;
+    gap: var(--space-2xs);
     height: 1.75rem;
-    padding: 0 0.5625rem;
+    padding: 0 var(--space-xs);
     border: 1px solid var(--line);
     background: var(--page);
     font-size: var(--mantine-font-size-sm);
@@ -6931,7 +6931,7 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 
   .workbench-centre > * + * {
-    margin-top: 0.375rem;
+    margin-top: var(--space-2xs);
   }
 
   /* the result tabs as one card: the tab bar on the surface color, the shown panel under it */
@@ -6966,13 +6966,13 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 
   .workbench .result-tabs > .workbench-centre > [role="tabpanel"] {
-    padding: 0.375rem var(--space-xs) var(--space-xs);
+    padding: var(--space-2xs) var(--space-xs) var(--space-xs);
     border: 1px solid var(--line);
     border-top: 0;
   }
 
   .workbench .chart-controls {
-    gap: 0.375rem;
+    gap: var(--space-2xs);
   }
 }
 
@@ -7090,7 +7090,7 @@ main .record-sources .sources td.source-document {
 }
 
 main .record-sources .sources th.source-page {
-  padding-inline-start: 1.5rem;
+  padding-inline-start: var(--space-lg);
   white-space: normal;
 }
 
@@ -7430,7 +7430,7 @@ main .record-sources .sources th.source-page {
 .burn-rate-body {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-xs) 1.5rem;
+  gap: var(--space-xs) var(--space-lg);
   align-items: center;
 }
 
@@ -7838,7 +7838,7 @@ main .field-table tr.field-group > th {
   }
 
   main .cartridge-values :is(th, td) {
-    padding: 0.125rem 0.4rem;
+    padding: 0.125rem var(--space-xs);
   }
 
   main .cartridge-values td {
@@ -7983,8 +7983,8 @@ main .field-table tr.field-group > th {
   display: flex;
   flex: 0 1 auto;
   align-items: center;
-  gap: 0.375rem;
-  padding: 0.375rem var(--space-xs);
+  gap: var(--space-2xs);
+  padding: var(--space-2xs) var(--space-xs);
   border: 1px solid var(--line);
   background: var(--page);
 }
@@ -8111,14 +8111,14 @@ main .field-table tr.field-group > th {
 .standard-facts {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2xs) 1.5rem;
+  gap: var(--space-2xs) var(--space-lg);
   margin: 0 0 var(--space-xs);
 }
 
 .standard-facts > div {
   display: flex;
   align-items: baseline;
-  gap: 0.375rem;
+  gap: var(--space-2xs);
 }
 
 .standard-facts dt {
@@ -8138,7 +8138,7 @@ main .field-table tr.field-group > th {
 :is(.fact, .standard-facts) .country {
   display: inline-flex;
   align-items: center;
-  gap: 0.375rem;
+  gap: var(--space-2xs);
 }
 
 :is(.fact, .standard-facts) .flag {
@@ -9696,7 +9696,7 @@ main .session-shots th:nth-child(-n + 2) {
 .prop-grid .filter-row-value {
   display: flex;
   align-items: center;
-  gap: 0.375rem;
+  gap: var(--space-2xs);
 }
 
 .prop-grid .filter-row-value > .mantine-Slider-root {
@@ -9818,9 +9818,9 @@ main .session-shots th:nth-child(-n + 2) {
   margin-top: 0;
 }
 
-/* the designers' groups: the same room above each heading but the first, 6 px to its rows */
+/* the designers' groups: the same room above each heading but the first, 4 px to its rows */
 .designer .prop-form .prop-head {
-  margin: var(--space-md) 0 0.375rem;
+  margin: var(--space-md) 0 var(--space-2xs);
 }
 
 .designer .prop-form > :not(:has(> .prop-head)) + :has(> .prop-head) > .prop-head {
@@ -10387,7 +10387,7 @@ main .session-shots th:nth-child(-n + 2) {
   }
 
   .target-editor .swatch-card {
-    padding: 0.875rem;
+    padding: var(--space-sm-md);
   }
 
   .shot-table tbody tr {
@@ -11475,7 +11475,7 @@ main .page-bar h1 {
 
 /* the first text column after numbers keeps its distance from their right edge */
 .directory-table .num + :is(th, td):not(.num, .filler) {
-  padding-left: 1.5rem;
+  padding-left: var(--space-lg);
 }
 
 /* a numeric head ends where its numbers end: the mark sits left of the label, out of the flow */
@@ -11598,7 +11598,7 @@ main .page-bar h1 {
 
 .directory-table th .th-end {
   float: right;
-  margin-top: 0.375rem;
+  margin-top: var(--space-2xs);
 }
 
 .rate-ticks text {
@@ -12097,7 +12097,7 @@ main .compare-table {
 
 /* nothing chosen yet: the note set off from the bar */
 .compare-view .mantine-EmptyState-root {
-  padding-top: 1.5rem;
+  padding-top: var(--space-lg);
 }
 
 /* the quantity stays beside the symbol while a phone scrolls the bullets */
@@ -12313,7 +12313,7 @@ main .page-panel-head > .page-panel-title {
 .fact-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.375rem;
+  gap: var(--space-2xs);
   align-items: center;
   margin-inline-start: auto;
 }
@@ -12852,7 +12852,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 /* the Run button of the page bar keeps its width for the longer German word */
 @media screen and (min-width: 75em) {
   :lang(de) .page-bar .bar-run {
-    padding-inline-end: 0.375rem;
+    padding-inline-end: var(--space-2xs);
   }
 }
 
@@ -12891,7 +12891,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
   .tune-layout {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-auto-flow: row dense;
-    column-gap: 1.5rem;
+    column-gap: var(--space-lg);
   }
 
   .tune-layout > * {
@@ -13006,7 +13006,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 .tune-legend li {
   display: flex;
   align-items: center;
-  gap: 0.375rem;
+  gap: var(--space-2xs);
 }
 
 .tune-swatch {
