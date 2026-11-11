@@ -13,6 +13,15 @@ Code: `apps/web/src/lib/target-face.ts`, `matchFaces`.
 3. A list that starts at 3 and needs the blank line above it.
 4. Its next item.
 
+## A list directly after a paragraph, then a repeated blank line
+
+Steps:
+- First.
+- Second.
+
+
+Text after two blank lines.
+
 ## Code spans after text
 
 | Kind | Field | Type, unit | Notes |
