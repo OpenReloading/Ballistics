@@ -234,6 +234,8 @@ jobs:
       WEB_URL: http://localhost:3003
       # only a pull request whose plan says so exports the sample of the cartridge pages
       PRERENDER: ${{ github.event_name == 'pull_request' && needs.changes.outputs.prerender == 'sample' && 'sample' || 'full' }}
+      # as the Pages build sets it, so the specs see the shell's issue and repository links and the load switch's rule
+      NEXT_PUBLIC_REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -310,7 +312,8 @@ jobs:
       - name: End-to-end tests in the Playwright image
         run: |
           docker run --rm --init --ipc=host --network=host --user "$(id -u):$(id -g)" --env HOME=/tmp \
-            --env CI --env GITHUB_ACTIONS --env API_URL --env WEB_URL --volume "$PWD:$PWD" --workdir "$PWD/apps/e2e" \
+            --env CI --env GITHUB_ACTIONS --env API_URL --env WEB_URL --env NEXT_PUBLIC_REPOSITORY_URL \
+            --volume "$PWD:$PWD" --workdir "$PWD/apps/e2e" \
             "$PLAYWRIGHT_IMAGE" npx playwright test
       - name: Drawing baseline in the Playwright image
         run: pnpm --filter @open-reloading/e2e run drawing-baseline
