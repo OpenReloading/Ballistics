@@ -2,7 +2,7 @@
    data-theme on <html>; :root[data-theme] outranks Infima's html[data-theme="dark"] in any load order, and :root alone
    holds the mapping when no script sets data-theme. The primary shades mix the accent with Docusaurus's steps (10, 15
    and 30 %), so they follow the scheme. Taken from Brand's docusaurus/brand.css, with two local changes: the bare :root
-   selector and the active breadcrumb on --link. */
+   selector and the active breadcrumb, tab, pill and page number on --link. */
 :root,
 :root[data-theme] {
   --ifm-font-family-base: var(--font-family-ui);
@@ -47,8 +47,11 @@
   --ifm-navbar-shadow: none;
   --ifm-menu-color: var(--ink);
   --ifm-menu-color-active: var(--link);
-  /* the active breadcrumb sits on the hover overlay, where the light accent falls under 4.5:1 */
+  /* these four sit on the hover overlay (the tab while hovered), where the light accent falls under 4.5:1 */
   --ifm-breadcrumb-color-active: var(--link);
+  --ifm-tabs-color-active: var(--link);
+  --ifm-pills-color-active: var(--link);
+  --ifm-pagination-color-active: var(--link);
   --ifm-footer-background-color: var(--page);
   --ifm-footer-color: var(--ink);
   --ifm-footer-link-color: var(--ink);
@@ -68,11 +71,13 @@
   --pf-font: var(--ifm-font-family-base);
 }
 
-/* Print is light (tokens.css), also with the dark theme on: the dark values of Infima that the mapping above leaves,
-   as Infima sets them in its light theme (the admonition colors, the icon filters). Code blocks keep the dark theme's
-   colors, which Docusaurus writes inline. */
+/* Infima's unmapped dark values in print, at its light ones (apps/docs/scripts/print-colors.test.mts) */
 @media print {
   :root[data-theme="dark"] {
+    --ifm-color-scheme: light;
+    --ifm-scrollbar-track-background-color: #f1f1f1;
+    --ifm-scrollbar-thumb-background-color: #c0c0c0;
+    --ifm-scrollbar-thumb-hover-background-color: #a7a7a7;
     --ifm-menu-link-sublist-icon-filter: none;
     --ifm-breadcrumb-separator-filter: none;
     --ifm-color-primary-contrast-background: rgb(235, 242, 252);

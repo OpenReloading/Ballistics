@@ -1,8 +1,4 @@
-/* Mantine's dark scheme in print, where tokens.css is light. Mantine's dark rules also apply on paper, so the variables
-   they read take the values the light scheme has in their place: the dark shades (text 0 to 3, edges 4, fills 5 to 9)
-   as its grays, the rest as Mantine's light scheme sets it, the variant colors for the colors the apps use (blue, gray,
-   red, orange, yellow, teal). Load it after Mantine's styles and tokens.css; check it against Mantine's
-   default-css-variables.css on a Mantine upgrade. */
+/* Mantine's dark rules stay active in print: their variables take light-scheme roles (check on a Mantine upgrade) */
 @media print {
   :root[data-mantine-color-scheme="dark"] {
     --mantine-color-bright: var(--mantine-color-black);
@@ -17,39 +13,54 @@
     --mantine-color-dark-7: var(--mantine-color-white);
     --mantine-color-dark-8: var(--mantine-color-gray-1);
     --mantine-color-dark-9: var(--mantine-color-gray-2);
-    --mantine-color-blue-text: var(--mantine-color-blue-filled);
     --mantine-color-blue-light: var(--mantine-color-blue-1);
-    --mantine-color-blue-light-color: var(--mantine-color-blue-9);
-    --mantine-color-blue-outline: var(--mantine-color-blue-6);
-    --mantine-color-gray-text: var(--mantine-color-gray-filled);
-    --mantine-color-gray-light: var(--mantine-color-gray-1);
-    --mantine-color-gray-light-color: var(--mantine-color-gray-9);
-    --mantine-color-gray-outline: var(--mantine-color-gray-6);
-    --mantine-color-red-text: var(--mantine-color-red-filled);
-    --mantine-color-red-light: var(--mantine-color-red-1);
-    --mantine-color-red-light-color: var(--mantine-color-red-9);
-    --mantine-color-red-outline: var(--mantine-color-red-6);
-    --mantine-color-orange-text: var(--mantine-color-orange-filled);
-    --mantine-color-orange-light: var(--mantine-color-orange-1);
-    --mantine-color-orange-light-color: var(--mantine-color-orange-9);
-    --mantine-color-orange-outline: var(--mantine-color-orange-6);
-    --mantine-color-yellow-text: var(--mantine-color-yellow-filled);
-    --mantine-color-yellow-light: var(--mantine-color-yellow-1);
-    --mantine-color-yellow-light-color: var(--mantine-color-yellow-9);
-    --mantine-color-yellow-outline: var(--mantine-color-yellow-6);
-    --mantine-color-teal-text: var(--mantine-color-teal-filled);
-    --mantine-color-teal-light: var(--mantine-color-teal-1);
-    --mantine-color-teal-light-color: var(--mantine-color-teal-9);
-    --mantine-color-teal-outline: var(--mantine-color-teal-6);
   }
 
-  /* the chosen segment: Mantine's dark rules give it white text, and its fill would equal the control's */
+  /* the variants at shade 8, the light primary shade; html outranks the dark variants a provider writes into the page */
+  html:root[data-mantine-color-scheme="dark"] {
+    --mantine-color-blue-text: var(--mantine-color-blue-8);
+    --mantine-color-blue-light-color: var(--mantine-color-blue-9);
+    --mantine-color-blue-outline: var(--mantine-color-blue-8);
+    --mantine-color-gray-filled: var(--mantine-color-gray-8);
+    --mantine-color-gray-text: var(--mantine-color-gray-8);
+    --mantine-color-gray-light: var(--mantine-color-gray-1);
+    --mantine-color-gray-light-color: var(--mantine-color-gray-9);
+    --mantine-color-gray-outline: var(--mantine-color-gray-8);
+    --mantine-color-red-filled: var(--mantine-color-red-8);
+    --mantine-color-red-text: var(--mantine-color-red-8);
+    --mantine-color-red-light: var(--mantine-color-red-1);
+    --mantine-color-red-light-color: var(--mantine-color-red-9);
+    --mantine-color-red-outline: var(--mantine-color-red-8);
+    --mantine-color-orange-filled: var(--mantine-color-orange-8);
+    --mantine-color-orange-text: var(--mantine-color-orange-8);
+    --mantine-color-orange-light: var(--mantine-color-orange-1);
+    --mantine-color-orange-light-color: var(--mantine-color-orange-9);
+    --mantine-color-orange-outline: var(--mantine-color-orange-8);
+    --mantine-color-yellow-filled: var(--mantine-color-yellow-8);
+    --mantine-color-yellow-text: var(--mantine-color-yellow-8);
+    --mantine-color-yellow-light: var(--mantine-color-yellow-1);
+    --mantine-color-yellow-light-color: var(--mantine-color-yellow-9);
+    --mantine-color-yellow-outline: var(--mantine-color-yellow-8);
+    --mantine-color-teal-filled: var(--mantine-color-teal-8);
+    --mantine-color-teal-text: var(--mantine-color-teal-8);
+    --mantine-color-teal-light: var(--mantine-color-teal-1);
+    --mantine-color-teal-light-color: var(--mantine-color-teal-9);
+    --mantine-color-teal-outline: var(--mantine-color-teal-8);
+  }
+
+  /* the chosen segment and the slider thumb, whose colors Mantine's dark rules set directly */
   [data-mantine-color-scheme="dark"] .mantine-SegmentedControl-label[data-active] {
-    color: var(--mantine-color-black);
+    color: var(--sc-label-color, var(--mantine-color-black));
   }
 
   [data-mantine-color-scheme="dark"] .mantine-SegmentedControl-indicator,
   [data-mantine-color-scheme="dark"] .mantine-SegmentedControl-label[data-active]::before {
     background-color: var(--sc-color, var(--mantine-color-white));
+  }
+
+  [data-mantine-color-scheme="dark"] .mantine-Slider-thumb {
+    color: var(--slider-color);
+    border-color: var(--slider-color);
+    background-color: var(--mantine-color-white);
   }
 }
