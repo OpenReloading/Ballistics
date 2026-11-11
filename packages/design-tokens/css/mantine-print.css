@@ -13,10 +13,13 @@
     --mantine-color-dark-7: var(--mantine-color-white);
     --mantine-color-dark-8: var(--mantine-color-gray-1);
     --mantine-color-dark-9: var(--mantine-color-gray-2);
-    /* the variants at shade 8, the light primary shade of the web app and of the tokens' theme */
+    --mantine-color-blue-light: var(--mantine-color-blue-1);
+  }
+
+  /* the variants at shade 8, the light primary shade; html outranks the dark variants a provider writes into the page */
+  html:root[data-mantine-color-scheme="dark"] {
     --mantine-color-blue-filled: var(--mantine-color-blue-8);
     --mantine-color-blue-text: var(--mantine-color-blue-8);
-    --mantine-color-blue-light: var(--mantine-color-blue-1);
     --mantine-color-blue-light-color: var(--mantine-color-blue-9);
     --mantine-color-blue-outline: var(--mantine-color-blue-8);
     --mantine-color-gray-filled: var(--mantine-color-gray-8);
