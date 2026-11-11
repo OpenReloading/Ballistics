@@ -7,15 +7,15 @@ import type { Translator } from '../i18n/translate.ts'
 import { type BarrelTimes, barrelTimeBand, lotChartDescription, lotLabel } from '../lib/lot-rows.ts'
 import { niceTicks } from '../lib/ticks.ts'
 import type { UnitSystem } from '../lib/units.ts'
-import { axisText, chartTooltip, EChart, tickStep, useChartTokens } from './echart.tsx'
+import { axisText, chartColors, chartTooltip, EChart, tickStep } from './echart.tsx'
 
-const tokens = {
+const theme = chartColors({
   line: '--series-1',
   muted: '--muted',
   border: '--line',
   bg: '--page',
   fg: '--ink',
-}
+})
 
 const ms = (s: number | undefined) => (s === undefined ? null : s * 1e3)
 const msText = (s: number | undefined, t: Translator['t']) =>
@@ -36,10 +36,8 @@ export function LotChart({
   height?: number | undefined
 }) {
   const { t } = useTranslation()
-  const theme = useChartTokens(tokens)
   const { charge } = system
   const option = useMemo(() => {
-    if (!theme) return
     const bands = times.map(barrelTimeBand)
     const all = [
       ...bands.flatMap((b) => b ?? []),
@@ -175,7 +173,7 @@ export function LotChart({
         },
       ],
     }
-  }, [theme, times, fraction, target, charge, t])
+  }, [times, fraction, target, charge, t])
   if (!option) return <div className="chart lot-chart" style={{ height }} />
   return (
     <div className="chart lot-chart">

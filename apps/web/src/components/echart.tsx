@@ -1,6 +1,5 @@
 'use client'
 
-import { useComputedColorScheme } from '@mantine/core'
 import { LineChart as Lines } from 'echarts/charts'
 import {
   GridComponent,
@@ -11,7 +10,7 @@ import {
 import { type ECharts, type EChartsCoreOption, init, use as register } from 'echarts/core'
 import { LabelLayout } from 'echarts/features'
 import { SVGRenderer } from 'echarts/renderers'
-import { type KeyboardEvent, useEffect, useId, useRef, useState } from 'react'
+import { type KeyboardEvent, useEffect, useId, useRef } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 
 // only the parts the charts use, so the chunk stays small (tree-shaken imports)
@@ -28,20 +27,17 @@ register([
 /** The distance between the first two ticks; NaN when there are fewer than two. */
 export const tickStep = (ticks: number[]) => (ticks[1] ?? Number.NaN) - (ticks[0] ?? Number.NaN)
 
-/** Read after the color scheme attribute is set and again on a scheme change, undefined before the first read; `names` is a module constant. */
-export function useChartTokens<K extends string>(names: Record<K, string>) {
-  const scheme = useComputedColorScheme('light')
-  const [tokens, setTokens] = useState<Record<K, string>>()
-  useEffect(() => {
-    const css = getComputedStyle(document.documentElement)
-    setTokens(
-      Object.fromEntries(
-        Object.entries<string>(names).map(([k, n]) => [k, css.getPropertyValue(n).trim()]),
-      ) as Record<K, string>,
-    )
-    // oxlint-disable-next-line react-hooks/exhaustive-deps -- read again on a scheme change
-  }, [scheme])
-  return tokens
+/** The custom properties `names` as colors the SVG and the tooltip resolve themselves, so a chart follows the scheme and prints light with no redraw. */
+export const chartColors = <K extends string>(names: Record<K, string>) =>
+  Object.fromEntries(Object.entries<string>(names).map(([k, n]) => [k, `var(${n})`])) as Record<
+    K,
+    string
+  >
+
+/** A hovered line or point a tenth lighter: ECharts lightens it itself, which it cannot do to a `var()` color (the line would vanish). */
+export const hovered = (color: string) => {
+  const lighter = `color-mix(in srgb, ${color}, #fff 10%)`
+  return { lineStyle: { color: lighter }, itemStyle: { color: lighter } }
 }
 
 /** The axis tooltip frame of the charts in the page's colors. */
