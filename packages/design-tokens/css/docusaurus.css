@@ -2,7 +2,7 @@
    data-theme on <html>; :root[data-theme] outranks Infima's html[data-theme="dark"] in any load order, and :root alone
    holds the mapping when no script sets data-theme. The primary shades mix the accent with Docusaurus's steps (10, 15
    and 30 %), so they follow the scheme. Taken from Brand's docusaurus/brand.css, with two local changes: the bare :root
-   selector and the active breadcrumb, tab and pill on --link. */
+   selector and the active breadcrumb, tab, pill and page number on --link. */
 :root,
 :root[data-theme] {
   --ifm-font-family-base: var(--font-family-ui);
@@ -47,10 +47,11 @@
   --ifm-navbar-shadow: none;
   --ifm-menu-color: var(--ink);
   --ifm-menu-color-active: var(--link);
-  /* the active breadcrumb, tab and pill sit on the hover overlay, where the light accent falls under 4.5:1 */
+  /* these four sit on the hover overlay (the tab while hovered), where the light accent falls under 4.5:1 */
   --ifm-breadcrumb-color-active: var(--link);
   --ifm-tabs-color-active: var(--link);
   --ifm-pills-color-active: var(--link);
+  --ifm-pagination-color-active: var(--link);
   --ifm-footer-background-color: var(--page);
   --ifm-footer-color: var(--ink);
   --ifm-footer-link-color: var(--ink);
