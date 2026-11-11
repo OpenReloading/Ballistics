@@ -397,7 +397,7 @@ function RunLine({
 /** Which tabs show and how many fit their row; the rest go into the More menu from 62em. */
 function useTabFit(tab: ResultTab, setTab: (tab: ResultTab) => void, hasOutcome: boolean) {
   // from 62em the tabs that do not fit their row go into a More menu; narrower, the row scrolls sideways
-  const framed = useMediaQuery('screen and (min-width: 62em)')
+  const framed = useMediaQuery('screen and (width >= 62em)')
   // in a low desktop window the burn-rate figure stands in the inputs' second column
   const short = useMediaQuery(shortFrame, false) ?? false
   const list = useRef<HTMLDivElement>(null)

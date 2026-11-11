@@ -57,8 +57,8 @@
   --mantine-color-disabled-color: var(--muted);
 }
 
-/* width queries on Mantine's scale (lib/theme.ts) plus 2xs 22.5em and 2xl 108em; a max-width is its step minus
-   0.01em, except 2xs (keeps 360 px phones) and the load switch's 79.99em */
+/* width queries in range syntax on Mantine's scale (lib/theme.ts) plus 2xs 22.5em (inclusive: keeps 360 px phones)
+   and 2xl 108em; the load switch's 80em is off the scale */
 
 /* dark on screen only, so print keeps the light values above; the head script resolves the system setting */
 @media screen {
@@ -146,7 +146,7 @@ body {
 
 /* the phone top bar scrolls away with the page (AppShell fixes it). From
    75em it stays fixed over the page, as the sidebar does */
-@media (max-width: 74.99em) {
+@media (width < 75em) {
   .mantine-AppShell-header {
     position: absolute;
     /* a row wider than the window (four 72 px buttons at 320 px with 200 % text) scrolls inside the
@@ -177,7 +177,7 @@ body {
 }
 
 /* a window lower than 40em: smaller buttons and gaps, so every link fits above the foot at 500 px */
-@media (max-height: 40em) {
+@media (height <= 40em) {
   .rail .mantine-ActionIcon-root {
     --ai-size-xl: 2.25rem;
   }
@@ -521,7 +521,7 @@ main .home-cards h3 {
 }
 
 /* one scrolling row on a phone */
-@media (max-width: 47.99em) {
+@media (width < 48em) {
   .library-tabs .mantine-Tabs-list {
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -532,7 +532,7 @@ main .home-cards h3 {
   }
 }
 
-@media (max-width: 47.99em) {
+@media (width < 48em) {
   .home-cards {
     grid-auto-flow: row;
   }
@@ -644,7 +644,7 @@ td.nowrap {
 }
 
 /* sticky headers stick to the window once the table fits the page */
-@media (min-width: 62em) {
+@media (width >= 62em) {
   .scroll:has(> table > thead[data-sticky]) {
     overflow-x: visible;
   }
@@ -665,7 +665,7 @@ td.nowrap {
 
 /* seven columns do not fit a phone: one labeled card per limit; `table.limits` outranks the
    `.sheet` cell rules further down */
-@media screen and (max-width: 47.99em) {
+@media screen and (width < 48em) {
   table.limits,
   table.limits :is(caption, tbody, tr) {
     display: block;
@@ -997,13 +997,13 @@ td.nowrap {
 }
 
 /* Run in the page bar from 75em; narrower, the form's Run bar and the phone bar hold it */
-@media (max-width: 74.99em) {
+@media (width < 75em) {
   .page-bar .bar-run {
     display: none;
   }
 }
 
-@media screen and (min-width: 75em) {
+@media screen and (width >= 75em) {
   .workbench .run-bar {
     display: none;
   }
@@ -1037,7 +1037,7 @@ td.nowrap {
   flex: 1 1 0;
 }
 
-@media (max-width: 47.99em) {
+@media (width < 48em) {
   /* a focused field at the end of the inputs scrolls above the readout bar (WCAG 2.4.11) */
   html:has(.workspace-bar) {
     scroll-padding-bottom: 5rem;
@@ -1046,7 +1046,7 @@ td.nowrap {
 
 /* the workbench below 48em with the readout bar: the page fills the window and the inputs scroll on
    their own above the bar, so the bar covers no control at any scroll position (WCAG 2.5.8) */
-@media screen and (max-width: 47.99em) {
+@media screen and (width < 48em) {
   .page-top:has(.workbench > .workspace-bar) {
     display: flex;
     flex-direction: column;
@@ -1124,7 +1124,7 @@ td.nowrap {
   }
 }
 
-@media (min-width: 48em) {
+@media (width >= 48em) {
   .workspace-tablist,
   .workspace-bar {
     display: none;
@@ -1275,7 +1275,7 @@ td.nowrap {
   }
 }
 
-@media (min-width: 48em) and (max-width: 61.99em) {
+@media (width >= 48em) and (width < 62em) {
   .workspace-results .readouts {
     position: sticky;
     top: 0;
@@ -1285,7 +1285,7 @@ td.nowrap {
   }
 }
 
-@media screen and (min-width: 62em) {
+@media screen and (width >= 62em) {
   .workspace-tabs {
     display: grid;
     grid-template-columns: 5fr 7fr;
@@ -1308,7 +1308,7 @@ td.nowrap {
 /* the designers: a property grid beside the drawing, two columns from 48em; from
    62em a window-high frame (page-shell.tsx), the fields scrolling on their own, the drawing fitted
    to its column */
-@media screen and (min-width: 48em) {
+@media screen and (width >= 48em) {
   .designer .workspace-tabs {
     display: grid;
     grid-template-columns: minmax(20rem, 5fr) 7fr;
@@ -1328,7 +1328,7 @@ td.nowrap {
   }
 }
 
-@media screen and (min-width: 62em) {
+@media screen and (width >= 62em) {
   .designer,
   .designer > .workspace {
     display: flex;
@@ -1422,7 +1422,7 @@ td.nowrap {
 }
 
 /* phones: the drawing stays above the fields while they scroll, no tabs */
-@media screen and (max-width: 47.99em) {
+@media screen and (width < 48em) {
   html:has(.designer) {
     scroll-padding-top: calc(var(--app-shell-header-offset, 0rem) + 38svh);
   }
@@ -1502,7 +1502,7 @@ td.nowrap {
   display: inline;
 }
 
-@media screen and (min-width: 62em) {
+@media screen and (width >= 62em) {
   .designer .workspace-scroll:has(.seating-figure .drawing) {
     overflow-y: auto;
   }
@@ -1518,7 +1518,7 @@ td.nowrap {
   }
 }
 
-@media screen and (max-width: 47.99em) {
+@media screen and (width < 48em) {
   .designer .workspace-scroll:has(.seating-figure .drawing) {
     max-height: 44svh;
   }
@@ -1555,7 +1555,7 @@ td.nowrap {
 }
 
 /* the drawing's title row as a panel's (`.page-panel > .page-panel-head`) */
-@media screen and (min-width: 48em) {
+@media screen and (width >= 48em) {
   .designer .workspace-results:has(.designer-panel-head) {
     padding-top: 0;
   }
@@ -1568,7 +1568,7 @@ td.nowrap {
 }
 
 /* a phone's sticky drawing keeps its height for the figure: of the title row only the view switch */
-@media screen and (max-width: 47.99em) {
+@media screen and (width < 48em) {
   .designer-panel-head:not(:has(.drawing-controls)) {
     display: none;
   }
@@ -1718,7 +1718,7 @@ td.nowrap {
   display: flow-root;
 }
 
-@media screen and (min-width: 62em) {
+@media screen and (width >= 62em) {
   .designer .prop-form > .designer-start {
     position: sticky;
     top: 0;
@@ -1791,7 +1791,7 @@ td.nowrap {
   grid-template-columns: minmax(10.5rem, 1.5fr) repeat(2, minmax(0, 1fr)) 1.75rem;
 }
 
-@media screen and (max-width: 35.99em) {
+@media screen and (width < 36em) {
   .face-event {
     grid-template-columns: repeat(2, minmax(0, 1fr)) 1.75rem;
   }
@@ -1831,7 +1831,7 @@ td.nowrap {
   margin-top: var(--space-2xs);
 }
 
-@media screen and (min-width: 62em) {
+@media screen and (width >= 62em) {
   .face-designer .workspace-tabs {
     grid-template-columns: 26rem minmax(0, 1fr);
   }
@@ -1845,7 +1845,7 @@ td.nowrap {
   }
 }
 
-@media screen and (max-width: 47.99em) {
+@media screen and (width < 48em) {
   .face-designer .target-face-drawing {
     max-height: 26svh;
   }
@@ -1878,7 +1878,7 @@ td.nowrap {
 
 /* a phone: a ring's colors one under the other, the row labels room for their longest word, the
    first field's placeholder left to its column head (Ingredient) */
-@media screen and (max-width: 22.5em) {
+@media screen and (width <= 22.5em) {
   .face-colours {
     gap: 0.125rem;
   }
@@ -1943,7 +1943,7 @@ td.nowrap {
 
 /* no drawing to keep in view: on a phone the record status is the first block of the page and the
    fields scroll with it */
-@media screen and (max-width: 47.99em) {
+@media screen and (width < 48em) {
   html:has(.powder-designer) {
     scroll-padding-top: var(--app-shell-header-offset, 0rem);
   }
@@ -1958,7 +1958,7 @@ td.nowrap {
   }
 }
 
-@media screen and (min-width: 62em) {
+@media screen and (width >= 62em) {
   .powder-designer .workspace-tabs {
     grid-template-columns: 30rem minmax(0, 1fr);
   }
@@ -2188,7 +2188,7 @@ td.nowrap {
   grid-area: values;
 }
 
-@media (max-width: 47.99em) {
+@media (width < 48em) {
   .seating-preview {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: none;
@@ -2232,7 +2232,7 @@ td.nowrap {
   font-size: 0.875em;
 }
 
-@media (max-width: 47.99em) {
+@media (width < 48em) {
   .seating-row {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -2823,7 +2823,7 @@ td.nowrap {
 /* the workbench bar from 75em: Run beside the loads, then a status block of 10.5rem (line 1 the
    result, line 2 the File menu's state), so a change of either moves nothing; Search, Copy link and
    Print as icons named by their text */
-@media screen and (min-width: 75em) {
+@media screen and (width >= 75em) {
   .page-bar:has(.load-strip) {
     gap: var(--space-xs);
   }
@@ -3260,7 +3260,7 @@ td.nowrap {
   gap: var(--space-lg);
 }
 
-@media (min-width: 62em) {
+@media (width >= 62em) {
   .library[data-editing] {
     grid-template-columns: 18rem minmax(0, 1fr);
     align-items: start;
@@ -3277,7 +3277,7 @@ td.nowrap {
 /* the firearm table's columns all have a width (72rem): a 1280 px window holds them, below it the
    table scrolls sideways in its box with the row menu held at its edge, above it the filler column
    takes the room left and the name keeps its width */
-@media screen and (min-width: 48em) {
+@media screen and (width >= 48em) {
   .library > .directory > .directory-scroll {
     overflow-x: auto;
   }
@@ -3629,7 +3629,7 @@ main .library-head.page-panel-head > .page-panel-title {
   margin: 0.125rem 0 var(--space-xs);
 }
 
-@media (max-width: 47.99em) {
+@media (width < 48em) {
   .result-notes {
     --notes-height: 3.375rem;
   }
@@ -3699,7 +3699,7 @@ main .library-head.page-panel-head > .page-panel-title {
 /* phones: the sticky Run bar is the run bar, the form's own one is not shown and not focusable
    (a clipped button would take the focus with nothing to see), the inputs keep room above the
    sticky bar; the result tabs fade where they are cut */
-@media (max-width: 47.99em) {
+@media (width < 48em) {
   .workbench .run-bar {
     display: none;
   }
@@ -3709,7 +3709,7 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 }
 
-@media (max-width: 61.99em) {
+@media (width < 62em) {
   .workbench .result-tablist {
     mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent);
   }
@@ -3766,7 +3766,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 /* the lot rows of a charge: the slower lot first, set off from the charge before it */
-@media (min-width: 48em) {
+@media (width >= 48em) {
   .ladder-table tr[data-lot="low"] td {
     border-top: 1px solid var(--line);
   }
@@ -3862,7 +3862,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 /* a phone: the charge modes on one row, the value, % Pmax and Compute under them */
-@media (max-width: 47.99em) {
+@media (width < 48em) {
   .powder-controls .mantine-SegmentedControl-root {
     flex: 1 1 100%;
   }
@@ -3891,7 +3891,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 /* from 48em the table is nine dense columns in the width of the results; below it the limits table's cards */
-@media screen and (min-width: 48em) {
+@media screen and (width >= 48em) {
   .workbench table.limits.powder-table {
     font-size: var(--mantine-font-size-xs);
   }
@@ -3994,7 +3994,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
 /* from 62em the readouts are a two-column label and value list, not tiles; the tab list
    wraps instead of hiding tabs */
-@media (min-width: 62em) {
+@media (width >= 62em) {
   .workbench .readouts {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0 var(--space-lg);
@@ -4070,7 +4070,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
 /* rows too narrow for label, value and note (the burn figure beside, from 108em): the note goes
    under the value instead of squeezing into a column of its own */
-@container (max-width: 62rem) {
+@container (width <= 62rem) {
   .workbench .readouts > div {
     grid-template-columns: minmax(0, 1fr) auto;
   }
@@ -4093,7 +4093,7 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 }
 
-@media (min-width: 62em) {
+@media (width >= 62em) {
   .workbench .readouts > .readout-wide {
     grid-column: 1 / -1;
   }
@@ -4117,7 +4117,7 @@ main .library-head.page-panel-head > .page-panel-title {
   font-size: var(--mantine-font-size-sm);
 }
 
-@media screen and (min-width: 48em) {
+@media screen and (width >= 48em) {
   .workbench table.limits td:is(:first-child, .num) {
     white-space: nowrap;
   }
@@ -4156,7 +4156,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 /* below 48em the limits tables are cards with their own cell padding */
-@media screen and (min-width: 48em) {
+@media screen and (width >= 48em) {
   .workbench table.limits th {
     vertical-align: bottom;
   }
@@ -4167,7 +4167,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 /* from 62em the inputs are a property grid: label beside its field, help and errors below */
-@media screen and (min-width: 62em) {
+@media screen and (width >= 62em) {
   .workbench .workspace-inputs .panel-fields {
     gap: var(--space-2xs) var(--space-md);
   }
@@ -4203,7 +4203,7 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 }
 
-@media (min-width: 48em) and (max-width: 61.99em) {
+@media (width >= 48em) and (width < 62em) {
   .workbench .panels {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -4217,7 +4217,7 @@ main .library-head.page-panel-head > .page-panel-title {
   display: contents;
 }
 
-@media screen and (min-width: 62em) {
+@media screen and (width >= 62em) {
   .page-shell[data-frame] .page-top {
     display: flex;
     flex-direction: column;
@@ -4322,7 +4322,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
 /* with both lots the four choices share one line from 75em, in German too, only with a small start
    width: a cell still grows to its label */
-@media screen and (min-width: 75em) {
+@media screen and (width >= 75em) {
   .workbench .pinned-row > *,
   .pinned-row-slot > * {
     flex-basis: 4.5rem;
@@ -4354,14 +4354,14 @@ main .library-head.page-panel-head > .page-panel-title {
 
 /* one flow below 75em in the order of the markup: Cartridge, the figure, Powder, Bullet, Gun; a
    flex column where the cards are not a grid (48em to 62em) */
-@media (max-width: 47.99em), (min-width: 62em) and (max-width: 74.99em) {
+@media (width < 48em), (width >= 62em) and (width < 75em) {
   .workbench .panels {
     display: flex;
     flex-direction: column;
   }
 }
 
-@media screen and (min-width: 75em) {
+@media screen and (width >= 75em) {
   .workbench .workspace-tabs {
     grid-template-columns: 48rem minmax(0, 1fr);
   }
@@ -4486,7 +4486,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
 /* the figure fills the free height of its column: the form, the cards' grid, the figure's tabs
    and the drawing stretch in one flex chain */
-@media screen and (min-width: 75em) {
+@media screen and (width >= 75em) {
   .workbench .workspace-inputs > form {
     display: flex;
     flex-direction: column;
@@ -4739,7 +4739,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 /* the moved fields and values as rows of the card: label beside value, notes for screen readers */
-@media screen and (min-width: 62em) {
+@media screen and (width >= 62em) {
   .workbench .seating-slot > :not(.seating-controls, .seating-values),
   .workbench .seating-slot :is(.seating-controls, .seating-values) > * {
     margin: 0;
@@ -4834,7 +4834,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 /* top right of the results at every desktop width */
-@media (min-width: 62em) {
+@media (width >= 62em) {
   .results-head {
     display: grid;
     gap: var(--space-xs) var(--space-md);
@@ -4936,7 +4936,7 @@ main .library-head.page-panel-head > .page-panel-title {
   font-size: var(--mantine-font-size-xs);
 }
 
-@media screen and (min-width: 62em) {
+@media screen and (width >= 62em) {
   .workbench .readouts dt {
     flex-basis: 11.5rem;
   }
@@ -5017,7 +5017,7 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 }
 
-@media screen and (min-width: 75em) {
+@media screen and (width >= 75em) {
   .workbench .panels {
     gap: 0 var(--space-sm-md);
   }
@@ -5171,7 +5171,7 @@ main .library-head.page-panel-head > .page-panel-title {
   font-weight: 700;
 }
 
-@media (min-width: 48em) {
+@media (width >= 48em) {
   .safety-columns:has(> :nth-child(2)) {
     grid-template-columns: 1fr 1fr;
   }
@@ -5191,7 +5191,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
 /* 75em to 108em: the sidebar is a rail on the workbench and the input columns narrower, so
    the frame fits 1280 x 800 and 1440 x 900 without scrolling */
-@media screen and (min-width: 75em) and (max-width: 107.99em) {
+@media screen and (width >= 75em) and (width < 108em) {
   .workbench .workspace-tabs {
     grid-template-columns: 37.5rem minmax(0, 1fr);
   }
@@ -5543,7 +5543,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
 /* the workbench's Trajectory tab: the groups in three columns as a dense
    property grid like the input cards, notes from the load for screen readers */
-@media screen and (min-width: 62em) {
+@media screen and (width >= 62em) {
   .workbench .embedded-calculator .panels {
     display: block;
     columns: 2;
@@ -5643,7 +5643,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
 /* dense property grid: rows about 27 px, labels on one line cut with the
    full text and its help on hover, the help itself for screen readers only */
-@media screen and (min-width: 62em) {
+@media screen and (width >= 62em) {
   /* Mantine sets --input-height inline from the size's variable, defined on the wrapper's class */
   .workbench .workspace-inputs .mantine-Input-wrapper {
     --input-height-sm: var(--field-height);
@@ -5701,7 +5701,7 @@ main .library-head.page-panel-head > .page-panel-title {
 /* workbench cards: a 32 px head of icon, title and record picker; 28 px rows of label, value and
    unit with hairline rules. A typed value sits in a filled field, a record's value is text, a
    derived value is muted text; choices are segmented rows. On a phone the same rows, 44 px high */
-@media screen and (max-width: 47.99em), screen and (min-width: 62em) {
+@media screen and (width < 48em), screen and (width >= 62em) {
   .workbench .panel {
     margin-bottom: var(--space-2xs);
   }
@@ -5933,7 +5933,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
 /* workbench inputs from 62em and on a phone: rows of label, value (84 px) and unit (42 px). A value
    too long for its column widens it in that row only, so every value ends at one edge */
-@media screen and (max-width: 47.99em), screen and (min-width: 62em) {
+@media screen and (width < 48em), screen and (width >= 62em) {
   .workbench .workspace-inputs .panel-fields > .mantine-InputWrapper-root,
   .workbench .seating-slot .mantine-InputWrapper-root,
   .workbench .workspace-inputs :is(.record-row, .seating-row, .pair-row) {
@@ -6091,7 +6091,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
 /* the phone's Load tab: the cards' rows at touch size, 44 px rows and heads, 36 px fields, a
    label, a 112 px value and a 44 px unit column */
-@media screen and (max-width: 47.99em) {
+@media screen and (width < 48em) {
   .workbench .workspace-inputs {
     --field-height: 2.25rem;
   }
@@ -6198,7 +6198,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 /* the cards' rows in 13 px from 62em, a record's row and the ladder's pair row too */
-@media screen and (min-width: 62em) {
+@media screen and (width >= 62em) {
   .workbench .workspace-inputs .panel-fields > :is(.record-row, .pair-row) {
     font-size: var(--mantine-font-size-sm);
   }
@@ -6207,7 +6207,7 @@ main .library-head.page-panel-head > .page-panel-title {
 /* the input columns from 75em: two of 288 px with 4 px between them, then 12 px, then the results.
    Column A Cartridge and the cartridge figure filling the rest, column B Powder, Bullet and Gun. In
    a window lower than 45em the burn-rate figure takes the cartridge figure's place */
-@media screen and (min-width: 75em) {
+@media screen and (width >= 75em) {
   .workbench .workspace-tabs {
     grid-template-columns: 36.25rem minmax(0, 1fr);
     gap: var(--space-sm-md);
@@ -6277,7 +6277,7 @@ main .library-head.page-panel-head > .page-panel-title {
   margin: 0 auto;
 }
 
-@media screen and (min-width: 75em) {
+@media screen and (width >= 75em) {
   .workbench .figure-host .cartridge-figure {
     display: flex;
     flex: 1;
@@ -6582,7 +6582,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
 /* below 62em: the peak pressure across the row, velocity and energy beside each other, the other
    values as one list of label and value rows; only the key tiles stay sticky on a tablet */
-@media screen and (max-width: 61.99em) {
+@media screen and (width < 62em) {
   .workbench .readouts.readout-keys {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -6647,7 +6647,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
 /* phones: the load on up to two lines above the notice, the ladder steps (44 px) before the
    readouts they select */
-@media screen and (max-width: 47.99em) {
+@media screen and (width < 48em) {
   .workbench .run-line {
     flex-wrap: wrap;
     row-gap: var(--space-2xs);
@@ -6693,7 +6693,7 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 }
 
-@media screen and (min-width: 62em) {
+@media screen and (width >= 62em) {
   .workbench .run-line {
     flex-wrap: nowrap;
     height: 1.75rem;
@@ -7025,13 +7025,13 @@ main .record-heading {
   flex-shrink: 0;
 }
 
-@media (max-width: 74.99em) {
+@media (width < 75em) {
   .page-bar .record-badge {
     display: none;
   }
 }
 
-@media (min-width: 75em) {
+@media (width >= 75em) {
   .record-facts {
     display: none;
   }
@@ -7095,7 +7095,7 @@ main .record-sources .sources th.source-page {
 }
 
 /* a phone: one block per source, each value after its column's name, nothing to scroll sideways */
-@media screen and (max-width: 47.99em) {
+@media screen and (width < 48em) {
   .record-sources .sources :is(tbody, tr, th, td) {
     display: block;
   }
@@ -7192,7 +7192,7 @@ main .record-sources .sources th.source-page {
    below it in document order (figure, values, side, sources). The values column takes the
    figure column's height (no height of its own in the row), its last panel growing, its table the
    scroll box, so a filter moves nothing */
-@media screen and (min-width: 62em) {
+@media screen and (width >= 62em) {
   .record-grid {
     display: grid;
     grid-template-columns: minmax(0, 11fr) minmax(0, 9fr);
@@ -7287,7 +7287,7 @@ main .record-sources .sources th.source-page {
 
 /* phone: a long value (the caliber classes, a combined number) wraps, so the discipline's values
    and the federation's discipline names stay in view */
-@media screen and (max-width: 47.99em) {
+@media screen and (width < 48em) {
   :is(.discipline-record, .federation-record)
     :is(.field-table td, .face-table td:not(.num, .nowrap)) {
     white-space: normal;
@@ -7331,7 +7331,7 @@ main .record-sources .sources th.source-page {
 
 /* the powder record: burn rate over the chart, the chart takes the column's rest down to the
    end of the parameters; a flex basis of 0, so the drawn chart never holds the row taller */
-@media screen and (min-width: 62em) {
+@media screen and (width >= 62em) {
   .record-chart :is(.record-figure, .vivacity-panel, .burn-rate-curve, .vivacity-chart, .echart) {
     display: flex;
     flex-direction: column;
@@ -7535,7 +7535,7 @@ main :is(.symbol-table, .coefficient-table, .record-sources .sources) {
 
 /* phone: a powder or bullet table at full width, a long value wraps, the symbol stays in view
    while a wide table scrolls sideways */
-@media screen and (max-width: 47.99em) {
+@media screen and (width < 48em) {
   :is(.record-chart, .bullet-record) .field-table {
     width: 100%;
   }
@@ -7723,7 +7723,7 @@ main .field-table tr.field-group > th {
   }
 }
 
-@media screen and (min-width: 48em) {
+@media screen and (width >= 48em) {
   .side-body {
     grid-template-columns: minmax(0, 26rem) max-content;
     justify-content: center;
@@ -7777,7 +7777,7 @@ main .field-table tr.field-group > th {
 }
 
 /* a wide window: larger type and a wider table */
-@media screen and (min-width: 88em) {
+@media screen and (width >= 88em) {
   main .cartridge-values {
     font-size: var(--mantine-font-size-md);
   }
@@ -7870,7 +7870,7 @@ main .field-table tr.field-group > th {
   }
 }
 
-@container (min-width: 70rem) {
+@container (width >= 70rem) {
   .cartridge-sides {
     --drawing-chrome: 16.25rem;
 
@@ -7945,7 +7945,7 @@ main .field-table tr.field-group > th {
 }
 
 /* the sides take the whole width, the sources under them */
-@media screen and (min-width: 62em) {
+@media screen and (width >= 62em) {
   .cartridge-record .record-grid {
     display: block;
   }
@@ -8041,7 +8041,7 @@ main .field-table tr.field-group > th {
 }
 
 /* a phone: a value longer than the window (a German method) wraps inside its card */
-@media screen and (max-width: 47.99em) {
+@media screen and (width < 48em) {
   .fact {
     white-space: normal;
   }
@@ -8718,7 +8718,7 @@ main .field-table tr.field-group > th {
   flex: none;
 }
 
-@media (max-width: 47.99em) {
+@media (width < 48em) {
   .message-slot {
     height: 4.5rem;
   }
@@ -8814,7 +8814,7 @@ main .field-table tr.field-group > th {
 
 /* session, firearms, settings, validation */
 /* settings: one body height for every tab, so switching moves nothing; Close in a footer line */
-@media screen and (min-width: 36em) {
+@media screen and (width >= 36em) {
   .settings-dialog .mantine-Tabs-root {
     min-height: min(31rem, 100dvh - 10rem);
   }
@@ -8853,7 +8853,7 @@ main .field-table tr.field-group > th {
 }
 
 /* workbench defaults: the label and its note left, the field right */
-@media (min-width: 48em) {
+@media (width >= 48em) {
   .workbench-defaults .mantine-InputWrapper-root {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 12rem;
@@ -8921,7 +8921,7 @@ main .field-table tr.field-group > th {
   margin: 0;
 }
 
-@media (max-width: 35.99em) {
+@media (width < 36em) {
   .chrono-import {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -8956,7 +8956,7 @@ main .field-table tr.field-group > th {
 }
 
 /* a phone: the hint takes a line under the label */
-@media (max-width: 35.99em) {
+@media (width < 36em) {
   .session-import .drop-zone {
     flex-wrap: wrap;
   }
@@ -9016,13 +9016,13 @@ main .session-shots th:nth-child(-n + 2) {
 }
 
 /* a phone: the seven statistics columns fit the width */
-@media screen and (max-width: 47.99em) {
+@media screen and (width < 48em) {
   .session-result .session-strings :is(th, td) {
     padding-inline: var(--space-2xs);
   }
 }
 
-@media screen and (min-width: 48em) {
+@media screen and (width >= 48em) {
   .session-result .scroll:has(> .session-strings) {
     max-height: 12rem;
   }
@@ -9032,7 +9032,7 @@ main .session-shots th:nth-child(-n + 2) {
   }
 }
 
-@media screen and (min-width: 62em) {
+@media screen and (width >= 62em) {
   .session-panels {
     display: grid;
     grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
@@ -9149,14 +9149,14 @@ main .session-shots th:nth-child(-n + 2) {
   min-height: 0;
 }
 
-@media screen and (min-width: 62em) {
+@media screen and (width >= 62em) {
   .page-shell[data-frame] .groups-page {
     flex: 1 1 0;
   }
 }
 
 /* below the window frame the page has no height to give: the editor takes most of the window */
-@media screen and (max-width: 61.99em) {
+@media screen and (width < 62em) {
   .groups-page .target-editor:not([data-phone]) .target-body {
     min-height: min(75svh, 40rem);
   }
@@ -9339,7 +9339,7 @@ main .session-shots th:nth-child(-n + 2) {
   background: var(--surface);
 }
 
-@container (max-width: 26rem) {
+@container (width <= 26rem) {
   /* a body of fixed height (expanded) gives the room left to the side, not to the canvas row */
   .target-body {
     grid-template-columns: minmax(0, 1fr);
@@ -10316,7 +10316,7 @@ main .session-shots th:nth-child(-n + 2) {
 
 /* the designers on a phone and under a coarse pointer: 44 px fields with 16 px text, so iOS does
    not zoom; the unit switch and the remove buttons keep at least 24 px */
-@media screen and (max-width: 47.99em), (pointer: coarse) {
+@media screen and (width < 48em), (pointer: coarse) {
   .designer {
     --field-height: 2.75rem;
   }
@@ -10342,7 +10342,7 @@ main .session-shots th:nth-child(-n + 2) {
 
 /* a phone: no drawing yet is one compact note above the inputs, without the panel's title and the
    empty lines it reserves for a drawing */
-@media screen and (max-width: 47.99em) {
+@media screen and (width < 48em) {
   .designer
     .workspace-results:has(.mantine-EmptyState-root)
     :is(.designer-panel-head, .derived-line:empty, .stale-line:empty) {
@@ -10425,7 +10425,7 @@ main .session-shots th:nth-child(-n + 2) {
   margin-top: var(--space-xs);
 }
 
-@media (max-width: 47.99em) {
+@media (width < 48em) {
   .ladder-impact .message-slot {
     height: 11rem;
   }
@@ -10439,7 +10439,7 @@ main .session-shots th:nth-child(-n + 2) {
 
 /* the tab before Expand, target first: the canvas takes the width, a fixed side column of 280 px
    holds the key readouts and the shot list, which scrolls on its own */
-@container (min-width: 26rem) {
+@container (width >= 26rem) {
   .groups-tab:not([data-expanded]) .target-body {
     grid-template-columns: minmax(0, 1fr) 17.5rem;
     /* the side column's content does not size the row: the shot list scrolls instead */
@@ -10666,7 +10666,7 @@ main .page-bar h1 {
   display: none;
 }
 
-@media screen and (max-width: 47.99em) {
+@media screen and (width < 48em) {
   .page-title-long {
     display: none;
   }
@@ -10702,7 +10702,7 @@ main .page-bar h1 {
   margin-inline-start: var(--space-sm-md);
 }
 
-@media screen and (min-width: 48em) {
+@media screen and (width >= 48em) {
   .bar-count {
     display: inline-block;
     min-width: var(--count-w);
@@ -10802,7 +10802,7 @@ main .page-bar h1 {
 /* below 75em the bar is the first row of the page, so a title with the 1.4.12 text spacing or a
    long German compound wraps over as many lines as it needs; "Page actions" shows the actions in
    a panel below it */
-@media screen and (max-width: 74.99em) {
+@media screen and (width < 75em) {
   .page-bar {
     position: relative;
     z-index: calc(var(--app-shell-header-z-index, 100) + 1);
@@ -10955,7 +10955,7 @@ main .page-bar h1 {
 
 /* a designer from 48em to 75em: Open, Save and Units stay in the bar, "Page actions" holds only
    Undo, Redo and New (`fold` of page-bar.tsx); on a phone all of them are rows of the panel */
-@media screen and (min-width: 48em) and (max-width: 74.99em) {
+@media screen and (width >= 48em) and (width < 75em) {
   .page-bar[data-fold] {
     grid-template: "title actions toggle" auto "status actions toggle" auto / minmax(0, 1fr) auto auto;
   }
@@ -11021,7 +11021,7 @@ main .page-bar h1 {
 }
 
 /* below 22.5em the panel is at most as wide as the bar, so its rows wrap */
-@media screen and (max-width: 22.5em) {
+@media screen and (width <= 22.5em) {
   .page-bar .page-bar-actions {
     min-width: 0;
     max-width: 100%;
@@ -11044,7 +11044,7 @@ main .page-bar h1 {
 /* from 75em the bar sits in the top bar between the wordmark's column and the theme switch: its
    title starts where the content starts, and the bar is centered in the 56 px band with 8 px above
    and below */
-@media screen and (min-width: 75em) {
+@media screen and (width >= 75em) {
   .page-bar {
     position: fixed;
     top: 0.5rem;
@@ -11113,7 +11113,7 @@ main .page-bar h1 {
 
 /* up to 80em the two icons leave the workbench's bar too little room: its load switcher gives it,
    the load's name cut with an ellipsis; off the scale: 75em overflows the bar, 88em cuts the name at 1280 px */
-@media screen and (min-width: 75em) and (max-width: 79.99em) {
+@media screen and (width >= 75em) and (width < 80em) {
   :root:has(.report-issue) .load-switch {
     width: 7.75rem;
   }
@@ -11121,7 +11121,7 @@ main .page-bar h1 {
 
 /* the Units button as an icon, named by its whole name, until its preset leaves a record's title
    its room (German, three page actions) */
-@media screen and (min-width: 75em) and (max-width: 107.99em) {
+@media screen and (width >= 75em) and (width < 108em) {
   /* beats the bar's left-section padding, so the icon sits in the middle */
   .page-bar .units-link.mantine-Button-root[data-with-left-section] {
     width: var(--button-height, 2.25rem);
@@ -11144,7 +11144,7 @@ main .page-bar h1 {
 
 /* a designer's Undo, Redo and Reset as icons named by their text until the German labels, the
    Safety button and the title fit in one bar */
-@media screen and (min-width: 75em) and (max-width: 107.99em) {
+@media screen and (width >= 75em) and (width < 108em) {
   .page-bar .toolbar > .bar-icon.mantine-Button-root {
     width: var(--button-height, 2.25rem);
     padding: 0;
@@ -11314,7 +11314,7 @@ main .page-bar h1 {
 
 /* a phone's status line is 150 px: while rows are picked, the summary has it and the count steps
    aside, still read by screen readers; Clear is its icon */
-@media screen and (max-width: 47.99em) {
+@media screen and (width < 48em) {
   .clear-picks .clear-picks-text {
     display: none;
   }
@@ -11632,7 +11632,7 @@ main .page-bar h1 {
    name, which a 768 px window left none, and the Sort shows to sort by the hidden columns; a print
    keeps every column */
 @media screen {
-  @container directory (max-width: 63.99rem) {
+  @container directory (width < 64rem) {
     .directory-table .wide-only {
       display: none;
     }
@@ -11642,7 +11642,7 @@ main .page-bar h1 {
     }
   }
 
-  @container (max-width: 59.99rem) {
+  @container (width < 60rem) {
     .directory-table {
       --rate-scale: 0px;
     }
@@ -11684,7 +11684,7 @@ main .page-bar h1 {
 
 /* a row with a menu held at the box's edge: the sticky cell lies over the link's box, so the
    focused row's cells draw the ring instead, the menu cell its right end beside its rule */
-@media screen and (min-width: 48em) {
+@media screen and (width >= 48em) {
   .directory-table
     tr[data-row]:has(> td.sticky-end):has(td.name-cell a:focus-visible)
     > td:not(.filler) {
@@ -11734,7 +11734,7 @@ main .page-bar h1 {
   display: none;
 }
 
-@media screen and (min-width: 62em) {
+@media screen and (width >= 62em) {
   .page-shell[data-frame] .directory {
     display: flex;
     flex: 1 1 0;
@@ -11819,7 +11819,7 @@ main .page-bar h1 {
 }
 
 /* phones scroll the page: the header sticks under the top bar */
-@media screen and (max-width: 61.99em) {
+@media screen and (width < 62em) {
   .directory-table thead :is(th, td) {
     top: var(--app-shell-header-offset, 0rem);
   }
@@ -11832,7 +11832,7 @@ main .page-bar h1 {
 
 /* a list page without the window-high frame scrolls the page at every width: the header sticks
    under the top bar there too */
-@media screen and (min-width: 62em) {
+@media screen and (width >= 62em) {
   .page-shell:not([data-frame]) .directory-table thead :is(th, td) {
     top: var(--app-shell-header-offset, 0rem);
   }
@@ -11844,13 +11844,13 @@ main .page-bar h1 {
 
 /* the firearm library's table scrolls sideways in its own box from 48em: its head sticks in that
    box, at its top */
-@media screen and (min-width: 48em) {
+@media screen and (width >= 48em) {
   .library > .directory > .directory-scroll .directory-table thead :is(th, td) {
     top: 0;
   }
 }
 
-@media screen and (max-width: 47.99em) {
+@media screen and (width < 48em) {
   .directory-table :is(th, td, col):not(.name-cell, .select-cell, .empty-cell) {
     display: none;
   }
@@ -12101,7 +12101,7 @@ main .compare-table {
 }
 
 /* the quantity stays beside the symbol while a phone scrolls the bullets */
-@media screen and (max-width: 47.99em) {
+@media screen and (width < 48em) {
   main .compare-table {
     min-width: calc(10rem + var(--n, 2) * 8rem);
   }
@@ -12159,7 +12159,7 @@ main .page-panel-head > .page-panel-title {
   margin: 0;
 }
 
-@media screen and (min-width: 48em) {
+@media screen and (width >= 48em) {
   :is(.page-panel, .designer .workspace-results, .library-list, .library-editor) {
     padding: 0 var(--panel-pad) var(--panel-pad);
     border: 1px solid var(--line);
@@ -12190,7 +12190,7 @@ main .page-panel-head > .page-panel-title {
   }
 }
 
-@media screen and (max-width: 47.99em) {
+@media screen and (width < 48em) {
   .page-panel {
     padding: 0;
     border: 0;
@@ -12220,7 +12220,7 @@ main .page-panel-head > .page-panel-title {
 }
 
 /* beside the drawing the table is as wide as its content: the drawing keeps the rest, whole */
-@media screen and (min-width: 48em) {
+@media screen and (width >= 48em) {
   main .side-values {
     width: auto;
   }
@@ -12292,7 +12292,7 @@ main .page-panel-head > .page-panel-title {
   margin: 0 0 var(--space-xs);
 }
 
-@media (min-width: 75em) {
+@media (width >= 75em) {
   .phone-action {
     display: none;
   }
@@ -12318,19 +12318,19 @@ main .page-panel-head > .page-panel-title {
   margin-inline-start: auto;
 }
 
-@media (max-width: 47.99em) {
+@media (width < 48em) {
   .fact-tags {
     display: none;
   }
 }
 
-@media (min-width: 48em) {
+@media (width >= 48em) {
   :is(.bullet-record, .record-chart) .record-facts {
     display: none;
   }
 }
 
-@media (max-width: 47.99em) {
+@media (width < 48em) {
   :is(.bullet-record, .record-chart) .record-facts {
     display: block;
   }
@@ -12397,7 +12397,7 @@ main .symbol-table tbody th {
   font-size: var(--mantine-font-size-xs);
 }
 
-@media screen and (min-width: 62em) {
+@media screen and (width >= 62em) {
   .bullet-cartridges {
     display: flex;
     flex: none;
@@ -12545,7 +12545,7 @@ main .cartridge-values td.dim-slot-cell {
   background: var(--page);
 }
 
-@media screen and (min-width: 62em) {
+@media screen and (width >= 62em) {
   .workbench .workbench-centre > [role="tabpanel"]:has(> .trajectory-view),
   .workbench .trajectory-view,
   .workbench .trajectory-detail,
@@ -12601,7 +12601,7 @@ main .cartridge-values td.dim-slot-cell {
 
 /* a wide results column: the inputs beside the notes and the chart, the table below, so the tab
    fits 1920 x 1080 without scrolling */
-@media screen and (min-width: 108em) {
+@media screen and (width >= 108em) {
   .workbench .trajectory-view {
     display: grid;
     grid-template-rows: auto auto 1fr auto;
@@ -12643,7 +12643,7 @@ main .cartridge-values td.dim-slot-cell {
   }
 }
 
-@media screen and (max-width: 47.99em) {
+@media screen and (width < 48em) {
   /* the search on a row of its own, then Source and Sort, which keep their text and wrap */
   .directory-filters > .directory-search {
     flex-basis: 100%;
@@ -12817,7 +12817,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
   text-align: end;
 }
 
-@media (max-width: 47.99em) {
+@media (width < 48em) {
   .bd-filter-bar {
     display: block;
   }
@@ -12850,7 +12850,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 }
 
 /* the Run button of the page bar keeps its width for the longer German word */
-@media screen and (min-width: 75em) {
+@media screen and (width >= 75em) {
   :lang(de) .page-bar .bar-run {
     padding-inline-end: var(--space-2xs);
   }
@@ -12858,7 +12858,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 
 /* German words run longer: where the columns are narrow (75em to 108em) the labels of the
    workbench's input cards take the smaller size and keep one line */
-@media screen and (min-width: 75em) and (max-width: 107.99em) {
+@media screen and (width >= 75em) and (width < 108em) {
   :lang(de)
     .workbench
     .workspace-inputs
@@ -12887,7 +12887,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
   align-content: start;
 }
 
-@media screen and (min-width: 62em) {
+@media screen and (width >= 62em) {
   .tune-layout {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-auto-flow: row dense;
@@ -13072,7 +13072,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 
 /* from 75em a tour's target taller than the window scrolls to its top below the fixed top bar (56 px),
    with room for the stage's 10 px and 8 px more, so the popover beside it starts below the bar too */
-@media screen and (min-width: 75em) {
+@media screen and (width >= 75em) {
   html:has(> body.driver-active) {
     scroll-padding-top: 4.625rem;
   }

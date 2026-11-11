@@ -121,7 +121,7 @@ export function SettingsSections({
   onTab: (t: SettingsTab) => void
   onClose: () => void
 }) {
-  const phone = useMediaQuery('(max-width: 35.99em)')
+  const phone = useMediaQuery('(width < 36em)')
   const { t } = useTranslation()
   return (
     <Tabs
