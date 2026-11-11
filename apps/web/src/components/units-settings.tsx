@@ -236,7 +236,7 @@ export function UnitsForm() {
   const { choice, choose, custom, ready } = useUnits()
   const { t } = useTranslation()
   // four segments do not fit a phone in a row
-  const narrow = useMediaQuery('(max-width: 35.99em)')
+  const narrow = useMediaQuery('(width < 36em)')
   const isCustom = hasOverrides(choice)
   const set = (preset: PresetId, overrides: UnitChoice['overrides']) =>
     choose({

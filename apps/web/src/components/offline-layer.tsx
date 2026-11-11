@@ -10,7 +10,7 @@ import { controlSize } from '../lib/theme.ts'
 /** Production builds only (development removes one); Reload lets the waiting worker take over and reloads this tab, never touching the store of the user's records. */
 export function OfflineLayer() {
   const [waiting, setWaiting] = useState<ServiceWorker>()
-  const wide = useMediaQuery('(min-width: 75em)')
+  const wide = useMediaQuery('(width >= 75em)')
   const { t } = useTranslation()
   useEffect(() => {
     if (!('serviceWorker' in navigator)) return
