@@ -1,4 +1,4 @@
-/** The web app's English messages and a language's catalogue against them: `messages` lists every message, `missing <code>` what `src/i18n/<code>.json` lacks and its keys no message matches (exit 1 for such a key), `check <code> [<base>]` the lint `pnpm run lint` runs (with the term table and safe wording for German; CI passes the pull request's base, whose untranslated list must hold every listed text); a message is the literal first argument of `t` or `msg` or both forms of `tn` in a file importing from `src/i18n/`. shortcut: a text scan, not a parse (`tn` read by bracket depth, a template literal with `${` refused); upgrade to the TypeScript API if a source needs more. */
+/** The web app's English messages and a language's catalogue against them: `messages` lists every message, `missing <code>` what `src/i18n/<code>.json` lacks and its keys no message matches (exit 1 for such a key), `check <code> [<base>]` the lint `pnpm run lint` runs (with the term table and safe wording for German; CI passes the pull request's base and `check:changed` the merge base with `origin/main`, whose untranslated list must hold every listed text); a message is the literal first argument of `t` or `msg` or both forms of `tn` in a file importing from `src/i18n/`. shortcut: a text scan, not a parse (`tn` read by bracket depth, a template literal with `${` refused); upgrade to the TypeScript API if a source needs more. */
 import { globSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { git } from './ci-plan.mts'
@@ -363,6 +363,16 @@ export function safeWordingProblems(
   return found
 }
 
+/** The untranslated list of `code` in `lintAtBase`, the lint file as the commit `baseRef` has it; a base without one throws, since nothing would show that the list only shrank. */
+export function baseList(lintAtBase: string, code: string, baseRef: string): string[] {
+  const list = JSON.parse(lintAtBase).untranslated?.[code]
+  if (!list)
+    throw new Error(
+      `the base ${baseRef} has no untranslated list for ${code} in apps/web/scripts/i18n-lint.json, so the list cannot be compared: if origin/main is stale, run git fetch origin main and check again`,
+    )
+  return list
+}
+
 if (import.meta.main) {
   const [command, code, baseRef] = process.argv.slice(2)
   const source = messages()
@@ -382,10 +392,11 @@ if (import.meta.main) {
     const read = (file: string) => JSON.parse(readFileSync(path.join(webRoot, file), 'utf8'))
     const lint = read('scripts/i18n-lint.json')
     const allowed: string[] = lint.untranslated[code] ?? []
-    // a base without a list for the language compares nothing
-    const base: string[] | undefined = baseRef
-      ? JSON.parse(git('show', `${baseRef}:apps/web/scripts/i18n-lint.json`)).untranslated?.[code]
-      : undefined
+    // with nothing listed there is nothing the base could lack
+    const base =
+      baseRef && allowed.length > 0
+        ? baseList(git('show', `${baseRef}:apps/web/scripts/i18n-lint.json`), code, baseRef)
+        : undefined
     const same: string[] = lint.sameAsEnglish?.[code] ?? []
     const found = problems(source, catalogue, code, requiredMessages(webRoot), allowed, base, same)
     if (code === 'de') {

@@ -60,7 +60,7 @@ pnpm --filter @open-reloading/web run i18n messages     # every message in the s
 
 - such a key, an empty text, placeholders other than the key's, or a plural form the language lacks;
 - a message without German that `untranslated.de` of `apps/web/scripts/i18n-lint.json` does not list. A new text needs its German text in the same change;
-- a listed message that has German now or is gone, and in CI one that the pull request's base does not list, so the list only shrinks. It holds the file readers' messages that had no German when the check became strict;
+- a listed message that has German now or is gone, and in CI and `pnpm run check:changed` one that the base (the pull request's, locally the merge base with `origin/main`) does not list, so the list only shrinks. It holds the file readers' messages that had no German when the check became strict;
 - a German text equal to its English key that `sameAsEnglish.de` of `i18n-lint.json` does not list, unless it has no letter or quote mark outside its placeholders (`{name}: {reason}`); a listed text that needs no entry or is listed twice fails. A text whose German really is the English (a unit, a brand, a term such as "Ogive") is added to the list in the same change; a listed text that has other German now or is gone fails too;
 - a text of the message table (`core-message-table.json`, the warning sentences of `core-message-table.ts` and the refusal words of `refusal-words.ts`) or a line of the Safety notice (`src/lib/safety.ts`) without a translation or left in English. These are never listed.
 
