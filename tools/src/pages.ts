@@ -1,6 +1,6 @@
 // Builds the Pages site into `pages/`; settings and flags: apps/docs/docs/release.md#pages-site
 import { spawn } from 'node:child_process'
-import { cpSync, rmSync, writeFileSync } from 'node:fs'
+import { cpSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { startBundleApi, writeStaticApi } from '@open-reloading/api/static'
 import { executable } from './executable.ts'
@@ -50,7 +50,8 @@ try {
     NEXT_PUBLIC_NO_DOCS: docs ? undefined : '1',
   })
   rmSync(site, { recursive: true, force: true })
-  cpSync(at('apps/web/out'), site, { recursive: true })
+  // a move, not a copy: a recursive cpSync into the dev container's bind mount fails with EACCES on macOS
+  renameSync(at('apps/web/out'), site)
   dropFullPayloads(site)
   await writeStaticApi(api.data, `${site}/api`)
 } finally {
