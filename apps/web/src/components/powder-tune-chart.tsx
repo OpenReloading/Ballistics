@@ -77,14 +77,16 @@ export function TuneChart({
   const c = system.charge
   const v = system.velocity
   const measured = rows.flatMap((r) => (r.velocityStats ? [r] : []))
-  const xs = [...band.map((p) => p.charge), ...measured.map((r) => r.charge)].map(c.fromSi)
+  const xs = [...band.map((p) => p.charge), ...measured.map((r) => r.charge)].map((x) =>
+    c.fromSi(x),
+  )
   const ys = [
     ...band.flatMap((p) => [p.velocity.lower, p.velocity.upper]),
     ...curve.map((p) => p.velocity),
     ...measured.flatMap(({ velocityStats: s }) =>
       s ? [s.mean - (s.standardDeviation ?? 0), s.mean + (s.standardDeviation ?? 0)] : [],
     ),
-  ].map(v.fromSi)
+  ].map((y) => v.fromSi(y))
   if (band.length < 2) return null
   const xt = niceTicks(Math.min(...xs), Math.max(...xs), ticks)
   const yt = niceTicks(Math.min(...ys), Math.max(...ys), ticks)

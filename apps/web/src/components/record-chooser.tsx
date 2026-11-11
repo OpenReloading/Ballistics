@@ -356,7 +356,7 @@ export function RecordChooser<R extends ChooserRow>(props: ChooserProps<R>) {
     () => (given ? { status: 'ok', rows: given } : read.state),
     [given, read.state],
   )
-  const phone = useMediaQuery('(max-width: 47.99em)')
+  const phone = useMediaQuery('(width < 48em)')
   // each opening mounts a new body, which starts from the card's text and no filter in its first render
   const [opening, setOpening] = useState({ opened, count: 0 })
   if (opening.opened !== opened) setOpening({ opened, count: opening.count + (opened ? 1 : 0) })

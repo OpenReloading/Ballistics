@@ -1860,7 +1860,7 @@ export function useWorkbenchState() {
   const [ladderError, setLadderError] = useState<string | undefined>()
   const [direction, setDirection] = useState<LadderDirection>('up')
   const [chartView, setChartView] = useState<ChartView>({ x: 'travel', quantity: 'all' })
-  const framed = useMediaQuery('screen and (min-width: 62em)')
+  const framed = useMediaQuery('screen and (width >= 62em)')
   const running = useRef<AbortController | null>(null)
   // the sampled band request of the shown result: an edit leaves it running, a new run ends it
   const bandRequest = useRef<AbortController | null>(null)
