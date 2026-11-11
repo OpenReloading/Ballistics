@@ -161,8 +161,8 @@ jobs:
     # a failed `changes` job leaves the outputs empty, so the job runs
     if: ${{ !cancelled() && needs.changes.outputs.docs != 'false' }}
     runs-on: ubuntu-latest
-    # about three times its run (4 to 5 minutes)
-    timeout-minutes: 15
+    # about three times its run on a runner (2 to 3 minutes)
+    timeout-minutes: 10
     permissions:
       contents: read
     steps:
