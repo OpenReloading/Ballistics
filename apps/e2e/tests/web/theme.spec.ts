@@ -1,5 +1,6 @@
 import { expect, type Page, test } from '@playwright/test'
 import { isDark } from './luminance.ts'
+import { gotoHydrated } from './nav.ts'
 
 // the body background as first computed, at DOMContentLoaded, before any client code runs
 const recordFirstPaint = (page: Page) =>
@@ -80,6 +81,22 @@ test('print with dark stored is light', async ({ page }) => {
   expect(await page.evaluate(() => getComputedStyle(document.documentElement).colorScheme)).toBe(
     'light',
   )
+})
+
+test("print with dark stored: Mantine's own dark colors are light too", async ({ page }) => {
+  await storeDark(page)
+  await gotoHydrated(page, '/workbench?cartridge=308-win')
+  await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', 'dark')
+  await page.emulateMedia({ media: 'print' })
+  const shown = (selector: string, property: 'backgroundColor' | 'color') =>
+    page
+      .locator(`${selector}:visible`)
+      .first()
+      .evaluate((node, name) => getComputedStyle(node)[name], property)
+  // a field's fill, Mantine's dark shade 6 on screen under the light ink
+  expect(isDark(await shown('.mantine-Input-input', 'backgroundColor'))).toBe(false)
+  // an accordion label, Mantine's bright color: white on screen
+  expect(isDark(await shown('.mantine-Accordion-control', 'color'))).toBe(true)
 })
 
 test('the switch is reachable by keyboard and exposes its name and pressed state', async ({
