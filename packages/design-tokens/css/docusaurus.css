@@ -68,9 +68,7 @@
   --pf-font: var(--ifm-font-family-base);
 }
 
-/* Print is light (tokens.css), also with the dark theme on: the dark values of Infima that the mapping above leaves,
-   as Infima sets them in its light theme (apps/docs/scripts/print-colors.test.mts compares them). Code blocks keep the
-   dark theme's colors, which Docusaurus writes inline. */
+/* Infima's unmapped dark values in print, at its light ones (apps/docs/scripts/print-colors.test.mts) */
 @media print {
   :root[data-theme="dark"] {
     --ifm-color-scheme: light;
