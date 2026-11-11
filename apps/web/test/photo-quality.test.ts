@@ -1,6 +1,8 @@
 import { findFace } from '@open-reloading/target-recognition'
 import sharp from 'sharp'
 import { describe, expect, it } from 'vitest'
+import { photoScene } from '../../../packages/target-recognition/test/face-photos.ts'
+import { render, type Scene } from '../../../packages/target-recognition/test/face-render.ts'
 import { msg } from '../src/i18n/translate.ts'
 import type { RgbaImage } from '../src/lib/image.ts'
 import {
@@ -11,8 +13,7 @@ import {
   type QualityIssue,
   type TargetLayout,
 } from '../src/lib/photo-quality.ts'
-import { photoScene } from './face-photos.ts'
-import { faceById, faces, render, type Scene } from './face-render.ts'
+import { faceById, faces } from './catalog-faces.ts'
 
 // Photo quality on drawn photos: a clean photo of a face has no problem, and each degradation (blur, low light, a reflection, a shadow, a slant, a small target, a cut black area) is named.
 

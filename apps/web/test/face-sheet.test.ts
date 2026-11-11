@@ -1,11 +1,16 @@
 import type { TargetSheet } from '@open-reloading/schema'
 import { type FaceFit, findFace } from '@open-reloading/target-recognition'
 import { describe, expect, it } from 'vitest'
+import {
+  type Homography,
+  project,
+  render,
+} from '../../../packages/target-recognition/test/face-render.ts'
 import { calibrateSheetOnFace, faceGeometry } from '../src/lib/face-sheet.ts'
 import { frameOf, viewToTarget } from '../src/lib/target-editor.ts'
 import { apply3 } from '../src/lib/target-geometry.ts'
+import { faceById, faces } from './catalog-faces.ts'
 import { defined } from './defined.ts'
-import { faceById, faces, type Homography, project, render } from './face-render.ts'
 
 // A face found on a photo as the calibration of the sheet
 const group = (id: string, face?: NonNullable<TargetSheet['groups'][number]['face']>) => ({

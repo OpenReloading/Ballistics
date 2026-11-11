@@ -1,11 +1,20 @@
-import type { TargetFace } from '@open-reloading/schema'
-import { autoDetect, type FaceFit, faceLabel, findFace } from '@open-reloading/target-recognition'
+import { applyMatrix } from '@open-reloading/shot-groups'
 import sharp from 'sharp'
 import { expect } from 'vitest'
-import type { RgbaImage } from '../src/lib/image.ts'
-import { applyMatrix } from '../src/lib/target-geometry.ts'
+import { findFace } from '../src/face-search.ts'
+import { autoDetect } from '../src/hole-detection.ts'
+import type { RgbaImage } from '../src/image.ts'
+import { type FaceFit, type FaceSearch, faceLabel, type PrintedFace } from '../src/target-face.ts'
 import { defined } from './defined.ts'
-import { type Camera, faceById, faces, project, render, type Scene } from './face-render.ts'
+import {
+  type Camera,
+  faceById,
+  faces,
+  type Homography,
+  project,
+  render,
+  type Scene,
+} from './face-render.ts'
 
 // The photos people take of a sheet (`photoScene`): the face search and the hole detection on the face it finds, as the editor runs them; one test file per face, so they run in parallel.
 
@@ -14,8 +23,8 @@ export const photoKinds = ['whole', 'insert', 'zoom', 'corner', 'cut', 'skewed',
 export type PhotoKind = (typeof photoKinds)[number]
 
 /** Ring numerals as bars of a digit's size on both axes, in the zones outside the two innermost (dark on paper, light on black). */
-function numerals(face: TargetFace, paper = 226, black = 30): NonNullable<Scene['marks']> {
-  const radii = face.rings.map((r) => r.diameter.value / 2).sort((a, b) => b - a)
+function numerals(face: PrintedFace, paper = 226, black = 30): NonNullable<Scene['marks']> {
+  const radii = face.rings.map((r) => r.diameter.value / 2).toSorted((a, b) => b - a)
   const blackR = face.blackDiameter.value / 2
   return radii.slice(0, -2).flatMap((r, i) => {
     const gap = r - defined(radii[i + 1])
@@ -72,27 +81,59 @@ const holeSpots: [number, number][] = [
 ]
 
 /** 1200 x 900 px (`poor`: 640 x 480 with uneven light, a shadow, blur and noise), six holes of `bullet` mm in the black area; a test adds the JPEG compression. */
-export function photoScene(face: TargetFace, kind: PhotoKind, bullet: number): Scene {
+export function photoScene(face: PrintedFace, kind: PhotoKind, bullet: number): Scene {
   const [W, H] = kind === 'poor' ? [640, 480] : [1200, 900]
   const outer = defined(face.rings[0]).diameter.value / 2
   const blackR = face.blackDiameter.value / 2
   // the whole sheet, its header included, fills 90 % of the height; the line is 2.2 px wide there
   const whole = (0.9 * H) / (2.53 * outer)
   const line = (2.2 * H) / 900 / whole
-  const sheet: Scene['sheet'] = {
-    box: [-1.15 * outer, -1.15 * outer, 1.15 * outer, 1.38 * outer],
-    background: 95,
-  }
-  const printed = { sheet, marks: [...sheetPrint(outer), ...numerals(face)] }
-  const mid = (s: number) => ({ x: W / 2, y: H / 2 + 0.115 * outer * s })
-  const camera = (s: number, more: Partial<Camera>): Camera => ({
+  const views = viewsOf(face, [W, H], whole)
+  return {
+    face,
+    line,
+    noise: 2,
+    holes: holeSpots.map(([x, y]) => ({ x: x * blackR, y: y * blackR, diameter: bullet })),
+    holeGrey: 205,
+    ...views[kind],
+  } as Scene
+}
+
+/** A camera of a `W` by `H` px photo at `s` px per mm, depth 5 unless `more` says otherwise. */
+const cameraOf =
+  (W: number, H: number) =>
+  (s: number, more: Partial<Camera>): Camera => ({
     width: W,
     height: H,
     pxPerMm: s,
     depth: 5,
     ...more,
   })
-  const views: Record<PhotoKind, Partial<Scene>> = {
+
+/** Light falling off to the right and a soft shadow over the lower right of a photo `W` px wide. */
+const shadowLight =
+  (W: number) =>
+  (x: number, y: number): number => {
+    const t = Math.min(1, Math.max(0, (x + 0.5 * y - 0.75 * W) / (0.05 * W)))
+    return (1 - 0.3 * (x / W)) * (1 - 0.45 * t)
+  }
+
+/** The camera, the print and the light of each kind of photo of a `W` by `H` px photo; `whole` px per mm shows the whole sheet. */
+function viewsOf(
+  face: PrintedFace,
+  [W, H]: [number, number],
+  whole: number,
+): Record<PhotoKind, Partial<Scene>> {
+  const outer = defined(face.rings[0]).diameter.value / 2
+  const blackR = face.blackDiameter.value / 2
+  const sheet: Scene['sheet'] = {
+    box: [-1.15 * outer, -1.15 * outer, 1.15 * outer, 1.38 * outer],
+    background: 95,
+  }
+  const printed = { sheet, marks: [...sheetPrint(outer), ...numerals(face)] }
+  const mid = (s: number) => ({ x: W / 2, y: H / 2 + 0.115 * outer * s })
+  const camera = cameraOf(W, H)
+  return {
     whole: { ...printed, camera: camera(whole, { tilt: 6, roll: 2, at: mid(whole) }) },
     insert: {
       sheet: { box: [-1.4 * blackR, -1.4 * blackR, 1.4 * blackR, 1.4 * blackR], background: 150 },
@@ -121,23 +162,11 @@ export function photoScene(face: TargetFace, kind: PhotoKind, bullet: number): S
     poor: {
       ...printed,
       camera: camera(whole, { tilt: 8, roll: -4, at: mid(whole) }),
-      // light falling off to the right and a soft shadow over the lower right
-      light: (x, y) => {
-        const t = Math.min(1, Math.max(0, (x + 0.5 * y - 0.75 * W) / (0.05 * W)))
-        return (1 - 0.3 * (x / W)) * (1 - 0.45 * t)
-      },
+      light: shadowLight(W),
       blur: 1,
       noise: 6,
     },
   }
-  return {
-    face,
-    line,
-    noise: 2,
-    holes: holeSpots.map(([x, y]) => ({ x: x * blackR, y: y * blackR, diameter: bullet })),
-    holeGrey: 205,
-    ...views[kind],
-  } as Scene
 }
 
 async function jpeg(image: RgbaImage, quality: number): Promise<RgbaImage> {
@@ -179,9 +208,7 @@ export async function measure(id: string, kind: PhotoKind, bullet: number): Prom
   const fit: FaceFit | undefined = search.fits.find((f) => f.face.id === id) ?? search.fits[0]
   const row: Row = {
     photo: `${id} ${kind}`,
-    face: !fit
-      ? '-'
-      : `${fit.face.id === id ? 'right' : 'wrong'} ${search.sure ? 'sure' : `ask ${search.fits.length}`}`,
+    face: verdict(search, fit, id),
     centreMm: Number.NaN,
     scalePct: Number.NaN,
     holes: 0,
@@ -196,6 +223,22 @@ export async function measure(id: string, kind: PhotoKind, bullet: number): Prom
   const local = Math.sqrt(Math.abs((ex.x - c.x) * (ey.y - c.y) - (ex.y - c.y) * (ey.x - c.x)))
   row.centreMm = Math.hypot(at.x, at.y)
   row.scalePct = 100 * (fit.pxPerMm / local - 1)
+  return { ...row, ...holesFound({ face, kind, bullet }, { image, h }, fit, local) }
+}
+
+/** `Row.face` of the search: '-' without a fit, else right or wrong, sure or the number of faces offered. */
+function verdict(search: FaceSearch, fit: FaceFit | undefined, id: string): string {
+  if (!fit) return '-'
+  return `${fit.face.id === id ? 'right' : 'wrong'} ${search.sure ? 'sure' : `ask ${search.fits.length}`}`
+}
+
+/** The hole detection on the face of `fit`: the holes of the scene found, of those on the photo, and the proposals that are no hole. */
+function holesFound(
+  { face, kind, bullet }: { face: PrintedFace; kind: PhotoKind; bullet: number },
+  { image, h }: { image: RgbaImage; h: Homography },
+  fit: FaceFit,
+  local: number,
+): Pick<Row, 'holes' | 'of' | 'extra'> {
   const label = faceLabel(
     {
       toFace: fit.toFace,
@@ -221,18 +264,18 @@ export async function measure(id: string, kind: PhotoKind, bullet: number): Prom
     const j = found.findIndex((p, k) => !used.has(k) && Math.hypot(p.x - t.x, p.y - t.y) <= D / 2)
     if (j >= 0) used.add(j)
   }
-  return { ...row, holes: used.size, of: truth.length, extra: found.length - used.size }
+  return { holes: used.size, of: truth.length, extra: found.length - used.size }
 }
 
 /** The face right, applied without a question (`sure`) or offered with the faces the photo cannot tell apart, its center within 0.6 % of the outer radius and its scale within 1 %. */
-export function expectFace(row: Row, outer: number, sure: boolean) {
+export function expectFace(row: Row, outer: number, sure: boolean): void {
   expect(row.face).toMatch(sure ? /^right sure$/ : /^right ask \d+$/)
   expect(row.centreMm).toBeLessThan(0.006 * outer)
   expect(Math.abs(row.scalePct)).toBeLessThan(1)
 }
 
 /** At least `holes` of the six holes found, at most `extra` proposals that are no hole. */
-export function expectHoles(row: Row, holes: number, extra: number) {
+export function expectHoles(row: Row, holes: number, extra: number): void {
   expect(row.holes).toBeGreaterThanOrEqual(holes)
   expect(row.extra).toBeLessThanOrEqual(extra)
 }
@@ -247,7 +290,7 @@ export function firstChoices(rows: readonly Row[]): string {
     counts.set(first.rings, c)
   }
   return [...counts]
-    .sort(([a], [b]) => a - b)
+    .toSorted(([a], [b]) => a - b)
     .map(([rings, c]) => `${rings} rings: right ${c.right}, wrong ${c.wrong}`)
     .join('\n')
 }

@@ -222,6 +222,7 @@ it('tests every group for a change outside the workspaces, an unknown or empty s
 // A test reads these workspaces' files without importing them; each reader declares the workspace it reads as a devDependency, so pnpm selects the reader when that workspace changes.
 it.each([
   ['catalog', 'shot-groups'], // the event types and target faces (shot-groups/test)
+  ['catalog', 'target-recognition'], // the target faces (target-recognition/test/face-render.ts)
   ['catalog', 'drawing'], // the bullet records (drawing/test/bullet-outline.test.ts)
   ['web', 'docs'], // files named in `Code:` lines, the photo checks (docs/scripts/photo-guide.test.mts)
   ['web', 'e2e'], // the German catalogue (e2e/scripts/visual-check.test.ts)

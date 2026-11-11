@@ -1,17 +1,16 @@
-import type { TargetFace } from '@open-reloading/schema'
-import { meanRadius } from '@open-reloading/shot-groups'
+import { apply3, meanRadius } from '@open-reloading/shot-groups'
+import { describe, expect, it } from 'vitest'
+import { findFace } from '../src/face-search.ts'
 import {
   confidenceOf,
   type FaceFit,
   faceLabel,
-  findFace,
   fitDiameter,
   fitPicked,
   matchFaces,
   onPhoto,
-} from '@open-reloading/target-recognition'
-import { describe, expect, it } from 'vitest'
-import { apply3 } from '../src/lib/target-geometry.ts'
+  type PrintedFace,
+} from '../src/target-face.ts'
 import { defined, missing } from './defined.ts'
 import { photoScene } from './face-photos.ts'
 import {
@@ -55,7 +54,7 @@ const offered = (id: string) => [
   ...(alsoOffered[id] ?? []),
 ]
 
-function scene(face: TargetFace, v: (typeof views)[number], extra: Partial<Scene> = {}): Scene {
+function scene(face: PrintedFace, v: (typeof views)[number], extra: Partial<Scene> = {}): Scene {
   const outer = defined(face.rings[0]).diameter.value / 2
   const pxPerMm = (0.42 * Math.min(W, H)) / outer
   return {
@@ -92,6 +91,13 @@ const searched = memo((id: string, v: number) => ({
   found: findFace(drawn(id, v).image, faces),
 }))
 
+/** A length 1.6 % larger. */
+const scale = (v: { value: number }) => ({ ...v, value: v.value * 1.016 })
+/** A length `k` times as large. */
+const times = (v: { value: number }, k: number) => ({ ...v, value: v.value * k })
+/** The ids of the fits, sorted. */
+const ids = (f: ReturnType<typeof findFace>) => f.fits.map((x) => x.face.id).toSorted()
+
 function memo<T>(make: (id: string, v: number) => T) {
   const cache = new Map<string, T>()
   return (id: string, v: number): T => {
@@ -101,47 +107,51 @@ function memo<T>(make: (id: string, v: number) => T) {
   }
 }
 
+/** The fit of `face` on the photo of homography `h`: its center, radii and scale close to the camera's. */
+function expectFitClose(face: PrintedFace, fit: FaceFit, h: Homography): void {
+  const outer = defined(face.rings[0]).diameter.value / 2
+  const e = error(fit, h, outer)
+  // within 0.5 % of the outer radius: a few tenths of a pixel on these photos
+  expect(e.centre).toBeLessThan(0.005 * outer)
+  expect(e.radial).toBeLessThan(0.007 * outer)
+  expect(fit.approximate).toBe(false)
+  expect(fit.rms).toBeLessThan(0.01 * (face.blackDiameter.value / 2))
+  // the scale at the center: the camera's px per mm there
+  const i0 = project(h, { x: 0, y: 0 })
+  const ex = project(h, { x: 1, y: 0 })
+  const ey = project(h, { x: 0, y: 1 })
+  const local = Math.sqrt(Math.abs((ex.x - i0.x) * (ey.y - i0.y) - (ex.y - i0.y) * (ey.x - i0.x)))
+  expect(Math.abs(fit.pxPerMm / local - 1)).toBeLessThan(0.01)
+}
+
 describe('findFace on drawn faces', () => {
   for (const face of faces.filter((f) => f.photoSearch !== false))
     for (const [i, v] of views.entries())
       it(`${face.id}, ${v.name}: the face, its center and its scale`, () => {
-        const { h = missing(), found } = searched(face.id, i)
+        const { h, found } = searched(face.id, i)
         const fit = found.fits.find((f) => f.face.id === face.id)
         expect(fit).toBeDefined()
         if (!fit) return
         // only the listed twins may be offered with the face, and then the editor asks
         expect(found.fits.every((f) => offered(face.id).includes(f.face.id))).toBe(true)
         expect(found.sure).toBe(found.fits.length === 1)
+        expectFitClose(face, fit, h)
         // any other face is the first fit, alone and sure
-        if (offered(face.id).length === 1) {
-          expect(defined(found.fits[0]).face.id).toBe(face.id)
-          expect(found.fits).toHaveLength(1)
-          expect(found.sure).toBe(true)
-        }
-        const outer = defined(face.rings[0]).diameter.value / 2
-        const e = error(fit, h, outer)
-        // within 0.5 % of the outer radius: a few tenths of a pixel on these photos
-        expect(e.centre).toBeLessThan(0.005 * outer)
-        expect(e.radial).toBeLessThan(0.007 * outer)
-        expect(fit.approximate).toBe(false)
-        expect(fit.rms).toBeLessThan(0.01 * (face.blackDiameter.value / 2))
-        // the scale at the center: the camera's px per mm there
-        const i0 = project(h, { x: 0, y: 0 })
-        const ex = project(h, { x: 1, y: 0 })
-        const ey = project(h, { x: 0, y: 1 })
-        const local = Math.sqrt(
-          Math.abs((ex.x - i0.x) * (ey.y - i0.y) - (ex.y - i0.y) * (ey.x - i0.x)),
-        )
-        expect(Math.abs(fit.pxPerMm / local - 1)).toBeLessThan(0.01)
+        if (offered(face.id).length !== 1) return
+        expect(defined(found.fits[0]).face.id).toBe(face.id)
+        expect(found.fits).toHaveLength(1)
+        expect(found.sure).toBe(true)
       })
+})
 
+describe('findFace on drawn faces: a skipped copy, the center under tilt, a close photo', () => {
   it('never offers a skipped copy of a face the search finds, which finds the record itself', () => {
     const face = faceById('issf-25m-rapid-fire-pistol')
     const copy = { ...face, id: 'skipped-copy', photoSearch: false }
     // the copy draws as the record does
     const found = findFace(drawn(face.id, 0).image, [...faces, copy])
-    const ids = [...found.fits.map((x) => x.face.id), ...found.ranked.map((x) => x.id)]
-    expect(ids).not.toContain(copy.id)
+    const shown = [...found.fits.map((x) => x.face.id), ...found.ranked.map((x) => x.id)]
+    expect(shown).not.toContain(copy.id)
     expect(found.fits[0]?.face.id).toBe(face.id)
   })
 
@@ -166,7 +176,9 @@ describe('findFace on drawn faces', () => {
     expect(found.sure).toBe(true)
     expect(found.fits[0]?.face.id).toBe(face.id)
   })
+})
 
+describe('findFace on drawn faces with holes, a dark patch or a twin', () => {
   it('keeps the face when holes pierce it and a dark patch hides part of it', () => {
     const face = faceById('issf-25m-precision-50m-pistol')
     const s = scene(face, defined(views[1]), {
@@ -179,17 +191,17 @@ describe('findFace on drawn faces', () => {
       // a pistol-sized dark patch over the edge of the face
       patches: [{ box: [800, 560, 1000, 700], grey: 25 }],
     })
-    const { image, h = missing() } = render(s)
+    const { image, h } = render(s)
     const fit = findFace(image, faces).fits[0]
     expect(fit?.face.id).toBe(face.id)
-    if (fit) expect(error(fit, h, 250).centre).toBeLessThan(2)
+    if (!fit) return
+    expect(error(fit, h, 250).centre).toBeLessThan(2)
   })
 
   it('proposes two faces whose rings the photo cannot tell apart', () => {
     const base = faceById('issf-25m-precision-50m-pistol')
     // a neighbor whose rings and black area are 1.6 % larger
-    const scale = (v: { value: number }) => ({ ...v, value: v.value * 1.016 })
-    const twin: TargetFace = {
+    const twin: PrintedFace = {
       ...base,
       id: 'twin',
       name: 'Twin',
@@ -202,7 +214,7 @@ describe('findFace on drawn faces', () => {
     const found = findFace(drawn(base.id, 0).image, [base, twin])
     // twins are a question for the user
     expect(found.sure).toBe(false)
-    expect(found.fits.map((f) => f.face.id).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))).toEqual([
+    expect(found.fits.map((f) => f.face.id).toSorted()).toEqual([
       'issf-25m-precision-50m-pistol',
       'twin',
     ])
@@ -227,11 +239,11 @@ describe('the confidence of a ranked face', () => {
   })
 })
 
-describe('findFace with a known scale', () => {
+/** The 25 m pistol face, a face of the same ring ratios at three times its size, and the front view of the first. */
+function scaleScenes() {
   const base = faceById('issf-25m-precision-50m-pistol')
-  const times = (v: { value: number }, k: number) => ({ ...v, value: v.value * k })
   // the same ring ratios at three times the size
-  const large: TargetFace = {
+  const large: PrintedFace = {
     ...base,
     id: 'large',
     name: 'Large',
@@ -243,7 +255,11 @@ describe('findFace with a known scale', () => {
   }
   const sc = scene(base, defined(views[0]))
   const { image } = drawn(base.id, 0)
-  const ids = (f: ReturnType<typeof findFace>) => f.fits.map((x) => x.face.id).sort()
+  return { base, large, sc, image }
+}
+
+describe('findFace with a known scale', () => {
+  const { base, large, sc, image } = scaleScenes()
 
   it('offers faces of equal ring ratios and different size as a tie without a scale', () => {
     const found = findFace(image, [base, large])
@@ -271,6 +287,10 @@ describe('findFace with a known scale', () => {
     // the same holes from a bullet three times as wide: the face three times as large
     expect(ids(findFace(shot, [base, large], undefined, 27))).toEqual(['large'])
   })
+})
+
+describe('findFace with a known scale on a tilted photo and beside a face with more rings', () => {
+  const { base, large, sc, image } = scaleScenes()
 
   it('measures the holes on the scale of the black area on a tilted photo', () => {
     const holes = [
@@ -292,9 +312,9 @@ describe('findFace with a known scale', () => {
       ...defined(base.rings[0]),
       diameter: times({ ...defined(base.rings[0]).diameter, value: d }, 3),
     }))
-    const wider: TargetFace = {
+    const wider: PrintedFace = {
       ...large,
-      rings: [...large.rings, ...extra].sort((a, b) => b.diameter.value - a.diameter.value),
+      rings: [...large.rings, ...extra].toSorted((a, b) => b.diameter.value - a.diameter.value),
     }
     const found = findFace(image, [base, wider])
     expect(ids(found)).toEqual(['issf-25m-precision-50m-pistol'])
@@ -340,11 +360,13 @@ describe('findFace without a face', () => {
       fitDiameter({ ellipses: [], rings: [], ranked: [], fits: [], alike: [], sure: false }, 200),
     ).toBeUndefined()
   })
+})
 
+describe('findFace on rings of no record, a dark bar and a colored band', () => {
   it('proposes no face for rings that are no face of the records', () => {
     // a black area with rings at 0.31, 0.58 and 0.83 of its radius, and 1.37, 1.9: no record
     const base = faceById('issf-25m-precision-50m-pistol')
-    const odd: TargetFace = {
+    const odd: PrintedFace = {
       ...base,
       id: 'odd',
       blackDiameter: { value: 200 },
@@ -382,25 +404,34 @@ describe('findFace without a face', () => {
   })
 })
 
+describe('DSU Sporthandbuch 2018, oval-ring faces b2 to b5 Präzision', () => {
+  it('are skipped by the photo face search', () => {
+    const dsu = ['dsu-b2', 'dsu-b3', 'dsu-b4', 'dsu-b5', 'dsu-b5-precision'].map(faceById)
+    const black = { centreX: 0, centreY: 0, semiMajor: 100, semiMinor: 60, angle: 0 }
+    expect(matchFaces(black, [], dsu)).toEqual([])
+  })
+})
+
 describe('a face the user picks', () => {
   it('fits a face of the ranking from the rings found, and the black edge alone when they do not match', () => {
     const face = faceById('issf-25m-precision-50m-pistol')
-    const { h = missing(), found } = searched(face.id, 1)
+    const { h, found } = searched(face.id, 1)
     const own = fitPicked(found, face)
     expect(own?.approximate).toBe(false)
     expect(own?.ellipses).toBeGreaterThan(3)
     const other = fitPicked(found, faceById('issf-10m-air-pistol'))
     // the air pistol face does not match these rings: its black radius (29.75 mm) is the scale
     expect(other?.approximate).toBe(true)
-    if (own) expect(error(own, h, 250).centre).toBeLessThan(2)
     expect(
       fitPicked({ ellipses: [], rings: [], ranked: [], fits: [], alike: [], sure: false }, face),
     ).toBeUndefined()
+    if (!own) return
+    expect(error(own, h, 250).centre).toBeLessThan(2)
   })
 
   it('drops a ring that matches a face ring by its radius and does not rectify to a circle', () => {
     const face = faceById('issf-25m-precision-50m-pistol')
-    const { h = missing(), found } = searched(face.id, 1)
+    const { h, found } = searched(face.id, 1)
     const fit = found.fits[0]
     expect(fit).toBeDefined()
     if (!fit) return
@@ -421,9 +452,12 @@ describe('a face the user picks', () => {
     expect(picked?.approximate).toBe(false)
     // the ring it replaced and the bogus one are both gone
     expect(picked?.ellipses).toBe(fit.ellipses - 1)
-    if (picked) expect(error(picked, h, 250).centre).toBeLessThan(2)
+    if (!picked) return
+    expect(error(picked, h, 250).centre).toBeLessThan(2)
   })
+})
 
+describe('the ranking of a face and its ratio twins', () => {
   // a face without ratio twins ranks first alone
   it.each(['issf-50m-rifle', 'issf-300m-rifle'])(
     'ranks %s and its ratio twins first, all others well below',
@@ -435,16 +469,16 @@ describe('a face the user picks', () => {
         found.ranked
           .slice(0, group.length)
           .map((r) => r.id)
-          .sort(),
-      ).toEqual([...group].sort())
+          .toSorted(),
+      ).toEqual(group.toSorted())
       expect(defined(found.ranked[0]).score).toBeGreaterThan(
         defined(found.ranked[group.length]).score + 1,
       )
       const own = found.ranked.find((r) => r.id === id)
-      if (found.black)
-        expect(defined(matchFaces(found.black, found.rings, [face])[0]).matched.length).toBe(
-          own?.matched,
-        )
+      if (!found.black) return
+      expect(defined(matchFaces(found.black, found.rings, [face])[0]).matched.length).toBe(
+        own?.matched,
+      )
     },
   )
 
@@ -510,7 +544,9 @@ describe('on the photo and as a label', () => {
     const c = apply3(inv, [defined(label.outline[0]).x, defined(label.outline[0]).y, 1])
     expect(Math.hypot(c[0] / c[2], c[1] / c[2])).toBeGreaterThan(245)
   })
+})
 
+describe('the ring numerals of a face label', () => {
   it('marks where the ring numerals stand: on an axis, between two ring lines, inside the outer ring', () => {
     const face = faceById('issf-25m-precision-50m-pistol')
     const radii = face.rings.map((r) => r.diameter.value / 2)
@@ -536,7 +572,9 @@ describe('on the photo and as a label', () => {
       faceLabel({ toFace: [1, 0, 0, 0, 1, 0, 0, 0, 1], outer: 250, black: 100 }, 6).numeral,
     ).toBeUndefined()
   })
+})
 
+describe('the quarter marks of a face label', () => {
   it('marks where the quarter marks of the black area stand: on an axis, near its edge', () => {
     const face = faceById('issf-25m-precision-50m-pistol')
     const radii = face.rings.map((r) => r.diameter.value / 2)
