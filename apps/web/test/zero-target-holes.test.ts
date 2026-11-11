@@ -1,7 +1,7 @@
 import { seededUniforms } from '@open-reloading/statistics'
 import {
-  findHoles,
   type HoleDetectionInput,
+  holeDetector,
   type RgbaImage,
 } from '@open-reloading/target-recognition'
 import { describe, expect, it } from 'vitest'
@@ -9,7 +9,8 @@ import type { Point } from '../src/lib/target-geometry.ts'
 import { defined } from './defined.ts'
 import { sheetInk, sheetSvg } from './zero-target-render.ts'
 
-const detectHoles = (input: HoleDetectionInput) => findHoles(input).proposals
+const detectHoles = async (input: HoleDetectionInput) =>
+  (await holeDetector.propose(input)).proposals
 
 // A synthetic photo of the sheet at 8 px/mm with 7.62 mm bullets, a hole about 61 px across.
 const pxPerMm = 8
@@ -72,7 +73,7 @@ class Scene {
 }
 
 describe('the printed zero target', () => {
-  it('finds five holes on the sheet: two in the black square, one on a grid line, two on paper', () => {
+  it('finds five holes on the sheet: two in the black square, one on a grid line, two on paper', async () => {
     const s = new Scene(210 * pxPerMm, 297 * pxPerMm)
     const ink = sheetInk(sheetSvg({ rifle: 'Rifle 1', distance: '100', group: 'Group 1' }))
     for (let y = 0; y < s.height; y++)
@@ -89,12 +90,12 @@ describe('the printed zero target', () => {
     const square = { x: at(-20, 0).x, y: at(0, 20).y, width: 40 * pxPerMm, height: 40 * pxPerMm }
     const options = { image, pxPerM, expectedHoleDiameter: bullet }
     const found = [
-      ...detectHoles({ ...options, region: square, polarity: 'light' }),
-      ...detectHoles({
+      ...(await detectHoles({ ...options, region: square, polarity: 'light' })),
+      ...(await detectHoles({
         ...options,
         region: { x: 0, y: 0, width: s.width, height: s.height },
         polarity: 'dark',
-      }),
+      })),
     ]
     const near = (p: Point) => truth.some((t) => Math.hypot(p.x - t.x, p.y - t.y) < 0.5 * D)
     for (const t of truth)
