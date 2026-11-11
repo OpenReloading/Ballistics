@@ -1,10 +1,10 @@
 /** The outer ring's square gives perspective and scale in one; pure, no React, DOM or Next.js. */
 import { type ShotGroup, type TargetFace, type TargetSheet, toSi } from '@open-reloading/schema'
+import type { FaceGeometry, FacePlane } from '@open-reloading/target-recognition'
 import { english } from '../i18n/translate.ts'
 import { type FederationData, mappingOf } from './face-disciplines.ts'
 import { nth } from './nth.ts'
 import { faceAlignment } from './ring-scoring.ts'
-import type { FaceGeometry, FacePlane } from './target-face.ts'
 import { type Matrix, mul3, type Point } from './target-geometry.ts'
 
 export type FoundFace = Pick<FacePlane, 'centre' | 'corners' | 'outer'> & {

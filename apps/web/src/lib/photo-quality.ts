@@ -1,9 +1,8 @@
 /** Says what the photo makes hard for detection, never that a detection is right (`apps/docs/docs/models/hole-detection.md`, Photo quality). */
 import { fromSi, type TargetFace } from '@open-reloading/schema'
-import { clamp } from '@open-reloading/target-recognition'
+import { clamp, grayGrid, shareInside } from '@open-reloading/target-recognition'
 import { type Message, msg } from '../i18n/translate.ts'
 import type { Ellipse } from './ellipse.ts'
-import { grayGrid, shareInside } from './face-image.ts'
 import type { RgbaImage } from './image.ts'
 import { nth } from './nth.ts'
 

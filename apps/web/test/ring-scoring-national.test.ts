@@ -7,7 +7,6 @@ import {
   scoreShot,
   usesOwnTenthRule,
 } from '../src/lib/ring-scoring.ts'
-import { matchFaces } from '../src/lib/target-face.ts'
 import { defined } from './defined.ts'
 import { catalogBundle } from './records.ts'
 
@@ -364,10 +363,4 @@ describe('DSU Sporthandbuch 2018, oval-ring faces b2 to b5 Präzision (Kapitel 1
       }
     })
   }
-  it('are skipped by the photo face search', () => {
-    const dsu = Object.keys(printed).map(face)
-    const black = { centreX: 0, centreY: 0, semiMajor: 100, semiMinor: 60, angle: 0 }
-    expect(matchFaces(black, [], dsu)).toEqual([])
-    expect(dsu.every((f) => f.federation === 'dsu')).toBe(true)
-  })
 })

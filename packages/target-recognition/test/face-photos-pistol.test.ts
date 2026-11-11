@@ -32,11 +32,10 @@ const holes: Record<PhotoKind, [number, number]> = {
 describe('the 25 m precision pistol face on the photos people take', () => {
   const rows: Row[] = []
   afterAll(() => console.log(`First choices by rings matched:\n${firstChoices(rows)}`))
-  for (const kind of photoKinds)
-    it(kind, async () => {
-      const row = await measure('issf-25m-precision-50m-pistol', kind, 9)
-      rows.push(row)
-      expectFace(row, 250, sure[kind])
-      expectHoles(row, ...holes[kind])
-    })
+  it.each(photoKinds)('%s', async (kind) => {
+    const row = await measure('issf-25m-precision-50m-pistol', kind, 9)
+    rows.push(row)
+    expectFace(row, 250, sure[kind])
+    expectHoles(row, ...holes[kind])
+  })
 })

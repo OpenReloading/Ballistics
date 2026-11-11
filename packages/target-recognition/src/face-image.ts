@@ -1,14 +1,24 @@
 /** Image steps of the target face search; pure, no React, DOM or Next.js. */
-import { clamp, upperMedian } from '@open-reloading/target-recognition'
-import { conicOf, type Ellipse, ellipsePoint, meanRadius, ransacEllipse } from './ellipse.ts'
+import {
+  conicOf,
+  type Ellipse,
+  ellipsePoint,
+  meanRadius,
+  type Point,
+  ransacEllipse,
+} from '@open-reloading/shot-groups'
+import { nth } from '@open-reloading/statistics'
 import type { RgbaImage } from './image.ts'
-import { nth } from './nth.ts'
-import type { Point } from './target-geometry.ts'
+import { clamp, upperMedian } from './raster-ops.ts'
 
 // Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the loop bounds keep the index in range
 const f32 = (a: Float32Array, i: number) => a[i] as number
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the loop bounds keep the index in range
 const i8 = (a: Int8Array, i: number) => a[i] as number
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the loop bounds keep the index in range
 const i32 = (a: Int32Array, i: number) => a[i] as number
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the loop bounds keep the index in range
 const u8 = (a: Uint8Array | Uint8ClampedArray, i: number) => a[i] as number
 
 /** Grey levels (ITU-R BT.601 luma) averaged over square blocks of `blockSize` image px of a crop of the image. */
@@ -71,7 +81,7 @@ export function grayGrid(
 }
 
 /** Value at (x, y) by bilinear interpolation; edge pixels repeat. */
-function sampleBilinear(g: Float32Array, w: number, h: number, x: number, y: number): number {
+function sampleBilinear({ grey: g, width: w, height: h }: Grid, x: number, y: number): number {
   const xc = clamp(x, 0, w - 1)
   const yc = clamp(y, 0, h - 1)
   const [i, j] = [Math.min(w - 2, Math.floor(xc)), Math.min(h - 2, Math.floor(yc))]
@@ -101,15 +111,18 @@ type Labels = {
   box: Array<{ x0: number; y0: number; x1: number; y1: number }>
 }
 
+/** The buffers of one `label` run over a `w` by `h` mask. */
+type Flood = { mask: Uint8Array; lab: Int32Array; stack: Int32Array; w: number; h: number }
+
 /** 8-connected components of the mask; the label image is -1 outside. */
 function label(mask: Uint8Array, w: number, h: number): Labels {
   const lab = new Int32Array(w * h).fill(-1)
-  const stack = new Int32Array(w * h)
+  const flood: Flood = { mask, lab, stack: new Int32Array(w * h), w, h }
   const area: number[] = []
   const box: Labels['box'] = []
   for (let start = 0; start < w * h; start++) {
     if (!mask[start] || i32(lab, start) >= 0) continue
-    const grown = growComponent(start, area.length, mask, lab, stack, w, h)
+    const grown = growComponent(flood, start, area.length)
     area.push(grown.n)
     box.push(grown.box)
   }
@@ -118,14 +131,11 @@ function label(mask: Uint8Array, w: number, h: number): Labels {
 
 /** Labels the component of `start` with `k` by a flood fill: its pixel count and bounding box. */
 function growComponent(
+  flood: Flood,
   start: number,
   k: number,
-  mask: Uint8Array,
-  lab: Int32Array,
-  stack: Int32Array,
-  w: number,
-  h: number,
-) {
+): { n: number; box: Labels['box'][number] } {
+  const { lab, stack, w, h } = flood
   let top = 0
   stack[top++] = start
   lab[start] = k
@@ -140,23 +150,16 @@ function growComponent(
     if (x > b.x1) b.x1 = x
     if (y < b.y0) b.y0 = y
     if (y > b.y1) b.y1 = y
-    top = pushUnlabelled(x, y, k, mask, lab, stack, top, w, h)
+    top = pushUnlabelled(flood, i, k, top)
   }
   return { n, box: b }
 }
 
-/** Labels the unlabeled mask pixels around (x, y) and pushes them on the stack; the new stack top. */
-function pushUnlabelled(
-  x: number,
-  y: number,
-  k: number,
-  mask: Uint8Array,
-  lab: Int32Array,
-  stack: Int32Array,
-  top: number,
-  w: number,
-  h: number,
-): number {
+/** Labels the unlabeled mask pixels around pixel `i` and pushes them on the stack; the new stack top. */
+function pushUnlabelled(flood: Flood, i: number, k: number, top: number): number {
+  const { mask, lab, stack, w, h } = flood
+  const x = i % w
+  const y = Math.trunc(i / w)
   let next = top
   const [u0, u1, v0, v1] = [
     Math.max(0, x - 1),
@@ -206,7 +209,7 @@ function blobsAt(grid: Grid, t: number, minArea: number): Blob[] {
   for (let i = 0; i < w * h; i++) mask[i] = f32(g, i) < t ? 1 : 0
   const { lab, area, box } = label(mask, w, h)
   const out: Blob[] = []
-  const order = area.map((_a, k) => k).sort((a, b) => nth(area, b) - nth(area, a))
+  const order = area.map((_a, k) => k).toSorted((a, b) => nth(area, b) - nth(area, a))
   for (const k of order.slice(0, 5)) {
     const b = nth(box, k)
     const size = nth(area, k)
@@ -233,17 +236,16 @@ function fillComponent({ lab, k, box: b }: Component, w: number, h: number): Fil
   const [left, top] = [b.x0 - 1, b.y0 - 1]
   const outside = new Uint8Array(bw * bh)
   const stack: number[] = []
+  const inComponent = (gx: number, gy: number) =>
+    gx >= 0 && gy >= 0 && gx < w && gy < h && lab[gy * w + gx] === k
   const visit = (x: number, y: number) => {
     if (x < 0 || y < 0 || x >= bw || y >= bh || outside[y * bw + x]) return
-    const gx = x + left
-    const gy = y + top
-    if (gx >= 0 && gy >= 0 && gx < w && gy < h && lab[gy * w + gx] === k) return
+    if (inComponent(x + left, y + top)) return
     outside[y * bw + x] = 1
     stack.push(y * bw + x)
   }
   visit(0, 0)
-  while (stack.length) {
-    const i = stack.pop() as number
+  for (let i = stack.pop(); i !== undefined; i = stack.pop()) {
     const [x, y] = [i % bw, Math.trunc(i / bw)]
     visit(x + 1, y)
     visit(x - 1, y)
@@ -268,17 +270,7 @@ function momentsOf(f: Filled) {
       sxx += px * px
       sxy += px * py
       syy += py * py
-      if (
-        x === 0 ||
-        y === 0 ||
-        x === bw - 1 ||
-        y === bh - 1 ||
-        outside[y * bw + x - 1] ||
-        outside[y * bw + x + 1] ||
-        outside[(y - 1) * bw + x] ||
-        outside[(y + 1) * bw + x]
-      )
-        outline.push({ x: px, y: py })
+      if (onOutline(f, x, y)) outline.push({ x: px, y: py })
     }
   const [mx, my] = [sx / n, sy / n]
   const [vxx, vxy, vyy] = [sxx / n - mx * mx, sxy / n - mx * my, syy / n - my * my]
@@ -288,6 +280,20 @@ function momentsOf(f: Filled) {
   // an ellipse of semi-axes a, b has the moment variances a^2 / 4 and b^2 / 4
   const fill = n / (Math.PI * 4 * Math.sqrt(l1 * l2))
   return { n, mx, my, vxx, vxy, vyy, l1, l2, fill, outline }
+}
+
+/** Whether the inside pixel (x, y) of the filled box touches its border or the outside. */
+function onOutline({ outside, width: bw, height: bh }: Filled, x: number, y: number): boolean {
+  return Boolean(
+    x === 0 ||
+      y === 0 ||
+      x === bw - 1 ||
+      y === bh - 1 ||
+      outside[y * bw + x - 1] ||
+      outside[y * bw + x + 1] ||
+      outside[(y - 1) * bw + x] ||
+      outside[(y + 1) * bw + x],
+  )
 }
 
 type Moments = ReturnType<typeof momentsOf>
@@ -310,6 +316,8 @@ function isBlackArea(grid: Grid, { lab, k, box: b, area }: Component, m: Moments
 /** A black area is dark to its edge, while a ring's closed line is not. */
 function rimDarkness(grid: Grid, t: number, f: Filled, e: Ellipse): number {
   const { width: w, height: h, grey: g } = grid
+  const darkAt = (px: number, py: number) =>
+    px >= 0 && py >= 0 && px < w && py < h && f32(g, py * w + px) < t
   const c = conicOf(e)
   let [total, darkRim] = [0, 0]
   for (let y = 0; y < f.height; y++)
@@ -319,14 +327,13 @@ function rimDarkness(grid: Grid, t: number, f: Filled, e: Ellipse): number {
       const u2 = c[0] * px * px + c[1] * px * py + c[2] * py * py + c[3] * px + c[4] * py + c[5] + 1
       if (u2 < 0.64 || u2 > 1.1) continue
       total++
-      if (px >= 0 && py >= 0 && px < w && py < h && f32(g, py * w + px) < t) darkRim++
+      if (darkAt(px, py)) darkRim++
     }
   return total ? darkRim / total : 0
 }
 
 /** A component the grid's border cuts needs half its ellipse and its center inside, and has no moment ellipse. */
 function blobOf(grid: Grid, t: number, f: Filled, m: Moments): Blob | undefined {
-  const { n } = m
   const { width: w, height: h } = grid
   // the filled box has a margin of 1 px about the component
   const cut =
@@ -334,6 +341,23 @@ function blobOf(grid: Grid, t: number, f: Filled, m: Moments): Blob | undefined 
   const outline = cut
     ? m.outline.filter((p) => p.x > 0 && p.y > 0 && p.x < w - 1 && p.y < h - 1)
     : m.outline
+  const candidate: Candidate = { grid, t, f, m, outline, cut }
+  return fittedBlob(candidate) ?? (cut ? undefined : momentBlob(candidate))
+}
+
+/** The arguments of `blobOf` and the outline it keeps of a component. */
+type Candidate = {
+  grid: Grid
+  t: number
+  f: Filled
+  m: Moments
+  outline: Point[]
+  cut: boolean
+}
+
+/** The blob of the robust ellipse fit to the outline; undefined when its area or position does not fit. */
+function fittedBlob({ grid, t, f, m: { n }, outline, cut }: Candidate): Blob | undefined {
+  const { width: w, height: h } = grid
   // a shadow or a neighbor joined to the black area leaves most of the outline on the ellipse
   const r0 = Math.sqrt(n / Math.PI)
   // about 300 outline points are enough for the fit
@@ -344,30 +368,33 @@ function blobOf(grid: Grid, t: number, f: Filled, m: Moments): Blob | undefined 
     minPoints: Math.ceil(0.4 * sparse.length),
     rounds: 60,
   })
-  const el = fit?.ellipse
-  const ratio = el
-    ? n / ((cut ? shareInside(el, w, h) : 1) * Math.PI * el.semiMajor * el.semiMinor)
-    : 0
-  const centred = el && el.centreX >= 0 && el.centreY >= 0 && el.centreX < w && el.centreY < h
-  if (
-    fit &&
-    el &&
-    ratio >= 0.85 &&
-    ratio <= 1.3 &&
-    (!cut || (centred && shareInside(el, w, h) >= 0.5))
-  )
-    return {
-      threshold: t,
-      area: n,
-      ellipse: el,
-      fill: ratio,
-      relativeRms: fit.rms / meanRadius(el),
-      outlineInlierShare: fit.inliers.length / sparse.length,
-      rimDarkShare: rimDarkness(grid, t, f, el),
-      outline,
-    }
-  if (cut) return undefined
-  // no clean outline: the moment ellipse is a start for `refineEdge`
+  if (!fit) return undefined
+  const el = fit.ellipse
+  const ratio = n / ((cut ? shareInside(el, w, h) : 1) * Math.PI * el.semiMajor * el.semiMinor)
+  if (!(ratio >= 0.85 && ratio <= 1.3 && (!cut || centeredInside(el, w, h)))) return undefined
+  return {
+    threshold: t,
+    area: n,
+    ellipse: el,
+    fill: ratio,
+    relativeRms: fit.rms / meanRadius(el),
+    outlineInlierShare: fit.inliers.length / sparse.length,
+    rimDarkShare: rimDarkness(grid, t, f, el),
+    outline,
+  }
+}
+
+/** Whether the ellipse's center and half its area lie in the grid of `w` by `h` px. */
+const centeredInside = (el: Ellipse, w: number, h: number): boolean =>
+  el.centreX >= 0 &&
+  el.centreY >= 0 &&
+  el.centreX < w &&
+  el.centreY < h &&
+  shareInside(el, w, h) >= 0.5
+
+/** No clean outline: the moment ellipse is a start for `refineEdge`. */
+function momentBlob({ grid, t, f, m, outline }: Candidate): Blob {
+  const { n } = m
   const moment = {
     centreX: m.mx,
     centreY: m.my,
@@ -426,7 +453,7 @@ function refineRough(grid: Grid, all: readonly Blob[]): Blob[] {
   const out: Blob[] = []
   const rough = all
     .filter((b) => b.rough)
-    .sort((a, b) => b.area - a.area)
+    .toSorted((a, b) => b.area - a.area)
     .slice(0, 3)
   for (const b of rough) {
     const e = refineEdge(grid, b.ellipse, 0.3)
@@ -494,7 +521,7 @@ function rankDistinct(grid: Grid, all: readonly Blob[]): Array<Blob & { stable: 
           (1 + 0.1 * stable),
       }
     })
-    .sort((a, b) => b.key - a.key)
+    .toSorted((a, b) => b.key - a.key)
   const out: Array<Blob & { stable: number }> = []
   for (const b of rated) if (!out.some((o) => sameEllipse(o.ellipse, b.ellipse))) out.push(b)
   return out.slice(0, 2)
@@ -570,7 +597,6 @@ function edgeAlongRay(
   t: number,
   span: number,
 ): { point: Point; inside: number; outside: number } | undefined {
-  const { width: w, height: h, grey: g } = grid
   const [c, sn] = [Math.cos(start.angle), Math.sin(start.angle)]
   // the outward normal of the ellipse at parameter t
   const nx = (Math.cos(t) * c) / start.semiMajor - (Math.sin(t) * sn) / start.semiMinor
@@ -579,7 +605,7 @@ function edgeAlongRay(
   const [dx, dy] = [nx / nl, ny / nl]
   const px = start.centreX + start.semiMajor * Math.cos(t) * c - start.semiMinor * Math.sin(t) * sn
   const py = start.centreY + start.semiMajor * Math.cos(t) * sn + start.semiMinor * Math.sin(t) * c
-  const at = (o: number) => sampleBilinear(g, w, h, px + dx * o, py + dy * o)
+  const at = (o: number) => sampleBilinear(grid, px + dx * o, py + dy * o)
   const inner: number[] = []
   const outer: number[] = []
   for (let o = -span; o <= -span / 2; o += 0.5) inner.push(at(o))
@@ -631,27 +657,16 @@ function normaliseDerivative(k: Float32Array, r: number, order: 1 | 2) {
 const parity = (k: Float32Array): 1 | -1 =>
   Math.abs(f32(k, 0) - f32(k, k.length - 1)) <= 1e-6 * (Math.abs(f32(k, 0)) + 1e-12) ? 1 : -1
 
-function convolve(
-  src: Float32Array,
-  w: number,
-  h: number,
-  kx: Float32Array,
-  ky: Float32Array,
-): Float32Array {
-  const tmp = convolveRows(src, w, h, kx, parity(kx))
-  return convolveColumns(tmp, w, h, ky, parity(ky))
+/** The grid's grey levels convolved with `kx` along the rows, then `ky` along the columns. */
+function convolve(grid: Grid, kx: Float32Array, ky: Float32Array): Float32Array {
+  return convolveColumns(convolveRows(grid, kx), grid, ky)
 }
 
-/** The kernel `kx` (parity `px`) over row `row` at column `x`; the row's edge pixels repeat. */
-function rowSum(
-  src: Float32Array,
-  row: number,
-  x: number,
-  w: number,
-  kx: Float32Array,
-  px: 1 | -1,
-): number {
-  const rx = (kx.length - 1) / 2
+/** One row convolution: the source, its width, the kernel `kx`, its parity `px` and its radius `rx`. */
+type RowKernel = { src: Float32Array; w: number; kx: Float32Array; px: 1 | -1; rx: number }
+
+/** The kernel over row `row` at column `x`; the row's edge pixels repeat. */
+function rowSum({ src, w, kx, px, rx }: RowKernel, row: number, x: number): number {
   let s = f32(kx, rx) * f32(src, row + x)
   if (x >= rx && x < w - rx)
     for (let i = 1; i <= rx; i++)
@@ -664,12 +679,13 @@ function rowSum(
   return s
 }
 
-function convolveRows(src: Float32Array, w: number, h: number, kx: Float32Array, px: 1 | -1) {
+function convolveRows({ grey, width: w, height: h }: Grid, kx: Float32Array): Float32Array {
+  const kernelRow: RowKernel = { src: grey, w, kx, px: parity(kx), rx: (kx.length - 1) / 2 }
   const tmp = new Float32Array(w * h)
   for (let y = 0; y < h; y++) {
     const row = y * w
     for (let x = 0; x < w; x++) {
-      const s = rowSum(src, row, x, w, kx, px)
+      const s = rowSum(kernelRow, row, x)
       tmp[row + x] = s
     }
   }
@@ -677,7 +693,12 @@ function convolveRows(src: Float32Array, w: number, h: number, kx: Float32Array,
 }
 
 /** The columns, a row at a time: the reads stay in order. */
-function convolveColumns(tmp: Float32Array, w: number, h: number, ky: Float32Array, py: 1 | -1) {
+function convolveColumns(
+  tmp: Float32Array,
+  { width: w, height: h }: Grid,
+  ky: Float32Array,
+): Float32Array {
+  const py = parity(ky)
   const ry = (ky.length - 1) / 2
   const out = new Float32Array(w * h)
   for (let y = 0; y < h; y++) {
@@ -751,16 +772,16 @@ function unitVector(vx: number, vy: number): [number, number] {
 
 /** Raises the line response in `acc` where the scale `sigma` gives a stronger one. */
 function accumulateScale(
-  { width: w, height: h, grey: g }: Grid,
+  grid: Grid,
   searchMask: Uint8Array,
   sigma: number,
   { strength, normalX, normalY, sgn, sigmaAt }: Hessian,
 ) {
-  const n = w * h
+  const n = grid.width * grid.height
   const [k0, k1, k2] = [kernel(sigma, 0), kernel(sigma, 1), kernel(sigma, 2)]
-  const lxx = convolve(g, w, h, k2, k0)
-  const lyy = convolve(g, w, h, k0, k2)
-  const lxy = convolve(g, w, h, k1, k1)
+  const lxx = convolve(grid, k2, k0)
+  const lyy = convolve(grid, k0, k2)
+  const lxy = convolve(grid, k1, k1)
   const s2 = sigma * sigma
   for (let i = 0; i < n; i++) {
     if (!searchMask[i]) continue
@@ -787,22 +808,16 @@ function accumulateScale(
 /** Whether either neighbor is stronger than `v`. */
 const exceeds = (v: number, a: number, b: number) => a > v || b > v
 
-/** A line, not a step: both sides at distance `d` along the normal are lower (bright) or higher (dark). */
-function isLine(
-  g: Float32Array,
-  w: number,
-  h: number,
-  x: number,
-  y: number,
-  nx: number,
-  ny: number,
-  sign: number,
-  d: number,
-): boolean {
+/** A line, not a step: both sides at 2 sigma along the normal are lower (bright) or higher (dark). */
+function isLine(grid: Grid, hessian: Hessian, x: number, y: number): boolean {
+  const { width: w, grey: g } = grid
   const i = y * w + x
+  const [nx, ny] = [f32(hessian.normalX, i), f32(hessian.normalY, i)]
+  const sign = i8(hessian.sgn, i)
+  const d = 2 * f32(hessian.sigmaAt, i)
   const [a, b] = [
-    sampleBilinear(g, w, h, x + nx * d, y + ny * d),
-    sampleBilinear(g, w, h, x - nx * d, y - ny * d),
+    sampleBilinear(grid, x + nx * d, y + ny * d),
+    sampleBilinear(grid, x - nx * d, y - ny * d),
   ]
   const diffA = sign * (f32(g, i) - a)
   const diffB = sign * (f32(g, i) - b)
@@ -818,11 +833,12 @@ function parabolaOffset(m1: number, v: number, p1: number): number {
 /** Both sides at 2 sigma lower or higher, so not a step; `thin` 2 at `high`, 1 at `low`. */
 function thinRidges(
   grid: Grid,
-  { strength, normalX, normalY, sgn, sigmaAt }: Hessian,
+  hessian: Hessian,
   low: number,
   high: number,
 ): { thin: Uint8Array; sub: Float32Array } {
-  const { width: w, height: h, grey: g } = grid
+  const { width: w, height: h } = grid
+  const { strength, normalX, normalY } = hessian
   const n = w * h
   const thin = new Uint8Array(n)
   const sub = new Float32Array(2 * n)
@@ -834,7 +850,7 @@ function thinRidges(
       const [nx, ny] = [f32(normalX, i), f32(normalY, i)]
       const at = (o: number) => f32(strength, Math.round(y + ny * o) * w + Math.round(x + nx * o))
       if (exceeds(v, at(1), at(-1))) continue
-      if (!isLine(g, w, h, x, y, nx, ny, i8(sgn, i), 2 * f32(sigmaAt, i))) continue
+      if (!isLine(grid, hessian, x, y)) continue
       thin[i] = v >= high ? 2 : 1
       // sub-pixel offset along the normal by a parabola through the three strengths
       const off = parabolaOffset(at(-1), v, at(1))
