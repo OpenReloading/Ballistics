@@ -1,6 +1,6 @@
 # Spell check of code, comments, docs and UI text (typos, run by ci.yml `check`).
 # Locally: `typos` from https://github.com/crate-ci/typos, or `docker run`-free: any 1.51 binary on the PATH.
-# The English messages apart: `node apps/web/scripts/i18n.mts messages > messages.txt && typos - < messages.txt`.
+# The English messages apart: `node apps/web/scripts/i18n.mts messages > /tmp/messages.txt && typos - < /tmp/messages.txt`.
 
 [files]
 ignore-hidden = false

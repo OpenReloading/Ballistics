@@ -118,7 +118,7 @@ jobs:
     needs: changes
     if: ${{ !cancelled() && needs.changes.outputs.check != 'false' && needs.changes.outputs.tests != '[]' }}
     runs-on: ubuntu-latest
-    # about three times the median run of the slowest group (packages, about 8 minutes)
+    # two and a half times the run of the slowest group (packages, 9 to 10 minutes)
     timeout-minutes: 25
     permissions:
       contents: read
