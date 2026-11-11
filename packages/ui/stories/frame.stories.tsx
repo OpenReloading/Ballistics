@@ -47,7 +47,7 @@ export const Frame: Story = {
     </AppFrame>
   ),
   play: async ({ canvas, canvasElement, userEvent }) => {
-    if (matchMedia('(min-width: 75em)').matches) {
+    if (matchMedia('(width >= 75em)').matches) {
       await expect(canvas.getByRole('navigation', { name: 'Main' })).toBeVisible()
       return
     }

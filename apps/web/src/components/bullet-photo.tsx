@@ -465,7 +465,7 @@ export function BulletPhoto({
   /** Resolves true when the designer took the design, false when the user kept their unsaved one. */
   onOpen: (d: Design) => Promise<boolean>
 }) {
-  const phone = useMediaQuery('(max-width: 47.99em)')
+  const phone = useMediaQuery('(width < 48em)')
   const { t } = useTranslation()
   // narrow while it only offers a photograph; the canvas and its controls side by side with one
   const [photo, setPhoto] = useState(false)

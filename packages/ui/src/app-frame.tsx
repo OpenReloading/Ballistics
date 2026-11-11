@@ -34,7 +34,7 @@ export function AppFrame({
   }
   const [opened, { toggle, close }] = useDisclosure(false)
   // the drawer is only hidden from 75em: left open there, its focus trap and scroll lock would stay
-  const wide = useMediaQuery('(min-width: 75em)')
+  const wide = useMediaQuery('(width >= 75em)')
   useEffect(() => {
     if (wide) close()
   }, [wide, close])

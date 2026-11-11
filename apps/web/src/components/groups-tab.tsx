@@ -26,7 +26,7 @@ export function GroupsTab({
     charges = ladder && chargeLadder(ladder.charge, ladder.step, ladder.steps, ladder.direction)
   } catch {}
   const slopeAt = useDropSlope(trajectoryLoad)
-  const framed = useMediaQuery('screen and (min-width: 62em)')
+  const framed = useMediaQuery('screen and (width >= 62em)')
   const [box, setBox] = useState<HTMLDivElement | null>(null)
   const [height, setHeight] = useState<number>()
   const [expanded, setExpanded] = useState(false)
