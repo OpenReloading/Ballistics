@@ -19,7 +19,7 @@ The web app supports these browsers and widths. An older browser may open it, bu
 ## Why these versions
 
 - Firefox 121: the styles use the CSS `:has()` selector ([MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/:has#browser_compatibility), Firefox 121). A browser without it drops each such rule, among them the phone layout of the workbench, whose readout bar could then cover the inputs. Share links also compress the load with `CompressionStream('deflate-raw')` ([MDN](https://developer.mozilla.org/en-US/docs/Web/API/CompressionStream#browser_compatibility), Firefox 113), and the code uses `Array.prototype.toSorted` ([MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toSorted#browser_compatibility), Firefox 115).
-- Safari 16.4: `CompressionStream` ([MDN](https://developer.mozilla.org/en-US/docs/Web/API/CompressionStream#browser_compatibility)).
+- Safari 16.4: `CompressionStream` ([MDN](https://developer.mozilla.org/en-US/docs/Web/API/CompressionStream#browser_compatibility)), and the width queries of the styles and components are written in range syntax, such as `(width < 48em)` ([MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/@media#browser_compatibility), Safari 16.4). A browser without it drops every such rule, the phone and the wide layouts among them.
 - Chrome and Edge 111: the styles mix colors with CSS `color-mix()` ([MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/color-mix#browser_compatibility), Chrome 111).
 
 ## Checks

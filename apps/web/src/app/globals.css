@@ -57,8 +57,7 @@
   --mantine-color-disabled-color: var(--muted);
 }
 
-/* width queries in range syntax on Mantine's scale (lib/theme.ts) plus 2xs 22.5em (inclusive: keeps 360 px phones)
-   and 2xl 108em; the load switch's 80em is off the scale */
+/* width queries: range syntax on Mantine's scale (lib/theme.ts) plus 2xs 22.5em (inclusive, for 360 px phones) and 2xl 108em */
 
 /* dark on screen only, so print keeps the light values above; the head script resolves the system setting */
 @media screen {
