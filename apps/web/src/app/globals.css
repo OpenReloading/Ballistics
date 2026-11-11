@@ -2335,30 +2335,8 @@ td.nowrap {
   }
 }
 
-/* paper: light colors whatever the screen preference; controls hidden, inputs and results kept */
+/* paper: controls hidden, inputs and results kept (the colors are light in print: tokens.css) */
 @media print {
-  /* the light values of tokens.css (@open-reloading/design-tokens), whose dark block also applies to print */
-  :root[data-mantine-color-scheme] {
-    --page: #fff;
-    --ink: #1d2130;
-    --muted: #555a6d;
-    --line: #dcdfe9;
-    --link: var(--accent-hover);
-    --link-hover: var(--ink);
-    --accent: #1971c2;
-    --accent-hover: #1864ab;
-    --accent-tint: #e7f5ff;
-    --on-accent: #fff;
-    --control-line: #7b7f91;
-    --surface: #f6f8fc;
-    --surface-alt: #eef0f6;
-    --warn-border: #e0b84a;
-    --warn-fill: #fff6db;
-    --warn-text: #7a4f00;
-    --error-text: #c92a2a;
-    color-scheme: light;
-  }
-
   .skip-link,
   .update-notice,
   header,
