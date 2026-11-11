@@ -30,7 +30,7 @@ export function PropertyGrid({
   sections: GridSection[]
   message?: string | undefined
 }) {
-  const phone = useMediaQuery('(max-width: 47.99em)', false, { getInitialValueInEffect: false })
+  const phone = useMediaQuery('(width < 48em)', false, { getInitialValueInEffect: false })
   const [focused, setFocused] = useState<Element>()
   const [help, setHelp] = useState<string>()
   // after each commit: an edit changes the focused field's state, so its description

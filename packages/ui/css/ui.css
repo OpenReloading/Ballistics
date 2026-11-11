@@ -143,7 +143,7 @@
 }
 
 /* below Mantine's lg breakpoint (75em), where AppFrame's navigation is the menu button's drawer */
-@media (max-width: 74.99em) {
+@media (width < 75em) {
   .ui-nav-item {
     flex-direction: row;
     gap: var(--space-sm);
