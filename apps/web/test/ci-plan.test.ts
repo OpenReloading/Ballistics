@@ -101,13 +101,14 @@ it('runs the e2e job for a change of the design tokens, whose palette the web ap
   expect(plan(['packages/design-tokens/tokens/base.tokens.json'], closure).e2e).toBe(true)
 })
 
-it('builds the docs image for the docs site, the design tokens and the build context, not for other code', () => {
+it('builds the docs image for the docs site, what its build imports and the compose service, not for other code', () => {
   for (const f of [
     'apps/docs/src/css/custom.css',
     'apps/docs/docs/browsers.md',
     'apps/docs/library.md',
     'apps/docs/Dockerfile',
     'packages/design-tokens/css/tokens.css',
+    'packages/api/src/openapi.ts',
     'compose.yaml',
     'pnpm-lock.yaml',
     '.github/workflows/ci.yml',

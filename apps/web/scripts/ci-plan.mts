@@ -38,10 +38,10 @@ const e2eInputs = [
   /^tools\/src\/(pages|pages-serve|pages-payload|executable)\.ts$/,
 ]
 
-/** Files whose change needs the docs image built, which runs the docs site build: the site, the palette it imports and the image's build context. */
+/** Files whose change needs the docs image built, which runs the docs site build: the site, the palette it imports, the API whose document it prints, and the compose service. */
 const docsInputs = [
   /^apps\/docs\//,
-  /^packages\/design-tokens\//,
+  /^packages\/(design-tokens|api)\//,
   /^(compose\.yaml|\.dockerignore)$/,
   ...rootInputs,
 ]

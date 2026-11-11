@@ -37,7 +37,7 @@ env:
 jobs:
   # Which jobs run and what the e2e job exports: only a pull request may skip `check` (prose only), `e2e` (no
   # change to what the API, the web app, the export scripts or the e2e specs read) or `docs` (no change to the docs
-  # site, the design tokens or the image's build context), test only the workspaces it reaches (pnpm's
+  # site or to what the plan lists as read by its image build), test only the workspaces it reaches (pnpm's
   # `--filter "...[<base>]"`, which adds every workspace that depends on a changed one), or export a sample of the
   # cartridge pages. Every other event (the default branch, the merge queue, the weekly run) and every doubt runs
   # everything; see apps/web/scripts/ci-plan.mts.
