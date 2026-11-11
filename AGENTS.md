@@ -4,7 +4,7 @@ Ballistics: a web app, a REST API, a CLI and libraries for handloading, whose re
 
 ## Commands
 
-Run them in the dev container (`.devcontainer/`): `devcontainer exec --workspace-folder . <command>`.
+Run them in the dev container (`.devcontainer/`): `devcontainer exec --workspace-folder . <command>`. Where the host has Podman with podman-compose and no `docker` command, add `--docker-path podman` to `devcontainer up` and `devcontainer exec` (without it `exec` exits 1 and prints nothing), and `--docker-compose-path podman-compose` to `up`.
 
 - Install: `pnpm install` (also the pre-commit hook: Oxlint and Biome on the staged files).
 - Build: `pnpm run build`. The workspaces import each other's `dist/`, so build before a typecheck or a test.

@@ -1312,7 +1312,7 @@ export function Workbench() {
   ])
   // Ctrl+Enter is caught by the frame below, Ctrl+P prints the report once the barrel length study has computed
   useShortcuts({ run: null, print: ok ? printReport : null })
-  const phone = useMediaQuery('(max-width: 47.99em)')
+  const phone = useMediaQuery('(width < 48em)')
   /** What opened Saved loads, which gets the focus back: a selector, none for the menu's item. */
   const listOpener = useRef<string | undefined>(undefined)
   const openList = useCallback(() => setListOpen(true), [])
