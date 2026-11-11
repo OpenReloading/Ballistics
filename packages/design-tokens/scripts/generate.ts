@@ -178,17 +178,17 @@ const mantineRoles = {
   '--mantine-color-default-border': 'control-line',
   '--mantine-color-error': 'error-text',
   '--mantine-primary-color-contrast': 'on-accent',
+  // the theme's primary shade already gives the accent per scheme, but that of the dark scheme also in print
+  '--mantine-color-blue-filled': 'accent',
   // Mantine's hover and tint of the primary color are other shades of its blue than the accent's
   '--mantine-color-blue-filled-hover': 'accent-hover',
   '--mantine-color-blue-light': 'accent-tint',
 }
 
-/** The Mantine CSS variables of one scheme, from its colors by role. */
-function mantineScheme(colors: Record<string, string>): Record<string, string | undefined> {
-  return Object.fromEntries(
-    Object.entries(mantineRoles).map(([name, role]) => [name, colors[role]]),
-  )
-}
+/** As the variables of `tokens.css`, which hold the scheme's color on screen and the light one in print. */
+const mantineVariables = Object.fromEntries(
+  Object.entries(mantineRoles).map(([name, role]) => [name, `var(--${role})`]),
+)
 
 function moduleSource(resolver: Resolver): string {
   const light = resolver.apply({ theme: 'light' })
@@ -205,8 +205,8 @@ function moduleSource(resolver: Resolver): string {
     "/** The Mantine theme of the tokens, for Mantine's `createTheme`. */",
     `export const theme = ${JSON.stringify(mantineTheme(light, colors), null, 2)} as const`,
     '',
-    '/** The scheme colors Mantine derives from its own palette, set to the tokens: for `cssVariablesResolver`. */',
-    `export const cssVariables = ${JSON.stringify({ variables: {}, light: mantineScheme(colors.light), dark: mantineScheme(colors.dark) }, null, 2)} as const`,
+    '/** The scheme colors Mantine derives from its own palette, set to the variables of `tokens.css` (load it too): for `cssVariablesResolver`. */',
+    `export const cssVariables = ${JSON.stringify({ variables: {}, light: mantineVariables, dark: mantineVariables }, null, 2)} as const`,
     '',
   ].join('\n')
 }
