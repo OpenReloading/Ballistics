@@ -1,7 +1,7 @@
-/* The styles of the interface base, in their order: Mantine, the design tokens, the UI font, then Mantine's controls on
-   the tokens. Import this file once; a Vite build resolves the package imports. */
+/* The interface base's styles: import this file once, a Vite build resolves the package imports */
 @import "@mantine/core/styles.css";
 @import "@open-reloading/design-tokens/tokens.css";
+@import "@open-reloading/design-tokens/mantine-print.css";
 @import "@fontsource-variable/inter";
 
 /* Control heights from the size tokens, which are 44 px under a coarse pointer: rows (xs), bars (sm) and the dense

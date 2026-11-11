@@ -267,11 +267,11 @@ test('the Powders tab copies its table as CSV and keeps its mode and filters wit
     'Powder,Charge (gr),Flags,Peak pressure (psi),Percent of maximum (%),Muzzle velocity (ft/s),Case fill (%),Burnt at the muzzle (%),Burnout (in)',
   )
   const maker = tab.getByRole('combobox', { name: 'Manufacturer' })
+  const name = 'Demo Powder Co.'
   await maker.click()
-  await maker.press('ArrowDown')
-  await maker.press('Enter')
-  const name = await maker.inputValue()
-  expect(name).not.toBe('')
+  // by a click, not by ArrowDown and Enter: docs/agents/footguns/e2e-clicks.md
+  await page.getByRole('option', { name }).click()
+  await expect(maker).toHaveValue(name)
 
   await (await barButton(page, 'Save')).click()
   const stored = () => storedLoad(page)

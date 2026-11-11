@@ -258,7 +258,7 @@ $$
 \phi = \arg\max_{\phi_i} \#\left\{ j : \left\lvert \phi_j - \phi_i \right\rvert_{\mathrm{mod}\ 90^\circ} \le 2^\circ \right\}
 $$
 
-Code: `packages/target-recognition/src/hole-detection.ts`, `dropPrintMarks`, `numeralRoll`, `ROLL_SPREAD`, `polar`, `PRINT_CONFIDENCE`, `NUMERALS_MIN`. `apps/web/src/lib/target-face.ts`, `faceLabel`, `QUARTER_WIDTH`, `QUARTER_REACH`.
+Code: `packages/target-recognition/src/hole-detection.ts`, `dropPrintMarks`, `numeralRoll`, `ROLL_SPREAD`, `polar`, `PRINT_CONFIDENCE`, `NUMERALS_MIN`. `packages/target-recognition/src/target-face.ts`, `faceLabel`, `QUARTER_WIDTH`, `QUARTER_REACH`.
 
 ### Target area
 
@@ -288,7 +288,7 @@ $$
 S = \sum_j \left(0.6 + 0.4\, a_j\right) \left(1 - \frac{e_j}{0.06}\right) - 0.3\, n_\mathrm{miss} - 0.1\, n_\mathrm{extra}
 $$
 
-Code: `apps/web/src/lib/target-face.ts`, `matchFaces`, `scoreMatch`, `shareInFrame`.
+Code: `packages/target-recognition/src/target-face.ts`, `matchFaces`, `scoreMatch`, `shareInFrame`.
 
 4. Every target within 0.5 of the best score with at least 3 rings matched is offered. Targets whose rings the photo shows in the same ratios (an insert card shows rings shared by several targets) are a choice for the user. Without a known scale, so is every target that matches all the rings the best target matches, whatever its score: a larger target with outer rings the photo does not show scores lower for them. The editor lists these first, smallest first, each with its outer diameter.
 5. The plane: the pair of matched ellipses farthest apart in radius gives the target plane by the conic pencil of two concentric circles, which removes the perspective. A plane whose ellipses do not rectify to circles of the target's radii within 1.5 % of the black radius (rms) drops its worst ring and tries again.
@@ -301,7 +301,7 @@ One target with at least 4 rings matched and a score of 2.5 calibrates the sheet
 
 The active group takes the target for ring scoring with the event the user chose, else the event of its discipline on this target, else the target's event at the group's distance: of the federation chosen for the Discipline list, else of the federation that publishes the target, else of the one federation that shoots the target there. Otherwise the group has no event and the Discipline list stays empty: no federation is guessed (`apps/web/src/lib/face-sheet.ts`, `calibrateSheetOnFace`).
 
-Code: `apps/web/src/lib/face-search.ts`, `findFace`, `holeSize`. `apps/web/src/lib/target-face.ts`, `searchFaces`, `confidenceOf`, `ringLines`, `ringPlane`, `matchFaces`, `scoreMatch`, `shareInFrame`, `fitFace`, `TIE`, `SCALE_TOLERANCE`, `BLACK_PX`. `apps/web/src/lib/face-image.ts`, `blackAreas`, `blobOf`, `shareInside`, `paperAround`. `packages/shot-groups/src/ellipse.ts`, `ransacEllipse`, `concentricPlane`.
+Code: `packages/target-recognition/src/face-search.ts`, `findFace`, `holeSize`. `packages/target-recognition/src/target-face.ts`, `searchFaces`, `confidenceOf`, `ringLines`, `ringPlane`, `matchFaces`, `scoreMatch`, `shareInFrame`, `fitFace`, `TIE`, `SCALE_TOLERANCE`, `BLACK_PX`. `packages/target-recognition/src/face-image.ts`, `blackAreas`, `blobOf`, `shareInside`, `paperAround`. `packages/shot-groups/src/ellipse.ts`, `ransacEllipse`, `concentricPlane`.
 
 ### Detection without a picked hole
 
@@ -321,7 +321,7 @@ $$
 \theta = \arccos\frac{b}{a}, \qquad s_\mathrm{in} = \frac{\text{area of the ellipse inside the photo}}{\text{area of the ellipse}}
 $$
 
-Code: `apps/web/src/lib/photo-quality.ts`, `photoQuality`. `apps/web/src/lib/face-image.ts`, `shareInside`.
+Code: `apps/web/src/lib/photo-quality.ts`, `photoQuality`. `packages/target-recognition/src/face-image.ts`, `shareInside`.
 
 The paper level $P$ is the 75th percentile of the grey blocks in the ring from 1.12 to 1.4 radii of the ellipse, the black level $K$ the 20th percentile of the blocks inside 0.8 radii (a white zone inside the black area does not raise it), and the contrast is $P - K$. Without paper blocks in the frame (the black area fills it) there is no contrast. The grey blocks come from a grid of about 700 blocks on the longer side. Glare is the share of the ring's lit blocks (grey of 120 or more) that are saturated (250 or more), counted only while the median of the other lit blocks is at most 232, so a white scan is not glare. Uneven light is the spread of the median grey levels $m_j$ of the ring's four sides, left and right, above and below the center (three sides suffice), relative to the largest:
 

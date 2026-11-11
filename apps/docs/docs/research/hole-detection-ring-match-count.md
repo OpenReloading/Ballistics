@@ -16,7 +16,7 @@ Ring lines from a Hessian ridge detector, grouped by normalized radius, one robu
 
 ## Formulas
 
-A ring of relative radius $\rho$ matches a ring $\rho_j$ of a record when $|\rho - \rho_j| \le 0.03\, \rho_j$ (`TOLERANCE` in `apps/web/src/lib/target-face.ts`); the match score ranks the records, and `SURE_SCORE` (2.5) is the score of a sure match.
+A ring of relative radius $\rho$ matches a ring $\rho_j$ of a record when $|\rho - \rho_j| \le 0.03\, \rho_j$ (`TOLERANCE` in `packages/target-recognition/src/target-face.ts`); the match score ranks the records, and `SURE_SCORE` (2.5) is the score of a sure match.
 
 ## Numbers
 
@@ -32,7 +32,7 @@ Measured. The measurements are not in the repository.
 
 ## Where in the app
 
-- `apps/web/src/lib/target-face.ts`, `matchFaces`, `scoreMatch`.
+- `packages/target-recognition/src/target-face.ts`, `matchFaces`, `scoreMatch`.
 - Model page: [hole detection](../models/hole-detection.md).
 
 ## Confidence

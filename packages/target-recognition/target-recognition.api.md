@@ -4,7 +4,10 @@
 
 ```ts
 
-import type { Point } from '@open-reloading/shot-groups';
+import { Ellipse } from '@open-reloading/shot-groups';
+import { FaceLength } from '@open-reloading/shot-groups';
+import { Matrix } from '@open-reloading/shot-groups';
+import { Point } from '@open-reloading/shot-groups';
 
 // @public
 export function autoDetect(raw: HoleDetectionInput): Found | undefined;
@@ -30,6 +33,19 @@ export function detectFromExample(input: HoleDetectionInput, at: Point): (Found 
 // @public
 export function distanceSquared(mask: Uint8Array, w: number, h: number, target: number): Float64Array;
 
+// @public (undocumented)
+export type FaceFit<F extends PrintedFace = PrintedFace> = FacePlane & {
+    face: F;
+};
+
+// @public
+export type FaceGeometry = {
+    toFace: Matrix;
+    outer: number;
+    black: number;
+    rings?: readonly number[];
+};
+
 // @public
 export type FaceLabel = {
     outline: Point[];
@@ -43,10 +59,53 @@ export type FaceLabel = {
 };
 
 // @public
+export function faceLabel(g: FaceGeometry, hole: number): FaceLabel;
+
+// @public
+export type FacePlane = {
+    centre: Point;
+    toFace: Matrix;
+    pxPerMm: number;
+    rms: number;
+    outer: number;
+    corners: [Point, Point, Point, Point];
+    outline: Point[];
+    blackOutline: Point[];
+    ellipses: number;
+    approximate: boolean;
+};
+
+// @public (undocumented)
+export type FaceSearch<F extends PrintedFace = PrintedFace> = {
+    black?: Ellipse;
+    ellipses: Ellipse[];
+    rings: Ring[];
+    ranked: Array<{
+        id: string;
+        name: string;
+        score: number;
+        matched: number;
+        confidence: number | undefined;
+    }>;
+    fits: FaceFit<F>[];
+    alike: FaceFit<F>[];
+    sure: boolean;
+};
+
+// @public
+export function findFace<F extends PrintedFace = PrintedFace>(image: RgbaImage, faces: readonly F[], scale?: number, hole?: number): FaceSearch<F>;
+
+// @public
 export function findHoles(input: HoleDetectionInput): {
     proposals: HoleProposal[];
     flagged: FlaggedRegion[];
 };
+
+// @public
+export function fitDiameter(search: FaceSearch, diameter: number): FacePlane | undefined;
+
+// @public
+export function fitPicked<F extends PrintedFace = PrintedFace>(search: FaceSearch<F>, face: F): FaceFit<F> | undefined;
 
 // @public
 export type FlaggedRegion = {
@@ -62,6 +121,25 @@ export type Found = {
     proposals: HoleProposal[];
     flagged: FlaggedRegion[];
     holeDiameter: number;
+};
+
+// @public (undocumented)
+export function grayGrid(image: RgbaImage, s: number, area?: {
+    x0: number;
+    y0: number;
+    x1: number;
+    y1: number;
+}): Grid;
+
+// @public
+export type Grid = {
+    width: number;
+    height: number;
+    blockSize: number;
+    left: number;
+    top: number;
+    grey: Float32Array;
+    chroma: Float32Array;
 };
 
 // @public
@@ -120,6 +198,9 @@ export const MAX_WORK_PIXELS = 2000000;
 // @public
 export function median1(v: readonly number[]): number;
 
+// @public
+export function onPhoto<F extends PrintedFace = PrintedFace>(search: FaceSearch<F>, k: number, x0: number, y0: number): FaceSearch<F>;
+
 // @public (undocumented)
 export const open: (src: Float32Array, w: number, h: number, k: number) => Float32Array;
 
@@ -139,6 +220,27 @@ export type Peak = {
 
 // @public
 export function peaksOf(sp: Space, inside: Uint8Array, D: number, count?: number): Peak[];
+
+// @public
+export interface PrintedFace {
+    // (undocumented)
+    readonly blackDiameter: FaceLength;
+    // (undocumented)
+    readonly id: string;
+    // (undocumented)
+    readonly innerTen?: {
+        readonly diameter: FaceLength;
+    } | undefined;
+    // (undocumented)
+    readonly name: string;
+    // (undocumented)
+    readonly photoSearch?: boolean | undefined;
+    // (undocumented)
+    readonly rings: readonly {
+        readonly value: number;
+        readonly diameter: FaceLength;
+    }[];
+}
 
 // @public
 export type ProposalRequest = HoleDetectionInput & {
@@ -179,6 +281,16 @@ export type RgbaImage = {
     height: number;
     data: Uint8ClampedArray;
 };
+
+// @public
+export type Ring = {
+    ellipse: Ellipse;
+    arc: number;
+    points: number;
+};
+
+// @public
+export function shareInside(e: Ellipse, w: number, h: number): number;
 
 // @public
 export function sigmaAt(sp: Space, i: number, count?: number): number;

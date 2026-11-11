@@ -98,39 +98,41 @@ export const theme = {
   "respectReducedMotion": true
 } as const
 
-/** The scheme colors Mantine derives from its own palette, set to the tokens: for `cssVariablesResolver`. */
+/** The scheme colors Mantine derives from its own palette, set to the variables of `tokens.css` (load it too): for `cssVariablesResolver`. */
 export const cssVariables = {
   "variables": {},
   "light": {
-    "--mantine-color-body": "#ffffff",
-    "--mantine-color-text": "#1d2130",
-    "--mantine-color-bright": "#1d2130",
-    "--mantine-color-dimmed": "#555a6d",
-    "--mantine-color-placeholder": "#555a6d",
-    "--mantine-color-anchor": "#1864ab",
-    "--mantine-color-default": "#ffffff",
-    "--mantine-color-default-hover": "#eef0f6",
-    "--mantine-color-default-color": "#1d2130",
-    "--mantine-color-default-border": "#7b7f91",
-    "--mantine-color-error": "#c92a2a",
-    "--mantine-primary-color-contrast": "#ffffff",
-    "--mantine-color-blue-filled-hover": "#1864ab",
-    "--mantine-color-blue-light": "#e7f5ff"
+    "--mantine-color-body": "var(--page)",
+    "--mantine-color-text": "var(--ink)",
+    "--mantine-color-bright": "var(--ink)",
+    "--mantine-color-dimmed": "var(--muted)",
+    "--mantine-color-placeholder": "var(--muted)",
+    "--mantine-color-anchor": "var(--link)",
+    "--mantine-color-default": "var(--page)",
+    "--mantine-color-default-hover": "var(--surface-alt)",
+    "--mantine-color-default-color": "var(--ink)",
+    "--mantine-color-default-border": "var(--control-line)",
+    "--mantine-color-error": "var(--error-text)",
+    "--mantine-primary-color-contrast": "var(--on-accent)",
+    "--mantine-color-blue-filled": "var(--accent)",
+    "--mantine-color-blue-filled-hover": "var(--accent-hover)",
+    "--mantine-color-blue-light": "var(--accent-tint)"
   },
   "dark": {
-    "--mantine-color-body": "#10121b",
-    "--mantine-color-text": "#e9ebf1",
-    "--mantine-color-bright": "#e9ebf1",
-    "--mantine-color-dimmed": "#acb0c0",
-    "--mantine-color-placeholder": "#acb0c0",
-    "--mantine-color-anchor": "#74c0fc",
-    "--mantine-color-default": "#10121b",
-    "--mantine-color-default-hover": "#1e212c",
-    "--mantine-color-default-color": "#e9ebf1",
-    "--mantine-color-default-border": "#6f7485",
-    "--mantine-color-error": "#ffa8a8",
-    "--mantine-primary-color-contrast": "#10121b",
-    "--mantine-color-blue-filled-hover": "#74c0fc",
-    "--mantine-color-blue-light": "#172a40"
+    "--mantine-color-body": "var(--page)",
+    "--mantine-color-text": "var(--ink)",
+    "--mantine-color-bright": "var(--ink)",
+    "--mantine-color-dimmed": "var(--muted)",
+    "--mantine-color-placeholder": "var(--muted)",
+    "--mantine-color-anchor": "var(--link)",
+    "--mantine-color-default": "var(--page)",
+    "--mantine-color-default-hover": "var(--surface-alt)",
+    "--mantine-color-default-color": "var(--ink)",
+    "--mantine-color-default-border": "var(--control-line)",
+    "--mantine-color-error": "var(--error-text)",
+    "--mantine-primary-color-contrast": "var(--on-accent)",
+    "--mantine-color-blue-filled": "var(--accent)",
+    "--mantine-color-blue-filled-hover": "var(--accent-hover)",
+    "--mantine-color-blue-light": "var(--accent-tint)"
   }
 } as const

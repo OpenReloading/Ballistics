@@ -8,7 +8,16 @@ import {
   type TargetSheet,
   toSi,
 } from '@open-reloading/schema'
-import type { FlaggedRegion, HoleProposal } from '@open-reloading/target-recognition'
+import {
+  type FaceFit,
+  type FacePlane,
+  type FaceSearch,
+  type FlaggedRegion,
+  faceLabel,
+  fitDiameter,
+  fitPicked,
+  type HoleProposal,
+} from '@open-reloading/target-recognition'
 import { ArrowClockwise, ArrowCounterClockwise, X } from '@phosphor-icons/react'
 import {
   type KeyboardEvent,
@@ -47,14 +56,6 @@ import {
 } from '../lib/hole-proposals.ts'
 import { belowMinimum, guideRule, layoutOf, type QualityIssue } from '../lib/photo-quality.ts'
 import type { Frame } from '../lib/target-editor.ts'
-import {
-  type FaceFit,
-  type FacePlane,
-  type FaceSearch,
-  faceLabel,
-  fitDiameter,
-  fitPicked,
-} from '../lib/target-face.ts'
 import { type Point, turnedBox } from '../lib/target-geometry.ts'
 import { controlSize } from '../lib/theme.ts'
 import { formatQuantity, type UnitSystem } from '../lib/units.ts'
@@ -170,7 +171,7 @@ export function useHoleDetection({
   /** The guided step shown, 0 to 4; undefined: the one-click start. */
   const [step, setStep] = useState<number>()
   /** What the face search found on this photo (photo px), for the choice and the fallback. */
-  const [found, setFound] = useState<FaceSearch>()
+  const [found, setFound] = useState<FaceSearch<TargetFace>>()
   /** The record of the active group's face, for the label the detection takes. */
   const [record, setRecord] = useState<TargetFace>()
   /** The black diameter typed when no face fits, m. */
@@ -446,7 +447,7 @@ export function useHoleDetection({
   }
 
   /** The sheet calibrated on a face or on a black area of a typed diameter. */
-  function applyFit(fit: FaceFit | FacePlane, thenDetect: boolean, event?: string) {
+  function applyFit(fit: FaceFit<TargetFace> | FacePlane, thenDetect: boolean, event?: string) {
     const face = 'face' in fit ? fit.face : undefined
     onFace({
       ...(face && {
@@ -846,7 +847,7 @@ function blockedReason(
 }
 
 /** What follows a face search that did not settle on one face: the step and the line to say. */
-function faceFollowUp({ fits, alike, black }: FaceSearch, t: Translator['t']) {
+function faceFollowUp({ fits, alike, black }: FaceSearch<TargetFace>, t: Translator['t']) {
   // no black area at all: the steps as they were, from the photo's turn
   if (!black)
     return { step: 0, text: t('Straighten the photo if needed, then set the scale (step 2).') }
@@ -930,7 +931,7 @@ type FaceChoice = { value: string; label: string }
 
 /** Fitting faces (several are ratio twins) each with its outer diameter, events and distance, so size, event or distance tells them apart; same-ring matches first, smallest first; without a fit the faces' ranking. */
 function faceChoices(
-  found: FaceSearch | undefined,
+  found: FaceSearch<TargetFace> | undefined,
   system: UnitSystem,
   t: Translator['t'],
 ): FaceChoice[] {

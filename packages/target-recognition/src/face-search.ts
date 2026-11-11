@@ -1,11 +1,10 @@
 /** Apart from `target-face.ts` because only the worker runs it, which keeps the blob detector out of the pages' bundles. */
-import type { TargetFace } from '@open-reloading/schema'
-import { peaksOf, radiiOf, space } from '@open-reloading/target-recognition'
-import { conicOf, type Ellipse } from './ellipse.ts'
+import { conicOf, type Ellipse } from '@open-reloading/shot-groups'
+import { nth } from '@open-reloading/statistics'
+import { peaksOf, radiiOf, space } from './blob-detector.ts'
 import { grayGrid, gridToImage } from './face-image.ts'
 import type { RgbaImage } from './image.ts'
-import { nth } from './nth.ts'
-import { type FaceSearch, SCALE_TOLERANCE, searchFaces } from './target-face.ts'
+import { type FaceSearch, type PrintedFace, SCALE_TOLERANCE, searchFaces } from './target-face.ts'
 
 /** A disc of radius r peaks the scale-normalized Hessian at sigma = r / sqrt 2: D = 2 sqrt 2 sigma. */
 const D_OVER_SIGMA = 2 * Math.SQRT2
@@ -13,12 +12,12 @@ const D_OVER_SIGMA = 2 * Math.SQRT2
 const HOLE_PX = 30
 
 /** `image` of any size runs on a grid of about 700 px; several fits are ratio twins the event or distance tells apart; a known `scale` (image px per mm) or `hole` (mm) drops other sizes. */
-export function findFace(
+export function findFace<F extends PrintedFace = PrintedFace>(
   image: RgbaImage,
-  faces: readonly TargetFace[],
-  scale?: number | undefined,
-  hole?: number | undefined,
-): FaceSearch {
+  faces: readonly F[],
+  scale?: number,
+  hole?: number,
+): FaceSearch<F> {
   const found = searchFaces(image, faces, scale)
   if (scale || !hole || !found.black || found.alike.length < 2) return found
   const sizes = found.alike.map((f) => f.pxPerMm * hole)
@@ -34,7 +33,7 @@ export function findFace(
 }
 
 /** Diameter in px of the strongest light blobs between `lo` and `hi` px, the holes, which show the backing; undefined when there is none. */
-function holeSize(image: RgbaImage, black: Ellipse, lo: number, hi: number) {
+function holeSize(image: RgbaImage, black: Ellipse, lo: number, hi: number): number | undefined {
   const r = black.semiMajor
   const grid = grayGrid(image, Math.max(1, Math.floor(hi / HOLE_PX)), {
     x0: black.centreX - r,
@@ -45,7 +44,7 @@ function holeSize(image: RgbaImage, black: Ellipse, lo: number, hi: number) {
   const { width: w, height: h, blockSize: k } = grid
   // inside the black edge by a large hole, so the edge itself gives no blob
   const inner = { ...black, semiMajor: black.semiMajor - hi, semiMinor: black.semiMinor - hi }
-  if (inner.semiMinor <= 0) return
+  if (inner.semiMinor <= 0) return undefined
   const [A, B, C, D, E, F] = conicOf(inner)
   const inside = new Uint8Array(w * h)
   for (let y = 0; y < h; y++)
@@ -59,11 +58,11 @@ function holeSize(image: RgbaImage, black: Ellipse, lo: number, hi: number) {
   const sigmas = Array.from({ length: 9 }, (_, i) => (d0 * (d1 / d0) ** (i / 8)) / D_OVER_SIGMA)
   const peaks = peaksOf(space(grid.grey, w, h, radiiOf(1, sigmas)), inside, d0)
   const top = peaks[0]
-  if (!top) return
+  if (!top) return undefined
   const d = peaks
     .filter((p) => p.response >= 0.5 * top.response)
     .slice(0, 5)
     .map((p) => D_OVER_SIGMA * p.sigma * k)
-    .sort((x, y) => x - y)
+    .toSorted((x, y) => x - y)
   return nth(d, d.length >> 1)
 }
