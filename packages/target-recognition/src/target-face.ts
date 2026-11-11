@@ -119,7 +119,7 @@ function ringLines(image: RgbaImage, black: Ellipse): { black: Ellipse; rings: R
   )
   const fine = grayGrid(image, s1, box)
   const blackFine = refineBlackEdge(fine, black)
-  const uOf = normalisedRadius(conicOf(blackFine))
+  const uOf = normalizedRadius(conicOf(blackFine))
   const rb = meanRadius(blackFine)
   const { components } = ridges(
     fine,
@@ -166,7 +166,7 @@ function ringPlane(black: Ellipse, rings: readonly Ellipse[]): Matrix | undefine
 type RadiusOf = (x: number, y: number) => number
 
 /** The normalized radius of a point: 1 on the ellipse of `conic`. */
-const normalisedRadius =
+const normalizedRadius =
   (conic: Conic): RadiusOf =>
   (x, y) =>
     Math.sqrt(

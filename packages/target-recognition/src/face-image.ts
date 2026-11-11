@@ -371,7 +371,7 @@ function fittedBlob({ grid, t, f, m: { n }, outline, cut }: Candidate): Blob | u
   if (!fit) return undefined
   const el = fit.ellipse
   const ratio = n / ((cut ? shareInside(el, w, h) : 1) * Math.PI * el.semiMajor * el.semiMinor)
-  if (!(ratio >= 0.85 && ratio <= 1.3 && (!cut || centredInside(el, w, h)))) return undefined
+  if (!(ratio >= 0.85 && ratio <= 1.3 && (!cut || centeredInside(el, w, h)))) return undefined
   return {
     threshold: t,
     area: n,
@@ -385,7 +385,7 @@ function fittedBlob({ grid, t, f, m: { n }, outline, cut }: Candidate): Blob | u
 }
 
 /** Whether the ellipse's center and half its area lie in the grid of `w` by `h` px. */
-const centredInside = (el: Ellipse, w: number, h: number): boolean =>
+const centeredInside = (el: Ellipse, w: number, h: number): boolean =>
   el.centreX >= 0 &&
   el.centreY >= 0 &&
   el.centreX < w &&
