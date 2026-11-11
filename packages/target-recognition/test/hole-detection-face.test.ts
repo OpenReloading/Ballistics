@@ -1,64 +1,63 @@
-import {
-  autoDetect,
-  detectFromExample,
-  type HoleProposal,
-} from '@open-reloading/target-recognition'
 import sharp from 'sharp'
 import { beforeAll, describe, expect, it } from 'vitest'
-import type { RgbaImage } from '../src/lib/image.ts'
-import { faceLabel } from '../src/lib/target-face.ts'
+import { autoDetect, detectFromExample, type HoleProposal } from '../src/hole-detection.ts'
+import type { RgbaImage } from '../src/image.ts'
+import { faceLabel } from '../src/target-face.ts'
 import { defined } from './defined.ts'
 import { photoScene } from './face-photos.ts'
 import { faceById, invert, project, render } from './face-render.ts'
 
 // With the face label (`apps/docs/docs/models/hole-detection.md`) the face outline is the region, the color axis takes its surroundings from the same surface and a dark mark on black or light one on paper is print; an air rifle face (4.5 mm pellets, 22.75 mm outer radius) with its black cut to 12 mm, 2.7 holes across, small enough to pass for holes.
-const base = faceById('issf-10m-air-rifle')
-const face = { ...base, blackDiameter: { value: 12 } }
-const outer = defined(face.rings[0]).diameter.value / 2
-const W = 1000
-const pxPerMm = (0.45 * W) / outer
-const holeMm = 4.5
-
-// six dark holes on the paper, 8 to 20 mm from the center, and one far outside the face
-const rnd = (() => {
-  let s = 9
-  return () => {
-    s = (s * 16807) % 2147483647
-    return s / 2147483647
-  }
-})()
-const holes = Array.from({ length: 6 }, () => {
-  const r = 8 + 12 * rnd()
-  const a = 6.28 * rnd()
-  return { x: r * Math.cos(a), y: r * Math.sin(a), diameter: holeMm }
-})
-const outside = { x: 23, y: 20, diameter: holeMm }
-const { image, h } = render({
-  face,
-  camera: { width: W, height: W, pxPerMm, depth: 6 },
-  line: 2.2 / pxPerMm,
-  noise: 3,
-  holes: [...holes, outside],
-  holeGrey: 25,
-  rings: false,
-})
-const D = holeMm * pxPerMm
-const truth = holes.map((q) => project(h, q))
-const far = project(h, outside)
-const label = faceLabel({ toFace: invert(h), outer, black: 6 }, holeMm)
-const input = { image, pxPerM: pxPerMm * 1000, expectedHoleDiameter: holeMm / 1000 / 0.9 }
-
-const score = (found: readonly HoleProposal[]) => ({
-  hits: truth.filter((t) => found.some((p) => Math.hypot(p.x - t.x, p.y - t.y) <= D / 2)).length,
-  extra: found.filter(
-    (p) =>
-      !truth.some((t) => Math.hypot(p.x - t.x, p.y - t.y) <= D / 2) &&
-      Math.hypot(p.x - far.x, p.y - far.y) > D / 2,
-  ).length,
-  outside: found.filter((p) => Math.hypot(p.x - far.x, p.y - far.y) <= D / 2).length,
-})
+function smallBlackScene() {
+  const base = faceById('issf-10m-air-rifle')
+  const face = { ...base, blackDiameter: { value: 12 } }
+  const outer = defined(face.rings[0]).diameter.value / 2
+  const W = 1000
+  const pxPerMm = (0.45 * W) / outer
+  const holeMm = 4.5
+  // six dark holes on the paper, 8 to 20 mm from the center, and one far outside the face
+  const rnd = (() => {
+    let s = 9
+    return () => {
+      s = (s * 16807) % 2147483647
+      return s / 2147483647
+    }
+  })()
+  const holes = Array.from({ length: 6 }, () => {
+    const r = 8 + 12 * rnd()
+    const a = 6.28 * rnd()
+    return { x: r * Math.cos(a), y: r * Math.sin(a), diameter: holeMm }
+  })
+  const outside = { x: 23, y: 20, diameter: holeMm }
+  const { image, h } = render({
+    face,
+    camera: { width: W, height: W, pxPerMm, depth: 6 },
+    line: 2.2 / pxPerMm,
+    noise: 3,
+    holes: [...holes, outside],
+    holeGrey: 25,
+    rings: false,
+  })
+  const D = holeMm * pxPerMm
+  const truth = holes.map((q) => project(h, q))
+  const far = project(h, outside)
+  const label = faceLabel({ toFace: invert(h), outer, black: 6 }, holeMm)
+  const input = { image, pxPerM: pxPerMm * 1000, expectedHoleDiameter: holeMm / 1000 / 0.9 }
+  const score = (found: readonly HoleProposal[]) => ({
+    hits: truth.filter((t) => found.some((p) => Math.hypot(p.x - t.x, p.y - t.y) <= D / 2)).length,
+    extra: found.filter(
+      (p) =>
+        !truth.some((t) => Math.hypot(p.x - t.x, p.y - t.y) <= D / 2) &&
+        Math.hypot(p.x - far.x, p.y - far.y) > D / 2,
+    ).length,
+    outside: found.filter((p) => Math.hypot(p.x - far.x, p.y - far.y) <= D / 2).length,
+  })
+  return { truth, label, input, score }
+}
 
 describe('hole detection with the face label', () => {
+  const { truth, label, input, score } = smallBlackScene()
+
   it('without it a black center of 2.7 holes across is proposed as holes (the known risk)', () => {
     const s = score(autoDetect({ ...input, region: label.outline })?.proposals ?? [])
     expect(s.hits).toBe(6)
@@ -164,7 +163,9 @@ async function viaJpeg(image: RgbaImage, quality: number): Promise<RgbaImage> {
 }
 
 // Print that holes can hide in: a hole on a ring numeral stands where the numerals do, and the bull's quarter marks (light squares of 5 mm where the axes meet the black area's edge) look like holes; blur, noise and JPEG are part of the scenes.
-describe('hole detection with holes on the print of the face', () => {
+
+/** The 25 m pistol face with seven holes and more on its print, and the holes found and the false proposals within half a hole. */
+function printScenes() {
   const pistol = faceById('issf-25m-precision-50m-pistol')
   const size = 1400
   const scale = (0.45 * size) / 250
@@ -209,78 +210,81 @@ describe('hole detection with holes on the print of the face', () => {
     truth.map((t) => found.some((p) => near(p, t)))
   const extra = (found: readonly HoleProposal[], truth: { x: number; y: number }[]) =>
     found.filter((p) => !truth.some((t) => near(p, t))).length
+  return { mm, numerals, quarter, scene, hits, extra }
+}
 
-  describe('a hole on a ring numeral', () => {
-    let s: Awaited<ReturnType<typeof scene>>
-    beforeAll(async () => {
-      // on the numeral between the rings of 50 and 75 mm, and beside the one at 87.5 mm
-      s = await scene(
-        [
-          { x: 62.5, y: 1 },
-          { x: 87.5, y: -5 },
-        ],
-        numerals,
-      )
-    })
-
-    it('is kept in the automatic run, with the numerals still left out', () => {
-      const found = autoDetect({ ...s.input, face: s.label })?.proposals ?? []
-      expect(hits(found, s.truth).every(Boolean)).toBe(true)
-      expect(extra(found, s.truth)).toBe(0)
-    })
-
-    it('leaves numerals of two sizes out, 5 and 4 mm wide', async () => {
-      const wide = numerals.map((m) => (m.x === 62.5 || m.x === -62.5 ? { ...m, width: 5 } : m))
-      const mixed = await scene([], wide)
-      const found = autoDetect({ ...mixed.input, face: mixed.label })?.proposals ?? []
-      expect(hits(found, mixed.truth).every(Boolean)).toBe(true)
-      expect(extra(found, mixed.truth)).toBe(0)
-    })
-
-    it('is kept from an example hole as well', () => {
-      const found = detectFromExample({ ...s.input, face: s.label }, defined(s.truth[0]))
-      expect(hits(found?.proposals ?? [], s.truth).every(Boolean)).toBe(true)
-      expect(extra(found?.proposals ?? [], s.truth)).toBe(0)
-    })
+describe('hole detection with holes on the print of the face: a hole on a ring numeral', () => {
+  const { numerals, scene, hits, extra } = printScenes()
+  let s: Awaited<ReturnType<typeof scene>>
+  beforeAll(async () => {
+    // on the numeral between the rings of 50 and 75 mm, and beside the one at 87.5 mm
+    s = await scene(
+      [
+        { x: 62.5, y: 1 },
+        { x: 87.5, y: -5 },
+      ],
+      numerals,
+    )
   })
 
-  describe('the quarter marks of the bull', () => {
-    let s: Awaited<ReturnType<typeof scene>>
-    let onMark: Awaited<ReturnType<typeof scene>>
-    beforeAll(async () => {
-      s = await scene([], quarter)
-      onMark = await scene([{ x: 96, y: 1 }], quarter)
-    })
+  it('is kept in the automatic run, with the numerals still left out', () => {
+    const found = autoDetect({ ...s.input, face: s.label })?.proposals ?? []
+    expect(hits(found, s.truth).every(Boolean)).toBe(true)
+    expect(extra(found, s.truth)).toBe(0)
+  })
 
-    it('are proposed as holes without the face label of the bull', () => {
-      const found = autoDetect({ ...s.input, face: { ...s.label, quarter: undefined } })
-      expect(extra(found?.proposals ?? [], s.truth)).toBeGreaterThanOrEqual(3)
-    })
+  it('leaves numerals of two sizes out, 5 and 4 mm wide', async () => {
+    const wide = numerals.map((m) => (m.x === 62.5 || m.x === -62.5 ? { ...m, width: 5 } : m))
+    const mixed = await scene([], wide)
+    const found = autoDetect({ ...mixed.input, face: mixed.label })?.proposals ?? []
+    expect(hits(found, mixed.truth).every(Boolean)).toBe(true)
+    expect(extra(found, mixed.truth)).toBe(0)
+  })
 
-    it('are not proposed with it, and every hole is found', () => {
-      const found = autoDetect({ ...s.input, face: s.label })?.proposals ?? []
-      expect(hits(found, s.truth).every(Boolean)).toBe(true)
-      expect(extra(found, s.truth)).toBe(0)
-    })
+  it('is kept from an example hole as well', () => {
+    const found = detectFromExample({ ...s.input, face: s.label }, defined(s.truth[0]))
+    expect(hits(found?.proposals ?? [], s.truth).every(Boolean)).toBe(true)
+    expect(extra(found?.proposals ?? [], s.truth)).toBe(0)
+  })
+})
 
-    it('are not proposed on a face without ring radii either', () => {
-      const { rings: _, ...bare } = s.geometry
-      const found = autoDetect({ ...s.input, face: faceLabel(bare, mm / 0.9) })?.proposals ?? []
-      expect(hits(found, s.truth).every(Boolean)).toBe(true)
-      expect(extra(found, s.truth)).toBe(0)
-    })
+describe('hole detection with holes on the print of the face: the quarter marks of the bull', () => {
+  const { mm, quarter, scene, hits, extra } = printScenes()
+  let s: Awaited<ReturnType<typeof scene>>
+  let onMark: Awaited<ReturnType<typeof scene>>
+  beforeAll(async () => {
+    s = await scene([], quarter)
+    onMark = await scene([{ x: 96, y: 1 }], quarter)
+  })
 
-    it('are not proposed from an example hole either', () => {
-      const found = detectFromExample({ ...s.input, face: s.label }, defined(s.truth[0]))
-      expect(hits(found?.proposals ?? [], s.truth).every(Boolean)).toBe(true)
-      expect(extra(found?.proposals ?? [], s.truth)).toBe(0)
-    })
+  it('are proposed as holes without the face label of the bull', () => {
+    const found = autoDetect({ ...s.input, face: { ...s.label, quarter: undefined } })
+    expect(extra(found?.proposals ?? [], s.truth)).toBeGreaterThanOrEqual(3)
+  })
 
-    it('leave a hole on one of them proposed', () => {
-      const found = autoDetect({ ...onMark.input, face: onMark.label })?.proposals ?? []
-      expect(hits(found, onMark.truth).every(Boolean)).toBe(true)
-      expect(extra(found, onMark.truth)).toBe(0)
-    })
+  it('are not proposed with it, and every hole is found', () => {
+    const found = autoDetect({ ...s.input, face: s.label })?.proposals ?? []
+    expect(hits(found, s.truth).every(Boolean)).toBe(true)
+    expect(extra(found, s.truth)).toBe(0)
+  })
+
+  it('are not proposed on a face without ring radii either', () => {
+    const { rings: _, ...bare } = s.geometry
+    const found = autoDetect({ ...s.input, face: faceLabel(bare, mm / 0.9) })?.proposals ?? []
+    expect(hits(found, s.truth).every(Boolean)).toBe(true)
+    expect(extra(found, s.truth)).toBe(0)
+  })
+
+  it('are not proposed from an example hole either', () => {
+    const found = detectFromExample({ ...s.input, face: s.label }, defined(s.truth[0]))
+    expect(hits(found?.proposals ?? [], s.truth).every(Boolean)).toBe(true)
+    expect(extra(found?.proposals ?? [], s.truth)).toBe(0)
+  })
+
+  it('leave a hole on one of them proposed', () => {
+    const found = autoDetect({ ...onMark.input, face: onMark.label })?.proposals ?? []
+    expect(hits(found, onMark.truth).every(Boolean)).toBe(true)
+    expect(extra(found, onMark.truth)).toBe(0)
   })
 })
 

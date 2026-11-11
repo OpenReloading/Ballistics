@@ -17,8 +17,8 @@ import {
   userFaceRows,
 } from '../src/lib/target-faces.ts'
 import { say } from '../src/lib/wording.ts'
+import { faceById, faces } from './catalog-faces.ts'
 import { defined, missing } from './defined.ts'
-import { faceById, faces } from './face-render.ts'
 import { readRecord } from './read-record.ts'
 
 // the list renders its tab bar, which reads the route and the router

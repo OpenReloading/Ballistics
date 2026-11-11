@@ -1,17 +1,23 @@
 /** Face plane, center and scale from two or more concentric ellipses (the conic pencil); pure, so it runs in the worker. */
 
-import type { TargetFace } from '@open-reloading/schema'
-import { seededUniforms } from '@open-reloading/statistics'
-import type { FaceLabel } from '@open-reloading/target-recognition'
 import {
+  applyMatrix,
+  type Conic,
   concentricPlane,
   conicOf,
   type Ellipse,
   ellipsePoint,
+  type FaceLength,
+  inv3,
   largestGap,
+  type Matrix,
+  mapMatrix,
   meanRadius,
+  mul3,
+  type Point,
   ransacEllipse,
-} from './ellipse.ts'
+} from '@open-reloading/shot-groups'
+import { nth, seededUniforms } from '@open-reloading/statistics'
 import {
   blackAreas,
   type Grid,
@@ -21,9 +27,18 @@ import {
   refineEdge,
   ridges,
 } from './face-image.ts'
+import type { FaceLabel } from './hole-detection.ts'
 import type { RgbaImage } from './image.ts'
-import { nth } from './nth.ts'
-import { applyMatrix, inv3, type Matrix, mapMatrix, mul3, type Point } from './target-geometry.ts'
+
+/** What the face search reads of a target face record; the `TargetFace` of `@open-reloading/schema` is one. */
+export interface PrintedFace {
+  readonly id: string
+  readonly name: string
+  readonly rings: readonly { readonly value: number; readonly diameter: FaceLength }[]
+  readonly innerTen?: { readonly diameter: FaceLength } | undefined
+  readonly blackDiameter: FaceLength
+  readonly photoSearch?: boolean | undefined
+}
 
 /** A ring line found on the photo. */
 export type Ring = {
@@ -104,22 +119,8 @@ function ringLines(image: RgbaImage, black: Ellipse): { black: Ellipse; rings: R
   )
   const fine = grayGrid(image, s1, box)
   const blackFine = refineBlackEdge(fine, black)
-  const conic = conicOf(blackFine)
+  const uOf = normalizedRadius(conicOf(blackFine))
   const rb = meanRadius(blackFine)
-  // the normalized radius of a point: 1 on the black edge
-  const uOf = (x: number, y: number) =>
-    Math.sqrt(
-      Math.max(
-        0,
-        conic[0] * x * x +
-          conic[1] * x * y +
-          conic[2] * y * y +
-          conic[3] * x +
-          conic[4] * y +
-          conic[5] +
-          1,
-      ),
-    )
   const { components } = ridges(
     fine,
     ringBandMask(fine, uOf),
@@ -164,6 +165,23 @@ function ringPlane(black: Ellipse, rings: readonly Ellipse[]): Matrix | undefine
 
 type RadiusOf = (x: number, y: number) => number
 
+/** The normalized radius of a point: 1 on the ellipse of `conic`. */
+const normalizedRadius =
+  (conic: Conic): RadiusOf =>
+  (x, y) =>
+    Math.sqrt(
+      Math.max(
+        0,
+        conic[0] * x * x +
+          conic[1] * x * y +
+          conic[2] * y * y +
+          conic[3] * x +
+          conic[4] * y +
+          conic[5] +
+          1,
+      ),
+    )
+
 /** The black edge refined on the crop's grid, else the one found on the coarse grid; grid px. */
 function refineBlackEdge(fine: Grid, black: Ellipse): Ellipse {
   const start = toGridEllipse(fine, black)
@@ -192,7 +210,7 @@ function groupFragments(components: Point[][], uOf: RadiusOf): Point[][] {
       return { pts, mean, sd }
     })
     .filter((f) => f.sd <= 0.06 * f.mean)
-    .sort((x, y) => x.mean - y.mean)
+    .toSorted((x, y) => x.mean - y.mean)
   const groups: Array<typeof frags> = []
   for (const f of frags) {
     const last = groups[groups.length - 1]
@@ -234,7 +252,7 @@ function concentric(black: Ellipse, rings: readonly Ring[]): Ring[] {
   const rho = meanRadius(black)
   const aspect = black.semiMinor / black.semiMajor
   const out: Ring[] = []
-  for (const r of [...rings].sort((x, y) => y.points - x.points)) {
+  for (const r of rings.toSorted((x, y) => y.points - x.points)) {
     const radius = meanRadius(r.ellipse)
     if (Math.abs(radius / rho - 1) < 0.025) continue
     if (
@@ -246,14 +264,14 @@ function concentric(black: Ellipse, rings: readonly Ring[]): Ring[] {
     if (out.some((o) => Math.abs(meanRadius(o.ellipse) / radius - 1) < 0.025)) continue
     out.push(r)
   }
-  return out.sort((x, y) => meanRadius(x.ellipse) - meanRadius(y.ellipse))
+  return out.toSorted((x, y) => meanRadius(x.ellipse) - meanRadius(y.ellipse))
 }
 
 /** A ring of a face record, radius in mm. */
 type FaceRing = { radius: number; label: string }
 
 /** The circles a face prints besides its black edge: the scoring rings and the inner ten. */
-function faceRings(face: TargetFace): FaceRing[] {
+function faceRings(face: PrintedFace): FaceRing[] {
   const list: FaceRing[] = face.rings.map((r) => ({
     radius: r.diameter.value / 2,
     label: String(r.value),
@@ -263,11 +281,11 @@ function faceRings(face: TargetFace): FaceRing[] {
     list.push({ radius: inner / 2, label: 'X' })
   return list
     .filter((r) => Math.abs(r.radius - face.blackDiameter.value / 2) > 1e-6)
-    .sort((a, b) => b.radius - a.radius)
+    .toSorted((a, b) => b.radius - a.radius)
 }
 
-type FaceMatch = {
-  face: TargetFace
+type FaceMatch<F extends PrintedFace = PrintedFace> = {
+  face: F
   /** Higher is better; ties are faces whose rings the photo cannot tell apart. */
   score: number
   /** The rings found that match, with the ring they match. */
@@ -275,16 +293,15 @@ type FaceMatch = {
 }
 
 /** The black edge fixes the scale; rings match within `TOLERANCE`, a known `scale` (image px per mm) drops other sizes, missing expected rings count a little against, `photoSearch: false` faces are skipped. */
-export function matchFaces(
+export function matchFaces<F extends PrintedFace = PrintedFace>(
   black: Ellipse,
   rings: readonly Ring[],
-  faces: readonly TargetFace[],
-  frame?: { width: number; height: number },
-  scale?: number | undefined,
-): FaceMatch[] {
+  faces: readonly F[],
+  { frame, scale }: { frame?: { width: number; height: number }; scale?: number | undefined } = {},
+): FaceMatch<F>[] {
   const rho = meanRadius(black)
   const found = concentric(black, rings)
-  const out: FaceMatch[] = []
+  const out: FaceMatch<F>[] = []
   for (const face of faces) {
     if (face.photoSearch === false) continue
     const s = rho / (face.blackDiameter.value / 2)
@@ -304,7 +321,7 @@ export function matchFaces(
     const missing = expected.filter((r) => !matched.some((m) => m.radius === r.radius)).length
     out.push({ face, score: scoreMatch(matched, missing, found.length), matched })
   }
-  return out.sort((a, b) => b.score - a.score)
+  return out.toSorted((a, b) => b.score - a.score)
 }
 
 /** Share of 24 points of the ellipse `e` grown `k` times about its center that lie in the frame. */
@@ -332,7 +349,7 @@ function pairCandidates(found: readonly Ring[], list: readonly FaceRing[], s: nu
       })),
     )
     .filter((p) => p.error <= TOLERANCE)
-    .sort((a, b) => a.error - b.error)
+    .toSorted((a, b) => a.error - b.error)
 }
 
 /** The pairs taken closest first, each ring found and each face ring once. */
@@ -393,7 +410,7 @@ export type FacePlane = {
   approximate: boolean
 }
 
-export type FaceFit = FacePlane & { face: TargetFace }
+export type FaceFit<F extends PrintedFace = PrintedFace> = FacePlane & { face: F }
 
 type Member = { ellipse: Ellipse; radius: number; arc: number }
 
@@ -423,11 +440,9 @@ function oriented(toPlane: Matrix, radius: number, centre: Point): Matrix {
 
 /** The plane of `members` from a map to the unit circle of the first; undefined when it is singular. */
 function planeOf(
-  toPlane: Matrix,
-  centre: Point,
+  { toPlane, centre }: { toPlane: Matrix; centre: Point },
   members: Member[],
-  outer: number,
-  black: number,
+  { outer, black }: { outer: number; black: number },
   approximate: boolean,
 ): FacePlane | undefined {
   const toFace = oriented(toPlane, nth(members, 0).radius, centre)
@@ -503,7 +518,7 @@ function planeFromEllipses(members: Member[], outer: number, black: number): Fac
   if (!best) return undefined
   // the pair's larger ellipse leads: its radius scales the plane
   const ordered = [best.a, ...members.filter((m) => m !== best?.a)]
-  return planeOf(best.plane.toPlane, best.plane.centre, ordered, outer, black, false)
+  return planeOf(best.plane, ordered, { outer, black }, false)
 }
 
 /** Without perspective the center is biased under tilt (3.7 to 15.7 mm measured on tilted photos). */
@@ -526,17 +541,18 @@ function planeFromOne(
     1,
   ]
   return planeOf(
-    toPlane,
-    { x: e.centreX, y: e.centreY },
+    { toPlane, centre: { x: e.centreX, y: e.centreY } },
     [{ ellipse: e, radius, arc: 1 }],
-    outer,
-    black,
+    { outer, black },
     true,
   )
 }
 
 /** Undefined when the ellipses do not rectify to the face's circles (rms above 1.5 % of the black radius). */
-function fitFace(black: Ellipse, match: FaceMatch): FaceFit | undefined {
+function fitFace<F extends PrintedFace = PrintedFace>(
+  black: Ellipse,
+  match: FaceMatch<F>,
+): FaceFit<F> | undefined {
   const face = match.face
   const blackRadius = face.blackDiameter.value / 2
   const outer = nth(face.rings, 0).diameter.value / 2
@@ -567,7 +583,7 @@ function misfitOf(m: Member, toFace: Matrix): number {
   return Math.sqrt(sum / 48)
 }
 
-export type FaceSearch = {
+export type FaceSearch<F extends PrintedFace = PrintedFace> = {
   /** The black area found, image px. */
   black?: Ellipse
   /** The black edge and the ring lines found, image px: what the user sees when no face fits. */
@@ -584,9 +600,9 @@ export type FaceSearch = {
     confidence: number | undefined
   }>
   /** The fits of the best face and of the faces that fit as well (ratio twins), best first. */
-  fits: FaceFit[]
+  fits: FaceFit<F>[]
   /** Whatever their score, since a larger face loses points for outer rings off the photo; empty with a known scale. */
-  alike: FaceFit[]
+  alike: FaceFit<F>[]
   /** Applied without a question; fewer rings match equally spaced faces by coincidence often enough to ask. */
   sure: boolean
 }
@@ -601,44 +617,41 @@ export function confidenceOf(
 }
 
 /** The fits of the faces that match every ring the best face matches, smallest first; none with a known scale. */
-function alikeOf(black: Ellipse, ranked: FaceMatch[], scale: number | undefined): FaceFit[] {
+function alikeOf<F extends PrintedFace = PrintedFace>(
+  black: Ellipse,
+  ranked: FaceMatch<F>[],
+  scale: number | undefined,
+): FaceFit<F>[] {
   const [top] = ranked
   if (scale || !top) return []
   return ranked
     .filter((m) => top.matched.every((t) => m.matched.some((x) => x.ring === t.ring)))
     .map((m) => fitFace(black, m))
-    .filter((f): f is FaceFit => !!f)
-    .sort((a, b) => a.outer - b.outer)
+    .filter((f): f is FaceFit<F> => !!f)
+    .toSorted((a, b) => a.outer - b.outer)
 }
 
 /** The face search of `findFace` (`face-search.ts`) at one scale, or none. */
-export function searchFaces(
+export function searchFaces<F extends PrintedFace = PrintedFace>(
   image: RgbaImage,
-  faces: readonly TargetFace[],
+  faces: readonly F[],
   scale: number | undefined,
-): FaceSearch {
+): FaceSearch<F> {
   const s0 = Math.max(1, Math.ceil(Math.max(image.width, image.height) / COARSE))
   const coarse = grayGrid(image, s0)
-  let result: FaceSearch = { ellipses: [], rings: [], ranked: [], fits: [], alike: [], sure: false }
+  let result: FaceSearch<F> = {
+    ellipses: [],
+    rings: [],
+    ranked: [],
+    fits: [],
+    alike: [],
+    sure: false,
+  }
   let bestScore = Number.NEGATIVE_INFINITY
   for (const cand of blackAreas(coarse)) {
     const { black, rings } = ringLines(image, toImageEllipse(coarse, cand.ellipse))
-    const ranked = matchFaces(black, rings, faces, image, scale)
-    const search: FaceSearch = {
-      black,
-      ellipses: [black, ...concentric(black, rings).map((r) => r.ellipse)],
-      rings,
-      ranked: ranked.map((m) => ({
-        id: m.face.id,
-        name: m.face.name,
-        score: m.score,
-        matched: m.matched.length,
-        confidence: confidenceOf(m.matched.length),
-      })),
-      fits: [],
-      alike: [],
-      sure: false,
-    }
+    const ranked = matchFaces(black, rings, faces, { frame: image, scale })
+    const search = unfitted(black, rings, ranked)
     if (!result.black) result = search
     const top = ranked[0]
     if (!top || top.matched.length < MIN_RINGS) {
@@ -649,9 +662,9 @@ export function searchFaces(
     const fits = ranked
       .filter((m) => m.score >= top.score - TIE && m.matched.length >= MIN_RINGS)
       .map((m) => fitFace(black, m))
-      .filter((f): f is FaceFit => !!f)
+      .filter((f): f is FaceFit<F> => !!f)
     if (!fits.length || top.score <= bestScore) continue
-    const sure = fits.length === 1 && top.matched.length >= SURE_RINGS && top.score >= SURE_SCORE
+    const sure = fits.length === 1 && isSure(top)
     const alike = alikeOf(black, ranked, scale)
     ;[result, bestScore] = [{ ...search, fits, alike, sure }, top.score]
     if (top.score >= SURE) break
@@ -659,8 +672,38 @@ export function searchFaces(
   return result
 }
 
+/** The search of one black area before any face is fitted: the faces ranked, no fit. */
+function unfitted<F extends PrintedFace = PrintedFace>(
+  black: Ellipse,
+  rings: Ring[],
+  ranked: readonly FaceMatch<F>[],
+): FaceSearch<F> {
+  return {
+    black,
+    ellipses: [black, ...concentric(black, rings).map((r) => r.ellipse)],
+    rings,
+    ranked: ranked.map((m) => ({
+      id: m.face.id,
+      name: m.face.name,
+      score: m.score,
+      matched: m.matched.length,
+      confidence: confidenceOf(m.matched.length),
+    })),
+    fits: [],
+    alike: [],
+    sure: false,
+  }
+}
+
+/** Whether the best match is applied without a question when its face is the only fit. */
+const isSure = (top: FaceMatch): boolean =>
+  top.matched.length >= SURE_RINGS && top.score >= SURE_SCORE
+
 /** With `MIN_RINGS` matched rings the pencil gives the plane, else the black edge alone (approximate). */
-export function fitPicked(search: FaceSearch, face: TargetFace): FaceFit | undefined {
+export function fitPicked<F extends PrintedFace = PrintedFace>(
+  search: FaceSearch<F>,
+  face: F,
+): FaceFit<F> | undefined {
   if (!search.black) return undefined
   const match = nth(matchFaces(search.black, search.rings, [face]), 0)
   const full = match.matched.length >= MIN_RINGS ? fitFace(search.black, match) : undefined
@@ -682,7 +725,12 @@ export function fitDiameter(search: FaceSearch, diameter: number): FacePlane | u
 }
 
 /** The same search on the photo: `k` work px per photo px, the work crop starting at (x0, y0) of the photo. */
-export function onPhoto(search: FaceSearch, k: number, x0: number, y0: number): FaceSearch {
+export function onPhoto<F extends PrintedFace = PrintedFace>(
+  search: FaceSearch<F>,
+  k: number,
+  x0: number,
+  y0: number,
+): FaceSearch<F> {
   const p = (q: Point): Point => ({ x: q.x / k + x0, y: q.y / k + y0 })
   const e = (el: Ellipse): Ellipse => {
     const c = p({ x: el.centreX, y: el.centreY })
@@ -696,12 +744,12 @@ export function onPhoto(search: FaceSearch, k: number, x0: number, y0: number): 
   }
   // photo to work: x' = k (x - x0)
   const toWork: Matrix = [k, 0, -k * x0, 0, k, -k * y0, 0, 0, 1]
-  const fit = (f: FaceFit): FaceFit => ({
+  const fit = (f: FaceFit<F>): FaceFit<F> => ({
     ...f,
     centre: p(f.centre),
     toFace: mul3(f.toFace, toWork),
     pxPerMm: f.pxPerMm / k,
-    corners: f.corners.map(p) as FaceFit['corners'],
+    corners: [p(f.corners[0]), p(f.corners[1]), p(f.corners[2]), p(f.corners[3])],
     outline: f.outline.map(p),
     blackOutline: f.blackOutline.map(p),
   })
@@ -726,7 +774,7 @@ export function faceLabel(g: FaceGeometry, hole: number): FaceLabel {
       y: R * Math.sin((2 * Math.PI * k) / 72),
     }),
   )
-  const radii = [...(g.rings ?? [])].sort((a, b) => a - b)
+  const radii = (g.rings ?? []).toSorted((a, b) => a - b)
   const mm = (p: Point) => applyMatrix(g.toFace, p)
   /** The point in face mm with the axes turned by `roll` (rad). */
   const turned = (p: Point, roll: number) => {

@@ -32,8 +32,8 @@ Measured. The measurements are not in the repository.
 
 ## Where in the app
 
-- `apps/web/src/lib/target-face.ts`, `ringPlane`, `fitFace`.
-- `apps/web/src/lib/ellipse.ts`, `concentricPlane`.
+- `packages/target-recognition/src/target-face.ts`, `ringPlane`, `fitFace`.
+- `packages/shot-groups/src/ellipse.ts`, `concentricPlane`.
 - Model page: [hole detection](../models/hole-detection.md).
 
 ## Confidence
