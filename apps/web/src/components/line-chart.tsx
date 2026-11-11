@@ -4,9 +4,15 @@ import type { ECharts } from 'echarts/core'
 import { createContext, type ReactNode, useContext, useMemo, useState } from 'react'
 import { formatNumber } from '../i18n/number.ts'
 import { niceTicks, tickDecimals } from '../lib/ticks.ts'
-import { axisText, chartTooltip, EChart, tickStep, useChartTokens } from './echart.tsx'
+import { axisText, chartColors, chartTooltip, EChart, hovered, tickStep } from './echart.tsx'
 
-const lineTokens = { muted: '--muted', border: '--line', link: '--link', bg: '--page', fg: '--ink' }
+const tokens = chartColors({
+  muted: '--muted',
+  border: '--line',
+  link: '--link',
+  bg: '--page',
+  fg: '--ink',
+})
 
 /** Smallest and largest value; a loop, as a spread of a long array can overflow the call stack. */
 function extent(values: number[]): [number, number] {
@@ -98,7 +104,6 @@ export function LineChart({
   bars?: number[]
   children?: ReactNode
 }) {
-  const tokens = useChartTokens(lineTokens)
   const [scale, setScale] = useState<ChartScale>()
   const [xMin, xMax] = extent(x)
   // the x axis ends at the data, ticks at nice values up to it
@@ -109,7 +114,7 @@ export function LineChart({
   // callers pass new arrays on each render: the option follows their values, so a render that changes nothing drawn does not redraw the chart
   const data = JSON.stringify([x, y, limits, xt, yt])
   const option = useMemo(() => {
-    if (!tokens || !ok) return {}
+    if (!ok) return {}
     const [dx, dy] = [tickDecimals(xt), tickDecimals(yt)]
     const text = axisText(tokens.muted)
     const axis = (ticks: number[], name: string, d: number, max: number | undefined) => ({
@@ -152,6 +157,7 @@ export function LineChart({
           symbol: points ? 'circle' : 'none',
           lineStyle: { color: tokens.link, width: 2 },
           itemStyle: { color: tokens.link },
+          emphasis: hovered(tokens.link),
           data: x.map((v, i) => [v, y[i]]),
           markLine: {
             silent: true,
@@ -182,7 +188,7 @@ export function LineChart({
       ],
     }
     // oxlint-disable-next-line react-hooks/exhaustive-deps -- the option follows the drawn values through `data` (see above)
-  }, [tokens, ok, data, zeroLine, points, xLabel, yLabel, xMax])
+  }, [ok, data, zeroLine, points, xLabel, yLabel, xMax])
   if (!ok) return null
   /** The scales after a draw; a new state only when the plot area moved, so no draw loop. */
   const measure = (c: ECharts) => {

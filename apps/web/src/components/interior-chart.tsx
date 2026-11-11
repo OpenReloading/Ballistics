@@ -40,7 +40,7 @@ import {
 } from '../lib/units.ts'
 import { AppModal } from './app-modal.tsx'
 import { ChartPlayback } from './chart-playback.tsx'
-import { chartTooltip, EChart, useChartTokens } from './echart.tsx'
+import { chartColors, chartTooltip, EChart } from './echart.tsx'
 import { PanelTable } from './scroll-region.tsx'
 
 type Limits = Parameters<typeof limitLines>[0]
@@ -82,7 +82,7 @@ function chartTitle(v: Pick<ChartView, 'x' | 'quantity'>, t: Translator['t']) {
 }
 
 /** The chart colors from the page's tokens (`tokens.css` of `@open-reloading/design-tokens` and `globals.css`). */
-const themeTokens: Record<keyof ChartTheme, string> = {
+const theme: ChartTheme = chartColors({
   pressure: '--series-2',
   pressureText: '--series-2-text',
   velocityText: '--series-1-text',
@@ -95,7 +95,7 @@ const themeTokens: Record<keyof ChartTheme, string> = {
   border: '--line',
   warning: '--warn-text',
   background: '--page',
-}
+})
 
 /** Pressure, velocity and energy on their own axes; `selected` solid with its event lines, the tooltip also by keyboard, a collapsed data table. */
 export function InteriorChart({
@@ -140,7 +140,6 @@ export function InteriorChart({
 }) {
   const { x, quantity } = view
   const { t, language } = useTranslation()
-  const theme = useChartTokens(themeTokens)
   const reduce = useReducedMotion(false, { getInitialValueInEffect: false })
   const [dataOpen, setDataOpen] = useState(false)
   const step = nth(steps, selected)
@@ -184,7 +183,6 @@ export function InteriorChart({
     system.energy.symbol,
     system.length.symbol,
     language,
-    theme && Object.values(theme).join(),
     reduce,
     z1,
     stepName,
@@ -192,7 +190,6 @@ export function InteriorChart({
     JSON.stringify(lines),
   ].join('|')
   const option = useMemo(() => {
-    if (!theme) return
     const base = interiorOption({
       steps,
       selected,
@@ -311,20 +308,18 @@ export function InteriorChart({
         redraw={redraw}
       />
       <div className="chart-stage" ref={setStage}>
-        {option && (
-          <EChart
-            option={option}
-            title={chartTitle(view, t)}
-            description={description}
-            focus={focus}
-            readout={(i) => readout(at(nth(r.points, Math.min(i, r.points.length - 1)).time))}
-            onRender={(c) => {
-              chart.current = c
-              redraw.current?.()
-              onRender?.(c)
-            }}
-          />
-        )}
+        <EChart
+          option={option}
+          title={chartTitle(view, t)}
+          description={description}
+          focus={focus}
+          readout={(i) => readout(at(nth(r.points, Math.min(i, r.points.length - 1)).time))}
+          onRender={(c) => {
+            chart.current = c
+            redraw.current?.()
+            onRender?.(c)
+          }}
+        />
         <div className="chart-rail" ref={setRailHost} />
       </div>
       {withPressure && !lines && (
