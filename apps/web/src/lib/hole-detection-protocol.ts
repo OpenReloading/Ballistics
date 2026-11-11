@@ -1,8 +1,13 @@
 /** Messages between the target editor and the hole detection worker, in photo px of the turned photo. */
 import type { TargetFace } from '@open-reloading/schema'
-import type { FlaggedRegion, HoleExample, HoleProposal } from '@open-reloading/target-recognition'
+import type {
+  FaceGeometry,
+  FaceSearch,
+  FlaggedRegion,
+  HoleExample,
+  HoleProposal,
+} from '@open-reloading/target-recognition'
 import type { QualityIssue, TargetLayout } from './photo-quality.ts'
-import type { FaceGeometry, FaceSearch } from './target-face.ts'
 import type { Point } from './target-geometry.ts'
 
 export type Rgb = { r: number; g: number; b: number }
@@ -59,5 +64,5 @@ export type WorkerReply =
       example?: HoleExample
     }
   /** The search on the photo's px (`fits` is empty when no face is proposed) and the photo's quality problems. */
-  | { kind: 'face'; search: FaceSearch; quality: QualityIssue[] }
+  | { kind: 'face'; search: FaceSearch<TargetFace>; quality: QualityIssue[] }
   | { kind: 'error'; message: string }

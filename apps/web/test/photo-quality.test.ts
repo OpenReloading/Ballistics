@@ -1,7 +1,7 @@
+import { findFace } from '@open-reloading/target-recognition'
 import sharp from 'sharp'
 import { describe, expect, it } from 'vitest'
 import { msg } from '../src/i18n/translate.ts'
-import { findFace } from '../src/lib/face-search.ts'
 import type { RgbaImage } from '../src/lib/image.ts'
 import {
   belowMinimum,

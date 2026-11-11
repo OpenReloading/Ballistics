@@ -1,12 +1,12 @@
 import {
   autoDetect,
   detectFromExample,
+  faceLabel,
   type HoleProposal,
 } from '@open-reloading/target-recognition'
 import sharp from 'sharp'
 import { beforeAll, describe, expect, it } from 'vitest'
 import type { RgbaImage } from '../src/lib/image.ts'
-import { faceLabel } from '../src/lib/target-face.ts'
 import { defined } from './defined.ts'
 import { photoScene } from './face-photos.ts'
 import { faceById, invert, project, render } from './face-render.ts'

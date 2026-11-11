@@ -3,17 +3,18 @@
 import { fromSi } from '@open-reloading/schema'
 import {
   clamp,
+  faceLabel,
+  findFace,
   type HoleDetectionInput,
   holeDetector,
+  onPhoto,
   type ProposalRequest,
   type Proposals,
   WORK_DIAMETER,
 } from '@open-reloading/target-recognition'
 import { errorText } from './error-text.ts'
-import { findFace } from './face-search.ts'
 import type { Photo, WorkerReply, WorkerRequest } from './hole-detection-protocol.ts'
 import { layoutOf, photoQuality } from './photo-quality.ts'
-import { faceLabel, onPhoto } from './target-face.ts'
 import { mul3, type Point, turnedBox } from './target-geometry.ts'
 
 /** The face search looks at the photo resized to this many px on its longer side. */

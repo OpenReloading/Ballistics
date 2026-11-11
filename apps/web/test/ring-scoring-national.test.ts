@@ -1,4 +1,5 @@
 import type { TargetFace } from '@open-reloading/schema'
+import { matchFaces } from '@open-reloading/target-recognition'
 import { describe, expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import {
@@ -7,7 +8,6 @@ import {
   scoreShot,
   usesOwnTenthRule,
 } from '../src/lib/ring-scoring.ts'
-import { matchFaces } from '../src/lib/target-face.ts'
 import { defined } from './defined.ts'
 import { catalogBundle } from './records.ts'
 

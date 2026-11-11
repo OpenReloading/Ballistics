@@ -30,7 +30,6 @@ const other: [file: string, text: string][] = [
   ['apps/web/src/lib/power-factor.ts', '(velocity / metersPerFoot)'],
   ['apps/web/src/lib/burn-rate.ts', 'perPa * 1e6'],
   ['apps/web/src/lib/record-fields.ts', '/ 1e6'],
-  ['apps/web/src/lib/face-image.ts', '1e-6 *'],
 ]
 
 function sources(dir: string): string[] {

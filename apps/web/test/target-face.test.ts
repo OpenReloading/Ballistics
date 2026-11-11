@@ -1,16 +1,16 @@
 import type { TargetFace } from '@open-reloading/schema'
-import { describe, expect, it } from 'vitest'
-import { meanRadius } from '../src/lib/ellipse.ts'
-import { findFace } from '../src/lib/face-search.ts'
+import { meanRadius } from '@open-reloading/shot-groups'
 import {
   confidenceOf,
   type FaceFit,
   faceLabel,
+  findFace,
   fitDiameter,
   fitPicked,
   matchFaces,
   onPhoto,
-} from '../src/lib/target-face.ts'
+} from '@open-reloading/target-recognition'
+import { describe, expect, it } from 'vitest'
 import { apply3 } from '../src/lib/target-geometry.ts'
 import { defined, missing } from './defined.ts'
 import { photoScene } from './face-photos.ts'
