@@ -118,9 +118,3 @@ it.each(['light', 'dark', 'print'] as const)(
     }
   },
 )
-
-it('a Docusaurus page printed with the dark theme on shows a warning in the light colors', () => {
-  const page = cssOf(['docusaurus.css'], ['@print :root[data-theme="dark"]'])
-  expect(page['--ifm-color-warning-contrast-background']).toBe('rgb(255, 248, 230)')
-  expect(page['--ifm-color-warning-contrast-foreground']).toBe('rgb(77, 56, 0)')
-})

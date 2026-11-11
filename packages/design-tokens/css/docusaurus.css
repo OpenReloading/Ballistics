@@ -69,10 +69,14 @@
 }
 
 /* Print is light (tokens.css), also with the dark theme on: the dark values of Infima that the mapping above leaves,
-   as Infima sets them in its light theme (the admonition colors, the icon filters). Code blocks keep the dark theme's
-   colors, which Docusaurus writes inline. */
+   as Infima sets them in its light theme (apps/docs/scripts/print-colors.test.mts compares them). Code blocks keep the
+   dark theme's colors, which Docusaurus writes inline. */
 @media print {
   :root[data-theme="dark"] {
+    --ifm-color-scheme: light;
+    --ifm-scrollbar-track-background-color: #f1f1f1;
+    --ifm-scrollbar-thumb-background-color: #c0c0c0;
+    --ifm-scrollbar-thumb-hover-background-color: #a7a7a7;
     --ifm-menu-link-sublist-icon-filter: none;
     --ifm-breadcrumb-separator-filter: none;
     --ifm-color-primary-contrast-background: rgb(235, 242, 252);
