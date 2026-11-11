@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 import {
+  baseList,
   extract,
   messages,
   problems,
@@ -105,6 +106,11 @@ describe('the catalogue lint', () => {
       'listed as equal to English, but needs no entry or is listed twice: {a}: {b}',
       'listed as equal to English, but needs no entry or is listed twice: Wind',
     ])
+  })
+
+  it('reads the untranslated list of the base and refuses a base without one', () => {
+    expect(baseList('{"untranslated":{"de":["Listed"]}}', 'de', 'abc1234')).toEqual(['Listed'])
+    expect(() => baseList('{"safeTexts":[]}', 'de', 'abc1234')).toThrow(/abc1234/)
   })
 
   it('names a German text without the verified term or with a rejected candidate, and a safe word without approval', () => {

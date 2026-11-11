@@ -363,6 +363,16 @@ export function safeWordingProblems(
   return found
 }
 
+/** The untranslated list of `code` in `lintAtBase`, the lint file as the commit `baseRef` has it; a base without one throws, since nothing would show that the list only shrank. */
+export function baseList(lintAtBase: string, code: string, baseRef: string): string[] {
+  const list = JSON.parse(lintAtBase).untranslated?.[code]
+  if (!list)
+    throw new Error(
+      `the base ${baseRef} has no untranslated list for ${code} in apps/web/scripts/i18n-lint.json, so the list cannot be compared: if origin/main is stale, run git fetch origin main and check again`,
+    )
+  return list
+}
+
 if (import.meta.main) {
   const [command, code, baseRef] = process.argv.slice(2)
   const source = messages()
@@ -382,10 +392,11 @@ if (import.meta.main) {
     const read = (file: string) => JSON.parse(readFileSync(path.join(webRoot, file), 'utf8'))
     const lint = read('scripts/i18n-lint.json')
     const allowed: string[] = lint.untranslated[code] ?? []
-    // a base without a list for the language compares nothing
-    const base: string[] | undefined = baseRef
-      ? JSON.parse(git('show', `${baseRef}:apps/web/scripts/i18n-lint.json`)).untranslated?.[code]
-      : undefined
+    // with nothing listed there is nothing the base could lack
+    const base =
+      baseRef && allowed.length > 0
+        ? baseList(git('show', `${baseRef}:apps/web/scripts/i18n-lint.json`), code, baseRef)
+        : undefined
     const same: string[] = lint.sameAsEnglish?.[code] ?? []
     const found = problems(source, catalogue, code, requiredMessages(webRoot), allowed, base, same)
     if (code === 'de') {
