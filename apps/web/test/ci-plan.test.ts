@@ -101,6 +101,27 @@ it('runs the e2e job for a change of the design tokens, whose palette the web ap
   expect(plan(['packages/design-tokens/tokens/base.tokens.json'], closure).e2e).toBe(true)
 })
 
+it('builds the docs image for the docs site, the design tokens and the build context, not for other code', () => {
+  for (const f of [
+    'apps/docs/src/css/custom.css',
+    'apps/docs/docs/browsers.md',
+    'apps/docs/library.md',
+    'apps/docs/Dockerfile',
+    'packages/design-tokens/css/tokens.css',
+    'compose.yaml',
+    'pnpm-lock.yaml',
+    '.github/workflows/ci.yml',
+  ])
+    expect(plan([f], closure).docs, f).toBe(true)
+  for (const f of [
+    'apps/web/src/components/workbench.tsx',
+    'packages/ballistics/src/index.ts',
+    'tools/src/audit.ts',
+    'CONTRIBUTING.md',
+  ])
+    expect(plan([f], closure).docs, f).toBe(false)
+})
+
 it('builds with the sample when the web app changed outside the record pages', () => {
   expect(plan(['apps/web/src/components/workbench.tsx'], closure)).toMatchObject({
     prerender: 'sample',
@@ -278,7 +299,7 @@ const run = (env: Record<string, string>, ...args: string[]) =>
   }).toString()
 
 it('is full unless the event is a pull request with a base commit that exists', () => {
-  const full = `check=true\ne2e=true\nprerender=full\ntests=${JSON.stringify(testJobs())}\n`
+  const full = `check=true\ne2e=true\ndocs=true\nprerender=full\ntests=${JSON.stringify(testJobs())}\n`
   expect(run({ EVENT_NAME: 'push', BASE_SHA: 'HEAD' })).toBe(full)
   expect(run({ EVENT_NAME: 'release', BASE_SHA: 'HEAD' })).toBe(full)
   expect(run({})).toBe(full)

@@ -35,11 +35,12 @@ env:
 # The jobs stay in this file until the shared gates workflow of ESchuderer/reusable-workflows is released; then they
 # become a call pinned by commit SHA, and `check` stays here (it names this file's jobs).
 jobs:
-  # Which jobs run and what the e2e job exports: only a pull request may skip `check` (prose only) or `e2e` (no
-  # change to what the API, the web app, the export scripts or the e2e specs read), test only the workspaces it
-  # reaches (pnpm's `--filter "...[<base>]"`, which adds every workspace that depends on a changed one), or export a
-  # sample of the cartridge pages. Every other event (the default branch, the merge queue, the weekly run) and every
-  # doubt runs everything; see apps/web/scripts/ci-plan.mts.
+  # Which jobs run and what the e2e job exports: only a pull request may skip `check` (prose only), `e2e` (no
+  # change to what the API, the web app, the export scripts or the e2e specs read) or `docs` (no change to the docs
+  # site, the design tokens or the image's build context), test only the workspaces it reaches (pnpm's
+  # `--filter "...[<base>]"`, which adds every workspace that depends on a changed one), or export a sample of the
+  # cartridge pages. Every other event (the default branch, the merge queue, the weekly run) and every doubt runs
+  # everything; see apps/web/scripts/ci-plan.mts.
   changes:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -48,6 +49,7 @@ jobs:
     outputs:
       check: ${{ steps.plan.outputs.check }}
       e2e: ${{ steps.plan.outputs.e2e }}
+      docs: ${{ steps.plan.outputs.docs }}
       prerender: ${{ steps.plan.outputs.prerender }}
       tests: ${{ steps.plan.outputs.tests }}
     steps:
@@ -152,12 +154,29 @@ jobs:
       - if: matrix.e2eUnit
         run: pnpm --filter @open-reloading/e2e run test:unit
 
+  # The docs image as compose.yaml builds it. Its build runs the docs site build, which no other job of a pull
+  # request runs: the e2e job exports the site without the docs, and pages.yml builds them on main.
+  docs:
+    needs: changes
+    # a failed `changes` job leaves the outputs empty, so the job runs
+    if: ${{ !cancelled() && needs.changes.outputs.docs != 'false' }}
+    runs-on: ubuntu-latest
+    # about three times its run (4 to 5 minutes)
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: docker compose build docs
+
   # The one check the ruleset requires: it waits for every other job of this workflow and fails when one failed or
-  # was cancelled, or was skipped where the plan cannot skip it (only `static`, `test` and `e2e` may be). It also
-  # checks the spelling of the tracked text files (typos, which skips `_typos.toml` itself) on every run: the plan
-  # skips `static` for prose that no other check reads, which is where a word breaks.
+  # was cancelled, or was skipped where the plan cannot skip it (only `static`, `test`, `docs` and `e2e` may be). It
+  # also checks the spelling of the tracked text files (typos, which skips `_typos.toml` itself) on every run: the
+  # plan skips `static` for prose that no other check reads, which is where a word breaks.
   check:
-    needs: [changes, static, test, e2e, workflows, dependency-review]
+    needs: [changes, static, test, docs, e2e, workflows, dependency-review]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -178,7 +197,7 @@ jobs:
           NEEDS: ${{ toJSON(needs) }}
         run: |
           jq -r 'to_entries[] | "\(.key): \(.value.result)"' <<< "$NEEDS"
-          jq -e 'to_entries | all(.value.result == "success" or (.value.result == "skipped" and (.key | IN("static", "test", "e2e"))))' <<< "$NEEDS" > /dev/null
+          jq -e 'to_entries | all(.value.result == "success" or (.value.result == "skipped" and (.key | IN("static", "test", "docs", "e2e"))))' <<< "$NEEDS" > /dev/null
 
   # Workflow lint and security audit of .github/workflows and dependabot.yml.
   workflows:
