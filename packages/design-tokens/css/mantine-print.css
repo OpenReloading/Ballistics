@@ -18,7 +18,6 @@
 
   /* the variants at shade 8, the light primary shade; html outranks the dark variants a provider writes into the page */
   html:root[data-mantine-color-scheme="dark"] {
-    --mantine-color-blue-filled: var(--mantine-color-blue-8);
     --mantine-color-blue-text: var(--mantine-color-blue-8);
     --mantine-color-blue-light-color: var(--mantine-color-blue-9);
     --mantine-color-blue-outline: var(--mantine-color-blue-8);
@@ -49,7 +48,7 @@
     --mantine-color-teal-outline: var(--mantine-color-teal-8);
   }
 
-  /* the chosen segment, whose text and fill Mantine's dark rules set directly */
+  /* the chosen segment and the slider thumb, whose colors Mantine's dark rules set directly */
   [data-mantine-color-scheme="dark"] .mantine-SegmentedControl-label[data-active] {
     color: var(--sc-label-color, var(--mantine-color-black));
   }
@@ -57,5 +56,11 @@
   [data-mantine-color-scheme="dark"] .mantine-SegmentedControl-indicator,
   [data-mantine-color-scheme="dark"] .mantine-SegmentedControl-label[data-active]::before {
     background-color: var(--sc-color, var(--mantine-color-white));
+  }
+
+  [data-mantine-color-scheme="dark"] .mantine-Slider-thumb {
+    color: var(--slider-color);
+    border-color: var(--slider-color);
+    background-color: var(--mantine-color-white);
   }
 }

@@ -1,5 +1,4 @@
-/* The styles of the interface base, in their order: Mantine, the design tokens, Mantine's dark scheme light in print,
-   the UI font, then Mantine's controls on the tokens. Import this file once; a Vite build resolves the package imports. */
+/* The interface base's styles: import this file once, a Vite build resolves the package imports */
 @import "@mantine/core/styles.css";
 @import "@open-reloading/design-tokens/tokens.css";
 @import "@open-reloading/design-tokens/mantine-print.css";

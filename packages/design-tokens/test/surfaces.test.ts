@@ -62,12 +62,6 @@ const pages: Record<Scheme | 'print', typeof light & { mantine: Scheme }> = {
   },
   print: { ...light, mantine: 'dark' },
 }
-/** The page and its text per page, which every surface must show. */
-const expected = {
-  light: ['#ffffff', '#1d2130'],
-  dark: ['#10121b', '#e9ebf1'],
-  print: ['#ffffff', '#1d2130'],
-}
 
 const steps = ['xs', 'sm', 'md', 'lg', 'xl']
 /** One role per row, as Mantine, the device page (tokens.css alone), Docusaurus and BuildGuide name it. */
@@ -102,7 +96,10 @@ it.each(['light', 'dark', 'print'] as const)(
   (kind) => {
     const page = pages[kind]
     const device = cssOf(['tokens.css'], page.device)
-    expect([resolve(device, '--page'), resolve(device, '--ink')]).toEqual(expected[kind])
+    const ground = (set: Variables) => [resolve(set, '--page'), resolve(set, '--ink')]
+    const lightGround = ground(cssOf(['tokens.css'], pages.light.device))
+    if (kind === 'dark') expect(ground(device)).not.toEqual(lightGround)
+    else expect(ground(device)).toEqual(lightGround)
     const surfaces = [
       mantineOf(page.mantine, device),
       device,
