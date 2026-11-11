@@ -77,6 +77,9 @@ test('print with dark stored is light', async ({ page }) => {
   // a light page with dark text, whatever the theme
   expect(isDark(await bg(page))).toBe(false)
   expect(isDark(await page.evaluate(() => getComputedStyle(document.body).color))).toBe(true)
+  expect(await page.evaluate(() => getComputedStyle(document.documentElement).colorScheme)).toBe(
+    'light',
+  )
 })
 
 test('the switch is reachable by keyboard and exposes its name and pressed state', async ({

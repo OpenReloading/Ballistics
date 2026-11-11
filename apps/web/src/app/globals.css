@@ -57,6 +57,9 @@
   --mantine-color-disabled-color: var(--muted);
 }
 
+/* width queries on Mantine's scale (lib/theme.ts) plus 2xs 22.5em and 2xl 108em; a max-width is its step minus
+   0.01em, except 2xs (keeps 360 px phones) and the load switch's 79.99em */
+
 /* dark on screen only, so print keeps the light values above; the head script resolves the system setting */
 @media screen {
   :root[data-mantine-color-scheme="dark"] {
@@ -2185,7 +2188,7 @@ td.nowrap {
   grid-area: values;
 }
 
-@media (max-width: 48em) {
+@media (max-width: 47.99em) {
   .seating-preview {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: none;
@@ -2229,7 +2232,7 @@ td.nowrap {
   font-size: 0.875em;
 }
 
-@media (max-width: 48em) {
+@media (max-width: 47.99em) {
   .seating-row {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -2332,30 +2335,8 @@ td.nowrap {
   }
 }
 
-/* paper: light colors whatever the screen preference; controls hidden, inputs and results kept */
+/* paper: controls hidden, inputs and results kept (the colors are light in print: tokens.css) */
 @media print {
-  /* the light values of tokens.css (@open-reloading/design-tokens), whose dark block also applies to print */
-  :root[data-mantine-color-scheme] {
-    --page: #fff;
-    --ink: #1d2130;
-    --muted: #555a6d;
-    --line: #dcdfe9;
-    --link: var(--accent-hover);
-    --link-hover: var(--ink);
-    --accent: #1971c2;
-    --accent-hover: #1864ab;
-    --accent-tint: #e7f5ff;
-    --on-accent: #fff;
-    --control-line: #7b7f91;
-    --surface: #f6f8fc;
-    --surface-alt: #eef0f6;
-    --warn-border: #e0b84a;
-    --warn-fill: #fff6db;
-    --warn-text: #7a4f00;
-    --error-text: #c92a2a;
-    color-scheme: light;
-  }
-
   .skip-link,
   .update-notice,
   header,
@@ -3881,7 +3862,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 /* a phone: the charge modes on one row, the value, % Pmax and Compute under them */
-@media (max-width: 48em) {
+@media (max-width: 47.99em) {
   .powder-controls .mantine-SegmentedControl-root {
     flex: 1 1 100%;
   }
@@ -7716,7 +7697,7 @@ main .field-table tr.field-group > th {
 }
 
 /* the two sides: a panel each, its drawing beside its table; one column
-   below 80em, the table above the drawing on phones */
+   in a box under 70rem, the table above the drawing on phones */
 @media screen {
   .cartridge-sides {
     display: grid;
@@ -8940,7 +8921,7 @@ main .field-table tr.field-group > th {
   margin: 0;
 }
 
-@media (max-width: 36em) {
+@media (max-width: 35.99em) {
   .chrono-import {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -8975,7 +8956,7 @@ main .field-table tr.field-group > th {
 }
 
 /* a phone: the hint takes a line under the label */
-@media (max-width: 36em) {
+@media (max-width: 35.99em) {
   .session-import .drop-zone {
     flex-wrap: wrap;
   }
@@ -11131,7 +11112,7 @@ main .page-bar h1 {
 }
 
 /* up to 80em the two icons leave the workbench's bar too little room: its load switcher gives it,
-   the load's name cut with an ellipsis */
+   the load's name cut with an ellipsis; off the scale: 75em overflows the bar, 88em cuts the name at 1280 px */
 @media screen and (min-width: 75em) and (max-width: 79.99em) {
   :root:has(.report-issue) .load-switch {
     width: 7.75rem;
@@ -11140,7 +11121,7 @@ main .page-bar h1 {
 
 /* the Units button as an icon, named by its whole name, until its preset leaves a record's title
    its room (German, three page actions) */
-@media screen and (min-width: 75em) and (max-width: 104.99em) {
+@media screen and (min-width: 75em) and (max-width: 107.99em) {
   /* beats the bar's left-section padding, so the icon sits in the middle */
   .page-bar .units-link.mantine-Button-root[data-with-left-section] {
     width: var(--button-height, 2.25rem);
@@ -11163,7 +11144,7 @@ main .page-bar h1 {
 
 /* a designer's Undo, Redo and Reset as icons named by their text until the German labels, the
    Safety button and the title fit in one bar */
-@media screen and (min-width: 75em) and (max-width: 104.99em) {
+@media screen and (min-width: 75em) and (max-width: 107.99em) {
   .page-bar .toolbar > .bar-icon.mantine-Button-root {
     width: var(--button-height, 2.25rem);
     padding: 0;
@@ -12898,7 +12879,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
   }
 }
 
-/* the tuning page: one column, the chart after the hand tuning; from 64em the chart in a second
+/* the tuning page: one column, the chart after the hand tuning; from 62em the chart in a second
    column beside the rest, held in view while the sliders move (powder-tune.tsx FitResult) */
 .tune-layout {
   display: grid;
@@ -12906,7 +12887,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
   align-content: start;
 }
 
-@media screen and (min-width: 64em) {
+@media screen and (min-width: 62em) {
   .tune-layout {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-auto-flow: row dense;

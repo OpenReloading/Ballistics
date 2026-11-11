@@ -235,14 +235,16 @@ const cssOutput = css({
       input: { theme: 'dark', density: 'fine' },
       include: ['color.**'],
       exclude: ['color.select'],
-      prepare: (body) => `${darkScheme} {\n  color-scheme: dark;\n  ${body}\n}`,
+      // screen only, so a page printed with the dark scheme on comes out light
+      prepare: (body) =>
+        `@media screen {\n  ${darkScheme} {\n    color-scheme: dark;\n    ${body}\n  }\n}`,
     },
     {
       input: { theme: 'dark', density: 'fine' },
       include: ['color.**'],
       exclude: ['color.select'],
       prepare: (body) =>
-        `@media (prefers-color-scheme: dark) {\n  ${systemScheme} {\n    color-scheme: dark;\n    ${body}\n  }\n}`,
+        `@media screen and (prefers-color-scheme: dark) {\n  ${systemScheme} {\n    color-scheme: dark;\n    ${body}\n  }\n}`,
     },
     {
       input: { theme: 'light', density: 'coarse' },
