@@ -55,6 +55,7 @@ function bandSeries(series: Series[], tokens: Tokens, t: Translator['t']) {
       symbol: 'none',
       lineStyle: { opacity: 0 },
       areaStyle: { color: tokens[`${slot + 1}`], opacity: 0.2 },
+      emphasis: hovered(tokens[`${slot + 1}`] ?? tokens.fg),
       tooltip: { show: false },
       data: chartBurntFractions.map((z) => {
         const v = curveAt(p, z)

@@ -27,17 +27,21 @@ register([
 /** The distance between the first two ticks; NaN when there are fewer than two. */
 export const tickStep = (ticks: number[]) => (ticks[1] ?? Number.NaN) - (ticks[0] ?? Number.NaN)
 
-/** The custom properties `names` as colors the SVG and the tooltip resolve themselves, so a chart follows the scheme and prints light with no redraw. */
+/** The custom properties `names` as colors the SVG and the tooltip resolve themselves, so a chart follows the scheme and prints light with no redraw; a series with such a color sets `emphasis` (`hovered`, or disabled). */
 export const chartColors = <K extends string>(names: Record<K, string>) =>
   Object.fromEntries(Object.entries<string>(names).map(([k, n]) => [k, `var(${n})`])) as Record<
     K,
     string
   >
 
-/** A hovered line or point a tenth lighter: ECharts lightens it itself, which it cannot do to a `var()` color (the line would vanish). */
+/** A hovered line, point or area a tenth lighter: ECharts lightens it itself, which it cannot do to a `var()` color (it would vanish). */
 export const hovered = (color: string) => {
   const lighter = `color-mix(in srgb, ${color}, #fff 10%)`
-  return { lineStyle: { color: lighter }, itemStyle: { color: lighter } }
+  return {
+    lineStyle: { color: lighter },
+    itemStyle: { color: lighter },
+    areaStyle: { color: lighter },
+  }
 }
 
 /** The axis tooltip frame of the charts in the page's colors. */
