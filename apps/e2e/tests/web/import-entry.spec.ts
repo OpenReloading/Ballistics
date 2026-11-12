@@ -115,7 +115,7 @@ test('a header without rows and a table of no kind show their refusals in Englis
       buffer: csv(['A,a@example.org,123', 'B,b@example.org,456'], 'Name,Email,Phone'),
     },
   ])
-  const card = (name: string) => entry.getByRole('region', { name })
+  const card = (name: string, dialog = entry) => dialog.getByRole('region', { name })
   await expect(card('header.csv').getByTestId('import-verdict')).toHaveText('Refused')
   await expect(card('header.csv').locator('.import-refusal')).toHaveText(/^The text has no table: /)
   await expect(card('contacts.csv').getByTestId('import-verdict')).toHaveText('Refused: no kind')
@@ -124,14 +124,13 @@ test('a header without rows and a table of no kind show their refusals in Englis
   )
 
   await showGerman(page)
-  await expect(card('header.csv').getByTestId('import-verdict')).toHaveText('Abgelehnt')
-  await expect(card('header.csv').locator('.import-refusal')).toHaveText(
+  const german = page.getByRole('dialog', { name: 'Tabellen zum Einlesen' })
+  await expect(card('header.csv', german).getByTestId('import-verdict')).toHaveText('Abgelehnt')
+  await expect(card('header.csv', german).locator('.import-refusal')).toHaveText(
     /^Der Text enthält keine Tabelle: /,
   )
-  await expect(card('contacts.csv').getByTestId('import-verdict')).toHaveText(
+  await expect(card('contacts.csv', german).getByTestId('import-verdict')).toHaveText(
     'Abgelehnt: keine Art',
   )
-  await expect(card('contacts.csv')).toContainText(
-    /Keine Spalte passt zu einem Feld von Geschossen/,
-  )
+  await expect(card('contacts.csv', german)).toContainText(/Keine Spalte .+; die Untergrenze /)
 })
