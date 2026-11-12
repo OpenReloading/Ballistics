@@ -1,9 +1,9 @@
 import { STATUS_CODES } from 'node:http'
 import { inlineRunner, type JsonSchema, jsonSchema } from '@open-reloading/use-cases'
+import type { Catalogue } from '@open-reloading/use-cases/catalog'
 import type { RouteOptions } from 'fastify'
 import type { z } from 'zod'
 import { buildApp } from './app.ts'
-import type { Catalogue } from './catalogue/types.ts'
 import { API_VERSION } from './version.ts'
 
 declare module 'fastify' {

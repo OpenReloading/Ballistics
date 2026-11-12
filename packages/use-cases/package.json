@@ -22,6 +22,10 @@
     "./advisories": {
       "types": "./dist/advisory-text.d.ts",
       "default": "./dist/advisory-text.js"
+    },
+    "./catalog": {
+      "types": "./dist/catalog/browser.d.ts",
+      "default": "./dist/catalog/browser.js"
     }
   },
   "files": [

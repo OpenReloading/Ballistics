@@ -45,7 +45,7 @@
       "entry": ["src/index.ts", "src/plausibility.ts"]
     },
     "packages/use-cases": {
-      "entry": ["src/index.ts", "src/advisory-text.ts"]
+      "entry": ["src/index.ts", "src/advisory-text.ts", "src/catalog/browser.ts"]
     },
     "packages/target-recognition": {
       "entry": ["src/index.ts", "test/fixtures/target-photos/make.mts"],
@@ -71,7 +71,6 @@
         "src/openapi.ts",
         "src/static.ts",
         "src/compute/worker.ts",
-        "src/catalogue/browser.ts",
         "src/catalogue/write.ts"
       ]
     },
