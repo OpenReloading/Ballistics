@@ -12,6 +12,12 @@ path = "packages/catalog/records/**"
 SPDX-FileCopyrightText = "2026 OpenReloading contributors"
 SPDX-License-Identifier = "CC-BY-4.0"
 
+# Records derived from Wikipedia state CC-BY-SA-4.0 in their source (packages/catalog/LICENSE).
+[[annotations]]
+path = "packages/catalog/records/capacities/*-wikipedia.json"
+SPDX-FileCopyrightText = "2026 OpenReloading contributors, Wikipedia contributors"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
 # Logo files copied from the OpenReloading Artwork repository (NOTICE).
 [[annotations]]
 path = [
