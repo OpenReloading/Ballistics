@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { canonicalJson } from '../src/canonical-json.ts'
 import { readShareLink, shareLinkOf } from '../src/share-link.ts'
+import { userRecord } from '../src/user-data.ts'
 import { readUserDataFile } from '../src/user-data-file.ts'
 
 // After a deliberate format change (new version, new files) `vitest run test/format-goldens.test.ts --update` rewrites the file goldens; a link golden is the fragment `shareLinkOf` writes, checked inflated since deflate bytes differ between zlib builds.
@@ -318,21 +319,9 @@ describe('user data file goldens', () => {
 
   it('holds one record of every kind the schema has', () => {
     const read = readUserDataFile(golden('user-data', 'v1-every-kind', 'json'))
-    expect(read.ok && read.records.map((r) => r.kind)).toEqual([
-      'manufacturer',
-      'bullet',
-      'cartridge',
-      'powder',
-      'caseCapacity',
-      'load',
-      'firearm',
-      'session',
-      'targetSheet',
-      'targetFaceDesign',
-      'case',
-      'event',
-      'shootingLogEntry',
-    ])
+    expect(read.ok && read.records.map((r) => r.kind)).toEqual(
+      userRecord.options.map((o) => o.shape.kind.value),
+    )
   })
 
   it.each(names)('%s of version 2 is refused as a whole', (name) => {
