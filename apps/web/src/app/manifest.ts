@@ -9,7 +9,7 @@ export default function manifest(): MetadataRoute.Manifest {
   ]
   return {
     name: 'RangeFoundry Workbench',
-    short_name: 'OpenReloading',
+    short_name: 'Workbench',
     description: 'A ballistics database with interior and exterior ballistics simulations.',
     id: `${basePath}/`,
     start_url: `${basePath}/`,

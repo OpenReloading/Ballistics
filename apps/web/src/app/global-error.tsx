@@ -17,7 +17,7 @@ export default function GlobalError({
         <title>{`${t('Something went wrong')} · RangeFoundry Workbench`}</title>
         <main>
           <h1>{t('Something went wrong')}</h1>
-          <p role="alert">{t('OpenReloading could not be shown.')}</p>
+          <p role="alert">{t('RangeFoundry Workbench could not be shown.')}</p>
           <p>
             {t(
               'Your saved records stay in this browser. Reload the page; if the error comes back, report an issue with the message below.',
