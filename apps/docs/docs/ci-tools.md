@@ -72,7 +72,10 @@ It reads `.next` after `pnpm run static:build`:
 Each route is counted in bytes of gzip level 9, each file once:
 
 - `initial`: what a first visit loads (root main, polyfill, the client chunks of the page and its layouts);
-- `total`: `initial` plus the lazy chunks the page can load on demand.
+- `total`: `initial` plus the lazy chunks the page can load on demand;
+- `chunk`: the largest of those lazy chunks.
+
+A group's budget limits `initial` and exactly one of `total` and `chunk`; a group that sets both or neither fails. A `chunk` limit applies to each lazy chunk, and the group's `total` is then reported but not gated: the `workbench` group, decision W-C1 (owner, 2026-11-12), since its lazy parts load only on use. A limit is set at the largest measured weight of the group plus 2 %, rounded up to 1000 B ([Web script size budgets](./research/web-size-budgets.md)).
 
 Only file content counts, so the numbers do not depend on the API, `PRERENDER`, the clock or the build directory. A route in no group, or a group route the build lacks, fails: a new route needs a budget in its pull request, and raising a number is an edit of `weight-budget.json` that review sees.
 
