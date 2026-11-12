@@ -6,7 +6,7 @@ description: One compute operation of the API offline, the list of operations wi
 
 # Command line
 
-`packages/cli` (`@open-reloading/cli`, bin `ballistics`) measures how far the interior model is from printed load rows it was not fitted to, and says whether a changed model got better. It adds no model of its own: a row becomes an interior run through `recordLoad` of `@open-reloading/ballistics` (the [M3 page](models/interior-m3.md#load-from-records)) and the seating of `@open-reloading/drawing`. Results are simulations compared with printed values, never load data.
+`packages/cli` (`@open-reloading/cli`, bin `ballistics`) measures how far the interior model is from printed load rows it was not fitted to, and says whether a changed model got better. It adds no model of its own: a row becomes an interior run through `recordLoad` of `@open-reloading/ballistics` (the [M3 page](models/interior-m3.md#load-from-records)) and the seating of `@open-reloading/svg-drawings`. Results are simulations compared with printed values, never load data.
 
 ```sh
 pnpm run build
@@ -161,7 +161,7 @@ No powder's own pressures decide its own values: the factor is shared and the bu
 
 Every result carries `modelVersion`, the SHA-256 over the sorted lines:
 
-- `<label> <sha256>` of each built source file the model's result depends on: the files `@open-reloading/units` builds for the unit conversion (`toSi`, `fromSi`, the conversion table and the water density that turns a capacity into a chamber volume), the files `@open-reloading/statistics` builds for the input checks (`need`, `InputError`) and the bisection the interior model solves with, the files `@open-reloading/ballistics` builds for `interior/model.js` and `interior/record-load.js`, the files `@open-reloading/schema` builds for its unit entry and the water capacity of a case or capacity record, the files `@open-reloading/drawing` builds for its seating and bullet entries, each with the files they import by a relative path (a candidate module adds itself and its relative imports, because it may call the installed interior model; imports of other packages are not followed), and the family median estimator (`unseen.js` of the CLI with its relative imports), which no run calls, kept so that published versions stay valid;
+- `<label> <sha256>` of each built source file the model's result depends on: the files `@open-reloading/units` builds for the unit conversion (`toSi`, `fromSi`, the conversion table and the water density that turns a capacity into a chamber volume), the files `@open-reloading/statistics` builds for the input checks (`need`, `InputError`) and the bisection the interior model solves with, the files `@open-reloading/ballistics` builds for `interior/model.js` and `interior/record-load.js`, the files `@open-reloading/schema` builds for its unit entry and the water capacity of a case or capacity record, the files `@open-reloading/svg-drawings` builds for its seating and bullet entries, each with the files they import by a relative path (a candidate module adds itself and its relative imports, because it may call the installed interior model; imports of other packages are not followed), and the family median estimator (`unseen.js` of the CLI with its relative imports), which no run calls, kept so that published versions stay valid;
 - `<kind>/<id> <sha256>` of the stored JSON of every cartridge, bullet, powder, capacity and case record the rows name;
 - `rows <sha256>` over the SHA-256 of each rows file.
 

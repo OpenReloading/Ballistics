@@ -1,6 +1,6 @@
 'use client'
 
-import { recordFigures } from '@open-reloading/drawing/cartridge'
+import { recordFigures } from '@open-reloading/svg-drawings/cartridge'
 import { useEffect, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'

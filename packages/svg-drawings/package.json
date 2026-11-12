@@ -1,5 +1,5 @@
 {
-  "name": "@open-reloading/drawing",
+  "name": "@open-reloading/svg-drawings",
   "version": "0.0.6",
   "description": "Figure models of cartridges, bullets, seating and target faces, without a renderer.",
   "keywords": [
@@ -14,7 +14,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OpenReloading/Ballistics.git",
-    "directory": "packages/drawing"
+    "directory": "packages/svg-drawings"
   },
   "publishConfig": {
     "access": "public"

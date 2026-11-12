@@ -281,7 +281,7 @@
       }
     },
     {
-      "files": ["packages/drawing/src/**"],
+      "files": ["packages/svg-drawings/src/**"],
       "rules": {
         "no-restricted-globals": [
           "error",
@@ -341,7 +341,7 @@
       }
     },
     {
-      "files": ["packages/drawing/src/*.ts", "packages/drawing/src/core/**"],
+      "files": ["packages/svg-drawings/src/*.ts", "packages/svg-drawings/src/core/**"],
       "rules": {
         "no-restricted-imports": [
           "error",
@@ -350,19 +350,19 @@
             "patterns": [
               {
                 "group": ["@*/*", "@*/*/**"],
-                "message": "drawing-core-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its core folder imports only the folders core."
+                "message": "drawing-core-imports: packages/svg-drawings has no I/O, no React, DOM or Next.js. Its core folder imports only the folders core."
               },
               {
                 "regex": "^[^.@]",
-                "message": "drawing-core-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its core folder imports only the folders core."
+                "message": "drawing-core-imports: packages/svg-drawings has no I/O, no React, DOM or Next.js. Its core folder imports only the folders core."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|target-recognition|api|drawing|cli)/(src|dist)|packages|apps)/",
-                "message": "drawing-core-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its core folder imports only the folders core."
+                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|target-recognition|api|svg-drawings|cli)/(src|dist)|packages|apps)/",
+                "message": "drawing-core-imports: packages/svg-drawings has no I/O, no React, DOM or Next.js. Its core folder imports only the folders core."
               },
               {
                 "regex": "^(\\./|(\\.\\./)+)(cartridge|bullet|seating|target)/",
-                "message": "drawing-core-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its core folder imports only the folders core."
+                "message": "drawing-core-imports: packages/svg-drawings has no I/O, no React, DOM or Next.js. Its core folder imports only the folders core."
               }
             ]
           }
@@ -370,7 +370,7 @@
       }
     },
     {
-      "files": ["packages/drawing/src/cartridge/**"],
+      "files": ["packages/svg-drawings/src/cartridge/**"],
       "rules": {
         "no-restricted-imports": [
           "error",
@@ -379,19 +379,19 @@
             "patterns": [
               {
                 "group": ["@*/*", "@*/*/**"],
-                "message": "drawing-cartridge-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its cartridge folder imports only the folders core, cartridge."
+                "message": "drawing-cartridge-imports: packages/svg-drawings has no I/O, no React, DOM or Next.js. Its cartridge folder imports only the folders core, cartridge."
               },
               {
                 "regex": "^[^.@]",
-                "message": "drawing-cartridge-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its cartridge folder imports only the folders core, cartridge."
+                "message": "drawing-cartridge-imports: packages/svg-drawings has no I/O, no React, DOM or Next.js. Its cartridge folder imports only the folders core, cartridge."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|target-recognition|api|drawing|cli)/(src|dist)|packages|apps)/",
-                "message": "drawing-cartridge-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its cartridge folder imports only the folders core, cartridge."
+                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|target-recognition|api|svg-drawings|cli)/(src|dist)|packages|apps)/",
+                "message": "drawing-cartridge-imports: packages/svg-drawings has no I/O, no React, DOM or Next.js. Its cartridge folder imports only the folders core, cartridge."
               },
               {
                 "regex": "^(\\.\\./)+(bullet|seating|target)/",
-                "message": "drawing-cartridge-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its cartridge folder imports only the folders core, cartridge."
+                "message": "drawing-cartridge-imports: packages/svg-drawings has no I/O, no React, DOM or Next.js. Its cartridge folder imports only the folders core, cartridge."
               }
             ]
           }
@@ -399,7 +399,7 @@
       }
     },
     {
-      "files": ["packages/drawing/src/bullet/**"],
+      "files": ["packages/svg-drawings/src/bullet/**"],
       "rules": {
         "no-restricted-imports": [
           "error",
@@ -408,19 +408,19 @@
             "patterns": [
               {
                 "group": ["@*/*", "@*/*/**"],
-                "message": "drawing-bullet-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its bullet folder imports only the folders core, bullet."
+                "message": "drawing-bullet-imports: packages/svg-drawings has no I/O, no React, DOM or Next.js. Its bullet folder imports only the folders core, bullet."
               },
               {
                 "regex": "^[^.@]",
-                "message": "drawing-bullet-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its bullet folder imports only the folders core, bullet."
+                "message": "drawing-bullet-imports: packages/svg-drawings has no I/O, no React, DOM or Next.js. Its bullet folder imports only the folders core, bullet."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|target-recognition|api|drawing|cli)/(src|dist)|packages|apps)/",
-                "message": "drawing-bullet-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its bullet folder imports only the folders core, bullet."
+                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|target-recognition|api|svg-drawings|cli)/(src|dist)|packages|apps)/",
+                "message": "drawing-bullet-imports: packages/svg-drawings has no I/O, no React, DOM or Next.js. Its bullet folder imports only the folders core, bullet."
               },
               {
                 "regex": "^(\\.\\./)+(cartridge|seating|target)/",
-                "message": "drawing-bullet-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its bullet folder imports only the folders core, bullet."
+                "message": "drawing-bullet-imports: packages/svg-drawings has no I/O, no React, DOM or Next.js. Its bullet folder imports only the folders core, bullet."
               }
             ]
           }
@@ -428,7 +428,7 @@
       }
     },
     {
-      "files": ["packages/drawing/src/seating/**"],
+      "files": ["packages/svg-drawings/src/seating/**"],
       "rules": {
         "no-restricted-imports": [
           "error",
@@ -437,19 +437,19 @@
             "patterns": [
               {
                 "group": ["@*/*", "@*/*/**"],
-                "message": "drawing-seating-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its seating folder imports only the folders core, cartridge, bullet, seating."
+                "message": "drawing-seating-imports: packages/svg-drawings has no I/O, no React, DOM or Next.js. Its seating folder imports only the folders core, cartridge, bullet, seating."
               },
               {
                 "regex": "^[^.@]",
-                "message": "drawing-seating-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its seating folder imports only the folders core, cartridge, bullet, seating."
+                "message": "drawing-seating-imports: packages/svg-drawings has no I/O, no React, DOM or Next.js. Its seating folder imports only the folders core, cartridge, bullet, seating."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|target-recognition|api|drawing|cli)/(src|dist)|packages|apps)/",
-                "message": "drawing-seating-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its seating folder imports only the folders core, cartridge, bullet, seating."
+                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|target-recognition|api|svg-drawings|cli)/(src|dist)|packages|apps)/",
+                "message": "drawing-seating-imports: packages/svg-drawings has no I/O, no React, DOM or Next.js. Its seating folder imports only the folders core, cartridge, bullet, seating."
               },
               {
                 "regex": "^(\\.\\./)+target/",
-                "message": "drawing-seating-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its seating folder imports only the folders core, cartridge, bullet, seating."
+                "message": "drawing-seating-imports: packages/svg-drawings has no I/O, no React, DOM or Next.js. Its seating folder imports only the folders core, cartridge, bullet, seating."
               }
             ]
           }
@@ -457,7 +457,7 @@
       }
     },
     {
-      "files": ["packages/drawing/src/target/**"],
+      "files": ["packages/svg-drawings/src/target/**"],
       "rules": {
         "no-restricted-imports": [
           "error",
@@ -466,19 +466,19 @@
             "patterns": [
               {
                 "group": ["@*/*", "@*/*/**"],
-                "message": "drawing-target-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its target folder imports only the folders target."
+                "message": "drawing-target-imports: packages/svg-drawings has no I/O, no React, DOM or Next.js. Its target folder imports only the folders target."
               },
               {
                 "regex": "^[^.@]",
-                "message": "drawing-target-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its target folder imports only the folders target."
+                "message": "drawing-target-imports: packages/svg-drawings has no I/O, no React, DOM or Next.js. Its target folder imports only the folders target."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|target-recognition|api|drawing|cli)/(src|dist)|packages|apps)/",
-                "message": "drawing-target-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its target folder imports only the folders target."
+                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|target-recognition|api|svg-drawings|cli)/(src|dist)|packages|apps)/",
+                "message": "drawing-target-imports: packages/svg-drawings has no I/O, no React, DOM or Next.js. Its target folder imports only the folders target."
               },
               {
                 "regex": "^((\\.\\./)+(core|cartridge|bullet|seating)/|\\.\\./[^/]+$)",
-                "message": "drawing-target-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its target folder imports only the folders target."
+                "message": "drawing-target-imports: packages/svg-drawings has no I/O, no React, DOM or Next.js. Its target folder imports only the folders target."
               }
             ]
           }
@@ -559,7 +559,7 @@
                 "message": "api-imports-logic-catalog-schema-only: packages/api depends on the logic packages (units, statistics, ballistics, shot-groups), catalog, schema and use-cases."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|target-recognition|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|target-recognition|api|svg-drawings|cli)/(src|dist)|packages|apps)/",
                 "message": "api-imports-logic-catalog-schema-only: packages/api depends on the logic packages (units, statistics, ballistics, shot-groups), catalog, schema and use-cases."
               }
             ]
@@ -591,8 +591,8 @@
                   "!@open-reloading/shot-groups/**",
                   "!@open-reloading/catalog",
                   "!@open-reloading/catalog/**",
-                  "!@open-reloading/drawing",
-                  "!@open-reloading/drawing/**",
+                  "!@open-reloading/svg-drawings",
+                  "!@open-reloading/svg-drawings/**",
                   "!@open-reloading/schema",
                   "!@open-reloading/schema/**",
                   "!@open-reloading/use-cases",
@@ -603,7 +603,7 @@
                 "message": "cli-imports-logic-catalog-drawing-schema-only: packages/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), catalog, drawing, schema and use-cases, and of @open-reloading/api only the catalogue entry the browser runs, and of @open-reloading/tools only the catalog reader."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|target-recognition|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|target-recognition|api|svg-drawings|cli)/(src|dist)|packages|apps)/",
                 "message": "cli-imports-logic-catalog-drawing-schema-only: packages/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), catalog, drawing, schema and use-cases, and of @open-reloading/api only the catalogue entry the browser runs, and of @open-reloading/tools only the catalog reader."
               }
             ]

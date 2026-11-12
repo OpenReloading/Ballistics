@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core'
-import { recordFigures } from '@open-reloading/drawing/cartridge'
+import { recordFigures } from '@open-reloading/svg-drawings/cartridge'
 import type { ReactNode } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'

@@ -1,4 +1,4 @@
-import type { BulletDimensions } from '@open-reloading/drawing/bullet'
+import type { BulletDimensions } from '@open-reloading/svg-drawings/bullet'
 import { describe, expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import { scaleOf } from '../src/lib/bullet-photo.ts'

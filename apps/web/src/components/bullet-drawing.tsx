@@ -1,14 +1,14 @@
 'use client'
 
-import { face, type LengthUnit, lengthText } from '@open-reloading/drawing'
+import type { Bullet } from '@open-reloading/schema'
+import { face, type LengthUnit, lengthText } from '@open-reloading/svg-drawings'
 import {
   type BulletProfile,
   bulletFigureModel,
   bulletScreenEm,
   bulletSymbols,
   recordProfile,
-} from '@open-reloading/drawing/bullet'
-import type { Bullet } from '@open-reloading/schema'
+} from '@open-reloading/svg-drawings/bullet'
 import { Ruler } from '@phosphor-icons/react/ssr'
 import { useTranslation } from '../i18n/language.ts'
 import { type Translator, translator } from '../i18n/translate.ts'

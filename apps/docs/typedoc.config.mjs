@@ -3,7 +3,7 @@ export default {
   entryPointStrategy: 'packages',
   entryPoints: [
     '../../packages/schema',
-    '../../packages/drawing',
+    '../../packages/svg-drawings',
     '../../packages/importers',
     '../../packages/catalog',
     '../../packages/use-cases',
