@@ -34,7 +34,7 @@
     "test": "vitest run --coverage && publint --strict && attw --pack . --profile esm-only"
   },
   "dependencies": {
-    "@open-reloading/statistics": "workspace:*",
+    "@rangefoundry/statistics": "workspace:*",
     "@open-reloading/units": "workspace:*"
   },
   "devDependencies": {

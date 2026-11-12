@@ -32,7 +32,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@open-reloading/statistics": "workspace:*",
+    "@rangefoundry/statistics": "workspace:*",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "ajv": "catalog:",

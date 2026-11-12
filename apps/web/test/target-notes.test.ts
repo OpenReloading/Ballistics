@@ -1,5 +1,5 @@
 import type { ShotGroup, TargetSheet } from '@open-reloading/schema'
-import { subtendedAngle } from '@open-reloading/shot-groups'
+import { subtendedAngle } from '@rangefoundry/shot-groups'
 import { describe, expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import { frameOf, rebase, targetToView } from '../src/lib/target-editor.ts'

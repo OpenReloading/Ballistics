@@ -1,6 +1,6 @@
 /** Apart from `target-face.ts` because only the worker runs it, which keeps the blob detector out of the pages' bundles. */
-import { conicOf, type Ellipse } from '@open-reloading/shot-groups'
-import { nth } from '@open-reloading/statistics'
+import { conicOf, type Ellipse } from '@rangefoundry/shot-groups'
+import { nth } from '@rangefoundry/statistics'
 import { peaksOf, radiiOf, space } from './blob-detector.ts'
 import { grayGrid, gridToImage } from './face-image.ts'
 import type { RgbaImage } from './image.ts'

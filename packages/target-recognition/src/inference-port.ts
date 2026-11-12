@@ -1,5 +1,5 @@
 /** The inference port: the one way from an image buffer to hole proposals, for the classical detector now and a learned model later. */
-import type { Point } from '@open-reloading/shot-groups'
+import type { Point } from '@rangefoundry/shot-groups'
 import {
   autoDetect,
   detectFromExample,

@@ -14,20 +14,20 @@
                 "group": [
                   "@*/*",
                   "@*/*/**",
-                  "!@open-reloading/shot-groups",
-                  "!@open-reloading/shot-groups/**",
-                  "!@open-reloading/statistics",
-                  "!@open-reloading/statistics/**"
+                  "!@rangefoundry/shot-groups",
+                  "!@rangefoundry/shot-groups/**",
+                  "!@rangefoundry/statistics",
+                  "!@rangefoundry/statistics/**"
                 ],
-                "message": "target-recognition-imports-shot-groups-statistics-only: packages/target-recognition has no I/O: it imports only @open-reloading/shot-groups, @open-reloading/statistics and its own files."
+                "message": "target-recognition-imports-shot-groups-statistics-only: packages/target-recognition has no I/O: it imports only @rangefoundry/shot-groups, @rangefoundry/statistics and its own files."
               },
               {
                 "regex": "^[^.@]",
-                "message": "target-recognition-imports-shot-groups-statistics-only: packages/target-recognition has no I/O: it imports only @open-reloading/shot-groups, @open-reloading/statistics and its own files."
+                "message": "target-recognition-imports-shot-groups-statistics-only: packages/target-recognition has no I/O: it imports only @rangefoundry/shot-groups, @rangefoundry/statistics and its own files."
               },
               {
                 "regex": "^(\\.\\./)+[^.]",
-                "message": "target-recognition-imports-shot-groups-statistics-only: packages/target-recognition has no I/O: it imports only @open-reloading/shot-groups, @open-reloading/statistics and its own files."
+                "message": "target-recognition-imports-shot-groups-statistics-only: packages/target-recognition has no I/O: it imports only @rangefoundry/shot-groups, @rangefoundry/statistics and its own files."
               }
             ]
           }

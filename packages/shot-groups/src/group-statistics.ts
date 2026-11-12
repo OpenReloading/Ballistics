@@ -6,7 +6,7 @@ import {
   type Interval,
   need as needAny,
   nth,
-} from '@open-reloading/statistics'
+} from '@rangefoundry/statistics'
 import type { GroupStatisticsIssue } from './issue.ts'
 
 /** `need` with an issue of the group statistics. */

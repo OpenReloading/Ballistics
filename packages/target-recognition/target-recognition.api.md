@@ -4,10 +4,10 @@
 
 ```ts
 
-import { Ellipse } from '@open-reloading/shot-groups';
-import { FaceLength } from '@open-reloading/shot-groups';
-import { Matrix } from '@open-reloading/shot-groups';
-import { Point } from '@open-reloading/shot-groups';
+import { Ellipse } from '@rangefoundry/shot-groups';
+import { FaceLength } from '@rangefoundry/shot-groups';
+import { Matrix } from '@rangefoundry/shot-groups';
+import { Point } from '@rangefoundry/shot-groups';
 
 // @public (undocumented)
 export const clamp: (v: number, lo: number, hi: number) => number;

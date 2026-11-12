@@ -35,8 +35,8 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@open-reloading/shot-groups": "workspace:*",
-    "@open-reloading/statistics": "workspace:*"
+    "@rangefoundry/shot-groups": "workspace:*",
+    "@rangefoundry/statistics": "workspace:*"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "catalog:",

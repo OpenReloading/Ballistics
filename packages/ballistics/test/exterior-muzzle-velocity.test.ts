@@ -1,4 +1,4 @@
-import { InputError, seededUniforms } from '@open-reloading/statistics'
+import { InputError, seededUniforms } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
 import { airDensity } from '../src/exterior/atmosphere.ts'
 import {

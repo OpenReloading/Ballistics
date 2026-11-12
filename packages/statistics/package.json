@@ -1,5 +1,5 @@
 {
-  "name": "@open-reloading/statistics",
+  "name": "@rangefoundry/statistics",
   "version": "0.0.0",
   "private": true,
   "description": "Distributions, velocity statistics, robust least squares on log parameters and a seeded random generator.",

@@ -23,7 +23,7 @@ import {
   trueDrag,
   trueMuzzleVelocity,
 } from '@open-reloading/ballistics'
-import { InputError } from '@open-reloading/statistics'
+import { InputError } from '@rangefoundry/statistics'
 
 /** The deadline passed while the task was queued or running. */
 export class ComputeTimeout extends Error {}

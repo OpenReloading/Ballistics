@@ -1,6 +1,6 @@
 /** Over sessions that differ in barrel length or powder temperature, holding the parameters they do not resolve at their input values (`apps/docs/docs/models/interior-powder-fit.md`, "Several barrel lengths and temperatures"); SI in and out. */
 
-import { nth } from '@open-reloading/statistics'
+import { nth } from '@rangefoundry/statistics'
 import { need } from '../issue.ts'
 import {
   fitPowder,

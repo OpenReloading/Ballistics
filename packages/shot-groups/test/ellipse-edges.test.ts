@@ -1,4 +1,4 @@
-import { seededUniforms } from '@open-reloading/statistics'
+import { seededUniforms } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
 import {
   type Conic,

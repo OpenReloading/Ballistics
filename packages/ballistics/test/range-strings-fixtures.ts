@@ -1,4 +1,4 @@
-import { nth } from '@open-reloading/statistics'
+import { nth } from '@rangefoundry/statistics'
 import { expect } from 'vitest'
 import {
   fitTruingStrings,

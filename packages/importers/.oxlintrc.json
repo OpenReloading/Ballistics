@@ -15,9 +15,9 @@
                 "message": "importers-schema-for-types-only: packages/importers uses @open-reloading/schema for types only."
               },
               {
-                "name": "@open-reloading/statistics",
+                "name": "@rangefoundry/statistics",
                 "allowTypeImports": true,
-                "message": "importers-statistics-for-types-only: packages/importers takes the Diagnostic type of @open-reloading/statistics, no code."
+                "message": "importers-statistics-for-types-only: packages/importers takes the Diagnostic type of @rangefoundry/statistics, no code."
               }
             ],
             "patterns": [
@@ -26,18 +26,18 @@
                   "@*/*",
                   "@*/*/**",
                   "!@open-reloading/schema",
-                  "!@open-reloading/statistics",
+                  "!@rangefoundry/statistics",
                   "!@open-reloading/units"
                 ],
-                "message": "importers-imports-schema-and-units: packages/importers has no I/O and imports nothing but @open-reloading/schema, @open-reloading/units, the Diagnostic type of @open-reloading/statistics and its own files."
+                "message": "importers-imports-schema-and-units: packages/importers has no I/O and imports nothing but @open-reloading/schema, @open-reloading/units, the Diagnostic type of @rangefoundry/statistics and its own files."
               },
               {
                 "regex": "^[^.@]",
-                "message": "importers-imports-schema-and-units: packages/importers has no I/O and imports nothing but @open-reloading/schema, @open-reloading/units, the Diagnostic type of @open-reloading/statistics and its own files."
+                "message": "importers-imports-schema-and-units: packages/importers has no I/O and imports nothing but @open-reloading/schema, @open-reloading/units, the Diagnostic type of @rangefoundry/statistics and its own files."
               },
               {
                 "regex": "^(\\.\\./)+[^.]",
-                "message": "importers-imports-schema-and-units: packages/importers has no I/O and imports nothing but @open-reloading/schema, @open-reloading/units, the Diagnostic type of @open-reloading/statistics and its own files."
+                "message": "importers-imports-schema-and-units: packages/importers has no I/O and imports nothing but @open-reloading/schema, @open-reloading/units, the Diagnostic type of @rangefoundry/statistics and its own files."
               }
             ]
           }

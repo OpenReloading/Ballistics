@@ -7,8 +7,8 @@ import {
   trajectory,
   zeroAngles,
 } from '@open-reloading/ballistics'
-import { pointDispersion } from '@open-reloading/shot-groups'
-import { normalsFrom, seededUniforms } from '@open-reloading/statistics'
+import { pointDispersion } from '@rangefoundry/shot-groups'
+import { normalsFrom, seededUniforms } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
 
 describe('velocity term against sampled muzzle speeds', () => {

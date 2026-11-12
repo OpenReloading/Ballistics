@@ -1,5 +1,5 @@
 import { interior } from '@open-reloading/ballistics'
-import { InputError } from '@open-reloading/statistics'
+import { InputError } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
 import { constructionOf, outcomes, predict } from '../src/evaluate.ts'
 import type { Records } from '../src/records.ts'

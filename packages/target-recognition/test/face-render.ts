@@ -1,6 +1,6 @@
 // Synthetic photos of the target faces of packages/catalog/records/target-faces for the face search: the face drawn from its record, seen by a pinhole camera.
 import { readdirSync, readFileSync } from 'node:fs'
-import { mul3, type Point, type Vector3 } from '@open-reloading/shot-groups'
+import { mul3, type Point, type Vector3 } from '@rangefoundry/shot-groups'
 import type { RgbaImage } from '../src/image.ts'
 import type { PrintedFace } from '../src/target-face.ts'
 import { defined } from './defined.ts'

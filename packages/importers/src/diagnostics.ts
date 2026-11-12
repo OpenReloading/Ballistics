@@ -1,5 +1,5 @@
 import type { UserRecord } from '@open-reloading/schema'
-import type { Diagnostic } from '@open-reloading/statistics'
+import type { Diagnostic } from '@rangefoundry/statistics'
 
 /** A finding of a reader: its code and the values its message names. The app words it in its language. */
 export type ReaderDiagnostic<Code extends string> = Diagnostic<

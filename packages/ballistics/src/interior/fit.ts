@@ -9,7 +9,7 @@ import {
   logLeastSquares,
   nth,
   studentTwoSidedQuantile,
-} from '@open-reloading/statistics'
+} from '@rangefoundry/statistics'
 import { type BallisticsIssue, need } from '../issue.ts'
 import type { Complete } from '../key-list.ts'
 import { positive, type Settings } from '../settings.ts'

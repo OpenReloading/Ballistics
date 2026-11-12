@@ -4,10 +4,10 @@
 
 ```ts
 
-import { Diagnostic } from '@open-reloading/statistics';
-import { InputError } from '@open-reloading/statistics';
-import { LogFitFailure } from '@open-reloading/statistics';
-import { LogFitStop } from '@open-reloading/statistics';
+import { Diagnostic } from '@rangefoundry/statistics';
+import { InputError } from '@rangefoundry/statistics';
+import { LogFitFailure } from '@rangefoundry/statistics';
+import { LogFitStop } from '@rangefoundry/statistics';
 
 // @public
 export type AdvisoryId = 'limitExceeded' | 'noCartridge' | 'noComparableLimit' | 'rangeIncomplete' | 'chargeTooSmall' | 'resistanceNotApplied' | 'loadRatioHigh' | 'startPressureBelowResistance' | 'gyrationRadiusWithoutTwist' | 'startPressureHeldOnce';

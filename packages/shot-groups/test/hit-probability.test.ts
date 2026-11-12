@@ -1,4 +1,4 @@
-import { InputError } from '@open-reloading/statistics'
+import { InputError } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
 import { ellipseProbability, hitProbability, pointDispersion } from '../src/index.ts'
 import { issueOf } from './issue.ts'

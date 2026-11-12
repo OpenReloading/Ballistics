@@ -1,6 +1,6 @@
 /** The peak-pressure range the fixed inputs add, a prior from similar powders and the confidence label (`apps/docs/docs/models/interior-powder-fit.md`, "Pressure range from the fixed inputs", "Prior from similar powders", "Confidence label"), describing the simulation's uncertainty, not a load; SI in and out. */
 
-import { nth } from '@open-reloading/statistics'
+import { nth } from '@rangefoundry/statistics'
 import { need } from '../issue.ts'
 import type { Complete } from '../key-list.ts'
 import {

@@ -16,18 +16,18 @@
                   "@*/*/**",
                   "!@open-reloading/units",
                   "!@open-reloading/units/**",
-                  "!@open-reloading/statistics",
-                  "!@open-reloading/statistics/**"
+                  "!@rangefoundry/statistics",
+                  "!@rangefoundry/statistics/**"
                 ],
-                "message": "shot-groups-imports-units-statistics-only: packages/shot-groups has no I/O: it imports only @open-reloading/units, @open-reloading/statistics and its own files."
+                "message": "shot-groups-imports-units-statistics-only: packages/shot-groups has no I/O: it imports only @open-reloading/units, @rangefoundry/statistics and its own files."
               },
               {
                 "regex": "^[^.@]",
-                "message": "shot-groups-imports-units-statistics-only: packages/shot-groups has no I/O: it imports only @open-reloading/units, @open-reloading/statistics and its own files."
+                "message": "shot-groups-imports-units-statistics-only: packages/shot-groups has no I/O: it imports only @open-reloading/units, @rangefoundry/statistics and its own files."
               },
               {
                 "regex": "^(\\.\\./)+((units|statistics|ballistics|locale-format|shot-groups|schema|importers|catalog|use-cases|target-recognition|api|svg-drawings|cli)/(src|dist)|packages|apps)/",
-                "message": "shot-groups-imports-units-statistics-only: packages/shot-groups has no I/O: it imports only @open-reloading/units, @open-reloading/statistics and its own files."
+                "message": "shot-groups-imports-units-statistics-only: packages/shot-groups has no I/O: it imports only @open-reloading/units, @rangefoundry/statistics and its own files."
               }
             ]
           }

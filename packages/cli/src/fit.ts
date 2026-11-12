@@ -5,7 +5,7 @@ import {
   type PowderFitReason,
 } from '@open-reloading/ballistics'
 import { compareKeys, fromSi, type Powder, toSi } from '@open-reloading/schema'
-import { InputError, nth } from '@open-reloading/statistics'
+import { InputError, nth } from '@rangefoundry/statistics'
 import { Refusal, UsageError } from './errors.ts'
 import { type InteriorModel, loadOf, outcomes, predict } from './evaluate.ts'
 import type { Records } from './records.ts'

@@ -1,5 +1,5 @@
 {
-  "name": "@open-reloading/shot-groups",
+  "name": "@rangefoundry/shot-groups",
   "version": "0.0.0",
   "private": true,
   "description": "Shot-group geometry, target faces, ring scoring and competition scoring.",
@@ -34,7 +34,7 @@
     "test": "vitest run --coverage && publint --strict && attw --pack . --profile esm-only"
   },
   "dependencies": {
-    "@open-reloading/statistics": "workspace:*",
+    "@rangefoundry/statistics": "workspace:*",
     "@open-reloading/units": "workspace:*"
   },
   "devDependencies": {

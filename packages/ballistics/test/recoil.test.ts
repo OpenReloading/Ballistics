@@ -1,4 +1,4 @@
-import { InputError } from '@open-reloading/statistics'
+import { InputError } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
 import { freeRecoil, gasVelocityFactor } from '../src/index.ts'
 

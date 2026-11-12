@@ -6,9 +6,9 @@ import {
   toSi,
   type UserBullet,
 } from '@open-reloading/schema'
-import { seededUniforms } from '@open-reloading/statistics'
 import { face } from '@open-reloading/svg-drawings'
 import { bulletFigureModel, bulletOutline } from '@open-reloading/svg-drawings/bullet'
+import { seededUniforms } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
 import { computedBulletRows } from '../src/lib/bullet.ts'
 import {

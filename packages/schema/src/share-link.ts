@@ -1,4 +1,4 @@
-import type { Diagnostic } from '@open-reloading/statistics'
+import type { Diagnostic } from '@rangefoundry/statistics'
 import { type UserRecords, userDataFormat, userDataVersion } from './user-data.ts'
 import { readUserDataFile, type UserDataRead } from './user-data-file.ts'
 
