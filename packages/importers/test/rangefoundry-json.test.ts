@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import {
   detectFormat,
-  isOpenReloadingJson,
+  isRangeFoundryJson,
   parseChrono,
-  parseOpenReloadingJson,
-  stringifyOpenReloadingJson,
+  parseRangeFoundryJson,
+  stringifyRangeFoundryJson,
 } from '../src/index.ts'
 import { complete } from './complete.ts'
 import { refusal } from './refusal.ts'
@@ -104,7 +104,7 @@ const refusals: [string, object, object][] = [
 
 describe('RangeFoundry session JSON: detection and missing fields', () => {
   it('is detected before every CSV format and read in m/s', () => {
-    expect(isOpenReloadingJson(text)).toBe(true)
+    expect(isRangeFoundryJson(text)).toBe(true)
     expect(detectFormat(text)).toBe('rangefoundry-json')
     expect(detectFormat(`﻿${text}`)).toBe('rangefoundry-json')
     const r = parseChrono(text, { fileName: 'session.json' })
@@ -128,7 +128,7 @@ describe('RangeFoundry session JSON: detection and missing fields', () => {
   })
 
   it('asks for the device and the date only when the file has none', () => {
-    const r = parseOpenReloadingJson(
+    const r = parseRangeFoundryJson(
       JSON.stringify({
         format: 'rangefoundry-session',
         version: 1,
@@ -144,15 +144,15 @@ describe('RangeFoundry session JSON: detection and missing fields', () => {
 
 describe('RangeFoundry session JSON: writing, and other JSON', () => {
   it('writes what it reads', () => {
-    const r = parseOpenReloadingJson(text)
-    const again = parseOpenReloadingJson(stringifyOpenReloadingJson(r))
+    const r = parseRangeFoundryJson(text)
+    const again = parseRangeFoundryJson(stringifyRangeFoundryJson(r))
     expect(again.session).toEqual({ ...r.session, provenance: again.session.provenance })
     expect(again.stringLabels).toEqual(r.stringLabels)
-    expect(JSON.parse(stringifyOpenReloadingJson(r))).toEqual(file)
+    expect(JSON.parse(stringifyRangeFoundryJson(r))).toEqual(file)
   })
 
   it('reads coldBore false as unset and writes only the members the session has', () => {
-    const r = parseOpenReloadingJson(
+    const r = parseRangeFoundryJson(
       JSON.stringify({
         format: 'rangefoundry-session',
         version: 1,
@@ -161,7 +161,7 @@ describe('RangeFoundry session JSON: writing, and other JSON', () => {
     )
     expect(r.session.strings[0]?.shots[0]).toEqual({ velocity: { value: 800, raw: '800 m/s' } })
     expect(r.stringLabels).toEqual([undefined])
-    expect(JSON.parse(stringifyOpenReloadingJson(r))).toEqual({
+    expect(JSON.parse(stringifyRangeFoundryJson(r))).toEqual({
       format: 'rangefoundry-session',
       version: 1,
       device: { kind: 'other' },
@@ -170,14 +170,14 @@ describe('RangeFoundry session JSON: writing, and other JSON', () => {
   })
 
   it('does not claim other JSON or text', () => {
-    expect(isOpenReloadingJson('{"format":"other"}')).toBe(false)
-    expect(isOpenReloadingJson('{not json')).toBe(false)
-    expect(isOpenReloadingJson('string,velocity\nA,2795\n')).toBe(false)
+    expect(isRangeFoundryJson('{"format":"other"}')).toBe(false)
+    expect(isRangeFoundryJson('{not json')).toBe(false)
+    expect(isRangeFoundryJson('string,velocity\nA,2795\n')).toBe(false)
   })
 })
 
 describe('RangeFoundry session JSON: refused members', () => {
   it.each(refusals)('refuses %s', (_, bad, diagnostic) => {
-    expect(refusal(() => parseOpenReloadingJson(JSON.stringify(bad)))).toEqual(diagnostic)
+    expect(refusal(() => parseRangeFoundryJson(JSON.stringify(bad)))).toEqual(diagnostic)
   })
 })

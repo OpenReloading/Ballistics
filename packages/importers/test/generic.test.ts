@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseDelimited, parseOpenReloadingCsv } from '../src/index.ts'
+import { parseDelimited, parseRangeFoundryCsv } from '../src/index.ts'
 import { splitDelimited } from '../src/text.ts'
 import { complete } from './complete.ts'
 import { template } from './fixtures.ts'
@@ -415,10 +415,10 @@ describe('parseDelimited: unit cells and refused columns', () => {
   })
 })
 
-describe('parseOpenReloadingCsv', () => {
+describe('parseRangeFoundryCsv', () => {
   it('names the template remedy when a comma splits a cell', () => {
     expect(
-      refusal(() => parseOpenReloadingCsv('velocity,coldBore\n812,5,1', { velocityUnit: 'm/s' })),
+      refusal(() => parseRangeFoundryCsv('velocity,coldBore\n812,5,1', { velocityUnit: 'm/s' })),
     ).toEqual({
       code: 'moreCellsThanHeaderComma',
       params: { row: 2, cells: 3, header: 2, remedy: 'quoteOrSemicolon' },
@@ -426,7 +426,7 @@ describe('parseOpenReloadingCsv', () => {
   })
 
   it('reads the template with labels, cold bore and excluded shots', () => {
-    const r = parseOpenReloadingCsv(template, { fileName: 'log.csv' })
+    const r = parseRangeFoundryCsv(template, { fileName: 'log.csv' })
     expect(r.format).toBe('rangefoundry-csv')
     expect(r.stringLabels).toEqual(['42.0 gr', '42.5 gr'])
     expect(r.session.strings[0]?.shots).toEqual([
@@ -438,19 +438,19 @@ describe('parseOpenReloadingCsv', () => {
   })
 
   it('reads ";" with decimal commas', () => {
-    const r = parseOpenReloadingCsv('velocity;velocityUnit\n812,5;m/s\n813;m/s')
+    const r = parseRangeFoundryCsv('velocity;velocityUnit\n812,5;m/s\n813;m/s')
     expect(r.session.strings[0]?.shots.map((s) => s.velocity.value)).toEqual([812.5, 813])
   })
 
   it('reads names in any case and ignores a trailing delimiter in the header', () => {
-    const r = parseOpenReloadingCsv('String,Velocity,VelocityUnit,ColdBore,\nA,2795,fps,yes,\n')
+    const r = parseRangeFoundryCsv('String,Velocity,VelocityUnit,ColdBore,\nA,2795,fps,yes,\n')
     expect(r.session.strings[0]?.shots).toEqual([
       { velocity: { value: 851.916, raw: '2795 fps' }, coldBore: true },
     ])
   })
 
   it('throws when the first row is not the template header', () => {
-    expect(refusal(() => parseOpenReloadingCsv('date,velocity\n2026-03-01,800'))).toEqual({
+    expect(refusal(() => parseRangeFoundryCsv('date,velocity\n2026-03-01,800'))).toEqual({
       code: 'notTemplate',
       params: { columns: ['string', 'velocity', 'velocityUnit', 'coldBore', 'excluded'] },
     })
@@ -465,7 +465,7 @@ describe('caller unit against the file unit', () => {
     expect(
       refusal(() => parseDelimited('Speed (fps)\n1000', { ...header, velocityUnit: 'm/s' })),
     ).toEqual({ code: 'unitDiffersFromCaller', params: { ...differs, row: 2 } })
-    expect(refusal(() => parseOpenReloadingCsv(template, { velocityUnit: 'm/s' }))).toMatchObject({
+    expect(refusal(() => parseRangeFoundryCsv(template, { velocityUnit: 'm/s' }))).toMatchObject({
       code: 'unitDiffersFromCaller',
       params: differs,
     })

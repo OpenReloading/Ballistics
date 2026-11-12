@@ -33,7 +33,7 @@ function parse(text: string): unknown {
 }
 
 /** True when the text is JSON whose `format` is `rangefoundry-session`. */
-export function isOpenReloadingJson(text: string): boolean {
+export function isRangeFoundryJson(text: string): boolean {
   if (
     !text
       .replace(/^\uFEFF/, '')
@@ -140,7 +140,7 @@ function readDate(root: Obj): string | undefined {
  *   "muzzleDistance"? (m), "note"?, "strings": [{ "label"?, "shots": [{ "velocity" (m/s), "coldBore"?, "excluded"? }] }] }
  * ```
  */
-export function parseOpenReloadingJson(
+export function parseRangeFoundryJson(
   text: string,
   options: ChronoParserOptions = {},
 ): ChronoImport {
@@ -172,7 +172,7 @@ export function parseOpenReloadingJson(
 }
 
 /** The session of an import as RangeFoundry session JSON, with the string labels inside the strings. */
-export function stringifyOpenReloadingJson(data: ChronoImport): string {
+export function stringifyRangeFoundryJson(data: ChronoImport): string {
   const { date, device, muzzleDistance, strings, note } = data.session
   return `${JSON.stringify(
     {

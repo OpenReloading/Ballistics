@@ -10,7 +10,7 @@ import {
 import type { ChronoImport, ChronoParserOptions, SessionCandidate } from './result.ts'
 import { splitLines } from './text.ts'
 
-/** Options of `parseOpenReloadingCsv`: the parser options and the device of the session. */
+/** Options of `parseRangeFoundryCsv`: the parser options and the device of the session. */
 export interface TemplateOptions extends ChronoParserOptions {
   /** Device of the session; kind `other` without manufacturer name or model when absent. */
   device?: SessionCandidate['device'] | undefined
@@ -33,7 +33,7 @@ function templateHeader(
 }
 
 /** RangeFoundry CSV template: a first row of known column names, `velocity` among them. */
-export function isOpenReloadingCsv(text: string): boolean {
+export function isRangeFoundryCsv(text: string): boolean {
   return templateHeader(text) !== undefined
 }
 
@@ -41,7 +41,7 @@ export function isOpenReloadingCsv(text: string): boolean {
  * Parses a RangeFoundry CSV template (first row names columns, delimiter read from it);
  * velocities in the unit of the `velocityUnit` column or the `velocityUnit` option.
  */
-export function parseOpenReloadingCsv(text: string, options: TemplateOptions = {}): ChronoImport {
+export function parseRangeFoundryCsv(text: string, options: TemplateOptions = {}): ChronoImport {
   const h = templateHeader(text)
   if (!h) refuse('notTemplate', { columns: templateNames })
   const columns: ColumnMap = { velocity: 'velocity' }

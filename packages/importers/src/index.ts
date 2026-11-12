@@ -1,7 +1,7 @@
 import type { Workbook } from './cells.ts'
 import { refuse } from './diagnostics.ts'
 import { type DelimitedOptions, parseDelimited } from './generic.ts'
-import { isOpenReloadingJson, parseOpenReloadingJson } from './openreloading-json.ts'
+import { isRangeFoundryJson, parseRangeFoundryJson } from './rangefoundry-json.ts'
 import type { ChronoImport, ChronoParserOptions } from './result.ts'
 import {
   isShotViewHeader,
@@ -9,7 +9,7 @@ import {
   parseShotViewWorkbook,
   shotViewHeaderIndex,
 } from './shotview.ts'
-import { isOpenReloadingCsv, parseOpenReloadingCsv } from './template.ts'
+import { isRangeFoundryCsv, parseRangeFoundryCsv } from './template.ts'
 import { splitLines } from './text.ts'
 
 export type { Workbook, Worksheet } from './cells.ts'
@@ -26,12 +26,6 @@ export type { Column, ColumnMap, CommaRemedy, DelimitedOptions, Delimiter } from
 export { parseDelimited } from './generic.ts'
 export type { GrtLoadRead, LoadDiagnostic } from './grtload.ts'
 export { readGrtLoad } from './grtload.ts'
-export {
-  isOpenReloadingJson,
-  parseOpenReloadingJson,
-  sessionJsonFormat,
-  stringifyOpenReloadingJson,
-} from './openreloading-json.ts'
 export type {
   PressureHistoryImport,
   PressureHistoryOptions,
@@ -40,6 +34,12 @@ export type {
   TimeUnit,
 } from './pressure-history.ts'
 export { parsePressureHistory } from './pressure-history.ts'
+export {
+  isRangeFoundryJson,
+  parseRangeFoundryJson,
+  sessionJsonFormat,
+  stringifyRangeFoundryJson,
+} from './rangefoundry-json.ts'
 export type { ColumnUnit, FieldSpec, TableKind } from './record-fields.ts'
 export { fieldSpecs, tableKinds } from './record-fields.ts'
 export { idOfKey } from './record-ids.ts'
@@ -60,7 +60,7 @@ export { parseShotView, parseShotViewWorkbook } from './shotview.ts'
 export type { Table, TableRead } from './tables.ts'
 export { readTable, tableOfRows } from './tables.ts'
 export type { TemplateOptions } from './template.ts'
-export { parseOpenReloadingCsv } from './template.ts'
+export { parseRangeFoundryCsv } from './template.ts'
 export { decodeText, formatMinutes } from './text.ts'
 export type { VelocityUnit } from './units.ts'
 export { parseVelocityUnit } from './units.ts'
@@ -126,10 +126,10 @@ const formats: readonly [
     name: 'RangeFoundry JSON',
     reads: 'text',
     /** True when the text is JSON with `format` `rangefoundry-session`. */
-    detect: isOpenReloadingJson,
+    detect: isRangeFoundryJson,
     /** Parses a RangeFoundry session JSON text; velocities are m/s. */
     parse: (text: string, options: ParseChronoOptions) =>
-      parseOpenReloadingJson(text, withoutFormatOptions(options)),
+      parseRangeFoundryJson(text, withoutFormatOptions(options)),
   },
   {
     id: 'shotview-csv',
@@ -156,10 +156,10 @@ const formats: readonly [
     name: 'RangeFoundry CSV template',
     reads: 'text',
     /** True when the first row holds known column names with `velocity` among them. */
-    detect: isOpenReloadingCsv,
+    detect: isRangeFoundryCsv,
     /** Parses a RangeFoundry CSV template; `device` sets the device. */
     parse: (text: string, options: ParseChronoOptions) =>
-      parseOpenReloadingCsv(text, { ...withoutFormatOptions(options), device: options.device }),
+      parseRangeFoundryCsv(text, { ...withoutFormatOptions(options), device: options.device }),
   },
   {
     id: 'delimited',

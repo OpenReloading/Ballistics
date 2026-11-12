@@ -8,7 +8,7 @@ import {
   parseChrono,
   ReaderError,
   readWorkbook,
-  stringifyOpenReloadingJson,
+  stringifyRangeFoundryJson,
   type VelocityUnit,
 } from '@open-reloading/importers'
 import { formatNumber } from '../i18n/number.ts'
@@ -186,7 +186,7 @@ export function sessionCsv(data: ChronoImport, unit: Unit): string {
 
 /** The JSON download: the session as RangeFoundry session JSON, velocities in m/s. */
 export const sessionJsonBlob = (data: ChronoImport) =>
-  new Blob([stringifyOpenReloadingJson(data)], { type: 'application/json' })
+  new Blob([stringifyRangeFoundryJson(data)], { type: 'application/json' })
 
 /** The CSV download: UTF-8 with a byte order mark, which spreadsheets need to read non-ASCII text. */
 export const sessionCsvBlob = (data: ChronoImport, unit: Unit) =>
