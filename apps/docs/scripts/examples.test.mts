@@ -52,10 +52,19 @@ function examplesOf(page: string): Example[] {
   return found
 }
 
-const examples = readdirSync(pagesDir)
+const pages = readdirSync(pagesDir)
   .filter((name) => name.endsWith('.md'))
   .sort()
-  .flatMap(examplesOf)
+const examples = pages.flatMap(examplesOf)
+
+for (const page of pages) {
+  test(`${page}: has a js or ts block under ## Example`, () => {
+    assert.ok(
+      examples.some((example) => example.page === page),
+      `${page}: no js or ts block under ## Example`,
+    )
+  })
+}
 
 // examples print with console.log only, one value per call, so no Node types are needed
 const consoleTypes = `${scratch}console.d.ts`
@@ -132,11 +141,16 @@ for (const example of examples) {
     )
     expected.forEach(({ at, comment }, n) => {
       const value = printed[n]
-      // a string prints bare; any other value is written as a JavaScript literal
-      const matches =
-        typeof value === 'string'
-          ? value === comment
-          : isDeepStrictEqual(value, runInThisContext(`(${comment})`))
+      // a primitive is compared as console.log prints it; an object or array as a JavaScript literal
+      let matches: boolean
+      if (typeof value !== 'object' || value === null) matches = String(value) === comment
+      else {
+        try {
+          matches = isDeepStrictEqual(value, runInThisContext(`(${comment})`))
+        } catch {
+          matches = false
+        }
+      }
       assert.ok(
         matches,
         `${at}: printed ${typeof value === 'string' ? value : inspect(value)}, the comment says ${comment}`,
