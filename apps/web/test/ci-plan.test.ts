@@ -1,5 +1,14 @@
 import { execFileSync } from 'node:child_process'
-import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+} from 'node:fs'
+import { tmpdir } from 'node:os'
+import path from 'node:path'
 import { expect, it } from 'vitest'
 import {
   importSpecifiers,
@@ -8,6 +17,7 @@ import {
   selected,
   testGroups,
   testJobs,
+  workspaceNames,
 } from '../scripts/ci-plan.mts'
 
 const closure = recordClosure()
@@ -257,7 +267,7 @@ it.each([
   ['cli', 'docs'], // files named in `Code:` lines and the research log
   ['tools', 'docs'], // files named in `Code:` lines and the research log
 ])('selects %s and its reader %s for a change of %s', (read, reader) => {
-  expect(selected(`...@open-reloading/${read}`)).toContain(reader)
+  expect(selected(`...${workspaceNames().get(read)}`)).toContain(reader)
 })
 
 it('tests every workspace that has tests, in exactly one group', () => {
@@ -275,10 +285,51 @@ it('tests every workspace that has tests, in exactly one group', () => {
       name: string
       scripts?: Record<string, string>
     }
-    return scripts?.test === undefined ? [] : [name.replace('@open-reloading/', '')]
+    return scripts?.test === undefined
+      ? []
+      : [name.replace(/^@(open-reloading|rangefoundry)\//, '')]
   })
   expect(members.length).toBe(new Set(members).size)
   expect([...members].sort()).toEqual(withTests.sort())
+})
+
+it('reads both scopes while the packages move to @rangefoundry', () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'ci-plan-'))
+  const put = (name: string, content: string) => {
+    mkdirSync(path.dirname(path.join(dir, name)), { recursive: true })
+    writeFileSync(path.join(dir, name), content)
+  }
+  for (const r of [
+    'cartridges',
+    'bullets',
+    'powders',
+    'cases',
+    'primers',
+    'targets',
+    'disciplines',
+    'federations',
+  ])
+    mkdirSync(path.join(dir, 'apps/web/src/app', r, '[id]'), { recursive: true })
+  put(
+    'apps/web/src/app/bullets/[id]/page.tsx',
+    "import { a } from '@rangefoundry/units/convert'\nimport { b } from '@open-reloading/drawing'\n",
+  )
+  put('packages/units/package.json', '{"name":"@rangefoundry/units"}')
+  put('packages/drawing/package.json', '{"name":"@open-reloading/drawing"}')
+  put('tools/package.json', '{"name":"@rangefoundry/tools"}')
+  mkdirSync(path.join(dir, 'tooling'))
+  expect([...recordClosure(dir).packages].sort()).toEqual(['drawing', 'units'])
+  const names = workspaceNames(dir)
+  expect(testJobs(['units', 'drawing', 'tools'], names)).toEqual([
+    { name: 'drawing', filter: '--filter @open-reloading/drawing', e2eUnit: false },
+    {
+      name: 'packages',
+      filter: '--filter @rangefoundry/units --filter @rangefoundry/tools',
+      e2eUnit: false,
+    },
+  ])
+  // a filter for a name pnpm does not know would select nothing, and the job would pass
+  expect(() => testJobs(['web'], names)).toThrow('no workspace web')
 })
 
 it('leaves the root project out of the selection: plan reads its files itself', () => {
