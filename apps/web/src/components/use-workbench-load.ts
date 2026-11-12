@@ -3,6 +3,19 @@
 import { useForm } from '@mantine/form'
 import { useMediaQuery } from '@mantine/hooks'
 import {
+  type Bullet,
+  type Firearm,
+  fromSi,
+  type Load,
+  type Powder,
+  parseRef,
+  type SessionRecord,
+  type SessionSnapshot,
+  toSi,
+  type UserRecord,
+  userRecord,
+} from '@open-reloading/schema'
+import {
   boreArea,
   bulletFits,
   bulletWindow,
@@ -16,20 +29,7 @@ import {
   recordBoreArea,
   recordResistance,
   ValueError,
-} from '@open-reloading/ballistics'
-import {
-  type Bullet,
-  type Firearm,
-  fromSi,
-  type Load,
-  type Powder,
-  parseRef,
-  type SessionRecord,
-  type SessionSnapshot,
-  toSi,
-  type UserRecord,
-  userRecord,
-} from '@open-reloading/schema'
+} from '@rangefoundry/ballistics'
 import { type SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'

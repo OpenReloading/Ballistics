@@ -1,4 +1,4 @@
-import type { FreeRecoil } from '@open-reloading/ballistics'
+import type { FreeRecoil } from '@rangefoundry/ballistics'
 import { formatNumber } from '../i18n/number.ts'
 import { footPound, metersPerFoot, type UnitSystem } from './units.ts'
 

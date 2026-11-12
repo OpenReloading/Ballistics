@@ -1,4 +1,4 @@
-import { bulletFits, type CartridgeDiameters } from '@open-reloading/ballistics'
+import { bulletFits, type CartridgeDiameters } from '@rangefoundry/ballistics'
 import { msg } from '../i18n/translate.ts'
 import type { CartridgeSummary } from './api-types.ts'
 

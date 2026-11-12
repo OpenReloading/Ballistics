@@ -8,7 +8,7 @@ import {
   reviveError,
   type TaskReply,
   taskTimeoutMs,
-} from '@open-reloading/use-cases'
+} from '@rangefoundry/use-cases'
 
 /** Settings of `createPool`. */
 export interface PoolOptions {

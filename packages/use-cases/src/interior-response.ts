@@ -1,6 +1,7 @@
 /** Every object is loose, so fields core adds later do not break the document; a non-finite number in an interior answer is a 422, so only the fields core defines as null are nullable. */
-import { advisoryIds } from '@open-reloading/ballistics'
+
 import { provenance } from '@open-reloading/schema'
+import { advisoryIds } from '@rangefoundry/ballistics'
 import { z } from 'zod'
 import { notice } from './answer.ts'
 import { chargeTargetKinds } from './charge-schema.ts'

@@ -1,6 +1,6 @@
 import { STATUS_CODES } from 'node:http'
-import { inlineRunner, type JsonSchema, jsonSchema } from '@open-reloading/use-cases'
-import type { Catalogue } from '@open-reloading/use-cases/catalog'
+import { inlineRunner, type JsonSchema, jsonSchema } from '@rangefoundry/use-cases'
+import type { Catalogue } from '@rangefoundry/use-cases/catalog'
 import type { RouteOptions } from 'fastify'
 import type { z } from 'zod'
 import { buildApp } from './app.ts'

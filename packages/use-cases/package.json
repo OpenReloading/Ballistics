@@ -1,5 +1,5 @@
 {
-  "name": "@open-reloading/use-cases",
+  "name": "@rangefoundry/use-cases",
   "version": "0.0.0",
   "private": true,
   "description": "The computations the web app, the command line and the API run: input checks, runs and answers, without a framework.",
@@ -42,7 +42,7 @@
     "test": "vitest run --coverage && publint --strict && attw --pack . --profile esm-only"
   },
   "dependencies": {
-    "@open-reloading/ballistics": "workspace:*",
+    "@rangefoundry/ballistics": "workspace:*",
     "@open-reloading/catalog": "workspace:*",
     "@open-reloading/schema": "workspace:*",
     "@rangefoundry/statistics": "workspace:*",

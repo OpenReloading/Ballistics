@@ -12,7 +12,7 @@ import {
   powderPressureRange,
   predictPowder,
   stringLadder,
-} from '@open-reloading/ballistics'
+} from '@rangefoundry/ballistics'
 import { InputError } from '@rangefoundry/statistics'
 import { refusalText } from './core-messages.ts'
 import { nth } from './nth.ts'

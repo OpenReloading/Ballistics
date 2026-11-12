@@ -1,4 +1,6 @@
 /** The truing section of the Trajectory tab: rows as typed, the plan and fit of ballistics, and their readouts. */
+
+import { type Truing, toSi, truing, type UserRecord, userRecord } from '@open-reloading/schema'
 import {
   fitTruingStrings,
   planTruingStrings,
@@ -10,8 +12,7 @@ import {
   TruingError,
   type TruingPlan,
   type WeakReason,
-} from '@open-reloading/ballistics'
-import { type Truing, toSi, truing, type UserRecord, userRecord } from '@open-reloading/schema'
+} from '@rangefoundry/ballistics'
 import { formatNumber, parseNumber, untranslated } from '../i18n/number.ts'
 import { type Message, msg, type Say, type Translator } from '../i18n/translate.ts'
 import { issueText, refusalText, translateMessage } from './core-messages.ts'

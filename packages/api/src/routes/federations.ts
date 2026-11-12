@@ -8,7 +8,7 @@ import {
   targetFace,
   targetMapping,
 } from '@open-reloading/schema'
-import type { Catalogue } from '@open-reloading/use-cases/catalog'
+import type { Catalogue } from '@rangefoundry/use-cases/catalog'
 import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
 import { missing, stored } from './record-answers.ts'

@@ -1,4 +1,4 @@
-import { chargeTargetExample, interiorExample, loadFileExample } from '@open-reloading/use-cases'
+import { chargeTargetExample, interiorExample, loadFileExample } from '@rangefoundry/use-cases'
 import { describe, expect, it } from 'vitest'
 import { API_PREFIX } from '../src/version.ts'
 import { withApi } from './setup.ts'

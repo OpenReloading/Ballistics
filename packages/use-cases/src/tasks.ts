@@ -22,7 +22,7 @@ import {
   trajectory,
   trueDrag,
   trueMuzzleVelocity,
-} from '@open-reloading/ballistics'
+} from '@rangefoundry/ballistics'
 import { InputError } from '@rangefoundry/statistics'
 
 /** The deadline passed while the task was queued or running. */

@@ -1,3 +1,5 @@
+import { firearm, sheetId, userRecord } from '@open-reloading/schema'
+import { bulletDimensions } from '@open-reloading/svg-drawings/bullet'
 import {
   interior,
   interiorPressureRange,
@@ -5,9 +7,7 @@ import {
   pressureToleranceDefaults,
   recordResistance,
   trajectory,
-} from '@open-reloading/ballistics'
-import { firearm, sheetId, userRecord } from '@open-reloading/schema'
-import { bulletDimensions } from '@open-reloading/svg-drawings/bullet'
+} from '@rangefoundry/ballistics'
 import { describe, expect, it } from 'vitest'
 import {
   exampleChamberVolume,

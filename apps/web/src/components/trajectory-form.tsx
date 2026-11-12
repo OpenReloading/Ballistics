@@ -12,14 +12,14 @@ import {
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useDebouncedValue, useMediaQuery } from '@mantine/hooks'
+import { type Bullet, toSi, type UserRecord } from '@open-reloading/schema'
+import { Printer } from '@phosphor-icons/react'
 import {
   type DragModel,
   dragModels,
   type OmittedEffect,
   type Trajectory,
-} from '@open-reloading/ballistics'
-import { type Bullet, toSi, type UserRecord } from '@open-reloading/schema'
-import { Printer } from '@phosphor-icons/react'
+} from '@rangefoundry/ballistics'
 import dynamic from 'next/dynamic'
 import {
   type ReactNode,

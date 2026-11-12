@@ -1,5 +1,5 @@
-import { inlineRunner } from '@open-reloading/use-cases'
-import type { Catalogue } from '@open-reloading/use-cases/catalog'
+import { inlineRunner } from '@rangefoundry/use-cases'
+import type { Catalogue } from '@rangefoundry/use-cases/catalog'
 import { describe, expect, it } from 'vitest'
 import { buildApp } from '../src/app.ts'
 import { buildOpenApi } from '../src/openapi.ts'

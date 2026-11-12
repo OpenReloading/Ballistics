@@ -6,11 +6,7 @@ import {
   caseTypes,
   catalogueCaseCapacity,
 } from '@open-reloading/schema'
-import {
-  type CartridgeQuery,
-  type Catalogue,
-  cartridgeItem,
-} from '@open-reloading/use-cases/catalog'
+import { type CartridgeQuery, type Catalogue, cartridgeItem } from '@rangefoundry/use-cases/catalog'
 import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
 import { missing, stored } from './record-answers.ts'
