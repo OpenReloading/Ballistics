@@ -194,7 +194,7 @@
     },
     "workbench": {
       "budget": {
-        "initial": 646000,
+        "initial": 643000,
         "chunk": 190000
       },
       "routes": {

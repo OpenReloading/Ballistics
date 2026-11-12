@@ -123,6 +123,10 @@ function groupViolations(
 export function violations(measured: Record<string, Weight>, budget: Budget) {
   const listed = new Set(Object.values(budget.groups).flatMap((g) => Object.keys(g.routes)))
   return [
+    // a group with neither (or a misspelt key) would leave its lazy part ungated
+    ...Object.entries(budget.groups)
+      .filter(([, g]) => (g.budget.total === undefined) === (g.budget.chunk === undefined))
+      .map(([name]) => `group ${name}: the budget must set exactly one of total and chunk`),
     ...Object.entries(budget.groups).flatMap(([name, g]) => groupViolations(name, g, measured)),
     ...Object.keys(measured)
       .filter((route) => !listed.has(route))

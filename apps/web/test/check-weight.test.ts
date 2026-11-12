@@ -99,6 +99,19 @@ it('gates each lazy chunk and not the total of a group with a chunk limit', () =
   ])
 })
 
+it('fails on a group whose budget sets both or neither of total and chunk', () => {
+  const groups: Budget = {
+    groups: {
+      both: { budget: { initial: 100, total: 150, chunk: 50 }, routes: {} },
+      neither: { budget: { initial: 100 }, routes: {} },
+    },
+  }
+  expect(violations({}, groups)).toEqual([
+    'group both: the budget must set exactly one of total and chunk',
+    'group neither: the budget must set exactly one of total and chunk',
+  ])
+})
+
 it('fails on a built route in no group and on a group route the build lacks', () => {
   const fits = { initial: 1, total: 1, chunk: 0 }
   expect(violations({ '/a': fits, '/new': fits }, budget)).toEqual([
