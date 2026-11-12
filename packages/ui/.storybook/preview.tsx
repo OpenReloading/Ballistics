@@ -4,6 +4,7 @@ import { UiProvider, uiMessages } from '../src/index.ts'
 import '../css/ui.css'
 
 // the width of a story test's project (vitest.config.ts); undefined in Storybook itself
+// oxlint-disable-next-line no-underscore-dangle -- the double underscores of Vite's define names
 declare const __STORY_WIDTH__: number | undefined
 const testWidth = typeof __STORY_WIDTH__ === 'number' ? __STORY_WIDTH__ : undefined
 

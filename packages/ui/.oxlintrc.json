@@ -1,0 +1,48 @@
+{
+  "$schema": "../../node_modules/oxlint/configuration_schema.json",
+  "extends": ["../oxlint.ui.json"],
+  "overrides": [
+    {
+      "files": ["src/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [],
+            "patterns": [
+              {
+                "regex": "^(\\.\\./)+([a-z-]+/(src|dist)|packages|apps)/",
+                "message": "ui-imports-the-ui-base: packages/ui imports design-tokens, locale-format and units of this repository, React, Mantine, Lucide and Lingui, and its own files."
+              },
+              {
+                "group": [
+                  "*",
+                  "*/**",
+                  "!react",
+                  "!react/**",
+                  "!react-dom",
+                  "!react-dom/**",
+                  "!lucide-react",
+                  "!lucide-react/**",
+                  "!@open-reloading/design-tokens",
+                  "!@open-reloading/design-tokens/**",
+                  "!@open-reloading/locale-format",
+                  "!@open-reloading/locale-format/**",
+                  "!@open-reloading/units",
+                  "!@open-reloading/units/**",
+                  "!@mantine/*",
+                  "!@mantine/*/**",
+                  "!@lingui/*",
+                  "!@lingui/*/**",
+                  "!./**",
+                  "!../**"
+                ],
+                "message": "ui-imports-the-ui-base: packages/ui imports design-tokens, locale-format and units of this repository, React, Mantine, Lucide and Lingui, and its own files."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -311,6 +311,10 @@
     "source": "import { x } from '../../catalog/src/index.ts'\nexport { x }",
     "rules": ["ui-imports-the-ui-base"]
   },
+  "packages/ui/src/photo.tsx": {
+    "source": "export const Photo = () => <img src=\"photo.png\" />",
+    "rules": ["alt-text"]
+  },
   "packages/schema/src/cycle-a.ts": {
     "source": "import { b } from './cycle-b.ts'\nexport const a = () => b",
     "rules": ["no-cycle"]
