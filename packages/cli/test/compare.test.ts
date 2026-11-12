@@ -37,6 +37,12 @@ describe('compare', () => {
       null,
     ])
     expect(r.baseline.modelVersion).toBe(r.candidate.modelVersion)
+    // two live models pair on every used row
+    expect(r.paired?.velocity).toMatchObject({
+      rows: 5,
+      median: { change: 0, standardError: 0 },
+      p90: { change: 0, standardError: 0 },
+    })
   })
 
   it('reports the sign of the change of a model that is 10 % too fast', async () => {
@@ -64,6 +70,24 @@ describe('compare', () => {
     const r = await compare(options, saved, worse)
     expect(r.baseline.model).toBe('m3')
     expect(r.change.overall.velocityMedian).toBeCloseTo(0.111 - 0.03, 9)
+    expect(r.paired).toBeUndefined()
+  })
+
+  it('gives the paired change against a baseline saved with --per-row', async () => {
+    const saved = writeRows(
+      JSON.stringify(await verify({ ...options, perRow: true })),
+      'per-row.json',
+    )
+    const r = await compare(options, saved, worse)
+    expect(r.baseline).not.toHaveProperty('rows')
+    expect(r.paired?.velocity).toMatchObject({ rows: 5, cartridges: 2 })
+    // 0.01, 0.02, 0.03, 0.04, 0.10 against 0.111, 0.078, 0.133, 0.056, 0.21
+    expect(r.paired?.velocity?.median.baseline).toBeCloseTo(0.03, 9)
+    expect(r.paired?.velocity?.median.change).toBeCloseTo(0.111 - 0.03, 9)
+    expect(r.paired?.velocity?.median.standardError).toBeGreaterThan(0)
+    // the worse model leaves the pressure as it is
+    expect(r.paired?.pressure).toMatchObject({ rows: 2, cartridges: 1 })
+    expect(r.paired?.pressure?.median.change).toBeCloseTo(0, 9)
   })
 
   it('reads a baseline with a byte order mark and names the cause of a read failure', async () => {

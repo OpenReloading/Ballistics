@@ -8,6 +8,7 @@ import { type InteriorModel, outcomes } from './evaluate.ts'
 import { fitPowders, fitPowdersWithPrior, notFittedReasons, withFit } from './fit.ts'
 import { changeOf, evaluate, type Grouping, metricsOf } from './metrics.ts'
 import { builtInName, fitFiles, loadModel, type Model } from './model.ts'
+import { pairedChange, type RowError, rowErrors } from './paired.ts'
 import { fillInputs, rowsFromPublished } from './published-rows.ts'
 import { loadRecords, type Records } from './records.ts'
 import {
@@ -48,6 +49,8 @@ export interface Options {
   exponent?: 'family' | undefined
   /** `prior`: each powder's energy is its prior times one energy-level factor chosen on the training pressures; default the record's. */
   energy?: 'prior' | undefined
+  /** `verify`: adds the error of each used row of the split. */
+  perRow?: boolean | undefined
 }
 
 /** What `fit` reads. */
@@ -239,15 +242,19 @@ function leftOut({ rows, records }: Prepared, model: InteriorModel, split: Split
   return { items, powders: inSplit.length }
 }
 
+/** An evaluation with the error of each used row of the split, which `verify` adds with `--per-row` and `compare` pairs. */
+type Evaluated = Evaluation & { rows?: RowError[] | undefined }
+
 /** What the model selected by `spec` gives on the split, with the burn coefficients fitted under it in a `fit-on-training` run; refuses a split with no evaluable row. */
-async function evaluateModel(spec: string, options: Options, data: Prepared): Promise<Evaluation> {
+async function evaluateModel(spec: string, options: Options, data: Prepared): Promise<Evaluated> {
   const model = await loadModel(spec)
   const fitted = options.params === 'fit-on-training' ? fitOf(options, data, model) : undefined
   const records = fitted?.records ?? data.records
   const wanted: Split[] = options.split === 'training' ? ['training'] : [options.split, 'training']
   const all = outcomes(data.rows, records, model.interior, wanted)
+  const inSplit = all.filter((o) => o.split === options.split)
   const evaluation = evaluate(
-    all.filter((o) => o.split === options.split),
+    inSplit,
     all.filter((o) => o.split === 'training'),
     options.groupBy,
   )
@@ -268,6 +275,7 @@ async function evaluateModel(spec: string, options: Options, data: Prepared): Pr
       },
     }),
     ...(fitted && { fit: fitted.summary }),
+    rows: rowErrors(inSplit),
   }
 }
 
@@ -275,7 +283,7 @@ async function evaluateModel(spec: string, options: Options, data: Prepared): Pr
 export async function verify(options: Options, spec = builtInName): Promise<VerifyResult> {
   checkSealed(options)
   const data = prepare(options)
-  const evaluation = await evaluateModel(spec, options, data)
+  const { rows, ...evaluation } = await evaluateModel(spec, options, data)
   return {
     schemaVersion,
     notice,
@@ -286,6 +294,7 @@ export async function verify(options: Options, spec = builtInName): Promise<Veri
     inputs: data.inputs,
     ...(data.published && { published: data.published }),
     ...evaluation,
+    ...(options.perRow && { rows }),
   }
 }
 
@@ -319,7 +328,7 @@ function savedResult(path: string): VerifyResult {
 }
 
 /** The baseline evaluation: a saved `verify` result of the same split and data, or a live model. */
-async function baselineOf(spec: string, options: Options, data: Prepared): Promise<Evaluation> {
+async function baselineOf(spec: string, options: Options, data: Prepared): Promise<Evaluated> {
   if (!spec.endsWith('.json')) return await evaluateModel(spec, options, data)
   const {
     schemaVersion: _v,
@@ -347,8 +356,8 @@ export async function compare(
 ): Promise<CompareResult> {
   checkSealed(options)
   const data = prepare(options)
-  const baseline = await baselineOf(baselineSpec, options, data)
-  const candidate = await evaluateModel(candidateSpec, options, data)
+  const { rows: baselineRows, ...baseline } = await baselineOf(baselineSpec, options, data)
+  const { rows: candidateRows, ...candidate } = await evaluateModel(candidateSpec, options, data)
   const by = candidate.grouped?.by
   const sameGroups = by !== undefined && baseline.grouped?.by === by
   const groupNames = new Set([
@@ -367,6 +376,7 @@ export async function compare(
     ...(data.published && { published: data.published }),
     baseline,
     candidate,
+    ...(baselineRows && candidateRows && { paired: pairedChange(baselineRows, candidateRows) }),
     change: {
       overall: changeOf(baseline.overall, candidate.overall),
       byFamily: Object.fromEntries(

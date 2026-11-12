@@ -99,6 +99,12 @@ The powder parameters are those of the records (`--params records`, the default)
 
 A powder without rows gets no value, not an estimate, as the app refuses a powder without interior parameters. A family median estimate (each field of `interior.fitted` replaced by the median over the other powders of its family) measured a median velocity error of 15.7 %, a P90 of 61.7 % and an interval coverage of 31.9 % on a local run, too weak to show. Its code (`src/unseen.ts`) stays with its tests; no command calls it.
 
+### Paired change
+
+`compare` adds `paired` when both sides have the error of each row: two models, or a baseline saved with `verify --per-row`. The `change` of the metrics takes each side over the rows it used, which differ when one side uses fewer rows; `paired` takes both over the rows both gave a result for (for pressure, those that print one in bar), matched by their position among the rows read. For velocity and pressure it gives those rows, their cartridges, and for the median and the P90 of the absolute error each side's value, the change (candidate minus baseline) and its standard error: the standard deviation of the change over 2,000 bootstrap draws with seed 1 ([Efron 1982](bibliography.md#efron-1982)). A draw takes as many cartridges as there are, with replacement, each with all its rows, because the rows of one cartridge share its errors and are not independent. The table prints one line per quantity, in percentage points.
+
+`verify --per-row` adds `rows` to the JSON (the table leaves them out): for each used row of the split its position among the rows read (`row`, from 0), its cartridge and the signed relative error of the velocity and, where the row prints one in bar, of the pressure, (model - printed) / printed. It holds a value per row: a per-row result of rows that are not yours to publish stays local, as the rows do.
+
 ## Fit
 
 `fit --rows <path> [--model m3|<module>] [--velocity-sigma <fraction>] [--exponent family] [--pressure-sigma <fraction>] [--energy prior]` fits the burn coefficient (`interior.vivacity`) of each powder the rows name that has interior parameters, and writes the fitted values with their uncertainties. It fits nothing else: the energy, the pressure exponent and the form constants stay the record's, unless `--exponent family` chooses the exponent ([below](#pressure-exponent-per-family)) or `--energy prior` sets the energy ([below](#energy-from-a-prior)).
@@ -166,11 +172,11 @@ The code of the evaluation itself (rows, split, the metrics and the percentiles,
 
 ## Commands
 
-`verify` takes no `--baseline` or `--candidate`, `compare` takes no `--model`, `fit` takes only `--rows`, `--records`, `--model`, `--velocity-sigma`, `--exponent`, `--pressure-sigma`, `--energy`, `--json` and `--table`: another option is bad input, as is `--velocity-sigma`, `--exponent`, `--pressure-sigma` or `--energy` in a `verify` or `compare` without `--params fit-on-training`. `--exponent` takes `family` only, `--energy` takes `prior` only. `--exponent` and `--pressure-sigma` do not combine, nor does `--energy prior` with either of them: a run with such a pair is bad input.
+`verify` takes no `--baseline` or `--candidate`, `compare` takes no `--model` or `--per-row`, `fit` takes only `--rows`, `--records`, `--model`, `--velocity-sigma`, `--exponent`, `--pressure-sigma`, `--energy`, `--json` and `--table`: another option is bad input, as is `--velocity-sigma`, `--exponent`, `--pressure-sigma` or `--energy` in a `verify` or `compare` without `--params fit-on-training`. `--exponent` takes `family` only, `--energy` takes `prior` only. `--exponent` and `--pressure-sigma` do not combine, nor does `--energy prior` with either of them: a run with such a pair is bad input.
 
 `verify --rows <path> [--model m3|<module>]` evaluates one model on the split. `m3` is the model of the installed `@open-reloading/ballistics`; a module path is a file that exports `interior(load, options?)` with the signature of its `interior`.
 
-`compare --baseline <m3|module|verify.json> --candidate <m3|module>` evaluates both on the same rows and split and gives each result and the change, candidate minus baseline, overall and per powder family (and per group of `--group-by`). A baseline `.json` is a saved `verify` result: it must be of the same split, split salt, rows and records, else the run is refused. A positive change of an error is worse; the change of the coverage is in fractions, the change of used rows in rows. The candidate may use fewer rows than the baseline: `usedRows` shows it.
+`compare --baseline <m3|module|verify.json> --candidate <m3|module>` evaluates both on the same rows and split and gives each result and the change, candidate minus baseline, overall and per powder family (and per group of `--group-by`). A baseline `.json` is a saved `verify` result: it must be of the same split, split salt, rows and records, else the run is refused. A positive change of an error is worse; the change of the coverage is in fractions, the change of used rows in rows. The candidate may use fewer rows than the baseline: `usedRows` shows it, and the [paired change](#paired-change) compares both on the same rows.
 
 ## Output
 

@@ -98,6 +98,23 @@ describe('verify on the validation split', () => {
   })
 })
 
+describe('verify with --per-row', () => {
+  it('adds the signed errors of the used rows of the split, by their position among the rows read', async () => {
+    const r = await verify({ ...options, perRow: true })
+    const near = (x: number) => expect.closeTo(x, 9)
+    expect(r.rows).toEqual([
+      { row: 0, cartridge: '308-match', velocity: near(0.01), pressure: near(0.1) },
+      { row: 1, cartridge: '308-match', velocity: near(-0.02), pressure: near(0.2) },
+      { row: 2, cartridge: '308-match', velocity: near(0.03) },
+      { row: 3, cartridge: '30-30-win', velocity: near(-0.04) },
+      { row: 4, cartridge: '30-30-win', velocity: near(0.1) },
+    ])
+    // the training rows follow the twelve rows of the validation split in the file
+    const training = await verify({ ...options, split: 'training', perRow: true })
+    expect(training.rows?.map((e) => e.row)).toEqual([12, 13, 14, 15, 16, 17, 18, 19, 20, 21])
+  })
+})
+
 describe('verify with --group-by', () => {
   it('adds the groups of the key, here the cartridge', async () => {
     const r = await verify({ ...options, groupBy: 'cartridge' })

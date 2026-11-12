@@ -3,6 +3,7 @@ import type { Outcome, Prediction } from '../src/evaluate.ts'
 import { changeOf, evaluate, metricsOf } from '../src/metrics.ts'
 
 const outcome = (bullet: string, velocity: number, prediction: Prediction): Outcome => ({
+  index: 0,
   row: { line: 2, cartridge: 'c', bullet, powder: 'p', charge: 1, velocity },
   split: 'validation',
   family: 'f',

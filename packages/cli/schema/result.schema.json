@@ -998,6 +998,34 @@
           },
           "required": ["velocitySigma", "powders", "notFitted"],
           "additionalProperties": false
+        },
+        "rows": {
+          "description": "With `--per-row`: the error of each used row of the split, for the paired change of `compare`.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "row": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991,
+                "description": "Position of the row among the rows read, from 0: two runs on the same rows pair by it."
+              },
+              "cartridge": {
+                "type": "string"
+              },
+              "velocity": {
+                "type": "number",
+                "description": "(model - printed) / printed, as a fraction."
+              },
+              "pressure": {
+                "description": "Of a row that prints a pressure in bar.",
+                "type": "number"
+              }
+            },
+            "required": ["row", "cartridge", "velocity"],
+            "additionalProperties": false
+          }
         }
       },
       "required": [
@@ -2961,6 +2989,176 @@
             }
           },
           "required": ["model", "modelVersion", "interval", "overall", "byFamily", "byPowder"],
+          "additionalProperties": false
+        },
+        "paired": {
+          "description": "When both sides have row errors (two models, or a baseline saved with `--per-row`): the change over the rows both sides ran, each with the standard error of a bootstrap that draws whole cartridges with replacement.",
+          "type": "object",
+          "properties": {
+            "draws": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "description": "Bootstrap draws."
+            },
+            "seed": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "description": "Seed of the draws."
+            },
+            "velocity": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "rows": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991,
+                      "description": "Rows both sides gave a result for (for pressure: that print one in bar)."
+                    },
+                    "cartridges": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991,
+                      "description": "Their distinct cartridges, the units the bootstrap draws."
+                    },
+                    "median": {
+                      "type": "object",
+                      "properties": {
+                        "baseline": {
+                          "type": "number",
+                          "description": "Of the baseline over the paired rows."
+                        },
+                        "candidate": {
+                          "type": "number",
+                          "description": "Of the candidate over the paired rows."
+                        },
+                        "change": {
+                          "type": "number",
+                          "description": "Candidate minus baseline."
+                        },
+                        "standardError": {
+                          "type": "number",
+                          "description": "Standard deviation of the change over the bootstrap draws."
+                        }
+                      },
+                      "required": ["baseline", "candidate", "change", "standardError"],
+                      "additionalProperties": false,
+                      "description": "Of the median absolute relative error."
+                    },
+                    "p90": {
+                      "type": "object",
+                      "properties": {
+                        "baseline": {
+                          "type": "number",
+                          "description": "Of the baseline over the paired rows."
+                        },
+                        "candidate": {
+                          "type": "number",
+                          "description": "Of the candidate over the paired rows."
+                        },
+                        "change": {
+                          "type": "number",
+                          "description": "Candidate minus baseline."
+                        },
+                        "standardError": {
+                          "type": "number",
+                          "description": "Standard deviation of the change over the bootstrap draws."
+                        }
+                      },
+                      "required": ["baseline", "candidate", "change", "standardError"],
+                      "additionalProperties": false,
+                      "description": "Of the 90th percentile of the absolute relative error."
+                    }
+                  },
+                  "required": ["rows", "cartridges", "median", "p90"],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Null without a row both sides ran that has the quantity."
+            },
+            "pressure": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "rows": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991,
+                      "description": "Rows both sides gave a result for (for pressure: that print one in bar)."
+                    },
+                    "cartridges": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991,
+                      "description": "Their distinct cartridges, the units the bootstrap draws."
+                    },
+                    "median": {
+                      "type": "object",
+                      "properties": {
+                        "baseline": {
+                          "type": "number",
+                          "description": "Of the baseline over the paired rows."
+                        },
+                        "candidate": {
+                          "type": "number",
+                          "description": "Of the candidate over the paired rows."
+                        },
+                        "change": {
+                          "type": "number",
+                          "description": "Candidate minus baseline."
+                        },
+                        "standardError": {
+                          "type": "number",
+                          "description": "Standard deviation of the change over the bootstrap draws."
+                        }
+                      },
+                      "required": ["baseline", "candidate", "change", "standardError"],
+                      "additionalProperties": false,
+                      "description": "Of the median absolute relative error."
+                    },
+                    "p90": {
+                      "type": "object",
+                      "properties": {
+                        "baseline": {
+                          "type": "number",
+                          "description": "Of the baseline over the paired rows."
+                        },
+                        "candidate": {
+                          "type": "number",
+                          "description": "Of the candidate over the paired rows."
+                        },
+                        "change": {
+                          "type": "number",
+                          "description": "Candidate minus baseline."
+                        },
+                        "standardError": {
+                          "type": "number",
+                          "description": "Standard deviation of the change over the bootstrap draws."
+                        }
+                      },
+                      "required": ["baseline", "candidate", "change", "standardError"],
+                      "additionalProperties": false,
+                      "description": "Of the 90th percentile of the absolute relative error."
+                    }
+                  },
+                  "required": ["rows", "cartridges", "median", "p90"],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Null without a row both sides ran that has the quantity."
+            }
+          },
+          "required": ["draws", "seed", "velocity", "pressure"],
           "additionalProperties": false
         },
         "change": {
