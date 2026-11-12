@@ -1,7 +1,7 @@
 import { gzipSync } from 'node:zlib'
+import { buildCatalogue } from '@open-reloading/use-cases/catalog'
 import { describe, expect, it } from 'vitest'
 import { loadBundle } from '../src/bundle.ts'
-import { buildCatalogue } from '../src/catalogue/build.ts'
 
 describe('catalogue budgets', () => {
   const bundle = loadBundle()

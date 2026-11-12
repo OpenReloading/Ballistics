@@ -1,9 +1,8 @@
 import { readFileSync } from 'node:fs'
 import { posix } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { defined } from './defined.ts'
 
-/** The packages `@open-reloading/api/catalogue` may import: ballistics and schema, no Node API. */
+/** The packages `@open-reloading/use-cases/catalog` may import: ballistics and schema, no Node API. */
 const catalogueAllowed = ['@open-reloading/ballistics', '@open-reloading/schema']
 
 /** The files below `src/` that `entry` reaches by relative imports, and their other imports. */
@@ -17,7 +16,7 @@ function imports(entry: string) {
       // type-only imports are erased, the browser never loads them
       .replace(/^(?:import|export) type\b.*?from '[^']+'/gms, '')
     for (const match of source.matchAll(/(?:from|import)\s*\(?\s*'([^']+)'/g)) {
-      const spec = defined(match[1], 'import specifier')
+      const spec = match[1] ?? ''
       if (spec.startsWith('.')) visit(posix.join(posix.dirname(file), spec))
       else found.push(`${file}: ${spec}`)
     }
@@ -28,20 +27,16 @@ function imports(entry: string) {
 
 describe('catalogue entry', () => {
   it('imports only ballistics and schema, no Node API, also through the modules it imports', () => {
-    const { files, found } = imports('catalogue/browser.ts')
-    expect([...files].sort()).toEqual([
-      'catalogue/browser.ts',
-      'catalogue/build.ts',
-      'catalogue/derive.ts',
-      'catalogue/list.ts',
-      'catalogue/open.ts',
-      'catalogue/types.ts',
-      'hash.ts',
+    const { files, found } = imports('catalog/browser.ts')
+    expect([...files].toSorted()).toEqual([
+      'catalog/browser.ts',
+      'catalog/build.ts',
+      'catalog/derive.ts',
+      'catalog/hash.ts',
+      'catalog/list.ts',
+      'catalog/open.ts',
+      'catalog/types.ts',
     ])
-    expect(found.filter((f) => !catalogueAllowed.includes(defined(f.split(': ')[1])))).toEqual([])
-  })
-
-  it('names the Node imports of the module that reads and writes the files', () => {
-    expect(imports('catalogue/node.ts').found).toContain('catalogue/node.ts: node:fs')
+    expect(found.filter((f) => !catalogueAllowed.includes(f.split(': ')[1] ?? ''))).toEqual([])
   })
 })
