@@ -34,7 +34,7 @@ options:
   --leave-one-powder-out
                      verify: add the line of the powder not in the fitted set
   --per-row          verify: add the error of each used row, which a compare against
-                     this result as --baseline pairs
+                     this result as --baseline pairs (in the JSON, not the table)
   --params records|fit-on-training
                      the powder parameters of the records (default), or the burn
                      coefficients fitted to the training rows
