@@ -69,7 +69,7 @@
     "The rows have no table of two columns or more.",
     "The table has a header but no rows. Add rows or choose another file.",
     "The text looks like JSON but does not parse. Fix the file or export it again.",
-    "The JSON is neither an OpenReloading data file nor a list of objects with the same keys. Export a table instead.",
+    "The JSON is neither a RangeFoundry data file nor a list of objects with the same keys. Export a table instead.",
     "The text has no table: no row repeats a comma, semicolon or tab as separator. Export the table as CSV.",
     "The file is larger than 40 MB. Split it and import the parts.",
     "The workbook has no cells with text. Open the right file or paste the table into a sheet.",

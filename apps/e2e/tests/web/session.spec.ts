@@ -6,7 +6,7 @@ import { choosePreset, storeUnits } from './units.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
-/** OpenReloading CSV template with made-up velocities. */
+/** RangeFoundry CSV template with made-up velocities. */
 const template = [
   'string,velocity,velocityUnit,coldBore,excluded',
   'A,2795,fps,yes,',
@@ -116,7 +116,7 @@ test('the example loads into badges, the strings table and a tab per string with
   await loadExample(page)
   expect([await strip.boundingBox(), await print.boundingBox()]).toEqual(before)
 
-  await expect(page.getByText('File: openreloading-example-session.csv')).toBeVisible()
+  await expect(page.getByText('File: rangefoundry-example-session.csv')).toBeVisible()
   await expect(page.getByText('Date: not in the file')).toBeVisible()
   await expect(stats(page).getByRole('row')).toHaveCount(4)
   await expect(
@@ -160,20 +160,20 @@ test('the example loads into badges, the strings table and a tab per string with
     const d = new Date()
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
   })
-  expect(download.suggestedFilename()).toBe(`openreloading-session-${day}.csv`)
+  expect(download.suggestedFilename()).toBe(`rangefoundry-session-${day}.csv`)
   const csv = (await (await download.createReadStream()).toArray()).join('')
   const lines = csv.slice(1).split('\n')
   expect(lines[0]).toBe('String,Shots,Excluded,Mean (m/s),SD (m/s),ES (m/s),Min (m/s),Max (m/s)')
   expect(lines[3]).toBe('String 3: Example C,9,1,872.5,1.6,4.9,870.2,875.1')
 
-  // the same session as OpenReloading JSON, velocities in m/s
+  // the same session as RangeFoundry JSON, velocities in m/s
   const [jsonDownload] = await Promise.all([
     page.waitForEvent('download'),
     (await barButton(page, 'Export JSON')).click(),
   ])
-  expect(jsonDownload.suggestedFilename()).toBe(`openreloading-session-${day}.json`)
+  expect(jsonDownload.suggestedFilename()).toBe(`rangefoundry-session-${day}.json`)
   const json = JSON.parse((await (await jsonDownload.createReadStream()).toArray()).join(''))
-  expect(json.format).toBe('openreloading-session')
+  expect(json.format).toBe('rangefoundry-session')
   expect(csv).not.toMatch(/safe|simulation|notice/i)
 
   await (await barButton(page, 'Print')).click()

@@ -175,6 +175,6 @@ describe('summary CSV', () => {
   it('names the months and the file', () => {
     expect(monthKey('2026', 0)).toBe('2026-01')
     expect(monthKey('2026', 11)).toBe('2026-12')
-    expect(summaryFileName('2026')).toBe('openreloading-shooting-log-2026-summary.csv')
+    expect(summaryFileName('2026')).toBe('rangefoundry-shooting-log-2026-summary.csv')
   })
 })

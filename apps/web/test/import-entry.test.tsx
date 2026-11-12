@@ -333,12 +333,12 @@ it('disables the Import button until the import has a source', () => {
 it('sends the data files of a mixed pick to the data import and the rest to the cards', async () => {
   const file = (name: string, text: string) => ({ file: new File([text], name) })
   const picked = [
-    file('openreloading-data.json', '﻿  {"format": "openreloading-user-data", "records": []}'),
+    file('rangefoundry-data.json', '﻿  {"format": "rangefoundry-user-data", "records": []}'),
     file('bullets.csv', 'Name,Diameter\nAlpha,7.82\nBeta,5.70'),
     file('list.json', '[{"Name": "Alpha", "Diameter": 7.82}]'),
   ]
   const { data, tables } = await splitImport(picked)
-  expect(data.map((p) => p.file.name)).toEqual(['openreloading-data.json'])
+  expect(data.map((p) => p.file.name)).toEqual(['rangefoundry-data.json'])
   expect(tables.map((p) => p.file.name)).toEqual(['bullets.csv', 'list.json'])
 })
 
@@ -418,7 +418,7 @@ it('gives a workbook, a semicolon CSV, a JSON list, a data file and a file over 
   })
   expect(await read(encoded(JSON.stringify(list)))).toMatchObject({ kind: 'bullet', rows: 3 })
   expect(await read(encoded(userDataText([load])))).toEqual({
-    format: 'OpenReloading data',
+    format: 'RangeFoundry data',
     records: 1,
     kinds: { load: 1 },
     warnings: [],

@@ -201,7 +201,7 @@ export function readTable(raw: string): TableRead {
     return (
       tableOfObjects(json) ?? {
         refusal:
-          'The JSON is neither an OpenReloading data file nor a list of objects with the same keys. Export a table instead.',
+          'The JSON is neither a RangeFoundry data file nor a list of objects with the same keys. Export a table instead.',
       }
     )
   }

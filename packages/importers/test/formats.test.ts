@@ -4,10 +4,10 @@ import { type ChronoFormatId, chronoFormats, type WorkbookFormatId } from '../sr
 it('has one entry for each id of ChronoFormatId and WorkbookFormatId, and no other', () => {
   // a Record of the union needs every member and refuses any other: the type check ties these keys to it
   const chrono: Record<ChronoFormatId, true> = {
-    'openreloading-json': true,
+    'rangefoundry-json': true,
     'shotview-csv': true,
     'shotview-xlsx': true,
-    'openreloading-csv': true,
+    'rangefoundry-csv': true,
     delimited: true,
   }
   const workbook: Record<WorkbookFormatId, true> = { 'shotview-xlsx': true }

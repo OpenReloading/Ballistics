@@ -1930,7 +1930,7 @@ export const userDataFile: z.ZodObject<{
 export const userDataFileText: (records: UserRecords, files?: EmbeddedFile[], invalid?: unknown[]) => string;
 
 // @public
-export const userDataFormat = "openreloading-user-data";
+export const userDataFormat = "rangefoundry-user-data";
 
 // @public
 export type UserDataRead = {

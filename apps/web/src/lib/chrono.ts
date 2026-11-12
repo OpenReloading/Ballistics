@@ -31,10 +31,10 @@ export const formats = Object.entries(formatNames)
   .map(([, name]) => name)
   .join(', ')
 
-/** The OpenReloading JSON template: the members the importer reads (velocities in m/s) and two made-up strings. */
+/** The RangeFoundry JSON template: the members the importer reads (velocities in m/s) and two made-up strings. */
 export const templateJson = `${JSON.stringify(
   {
-    format: 'openreloading-session',
+    format: 'rangefoundry-session',
     version: 1,
     date: '2026-03-05',
     device: { kind: 'other', manufacturerName: 'Manufacturer', model: 'Model' },
@@ -54,7 +54,7 @@ export const templateJson = `${JSON.stringify(
   2,
 )}\n`
 
-/** The OpenReloading CSV template: the column names the importer reads and two made-up strings. */
+/** The RangeFoundry CSV template: the column names the importer reads and two made-up strings. */
 export const templateCsv = `${[
   'string,velocity,velocityUnit,coldBore,excluded',
   'A,2795,fps,yes,',
@@ -64,7 +64,7 @@ export const templateCsv = `${[
 ].join('\n')}\n`
 
 /** File name of the example session download. */
-export const exampleSessionFileName = 'openreloading-example-session.csv'
+export const exampleSessionFileName = 'rangefoundry-example-session.csv'
 
 const exampleShots: [string, number[]][] = [
   ['Example A', [2794, 2801, 2788, 2810, 2797, 2805, 2792, 2799, 2803, 2796]],
@@ -184,7 +184,7 @@ export function sessionCsv(data: ChronoImport, unit: Unit): string {
   return `${toCsv(statisticsRows(data, unit))}\n\n${toCsv(shotRows(data, unit))}\n`
 }
 
-/** The JSON download: the session as OpenReloading session JSON, velocities in m/s. */
+/** The JSON download: the session as RangeFoundry session JSON, velocities in m/s. */
 export const sessionJsonBlob = (data: ChronoImport) =>
   new Blob([stringifyOpenReloadingJson(data)], { type: 'application/json' })
 

@@ -116,9 +116,9 @@ export const logCsv = (entries: readonly ShootingLogRecord[], names: LogNames) =
 /** A user data file of the entries, which Import of the File menu reads back. */
 export const logJson = (entries: readonly ShootingLogRecord[]) => userDataText([...entries])
 
-/** The file name of an export: `openreloading-shooting-log-<day>.<ext>`. */
+/** The file name of an export: `rangefoundry-shooting-log-<day>.<ext>`. */
 export const logFileName = (ext: 'csv' | 'json', now = new Date()) =>
-  `openreloading-shooting-log-${localDay(now)}.${ext}`
+  `rangefoundry-shooting-log-${localDay(now)}.${ext}`
 
 /** Empty optional texts are left out before the check, as Save writes them. */
 export function entryProblem(e: ShootingLogEntry): Message | undefined {

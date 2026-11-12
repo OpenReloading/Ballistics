@@ -10,7 +10,7 @@ import { complete } from './complete.ts'
 import { refusal } from './refusal.ts'
 
 const file = {
-  format: 'openreloading-session',
+  format: 'rangefoundry-session',
   version: 1,
   date: '2026-03-05',
   device: { kind: 'doppler-radar', manufacturerName: 'Manufacturer', model: 'Model' },
@@ -102,13 +102,13 @@ const refusals: [string, object, object][] = [
   ],
 ]
 
-describe('OpenReloading session JSON: detection and missing fields', () => {
+describe('RangeFoundry session JSON: detection and missing fields', () => {
   it('is detected before every CSV format and read in m/s', () => {
     expect(isOpenReloadingJson(text)).toBe(true)
-    expect(detectFormat(text)).toBe('openreloading-json')
-    expect(detectFormat(`﻿${text}`)).toBe('openreloading-json')
+    expect(detectFormat(text)).toBe('rangefoundry-json')
+    expect(detectFormat(`﻿${text}`)).toBe('rangefoundry-json')
     const r = parseChrono(text, { fileName: 'session.json' })
-    expect(r?.format).toBe('openreloading-json')
+    expect(r?.format).toBe('rangefoundry-json')
     expect(r?.stringLabels).toEqual(['A', undefined])
     expect(r?.session.strings[0]?.shots).toEqual([
       { velocity: { value: 853.5, raw: '853.5 m/s' }, coldBore: true },
@@ -130,7 +130,7 @@ describe('OpenReloading session JSON: detection and missing fields', () => {
   it('asks for the device and the date only when the file has none', () => {
     const r = parseOpenReloadingJson(
       JSON.stringify({
-        format: 'openreloading-session',
+        format: 'rangefoundry-session',
         version: 1,
         strings: [{ shots: [{ velocity: 800 }] }],
       }),
@@ -142,7 +142,7 @@ describe('OpenReloading session JSON: detection and missing fields', () => {
   })
 })
 
-describe('OpenReloading session JSON: writing, and other JSON', () => {
+describe('RangeFoundry session JSON: writing, and other JSON', () => {
   it('writes what it reads', () => {
     const r = parseOpenReloadingJson(text)
     const again = parseOpenReloadingJson(stringifyOpenReloadingJson(r))
@@ -154,7 +154,7 @@ describe('OpenReloading session JSON: writing, and other JSON', () => {
   it('reads coldBore false as unset and writes only the members the session has', () => {
     const r = parseOpenReloadingJson(
       JSON.stringify({
-        format: 'openreloading-session',
+        format: 'rangefoundry-session',
         version: 1,
         strings: [{ label: '', shots: [{ velocity: 800, coldBore: false }] }],
       }),
@@ -162,7 +162,7 @@ describe('OpenReloading session JSON: writing, and other JSON', () => {
     expect(r.session.strings[0]?.shots[0]).toEqual({ velocity: { value: 800, raw: '800 m/s' } })
     expect(r.stringLabels).toEqual([undefined])
     expect(JSON.parse(stringifyOpenReloadingJson(r))).toEqual({
-      format: 'openreloading-session',
+      format: 'rangefoundry-session',
       version: 1,
       device: { kind: 'other' },
       strings: [{ shots: [{ velocity: 800 }] }],
@@ -176,7 +176,7 @@ describe('OpenReloading session JSON: writing, and other JSON', () => {
   })
 })
 
-describe('OpenReloading session JSON: refused members', () => {
+describe('RangeFoundry session JSON: refused members', () => {
   it.each(refusals)('refuses %s', (_, bad, diagnostic) => {
     expect(refusal(() => parseOpenReloadingJson(JSON.stringify(bad)))).toEqual(diagnostic)
   })

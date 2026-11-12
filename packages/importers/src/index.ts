@@ -115,19 +115,19 @@ const anyRow = (book: Workbook, test: (cells: string[]) => boolean) =>
 
 // the literal list, with each id and what it reads in the type: `detectFormat` and `detectWorkbookFormat` fail to compile on an id that `ChronoFormatId` or `WorkbookFormatId` lacks, formats.test.ts on one they have and the list does not
 const formats: readonly [
-  TextChronoFormat & { id: 'openreloading-json' },
+  TextChronoFormat & { id: 'rangefoundry-json' },
   TextChronoFormat & { id: 'shotview-csv' },
   WorkbookChronoFormat & { id: 'shotview-xlsx' },
-  TextChronoFormat & { id: 'openreloading-csv' },
+  TextChronoFormat & { id: 'rangefoundry-csv' },
   TextChronoFormat & { id: 'delimited' },
 ] = [
   {
-    id: 'openreloading-json',
-    name: 'OpenReloading JSON',
+    id: 'rangefoundry-json',
+    name: 'RangeFoundry JSON',
     reads: 'text',
-    /** True when the text is JSON with `format` `openreloading-session`. */
+    /** True when the text is JSON with `format` `rangefoundry-session`. */
     detect: isOpenReloadingJson,
-    /** Parses an OpenReloading session JSON text; velocities are m/s. */
+    /** Parses a RangeFoundry session JSON text; velocities are m/s. */
     parse: (text: string, options: ParseChronoOptions) =>
       parseOpenReloadingJson(text, withoutFormatOptions(options)),
   },
@@ -152,12 +152,12 @@ const formats: readonly [
       parseShotViewWorkbook(book, { ...withoutFormatOptions(options), date: options.date }),
   },
   {
-    id: 'openreloading-csv',
-    name: 'OpenReloading CSV template',
+    id: 'rangefoundry-csv',
+    name: 'RangeFoundry CSV template',
     reads: 'text',
     /** True when the first row holds known column names with `velocity` among them. */
     detect: isOpenReloadingCsv,
-    /** Parses an OpenReloading CSV template; `device` sets the device. */
+    /** Parses a RangeFoundry CSV template; `device` sets the device. */
     parse: (text: string, options: ParseChronoOptions) =>
       parseOpenReloadingCsv(text, { ...withoutFormatOptions(options), device: options.device }),
   },
@@ -188,10 +188,10 @@ export const chronoFormats: readonly ChronoFormat[] = formats
 
 /** A chronograph format id, one per entry of `chronoFormats`. */
 export type ChronoFormatId =
-  | 'openreloading-json'
+  | 'rangefoundry-json'
   | 'shotview-csv'
   | 'shotview-xlsx'
-  | 'openreloading-csv'
+  | 'rangefoundry-csv'
   | 'delimited'
 
 /** The id of a chronograph format that reads a workbook. */

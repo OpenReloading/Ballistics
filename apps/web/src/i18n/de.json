@@ -784,7 +784,7 @@
   "Tolerance": "Toleranzen",
   "Tolerance, clearance": "Toleranzen, Spiel",
   "Mine": "Meine",
-  "Mine: designs saved in this browser. Rows without a mark are the OpenReloading catalog.": "Meine: In diesem Browser gespeicherte Entwürfe. Zeilen ohne Markierung gehören zum OpenReloading-Katalog.",
+  "Mine: designs saved in this browser. Rows without a mark are the RangeFoundry catalog.": "Meine: In diesem Browser gespeicherte Entwürfe. Zeilen ohne Markierung gehören zum RangeFoundry-Katalog.",
   "Model fit": "Modellanpassung",
   "Model fit table": "Tabelle der Modellanpassung",
   "Model output from fitted M3 parameters, not manufacturer data.": "Modellergebnis aus angepassten M3-Parametern, keine Herstellerdaten.",
@@ -929,7 +929,6 @@
   "Open shot groups": "Schussbilder öffnen",
   "Open the record": "Datensatz öffnen",
   "Open {name} in shot groups": "{name} in den Schussbildern öffnen",
-  "OpenReloading": "OpenReloading",
   "Optic": "Optik",
   "Optic {n}": "Optik {n}",
   "Optional. Absolute station pressure of the zero, not reduced to sea level; empty takes the shot value.": "Optional. Absoluter Luftdruck am Standort beim Einschießen, nicht auf Meereshöhe umgerechnet; leer übernimmt den Wert des Schusses.",
@@ -1051,6 +1050,7 @@
   "Range uncertainty": "Unsicherheit der Entfernung",
   "Range {low} to {high} {unit}, nominal {nominal} {unit}, {name}": "Bereich {low} bis {high} {unit}, nominell {nominal} {unit}, {name}",
   "Range, distance": "Entfernung",
+  "RangeFoundry": "RangeFoundry",
   "Ratio of specific heats": "Verhältnis der spezifischen Wärmen",
   "Read a chronograph file to compare its strings with the simulated velocity per charge.": "Lesen Sie eine Chronograph-Datei ein, um ihre Schussreihen mit der simulierten Geschwindigkeit je Treibladung zu vergleichen.",
   "Read the target as a percentage of the cartridge's CIP Pmax": "Ziel als Prozentsatz des CIP-Pmax der Patrone lesen",
@@ -3072,7 +3072,7 @@
   "{reminder} Export all (Save options) keeps a copy.": "{reminder} Alles exportieren (Speicheroptionen) sichert eine Kopie.",
   "The file is larger than {size} MB.": "Die Datei ist größer als {size} MB.",
   "The file is not JSON.": "Die Datei ist kein JSON.",
-  "The file is not an OpenReloading data file.": "Die Datei ist keine OpenReloading-Datendatei.",
+  "The file is not a RangeFoundry data file.": "Die Datei ist keine RangeFoundry-Datendatei.",
   "{name}: the {field} {target} is not in this browser": "{name}: {field} {target} ist nicht in diesem Browser",
   "Not found: {list}.": "Nicht gefunden: {list}.",
   "{count} save|{count} saves": {
@@ -3536,7 +3536,7 @@
   "The rows have no table of two columns or more.": "Die Zeilen enthalten keine Tabelle mit zwei oder mehr Spalten.",
   "The table has a header but no rows. Add rows or choose another file.": "Die Tabelle hat Spaltenköpfe, aber keine Zeilen. Fügen Sie Zeilen hinzu oder wählen Sie eine andere Datei.",
   "The text looks like JSON but does not parse. Fix the file or export it again.": "Der Text sieht wie JSON aus, lässt sich aber nicht lesen. Korrigieren Sie die Datei oder exportieren Sie sie erneut.",
-  "The JSON is neither an OpenReloading data file nor a list of objects with the same keys. Export a table instead.": "Das JSON ist weder eine OpenReloading-Datendatei noch eine Liste von Objekten mit denselben Schlüsseln. Exportieren Sie stattdessen eine Tabelle.",
+  "The JSON is neither a RangeFoundry data file nor a list of objects with the same keys. Export a table instead.": "Das JSON ist weder eine RangeFoundry-Datendatei noch eine Liste von Objekten mit denselben Schlüsseln. Exportieren Sie stattdessen eine Tabelle.",
   "The text has no table: no row repeats a comma, semicolon or tab as separator. Export the table as CSV.": "Der Text enthält keine Tabelle: Keine Zeile wiederholt ein Komma, Semikolon oder Tabulatorzeichen als Trennzeichen. Exportieren Sie die Tabelle als CSV.",
   "The file is larger than 40 MB. Split it and import the parts.": "Die Datei ist größer als 40 MB. Teilen Sie sie auf und importieren Sie die Teile.",
   "The workbook has no cells with text. Open the right file or paste the table into a sheet.": "Die Arbeitsmappe hat keine Zellen mit Text. Öffnen Sie die richtige Datei oder fügen Sie die Tabelle in ein Blatt ein.",
@@ -4383,5 +4383,7 @@
   "The file is of format unknown; the reader is written for format {expected}. Check every value.": "Das Format der Datei ist unbekannt; der Leser ist für Format {expected} geschrieben. Prüfen Sie jeden Wert.",
   "Entered at the range": "Auf dem Schießstand erfasst",
   "Entered in the target designer": "Im Scheiben-Editor erfasst",
-  "excluded at the range": "auf dem Schießstand ausgeschlossen"
+  "excluded at the range": "auf dem Schießstand ausgeschlossen",
+  "not a RangeFoundry CSV template: the first row must name columns from {columns}, velocity among them": "keine RangeFoundry-CSV-Vorlage: Die erste Zeile muss Spaltennamen aus {columns} enthalten, darunter die Geschwindigkeit",
+  "not a RangeFoundry session JSON file: \"format\" must be \"{format}\"": "keine RangeFoundry-Sitzungs-JSON-Datei: „format“ muss „{format}“ sein"
 }

@@ -56,7 +56,7 @@ describe('parseChrono', () => {
     }
     expect(cases.map(([text]) => parseChrono(text, options)?.format)).toEqual([
       'shotview-csv',
-      'openreloading-csv',
+      'rangefoundry-csv',
     ])
   })
 

@@ -63,7 +63,7 @@ const chronoMessages: Record<ChronoDiagnostic['code'], Message> = {
   severalDays: msg(
     'strings from several days ({dates}); enter the date, or import one day with the date option',
   ),
-  notSessionJson: msg('not an OpenReloading session JSON file: "format" must be "{format}"'),
+  notSessionJson: msg('not a RangeFoundry session JSON file: "format" must be "{format}"'),
   versionUnsupported: msg('version {version} is not supported; expected 1'),
   memberNotPositive: msg('{path}: must be a positive number'),
   memberNotText: msg('{path}: must be text'),
@@ -76,7 +76,7 @@ const chronoMessages: Record<ChronoDiagnostic['code'], Message> = {
   noStringShots: msg('{path}: must list at least one shot'),
   memberNotDate: msg('{path}: must be a date as YYYY-MM-DD'),
   notTemplate: msg(
-    'not an OpenReloading CSV template: the first row must name columns from {columns}, velocity among them',
+    'not a RangeFoundry CSV template: the first row must name columns from {columns}, velocity among them',
   ),
   needsColumnMapping: msg('the delimited format needs a column mapping'),
   readsText: msg('{format} reads text files; this file is a workbook'),

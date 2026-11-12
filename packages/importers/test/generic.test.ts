@@ -427,7 +427,7 @@ describe('parseOpenReloadingCsv', () => {
 
   it('reads the template with labels, cold bore and excluded shots', () => {
     const r = parseOpenReloadingCsv(template, { fileName: 'log.csv' })
-    expect(r.format).toBe('openreloading-csv')
+    expect(r.format).toBe('rangefoundry-csv')
     expect(r.stringLabels).toEqual(['42.0 gr', '42.5 gr'])
     expect(r.session.strings[0]?.shots).toEqual([
       { velocity: { value: 851.916, raw: '2795 fps' }, coldBore: true },

@@ -48,7 +48,7 @@ export type ChronoDiagnostic = ReaderDiagnostic<'sha256Malformed' | 'outsideRang
 export type ChronoFormat = TextChronoFormat | WorkbookChronoFormat;
 
 // @public
-export type ChronoFormatId = 'openreloading-json' | 'shotview-csv' | 'shotview-xlsx' | 'openreloading-csv' | 'delimited';
+export type ChronoFormatId = 'rangefoundry-json' | 'shotview-csv' | 'shotview-xlsx' | 'rangefoundry-csv' | 'delimited';
 
 // @public
 export const chronoFormats: readonly ChronoFormat[];
@@ -349,7 +349,7 @@ export interface SessionCandidate {
 }
 
 // @public
-export const sessionJsonFormat = "openreloading-session";
+export const sessionJsonFormat = "rangefoundry-session";
 
 // @public
 export function stringifyOpenReloadingJson(data: ChronoImport): string;

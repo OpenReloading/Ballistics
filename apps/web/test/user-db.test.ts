@@ -41,7 +41,7 @@ it('refuses a database of a pre-release version, which deleteDatabase removes', 
   const fired: string[] = []
   vi.stubGlobal('dispatchEvent', (e: Event) => fired.push(e.type))
   await new Promise<void>((resolve, reject) => {
-    const r = indexedDB.open('openreloading-user-data', 2)
+    const r = indexedDB.open('rangefoundry-user-data', 2)
     r.onupgradeneeded = () => r.result.createObjectStore('records', { keyPath: 'id' })
     r.onsuccess = () => {
       r.result.close()
