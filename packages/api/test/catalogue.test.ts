@@ -3,12 +3,13 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import {
   buildCatalogue,
+  cartridgeItem,
   catalogueFormat,
   deriveVersion,
   openCatalogue,
 } from '@open-reloading/use-cases/catalog'
 import { describe, expect, it } from 'vitest'
-import { cartridgeItem, contentHash, revisionOf } from '../../use-cases/src/catalog/derive.ts'
+import { contentHash, revisionOf } from '../../use-cases/src/catalog/derive.ts'
 import { loadCatalogue, writeCatalogue } from '../src/catalogue/node.ts'
 import { defined } from './defined.ts'
 import { bundle } from './fixtures.ts'
