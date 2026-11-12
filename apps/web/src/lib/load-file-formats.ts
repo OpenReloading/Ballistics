@@ -28,7 +28,7 @@ const utf8 = (bytes: Uint8Array) => new TextDecoder().decode(bytes)
 /** The user data file comes first and also reads every file no entry claims, so its reasons name what is wrong. */
 export const loadFileFormats: LoadFileFormat[] = [
   {
-    name: 'OpenReloading data',
+    name: 'RangeFoundry data',
     accept: { 'application/json': ['.json'] },
     detect: (bytes) => {
       const text = utf8(bytes)

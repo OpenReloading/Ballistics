@@ -112,7 +112,7 @@ export function SessionSummary() {
                 read &&
                 download(
                   sessionJsonBlob(read.data),
-                  `openreloading-session-${localDay(new Date())}.json`,
+                  `rangefoundry-session-${localDay(new Date())}.json`,
                 )
               }
             >
@@ -125,7 +125,7 @@ export function SessionSummary() {
                 read &&
                 download(
                   sessionCsvBlob(read.data, v),
-                  `openreloading-session-${localDay(new Date())}.csv`,
+                  `rangefoundry-session-${localDay(new Date())}.csv`,
                 )
               }
             >

@@ -189,7 +189,7 @@ describe('export', () => {
 
   it('names the files after the day', () => {
     expect(logFileName('csv', new Date(2026, 9, 12, 12))).toBe(
-      'openreloading-shooting-log-2026-10-12.csv',
+      'rangefoundry-shooting-log-2026-10-12.csv',
     )
   })
 })

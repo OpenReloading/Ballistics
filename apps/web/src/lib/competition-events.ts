@@ -269,9 +269,9 @@ export const eventsCsv = (
 /** A user data file of the events, which Import JSON and the File menu read back. */
 export const eventsJson = (events: readonly EventRecord[]) => userDataText([...events])
 
-/** The file name of an export: `openreloading-events-<day>.<ext>`. */
+/** The file name of an export: `rangefoundry-events-<day>.<ext>`. */
 export const eventsFileName = (ext: 'csv' | 'json', now = new Date()) =>
-  `openreloading-events-${localDay(now)}.${ext}`
+  `rangefoundry-events-${localDay(now)}.${ext}`
 
 /** The ring values typed in one field ("10 9 10.5" or "10;9"), undefined while one is no number. */
 export function parseShots(text: string): number[] | undefined {

@@ -3,7 +3,7 @@ import {
   decodeText,
   parseChrono,
   parseDelimited,
-  parseOpenReloadingCsv,
+  parseRangeFoundryCsv,
   parseShotView,
   parseShotViewWorkbook,
   type Workbook,
@@ -46,7 +46,7 @@ describe('parseChrono', () => {
   it('dispatches each detected text format to its parser', () => {
     const cases = [
       [shotViewEnglish, parseShotView],
-      [template, parseOpenReloadingCsv],
+      [template, parseRangeFoundryCsv],
     ] as const
     for (const [text, parse] of cases) {
       const r = parseChrono(text, options)
@@ -56,7 +56,7 @@ describe('parseChrono', () => {
     }
     expect(cases.map(([text]) => parseChrono(text, options)?.format)).toEqual([
       'shotview-csv',
-      'openreloading-csv',
+      'rangefoundry-csv',
     ])
   })
 

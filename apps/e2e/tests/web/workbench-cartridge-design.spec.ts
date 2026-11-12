@@ -98,7 +98,7 @@ test('a load saved on a design keeps the design by reference and reopens with it
   const stored = () =>
     page.evaluate(async () => {
       const db: IDBDatabase = await new Promise((ok, no) => {
-        const r = indexedDB.open('openreloading-user-data')
+        const r = indexedDB.open('rangefoundry-user-data')
         r.onsuccess = () => ok(r.result)
         r.onerror = () => no(r.error)
       })

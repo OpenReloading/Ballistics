@@ -38,7 +38,7 @@ Saving an event with a firearm that has a round count asks once whether to add t
 With an event open, Print, Export CSV and Export JSON take that event; with none open, the list of events.
 
 - **Print** of an open event gives its facts, one line per series or stage with its total or points and hit factor, and the event total.
-- **Export CSV** writes `openreloading-events-<day>.csv`, UTF-8 with a byte order mark, one row per series or stage (an event without results has one row), the event's columns repeated on each:
+- **Export CSV** writes `rangefoundry-events-<day>.csv`, UTF-8 with a byte order mark, one row per series or stage (an event without results has one row), the event's columns repeated on each:
 
 | Column                               | Content                                                                 |
 | ------------------------------------ | ----------------------------------------------------------------------- |
@@ -63,4 +63,4 @@ With an event open, Print, Export CSV and Export JSON take that event; with none
 
 A text a spreadsheet would read as a formula starts with an apostrophe.
 
-- **Export JSON** writes `openreloading-events-<day>.json`, a user data file with the events. **Import JSON** reads it back: new events are added, equal ones left, and events that differ from the browser's are replaced after one question. The firearms, loads and target sheets the events name are not in the file.
+- **Export JSON** writes `rangefoundry-events-<day>.json`, a user data file with the events. **Import JSON** reads it back: new events are added, equal ones left, and events that differ from the browser's are replaced after one question. The firearms, loads and target sheets the events name are not in the file.
