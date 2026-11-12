@@ -18,17 +18,20 @@ import {
   type TableColumnMap,
   type TableKind,
   tableKinds,
-  tierFloors,
 } from '@open-reloading/importers'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import { fixedNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { localDay } from '../lib/dates.ts'
 import { errorText } from '../lib/error-text.ts'
 import { pickFiles, tableFormats } from '../lib/file-access.ts'
-import { tableReasonText } from '../lib/import-diagnostics.ts'
+import {
+  kindLabels,
+  kindRefusalText,
+  tableReadText,
+  tableReasonText,
+} from '../lib/import-diagnostics.ts'
 import {
   type BuildView,
   type CardView,
@@ -63,11 +66,6 @@ export interface Entry {
   failure?: string | undefined
 }
 
-const kindLabels: Record<TableKind, Message> = {
-  bullet: msg('bullets'),
-  powder: msg('powders'),
-  cartridge: msg('cartridges'),
-}
 const tierLabels = {
   high: msg('tier\u0004high'),
   medium: msg('tier\u0004medium'),
@@ -98,17 +96,6 @@ export const folded = (e: Entry) =>
   e.card.tier === 'high' &&
   e.kind === e.card.kind
 
-/** The refusal of a table no kind reaches, with the scores and the floor. */
-function noKindText(c: Extract<CardView, { header: string[] }>, t: Translator['t']) {
-  const scores = c.scores
-    .map((s) => `${t(kindLabels[s.kind])} ${fixedNumber(s.score, 2)}`)
-    .join(', ')
-  return t(
-    'No column matches a bullet, powder or cartridge field ({scores}; the floor is {floor}). Pick the kind by hand, or export a table with headers such as Name, Diameter, Weight.',
-    { scores, floor: fixedNumber(tierFloors.low, 2) },
-  )
-}
-
 const label = (text: string, t: Translator['t']) => translateMessage(text, t)
 
 /** The Import entry's status line: how many files are read and the reason of each refused one. */
@@ -120,7 +107,7 @@ export function readStatus(files: Entry[], t: Translator['t']) {
     const reason = e.failure
       ? label(e.failure, t)
       : c && 'refusal' in c
-        ? label(c.refusal, t)
+        ? tableReadText(c.refusal, t)
         : c && 'header' in c && !e.kind
           ? verdict(e, t).text
           : undefined
@@ -293,8 +280,8 @@ function ReadNote({ c }: { c: Exclude<CardView, { header: string[] }> }) {
       <>
         <Text size="sm" c="var(--error-text)" className="import-refusal">
           {c.format === undefined
-            ? label(c.refusal, t)
-            : t('{format}: {reason}', { format: c.format, reason: label(c.refusal, t) })}
+            ? tableReadText(c.refusal, t)
+            : t('{format}: {reason}', { format: c.format, reason: tableReadText(c.refusal, t) })}
         </Text>
         {c.detail && (
           <Text size="xs">
@@ -419,9 +406,9 @@ export function FileCard({
           </Text>
         )}
         {c && !('header' in c) && <ReadNote c={c} />}
-        {table && !e.kind && (
+        {table?.noKind && !e.kind && (
           <Text size="sm" c="var(--error-text)">
-            {noKindText(table, t)}
+            {kindRefusalText(table.noKind, t)}
           </Text>
         )}
         {table && e.mapping && (

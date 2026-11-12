@@ -5,10 +5,8 @@ import {
   loadFileExample,
   trajectoryExample,
 } from '@open-reloading/use-cases'
+import { buildCatalogue, openCatalogue, sha256 } from '@open-reloading/use-cases/catalog'
 import { describe, expect, it } from 'vitest'
-import { buildCatalogue } from '../src/catalogue/build.ts'
-import { openCatalogue } from '../src/catalogue/open.ts'
-import { sha256 } from '../src/hash.ts'
 import { API_PREFIX, API_VERSION } from '../src/version.ts'
 import { bundle } from './fixtures.ts'
 import { testCatalogue, withApi } from './setup.ts'

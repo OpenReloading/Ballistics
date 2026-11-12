@@ -46,6 +46,7 @@ export { idOfKey } from './record-ids.ts'
 export type {
   BuiltEntry,
   BuiltRecords,
+  KindDiagnostic,
   KindScore,
   KindSuggestion,
   RowCounts,
@@ -57,7 +58,7 @@ export type {
 export { autoMap, buildRecords, suggestKind, tierFloors } from './records.ts'
 export type { ChronoImport, ChronoParserOptions, SessionCandidate } from './result.ts'
 export { parseShotView, parseShotViewWorkbook } from './shotview.ts'
-export type { Table, TableRead } from './tables.ts'
+export type { Table, TableRead, TableReadDiagnostic } from './tables.ts'
 export { readTable, tableOfRows } from './tables.ts'
 export type { TemplateOptions } from './template.ts'
 export { parseRangeFoundryCsv } from './template.ts'

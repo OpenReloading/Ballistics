@@ -1,6 +1,12 @@
 /** The worker gives fields as column labels (`labelled` in `import-entry.ts`), so this module carries no importer code. */
-import type { TableDiagnostic } from '@open-reloading/importers'
+import type {
+  KindDiagnostic,
+  TableDiagnostic,
+  TableKind,
+  TableReadDiagnostic,
+} from '@open-reloading/importers'
 import type { Diagnostic } from '@open-reloading/statistics'
+import { fixedNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { translateMessage } from './core-messages.ts'
 
@@ -47,12 +53,52 @@ function shown(name: string, v: string | number | readonly string[], t: Translat
   return name === 'reason' ? translateMessage(v, t) : v
 }
 
+const shownParams = (params: TableDiagnostic['params'], t: Translator['t']) =>
+  Object.fromEntries(Object.entries(params).map(([k, v]) => [k, shown(k, v, t)]))
+
 /** Why a table row is rejected or warned, in the language of `t`. */
 export const tableReasonText = (
   d: TableDiagnostic | InvalidRecordDiagnostic,
   t: Translator['t'],
-): string =>
-  t(
-    tableMessages[d.code],
-    Object.fromEntries(Object.entries(d.params).map(([k, v]) => [k, shown(k, v, t)])),
+): string => t(tableMessages[d.code], shownParams(d.params, t))
+
+const tableReadMessages: Record<TableReadDiagnostic['code'], Message> = {
+  noTwoColumns: msg('The rows have no table of two columns or more.'),
+  tooManyColumns: msg(
+    'The table has more than {max} columns. Remove the extra columns or choose another file.',
+  ),
+  tooManyCells: msg('The table has more than {max} cells. Split it into smaller files.'),
+  headerOnly: msg('The table has a header but no rows. Add rows or choose another file.'),
+  jsonMalformed: msg(
+    'The text looks like JSON but does not parse. Fix the file or export it again.',
+  ),
+  jsonNotTable: msg(
+    'The JSON is neither a RangeFoundry data file nor a list of objects with the same keys. Export a table instead.',
+  ),
+  noDelimiter: msg(
+    'The text has no table: no row repeats a comma, semicolon or tab as separator. Export the table as CSV.',
+  ),
+}
+
+/** Why a file holds no table, in the language of `t`; a refusal the app wrote itself is English text. */
+export const tableReadText = (r: TableReadDiagnostic | string, t: Translator['t']): string =>
+  typeof r === 'string'
+    ? translateMessage(r, t)
+    : t(tableReadMessages[r.code], shownParams(r.params, t))
+
+export const kindLabels: Record<TableKind, Message> = {
+  bullet: msg('bullets'),
+  powder: msg('powders'),
+  cartridge: msg('cartridges'),
+}
+
+/** Why no kind is suggested for a table, with the scores and the floor, in the language of `t`. */
+export function kindRefusalText({ params }: KindDiagnostic, t: Translator['t']): string {
+  const scores = params.scores
+    .map((s) => `${t(kindLabels[s.kind])} ${fixedNumber(s.score, 2)}`)
+    .join(', ')
+  return t(
+    'No column matches a bullet, powder or cartridge field ({scores}; the floor is {floor}). Pick the kind by hand, or export a table with headers such as Name, Diameter, Weight.',
+    { scores, floor: fixedNumber(params.floor, 2) },
   )
+}

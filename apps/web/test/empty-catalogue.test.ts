@@ -1,4 +1,4 @@
-import { buildCatalogue, type CatalogueIndex } from '@open-reloading/api/catalogue'
+import { buildCatalogue, type CatalogueIndex } from '@open-reloading/use-cases/catalog'
 import { expect, it, vi } from 'vitest'
 
 vi.mock('react', async (original) => ({

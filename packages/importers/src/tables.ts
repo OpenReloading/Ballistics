@@ -1,5 +1,6 @@
 // Tables out of delimited text, JSON lists and worksheet rows: cell text, the header row, numbers in either decimal mark.
 
+import type { ReaderDiagnostic } from './diagnostics.ts'
 import { maxCells, maxColumn } from './limits.ts'
 
 /** A table of cell text: the header and the data rows. */
@@ -11,8 +12,27 @@ export interface Table {
   rows: string[][]
 }
 
-/** A table, or the refusal text that says why the input is none. */
-export type TableRead = { table: Table } | { refusal: string }
+/**
+ * Why a text or rows are no table: below two columns, more than `max` columns or cells, a header
+ * without rows, JSON that does not parse or is no list of objects, or no delimiter. The app words it.
+ */
+export type TableReadDiagnostic = ReaderDiagnostic<
+  | 'noTwoColumns'
+  | 'tooManyColumns'
+  | 'tooManyCells'
+  | 'headerOnly'
+  | 'jsonMalformed'
+  | 'jsonNotTable'
+  | 'noDelimiter'
+>
+
+/** A table, or the refusal that says why the input is none. */
+export type TableRead = { table: Table } | { refusal: TableReadDiagnostic }
+
+const refused = (
+  code: TableReadDiagnostic['code'],
+  params: TableReadDiagnostic['params'] = {},
+): TableRead => ({ refusal: { code, params } })
 
 type TableDelimiter = ',' | ';' | '\t'
 
@@ -118,19 +138,9 @@ function columnLetters(i: number): string {
 
 /** The refusal of a table of `width` columns and `rows` rows beyond the size the readers take. */
 function tooLarge(width: number, rows: number): TableRead | undefined {
-  if (width > maxColumn)
-    return {
-      refusal: `The table has more than ${maxColumn} columns. Remove the extra columns or choose another file.`,
-    }
-  if (width * rows > maxCells)
-    return {
-      refusal: `The table has more than ${maxCells} cells. Split it into smaller files.`,
-    }
+  if (width > maxColumn) return refused('tooManyColumns', { max: maxColumn })
+  if (width * rows > maxCells) return refused('tooManyCells', { max: maxCells })
   return undefined
-}
-
-const headerOnly: TableRead = {
-  refusal: 'The table has a header but no rows. Add rows or choose another file.',
 }
 
 /**
@@ -139,9 +149,9 @@ const headerOnly: TableRead = {
  */
 export function tableOfRows(raw: string[][]): TableRead {
   const width = raw.reduce((m, r) => Math.max(m, r.length), 0)
-  if (width < 2) return { refusal: 'The rows have no table of two columns or more.' }
-  const refused = tooLarge(width, raw.length)
-  if (refused) return refused
+  if (width < 2) return refused('noTwoColumns')
+  const large = tooLarge(width, raw.length)
+  if (large) return large
   const padded = raw.map((r) => Array.from({ length: width }, (_, i) => (r[i] ?? '').trim()))
   const first = padded[0] ?? []
   const filled = first.filter((c) => c !== '')
@@ -151,7 +161,7 @@ export function tableOfRows(raw: string[][]): TableRead {
     ? first.map((c, i) => c || `Column ${columnLetters(i)}`)
     : first.map((_, i) => `Column ${columnLetters(i)}`)
   const rows = hasHeader ? padded.slice(1) : padded
-  return rows.length === 0 ? headerOnly : { table: { header, hasHeader, rows } }
+  return rows.length === 0 ? refused('headerOnly') : { table: { header, hasHeader, rows } }
 }
 
 /** The text of a JSON value in a cell: empty for none, JSON for an object or a list, else its text. */
@@ -170,8 +180,8 @@ function tableOfObjects(list: unknown): TableRead | undefined {
   if (objects.length === 0 || objects.length !== list.length) return undefined
   const keys = [...new Set(objects.flatMap((o) => Object.keys(o)))]
   if (keys.length < 2) return undefined
-  const refused = tooLarge(keys.length, objects.length)
-  if (refused) return refused
+  const large = tooLarge(keys.length, objects.length)
+  if (large) return large
   return {
     table: {
       header: keys,
@@ -185,7 +195,7 @@ function tableOfObjects(list: unknown): TableRead | undefined {
 
 /**
  * The table of a text: a JSON list of objects, or delimited text (comma, semicolon or tab) with
- * two or more rows of equal width. Otherwise the refusal names the cause and one action.
+ * two or more rows of equal width. Otherwise the refusal's code names the cause.
  */
 export function readTable(raw: string): TableRead {
   const text = raw.replace(/^\uFEFF/, '')
@@ -194,24 +204,12 @@ export function readTable(raw: string): TableRead {
     try {
       json = JSON.parse(text)
     } catch {
-      return {
-        refusal: 'The text looks like JSON but does not parse. Fix the file or export it again.',
-      }
+      return refused('jsonMalformed')
     }
-    return (
-      tableOfObjects(json) ?? {
-        refusal:
-          'The JSON is neither a RangeFoundry data file nor a list of objects with the same keys. Export a table instead.',
-      }
-    )
+    return tableOfObjects(json) ?? refused('jsonNotTable')
   }
   const delimiter = detectDelimiter(text)
-  if (!delimiter) {
-    return {
-      refusal:
-        'The text has no table: no row repeats a comma, semicolon or tab as separator. Export the table as CSV.',
-    }
-  }
+  if (!delimiter) return refused('noDelimiter')
   return tableOfRows(splitRows(text, delimiter))
 }
 

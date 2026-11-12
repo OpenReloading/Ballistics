@@ -1,13 +1,14 @@
 import { bulletWindow } from '@open-reloading/ballistics'
 import { canonicalJson } from '@open-reloading/schema'
-import { sha256 } from '../hash.ts'
 import { revisionOf } from './derive.ts'
+import { sha256 } from './hash.ts'
 import { select } from './list.ts'
 import {
   type Catalogue,
   type CatalogueData,
   type Catalogued,
   type CatalogueHeader,
+  type CatalogueIndex,
   type CatalogueKind,
   catalogueFormat,
   deriveVersion,
@@ -22,6 +23,83 @@ function checkHeader(what: string, file: Partial<CatalogueHeader>) {
     throw new Error(
       `catalogue ${what} derive version ${file.derive} is not ${deriveVersion}: rebuild it`,
     )
+}
+
+/** The bullet list: a `cartridge` filter keeps the diameters of its bullet window (`bulletWindow`). */
+function bulletList(index: CatalogueIndex): Catalogue['bullets'] {
+  const cartridgeItems = new Map(index.cartridges.map((r) => [r.item.id, r.item]))
+  return ({ manufacturer, cartridge, ...paging } = {}) => {
+    let window: ReturnType<typeof bulletWindow> | undefined
+    if (cartridge) {
+      const c = cartridgeItems.get(cartridge)
+      const { maxBulletDiameter: g1, boreDiameter: land, grooveDiameter: groove } = c ?? {}
+      if (g1 === undefined || land === undefined || groove === undefined)
+        return { total: 0, items: [] }
+      window = bulletWindow({ g1, land, groove })
+    }
+    return select(
+      index.bullets,
+      paging,
+      (b) =>
+        (!manufacturer || b.manufacturer === manufacturer) &&
+        (window === undefined ||
+          (b.diameter !== null && b.diameter > window.above && b.diameter <= window.upTo)),
+    )
+  }
+}
+
+/** The lists of cartridges and components, with their filters. */
+function componentLists(
+  index: CatalogueIndex,
+): Pick<Catalogue, 'cartridges' | 'manufacturers' | 'powders' | 'primers' | 'bullets' | 'cases'> {
+  return {
+    cartridges: ({ table, ...paging } = {}) =>
+      select(index.cartridges, paging, (c) => !table || c.table === table),
+    manufacturers: () => select(index.manufacturers, {}),
+    powders: ({ manufacturer, ...paging } = {}) =>
+      select(index.powders, paging, (p) => !manufacturer || p.manufacturer === manufacturer),
+    primers: ({ manufacturer, size, compound, ...paging } = {}) =>
+      select(
+        index.primers,
+        paging,
+        (p) =>
+          (!manufacturer || p.manufacturer === manufacturer) &&
+          (!size || p.size === size) &&
+          (!compound || p.compound === compound),
+      ),
+    bullets: bulletList(index),
+    cases: ({ manufacturer, cartridge, ...paging } = {}) =>
+      select(
+        index.cases,
+        paging,
+        (c) =>
+          (!manufacturer || c.manufacturer === manufacturer) &&
+          (!cartridge || c.cartridge === cartridge),
+      ),
+  }
+}
+
+/** The lists of the competition records, with their filters. */
+function competitionLists(
+  index: CatalogueIndex,
+): Pick<
+  Catalogue,
+  'targetFaces' | 'federations' | 'disciplines' | 'targetMappings' | 'caliberClasses' | 'eventTypes'
+> {
+  return {
+    targetFaces: () => select(index.targetFaces, {}),
+    federations: () => select(index.federations, {}),
+    disciplines: ({ federation } = {}) =>
+      select(index.disciplines, {}, (d) => !federation || d.federation === federation),
+    targetMappings: ({ discipline, face } = {}) =>
+      select(
+        index.targetMappings,
+        {},
+        (m) => (!discipline || m.discipline === discipline) && (!face || m.face === face),
+      ),
+    caliberClasses: () => select(index.caliberClasses, {}),
+    eventTypes: () => select(index.eventTypes, {}),
+  }
 }
 
 /**
@@ -43,63 +121,13 @@ export function openCatalogue({ index, records }: CatalogueData): Catalogue {
     const byId = load()[kind] as Record<string, object>
     const record = Object.hasOwn(byId, id) ? byId[id] : undefined
     if (record === undefined) return undefined
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- a stored record of `kind` with the fields every answer adds
     return { ...record, kind, origin: 'catalogue', revision: revisionOf(record) } as Catalogued<K>
   }
   let dataHash: Promise<string> | undefined
-  const cartridgeItems = new Map(index.cartridges.map((r) => [r.item.id, r.item]))
   return {
-    cartridges: ({ table, ...paging } = {}) =>
-      select(index.cartridges, paging, (c) => !table || c.table === table),
-    manufacturers: () => select(index.manufacturers, {}),
-    powders: ({ manufacturer, ...paging } = {}) =>
-      select(index.powders, paging, (p) => !manufacturer || p.manufacturer === manufacturer),
-    primers: ({ manufacturer, size, compound, ...paging } = {}) =>
-      select(
-        index.primers,
-        paging,
-        (p) =>
-          (!manufacturer || p.manufacturer === manufacturer) &&
-          (!size || p.size === size) &&
-          (!compound || p.compound === compound),
-      ),
-    bullets: ({ manufacturer, cartridge, ...paging } = {}) => {
-      let window: ReturnType<typeof bulletWindow> | undefined
-      if (cartridge) {
-        const c = cartridgeItems.get(cartridge)
-        const { maxBulletDiameter: g1, boreDiameter: land, grooveDiameter: groove } = c ?? {}
-        if (g1 === undefined || land === undefined || groove === undefined)
-          return { total: 0, items: [] }
-        window = bulletWindow({ g1, land, groove })
-      }
-      return select(
-        index.bullets,
-        paging,
-        (b) =>
-          (!manufacturer || b.manufacturer === manufacturer) &&
-          (window === undefined ||
-            (b.diameter !== null && b.diameter > window.above && b.diameter <= window.upTo)),
-      )
-    },
-    cases: ({ manufacturer, cartridge, ...paging } = {}) =>
-      select(
-        index.cases,
-        paging,
-        (c) =>
-          (!manufacturer || c.manufacturer === manufacturer) &&
-          (!cartridge || c.cartridge === cartridge),
-      ),
-    targetFaces: () => select(index.targetFaces, {}),
-    federations: () => select(index.federations, {}),
-    disciplines: ({ federation } = {}) =>
-      select(index.disciplines, {}, (d) => !federation || d.federation === federation),
-    targetMappings: ({ discipline, face } = {}) =>
-      select(
-        index.targetMappings,
-        {},
-        (m) => (!discipline || m.discipline === discipline) && (!face || m.face === face),
-      ),
-    caliberClasses: () => select(index.caliberClasses, {}),
-    eventTypes: () => select(index.eventTypes, {}),
+    ...componentLists(index),
+    ...competitionLists(index),
     get,
     capacities: (cartridge) => {
       const ids = Object.hasOwn(index.capacities, cartridge)

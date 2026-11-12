@@ -8,6 +8,7 @@ import {
   type DisciplineKey,
   type Manufacturer,
   parseRef,
+  type TargetMapping,
 } from '@open-reloading/schema'
 import {
   bulletRow,
@@ -26,6 +27,7 @@ import {
 } from './derive.ts'
 import {
   type CatalogueData,
+  type CatalogueIndex,
   type CatalogueSource,
   catalogueFormat,
   deriveVersion,
@@ -46,11 +48,10 @@ function ordered<T extends { id: string }, R>(
   compare: (a: R, b: R) => number,
   id: (record: R) => string,
 ) {
-  const rows = new Map(records.map((r) => [r, row(r)]))
   return records
     .toSorted((a, b) => compareKeys(id(a), id(b)))
-    .sort(compare)
-    .map((r) => rows.get(r) as IndexRow<T>)
+    .toSorted(compare)
+    .map((r) => row(r))
 }
 
 const refId = (reference: string) => parseRef(reference)?.id ?? reference
@@ -62,13 +63,20 @@ function maker(manufacturers: Map<string, Manufacturer>, c: { id: string; manufa
   return m
 }
 
-/**
- * The index and the record file of `source`, every list in its default order. Pure: the same
- * records give the same output in Node and in the browser. The record file holds the records
- * without `kind`, `origin` and `revision`.
- */
-export function buildCatalogue(source: CatalogueSource): CatalogueData & { records: RecordFile } {
-  const manufacturers = new Map(source.manufacturers.map((m) => [m.id, m]))
+/** What the mapping order reads of a mapping. */
+const mappingKey = (disciplines: Map<string, Discipline>, m: TargetMapping) => ({
+  id: m.id,
+  face: m.face,
+  discipline: disciplineKey(disciplineOf(disciplines, m)),
+})
+
+/** The index lists of the competition records, each in its default order. */
+function competitionRows(
+  source: CatalogueSource,
+): Pick<
+  CatalogueIndex,
+  'targetFaces' | 'federations' | 'disciplines' | 'targetMappings' | 'caliberClasses'
+> {
   const federations = new Map(source.federations.map((f) => [f.id, f]))
   const mappedFaces = new Map<string, Discipline[]>()
   const disciplines = new Map(source.disciplines.map((d) => [d.id, d]))
@@ -77,6 +85,69 @@ export function buildCatalogue(source: CatalogueSource): CatalogueData & { recor
     const face = m.face
     mappedFaces.set(face, [...(mappedFaces.get(face) ?? []), d])
   }
+  return {
+    targetFaces: ordered(
+      source.targetFaces,
+      (f) =>
+        targetFaceRow(
+          f,
+          mappedFaces.get(f.id) ?? [],
+          f.federation ? federations.get(f.federation) : undefined,
+        ),
+      compareTargetFaces,
+      (f) => f.id,
+    ),
+    federations: ordered(source.federations, federationRow, compareFederations, (f) => f.id),
+    disciplines: ordered(
+      source.disciplines,
+      disciplineRow,
+      (a, b) => compareDisciplines(disciplineKey(a), disciplineKey(b)),
+      (d) => d.id,
+    ),
+    targetMappings: ordered(
+      source.targetMappings,
+      targetMappingRow,
+      (a, b) => compareMappings(mappingKey(disciplines, a), mappingKey(disciplines, b)),
+      (m) => m.id,
+    ),
+    caliberClasses: ordered(
+      source.caliberClasses,
+      caliberClassRow,
+      (a, b) => a.diameter.value - b.diameter.value,
+      (c) => c.id,
+    ),
+  }
+}
+
+/** The record file: every record by id, a case and a capacity without `origin`. */
+function recordFile(source: CatalogueSource): RecordFile {
+  return {
+    format: catalogueFormat,
+    derive: deriveVersion,
+    cartridge: byId(source.cartridges),
+    manufacturer: byId(source.manufacturers),
+    powder: byId(source.powders),
+    primer: byId(source.primers),
+    bullet: byId(source.bullets),
+    case: byId(source.cases.map(({ origin, ...rest }) => rest)),
+    caseCapacity: byId(source.capacities.map(({ origin, ...rest }) => rest)),
+    targetFace: byId(source.targetFaces),
+    federation: byId(source.federations),
+    discipline: byId(source.disciplines),
+    targetMapping: byId(source.targetMappings),
+    caliberClass: byId(source.caliberClasses),
+    eventType: byId(source.eventTypes ?? []),
+  }
+}
+
+/**
+ * The index and the record file of `source`, every list in its default order. Pure: the same
+ * records give the same output in Node and in the browser. The record file holds the records
+ * without `kind`, `origin` and `revision`.
+ */
+export function buildCatalogue(source: CatalogueSource): CatalogueData & { records: RecordFile } {
+  const manufacturers = new Map(source.manufacturers.map((m) => [m.id, m]))
+  const competition = competitionRows(source)
   const capacities = new Map<string, string[]>()
   for (const c of source.capacities.toSorted((a, b) => compareKeys(a.id, b.id))) {
     const cartridge = refId(c.cartridge)
@@ -101,68 +172,11 @@ export function buildCatalogue(source: CatalogueSource): CatalogueData & { recor
           ),
         ),
       ),
-      targetFaces: ordered(
-        source.targetFaces,
-        (f) =>
-          targetFaceRow(
-            f,
-            mappedFaces.get(f.id) ?? [],
-            f.federation ? federations.get(f.federation) : undefined,
-          ),
-        compareTargetFaces,
-        (f) => f.id,
-      ),
-      federations: ordered(source.federations, federationRow, compareFederations, (f) => f.id),
-      disciplines: ordered(
-        source.disciplines,
-        disciplineRow,
-        (a, b) => compareDisciplines(disciplineKey(a), disciplineKey(b)),
-        (d) => d.id,
-      ),
-      targetMappings: ordered(
-        source.targetMappings,
-        targetMappingRow,
-        (a, b) =>
-          compareMappings(
-            {
-              id: a.id,
-              face: a.face,
-              discipline: disciplineKey(disciplineOf(disciplines, a)),
-            },
-            {
-              id: b.id,
-              face: b.face,
-              discipline: disciplineKey(disciplineOf(disciplines, b)),
-            },
-          ),
-        (m) => m.id,
-      ),
-      caliberClasses: ordered(
-        source.caliberClasses,
-        caliberClassRow,
-        (a, b) => a.diameter.value - b.diameter.value,
-        (c) => c.id,
-      ),
+      ...competition,
       eventTypes: byKey((source.eventTypes ?? []).map(eventTypeRow)),
       capacities: Object.fromEntries(capacities),
     },
-    records: {
-      format: catalogueFormat,
-      derive: deriveVersion,
-      cartridge: byId(source.cartridges),
-      manufacturer: byId(source.manufacturers),
-      powder: byId(source.powders),
-      primer: byId(source.primers),
-      bullet: byId(source.bullets),
-      case: byId(source.cases.map(({ origin, ...rest }) => rest)),
-      caseCapacity: byId(source.capacities.map(({ origin, ...rest }) => rest)),
-      targetFace: byId(source.targetFaces),
-      federation: byId(source.federations),
-      discipline: byId(source.disciplines),
-      targetMapping: byId(source.targetMappings),
-      caliberClass: byId(source.caliberClasses),
-      eventType: byId(source.eventTypes ?? []),
-    },
+    records: recordFile(source),
   }
 }
 

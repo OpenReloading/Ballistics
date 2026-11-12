@@ -1,0 +1,358 @@
+{
+  "files": [
+    {
+      "data": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
+      "id": "photo-1",
+      "type": "image/png"
+    }
+  ],
+  "format": "rangefoundry-user-data",
+  "records": [
+    {
+      "data": {
+        "origin": "user"
+      },
+      "id": "00000000-0000-4000-8000-000000000001",
+      "kind": "manufacturer",
+      "name": "Büchsenmacher Müller",
+      "saved": "2026-10-13T10:00:00.000Z"
+    },
+    {
+      "data": {
+        "basedOn": "catalogue:alpha-30425",
+        "basedOnRevision": "r1",
+        "manufacturer": "user:00000000-0000-4000-8000-000000000001",
+        "origin": "user",
+        "overrides": {
+          "base": {
+            "angle": null
+          },
+          "diameter": {
+            "value": 7.82
+          },
+          "mass": {
+            "value": 10.886
+          }
+        }
+      },
+      "id": "00000000-0000-4000-8000-000000000002",
+      "kind": "bullet",
+      "name": "168 gr boat tail",
+      "saved": "2026-10-13T10:00:00.000Z"
+    },
+    {
+      "data": {
+        "origin": "user",
+        "overrides": {
+          "table": "I",
+          "values": [
+            {
+              "quantity": "length",
+              "side": "cartridge",
+              "symbol": "L3",
+              "value": 51.18
+            }
+          ]
+        }
+      },
+      "id": "00000000-0000-4000-8000-000000000003",
+      "kind": "cartridge",
+      "name": "Wildcat",
+      "saved": "2026-10-13T10:00:00.000Z"
+    },
+    {
+      "data": {
+        "draft": {
+          "bulkDensity": {
+            "value": 0.9
+          },
+          "composition": [
+            {
+              "max": 100,
+              "min": 60,
+              "name": "Nitrocellulose"
+            }
+          ],
+          "grainForm": "extruded",
+          "propellantBase": "double"
+        },
+        "origin": "user",
+        "provenanceKind": "fitted"
+      },
+      "id": "00000000-0000-4000-8000-000000000004",
+      "kind": "powder",
+      "name": "Draft powder",
+      "saved": "2026-10-13T10:00:00.000Z"
+    },
+    {
+      "data": {
+        "cartridge": "user:00000000-0000-4000-8000-000000000003",
+        "caseManufacturer": "user:00000000-0000-4000-8000-000000000001",
+        "origin": "user",
+        "waterCapacity": {
+          "value": 3.5
+        }
+      },
+      "id": "00000000-0000-4000-8000-000000000005",
+      "kind": "caseCapacity",
+      "name": "Measured",
+      "saved": "2026-10-13T10:00:00.000Z"
+    },
+    {
+      "data": {
+        "bullet": "user:00000000-0000-4000-8000-000000000002",
+        "capacity": "user:00000000-0000-4000-8000-000000000005",
+        "cartridge": "catalogue:308-win",
+        "charge": {
+          "value": 2.8
+        },
+        "firearm": "user:00000000-0000-4000-8000-000000000007",
+        "origin": "user",
+        "powder": "user:00000000-0000-4000-8000-000000000004",
+        "sessions": [
+          "user:00000000-0000-4000-8000-000000000008"
+        ]
+      },
+      "id": "00000000-0000-4000-8000-000000000006",
+      "imported": {
+        "day": "2026-10-20",
+        "file": "loads.csv",
+        "source": "Maker load data 2026"
+      },
+      "kind": "load",
+      "name": "Range load",
+      "saved": "2026-10-13T10:00:00.000Z"
+    },
+    {
+      "data": {
+        "active": "c1",
+        "barrelLength": {
+          "value": 610
+        },
+        "cartridge": "catalogue:308-win",
+        "configurations": [
+          {
+            "id": "c1",
+            "mounted": "2026-04-01",
+            "mounts": [
+              {
+                "optic": "o1",
+                "sightHeight": {
+                  "value": 55
+                },
+                "zeroRange": {
+                  "value": 100000
+                }
+              }
+            ],
+            "name": "Scope"
+          }
+        ],
+        "manufacturer": "user:00000000-0000-4000-8000-000000000001",
+        "name": "Jagdbüchse",
+        "optics": [
+          {
+            "clickUnit": "mrad",
+            "clickValue": {
+              "value": 0.00573
+            },
+            "id": "o1",
+            "kind": "scope",
+            "name": "5-25x56"
+          }
+        ],
+        "origin": "user",
+        "roundCount": 1200,
+        "twist": {
+          "value": 254
+        },
+        "twistHand": "right"
+      },
+      "id": "00000000-0000-4000-8000-000000000007",
+      "kind": "firearm",
+      "name": "Jagdbüchse",
+      "saved": "2026-10-13T10:00:00.000Z"
+    },
+    {
+      "data": {
+        "device": {
+          "kind": "doppler-radar",
+          "manufacturer": "user:00000000-0000-4000-8000-000000000001",
+          "model": "Radar"
+        },
+        "muzzleDistance": {
+          "value": 3000
+        },
+        "origin": "user",
+        "provenance": {
+          "kind": "measured",
+          "sources": [
+            {
+              "title": "day1.csv"
+            }
+          ]
+        },
+        "strings": [
+          {
+            "label": "A",
+            "load": "user:00000000-0000-4000-8000-000000000006",
+            "shots": [
+              {
+                "velocity": {
+                  "value": 800
+                }
+              },
+              {
+                "excluded": "flyer",
+                "velocity": {
+                  "value": 790
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "id": "00000000-0000-4000-8000-000000000008",
+      "kind": "session",
+      "name": "Chronograph day",
+      "saved": "2026-10-13T10:00:00.000Z"
+    },
+    {
+      "data": {
+        "groups": [
+          {
+            "colour": "#d9480f",
+            "distance": 100,
+            "id": "g1",
+            "ladderStep": 0,
+            "name": "Step 1",
+            "shots": [
+              {
+                "chrono": {
+                  "session": "user:00000000-0000-4000-8000-000000000008",
+                  "shot": 1,
+                  "string": 0
+                },
+                "placement": "placed",
+                "x": 0.003,
+                "y": -0.001
+              }
+            ]
+          }
+        ],
+        "load": "00000000-0000-4000-8000-000000000006",
+        "photo": "photo-1",
+        "references": [],
+        "targetRotation": 0
+      },
+      "id": "00000000-0000-4000-8000-000000000009",
+      "kind": "targetSheet",
+      "name": "Ladder sheet",
+      "saved": "2026-10-13T10:00:00.000Z"
+    },
+    {
+      "data": {
+        "blackDiameter": 50,
+        "decimal": true,
+        "events": [
+          {
+            "distance": 25000,
+            "gauge": 5.6,
+            "name": "25 m"
+          }
+        ],
+        "innerTen": {
+          "diameter": 10,
+          "rule": "cover"
+        },
+        "rings": [
+          {
+            "diameter": 100,
+            "fill": "white",
+            "line": "black",
+            "value": 1
+          },
+          {
+            "diameter": 50,
+            "value": 2
+          }
+        ]
+      },
+      "id": "00000000-0000-4000-8000-000000000010",
+      "kind": "targetFaceDesign",
+      "name": "Club face",
+      "saved": "2026-10-13T10:00:00.000Z"
+    },
+    {
+      "data": {
+        "cartridge": "catalogue:308-win",
+        "material": "brass",
+        "name": "Match brass, lot 3",
+        "numberOfFirings": 3,
+        "origin": "user",
+        "trimLength": {
+          "value": 51.1
+        }
+      },
+      "id": "00000000-0000-4000-8000-000000000011",
+      "kind": "case",
+      "name": "Match brass, lot 3",
+      "saved": "2026-10-13T10:00:00.000Z"
+    },
+    {
+      "data": {
+        "date": "2026-06-14",
+        "discipline": "catalogue:dsb-25m-sportpistole",
+        "eventType": "catalogue:dsb-meisterschaft",
+        "firearm": "user:00000000-0000-4000-8000-000000000007",
+        "level": "Landesmeisterschaft",
+        "place": "Hannover",
+        "results": {
+          "method": "rings",
+          "series": [
+            {
+              "shots": [
+                10,
+                9,
+                10,
+                8,
+                9
+              ],
+              "targetSheet": "user:00000000-0000-4000-8000-000000000009"
+            },
+            {
+              "total": 47
+            }
+          ]
+        },
+        "state": "completed"
+      },
+      "id": "00000000-0000-4000-8000-000000000012",
+      "kind": "event",
+      "name": "Landesmeisterschaft 25 m",
+      "saved": "2026-10-13T10:00:00.000Z"
+    },
+    {
+      "data": {
+        "confirmation": {
+          "by": "Range officer",
+          "date": "2026-10-12"
+        },
+        "date": "2026-10-12",
+        "discipline": "catalogue:dsb-1-35",
+        "event": "user:00000000-0000-4000-8000-000000000012",
+        "firearm": "user:00000000-0000-4000-8000-000000000007",
+        "load": "user:00000000-0000-4000-8000-000000000006",
+        "notes": "Wind from the left",
+        "place": "Club range",
+        "result": "285 rings",
+        "rounds": 30
+      },
+      "id": "00000000-0000-4000-8000-000000000013",
+      "kind": "shootingLogEntry",
+      "name": "2026-10-12 Range",
+      "saved": "2026-10-13T10:00:00.000Z"
+    }
+  ],
+  "version": 1
+}

@@ -172,6 +172,12 @@ export function isRangeFoundryJson(text: string): boolean;
 export function isWorkbook(bytes: Uint8Array): boolean;
 
 // @public
+export type KindDiagnostic = Diagnostic<'noKind', {
+    readonly scores: readonly KindScore[];
+    readonly floor: number;
+}>;
+
+// @public
 export interface KindScore {
     // (undocumented)
     kind: TableKind;
@@ -184,7 +190,7 @@ export interface KindSuggestion {
     // (undocumented)
     kind?: TableKind | undefined;
     // (undocumented)
-    refusal?: string | undefined;
+    refusal?: KindDiagnostic | undefined;
     // (undocumented)
     scores: KindScore[];
     // (undocumented)
@@ -392,8 +398,11 @@ export function tableOfRows(raw: string[][]): TableRead;
 export type TableRead = {
     table: Table;
 } | {
-    refusal: string;
+    refusal: TableReadDiagnostic;
 };
+
+// @public
+export type TableReadDiagnostic = ReaderDiagnostic<'noTwoColumns' | 'tooManyColumns' | 'tooManyCells' | 'headerOnly' | 'jsonMalformed' | 'jsonNotTable' | 'noDelimiter'>;
 
 // @public
 export interface TemplateOptions extends ChronoParserOptions {

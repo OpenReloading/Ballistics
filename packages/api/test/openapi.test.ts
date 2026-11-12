@@ -1,7 +1,7 @@
 import { inlineRunner } from '@open-reloading/use-cases'
+import type { Catalogue } from '@open-reloading/use-cases/catalog'
 import { describe, expect, it } from 'vitest'
 import { buildApp } from '../src/app.ts'
-import type { Catalogue } from '../src/catalogue/types.ts'
 import { buildOpenApi } from '../src/openapi.ts'
 import { API_VERSION } from '../src/version.ts'
 import { undescribed } from './setup.ts'
