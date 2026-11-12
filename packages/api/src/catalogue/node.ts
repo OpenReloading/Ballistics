@@ -1,9 +1,12 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+import {
+  buildCatalogue,
+  type Catalogue,
+  type CatalogueSource,
+  openCatalogue,
+} from '@open-reloading/use-cases/catalog'
 import { loadBundle } from '../bundle.ts'
-import { buildCatalogue } from './build.ts'
-import { openCatalogue } from './open.ts'
-import type { Catalogue, CatalogueSource } from './types.ts'
 
 /** The files the build writes: the index and the record file. */
 const catalogueFiles = { index: 'index.json', records: 'records.json' } as const

@@ -1,12 +1,15 @@
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import {
+  buildCatalogue,
+  catalogueFormat,
+  deriveVersion,
+  openCatalogue,
+} from '@open-reloading/use-cases/catalog'
 import { describe, expect, it } from 'vitest'
-import { buildCatalogue } from '../src/catalogue/build.ts'
-import { cartridgeItem, contentHash, revisionOf } from '../src/catalogue/derive.ts'
+import { cartridgeItem, contentHash, revisionOf } from '../../use-cases/src/catalog/derive.ts'
 import { loadCatalogue, writeCatalogue } from '../src/catalogue/node.ts'
-import { openCatalogue } from '../src/catalogue/open.ts'
-import { catalogueFormat, deriveVersion } from '../src/catalogue/types.ts'
 import { defined } from './defined.ts'
 import { bundle } from './fixtures.ts'
 

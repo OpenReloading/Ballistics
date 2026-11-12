@@ -1,7 +1,6 @@
 import { canonicalJson } from '@open-reloading/schema'
+import { type Catalogue, sha256 } from '@open-reloading/use-cases/catalog'
 import type { FastifyInstance, FastifyRequest } from 'fastify'
-import type { Catalogue } from '../catalogue/types.ts'
-import { sha256 } from '../hash.ts'
 import { API_VERSION } from '../version.ts'
 
 /** The body, the query of a request without a body, both where a request has both and a non-empty query. */

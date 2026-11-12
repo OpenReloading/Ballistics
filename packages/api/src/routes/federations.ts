@@ -8,9 +8,9 @@ import {
   targetFace,
   targetMapping,
 } from '@open-reloading/schema'
+import type { Catalogue } from '@open-reloading/use-cases/catalog'
 import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
-import type { Catalogue } from '../catalogue/types.ts'
 import { missing, stored } from './record-answers.ts'
 import { idParams, noQuery, page, recordIdPattern } from './schemas.ts'
 

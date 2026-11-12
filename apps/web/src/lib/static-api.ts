@@ -1,6 +1,5 @@
 /** The API in the browser over the data files the Pages build writes under `<base>/api/` (`writeStaticApi` of `@open-reloading/api/static`), running the API's own code (`@open-reloading/use-cases`), each compute task in its own worker. */
 
-import { type Catalogue, type CatalogueIndex, openCatalogue } from '@open-reloading/api/catalogue'
 import { type Powder, primerCompounds, primerSizes, recordIdRegex } from '@open-reloading/schema'
 import {
   type CartridgeWithSpecs,
@@ -16,6 +15,11 @@ import {
   type TaskReply,
   taskTimeoutMs,
 } from '@open-reloading/use-cases'
+import {
+  type Catalogue,
+  type CatalogueIndex,
+  openCatalogue,
+} from '@open-reloading/use-cases/catalog'
 import { maxRecordIdLength } from './compare-ids.ts'
 import { dataFile } from './data-file.ts'
 

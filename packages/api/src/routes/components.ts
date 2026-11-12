@@ -9,15 +9,15 @@ import {
   primerSizes,
   recordId,
 } from '@open-reloading/schema'
-import type { FastifyPluginAsync } from 'fastify'
-import { z } from 'zod'
 import type {
   BulletQuery,
   CaseQuery,
   Catalogue,
   Catalogued,
   PrimerQuery,
-} from '../catalogue/types.ts'
+} from '@open-reloading/use-cases/catalog'
+import type { FastifyPluginAsync } from 'fastify'
+import { z } from 'zod'
 import { missing, originated, revised, stored } from './record-answers.ts'
 import { idParams, listQuery, noQuery, page, recordIdPattern, revision } from './schemas.ts'
 
