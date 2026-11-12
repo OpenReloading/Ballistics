@@ -275,10 +275,8 @@ const names = Object.keys(cases) as (keyof typeof cases)[]
 const fileText = (value: unknown) =>
   `${JSON.stringify(JSON.parse(canonicalJson(value)), null, 2)}\n`
 
-const goldenUrl = (dir: string, name: string, extension: string) =>
-  new URL(`golden/${dir}/${name}.${extension}`, import.meta.url)
 const golden = (dir: string, name: string, extension: string) =>
-  readFileSync(goldenUrl(dir, name, extension), 'utf8')
+  readFileSync(new URL(`golden/${dir}/${name}.${extension}`, import.meta.url), 'utf8')
 
 const page = 'https://example.test/records'
 const fragment = (link: string | undefined) => link?.slice(page.length)
@@ -304,9 +302,7 @@ async function unpacked(link: string) {
 
 describe('user data file goldens', () => {
   it.each(names)('%s is rebuilt from its records', async (name) => {
-    await expect(fileText(cases[name])).toMatchFileSnapshot(
-      goldenUrl('user-data', name, 'json').pathname,
-    )
+    await expect(fileText(cases[name])).toMatchFileSnapshot(`golden/user-data/${name}.json`)
   })
 
   it.each(names)('%s parses and writes back byte-identical', (name) => {
