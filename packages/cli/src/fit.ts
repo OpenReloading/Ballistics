@@ -72,6 +72,9 @@ function factorOf(pressure: PressureRun | undefined, row: Row) {
   return pressure.factors[basis]
 }
 
+// a fit with large residuals needs one rejected step per factor of 10 to raise the damping before it ends, so fits that had their minimum by 19 ended not-converged at the default 30
+const maxIterations = 100
+
 /** The model a fit runs and the sigmas of its rows. */
 type FitRun = { model: InteriorModel; velocitySigma: number; pressure?: PressureRun | undefined }
 
@@ -150,7 +153,10 @@ function fitOne(
       velocity: run.velocitySigma,
       pressure: run.pressure,
     })
-    const fit = fitPowderPooled(sessions, { interior: refusedAsInvalid(run.model) })
+    const fit = fitPowderPooled(sessions, {
+      interior: refusedAsInvalid(run.model),
+      maxIterations,
+    })
     const burn = fit.parameters.find((p) => p.kind === 'burnRate' && p.group === id)
     if (!burn) throw new Error(`no burn coefficient in the fit of ${id}`)
     const factor = (burn.value / burn.initial) * (vivacity.start / vivacity.record)
