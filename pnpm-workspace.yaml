@@ -7,7 +7,8 @@ packages:
 # A version must be 3 days old before an install resolves to it: the Dependabot cooldown, applied to transitive
 # packages too.
 minimumReleaseAge: 4320
-strictPeerDependencies: true
+# not at install, where Dependabot's one-package steps of a family such as @mantine/* failed: `pnpm run lint` checks the peers
+strictPeerDependencies: false
 
 # One version per dependency that two or more workspaces use: they name it as "catalog:". Dependabot updates it here.
 # Exact versions, except zod: the published libraries depend on it, and `pnpm pack` writes the catalog's range.

@@ -1,4 +1,4 @@
-# Weekly version updates, minor and patch grouped per ecosystem; security updates come at once
+# Weekly version updates, grouped per ecosystem (npm: minor and patch); security updates come at once
 # (repository settings), except that pnpm installs no release younger than three days: a fix that new needs an
 # entry in minimumReleaseAgeExclude of pnpm-workspace.yaml. Three days of cooldown let a broken or malicious release be pulled first
 # (.github/zizmor.yml tells zizmor, whose audit expects seven). The npm ecosystem reads pnpm-lock.yaml
@@ -37,9 +37,10 @@ updates:
       interval: weekly
     cooldown:
       default-days: 3
+    groups:
+      docker:
+        patterns: ["*"]
     ignore:
-      # Node major follows .nvmrc and engines, changed by hand
-      - dependency-name: node
-        update-types: [version-update:semver-major]
-      - dependency-name: "*typescript-node"
+      # Node major follows .nvmrc and engines, changed by hand; the images are library/node and devcontainers/typescript-node
+      - dependency-name: "*node"
         update-types: [version-update:semver-major]
