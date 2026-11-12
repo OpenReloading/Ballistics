@@ -6,21 +6,26 @@ import path from 'node:path'
 const webRoot = path.join(import.meta.dirname, '..')
 const repoRoot = path.join(webRoot, '../..')
 
+/** Files outside the workspaces that every build reads. */
+const rootInputs = [
+  /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|tsconfig\.base\.json|\.nvmrc)$/,
+  /^\.github\/(pnpm|actions)\//,
+  /^\.github\/workflows\/ci\.yml$/,
+]
+
 /** Files whose change feeds the web build: without one, only the checks and the jobs of `e2eInputs` run. */
 const webInputs = [
   /^apps\/web\//,
   /^packages\/(units|locale-format|statistics|ballistics|shot-groups|schema|importers|drawing|catalog|target-recognition|use-cases|api|design-tokens)\//,
   // the catalog reader that writes the bundle the API serves
   /^tools\/src\/catalog\//,
-  /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|tsconfig\.base\.json|\.nvmrc)$/,
-  /^\.github\/(pnpm|actions)\//,
-  /^\.github\/workflows\/ci\.yml$/,
+  ...rootInputs,
 ]
 
 /** Changes that no check reads: prose outside the documents the app, its tests and the tools read, and GitHub's templates. */
 const docsOnly = [
-  // the docs site's pages are checked by the docs tests (bibliography and code lines), the home page prerenders the news items, the build compares a package's API report (`*.api.md`)
-  /^(?!README\.md$)(?!apps\/docs\/docs\/)(?!apps\/web\/news\/)(?!.*\.api\.md$).*\.md$/,
+  // the docs site's pages are checked by the docs tests (bibliography and code lines) and its library page is built into the site, the home page prerenders the news items, the build compares a package's API report (`*.api.md`)
+  /^(?!README\.md$)(?!apps\/docs\/(docs\/|library\.md$))(?!apps\/web\/news\/)(?!.*\.api\.md$).*\.md$/,
   // the web tests read the user report template, the license check the generated block of NOTICE
   /^\.github\/(ISSUE_TEMPLATE\/(?!user-report\.yml$)|pull_request_template\.md$)/,
   /^(LICENSE|\.coderabbit\.yaml)$/,
@@ -31,6 +36,14 @@ const e2eInputs = [
   /^apps\/e2e\//,
   /^(compose\.yaml|\.dockerignore)$/,
   /^tools\/src\/(pages|pages-serve|pages-payload|executable)\.ts$/,
+]
+
+/** Files whose change needs the docs image built, which runs the docs site build: the site, the palette it imports, the API whose document it prints, and the compose service. */
+const docsInputs = [
+  /^apps\/docs\//,
+  /^packages\/(design-tokens|api)\//,
+  /^(compose\.yaml|\.dockerignore)$/,
+  ...rootInputs,
 ]
 
 /** Tests and notes of the packages and the web app do not change the build. */
@@ -46,9 +59,7 @@ const recordInputs = [
   /^tools\/src\/catalog\//,
   /^packages\/schema\//,
   /^packages\/api\//,
-  /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|tsconfig\.base\.json|\.nvmrc)$/,
-  /^\.github\/(pnpm|actions)\//,
-  /^\.github\/workflows\/ci\.yml$/,
+  ...rootInputs,
   /^apps\/web\/(package\.json|next\.config\.ts|tsconfig\.json)$/,
   /^apps\/web\/scripts\/(ci-plan|check-prerender)\.mts$/,
   /^apps\/web\/src\/lib\/prerender-sample\.ts$/,
@@ -162,6 +173,7 @@ export function testJobs(affected?: string[]): TestJob[] {
 export type Plan = {
   check: boolean
   e2e: boolean
+  docs: boolean
   prerender: 'full' | 'sample'
   tests: TestJob[]
   reason: string
@@ -170,6 +182,7 @@ export type Plan = {
 const everything = (reason: string): Plan => ({
   check: true,
   e2e: true,
+  docs: true,
   prerender: 'full',
   tests: testJobs(),
   reason,
@@ -190,10 +203,12 @@ export function plan(all: string[], closure = recordClosure(), affected?: string
     return {
       check: false,
       e2e: false,
+      docs: false,
       prerender: 'sample',
       tests: [],
       reason: 'only prose changed',
     }
+  const docs = code.some((f) => docsInputs.some((re) => re.test(f)))
   const tests = testJobs(code.every(inWorkspace) && affected?.length ? affected : undefined)
   const changed = code.filter((f) => !ignored.some((re) => re.test(f)))
   if (!changed.some((f) => webInputs.some((re) => re.test(f)))) {
@@ -201,6 +216,7 @@ export function plan(all: string[], closure = recordClosure(), affected?: string
     return {
       check: true,
       e2e,
+      docs,
       prerender: 'sample',
       tests,
       reason: 'no changed file feeds the web build',
@@ -214,8 +230,8 @@ export function plan(all: string[], closure = recordClosure(), affected?: string
       packageInputs.some((re) => re.test(f)),
   )
   return record
-    ? { ...everything(`${record} feeds the record pages`), tests }
-    : { ...everything('no changed file feeds the record pages'), prerender: 'sample', tests }
+    ? { ...everything(`${record} feeds the record pages`), docs, tests }
+    : { ...everything('no changed file feeds the record pages'), docs, prerender: 'sample', tests }
 }
 
 /** git by an absolute path of a system directory, never through `PATH`. */
@@ -274,6 +290,7 @@ function argument(name: string) {
 const nothingChanged: Plan = {
   check: false,
   e2e: false,
+  docs: false,
   prerender: 'sample',
   tests: [],
   reason: 'nothing changed since the recorded build',
@@ -330,7 +347,7 @@ if (import.meta.main) {
     writeFileSync(stamp, `${git('rev-parse', 'HEAD').trim()} ${mode}\n`)
   } else {
     const p = decide()
-    const out = `check=${p.check}\ne2e=${p.e2e}\nprerender=${p.prerender}\ntests=${JSON.stringify(p.tests)}`
+    const out = `check=${p.check}\ne2e=${p.e2e}\ndocs=${p.docs}\nprerender=${p.prerender}\ntests=${JSON.stringify(p.tests)}`
     console.log(out)
     console.error(`ci-plan: ${out.replaceAll('\n', ' ')}: ${p.reason}`)
   }
