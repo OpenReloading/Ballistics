@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.0.7](https://github.com/OpenReloading/Ballistics/compare/catalog-v0.0.6...catalog-v0.0.7) (2026-11-12)
+
+
+### Bug fixes
+
+* **catalog:** a fitted source without an origin keeps a record out of the public catalog ([#1147](https://github.com/OpenReloading/Ballistics/issues/1147)) ([04389c8](https://github.com/OpenReloading/Ballistics/commit/04389c89c2dfcd17a0331c7353d518101634185c))
+* US spelling in prose, comments and messages, checked by typos ([#1160](https://github.com/OpenReloading/Ballistics/issues/1160)) ([7e1255c](https://github.com/OpenReloading/Ballistics/commit/7e1255c3ef421ae348b39db550c15e4e87eb7a2f))
+
+
+### Documentation
+
+* **tests:** one-line comments in the test files ([#1137](https://github.com/OpenReloading/Ballistics/issues/1137)) ([1ada953](https://github.com/OpenReloading/Ballistics/commit/1ada953bc7b048bcfe7b3982c87083c2f96dc0c7))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @open-reloading/schema bumped to 0.0.7
+
 ## [0.0.6](https://github.com/OpenReloading/Ballistics/compare/catalog-v0.0.5...catalog-v0.0.6) (2026-11-09)
 
 

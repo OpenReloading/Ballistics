@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.0.3](https://github.com/OpenReloading/Ballistics/compare/cli-v0.0.2...cli-v0.0.3) (2026-11-12)
+
+
+### Features
+
+* **cli:** energy from a prior times one energy-level factor in the fit ([#1155](https://github.com/OpenReloading/Ballistics/issues/1155)) ([cf4892d](https://github.com/OpenReloading/Ballistics/commit/cf4892d1b0e8a6ed24fa8efe2ab4b685771e6deb))
+* **cli:** fit powders from rows ([#1141](https://github.com/OpenReloading/Ballistics/issues/1141)) ([661678f](https://github.com/OpenReloading/Ballistics/commit/661678f621bb28b4082e8c4f854f56195d1b8012))
+* **cli:** pressure exponent per powder family in the fit ([#1150](https://github.com/OpenReloading/Ballistics/issues/1150)) ([dc65c8e](https://github.com/OpenReloading/Ballistics/commit/dc65c8e68fb0507a577e708e422ef87385530a7e))
+* **cli:** pressure rows in the fit, with a factor per pressure basis ([#1153](https://github.com/OpenReloading/Ballistics/issues/1153)) ([4aa1fa5](https://github.com/OpenReloading/Ballistics/commit/4aa1fa5fb9245e8376a575dc3df96a9d7910621d))
+
+
+### Bug fixes
+
+* **ballistics:** record loads take the grain-form temperature default ([#1145](https://github.com/OpenReloading/Ballistics/issues/1145)) ([7f0b186](https://github.com/OpenReloading/Ballistics/commit/7f0b186fd180aee4da2d81bcf8cca77ce83002b2))
+* US spelling in prose, comments and messages, checked by typos ([#1160](https://github.com/OpenReloading/Ballistics/issues/1160)) ([7e1255c](https://github.com/OpenReloading/Ballistics/commit/7e1255c3ef421ae348b39db550c15e4e87eb7a2f))
+
+
+### Documentation
+
+* **tests:** one-line comments in the test files ([#1137](https://github.com/OpenReloading/Ballistics/issues/1137)) ([1ada953](https://github.com/OpenReloading/Ballistics/commit/1ada953bc7b048bcfe7b3982c87083c2f96dc0c7))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @open-reloading/api bumped to 0.0.7
+    * @open-reloading/catalog bumped to 0.0.7
+    * @open-reloading/drawing bumped to 0.0.6
+    * @open-reloading/schema bumped to 0.0.7
+
 ## [0.0.2](https://github.com/OpenReloading/Ballistics/compare/cli-v0.0.1...cli-v0.0.2) (2026-11-09)
 
 
