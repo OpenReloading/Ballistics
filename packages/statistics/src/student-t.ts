@@ -69,7 +69,7 @@ function betaTimesA(a: number): number {
   return product
 }
 
-/** The `t`, not negative, at which the probability of |T| below `t` is `level`; level in (0, 1), `df` a positive whole number. Every level a double holds below 1 is supported: for `df` up to 1,000 the result keeps a relative accuracy of 1e-12 up to level 1 - 2^-53. */
+/** The `t`, not negative, at which the probability of |T| below `t` is `level`; level in (0, 1), `df` a positive whole number. Every level a double holds in (0, 1) is accepted: for `df` up to 1,000 and levels from 1e-40 to 1 - 2^-53 the result keeps a relative accuracy of 1e-12; below 1e-40 the 200 bisection steps from 2 stop short of `t` (level 1e-100 at `df` 1 returns about 6e-61, not 1.6e-100). */
 export function studentTwoSidedQuantile(level: number, df: number): number {
   need(level > 0 && level < 1, { code: 'levelOutsideUnit', params: {} })
   need(Number.isInteger(df) && df > 0, { code: 'degreesOfFreedomNotPositiveWhole', params: {} })

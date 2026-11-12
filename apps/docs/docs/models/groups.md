@@ -235,7 +235,7 @@ $$
 
 Code: `packages/statistics/src/student-t.ts`, `studentTwoSidedQuantile` (`tailMass`).
 
-Every level a double holds in (0, 1) is supported: for whole $\nu$ from 1 to 1,000 and levels up to $1 - 2^{-53}$ the quantile stays within a relative $10^{-12}$ of reference values.
+Every level a double holds in (0, 1) is accepted: for whole $\nu$ from 1 to 1,000 and levels from $10^{-40}$ to $1 - 2^{-53}$ the quantile stays within a relative $10^{-12}$ of reference values. Below $10^{-40}$ the 200 bisection steps from 2 cannot go below about $6 \cdot 10^{-61}$, so the quantile can be too large (level $10^{-100}$ at $\nu = 1$ returns $6 \cdot 10^{-61}$ instead of $1.6 \cdot 10^{-100}$).
 
 The intervals of the [range string fit](exterior-truing-strings.md) use it.
 

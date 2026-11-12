@@ -184,3 +184,15 @@ describe('Student t two-sided quantile', () => {
       expect(studentTwoSidedQuantile(level, df)).toEqual(near(t, { relative: 1e-12 }))
   })
 })
+
+describe('Student t two-sided quantile at the lowest stated level', () => {
+  it('keeps its digits at 1e-40', () => {
+    // closed forms: df 1 t = tan(pi level / 2), df 2 t = level sqrt(2 / (1 - level^2))
+    expect(studentTwoSidedQuantile(1e-40, 1)).toEqual(
+      near(1.5707963267948964e-40, { relative: 1e-12 }),
+    )
+    expect(studentTwoSidedQuantile(1e-40, 2)).toEqual(
+      near(1.4142135623730951e-40, { relative: 1e-12 }),
+    )
+  })
+})
