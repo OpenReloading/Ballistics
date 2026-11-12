@@ -1,0 +1,36 @@
+{
+  "name": "@open-reloading/spike-start",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@lingui/core": "6.12.0",
+    "@lingui/react": "6.12.0",
+    "@mantine/core": "catalog:",
+    "@mantine/hooks": "catalog:",
+    "@open-reloading/design-tokens": "workspace:*",
+    "@open-reloading/ui": "workspace:*",
+    "@tanstack/react-router": "1.170.46",
+    "@tanstack/react-start": "1.169.4",
+    "lucide-react": "1.68.0",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "serwist": "9.5.13"
+  },
+  "devDependencies": {
+    "@open-reloading/api": "workspace:*",
+    "@open-reloading/catalog": "workspace:*",
+    "@playwright/test": "catalog:",
+    "@serwist/build": "9.5.13",
+    "@types/node": "catalog:",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.2.1",
+    "typescript": "catalog:",
+    "vite": "8.3.5"
+  }
+}

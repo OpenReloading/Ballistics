@@ -1,0 +1,7 @@
+dist/
+site/
+site-b/
+generated/
+public/api/
+test-results/
+test-results-*/
