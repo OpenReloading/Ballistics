@@ -162,7 +162,7 @@ describe('constructionOf', () => {
 
 describe('outcomes', () => {
   it('keeps the rows of the wanted splits, with their split and family', () => {
-    const rows = [row, { ...row, cartridge: '30-br' }, { ...row, cartridge: '30-06-spring' }]
+    const rows = ['308-match', '30-br', '307-win'].map((cartridge) => ({ ...row, cartridge }))
     const out = outcomes(rows, records, interior, ['validation', 'training'])
     expect(out.map((o) => o.split)).toEqual(['validation', 'training'])
     expect(out[0]?.family).toBe('double/extruded')

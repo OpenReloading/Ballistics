@@ -133,7 +133,7 @@ describe('rowsFromPublished', () => {
   })
 
   it('gives one row per charge with a velocity, with its figures', () => {
-    const file = table('308-win', [
+    const file = table('308-match', [
       load(
         'a',
         [
@@ -156,7 +156,7 @@ describe('rowsFromPublished', () => {
     expect(rows).toEqual([
       {
         line: 1,
-        cartridge: '308-win',
+        cartridge: '308-match',
         bullet: 'demo-bullet-168',
         powder: 'demo-powder-dp40',
         charge: 2,
@@ -170,7 +170,7 @@ describe('rowsFromPublished', () => {
       },
       {
         line: 2,
-        cartridge: '308-win',
+        cartridge: '308-match',
         bullet: 'demo-bullet-168',
         powder: 'demo-powder-dp40',
         charge: 2.2,
@@ -194,7 +194,7 @@ describe('rowsFromPublished', () => {
     }
     const plain = { unit: 'bar' as const, peak: figure(3000, 'bar') }
     const { rows } = rowsFromPublished([
-      table('308-win', [
+      table('308-match', [
         load('a', [charge('single', 2, { velocity: v(800), pressure: cup })]),
         load('b', [charge('single', 2, { velocity: v(800), pressure: plain })]),
       ]),
@@ -208,19 +208,19 @@ describe('rowsFromPublished', () => {
   it('counts the charges it skips by reason and never reads a customer table', () => {
     const { rows, skipped } = rowsFromPublished(
       [
-        table('308-win', [
+        table('308-match', [
           load('a', [charge('start', 2), charge('max', 2.2, { velocity: v(850) })]),
           load('b', [charge('single', 2, { velocity: v(800) })], {
             powder: { printed: 'Unknown powder' },
           }),
         ]),
-        table('308-win', [load('c', [charge('single', 2, { velocity: v(800) })])], {
+        table('308-match', [load('c', [charge('single', 2, { velocity: v(800) })])], {
           id: 'demo-powder-customer',
           producedBy: 'customer',
         }),
         table('no-cartridge', [load('d', [charge('single', 2, { velocity: v(800) })])]),
       ],
-      new Set(['308-win']),
+      new Set(['308-match']),
     )
     expect(rows).toHaveLength(1)
     expect(skipped).toEqual({ noVelocity: 1, noPowderRecord: 1, customerTable: 1, noCartridge: 1 })
@@ -228,14 +228,14 @@ describe('rowsFromPublished', () => {
 
   it('names a stand-in bullet for a printed bullet without a record', () => {
     const { rows } = rowsFromPublished([
-      table('308-win', [
+      table('308-match', [
         load('a', [charge('single', 2, { velocity: v(800) })], {
           bullet: { printed: 'FMJ', mass: figure(9.72, 'g') },
         }),
       ]),
     ])
-    expect(rows[0]?.bullet).toBe(standInId('308-win', 9.72))
-    expect(rows[0]?.bullet).toBe('stand-in-308-win-9720mg')
+    expect(rows[0]?.bullet).toBe(standInId('308-match', 9.72))
+    expect(rows[0]?.bullet).toBe('stand-in-308-match-9720mg')
     expect(rows[0]?.bulletMass).toBe(9.72)
   })
 })
@@ -243,7 +243,7 @@ describe('rowsFromPublished', () => {
 describe('the inputs published rows do not carry', () => {
   const base: Row = {
     line: 1,
-    cartridge: '308-win',
+    cartridge: '308-match',
     bullet: 'demo-bullet-168',
     powder: 'demo-powder-dp40',
     charge: 2,
@@ -252,10 +252,10 @@ describe('the inputs published rows do not carry', () => {
 
   it('builds a stand-in bullet of the cartridge G1, the printed mass and the modeled length', () => {
     const own = loadRecords(recordRoots)
-    const id = standInId('308-win', 9.72)
+    const id = standInId('308-match', 9.72)
     const [row] = fillInputs([{ ...base, bullet: id, bulletMass: 9.72, barrel: 600 }], own)
     const bullet = own.bullets.get(id)
-    const g1 = own.cartridges.get('308-win')?.values.find((x) => x.symbol === 'G1')?.value
+    const g1 = own.cartridges.get('308-match')?.values.find((x) => x.symbol === 'G1')?.value
     expect(row?.bullet).toBe(id)
     expect(bullet?.mass.value).toBe(9.72)
     expect(bullet?.diameter?.value).toBe(g1)
@@ -285,11 +285,11 @@ describe('the inputs published rows do not carry', () => {
 
 describe('verify on published loads', () => {
   const grams = [2.0, 2.2, 2.4]
-  /** The validation cartridge 308-win: one row at the muzzle, one at V5 and one CUP row, each at its model velocity. */
+  /** The validation cartridge 308-match: one row at the muzzle, one at V5 and one CUP row, each at its model velocity. */
   const validation = () => {
-    const [a, b, c] = grams.map((g) => model('308-win', g))
+    const [a, b, c] = grams.map((g) => model('308-match', g))
     if (!a || !b || !c) throw new Error('no model')
-    return table('308-win', [
+    return table('308-match', [
       load('a', [
         charge('single', 2.0, {
           velocity: figure(a.velocity, 'm/s'),
@@ -383,7 +383,7 @@ describe('verify on published loads', () => {
     const row: Row = {
       ...{
         line: 1,
-        cartridge: '308-win',
+        cartridge: '308-match',
         bullet: 'demo-bullet-168',
         powder: 'demo-powder-dp40',
         charge: 2,
@@ -416,7 +416,7 @@ describe('verify on published loads', () => {
     const folder = writeLoads([validation()])
     await expect(
       verify({
-        rows: join(folder, '308-win', '..', '..'),
+        rows: join(folder, '308-match', '..', '..'),
         records: recordRoots,
         split: 'validation',
         final: false,
@@ -442,7 +442,7 @@ describe('verify on published loads', () => {
   })
 
   it('is uncorrected the speed at 5 m, below the muzzle value', () => {
-    const { velocity } = model('308-win', 2.2)
+    const { velocity } = model('308-match', 2.2)
     expect(flown(velocity, 5) / velocity).toBeLessThan(0.999)
   })
 
@@ -477,7 +477,7 @@ describe('verify on published loads', () => {
     if (!demo) throw new Error('no demo bullet')
     const row: Row = {
       line: 1,
-      cartridge: '308-win',
+      cartridge: '308-match',
       bullet: 'x',
       powder: 'demo-powder-dp40',
       charge: 2,
@@ -572,7 +572,7 @@ describe('verify on published loads', () => {
       provenance: { kind: 'published', sources: [{ source: 'synthetic-table' }] },
     }
     const folder = writeLoads([cited as unknown as PublishedLoads])
-    writeFileSync(join(folder, '308-win', 'broken.json'), '{}')
+    writeFileSync(join(folder, '308-match', 'broken.json'), '{}')
     let warned = ''
     const r = await verify({
       rows: folder,

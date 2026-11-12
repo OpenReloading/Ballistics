@@ -88,7 +88,7 @@ describe('compare', () => {
     const saved = writeRows(JSON.stringify(await verify(options)), 'baseline.json')
     const otherRows = writeRows(
       rowsCsv([
-        { cartridge: '308-win', charge: 2.0, velocity: 0.02 },
+        { cartridge: '308-match', charge: 2.0, velocity: 0.02 },
         { cartridge: '30-br', charge: 2.0, velocity: 0.02 },
       ]),
     )
@@ -97,6 +97,17 @@ describe('compare', () => {
     await expect(compare(options, broken, 'm3')).rejects.toThrow('the --baseline file is not JSON')
     const notResult = writeRows('{"a":1}', 'a.json')
     await expect(compare(options, notResult, 'm3')).rejects.toThrow('not a verify result')
+  })
+
+  it('refuses a baseline split by another rule: one of the earlier rule, without a salt, or of another salt', async () => {
+    const { splitSalt, ...earlier } = await verify(options)
+    expect(splitSalt).toBe('2026-11-12')
+    const unsalted = writeRows(JSON.stringify(earlier), 'unsalted.json')
+    await expect(compare(options, unsalted, 'm3')).rejects.toThrow(
+      'the baseline was split by another rule (salt none, this run 2026-11-12)',
+    )
+    const other = writeRows(JSON.stringify({ ...earlier, splitSalt: '2027-01-01' }), 'other.json')
+    await expect(compare(options, other, 'm3')).rejects.toThrow(Refusal)
   })
 
   it('needs --final for the test split', async () => {

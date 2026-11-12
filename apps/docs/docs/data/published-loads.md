@@ -76,7 +76,7 @@ A table that several files cite is a source record (`records/sources/`). The raw
 
 ## Hold-out split
 
-The split of a row follows from its cartridge: the first byte of the SHA-256 of the lower-case cartridge id is 0 to 50 for test, 51 to 101 for validation and 102 to 255 for training (`splitOf`, `packages/cli/src/split.ts`). It is not stored. Fit tooling reads training rows only, and model choices use the validation rows.
+The split of a row follows from its cartridge: the first byte of the SHA-256 of `2026-11-12:<lower-case cartridge id>` is 0 to 50 for test, 51 to 101 for validation and 102 to 255 for training (`splitOf`, `packages/cli/src/split.ts`; the [command line](../cli.md#split) page says why the rule carries a salt). It is not stored. Fit tooling reads training rows only, and model choices use the validation rows.
 
 ## Import and re-import
 

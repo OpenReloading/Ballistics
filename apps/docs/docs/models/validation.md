@@ -14,7 +14,7 @@ Measured chronograph rows are never published and are not in the repository. Any
 
 ### Split
 
-The first byte of the SHA-256 of the lower-case UTF-8 cartridge id assigns every row to a split. A row has the split of its cartridge, so one cartridge never appears on both sides of a comparison.
+The first byte of the SHA-256 of the UTF-8 text `<salt>:<lower-case cartridge id>`, with the salt `2026-11-12`, assigns every row to a split. A row has the split of its cartridge, so one cartridge never appears on both sides of a comparison.
 
 | Split      | First byte | Use                                     |
 | ---------- | ---------- | --------------------------------------- |
@@ -23,6 +23,8 @@ The first byte of the SHA-256 of the lower-case UTF-8 cartridge id assigns every
 | Training   | 102 to 255 | Fitting, and the width of the interval  |
 
 The test split is run once per model version, at release, with the model version hash printed in the pull request or the release notes. A run on the test split never guides a model change; a change made after looking at it needs a new version and gives up that split's claim for the earlier one.
+
+The salt dates from 2026-11-12. The rule before it had none, and its test split was read for eight model versions, so it is spent and every cartridge was assigned again ([research entry](../research/validation-split-salt.md)). A result of the earlier rule is not compared with one of this rule. The powder records were fitted on the earlier rule's training rows, so under this rule only a run with `--params fit-on-training` is held out, and only for the values its fit sets.
 
 ### Metrics
 
@@ -47,7 +49,7 @@ The repository holds no measured rows. The command line tests run on synthetic r
 
 ## Results
 
-A local run of `verify --json` on load rows that are not in the repository, validation split, model version `67d67adfce3ebe7c390bd6630a9a508726dfd85f52ac8f00cd9958a458f187bd`, with the powder parameters of the records (`--params records`). Each cell is a local run. The table is updated by hand at each release.
+A local run of `verify --json` on load rows that are not in the repository, validation split of the rule without a salt (in force until 2026-11-12, [Split](#split)), model version `67d67adfce3ebe7c390bd6630a9a508726dfd85f52ac8f00cd9958a458f187bd`, with the powder parameters of the records (`--params records`). Each cell is a local run. The table is updated by hand at each release; today's command line splits by the salted rule and does not rerun it.
 
 | Group                                        | Cartridges    | Rows          | Median velocity error | P90 velocity error | Interval coverage |
 | -------------------------------------------- | ------------- | ------------- | --------------------- | ------------------ | ----------------- |
@@ -72,11 +74,11 @@ Pressure, rows that carry a printed peak pressure in bar (piezo, transducer, C.I
 | All                                          | 4,060   | 15.0 %                | 38.1 %             |
 | Not in the fitted set (leave-one-powder-out) | no data | no data               | no data            |
 
-Not measured: the sealed test split (so the command line tool does not reproduce the earlier test-split baseline of median 3.4 %, P90 9.0 %), by-session checks, a fit of each powder from rows.
+Not measured: the sealed test split of the salted rule (the earlier rule's test split gave the baseline of median 3.4 %, P90 9.0 % and is spent), by-session checks, a fit of each powder from rows.
 
 ### Pooled powder fit
 
-A local run of the [pooled fit](interior-powder-fit.md#pooled-fit-over-rifles-powders-and-lots) on the same kind of load rows, outside the repository. The split was fixed before any result was seen, and the sealed test split was not read.
+A local run of the [pooled fit](interior-powder-fit.md#pooled-fit-over-rifles-powders-and-lots) on the same kind of load rows, outside the repository, under the split rule without a salt. The split was fixed before any result was seen, and the sealed test split was not read.
 
 - Sessions: the rows of one table, cartridge, powder, bullet mass and type, barrel and overall length. Rifle: table, cartridge and barrel. Lot: table.
 - Fit: 516 training-split sessions (952 rows) of 100 powders, 356 parameters. Each powder has a burn coefficient prior centered on its record value, log sigma 0.3. Without it, powders whose velocity barely moves with the burn coefficient left the fit `unresolved`.
@@ -131,4 +133,4 @@ May not say:
 
 - [JCGM 100:2008](../bibliography.md#jcgm-100-2008): the law of propagation of uncertainty behind the fit's prediction interval, which the coverage tests.
 - The [powder fit](interior-powder-fit.md) and [peak-pressure range](interior-pressure-range.md) pages describe the models whose outputs are compared.
-- Research log: [burn law constants](../research/interior-burn-law-constants.md), [pressure exponent per powder family, leave one powder out](../research/interior-exponent-per-family-unseen-powder.md).
+- Research log: [burn law constants](../research/interior-burn-law-constants.md), [pressure exponent per powder family, leave one powder out](../research/interior-exponent-per-family-unseen-powder.md), [a new sealed test split by a hash salt](../research/validation-split-salt.md).

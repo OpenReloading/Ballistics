@@ -81,8 +81,8 @@ describe('the JSON result', () => {
         [
           ['30-br', 2.0],
           ['30-br', 2.4],
-          ['308-match', 2.2],
-          ['308-win', 2.0],
+          ['308-win', 2.2],
+          ['308-match', 2.0],
         ].map(([cartridge, charge]) => ({
           cartridge: cartridge as string,
           powder: 'demo-powder-sp30',
@@ -96,13 +96,13 @@ describe('the JSON result', () => {
     // a run with `--exponent family` fits every powder of the rows seven times, so it gets few rows of one powder
     const specs = [
       ...[2.0, 2.2, 2.4].map((charge) => ({ cartridge: '30-br', charge, velocity: 0.01 })),
-      ...[2.0, 2.2].map((charge) => ({ cartridge: '308-win', charge, velocity: 0.01 })),
+      ...[2.0, 2.2].map((charge) => ({ cartridge: '308-match', charge, velocity: 0.01 })),
     ]
     const few = ['--rows', writeRows(rowsCsv(specs)), ...data.slice(2)]
     const printed = [
       { cartridge: '30-br', charge: 2.0 },
       { cartridge: '30-br', charge: 2.2 },
-      { cartridge: '308-win', charge: 2.0 },
+      { cartridge: '308-match', charge: 2.0 },
     ].map((s) => ({ ...s, velocity: 0, pressure: 0, pressureBasis: 'transducer' }))
     const pressures = ['--rows', writeRows(rowsCsv(printed)), ...data.slice(2)]
     for (const args of [
@@ -175,7 +175,7 @@ describe('exit codes', () => {
       (await cli(['compare', ...data, '--split', 'test', '--baseline', 'm3', '--candidate', 'm3']))
         .code,
     ).toBe(1)
-    const only = writeRows(rowsCsv([{ cartridge: '308-win', charge: 2.0, velocity: 0.01 }]))
+    const only = writeRows(rowsCsv([{ cartridge: '308-match', charge: 2.0, velocity: 0.01 }]))
     const none = await cli([
       'verify',
       '--rows',
@@ -275,7 +275,7 @@ describe('exit codes', () => {
 
   it('is 2 for a rows file with a bad value, naming line and column', async () => {
     const { writeRows } = await import('./fixture.ts')
-    const bad = writeRows('cartridge,bullet,powder,charge_g,velocity_ms\n308-win,b,p,x,800\n')
+    const bad = writeRows('cartridge,bullet,powder,charge_g,velocity_ms\n308-match,b,p,x,800\n')
     const { code, stderr } = await cli([
       'verify',
       '--rows',
@@ -424,7 +424,7 @@ describe('defaults', () => {
 
   it('prints the groups of --group-by in the table', async () => {
     const { stdout } = await cli(['verify', ...data, '--group-by', 'cartridge'], {}, true)
-    expect(stdout).toContain('cartridge 308-win')
+    expect(stdout).toContain('cartridge 308-match')
     expect(stdout).not.toContain('powder not in the fitted set')
     const unseen = await cli(['verify', ...data, '--leave-one-powder-out'], {}, true)
     expect(unseen.stdout).toContain(
@@ -435,7 +435,7 @@ describe('defaults', () => {
       {},
       true,
     )
-    expect(compared.stdout).toContain('cartridge 308-win')
+    expect(compared.stdout).toContain('cartridge 308-match')
   })
 
   it('prints the change of a comparison with its sign', async () => {
