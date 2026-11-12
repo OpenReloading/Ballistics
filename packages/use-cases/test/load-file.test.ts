@@ -1,4 +1,4 @@
-import { interiorLoad, interiorValueKeys, overrideResistance } from '@open-reloading/ballistics'
+import { interiorLoad, interiorValueKeys, overrideResistance } from '@rangefoundry/ballistics'
 import { describe, expect, it } from 'vitest'
 import { filePath } from '../src/load-file.ts'
 

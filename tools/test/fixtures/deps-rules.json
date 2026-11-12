@@ -72,7 +72,7 @@
     "rules": ["drawing-seating-imports"]
   },
   "packages/svg-drawings/src/seating/workspace-package.ts": {
-    "source": "import { waterDensity } from '@open-reloading/ballistics'\nexport { waterDensity }",
+    "source": "import { waterDensity } from '@rangefoundry/ballistics'\nexport { waterDensity }",
     "rules": ["drawing-seating-imports"]
   },
   "packages/svg-drawings/src/seating/into-web.ts": {
@@ -140,7 +140,7 @@
     "rules": ["schema-statistics-for-types-only"]
   },
   "packages/schema/src/ballistics.ts": {
-    "source": "import { waterDensity } from '@open-reloading/ballistics'\nexport { waterDensity }",
+    "source": "import { waterDensity } from '@rangefoundry/ballistics'\nexport { waterDensity }",
     "rules": ["schema-imports-units-only"]
   },
   "packages/schema/src/dom.ts": {
@@ -156,11 +156,11 @@
     "rules": ["catalog-imports-schema-only"]
   },
   "packages/catalog/src/ballistics.ts": {
-    "source": "import { waterDensity } from '@open-reloading/ballistics'\nexport { waterDensity }",
+    "source": "import { waterDensity } from '@rangefoundry/ballistics'\nexport { waterDensity }",
     "rules": ["catalog-imports-schema-only"]
   },
   "packages/api/src/logic-catalog-schema.ts": {
-    "source": "import { waterDensity } from '@open-reloading/ballistics'\nimport { checkRecords } from '@open-reloading/catalog'\nimport { Load } from '@open-reloading/schema'\nimport { runTask } from '@open-reloading/use-cases'\nimport Fastify from 'fastify'\nexport { waterDensity, checkRecords, Load, runTask, Fastify }",
+    "source": "import { waterDensity } from '@rangefoundry/ballistics'\nimport { checkRecords } from '@open-reloading/catalog'\nimport { Load } from '@open-reloading/schema'\nimport { runTask } from '@rangefoundry/use-cases'\nimport Fastify from 'fastify'\nexport { waterDensity, checkRecords, Load, runTask, Fastify }",
     "rules": []
   },
   "packages/api/src/importers.ts": {
@@ -176,7 +176,7 @@
     "rules": []
   },
   "packages/cli/src/libraries.ts": {
-    "source": "import { interior } from '@open-reloading/ballistics'\nimport { checkRecords } from '@open-reloading/catalog'\nimport { seat } from '@open-reloading/svg-drawings/seating'\nimport { toSi } from '@open-reloading/schema'\nimport { readRecords } from '@open-reloading/tools/catalog'\nexport { interior, checkRecords, seat, toSi, readRecords }",
+    "source": "import { interior } from '@rangefoundry/ballistics'\nimport { checkRecords } from '@open-reloading/catalog'\nimport { seat } from '@open-reloading/svg-drawings/seating'\nimport { toSi } from '@open-reloading/schema'\nimport { readRecords } from '@open-reloading/tools/catalog'\nexport { interior, checkRecords, seat, toSi, readRecords }",
     "rules": []
   },
   "packages/cli/src/api.ts": {
@@ -184,7 +184,7 @@
     "rules": ["cli-imports-logic-catalog-drawing-schema-only"]
   },
   "packages/cli/src/api-entries.ts": {
-    "source": "import { openCatalogue } from '@open-reloading/api/catalogue'\nimport { operations } from '@open-reloading/use-cases'\nexport { openCatalogue, operations }",
+    "source": "import { openCatalogue } from '@open-reloading/api/catalogue'\nimport { operations } from '@rangefoundry/use-cases'\nexport { openCatalogue, operations }",
     "rules": []
   },
   "packages/cli/src/api-static.ts": {
@@ -208,7 +208,7 @@
     "rules": ["api-imports-logic-catalog-schema-only"]
   },
   "apps/web/src/lib/allowed.ts": {
-    "source": "import { checkSpec } from '@open-reloading/catalog/plausibility'\nimport { runTask } from '@open-reloading/use-cases'\nimport { openCatalogue } from '@open-reloading/api/catalogue'\nimport { waterDensity } from '@open-reloading/ballistics'\nimport { seating } from '@open-reloading/svg-drawings/seating'\nexport { checkSpec, runTask, openCatalogue, waterDensity, seating }",
+    "source": "import { checkSpec } from '@open-reloading/catalog/plausibility'\nimport { runTask } from '@rangefoundry/use-cases'\nimport { openCatalogue } from '@open-reloading/api/catalogue'\nimport { waterDensity } from '@rangefoundry/ballistics'\nimport { seating } from '@open-reloading/svg-drawings/seating'\nexport { checkSpec, runTask, openCatalogue, waterDensity, seating }",
     "rules": []
   },
   "apps/web/src/lib/alias.ts": {
@@ -400,7 +400,7 @@
     "rules": ["shot-groups-imports-units-statistics-only"]
   },
   "packages/use-cases/src/logic.ts": {
-    "source": "import { trajectory } from '@open-reloading/ballistics'\nimport { bullet } from '@open-reloading/schema'\nimport type { Catalogue } from '@open-reloading/catalog'\nimport { z } from 'zod'\nexport type { Catalogue }\nexport { trajectory, bullet, z }",
+    "source": "import { trajectory } from '@rangefoundry/ballistics'\nimport { bullet } from '@open-reloading/schema'\nimport type { Catalogue } from '@open-reloading/catalog'\nimport { z } from 'zod'\nexport type { Catalogue }\nexport { trajectory, bullet, z }",
     "rules": []
   },
   "packages/use-cases/src/catalog-value.ts": {
@@ -432,7 +432,7 @@
     "rules": ["use-cases-imports-logic-only"]
   },
   "apps/web/src/lib/refusal-words.ts": {
-    "source": "import type { ExteriorIssue } from '@open-reloading/ballistics'\nimport { msg } from '../i18n/translate.ts'\nimport { gapWords } from './resistance-gaps.ts'\nimport { interiorFields } from './interior-input.ts'\nexport const words = [msg, gapWords, interiorFields]\nexport type Issue = ExteriorIssue",
+    "source": "import type { ExteriorIssue } from '@rangefoundry/ballistics'\nimport { msg } from '../i18n/translate.ts'\nimport { gapWords } from './resistance-gaps.ts'\nimport { interiorFields } from './interior-input.ts'\nexport const words = [msg, gapWords, interiorFields]\nexport type Issue = ExteriorIssue",
     "rules": ["refusal-words-imports"]
   },
   "packages/target-recognition/src/logic.ts": {

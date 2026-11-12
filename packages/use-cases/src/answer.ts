@@ -1,6 +1,7 @@
 /** Parts of compute answers shared by the compute routes: the notice, error answers and checks. */
-import { TruingError } from '@open-reloading/ballistics'
+
 import type { Bullet, Powder, Provenance } from '@open-reloading/schema'
+import { TruingError } from '@rangefoundry/ballistics'
 import { InputError } from '@rangefoundry/statistics'
 import { z } from 'zod'
 import { RecordNotFound, InputError as UseCaseInputError } from './issue.ts'

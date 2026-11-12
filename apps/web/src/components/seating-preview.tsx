@@ -1,7 +1,6 @@
 'use client'
 
 import { Anchor, NativeSelect } from '@mantine/core'
-import { cartridgeDiameters } from '@open-reloading/ballistics'
 import { type Bullet, fromSi, toSi } from '@open-reloading/schema'
 import { fullSection, svgPath, toPartFrame } from '@open-reloading/svg-drawings'
 import { bulletDimensions } from '@open-reloading/svg-drawings/bullet'
@@ -18,6 +17,7 @@ import {
   seat,
   type Tagged,
 } from '@open-reloading/svg-drawings/seating'
+import { cartridgeDiameters } from '@rangefoundry/ballistics'
 import dynamic from 'next/dynamic'
 import {
   type Dispatch,

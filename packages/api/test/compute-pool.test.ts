@@ -1,6 +1,6 @@
 import { once } from 'node:events'
 import type { AddressInfo } from 'node:net'
-import type { ComputeRunner } from '@open-reloading/use-cases'
+import type { ComputeRunner } from '@rangefoundry/use-cases'
 import { describe, expect, it, vi } from 'vitest'
 import { buildApp } from '../src/app.ts'
 import { createComputeRunner } from '../src/compute/pool.ts'

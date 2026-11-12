@@ -2,8 +2,8 @@ import { readFileSync } from 'node:fs'
 import { posix } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-/** The packages `@open-reloading/use-cases/catalog` may import: ballistics and schema, no Node API. */
-const catalogueAllowed = ['@open-reloading/ballistics', '@open-reloading/schema']
+/** The packages `@rangefoundry/use-cases/catalog` may import: ballistics and schema, no Node API. */
+const catalogueAllowed = ['@rangefoundry/ballistics', '@open-reloading/schema']
 
 /** The files below `src/` that `entry` reaches by relative imports, and their other imports. */
 function imports(entry: string) {

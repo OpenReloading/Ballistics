@@ -1,9 +1,4 @@
-import {
-  burnFormKeys,
-  type InteriorLoad,
-  interiorLoad,
-  ValueError,
-} from '@open-reloading/ballistics'
+import { burnFormKeys, type InteriorLoad, interiorLoad, ValueError } from '@rangefoundry/ballistics'
 import { msg, type Translator } from '../i18n/translate.ts'
 import type { FieldSpec } from './field-spec.ts'
 

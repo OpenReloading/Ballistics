@@ -1,5 +1,5 @@
 import { useElementSize } from '@mantine/hooks'
-import type { PowderPrediction } from '@open-reloading/ballistics'
+import type { PowderPrediction } from '@rangefoundry/ballistics'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
 import type { ChargeRow } from '../lib/measurements.ts'

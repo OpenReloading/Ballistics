@@ -1,4 +1,4 @@
-import { ComputeBusy, ComputeTimeout } from '@open-reloading/use-cases'
+import { ComputeBusy, ComputeTimeout } from '@rangefoundry/use-cases'
 import { describe, expect, it, vi } from 'vitest'
 import { createPool, type PoolOptions } from '../src/compute/pool.ts'
 

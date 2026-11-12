@@ -1,4 +1,3 @@
-import type { PowderConfidence, PowderFit } from '@open-reloading/ballistics'
 import {
   fromSi,
   type Powder,
@@ -6,6 +5,7 @@ import {
   type UserPowderFit,
   type UserRecord,
 } from '@open-reloading/schema'
+import type { PowderConfidence, PowderFit } from '@rangefoundry/ballistics'
 import web from '../../package.json'
 import { english, type Translator } from '../i18n/translate.ts'
 import { fitStrings, type TuneString } from './powder-tune.ts'

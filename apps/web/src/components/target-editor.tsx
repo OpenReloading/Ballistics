@@ -21,7 +21,6 @@ import {
   Tooltip,
 } from '@mantine/core'
 import { useElementSize, useMediaQuery, useMergedRef } from '@mantine/hooks'
-import { overlay } from '@open-reloading/ballistics'
 import {
   type CalibrationReference,
   type GroupFace,
@@ -55,6 +54,7 @@ import {
   Target,
   Trash,
 } from '@phosphor-icons/react'
+import { overlay } from '@rangefoundry/ballistics'
 import {
   type CSSProperties,
   type Dispatch,

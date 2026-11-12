@@ -1,6 +1,6 @@
-import { icao, startPressureOf } from '@open-reloading/ballistics'
 import { fromSi, toSi } from '@open-reloading/schema'
 import { seat } from '@open-reloading/svg-drawings/seating'
+import { icao, startPressureOf } from '@rangefoundry/ballistics'
 import { english, type Translator } from '../i18n/translate.ts'
 import type { InteriorKey } from './interior-input.ts'
 import type { LadderDirection } from './seating-ladder.ts'

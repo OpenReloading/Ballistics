@@ -15,14 +15,14 @@
   },
   "dependencies": {
     "@open-reloading/api": "workspace:*",
-    "@open-reloading/ballistics": "workspace:*",
+    "@rangefoundry/ballistics": "workspace:*",
     "@open-reloading/catalog": "workspace:*",
     "@open-reloading/svg-drawings": "workspace:*",
     "@open-reloading/schema": "workspace:*",
     "@rangefoundry/statistics": "workspace:*",
     "@open-reloading/tools": "workspace:*",
     "@open-reloading/units": "workspace:*",
-    "@open-reloading/use-cases": "workspace:*",
+    "@rangefoundry/use-cases": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {

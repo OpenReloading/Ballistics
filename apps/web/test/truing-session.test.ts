@@ -3,7 +3,7 @@ import {
   standardAtmosphere,
   type TrajectoryInput,
   trajectory,
-} from '@open-reloading/ballistics'
+} from '@rangefoundry/ballistics'
 import { describe, expect, it } from 'vitest'
 import { english, type Say } from '../src/i18n/translate.ts'
 import { setRefusalWords } from '../src/lib/core-messages.ts'

@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { dirname, extname, join, relative, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { interior } from '@open-reloading/ballistics'
+import { interior } from '@rangefoundry/ballistics'
 import { InputError } from '@rangefoundry/statistics'
 import { UsageError } from './errors.ts'
 import type { InteriorModel } from './evaluate.ts'
@@ -43,7 +43,7 @@ function sharedFiles() {
   const schema = dirname(fileURLToPath(import.meta.resolve('@open-reloading/schema')))
   const units = dirname(fileURLToPath(import.meta.resolve('@open-reloading/units')))
   const statistics = dirname(fileURLToPath(import.meta.resolve('@rangefoundry/statistics')))
-  const ballistics = dirname(fileURLToPath(import.meta.resolve('@open-reloading/ballistics')))
+  const ballistics = dirname(fileURLToPath(import.meta.resolve('@rangefoundry/ballistics')))
   return {
     statistics,
     ballistics,

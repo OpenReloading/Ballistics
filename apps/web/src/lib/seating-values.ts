@@ -1,7 +1,7 @@
-import { loadRatio } from '@open-reloading/ballistics'
 import { toSi } from '@open-reloading/schema'
 import { type Annotation, angleText, face, greek } from '@open-reloading/svg-drawings'
 import type { Seating } from '@open-reloading/svg-drawings/seating'
+import { loadRatio } from '@rangefoundry/ballistics'
 import { formatNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { formatQuantity, type UnitSystem, unitsOf } from './units.ts'
