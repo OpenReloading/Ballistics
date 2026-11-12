@@ -73,7 +73,7 @@ The records are read with `readRecords` of the repository's catalog reader (`too
 
 The first byte of the SHA-256 of the UTF-8 text `<salt>:<lower-case cartridge id>` decides: 0 to 50 test, 51 to 101 validation, 102 to 255 training (about 20 %, 20 % and 60 %). The salt is `2026-11-12` (`splitSalt`, `src/split.ts`); every result carries it as `splitSalt`. A row has the split of its cartridge. `--split` takes `validation` (default), `training` or `test`. The test split is sealed: `--split test` is refused without `--final`, to be run once per model version. `--final` with another split is bad input.
 
-Until 2026-11-12 the rule had no salt. Its test split was read for eight model versions and is spent, so the salt assigns every cartridge again ([research entry](research/validation-split-salt.md)). Results of the two rules hold other rows per split and are not compared: `compare` refuses a saved baseline of another salt or of none.
+Until 2026-11-12 the rule had no salt. Its test split was read for eight model versions and is spent, so the salt assigns every cartridge again ([research entry](research/validation-split-salt.md)). Every figure of the documentation outside the [research entry](research/validation-split-salt.md) was measured under the rule without a salt unless it names the salt. Results of the two rules hold other rows per split and are not compared: `compare` refuses a saved baseline of another salt or of none.
 
 ## Metrics
 

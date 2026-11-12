@@ -24,7 +24,7 @@ The first byte of the SHA-256 of the UTF-8 text `<salt>:<lower-case cartridge id
 
 The test split is run once per model version, at release, with the model version hash printed in the pull request or the release notes. A run on the test split never guides a model change; a change made after looking at it needs a new version and gives up that split's claim for the earlier one.
 
-The salt dates from 2026-11-12. The rule before it had none, and its test split was read for eight model versions, so it is spent and every cartridge was assigned again ([research entry](../research/validation-split-salt.md)). A result of the earlier rule is not compared with one of this rule. The powder records were fitted on the earlier rule's training rows, so under this rule only a run with `--params fit-on-training` is held out, and only for the values its fit sets.
+The salt dates from 2026-11-12. The rule before it had none, and its test split was read for eight model versions, so it is spent and every cartridge was assigned again ([research entry](../research/validation-split-salt.md)). A result of the earlier rule is not compared with one of this rule. The powder records, the friction constants and the start-pressure rule were fitted on the earlier rule's training rows, which hold cartridges of this rule's validation and test splits, and no command line option refits the friction constants or the start-pressure rule. So under this rule only a run with `--params fit-on-training` is held out, and only for the values its fit sets.
 
 ### Metrics
 
@@ -39,11 +39,11 @@ All errors are absolute relative errors. For the muzzle velocity the error of a 
 
 ```sh
 pnpm run build
-node packages/cli/dist/bin.js verify --rows <rows> --records <records> --split validation
-node packages/cli/dist/bin.js verify --rows <rows> --records <records> --split test --final
+node packages/cli/dist/bin.js verify --rows <rows> --records <records> --params fit-on-training --split validation
+node packages/cli/dist/bin.js verify --rows <rows> --records <records> --params fit-on-training --split test --final
 ```
 
-`--json` gives the result as data; `--group-by powder` and `--group-by family` give the groups; `--leave-one-powder-out` gives the line of the powder not in the fitted set (`notInFittedSet`), which fills the last row of the results table. The second command is the sealed run and is refused without `--final`. A change to the model is judged with `compare --baseline <verify.json> --candidate <model>` on the same rows. The row and column format and the model version hash are defined on the [command line](../cli.md) page.
+`--params fit-on-training` is part of both commands because the powder records were fitted on the training rows of the earlier rule, so a run with `--params records` is not held out under the salted rule ([Split](#split)). `--json` gives the result as data; `--group-by powder` and `--group-by family` give the groups; `--leave-one-powder-out` gives the line of the powder not in the fitted set (`notInFittedSet`), which fills the last row of the results table. The second command is the sealed run and is refused without `--final`. A change to the model is judged with `compare --baseline <verify.json> --candidate <model>` on the same rows. The row and column format and the model version hash are defined on the [command line](../cli.md) page.
 
 The repository holds no measured rows. The command line tests run on synthetic rows built from the model itself, so they test the arithmetic of the evaluation and not the model. Before a release, a test reruns the table below from the rows file ([Releases](../release.md#validation-results)).
 
@@ -111,7 +111,7 @@ May say, with the numbers of a run and nothing else added:
 
 > Held-out median error X percent, P90 Y percent on N rows of powder family F, model version H.
 
-Where X, Y, N, F and H are the values of one `verify` result on one split. A result on the test split says so.
+Where X, Y, N, F and H are the values of one `verify` result on one split. A result on the test split says so. Say "held-out" only of a run that is held out under the split rule in force: under the salted rule, a run with `--params fit-on-training`, and only for the values its fit sets.
 
 May not say:
 

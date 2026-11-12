@@ -61,7 +61,7 @@ export function verifyTable(r: VerifyResult): string {
   return [
     `model ${r.model}  version ${r.modelVersion}`,
     ...publishedLines(r.published),
-    `split ${r.split}  interval half width ${pct(r.interval.halfWidth)} % from ${r.interval.trainingRows} training rows`,
+    `split ${r.split}  salt ${r.splitSalt}  interval half width ${pct(r.interval.halfWidth)} % from ${r.interval.trainingRows} training rows`,
     table(metricHead, groups),
     ...(reasons.length > 0 ? [`not used: ${reasons.join(', ')}`] : []),
     ...(bases.length > 0 ? [`pressure by basis, median / P90: ${bases.join(', ')}`] : []),
@@ -91,7 +91,7 @@ export function compareTable(r: CompareResult): string {
     `baseline ${r.baseline.model}  version ${r.baseline.modelVersion}`,
     `candidate ${r.candidate.model}  version ${r.candidate.modelVersion}`,
     ...publishedLines(r.published),
-    `split ${r.split}  change = candidate minus baseline, percentage points`,
+    `split ${r.split}  salt ${r.splitSalt}  change = candidate minus baseline, percentage points`,
     table(
       metricHead.map((h, i) => (i === 1 ? 'used' : h)),
       groups,
@@ -114,7 +114,7 @@ export function fitTable(r: FitResult): string {
   const families = Object.entries(r.exponent?.families ?? {}).map(([k, f]) => `${k} ${f.exponent}`)
   const e = r.energy
   return [
-    `model ${r.model}  version ${r.modelVersion}`,
+    `model ${r.model}  version ${r.modelVersion}  split salt ${r.splitSalt}`,
     ...(e
       ? [
           `energy: factor ${e.factor} from ${e.pressureRows} pressure rows; priors own ${e.priors.own}, by base ${e.priors.byBase}, pooled ${e.priors.pooled}`,

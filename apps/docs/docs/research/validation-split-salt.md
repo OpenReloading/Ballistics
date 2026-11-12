@@ -20,8 +20,9 @@ The first rule's test split is declared spent: a model version tuned after eight
 
 What a result under the new rule is not held out from:
 
-- The powder records in use were fitted on the training rows of the first rule, which hold cartridges of the new validation and test splits. A `--params records` run on those splits is therefore not a held-out result. A `--params fit-on-training` run is one for what its fit sets (the burn coefficient, with `--exponent family` the exponent, with `--energy prior` the energy); a value the fit leaves at the record's, such as the energy without `--energy prior`, has seen the earlier training rows.
-- Choices made earlier on the first rule's validation rows (the start-pressure rule, the friction constants, the design of the fit options) have seen cartridges that are now in the test split.
+- The powder records in use were fitted on the training rows of the first rule, which hold cartridges of the new validation and test splits. The friction constants ([engraving ramp](interior-engraving-ramp.md)) and the start-pressure rule ([start-pressure rules](interior-start-pressure-rules.md)) are model constants fitted on those first-rule training rows too, and no command line option refits them, so every run, `--params fit-on-training` included, has seen them. A `--params records` run on those splits is therefore not a held-out result. A `--params fit-on-training` run is one for what its fit sets (the burn coefficient, with `--exponent family` the exponent, with `--energy prior` the energy); a value the fit leaves at the record's, such as the energy without `--energy prior`, has seen the earlier training rows.
+- Choices made earlier on the first rule's validation rows (the design of the fit options) have seen cartridges that are now in the test split.
+- Every figure of the documentation outside this entry was measured under the rule without a salt unless it names the salt.
 
 ## Formulas
 
@@ -64,4 +65,4 @@ Public: the cartridge ids of the catalog and the hash rule. The row counts are o
 
 ## Confidence
 
-Medium: the salt was fixed blind and the tool refuses a comparison across the two rules, but the rows are the earlier rows divided again, so earlier choices have seen cartridges of the new test split. It is a cleaner final check than the spent one, not an untouched one.
+Medium: the salt was fixed blind and the tool refuses a comparison across the two rules, but the rows are the earlier rows divided again, so earlier choices have seen cartridges of the new test split. The friction constants and the start-pressure rule were fitted on first-rule training rows and are not refitted by any run, so even a `--params fit-on-training` run is held out only for the values its fit sets. It is a cleaner final check than the spent one, not an untouched one.
