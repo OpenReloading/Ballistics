@@ -1,5 +1,5 @@
+import type { Catalogued, CatalogueKind } from '@open-reloading/use-cases/catalog'
 import type { FastifyReply } from 'fastify'
-import type { Catalogued, CatalogueKind } from '../catalogue/types.ts'
 
 /** A record as the routes answer it: the stored record without the `kind`, `origin` and `revision` that `Catalogue.get` adds. */
 export function stored<K extends CatalogueKind>(record: Catalogued<K>) {

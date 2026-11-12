@@ -1,5 +1,11 @@
 import { checkSpec } from '@open-reloading/catalog/plausibility'
 import {
+  type CartridgeOverrides,
+  type SpecValue,
+  toSi,
+  type UserCartridge,
+} from '@open-reloading/schema'
+import {
   drawnTables,
   type Figure,
   figureModel,
@@ -10,14 +16,8 @@ import {
   screenWidth,
   sideName,
   storedValue,
-} from '@open-reloading/drawing/cartridge'
-import { chamberOf } from '@open-reloading/drawing/seating'
-import {
-  type CartridgeOverrides,
-  type SpecValue,
-  toSi,
-  type UserCartridge,
-} from '@open-reloading/schema'
+} from '@open-reloading/svg-drawings/cartridge'
+import { chamberOf } from '@open-reloading/svg-drawings/seating'
 import { localizeNumber } from '../i18n/number.ts'
 import { english, msg, type Translator } from '../i18n/translate.ts'
 import type { CartridgeDetail } from './api-types.ts'
@@ -52,7 +52,7 @@ const both: Side[] = ['cartridge', 'chamber']
 const cartridge: Side[] = ['cartridge']
 const chamber: Side[] = ['chamber']
 
-/** The CIP symbols the outline reads (`cipProfile` of `@open-reloading/drawing/cartridge`): the typical largest value sets the length limit (2.5 times it, 50 mm for a diameter); not read for an angle. */
+/** The CIP symbols the outline reads (`cipProfile` of `@open-reloading/svg-drawings/cartridge`): the typical largest value sets the length limit (2.5 times it, 50 mm for a diameter); not read for an angle. */
 const symbols: [string, string, Side[], Group, number, 'length' | 'angle'][] = [
   ['R1', 'rim diameter at the head', both, 'head', 35, 'length'],
   ['R', 'rim thickness', both, 'head', 10, 'length'],

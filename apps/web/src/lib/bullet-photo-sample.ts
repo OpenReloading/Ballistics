@@ -1,6 +1,7 @@
 /** The sample photo the tool offers and the known truth the tests measure against (`apps/docs/docs/models/bullet-photo.md`). */
-import { type BulletDimensions, bulletProfile } from '@open-reloading/drawing/bullet'
+
 import { toSi } from '@open-reloading/schema'
+import { type BulletDimensions, bulletProfile } from '@open-reloading/svg-drawings/bullet'
 import { clamp } from '@open-reloading/target-recognition'
 import type { ScaleSpan } from './bullet-photo.ts'
 import type { RgbaImage } from './image.ts'

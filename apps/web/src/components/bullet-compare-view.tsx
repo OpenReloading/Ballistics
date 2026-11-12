@@ -1,9 +1,9 @@
 'use client'
 
 import { Text } from '@mantine/core'
-import type { LengthUnit } from '@open-reloading/drawing'
-import { type BulletProfile, recordProfile } from '@open-reloading/drawing/bullet'
 import type { Bullet } from '@open-reloading/schema'
+import type { LengthUnit } from '@open-reloading/svg-drawings'
+import { type BulletProfile, recordProfile } from '@open-reloading/svg-drawings/bullet'
 import { ArrowsLeftRight, WarningCircle } from '@phosphor-icons/react'
 import { useSearchParams } from 'next/navigation'
 import { Fragment, useEffect, useState } from 'react'

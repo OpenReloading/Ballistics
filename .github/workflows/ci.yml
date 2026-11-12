@@ -127,7 +127,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include: ${{ fromJSON(needs.changes.outputs.tests || '[{"name":"drawing","filter":"--filter @open-reloading/drawing","e2eUnit":false},{"name":"web","filter":"--filter @open-reloading/web","e2eUnit":false},{"name":"packages","filter":"--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/design-tokens --filter @open-reloading/statistics --filter @open-reloading/ballistics --filter @open-reloading/shot-groups --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/catalog --filter @open-reloading/target-recognition --filter @open-reloading/use-cases --filter @open-reloading/api --filter @open-reloading/docs --filter @open-reloading/tools --filter @open-reloading/test-kit","e2eUnit":true},{"name":"cli","filter":"--filter @open-reloading/cli","e2eUnit":false},{"name":"ui","filter":"--filter @open-reloading/ui","e2eUnit":false}]') }}
+        include: ${{ fromJSON(needs.changes.outputs.tests || '[{"name":"drawing","filter":"--filter @open-reloading/svg-drawings","e2eUnit":false},{"name":"web","filter":"--filter @open-reloading/web","e2eUnit":false},{"name":"packages","filter":"--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/design-tokens --filter @open-reloading/statistics --filter @open-reloading/ballistics --filter @open-reloading/shot-groups --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/catalog --filter @open-reloading/target-recognition --filter @open-reloading/use-cases --filter @open-reloading/api --filter @open-reloading/docs --filter @open-reloading/tools --filter @open-reloading/test-kit","e2eUnit":true},{"name":"cli","filter":"--filter @open-reloading/cli","e2eUnit":false},{"name":"ui","filter":"--filter @open-reloading/ui","e2eUnit":false}]') }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -351,7 +351,7 @@ jobs:
           BASE: ${{ github.event.pull_request.base.sha }}
         run: |
           git cat-file -e "$BASE^{commit}" 2>/dev/null || { echo "no base commit"; exit 0; }
-          if git diff --quiet "$BASE" HEAD -- packages/drawing/src 'apps/web/src/components/*drawing*'; then
+          if git diff --quiet "$BASE" HEAD -- packages/svg-drawings/src 'apps/web/src/components/*drawing*'; then
             echo "no drawing change"; exit 0
           fi
           snaps='apps/e2e/tests/web/drawing-baseline.spec.ts-snapshots/'

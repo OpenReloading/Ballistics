@@ -179,7 +179,7 @@ Screening of 16 small modules of the web libraries, the data checks, the drawing
 - `apps/web/src/lib/user-store.ts`: the browser store of user records and photos: invalid entries stored only where the id is free, the photo ids of invalid sheets, a change read and written in one transaction, the relink of a chain of refits on delete and the persistent storage request.
 - `packages/catalog/src/references.ts`: the reference checks of the record data (cartridge, components, primer, capacity, case, session, load and manufacturer of every record kind), with renamed ids.
 - `tools/src/pack-check.ts`: the tarball check of the published libraries: entry points, the `files` field, test files, source maps and undeclared imports.
-- `packages/drawing/src/core/geometry.ts`: the overlap tests the label placement of the drawings reads: segment and box, two boxes, two segments, two polygons with a pad, and the distance to a box.
+- `packages/svg-drawings/src/core/geometry.ts`: the overlap tests the label placement of the drawings reads: segment and box, two boxes, two segments, two polygons with a pad, and the distance to a box.
 
 Left out: `tools/audit.ts`, whose survivors are mostly its script block, which runs `npm audit` through a path that a test cannot replace; `web/caliber.ts`, whose survivors are mostly the literals of its caliber table; the others for their higher scores.
 
@@ -285,7 +285,7 @@ analytic. The runs mutate the source and run the existing tests; no measured dat
 - `apps/web/src/lib/user-store.ts`, `apps/web/test/user-store.test.ts`, `apps/web/test/user-store-refit.test.ts`, `apps/web/test/user-store-write.test.ts`
 - `packages/catalog/src/references.ts`, `packages/catalog/test/references.test.ts`
 - `tools/src/pack-check.ts`, `tools/test/pack-check.test.ts`
-- `packages/drawing/src/core/geometry.ts`, `packages/drawing/test/geometry.test.ts`
+- `packages/svg-drawings/src/core/geometry.ts`, `packages/svg-drawings/test/geometry.test.ts`
 - `packages/importers/src/units.ts`, `packages/importers/test/units.test.ts`
 - `apps/web/src/lib/records-csv.ts`, `apps/web/test/records-csv.test.ts`
 - `tools/src/licences.ts`, `tools/test/licences.test.ts`

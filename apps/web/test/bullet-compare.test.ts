@@ -1,5 +1,5 @@
-import { bulletProfile } from '@open-reloading/drawing/bullet'
 import type { Bullet } from '@open-reloading/schema'
+import { bulletProfile } from '@open-reloading/svg-drawings/bullet'
 import { expect, it } from 'vitest'
 import { translator } from '../src/i18n/translate.ts'
 import {
