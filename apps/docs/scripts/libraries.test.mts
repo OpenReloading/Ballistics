@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict'
-import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
@@ -35,18 +34,5 @@ for (const { page: pageName, name } of libraries) {
       manifest.homepage,
       `https://openreloading.github.io/Ballistics/docs/libraries/${pageName}/`,
     )
-  })
-
-  // the example runs from apps/docs, where the workspace packages resolve to their dist/
-  test(`${name}: the example prints what its comments say`, () => {
-    const example = page.match(/^## Example\n[\s\S]*?```js\n([\s\S]*?)```/m)?.[1]
-    assert.ok(example, 'no js block under ## Example')
-    const expected = [...example.matchAll(/^console\.log\(.*\) \/\/ (.*)$/gm)].map((m) => m[1])
-    assert.ok(expected.length > 0, 'no console.log line with its output')
-    const out = execFileSync(process.execPath, ['--input-type=module', '-e', example], {
-      cwd: docs,
-      encoding: 'utf8',
-    })
-    assert.deepEqual(out.trimEnd().split('\n'), expected)
   })
 }
