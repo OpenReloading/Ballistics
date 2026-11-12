@@ -194,13 +194,14 @@
     },
     "workbench": {
       "budget": {
-        "initial": 643000,
-        "total": 1061000
+        "initial": 646000,
+        "chunk": 190000
       },
       "routes": {
         "/workbench": {
-          "initial": 617542,
-          "total": 1024030
+          "initial": 633296,
+          "total": 1060281,
+          "chunk": 186247
         }
       }
     }

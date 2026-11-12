@@ -10,6 +10,7 @@ import {
   parseClientManifest,
   table,
   violations,
+  type Weight,
 } from '../scripts/check-weight.mts'
 
 const budget: Budget = {
@@ -61,7 +62,11 @@ it('counts each file once in gzip bytes: initial files first, lazy chunks in the
   const gz = (s: string) => gzipSync(s, { level: 9 }).length
   const initial = gz(files['static/main.js']) + gz(files['static/chunk.js'])
   expect(measure(build(files))).toEqual({
-    '/a': { initial, total: initial + gz(files['static/lazy.js']) },
+    '/a': {
+      initial,
+      total: initial + gz(files['static/lazy.js']),
+      chunk: gz(files['static/lazy.js']),
+    },
   })
 })
 
@@ -75,17 +80,27 @@ it('fails on a route whose manifest is missing', () => {
 })
 
 it('passes at the budget and fails one byte over, per measure', () => {
-  expect(violations({ '/a': { initial: 100, total: 150 } }, budget)).toEqual([])
-  expect(violations({ '/a': { initial: 101, total: 150 } }, budget)).toEqual([
+  expect(violations({ '/a': { initial: 100, total: 150, chunk: 150 } }, budget)).toEqual([])
+  expect(violations({ '/a': { initial: 101, total: 150, chunk: 0 } }, budget)).toEqual([
     '/a: initial 101 B over the pages budget of 100 B',
   ])
-  expect(violations({ '/a': { initial: 100, total: 151 } }, budget)).toEqual([
+  expect(violations({ '/a': { initial: 100, total: 151, chunk: 0 } }, budget)).toEqual([
     '/a: total 151 B over the pages budget of 150 B',
   ])
 })
 
+it('gates each lazy chunk and not the total of a group with a chunk limit', () => {
+  const chunked: Budget = {
+    groups: { pages: { budget: { initial: 100, chunk: 50 }, routes: { '/a': {} } } },
+  }
+  expect(violations({ '/a': { initial: 100, total: 999, chunk: 50 } }, chunked)).toEqual([])
+  expect(violations({ '/a': { initial: 100, total: 999, chunk: 51 } }, chunked)).toEqual([
+    '/a: chunk 51 B over the pages budget of 50 B',
+  ])
+})
+
 it('fails on a built route in no group and on a group route the build lacks', () => {
-  const fits = { initial: 1, total: 1 }
+  const fits = { initial: 1, total: 1, chunk: 0 }
   expect(violations({ '/a': fits, '/new': fits }, budget)).toEqual([
     '/new: in no group of weight-budget.json',
   ])
@@ -101,9 +116,9 @@ it('tabulates the change against the recorded weight', () => {
       },
     },
   }
-  const rows = table({ '/a': { initial: 95_000, total: 120_000 } }, big).split('\n')
+  const rows = table({ '/a': { initial: 95_000, total: 120_000, chunk: 20_000 } }, big).split('\n')
   expect(rows[2]).toBe(
-    '| pages | `/a` | 95.0 kB | +5000 B | 120.0 kB | 0 | 100.0 kB / 150.0 kB | 5000 B / 30000 B |',
+    '| pages | `/a` | 95.0 kB | +5000 B | 120.0 kB | 0 | 20.0 kB | new | 100.0 kB / 150.0 kB / none | 5000 B / 30000 B / none |',
   )
 })
 
@@ -116,29 +131,37 @@ it('warns once per route with less than 1 % of its budget left, not on a route o
       },
     },
   }
-  const near = { '/a': { initial: 99_001, total: 149_000 }, '/b': { initial: 99_000, total: 1 } }
+  const near = {
+    '/a': { initial: 99_001, total: 149_000, chunk: 0 },
+    '/b': { initial: 99_000, total: 1, chunk: 0 },
+  }
   expect(nearLimit(near, big)).toEqual([
     '/a: near the limit of the pages budget, initial 999 B left, total 1000 B left',
   ])
   expect(violations(near, big)).toEqual([])
   expect(
-    nearLimit({ '/a': { initial: 100_001, total: 1 }, '/b': { initial: 1, total: 1 } }, big),
+    nearLimit(
+      { '/a': { initial: 100_001, total: 1, chunk: 0 }, '/b': { initial: 1, total: 1, chunk: 0 } },
+      big,
+    ),
   ).toEqual([])
 })
 
 it('tabulates a built route in no group, for the budget it needs', () => {
-  const rows = table({ '/new': { initial: 1_000, total: 2_000 } }, { groups: {} }).split('\n')
-  expect(rows[2]).toBe('| none | `/new` | 1.0 kB | new | 2.0 kB | new | none | none |')
+  const rows = table({ '/new': { initial: 1_000, total: 2_000, chunk: 1_000 } }, { groups: {} })
+  expect(rows.split('\n')[2]).toBe(
+    '| none | `/new` | 1.0 kB | new | 2.0 kB | new | 1.0 kB | new | none | none |',
+  )
 })
 
 // The 2 % margin applies when a budget is set or raised; recorded weights may later grow into it.
 it('keeps every group budget at least at its largest recorded weight', () => {
   const file = readFileSync(path.join(import.meta.dirname, '..', 'weight-budget.json'), 'utf8')
   const recorded = JSON.parse(file) as Budget
-  const largest = (group: Budget['groups'][string], key: 'initial' | 'total') =>
-    Math.max(...Object.values(group.routes).map((w) => w[key]))
   for (const [name, group] of Object.entries(recorded.groups)) {
-    expect(group.budget.initial, name).toBeGreaterThanOrEqual(largest(group, 'initial'))
-    expect(group.budget.total, name).toBeGreaterThanOrEqual(largest(group, 'total'))
+    for (const [key, limit] of Object.entries(group.budget) as [keyof Weight, number][]) {
+      const largest = Math.max(...Object.values(group.routes).map((w) => w[key] ?? Number.NaN))
+      expect(limit, `${name} ${key}`).toBeGreaterThanOrEqual(largest)
+    }
   }
 })

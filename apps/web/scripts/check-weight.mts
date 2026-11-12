@@ -5,12 +5,17 @@ import { gzipSync } from 'node:zlib'
 
 const webRoot = path.join(import.meta.dirname, '..')
 
-/** Bytes of gzip level 9 of the JavaScript of one route. */
-export type Weight = { initial: number; total: number }
+/** Bytes of gzip level 9 of the JavaScript of one route; `chunk` is its largest lazy chunk. */
+export type Weight = { initial: number; total: number; chunk: number }
+
+/** A group's limits: `initial`, and `total` or `chunk` (each lazy chunk, the total then reported only). */
+export type Limits = { initial: number; total?: number; chunk?: number }
 
 export type Budget = {
-  groups: Record<string, { budget: Weight; routes: Record<string, Weight> }>
+  groups: Record<string, { budget: Limits; routes: Record<string, Partial<Weight>> }>
 }
+
+const keys = ['initial', 'total', 'chunk'] as const
 
 const readJson = (file: string): unknown => JSON.parse(readFileSync(file, 'utf8'))
 
@@ -88,7 +93,10 @@ export function measure(next: string): Record<string, Weight> {
   return Object.fromEntries(
     Object.entries(routeFiles(next)).map(([route, { initial, lazy }]) => {
       const first = sum(initial)
-      return [route, { initial: first, total: first + sum(lazy) }]
+      return [
+        route,
+        { initial: first, total: first + sum(lazy), chunk: Math.max(0, ...[...lazy].map(size)) },
+      ]
     }),
   )
 }
@@ -102,8 +110,8 @@ function groupViolations(
   return Object.keys(group.routes).flatMap((route) => {
     const weight = measured[route]
     if (weight === undefined) return [`${route}: in group ${name} but not in the build`]
-    return (['initial', 'total'] as const)
-      .filter((key) => weight[key] > group.budget[key])
+    return keys
+      .filter((key) => weight[key] > (group.budget[key] ?? Number.POSITIVE_INFINITY))
       .map(
         (key) =>
           `${route}: ${key} ${weight[key]} B over the ${name} budget of ${group.budget[key]} B`,
@@ -131,9 +139,12 @@ export function nearLimit(measured: Record<string, Weight>, budget: Budget) {
     Object.keys(group.routes).flatMap((route) => {
       const weight = measured[route]
       if (weight === undefined) return []
-      const near = (['initial', 'total'] as const)
-        .map((key) => ({ key, left: group.budget[key] - weight[key] }))
-        .filter(({ key, left }) => left >= 0 && left < group.budget[key] * nearShare)
+      const near = keys
+        .flatMap((key) => {
+          const limit = group.budget[key]
+          return limit === undefined ? [] : [{ key, limit, left: limit - weight[key] }]
+        })
+        .filter(({ limit, left }) => left >= 0 && left < limit * nearShare)
       if (near.length === 0) return []
       return [
         `${route}: near the limit of the ${name} budget, ${near.map(({ key, left }) => `${key} ${left} B left`).join(', ')}`,
@@ -146,18 +157,21 @@ const kb = (n: number) => `${(n / 1000).toFixed(1)} kB`
 const change = (now: number, was: number | undefined) =>
   was === undefined ? 'new' : now === was ? '0' : `${now > was ? '+' : '-'}${Math.abs(now - was)} B`
 
+const perKey = (limits: Limits, cell: (limit: number, key: (typeof keys)[number]) => string) =>
+  keys.map((key) => (limits[key] === undefined ? 'none' : cell(limits[key], key))).join(' / ')
+
 /** Markdown table: per route the weight now, the change against the recorded weight, the group budget and the headroom under it. */
 export function table(measured: Record<string, Weight>, budget: Budget) {
   const rows = [
-    '| Group | Route | Initial | Change | Total | Change | Budget (initial / total) | Headroom (initial / total) |',
-    '|---|---|---:|---:|---:|---:|---:|---:|',
+    '| Group | Route | Initial | Change | Total | Change | Largest lazy chunk | Change | Budget (initial / total / chunk) | Headroom (initial / total / chunk) |',
+    '|---|---|---:|---:|---:|---:|---:|---:|---:|---:|',
   ]
   for (const [name, group] of Object.entries(budget.groups)) {
     for (const [route, recorded] of Object.entries(group.routes)) {
       const now = measured[route]
       if (now === undefined) continue
       rows.push(
-        `| ${name} | \`${route}\` | ${kb(now.initial)} | ${change(now.initial, recorded.initial)} | ${kb(now.total)} | ${change(now.total, recorded.total)} | ${kb(group.budget.initial)} / ${kb(group.budget.total)} | ${group.budget.initial - now.initial} B / ${group.budget.total - now.total} B |`,
+        `| ${name} | \`${route}\` | ${kb(now.initial)} | ${change(now.initial, recorded.initial)} | ${kb(now.total)} | ${change(now.total, recorded.total)} | ${kb(now.chunk)} | ${change(now.chunk, recorded.chunk)} | ${perKey(group.budget, kb)} | ${perKey(group.budget, (limit, key) => `${limit - now[key]} B`)} |`,
       )
     }
   }
@@ -165,7 +179,7 @@ export function table(measured: Record<string, Weight>, budget: Budget) {
   for (const [route, now] of Object.entries(measured)) {
     if (!listed.has(route)) {
       rows.push(
-        `| none | \`${route}\` | ${kb(now.initial)} | new | ${kb(now.total)} | new | none | none |`,
+        `| none | \`${route}\` | ${kb(now.initial)} | new | ${kb(now.total)} | new | ${kb(now.chunk)} | new | none | none |`,
       )
     }
   }
