@@ -6,11 +6,17 @@ import { fileURLToPath } from 'node:url'
 
 const docs = fileURLToPath(new URL('../', import.meta.url))
 const root = fileURLToPath(new URL('../../../', import.meta.url))
-const libraries = ['schema', 'drawing', 'importers', 'catalog']
+// the page keeps its file name and URL when the package is renamed
+const libraries = [
+  { page: 'schema', name: 'schema' },
+  { page: 'drawing', name: 'svg-drawings' },
+  { page: 'importers', name: 'importers' },
+  { page: 'catalog', name: 'catalog' },
+]
 
-for (const name of libraries) {
+for (const { page: pageName, name } of libraries) {
   const pkg = `@open-reloading/${name}`
-  const page = readFileSync(`${docs}docs/libraries/${name}.md`, 'utf8')
+  const page = readFileSync(`${docs}docs/libraries/${pageName}.md`, 'utf8')
 
   test(`${name}: install line, entry points, reference link and homepage`, () => {
     const manifest = JSON.parse(readFileSync(`${root}packages/${name}/package.json`, 'utf8'))
@@ -24,7 +30,7 @@ for (const name of libraries) {
     assert.ok(page.includes(`(pathname:///library/modules/_open-reloading_${name}.html)`))
     assert.equal(
       manifest.homepage,
-      `https://openreloading.github.io/Ballistics/docs/libraries/${name}/`,
+      `https://openreloading.github.io/Ballistics/docs/libraries/${pageName}/`,
     )
   })
 

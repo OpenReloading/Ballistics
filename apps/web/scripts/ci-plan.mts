@@ -16,7 +16,7 @@ const rootInputs = [
 /** Files whose change feeds the web build: without one, only the checks and the jobs of `e2eInputs` run. */
 const webInputs = [
   /^apps\/web\//,
-  /^packages\/(units|locale-format|statistics|ballistics|shot-groups|schema|importers|drawing|catalog|target-recognition|use-cases|api|design-tokens)\//,
+  /^packages\/(units|locale-format|statistics|ballistics|shot-groups|schema|importers|svg-drawings|catalog|target-recognition|use-cases|api|design-tokens)\//,
   // the catalog reader that writes the bundle the API serves
   /^tools\/src\/catalog\//,
   ...rootInputs,
@@ -128,7 +128,7 @@ export function recordClosure(root = repoRoot) {
 
 /** The test jobs of ci.yml and their workspaces; of `e2e` only the unit tests run (`test:unit`), in `packages`; a test that reads another workspace's files declares it as a devDependency, so pnpm's selection reaches it. */
 export const testGroups: Record<string, string[]> = {
-  drawing: ['drawing'],
+  drawing: ['svg-drawings'],
   web: ['web'],
   packages: [
     'units',

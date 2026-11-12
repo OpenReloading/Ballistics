@@ -1,5 +1,5 @@
-import type { Layout, LengthUnit } from '@open-reloading/drawing'
-import { face } from '@open-reloading/drawing'
+import type { Layout, LengthUnit } from '@open-reloading/svg-drawings'
+import { face } from '@open-reloading/svg-drawings'
 import {
   type FigureModel,
   figureModel,
@@ -7,7 +7,7 @@ import {
   regions,
   screenEm,
   screenWidth,
-} from '@open-reloading/drawing/cartridge'
+} from '@open-reloading/svg-drawings/cartridge'
 import { describe, expect, it } from 'vitest'
 import { defined, missing } from './defined.ts'
 import {

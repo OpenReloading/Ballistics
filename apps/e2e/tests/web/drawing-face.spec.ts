@@ -1,5 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
-import { textWidth } from '../../../../packages/drawing/src/core/text.ts'
+import { textWidth } from '../../../../packages/svg-drawings/src/core/text.ts'
 import { storeUnits } from './units.ts'
 
 /** A common rifle cartridge and a rimfire one with a short case. */

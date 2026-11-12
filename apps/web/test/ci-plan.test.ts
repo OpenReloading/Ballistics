@@ -22,7 +22,7 @@ it('walks the imports of the record pages', () => {
   expect(closure.files).toContain('apps/web/src/components/record-page.tsx')
   expect(closure.files).toContain('apps/web/src/lib/api.ts')
   expect(closure.files).not.toContain('apps/web/src/components/workbench.tsx')
-  expect(closure.packages).toContain('drawing')
+  expect(closure.packages).toContain('svg-drawings')
 })
 
 it('reads the specifiers of static, side-effect and dynamic imports', () => {
@@ -144,7 +144,7 @@ it('prerenders every record when record data, page code or shared parts changed'
     'packages/locale-format/src/display-units.ts',
     'packages/schema/src/units.ts',
     'packages/api/src/server.ts',
-    'packages/drawing/src/index.ts',
+    'packages/svg-drawings/src/index.ts',
     'apps/web/src/app/bullets/[id]/page.tsx',
     'apps/web/src/components/record-page.tsx',
     'apps/web/src/lib/api.ts',
@@ -170,7 +170,7 @@ const reachedByUnits =
 
 it('tests every workspace of every group without a list of affected ones', () => {
   expect(testJobs()).toEqual([
-    { name: 'drawing', filter: '--filter @open-reloading/drawing', e2eUnit: false },
+    { name: 'drawing', filter: '--filter @open-reloading/svg-drawings', e2eUnit: false },
     { name: 'web', filter: '--filter @open-reloading/web', e2eUnit: false },
     { name: 'packages', filter: packages, e2eUnit: true },
     { name: 'cli', filter: '--filter @open-reloading/cli', e2eUnit: false },
@@ -201,13 +201,13 @@ it('tests the workspaces a change reaches and leaves out the groups it does not'
     { name: 'packages', filter: reachedByUnits, e2eUnit: false },
     { name: 'cli', filter: '--filter @open-reloading/cli', e2eUnit: false },
   ])
-  expect(plan(['packages/drawing/src/index.ts'], closure, ['drawing', 'web', 'cli']).tests).toEqual(
-    [
-      { name: 'drawing', filter: '--filter @open-reloading/drawing', e2eUnit: false },
-      { name: 'web', filter: '--filter @open-reloading/web', e2eUnit: false },
-      { name: 'cli', filter: '--filter @open-reloading/cli', e2eUnit: false },
-    ],
-  )
+  expect(
+    plan(['packages/svg-drawings/src/index.ts'], closure, ['svg-drawings', 'web', 'cli']).tests,
+  ).toEqual([
+    { name: 'drawing', filter: '--filter @open-reloading/svg-drawings', e2eUnit: false },
+    { name: 'web', filter: '--filter @open-reloading/web', e2eUnit: false },
+    { name: 'cli', filter: '--filter @open-reloading/cli', e2eUnit: false },
+  ])
   expect(plan(['apps/e2e/tests/web/groups.spec.ts'], closure, ['e2e']).tests).toEqual([
     { name: 'packages', filter: '', e2eUnit: true },
   ])
@@ -220,19 +220,21 @@ it('tests every group for a change outside the workspaces, an unknown or empty s
     '.github/workflows/ci.yml',
     'tsconfig.base.json',
   ])
-    expect(plan(['packages/drawing/src/index.ts', f], closure, ['drawing']).tests, f).toEqual(
-      testJobs(),
-    )
-  expect(plan(['packages/drawing/src/index.ts'], closure).tests).toEqual(testJobs())
+    expect(
+      plan(['packages/svg-drawings/src/index.ts', f], closure, ['svg-drawings']).tests,
+      f,
+    ).toEqual(testJobs())
+  expect(plan(['packages/svg-drawings/src/index.ts'], closure).tests).toEqual(testJobs())
   // a folder of packages/ that is no workspace: pnpm selects nothing for it
   expect(plan(['packages/stray/src/index.ts'], closure, []).tests).toEqual(testJobs())
   // and it selects the workspaces beside it alone
   expect(
-    plan(['packages/stray/src/index.ts', 'packages/drawing/src/index.ts'], closure, ['drawing'])
-      .tests,
+    plan(['packages/stray/src/index.ts', 'packages/svg-drawings/src/index.ts'], closure, [
+      'svg-drawings',
+    ]).tests,
   ).toEqual(testJobs())
   // a workspace that no group lists (a new one)
-  expect(testJobs(['drawing', 'stray'])).toEqual(testJobs())
+  expect(testJobs(['svg-drawings', 'stray'])).toEqual(testJobs())
   // the catalog reader of tools, which writes the bundle other workspaces' tests read
   expect(plan(['tools/src/catalog/read-kind.ts'], closure, ['tools', 'cli', 'docs']).tests).toEqual(
     testJobs(),
@@ -247,13 +249,13 @@ it('tests every group for a change outside the workspaces, an unknown or empty s
 it.each([
   ['catalog', 'shot-groups'], // the event types and target faces (shot-groups/test)
   ['catalog', 'target-recognition'], // the target faces (target-recognition/test/face-render.ts)
-  ['catalog', 'drawing'], // the bullet records (drawing/test/bullet-outline.test.ts)
+  ['catalog', 'svg-drawings'], // the bullet records (svg-drawings/test/bullet-outline.test.ts)
   ['web', 'docs'], // files named in `Code:` lines, the photo checks (docs/scripts/photo-guide.test.mts)
   ['web', 'e2e'], // the German catalogue (e2e/scripts/visual-check.test.ts)
   ['web', 'tools'], // the browser sources (tools/test/browser-builtins.test.ts)
   ['importers', 'docs'], // the table fields (docs/scripts/table-import.test.mts)
   ['importers', 'tools'], // the browser sources and exports (tools/test)
-  ['drawing', 'tools'], // the browser sources and exports (tools/test)
+  ['svg-drawings', 'tools'], // the browser sources and exports (tools/test)
   ['cli', 'docs'], // files named in `Code:` lines and the research log
   ['tools', 'docs'], // files named in `Code:` lines and the research log
 ])('selects %s and its reader %s for a change of %s', (read, reader) => {

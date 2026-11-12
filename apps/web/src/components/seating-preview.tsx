@@ -2,9 +2,10 @@
 
 import { Anchor, NativeSelect } from '@mantine/core'
 import { cartridgeDiameters } from '@open-reloading/ballistics'
-import { fullSection, svgPath, toPartFrame } from '@open-reloading/drawing'
-import { bulletDimensions } from '@open-reloading/drawing/bullet'
-import { drawnTables } from '@open-reloading/drawing/cartridge'
+import { type Bullet, fromSi, toSi } from '@open-reloading/schema'
+import { fullSection, svgPath, toPartFrame } from '@open-reloading/svg-drawings'
+import { bulletDimensions } from '@open-reloading/svg-drawings/bullet'
+import { drawnTables } from '@open-reloading/svg-drawings/cartridge'
 import {
   bulletOutline,
   chamberOf,
@@ -16,8 +17,7 @@ import {
   type Seating,
   seat,
   type Tagged,
-} from '@open-reloading/drawing/seating'
-import { type Bullet, fromSi, toSi } from '@open-reloading/schema'
+} from '@open-reloading/svg-drawings/seating'
 import dynamic from 'next/dynamic'
 import {
   type Dispatch,
@@ -2292,7 +2292,7 @@ function PreviewBody({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Cham
   )
 }
 
-/** Case at CIP maximum, chamber at CIP minimum; seating depth, volume behind the bullet, travel and jump follow the slider and the field (`@open-reloading/drawing/seating`). */
+/** Case at CIP maximum, chamber at CIP minimum; seating depth, volume behind the bullet, travel and jump follow the slider and the field (`@open-reloading/svg-drawings/seating`). */
 export function SeatingPreview(props: PreviewProps) {
   const m = useSeatingModel(props)
   const { t } = useTranslation()

@@ -52,7 +52,7 @@
       // the target faces of data's records are read by path in the tests, declared so the CI plan tests target-recognition with them
       "ignoreDependencies": ["@open-reloading/catalog"]
     },
-    "packages/drawing": {
+    "packages/svg-drawings": {
       // the bullet records of data are read by path in the tests, declared so the CI plan tests drawing with them
       "ignoreDependencies": ["@open-reloading/catalog"],
       "entry": [
@@ -87,7 +87,7 @@
         "katex",
         // imported by the examples of the library pages, which scripts/libraries.test.mts runs from this folder
         "@open-reloading/catalog",
-        "@open-reloading/drawing",
+        "@open-reloading/svg-drawings",
         "@open-reloading/importers",
         "@open-reloading/schema",
         // files these name in `Code:` lines and the research log, or that the docs tests import by path, so the CI
@@ -113,7 +113,7 @@
     "tools": {
       // their sources and exports are read by path in the tests, declared so the CI plan tests tools when they change
       "ignoreDependencies": [
-        "@open-reloading/drawing",
+        "@open-reloading/svg-drawings",
         "@open-reloading/importers",
         "@open-reloading/web"
       ],
