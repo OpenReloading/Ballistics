@@ -8,7 +8,7 @@ import {
   type PressureBasis,
 } from '@open-reloading/ballistics'
 import { toSi } from '@open-reloading/schema'
-import { InputError } from '@open-reloading/statistics'
+import { InputError } from '@rangefoundry/statistics'
 import { atMuzzle, loadOf } from '../src/evaluate.ts'
 import { loadRecords, type Records } from '../src/records.ts'
 import { type Row, readRows } from '../src/rows.ts'

@@ -29,7 +29,9 @@ function exportedNames(file: URL, seen = new Set<string>()): string[] {
   for (const [, ns] of text.matchAll(/^export \* as (\w+) from/gm)) names.push(ns as string)
   for (const [, from] of text.matchAll(/^export \* from '(\.[^']+)\.ts'/gm))
     names.push(...exportedNames(new URL(`${from}.d.ts`, file), seen))
-  for (const [, pkg] of text.matchAll(/^export \* from '@open-reloading\/([\w-]+)'/gm))
+  for (const [, pkg] of text.matchAll(
+    /^export \* from '@(?:open-reloading|rangefoundry)\/([\w-]+)'/gm,
+  ))
     for (const [path, entry] of entries(pkg as string))
       if (path === '.') names.push(...exportedNames(entry, seen))
   return names
@@ -88,7 +90,7 @@ describe('export lists of the published packages', () => {
 
   it('follows `export *` of a workspace package into its declarations', () => {
     const dir = mkdtempSync(join(tmpdir(), 'exports-'))
-    writeFileSync(join(dir, 'index.d.ts'), "export * from '@open-reloading/statistics';\n")
+    writeFileSync(join(dir, 'index.d.ts'), "export * from '@rangefoundry/statistics';\n")
     const names = exportedNames(pathToFileURL(join(dir, 'index.d.ts')))
     rmSync(dir, { recursive: true })
     expect(names).toEqual(expect.arrayContaining(['chiSquareQuantile', 'InputError', 'Interval']))

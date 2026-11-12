@@ -1,5 +1,5 @@
 import { compareKeys } from '@open-reloading/schema'
-import { nth, seededUniforms, percentile as sortedPercentile } from '@open-reloading/statistics'
+import { nth, seededUniforms, percentile as sortedPercentile } from '@rangefoundry/statistics'
 import type { Outcome } from './evaluate.ts'
 import { isUsed, signedPressureError, signedVelocityError } from './metrics.ts'
 

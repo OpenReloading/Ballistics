@@ -1,6 +1,6 @@
 /** The target paper in a photo without a marked region: its light area by Otsu's threshold, as a convex hull. */
-import type { Point } from '@open-reloading/shot-groups'
-import { nth } from '@open-reloading/statistics'
+import type { Point } from '@rangefoundry/shot-groups'
+import { nth } from '@rangefoundry/statistics'
 import type { RgbaImage } from './image.ts'
 import { clamp, components, rectangle } from './raster-ops.ts'
 

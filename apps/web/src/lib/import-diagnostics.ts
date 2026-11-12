@@ -1,6 +1,6 @@
 /** The worker gives fields as column labels (`labelled` in `import-entry.ts`), so this module carries no importer code. */
 import type { TableDiagnostic } from '@open-reloading/importers'
-import type { Diagnostic } from '@open-reloading/statistics'
+import type { Diagnostic } from '@rangefoundry/statistics'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { translateMessage } from './core-messages.ts'
 

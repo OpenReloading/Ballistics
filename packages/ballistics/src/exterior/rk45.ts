@@ -1,5 +1,5 @@
 /** Dormand-Prince 5(4) with error control, dense output and event location, generic over the state length (`apps/docs/docs/models/exterior-point-mass.md`, "Numerical method"; Dormand and Prince 1980; Hairer, Norsett and Wanner 1993, sections II.4 to II.6). */
-import { nth } from '@open-reloading/statistics'
+import { nth } from '@rangefoundry/statistics'
 import { InputError } from '../issue.ts'
 
 /** Unchecked read of a state vector the caller sizes and indexes by the same count (kept in this module so the integrator loops inline it). */

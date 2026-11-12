@@ -1,6 +1,6 @@
 import { type Aerodynamics, lbPerSqInToKgPerSqM } from '@open-reloading/ballistics'
 import { type Bullet, toSi } from '@open-reloading/schema'
-import { InputError } from '@open-reloading/statistics'
+import { InputError } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
 import { bundle } from '../../catalog/test/bundle.ts'
 import { defined } from '../../catalog/test/defined.ts'

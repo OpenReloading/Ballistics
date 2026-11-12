@@ -1,5 +1,5 @@
 import type { ShotGroup } from '@open-reloading/schema'
-import { type GroupInput, type GroupStatistics, groupStatistics } from '@open-reloading/shot-groups'
+import { type GroupInput, type GroupStatistics, groupStatistics } from '@rangefoundry/shot-groups'
 
 /** A saved group (SI, as stored) as statistics input. */
 export function groupStatisticsInput(group: ShotGroup): GroupInput {

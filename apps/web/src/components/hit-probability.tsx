@@ -3,7 +3,7 @@
 import { NativeSelect } from '@mantine/core'
 import type { TrajectoryPoint } from '@open-reloading/ballistics'
 import type { TargetFace } from '@open-reloading/schema'
-import { type HitResult, hitProbability, pointDispersion } from '@open-reloading/shot-groups'
+import { type HitResult, hitProbability, pointDispersion } from '@rangefoundry/shot-groups'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'

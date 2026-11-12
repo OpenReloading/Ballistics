@@ -10,9 +10,9 @@
           {
             "paths": [
               {
-                "name": "@open-reloading/statistics",
+                "name": "@rangefoundry/statistics",
                 "allowTypeImports": true,
-                "message": "schema-statistics-for-types-only: packages/schema takes the Diagnostic type of @open-reloading/statistics, no code."
+                "message": "schema-statistics-for-types-only: packages/schema takes the Diagnostic type of @rangefoundry/statistics, no code."
               }
             ],
             "patterns": [
@@ -24,13 +24,13 @@
                   "@rangefoundry/*/**",
                   "!@open-reloading/units",
                   "!@open-reloading/units/**",
-                  "!@open-reloading/statistics"
+                  "!@rangefoundry/statistics"
                 ],
-                "message": "schema-imports-units-only: packages/schema imports no workspace package but @open-reloading/units and the Diagnostic type of @open-reloading/statistics."
+                "message": "schema-imports-units-only: packages/schema imports no workspace package but @open-reloading/units and the Diagnostic type of @rangefoundry/statistics."
               },
               {
                 "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|target-recognition|api|drawing|cli)/(src|dist)|packages|apps)/",
-                "message": "schema-imports-units-only: packages/schema imports no workspace package but @open-reloading/units and the Diagnostic type of @open-reloading/statistics."
+                "message": "schema-imports-units-only: packages/schema imports no workspace package but @open-reloading/units and the Diagnostic type of @rangefoundry/statistics."
               }
             ]
           }

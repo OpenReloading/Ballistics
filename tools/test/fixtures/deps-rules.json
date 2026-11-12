@@ -104,11 +104,11 @@
     "rules": ["importers-imports-schema-and-units"]
   },
   "packages/importers/src/types-of-statistics.ts": {
-    "source": "import type { Diagnostic } from '@open-reloading/statistics'\nexport type Found = Diagnostic<'x'>",
+    "source": "import type { Diagnostic } from '@rangefoundry/statistics'\nexport type Found = Diagnostic<'x'>",
     "rules": []
   },
   "packages/importers/src/statistics-code.ts": {
-    "source": "import { need } from '@open-reloading/statistics'\nexport { need }",
+    "source": "import { need } from '@rangefoundry/statistics'\nexport { need }",
     "rules": ["importers-statistics-for-types-only"]
   },
   "packages/importers/src/units-package.ts": {
@@ -132,11 +132,11 @@
     "rules": []
   },
   "packages/schema/src/types-of-statistics.ts": {
-    "source": "import type { Diagnostic } from '@open-reloading/statistics'\nexport type Found = Diagnostic<'x'>",
+    "source": "import type { Diagnostic } from '@rangefoundry/statistics'\nexport type Found = Diagnostic<'x'>",
     "rules": []
   },
   "packages/schema/src/statistics-code.ts": {
-    "source": "import { need } from '@open-reloading/statistics'\nexport { need }",
+    "source": "import { need } from '@rangefoundry/statistics'\nexport { need }",
     "rules": ["schema-statistics-for-types-only"]
   },
   "packages/schema/src/ballistics.ts": {
@@ -352,7 +352,7 @@
     "rules": ["no-identical-title"]
   },
   "packages/ballistics/src/exterior/own.ts": {
-    "source": "import { overlay } from '../settings.ts'\nimport { need } from '@open-reloading/statistics'\nimport { toSi } from '@open-reloading/units'\nexport { need, overlay, toSi }",
+    "source": "import { overlay } from '../settings.ts'\nimport { need } from '@rangefoundry/statistics'\nimport { toSi } from '@open-reloading/units'\nexport { need, overlay, toSi }",
     "rules": []
   },
   "packages/ballistics/src/schema-package.ts": {
@@ -372,7 +372,7 @@
     "rules": []
   },
   "packages/shot-groups/src/statistics.ts": {
-    "source": "import { nth } from '@open-reloading/statistics'\nexport { nth }",
+    "source": "import { nth } from '@rangefoundry/statistics'\nexport { nth }",
     "rules": []
   },
   "packages/shot-groups/src/schema.ts": {
@@ -436,7 +436,7 @@
     "rules": ["refusal-words-imports"]
   },
   "packages/target-recognition/src/logic.ts": {
-    "source": "import { applyMatrix } from '@open-reloading/shot-groups'\nimport { nth } from '@open-reloading/statistics'\nexport { applyMatrix, nth }",
+    "source": "import { applyMatrix } from '@rangefoundry/shot-groups'\nimport { nth } from '@rangefoundry/statistics'\nexport { applyMatrix, nth }",
     "rules": []
   },
   "packages/target-recognition/src/schema.ts": {

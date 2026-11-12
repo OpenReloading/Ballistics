@@ -1,4 +1,4 @@
-import { nth } from '@open-reloading/statistics'
+import { nth } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
 import { airDensity } from '../src/exterior/atmosphere.ts'
 import { gyroscopicStability } from '../src/exterior/modified.ts'
