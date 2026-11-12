@@ -112,10 +112,12 @@ describe('verify with --params fit-on-training', () => {
 // each run fits every powder at nine factors
 describe('--energy prior', { timeout: 120_000 }, () => {
   const sp30 = 'demo-powder-sp30'
-  /** The fixture records with each powder's energy and burn coefficient set as given. */
-  const plant = (values: Record<string, [energy: number, vivacity: number]>) => {
+  /** The fixture records with each powder's energy, burn coefficient and, where given, pressure exponent set as given. */
+  const plant = (
+    values: Record<string, [energy: number, vivacity: number, pressureExponent?: number]>,
+  ) => {
     const powders = new Map(records.powders)
-    for (const [id, [energy, vivacity]] of Object.entries(values)) {
+    for (const [id, [energy, vivacity, exponent]] of Object.entries(values)) {
       const p = records.powders.get(id)
       if (!p?.interior) throw new Error(`${id} has no interior parameters`)
       powders.set(id, {
@@ -124,6 +126,7 @@ describe('--energy prior', { timeout: 120_000 }, () => {
           ...p.interior,
           energy: { ...p.interior.energy, value: energy },
           vivacity: { ...p.interior.vivacity, value: vivacity },
+          ...(exponent !== undefined && { pressureExponent: exponent }),
         },
       })
     }
@@ -212,6 +215,19 @@ describe('--energy prior', { timeout: 120_000 }, () => {
     expect(r.energy?.objective.every((o) => o !== null)).toBe(true)
     expect(r.energy?.pressureRows).toBe(18)
     expect(r.energy?.factor).toBe(0.8)
+  })
+
+  // 63 fits: 7 s locally, 20 s under coverage
+  it('chooses the family exponent at each factor and the factor on the pressures of the fits at it', {
+    timeout: 180_000,
+  }, async () => {
+    const rows = writeRows(rowsCsv(training(sp30), plant({ [sp30]: [3.2e6, 3.6, 0.8] })))
+    const r = await fit({ ...options, rows, exponent: 'family', energy: 'prior' })
+    expect(r.energy?.factor).toBe(0.8)
+    expect(r.exponent?.families).toEqual({ 'single/ball': { exponent: 0.8, powders: 1 } })
+    expect(r.powders[sp30]?.pressureExponent).toBe(0.8)
+    expect(r.powders[sp30]?.energy).toEqual({ value: 3.2e6, prior: 'own' })
+    expect(r.powders[sp30]?.vivacity.value.toPrecision(3)).toBe('3.60')
   })
 
   it('evaluates the held-out rows with the energy and burn coefficient of the fit', async () => {

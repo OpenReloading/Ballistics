@@ -324,14 +324,59 @@ function basisFactors(
   )
 }
 
-/** The burn coefficient of each powder with interior parameters the rows name, fitted under `model` to its training rows that model can run, velocities corrected to the muzzle; `velocitySigma` is a fraction of the velocity; `exponent` `family` fits each at the pressure exponent its family chooses; with `pressureSigma`, a fraction of the pressure, the printed pressures over the factor of their basis join a second fit. */
+/** What a fit of the powders gives: the fitted values, the powders not fitted, and what each option chose. */
+interface PowdersFit {
+  powders: Record<string, PowderFitValue>
+  notFitted: Record<string, NotFitted>
+  /** With `exponent` `family`: the grid, the shrinkage, the pooled exponent and per family its exponent and the powders that entered its sum. */
+  exponent?: {
+    grid: number[]
+    shrinkage: number
+    pooled: number
+    families: Record<string, { exponent: number; powders: number }>
+  }
+  /** With `pressureSigma`: the sigma and per basis its factor and rows. */
+  pressure?: { sigma: number; factors: Record<string, { factor: number; rows: number }> }
+  /** With `energy` `prior`: the chosen energy-level factor, the grid, the objective per factor, the rows of the objective and the kinds of prior taken. */
+  energy?: {
+    factor: number
+    grid: number[]
+    objective: (number | null)[]
+    pressureRows: number
+    priors: { own: number; byBase: number; pooled: number }
+  }
+  /** With `energy` `prior`: `<powder id>=<prior impetus>` of each powder the rows name that has interior parameters, for the model version. */
+  priorLines?: string[]
+}
+
+/** The options of {@link fitPowders}. */
+interface PowdersFitOptions {
+  exponent?: 'family' | undefined
+  pressureSigma?: number | undefined
+  energy?: 'prior' | undefined
+}
+
+/** The burn coefficient of each powder with interior parameters the rows name, fitted under `model` to its training rows that model can run, velocities corrected to the muzzle; `velocitySigma` is a fraction of the velocity; `exponent` `family` fits each at the pressure exponent its family chooses; with `pressureSigma`, a fraction of the pressure, the printed pressures over the factor of their basis join a second fit; `energy` `prior` takes each powder's energy from its prior impetus. */
 export function fitPowders(
   rows: readonly Row[],
   records: Records,
   model: InteriorModel,
   velocitySigma: number,
-  options: { exponent?: 'family' | undefined; pressureSigma?: number | undefined } = {},
-) {
+  options: PowdersFitOptions = {},
+): PowdersFit {
+  return options.energy === 'prior'
+    ? fitWithPrior(rows, records, model, velocitySigma, options.exponent)
+    : fitAtRecordEnergy(rows, records, model, velocitySigma, options)
+}
+
+/** As {@link fitPowders}, at the energies of `records`. */
+function fitAtRecordEnergy(
+  rows: readonly Row[],
+  records: Records,
+  model: InteriorModel,
+  velocitySigma: number,
+  options: Omit<PowdersFitOptions, 'energy'>,
+): PowdersFit {
   const used = outcomes(rows, records, model, ['training']).flatMap((o) =>
     'velocity' in o.prediction ? [{ row: o.row, pressure: o.prediction.pressure }] : [],
   )
@@ -385,13 +430,14 @@ const energyOf = (level: number, impetus: number, gamma: number) => (level * imp
 // an effective energy-level factor: it takes whatever separates the thermochemical impetus from the level the model needs (heat to the bore, what the lumped model leaves out, how the pressures were measured)
 const levels = Array.from({ length: 9 }, (_, i) => (60 + 5 * i) / 100)
 
-/** As {@link fitPowders}, with each powder's energy from its prior impetus times one energy-level factor of `levels`, the one whose fitted peak pressures are nearest the printed ones of the training rows (median absolute log ratio over the same rows at every factor that takes part); a `UsageError` without a training row that prints a pressure. */
-export function fitPowdersWithPrior(
+/** As {@link fitPowders}, with each powder's energy from its prior impetus times one energy-level factor of `levels`, the one whose fitted peak pressures are nearest the printed ones of the training rows (median absolute log ratio over the same rows at every factor that takes part); with `exponent` `family`, the family choice runs at each factor; a `UsageError` without a training row that prints a pressure. */
+function fitWithPrior(
   rows: readonly Row[],
   records: Records,
   model: InteriorModel,
   velocitySigma: number,
-) {
+  exponent: 'family' | undefined,
+): PowdersFit {
   const priorOf = priorsOf(records)
   const pressured = rows.filter(
     (r) => r.pressure !== undefined && splitOf(r.cartridge) === 'training',
@@ -418,7 +464,18 @@ export function fitPowdersWithPrior(
       })
     }
     const start = { ...records, powders }
-    const fit = fitPowders(rows, start, model, velocitySigma)
+    let fit: PowdersFit
+    try {
+      fit = fitAtRecordEnergy(rows, start, model, velocitySigma, { exponent })
+    } catch (error) {
+      // a factor at which no powder was fitted at every exponent cannot choose one, so it does not take part
+      if (!(error instanceof Refusal)) throw error
+      return {
+        level,
+        fit: { powders: {}, notFitted: {} },
+        logRatios: pressured.map(() => undefined),
+      }
+    }
     const fitted = withFit(start, fit)
     // by position in `pressured`; a powder not fitted loses its interior parameters in withFit, so its rows give no peak
     const logRatios = pressured.map((row) => {
@@ -478,7 +535,7 @@ export function fitPowdersWithPrior(
   return {
     powders,
     notFitted: chosen.fit.notFitted,
-    /** `<powder id>=<prior impetus>` of each powder the rows name that has interior parameters, for the model version. */
+    ...(chosen.fit.exponent && { exponent: chosen.fit.exponent }),
     priorLines: named.map((n) => `${n.powder.id}=${n.prior.value}`),
     energy: {
       factor: chosen.level,

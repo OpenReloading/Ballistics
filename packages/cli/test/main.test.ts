@@ -211,7 +211,6 @@ describe('exit codes', () => {
     [['verify', ...data, '--split', 'training', '--final']],
     [['compare', ...data, '--baseline', 'm3', '--candidate', 'm3', '--final']],
     [['fit', ...data, '--exponent', 'family', '--pressure-sigma', '0.05']],
-    [['fit', ...pressured, '--energy', 'prior', '--exponent', 'family']],
     [['fit', ...pressured, '--energy', 'prior', '--pressure-sigma', '0.05']],
   ])('is 2 for bad input: %j', async (args) => {
     const { code, stdout } = await cli(args)
