@@ -12,7 +12,7 @@ import {
   practicalEventTotals,
   ringEventTotals,
   type StageScore,
-} from '@open-reloading/shot-groups'
+} from '@rangefoundry/shot-groups'
 import { fixedNumber, plainNumber } from '../i18n/number.ts'
 import { type Message, msg } from '../i18n/translate.ts'
 import { toCsv } from './csv.ts'

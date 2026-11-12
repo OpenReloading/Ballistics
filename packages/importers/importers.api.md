@@ -6,7 +6,7 @@
 
 import type { ChronoSession } from '@open-reloading/schema';
 import type { ChronoShot } from '@open-reloading/schema';
-import type { Diagnostic } from '@open-reloading/statistics';
+import type { Diagnostic } from '@rangefoundry/statistics';
 import type { QuantityValue } from '@open-reloading/schema';
 import type { UserRecord } from '@open-reloading/schema';
 

@@ -249,10 +249,10 @@ importers:
       '@open-reloading/schema':
         specifier: workspace:*
         version: link:../../packages/schema
-      '@open-reloading/shot-groups':
+      '@rangefoundry/shot-groups':
         specifier: workspace:*
         version: link:../../packages/shot-groups
-      '@open-reloading/statistics':
+      '@rangefoundry/statistics':
         specifier: workspace:*
         version: link:../../packages/statistics
       '@open-reloading/svg-drawings':
@@ -353,7 +353,7 @@ importers:
         specifier: 'catalog:'
         version: 4.6.7
     devDependencies:
-      '@open-reloading/statistics':
+      '@rangefoundry/statistics':
         specifier: workspace:*
         version: link:../statistics
       '@types/node':
@@ -374,7 +374,7 @@ importers:
 
   packages/ballistics:
     dependencies:
-      '@open-reloading/statistics':
+      '@rangefoundry/statistics':
         specifier: workspace:*
         version: link:../statistics
       '@open-reloading/units':
@@ -460,7 +460,7 @@ importers:
       '@open-reloading/schema':
         specifier: workspace:*
         version: link:../schema
-      '@open-reloading/statistics':
+      '@rangefoundry/statistics':
         specifier: workspace:*
         version: link:../statistics
       '@open-reloading/svg-drawings':
@@ -551,7 +551,7 @@ importers:
       '@open-reloading/schema':
         specifier: workspace:*
         version: link:../schema
-      '@open-reloading/statistics':
+      '@rangefoundry/statistics':
         specifier: workspace:*
         version: link:../statistics
       '@open-reloading/units':
@@ -628,7 +628,7 @@ importers:
 
   packages/schema:
     dependencies:
-      '@open-reloading/statistics':
+      '@rangefoundry/statistics':
         specifier: workspace:*
         version: link:../statistics
       '@open-reloading/units':
@@ -671,7 +671,7 @@ importers:
 
   packages/shot-groups:
     dependencies:
-      '@open-reloading/statistics':
+      '@rangefoundry/statistics':
         specifier: workspace:*
         version: link:../statistics
       '@open-reloading/units':
@@ -768,10 +768,10 @@ importers:
 
   packages/target-recognition:
     dependencies:
-      '@open-reloading/shot-groups':
+      '@rangefoundry/shot-groups':
         specifier: workspace:*
         version: link:../shot-groups
-      '@open-reloading/statistics':
+      '@rangefoundry/statistics':
         specifier: workspace:*
         version: link:../statistics
     devDependencies:
@@ -941,7 +941,7 @@ importers:
       '@open-reloading/schema':
         specifier: workspace:*
         version: link:../schema
-      '@open-reloading/statistics':
+      '@rangefoundry/statistics':
         specifier: workspace:*
         version: link:../statistics
       zod:

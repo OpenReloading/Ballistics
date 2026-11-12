@@ -8,7 +8,7 @@ import {
   type LogFitResult,
   logLeastSquares,
   nth,
-} from '@open-reloading/statistics'
+} from '@rangefoundry/statistics'
 import { type BallisticsIssue, need } from '../issue.ts'
 import type { Settings } from '../settings.ts'
 import { PowderFitError } from './fit.ts'

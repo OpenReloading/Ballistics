@@ -5,7 +5,7 @@ import type {
   TableKind,
   TableReadDiagnostic,
 } from '@open-reloading/importers'
-import type { Diagnostic } from '@open-reloading/statistics'
+import type { Diagnostic } from '@rangefoundry/statistics'
 import { fixedNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { translateMessage } from './core-messages.ts'

@@ -1,5 +1,5 @@
 import { interior as core } from '@open-reloading/ballistics'
-import { InputError } from '@open-reloading/statistics'
+import { InputError } from '@rangefoundry/statistics'
 
 /** The core model that refuses by a throw a burn coefficient above 0.64, between the record value 0.612 of demo-powder-dp40 and the 0.66096 the fit tests plant. */
 export function interior(load, options) {

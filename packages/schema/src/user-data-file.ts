@@ -1,4 +1,4 @@
-import type { Diagnostic } from '@open-reloading/statistics'
+import type { Diagnostic } from '@rangefoundry/statistics'
 import type { z } from 'zod'
 import { isPlain } from './plain.ts'
 import {

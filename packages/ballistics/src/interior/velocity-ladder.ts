@@ -1,6 +1,6 @@
 /** Charge ranges where the mean velocity changes least with charge, from the mean, spread and shot count of each string (`apps/docs/docs/models/interior-velocity-ladder.md`); SI throughout: charge kg, velocity m/s. */
 
-import { nth, studentTwoSidedQuantile } from '@open-reloading/statistics'
+import { nth, studentTwoSidedQuantile } from '@rangefoundry/statistics'
 import { need } from '../issue.ts'
 
 /** One string of a ladder: the charge, the mean and sample standard deviation of its velocities, and its shot count. */

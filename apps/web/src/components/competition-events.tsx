@@ -19,8 +19,8 @@ import {
   type UserRecord,
   userRecord,
 } from '@open-reloading/schema'
-import type { EventTotals, StageScore } from '@open-reloading/shot-groups'
 import { Plus, Trash } from '@phosphor-icons/react'
+import type { EventTotals, StageScore } from '@rangefoundry/shot-groups'
 import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { plainNumber } from '../i18n/number.ts'

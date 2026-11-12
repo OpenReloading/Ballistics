@@ -1,4 +1,4 @@
-import { InputError, nth } from '@open-reloading/statistics'
+import { InputError, nth } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
 import { type ChronographString, fitPowder, interior, stringLadder } from '../src/index.ts'
 import { pooledVelocitySd } from '../src/interior/fit-strings.ts'

@@ -1,9 +1,9 @@
-import { seededUniforms } from '@open-reloading/statistics'
 import {
   type HoleDetectionInput,
   holeDetector,
   type RgbaImage,
 } from '@open-reloading/target-recognition'
+import { seededUniforms } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
 import type { Point } from '../src/lib/target-geometry.ts'
 import { defined } from './defined.ts'

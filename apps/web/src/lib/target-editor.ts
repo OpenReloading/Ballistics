@@ -11,7 +11,7 @@ import {
   type GroupEllipse,
   type GroupStatistics,
   subtendedAngle,
-} from '@open-reloading/shot-groups'
+} from '@rangefoundry/shot-groups'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { nth } from './nth.ts'
 import {

@@ -1,6 +1,6 @@
 # @open-reloading/target-recognition
 
-Finds the target face and proposes the bullet holes on a target photo for the web app, without I/O. Callers get hole proposals through the inference port, `holeDetector.propose`, which takes an RGBA image buffer and resolves to proposals in image px. Its dependencies are `@open-reloading/shot-groups` (points, ellipse fitting and plane geometry) and `@open-reloading/statistics`. Private to this repository: it is not published.
+Finds the target face and proposes the bullet holes on a target photo for the web app, without I/O. Callers get hole proposals through the inference port, `holeDetector.propose`, which takes an RGBA image buffer and resolves to proposals in image px. Its dependencies are `@rangefoundry/shot-groups` (points, ellipse fitting and plane geometry) and `@rangefoundry/statistics`. Private to this repository: it is not published.
 
 - `holeDetector`: the classical detector, known-weak. It misses the default bar on the holdout photos and stays until a learned model meets an accuracy bar that is not measured yet ([Quality bar](../../apps/docs/docs/models/hole-detection.md#quality-bar)).
 - The face search: `findFace` finds which face of a list is on the photo and how it lies, `fitPicked` and `fitDiameter` fit a face the user picks, `onPhoto` maps a search to the full photo, `faceLabel` gives the detector the face's print. A face is any object with the fields of `PrintedFace`, such as a target face record.

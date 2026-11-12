@@ -1,6 +1,6 @@
 import type { TrajectoryPoint } from '@open-reloading/ballistics'
 import type { TargetFace } from '@open-reloading/schema'
-import { InputError } from '@open-reloading/statistics'
+import { InputError } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import { faceZones, hitFailureText, impactSensitivity } from '../src/lib/hit-probability.ts'

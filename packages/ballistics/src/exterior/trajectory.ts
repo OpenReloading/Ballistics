@@ -1,5 +1,5 @@
 /** Point-mass (`apps/docs/docs/models/exterior-point-mass.md`) and modified point-mass (`apps/docs/docs/models/exterior-modified-point-mass.md`) trajectory in 3-D; SI in and out, angles in rad; integrated in the local-level ground frame (x downrange, y up, z right), the line of sight an output projection (`apps/docs/docs/models/exterior-point-mass.md`, "Frames"). */
-import { nth } from '@open-reloading/statistics'
+import { nth } from '@rangefoundry/statistics'
 import { type DragModel, type DragTable, dragTables } from '../drag-tables.ts'
 import { InputError, need } from '../issue.ts'
 import { overlay, type Settings } from '../settings.ts'

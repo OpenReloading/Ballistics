@@ -16,8 +16,8 @@ import {
   mul3,
   type Point,
   ransacEllipse,
-} from '@open-reloading/shot-groups'
-import { nth, seededUniforms } from '@open-reloading/statistics'
+} from '@rangefoundry/shot-groups'
+import { nth, seededUniforms } from '@rangefoundry/statistics'
 import {
   blackAreas,
   type Grid,

@@ -1,5 +1,5 @@
 import { TruingError } from '@open-reloading/ballistics'
-import { InputError } from '@open-reloading/statistics'
+import { InputError } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
 import { errorAnswer, replyTo, reviveError, serializeError, type Task } from '../src/index.ts'
 

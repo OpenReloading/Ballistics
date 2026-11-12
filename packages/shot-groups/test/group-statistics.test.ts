@@ -1,4 +1,4 @@
-import { chiSquareQuantile, InputError, nth, seededUniforms } from '@open-reloading/statistics'
+import { chiSquareQuantile, InputError, nth, seededUniforms } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
 import {
   dispersionEllipse,

@@ -5,7 +5,7 @@
 ```ts
 
 import { conversions } from '@open-reloading/units';
-import type { Diagnostic } from '@open-reloading/statistics';
+import type { Diagnostic } from '@rangefoundry/statistics';
 import { QuantityKind } from '@open-reloading/units';
 import { SiMap } from '@open-reloading/units';
 import { siMaps } from '@open-reloading/units';

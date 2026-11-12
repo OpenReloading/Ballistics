@@ -1,4 +1,4 @@
-import { bisect, nth } from '@open-reloading/statistics'
+import { bisect, nth } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
 import {
   chargeTooSmall,

@@ -1,7 +1,7 @@
 'use client'
 
 import { type CalibrationReference, fromSi, type TargetSheet, toSi } from '@open-reloading/schema'
-import { dispersionEllipse, predictionEllipse } from '@open-reloading/shot-groups'
+import { dispersionEllipse, predictionEllipse } from '@rangefoundry/shot-groups'
 import {
   type KeyboardEvent,
   type PointerEvent,

@@ -1,4 +1,4 @@
-import { InputError, nth } from '@open-reloading/statistics'
+import { InputError, nth } from '@rangefoundry/statistics'
 import type { LoadFileIssue } from '../issue.ts'
 import { boreArea } from './bore-resistance.ts'
 import type { InteriorLoad } from './model.ts'

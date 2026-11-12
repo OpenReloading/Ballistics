@@ -1,4 +1,4 @@
-import { apply3, meanRadius } from '@open-reloading/shot-groups'
+import { apply3, meanRadius } from '@rangefoundry/shot-groups'
 import { describe, expect, it } from 'vitest'
 import { findFace } from '../src/face-search.ts'
 import {

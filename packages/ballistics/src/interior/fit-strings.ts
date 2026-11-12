@@ -1,6 +1,6 @@
 /** The mean of each string, weighted by the pooled standard deviation of all shots about their string means over the root of its shot count (`apps/docs/docs/models/interior-powder-fit.md`, "Strings and their weights"); velocities in m/s, charges in kg. */
 
-import { velocityStatistics } from '@open-reloading/statistics'
+import { velocityStatistics } from '@rangefoundry/statistics'
 import { need } from '../issue.ts'
 import type { LadderPoint } from './fit.ts'
 
