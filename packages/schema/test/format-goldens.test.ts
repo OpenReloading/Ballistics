@@ -4,7 +4,7 @@ import { canonicalJson } from '../src/canonical-json.ts'
 import { readShareLink, shareLinkOf } from '../src/share-link.ts'
 import { readUserDataFile } from '../src/user-data-file.ts'
 
-// The "rebuilt" tests write the goldens: after a deliberate format change (new version, new files) run `vitest run test/format-goldens.test.ts --update` twice, the share links follow the files.
+// After a deliberate format change (new version, new files) `vitest run test/format-goldens.test.ts --update` rewrites the file goldens; a link golden is the fragment `shareLinkOf` writes, checked inflated since deflate bytes differ between zlib builds.
 const saved = '2026-10-13T10:00:00.000Z'
 const id = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`
 const user = (n: number) => `user:${id(n)}`
@@ -292,6 +292,15 @@ async function packed(text: string) {
   return `#record=${b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')}`
 }
 
+/** The text a `#record=` fragment holds: inflate output is fixed by RFC 1951, deflate output is not. */
+async function unpacked(link: string) {
+  const binary = atob(link.slice('#record='.length).replace(/-/g, '+').replace(/_/g, '/'))
+  const stream = new Blob([Uint8Array.from(binary, (c) => c.charCodeAt(0))])
+    .stream()
+    .pipeThrough(new DecompressionStream('deflate-raw'))
+  return new Response(stream).text()
+}
+
 describe('user data file goldens', () => {
   it.each(names)('%s is rebuilt from its records', async (name) => {
     await expect(fileText(cases[name])).toMatchFileSnapshot(
@@ -335,21 +344,21 @@ describe('user data file goldens', () => {
 })
 
 describe('share link goldens', () => {
-  it.each(names)('%s is rebuilt from its records', async (name) => {
+  it.each(names)('%s inflates to the payload of its file golden', async (name) => {
     const read = readUserDataFile(golden('user-data', name, 'json'))
     if (!read.ok) throw new Error(JSON.stringify(read.diagnostic))
-    await expect(fragment(await shareLinkOf(read.records, page))).toMatchFileSnapshot(
-      goldenUrl('share-link', name, 'txt').pathname,
+    expect(await unpacked(golden('share-link', name, 'txt'))).toBe(
+      JSON.stringify({ format: 'openreloading-user-data', version: 1, records: read.records }),
     )
   })
 
-  it.each(names)('%s reads back to its records and writes the same text', async (name) => {
-    const payload = golden('share-link', name, 'txt')
+  it.each(names)('%s reads back to its records, and so does a link of them', async (name) => {
     const expected = readUserDataFile(golden('user-data', name, 'json'))
-    const read = await readShareLink(payload)
+    const read = await readShareLink(golden('share-link', name, 'txt'))
     if (!expected.ok || !read?.ok) throw new Error('a golden is not read')
     expect(read.records).toEqual(expected.records)
-    expect(fragment(await shareLinkOf(read.records, page))).toBe(payload)
+    const again = await readShareLink(fragment(await shareLinkOf(read.records, page)) ?? '')
+    expect(again?.ok && again.records).toEqual(expected.records)
   })
 
   it.each(names)('%s of version 2 is refused as a whole', async (name) => {
