@@ -15,10 +15,10 @@ strictPeerDependencies: false
 catalog:
   "@arethetypeswrong/cli": 0.18.5
   # every @mantine package, so one upgrade moves them together
-  "@mantine/core": 9.7.5
-  "@mantine/form": 9.7.5
-  "@mantine/hooks": 9.7.5
-  "@mantine/spotlight": 9.7.5
+  "@mantine/core": 9.8.0
+  "@mantine/form": 9.8.0
+  "@mantine/hooks": 9.8.0
+  "@mantine/spotlight": 9.8.0
   "@microsoft/api-extractor": 7.60.1
   "@playwright/test": 1.65.0
   "@types/node": 26.6.6
@@ -43,8 +43,6 @@ catalog:
 # Versions with the fix for a security advisory of a transitive dependency.
 overrides:
   "@docusaurus/core>tinypool": ^2.1.2
-  # GHSA-jm63-cq47-j5jp, GHSA-46jr-4wx8-v453; the version @mantine/mcp-server 9.8.0 pins, drop with that upgrade
-  "@mantine/mcp-server>@modelcontextprotocol/server": 2.3.1
   katex: 0.19.1
   postcss-selector-parser: ^7.1.6
   serialize-javascript: ^7.1.3
