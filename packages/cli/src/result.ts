@@ -3,7 +3,7 @@ import { reasons } from './evaluate.ts'
 import { notFittedReasons } from './fit.ts'
 import { groupings } from './metrics.ts'
 import { skipReasons } from './published-rows.ts'
-import { splits } from './split.ts'
+import { splitSalt, splits } from './split.ts'
 
 /** Version of the JSON shape every result carries as `schemaVersion`. */
 export const schemaVersion = 1
@@ -169,10 +169,17 @@ const published = z
   .optional()
   .describe('With `--rows catalogue` or a folder of published loads: what the files gave.')
 
+const salt = z
+  .literal(splitSalt)
+  .describe(
+    'The salt of the rule that assigns a cartridge to its split; results of different salts hold other rows per split and do not compare.',
+  )
+
 const common = {
   schemaVersion: z.literal(schemaVersion),
   notice: z.literal(notice),
   split: z.enum(splits),
+  splitSalt: salt,
   final: z.boolean().describe('True for a run of the test split, which needs `--final`.'),
   inputs,
   published,
@@ -232,6 +239,7 @@ const fitResult = z.object({
       'SHA-256 over the model and fit sources, the params line, the records the rows name and the rows bytes.',
     ),
   split: z.literal('training').describe('The split whose rows the fit reads.'),
+  splitSalt: salt,
   velocitySigma: fraction.describe('Velocity sigma of each row, a fraction of its velocity.'),
   exponent: z
     .object({

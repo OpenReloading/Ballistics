@@ -17,6 +17,11 @@
           "type": "string",
           "enum": ["test", "validation", "training"]
         },
+        "splitSalt": {
+          "type": "string",
+          "const": "2026-11-12",
+          "description": "The salt of the rule that assigns a cartridge to its split; results of different salts hold other rows per split and do not compare."
+        },
         "final": {
           "type": "boolean",
           "description": "True for a run of the test split, which needs `--final`."
@@ -999,6 +1004,7 @@
         "schemaVersion",
         "notice",
         "split",
+        "splitSalt",
         "final",
         "inputs",
         "command",
@@ -1025,6 +1031,11 @@
         "split": {
           "type": "string",
           "enum": ["test", "validation", "training"]
+        },
+        "splitSalt": {
+          "type": "string",
+          "const": "2026-11-12",
+          "description": "The salt of the rule that assigns a cartridge to its split; results of different salts hold other rows per split and do not compare."
         },
         "final": {
           "type": "boolean",
@@ -3091,6 +3102,7 @@
         "schemaVersion",
         "notice",
         "split",
+        "splitSalt",
         "final",
         "inputs",
         "command",
@@ -3175,6 +3187,11 @@
           "type": "string",
           "const": "training",
           "description": "The split whose rows the fit reads."
+        },
+        "splitSalt": {
+          "type": "string",
+          "const": "2026-11-12",
+          "description": "The salt of the rule that assigns a cartridge to its split; results of different salts hold other rows per split and do not compare."
         },
         "velocitySigma": {
           "type": "number",
@@ -3435,6 +3452,7 @@
         "model",
         "modelVersion",
         "split",
+        "splitSalt",
         "velocitySigma",
         "powders",
         "notFitted"

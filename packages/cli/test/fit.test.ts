@@ -35,19 +35,19 @@ const specs: Spec[] = [
     ['30-br', 2.2],
     ['30-br', 2.4],
     ['30-br', 2.6],
-    ['308-match', 2.0],
-    ['308-match', 2.2],
-    ['308-match', 2.4],
-    ['7-62-x-54-r', 2.2],
-    ['7-62-x-54-r', 2.4],
-    ['7-62-x-54-r', 2.6],
+    ['308-win', 2.0],
+    ['308-win', 2.2],
+    ['308-win', 2.4],
+    ['30-06-spring', 2.2],
+    ['30-06-spring', 2.4],
+    ['30-06-spring', 2.6],
   ].map(([cartridge, charge]) => ({
     cartridge: cartridge as string,
     charge: charge as number,
     velocity: 0,
   })),
-  { cartridge: '308-win', charge: 2.0, velocity: 0 },
-  { cartridge: '308-win', charge: 2.2, velocity: 0 },
+  { cartridge: '308-match', charge: 2.0, velocity: 0 },
+  { cartridge: '308-match', charge: 2.2, velocity: 0 },
 ]
 
 const options = {
@@ -74,7 +74,7 @@ describe('fit', () => {
         [
           ...specs,
           { cartridge: '30-br', powder: sp20, charge: 2.0, velocity: 0 },
-          { cartridge: '308-win', powder: sp20, charge: 2.4, velocity: 0 },
+          { cartridge: '308-match', powder: sp20, charge: 2.4, velocity: 0 },
         ],
         planted,
       ),
@@ -139,7 +139,7 @@ describe('--energy prior', { timeout: 120_000 }, () => {
     [
       ['30-br', 2.0],
       ['30-br', 2.4],
-      ['308-match', 2.2],
+      ['308-win', 2.2],
     ].map(([cartridge, charge]) => ({
       cartridge: cartridge as string,
       powder,
@@ -219,8 +219,8 @@ describe('--energy prior', { timeout: 120_000 }, () => {
       rowsCsv(
         [
           ...training(sp30),
-          { cartridge: '308-win', powder: sp30, charge: 2.0, velocity: 0, pressure: 0 },
-          { cartridge: '308-win', powder: sp30, charge: 2.3, velocity: 0, pressure: 0 },
+          { cartridge: '308-match', powder: sp30, charge: 2.0, velocity: 0, pressure: 0 },
+          { cartridge: '308-match', powder: sp30, charge: 2.3, velocity: 0, pressure: 0 },
         ],
         truth,
       ),
@@ -313,7 +313,7 @@ describe('fit --exponent family', { timeout: 300_000 }, () => {
   /** Three charges in each of two training cartridges. */
   const training = (powder: string, charges = [1.4, 1.8, 2.2]) => [
     ...ladder(powder, '30-br', charges),
-    ...ladder(powder, '308-match', charges),
+    ...ladder(powder, '308-win', charges),
   ]
   const truth = plant({
     ...Object.fromEntries(Object.entries(at08).map(([id, b]) => [id, [0.8, b]])),
@@ -341,7 +341,7 @@ describe('fit --exponent family', { timeout: 300_000 }, () => {
   })
 
   it('evaluates the validation split at the fitted exponent and burn coefficient', async () => {
-    const specs = [...training(dp40), ...ladder(dp40, '308-win', [1.2, 1.6])]
+    const specs = [...training(dp40), ...ladder(dp40, '308-match', [1.2, 1.6])]
     const rows = writeRows(rowsCsv(specs, truth))
     const chosen = await verify({ ...options, rows, params: 'fit-on-training', exponent: 'family' })
     expect(chosen.overall.velocity?.median).toBeCloseTo(0, 6)
@@ -396,7 +396,7 @@ describe('the uncertainty of a fit', () => {
   it('counts the prior rows of the rifle effects in the degrees of freedom', async () => {
     const specs = [
       { cartridge: '30-br', charge: 2.0, velocity: 0 },
-      { cartridge: '308-match', charge: 2.2, velocity: 0 },
+      { cartridge: '308-win', charge: 2.2, velocity: 0 },
     ]
     expect((await fitted(specs, 0.03))?.chiSquarePerDegree).toBeTypeOf('number')
   })
@@ -418,7 +418,7 @@ describe('the pressure rows of a fit', () => {
         })),
       ),
     )
-  const training = printed(['30-br', '308-match'])
+  const training = printed(['30-br', '308-win'])
   const rows = writeRows(rowsCsv(training))
 
   it('finds a factor per basis and leaves the burn coefficients at the record values', async () => {
@@ -430,7 +430,7 @@ describe('the pressure rows of a fit', () => {
   })
 
   it('moves the burn coefficient of a powder whose pressures are off its basis, and not the factor', async () => {
-    const off = ['308-match'].flatMap((cartridge) =>
+    const off = ['308-win'].flatMap((cartridge) =>
       [2.0, 2.2, 2.4].map((charge) => ({
         cartridge,
         powder: sp21,
@@ -450,7 +450,7 @@ describe('the pressure rows of a fit', () => {
   })
 
   it('reports the factors in the evaluation and compares the held-out pressures with the model peak as it is', async () => {
-    const withValidation = writeRows(rowsCsv([...training, ...printed(['308-win', '308-win'])]))
+    const withValidation = writeRows(rowsCsv([...training, ...printed(['308-match', '308-match'])]))
     const r = await verify({
       ...options,
       rows: withValidation,

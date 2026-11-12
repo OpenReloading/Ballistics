@@ -4,17 +4,19 @@ import { splitOf } from '../src/split.ts'
 
 describe('splitOf', () => {
   it.each([
-    ['30-06-spring', 'test'], // first byte 9
-    ['7-62-x-39', 'test'], // 17
-    ['308-win', 'validation'], // 58
-    ['8-x-57-is', 'validation'], // 74
-    ['30-30-win', 'validation'], // 97
-    ['30-br', 'training'], // 119
-    ['7-62-x-54-r', 'training'], // 125
-    ['308-match', 'training'], // 128
-    ['', 'training'], // 227
-    ['ä', 'validation'], // 51, the first byte of the validation range
-  ] as const)('puts %j in %s by the first byte of its SHA-256', (id, split) => {
+    ['307-win', 'test'], // first byte 9
+    ['300-win-mag', 'test'], // 24
+    ['c144', 'test'], // 50, the last byte of the test range
+    ['c1091', 'validation'], // 51, the first byte of the validation range
+    ['30-30-win', 'validation'], // 65
+    ['308-match', 'validation'], // 76
+    ['c108', 'validation'], // 101, the last byte of the validation range
+    ['c443', 'training'], // 102, the first byte of the training range
+    ['30-06-spring', 'training'], // 122
+    ['308-win', 'training'], // 200
+    ['', 'training'], // 216
+    ['ä', 'test'], // 0
+  ] as const)('puts %j in %s by the first byte of the SHA-256 of the salt and it', (id, split) => {
     expect(splitOf(id)).toBe(split)
   })
 

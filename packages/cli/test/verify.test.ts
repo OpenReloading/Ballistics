@@ -84,7 +84,7 @@ describe('verify on the validation split', () => {
     expect((await verify({ ...options, split: 'training' })).modelVersion).toBe(same.modelVersion)
     const other = writeRows(
       rowsCsv([
-        { cartridge: '308-win', charge: 2.0, velocity: 0.01 },
+        { cartridge: '308-match', charge: 2.0, velocity: 0.01 },
         { cartridge: '30-br', charge: 2.0, velocity: 0.01 },
       ]),
     )
@@ -103,10 +103,10 @@ describe('verify with --group-by', () => {
     const r = await verify({ ...options, groupBy: 'cartridge' })
     expect(r.grouped?.by).toBe('cartridge')
     const groups = r.grouped?.groups ?? {}
-    expect(Object.keys(groups)).toEqual(['30-30-win', '308-win', '8-x-57-is', 'unknown-3'])
+    expect(Object.keys(groups)).toEqual(['30-30-win', '308-match', '7-62-x-54-r', 'unknown-4'])
     // 30-30-win: errors 0.04 and 0.10
     expect(groups['30-30-win']?.velocity?.median).toBeCloseTo(0.07, 9)
-    expect(groups['8-x-57-is']?.rows.notUsed).toEqual({ noCaseCapacity: 1 })
+    expect(groups['7-62-x-54-r']?.rows.notUsed).toEqual({ noCaseCapacity: 1 })
   })
 
   it('groups by bullet construction', async () => {
@@ -137,14 +137,14 @@ describe('verify on the other splits', () => {
   })
 
   it('refuses a split without a row that can be used', async () => {
-    const only = writeRows(rowsCsv([{ cartridge: '308-win', charge: 2.0, velocity: 0.01 }]))
+    const only = writeRows(rowsCsv([{ cartridge: '308-match', charge: 2.0, velocity: 0.01 }]))
     await expect(verify({ ...options, rows: only, split: 'test', final: true })).rejects.toThrow(
       /no row of the test split could be evaluated \(0 in the split\)/,
     )
   })
 
   it('has no interval without a training row', async () => {
-    const only = writeRows(rowsCsv([{ cartridge: '308-win', charge: 2.0, velocity: 0.01 }]))
+    const only = writeRows(rowsCsv([{ cartridge: '308-match', charge: 2.0, velocity: 0.01 }]))
     const r = await verify({ ...options, rows: only })
     expect(r.interval).toEqual({ basis: 'training', halfWidth: null, trainingRows: 0 })
     expect(r.overall.interval).toBeNull()

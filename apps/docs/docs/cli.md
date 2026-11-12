@@ -71,7 +71,9 @@ The records are read with `readRecords` of the repository's catalog reader (`too
 
 ## Split
 
-The first byte of the SHA-256 of the lower-case UTF-8 cartridge id decides: 0 to 50 test, 51 to 101 validation, 102 to 255 training (about 20 %, 20 % and 60 %). A row has the split of its cartridge. `--split` takes `validation` (default), `training` or `test`. The test split is sealed: `--split test` is refused without `--final`, to be run once per model version. `--final` with another split is bad input.
+The first byte of the SHA-256 of the UTF-8 text `<salt>:<lower-case cartridge id>` decides: 0 to 50 test, 51 to 101 validation, 102 to 255 training (about 20 %, 20 % and 60 %). The salt is `2026-11-12` (`splitSalt`, `src/split.ts`); every result carries it as `splitSalt`. A row has the split of its cartridge. `--split` takes `validation` (default), `training` or `test`. The test split is sealed: `--split test` is refused without `--final`, to be run once per model version. `--final` with another split is bad input.
+
+Until 2026-11-12 the rule had no salt. Its test split was read for eight model versions and is spent, so the salt assigns every cartridge again ([research entry](research/validation-split-salt.md)). Every figure of the documentation outside the [research entry](research/validation-split-salt.md) was measured under the rule without a salt unless it names the salt. Results of the two rules hold other rows per split and are not compared: `compare` refuses a saved baseline of another salt or of none.
 
 ## Metrics
 
@@ -168,7 +170,7 @@ The code of the evaluation itself (rows, split, the metrics and the percentiles,
 
 `verify --rows <path> [--model m3|<module>]` evaluates one model on the split. `m3` is the model of the installed `@open-reloading/ballistics`; a module path is a file that exports `interior(load, options?)` with the signature of its `interior`.
 
-`compare --baseline <m3|module|verify.json> --candidate <m3|module>` evaluates both on the same rows and split and gives each result and the change, candidate minus baseline, overall and per powder family (and per group of `--group-by`). A baseline `.json` is a saved `verify` result: it must be of the same split, rows and records, else the run is refused. A positive change of an error is worse; the change of the coverage is in fractions, the change of used rows in rows. The candidate may use fewer rows than the baseline: `usedRows` shows it.
+`compare --baseline <m3|module|verify.json> --candidate <m3|module>` evaluates both on the same rows and split and gives each result and the change, candidate minus baseline, overall and per powder family (and per group of `--group-by`). A baseline `.json` is a saved `verify` result: it must be of the same split, split salt, rows and records, else the run is refused. A positive change of an error is worse; the change of the coverage is in fractions, the change of used rows in rows. The candidate may use fewer rows than the baseline: `usedRows` shows it.
 
 ## Output
 
@@ -176,11 +178,11 @@ JSON when stdout is not a terminal or with `--json`, a table with `--table` or o
 
 `--version` prints `ballistics <version>` and exits 0.
 
-| Exit code | Meaning                                                                                                                                                                                                                                      | `kind`     |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| 0         | A result was written                                                                                                                                                                                                                         |            |
-| 1         | A refused run: the test split without `--final`, a baseline of another split or data, a split without a row the model could run, a `--exponent family` run with no powder fitted at every exponent of the grid, a 422 answer of an operation | `refused`  |
-| 2         | Bad input: the rows file, an option, the records, a model module (also one that throws), an operation body or an unknown record id                                                                                                           | `usage`    |
-| 3         | An internal error of the CLI                                                                                                                                                                                                                 | `internal` |
+| Exit code | Meaning                                                                                                                                                                                                                                                  | `kind`     |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| 0         | A result was written                                                                                                                                                                                                                                     |            |
+| 1         | A refused run: the test split without `--final`, a baseline of another split, split salt or data, a split without a row the model could run, a `--exponent family` run with no powder fitted at every exponent of the grid, a 422 answer of an operation | `refused`  |
+| 2         | Bad input: the rows file, an option, the records, a model module (also one that throws), an operation body or an unknown record id                                                                                                                       | `usage`    |
+| 3         | An internal error of the CLI                                                                                                                                                                                                                             | `internal` |
 
 An error goes to stderr. With `--json`, or when stdout is not a terminal, it is one JSON object on one line, `{"error":{"kind":"usage","message":"..."}}`, for `run` with `issues` or `answer`; on a terminal it is a text line. It never carries a stack trace.

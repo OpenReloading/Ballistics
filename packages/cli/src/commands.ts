@@ -20,7 +20,7 @@ import {
   verifyResult,
 } from './result.ts'
 import { type Row, readRows } from './rows.ts'
-import { type Split, splitOf } from './split.ts'
+import { type Split, splitOf, splitSalt } from './split.ts'
 import { inputsOf, modelVersion, sha256 } from './version.ts'
 
 /** What `verify` and `compare` read: the rows, the records, the split and the sealed-split switch. */
@@ -281,6 +281,7 @@ export async function verify(options: Options, spec = builtInName): Promise<Veri
     notice,
     command: 'verify',
     split: options.split,
+    splitSalt,
     final: options.final,
     inputs: data.inputs,
     ...(data.published && { published: data.published }),
@@ -304,6 +305,14 @@ function savedResult(path: string): VerifyResult {
   } catch {
     throw new UsageError('the --baseline file is not JSON')
   }
+  // before the schema, which would call a result of the earlier rule "not a verify result"
+  if ((json as { command?: unknown } | null)?.command === 'verify') {
+    const salt = (json as { splitSalt?: unknown }).splitSalt
+    if (salt !== splitSalt)
+      throw new Refusal(
+        `the baseline was split by another rule (salt ${typeof salt === 'string' ? salt : 'none'}, this run ${splitSalt}): its splits hold other rows`,
+      )
+  }
   const parsed = verifyResult.safeParse(json)
   if (!parsed.success) throw new UsageError('the baseline file is not a verify result')
   return parsed.data
@@ -317,6 +326,7 @@ async function baselineOf(spec: string, options: Options, data: Prepared): Promi
     notice: _n,
     command: _c,
     split,
+    splitSalt: _s,
     final: _f,
     inputs,
     published: _p,
@@ -351,6 +361,7 @@ export async function compare(
     notice,
     command: 'compare',
     split: options.split,
+    splitSalt,
     final: options.final,
     inputs: data.inputs satisfies Inputs,
     ...(data.published && { published: data.published }),
@@ -388,6 +399,7 @@ export async function fit(options: FitOptions, spec = builtInName): Promise<FitR
     model: model.name,
     modelVersion: versionOf(model, data, fitted),
     split: 'training',
+    splitSalt,
     velocitySigma: fitted.velocitySigma,
     ...('exponent' in fitted && { exponent: fitted.exponent }),
     ...(fitted.summary.pressure && { pressure: fitted.summary.pressure }),

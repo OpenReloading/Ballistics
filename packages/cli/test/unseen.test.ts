@@ -43,13 +43,13 @@ describe('unseenPowder', () => {
 })
 
 describe('verify --leave-one-powder-out', () => {
-  // validation cartridge 308-win; the 30-br row is training and plain has no parameters
+  // validation cartridge 308-match; the 30-br row is training and plain has no parameters
   const specs = [
-    { cartridge: '308-win', powder: 'demo-powder-sp20', charge: 2.4, velocity: 0.03 },
-    { cartridge: '308-win', powder: 'demo-powder-sp21', charge: 2.4, velocity: -0.04 },
-    { cartridge: '308-win', powder: 'demo-powder-sp22', charge: 2.0, velocity: 0.01 },
-    { cartridge: '308-win', powder: 'demo-powder-sp25', charge: 2.4, velocity: 0 },
-    { cartridge: '308-win', powder: 'demo-powder-plain', charge: 2.0, velocity: 0 },
+    { cartridge: '308-match', powder: 'demo-powder-sp20', charge: 2.4, velocity: 0.03 },
+    { cartridge: '308-match', powder: 'demo-powder-sp21', charge: 2.4, velocity: -0.04 },
+    { cartridge: '308-match', powder: 'demo-powder-sp22', charge: 2.0, velocity: 0.01 },
+    { cartridge: '308-match', powder: 'demo-powder-sp25', charge: 2.4, velocity: 0 },
+    { cartridge: '308-match', powder: 'demo-powder-plain', charge: 2.0, velocity: 0 },
     { cartridge: '30-br', powder: 'demo-powder-sp20', charge: 2.0, velocity: 0.05 },
   ]
   const options = {

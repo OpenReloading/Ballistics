@@ -14,18 +14,18 @@ The model was compared with printed load rows of cartridges it was not fitted to
 
 ### All used rows
 
-From the [results](models/validation.md#results) of `verify --json` on the validation split (rows not in the repository), model version `67d67adf…`, powder parameters of the records:
+From the [results](models/validation.md#results) of `verify --json` on the validation split of the rule without a salt (rows not in the repository), model version `67d67adf…`, powder parameters of the records:
 
 | Quantity                                   | Rows   | Median error | P90 error | Interval coverage |
 | ------------------------------------------ | ------ | ------------ | --------- | ----------------- |
 | Muzzle velocity                            | 10,497 | 3.32 %       | 8.87 %    | 89.6 %            |
 | Peak pressure (rows that print one in bar) | 4,060  | 15.0 %       | 38.1 %    | not measured      |
 
-The errors are over the 10,497 of 16,871 rows in the split that the model ran. The [results](models/validation.md#results) give the reasons for the rest, the family lines and the [pooled powder fit](models/validation.md#pooled-powder-fit) (median 2.85 %, P90 7.84 % on 633 held-out rows). Not measured: the sealed test split, and a powder that is not in the fitted set.
+The errors are over the 10,497 of 16,871 rows in the split of the rule without a salt that the model ran. The [results](models/validation.md#results) give the reasons for the rest, the family lines and the [pooled powder fit](models/validation.md#pooled-powder-fit) (median 2.85 %, P90 7.84 % on 633 held-out rows). Not measured: the sealed test split, and a powder that is not in the fitted set.
 
 ### Rifle and handgun
 
-`verify --group-by` has no firearm class, so the split comes from the research entry [Shot-start pressure by bullet construction and firearm class](research/interior-start-pressure-rules.md). It scores the load-table fit with every powder refitted on the training split, on 14,238 validation rows, a different set-up from the table above:
+`verify --group-by` has no firearm class, so the split comes from the research entry [Shot-start pressure by bullet construction and firearm class](research/interior-start-pressure-rules.md). It scores the load-table fit with every powder refitted on the training split, on 14,238 validation rows of the rule without a salt, a different set-up from the table above:
 
 | Start pressure rule                                                | Rifle median | Rifle P90 | Handgun median | Handgun P90 |
 | ------------------------------------------------------------------ | ------------ | --------- | -------------- | ----------- |
