@@ -5,11 +5,12 @@ import {
   mkdtempSync,
   readdirSync,
   readFileSync,
+  rmSync,
   writeFileSync,
 } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
-import { expect, it } from 'vitest'
+import { expect, it, onTestFinished } from 'vitest'
 import {
   importSpecifiers,
   plan,
@@ -295,6 +296,7 @@ it('tests every workspace that has tests, in exactly one group', () => {
 
 it('reads both scopes while the packages move to @rangefoundry', () => {
   const dir = mkdtempSync(path.join(tmpdir(), 'ci-plan-'))
+  onTestFinished(() => rmSync(dir, { recursive: true, force: true }))
   const put = (name: string, content: string) => {
     mkdirSync(path.dirname(path.join(dir, name)), { recursive: true })
     writeFileSync(path.join(dir, name), content)
