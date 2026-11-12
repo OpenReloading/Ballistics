@@ -1,5 +1,45 @@
 # Changelog
 
+## [0.0.7](https://github.com/OpenReloading/Ballistics/compare/web-v0.0.6...web-v0.0.7) (2026-11-12)
+
+
+### Features
+
+* **cli:** pressure rows in the fit, with a factor per pressure basis ([#1153](https://github.com/OpenReloading/Ballistics/issues/1153)) ([4aa1fa5](https://github.com/OpenReloading/Ballistics/commit/4aa1fa5fb9245e8376a575dc3df96a9d7910621d))
+* **design-tokens:** space steps 2xs and sm-md, used in the first half of the web app's styles ([#1164](https://github.com/OpenReloading/Ballistics/issues/1164)) ([adab2c1](https://github.com/OpenReloading/Ballistics/commit/adab2c183a4f0660ddb85779e4d9e329539c36bc))
+* **schema:** store a bullet measured from a photo as values, not an English note ([#1146](https://github.com/OpenReloading/Ballistics/issues/1146)) ([60f1d99](https://github.com/OpenReloading/Ballistics/commit/60f1d995b6c1f7dbe0fe00789a5192bfe3cdb766))
+* **target-recognition:** add the package with the raster operations and the blob detector ([#1139](https://github.com/OpenReloading/Ballistics/issues/1139)) ([6aa1e90](https://github.com/OpenReloading/Ballistics/commit/6aa1e90989ba9e1b2ae047aebab0fa4d39d301c5))
+* **target-recognition:** the hole detector moves behind the inference port ([#1144](https://github.com/OpenReloading/Ballistics/issues/1144)) ([a64cf85](https://github.com/OpenReloading/Ballistics/commit/a64cf859804b268f3f2ba1b1e92871dc70a10456))
+* **web:** show the built-in example rifle's names in the interface language ([#1143](https://github.com/OpenReloading/Ballistics/issues/1143)) ([011edbb](https://github.com/OpenReloading/Ballistics/commit/011edbb9410ebd3d4b0085c54806f1ec8cf84a7d))
+* **web:** the page palette from @open-reloading/design-tokens ([#1156](https://github.com/OpenReloading/Ballistics/issues/1156)) ([4e4b84a](https://github.com/OpenReloading/Ballistics/commit/4e4b84a5d09e19139e280dd3d25ee7ee6c9af9a9))
+
+
+### Bug fixes
+
+* **design-tokens:** Mantine's dark scheme prints light, in the web app, packages/ui and Docusaurus ([#1178](https://github.com/OpenReloading/Ballistics/issues/1178)) ([2674fee](https://github.com/OpenReloading/Ballistics/commit/2674feea7c0c8dc23c63286626bb713b562f95c9))
+* **design-tokens:** the dark scheme on screen only, so pages print light ([#1168](https://github.com/OpenReloading/Ballistics/issues/1168)) ([4824eee](https://github.com/OpenReloading/Ballistics/commit/4824eeee51c26517214edb6064630a66b15d11c2))
+* US spelling in prose, comments and messages, checked by typos ([#1160](https://github.com/OpenReloading/Ballistics/issues/1160)) ([7e1255c](https://github.com/OpenReloading/Ballistics/commit/7e1255c3ef421ae348b39db550c15e4e87eb7a2f))
+* **web:** charts print in the light colors from the dark scheme ([#1183](https://github.com/OpenReloading/Ballistics/issues/1183)) ([d786d67](https://github.com/OpenReloading/Ballistics/commit/d786d67d33888102f5ea9004d4f75f23f040d674))
+* **web:** media queries in range syntax, so no width falls between two breakpoints ([#1170](https://github.com/OpenReloading/Ballistics/issues/1170)) ([58555ae](https://github.com/OpenReloading/Ballistics/commit/58555ae7ed60014a77c9aeda4a59fb63c8773eb9))
+* **web:** media queries on the breakpoint scale ([#1161](https://github.com/OpenReloading/Ballistics/issues/1161)) ([c9018dd](https://github.com/OpenReloading/Ballistics/commit/c9018dd498d9457dddd7fc35066cbdad4ac2eb84))
+
+
+### Documentation
+
+* make the last four multi-line comment runs one line ([#1142](https://github.com/OpenReloading/Ballistics/issues/1142)) ([1d303bd](https://github.com/OpenReloading/Ballistics/commit/1d303bd4491cc7ba09a6a2db60df6ed7c28c3174))
+* **tests:** one-line comments in the test files ([#1137](https://github.com/OpenReloading/Ballistics/issues/1137)) ([1ada953](https://github.com/OpenReloading/Ballistics/commit/1ada953bc7b048bcfe7b3982c87083c2f96dc0c7))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @open-reloading/api bumped to 0.0.7
+    * @open-reloading/catalog bumped to 0.0.7
+    * @open-reloading/drawing bumped to 0.0.6
+    * @open-reloading/importers bumped to 0.0.7
+    * @open-reloading/schema bumped to 0.0.7
+
 ## [0.0.6](https://github.com/OpenReloading/Ballistics/compare/web-v0.0.5...web-v0.0.6) (2026-11-09)
 
 

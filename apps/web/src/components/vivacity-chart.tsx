@@ -12,18 +12,18 @@ import {
   vivacityUnit,
 } from '../lib/burn-rate.ts'
 import { niceTicks, tickDecimals } from '../lib/ticks.ts'
-import { axisText, chartTooltip, EChart, tickStep, useChartTokens } from './echart.tsx'
+import { axisText, chartColors, chartTooltip, EChart, hovered, tickStep } from './echart.tsx'
 
 // the named colors and the series slots 1 to 6
 type Tokens = Record<'muted' | 'border' | 'bg' | 'fg' | `${number}`, string>
 
-const vivacityTokens: Tokens = {
+const tokens: Tokens = chartColors({
   muted: '--muted',
   border: '--line',
   bg: '--page',
   fg: '--ink',
   ...Object.fromEntries([1, 2, 3, 4, 5, 6].map((k) => [k, `--series-${k}`])),
-}
+})
 
 /** One powder of the chart and its color slot (0 to 5, `--series-<slot + 1>` in globals.css). */
 interface Series {
@@ -55,6 +55,7 @@ function bandSeries(series: Series[], tokens: Tokens, t: Translator['t']) {
       symbol: 'none',
       lineStyle: { opacity: 0 },
       areaStyle: { color: tokens[`${slot + 1}`], opacity: 0.2 },
+      emphasis: hovered(tokens[`${slot + 1}`] ?? tokens.fg),
       tooltip: { show: false },
       data: chartBurntFractions.map((z) => {
         const v = curveAt(p, z)
@@ -151,6 +152,7 @@ function vivacityOption(
         symbol: 'none',
         lineStyle: { color: tokens[`${slot + 1}`], width: 2, type: dashArray(dashes[slot] ?? '') },
         itemStyle: { color: tokens[`${slot + 1}`] },
+        emphasis: hovered(tokens[`${slot + 1}`] ?? tokens.fg),
         data: chartBurntFractions.map((z) => [z, curveAt(p, z).value]),
       })),
       ...marksSeries(marks, tokens, small, t),
@@ -175,10 +177,9 @@ export function VivacityChart({
   marks?: Mark[] | undefined
 }) {
   const { t } = useTranslation()
-  const tokens = useChartTokens(vivacityTokens)
   const option = useMemo(
-    () => (tokens ? vivacityOption(tokens, series, height, marks, t) : {}),
-    [series, tokens, height, marks, t],
+    () => vivacityOption(tokens, series, height, marks, t),
+    [series, height, marks, t],
   )
   return (
     <div className="chart vivacity-chart">

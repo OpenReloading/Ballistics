@@ -211,7 +211,7 @@ export function SiteHeader() {
   const { t } = useTranslation()
   const [opened, { toggle, close }] = useDisclosure(false)
   // the drawer is only hidden by CSS from 75em: left open, its scroll lock and focus trap would stay
-  const wide = useMediaQuery('(min-width: 75em)')
+  const wide = useMediaQuery('(width >= 75em)')
   useEffect(() => {
     if (wide) close()
   }, [wide, close])

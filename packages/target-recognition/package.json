@@ -2,7 +2,7 @@
   "name": "@open-reloading/target-recognition",
   "version": "0.0.0",
   "private": true,
-  "description": "Hole proposals on target photos through an inference port, with the raster operations and the blob detector they are built on.",
+  "description": "The target face search and hole proposals on target photos through an inference port.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -31,7 +31,8 @@
     "build": "tsc -b tsconfig.build.json && api-extractor run",
     "typecheck": "tsc --noEmit && tsc -p test",
     "lint": "oxlint --type-aware --deny-warnings --report-unused-disable-directives",
-    "test": "vitest run --coverage && publint --strict && attw --pack . --profile esm-only"
+    "test": "vitest run && publint --strict && attw --pack . --profile esm-only",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@open-reloading/shot-groups": "workspace:*",
@@ -40,6 +41,7 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "catalog:",
     "@microsoft/api-extractor": "catalog:",
+    "@open-reloading/catalog": "workspace:*",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "oxlint": "catalog:",

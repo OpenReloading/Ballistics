@@ -4,14 +4,14 @@ Ballistics: a web app, a REST API, a CLI and libraries for handloading, whose re
 
 ## Commands
 
-Run them in the dev container (`.devcontainer/`): `devcontainer exec --workspace-folder . <command>`.
+Run them in the dev container (`.devcontainer/`): `devcontainer exec --workspace-folder . <command>`. Where the host has Podman with podman-compose and no `docker` command, add `--docker-path podman` to `devcontainer up` and `devcontainer exec` (without it `exec` exits 1 and prints nothing), and `--docker-compose-path podman-compose` to `up`.
 
 - Install: `pnpm install` (also the pre-commit hook: Oxlint and Biome on the staged files).
 - Build: `pnpm run build`. The workspaces import each other's `dist/`, so build before a typecheck or a test.
 - Typecheck `pnpm run typecheck`, lint `pnpm run lint`, format and safe fixes `pnpm run format`.
 - Tests: `pnpm test` (all but the browser tests). End-to-end: `pnpm run static:build`; then, each left running, `pnpm run pages:serve` (the export, port 3003) and `pnpm --filter @open-reloading/api start` (the API, port 3000); then `pnpm run test:e2e`.
 - Records `pnpm run data:validate`; API contract `pnpm run api:check`, and `pnpm run api:conformance` against a running API.
-- Changed-files check: `pnpm run check:changed` (after `git fetch origin`): build, typecheck, lint, knip and the comment check, then the tests CI's plan ([`apps/web/scripts/ci-plan.mts`](apps/web/scripts/ci-plan.mts)) picks for the changes since `origin/main`, uncommitted ones included: the workspaces changed and those that depend on them, every test group for a change outside the workspaces, none for prose.
+- Changed-files check: `pnpm run check:changed` (after `git fetch origin`): build, typecheck, lint, the German catalogue against the untranslated list of the merge base with `origin/main`, knip and the comment check, then the tests CI's plan ([`apps/web/scripts/ci-plan.mts`](apps/web/scripts/ci-plan.mts)) picks for the changes since `origin/main`, uncommitted ones included: the workspaces changed and those that depend on them, every test group for a change outside the workspaces, none for prose.
 
 ## Before you push
 

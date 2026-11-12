@@ -180,7 +180,7 @@ const plotBottom = 24
 /** One source for the grid and the playback strip: 56 px of pressure labels, 72 px for Play and the speed (`globals.css` `.play-controls`). */
 export const plotEdges = (shown: number): readonly [number, number] => [56, shown > 1 ? 100 : 72]
 
-/** Colors of the chart, read from the page's tokens so light and dark match the app. */
+/** Colors of the chart, the page's tokens so light and dark match the app. */
 export type ChartTheme = Record<
   | ChartQuantity
   | `${ChartQuantity}Text`

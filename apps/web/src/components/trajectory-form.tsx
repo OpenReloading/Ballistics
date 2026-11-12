@@ -1112,7 +1112,7 @@ export function TrajectoryForm({
   const [choice, setChoice] = useState<number | undefined>(undefined)
   const [twistHand, setTwistHand] = useState<'right' | 'left'>('right')
   // from 62em the chart fills the results column's height
-  const wide = useMediaQuery('(min-width: 62em)')
+  const wide = useMediaQuery('(width >= 62em)')
   const [sights, setSights] = useState(() =>
     sightPicker([], exampleFirearmIn(t) as unknown as UserRecord, t),
   )

@@ -1,22 +1,15 @@
 // Synthetic photos of the target faces of packages/catalog/records/target-faces for the face search: the face drawn from its record, seen by a pinhole camera.
 import { readdirSync, readFileSync } from 'node:fs'
-import type { Federation, TargetFace } from '@open-reloading/schema'
-import { type Face, withOrganization } from '../src/lib/face-organization.ts'
-import type { RgbaImage } from '../src/lib/image.ts'
-import { mul3, type Point, type Vector3 } from '../src/lib/target-geometry.ts'
+import { mul3, type Point, type Vector3 } from '@open-reloading/shot-groups'
+import type { RgbaImage } from '../src/image.ts'
+import type { PrintedFace } from '../src/target-face.ts'
 import { defined } from './defined.ts'
 
-const dir = new URL('../../../packages/catalog/records/target-faces/', import.meta.url)
-const federationDir = new URL('../../../packages/catalog/records/federations/', import.meta.url)
-const federations = readdirSync(federationDir).map(
-  (f) => JSON.parse(readFileSync(new URL(f, federationDir), 'utf8')) as Federation,
-)
-export const faces: Face[] = readdirSync(dir)
-  .sort()
-  .map((f) =>
-    withOrganization(JSON.parse(readFileSync(new URL(f, dir), 'utf8')) as TargetFace, federations),
-  )
-export const faceById = (id: string) => {
+const dir = new URL('../../catalog/records/target-faces/', import.meta.url)
+export const faces: PrintedFace[] = readdirSync(dir)
+  .toSorted()
+  .map((f) => JSON.parse(readFileSync(new URL(f, dir), 'utf8')) as PrintedFace)
+export const faceById = (id: string): PrintedFace => {
   const f = faces.find((x) => x.id === id)
   if (!f) throw new Error(`No face ${id}`)
   return f
@@ -111,7 +104,7 @@ export function invert(m: Homography): Homography {
 
 export type Scene = {
   camera: Camera
-  face: TargetFace
+  face: PrintedFace
   /** Line width, mm. */
   line?: number
   /** Grey of the paper and of the black area. */
@@ -148,6 +141,9 @@ const rng = (seed: number) => {
 
 type Look = { radii: number[]; blackR: number; line: number; paper: number; black: number }
 
+/** What every pixel of one `render` reads: the scene, its look and the inverse homography. */
+type Draw = { scene: Scene; look: Look; inv: Homography }
+
 /** The scene as RGBA, drawn per pixel through the inverse homography with 2 x 2 samples. */
 export function render(scene: Scene): { image: RgbaImage; h: Homography } {
   const { width, height } = scene.camera
@@ -164,8 +160,9 @@ export function render(scene: Scene): { image: RgbaImage; h: Homography } {
     black: scene.black ?? 30,
   }
   const grey = new Float32Array(width * height)
+  const draw: Draw = { scene, look, inv }
   for (let y = 0; y < height; y++)
-    for (let x = 0; x < width; x++) grey[y * width + x] = pixelGrey(scene, look, inv, x, y)
+    for (let x = 0; x < width; x++) grey[y * width + x] = pixelGrey(draw, x, y)
   if (scene.blur) boxBlur(grey, width, height, scene.blur)
   if (scene.noise) addNoise(grey, scene.noise)
   const data = new Uint8ClampedArray(width * height * 4)
@@ -177,36 +174,47 @@ export function render(scene: Scene): { image: RgbaImage; h: Homography } {
 }
 
 /** The grey of image pixel (x, y): the mean of 2 x 2 samples, the patches, the light. */
-function pixelGrey(scene: Scene, look: Look, inv: Homography, x: number, y: number): number {
+function pixelGrey(draw: Draw, x: number, y: number): number {
+  const { scene } = draw
   const { width } = scene.camera
   let sum = 0
   for (let sy = 0; sy < 2; sy++)
-    for (let sx = 0; sx < 2; sx++)
-      sum += sampleGrey(scene, look, inv, x + 0.25 + 0.5 * sx, y + 0.25 + 0.5 * sy)
-  let v = sum / 4
-  for (const p of scene.patches ?? [])
-    if (x >= p.box[0] && x < p.box[2] && y >= p.box[1] && y < p.box[3]) v = p.grey
+    for (let sx = 0; sx < 2; sx++) sum += sampleGrey(draw, x + 0.25 + 0.5 * sx, y + 0.25 + 0.5 * sy)
+  let v = patchGrey(scene.patches, x, y, sum / 4)
   v *= (1 - (scene.gradient ?? 0) * (x / width)) * (scene.light?.(x, y) ?? 1)
   return v
 }
 
+/** `v` at image pixel (x, y), or the grey of the last patch that covers it. */
+function patchGrey(patches: Scene['patches'], x: number, y: number, v: number): number {
+  let out = v
+  for (const p of patches ?? [])
+    if (x >= p.box[0] && x < p.box[2] && y >= p.box[1] && y < p.box[3]) out = p.grey
+  return out
+}
+
+/** Whether face point (X, Y) lies outside the sheet's paper. */
+function offSheet(scene: Scene, X: number, Y: number): boolean {
+  const sh = scene.sheet?.box
+  return !!sh && (X < sh[0] || X > sh[2] || Y < sh[1] || Y > sh[3])
+}
+
 /** The grey at image point (px, py): paper, black area, ring line, print mark or hole. */
-function sampleGrey(scene: Scene, look: Look, inv: Homography, px: number, py: number): number {
+function sampleGrey(draw: Draw, px: number, py: number): number {
+  const { scene, look, inv } = draw
   const { blackR, paper, black } = look
   const w = inv[6] * px + inv[7] * py + inv[8]
   const X = (inv[0] * px + inv[1] * py + inv[2]) / w
   const Y = (inv[3] * px + inv[4] * py + inv[5]) / w
   const r = Math.hypot(X, Y)
-  const sh = scene.sheet?.box
-  if (sh && (X < sh[0] || X > sh[2] || Y < sh[1] || Y > sh[3]))
-    return scene.sheet?.background ?? paper
+  if (offSheet(scene, X, Y)) return scene.sheet?.background ?? paper
   let v = r <= blackR ? black : paper
   if (scene.rings !== false) v = ringGrey(look, r, v)
-  return printGrey(scene, X, Y, v, paper)
+  return printGrey(draw, X, Y, v)
 }
 
 /** `v` at face point (X, Y), or the grey of the print mark or hole that covers it. */
-function printGrey(scene: Scene, X: number, Y: number, v: number, paper: number): number {
+function printGrey({ scene, look: { paper } }: Draw, X: number, Y: number, v: number): number {
   let out = v
   for (const m of scene.marks ?? [])
     if (Math.abs(X - m.x) <= m.width / 2 && Math.abs(Y - m.y) <= m.height / 2) out = m.grey

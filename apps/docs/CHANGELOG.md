@@ -1,5 +1,51 @@
 # Changelog
 
+## [0.0.7](https://github.com/OpenReloading/Ballistics/compare/docs-v0.0.6...docs-v0.0.7) (2026-11-12)
+
+
+### Features
+
+* **ballistics:** chambrage in the pressure gradient, as an option ([#1149](https://github.com/OpenReloading/Ballistics/issues/1149)) ([c542984](https://github.com/OpenReloading/Ballistics/commit/c5429842dc54716b0f8aa6e42c63aa9bf290ba92))
+* **cli:** energy from a prior times one energy-level factor in the fit ([#1155](https://github.com/OpenReloading/Ballistics/issues/1155)) ([cf4892d](https://github.com/OpenReloading/Ballistics/commit/cf4892d1b0e8a6ed24fa8efe2ab4b685771e6deb))
+* **cli:** fit powders from rows ([#1141](https://github.com/OpenReloading/Ballistics/issues/1141)) ([661678f](https://github.com/OpenReloading/Ballistics/commit/661678f621bb28b4082e8c4f854f56195d1b8012))
+* **cli:** pressure exponent per powder family in the fit ([#1150](https://github.com/OpenReloading/Ballistics/issues/1150)) ([dc65c8e](https://github.com/OpenReloading/Ballistics/commit/dc65c8e68fb0507a577e708e422ef87385530a7e))
+* **cli:** pressure rows in the fit, with a factor per pressure basis ([#1153](https://github.com/OpenReloading/Ballistics/issues/1153)) ([4aa1fa5](https://github.com/OpenReloading/Ballistics/commit/4aa1fa5fb9245e8376a575dc3df96a9d7910621d))
+* **docs:** the site palette from @open-reloading/design-tokens ([#1167](https://github.com/OpenReloading/Ballistics/issues/1167)) ([8f80efa](https://github.com/OpenReloading/Ballistics/commit/8f80efa851b92754b3ab9362c0216460a28145ce))
+* **schema:** store a bullet measured from a photo as values, not an English note ([#1146](https://github.com/OpenReloading/Ballistics/issues/1146)) ([60f1d99](https://github.com/OpenReloading/Ballistics/commit/60f1d995b6c1f7dbe0fe00789a5192bfe3cdb766))
+* **target-recognition:** add the package with the raster operations and the blob detector ([#1139](https://github.com/OpenReloading/Ballistics/issues/1139)) ([6aa1e90](https://github.com/OpenReloading/Ballistics/commit/6aa1e90989ba9e1b2ae047aebab0fa4d39d301c5))
+* **target-recognition:** the hole detector moves behind the inference port ([#1144](https://github.com/OpenReloading/Ballistics/issues/1144)) ([a64cf85](https://github.com/OpenReloading/Ballistics/commit/a64cf859804b268f3f2ba1b1e92871dc70a10456))
+* **web:** the page palette from @open-reloading/design-tokens ([#1156](https://github.com/OpenReloading/Ballistics/issues/1156)) ([4e4b84a](https://github.com/OpenReloading/Ballistics/commit/4e4b84a5d09e19139e280dd3d25ee7ee6c9af9a9))
+
+
+### Bug fixes
+
+* **ballistics:** record loads take the grain-form temperature default ([#1145](https://github.com/OpenReloading/Ballistics/issues/1145)) ([7f0b186](https://github.com/OpenReloading/Ballistics/commit/7f0b186fd180aee4da2d81bcf8cca77ce83002b2))
+* **catalog:** a fitted source without an origin keeps a record out of the public catalog ([#1147](https://github.com/OpenReloading/Ballistics/issues/1147)) ([04389c8](https://github.com/OpenReloading/Ballistics/commit/04389c89c2dfcd17a0331c7353d518101634185c))
+* **design-tokens:** Mantine's dark scheme prints light, in the web app, packages/ui and Docusaurus ([#1178](https://github.com/OpenReloading/Ballistics/issues/1178)) ([2674fee](https://github.com/OpenReloading/Ballistics/commit/2674feea7c0c8dc23c63286626bb713b562f95c9))
+* **schema:** state the remaining one-of rules in the JSON Schemas ([#1140](https://github.com/OpenReloading/Ballistics/issues/1140)) ([532ae6e](https://github.com/OpenReloading/Ballistics/commit/532ae6ecf15cb6b3c1fcd269145a31f355600a59))
+* US spelling in prose, comments and messages, checked by typos ([#1160](https://github.com/OpenReloading/Ballistics/issues/1160)) ([7e1255c](https://github.com/OpenReloading/Ballistics/commit/7e1255c3ef421ae348b39db550c15e4e87eb7a2f))
+* **web:** media queries in range syntax, so no width falls between two breakpoints ([#1170](https://github.com/OpenReloading/Ballistics/issues/1170)) ([58555ae](https://github.com/OpenReloading/Ballistics/commit/58555ae7ed60014a77c9aeda4a59fb63c8773eb9))
+
+
+### Documentation
+
+* make the last four multi-line comment runs one line ([#1142](https://github.com/OpenReloading/Ballistics/issues/1142)) ([1d303bd](https://github.com/OpenReloading/Ballistics/commit/1d303bd4491cc7ba09a6a2db60df6ed7c28c3174))
+* **web:** record the mantine-datatable trial ([#1163](https://github.com/OpenReloading/Ballistics/issues/1163)) ([df36858](https://github.com/OpenReloading/Ballistics/commit/df368582ff9a5f209092a96e8a365a40b8c0255a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @open-reloading/api bumped to 0.0.7
+  * devDependencies
+    * @open-reloading/cli bumped to 0.0.3
+    * @open-reloading/catalog bumped to 0.0.7
+    * @open-reloading/drawing bumped to 0.0.6
+    * @open-reloading/importers bumped to 0.0.7
+    * @open-reloading/schema bumped to 0.0.7
+    * @open-reloading/web bumped to 0.0.7
+
 ## [0.0.6](https://github.com/OpenReloading/Ballistics/compare/docs-v0.0.5...docs-v0.0.6) (2026-11-09)
 
 

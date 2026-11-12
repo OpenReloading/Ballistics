@@ -782,6 +782,9 @@ importers:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
         version: 7.60.1(@types/node@26.6.6)
+      '@open-reloading/catalog':
+        specifier: workspace:*
+        version: link:../catalog
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6

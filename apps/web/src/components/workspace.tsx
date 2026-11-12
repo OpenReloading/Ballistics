@@ -55,7 +55,7 @@ export function Workspace({
   // from 48em both panels show and the tab list is gone: a Range tab left open would hide
   useEffect(() => {
     if (!range) return
-    const wide = matchMedia('(min-width: 48em)')
+    const wide = matchMedia('(width >= 48em)')
     const leave = () => wide.matches && setTab((open) => (open === 'range' ? 'inputs' : open))
     wide.addEventListener('change', leave)
     return () => wide.removeEventListener('change', leave)

@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.0.7](https://github.com/OpenReloading/Ballistics/compare/api-v0.0.6...api-v0.0.7) (2026-11-12)
+
+
+### Features
+
+* **schema:** store a bullet measured from a photo as values, not an English note ([#1146](https://github.com/OpenReloading/Ballistics/issues/1146)) ([60f1d99](https://github.com/OpenReloading/Ballistics/commit/60f1d995b6c1f7dbe0fe00789a5192bfe3cdb766))
+* **target-recognition:** add the package with the raster operations and the blob detector ([#1139](https://github.com/OpenReloading/Ballistics/issues/1139)) ([6aa1e90](https://github.com/OpenReloading/Ballistics/commit/6aa1e90989ba9e1b2ae047aebab0fa4d39d301c5))
+
+
+### Bug fixes
+
+* **schema:** state the remaining one-of rules in the JSON Schemas ([#1140](https://github.com/OpenReloading/Ballistics/issues/1140)) ([532ae6e](https://github.com/OpenReloading/Ballistics/commit/532ae6ecf15cb6b3c1fcd269145a31f355600a59))
+* US spelling in prose, comments and messages, checked by typos ([#1160](https://github.com/OpenReloading/Ballistics/issues/1160)) ([7e1255c](https://github.com/OpenReloading/Ballistics/commit/7e1255c3ef421ae348b39db550c15e4e87eb7a2f))
+
+
+### Documentation
+
+* **tests:** one-line comments in the test files ([#1137](https://github.com/OpenReloading/Ballistics/issues/1137)) ([1ada953](https://github.com/OpenReloading/Ballistics/commit/1ada953bc7b048bcfe7b3982c87083c2f96dc0c7))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @open-reloading/catalog bumped to 0.0.7
+    * @open-reloading/schema bumped to 0.0.7
+
 ## [0.0.6](https://github.com/OpenReloading/Ballistics/compare/api-v0.0.5...api-v0.0.6) (2026-11-09)
 
 

@@ -7,17 +7,17 @@ import type { Translator } from '../i18n/translate.ts'
 import type { BarrelRow } from '../lib/barrel-length.ts'
 import { niceTicks } from '../lib/ticks.ts'
 import { formatQuantity, type UnitSystem } from '../lib/units.ts'
-import { axisText, chartTooltip, EChart, tickStep, useChartTokens } from './echart.tsx'
+import { axisText, chartColors, chartTooltip, EChart, tickStep } from './echart.tsx'
 import type { BarrelStep } from './use-barrel-study.ts'
 
-const tokens = {
+const theme = chartColors({
   velocity: '--series-1',
   energy: '--series-3',
   muted: '--muted',
   border: '--line',
   bg: '--page',
   fg: '--ink',
-}
+})
 
 /** The rows with values: the points of a curve. */
 const drawn = (rows: BarrelRow[] | undefined) =>
@@ -25,7 +25,7 @@ const drawn = (rows: BarrelRow[] | undefined) =>
     Boolean(r.values),
   )
 
-type Theme = Record<keyof typeof tokens, string>
+type Theme = typeof theme
 type DrawnRow = ReturnType<typeof drawn>[number]
 
 const valueAxis = (
@@ -222,12 +222,11 @@ export function BarrelChart({
   height?: number | undefined
 }) {
   const { t } = useTranslation()
-  const theme = useChartTokens(tokens)
   const { barrelLength: length, velocity, energy } = system
   const ladder = steps.length > 1
   const option = useMemo(
-    () => theme && chartOption(theme, steps, selected, system, t),
-    [theme, steps, selected, system, t],
+    () => chartOption(theme, steps, selected, system, t),
+    [steps, selected, system, t],
   )
   const rows = drawn(steps[selected]?.rows)
   // the box stays while nothing is drawn (a longer run on its way): the chart area does not jump

@@ -1,6 +1,6 @@
 {
   "name": "@open-reloading/drawing",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Figure models of cartridges, bullets, seating and target faces, without a renderer.",
   "keywords": [
     "reloading",

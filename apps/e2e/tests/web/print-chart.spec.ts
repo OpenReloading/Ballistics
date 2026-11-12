@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
+import { isDark } from './luminance.ts'
 import { storeUnits } from './units.ts'
 import { runExample } from './workbench-run.ts'
 
@@ -33,4 +34,15 @@ test('the result chart returns to the panel width after printing', async ({ page
   await page.emulateMedia({ media: 'print' })
   await page.emulateMedia({ media: 'screen' })
   await expect.poll(() => drawn(page)).toBe(before)
+})
+
+test('with dark stored the chart of the report prints in the light colors', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('theme', 'dark'))
+  await runExample(page)
+  const label = page.locator('.print-report .report-chart svg text').first()
+  await expect(label).toBeAttached()
+  const fill = () => label.evaluate((node) => getComputedStyle(node).fill)
+  expect(isDark(await fill())).toBe(false)
+  await page.emulateMedia({ media: 'print' })
+  expect(isDark(await fill())).toBe(true)
 })
