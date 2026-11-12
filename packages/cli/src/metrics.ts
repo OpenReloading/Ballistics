@@ -7,20 +7,29 @@ import { percentile } from './stats.ts'
 
 type Used = Outcome & { prediction: { velocity: number; pressure: number } }
 
-const isUsed = (o: Outcome): o is Used => 'velocity' in o.prediction
+/** Whether the model gave a result for the row. */
+export const isUsed = (o: Outcome): o is Used => 'velocity' in o.prediction
 
-/** Absolute relative error of the model's velocity against the printed one. */
-const velocityError = (o: Used) => Math.abs(o.prediction.velocity - o.row.velocity) / o.row.velocity
+/** Relative error of the model's velocity against the printed one, signed: (model - printed) / printed. */
+export const signedVelocityError = (o: Used) =>
+  (o.prediction.velocity - o.row.velocity) / o.row.velocity
+
+const velocityError = (o: Used) => Math.abs(signedVelocityError(o))
 
 /** Distance of the printed velocity from the model's, as a share of the model's: inside the band model * (1 +/- h) when at most h. */
 const bandDistance = (o: Used) =>
   Math.abs(o.prediction.velocity - o.row.velocity) / o.prediction.velocity
 
-/** Absolute relative error of the model's peak pressure against the printed one, undefined without a printed one. */
-const pressureError = (o: Used) =>
+/** Relative error of the model's peak pressure against the printed one in bar, signed as the velocity's; undefined without a printed one. */
+export const signedPressureError = (o: Used) =>
   o.row.pressure === undefined
     ? undefined
-    : Math.abs(fromSi('pressure', o.prediction.pressure) - o.row.pressure) / o.row.pressure
+    : (fromSi('pressure', o.prediction.pressure) - o.row.pressure) / o.row.pressure
+
+const pressureError = (o: Used) => {
+  const error = signedPressureError(o)
+  return error === undefined ? undefined : Math.abs(error)
+}
 
 const stats = (errors: number[]) =>
   errors.length === 0

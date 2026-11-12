@@ -33,6 +33,8 @@ options:
   --group-by <key>   also group by powder, family, cartridge, bullet or construction
   --leave-one-powder-out
                      verify: add the line of the powder not in the fitted set
+  --per-row          verify: add the error of each used row, which a compare against
+                     this result as --baseline pairs
   --params records|fit-on-training
                      the powder parameters of the records (default), or the burn
                      coefficients fitted to the training rows
@@ -130,8 +132,17 @@ type Command = 'verify' | 'compare' | 'fit'
 /** The options each command does not take. */
 const foreignOptions = {
   verify: ['baseline', 'candidate'],
-  compare: ['model', 'leave-one-powder-out'],
-  fit: ['split', 'final', 'baseline', 'candidate', 'group-by', 'params', 'leave-one-powder-out'],
+  compare: ['model', 'leave-one-powder-out', 'per-row'],
+  fit: [
+    'split',
+    'final',
+    'baseline',
+    'candidate',
+    'group-by',
+    'params',
+    'leave-one-powder-out',
+    'per-row',
+  ],
 } as const
 
 /** The options of the command line, with the environment's defaults. */
@@ -158,6 +169,7 @@ function optionsOf(
       'group-by': { type: 'string' },
       params: { type: 'string' },
       'leave-one-powder-out': { type: 'boolean' },
+      'per-row': { type: 'boolean' },
       'velocity-sigma': { type: 'string' },
       exponent: { type: 'string' },
       'pressure-sigma': { type: 'string' },
@@ -181,6 +193,7 @@ function optionsOf(
     split: split as Split,
     final: values.final === true,
     leaveOnePowderOut: values['leave-one-powder-out'] === true,
+    perRow: values['per-row'] === true,
     warn,
     ...(by !== undefined && { groupBy: by as Grouping }),
     params: values.params as Options['params'],

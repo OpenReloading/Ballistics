@@ -43,6 +43,8 @@ export type Prediction = { velocity: number; pressure: number } | { reason: Reas
 
 /** A row with its split, its powder's family and what the model gave. */
 export interface Outcome {
+  /** Position of the row among the rows read, from 0. */
+  index: number
   row: Row
   split: Split
   family: string
@@ -192,7 +194,7 @@ export function outcomes(
   model: InteriorModel,
   wanted: readonly Split[],
 ): Outcome[] {
-  return rows.flatMap((row) => {
+  return rows.flatMap((row, index) => {
     const split = splitOf(row.cartridge)
     if (!wanted.includes(split)) return []
     const family = familyOf(records.powders.get(row.powder))
@@ -200,7 +202,8 @@ export function outcomes(
     const prediction = predict(row, records, model)
     // the correction applies to a row the model gave a result for, so the other reasons come first
     const corrected = 'velocity' in prediction ? atMuzzle(row, records) : row
-    if ('reason' in corrected) return [{ row, split, family, construction, prediction: corrected }]
-    return [{ row: corrected, split, family, construction, prediction }]
+    if ('reason' in corrected)
+      return [{ index, row, split, family, construction, prediction: corrected }]
+    return [{ index, row: corrected, split, family, construction, prediction }]
   })
 }

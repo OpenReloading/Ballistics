@@ -185,11 +185,28 @@ const common = {
   published,
 }
 
+const signed = z.number().describe('(model - printed) / printed, as a fraction.')
+
 /** The result of `verify`. */
 export const verifyResult = z.object({
   ...common,
   command: z.literal('verify'),
   ...evaluation.shape,
+  rows: z
+    .array(
+      z.object({
+        row: count.describe(
+          'Position of the row among the rows read, from 0: two runs on the same rows pair by it.',
+        ),
+        cartridge: z.string(),
+        velocity: signed,
+        pressure: signed.optional().describe('Of a row that prints a pressure in bar.'),
+      }),
+    )
+    .optional()
+    .describe(
+      'With `--per-row`: the error of each used row of the split, for the paired change of `compare`.',
+    ),
 })
 
 /** The result of `verify`. */
@@ -211,11 +228,40 @@ const change = z.object({
 /** The change of each metric from the baseline to the candidate. */
 export type Change = z.infer<typeof change>
 
+const pairedStat = z.object({
+  baseline: fraction.describe('Of the baseline over the paired rows.'),
+  candidate: fraction.describe('Of the candidate over the paired rows.'),
+  change: z.number().describe('Candidate minus baseline.'),
+  standardError: z.number().describe('Standard deviation of the change over the bootstrap draws.'),
+})
+const pairedQuantity = z
+  .object({
+    rows: count.describe(
+      'Rows both sides gave a result for (for pressure: that print one in bar).',
+    ),
+    cartridges: count.describe('Their distinct cartridges, the units the bootstrap draws.'),
+    median: pairedStat.describe('Of the median absolute relative error.'),
+    p90: pairedStat.describe('Of the 90th percentile of the absolute relative error.'),
+  })
+  .nullable()
+  .describe('Null without a row both sides ran that has the quantity.')
+
 const compareResult = z.object({
   ...common,
   command: z.literal('compare'),
   baseline: evaluation,
   candidate: evaluation,
+  paired: z
+    .object({
+      draws: count.describe('Bootstrap draws.'),
+      seed: count.describe('Seed of the draws.'),
+      velocity: pairedQuantity,
+      pressure: pairedQuantity,
+    })
+    .optional()
+    .describe(
+      'When both sides have row errors (two models, or a baseline saved with `--per-row`): the change over the rows both sides ran, each with the standard error of a bootstrap that draws whole cartridges with replacement.',
+    ),
   change: z.object({
     overall: change,
     byFamily: z.record(z.string(), change),

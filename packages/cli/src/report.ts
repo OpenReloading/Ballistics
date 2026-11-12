@@ -78,7 +78,19 @@ const changeRow = (name: string, c: Change) => [
   signed(c.intervalCoverage),
 ]
 
-/** `compare` as text: both versions and the change per group, in percentage points. */
+/** The line of each quantity of the paired change, none without it. */
+function pairedLines(p: CompareResult['paired']) {
+  if (!p) return []
+  return (['velocity', 'pressure'] as const).flatMap((q) => {
+    const c = p[q]
+    if (!c) return []
+    return [
+      `paired ${q}: median ${signed(c.median.change)} (se ${(100 * c.median.standardError).toFixed(2)}), P90 ${signed(c.p90.change)} (se ${(100 * c.p90.standardError).toFixed(2)}) over ${c.rows} rows of ${c.cartridges} cartridges`,
+    ]
+  })
+}
+
+/** `compare` as text: both versions, the change per group and the paired change, in percentage points. */
 export function compareTable(r: CompareResult): string {
   const groups = [
     changeRow('all', r.change.overall),
@@ -96,6 +108,7 @@ export function compareTable(r: CompareResult): string {
       metricHead.map((h, i) => (i === 1 ? 'used' : h)),
       groups,
     ),
+    ...pairedLines(r.paired),
   ].join('\n')
 }
 
