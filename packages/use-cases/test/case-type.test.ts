@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { caseType } from '../src/catalogue/derive.ts'
+import { caseType } from '../src/catalog/derive.ts'
 
 describe('caseType', () => {
   it('sorts the head by R1 over P1 at the bounds, a belt first', () => {
@@ -27,7 +27,10 @@ describe('caseType', () => {
       '300-win-short-mag': 'rebated',
       '303-british': 'rimmed',
       '300-win-mag': 'belted',
+      '220-swift': 'semi-rimmed',
     }
+    const found: Record<string, string | undefined> = {}
+    const tableIIOthers: string[] = []
     const checkSheet = (f: string) => {
       const s = JSON.parse(readFileSync(path.join(dir, f), 'utf8'))
       const v = (symbol: string) =>
@@ -35,14 +38,15 @@ describe('caseType', () => {
           (x: { side?: string; symbol: string }) => x.side === 'cartridge' && x.symbol === symbol,
         )?.value ?? null
       const type = caseType(v('R1'), v('P1'), v('R3'))
-      if (s.id in named) expect(type).toBe(named[s.id])
+      if (s.id in named) found[s.id] = type
       if (type === undefined) return
       types.set(s.table, (types.get(s.table) ?? new Set()).add(type))
-      if (s.table === 'II' && type !== 'rimmed') expect(s.id).toMatch(/win-sl|arisaka/)
-      if (s.id === '220-swift') expect(type).toBe('semi-rimmed')
+      if (s.table === 'II' && type !== 'rimmed') tableIIOthers.push(s.id)
     }
     for (const f of readdirSync(dir)) checkSheet(f)
+    expect(found).toEqual(named)
+    expect(tableIIOthers.filter((id) => !/win-sl|arisaka/.test(id))).toEqual([])
     expect([...(types.get('III') ?? [])]).toEqual(['belted'])
-    expect([...(types.get('II') ?? [])].sort()).toEqual(['rimmed', 'semi-rimmed'])
+    expect([...(types.get('II') ?? [])].toSorted()).toEqual(['rimmed', 'semi-rimmed'])
   })
 })

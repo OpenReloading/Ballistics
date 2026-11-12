@@ -1,29 +1,29 @@
 {
-  "packages/drawing/src/core/geometry.ts": {
+  "packages/svg-drawings/src/core/geometry.ts": {
     "source": "export const geometry = 1",
     "rules": []
   },
-  "packages/drawing/src/cartridge/profile.ts": {
+  "packages/svg-drawings/src/cartridge/profile.ts": {
     "source": "import { geometry } from '../core/geometry.ts'\nexport const profile = geometry",
     "rules": []
   },
-  "packages/drawing/src/bullet/outline.ts": {
+  "packages/svg-drawings/src/bullet/outline.ts": {
     "source": "import { geometry } from '../core/geometry.ts'\nexport const outline = geometry",
     "rules": []
   },
-  "packages/drawing/src/seating/seating.ts": {
+  "packages/svg-drawings/src/seating/seating.ts": {
     "source": "export const seat = 1",
     "rules": []
   },
-  "packages/drawing/src/seating/uses-cartridge-and-bullet.ts": {
+  "packages/svg-drawings/src/seating/uses-cartridge-and-bullet.ts": {
     "source": "import { profile } from '../cartridge/profile.ts'\nimport { outline } from '../bullet/outline.ts'\nexport const both = [profile, outline]",
     "rules": []
   },
-  "packages/drawing/src/target/face.ts": {
+  "packages/svg-drawings/src/target/face.ts": {
     "source": "export const face = 1",
     "rules": []
   },
-  "packages/drawing/src/index.ts": {
+  "packages/svg-drawings/src/index.ts": {
     "source": "export { geometry } from './core/geometry.ts'",
     "rules": []
   },
@@ -31,55 +31,55 @@
     "source": "export type SpecValue = number",
     "rules": []
   },
-  "packages/drawing/src/core/up-cartridge.ts": {
+  "packages/svg-drawings/src/core/up-cartridge.ts": {
     "source": "import { profile } from '../cartridge/profile.ts'\nexport { profile }",
     "rules": ["drawing-core-imports"]
   },
-  "packages/drawing/src/core/up-seating.ts": {
+  "packages/svg-drawings/src/core/up-seating.ts": {
     "source": "import type { seat } from '../seating/seating.ts'\nexport type Seat = typeof seat",
     "rules": ["drawing-core-imports"]
   },
-  "packages/drawing/src/dynamic-react-dom.ts": {
+  "packages/svg-drawings/src/dynamic-react-dom.ts": {
     "source": "export const dom = await import('react-dom')",
     "rules": ["drawing-core-imports"]
   },
-  "packages/drawing/src/cartridge/to-bullet.ts": {
+  "packages/svg-drawings/src/cartridge/to-bullet.ts": {
     "source": "import { outline } from '../bullet/outline.ts'\nexport { outline }",
     "rules": ["drawing-cartridge-imports"]
   },
-  "packages/drawing/src/cartridge/to-seating.ts": {
+  "packages/svg-drawings/src/cartridge/to-seating.ts": {
     "source": "import { seat } from '../seating/seating.ts'\nexport { seat }",
     "rules": ["drawing-cartridge-imports"]
   },
-  "packages/drawing/src/bullet/reexport-cartridge.ts": {
+  "packages/svg-drawings/src/bullet/reexport-cartridge.ts": {
     "source": "export { profile } from '../cartridge/profile.ts'",
     "rules": ["drawing-bullet-imports"]
   },
-  "packages/drawing/src/bullet/to-seating.ts": {
+  "packages/svg-drawings/src/bullet/to-seating.ts": {
     "source": "import { seat } from '../seating/seating.ts'\nexport { seat }",
     "rules": ["drawing-bullet-imports"]
   },
-  "packages/drawing/src/seating/react.ts": {
+  "packages/svg-drawings/src/seating/react.ts": {
     "source": "import { useMemo } from 'react'\nexport { useMemo }",
     "rules": ["drawing-seating-imports"]
   },
-  "packages/drawing/src/seating/next.ts": {
+  "packages/svg-drawings/src/seating/next.ts": {
     "source": "import Link from 'next/link'\nexport { Link }",
     "rules": ["drawing-seating-imports"]
   },
-  "packages/drawing/src/seating/node-fs.ts": {
+  "packages/svg-drawings/src/seating/node-fs.ts": {
     "source": "import { readFileSync } from 'node:fs'\nexport { readFileSync }",
     "rules": ["drawing-seating-imports"]
   },
-  "packages/drawing/src/seating/workspace-package.ts": {
+  "packages/svg-drawings/src/seating/workspace-package.ts": {
     "source": "import { waterDensity } from '@open-reloading/ballistics'\nexport { waterDensity }",
     "rules": ["drawing-seating-imports"]
   },
-  "packages/drawing/src/seating/into-web.ts": {
+  "packages/svg-drawings/src/seating/into-web.ts": {
     "source": "import type { SpecValue } from '../../../../apps/web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
     "rules": ["drawing-seating-imports"]
   },
-  "packages/drawing/src/target/to-core.ts": {
+  "packages/svg-drawings/src/target/to-core.ts": {
     "source": "import { geometry } from '../core/geometry.ts'\nexport { geometry }",
     "rules": ["drawing-target-imports"]
   },
@@ -176,7 +176,7 @@
     "rules": []
   },
   "packages/cli/src/libraries.ts": {
-    "source": "import { interior } from '@open-reloading/ballistics'\nimport { checkRecords } from '@open-reloading/catalog'\nimport { seat } from '@open-reloading/drawing/seating'\nimport { toSi } from '@open-reloading/schema'\nimport { readRecords } from '@open-reloading/tools/catalog'\nexport { interior, checkRecords, seat, toSi, readRecords }",
+    "source": "import { interior } from '@open-reloading/ballistics'\nimport { checkRecords } from '@open-reloading/catalog'\nimport { seat } from '@open-reloading/svg-drawings/seating'\nimport { toSi } from '@open-reloading/schema'\nimport { readRecords } from '@open-reloading/tools/catalog'\nexport { interior, checkRecords, seat, toSi, readRecords }",
     "rules": []
   },
   "packages/cli/src/api.ts": {
@@ -208,7 +208,7 @@
     "rules": ["api-imports-logic-catalog-schema-only"]
   },
   "apps/web/src/lib/allowed.ts": {
-    "source": "import { checkSpec } from '@open-reloading/catalog/plausibility'\nimport { runTask } from '@open-reloading/use-cases'\nimport { openCatalogue } from '@open-reloading/api/catalogue'\nimport { waterDensity } from '@open-reloading/ballistics'\nimport { seating } from '@open-reloading/drawing/seating'\nexport { checkSpec, runTask, openCatalogue, waterDensity, seating }",
+    "source": "import { checkSpec } from '@open-reloading/catalog/plausibility'\nimport { runTask } from '@open-reloading/use-cases'\nimport { openCatalogue } from '@open-reloading/api/catalogue'\nimport { waterDensity } from '@open-reloading/ballistics'\nimport { seating } from '@open-reloading/svg-drawings/seating'\nexport { checkSpec, runTask, openCatalogue, waterDensity, seating }",
     "rules": []
   },
   "apps/web/src/lib/alias.ts": {

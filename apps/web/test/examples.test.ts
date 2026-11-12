@@ -6,8 +6,8 @@ import {
   recordResistance,
   trajectory,
 } from '@open-reloading/ballistics'
-import { bulletDimensions } from '@open-reloading/drawing/bullet'
 import { firearm, sheetId, userRecord } from '@open-reloading/schema'
+import { bulletDimensions } from '@open-reloading/svg-drawings/bullet'
 import { describe, expect, it } from 'vitest'
 import {
   exampleChamberVolume,

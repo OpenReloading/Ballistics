@@ -35,7 +35,7 @@ import type {
 } from './types.ts'
 
 /** Drops null and undefined fields, so responses match the records' "absent means unknown". */
-function compact<T extends Record<string, unknown>>(row: T) {
+function compact(row: Record<string, unknown>) {
   return Object.fromEntries(Object.entries(row).filter(([, v]) => v !== null && v !== undefined))
 }
 
@@ -51,7 +51,7 @@ export function caseType(
   r3: number | null,
 ): CaseType | undefined {
   if (r3 !== null) return 'belted'
-  if (r1 === null || p1 === null) return
+  if (r1 === null || p1 === null) return undefined
   // to 0.01 mm, the records' resolution, so a difference on a bound stays on its side
   const d = Math.round((r1 - p1) * 100) / 100
   if (d > 0.7) return 'rimmed'
@@ -74,7 +74,7 @@ export function contentHash(text: string): string {
 }
 
 /** The revision of a stored record: the hash of its JSON text. */
-export const revisionOf = (record: object) => contentHash(JSON.stringify(record))
+export const revisionOf = (record: object): string => contentHash(JSON.stringify(record))
 
 /** The highest `Pmax` of a sheet that has no side (the pressure is not one of the cartridge or chamber), as the list gives it. */
 function greatestPmax(values: Cartridge['values']): number | undefined {
@@ -139,7 +139,7 @@ function componentKeys(m: Manufacturer, c: { name: string; aliases?: string[] | 
 
 /** The M3 parameters the burn-rate curve reads, with the training rows and cartridges of the fit and the latest day its fitted sources were read. */
 function interiorItem({ interior, provenance }: Powder): PowderItem['interior'] {
-  if (!interior) return
+  if (!interior) return undefined
   const {
     vivacity,
     pressureExponent,
@@ -155,7 +155,7 @@ function interiorItem({ interior, provenance }: Powder): PowderItem['interior'] 
         (!s.fields || s.fields.some((f) => f === 'interior' || f.startsWith('interior.'))),
     )
     .flatMap((s) => (s.retrieved ? [s.retrieved] : []))
-    .sort()
+    .toSorted()
     .at(-1)
   return compact({
     vivacity,
@@ -244,7 +244,7 @@ export const caseRow = (
 })
 
 const distinct = (values: (string | undefined)[]) =>
-  [...new Set(values.filter((v) => v !== undefined))].sort((a, b) => a.localeCompare(b, 'en'))
+  [...new Set(values.filter((v) => v !== undefined))].toSorted((a, b) => a.localeCompare(b, 'en'))
 
 /** The index row of a target face, with the disciplines mapped to it (their caliber classes and categories) and its federation. */
 export const targetFaceRow = (

@@ -1,5 +1,4 @@
 import { readFileSync } from 'node:fs'
-import { buildCatalogue, type Catalogue, openCatalogue } from '@open-reloading/api/catalogue'
 import type { Bundle } from '@open-reloading/catalog'
 import {
   errorAnswer,
@@ -9,6 +8,7 @@ import {
   operations,
   RecordNotFound,
 } from '@open-reloading/use-cases'
+import { buildCatalogue, type Catalogue, openCatalogue } from '@open-reloading/use-cases/catalog'
 import { z } from 'zod'
 import { Refusal, UsageError } from './errors.ts'
 import { readBundle } from './records.ts'

@@ -28,7 +28,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@open-reloading/drawing": "workspace:*",
+    "@open-reloading/svg-drawings": "workspace:*",
     "@open-reloading/importers": "workspace:*",
     "@open-reloading/web": "workspace:*",
     "@types/node": "catalog:",

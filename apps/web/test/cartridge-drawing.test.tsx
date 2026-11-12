@@ -1,6 +1,6 @@
 import { MantineProvider } from '@mantine/core'
-import { face } from '@open-reloading/drawing'
-import { recordFigures } from '@open-reloading/drawing/cartridge'
+import { face } from '@open-reloading/svg-drawings'
+import { recordFigures } from '@open-reloading/svg-drawings/cartridge'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { translator } from '../src/i18n/translate.ts'

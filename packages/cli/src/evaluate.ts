@@ -7,10 +7,10 @@ import {
   standardAtmosphere,
   ValueError,
 } from '@open-reloading/ballistics'
-import { bulletDimensions } from '@open-reloading/drawing/bullet'
-import { chamberOf, seat } from '@open-reloading/drawing/seating'
 import type { Bullet, Cartridge } from '@open-reloading/schema'
 import { bulletListFields, loadWaterCapacity, toSi } from '@open-reloading/schema'
+import { bulletDimensions } from '@open-reloading/svg-drawings/bullet'
+import { chamberOf, seat } from '@open-reloading/svg-drawings/seating'
 import { waterDensityGramsPerCm3 } from '@open-reloading/units'
 import { InputError } from '@rangefoundry/statistics'
 import type { Records } from './records.ts'

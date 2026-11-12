@@ -1,4 +1,4 @@
-import { type BulletDimensions, bulletProfile } from '@open-reloading/drawing/bullet'
+import { type BulletDimensions, bulletProfile } from '@open-reloading/svg-drawings/bullet'
 import { describe, expect, it } from 'vitest'
 import {
   type Cutout,

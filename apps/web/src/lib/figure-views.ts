@@ -1,11 +1,11 @@
-import type { Annotation, Dimension, LengthUnit, Medium } from '@open-reloading/drawing'
+import type { Annotation, Dimension, LengthUnit, Medium } from '@open-reloading/svg-drawings'
 import {
   type Drawn,
   type FigureModel,
   figureModel,
   recordFigures,
   screenEm,
-} from '@open-reloading/drawing/cartridge'
+} from '@open-reloading/svg-drawings/cartridge'
 
 /** The views of the workbench's cartridge figure: Combined has no dimensions. */
 export type FigureView = 'cartridge' | 'chamber' | 'combined'

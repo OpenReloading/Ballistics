@@ -29,7 +29,7 @@
                 "message": "schema-imports-units-only: packages/schema imports no workspace package but @open-reloading/units and the Diagnostic type of @rangefoundry/statistics."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|target-recognition|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|target-recognition|api|svg-drawings|cli)/(src|dist)|packages|apps)/",
                 "message": "schema-imports-units-only: packages/schema imports no workspace package but @open-reloading/units and the Diagnostic type of @rangefoundry/statistics."
               }
             ]

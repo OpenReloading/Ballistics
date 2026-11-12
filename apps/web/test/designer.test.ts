@@ -1,5 +1,3 @@
-import { face } from '@open-reloading/drawing'
-import { bulletFigureModel, bulletOutline } from '@open-reloading/drawing/bullet'
 import {
   applyOverrides,
   type Bullet,
@@ -8,6 +6,8 @@ import {
   toSi,
   type UserBullet,
 } from '@open-reloading/schema'
+import { face } from '@open-reloading/svg-drawings'
+import { bulletFigureModel, bulletOutline } from '@open-reloading/svg-drawings/bullet'
 import { seededUniforms } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
 import { computedBulletRows } from '../src/lib/bullet.ts'

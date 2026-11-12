@@ -1,9 +1,9 @@
-// Writes packages/drawing/src/core/advances.json: the advance of each drawing character in the drawing font (src/app/fonts/Inter-Regular.woff2) in em, by canvas measureText in Chromium, kerning off as in the drawing CSS; run after changing the font: node scripts/glyph-advances.mts
+// Writes packages/svg-drawings/src/core/advances.json: the advance of each drawing character in the drawing font (src/app/fonts/Inter-Regular.woff2) in em, by canvas measureText in Chromium, kerning off as in the drawing CSS; run after changing the font: node scripts/glyph-advances.mts
 import { readFileSync, writeFileSync } from 'node:fs'
 import { chromium } from '@playwright/test'
 
 const font = new URL('../src/app/fonts/Inter-Regular.woff2', import.meta.url)
-const out = new URL('../../../packages/drawing/src/core/advances.json', import.meta.url)
+const out = new URL('../../../packages/svg-drawings/src/core/advances.json', import.meta.url)
 const characters = [
   ...Array.from({ length: 95 }, (_, k) => String.fromCharCode(32 + k)),
   '°', // degree

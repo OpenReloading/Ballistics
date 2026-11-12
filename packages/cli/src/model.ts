@@ -38,7 +38,7 @@ function closure(file: string, root: string, prefix: string) {
 /** The built files the record to load step, the water density, the unit conversion, the input checks and the seating read, which every model version shares. */
 function sharedFiles() {
   const drawing = dirname(
-    dirname(fileURLToPath(import.meta.resolve('@open-reloading/drawing/seating'))),
+    dirname(fileURLToPath(import.meta.resolve('@open-reloading/svg-drawings/seating'))),
   )
   const schema = dirname(fileURLToPath(import.meta.resolve('@open-reloading/schema')))
   const units = dirname(fileURLToPath(import.meta.resolve('@open-reloading/units')))

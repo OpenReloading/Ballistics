@@ -9,7 +9,7 @@ import {
 } from 'typedoc'
 import { tooLong } from './scripts/type-length.mts'
 
-const packages = ['schema', 'drawing', 'importers', 'catalog', 'use-cases', 'api']
+const packages = ['schema', 'svg-drawings', 'importers', 'catalog', 'use-cases', 'api']
 // zod's own generics, linked from the doc comment to the inferred type
 const exempt = (type) => type.type === 'reference' && type.package === 'zod'
 

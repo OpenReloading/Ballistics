@@ -1,6 +1,7 @@
 // Layout rules of the drawing checks on the verified records: each takes one laid-out side and returns its broken rules, so a test can break one on purpose
 
 import { readdirSync, readFileSync } from 'node:fs'
+import type { SpecValue } from '@open-reloading/schema'
 import {
   arrowheadCorners,
   boxDistance,
@@ -16,9 +17,8 @@ import {
   type Profile,
   polygonsOverlap,
   steelBand,
-} from '@open-reloading/drawing'
-import type { FigureModel } from '@open-reloading/drawing/cartridge'
-import type { SpecValue } from '@open-reloading/schema'
+} from '@open-reloading/svg-drawings'
+import type { FigureModel } from '@open-reloading/svg-drawings/cartridge'
 import type { CartridgeDetail } from '../src/lib/api-types.ts'
 import { drawable } from '../src/lib/cartridge-sheet.ts'
 import { defined } from './defined.ts'

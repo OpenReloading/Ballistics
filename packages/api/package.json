@@ -9,11 +9,6 @@
       "types": "./dist/openapi.d.ts",
       "default": "./dist/openapi.js"
     },
-    "./catalogue": {
-      "types": "./dist/catalogue/browser.d.ts",
-      "default": "./dist/catalogue/browser.js"
-    },
-    "./catalogue/*.json": "./dist/catalogue/*.json",
     "./static": {
       "types": "./dist/static.d.ts",
       "default": "./dist/static.js"
