@@ -5,7 +5,7 @@ import { compareKeys, type SourceRecord, sourceRecord } from '@open-reloading/sc
 import { readPublishedLoads } from '@open-reloading/tools/catalog'
 import { Refusal, UsageError } from './errors.ts'
 import { type InteriorModel, outcomes } from './evaluate.ts'
-import { fitPowders, fitPowdersWithPrior, notFittedReasons, withFit } from './fit.ts'
+import { fitPowders, notFittedReasons, withFit } from './fit.ts'
 import { changeOf, evaluate, type Grouping, metricsOf } from './metrics.ts'
 import { builtInName, fitFiles, loadModel, type Model } from './model.ts'
 import { pairedChange, type RowError, rowErrors } from './paired.ts'
@@ -161,21 +161,14 @@ function fitOf(options: FitOptions, data: Prepared, model: Model) {
   // with pressure rows in the chi squares the family choice would measure something no study has covered
   if (exponent !== undefined && pressureSigma !== undefined)
     throw new UsageError('--exponent and --pressure-sigma do not combine')
-  // one factor on all printed pressures and one per basis both set the pressure level with no rule for which comes first, and no study has covered the family choice under another energy
-  if (energy !== undefined && (exponent !== undefined || pressureSigma !== undefined))
-    throw new UsageError('--energy prior does not combine with --exponent or --pressure-sigma')
-  const prior =
-    energy === 'prior'
-      ? fitPowdersWithPrior(data.rows, data.records, model.interior, velocitySigma)
-      : undefined
-  // an if, not `?:` or `??`, which would reduce the union of fitPowders to its common fields and lose `exponent` and `pressure`
-  let plain: ReturnType<typeof fitPowders> | undefined
-  if (!prior)
-    plain = fitPowders(data.rows, data.records, model.interior, velocitySigma, {
-      exponent,
-      pressureSigma,
-    })
-  const fit = prior ?? (plain as ReturnType<typeof fitPowders>)
+  // one factor on all printed pressures and one per basis both set the pressure level with no rule for which comes first
+  if (energy !== undefined && pressureSigma !== undefined)
+    throw new UsageError('--energy prior and --pressure-sigma do not combine')
+  const fit = fitPowders(data.rows, data.records, model.interior, velocitySigma, {
+    exponent,
+    pressureSigma,
+    energy,
+  })
   const reasons = Object.values(fit.notFitted)
   const notFitted = Object.fromEntries(
     notFittedReasons.flatMap((reason) => {
@@ -184,14 +177,14 @@ function fitOf(options: FitOptions, data: Prepared, model: Model) {
     }),
   )
   // the priors come from records the rows may not name, which the records lines of the version leave out
-  const energyLine = prior
-    ? ` energy prior ${sha256(prior.priorLines.toSorted(compareKeys).join('\n'))}`
+  const energyLine = fit.priorLines
+    ? ` energy prior ${sha256(fit.priorLines.toSorted(compareKeys).join('\n'))}`
     : ''
   return {
-    ...plain,
     powders: fit.powders,
     notFitted: fit.notFitted,
-    energy: prior?.energy,
+    exponent: fit.exponent,
+    energy: fit.energy,
     velocitySigma,
     records: withFit(data.records, fit),
     params: `params fit-on-training velocity-sigma ${velocitySigma}${exponent === undefined ? '' : ' exponent family'}${pressureSigma === undefined ? '' : ` pressure-sigma ${pressureSigma}`}${energyLine}`,
@@ -199,17 +192,16 @@ function fitOf(options: FitOptions, data: Prepared, model: Model) {
       velocitySigma,
       powders: Object.keys(fit.powders).length,
       notFitted,
-      ...(plain &&
-        'exponent' in plain && {
-          exponent: {
-            pooled: plain.exponent.pooled,
-            families: Object.fromEntries(
-              Object.entries(plain.exponent.families).map(([name, f]) => [name, f.exponent]),
-            ),
-          },
-        }),
-      ...(plain && 'pressure' in plain && { pressure: plain.pressure }),
-      ...(prior && { energy: { factor: prior.energy.factor } }),
+      ...(fit.exponent && {
+        exponent: {
+          pooled: fit.exponent.pooled,
+          families: Object.fromEntries(
+            Object.entries(fit.exponent.families).map(([name, f]) => [name, f.exponent]),
+          ),
+        },
+      }),
+      ...(fit.pressure && { pressure: fit.pressure }),
+      ...(fit.energy && { energy: { factor: fit.energy.factor } }),
     },
   }
 }
@@ -411,7 +403,7 @@ export async function fit(options: FitOptions, spec = builtInName): Promise<FitR
     split: 'training',
     splitSalt,
     velocitySigma: fitted.velocitySigma,
-    ...('exponent' in fitted && { exponent: fitted.exponent }),
+    ...(fitted.exponent && { exponent: fitted.exponent }),
     ...(fitted.summary.pressure && { pressure: fitted.summary.pressure }),
     powders: fitted.powders,
     notFitted: fitted.notFitted,
