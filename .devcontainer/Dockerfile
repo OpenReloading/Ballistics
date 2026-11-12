@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/devcontainers/typescript-node:26-bookworm@sha256:fc4b4da3
 # agent-side tools that run in the container: MCP servers for Mantine docs and Playwright
 # the e2e headless shell too: keep 1.65.0 equal to @playwright/test in pnpm-lock.yaml (postCreateCommand installs it on a mismatch)
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
-RUN npm i -g --prefix /usr/local @mantine/mcp-server@9.7.3 @playwright/mcp@0.0.83 \
+RUN npm i -g --prefix /usr/local @mantine/mcp-server@9.8.0 @playwright/mcp@0.0.83 \
   && cd /usr/local/lib/node_modules/@playwright/mcp && npx playwright install --with-deps chromium \
   && npx -y playwright@1.65.0 install --only-shell chromium \
   && chown -R node:node /ms-playwright \

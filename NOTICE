@@ -88,7 +88,7 @@ License, whose text is the same as above, with these copyright notices:
   Copyright (c) Meta Platforms, Inc. and affiliates.
 - next 16.4.5 (https://github.com/vercel/next.js): Copyright (c) 2025 Vercel, Inc.
 - styled-jsx 5.1.6 (https://github.com/vercel/styled-jsx): Copyright (c) 2016-present Vercel, Inc.
-- @mantine/core, @mantine/form, @mantine/hooks, @mantine/spotlight 9.7.5
+- @mantine/core, @mantine/form, @mantine/hooks, @mantine/spotlight 9.8.0
   (https://github.com/mantinedev/mantine): Copyright (c) 2021 Vitaly Rtishchev
 - @phosphor-icons/react 2.1.10 (https://github.com/phosphor-icons/react):
   Copyright (c) 2020 Phosphor Icons
@@ -193,11 +193,11 @@ the package declares. Written by `node tools/src/licences.ts --write`.
 @floating-ui/react 0.27.20 MIT
 @floating-ui/utils 0.2.12 MIT
 @lukeed/ms 2.0.2 MIT
-@mantine/core 9.7.5 MIT
-@mantine/form 9.7.5 MIT
-@mantine/hooks 9.7.5 MIT
-@mantine/spotlight 9.7.5 MIT
-@mantine/store 9.7.5 MIT
+@mantine/core 9.8.0 MIT
+@mantine/form 9.8.0 MIT
+@mantine/hooks 9.8.0 MIT
+@mantine/spotlight 9.8.0 MIT
+@mantine/store 9.8.0 MIT
 @next/env 16.4.5 MIT
 @phosphor-icons/react 2.1.10 MIT
 @pinojs/redact 0.4.0 MIT

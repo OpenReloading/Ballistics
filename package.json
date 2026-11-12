@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.6",
-    "@mantine/mcp-server": "9.7.5",
+    "@mantine/mcp-server": "9.8.0",
     "eslint-plugin-regexp": "3.3.3",
     "knip": "^6.44.2",
     "oxlint": "catalog:"
