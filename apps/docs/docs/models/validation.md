@@ -111,7 +111,7 @@ May say, with the numbers of a run and nothing else added:
 
 > Held-out median error X percent, P90 Y percent on N rows of powder family F, model version H.
 
-Where X, Y, N, F and H are the values of one `verify` result on one split. A result on the test split says so. Say "held-out" only of a run that is held out under the split rule in force: under the salted rule, a run with `--params fit-on-training`, and only for the values its fit sets.
+Where X, Y, N, F and H are the values of one `verify` result on one split. A result on the test split says so. Say "held-out" only of a run that is held out under the split rule it was run under, and name that rule when it is not the salted one. Under the salted rule that is a run with `--params fit-on-training`, and only for the values its fit sets.
 
 May not say:
 

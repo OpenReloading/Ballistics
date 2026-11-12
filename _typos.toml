@@ -37,6 +37,8 @@ extend-ignore-re = [
   # a product page title as the maker prints it (it misspells the name) and a powder trade name, in the bibliography
   "Accuarte No\\. 5",
   "LEVERevolution",
+  # the abbreviation in the title of FIPS 180-4, in the bibliography
+  "Secure Hash Standard \\(SHS\\)",
   # Dutch names in the federations page and the bibliography
   "Precisie Geweer",
   "Schietsport Associatie",
