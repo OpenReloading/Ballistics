@@ -1,4 +1,4 @@
-# OpenReloading
+# RangeFoundry
 
 The fields of the record files (`packages/catalog/records`), the user data files of the web app and the request and response bodies of the API (`/v1`), with the names they carry in files and on the wire.
 

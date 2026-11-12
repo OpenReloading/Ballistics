@@ -6,6 +6,7 @@ import {
   decodeText,
   fieldSpecs,
   isWorkbook,
+  type KindDiagnostic,
   type KindScore,
   ReaderError,
   type RowCounts,
@@ -16,6 +17,7 @@ import {
   type Table,
   type TableColumnMap,
   type TableKind,
+  type TableReadDiagnostic,
   type Tier,
   tableKinds,
   tableOfRows,
@@ -28,9 +30,9 @@ import type { InvalidRecordDiagnostic } from './import-diagnostics.ts'
 import { type LoadFileFormat, loadFileFormats, loadFormatOf } from './load-file-formats.ts'
 import { type InvalidRecord, maxFileBytes, planImport, type WordedWarning } from './user-data.ts'
 
-/** A refusal carries the refusing load-file format and the reader's message as `detail`. */
+/** A refusal, the app's English text or the table reader's code, carries the refusing load-file format and the reader's message as `detail`. */
 export type CardView =
-  | { refusal: string; format?: string | undefined; detail?: string }
+  | { refusal: string | TableReadDiagnostic; format?: string | undefined; detail?: string }
   | {
       format: string
       records: number
@@ -47,6 +49,8 @@ export type CardView =
       scores: KindScore[]
       kind?: TableKind | undefined
       tier?: Tier | undefined
+      /** Why no kind is suggested, when none is. */
+      noKind?: KindDiagnostic | undefined
       /** The sheet of a workbook the table was read from. */
       sheet?: string | undefined
     }
@@ -138,7 +142,7 @@ interface Held {
 
 /** A file's table and the sheet it is on, a load file's card, or its refusal. */
 type FileRead =
-  | { refusal: string; format?: string | undefined; detail?: string }
+  | { refusal: string | TableReadDiagnostic; format?: string | undefined; detail?: string }
   | { load: Extract<CardView, { records: number }>; records: UserRecord[] }
   | { table: Table; sheet?: string | undefined }
 
@@ -320,6 +324,7 @@ function cardOf(read: FileRead): CardView {
     scores: s.scores,
     kind: s.kind,
     tier: s.tier,
+    noKind: s.refusal,
     ...(read.sheet !== undefined && { sheet: read.sheet }),
   }
 }

@@ -17,7 +17,7 @@ import { recordOf } from './record-of.ts'
 const csv = (rows: string[][], d = ',') => rows.map((r) => r.join(d)).join('\n')
 const tableOf = (text: string): Table => {
   const r = readTable(text)
-  if ('refusal' in r) throw new Error(r.refusal)
+  if ('refusal' in r) throw new Error(r.refusal.code)
   return r.table
 }
 
@@ -110,9 +110,7 @@ describe('suggestKind', () => {
     (_, rows) => {
       const s = suggestKind(tableOf(csv(rows)))
       expect(s.kind).toBeUndefined()
-      expect(s.refusal).toMatch(
-        /^No column matches a bullet, powder or cartridge field \(\w+ \d\.\d\d, \w+ \d\.\d\d, \w+ \d\.\d\d; the floor is 0\.40\)\. Pick the kind by hand/,
-      )
+      expect(s.refusal).toEqual({ code: 'noKind', params: { scores: s.scores, floor: 0.4 } })
     },
   )
 
@@ -491,8 +489,7 @@ describe('buildRecords: cartridges and tables without a header', () => {
 describe('readTable: rows, sizes and delimiters', () => {
   it('refuses a text with one comma line and no repeated row width as "no table"', () => {
     expect(readTable('Range day, bring the chronograph.\nCheck the new scale.\n')).toEqual({
-      refusal:
-        'The text has no table: no row repeats a comma, semicolon or tab as separator. Export the table as CSV.',
+      refusal: { code: 'noDelimiter', params: {} },
     })
   })
 
@@ -533,14 +530,9 @@ describe('readTable: JSON lists and tables without a header', () => {
       ['A', '', ''],
       ['B', 'x', 'y'],
     ])
-    expect(readTable('[{"a":')).toEqual({
-      refusal: 'The text looks like JSON but does not parse. Fix the file or export it again.',
-    })
+    expect(readTable('[{"a":')).toEqual({ refusal: { code: 'jsonMalformed', params: {} } })
     for (const text of ['{"a":1}', '[1,2]', '[]', '[{"a":1}]'])
-      expect(readTable(text)).toHaveProperty(
-        'refusal',
-        expect.stringMatching(/^The JSON is neither/),
-      )
+      expect(readTable(text)).toEqual({ refusal: { code: 'jsonNotTable', params: {} } })
   })
 
   it('names columns by letter without a header and refuses rows of one column or a header alone', () => {
@@ -550,12 +542,12 @@ describe('readTable: JSON lists and tables without a header', () => {
       'Column AA',
       'Column AB',
     ])
-    expect(tableOfRows([['a'], ['b']])).toHaveProperty('refusal')
+    expect(tableOfRows([['a'], ['b']])).toEqual({ refusal: { code: 'noTwoColumns', params: {} } })
     expect(tableOfRows([['Name', ''], ['A']])).toMatchObject({
       table: { header: ['Name', 'Column B'], rows: [['A', '']] },
     })
     expect(tableOfRows([['Name', 'Weight']])).toEqual({
-      refusal: 'The table has a header but no rows. Add rows or choose another file.',
+      refusal: { code: 'headerOnly', params: {} },
     })
   })
 })
@@ -575,24 +567,21 @@ describe('readTable: column letters and limits', () => {
 
   it('refuses delimited text and JSON lists beyond the column and cell limits quickly', () => {
     expect(readTable(`a,b\n1,2\n5${','.repeat(1_000_000)}\n3,4\n`)).toEqual({
-      refusal:
-        'The table has more than 256 columns. Remove the extra columns or choose another file.',
+      refusal: { code: 'tooManyColumns', params: { max: 256 } },
     })
     const objects = Array.from({ length: 2000 }, (_, i) => ({ [`k${i % 1000}`]: i }))
     expect(readTable(JSON.stringify(objects))).toEqual({
-      refusal:
-        'The table has more than 256 columns. Remove the extra columns or choose another file.',
+      refusal: { code: 'tooManyColumns', params: { max: 256 } },
     })
     const tall = Array.from({ length: 500_001 }, () => ['1', '2'])
     expect(tableOfRows(tall)).toEqual({
-      refusal: 'The table has more than 1000000 cells. Split it into smaller files.',
+      refusal: { code: 'tooManyCells', params: { max: 1_000_000 } },
     })
     expect(readTable(`a,b\n1,2\n${','.repeat(257)}x`)).toEqual({
-      refusal:
-        'The table has more than 256 columns. Remove the extra columns or choose another file.',
+      refusal: { code: 'tooManyColumns', params: { max: 256 } },
     })
     expect(readTable('1,2\n'.repeat(5_000_000))).toEqual({
-      refusal: 'The table has more than 1000000 cells. Split it into smaller files.',
+      refusal: { code: 'tooManyCells', params: { max: 1_000_000 } },
     })
   })
 })

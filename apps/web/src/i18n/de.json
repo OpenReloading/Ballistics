@@ -3538,6 +3538,8 @@
   "The text looks like JSON but does not parse. Fix the file or export it again.": "Der Text sieht wie JSON aus, lässt sich aber nicht lesen. Korrigieren Sie die Datei oder exportieren Sie sie erneut.",
   "The JSON is neither an OpenReloading data file nor a list of objects with the same keys. Export a table instead.": "Das JSON ist weder eine OpenReloading-Datendatei noch eine Liste von Objekten mit denselben Schlüsseln. Exportieren Sie stattdessen eine Tabelle.",
   "The text has no table: no row repeats a comma, semicolon or tab as separator. Export the table as CSV.": "Der Text enthält keine Tabelle: Keine Zeile wiederholt ein Komma, Semikolon oder Tabulatorzeichen als Trennzeichen. Exportieren Sie die Tabelle als CSV.",
+  "The table has more than {max} columns. Remove the extra columns or choose another file.": "Die Tabelle hat mehr als {max} Spalten. Entfernen Sie die überzähligen Spalten oder wählen Sie eine andere Datei.",
+  "The table has more than {max} cells. Split it into smaller files.": "Die Tabelle hat mehr als {max} Zellen. Teilen Sie sie auf kleinere Dateien auf.",
   "The file is larger than 40 MB. Split it and import the parts.": "Die Datei ist größer als 40 MB. Teilen Sie sie auf und importieren Sie die Teile.",
   "The workbook has no cells with text. Open the right file or paste the table into a sheet.": "Die Arbeitsmappe hat keine Zellen mit Text. Öffnen Sie die richtige Datei oder fügen Sie die Tabelle in ein Blatt ein.",
   "UTF-16 text with an odd number of bytes": "UTF-16-Text mit einer ungeraden Anzahl von Bytes",
