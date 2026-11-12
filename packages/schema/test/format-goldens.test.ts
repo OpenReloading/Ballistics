@@ -329,12 +329,16 @@ describe('user data file goldens', () => {
 })
 
 describe('share link goldens', () => {
-  it.each(names)('%s inflates to the payload of its file golden', async (name) => {
+  it.each(names)('%s and a fresh link inflate to the payload of its file golden', async (name) => {
     const read = readUserDataFile(golden('user-data', name, 'json'))
     if (!read.ok) throw new Error(JSON.stringify(read.diagnostic))
-    expect(await unpacked(golden('share-link', name, 'txt'))).toBe(
-      JSON.stringify({ format: 'openreloading-user-data', version: 1, records: read.records }),
-    )
+    const text = JSON.stringify({
+      format: 'openreloading-user-data',
+      version: 1,
+      records: read.records,
+    })
+    expect(await unpacked(golden('share-link', name, 'txt'))).toBe(text)
+    expect(await unpacked(fragment(await shareLinkOf(read.records, page)) ?? '')).toBe(text)
   })
 
   it.each(names)('%s reads back to its records, and so does a link of them', async (name) => {
