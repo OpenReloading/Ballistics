@@ -53,35 +53,35 @@ const cartridge = (id: string, name: string, values: object[]): UserCartridgeVie
 }
 
 it('reads the sources that are on: absent, empty or unknown names mean all', () => {
-  expect(readOrigins(undefined)).toEqual(['openreloading', 'user'])
-  expect(readOrigins('')).toEqual(['openreloading', 'user'])
-  expect(readOrigins('community')).toEqual(['openreloading', 'user'])
+  expect(readOrigins(undefined)).toEqual(['rangefoundry', 'user'])
+  expect(readOrigins('')).toEqual(['rangefoundry', 'user'])
+  expect(readOrigins('community')).toEqual(['rangefoundry', 'user'])
   expect(readOrigins('user')).toEqual(['user'])
   expect(readOrigins('user,community')).toEqual(['user'])
-  expect(readOrigins('user,openreloading,user')).toEqual(['openreloading', 'user'])
+  expect(readOrigins('user,rangefoundry,user')).toEqual(['rangefoundry', 'user'])
 })
 
 it('writes no parameter while all sources are on', () => {
-  expect(writeOrigins(['openreloading', 'user'])).toBe('')
+  expect(writeOrigins(['rangefoundry', 'user'])).toBe('')
   expect(writeOrigins(['user'])).toBe('user')
-  expect(writeOrigins(['openreloading'])).toBe('openreloading')
+  expect(writeOrigins(['rangefoundry'])).toBe('rangefoundry')
 })
 
 it('toggles a source and keeps the last one on', () => {
-  expect(toggleOrigin('', 'user')).toBe('openreloading')
-  expect(toggleOrigin('openreloading', 'user')).toBe('')
-  expect(toggleOrigin('user', 'openreloading')).toBe('')
+  expect(toggleOrigin('', 'user')).toBe('rangefoundry')
+  expect(toggleOrigin('rangefoundry', 'user')).toBe('')
+  expect(toggleOrigin('user', 'rangefoundry')).toBe('')
   expect(toggleOrigin('user', 'user')).toBe('user')
-  expect(toggleOrigin('openreloading', 'openreloading')).toBe('openreloading')
+  expect(toggleOrigin('rangefoundry', 'rangefoundry')).toBe('rangefoundry')
 })
 
 it('reads, writes and toggles within the sources a list has', () => {
-  const powders = ['openreloading'] as const
-  expect(readOrigins('user', powders)).toEqual(['openreloading'])
-  expect(readOrigins('', powders)).toEqual(['openreloading'])
-  expect(writeOrigins(['openreloading'], powders)).toBe('')
-  expect(toggleOrigin('', 'openreloading', powders)).toBe('')
-  expect(toggleOrigin('user', 'openreloading', powders)).toBe('')
+  const powders = ['rangefoundry'] as const
+  expect(readOrigins('user', powders)).toEqual(['rangefoundry'])
+  expect(readOrigins('', powders)).toEqual(['rangefoundry'])
+  expect(writeOrigins(['rangefoundry'], powders)).toBe('')
+  expect(toggleOrigin('', 'rangefoundry', powders)).toBe('')
+  expect(toggleOrigin('user', 'rangefoundry', powders)).toBe('')
   expect(inOrigins({}, 'user', powders)).toBe(true)
 })
 
@@ -95,10 +95,10 @@ it('keeps src in the URL beside the search', () => {
 
 it('counts rows per source and filters rows by the sources on', () => {
   const rows = [{ origin: 'user' as const }, {}, {}, { origin: 'user' as const }, {}]
-  expect(countOrigins(rows)).toEqual({ openreloading: 3, user: 2 })
+  expect(countOrigins(rows)).toEqual({ rangefoundry: 3, user: 2 })
   expect(rows.filter((r) => inOrigins(r, 'user'))).toHaveLength(2)
   expect(rows.filter((r) => inOrigins(r, ''))).toHaveLength(5)
-  expect(rows.filter((r) => inOrigins(r, 'openreloading'))).toHaveLength(3)
+  expect(rows.filter((r) => inOrigins(r, 'rangefoundry'))).toHaveLength(3)
 })
 
 it('lists bullet designs as rows in mm and g', () => {

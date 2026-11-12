@@ -35,7 +35,7 @@ const shot = (value: number, excluded?: string): Shot => ({
 describe('readChrono', () => {
   it('tells the template by its header and keeps strings and exclusions', async () => {
     const r = await readChrono(bytes(template), { fileName: 'a.csv' })
-    expect(r.format).toBe('openreloading-csv')
+    expect(r.format).toBe('rangefoundry-csv')
     expect(r.stringLabels).toEqual(['A', 'B'])
     expect(r.session.strings.map((s) => s.shots.length)).toEqual([3, 1])
     expect(defined(defined(r.session.strings[0]).shots[2]).excluded).toBe('flyer')
@@ -139,7 +139,7 @@ describe('stringStats', () => {
 
 it('offers a JSON template and exports a session as JSON that reads back', async () => {
   const read = await readChrono(new TextEncoder().encode(templateJson), { fileName: 't.json' })
-  expect(read.format).toBe('openreloading-json')
+  expect(read.format).toBe('rangefoundry-json')
   expect(read.session.strings.map((s) => s.shots.length)).toEqual([3, 1])
   const back = await readChrono(new Uint8Array(await sessionJsonBlob(read).arrayBuffer()), {
     fileName: 'x.json',
@@ -187,7 +187,7 @@ describe('readSession', () => {
 
 it('offers an example of three strings of ten made-up shots in the template format', async () => {
   const r = await readSession(bytes(exampleCsv), 'example.csv', 'm/s')
-  expect(r.format).toBe('openreloading-csv')
+  expect(r.format).toBe('rangefoundry-csv')
   expect(r.session.strings.map((s) => s.shots.length)).toEqual([10, 10, 10])
   expect(r.stringLabels).toEqual(['Example A', 'Example B', 'Example C'])
   const marked = r.session.strings.map((s) =>
@@ -197,7 +197,7 @@ it('offers an example of three strings of ten made-up shots in the template form
     ]),
   )
   expect(marked).toEqual([['0 cold bore'], [], ['8 flyer']])
-  expect(exampleSessionFileName).toBe('openreloading-example-session.csv')
+  expect(exampleSessionFileName).toBe('rangefoundry-example-session.csv')
 })
 
 it('names every format read in the browser but the delimited text', () => {

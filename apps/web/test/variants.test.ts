@@ -226,7 +226,7 @@ it('treats a kept base of another shape as none kept, and forgets it', async () 
   const data = bulletData(`catalogue:${matchBullet.id}`)
   stubApi({ [`bullets/${matchBullet.id}`]: matchBullet })
   await resolveBullet(data)
-  const key = storageName(`openreloading-base:bullets/${matchBullet.id}`)
+  const key = storageName(`rangefoundry-base:bullets/${matchBullet.id}`)
   expect(localStorage.getItem(key)).not.toBeNull()
   stubApi({}, true)
   for (const kept of ['"a string"', JSON.stringify({ id: matchBullet.id, mass: 11 })]) {

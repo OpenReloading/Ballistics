@@ -73,7 +73,7 @@ const tableReadMessages: Record<TableReadDiagnostic['code'], Message> = {
     'The text looks like JSON but does not parse. Fix the file or export it again.',
   ),
   jsonNotTable: msg(
-    'The JSON is neither an OpenReloading data file nor a list of objects with the same keys. Export a table instead.',
+    'The JSON is neither a RangeFoundry data file nor a list of objects with the same keys. Export a table instead.',
   ),
   noDelimiter: msg(
     'The text has no table: no row repeats a comma, semicolon or tab as separator. Export the table as CSV.',

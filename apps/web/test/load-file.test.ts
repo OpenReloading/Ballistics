@@ -35,8 +35,8 @@ const lines: LoadFileFormat = {
 const formats = [...loadFileFormats, lines]
 
 describe('load-file formats', () => {
-  it('the OpenReloading user data file is the first entry and reads its files', async () => {
-    expect(loadFileFormats[0]?.name).toBe('OpenReloading data')
+  it('the RangeFoundry user data file is the first entry and reads its files', async () => {
+    expect(loadFileFormats[0]?.name).toBe('RangeFoundry data')
     expect(await readLoadFile(bytes(userDataText([load])))).toEqual({ ok: true, records: [load] })
   })
 

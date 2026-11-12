@@ -51,7 +51,7 @@ export async function chooseFolder() {
   let handle: FileSystemDirectoryHandle
   try {
     handle = await (pickers().showDirectoryPicker as NonNullable<Pickers['showDirectoryPicker']>)({
-      id: 'openreloading',
+      id: 'rangefoundry',
       mode: 'readwrite',
     })
   } catch (e) {

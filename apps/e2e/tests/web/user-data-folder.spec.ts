@@ -25,7 +25,7 @@ const storedManufacturers = (page: Page) =>
   page.evaluate(
     () =>
       new Promise<{ id: string; name: string }[]>((ok, no) => {
-        const open = indexedDB.open('openreloading-user-data')
+        const open = indexedDB.open('rangefoundry-user-data')
         open.onerror = () => no(open.error)
         open.onsuccess = () => {
           const all = open.result.transaction('records').objectStore('records').getAll()
