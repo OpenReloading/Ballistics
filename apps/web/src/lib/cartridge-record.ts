@@ -1,11 +1,11 @@
-import { greek } from '@open-reloading/drawing'
+import { type SpecValue, toSi } from '@open-reloading/schema'
+import { greek } from '@open-reloading/svg-drawings'
 import {
   conflictWording,
   differenceWording,
   type Figure,
   shotshellVariants,
-} from '@open-reloading/drawing/cartridge'
-import { type SpecValue, toSi } from '@open-reloading/schema'
+} from '@open-reloading/svg-drawings/cartridge'
 import { formatNumber, localizeNumber, plainNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator, translator } from '../i18n/translate.ts'
 import type { CartridgeDetail } from './api-types.ts'

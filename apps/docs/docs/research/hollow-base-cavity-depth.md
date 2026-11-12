@@ -40,8 +40,8 @@ Analytic. Closed forms of the cavity shapes and stand-in loads; no measured cavi
 
 ## Where in the app
 
-- `packages/drawing/src/bullet/outline.ts`, `cavityGeometry`, `cavityDepthBracket`, `cavityVolumeBracket`.
-- `packages/drawing/src/seating/seating.ts`, `seat` (`cavityRange`).
+- `packages/svg-drawings/src/bullet/outline.ts`, `cavityGeometry`, `cavityDepthBracket`, `cavityVolumeBracket`.
+- `packages/svg-drawings/src/seating/seating.ts`, `seat` (`cavityRange`).
 - `packages/schema/src/bullet.ts`, `base.cavityDepth`.
 - `apps/web/src/lib/cavity-range.ts`, `apps/web/src/lib/interior-request.ts`.
 - Model page: [case capacity](../models/case-capacity.md#cavity-depth).

@@ -76,7 +76,7 @@ import { titleTemplate } from '../lib/title-template.ts'
 import { uiFont } from './fonts/ui.ts'
 
 export const metadata: Metadata = {
-  title: { default: 'OpenReloading Ballistics', template: titleTemplate },
+  title: { default: 'RangeFoundry Workbench', template: titleTemplate },
   description: 'A ballistics database with interior and exterior ballistics simulations.',
   // the social image needs an absolute URL: only the deployment knows its origin (`PAGES_URL`)
   ...(process.env.PAGES_URL && {
@@ -86,7 +86,7 @@ export const metadata: Metadata = {
         url: 'opengraph-image.png',
         width: 1280,
         height: 640,
-        alt: 'OpenReloading Ballistics',
+        alt: 'RangeFoundry Workbench',
       },
     },
   }),

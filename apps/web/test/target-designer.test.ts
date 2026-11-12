@@ -1,5 +1,5 @@
-import { targetFaceFigure } from '@open-reloading/drawing/target'
 import { type TargetFaceDesign, targetFace, type UserRecord } from '@open-reloading/schema'
+import { targetFaceFigure } from '@open-reloading/svg-drawings/target'
 import { describe, expect, it } from 'vitest'
 import { fieldValueFromText } from '../src/lib/field-spec.ts'
 import { historyOf } from '../src/lib/history.ts'

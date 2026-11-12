@@ -1,8 +1,8 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { expect, test } from '@playwright/test'
-import { recordFigures } from '../../../../packages/drawing/src/cartridge/figures.ts'
-import type { SpecValue } from '../../../../packages/drawing/src/core/types.ts'
+import { recordFigures } from '../../../../packages/svg-drawings/src/cartridge/figures.ts'
+import type { SpecValue } from '../../../../packages/svg-drawings/src/core/types.ts'
 import { gotoHydrated } from './nav.ts'
 
 // the pixels depend on the fonts: this runs only in the Playwright image of the installed version, in CI and locally (pnpm run drawing-baseline); DRAWING_BASELINE=full shoots the full set on demand (pnpm run drawing-baseline:full)

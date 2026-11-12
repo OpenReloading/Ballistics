@@ -4,8 +4,8 @@ import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
-// The exported names of drawing, the published package without an API Extractor report, read from the declarations the build writes so a type counts as a value; `pnpm run baselines` at the root rewrites the list.
-const published = ['drawing']
+// The exported names of svg-drawings, the published package without an API Extractor report, read from the declarations the build writes so a type counts as a value; `pnpm run baselines` at the root rewrites the list.
+const published = ['svg-drawings']
 
 /** The names a declaration file exports, following `export *` through its relative imports and into workspace packages. */
 function exportedNames(file: URL, seen = new Set<string>()): string[] {

@@ -19,7 +19,7 @@
     "@open-reloading/ballistics": "workspace:*",
     "@open-reloading/cli": "workspace:*",
     "@open-reloading/catalog": "workspace:*",
-    "@open-reloading/drawing": "workspace:*",
+    "@open-reloading/svg-drawings": "workspace:*",
     "@open-reloading/importers": "workspace:*",
     "@open-reloading/schema": "workspace:*",
     "@open-reloading/tools": "workspace:*",

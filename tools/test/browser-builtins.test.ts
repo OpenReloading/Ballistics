@@ -17,7 +17,7 @@ const browserSources = [
     'statistics',
     'ballistics',
     'shot-groups',
-    'drawing',
+    'svg-drawings',
     'schema',
     'api',
     'importers',

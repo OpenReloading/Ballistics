@@ -171,15 +171,15 @@ importers:
       '@open-reloading/cli':
         specifier: workspace:*
         version: link:../../packages/cli
-      '@open-reloading/drawing':
-        specifier: workspace:*
-        version: link:../../packages/drawing
       '@open-reloading/importers':
         specifier: workspace:*
         version: link:../../packages/importers
       '@open-reloading/schema':
         specifier: workspace:*
         version: link:../../packages/schema
+      '@open-reloading/svg-drawings':
+        specifier: workspace:*
+        version: link:../../packages/svg-drawings
       '@open-reloading/tools':
         specifier: workspace:*
         version: link:../../tools
@@ -240,9 +240,6 @@ importers:
       '@open-reloading/design-tokens':
         specifier: workspace:*
         version: link:../../packages/design-tokens
-      '@open-reloading/drawing':
-        specifier: workspace:*
-        version: link:../../packages/drawing
       '@open-reloading/importers':
         specifier: workspace:*
         version: link:../../packages/importers
@@ -258,6 +255,9 @@ importers:
       '@open-reloading/statistics':
         specifier: workspace:*
         version: link:../../packages/statistics
+      '@open-reloading/svg-drawings':
+        specifier: workspace:*
+        version: link:../../packages/svg-drawings
       '@open-reloading/target-recognition':
         specifier: workspace:*
         version: link:../../packages/target-recognition
@@ -457,15 +457,15 @@ importers:
       '@open-reloading/catalog':
         specifier: workspace:*
         version: link:../catalog
-      '@open-reloading/drawing':
-        specifier: workspace:*
-        version: link:../drawing
       '@open-reloading/schema':
         specifier: workspace:*
         version: link:../schema
       '@open-reloading/statistics':
         specifier: workspace:*
         version: link:../statistics
+      '@open-reloading/svg-drawings':
+        specifier: workspace:*
+        version: link:../svg-drawings
       '@open-reloading/tools':
         specifier: workspace:*
         version: link:../../tools
@@ -539,24 +539,6 @@ importers:
       react-dom:
         specifier: 'catalog:'
         version: 19.3.1(react@19.3.1)
-      typescript:
-        specifier: 'catalog:'
-        version: 7.0.2
-      vitest:
-        specifier: 'catalog:'
-        version: 5.0.5(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/browser-playwright@5.0.5)(@vitest/coverage-v8@5.0.5)(@vitest/ui@5.0.5)(vite@8.3.6(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
-
-  packages/drawing:
-    devDependencies:
-      '@open-reloading/catalog':
-        specifier: workspace:*
-        version: link:../catalog
-      '@types/node':
-        specifier: 'catalog:'
-        version: 26.6.6
-      '@vitest/coverage-v8':
-        specifier: 'catalog:'
-        version: 5.0.5(@vitest/browser@5.0.5)(vitest@5.0.5)
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
@@ -759,6 +741,24 @@ importers:
       publint:
         specifier: 'catalog:'
         version: 0.3.25
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.5(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/browser-playwright@5.0.5)(@vitest/coverage-v8@5.0.5)(@vitest/ui@5.0.5)(vite@8.3.6(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
+
+  packages/svg-drawings:
+    devDependencies:
+      '@open-reloading/catalog':
+        specifier: workspace:*
+        version: link:../catalog
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.6.6
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 5.0.5(@vitest/browser@5.0.5)(vitest@5.0.5)
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
@@ -1016,12 +1016,12 @@ importers:
         specifier: 'catalog:'
         version: 4.6.7
     devDependencies:
-      '@open-reloading/drawing':
-        specifier: workspace:*
-        version: link:../packages/drawing
       '@open-reloading/importers':
         specifier: workspace:*
         version: link:../packages/importers
+      '@open-reloading/svg-drawings':
+        specifier: workspace:*
+        version: link:../packages/svg-drawings
       '@open-reloading/web':
         specifier: workspace:*
         version: link:../apps/web

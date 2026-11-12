@@ -1,12 +1,12 @@
+import { fromSi } from '@open-reloading/schema'
 import {
   fullSection,
   type SectionPoint,
   type SpecValue,
   steelBand,
   svgPath,
-} from '@open-reloading/drawing'
-import { previewDrawn } from '@open-reloading/drawing/seating'
-import { fromSi } from '@open-reloading/schema'
+} from '@open-reloading/svg-drawings'
+import { previewDrawn } from '@open-reloading/svg-drawings/seating'
 import { nth } from './nth.ts'
 
 /** From the seated preview at the run: record values, the seated bullet's half outline ([r, z] mm from its base) and the base's z from the head, mm. */
