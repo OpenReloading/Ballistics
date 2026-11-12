@@ -15,9 +15,9 @@ import {
 import type { Bullet } from '@open-reloading/schema'
 import { Flask, Plus } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { type CSSProperties, type ReactNode, useState } from 'react'
+import Link from '@/platform/link.tsx'
+import { useRouter } from '@/platform/navigation.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 import {

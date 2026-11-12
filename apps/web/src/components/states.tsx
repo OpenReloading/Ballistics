@@ -2,8 +2,8 @@
 
 import { Alert, Button, EmptyState, Group, Skeleton, Stack, Text } from '@mantine/core'
 import { FunnelX, Info, Warning, WarningOctagon } from '@phosphor-icons/react'
-import { useRouter } from 'next/navigation'
 import { type ReactNode, useLayoutEffect, useState } from 'react'
+import { useRouter } from '@/platform/navigation.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message as Marked, msg } from '../i18n/translate.ts'
 import { controlSize } from '../lib/theme.ts'

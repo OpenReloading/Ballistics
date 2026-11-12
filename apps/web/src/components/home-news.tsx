@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/platform/link.tsx'
 import { msg } from '../i18n/translate.ts'
 import type { NewsItem } from '../lib/news.ts'
 import { Panel } from './panel.tsx'
