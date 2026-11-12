@@ -1,0 +1,25 @@
+/* Stands in for next/font/local: the same Inter files and display values as apps/web/src/app/fonts/{ui,drawing}.ts */
+@font-face {
+  font-family: "Inter UI";
+  src: url("../../../web/src/app/fonts/Inter-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter UI";
+  src: url("../../../web/src/app/fonts/Inter-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter Drawing";
+  src: url("../../../web/src/app/fonts/Inter-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: block;
+}
+.font-ui {
+  --font-ui: "Inter UI";
+}
+.font-drawing {
+  --font-drawing: "Inter Drawing";
+}
