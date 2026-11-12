@@ -140,7 +140,7 @@ it('refuses a text without a table', async () => {
     id: 1,
     bytes: new TextEncoder().encode('Notes, from the range\nwindy day').buffer as ArrayBuffer,
   })
-  expect(r).toMatchObject({ type: 'read', card: { refusal: expect.stringContaining('no table') } })
+  expect(r).toMatchObject({ type: 'read', card: { refusal: { code: 'noDelimiter', params: {} } } })
 })
 
 it('keeps the Import button disabled while a file that writes rows has no source', () => {
