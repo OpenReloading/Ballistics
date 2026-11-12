@@ -14,7 +14,7 @@ export default function GlobalError({
   return (
     <html lang={language}>
       <body style={{ fontFamily: 'system-ui, sans-serif', margin: '2rem' }}>
-        <title>{`${t('Something went wrong')} · OpenReloading Ballistics`}</title>
+        <title>{`${t('Something went wrong')} · RangeFoundry Workbench`}</title>
         <main>
           <h1>{t('Something went wrong')}</h1>
           <p role="alert">{t('OpenReloading could not be shown.')}</p>

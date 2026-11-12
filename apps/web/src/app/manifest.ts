@@ -8,7 +8,7 @@ export default function manifest(): MetadataRoute.Manifest {
     { src: `${basePath}/icon.png`, sizes: '512x512', type: 'image/png' },
   ]
   return {
-    name: 'OpenReloading Ballistics',
+    name: 'RangeFoundry Workbench',
     short_name: 'OpenReloading',
     description: 'A ballistics database with interior and exterior ballistics simulations.',
     id: `${basePath}/`,

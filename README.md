@@ -1,4 +1,4 @@
-<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="apps/web/src/assets/ballistics-dark.svg"><img src="apps/web/src/assets/ballistics-light.svg" width="360" alt="OpenReloading Ballistics"></picture></p>
+<p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="apps/web/src/assets/ballistics-dark.svg"><img src="apps/web/src/assets/ballistics-light.svg" width="360" alt="RangeFoundry Workbench"></picture></p>
 
 # OpenReloading
 

@@ -9,7 +9,7 @@ export default {
     '../../packages/use-cases',
     '../../packages/api',
   ],
-  name: 'OpenReloading Ballistics library',
+  name: 'RangeFoundry Workbench library',
   readme: 'library.md',
   out: 'static/library',
   disableSources: true,

@@ -90,7 +90,7 @@ test('the Database list and a record page show in German', async ({ page }) => {
   await expect(page.getByRole('searchbox')).toHaveAttribute('placeholder', /Alias/)
   // the tab title is the page title in the language shown, after a full load and a client-side navigation
   const tabTitle = async () =>
-    `${await page.getByRole('heading', { level: 1 }).getAttribute('title')} · OpenReloading Ballistics`
+    `${await page.getByRole('heading', { level: 1 }).getAttribute('title')} · RangeFoundry Workbench`
   await expect(page).toHaveTitle(await tabTitle())
   await page.getByRole('tab', { name: 'Treibladungspulver' }).click()
   await expect(page.getByRole('heading', { level: 1, name: 'Treibladungspulver' })).toBeVisible()
