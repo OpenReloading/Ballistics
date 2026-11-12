@@ -539,6 +539,8 @@
                 "group": [
                   "@open-reloading/*",
                   "@open-reloading/*/**",
+                  "@rangefoundry/*",
+                  "@rangefoundry/*/**",
                   "!@open-reloading/units",
                   "!@open-reloading/units/**",
                   "!@open-reloading/statistics",
@@ -577,6 +579,8 @@
                 "group": [
                   "@open-reloading/*",
                   "@open-reloading/*/**",
+                  "@rangefoundry/*",
+                  "@rangefoundry/*/**",
                   "!@open-reloading/units",
                   "!@open-reloading/units/**",
                   "!@open-reloading/statistics",

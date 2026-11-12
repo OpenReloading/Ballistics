@@ -77,6 +77,26 @@ const recordRoutes = [
   'federations',
 ].map((r) => `apps/web/src/app/${r}/[id]`)
 
+/** The workspace scope: either one while the packages move from `@open-reloading/` to `@rangefoundry/`. */
+const scope = /^@(?:open-reloading|rangefoundry)\//
+
+/** The package name of each workspace of pnpm-workspace.yaml, by its name without the scope. */
+export function workspaceNames(root = repoRoot) {
+  const dirs = [
+    ...['packages', 'apps', 'tooling'].flatMap((d) =>
+      readdirSync(path.join(root, d)).map((n) => `${d}/${n}`),
+    ),
+    'tools',
+  ]
+  return new Map(
+    dirs
+      .map((dir) => path.join(root, dir, 'package.json'))
+      .filter((file) => existsSync(file))
+      .map((file) => (JSON.parse(readFileSync(file, 'utf8')) as { name: string }).name)
+      .map((name) => [name.replace(scope, ''), name]),
+  )
+}
+
 const importRe = /(?:\bfrom|\bimport)\s*(?:\(\s*)?['"]([^'"]+)['"]/g
 const extensions = ['', '.ts', '.tsx', '.mts', '.js', '.css']
 
@@ -116,8 +136,8 @@ export function recordClosure(root = repoRoot) {
     if (!/\.(ts|tsx|mts|js)$/.test(file)) continue
     const source = readFileSync(path.join(root, file), 'utf8')
     for (const spec of importSpecifiers(source)) {
-      const pkg = /^@open-reloading\/([^/]+)/.exec(spec)
-      if (pkg?.[1]) packages.add(pkg[1])
+      const pkg = scope.test(spec) ? spec.replace(scope, '').split('/')[0] : undefined
+      if (pkg) packages.add(pkg)
       const found = resolveImport(root, file, spec)
       if (found === null) continue
       add(found)
@@ -157,8 +177,16 @@ export const testGroups: Record<string, string[]> = {
 /** One test job: its group, the pnpm filters of its workspaces to test, whether it runs the e2e unit tests. */
 export type TestJob = { name: string; filter: string; e2eUnit: boolean }
 
-/** Every group's for undefined and for a workspace no group lists (a new one), which the completeness test of `testGroups` then names. */
-export function testJobs(affected?: string[]): TestJob[] {
+const workspaces = workspaceNames()
+
+/** Every group's for undefined and for a workspace no group lists (a new one), which the completeness test of `testGroups` then names; `names` gives each its scope. */
+export function testJobs(affected?: string[], names = workspaces): TestJob[] {
+  const filter = (m: string) => {
+    const name = names.get(m)
+    // a filter that names no workspace would test nothing and pass
+    if (name === undefined) throw new Error(`no workspace ${m} for the test groups`)
+    return `--filter ${name}`
+  }
   const listed = Object.values(testGroups).flat()
   const only = affected?.every((m) => listed.includes(m)) ? affected : undefined
   return Object.entries(testGroups).flatMap(([name, members]) => {
@@ -166,7 +194,7 @@ export function testJobs(affected?: string[]): TestJob[] {
     const tested = hit.filter((m) => m !== 'e2e')
     const e2eUnit = hit.includes('e2e')
     if (tested.length === 0 && !e2eUnit) return []
-    return [{ name, filter: tested.map((m) => `--filter @open-reloading/${m}`).join(' '), e2eUnit }]
+    return [{ name, filter: tested.map(filter).join(' '), e2eUnit }]
   })
 }
 
@@ -255,7 +283,7 @@ export function selected(filter: string): string[] | undefined {
     // the root project: plan reads the files outside the workspaces itself
     return listed
       .filter((p) => path.resolve(p.path) !== path.resolve(repoRoot))
-      .map((p) => p.name.replace(/^@open-reloading\//, ''))
+      .map((p) => p.name.replace(scope, ''))
   } catch {
     return
   }

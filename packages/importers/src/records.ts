@@ -1,11 +1,11 @@
 // Kind scoring, column mapping and the record candidates a mapped table becomes, with a report per row.
 import type { UserRecord } from '@open-reloading/schema'
+import type { Diagnostic } from '@open-reloading/statistics'
 import type { Candidate, ReaderDiagnostic } from './diagnostics.ts'
 import {
   type ColumnUnit,
   type FieldSpec,
   fieldSpecs,
-  kindNames,
   type TableKind,
   tableKinds,
 } from './record-fields.ts'
@@ -42,12 +42,18 @@ export interface KindScore {
   score: number
 }
 
+/** No kind reaches `floor`, the lowest score that suggests one: the scores of every kind, best first. The app words it. */
+export type KindDiagnostic = Diagnostic<
+  'noKind',
+  { readonly scores: readonly KindScore[]; readonly floor: number }
+>
+
 /** The kind scores of a table, best first, and the suggested kind with its tier, or the refusal when none reaches the floor. */
 export interface KindSuggestion {
   scores: KindScore[]
   kind?: TableKind | undefined
   tier?: Tier | undefined
-  refusal?: string | undefined
+  refusal?: KindDiagnostic | undefined
 }
 
 const sampleOf = (table: Table, column: number) =>
@@ -210,18 +216,14 @@ function scoreKinds(table: Table): KindScore[] {
 
 /**
  * The kind a table suggests from its header words and value ranges: high from 0.80, medium from
- * 0.60, low from 0.40. Below 0.40 no kind is suggested and the refusal names the scores and the floor.
+ * 0.60, low from 0.40. Below 0.40 no kind is suggested and the refusal carries the scores and the floor.
  */
 export function suggestKind(table: Table): KindSuggestion {
   const scores = scoreKinds(table)
   const best = scores[0]
   const tier = best && tierOf(best.score)
   if (best && tier) return { scores, kind: best.kind, tier }
-  const all = scores.map((x) => `${kindNames[x.kind]} ${x.score.toFixed(2)}`).join(', ')
-  return {
-    scores,
-    refusal: `No column matches a bullet, powder or cartridge field (${all}; the floor is ${tierFloors.low.toFixed(2)}). Pick the kind by hand, or export a table with headers such as Name, Diameter, Weight.`,
-  }
+  return { scores, refusal: { code: 'noKind', params: { scores, floor: tierFloors.low } } }
 }
 
 /** The column map the headers and values suggest for `kind`, one entry per column. */
