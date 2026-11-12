@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.0.6](https://github.com/OpenReloading/Ballistics/compare/drawing-v0.0.5...drawing-v0.0.6) (2026-11-12)
+
+
+### Bug fixes
+
+* US spelling in prose, comments and messages, checked by typos ([#1160](https://github.com/OpenReloading/Ballistics/issues/1160)) ([7e1255c](https://github.com/OpenReloading/Ballistics/commit/7e1255c3ef421ae348b39db550c15e4e87eb7a2f))
+
+
+### Documentation
+
+* **tests:** one-line comments in the test files ([#1137](https://github.com/OpenReloading/Ballistics/issues/1137)) ([1ada953](https://github.com/OpenReloading/Ballistics/commit/1ada953bc7b048bcfe7b3982c87083c2f96dc0c7))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @open-reloading/catalog bumped to 0.0.7
+
 ## [0.0.5](https://github.com/OpenReloading/Ballistics/compare/drawing-v0.0.4...drawing-v0.0.5) (2026-11-09)
 
 
