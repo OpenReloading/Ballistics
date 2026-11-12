@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
+import { showGerman } from './german.ts'
 import { pickFiles, withoutOpenPicker } from './import.ts'
 import { gotoHydrated } from './nav.ts'
 
@@ -101,4 +102,36 @@ test('the entry announces each read and keeps the focus after Kind and columns a
   await expect(entry.getByRole('heading', { name: 'notes.txt' })).toBeFocused()
   await entry.getByRole('button', { name: 'Remove notes.txt' }).click()
   await expect(entry.getByRole('button', { name: 'Choose files' })).toBeFocused()
+})
+
+test('a header without rows and a table of no kind show their refusals in English and German', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/bullets/designer')
+  const entry = await pickFiles(page, [
+    { name: 'header.csv', buffer: Buffer.from('Name,Diameter (mm),Weight (gr)\n') },
+    {
+      name: 'contacts.csv',
+      buffer: csv(['A,a@example.org,123', 'B,b@example.org,456'], 'Name,Email,Phone'),
+    },
+  ])
+  const card = (name: string) => entry.getByRole('region', { name })
+  await expect(card('header.csv').getByTestId('import-verdict')).toHaveText('Refused')
+  await expect(card('header.csv').locator('.import-refusal')).toHaveText(/^The text has no table: /)
+  await expect(card('contacts.csv').getByTestId('import-verdict')).toHaveText('Refused: no kind')
+  await expect(card('contacts.csv')).toContainText(
+    /No column matches a bullet, powder or cartridge field \(.+; the floor is 0\.40\)/,
+  )
+
+  await showGerman(page)
+  await expect(card('header.csv').getByTestId('import-verdict')).toHaveText('Abgelehnt')
+  await expect(card('header.csv').locator('.import-refusal')).toHaveText(
+    /^Der Text enthält keine Tabelle: /,
+  )
+  await expect(card('contacts.csv').getByTestId('import-verdict')).toHaveText(
+    'Abgelehnt: keine Art',
+  )
+  await expect(card('contacts.csv')).toContainText(
+    /Keine Spalte passt zu einem Feld von Geschossen/,
+  )
 })

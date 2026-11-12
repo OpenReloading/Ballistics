@@ -1,9 +1,10 @@
-import type { TableKind } from '@open-reloading/importers'
+import type { TableKind, TableReadDiagnostic } from '@open-reloading/importers'
 import { describe, expect, it } from 'vitest'
-import { english } from '../src/i18n/translate.ts'
+import de from '../src/i18n/de.json'
+import { type Catalogue, english, translator } from '../src/i18n/translate.ts'
 import { recordOf } from '../src/lib/candidates.ts'
 import { parseCsrLoad } from '../src/lib/grt-load-file.ts'
-import { tableReasonText } from '../src/lib/import-diagnostics.ts'
+import { kindRefusalText, tableReadText, tableReasonText } from '../src/lib/import-diagnostics.ts'
 import { type BuildView, type ImportReply, importWorker } from '../src/lib/import-entry.ts'
 
 const { t } = english
@@ -72,6 +73,44 @@ describe('the reasons of a table import in words', () => {
     ).toBe(
       'Rows 2 and 3 give the same name, maker, diameter and mass, so one id: only row 2 is imported. Change the name, maker, diameter or mass of row 3 to import it as a record of its own.',
     )
+  })
+})
+
+const german = translator(de as Catalogue, 'de')
+
+const tableReads: TableReadDiagnostic[] = [
+  { code: 'noTwoColumns', params: {} },
+  { code: 'tooManyColumns', params: { max: 256 } },
+  { code: 'tooManyCells', params: { max: 1_000_000 } },
+  { code: 'headerOnly', params: {} },
+  { code: 'jsonMalformed', params: {} },
+  { code: 'jsonNotTable', params: {} },
+  { code: 'noDelimiter', params: {} },
+]
+
+describe('a file without a table and a table without a kind in English and German', () => {
+  it.each(tableReads.map((d) => [d.code, d] as const))('words %s in both', (_, d) => {
+    const en = tableReadText(d, t)
+    const shown = tableReadText(d, german.t)
+    expect(en).not.toBe(shown)
+    for (const text of [en, shown]) expect(text).not.toMatch(/[{}]/)
+  })
+
+  it('words noKind in both, with each kind and the floor', () => {
+    const d = {
+      code: 'noKind',
+      params: {
+        scores: [
+          { kind: 'cartridge', score: 0.25 },
+          { kind: 'bullet', score: 0.1 },
+          { kind: 'powder', score: 0 },
+        ],
+        floor: 0.4,
+      },
+    } as const
+    expect(kindRefusalText(d, t)).toContain('(cartridges 0.25, bullets 0.10, powders 0.00; ')
+    expect(kindRefusalText(d, t)).toContain(' 0.40)')
+    expect(kindRefusalText(d, german.t)).not.toBe(kindRefusalText(d, t))
   })
 })
 

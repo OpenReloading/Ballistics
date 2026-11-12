@@ -7,13 +7,6 @@ export type TableKind = 'bullet' | 'powder' | 'cartridge'
 /** The kinds a table is scored for. */
 export const tableKinds: readonly TableKind[] = ['bullet', 'powder', 'cartridge']
 
-/** The plural of each kind as a refusal names it. */
-export const kindNames: Record<TableKind, string> = {
-  bullet: 'bullets',
-  powder: 'powders',
-  cartridge: 'cartridges',
-}
-
 /** A unit a column can be in: its symbol and the conversion into the stored unit of the field. */
 export interface ColumnUnit {
   /** The symbol, also the id a column map names. */
