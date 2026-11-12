@@ -7,7 +7,7 @@ export type TableKind = 'bullet' | 'powder' | 'cartridge'
 /** The kinds a table is scored for. */
 export const tableKinds: readonly TableKind[] = ['bullet', 'powder', 'cartridge']
 
-/** The plural of each kind as a refusal names it. */
+/** The plural name of each kind, as the table import page titles its sections. */
 export const kindNames: Record<TableKind, string> = {
   bullet: 'bullets',
   powder: 'powders',
