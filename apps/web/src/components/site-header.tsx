@@ -49,7 +49,7 @@ const SiteSearch = dynamic(() => import('./site-search.tsx').then((m) => m.SiteS
   ssr: false,
 })
 
-const name = 'OpenReloading Ballistics'
+const name = 'RangeFoundry Workbench'
 
 // inlined at build; no link without it
 const repository = repositoryUrl(process.env.NEXT_PUBLIC_REPOSITORY_URL)

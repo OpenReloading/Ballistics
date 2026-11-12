@@ -41,7 +41,7 @@ writeFileSync(
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>REST API | OpenReloading Ballistics</title>
+    <title>REST API | RangeFoundry Workbench</title>
     <link rel="stylesheet" href="./tokens.css" />
     <style>
       body { margin: 0; background: var(--surface); }

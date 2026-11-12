@@ -41,7 +41,7 @@ export function Home({ counts }: { counts: Record<string, ReactNode> }) {
   const [tools, library] = sections
   return (
     <>
-      <PageBar title="OpenReloading Ballistics" titleHidden />
+      <PageBar title="RangeFoundry Workbench" titleHidden />
       <div className="home-lead">
         <p className="lead">
           {t('A ballistics database with interior and exterior ballistics simulations')}
