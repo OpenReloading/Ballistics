@@ -227,15 +227,15 @@ $$
 
 Code: `packages/statistics/src/student-t.ts`, `studentTwoSidedQuantile` (`centralMass`).
 
-Below a level of 0.5 the bisection compares this central mass with $1 - \alpha$. From 0.5 up it compares the tail with $\alpha$, which is exact there, because near a level of 1 the difference $1 - P(\lvert T \rvert \lt t)$ loses its digits. The tail is the regularized incomplete beta function
+Below a level of 0.5 the bisection compares this central mass with $1 - \alpha$. From 0.5 up it compares the tail with $\alpha$, which is exact there, because near a level of 1 the difference $1 - P(\lvert T \rvert \lt t)$ loses its digits. The tail is the regularized incomplete beta function, from its continued fraction by the modified Lentz method where that converges fast ($x \lt (\nu/2 + 1)/(\nu/2 + 5/2)$); above, the tail is at least 0.08 and comes from $1 - P(\lvert T \rvert \lt t)$ without a loss of digits:
 
 $$
 P(\lvert T \rvert \gt t) = I_x\left(\frac{\nu}{2}, \frac{1}{2}\right), \qquad x = \frac{\nu}{\nu + t^2}
 $$
 
-from its continued fraction by the modified Lentz method, where that converges fast ($x \lt (\nu/2 + 1)/(\nu/2 + 5/2)$); above, the tail is at least 0.08 and comes from $1 - P(\lvert T \rvert \lt t)$ without a loss of digits. Every level a double holds in (0, 1) is supported: for whole $\nu$ from 1 to 1,000 and levels up to $1 - 2^{-53}$ the quantile stays within a relative $10^{-12}$ of reference values.
-
 Code: `packages/statistics/src/student-t.ts`, `studentTwoSidedQuantile` (`tailMass`).
+
+Every level a double holds in (0, 1) is supported: for whole $\nu$ from 1 to 1,000 and levels up to $1 - 2^{-53}$ the quantile stays within a relative $10^{-12}$ of reference values.
 
 The intervals of the [range string fit](exterior-truing-strings.md) use it.
 
