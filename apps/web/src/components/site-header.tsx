@@ -52,7 +52,7 @@ const SiteSearch = dynamic(() => import('./site-search.tsx').then((m) => m.SiteS
 
 const name = 'RangeFoundry Workbench'
 
-// inlined at build; no link without it
+// no link without it
 const repository = repositoryUrl(repositoryAddress)
 const docs = docsUrl(docsAddress, undefined, noDocs)
 

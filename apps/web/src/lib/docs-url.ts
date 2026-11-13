@@ -14,7 +14,7 @@ export function docsUrl(
 export const docsPage = (docs: string | undefined, page: string): string | undefined =>
   docs && `${docs.replace(/\/?$/, '/')}${page}`
 
-// inlined at build; no link without a docs site
+// no link without a docs site
 const docs = docsUrl(docsAddress, undefined, noDocs)
 
 /** The photo guide, how to take a target photo that hole detection can read. */
