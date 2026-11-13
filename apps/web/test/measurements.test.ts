@@ -171,7 +171,7 @@ describe('sessionOf', () => {
       provenance: { kind: 'measured' as const, sources: [{}] as [object] },
     }
     const t = sessionOf('x.csv', { ...data, session: untitled }, [], { id, now })
-    expect(defined(t.data.provenance.sources[0]).title).toBe('x.csv')
+    expect(defined(t.data.provenance?.sources[0]).title).toBe('x.csv')
   })
 
   it('maps a string to a charge and back to not used', () => {

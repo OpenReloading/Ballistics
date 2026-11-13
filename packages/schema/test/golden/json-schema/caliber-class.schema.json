@@ -196,8 +196,7 @@
     "id",
     "name",
     "diameter",
-    "cartridges",
-    "provenance"
+    "cartridges"
   ],
   "additionalProperties": false
 }

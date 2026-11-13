@@ -206,7 +206,7 @@ export interface InteriorResponse {
       | {
           id: string
           name: string
-          provenance: Provenance
+          provenance?: Provenance | undefined
         }
       | undefined
   }

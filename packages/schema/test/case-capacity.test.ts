@@ -48,10 +48,9 @@ describe('CaseCapacity', () => {
     )
   })
 
-  it('needs an id and provenance in a catalogue record, which names catalogue records only', () => {
+  it('needs an id in a catalogue record, which names catalogue records only', () => {
     const { id: _id, provenance: _p, ...bare } = catalogue
     expectIssueAt(caseCapacity, bare, 'id')
-    expectIssueAt(caseCapacity, bare, 'provenance')
     expectIssueAt(caseCapacity, { ...catalogue, cartridge: user.cartridge }, 'cartridge')
     expectIssueAt(
       caseCapacity,
@@ -65,10 +64,11 @@ describe('CaseCapacity rules of each origin', () => {
   it('names each catalogue rule in its issue and needs no case manufacturer', () => {
     const { caseManufacturer: _m, ...noMaker } = catalogue
     expect(caseCapacity.safeParse(noMaker).success).toBe(true)
+    const { provenance: _source, ...unsourced } = catalogue
+    expect(caseCapacity.safeParse(unsourced).success).toBe(true)
     const { id: _id, provenance: _p, ...bare } = catalogue
     expect(issues({ ...bare, cartridge: user.cartridge })).toEqual([
       { code: 'custom', path: ['id'], message: 'A catalogue capacity needs an id' },
-      { code: 'custom', path: ['provenance'], message: 'A catalogue capacity needs provenance' },
       {
         code: 'custom',
         path: ['cartridge'],

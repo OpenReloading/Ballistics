@@ -321,26 +321,28 @@ const publishedLoadsParser = z
     cartridgeName: z.string().min(1).describe('The cartridge as the table prints it.'),
     cartridge: catalogueRef('cartridge'),
     loads: z.array(publishedLoad).min(1),
-    provenance: provenance.superRefine((p, ctx) => {
-      const issue = (path: (string | number)[], message: string) =>
-        ctx.addIssue({ code: 'custom', path, message })
-      if (p.kind !== 'published') issue(['kind'], 'a table is published')
-      p.sources.forEach((s, i) => {
-        for (const k of ['publisher', 'url', 'retrieved', 'origin'] as const)
-          if (s[k] === undefined) issue(['sources', i, k], `a table source names its ${k}`)
-        if (s.origin === 'manufacturer' && s.license !== undefined) {
-          if (!s.license.startsWith('LicenseRef-') || s.terms === undefined)
-            issue(
-              ['sources', i, 'license'],
-              "maker data has no project license: only the maker's own terms, as LicenseRef-<name> with terms",
-            )
-        }
+    provenance: provenance
+      .superRefine((p, ctx) => {
+        const issue = (path: (string | number)[], message: string) =>
+          ctx.addIssue({ code: 'custom', path, message })
+        if (p.kind !== 'published') issue(['kind'], 'a table is published')
+        p.sources.forEach((s, i) => {
+          for (const k of ['publisher', 'url', 'retrieved', 'origin'] as const)
+            if (s[k] === undefined) issue(['sources', i, k], `a table source names its ${k}`)
+          if (s.origin === 'manufacturer' && s.license !== undefined) {
+            if (!s.license.startsWith('LicenseRef-') || s.terms === undefined)
+              issue(
+                ['sources', i, 'license'],
+                "maker data has no project license: only the maker's own terms, as LicenseRef-<name> with terms",
+              )
+          }
+        })
       })
-    }),
+      .optional(),
   })
   .superRefine((f, ctx) => {
     f.loads.forEach((l, i) => {
-      if (l.source !== undefined && l.source >= f.provenance.sources.length)
+      if (l.source !== undefined && l.source >= (f.provenance?.sources.length ?? 0))
         ctx.addIssue({
           code: 'custom',
           path: ['loads', i, 'source'],
@@ -364,7 +366,7 @@ export const publishedLoads: z.ZodObject<
     cartridgeName: z.ZodString
     cartridge: z.ZodString
     loads: z.ZodArray<typeof publishedLoad>
-    provenance: typeof provenance
+    provenance: z.ZodOptional<typeof provenance>
   },
   z.core.$strict
 > = publishedLoadsParser satisfies Exact<typeof publishedLoads, typeof publishedLoadsParser>

@@ -27,9 +27,9 @@ Schema: `packages/schema/src/manufacturer.ts`. Records: `packages/catalog/record
 | `country`    | ISO 3166-1 alpha-2 code of the company behind the name                  |
 | `website`    | The manufacturer's site, or the brand's page on its owner's site, https |
 | `aliases`    | Former names and other names the products are sold under                |
-| `provenance` | Sources of the name, the country, the website and the aliases           |
+| `provenance` | Sources of the name, the country, the website and the aliases; optional |
 
-`country` is the country of the address the manufacturer's own contact page, imprint or safety data sheet names: for a brand, its owner's (IMR, Ramshot, Winchester and Accurate: Hodgdon, United States; Rottweil, whose reloading powders RWS GmbH sells: Germany). A source with `fields: ["country"]` must support it, and every other field needs a source too. The invented `demo-` manufacturers have neither field; Western has no website, because its former domain now serves unrelated content.
+`country` is the country of the address the manufacturer's own contact page, imprint or safety data sheet names: for a brand, its owner's (IMR, Ramshot, Winchester and Accurate: Hodgdon, United States; Rottweil, whose reloading powders RWS GmbH sells: Germany). It is a basic fact that needs no source; where the record has provenance, `data:validate` asks a source for every field (`checkCoverage`). The invented `demo-` manufacturers have neither field; Western has no website, because its former domain now serves unrelated content.
 
 ## Id
 

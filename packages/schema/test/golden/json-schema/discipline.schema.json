@@ -546,8 +546,7 @@
     "name",
     "section",
     "page",
-    "distance",
-    "provenance"
+    "distance"
   ],
   "additionalProperties": false
 }

@@ -120,9 +120,10 @@ describe('Load overrides and catalogue fields', () => {
     expectIssueAt(load, { ...userLoad, analysis: { overrides: { twist: '305' } } }, 'analysis')
   })
 
-  it('needs an id, provenance, cartridge, bullet, powder and charge in a catalogue load', () => {
-    for (const k of ['id', 'name', 'provenance', 'cartridge', 'bullet', 'powder', 'charge'])
+  it('needs an id, cartridge, bullet, powder and charge in a catalogue load, not provenance', () => {
+    for (const k of ['id', 'name', 'cartridge', 'bullet', 'powder', 'charge'])
       expectIssueAt(load, { ...catalogueLoad, [k]: undefined }, k)
+    expect(load.safeParse({ ...catalogueLoad, provenance: undefined }).success).toBe(true)
   })
 
   it('lets a user load name a user powder and refuses a plain id', () => {

@@ -110,7 +110,7 @@ export const cartridgeRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
         errors: [404],
         summary: 'Get a cartridge',
         description:
-          'The cartridge record of its C.I.P. sheet with provenance, case type and case capacities. `revision` is a hash of the stored record, changes with any field.',
+          'The cartridge record of its C.I.P. sheet with case type, case capacities and its provenance where it has one. `revision` is a hash of the stored record, changes with any field.',
       },
     },
     (request, reply) => {

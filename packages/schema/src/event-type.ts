@@ -142,7 +142,7 @@ const eventTypeParser = z.strictObject({
     .refine((l) => new Set(l).size === l.length, { message: 'a level is listed twice' }),
   magazine: z.array(magazineLimit).min(1).optional(),
   movingTargets: z.boolean().optional(),
-  provenance,
+  provenance: provenance.optional(),
 })
 
 /**
@@ -196,8 +196,8 @@ export const eventType: z.ZodObject<
     >
     /** Whether the rule book allows moving targets; absent: it does not say. */
     movingTargets: z.ZodOptional<z.ZodBoolean>
-    /** Where the values of the record come from: a kind and at least one source. */
-    provenance: typeof provenance
+    /** Where the values of the record come from, wherever the record has a source: a kind and at least one source. */
+    provenance: z.ZodOptional<typeof provenance>
   },
   z.core.$strict
 > = eventTypeParser satisfies Exact<typeof eventType, typeof eventTypeParser>

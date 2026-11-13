@@ -147,6 +147,7 @@ function readIncoming(options: MergeOptions, sources: SourceIndex, errors: strin
     }
     const parsed = publishedLoads.safeParse(resolveRecord(withIds, sources, path, errors))
     if (!parsed.success) addIssues(path, parsed.error, errors)
+    else if (!parsed.data.provenance) errors.push(`${path}: a table needs provenance`)
     else errors.push(...placement(path, parsed.data))
     if (errors.length === before) read.push({ path, file: json })
   }

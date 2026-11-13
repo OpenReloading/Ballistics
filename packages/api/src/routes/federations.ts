@@ -99,7 +99,7 @@ export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = as
         errors: [404],
         summary: 'Get a target face',
         description:
-          'The target face record: federation id, ring diameters (mm), inner ten, events with ids, and provenance.',
+          'The target face record: federation id, ring diameters (mm), inner ten, events with ids, and provenance where it has one.',
       },
     },
     (request, reply) => {
@@ -193,7 +193,7 @@ export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = as
           response: record,
           errors: [404],
           summary: `Get a ${noun}`,
-          description: `The ${noun} record with its provenance.`,
+          description: `The ${noun} record with its provenance where it has one.`,
         },
       },
       (request, reply) => {

@@ -80,7 +80,7 @@ describe('BDMP Sportordnung 24.02.2026, B.11.2 BDMP-Scheibe Nr. 1', () => {
   it('keeps the VdRBw .30 M1 face out of the record, with the disagreement in the note', () => {
     const f = face('bdmp-nr1-100m')
     expect(defined(f.rings[0]).diameter.value).toBe(340)
-    const vdrbw = f.provenance.sources.find((s) => s.note?.startsWith('VdRBw 10.5'))
+    const vdrbw = f.provenance?.sources.find((s) => s.note?.startsWith('VdRBw 10.5'))
     expect(vdrbw?.note).toContain('1.65 cm')
     expect(vdrbw?.note).toContain('33.3 cm')
   })

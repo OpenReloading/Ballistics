@@ -82,7 +82,7 @@ const primerParser = z.strictObject({
     .describe('Output or sensitivity figures the source publishes.')
     .optional(),
   note: z.string().min(1).describe('Notes on the product.').optional(),
-  provenance,
+  provenance: provenance.optional(),
 })
 
 /**
@@ -113,8 +113,8 @@ export const primer: z.ZodObject<
       z.ZodArray<z.ZodObject<{ property: z.ZodString; value: z.ZodString }, z.core.$strict>>
     >
     note: z.ZodOptional<z.ZodString>
-    /** Where the values of the record come from: a kind and at least one source. */
-    provenance: typeof provenance
+    /** Where the values of the record come from, wherever the record has a source: a kind and at least one source. */
+    provenance: z.ZodOptional<typeof provenance>
   },
   z.core.$strict
 > = primerParser satisfies Exact<typeof primer, typeof primerParser>

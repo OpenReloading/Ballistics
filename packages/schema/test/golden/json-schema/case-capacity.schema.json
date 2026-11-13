@@ -228,7 +228,7 @@
         "kind",
         "sources"
       ],
-      "description": "Where the value comes from. Required for a catalogue capacity."
+      "description": "Where the value comes from, wherever the record has a source."
     }
   },
   "required": [
