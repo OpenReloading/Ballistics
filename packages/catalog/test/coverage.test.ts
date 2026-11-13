@@ -26,9 +26,54 @@ describe('checkCoverage', () => {
     expect(checkCoverage(record)).toEqual([])
   })
 
-  it('refuses a record without provenance, even of basic fields only', () => {
-    const basic = { id: 'x', name: 'X', mass: { value: 1 }, provenance: undefined }
-    expect(checkCoverage(basic)).toEqual(['needs provenance'])
+  it('asks a source for each data field of a kind without field classes, also without provenance', () => {
+    const record = { id: 'x', name: 'X', mass: { value: 1 }, provenance: undefined }
+    expect(checkCoverage(record)).toEqual(['field mass has no source'])
+    const bare = { id: 'x', name: 'X', provenance: undefined }
+    expect(checkCoverage(bare)).toEqual([])
+  })
+})
+
+describe('checkCoverage by field class', () => {
+  const basicBullet = {
+    id: 'x',
+    manufacturer: 'm',
+    name: 'X',
+    mass: { value: 10 },
+    construction: { raw: 'Jacketed', structure: 'jacketed' },
+    provenance: undefined,
+  }
+
+  it('asks no source for basic fields, and one for each detailed field also without provenance', () => {
+    expect(checkCoverage(basicBullet, 'bullet')).toEqual([])
+    const withOgive = { ...basicBullet, ogive: { form: 'tangent', radius: { value: 20 } } }
+    expect(checkCoverage(withOgive, 'bullet')).toEqual([
+      'field ogive.form has no source',
+      'field ogive.radius has no source',
+    ])
+    const sheet = provenance([{ title: 'Sheet', fields: ['ogive'] }])
+    expect(checkCoverage({ ...withOgive, provenance: sheet }, 'bullet')).toEqual([])
+  })
+
+  it('asks a source for a detailed field below a basic one, and for a powder interior', () => {
+    const jacket = { raw: 'Jacketed', jacket: { thickness: { value: 0.3 } } }
+    const sheet = provenance([{ title: 'Sheet', fields: ['mass'] }])
+    const jacketed = { ...basicBullet, construction: jacket, provenance: sheet }
+    expect(checkCoverage(jacketed, 'bullet')).toEqual([
+      'field construction.jacket.thickness has no source',
+    ])
+    const powder = {
+      id: 'p',
+      name: 'P',
+      interior: { vivacity: { value: 1 } },
+      provenance: undefined,
+    }
+    expect(checkCoverage(powder, 'powder')).toEqual(['field interior.vivacity has no source'])
+  })
+
+  it('asks no source for a manufacturer', () => {
+    const maker = { id: 'm', name: 'M', country: 'US', provenance: undefined }
+    expect(checkCoverage(maker, 'manufacturer')).toEqual([])
   })
 })
 
