@@ -1,5 +1,5 @@
 import { SegmentedControl, Tooltip } from '@mantine/core'
-import { angleText, face, fitEm, type LengthUnit, lengthText } from '@open-reloading/svg-drawings'
+import { angleText, face, fitEm, type LengthUnit, lengthText } from '@rangefoundry/svg-drawings'
 import {
   type Drawn,
   type Figure,
@@ -15,7 +15,7 @@ import {
   sideName,
   signedLengthText,
   valueParts,
-} from '@open-reloading/svg-drawings/cartridge'
+} from '@rangefoundry/svg-drawings/cartridge'
 import type { CSSProperties } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'

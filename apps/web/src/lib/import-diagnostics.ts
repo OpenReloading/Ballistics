@@ -4,7 +4,7 @@ import type {
   TableDiagnostic,
   TableKind,
   TableReadDiagnostic,
-} from '@open-reloading/importers'
+} from '@rangefoundry/importers'
 import type { Diagnostic } from '@rangefoundry/statistics'
 import { fixedNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'

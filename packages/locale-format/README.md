@@ -1,6 +1,6 @@
 # @rangefoundry/locale-format
 
-Writes numbers, values with their units and dates in a language on `Intl`, and holds the display unit tables: the units each quantity can be shown in and the unit presets. Every function takes the language as an argument. Its only dependency is `@open-reloading/units`. Private to this repository: it is not published.
+Writes numbers, values with their units and dates in a language on `Intl`, and holds the display unit tables: the units each quantity can be shown in and the unit presets. Every function takes the language as an argument. Its only dependency is `@rangefoundry/units`. Private to this repository: it is not published.
 
 Supported languages: those that write Latin digits with "." or "," as the decimal mark (today `en` and `de`). `decimalMark`, `inchText`, `canonicalNumberText` and reading a shown number back rely on that: Persian or Arabic-Indic digits would break them. A third language first settles whether to pin Latin digits or to type the language list.
 

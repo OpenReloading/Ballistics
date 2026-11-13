@@ -1,8 +1,8 @@
 'use client'
 
 import { Badge, Button, Flex, Group, NativeSelect, Tabs } from '@mantine/core'
-import type { ChronoImport, VelocityUnit } from '@open-reloading/importers'
 import { FileArrowUp } from '@phosphor-icons/react'
+import type { ChronoImport, VelocityUnit } from '@rangefoundry/importers'
 import { toSi } from '@rangefoundry/schema'
 import { useEffect, useRef, useState } from 'react'
 import Link from '@/platform/link.tsx'

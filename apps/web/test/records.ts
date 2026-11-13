@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import type { Bundle } from '@open-reloading/catalog'
+import type { Bundle } from '@rangefoundry/catalog'
 import { sheetId } from '@rangefoundry/schema'
 import type { CartridgeDetail } from '../src/lib/api-types.ts'
 import { readRecord } from './read-record.ts'
@@ -15,8 +15,8 @@ export function sheetRecord(sheet: string) {
   return c
 }
 
-/** The catalog records, as the build of `@open-reloading/catalog` writes them to its `bundle.json`. */
+/** The catalog records, as the build of `@rangefoundry/catalog` writes them to its `bundle.json`. */
 export const catalogBundle = (): Bundle =>
   JSON.parse(
-    readFileSync(fileURLToPath(import.meta.resolve('@open-reloading/catalog/bundle.json')), 'utf8'),
+    readFileSync(fileURLToPath(import.meta.resolve('@rangefoundry/catalog/bundle.json')), 'utf8'),
   )

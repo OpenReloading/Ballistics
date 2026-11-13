@@ -38,10 +38,10 @@ function closure(file: string, root: string, prefix: string) {
 /** The built files the record to load step, the water density, the unit conversion, the input checks and the seating read, which every model version shares. */
 function sharedFiles() {
   const drawing = dirname(
-    dirname(fileURLToPath(import.meta.resolve('@open-reloading/svg-drawings/seating'))),
+    dirname(fileURLToPath(import.meta.resolve('@rangefoundry/svg-drawings/seating'))),
   )
   const schema = dirname(fileURLToPath(import.meta.resolve('@rangefoundry/schema')))
-  const units = dirname(fileURLToPath(import.meta.resolve('@open-reloading/units')))
+  const units = dirname(fileURLToPath(import.meta.resolve('@rangefoundry/units')))
   const statistics = dirname(fileURLToPath(import.meta.resolve('@rangefoundry/statistics')))
   const ballistics = dirname(fileURLToPath(import.meta.resolve('@rangefoundry/ballistics')))
   return {

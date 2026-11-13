@@ -27,17 +27,17 @@
                   "@*/*/**",
                   "!@rangefoundry/schema",
                   "!@rangefoundry/statistics",
-                  "!@open-reloading/units"
+                  "!@rangefoundry/units"
                 ],
-                "message": "importers-imports-schema-and-units: packages/importers has no I/O and imports nothing but @rangefoundry/schema, @open-reloading/units, the Diagnostic type of @rangefoundry/statistics and its own files."
+                "message": "importers-imports-schema-and-units: packages/importers has no I/O and imports nothing but @rangefoundry/schema, @rangefoundry/units, the Diagnostic type of @rangefoundry/statistics and its own files."
               },
               {
                 "regex": "^[^.@]",
-                "message": "importers-imports-schema-and-units: packages/importers has no I/O and imports nothing but @rangefoundry/schema, @open-reloading/units, the Diagnostic type of @rangefoundry/statistics and its own files."
+                "message": "importers-imports-schema-and-units: packages/importers has no I/O and imports nothing but @rangefoundry/schema, @rangefoundry/units, the Diagnostic type of @rangefoundry/statistics and its own files."
               },
               {
                 "regex": "^(\\.\\./)+[^.]",
-                "message": "importers-imports-schema-and-units: packages/importers has no I/O and imports nothing but @rangefoundry/schema, @open-reloading/units, the Diagnostic type of @rangefoundry/statistics and its own files."
+                "message": "importers-imports-schema-and-units: packages/importers has no I/O and imports nothing but @rangefoundry/schema, @rangefoundry/units, the Diagnostic type of @rangefoundry/statistics and its own files."
               }
             ]
           }

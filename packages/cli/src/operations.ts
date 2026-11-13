@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs'
-import type { Bundle } from '@open-reloading/catalog'
+import type { Bundle } from '@rangefoundry/catalog'
 import {
   errorAnswer,
   inlineRunner,

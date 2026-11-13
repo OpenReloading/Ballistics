@@ -1,7 +1,7 @@
 /** The target face designer: the draft, its file data, the face it builds and the problems it reports. */
 
-import type { FaceShape } from '@open-reloading/svg-drawings/target'
 import { faceColour, type TargetFace, type TargetFaceDesign } from '@rangefoundry/schema'
+import type { FaceShape } from '@rangefoundry/svg-drawings/target'
 import { untranslated } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import {

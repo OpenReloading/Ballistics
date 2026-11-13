@@ -1,6 +1,6 @@
 /** The routes and the contract document read their texts, schemas and examples here and the command line runs them offline, so none can drift. */
 
-import type { Catalogue } from '@open-reloading/catalog'
+import type { Catalogue } from '@rangefoundry/catalog'
 import type { z } from 'zod'
 import { runChargeTarget } from './charge-run.ts'
 import { chargeBody, chargeTargetExample } from './charge-schema.ts'

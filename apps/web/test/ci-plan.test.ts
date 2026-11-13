@@ -174,14 +174,14 @@ it('prerenders every record when record data, page code or shared parts changed'
 })
 
 const packages =
-  '--filter @open-reloading/units --filter @rangefoundry/locale-format --filter @rangefoundry/design-tokens --filter @rangefoundry/statistics --filter @rangefoundry/ballistics --filter @rangefoundry/shot-groups --filter @rangefoundry/schema --filter @open-reloading/importers --filter @open-reloading/catalog --filter @rangefoundry/target-recognition --filter @rangefoundry/use-cases --filter @rangefoundry/api --filter @rangefoundry/docs --filter @rangefoundry/tools --filter @rangefoundry/test-kit'
+  '--filter @rangefoundry/units --filter @rangefoundry/locale-format --filter @rangefoundry/design-tokens --filter @rangefoundry/statistics --filter @rangefoundry/ballistics --filter @rangefoundry/shot-groups --filter @rangefoundry/schema --filter @rangefoundry/importers --filter @rangefoundry/catalog --filter @rangefoundry/target-recognition --filter @rangefoundry/use-cases --filter @rangefoundry/api --filter @rangefoundry/docs --filter @rangefoundry/tools --filter @rangefoundry/test-kit'
 /** The workspaces of the packages group that a change of units reaches. */
 const reachedByUnits =
-  '--filter @open-reloading/units --filter @rangefoundry/locale-format --filter @rangefoundry/ballistics --filter @rangefoundry/shot-groups --filter @rangefoundry/schema --filter @open-reloading/importers --filter @open-reloading/catalog --filter @rangefoundry/target-recognition --filter @rangefoundry/use-cases --filter @rangefoundry/api --filter @rangefoundry/docs --filter @rangefoundry/tools'
+  '--filter @rangefoundry/units --filter @rangefoundry/locale-format --filter @rangefoundry/ballistics --filter @rangefoundry/shot-groups --filter @rangefoundry/schema --filter @rangefoundry/importers --filter @rangefoundry/catalog --filter @rangefoundry/target-recognition --filter @rangefoundry/use-cases --filter @rangefoundry/api --filter @rangefoundry/docs --filter @rangefoundry/tools'
 
 it('tests every workspace of every group without a list of affected ones', () => {
   expect(testJobs()).toEqual([
-    { name: 'drawing', filter: '--filter @open-reloading/svg-drawings', e2eUnit: false },
+    { name: 'drawing', filter: '--filter @rangefoundry/svg-drawings', e2eUnit: false },
     { name: 'web', filter: '--filter @rangefoundry/web', e2eUnit: false },
     { name: 'packages', filter: packages, e2eUnit: true },
     { name: 'cli', filter: '--filter @rangefoundry/cli', e2eUnit: false },
@@ -215,7 +215,7 @@ it('tests the workspaces a change reaches and leaves out the groups it does not'
   expect(
     plan(['packages/svg-drawings/src/index.ts'], closure, ['svg-drawings', 'web', 'cli']).tests,
   ).toEqual([
-    { name: 'drawing', filter: '--filter @open-reloading/svg-drawings', e2eUnit: false },
+    { name: 'drawing', filter: '--filter @rangefoundry/svg-drawings', e2eUnit: false },
     { name: 'web', filter: '--filter @rangefoundry/web', e2eUnit: false },
     { name: 'cli', filter: '--filter @rangefoundry/cli', e2eUnit: false },
   ])
@@ -316,16 +316,16 @@ it('reads both scopes while the packages move to @rangefoundry', () => {
     mkdirSync(path.join(dir, 'apps/web/src/app', r, '[id]'), { recursive: true })
   put(
     'apps/web/src/app/bullets/[id]/page.tsx',
-    "import { a } from '@rangefoundry/units/convert'\nimport { b } from '@open-reloading/svg-drawings'\n",
+    "import { a } from '@rangefoundry/units/convert'\nimport { b } from '@rangefoundry/svg-drawings'\n",
   )
   put('packages/units/package.json', '{"name":"@rangefoundry/units"}')
-  put('packages/svg-drawings/package.json', '{"name":"@open-reloading/svg-drawings"}')
+  put('packages/svg-drawings/package.json', '{"name":"@rangefoundry/svg-drawings"}')
   put('tools/package.json', '{"name":"@rangefoundry/tools"}')
   mkdirSync(path.join(dir, 'tooling'))
   expect([...recordClosure(dir).packages].sort()).toEqual(['svg-drawings', 'units'])
   const names = workspaceNames(dir)
   expect(testJobs(['units', 'svg-drawings', 'tools'], names)).toEqual([
-    { name: 'drawing', filter: '--filter @open-reloading/svg-drawings', e2eUnit: false },
+    { name: 'drawing', filter: '--filter @rangefoundry/svg-drawings', e2eUnit: false },
     {
       name: 'packages',
       filter: '--filter @rangefoundry/units --filter @rangefoundry/tools',

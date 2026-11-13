@@ -10,7 +10,7 @@
           {
             "paths": [
               {
-                "name": "@open-reloading/catalog",
+                "name": "@rangefoundry/catalog",
                 "allowTypeImports": true,
                 "message": "use-cases-imports-catalog-types: packages/use-cases reads records through the Catalogue its caller passes, so it imports only types from catalog."
               }
@@ -20,8 +20,8 @@
                 "group": [
                   "@*/*",
                   "@*/*/**",
-                  "!@open-reloading/units",
-                  "!@open-reloading/units/**",
+                  "!@rangefoundry/units",
+                  "!@rangefoundry/units/**",
                   "!@rangefoundry/statistics",
                   "!@rangefoundry/statistics/**",
                   "!@rangefoundry/schema",
@@ -30,9 +30,9 @@
                   "!@rangefoundry/ballistics/**",
                   "!@rangefoundry/shot-groups",
                   "!@rangefoundry/shot-groups/**",
-                  "!@open-reloading/catalog",
-                  "!@open-reloading/importers",
-                  "!@open-reloading/importers/**"
+                  "!@rangefoundry/catalog",
+                  "!@rangefoundry/importers",
+                  "!@rangefoundry/importers/**"
                 ],
                 "message": "use-cases-imports-logic-only: packages/use-cases has no framework and no I/O: it imports units, statistics, schema, ballistics, shot-groups, catalog (types from its root), importers, zod and its own files."
               },

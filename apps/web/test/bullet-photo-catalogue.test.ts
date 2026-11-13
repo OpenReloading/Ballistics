@@ -5,7 +5,7 @@ import {
   bulletDimensions,
   bulletOutline,
   revolutionVolume,
-} from '@open-reloading/svg-drawings/bullet'
+} from '@rangefoundry/svg-drawings/bullet'
 import sharp from 'sharp'
 import { describe, it } from 'vitest'
 import { scaleOf } from '../src/lib/bullet-photo.ts'

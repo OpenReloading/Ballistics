@@ -1,5 +1,5 @@
 /** Load files of other programs read into user records, loaded by their format's `parse` only when such a file is read. */
-import { readCsrLoad, readGrtLoad } from '@open-reloading/importers'
+import { readCsrLoad, readGrtLoad } from '@rangefoundry/importers'
 import { type UserRecord, userRecord } from '@rangefoundry/schema'
 import { z } from 'zod'
 import { recordOf } from './candidates.ts'

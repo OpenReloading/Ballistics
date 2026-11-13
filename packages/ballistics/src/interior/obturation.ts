@@ -1,6 +1,6 @@
 /** A rule of thumb, not a model of the leak, and the run is not changed (`apps/docs/docs/models/interior-m3.md`, "Cast bullet hardness"). */
 
-import { conversions } from '@open-reloading/units'
+import { conversions } from '@rangefoundry/units'
 
 /** Pa per pound-force per square inch (NIST SP 811, 2008, appendix B.9). */
 const pascalPerPsi = conversions.psi.factor

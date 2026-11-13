@@ -1,11 +1,11 @@
 'use client'
 
+import type { TargetFace } from '@rangefoundry/schema'
 import {
   type FaceEllipse,
   type FaceShape,
   targetFaceFigure,
-} from '@open-reloading/svg-drawings/target'
-import type { TargetFace } from '@rangefoundry/schema'
+} from '@rangefoundry/svg-drawings/target'
 import { useTranslation } from '../i18n/language.ts'
 
 type Paint = {

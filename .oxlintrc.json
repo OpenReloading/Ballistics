@@ -499,16 +499,16 @@
                   "@open-reloading/*/**",
                   "@rangefoundry/*",
                   "@rangefoundry/*/**",
-                  "!@open-reloading/units",
-                  "!@open-reloading/units/**",
+                  "!@rangefoundry/units",
+                  "!@rangefoundry/units/**",
                   "!@rangefoundry/statistics",
                   "!@rangefoundry/statistics/**",
                   "!@rangefoundry/ballistics",
                   "!@rangefoundry/ballistics/**",
                   "!@rangefoundry/shot-groups",
                   "!@rangefoundry/shot-groups/**",
-                  "!@open-reloading/catalog",
-                  "!@open-reloading/catalog/**",
+                  "!@rangefoundry/catalog",
+                  "!@rangefoundry/catalog/**",
                   "!@rangefoundry/schema",
                   "!@rangefoundry/schema/**",
                   "!@rangefoundry/use-cases",
@@ -539,18 +539,18 @@
                   "@open-reloading/*/**",
                   "@rangefoundry/*",
                   "@rangefoundry/*/**",
-                  "!@open-reloading/units",
-                  "!@open-reloading/units/**",
+                  "!@rangefoundry/units",
+                  "!@rangefoundry/units/**",
                   "!@rangefoundry/statistics",
                   "!@rangefoundry/statistics/**",
                   "!@rangefoundry/ballistics",
                   "!@rangefoundry/ballistics/**",
                   "!@rangefoundry/shot-groups",
                   "!@rangefoundry/shot-groups/**",
-                  "!@open-reloading/catalog",
-                  "!@open-reloading/catalog/**",
-                  "!@open-reloading/svg-drawings",
-                  "!@open-reloading/svg-drawings/**",
+                  "!@rangefoundry/catalog",
+                  "!@rangefoundry/catalog/**",
+                  "!@rangefoundry/svg-drawings",
+                  "!@rangefoundry/svg-drawings/**",
                   "!@rangefoundry/schema",
                   "!@rangefoundry/schema/**",
                   "!@rangefoundry/use-cases",
@@ -579,9 +579,9 @@
             "patterns": [
               {
                 "group": [
-                  "@open-reloading/catalog",
-                  "@open-reloading/catalog/**",
-                  "!@open-reloading/catalog/plausibility",
+                  "@rangefoundry/catalog",
+                  "@rangefoundry/catalog/**",
+                  "!@rangefoundry/catalog/plausibility",
                   "@rangefoundry/api",
                   "@rangefoundry/api/**",
                   "!@rangefoundry/api/catalogue",
@@ -589,11 +589,11 @@
                   "fastify/**",
                   "@fastify/**"
                 ],
-                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/catalog only the plausibility checks and of @rangefoundry/api only the catalogue entry of the static site runs in the web app."
+                "message": "web-reads-api-only: apps/web reads records through the API. Of @rangefoundry/catalog only the plausibility checks and of @rangefoundry/api only the catalogue entry of the static site runs in the web app."
               },
               {
                 "regex": "^(\\.\\./)+packages/",
-                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/catalog only the plausibility checks and of @rangefoundry/api only the catalogue entry of the static site runs in the web app."
+                "message": "web-reads-api-only: apps/web reads records through the API. Of @rangefoundry/catalog only the plausibility checks and of @rangefoundry/api only the catalogue entry of the static site runs in the web app."
               },
               {
                 "regex": "^node:",
@@ -614,9 +614,9 @@
             "patterns": [
               {
                 "group": [
-                  "@open-reloading/catalog",
-                  "@open-reloading/catalog/**",
-                  "!@open-reloading/catalog/plausibility",
+                  "@rangefoundry/catalog",
+                  "@rangefoundry/catalog/**",
+                  "!@rangefoundry/catalog/plausibility",
                   "@rangefoundry/api",
                   "@rangefoundry/api/**",
                   "!@rangefoundry/api/catalogue",
@@ -624,11 +624,11 @@
                   "fastify/**",
                   "@fastify/**"
                 ],
-                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/catalog only the plausibility checks and of @rangefoundry/api only the catalogue entry of the static site runs in the web app."
+                "message": "web-reads-api-only: apps/web reads records through the API. Of @rangefoundry/catalog only the plausibility checks and of @rangefoundry/api only the catalogue entry of the static site runs in the web app."
               },
               {
                 "regex": "^(\\.\\./)+packages/",
-                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/catalog only the plausibility checks and of @rangefoundry/api only the catalogue entry of the static site runs in the web app."
+                "message": "web-reads-api-only: apps/web reads records through the API. Of @rangefoundry/catalog only the plausibility checks and of @rangefoundry/api only the catalogue entry of the static site runs in the web app."
               }
             ]
           }

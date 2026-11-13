@@ -35,12 +35,12 @@
   },
   "dependencies": {
     "@rangefoundry/statistics": "workspace:*",
-    "@open-reloading/units": "workspace:*"
+    "@rangefoundry/units": "workspace:*"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "catalog:",
     "@microsoft/api-extractor": "catalog:",
-    "@open-reloading/catalog": "workspace:*",
+    "@rangefoundry/catalog": "workspace:*",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "fast-check": "catalog:",

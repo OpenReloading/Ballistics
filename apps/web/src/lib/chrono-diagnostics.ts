@@ -1,5 +1,5 @@
 /** The warnings and refusals of the chronograph readers in words, loaded where they are shown. */
-import { type ChronoDiagnostic, type CommaRemedy, ReaderError } from '@open-reloading/importers'
+import { type ChronoDiagnostic, type CommaRemedy, ReaderError } from '@rangefoundry/importers'
 import { fixedNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { chronoOwnMessages, formats } from './chrono.ts'

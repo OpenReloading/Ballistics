@@ -1,4 +1,4 @@
-import type { Bundle } from '@open-reloading/catalog'
+import type { Bundle } from '@rangefoundry/catalog'
 import type { ComputeRunner } from '@rangefoundry/use-cases'
 import type { Catalogue } from '@rangefoundry/use-cases/catalog'
 import { buildCatalogue, openCatalogue } from '@rangefoundry/use-cases/catalog'

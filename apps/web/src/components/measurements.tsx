@@ -1,7 +1,7 @@
 'use client'
 
 import { Anchor, Button } from '@mantine/core'
-import type { VelocityUnit } from '@open-reloading/importers'
+import type { VelocityUnit } from '@rangefoundry/importers'
 import { chronoSession, type SessionRecord, toSi, userRecord } from '@rangefoundry/schema'
 import { type Dispatch, type ReactNode, type SetStateAction, useRef, useState } from 'react'
 import Link from '@/platform/link.tsx'

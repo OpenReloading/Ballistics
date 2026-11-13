@@ -1,4 +1,3 @@
-import { bulletDimensions } from '@open-reloading/svg-drawings/bullet'
 import {
   interior,
   interiorPressureRange,
@@ -8,6 +7,7 @@ import {
   trajectory,
 } from '@rangefoundry/ballistics'
 import { firearm, sheetId, userRecord } from '@rangefoundry/schema'
+import { bulletDimensions } from '@rangefoundry/svg-drawings/bullet'
 import { describe, expect, it } from 'vitest'
 import {
   exampleChamberVolume,

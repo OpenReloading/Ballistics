@@ -1,4 +1,4 @@
-import type { TableKind, TableReadDiagnostic } from '@open-reloading/importers'
+import type { TableKind, TableReadDiagnostic } from '@rangefoundry/importers'
 import { describe, expect, it } from 'vitest'
 import de from '../src/i18n/de.json'
 import { type Catalogue, english, translator } from '../src/i18n/translate.ts'

@@ -1,13 +1,13 @@
 import { readFileSync } from 'node:fs'
-import { face } from '@open-reloading/svg-drawings'
+import type { Bullet } from '@rangefoundry/schema'
+import { face } from '@rangefoundry/svg-drawings'
 import {
   type BulletProfile,
   bulletFigureModel,
   bulletScreenEm,
   bulletSymbols,
   recordProfile,
-} from '@open-reloading/svg-drawings/bullet'
-import type { Bullet } from '@rangefoundry/schema'
+} from '@rangefoundry/svg-drawings/bullet'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { bullet } from '../../../packages/schema/src/index.ts'

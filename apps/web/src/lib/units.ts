@@ -1,7 +1,7 @@
-import { conversions, waterDensityGramsPerCm3 } from '@open-reloading/units'
 import type { PresetId, Quantity, UnitSystem } from '@rangefoundry/locale-format'
 import * as locale from '@rangefoundry/locale-format'
 import { fromSi, toSi } from '@rangefoundry/schema'
+import { conversions, waterDensityGramsPerCm3 } from '@rangefoundry/units'
 import { parseNumber } from '../i18n/number.ts'
 import { shownLanguage } from '../i18n/shown.ts'
 import { type Message, msg } from '../i18n/translate.ts'
@@ -30,7 +30,7 @@ export const waterVolume = (grams: number) =>
 export const waterGrams = (m3: number) =>
   fromSi('mass', m3 * toSi('density', waterDensityGramsPerCm3))
 
-// the customary factors of `conversions` in `@open-reloading/units`, by the names the app uses
+// the customary factors of `conversions` in `@rangefoundry/units`, by the names the app uses
 export const metersPerInch = conversions.in.factor
 export const metersPerFoot = conversions.ft.factor
 export const metersPerYard = conversions.yd.factor

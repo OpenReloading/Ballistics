@@ -8,7 +8,7 @@ description: Weighted least-squares fit of the M3 burn coefficient, two-stage fo
 
 `fitPressureCurve` fits the burn coefficient, the form parameters $a$ and $z_1$ of a two-stage vivacity form and the pressure exponent $n$ of one [M3](interior-m3.md) load to a measured pressure-time trace. The trace's clock is not the model's, so the fit also finds the time shift between them. The fit works on log parameters with the Levenberg-Marquardt loop of the [least-squares page](least-squares.md). Each parameter is reported as `identified`, `weak` (fitted, but collinear with the others or imprecise) or `fixed` (held at its start value because the trace does not resolve it), with its uncertainty and variance inflation. The fitted values describe the powder lot, rifle and sensor of that one trace over the pressure range it covers. `fitPressureCurves` fits several traces of the same powder lot, rifle and sensor at different charges together, which resolves the exponent that one trace leaves held ([Several traces](#several-traces)). The results are simulation results, not powder data and not load data.
 
-`parsePressureHistory` in `@open-reloading/importers` reads the user's own trace file into times in s, pressures in bar (`pressureBar`) and the sensor position. The fit takes pressures in Pa, so the caller passes `pressureBar` times $10^5$ as `pressure`.
+`parsePressureHistory` in `@rangefoundry/importers` reads the user's own trace file into times in s, pressures in bar (`pressureBar`) and the sensor position. The fit takes pressures in Pa, so the caller passes `pressureBar` times $10^5$ as `pressure`.
 
 ## Equations
 

@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
 // the web app runs checkSpec in the browser through this subpath
-describe('@open-reloading/catalog/plausibility', () => {
+describe('@rangefoundry/catalog/plausibility', () => {
   it('imports types from @rangefoundry/schema only', () => {
     const source = readFileSync(new URL('../src/plausibility.ts', import.meta.url), 'utf8')
     const imports = [...source.matchAll(/^import\s+(type\s+)?[^;]*?from\s+'([^']+)'/gms)].map(

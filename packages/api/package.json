@@ -24,7 +24,7 @@
   "dependencies": {
     "@fastify/sensible": "^6.0.7",
     "@rangefoundry/ballistics": "workspace:*",
-    "@open-reloading/catalog": "workspace:*",
+    "@rangefoundry/catalog": "workspace:*",
     "@rangefoundry/schema": "workspace:*",
     "@rangefoundry/use-cases": "workspace:*",
     "@scalar/fastify-api-reference": "1.77.0",

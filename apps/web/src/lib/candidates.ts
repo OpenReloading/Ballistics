@@ -1,5 +1,5 @@
 /** The records the app makes of the importers' candidates; loaded only by the import worker and the load-file readers. */
-import { type Candidate, idOfKey } from '@open-reloading/importers'
+import { type Candidate, idOfKey } from '@rangefoundry/importers'
 import type { UserRecord } from '@rangefoundry/schema'
 
 /** The record of a candidate: its id from its key, saved at `saved`; the caller parses it with the user record schema. */

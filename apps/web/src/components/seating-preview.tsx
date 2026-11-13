@@ -1,9 +1,11 @@
 'use client'
 
 import { Anchor, NativeSelect } from '@mantine/core'
-import { fullSection, svgPath, toPartFrame } from '@open-reloading/svg-drawings'
-import { bulletDimensions } from '@open-reloading/svg-drawings/bullet'
-import { drawnTables } from '@open-reloading/svg-drawings/cartridge'
+import { cartridgeDiameters } from '@rangefoundry/ballistics'
+import { type Bullet, fromSi, toSi } from '@rangefoundry/schema'
+import { fullSection, svgPath, toPartFrame } from '@rangefoundry/svg-drawings'
+import { bulletDimensions } from '@rangefoundry/svg-drawings/bullet'
+import { drawnTables } from '@rangefoundry/svg-drawings/cartridge'
 import {
   bulletOutline,
   chamberOf,
@@ -15,9 +17,7 @@ import {
   type Seating,
   seat,
   type Tagged,
-} from '@open-reloading/svg-drawings/seating'
-import { cartridgeDiameters } from '@rangefoundry/ballistics'
-import { type Bullet, fromSi, toSi } from '@rangefoundry/schema'
+} from '@rangefoundry/svg-drawings/seating'
 import dynamic from 'next/dynamic'
 import {
   type Dispatch,
@@ -2292,7 +2292,7 @@ function PreviewBody({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Cham
   )
 }
 
-/** Case at CIP maximum, chamber at CIP minimum; seating depth, volume behind the bullet, travel and jump follow the slider and the field (`@open-reloading/svg-drawings/seating`). */
+/** Case at CIP maximum, chamber at CIP minimum; seating depth, volume behind the bullet, travel and jump follow the slider and the field (`@rangefoundry/svg-drawings/seating`). */
 export function SeatingPreview(props: PreviewProps) {
   const m = useSeatingModel(props)
   const { t } = useTranslation()

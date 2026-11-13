@@ -1,6 +1,6 @@
-import { face } from '@open-reloading/svg-drawings'
-import type { Seating } from '@open-reloading/svg-drawings/seating'
 import { toSi } from '@rangefoundry/schema'
+import { face } from '@rangefoundry/svg-drawings'
+import type { Seating } from '@rangefoundry/svg-drawings/seating'
 import { describe, expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import { drawable } from '../src/lib/cartridge-sheet.ts'

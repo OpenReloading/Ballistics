@@ -10,7 +10,7 @@ The catalogue (the records of `packages/catalog`) is read only, rebuilt from git
 
 ## Decision
 
-No server database for the catalogue. A typed index and a record file are built at build time and opened in process through one `Catalogue` interface (`@open-reloading/catalog`), used by the API server, the Pages build, the browser, the CLI and the tests. User data stays in the browser ([Record model](record-model.md)).
+No server database for the catalogue. A typed index and a record file are built at build time and opened in process through one `Catalogue` interface (`@rangefoundry/catalog`), used by the API server, the Pages build, the browser, the CLI and the tests. User data stays in the browser ([Record model](record-model.md)).
 
 Speed does not decide it (every option answers in under 3 ms at this size). These do:
 
@@ -39,7 +39,7 @@ The load tables of the makers are `records/loads/<cartridge id>/<maker>.json`, o
 
 - `derive.ts`: one index row per record, `{ item, sortKey, search }`. `item` is the list item the route answers (the cartridge's sheet minima and case head, a bullet's first G1 and G7 coefficient, a target's caliber classes), `sortKey` and `search` come from the schema package's `sortKey` and `searchKey`. Also the revision: a synchronous 53-bit hash of the record's JSON text, the same in Node and the browser, for change detection only.
 - `build.ts`: `buildCatalogue(records)` returns the typed index (`CatalogueIndex`, every list in its default order) and the record file (every record by id, one map per kind). Both start with the header `format` and `derive`, see below. Pure, so the build, the tests and a browser can all run it. The files hold the records as they are: `kind`, `origin` and `revision` are added when a record is read.
-- `open.ts`: `openCatalogue({ index, records })` returns the `Catalogue` interface, which `@open-reloading/catalog` defines (`src/catalogue.ts`) and this entry passes on: `cartridges`, `powders`, `primers`, `bullets` and `cases` (with `q`, `table`, `manufacturer`, `cartridge`, `limit`, `offset`), `manufacturers`, `targetFaces`, `federations`, `disciplines`, `targetMappings`, `caliberClasses`, `capacities` and `get(kind, id)`. The record file may be a function, read on the first `get`. A file whose header does not match is refused.
+- `open.ts`: `openCatalogue({ index, records })` returns the `Catalogue` interface, which `@rangefoundry/catalog` defines (`src/catalogue.ts`) and this entry passes on: `cartridges`, `powders`, `primers`, `bullets` and `cases` (with `q`, `table`, `manufacturer`, `cartridge`, `limit`, `offset`), `manufacturers`, `targetFaces`, `federations`, `disciplines`, `targetMappings`, `caliberClasses`, `capacities` and `get(kind, id)`. The record file may be a function, read on the first `get`. A file whose header does not match is refused.
 - `list.ts`: the one filter, rank and page step. A query ranks by `score` and keeps the default order between equal ranks.
 - `browser.ts`: the entry `@rangefoundry/api/catalogue`. It imports ballistics, catalog and schema only, no Node API (`test/compute-imports.test.ts`). `node.ts` reads and writes the two files (`index.json`, `records.json`), `write.ts` is the build step (`pnpm run build` writes them into `dist/catalogue/`, also exported as `@rangefoundry/api/catalogue/*.json`). The server opens them at start (`loadCatalogue`, no database, no wait) and answers a record as stored, without the added `kind`, `origin` and `revision`; the API image gets the files from the same build.
 

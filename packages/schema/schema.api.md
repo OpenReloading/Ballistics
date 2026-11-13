@@ -4,13 +4,13 @@
 
 ```ts
 
-import { conversions } from '@open-reloading/units';
+import { conversions } from '@rangefoundry/units';
 import type { Diagnostic } from '@rangefoundry/statistics';
-import { QuantityKind } from '@open-reloading/units';
-import { SiMap } from '@open-reloading/units';
-import { siMaps } from '@open-reloading/units';
-import { StoredUnits } from '@open-reloading/units';
-import { units } from '@open-reloading/units';
+import { QuantityKind } from '@rangefoundry/units';
+import { SiMap } from '@rangefoundry/units';
+import { siMaps } from '@rangefoundry/units';
+import { StoredUnits } from '@rangefoundry/units';
+import { units } from '@rangefoundry/units';
 import { z } from 'zod';
 
 // @public

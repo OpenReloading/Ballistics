@@ -79,7 +79,7 @@ function checkSealed({ split, final }: Options) {
 
 /** The records folder of the catalog package, which `readRecords` reads without roots. */
 const packageRecords = () =>
-  fileURLToPath(new URL('../records', import.meta.resolve('@open-reloading/catalog')))
+  fileURLToPath(new URL('../records', import.meta.resolve('@rangefoundry/catalog')))
 
 /** Whether `path` is a folder of published load files: cartridge folders and no `.csv` file. */
 function isPublishedFolder(path: string) {

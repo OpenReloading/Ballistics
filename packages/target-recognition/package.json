@@ -41,7 +41,7 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "catalog:",
     "@microsoft/api-extractor": "catalog:",
-    "@open-reloading/catalog": "workspace:*",
+    "@rangefoundry/catalog": "workspace:*",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "oxlint": "catalog:",

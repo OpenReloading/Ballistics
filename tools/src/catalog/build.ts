@@ -7,6 +7,6 @@ if (errors.length > 0) {
   for (const error of errors) console.error(error)
   process.exit(1)
 }
-// the catalog package ships the bundle as `@open-reloading/catalog/bundle.json`
+// the catalog package ships the bundle as `@rangefoundry/catalog/bundle.json`
 const dist = join(import.meta.dirname, '..', '..', '..', 'packages', 'catalog', 'dist')
 writeFileSync(join(dist, 'bundle.json'), `${JSON.stringify(bundle)}\n`)

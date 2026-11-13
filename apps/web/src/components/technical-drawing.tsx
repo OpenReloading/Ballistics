@@ -1,3 +1,4 @@
+import { fromSi, toSi } from '@rangefoundry/schema'
 import {
   type Arc,
   type Arrowhead,
@@ -8,10 +9,9 @@ import {
   type LineSegment,
   type PartPoint,
   svgPath,
-} from '@open-reloading/svg-drawings'
-import type { BulletModel } from '@open-reloading/svg-drawings/bullet'
-import type { FigureModel, Side } from '@open-reloading/svg-drawings/cartridge'
-import { fromSi, toSi } from '@rangefoundry/schema'
+} from '@rangefoundry/svg-drawings'
+import type { BulletModel } from '@rangefoundry/svg-drawings/bullet'
+import type { FigureModel, Side } from '@rangefoundry/svg-drawings/cartridge'
 import type { CSSProperties, ReactNode } from 'react'
 import { drawingFont } from '@/platform/fonts/drawing.ts'
 import { Decimal } from './decimal.tsx'

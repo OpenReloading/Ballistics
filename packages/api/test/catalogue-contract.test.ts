@@ -1,7 +1,7 @@
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import type { Bundle } from '@open-reloading/catalog'
+import type { Bundle } from '@rangefoundry/catalog'
 import { buildCatalogue, openCatalogue } from '@rangefoundry/use-cases/catalog'
 import { afterAll } from 'vitest'
 import { catalogueListContract, catalogueRecordContract } from '../../catalog/test/contract.ts'

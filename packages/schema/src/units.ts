@@ -3,7 +3,7 @@ import {
   toSi as brandedToSi,
   type QuantityKind,
   units,
-} from '@open-reloading/units'
+} from '@rangefoundry/units'
 import { z } from 'zod'
 import type { Exact } from './exact.ts'
 
@@ -14,9 +14,9 @@ export {
   type StoredUnits,
   siMaps,
   units,
-} from '@open-reloading/units'
+} from '@rangefoundry/units'
 
-// unbranded, as before the table moved: the branded forms are those of @open-reloading/units
+// unbranded, as before the table moved: the branded forms are those of @rangefoundry/units
 /** A value of quantity `kind` in its stored unit, in SI. */
 export const toSi: (kind: QuantityKind, stored: number) => number = brandedToSi
 

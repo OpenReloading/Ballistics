@@ -1,7 +1,7 @@
 /** Ring scoring on a rule-book target face and the fit of a face to ring marks on a sheet (`apps/docs/docs/models/ring-scoring.md`); shots and holes in target m from the face center, as the sheet stores them, face records in mm; a refusal is a `RingFitIssue` or a `GroupIssue`. */
 
-import { fromSi, toSi } from '@open-reloading/units'
 import { type Diagnostic, nth } from '@rangefoundry/statistics'
+import { fromSi, toSi } from '@rangefoundry/units'
 import { type Point, solveLinear } from './geometry.ts'
 import type { RingFitIssue } from './issue.ts'
 

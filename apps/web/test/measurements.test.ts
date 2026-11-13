@@ -1,4 +1,4 @@
-import type { ChronoImport } from '@open-reloading/importers'
+import type { ChronoImport } from '@rangefoundry/importers'
 import { chronoSession, userRecord } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import type { Shot } from '../src/lib/chrono.ts'

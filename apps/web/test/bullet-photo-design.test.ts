@@ -1,5 +1,5 @@
-import type { BulletDimensions } from '@open-reloading/svg-drawings/bullet'
 import { applyOverrides, type Bullet, bullet, userBullet } from '@rangefoundry/schema'
+import type { BulletDimensions } from '@rangefoundry/svg-drawings/bullet'
 import { describe, expect, it } from 'vitest'
 import { designerSpecs, evaluate, fileData, fromUser } from '../src/lib/bullet-designer.ts'
 import { grayOf, scaleOf, segment } from '../src/lib/bullet-photo.ts'
