@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.0.8](https://github.com/OpenReloading/Ballistics/compare/docs-v0.0.7...docs-v0.0.8) (2026-11-13)
+
+
+### Features
+
+* **cli:** --exponent family and --energy prior combine in one fit ([#1190](https://github.com/OpenReloading/Ballistics/issues/1190)) ([e13a3f7](https://github.com/OpenReloading/Ballistics/commit/e13a3f7ac71eb85247f9c70929add2f872243a33))
+* **cli:** a pressure factor per table or cartridge, and --pressure-sigma with --exponent family ([#1216](https://github.com/OpenReloading/Ballistics/issues/1216)) ([e337188](https://github.com/OpenReloading/Ballistics/commit/e33718800ff279406f0ceb90abcb4aa636185ff4))
+* **cli:** per-row errors and a paired bootstrap change in compare ([#1189](https://github.com/OpenReloading/Ballistics/issues/1189)) ([34a3627](https://github.com/OpenReloading/Ballistics/commit/34a3627a738afcb027e28ccf8b3fb529f356c22f))
+* **cli:** the split rule takes a salt, which seals a new test split ([#1185](https://github.com/OpenReloading/Ballistics/issues/1185)) ([17cd87f](https://github.com/OpenReloading/Ballistics/commit/17cd87f80053d7ba821bd8978cd4702772b23f60))
+* **schema:** optional provenance for basic bullet and powder records ([#1223](https://github.com/OpenReloading/Ballistics/issues/1223)) ([226f018](https://github.com/OpenReloading/Ballistics/commit/226f0187c7e5b14741edae96204b444cc15b3936))
+
+
+### Documentation
+
+* **cli:** the stop reasons at the iteration limit and the run time of the combined fit ([#1207](https://github.com/OpenReloading/Ballistics/issues/1207)) ([138f599](https://github.com/OpenReloading/Ballistics/commit/138f599a96b8eb9bfb4f369ed4485e0a135383bc))
+* type-checked and executed library examples ([#1211](https://github.com/OpenReloading/Ballistics/issues/1211)) ([2d5cb29](https://github.com/OpenReloading/Ballistics/commit/2d5cb29694c328b685c4c0f732aeb930bd1bfe23))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @rangefoundry/api bumped to 0.0.8
+  * devDependencies
+    * @rangefoundry/cli bumped to 0.0.4
+    * @rangefoundry/catalog bumped to 0.0.8
+    * @rangefoundry/svg-drawings bumped to 0.0.7
+    * @rangefoundry/importers bumped to 0.0.8
+    * @rangefoundry/schema bumped to 0.0.8
+    * @rangefoundry/web bumped to 0.0.8
+
 ## [0.0.7](https://github.com/OpenReloading/Ballistics/compare/docs-v0.0.6...docs-v0.0.7) (2026-11-12)
 
 
