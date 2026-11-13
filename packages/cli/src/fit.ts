@@ -55,21 +55,36 @@ const exponentGrid = [7, 8, 9, 10, 11, 12, 13].map((k) => k / 10)
 /** Weight of the pooled term in a family's choice, in powders; fixed before any result on real rows. */
 const shrinkage = 5
 
-/** The pressure rows of a fit: the sigma, a fraction of the observed pressure, and the factor per basis (1 where absent). */
-interface PressureRun {
-  sigma: number
-  factors: Readonly<Record<string, number>>
-}
-
 /** The basis a row's printed pressure is grouped by, as the metrics group it. */
 export const basisOf = (row: Row) => row.pressureBasis ?? 'unstated'
 
-/** The factor of a row's printed pressure, undefined without a pressure or without a factor of its basis. */
+/** What `--pressure-factor` computes one pressure factor per and applies it by. */
+export const pressureKeys = ['basis', 'table', 'cartridge', 'table-cartridge'] as const
+
+export type PressureKey = (typeof pressureKeys)[number]
+
+/** The key of a row under each {@link pressureKeys} value, `unstated` for a missing basis or table. */
+const keyOf: Record<PressureKey, (row: Row) => string> = {
+  basis: basisOf,
+  table: (row) => row.table ?? 'unstated',
+  cartridge: (row) => row.cartridge,
+  'table-cartridge': (row) => `${row.table ?? 'unstated'}/${row.cartridge}`,
+}
+
+/** The pressure rows of a fit: the sigma, a fraction of the observed pressure, the key the factors are by, and the factor per key (1 where absent). */
+interface PressureRun {
+  sigma: number
+  by: PressureKey
+  factors: Readonly<Record<string, number>>
+}
+
+/** The factor of a row's printed pressure, undefined without a pressure or without a factor of its key. */
 function factorOf(pressure: PressureRun | undefined, row: Row) {
-  const basis = basisOf(row)
-  // own keys only: a basis named like an Object.prototype member has no factor
-  if (!pressure || row.pressure === undefined || !Object.hasOwn(pressure.factors, basis)) return
-  return pressure.factors[basis]
+  if (!pressure || row.pressure === undefined) return
+  const key = keyOf[pressure.by](row)
+  // own keys only: a key named like an Object.prototype member has no factor
+  if (!Object.hasOwn(pressure.factors, key)) return
+  return pressure.factors[key]
 }
 
 // a fit with large residuals needs one rejected step per factor of 10 to raise the damping before it ends, so fits that had their minimum by 19 ended not-converged at the default 30
@@ -78,7 +93,7 @@ const maxIterations = 100
 /** The model a fit runs and the sigmas of its rows. */
 type FitRun = { model: InteriorModel; velocitySigma: number; pressure?: PressureRun | undefined }
 
-/** The sessions of one powder's used training rows, one per load without its charge; with `pressure`, a printed pressure over its basis factor is a point's peak pressure. */
+/** The sessions of one powder's used training rows, one per load without its charge; with `pressure`, a printed pressure over the factor of its key is a point's peak pressure. */
 function sessionsOf(
   powder: string,
   rows: readonly Row[],
@@ -192,13 +207,13 @@ function fitOne(
 /** A used training row with the peak pressure (Pa) the model predicts for it at the record values. */
 type Used = { row: Row; pressure: number }
 
-/** Each powder of `ids` fitted to its rows of `used`, at its record exponent or, with `n`, at `n` from the start value that belongs to `n`. */
+/** Each powder of `ids` fitted to its rows of `used`, at its record exponent or, with `exponentOf`, at its exponent `n` from the start value that belongs to `n`, which its fitted value then carries. */
 function fitEach(
   ids: readonly string[],
   used: readonly Used[],
   records: Records,
   run: FitRun,
-  n?: number,
+  exponentOf?: (id: string) => number,
 ) {
   return new Map(
     ids.map((id): [string, Fitted | NotFitted] => {
@@ -207,8 +222,9 @@ function fitEach(
       // `ids` holds only powders with interior parameters
       const interior = records.powders.get(id)?.interior as NonNullable<Powder['interior']>
       const record = interior.vivacity.value
-      if (n === undefined || rows.length === 0)
+      if (exponentOf === undefined || rows.length === 0)
         return [id, fitOne(id, { record, start: record }, rows, records, run)]
+      const n = exponentOf(id)
       const pressures = own.map((u) => u.pressure)
       const typical = (percentile(pressures, 0.5) as number) / 2
       const reference = toSi('pressure', interior.referencePressure.value)
@@ -218,7 +234,8 @@ function fitEach(
         powders: { [id]: { vivacity: { value: start }, pressureExponent: n } },
         notFitted: {},
       })
-      return [id, fitOne(id, { record, start }, rows, at, run)]
+      const fit = fitOne(id, { record, start }, rows, at, run)
+      return [id, typeof fit === 'string' ? fit : { ...fit, pressureExponent: n }]
     }),
   )
 }
@@ -234,7 +251,7 @@ const best = (objective: readonly number[], pooled = 0) =>
     0,
   ).k
 
-/** Each powder fitted at the grid exponent its family chooses, and the choice: per family the least sum of its powders' chi squares plus `shrinkage` times the mean over all powders, over the powders fitted at every grid value. */
+/** Each powder fitted at the grid exponent its family chooses, the choice (per family the least sum of its powders' chi squares plus `shrinkage` times the mean over all powders, over the powders fitted at every grid value) and the chosen exponent of a powder of `ids`. */
 function familyExponents(
   ids: readonly string[],
   records: Records,
@@ -258,17 +275,16 @@ function familyExponents(
       return [name, { k: best(objective, pooled), powders: members.length }]
     }),
   )
+  // every family of `ids` has a choice
+  const k = (id: string) => chosen.get(family(id))?.k as number
   return {
     fits: new Map(
-      ids.map((id): [string, Fitted | NotFitted] => {
-        const k = chosen.get(family(id))?.k as number
-        const fit = nth(fits, k).get(id) as Fitted | NotFitted
-        return [
-          id,
-          typeof fit === 'string' ? fit : { ...fit, pressureExponent: nth(exponentGrid, k) },
-        ]
-      }),
+      ids.map((id): [string, Fitted | NotFitted] => [
+        id,
+        nth(fits, k(id)).get(id) as Fitted | NotFitted,
+      ]),
     ),
+    exponentOf: (id: string) => nth(exponentGrid, k(id)),
     summary: {
       grid: exponentGrid,
       shrinkage,
@@ -297,28 +313,30 @@ function fittedAndNot(fits: ReturnType<typeof fitEach>) {
   return { powders, notFitted }
 }
 
-/** Per basis of the `used` rows that print a pressure, of the powders `fit` holds, the exponential of the median log of printed over model peak pressure under that fit, and their number, bases sorted. */
-function basisFactors(
+/** Per key `by` of the `used` rows that print a pressure, of the powders `fit` holds, the exponential of the median log of printed over model peak pressure under that fit, and their number, keys sorted. */
+function pressureFactors(
   used: readonly Used[],
   records: Records,
   model: InteriorModel,
   fit: ReturnType<typeof fittedAndNot>,
+  by: PressureKey,
 ) {
   const fitted = withFit(records, fit)
-  const bases = new Map<string, number[]>()
+  const keys = new Map<string, number[]>()
   for (const { row: r } of used) {
     if (r.pressure === undefined || !Object.hasOwn(fit.powders, r.powder)) continue
     const p = predict(r, fitted, model)
     if (!('pressure' in p)) continue
     const log = Math.log(toSi('pressure', r.pressure) / p.pressure)
-    bases.set(basisOf(r), [...(bases.get(basisOf(r)) ?? []), log])
+    const key = keyOf[by](r)
+    keys.set(key, [...(keys.get(key) ?? []), log])
   }
-  // the median: a misprinted row or a powder with a minority of the basis's rows does not move the factor of the others
+  // the median: a misprinted row or a powder with a minority of the key's rows does not move the factor of the others
   return Object.fromEntries(
-    [...bases]
+    [...keys]
       .toSorted(([a], [b]) => compareKeys(a, b))
-      .map(([basis, list]) => [
-        basis,
+      .map(([key, list]) => [
+        key,
         { factor: Math.exp(percentile(list, 0.5) as number), rows: list.length },
       ]),
   )
@@ -335,8 +353,12 @@ interface PowdersFit {
     pooled: number
     families: Record<string, { exponent: number; powders: number }>
   }
-  /** With `pressureSigma`: the sigma and per basis its factor and rows. */
-  pressure?: { sigma: number; factors: Record<string, { factor: number; rows: number }> }
+  /** With `pressureSigma`: the sigma, the key of `pressureFactor` and per key its factor and rows. */
+  pressure?: {
+    sigma: number
+    by: PressureKey
+    factors: Record<string, { factor: number; rows: number }>
+  }
   /** With `energy` `prior`: the chosen energy-level factor, the grid, the objective per factor, the rows of the objective and the kinds of prior taken. */
   energy?: {
     factor: number
@@ -353,10 +375,11 @@ interface PowdersFit {
 interface PowdersFitOptions {
   exponent?: 'family' | undefined
   pressureSigma?: number | undefined
+  pressureFactor?: PressureKey | undefined
   energy?: 'prior' | undefined
 }
 
-/** The burn coefficient of each powder with interior parameters the rows name, fitted under `model` to its training rows that model can run, velocities corrected to the muzzle; `velocitySigma` is a fraction of the velocity; `exponent` `family` fits each at the pressure exponent its family chooses; with `pressureSigma`, a fraction of the pressure, the printed pressures over the factor of their basis join a second fit; `energy` `prior` takes each powder's energy from its prior impetus. */
+/** The burn coefficient of each powder with interior parameters the rows name, fitted under `model` to its training rows that model can run, velocities corrected to the muzzle; `velocitySigma` is a fraction of the velocity; `exponent` `family` fits each at the pressure exponent its family chooses; with `pressureSigma`, a fraction of the pressure, the printed pressures over the factor of their key of `pressureFactor` (default the basis) join a second fit; `energy` `prior` takes each powder's energy from its prior impetus. */
 export function fitPowders(
   rows: readonly Row[],
   records: Records,
@@ -383,22 +406,26 @@ function fitAtRecordEnergy(
   const ids = [...new Set(rows.map((r) => r.powder))]
     .toSorted(compareKeys)
     .filter((id) => records.powders.get(id)?.interior)
-  const fitAt = (n?: number) => fitEach(ids, used, records, { model, velocitySigma }, n)
-  if (options.exponent === 'family') {
-    const family = familyExponents(ids, records, fitAt)
-    return { ...fittedAndNot(family.fits), exponent: family.summary }
-  }
-  const velocities = fittedAndNot(fitAt())
+  const run = { model, velocitySigma }
+  // the family choice reads velocities only, so pressure rows move burn coefficients, not exponents
+  const family =
+    options.exponent === 'family'
+      ? familyExponents(ids, records, (n) => fitEach(ids, used, records, run, () => n))
+      : undefined
+  const velocities = fittedAndNot(family?.fits ?? fitEach(ids, used, records, run))
+  const exponent = family && { exponent: family.summary }
   const { pressureSigma } = options
-  if (pressureSigma === undefined) return velocities
-  // the factor is what the basis has in common against the model fitted to velocities (the measuring method, the source, what the model lacks), so the pressure rows move a powder's burn coefficient only by its own deviation from the median of its basis; fitted together with the pressures, the burn coefficients would take part of that common offset
-  const factors = basisFactors(used, records, model, velocities)
+  if (pressureSigma === undefined) return { ...velocities, ...exponent }
+  const by = options.pressureFactor ?? 'basis'
+  // the factor is what the key has in common against the model fitted to velocities (the measuring method, the source, what the model lacks), so the pressure rows move a powder's burn coefficient only by its own deviation from the median of its key; fitted together with the pressures, the burn coefficients would take part of that common offset
+  const factors = pressureFactors(used, records, model, velocities, by)
   const pressure = {
     sigma: pressureSigma,
-    factors: Object.fromEntries(Object.entries(factors).map(([b, f]) => [b, f.factor])),
+    by,
+    factors: Object.fromEntries(Object.entries(factors).map(([k, f]) => [k, f.factor])),
   }
-  const fit = fittedAndNot(fitEach(ids, used, records, { model, velocitySigma, pressure }))
-  return { ...fit, pressure: { sigma: pressureSigma, factors } }
+  const fit = fittedAndNot(fitEach(ids, used, records, { ...run, pressure }, family?.exponentOf))
+  return { ...fit, ...exponent, pressure: { sigma: pressureSigma, by, factors } }
 }
 
 /** The prior impetus of a powder of `records`, J/kg, and its kind; a `UsageError` without a powder with a thermochemistry. */
