@@ -1,6 +1,7 @@
 /** One search for the picker, its dialog, the card's field and Ctrl+K; the catalogue is read once per page load. */
-import { bulletFits, type CartridgeDiameters } from '@open-reloading/ballistics'
+
 import { compareKeys, fold, sortKey } from '@open-reloading/schema'
+import { bulletFits, type CartridgeDiameters } from '@rangefoundry/ballistics'
 import { apiFetch } from './api-fetch.ts'
 import type { BulletSummary, ListOf, ManufacturerSummary } from './api-types.ts'
 import {

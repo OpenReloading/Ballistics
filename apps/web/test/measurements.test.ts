@@ -110,7 +110,7 @@ describe('simulatedCurve', () => {
 
 describe('sessionOf', () => {
   const data: ChronoImport = {
-    format: 'openreloading-csv',
+    format: 'rangefoundry-csv',
     session: {
       date: '2026-10-12',
       device: { kind: 'doppler-radar', manufacturerName: 'Manufacturer', model: 'Radar' },

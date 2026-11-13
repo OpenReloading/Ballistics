@@ -1,5 +1,5 @@
 import { gzipSync } from 'node:zlib'
-import { buildCatalogue } from '@open-reloading/use-cases/catalog'
+import { buildCatalogue } from '@rangefoundry/use-cases/catalog'
 import { describe, expect, it } from 'vitest'
 import { loadBundle } from '../src/bundle.ts'
 

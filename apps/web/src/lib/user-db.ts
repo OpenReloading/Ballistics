@@ -12,7 +12,7 @@ type Store = 'records' | 'handles' | 'files'
 /** The database version. A database at a later one holds data of a pre-release version: refused, never read. */
 const version = 1
 
-const databaseName = storageName('openreloading-user-data')
+const databaseName = storageName('rangefoundry-user-data')
 
 /** Fired on the global scope when the database is refused: it holds data of a pre-release version. */
 export const refusedEvent = 'user-db-refused'

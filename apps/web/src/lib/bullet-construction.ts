@@ -1,5 +1,5 @@
-import { type DensityClass, structureOf } from '@open-reloading/ballistics'
 import type { Bullet } from '@open-reloading/schema'
+import { type DensityClass, structureOf } from '@rangefoundry/ballistics'
 import { type Message, msg } from '../i18n/translate.ts'
 
 /** g/cm³: the median of the class's records with a published length, with its 90th percentile length error (`apps/docs/docs/models/case-capacity.md`, "Bullet without a length"). */

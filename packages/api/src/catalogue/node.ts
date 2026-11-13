@@ -5,7 +5,7 @@ import {
   type Catalogue,
   type CatalogueSource,
   openCatalogue,
-} from '@open-reloading/use-cases/catalog'
+} from '@rangefoundry/use-cases/catalog'
 import { loadBundle } from '../bundle.ts'
 
 /** The files the build writes: the index and the record file. */

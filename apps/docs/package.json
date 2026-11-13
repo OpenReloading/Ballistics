@@ -16,7 +16,7 @@
     "@docusaurus/theme-common": "3.10.2",
     "@docusaurus/tsconfig": "3.10.2",
     "@docusaurus/types": "3.10.2",
-    "@open-reloading/ballistics": "workspace:*",
+    "@rangefoundry/ballistics": "workspace:*",
     "@open-reloading/cli": "workspace:*",
     "@open-reloading/catalog": "workspace:*",
     "@open-reloading/svg-drawings": "workspace:*",

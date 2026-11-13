@@ -603,7 +603,7 @@ One entry of `magazine` of an event type: per `division` (and `powerFactor`, whe
 ### User data files
 
 **User data file**:
-A JSON file of the web app with `format` (`openreloading-user-data`), `version` (a file of another version is refused), `records` and the photos of its target sheets in `files`.
+A JSON file of the web app with `format` (`rangefoundry-user-data`), `version` (a file of another version is refused), `records` and the photos of its target sheets in `files`.
 
 **User record**:
 One entry of `records`: `kind` (`bullet`, `cartridge`, `load`, `firearm`, `targetSheet`, `targetFaceDesign`, `powder`), `id`, `name`, `saved` (ISO date and time of the save) and the `data` of that kind.

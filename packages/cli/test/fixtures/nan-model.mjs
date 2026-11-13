@@ -1,4 +1,4 @@
-import { interior as core } from '@open-reloading/ballistics'
+import { interior as core } from '@rangefoundry/ballistics'
 
 /** The core model with a muzzle velocity that is not a number for charges above 2.3 g. */
 export function interior(load, options) {

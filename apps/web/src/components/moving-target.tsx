@@ -1,6 +1,6 @@
 'use client'
 
-import type { TrajectoryPoint } from '@open-reloading/ballistics'
+import type { TrajectoryPoint } from '@rangefoundry/ballistics'
 import { useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'

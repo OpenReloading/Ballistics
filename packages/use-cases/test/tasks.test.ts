@@ -1,4 +1,4 @@
-import { TruingError } from '@open-reloading/ballistics'
+import { TruingError } from '@rangefoundry/ballistics'
 import { InputError } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
 import { errorAnswer, replyTo, reviveError, serializeError, type Task } from '../src/index.ts'

@@ -17787,7 +17787,7 @@
                 "properties": {
                   "format": {
                     "type": "string",
-                    "const": "openreloading-user-data",
+                    "const": "rangefoundry-user-data",
                     "description": "Format of the file."
                   },
                   "version": {
@@ -25509,7 +25509,7 @@
                 "description": "A load file saved by the workbench."
               },
               "example": {
-                "format": "openreloading-user-data",
+                "format": "rangefoundry-user-data",
                 "version": 1,
                 "records": [
                   {

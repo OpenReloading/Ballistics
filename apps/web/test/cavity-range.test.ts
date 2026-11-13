@@ -1,4 +1,4 @@
-import { interiorBody } from '@open-reloading/use-cases'
+import { interiorBody } from '@rangefoundry/use-cases'
 import { describe, expect, it } from 'vitest'
 import { cavityVolumeFraction } from '../src/lib/cavity-range.ts'
 import { exampleInterior } from '../src/lib/example-data.ts'

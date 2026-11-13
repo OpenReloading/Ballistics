@@ -10,7 +10,7 @@ import {
   simulateQuery,
   stabilityQuery,
   stabilityResponse,
-} from '@open-reloading/use-cases'
+} from '@rangefoundry/use-cases'
 import type { FastifyError, FastifyPluginAsync } from 'fastify'
 import { computeErrorHandler } from '../compute/error-handler.ts'
 import { API_PREFIX } from '../version.ts'

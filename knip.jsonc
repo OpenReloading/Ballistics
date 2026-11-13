@@ -91,7 +91,7 @@
         "@open-reloading/schema",
         // files these name in `Code:` lines and the research log, or that the docs tests import by path, so the CI
         // plan tests the docs when they change
-        "@open-reloading/ballistics",
+        "@rangefoundry/ballistics",
         "@open-reloading/cli",
         "@open-reloading/tools",
         "@open-reloading/web"
