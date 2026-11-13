@@ -952,6 +952,12 @@ export function loadWaterCapacity(records: {
 } | undefined;
 
 // @public
+export const makerSourceFields: {
+    readonly bullet: readonly string[];
+    readonly powder: readonly string[];
+};
+
+// @public
 export interface Manufacturer extends z.infer<typeof manufacturer> {
 }
 

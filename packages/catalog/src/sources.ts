@@ -1,16 +1,25 @@
 import { type SourceRecord, sourceReference } from '@rangefoundry/schema'
 import { isObject } from './json-object.ts'
 
-/** The source records by id, the ids records cite, and the files that embed each other source. */
+/**
+ * The source records by id, the ids records cite, the files that embed each other source, and by
+ * file the source record id of each provenance source, undefined for an embedded one.
+ */
 export type SourceIndex = {
   byId: Map<string, SourceRecord>
   cited: Set<string>
   embedded: Map<string, Set<string>>
+  citations: Map<string, (string | undefined)[]>
 }
 
 /** An index of `records` with nothing cited yet. */
 export function sourceIndex(records: SourceRecord[]): SourceIndex {
-  return { byId: new Map(records.map((s) => [s.id, s])), cited: new Set(), embedded: new Map() }
+  return {
+    byId: new Map(records.map((s) => [s.id, s])),
+    cited: new Set(),
+    embedded: new Map(),
+    citations: new Map(),
+  }
 }
 
 /** The file being read, where its errors go, and the source records. */
@@ -79,6 +88,12 @@ export function resolveRecord(
   const out = { ...json }
   const provenance = json['provenance']
   if (isObject(provenance) && Array.isArray(provenance['sources'])) {
+    index.citations.set(
+      file,
+      provenance['sources'].map((s) =>
+        isObject(s) && typeof s['source'] === 'string' ? s['source'] : undefined,
+      ),
+    )
     out['provenance'] = {
       ...provenance,
       sources: provenance['sources'].map((s, i) =>
