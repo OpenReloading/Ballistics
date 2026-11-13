@@ -227,6 +227,16 @@ $$
 
 Code: `packages/statistics/src/student-t.ts`, `studentTwoSidedQuantile` (`centralMass`).
 
+Below a level of 0.5 the bisection compares this central mass with $1 - \alpha$. From 0.5 up it compares the tail with $\alpha$, which is exact there, because near a level of 1 the difference $1 - P(\lvert T \rvert \lt t)$ loses its digits. The tail is the regularized incomplete beta function, from its continued fraction by the modified Lentz method where that converges fast ($x \lt (\nu/2 + 1)/(\nu/2 + 5/2)$); above, the tail is at least 0.08 and comes from $1 - P(\lvert T \rvert \lt t)$ without a loss of digits:
+
+$$
+P(\lvert T \rvert \gt t) = I_x\left(\frac{\nu}{2}, \frac{1}{2}\right), \qquad x = \frac{\nu}{\nu + t^2}
+$$
+
+Code: `packages/statistics/src/student-t.ts`, `studentTwoSidedQuantile` (`tailMass`).
+
+Every level a double holds in (0, 1) is accepted: for whole $\nu$ from 1 to 1,000 and levels from $10^{-40}$ to $1 - 2^{-53}$ the quantile stays within a relative $10^{-12}$ of reference values. Below $10^{-40}$ the 200 bisection steps from 2 cannot go below about $6 \cdot 10^{-61}$, so the quantile can be too large (level $10^{-100}$ at $\nu = 1$ returns $6 \cdot 10^{-61}$ instead of $1.6 \cdot 10^{-100}$).
+
 The intervals of the [range string fit](exterior-truing-strings.md) use it.
 
 ### Vertical position and velocity
@@ -291,6 +301,7 @@ The intervals use $\nu = \sum_j (n_j - 1)$ per axis and $2\sum_j (n_j - 1)$ for 
 | $\chi^2_{q,\nu}$              | Quantile of the chi-square distribution at probability $q$                       | 1           | 1              |
 | $P$, $Q$                      | Regularized lower and upper incomplete gamma functions                           | 1           | 1              |
 | $t$, $\theta$                 | Student's t quantile and its angle $\arctan(t/\sqrt{\nu})$                       | 1, no kind  | 1, rad         |
+| $I_x(a, b)$                   | Regularized incomplete beta function                                             | 1           | 1              |
 | $r$, $b$                      | Correlation of height with velocity, slope of height on velocity                 | 1, no kind  | 1, m per m/s   |
 | $L$, $D$                      | Length in the target plane, distance from the muzzle to the target               | mm          | m              |
 | $\alpha$                      | Angle subtended at the muzzle                                                    | deg         | rad            |
@@ -319,6 +330,6 @@ The intervals use $\nu = \sum_j (n_j - 1)$ per axis and $2\sum_j (n_j - 1)$ for 
 - [Carlson 2021](../bibliography.md#carlson-2021): CEP of a circular normal spread, sections 1.4.2.1 and 1.4.2.2, pp. 4 to 7, and the CEP of a bivariate normal as a disc integral found by iteration, section 1.4.2.3, p. 7.
 - [Hoover 1984](../bibliography.md#hoover-1984): coverage of the covariance ellipse, section 2.5, p. 7.
 - [NIST/SEMATECH](../bibliography.md#nist-sematech): 1.3.5.6 (measures of scale), 1.3.5.8 (chi-square interval for the variance), 1.3.6.6.5 (F distribution), 1.3.6.6.6 (chi-square distribution), 4.4.3.1 (least-squares slope), 6.5.4.1 and 6.5.4.2 (mean vector, covariance, correlation), 6.5.4.3.3 and 6.5.4.3.4 (limit for a further observation, the prediction ellipse), 6.5.5.1 (principal components).
-- [DLMF](../bibliography.md#dlmf): 8.2.4 and 8.2.6 (incomplete gamma functions), 8.7.1 (series), 8.9.2 (continued fraction), 8.17.1 and 8.17.2 (incomplete beta function).
+- [DLMF](../bibliography.md#dlmf): 8.2.4 and 8.2.6 (incomplete gamma functions), 8.7.1 (series), 8.9.2 (continued fraction), 8.17.1 and 8.17.2 (incomplete beta function), 8.17.4 (symmetry), 8.17.22 and 8.17.23 (continued fraction, and where it converges fast).
 - [Lentz 1976](../bibliography.md#lentz-1976): the Lentz method for evaluating a continued fraction, which the code uses in its modified form with a floor on the terms.
 - [Abramowitz 1964](../bibliography.md#abramowitz-1964): 26.7.3 and 26.7.4 (Student's t distribution for whole degrees of freedom), page numbers unverified.

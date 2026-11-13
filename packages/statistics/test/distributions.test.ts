@@ -151,4 +151,48 @@ describe('Student t two-sided quantile', () => {
     expect(() => studentTwoSidedQuantile(1, 3)).toThrow(InputError)
     expect(() => studentTwoSidedQuantile(0.9, 0)).toThrow(InputError)
   })
+
+  it('keeps its digits for levels within 1e-15 of 1', () => {
+    // mpmath 1.4.1 at 50 digits, t = sqrt(df (1 - x) / x) where I_x(df/2, 1/2) = 1 - level; SciPy 1.18.1 t.isf((1 - level) / 2, df) agrees to 3e-16
+    const table: [level: number, df: number, t: number][] = [
+      [1 - 1e-6, 1, 636619.7723487513],
+      [1 - 1e-6, 2, 999.9992499854659],
+      [1 - 1e-6, 3, 130.1545895571102],
+      [1 - 1e-6, 10, 10.516489956882173],
+      [1 - 1e-6, 30, 6.119075620373899],
+      [1 - 1e-6, 1000, 4.922289523423825],
+      [1 - 1e-9, 1, 636619790.3724186],
+      [1 - 1e-9, 2, 31622.77702514332],
+      [1 - 1e-9, 3, 1301.637179562648],
+      [1 - 1e-9, 10, 21.622044216833572],
+      [1 - 1e-9, 30, 8.721511235701241],
+      [1 - 1e-9, 1000, 6.168430252449106],
+      [1 - 1e-12, 1, 636633855803.5593],
+      [1 - 1e-12, 2, 1000011.0610428281],
+      [1 - 1e-12, 3, 13016.476782874553],
+      [1 - 1e-12, 10, 43.457001115662806],
+      [1 - 1e-12, 30, 11.722018886810611],
+      [1 - 1e-12, 1000, 7.223957750518744],
+      [1 - 1e-15, 1, 637129015469184.25],
+      [1 - 1e-15, 2, 31635421.874750495],
+      [1 - 1e-15, 3, 130198.5064176715],
+      [1 - 1e-15, 10, 86.87227609687449],
+      [1 - 1e-15, 30, 15.319947332312712],
+      [1 - 1e-15, 1000, 8.160102707885518],
+    ]
+    for (const [level, df, t] of table)
+      expect(studentTwoSidedQuantile(level, df)).toEqual(near(t, { relative: 1e-12 }))
+  })
+})
+
+describe('Student t two-sided quantile at the lowest stated level', () => {
+  it('keeps its digits at 1e-40', () => {
+    // closed forms: df 1 t = tan(pi level / 2), df 2 t = level sqrt(2 / (1 - level^2))
+    expect(studentTwoSidedQuantile(1e-40, 1)).toEqual(
+      near(1.5707963267948964e-40, { relative: 1e-12 }),
+    )
+    expect(studentTwoSidedQuantile(1e-40, 2)).toEqual(
+      near(1.4142135623730951e-40, { relative: 1e-12 }),
+    )
+  })
 })
