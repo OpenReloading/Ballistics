@@ -19,9 +19,10 @@ import {
 } from '@mantine/core'
 import { useDisclosure, useHotkeys, useMediaQuery } from '@mantine/hooks'
 import dynamic from 'next/dynamic'
-import Image from 'next/image'
 import { useContext, useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { docsAddress, noDocs, repositoryAddress } from '@/platform/edition.ts'
+import Image from '@/platform/image.tsx'
 import Link from '@/platform/link.tsx'
 import dark from '../assets/ballistics-dark.svg'
 import light from '../assets/ballistics-light.svg'
@@ -51,9 +52,9 @@ const SiteSearch = dynamic(() => import('./site-search.tsx').then((m) => m.SiteS
 
 const name = 'RangeFoundry Workbench'
 
-// inlined at build; no link without it
-const repository = repositoryUrl(process.env.NEXT_PUBLIC_REPOSITORY_URL)
-const docs = docsUrl(process.env.NEXT_PUBLIC_DOCS_URL, undefined, process.env.NEXT_PUBLIC_NO_DOCS)
+// no link without it
+const repository = repositoryUrl(repositoryAddress)
+const docs = docsUrl(docsAddress, undefined, noDocs)
 
 type Section = (typeof sections)[number]
 

@@ -15,6 +15,7 @@ import {
   useRef,
   useState,
 } from 'react'
+import { buildTag } from '@/platform/edition.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber, localizeNumber, plainNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
@@ -396,7 +397,7 @@ function Report(props: ReportProps) {
       <h1>{loadTitle}</h1>
       <p className="report-sub">
         {t('Printed {date}', { date: localDay(new Date()) })}
-        <span className="report-build"> · {process.env.NEXT_PUBLIC_BUILD_TAG}</span>.
+        <span className="report-build"> · {buildTag}</span>.
         {stale && ` ${t('Inputs changed since this result.')}`}
         {fromDesign && ` ${fromDesign}`}
         {approximate && ` ${approximate}`}

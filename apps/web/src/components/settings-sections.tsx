@@ -14,6 +14,7 @@ import {
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import type { ReactNode } from 'react'
+import { buildLine } from '@/platform/edition.ts'
 import { chooseLanguage, type Language, languages, useTranslation } from '../i18n/language.ts'
 import { useInstall } from './install-button.tsx'
 import { ManufacturersForm } from './manufacturers-settings.tsx'
@@ -162,7 +163,7 @@ export function SettingsSections({
             <ManufacturersForm />
           </Section>
           <Section id="settings-version" title={t('Version')}>
-            <Text size="sm">{process.env.NEXT_PUBLIC_BUILD_LINE}</Text>
+            <Text size="sm">{buildLine}</Text>
           </Section>
         </Stack>
       </Tabs.Panel>
