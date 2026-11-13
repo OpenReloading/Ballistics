@@ -66,6 +66,9 @@ function uncoveredFields(record: Sourced): string[] {
  * Checks that every data field is supported by a source and that every `fields` entry names a
  * field of the record.
  */
-export function checkCoverage(record: { provenance: Provenance }): string[] {
-  return [...missingFields(record), ...uncoveredFields(record)]
+export function checkCoverage(record: { provenance?: Provenance | undefined }): string[] {
+  // fails closed: no basic record enters the catalog before the field-class gate
+  if (!record.provenance) return ['needs provenance']
+  const sourced = { ...record, provenance: record.provenance }
+  return [...missingFields(sourced), ...uncoveredFields(sourced)]
 }

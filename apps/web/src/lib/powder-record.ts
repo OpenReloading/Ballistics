@@ -126,10 +126,10 @@ interface FitTable {
 
 /** The fitted sources of a record with their training rows. */
 export function fitTables(p: Powder): FitTable[] {
-  return p.provenance.sources
+  return (p.provenance?.sources ?? [])
     .filter(
       (s) =>
-        (s.kind ?? p.provenance.kind) === 'fitted' && (!s.fields || s.fields.includes('interior')),
+        (s.kind ?? p.provenance?.kind) === 'fitted' && (!s.fields || s.fields.includes('interior')),
     )
     .map((s, _, all) => {
       const rows = /^(\d+) training rows/.exec(s.note ?? '')?.[1]

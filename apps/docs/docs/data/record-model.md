@@ -115,7 +115,7 @@ A table names a bullet by maker, type and mass, often without a product number, 
 
 ## Powder
 
-A powder needs no name-only marker: only `id`, `manufacturer`, `name` and `provenance` are required, so a powder with only a name is a valid record.
+A powder needs no name-only marker: only `id`, `manufacturer` and `name` are required, so a powder with only a name is a valid record. `provenance` is required unless the record holds basic fields only (`powderBasicFields`).
 
 A user powder (`userPowder` in `packages/schema/src/user-data.ts`) is the powder designer's record: `origin: 'user'`, an optional `provenanceKind` (burn-law parameters need `fitted`), an optional `draft` (`powderDraft` in `packages/schema/src/overrides.ts`: the powder fields entered so far in stored units, each optional, without the powder record's bounds) and an optional `fit`. The record's `name` is the powder's name. The designer builds a `Powder` from the draft and checks it against `powder`.
 
