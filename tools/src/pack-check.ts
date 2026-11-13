@@ -144,7 +144,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const privates = privateWorkspaces(root)
   for (const name of published) {
     const problems = packProblems(join(root, 'packages', name), privates)
-    for (const problem of problems) console.error(`@open-reloading/${name}: ${problem}`)
+    for (const problem of problems) console.error(`@rangefoundry/${name}: ${problem}`)
     failed ||= problems.length > 0
   }
   if (failed) process.exit(1)
