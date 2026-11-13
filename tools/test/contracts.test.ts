@@ -29,9 +29,7 @@ function exportedNames(file: URL, seen = new Set<string>()): string[] {
   for (const [, ns] of text.matchAll(/^export \* as (\w+) from/gm)) names.push(ns as string)
   for (const [, from] of text.matchAll(/^export \* from '(\.[^']+)\.ts'/gm))
     names.push(...exportedNames(new URL(`${from}.d.ts`, file), seen))
-  for (const [, pkg] of text.matchAll(
-    /^export \* from '@rangefoundry\/([\w-]+)'/gm,
-  ))
+  for (const [, pkg] of text.matchAll(/^export \* from '@rangefoundry\/([\w-]+)'/gm))
     for (const [path, entry] of entries(pkg as string))
       if (path === '.') names.push(...exportedNames(entry, seen))
   return names
