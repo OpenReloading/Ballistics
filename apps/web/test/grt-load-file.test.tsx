@@ -142,7 +142,7 @@ describe('GRT load files', () => {
     ])
   })
 
-  it('an OpenReloading file carries the records its load names to an Open as well', async () => {
+  it('a RangeFoundry file carries the records its load names to an Open as well', async () => {
     const bullet: UserRecord = {
       kind: 'bullet',
       id: '00000000-0000-4000-8000-000000000001',

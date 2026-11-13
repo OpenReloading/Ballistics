@@ -27,7 +27,7 @@ import { HomepageLink } from './homepage-link.tsx'
 import { EmptyList } from './states.tsx'
 
 /** Disciplines and federations are rule-book records only: the catalogue is the lists' one source. */
-const ruleBookSources: readonly Origin[] = ['openreloading']
+const ruleBookSources: readonly Origin[] = ['rangefoundry']
 
 /** The discipline directory: name, number, federation, distance, category, caliber classes, faces. */
 export function DisciplineList({
@@ -115,7 +115,7 @@ export function DisciplineList({
       set={set}
       placeholder={t('Name, number, federation or caliber, 2.53…')}
       columns={columns}
-      counts={{ openreloading: items.length, user: 0 }}
+      counts={{ rangefoundry: items.length, user: 0 }}
       sources={ruleBookSources}
       filters={
         <FacetFilters
@@ -220,7 +220,7 @@ export function FederationList({ items }: { items: FederationRow[] }) {
       set={set}
       placeholder={t('Name, abbreviation or country, DSB…')}
       columns={columns}
-      counts={{ openreloading: items.length, user: 0 }}
+      counts={{ rangefoundry: items.length, user: 0 }}
       sources={ruleBookSources}
       filters={
         <FacetFilters

@@ -159,7 +159,7 @@ describe('compare', () => {
 
   it('leaves a relative specifier without a file out of the candidate version', async () => {
     const path = writeRows(
-      "// was: export { interior } from './gone.mjs'\nexport { interior } from '@open-reloading/ballistics'\n",
+      "// was: export { interior } from './gone.mjs'\nexport { interior } from '@rangefoundry/ballistics'\n",
       'candidate.mjs',
     )
     const { files } = await loadModel(path)
@@ -171,9 +171,9 @@ describe('compare', () => {
   it('hashes the files a candidate module imports', async () => {
     const path = writeRows("export { interior } from './helper.mjs'\n", 'candidate.mjs')
     const helper = path.replace('candidate.mjs', 'helper.mjs')
-    writeFileSync(helper, "export { interior } from '@open-reloading/ballistics'\n")
+    writeFileSync(helper, "export { interior } from '@rangefoundry/ballistics'\n")
     const a = await verify(options, path)
-    writeFileSync(helper, "export { interior } from '@open-reloading/ballistics'\n// changed\n")
+    writeFileSync(helper, "export { interior } from '@rangefoundry/ballistics'\n// changed\n")
     expect((await verify(options, path)).modelVersion).not.toBe(a.modelVersion)
   })
 

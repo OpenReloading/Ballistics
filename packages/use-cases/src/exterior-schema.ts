@@ -1,4 +1,4 @@
-import { type DragModel, dragModels } from '@open-reloading/ballistics'
+import { type DragModel, dragModels } from '@rangefoundry/ballistics'
 import { z } from 'zod'
 import type { Exact } from './exact.ts'
 import { caps, fitIterations, recordId, steps } from './schemas.ts'

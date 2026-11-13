@@ -6,7 +6,7 @@ import {
   type TrajectoryInput,
   trajectory,
   zeroAngles,
-} from '@open-reloading/ballistics'
+} from '@rangefoundry/ballistics'
 import { pointDispersion } from '@rangefoundry/shot-groups'
 import { normalsFrom, seededUniforms } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'

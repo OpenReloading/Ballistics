@@ -7,8 +7,8 @@ import {
   operation,
   operations,
   RecordNotFound,
-} from '@open-reloading/use-cases'
-import { buildCatalogue, type Catalogue, openCatalogue } from '@open-reloading/use-cases/catalog'
+} from '@rangefoundry/use-cases'
+import { buildCatalogue, type Catalogue, openCatalogue } from '@rangefoundry/use-cases/catalog'
 import { z } from 'zod'
 import { Refusal, UsageError } from './errors.ts'
 import { readBundle } from './records.ts'

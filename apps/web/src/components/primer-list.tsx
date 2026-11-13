@@ -14,7 +14,7 @@ import { type DirectoryColumn, DirectoryTable, useListState } from './directory-
 import { EmptyList } from './states.tsx'
 
 /** No user record holds a primer: the catalogue is the list's one source, so the filter filters nothing. */
-const primerSources: readonly Origin[] = ['openreloading']
+const primerSources: readonly Origin[] = ['rangefoundry']
 
 /** The primer directory: manufacturer, name, product number, size, magnum flag and priming compound. */
 export function PrimerList({ rows }: { rows: PrimerRow[] }) {
@@ -81,7 +81,7 @@ export function PrimerList({ rows }: { rows: PrimerRow[] }) {
       set={set}
       placeholder={t('Manufacturer, name or size…')}
       columns={columns}
-      counts={{ openreloading: rows.length, user: 0 }}
+      counts={{ rangefoundry: rows.length, user: 0 }}
       sources={primerSources}
       table={
         <DirectoryTable

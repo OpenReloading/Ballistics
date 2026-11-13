@@ -34,7 +34,7 @@ Saving an entry with a firearm that has a round count asks once whether to add t
 The firearm and year filters are kept in the address; From and To narrow the entries to a day range. Print, Export CSV and Export JSON take the entries the filters show.
 
 - **Print** gives one line per entry with a blank Signature column for the club's confirmation, the firearm and period the filters name, and the number of entries and rounds. It leaves out the notes and writes the confirmation's name and day in one column.
-- **Export CSV** writes `openreloading-shooting-log-<day>.csv`, UTF-8 with a byte order mark, one row per entry in the order of the dates:
+- **Export CSV** writes `rangefoundry-shooting-log-<day>.csv`, UTF-8 with a byte order mark, one row per entry in the order of the dates:
 
 | Column               | Content                                                                        |
 | -------------------- | ------------------------------------------------------------------------------ |
@@ -51,7 +51,7 @@ The firearm and year filters are kept in the address; From and To narrow the ent
 
 A text a spreadsheet would read as a formula starts with an apostrophe.
 
-- **Export JSON** writes `openreloading-shooting-log-<day>.json`, a user data file with the entries. **Import JSON** reads it back: new entries are added, equal ones left, and entries that differ from the browser's are replaced after one question. An entry whose id another record of the browser holds is not imported, and the report counts it. The firearms and loads the entries name are not in the file; in another browser their names show as not in this browser.
+- **Export JSON** writes `rangefoundry-shooting-log-<day>.json`, a user data file with the entries. **Import JSON** reads it back: new entries are added, equal ones left, and entries that differ from the browser's are replaced after one question. An entry whose id another record of the browser holds is not imported, and the report counts it. The firearms and loads the entries name are not in the file; in another browser their names show as not in this browser.
 
 ## Yearly summary
 
@@ -62,7 +62,7 @@ Under the entries, **Yearly summary** adds up the entries of one calendar year: 
 - **Range days per month**: the entries of each month.
 - **Competitions**: the [competition events](competition-events.md) dated in the year, each once, with its day, name, total (and how it ended when it was not completed) and the number of the year's entries that link it. **Summary year** also offers a year with events but no entries.
 
-**Print summary** prints the summary alone. **Export summary CSV** writes `openreloading-shooting-log-<year>-summary.csv` (UTF-8 with a byte order mark) with the same numbers as the screen and the print: a row `Year`, then a header and one row per total.
+**Print summary** prints the summary alone. **Export summary CSV** writes `rangefoundry-shooting-log-<year>-summary.csv` (UTF-8 with a byte order mark) with the same numbers as the screen and the print: a row `Year`, then a header and one row per total.
 
 | Column    | Content                                                                                                                                                                                                            |
 | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |

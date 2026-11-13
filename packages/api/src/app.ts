@@ -1,6 +1,6 @@
 import sensible from '@fastify/sensible'
-import type { ComputeRunner } from '@open-reloading/use-cases'
-import type { Catalogue } from '@open-reloading/use-cases/catalog'
+import type { ComputeRunner } from '@rangefoundry/use-cases'
+import type { Catalogue } from '@rangefoundry/use-cases/catalog'
 import apiReference from '@scalar/fastify-api-reference'
 import Fastify, {
   type FastifyError,

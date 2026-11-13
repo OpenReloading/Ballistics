@@ -5,9 +5,9 @@ export const editionName = (edition: string, name: string) =>
   edition ? `${edition}:${name}` : name
 
 /** The prefix of the shell caches of `edition`. */
-export const shellPrefix = (edition = '') => editionName(edition, 'openreloading-shell-')
+export const shellPrefix = (edition = '') => editionName(edition, 'rangefoundry-shell-')
 /** Records fetched through `/api/`: JSON that stays valid across builds, so no build in the name. */
-export const recordsCache = (edition = '') => editionName(edition, 'openreloading-records')
+export const recordsCache = (edition = '') => editionName(edition, 'rangefoundry-records')
 export const offlinePage = '/offline'
 
 /** Every page route but the record pages, which stay network-first. */

@@ -4,8 +4,8 @@ import {
   interiorExample,
   loadFileExample,
   trajectoryExample,
-} from '@open-reloading/use-cases'
-import { buildCatalogue, openCatalogue, sha256 } from '@open-reloading/use-cases/catalog'
+} from '@rangefoundry/use-cases'
+import { buildCatalogue, openCatalogue, sha256 } from '@rangefoundry/use-cases/catalog'
 import { describe, expect, it } from 'vitest'
 import { API_PREFIX, API_VERSION } from '../src/version.ts'
 import { bundle } from './fixtures.ts'

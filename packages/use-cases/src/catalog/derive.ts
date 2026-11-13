@@ -1,4 +1,3 @@
-import { leastSpecValue } from '@open-reloading/ballistics'
 import {
   type Bullet,
   bulletListFields,
@@ -18,6 +17,7 @@ import {
   type TargetFace,
   type TargetMapping,
 } from '@open-reloading/schema'
+import { leastSpecValue } from '@rangefoundry/ballistics'
 import type {
   BulletItem,
   CaliberClassItem,

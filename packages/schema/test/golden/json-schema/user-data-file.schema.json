@@ -4,7 +4,7 @@
   "properties": {
     "format": {
       "type": "string",
-      "const": "openreloading-user-data",
+      "const": "rangefoundry-user-data",
       "description": "Format of the file."
     },
     "version": {

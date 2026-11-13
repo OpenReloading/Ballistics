@@ -48,7 +48,7 @@ export type ChronoDiagnostic = ReaderDiagnostic<'sha256Malformed' | 'outsideRang
 export type ChronoFormat = TextChronoFormat | WorkbookChronoFormat;
 
 // @public
-export type ChronoFormatId = 'openreloading-json' | 'shotview-csv' | 'shotview-xlsx' | 'openreloading-csv' | 'delimited';
+export type ChronoFormatId = 'rangefoundry-json' | 'shotview-csv' | 'shotview-xlsx' | 'rangefoundry-csv' | 'delimited';
 
 // @public
 export const chronoFormats: readonly ChronoFormat[];
@@ -166,7 +166,7 @@ export function idOfKey(key: string): string;
 export type Inflate = (data: Uint8Array<ArrayBuffer>, size: number) => Promise<Uint8Array<ArrayBuffer>>;
 
 // @public
-export function isOpenReloadingJson(text: string): boolean;
+export function isRangeFoundryJson(text: string): boolean;
 
 // @public
 export function isWorkbook(bytes: Uint8Array): boolean;
@@ -215,13 +215,13 @@ export interface ParseChronoOptions extends ChronoParserOptions, Partial<Omit<De
 export function parseDelimited(text: string, options: DelimitedOptions): ChronoImport;
 
 // @public
-export function parseOpenReloadingCsv(text: string, options?: TemplateOptions): ChronoImport;
-
-// @public
-export function parseOpenReloadingJson(text: string, options?: ChronoParserOptions): ChronoImport;
-
-// @public
 export function parsePressureHistory(text: string, options: PressureHistoryOptions): PressureHistoryImport;
+
+// @public
+export function parseRangeFoundryCsv(text: string, options?: TemplateOptions): ChronoImport;
+
+// @public
+export function parseRangeFoundryJson(text: string, options?: ChronoParserOptions): ChronoImport;
 
 // @public
 export function parseShotView(text: string, options?: ChronoParserOptions): ChronoImport;
@@ -355,10 +355,10 @@ export interface SessionCandidate {
 }
 
 // @public
-export const sessionJsonFormat = "openreloading-session";
+export const sessionJsonFormat = "rangefoundry-session";
 
 // @public
-export function stringifyOpenReloadingJson(data: ChronoImport): string;
+export function stringifyRangeFoundryJson(data: ChronoImport): string;
 
 // @public
 export function suggestKind(table: Table): KindSuggestion;

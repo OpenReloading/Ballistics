@@ -1,4 +1,4 @@
-import type { TrajectoryPoint } from '@open-reloading/ballistics'
+import type { TrajectoryPoint } from '@rangefoundry/ballistics'
 import { describe, expect, it } from 'vitest'
 import { movingTargetRows } from '../src/lib/moving-target.ts'
 

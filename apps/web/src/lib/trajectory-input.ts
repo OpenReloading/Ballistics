@@ -9,7 +9,7 @@ import {
   type TrajectoryInput,
   type TrajectoryPoint,
   trajectory,
-} from '@open-reloading/ballistics'
+} from '@rangefoundry/ballistics'
 import { msg } from '../i18n/translate.ts'
 import type { FieldSpec } from './field-spec.ts'
 import { nth } from './nth.ts'

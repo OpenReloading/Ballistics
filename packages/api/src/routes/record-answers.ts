@@ -1,4 +1,4 @@
-import type { Catalogued, CatalogueKind } from '@open-reloading/use-cases/catalog'
+import type { Catalogued, CatalogueKind } from '@rangefoundry/use-cases/catalog'
 import type { FastifyReply } from 'fastify'
 
 /** A record as the routes answer it: the stored record without the `kind`, `origin` and `revision` that `Catalogue.get` adds. */

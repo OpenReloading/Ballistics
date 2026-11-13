@@ -1,7 +1,7 @@
-import { lbPerSqInToKgPerSqM, millerStability } from '@open-reloading/ballistics'
 import type { Bullet } from '@open-reloading/schema'
 import { bulletDimensions } from '@open-reloading/svg-drawings/bullet'
 import { bulletOutline } from '@open-reloading/svg-drawings/seating'
+import { lbPerSqInToKgPerSqM, millerStability } from '@rangefoundry/ballistics'
 import { expect, it } from 'vitest'
 import {
   bandCount,

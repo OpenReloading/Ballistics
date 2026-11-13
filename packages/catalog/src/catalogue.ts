@@ -88,7 +88,7 @@ export interface PowderQuery extends Paging {
   manufacturer?: string | undefined
 }
 
-/** Query of `Catalogue.bullets`: as {@link PowderQuery}, `cartridge` keeps the bullets that fit that cartridge (`bulletWindow` of `@open-reloading/ballistics`). */
+/** Query of `Catalogue.bullets`: as {@link PowderQuery}, `cartridge` keeps the bullets that fit that cartridge (`bulletWindow` of `@rangefoundry/ballistics`). */
 export interface BulletQuery extends PowderQuery {
   cartridge?: string | undefined
 }

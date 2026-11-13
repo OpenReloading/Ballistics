@@ -63,7 +63,7 @@ test('an own case group is a Mine row of the Cases list, opened in its editor, p
   await page.getByRole('button', { name: /^Source: / }).click()
   await page
     .getByRole('dialog', { name: /^Source: / })
-    .getByRole('checkbox', { name: /^OpenReloading/ })
+    .getByRole('checkbox', { name: /^RangeFoundry/ })
     .uncheck()
   await expect(page).toHaveURL(/[?&]src=user/)
   await expect(count).toHaveText(`2 of ${all}`)

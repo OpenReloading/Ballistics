@@ -160,7 +160,7 @@ export function sourceColumn<T extends { id: string; origin?: 'user' | undefined
     key: 'source',
     label: msg('Source'),
     help: msg(
-      'Mine: designs saved in this browser. Rows without a mark are the OpenReloading catalog.',
+      'Mine: designs saved in this browser. Rows without a mark are the RangeFoundry catalog.',
     ),
     width: '6.5rem',
     value: (r) => originOf(r),
@@ -174,7 +174,7 @@ export function sourceColumn<T extends { id: string; origin?: 'user' | undefined
         </Group>
       ) : (
         <span className="visually-hidden">
-          <OriginName origin="openreloading" />
+          <OriginName origin="rangefoundry" />
         </span>
       ),
   }

@@ -1,5 +1,5 @@
-import type { Projectile } from '@open-reloading/ballistics'
 import type { SessionRecord, ShotGroup } from '@open-reloading/schema'
+import type { Projectile } from '@rangefoundry/ballistics'
 import { describe, expect, it } from 'vitest'
 import { linkString, stringChoices } from '../src/lib/chrono-link.ts'
 import { ladderImpact } from '../src/lib/ladder-impact.ts'

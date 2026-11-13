@@ -1,5 +1,5 @@
 /** The fields of API responses the pages read (`packages/api/src/catalogue/`, `packages/use-cases/src/`, `packages/api/src/routes/`). */
-import type { InteriorResult } from '@open-reloading/ballistics'
+
 import type {
   Cartridge,
   CaseMaterial,
@@ -10,6 +10,7 @@ import type {
   PrimerSize,
   Provenance,
 } from '@open-reloading/schema'
+import type { InteriorResult } from '@rangefoundry/ballistics'
 
 export interface CartridgeSummary {
   id: string

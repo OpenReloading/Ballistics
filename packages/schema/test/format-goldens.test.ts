@@ -261,9 +261,9 @@ const photo = {
 }
 
 const cases = {
-  'v1-empty': { format: 'openreloading-user-data', version: 1, records: [] },
+  'v1-empty': { format: 'rangefoundry-user-data', version: 1, records: [] },
   'v1-every-kind': {
-    format: 'openreloading-user-data',
+    format: 'rangefoundry-user-data',
     version: 1,
     records: everyKind,
     files: [photo],
@@ -333,7 +333,7 @@ describe('share link goldens', () => {
     const read = readUserDataFile(golden('user-data', name, 'json'))
     if (!read.ok) throw new Error(JSON.stringify(read.diagnostic))
     const text = JSON.stringify({
-      format: 'openreloading-user-data',
+      format: 'rangefoundry-user-data',
       version: 1,
       records: read.records,
     })
