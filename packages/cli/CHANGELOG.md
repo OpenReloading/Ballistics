@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.0.4](https://github.com/OpenReloading/Ballistics/compare/cli-v0.0.3...cli-v0.0.4) (2026-11-13)
+
+
+### Features
+
+* **cli:** --exponent family and --energy prior combine in one fit ([#1190](https://github.com/OpenReloading/Ballistics/issues/1190)) ([e13a3f7](https://github.com/OpenReloading/Ballistics/commit/e13a3f7ac71eb85247f9c70929add2f872243a33))
+* **cli:** a pressure factor per table or cartridge, and --pressure-sigma with --exponent family ([#1216](https://github.com/OpenReloading/Ballistics/issues/1216)) ([e337188](https://github.com/OpenReloading/Ballistics/commit/e33718800ff279406f0ceb90abcb4aa636185ff4))
+* **cli:** per-row errors and a paired bootstrap change in compare ([#1189](https://github.com/OpenReloading/Ballistics/issues/1189)) ([34a3627](https://github.com/OpenReloading/Ballistics/commit/34a3627a738afcb027e28ccf8b3fb529f356c22f))
+* **cli:** the split rule takes a salt, which seals a new test split ([#1185](https://github.com/OpenReloading/Ballistics/issues/1185)) ([17cd87f](https://github.com/OpenReloading/Ballistics/commit/17cd87f80053d7ba821bd8978cd4702772b23f60))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @rangefoundry/api bumped to 0.0.8
+    * @rangefoundry/catalog bumped to 0.0.8
+    * @rangefoundry/svg-drawings bumped to 0.0.7
+    * @rangefoundry/schema bumped to 0.0.8
+
 ## [0.0.3](https://github.com/OpenReloading/Ballistics/compare/cli-v0.0.2...cli-v0.0.3) (2026-11-12)
 
 

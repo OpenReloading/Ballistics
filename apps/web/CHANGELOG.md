@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.0.8](https://github.com/OpenReloading/Ballistics/compare/web-v0.0.7...web-v0.0.8) (2026-11-13)
+
+
+### Features
+
+* **importers:** typed codes for table and kind-guess refusals ([#1198](https://github.com/OpenReloading/Ballistics/issues/1198)) ([66b4730](https://github.com/OpenReloading/Ballistics/commit/66b4730f9bfddb9f3db8351f01b3243ff4818ccd))
+* **schema:** optional provenance for basic bullet and powder records ([#1223](https://github.com/OpenReloading/Ballistics/issues/1223)) ([226f018](https://github.com/OpenReloading/Ballistics/commit/226f0187c7e5b14741edae96204b444cc15b3936))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @rangefoundry/api bumped to 0.0.8
+    * @rangefoundry/catalog bumped to 0.0.8
+    * @rangefoundry/svg-drawings bumped to 0.0.7
+    * @rangefoundry/importers bumped to 0.0.8
+    * @rangefoundry/schema bumped to 0.0.8
+
 ## [0.0.7](https://github.com/OpenReloading/Ballistics/compare/web-v0.0.6...web-v0.0.7) (2026-11-12)
 
 

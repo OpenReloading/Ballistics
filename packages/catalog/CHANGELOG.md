@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.0.8](https://github.com/OpenReloading/Ballistics/compare/catalog-v0.0.7...catalog-v0.0.8) (2026-11-13)
+
+
+### Features
+
+* **schema:** optional provenance for basic bullet and powder records ([#1223](https://github.com/OpenReloading/Ballistics/issues/1223)) ([226f018](https://github.com/OpenReloading/Ballistics/commit/226f0187c7e5b14741edae96204b444cc15b3936))
+
+
+### Documentation
+
+* rename the brand text to RangeFoundry ([#1202](https://github.com/OpenReloading/Ballistics/issues/1202)) ([6e8ddfe](https://github.com/OpenReloading/Ballistics/commit/6e8ddfe757ff262dcacfc8f1d57b68382cfca7a9))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @rangefoundry/schema bumped to 0.0.8
+
 ## [0.0.7](https://github.com/OpenReloading/Ballistics/compare/catalog-v0.0.6...catalog-v0.0.7) (2026-11-12)
 
 
