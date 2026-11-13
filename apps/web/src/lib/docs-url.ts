@@ -1,3 +1,4 @@
+import { docsAddress, noDocs } from '@/platform/edition.ts'
 import { basePath } from './edition.ts'
 
 /** `NEXT_PUBLIC_DOCS_URL`, else the site's `docs/` folder; `without` (builds with no docs site) gives no link. */
@@ -14,7 +15,7 @@ export const docsPage = (docs: string | undefined, page: string): string | undef
   docs && `${docs.replace(/\/?$/, '/')}${page}`
 
 // inlined at build; no link without a docs site
-const docs = docsUrl(process.env.NEXT_PUBLIC_DOCS_URL, undefined, process.env.NEXT_PUBLIC_NO_DOCS)
+const docs = docsUrl(docsAddress, undefined, noDocs)
 
 /** The photo guide, how to take a target photo that hole detection can read. */
 export const photoGuide = docsPage(docs, 'photo-guide/')
