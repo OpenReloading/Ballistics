@@ -2,8 +2,8 @@
 
 import { TextInput } from '@mantine/core'
 import { MagnifyingGlass } from '@phosphor-icons/react'
-import Link from 'next/link'
 import { useState } from 'react'
+import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 import { controlSize } from '../lib/theme.ts'

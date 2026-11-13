@@ -21,7 +21,6 @@ import {
   type UserRecord,
 } from '@open-reloading/schema'
 import { DotsThreeVertical, Plus } from '@phosphor-icons/react'
-import Link from 'next/link'
 import {
   type ReactNode,
   useCallback,
@@ -32,6 +31,7 @@ import {
   useRef,
   useState,
 } from 'react'
+import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'

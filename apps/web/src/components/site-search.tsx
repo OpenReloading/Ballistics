@@ -1,8 +1,8 @@
 'use client'
 
 import { createSpotlight } from '@mantine/spotlight'
-import { useRouter } from 'next/navigation'
 import { useEffect, useMemo } from 'react'
+import { useRouter } from '@/platform/navigation.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { designerHref, userBulletRows } from '../lib/sources.ts'

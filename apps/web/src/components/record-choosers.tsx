@@ -1,7 +1,7 @@
 'use client'
 
-import Link from 'next/link'
 import { type ComponentProps, useMemo } from 'react'
+import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'

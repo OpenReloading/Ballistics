@@ -2,8 +2,8 @@
 
 import { Button, Tooltip } from '@mantine/core'
 import { ArrowsLeftRight, X } from '@phosphor-icons/react'
-import Link from 'next/link'
 import { useId } from 'react'
+import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { togglePick } from '../lib/selection.ts'
 import { controlSize } from '../lib/theme.ts'

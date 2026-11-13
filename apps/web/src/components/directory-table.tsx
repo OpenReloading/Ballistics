@@ -2,7 +2,6 @@
 
 import { CloseButton, Group, Select, TextInput, Tooltip, UnstyledButton } from '@mantine/core'
 import { CaretDown, CaretUp, CaretUpDown, MagnifyingGlass } from '@phosphor-icons/react'
-import Link from 'next/link'
 import {
   type CSSProperties,
   type FocusEvent,
@@ -17,6 +16,7 @@ import {
   useState,
 } from 'react'
 import { flushSync } from 'react-dom'
+import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import {
