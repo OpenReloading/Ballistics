@@ -383,6 +383,25 @@ describe('fit --exponent family', { timeout: 300_000 }, () => {
     })
     expect(alone.exponent?.families['double/flake']?.exponent).toBe(0.8)
   })
+
+  it('chooses the exponent on velocities and fits the pressure rows at it with --pressure-sigma', async () => {
+    const specs = training(dp40).map((s) => ({
+      ...s,
+      pressure: 1 / 1.1 - 1,
+      pressureBasis: 'transducer',
+    }))
+    const r = await fit({
+      ...options,
+      rows: writeRows(rowsCsv(specs, truth)),
+      exponent: 'family',
+      pressureSigma: 0.05,
+    })
+    expect(Object.values(r.exponent?.families ?? {})).toEqual([{ exponent: 0.8, powders: 1 }])
+    expect(r.pressure?.factors.transducer?.factor).toBeCloseTo(1.1, 3)
+    expect(r.powders[dp40]?.pressureExponent).toBe(0.8)
+    expect(r.powders[dp40]?.pressureRows).toBe(6)
+    expect(r.powders[dp40]?.vivacity.value.toPrecision(3)).toBe('2.81')
+  })
 })
 
 describe('the uncertainty of a fit', () => {
@@ -463,6 +482,42 @@ describe('the pressure rows of a fit', () => {
     })
     expect(r.pressure?.factors.transducer?.factor).toBeCloseTo(1.1, 3)
     expect(r.powders[sp21]?.factor).toBeGreaterThan(1.03)
+  })
+
+  it('finds a factor per cartridge with --pressure-factor cartridge, one for the basis by default', async () => {
+    const byCartridge = writeRows(
+      rowsCsv(
+        [dp40, sp20].flatMap((powder) =>
+          [
+            ['30-br', 1 / 1.2 - 1],
+            ['308-win', 1 / 0.8 - 1],
+          ].flatMap(([cartridge, pressure]) =>
+            [2.0, 2.2, 2.4].map((charge) => ({
+              cartridge: cartridge as string,
+              powder,
+              charge,
+              velocity: 0,
+              pressure: pressure as number,
+              pressureBasis: 'transducer',
+            })),
+          ),
+        ),
+      ),
+    )
+    const r = await fit({
+      ...options,
+      rows: byCartridge,
+      pressureSigma: 0.05,
+      pressureFactor: 'cartridge',
+    })
+    expect(r.pressure?.by).toBe('cartridge')
+    expect(Object.keys(r.pressure?.factors ?? {})).toEqual(['30-br', '308-win'])
+    expect(r.pressure?.factors['30-br']?.factor).toBeCloseTo(1.2, 3)
+    expect(r.pressure?.factors['308-win']?.factor).toBeCloseTo(0.8, 3)
+    const basis = await fit({ ...options, rows: byCartridge, pressureSigma: 0.05 })
+    expect(basis.pressure?.by).toBe('basis')
+    // the median of six logs of 1.2 and six of 0.8: the root of 0.96
+    expect(basis.pressure?.factors.transducer?.factor).toBeCloseTo(0.98, 2)
   })
 
   it('reports the factors in the evaluation and compares the held-out pressures with the model peak as it is', async () => {

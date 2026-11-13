@@ -35,7 +35,7 @@ export interface Row {
   lot?: string | undefined
   /** Printed bullet mass, g, of a published row whose bullet is a stand-in. */
   bulletMass?: number | undefined
-  /** A free label of the source table: carried with the row, never part of a result. */
+  /** A free label of the source table: carried with the row, part of a result only as a factor key of `--pressure-factor table` or `table-cartridge`. */
   table?: string | undefined
 }
 
