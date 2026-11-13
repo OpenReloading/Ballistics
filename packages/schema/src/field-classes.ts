@@ -3,7 +3,9 @@ import type { z } from 'zod'
 /**
  * Dot paths of the bullet fields a record may hold without provenance: the plain facts a maker prints
  * (name, product number, diameter, weight, length, coefficients, twists, the printed construction
- * wording and the enums mapped from it). Every other field is detailed and needs provenance.
+ * wording and the enums mapped from it) and our own `note`. Every other field is detailed and needs
+ * provenance. A `note` is our own text and basic in every kind that has one, as in the identity set of
+ * the kinds without field classes (`packages/catalog/src/coverage.ts`).
  */
 export const bulletBasicFields: readonly string[] = [
   'id',
@@ -22,11 +24,13 @@ export const bulletBasicFields: readonly string[] = [
   'tip.type',
   'base.type',
   'construction',
+  'note',
 ]
 
 /**
- * Dot paths of the powder fields a record may hold without provenance: name, maker, grain form and
- * base. Every other field is detailed and needs provenance.
+ * Dot paths of the powder fields a record may hold without provenance: name, maker, grain form, base
+ * and our own `note` (basic in every kind that has one, see {@link bulletBasicFields}). Every other field is
+ * detailed and needs provenance.
  */
 export const powderBasicFields: readonly string[] = [
   'id',
@@ -34,6 +38,7 @@ export const powderBasicFields: readonly string[] = [
   'name',
   'grainForm',
   'propellantBase',
+  'note',
 ]
 
 /**

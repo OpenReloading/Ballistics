@@ -1,3 +1,4 @@
+import { powder as powderSchema } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { makerRows } from '../src/maker-rows.ts'
 import type { Bundle } from '../src/records.ts'
@@ -19,6 +20,14 @@ const fittedPowder = (id: string) => ({
   interior,
 })
 
+const solved = (id: string, source: object) => ({
+  ...cited(id, 'computed', source),
+  thermochemistry: { flameTemperature: { value: 2800 } },
+})
+const range = (value: number) => ({ value, min: value - 1, max: value + 1 })
+const coversFinding = (path: string) =>
+  `source "Maker page" (not a listed non-maker source): covers ${path}, which no maker source may supply`
+
 describe('makerRows of bullets and powders by source id', () => {
   it("counts a source as a maker's unless its id is listed, also an embedded one", () => {
     const powders = [fittedPowder('listed'), fittedPowder('other'), fittedPowder('embedded')]
@@ -26,7 +35,9 @@ describe('makerRows of bullets and powders by source id', () => {
       ['powders/listed.json', ['synthetic-test-data']],
       ['powders/other.json', ['maker-table']],
     ])
-    const covers = ['maker source "Maker page": covers interior, which no maker source may supply']
+    const covers = [
+      'source "Maker page" (not a listed non-maker source): covers interior, which no maker source may supply',
+    ]
     expect(found).toEqual({
       powders: [
         { id: 'other', findings: covers },
@@ -45,7 +56,40 @@ describe('makerRows of bullets and powders by source id', () => {
         {
           id: 'p',
           findings: [
-            'maker source "Maker page": covers interior, which no maker source may supply',
+            'source "Maker page" (not a listed non-maker source): covers interior, which no maker source may supply',
+          ],
+        },
+      ],
+    })
+  })
+})
+
+describe('makerRows of the listed sources of bullets and powders', () => {
+  const solver = 'openreloading-constant-volume-equilibrium-solver'
+
+  it('asks a listed source other than synthetic-test-data to name its fields when the record holds detailed fields', () => {
+    const found = rows(
+      {
+        powders: [
+          solved('unnamed', { title: 'Solver' }),
+          solved('named', { title: 'Solver', fields: ['thermochemistry'] }),
+          solved('synthetic', { title: 'Invented' }),
+          { ...cited('basic', 'computed', { title: 'Solver' }), name: 'Basic' },
+        ],
+      },
+      [
+        ['powders/unnamed.json', [solver]],
+        ['powders/named.json', [solver]],
+        ['powders/synthetic.json', ['synthetic-test-data']],
+        ['powders/basic.json', [solver]],
+      ],
+    )
+    expect(found).toEqual({
+      powders: [
+        {
+          id: 'unnamed',
+          findings: [
+            `listed source "${solver}" names no fields, but the record holds detailed fields`,
           ],
         },
       ],
@@ -66,13 +110,53 @@ describe('makerRows of the maker sources of bullets and powders', () => {
         {
           id: 'p',
           findings: [
-            'maker source "Maker page": covers thermochemistry, which no maker source may supply',
+            'source "Maker page" (not a listed non-maker source): covers thermochemistry, which no maker source may supply',
           ],
         },
       ],
     })
   })
+})
 
+describe('makerRows of a maker source that names a field below a detailed path', () => {
+  it('refuses it when the path is outside the list', () => {
+    const powder = powderSchema.parse({
+      id: 'p',
+      manufacturer: 'm',
+      name: 'P',
+      composition: [{ name: 'Nitrocellulose', min: 90, max: 100 }],
+      thermochemistry: {
+        loadingDensity: { value: 200 },
+        flameTemperature: range(2800),
+        impetus: range(1000),
+        gamma: range(1.24),
+        molarMass: range(24),
+        covolume: range(1),
+      },
+      provenance: {
+        kind: 'published',
+        sources: [
+          {
+            ...page,
+            fields: ['composition', 'thermochemistry.flameTemperature', 'thermochemistry.impetus'],
+          },
+        ],
+      },
+    })
+    const vivacity = {
+      ...cited('v', 'fitted', { ...page, fields: ['interior.vivacity'] }),
+      interior,
+    }
+    expect(rows({ powders: [powder, vivacity] })).toEqual({
+      powders: [
+        { id: 'p', findings: [coversFinding('thermochemistry')] },
+        { id: 'v', findings: [coversFinding('interior')] },
+      ],
+    })
+  })
+})
+
+describe('makerRows of the fields and terms of a maker source', () => {
   it('asks a published maker source for its fields and a terms URL, and refuses a license', () => {
     const bullet = cited(
       'b',
@@ -85,9 +169,9 @@ describe('makerRows of the maker sources of bullets and powders', () => {
         {
           id: 'b',
           findings: [
-            'maker source "Sheet": needs a terms URL',
-            'maker source "Table": names no fields',
-            'maker source "Table": carries a license',
+            'source "Sheet" (not a listed non-maker source): needs a terms URL',
+            'source "Table" (not a listed non-maker source): names no fields',
+            'source "Table" (not a listed non-maker source): carries a license',
           ],
         },
       ],
@@ -106,7 +190,7 @@ describe('makerRows of data received directly from a maker', () => {
         {
           id: 'b',
           findings: [
-            'maker source "Letter": data received directly from a maker is not yet supported',
+            'source "Letter" is not a listed non-maker source and has no URL: it counts as data received directly from a maker, which is not yet supported',
           ],
         },
       ],

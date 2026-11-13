@@ -6,7 +6,9 @@ import type { SourceIndex } from './sources.ts'
  * Ids of the source records that are not a maker's: our thermochemistry solver, our map of the
  * makers' construction wording, and the invented data of the demo records. Every other source a
  * bullet, powder or load cites counts as a maker's, whatever its `origin` or `publisher` says. An id
- * added here changes the guard of the public catalog, and its pull request is reviewed as one.
+ * added here changes the guard of the public catalog, and its pull request is reviewed as one. The
+ * solver and the wording map have no source record yet; the importer change that first cites one
+ * adds its record under the id listed here. Until then a mismatched id fails closed.
  */
 export const nonMakerSources: readonly string[] = [
   'openreloading-constant-volume-equilibrium-solver',
@@ -50,11 +52,13 @@ const overlaps = (path: string, field: string) =>
 
 /** Why the maker source `source` may not stand in a bullet or powder record: an unpublished source, a missing field list or terms URL, a license, or a detailed field outside {@link makerSourceFields}. */
 function makerSourceFindings(kind: 'bullet' | 'powder', record: Cited, source: CitedSource) {
-  const name = `maker source "${source.title}"`
+  const name = `source "${source.title}" (not a listed non-maker source)`
   const findings: string[] = []
   // a source without an address is data a maker sent us, which has no rules yet
   if (source.url === undefined)
-    findings.push(`${name}: data received directly from a maker is not yet supported`)
+    findings.push(
+      `source "${source.title}" is not a listed non-maker source and has no URL: it counts as data received directly from a maker, which is not yet supported`,
+    )
   else {
     if (!source.fields) findings.push(`${name}: names no fields`)
     if (!source.terms || !isWebLink(source.terms)) findings.push(`${name}: needs a terms URL`)
@@ -67,6 +71,17 @@ function makerSourceFindings(kind: 'bullet' | 'powder', record: Cited, source: C
       findings.push(`${name}: covers ${path}, which no maker source may supply`)
   }
   return findings
+}
+
+/** A listed source other than `synthetic-test-data` names its `fields` when the record holds detailed fields, else it covers them all. */
+function listedSourceFindings(kind: 'bullet' | 'powder', record: Cited, ids: Ids): string[] {
+  if (detailedFields(kind, record).length === 0) return []
+  return (record.provenance?.sources ?? []).flatMap((source, i) => {
+    const id = ids?.[i]
+    return id === undefined || isMakerId(id) || id === 'synthetic-test-data' || source.fields
+      ? []
+      : [`listed source "${id}" names no fields, but the record holds detailed fields`]
+  })
 }
 
 const loadFinding = (id: string | undefined) =>
@@ -86,7 +101,10 @@ const mayHoldMakerData = (record: Cited) =>
 function findingsOf(kind: string, record: Cited, ids: Ids): string[] {
   if (kind === 'bullets' || kind === 'powders') {
     const fieldKind = kind === 'bullets' ? 'bullet' : 'powder'
-    return makerSources(record, ids).flatMap((s) => makerSourceFindings(fieldKind, record, s))
+    return [
+      ...listedSourceFindings(fieldKind, record, ids),
+      ...makerSources(record, ids).flatMap((s) => makerSourceFindings(fieldKind, record, s)),
+    ]
   }
   if (kind === 'loads')
     return (record.provenance?.sources ?? []).flatMap((_, i) =>
@@ -101,7 +119,7 @@ function findingsOf(kind: string, record: Cited, ids: Ids): string[] {
  * The records of `bundle` the public catalog may not hold, by kind, in the order of the bundle;
  * kinds without one are left out. `citations` gives the cited source ids of each record file. A
  * bullet or powder may cite a maker's published source for the fields of `makerSourceFields`
- * only, a catalogue load or a published-load file (`publishedLoads`, by `<cartridge>/<id>`) no
+ * only, and a listed source other than `synthetic-test-data` with its fields named; a catalogue load or a published-load file (`publishedLoads`, by `<cartridge>/<id>`) no
  * maker source, and a record of another kind no manufacturer-origin source or fitted source without
  * an origin. Manufacturer records are identity records and may cite their maker.
  */
