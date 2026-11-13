@@ -34,10 +34,11 @@ const firingSeriesParser = z
       })
       .optional(),
     note: z.string().min(1).optional(),
-    provenance: provenance.refine(
-      (p) => p.kind === 'measured' && p.sources.every((s) => s.url && s.license),
-      { message: 'published measurements are measured, and each source names its URL and license' },
-    ),
+    provenance: provenance
+      .refine((p) => p.kind === 'measured' && p.sources.every((s) => s.url && s.license), {
+        message: 'published measurements are measured, and each source names its URL and license',
+      })
+      .optional(),
   })
   .refine((f) => !f.velocity.shots || f.velocity.shots.length === f.roundCount, {
     message: 'one velocity per round',
@@ -82,7 +83,7 @@ export const firingSeries: z.ZodObject<{
     }>
   >
   note: z.ZodOptional<z.ZodString>
-  provenance: typeof provenance
+  provenance: z.ZodOptional<typeof provenance>
 }> = firingSeriesParser satisfies Exact<typeof firingSeries, typeof firingSeriesParser>
 
 /** A record of rounds fired and measured by others, as a publication reports them. */

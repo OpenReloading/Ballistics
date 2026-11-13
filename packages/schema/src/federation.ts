@@ -59,7 +59,7 @@ const federationParser = z.strictObject({
       }),
     )
     .min(1),
-  provenance,
+  provenance: provenance.optional(),
 })
 
 /**
@@ -95,8 +95,8 @@ export const federation: z.ZodObject<
         z.core.$strict
       >
     >
-    /** Where the values of the record come from: a kind and at least one source. */
-    provenance: typeof provenance
+    /** Where the values of the record come from, wherever the record has a source: a kind and at least one source. */
+    provenance: z.ZodOptional<typeof provenance>
   },
   z.core.$strict
 > = federationParser satisfies Exact<typeof federation, typeof federationParser>
@@ -269,7 +269,7 @@ const disciplineParser = z.strictObject({
     .optional(),
   internationalDiscipline: recordId.optional(),
   rules: disciplineRules.optional(),
-  provenance,
+  provenance: provenance.optional(),
 })
 
 /**
@@ -318,8 +318,8 @@ export const discipline: z.ZodObject<
     internationalDiscipline: z.ZodOptional<typeof recordId>
     /** Rule facts per the rule book; a stage's own are on its target mapping. */
     rules: z.ZodOptional<typeof disciplineRules>
-    /** Where the values of the record come from: a kind and at least one source. */
-    provenance: typeof provenance
+    /** Where the values of the record come from, wherever the record has a source: a kind and at least one source. */
+    provenance: z.ZodOptional<typeof provenance>
   },
   z.core.$strict
 > = disciplineParser satisfies Exact<typeof discipline, typeof disciplineParser>
@@ -336,7 +336,7 @@ const targetMappingParser = z.strictObject({
   gauge: positiveLength().optional(),
   shotCount: z.int().positive().optional(),
   ...courseOfFire,
-  provenance,
+  provenance: provenance.optional(),
 })
 
 /**
@@ -375,8 +375,8 @@ export const targetMapping: z.ZodObject<
         >
       >
     >
-    /** Where the values of the record come from: a kind and at least one source. */
-    provenance: typeof provenance
+    /** Where the values of the record come from, wherever the record has a source: a kind and at least one source. */
+    provenance: z.ZodOptional<typeof provenance>
   },
   z.core.$strict
 > = targetMappingParser satisfies Exact<typeof targetMapping, typeof targetMappingParser>

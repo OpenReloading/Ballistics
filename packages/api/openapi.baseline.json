@@ -1149,7 +1149,7 @@
         "operationId": "getCaliberClassesById",
         "tags": ["Competition"],
         "summary": "Get a caliber class",
-        "description": "The caliber class record with its provenance.",
+        "description": "The caliber class record with its provenance where it has one.",
         "parameters": [
           {
             "name": "id",
@@ -1334,7 +1334,7 @@
                       "additionalProperties": false
                     }
                   },
-                  "required": ["id", "name", "diameter", "cartridges", "provenance"],
+                  "required": ["id", "name", "diameter", "cartridges"],
                   "additionalProperties": false
                 }
               }
@@ -1540,7 +1540,7 @@
         "operationId": "getCartridgesById",
         "tags": ["Records"],
         "summary": "Get a cartridge",
-        "description": "The cartridge record of its C.I.P. sheet with provenance, case type and case capacities. `revision` is a hash of the stored record, changes with any field.",
+        "description": "The cartridge record of its C.I.P. sheet with case type, case capacities and its provenance where it has one. `revision` is a hash of the stored record, changes with any field.",
         "parameters": [
           {
             "name": "id",
@@ -2056,7 +2056,7 @@
                             },
                             "required": ["kind", "sources"],
                             "additionalProperties": false,
-                            "description": "Where the value comes from. Required for a catalogue capacity."
+                            "description": "Where the value comes from, wherever the record has a source."
                           }
                         },
                         "required": ["origin", "cartridge", "waterCapacity"],
@@ -2076,7 +2076,6 @@
                     "published",
                     "verification",
                     "values",
-                    "provenance",
                     "capacities",
                     "revision"
                   ],
@@ -2292,7 +2291,7 @@
         "operationId": "getCasesById",
         "tags": ["Records"],
         "summary": "Get a case",
-        "description": "The case record with its provenance and `origin`. `revision` is a hash of the stored record, changes with any field.",
+        "description": "The case record with `origin` and its provenance where it has one. `revision` is a hash of the stored record, changes with any field.",
         "parameters": [
           {
             "name": "id",
@@ -2657,7 +2656,7 @@
                       },
                       "required": ["kind", "sources"],
                       "additionalProperties": false,
-                      "description": "Where the values come from. Required for a catalogue case."
+                      "description": "Where the values come from, wherever the record has a source."
                     },
                     "revision": {
                       "type": "string",
@@ -2823,7 +2822,7 @@
         "operationId": "getDisciplinesById",
         "tags": ["Competition"],
         "summary": "Get a discipline",
-        "description": "The discipline record with its provenance.",
+        "description": "The discipline record with its provenance where it has one.",
         "parameters": [
           {
             "name": "id",
@@ -3311,15 +3310,7 @@
                       "additionalProperties": false
                     }
                   },
-                  "required": [
-                    "id",
-                    "federation",
-                    "name",
-                    "section",
-                    "page",
-                    "distance",
-                    "provenance"
-                  ],
+                  "required": ["id", "federation", "name", "section", "page", "distance"],
                   "additionalProperties": false
                 }
               }
@@ -3448,7 +3439,7 @@
         "operationId": "getEventTypesById",
         "tags": ["Competition"],
         "summary": "Get a event type",
-        "description": "The event type record with its provenance.",
+        "description": "The event type record with its provenance where it has one.",
         "parameters": [
           {
             "name": "id",
@@ -3852,15 +3843,7 @@
                       "additionalProperties": false
                     }
                   },
-                  "required": [
-                    "id",
-                    "name",
-                    "federation",
-                    "ruleBook",
-                    "scoring",
-                    "levels",
-                    "provenance"
-                  ],
+                  "required": ["id", "name", "federation", "ruleBook", "scoring", "levels"],
                   "additionalProperties": false
                 }
               }
@@ -11359,7 +11342,7 @@
         "operationId": "getFederationsById",
         "tags": ["Competition"],
         "summary": "Get a federation",
-        "description": "The federation record with its provenance.",
+        "description": "The federation record with its provenance where it has one.",
         "parameters": [
           {
             "name": "id",
@@ -11570,7 +11553,7 @@
                       "additionalProperties": false
                     }
                   },
-                  "required": ["id", "name", "abbreviation", "country", "ruleBooks", "provenance"],
+                  "required": ["id", "name", "abbreviation", "country", "ruleBooks"],
                   "additionalProperties": false
                 }
               }
@@ -12349,6 +12332,7 @@
                                   "description": "Cartridge name"
                                 },
                                 "provenance": {
+                                  "description": "Provenance of the cartridge record, where it has one",
                                   "type": "object",
                                   "properties": {
                                     "kind": {
@@ -12490,7 +12474,7 @@
                                   "additionalProperties": false
                                 }
                               },
-                              "required": ["id", "name", "provenance"],
+                              "required": ["id", "name"],
                               "additionalProperties": {},
                               "description": "The cartridge record of the request"
                             }
@@ -13281,6 +13265,7 @@
                                   "description": "Cartridge name"
                                 },
                                 "provenance": {
+                                  "description": "Provenance of the cartridge record, where it has one",
                                   "type": "object",
                                   "properties": {
                                     "kind": {
@@ -13422,7 +13407,7 @@
                                   "additionalProperties": false
                                 }
                               },
-                              "required": ["id", "name", "provenance"],
+                              "required": ["id", "name"],
                               "additionalProperties": {},
                               "description": "The cartridge record of the request"
                             }
@@ -15149,6 +15134,7 @@
                               "description": "Cartridge name"
                             },
                             "provenance": {
+                              "description": "Provenance of the cartridge record, where it has one",
                               "type": "object",
                               "properties": {
                                 "kind": {
@@ -15290,7 +15276,7 @@
                               "additionalProperties": false
                             }
                           },
-                          "required": ["id", "name", "provenance"],
+                          "required": ["id", "name"],
                           "additionalProperties": {},
                           "description": "The cartridge record of the request"
                         }
@@ -17152,6 +17138,7 @@
                               "description": "Cartridge name"
                             },
                             "provenance": {
+                              "description": "Provenance of the cartridge record, where it has one",
                               "type": "object",
                               "properties": {
                                 "kind": {
@@ -17293,7 +17280,7 @@
                               "additionalProperties": false
                             }
                           },
-                          "required": ["id", "name", "provenance"],
+                          "required": ["id", "name"],
                           "additionalProperties": {},
                           "description": "The cartridge record of the request"
                         },
@@ -21020,7 +21007,7 @@
                                     }
                                   },
                                   "required": ["kind", "sources"],
-                                  "description": "Where the value comes from. Required for a catalogue capacity."
+                                  "description": "Where the value comes from, wherever the record has a source."
                                 }
                               },
                               "required": ["origin", "cartridge", "waterCapacity"],
@@ -21855,7 +21842,7 @@
                                     }
                                   },
                                   "required": ["kind", "sources"],
-                                  "description": "Where the values come from. Required for a catalogue load."
+                                  "description": "Where the values come from, wherever the record has a source."
                                 }
                               },
                               "required": ["origin"],
@@ -23656,7 +23643,7 @@
                                   "description": "Where the values come from: the imported file."
                                 }
                               },
-                              "required": ["origin", "device", "strings", "provenance"],
+                              "required": ["origin", "device", "strings"],
                               "description": "A chronograph session, in stored units."
                             }
                           },
@@ -24925,7 +24912,7 @@
                                     }
                                   },
                                   "required": ["kind", "sources"],
-                                  "description": "Where the values come from. Required for a catalogue case."
+                                  "description": "Where the values come from, wherever the record has a source."
                                 }
                               },
                               "required": ["origin", "cartridge", "material"],
@@ -25585,7 +25572,7 @@
         "operationId": "getManufacturersById",
         "tags": ["Records"],
         "summary": "Get a manufacturer",
-        "description": "The manufacturer record with its provenance.",
+        "description": "The manufacturer record with its provenance where it has one.",
         "parameters": [
           {
             "name": "id",
@@ -25760,7 +25747,7 @@
                       "additionalProperties": false
                     }
                   },
-                  "required": ["id", "name", "provenance"],
+                  "required": ["id", "name"],
                   "additionalProperties": false
                 }
               }
@@ -26944,7 +26931,7 @@
         "operationId": "getPrimersById",
         "tags": ["Records"],
         "summary": "Get a primer",
-        "description": "The primer record with its provenance.",
+        "description": "The primer record with its provenance where it has one.",
         "parameters": [
           {
             "name": "id",
@@ -27196,7 +27183,7 @@
                       "additionalProperties": false
                     }
                   },
-                  "required": ["id", "manufacturer", "name", "size", "provenance"],
+                  "required": ["id", "manufacturer", "name", "size"],
                   "additionalProperties": false
                 }
               }
@@ -27350,7 +27337,7 @@
         "operationId": "getTargetFacesById",
         "tags": ["Competition"],
         "summary": "Get a target face",
-        "description": "The target face record: federation id, ring diameters (mm), inner ten, events with ids, and provenance.",
+        "description": "The target face record: federation id, ring diameters (mm), inner ten, events with ids, and provenance where it has one.",
         "parameters": [
           {
             "name": "id",
@@ -27872,7 +27859,7 @@
                       "additionalProperties": false
                     }
                   },
-                  "required": ["id", "name", "rings", "blackDiameter", "events", "provenance"],
+                  "required": ["id", "name", "rings", "blackDiameter", "events"],
                   "additionalProperties": false
                 }
               }
@@ -28030,7 +28017,7 @@
         "operationId": "getTargetMappingsById",
         "tags": ["Competition"],
         "summary": "Get a target mapping",
-        "description": "The target mapping record with its provenance.",
+        "description": "The target mapping record with its provenance where it has one.",
         "parameters": [
           {
             "name": "id",
@@ -28279,7 +28266,7 @@
                       "additionalProperties": false
                     }
                   },
-                  "required": ["id", "discipline", "face", "event", "provenance"],
+                  "required": ["id", "discipline", "face", "event"],
                   "additionalProperties": false
                 }
               }

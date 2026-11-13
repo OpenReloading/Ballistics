@@ -10,7 +10,7 @@ const caliberClassParser = z.strictObject({
   name: z.string().min(1),
   diameter: positiveLength(),
   cartridges: z.array(recordId),
-  provenance,
+  provenance: provenance.optional(),
 })
 
 /**
@@ -36,8 +36,8 @@ export const caliberClass: z.ZodObject<
     diameter: QuantitySchema
     /** Ids of the cartridge records in the class; empty where the class has no CIP cartridge. */
     cartridges: z.ZodArray<typeof recordId>
-    /** Where the values of the record come from: a kind and at least one source. */
-    provenance: typeof provenance
+    /** Where the values of the record come from, wherever the record has a source: a kind and at least one source. */
+    provenance: z.ZodOptional<typeof provenance>
   },
   z.core.$strict
 > = caliberClassParser satisfies Exact<typeof caliberClass, typeof caliberClassParser>

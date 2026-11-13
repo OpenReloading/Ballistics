@@ -114,7 +114,7 @@ function otherNames(bundle: Pick<Bundle, 'cases' | 'rangeFirings' | 'targetFaces
     })),
     // One projectile may appear in several reports.
     bundle.rangeFirings.flatMap((r) => {
-      const [source] = r.provenance.sources
+      const [source] = r.provenance?.sources ?? []
       if (!source) return []
       return [
         {

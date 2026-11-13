@@ -30,11 +30,13 @@ describe('Primer', () => {
     ).toBe(true)
   })
 
-  it('needs an id, maker, name, size and provenance', () => {
-    for (const key of ['id', 'manufacturer', 'name', 'size', 'provenance']) {
+  it('needs an id, maker, name and size, not provenance', () => {
+    for (const key of ['id', 'manufacturer', 'name', 'size']) {
       const { [key]: _gone, ...rest } = record as Record<string, unknown>
       expectIssueAt(primer, rest, key)
     }
+    const { provenance: _p, ...unsourced } = record
+    expect(primer.safeParse(unsourced).success).toBe(true)
   })
 
   it('refuses an unknown size, compound, cup metal and field, and accepts every listed size', () => {

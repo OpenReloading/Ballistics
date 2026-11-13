@@ -3576,7 +3576,7 @@
                       "kind",
                       "sources"
                     ],
-                    "description": "Where the value comes from. Required for a catalogue capacity."
+                    "description": "Where the value comes from, wherever the record has a source."
                   }
                 },
                 "required": [
@@ -4509,7 +4509,7 @@
                       "kind",
                       "sources"
                     ],
-                    "description": "Where the values come from. Required for a catalogue load."
+                    "description": "Where the values come from, wherever the record has a source."
                   }
                 },
                 "required": [
@@ -6525,8 +6525,7 @@
                 "required": [
                   "origin",
                   "device",
-                  "strings",
-                  "provenance"
+                  "strings"
                 ],
                 "description": "A chronograph session, in stored units."
               }
@@ -7968,7 +7967,7 @@
                       "kind",
                       "sources"
                     ],
-                    "description": "Where the values come from. Required for a catalogue case."
+                    "description": "Where the values come from, wherever the record has a source."
                   }
                 },
                 "required": [

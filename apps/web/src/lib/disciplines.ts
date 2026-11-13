@@ -22,12 +22,14 @@ import { metersPerYard, type Quantity } from './units.ts'
 import { say, verbatim, type Wording, worded } from './wording.ts'
 
 /** A discipline record as the API answers it: its sources resolved. */
-export type DisciplineRecord = Omit<Discipline, 'provenance'> & { provenance: Provenance }
+export type DisciplineRecord = Omit<Discipline, 'provenance'> & {
+  provenance?: Provenance | undefined
+}
 
 /** A federation record as the API answers it: its rule books and sources resolved. */
 export type FederationRecord = Omit<Federation, 'ruleBooks' | 'provenance'> & {
   ruleBooks: { title: string; edition: string; url: string }[]
-  provenance: Provenance
+  provenance?: Provenance | undefined
 }
 
 /** A caliber class as `GET /caliber-classes` lists it. */
@@ -387,7 +389,7 @@ export function disciplineGroups(
 export function disciplineRuleBook(
   d: Pick<DisciplineRecord, 'section' | 'page' | 'provenance'>,
 ): (Source & { section: string; page: string }) | undefined {
-  const sources = d.provenance.sources
+  const sources = d.provenance?.sources ?? []
   const s = sources.find((x) => x.fields?.includes('section')) ?? sources[0]
   return s && { ...s, section: d.section, page: d.page }
 }

@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import {
   canonicalJson,
   compareKeys,
+  type Provenance,
   type PublishedLoad,
   type PublishedLoads,
   parseRef,
@@ -10,8 +11,11 @@ import {
 /** A load of an incoming file, which may come without an id: {@link mergePublishedLoads} sets it. */
 export type IncomingLoad = Omit<PublishedLoad, 'id'> & { id?: string | undefined }
 
-/** An incoming file of published loads, its loads in the order the table prints them. */
-export type IncomingLoads = Omit<PublishedLoads, 'loads'> & { loads: IncomingLoad[] }
+/** An incoming file of published loads, its loads in the order the table prints them, with the sources of its table. */
+export type IncomingLoads = Omit<PublishedLoads, 'loads' | 'provenance'> & {
+  loads: IncomingLoad[]
+  provenance: Provenance
+}
 
 /** A figure's stored value, or its printed text where it has none (`Flush`). */
 const figure = (f: { value?: number | undefined; raw: string } | undefined) =>
@@ -152,12 +156,8 @@ export function mergePublishedLoads(
   resolveSource: (source: unknown) => unknown = (source) => source,
 ): MergeResult {
   const loads = withLoadIds(incoming).loads
-  const base: PublishedLoads = existing ?? {
-    ...incoming,
-    loads: [],
-    provenance: { ...incoming.provenance, sources: [] },
-  }
-  const sources = [...base.provenance.sources]
+  const base: PublishedLoads = existing ?? { ...incoming, loads: [] }
+  const sources = [...(existing?.provenance?.sources ?? [])]
   const sourceIndex = (i: number) => {
     const s = incoming.provenance.sources[i]
     const key = canonicalJson(resolveSource(s))
@@ -181,7 +181,7 @@ export function mergePublishedLoads(
   const file: PublishedLoads = {
     ...base,
     loads: [...byId.values()].sort((a, b) => compareKeys(a.id, b.id)),
-    provenance: { ...base.provenance, sources },
+    provenance: { ...(base.provenance ?? incoming.provenance), sources },
   }
   return { file: written ? file : (existing ?? file), report, written }
 }

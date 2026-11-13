@@ -225,8 +225,14 @@ describe('publishedLoads charges, sources and provenance', () => {
     ).toBe(true)
   })
 
-  it('names a source of the file that exists', () => {
+  it('names a source of the file that exists, and none in a file without provenance', () => {
     expectIssueAt(publishedLoads, { ...file, loads: [{ ...load, source: 2 }] }, 'loads.0.source')
+    const { provenance: _p, ...unsourced } = file
+    expectIssueAt(
+      publishedLoads,
+      { ...unsourced, loads: [{ ...load, source: 0 }] },
+      'loads.0.source',
+    )
   })
 
   it('needs a cartridge reference, a maker and who produced the loads', () => {

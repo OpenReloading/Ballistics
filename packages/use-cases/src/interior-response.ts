@@ -240,7 +240,9 @@ const cartridge = z
   .looseObject({
     id: text('Cartridge id'),
     name: text('Cartridge name'),
-    provenance,
+    provenance: provenance
+      .optional()
+      .describe('Provenance of the cartridge record, where it has one'),
   })
   .describe('The cartridge record of the request')
 

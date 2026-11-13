@@ -147,6 +147,7 @@ function readIncoming(options: MergeOptions, sources: SourceIndex, errors: strin
     }
     const parsed = publishedLoads.safeParse(resolveRecord(withIds, sources, path, errors))
     if (!parsed.success) addIssues(path, parsed.error, errors)
+    else if (!parsed.data.provenance) errors.push(`${path}: a table needs provenance`)
     else errors.push(...placement(path, parsed.data))
     if (errors.length === before) read.push({ path, file: json })
   }
@@ -162,7 +163,7 @@ function readStored(path: string): PublishedLoads | undefined {
   }
 }
 
-/** Into the records' `loads/` folder ({@link mergePublishedLoads}); a file whose cartridge folder is no cartridge record is reported as waiting, not written, and with `dryRun` or when a file fails the schema nothing is written. */
+/** Into the records' `loads/` folder ({@link mergePublishedLoads}); a file whose cartridge folder is no cartridge record is reported as waiting, not written, and with `dryRun`, when a file fails the schema or when a table in the records has no provenance nothing is written. */
 export function mergeLoadFolder(options: MergeOptions): MergeRun {
   const errors: string[] = []
   const sources = sourceIndex(
@@ -170,12 +171,19 @@ export function mergeLoadFolder(options: MergeOptions): MergeRun {
   )
   const read = readIncoming(options, sources, errors)
   if (errors.length > 0) return { files: [], errors }
-  const files: FileOutcome[] = read.map(({ path, file }) => {
+  const stored = read.map(({ path }) => readStored(join(options.records, path)))
+  // a stored load without `source` cites the first source, which would become the incoming one
+  read.forEach(({ path }, i) => {
+    if (stored[i] && !stored[i].provenance)
+      errors.push(`${path}: the table in the records needs provenance`)
+  })
+  if (errors.length > 0) return { files: [], errors }
+  const files: FileOutcome[] = read.map(({ path, file }, i) => {
     const cartridge = basename(dirname(path))
     if (!existsSync(join(options.records, 'cartridges', `${cartridge}.json`)))
       return { path, status: 'waiting' }
     const target = join(options.records, path)
-    const existing = readStored(target)
+    const existing = stored[i]
     const merged = mergePublishedLoads(existing, file, options.accept, resolving(sources))
     if (merged.written && !options.dryRun) {
       mkdirSync(dirname(target), { recursive: true })
