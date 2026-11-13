@@ -1,6 +1,6 @@
 'use client'
 
-import type { Load } from '@open-reloading/schema'
+import type { Load } from '@rangefoundry/schema'
 import { useEffect, useRef, useState } from 'react'
 import { storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'

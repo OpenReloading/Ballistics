@@ -1,4 +1,4 @@
-import { userRecord } from '@open-reloading/schema'
+import { userRecord } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import {
   autoMap,

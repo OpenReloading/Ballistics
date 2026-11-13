@@ -1,5 +1,5 @@
-import { fromSi } from '@open-reloading/schema'
 import { castHarderThanPeak, loadRatio } from '@rangefoundry/ballistics'
+import { fromSi } from '@rangefoundry/schema'
 import { formatNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
 import type { ErrorBody, InteriorLadderResponse, InteriorResponse } from '../lib/api-types.ts'

@@ -12,7 +12,6 @@ import {
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useDebouncedValue, useMediaQuery } from '@mantine/hooks'
-import { type Bullet, toSi, type UserRecord } from '@open-reloading/schema'
 import { Printer } from '@phosphor-icons/react'
 import {
   type DragModel,
@@ -20,6 +19,7 @@ import {
   type OmittedEffect,
   type Trajectory,
 } from '@rangefoundry/ballistics'
+import { type Bullet, toSi, type UserRecord } from '@rangefoundry/schema'
 import dynamic from 'next/dynamic'
 import {
   type ReactNode,

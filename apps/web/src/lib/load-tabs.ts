@@ -1,5 +1,5 @@
 /** The workbench loads, tabs and the saved-loads list. */
-import type { UserRecord } from '@open-reloading/schema'
+import type { UserRecord } from '@rangefoundry/schema'
 import { putRecords, storedRecord } from '@/platform/user-store.ts'
 import type { Translator } from '../i18n/translate.ts'
 import { matchesQuery } from './lists.ts'

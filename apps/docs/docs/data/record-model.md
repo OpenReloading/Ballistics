@@ -79,10 +79,10 @@ A user bullet or cartridge (`userBullet`, `userCartridge` in `packages/schema/sr
 
 ## Units
 
-Stored entities use the stored units of `packages/units/src/units.ts` (re-exported by `@open-reloading/schema`) only; SI appears at solver calls. `toSi(kind, stored)` and `fromSi(kind, si)` convert between them. `siMaps` holds one entry per `QuantityKind`: `si = stored * factor + offset`. Temperature carries the offset of 273.15 (degC to K), percent is a fraction in SI, the ballistic coefficient is kg/m2.
+Stored entities use the stored units of `packages/units/src/units.ts` (re-exported by `@rangefoundry/schema`) only; SI appears at solver calls. `toSi(kind, stored)` and `fromSi(kind, si)` convert between them. `siMaps` holds one entry per `QuantityKind`: `si = stored * factor + offset`. Temperature carries the offset of 273.15 (degC to K), percent is a fraction in SI, the ballistic coefficient is kg/m2.
 
 - The API's record resolution, limit check and bore area, and the web app's field specs, record rows, designers, seating preview and workbench load hook call these functions. No file outside the units package writes a factor between a stored unit and SI: `apps/web/test/unit-literals.test.ts` scans the sources of the API and the web app for the literals.
-- Display units (inch, grain, psi, ft/s) are in `packages/locale-format/src/display-units.ts`. They, the solver package and the web app take their customary factors (inch, foot, yard, grain, pound, mph, inch of mercury, psi, ft·lbf, MOA, lb/in2) and the water density of a capacity in grains of water from the conversion table of `@open-reloading/units`. The importers take theirs from the table too (`packages/importers/src/record-fields.ts` and `units.ts`). The drawing and data packages keep their own (`packages/svg-drawings/src/core/units.ts`, `packages/catalog/src/published-loads.ts`): data may import only `@open-reloading/schema`, which does not re-export the table.
+- Display units (inch, grain, psi, ft/s) are in `packages/locale-format/src/display-units.ts`. They, the solver package and the web app take their customary factors (inch, foot, yard, grain, pound, mph, inch of mercury, psi, ft·lbf, MOA, lb/in2) and the water density of a capacity in grains of water from the conversion table of `@open-reloading/units`. The importers take theirs from the table too (`packages/importers/src/record-fields.ts` and `units.ts`). The drawing and data packages keep their own (`packages/svg-drawings/src/core/units.ts`, `packages/catalog/src/published-loads.ts`): data may import only `@rangefoundry/schema`, which does not re-export the table.
 - User files of the old SI format are rejected, since no migrations are written before 1.0.
 
 ## Manufacturer
@@ -234,7 +234,7 @@ The File menu's Copy share link copies a link to a bullet, a cartridge or a load
 
 - The catalogue holds one record per entity and an index row per record, read in process ([Catalogue storage](catalogue-storage.md)).
 - User data stays client side. The server holds catalogue records only and needs no `origin` column.
-- The web app imports `Source`, `Provenance`, `SpecValue`, `CaseCapacity`, `Bullet` and `Powder` from `@open-reloading/schema`. `apps/web/src/lib/api-types.ts` keeps the shapes the API adds (list summaries, `CartridgeDetail` as the cartridge plus `caseType` and `capacities`, compute answers).
+- The web app imports `Source`, `Provenance`, `SpecValue`, `CaseCapacity`, `Bullet` and `Powder` from `@rangefoundry/schema`. `apps/web/src/lib/api-types.ts` keeps the shapes the API adds (list summaries, `CartridgeDetail` as the cartridge plus `caseType` and `capacities`, compute answers).
 
 ## Decisions
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { Table } from '@mantine/core'
-import type { Firearm, Optic } from '@open-reloading/schema'
+import type { Firearm, Optic } from '@rangefoundry/schema'
 import { useTranslation } from '../i18n/language.ts'
 import { plainNumber } from '../i18n/number.ts'
 import { type Message, msg } from '../i18n/translate.ts'

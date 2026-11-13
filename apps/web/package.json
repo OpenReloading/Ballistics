@@ -26,7 +26,7 @@
     "@open-reloading/svg-drawings": "workspace:*",
     "@open-reloading/importers": "workspace:*",
     "@rangefoundry/locale-format": "workspace:*",
-    "@open-reloading/schema": "workspace:*",
+    "@rangefoundry/schema": "workspace:*",
     "@rangefoundry/shot-groups": "workspace:*",
     "@rangefoundry/statistics": "workspace:*",
     "@rangefoundry/target-recognition": "workspace:*",

@@ -6,8 +6,8 @@ import type {
   CatalogueCaseCapacity,
   Powder,
   PublishedLoads,
-} from '@open-reloading/schema'
-import { compareKeys, parseRef } from '@open-reloading/schema'
+} from '@rangefoundry/schema'
+import { compareKeys, parseRef } from '@rangefoundry/schema'
 import { readRecords } from '@rangefoundry/tools/catalog'
 import { UsageError } from './errors.ts'
 

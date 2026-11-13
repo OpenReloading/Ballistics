@@ -1,4 +1,4 @@
-import { parseRef, type UserRecord } from '@open-reloading/schema'
+import { parseRef, type UserRecord } from '@rangefoundry/schema'
 import { storedRecords } from '@/platform/user-store.ts'
 import { fetchRecord } from './api-fetch.ts'
 import { toCsv } from './csv.ts'

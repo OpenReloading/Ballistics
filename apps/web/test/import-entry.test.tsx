@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core'
-import type { UserRecord } from '@open-reloading/schema'
+import type { UserRecord } from '@rangefoundry/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it, vi } from 'vitest'
 import { xlsx } from '../../../packages/importers/test/xlsx.ts'

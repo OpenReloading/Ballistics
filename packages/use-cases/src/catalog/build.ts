@@ -9,7 +9,7 @@ import {
   type Manufacturer,
   parseRef,
   type TargetMapping,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import {
   bulletRow,
   byKey,

@@ -1,5 +1,5 @@
 // Kind scoring, column mapping and the record candidates a mapped table becomes, with a report per row.
-import type { UserRecord } from '@open-reloading/schema'
+import type { UserRecord } from '@rangefoundry/schema'
 import type { Diagnostic } from '@rangefoundry/statistics'
 import type { Candidate, ReaderDiagnostic } from './diagnostics.ts'
 import {

@@ -1,5 +1,5 @@
 /** The bullet compare view's `ids` parameter and the links to it. */
-import { recordIdRegex } from '@open-reloading/schema'
+import { recordIdRegex } from '@rangefoundry/schema'
 import { commonCaliber } from './caliber.ts'
 
 /** Most bullets the compare view takes (4), checked before any request. */

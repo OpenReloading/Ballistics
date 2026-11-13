@@ -7,7 +7,7 @@
     "node": ">=26"
   },
   "scripts": {
-    "lint": "oxlint --format default --ignore-pattern \"packages/units/**\" --ignore-pattern \"packages/locale-format/**\" --ignore-pattern \"packages/design-tokens/**\" --ignore-pattern \"packages/schema/**\" --ignore-pattern \"packages/statistics/**\" --ignore-pattern \"packages/ballistics/**\" --ignore-pattern \"packages/shot-groups/**\" --ignore-pattern \"packages/importers/**\" --ignore-pattern \"packages/catalog/**\" --ignore-pattern \"packages/use-cases/**\" --ignore-pattern \"packages/target-recognition/**\" --ignore-pattern \"packages/ui/**\" --ignore-pattern \"tooling/**\" --deny-warnings --report-unused-disable-directives && biome check --error-on-warnings . && pnpm --filter @open-reloading/units --filter @rangefoundry/locale-format --filter @rangefoundry/design-tokens --filter @open-reloading/schema --filter @rangefoundry/statistics --filter @rangefoundry/ballistics --filter @rangefoundry/shot-groups --filter @open-reloading/importers --filter @open-reloading/catalog --filter @rangefoundry/use-cases --filter @rangefoundry/target-recognition --filter @rangefoundry/ui --filter @rangefoundry/test-kit run lint && pnpm --filter @rangefoundry/web run i18n check de && pnpm peers check --lockfile-only",
+    "lint": "oxlint --format default --ignore-pattern \"packages/units/**\" --ignore-pattern \"packages/locale-format/**\" --ignore-pattern \"packages/design-tokens/**\" --ignore-pattern \"packages/schema/**\" --ignore-pattern \"packages/statistics/**\" --ignore-pattern \"packages/ballistics/**\" --ignore-pattern \"packages/shot-groups/**\" --ignore-pattern \"packages/importers/**\" --ignore-pattern \"packages/catalog/**\" --ignore-pattern \"packages/use-cases/**\" --ignore-pattern \"packages/target-recognition/**\" --ignore-pattern \"packages/ui/**\" --ignore-pattern \"tooling/**\" --deny-warnings --report-unused-disable-directives && biome check --error-on-warnings . && pnpm --filter @open-reloading/units --filter @rangefoundry/locale-format --filter @rangefoundry/design-tokens --filter @rangefoundry/schema --filter @rangefoundry/statistics --filter @rangefoundry/ballistics --filter @rangefoundry/shot-groups --filter @open-reloading/importers --filter @open-reloading/catalog --filter @rangefoundry/use-cases --filter @rangefoundry/target-recognition --filter @rangefoundry/ui --filter @rangefoundry/test-kit run lint && pnpm --filter @rangefoundry/web run i18n check de && pnpm peers check --lockfile-only",
     "format": "biome check --write .",
     "build": "pnpm --filter \"./packages/*\" --filter \"./tooling/*\" run build",
     "typecheck": "pnpm --recursive --workspace-concurrency=1 run typecheck",
@@ -22,7 +22,7 @@
     "data:validate": "pnpm --filter @rangefoundry/tools run catalog:validate",
     "api:check": "pnpm --filter @rangefoundry/tools run api-check",
     "api:conformance": "pnpm --filter @rangefoundry/tools run api-conformance",
-    "baselines": "pnpm --filter @open-reloading/schema --filter @rangefoundry/web --filter @rangefoundry/tools exec vitest run test/contracts.test.ts --update",
+    "baselines": "pnpm --filter @rangefoundry/schema --filter @rangefoundry/web --filter @rangefoundry/tools exec vitest run test/contracts.test.ts --update",
     "knip": "knip",
     "pack:check": "pnpm --filter @rangefoundry/tools run pack-check",
     "docs:check": "pnpm --filter @rangefoundry/docs run check",

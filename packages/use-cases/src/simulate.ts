@@ -2,15 +2,6 @@
 
 import type { Catalogue } from '@open-reloading/catalog'
 import {
-  type Bullet,
-  fromSi,
-  type Load,
-  ladderStepKinds,
-  type Powder,
-  toSi,
-  userDataFile,
-} from '@open-reloading/schema'
-import {
   advisoryRule,
   boreArea,
   cartridgeBoreAreaMm2,
@@ -28,6 +19,15 @@ import {
   solidFill,
   solidFillLimit,
 } from '@rangefoundry/ballistics'
+import {
+  type Bullet,
+  fromSi,
+  type Load,
+  ladderStepKinds,
+  type Powder,
+  toSi,
+  userDataFile,
+} from '@rangefoundry/schema'
 import { z } from 'zod'
 import { resistanceGapText } from './advisory-text.ts'
 import { assertFinite, notice, resolvedRecord, unprocessable } from './answer.ts'

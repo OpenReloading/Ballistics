@@ -1,8 +1,8 @@
 'use client'
 
 import { ActionIcon, Button, Drawer, Text, TextInput } from '@mantine/core'
-import { parseRef } from '@open-reloading/schema'
 import { Copy, DownloadSimple, PencilSimple, Printer, Trash } from '@phosphor-icons/react'
+import { parseRef } from '@rangefoundry/schema'
 import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { deleteRecord, storedRecord, storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'

@@ -1,5 +1,5 @@
 /** The workspace folder handle shares the database (`workspace-folder.ts`). */
-import type { EmbeddedFile, UserRecord } from '@open-reloading/schema'
+import type { EmbeddedFile, UserRecord } from '@rangefoundry/schema'
 import { validRecords } from '../lib/user-data.ts'
 import { embeddedFileBlob, photoIds } from '../lib/user-photos.ts'
 import { inStore } from './user-db.ts'

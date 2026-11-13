@@ -1,13 +1,13 @@
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import type { PublishedLoads } from '@open-reloading/schema'
 import {
   interior,
   lbPerSqInToKgPerSqM,
   standardAtmosphere,
   trajectory,
 } from '@rangefoundry/ballistics'
+import type { PublishedLoads } from '@rangefoundry/schema'
 import { describe, expect, it, vi } from 'vitest'
 import { compare, verify } from '../src/commands.ts'
 import { Refusal, UsageError } from '../src/errors.ts'

@@ -7,7 +7,7 @@ import {
   recordId,
   targetFace,
   targetMapping,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import type { Catalogue } from '@rangefoundry/use-cases/catalog'
 import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'

@@ -1,4 +1,4 @@
-import type { UserRecord } from '@open-reloading/schema'
+import type { UserRecord } from '@rangefoundry/schema'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { putRecords, requestPersistentStorage } from '@/platform/user-store.ts'
 

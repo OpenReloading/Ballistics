@@ -1,8 +1,8 @@
 /** Database records to model inputs, with exact unit conversions. */
 
 import type { Catalogue, Catalogued } from '@open-reloading/catalog'
-import { type Bullet, toSi } from '@open-reloading/schema'
 import type { Aerodynamics, Projectile } from '@rangefoundry/ballistics'
+import { type Bullet, toSi } from '@rangefoundry/schema'
 import { type ResolvedRecord, resolvedRecord } from './answer.ts'
 import { InputError, RecordNotFound } from './issue.ts'
 import type { CartridgeWithSpecs } from './limits.ts'

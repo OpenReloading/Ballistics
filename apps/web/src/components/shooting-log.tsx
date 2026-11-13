@@ -13,13 +13,13 @@ import {
   TextInput,
   Title,
 } from '@mantine/core'
+import { DotsThreeVertical, Plus } from '@phosphor-icons/react'
 import {
   type ShootingLogEntry,
   type ShootingLogRecord,
   type UserRecord,
   userRecord,
-} from '@open-reloading/schema'
-import { DotsThreeVertical, Plus } from '@phosphor-icons/react'
+} from '@rangefoundry/schema'
 import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import {
   deleteRecord,

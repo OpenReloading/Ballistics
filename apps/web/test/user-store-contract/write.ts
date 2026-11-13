@@ -1,4 +1,4 @@
-import type { UserRecord } from '@open-reloading/schema'
+import type { UserRecord } from '@rangefoundry/schema'
 import { beforeEach, expect, it } from 'vitest'
 import type { UserStoreImplementation } from './implementation.ts'
 

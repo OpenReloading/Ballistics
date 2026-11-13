@@ -1,7 +1,7 @@
 'use client'
 
-import type { Cartridge, Powder } from '@open-reloading/schema'
 import { ChartBar } from '@phosphor-icons/react'
+import type { Cartridge, Powder } from '@rangefoundry/schema'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 import { fetchPowderList } from '../lib/api-client.ts'

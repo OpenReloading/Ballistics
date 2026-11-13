@@ -1,5 +1,5 @@
 import type { Bundle } from '@open-reloading/catalog'
-import type { Cartridge, SpecValue } from '@open-reloading/schema'
+import type { Cartridge, SpecValue } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { revisionOf } from '../../use-cases/src/catalog/derive.ts'
 import { API_PREFIX } from '../src/version.ts'

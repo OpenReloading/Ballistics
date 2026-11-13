@@ -5,7 +5,7 @@ import {
   type ShootingLogRecord,
   shootingLogEntry,
   type UserRecord,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import { type Message, msg } from '../i18n/translate.ts'
 import { toCsv } from './csv.ts'
 import { localDay } from './dates.ts'

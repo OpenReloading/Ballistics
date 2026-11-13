@@ -3,7 +3,7 @@ import { posix } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 /** The packages `@rangefoundry/use-cases/catalog` may import: ballistics and schema, no Node API. */
-const catalogueAllowed = ['@rangefoundry/ballistics', '@open-reloading/schema']
+const catalogueAllowed = ['@rangefoundry/ballistics', '@rangefoundry/schema']
 
 /** The files below `src/` that `entry` reaches by relative imports, and their other imports. */
 function imports(entry: string) {

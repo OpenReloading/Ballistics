@@ -1,5 +1,5 @@
-import type { Bullet } from '@open-reloading/schema'
 import type { Projectile } from '@rangefoundry/ballistics'
+import type { Bullet } from '@rangefoundry/schema'
 import { useEffect, useMemo, useState } from 'react'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import { bulletDrag } from '../lib/bullet.ts'

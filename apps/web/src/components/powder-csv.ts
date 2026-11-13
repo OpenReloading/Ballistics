@@ -1,4 +1,4 @@
-import { fromSi, toSi } from '@open-reloading/schema'
+import { fromSi, toSi } from '@rangefoundry/schema'
 import { canonicalNumberText, formatNumber } from '../i18n/number.ts'
 import type { Translator } from '../i18n/translate.ts'
 import { toCsv } from '../lib/csv.ts'

@@ -1,4 +1,4 @@
-import { checkUserRefs, type UserBullet, type UserRecord, userRecord } from '@open-reloading/schema'
+import { checkUserRefs, type UserBullet, type UserRecord, userRecord } from '@rangefoundry/schema'
 import { afterEach, expect, it, vi } from 'vitest'
 import { storageName } from '../src/lib/edition.ts'
 import {

@@ -1,5 +1,5 @@
-import type { TargetFace } from '@open-reloading/schema'
 import type { TrajectoryPoint } from '@rangefoundry/ballistics'
+import type { TargetFace } from '@rangefoundry/schema'
 import { InputError } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'

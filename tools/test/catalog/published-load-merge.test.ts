@@ -1,7 +1,7 @@
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
-import type { PublishedLoads } from '@open-reloading/schema'
+import type { PublishedLoads } from '@rangefoundry/schema'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { defined } from '../../../packages/catalog/test/defined.ts'
 import {

@@ -5,7 +5,7 @@ import {
   shareLinkOf,
   type UserRecord,
   userRefFields,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { type ParsedUserFile, reasonOf, reasonText } from './user-data.ts'
 

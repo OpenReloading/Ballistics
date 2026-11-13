@@ -282,7 +282,7 @@ analytic. The runs mutate the source and run the existing tests; no measured dat
 - `packages/schema/src/overrides.ts`, `packages/schema/test/overrides.test.ts`
 - `packages/schema/src/case-capacity.ts`, `packages/schema/test/case-capacity.test.ts`, `packages/schema/test/case-capacity-unit.test.ts`
 - `apps/web/src/lib/hole-proposals.ts`, `apps/web/test/hole-proposals.test.ts`
-- `apps/web/src/platform/user-store.ts`, `apps/web/test/user-store.test.ts`, `apps/web/test/user-store-contract/refit.ts`, `apps/web/test/user-store-contract/write.ts`
+- `apps/web/src/platform/user-store.ts`, `apps/web/test/user-store.test.ts`, `apps/web/test/user-store-contract/basics.ts`, `apps/web/test/user-store-contract/refit.ts`, `apps/web/test/user-store-contract/write.ts`
 - `packages/catalog/src/references.ts`, `packages/catalog/test/references.test.ts`
 - `tools/src/pack-check.ts`, `tools/test/pack-check.test.ts`
 - `packages/svg-drawings/src/core/geometry.ts`, `packages/svg-drawings/test/geometry.test.ts`

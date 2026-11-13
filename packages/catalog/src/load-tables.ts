@@ -1,6 +1,6 @@
-import type { LoadTables, Powder, Source } from '@open-reloading/schema'
+import type { LoadTables, Powder, Source } from '@rangefoundry/schema'
 
-export type { LoadTable, LoadTables } from '@open-reloading/schema'
+export type { LoadTable, LoadTables } from '@rangefoundry/schema'
 
 /** Whether `loadTables` lists a table with the source's title, URL and retrieval date. */
 function isListedLoadTable(source: Source, loadTables: LoadTables) {

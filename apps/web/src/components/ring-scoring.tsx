@@ -9,7 +9,7 @@ import {
   type ShotGroup,
   type TargetSheet,
   toSi,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import { type RefObject, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { fixedNumber, plainNumber } from '../i18n/number.ts'

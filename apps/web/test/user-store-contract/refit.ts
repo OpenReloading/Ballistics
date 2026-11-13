@@ -1,4 +1,4 @@
-import type { Powder, UserPowderFit } from '@open-reloading/schema'
+import type { Powder, UserPowderFit } from '@rangefoundry/schema'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { newerFit, type PowderDesign } from '../../src/lib/powder-designer.ts'
 import type { UserStoreImplementation } from './implementation.ts'

@@ -1,4 +1,4 @@
-import { score } from '@open-reloading/schema'
+import { score } from '@rangefoundry/schema'
 import type { CataloguePage, IndexRow, Paging } from './types.ts'
 
 /**

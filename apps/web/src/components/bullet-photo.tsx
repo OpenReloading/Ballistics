@@ -11,7 +11,7 @@ import {
   Text,
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
-import { fromSi, toSi } from '@open-reloading/schema'
+import { fromSi, toSi } from '@rangefoundry/schema'
 import { useEffect, useId, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { fixedNumber } from '../i18n/number.ts'

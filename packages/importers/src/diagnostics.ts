@@ -1,4 +1,4 @@
-import type { UserRecord } from '@open-reloading/schema'
+import type { UserRecord } from '@rangefoundry/schema'
 import type { Diagnostic } from '@rangefoundry/statistics'
 
 /** A finding of a reader: its code and the values its message names. The app words it in its language. */

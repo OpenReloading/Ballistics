@@ -1,7 +1,7 @@
 'use client'
 
 import { Button, Menu } from '@mantine/core'
-import { parseRef, type ShotGroup, type TargetSheet, userRecord } from '@open-reloading/schema'
+import { parseRef, type ShotGroup, type TargetSheet, userRecord } from '@rangefoundry/schema'
 import { useRef, useState } from 'react'
 import { createPortal, flushSync } from 'react-dom'
 import { storedRecord } from '@/platform/user-store.ts'

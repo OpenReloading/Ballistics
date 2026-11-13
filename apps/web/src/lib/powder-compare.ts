@@ -1,5 +1,5 @@
-import { type Powder, toSi } from '@open-reloading/schema'
 import { powderModelValues } from '@rangefoundry/ballistics'
+import { type Powder, toSi } from '@rangefoundry/schema'
 import type { InteriorBody } from './interior-input.ts'
 import { type SortDirection, sortRows } from './lists.ts'
 

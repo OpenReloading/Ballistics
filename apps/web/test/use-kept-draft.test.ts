@@ -1,4 +1,4 @@
-import type { UserRecord } from '@open-reloading/schema'
+import type { UserRecord } from '@rangefoundry/schema'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 
 vi.mock('react', async (original) => ({

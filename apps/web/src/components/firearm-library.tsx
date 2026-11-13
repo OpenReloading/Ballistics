@@ -12,6 +12,7 @@ import {
   Tooltip,
   UnstyledButton,
 } from '@mantine/core'
+import { DotsThreeVertical, Plus } from '@phosphor-icons/react'
 import {
   type Firearm,
   type Optic,
@@ -19,8 +20,7 @@ import {
   type OpticMount,
   parseRef,
   type UserRecord,
-} from '@open-reloading/schema'
-import { DotsThreeVertical, Plus } from '@phosphor-icons/react'
+} from '@rangefoundry/schema'
 import {
   type ReactNode,
   useCallback,

@@ -1,5 +1,3 @@
-import type { Bullet, Cartridge } from '@open-reloading/schema'
-import { bulletListFields, loadWaterCapacity, toSi } from '@open-reloading/schema'
 import { bulletDimensions } from '@open-reloading/svg-drawings/bullet'
 import { chamberOf, seat } from '@open-reloading/svg-drawings/seating'
 import { waterDensityGramsPerCm3 } from '@open-reloading/units'
@@ -12,6 +10,8 @@ import {
   standardAtmosphere,
   ValueError,
 } from '@rangefoundry/ballistics'
+import type { Bullet, Cartridge } from '@rangefoundry/schema'
+import { bulletListFields, loadWaterCapacity, toSi } from '@rangefoundry/schema'
 import { InputError } from '@rangefoundry/statistics'
 import type { Records } from './records.ts'
 import type { Row } from './rows.ts'

@@ -1,5 +1,5 @@
-import type { Bullet } from '@open-reloading/schema'
 import { bulletProfile } from '@open-reloading/svg-drawings/bullet'
+import type { Bullet } from '@rangefoundry/schema'
 import { expect, it } from 'vitest'
 import { translator } from '../src/i18n/translate.ts'
 import {

@@ -1,8 +1,8 @@
 'use client'
 
 import { ActionIcon, Button, Menu } from '@mantine/core'
-import type { ShotGroup } from '@open-reloading/schema'
 import { Export } from '@phosphor-icons/react'
+import type { ShotGroup } from '@rangefoundry/schema'
 import { type ReactNode, useState } from 'react'
 import { createPortal, flushSync } from 'react-dom'
 import { storedPhoto } from '@/platform/user-store.ts'

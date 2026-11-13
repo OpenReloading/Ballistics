@@ -1,8 +1,8 @@
 'use client'
 
 import { Button, Checkbox, NativeSelect, TextInput } from '@mantine/core'
-import type { Truing } from '@open-reloading/schema'
 import type { RangeStringFit, TrajectoryInput, TruingPlan } from '@rangefoundry/ballistics'
+import type { Truing } from '@rangefoundry/schema'
 import { useState } from 'react'
 import { updateRecord } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'

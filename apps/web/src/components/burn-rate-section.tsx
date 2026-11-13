@@ -1,6 +1,6 @@
 'use client'
 
-import type { Powder } from '@open-reloading/schema'
+import type { Powder } from '@rangefoundry/schema'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'

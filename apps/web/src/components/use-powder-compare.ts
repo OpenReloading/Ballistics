@@ -1,6 +1,6 @@
 'use client'
 
-import type { Powder } from '@open-reloading/schema'
+import type { Powder } from '@rangefoundry/schema'
 import { useEffect, useRef, useState } from 'react'
 import { english, type Message, msg, type Translator } from '../i18n/translate.ts'
 import { anySignal } from '../lib/any-signal.ts'

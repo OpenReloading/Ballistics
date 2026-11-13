@@ -1,8 +1,8 @@
 'use client'
 
 import { ActionIcon, Badge, Button, Checkbox, Group, Popover, Stack, Tooltip } from '@mantine/core'
-import type { UserRecord } from '@open-reloading/schema'
 import { CaretDown, Trash } from '@phosphor-icons/react'
+import type { UserRecord } from '@rangefoundry/schema'
 import { useCallback, useEffect, useState } from 'react'
 import { deleteRecords, storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'

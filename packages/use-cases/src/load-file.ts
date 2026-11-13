@@ -1,6 +1,15 @@
 /** `POST /interior/load-file` input: a load file (one record of kind `load`) read to the `POST /interior` body; a value the workbench takes from Settings, followed defaults or seating (temperature, volume, bore diameter, twist, travel) is not filled, so the route answers 422 with each; the field mapping is core's `interiorLoad`, this module adds the file check, the values of the referenced records and the lookups. */
 
 import {
+  checkResistanceValues,
+  type InteriorLoad,
+  interiorLoad,
+  missingLoadKeys,
+  overrideResistance,
+  powderModelValues,
+  ValueError,
+} from '@rangefoundry/ballistics'
+import {
   type AnalysisKey,
   analysisKinds,
   type Bullet,
@@ -12,16 +21,7 @@ import {
   toSi,
   userDataFile,
   versionProblem,
-} from '@open-reloading/schema'
-import {
-  checkResistanceValues,
-  type InteriorLoad,
-  interiorLoad,
-  missingLoadKeys,
-  overrideResistance,
-  powderModelValues,
-  ValueError,
-} from '@rangefoundry/ballistics'
+} from '@rangefoundry/schema'
 import { z } from 'zod'
 import { notice, unprocessable } from './answer.ts'
 

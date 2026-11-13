@@ -1,6 +1,6 @@
 'use client'
 
-import type { Bullet } from '@open-reloading/schema'
+import type { Bullet } from '@rangefoundry/schema'
 import { Fragment, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { storedRecords } from '@/platform/user-store.ts'

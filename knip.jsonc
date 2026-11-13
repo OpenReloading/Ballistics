@@ -88,7 +88,7 @@
         "@open-reloading/catalog",
         "@open-reloading/svg-drawings",
         "@open-reloading/importers",
-        "@open-reloading/schema",
+        "@rangefoundry/schema",
         // files these name in `Code:` lines and the research log, or that the docs tests import by path, so the CI
         // plan tests the docs when they change
         "@rangefoundry/ballistics",

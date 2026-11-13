@@ -1,8 +1,8 @@
 'use client'
 
 import { NativeSelect } from '@mantine/core'
-import type { TargetFace } from '@open-reloading/schema'
 import type { TrajectoryPoint } from '@rangefoundry/ballistics'
+import type { TargetFace } from '@rangefoundry/schema'
 import { type HitResult, hitProbability, pointDispersion } from '@rangefoundry/shot-groups'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'

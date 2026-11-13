@@ -5,7 +5,7 @@ import type {
   Powder,
   Primer,
   TargetFace,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import { cacheLife } from 'next/cache'
 import type {
   BulletSummary,

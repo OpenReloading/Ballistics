@@ -21,7 +21,7 @@ describe('JSON Schema baseline', () => {
 
   it('reaches a file through the export of the package name', () => {
     const path = createRequire(import.meta.url).resolve(
-      '@open-reloading/schema/json-schema/bullet.schema.json',
+      '@rangefoundry/schema/json-schema/bullet.schema.json',
     )
     expect(path).toBe(fileURLToPath(new URL('bullet.schema.json', built)))
   })

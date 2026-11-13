@@ -1,17 +1,17 @@
 import {
+  type InteriorLoad,
+  lbPerSqInToKgPerSqM,
+  type Projectile,
+  type TrajectoryInput,
+} from '@rangefoundry/ballistics'
+import {
   type AnalysisKey,
   analysisKinds,
   fromSi,
   ladderStepKinds,
   userDataFormat,
   userDataVersion,
-} from '@open-reloading/schema'
-import {
-  type InteriorLoad,
-  lbPerSqInToKgPerSqM,
-  type Projectile,
-  type TrajectoryInput,
-} from '@rangefoundry/ballistics'
+} from '@rangefoundry/schema'
 
 export { bundle } from '../../catalog/test/bundle.ts'
 

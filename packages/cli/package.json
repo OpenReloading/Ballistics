@@ -18,7 +18,7 @@
     "@rangefoundry/ballistics": "workspace:*",
     "@open-reloading/catalog": "workspace:*",
     "@open-reloading/svg-drawings": "workspace:*",
-    "@open-reloading/schema": "workspace:*",
+    "@rangefoundry/schema": "workspace:*",
     "@rangefoundry/statistics": "workspace:*",
     "@rangefoundry/tools": "workspace:*",
     "@open-reloading/units": "workspace:*",

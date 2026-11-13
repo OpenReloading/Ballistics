@@ -1,10 +1,10 @@
-import { compareKeys, fromSi, type Powder, toSi } from '@open-reloading/schema'
 import {
   fitPowderPooled,
   type PooledSession,
   PowderFitError,
   type PowderFitReason,
 } from '@rangefoundry/ballistics'
+import { compareKeys, fromSi, type Powder, toSi } from '@rangefoundry/schema'
 import { InputError, nth } from '@rangefoundry/statistics'
 import { Refusal, UsageError } from './errors.ts'
 import { type InteriorModel, loadOf, outcomes, predict } from './evaluate.ts'

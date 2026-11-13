@@ -1,5 +1,5 @@
 /** Filtering and sorting of the data lists (cartridges, bullets, powders) in the browser. */
-import { compareKeys, score, searchKey, sortKey } from '@open-reloading/schema'
+import { compareKeys, score, searchKey, sortKey } from '@rangefoundry/schema'
 import type { Translator } from '../i18n/translate.ts'
 
 export type SortDirection = 'ascending' | 'descending'

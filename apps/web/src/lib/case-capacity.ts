@@ -1,4 +1,4 @@
-import { loadWaterCapacity } from '@open-reloading/schema'
+import { loadWaterCapacity } from '@rangefoundry/schema'
 import { msg } from '../i18n/translate.ts'
 
 /** The Cartridge card's measured case capacity, for the unit switch (the field is the preview's). */

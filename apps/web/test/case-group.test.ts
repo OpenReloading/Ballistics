@@ -6,7 +6,7 @@ import {
   load as loadSchema,
   type UserRecord,
   userRecord,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import { expect, it } from 'vitest'
 import {
   blankCaseGroup,

@@ -6,7 +6,7 @@ import {
   type UserRecord,
   userId,
   userRecord,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import { expect, it } from 'vitest'
 import { ambiguousMessage } from '../src/i18n/number.ts'
 import { setShownLanguage } from '../src/i18n/shown.ts'

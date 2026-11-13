@@ -15,7 +15,7 @@ Parsers that turn chronograph exports, pressure histories, spreadsheets, load fi
 npm install @open-reloading/importers
 ```
 
-It installs `@open-reloading/schema` with it. Each library has its own [Semantic Versioning](../release.md#versions) version.
+It installs `@rangefoundry/schema` with it. Each library has its own [Semantic Versioning](../release.md#versions) version.
 
 ## Entry points
 
