@@ -3,6 +3,7 @@
 import type { Bullet } from '@rangefoundry/schema'
 import { Fragment, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import type { Say } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
@@ -19,7 +20,6 @@ import {
   withUserManufacturers,
 } from '../lib/manufacturers.ts'
 import type { UnitSystem } from '../lib/units.ts'
-import { storedRecords } from '../lib/user-store.ts'
 import { printAlone, usePortalBody } from './print.ts'
 import { RangeCard } from './range-card.tsx'
 

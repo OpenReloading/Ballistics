@@ -21,7 +21,7 @@ vi.mock('../src/lib/face-records.ts', () => ({
     mappings: [{ face: 'issf-10m', event: 'ar60', discipline: 'air-rifle-10m' }],
   }),
 }))
-vi.mock('../src/lib/user-store.ts', () => ({ storedRecords: () => api.stored() }))
+vi.mock('../src/platform/user-store.ts', () => ({ storedRecords: () => api.stored() }))
 
 const mm = (v: number) => toSi('length', v)
 const nine: CandidateClass = {

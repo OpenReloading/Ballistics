@@ -64,6 +64,7 @@ import './globals.css'
 import { Container, mantineHtmlProps } from '@mantine/core'
 import { colors } from '@rangefoundry/design-tokens'
 import type { Metadata, Viewport } from 'next'
+import { uiFont } from '@/platform/fonts/ui.ts'
 import { OfflineLayer } from '../components/offline-layer.tsx'
 import { PageShell } from '../components/page-shell.tsx'
 import { PreReleaseData } from '../components/pre-release-data.tsx'
@@ -73,7 +74,6 @@ import { SafetyDialog } from '../components/safety-dialog.tsx'
 import { basePath } from '../lib/edition.ts'
 import { colorSchemeScript, pageWidth } from '../lib/theme.ts'
 import { titleTemplate } from '../lib/title-template.ts'
-import { uiFont } from './fonts/ui.ts'
 
 export const metadata: Metadata = {
   title: { default: 'RangeFoundry Workbench', template: titleTemplate },

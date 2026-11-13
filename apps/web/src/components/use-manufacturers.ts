@@ -2,6 +2,7 @@
 
 import type { UserRecord } from '@rangefoundry/schema'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { putRecords, storedRecords } from '@/platform/user-store.ts'
 import type { ManufacturerSummary } from '../lib/api-types.ts'
 import {
   fetchManufacturers,
@@ -14,7 +15,6 @@ import {
   withUserManufacturers,
 } from '../lib/manufacturers.ts'
 import { newId } from '../lib/new-id.ts'
-import { putRecords, storedRecords } from '../lib/user-store.ts'
 
 /** While the catalogue has not answered (`ready` false) a name that matches no user manufacturer gets no reference and no record, so it cannot duplicate a catalogue manufacturer; `retry` asks again. */
 export function useManufacturers() {

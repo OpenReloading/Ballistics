@@ -28,7 +28,7 @@ import {
   withStoredSessions,
 } from '../src/lib/range-entry.ts'
 import { presetUnits, withUnit } from '../src/lib/units.ts'
-import { storedRecord, updateRecord } from '../src/lib/user-store.ts'
+import { storedRecord, updateRecord } from '../src/platform/user-store.ts'
 import { defined } from './defined.ts'
 
 const loadRef = 'user:7a2d9c10-5b3e-4f68-9d41-0c8e2b6a1f57'

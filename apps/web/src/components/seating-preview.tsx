@@ -33,6 +33,7 @@ import {
   useState,
 } from 'react'
 import { createPortal } from 'react-dom'
+import { storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
@@ -73,7 +74,6 @@ import {
   waterVolume,
   withUnit,
 } from '../lib/units.ts'
-import { storedRecords } from '../lib/user-store.ts'
 import { type UserBulletView, userBullets } from '../lib/variants.ts'
 import { type CapacityRule, capacityFraction } from '../lib/volume-tolerance.ts'
 import { AppModal } from './app-modal.tsx'

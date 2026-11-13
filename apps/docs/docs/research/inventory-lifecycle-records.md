@@ -60,7 +60,7 @@ analytic. A review of the repository's schema and web app; no measured data and 
 - `apps/web/src/lib/range-entry.ts` (`withSession`, the snapshot of the lots and the round count).
 - `apps/web/src/lib/load-notes.ts` (the notes on a changed lot and on the round count).
 - `apps/web/src/lib/case-group.ts` (the fields of a case group).
-- `apps/web/src/lib/export-reminder.ts` and `apps/web/src/lib/user-store.ts` (the export reminder, persistent storage).
+- `apps/web/src/lib/export-reminder.ts` and `apps/web/src/platform/user-store.ts` (the export reminder, persistent storage).
 - `apps/web/src/components/load-sheets.tsx` (the printed load sheets, the base of a box label).
 
 ## Confidence
