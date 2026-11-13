@@ -71,7 +71,7 @@
     "@types/react-dom": "19.3.0",
     "@vitest/browser": "catalog:",
     "@vitest/browser-playwright": "catalog:",
-    "lucide-react": "1.70.0",
+    "lucide-react": "1.71.0",
     "oxlint": "catalog:",
     "oxlint-tsgolint": "catalog:",
     "playwright": "catalog:",
@@ -80,7 +80,7 @@
     "react-dom": "catalog:",
     "storybook": "10.6.6",
     "typescript": "catalog:",
-    "vite": "8.3.6",
+    "vite": "8.3.7",
     "vitest": "catalog:"
   }
 }
