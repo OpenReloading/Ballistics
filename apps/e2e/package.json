@@ -1,5 +1,5 @@
 {
-  "name": "@open-reloading/e2e",
+  "name": "@rangefoundry/e2e",
   "version": "0.0.1",
   "private": true,
   "license": "MIT",
@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
-    "@open-reloading/web": "workspace:*",
+    "@rangefoundry/web": "workspace:*",
     "@playwright/test": "catalog:",
     "@types/node": "catalog:",
     "typescript": "catalog:",

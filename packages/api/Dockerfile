@@ -26,7 +26,7 @@ COPY apps/e2e/package.json apps/e2e/
 COPY apps/docs/package.json apps/docs/
 COPY tooling/test-kit/package.json tooling/test-kit/
 # tools: the catalog build writes its bundle with the catalog reader of tools/src/catalog
-RUN pnpm install --frozen-lockfile --ignore-scripts --filter "@open-reloading/api..." --filter @open-reloading/tools
+RUN pnpm install --frozen-lockfile --ignore-scripts --filter "@rangefoundry/api..." --filter @rangefoundry/tools
 # the API Extractor configuration that the builds of the packages extend
 COPY packages/api-extractor.base.json packages/
 COPY packages/units packages/units
@@ -39,7 +39,7 @@ COPY packages/api packages/api
 COPY tools/src/catalog tools/src/catalog
 # statistics' tests draw on the test kit, a dev dependency the filter builds too
 COPY tooling/test-kit tooling/test-kit
-RUN pnpm --filter "@open-reloading/api..." run build
+RUN pnpm --filter "@rangefoundry/api..." run build
 
 FROM docker.io/library/node:26-trixie-slim@sha256:5adad64f9a1fca2d51972caa65983634c8a774eb300d72b20f7f2a0f60368072
 ENV NODE_ENV=production
@@ -69,7 +69,7 @@ COPY apps/e2e/package.json apps/e2e/
 COPY apps/docs/package.json apps/docs/
 COPY tooling/test-kit/package.json tooling/test-kit/
 # The image runs node only: pnpm and npm are removed after the install.
-RUN pnpm install --frozen-lockfile --prod --ignore-scripts --filter "@open-reloading/api..." \
+RUN pnpm install --frozen-lockfile --prod --ignore-scripts --filter "@rangefoundry/api..." \
   && rm -rf /opt/pnpm /usr/local/bin/pnpm /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
 COPY --from=build /app/packages/units/dist packages/units/dist
 COPY --from=build /app/packages/statistics/dist packages/statistics/dist

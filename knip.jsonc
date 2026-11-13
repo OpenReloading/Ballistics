@@ -92,9 +92,9 @@
         // files these name in `Code:` lines and the research log, or that the docs tests import by path, so the CI
         // plan tests the docs when they change
         "@rangefoundry/ballistics",
-        "@open-reloading/cli",
-        "@open-reloading/tools",
-        "@open-reloading/web"
+        "@rangefoundry/cli",
+        "@rangefoundry/tools",
+        "@rangefoundry/web"
       ]
     },
     "apps/web": {
@@ -107,14 +107,14 @@
     },
     "apps/e2e": {
       // the web app's catalogue is read by path in the unit tests, declared so the CI plan runs them when it changes
-      "ignoreDependencies": ["@open-reloading/web"]
+      "ignoreDependencies": ["@rangefoundry/web"]
     },
     "tools": {
       // their sources and exports are read by path in the tests, declared so the CI plan tests tools when they change
       "ignoreDependencies": [
         "@open-reloading/svg-drawings",
         "@open-reloading/importers",
-        "@open-reloading/web"
+        "@rangefoundry/web"
       ],
       "ignoreBinaries": [
         // installed in the dev container and the CI image, not from npm

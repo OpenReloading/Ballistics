@@ -32,5 +32,5 @@ const pnpm = (...args: string[]) =>
   execFileSync(executable('pnpm'), args, { cwd: root, stdio: 'inherit' })
 for (const { filter, e2eUnit } of jobs) {
   if (filter !== '') pnpm('--workspace-concurrency=1', ...filter.split(' '), 'run', 'test')
-  if (e2eUnit) pnpm('--filter', '@open-reloading/e2e', 'run', 'test:unit')
+  if (e2eUnit) pnpm('--filter', '@rangefoundry/e2e', 'run', 'test:unit')
 }

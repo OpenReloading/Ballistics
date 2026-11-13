@@ -6,7 +6,7 @@ description: One compute operation of the API offline, the list of operations wi
 
 # Command line
 
-`packages/cli` (`@open-reloading/cli`, bin `ballistics`) measures how far the interior model is from printed load rows it was not fitted to, and says whether a changed model got better. It adds no model of its own: a row becomes an interior run through `recordLoad` of `@rangefoundry/ballistics` (the [M3 page](models/interior-m3.md#load-from-records)) and the seating of `@open-reloading/svg-drawings`. Results are simulations compared with printed values, never load data.
+`packages/cli` (`@rangefoundry/cli`, bin `ballistics`) measures how far the interior model is from printed load rows it was not fitted to, and says whether a changed model got better. It adds no model of its own: a row becomes an interior run through `recordLoad` of `@rangefoundry/ballistics` (the [M3 page](models/interior-m3.md#load-from-records)) and the seating of `@open-reloading/svg-drawings`. Results are simulations compared with printed values, never load data.
 
 ```sh
 pnpm run build
@@ -181,7 +181,7 @@ The code of the evaluation itself (rows, split, the metrics and the percentiles,
 
 ## Output
 
-JSON when stdout is not a terminal or with `--json`, a table with `--table` or on a terminal. The JSON of `verify`, `compare` and `fit` carries `schemaVersion` (1) and `notice: "simulation, not load data"`, the label of the API's answers. It is described by `packages/cli/schema/result.schema.json`, written from the zod definition in `src/result.ts` by `pnpm --filter @open-reloading/cli run schema`; a test validates real output of these commands against it. The schema's `$id`, `https://openreloading.github.io/Ballistics/docs/result.schema.json`, is where the build of this site copies it.
+JSON when stdout is not a terminal or with `--json`, a table with `--table` or on a terminal. The JSON of `verify`, `compare` and `fit` carries `schemaVersion` (1) and `notice: "simulation, not load data"`, the label of the API's answers. It is described by `packages/cli/schema/result.schema.json`, written from the zod definition in `src/result.ts` by `pnpm --filter @rangefoundry/cli run schema`; a test validates real output of these commands against it. The schema's `$id`, `https://openreloading.github.io/Ballistics/docs/result.schema.json`, is where the build of this site copies it.
 
 `--version` prints `ballistics <version>` and exits 0.
 

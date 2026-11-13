@@ -555,14 +555,14 @@
                   "!@open-reloading/schema/**",
                   "!@rangefoundry/use-cases",
                   "!@rangefoundry/use-cases/**",
-                  "!@open-reloading/api/catalogue",
-                  "!@open-reloading/tools/catalog"
+                  "!@rangefoundry/api/catalogue",
+                  "!@rangefoundry/tools/catalog"
                 ],
-                "message": "cli-imports-logic-catalog-drawing-schema-only: packages/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), catalog, drawing, schema and use-cases, and of @open-reloading/api only the catalogue entry the browser runs, and of @open-reloading/tools only the catalog reader."
+                "message": "cli-imports-logic-catalog-drawing-schema-only: packages/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), catalog, drawing, schema and use-cases, and of @rangefoundry/api only the catalogue entry the browser runs, and of @rangefoundry/tools only the catalog reader."
               },
               {
                 "regex": "^(\\.\\./)+((units|schema|importers|catalog|use-cases|target-recognition|api|svg-drawings|cli)/(src|dist)|packages|apps)/",
-                "message": "cli-imports-logic-catalog-drawing-schema-only: packages/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), catalog, drawing, schema and use-cases, and of @open-reloading/api only the catalogue entry the browser runs, and of @open-reloading/tools only the catalog reader."
+                "message": "cli-imports-logic-catalog-drawing-schema-only: packages/cli is a thin layer over the libraries: the logic packages (units, statistics, ballistics, shot-groups), catalog, drawing, schema and use-cases, and of @rangefoundry/api only the catalogue entry the browser runs, and of @rangefoundry/tools only the catalog reader."
               }
             ]
           }
@@ -582,18 +582,18 @@
                   "@open-reloading/catalog",
                   "@open-reloading/catalog/**",
                   "!@open-reloading/catalog/plausibility",
-                  "@open-reloading/api",
-                  "@open-reloading/api/**",
-                  "!@open-reloading/api/catalogue",
+                  "@rangefoundry/api",
+                  "@rangefoundry/api/**",
+                  "!@rangefoundry/api/catalogue",
                   "fastify",
                   "fastify/**",
                   "@fastify/**"
                 ],
-                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/catalog only the plausibility checks and of @open-reloading/api only the catalogue entry of the static site runs in the web app."
+                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/catalog only the plausibility checks and of @rangefoundry/api only the catalogue entry of the static site runs in the web app."
               },
               {
                 "regex": "^(\\.\\./)+packages/",
-                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/catalog only the plausibility checks and of @open-reloading/api only the catalogue entry of the static site runs in the web app."
+                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/catalog only the plausibility checks and of @rangefoundry/api only the catalogue entry of the static site runs in the web app."
               },
               {
                 "regex": "^node:",
@@ -617,18 +617,18 @@
                   "@open-reloading/catalog",
                   "@open-reloading/catalog/**",
                   "!@open-reloading/catalog/plausibility",
-                  "@open-reloading/api",
-                  "@open-reloading/api/**",
-                  "!@open-reloading/api/catalogue",
+                  "@rangefoundry/api",
+                  "@rangefoundry/api/**",
+                  "!@rangefoundry/api/catalogue",
                   "fastify",
                   "fastify/**",
                   "@fastify/**"
                 ],
-                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/catalog only the plausibility checks and of @open-reloading/api only the catalogue entry of the static site runs in the web app."
+                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/catalog only the plausibility checks and of @rangefoundry/api only the catalogue entry of the static site runs in the web app."
               },
               {
                 "regex": "^(\\.\\./)+packages/",
-                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/catalog only the plausibility checks and of @open-reloading/api only the catalogue entry of the static site runs in the web app."
+                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/catalog only the plausibility checks and of @rangefoundry/api only the catalogue entry of the static site runs in the web app."
               }
             ]
           }

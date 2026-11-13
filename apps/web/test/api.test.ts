@@ -1,4 +1,4 @@
-import { startBundleApi } from '@open-reloading/api/static'
+import { startBundleApi } from '@rangefoundry/api/static'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 
 vi.mock('next/cache', () => ({ cacheLife: () => {} }))

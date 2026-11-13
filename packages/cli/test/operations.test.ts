@@ -2,15 +2,15 @@ import { spawnSync } from 'node:child_process'
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { startBundleApi } from '@open-reloading/api/static'
+import { startBundleApi } from '@rangefoundry/api/static'
 import { operation, operations } from '@rangefoundry/use-cases'
 import { Ajv2020 } from 'ajv/dist/2020.js'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { run } from '../src/main.ts'
 
-vi.mock('@open-reloading/tools/catalog', async (original) =>
+vi.mock('@rangefoundry/tools/catalog', async (original) =>
   (await import('./records-memo.ts')).memoRecords(
-    await original<typeof import('@open-reloading/tools/catalog')>(),
+    await original<typeof import('@rangefoundry/tools/catalog')>(),
   ),
 )
 

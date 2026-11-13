@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync } from 'node:fs'
-import { buildOpenApi } from '@open-reloading/api/openapi'
 import { pressureMethod } from '@open-reloading/schema'
+import { buildOpenApi } from '@rangefoundry/api/openapi'
 import { advisoryText } from '@rangefoundry/use-cases'
 import { describe, expect, it } from 'vitest'
 import { limitCheck, type Warning } from '../../../packages/use-cases/dist/limits.js'

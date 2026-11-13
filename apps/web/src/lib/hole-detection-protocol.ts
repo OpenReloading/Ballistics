@@ -6,7 +6,7 @@ import type {
   FlaggedRegion,
   HoleExample,
   HoleProposal,
-} from '@open-reloading/target-recognition'
+} from '@rangefoundry/target-recognition'
 import type { QualityIssue, TargetLayout } from './photo-quality.ts'
 import type { Point } from './target-geometry.ts'
 

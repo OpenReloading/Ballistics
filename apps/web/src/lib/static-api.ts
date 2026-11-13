@@ -1,4 +1,4 @@
-/** The API in the browser over the data files the Pages build writes under `<base>/api/` (`writeStaticApi` of `@open-reloading/api/static`), running the API's own code (`@rangefoundry/use-cases`), each compute task in its own worker. */
+/** The API in the browser over the data files the Pages build writes under `<base>/api/` (`writeStaticApi` of `@rangefoundry/api/static`), running the API's own code (`@rangefoundry/use-cases`), each compute task in its own worker. */
 
 import { type Powder, primerCompounds, primerSizes, recordIdRegex } from '@open-reloading/schema'
 import {

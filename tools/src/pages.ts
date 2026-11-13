@@ -2,7 +2,7 @@
 import { spawn } from 'node:child_process'
 import { cpSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { startBundleApi, writeStaticApi } from '@open-reloading/api/static'
+import { startBundleApi, writeStaticApi } from '@rangefoundry/api/static'
 import { executable } from './executable.ts'
 import { dropFullPayloads } from './pages-payload.ts'
 
@@ -41,7 +41,7 @@ rmSync(at('apps/web/public/api'), { recursive: true, force: true })
 const api = await startBundleApi()
 try {
   // never the inherited value: the dev container sets `sample`, which leaves record pages out of the export
-  await run(['--filter', '@open-reloading/web', 'run', 'build'], {
+  await run(['--filter', '@rangefoundry/web', 'run', 'build'], {
     API_URL: api.url,
     PRERENDER: sample ? 'sample' : 'full',
     PAGES_BASE_PATH: base,
@@ -66,13 +66,10 @@ const docsEnv = {
   PAGES_EDITION: undefined,
 }
 if (docs)
-  await run(
-    ['--filter', '@open-reloading/docs', 'run', 'site:build', '--out-dir', `${site}/docs`],
-    {
-      ...docsEnv,
-      ...(process.env.PAGES_URL && { DOCS_URL: process.env.PAGES_URL }),
-    },
-  )
+  await run(['--filter', '@rangefoundry/docs', 'run', 'site:build', '--out-dir', `${site}/docs`], {
+    ...docsEnv,
+    ...(process.env.PAGES_URL && { DOCS_URL: process.env.PAGES_URL }),
+  })
 for (const file of ['LICENSE', 'NOTICE']) cpSync(at(file), `${site}/${file}`)
 cpSync(at('packages/catalog/LICENSE'), `${site}/data/LICENSE`)
 // GitHub Pages serves the files as they are, `_next/` among them, without Jekyll

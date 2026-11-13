@@ -1,5 +1,5 @@
 import type { TargetSheet } from '@open-reloading/schema'
-import { type FaceFit, findFace } from '@open-reloading/target-recognition'
+import { type FaceFit, findFace } from '@rangefoundry/target-recognition'
 import { describe, expect, it } from 'vitest'
 import {
   type Homography,
