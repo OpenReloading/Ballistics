@@ -32,7 +32,7 @@ _Avoid_: record id (for user data)
 `note`: free text on a record, a provenance block, a source, a published ballistic coefficient or a plausibility exception.
 
 **Provenance**:
-`provenance`: where the values of a record come from, a `kind` and at least one source in `sources`, with an optional `note`. Carried by every record and its API answers, except a bullet or powder of basic fields only (`bulletBasicFields`, `powderBasicFields`).
+`provenance`: where the values of a record come from, a `kind` and at least one source in `sources`, with an optional `note`. Carried by every record and its API answers; a bullet or powder of basic fields only (`bulletBasicFields`, `powderBasicFields`) may omit it.
 
 **Provenance kind**:
 `kind` of a provenance block or a source: `published`, `measured`, `derived`, `fitted` or `computed`. A source's `kind` overrides the block's for that source's values.
@@ -957,7 +957,7 @@ _Avoid_: trajectory, truing, plans, fit, stability (as answer keys)
 `units`: the unit of each field of a compute answer.
 
 **Resolved record**:
-`resolved`: the records a request named by id (`bullet`, `powder`, `cartridge`), each echoed with `id`, `manufacturer`, `name`, `provenance` (absent on a bullet or powder of basic fields only) and `suppliedFields`.
+`resolved`: the records a request named by id (`bullet`, `powder`, `cartridge`), each echoed with `id`, `manufacturer`, `name`, `provenance` (may be absent on a bullet or powder of basic fields only) and `suppliedFields`.
 _Avoid_: echo
 
 **Supplied fields**:
