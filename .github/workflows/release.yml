@@ -242,7 +242,7 @@ jobs:
       # pnpm packs (it writes the version of each `workspace:` dependency), npm publishes with provenance.
       - run: |
           for name in $(jq -r '.[]' <<< "$LIBRARIES"); do
-            package="@open-reloading/$name"
+            package="@rangefoundry/$name"
             version=$(node -p "require('./packages/$name/package.json').version")
             if npm view "$package@$version" version > /dev/null 2>&1; then
               echo "$package@$version is already published"
