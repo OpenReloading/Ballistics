@@ -7,7 +7,8 @@ test('a bullet list filtered by tip and base narrows the list, survives a reload
 }) => {
   await gotoHydrated(page, '/bullets')
   const filters = page.locator('.directory-filters')
-  const count = page.locator('.page-bar').getByText(/^\d[\d,]* (of [\d,]+ )?bullets$/)
+  // the mounted count: a streamed copy not yet revealed holds the same text without the role
+  const count = page.locator('.page-bar-status [role="status"]')
   const total = await count.textContent()
   await filters.getByRole('button', { name: 'Tip', exact: true }).click()
   // each option counts the rows it leaves

@@ -20,10 +20,11 @@ const fixture: Record<string, { source: string; rules: string[] }> = JSON.parse(
 )
 const root = fileURLToPath(new URL('../..', import.meta.url))
 const oxlint = join(root, 'node_modules/.bin/oxlint')
-/** The configurations the mirror lints with: the root one, the base of the logic packages and the own ones that extend it. */
+/** The configurations the mirror lints with: the root one, the bases of the logic and the UI packages and the own ones that extend them. */
 const configs = [
   '.oxlintrc.json',
   'packages/oxlint.logic.json',
+  'packages/oxlint.ui.json',
   'packages/units/.oxlintrc.json',
   'packages/locale-format/.oxlintrc.json',
   'packages/design-tokens/.oxlintrc.json',
@@ -35,6 +36,7 @@ const configs = [
   'packages/catalog/.oxlintrc.json',
   'packages/use-cases/.oxlintrc.json',
   'packages/target-recognition/.oxlintrc.json',
+  'packages/ui/.oxlintrc.json',
 ]
 
 let mirror = ''
@@ -63,6 +65,7 @@ const ruleOf = (d: { code: string; message: string; help?: string }) =>
     'import(no-cycle)': 'no-cycle',
     'vitest(no-identical-title)': 'no-identical-title',
     'typescript(no-import-type-side-effects)': 'no-import-type-side-effects',
+    'jsx-a11y(alt-text)': 'alt-text',
   })[d.code] ?? /\b([a-z]+(?:-[a-z]+)+): /.exec(`${d.help ?? ''} ${d.message}`)?.[1]
 
 it('names the rule each forbidden import or global breaks and passes the allowed ones', () => {
@@ -82,7 +85,15 @@ it('names the rule each forbidden import or global breaks and passes the allowed
   )
 })
 
-it('lets the config of a logic package add only its import rule to the base', () => {
+/** A package that renders React at run time, which the UI base lints with the React and jsx-a11y rules. */
+const usesReact = (dir: string) => {
+  const manifest: Record<string, Record<string, string> | undefined> = JSON.parse(
+    readFileSync(join(root, dir, 'package.json'), 'utf8'),
+  )
+  return Boolean(manifest['dependencies']?.['react'] ?? manifest['peerDependencies']?.['react'])
+}
+
+it('lets the config of a package add only its import rule to its base', () => {
   const shapes = globSync('packages/*/.oxlintrc.json', { cwd: root }).map((file) => {
     const config: { extends: string[]; overrides: { rules: object }[] } = JSON.parse(
       readFileSync(join(root, file), 'utf8'),
@@ -101,7 +112,7 @@ it('lets the config of a logic package add only its import rule to the base', ()
     shapes.map(({ file, overrides }) => ({
       file,
       keys: ['$schema', 'extends', 'overrides'],
-      extends: ['../oxlint.logic.json'],
+      extends: [usesReact(dirname(file)) ? '../oxlint.ui.json' : '../oxlint.logic.json'],
       overrides: overrides.map(() => [['files', 'rules'], ['no-restricted-imports']]),
     })),
   )

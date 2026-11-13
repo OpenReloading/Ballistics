@@ -6,16 +6,17 @@ const meta = { title: 'Controls' } satisfies Meta
 export default meta
 type Story = StoryObj<typeof meta>
 
+const luminance = (color: string) => {
+  const [r = 0, g = 0, b = 0] = (color.match(/[\d.]+/g) ?? []).map((v) => {
+    const c = Number(v) / 255
+    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
+  })
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b
+}
+
 /** The WCAG 2 contrast of two computed `rgb()` colors. */
 function contrast(a: string, b: string): number {
-  const luminance = (color: string) => {
-    const [r = 0, g = 0, b = 0] = (color.match(/[\d.]+/g) ?? []).map((v) => {
-      const c = Number(v) / 255
-      return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
-    })
-    return 0.2126 * r + 0.7152 * g + 0.0722 * b
-  }
-  const [high = 0, low = 0] = [luminance(a), luminance(b)].sort((x, y) => y - x)
+  const [high = 0, low = 0] = [luminance(a), luminance(b)].toSorted((x, y) => y - x)
   return (high + 0.05) / (low + 0.05)
 }
 

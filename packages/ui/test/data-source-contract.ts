@@ -23,15 +23,6 @@ export function dataSourceContract(make: (rows: ContractRow[]) => DataSource<Con
       (row) => row.name,
     )
 
-  it('counts every row that passes the filters and returns the range of them', async () => {
-    const page = await make(contractRows).query({
-      filters: [{ id: 'weight', value: 168 }],
-      sorting: [],
-      range: { start: 1, count: 5 },
-    })
-    expect(page).toEqual({ rows: [{ name: 'berger', weight: 168, code: Number.NaN }], total: 2 })
-  })
-
   it('sorts by each key in turn, keeping the given order of equal rows', async () => {
     expect(await sortedNames([{ id: 'weight', desc: true }])).toEqual([
       'Lapua',
@@ -65,6 +56,20 @@ export function dataSourceContract(make: (rows: ContractRow[]) => DataSource<Con
     ])
   })
 
+  rangeContract(make)
+}
+
+/** The ranges and refusals of the contract. */
+function rangeContract(make: (rows: ContractRow[]) => DataSource<ContractRow>): void {
+  it('counts every row that passes the filters and returns the range of them', async () => {
+    const page = await make(contractRows).query({
+      filters: [{ id: 'weight', value: 168 }],
+      sorting: [],
+      range: { start: 1, count: 5 },
+    })
+    expect(page).toEqual({ rows: [{ name: 'berger', weight: 168, code: Number.NaN }], total: 2 })
+  })
+
   it('returns no rows past the end, with the total still counted', async () => {
     const page = await make(contractRows).query({
       filters: [],
@@ -87,7 +92,10 @@ export function dataSourceContract(make: (rows: ContractRow[]) => DataSource<Con
   })
 
   it('refuses an aborted query', async () => {
-    const query = { filters: [], sorting: [], range: all }
-    await expect(make(contractRows).query(query, AbortSignal.abort())).rejects.toThrow()
+    const query = { filters: [], sorting: [], range: { start: 0, count: 100 } }
+    await expect(make(contractRows).query(query, AbortSignal.abort())).rejects.toHaveProperty(
+      'name',
+      'AbortError',
+    )
   })
 }

@@ -249,12 +249,6 @@ importers:
       '@open-reloading/schema':
         specifier: workspace:*
         version: link:../../packages/schema
-      '@rangefoundry/shot-groups':
-        specifier: workspace:*
-        version: link:../../packages/shot-groups
-      '@rangefoundry/statistics':
-        specifier: workspace:*
-        version: link:../../packages/statistics
       '@open-reloading/svg-drawings':
         specifier: workspace:*
         version: link:../../packages/svg-drawings
@@ -270,6 +264,12 @@ importers:
       '@phosphor-icons/react':
         specifier: 2.1.10
         version: 2.1.10(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@rangefoundry/shot-groups':
+        specifier: workspace:*
+        version: link:../../packages/shot-groups
+      '@rangefoundry/statistics':
+        specifier: workspace:*
+        version: link:../../packages/statistics
       country-flag-icons:
         specifier: 1.6.20
         version: 1.6.20
@@ -374,12 +374,12 @@ importers:
 
   packages/ballistics:
     dependencies:
-      '@rangefoundry/statistics':
-        specifier: workspace:*
-        version: link:../statistics
       '@open-reloading/units':
         specifier: workspace:*
         version: link:../units
+      '@rangefoundry/statistics':
+        specifier: workspace:*
+        version: link:../statistics
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: 'catalog:'
@@ -460,9 +460,6 @@ importers:
       '@open-reloading/schema':
         specifier: workspace:*
         version: link:../schema
-      '@rangefoundry/statistics':
-        specifier: workspace:*
-        version: link:../statistics
       '@open-reloading/svg-drawings':
         specifier: workspace:*
         version: link:../svg-drawings
@@ -475,6 +472,9 @@ importers:
       '@rangefoundry/use-cases':
         specifier: workspace:*
         version: link:../use-cases
+      '@rangefoundry/statistics':
+        specifier: workspace:*
+        version: link:../statistics
       zod:
         specifier: 'catalog:'
         version: 4.6.7
@@ -551,12 +551,12 @@ importers:
       '@open-reloading/schema':
         specifier: workspace:*
         version: link:../schema
-      '@rangefoundry/statistics':
-        specifier: workspace:*
-        version: link:../statistics
       '@open-reloading/units':
         specifier: workspace:*
         version: link:../units
+      '@rangefoundry/statistics':
+        specifier: workspace:*
+        version: link:../statistics
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: 'catalog:'
@@ -628,12 +628,12 @@ importers:
 
   packages/schema:
     dependencies:
-      '@rangefoundry/statistics':
-        specifier: workspace:*
-        version: link:../statistics
       '@open-reloading/units':
         specifier: workspace:*
         version: link:../units
+      '@rangefoundry/statistics':
+        specifier: workspace:*
+        version: link:../statistics
       zod:
         specifier: 'catalog:'
         version: 4.6.7
@@ -671,12 +671,12 @@ importers:
 
   packages/shot-groups:
     dependencies:
-      '@rangefoundry/statistics':
-        specifier: workspace:*
-        version: link:../statistics
       '@open-reloading/units':
         specifier: workspace:*
         version: link:../units
+      '@rangefoundry/statistics':
+        specifier: workspace:*
+        version: link:../statistics
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: 'catalog:'
@@ -872,6 +872,12 @@ importers:
       lucide-react:
         specifier: 1.70.0
         version: 1.70.0(@types/react@19.3.0)(react@19.3.1)
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.92.0(oxlint-tsgolint@7.0.2006)
+      oxlint-tsgolint:
+        specifier: 'catalog:'
+        version: 7.0.2006
       playwright:
         specifier: 'catalog:'
         version: 1.65.0
