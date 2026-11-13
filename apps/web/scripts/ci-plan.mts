@@ -77,8 +77,8 @@ const recordRoutes = [
   'federations',
 ].map((r) => `apps/web/src/app/${r}/[id]`)
 
-/** The workspace scope: either one while the packages move from `@open-reloading/` to `@rangefoundry/`. */
-const scope = /^@(?:open-reloading|rangefoundry)\//
+/** The workspace scope. */
+const scope = /^@rangefoundry\//
 
 /** The package name of each workspace of pnpm-workspace.yaml, by its name without the scope. */
 export function workspaceNames(root = repoRoot) {

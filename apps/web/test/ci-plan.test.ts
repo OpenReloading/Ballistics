@@ -290,7 +290,7 @@ it('tests every workspace that has tests, in exactly one group', () => {
     }
     return scripts?.test === undefined
       ? []
-      : [name.replace(/^@(open-reloading|rangefoundry)\//, '')]
+      : [name.replace(/^@rangefoundry\//, '')]
   })
   expect(members.length).toBe(new Set(members).size)
   expect([...members].sort()).toEqual(withTests.sort())

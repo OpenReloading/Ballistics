@@ -30,7 +30,7 @@ function exportedNames(file: URL, seen = new Set<string>()): string[] {
   for (const [, from] of text.matchAll(/^export \* from '(\.[^']+)\.ts'/gm))
     names.push(...exportedNames(new URL(`${from}.d.ts`, file), seen))
   for (const [, pkg] of text.matchAll(
-    /^export \* from '@(?:open-reloading|rangefoundry)\/([\w-]+)'/gm,
+    /^export \* from '@rangefoundry\/([\w-]+)'/gm,
   ))
     for (const [path, entry] of entries(pkg as string))
       if (path === '.') names.push(...exportedNames(entry, seen))
@@ -96,7 +96,7 @@ describe('export lists of the published packages', () => {
     expect(names).toEqual(expect.arrayContaining(['chiSquareQuantile', 'InputError', 'Interval']))
   })
 
-  it.each(published)('@open-reloading/%s exports the names of its baseline', async (name) => {
+  it.each(published)('@rangefoundry/%s exports the names of its baseline', async (name) => {
     const list = entries(name).flatMap(([path, file]) =>
       [...new Set(exportedNames(file))].sort().map((n) => `${path} ${n}`),
     )
