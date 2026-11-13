@@ -1,9 +1,9 @@
 /** The workbench loads, tabs and the saved-loads list. */
 import type { UserRecord } from '@open-reloading/schema'
+import { putRecords, storedRecord } from '@/platform/user-store.ts'
 import type { Translator } from '../i18n/translate.ts'
 import { matchesQuery } from './lists.ts'
 import { copyName } from './user-file-names.ts'
-import { putRecords, storedRecord } from './user-store.ts'
 import { catalogueIdOf } from './variants.ts'
 
 export type LoadRecord = Extract<UserRecord, { kind: 'load' }>

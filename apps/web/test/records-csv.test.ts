@@ -17,7 +17,7 @@ vi.mock('../src/lib/api-fetch.ts', () => ({
       : Promise.reject(new Error('not found'))
   },
 }))
-vi.mock('../src/lib/user-store.ts', () => ({
+vi.mock('../src/platform/user-store.ts', () => ({
   storedRecords: async () => ({ records: api.stored, invalid: [] }),
 }))
 vi.mock('../src/lib/download.ts', () => ({

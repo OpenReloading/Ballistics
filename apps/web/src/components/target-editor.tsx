@@ -74,6 +74,18 @@ import {
 } from 'react'
 import { flushSync } from 'react-dom'
 import { z } from 'zod'
+import {
+  deletePhoto,
+  deleteRecord,
+  putPhoto,
+  putRecordIf,
+  putRecords,
+  requestPersistentStorage,
+  storedPhoto,
+  storedPhotoIds,
+  storedRecord,
+  storedRecords,
+} from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { decimalMark, fixedNumber, formatNumber, plainNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
@@ -111,18 +123,6 @@ import { groupStatisticsOf } from '../lib/target-groups.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
 import { formatQuantity, unitsOf, withUnit } from '../lib/units.ts'
 import { canonicalJson, validRecords } from '../lib/user-data.ts'
-import {
-  deletePhoto,
-  deleteRecord,
-  putPhoto,
-  putRecordIf,
-  putRecords,
-  requestPersistentStorage,
-  storedPhoto,
-  storedPhotoIds,
-  storedRecord,
-  storedRecords,
-} from '../lib/user-store.ts'
 import {
   keptCopy,
   keptNote,

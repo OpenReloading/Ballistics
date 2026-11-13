@@ -1,5 +1,5 @@
 /** Without the schema, so a page that only lists stored values stays small. */
-import { storageName } from './edition.ts'
+import { storageName } from '../lib/edition.ts'
 
 const request = <T>(r: IDBRequest<T>) =>
   new Promise<T>((resolve, reject) => {

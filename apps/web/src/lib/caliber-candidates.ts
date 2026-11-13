@@ -6,10 +6,10 @@ import {
   parseRef,
   toSi,
 } from '@open-reloading/schema'
+import { storedRecords } from '@/platform/user-store.ts'
 import { apiFetch, fetchRecord } from './api-fetch.ts'
 import { mappingOf } from './face-disciplines.ts'
 import { fetchFederationData } from './face-records.ts'
-import { storedRecords } from './user-store.ts'
 
 /** A caliber class: nominal bullet diameter in m, the ids of its member cartridge records. */
 export type CandidateClass = {

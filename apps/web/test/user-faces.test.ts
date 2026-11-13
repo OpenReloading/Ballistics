@@ -2,10 +2,10 @@ import type { UserRecord } from '@open-reloading/schema'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { apiFetch } from '../src/lib/api-fetch.ts'
 import { fetchFace, fetchFaceSummaries, isFaceId } from '../src/lib/face-records.ts'
-import { storedRecords } from '../src/lib/user-store.ts'
+import { storedRecords } from '../src/platform/user-store.ts'
 
 vi.mock('../src/lib/api-fetch.ts', () => ({ apiFetch: vi.fn() }))
-vi.mock('../src/lib/user-store.ts', () => ({ storedRecords: vi.fn() }))
+vi.mock('../src/platform/user-store.ts', () => ({ storedRecords: vi.fn() }))
 
 const design = (id: string, name: string, data: object): UserRecord =>
   ({ kind: 'targetFaceDesign', id, name, saved: '2026-10-24T10:00:00.000Z', data }) as UserRecord

@@ -2,6 +2,7 @@
 
 import { Button, Group, Stack, Text } from '@mantine/core'
 import { useCallback, useEffect, useState } from 'react'
+import { deleteRecord, putRecords, storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { errorText } from '../lib/error-text.ts'
 import {
@@ -10,7 +11,6 @@ import {
   manufacturerUses,
 } from '../lib/manufacturers.ts'
 import { controlSize } from '../lib/theme.ts'
-import { deleteRecord, putRecords, storedRecords } from '../lib/user-store.ts'
 import { offerUndo } from './confirm.tsx'
 import { ErrorNote, Loading } from './states.tsx'
 

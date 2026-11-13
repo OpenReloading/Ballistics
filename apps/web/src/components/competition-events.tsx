@@ -22,6 +22,13 @@ import {
 import { Plus, Trash } from '@phosphor-icons/react'
 import type { EventTotals, StageScore } from '@rangefoundry/shot-groups'
 import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
+import {
+  deleteRecord,
+  putRecords,
+  storedRecord,
+  storedRecords,
+  updateRecord,
+} from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { plainNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
@@ -58,13 +65,6 @@ import { newId } from '../lib/new-id.ts'
 import { userIdOf } from '../lib/shooting-log.ts'
 import { controlSize } from '../lib/theme.ts'
 import { parseUserDataFile, planImport, reasonText } from '../lib/user-data.ts'
-import {
-  deleteRecord,
-  putRecords,
-  storedRecord,
-  storedRecords,
-  updateRecord,
-} from '../lib/user-store.ts'
 import { confirmDialog, offerUndo } from './confirm.tsx'
 import { type DirectoryColumn, DirectoryTable, useListState } from './directory-table.tsx'
 import { BarButton, useDisciplines } from './log-parts.tsx'

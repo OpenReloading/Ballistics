@@ -4,6 +4,7 @@ import { Button, Checkbox, NativeSelect, TextInput } from '@mantine/core'
 import type { Truing } from '@open-reloading/schema'
 import type { RangeStringFit, TrajectoryInput, TruingPlan } from '@rangefoundry/ballistics'
 import { useState } from 'react'
+import { updateRecord } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import type { Translator } from '../i18n/translate.ts'
 import { errorText } from '../lib/error-text.ts'
@@ -26,7 +27,6 @@ import {
   withTruing,
 } from '../lib/truing-session.ts'
 import { roundedFieldText, type UnitSystem } from '../lib/units.ts'
-import { updateRecord } from '../lib/user-store.ts'
 import { PanelTable } from './scroll-region.tsx'
 
 /** What the section reads from the Trajectory tab's result. */

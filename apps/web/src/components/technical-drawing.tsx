@@ -13,7 +13,7 @@ import {
 import type { BulletModel } from '@open-reloading/svg-drawings/bullet'
 import type { FigureModel, Side } from '@open-reloading/svg-drawings/cartridge'
 import type { CSSProperties, ReactNode } from 'react'
-import { drawingFont } from '../app/fonts/drawing.ts'
+import { drawingFont } from '@/platform/fonts/drawing.ts'
 import { Decimal } from './decimal.tsx'
 
 const n = (x: number) => Number(x.toFixed(2))

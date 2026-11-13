@@ -4,6 +4,7 @@ import { ActionIcon, Badge, Button, Checkbox, Group, Popover, Stack, Tooltip } f
 import type { UserRecord } from '@open-reloading/schema'
 import { CaretDown, Trash } from '@phosphor-icons/react'
 import { useCallback, useEffect, useState } from 'react'
+import { deleteRecords, storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 import {
@@ -16,7 +17,6 @@ import {
   userRecordId,
 } from '../lib/sources.ts'
 import { controlSize } from '../lib/theme.ts'
-import { deleteRecords, storedRecords } from '../lib/user-store.ts'
 import { AppPopover } from './app-popover.tsx'
 import { confirmDialog } from './confirm.tsx'
 import type { DirectoryColumn } from './directory-table.tsx'

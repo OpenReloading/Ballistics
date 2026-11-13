@@ -31,6 +31,7 @@ import {
   useState,
 } from 'react'
 import { flushSync } from 'react-dom'
+import { storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
@@ -62,7 +63,6 @@ import {
   zeroKeys,
 } from '../lib/trajectory-input.ts'
 import { formatQuantity, roundedFieldText, type UnitSystem, withUnit } from '../lib/units.ts'
-import { storedRecords } from '../lib/user-store.ts'
 import { type UserBulletView, userBullets } from '../lib/variants.ts'
 import { HitProbability } from './hit-probability.tsx'
 import { LazyLineChart as LineChart, preloadChart } from './lazy-chart.tsx'

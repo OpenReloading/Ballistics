@@ -1,6 +1,6 @@
 import 'fake-indexeddb/auto'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
-import { deleteDatabase, inStore } from '../src/lib/user-db.ts'
+import { deleteDatabase, inStore } from '../src/platform/user-db.ts'
 import { deleteUserDb } from './user-db-reset.ts'
 
 beforeEach(deleteUserDb)

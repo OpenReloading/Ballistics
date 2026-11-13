@@ -2,6 +2,12 @@
 
 import { type Load, parseRef, type SessionRecord, toSi, userRecord } from '@open-reloading/schema'
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import {
+  requestPersistentStorage,
+  storedRecord,
+  storedRecords,
+  updateRecord,
+} from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import type { Translator } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
@@ -26,12 +32,6 @@ import {
   withSession,
 } from '../lib/range-entry.ts'
 import { fixedFieldText } from '../lib/units.ts'
-import {
-  requestPersistentStorage,
-  storedRecord,
-  storedRecords,
-  updateRecord,
-} from '../lib/user-store.ts'
 import { useUnits } from './units-settings.tsx'
 
 const subscribe = (notify: () => void) => {

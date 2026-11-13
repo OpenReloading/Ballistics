@@ -23,7 +23,7 @@ import {
 } from '../src/lib/load-record.ts'
 import { waterVolume } from '../src/lib/units.ts'
 import { exportAllText, parseUserDataFile, planImport } from '../src/lib/user-data.ts'
-import { putRecords, storedRecords } from '../src/lib/user-store.ts'
+import { putRecords, storedRecords } from '../src/platform/user-store.ts'
 
 const cartridge = 'catalogue:308-win'
 const caseId = '5d6e7f80-1a2b-4c3d-8e4f-5a6b7c8d9e0f'

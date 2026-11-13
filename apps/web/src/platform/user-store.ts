@@ -1,8 +1,8 @@
 /** The workspace folder handle shares the database (`workspace-folder.ts`). */
 import type { EmbeddedFile, UserRecord } from '@open-reloading/schema'
-import { validRecords } from './user-data.ts'
+import { validRecords } from '../lib/user-data.ts'
+import { embeddedFileBlob, photoIds } from '../lib/user-photos.ts'
 import { inStore } from './user-db.ts'
-import { embeddedFileBlob, photoIds } from './user-photos.ts'
 
 /** The schema-valid records of the browser store and the invalid ones, as stored: none is dropped. */
 export const storedRecords = async () =>

@@ -22,6 +22,19 @@ import {
   useState,
 } from 'react'
 import { createPortal } from 'react-dom'
+import {
+  deletePhoto,
+  deleteRecords,
+  putRecordIfAbsent,
+  putRecords,
+  rawPhotoId,
+  requestPersistentStorage,
+  storedPhoto,
+  storedPhotoIds,
+  storedRecord,
+  storedRecords,
+  storePhotos,
+} from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import type { ImportFile, ImportReport as Report } from '../lib/data-files.ts'
@@ -72,19 +85,6 @@ import {
 } from '../lib/user-data.ts'
 import { holdsSkipped, ownsFile, recordFileName } from '../lib/user-file-names.ts'
 import { droppedPhotos, embedFiles, photoIds } from '../lib/user-photos.ts'
-import {
-  deletePhoto,
-  deleteRecords,
-  putRecordIfAbsent,
-  putRecords,
-  rawPhotoId,
-  requestPersistentStorage,
-  storedPhoto,
-  storedPhotoIds,
-  storedRecord,
-  storedRecords,
-  storePhotos,
-} from '../lib/user-store.ts'
 import {
   canPickFolder,
   chooseFolder,
