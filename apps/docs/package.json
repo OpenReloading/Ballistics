@@ -34,7 +34,7 @@
     "@docusaurus/theme-classic": "3.10.2",
     "@rangefoundry/api": "workspace:*",
     "@rangefoundry/design-tokens": "workspace:*",
-    "@scalar/api-reference": "1.77.0",
+    "@scalar/api-reference": "1.78.0",
     "katex": "0.19.1",
     "pagefind": "1.6.0",
     "react": "catalog:",

@@ -27,7 +27,7 @@
     "@rangefoundry/catalog": "workspace:*",
     "@rangefoundry/schema": "workspace:*",
     "@rangefoundry/use-cases": "workspace:*",
-    "@scalar/fastify-api-reference": "1.77.0",
+    "@scalar/fastify-api-reference": "1.78.0",
     "fastify": "^5.12.8",
     "zod": "catalog:"
   },
