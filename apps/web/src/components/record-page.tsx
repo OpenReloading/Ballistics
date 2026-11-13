@@ -1,6 +1,6 @@
 'use client'
 
-import type { Provenance } from '@open-reloading/schema'
+import type { Provenance } from '@rangefoundry/schema'
 import type { ReactNode } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { say, type Wording } from '../lib/wording.ts'

@@ -1,5 +1,5 @@
 /** Dimensions with standard uncertainties from a photographed outline (`apps/docs/docs/models/bullet-photo.md`); pure, so it runs in a worker. */
-import { fromSi, type UserBullet } from '@open-reloading/schema'
+import { fromSi, type UserBullet } from '@rangefoundry/schema'
 import { median1 } from '@rangefoundry/target-recognition'
 import { msg } from '../i18n/translate.ts'
 import { type Scale, solve } from './bullet-photo.ts'

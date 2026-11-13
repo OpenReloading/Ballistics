@@ -1,5 +1,5 @@
 /** Apart from `bullet-rows.ts`, so the pages that list designs through the site search load none of it. */
-import { type Bullet, bulletListFields, toSi } from '@open-reloading/schema'
+import { type Bullet, bulletListFields, toSi } from '@rangefoundry/schema'
 import { present } from './directory.ts'
 
 /** Sectional density, mass over diameter squared, kg/m² (as `computedBulletRows`); undefined without both. */

@@ -1,4 +1,4 @@
-import { type SourceRecord, sourceReference } from '@open-reloading/schema'
+import { type SourceRecord, sourceReference } from '@rangefoundry/schema'
 import { isObject } from './json-object.ts'
 
 /** The source records by id, the ids records cite, and the files that embed each other source. */

@@ -1,4 +1,4 @@
-import type { UserRecord, UserRecordKind } from '@open-reloading/schema'
+import type { UserRecord, UserRecordKind } from '@rangefoundry/schema'
 import { type Message, msg } from '../i18n/translate.ts'
 import { gapCounts, loadGaps } from './load-gaps.ts'
 

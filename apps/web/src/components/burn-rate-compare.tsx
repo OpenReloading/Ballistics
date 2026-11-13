@@ -1,8 +1,8 @@
 'use client'
 
 import { Button, Group, MultiSelect, Pill } from '@mantine/core'
-import type { Powder } from '@open-reloading/schema'
 import { ChartLine } from '@phosphor-icons/react'
+import type { Powder } from '@rangefoundry/schema'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'

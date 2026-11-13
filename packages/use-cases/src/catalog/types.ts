@@ -28,7 +28,7 @@ import type {
   Primer,
   TargetFace,
   TargetMapping,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 
 // the Catalogue interface and its types belong to the catalog package; this entry passes them on with openCatalogue
 export type {

@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core'
-import { toSi } from '@open-reloading/schema'
+import { toSi } from '@rangefoundry/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { DisciplineList, FederationList } from '../src/components/discipline-list.tsx'

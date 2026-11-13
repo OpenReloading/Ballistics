@@ -4,7 +4,7 @@ import type {
   CatalogueSession,
   Powder,
   SpecValue,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import {
   checkBullet,

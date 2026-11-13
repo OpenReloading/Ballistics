@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { compareKeys, type SourceRecord, sourceRecord } from '@open-reloading/schema'
+import { compareKeys, type SourceRecord, sourceRecord } from '@rangefoundry/schema'
 import { readPublishedLoads } from '@rangefoundry/tools/catalog'
 import { Refusal, UsageError } from './errors.ts'
 import { type InteriorModel, outcomes } from './evaluate.ts'

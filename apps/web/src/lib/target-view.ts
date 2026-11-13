@@ -1,5 +1,5 @@
 /** View units are photo px, or target mm on a drawn target; no React, DOM or Next.js. */
-import { fromSi } from '@open-reloading/schema'
+import { fromSi } from '@rangefoundry/schema'
 
 export type ViewBox = { x: number; y: number; w: number; h: number }
 type Pt = { x: number; y: number }

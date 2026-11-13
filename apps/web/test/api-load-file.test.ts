@@ -1,5 +1,5 @@
-import { type Load, load as loadSchema } from '@open-reloading/schema'
 import { startBundleApi } from '@rangefoundry/api/static'
+import { type Load, load as loadSchema } from '@rangefoundry/schema'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { type LoadParts, toApiLoad, toLoad } from '../src/lib/load-record.ts'
 import { userDataText } from '../src/lib/user-data.ts'

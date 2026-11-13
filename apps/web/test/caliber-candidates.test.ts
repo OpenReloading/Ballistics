@@ -1,4 +1,4 @@
-import { toSi } from '@open-reloading/schema'
+import { toSi } from '@rangefoundry/schema'
 import { describe, expect, it, vi } from 'vitest'
 import {
   type CandidateClass,

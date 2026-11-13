@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core'
-import type { UserRecord } from '@open-reloading/schema'
+import type { UserRecord } from '@rangefoundry/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { type CardActions, FileCard } from '../src/components/import-entry.tsx'

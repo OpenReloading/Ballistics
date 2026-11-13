@@ -1,8 +1,8 @@
 'use client'
 
 import { ActionIcon, Button, NativeSelect, Popover, Textarea } from '@mantine/core'
-import type { SheetNote, ShotGroup } from '@open-reloading/schema'
 import { BracketsCurly, Plus, Trash } from '@phosphor-icons/react'
+import type { SheetNote, ShotGroup } from '@rangefoundry/schema'
 import type { GroupStatistics } from '@rangefoundry/shot-groups'
 import { type KeyboardEvent, type PointerEvent, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'

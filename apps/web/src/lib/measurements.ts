@@ -1,6 +1,6 @@
 import type { ChronoImport } from '@open-reloading/importers'
-import { fromSi, type SessionRecord, toSi } from '@open-reloading/schema'
 import { type LadderFlatSpots, ladderFlatSpots } from '@rangefoundry/ballistics'
+import { fromSi, type SessionRecord, toSi } from '@rangefoundry/schema'
 import type { Shot } from './chrono.ts'
 import { type StringStats, stringStats } from './string-stats.ts'
 

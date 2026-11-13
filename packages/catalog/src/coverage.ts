@@ -1,4 +1,4 @@
-import type { Provenance } from '@open-reloading/schema'
+import type { Provenance } from '@rangefoundry/schema'
 import { isObject } from './json-object.ts'
 
 /** Fields that name a record rather than carry data, and need no source of their own. */

@@ -1,7 +1,7 @@
 /** `POST /exterior/trajectory`, `/exterior/truing`, `/exterior/range-strings/plan` and `/fit` and `GET /exterior/stability`, with the bullet of a `bullet` id resolved. */
 
-import type { Bullet } from '@open-reloading/schema'
 import { icao, millerStability } from '@rangefoundry/ballistics'
+import type { Bullet } from '@rangefoundry/schema'
 import { assertFinite, resolvedRecord } from './answer.ts'
 import type { TrajectoryBody, TruingBody } from './exterior-schema.ts'
 import { InputError } from './issue.ts'

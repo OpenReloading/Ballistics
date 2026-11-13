@@ -1,10 +1,10 @@
-import type { Bullet } from '@open-reloading/schema'
 import {
   type BulletDimensions,
   estimateIntrusion,
   intrusion,
 } from '@open-reloading/svg-drawings/seating'
 import type { DensityClass } from '@rangefoundry/ballistics'
+import type { Bullet } from '@rangefoundry/schema'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { classOf, effectiveDensity } from './bullet-construction.ts'
 import type { Suggestion } from './input-defaults.ts'

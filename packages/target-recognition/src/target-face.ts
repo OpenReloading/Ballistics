@@ -30,7 +30,7 @@ import {
 import type { FaceLabel } from './hole-detection.ts'
 import type { RgbaImage } from './image.ts'
 
-/** What the face search reads of a target face record; the `TargetFace` of `@open-reloading/schema` is one. */
+/** What the face search reads of a target face record; the `TargetFace` of `@rangefoundry/schema` is one. */
 export interface PrintedFace {
   readonly id: string
   readonly name: string

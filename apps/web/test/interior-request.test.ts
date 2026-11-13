@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
-import { powder } from '@open-reloading/schema'
 import { interior, recordResistance } from '@rangefoundry/ballistics'
+import { powder } from '@rangefoundry/schema'
 import { interiorBody } from '@rangefoundry/use-cases'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { exampleInterior } from '../src/lib/example-data.ts'

@@ -1,4 +1,3 @@
-import type { Cartridge } from '@open-reloading/schema'
 import {
   chargeLadder,
   type InteriorLoad,
@@ -15,6 +14,7 @@ import {
   trueDrag,
   trueMuzzleVelocity,
 } from '@rangefoundry/ballistics'
+import type { Cartridge } from '@rangefoundry/schema'
 import { caps, stabilityBounds } from '@rangefoundry/use-cases'
 import { describe, expect, it } from 'vitest'
 import { API_PREFIX } from '../src/version.ts'

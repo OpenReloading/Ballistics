@@ -1,6 +1,6 @@
 /** Decodes and downscales the posted photo so a hole is about 32 px across (`apps/docs/docs/models/hole-detection.md`); nothing leaves the browser. */
 
-import { fromSi } from '@open-reloading/schema'
+import { fromSi } from '@rangefoundry/schema'
 import {
   clamp,
   faceLabel,

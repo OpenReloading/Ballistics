@@ -4,7 +4,7 @@ import {
   type ShotGroup,
   type TargetSheet,
   toSi,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import {
   type AimOffset,
   dispersionEllipse,

@@ -1,4 +1,4 @@
-import { load as loadSchema } from '@open-reloading/schema'
+import { load as loadSchema } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import {
   initialPowderTab,

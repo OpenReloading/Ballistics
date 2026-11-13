@@ -2,8 +2,8 @@
 
 import { Badge, Button, Flex, Group, NativeSelect, Tabs } from '@mantine/core'
 import type { ChronoImport, VelocityUnit } from '@open-reloading/importers'
-import { toSi } from '@open-reloading/schema'
 import { FileArrowUp } from '@phosphor-icons/react'
+import { toSi } from '@rangefoundry/schema'
 import { useEffect, useRef, useState } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'

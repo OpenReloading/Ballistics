@@ -1,4 +1,4 @@
-import type { ChronoShot } from '@open-reloading/schema'
+import type { ChronoShot } from '@rangefoundry/schema'
 import { type ChronoDiagnostic, ReaderError, refuse } from './diagnostics.ts'
 import {
   buildChronoImport,

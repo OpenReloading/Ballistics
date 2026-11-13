@@ -1,6 +1,6 @@
-import type { Bullet, Cartridge, PublishedLoads } from '@open-reloading/schema'
-import { parseRef } from '@open-reloading/schema'
 import { cartridgeBulletDiameterMm } from '@rangefoundry/ballistics'
+import type { Bullet, Cartridge, PublishedLoads } from '@rangefoundry/schema'
+import { parseRef } from '@rangefoundry/schema'
 import type { Records } from './records.ts'
 import type { Row } from './rows.ts'
 import { percentile } from './stats.ts'

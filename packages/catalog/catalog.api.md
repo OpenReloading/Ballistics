@@ -4,32 +4,32 @@
 
 ```ts
 
-import { Bullet } from '@open-reloading/schema';
-import type { CaliberClass } from '@open-reloading/schema';
-import { Cartridge } from '@open-reloading/schema';
-import type { CaseMaterial } from '@open-reloading/schema';
-import type { CaseType } from '@open-reloading/schema';
-import type { CatalogueCase } from '@open-reloading/schema';
-import type { CatalogueCaseCapacity } from '@open-reloading/schema';
-import type { CatalogueLoad } from '@open-reloading/schema';
-import type { CatalogueSession } from '@open-reloading/schema';
-import type { Discipline } from '@open-reloading/schema';
-import type { EventType } from '@open-reloading/schema';
-import type { Federation } from '@open-reloading/schema';
-import type { FiringSeries } from '@open-reloading/schema';
-import { LoadTable } from '@open-reloading/schema';
-import { LoadTables } from '@open-reloading/schema';
-import type { Manufacturer } from '@open-reloading/schema';
-import { Powder } from '@open-reloading/schema';
-import { Primer } from '@open-reloading/schema';
-import type { PrimerCompound } from '@open-reloading/schema';
-import type { PrimerSize } from '@open-reloading/schema';
-import type { Provenance } from '@open-reloading/schema';
-import { PublishedLoads } from '@open-reloading/schema';
-import type { RangeFirings } from '@open-reloading/schema';
-import { SourceRecord } from '@open-reloading/schema';
-import type { TargetFace } from '@open-reloading/schema';
-import type { TargetMapping } from '@open-reloading/schema';
+import { Bullet } from '@rangefoundry/schema';
+import type { CaliberClass } from '@rangefoundry/schema';
+import { Cartridge } from '@rangefoundry/schema';
+import type { CaseMaterial } from '@rangefoundry/schema';
+import type { CaseType } from '@rangefoundry/schema';
+import type { CatalogueCase } from '@rangefoundry/schema';
+import type { CatalogueCaseCapacity } from '@rangefoundry/schema';
+import type { CatalogueLoad } from '@rangefoundry/schema';
+import type { CatalogueSession } from '@rangefoundry/schema';
+import type { Discipline } from '@rangefoundry/schema';
+import type { EventType } from '@rangefoundry/schema';
+import type { Federation } from '@rangefoundry/schema';
+import type { FiringSeries } from '@rangefoundry/schema';
+import { LoadTable } from '@rangefoundry/schema';
+import { LoadTables } from '@rangefoundry/schema';
+import type { Manufacturer } from '@rangefoundry/schema';
+import { Powder } from '@rangefoundry/schema';
+import { Primer } from '@rangefoundry/schema';
+import type { PrimerCompound } from '@rangefoundry/schema';
+import type { PrimerSize } from '@rangefoundry/schema';
+import type { Provenance } from '@rangefoundry/schema';
+import { PublishedLoads } from '@rangefoundry/schema';
+import type { RangeFirings } from '@rangefoundry/schema';
+import { SourceRecord } from '@rangefoundry/schema';
+import type { TargetFace } from '@rangefoundry/schema';
+import type { TargetMapping } from '@rangefoundry/schema';
 
 // @public
 export const airTemperatureRange: Readonly<{

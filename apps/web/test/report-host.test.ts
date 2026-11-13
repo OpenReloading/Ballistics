@@ -1,4 +1,4 @@
-import type { TargetSheet } from '@open-reloading/schema'
+import type { TargetSheet } from '@rangefoundry/schema'
 import { afterEach, expect, it, vi } from 'vitest'
 
 vi.mock('react', async (original) => ({

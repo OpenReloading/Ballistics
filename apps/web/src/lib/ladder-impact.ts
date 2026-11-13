@@ -1,5 +1,5 @@
-import { type SessionRecord, type ShotGroup, toSi } from '@open-reloading/schema'
 import { type ImpactStep, ladderImpactResiduals } from '@rangefoundry/ballistics'
+import { type SessionRecord, type ShotGroup, toSi } from '@rangefoundry/schema'
 import { sessionRef } from './measurements.ts'
 
 /** Level of the test across charges. */

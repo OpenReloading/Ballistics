@@ -1,5 +1,5 @@
-/** The comparators live in `@open-reloading/schema`, which the API sorts with too. */
-import type { TargetFace } from '@open-reloading/schema'
+/** The comparators live in `@rangefoundry/schema`, which the API sorts with too. */
+import type { TargetFace } from '@rangefoundry/schema'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
 
 export {
@@ -8,7 +8,7 @@ export {
   compareFederations,
   compareNames,
   compareTargetFaces,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 
 /** The faces its disciplines map to and the faces it publishes. */
 export function federationFaceIds(

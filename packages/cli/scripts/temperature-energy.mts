@@ -1,6 +1,5 @@
 // The measured check of apps/docs/docs/research/propellant-temperature-energy.md, by the rule of #367; it prints aggregates only
 import { parseArgs } from 'node:util'
-import { toSi } from '@open-reloading/schema'
 import {
   fitPowder,
   type InteriorLoad,
@@ -8,6 +7,7 @@ import {
   type LadderPoint,
   type PressureBasis,
 } from '@rangefoundry/ballistics'
+import { toSi } from '@rangefoundry/schema'
 import { InputError } from '@rangefoundry/statistics'
 import { atMuzzle, loadOf } from '../src/evaluate.ts'
 import { loadRecords, type Records } from '../src/records.ts'

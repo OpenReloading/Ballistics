@@ -1,4 +1,4 @@
-import { type UserRecord, userRecord } from '@open-reloading/schema'
+import { type UserRecord, userRecord } from '@rangefoundry/schema'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { blankFirearm } from '../src/lib/firearm.ts'
 import {

@@ -1,5 +1,5 @@
 /** Each cartridge is in at most one class, which links the firearm to the disciplines naming it. */
-import type { CaliberClass } from '@open-reloading/schema'
+import type { CaliberClass } from '@rangefoundry/schema'
 import { apiFetch, fetchRecord } from './api-fetch.ts'
 
 /** A caliber class: its id, name and member cartridge record ids. */

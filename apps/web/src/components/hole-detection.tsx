@@ -1,14 +1,14 @@
 'use client'
 
 import { ActionIcon, Anchor, Button, NativeSelect } from '@mantine/core'
+import { ArrowClockwise, ArrowCounterClockwise, X } from '@phosphor-icons/react'
 import {
   fromSi,
   type ShotGroup,
   type TargetFace,
   type TargetSheet,
   toSi,
-} from '@open-reloading/schema'
-import { ArrowClockwise, ArrowCounterClockwise, X } from '@phosphor-icons/react'
+} from '@rangefoundry/schema'
 import {
   type FaceFit,
   type FacePlane,

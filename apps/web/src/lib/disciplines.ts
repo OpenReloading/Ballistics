@@ -8,7 +8,7 @@ import {
   type QuantityValue,
   type Source,
   toSi,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import { plainNumber } from '../i18n/number.ts'
 import { english, type Message, msg, type Translator, translator } from '../i18n/translate.ts'
 import type { DirectoryState } from './directory.ts'

@@ -1,4 +1,3 @@
-import { type SpecValue, toSi } from '@open-reloading/schema'
 import { greek } from '@open-reloading/svg-drawings'
 import {
   conflictWording,
@@ -6,6 +5,7 @@ import {
   type Figure,
   shotshellVariants,
 } from '@open-reloading/svg-drawings/cartridge'
+import { type SpecValue, toSi } from '@rangefoundry/schema'
 import { formatNumber, localizeNumber, plainNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator, translator } from '../i18n/translate.ts'
 import type { CartridgeDetail } from './api-types.ts'

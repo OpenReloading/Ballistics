@@ -1,4 +1,4 @@
-import type { Powder } from '@open-reloading/schema'
+import type { Powder } from '@rangefoundry/schema'
 import { expect, it } from 'vitest'
 import {
   approximateVolumeTolerance,

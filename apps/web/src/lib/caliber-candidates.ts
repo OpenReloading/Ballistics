@@ -5,7 +5,7 @@ import {
   type GroupFace,
   parseRef,
   toSi,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import { apiFetch, fetchRecord } from './api-fetch.ts'
 import { mappingOf } from './face-disciplines.ts'
 import { fetchFederationData } from './face-records.ts'

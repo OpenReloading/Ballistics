@@ -1,4 +1,4 @@
-import type { GroupShot, SessionRecord } from '@open-reloading/schema'
+import type { GroupShot, SessionRecord } from '@rangefoundry/schema'
 import type { Translator } from '../i18n/translate.ts'
 import { sessionRef } from './measurements.ts'
 import { stringName } from './string-name.ts'

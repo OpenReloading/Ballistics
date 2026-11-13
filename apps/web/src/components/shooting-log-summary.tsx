@@ -1,7 +1,7 @@
 'use client'
 
 import { Button, Group, Select, SimpleGrid, Table, Text, Title } from '@mantine/core'
-import { parseRef, type ShootingLogRecord, type UserRecord } from '@open-reloading/schema'
+import { parseRef, type ShootingLogRecord, type UserRecord } from '@rangefoundry/schema'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'

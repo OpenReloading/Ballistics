@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import type { Bundle } from '@open-reloading/catalog'
-import { sheetId } from '@open-reloading/schema'
+import { sheetId } from '@rangefoundry/schema'
 import type { CartridgeDetail } from '../src/lib/api-types.ts'
 import { readRecord } from './read-record.ts'
 

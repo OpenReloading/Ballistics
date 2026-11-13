@@ -8,7 +8,7 @@ import {
   primerCompounds,
   primerSizes,
   recordId,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import type {
   BulletQuery,
   CaseQuery,

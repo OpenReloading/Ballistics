@@ -1,12 +1,4 @@
 import {
-  type Bullet,
-  baseTypes,
-  fromSi,
-  ogiveForms,
-  tipTypes,
-  type UserBullet,
-} from '@open-reloading/schema'
-import {
   type BulletDimensions,
   type BulletModel,
   type BulletProfile,
@@ -14,6 +6,14 @@ import {
   bulletProfile,
   bulletScreenEm,
 } from '@open-reloading/svg-drawings/bullet'
+import {
+  type Bullet,
+  baseTypes,
+  fromSi,
+  ogiveForms,
+  tipTypes,
+  type UserBullet,
+} from '@rangefoundry/schema'
 import { untranslated } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { computedBulletRows } from './bullet.ts'

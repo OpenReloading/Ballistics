@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto'
-import type { Powder, UserPowderFit } from '@open-reloading/schema'
+import type { Powder, UserPowderFit } from '@rangefoundry/schema'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { newerFit, type PowderDesign } from '../src/lib/powder-designer.ts'
 import { deleteRecords, putRecords, storedRecords } from '../src/lib/user-store.ts'

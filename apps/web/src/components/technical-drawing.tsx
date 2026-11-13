@@ -1,4 +1,3 @@
-import { fromSi, toSi } from '@open-reloading/schema'
 import {
   type Arc,
   type Arrowhead,
@@ -12,6 +11,7 @@ import {
 } from '@open-reloading/svg-drawings'
 import type { BulletModel } from '@open-reloading/svg-drawings/bullet'
 import type { FigureModel, Side } from '@open-reloading/svg-drawings/cartridge'
+import { fromSi, toSi } from '@rangefoundry/schema'
 import type { CSSProperties, ReactNode } from 'react'
 import { drawingFont } from '../app/fonts/drawing.ts'
 import { Decimal } from './decimal.tsx'

@@ -1,4 +1,4 @@
-import { type UserRecordKind, userRecord } from '@open-reloading/schema'
+import { type UserRecordKind, userRecord } from '@rangefoundry/schema'
 import { type RefObject, useEffect } from 'react'
 import { type Message, msg } from '../i18n/translate.ts'
 import { storedRecord } from '../lib/user-store.ts'

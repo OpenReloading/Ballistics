@@ -1,5 +1,5 @@
 import { NativeSelect } from '@mantine/core'
-import type { SessionRecord, ShotGroup } from '@open-reloading/schema'
+import type { SessionRecord, ShotGroup } from '@rangefoundry/schema'
 import { useTranslation } from '../i18n/language.ts'
 import { choiceLabel, linkedString, linkString, stringChoices } from '../lib/chrono-link.ts'
 import { sessionRef } from '../lib/measurements.ts'

@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core'
-import type { ShotGroup, TargetSheet } from '@open-reloading/schema'
+import type { ShotGroup, TargetSheet } from '@rangefoundry/schema'
 import type { ReactNode } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'

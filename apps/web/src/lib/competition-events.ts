@@ -5,7 +5,7 @@ import {
   competitionEvent,
   type EventType,
   type UserRecord,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import {
   type EventTotals,
   eventMismatches,

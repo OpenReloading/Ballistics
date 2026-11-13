@@ -1,4 +1,4 @@
-import { fromSi, type UserBullet, type UserCartridge } from '@open-reloading/schema'
+import { fromSi, type UserBullet, type UserCartridge } from '@rangefoundry/schema'
 import { expect, it } from 'vitest'
 import { bulletMatches } from '../src/lib/bullet-rows.ts'
 import { searchBullets } from '../src/lib/bullet-search.ts'

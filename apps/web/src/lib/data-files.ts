@@ -1,5 +1,5 @@
 /** The data file import and Export all of the File menu, which loads them on use (`file-menu.tsx`). */
-import type { EmbeddedFile, UserRecord } from '@open-reloading/schema'
+import type { EmbeddedFile, UserRecord } from '@rangefoundry/schema'
 import type { Translator } from '../i18n/translate.ts'
 import { errorText } from './error-text.ts'
 import { parseFiles } from './load-file-formats.ts'

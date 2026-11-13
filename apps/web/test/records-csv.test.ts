@@ -1,4 +1,4 @@
-import type { UserRecord } from '@open-reloading/schema'
+import type { UserRecord } from '@rangefoundry/schema'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { toCsv } from '../src/lib/csv.ts'
 import { firearmRows, loadRows, saveFirearmsCsv, saveLoadsCsv } from '../src/lib/records-csv.ts'

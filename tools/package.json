@@ -24,7 +24,7 @@
   "dependencies": {
     "@rangefoundry/api": "workspace:*",
     "@open-reloading/catalog": "workspace:*",
-    "@open-reloading/schema": "workspace:*",
+    "@rangefoundry/schema": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {

@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@mantine/core'
-import type { Case, UserCaseRecord, UserRecord } from '@open-reloading/schema'
+import type { Case, UserCaseRecord, UserRecord } from '@rangefoundry/schema'
 import { useCallback, useDeferredValue, useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import type { Message } from '../i18n/translate.ts'

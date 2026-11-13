@@ -1,6 +1,6 @@
-import type { TargetFace } from '@open-reloading/schema'
-import { toSi } from '@open-reloading/schema'
 import type { TrajectoryPoint } from '@rangefoundry/ballistics'
+import type { TargetFace } from '@rangefoundry/schema'
+import { toSi } from '@rangefoundry/schema'
 import type { HitIssue, ScoringZone } from '@rangefoundry/shot-groups'
 import { InputError } from '@rangefoundry/statistics'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'

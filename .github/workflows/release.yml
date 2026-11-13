@@ -237,7 +237,7 @@ jobs:
       # trusted publishing needs npm 11.5.1 or later (Node 22.14.0 or later)
       - run: '[ "$(printf ''%s\n11.5.1'' "$(npm --version)" | sort -V | head -n 1)" = 11.5.1 ]'
       # units first: schema builds it through its project references
-      - run: pnpm --filter @open-reloading/units --filter @open-reloading/schema --filter @open-reloading/svg-drawings --filter @open-reloading/importers --filter @open-reloading/catalog run build
+      - run: pnpm --filter @open-reloading/units --filter @rangefoundry/schema --filter @open-reloading/svg-drawings --filter @open-reloading/importers --filter @open-reloading/catalog run build
       # in the order of LIBRARIES; a version that is already on the registry is skipped, so a failed run can be re-run.
       # pnpm packs (it writes the version of each `workspace:` dependency), npm publishes with provenance.
       - run: |

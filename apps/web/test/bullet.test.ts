@@ -1,7 +1,7 @@
-import type { Bullet } from '@open-reloading/schema'
 import { bulletDimensions } from '@open-reloading/svg-drawings/bullet'
 import { bulletOutline } from '@open-reloading/svg-drawings/seating'
 import { lbPerSqInToKgPerSqM, millerStability } from '@rangefoundry/ballistics'
+import type { Bullet } from '@rangefoundry/schema'
 import { expect, it } from 'vitest'
 import {
   bandCount,

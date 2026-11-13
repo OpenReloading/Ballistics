@@ -1,4 +1,4 @@
-import { firearmAction, powder } from '@open-reloading/schema'
+import { firearmAction, powder } from '@rangefoundry/schema'
 import { interiorBody } from '@rangefoundry/use-cases'
 import { fetchRecord } from './api-fetch.ts'
 import type { CartridgeDetail } from './api-types.ts'

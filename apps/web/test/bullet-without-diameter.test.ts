@@ -1,5 +1,5 @@
-import type { Bullet } from '@open-reloading/schema'
 import { bulletDimensions, recordProfile } from '@open-reloading/svg-drawings/bullet'
+import type { Bullet } from '@rangefoundry/schema'
 import { expect, it } from 'vitest'
 import { typedBullet } from '../src/lib/bullet.ts'
 

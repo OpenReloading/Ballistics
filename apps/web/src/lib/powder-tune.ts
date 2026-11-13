@@ -1,11 +1,11 @@
+import type { ChronographString, InteriorLoad } from '@rangefoundry/ballistics'
 import {
   type Firearm,
   type Powder,
   type SessionRecord,
   toSi,
   type UserRecord,
-} from '@open-reloading/schema'
-import type { ChronographString, InteriorLoad } from '@rangefoundry/ballistics'
+} from '@rangefoundry/schema'
 import { parseNumber } from '../i18n/number.ts'
 import type { Shot } from './chrono.ts'
 import { storageName } from './edition.ts'

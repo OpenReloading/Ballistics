@@ -40,7 +40,7 @@ function sharedFiles() {
   const drawing = dirname(
     dirname(fileURLToPath(import.meta.resolve('@open-reloading/svg-drawings/seating'))),
   )
-  const schema = dirname(fileURLToPath(import.meta.resolve('@open-reloading/schema')))
+  const schema = dirname(fileURLToPath(import.meta.resolve('@rangefoundry/schema')))
   const units = dirname(fileURLToPath(import.meta.resolve('@open-reloading/units')))
   const statistics = dirname(fileURLToPath(import.meta.resolve('@rangefoundry/statistics')))
   const ballistics = dirname(fileURLToPath(import.meta.resolve('@rangefoundry/ballistics')))

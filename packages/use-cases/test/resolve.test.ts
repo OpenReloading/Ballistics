@@ -1,5 +1,5 @@
-import { type Bullet, toSi } from '@open-reloading/schema'
 import { type Aerodynamics, lbPerSqInToKgPerSqM } from '@rangefoundry/ballistics'
+import { type Bullet, toSi } from '@rangefoundry/schema'
 import { InputError } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
 import { bundle } from '../../catalog/test/bundle.ts'

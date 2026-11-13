@@ -1,5 +1,5 @@
 /** Messages between the target editor and the hole detection worker, in photo px of the turned photo. */
-import type { TargetFace } from '@open-reloading/schema'
+import type { TargetFace } from '@rangefoundry/schema'
 import type {
   FaceGeometry,
   FaceSearch,

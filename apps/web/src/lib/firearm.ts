@@ -10,7 +10,7 @@ import {
   toSi,
   type UserRecord,
   userRecord,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import { formatNumber, untranslated } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { localDay } from './dates.ts'

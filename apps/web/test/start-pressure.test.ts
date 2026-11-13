@@ -1,5 +1,5 @@
-import { constructionFields } from '@open-reloading/schema'
 import { bulletStructures } from '@rangefoundry/ballistics'
+import { constructionFields } from '@rangefoundry/schema'
 import { expect, it } from 'vitest'
 import { followWrites } from '../src/components/use-workbench-load.ts'
 import { english } from '../src/i18n/translate.ts'

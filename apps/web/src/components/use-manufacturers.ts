@@ -1,6 +1,6 @@
 'use client'
 
-import type { UserRecord } from '@open-reloading/schema'
+import type { UserRecord } from '@rangefoundry/schema'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ManufacturerSummary } from '../lib/api-types.ts'
 import {
