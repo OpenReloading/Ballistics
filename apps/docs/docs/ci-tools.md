@@ -76,7 +76,7 @@ Each route is counted in bytes of gzip level 9, each file once:
 - `total`: `initial` plus the lazy chunks the page can load on demand;
 - `chunk`: the largest of those lazy chunks.
 
-A group's budget limits `initial` and exactly one of `total` and `chunk`; a group that sets both or neither fails. A `chunk` limit applies to each lazy chunk, and the group's `total` is then reported but not gated: the `workbench` group, decision W-C1 (owner, 2026-11-12), since its lazy parts load only on use. A limit is set at the largest measured weight of the group plus 2 %, rounded up to 1000 B ([Web script size budgets](./research/web-size-budgets.md)).
+A group's budget limits `initial` and exactly one of `total` and `chunk`; a group that sets both or neither fails. A `chunk` limit applies to each lazy chunk, and the group's `total` is then reported but not gated: the `workbench` group, decision W-C1 (owner, 2026-11-12), since its lazy parts load only on use. A route of such a group with no lazy chunk measured fails, since an empty `react-loadable-manifest.json` would otherwise pass the limit unchecked. A limit is set at the largest measured weight of the group plus 2 %, rounded up to 1000 B ([Web script size budgets](./research/web-size-budgets.md)).
 
 Only file content counts, so the numbers do not depend on the API, `PRERENDER`, the clock or the build directory. A route in no group, or a group route the build lacks, fails: a new route needs a budget in its pull request, and raising a number is an edit of `weight-budget.json` that review sees.
 

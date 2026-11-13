@@ -110,12 +110,20 @@ function groupViolations(
   return Object.keys(group.routes).flatMap((route) => {
     const weight = measured[route]
     if (weight === undefined) return [`${route}: in group ${name} but not in the build`]
-    return keys
-      .filter((key) => weight[key] > (group.budget[key] ?? Number.POSITIVE_INFINITY))
-      .map(
-        (key) =>
-          `${route}: ${key} ${weight[key]} B over the ${name} budget of ${group.budget[key]} B`,
-      )
+    // an empty loadable manifest (lazy loading that Next no longer records) would pass a chunk limit unmeasured
+    const unmeasured =
+      group.budget.chunk !== undefined && weight.chunk === 0
+        ? [`${route}: no lazy chunk measured for the chunk limit of group ${name}`]
+        : []
+    return [
+      ...unmeasured,
+      ...keys
+        .filter((key) => weight[key] > (group.budget[key] ?? Number.POSITIVE_INFINITY))
+        .map(
+          (key) =>
+            `${route}: ${key} ${weight[key]} B over the ${name} budget of ${group.budget[key]} B`,
+        ),
+    ]
   })
 }
 
