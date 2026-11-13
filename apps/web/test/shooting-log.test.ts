@@ -1,4 +1,4 @@
-import { type ShootingLogRecord, type UserRecord, userRecord } from '@open-reloading/schema'
+import { type ShootingLogRecord, type UserRecord, userRecord } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { eventRoundsDue, withEventRounds } from '../src/lib/firearm.ts'
 import {

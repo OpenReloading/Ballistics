@@ -1,5 +1,5 @@
 /** Caliper sizes give the scale without a ruler and check it with one (`apps/docs/docs/models/bullet-photo.md`); pure, so it runs in a worker. */
-import type { UserBullet } from '@open-reloading/schema'
+import type { UserBullet } from '@rangefoundry/schema'
 import { type Message, msg } from '../i18n/translate.ts'
 import type { Scale } from './bullet-photo.ts'
 import type { BulletMeasurement } from './bullet-photo-measure.ts'

@@ -1,5 +1,5 @@
 /** Kept apart from the sheet, in photo px, until the user accepts them as shots (`apps/docs/docs/models/hole-detection.md`). */
-import { type ShotGroup, toSi } from '@open-reloading/schema'
+import { type ShotGroup, toSi } from '@rangefoundry/schema'
 import type { HoleProposal } from '@rangefoundry/target-recognition'
 import { nth } from './nth.ts'
 import { type Frame, targetToView, viewToTarget } from './target-editor.ts'

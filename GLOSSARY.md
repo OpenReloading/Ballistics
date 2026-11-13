@@ -2,7 +2,7 @@
 
 The fields of the record files (`packages/catalog/records`), the user data files of the web app and the request and response bodies of the API (`/v1`), with the names they carry in files and on the wire.
 
-Units: a record file stores each quantity in one unit (`packages/units/src/units.ts`, re-exported by `@open-reloading/schema`): length mm, area mm2, mass g, density g/cm3, pressure bar, energy J, velocity m/s, angle deg, temperature degC (flame and gas temperatures K), specific energy J/kg, molar mass kg/kmol, specific volume m3/kg, burn rate 1/s, mass fraction %, relative humidity %, ballistic coefficient lb/in2. A record quantity is an object `{ value, raw }` in that unit. User data files and API request bodies use SI (m, kg, s, rad, Pa, K) unless a term names another unit. Results are simulations, not load data.
+Units: a record file stores each quantity in one unit (`packages/units/src/units.ts`, re-exported by `@rangefoundry/schema`): length mm, area mm2, mass g, density g/cm3, pressure bar, energy J, velocity m/s, angle deg, temperature degC (flame and gas temperatures K), specific energy J/kg, molar mass kg/kmol, specific volume m3/kg, burn rate 1/s, mass fraction %, relative humidity %, ballistic coefficient lb/in2. A record quantity is an object `{ value, raw }` in that unit. User data files and API request bodies use SI (m, kg, s, rad, Pa, K) unless a term names another unit. Results are simulations, not load data.
 
 ## Language
 

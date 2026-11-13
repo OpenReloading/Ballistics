@@ -15,7 +15,7 @@ The catalogue records of this repository as one JSON bundle and the checks the r
 npm install @open-reloading/catalog
 ```
 
-It installs `@open-reloading/schema` with it. Each library has its own [Semantic Versioning](../release.md#versions) version.
+It installs `@rangefoundry/schema` with it. Each library has its own [Semantic Versioning](../release.md#versions) version.
 
 ## Entry points
 

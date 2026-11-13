@@ -52,7 +52,7 @@
     "test": "vitest run --coverage && publint --strict && attw --pack . --profile esm-only"
   },
   "dependencies": {
-    "@open-reloading/schema": "workspace:*"
+    "@rangefoundry/schema": "workspace:*"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "catalog:",

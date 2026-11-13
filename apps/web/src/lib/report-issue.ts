@@ -1,5 +1,5 @@
 /** Report issue: the area of a page, the record it shows, and the prefilled new-issue link of the repository. */
-import { fromSi, type TargetSheet } from '@open-reloading/schema'
+import { fromSi, type TargetSheet } from '@rangefoundry/schema'
 import { msg } from '../i18n/translate.ts'
 import type { FederationData } from './face-disciplines.ts'
 

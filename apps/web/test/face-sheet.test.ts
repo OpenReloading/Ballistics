@@ -1,4 +1,4 @@
-import type { TargetSheet } from '@open-reloading/schema'
+import type { TargetSheet } from '@rangefoundry/schema'
 import { type FaceFit, findFace } from '@rangefoundry/target-recognition'
 import { describe, expect, it } from 'vitest'
 import {

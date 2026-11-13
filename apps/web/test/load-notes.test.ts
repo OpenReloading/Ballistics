@@ -1,4 +1,4 @@
-import { type Load, load, type SessionRecord } from '@open-reloading/schema'
+import { type Load, load, type SessionRecord } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import {

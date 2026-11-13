@@ -1,4 +1,4 @@
-import type { ShotGroup } from '@open-reloading/schema'
+import type { ShotGroup } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { groupStatisticsInput } from '../src/lib/target-groups.ts'
 import { defined } from './defined.ts'

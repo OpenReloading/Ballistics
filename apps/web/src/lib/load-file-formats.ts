@@ -1,5 +1,5 @@
 /** The load-file formats the File menu opens, and reading files with them. */
-import { type EmbeddedFile, type UserRecord, userDataFormat } from '@open-reloading/schema'
+import { type EmbeddedFile, type UserRecord, userDataFormat } from '@rangefoundry/schema'
 import type { Translator } from '../i18n/translate.ts'
 import { csrLoadFormat } from './csr-load-format.ts'
 import { grtLoadFormat } from './grt-load-format.ts'
@@ -11,7 +11,7 @@ import {
   tooLargeMessage,
 } from './user-data.ts'
 
-/** Detected and read from the bytes into records that passed `@open-reloading/schema` at runtime, so the extension plays no part; a new format is its module plus one entry here. */
+/** Detected and read from the bytes into records that passed `@rangefoundry/schema` at runtime, so the extension plays no part; a new format is its module plus one entry here. */
 export interface LoadFileFormat {
   /** Shown in the open picker and on the Import entry's card. */
   name: string

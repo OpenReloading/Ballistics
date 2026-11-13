@@ -2,7 +2,7 @@
 
 import { ActionIcon, Button, Menu } from '@mantine/core'
 import { useReducedMotion } from '@mantine/hooks'
-import { toSi } from '@open-reloading/schema'
+import { toSi } from '@rangefoundry/schema'
 import type { ECharts } from 'echarts/core'
 import {
   type CSSProperties,

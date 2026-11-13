@@ -1,11 +1,5 @@
 import { checkSpec } from '@open-reloading/catalog/plausibility'
 import {
-  type CartridgeOverrides,
-  type SpecValue,
-  toSi,
-  type UserCartridge,
-} from '@open-reloading/schema'
-import {
   drawnTables,
   type Figure,
   figureModel,
@@ -18,6 +12,12 @@ import {
   storedValue,
 } from '@open-reloading/svg-drawings/cartridge'
 import { chamberOf } from '@open-reloading/svg-drawings/seating'
+import {
+  type CartridgeOverrides,
+  type SpecValue,
+  toSi,
+  type UserCartridge,
+} from '@rangefoundry/schema'
 import { localizeNumber } from '../i18n/number.ts'
 import { english, msg, type Translator } from '../i18n/translate.ts'
 import type { CartridgeDetail } from './api-types.ts'

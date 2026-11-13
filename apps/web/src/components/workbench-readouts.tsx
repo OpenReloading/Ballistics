@@ -1,8 +1,8 @@
 'use client'
 
 import { Popover, UnstyledButton } from '@mantine/core'
-import { fromSi } from '@open-reloading/schema'
 import { type FreeRecoil, freeRecoil } from '@rangefoundry/ballistics'
+import { fromSi } from '@rangefoundry/schema'
 import { memo, useEffect, useRef } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber, plainNumber } from '../i18n/number.ts'

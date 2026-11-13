@@ -1,5 +1,5 @@
-import type { SessionRecord, UserRecord } from '@open-reloading/schema'
 import type { InteriorLoad } from '@rangefoundry/ballistics'
+import type { SessionRecord, UserRecord } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import {
   fitStrings,

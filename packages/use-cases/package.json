@@ -44,7 +44,7 @@
   "dependencies": {
     "@rangefoundry/ballistics": "workspace:*",
     "@open-reloading/catalog": "workspace:*",
-    "@open-reloading/schema": "workspace:*",
+    "@rangefoundry/schema": "workspace:*",
     "@rangefoundry/statistics": "workspace:*",
     "zod": "catalog:"
   },

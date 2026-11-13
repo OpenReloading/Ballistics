@@ -1,4 +1,3 @@
-import { analysisKinds, toSi } from '@open-reloading/schema'
 import {
   interiorLoad,
   overrideResistance,
@@ -7,6 +6,7 @@ import {
   recordSensitivity,
   workbenchValueKeys,
 } from '@rangefoundry/ballistics'
+import { analysisKinds, toSi } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { API_PREFIX } from '../src/version.ts'
 import { defined } from './defined.ts'

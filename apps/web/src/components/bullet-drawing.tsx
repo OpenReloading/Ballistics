@@ -1,6 +1,5 @@
 'use client'
 
-import type { Bullet } from '@open-reloading/schema'
 import { face, type LengthUnit, lengthText } from '@open-reloading/svg-drawings'
 import {
   type BulletProfile,
@@ -10,6 +9,7 @@ import {
   recordProfile,
 } from '@open-reloading/svg-drawings/bullet'
 import { Ruler } from '@phosphor-icons/react/ssr'
+import type { Bullet } from '@rangefoundry/schema'
 import { useTranslation } from '../i18n/language.ts'
 import { type Translator, translator } from '../i18n/translate.ts'
 import { DrawingNotes } from './record-actions.tsx'

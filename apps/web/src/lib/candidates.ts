@@ -1,6 +1,6 @@
 /** The records the app makes of the importers' candidates; loaded only by the import worker and the load-file readers. */
 import { type Candidate, idOfKey } from '@open-reloading/importers'
-import type { UserRecord } from '@open-reloading/schema'
+import type { UserRecord } from '@rangefoundry/schema'
 
 /** The record of a candidate: its id from its key, saved at `saved`; the caller parses it with the user record schema. */
 export const recordOf = ({ key, ...candidate }: Candidate, saved: string): UserRecord =>

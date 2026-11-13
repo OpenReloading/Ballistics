@@ -1,6 +1,6 @@
-import type { Bullet } from '@open-reloading/schema'
 import { bulletDimensions, bulletOutline } from '@open-reloading/svg-drawings/bullet'
 import { chamberOf } from '@open-reloading/svg-drawings/seating'
+import type { Bullet } from '@rangefoundry/schema'
 import { expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import {

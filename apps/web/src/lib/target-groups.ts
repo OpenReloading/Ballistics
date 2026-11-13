@@ -1,4 +1,4 @@
-import type { ShotGroup } from '@open-reloading/schema'
+import type { ShotGroup } from '@rangefoundry/schema'
 import { type GroupInput, type GroupStatistics, groupStatistics } from '@rangefoundry/shot-groups'
 
 /** A saved group (SI, as stored) as statistics input. */

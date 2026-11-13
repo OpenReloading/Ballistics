@@ -1,4 +1,4 @@
-import { parseRef, type UserRecord } from '@open-reloading/schema'
+import { parseRef, type UserRecord } from '@rangefoundry/schema'
 import { fetchRecord } from './api-fetch.ts'
 import { toCsv } from './csv.ts'
 import { localDay } from './dates.ts'

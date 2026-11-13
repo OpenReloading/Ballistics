@@ -1,7 +1,7 @@
 'use client'
 
-import type { Powder, SessionRecord } from '@open-reloading/schema'
 import type { LoadNote, LoadNoteRule } from '@rangefoundry/ballistics'
+import type { Powder, SessionRecord } from '@rangefoundry/schema'
 import type { Context, Dispatch, RefObject, SetStateAction } from 'react'
 import { createContext, useContext } from 'react'
 import type { InteriorResponse } from '../lib/api-types.ts'

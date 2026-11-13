@@ -1,14 +1,14 @@
 'use client'
 
 import { Button, Group, Kbd, Menu, Textarea } from '@mantine/core'
+import { CaretDown, FloppyDisk, FolderOpen } from '@phosphor-icons/react'
 import {
   type EmbeddedFile,
   parseRef,
   type UserRecord,
   type UserRecordKind,
   userRecord,
-} from '@open-reloading/schema'
-import { CaretDown, FloppyDisk, FolderOpen } from '@phosphor-icons/react'
+} from '@rangefoundry/schema'
 import {
   type Dispatch,
   memo,

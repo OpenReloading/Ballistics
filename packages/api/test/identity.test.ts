@@ -1,4 +1,4 @@
-import { canonicalJson } from '@open-reloading/schema'
+import { canonicalJson } from '@rangefoundry/schema'
 import {
   chargeTargetExample,
   interiorExample,

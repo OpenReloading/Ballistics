@@ -1,5 +1,5 @@
 /** Fetched once per page load; designs are read from the store on each call, so one saved in another tab shows at once. */
-import type { TargetFace } from '@open-reloading/schema'
+import type { TargetFace } from '@rangefoundry/schema'
 import { apiFetch } from './api-fetch.ts'
 import type { FederationData } from './face-disciplines.ts'
 import { type Face, withOrganization } from './face-organization.ts'

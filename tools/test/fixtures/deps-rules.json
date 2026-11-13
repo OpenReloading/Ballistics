@@ -88,11 +88,11 @@
     "rules": ["units-imports-nothing"]
   },
   "packages/units/src/schema.ts": {
-    "source": "import { quantity } from '@open-reloading/schema'\nexport { quantity }",
+    "source": "import { quantity } from '@rangefoundry/schema'\nexport { quantity }",
     "rules": ["units-imports-nothing"]
   },
   "packages/importers/src/types-of-schema.ts": {
-    "source": "import type { ChronoShot } from '@open-reloading/schema'\nexport type Shot = ChronoShot",
+    "source": "import type { ChronoShot } from '@rangefoundry/schema'\nexport type Shot = ChronoShot",
     "rules": []
   },
   "packages/importers/src/node-fs.ts": {
@@ -120,7 +120,7 @@
     "rules": ["importers-imports-schema-and-units"]
   },
   "packages/importers/src/runtime-schema.ts": {
-    "source": "import { ChronoShot } from '@open-reloading/schema'\nexport { ChronoShot }",
+    "source": "import { ChronoShot } from '@rangefoundry/schema'\nexport { ChronoShot }",
     "rules": ["importers-schema-for-types-only"]
   },
   "packages/schema/src/zod.ts": {
@@ -148,7 +148,7 @@
     "rules": ["logic-no-dom"]
   },
   "packages/catalog/src/schema.ts": {
-    "source": "import { Load } from '@open-reloading/schema'\nexport { Load }",
+    "source": "import { Load } from '@rangefoundry/schema'\nexport { Load }",
     "rules": []
   },
   "packages/catalog/src/node-fs.ts": {
@@ -160,7 +160,7 @@
     "rules": ["catalog-imports-schema-only"]
   },
   "packages/api/src/logic-catalog-schema.ts": {
-    "source": "import { waterDensity } from '@rangefoundry/ballistics'\nimport { checkRecords } from '@open-reloading/catalog'\nimport { Load } from '@open-reloading/schema'\nimport { runTask } from '@rangefoundry/use-cases'\nimport Fastify from 'fastify'\nexport { waterDensity, checkRecords, Load, runTask, Fastify }",
+    "source": "import { waterDensity } from '@rangefoundry/ballistics'\nimport { checkRecords } from '@open-reloading/catalog'\nimport { Load } from '@rangefoundry/schema'\nimport { runTask } from '@rangefoundry/use-cases'\nimport Fastify from 'fastify'\nexport { waterDensity, checkRecords, Load, runTask, Fastify }",
     "rules": []
   },
   "packages/api/src/importers.ts": {
@@ -176,7 +176,7 @@
     "rules": []
   },
   "packages/cli/src/libraries.ts": {
-    "source": "import { interior } from '@rangefoundry/ballistics'\nimport { checkRecords } from '@open-reloading/catalog'\nimport { seat } from '@open-reloading/svg-drawings/seating'\nimport { toSi } from '@open-reloading/schema'\nimport { readRecords } from '@rangefoundry/tools/catalog'\nexport { interior, checkRecords, seat, toSi, readRecords }",
+    "source": "import { interior } from '@rangefoundry/ballistics'\nimport { checkRecords } from '@open-reloading/catalog'\nimport { seat } from '@open-reloading/svg-drawings/seating'\nimport { toSi } from '@rangefoundry/schema'\nimport { readRecords } from '@rangefoundry/tools/catalog'\nexport { interior, checkRecords, seat, toSi, readRecords }",
     "rules": []
   },
   "packages/cli/src/api.ts": {
@@ -260,7 +260,7 @@
     "rules": []
   },
   "packages/locale-format/src/schema.ts": {
-    "source": "import { quantity } from '@open-reloading/schema'\nexport { quantity }",
+    "source": "import { quantity } from '@rangefoundry/schema'\nexport { quantity }",
     "rules": ["locale-format-imports-units-only"]
   },
   "packages/locale-format/src/node-fs.ts": {
@@ -296,7 +296,7 @@
     "rules": []
   },
   "packages/ui/src/schema.tsx": {
-    "source": "import { quantity } from '@open-reloading/schema'\nexport { quantity }",
+    "source": "import { quantity } from '@rangefoundry/schema'\nexport { quantity }",
     "rules": ["ui-imports-the-ui-base"]
   },
   "packages/ui/src/node-fs.tsx": {
@@ -328,11 +328,11 @@
     "rules": ["importers-imports-schema-and-units"]
   },
   "packages/importers/src/inline-type.ts": {
-    "source": "import { type ChronoShot } from '@open-reloading/schema'\nexport type Shot = ChronoShot",
+    "source": "import { type ChronoShot } from '@rangefoundry/schema'\nexport type Shot = ChronoShot",
     "rules": ["no-import-type-side-effects"]
   },
   "packages/importers/src/schema-subpath.ts": {
-    "source": "import load from '@open-reloading/schema/json-schema/load.json' with { type: 'json' }\nexport { load }",
+    "source": "import load from '@rangefoundry/schema/json-schema/load.json' with { type: 'json' }\nexport { load }",
     "rules": ["importers-imports-schema-and-units"]
   },
   "packages/statistics/src/own.ts": {
@@ -360,7 +360,7 @@
     "rules": []
   },
   "packages/ballistics/src/schema-package.ts": {
-    "source": "import { pressureMethod } from '@open-reloading/schema'\nexport { pressureMethod }",
+    "source": "import { pressureMethod } from '@rangefoundry/schema'\nexport { pressureMethod }",
     "rules": ["ballistics-imports-units-and-statistics"]
   },
   "packages/ballistics/src/npm-package.ts": {
@@ -380,7 +380,7 @@
     "rules": []
   },
   "packages/shot-groups/src/schema.ts": {
-    "source": "import { quantity } from '@open-reloading/schema'\nexport { quantity }",
+    "source": "import { quantity } from '@rangefoundry/schema'\nexport { quantity }",
     "rules": ["shot-groups-imports-units-statistics-only"]
   },
   "packages/shot-groups/src/node-fs.ts": {
@@ -404,7 +404,7 @@
     "rules": ["shot-groups-imports-units-statistics-only"]
   },
   "packages/use-cases/src/logic.ts": {
-    "source": "import { trajectory } from '@rangefoundry/ballistics'\nimport { bullet } from '@open-reloading/schema'\nimport type { Catalogue } from '@open-reloading/catalog'\nimport { z } from 'zod'\nexport type { Catalogue }\nexport { trajectory, bullet, z }",
+    "source": "import { trajectory } from '@rangefoundry/ballistics'\nimport { bullet } from '@rangefoundry/schema'\nimport type { Catalogue } from '@open-reloading/catalog'\nimport { z } from 'zod'\nexport type { Catalogue }\nexport { trajectory, bullet, z }",
     "rules": []
   },
   "packages/use-cases/src/catalog-value.ts": {
@@ -444,7 +444,7 @@
     "rules": []
   },
   "packages/target-recognition/src/schema.ts": {
-    "source": "import { quantity } from '@open-reloading/schema'\nexport { quantity }",
+    "source": "import { quantity } from '@rangefoundry/schema'\nexport { quantity }",
     "rules": ["target-recognition-imports-shot-groups-statistics-only"]
   },
   "packages/target-recognition/src/node-fs.ts": {

@@ -1,4 +1,4 @@
-import { canonicalJson } from '@open-reloading/schema'
+import { canonicalJson } from '@rangefoundry/schema'
 import { type Catalogue, sha256 } from '@rangefoundry/use-cases/catalog'
 import type { FastifyInstance, FastifyRequest } from 'fastify'
 import { API_VERSION } from '../version.ts'

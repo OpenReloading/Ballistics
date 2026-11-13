@@ -1,8 +1,8 @@
 'use client'
 
 import { ActionIcon, NativeSelect, Tooltip } from '@mantine/core'
-import { baseTypes } from '@open-reloading/schema'
 import { ArrowCounterClockwise } from '@phosphor-icons/react'
+import { baseTypes } from '@rangefoundry/schema'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import {

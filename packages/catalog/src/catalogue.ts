@@ -16,7 +16,7 @@ import type {
   PrimerSize,
   TargetFace,
   TargetMapping,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 
 /** The entities of the catalogue, the names `Catalogue.get` takes. */
 export type CatalogueKind =

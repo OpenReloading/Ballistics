@@ -1,6 +1,14 @@
 'use client'
 
 import { Anchor, Badge, Button, Group, NativeSelect, Slider, Text, TextInput } from '@mantine/core'
+import type {
+  InteriorLoad,
+  PowderConfidenceReason,
+  PowderFitReason,
+  PowderFitResidual,
+  PowderParameter,
+  PowderPrediction,
+} from '@rangefoundry/ballistics'
 import {
   chronoSession,
   type Firearm,
@@ -10,15 +18,7 @@ import {
   type UserPowderFit,
   type UserRecord,
   userRecord,
-} from '@open-reloading/schema'
-import type {
-  InteriorLoad,
-  PowderConfidenceReason,
-  PowderFitReason,
-  PowderFitResidual,
-  PowderParameter,
-  PowderPrediction,
-} from '@rangefoundry/ballistics'
+} from '@rangefoundry/schema'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'

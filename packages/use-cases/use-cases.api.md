@@ -6,8 +6,8 @@
 
 import { AdvisoryId } from '@rangefoundry/ballistics';
 import type { Aerodynamics } from '@rangefoundry/ballistics';
-import { Bullet } from '@open-reloading/schema';
-import { Cartridge } from '@open-reloading/schema';
+import { Bullet } from '@rangefoundry/schema';
+import { Cartridge } from '@rangefoundry/schema';
 import type { Catalogue } from '@open-reloading/catalog';
 import type { Catalogued } from '@open-reloading/catalog';
 import { ChargeSolverOptions } from '@rangefoundry/ballistics';
@@ -20,22 +20,22 @@ import { InputError } from '@rangefoundry/statistics';
 import { InteriorLoad } from '@rangefoundry/ballistics';
 import { InteriorOptions } from '@rangefoundry/ballistics';
 import { InteriorResult } from '@rangefoundry/ballistics';
-import { Powder } from '@open-reloading/schema';
+import { Powder } from '@rangefoundry/schema';
 import { PressureRange } from '@rangefoundry/ballistics';
 import { PressureTolerances } from '@rangefoundry/ballistics';
 import type { Projectile } from '@rangefoundry/ballistics';
-import type { Provenance } from '@open-reloading/schema';
+import type { Provenance } from '@rangefoundry/schema';
 import { SampledBand } from '@rangefoundry/ballistics';
 import { SamplingOptions } from '@rangefoundry/ballistics';
 import { solveCharge } from '@rangefoundry/ballistics';
-import { SpecValue } from '@open-reloading/schema';
+import { SpecValue } from '@rangefoundry/schema';
 import { trajectory } from '@rangefoundry/ballistics';
 import { TruedParameter } from '@rangefoundry/ballistics';
 import { trueDrag } from '@rangefoundry/ballistics';
 import { trueMuzzleVelocity } from '@rangefoundry/ballistics';
 import { TruingError } from '@rangefoundry/ballistics';
 import { TruingReason } from '@rangefoundry/ballistics';
-import { userDataFile } from '@open-reloading/schema';
+import { userDataFile } from '@rangefoundry/schema';
 import { z } from 'zod';
 
 // @public

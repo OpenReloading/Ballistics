@@ -5,7 +5,7 @@ import {
   type PublishedLoad,
   type PublishedLoads,
   parseRef,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 
 /** A load of an incoming file, which may come without an id: {@link mergePublishedLoads} sets it. */
 export type IncomingLoad = Omit<PublishedLoad, 'id'> & { id?: string | undefined }

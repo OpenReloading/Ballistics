@@ -1,6 +1,5 @@
 /** CIP Pmax against a simulated pressure range: only values measured by transducer or piezo, or without a stated method, are compared, crusher values listed but never compared; no message says or implies that a load is safe. */
 
-import { type Cartridge, fromSi, type SpecValue, sheetId, toSi } from '@open-reloading/schema'
 import {
   type AdvisoryId,
   type AdvisoryLoad,
@@ -13,6 +12,7 @@ import {
   type PressureRange,
   placeMaximum,
 } from '@rangefoundry/ballistics'
+import { type Cartridge, fromSi, type SpecValue, sheetId, toSi } from '@rangefoundry/schema'
 import { advisoryText } from './advisory-text.ts'
 
 /** The fields of a `getCartridge` record that the limit check reads. */

@@ -11,7 +11,7 @@ import {
   type UserCartridge,
   type UserRecord,
   userIdRegex,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import type { z } from 'zod'
 import { fetchRecord } from './api-fetch.ts'
 import type { CartridgeDetail } from './api-types.ts'

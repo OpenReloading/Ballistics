@@ -1,4 +1,4 @@
-import type { Powder, UserPowderFit } from '@open-reloading/schema'
+import type { Powder, UserPowderFit } from '@rangefoundry/schema'
 import type { Translator } from '../i18n/translate.ts'
 import { localDay } from './dates.ts'
 import { interiorFields } from './interior-input.ts'

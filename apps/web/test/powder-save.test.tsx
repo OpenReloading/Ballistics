@@ -1,6 +1,6 @@
 import { MantineProvider } from '@mantine/core'
-import { fromSi, type Powder, userRecord } from '@open-reloading/schema'
 import { type ChronographString, interior, powderModelValues } from '@rangefoundry/ballistics'
+import { fromSi, type Powder, userRecord } from '@rangefoundry/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { load } from '../../../packages/ballistics/test/powder-load.ts'

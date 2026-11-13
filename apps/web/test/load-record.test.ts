@@ -1,3 +1,4 @@
+import { lbPerSqInToKgPerSqM, workbenchValueKeys } from '@rangefoundry/ballistics'
 import {
   checkUserRefs,
   ladderStepKinds,
@@ -5,8 +6,7 @@ import {
   parseRef,
   userId,
   userRecord,
-} from '@open-reloading/schema'
-import { lbPerSqInToKgPerSqM, workbenchValueKeys } from '@rangefoundry/ballistics'
+} from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { bulletFields, interiorFields, specFields } from '../src/lib/interior-input.ts'
 import {

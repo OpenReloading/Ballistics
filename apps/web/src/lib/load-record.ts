@@ -8,7 +8,7 @@ import {
   toSi,
   type UserRecord,
   userRecord,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import type { BaseType, BulletValueKey, BulletValues } from './bullet.ts'
 import { storedOf } from './firearm.ts'
 import type { Lots } from './load-notes.ts'

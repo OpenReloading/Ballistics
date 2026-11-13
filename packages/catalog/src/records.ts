@@ -17,8 +17,8 @@ import type {
   RangeFirings,
   TargetFace,
   TargetMapping,
-} from '@open-reloading/schema'
-import { parseRef } from '@open-reloading/schema'
+} from '@rangefoundry/schema'
+import { parseRef } from '@rangefoundry/schema'
 import { checkCaliberClasses } from './caliber-classes.ts'
 import { checkCoverage } from './coverage.ts'
 import { checkEventTypes } from './event-types.ts'

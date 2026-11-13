@@ -6,7 +6,7 @@ import type {
   Primer,
   RangeFirings,
   TargetFace,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { checkNames, normaliseName } from '../src/names.ts'
 

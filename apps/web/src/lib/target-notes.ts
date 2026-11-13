@@ -1,5 +1,5 @@
 /** Placeholders `{key.unit}` resolved on every render; no React, DOM or Next.js. */
-import type { ShotGroup } from '@open-reloading/schema'
+import type { ShotGroup } from '@rangefoundry/schema'
 import type { GroupStatistics } from '@rangefoundry/shot-groups'
 import { formatNumber, plainNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'

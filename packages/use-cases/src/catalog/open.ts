@@ -1,5 +1,5 @@
-import { canonicalJson } from '@open-reloading/schema'
 import { bulletWindow } from '@rangefoundry/ballistics'
+import { canonicalJson } from '@rangefoundry/schema'
 import { revisionOf } from './derive.ts'
 import { sha256 } from './hash.ts'
 import { select } from './list.ts'

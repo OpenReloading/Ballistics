@@ -7,7 +7,7 @@ import {
   type PublishedLoad,
   type PublishedLoads,
   parseRef,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import type { Finding } from './plausibility.ts'
 
 /** A file of published loads and the cartridge folder it is read from. */

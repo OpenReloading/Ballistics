@@ -8,7 +8,7 @@ import {
   parseRef,
   publishedLoads,
   sourceRecord,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import {
   type IncomingLoads,
   type MergeReport,

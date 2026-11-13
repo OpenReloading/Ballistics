@@ -1,5 +1,5 @@
 /** An A4 sheet in mm, y down; four corner marks span a known rectangle for the photo calibration. */
-import type { ShotGroup } from '@open-reloading/schema'
+import type { ShotGroup } from '@rangefoundry/schema'
 import { plainNumber } from '../i18n/number.ts'
 import type { Point } from './target-geometry.ts'
 

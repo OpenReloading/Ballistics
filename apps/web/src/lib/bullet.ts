@@ -1,5 +1,5 @@
-import { type Bullet, baseTypes, fromSi, toSi } from '@open-reloading/schema'
 import { millerStability, type Projectile } from '@rangefoundry/ballistics'
+import { type Bullet, baseTypes, fromSi, toSi } from '@rangefoundry/schema'
 import { msg } from '../i18n/translate.ts'
 import type { FieldRow } from './record-fields.ts'
 import { metersPerFoot, pascalsPerInHg } from './units.ts'

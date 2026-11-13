@@ -2,7 +2,7 @@ import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } f
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { checkPublishedLoadPlausibility } from '@open-reloading/catalog'
-import type { PublishedLoads } from '@open-reloading/schema'
+import type { PublishedLoads } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { readRecords } from '../../src/catalog/records.ts'
 

@@ -1,5 +1,5 @@
 /** A bullet diameter (a bullet's, or a cartridge's G1) falls in the group whose span holds it. */
-import { toSi } from '@open-reloading/schema'
+import { toSi } from '@rangefoundry/schema'
 import type { Translator } from '../i18n/translate.ts'
 import { inchText, metersPerInch, type UnitSystem } from './units.ts'
 

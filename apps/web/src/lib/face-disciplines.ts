@@ -5,7 +5,7 @@ import {
   type GroupFace,
   type TargetMapping,
   toSi,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import { compareDisciplines, compareFederations, compareNames } from './face-order.ts'
 import type { Face } from './face-organization.ts'
 

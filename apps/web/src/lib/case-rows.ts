@@ -1,5 +1,5 @@
 /** The case list's rows: the summary with the names of its manufacturer and cartridge, and the search. */
-import { parseRef, type UserRecord } from '@open-reloading/schema'
+import { parseRef, type UserRecord } from '@rangefoundry/schema'
 import type { CaseSummary } from './api-types.ts'
 import { groupCapacity } from './case-group.ts'
 import { matchesQuery } from './lists.ts'

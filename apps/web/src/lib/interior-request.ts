@@ -1,4 +1,3 @@
-import { type Powder, toSi } from '@open-reloading/schema'
 import {
   defaultSensitivity,
   type InteriorLoad,
@@ -7,6 +6,7 @@ import {
   recordSensitivity,
   sensitivityReferenceDefault,
 } from '@rangefoundry/ballistics'
+import { type Powder, toSi } from '@rangefoundry/schema'
 import { type InteriorBody, interiorBody } from './interior-input.ts'
 import type { RecordValues } from './query.ts'
 import type { Gap } from './resistance-gaps.ts'

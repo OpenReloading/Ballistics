@@ -17,14 +17,14 @@ import {
   Title,
   Tooltip,
 } from '@mantine/core'
+import { Plus, Trash, X } from '@phosphor-icons/react'
 import type {
   Firearm,
   Optic,
   OpticConfiguration,
   OpticMount,
   QuantityValue,
-} from '@open-reloading/schema'
-import { Plus, Trash, X } from '@phosphor-icons/react'
+} from '@rangefoundry/schema'
 import { type Dispatch, type ReactElement, type SetStateAction, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'

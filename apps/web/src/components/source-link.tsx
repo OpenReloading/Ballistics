@@ -1,6 +1,6 @@
 'use client'
 
-import type { Source } from '@open-reloading/schema'
+import type { Source } from '@rangefoundry/schema'
 import { useTranslation } from '../i18n/language.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
 

@@ -174,10 +174,10 @@ it('prerenders every record when record data, page code or shared parts changed'
 })
 
 const packages =
-  '--filter @open-reloading/units --filter @rangefoundry/locale-format --filter @rangefoundry/design-tokens --filter @rangefoundry/statistics --filter @rangefoundry/ballistics --filter @rangefoundry/shot-groups --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/catalog --filter @rangefoundry/target-recognition --filter @rangefoundry/use-cases --filter @rangefoundry/api --filter @rangefoundry/docs --filter @rangefoundry/tools --filter @rangefoundry/test-kit'
+  '--filter @open-reloading/units --filter @rangefoundry/locale-format --filter @rangefoundry/design-tokens --filter @rangefoundry/statistics --filter @rangefoundry/ballistics --filter @rangefoundry/shot-groups --filter @rangefoundry/schema --filter @open-reloading/importers --filter @open-reloading/catalog --filter @rangefoundry/target-recognition --filter @rangefoundry/use-cases --filter @rangefoundry/api --filter @rangefoundry/docs --filter @rangefoundry/tools --filter @rangefoundry/test-kit'
 /** The workspaces of the packages group that a change of units reaches. */
 const reachedByUnits =
-  '--filter @open-reloading/units --filter @rangefoundry/locale-format --filter @rangefoundry/ballistics --filter @rangefoundry/shot-groups --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/catalog --filter @rangefoundry/target-recognition --filter @rangefoundry/use-cases --filter @rangefoundry/api --filter @rangefoundry/docs --filter @rangefoundry/tools'
+  '--filter @open-reloading/units --filter @rangefoundry/locale-format --filter @rangefoundry/ballistics --filter @rangefoundry/shot-groups --filter @rangefoundry/schema --filter @open-reloading/importers --filter @open-reloading/catalog --filter @rangefoundry/target-recognition --filter @rangefoundry/use-cases --filter @rangefoundry/api --filter @rangefoundry/docs --filter @rangefoundry/tools'
 
 it('tests every workspace of every group without a list of affected ones', () => {
   expect(testJobs()).toEqual([

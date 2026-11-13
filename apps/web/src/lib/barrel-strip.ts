@@ -1,4 +1,3 @@
-import { fromSi } from '@open-reloading/schema'
 import {
   fullSection,
   type SectionPoint,
@@ -7,6 +6,7 @@ import {
   svgPath,
 } from '@open-reloading/svg-drawings'
 import { previewDrawn } from '@open-reloading/svg-drawings/seating'
+import { fromSi } from '@rangefoundry/schema'
 import { nth } from './nth.ts'
 
 /** From the seated preview at the run: record values, the seated bullet's half outline ([r, z] mm from its base) and the base's z from the head, mm. */

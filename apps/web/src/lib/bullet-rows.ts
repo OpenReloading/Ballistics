@@ -1,5 +1,5 @@
 /** The bullet list's rows: search text, filters, cells, the BC column and the packed page props. */
-import { fold, score, searchKey, toSi } from '@open-reloading/schema'
+import { fold, score, searchKey, toSi } from '@rangefoundry/schema'
 import { formatNumber } from '../i18n/number.ts'
 import type { BulletSummary } from './api-types.ts'
 import { caliberLabel, commonCaliber } from './caliber.ts'

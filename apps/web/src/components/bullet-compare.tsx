@@ -12,8 +12,8 @@ import {
   TableTr,
   Text,
 } from '@mantine/core'
-import type { Bullet } from '@open-reloading/schema'
 import { Flask, Plus } from '@phosphor-icons/react'
+import type { Bullet } from '@rangefoundry/schema'
 import dynamic from 'next/dynamic'
 import { type CSSProperties, type ReactNode, useState } from 'react'
 import Link from '@/platform/link.tsx'

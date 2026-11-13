@@ -5,7 +5,7 @@ import {
   cartridge,
   caseTypes,
   catalogueCaseCapacity,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import { type CartridgeQuery, type Catalogue, cartridgeItem } from '@rangefoundry/use-cases/catalog'
 import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'

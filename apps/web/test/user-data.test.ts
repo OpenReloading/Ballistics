@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
-import { type UserRecord, userRecord } from '@open-reloading/schema'
+import { type UserRecord, userRecord } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import { installCoreMessages } from '../src/lib/core-message-table.ts'

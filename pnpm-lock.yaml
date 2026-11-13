@@ -168,9 +168,6 @@ importers:
       '@open-reloading/importers':
         specifier: workspace:*
         version: link:../../packages/importers
-      '@open-reloading/schema':
-        specifier: workspace:*
-        version: link:../../packages/schema
       '@open-reloading/svg-drawings':
         specifier: workspace:*
         version: link:../../packages/svg-drawings
@@ -180,6 +177,9 @@ importers:
       '@rangefoundry/cli':
         specifier: workspace:*
         version: link:../../packages/cli
+      '@rangefoundry/schema':
+        specifier: workspace:*
+        version: link:../../packages/schema
       '@rangefoundry/tools':
         specifier: workspace:*
         version: link:../../tools
@@ -234,9 +234,6 @@ importers:
       '@open-reloading/importers':
         specifier: workspace:*
         version: link:../../packages/importers
-      '@open-reloading/schema':
-        specifier: workspace:*
-        version: link:../../packages/schema
       '@open-reloading/svg-drawings':
         specifier: workspace:*
         version: link:../../packages/svg-drawings
@@ -258,6 +255,9 @@ importers:
       '@rangefoundry/locale-format':
         specifier: workspace:*
         version: link:../../packages/locale-format
+      '@rangefoundry/schema':
+        specifier: workspace:*
+        version: link:../../packages/schema
       '@rangefoundry/shot-groups':
         specifier: workspace:*
         version: link:../../packages/shot-groups
@@ -334,12 +334,12 @@ importers:
       '@open-reloading/catalog':
         specifier: workspace:*
         version: link:../catalog
-      '@open-reloading/schema':
-        specifier: workspace:*
-        version: link:../schema
       '@rangefoundry/ballistics':
         specifier: workspace:*
         version: link:../ballistics
+      '@rangefoundry/schema':
+        specifier: workspace:*
+        version: link:../schema
       '@rangefoundry/use-cases':
         specifier: workspace:*
         version: link:../use-cases
@@ -414,7 +414,7 @@ importers:
 
   packages/catalog:
     dependencies:
-      '@open-reloading/schema':
+      '@rangefoundry/schema':
         specifier: workspace:*
         version: link:../schema
     devDependencies:
@@ -451,9 +451,6 @@ importers:
       '@open-reloading/catalog':
         specifier: workspace:*
         version: link:../catalog
-      '@open-reloading/schema':
-        specifier: workspace:*
-        version: link:../schema
       '@open-reloading/svg-drawings':
         specifier: workspace:*
         version: link:../svg-drawings
@@ -466,6 +463,9 @@ importers:
       '@rangefoundry/ballistics':
         specifier: workspace:*
         version: link:../ballistics
+      '@rangefoundry/schema':
+        specifier: workspace:*
+        version: link:../schema
       '@rangefoundry/statistics':
         specifier: workspace:*
         version: link:../statistics
@@ -548,12 +548,12 @@ importers:
 
   packages/importers:
     dependencies:
-      '@open-reloading/schema':
-        specifier: workspace:*
-        version: link:../schema
       '@open-reloading/units':
         specifier: workspace:*
         version: link:../units
+      '@rangefoundry/schema':
+        specifier: workspace:*
+        version: link:../schema
       '@rangefoundry/statistics':
         specifier: workspace:*
         version: link:../statistics
@@ -941,12 +941,12 @@ importers:
       '@open-reloading/catalog':
         specifier: workspace:*
         version: link:../catalog
-      '@open-reloading/schema':
-        specifier: workspace:*
-        version: link:../schema
       '@rangefoundry/ballistics':
         specifier: workspace:*
         version: link:../ballistics
+      '@rangefoundry/schema':
+        specifier: workspace:*
+        version: link:../schema
       '@rangefoundry/statistics':
         specifier: workspace:*
         version: link:../statistics
@@ -1012,12 +1012,12 @@ importers:
       '@open-reloading/catalog':
         specifier: workspace:*
         version: link:../packages/catalog
-      '@open-reloading/schema':
-        specifier: workspace:*
-        version: link:../packages/schema
       '@rangefoundry/api':
         specifier: workspace:*
         version: link:../packages/api
+      '@rangefoundry/schema':
+        specifier: workspace:*
+        version: link:../packages/schema
       zod:
         specifier: 'catalog:'
         version: 4.6.7

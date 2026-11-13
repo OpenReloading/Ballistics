@@ -27,7 +27,7 @@ A field is absent where the wording does not state it. Wording that maps unambig
 
 ## Lead-free
 
-`leadFree(construction)` in `@open-reloading/schema` is derived, never stored:
+`leadFree(construction)` in `@rangefoundry/schema` is derived, never stored:
 
 | Result      | When                                                                                              |
 | ----------- | ------------------------------------------------------------------------------------------------- |

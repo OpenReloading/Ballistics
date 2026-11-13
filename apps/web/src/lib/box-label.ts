@@ -1,4 +1,4 @@
-import { toSi, type UserRecord } from '@open-reloading/schema'
+import { toSi, type UserRecord } from '@rangefoundry/schema'
 import { encode } from 'uqr'
 import type { Translator } from '../i18n/translate.ts'
 import { localDay } from './dates.ts'

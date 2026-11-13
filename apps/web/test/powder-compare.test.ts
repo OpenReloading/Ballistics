@@ -1,4 +1,4 @@
-import type { Powder } from '@open-reloading/schema'
+import type { Powder } from '@rangefoundry/schema'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { answerRow, computeRows } from '../src/components/use-powder-compare.ts'
 import { english } from '../src/i18n/translate.ts'

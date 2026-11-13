@@ -8,7 +8,7 @@ import {
   type UserPowder,
   type UserPowderFit,
   type UserRecord,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import { untranslated } from '../i18n/number.ts'
 import { english, type Message, msg, type Translator } from '../i18n/translate.ts'
 import {

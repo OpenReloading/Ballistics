@@ -13,7 +13,7 @@ import {
   type UserRecord,
   userDataFileText,
   userRecord,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import { z } from 'zod'
 import type { Message, Translator } from '../i18n/translate.ts'
 import { translateMessage } from './core-messages.ts'
@@ -97,7 +97,7 @@ export function reasonOf(d: UserDataDiagnostic): string {
   }
 }
 
-/** One file, validated against `@open-reloading/schema` as a whole but for records of a kind it does not know. */
+/** One file, validated against `@rangefoundry/schema` as a whole but for records of a kind it does not know. */
 export function parseUserDataFile(text: string): ParsedUserFile {
   const read = readUserDataFile(text)
   return read.ok ? read : { ok: false, reason: reasonOf(read.diagnostic) }

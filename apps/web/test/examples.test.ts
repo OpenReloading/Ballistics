@@ -1,4 +1,3 @@
-import { firearm, sheetId, userRecord } from '@open-reloading/schema'
 import { bulletDimensions } from '@open-reloading/svg-drawings/bullet'
 import {
   interior,
@@ -8,6 +7,7 @@ import {
   recordResistance,
   trajectory,
 } from '@rangefoundry/ballistics'
+import { firearm, sheetId, userRecord } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import {
   exampleChamberVolume,

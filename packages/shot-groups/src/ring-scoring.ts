@@ -32,7 +32,7 @@ export interface FaceBull {
   readonly zone?: string | undefined
 }
 
-/** What ring scoring reads of a target face record; the `TargetFace` of `@open-reloading/schema` is one. */
+/** What ring scoring reads of a target face record; the `TargetFace` of `@rangefoundry/schema` is one. */
 export interface ScoringFace {
   readonly rings: readonly FaceRing[]
   readonly innerTen?:

@@ -1,4 +1,4 @@
-import { powder as powderSchema, type UserPowder, type UserRecord } from '@open-reloading/schema'
+import { powder as powderSchema, type UserPowder, type UserRecord } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import { fieldValueFromText } from '../src/lib/field-spec.ts'

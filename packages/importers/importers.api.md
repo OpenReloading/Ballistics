@@ -4,11 +4,11 @@
 
 ```ts
 
-import type { ChronoSession } from '@open-reloading/schema';
-import type { ChronoShot } from '@open-reloading/schema';
+import type { ChronoSession } from '@rangefoundry/schema';
+import type { ChronoShot } from '@rangefoundry/schema';
 import type { Diagnostic } from '@rangefoundry/statistics';
-import type { QuantityValue } from '@open-reloading/schema';
-import type { UserRecord } from '@open-reloading/schema';
+import type { QuantityValue } from '@rangefoundry/schema';
+import type { UserRecord } from '@rangefoundry/schema';
 
 // @public
 export function autoMap(table: Table, kind: TableKind): TableColumnMap[];

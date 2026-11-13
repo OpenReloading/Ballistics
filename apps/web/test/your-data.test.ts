@@ -1,4 +1,4 @@
-import type { UserRecord } from '@open-reloading/schema'
+import type { UserRecord } from '@rangefoundry/schema'
 import { expect, it } from 'vitest'
 import { blankFirearm } from '../src/lib/firearm.ts'
 import { yourDataRows } from '../src/lib/your-data.ts'

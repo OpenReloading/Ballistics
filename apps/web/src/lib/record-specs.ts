@@ -1,4 +1,4 @@
-import { fromSi, toSi } from '@open-reloading/schema'
+import { fromSi, toSi } from '@rangefoundry/schema'
 
 /** A Pmax the user types is theirs, no CIP value. */
 export const specValueKeys = ['pmax', 'caseLength', 'bulkDensity'] as const

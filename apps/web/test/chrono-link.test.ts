@@ -1,4 +1,4 @@
-import type { GroupShot, SessionRecord } from '@open-reloading/schema'
+import type { GroupShot, SessionRecord } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { linkedString, linkString, stringChoices } from '../src/lib/chrono-link.ts'
 import { nth } from '../src/lib/nth.ts'

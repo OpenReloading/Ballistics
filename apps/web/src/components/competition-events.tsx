@@ -13,13 +13,13 @@ import {
   TextInput,
   Title,
 } from '@mantine/core'
+import { Plus, Trash } from '@phosphor-icons/react'
 import {
   type CompetitionEvent,
   type EventType,
   type UserRecord,
   userRecord,
-} from '@open-reloading/schema'
-import { Plus, Trash } from '@phosphor-icons/react'
+} from '@rangefoundry/schema'
 import type { EventTotals, StageScore } from '@rangefoundry/shot-groups'
 import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'

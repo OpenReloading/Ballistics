@@ -22,19 +22,6 @@ import {
 } from '@mantine/core'
 import { useElementSize, useMediaQuery, useMergedRef } from '@mantine/hooks'
 import {
-  type CalibrationReference,
-  type GroupFace,
-  photoTypes,
-  recordIdRegex,
-  type SessionRecord,
-  type SheetNote,
-  type ShotGroup,
-  type TargetSheet,
-  type TargetSheetRecord,
-  targetSheet,
-  type UserRecord,
-} from '@open-reloading/schema'
-import {
   ArrowClockwise,
   ArrowCounterClockwise,
   ArrowsIn,
@@ -55,6 +42,19 @@ import {
   Trash,
 } from '@phosphor-icons/react'
 import { overlay } from '@rangefoundry/ballistics'
+import {
+  type CalibrationReference,
+  type GroupFace,
+  photoTypes,
+  recordIdRegex,
+  type SessionRecord,
+  type SheetNote,
+  type ShotGroup,
+  type TargetSheet,
+  type TargetSheetRecord,
+  targetSheet,
+  type UserRecord,
+} from '@rangefoundry/schema'
 import {
   type CSSProperties,
   type Dispatch,

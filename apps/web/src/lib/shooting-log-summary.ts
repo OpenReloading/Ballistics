@@ -1,5 +1,5 @@
 /** A sum of the log, not a second total: the firearm's `roundCount` stays the one counter (#604). */
-import type { ShootingLogRecord, UserRecord } from '@open-reloading/schema'
+import type { ShootingLogRecord, UserRecord } from '@rangefoundry/schema'
 import type { EventRecord } from './competition-events.ts'
 import { toCsv } from './csv.ts'
 import { entryYear, userIdOf } from './shooting-log.ts'
