@@ -235,7 +235,7 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
           response: record,
           errors: [404],
           summary: `Get a ${noun}`,
-          description: `The ${noun} record with its provenance.${noun === 'bullet' ? ' `revision` is a hash of the stored record, changes with any field.' : ''}`,
+          description: `The ${noun} record with its provenance where it has one.${noun === 'bullet' ? ' `revision` is a hash of the stored record, changes with any field.' : ''}`,
         },
       },
       (request, reply) => {

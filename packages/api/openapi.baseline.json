@@ -235,7 +235,7 @@
         "operationId": "getBulletsById",
         "tags": ["Records"],
         "summary": "Get a bullet",
-        "description": "The bullet record with its provenance. `revision` is a hash of the stored record, changes with any field.",
+        "description": "The bullet record with its provenance where it has one. `revision` is a hash of the stored record, changes with any field.",
         "parameters": [
           {
             "name": "id",
@@ -26047,7 +26047,7 @@
         "operationId": "getPowdersById",
         "tags": ["Records"],
         "summary": "Get a powder",
-        "description": "The powder record with its provenance.",
+        "description": "The powder record with its provenance where it has one.",
         "parameters": [
           {
             "name": "id",
