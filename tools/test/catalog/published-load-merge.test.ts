@@ -451,6 +451,24 @@ describe('pnpm run loads:merge', () => {
     expect(readRecords(records).errors).toEqual([])
   })
 
+  it('refuses an incoming table without provenance and does not merge into a stored one without it', () => {
+    const records = temp()
+    const incoming = temp()
+    const { provenance: _p, ...unsourced } = table([a])
+    write(incoming, target, unsourced)
+    expect(mergeLoadFolder({ incoming, records, accept: 'all', dryRun: false }).errors).toEqual([
+      `${target}: a table needs provenance`,
+    ])
+    write(records, target, withLoadIds(unsourced as IncomingLoads))
+    expect(readRecords(records).errors).toContain(`${target}: needs provenance`)
+    const before = readFileSync(join(records, target), 'utf8')
+    write(incoming, target, table([a, b]))
+    expect(mergeLoadFolder({ incoming, records, accept: 'all', dryRun: false }).errors).toEqual([
+      `${target}: the table in the records needs provenance`,
+    ])
+    expect(readFileSync(join(records, target), 'utf8')).toBe(before)
+  })
+
   it('refuses a file that is not in its cartridge folder or not named for its maker', () => {
     const records = temp()
     const incoming = temp()

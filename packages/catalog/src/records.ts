@@ -119,7 +119,7 @@ function checkSourceCoverage(bundle: Bundle, errors: string[]) {
       for (const error of checkCoverage(record)) errors.push(`${dir}/${record.id}.json: ${error}`)
     }
   }
-  // fails closed like checkCoverage: no record without provenance enters the catalog before the publishing gate
+  // these kinds and published tables (checkRecords) need provenance in the catalog until a gate that covers them replaces this check
   for (const [dir, records] of [
     ['cartridges', bundle.cartridges],
     ['loads', bundle.loads],
@@ -213,6 +213,7 @@ export function checkRecords({ bundle, published, loadTables }: RecordsRead): {
     applyExceptions(c, errors)
   }
   checkSourceCoverage(bundle, errors)
+  // kept until a gate that covers published tables replaces it, as for the kinds in checkSourceCoverage
   for (const { folder, file } of published)
     if (!file.provenance) errors.push(`loads/${folder}/${file.id}.json: needs provenance`)
   errors.push(...checkFederations(bundle))

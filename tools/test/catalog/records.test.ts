@@ -100,6 +100,7 @@ describe('readRecords', () => {
   it('refuses a record of a kind without source coverage when it has no provenance', () => {
     const files = [
       'cartridges/test-cartridge.json',
+      'loads/test-load.json',
       'chrono/test-session.json',
       'firings/test-firing.json',
       'range/test-range.json',
@@ -110,6 +111,15 @@ describe('readRecords', () => {
         const { provenance: _p, ...rest } = JSON.parse(readFileSync(join(root, path), 'utf8'))
         write(path, rest)
       }
+      // without provenance a load names its bullet and powder by reference, not by description
+      const { provenance: _p, ...load } = JSON.parse(
+        readFileSync(join(root, 'loads/test-load.json'), 'utf8'),
+      )
+      write('loads/test-load.json', {
+        ...load,
+        bullet: 'catalogue:test-bullet',
+        powder: 'catalogue:test-powder',
+      })
     })
     for (const path of files) expect(errors).toContain(`${path}: needs provenance`)
   })
