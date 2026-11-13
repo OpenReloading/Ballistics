@@ -12,7 +12,7 @@ import {
 } from '@mantine/core'
 import { toSi } from '@open-reloading/schema'
 import { Backspace, Camera, Gauge } from '@phosphor-icons/react'
-import Link from 'next/link'
+import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { decimalMark, formatNumber, plainNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'

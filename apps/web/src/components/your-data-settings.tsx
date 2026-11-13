@@ -1,8 +1,8 @@
 'use client'
 
 import { Text } from '@mantine/core'
-import Link from 'next/link'
 import { Fragment, useEffect, useState } from 'react'
+import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { plainNumber } from '../i18n/number.ts'
 import { errorText } from '../lib/error-text.ts'

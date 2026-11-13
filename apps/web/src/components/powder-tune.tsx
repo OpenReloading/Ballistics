@@ -19,8 +19,8 @@ import type {
   PowderParameter,
   PowderPrediction,
 } from '@rangefoundry/ballistics'
-import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber, parseNumber } from '../i18n/number.ts'
 import { type Message as Marked, msg } from '../i18n/translate.ts'

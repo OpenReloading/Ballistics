@@ -2,8 +2,8 @@
 
 import { Box, Button, Text } from '@mantine/core'
 import { Flask, Plus } from '@phosphor-icons/react'
-import Link from 'next/link'
 import { useDeferredValue, useMemo } from 'react'
+import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
 import { msg } from '../i18n/translate.ts'

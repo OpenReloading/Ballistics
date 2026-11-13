@@ -1,7 +1,7 @@
 'use client'
 
-import Link from 'next/link'
 import { type ReactNode, Suspense } from 'react'
+import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg } from '../i18n/translate.ts'
 import { sections } from '../lib/sections.ts'
