@@ -1,10 +1,10 @@
 /** Fetched once per page load; designs are read from the store on each call, so one saved in another tab shows at once. */
 import type { TargetFace } from '@rangefoundry/schema'
+import { storedRecords } from '@/platform/user-store.ts'
 import { apiFetch } from './api-fetch.ts'
 import type { FederationData } from './face-disciplines.ts'
 import { type Face, withOrganization } from './face-organization.ts'
 import { buildFace, faceIdPrefix, userFaceId } from './user-faces.ts'
-import { storedRecords } from './user-store.ts'
 
 export type FaceSummary = { id: string; organization: string; name: string }
 

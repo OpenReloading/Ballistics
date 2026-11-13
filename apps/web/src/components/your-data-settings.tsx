@@ -3,10 +3,10 @@
 import { Text } from '@mantine/core'
 import { Fragment, useEffect, useState } from 'react'
 import Link from '@/platform/link.tsx'
+import { storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { plainNumber } from '../i18n/number.ts'
 import { errorText } from '../lib/error-text.ts'
-import { storedRecords } from '../lib/user-store.ts'
 import { yourDataRows } from '../lib/your-data.ts'
 import { ErrorNote, Loading } from './states.tsx'
 

@@ -5,6 +5,7 @@ import { Export } from '@phosphor-icons/react'
 import type { ShotGroup } from '@rangefoundry/schema'
 import { type ReactNode, useState } from 'react'
 import { createPortal, flushSync } from 'react-dom'
+import { storedPhoto } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { download } from '../lib/download.ts'
 import { errorText } from '../lib/error-text.ts'
@@ -13,7 +14,6 @@ import { groupStatisticsOf } from '../lib/target-groups.ts'
 import { exportSize, type ViewBox } from '../lib/target-view.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { recordFileName } from '../lib/user-file-names.ts'
-import { storedPhoto } from '../lib/user-store.ts'
 
 /** The extent Fit shows (the whole photo): exports and print use it, never the zoom. */
 export type ViewRef = { current: { extent: ViewBox } | undefined }

@@ -1,10 +1,10 @@
 import { parseRef, type UserRecord } from '@rangefoundry/schema'
+import { storedRecords } from '@/platform/user-store.ts'
 import { fetchRecord } from './api-fetch.ts'
 import { toCsv } from './csv.ts'
 import { localDay } from './dates.ts'
 import { download } from './download.ts'
 import { type FirearmUse, loadUse } from './load-use.ts'
-import { storedRecords } from './user-store.ts'
 
 type FirearmRecord = Extract<UserRecord, { kind: 'firearm' }>
 /** The API path of each kind of record a load names. */

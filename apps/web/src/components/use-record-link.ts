@@ -1,7 +1,7 @@
 import { type UserRecordKind, userRecord } from '@rangefoundry/schema'
 import { type RefObject, useEffect } from 'react'
+import { storedRecord } from '@/platform/user-store.ts'
 import { type Message, msg } from '../i18n/translate.ts'
-import { storedRecord } from '../lib/user-store.ts'
 import type { FileMenuHandle } from './file-menu.tsx'
 
 /** The status while a linked record is read. */

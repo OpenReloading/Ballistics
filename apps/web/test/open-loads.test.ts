@@ -7,7 +7,7 @@ import {
   recentLoads,
   withOpened,
 } from '../src/lib/open-loads.ts'
-import { putRecords } from '../src/lib/user-store.ts'
+import { putRecords } from '../src/platform/user-store.ts'
 
 it('reads the open set back and ignores anything damaged', () => {
   const set = { ids: ['a', 'b'], active: 'b' }

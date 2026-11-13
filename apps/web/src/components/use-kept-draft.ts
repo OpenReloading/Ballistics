@@ -1,6 +1,6 @@
 import type { UserRecord } from '@rangefoundry/schema'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { putRecords, requestPersistentStorage } from '../lib/user-store.ts'
+import { putRecords, requestPersistentStorage } from '@/platform/user-store.ts'
 
 /** What the browser holds of the draft shown: nothing yet, a write under way, done or refused. */
 export type Kept = 'blank' | 'saving' | 'saved' | 'failed'

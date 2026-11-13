@@ -13,7 +13,7 @@ import {
 import type { BulletModel } from '@rangefoundry/svg-drawings/bullet'
 import type { FigureModel, Side } from '@rangefoundry/svg-drawings/cartridge'
 import type { CSSProperties, ReactNode } from 'react'
-import { drawingFont } from '../app/fonts/drawing.ts'
+import { drawingFont } from '@/platform/fonts/drawing.ts'
 import { Decimal } from './decimal.tsx'
 
 const n = (x: number) => Number(x.toFixed(2))
