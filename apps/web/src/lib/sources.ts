@@ -1,21 +1,21 @@
-/** List sources: OpenReloading records and the user records of the browser. */
+/** List sources: RangeFoundry records and the user records of the browser. */
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import type { BulletRow } from './bullet-rows.ts'
 import type { CartridgeRow } from './cartridge-rows.ts'
 import type { UserBulletView, UserCartridgeView } from './variants.ts'
 
-export const origins = ['openreloading', 'user'] as const
+export const origins = ['rangefoundry', 'user'] as const
 export type Origin = (typeof origins)[number]
 
 /** Full names, the chips' labels and the badges' hover text; shown through `t`. */
 export const originNames: Record<Origin, Message> = {
-  openreloading: msg('OpenReloading'),
+  rangefoundry: msg('RangeFoundry'),
   user: msg('Mine'),
 }
 
 /** A row without `origin` is a catalogue row. */
 export const originOf = (row: { origin?: 'user' | undefined }): Origin =>
-  row.origin ?? 'openreloading'
+  row.origin ?? 'rangefoundry'
 
 /** All of them when it is empty or names none of them. */
 export function readOrigins(
@@ -61,7 +61,7 @@ export const onlyText = (t: Translator['t'], on: readonly Origin[]) =>
 export function countOrigins(
   rows: readonly { origin?: 'user' | undefined }[],
 ): Record<Origin, number> {
-  const counts = { openreloading: 0, user: 0 }
+  const counts = { rangefoundry: 0, user: 0 }
   for (const r of rows) counts[originOf(r)]++
   return counts
 }

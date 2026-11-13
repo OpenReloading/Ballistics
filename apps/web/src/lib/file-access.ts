@@ -13,7 +13,7 @@ export type Pickers = {
 /** The window's File System Access pickers; each is absent where the browser lacks it. */
 export const pickers = () => window as unknown as Pickers
 
-const types = [{ description: 'OpenReloading data', accept: { 'application/json': ['.json'] } }]
+const types = [{ description: 'RangeFoundry data', accept: { 'application/json': ['.json'] } }]
 /** A picker the user closed without a choice. */
 export const aborted = (e: unknown) => e instanceof DOMException && e.name === 'AbortError'
 

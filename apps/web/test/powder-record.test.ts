@@ -1,5 +1,5 @@
-import { powderModelValues, recordResistance } from '@open-reloading/ballistics'
 import type { Powder } from '@open-reloading/schema'
+import { powderModelValues, recordResistance } from '@rangefoundry/ballistics'
 import { expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import {

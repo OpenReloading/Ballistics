@@ -33,7 +33,7 @@ export type Base<T> =
 // the API answers a cartridge without aliases with an empty list, which the record schema rejects
 const cartridgeBase = cartridge.omit({ aliases: true })
 
-const baseKey = (kind: string, id: string) => storageName(`openreloading-base:${kind}/${id}`)
+const baseKey = (kind: string, id: string) => storageName(`rangefoundry-base:${kind}/${id}`)
 
 /** A kept value the schema rejects (an older shape, a damaged entry) is forgotten. */
 function recalled<T>(key: string, schema: z.ZodType): T | undefined {

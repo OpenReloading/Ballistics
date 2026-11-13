@@ -7,7 +7,7 @@ import {
   catalogueFormat,
   deriveVersion,
   openCatalogue,
-} from '@open-reloading/use-cases/catalog'
+} from '@rangefoundry/use-cases/catalog'
 import { describe, expect, it } from 'vitest'
 import { contentHash, revisionOf } from '../../use-cases/src/catalog/derive.ts'
 import { loadCatalogue, writeCatalogue } from '../src/catalogue/node.ts'

@@ -162,7 +162,7 @@ importers:
       '@docusaurus/types':
         specifier: 3.10.2
         version: 3.10.2(@swc/core@1.16.20(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@6.1.2(postcss@8.5.31))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@7.2.0)(lightningcss@1.33.0)(postcss@8.5.31)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sharp@0.35.5(@types/node@26.6.6))(supports-color@8.1.1)(svgo@3.3.5)
-      '@open-reloading/ballistics':
+      '@rangefoundry/ballistics':
         specifier: workspace:*
         version: link:../../packages/ballistics
       '@open-reloading/catalog':
@@ -231,7 +231,7 @@ importers:
       '@open-reloading/api':
         specifier: workspace:*
         version: link:../../packages/api
-      '@open-reloading/ballistics':
+      '@rangefoundry/ballistics':
         specifier: workspace:*
         version: link:../../packages/ballistics
       '@open-reloading/catalog':
@@ -258,7 +258,7 @@ importers:
       '@open-reloading/units':
         specifier: workspace:*
         version: link:../../packages/units
-      '@open-reloading/use-cases':
+      '@rangefoundry/use-cases':
         specifier: workspace:*
         version: link:../../packages/use-cases
       '@phosphor-icons/react':
@@ -331,7 +331,7 @@ importers:
       '@fastify/sensible':
         specifier: ^6.0.7
         version: 6.0.7
-      '@open-reloading/ballistics':
+      '@rangefoundry/ballistics':
         specifier: workspace:*
         version: link:../ballistics
       '@open-reloading/catalog':
@@ -340,7 +340,7 @@ importers:
       '@open-reloading/schema':
         specifier: workspace:*
         version: link:../schema
-      '@open-reloading/use-cases':
+      '@rangefoundry/use-cases':
         specifier: workspace:*
         version: link:../use-cases
       '@scalar/fastify-api-reference':
@@ -451,7 +451,7 @@ importers:
       '@open-reloading/api':
         specifier: workspace:*
         version: link:../api
-      '@open-reloading/ballistics':
+      '@rangefoundry/ballistics':
         specifier: workspace:*
         version: link:../ballistics
       '@open-reloading/catalog':
@@ -469,7 +469,7 @@ importers:
       '@open-reloading/units':
         specifier: workspace:*
         version: link:../units
-      '@open-reloading/use-cases':
+      '@rangefoundry/use-cases':
         specifier: workspace:*
         version: link:../use-cases
       '@rangefoundry/statistics':
@@ -938,7 +938,7 @@ importers:
 
   packages/use-cases:
     dependencies:
-      '@open-reloading/ballistics':
+      '@rangefoundry/ballistics':
         specifier: workspace:*
         version: link:../ballistics
       '@open-reloading/catalog':

@@ -1,7 +1,7 @@
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { interior } from '@open-reloading/ballistics'
+import { interior } from '@rangefoundry/ballistics'
 import { type InteriorModel, predict } from '../src/evaluate.ts'
 import { loadRecords, type Records } from '../src/records.ts'
 import type { Row } from '../src/rows.ts'

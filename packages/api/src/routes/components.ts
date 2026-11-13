@@ -15,7 +15,7 @@ import type {
   Catalogue,
   Catalogued,
   PrimerQuery,
-} from '@open-reloading/use-cases/catalog'
+} from '@rangefoundry/use-cases/catalog'
 import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
 import { missing, originated, revised, stored } from './record-answers.ts'

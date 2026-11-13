@@ -1,7 +1,7 @@
 /** The API over the catalogue of the data bundle, and the data files the web app serves in its place (`@open-reloading/api/static`, build time only). */
 import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
-import { inlineRunner } from '@open-reloading/use-cases'
+import { inlineRunner } from '@rangefoundry/use-cases'
 import {
   buildCatalogue,
   type Catalogue,
@@ -9,7 +9,7 @@ import {
   type Catalogued,
   type CatalogueKind,
   openCatalogue,
-} from '@open-reloading/use-cases/catalog'
+} from '@rangefoundry/use-cases/catalog'
 import { buildApp } from './app.ts'
 import { loadBundle } from './bundle.ts'
 import { cartridgeAnswer } from './routes/cartridges.ts'

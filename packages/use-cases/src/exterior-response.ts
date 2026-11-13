@@ -1,6 +1,7 @@
 /** Every object is loose, so fields core adds later do not break the document; paths where the route writes a NaN or infinite number as null are nullable. */
-import { dragModels } from '@open-reloading/ballistics'
+
 import { provenance } from '@open-reloading/schema'
+import { dragModels } from '@rangefoundry/ballistics'
 import { z } from 'zod'
 import { identity } from './identity.ts'
 

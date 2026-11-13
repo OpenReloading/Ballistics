@@ -15,11 +15,11 @@ export function TemplateLinks({ json, between }: { json?: string; between?: Reac
   const { t } = useTranslation()
   return (
     <>
-      <a href={jsonTemplateHref} download="openreloading-session-template.json">
+      <a href={jsonTemplateHref} download="rangefoundry-session-template.json">
         {json ?? t('JSON template')}
       </a>
       {between}
-      <a href={templateHref} download="openreloading-session-template.csv">
+      <a href={templateHref} download="rangefoundry-session-template.csv">
         {t('CSV template')}
       </a>
     </>

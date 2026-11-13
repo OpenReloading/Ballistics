@@ -4,7 +4,7 @@ import type { Page } from '@playwright/test'
 export async function putRecords(page: Page, records: object[]) {
   await page.evaluate(async (records) => {
     const db: IDBDatabase = await new Promise((ok, no) => {
-      const r = indexedDB.open('openreloading-user-data')
+      const r = indexedDB.open('rangefoundry-user-data')
       r.onupgradeneeded = () => {
         r.result.createObjectStore('records', { keyPath: 'id' })
         r.result.createObjectStore('handles')

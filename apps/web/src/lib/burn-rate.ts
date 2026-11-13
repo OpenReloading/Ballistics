@@ -1,7 +1,7 @@
 /** Dynamic vivacity in 1/(MPa s) from fitted M3 parameters (`apps/docs/docs/models/interior-burn-forms.md`, "Dynamic vivacity"), interval ± `uncertaintyFactor` standard uncertainties. */
 
-import { dynamicVivacity, meanDynamicVivacity, type VivacityBurn } from '@open-reloading/ballistics'
 import { type Powder, toSi } from '@open-reloading/schema'
+import { dynamicVivacity, meanDynamicVivacity, type VivacityBurn } from '@rangefoundry/ballistics'
 import { formatNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator, translator } from '../i18n/translate.ts'
 import type { PowderSummary } from './api-types.ts'

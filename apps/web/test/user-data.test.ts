@@ -92,9 +92,9 @@ describe('user data files', () => {
   it('rejects text that is not JSON, another format and a newer version with a reason', () => {
     expect(parseUserDataFile('{')).toEqual({ ok: false, reason: 'The file is not JSON.' })
     const other = parseUserDataFile(JSON.stringify({ format: 'x', version: 1, records: [] }))
-    expect(other).toEqual({ ok: false, reason: 'The file is not an OpenReloading data file.' })
+    expect(other).toEqual({ ok: false, reason: 'The file is not a RangeFoundry data file.' })
     const newer = parseUserDataFile(
-      JSON.stringify({ format: 'openreloading-user-data', version: 2, records: [] }),
+      JSON.stringify({ format: 'rangefoundry-user-data', version: 2, records: [] }),
     )
     expect(newer).toEqual({
       ok: false,

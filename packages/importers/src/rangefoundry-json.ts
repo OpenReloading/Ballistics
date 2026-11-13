@@ -8,8 +8,8 @@ import {
 } from './result.ts'
 import { yearFirstDate } from './text.ts'
 
-/** Value of the `format` member: `openreloading-session`. */
-export const sessionJsonFormat = 'openreloading-session'
+/** Value of the `format` member: `rangefoundry-session`. */
+export const sessionJsonFormat = 'rangefoundry-session'
 
 type DeviceKind = ChronoSession['device']['kind']
 // every kind of the session schema once: a kind added or dropped there fails the type check here
@@ -32,8 +32,8 @@ function parse(text: string): unknown {
   }
 }
 
-/** True when the text is JSON whose `format` is `openreloading-session`. */
-export function isOpenReloadingJson(text: string): boolean {
+/** True when the text is JSON whose `format` is `rangefoundry-session`. */
+export function isRangeFoundryJson(text: string): boolean {
   if (
     !text
       .replace(/^\uFEFF/, '')
@@ -132,15 +132,15 @@ function readDate(root: Obj): string | undefined {
 }
 
 /**
- * An OpenReloading session JSON file, the format the session summary exports. Velocities are m/s.
+ * A RangeFoundry session JSON file, the format the session summary exports. Velocities are m/s.
  * The muzzle distance is m in the file and mm (the stored unit) in the session.
  *
  * ```
- * { "format": "openreloading-session", "version": 1, "date"?, "device"?: { "kind", "manufacturerName"?, "model"? },
+ * { "format": "rangefoundry-session", "version": 1, "date"?, "device"?: { "kind", "manufacturerName"?, "model"? },
  *   "muzzleDistance"? (m), "note"?, "strings": [{ "label"?, "shots": [{ "velocity" (m/s), "coldBore"?, "excluded"? }] }] }
  * ```
  */
-export function parseOpenReloadingJson(
+export function parseRangeFoundryJson(
   text: string,
   options: ChronoParserOptions = {},
 ): ChronoImport {
@@ -156,7 +156,7 @@ export function parseOpenReloadingJson(
   const { strings, labels } = readStrings(root)
 
   return buildChronoImport(
-    'openreloading-json',
+    'rangefoundry-json',
     {
       date,
       device,
@@ -171,8 +171,8 @@ export function parseOpenReloadingJson(
   )
 }
 
-/** The session of an import as OpenReloading session JSON, with the string labels inside the strings. */
-export function stringifyOpenReloadingJson(data: ChronoImport): string {
+/** The session of an import as RangeFoundry session JSON, with the string labels inside the strings. */
+export function stringifyRangeFoundryJson(data: ChronoImport): string {
   const { date, device, muzzleDistance, strings, note } = data.session
   return `${JSON.stringify(
     {
