@@ -19,8 +19,8 @@ Each library has its own [Semantic Versioning](../release.md#versions) version.
 
 ## Entry points
 
-| Import                                 | Contents                                                                                                                                      |
-| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Import                               | Contents                                                                                                                                      |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | `@rangefoundry/schema`               | Every schema, type and unit helper                                                                                                            |
 | `@rangefoundry/schema/json-schema/*` | The JSON Schema (draft 2020-12) of each record kind and file, written from its Zod schema: `<name>.schema.json`, such as `bullet.schema.json` |
 
