@@ -1,4 +1,4 @@
-import * as locale from '@open-reloading/locale-format'
+import * as locale from '@rangefoundry/locale-format'
 import { shownLanguage } from '../i18n/shown.ts'
 
 /** The local calendar day of `d` as YYYY-MM-DD: the date of a print or a file name. */

@@ -11,7 +11,7 @@ import {
   type ProposalRequest,
   type Proposals,
   WORK_DIAMETER,
-} from '@open-reloading/target-recognition'
+} from '@rangefoundry/target-recognition'
 import { errorText } from './error-text.ts'
 import type { Photo, WorkerReply, WorkerRequest } from './hole-detection-protocol.ts'
 import { layoutOf, photoQuality } from './photo-quality.ts'

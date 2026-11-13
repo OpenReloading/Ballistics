@@ -1,6 +1,6 @@
 // Writes the REST reference page to static/rest/ (openapi.json of the current routes, the Scalar viewer scalar.js, the palette tokens.css and the page loading them); needs `pnpm run build` at the root, API_URL is the API its reference sends requests to, unset (GitHub Pages) the page links to none
 import { copyFileSync, mkdirSync, writeFileSync } from 'node:fs'
-import { buildOpenApi } from '@open-reloading/api/openapi'
+import { buildOpenApi } from '@rangefoundry/api/openapi'
 
 const out = new URL('../static/rest/', import.meta.url)
 const api = process.env.API_URL?.replace(/\/$/, '')
@@ -14,7 +14,7 @@ writeFileSync(new URL('openapi.json', out), `${JSON.stringify(await buildOpenApi
 const scalar = new URL('browser/standalone.js', import.meta.resolve('@scalar/api-reference'))
 copyFileSync(scalar, new URL('scalar.js', out))
 copyFileSync(
-  new URL(import.meta.resolve('@open-reloading/design-tokens/tokens.css')),
+  new URL(import.meta.resolve('@rangefoundry/design-tokens/tokens.css')),
   new URL('tokens.css', out),
 )
 

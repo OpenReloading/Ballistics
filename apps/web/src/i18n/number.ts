@@ -1,28 +1,28 @@
-import * as locale from '@open-reloading/locale-format'
 import {
   type NumberRange,
   type ParsedNumber,
   parseNumber as parseWithMark,
 } from '@open-reloading/units'
+import * as locale from '@rangefoundry/locale-format'
 import { shownLanguage } from './shown.ts'
 import { type Translator, translator } from './translate.ts'
 
-/** The formatting of `@open-reloading/locale-format` in the language shown; inside the app a number is its canonical text (a point as the decimal mark, no grouping, what `Number(text)` reads), stored, linked, exported and sent to the packages as such: only the screen writes the language's mark, and only what a person types or pastes is read through {@link parseNumber}. */
+/** The formatting of `@rangefoundry/locale-format` in the language shown; inside the app a number is its canonical text (a point as the decimal mark, no grouping, what `Number(text)` reads), stored, linked, exported and sent to the packages as such: only the screen writes the language's mark, and only what a person types or pastes is read through {@link parseNumber}. */
 
 export type { NumberRange, ParsedNumber }
 
 /** The decimal mark of `language` ("." or ","); the language shown by default. */
 export const decimalMark = (language = shownLanguage()) => locale.decimalMark(language)
 
-/** `localizeNumber` of `@open-reloading/locale-format`, in the language shown by default. */
+/** `localizeNumber` of `@rangefoundry/locale-format`, in the language shown by default. */
 export const localizeNumber = (text: string, language = shownLanguage()) =>
   locale.localizeNumber(text, language)
 
-/** `localizeDecimals` of `@open-reloading/locale-format` for text built on the server, which writes English; in the language shown by default. */
+/** `localizeDecimals` of `@rangefoundry/locale-format` for text built on the server, which writes English; in the language shown by default. */
 export const localizeDecimals = (text: string, language = shownLanguage()) =>
   locale.localizeDecimals(text, language)
 
-/** `canonicalNumberText` of `@open-reloading/locale-format`, in the language shown by default. */
+/** `canonicalNumberText` of `@rangefoundry/locale-format`, in the language shown by default. */
 export const canonicalNumberText = (text: string, language = shownLanguage()) =>
   locale.canonicalNumberText(text, language)
 

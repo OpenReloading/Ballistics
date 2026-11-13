@@ -27,7 +27,7 @@ The web app's language is a setting (Settings, General, Language). There is one 
 
 ## The interface base (`packages/ui`)
 
-The shared base keeps its own texts in Lingui catalogs, the format the rebuilt web app moves to: `packages/ui/src/locales/en.po` and `de.po`, each text with an explicit id under `ui.` (`ui.frame.menu`). A text in `ui` is `i18n._({ id: 'ui.frame.menu', message: 'Navigation' })`; `pnpm --filter @open-reloading/ui run messages` adds new texts to both catalogs, and a German one is written into `de.po` by hand. The build fails while a German text is missing, and `tsc` fails on an id the English catalog lacks. The app loads `uiMessages` of `@open-reloading/ui` beside its own texts.
+The shared base keeps its own texts in Lingui catalogs, the format the rebuilt web app moves to: `packages/ui/src/locales/en.po` and `de.po`, each text with an explicit id under `ui.` (`ui.frame.menu`). A text in `ui` is `i18n._({ id: 'ui.frame.menu', message: 'Navigation' })`; `pnpm --filter @rangefoundry/ui run messages` adds new texts to both catalogs, and a German one is written into `de.po` by hand. The build fails while a German text is missing, and `tsc` fails on an id the English catalog lacks. The app loads `uiMessages` of `@rangefoundry/ui` beside its own texts.
 
 ## Numbers, dates and country names
 
@@ -52,8 +52,8 @@ Surrounding spaces and the minus sign U+2212 are tolerated. An empty text is emp
 ## Find what is untranslated
 
 ```sh
-pnpm --filter @open-reloading/web run i18n missing de   # English messages without a German text
-pnpm --filter @open-reloading/web run i18n messages     # every message in the sources
+pnpm --filter @rangefoundry/web run i18n missing de   # English messages without a German text
+pnpm --filter @rangefoundry/web run i18n messages     # every message in the sources
 ```
 
 `missing` also lists catalogue keys that no message matches (a text that was reworded in the source) and then exits with 1. `pnpm run lint` runs `i18n check de`, which fails on:
@@ -69,7 +69,7 @@ pnpm --filter @open-reloading/web run i18n messages     # every message in the s
 1. Add the language to `languages` and `loaders` in `apps/web/src/i18n/language.ts`: its code (a BCP 47 language tag such as `fr`) and its own name (`Français`). `loaders` is typed over `languages`, so the build fails until both are there.
 2. Create `apps/web/src/i18n/<code>.json`: the English text as key and its translation as value, or for a plural the key `one|other` (the two English forms, as in the `tn` call) and an object of the plural forms of the language by CLDR category (`one` and `other` in English and German; `Intl.PluralRules('<code>').resolvedOptions().pluralCategories` lists a language's categories). A translation keeps the placeholders of its key.
 3. Run `missing <code>` until it lists nothing you want to translate.
-4. `pnpm --filter @open-reloading/web run i18n check <code>` checks the catalogue as for German: every message translated except those `untranslated.<code>` of `apps/web/scripts/i18n-lint.json` lists (never a message-table or Safety notice text), no text equal to English that `sameAsEnglish.<code>` does not list, no key without a message, equal placeholders, only categories of the language. List what `missing <code>` still shows, then add the check to the root `lint` script next to `check de`.
+4. `pnpm --filter @rangefoundry/web run i18n check <code>` checks the catalogue as for German: every message translated except those `untranslated.<code>` of `apps/web/scripts/i18n-lint.json` lists (never a message-table or Safety notice text), no text equal to English that `sameAsEnglish.<code>` does not list, no key without a message, equal placeholders, only categories of the language. List what `missing <code>` still shows, then add the check to the root `lint` script next to `check de`.
 
 The German catalogue follows the term table `apps/web/src/i18n/german-terms.json`. Only the texts in `safeTexts` of `apps/web/scripts/i18n-lint.json` (the Safety notice and the disclaimers) may use a word that starts with "safe" (safe, safety, safely), and their German says "sicher" as often. A verified or decided term is used as the table gives it. Another language has no table yet: add one with the same shape if the language needs one.
 

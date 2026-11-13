@@ -81,7 +81,7 @@ function chartTitle(v: Pick<ChartView, 'x' | 'quantity'>, t: Translator['t']) {
   })
 }
 
-/** The chart colors from the page's tokens (`tokens.css` of `@open-reloading/design-tokens` and `globals.css`). */
+/** The chart colors from the page's tokens (`tokens.css` of `@rangefoundry/design-tokens` and `globals.css`). */
 const theme: ChartTheme = chartColors({
   pressure: '--series-2',
   pressureText: '--series-2-text',

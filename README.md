@@ -22,7 +22,7 @@ To run it yourself, with Node (version in `.nvmrc`):
 pnpm install
 pnpm run build
 pnpm run dev:static                        # web app on port 3000, reading data files, no API needed
-PORT=3010 pnpm --filter @open-reloading/api start  # REST API on port 3010
+PORT=3010 pnpm --filter @rangefoundry/api start  # REST API on port 3010
 ```
 
 To host the web app, run `pnpm run pages:build` (set `PAGES_BASE_PATH` to the path it is served under, empty for a site root) and copy `pages/` to any static host. The REST API is the container image `ghcr.io/openreloading/ballistics-api`, published with each API release (`docker run -p 3000:3000 ghcr.io/openreloading/ballistics-api:<version>`). `docker compose up` (or `podman compose up`) builds and starts the API on port 3000 and the documentation on port 3002. The libraries `schema`, `svg-drawings`, `importers` and `data` are in `packages/` and tagged in [GitHub releases](https://github.com/OpenReloading/Ballistics/releases). Setup and the dev container: [CONTRIBUTING.md](CONTRIBUTING.md).

@@ -1,7 +1,7 @@
 import { mkdtemp, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
-import { writeStaticApi } from '@open-reloading/api/static'
+import { writeStaticApi } from '@rangefoundry/api/static'
 import { buildCatalogue } from '@rangefoundry/use-cases/catalog'
 import { afterAll, vi } from 'vitest'
 import { catalogueListContract } from '../../../packages/catalog/test/contract.ts'

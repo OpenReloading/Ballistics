@@ -1,12 +1,12 @@
-import type { PresetId, Quantity, UnitSystem } from '@open-reloading/locale-format'
-import * as locale from '@open-reloading/locale-format'
 import { fromSi, toSi } from '@open-reloading/schema'
 import { conversions, waterDensityGramsPerCm3 } from '@open-reloading/units'
+import type { PresetId, Quantity, UnitSystem } from '@rangefoundry/locale-format'
+import * as locale from '@rangefoundry/locale-format'
 import { parseNumber } from '../i18n/number.ts'
 import { shownLanguage } from '../i18n/shown.ts'
 import { type Message, msg } from '../i18n/translate.ts'
 
-/** The display unit tables and unit formatting of `@open-reloading/locale-format` in the language shown, with the app's factors and unit-field text. */
+/** The display unit tables and unit formatting of `@rangefoundry/locale-format` in the language shown, with the app's factors and unit-field text. */
 export {
   localePreset,
   type PresetId,
@@ -20,7 +20,7 @@ export {
   type UnitChoice,
   type UnitSystem,
   unitsOf,
-} from '@open-reloading/locale-format'
+} from '@rangefoundry/locale-format'
 
 /** The volume in m3 of `grams` of water: a water capacity as the records store it. */
 export const waterVolume = (grams: number) =>
@@ -58,7 +58,7 @@ export function degreeText(x: number): string {
   return String(Number(x.toFixed(4)))
 }
 
-/** `inchText` of `@open-reloading/locale-format` in the language shown. */
+/** `inchText` of `@rangefoundry/locale-format` in the language shown. */
 export const inchText = (text: string, symbol: string) =>
   locale.inchText(text, symbol, shownLanguage())
 

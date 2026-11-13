@@ -7,9 +7,9 @@ import { UsageError } from '../src/errors.ts'
 import { loadModel } from '../src/model.ts'
 import { recordRoots, records, rowsCsv, type Spec, writeRows } from './fixture.ts'
 
-vi.mock('@open-reloading/tools/catalog', async (original) =>
+vi.mock('@rangefoundry/tools/catalog', async (original) =>
   (await import('./records-memo.ts')).memoRecords(
-    await original<typeof import('@open-reloading/tools/catalog')>(),
+    await original<typeof import('@rangefoundry/tools/catalog')>(),
   ),
 )
 
