@@ -1,4 +1,4 @@
-# @open-reloading/target-recognition
+# @rangefoundry/target-recognition
 
 Finds the target face and proposes the bullet holes on a target photo for the web app, without I/O. Callers get hole proposals through the inference port, `holeDetector.propose`, which takes an RGBA image buffer and resolves to proposals in image px. Its dependencies are `@rangefoundry/shot-groups` (points, ellipse fitting and plane geometry) and `@rangefoundry/statistics`. Private to this repository: it is not published.
 
@@ -7,7 +7,7 @@ Finds the target face and proposes the bullet holes on a target photo for the we
 - Helpers the web app's photo quality check and bullet photo use: `grayGrid`, `shareInside`, `clamp`, `components`, `median1` and Otsu's threshold `otsu`.
 
 ```js
-import { holeDetector } from '@open-reloading/target-recognition'
+import { holeDetector } from '@rangefoundry/target-recognition'
 
 // image: { width, height, data } as in a canvas ImageData; 8 px/mm, 7.62 mm bullets
 const { proposals } = await holeDetector.propose({ image, pxPerM: 8000, expectedHoleDiameter: 0.00762, auto: true })

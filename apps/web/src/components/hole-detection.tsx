@@ -8,6 +8,7 @@ import {
   type TargetSheet,
   toSi,
 } from '@open-reloading/schema'
+import { ArrowClockwise, ArrowCounterClockwise, X } from '@phosphor-icons/react'
 import {
   type FaceFit,
   type FacePlane,
@@ -17,8 +18,7 @@ import {
   fitDiameter,
   fitPicked,
   type HoleProposal,
-} from '@open-reloading/target-recognition'
-import { ArrowClockwise, ArrowCounterClockwise, X } from '@phosphor-icons/react'
+} from '@rangefoundry/target-recognition'
 import {
   type KeyboardEvent,
   type PointerEvent,

@@ -14,10 +14,10 @@ Where questions, ideas, bugs and record requests go: [README](README.md#communit
 
 - `pnpm run build`, `pnpm run typecheck`, `pnpm run lint` (`pnpm run format` applies the fixes), `pnpm test`.
 - Record changes: `pnpm run data:validate`.
-- Token changes (`packages/design-tokens/tokens/`): `pnpm --filter @open-reloading/design-tokens run generate` rewrites the generated files, which the tests compare; then `pnpm --filter @open-reloading/design-tokens exec tsc -b tsconfig.build.json` and `pnpm exec api-extractor run --local` in that folder rewrite its API report from the new module.
-- Interface changes (`packages/ui`): `pnpm --filter @open-reloading/ui run storybook` shows the stories; `pnpm --filter @open-reloading/ui run test:browser` runs them as tests with axe (it needs the Playwright browsers: `pnpm --filter @open-reloading/ui exec playwright install chromium webkit`).
+- Token changes (`packages/design-tokens/tokens/`): `pnpm --filter @rangefoundry/design-tokens run generate` rewrites the generated files, which the tests compare; then `pnpm --filter @rangefoundry/design-tokens exec tsc -b tsconfig.build.json` and `pnpm exec api-extractor run --local` in that folder rewrite its API report from the new module.
+- Interface changes (`packages/ui`): `pnpm --filter @rangefoundry/ui run storybook` shows the stories; `pnpm --filter @rangefoundry/ui run test:browser` runs them as tests with axe (it needs the Playwright browsers: `pnpm --filter @rangefoundry/ui exec playwright install chromium webkit`).
 - A change to the exports of `packages/units`, `packages/locale-format`, `packages/design-tokens`, `packages/ui`, `packages/schema`, `packages/statistics`, `packages/ballistics`, `packages/shot-groups`, `packages/importers`, `packages/use-cases` or `packages/target-recognition`: `pnpm exec api-extractor run --local` in that folder rewrites its API report (`<name>.api.md`), which the build compares and the pull request shows. A declaration that names a type the package does not export fails the run (`ae-forgotten-export`): export the type or write it out.
-- API changes, in the dev container (the checks need oasdiff and Schemathesis): `pnpm run api:check` (a breaking change also rewrites the baseline: `pnpm --filter @open-reloading/tools run api-baseline`) and `pnpm run api:conformance` against a running API.
+- API changes, in the dev container (the checks need oasdiff and Schemathesis): `pnpm run api:check` (a breaking change also rewrites the baseline: `pnpm --filter @rangefoundry/tools run api-baseline`) and `pnpm run api:conformance` against a running API.
 - CI (`.github/workflows/ci.yml`) also runs `pnpm run docs:check`, `pnpm audit` (`tools/src/audit.ts`: high and critical advisories, except the allowlisted ones without a fix), the license policy (`tools/src/licences.ts`: licenses of the production dependencies of the API image and the web app, and the list of them in `NOTICE`), the API contract checks, the e2e tests, the drawing baseline, the workflow lint (actionlint, zizmor) and the dependency review.
 
 ## Rules
@@ -26,7 +26,7 @@ Where questions, ideas, bugs and record requests go: [README](README.md#communit
 - Results are simulations, not load data: no wording that calls a load or a result safe.
 - Names of the record fields, the user data files and the API bodies, with the terms to avoid: [GLOSSARY.md](GLOSSARY.md).
 - A pull request that adds a major user-visible feature adds a news item (`apps/web/news/YYYY-MM-DD-slug.md`: front matter `title` and `link`, two sentences) for the home page's What's new list, reviewed like any file; smaller changes are in the changelogs only.
-- Every spike and model-change issue ends with an entry in the [research log](apps/docs/docs/research/index.md) (negative or null results too), from the template on that page, and is closed with a link to it. `pnpm --filter @open-reloading/docs test` fails on an entry that misses a section.
+- Every spike and model-change issue ends with an entry in the [research log](apps/docs/docs/research/index.md) (negative or null results too), from the template on that page, and is closed with a link to it. `pnpm --filter @rangefoundry/docs test` fails on an entry that misses a section.
 
 ## Data requests, translations and review
 

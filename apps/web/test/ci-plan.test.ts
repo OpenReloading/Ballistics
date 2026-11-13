@@ -174,18 +174,18 @@ it('prerenders every record when record data, page code or shared parts changed'
 })
 
 const packages =
-  '--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/design-tokens --filter @rangefoundry/statistics --filter @rangefoundry/ballistics --filter @rangefoundry/shot-groups --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/catalog --filter @open-reloading/target-recognition --filter @rangefoundry/use-cases --filter @open-reloading/api --filter @open-reloading/docs --filter @open-reloading/tools --filter @open-reloading/test-kit'
+  '--filter @open-reloading/units --filter @rangefoundry/locale-format --filter @rangefoundry/design-tokens --filter @rangefoundry/statistics --filter @rangefoundry/ballistics --filter @rangefoundry/shot-groups --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/catalog --filter @rangefoundry/target-recognition --filter @rangefoundry/use-cases --filter @rangefoundry/api --filter @rangefoundry/docs --filter @rangefoundry/tools --filter @rangefoundry/test-kit'
 /** The workspaces of the packages group that a change of units reaches. */
 const reachedByUnits =
-  '--filter @open-reloading/units --filter @open-reloading/locale-format --filter @rangefoundry/ballistics --filter @rangefoundry/shot-groups --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/catalog --filter @open-reloading/target-recognition --filter @rangefoundry/use-cases --filter @open-reloading/api --filter @open-reloading/docs --filter @open-reloading/tools'
+  '--filter @open-reloading/units --filter @rangefoundry/locale-format --filter @rangefoundry/ballistics --filter @rangefoundry/shot-groups --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/catalog --filter @rangefoundry/target-recognition --filter @rangefoundry/use-cases --filter @rangefoundry/api --filter @rangefoundry/docs --filter @rangefoundry/tools'
 
 it('tests every workspace of every group without a list of affected ones', () => {
   expect(testJobs()).toEqual([
     { name: 'drawing', filter: '--filter @open-reloading/svg-drawings', e2eUnit: false },
-    { name: 'web', filter: '--filter @open-reloading/web', e2eUnit: false },
+    { name: 'web', filter: '--filter @rangefoundry/web', e2eUnit: false },
     { name: 'packages', filter: packages, e2eUnit: true },
-    { name: 'cli', filter: '--filter @open-reloading/cli', e2eUnit: false },
-    { name: 'ui', filter: '--filter @open-reloading/ui', e2eUnit: false },
+    { name: 'cli', filter: '--filter @rangefoundry/cli', e2eUnit: false },
+    { name: 'ui', filter: '--filter @rangefoundry/ui', e2eUnit: false },
   ])
 })
 
@@ -208,16 +208,16 @@ it('tests the workspaces a change reaches and leaves out the groups it does not'
     'target-recognition',
   ]
   expect(plan(['packages/units/src/units.ts'], closure, units).tests).toEqual([
-    { name: 'web', filter: '--filter @open-reloading/web', e2eUnit: false },
+    { name: 'web', filter: '--filter @rangefoundry/web', e2eUnit: false },
     { name: 'packages', filter: reachedByUnits, e2eUnit: false },
-    { name: 'cli', filter: '--filter @open-reloading/cli', e2eUnit: false },
+    { name: 'cli', filter: '--filter @rangefoundry/cli', e2eUnit: false },
   ])
   expect(
     plan(['packages/svg-drawings/src/index.ts'], closure, ['svg-drawings', 'web', 'cli']).tests,
   ).toEqual([
     { name: 'drawing', filter: '--filter @open-reloading/svg-drawings', e2eUnit: false },
-    { name: 'web', filter: '--filter @open-reloading/web', e2eUnit: false },
-    { name: 'cli', filter: '--filter @open-reloading/cli', e2eUnit: false },
+    { name: 'web', filter: '--filter @rangefoundry/web', e2eUnit: false },
+    { name: 'cli', filter: '--filter @rangefoundry/cli', e2eUnit: false },
   ])
   expect(plan(['apps/e2e/tests/web/groups.spec.ts'], closure, ['e2e']).tests).toEqual([
     { name: 'packages', filter: '', e2eUnit: true },
@@ -338,7 +338,7 @@ it('reads both scopes while the packages move to @rangefoundry', () => {
 
 it('leaves the root project out of the selection: plan reads its files itself', () => {
   expect(selected('openreloading')).toEqual([])
-  expect(selected('@open-reloading/cli')).toEqual(['cli'])
+  expect(selected('@rangefoundry/cli')).toEqual(['cli'])
 })
 
 it('falls back in ci.yml to the test jobs of every group', () => {

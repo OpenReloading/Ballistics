@@ -1,6 +1,6 @@
 /** The axis as the symmetry line of both edges and the half-width profile (`apps/docs/docs/models/bullet-photo.md`); photo px, y down. */
 import { fromSi } from '@open-reloading/schema'
-import { median1 as median } from '@open-reloading/target-recognition'
+import { median1 as median } from '@rangefoundry/target-recognition'
 import type { Cutout } from './bullet-photo.ts'
 import type { Point } from './target-geometry.ts'
 

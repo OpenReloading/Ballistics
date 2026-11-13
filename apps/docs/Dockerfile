@@ -25,18 +25,18 @@ COPY tools/package.json tools/
 COPY apps/e2e/package.json apps/e2e/
 COPY apps/docs/package.json apps/docs/
 COPY tooling/test-kit/package.json tooling/test-kit/
-RUN pnpm install --frozen-lockfile --ignore-scripts --filter "@open-reloading/docs..."
+RUN pnpm install --frozen-lockfile --ignore-scripts --filter "@rangefoundry/docs..."
 COPY packages packages
 COPY tooling tooling
 # the catalog reader that the catalog build writes its bundle with
 COPY tools/src/catalog tools/src/catalog
 # the libraries the docs document and the API its REST page describes (the docs also depend on web, cli and tools,
 # whose files their tests read; the site needs no build of them)
-RUN pnpm --filter "@open-reloading/api..." --filter "@open-reloading/svg-drawings..." --filter "@open-reloading/importers..." run build
+RUN pnpm --filter "@rangefoundry/api..." --filter "@open-reloading/svg-drawings..." --filter "@open-reloading/importers..." run build
 COPY apps/docs apps/docs
 # the API the REST page links to, no link when unset
 ARG API_URL
-RUN pnpm --filter @open-reloading/docs run site:build
+RUN pnpm --filter @rangefoundry/docs run site:build
 
 # unprivileged variant: listens on 8080, runs as `nginx`
 FROM docker.io/nginxinc/nginx-unprivileged:1.31-alpine@sha256:b5047b9b76845eac124358373c6852377c52e4b05834a47647e955dd91cb8f1e

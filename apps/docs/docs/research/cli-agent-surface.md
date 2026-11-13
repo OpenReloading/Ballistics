@@ -35,7 +35,7 @@ Integration head:
 - Start time: `node -e 0` 0.017 s, `--help` 0.107 s, `verify` on 25 rows 0.297 s. `main.ts` imports core, data and drawing before it reads the arguments, so `--help` pays for the libraries (inferred from the imports, not profiled).
 - `verify` writes 3680 B of JSON, `compare` 8833 B; two `verify` runs are byte-identical. The table mode prints 11 lines on a terminal or with `--table`.
 - The API has 8 compute operations (interior, interior charge target, interior load file, exterior trajectory, truing, range strings plan and fit, stability). The CLI runs none of them: $c = 0/8$. The web app also computes group and velocity statistics, hit probability, moving target lead, recoil and powder fit from chronograph strings by calling core directly; none of these is an API route.
-- Simplicity test: a 9-line Node script that imports `interiorBody`, `runInterior` and `runTask` from `@open-reloading/api/compute`, reads the interior example body on stdin and prints the answer, ran offline in 0.212 s, exit 0, with `notice` "simulation, not load data", `units` (SI) and `result` with peak pressure, muzzle velocity and energy (217153 B, the full time curves). A script can already run the interior computation; the contract around it is missing.
+- Simplicity test: a 9-line Node script that imports `interiorBody`, `runInterior` and `runTask` from `@rangefoundry/api/compute`, reads the interior example body on stdin and prints the answer, ran offline in 0.212 s, exit 0, with `notice` "simulation, not load data", `units` (SI) and `result` with peak pressure, muzzle velocity and energy (217153 B, the full time curves). A script can already run the interior computation; the contract around it is missing.
 
 Checklist:
 
@@ -62,7 +62,7 @@ Reuse decision:
 
 - Thin client over the REST API: fails item 4 (no network access needed) and needs a running server. Rejected.
 - Command line over core directly: copies the compute routes' request schemas, record resolution, limits and answer shapes, the contract the OpenAPI baseline guards. Rejected.
-- Command line over the API's browser entries (`@open-reloading/api/compute`, `@open-reloading/api/catalogue`): no Fastify and no I/O of their own, already imported by the web app, and the simplicity test runs a load offline through them. Recommended. Blocked by the import rule `cli-imports-core-data-drawing-schema-only` of `.dependency-cruiser.cjs` and the package rule that the CLI never depends on the API: changing them is an owner decision.
+- Command line over the API's browser entries (`@rangefoundry/api/compute`, `@rangefoundry/api/catalogue`): no Fastify and no I/O of their own, already imported by the web app, and the simplicity test runs a load offline through them. Recommended. Blocked by the import rule `cli-imports-core-data-drawing-schema-only` of `.dependency-cruiser.cjs` and the package rule that the CLI never depends on the API: changing them is an owner decision.
 - Must not be duplicated: the zod request and answer schemas, record resolution, the limit checks and warnings, the notice string, and the units of the answers.
 
 Simplicity gate per command:
@@ -80,7 +80,7 @@ no change. Not adopted in code. Recommendation (medium confidence): the CLI is n
 Plan, in order:
 
 1. Issue #653 (small, no dependency): error objects on stderr with `--json`, exit code 3 for an internal error, `--version`, `--rows -`, `notice` in the result, `$id` in the schema, `--help` before the libraries load.
-2. Owner decision: allow `packages/cli` to import `@open-reloading/api/compute` and `@open-reloading/api/catalogue` (the rule and the package rule).
+2. Owner decision: allow `packages/cli` to import `@rangefoundry/api/compute` and `@rangefoundry/api/catalogue` (the rule and the package rule).
 3. Issue #654 (medium, useful alone): move the exterior handlers and the load file computation into run functions exported from the compute entry, OpenAPI unchanged.
 4. Issue #655 (medium, after 2; exterior and load file operations after 3): `ballistics run <operation> [--input <file>|-]` and `ballistics operations` with input and output schemas from the same zod definitions, docs page, an agent loop description, an example that runs, a line in `llms.txt`.
 

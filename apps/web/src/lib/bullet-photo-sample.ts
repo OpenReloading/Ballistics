@@ -2,7 +2,7 @@
 
 import { toSi } from '@open-reloading/schema'
 import { type BulletDimensions, bulletProfile } from '@open-reloading/svg-drawings/bullet'
-import { clamp } from '@open-reloading/target-recognition'
+import { clamp } from '@rangefoundry/target-recognition'
 import type { ScaleSpan } from './bullet-photo.ts'
 import type { RgbaImage } from './image.ts'
 import { nth } from './nth.ts'

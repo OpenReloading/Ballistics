@@ -2,7 +2,7 @@
 import { type ChildProcess, spawn } from 'node:child_process'
 import { rmSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { startBundleApi, writeStaticApi } from '@open-reloading/api/static'
+import { startBundleApi, writeStaticApi } from '@rangefoundry/api/static'
 import { devExit, stopOnSignal } from './dev-exit.ts'
 import { executable } from './executable.ts'
 
@@ -17,7 +17,7 @@ try {
   rmSync(dataDir, { recursive: true, force: true })
   await writeStaticApi(api.data, dataDir)
   if (!stopped()) {
-    dev = spawn(executable('pnpm'), ['--filter', '@open-reloading/web', 'run', 'dev'], {
+    dev = spawn(executable('pnpm'), ['--filter', '@rangefoundry/web', 'run', 'dev'], {
       cwd: at(''),
       // `full`: the inherited `sample` would leave records out of the generated routes
       env: {

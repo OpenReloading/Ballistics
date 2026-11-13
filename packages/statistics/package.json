@@ -36,7 +36,7 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "catalog:",
     "@microsoft/api-extractor": "catalog:",
-    "@open-reloading/test-kit": "workspace:*",
+    "@rangefoundry/test-kit": "workspace:*",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "fast-check": "catalog:",

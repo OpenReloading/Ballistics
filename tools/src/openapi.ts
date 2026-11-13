@@ -3,7 +3,7 @@ import { writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { buildOpenApi } from '@open-reloading/api/openapi'
+import { buildOpenApi } from '@rangefoundry/api/openapi'
 
 const [mode, ...rest] = process.argv.slice(2)
 if (rest.length > 0 || (mode !== undefined && mode !== 'baseline'))

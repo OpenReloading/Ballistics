@@ -1,4 +1,4 @@
-import { near } from '@open-reloading/test-kit'
+import { near } from '@rangefoundry/test-kit'
 import { describe, expect, it } from 'vitest'
 import { nth } from '../src/errors.ts'
 import { type LogFitInput, logLeastSquares } from '../src/least-squares.ts'

@@ -1,4 +1,4 @@
-import { findFace } from '@open-reloading/target-recognition'
+import { findFace } from '@rangefoundry/target-recognition'
 import sharp from 'sharp'
 import { describe, expect, it } from 'vitest'
 import { photoScene } from '../../../packages/target-recognition/test/face-photos.ts'

@@ -1,4 +1,4 @@
-/** The API over the catalogue of the data bundle, and the data files the web app serves in its place (`@open-reloading/api/static`, build time only). */
+/** The API over the catalogue of the data bundle, and the data files the web app serves in its place (`@rangefoundry/api/static`, build time only). */
 import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { inlineRunner } from '@rangefoundry/use-cases'

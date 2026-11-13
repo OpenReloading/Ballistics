@@ -1,5 +1,5 @@
 {
-  "name": "@open-reloading/target-recognition",
+  "name": "@rangefoundry/target-recognition",
   "version": "0.0.0",
   "private": true,
   "description": "The target face search and hole proposals on target photos through an inference port.",
