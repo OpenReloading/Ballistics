@@ -228,7 +228,7 @@ export function checkChronoSession(session: CatalogueSession): Finding[];
 
 // @public
 export function checkCoverage(record: {
-    provenance: Provenance;
+    provenance?: Provenance | undefined;
 }): string[];
 
 // @public

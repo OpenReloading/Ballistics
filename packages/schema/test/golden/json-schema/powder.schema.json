@@ -744,7 +744,6 @@
   "required": [
     "id",
     "manufacturer",
-    "name",
-    "provenance"
+    "name"
   ]
 }

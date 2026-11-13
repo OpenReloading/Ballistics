@@ -93,8 +93,11 @@ export const bullet: z.ZodObject<{
     slowestTwist: z.ZodOptional<QuantitySchema>;
     note: z.ZodOptional<z.ZodString>;
     nameOnly: z.ZodOptional<z.ZodLiteral<true>>;
-    provenance: typeof provenance;
+    provenance: z.ZodOptional<typeof provenance>;
 }>;
+
+// @public
+export const bulletBasicFields: readonly string[];
 
 // @public
 export interface BulletListFields {
@@ -543,6 +546,9 @@ export interface DanglingRef {
     record: string;
     target: string;
 }
+
+// @public
+export function detailedFields(kind: 'bullet' | 'powder', record: object): string[];
 
 // @public
 export interface Discipline extends z.infer<typeof discipline> {
@@ -1142,8 +1148,11 @@ export const powder: z.ZodObject<{
     }>>;
     listedCartridges: z.ZodOptional<z.ZodArray<typeof recordId>>;
     note: z.ZodOptional<z.ZodString>;
-    provenance: typeof provenance;
+    provenance: z.ZodOptional<typeof provenance>;
 }>;
+
+// @public
+export const powderBasicFields: readonly string[];
 
 // @public
 export type PowderDraft = Overrides<Omit<Powder, 'id' | 'manufacturer' | 'name' | 'country' | 'provenance' | 'composition' | 'listedCartridges'>> & {

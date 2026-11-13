@@ -148,10 +148,10 @@ function interiorItem({ interior, provenance }: Powder): PowderItem['interior'] 
     trainingRows,
     trainingCartridges,
   } = interior
-  const retrieved = provenance.sources
+  const retrieved = (provenance?.sources ?? [])
     .filter(
       (s) =>
-        (s.kind ?? provenance.kind) === 'fitted' &&
+        (s.kind ?? provenance?.kind) === 'fitted' &&
         (!s.fields || s.fields.some((f) => f === 'interior' || f.startsWith('interior.'))),
     )
     .flatMap((s) => (s.retrieved ? [s.retrieved] : []))

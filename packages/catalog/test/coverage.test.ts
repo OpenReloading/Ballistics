@@ -25,6 +25,11 @@ describe('checkCoverage', () => {
     }
     expect(checkCoverage(record)).toEqual([])
   })
+
+  it('refuses a record without provenance, even of basic fields only', () => {
+    const basic = { id: 'x', name: 'X', mass: { value: 1 }, provenance: undefined }
+    expect(checkCoverage(basic)).toEqual(['needs provenance'])
+  })
 })
 
 describe('checkCoverage of construction and geometry', () => {

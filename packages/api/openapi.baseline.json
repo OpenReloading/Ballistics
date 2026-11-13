@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "OpenReloading API",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "description": "Records of cartridges, components and competitions, and the exterior and interior ballistics models. Quantities are SI (m, kg, s, Pa, K, rad) unless a field names another unit. Results are simulations, not load data."
   },
   "tags": [
@@ -1026,7 +1026,7 @@
                       "description": "Hash of the stored record, changes with any field."
                     }
                   },
-                  "required": ["id", "manufacturer", "name", "mass", "provenance", "revision"],
+                  "required": ["id", "manufacturer", "name", "mass", "revision"],
                   "additionalProperties": false
                 }
               }
@@ -4643,6 +4643,7 @@
                               "description": "Names of the request values the record supplied"
                             },
                             "provenance": {
+                              "description": "Provenance of the bullet record; absent on a record of basic fields only",
                               "type": "object",
                               "properties": {
                                 "kind": {
@@ -4781,8 +4782,7 @@
                                 }
                               },
                               "required": ["kind", "sources"],
-                              "additionalProperties": false,
-                              "description": "Provenance of the bullet record"
+                              "additionalProperties": false
                             },
                             "dragModel": {
                               "type": "string",
@@ -4790,14 +4790,7 @@
                               "description": "Drag model of the ballistic coefficients used"
                             }
                           },
-                          "required": [
-                            "id",
-                            "manufacturer",
-                            "name",
-                            "suppliedFields",
-                            "provenance",
-                            "dragModel"
-                          ],
+                          "required": ["id", "manufacturer", "name", "suppliedFields", "dragModel"],
                           "additionalProperties": {},
                           "description": "The bullet record the request named"
                         },
@@ -6282,6 +6275,7 @@
                               "description": "Names of the request values the record supplied"
                             },
                             "provenance": {
+                              "description": "Provenance of the bullet record; absent on a record of basic fields only",
                               "type": "object",
                               "properties": {
                                 "kind": {
@@ -6420,8 +6414,7 @@
                                 }
                               },
                               "required": ["kind", "sources"],
-                              "additionalProperties": false,
-                              "description": "Provenance of the bullet record"
+                              "additionalProperties": false
                             },
                             "dragModel": {
                               "type": "string",
@@ -6429,14 +6422,7 @@
                               "description": "Drag model of the ballistic coefficients used"
                             }
                           },
-                          "required": [
-                            "id",
-                            "manufacturer",
-                            "name",
-                            "suppliedFields",
-                            "provenance",
-                            "dragModel"
-                          ],
+                          "required": ["id", "manufacturer", "name", "suppliedFields", "dragModel"],
                           "additionalProperties": {},
                           "description": "The bullet record the request named"
                         },
@@ -7832,6 +7818,7 @@
                               "description": "Names of the request values the record supplied"
                             },
                             "provenance": {
+                              "description": "Provenance of the bullet record; absent on a record of basic fields only",
                               "type": "object",
                               "properties": {
                                 "kind": {
@@ -7970,17 +7957,10 @@
                                 }
                               },
                               "required": ["kind", "sources"],
-                              "additionalProperties": false,
-                              "description": "Provenance of the bullet record"
+                              "additionalProperties": false
                             }
                           },
-                          "required": [
-                            "id",
-                            "manufacturer",
-                            "name",
-                            "suppliedFields",
-                            "provenance"
-                          ],
+                          "required": ["id", "manufacturer", "name", "suppliedFields"],
                           "additionalProperties": {},
                           "description": "The bullet record the request named"
                         }
@@ -8274,6 +8254,7 @@
                               "description": "Names of the request values the record supplied"
                             },
                             "provenance": {
+                              "description": "Provenance of the bullet record; absent on a record of basic fields only",
                               "type": "object",
                               "properties": {
                                 "kind": {
@@ -8412,8 +8393,7 @@
                                 }
                               },
                               "required": ["kind", "sources"],
-                              "additionalProperties": false,
-                              "description": "Provenance of the bullet record"
+                              "additionalProperties": false
                             },
                             "dragModel": {
                               "type": "string",
@@ -8421,14 +8401,7 @@
                               "description": "Drag model of the ballistic coefficients used"
                             }
                           },
-                          "required": [
-                            "id",
-                            "manufacturer",
-                            "name",
-                            "suppliedFields",
-                            "provenance",
-                            "dragModel"
-                          ],
+                          "required": ["id", "manufacturer", "name", "suppliedFields", "dragModel"],
                           "additionalProperties": {},
                           "description": "The bullet record the request named"
                         },
@@ -10042,6 +10015,7 @@
                               "description": "Names of the request values the record supplied"
                             },
                             "provenance": {
+                              "description": "Provenance of the bullet record; absent on a record of basic fields only",
                               "type": "object",
                               "properties": {
                                 "kind": {
@@ -10180,8 +10154,7 @@
                                 }
                               },
                               "required": ["kind", "sources"],
-                              "additionalProperties": false,
-                              "description": "Provenance of the bullet record"
+                              "additionalProperties": false
                             },
                             "dragModel": {
                               "type": "string",
@@ -10189,14 +10162,7 @@
                               "description": "Drag model of the ballistic coefficients used"
                             }
                           },
-                          "required": [
-                            "id",
-                            "manufacturer",
-                            "name",
-                            "suppliedFields",
-                            "provenance",
-                            "dragModel"
-                          ],
+                          "required": ["id", "manufacturer", "name", "suppliedFields", "dragModel"],
                           "additionalProperties": {},
                           "description": "The bullet record the request named"
                         },
@@ -15025,6 +14991,7 @@
                               "description": "Names of the request values the record supplied"
                             },
                             "provenance": {
+                              "description": "Provenance of the record; absent on a record of basic fields only",
                               "type": "object",
                               "properties": {
                                 "kind": {
@@ -15166,13 +15133,7 @@
                               "additionalProperties": false
                             }
                           },
-                          "required": [
-                            "id",
-                            "manufacturer",
-                            "name",
-                            "suppliedFields",
-                            "provenance"
-                          ],
+                          "required": ["id", "manufacturer", "name", "suppliedFields"],
                           "additionalProperties": {},
                           "description": "The powder record of the request"
                         },
@@ -17359,6 +17320,7 @@
                               "description": "Names of the request values the record supplied"
                             },
                             "provenance": {
+                              "description": "Provenance of the record; absent on a record of basic fields only",
                               "type": "object",
                               "properties": {
                                 "kind": {
@@ -17500,13 +17462,7 @@
                               "additionalProperties": false
                             }
                           },
-                          "required": [
-                            "id",
-                            "manufacturer",
-                            "name",
-                            "suppliedFields",
-                            "provenance"
-                          ],
+                          "required": ["id", "manufacturer", "name", "suppliedFields"],
                           "additionalProperties": {},
                           "description": "The bullet record of the file"
                         },
@@ -17533,6 +17489,7 @@
                               "description": "Names of the request values the record supplied"
                             },
                             "provenance": {
+                              "description": "Provenance of the record; absent on a record of basic fields only",
                               "type": "object",
                               "properties": {
                                 "kind": {
@@ -17674,13 +17631,7 @@
                               "additionalProperties": false
                             }
                           },
-                          "required": [
-                            "id",
-                            "manufacturer",
-                            "name",
-                            "suppliedFields",
-                            "provenance"
-                          ],
+                          "required": ["id", "manufacturer", "name", "suppliedFields"],
                           "additionalProperties": {},
                           "description": "The powder record of the file"
                         }
@@ -26775,7 +26726,7 @@
                       "additionalProperties": false
                     }
                   },
-                  "required": ["id", "manufacturer", "name", "provenance"],
+                  "required": ["id", "manufacturer", "name"],
                   "additionalProperties": false
                 }
               }

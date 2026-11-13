@@ -320,13 +320,15 @@ function RecordDetails({
           )
         })}
       </ul>
-      <p className="sources">
-        <RecordSourcesLink
-          kind="bullets"
-          id={record.id}
-          label={t('Sources ({kind})', { kind: t(provenanceKinds[record.provenance.kind]) })}
-        />
-      </p>
+      {record.provenance && (
+        <p className="sources">
+          <RecordSourcesLink
+            kind="bullets"
+            id={record.id}
+            label={t('Sources ({kind})', { kind: t(provenanceKinds[record.provenance.kind]) })}
+          />
+        </p>
+      )}
     </div>
   )
 }

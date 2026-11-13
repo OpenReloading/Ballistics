@@ -1,9 +1,10 @@
 import { z } from 'zod'
 import { needsCountrySource } from './country-source.ts'
 import type { Exact } from './exact.ts'
+import { needsProvenance } from './field-classes.ts'
 import { countryCode } from './fields.ts'
 import { recordId } from './ids.ts'
-import { provenance } from './provenance.ts'
+import { type Provenance, provenance, type Source } from './provenance.ts'
 import { type QuantityKind, type QuantitySchema, quantity, units } from './units.ts'
 
 /** A computed value with the extremes over the input ranges, in the unit of its quantity. */
@@ -93,6 +94,12 @@ const powderTemperatureSensitivity = z.object({
   hot: quantity('inverseTemperature'),
 })
 
+/** Whether a source of the provenance passes `test`, given the source's own kind or the record's; none without provenance. */
+const anySource = (
+  p: Provenance | undefined,
+  test: (s: Source, kind: Provenance['kind']) => boolean,
+): boolean => p?.sources.some((s) => test(s, s.kind ?? p.kind)) ?? false
+
 const powderParser = z
   .object({
     id: recordId,
@@ -109,22 +116,22 @@ const powderParser = z
     temperatureSensitivity: powderTemperatureSensitivity.optional(),
     listedCartridges: z.array(recordId).min(1).optional(),
     note: z.string().min(1).optional(),
-    provenance,
+    provenance: provenance.optional(),
   })
   .superRefine((p, ctx) => {
     needsCountrySource(p, ctx)
+    needsProvenance('powder', p, ctx)
     if (
       p.interior &&
-      !p.provenance.sources.some(
-        (s) =>
-          (s.kind ?? p.provenance.kind) === 'fitted' &&
-          (!s.fields || s.fields.includes('interior')),
+      !anySource(
+        p.provenance,
+        (s, kind) => kind === 'fitted' && (!s.fields || s.fields.includes('interior')),
       )
     )
       ctx.addIssue({ code: 'custom', path: ['interior'], message: 'needs a fitted source' })
     if (
       p.listedCartridges &&
-      !p.provenance.sources.some((s) => s.fields?.includes('listedCartridges'))
+      !anySource(p.provenance, (s) => s.fields?.includes('listedCartridges') === true)
     )
       ctx.addIssue({
         code: 'custom',
@@ -236,8 +243,11 @@ export const powder: z.ZodObject<{
    */
   listedCartridges: z.ZodOptional<z.ZodArray<typeof recordId>>
   note: z.ZodOptional<z.ZodString>
-  /** Where the values of the record come from: a kind and at least one source. */
-  provenance: typeof provenance
+  /**
+   * Where the values of the record come from: a kind and at least one source. Absent: the record
+   * holds basic fields only ({@link powderBasicFields}).
+   */
+  provenance: z.ZodOptional<typeof provenance>
 }> = powderParser satisfies Exact<typeof powder, typeof powderParser>
 
 /** A powder record: grain form, composition, thermochemistry and M3 interior parameters. */
