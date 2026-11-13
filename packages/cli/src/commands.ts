@@ -5,7 +5,7 @@ import { compareKeys, type SourceRecord, sourceRecord } from '@open-reloading/sc
 import { readPublishedLoads } from '@rangefoundry/tools/catalog'
 import { Refusal, UsageError } from './errors.ts'
 import { type InteriorModel, outcomes } from './evaluate.ts'
-import { fitPowders, notFittedReasons, withFit } from './fit.ts'
+import { fitPowders, notFittedReasons, type PressureKey, withFit } from './fit.ts'
 import { changeOf, evaluate, type Grouping, metricsOf } from './metrics.ts'
 import { builtInName, fitFiles, loadModel, type Model } from './model.ts'
 import { pairedChange, type RowError, rowErrors } from './paired.ts'
@@ -43,8 +43,10 @@ export interface Options {
   params?: 'records' | 'fit-on-training' | undefined
   /** Of the fit, a fraction of the velocity; default 0.03. */
   velocitySigma?: number | undefined
-  /** Fits with the printed pressures, this sigma a fraction of the pressure, and a factor per basis; none without it. */
+  /** Fits with the printed pressures, this sigma a fraction of the pressure, and a factor per key of `pressureFactor`; none without it. */
   pressureSigma?: number | undefined
+  /** With `pressureSigma`: the key a pressure factor is computed per and applied by; default `basis`. */
+  pressureFactor?: PressureKey | undefined
   /** `family` fits each burn coefficient at the pressure exponent its powder family chooses; default the record's. */
   exponent?: 'family' | undefined
   /** `prior`: each powder's energy is its prior times one energy-level factor chosen on the training pressures; default the record's. */
@@ -56,7 +58,14 @@ export interface Options {
 /** What `fit` reads. */
 type FitOptions = Pick<
   Options,
-  'rows' | 'records' | 'warn' | 'velocitySigma' | 'pressureSigma' | 'exponent' | 'energy'
+  | 'rows'
+  | 'records'
+  | 'warn'
+  | 'velocitySigma'
+  | 'pressureSigma'
+  | 'pressureFactor'
+  | 'exponent'
+  | 'energy'
 >
 
 type Inputs = VerifyResult['inputs']
@@ -157,16 +166,16 @@ type Prepared = ReturnType<typeof prepare>
 function fitOf(options: FitOptions, data: Prepared, model: Model) {
   // load tables print no spread; ANSI/SAAMI Z299.4-2025 expects tested ammunition within 90 fps of the table, about 3 %
   const velocitySigma = options.velocitySigma ?? 0.03
-  const { exponent, pressureSigma, energy } = options
-  // with pressure rows in the chi squares the family choice would measure something no study has covered
-  if (exponent !== undefined && pressureSigma !== undefined)
-    throw new UsageError('--exponent and --pressure-sigma do not combine')
-  // one factor on all printed pressures and one per basis both set the pressure level with no rule for which comes first
+  const { exponent, pressureSigma, pressureFactor, energy } = options
+  if (pressureFactor !== undefined && pressureSigma === undefined)
+    throw new UsageError('--pressure-factor needs --pressure-sigma')
+  // one factor on all printed pressures and one per key both set the pressure level with no rule for which comes first
   if (energy !== undefined && pressureSigma !== undefined)
     throw new UsageError('--energy prior and --pressure-sigma do not combine')
   const fit = fitPowders(data.rows, data.records, model.interior, velocitySigma, {
     exponent,
     pressureSigma,
+    pressureFactor,
     energy,
   })
   const reasons = Object.values(fit.notFitted)
@@ -187,7 +196,7 @@ function fitOf(options: FitOptions, data: Prepared, model: Model) {
     energy: fit.energy,
     velocitySigma,
     records: withFit(data.records, fit),
-    params: `params fit-on-training velocity-sigma ${velocitySigma}${exponent === undefined ? '' : ' exponent family'}${pressureSigma === undefined ? '' : ` pressure-sigma ${pressureSigma}`}${energyLine}`,
+    params: `params fit-on-training velocity-sigma ${velocitySigma}${exponent === undefined ? '' : ' exponent family'}${fit.pressure ? ` pressure-sigma ${fit.pressure.sigma} pressure-factor ${fit.pressure.by}` : ''}${energyLine}`,
     summary: {
       velocitySigma,
       powders: Object.keys(fit.powders).length,

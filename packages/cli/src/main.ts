@@ -18,7 +18,8 @@ const usage = `usage:
   ballistics verify  --rows <path> [--model m3|<module>] [options]
   ballistics compare --rows <path> --baseline <m3|module|verify.json> --candidate <m3|module> [options]
   ballistics fit     --rows <path> [--model m3|<module>] [--velocity-sigma <fraction>] [--exponent family]
-                     [--pressure-sigma <fraction>] [--energy prior] [--records <dir>] [--json | --table]
+                     [--pressure-sigma <fraction> [--pressure-factor <key>]] [--energy prior]
+                     [--records <dir>] [--json | --table]
   ballistics run <operation> --input <file|-> [--records <dir>]
   ballistics operations
   ballistics --help | --version
@@ -45,7 +46,10 @@ options:
                      powder family and fit each burn coefficient at it
   --pressure-sigma <fraction>
                      fit and --params fit-on-training: fit the printed pressures too, with
-                     this sigma, a fraction of the pressure, and one factor per pressure basis
+                     this sigma, a fraction of the pressure, and one factor per key
+  --pressure-factor basis|table|cartridge|table-cartridge
+                     with --pressure-sigma: the key of a pressure factor, the row's pressure
+                     basis (default), its table, its cartridge or both
   --energy prior     fit and --params fit-on-training: each powder's energy is its prior
                      from thermochemistry times one energy-level factor chosen on the
                      training pressures; only the burn coefficient is fitted per powder
@@ -95,11 +99,13 @@ function checkChoices(
     params?: string | undefined
     exponent?: string | undefined
     energy?: string | undefined
+    'pressure-factor'?: string | undefined
   },
   split: string,
   by: string | undefined,
-  groupings: readonly Grouping[],
+  choices: { groupings: readonly Grouping[]; pressureKeys: readonly string[] },
 ) {
+  const { groupings, pressureKeys } = choices
   if (!splits.includes(split as Split))
     throw new UsageError(`--split is one of ${splits.join(', ')}`)
   if (values.json && values.table) throw new UsageError('--json and --table exclude each other')
@@ -115,6 +121,9 @@ function checkChoices(
     throw new UsageError('--exponent is family')
   if (values.energy !== undefined && values.energy !== 'prior')
     throw new UsageError('--energy takes prior only')
+  const key = values['pressure-factor']
+  if (key !== undefined && !pressureKeys.includes(key))
+    throw new UsageError(`--pressure-factor is one of ${pressureKeys.join(', ')}`)
 }
 
 /** The fraction of the sigma option `name`, undefined without it; bad input outside (0, 1). */
@@ -151,7 +160,7 @@ function optionsOf(
   args: string[],
   env: NodeJS.ProcessEnv,
   warn: Io['stderr'],
-  groupings: readonly Grouping[],
+  choices: Parameters<typeof checkChoices>[3],
 ) {
   const { values } = parse({
     args,
@@ -173,19 +182,26 @@ function optionsOf(
       'velocity-sigma': { type: 'string' },
       exponent: { type: 'string' },
       'pressure-sigma': { type: 'string' },
+      'pressure-factor': { type: 'string' },
       energy: { type: 'string' },
     },
   })
   const foreign = foreignOptions[command].filter((o) => values[o] !== undefined)
   if (foreign.length > 0) throw new UsageError(`${command} takes no --${foreign.join(' or --')}`)
-  for (const option of ['velocity-sigma', 'exponent', 'pressure-sigma', 'energy'] as const)
+  for (const option of [
+    'velocity-sigma',
+    'exponent',
+    'pressure-sigma',
+    'pressure-factor',
+    'energy',
+  ] as const)
     if (command !== 'fit' && values[option] !== undefined && values.params !== 'fit-on-training')
       throw new UsageError(`--${option} is for fit and --params fit-on-training`)
   const rows = values.rows ?? env.BALLISTICS_ROWS
   if (!rows) throw new UsageError('give --rows <path> or set BALLISTICS_ROWS')
   const split = values.split ?? 'validation'
   const by = values['group-by']
-  checkChoices(values, split, by, groupings)
+  checkChoices(values, split, by, choices)
   const fromEnv = env.BALLISTICS_RECORDS?.split(':').filter(Boolean) ?? []
   const options: Options = {
     rows,
@@ -200,6 +216,7 @@ function optionsOf(
     velocitySigma: sigmaOf('velocity-sigma', values['velocity-sigma']),
     exponent: values.exponent as Options['exponent'],
     pressureSigma: sigmaOf('pressure-sigma', values['pressure-sigma']),
+    pressureFactor: values['pressure-factor'] as Options['pressureFactor'],
     energy: values.energy as Options['energy'],
   }
   return { options, values }
@@ -208,11 +225,12 @@ function optionsOf(
 /** Runs `command` with its options and returns the text of the result. */
 async function execute(command: Command, args: string[], env: NodeJS.ProcessEnv, io: Io) {
   // the libraries load after --help and --version have answered
-  const [{ compare, fit, verify }, { groupings }] = await Promise.all([
+  const [{ compare, fit, verify }, { groupings }, { pressureKeys }] = await Promise.all([
     import('./commands.ts'),
     import('./metrics.ts'),
+    import('./fit.ts'),
   ])
-  const { options, values } = optionsOf(command, args, env, io.stderr, groupings)
+  const { options, values } = optionsOf(command, args, env, io.stderr, { groupings, pressureKeys })
   const json = values.json === true || (values.table !== true && !io.tty)
   if (command === 'fit') {
     const result = await fit(options, values.model)

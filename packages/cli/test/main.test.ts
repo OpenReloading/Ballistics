@@ -210,8 +210,9 @@ describe('exit codes', () => {
     [['verify', ...data, '--final']],
     [['verify', ...data, '--split', 'training', '--final']],
     [['compare', ...data, '--baseline', 'm3', '--candidate', 'm3', '--final']],
-    [['fit', ...data, '--exponent', 'family', '--pressure-sigma', '0.05']],
     [['fit', ...pressured, '--energy', 'prior', '--pressure-sigma', '0.05']],
+    [['fit', ...pressured, '--pressure-factor', 'table']],
+    [['fit', ...pressured, '--pressure-sigma', '0.05', '--pressure-factor', 'lot']],
   ])('is 2 for bad input: %j', async (args) => {
     const { code, stdout } = await cli(args)
     expect(code).toBe(2)

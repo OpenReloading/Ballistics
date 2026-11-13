@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { reasons } from './evaluate.ts'
-import { notFittedReasons } from './fit.ts'
+import { notFittedReasons, pressureKeys } from './fit.ts'
 import { groupings } from './metrics.ts'
 import { skipReasons } from './published-rows.ts'
 import { splitSalt, splits } from './split.ts'
@@ -56,8 +56,14 @@ export type Metrics = z.infer<typeof metrics>
 const pressureFit = z
   .object({
     sigma: fraction.describe(
-      'Pressure sigma of each row, a fraction of its printed pressure over the factor of its basis.',
+      'Pressure sigma of each row, a fraction of its printed pressure over the factor of its key.',
     ),
+    by: z
+      .enum(pressureKeys)
+      .default('basis')
+      .describe(
+        'The key of `--pressure-factor` a factor is computed per and applied by: `basis`, the pressure basis (`unstated` without one); `table`, the table label (`unstated` without one); `cartridge`; `table-cartridge`, `<table>/<cartridge>`. A result without it reads as `basis`.',
+      ),
     factors: z
       .record(
         z.string(),
@@ -65,18 +71,18 @@ const pressureFit = z
           factor: z
             .number()
             .describe(
-              'The model peak pressure times this is what the basis reads: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only.',
+              'The model peak pressure times this is what the rows of the key read: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only.',
             ),
-          rows: count.describe('Pressure rows of the basis of the powders fitted to velocities.'),
+          rows: count.describe('Pressure rows of the key of the powders fitted to velocities.'),
         }),
       )
       .describe(
-        'By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its training pressures are not read.',
+        'By key of the training rows; a key without a row of a powder fitted to velocities is left out, and its training pressures are not read.',
       ),
   })
   .optional()
   .describe(
-    'With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its basis.',
+    'With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its key of `--pressure-factor`.',
   )
 
 const evaluation = z.object({
@@ -142,7 +148,7 @@ const evaluation = z.object({
     })
     .optional()
     .describe(
-      "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`. With `--pressure-sigma`, `pressure` holds the basis factors of the fit; the pressure errors still compare the model's peak pressure as it is with the printed pressure.",
+      "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`. With `--pressure-sigma`, `pressure` holds the factor per key of `--pressure-factor` of the fit; the pressure errors still compare the model's peak pressure as it is with the printed pressure.",
     ),
 })
 
@@ -352,7 +358,7 @@ const fitResult = z.object({
         pressureRows: count
           .optional()
           .describe(
-            'With `--pressure-sigma`: used training rows whose printed pressure the fit read, those of a basis with a factor.',
+            'With `--pressure-sigma`: used training rows whose printed pressure the fit read, those of a key of `--pressure-factor` with a factor.',
           ),
         energy: z
           .object({
