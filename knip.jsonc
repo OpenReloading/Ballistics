@@ -36,7 +36,7 @@
     "packages/shot-groups": {
       "entry": ["src/index.ts", "scripts/*.mts"],
       // the event types and target faces of data's records are read by path in the tests, declared so the CI plan tests shot-groups with them
-      "ignoreDependencies": ["@open-reloading/catalog"]
+      "ignoreDependencies": ["@rangefoundry/catalog"]
     },
     "packages/importers": {
       "entry": ["src/index.ts"]
@@ -50,11 +50,11 @@
     "packages/target-recognition": {
       "entry": ["src/index.ts", "test/fixtures/target-photos/make.mts"],
       // the target faces of data's records are read by path in the tests, declared so the CI plan tests target-recognition with them
-      "ignoreDependencies": ["@open-reloading/catalog"]
+      "ignoreDependencies": ["@rangefoundry/catalog"]
     },
     "packages/svg-drawings": {
       // the bullet records of data are read by path in the tests, declared so the CI plan tests drawing with them
-      "ignoreDependencies": ["@open-reloading/catalog"],
+      "ignoreDependencies": ["@rangefoundry/catalog"],
       "entry": [
         "src/index.ts",
         "src/cartridge/index.ts",
@@ -85,9 +85,9 @@
         // its stylesheet is imported by src/css/custom.css, which knip does not read
         "katex",
         // imported by the examples of the library pages, which scripts/libraries.test.mts runs from this folder
-        "@open-reloading/catalog",
-        "@open-reloading/svg-drawings",
-        "@open-reloading/importers",
+        "@rangefoundry/catalog",
+        "@rangefoundry/svg-drawings",
+        "@rangefoundry/importers",
         "@rangefoundry/schema",
         // files these name in `Code:` lines and the research log, or that the docs tests import by path, so the CI
         // plan tests the docs when they change
@@ -112,8 +112,8 @@
     "tools": {
       // their sources and exports are read by path in the tests, declared so the CI plan tests tools when they change
       "ignoreDependencies": [
-        "@open-reloading/svg-drawings",
-        "@open-reloading/importers",
+        "@rangefoundry/svg-drawings",
+        "@rangefoundry/importers",
         "@rangefoundry/web"
       ],
       "ignoreBinaries": [

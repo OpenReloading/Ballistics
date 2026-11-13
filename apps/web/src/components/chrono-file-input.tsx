@@ -1,7 +1,7 @@
 'use client'
 
 import { NativeSelect } from '@mantine/core'
-import type { VelocityUnit } from '@open-reloading/importers'
+import type { VelocityUnit } from '@rangefoundry/importers'
 import type { ReactNode } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { formats, templateCsv, templateJson } from '../lib/chrono.ts'

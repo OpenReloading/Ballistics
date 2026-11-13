@@ -7,7 +7,7 @@ import {
   type LocatedPublishedLoads,
   type SourceIndex,
   sourceIndex,
-} from '@open-reloading/catalog'
+} from '@rangefoundry/catalog'
 import {
   bullet,
   caliberClass,

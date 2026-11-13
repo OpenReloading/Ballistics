@@ -47,7 +47,7 @@
   },
   "dependencies": {
     "@rangefoundry/statistics": "workspace:*",
-    "@open-reloading/units": "workspace:*",
+    "@rangefoundry/units": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {

@@ -1,5 +1,5 @@
 {
-  "name": "@open-reloading/importers",
+  "name": "@rangefoundry/importers",
   "version": "0.0.7",
   "description": "Parsers of chronograph exports, pressure histories and reloading record tables.",
   "keywords": [
@@ -48,7 +48,7 @@
   "dependencies": {
     "@rangefoundry/schema": "workspace:*",
     "@rangefoundry/statistics": "workspace:*",
-    "@open-reloading/units": "workspace:*"
+    "@rangefoundry/units": "workspace:*"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "catalog:",

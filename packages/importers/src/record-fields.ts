@@ -1,5 +1,5 @@
 // The record kinds a table is read as and the fields each one maps.
-import { conversions } from '@open-reloading/units'
+import { conversions } from '@rangefoundry/units'
 
 /** A kind of user record a table is read as. */
 export type TableKind = 'bullet' | 'powder' | 'cartridge'

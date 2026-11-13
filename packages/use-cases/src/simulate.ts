@@ -1,6 +1,5 @@
 /** `POST /interior/load-file`: an M3 run of the workbench load file, with the summary the workbench shows. */
 
-import type { Catalogue } from '@open-reloading/catalog'
 import {
   advisoryRule,
   boreArea,
@@ -19,6 +18,7 @@ import {
   solidFill,
   solidFillLimit,
 } from '@rangefoundry/ballistics'
+import type { Catalogue } from '@rangefoundry/catalog'
 import {
   type Bullet,
   fromSi,

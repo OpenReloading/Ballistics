@@ -1,6 +1,6 @@
-import { seat } from '@open-reloading/svg-drawings/seating'
 import { icao, startPressureOf } from '@rangefoundry/ballistics'
 import { fromSi, toSi } from '@rangefoundry/schema'
+import { seat } from '@rangefoundry/svg-drawings/seating'
 import { english, type Translator } from '../i18n/translate.ts'
 import type { InteriorKey } from './interior-input.ts'
 import type { LadderDirection } from './seating-ladder.ts'
@@ -76,7 +76,7 @@ const exampleLadder = {
   direction: 'down',
 } as const
 
-/** The bullet seated to L6 (`@open-reloading/svg-drawings/seating`): volume behind it, cm³, and travel, mm. */
+/** The bullet seated to L6 (`@rangefoundry/svg-drawings/seating`): volume behind it, cm³, and travel, mm. */
 const seated = seat({
   bullet,
   chamber: { caseLength: spec.L3, cartridgeL6: spec.L6 },

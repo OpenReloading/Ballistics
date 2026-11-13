@@ -1,6 +1,3 @@
-import { bulletDimensions } from '@open-reloading/svg-drawings/bullet'
-import { chamberOf, seat } from '@open-reloading/svg-drawings/seating'
-import { waterDensityGramsPerCm3 } from '@open-reloading/units'
 import {
   type InteriorLoad,
   type interior,
@@ -13,6 +10,9 @@ import {
 import type { Bullet, Cartridge } from '@rangefoundry/schema'
 import { bulletListFields, loadWaterCapacity, toSi } from '@rangefoundry/schema'
 import { InputError } from '@rangefoundry/statistics'
+import { bulletDimensions } from '@rangefoundry/svg-drawings/bullet'
+import { chamberOf, seat } from '@rangefoundry/svg-drawings/seating'
+import { waterDensityGramsPerCm3 } from '@rangefoundry/units'
 import type { Records } from './records.ts'
 import type { Row } from './rows.ts'
 import { type Split, splitOf } from './split.ts'

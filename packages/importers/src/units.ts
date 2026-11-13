@@ -1,7 +1,7 @@
 // Velocity units of export files and the conversion to stored m/s.
 
-import { conversions } from '@open-reloading/units'
 import type { QuantityValue } from '@rangefoundry/schema'
+import { conversions } from '@rangefoundry/units'
 import { type ChronoDiagnostic, refuse } from './diagnostics.ts'
 import { parseNumber } from './text.ts'
 

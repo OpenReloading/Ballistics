@@ -1,4 +1,4 @@
-import type { Bundle, Catalogue } from '@open-reloading/catalog'
+import type { Bundle, Catalogue } from '@rangefoundry/catalog'
 
 const lists = {
   cartridge: 'cartridges',

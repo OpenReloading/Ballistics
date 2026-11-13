@@ -16,12 +16,12 @@
   "dependencies": {
     "@rangefoundry/api": "workspace:*",
     "@rangefoundry/ballistics": "workspace:*",
-    "@open-reloading/catalog": "workspace:*",
-    "@open-reloading/svg-drawings": "workspace:*",
+    "@rangefoundry/catalog": "workspace:*",
+    "@rangefoundry/svg-drawings": "workspace:*",
     "@rangefoundry/schema": "workspace:*",
     "@rangefoundry/statistics": "workspace:*",
     "@rangefoundry/tools": "workspace:*",
-    "@open-reloading/units": "workspace:*",
+    "@rangefoundry/units": "workspace:*",
     "@rangefoundry/use-cases": "workspace:*",
     "zod": "catalog:"
   },

@@ -34,7 +34,7 @@
     "test": "vitest run --coverage && publint --strict && attw --pack . --profile esm-only"
   },
   "dependencies": {
-    "@open-reloading/units": "workspace:*"
+    "@rangefoundry/units": "workspace:*"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "catalog:",

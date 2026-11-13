@@ -11,16 +11,16 @@
             "paths": [],
             "patterns": [
               {
-                "group": ["@*/*", "@*/*/**", "!@open-reloading/units", "!@open-reloading/units/**"],
-                "message": "locale-format-imports-units-only: packages/locale-format has no I/O: it imports only @open-reloading/units and its own files."
+                "group": ["@*/*", "@*/*/**", "!@rangefoundry/units", "!@rangefoundry/units/**"],
+                "message": "locale-format-imports-units-only: packages/locale-format has no I/O: it imports only @rangefoundry/units and its own files."
               },
               {
                 "regex": "^[^.@]",
-                "message": "locale-format-imports-units-only: packages/locale-format has no I/O: it imports only @open-reloading/units and its own files."
+                "message": "locale-format-imports-units-only: packages/locale-format has no I/O: it imports only @rangefoundry/units and its own files."
               },
               {
                 "regex": "^(\\.\\./)+((units|locale-format|schema|importers|catalog|use-cases|target-recognition|api|svg-drawings|cli)/(src|dist)|packages|apps)/",
-                "message": "locale-format-imports-units-only: packages/locale-format has no I/O: it imports only @open-reloading/units and its own files."
+                "message": "locale-format-imports-units-only: packages/locale-format has no I/O: it imports only @rangefoundry/units and its own files."
               }
             ]
           }

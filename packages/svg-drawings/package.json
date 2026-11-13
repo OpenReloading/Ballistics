@@ -1,5 +1,5 @@
 {
-  "name": "@open-reloading/svg-drawings",
+  "name": "@rangefoundry/svg-drawings",
   "version": "0.0.6",
   "description": "Figure models of cartridges, bullets, seating and target faces, without a renderer.",
   "keywords": [
@@ -58,7 +58,7 @@
     "test": "vitest run --coverage"
   },
   "devDependencies": {
-    "@open-reloading/catalog": "workspace:*",
+    "@rangefoundry/catalog": "workspace:*",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "typescript": "catalog:",

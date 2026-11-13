@@ -162,24 +162,24 @@ importers:
       '@docusaurus/types':
         specifier: 3.10.2
         version: 3.10.2(@swc/core@1.16.20(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@6.1.2(postcss@8.5.31))(csso@5.0.5)(esbuild@0.28.2)(html-minifier-terser@7.2.0)(lightningcss@1.33.0)(postcss@8.5.31)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sharp@0.35.5(@types/node@26.6.6))(supports-color@8.1.1)(svgo@3.3.5)
-      '@open-reloading/catalog':
-        specifier: workspace:*
-        version: link:../../packages/catalog
-      '@open-reloading/importers':
-        specifier: workspace:*
-        version: link:../../packages/importers
-      '@open-reloading/svg-drawings':
-        specifier: workspace:*
-        version: link:../../packages/svg-drawings
       '@rangefoundry/ballistics':
         specifier: workspace:*
         version: link:../../packages/ballistics
+      '@rangefoundry/catalog':
+        specifier: workspace:*
+        version: link:../../packages/catalog
       '@rangefoundry/cli':
         specifier: workspace:*
         version: link:../../packages/cli
+      '@rangefoundry/importers':
+        specifier: workspace:*
+        version: link:../../packages/importers
       '@rangefoundry/schema':
         specifier: workspace:*
         version: link:../../packages/schema
+      '@rangefoundry/svg-drawings':
+        specifier: workspace:*
+        version: link:../../packages/svg-drawings
       '@rangefoundry/tools':
         specifier: workspace:*
         version: link:../../tools
@@ -228,18 +228,6 @@ importers:
       '@mantine/spotlight':
         specifier: 'catalog:'
         version: 9.8.0(@mantine/core@9.8.0(@mantine/hooks@9.8.0(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(@mantine/hooks@9.8.0(react@19.3.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      '@open-reloading/catalog':
-        specifier: workspace:*
-        version: link:../../packages/catalog
-      '@open-reloading/importers':
-        specifier: workspace:*
-        version: link:../../packages/importers
-      '@open-reloading/svg-drawings':
-        specifier: workspace:*
-        version: link:../../packages/svg-drawings
-      '@open-reloading/units':
-        specifier: workspace:*
-        version: link:../../packages/units
       '@phosphor-icons/react':
         specifier: 2.1.10
         version: 2.1.10(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -249,9 +237,15 @@ importers:
       '@rangefoundry/ballistics':
         specifier: workspace:*
         version: link:../../packages/ballistics
+      '@rangefoundry/catalog':
+        specifier: workspace:*
+        version: link:../../packages/catalog
       '@rangefoundry/design-tokens':
         specifier: workspace:*
         version: link:../../packages/design-tokens
+      '@rangefoundry/importers':
+        specifier: workspace:*
+        version: link:../../packages/importers
       '@rangefoundry/locale-format':
         specifier: workspace:*
         version: link:../../packages/locale-format
@@ -264,9 +258,15 @@ importers:
       '@rangefoundry/statistics':
         specifier: workspace:*
         version: link:../../packages/statistics
+      '@rangefoundry/svg-drawings':
+        specifier: workspace:*
+        version: link:../../packages/svg-drawings
       '@rangefoundry/target-recognition':
         specifier: workspace:*
         version: link:../../packages/target-recognition
+      '@rangefoundry/units':
+        specifier: workspace:*
+        version: link:../../packages/units
       '@rangefoundry/use-cases':
         specifier: workspace:*
         version: link:../../packages/use-cases
@@ -331,12 +331,12 @@ importers:
       '@fastify/sensible':
         specifier: ^6.0.7
         version: 6.0.7
-      '@open-reloading/catalog':
-        specifier: workspace:*
-        version: link:../catalog
       '@rangefoundry/ballistics':
         specifier: workspace:*
         version: link:../ballistics
+      '@rangefoundry/catalog':
+        specifier: workspace:*
+        version: link:../catalog
       '@rangefoundry/schema':
         specifier: workspace:*
         version: link:../schema
@@ -374,12 +374,12 @@ importers:
 
   packages/ballistics:
     dependencies:
-      '@open-reloading/units':
-        specifier: workspace:*
-        version: link:../units
       '@rangefoundry/statistics':
         specifier: workspace:*
         version: link:../statistics
+      '@rangefoundry/units':
+        specifier: workspace:*
+        version: link:../units
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: 'catalog:'
@@ -448,30 +448,30 @@ importers:
 
   packages/cli:
     dependencies:
-      '@open-reloading/catalog':
-        specifier: workspace:*
-        version: link:../catalog
-      '@open-reloading/svg-drawings':
-        specifier: workspace:*
-        version: link:../svg-drawings
-      '@open-reloading/units':
-        specifier: workspace:*
-        version: link:../units
       '@rangefoundry/api':
         specifier: workspace:*
         version: link:../api
       '@rangefoundry/ballistics':
         specifier: workspace:*
         version: link:../ballistics
+      '@rangefoundry/catalog':
+        specifier: workspace:*
+        version: link:../catalog
       '@rangefoundry/schema':
         specifier: workspace:*
         version: link:../schema
       '@rangefoundry/statistics':
         specifier: workspace:*
         version: link:../statistics
+      '@rangefoundry/svg-drawings':
+        specifier: workspace:*
+        version: link:../svg-drawings
       '@rangefoundry/tools':
         specifier: workspace:*
         version: link:../../tools
+      '@rangefoundry/units':
+        specifier: workspace:*
+        version: link:../units
       '@rangefoundry/use-cases':
         specifier: workspace:*
         version: link:../use-cases
@@ -548,15 +548,15 @@ importers:
 
   packages/importers:
     dependencies:
-      '@open-reloading/units':
-        specifier: workspace:*
-        version: link:../units
       '@rangefoundry/schema':
         specifier: workspace:*
         version: link:../schema
       '@rangefoundry/statistics':
         specifier: workspace:*
         version: link:../statistics
+      '@rangefoundry/units':
+        specifier: workspace:*
+        version: link:../units
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: 'catalog:'
@@ -591,7 +591,7 @@ importers:
 
   packages/locale-format:
     dependencies:
-      '@open-reloading/units':
+      '@rangefoundry/units':
         specifier: workspace:*
         version: link:../units
     devDependencies:
@@ -628,12 +628,12 @@ importers:
 
   packages/schema:
     dependencies:
-      '@open-reloading/units':
-        specifier: workspace:*
-        version: link:../units
       '@rangefoundry/statistics':
         specifier: workspace:*
         version: link:../statistics
+      '@rangefoundry/units':
+        specifier: workspace:*
+        version: link:../units
       zod:
         specifier: 'catalog:'
         version: 4.6.7
@@ -671,12 +671,12 @@ importers:
 
   packages/shot-groups:
     dependencies:
-      '@open-reloading/units':
-        specifier: workspace:*
-        version: link:../units
       '@rangefoundry/statistics':
         specifier: workspace:*
         version: link:../statistics
+      '@rangefoundry/units':
+        specifier: workspace:*
+        version: link:../units
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: 'catalog:'
@@ -684,7 +684,7 @@ importers:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
         version: 7.60.1(@types/node@26.6.6)
-      '@open-reloading/catalog':
+      '@rangefoundry/catalog':
         specifier: workspace:*
         version: link:../catalog
       '@types/node':
@@ -750,7 +750,7 @@ importers:
 
   packages/svg-drawings:
     devDependencies:
-      '@open-reloading/catalog':
+      '@rangefoundry/catalog':
         specifier: workspace:*
         version: link:../catalog
       '@types/node':
@@ -781,7 +781,7 @@ importers:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
         version: 7.60.1(@types/node@26.6.6)
-      '@open-reloading/catalog':
+      '@rangefoundry/catalog':
         specifier: workspace:*
         version: link:../catalog
       '@types/node':
@@ -938,12 +938,12 @@ importers:
 
   packages/use-cases:
     dependencies:
-      '@open-reloading/catalog':
-        specifier: workspace:*
-        version: link:../catalog
       '@rangefoundry/ballistics':
         specifier: workspace:*
         version: link:../ballistics
+      '@rangefoundry/catalog':
+        specifier: workspace:*
+        version: link:../catalog
       '@rangefoundry/schema':
         specifier: workspace:*
         version: link:../schema
@@ -1009,12 +1009,12 @@ importers:
 
   tools:
     dependencies:
-      '@open-reloading/catalog':
-        specifier: workspace:*
-        version: link:../packages/catalog
       '@rangefoundry/api':
         specifier: workspace:*
         version: link:../packages/api
+      '@rangefoundry/catalog':
+        specifier: workspace:*
+        version: link:../packages/catalog
       '@rangefoundry/schema':
         specifier: workspace:*
         version: link:../packages/schema
@@ -1022,10 +1022,10 @@ importers:
         specifier: 'catalog:'
         version: 4.6.7
     devDependencies:
-      '@open-reloading/importers':
+      '@rangefoundry/importers':
         specifier: workspace:*
         version: link:../packages/importers
-      '@open-reloading/svg-drawings':
+      '@rangefoundry/svg-drawings':
         specifier: workspace:*
         version: link:../packages/svg-drawings
       '@rangefoundry/web':

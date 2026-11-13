@@ -1,15 +1,15 @@
 'use client'
 
-import { face, type LengthUnit, lengthText } from '@open-reloading/svg-drawings'
+import { Ruler } from '@phosphor-icons/react/ssr'
+import type { Bullet } from '@rangefoundry/schema'
+import { face, type LengthUnit, lengthText } from '@rangefoundry/svg-drawings'
 import {
   type BulletProfile,
   bulletFigureModel,
   bulletScreenEm,
   bulletSymbols,
   recordProfile,
-} from '@open-reloading/svg-drawings/bullet'
-import { Ruler } from '@phosphor-icons/react/ssr'
-import type { Bullet } from '@rangefoundry/schema'
+} from '@rangefoundry/svg-drawings/bullet'
 import { useTranslation } from '../i18n/language.ts'
 import { type Translator, translator } from '../i18n/translate.ts'
 import { DrawingNotes } from './record-actions.tsx'

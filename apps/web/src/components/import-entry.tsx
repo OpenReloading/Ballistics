@@ -18,7 +18,7 @@ import {
   type TableColumnMap,
   type TableKind,
   tableKinds,
-} from '@open-reloading/importers'
+} from '@rangefoundry/importers'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'

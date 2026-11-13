@@ -1,5 +1,5 @@
 import { join } from 'node:path'
-import { checkCoverage, sourceIndex } from '@open-reloading/catalog'
+import { checkCoverage, sourceIndex } from '@rangefoundry/catalog'
 import { eventType, federation, sourceRecord } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 // not part of the package's exports: readRecords runs it on the whole bundle

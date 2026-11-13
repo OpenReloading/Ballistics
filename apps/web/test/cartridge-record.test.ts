@@ -1,4 +1,4 @@
-import { figureModel, recordFigures, screenEm } from '@open-reloading/svg-drawings/cartridge'
+import { figureModel, recordFigures, screenEm } from '@rangefoundry/svg-drawings/cartridge'
 import { describe, expect, it } from 'vitest'
 import de from '../src/i18n/de.json'
 import { translator } from '../src/i18n/translate.ts'

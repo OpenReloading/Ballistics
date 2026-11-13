@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { basename, join } from 'node:path'
-import { resolveRecord, type SourceIndex } from '@open-reloading/catalog'
+import { resolveRecord, type SourceIndex } from '@rangefoundry/catalog'
 import type { z } from 'zod'
 
 /** Where reading adds its errors, the source records that resolve references, where given, and whether the kind's directory may be missing from every root. */

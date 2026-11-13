@@ -1,5 +1,5 @@
-import type { BulletDimensions } from '@open-reloading/svg-drawings/seating'
-import { chamberOf, jumpNote, seat } from '@open-reloading/svg-drawings/seating'
+import type { BulletDimensions } from '@rangefoundry/svg-drawings/seating'
+import { chamberOf, jumpNote, seat } from '@rangefoundry/svg-drawings/seating'
 import { describe, expect, it } from 'vitest'
 import {
   type Action,

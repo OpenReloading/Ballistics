@@ -1,4 +1,4 @@
-import { type Bundle, makerRows } from '@open-reloading/catalog'
+import { type Bundle, makerRows } from '@rangefoundry/catalog'
 import { describe, expect, it } from 'vitest'
 import { readRecords } from '../../src/catalog/records.ts'
 

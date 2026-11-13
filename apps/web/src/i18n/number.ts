@@ -1,9 +1,9 @@
+import * as locale from '@rangefoundry/locale-format'
 import {
   type NumberRange,
   type ParsedNumber,
   parseNumber as parseWithMark,
-} from '@open-reloading/units'
-import * as locale from '@rangefoundry/locale-format'
+} from '@rangefoundry/units'
 import { shownLanguage } from './shown.ts'
 import { type Translator, translator } from './translate.ts'
 
@@ -38,7 +38,7 @@ export const fixedNumber = (x: number, digits: number, language = shownLanguage(
 export const plainNumber = (x: number, language = shownLanguage()) =>
   locale.plainNumber(x, language)
 
-/** Either decimal mark; the mark of `language` settles a lone mark before three digits (`parseNumber` of `@open-reloading/units` has the rules). */
+/** Either decimal mark; the mark of `language` settles a lone mark before three digits (`parseNumber` of `@rangefoundry/units` has the rules). */
 export const parseNumber = (
   input: string,
   range: NumberRange = {},

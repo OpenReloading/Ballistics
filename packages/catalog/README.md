@@ -1,14 +1,14 @@
-# @open-reloading/catalog
+# @rangefoundry/catalog
 
 The OpenReloading catalogue records as one JSON bundle and the checks the records pass. The package reads no files.
 
 ```sh
-npm install @open-reloading/catalog
+npm install @rangefoundry/catalog
 ```
 
 ```js
-import bundle from '@open-reloading/catalog/bundle.json' with { type: 'json' }
-import { twistPlausible } from '@open-reloading/catalog/plausibility'
+import bundle from '@rangefoundry/catalog/bundle.json' with { type: 'json' }
+import { twistPlausible } from '@rangefoundry/catalog/plausibility'
 
 console.log(bundle.cartridges.length > 0) // true
 console.log(twistPlausible(254)) // true

@@ -4,9 +4,9 @@ import {
   type QuantityKind,
   toSi,
   waterDensityGramsPerCm3,
-} from '@open-reloading/units'
+} from '@rangefoundry/units'
 
-/** Every value is held in SI; a unit converts to and from SI and has a fixed number of decimals, the customary factors those of `conversions` in `@open-reloading/units`. */
+/** Every value is held in SI; a unit converts to and from SI and has a fixed number of decimals, the customary factors those of `conversions` in `@rangefoundry/units`. */
 export interface Unit {
   /** The symbol shown after a value: "mm", "gr H₂O"; empty for a ratio. */
   symbol: string

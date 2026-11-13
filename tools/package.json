@@ -23,13 +23,13 @@
   },
   "dependencies": {
     "@rangefoundry/api": "workspace:*",
-    "@open-reloading/catalog": "workspace:*",
+    "@rangefoundry/catalog": "workspace:*",
     "@rangefoundry/schema": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@open-reloading/svg-drawings": "workspace:*",
-    "@open-reloading/importers": "workspace:*",
+    "@rangefoundry/svg-drawings": "workspace:*",
+    "@rangefoundry/importers": "workspace:*",
     "@rangefoundry/web": "workspace:*",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",

@@ -10,7 +10,7 @@ import {
   readWorkbook,
   stringifyRangeFoundryJson,
   type VelocityUnit,
-} from '@open-reloading/importers'
+} from '@rangefoundry/importers'
 import { formatNumber } from '../i18n/number.ts'
 import { english, type Message, msg } from '../i18n/translate.ts'
 import { toCsv } from './csv.ts'

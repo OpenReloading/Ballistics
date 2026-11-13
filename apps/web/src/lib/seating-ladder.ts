@@ -75,7 +75,7 @@ export const seatingLengthName: Record<SeatingLengthKind, string> = {
   baseToOgive: 'CBTO',
 }
 
-/** From the seating preview (`seat` of `@open-reloading/svg-drawings/seating`). */
+/** From the seating preview (`seat` of `@rangefoundry/svg-drawings/seating`). */
 export type SeatingLengths = {
   lengthKind: SeatingLengthKind
   /** Slider range of the length it seats by, m. */
