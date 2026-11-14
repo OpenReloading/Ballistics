@@ -296,20 +296,12 @@ const firearmRow = (id: string, name: string, f: Firearm): FirearmRow => ({
   twist: siOf('length', f.twist),
 })
 
-/** The built-in example rifle is never stored, so a fresh browser still has one to choose. */
 export const gunPicker = (
   stored: readonly { id: string; name: string; data: Firearm }[],
-  example: { id: string; name: string; data: Record<string, unknown> },
   t: Translator['t'],
 ) => ({
-  rows: [
-    ...stored.map((f) => firearmRow(f.id, f.name, f.data)),
-    // the example rifle's data is a firearm (`example-data.ts`)
-    firearmRow(example.id, t('{name} (example)', { name: example.name }), example.data as Firearm),
-  ],
-  placeholder: stored.length
-    ? t('Choose a firearm')
-    : t('No firearm saved yet. Pick the example rifle, or add yours under Firearms.'),
+  rows: stored.map((f) => firearmRow(f.id, f.name, f.data)),
+  placeholder: stored.length ? t('Choose a firearm') : t('Add a firearm under Firearms'),
 })
 
 /** The catalogue record id a cartridge reference names; undefined for a `user:` reference. */
@@ -514,19 +506,10 @@ export function sightOptions(records: UserRecord[], t: Translator['t'] = untrans
   })
 }
 
-/** The built-in example rifle is never stored, so it follows the browser's firearms. */
-export function sightPicker(records: UserRecord[], example: UserRecord, t: Translator['t']) {
+export function sightPicker(records: UserRecord[], t: Translator['t']) {
   return {
-    options: [
-      ...sightOptions(records, t),
-      ...sightOptions([example], t).map((o) => ({
-        ...o,
-        label: t('{name} (example)', { name: o.label }),
-      })),
-    ],
-    none: records.some((r) => r.kind === 'firearm')
-      ? t('None')
-      : t('No firearm saved yet. Pick the example rifle, or add yours under Firearms.'),
+    options: sightOptions(records, t),
+    none: records.some((r) => r.kind === 'firearm') ? t('None') : t('Add a firearm under Firearms'),
   }
 }
 

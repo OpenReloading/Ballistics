@@ -159,10 +159,8 @@ export const manualBulletFields = [
   },
 ] as const satisfies readonly FieldSpec[]
 
-/** The optional fields of the zero air and the drag factor, which the example leaves empty. */
+/** The optional fields of the zero air and the drag factor. */
 export const zeroKeys = ['zeroTemperature', 'zeroPressure', 'zeroHumidity', 'dragFactor'] as const
-export type ShotKey = (typeof shotFields)[number]['key']
-export type ManualKey = (typeof manualBulletFields)[number]['key']
 
 type Values = Record<string, number | undefined>
 

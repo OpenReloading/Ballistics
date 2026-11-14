@@ -168,7 +168,7 @@ it('the firearm chooser shows barrel length and twist, ranks by name and says wh
   const rows: FirearmRow[] = [
     { id: 'a', name: 'Match rifle 308', barrelLength: 0.66, twist: 0.254 },
     { id: 'b', name: 'Hunting rifle', barrelLength: 0.56 },
-    { id: 'ex', name: 'Example rifle, 308 Win. (example)', barrelLength: 0.6, twist: 0.3048 },
+    { id: 'c', name: 'Club rifle, 308 Win.', barrelLength: 0.6, twist: 0.3048 },
   ]
   expect(table(firearmKind, rows[0] as FirearmRow)).toEqual([
     ['Firearm', 'Match rifle 308'],
@@ -177,9 +177,9 @@ it('the firearm chooser shows barrel length and twist, ranks by name and says wh
   ])
   expect(table(firearmKind, rows[1] as FirearmRow)[2]).toEqual(['Twist', ''])
   // a word's start ranks above its middle; no words: by name
-  expect(ids(firearmKind, rows, '308')).toEqual(['ex', 'a'])
+  expect(ids(firearmKind, rows, '308')).toEqual(['c', 'a'])
   expect(ids(firearmKind, rows, 'rifle hunt')).toEqual(['b'])
-  expect(ids(firearmKind, rows, '')).toEqual(['ex', 'b', 'a'])
+  expect(ids(firearmKind, rows, '')).toEqual(['c', 'b', 'a'])
   expect(ids(firearmKind, rows, 'nothing')).toEqual([])
   expect(t(firearmKind.texts.empty)).toBe('No firearm matches')
   expect(firearmKind.href).toBeUndefined()

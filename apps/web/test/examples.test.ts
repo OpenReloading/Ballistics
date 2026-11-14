@@ -1,165 +1,16 @@
-import {
-  interior,
-  interiorPressureRange,
-  powderModelValues,
-  pressureToleranceDefaults,
-  recordResistance,
-  trajectory,
-} from '@rangefoundry/ballistics'
-import { firearm, sheetId, userRecord } from '@rangefoundry/schema'
-import { bulletDimensions } from '@rangefoundry/svg-drawings/bullet'
 import { describe, expect, it } from 'vitest'
-import {
-  exampleChamberVolume,
-  exampleFirearm,
-  exampleInterior,
-  exampleMuzzleVelocity,
-  exampleRecords,
-  exampleSeating,
-  exampleTrajectory,
-  loadExample,
-} from '../src/lib/example-data.ts'
-import { exampleFields, quickCartridges } from '../src/lib/examples.ts'
-import { siValues } from '../src/lib/field-spec.ts'
-import { gunValues, siOf } from '../src/lib/firearm.ts'
-import { interiorBody, interiorFields } from '../src/lib/interior-input.ts'
-import { productLabel } from '../src/lib/manufacturers.ts'
-import {
-  manualBulletFields,
-  manualProjectile,
-  shotFields,
-  shotFromValues,
-  zeroKeys,
-} from '../src/lib/trajectory-input.ts'
-import { presetUnits } from '../src/lib/units.ts'
-import { defined } from './defined.ts'
+import { quickCartridges } from '../src/lib/examples.ts'
 import { readRecord } from './read-record.ts'
 
 type Value = {
   side?: string | undefined
   symbol: string
   value: number
-  variant?: string | undefined
 }
-
-function record(kind: string, id: string) {
-  return readRecord(`${kind}/${id}.json`)
-}
-
-describe('embedded record values', () => {
-  it('equal the committed records', () => {
-    const b = record('bullets', exampleRecords.bullet.id)
-    // the mass and the shape the seating preview reads from the record (`bulletDimensions`)
-    const { id, g7: bc } = exampleRecords.bullet
-    expect({ id, mass: b.mass.value, g7: bc, ...bulletDimensions(b) }).toEqual(
-      exampleRecords.bullet,
-    )
-    const g7 = b.ballisticCoefficients.filter((c: { dragModel: string }) => c.dragModel === 'G7')
-    expect(g7).toHaveLength(1)
-    expect(g7[0].value).toBe(exampleRecords.bullet.g7)
-
-    const s = record('cartridges', exampleRecords.cartridge.id)
-    expect(sheetId(s)).toBe(exampleRecords.spec.id)
-    const v = (side: string | undefined, symbol: string) =>
-      (s.values as Value[]).find((x) => x.side === side && x.symbol === symbol && !x.variant)?.value
-    expect(v('cartridge', 'G1')).toBe(exampleRecords.spec.G1)
-    expect(v('cartridge', 'L3')).toBe(exampleRecords.spec.L3)
-    expect(v('cartridge', 'L6')).toBe(exampleRecords.spec.L6)
-    expect(v('chamber', 'F')).toBe(exampleRecords.spec.F)
-    expect(v('chamber', 'Z')).toBe(exampleRecords.spec.Z)
-    expect(v('chamber', 'Q')).toBe(exampleRecords.spec.Q)
-    expect(v('chamber', 'u')).toBe(exampleRecords.spec.u)
-    expect(v(undefined, 'Pmax')).toBe(exampleRecords.spec.Pmax)
-    expect(record('cases', exampleRecords.case.id).waterCapacity.value).toBe(
-      exampleRecords.case.water,
-    )
-
-    const p = record('powders', exampleRecords.powder.id)
-    const m = record('manufacturers', p.manufacturer)
-    expect(productLabel(p, new Map([[m.id, m.name]]))).toBe(exampleRecords.powder.name)
-    // the model fields equal what the workbench fills from the record
-    const filledFromRecord = powderModelValues(p) as Record<string, number>
-    for (const [k, v] of Object.entries(filledFromRecord))
-      expect(exampleInterior[k as keyof typeof exampleInterior], k).toBeCloseTo(v, 12)
-
-    expect(record('cartridges', exampleRecords.cartridge.id).name).toBe(
-      exampleRecords.cartridge.name,
-    )
-  })
-
-  it('derive the chamber volume', () => {
-    expect(exampleChamberVolume).toBeCloseTo(3.126, 3)
-  })
-})
-
-describe('interior example', () => {
-  const filled = exampleFields(interiorFields, exampleInterior, presetUnits('us'))
-  const { load } = interiorBody(siValues(filled), exampleRecords.cartridge.id)
-  // the bore resistance of the powder record's fit, as the workbench adds it to a run
-  const spec = record('cartridges', exampleRecords.cartridge.id)
-  const z = spec.values.find(
-    (v: Value) => v.side === 'chamber' && v.symbol === 'Z' && !v.variant,
-  )?.value
-  const { resistance } = recordResistance(record('powders', exampleRecords.powder.id), {
-    boreDiameter: load.chamber.boreDiameter,
-    boreArea: load.chamber.boreArea,
-    startPressure: load.startPressure,
-    cartridge: { g1: exampleRecords.spec.G1, z },
-    bulletLengthMm: exampleRecords.bullet.length,
-  })
-  if (resistance) load.resistance = resistance
-
-  it('fills every field but the optional ones: Sébert factor (Lagrange), leak area, throat wear, bore friction and engraving', () => {
-    const optional = [
-      'sebert',
-      'leakArea',
-      'throatWear',
-      'boreFriction',
-      'engravingPressure',
-      'engravingLength',
-    ]
-    for (const f of interiorFields)
-      expect(defined(filled[f.key]).text === '').toBe(optional.includes(f.key))
-    expect(load).not.toHaveProperty('gradient')
-    expect(load).not.toHaveProperty('leakage')
-  })
-
-  // the start load: no warning shows
-  it('stays below the CIP Pmax with the upper end of its range', () => {
-    expect(resistance).toBeDefined()
-    const r = interior(load)
-    if (!r.valid) throw new Error(`interior example invalid: ${r.reason}`)
-    const range = interiorPressureRange(load, r.peakBreechPressure, pressureToleranceDefaults)
-    const pmax = exampleRecords.spec.Pmax * 1e5
-    expect(r.peakBreechPressure).toBeLessThan(0.8 * pmax)
-    expect(range.highPressure).toBeLessThan(0.9 * pmax)
-    // a load that burns out in the barrel
-    expect(r.burnout).not.toBeNull()
-    expect(Math.round(r.muzzleVelocity)).toBe(exampleMuzzleVelocity)
-  })
-})
-
-describe('trajectory example', () => {
-  it('fills every field but the optional zero air and drag factor, and computes with manual G7 drag', () => {
-    const filled = exampleFields(
-      [...shotFields, ...manualBulletFields],
-      exampleTrajectory,
-      presetUnits('metric-grams'),
-    )
-    for (const f of [...shotFields, ...manualBulletFields])
-      if (!(zeroKeys as readonly string[]).includes(f.key))
-        expect(defined(filled[f.key]).text).not.toBe('')
-    expect(defined(filled.ballisticCoefficient).text).toBe('0.221')
-    const si = siValues(filled)
-    const t = trajectory(shotFromValues(si, manualProjectile(si, 'G7'), 'right'), [100, 1000])
-    expect(t.stop).toBe('done')
-    expect(Math.abs(defined(t.points[0]).height)).toBeLessThan(1e-5)
-  })
-})
 
 describe('start-card cartridges', () => {
   it.each(quickCartridges)('$id has its record name and the CIP G1, F and Z of its record', (c) => {
-    const r = record('cartridges', c.id)
+    const r = readRecord(`cartridges/${c.id}.json`)
     expect(r.name).toBe(c.name)
     const least = (side: string, symbol: string) =>
       Math.min(
@@ -172,25 +23,5 @@ describe('start-card cartridges', () => {
       c.land,
       c.groove,
     ])
-  })
-})
-
-describe('example rifle', () => {
-  it('is a valid firearm record with the example cartridge, barrel, twist, sight height and zero', () => {
-    expect(userRecord.safeParse(exampleFirearm).success).toBe(true)
-    expect(exampleFirearm.data.cartridge).toBe(`catalogue:${loadExample?.cartridge.id}`)
-    expect(loadExample?.firearm).toBe(exampleFirearm)
-    const [mount] = exampleFirearm.data.configurations[0].mounts
-    const gun = gunValues(firearm.parse(exampleFirearm.data))
-    expect(siOf('length', mount.sightHeight)).toBeCloseTo(exampleTrajectory.sightHeight, 12)
-    expect(siOf('length', mount.zeroRange)).toBeCloseTo(exampleTrajectory.zeroRange, 12)
-    expect(gun.twist).toBeCloseTo(exampleTrajectory.twist, 12)
-    expect(gun.twist).toBeCloseTo(exampleInterior.twist, 12)
-    expect(gun.barrelLength).toBeCloseTo(exampleSeating.barrel, 9)
-    expect(gun.firearmMass).toBeCloseTo(7, 12)
-    expect(loadExample?.firearmMass).toBeCloseTo(gun.firearmMass as number, 12)
-    // the case record the example chooses and the seating ladder step it fills
-    expect(loadExample?.caseId).toBe(exampleRecords.case.id)
-    expect(loadExample?.seatStep).toBe(0.5e-3)
   })
 })

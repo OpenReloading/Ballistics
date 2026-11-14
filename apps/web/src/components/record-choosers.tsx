@@ -240,7 +240,7 @@ const byName = [
   { value: 'name', label: msg('Name') },
 ]
 
-/** The firearms of the Gun card as a kind of the record chooser: the library and the example rifle. */
+/** The firearms of the Gun card as a kind of the record chooser: the library. */
 export const firearmKind: ChooserKind<FirearmRow> = {
   texts: {
     title: msg('Choose a firearm'),
