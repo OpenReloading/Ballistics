@@ -105,7 +105,9 @@ export async function openLadderGroups(page: Page) {
   await expect(async () => {
     await expect(ladder.or(strip).first()).toBeVisible()
     if (await strip.count()) {
-      await strip.click({ timeout: 2000 })
+      // the strip toggles the sheet: a retry after a click that opened it must not close it
+      if ((await strip.getAttribute('aria-expanded')) !== 'true')
+        await strip.click({ timeout: 2000 })
       await page.getByRole('tab', { name: 'Ladder', exact: true }).click({ timeout: 2000 })
     }
     await expect(ladder).toBeVisible({ timeout: 2000 })

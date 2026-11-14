@@ -52,8 +52,9 @@ const stored = (page: Page, kind: string) =>
     return all.filter((r) => r.kind === kind)
   }, kind)
 
-/** Saves the fixture load in the workbench as a load of this browser and gives its record and form values. */
-async function saveFixtureLoad(page: Page) {
+/** Opens the fixture load, stored in this browser, in the workbench and gives its record and form values. */
+async function openStoredFixtureLoad(page: Page) {
+  // the later Save of the tests that follow writes to this file
   await page.addInitScript(() => {
     ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
@@ -61,10 +62,8 @@ async function saveFixtureLoad(page: Page) {
   await gotoHydrated(page, '/workbench')
   await openSavedLoad(page)
   await runLine(page)
-  await (await barButton(page, 'Save')).click()
-  await expect.poll(async () => (await stored(page, 'load')).length).toBe(1)
   const [record] = await stored(page, 'load')
-  if (!record) throw new Error('the load was not saved')
+  if (!record) throw new Error('the fixture load is not stored')
   return { ...record, values: await formValues(page) }
 }
 
@@ -97,7 +96,7 @@ test('a 10-shot string entered offline survives reloads and is on the Measuremen
   page,
   context,
 }) => {
-  const saved = await saveFixtureLoad(page)
+  const saved = await openStoredFixtureLoad(page)
   await openRange(page, saved.id)
   // the worker is active and controls the page, so the reloads below are answered from its caches
   await page.evaluate(() => navigator.serviceWorker.ready)
@@ -182,7 +181,7 @@ test('two tabs entering shots for one load lose none, and a Save of the load in 
   page,
 }) => {
   // the workbench has the load open, then the range page adds a session to it
-  const saved = await saveFixtureLoad(page)
+  const saved = await openStoredFixtureLoad(page)
   const a = await context.newPage()
   const b = await context.newPage()
   await Promise.all([openRange(a, saved.id), openRange(b, saved.id)])
