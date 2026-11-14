@@ -29,10 +29,9 @@ describe('distribution properties', () => {
   })
 
   it('widens the Student t quantile with the level and narrows it with the degrees of freedom', () => {
-    // confidence levels: within about 1e-12 of 1 the central mass rounds to 1 and the quantile is noise
-    const level = double({ min: 0.01, max: 0.9999, noNaN: true })
+    const level = double({ min: 0.01, max: 1 - 1e-15, noNaN: true })
     assert(
-      property(level, level, degreesOfFreedom(40), (a, b, df) => {
+      property(level, level, degreesOfFreedom(1000), (a, b, df) => {
         const [lo, hi] = a < b ? [a, b] : [b, a]
         expect(studentTwoSidedQuantile(lo, df)).toBeLessThanOrEqual(studentTwoSidedQuantile(hi, df))
         expect(studentTwoSidedQuantile(hi, df + 1)).toBeLessThanOrEqual(
