@@ -5,6 +5,7 @@ import {
   checkRecords,
   checkSources,
   type LocatedPublishedLoads,
+  makerRows,
   type SourceIndex,
   sourceIndex,
 } from '@rangefoundry/catalog'
@@ -109,13 +110,15 @@ export type ReadRecordsResult = {
   errors: string[]
   /** Plausibility findings that do not fail validation: a published load stays as printed. */
   warnings: string[]
+  /** By record file (`bullets/<id>.json`), the source record id of each provenance source, undefined for an embedded one. */
+  citations: SourceIndex['citations']
 }
 
 /** Reads every kind directory of `roots`, in this order, the source records first. */
 function readBundle(
   roots: string[],
   errors: string[],
-): { bundle: Bundle; published: LocatedPublishedLoads[] } {
+): { bundle: Bundle; published: LocatedPublishedLoads[]; citations: SourceIndex['citations'] } {
   const sources = sourceIndex(readKind(roots, 'sources', sourceRecord, { errors }))
   const read = <T extends { id: string }>(dir: string, schema: z.ZodType<T>, optional = false) =>
     readKind(roots, dir, schema, { errors, sources, optional })
@@ -140,7 +143,7 @@ function readBundle(
   }
   const published = readPublishedLoads(roots, sources, errors)
   checkSources(sources, errors)
-  return { bundle, published }
+  return { bundle, published, citations: sources.citations }
 }
 
 /** Under `root`, or under several roots read as one set (the first holds every kind directory, the `load-tables.json` of every root lists tables); without `root` the `records/` folder of the catalog package. */
@@ -148,7 +151,7 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
   const roots = typeof root === 'string' ? [root] : [...root]
   if (roots.length === 0) throw new Error('readRecords needs at least one records root')
   const errors: string[] = []
-  const { bundle, published } = readBundle(roots, errors)
+  const { bundle, published, citations } = readBundle(roots, errors)
   const loadTables = readRootsLoadTables(roots, errors)
   const checked = checkRecords({ bundle, published, loadTables })
   return {
@@ -156,5 +159,25 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
     publishedLoads: published.map((p) => p.file),
     errors: [...errors, ...checked.errors],
     warnings: checked.warnings,
+    citations,
   }
+}
+
+/** The folder of a `makerRows` kind: the bundle key in kebab case, but for the three keys below. */
+const folders: Record<string, string> = {
+  publishedLoads: 'loads',
+  chronoSessions: 'chrono',
+  rangeFirings: 'range',
+}
+const folderOf = (kind: string) =>
+  folders[kind] ?? kind.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)
+
+/** {@link readRecords} with the maker-source rule of the public catalog (`makerRows`) as errors: what `data:validate` checks. Not part of `readRecords`, which also reads private records. */
+export function validateRecords(root?: string | readonly string[]): ReadRecordsResult {
+  const result = readRecords(root)
+  const refused = Object.entries(makerRows(result.bundle, result.citations)).flatMap(
+    ([kind, rows]) =>
+      rows.flatMap(({ id, findings }) => findings.map((f) => `${folderOf(kind)}/${id}.json: ${f}`)),
+  )
+  return { ...result, errors: [...result.errors, ...refused] }
 }
