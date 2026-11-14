@@ -4,13 +4,13 @@ import { fileURLToPath } from 'node:url'
 import { compareKeys, type SourceRecord, sourceRecord } from '@rangefoundry/schema'
 import { readPublishedLoads } from '@rangefoundry/tools/catalog'
 import { Refusal, UsageError } from './errors.ts'
-import { type InteriorModel, outcomes } from './evaluate.ts'
+import { type InteriorModel, type Outcome, outcomes } from './evaluate.ts'
 import { fitPowders, notFittedReasons, type PressureKey, withFit } from './fit.ts'
 import { changeOf, evaluate, type Grouping, metricsOf } from './metrics.ts'
 import { builtInName, fitFiles, loadModel, type Model } from './model.ts'
 import { pairedChange, type RowError, rowErrors } from './paired.ts'
 import { fillInputs, rowsFromPublished } from './published-rows.ts'
-import { loadRecords, type Records } from './records.ts'
+import { loadRecords, type Records, withoutEstimates } from './records.ts'
 import {
   type CompareResult,
   type Evaluation,
@@ -177,7 +177,8 @@ function fitOf(options: FitOptions, data: Prepared, model: Model) {
   // one factor on all printed pressures and one per key both set the pressure level with no rule for which comes first
   if (energy !== undefined && pressureSigma !== undefined)
     throw new UsageError('--energy prior and --pressure-sigma do not combine')
-  const fit = fitPowders(data.rows, data.records, model.interior, velocitySigma, {
+  // a fit on estimated capacities would move the values of every row of the powder, the rows with a measured capacity too
+  const fit = fitPowders(data.rows, withoutEstimates(data.records), model.interior, velocitySigma, {
     exponent,
     pressureSigma,
     pressureFactor,
@@ -257,7 +258,12 @@ async function evaluateModel(spec: string, options: Options, data: Prepared): Pr
   const fitted = options.params === 'fit-on-training' ? fitOf(options, data, model) : undefined
   const records = fitted?.records ?? data.records
   const wanted: Split[] = options.split === 'training' ? ['training'] : [options.split, 'training']
-  const all = outcomes(data.rows, records, model.interior, wanted)
+  const run = outcomes(data.rows, records, model.interior, wanted)
+  const estimated = run.filter((o) => o.estimatedCapacity && o.split === options.split)
+  const all = run.map(
+    (o): Outcome =>
+      o.estimatedCapacity ? { ...o, prediction: { reason: 'estimatedCapacity' } } : o,
+  )
   const inSplit = all.filter((o) => o.split === options.split)
   const evaluation = evaluate(
     inSplit,
@@ -280,8 +286,14 @@ async function evaluateModel(spec: string, options: Options, data: Prepared): Pr
         powders: unseen.powders,
       },
     }),
+    ...(estimated.length > 0 && {
+      estimatedCapacity: metricsOf(estimated, evaluation.interval.halfWidth),
+    }),
     ...(fitted && { fit: fitted.summary }),
-    rows: rowErrors(inSplit),
+    rows: [
+      ...rowErrors(inSplit),
+      ...rowErrors(estimated).map((e) => ({ ...e, capacity: 'estimated' as const })),
+    ].toSorted((a, b) => a.row - b.row),
   }
 }
 

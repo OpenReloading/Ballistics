@@ -14,6 +14,27 @@ export const recordRoots = [
 
 export const records = loadRecords(recordRoots)
 
+/** A new records root with one estimated capacity (provenance derived) of `cartridge`, first by id. */
+export function rootWithEstimate(cartridge: string, value: number) {
+  const root = mkdtempSync(join(tmpdir(), 'cli-estimate-'))
+  mkdirSync(join(root, 'capacities'))
+  const id = `a-${cartridge}-estimate`
+  writeFileSync(
+    join(root, 'capacities', `${id}.json`),
+    JSON.stringify({
+      id,
+      origin: 'catalogue',
+      cartridge: `catalogue:${cartridge}`,
+      waterCapacity: { value },
+      provenance: {
+        kind: 'derived',
+        sources: [{ title: 'Outline estimate', fields: ['waterCapacity'] }],
+      },
+    }),
+  )
+  return root
+}
+
 /** A row of the synthetic set: the printed values are the model's, moved by `velocity` and `pressure`. */
 export interface Spec {
   cartridge: string

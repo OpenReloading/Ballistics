@@ -140,7 +140,8 @@
                       "noBarrelLength",
                       "missingCartridgeValue",
                       "modelRefused",
-                      "noBulletDrag"
+                      "noBulletDrag",
+                      "estimatedCapacity"
                     ]
                   },
                   "additionalProperties": {
@@ -294,7 +295,8 @@
                         "noBarrelLength",
                         "missingCartridgeValue",
                         "modelRefused",
-                        "noBulletDrag"
+                        "noBulletDrag",
+                        "estimatedCapacity"
                       ]
                     },
                     "additionalProperties": {
@@ -450,7 +452,8 @@
                         "noBarrelLength",
                         "missingCartridgeValue",
                         "modelRefused",
-                        "noBulletDrag"
+                        "noBulletDrag",
+                        "estimatedCapacity"
                       ]
                     },
                     "additionalProperties": {
@@ -614,7 +617,8 @@
                             "noBarrelLength",
                             "missingCartridgeValue",
                             "modelRefused",
-                            "noBulletDrag"
+                            "noBulletDrag",
+                            "estimatedCapacity"
                           ]
                         },
                         "additionalProperties": {
@@ -735,6 +739,157 @@
           "required": ["by", "groups"],
           "additionalProperties": false
         },
+        "estimatedCapacity": {
+          "description": "The rows of the split whose cartridge has an estimated capacity (a capacity record of provenance kind `derived`), present when there are any. They are left out of `overall`, the groups, the fit, the interval and the paired change, where they count as `estimatedCapacity`; the interval coverage here uses the half width of the other rows.",
+          "type": "object",
+          "properties": {
+            "rows": {
+              "type": "object",
+              "properties": {
+                "inSplit": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991,
+                  "description": "Rows of the split in this group."
+                },
+                "used": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991,
+                  "description": "Rows the model gave a result for."
+                },
+                "notUsed": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string",
+                    "enum": [
+                      "unknownCartridge",
+                      "unknownBullet",
+                      "unknownPowder",
+                      "noPowderModel",
+                      "noCaseCapacity",
+                      "noBulletLength",
+                      "noBulletShape",
+                      "noBarrelLength",
+                      "missingCartridgeValue",
+                      "modelRefused",
+                      "noBulletDrag",
+                      "estimatedCapacity"
+                    ]
+                  },
+                  "additionalProperties": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "description": "Rows not used, by reason; a reason without rows is left out."
+                }
+              },
+              "required": ["inSplit", "used", "notUsed"],
+              "additionalProperties": false
+            },
+            "velocity": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "median": {
+                      "type": "number",
+                      "description": "Median of the absolute relative error, as a fraction."
+                    },
+                    "p90": {
+                      "type": "number",
+                      "description": "90th percentile of the absolute relative error, as a fraction."
+                    }
+                  },
+                  "required": ["median", "p90"],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Absolute relative error of the muzzle velocity over the used rows; null without one."
+            },
+            "pressure": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "median": {
+                      "type": "number",
+                      "description": "Median of the absolute relative error, as a fraction."
+                    },
+                    "p90": {
+                      "type": "number",
+                      "description": "90th percentile of the absolute relative error, as a fraction."
+                    },
+                    "rows": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991,
+                      "description": "Used rows that print a peak pressure."
+                    }
+                  },
+                  "required": ["median", "p90", "rows"],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+            },
+            "pressureByBasis": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "median": {
+                    "type": "number",
+                    "description": "Median of the absolute relative error, as a fraction."
+                  },
+                  "p90": {
+                    "type": "number",
+                    "description": "90th percentile of the absolute relative error, as a fraction."
+                  },
+                  "rows": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": ["median", "p90", "rows"],
+                "additionalProperties": false
+              },
+              "description": "The pressure error per basis, the measuring method a row prints (`transducer`, `case-contact`, `piezo`, ..., `unstated` without one); a basis is never compared with another. A basis without a used row in bar is left out."
+            },
+            "interval": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "coverage": {
+                      "type": "number",
+                      "description": "Share of the used rows whose printed velocity is inside the interval."
+                    }
+                  },
+                  "required": ["coverage"],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Coverage of the 90 % interval; null without rows or without an interval."
+            }
+          },
+          "required": ["rows", "velocity", "pressure", "pressureByBasis", "interval"],
+          "additionalProperties": false
+        },
         "notInFittedSet": {
           "description": "Powder not in the fitted set, with `--leave-one-powder-out`: the rows of each powder that has interior parameters, run without them. A powder without rows has no value, so its rows count as `noPowderModel` (a row with an unknown cartridge or bullet as `unknownCartridge` or `unknownBullet`, which are checked first) and the errors and the coverage are null.",
           "type": "object",
@@ -769,7 +924,8 @@
                       "noBarrelLength",
                       "missingCartridgeValue",
                       "modelRefused",
-                      "noBulletDrag"
+                      "noBulletDrag",
+                      "estimatedCapacity"
                     ]
                   },
                   "additionalProperties": {
@@ -1006,7 +1162,7 @@
           "additionalProperties": false
         },
         "rows": {
-          "description": "With `--per-row`: the error of each used row of the split, for the paired change of `compare`.",
+          "description": "With `--per-row`: the error of each used row of the split, for the paired change of `compare`, the rows of `estimatedCapacity` among them.",
           "type": "array",
           "items": {
             "type": "object",
@@ -1027,6 +1183,11 @@
               "pressure": {
                 "description": "Of a row that prints a pressure in bar.",
                 "type": "number"
+              },
+              "capacity": {
+                "description": "The capacity of its cartridge is an estimate: `compare` never pairs the row.",
+                "type": "string",
+                "const": "estimated"
               }
             },
             "required": ["row", "cartridge", "velocity"],
@@ -1192,7 +1353,8 @@
                           "noBarrelLength",
                           "missingCartridgeValue",
                           "modelRefused",
-                          "noBulletDrag"
+                          "noBulletDrag",
+                          "estimatedCapacity"
                         ]
                       },
                       "additionalProperties": {
@@ -1346,7 +1508,8 @@
                             "noBarrelLength",
                             "missingCartridgeValue",
                             "modelRefused",
-                            "noBulletDrag"
+                            "noBulletDrag",
+                            "estimatedCapacity"
                           ]
                         },
                         "additionalProperties": {
@@ -1502,7 +1665,8 @@
                             "noBarrelLength",
                             "missingCartridgeValue",
                             "modelRefused",
-                            "noBulletDrag"
+                            "noBulletDrag",
+                            "estimatedCapacity"
                           ]
                         },
                         "additionalProperties": {
@@ -1666,7 +1830,8 @@
                                 "noBarrelLength",
                                 "missingCartridgeValue",
                                 "modelRefused",
-                                "noBulletDrag"
+                                "noBulletDrag",
+                                "estimatedCapacity"
                               ]
                             },
                             "additionalProperties": {
@@ -1787,6 +1952,157 @@
               "required": ["by", "groups"],
               "additionalProperties": false
             },
+            "estimatedCapacity": {
+              "description": "The rows of the split whose cartridge has an estimated capacity (a capacity record of provenance kind `derived`), present when there are any. They are left out of `overall`, the groups, the fit, the interval and the paired change, where they count as `estimatedCapacity`; the interval coverage here uses the half width of the other rows.",
+              "type": "object",
+              "properties": {
+                "rows": {
+                  "type": "object",
+                  "properties": {
+                    "inSplit": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991,
+                      "description": "Rows of the split in this group."
+                    },
+                    "used": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991,
+                      "description": "Rows the model gave a result for."
+                    },
+                    "notUsed": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string",
+                        "enum": [
+                          "unknownCartridge",
+                          "unknownBullet",
+                          "unknownPowder",
+                          "noPowderModel",
+                          "noCaseCapacity",
+                          "noBulletLength",
+                          "noBulletShape",
+                          "noBarrelLength",
+                          "missingCartridgeValue",
+                          "modelRefused",
+                          "noBulletDrag",
+                          "estimatedCapacity"
+                        ]
+                      },
+                      "additionalProperties": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "description": "Rows not used, by reason; a reason without rows is left out."
+                    }
+                  },
+                  "required": ["inSplit", "used", "notUsed"],
+                  "additionalProperties": false
+                },
+                "velocity": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "median": {
+                          "type": "number",
+                          "description": "Median of the absolute relative error, as a fraction."
+                        },
+                        "p90": {
+                          "type": "number",
+                          "description": "90th percentile of the absolute relative error, as a fraction."
+                        }
+                      },
+                      "required": ["median", "p90"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Absolute relative error of the muzzle velocity over the used rows; null without one."
+                },
+                "pressure": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "median": {
+                          "type": "number",
+                          "description": "Median of the absolute relative error, as a fraction."
+                        },
+                        "p90": {
+                          "type": "number",
+                          "description": "90th percentile of the absolute relative error, as a fraction."
+                        },
+                        "rows": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991,
+                          "description": "Used rows that print a peak pressure."
+                        }
+                      },
+                      "required": ["median", "p90", "rows"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+                },
+                "pressureByBasis": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "median": {
+                        "type": "number",
+                        "description": "Median of the absolute relative error, as a fraction."
+                      },
+                      "p90": {
+                        "type": "number",
+                        "description": "90th percentile of the absolute relative error, as a fraction."
+                      },
+                      "rows": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      }
+                    },
+                    "required": ["median", "p90", "rows"],
+                    "additionalProperties": false
+                  },
+                  "description": "The pressure error per basis, the measuring method a row prints (`transducer`, `case-contact`, `piezo`, ..., `unstated` without one); a basis is never compared with another. A basis without a used row in bar is left out."
+                },
+                "interval": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "coverage": {
+                          "type": "number",
+                          "description": "Share of the used rows whose printed velocity is inside the interval."
+                        }
+                      },
+                      "required": ["coverage"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Coverage of the 90 % interval; null without rows or without an interval."
+                }
+              },
+              "required": ["rows", "velocity", "pressure", "pressureByBasis", "interval"],
+              "additionalProperties": false
+            },
             "notInFittedSet": {
               "description": "Powder not in the fitted set, with `--leave-one-powder-out`: the rows of each powder that has interior parameters, run without them. A powder without rows has no value, so its rows count as `noPowderModel` (a row with an unknown cartridge or bullet as `unknownCartridge` or `unknownBullet`, which are checked first) and the errors and the coverage are null.",
               "type": "object",
@@ -1821,7 +2137,8 @@
                           "noBarrelLength",
                           "missingCartridgeValue",
                           "modelRefused",
-                          "noBulletDrag"
+                          "noBulletDrag",
+                          "estimatedCapacity"
                         ]
                       },
                       "additionalProperties": {
@@ -2133,7 +2450,8 @@
                           "noBarrelLength",
                           "missingCartridgeValue",
                           "modelRefused",
-                          "noBulletDrag"
+                          "noBulletDrag",
+                          "estimatedCapacity"
                         ]
                       },
                       "additionalProperties": {
@@ -2287,7 +2605,8 @@
                             "noBarrelLength",
                             "missingCartridgeValue",
                             "modelRefused",
-                            "noBulletDrag"
+                            "noBulletDrag",
+                            "estimatedCapacity"
                           ]
                         },
                         "additionalProperties": {
@@ -2443,7 +2762,8 @@
                             "noBarrelLength",
                             "missingCartridgeValue",
                             "modelRefused",
-                            "noBulletDrag"
+                            "noBulletDrag",
+                            "estimatedCapacity"
                           ]
                         },
                         "additionalProperties": {
@@ -2607,7 +2927,8 @@
                                 "noBarrelLength",
                                 "missingCartridgeValue",
                                 "modelRefused",
-                                "noBulletDrag"
+                                "noBulletDrag",
+                                "estimatedCapacity"
                               ]
                             },
                             "additionalProperties": {
@@ -2728,6 +3049,157 @@
               "required": ["by", "groups"],
               "additionalProperties": false
             },
+            "estimatedCapacity": {
+              "description": "The rows of the split whose cartridge has an estimated capacity (a capacity record of provenance kind `derived`), present when there are any. They are left out of `overall`, the groups, the fit, the interval and the paired change, where they count as `estimatedCapacity`; the interval coverage here uses the half width of the other rows.",
+              "type": "object",
+              "properties": {
+                "rows": {
+                  "type": "object",
+                  "properties": {
+                    "inSplit": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991,
+                      "description": "Rows of the split in this group."
+                    },
+                    "used": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991,
+                      "description": "Rows the model gave a result for."
+                    },
+                    "notUsed": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string",
+                        "enum": [
+                          "unknownCartridge",
+                          "unknownBullet",
+                          "unknownPowder",
+                          "noPowderModel",
+                          "noCaseCapacity",
+                          "noBulletLength",
+                          "noBulletShape",
+                          "noBarrelLength",
+                          "missingCartridgeValue",
+                          "modelRefused",
+                          "noBulletDrag",
+                          "estimatedCapacity"
+                        ]
+                      },
+                      "additionalProperties": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "description": "Rows not used, by reason; a reason without rows is left out."
+                    }
+                  },
+                  "required": ["inSplit", "used", "notUsed"],
+                  "additionalProperties": false
+                },
+                "velocity": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "median": {
+                          "type": "number",
+                          "description": "Median of the absolute relative error, as a fraction."
+                        },
+                        "p90": {
+                          "type": "number",
+                          "description": "90th percentile of the absolute relative error, as a fraction."
+                        }
+                      },
+                      "required": ["median", "p90"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Absolute relative error of the muzzle velocity over the used rows; null without one."
+                },
+                "pressure": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "median": {
+                          "type": "number",
+                          "description": "Median of the absolute relative error, as a fraction."
+                        },
+                        "p90": {
+                          "type": "number",
+                          "description": "90th percentile of the absolute relative error, as a fraction."
+                        },
+                        "rows": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991,
+                          "description": "Used rows that print a peak pressure."
+                        }
+                      },
+                      "required": ["median", "p90", "rows"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+                },
+                "pressureByBasis": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "median": {
+                        "type": "number",
+                        "description": "Median of the absolute relative error, as a fraction."
+                      },
+                      "p90": {
+                        "type": "number",
+                        "description": "90th percentile of the absolute relative error, as a fraction."
+                      },
+                      "rows": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      }
+                    },
+                    "required": ["median", "p90", "rows"],
+                    "additionalProperties": false
+                  },
+                  "description": "The pressure error per basis, the measuring method a row prints (`transducer`, `case-contact`, `piezo`, ..., `unstated` without one); a basis is never compared with another. A basis without a used row in bar is left out."
+                },
+                "interval": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "coverage": {
+                          "type": "number",
+                          "description": "Share of the used rows whose printed velocity is inside the interval."
+                        }
+                      },
+                      "required": ["coverage"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Coverage of the 90 % interval; null without rows or without an interval."
+                }
+              },
+              "required": ["rows", "velocity", "pressure", "pressureByBasis", "interval"],
+              "additionalProperties": false
+            },
             "notInFittedSet": {
               "description": "Powder not in the fitted set, with `--leave-one-powder-out`: the rows of each powder that has interior parameters, run without them. A powder without rows has no value, so its rows count as `noPowderModel` (a row with an unknown cartridge or bullet as `unknownCartridge` or `unknownBullet`, which are checked first) and the errors and the coverage are null.",
               "type": "object",
@@ -2762,7 +3234,8 @@
                           "noBarrelLength",
                           "missingCartridgeValue",
                           "modelRefused",
-                          "noBulletDrag"
+                          "noBulletDrag",
+                          "estimatedCapacity"
                         ]
                       },
                       "additionalProperties": {

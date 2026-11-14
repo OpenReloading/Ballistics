@@ -42,6 +42,7 @@ function publishedLines(p: VerifyResult['published']) {
 export function verifyTable(r: VerifyResult): string {
   const groups = [
     rowsOf('all', r.overall),
+    ...(r.estimatedCapacity ? [rowsOf('estimated capacity', r.estimatedCapacity)] : []),
     ...Object.entries(r.byFamily).map(([k, m]) => rowsOf(`family ${k}`, m)),
     ...Object.entries(r.byPowder).map(([k, m]) => rowsOf(`powder ${k}`, m)),
     ...Object.entries(r.grouped?.groups ?? {}).map(([k, m]) => rowsOf(`${r.grouped?.by} ${k}`, m)),

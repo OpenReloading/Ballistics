@@ -59,3 +59,12 @@ describe('pairedChange', () => {
     )
   })
 })
+
+describe('pairedChange with estimated capacities', () => {
+  it('leaves out a row whose capacity is estimated on either side', () => {
+    const estimated = (x: RowError): RowError => ({ ...x, capacity: 'estimated' })
+    const baseline = [e(0, 'a', 0.01), e(1, 'a', 0.02), estimated(e(2, 'b', 0.5))]
+    const candidate = [e(0, 'a', 0.01), estimated(e(1, 'a', 0.9)), estimated(e(2, 'b', 0.4))]
+    expect(pairedChange(baseline, candidate).velocity).toMatchObject({ rows: 1, cartridges: 1 })
+  })
+})

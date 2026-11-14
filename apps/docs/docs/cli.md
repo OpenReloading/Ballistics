@@ -67,7 +67,7 @@ A problem in the file is reported as file, line and column with a reason, never 
 
 A table of loads customers sent (`producedBy: customer`) is never read. Charges that give no row are counted by reason in `published.skipped`: `noVelocity`, `customerTable`, `noPowderRecord`, `noCartridge` (no cartridge record). `published` also carries the number of files and rows. `inputs.rows` is the SHA-256 over the SHA-256 of each file's JSON, in cartridge and file order.
 
-The records are read with `readRecords` of the repository's catalog reader (`tools/src/catalog/records.ts`): `--records <dir>` (repeatable, read as one set; `BALLISTICS_RECORDS` is a `:`-separated list), by default the records of the catalog package. The problems the reader reports (a record that fails its schema is left out, a duplicate id is kept) are counted in a note on stderr. The default rows path is `BALLISTICS_ROWS`; `--rows -` reads one rows file from standard input. A cartridge's chamber volume is its water capacity (a capacity record, else a case record with a stated capacity, the first by id) less the volume of the seated bullet, as the [seating](models/case-capacity.md) computes it.
+The records are read with `readRecords` of the repository's catalog reader (`tools/src/catalog/records.ts`): `--records <dir>` (repeatable, read as one set; `BALLISTICS_RECORDS` is a `:`-separated list), by default the records of the catalog package. The problems the reader reports (a record that fails its schema is left out, a duplicate id is kept) are counted in a note on stderr. The default rows path is `BALLISTICS_ROWS`; `--rows -` reads one rows file from standard input. A cartridge's chamber volume is its water capacity (a capacity record, else a case record with a stated capacity, the first by id) less the volume of the seated bullet, as the [seating](models/case-capacity.md) computes it. A capacity record of provenance kind `derived` is an estimate: it counts only for a cartridge with neither another capacity record nor a case with a capacity ([below](#estimated-case-capacity)).
 
 ## Split
 
@@ -81,7 +81,7 @@ All errors are absolute relative errors, as fractions: for the velocity $|v_\tex
 
 The 90 % interval has the half width $h$, the 90th percentile of the velocity error of the used training rows of the same model; the interval of a row is the model velocity times $(1 \pm h)$, so a row is inside when $|v_\text{model} - v_\text{printed}| / v_\text{model} \le h$ (the distance is taken against the model's velocity, not the printed one, so it differs from the error above). The coverage is the share of used rows inside. It comes from the training split and is not a prediction interval of the model's inputs.
 
-Rows that are not used are counted by reason: `unknownCartridge`, `unknownBullet`, `unknownPowder`, `noPowderModel` (no interior parameters), `noCaseCapacity`, `noBulletLength`, `noBulletShape`, `noBarrelLength`, `missingCartridgeValue`, `modelRefused`, `noBulletDrag` (a velocity printed at a distance whose bullet has no drag to fly back to the muzzle, see below).
+Rows that are not used are counted by reason: `unknownCartridge`, `unknownBullet`, `unknownPowder`, `noPowderModel` (no interior parameters), `noCaseCapacity`, `noBulletLength`, `noBulletShape`, `noBarrelLength`, `missingCartridgeValue`, `modelRefused`, `noBulletDrag` (a velocity printed at a distance whose bullet has no drag to fly back to the muzzle, see below), `estimatedCapacity` (the case capacity is an estimate; the row is reported on its own, [below](#estimated-case-capacity)).
 
 ### Pressure by basis
 
@@ -104,6 +104,12 @@ A powder without rows gets no value, not an estimate, as the app refuses a powde
 `compare` adds `paired` when both sides have the error of each row: two models, or a baseline saved with `verify --per-row`. The `change` of the metrics takes each side over the rows it used, which differ when one side uses fewer rows; `paired` takes both over the rows both gave a result for (for pressure, those that print one in bar), matched by their position among the rows read. For velocity and pressure it gives those rows, their cartridges, and for the median and the P90 of the absolute error each side's value, the change (candidate minus baseline) and its standard error: the standard deviation of the change over 2,000 bootstrap draws with seed 1 ([Efron 1982](bibliography.md#efron-1982)). A draw takes as many cartridges as there are, with replacement, each with all its rows, because the rows of one cartridge share its errors and are not independent. The table prints one line per quantity, in percentage points.
 
 `verify --per-row` adds `rows` to the JSON (the table leaves them out): for each used row of the split its position among the rows read (`row`, from 0), its cartridge and the signed relative error of the velocity and, where the row prints one in bar, of the pressure, (model - printed) / printed. It holds a value per row: a per-row result of rows that are not yours to publish stays local, as the rows do.
+
+### Estimated case capacity
+
+`estimate-capacities --out <dir> [--records <dir>]` writes a capacity record of provenance kind `derived` to `<dir>/capacities/` (a folder that must not exist yet) for each cartridge record with a case outline and neither a capacity record nor a case with a capacity. The estimate is the volume of the cones through the outline, with the diameter P1 at the head, P2 at L1, H2 at L2 and the mouth (H1, else H2, else G1) at L3, cartridge values first, else the chamber's, times a fill factor. The factor is the median of water capacity over outline volume of the cartridges with a capacity record that is not an estimate; it accounts for the case wall and head, which the outside outline includes. The command prints the factor, its number of cartridges and the root mean square of the leave-one-out error, the relative error each of those cartridges gets from the median of the others.
+
+Passed as one more `--records` root, the estimates give a chamber volume to rows that would otherwise be `noCaseCapacity`. They are never mixed with the other rows: they count as `estimatedCapacity` among the rows not used of every group, and `estimatedCapacity` of the result holds their own metrics (the table line "estimated capacity"), with the interval of the other rows. With `--per-row` their rows carry `capacity: "estimated"`, and the paired change leaves them out. A fit reads only capacities that are not estimates, so the other rows give the same figures with and without the estimates.
 
 ## Fit
 
@@ -177,6 +183,8 @@ The code of the evaluation itself (rows, split, the metrics and the percentiles,
 ## Commands
 
 `verify` takes no `--baseline` or `--candidate`, `compare` takes no `--model` or `--per-row`, `fit` takes only `--rows`, `--records`, `--model`, `--velocity-sigma`, `--exponent`, `--pressure-sigma`, `--pressure-factor`, `--energy`, `--json` and `--table`: another option is bad input, as is `--velocity-sigma`, `--exponent`, `--pressure-sigma`, `--pressure-factor` or `--energy` in a `verify` or `compare` without `--params fit-on-training`. `--exponent` takes `family` only, `--energy` takes `prior` only, `--pressure-factor` takes `basis`, `table`, `cartridge` or `table-cartridge` and needs `--pressure-sigma`. `--pressure-sigma` combines with `--exponent family` ([above](#pressure-rows)) and not with `--energy prior`: a run with that pair is bad input. `--exponent family` and `--energy prior` combine ([above](#energy-from-a-prior)).
+
+`estimate-capacities` takes only `--out` and `--records` ([above](#estimated-case-capacity)).
 
 `verify --rows <path> [--model m3|<module>]` evaluates one model on the split. `m3` is the model of the installed `@rangefoundry/ballistics`; a module path is a file that exports `interior(load, options?)` with the signature of its `interior`.
 

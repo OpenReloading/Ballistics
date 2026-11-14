@@ -2,6 +2,7 @@ import { statSync } from 'node:fs'
 import type {
   Bullet,
   Cartridge,
+  CaseCapacity,
   CatalogueCase,
   CatalogueCaseCapacity,
   Powder,
@@ -11,7 +12,7 @@ import { compareKeys, parseRef } from '@rangefoundry/schema'
 import { readRecords } from '@rangefoundry/tools/catalog'
 import { UsageError } from './errors.ts'
 
-/** The records a run reads, by id; a cartridge's capacity and case (one with a stated water capacity) are the first by id. */
+/** The records a run reads, by id; a cartridge's capacity and case (one with a stated water capacity) are the first by id, an estimated capacity only for a cartridge with neither. */
 export interface Records {
   cartridges: Map<string, Cartridge>
   bullets: Map<string, Bullet>
@@ -36,6 +37,16 @@ function firstPerCartridge<T extends { id: string; cartridge: string }>(list: T[
   return out
 }
 
+/** Whether a capacity is an estimate (provenance kind `derived`, as `estimate-capacities` writes it), not a measured or published figure. */
+export const isEstimated = (capacity: CaseCapacity): boolean =>
+  capacity.provenance?.kind === 'derived'
+
+/** `records` without their estimated capacities, which a fit does not read. */
+export const withoutEstimates = (records: Records): Records => ({
+  ...records,
+  capacities: new Map([...records.capacities].filter(([, c]) => !isEstimated(c))),
+})
+
 /** Reads the records of `roots` as one set, or the records of the catalog package without roots; a `UsageError` for a root that is not a folder. */
 export function readBundle(roots: readonly string[]) {
   for (const [i, root] of roots.entries())
@@ -50,12 +61,16 @@ export function readBundle(roots: readonly string[]) {
 /** The records of {@link readBundle} by id. */
 export function loadRecords(roots: readonly string[]): Records {
   const { bundle, errors, publishedLoads } = readBundle(roots)
+  const capacities = firstPerCartridge(bundle.capacities.filter((c) => !isEstimated(c)))
+  const cases = firstPerCartridge(bundle.cases.filter((c) => c.waterCapacity))
+  for (const [cartridge, estimate] of firstPerCartridge(bundle.capacities.filter(isEstimated)))
+    if (!capacities.has(cartridge) && !cases.has(cartridge)) capacities.set(cartridge, estimate)
   return {
     cartridges: byId(bundle.cartridges),
     bullets: byId(bundle.bullets),
     powders: byId(bundle.powders),
-    capacities: firstPerCartridge(bundle.capacities),
-    cases: firstPerCartridge(bundle.cases.filter((c) => c.waterCapacity)),
+    capacities,
+    cases,
     published: publishedLoads,
     issues: errors.length,
   }
