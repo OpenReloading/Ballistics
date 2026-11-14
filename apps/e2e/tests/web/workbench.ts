@@ -81,13 +81,18 @@ export async function openSavedLoad(page: Page, language: 'en' | 'de' = 'en') {
     name: de ? /^Gespeicherte Laborierungen/ : /^Saved loads/,
   })
   const name = page.getByRole('button', { name: fixtureLoad.name, exact: true })
-  // retried: the menu can close again before the item's click while the page still hydrates
+  const drawer = page.getByRole('dialog', {
+    name: de ? 'Gespeicherte Laborierungen' : 'Saved loads',
+  })
+  // retried: the menu can close again before the item's click while the page still hydrates; an open drawer's overlay blocks the menu, so then only its list is awaited
   await expect(async () => {
-    if (!(await item.isVisible()))
-      await (await barButton(page, de ? 'Öffnen' : 'Open')).click({ timeout: 1000 })
-    await item.click({ timeout: 1000 })
-    await name.waitFor({ timeout: 1000 })
-  }).toPass({ timeout: 10_000 })
+    if (!(await drawer.isVisible())) {
+      if (!(await item.isVisible()))
+        await (await barButton(page, de ? 'Öffnen' : 'Open')).click({ timeout: 1000 })
+      await item.click({ timeout: 1000 })
+    }
+    await name.waitFor({ timeout: 2000 })
+  }).toPass({ timeout: 15_000 })
   await name.click()
   // complete once its bullet is seated: volume and travel follow the seating
   await expect(
