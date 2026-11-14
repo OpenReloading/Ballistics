@@ -1,7 +1,10 @@
-import type { Provenance } from '@rangefoundry/schema'
+import { detailedFields, type Provenance } from '@rangefoundry/schema'
 import { isObject } from './json-object.ts'
 
-/** Fields that name a record rather than carry data, and need no source of their own. */
+/** The kinds whose fields the schema sorts into basic and detailed; every field of a manufacturer is basic. */
+export type FieldClassKind = 'bullet' | 'powder' | 'manufacturer'
+
+/** Of the kinds without field classes, the fields that name a record rather than carry data, and need no source of their own. */
 const identity = new Set([
   'id',
   'origin',
@@ -28,14 +31,33 @@ function leaves(value: unknown, path: string, out: string[]) {
     leaves(child, path ? `${path}.${key}` : key, out)
 }
 
-function hasPath(record: unknown, path: string) {
+const missing = Symbol('missing')
+
+/** The value at the dot path `path` of `record`, or `missing` where a key on the way is absent. */
+function valueAt(record: unknown, path: string): unknown {
   let node: unknown = record
   for (const key of path.split('.')) {
-    if (!isObject(node) || !(key in node)) return false
+    if (!isObject(node) || !(key in node)) return missing
     node = node[key]
   }
-  return true
+  return node
 }
+
+/** The fields of `record` that need a covering source: the detailed ones where its kind has field classes, else each one outside the identity set. */
+function sourcedFields(record: object, kind: FieldClassKind | undefined): string[] {
+  const paths: string[] = []
+  if (kind === 'manufacturer') return paths
+  if (kind) {
+    for (const path of detailedFields(kind, record)) leaves(valueAt(record, path), path, paths)
+    return paths
+  }
+  for (const [key, value] of Object.entries(record)) {
+    if (!identity.has(key) && key !== 'provenance') leaves(value, key, paths)
+  }
+  return paths
+}
+
+const noSource = (path: string) => `field ${path} has no source`
 
 type Sourced = { provenance: Provenance }
 
@@ -43,32 +65,35 @@ type Sourced = { provenance: Provenance }
 function missingFields(record: Sourced): string[] {
   return record.provenance.sources.flatMap((source) =>
     (source.fields ?? [])
-      .filter((field) => !hasPath(record, field))
+      .filter((field) => valueAt(record, field) === missing)
       .map((field) => `source "${source.title}" names missing field ${field}`),
   )
 }
 
-/** Every data field is supported by a source; a source without `fields` supports them all. */
-function uncoveredFields(record: Sourced): string[] {
-  const { sources } = record.provenance
+/** Each field of `paths` is supported by a source; a source without `fields` supports them all. */
+function uncoveredFields(paths: string[], sources: Provenance['sources']): string[] {
   if (sources.some((s) => !s.fields)) return []
-  const paths: string[] = []
-  for (const [key, value] of Object.entries(record)) {
-    if (!identity.has(key) && key !== 'provenance') leaves(value, key, paths)
-  }
   const covered = sources.flatMap((s) => s.fields ?? [])
   return paths
     .filter((path) => !covered.some((f) => path === f || path.startsWith(`${f}.`)))
-    .map((path) => `field ${path} has no source`)
+    .map(noSource)
 }
 
 /**
- * Checks that every data field is supported by a source and that every `fields` entry names a
- * field of the record.
+ * Checks that every field that needs a source has one, and that every `fields` entry names a field
+ * of the record. Of a bullet or powder (`kind`) only the detailed fields need a source and of a
+ * manufacturer none; of the other kinds every field outside the identity set does. A record without
+ * provenance passes when none of its fields needs a source.
  */
-export function checkCoverage(record: { provenance?: Provenance | undefined }): string[] {
-  // fails closed: no basic record enters the catalog before the field-class gate
-  if (!record.provenance) return ['needs provenance']
-  const sourced = { ...record, provenance: record.provenance }
-  return [...missingFields(sourced), ...uncoveredFields(sourced)]
+export function checkCoverage(
+  record: { provenance?: Provenance | undefined },
+  kind?: FieldClassKind,
+): string[] {
+  const paths = sourcedFields(record, kind)
+  const { provenance } = record
+  if (!provenance) return paths.map(noSource)
+  return [
+    ...missingFields({ ...record, provenance }),
+    ...uncoveredFields(paths, provenance.sources),
+  ]
 }

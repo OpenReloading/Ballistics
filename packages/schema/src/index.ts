@@ -8,7 +8,12 @@ export * from './chrono-session.ts'
 export * from './competition-order.ts'
 export * from './event-type.ts'
 export * from './federation.ts'
-export { bulletBasicFields, detailedFields, powderBasicFields } from './field-classes.ts'
+export {
+  bulletBasicFields,
+  detailedFields,
+  makerSourceFields,
+  powderBasicFields,
+} from './field-classes.ts'
 export * from './firearm.ts'
 export * from './firing.ts'
 export * from './ids.ts'
