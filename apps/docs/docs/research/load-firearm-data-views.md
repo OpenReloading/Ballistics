@@ -28,25 +28,25 @@ No model equations. The one sum the planner computes, never stored:
 
 Verdict per view, with the confidence of each:
 
-| View                                          | Needs entry                | Verdict                                                | Confidence |
-| --------------------------------------------- | -------------------------- | ------------------------------------------------------ | ---------- |
-| Loads per firearm, firearm of a load          | no                         | kept: line and column                                  | high       |
-| Gaps and cartridge mismatches                 | no                         | kept: load notes and a count                           | high       |
-| Firearm to discipline filter                  | no                         | kept: filter by caliber class                          | medium     |
-| Dope card                                     | no                         | kept: range cards of all loads of a firearm            | medium     |
-| Loads side by side                            | no                         | kept: compare page                                     | medium     |
-| Data quality, record default against measured | no                         | kept: load notes                                       | medium     |
-| Stale or untested loads                       | no                         | kept: sessions and last session                        | high       |
-| CSV export                                    | no                         | kept                                                   | high       |
-| Model against measurement                     | no                         | exists                                                 | high       |
-| Enough for the match                          | one number at that moment  | kept as a stateless planner                            | medium     |
-| Rounds made, stored                           | every loading session      | ruled out                                              | high       |
-| Rounds fired, stored or decremented           | every range day            | ruled out                                              | high       |
-| Rounds on hand, decremented                   | every range day            | ruled out; a typed dated number is an open question    | medium     |
-| Barrel life against rounds made               | every loading session      | ruled out                                              | medium     |
-| Velocity and group over time                  | many logged sessions       | ruled out                                              | medium     |
-| Charge ladder results across seasons          | several seasons of ladders | ruled out                                              | medium     |
-| Yearly summary                                | every range day            | ruled out here, moved to the shooting log spike        | high       |
+| View                                          | Needs entry                | Verdict                                             | Confidence |
+| --------------------------------------------- | -------------------------- | --------------------------------------------------- | ---------- |
+| Loads per firearm, firearm of a load          | no                         | kept: line and column                               | high       |
+| Gaps and cartridge mismatches                 | no                         | kept: load notes and a count                        | high       |
+| Firearm to discipline filter                  | no                         | kept: filter by caliber class                       | medium     |
+| Dope card                                     | no                         | kept: range cards of all loads of a firearm         | medium     |
+| Loads side by side                            | no                         | kept: compare page                                  | medium     |
+| Data quality, record default against measured | no                         | kept: load notes                                    | medium     |
+| Stale or untested loads                       | no                         | kept: sessions and last session                     | high       |
+| CSV export                                    | no                         | kept                                                | high       |
+| Model against measurement                     | no                         | exists                                              | high       |
+| Enough for the match                          | one number at that moment  | kept as a stateless planner                         | medium     |
+| Rounds made, stored                           | every loading session      | ruled out                                           | high       |
+| Rounds fired, stored or decremented           | every range day            | ruled out                                           | high       |
+| Rounds on hand, decremented                   | every range day            | ruled out; a typed dated number is an open question | medium     |
+| Barrel life against rounds made               | every loading session      | ruled out                                           | medium     |
+| Velocity and group over time                  | many logged sessions       | ruled out                                           | medium     |
+| Charge ladder results across seasons          | several seasons of ladders | ruled out                                           | medium     |
+| Yearly summary                                | every range day            | ruled out here, moved to the shooting log spike     | high       |
 
 Totals: 10 views kept (one of them exists), 7 ruled out, 0 stored-shape changes, 4 open questions (rounds on hand, the planner, the firearm round count with its age, the place of the derived views).
 
