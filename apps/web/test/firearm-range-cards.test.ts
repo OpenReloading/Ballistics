@@ -1,4 +1,4 @@
-import type { Bullet, UserRecord } from '@open-reloading/schema'
+import type { Bullet, UserRecord } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { bulletDrag } from '../src/lib/bullet.ts'
 import { cardResult, firearmCardPlans } from '../src/lib/firearm-range-cards.ts'

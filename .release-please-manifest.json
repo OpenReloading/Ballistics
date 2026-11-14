@@ -1,6 +1,6 @@
 {
   "packages/schema": "0.0.7",
-  "packages/drawing": "0.0.6",
+  "packages/svg-drawings": "0.0.6",
   "packages/importers": "0.0.7",
   "packages/catalog": "0.0.7",
   "packages/api": "0.0.7",

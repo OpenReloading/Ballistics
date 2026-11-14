@@ -1,4 +1,4 @@
-import type { TargetSheet } from '@open-reloading/schema'
+import type { TargetSheet } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { frameOf, viewToTarget } from '../src/lib/target-editor.ts'
 import { applyMatrix, type Point, solveHomography } from '../src/lib/target-geometry.ts'

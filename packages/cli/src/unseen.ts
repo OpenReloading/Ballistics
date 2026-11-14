@@ -1,4 +1,4 @@
-import type { Powder } from '@open-reloading/schema'
+import type { Powder } from '@rangefoundry/schema'
 import { percentile } from './stats.ts'
 
 /** The powder family: propellant base and grain form of the record, `unspecified` where it has none. */

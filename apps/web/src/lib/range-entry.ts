@@ -1,5 +1,5 @@
-import type { Load, SessionRecord, UserRecord } from '@open-reloading/schema'
-import { chronoSession, fromSi, toSi, userRecord } from '@open-reloading/schema'
+import type { Load, SessionRecord, UserRecord } from '@rangefoundry/schema'
+import { chronoSession, fromSi, toSi, userRecord } from '@rangefoundry/schema'
 import { ambiguousMessage, parseNumber, untranslated } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
 import { stringStats } from './string-stats.ts'

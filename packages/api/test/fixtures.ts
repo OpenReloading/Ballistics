@@ -3,7 +3,7 @@ import {
   lbPerSqInToKgPerSqM,
   type Projectile,
   type TrajectoryInput,
-} from '@open-reloading/ballistics'
+} from '@rangefoundry/ballistics'
 import {
   type AnalysisKey,
   analysisKinds,
@@ -11,7 +11,7 @@ import {
   ladderStepKinds,
   userDataFormat,
   userDataVersion,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 
 export { bundle } from '../../catalog/test/bundle.ts'
 

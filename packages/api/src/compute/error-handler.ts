@@ -1,5 +1,5 @@
-/** The error handler of the compute route plugins: the answers of `errorAnswer` of `@open-reloading/use-cases`. */
-import { errorAnswer } from '@open-reloading/use-cases'
+/** The error handler of the compute route plugins: the answers of `errorAnswer` of `@rangefoundry/use-cases`. */
+import { errorAnswer } from '@rangefoundry/use-cases'
 import type { FastifyError, FastifyReply, FastifyRequest } from 'fastify'
 
 /** A Fastify error handler that answers with a status code and a JSON body. */

@@ -1,4 +1,4 @@
-import { type UserRecord, userRecord } from '@open-reloading/schema'
+import { type UserRecord, userRecord } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { readCsrLoad, readGrtLoad } from '../src/index.ts'
 import { defined } from './defined.ts'
@@ -98,7 +98,7 @@ describe('readCsrLoad: the load, its components and its series', () => {
     const session = ofKind(records, 'session')
     expect(session.name).toBe('Testcal ladder')
     expect(session.data.device).toEqual({ kind: 'other' })
-    expect(session.data.provenance.kind).toBe('measured')
+    expect(session.data.provenance?.kind).toBe('measured')
     expect(session.data.strings).toEqual([
       {
         load: `user:${load.id}`,

@@ -4,7 +4,7 @@ import {
   type SessionRecord,
   toSi,
   type UserRecord,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import { type Message, msg } from '../i18n/translate.ts'
 import { bulletDrag } from './bullet.ts'
 import { sightOptions } from './firearm.ts'

@@ -1,0 +1,67 @@
+{
+  "name": "@rangefoundry/svg-drawings",
+  "version": "0.0.6",
+  "description": "Figure models of cartridges, bullets, seating and target faces, without a renderer.",
+  "keywords": [
+    "reloading",
+    "ballistics",
+    "cartridge",
+    "drawing",
+    "svg"
+  ],
+  "license": "MIT",
+  "homepage": "https://openreloading.github.io/Ballistics/docs/libraries/drawing/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenReloading/Ballistics.git",
+    "directory": "packages/svg-drawings"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./cartridge": {
+      "types": "./dist/cartridge/index.d.ts",
+      "default": "./dist/cartridge/index.js"
+    },
+    "./bullet": {
+      "types": "./dist/bullet/index.d.ts",
+      "default": "./dist/bullet/index.js"
+    },
+    "./seating": {
+      "types": "./dist/seating/index.d.ts",
+      "default": "./dist/seating/index.js"
+    },
+    "./target": {
+      "types": "./dist/target/index.d.ts",
+      "default": "./dist/target/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.map",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@rangefoundry/catalog": "workspace:*",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

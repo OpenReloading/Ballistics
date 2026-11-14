@@ -1,5 +1,5 @@
 {
-  "name": "@open-reloading/design-tokens",
+  "name": "@rangefoundry/design-tokens",
   "version": "0.0.0",
   "private": true,
   "description": "The Brand palette and sizes as CSS variables, typed constants and the Mantine theme.",

@@ -1,5 +1,5 @@
 /** The rounds a match of one discipline takes, from the shot counts and sighters of its stages. */
-import type { DisciplineRules, TargetMapping } from '@open-reloading/schema'
+import type { DisciplineRules, TargetMapping } from '@rangefoundry/schema'
 
 /** What a discipline's records give per event: shots and sighters summed over its stages. */
 export interface MatchCourse {

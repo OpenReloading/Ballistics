@@ -1,6 +1,6 @@
 'use client'
 
-import type { TargetFace, TargetMapping } from '@open-reloading/schema'
+import type { TargetFace, TargetMapping } from '@rangefoundry/schema'
 import { msg } from '../i18n/translate.ts'
 import { emptyDirectory, writeDirectory } from '../lib/directory.ts'
 import type { FederationListItem } from '../lib/disciplines.ts'

@@ -1,6 +1,6 @@
 'use client'
 
-import type { CatalogueCase } from '@open-reloading/schema'
+import type { CatalogueCase } from '@rangefoundry/schema'
 import { msg } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { CartridgeDetail } from '../lib/api-types.ts'

@@ -12,7 +12,7 @@ M3 interior model, bore resistance: should a typed or record engraving ramp star
 
 ## Method
 
-The workbench's run gets the seated bullet's jump (seating figure, `packages/drawing/src/seating/seating.ts`, `jumpOf`) and moves every point of the engraving profile by it, with the first point at the jump, or at 0 for a jump of 0 or less. A seating ladder moves the ramp of each step to that step's jump. Without a ramp nothing changes and the result notes say so. No default ramp is added.
+The workbench's run gets the seated bullet's jump (seating figure, `packages/svg-drawings/src/seating/seating.ts`, `jumpOf`) and moves every point of the engraving profile by it, with the first point at the jump, or at 0 for a jump of 0 or less. A seating ladder moves the ramp of each step to that step's jump. Without a ramp nothing changes and the result notes say so. No default ramp is added.
 
 Comparison: the workbench example load (`apps/web/src/lib/example-data.ts`, `exampleInterior`) with two typed ramps, at jumps of -0.3, 0, 0.5, 1.0, 1.5 and 3.0 mm, and without a ramp. Metric: peak breech pressure and muzzle velocity of `interior` (`packages/ballistics/src/interior/model.ts`). Accept rule: a jammed load and the same load with a jump give different results with a ramp, and identical results without one.
 

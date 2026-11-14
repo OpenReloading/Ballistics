@@ -1,4 +1,4 @@
-import { type Diagnostic, InputError as StatisticsInputError } from '@open-reloading/statistics'
+import { type Diagnostic, InputError as StatisticsInputError } from '@rangefoundry/statistics'
 
 /** Why a use case refuses a request: a record without a value the run needs, or a result it cannot answer. */
 export type UseCaseIssue =
@@ -15,7 +15,7 @@ export type UseCaseIssue =
   | Diagnostic<'bulletCoefficientsWithoutBands', { bullet: string; count: number; model: string }>
   | Diagnostic<'ladderChargeNotAboveZero', { charge: number }>
 
-/** The `InputError` of `@open-reloading/statistics`, raised with an issue of this package. */
+/** The `InputError` of `@rangefoundry/statistics`, raised with an issue of this package. */
 export const InputError: new (issue: UseCaseIssue) => StatisticsInputError = StatisticsInputError
 
 /** A record id of a request that the catalogue does not hold. */

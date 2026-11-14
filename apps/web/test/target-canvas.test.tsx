@@ -1,4 +1,4 @@
-import type { ShotGroup, TargetSheet } from '@open-reloading/schema'
+import type { ShotGroup, TargetSheet } from '@rangefoundry/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { TargetCanvas } from '../src/components/target-canvas.tsx'

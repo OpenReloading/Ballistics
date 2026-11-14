@@ -1,5 +1,5 @@
 /** The warnings of a load file read as messages; loaded with the load-file readers, so other pages carry none of them. */
-import type { LoadDiagnostic } from '@open-reloading/importers'
+import type { LoadDiagnostic } from '@rangefoundry/importers'
 import { type Message, msg } from '../i18n/translate.ts'
 import type { WordedWarning } from './user-data.ts'
 

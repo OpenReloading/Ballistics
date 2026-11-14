@@ -13,8 +13,8 @@ import {
   Tooltip,
 } from '@mantine/core'
 import { MagnifyingGlass } from '@phosphor-icons/react'
-import Link from 'next/link'
 import { Fragment, type KeyboardEvent, type ReactNode, useId, useState } from 'react'
+import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { type Translator, translator } from '../i18n/translate.ts'
 import {

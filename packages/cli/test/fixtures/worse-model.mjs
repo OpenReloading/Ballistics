@@ -1,4 +1,4 @@
-import { interior as core } from '@open-reloading/ballistics'
+import { interior as core } from '@rangefoundry/ballistics'
 
 /** The core model with every muzzle velocity 10 % too high. */
 export function interior(load, options) {

@@ -1,4 +1,4 @@
-import { type CatalogueSession, catalogueSession } from '@open-reloading/schema'
+import { type CatalogueSession, catalogueSession } from '@rangefoundry/schema'
 import type { ChronoImport } from '../src/index.ts'
 import { defined } from './defined.ts'
 

@@ -16,7 +16,7 @@ import {
   recordBoreArea,
   recordResistance,
   ValueError,
-} from '@open-reloading/ballistics'
+} from '@rangefoundry/ballistics'
 import {
   type Bullet,
   type Firearm,
@@ -29,9 +29,10 @@ import {
   toSi,
   type UserRecord,
   userRecord,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import { type SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
+import { putRecords, storedRecord, storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { english, msg, type Translator } from '../i18n/translate.ts'
 import { apiFetch, fetchRecord } from '../lib/api-fetch.ts'
@@ -151,7 +152,6 @@ import {
   waterVolume,
   withUnit,
 } from '../lib/units.ts'
-import { putRecords, storedRecord, storedRecords } from '../lib/user-store.ts'
 import {
   catalogueIdOf,
   catalogueRef,

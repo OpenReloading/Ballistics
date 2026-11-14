@@ -1,6 +1,6 @@
 'use client'
 
-import { compareTargetFaces, type TargetFace, type TargetMapping } from '@open-reloading/schema'
+import { compareTargetFaces, type TargetFace, type TargetMapping } from '@rangefoundry/schema'
 import { useTranslation } from '../i18n/language.ts'
 import {
   type CaliberClassSummary,

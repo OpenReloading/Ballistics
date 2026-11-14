@@ -15,7 +15,7 @@ import { targetSheet } from './target-sheet.ts'
 import { type QuantitySchema, quantity } from './units.ts'
 
 /** Value of `format` in every user data file. */
-export const userDataFormat = 'openreloading-user-data'
+export const userDataFormat = 'rangefoundry-user-data'
 /** Current `version` of a user data file: a file of any other version is refused. */
 export const userDataVersion = 1
 

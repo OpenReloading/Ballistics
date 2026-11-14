@@ -3,7 +3,7 @@
 import { Modal } from '@mantine/core'
 import { useDebouncedValue } from '@mantine/hooks'
 import { type createSpotlight, Spotlight, spotlight } from '@mantine/spotlight'
-import type { CartridgeDiameters } from '@open-reloading/ballistics'
+import type { CartridgeDiameters } from '@rangefoundry/ballistics'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import type { BulletSummary, CartridgeSummary, PowderSummary } from '../lib/api-types.ts'

@@ -1,4 +1,4 @@
-import { parseRef, type UserRecord } from '@open-reloading/schema'
+import { parseRef, type UserRecord } from '@rangefoundry/schema'
 import type { Translator } from '../i18n/translate.ts'
 
 /** A saved load whose cartridge differs from the cartridge of the firearm it names. */

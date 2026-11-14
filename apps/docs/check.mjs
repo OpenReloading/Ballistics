@@ -9,7 +9,7 @@ import {
 } from 'typedoc'
 import { tooLong } from './scripts/type-length.mts'
 
-const packages = ['schema', 'drawing', 'importers', 'catalog', 'use-cases', 'api']
+const packages = ['schema', 'svg-drawings', 'importers', 'catalog', 'use-cases', 'api']
 // zod's own generics, linked from the doc comment to the inferred type
 const exempt = (type) => type.type === 'reference' && type.package === 'zod'
 
@@ -35,7 +35,7 @@ const longTypes = (project) =>
 let failed = false
 for (const name of packages) {
   const dir = join(import.meta.dirname, '..', '..', 'packages', name)
-  console.log(`typedoc @open-reloading/${name}`)
+  console.log(`typedoc packages/${name}`)
   process.chdir(dir)
   // the check writes nothing, so no source links: a clone without a git remote passes too
   const app = await Application.bootstrapWithPlugins(

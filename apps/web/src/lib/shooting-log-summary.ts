@@ -1,5 +1,5 @@
 /** A sum of the log, not a second total: the firearm's `roundCount` stays the one counter (#604). */
-import type { ShootingLogRecord, UserRecord } from '@open-reloading/schema'
+import type { ShootingLogRecord, UserRecord } from '@rangefoundry/schema'
 import type { EventRecord } from './competition-events.ts'
 import { toCsv } from './csv.ts'
 import { entryYear, userIdOf } from './shooting-log.ts'
@@ -140,5 +140,5 @@ export function summaryRows(s: YearSummary, names: SummaryNames): (string | numb
 export const summaryCsv = (s: YearSummary, names: SummaryNames) =>
   `\ufeff${toCsv(summaryRows(s, names))}\n`
 
-/** The file name of the summary CSV: `openreloading-shooting-log-<year>-summary.csv`. */
-export const summaryFileName = (year: string) => `openreloading-shooting-log-${year}-summary.csv`
+/** The file name of the summary CSV: `rangefoundry-shooting-log-<year>-summary.csv`. */
+export const summaryFileName = (year: string) => `rangefoundry-shooting-log-${year}-summary.csv`

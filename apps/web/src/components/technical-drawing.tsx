@@ -1,3 +1,4 @@
+import { fromSi, toSi } from '@rangefoundry/schema'
 import {
   type Arc,
   type Arrowhead,
@@ -8,12 +9,11 @@ import {
   type LineSegment,
   type PartPoint,
   svgPath,
-} from '@open-reloading/drawing'
-import type { BulletModel } from '@open-reloading/drawing/bullet'
-import type { FigureModel, Side } from '@open-reloading/drawing/cartridge'
-import { fromSi, toSi } from '@open-reloading/schema'
+} from '@rangefoundry/svg-drawings'
+import type { BulletModel } from '@rangefoundry/svg-drawings/bullet'
+import type { FigureModel, Side } from '@rangefoundry/svg-drawings/cartridge'
 import type { CSSProperties, ReactNode } from 'react'
-import { drawingFont } from '../app/fonts/drawing.ts'
+import { drawingFont } from '@/platform/fonts/drawing.ts'
 import { Decimal } from './decimal.tsx'
 
 const n = (x: number) => Number(x.toFixed(2))

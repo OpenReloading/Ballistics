@@ -1,4 +1,4 @@
-import type { ShotGroup } from '@open-reloading/schema'
+import type { ShotGroup } from '@rangefoundry/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { extension, renderJob, StatsBlock } from '../src/components/target-export.tsx'

@@ -6,8 +6,8 @@ import {
   lbPerSqInToKgPerSqM,
   standardAtmosphere,
   trajectory,
-} from '@open-reloading/ballistics'
-import type { PublishedLoads } from '@open-reloading/schema'
+} from '@rangefoundry/ballistics'
+import type { PublishedLoads } from '@rangefoundry/schema'
 import { describe, expect, it, vi } from 'vitest'
 import { compare, verify } from '../src/commands.ts'
 import { Refusal, UsageError } from '../src/errors.ts'
@@ -19,9 +19,9 @@ import { result } from '../src/result.ts'
 import type { Row } from '../src/rows.ts'
 import { recordRoots, records } from './fixture.ts'
 
-vi.mock('@open-reloading/tools/catalog', async (original) =>
+vi.mock('@rangefoundry/tools/catalog', async (original) =>
   (await import('./records-memo.ts')).memoRecords(
-    await original<typeof import('@open-reloading/tools/catalog')>(),
+    await original<typeof import('@rangefoundry/tools/catalog')>(),
   ),
 )
 

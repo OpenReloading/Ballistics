@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core'
-import type { Load } from '@open-reloading/schema'
+import type { Load } from '@rangefoundry/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { LoadLots, LotField } from '../src/components/load-notes.tsx'

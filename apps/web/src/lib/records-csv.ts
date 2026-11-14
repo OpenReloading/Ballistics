@@ -1,10 +1,10 @@
-import { parseRef, type UserRecord } from '@open-reloading/schema'
+import { parseRef, type UserRecord } from '@rangefoundry/schema'
+import { storedRecords } from '@/platform/user-store.ts'
 import { fetchRecord } from './api-fetch.ts'
 import { toCsv } from './csv.ts'
 import { localDay } from './dates.ts'
 import { download } from './download.ts'
 import { type FirearmUse, loadUse } from './load-use.ts'
-import { storedRecords } from './user-store.ts'
 
 type FirearmRecord = Extract<UserRecord, { kind: 'firearm' }>
 /** The API path of each kind of record a load names. */
@@ -99,11 +99,11 @@ export async function recordNames(records: readonly UserRecord[]): Promise<NameO
   return (kind, ref) => (ref === undefined ? '' : (names.get(`${kind} ${ref}`) ?? ref))
 }
 
-/** Saves `rows` as `openreloading-<what>-<day>.csv`, written in the browser. No notice: a download carries the data only. */
+/** Saves `rows` as `rangefoundry-<what>-<day>.csv`, written in the browser. No notice: a download carries the data only. */
 const save = (rows: (string | number)[][], what: string) =>
   download(
     new Blob(['﻿', `${toCsv(rows)}\n`], { type: 'text/csv;charset=utf-8' }),
-    `openreloading-${what}-${localDay(new Date())}.csv`,
+    `rangefoundry-${what}-${localDay(new Date())}.csv`,
   )
 
 /** Saves the saved loads of this browser as CSV. */

@@ -126,8 +126,8 @@ for (const scheme of ['light', 'dark'] as const)
     await page.goto('/cartridges/308-win')
     const logo = page
       .getByRole('banner')
-      .getByRole('link', { name: 'OpenReloading Ballistics' })
-      .getByRole('img', { name: 'OpenReloading Ballistics' })
+      .getByRole('link', { name: 'RangeFoundry Workbench' })
+      .getByRole('img', { name: 'RangeFoundry Workbench' })
     // one visible wordmark: the top bar's
     await expect(logo).toHaveCount(1)
     await expect(logo).toBeVisible()

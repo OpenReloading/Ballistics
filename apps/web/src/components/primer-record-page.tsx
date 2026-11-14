@@ -1,6 +1,6 @@
 'use client'
 
-import type { Primer } from '@open-reloading/schema'
+import type { Primer } from '@rangefoundry/schema'
 import { msg } from '../i18n/translate.ts'
 import {
   fetchManufacturerNames,

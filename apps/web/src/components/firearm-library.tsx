@@ -12,6 +12,7 @@ import {
   Tooltip,
   UnstyledButton,
 } from '@mantine/core'
+import { DotsThreeVertical, Plus } from '@phosphor-icons/react'
 import {
   type Firearm,
   type Optic,
@@ -19,9 +20,7 @@ import {
   type OpticMount,
   parseRef,
   type UserRecord,
-} from '@open-reloading/schema'
-import { DotsThreeVertical, Plus } from '@phosphor-icons/react'
-import Link from 'next/link'
+} from '@rangefoundry/schema'
 import {
   type ReactNode,
   useCallback,
@@ -32,6 +31,8 @@ import {
   useRef,
   useState,
 } from 'react'
+import Link from '@/platform/link.tsx'
+import { deleteRecord, putRecords, storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
@@ -61,7 +62,6 @@ import { type FirearmUse, loadUse } from '../lib/load-use.ts'
 import { controlSize } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { copyName } from '../lib/user-file-names.ts'
-import { deleteRecord, putRecords, storedRecords } from '../lib/user-store.ts'
 import { catalogueIdOf } from '../lib/variants.ts'
 import { offerUndo } from './confirm.tsx'
 import {

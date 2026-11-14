@@ -1,4 +1,4 @@
-import { degreesOfFreedom, near, positive, probability, velocities } from '@open-reloading/test-kit'
+import { degreesOfFreedom, near, positive, probability, velocities } from '@rangefoundry/test-kit'
 import { assert, double, integer, property } from 'fast-check'
 import { describe, expect, it } from 'vitest'
 import { bisect } from '../src/bisect.ts'

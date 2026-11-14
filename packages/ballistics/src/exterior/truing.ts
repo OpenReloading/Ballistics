@@ -7,7 +7,7 @@ import {
   type LogFitResult,
   logLeastSquares,
   nth,
-} from '@open-reloading/statistics'
+} from '@rangefoundry/statistics'
 import type { DragTable } from '../drag-tables.ts'
 import { need } from '../issue.ts'
 import { overlay, type Settings } from '../settings.ts'

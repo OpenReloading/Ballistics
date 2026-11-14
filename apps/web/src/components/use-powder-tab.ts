@@ -1,6 +1,6 @@
 'use client'
 
-import type { Load } from '@open-reloading/schema'
+import type { Load } from '@rangefoundry/schema'
 import { useCallback, useMemo, useState } from 'react'
 
 /** The Powders tab's charge mode and filters as a load keeps them (`analysis.powders`), stored units. */

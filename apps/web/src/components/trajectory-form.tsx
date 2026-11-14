@@ -12,14 +12,14 @@ import {
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useDebouncedValue, useMediaQuery } from '@mantine/hooks'
+import { Printer } from '@phosphor-icons/react'
 import {
   type DragModel,
   dragModels,
   type OmittedEffect,
   type Trajectory,
-} from '@open-reloading/ballistics'
-import { type Bullet, toSi, type UserRecord } from '@open-reloading/schema'
-import { Printer } from '@phosphor-icons/react'
+} from '@rangefoundry/ballistics'
+import { type Bullet, toSi, type UserRecord } from '@rangefoundry/schema'
 import dynamic from 'next/dynamic'
 import {
   type ReactNode,
@@ -31,6 +31,7 @@ import {
   useState,
 } from 'react'
 import { flushSync } from 'react-dom'
+import { storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
@@ -62,7 +63,6 @@ import {
   zeroKeys,
 } from '../lib/trajectory-input.ts'
 import { formatQuantity, roundedFieldText, type UnitSystem, withUnit } from '../lib/units.ts'
-import { storedRecords } from '../lib/user-store.ts'
 import { type UserBulletView, userBullets } from '../lib/variants.ts'
 import { HitProbability } from './hit-probability.tsx'
 import { LazyLineChart as LineChart, preloadChart } from './lazy-chart.tsx'
@@ -320,13 +320,15 @@ function RecordDetails({
           )
         })}
       </ul>
-      <p className="sources">
-        <RecordSourcesLink
-          kind="bullets"
-          id={record.id}
-          label={t('Sources ({kind})', { kind: t(provenanceKinds[record.provenance.kind]) })}
-        />
-      </p>
+      {record.provenance && (
+        <p className="sources">
+          <RecordSourcesLink
+            kind="bullets"
+            id={record.id}
+            label={t('Sources ({kind})', { kind: t(provenanceKinds[record.provenance.kind]) })}
+          />
+        </p>
+      )}
     </div>
   )
 }

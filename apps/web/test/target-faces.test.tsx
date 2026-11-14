@@ -1,6 +1,6 @@
 import { readdirSync } from 'node:fs'
 import { MantineProvider } from '@mantine/core'
-import type { TargetMapping } from '@open-reloading/schema'
+import type { TargetMapping } from '@rangefoundry/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it, vi } from 'vitest'
 import { TargetFaceDrawing } from '../src/components/target-face-drawing.tsx'

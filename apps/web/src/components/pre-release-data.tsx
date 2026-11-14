@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { deleteDatabase, inStore, refusedEvent } from '@/platform/user-db.ts'
 import { useTranslation } from '../i18n/language.ts'
-import { deleteDatabase, inStore, refusedEvent } from '../lib/user-db.ts'
 import { confirmDialog } from './confirm.tsx'
 
 /** A pre-release database this version refuses (`refusedEvent`), asked once per page load; the page opens the database on mount, as a refusal in a worker never reaches this listener. */

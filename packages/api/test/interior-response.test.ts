@@ -1,5 +1,5 @@
-import { interior } from '@open-reloading/ballistics'
-import { inlineRunner, operations } from '@open-reloading/use-cases'
+import { interior } from '@rangefoundry/ballistics'
+import { inlineRunner, operations } from '@rangefoundry/use-cases'
 import { describe, expect, it } from 'vitest'
 import type { z } from 'zod'
 import { API_PREFIX } from '../src/version.ts'

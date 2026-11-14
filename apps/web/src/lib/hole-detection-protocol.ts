@@ -1,12 +1,12 @@
 /** Messages between the target editor and the hole detection worker, in photo px of the turned photo. */
-import type { TargetFace } from '@open-reloading/schema'
+import type { TargetFace } from '@rangefoundry/schema'
 import type {
   FaceGeometry,
   FaceSearch,
   FlaggedRegion,
   HoleExample,
   HoleProposal,
-} from '@open-reloading/target-recognition'
+} from '@rangefoundry/target-recognition'
 import type { QualityIssue, TargetLayout } from './photo-quality.ts'
 import type { Point } from './target-geometry.ts'
 

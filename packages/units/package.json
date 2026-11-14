@@ -1,5 +1,5 @@
 {
-  "name": "@open-reloading/units",
+  "name": "@rangefoundry/units",
   "version": "0.0.0",
   "private": true,
   "description": "Quantity kinds, stored units, conversion to and from SI and the decimal-mark parser.",

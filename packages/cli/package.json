@@ -1,5 +1,5 @@
 {
-  "name": "@open-reloading/cli",
+  "name": "@rangefoundry/cli",
   "version": "0.0.3",
   "private": true,
   "license": "MIT",
@@ -14,15 +14,15 @@
     "test": "vitest run --coverage"
   },
   "dependencies": {
-    "@open-reloading/api": "workspace:*",
-    "@open-reloading/ballistics": "workspace:*",
-    "@open-reloading/catalog": "workspace:*",
-    "@open-reloading/drawing": "workspace:*",
-    "@open-reloading/schema": "workspace:*",
-    "@open-reloading/statistics": "workspace:*",
-    "@open-reloading/tools": "workspace:*",
-    "@open-reloading/units": "workspace:*",
-    "@open-reloading/use-cases": "workspace:*",
+    "@rangefoundry/api": "workspace:*",
+    "@rangefoundry/ballistics": "workspace:*",
+    "@rangefoundry/catalog": "workspace:*",
+    "@rangefoundry/svg-drawings": "workspace:*",
+    "@rangefoundry/schema": "workspace:*",
+    "@rangefoundry/statistics": "workspace:*",
+    "@rangefoundry/tools": "workspace:*",
+    "@rangefoundry/units": "workspace:*",
+    "@rangefoundry/use-cases": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {

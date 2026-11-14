@@ -1,6 +1,6 @@
 /** Each charge's shot heights with the effect of their velocity removed, and a test whether the remaining heights differ between charges (`apps/docs/docs/models/interior-ladder-impact.md`); SI throughout: charge kg, height m, velocity m/s. */
 
-import { chiSquareQuantile, nth } from '@open-reloading/statistics'
+import { chiSquareQuantile, nth } from '@rangefoundry/statistics'
 import { need } from '../issue.ts'
 import type { LadderStep } from './velocity-ladder.ts'
 

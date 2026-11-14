@@ -1,6 +1,6 @@
 'use client'
 
-import type { ShotGroup, TargetSheet } from '@open-reloading/schema'
+import type { ShotGroup, TargetSheet } from '@rangefoundry/schema'
 import type { Ref } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'

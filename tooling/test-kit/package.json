@@ -1,5 +1,5 @@
 {
-  "name": "@open-reloading/test-kit",
+  "name": "@rangefoundry/test-kit",
   "version": "0.0.0",
   "private": true,
   "description": "Test helpers of the logic packages: a tolerance matcher and typed arbitraries.",

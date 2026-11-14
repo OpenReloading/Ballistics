@@ -1,4 +1,4 @@
-import { type UserRecord, userRecord } from '@open-reloading/schema'
+import { type UserRecord, userRecord } from '@rangefoundry/schema'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { blankFirearm } from '../src/lib/firearm.ts'
 import {
@@ -16,7 +16,7 @@ vi.mock('react', async (original) => ({
   ...(await import('./fake-hooks.ts')).fakeHooks,
 }))
 const store = vi.hoisted(() => new Map<string, unknown>())
-vi.mock('../src/lib/user-store.ts', () => ({
+vi.mock('../src/platform/user-store.ts', () => ({
   storedRecords: () => Promise.resolve({ records: [...store.values()], invalid: [] }),
   storedRecord: (id: string) => Promise.resolve(store.get(id)),
   updateRecord: (id: string, change: (stored: unknown) => unknown) => {

@@ -2,7 +2,7 @@ import {
   type Diagnostic,
   need as needAny,
   InputError as StatisticsInputError,
-} from '@open-reloading/statistics'
+} from '@rangefoundry/statistics'
 import type { ResistanceGap } from './interior/bore-resistance.ts'
 import type { PressureBasis } from './interior/fit.ts'
 
@@ -227,8 +227,8 @@ export type LoadFileIssue =
 /** Why a function of this package refuses its input. */
 export type BallisticsIssue = ExteriorIssue | InteriorIssue | LoadFileIssue
 
-/** `need` of `@open-reloading/statistics` with an issue of this package. */
+/** `need` of `@rangefoundry/statistics` with an issue of this package. */
 export const need: (ok: boolean, issue: BallisticsIssue) => void = needAny
 
-/** The `InputError` of `@open-reloading/statistics`, raised with an issue of this package. */
+/** The `InputError` of `@rangefoundry/statistics`, raised with an issue of this package. */
 export const InputError: new (issue: BallisticsIssue) => StatisticsInputError = StatisticsInputError

@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
-import type { UserRecord } from '@open-reloading/schema'
-import { checkUserRefs, userDataVersion, userRecord } from '@open-reloading/schema'
+import type { UserRecord } from '@rangefoundry/schema'
+import { checkUserRefs, userDataVersion, userRecord } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { readLink, shareLink } from '../src/lib/share-link.ts'
 import { parseUserDataFile, userDataText } from '../src/lib/user-data.ts'

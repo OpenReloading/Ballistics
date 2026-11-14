@@ -2,6 +2,7 @@
 
 import { Button, FileButton, Group, Stack, TextInput } from '@mantine/core'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import type { Say } from '../i18n/translate.ts'
 import { labelledLoad, readLabel } from '../lib/box-label.ts'
@@ -9,7 +10,6 @@ import { cameraSession } from '../lib/camera-session.ts'
 import { errorText } from '../lib/error-text.ts'
 import { photoTries, pixelsOf, readCode, readPhoto } from '../lib/label-reader.ts'
 import type { LoadRecord } from '../lib/load-tabs.ts'
-import { storedRecords } from '../lib/user-store.ts'
 import { AppModal } from './app-modal.tsx'
 import { MessageSlot, type Severity } from './states.tsx'
 

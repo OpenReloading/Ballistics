@@ -1,4 +1,4 @@
-import { InputError } from '@open-reloading/statistics'
+import { InputError } from '@rangefoundry/statistics'
 import type { Issue } from '../src/issue.ts'
 
 /** The issue `f` refuses with; any other throw, or none, fails the test. */

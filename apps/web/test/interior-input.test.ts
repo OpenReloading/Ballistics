@@ -1,4 +1,4 @@
-import { interiorValueKeys } from '@open-reloading/ballistics'
+import { interiorValueKeys } from '@rangefoundry/ballistics'
 import { expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import { fieldError, fieldValueFromText } from '../src/lib/field-spec.ts'

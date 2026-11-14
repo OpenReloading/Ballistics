@@ -1,6 +1,6 @@
 /** Requests of the Powders tab through `apiFetch`: powder records and summaries, runs. */
 
-import type { Powder } from '@open-reloading/schema'
+import type { Powder } from '@rangefoundry/schema'
 import { anySignal } from './any-signal.ts'
 import { apiFetch, fetchRecord } from './api-fetch.ts'
 import type { ErrorBody, InteriorResponse, PowderSummary } from './api-types.ts'

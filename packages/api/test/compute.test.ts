@@ -13,9 +13,9 @@ import {
   trajectory,
   trueDrag,
   trueMuzzleVelocity,
-} from '@open-reloading/ballistics'
-import type { Cartridge } from '@open-reloading/schema'
-import { caps, stabilityBounds } from '@open-reloading/use-cases'
+} from '@rangefoundry/ballistics'
+import type { Cartridge } from '@rangefoundry/schema'
+import { caps, stabilityBounds } from '@rangefoundry/use-cases'
 import { describe, expect, it } from 'vitest'
 import { API_PREFIX } from '../src/version.ts'
 import { defined } from './defined.ts'

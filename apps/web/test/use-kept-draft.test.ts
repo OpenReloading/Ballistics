@@ -1,4 +1,4 @@
-import type { UserRecord } from '@open-reloading/schema'
+import type { UserRecord } from '@rangefoundry/schema'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 
 vi.mock('react', async (original) => ({
@@ -10,7 +10,7 @@ const store = vi.hoisted(() => ({
   fail: false,
   persist: 0,
 }))
-vi.mock('../src/lib/user-store.ts', () => ({
+vi.mock('../src/platform/user-store.ts', () => ({
   putRecords: (records: UserRecord[]) => {
     if (store.fail) return Promise.reject(new Error('quota'))
     store.written.push(...records)

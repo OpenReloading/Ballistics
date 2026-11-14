@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core'
-import type { Source } from '@open-reloading/schema'
+import type { Source } from '@rangefoundry/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { groupSources, RecordSourcesLink, Sources } from '../src/components/sources.tsx'

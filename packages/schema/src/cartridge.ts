@@ -30,7 +30,7 @@ const cartridgeParser = z.object({
   verification: z.enum(['verified', 'unverified']),
   values: z.array(specValue),
   exceptions: z.array(plausibilityException).min(1).optional(),
-  provenance,
+  provenance: provenance.optional(),
 })
 
 /**
@@ -54,8 +54,8 @@ export const cartridge: z.ZodObject<{
   verification: z.ZodEnum<z.core.util.ToEnum<'verified' | 'unverified'>>
   values: z.ZodArray<typeof specValue>
   exceptions: z.ZodOptional<z.ZodArray<typeof plausibilityException>>
-  /** Where the values of the record come from: a kind and at least one source. */
-  provenance: typeof provenance
+  /** Where the values of the record come from, wherever the record has a source: a kind and at least one source. */
+  provenance: z.ZodOptional<typeof provenance>
 }> = cartridgeParser satisfies Exact<typeof cartridge, typeof cartridgeParser>
 
 /** A cartridge record: the values of its C.I.P. sheet. */

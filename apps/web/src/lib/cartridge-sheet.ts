@@ -1,4 +1,4 @@
-import { type SpecValue, sheetId } from '@open-reloading/schema'
+import { type SpecValue, sheetId } from '@rangefoundry/schema'
 import type { CartridgeDetail } from './api-types.ts'
 
 /** The sheet with the cartridge's case length L3 (mm) replaced: a length the user typed over the record's. */

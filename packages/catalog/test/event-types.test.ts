@@ -1,4 +1,4 @@
-import type { Discipline, EventType, Federation } from '@open-reloading/schema'
+import type { Discipline, EventType, Federation } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { checkEventTypes } from '../src/event-types.ts'
 

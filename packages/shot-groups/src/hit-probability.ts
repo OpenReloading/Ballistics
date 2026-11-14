@@ -1,6 +1,6 @@
 /** From a point dispersion (`apps/docs/docs/models/hit-probability.md`); SI throughout: lengths m, speeds m/s, angles rad; a refusal is an `InputError` with a `HitIssue`. */
 
-import { chiSquareCdf, need, nth } from '@open-reloading/statistics'
+import { chiSquareCdf, need, nth } from '@rangefoundry/statistics'
 
 /** A scoring zone: an ellipse about the aim point with the value a hit inside it scores. */
 export interface ScoringZone {

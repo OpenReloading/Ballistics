@@ -4,7 +4,7 @@ import {
   interiorDefaults,
   overlay,
   pressureToleranceDefaults,
-} from '@open-reloading/ballistics'
+} from '@rangefoundry/ballistics'
 import { z } from 'zod'
 import type { Exact } from './exact.ts'
 import { caps, recordId, steps } from './schemas.ts'

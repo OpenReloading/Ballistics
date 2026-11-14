@@ -1,4 +1,4 @@
-import { recordIdRegex } from '@open-reloading/schema'
+import { recordIdRegex } from '@rangefoundry/schema'
 import { z } from 'zod'
 
 /** `pattern` of a query string value without a NUL character. */
@@ -7,7 +7,7 @@ export const noNul = '^[^\\u0000]*$'
 /** `pattern` of search text without a control character (a search key separates its parts with one). */
 const noControl = '^[^\\u0000-\\u001f\\u007f-\\u009f]*$'
 
-/** `pattern` of a record id, as `recordId` of `@open-reloading/schema`. */
+/** `pattern` of a record id, as `recordId` of `@rangefoundry/schema`. */
 export const recordIdPattern = recordIdRegex.source
 
 /** The `revision` field of the record answers that carry one. */

@@ -1,10 +1,10 @@
 'use client'
 
 import { Button } from '@mantine/core'
-import { bulletFits, type CartridgeDiameters } from '@open-reloading/ballistics'
 import { Plus } from '@phosphor-icons/react'
-import Link from 'next/link'
+import { bulletFits, type CartridgeDiameters } from '@rangefoundry/ballistics'
 import { useDeferredValue, useMemo } from 'react'
+import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 import { bulletKinds, bulletSectionalDensity } from '../lib/bullet-kinds.ts'

@@ -6,10 +6,10 @@ describe('detectFormat', () => {
   it('tells each format by its shape', () => {
     expect(detectFormat(shotViewEnglish)).toBe('shotview-csv')
     expect(detectFormat(shotViewGerman)).toBe('shotview-csv')
-    expect(detectFormat(template)).toBe('openreloading-csv')
-    expect(detectFormat('velocity;velocityUnit\n812,5;m/s')).toBe('openreloading-csv')
-    expect(detectFormat('String,Velocity\nA,2795\n')).toBe('openreloading-csv')
-    expect(detectFormat('string,velocity,velocityUnit,\nA,2795,fps,\n')).toBe('openreloading-csv')
+    expect(detectFormat(template)).toBe('rangefoundry-csv')
+    expect(detectFormat('velocity;velocityUnit\n812,5;m/s')).toBe('rangefoundry-csv')
+    expect(detectFormat('String,Velocity\nA,2795\n')).toBe('rangefoundry-csv')
+    expect(detectFormat('string,velocity,velocityUnit,\nA,2795,fps,\n')).toBe('rangefoundry-csv')
   })
 
   it('returns null for an empty or unknown file', () => {

@@ -1,4 +1,4 @@
-import type { Load } from '@open-reloading/schema'
+import type { Load } from '@rangefoundry/schema'
 import { expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import { type ComponentKind, componentRefs, loadSummary } from '../src/lib/range-entry.ts'

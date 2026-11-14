@@ -33,7 +33,7 @@ const seed = (page: Page) =>
 const stored = (page: Page, kind: string) =>
   page.evaluate(async (kind) => {
     const db: IDBDatabase = await new Promise((ok, no) => {
-      const r = indexedDB.open('openreloading-user-data')
+      const r = indexedDB.open('rangefoundry-user-data')
       r.onsuccess = () => ok(r.result)
       r.onerror = () => no(r.error)
     })
@@ -141,7 +141,7 @@ test('the shooting log adds entries, counts rounds only after the confirm, print
     page.waitForEvent('download'),
     (await barButton(page, 'Export CSV')).click(),
   ])
-  expect(csv.suggestedFilename()).toMatch(/^openreloading-shooting-log-\d{4}-\d{2}-\d{2}\.csv$/)
+  expect(csv.suggestedFilename()).toMatch(/^rangefoundry-shooting-log-\d{4}-\d{2}-\d{2}\.csv$/)
   const lines = (await readFile(await csv.path(), 'utf8')).replace(/^﻿/, '').trim().split('\n')
   expect(lines[0]).toBe(
     'Date,Place,Discipline,Firearm,Load or ammunition,Rounds,Result,Notes,Confirmed by,Confirmed on',
@@ -165,7 +165,7 @@ test('the shooting log adds entries, counts rounds only after the confirm, print
   await page.evaluate(
     async (ids) => {
       const db: IDBDatabase = await new Promise((ok) => {
-        const r = indexedDB.open('openreloading-user-data')
+        const r = indexedDB.open('rangefoundry-user-data')
         r.onsuccess = () => ok(r.result)
       })
       const tx = db.transaction('records', 'readwrite')
@@ -244,7 +244,7 @@ test('the yearly summary shows only the entries of its year, the same numbers in
     page.waitForEvent('download'),
     summary.getByRole('button', { name: 'Export summary CSV' }).click(),
   ])
-  expect(csv.suggestedFilename()).toBe('openreloading-shooting-log-2025-summary.csv')
+  expect(csv.suggestedFilename()).toBe('rangefoundry-shooting-log-2025-summary.csv')
   const lines = (await readFile(await csv.path(), 'utf8')).replace(/^﻿/, '').trim().split('\n')
   expect(lines.slice(0, 3)).toEqual([
     'Year,2025',

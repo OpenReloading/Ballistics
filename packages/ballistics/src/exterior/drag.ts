@@ -1,5 +1,5 @@
 /** Drag input and table lookup, BC reference atmosphere and monotone cubic interpolation, `apps/docs/docs/models/exterior-drag.md`. */
-import { conversions } from '@open-reloading/units'
+import { conversions } from '@rangefoundry/units'
 import { type DragModel, type DragTable, dragTables } from '../drag-tables.ts'
 
 /** In the key order of the generated `dragTables` (a test pins it); a literal, so a bundle that imports only other names from this module drops the tables. */

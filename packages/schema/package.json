@@ -1,5 +1,5 @@
 {
-  "name": "@open-reloading/schema",
+  "name": "@rangefoundry/schema",
   "version": "0.0.7",
   "description": "Zod schemas, types and stored units of every OpenReloading record kind.",
   "keywords": [
@@ -46,8 +46,8 @@
     "test": "vitest run --coverage && publint --strict && attw --pack . --profile esm-only"
   },
   "dependencies": {
-    "@open-reloading/statistics": "workspace:*",
-    "@open-reloading/units": "workspace:*",
+    "@rangefoundry/statistics": "workspace:*",
+    "@rangefoundry/units": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {

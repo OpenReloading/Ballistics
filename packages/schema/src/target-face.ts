@@ -101,7 +101,7 @@ const targetFaceFields = z.object({
   numerals: z.boolean().optional(),
   photoSearch: z.boolean().optional(),
   note: z.string().min(1).optional(),
-  provenance,
+  provenance: provenance.optional(),
 })
 
 type Issue = (path: PropertyKey[], message: string) => void
@@ -345,8 +345,8 @@ export const targetFace: z.ZodObject<{
    */
   photoSearch: z.ZodOptional<z.ZodBoolean>
   note: z.ZodOptional<z.ZodString>
-  /** Where the values of the record come from: a kind and at least one source. */
-  provenance: typeof provenance
+  /** Where the values of the record come from, wherever the record has a source: a kind and at least one source. */
+  provenance: z.ZodOptional<typeof provenance>
 }> = targetFaceParser satisfies Exact<typeof targetFace, typeof targetFaceParser>
 
 /** A printed target face record: ring diameters in mm, inner ten, events. */

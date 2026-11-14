@@ -275,8 +275,7 @@
     "id",
     "manufacturer",
     "name",
-    "size",
-    "provenance"
+    "size"
   ],
   "additionalProperties": false
 }

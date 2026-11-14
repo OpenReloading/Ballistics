@@ -1,14 +1,14 @@
 'use client'
 
 import { Button, Group, Kbd, Menu, Textarea } from '@mantine/core'
+import { CaretDown, FloppyDisk, FolderOpen } from '@phosphor-icons/react'
 import {
   type EmbeddedFile,
   parseRef,
   type UserRecord,
   type UserRecordKind,
   userRecord,
-} from '@open-reloading/schema'
-import { CaretDown, FloppyDisk, FolderOpen } from '@phosphor-icons/react'
+} from '@rangefoundry/schema'
 import {
   type Dispatch,
   memo,
@@ -22,6 +22,19 @@ import {
   useState,
 } from 'react'
 import { createPortal } from 'react-dom'
+import {
+  deletePhoto,
+  deleteRecords,
+  putRecordIfAbsent,
+  putRecords,
+  rawPhotoId,
+  requestPersistentStorage,
+  storedPhoto,
+  storedPhotoIds,
+  storedRecord,
+  storedRecords,
+  storePhotos,
+} from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import type { ImportFile, ImportReport as Report } from '../lib/data-files.ts'
@@ -72,19 +85,6 @@ import {
 } from '../lib/user-data.ts'
 import { holdsSkipped, ownsFile, recordFileName } from '../lib/user-file-names.ts'
 import { droppedPhotos, embedFiles, photoIds } from '../lib/user-photos.ts'
-import {
-  deletePhoto,
-  deleteRecords,
-  putRecordIfAbsent,
-  putRecords,
-  rawPhotoId,
-  requestPersistentStorage,
-  storedPhoto,
-  storedPhotoIds,
-  storedRecord,
-  storedRecords,
-  storePhotos,
-} from '../lib/user-store.ts'
 import {
   canPickFolder,
   chooseFolder,
@@ -1407,7 +1407,7 @@ function FileMenuOf<K extends UserRecordKind>({
       return false
     }
     const day = localDay(new Date())
-    const r = await saveAs(checked.text, `openreloading-data-${day}.json`, ready)
+    const r = await saveAs(checked.text, `rangefoundry-data-${day}.json`, ready)
     if (r) {
       setMessage(({ t, tn }) => {
         const notes = exportNotes(records, invalid, checked.left, t, tn)

@@ -1,4 +1,4 @@
-import { toSi } from '@open-reloading/schema'
+import { toSi } from '@rangefoundry/schema'
 import { presetUnits, withUnit } from '../lib/units.ts'
 import { ByLengthUnit } from './by-length-unit.tsx'
 

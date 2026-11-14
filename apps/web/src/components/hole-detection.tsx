@@ -1,13 +1,14 @@
 'use client'
 
 import { ActionIcon, Anchor, Button, NativeSelect } from '@mantine/core'
+import { ArrowClockwise, ArrowCounterClockwise, X } from '@phosphor-icons/react'
 import {
   fromSi,
   type ShotGroup,
   type TargetFace,
   type TargetSheet,
   toSi,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import {
   type FaceFit,
   type FacePlane,
@@ -17,8 +18,7 @@ import {
   fitDiameter,
   fitPicked,
   type HoleProposal,
-} from '@open-reloading/target-recognition'
-import { ArrowClockwise, ArrowCounterClockwise, X } from '@phosphor-icons/react'
+} from '@rangefoundry/target-recognition'
 import {
   type KeyboardEvent,
   type PointerEvent,
@@ -28,6 +28,7 @@ import {
   useRef,
   useState,
 } from 'react'
+import { storedPhoto } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { msg, type Message as Text, type Translator } from '../i18n/translate.ts'
 import { commonCaliber } from '../lib/caliber.ts'
@@ -59,7 +60,6 @@ import type { Frame } from '../lib/target-editor.ts'
 import { type Point, turnedBox } from '../lib/target-geometry.ts'
 import { controlSize } from '../lib/theme.ts'
 import { formatQuantity, type UnitSystem } from '../lib/units.ts'
-import { storedPhoto } from '../lib/user-store.ts'
 import { SiField } from './si-field.tsx'
 import { Message } from './states.tsx'
 import { arrows, viewPoint } from './svg-point.ts'

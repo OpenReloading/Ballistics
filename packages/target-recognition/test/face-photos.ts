@@ -1,4 +1,4 @@
-import { applyMatrix } from '@open-reloading/shot-groups'
+import { applyMatrix } from '@rangefoundry/shot-groups'
 import sharp from 'sharp'
 import { expect } from 'vitest'
 import { findFace } from '../src/face-search.ts'

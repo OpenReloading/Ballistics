@@ -7,7 +7,7 @@ import {
   pressureToleranceDefaults,
   type SampledBand,
   type SamplingOptions,
-} from '@open-reloading/ballistics'
+} from '@rangefoundry/ballistics'
 import { assertFinite, notice, unprocessable } from './answer.ts'
 import { type InteriorBody, m3Options, maxPoints, samplingDefaults } from './interior-schema.ts'
 import { type CartridgeWithSpecs, limitCheck, maximumCheck } from './limits.ts'

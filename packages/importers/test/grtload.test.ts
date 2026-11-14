@@ -1,4 +1,4 @@
-import { type UserRecord, userRecord } from '@open-reloading/schema'
+import { type UserRecord, userRecord } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { readGrtLoad } from '../src/index.ts'
 import { defined } from './defined.ts'

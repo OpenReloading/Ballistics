@@ -1,4 +1,4 @@
-import type { CaliberClass, Cartridge } from '@open-reloading/schema'
+import type { CaliberClass, Cartridge } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { checkCaliberClasses } from '../src/caliber-classes.ts'
 

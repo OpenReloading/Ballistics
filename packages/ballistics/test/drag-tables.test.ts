@@ -1,4 +1,4 @@
-import { nth } from '@open-reloading/statistics'
+import { nth } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
 import { dragTables } from '../src/drag-tables.ts'
 

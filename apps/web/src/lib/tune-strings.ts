@@ -1,4 +1,4 @@
-import type { UserRecord } from '@open-reloading/schema'
+import type { UserRecord } from '@rangefoundry/schema'
 import { parseNumber } from '../i18n/number.ts'
 import { sessionRef } from './measurements.ts'
 import { parseVelocities, sessionStrings, type TuneString } from './powder-tune.ts'

@@ -15,7 +15,7 @@ const appUrl = process.env.APP_URL
 const repo = 'OpenReloading/Ballistics'
 
 const config = async (): Promise<Config> => ({
-  title: 'OpenReloading Ballistics',
+  title: 'RangeFoundry Workbench',
   tagline: 'Documentation',
   // GitHub Pages: DOCS_URL is the site origin, DOCS_BASE_URL the path of the docs ("/repository/docs/")
   url: process.env.DOCS_URL ?? 'https://openreloading.github.io',
@@ -59,7 +59,7 @@ const config = async (): Promise<Config> => ({
   ],
   themeConfig: {
     navbar: {
-      title: 'OpenReloading Ballistics',
+      title: 'RangeFoundry Workbench',
       items: [
         { type: 'docSidebar', sidebarId: 'models', label: 'Models', position: 'left' },
         { type: 'docSidebar', sidebarId: 'data', label: 'Data', position: 'left' },

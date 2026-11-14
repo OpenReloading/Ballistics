@@ -2,8 +2,8 @@
 
 import { Button, Code, EmptyState, Group } from '@mantine/core'
 import { type Icon, MagnifyingGlass, WifiSlash } from '@phosphor-icons/react'
-import Link from 'next/link'
 import { type ReactNode, useSyncExternalStore } from 'react'
+import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import type { Message } from '../i18n/translate.ts'
 import { basePath } from '../lib/edition.ts'

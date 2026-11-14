@@ -13,7 +13,7 @@ import {
   type UserRecord,
   userDataFileText,
   userRecord,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import { z } from 'zod'
 import type { Message, Translator } from '../i18n/translate.ts'
 import { translateMessage } from './core-messages.ts'
@@ -22,14 +22,14 @@ import { translateMessage } from './core-messages.ts'
 export const maxFileBytes = maxUserDataBytes
 export const tooLargeMessage = `The file is larger than ${maxFileBytes / 1e6} MB.`
 const notJsonMessage = 'The file is not JSON.'
-const notDataFileMessage = 'The file is not an OpenReloading data file.'
+const notDataFileMessage = 'The file is not a RangeFoundry data file.'
 
 /** A `reason` of a file that was not read, in the language of `t`: the app's own three, else a message of the packages. */
 export function reasonText(reason: string, { t, tn }: Pick<Translator, 't' | 'tn'>) {
   if (reason === tooLargeMessage)
     return t('The file is larger than {size} MB.', { size: maxFileBytes / 1e6 })
   if (reason === notJsonMessage) return t('The file is not JSON.')
-  if (reason === notDataFileMessage) return t('The file is not an OpenReloading data file.')
+  if (reason === notDataFileMessage) return t('The file is not a RangeFoundry data file.')
   // zod's `✖` and `→ at` lines, then the problem count on the last line only: no `m` flag, since a key in the file may carry a line of its own into a message.
   if (!reason.startsWith('✖ ')) return translateMessage(reason, t)
   return reason
@@ -97,7 +97,7 @@ export function reasonOf(d: UserDataDiagnostic): string {
   }
 }
 
-/** One file, validated against `@open-reloading/schema` as a whole but for records of a kind it does not know. */
+/** One file, validated against `@rangefoundry/schema` as a whole but for records of a kind it does not know. */
 export function parseUserDataFile(text: string): ParsedUserFile {
   const read = readUserDataFile(text)
   return read.ok ? read : { ok: false, reason: reasonOf(read.diagnostic) }

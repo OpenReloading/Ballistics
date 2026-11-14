@@ -6,13 +6,13 @@ import {
   recordLoad,
   standardAtmosphere,
   ValueError,
-} from '@open-reloading/ballistics'
-import { bulletDimensions } from '@open-reloading/drawing/bullet'
-import { chamberOf, seat } from '@open-reloading/drawing/seating'
-import type { Bullet, Cartridge } from '@open-reloading/schema'
-import { bulletListFields, loadWaterCapacity, toSi } from '@open-reloading/schema'
-import { InputError } from '@open-reloading/statistics'
-import { waterDensityGramsPerCm3 } from '@open-reloading/units'
+} from '@rangefoundry/ballistics'
+import type { Bullet, Cartridge } from '@rangefoundry/schema'
+import { bulletListFields, loadWaterCapacity, toSi } from '@rangefoundry/schema'
+import { InputError } from '@rangefoundry/statistics'
+import { bulletDimensions } from '@rangefoundry/svg-drawings/bullet'
+import { chamberOf, seat } from '@rangefoundry/svg-drawings/seating'
+import { waterDensityGramsPerCm3 } from '@rangefoundry/units'
 import type { Records } from './records.ts'
 import type { Row } from './rows.ts'
 import { type Split, splitOf } from './split.ts'

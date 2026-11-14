@@ -1,5 +1,5 @@
 /** Cut-out and ruler scale of a bullet photograph (`apps/docs/docs/models/bullet-photo.md`); photo px, y down, pixel (i, j) covering [i, i + 1) x [j, j + 1); pure, so it runs in a worker. */
-import { clamp, components, otsu } from '@open-reloading/target-recognition'
+import { clamp, components, otsu } from '@rangefoundry/target-recognition'
 import { msg } from '../i18n/translate.ts'
 import type { RgbaImage } from './image.ts'
 import { nth } from './nth.ts'

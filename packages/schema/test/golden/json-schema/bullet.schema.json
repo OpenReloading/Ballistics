@@ -841,7 +841,6 @@
     "id",
     "manufacturer",
     "name",
-    "mass",
-    "provenance"
+    "mass"
   ]
 }

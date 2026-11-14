@@ -10,7 +10,7 @@ One entry per model question that was investigated, including the ones that chan
 
 ## Template
 
-Copy this into `apps/docs/docs/research/<slug>.md`, add the front matter (`title`, `description` with one line of what the page covers) and fill every section. A section may be short. The check (`pnpm --filter @open-reloading/docs test`, `scripts/research-log.mts`) fails on a missing or empty section, on a `Result`, `Data basis` or `Confidence` that does not start with one of its answers, and on a path under `Where in the app` that is not an existing file.
+Copy this into `apps/docs/docs/research/<slug>.md`, add the front matter (`title`, `description` with one line of what the page covers) and fill every section. A section may be short. The check (`pnpm --filter @rangefoundry/docs test`, `scripts/research-log.mts`) fails on a missing or empty section, on a `Result`, `Data basis` or `Confidence` that does not start with one of its answers, and on a path under `Where in the app` that is not an existing file.
 
 ```md
 ## Question

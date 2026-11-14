@@ -1,8 +1,8 @@
 'use client'
 
 import { useMantineColorScheme } from '@mantine/core'
-import { useRouter } from 'next/navigation'
 import { useContext } from 'react'
+import { useRouter } from '@/platform/navigation.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { sections } from '../lib/sections.ts'
 import { shortcutLabel } from '../lib/shortcuts.ts'

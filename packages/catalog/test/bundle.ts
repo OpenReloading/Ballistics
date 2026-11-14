@@ -1,4 +1,4 @@
-import type { Cartridge, Provenance } from '@open-reloading/schema'
+import type { Cartridge, Provenance } from '@rangefoundry/schema'
 import type { Bundle } from '../src/records.ts'
 
 const published: Provenance = { kind: 'published', sources: [{ title: 'Test standard' }] }

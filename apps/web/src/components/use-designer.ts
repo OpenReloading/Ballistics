@@ -1,6 +1,6 @@
 'use client'
 
-import type { UserRecordKind } from '@open-reloading/schema'
+import type { UserRecordKind } from '@rangefoundry/schema'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import type { Message } from '../i18n/translate.ts'

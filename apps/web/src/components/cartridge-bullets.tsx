@@ -1,7 +1,7 @@
 'use client'
 
 import { Button, Tooltip } from '@mantine/core'
-import Link from 'next/link'
+import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { fitRule } from '../lib/bullet-fit.ts'
 import { controlSize } from '../lib/theme.ts'

@@ -1,10 +1,7 @@
+import { edition } from '@/platform/edition.ts'
 import { editionName } from './offline.ts'
 
-/** The path the app's pages and files are served under (`PAGES_BASE_PATH`, `next.config.ts`): `''` at a domain root. */
-export const basePath = process.env.NEXT_PUBLIC_PAGES_BASE_PATH ?? ''
-
-/** Both editions share one origin and so one browser store. */
-export const edition = process.env.NEXT_PUBLIC_PAGES_EDITION ?? ''
+export { basePath, edition } from '@/platform/edition.ts'
 
 /** The name of a database, local storage key or cache in this edition (`next:` ahead of it in `next`). */
 export const storageName = (name: string) => editionName(edition, name)

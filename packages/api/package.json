@@ -1,5 +1,5 @@
 {
-  "name": "@open-reloading/api",
+  "name": "@rangefoundry/api",
   "version": "0.0.7",
   "private": true,
   "license": "MIT",
@@ -9,11 +9,6 @@
       "types": "./dist/openapi.d.ts",
       "default": "./dist/openapi.js"
     },
-    "./catalogue": {
-      "types": "./dist/catalogue/browser.d.ts",
-      "default": "./dist/catalogue/browser.js"
-    },
-    "./catalogue/*.json": "./dist/catalogue/*.json",
     "./static": {
       "types": "./dist/static.d.ts",
       "default": "./dist/static.js"
@@ -28,16 +23,16 @@
   },
   "dependencies": {
     "@fastify/sensible": "^6.0.7",
-    "@open-reloading/ballistics": "workspace:*",
-    "@open-reloading/catalog": "workspace:*",
-    "@open-reloading/schema": "workspace:*",
-    "@open-reloading/use-cases": "workspace:*",
+    "@rangefoundry/ballistics": "workspace:*",
+    "@rangefoundry/catalog": "workspace:*",
+    "@rangefoundry/schema": "workspace:*",
+    "@rangefoundry/use-cases": "workspace:*",
     "@scalar/fastify-api-reference": "1.77.0",
     "fastify": "^5.12.8",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@open-reloading/statistics": "workspace:*",
+    "@rangefoundry/statistics": "workspace:*",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "ajv": "catalog:",

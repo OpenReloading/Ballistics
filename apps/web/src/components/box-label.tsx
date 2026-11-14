@@ -1,11 +1,11 @@
 import type { ReactNode } from 'react'
 import { createPortal, flushSync } from 'react-dom'
+import { storedRecords } from '@/platform/user-store.ts'
 import type { Translator } from '../i18n/translate.ts'
 import { type BoxLabel, boxLabel, qrModules } from '../lib/box-label.ts'
 import type { LoadRecord } from '../lib/load-tabs.ts'
 import { recordNames } from '../lib/records-csv.ts'
 import type { UnitSystem } from '../lib/units.ts'
-import { storedRecords } from '../lib/user-store.ts'
 import { printAlone } from './print.ts'
 
 /** The QR code of `text` as one path of unit squares, sharp at any print size. */

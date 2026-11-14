@@ -5,11 +5,10 @@ import {
   cartridge,
   caseTypes,
   catalogueCaseCapacity,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
+import { type CartridgeQuery, type Catalogue, cartridgeItem } from '@rangefoundry/use-cases/catalog'
 import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
-import { cartridgeItem } from '../catalogue/derive.ts'
-import type { CartridgeQuery, Catalogue } from '../catalogue/types.ts'
 import { missing, stored } from './record-answers.ts'
 import { idParams, listQuery, noNul, revision } from './schemas.ts'
 
@@ -111,7 +110,7 @@ export const cartridgeRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
         errors: [404],
         summary: 'Get a cartridge',
         description:
-          'The cartridge record of its C.I.P. sheet with provenance, case type and case capacities. `revision` is a hash of the stored record, changes with any field.',
+          'The cartridge record of its C.I.P. sheet with case type, case capacities and its provenance where it has one. `revision` is a hash of the stored record, changes with any field.',
       },
     },
     (request, reply) => {

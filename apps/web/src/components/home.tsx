@@ -1,7 +1,7 @@
 'use client'
 
-import Link from 'next/link'
 import { type ReactNode, Suspense } from 'react'
+import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg } from '../i18n/translate.ts'
 import { sections } from '../lib/sections.ts'
@@ -41,7 +41,7 @@ export function Home({ counts }: { counts: Record<string, ReactNode> }) {
   const [tools, library] = sections
   return (
     <>
-      <PageBar title="OpenReloading Ballistics" titleHidden />
+      <PageBar title="RangeFoundry Workbench" titleHidden />
       <div className="home-lead">
         <p className="lead">
           {t('A ballistics database with interior and exterior ballistics simulations')}

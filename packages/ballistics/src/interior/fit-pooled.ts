@@ -6,7 +6,7 @@ import {
   type LogFitResult,
   logLeastSquares,
   nth,
-} from '@open-reloading/statistics'
+} from '@rangefoundry/statistics'
 import { InputError, need } from '../issue.ts'
 import { positive, type Settings } from '../settings.ts'
 import { type LadderPoint, PowderFitError, type PowderPrior } from './fit.ts'

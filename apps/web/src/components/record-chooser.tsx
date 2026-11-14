@@ -12,7 +12,6 @@ import {
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { Funnel, MagnifyingGlass } from '@phosphor-icons/react'
-import Link from 'next/link'
 import {
   type ReactNode,
   useCallback,
@@ -23,6 +22,7 @@ import {
   useRef,
   useState,
 } from 'react'
+import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { completeFirst } from '../lib/complete-records.ts'

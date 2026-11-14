@@ -1,19 +1,19 @@
 import {
-  type BulletDimensions,
-  type BulletModel,
-  type BulletProfile,
-  bulletFigureModel,
-  bulletProfile,
-  bulletScreenEm,
-} from '@open-reloading/drawing/bullet'
-import {
   type Bullet,
   baseTypes,
   fromSi,
   ogiveForms,
   tipTypes,
   type UserBullet,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
+import {
+  type BulletDimensions,
+  type BulletModel,
+  type BulletProfile,
+  bulletFigureModel,
+  bulletProfile,
+  bulletScreenEm,
+} from '@rangefoundry/svg-drawings/bullet'
 import { untranslated } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { computedBulletRows } from './bullet.ts'

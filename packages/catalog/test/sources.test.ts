@@ -1,4 +1,4 @@
-import type { SourceRecord } from '@open-reloading/schema'
+import type { SourceRecord } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { checkSources, resolveRecord, sourceIndex } from '../src/sources.ts'
 

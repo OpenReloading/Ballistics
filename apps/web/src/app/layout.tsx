@@ -58,12 +58,13 @@ import '@mantine/core/styles/ColorSwatch.layer.css'
 import '@mantine/core/styles/Indicator.layer.css'
 import '@mantine/core/styles/Slider.layer.css'
 import '@mantine/spotlight/styles.layer.css'
-import '@open-reloading/design-tokens/tokens.css'
-import '@open-reloading/design-tokens/mantine-print.css'
+import '@rangefoundry/design-tokens/tokens.css'
+import '@rangefoundry/design-tokens/mantine-print.css'
 import './globals.css'
 import { Container, mantineHtmlProps } from '@mantine/core'
-import { colors } from '@open-reloading/design-tokens'
+import { colors } from '@rangefoundry/design-tokens'
 import type { Metadata, Viewport } from 'next'
+import { uiFont } from '@/platform/fonts/ui.ts'
 import { OfflineLayer } from '../components/offline-layer.tsx'
 import { PageShell } from '../components/page-shell.tsx'
 import { PreReleaseData } from '../components/pre-release-data.tsx'
@@ -73,10 +74,9 @@ import { SafetyDialog } from '../components/safety-dialog.tsx'
 import { basePath } from '../lib/edition.ts'
 import { colorSchemeScript, pageWidth } from '../lib/theme.ts'
 import { titleTemplate } from '../lib/title-template.ts'
-import { uiFont } from './fonts/ui.ts'
 
 export const metadata: Metadata = {
-  title: { default: 'OpenReloading Ballistics', template: titleTemplate },
+  title: { default: 'RangeFoundry Workbench', template: titleTemplate },
   description: 'A ballistics database with interior and exterior ballistics simulations.',
   // the social image needs an absolute URL: only the deployment knows its origin (`PAGES_URL`)
   ...(process.env.PAGES_URL && {
@@ -86,7 +86,7 @@ export const metadata: Metadata = {
         url: 'opengraph-image.png',
         width: 1280,
         height: 640,
-        alt: 'OpenReloading Ballistics',
+        alt: 'RangeFoundry Workbench',
       },
     },
   }),

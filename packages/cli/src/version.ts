@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
-import { compareKeys } from '@open-reloading/schema'
+import { compareKeys } from '@rangefoundry/schema'
 import type { Model } from './model.ts'
 import type { Records } from './records.ts'
 import type { Row } from './rows.ts'

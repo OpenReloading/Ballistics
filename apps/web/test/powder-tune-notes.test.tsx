@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core'
-import type { PowderFit } from '@open-reloading/ballistics'
+import type { PowderFit } from '@rangefoundry/ballistics'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { TuneNotes } from '../src/components/powder-tune.tsx'

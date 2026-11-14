@@ -22,8 +22,8 @@ import {
   trajectory,
   trueDrag,
   trueMuzzleVelocity,
-} from '@open-reloading/ballistics'
-import { InputError } from '@open-reloading/statistics'
+} from '@rangefoundry/ballistics'
+import { InputError } from '@rangefoundry/statistics'
 
 /** The deadline passed while the task was queued or running. */
 export class ComputeTimeout extends Error {}

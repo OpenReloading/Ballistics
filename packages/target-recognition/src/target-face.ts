@@ -16,8 +16,8 @@ import {
   mul3,
   type Point,
   ransacEllipse,
-} from '@open-reloading/shot-groups'
-import { nth, seededUniforms } from '@open-reloading/statistics'
+} from '@rangefoundry/shot-groups'
+import { nth, seededUniforms } from '@rangefoundry/statistics'
 import {
   blackAreas,
   type Grid,
@@ -30,7 +30,7 @@ import {
 import type { FaceLabel } from './hole-detection.ts'
 import type { RgbaImage } from './image.ts'
 
-/** What the face search reads of a target face record; the `TargetFace` of `@open-reloading/schema` is one. */
+/** What the face search reads of a target face record; the `TargetFace` of `@rangefoundry/schema` is one. */
 export interface PrintedFace {
   readonly id: string
   readonly name: string

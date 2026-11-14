@@ -1,14 +1,12 @@
-import { canonicalJson } from '@open-reloading/schema'
+import { canonicalJson } from '@rangefoundry/schema'
 import {
   chargeTargetExample,
   interiorExample,
   loadFileExample,
   trajectoryExample,
-} from '@open-reloading/use-cases'
+} from '@rangefoundry/use-cases'
+import { buildCatalogue, openCatalogue, sha256 } from '@rangefoundry/use-cases/catalog'
 import { describe, expect, it } from 'vitest'
-import { buildCatalogue } from '../src/catalogue/build.ts'
-import { openCatalogue } from '../src/catalogue/open.ts'
-import { sha256 } from '../src/hash.ts'
 import { API_PREFIX, API_VERSION } from '../src/version.ts'
 import { bundle } from './fixtures.ts'
 import { testCatalogue, withApi } from './setup.ts'

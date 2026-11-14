@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto'
-import type { UserRecord } from '@open-reloading/schema'
+import type { UserRecord } from '@rangefoundry/schema'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import {

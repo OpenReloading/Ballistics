@@ -7,7 +7,7 @@ import {
   type TargetMapping,
   toSi,
   type UserRecord,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
 import type { Face } from './face-organization.ts'

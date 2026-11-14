@@ -88,7 +88,7 @@ function runShortcut(
   }
 }
 
-const openEvent = 'openreloading:shortcuts'
+const openEvent = 'rangefoundry:shortcuts'
 /** Opens the help dialog (the search's command, the "?" key). */
 export const openShortcuts = () => window.dispatchEvent(new Event(openEvent))
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { Table, TableTbody, TableTd, TableTh, TableThead, TableTr } from '@mantine/core'
-import type { Powder } from '@open-reloading/schema'
+import type { Powder } from '@rangefoundry/schema'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 import { fitTables } from '../lib/powder-record.ts'

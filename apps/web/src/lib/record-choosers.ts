@@ -1,5 +1,5 @@
 /** Ranked as the API's `q` ranks them, so the dialog finds what the card's field finds. */
-import { type CaseMaterial, compareKeys, score, searchKey, sortKey } from '@open-reloading/schema'
+import { type CaseMaterial, compareKeys, score, searchKey, sortKey } from '@rangefoundry/schema'
 import { apiFetch } from './api-fetch.ts'
 import type { CartridgeSummary, ListOf, PowderSummary, PrimerSummary } from './api-types.ts'
 import { orderPowders, type PowderRow } from './burn-rate.ts'

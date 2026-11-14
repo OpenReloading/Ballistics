@@ -1,4 +1,4 @@
-import type { EventType, Federation } from '@open-reloading/schema'
+import type { EventType, Federation } from '@rangefoundry/schema'
 import { type Lookup, lookupOf } from './federations.ts'
 import type { Bundle } from './records.ts'
 

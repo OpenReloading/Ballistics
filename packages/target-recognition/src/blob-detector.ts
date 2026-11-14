@@ -1,6 +1,6 @@
 /** Multi-scale blob detection on a float image: box-blur scale space, scale-normalized Hessian response, peaks. */
 
-import { nth } from '@open-reloading/statistics'
+import { nth } from '@rangefoundry/statistics'
 import { clamp } from './raster-ops.ts'
 
 // Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.

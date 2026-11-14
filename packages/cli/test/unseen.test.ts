@@ -1,4 +1,4 @@
-import type { Powder } from '@open-reloading/schema'
+import type { Powder } from '@rangefoundry/schema'
 import { describe, expect, it, vi } from 'vitest'
 import { verify } from '../src/commands.ts'
 import { Refusal } from '../src/errors.ts'
@@ -6,9 +6,9 @@ import { loadModel } from '../src/model.ts'
 import { unseenPowder } from '../src/unseen.ts'
 import { recordRoots, records, rowsCsv, writeRows } from './fixture.ts'
 
-vi.mock('@open-reloading/tools/catalog', async (original) =>
+vi.mock('@rangefoundry/tools/catalog', async (original) =>
   (await import('./records-memo.ts')).memoRecords(
-    await original<typeof import('@open-reloading/tools/catalog')>(),
+    await original<typeof import('@rangefoundry/tools/catalog')>(),
   ),
 )
 

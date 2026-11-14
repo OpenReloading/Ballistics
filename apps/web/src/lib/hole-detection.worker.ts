@@ -1,6 +1,6 @@
 /** Decodes and downscales the posted photo so a hole is about 32 px across (`apps/docs/docs/models/hole-detection.md`); nothing leaves the browser. */
 
-import { fromSi } from '@open-reloading/schema'
+import { fromSi } from '@rangefoundry/schema'
 import {
   clamp,
   faceLabel,
@@ -11,7 +11,7 @@ import {
   type ProposalRequest,
   type Proposals,
   WORK_DIAMETER,
-} from '@open-reloading/target-recognition'
+} from '@rangefoundry/target-recognition'
 import { errorText } from './error-text.ts'
 import type { Photo, WorkerReply, WorkerRequest } from './hole-detection-protocol.ts'
 import { layoutOf, photoQuality } from './photo-quality.ts'

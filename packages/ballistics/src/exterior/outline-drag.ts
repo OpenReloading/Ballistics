@@ -1,5 +1,5 @@
 /** Zero-yaw drag from the bullet outline, `apps/docs/docs/models/exterior-outline-drag.md` (R. L. McCoy, ARBRL-TR-02293, 1981): equation and page numbers are the report's, "listing" its appendix (pp. 63 to 64) with the constants and Mach cut-offs; calibers inside, SI at the interface. */
-import { nth } from '@open-reloading/statistics'
+import { nth } from '@rangefoundry/statistics'
 import type { DragTable } from '../drag-tables.ts'
 import { need } from '../issue.ts'
 

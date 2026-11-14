@@ -3,7 +3,7 @@ import {
   interior,
   type PowderFitOptions,
   type PowderParameter,
-} from '@open-reloading/ballistics'
+} from '@rangefoundry/ballistics'
 import { describe, expect, it } from 'vitest'
 import { load } from '../../../packages/ballistics/test/powder-load.ts'
 import type { PowderFitReply } from '../src/lib/powder-fit.ts'

@@ -1,4 +1,4 @@
-import { movingTargetLead, type TrajectoryPoint } from '@open-reloading/ballistics'
+import { movingTargetLead, type TrajectoryPoint } from '@rangefoundry/ballistics'
 
 /** The lead at one range of the trajectory table (SI: m, s, rad). */
 export interface MovingTargetRow {

@@ -1,10 +1,11 @@
 'use client'
 
 import { Anchor, NativeSelect } from '@mantine/core'
-import { cartridgeDiameters } from '@open-reloading/ballistics'
-import { fullSection, svgPath, toPartFrame } from '@open-reloading/drawing'
-import { bulletDimensions } from '@open-reloading/drawing/bullet'
-import { drawnTables } from '@open-reloading/drawing/cartridge'
+import { cartridgeDiameters } from '@rangefoundry/ballistics'
+import { type Bullet, fromSi, toSi } from '@rangefoundry/schema'
+import { fullSection, svgPath, toPartFrame } from '@rangefoundry/svg-drawings'
+import { bulletDimensions } from '@rangefoundry/svg-drawings/bullet'
+import { drawnTables } from '@rangefoundry/svg-drawings/cartridge'
 import {
   bulletOutline,
   chamberOf,
@@ -16,8 +17,7 @@ import {
   type Seating,
   seat,
   type Tagged,
-} from '@open-reloading/drawing/seating'
-import { type Bullet, fromSi, toSi } from '@open-reloading/schema'
+} from '@rangefoundry/svg-drawings/seating'
 import dynamic from 'next/dynamic'
 import {
   type Dispatch,
@@ -33,6 +33,7 @@ import {
   useState,
 } from 'react'
 import { createPortal } from 'react-dom'
+import { storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
@@ -73,7 +74,6 @@ import {
   waterVolume,
   withUnit,
 } from '../lib/units.ts'
-import { storedRecords } from '../lib/user-store.ts'
 import { type UserBulletView, userBullets } from '../lib/variants.ts'
 import { type CapacityRule, capacityFraction } from '../lib/volume-tolerance.ts'
 import { AppModal } from './app-modal.tsx'
@@ -1478,7 +1478,7 @@ function BulletStatus({ m }: { m: Model }) {
       {bulletRecord && (
         <p className="record">
           {t('Bullet: {label}', { label: productLabel(bulletRecord, names) })} ({bulletRecord.id}
-          {bulletRecord.provenance.sources[0] && (
+          {bulletRecord.provenance?.sources[0] && (
             <>
               , <RecordSourcesLink kind="bullets" id={bulletRecord.id} />
             </>
@@ -2292,7 +2292,7 @@ function PreviewBody({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Cham
   )
 }
 
-/** Case at CIP maximum, chamber at CIP minimum; seating depth, volume behind the bullet, travel and jump follow the slider and the field (`@open-reloading/drawing/seating`). */
+/** Case at CIP maximum, chamber at CIP minimum; seating depth, volume behind the bullet, travel and jump follow the slider and the field (`@rangefoundry/svg-drawings/seating`). */
 export function SeatingPreview(props: PreviewProps) {
   const m = useSeatingModel(props)
   const { t } = useTranslation()

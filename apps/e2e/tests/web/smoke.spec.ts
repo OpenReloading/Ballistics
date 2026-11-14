@@ -7,7 +7,7 @@ import { loadForm } from './workbench.ts'
 import { runLine } from './workbench-run.ts'
 
 const pages = [
-  ['/', 'OpenReloading Ballistics'],
+  ['/', 'RangeFoundry Workbench'],
   ['/cartridges/308-win', '308 Win.'],
   ['/workbench', 'Load workbench'],
   ['/targets', 'Targets'],

@@ -2,7 +2,7 @@ import {
   handgunBarrelLengthLimit,
   type StructureFields,
   startPressureOf,
-} from '@open-reloading/ballistics'
+} from '@rangefoundry/ballistics'
 import { msg, type Translator } from '../i18n/translate.ts'
 import type { Suggestion } from './input-defaults.ts'
 import { citedDefaults } from './workbench-defaults.ts'

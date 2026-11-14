@@ -1,4 +1,4 @@
-import type { UserRecord } from '@open-reloading/schema'
+import type { UserRecord } from '@rangefoundry/schema'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { toCsv } from '../src/lib/csv.ts'
 import { firearmRows, loadRows, saveFirearmsCsv, saveLoadsCsv } from '../src/lib/records-csv.ts'
@@ -17,7 +17,7 @@ vi.mock('../src/lib/api-fetch.ts', () => ({
       : Promise.reject(new Error('not found'))
   },
 }))
-vi.mock('../src/lib/user-store.ts', () => ({
+vi.mock('../src/platform/user-store.ts', () => ({
   storedRecords: async () => ({ records: api.stored, invalid: [] }),
 }))
 vi.mock('../src/lib/download.ts', () => ({
@@ -200,7 +200,7 @@ describe('saving the CSV files', () => {
     ]
     await saveLoadsCsv()
     const file = await lastSaved()
-    expect(file.name).toBe('openreloading-loads-2026-10-30.csv')
+    expect(file.name).toBe('rangefoundry-loads-2026-10-30.csv')
     expect(file.type).toBe('text/csv;charset=utf-8')
     expect(file.bom).toEqual([0xef, 0xbb, 0xbf])
     const lines = file.text.replace('\ufeff', '').split('\n')
@@ -225,7 +225,7 @@ describe('saving the CSV files', () => {
     >
     saveFirearmsCsv([bare], new Map(), () => undefined)
     const file = await lastSaved()
-    expect(file.name).toBe('openreloading-firearms-2026-10-30.csv')
+    expect(file.name).toBe('rangefoundry-firearms-2026-10-30.csv')
     expect(file.text.replace('\ufeff', '')).toBe(
       'Name,Cartridge,Round count,Loads,Last session\nSpare,,,0,\n',
     )

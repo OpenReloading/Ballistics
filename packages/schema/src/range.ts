@@ -22,14 +22,16 @@ const rangeFiringsParser = z
       .min(1),
     note: z.string().min(1).optional(),
     // One report per record: its rounds are numbered within that report.
-    provenance: provenance.refine(
-      (p) =>
-        p.kind === 'measured' &&
-        p.sources.length === 1 &&
-        !!p.sources[0]?.url &&
-        !!p.sources[0]?.sha256,
-      { message: 'range firings are measured, from one report with its URL and sha256' },
-    ),
+    provenance: provenance
+      .refine(
+        (p) =>
+          p.kind === 'measured' &&
+          p.sources.length === 1 &&
+          !!p.sources[0]?.url &&
+          !!p.sources[0]?.sha256,
+        { message: 'range firings are measured, from one report with its URL and sha256' },
+      )
+      .optional(),
   })
   .superRefine((r, ctx) => {
     const issue = (path: (string | number)[], message: string) =>
@@ -72,7 +74,7 @@ export const rangeFirings: z.ZodObject<{
     }>
   >
   note: z.ZodOptional<z.ZodString>
-  provenance: typeof provenance
+  provenance: z.ZodOptional<typeof provenance>
 }> = rangeFiringsParser satisfies Exact<typeof rangeFirings, typeof rangeFiringsParser>
 
 /** A record of spark-range rounds of one projectile from one report. */

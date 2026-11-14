@@ -1,5 +1,5 @@
 /** The bullet list page's own data, apart from `bullet-rows.ts`, which the site search of every page loads. */
-import { toSi } from '@open-reloading/schema'
+import { toSi } from '@rangefoundry/schema'
 import { formatNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
 import { bulletSectionalDensity } from './bullet-kinds.ts'

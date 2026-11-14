@@ -1,4 +1,4 @@
-import type { TargetSheet } from '@open-reloading/schema'
+import type { TargetSheet } from '@rangefoundry/schema'
 import { useEffect, useRef } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { fetchFederationData } from '../lib/face-records.ts'
