@@ -110,7 +110,12 @@ function sourcesOf(roots: readonly string[]) {
       if (parsed.success && !byId.has(parsed.data.id)) byId.set(parsed.data.id, parsed.data)
     }
   }
-  return { byId, cited: new Set<string>(), embedded: new Map<string, Set<string>>() }
+  return {
+    byId,
+    cited: new Set<string>(),
+    embedded: new Map<string, Set<string>>(),
+    citations: new Map<string, (string | undefined)[]>(),
+  }
 }
 
 /** Of the catalogue's published load files (`catalogue`), or of a folder laid out as `records/loads/` only, their source references resolved from the records' sources. */

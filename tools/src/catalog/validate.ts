@@ -1,6 +1,6 @@
-import { readRecords } from './records.ts'
+import { validateRecords } from './records.ts'
 
-const { bundle, errors, warnings } = readRecords()
+const { bundle, errors, warnings } = validateRecords()
 for (const error of errors) console.error(error)
 for (const warning of warnings) console.warn(`warning: ${warning}`)
 const counts = Object.entries(bundle).flatMap(([kind, records]) =>

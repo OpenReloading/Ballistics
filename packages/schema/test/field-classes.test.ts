@@ -34,6 +34,11 @@ describe('a bullet without provenance', () => {
     expect(bullet.parse(basicBullet)).toEqual(basicBullet)
   })
 
+  it('passes with our own note, a basic field', () => {
+    const record = { ...basicBullet, note: 'Our text' }
+    expect(bullet.parse(record)).toEqual(record)
+  })
+
   it('fails with a nose length, and the message names it', () => {
     const record = { ...basicBullet, noseLength: { value: 16 } }
     expectIssueAt(bullet, record, 'noseLength')
@@ -60,6 +65,11 @@ describe('a bullet without provenance', () => {
 describe('a powder without provenance', () => {
   it('passes with basic fields only', () => {
     expect(powder.parse(basicPowder)).toEqual(basicPowder)
+  })
+
+  it('passes with our own note, a basic field', () => {
+    const record = { ...basicPowder, note: 'Our text' }
+    expect(powder.parse(record)).toEqual(record)
   })
 
   it('fails with a composition', () => {
