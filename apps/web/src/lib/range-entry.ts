@@ -159,7 +159,8 @@ const changeString =
           }
     const at = stringIndex(base, step)
     const strings = [...base.data.strings]
-    const made = edit(at < 0 ? undefined : strings[at])
+    // a missing string (index -1) reads as undefined: the edit starts a new one
+    const made = edit(strings[at])
     if (at < 0) strings.push(made)
     else strings[at] = made
     // never a record the schema rejects: it would block every later change of this session

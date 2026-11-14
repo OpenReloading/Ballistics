@@ -14,13 +14,14 @@ import type {
   Manufacturer,
   Powder,
   Primer,
+  Provenance,
   RangeFirings,
   TargetFace,
   TargetMapping,
 } from '@rangefoundry/schema'
 import { parseRef } from '@rangefoundry/schema'
 import { checkCaliberClasses } from './caliber-classes.ts'
-import { checkCoverage } from './coverage.ts'
+import { checkCoverage, type FieldClassKind } from './coverage.ts'
 import { checkEventTypes } from './event-types.ts'
 import { checkFederations } from './federations.ts'
 import { checkFittedSources } from './load-tables.ts'
@@ -100,26 +101,32 @@ function applyExceptions(spec: Cartridge, errors: string[]) {
   }
 }
 
-/** Every data field of the source-backed kinds is supported by a source; every other kind has provenance. */
+/** A record a source may support. */
+type Sourced = { id: string; provenance?: Provenance | undefined }
+
+/** Every field of the source-backed kinds that needs a source has one, bullets, powders and manufacturers by their field classes; the third-party kinds have provenance. */
 function checkSourceCoverage(bundle: Bundle, errors: string[]) {
+  const check = (dir: string, records: readonly Sourced[], kind?: FieldClassKind) => {
+    for (const record of records) {
+      for (const error of checkCoverage(record, kind))
+        errors.push(`${dir}/${record.id}.json: ${error}`)
+    }
+  }
+  check('manufacturers', bundle.manufacturers, 'manufacturer')
+  check('powders', bundle.powders, 'powder')
+  check('bullets', bundle.bullets, 'bullet')
   for (const [dir, records] of [
-    ['manufacturers', bundle.manufacturers],
     ['caliber-classes', bundle.caliberClasses],
-    ['powders', bundle.powders],
     ['primers', bundle.primers],
-    ['bullets', bundle.bullets],
     ['cases', bundle.cases],
     ['capacities', bundle.capacities],
     ['federations', bundle.federations],
     ['disciplines', bundle.disciplines],
     ['target-mappings', bundle.targetMappings],
     ['event-types', bundle.eventTypes ?? []],
-  ] as const) {
-    for (const record of records) {
-      for (const error of checkCoverage(record)) errors.push(`${dir}/${record.id}.json: ${error}`)
-    }
-  }
-  // these kinds and published tables (checkRecords) need provenance in the catalog until a gate that covers them replaces this check
+  ] as const)
+    check(dir, records)
+  // permanent rule: these kinds hold third-party data and need provenance; chrono sessions need provenance too
   for (const [dir, records] of [
     ['cartridges', bundle.cartridges],
     ['loads', bundle.loads],
@@ -213,7 +220,7 @@ export function checkRecords({ bundle, published, loadTables }: RecordsRead): {
     applyExceptions(c, errors)
   }
   checkSourceCoverage(bundle, errors)
-  // kept until a gate that covers published tables replaces it, as for the kinds in checkSourceCoverage
+  // a published-load file holds third-party data and needs provenance, the permanent rule beside the kinds in checkSourceCoverage
   for (const { folder, file } of published)
     if (!file.provenance) errors.push(`loads/${folder}/${file.id}.json: needs provenance`)
   errors.push(...checkFederations(bundle))
