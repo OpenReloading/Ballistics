@@ -243,6 +243,8 @@ const everyKind = bundle({
   ],
 })
 
+const chart = (manufacturer: string) => ({ chart: { manufacturer, edition: '2024' } })
+
 describe('checkManufacturerReferences', () => {
   it('reads the case maker of a capacity as a reference or a plain id', () => {
     const b = bundle({
@@ -254,6 +256,15 @@ describe('checkManufacturerReferences', () => {
     })
     expect(errorsOf((e) => checkManufacturerReferences(b, {}, recordIds(b), e))).toEqual([
       'capacities/cap2.json: unknown caseManufacturer "m9"',
+    ])
+  })
+
+  it("names the unknown maker of a powder's burn-rate chart", () => {
+    const b = bundle({
+      powders: [{ id: 'p1', manufacturer: 'm1', burnRateCharts: [chart('m1'), chart('m9')] }],
+    })
+    expect(errorsOf((e) => checkManufacturerReferences(b, {}, recordIds(b), e))).toEqual([
+      'powders/p1.json: unknown burn-rate chart manufacturer "m9"',
     ])
   })
 

@@ -1147,6 +1147,15 @@ export const powder: z.ZodObject<{
         hot: QuantitySchema;
     }>>;
     listedCartridges: z.ZodOptional<z.ZodArray<typeof recordId>>;
+    burnRateCharts: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        chart: z.ZodObject<{
+            manufacturer: typeof recordId;
+            edition: z.ZodString;
+        }>;
+        position: z.ZodNumber;
+        relative: z.ZodOptional<z.ZodNumber>;
+    }>>>;
+    scope: z.ZodOptional<z.ZodArray<typeof powderScopes>>;
     note: z.ZodOptional<z.ZodString>;
     provenance: z.ZodOptional<typeof provenance>;
 }>;
@@ -1155,7 +1164,7 @@ export const powder: z.ZodObject<{
 export const powderBasicFields: readonly string[];
 
 // @public
-export type PowderDraft = Overrides<Omit<Powder, 'id' | 'manufacturer' | 'name' | 'country' | 'provenance' | 'composition' | 'listedCartridges'>> & {
+export type PowderDraft = Overrides<Omit<Powder, 'id' | 'manufacturer' | 'name' | 'country' | 'provenance' | 'composition' | 'listedCartridges' | 'burnRateCharts' | 'scope'>> & {
     composition?: {
         name?: string | undefined;
         cas?: string | undefined;
@@ -1166,6 +1175,13 @@ export type PowderDraft = Overrides<Omit<Powder, 'id' | 'manufacturer' | 'name' 
 
 // @public
 export const powderDraft: z.ZodType<PowderDraft>;
+
+// @public
+export const powderScopes: z.ZodEnum<{
+    rifle: 'rifle';
+    handgun: 'handgun';
+    shotgun: 'shotgun';
+}>;
 
 // @public
 export const pressureMethod: z.ZodEnum<z.core.util.ToEnum<'transducer' | 'piezo' | 'case-contact' | 'crusher' | 'energy'>>;
