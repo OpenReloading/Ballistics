@@ -1699,11 +1699,7 @@ export function useWorkbenchState() {
   const [status, setStatus] = useState<Status>('')
   // remounts the cartridge search so it drops an earlier query when a preset chooses the cartridge
   const [searchKey, setSearchKey] = useState(0)
-  const [previewInitial, setPreviewInitial] = useState<{
-    bullet?: string | undefined
-    barrel?: number
-    seating?: Seating
-  }>()
+  const [previewInitial, setPreviewInitial] = useState<{ seating?: Seating }>()
   /** SI values the preview wrote into the fields. */
   const [previewed, setPreviewedState] = useState<Previewed>({})
   // the run reads the seating at once, as `seatedNow` (#938): a run pressed while a seating arrives plans the seating ladder from it, not from the render before

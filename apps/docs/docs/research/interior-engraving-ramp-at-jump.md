@@ -1,7 +1,7 @@
 ---
 
 title: Engraving ramp at the jump to the lands
-description: Starting the workbench's engraving ramp at the seated bullet's jump (0 when touching or jammed) and its effect on peak pressure and muzzle velocity of the example load.
+description: Starting the workbench's engraving ramp at the seated bullet's jump (0 when touching or jammed) and its effect on peak pressure and muzzle velocity of the 308 Win. test load.
 ---
 
 # Engraving ramp at the jump to the lands
@@ -22,7 +22,7 @@ The engraving term of the bore resistance is unchanged ([M3 interior model](../m
 
 ## Numbers
 
-Example load: 2.4 g charge, 3.13 cm3 behind the bullet, 10.886 g bullet, 569 mm travel, start pressure 30 MPa. Ramp values are typed stand-ins, not taken from a record or a source.
+308 Win. test load: 2.4 g charge, 3.13 cm3 behind the bullet, 10.886 g bullet, 569 mm travel, start pressure 30 MPa. Ramp values are typed stand-ins, not taken from a record or a source.
 
 | Jump             | Ramp 60 MPa over 5 mm: peak, velocity | Ramp 30 MPa over 10 mm: peak, velocity |
 | ---------------- | ------------------------------------- | -------------------------------------- |
@@ -41,7 +41,7 @@ Improved: adopted. The jammed and jumped runs differ with a ramp and are identic
 
 ## Data basis
 
-Analytic: the workbench example load with typed stand-in ramps, no measurement.
+Analytic: the 308 Win. test load with typed stand-in ramps, no measurement.
 
 ## Where in the app
 
