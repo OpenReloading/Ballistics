@@ -58,6 +58,18 @@ const grainForms: Record<string, Message> = {
   other: msg('other'),
 }
 
+const scopes: Record<string, Message> = {
+  rifle: msg('Rifle'),
+  handgun: msg('Handgun'),
+  shotgun: msg('Shotgun'),
+}
+
+/** A use the maker states for a powder ("Rifle"). */
+export const scopeText = (t: Translator['t'], scope: string) => {
+  const known = scopes[scope]
+  return known ? t(known) : scope
+}
+
 const bases: Record<string, Message> = {
   single: msg('single'),
   double: msg('double'),
