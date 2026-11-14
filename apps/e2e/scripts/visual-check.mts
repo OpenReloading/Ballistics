@@ -1,4 +1,5 @@
 // Screenshots for a person to look at before landing a UI change: each page at 390 and 1280 px, light and dark, against WEB_URL (it starts no server), written to visual-check-out/shots/<page>__<theme>__<width>.png plus one contact sheet, visual-check-out/sheet.png (VISUAL_OUT for another folder); pnpm run visual-check [--preset drawing|calculators] [/path ...]; VISUAL_LANGUAGE=de for the German interface (pages waited for by structure, not English text), /workbench takes VISUAL_LADDER, VISUAL_DEFAULTS and VISUAL_LOADS
+import { randomUUID } from 'node:crypto'
 import { mkdirSync, readFileSync, rmSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -81,12 +82,11 @@ export const fittedCaption = 'Model output from fitted M3 parameters, not manufa
 export const bar = (page: Page, name: string, texts = catalogue) =>
   barButton(page, name, inLanguage('Page actions', texts))
 
-/** Stores the fixture load and opens it in the workbench; below 75em the bar's actions are behind "Page actions". */
-async function openFixtureLoad(page: Page) {
-  await putRecords(page, [fixtureRifle, fixtureLoad])
+/** Opens a stored load in the workbench; below 75em the bar's actions are behind "Page actions". */
+async function openFixtureLoad(page: Page, load: { name: string }) {
   await (await bar(page, 'Open')).click()
   await page.getByRole('menuitem', { name: new RegExp(`^${inLanguage('Saved loads')}`) }).click()
-  await page.getByRole('button', { name: fixtureLoad.name, exact: true }).click()
+  await page.getByRole('button', { name: load.name, exact: true }).click()
 }
 
 /** VISUAL_DEFAULTS=1: the load's link without the defaulted inputs, so the run lists them. */
@@ -101,13 +101,13 @@ async function withoutDefaults(page: Page) {
   if ((await powder.getAttribute('aria-expanded')) !== 'true') await powder.click()
 }
 
-/** VISUAL_LOADS=<n>: n open loads (the fixture load in each), made at 1280 px where the strip is shown (below 75em it is hidden), then the window back at its width. */
-async function openLoads(page: Page, loads: number) {
+/** VISUAL_LOADS=<n>: n open loads (a copy of the fixture load in each), made at 1280 px where the strip is shown (below 75em it is hidden), then the window back at its width. */
+async function openLoads(page: Page, copies: (typeof fixtureLoad)[]) {
   const size = page.viewportSize()
   await page.setViewportSize({ width: 1280, height: size?.height ?? 844 })
-  for (let i = 1; i < loads; i++) {
+  for (const copy of copies) {
     await page.locator('.load-strip > button[aria-label="New load"]').click()
-    await openFixtureLoad(page)
+    await openFixtureLoad(page, copy)
     await page.locator('.field-flag-seating').first().waitFor()
   }
   if (size) await page.setViewportSize(size)
@@ -115,10 +115,20 @@ async function openLoads(page: Page, loads: number) {
 
 /** The workbench with the fixture load run and its results shown. */
 async function workbenchReady(page: Page) {
-  await openFixtureLoad(page)
-  if (process.env.VISUAL_DEFAULTS) await withoutDefaults(page)
+  // an open load of a record already open switches to its tab, so each extra load is a copy with its own id and name
   const loads = Number(process.env.VISUAL_LOADS)
-  if (loads > 1) await openLoads(page, loads)
+  const copies = Array.from({ length: loads > 1 ? loads - 1 : 0 }, (_, i) => ({
+    ...fixtureLoad,
+    id: randomUUID(),
+    name: `${fixtureLoad.name} ${i + 2}`,
+  }))
+  await putRecords(page, [fixtureRifle, fixtureLoad, ...copies])
+  // the workbench reads the firearms as it mounts
+  await page.reload()
+  await page.locator('html[data-hydrated]').waitFor({ state: 'attached' })
+  await openFixtureLoad(page, fixtureLoad)
+  if (process.env.VISUAL_DEFAULTS) await withoutDefaults(page)
+  if (copies.length) await openLoads(page, copies)
   // VISUAL_LADDER=<steps>: a charge ladder of that many steps of 0.5 gr on the fixture load (both default presets weigh the charge in grains)
   const steps = process.env.VISUAL_LADDER
   if (steps) {
@@ -141,7 +151,7 @@ async function workbenchReady(page: Page) {
     })
 }
 
-/** Waits until the page shows what a person checks: the drawing, or the .308 Win. example result. */
+/** Waits until the page shows what a person checks: the drawing, or the fixture load's result. */
 async function ready(page: Page, url: string) {
   // the URL's filters and the browser's records apply after hydration
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' })
