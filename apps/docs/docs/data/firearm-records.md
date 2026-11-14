@@ -1,7 +1,7 @@
 ---
 
 title: Firearm records
-description: Recommended record kinds for firearm manufacturers, models, variants and builds, their import path, workbench integration and the decisions the owner takes.
+description: Recommended record kinds for firearm manufacturers, models, variants and builds, their import path, workbench integration and the open decisions.
 ---
 
 # Firearm records

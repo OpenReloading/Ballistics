@@ -94,6 +94,46 @@ const powderTemperatureSensitivity = z.object({
   hot: quantity('inverseTemperature'),
 })
 
+/** The uses a maker states for a powder. */
+export const powderScopes: z.ZodEnum<{ rifle: 'rifle'; handgun: 'handgun'; shotgun: 'shotgun' }> =
+  z.enum(['rifle', 'handgun', 'shotgun'])
+
+/** Each maker's chart is its own scale, so the entries stay apart and carry no merged number. */
+const powderBurnRateCharts = z
+  .array(
+    z.object({
+      chart: z
+        .object({
+          manufacturer: recordId.describe("Id of the manufacturer record of the chart's maker."),
+          edition: z
+            .string()
+            .min(1)
+            .describe("The chart's edition as printed, or its publication date (ISO 8601)."),
+        })
+        .describe('The burn-rate chart: its maker and edition.'),
+      position: z
+        .number()
+        .int()
+        .positive()
+        .describe("Place of the powder in the chart's printed order, from 1."),
+      relative: z
+        .number()
+        .positive()
+        .describe("The relative value the chart prints for the powder, on that chart's own scale.")
+        .optional(),
+    }),
+  )
+  .min(1)
+  .refine(
+    (entries) =>
+      new Set(entries.map((e) => `${e.chart.manufacturer} ${e.chart.edition}`)).size ===
+      entries.length,
+    { message: 'a chart is listed twice' },
+  )
+  .describe(
+    "The powder's place in burn-rate charts as their makers publish them, one entry per chart.",
+  )
+
 /** Whether a source of the provenance passes `test`, given the source's own kind or the record's; none without provenance. */
 const anySource = (
   p: Provenance | undefined,
@@ -115,6 +155,13 @@ const powderParser = z
     interior: powderInterior.optional(),
     temperatureSensitivity: powderTemperatureSensitivity.optional(),
     listedCartridges: z.array(recordId).min(1).optional(),
+    burnRateCharts: powderBurnRateCharts.optional(),
+    scope: z
+      .array(powderScopes)
+      .min(1)
+      .refine((s) => new Set(s).size === s.length, { message: 'a use is listed twice' })
+      .describe('The uses the maker states for the powder: rifle, handgun, shotgun.')
+      .optional(),
     note: z.string().min(1).optional(),
     provenance: provenance.optional(),
   })
@@ -242,6 +289,22 @@ export const powder: z.ZodObject<{
    * sheet does: what the manufacturer says, not a recommendation. Absent: not recorded, never none.
    */
   listedCartridges: z.ZodOptional<z.ZodArray<typeof recordId>>
+  /**
+   * The powder's place in burn-rate charts as their makers publish them: per chart its maker and
+   * edition, the position in the printed order and the relative value where the chart prints one.
+   * Charts of different makers are not on one scale. Absent: not recorded.
+   */
+  burnRateCharts: z.ZodOptional<
+    z.ZodArray<
+      z.ZodObject<{
+        chart: z.ZodObject<{ manufacturer: typeof recordId; edition: z.ZodString }>
+        position: z.ZodNumber
+        relative: z.ZodOptional<z.ZodNumber>
+      }>
+    >
+  >
+  /** The uses the manufacturer states for the powder. Absent: not recorded, never none. */
+  scope: z.ZodOptional<z.ZodArray<typeof powderScopes>>
   note: z.ZodOptional<z.ZodString>
   /**
    * Where the values of the record come from: a kind and at least one source. Absent: the record

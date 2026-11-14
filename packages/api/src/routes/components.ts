@@ -83,6 +83,7 @@ const powderList = page(
     grainForm: powder.shape.grainForm,
     propellantBase: powder.shape.propellantBase,
     country: powder.shape.country,
+    scope: powder.shape.scope,
     interior: powder.shape.interior
       .unwrap()
       .pick({
