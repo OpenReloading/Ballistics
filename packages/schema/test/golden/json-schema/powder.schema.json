@@ -581,6 +581,64 @@
         "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
       }
     },
+    "burnRateCharts": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "chart": {
+            "type": "object",
+            "properties": {
+              "manufacturer": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Id of the manufacturer record of the chart's maker."
+              },
+              "edition": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The chart's edition as printed, or its publication date (ISO 8601)."
+              }
+            },
+            "required": [
+              "manufacturer",
+              "edition"
+            ],
+            "description": "The burn-rate chart: its maker and edition."
+          },
+          "position": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991,
+            "description": "Place of the powder in the chart's printed order, from 1."
+          },
+          "relative": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "The relative value the chart prints for the powder, on that chart's own scale."
+          }
+        },
+        "required": [
+          "chart",
+          "position"
+        ]
+      },
+      "description": "The powder's place in burn-rate charts as their makers publish them, one entry per chart."
+    },
+    "scope": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "rifle",
+          "handgun",
+          "shotgun"
+        ]
+      },
+      "description": "The uses the maker states for the powder: rifle, handgun, shotgun."
+    },
     "note": {
       "type": "string",
       "minLength": 1

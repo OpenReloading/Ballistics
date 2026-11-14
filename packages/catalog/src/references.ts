@@ -173,7 +173,7 @@ function checkComponentMakers(
     )
 }
 
-/** Of every powder, primer, bullet, case and listed load table, the case manufacturer of a capacity, the device manufacturer of a chronograph session and the manufacturers a load names (a described bullet or powder and the case). */
+/** Of every powder (and of its burn-rate charts), primer, bullet, case and listed load table, the case manufacturer of a capacity, the device manufacturer of a chronograph session and the manufacturers a load names (a described bullet or powder and the case). */
 export function checkManufacturerReferences(
   bundle: Pick<
     Bundle,
@@ -188,6 +188,9 @@ export function checkManufacturerReferences(
       errors.push(`${where}: unknown ${field} "${id}"`)
   }
   checkComponentMakers(bundle, check)
+  for (const p of bundle.powders)
+    for (const c of p.burnRateCharts ?? [])
+      check(`powders/${p.id}.json`, 'burn-rate chart manufacturer', c.chart.manufacturer)
   for (const s of bundle.chronoSessions)
     check(`chrono/${s.id}.json`, 'device.manufacturer', parseRef(s.device.manufacturer)?.id)
   for (const l of bundle.loads) checkLoadMakers(l, check)

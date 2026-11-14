@@ -148,6 +148,8 @@ export interface PowderItem {
   grainForm?: string
   propellantBase?: string
   country?: string
+  /** The uses the maker states: `rifle`, `handgun`, `shotgun`. */
+  scope?: string[]
   interior?: PowderInteriorItem
 }
 
