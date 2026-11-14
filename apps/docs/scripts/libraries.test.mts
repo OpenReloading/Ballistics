@@ -19,8 +19,7 @@ for (const { page: pageName, name } of libraries) {
   test(`${name}: install line, entry points, reference link and homepage`, () => {
     const manifest = JSON.parse(readFileSync(`${root}packages/${name}/package.json`, 'utf8'))
     const pkg: string = manifest.name
-    // either scope while the packages move to @rangefoundry
-    assert.match(pkg, new RegExp(`^@(open-reloading|rangefoundry)/${name}$`))
+    assert.match(pkg, new RegExp(`^@rangefoundry/${name}$`))
     assert.match(page, new RegExp(`\`\`\`sh\\nnpm install ${pkg}\\n\`\`\``))
     // a table cell, padded to its column's width
     const cell = (path: string) =>

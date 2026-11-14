@@ -549,8 +549,7 @@ export interface ResolvedRecord {
     manufacturer: string;
     // (undocumented)
     name: string;
-    // (undocumented)
-    provenance: Provenance;
+    provenance?: Provenance | undefined;
     // (undocumented)
     suppliedFields: string[];
 }

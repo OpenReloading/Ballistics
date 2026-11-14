@@ -22,7 +22,8 @@ export interface ResolvedRecord {
   manufacturer: string
   name: string
   suppliedFields: string[]
-  provenance: Provenance
+  /** Absent on a record of basic fields only. */
+  provenance?: Provenance | undefined
 }
 
 /** The {@link ResolvedRecord} of a bullet or powder record. */

@@ -111,7 +111,7 @@ describe('mergePublishedLoads', () => {
     expect(written).toBe(true)
     expect(report).toEqual({ created: ids, changed: [], unchanged: [], absent: [] })
     expect(file.loads.map((l) => l.id)).toEqual(ids)
-    expect(file.provenance.sources).toEqual([edition(2025)])
+    expect(file.provenance?.sources).toEqual([edition(2025)])
     expect(file.loads.every((l) => l.source === undefined)).toBe(true)
   })
 
@@ -156,7 +156,7 @@ describe('mergePublishedLoads', () => {
     )
     expect(written).toBe(true)
     expect(report.changed[0]?.accepted).toBe(true)
-    expect(file.provenance.sources).toEqual([edition(2025), edition(2026)])
+    expect(file.provenance?.sources).toEqual([edition(2025), edition(2026)])
     const merged = defined(file.loads.find((l) => l.id === id))
     expect(merged.source).toBe(1)
     expect(merged.page).toBe('9')
@@ -183,7 +183,7 @@ describe('mergePublishedLoads', () => {
     const c = load('FMJ', 'Powder C', '27.0')
     const incoming = { ...table([a, b, c]), cartridgeName: 'Printed otherwise' }
     const { file } = mergePublishedLoads(first, incoming, new Set())
-    expect(file.provenance.sources).toEqual([edition(2025)])
+    expect(file.provenance?.sources).toEqual([edition(2025)])
     expect(file.cartridgeName).toBe('Test cartridge')
   })
 
@@ -192,7 +192,7 @@ describe('mergePublishedLoads', () => {
     const incoming = table([a, c], 2026)
     incoming.provenance.sources = [edition(2025), edition(2026)]
     const { file } = mergePublishedLoads(first, incoming, new Set())
-    expect(file.provenance.sources).toEqual([edition(2025), edition(2026)])
+    expect(file.provenance?.sources).toEqual([edition(2025), edition(2026)])
     expect(defined(file.loads.find((l) => l.id === loadId(first, c))).source).toBe(1)
   })
 
@@ -446,9 +446,27 @@ describe('pnpm run loads:merge', () => {
     write(incoming, target, table([a, b]))
     expect(mergeLoadFolder({ incoming, records, accept: 'all', dryRun: false }).errors).toEqual([])
     const merged = JSON.parse(readFileSync(join(records, target), 'utf8')) as PublishedLoads
-    expect(merged.provenance.sources).toEqual([{ source: 'test-table' }])
+    expect(merged.provenance?.sources).toEqual([{ source: 'test-table' }])
     expect(merged.loads).toHaveLength(2)
     expect(readRecords(records).errors).toEqual([])
+  })
+
+  it('refuses an incoming table without provenance and does not merge into a stored one without it', () => {
+    const records = temp()
+    const incoming = temp()
+    const { provenance: _p, ...unsourced } = table([a])
+    write(incoming, target, unsourced)
+    expect(mergeLoadFolder({ incoming, records, accept: 'all', dryRun: false }).errors).toEqual([
+      `${target}: a table needs provenance`,
+    ])
+    write(records, target, withLoadIds(unsourced as IncomingLoads))
+    expect(readRecords(records).errors).toContain(`${target}: needs provenance`)
+    const before = readFileSync(join(records, target), 'utf8')
+    write(incoming, target, table([a, b]))
+    expect(mergeLoadFolder({ incoming, records, accept: 'all', dryRun: false }).errors).toEqual([
+      `${target}: the table in the records needs provenance`,
+    ])
+    expect(readFileSync(join(records, target), 'utf8')).toBe(before)
   })
 
   it('refuses a file that is not in its cartridge folder or not named for its maker', () => {

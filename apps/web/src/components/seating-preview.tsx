@@ -1478,7 +1478,7 @@ function BulletStatus({ m }: { m: Model }) {
       {bulletRecord && (
         <p className="record">
           {t('Bullet: {label}', { label: productLabel(bulletRecord, names) })} ({bulletRecord.id}
-          {bulletRecord.provenance.sources[0] && (
+          {bulletRecord.provenance?.sources[0] && (
             <>
               , <RecordSourcesLink kind="bullets" id={bulletRecord.id} />
             </>

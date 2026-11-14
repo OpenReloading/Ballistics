@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import type { Exact } from './exact.ts'
 import { catalogueRef, recordId, ref } from './ids.ts'
-import { type Provenance, provenance } from './provenance.ts'
+import { provenance } from './provenance.ts'
 import { type QuantitySchema, quantity } from './units.ts'
 
 const caseMaterialsParser = z.enum([
@@ -94,14 +94,14 @@ const cartridgeCaseParser = z
       .optional(),
     note: z.string().min(1).describe('Notes on the product.').optional(),
     provenance: provenance
-      .describe('Where the values come from. Required for a catalogue case.')
+      .describe('Where the values come from, wherever the record has a source.')
       .optional(),
   })
   .superRefine((c, ctx) => {
     if (c.origin !== 'catalogue') return
     const issue = (path: PropertyKey[], message: string) =>
       ctx.addIssue({ code: 'custom', path, message })
-    for (const k of ['id', 'name', 'manufacturer', 'productNumber', 'provenance'] as const)
+    for (const k of ['id', 'name', 'manufacturer', 'productNumber'] as const)
       if (c[k] === undefined) issue([k], `A catalogue case needs ${k === 'id' ? 'an' : 'a'} ${k}`)
     for (const k of ['cartridge', 'manufacturer', 'capacity'] as const)
       if (c[k] !== undefined && !c[k].startsWith('catalogue:'))
@@ -112,7 +112,7 @@ const cartridgeCaseParser = z
  * A cartridge case, for one cartridge: the entity of a catalogue record (`records/cases`) as its
  * manufacturer sells it, the user record of kind `case` (a group of cases the user keeps, with
  * their measured values) and the case a load references. A catalogue case carries its `id` (the
- * file name), `manufacturer`, `name`, `productNumber` and `provenance`, and names catalogue records
+ * file name), `manufacturer`, `name` and `productNumber`, and names catalogue records
  * only. `waterCapacity` is the capacity the manufacturer states; a capacity the user measured stays
  * a case capacity record that `capacity` names, and takes precedence.
  * Inferred type: {@link Case}.
@@ -169,5 +169,4 @@ export interface CatalogueCase extends Case {
   manufacturer: string
   origin: 'catalogue'
   productNumber: string
-  provenance: Provenance
 }

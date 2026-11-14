@@ -227,8 +227,7 @@
     "name",
     "abbreviation",
     "country",
-    "ruleBooks",
-    "provenance"
+    "ruleBooks"
   ],
   "additionalProperties": false
 }

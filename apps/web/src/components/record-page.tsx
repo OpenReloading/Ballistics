@@ -57,7 +57,8 @@ export function RecordPage({
   values: ReactNode
   /** The side column: coefficients, notes. */
   side?: ReactNode | undefined
-  provenance: Provenance
+  /** Absent on a record of basic fields only: no sources section. */
+  provenance?: Provenance | undefined
   /** The record kind (`powders`), whose field labels name the fields a source covers. */
   kind?: string | undefined
   /** Over the sources table: facts of the record's standard (the cartridge record's table, date, country and method). */
@@ -104,14 +105,16 @@ export function RecordPage({
         {figure && <div className="record-figure">{figure}</div>}
         <div className="record-values">{values}</div>
         {side && <div className="record-side">{side}</div>}
-        <Panel
-          id="record-sources"
-          title={t('Sources ({kind})', { kind: t(provenanceKinds[provenance.kind]) })}
-          className="record-sources"
-        >
-          {sourceFacts}
-          <Sources provenance={provenance} kind={kind} />
-        </Panel>
+        {provenance && (
+          <Panel
+            id="record-sources"
+            title={t('Sources ({kind})', { kind: t(provenanceKinds[provenance.kind]) })}
+            className="record-sources"
+          >
+            {sourceFacts}
+            <Sources provenance={provenance} kind={kind} />
+          </Panel>
+        )}
       </div>
     </div>
   )

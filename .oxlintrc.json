@@ -495,8 +495,6 @@
             "patterns": [
               {
                 "group": [
-                  "@open-reloading/*",
-                  "@open-reloading/*/**",
                   "@rangefoundry/*",
                   "@rangefoundry/*/**",
                   "!@rangefoundry/units",
@@ -535,8 +533,6 @@
             "patterns": [
               {
                 "group": [
-                  "@open-reloading/*",
-                  "@open-reloading/*/**",
                   "@rangefoundry/*",
                   "@rangefoundry/*/**",
                   "!@rangefoundry/units",

@@ -137,7 +137,9 @@ const resolvedBullet = {
   manufacturer: z.string().describe('Manufacturer record id'),
   name: z.string().describe('Product name'),
   suppliedFields: z.array(z.string()).describe('Names of the request values the record supplied'),
-  provenance: provenance.describe('Provenance of the bullet record'),
+  provenance: provenance
+    .optional()
+    .describe('Provenance of the bullet record; absent on a record of basic fields only'),
 }
 
 const exteriorResolved = z

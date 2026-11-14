@@ -22,7 +22,7 @@ Where questions, ideas, bugs and record requests go: [README](README.md#communit
 
 ## Rules
 
-- Every record carries its source (provenance), and the terms where the source states them; values taken as facts carry a page citation.
+- A record carries its source (provenance) wherever it has one, and the terms where the source states them; values taken as facts carry a page citation. The schema takes a record without provenance, but `data:validate` still refuses one in `data/` ("needs provenance") until the publishing gate defines what may go without it.
 - Results are simulations, not load data: no wording that calls a load or a result safe.
 - Names of the record fields, the user data files and the API bodies, with the terms to avoid: [GLOSSARY.md](GLOSSARY.md).
 - A pull request that adds a major user-visible feature adds a news item (`apps/web/news/YYYY-MM-DD-slug.md`: front matter `title` and `link`, two sentences) for the home page's What's new list, reviewed like any file; smaller changes are in the changelogs only.

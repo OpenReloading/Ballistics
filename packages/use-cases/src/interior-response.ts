@@ -240,7 +240,9 @@ const cartridge = z
   .looseObject({
     id: text('Cartridge id'),
     name: text('Cartridge name'),
-    provenance,
+    provenance: provenance
+      .optional()
+      .describe('Provenance of the cartridge record, where it has one'),
   })
   .describe('The cartridge record of the request')
 
@@ -253,7 +255,9 @@ const record = (description: string) =>
       suppliedFields: z
         .array(z.string())
         .describe('Names of the request values the record supplied'),
-      provenance,
+      provenance: provenance
+        .optional()
+        .describe('Provenance of the record; absent on a record of basic fields only'),
     })
     .describe(description)
 

@@ -133,9 +133,10 @@ export const source: z.ZodObject<{
   /**
    * SPDX id of the license the data is used under ("CC-BY-4.0"; "LicenseRef-US-Gov-PD" for a US Government work),
    * or `LicenseRef-<name>` for the publisher's own terms, described in `terms`.
-   * Without a license, a source of a record distributed by `@rangefoundry/catalog` is covered by its
-   * data license, CC BY 4.0 (`packages/catalog/LICENSE`), except one with `origin: manufacturer`: data a
-   * manufacturer published carries no project license, only the terms the manufacturer states.
+   * Without a license, a source of a record distributed by `@rangefoundry/catalog` falls under its data
+   * license (`packages/catalog/LICENSE`): CC BY 4.0 covers the project's own work, the selection and
+   * structure of the records and its fitted values. Data a manufacturer published carries no project
+   * license, and the project claims no rights in facts taken from makers' publications.
    * For other producers' records the producer sets the default.
    */
   license: z.ZodOptional<z.ZodString>

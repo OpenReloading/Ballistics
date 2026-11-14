@@ -37,10 +37,12 @@ function checkInteriorSource(
  * rule.
  */
 export function checkFittedSources(powder: Powder, loadTables: LoadTables): string[] {
+  const { provenance } = powder
+  if (!provenance) return powder.interior ? ['interior without a fitted source'] : []
   const errors: string[] = []
   let fitted = 0
-  powder.provenance.sources.forEach((s, i) => {
-    const kind = s.kind ?? powder.provenance.kind
+  provenance.sources.forEach((s, i) => {
+    const kind = s.kind ?? provenance.kind
     const covers = !s.fields || s.fields.some(isInterior)
     // a source under an open license needs no listed manufacturer load table (the demo powder)
     if (s.origin === 'public' && s.license) {

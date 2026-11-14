@@ -538,7 +538,6 @@
   "required": [
     "origin",
     "device",
-    "strings",
-    "provenance"
+    "strings"
   ]
 }
