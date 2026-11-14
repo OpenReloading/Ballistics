@@ -7,20 +7,20 @@ import { type Outcome, type Step, shownSteps } from '../src/components/workbench
 import { LadderTable } from '../src/components/workbench-readouts.tsx'
 import { english } from '../src/i18n/translate.ts'
 import type { InteriorResponse } from '../src/lib/api-types.ts'
-import { exampleInterior, exampleRecords, loadExample } from '../src/lib/example-data.ts'
 import { exampleFields } from '../src/lib/examples.ts'
 import { siValues } from '../src/lib/field-spec.ts'
 import { interiorBody, interiorFields } from '../src/lib/interior-input.ts'
 import { lotChartDescription, lotFractionError, lotLoad } from '../src/lib/lot-rows.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import { defined } from './defined.ts'
+import { fixtureInterior, fixtureLadder, fixtureRecords } from './fixtures/load.ts'
 
 const system = presetUnits('us')
 const { load } = interiorBody(
-  siValues(exampleFields(interiorFields, exampleInterior, system)),
-  exampleRecords.cartridge.id,
+  siValues(exampleFields(interiorFields, fixtureInterior, system)),
+  fixtureRecords.cartridge.id,
 )
-const { steps: count, step, direction } = loadExample.ladder
+const { steps: count, step, direction } = fixtureLadder
 const charges = chargeLadder(load.charge, step, count, direction)
 
 /** A step of the run at `charge`, its answer shaped as the API's from the model's own run. */

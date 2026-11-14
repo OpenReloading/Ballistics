@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test'
 import { choosePreset, storeUnits } from './units.ts'
 import { loadForm } from './workbench.ts'
-import { runExample } from './workbench-run.ts'
+import { runSavedLoad } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
@@ -22,7 +22,7 @@ test('switching steps, changing an input and the units move nothing below the no
 }) => {
   test.setTimeout(90_000)
   await page.setViewportSize({ width: 1280, height: 800 })
-  await runExample(page)
+  await runSavedLoad(page)
   const form = loadForm(page)
   await form.getByLabel(/^Ladder steps/).fill('5')
   await form.getByLabel(/^Step size/).fill('0.15')
@@ -60,7 +60,7 @@ test('More shows the count, its dialog lists every note, traps the focus and ret
 }) => {
   test.setTimeout(60_000)
   await page.setViewportSize({ width: 390, height: 844 })
-  await runExample(page)
+  await runSavedLoad(page)
   await page.getByRole('tab', { name: 'Results', exact: true }).click()
   const items = notes(page).locator('li[data-kind]')
   await expect(band(page)).toHaveCount(1, { timeout: 10_000 })

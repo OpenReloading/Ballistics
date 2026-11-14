@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { fetchRecord } from '../src/lib/api-fetch.ts'
-import { exampleInterior } from '../src/lib/example-data.ts'
 import { interiorBody } from '../src/lib/interior-input.ts'
 import { revolverLeakNote, writeTuneLoad } from '../src/lib/powder-tune.ts'
 import { tuneTable } from '../src/lib/tune-load.ts'
+import { fixtureInterior } from './fixtures/load.ts'
 
 vi.mock('../src/lib/api-fetch.ts', () => ({ fetchRecord: vi.fn() }))
 const fetched = vi.mocked(fetchRecord)
@@ -22,7 +22,7 @@ afterEach(() => {
 })
 
 const ref = 'user:0b5f7a2e-3c1d-4e8f-9a6b-2d4c8e1f7a30'
-const { load } = interiorBody(exampleInterior)
+const { load } = interiorBody(fixtureInterior)
 
 it('fetches the table of a cartridge record handed over while loading, for the revolver note', async () => {
   expect(load.leakage).toBeUndefined()

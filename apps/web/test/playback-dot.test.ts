@@ -1,7 +1,6 @@
 import { interior } from '@rangefoundry/ballistics'
 import { describe, expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
-import { exampleInterior } from '../src/lib/example-data.ts'
 import {
   type ChartQuantity,
   type ChartX,
@@ -22,17 +21,18 @@ import {
 } from '../src/lib/playback.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import { defined, missing } from './defined.ts'
+import { fixtureInterior } from './fixtures/load.ts'
 
 const run = (
-  change: Partial<Record<keyof typeof exampleInterior, number>> = {},
+  change: Partial<Record<keyof typeof fixtureInterior, number>> = {},
 ): PlaybackResult => {
-  const result = interior(interiorBody({ ...exampleInterior, ...change }).load)
+  const result = interior(interiorBody({ ...fixtureInterior, ...change }).load)
   if (!result.valid) throw new Error(`example invalid: ${result.reason}`)
   return result
 }
 // a faster burn than the example, as in playback.test.ts: it burns out in the barrel
 const r = run({ vivacity: 1 })
-const mass = interiorBody(exampleInterior).load.bullet.mass
+const mass = interiorBody(fixtureInterior).load.bullet.mass
 const events = playbackEvents(r, english.t)
 const stops = events.map((e) => e.time)
 

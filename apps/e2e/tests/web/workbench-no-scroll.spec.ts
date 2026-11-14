@@ -2,8 +2,8 @@ import { expect, type Page, test } from '@playwright/test'
 import { cut } from './cut.ts'
 import { showGerman } from './german.ts'
 import { storeUnits } from './units.ts'
-import { applyExampleLoad, loadForm } from './workbench.ts'
-import { runExample } from './workbench-run.ts'
+import { loadForm, openSavedLoad } from './workbench.ts'
+import { runSavedLoad } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
@@ -39,7 +39,7 @@ const overflowing = (page: Page) =>
     ]
   })
 
-/** Runs the example with a `steps`-step ladder of `kind`; its top steps carry the widest flags. */
+/** Runs the fixture load with a `steps`-step ladder of `kind`; its top steps carry the widest flags. */
 async function runLadder(page: Page, kind: 'Charge' | 'Seating', steps: number) {
   const form = loadForm(page)
   await form.getByLabel(/^Ladder steps/).fill(String(steps))
@@ -54,13 +54,13 @@ async function runLadder(page: Page, kind: 'Charge' | 'Seating', steps: number) 
 }
 
 const states = [
-  ['the example load run', undefined],
+  ['the fixture load run', undefined],
   ['a 5-step charge ladder', ['Charge', 5]],
   ['a 21-step charge ladder', ['Charge', 21]],
   ['a 5-step seating ladder', ['Seating', 5]],
 ] as const
 
-// the lowest window of each layout with every state, a 768 px laptop's window, the others with the example
+// the lowest window of each layout with every state, a 768 px laptop's window, the others with the fixture load
 for (const [width, height, shown] of [
   [1280, 650, states],
   [1366, 657, [states[0], states[2]]],
@@ -74,7 +74,7 @@ for (const [width, height, shown] of [
     }) => {
       test.setTimeout(60_000)
       await page.setViewportSize({ width, height })
-      await runExample(page)
+      await runSavedLoad(page)
       if (ladder) await runLadder(page, ladder[0], ladder[1])
       // the sampled band and its note follow the result
       await expect(
@@ -93,7 +93,7 @@ for (const [state, ladder] of [states[0], states[1]])
   }) => {
     test.setTimeout(60_000)
     await page.setViewportSize({ width: 1280, height: 650 })
-    await runExample(page)
+    await runSavedLoad(page)
     if (ladder) await runLadder(page, ladder[0], ladder[1])
     await showGerman(page)
     await expect(page.locator('.readouts dt', { hasText: 'Ladedichte' }).first()).toBeVisible()
@@ -111,16 +111,16 @@ test('at 1100 x 800 only the inputs column of the workbench scrolls, not the pag
 }) => {
   test.setTimeout(60_000)
   await page.setViewportSize({ width: 1100, height: 800 })
-  await runExample(page)
+  await runSavedLoad(page)
   await expect
     .poll(() => overflowing(page))
     .toEqual([expect.stringMatching(/ workspace-inputs v$/)])
   expect(await cut(page)).toEqual([])
 })
 
-/** Runs the example and opens the result tab Trajectory. */
+/** Runs the fixture load and opens the result tab Trajectory. */
 async function openTrajectory(page: Page) {
-  await runExample(page)
+  await runSavedLoad(page)
   await page.getByRole('tab', { name: 'Trajectory', exact: true }).click()
   await expect(page.getByRole('table', { name: /^Trajectory: / })).toBeVisible()
 }
@@ -162,7 +162,7 @@ test('the Gun card keeps its weight error, firearm query and focus when the wind
 }) => {
   test.setTimeout(60_000)
   await page.setViewportSize({ width: 1280, height: 800 })
-  await runExample(page)
+  await runSavedLoad(page)
   const weight = page.getByLabel(/^Gun weight/)
   await weight.fill('0')
   await weight.blur()
@@ -190,7 +190,7 @@ for (const [width, height] of [
     test.setTimeout(60_000)
     await page.setViewportSize({ width, height })
     await page.goto('/workbench')
-    await applyExampleLoad(page)
+    await openSavedLoad(page)
     const charge = loadForm(page).getByLabel(/^Charge mass/)
     await charge.fill('20')
     await charge.press('Control+Enter')

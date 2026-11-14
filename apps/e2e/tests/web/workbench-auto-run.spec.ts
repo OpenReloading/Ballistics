@@ -2,7 +2,7 @@ import { expect, type Page, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
 import { settingsEntry, storeUnits } from './units.ts'
 import { loadForm } from './workbench.ts'
-import { runExample } from './workbench-run.ts'
+import { runSavedLoad } from './workbench-run.ts'
 
 // a change runs the load 600 ms after the last key; Settings > Workbench switches that off
 
@@ -20,7 +20,7 @@ async function lowerCharge(page: Page) {
 
 test('a charge change updates the result without Run', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
-  await runExample(page)
+  await runSavedLoad(page)
   // the safety wording on every view of a result
   await expect(page.getByText('Simulation, not load data', { exact: true })).toBeVisible()
   const before = await resultLine(page).textContent()
@@ -36,7 +36,7 @@ for (const [what, text] of [
 ] as const)
   test(`${what} never starts a run, the result stays marked`, async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 })
-    await runExample(page)
+    await runSavedLoad(page)
     const before = await resultLine(page).textContent()
     await page.clock.install()
     await charge(page).fill(text)
@@ -58,7 +58,7 @@ test('with Run automatically off, only Run runs', async ({ page }) => {
   await expect(toggle).not.toBeChecked()
   await page.keyboard.press('Escape')
 
-  await runExample(page)
+  await runSavedLoad(page)
   const before = await resultLine(page).textContent()
   await page.clock.install()
   await lowerCharge(page)

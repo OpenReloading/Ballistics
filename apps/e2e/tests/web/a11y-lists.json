@@ -77,7 +77,7 @@
     {
       "rule": "color-contrast",
       "node": "li[data-kind=",
-      "where": "workbench after the example run",
+      "where": "workbench after the fixture load run",
       "reason": "Entry of the result notes, a scroll box of fixed height: the part outside the box counts as covered, and the More button beside it as overlapping. Measured against the page and panel background the warning, message and note text has 6.4:1 or more in both themes."
     },
     {

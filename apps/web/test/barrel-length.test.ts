@@ -13,12 +13,12 @@ import {
   rangeLengths,
   valuesAtTravel,
 } from '../src/lib/barrel-length.ts'
-import { exampleInterior } from '../src/lib/example-data.ts'
 import { interiorBody } from '../src/lib/interior-input.ts'
 import { resolveUnits } from '../src/lib/units.ts'
 import { defined, missing } from './defined.ts'
+import { fixtureInterior } from './fixtures/load.ts'
 
-const { load } = interiorBody(exampleInterior)
+const { load } = interiorBody(fixtureInterior)
 const mass = load.bullet.mass
 /** The seated base from the head, m (any value: the length is base + travel). */
 const base = 0.0712
