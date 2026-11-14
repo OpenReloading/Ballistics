@@ -126,7 +126,7 @@ function checkSourceCoverage(bundle: Bundle, errors: string[]) {
     ['event-types', bundle.eventTypes ?? []],
   ] as const)
     check(dir, records)
-  // permanent rule: these hold third-party data and need provenance (owner decision 2026-11-13); chrono fails closed for now
+  // permanent rule: these kinds hold third-party data and need provenance; chrono sessions need provenance too
   for (const [dir, records] of [
     ['cartridges', bundle.cartridges],
     ['loads', bundle.loads],
