@@ -3,7 +3,7 @@ import { baseTypes } from './bullet.ts'
 import type { Exact } from './exact.ts'
 import { text } from './fields.ts'
 import { catalogueRef, recordId, ref } from './ids.ts'
-import { type Provenance, provenance } from './provenance.ts'
+import { provenance } from './provenance.ts'
 import { type QuantityKind, type QuantitySchema, quantity, units } from './units.ts'
 
 /** A solver value a load may override: a key of {@link analysisKinds}. */
@@ -377,7 +377,7 @@ const loadShape = z.object({
     .describe('What the load was at each of its sessions, at most one per session of `sessions`.')
     .optional(),
   provenance: provenance
-    .describe('Where the values come from. Required for a catalogue load.')
+    .describe('Where the values come from, wherever the record has a source.')
     .optional(),
 })
 
@@ -387,7 +387,6 @@ type LoadFields = z.infer<typeof loadShape>
 const checkCatalogueFields = (l: LoadFields, issue: LoadIssue) => {
   if (l.id === undefined) issue(['id'], 'A catalogue load needs an id')
   if (l.name === undefined) issue(['name'], 'A catalogue load needs a name')
-  if (l.provenance === undefined) issue(['provenance'], 'A catalogue load needs provenance')
   for (const k of ['cartridge', 'bullet', 'powder', 'charge'] as const)
     if (l[k] === undefined) issue([k], `A catalogue load needs a ${k}`)
   checkCatalogOnly(
@@ -457,7 +456,7 @@ const loadParser = loadShape.superRefine((l, ctx) => {
  * One cartridge recipe fired from one firearm, for every origin. The cartridge, firearm, bullet, powder
  * and case capacity are references; a catalogue load of publication data (provenance `measured`) may
  * describe its bullet and powder by maker and name where no record exists. A catalogue load carries its `id`
- * (the file name), `name`, `provenance`, cartridge, bullet, powder and charge; a user load keeps
+ * (the file name), `name`, cartridge, bullet, powder and charge; a user load keeps
  * what the workbench had and takes its name from its record. Charge and masses in g, lengths in mm,
  * the typed solver values in `analysis`.
  * Inferred type: {@link Load}.
@@ -554,5 +553,4 @@ export interface CatalogueLoad extends Load {
   bullet: NonNullable<Load['bullet']>
   powder: NonNullable<Load['powder']>
   charge: NonNullable<Load['charge']>
-  provenance: Provenance
 }

@@ -36,8 +36,7 @@ it('fails a new multi-line JSX comment and skips JSX text', () => {
   expect(lines('apps/web/src/x.tsx', '', head)).toEqual([[3, true]])
 })
 
-const base =
-  '// Rounds down, see #788, `floor` and @open-reloading/units.\nconst a = Math.floor(b)\n'
+const base = '// Rounds down, see #788, `floor` and @rangefoundry/units.\nconst a = Math.floor(b)\n'
 
 it('fails a comment-only change that drops a reference and notes a dropped name or package', () => {
   const head = '// Rounds down.\nconst a = Math.floor(b)\n'
@@ -50,7 +49,7 @@ it('fails a comment-only change that drops a reference and notes a dropped name 
   ).toEqual([
     [1, true, '#788'],
     [1, false, '"`floor`"'],
-    [1, false, '"@open-reloading/units"'],
+    [1, false, '"@rangefoundry/units"'],
   ])
 })
 

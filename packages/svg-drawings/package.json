@@ -1,5 +1,5 @@
 {
-  "name": "@open-reloading/drawing",
+  "name": "@rangefoundry/svg-drawings",
   "version": "0.0.6",
   "description": "Figure models of cartridges, bullets, seating and target faces, without a renderer.",
   "keywords": [
@@ -14,7 +14,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OpenReloading/Ballistics.git",
-    "directory": "packages/drawing"
+    "directory": "packages/svg-drawings"
   },
   "publishConfig": {
     "access": "public"
@@ -58,7 +58,7 @@
     "test": "vitest run --coverage"
   },
   "devDependencies": {
-    "@open-reloading/catalog": "workspace:*",
+    "@rangefoundry/catalog": "workspace:*",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "typescript": "catalog:",

@@ -1,5 +1,5 @@
 /** The cartridge list's rows: search text, cells and the packed page props. */
-import { fold, toSi } from '@open-reloading/schema'
+import { fold, toSi } from '@rangefoundry/schema'
 import { formatNumber } from '../i18n/number.ts'
 import type { CartridgeSummary } from './api-types.ts'
 import { caliberLabel, commonCaliber } from './caliber.ts'

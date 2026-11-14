@@ -16,7 +16,7 @@ The cartridge designer seats a bullet in the case and chamber of its own values:
 
 A load can name a case record (`case.record`, [Brass](../data/cases.md): a catalogue product, or a group of the user's own cases) and a case capacity record (`capacity`). A group of the user's cases names the capacity record that holds the water the user measured on it, and choosing the group in the workbench makes that record the load's capacity. The capacity record is a figure the user measured on fired cases, or a catalogue figure chosen for the cartridge. The case record states the water capacity of the product as its manufacturer gives it. The capacity record takes precedence; without one the stated capacity of the case record is the default, and without either the capacity is not given. A stated capacity is never saved into the load: opening a load reads it again from the case record. Code: `packages/schema/src/case-capacity.ts`, `loadWaterCapacity`.
 
-The seating geometry is in `packages/drawing/src/seating/seating.ts`, the outline in `packages/drawing/src/bullet/outline.ts`.
+The seating geometry is in `packages/svg-drawings/src/seating/seating.ts`, the outline in `packages/svg-drawings/src/bullet/outline.ts`.
 
 ## Equations
 
@@ -26,7 +26,7 @@ $$
 V_\mathrm{case} = \frac{m_w}{\rho_w}, \qquad \rho_w = 0.9982\ \text{g/cm}^3
 $$
 
-Code: `packages/units/src/units.ts`, `waterDensityGramsPerCm3`, `packages/drawing/src/seating/seating.ts`, `seat` (`caseVolume`).
+Code: `packages/units/src/units.ts`, `waterDensityGramsPerCm3`, `packages/svg-drawings/src/seating/seating.ts`, `seat` (`caseVolume`).
 
 $\rho_w$ is the density of water at 20 °C. The `primerState` (`primed-spent` or `unprimed`) and `fillLevel` (`mouth`) of a case capacity record say how its water was filled, where the source states it. They are recorded and echoed (the `capacities` of `GET /cartridges/:id`) and do not enter $V_\mathrm{case}$: the same mass gives the same volume either way. No volume correction for the primer pocket is applied until a sourced primer pocket volume per primer size exists. A record without `fillLevel` takes the mouth (Assumptions); one without `primerState` has no primer state. A water temperature the source states goes in `note`. A file with the field `convention` is refused (no migrations before 1.0). A case capacity the user measured, stored as a volume, takes the place of the record's water mass.
 
@@ -46,7 +46,7 @@ $$
 s = L_3 - z_b, \qquad x_e = L_\mathrm{barrel} - z_b
 $$
 
-Code: `packages/drawing/src/seating/seating.ts`, `seat` (`basePosition`, `depthValue`, `travel`).
+Code: `packages/svg-drawings/src/seating/seating.ts`, `seat` (`basePosition`, `depthValue`, `travel`).
 
 ### Bullet volume below the mouth
 
@@ -56,7 +56,7 @@ $$
 V_b = \sum_k \sigma_k \frac{\pi}{3} (z'_\mathrm{hi} - z_\mathrm{lo}) \left(r_\mathrm{lo}^2 + r_\mathrm{lo} r'_\mathrm{hi} + {r'_\mathrm{hi}}^2\right), \qquad z'_\mathrm{hi} = \min(z_\mathrm{hi}, c)
 $$
 
-Code: `packages/drawing/src/bullet/outline.ts`, `revolutionVolume`, `bulletOutline`.
+Code: `packages/svg-drawings/src/bullet/outline.ts`, `revolutionVolume`, `bulletOutline`.
 
 with $z_\mathrm{lo} < z_\mathrm{hi}$ the ends of segment $k$ in z, $r_\mathrm{lo}$ its radius at $z_\mathrm{lo}$, $r'_\mathrm{hi}$ its radius at $z'_\mathrm{hi}$, interpolated linearly along the segment, and $\sigma_k = +1$ for a rising segment, $-1$ for a falling one. A boat tail counts as a frustum and a nose below the mouth with its own profile.
 
@@ -70,7 +70,7 @@ $$
 V_\mathrm{cone}(c) = \frac{\pi}{3} r_c^2 h \left(1 - \left(1 - \frac{c}{h}\right)^3\right), \qquad V_\mathrm{hemi}(c) = \pi \left(r_c^2 c - \frac{c^3}{3}\right), \qquad c \le h = r_c
 $$
 
-Code: `packages/drawing/src/bullet/outline.ts`, `cavityGeometry`, `revolutionVolume`.
+Code: `packages/svg-drawings/src/bullet/outline.ts`, `cavityGeometry`, `revolutionVolume`.
 
 From $c = h$ on the whole cavity counts: $V_\mathrm{cone} = \pi r_c^3 / 3$ and $V_\mathrm{hemi} = 2 \pi r_c^3 / 3$. The outline samples the hemisphere in 24 equal angle steps, which undercounts its volume by less than 0.3 %. A cavity part beyond the mouth lies outside the case volume and is not counted. For a cylinder of diameter $d$ seated past the cavity ($c \ge h$):
 
@@ -78,7 +78,7 @@ $$
 V_b = \frac{\pi}{4} d^2 c - V_\mathrm{cavity}
 $$
 
-Code: `packages/drawing/src/seating/seating.ts`, `intrusion`, `seat`, `packages/drawing/src/bullet/outline.ts`, `revolutionVolume`.
+Code: `packages/svg-drawings/src/seating/seating.ts`, `intrusion`, `seat`, `packages/svg-drawings/src/bullet/outline.ts`, `revolutionVolume`.
 
 #### Cavity depth
 
@@ -88,7 +88,7 @@ $$
 V_\mathrm{cone} = \frac{\pi}{3} r_c^2 h, \qquad V_\mathrm{ell} = \frac{2 \pi}{3} r_c^2 h
 $$
 
-Code: `packages/drawing/src/bullet/outline.ts`, `cavityGeometry`, `cavityVolumeBracket`.
+Code: `packages/svg-drawings/src/bullet/outline.ts`, `cavityGeometry`, `cavityVolumeBracket`.
 
 Without a given depth the depth is bracketed from half to three times the assumed one, $0.5\, r_c \le h \le 3\, r_c$ (`cavityDepthBracket`, an assumption without a source). At $r_c$ = 3 mm the whole cone cavity then lies between 0.014 and 0.085 cm³, around the assumed 0.028 cm³ (cone) and 0.057 cm³ (hemisphere). The seating gives the volume behind the bullet at both ends (`cavityRange` of `seat`). When the run's volume follows the seated bullet, the workbench adds the larger move of $V_b$ over the bracket, relative to the run's volume, to the default volume tolerance of 1 % of the [pressure range](interior-pressure-range.md) (`apps/web/src/lib/cavity-range.ts`, `cavityVolumeFraction`, at most the 0.2 the API takes). The tolerance is symmetric, so the range covers the bracket on its wider side; a move above 19 % of the volume is not covered in full. A deepest bracket cavity that would cut through the wall is made shallower until the outline holds. Each step of a seating ladder sends the tolerance of its own seating depth, from the bracket and the volume behind the bullet at that step.
 
@@ -104,7 +104,7 @@ $$
 V_c = V_\mathrm{case} - V_b
 $$
 
-Code: `packages/drawing/src/seating/seating.ts`, `seat` (`volumeBehindBullet`).
+Code: `packages/svg-drawings/src/seating/seating.ts`, `seat` (`volumeBehindBullet`).
 
 No volume behind the bullet is given, with a note, when the seating depth is above the case length (the base would sit behind the case head) or when $V_c \le 0$ (the bullet below the mouth takes the whole case volume).
 
@@ -116,7 +116,7 @@ $$
 \lvert \Delta V_b \rvert \le \frac{\pi}{4} d^2 \Delta L, \qquad \Delta L = \begin{cases} 0.05\ \text{mm} & \text{measured length} \\ 0.15\, L_b & \text{estimated length} \end{cases}
 $$
 
-Code: `packages/drawing/src/seating/seating.ts`, `intrusion`, `bulletLengthTolerance`.
+Code: `packages/svg-drawings/src/seating/seating.ts`, `intrusion`, `bulletLengthTolerance`.
 
 The lower bound of $V_b$ is clamped at 0. Both tolerances are assumptions without a source.
 
@@ -130,11 +130,11 @@ $$
 \hat L = \frac{m}{\rho_\mathrm{eff}\,\frac{\pi}{4} d^2}
 $$
 
-Code: `packages/drawing/src/seating/seating.ts`, `estimateIntrusion`.
+Code: `packages/svg-drawings/src/seating/seating.ts`, `estimateIntrusion`.
 
 The bullet is seated at the COAL entered, else at the cartridge maximum overall length $L_6$ (the start of the seating preview), so $s = L_3 - (\mathrm{COAL} - \hat L)$, and $V_b$ is the volume below the mouth of the outline that `bulletOutline` builds from the diameter and $\hat L$ (every other proportion assumed). The class error $e$ is the 90th percentile of $|\hat L - L| / L$ over the records of the class, so the true length lies between $\hat L / (1 + e)$ and $\hat L / (1 - e)$, and $V_b$ between the volumes for those lengths: a longer bullet takes more of the case.
 
-Code: `packages/drawing/src/seating/seating.ts`, `estimateIntrusion`, `intrusion`.
+Code: `packages/svg-drawings/src/seating/seating.ts`, `estimateIntrusion`, `intrusion`.
 
 The diameter is the record's, else the typed one, else the groove diameter $Z$ of the cartridge. The default of the chamber volume is the case volume less $V_b$, with the interval of the volume behind the bullet in its source text, which names the class, what the length rests on and why the bullet is not seated; a typed volume replaces it. A record with a length never takes the estimate. While the field holds this default, the run takes its interval as the tolerance of the chamber volume of the pressure range, relative to the volume and at most 0.2, the limit of the API. Without the diameter, the mass (no outline), $L_3$ or a COAL the volume is not estimated: the field stays empty and the card names the missing value.
 
@@ -184,7 +184,7 @@ $$
 z_\mathrm{c} = L_{3,\mathrm{ch}} + s_\mathrm{ch} + \frac{G_1 - d}{2 \tan i}
 $$
 
-Code: `packages/drawing/src/seating/seating.ts`, `leadeContact`.
+Code: `packages/svg-drawings/src/seating/seating.ts`, `leadeContact`.
 
 Without $s_\mathrm{ch}$ the leade starts at $L_{3,\mathrm{ch}} + G - (G_1 - F)/(2 \tan i)$. A bullet not above $F$ has no land contact, and one not below $G_1$ touches at the leade start. The jump is the distance from the ogive point at diameter $d$ to the contact:
 
@@ -192,7 +192,7 @@ $$
 j = z_\mathrm{c} - (z_b + L_b - L_\mathrm{nose})
 $$
 
-Code: `packages/drawing/src/seating/seating.ts`, `leadeContact`, `jumpOf`.
+Code: `packages/svg-drawings/src/seating/seating.ts`, `leadeContact`, `jumpOf`.
 
 The contact position is derived from the C.I.P. chamber drawing, not a C.I.P. value, and is not checked against a measurement. The jump is an estimate against the C.I.P. minimum chamber for either seating input: derived for a bullet seated by a measured CBTO, approximate from COAL.
 
@@ -206,7 +206,7 @@ z_{b,\mathrm{c}} = \mathrm{CBTO}_\mathrm{lands} - B
 z_{b,\mathrm{c}} = \mathrm{COAL}_\mathrm{lands} - L_b
 $$
 
-Code: `packages/drawing/src/seating/seating.ts`, `landsBase`, `landsContactCoal`.
+Code: `packages/svg-drawings/src/seating/seating.ts`, `landsBase`, `landsContactCoal`.
 
 The jump is the distance the base moves from the seated position to the contact, and the COAL of contact is $z_{b,\mathrm{c}} + L_b$:
 
@@ -214,7 +214,7 @@ $$
 j = z_{b,\mathrm{c}} - z_b
 $$
 
-Code: `packages/drawing/src/seating/seating.ts`, `jumpOf`.
+Code: `packages/svg-drawings/src/seating/seating.ts`, `jumpOf`.
 
 A jump of 0 or less is contact. The bullet and the chamber values do not enter, so this jump is given without a nose length or chamber values and is tagged derived: it holds the measured contact and the entered length, and assumes the same comparator and bullet as the measurement. A contact measured with another bullet is not used for the chosen one: the jump then comes from the chamber values above, and the row says so.
 
@@ -279,7 +279,7 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 - A capacity measured unprimed and one measured with a spent primer differ by the primer pocket volume behind the anvil; neither is corrected, since no sourced primer pocket volume per primer size exists.
 - A primer swap is stated as an uncertainty of the start pressure, not applied: the solver keeps one start pressure whatever primer a load names. Peterson Cartridge fired one .22 Creedmoor load with Federal Match large rifle magnum and standard large rifle primers, five new cases each, 24 in barrel; the magnum primers gave on average 25 fps more velocity and 1,500 psi more pressure ([Peterson Cartridge, 22 Creedmoor Load Data](https://petersoncartridge.com/blog/22-creedmoor-load-data), section Maximum Pressure Load Data, retrieved 2026-11-01). The source says the result holds only for that one load and primer brand: it gives the size of the effect, not a correction.
 - A bullet base in front of the case mouth gives $V_b = 0$ with a note, and a bullet wholly below the mouth counts its whole volume.
-- The default outline undercounts the volume of many round-nose and flat-nose bullets: the mass over the outline volume (`outlineDensity`, `packages/drawing/src/bullet/density.ts`) lies above the density of the bullet's material on 157 of the 192 Missouri Bullet cast records with a length (median 12.24 g/cm³ against lead at 11.348 g/cm³), 102 of 354 Cutting Edge, 39 of 317 Hammer and 49 of 121 Lehigh records (copper at 8.935 g/cm³). The check flags such a record; it does not correct the outline. The effect on $V_b$ is limited to a nose below the mouth, as in short handgun cartridges and flush-seated wadcutters.
+- The default outline undercounts the volume of many round-nose and flat-nose bullets: the mass over the outline volume (`outlineDensity`, `packages/svg-drawings/src/bullet/density.ts`) lies above the density of the bullet's material on 157 of the 192 Missouri Bullet cast records with a length (median 12.24 g/cm³ against lead at 11.348 g/cm³), 102 of 354 Cutting Edge, 39 of 317 Hammer and 49 of 121 Lehigh records (copper at 8.935 g/cm³). The check flags such a record; it does not correct the outline. The effect on $V_b$ is limited to a nose below the mouth, as in short handgun cartridges and flush-seated wadcutters.
 - The jump needs the chamber values and the bullet nose length, or a measured lands contact of the firearm for the same bullet. Without either it is not given.
 - Without a given depth the cavity is as deep as its radius, with the bracket of half to three times that depth in the pressure range only, not in the drawn outline. The cavity diameter must be below the base face diameter and its depth below the bullet length, else the outline is refused.
 - The bounds from the length tolerance cover the bullet length only, not the case capacity.

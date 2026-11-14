@@ -1,6 +1,6 @@
 /** Image pixels (x right, y down) to target coordinates (x right, y up) from scale references, a known rectangle for perspective and a rotation; unit-free, in the unit of the reference lengths (the record uses m; "mm" below reads as that unit); a refusal is an `InputError` (statistics) with a `GeometryIssue`. */
 
-import { InputError, nth } from '@open-reloading/statistics'
+import { InputError, nth } from '@rangefoundry/statistics'
 
 export type Point = { x: number; y: number }
 /** A 3 x 3 matrix in row-major order, acting on homogeneous points (x, y, 1). */

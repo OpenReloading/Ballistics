@@ -1,4 +1,4 @@
-import type { UserRecord } from '@open-reloading/schema'
+import type { UserRecord } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { english, type Message } from '../src/i18n/translate.ts'
 import {
@@ -35,8 +35,8 @@ const lines: LoadFileFormat = {
 const formats = [...loadFileFormats, lines]
 
 describe('load-file formats', () => {
-  it('the OpenReloading user data file is the first entry and reads its files', async () => {
-    expect(loadFileFormats[0]?.name).toBe('OpenReloading data')
+  it('the RangeFoundry user data file is the first entry and reads its files', async () => {
+    expect(loadFileFormats[0]?.name).toBe('RangeFoundry data')
     expect(await readLoadFile(bytes(userDataText([load])))).toEqual({ ok: true, records: [load] })
   })
 

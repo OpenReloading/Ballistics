@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { needsCountrySource } from './country-source.ts'
 import type { Exact } from './exact.ts'
+import { needsProvenance } from './field-classes.ts'
 import { countryCode } from './fields.ts'
 import { recordId } from './ids.ts'
 import { provenance } from './provenance.ts'
@@ -416,7 +417,7 @@ const bulletFields = z.object({
     .literal(true)
     .describe('A record that only names the bullet: it has no product number.')
     .optional(),
-  provenance,
+  provenance: provenance.optional(),
 })
 
 type BulletFields = z.infer<typeof bulletFields>
@@ -520,6 +521,7 @@ function cannelureOnShank(b: BulletFields, issue: Issue) {
 
 const bulletParser = bulletFields.superRefine((b, ctx) => {
   needsCountrySource(b, ctx)
+  needsProvenance('bullet', b, ctx)
   const issue: Issue = (path, message) => ctx.addIssue({ code: 'custom', path, message })
   const below: Below = (path, q, limit, what) => {
     if (q && limit !== undefined && !(q.value < limit)) issue(path, `must be smaller than ${what}`)
@@ -631,8 +633,11 @@ export const bullet: z.ZodObject<{
    * full record cannot lose them unnoticed.
    */
   nameOnly: z.ZodOptional<z.ZodLiteral<true>>
-  /** Where the values of the record come from: a kind and at least one source. */
-  provenance: typeof provenance
+  /**
+   * Where the values of the record come from: a kind and at least one source. Absent: the record
+   * holds basic fields only ({@link bulletBasicFields}).
+   */
+  provenance: z.ZodOptional<typeof provenance>
 }> = bulletParser satisfies Exact<typeof bullet, typeof bulletParser>
 
 /** One published coefficient: G1 or G7, value in lb/in2, optional velocity band. */

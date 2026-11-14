@@ -3,9 +3,9 @@ import {
   fitTruingStrings,
   trajectory,
   trueMuzzleVelocity,
-} from '@open-reloading/ballistics'
-import { InputError } from '@open-reloading/statistics'
-import { ComputeBusy, caps, inlineRunner } from '@open-reloading/use-cases'
+} from '@rangefoundry/ballistics'
+import { InputError } from '@rangefoundry/statistics'
+import { ComputeBusy, caps, inlineRunner } from '@rangefoundry/use-cases'
 import { describe, expect, it, vi } from 'vitest'
 import { buildApp } from '../src/app.ts'
 import { API_PREFIX } from '../src/version.ts'
@@ -13,9 +13,9 @@ import { m3Load, flatShot as shot } from './fixtures.ts'
 import { withApi } from './setup.ts'
 
 // millerStability by velocity: 1 throws an engine RangeError, 2 an InputError, 3 returns NaN, 4 throws a typed InputError
-vi.mock('@open-reloading/ballistics', async (importOriginal) => {
-  const ballistics = await importOriginal<typeof import('@open-reloading/ballistics')>()
-  const { InputError } = await import('@open-reloading/statistics')
+vi.mock('@rangefoundry/ballistics', async (importOriginal) => {
+  const ballistics = await importOriginal<typeof import('@rangefoundry/ballistics')>()
+  const { InputError } = await import('@rangefoundry/statistics')
   return {
     ...ballistics,
     millerStability: (input: Parameters<typeof ballistics.millerStability>[0]) => {

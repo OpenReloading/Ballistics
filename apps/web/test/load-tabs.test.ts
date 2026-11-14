@@ -1,4 +1,4 @@
-import type { UserRecord } from '@open-reloading/schema'
+import type { UserRecord } from '@rangefoundry/schema'
 import { expect, it, vi } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import {
@@ -16,7 +16,7 @@ import { namedKey, renamedKey } from '../src/lib/user-data.ts'
 import { copyName } from '../src/lib/user-file-names.ts'
 
 const store = vi.hoisted(() => new Map<string, unknown>())
-vi.mock('../src/lib/user-store.ts', () => ({
+vi.mock('../src/platform/user-store.ts', () => ({
   storedRecord: async (id: string) => store.get(id),
   putRecords: (records: { id: string }[]) => {
     for (const r of records) store.set(r.id, r)

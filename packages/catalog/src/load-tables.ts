@@ -1,6 +1,6 @@
-import type { LoadTables, Powder, Source } from '@open-reloading/schema'
+import type { LoadTables, Powder, Source } from '@rangefoundry/schema'
 
-export type { LoadTable, LoadTables } from '@open-reloading/schema'
+export type { LoadTable, LoadTables } from '@rangefoundry/schema'
 
 /** Whether `loadTables` lists a table with the source's title, URL and retrieval date. */
 function isListedLoadTable(source: Source, loadTables: LoadTables) {
@@ -37,10 +37,12 @@ function checkInteriorSource(
  * rule.
  */
 export function checkFittedSources(powder: Powder, loadTables: LoadTables): string[] {
+  const { provenance } = powder
+  if (!provenance) return powder.interior ? ['interior without a fitted source'] : []
   const errors: string[] = []
   let fitted = 0
-  powder.provenance.sources.forEach((s, i) => {
-    const kind = s.kind ?? powder.provenance.kind
+  provenance.sources.forEach((s, i) => {
+    const kind = s.kind ?? provenance.kind
     const covers = !s.fields || s.fields.some(isInterior)
     // a source under an open license needs no listed manufacturer load table (the demo powder)
     if (s.origin === 'public' && s.license) {

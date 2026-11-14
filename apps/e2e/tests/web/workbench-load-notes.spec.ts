@@ -16,7 +16,7 @@ type Stored = {
 const storedLoads = (page: Page) =>
   page.evaluate(async () => {
     const db: IDBDatabase = await new Promise((ok, no) => {
-      const r = indexedDB.open('openreloading-user-data')
+      const r = indexedDB.open('rangefoundry-user-data')
       r.onsuccess = () => ok(r.result)
       r.onerror = () => no(r.error)
     })

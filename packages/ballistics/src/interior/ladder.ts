@@ -1,4 +1,4 @@
-import { nth } from '@open-reloading/statistics'
+import { nth } from '@rangefoundry/statistics'
 import { need } from '../issue.ts'
 
 /** Charges in kg: `start + i * step` up or `start - i * step` down, multiplied so the last step carries no accumulated rounding; `around` takes an odd count centered on `start`, lowest first. */

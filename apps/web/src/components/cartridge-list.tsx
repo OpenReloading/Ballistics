@@ -2,8 +2,8 @@
 
 import { Button } from '@mantine/core'
 import { Plus } from '@phosphor-icons/react'
-import Link from 'next/link'
 import { useDeferredValue, useMemo } from 'react'
+import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 import {

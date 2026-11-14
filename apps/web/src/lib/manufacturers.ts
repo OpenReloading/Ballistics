@@ -1,6 +1,6 @@
 /** One request per page load, or at build time from `getManufacturerNames` (`api.ts`). */
 
-import { checkUserRefs, fold, type UserRecord, userIdRegex } from '@open-reloading/schema'
+import { checkUserRefs, fold, type UserRecord, userIdRegex } from '@rangefoundry/schema'
 import { apiFetch } from './api-fetch.ts'
 import type { ManufacturerSummary } from './api-types.ts'
 import type { InvalidRecord } from './user-data.ts'

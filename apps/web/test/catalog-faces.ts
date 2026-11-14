@@ -1,6 +1,6 @@
 // The target faces of packages/catalog/records/target-faces with the abbreviation of their federation, as the app lists them.
 import { readdirSync, readFileSync } from 'node:fs'
-import type { Federation, TargetFace } from '@open-reloading/schema'
+import type { Federation, TargetFace } from '@rangefoundry/schema'
 import { type Face, withOrganization } from '../src/lib/face-organization.ts'
 
 const dir = new URL('../../../packages/catalog/records/target-faces/', import.meta.url)

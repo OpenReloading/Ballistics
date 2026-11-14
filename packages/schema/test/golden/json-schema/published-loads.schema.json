@@ -683,8 +683,7 @@
     "producedBy",
     "cartridgeName",
     "cartridge",
-    "loads",
-    "provenance"
+    "loads"
   ],
   "additionalProperties": false
 }

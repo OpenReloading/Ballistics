@@ -1,4 +1,4 @@
-import type { UserRecord } from '@open-reloading/schema'
+import type { UserRecord } from '@rangefoundry/schema'
 import { type Candidate, idOfKey } from '../src/index.ts'
 
 /** The save time of the records the tests make of candidates. */

@@ -3,8 +3,8 @@ import {
   interior,
   interiorPressureRange,
   pressureToleranceDefaults,
-} from '@open-reloading/ballistics'
-import { ComputeBusy, chargeTargetExample } from '@open-reloading/use-cases'
+} from '@rangefoundry/ballistics'
+import { ComputeBusy, chargeTargetExample } from '@rangefoundry/use-cases'
 import { describe, expect, it } from 'vitest'
 import { buildApp } from '../src/app.ts'
 import { buildOpenApi } from '../src/openapi.ts'

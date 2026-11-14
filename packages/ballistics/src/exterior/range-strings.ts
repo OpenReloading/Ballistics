@@ -12,7 +12,7 @@ import {
   logLeastSquares,
   nth,
   studentTwoSidedQuantile,
-} from '@open-reloading/statistics'
+} from '@rangefoundry/statistics'
 import { need } from '../issue.ts'
 import { overlay, type Settings } from '../settings.ts'
 import {

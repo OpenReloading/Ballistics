@@ -1,6 +1,7 @@
 /** Every object is loose, so fields core adds later do not break the document; paths where the route writes a NaN or infinite number as null are nullable. */
-import { dragModels } from '@open-reloading/ballistics'
-import { provenance } from '@open-reloading/schema'
+
+import { dragModels } from '@rangefoundry/ballistics'
+import { provenance } from '@rangefoundry/schema'
 import { z } from 'zod'
 import { identity } from './identity.ts'
 
@@ -136,7 +137,9 @@ const resolvedBullet = {
   manufacturer: z.string().describe('Manufacturer record id'),
   name: z.string().describe('Product name'),
   suppliedFields: z.array(z.string()).describe('Names of the request values the record supplied'),
-  provenance: provenance.describe('Provenance of the bullet record'),
+  provenance: provenance
+    .optional()
+    .describe('Provenance of the bullet record; absent on a record of basic fields only'),
 }
 
 const exteriorResolved = z

@@ -22,7 +22,7 @@ const file = [
 const stored = (page: Page, kind: string) =>
   page.evaluate(async (kind) => {
     const db: IDBDatabase = await new Promise((ok, no) => {
-      const r = indexedDB.open('openreloading-user-data')
+      const r = indexedDB.open('rangefoundry-user-data')
       r.onsuccess = () => ok(r.result)
       r.onerror = () => no(r.error ?? new Error('IndexedDB request failed'))
     })

@@ -1,4 +1,4 @@
-import { compareKeys, fromSi } from '@open-reloading/schema'
+import { compareKeys, fromSi } from '@rangefoundry/schema'
 import type { Outcome } from './evaluate.ts'
 import { reasons } from './evaluate.ts'
 import { basisOf } from './fit.ts'

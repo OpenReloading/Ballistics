@@ -1,4 +1,4 @@
-import { near } from '@open-reloading/test-kit'
+import { near } from '@rangefoundry/test-kit'
 import { describe, expect, it } from 'vitest'
 import { chiSquareCdf, chiSquareQuantile, chiSquareSurvival } from '../src/chi-square.ts'
 import { InputError } from '../src/errors.ts'

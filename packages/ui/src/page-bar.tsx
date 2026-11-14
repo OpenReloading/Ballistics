@@ -15,6 +15,7 @@ export function PageBar({ title, status, actions }: PageBarProps): ReactElement 
     <div className="ui-page-bar">
       <h1>{title}</h1>
       {/* the live region stays in the page, so the first change is announced */}
+      {/* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- an explicit live region, not one implied by <output>'s role */}
       <span role="status" className="ui-page-bar-status">
         {status}
       </span>

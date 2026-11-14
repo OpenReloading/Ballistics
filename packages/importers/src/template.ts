@@ -1,4 +1,4 @@
-// The OpenReloading CSV template: delimited text whose first row names the columns.
+// The RangeFoundry CSV template: delimited text whose first row names the columns.
 import { refuse } from './diagnostics.ts'
 import {
   type ColumnMap,
@@ -10,7 +10,7 @@ import {
 import type { ChronoImport, ChronoParserOptions, SessionCandidate } from './result.ts'
 import { splitLines } from './text.ts'
 
-/** Options of `parseOpenReloadingCsv`: the parser options and the device of the session. */
+/** Options of `parseRangeFoundryCsv`: the parser options and the device of the session. */
 export interface TemplateOptions extends ChronoParserOptions {
   /** Device of the session; kind `other` without manufacturer name or model when absent. */
   device?: SessionCandidate['device'] | undefined
@@ -32,22 +32,22 @@ function templateHeader(
   return { names: known, delimiter }
 }
 
-/** OpenReloading CSV template: a first row of known column names, `velocity` among them. */
-export function isOpenReloadingCsv(text: string): boolean {
+/** RangeFoundry CSV template: a first row of known column names, `velocity` among them. */
+export function isRangeFoundryCsv(text: string): boolean {
   return templateHeader(text) !== undefined
 }
 
 /**
- * Parses an OpenReloading CSV template (first row names columns, delimiter read from it);
+ * Parses a RangeFoundry CSV template (first row names columns, delimiter read from it);
  * velocities in the unit of the `velocityUnit` column or the `velocityUnit` option.
  */
-export function parseOpenReloadingCsv(text: string, options: TemplateOptions = {}): ChronoImport {
+export function parseRangeFoundryCsv(text: string, options: TemplateOptions = {}): ChronoImport {
   const h = templateHeader(text)
   if (!h) refuse('notTemplate', { columns: templateNames })
   const columns: ColumnMap = { velocity: 'velocity' }
   for (const n of h.names) columns[n] = n
   return parseDelimitedRows(
-    'openreloading-csv',
+    'rangefoundry-csv',
     text,
     { ...options, columns, delimiter: h.delimiter },
     true,

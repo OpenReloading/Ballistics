@@ -10,8 +10,8 @@ import {
   TextInput,
 } from '@mantine/core'
 import { Flask, Plus, X } from '@phosphor-icons/react'
-import Link from 'next/link'
 import { type ReactNode, useEffect, useMemo, useReducer, useRef, useState } from 'react'
+import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message as Marked, msg } from '../i18n/translate.ts'
 import { fieldError, specText } from '../lib/field-spec.ts'

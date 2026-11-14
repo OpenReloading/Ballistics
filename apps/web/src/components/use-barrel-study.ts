@@ -1,6 +1,6 @@
 'use client'
 
-import { toSi } from '@open-reloading/schema'
+import { toSi } from '@rangefoundry/schema'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { requestTimeout } from '../lib/api-client.ts'

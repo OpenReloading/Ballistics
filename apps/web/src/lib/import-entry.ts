@@ -21,8 +21,8 @@ import {
   type Tier,
   tableKinds,
   tableOfRows,
-} from '@open-reloading/importers'
-import { type UserRecord, type UserRecordKind, userRecord } from '@open-reloading/schema'
+} from '@rangefoundry/importers'
+import { type UserRecord, type UserRecordKind, userRecord } from '@rangefoundry/schema'
 import { recordOf } from './candidates.ts'
 import { storageName } from './edition.ts'
 import { readerErrorText } from './file-diagnostics.ts'

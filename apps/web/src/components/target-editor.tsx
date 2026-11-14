@@ -21,20 +21,6 @@ import {
   Tooltip,
 } from '@mantine/core'
 import { useElementSize, useMediaQuery, useMergedRef } from '@mantine/hooks'
-import { overlay } from '@open-reloading/ballistics'
-import {
-  type CalibrationReference,
-  type GroupFace,
-  photoTypes,
-  recordIdRegex,
-  type SessionRecord,
-  type SheetNote,
-  type ShotGroup,
-  type TargetSheet,
-  type TargetSheetRecord,
-  targetSheet,
-  type UserRecord,
-} from '@open-reloading/schema'
 import {
   ArrowClockwise,
   ArrowCounterClockwise,
@@ -55,6 +41,20 @@ import {
   Target,
   Trash,
 } from '@phosphor-icons/react'
+import { overlay } from '@rangefoundry/ballistics'
+import {
+  type CalibrationReference,
+  type GroupFace,
+  photoTypes,
+  recordIdRegex,
+  type SessionRecord,
+  type SheetNote,
+  type ShotGroup,
+  type TargetSheet,
+  type TargetSheetRecord,
+  targetSheet,
+  type UserRecord,
+} from '@rangefoundry/schema'
 import {
   type CSSProperties,
   type Dispatch,
@@ -74,6 +74,18 @@ import {
 } from 'react'
 import { flushSync } from 'react-dom'
 import { z } from 'zod'
+import {
+  deletePhoto,
+  deleteRecord,
+  putPhoto,
+  putRecordIf,
+  putRecords,
+  requestPersistentStorage,
+  storedPhoto,
+  storedPhotoIds,
+  storedRecord,
+  storedRecords,
+} from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { decimalMark, fixedNumber, formatNumber, plainNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
@@ -111,18 +123,6 @@ import { groupStatisticsOf } from '../lib/target-groups.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
 import { formatQuantity, unitsOf, withUnit } from '../lib/units.ts'
 import { canonicalJson, validRecords } from '../lib/user-data.ts'
-import {
-  deletePhoto,
-  deleteRecord,
-  putPhoto,
-  putRecordIf,
-  putRecords,
-  requestPersistentStorage,
-  storedPhoto,
-  storedPhotoIds,
-  storedRecord,
-  storedRecords,
-} from '../lib/user-store.ts'
 import {
   keptCopy,
   keptNote,

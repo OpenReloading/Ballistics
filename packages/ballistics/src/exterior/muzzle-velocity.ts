@@ -1,5 +1,5 @@
 /** Muzzle velocity from a speed measured downrange, `apps/docs/docs/models/exterior-drag.md`, "Speed measured downrange"; SI in and out. */
-import { nth } from '@open-reloading/statistics'
+import { nth } from '@rangefoundry/statistics'
 import { InputError, need } from '../issue.ts'
 import { overlay, type Settings } from '../settings.ts'
 import type { Air } from './atmosphere.ts'

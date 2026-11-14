@@ -8,16 +8,16 @@ import {
   primerCompounds,
   primerSizes,
   recordId,
-} from '@open-reloading/schema'
-import type { FastifyPluginAsync } from 'fastify'
-import { z } from 'zod'
+} from '@rangefoundry/schema'
 import type {
   BulletQuery,
   CaseQuery,
   Catalogue,
   Catalogued,
   PrimerQuery,
-} from '../catalogue/types.ts'
+} from '@rangefoundry/use-cases/catalog'
+import type { FastifyPluginAsync } from 'fastify'
+import { z } from 'zod'
 import { missing, originated, revised, stored } from './record-answers.ts'
 import { idParams, listQuery, noQuery, page, recordIdPattern, revision } from './schemas.ts'
 
@@ -185,7 +185,7 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
         response: manufacturer,
         errors: [404],
         summary: 'Get a manufacturer',
-        description: 'The manufacturer record with its provenance.',
+        description: 'The manufacturer record with its provenance where it has one.',
       },
     },
     (request, reply) => {
@@ -235,7 +235,7 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
           response: record,
           errors: [404],
           summary: `Get a ${noun}`,
-          description: `The ${noun} record with its provenance.${noun === 'bullet' ? ' `revision` is a hash of the stored record, changes with any field.' : ''}`,
+          description: `The ${noun} record with its provenance where it has one.${noun === 'bullet' ? ' `revision` is a hash of the stored record, changes with any field.' : ''}`,
         },
       },
       (request, reply) => {
@@ -268,7 +268,7 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
         response: primer,
         errors: [404],
         summary: 'Get a primer',
-        description: 'The primer record with its provenance.',
+        description: 'The primer record with its provenance where it has one.',
       },
     },
     (request, reply) => {
@@ -303,7 +303,7 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
         errors: [404],
         summary: 'Get a case',
         description:
-          'The case record with its provenance and `origin`. `revision` is a hash of the stored record, changes with any field.',
+          'The case record with `origin` and its provenance where it has one. `revision` is a hash of the stored record, changes with any field.',
       },
     },
     (request, reply) => {

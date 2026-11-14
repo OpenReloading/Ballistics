@@ -1,4 +1,4 @@
-import { InputError, nth } from '@open-reloading/statistics'
+import { InputError, nth } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
 import { dragTables } from '../src/drag-tables.ts'
 import { airAt, airDensity, speedOfSound } from '../src/exterior/atmosphere.ts'

@@ -1,4 +1,4 @@
-import { type Case, cartridgeCase, parseRef, type UserRecord } from '@open-reloading/schema'
+import { type Case, cartridgeCase, parseRef, type UserRecord } from '@rangefoundry/schema'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import type { FieldSpec } from './field-spec.ts'
 import { measuredCapacityRef } from './load-record.ts'

@@ -1,5 +1,5 @@
 /** For the target face search: the direct least-squares ellipse fit, a robust fit by random samples, and the conic pencil of two concentric circles seen in perspective. */
-import { nth, seededUniforms } from '@open-reloading/statistics'
+import { nth, seededUniforms } from '@rangefoundry/statistics'
 import {
   apply3,
   det3,

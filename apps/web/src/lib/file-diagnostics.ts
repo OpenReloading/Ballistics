@@ -1,5 +1,5 @@
 /** The refusals of the file readers (text, XLSX, XLS, XML, an XML load file's root) in words. */
-import { type FileDiagnostic, ReaderError } from '@open-reloading/importers'
+import { type FileDiagnostic, ReaderError } from '@rangefoundry/importers'
 import { english, type Message, msg, type Translator } from '../i18n/translate.ts'
 import { errorText } from './error-text.ts'
 

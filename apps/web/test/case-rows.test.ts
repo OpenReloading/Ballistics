@@ -1,4 +1,4 @@
-import type { Case, UserRecord } from '@open-reloading/schema'
+import type { Case, UserRecord } from '@rangefoundry/schema'
 import { expect, it } from 'vitest'
 import type { CaseSummary } from '../src/lib/api-types.ts'
 import { caseMatches, caseRows, userCaseRows } from '../src/lib/case-rows.ts'

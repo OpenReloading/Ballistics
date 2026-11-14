@@ -4,8 +4,8 @@ import type {
   TableDiagnostic,
   TableKind,
   TableReadDiagnostic,
-} from '@open-reloading/importers'
-import type { Diagnostic } from '@open-reloading/statistics'
+} from '@rangefoundry/importers'
+import type { Diagnostic } from '@rangefoundry/statistics'
 import { fixedNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { translateMessage } from './core-messages.ts'
@@ -73,7 +73,7 @@ const tableReadMessages: Record<TableReadDiagnostic['code'], Message> = {
     'The text looks like JSON but does not parse. Fix the file or export it again.',
   ),
   jsonNotTable: msg(
-    'The JSON is neither an OpenReloading data file nor a list of objects with the same keys. Export a table instead.',
+    'The JSON is neither a RangeFoundry data file nor a list of objects with the same keys. Export a table instead.',
   ),
   noDelimiter: msg(
     'The text has no table: no row repeats a comma, semicolon or tab as separator. Export the table as CSV.',

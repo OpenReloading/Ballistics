@@ -1,5 +1,5 @@
 /** The bullet picker's mass range: "150-180gr", "9.5-g", and the grams or grains it compares in. */
-import { fromSi } from '@open-reloading/schema'
+import { fromSi } from '@rangefoundry/schema'
 import { kilogramsPerGrain } from './units.ts'
 
 /** Digits with at most one point, either part may be empty. */

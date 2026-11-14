@@ -1,7 +1,8 @@
 /** The workspace folder picked for saving: its handle in the browser store and its write permission. */
+
+import { inStore } from '@/platform/user-db.ts'
 import { storageName } from './edition.ts'
 import { aborted, type Pickers, pickers } from './file-access.ts'
-import { inStore } from './user-db.ts'
 
 type Permission = {
   queryPermission(o: object): Promise<string>
@@ -51,7 +52,7 @@ export async function chooseFolder() {
   let handle: FileSystemDirectoryHandle
   try {
     handle = await (pickers().showDirectoryPicker as NonNullable<Pickers['showDirectoryPicker']>)({
-      id: 'openreloading',
+      id: 'rangefoundry',
       mode: 'readwrite',
     })
   } catch (e) {

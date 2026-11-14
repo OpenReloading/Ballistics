@@ -1,4 +1,4 @@
-import type { CompetitionEvent, EventType } from '@open-reloading/schema'
+import type { CompetitionEvent, EventType } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { setShownLanguage } from '../src/i18n/shown.ts'
 import {

@@ -1,4 +1,4 @@
-import { InputError, nth } from '@open-reloading/statistics'
+import { InputError, nth } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
 import { minIntervalScale } from '../src/exterior/range-strings.ts'
 import {

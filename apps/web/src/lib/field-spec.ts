@@ -1,5 +1,5 @@
 /** Form fields: specs, typed text and SI values, validation messages. */
-import { fromSi, type QuantityKind, toSi } from '@open-reloading/schema'
+import { fromSi, type QuantityKind, toSi } from '@rangefoundry/schema'
 import { ambiguousMessage, type NumberRange, parseNumber, untranslated } from '../i18n/number.ts'
 import type { Message, Translator } from '../i18n/translate.ts'
 import {

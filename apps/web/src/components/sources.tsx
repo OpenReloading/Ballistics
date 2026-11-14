@@ -1,8 +1,8 @@
 'use client'
 
 import { Table, TableTbody, TableTd, TableTh, TableThead, TableTr } from '@mantine/core'
-import { isWebLink, type Provenance, type Source } from '@open-reloading/schema'
-import Link from 'next/link'
+import { isWebLink, type Provenance, type Source } from '@rangefoundry/schema'
+import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg } from '../i18n/translate.ts'
 import { fieldLabel } from '../lib/field-labels.ts'

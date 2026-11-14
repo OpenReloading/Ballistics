@@ -3,8 +3,8 @@ import {
   type LoadNoteRule,
   loadNotes,
   type SessionReading,
-} from '@open-reloading/ballistics'
-import { type Load, type SessionRecord, type SessionSnapshot, toSi } from '@open-reloading/schema'
+} from '@rangefoundry/ballistics'
+import { type Load, type SessionRecord, type SessionSnapshot, toSi } from '@rangefoundry/schema'
 import { msg, type Translator } from '../i18n/translate.ts'
 import { sessionRef } from './measurements.ts'
 import { stringStats } from './string-stats.ts'

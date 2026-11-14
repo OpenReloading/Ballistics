@@ -8,7 +8,7 @@ import type {
   PowderFitResidual,
   PowderParameter,
   PowderPrediction,
-} from '@open-reloading/ballistics'
+} from '@rangefoundry/ballistics'
 import {
   chronoSession,
   type Firearm,
@@ -18,9 +18,10 @@ import {
   type UserPowderFit,
   type UserRecord,
   userRecord,
-} from '@open-reloading/schema'
-import Link from 'next/link'
+} from '@rangefoundry/schema'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import Link from '@/platform/link.tsx'
+import { putRecords, storedRecord, storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber, parseNumber } from '../i18n/number.ts'
 import { type Message as Marked, msg } from '../i18n/translate.ts'
@@ -56,7 +57,6 @@ import {
   stringResiduals,
 } from '../lib/tune-strings.ts'
 import { formatQuantity, type Quantity, type UnitSystem, withUnit } from '../lib/units.ts'
-import { putRecords, storedRecord, storedRecords } from '../lib/user-store.ts'
 import { catalogueIdOf, userRef } from '../lib/variants.ts'
 import { offerUndo } from './confirm.tsx'
 import { PageBar } from './page-bar.tsx'

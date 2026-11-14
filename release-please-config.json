@@ -23,7 +23,7 @@
   ],
   "packages": {
     "packages/schema": { "component": "schema" },
-    "packages/drawing": { "component": "drawing" },
+    "packages/svg-drawings": { "component": "svg-drawings" },
     "packages/importers": { "component": "importers" },
     "packages/catalog": { "component": "catalog" },
     "packages/api": { "component": "api" },

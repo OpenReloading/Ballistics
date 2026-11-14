@@ -1,4 +1,4 @@
-import type { Bullet } from '@open-reloading/schema'
+import type { Bullet } from '@rangefoundry/schema'
 import { useMemo } from 'react'
 import {
   type BulletValues,

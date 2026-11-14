@@ -1,4 +1,4 @@
-import type { ResistanceGap } from '@open-reloading/ballistics'
+import type { ResistanceGap } from '@rangefoundry/ballistics'
 import { type Message, msg } from '../i18n/translate.ts'
 
 /** What a run lacks for a powder record's bore resistance: the gaps of ballistics and one of the app's. */

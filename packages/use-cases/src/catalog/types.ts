@@ -13,7 +13,7 @@ import type {
   RecordOfKind,
   TargetFaceItem,
   TargetMappingItem,
-} from '@open-reloading/catalog'
+} from '@rangefoundry/catalog'
 import type {
   Bullet,
   CaliberClass,
@@ -28,7 +28,7 @@ import type {
   Primer,
   TargetFace,
   TargetMapping,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 
 // the Catalogue interface and its types belong to the catalog package; this entry passes them on with openCatalogue
 export type {
@@ -56,7 +56,7 @@ export type {
   RecordOfKind,
   TargetFaceItem,
   TargetMappingItem,
-} from '@open-reloading/catalog'
+} from '@rangefoundry/catalog'
 
 /**
  * A row of the index: the list item, its order key (`sortKey` of the schema package) and search
@@ -106,7 +106,7 @@ export type RecordFile = CatalogueHeader & {
   [K in CatalogueKind]: Record<string, RecordOfKind[K]>
 }
 
-/** The records a catalogue is built from; `Bundle` of `@open-reloading/catalog` has them. */
+/** The records a catalogue is built from; `Bundle` of `@rangefoundry/catalog` has them. */
 export interface CatalogueSource {
   cartridges: Cartridge[]
   manufacturers: Manufacturer[]

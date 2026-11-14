@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs'
-import { colors } from '@open-reloading/design-tokens'
+import { colors } from '@rangefoundry/design-tokens'
 import { describe, expect, it } from 'vitest'
 import { groupColours } from '../src/lib/target-editor.ts'
 import { missing } from './defined.ts'

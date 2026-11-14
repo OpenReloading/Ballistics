@@ -1,6 +1,6 @@
-/* the palette and its Infima mapping from @open-reloading/design-tokens, then the math of the model pages with its fonts */
-@import "@open-reloading/design-tokens/tokens.css";
-@import "@open-reloading/design-tokens/docusaurus.css";
+/* the palette and its Infima mapping from @rangefoundry/design-tokens, then the math of the model pages with its fonts */
+@import "@rangefoundry/design-tokens/tokens.css";
+@import "@rangefoundry/design-tokens/docusaurus.css";
 @import "katex/dist/katex.min.css";
 
 /* the two entry cards of the overview */

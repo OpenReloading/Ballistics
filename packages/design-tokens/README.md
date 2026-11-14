@@ -1,20 +1,20 @@
-# @open-reloading/design-tokens
+# @rangefoundry/design-tokens
 
 The Brand palette (version 1, with the light link at Mantine's blue 9, `#1864ab`, by owner decision: 5.3:1 on every surface where blue 8 gave 4.4:1 on `surface-alt`) and the interface sizes as one DTCG 2025.10 source in `tokens/`, built with Terrazzo into files every surface uses: CSS variables for any page, Docusaurus and BuildGuide, typed constants and the Mantine theme. The generated files are committed, so a site needs no Node to use them. Private to this repository: it is not published.
 
-| Export                                            | What it holds                                                                                                                                                                                                                                               |
-| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@open-reloading/design-tokens`                   | `colors` per scheme, the Mantine `theme` and the `cssVariables` for Mantine's `cssVariablesResolver`, which read the variables of `tokens.css`                                                                                                              |
-| `@open-reloading/design-tokens/tokens.css`        | the variables (`--page`, `--ink`, `--space-md`, `--size-field`): light on `:root` (and in print); dark on screen on `data-mantine-color-scheme="dark"` or `data-theme="dark"`, else on the system setting; the coarse-pointer sizes under `pointer: coarse` |
-| `@open-reloading/design-tokens/docusaurus.css`    | Infima and Pagefind on the variables; load it after `tokens.css`                                                                                                                                                                                            |
-| `@open-reloading/design-tokens/buildguide.css`    | BuildGuide's `--ag-*` colors on the variables; load it after `tokens.css`                                                                                                                                                                                   |
-| `@open-reloading/design-tokens/mantine-print.css` | Mantine's dark scheme in the light colors in print; load it after Mantine's styles and `tokens.css`                                                                                                                                                         |
+| Export                                          | What it holds                                                                                                                                                                                                                                               |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@rangefoundry/design-tokens`                   | `colors` per scheme, the Mantine `theme` and the `cssVariables` for Mantine's `cssVariablesResolver`, which read the variables of `tokens.css`                                                                                                              |
+| `@rangefoundry/design-tokens/tokens.css`        | the variables (`--page`, `--ink`, `--space-md`, `--size-field`): light on `:root` (and in print); dark on screen on `data-mantine-color-scheme="dark"` or `data-theme="dark"`, else on the system setting; the coarse-pointer sizes under `pointer: coarse` |
+| `@rangefoundry/design-tokens/docusaurus.css`    | Infima and Pagefind on the variables; load it after `tokens.css`                                                                                                                                                                                            |
+| `@rangefoundry/design-tokens/buildguide.css`    | BuildGuide's `--ag-*` colors on the variables; load it after `tokens.css`                                                                                                                                                                                   |
+| `@rangefoundry/design-tokens/mantine-print.css` | Mantine's dark scheme in the light colors in print; load it after Mantine's styles and `tokens.css`                                                                                                                                                         |
 
 ```js
 import { createTheme, MantineProvider } from '@mantine/core'
-import { cssVariables, theme } from '@open-reloading/design-tokens'
-import '@open-reloading/design-tokens/tokens.css'
-import '@open-reloading/design-tokens/mantine-print.css'
+import { cssVariables, theme } from '@rangefoundry/design-tokens'
+import '@rangefoundry/design-tokens/tokens.css'
+import '@rangefoundry/design-tokens/mantine-print.css'
 
 <MantineProvider theme={createTheme(theme)} cssVariablesResolver={() => cssVariables} />
 ```

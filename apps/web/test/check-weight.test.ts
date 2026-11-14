@@ -97,6 +97,9 @@ it('gates each lazy chunk and not the total of a group with a chunk limit', () =
   expect(violations({ '/a': { initial: 100, total: 999, chunk: 51 } }, chunked)).toEqual([
     '/a: chunk 51 B over the pages budget of 50 B',
   ])
+  expect(violations({ '/a': { initial: 100, total: 100, chunk: 0 } }, chunked)).toEqual([
+    '/a: no lazy chunk measured for the chunk limit of group pages',
+  ])
 })
 
 it('fails on a group whose budget sets both or neither of total and chunk', () => {

@@ -892,7 +892,7 @@
           "additionalProperties": false
         },
         "fit": {
-          "description": "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`. With `--pressure-sigma`, `pressure` holds the basis factors of the fit; the pressure errors still compare the model's peak pressure as it is with the printed pressure.",
+          "description": "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`. With `--pressure-sigma`, `pressure` holds the factor per key of `--pressure-factor` of the fit; the pressure errors still compare the model's peak pressure as it is with the printed pressure.",
           "type": "object",
           "properties": {
             "velocitySigma": {
@@ -948,12 +948,18 @@
               "additionalProperties": false
             },
             "pressure": {
-              "description": "With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its basis.",
+              "description": "With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its key of `--pressure-factor`.",
               "type": "object",
               "properties": {
                 "sigma": {
                   "type": "number",
-                  "description": "Pressure sigma of each row, a fraction of its printed pressure over the factor of its basis."
+                  "description": "Pressure sigma of each row, a fraction of its printed pressure over the factor of its key."
+                },
+                "by": {
+                  "default": "basis",
+                  "description": "The key of `--pressure-factor` a factor is computed per and applied by: `basis`, the pressure basis (`unstated` without one); `table`, the table label (`unstated` without one); `cartridge`; `table-cartridge`, `<table>/<cartridge>`. A result without it reads as `basis`.",
+                  "type": "string",
+                  "enum": ["basis", "table", "cartridge", "table-cartridge"]
                 },
                 "factors": {
                   "type": "object",
@@ -965,22 +971,22 @@
                     "properties": {
                       "factor": {
                         "type": "number",
-                        "description": "The model peak pressure times this is what the basis reads: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only."
+                        "description": "The model peak pressure times this is what the rows of the key read: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only."
                       },
                       "rows": {
                         "type": "integer",
                         "minimum": 0,
                         "maximum": 9007199254740991,
-                        "description": "Pressure rows of the basis of the powders fitted to velocities."
+                        "description": "Pressure rows of the key of the powders fitted to velocities."
                       }
                     },
                     "required": ["factor", "rows"],
                     "additionalProperties": false
                   },
-                  "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its training pressures are not read."
+                  "description": "By key of the training rows; a key without a row of a powder fitted to velocities is left out, and its training pressures are not read."
                 }
               },
-              "required": ["sigma", "factors"],
+              "required": ["sigma", "by", "factors"],
               "additionalProperties": false
             },
             "energy": {
@@ -1945,7 +1951,7 @@
               "additionalProperties": false
             },
             "fit": {
-              "description": "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`. With `--pressure-sigma`, `pressure` holds the basis factors of the fit; the pressure errors still compare the model's peak pressure as it is with the printed pressure.",
+              "description": "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`. With `--pressure-sigma`, `pressure` holds the factor per key of `--pressure-factor` of the fit; the pressure errors still compare the model's peak pressure as it is with the printed pressure.",
               "type": "object",
               "properties": {
                 "velocitySigma": {
@@ -2001,12 +2007,18 @@
                   "additionalProperties": false
                 },
                 "pressure": {
-                  "description": "With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its basis.",
+                  "description": "With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its key of `--pressure-factor`.",
                   "type": "object",
                   "properties": {
                     "sigma": {
                       "type": "number",
-                      "description": "Pressure sigma of each row, a fraction of its printed pressure over the factor of its basis."
+                      "description": "Pressure sigma of each row, a fraction of its printed pressure over the factor of its key."
+                    },
+                    "by": {
+                      "default": "basis",
+                      "description": "The key of `--pressure-factor` a factor is computed per and applied by: `basis`, the pressure basis (`unstated` without one); `table`, the table label (`unstated` without one); `cartridge`; `table-cartridge`, `<table>/<cartridge>`. A result without it reads as `basis`.",
+                      "type": "string",
+                      "enum": ["basis", "table", "cartridge", "table-cartridge"]
                     },
                     "factors": {
                       "type": "object",
@@ -2018,22 +2030,22 @@
                         "properties": {
                           "factor": {
                             "type": "number",
-                            "description": "The model peak pressure times this is what the basis reads: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only."
+                            "description": "The model peak pressure times this is what the rows of the key read: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only."
                           },
                           "rows": {
                             "type": "integer",
                             "minimum": 0,
                             "maximum": 9007199254740991,
-                            "description": "Pressure rows of the basis of the powders fitted to velocities."
+                            "description": "Pressure rows of the key of the powders fitted to velocities."
                           }
                         },
                         "required": ["factor", "rows"],
                         "additionalProperties": false
                       },
-                      "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its training pressures are not read."
+                      "description": "By key of the training rows; a key without a row of a powder fitted to velocities is left out, and its training pressures are not read."
                     }
                   },
-                  "required": ["sigma", "factors"],
+                  "required": ["sigma", "by", "factors"],
                   "additionalProperties": false
                 },
                 "energy": {
@@ -2880,7 +2892,7 @@
               "additionalProperties": false
             },
             "fit": {
-              "description": "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`. With `--pressure-sigma`, `pressure` holds the basis factors of the fit; the pressure errors still compare the model's peak pressure as it is with the printed pressure.",
+              "description": "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`. With `--pressure-sigma`, `pressure` holds the factor per key of `--pressure-factor` of the fit; the pressure errors still compare the model's peak pressure as it is with the printed pressure.",
               "type": "object",
               "properties": {
                 "velocitySigma": {
@@ -2936,12 +2948,18 @@
                   "additionalProperties": false
                 },
                 "pressure": {
-                  "description": "With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its basis.",
+                  "description": "With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its key of `--pressure-factor`.",
                   "type": "object",
                   "properties": {
                     "sigma": {
                       "type": "number",
-                      "description": "Pressure sigma of each row, a fraction of its printed pressure over the factor of its basis."
+                      "description": "Pressure sigma of each row, a fraction of its printed pressure over the factor of its key."
+                    },
+                    "by": {
+                      "default": "basis",
+                      "description": "The key of `--pressure-factor` a factor is computed per and applied by: `basis`, the pressure basis (`unstated` without one); `table`, the table label (`unstated` without one); `cartridge`; `table-cartridge`, `<table>/<cartridge>`. A result without it reads as `basis`.",
+                      "type": "string",
+                      "enum": ["basis", "table", "cartridge", "table-cartridge"]
                     },
                     "factors": {
                       "type": "object",
@@ -2953,22 +2971,22 @@
                         "properties": {
                           "factor": {
                             "type": "number",
-                            "description": "The model peak pressure times this is what the basis reads: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only."
+                            "description": "The model peak pressure times this is what the rows of the key read: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only."
                           },
                           "rows": {
                             "type": "integer",
                             "minimum": 0,
                             "maximum": 9007199254740991,
-                            "description": "Pressure rows of the basis of the powders fitted to velocities."
+                            "description": "Pressure rows of the key of the powders fitted to velocities."
                           }
                         },
                         "required": ["factor", "rows"],
                         "additionalProperties": false
                       },
-                      "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its training pressures are not read."
+                      "description": "By key of the training rows; a key without a row of a powder fitted to velocities is left out, and its training pressures are not read."
                     }
                   },
-                  "required": ["sigma", "factors"],
+                  "required": ["sigma", "by", "factors"],
                   "additionalProperties": false
                 },
                 "energy": {
@@ -3443,12 +3461,18 @@
           "additionalProperties": false
         },
         "pressure": {
-          "description": "With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its basis.",
+          "description": "With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its key of `--pressure-factor`.",
           "type": "object",
           "properties": {
             "sigma": {
               "type": "number",
-              "description": "Pressure sigma of each row, a fraction of its printed pressure over the factor of its basis."
+              "description": "Pressure sigma of each row, a fraction of its printed pressure over the factor of its key."
+            },
+            "by": {
+              "default": "basis",
+              "description": "The key of `--pressure-factor` a factor is computed per and applied by: `basis`, the pressure basis (`unstated` without one); `table`, the table label (`unstated` without one); `cartridge`; `table-cartridge`, `<table>/<cartridge>`. A result without it reads as `basis`.",
+              "type": "string",
+              "enum": ["basis", "table", "cartridge", "table-cartridge"]
             },
             "factors": {
               "type": "object",
@@ -3460,22 +3484,22 @@
                 "properties": {
                   "factor": {
                     "type": "number",
-                    "description": "The model peak pressure times this is what the basis reads: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only."
+                    "description": "The model peak pressure times this is what the rows of the key read: the exponential of the median log of printed over model peak pressure of its rows under the fit to velocities only."
                   },
                   "rows": {
                     "type": "integer",
                     "minimum": 0,
                     "maximum": 9007199254740991,
-                    "description": "Pressure rows of the basis of the powders fitted to velocities."
+                    "description": "Pressure rows of the key of the powders fitted to velocities."
                   }
                 },
                 "required": ["factor", "rows"],
                 "additionalProperties": false
               },
-              "description": "By pressure basis of the training rows (`unstated` without one); a basis without a row of a powder fitted to velocities is left out, and its training pressures are not read."
+              "description": "By key of the training rows; a key without a row of a powder fitted to velocities is left out, and its training pressures are not read."
             }
           },
-          "required": ["sigma", "factors"],
+          "required": ["sigma", "by", "factors"],
           "additionalProperties": false
         },
         "powders": {
@@ -3533,7 +3557,7 @@
                 "type": "number"
               },
               "pressureRows": {
-                "description": "With `--pressure-sigma`: used training rows whose printed pressure the fit read, those of a basis with a factor.",
+                "description": "With `--pressure-sigma`: used training rows whose printed pressure the fit read, those of a key of `--pressure-factor` with a factor.",
                 "type": "integer",
                 "minimum": 0,
                 "maximum": 9007199254740991

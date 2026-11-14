@@ -1,6 +1,6 @@
 /** Hole proposals from one example hole (`apps/docs/docs/models/hole-detection.md`); pure, so it runs in a worker. */
-import type { Point } from '@open-reloading/shot-groups'
-import { nth } from '@open-reloading/statistics'
+import type { Point } from '@rangefoundry/shot-groups'
+import { nth } from '@rangefoundry/statistics'
 import {
   boxBlur,
   type Peak,

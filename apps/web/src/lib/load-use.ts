@@ -1,4 +1,4 @@
-import { parseRef, type UserRecord } from '@open-reloading/schema'
+import { parseRef, type UserRecord } from '@rangefoundry/schema'
 import type { Translator } from '../i18n/translate.ts'
 import { dayText } from './dates.ts'
 import { sessionRef } from './measurements.ts'

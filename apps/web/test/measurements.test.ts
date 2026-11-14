@@ -1,5 +1,5 @@
-import type { ChronoImport } from '@open-reloading/importers'
-import { chronoSession, userRecord } from '@open-reloading/schema'
+import type { ChronoImport } from '@rangefoundry/importers'
+import { chronoSession, userRecord } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import type { Shot } from '../src/lib/chrono.ts'
 import {
@@ -110,7 +110,7 @@ describe('simulatedCurve', () => {
 
 describe('sessionOf', () => {
   const data: ChronoImport = {
-    format: 'openreloading-csv',
+    format: 'rangefoundry-csv',
     session: {
       date: '2026-10-12',
       device: { kind: 'doppler-radar', manufacturerName: 'Manufacturer', model: 'Radar' },
@@ -171,7 +171,7 @@ describe('sessionOf', () => {
       provenance: { kind: 'measured' as const, sources: [{}] as [object] },
     }
     const t = sessionOf('x.csv', { ...data, session: untitled }, [], { id, now })
-    expect(defined(t.data.provenance.sources[0]).title).toBe('x.csv')
+    expect(defined(t.data.provenance?.sources[0]).title).toBe('x.csv')
   })
 
   it('maps a string to a charge and back to not used', () => {

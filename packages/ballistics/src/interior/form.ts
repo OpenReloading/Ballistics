@@ -1,6 +1,6 @@
 /** Burn laws and form functions of the Noble-Abel interior model, `apps/docs/docs/models/interior-burn-forms.md`; dimensions in m. */
 
-import { bisect } from '@open-reloading/statistics'
+import { bisect } from '@rangefoundry/statistics'
 
 /** Propellant grain by shape; dimensions in m, `perforationDiameter` is the diameter of one perforation. */
 export type Grain =

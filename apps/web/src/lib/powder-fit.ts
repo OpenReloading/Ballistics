@@ -7,7 +7,7 @@ import type {
   PowderFitReason,
   PowderPrediction,
   PowderPressureRange,
-} from '@open-reloading/ballistics'
+} from '@rangefoundry/ballistics'
 import { msg } from '../i18n/translate.ts'
 
 /** `parameters` are the values asked for. */

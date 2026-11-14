@@ -1,13 +1,13 @@
 /** Bullets side by side: the rows in the preset, the difference marks, one drawing scale. */
 
-import { face, type LengthUnit } from '@open-reloading/drawing'
+import type { Bullet } from '@rangefoundry/schema'
+import { face, type LengthUnit } from '@rangefoundry/svg-drawings'
 import {
   type BulletModel,
   type BulletProfile,
   bulletFigureModel,
   bulletScreenEm,
-} from '@open-reloading/drawing/bullet'
-import type { Bullet } from '@open-reloading/schema'
+} from '@rangefoundry/svg-drawings/bullet'
 import { msg, type Translator, translator } from '../i18n/translate.ts'
 import {
   ballisticCoefficientRows,

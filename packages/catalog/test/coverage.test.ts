@@ -1,4 +1,4 @@
-import type { Provenance } from '@open-reloading/schema'
+import type { Provenance } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { checkCoverage } from '../src/coverage.ts'
 
@@ -24,6 +24,11 @@ describe('checkCoverage', () => {
       provenance: provenance([{ title: 'S', fields: ['mass', 'base'] }]),
     }
     expect(checkCoverage(record)).toEqual([])
+  })
+
+  it('refuses a record without provenance, even of basic fields only', () => {
+    const basic = { id: 'x', name: 'X', mass: { value: 1 }, provenance: undefined }
+    expect(checkCoverage(basic)).toEqual(['needs provenance'])
   })
 })
 

@@ -47,7 +47,7 @@ const declared = (list: Rule[], match: (rule: Rule) => boolean) =>
 test("a page printed with the dark theme on keeps none of Infima's dark values", () => {
   const theme = rules(readFileSync(infima, 'utf8'))
   const ours = rules(
-    readFileSync(require.resolve('@open-reloading/design-tokens/docusaurus.css'), 'utf8'),
+    readFileSync(require.resolve('@rangefoundry/design-tokens/docusaurus.css'), 'utf8'),
   )
   const light = declared(theme, (r) => r.selectors.includes(':root'))
   const dark = declared(theme, (r) => r.selectors.includes("html[data-theme='dark']"))

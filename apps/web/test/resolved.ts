@@ -3,7 +3,7 @@ import {
   type Bullet,
   type UserBullet,
   type UserCartridge,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import type { CartridgeDetail } from '../src/lib/api-types.ts'
 import type { ResolvedBullet, ResolvedCartridge } from '../src/lib/variants.ts'
 

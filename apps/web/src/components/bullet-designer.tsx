@@ -2,10 +2,10 @@
 
 import { Anchor, Button, NativeSelect, Text, TextInput } from '@mantine/core'
 import { useDebouncedValue } from '@mantine/hooks'
-import { face, type LengthUnit } from '@open-reloading/drawing'
-import { bulletFigureModel, bulletSymbols } from '@open-reloading/drawing/bullet'
-import { type Bullet, toSi, type UserBullet } from '@open-reloading/schema'
 import { Camera } from '@phosphor-icons/react'
+import { type Bullet, toSi, type UserBullet } from '@rangefoundry/schema'
+import { face, type LengthUnit } from '@rangefoundry/svg-drawings'
+import { bulletFigureModel, bulletSymbols } from '@rangefoundry/svg-drawings/bullet'
 import dynamic from 'next/dynamic'
 import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'

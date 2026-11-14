@@ -1,4 +1,4 @@
-import { parseRef } from '@open-reloading/schema'
+import { parseRef } from '@rangefoundry/schema'
 import type { LoadTables } from './load-tables.ts'
 import type { Bundle } from './records.ts'
 

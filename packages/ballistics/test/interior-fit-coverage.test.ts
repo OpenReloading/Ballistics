@@ -1,4 +1,4 @@
-import { nth } from '@open-reloading/statistics'
+import { nth } from '@rangefoundry/statistics'
 import { describe, expect, it } from 'vitest'
 import { fitPowder, interior, predictPowder } from '../src/index.ts'
 import { load } from './powder-load.ts'

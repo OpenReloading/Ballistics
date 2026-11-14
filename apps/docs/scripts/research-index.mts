@@ -146,7 +146,7 @@ export function llmsText(list: Entry[], site: string): string {
     return `- [${e.id ? `${e.id} ` : ''}${e.title}](${e.link}): ${e.description}${tail ? ` (${tail})` : ''}`
   }
   return [
-    '# OpenReloading Ballistics research',
+    '# RangeFoundry Workbench research',
     '',
     '> Research log entries and literature notes of the model docs. Before a model changes, read the entries of its model page. The same list with the fields is research-index.json.',
     '',

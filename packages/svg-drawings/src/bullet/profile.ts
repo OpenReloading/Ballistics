@@ -49,7 +49,9 @@ export interface BulletValues {
         mouthDiameter?: StoredQuantity | undefined
       }
     | undefined
-  provenance: { sources: { title?: string | undefined; fields?: string[] | undefined }[] }
+  provenance?:
+    | { sources: { title?: string | undefined; fields?: string[] | undefined }[] }
+    | undefined
 }
 
 /** A dimensioned field of a bullet drawing. */
@@ -135,9 +137,9 @@ export function bulletDimensions(r: BulletValues): BulletDimensions | undefined 
   }
 }
 
-/** The title of the source that covers a field: one without `fields` covers the whole record. */
+/** The title of the source that covers a field: one without `fields` covers the whole record; none without provenance. */
 export const sourceTitle = (r: BulletValues, field: string) =>
-  r.provenance.sources.find(
+  r.provenance?.sources.find(
     (s) => !s.fields || s.fields.some((f) => field === f || field.startsWith(`${f}.`)),
   )?.title
 

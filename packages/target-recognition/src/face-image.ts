@@ -6,8 +6,8 @@ import {
   meanRadius,
   type Point,
   ransacEllipse,
-} from '@open-reloading/shot-groups'
-import { nth } from '@open-reloading/statistics'
+} from '@rangefoundry/shot-groups'
+import { nth } from '@rangefoundry/statistics'
 import type { RgbaImage } from './image.ts'
 import { clamp, upperMedian } from './raster-ops.ts'
 

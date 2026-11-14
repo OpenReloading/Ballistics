@@ -21,8 +21,8 @@ import {
   Printer,
   Target,
 } from '@phosphor-icons/react'
-import Link from 'next/link'
 import { type ReactNode, useId } from 'react'
+import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
 import { AppPopover, popoverWidth } from './app-popover.tsx'

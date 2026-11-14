@@ -1,7 +1,7 @@
 'use client'
 
 import { Crosshair } from '@phosphor-icons/react'
-import Link from 'next/link'
+import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { Fact, FactCard } from './fact-cards.tsx'
 

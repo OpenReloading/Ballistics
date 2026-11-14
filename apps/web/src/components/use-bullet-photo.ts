@@ -1,6 +1,6 @@
 'use client'
 
-import { fromSi, toSi } from '@open-reloading/schema'
+import { fromSi, toSi } from '@rangefoundry/schema'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { type Message, msg } from '../i18n/translate.ts'
 import { type Design, evaluate } from '../lib/bullet-designer.ts'

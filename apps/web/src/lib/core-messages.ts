@@ -1,4 +1,4 @@
-import { type Diagnostic, InputError } from '@open-reloading/statistics'
+import { type Diagnostic, InputError } from '@rangefoundry/statistics'
 import type { Translator } from '../i18n/translate.ts'
 import { errorText } from './error-text.ts'
 

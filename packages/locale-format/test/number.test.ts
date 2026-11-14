@@ -1,4 +1,4 @@
-import { parseNumber } from '@open-reloading/units'
+import { parseNumber } from '@rangefoundry/units'
 import * as fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
 import {

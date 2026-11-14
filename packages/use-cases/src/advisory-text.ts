@@ -1,9 +1,5 @@
 /** A short name for a summary line, the message of a rule whose message states no values, and what changes the situation; a message states facts about the inputs and the model only, never a statement about the load. */
-import {
-  type AdvisoryId,
-  chargeTooSmallRatio,
-  type ResistanceGap,
-} from '@open-reloading/ballistics'
+import { type AdvisoryId, chargeTooSmallRatio, type ResistanceGap } from '@rangefoundry/ballistics'
 
 /** The English words of one rule. */
 export interface AdvisoryText {

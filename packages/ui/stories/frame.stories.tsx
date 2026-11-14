@@ -64,7 +64,7 @@ export const Frame: Story = {
     }
     // past its last link the focus stays inside: the close button and three links, five steps
     for (let step = 0; step < 5; step++) await userEvent.tab()
-    await expect(drawer).toContainElement(canvasElement.ownerDocument.activeElement as HTMLElement)
+    await expect(drawer.contains(canvasElement.ownerDocument.activeElement)).toBe(true)
     await userEvent.keyboard('{Escape}')
     await waitFor(() => expect(menu).toHaveFocus())
     // the drawer leaves after its transition; reopened before that, the old one would still be found

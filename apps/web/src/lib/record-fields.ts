@@ -6,7 +6,7 @@ import {
   type Primer,
   type QuantityValue,
   toSi,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import { formatNumber, localizeDecimals } from '../i18n/number.ts'
 import { type Message, msg, type Translator, translator } from '../i18n/translate.ts'
 import { computedBulletRows } from './bullet.ts'

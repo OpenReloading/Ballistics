@@ -1,5 +1,5 @@
 /** The face a user's design builds for the tools: its id, organization and the face schema's checks. */
-import { type TargetFace, type TargetFaceDesign, targetFace } from '@open-reloading/schema'
+import { type TargetFace, type TargetFaceDesign, targetFace } from '@rangefoundry/schema'
 
 /** The owner of a built face: it names the face as the user's own in the tools' lists. */
 export const userOrganization = 'User design'

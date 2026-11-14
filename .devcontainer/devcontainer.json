@@ -9,5 +9,5 @@
   "service": "app",
   "workspaceFolder": "${localWorkspaceFolder}",
   "forwardPorts": [3000, 3003],
-  "postCreateCommand": "git config --global --add safe.directory \"${containerWorkspaceFolder}\" && pnpm install --frozen-lockfile && pnpm --filter @open-reloading/e2e exec playwright install --only-shell chromium"
+  "postCreateCommand": "git config --global --add safe.directory \"${containerWorkspaceFolder}\" && pnpm install --frozen-lockfile && pnpm --filter @rangefoundry/e2e exec playwright install --only-shell chromium"
 }

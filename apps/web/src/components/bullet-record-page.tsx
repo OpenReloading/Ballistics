@@ -1,7 +1,7 @@
 'use client'
 
-import type { Bullet } from '@open-reloading/schema'
 import { Flask } from '@phosphor-icons/react'
+import type { Bullet } from '@rangefoundry/schema'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 import { compareFrom } from '../lib/compare-ids.ts'

@@ -1,6 +1,6 @@
 /** M3 interior model with Noble-Abel gas, `apps/docs/docs/models/interior-m3.md`; SI in and out, temperatures in K. */
 
-import { bisect, InputError, nth } from '@open-reloading/statistics'
+import { bisect, InputError, nth } from '@rangefoundry/statistics'
 
 import { icao } from '../exterior/atmosphere.ts'
 import {

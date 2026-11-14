@@ -1,8 +1,8 @@
 'use client'
 
 import { Tabs } from '@mantine/core'
-import { useRouter } from 'next/navigation'
 import { useEffect, useRef } from 'react'
+import { useRouter } from '@/platform/navigation.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { libraryOf } from '../lib/sections.ts'
 import { useRoute } from './use-route.ts'

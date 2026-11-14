@@ -2,7 +2,7 @@
 
 The fields of the record files (`packages/catalog/records`), the user data files of the web app and the request and response bodies of the API (`/v1`), with the names they carry in files and on the wire.
 
-Units: a record file stores each quantity in one unit (`packages/units/src/units.ts`, re-exported by `@open-reloading/schema`): length mm, area mm2, mass g, density g/cm3, pressure bar, energy J, velocity m/s, angle deg, temperature degC (flame and gas temperatures K), specific energy J/kg, molar mass kg/kmol, specific volume m3/kg, burn rate 1/s, mass fraction %, relative humidity %, ballistic coefficient lb/in2. A record quantity is an object `{ value, raw }` in that unit. User data files and API request bodies use SI (m, kg, s, rad, Pa, K) unless a term names another unit. Results are simulations, not load data.
+Units: a record file stores each quantity in one unit (`packages/units/src/units.ts`, re-exported by `@rangefoundry/schema`): length mm, area mm2, mass g, density g/cm3, pressure bar, energy J, velocity m/s, angle deg, temperature degC (flame and gas temperatures K), specific energy J/kg, molar mass kg/kmol, specific volume m3/kg, burn rate 1/s, mass fraction %, relative humidity %, ballistic coefficient lb/in2. A record quantity is an object `{ value, raw }` in that unit. User data files and API request bodies use SI (m, kg, s, rad, Pa, K) unless a term names another unit. Results are simulations, not load data.
 
 ## Language
 
@@ -32,7 +32,7 @@ _Avoid_: record id (for user data)
 `note`: free text on a record, a provenance block, a source, a published ballistic coefficient or a plausibility exception.
 
 **Provenance**:
-`provenance`: where the values of a record come from, a `kind` and at least one source in `sources`, with an optional `note`. Carried by every record, API answers included.
+`provenance`: where the values of a record come from, a `kind` and at least one source in `sources`, with an optional `note`. Optional on every record kind and in its API answers, given wherever the record has a source; a bullet or powder needs it unless it holds basic fields only (`bulletBasicFields`, `powderBasicFields`).
 
 **Provenance kind**:
 `kind` of a provenance block or a source: `published`, `measured`, `derived`, `fitted` or `computed`. A source's `kind` overrides the block's for that source's values.
@@ -603,7 +603,7 @@ One entry of `magazine` of an event type: per `division` (and `powerFactor`, whe
 ### User data files
 
 **User data file**:
-A JSON file of the web app with `format` (`openreloading-user-data`), `version` (a file of another version is refused), `records` and the photos of its target sheets in `files`.
+A JSON file of the web app with `format` (`rangefoundry-user-data`), `version` (a file of another version is refused), `records` and the photos of its target sheets in `files`.
 
 **User record**:
 One entry of `records`: `kind` (`bullet`, `cartridge`, `load`, `firearm`, `targetSheet`, `targetFaceDesign`, `powder`), `id`, `name`, `saved` (ISO date and time of the save) and the `data` of that kind.
@@ -957,7 +957,7 @@ _Avoid_: trajectory, truing, plans, fit, stability (as answer keys)
 `units`: the unit of each field of a compute answer.
 
 **Resolved record**:
-`resolved`: the records a request named by id (`bullet`, `powder`, `cartridge`), each echoed with `id`, `manufacturer`, `name`, `provenance` and `suppliedFields`.
+`resolved`: the records a request named by id (`bullet`, `powder`, `cartridge`), each echoed with `id`, `manufacturer`, `name`, `provenance` (absent where the record has none) and `suppliedFields`.
 _Avoid_: echo
 
 **Supplied fields**:

@@ -1,4 +1,5 @@
 /** `POST /interior/load-file`: an M3 run of the workbench load file, with the summary the workbench shows. */
+
 import {
   advisoryRule,
   boreArea,
@@ -16,8 +17,8 @@ import {
   recordSensitivity,
   solidFill,
   solidFillLimit,
-} from '@open-reloading/ballistics'
-import type { Catalogue } from '@open-reloading/catalog'
+} from '@rangefoundry/ballistics'
+import type { Catalogue } from '@rangefoundry/catalog'
 import {
   type Bullet,
   fromSi,
@@ -26,7 +27,7 @@ import {
   type Powder,
   toSi,
   userDataFile,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import { z } from 'zod'
 import { resistanceGapText } from './advisory-text.ts'
 import { assertFinite, notice, resolvedRecord, unprocessable } from './answer.ts'

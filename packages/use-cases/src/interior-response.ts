@@ -1,6 +1,7 @@
 /** Every object is loose, so fields core adds later do not break the document; a non-finite number in an interior answer is a 422, so only the fields core defines as null are nullable. */
-import { advisoryIds } from '@open-reloading/ballistics'
-import { provenance } from '@open-reloading/schema'
+
+import { advisoryIds } from '@rangefoundry/ballistics'
+import { provenance } from '@rangefoundry/schema'
 import { z } from 'zod'
 import { notice } from './answer.ts'
 import { chargeTargetKinds } from './charge-schema.ts'
@@ -239,7 +240,9 @@ const cartridge = z
   .looseObject({
     id: text('Cartridge id'),
     name: text('Cartridge name'),
-    provenance,
+    provenance: provenance
+      .optional()
+      .describe('Provenance of the cartridge record, where it has one'),
   })
   .describe('The cartridge record of the request')
 
@@ -252,7 +255,9 @@ const record = (description: string) =>
       suppliedFields: z
         .array(z.string())
         .describe('Names of the request values the record supplied'),
-      provenance,
+      provenance: provenance
+        .optional()
+        .describe('Provenance of the record; absent on a record of basic fields only'),
     })
     .describe(description)
 

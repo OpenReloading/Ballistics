@@ -1,7 +1,6 @@
-/** The API in the browser over the data files the Pages build writes under `<base>/api/` (`writeStaticApi` of `@open-reloading/api/static`), running the API's own code (`@open-reloading/use-cases`), each compute task in its own worker. */
+/** The API in the browser over the data files the Pages build writes under `<base>/api/` (`writeStaticApi` of `@rangefoundry/api/static`), running the API's own code (`@rangefoundry/use-cases`), each compute task in its own worker. */
 
-import { type Catalogue, type CatalogueIndex, openCatalogue } from '@open-reloading/api/catalogue'
-import { type Powder, primerCompounds, primerSizes, recordIdRegex } from '@open-reloading/schema'
+import { type Powder, primerCompounds, primerSizes, recordIdRegex } from '@rangefoundry/schema'
 import {
   type CartridgeWithSpecs,
   type ComputeRunner,
@@ -15,7 +14,8 @@ import {
   runInterior,
   type TaskReply,
   taskTimeoutMs,
-} from '@open-reloading/use-cases'
+} from '@rangefoundry/use-cases'
+import { type Catalogue, type CatalogueIndex, openCatalogue } from '@rangefoundry/use-cases/catalog'
 import { maxRecordIdLength } from './compare-ids.ts'
 import { dataFile } from './data-file.ts'
 

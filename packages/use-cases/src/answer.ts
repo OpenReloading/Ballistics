@@ -1,7 +1,8 @@
 /** Parts of compute answers shared by the compute routes: the notice, error answers and checks. */
-import { TruingError } from '@open-reloading/ballistics'
-import type { Bullet, Powder, Provenance } from '@open-reloading/schema'
-import { InputError } from '@open-reloading/statistics'
+
+import { TruingError } from '@rangefoundry/ballistics'
+import type { Bullet, Powder, Provenance } from '@rangefoundry/schema'
+import { InputError } from '@rangefoundry/statistics'
 import { z } from 'zod'
 import { RecordNotFound, InputError as UseCaseInputError } from './issue.ts'
 import { ComputeBusy, ComputeTimeout } from './tasks.ts'
@@ -21,7 +22,8 @@ export interface ResolvedRecord {
   manufacturer: string
   name: string
   suppliedFields: string[]
-  provenance: Provenance
+  /** Absent on a record of basic fields only. */
+  provenance?: Provenance | undefined
 }
 
 /** The {@link ResolvedRecord} of a bullet or powder record. */

@@ -1,4 +1,4 @@
-import { radPerMoa } from '@open-reloading/ballistics'
+import { radPerMoa } from '@rangefoundry/ballistics'
 import { describe, expect, it } from 'vitest'
 import { cssMm, ladderMarks, markDiameterMm, maxMarkMm, rulerMm } from '../src/lib/ladder-target.ts'
 

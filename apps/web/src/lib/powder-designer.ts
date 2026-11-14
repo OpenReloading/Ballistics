@@ -8,7 +8,7 @@ import {
   type UserPowder,
   type UserPowderFit,
   type UserRecord,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import { untranslated } from '../i18n/number.ts'
 import { english, type Message, msg, type Translator } from '../i18n/translate.ts'
 import {
@@ -34,7 +34,7 @@ import { roundedFieldText } from './units.ts'
 type FittedKey = NonNullable<Powder['interior']>['fitted'][number]
 
 /** How the values of the powder came about: the kind of the provenance the record is built with. */
-export type ProvenanceKind = Powder['provenance']['kind']
+export type ProvenanceKind = NonNullable<Powder['provenance']>['kind']
 
 /** The choices of the grain form, the propellant base and the provenance kind, from the schema. */
 export const grainForms = [

@@ -1,6 +1,6 @@
 /** Synthetic target photos for the hole detection recall test: rendered faces with torn holes smaller than the bullet, as paper shows them; `make.mts` writes the files and the test reads them, so JPEG artifacts, blur and noise are part of the fixture. */
 
-import { seededUniforms } from '@open-reloading/statistics'
+import { seededUniforms } from '@rangefoundry/statistics'
 import { defined } from '../../defined.ts'
 
 type Rgb = [number, number, number]

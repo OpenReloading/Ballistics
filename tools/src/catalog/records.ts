@@ -7,7 +7,7 @@ import {
   type LocatedPublishedLoads,
   type SourceIndex,
   sourceIndex,
-} from '@open-reloading/catalog'
+} from '@rangefoundry/catalog'
 import {
   bullet,
   caliberClass,
@@ -32,7 +32,7 @@ import {
   sourceRecord,
   targetFace,
   targetMapping,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import { z } from 'zod'
 import { readKind } from './read-kind.ts'
 

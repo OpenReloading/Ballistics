@@ -1,4 +1,4 @@
-import { defaultStartPressure } from '@open-reloading/ballistics'
+import { defaultStartPressure } from '@rangefoundry/ballistics'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { interiorFields } from '../src/lib/interior-input.ts'
 import {

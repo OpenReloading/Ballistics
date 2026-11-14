@@ -1,10 +1,10 @@
 'use client'
 
 import { Button } from '@mantine/core'
-import { toSi } from '@open-reloading/schema'
 import { Plus } from '@phosphor-icons/react'
-import Link from 'next/link'
+import { toSi } from '@rangefoundry/schema'
 import { useDeferredValue, useMemo } from 'react'
+import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 import { type CaseRow, caseMatches, userCaseRows } from '../lib/case-rows.ts'

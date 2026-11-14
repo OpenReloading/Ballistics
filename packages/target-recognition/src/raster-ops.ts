@@ -1,7 +1,7 @@
 /** Raster operations on working images held as flat arrays, row by row: masks, morphology, distances, components. */
 
-import type { Point } from '@open-reloading/shot-groups'
-import { nth } from '@open-reloading/statistics'
+import type { Point } from '@rangefoundry/shot-groups'
+import { nth } from '@rangefoundry/statistics'
 
 // Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
 // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the loop bounds keep the index in range

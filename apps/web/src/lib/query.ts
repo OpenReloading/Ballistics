@@ -1,4 +1,4 @@
-import { recordIdRegex } from '@open-reloading/schema'
+import { recordIdRegex } from '@rangefoundry/schema'
 import type { FieldSpec, Fields } from './field-spec.ts'
 import { exactFieldText, type PresetId, type UnitSystem } from './units.ts'
 

@@ -4,14 +4,14 @@ import {
   type ShotGroup,
   type TargetSheet,
   toSi,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 import {
   type AimOffset,
   dispersionEllipse,
   type GroupEllipse,
   type GroupStatistics,
   subtendedAngle,
-} from '@open-reloading/shot-groups'
+} from '@rangefoundry/shot-groups'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { nth } from './nth.ts'
 import {

@@ -1,5 +1,5 @@
 /** The charge at which one `interior` run reaches a target (`apps/docs/docs/models/interior-charge-solver.md`): a scan over the charges the case allows brackets it, then Illinois false position (bisection when a step leaves the bracket); the returned run is the one at the returned charge, a simulation, not a charge to load. */
-import { nth } from '@open-reloading/statistics'
+import { nth } from '@rangefoundry/statistics'
 import { need } from '../issue.ts'
 import type { Settings } from '../settings.ts'
 

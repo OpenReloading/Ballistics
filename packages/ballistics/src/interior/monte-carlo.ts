@@ -1,6 +1,6 @@
 /** Every input drawn from a normal distribution around its nominal value, one run per draw, the 5th, 50th and 95th percentiles of peak pressure and muzzle velocity reported; input tolerances only, not model error (`apps/docs/docs/models/interior-sampled-band.md`). */
 
-import { normalsFrom, percentile, seededUniforms } from '@open-reloading/statistics'
+import { normalsFrom, percentile, seededUniforms } from '@rangefoundry/statistics'
 import type { Settings } from '../settings.ts'
 import { type InteriorLoad, type InteriorOptions, interior } from './model.ts'
 import {

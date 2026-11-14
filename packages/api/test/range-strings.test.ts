@@ -6,8 +6,8 @@ import {
   planTruingStrings,
   type TrajectoryInput,
   trajectory,
-} from '@open-reloading/ballistics'
-import { caps, rangeStringsLimits } from '@open-reloading/use-cases'
+} from '@rangefoundry/ballistics'
+import { caps, rangeStringsLimits } from '@rangefoundry/use-cases'
 import { describe, expect, it } from 'vitest'
 import { API_PREFIX } from '../src/version.ts'
 import { defined } from './defined.ts'

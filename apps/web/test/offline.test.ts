@@ -28,7 +28,7 @@ const req = (
 })
 
 it('names one shell cache per build and keeps the records cache across builds', () => {
-  expect(shellCache('abc')).toBe('openreloading-shell-abc')
+  expect(shellCache('abc')).toBe('rangefoundry-shell-abc')
   expect(shellCache('abc')).not.toBe(shellCache('def'))
   // names in creation order: the newest other shell stays for tabs still on that build
   expect(
@@ -51,8 +51,8 @@ it('names one shell cache per build and keeps the records cache across builds', 
 it('keeps the caches of the next edition apart from the stable edition, which shares its origin', () => {
   expect(editionName('', 'units')).toBe('units')
   expect(editionName('next', 'units')).toBe('next:units')
-  expect(shellCache('abc', 'next')).toBe('next:openreloading-shell-abc')
-  expect(recordsCache('next')).toBe('next:openreloading-records')
+  expect(shellCache('abc', 'next')).toBe('next:rangefoundry-shell-abc')
+  expect(recordsCache('next')).toBe('next:rangefoundry-records')
   const stable = [shellCache('a'), shellCache('b'), recordsCache()]
   const next = [shellCache('a', 'next'), shellCache('b', 'next'), recordsCache('next')]
   // a worker deletes only the shells of its own edition
@@ -225,9 +225,9 @@ it('answers a worker script from the cache with a copy that has no URL of its ow
 
 it('a worker update deletes shell caches only and its source never opens the browser store', () => {
   // the records cache and unknown caches stay; entered data lives in IndexedDB, which no cache name reaches
-  const names = [shellCache('a'), recordsCache(), 'openreloading-user-data', shellCache('b')]
+  const names = [shellCache('a'), recordsCache(), 'rangefoundry-user-data', shellCache('b')]
   expect(staleCaches(names, 'b')).toEqual([])
   expect(staleCaches([...names, shellCache('c')], 'c')).toEqual([shellCache('a')])
   const source = readFileSync(new URL('../src/service-worker.js', import.meta.url), 'utf8')
-  expect(source.replace(/^\s*\/\/.*$/gm, '')).not.toMatch(/indexedDB|openreloading-user-data/)
+  expect(source.replace(/^\s*\/\/.*$/gm, '')).not.toMatch(/indexedDB|rangefoundry-user-data/)
 })

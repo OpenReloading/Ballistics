@@ -5,7 +5,7 @@ import type {
   CatalogueSession,
   Powder,
   SpecValue,
-} from '@open-reloading/schema'
+} from '@rangefoundry/schema'
 
 /** A rule violation, identified by `finding` so that a record can acknowledge it. */
 export type Finding = {

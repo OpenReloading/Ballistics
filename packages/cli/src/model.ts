@@ -1,8 +1,8 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { dirname, extname, join, relative, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { interior } from '@open-reloading/ballistics'
-import { InputError } from '@open-reloading/statistics'
+import { interior } from '@rangefoundry/ballistics'
+import { InputError } from '@rangefoundry/statistics'
 import { UsageError } from './errors.ts'
 import type { InteriorModel } from './evaluate.ts'
 
@@ -38,12 +38,12 @@ function closure(file: string, root: string, prefix: string) {
 /** The built files the record to load step, the water density, the unit conversion, the input checks and the seating read, which every model version shares. */
 function sharedFiles() {
   const drawing = dirname(
-    dirname(fileURLToPath(import.meta.resolve('@open-reloading/drawing/seating'))),
+    dirname(fileURLToPath(import.meta.resolve('@rangefoundry/svg-drawings/seating'))),
   )
-  const schema = dirname(fileURLToPath(import.meta.resolve('@open-reloading/schema')))
-  const units = dirname(fileURLToPath(import.meta.resolve('@open-reloading/units')))
-  const statistics = dirname(fileURLToPath(import.meta.resolve('@open-reloading/statistics')))
-  const ballistics = dirname(fileURLToPath(import.meta.resolve('@open-reloading/ballistics')))
+  const schema = dirname(fileURLToPath(import.meta.resolve('@rangefoundry/schema')))
+  const units = dirname(fileURLToPath(import.meta.resolve('@rangefoundry/units')))
+  const statistics = dirname(fileURLToPath(import.meta.resolve('@rangefoundry/statistics')))
+  const ballistics = dirname(fileURLToPath(import.meta.resolve('@rangefoundry/ballistics')))
   return {
     statistics,
     ballistics,

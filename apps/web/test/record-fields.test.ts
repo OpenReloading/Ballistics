@@ -1,4 +1,4 @@
-import type { Bullet, Powder, Provenance } from '@open-reloading/schema'
+import type { Bullet, Powder, Provenance } from '@rangefoundry/schema'
 import { expect, it } from 'vitest'
 import { msg, translator } from '../src/i18n/translate.ts'
 import {

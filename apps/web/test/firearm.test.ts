@@ -1,5 +1,5 @@
-import type { CompetitionEvent, UserRecord } from '@open-reloading/schema'
-import { toSi, userRecord } from '@open-reloading/schema'
+import type { CompetitionEvent, UserRecord } from '@rangefoundry/schema'
+import { toSi, userRecord } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { translator } from '../src/i18n/translate.ts'
 import { loadExample } from '../src/lib/example-data.ts'

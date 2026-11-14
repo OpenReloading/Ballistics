@@ -1,6 +1,6 @@
-import type { Diagnostic } from '@open-reloading/statistics'
+import type { Diagnostic } from '@rangefoundry/statistics'
 
-// The typed refusals of this package, raised as the `InputError` of `@open-reloading/statistics` with the issue: a code and the values its message needs, no text.
+// The typed refusals of this package, raised as the `InputError` of `@rangefoundry/statistics` with the issue: a code and the values its message needs, no text.
 
 /** Why a photo calibration or a matrix operation refuses its input. */
 export type GeometryIssue =

@@ -1,6 +1,6 @@
 /** Gyroscopic and dynamic stability, spin drift and aerodynamic jump, `apps/docs/docs/models/exterior-stability.md`; SI in and out, the empirical fits stated in customary units and converted here. */
 
-import { conversions } from '@open-reloading/units'
+import { conversions } from '@rangefoundry/units'
 import { InputError } from '../issue.ts'
 import type { Air } from './atmosphere.ts'
 

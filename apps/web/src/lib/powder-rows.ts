@@ -1,5 +1,5 @@
 /** The powder list's rows: search, the packed page props and the browser's powders. */
-import { powder, type UserRecord } from '@open-reloading/schema'
+import { powder, type UserRecord } from '@rangefoundry/schema'
 import {
   classifyPowder,
   type FittedPowder,

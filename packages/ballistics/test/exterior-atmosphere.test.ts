@@ -1,4 +1,4 @@
-import { InputError } from '@open-reloading/statistics'
+import { InputError } from '@rangefoundry/statistics'
 import * as fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
 import {

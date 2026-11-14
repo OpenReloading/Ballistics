@@ -1,5 +1,5 @@
 // The result every chronograph parser returns, and the options they share.
-import type { ChronoSession, ChronoShot, QuantityValue } from '@open-reloading/schema'
+import type { ChronoSession, ChronoShot, QuantityValue } from '@rangefoundry/schema'
 import { type ChronoDiagnostic, refuse } from './diagnostics.ts'
 import type { ChronoFormatId } from './index.ts'
 import { parseVelocityUnit, type VelocityUnit } from './units.ts'

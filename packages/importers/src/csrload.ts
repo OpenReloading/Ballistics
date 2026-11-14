@@ -1,6 +1,6 @@
 // The load files of ChamberSim Reloaded (`.csrload`, XML) as record candidates: the load input has the layout of a GRT load file (`readLoadInput`), this file adds the format check and the measurement series; mapping and reasons in `apps/docs/docs/data/grt-load-files.md`, written from saved files of format 1
 
-import type { SessionRecord } from '@open-reloading/schema'
+import type { SessionRecord } from '@rangefoundry/schema'
 import { type Candidate, refuseFile } from './diagnostics.ts'
 import {
   clip,

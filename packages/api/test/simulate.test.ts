@@ -5,8 +5,8 @@ import {
   recordResistance,
   recordSensitivity,
   workbenchValueKeys,
-} from '@open-reloading/ballistics'
-import { analysisKinds, toSi } from '@open-reloading/schema'
+} from '@rangefoundry/ballistics'
+import { analysisKinds, toSi } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { API_PREFIX } from '../src/version.ts'
 import { defined } from './defined.ts'

@@ -18,7 +18,7 @@ import {
   type TableColumnMap,
   type TableKind,
   tableKinds,
-} from '@open-reloading/importers'
+} from '@rangefoundry/importers'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
@@ -752,7 +752,7 @@ export async function pickedBytes(file: Blob): Promise<ArrayBuffer | { refusal: 
   }
 }
 
-/** A file the OpenReloading data format detects goes to the data file import, every other (one over the size limit unread) to the Import entry's cards. */
+/** A file the RangeFoundry data format detects goes to the data file import, every other (one over the size limit unread) to the Import entry's cards. */
 export async function splitImport<F extends { file: Blob }>(picked: F[]) {
   const data: F[] = []
   const tables: F[] = []

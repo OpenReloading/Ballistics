@@ -1,4 +1,4 @@
-/** Issues of the ring scoring of `@open-reloading/shot-groups` (packages/shot-groups/src/ring-scoring.ts) become messages in the language shown. */
+/** Issues of the ring scoring of `@rangefoundry/shot-groups` (packages/shot-groups/src/ring-scoring.ts) become messages in the language shown. */
 import {
   faceAlignment as alignFace,
   type FaceAlignment,
@@ -8,7 +8,7 @@ import {
   type RingFitIssue,
   type ScoringFace,
   scoreGroupOnFace as scoreOnFace,
-} from '@open-reloading/shot-groups'
+} from '@rangefoundry/shot-groups'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import type { Point } from './target-geometry.ts'
 
@@ -20,7 +20,7 @@ export {
   scoredHoleDiameter,
   scoreShot,
   usesOwnTenthRule,
-} from '@open-reloading/shot-groups'
+} from '@rangefoundry/shot-groups'
 
 const fitWords = {
   'two-rings': msg('Marks on at least two rings are needed'),

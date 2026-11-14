@@ -1,5 +1,5 @@
 // Fixed-seed normal draws for the hit-probability research scripts: mulberry32 uniforms, Box-Muller pairs.
-import { seededUniforms } from '@open-reloading/statistics'
+import { seededUniforms } from '@rangefoundry/statistics'
 
 /** Deterministic uniform numbers in (0, 1): half a step above mulberry32's, so never 0 for the log. */
 function uniforms(seed: number): () => number {

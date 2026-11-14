@@ -6,9 +6,9 @@ import {
   interior,
   type LadderPoint,
   type PressureBasis,
-} from '@open-reloading/ballistics'
-import { toSi } from '@open-reloading/schema'
-import { InputError } from '@open-reloading/statistics'
+} from '@rangefoundry/ballistics'
+import { toSi } from '@rangefoundry/schema'
+import { InputError } from '@rangefoundry/statistics'
 import { atMuzzle, loadOf } from '../src/evaluate.ts'
 import { loadRecords, type Records } from '../src/records.ts'
 import { type Row, readRows } from '../src/rows.ts'

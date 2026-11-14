@@ -37,7 +37,7 @@ export const shotViewGerman = [
   'Alle Sch\u00FCsse sind in den Berechnungen enthalten,,,,,,',
 ].join('\n')
 
-/** OpenReloading CSV template, comma-separated. */
+/** RangeFoundry CSV template, comma-separated. */
 export const template = [
   'string,velocity,velocityUnit,coldBore,excluded',
   '42.0 gr,2795,fps,yes,',

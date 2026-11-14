@@ -25,7 +25,7 @@ Fixed before the run.
 
 ## Formulas
 
-The pipeline is the model page's. At a fixed COAL the seating depth moves with the bullet length, so a length error $\Delta L$ moves the volume below the mouth by $\Delta V \approx \frac{\pi}{4} d^2 \Delta L$ (`intrusion` in `packages/drawing/src/seating/seating.ts`). With the scale from the diameter alone, $k = d_\mathrm{px} / d$, every length is $L = L_\mathrm{px}\, d / d_\mathrm{px}$, so the relative error of $L$ is that of $L_\mathrm{px}/d_\mathrm{px}$: only the ratio is measured. A bullet turned by $\varphi$ towards the camera keeps its diameter and shows $L \cos\varphi$, $1 - \cos 10^\circ = 1.5\,\%$. The peak pressure moves by about 1.9 % per 0.5 mm of seating depth in a rifle case and 9.9 % in a 9 x 19 mm case (solver runs of #836); the existing length regression has an rms of 10.5 % of the length, which moves the peak pressure by about 7 to 8 % (rifle) and 17 to 30 % (9 x 19 mm) (#860, #823).
+The pipeline is the model page's. At a fixed COAL the seating depth moves with the bullet length, so a length error $\Delta L$ moves the volume below the mouth by $\Delta V \approx \frac{\pi}{4} d^2 \Delta L$ (`intrusion` in `packages/svg-drawings/src/seating/seating.ts`). With the scale from the diameter alone, $k = d_\mathrm{px} / d$, every length is $L = L_\mathrm{px}\, d / d_\mathrm{px}$, so the relative error of $L$ is that of $L_\mathrm{px}/d_\mathrm{px}$: only the ratio is measured. A bullet turned by $\varphi$ towards the camera keeps its diameter and shows $L \cos\varphi$, $1 - \cos 10^\circ = 1.5\,\%$. The peak pressure moves by about 1.9 % per 0.5 mm of seating depth in a rifle case and 9.9 % in a 9 x 19 mm case (solver runs of #836); the existing length regression has an rms of 10.5 % of the length, which moves the peak pressure by about 7 to 8 % (rifle) and 17 to 30 % (9 x 19 mm) (#860, #823).
 
 ## Numbers
 
@@ -66,7 +66,7 @@ Analytic: synthetic photographs rendered from the drawings of bullet records and
 
 - `apps/web/test/bullet-photo-catalogue.test.ts` (the evaluation; run with `BULLET_PHOTO_EVAL=<out.json>`).
 - `apps/web/src/lib/bullet-photo-colour.ts`, `apps/web/src/lib/bullet-photo-outline.ts`, `apps/web/src/lib/bullet-photo-measure.ts`, `apps/web/src/lib/bullet-photo-scale.ts`, `apps/web/src/lib/bullet-photo-sample.ts`.
-- `packages/drawing/src/seating/seating.ts` (seated volume and its length band).
+- `packages/svg-drawings/src/seating/seating.ts` (seated volume and its length band).
 - Model pages: [bullet from a photo](../models/bullet-photo.md), [case capacity](../models/case-capacity.md). Earlier entry: [synthetic photographs](./bullet-photo-synthetic-renders.md).
 
 ## Confidence
