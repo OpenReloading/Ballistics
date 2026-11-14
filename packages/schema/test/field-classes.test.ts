@@ -72,6 +72,17 @@ describe('a powder without provenance', () => {
     expect(powder.parse(record)).toEqual(record)
   })
 
+  it('passes with burn-rate charts and scope, basic fields', () => {
+    const record = {
+      ...basicPowder,
+      burnRateCharts: [
+        { chart: { manufacturer: 'test-manufacturer', edition: '2024' }, position: 3 },
+      ],
+      scope: ['shotgun'],
+    }
+    expect(powder.parse(record)).toEqual(record)
+  })
+
   it('fails with a composition', () => {
     const composition = [{ name: 'Nitrocellulose', min: 90, max: 100 }]
     expectIssueAt(powder, { ...basicPowder, composition }, 'composition')

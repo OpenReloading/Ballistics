@@ -385,6 +385,7 @@ export interface PowderItem {
     name: string;
     // (undocumented)
     propellantBase?: string;
+    scope?: string[];
 }
 
 // @public
