@@ -245,7 +245,7 @@ _Avoid_: `base` (on a powder)
 `burnRateCharts`: the powder's place in burn-rate charts as their makers publish them, one entry per chart: `chart` (`manufacturer`, the chart maker's record id, and `edition`, the printed edition or the publication date), `position` (the place in the printed order, from 1) and `relative` (the relative value, where the chart prints one). Charts of different makers are not on one scale, so the entries are never merged into one number. Not the model's burn-rate order of the powder list.
 
 **Powder scope**:
-`scope`: the uses the maker states for a powder, a set of `rifle`, `handgun` and `shotgun`. A shotgun-only powder has `scope` `["shotgun"]`.
+`scope`: the uses the maker states for a powder, a set of `rifle`, `handgun` and `shotgun`. A shotgun-only powder has `scope` `["shotgun"]`; the workbench does not compute it, as it computes metallic cartridges.
 
 **Bulk density**:
 `bulkDensity`: mass per volume of uncompressed powder, voids between grains included, g/cm3 on the powder record. In charge-target bodies `propellant.bulkDensity`, kg/m3.

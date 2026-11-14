@@ -4387,5 +4387,13 @@
   "Entered in the target designer": "Im Scheiben-Editor erfasst",
   "excluded at the range": "auf dem Schießstand ausgeschlossen",
   "not a RangeFoundry CSV template: the first row must name columns from {columns}, velocity among them": "keine RangeFoundry-CSV-Vorlage: Die erste Zeile muss Spaltennamen aus {columns} enthalten, darunter die Geschwindigkeit",
-  "not a RangeFoundry session JSON file: \"format\" must be \"{format}\"": "keine RangeFoundry-Sitzungs-JSON-Datei: „format“ muss „{format}“ sein"
+  "not a RangeFoundry session JSON file: \"format\" must be \"{format}\"": "keine RangeFoundry-Sitzungs-JSON-Datei: „format“ muss „{format}“ sein",
+  "{name} (not a metallic-cartridge powder)": "{name} (kein Treibladungspulver für Metallpatronen)",
+  "Handgun": "Kurzwaffe",
+  "No use found": "Keine Verwendung gefunden",
+  "Not a metallic-cartridge powder": "Kein Treibladungspulver für Metallpatronen",
+  "Shotgun": "Flinte",
+  "Shotgun powders: the maker states shotgun use only, and the app computes metallic cartridges.": "Treibladungspulver für Flinten: Der Hersteller nennt nur die Verwendung in Flinten, und die App berechnet Metallpatronen.",
+  "Shotgun-only powders left out: {shotgun}": "Ausgelassene Treibladungspulver nur für Flinten: {shotgun}",
+  "Stated use": "Angegebene Verwendung"
 }
