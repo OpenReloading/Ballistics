@@ -62,7 +62,7 @@ Reuse decision:
 
 - Thin client over the REST API: fails item 4 (no network access needed) and needs a running server. Rejected.
 - Command line over core directly: copies the compute routes' request schemas, record resolution, limits and answer shapes, the contract the OpenAPI baseline guards. Rejected.
-- Command line over the API's browser entries (`@rangefoundry/api/compute`, `@rangefoundry/api/catalogue`): no Fastify and no I/O of their own, already imported by the web app, and the simplicity test runs a load offline through them. Recommended. Blocked by the import rule `cli-imports-core-data-drawing-schema-only` of `.dependency-cruiser.cjs` and the package rule that the CLI never depends on the API: changing them is open.
+- Command line over the API's browser entries (`@rangefoundry/api/compute`, `@rangefoundry/api/catalogue`): no Fastify and no I/O of their own, already imported by the web app, and the simplicity test runs a load offline through them. Recommended. Blocked by the lint rule `cli-imports-logic-catalog-drawing-schema-only` in `.oxlintrc.json`, which permits only `@rangefoundry/api/catalogue`. `@rangefoundry/api` already appears in the CLI manifest, and `packages/api/package.json` exports neither `./compute` nor `./catalogue`. Changing the lint rule is open.
 - Must not be duplicated: the zod request and answer schemas, record resolution, the limit checks and warnings, the notice string, and the units of the answers.
 
 Simplicity gate per command:
