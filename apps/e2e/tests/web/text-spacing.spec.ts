@@ -2,7 +2,7 @@ import { expect, type Page, test } from '@playwright/test'
 import { cutText } from './cut.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
-import { runExample } from './workbench-run.ts'
+import { runSavedLoad } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
@@ -24,12 +24,12 @@ async function nothingCut(page: Page) {
 }
 
 for (const width of [1280, 390])
-  test(`at ${width} px the workbench after the example run cuts nothing with the spacing`, async ({
+  test(`at ${width} px the workbench after the fixture load run cuts nothing with the spacing`, async ({
     page,
   }) => {
     test.setTimeout(60_000)
     await page.setViewportSize({ width, height: 800 })
-    await runExample(page)
+    await runSavedLoad(page)
     await nothingCut(page)
     // the status line's whole text is its tooltip on focus
     const line = page.locator('.page-bar-status')

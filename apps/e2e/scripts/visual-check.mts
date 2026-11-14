@@ -6,6 +6,8 @@ import { parseArgs } from 'node:util'
 import { chromium, type Page } from '@playwright/test'
 import { barButton } from '../tests/web/bar.ts'
 import { safetyAck } from '../tests/web/nav.ts'
+import { putRecords } from '../tests/web/user-store.ts'
+import { fixtureLoad, fixtureRifle } from '../tests/web/workbench.ts'
 
 export const presets = {
   // 308 Win., 8 x 51 R Lebel, a belted magnum (table III), a rimfire (V), a long case, a shotshell (VII)
@@ -79,13 +81,15 @@ export const fittedCaption = 'Model output from fitted M3 parameters, not manufa
 export const bar = (page: Page, name: string, texts = catalogue) =>
   barButton(page, name, inLanguage('Page actions', texts))
 
-/** Opens the example load in the workbench; below 75em the bar's actions are behind "Page actions". */
-async function openExampleLoad(page: Page) {
+/** Stores the fixture load and opens it in the workbench; below 75em the bar's actions are behind "Page actions". */
+async function openFixtureLoad(page: Page) {
+  await putRecords(page, [fixtureRifle, fixtureLoad])
   await (await bar(page, 'Open')).click()
-  await page.getByRole('menuitem', { name: 'Example load' }).click()
+  await page.getByRole('menuitem', { name: new RegExp(`^${inLanguage('Saved loads')}`) }).click()
+  await page.getByRole('button', { name: fixtureLoad.name, exact: true }).click()
 }
 
-/** VISUAL_DEFAULTS=1: the example's link without the defaulted inputs, so the run lists them. */
+/** VISUAL_DEFAULTS=1: the load's link without the defaulted inputs, so the run lists them. */
 async function withoutDefaults(page: Page) {
   // Copy link writes the link into the address bar
   await (await bar(page, 'Copy link')).click()
@@ -97,25 +101,25 @@ async function withoutDefaults(page: Page) {
   if ((await powder.getAttribute('aria-expanded')) !== 'true') await powder.click()
 }
 
-/** VISUAL_LOADS=<n>: n open loads (the example in each), made at 1280 px where the strip is shown (below 75em it is hidden), then the window back at its width. */
+/** VISUAL_LOADS=<n>: n open loads (the fixture load in each), made at 1280 px where the strip is shown (below 75em it is hidden), then the window back at its width. */
 async function openLoads(page: Page, loads: number) {
   const size = page.viewportSize()
   await page.setViewportSize({ width: 1280, height: size?.height ?? 844 })
   for (let i = 1; i < loads; i++) {
     await page.locator('.load-strip > button[aria-label="New load"]').click()
-    await openExampleLoad(page)
+    await openFixtureLoad(page)
     await page.locator('.field-flag-seating').first().waitFor()
   }
   if (size) await page.setViewportSize(size)
 }
 
-/** The workbench with the example run and its results shown. */
+/** The workbench with the fixture load run and its results shown. */
 async function workbenchReady(page: Page) {
-  await openExampleLoad(page)
+  await openFixtureLoad(page)
   if (process.env.VISUAL_DEFAULTS) await withoutDefaults(page)
   const loads = Number(process.env.VISUAL_LOADS)
   if (loads > 1) await openLoads(page, loads)
-  // VISUAL_LADDER=<steps>: a charge ladder of that many steps of 0.5 gr on the example (both default presets weigh the charge in grains)
+  // VISUAL_LADDER=<steps>: a charge ladder of that many steps of 0.5 gr on the fixture load (both default presets weigh the charge in grains)
   const steps = process.env.VISUAL_LADDER
   if (steps) {
     await page.getByLabel(/^Ladder steps/).fill(steps)

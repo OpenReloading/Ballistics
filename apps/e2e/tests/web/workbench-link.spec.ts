@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { barButton } from './bar.ts'
 import { storeUnits } from './units.ts'
-import { applyExampleLoad, loadForm } from './workbench.ts'
+import { loadForm, openSavedLoad } from './workbench.ts'
 import { runLine } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
@@ -11,7 +11,7 @@ test('a copied link runs the same load where its bullet and powder records are m
   context,
 }) => {
   await page.goto('/workbench')
-  await applyExampleLoad(page)
+  await openSavedLoad(page)
   const withRecords = await runLine(page)
   expect(withRecords).toMatch(/peak \d+ bar, .* \d+ m\/s/)
   await (await barButton(page, 'Copy link')).click()
@@ -21,7 +21,7 @@ test('a copied link runs the same load where its bullet and powder records are m
   expect(link.hash).toMatch(/^#units=/)
   expect(link.href.length).toBeLessThan(2000)
 
-  // a deploy without the demo bullet and powder records (the example's fitted powder)
+  // a deploy without the demo bullet and powder records (the fixture load's fitted powder)
   const missing = await context.newPage()
   await storeUnits(missing)
   for (const record of ['bullets/demo-bullet-168', 'powders/demo-powder-dp40'])

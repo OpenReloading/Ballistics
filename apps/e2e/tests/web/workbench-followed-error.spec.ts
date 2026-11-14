@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
-import { applyExampleLoad, loadForm } from './workbench.ts'
+import { loadForm, openSavedLoad } from './workbench.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
@@ -15,7 +15,7 @@ test('Run pressed while the seated volume arrives leaves no error on the volume'
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
   })
   await gotoHydrated(page, '/workbench')
-  await applyExampleLoad(page)
+  await openSavedLoad(page)
   await (await barButton(page, 'Save')).click()
   await expect(page.locator('.file-state')).toContainText('Saved')
 

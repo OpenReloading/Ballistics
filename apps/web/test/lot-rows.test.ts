@@ -1,7 +1,6 @@
 import { chargeLadder, type InteriorLoad, interior } from '@rangefoundry/ballistics'
 import { describe, expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
-import { exampleInterior, exampleRecords, loadExample } from '../src/lib/example-data.ts'
 import { exampleFields } from '../src/lib/examples.ts'
 import { siValues } from '../src/lib/field-spec.ts'
 import { interiorBody, interiorFields } from '../src/lib/interior-input.ts'
@@ -17,10 +16,11 @@ import {
 } from '../src/lib/lot-rows.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import { defined } from './defined.ts'
+import { fixtureInterior, fixtureLadder, fixtureRecords } from './fixtures/load.ts'
 
-const filled = exampleFields(interiorFields, exampleInterior, presetUnits('us'))
-const { load } = interiorBody(siValues(filled), exampleRecords.cartridge.id)
-const { steps, step, direction } = loadExample.ladder
+const filled = exampleFields(interiorFields, fixtureInterior, presetUnits('us'))
+const { load } = interiorBody(siValues(filled), fixtureRecords.cartridge.id)
+const { steps, step, direction } = fixtureLadder
 const charges = chargeLadder(load.charge, step, steps, direction)
 
 /** The run of a body's ladder, as the API runs it: one model run per charge. */

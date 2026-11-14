@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test'
 import { showGerman } from './german.ts'
 import { storeUnits } from './units.ts'
-import { runExample } from './workbench-run.ts'
+import { runSavedLoad } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
@@ -38,7 +38,7 @@ const landscape = { A4: (297 - 20) * (96 / 25.4), Letter: (279.4 - 20) * (96 / 2
 test('the load sheet heads the steps by their value and breaks no header word on A4 and Letter', async ({
   page,
 }) => {
-  await runExample(page)
+  await runSavedLoad(page)
   await page.emulateMedia({ media: 'print' })
   await page.evaluate(() => {
     document.documentElement.dataset.print = 'sheets'
@@ -60,7 +60,7 @@ test('the report and the load sheets print in German and stay inside the page', 
   page,
 }) => {
   test.setTimeout(60_000)
-  await runExample(page)
+  await runSavedLoad(page)
   await showGerman(page)
   await expect(page.getByRole('tab', { name: 'Ladeleiter-Tabelle', exact: true })).toBeVisible()
   await page.emulateMedia({ media: 'print' })

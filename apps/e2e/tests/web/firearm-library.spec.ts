@@ -2,7 +2,7 @@ import { expect, type Page, test } from '@playwright/test'
 import { AxeBuilder } from './a11y.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
-import { runExample } from './workbench-run.ts'
+import { runSavedLoad } from './workbench-run.ts'
 
 /** The UUID of the `n`th seeded firearm. */
 const firearmId = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`
@@ -204,7 +204,7 @@ test('the zero air and drag factor of a mount fill the trajectory form with the 
     },
     1,
   )
-  await runExample(page)
+  await runSavedLoad(page)
   await page.getByRole('tab', { name: 'Trajectory', exact: true }).click()
   await expect(page.getByRole('table', { name: /^Trajectory: / })).toBeVisible()
   // the load's firearm fills the trajectory form's sight, zero air and drag factor anchored, and a field's unit switch is named after it too

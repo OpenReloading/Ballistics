@@ -4,7 +4,7 @@ import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
-import { applyExampleLoad, formValues } from './workbench.ts'
+import { formValues, openSavedLoad } from './workbench.ts'
 import { runLine } from './workbench-run.ts'
 
 // the offline layer's worker answers the reloads of the offline test
@@ -52,14 +52,14 @@ const stored = (page: Page, kind: string) =>
     return all.filter((r) => r.kind === kind)
   }, kind)
 
-/** Saves the example load in the workbench as a load of this browser and gives its record and form values. */
-async function saveExampleLoad(page: Page) {
+/** Saves the fixture load in the workbench as a load of this browser and gives its record and form values. */
+async function saveFixtureLoad(page: Page) {
   await page.addInitScript(() => {
     ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
   })
   await gotoHydrated(page, '/workbench')
-  await applyExampleLoad(page)
+  await openSavedLoad(page)
   await runLine(page)
   await (await barButton(page, 'Save')).click()
   await expect.poll(async () => (await stored(page, 'load')).length).toBe(1)
@@ -97,7 +97,7 @@ test('a 10-shot string entered offline survives reloads and is on the Measuremen
   page,
   context,
 }) => {
-  const saved = await saveExampleLoad(page)
+  const saved = await saveFixtureLoad(page)
   await openRange(page, saved.id)
   // the worker is active and controls the page, so the reloads below are answered from its caches
   await page.evaluate(() => navigator.serviceWorker.ready)
@@ -182,7 +182,7 @@ test('two tabs entering shots for one load lose none, and a Save of the load in 
   page,
 }) => {
   // the workbench has the load open, then the range page adds a session to it
-  const saved = await saveExampleLoad(page)
+  const saved = await saveFixtureLoad(page)
   const a = await context.newPage()
   const b = await context.newPage()
   await Promise.all([openRange(a, saved.id), openRange(b, saved.id)])
