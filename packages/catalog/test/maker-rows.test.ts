@@ -28,6 +28,11 @@ const range = (value: number) => ({ value, min: value - 1, max: value + 1 })
 const coversFinding = (path: string) =>
   `source "Maker page" (not a listed non-maker source): covers ${path}, which no maker source may supply`
 
+const solver = 'openreloading-constant-volume-equilibrium-solver'
+const wording = 'mapping-of-the-maker-wording-tools-src-bullets'
+const refused = (id: string, field: string) =>
+  `listed source "${id}" names ${field}, which it may not supply`
+
 describe('makerRows of bullets and powders by source id', () => {
   it("counts a source as a maker's unless its id is listed, also an embedded one", () => {
     const powders = [fittedPowder('listed'), fittedPowder('other'), fittedPowder('embedded')]
@@ -65,8 +70,6 @@ describe('makerRows of bullets and powders by source id', () => {
 })
 
 describe('makerRows of the listed sources of bullets and powders', () => {
-  const solver = 'openreloading-constant-volume-equilibrium-solver'
-
   it('asks a listed source other than synthetic-test-data to name its fields when the record holds detailed fields', () => {
     const found = rows(
       {
@@ -94,6 +97,63 @@ describe('makerRows of the listed sources of bullets and powders', () => {
         },
       ],
     })
+  })
+})
+
+describe('makerRows of the fields a listed source names', () => {
+  it('refuses a powder field outside the list of the source', () => {
+    const found = rows(
+      {
+        powders: [
+          solved('below', { title: 'Solver', fields: ['thermochemistry.flameTemperature'] }),
+          { ...solved('interior', { title: 'Solver', fields: ['interior'] }), interior },
+          { ...cited('basic', 'computed', { title: 'Solver', fields: ['name'] }), name: 'Basic' },
+          { ...cited('invented', 'fitted', { title: 'Invented', fields: ['interior'] }), interior },
+        ],
+      },
+      [
+        ['powders/below.json', [solver]],
+        ['powders/interior.json', [solver]],
+        ['powders/basic.json', [solver]],
+        ['powders/invented.json', ['synthetic-test-data']],
+      ],
+    )
+    expect(found).toEqual({
+      powders: [
+        { id: 'interior', findings: [refused(solver, 'interior')] },
+        { id: 'basic', findings: [refused(solver, 'name')] },
+      ],
+    })
+  })
+
+  it('refuses a bullet field outside the list of the source for bullets', () => {
+    const found = rows(
+      {
+        bullets: [
+          cited('mapped', 'computed', { title: 'Map', fields: ['construction'] }),
+          { ...cited('ogive', 'computed', { title: 'Map', fields: ['ogive'] }), ogive },
+          cited('solved', 'computed', { title: 'Solver', fields: ['thermochemistry'] }),
+        ],
+      },
+      [
+        ['bullets/mapped.json', [wording]],
+        ['bullets/ogive.json', [wording]],
+        ['bullets/solved.json', [solver]],
+      ],
+    )
+    expect(found).toEqual({
+      bullets: [
+        { id: 'ogive', findings: [refused(wording, 'ogive')] },
+        { id: 'solved', findings: [refused(solver, 'thermochemistry')] },
+      ],
+    })
+  })
+})
+
+describe('makerRows of an id outside the list', () => {
+  it('counts an id that is only a property of every object as a maker source', () => {
+    const found = rows({ powders: [fittedPowder('p')] }, [['powders/p.json', ['constructor']]])
+    expect(found).toEqual({ powders: [{ id: 'p', findings: [coversFinding('interior')] }] })
   })
 })
 

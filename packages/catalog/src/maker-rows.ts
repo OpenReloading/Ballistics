@@ -2,19 +2,67 @@ import { detailedFields, isWebLink, makerSourceFields } from '@rangefoundry/sche
 import type { Bundle } from './records.ts'
 import type { SourceIndex } from './sources.ts'
 
+/** Dot paths of the bullet and powder fields a listed source may name; a path covers the fields below it. */
+export interface ListedSourceFields {
+  readonly bullet: readonly string[]
+  readonly powder: readonly string[]
+}
+
 /**
- * Ids of the source records that are not a maker's: our thermochemistry solver, our map of the
- * makers' construction wording, and the invented data of the demo records. Every other source a
- * bullet, powder or load cites counts as a maker's, whatever its `origin` or `publisher` says. An id
- * added here changes the guard of the public catalog, and its pull request is reviewed as one. The
- * solver and the wording map have no source record yet; the importer change that first cites one
- * adds its record under the id listed here. Until then a mismatched id fails closed.
+ * The source records that are not a maker's, by id, each with the fields it may name: our
+ * thermochemistry solver, our map of the makers' construction wording, and the invented data of the
+ * demo records. Every other source a bullet, powder or load cites counts as a maker's, whatever its
+ * `origin` or `publisher` says. An id or a field added here changes the guard of the public catalog,
+ * and its pull request is reviewed as one. The solver and the wording map have no source record yet;
+ * the importer change that first cites one adds its record under the id listed here. Until then a
+ * mismatched id fails closed.
  */
-export const nonMakerSources: readonly string[] = [
-  'openreloading-constant-volume-equilibrium-solver',
-  'mapping-of-the-maker-wording-tools-src-bullets',
-  'synthetic-test-data',
-]
+export const nonMakerSources: Readonly<Record<string, ListedSourceFields>> = {
+  'openreloading-constant-volume-equilibrium-solver': { bullet: [], powder: ['thermochemistry'] },
+  'mapping-of-the-maker-wording-tools-src-bullets': { bullet: ['construction'], powder: [] },
+  'synthetic-test-data': {
+    bullet: [
+      'manufacturer',
+      'productNumber',
+      'name',
+      'country',
+      'productLine',
+      'caliber',
+      'diameter',
+      'mass',
+      'length',
+      'base',
+      'ogive',
+      'cannelure',
+      'tip',
+      'meplatDiameter',
+      'noseLength',
+      'baseToOgive',
+      'bearingLength',
+      'construction',
+      'ballisticCoefficients',
+      'recommendedTwist',
+      'slowestTwist',
+      'note',
+      'nameOnly',
+    ],
+    powder: [
+      'manufacturer',
+      'name',
+      'aliases',
+      'country',
+      'grainForm',
+      'propellantBase',
+      'bulkDensity',
+      'composition',
+      'thermochemistry',
+      'interior',
+      'temperatureSensitivity',
+      'listedCartridges',
+      'note',
+    ],
+  },
+}
 
 /** A record the public catalog may not hold, with what keeps it out. */
 export interface MakerRow {
@@ -41,7 +89,9 @@ interface Cited {
 
 type Ids = readonly (string | undefined)[] | undefined
 
-const isMakerId = (id: string | undefined) => id === undefined || !nonMakerSources.includes(id)
+// own keys only, so an id such as `constructor` stays a maker's
+const isMakerId = (id: string | undefined) =>
+  id === undefined || !Object.hasOwn(nonMakerSources, id)
 
 /** The sources of `record` that count as a maker's: an embedded one, or one whose id `ids` gives outside {@link nonMakerSources}. */
 const makerSources = (record: Cited, ids: Ids) =>
@@ -73,14 +123,20 @@ function makerSourceFindings(kind: 'bullet' | 'powder', record: Cited, source: C
   return findings
 }
 
-/** A listed source other than `synthetic-test-data` names its `fields` when the record holds detailed fields, else it covers them all. */
+/** A listed source names only fields of its {@link nonMakerSources} entry, and names them unless it is `synthetic-test-data` or the record holds no detailed field. */
 function listedSourceFindings(kind: 'bullet' | 'powder', record: Cited, ids: Ids): string[] {
-  if (detailedFields(kind, record).length === 0) return []
+  const detailed = detailedFields(kind, record).length > 0
   return (record.provenance?.sources ?? []).flatMap((source, i) => {
     const id = ids?.[i]
-    return id === undefined || isMakerId(id) || id === 'synthetic-test-data' || source.fields
-      ? []
-      : [`listed source "${id}" names no fields, but the record holds detailed fields`]
+    if (id === undefined || isMakerId(id)) return []
+    if (!source.fields)
+      return detailed && id !== 'synthetic-test-data'
+        ? [`listed source "${id}" names no fields, but the record holds detailed fields`]
+        : []
+    const allowed = nonMakerSources[id]?.[kind] ?? []
+    return source.fields
+      .filter((f) => !allowed.some((a) => f === a || f.startsWith(`${a}.`)))
+      .map((f) => `listed source "${id}" names ${f}, which it may not supply`)
   })
 }
 
@@ -119,9 +175,10 @@ function findingsOf(kind: string, record: Cited, ids: Ids): string[] {
  * The records of `bundle` the public catalog may not hold, by kind, in the order of the bundle;
  * kinds without one are left out. `citations` gives the cited source ids of each record file. A
  * bullet or powder may cite a maker's published source for the fields of `makerSourceFields`
- * only, and a listed source other than `synthetic-test-data` with its fields named; a catalogue load or a published-load file (`publishedLoads`, by `<cartridge>/<id>`) no
- * maker source, and a record of another kind no manufacturer-origin source or fitted source without
- * an origin. Manufacturer records are identity records and may cite their maker.
+ * only, and a listed source for the fields of its {@link nonMakerSources} entry only, named unless
+ * it is `synthetic-test-data`; a catalogue load or a published-load file (`publishedLoads`, by
+ * `<cartridge>/<id>`) no maker source, and a record of another kind no manufacturer-origin source or
+ * fitted source without an origin. Manufacturer records are identity records and may cite their maker.
  */
 export function makerRows(
   bundle: Bundle,

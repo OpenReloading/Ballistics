@@ -308,6 +308,14 @@ export type Finding = {
     message: string;
 };
 
+// @public
+export interface ListedSourceFields {
+    // (undocumented)
+    readonly bullet: readonly string[];
+    // (undocumented)
+    readonly powder: readonly string[];
+}
+
 export { LoadTable }
 
 export { LoadTables }
@@ -342,7 +350,7 @@ export interface ManufacturerItem {
 }
 
 // @public
-export const nonMakerSources: readonly string[];
+export const nonMakerSources: Readonly<Record<string, ListedSourceFields>>;
 
 // @public
 export interface Paging {
