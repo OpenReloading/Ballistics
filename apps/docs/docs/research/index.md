@@ -35,7 +35,7 @@ Starts with one of: improved, no change, worse. Then what was done: adopted, ado
 
 ## Data basis
 
-Starts with one of: public, analytic, measured. A closed form or a synthetic case is analytic. Measured data that is not in the repository: only what the owner allows to be stated.
+Starts with one of: public, analytic, measured. A closed form or a synthetic case is analytic. Measured data that is not in the repository: only what may be stated.
 
 ## Where in the app
 
