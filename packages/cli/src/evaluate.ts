@@ -13,7 +13,7 @@ import { InputError } from '@rangefoundry/statistics'
 import { bulletDimensions } from '@rangefoundry/svg-drawings/bullet'
 import { chamberOf, seat } from '@rangefoundry/svg-drawings/seating'
 import { waterDensityGramsPerCm3 } from '@rangefoundry/units'
-import { isEstimated, type Records } from './records.ts'
+import { isEstimated, type Records, withoutEstimates } from './records.ts'
 import type { Row } from './rows.ts'
 import { type Split, splitOf } from './split.ts'
 import { familyOf } from './unseen.ts'
@@ -52,7 +52,7 @@ export interface Outcome {
   /** Structure of the bullet record, else `<core material>-core`, else `unspecified`; `unknown` without a record. */
   construction: string
   prediction: Prediction
-  /** The capacity of the row's cartridge is an estimate (`isEstimated`). */
+  /** The capacity of the row's cartridge is an estimate (`isEstimated`) and the row would be `noCaseCapacity` without it. */
   estimatedCapacity?: true
 }
 
@@ -197,6 +197,7 @@ export function outcomes(
   model: InteriorModel,
   wanted: readonly Split[],
 ): Outcome[] {
+  const measured = withoutEstimates(records)
   return rows.flatMap((row, index) => {
     const split = splitOf(row.cartridge)
     if (!wanted.includes(split)) return []
@@ -204,7 +205,10 @@ export function outcomes(
     const construction = constructionOf(records.bullets.get(row.bullet))
     const prediction = predict(row, records, model)
     const capacity = records.capacities.get(row.cartridge)
-    const flag = capacity && isEstimated(capacity) ? { estimatedCapacity: true as const } : {}
+    // a row refused for a reason checked before the capacity keeps that reason
+    const estimated =
+      capacity && isEstimated(capacity) && loadOf(row, measured) === 'noCaseCapacity'
+    const flag = estimated ? { estimatedCapacity: true as const } : {}
     // the correction applies to a row the model gave a result for, so the other reasons come first
     const corrected = 'velocity' in prediction ? atMuzzle(row, records) : row
     if ('reason' in corrected)

@@ -165,6 +165,27 @@ describe('verify with an estimated case capacity', () => {
   })
 })
 
+describe('verify with an estimated case capacity, rows refused before the capacity', () => {
+  it('keeps their reason and leaves them out of the estimate', async () => {
+    const rows = writeRows(
+      rowsCsv([
+        { cartridge: '308-match', charge: 2.0, velocity: 0.01 },
+        { cartridge: '7-62-x-54-r', charge: 2.0, velocity: 0 },
+        { cartridge: '7-62-x-54-r', powder: 'demo-powder-plain', charge: 2.0, velocity: 0 },
+        { cartridge: '7-62-x-54-r', powder: 'no-powder', charge: 2.0, velocity: 0 },
+      ]),
+    )
+    const records = [...recordRoots, rootWithEstimate('7-62-x-54-r', 4.1)]
+    const r = await verify({ ...options, rows, records })
+    expect(r.overall.rows.notUsed).toEqual({
+      unknownPowder: 1,
+      noPowderModel: 1,
+      estimatedCapacity: 1,
+    })
+    expect(r.estimatedCapacity?.rows).toEqual({ inSplit: 1, used: 1, notUsed: {} })
+  })
+})
+
 describe('verify on the other splits', () => {
   it('refuses the test split without --final, and runs it with it', async () => {
     await expect(verify({ ...options, split: 'test' })).rejects.toThrow(Refusal)

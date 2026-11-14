@@ -115,7 +115,7 @@ const evaluation = z.object({
   estimatedCapacity: metrics
     .optional()
     .describe(
-      'The rows of the split whose cartridge has an estimated capacity (a capacity record of provenance kind `derived`), present when there are any. They are left out of `overall`, the groups, the fit, the interval and the paired change, where they count as `estimatedCapacity`; the interval coverage here uses the half width of the other rows.',
+      'The rows of the split that would be `noCaseCapacity` without the estimated capacity of their cartridge (a capacity record of provenance kind `derived`), present when there are any. They are left out of `overall`, the groups, the fit, the interval and the paired change, where they count as `estimatedCapacity`; the interval coverage here uses the half width of the other rows.',
     ),
   notInFittedSet: metrics
     .extend({ powders: count.describe('Powders left out, one at a time, each without a value.') })

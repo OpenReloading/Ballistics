@@ -45,7 +45,7 @@ export function fillFactor(pairs: readonly { capacity: number; outline: number }
   }
 }
 
-const millilitres = (grams: number) => (grams * 1000) / waterDensityGramsPerCm3
+const milliliters = (grams: number) => (grams * 1000) / waterDensityGramsPerCm3
 
 /** The fill factor over the cartridges of `records` with a capacity that is no estimate and an outline, and an estimated capacity record for each cartridge with an outline and neither a capacity nor a case with one. */
 export function estimateCapacities(records: Records) {
@@ -53,7 +53,7 @@ export function estimateCapacities(records: Records) {
     const outline =
       records.cartridges.get(id) && outlineVolume(records.cartridges.get(id) as Cartridge)
     return outline && !isEstimated(c)
-      ? [{ capacity: millilitres(c.waterCapacity.value), outline }]
+      ? [{ capacity: milliliters(c.waterCapacity.value), outline }]
       : []
   })
   const fill = fillFactor(pairs)
