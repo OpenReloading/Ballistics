@@ -2,24 +2,42 @@ import { detailedFields, isWebLink, makerSourceFields } from '@rangefoundry/sche
 import type { Bundle } from './records.ts'
 import type { SourceIndex } from './sources.ts'
 
-/** Dot paths of the bullet and powder fields a listed source may name; a path covers the fields below it. */
+/** Dot paths of the bullet and powder fields a listed source may name, a path covering the fields below it, and whether it may stand in a load. */
 export interface ListedSourceFields {
   readonly bullet: readonly string[]
   readonly powder: readonly string[]
+  readonly load: boolean
 }
 
 /**
- * The source records that are not a maker's, by id, each with the fields it may name: our
- * thermochemistry solver, our map of the makers' construction wording, and the invented data of the
- * demo records. Every other source a bullet, powder or load cites counts as a maker's, whatever its
- * `origin` or `publisher` says. An id or a field added here changes the guard of the public catalog,
- * and its pull request is reviewed as one. The solver and the wording map have no source record yet;
- * the importer change that first cites one adds its record under the id listed here. Until then a
- * mismatched id fails closed.
+ * The source records that are not a maker's, by id, each with the fields it may name and whether it
+ * may stand in a load: our thermochemistry solver, our map of the makers' construction wording, and
+ * the invented data of the demo records. Every other source a bullet, powder or load cites counts
+ * as a maker's, whatever its `origin` or `publisher` says. An id or a field added here changes the
+ * guard of the public catalog, and its pull request is reviewed as one. The solver and the wording
+ * map have no source record yet; the importer change that first cites one adds its record under the
+ * id listed here. Until then a mismatched id fails closed.
  */
 export const nonMakerSources: Readonly<Record<string, ListedSourceFields>> = {
-  'openreloading-constant-volume-equilibrium-solver': { bullet: [], powder: ['thermochemistry'] },
-  'mapping-of-the-maker-wording-tools-src-bullets': { bullet: ['construction'], powder: [] },
+  'openreloading-constant-volume-equilibrium-solver': {
+    bullet: [],
+    powder: ['thermochemistry'],
+    load: false,
+  },
+  'mapping-of-the-maker-wording-tools-src-bullets': {
+    bullet: [
+      'construction.raw',
+      'construction.structure',
+      'construction.core',
+      'construction.jacket.material',
+      'construction.surface',
+      'construction.gasCheck',
+      'construction.drivingBands',
+      'construction.unmapped',
+    ],
+    powder: [],
+    load: false,
+  },
   'synthetic-test-data': {
     bullet: [
       'manufacturer',
@@ -61,6 +79,7 @@ export const nonMakerSources: Readonly<Record<string, ListedSourceFields>> = {
       'listedCartridges',
       'note',
     ],
+    load: true,
   },
 }
 
@@ -123,16 +142,13 @@ function makerSourceFindings(kind: 'bullet' | 'powder', record: Cited, source: C
   return findings
 }
 
-/** A listed source names only fields of its {@link nonMakerSources} entry, and names them unless it is `synthetic-test-data` or the record holds no detailed field. */
+/** A listed source names only fields of its {@link nonMakerSources} entry, and names them unless it is `synthetic-test-data`. */
 function listedSourceFindings(kind: 'bullet' | 'powder', record: Cited, ids: Ids): string[] {
-  const detailed = detailedFields(kind, record).length > 0
   return (record.provenance?.sources ?? []).flatMap((source, i) => {
     const id = ids?.[i]
     if (id === undefined || isMakerId(id)) return []
     if (!source.fields)
-      return detailed && id !== 'synthetic-test-data'
-        ? [`listed source "${id}" names no fields, but the record holds detailed fields`]
-        : []
+      return id === 'synthetic-test-data' ? [] : [`listed source "${id}" names no fields`]
     const allowed = nonMakerSources[id]?.[kind] ?? []
     return source.fields
       .filter((f) => !allowed.some((a) => f === a || f.startsWith(`${a}.`)))
@@ -140,10 +156,14 @@ function listedSourceFindings(kind: 'bullet' | 'powder', record: Cited, ids: Ids
   })
 }
 
-const loadFinding = (id: string | undefined) =>
-  id === undefined
-    ? "cites an embedded source, which counts as a maker's"
-    : `cites source "${id}", which counts as a maker's`
+/** Why the source `id` may not stand in a load or a published-load file: a maker's, or a listed source without standing for loads. */
+const loadFindings = (id: string | undefined) => {
+  if (id === undefined) return ["cites an embedded source, which counts as a maker's"]
+  if (isMakerId(id)) return [`cites source "${id}", which counts as a maker's`]
+  return nonMakerSources[id]?.load
+    ? []
+    : [`cites listed source "${id}", which supplies no load field`]
+}
 
 /** True when `record` cites a manufacturer-origin source, or a fitted source that does not say whose data it was fitted to. */
 const mayHoldMakerData = (record: Cited) =>
@@ -163,9 +183,7 @@ function findingsOf(kind: string, record: Cited, ids: Ids): string[] {
     ]
   }
   if (kind === 'loads')
-    return (record.provenance?.sources ?? []).flatMap((_, i) =>
-      isMakerId(ids?.[i]) ? [loadFinding(ids?.[i])] : [],
-    )
+    return (record.provenance?.sources ?? []).flatMap((_, i) => loadFindings(ids?.[i]))
   return mayHoldMakerData(record)
     ? ['cites a manufacturer-origin source or a fitted source without an origin']
     : []
@@ -177,8 +195,9 @@ function findingsOf(kind: string, record: Cited, ids: Ids): string[] {
  * bullet or powder may cite a maker's published source for the fields of `makerSourceFields`
  * only, and a listed source for the fields of its {@link nonMakerSources} entry only, named unless
  * it is `synthetic-test-data`; a catalogue load or a published-load file (`publishedLoads`, by
- * `<cartridge>/<id>`) no maker source, and a record of another kind no manufacturer-origin source or
- * fitted source without an origin. Manufacturer records are identity records and may cite their maker.
+ * `<cartridge>/<id>`) no maker source and only a listed source that may stand in a load, and a
+ * record of another kind no manufacturer-origin source or fitted source without an origin.
+ * Manufacturer records are identity records and may cite their maker.
  */
 export function makerRows(
   bundle: Bundle,
@@ -195,7 +214,7 @@ export function makerRows(
   }
   for (const [file, ids] of citations) {
     const published = /^loads\/([^/]+\/[^/]+)\.json$/.exec(file)?.[1]
-    if (published) add('publishedLoads', published, ids.filter(isMakerId).map(loadFinding))
+    if (published) add('publishedLoads', published, ids.flatMap(loadFindings))
   }
   return out
 }

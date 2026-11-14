@@ -70,7 +70,7 @@ describe('makerRows of bullets and powders by source id', () => {
 })
 
 describe('makerRows of the listed sources of bullets and powders', () => {
-  it('asks a listed source other than synthetic-test-data to name its fields when the record holds detailed fields', () => {
+  it('asks a listed source other than synthetic-test-data to name its fields', () => {
     const found = rows(
       {
         powders: [
@@ -89,18 +89,14 @@ describe('makerRows of the listed sources of bullets and powders', () => {
     )
     expect(found).toEqual({
       powders: [
-        {
-          id: 'unnamed',
-          findings: [
-            `listed source "${solver}" names no fields, but the record holds detailed fields`,
-          ],
-        },
+        { id: 'unnamed', findings: [`listed source "${solver}" names no fields`] },
+        { id: 'basic', findings: [`listed source "${solver}" names no fields`] },
       ],
     })
   })
 })
 
-describe('makerRows of the fields a listed source names', () => {
+describe('makerRows of the powder fields a listed source names', () => {
   it('refuses a powder field outside the list of the source', () => {
     const found = rows(
       {
@@ -109,6 +105,7 @@ describe('makerRows of the fields a listed source names', () => {
           { ...solved('interior', { title: 'Solver', fields: ['interior'] }), interior },
           { ...cited('basic', 'computed', { title: 'Solver', fields: ['name'] }), name: 'Basic' },
           { ...cited('invented', 'fitted', { title: 'Invented', fields: ['interior'] }), interior },
+          solved('prefix', { title: 'Solver', fields: ['thermochemistryX'] }),
         ],
       },
       [
@@ -116,35 +113,75 @@ describe('makerRows of the fields a listed source names', () => {
         ['powders/interior.json', [solver]],
         ['powders/basic.json', [solver]],
         ['powders/invented.json', ['synthetic-test-data']],
+        ['powders/prefix.json', [solver]],
       ],
     )
     expect(found).toEqual({
       powders: [
         { id: 'interior', findings: [refused(solver, 'interior')] },
         { id: 'basic', findings: [refused(solver, 'name')] },
+        { id: 'prefix', findings: [refused(solver, 'thermochemistryX')] },
       ],
     })
   })
+})
 
+describe('makerRows of the bullet fields a listed source names', () => {
   it('refuses a bullet field outside the list of the source for bullets', () => {
     const found = rows(
       {
         bullets: [
-          cited('mapped', 'computed', { title: 'Map', fields: ['construction'] }),
+          cited('mapped', 'computed', { title: 'Map', fields: ['construction.core.hardness'] }),
           { ...cited('ogive', 'computed', { title: 'Map', fields: ['ogive'] }), ogive },
           cited('solved', 'computed', { title: 'Solver', fields: ['thermochemistry'] }),
+          cited('invented', 'computed', { title: 'Invented', fields: ['interior'] }),
         ],
       },
       [
         ['bullets/mapped.json', [wording]],
         ['bullets/ogive.json', [wording]],
         ['bullets/solved.json', [solver]],
+        ['bullets/invented.json', ['synthetic-test-data']],
       ],
     )
     expect(found).toEqual({
       bullets: [
         { id: 'ogive', findings: [refused(wording, 'ogive')] },
         { id: 'solved', findings: [refused(solver, 'thermochemistry')] },
+        { id: 'invented', findings: [refused('synthetic-test-data', 'interior')] },
+      ],
+    })
+  })
+})
+
+describe('makerRows of the wording map and a detailed path below a basic field', () => {
+  it('refuses the wording map for the jacket thickness, also through construction', () => {
+    const thickness = { raw: 'Jacketed', jacket: { thickness: { value: 0.6 } } }
+    const found = rows(
+      {
+        bullets: [
+          {
+            ...cited('whole', 'computed', { title: 'Map', fields: ['construction'] }),
+            construction: thickness,
+          },
+          {
+            ...cited('wall', 'computed', {
+              title: 'Map',
+              fields: ['construction.jacket.thickness'],
+            }),
+            construction: thickness,
+          },
+        ],
+      },
+      [
+        ['bullets/whole.json', [wording]],
+        ['bullets/wall.json', [wording]],
+      ],
+    )
+    expect(found).toEqual({
+      bullets: [
+        { id: 'whole', findings: [refused(wording, 'construction')] },
+        { id: 'wall', findings: [refused(wording, 'construction.jacket.thickness')] },
       ],
     })
   })
@@ -252,6 +289,28 @@ describe('makerRows of data received directly from a maker', () => {
           findings: [
             'source "Letter" is not a listed non-maker source and has no URL: it counts as data received directly from a maker, which is not yet supported',
           ],
+        },
+      ],
+    })
+  })
+})
+
+describe('makerRows of the listed sources of loads', () => {
+  it('refuses a load or published-load file citing a listed source that supplies no load field', () => {
+    const found = rows({ loads: [cited('l1', 'computed', page), cited('l2', 'computed', page)] }, [
+      ['loads/l1.json', [solver]],
+      ['loads/l2.json', [wording]],
+      ['loads/308-win/file.json', ['synthetic-test-data', solver]],
+    ])
+    expect(found).toEqual({
+      loads: [
+        { id: 'l1', findings: [`cites listed source "${solver}", which supplies no load field`] },
+        { id: 'l2', findings: [`cites listed source "${wording}", which supplies no load field`] },
+      ],
+      publishedLoads: [
+        {
+          id: '308-win/file',
+          findings: [`cites listed source "${solver}", which supplies no load field`],
         },
       ],
     })

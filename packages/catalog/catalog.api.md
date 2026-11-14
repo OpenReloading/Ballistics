@@ -313,6 +313,8 @@ export interface ListedSourceFields {
     // (undocumented)
     readonly bullet: readonly string[];
     // (undocumented)
+    readonly load: boolean;
+    // (undocumented)
     readonly powder: readonly string[];
 }
 
