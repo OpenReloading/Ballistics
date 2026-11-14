@@ -134,7 +134,8 @@ const chronoSessionParser = z
     note: z.string().min(1).describe('Note on the session.').optional(),
     provenance: provenance
       .refine((p) => p.kind === 'measured', { message: 'chronograph data is measured' })
-      .describe('Where the values come from: the imported file.'),
+      .describe('Where the values come from: the imported file.')
+      .optional(),
   })
   .superRefine((s, ctx) => {
     if (s.origin !== 'catalogue') return
@@ -186,7 +187,7 @@ export const chronoSession: z.ZodObject<{
   >
   strings: z.ZodArray<typeof shotString>
   note: z.ZodOptional<z.ZodString>
-  provenance: typeof provenance
+  provenance: z.ZodOptional<typeof provenance>
 }> = chronoSessionParser satisfies Exact<typeof chronoSession, typeof chronoSessionParser>
 
 /** A session of the catalogue (`records/chrono`): {@link chronoSession} with `origin` `catalogue`. */

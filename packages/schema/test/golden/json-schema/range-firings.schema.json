@@ -284,7 +284,6 @@
     "projectile",
     "bulletDiameter",
     "bulletMass",
-    "rounds",
-    "provenance"
+    "rounds"
   ]
 }

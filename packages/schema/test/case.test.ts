@@ -36,11 +36,12 @@ describe('Case', () => {
       'cartridge',
       'productNumber',
       'material',
-      'provenance',
     ]) {
       const { [key]: _gone, ...rest } = record as Record<string, unknown>
       expectIssueAt(catalogueCase, rest, key)
     }
+    const { provenance: _p, ...unsourced } = record
+    expect(catalogueCase.safeParse(unsourced).success).toBe(true)
   })
 
   it('refuses an unknown material and every listed one is accepted', () => {

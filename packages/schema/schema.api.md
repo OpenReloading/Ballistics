@@ -131,7 +131,7 @@ export const caliberClass: z.ZodObject<{
     name: z.ZodString;
     diameter: QuantitySchema;
     cartridges: z.ZodArray<typeof recordId>;
-    provenance: typeof provenance;
+    provenance: z.ZodOptional<typeof provenance>;
 }, z.core.$strict>;
 
 // @public
@@ -229,7 +229,7 @@ export const cartridge: z.ZodObject<{
     verification: z.ZodEnum<z.core.util.ToEnum<'verified' | 'unverified'>>;
     values: z.ZodArray<typeof specValue>;
     exceptions: z.ZodOptional<z.ZodArray<typeof plausibilityException>>;
-    provenance: typeof provenance;
+    provenance: z.ZodOptional<typeof provenance>;
 }>;
 
 // @public
@@ -320,8 +320,6 @@ export interface CatalogueCase extends Case {
     origin: 'catalogue';
     // (undocumented)
     productNumber: string;
-    // (undocumented)
-    provenance: Provenance;
 }
 
 // @public
@@ -333,8 +331,6 @@ export interface CatalogueCaseCapacity extends CaseCapacity {
     id: string;
     // (undocumented)
     origin: 'catalogue';
-    // (undocumented)
-    provenance: Provenance;
 }
 
 // @public
@@ -356,8 +352,6 @@ export interface CatalogueLoad extends Load {
     origin: 'catalogue';
     // (undocumented)
     powder: NonNullable<Load['powder']>;
-    // (undocumented)
-    provenance: Provenance;
 }
 
 // @public
@@ -427,7 +421,7 @@ export const chronoSession: z.ZodObject<{
     }>>;
     strings: z.ZodArray<typeof shotString>;
     note: z.ZodOptional<z.ZodString>;
-    provenance: typeof provenance;
+    provenance: z.ZodOptional<typeof provenance>;
 }>;
 
 // @public
@@ -574,7 +568,7 @@ export const discipline: z.ZodObject<{
     }, z.core.$strict>>;
     internationalDiscipline: z.ZodOptional<typeof recordId>;
     rules: z.ZodOptional<typeof disciplineRules>;
-    provenance: typeof provenance;
+    provenance: z.ZodOptional<typeof provenance>;
 }, z.core.$strict>;
 
 // @public
@@ -662,7 +656,7 @@ export const eventType: z.ZodObject<{
         note: z.ZodOptional<z.ZodString>;
     }, z.core.$strict>>>;
     movingTargets: z.ZodOptional<z.ZodBoolean>;
-    provenance: typeof provenance;
+    provenance: z.ZodOptional<typeof provenance>;
 }, z.core.$strict>;
 
 // @public
@@ -696,7 +690,7 @@ export const federation: z.ZodObject<{
         url: z.ZodURL;
         sha256: z.ZodString;
     }, z.core.$strict>>;
-    provenance: typeof provenance;
+    provenance: z.ZodOptional<typeof provenance>;
 }, z.core.$strict>;
 
 // @public
@@ -763,7 +757,7 @@ export const firingSeries: z.ZodObject<{
         meanPeak: QuantitySchema;
     }>>;
     note: z.ZodOptional<z.ZodString>;
-    provenance: typeof provenance;
+    provenance: z.ZodOptional<typeof provenance>;
 }>;
 
 // @public
@@ -962,7 +956,7 @@ export const manufacturer: z.ZodObject<{
     country: z.ZodOptional<z.ZodString>;
     website: z.ZodOptional<z.ZodURL>;
     aliases: z.ZodOptional<z.ZodArray<z.ZodString>>;
-    provenance: typeof provenance;
+    provenance: z.ZodOptional<typeof provenance>;
 }, z.core.$strict>;
 
 // @public
@@ -1193,7 +1187,7 @@ export const primer: z.ZodObject<{
         value: z.ZodString;
     }, z.core.$strict>>>;
     note: z.ZodOptional<z.ZodString>;
-    provenance: typeof provenance;
+    provenance: z.ZodOptional<typeof provenance>;
 }, z.core.$strict>;
 
 // @public
@@ -1320,7 +1314,7 @@ export const publishedLoads: z.ZodObject<{
     cartridgeName: z.ZodString;
     cartridge: z.ZodString;
     loads: z.ZodArray<typeof publishedLoad>;
-    provenance: typeof provenance;
+    provenance: z.ZodOptional<typeof provenance>;
 }, z.core.$strict>;
 
 // @public
@@ -1375,7 +1369,7 @@ export const rangeFirings: z.ZodObject<{
         dragCoefficient: QuantitySchema;
     }>>;
     note: z.ZodOptional<z.ZodString>;
-    provenance: typeof provenance;
+    provenance: z.ZodOptional<typeof provenance>;
 }>;
 
 // @public
@@ -1705,7 +1699,7 @@ export const targetFace: z.ZodObject<{
     numerals: z.ZodOptional<z.ZodBoolean>;
     photoSearch: z.ZodOptional<z.ZodBoolean>;
     note: z.ZodOptional<z.ZodString>;
-    provenance: typeof provenance;
+    provenance: z.ZodOptional<typeof provenance>;
 }>;
 
 // @public
@@ -1756,7 +1750,7 @@ export const targetMapping: z.ZodObject<{
         covers: z.ZodEnum<z.core.util.ToEnum<'discipline' | 'stage' | 'series' | 'shot'>>;
         includesSighters: z.ZodOptional<z.ZodBoolean>;
     }, z.core.$strict>>>;
-    provenance: typeof provenance;
+    provenance: z.ZodOptional<typeof provenance>;
 }, z.core.$strict>;
 
 // @public

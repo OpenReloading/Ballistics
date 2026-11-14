@@ -100,7 +100,7 @@ function applyExceptions(spec: Cartridge, errors: string[]) {
   }
 }
 
-/** Every data field of the source-backed kinds is supported by a source. */
+/** Every data field of the source-backed kinds is supported by a source; every other kind has provenance. */
 function checkSourceCoverage(bundle: Bundle, errors: string[]) {
   for (const [dir, records] of [
     ['manufacturers', bundle.manufacturers],
@@ -119,15 +119,29 @@ function checkSourceCoverage(bundle: Bundle, errors: string[]) {
       for (const error of checkCoverage(record)) errors.push(`${dir}/${record.id}.json: ${error}`)
     }
   }
+  // these kinds and published tables (checkRecords) need provenance in the catalog until a gate that covers them replaces this check
+  for (const [dir, records] of [
+    ['cartridges', bundle.cartridges],
+    ['loads', bundle.loads],
+    ['chrono', bundle.chronoSessions],
+    ['firings', bundle.firings],
+    ['range', bundle.rangeFirings],
+    ['target-faces', bundle.targetFaces],
+  ] as const) {
+    for (const record of records)
+      if (!record.provenance) errors.push(`${dir}/${record.id}.json: needs provenance`)
+  }
 }
 
 /** The same round number of the same report (its one source, by sha256) in two range records is a copy error, as a round belongs to one projectile. */
 function checkRangeRounds(records: RangeFirings[], errors: string[]) {
   const roundOwner = new Map<string, string>()
   for (const r of records) {
+    const report = r.provenance?.sources[0]?.sha256
+    if (!report) continue
     for (const { label: round } of r.rounds) {
       // The base round number: a split reduction "(a)" or a yaw-card mark "*" is part of one round.
-      const key = `${r.provenance.sources[0]?.sha256} ${round.replace(/\(.\)|\*/g, '')}`
+      const key = `${report} ${round.replace(/\(.\)|\*/g, '')}`
       const owner = roundOwner.get(key)
       if (owner && owner !== r.id) {
         errors.push(`range/${r.id}.json: round ${round} is also in ${owner}`)
@@ -199,6 +213,9 @@ export function checkRecords({ bundle, published, loadTables }: RecordsRead): {
     applyExceptions(c, errors)
   }
   checkSourceCoverage(bundle, errors)
+  // kept until a gate that covers published tables replaces it, as for the kinds in checkSourceCoverage
+  for (const { folder, file } of published)
+    if (!file.provenance) errors.push(`loads/${folder}/${file.id}.json: needs provenance`)
   errors.push(...checkFederations(bundle))
   errors.push(...checkEventTypes(bundle))
   errors.push(...checkCaliberClasses(bundle))

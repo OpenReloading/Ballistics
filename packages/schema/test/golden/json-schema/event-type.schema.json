@@ -459,8 +459,7 @@
     "federation",
     "ruleBook",
     "scoring",
-    "levels",
-    "provenance"
+    "levels"
   ],
   "additionalProperties": false
 }

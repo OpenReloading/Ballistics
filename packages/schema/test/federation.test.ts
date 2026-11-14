@@ -193,9 +193,9 @@ describe('targetMapping', () => {
   })
 })
 
-it('writes JSON Schema for the three kinds', () => {
+it('writes JSON Schema for the three kinds, provenance optional', () => {
   for (const schema of [federation, discipline, targetMapping]) {
     const json = z.toJSONSchema(schema, { io: 'input' }) as { required: string[] }
-    expect(json.required).toContain('provenance')
+    expect(json.required).not.toContain('provenance')
   }
 })

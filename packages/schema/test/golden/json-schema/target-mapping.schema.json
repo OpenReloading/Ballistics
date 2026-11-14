@@ -269,8 +269,7 @@
     "id",
     "discipline",
     "face",
-    "event",
-    "provenance"
+    "event"
   ],
   "additionalProperties": false
 }
