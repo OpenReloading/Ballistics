@@ -75,16 +75,16 @@ Simplicity gate per command:
 
 ## Result
 
-no change. Not adopted in code. Recommendation (medium confidence): the CLI is not a full simulator today (0 of 8 compute operations, items 1 and 2 largely missing); make it one by running the API's own compute entry offline behind a small contract, after the owner allows that import, rather than a REST client or a copy over core.
+no change. Not adopted in code. Recommendation (medium confidence): the CLI is not a full simulator today (0 of 8 compute operations, items 1 and 2 largely missing); make it one by running the API's own compute entry offline behind a small contract, once that import is allowed, rather than a REST client or a copy over core.
 
 Plan, in order:
 
 1. Issue #653 (small, no dependency): error objects on stderr with `--json`, exit code 3 for an internal error, `--version`, `--rows -`, `notice` in the result, `$id` in the schema, `--help` before the libraries load.
-2. Owner decision: allow `packages/cli` to import `@rangefoundry/api/compute` and `@rangefoundry/api/catalogue` (the rule and the package rule).
+2. Allow `packages/cli` to import `@rangefoundry/api/compute` and `@rangefoundry/api/catalogue` (the rule and the package rule).
 3. Issue #654 (medium, useful alone): move the exterior handlers and the load file computation into run functions exported from the compute entry, OpenAPI unchanged.
 4. Issue #655 (medium, after 2; exterior and load file operations after 3): `ballistics run <operation> [--input <file>|-]` and `ballistics operations` with input and output schemas from the same zod definitions, docs page, an agent loop description, an example that runs, a line in `llms.txt`.
 
-Deferred, outside the pre-release scope: tool-server wrapper, group statistics and powder fit (API first), a table for `run`, publishing the package (an owner decision on releases).
+Deferred, outside the pre-release scope: tool-server wrapper, group statistics and powder fit (API first), a table for `run`, publishing the package (a release decision).
 
 ## Data basis
 

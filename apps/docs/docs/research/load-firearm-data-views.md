@@ -16,7 +16,7 @@ User records: which of the views planned from the link between a load and a fire
 - Rule 1: a view that needs ongoing data entry (rounds made, on hand or fired, a yearly rounds summary, an over-time view that needs many logged sessions) is ruled out, unless it rests on one optional typed value shown with its date, and shown as stale when old.
 - Rule 2: a view derived from fields already stored (the firearm of a load, the cartridge of a firearm, the sessions of a load, the record defaults of a load's inputs) is kept, in its cheapest form: a column, a note, a filter, a print or a CSV before a page.
 - Rule 3: "enough rounds for the match" is kept only as a stateless sum compared with a number typed at that moment.
-- A question that would change a stored shape is not decided here; it becomes a grilling ticket for the owner.
+- A question that would change a stored shape is not decided here; it is raised as an open question.
 
 ## Formulas
 
@@ -42,13 +42,13 @@ Verdict per view, with the confidence of each:
 | Enough for the match                          | one number at that moment  | kept as a stateless planner                            | medium     |
 | Rounds made, stored                           | every loading session      | ruled out                                              | high       |
 | Rounds fired, stored or decremented           | every range day            | ruled out                                              | high       |
-| Rounds on hand, decremented                   | every range day            | ruled out; a typed dated number is a grilling question | medium     |
+| Rounds on hand, decremented                   | every range day            | ruled out; a typed dated number is an open question    | medium     |
 | Barrel life against rounds made               | every loading session      | ruled out                                              | medium     |
 | Velocity and group over time                  | many logged sessions       | ruled out                                              | medium     |
 | Charge ladder results across seasons          | several seasons of ladders | ruled out                                              | medium     |
 | Yearly summary                                | every range day            | ruled out here, moved to the shooting log spike        | high       |
 
-Totals: 10 views kept (one of them exists), 7 ruled out, 0 stored-shape changes, 4 grilling tickets (rounds on hand, the planner, the firearm round count with its age, the place of the derived views).
+Totals: 10 views kept (one of them exists), 7 ruled out, 0 stored-shape changes, 4 open questions (rounds on hand, the planner, the firearm round count with its age, the place of the derived views).
 
 ## Result
 
