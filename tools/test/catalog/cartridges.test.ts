@@ -26,7 +26,7 @@ describe('the committed C.I.P. cartridge records', () => {
   it('give the 308 Win. sheet values, its verification and the C.I.P. as publisher', () => {
     const win = byId('308-win')
     expect(win).toMatchObject({ table: 'I', verification: 'verified' })
-    expect(win?.provenance.sources[0]).toMatchObject({
+    expect(win?.provenance?.sources[0]).toMatchObject({
       publisher: expect.stringContaining('(C.I.P.)'),
     })
     expect(value('308-win', 'cartridge', 'L3')).toMatchObject({ quantity: 'length', value: 51.18 })

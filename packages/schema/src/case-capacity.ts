@@ -2,7 +2,7 @@ import { z } from 'zod'
 import type { Case } from './case.ts'
 import type { Exact } from './exact.ts'
 import { recordId, ref } from './ids.ts'
-import { type Provenance, provenance } from './provenance.ts'
+import { provenance } from './provenance.ts'
 import { type QuantitySchema, quantity } from './units.ts'
 
 const caseCapacityParser = z
@@ -30,7 +30,7 @@ const caseCapacityParser = z
       .optional(),
     note: z.string().min(1).describe('Notes on the measurement.').optional(),
     provenance: provenance
-      .describe('Where the value comes from. Required for a catalogue capacity.')
+      .describe('Where the value comes from, wherever the record has a source.')
       .optional(),
   })
   .superRefine((c, ctx) => {
@@ -38,7 +38,6 @@ const caseCapacityParser = z
     const issue = (path: PropertyKey[], message: string) =>
       ctx.addIssue({ code: 'custom', path, message })
     if (c.id === undefined) issue(['id'], 'A catalogue capacity needs an id')
-    if (c.provenance === undefined) issue(['provenance'], 'A catalogue capacity needs provenance')
     for (const k of ['cartridge', 'caseManufacturer'] as const)
       if (c[k] !== undefined && !c[k].startsWith('catalogue:'))
         issue([k], 'A catalogue capacity names catalogue records only')
@@ -48,7 +47,7 @@ const caseCapacityParser = z
  * Water capacity of a case of one cartridge, from one source: the one entity of a catalogue
  * record (`records/capacities`), the user record of kind `caseCapacity` (a capacity the user
  * measured) and the capacity a load references. A catalogue capacity carries its `id` (the file
- * name), `provenance` and catalogue references only; a user capacity is named by its record.
+ * name) and catalogue references only; a user capacity is named by its record.
  * Inferred type: {@link CaseCapacity}.
  */
 export const caseCapacity: z.ZodObject<{
@@ -77,7 +76,6 @@ export interface CaseCapacity extends z.infer<typeof caseCapacity> {}
 export interface CatalogueCaseCapacity extends CaseCapacity {
   id: string
   origin: 'catalogue'
-  provenance: Provenance
 }
 
 /** Where the water capacity a load uses comes from: its capacity record, or the case product's stated figure. */

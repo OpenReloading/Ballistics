@@ -104,7 +104,7 @@ function applyExceptions(spec: Cartridge, errors: string[]) {
 /** A record a source may support. */
 type Sourced = { id: string; provenance?: Provenance | undefined }
 
-/** Every field of the source-backed kinds that needs a source has one; bullets, powders and manufacturers by their field classes. */
+/** Every field of the source-backed kinds that needs a source has one, bullets, powders and manufacturers by their field classes; the third-party kinds have provenance. */
 function checkSourceCoverage(bundle: Bundle, errors: string[]) {
   const check = (dir: string, records: readonly Sourced[], kind?: FieldClassKind) => {
     for (const record of records) {
@@ -126,15 +126,29 @@ function checkSourceCoverage(bundle: Bundle, errors: string[]) {
     ['event-types', bundle.eventTypes ?? []],
   ] as const)
     check(dir, records)
+  // permanent rule: these hold third-party data and need provenance (hub#307 issuecomment-6861138343); chrono fails closed for now
+  for (const [dir, records] of [
+    ['cartridges', bundle.cartridges],
+    ['loads', bundle.loads],
+    ['chrono', bundle.chronoSessions],
+    ['firings', bundle.firings],
+    ['range', bundle.rangeFirings],
+    ['target-faces', bundle.targetFaces],
+  ] as const) {
+    for (const record of records)
+      if (!record.provenance) errors.push(`${dir}/${record.id}.json: needs provenance`)
+  }
 }
 
 /** The same round number of the same report (its one source, by sha256) in two range records is a copy error, as a round belongs to one projectile. */
 function checkRangeRounds(records: RangeFirings[], errors: string[]) {
   const roundOwner = new Map<string, string>()
   for (const r of records) {
+    const report = r.provenance?.sources[0]?.sha256
+    if (!report) continue
     for (const { label: round } of r.rounds) {
       // The base round number: a split reduction "(a)" or a yaw-card mark "*" is part of one round.
-      const key = `${r.provenance.sources[0]?.sha256} ${round.replace(/\(.\)|\*/g, '')}`
+      const key = `${report} ${round.replace(/\(.\)|\*/g, '')}`
       const owner = roundOwner.get(key)
       if (owner && owner !== r.id) {
         errors.push(`range/${r.id}.json: round ${round} is also in ${owner}`)
@@ -206,6 +220,9 @@ export function checkRecords({ bundle, published, loadTables }: RecordsRead): {
     applyExceptions(c, errors)
   }
   checkSourceCoverage(bundle, errors)
+  // a published-load file holds third-party data and needs provenance, the permanent rule beside the kinds in checkSourceCoverage
+  for (const { folder, file } of published)
+    if (!file.provenance) errors.push(`loads/${folder}/${file.id}.json: needs provenance`)
   errors.push(...checkFederations(bundle))
   errors.push(...checkEventTypes(bundle))
   errors.push(...checkCaliberClasses(bundle))

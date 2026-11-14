@@ -185,7 +185,7 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
         response: manufacturer,
         errors: [404],
         summary: 'Get a manufacturer',
-        description: 'The manufacturer record with its provenance.',
+        description: 'The manufacturer record with its provenance where it has one.',
       },
     },
     (request, reply) => {
@@ -268,7 +268,7 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
         response: primer,
         errors: [404],
         summary: 'Get a primer',
-        description: 'The primer record with its provenance.',
+        description: 'The primer record with its provenance where it has one.',
       },
     },
     (request, reply) => {
@@ -303,7 +303,7 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
         errors: [404],
         summary: 'Get a case',
         description:
-          'The case record with its provenance and `origin`. `revision` is a hash of the stored record, changes with any field.',
+          'The case record with `origin` and its provenance where it has one. `revision` is a hash of the stored record, changes with any field.',
       },
     },
     (request, reply) => {
