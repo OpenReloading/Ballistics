@@ -5,6 +5,7 @@ import {
   checkRecords,
   checkSources,
   type LocatedPublishedLoads,
+  makerRows,
   type SourceIndex,
   sourceIndex,
 } from '@rangefoundry/catalog'
@@ -160,4 +161,23 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
     warnings: checked.warnings,
     citations,
   }
+}
+
+/** The folder of a `makerRows` kind: the bundle key in kebab case, but for the three keys below. */
+const folders: Record<string, string> = {
+  publishedLoads: 'loads',
+  chronoSessions: 'chrono',
+  rangeFirings: 'range',
+}
+const folderOf = (kind: string) =>
+  folders[kind] ?? kind.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)
+
+/** {@link readRecords} with the maker-source rule of the public catalog (`makerRows`) as errors: what `data:validate` checks. Not part of `readRecords`, which also reads private records. */
+export function validateRecords(root?: string | readonly string[]): ReadRecordsResult {
+  const result = readRecords(root)
+  const refused = Object.entries(makerRows(result.bundle, result.citations)).flatMap(
+    ([kind, rows]) =>
+      rows.flatMap(({ id, findings }) => findings.map((f) => `${folderOf(kind)}/${id}.json: ${f}`)),
+  )
+  return { ...result, errors: [...result.errors, ...refused] }
 }
