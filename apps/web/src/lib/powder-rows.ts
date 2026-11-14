@@ -31,6 +31,7 @@ export type PackedPowder = [
   number | null,
   string | null,
   true | null,
+  string[] | null,
 ]
 
 /** Powder rows as arrays: the list page's props carry no key names. */
@@ -51,6 +52,7 @@ export const packPowders = (rows: readonly PowderRow[]): PackedPowder[] =>
     r.trainingCartridges ?? null,
     r.retrieved ?? null,
     r.modelled ?? null,
+    r.scope ?? null,
   ])
 
 export const unpackPowders = (rows: readonly PackedPowder[]): PowderRow[] =>
@@ -71,6 +73,7 @@ export const unpackPowders = (rows: readonly PackedPowder[]): PowderRow[] =>
       trainingCartridges,
       retrieved,
       modelled,
+      scope,
     ]) => ({
       id,
       manufacturer,
@@ -88,6 +91,7 @@ export const unpackPowders = (rows: readonly PackedPowder[]): PowderRow[] =>
         trainingCartridges,
         retrieved,
         modelled,
+        scope,
       }),
     }),
   )

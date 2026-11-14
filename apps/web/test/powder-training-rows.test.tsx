@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it, vi } from 'vitest'
 import type { PowderSummary } from '../src/lib/api-types.ts'
+import { defined } from './defined.ts'
 
 vi.mock('next/navigation', () => ({
   usePathname: () => '/powders',
@@ -52,6 +53,29 @@ it('sorts the powder list by training rows, most first and the powders without a
     (m) => m[1],
   )
   expect(ids).toEqual(['many', 'few', 'none'])
+})
+
+it('marks a shotgun-only powder on the list as not a metallic-cartridge powder, not as missing values', () => {
+  const unfitted = (id: string, scope: NonNullable<PowderSummary['scope']>) => ({
+    id,
+    manufacturer: 'example',
+    manufacturerName: 'Example',
+    name: id,
+    scope,
+  })
+  const page = html(
+    <PowderList
+      packed={packPowders(
+        orderPowders([unfitted('shot', ['shotgun']), unfitted('both', ['rifle', 'shotgun'])]),
+      )}
+    />,
+  )
+  const row = (id: string) =>
+    defined(page.match(new RegExp(`<tr[^>]*data-id="${id}".*?</tr>`))?.[0])
+  expect(row('shot')).toContain('Not a metallic-cartridge powder')
+  expect(row('shot')).not.toContain('Values missing')
+  expect(row('both')).toContain('Values missing')
+  expect(row('both')).not.toContain('Not a metallic-cartridge powder')
 })
 
 it('lists the load tables of a fit with their rows on the record page, and nothing without a count', () => {

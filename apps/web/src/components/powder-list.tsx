@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, Button, Text } from '@mantine/core'
+import { Badge, Box, Button, Text } from '@mantine/core'
 import { Flask, Plus } from '@phosphor-icons/react'
 import { useDeferredValue, useMemo } from 'react'
 import Link from '@/platform/link.tsx'
@@ -15,7 +15,7 @@ import {
   unfitTitles,
   vivacityUnit,
 } from '../lib/burn-rate.ts'
-import { powderRowIncomplete } from '../lib/complete-records.ts'
+import { notMetallic, powderRowIncomplete, shotgunOnly } from '../lib/complete-records.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { baseLine, baseText, grainFormText } from '../lib/list-values.ts'
 import { filterText, matchingText } from '../lib/lists.ts'
@@ -44,12 +44,13 @@ import { MissingMark } from './missing-mark.tsx'
 import { RateBar, RateTicks, scaleWidth } from './rate-scale.tsx'
 import { EmptyList, EmptyNote } from './states.tsx'
 
-/** The Training rows column's help: the column, then the burn-rate page's sentence for a powder without fitted parameters. */
+/** The Training rows column's help: the column, then the burn-rate page's sentences for a powder without fitted parameters and a shotgun-only one. */
 const trainingRowsHelp = [
   msg(
     'Load-table rows the model was fitted to, their cartridges and the day the load tables were read; the record page lists them per load table. A count, not a rating.',
   ),
   unfitTitles.none,
+  unfitTitles.shotgun,
 ] as const
 
 const n2 = (v: number | undefined) => (v === undefined ? '' : formatNumber(v, 2))
@@ -115,7 +116,13 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
       cell: (r) => (
         <>
           {r.name}
-          {powderRowIncomplete(r) && <MissingMark />}
+          {shotgunOnly(r) ? (
+            <Badge ml="xs" variant="light" color="gray">
+              {t(notMetallic)}
+            </Badge>
+          ) : (
+            powderRowIncomplete(r) && <MissingMark />
+          )}
         </>
       ),
     },
