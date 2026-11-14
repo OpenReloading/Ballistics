@@ -42,7 +42,8 @@ options:
                      coefficients fitted to the training rows
   --fit <fit.json>   verify and compare, instead of --params: evaluate the values of a saved
                      fit of the same rows and records without fitting; the result is
-                     marked as a screen and carries the fit's model version
+                     marked as a screen with this build's version and carries the fit's
+                     model version
   --velocity-sigma <fraction>
                      fit and --params fit-on-training: velocity sigma of a row, a fraction
                      of its velocity (default 0.03)

@@ -477,6 +477,21 @@ function priorsOf(records: Records) {
   }
 }
 
+/** Each powder the rows name that has interior parameters, with its prior impetus. */
+function namedPriors(rows: readonly Row[], records: Records) {
+  const priorOf = priorsOf(records)
+  return [...new Set(rows.map((r) => r.powder))].flatMap((id) => {
+    const powder = records.powders.get(id)
+    return powder?.interior ? [{ powder, interior: powder.interior, prior: priorOf(powder) }] : []
+  })
+}
+
+const priorLine = (n: ReturnType<typeof namedPriors>[number]) => `${n.powder.id}=${n.prior.value}`
+
+/** The `priorLines` a fit with `energy` `prior` of `rows` on `records` gives. */
+export const priorLines = (rows: readonly Row[], records: Records) =>
+  namedPriors(rows, records).map(priorLine)
+
 // the model's impetus is (gamma - 1) times its energy, so the prior fixes the impetus and the model's own gamma turns it into the energy
 const energyOf = (level: number, impetus: number, gamma: number) => (level * impetus) / (gamma - 1)
 
@@ -491,16 +506,12 @@ function fitWithPrior(
   velocitySigma: number,
   exponent: 'family' | undefined,
 ): PowdersFit {
-  const priorOf = priorsOf(records)
   const pressured = rows.filter(
     (r) => r.pressure !== undefined && splitOf(r.cartridge) === 'training',
   )
   if (pressured.length === 0)
     throw new UsageError('--energy prior needs training rows that print a pressure in bar')
-  const named = [...new Set(rows.map((r) => r.powder))].flatMap((id) => {
-    const powder = records.powders.get(id)
-    return powder?.interior ? [{ powder, interior: powder.interior, prior: priorOf(powder) }] : []
-  })
+  const named = namedPriors(rows, records)
   const runs = levels.map((level) => {
     const powders = new Map(records.powders)
     for (const { powder, interior, prior } of named) {
@@ -589,7 +600,7 @@ function fitWithPrior(
     powders,
     notFitted: chosen.fit.notFitted,
     ...(chosen.fit.exponent && { exponent: chosen.fit.exponent }),
-    priorLines: named.map((n) => `${n.powder.id}=${n.prior.value}`),
+    priorLines: named.map(priorLine),
     energy: {
       factor: chosen.level,
       grid: levels,

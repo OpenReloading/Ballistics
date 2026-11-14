@@ -1007,8 +1007,15 @@
         },
         "screen": {
           "description": "With `--fit`: an evaluation only, a screen. The values are those of a saved fit, not fitted in this run, and `modelVersion` is that fit's, whose model and fit sources may differ from this build's; a full run with `--params fit-on-training` gives the result to report.",
-          "type": "boolean",
-          "const": true
+          "type": "object",
+          "properties": {
+            "version": {
+              "type": "string",
+              "description": "The model version of this build with the saved fit's options, the `modelVersion` a full run with `--params fit-on-training` gives."
+            }
+          },
+          "required": ["version"],
+          "additionalProperties": false
         },
         "rows": {
           "description": "With `--per-row`: the error of each used row of the split, for the paired change of `compare`.",
@@ -2071,8 +2078,15 @@
             },
             "screen": {
               "description": "With `--fit`: an evaluation only, a screen. The values are those of a saved fit, not fitted in this run, and `modelVersion` is that fit's, whose model and fit sources may differ from this build's; a full run with `--params fit-on-training` gives the result to report.",
-              "type": "boolean",
-              "const": true
+              "type": "object",
+              "properties": {
+                "version": {
+                  "type": "string",
+                  "description": "The model version of this build with the saved fit's options, the `modelVersion` a full run with `--params fit-on-training` gives."
+                }
+              },
+              "required": ["version"],
+              "additionalProperties": false
             }
           },
           "required": ["model", "modelVersion", "interval", "overall", "byFamily", "byPowder"],
@@ -3017,8 +3031,15 @@
             },
             "screen": {
               "description": "With `--fit`: an evaluation only, a screen. The values are those of a saved fit, not fitted in this run, and `modelVersion` is that fit's, whose model and fit sources may differ from this build's; a full run with `--params fit-on-training` gives the result to report.",
-              "type": "boolean",
-              "const": true
+              "type": "object",
+              "properties": {
+                "version": {
+                  "type": "string",
+                  "description": "The model version of this build with the saved fit's options, the `modelVersion` a full run with `--params fit-on-training` gives."
+                }
+              },
+              "required": ["version"],
+              "additionalProperties": false
             }
           },
           "required": ["model", "modelVersion", "interval", "overall", "byFamily", "byPowder"],

@@ -38,7 +38,15 @@ function publishedLines(p: VerifyResult['published']) {
   ]
 }
 
-/** `verify` as text: the version, the interval and one line per group. */
+/** The line that marks a screen of `--fit`, with the version of the build that evaluated it, none for a run that fitted. */
+function screenLines(name: string, s: VerifyResult['screen']) {
+  if (!s) return []
+  return [
+    `${name}screen: the values of a saved fit, not fitted in this run; this build's version ${s.version}`,
+  ]
+}
+
+/** `verify` as text: the version, the screen line, the interval and one line per group. */
 export function verifyTable(r: VerifyResult): string {
   const groups = [
     rowsOf('all', r.overall),
@@ -60,6 +68,7 @@ export function verifyTable(r: VerifyResult): string {
   )
   return [
     `model ${r.model}  version ${r.modelVersion}`,
+    ...screenLines('', r.screen),
     ...publishedLines(r.published),
     `split ${r.split}  salt ${r.splitSalt}  interval half width ${pct(r.interval.halfWidth)} % from ${r.interval.trainingRows} training rows`,
     table(metricHead, groups),
@@ -90,7 +99,7 @@ function pairedLines(p: CompareResult['paired']) {
   })
 }
 
-/** `compare` as text: both versions, the change per group and the paired change, in percentage points. */
+/** `compare` as text: both versions with their screen lines, the change per group and the paired change, in percentage points. */
 export function compareTable(r: CompareResult): string {
   const groups = [
     changeRow('all', r.change.overall),
@@ -101,7 +110,9 @@ export function compareTable(r: CompareResult): string {
   ]
   return [
     `baseline ${r.baseline.model}  version ${r.baseline.modelVersion}`,
+    ...screenLines('baseline ', r.baseline.screen),
     `candidate ${r.candidate.model}  version ${r.candidate.modelVersion}`,
+    ...screenLines('candidate ', r.candidate.screen),
     ...publishedLines(r.published),
     `split ${r.split}  salt ${r.splitSalt}  change = candidate minus baseline, percentage points`,
     table(

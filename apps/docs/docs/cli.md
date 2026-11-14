@@ -121,7 +121,7 @@ A powder that is not fitted is listed in `notFitted` with its reason: the reason
 
 ### Evaluation of a saved fit
 
-`verify` and `compare` with `--fit <fit.json>`, instead of `--params`, evaluate the values of a saved `fit` result without fitting: the run takes the time of an evaluation, not of a fit. The file must be a `fit` result of the same split salt, rows and records, and of the model the run evaluates, else the run is refused. The evaluation carries the `fit` summary of the file, its `modelVersion` and `screen: true`. On the same build the figures are those of a `--params fit-on-training` run with the options the fit ran with. The `modelVersion` is the fit's, whose model and fit sources may be those of another build, so a screen sorts candidates and a full `--params fit-on-training` run gives the result to report.
+`verify` and `compare` with `--fit <fit.json>`, instead of `--params`, evaluate the values of a saved `fit` result without fitting: the run takes the time of an evaluation, not of a fit. The file must be a `fit` result of the same split salt, rows and records, and of the model the run evaluates, else the run is refused. The evaluation carries the `fit` summary of the file, its `modelVersion` and `screen`, whose `version` is the `modelVersion` a `--params fit-on-training` run with the options the fit ran with gives on this build; `--table` prints a `screen` line with it. On the same build the two versions are equal and the figures are those of that run. The `modelVersion` is the fit's, whose model and fit sources may be those of another build (then the two versions differ), so a screen sorts candidates and a full `--params fit-on-training` run gives the result to report.
 
 ### Pressure rows
 

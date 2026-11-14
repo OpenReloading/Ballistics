@@ -113,9 +113,20 @@ describe('verify with --fit', () => {
   it('evaluates the values of a saved fit as --params fit-on-training does, marked as a screen', async () => {
     const saved = writeRows(JSON.stringify(await fit(options)), 'fit.json')
     const { screen, ...screened } = await verify({ ...options, fit: saved, perRow: true })
-    expect(screen).toBe(true)
+    const full = await verify({ ...options, params: 'fit-on-training', perRow: true })
+    expect(screen).toEqual({ version: full.modelVersion })
     expect(screened.overall.velocity?.median).toBeCloseTo(0, 6)
-    expect(screened).toEqual(await verify({ ...options, params: 'fit-on-training', perRow: true }))
+    expect(screened).toEqual(full)
+  })
+
+  it("keeps the version of a fit of another build and records this build's beside it", async () => {
+    const other = { ...(await fit(options)), modelVersion: 'another build' }
+    const saved = writeRows(JSON.stringify(other), 'fit.json')
+    const r = await verify({ ...options, fit: saved })
+    expect(r.modelVersion).toBe('another build')
+    expect(r.screen?.version).toBe(
+      (await verify({ ...options, params: 'fit-on-training' })).modelVersion,
+    )
   })
 
   it('refuses a fit of other rows', async () => {
@@ -182,6 +193,17 @@ describe('--energy prior', { timeout: 120_000 }, () => {
     expect(r.powders[sp30]?.vivacity.value.toPrecision(3)).toBe('0.800')
     expect(r.powders[sp20]?.vivacity.value.toPrecision(3)).toBe('0.700')
     expect(r.powders[dp40]?.vivacity.value.toPrecision(3)).toBe('1.00')
+  })
+
+  it('screens a fit with --energy prior under the version of a full run with it', async () => {
+    const rows = writeRows(rowsCsv(training(sp30), truth))
+    const saved = writeRows(
+      JSON.stringify(await fit({ ...options, rows, energy: 'prior' })),
+      'fit.json',
+    )
+    const on = { ...options, rows, split: 'training' } as const
+    const full = await verify({ ...on, params: 'fit-on-training', energy: 'prior' })
+    expect((await verify({ ...on, fit: saved })).screen?.version).toBe(full.modelVersion)
   })
 
   it('leaves out a factor at which fewer than 90 % of the powders are fitted', async () => {

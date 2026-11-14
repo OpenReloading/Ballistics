@@ -5,7 +5,7 @@ import { compareKeys, type SourceRecord, sourceRecord } from '@rangefoundry/sche
 import { readPublishedLoads } from '@rangefoundry/tools/catalog'
 import { Refusal, UsageError } from './errors.ts'
 import { type InteriorModel, outcomes } from './evaluate.ts'
-import { fitPowders, notFittedReasons, type PressureKey, withFit } from './fit.ts'
+import { fitPowders, notFittedReasons, type PressureKey, priorLines, withFit } from './fit.ts'
 import { changeOf, evaluate, type Grouping, metricsOf } from './metrics.ts'
 import { builtInName, fitFiles, loadModel, type Model } from './model.ts'
 import { pairedChange, type RowError, rowErrors } from './paired.ts'
@@ -309,14 +309,21 @@ function leftOut({ rows, records }: Prepared, model: InteriorModel, split: Split
 /** An evaluation with the error of each used row of the split, which `verify` adds with `--per-row` and `compare` pairs. */
 type Evaluated = Evaluation & { rows?: RowError[] | undefined }
 
-/** The values of the saved fit of `--fit` for an evaluation of `model`, which carries the fit's version; a `Refusal` for a fit of another model. */
+/** The values of the saved fit of `--fit` for an evaluation of `model`, which carries the fit's version and the version a fit of this build with the fit's options has; a `Refusal` for a fit of another model. */
 function screenOf(path: string, data: Prepared, model: Model) {
   const saved = savedFit(path, 'fit', data)
   if (saved.model !== model.name)
     throw new Refusal(`the --fit fit is of the model ${saved.model}, this run ${model.name}`)
+  const params = paramsLine(
+    saved.velocitySigma,
+    saved.exponent !== undefined,
+    saved.pressure,
+    saved.energy && priorLines(data.rows, data.records),
+  )
   return {
     records: withFit(data.records, saved),
     modelVersion: saved.modelVersion,
+    screen: { version: versionOf(model, data, params) },
     summary: summaryOf(saved),
   }
 }
@@ -359,7 +366,7 @@ async function evaluateModel(spec: string, options: Options, data: Prepared): Pr
       },
     }),
     ...(fitted && { fit: fitted.summary }),
-    ...(options.fit !== undefined && { screen: true as const }),
+    ...(fitted && 'screen' in fitted && { screen: fitted.screen }),
     rows: rowErrors(inSplit),
   }
 }
