@@ -109,6 +109,24 @@ describe('verify with --params fit-on-training', () => {
   })
 })
 
+describe('verify with --fit', () => {
+  it('evaluates the values of a saved fit as --params fit-on-training does, marked as a screen', async () => {
+    const saved = writeRows(JSON.stringify(await fit(options)), 'fit.json')
+    const { screen, ...screened } = await verify({ ...options, fit: saved, perRow: true })
+    expect(screen).toBe(true)
+    expect(screened.overall.velocity?.median).toBeCloseTo(0, 6)
+    expect(screened).toEqual(await verify({ ...options, params: 'fit-on-training', perRow: true }))
+  })
+
+  it('refuses a fit of other rows', async () => {
+    const saved = writeRows(JSON.stringify(await fit(options)), 'fit.json')
+    const rows = writeRows(rowsCsv(specs.slice(1), planted))
+    await expect(verify({ ...options, rows, fit: saved })).rejects.toThrow(
+      'the --fit fit was run on other rows or records',
+    )
+  })
+})
+
 // each run fits every powder at nine factors
 describe('--energy prior', { timeout: 120_000 }, () => {
   const sp30 = 'demo-powder-sp30'
@@ -401,6 +419,48 @@ describe('fit --exponent family', { timeout: 300_000 }, () => {
     expect(r.powders[dp40]?.pressureExponent).toBe(0.8)
     expect(r.powders[dp40]?.pressureRows).toBe(6)
     expect(r.powders[dp40]?.vivacity.value.toPrecision(3)).toBe('2.81')
+  })
+
+  describe('with --family', () => {
+    const specs = training(dp40).map((s) => ({
+      ...s,
+      pressure: 1 / 1.1 - 1,
+      pressureBasis: 'transducer',
+    }))
+    const rows = writeRows(rowsCsv(specs, truth))
+    const family = { ...options, rows, exponent: 'family' } as const
+
+    it('takes the choice of a saved fit and gives the run that makes it byte for byte', async () => {
+      const saved = writeRows(JSON.stringify(await fit(family)), 'family.json')
+      const cold = await fit({ ...family, pressureSigma: 0.05 })
+      const reused = await fit({ ...family, pressureSigma: 0.05, family: saved })
+      expect(JSON.stringify(reused, null, 2)).toBe(JSON.stringify(cold, null, 2))
+      expect(reused.powders[dp40]?.pressureExponent).toBe(0.8)
+    })
+
+    it('fits at the exponent the saved fit names', async () => {
+      const cold = await fit(family)
+      const families = Object.fromEntries(
+        Object.keys(cold.exponent?.families ?? {}).map((name) => [
+          name,
+          { exponent: 1.2, powders: 1 },
+        ]),
+      )
+      const saved = writeRows(
+        JSON.stringify({ ...cold, exponent: { ...cold.exponent, families } }),
+        'family.json',
+      )
+      const r = await fit({ ...family, family: saved })
+      expect(r.powders[dp40]?.pressureExponent).toBe(1.2)
+      expect(r.exponent?.families).toEqual(families)
+    })
+
+    it('refuses a saved fit of another velocity sigma', async () => {
+      const saved = writeRows(JSON.stringify(await fit(family)), 'family.json')
+      await expect(fit({ ...family, velocitySigma: 0.02, family: saved })).rejects.toThrow(
+        'the --family fit has velocity sigma 0.03, this run 0.02',
+      )
+    })
   })
 })
 
