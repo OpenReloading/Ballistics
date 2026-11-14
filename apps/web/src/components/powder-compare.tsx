@@ -13,6 +13,7 @@ import {
   targetNumber,
   targetUnit,
 } from '../lib/charge-target.ts'
+import { notMetallic } from '../lib/complete-records.ts'
 import { refusalText as thrownText, translateMessage } from '../lib/core-messages.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import {
@@ -444,6 +445,8 @@ function statusText(
     shown: number
     total: number
     failed: number
+    /** Rows of shotgun-only powders, not in `failed`. */
+    shotgun: number
     message: CompareMessage | undefined
     targetShown: string | undefined
     stale: boolean
@@ -467,6 +470,9 @@ function statusText(
           })
   const parts = [
     head,
+    o.shotgun > 0 && !o.running
+      ? t('Shotgun-only powders left out: {shotgun}', { shotgun: o.shotgun })
+      : undefined,
     o.message && messageText(o.message, t),
     o.targetShown,
     o.stale ? t('Inputs changed since these rows') : undefined,
@@ -658,7 +664,8 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
       : reasonText(r, t)
   const csv = () => powderTableCsv(shown, target, system, t, reason)
   const { progress, running, message } = study
-  const failed = study.rows.filter((r) => !r.values).length
+  const shotgun = study.rows.filter((r) => r.reason === notMetallic).length
+  const failed = study.rows.filter((r) => !r.values).length - shotgun
   // `loadRequest` is a new function on each change of the load, so filter and sort changes skip it
   const stale = useMemo(
     () => isStale(loadRequest, mode, study.key, running),
@@ -671,6 +678,7 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
       shown: shown.length,
       total: study.rows.length,
       failed,
+      shotgun,
       message,
       targetShown,
       stale,

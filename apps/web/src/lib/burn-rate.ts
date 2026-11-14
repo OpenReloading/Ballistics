@@ -5,6 +5,7 @@ import { type Powder, toSi } from '@rangefoundry/schema'
 import { formatNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator, translator } from '../i18n/translate.ts'
 import type { PowderSummary } from './api-types.ts'
+import { notMetallic, shotgunOnly } from './complete-records.ts'
 import { type ManufacturerNames, productLabel } from './manufacturers.ts'
 import { nth } from './nth.ts'
 import { say, type Wording, worded } from './wording.ts'
@@ -28,8 +29,8 @@ export interface FittedPowder {
   spread?: number | undefined
 }
 
-/** Why a powder has no curve: no fit, a pressure exponent other than 1, an interval reaching 0. */
-type UnfitKind = 'none' | 'exponent' | 'unresolved'
+/** Why a powder has no curve: shotgun use only, no fit, a pressure exponent other than 1, an interval reaching 0. */
+type UnfitKind = 'shotgun' | 'none' | 'exponent' | 'unresolved'
 
 export interface UnfittedPowder {
   id: string
@@ -70,7 +71,10 @@ const noFitReason = msg(
 )
 
 /** What `classifyPowder` reads: a powder record or a list summary, with its manufacturer's name where known. */
-type BurnSource = Pick<Powder, 'id' | 'manufacturer' | 'name' | 'grainForm' | 'propellantBase'> & {
+type BurnSource = Pick<
+  Powder,
+  'id' | 'manufacturer' | 'name' | 'grainForm' | 'propellantBase' | 'scope'
+> & {
   manufacturerName?: string
   interior?: PowderSummary['interior']
 }
@@ -84,10 +88,11 @@ const exponentReason = (exponent: number) =>
     { exponent },
   )
 
-/** Why the powder has no curve: no fit, an exponent other than 1, an interval reaching 0; none when it has one. */
+/** Why the powder has no curve: shotgun use only, no fit, an exponent other than 1, an interval reaching 0; none when it has one. */
 function unfitReason(p: BurnSource, label: string): UnfittedPowder | undefined {
   const i = p.interior
   const own = { id: p.id, label }
+  if (!i && shotgunOnly(p)) return unfit({ ...own, kind: 'shotgun' }, notMetallic)
   if (!i) return unfit({ ...own, kind: 'none' }, noFitReason)
   if (i.pressureExponent !== 1)
     return unfit(
@@ -243,6 +248,9 @@ export function describeCurve(p: FittedPowder, t: Translator['t'] = english): st
 
 /** The sentence of each group of powders without a curve; the unresolved one has `{factor}` standard uncertainties. */
 export const unfitTitles: Record<UnfitKind, Message> = {
+  shotgun: msg(
+    'Shotgun powders: the maker states shotgun use only, and the app computes metallic cartridges.',
+  ),
   none: noFitReason,
   exponent: msg(
     'Pressure exponent other than 1: the burn rate per pressure depends on the pressure, so there is no single curve.',
@@ -272,6 +280,8 @@ export interface PowderRow {
   name: string
   grainForm?: string | undefined
   propellantBase?: string | undefined
+  /** The uses the maker states. */
+  scope?: string[] | undefined
   /** Mean dynamic vivacity with its interval, 1/(MPa s); absent without a curve. */
   meanVivacity?: number | undefined
   low?: number | undefined
@@ -303,6 +313,7 @@ export function orderPowders(
       name: s.name,
       grainForm: s.grainForm,
       propellantBase: s.propellantBase,
+      ...(s.scope && { scope: s.scope }),
       ...(s.interior && { modelled: true as const }),
       ...(s.interior?.trainingRows !== undefined && {
         trainingRows: s.interior.trainingRows,

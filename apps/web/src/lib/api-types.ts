@@ -117,6 +117,8 @@ export interface PowderSummary {
   propellantBase?: Powder['propellantBase']
   /** ISO 3166-1 alpha-2 code of the manufacturer's country. */
   country?: string | undefined
+  /** The uses the maker states. */
+  scope?: Powder['scope']
   /** The fitted model's fields the burn-rate curve needs, with the training rows and cartridges of the fit. */
   interior?: Pick<
     NonNullable<Powder['interior']>,

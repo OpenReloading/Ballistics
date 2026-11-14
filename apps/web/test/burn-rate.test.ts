@@ -60,6 +60,18 @@ describe('burn-rate rows', () => {
     )
     expect(isFitted(classifyPowder(record({ value: 1 })))).toBe(true)
   })
+
+  it('sets a shotgun-only powder without a fit apart from the other powders without one', () => {
+    const unfitted = { ...record({ value: 1 }), interior: undefined }
+    expect(classifyPowder({ ...unfitted, scope: ['shotgun'] })).toMatchObject({
+      kind: 'shotgun',
+      reason: 'Not a metallic-cartridge powder',
+    })
+    expect(classifyPowder({ ...unfitted, scope: ['rifle', 'shotgun'] })).toHaveProperty(
+      'kind',
+      'none',
+    )
+  })
 })
 
 describe('typed model parameters', () => {

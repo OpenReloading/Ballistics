@@ -12760,6 +12760,11 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
   font-size: var(--mantine-font-size-sm);
 }
 
+.bd-row[aria-disabled="true"] {
+  cursor: not-allowed;
+  color: var(--muted);
+}
+
 .bd-row[data-active] {
   background: var(--surface);
   outline: 2px solid var(--link);
@@ -12773,7 +12778,8 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
   overflow-wrap: anywhere;
 }
 
-.bd-maker {
+.bd-maker,
+.bd-reason {
   color: var(--muted);
   font-size: var(--mantine-font-size-xs);
 }
