@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { storeUnits } from './units.ts'
-import { applyExampleLoad, loadForm } from './workbench.ts'
+import { loadForm, openSavedLoad } from './workbench.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
@@ -8,7 +8,7 @@ test('a value changed over its record is marked and one click gives the record v
   page,
 }) => {
   await page.goto('/workbench')
-  await applyExampleLoad(page)
+  await openSavedLoad(page)
   const form = loadForm(page)
   const reset = (label: string) =>
     form.getByRole('button', { name: new RegExp(`^Reset ${label} to the record value`) })
@@ -44,7 +44,7 @@ test('a value changed over its record is marked and one click gives the record v
 
 test('Reset card gives a card all its record values back', async ({ page }) => {
   await page.goto('/workbench')
-  await applyExampleLoad(page)
+  await openSavedLoad(page)
   const form = loadForm(page)
   const [diameter, length] = [
     form.getByRole('textbox', { name: /^Diameter/ }),
@@ -118,7 +118,7 @@ test('the base form and its dimensions are typed over the record, change the vol
   page,
 }) => {
   await page.goto('/workbench')
-  await applyExampleLoad(page)
+  await openSavedLoad(page)
   const volume = loadForm(page).getByRole('textbox', { name: /^Usable case volume/ })
   // the base form is in the card's More popover, which closes with Escape
   const more = () => page.getByRole('button', { name: 'More of Bullet' })
@@ -194,7 +194,7 @@ test('a typed Pmax is the limit of the readouts, marked as yours, and a reset br
   page,
 }) => {
   await page.goto('/workbench')
-  await applyExampleLoad(page)
+  await openSavedLoad(page)
   const form = loadForm(page)
   const pmax = form.getByRole('textbox', { name: /^Pmax/ })
   const reset = form.getByRole('button', { name: /^Reset Pmax to the record value/ })
@@ -218,7 +218,7 @@ test('a typed case length L3 moves the seating volume and a reset gives the shee
   page,
 }) => {
   await page.goto('/workbench')
-  await applyExampleLoad(page)
+  await openSavedLoad(page)
   const form = loadForm(page)
   const l3 = form.getByRole('textbox', { name: /^Case length L3/ })
   const volume = form.getByRole('textbox', { name: /^Usable case volume/ })

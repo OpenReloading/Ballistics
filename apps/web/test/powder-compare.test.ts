@@ -5,7 +5,6 @@ import { english } from '../src/i18n/translate.ts'
 import { fetchPowder, postInteriorRun, postJson } from '../src/lib/api-client.ts'
 import { runBatch } from '../src/lib/batch.ts'
 import { noComparableLimitText, targetError, targetUnit } from '../src/lib/charge-target.ts'
-import { exampleInterior } from '../src/lib/example-data.ts'
 import { interiorBody } from '../src/lib/interior-input.ts'
 import {
   compareCharge,
@@ -18,6 +17,7 @@ import {
   sortPowderRows,
 } from '../src/lib/powder-compare.ts'
 import { defined } from './defined.ts'
+import { fixtureInterior } from './fixtures/load.ts'
 
 // these tests stub `fetch` as the API's own answers: the browser's calls go to it as written, in place of the data files and the compute worker
 vi.mock('../src/lib/static-api.ts', () => ({
@@ -161,7 +161,7 @@ describe('powderValues', () => {
 })
 
 describe('compareKey', () => {
-  const body = interiorBody(exampleInterior, 'x')
+  const body = interiorBody(fixtureInterior, 'x')
   const inputs = ['p1', 0.03, 7.8, 7.7]
   const key = compareKey(body, { kind: 'typed' }, inputs)
 
@@ -216,7 +216,7 @@ describe('compareKey', () => {
 })
 
 describe('compareKey in the target mode', () => {
-  const body = interiorBody(exampleInterior, 'x')
+  const body = interiorBody(fixtureInterior, 'x')
   const inputs = ['p1']
   const target = { kind: 'target', value: 3.5e8, percent: false } as const
   const key = compareKey(body, target, inputs)
@@ -233,7 +233,7 @@ describe('compareKey in the target mode', () => {
 
 describe('answerRow', () => {
   const head = { id: 'p1', manufacturerName: 'M', name: 'N' }
-  const body = interiorBody(exampleInterior, 'x')
+  const body = interiorBody(fixtureInterior, 'x')
   const answer = {
     result: {
       peakBreechPressure: 3.4e8,
@@ -487,7 +487,7 @@ describe('postJson cut by an abort', () => {
 })
 
 describe('computeRows in the target mode', () => {
-  const body = interiorBody(exampleInterior, 'x')
+  const body = interiorBody(fixtureInterior, 'x')
   const loadRequest = (as?: { powder: Powder }) => ({
     body,
     bulkDensity: as?.powder.bulkDensity && as.powder.bulkDensity.value * 1e3,

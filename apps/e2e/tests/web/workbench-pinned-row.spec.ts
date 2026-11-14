@@ -1,7 +1,7 @@
 import { expect, type Locator, type Page, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
-import { applyExampleLoad, loadForm } from './workbench.ts'
+import { loadForm, openSavedLoad } from './workbench.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
@@ -13,7 +13,7 @@ const row = [
   ['button', 'Browse primers'],
   ['textbox', 'Primer lot'],
   ['combobox', 'Brass record'],
-  // the example load chooses its brass: its clear button takes the place of Browse brass
+  // the fixture load chooses its brass: its clear button takes the place of Browse brass
   ['button', 'Clear the brass record'],
   ['textbox', 'Case lot'],
   ['combobox', 'Case capacity record'],
@@ -48,7 +48,7 @@ for (const [width, height] of [
   }) => {
     await page.setViewportSize({ width, height })
     await gotoHydrated(page, '/workbench')
-    await applyExampleLoad(page)
+    await openSavedLoad(page)
     const controls = rowControls(page)
     if (width > 390) for (const c of controls) await expect(c).toBeInViewport()
     expect(await inversions(controls)).toBe(0)
@@ -80,7 +80,7 @@ for (const [width, height] of [
 test("the Cartridge card's More holds no primer, brass or capacity select", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 650 })
   await gotoHydrated(page, '/workbench')
-  await applyExampleLoad(page)
+  await openSavedLoad(page)
   await page.getByRole('button', { name: 'More of Cartridge' }).click()
   const more = page.locator('.more-fields[data-panel="cartridge"]')
   await expect(more.getByText('COAL, CIP maximum L6')).toBeVisible()

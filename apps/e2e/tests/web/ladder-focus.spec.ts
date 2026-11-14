@@ -1,7 +1,7 @@
 import { expect, type Locator, test } from '@playwright/test'
 import { storeUnits } from './units.ts'
 import { loadForm } from './workbench.ts'
-import { runExample, runSettled } from './workbench-run.ts'
+import { runSavedLoad, runSettled } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
@@ -27,7 +27,7 @@ for (const width of [1280, 390])
   test(`at ${width} px the focused ladder chip shows its whole focus ring`, async ({ page }) => {
     test.setTimeout(60_000)
     await page.setViewportSize({ width, height: 800 })
-    await runExample(page)
+    await runSavedLoad(page)
     const form = loadForm(page)
     await form.getByLabel(/^Ladder steps/).fill('5')
     await form.getByRole('radio', { name: 'Charge', exact: true }).check()

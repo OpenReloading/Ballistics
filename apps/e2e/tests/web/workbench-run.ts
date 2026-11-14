@@ -1,6 +1,6 @@
 import { expect, type Page } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
-import { applyExampleLoad, loadForm } from './workbench.ts'
+import { loadForm, openSavedLoad } from './workbench.ts'
 
 /** Runs the shown load and gives the result line: step, charge, peak pressure and muzzle velocity. */
 export async function runLine(page: Page) {
@@ -12,10 +12,10 @@ export async function runLine(page: Page) {
   return line.textContent()
 }
 
-/** Opens the workbench, applies the example load and runs it. */
-export async function runExample(page: Page) {
+/** Opens the workbench, opens the fixture load and runs it. */
+export async function runSavedLoad(page: Page) {
   await gotoHydrated(page, '/workbench')
-  await applyExampleLoad(page)
+  await openSavedLoad(page)
   await loadForm(page)
     .getByLabel(/^Charge mass/)
     .press('Control+Enter')

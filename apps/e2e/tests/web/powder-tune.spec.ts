@@ -4,7 +4,7 @@ import { gotoHydrated } from './nav.ts'
 import { openFit } from './powder-tune-run.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
-import { applyExampleLoad, loadForm } from './workbench.ts'
+import { loadForm, openSavedLoad } from './workbench.ts'
 import { runLine } from './workbench-run.ts'
 
 // The powder tuning route lists the open load's chronograph strings per charge and takes more typed in; the Measurements tab and the powder designer link to it, in Metric (SI): g, m/s
@@ -26,14 +26,14 @@ test('the Measurements tab opens the route with the load strings, and an added s
   page,
 }) => {
   await page.goto('/workbench')
-  await applyExampleLoad(page)
+  await openSavedLoad(page)
   await runLine(page)
   await page.getByRole('tab', { name: 'Measurements', exact: true }).click()
   await page
     .locator('input[type="file"]#measurements-file')
     .setInputFiles({ name: 'day1.csv', mimeType: 'text/csv', buffer: Buffer.from(file) })
   await page.getByRole('link', { name: 'Fit a powder from these strings' }).click()
-  // the example load is unsaved work: the page asks before it is left
+  // the read strings are unsaved work: the page asks before it is left
   await page
     .getByRole('dialog', { name: /^Leave this page\?/ })
     .getByRole('button', { name: 'Leave', exact: true })
@@ -47,7 +47,7 @@ test('the Measurements tab opens the route with the load strings, and an added s
   await expect(rows.first().locator('td').nth(2)).toHaveText('3')
   await expect(rows.first().locator('td').nth(3)).toHaveText('852.0')
   await expect(rows.first().locator('td').nth(4)).toHaveText('2.0')
-  // the example load is not saved: its strings name no load, so no fit runs
+  // the strings are not saved: they name no load, so no fit runs
   await expect(page.getByText('Save the load to fit a powder from its strings.')).toBeVisible()
   await expect(page.getByText(/^Fitted vivacity/)).toHaveCount(0)
 
@@ -97,7 +97,7 @@ for (const answer of ['loads', 'fails'] as const)
     page,
   }) => {
     await page.goto('/workbench')
-    await applyExampleLoad(page)
+    await openSavedLoad(page)
     await runLine(page)
     await page.getByRole('tab', { name: 'Measurements', exact: true }).click()
     await page

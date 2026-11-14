@@ -2,7 +2,7 @@ import { expect, type Page, test } from '@playwright/test'
 import { defined } from '../../../web/test/defined.ts'
 import { barButton } from './bar.ts'
 import { storeUnits } from './units.ts'
-import { applyExampleLoad, formValues } from './workbench.ts'
+import { formValues, openSavedLoad } from './workbench.ts'
 import { runLine } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
@@ -45,7 +45,7 @@ test('a chronograph file on the Measurements tab is a stored session that the sa
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
   })
   await page.goto('/workbench')
-  await applyExampleLoad(page)
+  await openSavedLoad(page)
   await runLine(page)
   await page.getByRole('tab', { name: 'Measurements', exact: true }).click()
   await page
@@ -65,6 +65,7 @@ test('a chronograph file on the Measurements tab is a stored session that the sa
     .toEqual(['charge', undefined])
 
   await (await barButton(page, 'Save')).click()
+  await expect(page.locator('.file-state[data-dirty]')).toHaveCount(0)
   await expect.poll(async () => (await stored(page, 'load')).length).toBe(1)
   const load = defined((await stored(page, 'load'))[0])
   const session = defined((await stored(page, 'session'))[0])

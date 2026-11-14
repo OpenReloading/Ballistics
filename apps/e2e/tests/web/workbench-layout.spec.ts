@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
 import { inversions, tabStops } from './tab-order.ts'
 import { storeUnits } from './units.ts'
-import { applyExampleLoad, loadForm } from './workbench.ts'
+import { loadForm, openSavedLoad } from './workbench.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
@@ -24,7 +24,7 @@ for (const [width, height] of sizes)
   }) => {
     await page.setViewportSize({ width, height })
     await gotoHydrated(page, '/workbench')
-    await applyExampleLoad(page)
+    await openSavedLoad(page)
     const stops = await tabStops(loadForm(page))
     expect(stops.length).toBeGreaterThan(20)
     expect(inversions(stops)).toEqual([])
@@ -57,7 +57,7 @@ for (const [width, height] of sizes)
     })
     await page.setViewportSize({ width, height })
     await gotoHydrated(page, '/workbench')
-    await applyExampleLoad(page)
+    await openSavedLoad(page)
     const charge = loadForm(page).getByLabel(/^Charge mass/)
     await page.evaluate(() => {
       ;(window as unknown as { inputShift: number }).inputShift = 0

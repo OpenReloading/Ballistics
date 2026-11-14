@@ -1,8 +1,8 @@
 import { interiorBody } from '@rangefoundry/use-cases'
 import { describe, expect, it } from 'vitest'
 import { cavityVolumeFraction } from '../src/lib/cavity-range.ts'
-import { exampleInterior } from '../src/lib/example-data.ts'
 import { interiorRequest } from '../src/lib/interior-request.ts'
+import { fixtureInterior } from './fixtures/load.ts'
 
 describe('cavityVolumeFraction', () => {
   // made-up seating: 0.6 cm3 behind the bullet, 0.02 cm3 less at the deepest cavity, 0.05 cm3 more at the shallowest
@@ -30,7 +30,7 @@ describe('cavityVolumeFraction', () => {
 
 describe('interiorRequest', () => {
   it('sends the volume tolerance only when one is given, in a body the API takes', () => {
-    const values = { ...exampleInterior, boreArea: undefined }
+    const values = { ...fixtureInterior, boreArea: undefined }
     const plain = interiorRequest({ values, powder: undefined, boreArea: 4.7e-5 })
     expect(plain.body.tolerances).toBeUndefined()
     const covered = interiorRequest({

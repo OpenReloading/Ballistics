@@ -3,12 +3,12 @@ import type { PowderFit } from '@rangefoundry/ballistics'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { TuneNotes } from '../src/components/powder-tune.tsx'
-import { exampleInterior } from '../src/lib/example-data.ts'
 import { interiorBody } from '../src/lib/interior-input.ts'
+import { fixtureInterior } from './fixtures/load.ts'
 
 const saved = 'user:0b5f7a2e-3c1d-4e8f-9a6b-2d4c8e1f7a30'
 const strings = [{ charge: 0.0025, shots: [{ velocity: { value: 800 } }] }]
-const { load } = interiorBody(exampleInterior)
+const { load } = interiorBody(fixtureInterior)
 const fitted = {
   kind: 'fit' as const,
   id: 1,

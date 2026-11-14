@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
 import { storeUnits } from './units.ts'
-import { applyExampleLoad } from './workbench.ts'
+import { openSavedLoad } from './workbench.ts'
 import { runLine } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
@@ -43,7 +43,7 @@ test('a changed powder lot between two sessions is a note on the load and its se
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
   })
   await page.goto('/workbench')
-  await applyExampleLoad(page)
+  await openSavedLoad(page)
   await runLine(page)
   await page.getByRole('tab', { name: 'Notes', exact: true }).click()
   // the Notes tab's fields: the lots beside the component choices carry the same names
@@ -58,6 +58,7 @@ test('a changed powder lot between two sessions is a note on the load and its se
   await read(page, 'day1.csv')
   await expect(page.getByRole('status').filter({ hasText: 'Read day1.csv' })).toBeVisible()
   await (await barButton(page, 'Save')).click()
+  await expect(page.locator('.file-state[data-dirty]')).toHaveCount(0)
   await expect.poll(async () => (await storedLoads(page)).length).toBe(1)
 
   // the lot of the next session differs; a note shows before the load is saved again

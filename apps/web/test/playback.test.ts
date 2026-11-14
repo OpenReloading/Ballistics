@@ -2,7 +2,6 @@ import { interior } from '@rangefoundry/ballistics'
 import { expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import { baseAt, flightAt, flightTime, type StripModel } from '../src/lib/barrel-strip.ts'
-import { exampleInterior } from '../src/lib/example-data.ts'
 import { interiorBody } from '../src/lib/interior-input.ts'
 import {
   defaultFactor,
@@ -15,6 +14,7 @@ import {
   timeIndex,
 } from '../src/lib/playback.ts'
 import { defined, missing } from './defined.ts'
+import { fixtureInterior } from './fixtures/load.ts'
 
 /** Made-up uneven times with repeats, as event points add them. */
 const times = [0, 1, 2, 2, 2.5, 4, 4, 4, 10, 10.1, 12]
@@ -26,11 +26,11 @@ function scan(t: number) {
   return i
 }
 
-const { load } = interiorBody(exampleInterior)
+const { load } = interiorBody(fixtureInterior)
 
 /** The interior example through core, with changed form values (SI). */
-function run(change: Partial<Record<keyof typeof exampleInterior, number>> = {}): PlaybackResult {
-  const r = interior(interiorBody({ ...exampleInterior, ...change }).load)
+function run(change: Partial<Record<keyof typeof fixtureInterior, number>> = {}): PlaybackResult {
+  const r = interior(interiorBody({ ...fixtureInterior, ...change }).load)
   if (!r.valid) throw new Error(`example invalid: ${r.reason}`)
   return r
 }

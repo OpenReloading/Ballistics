@@ -3,7 +3,7 @@ import { barButton } from './bar.ts'
 import { showGerman } from './german.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
-import { applyExampleLoad } from './workbench.ts'
+import { openSavedLoad } from './workbench.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 // the printed QR code is read from a screenshot: at 96 dpi a module is 2.9 px, which jsQR cannot read for some codes; at 3 x it is 8.6 px
@@ -27,7 +27,7 @@ for (const language of languages)
     })
     await page.setViewportSize({ width: 1280, height: 900 })
     await gotoHydrated(page, '/workbench')
-    await applyExampleLoad(page)
+    await openSavedLoad(page)
     // every lot typed: the tallest label
     for (const [lot, text] of [
       ['Powder lot', 'P-2026-0412-A'],
@@ -105,7 +105,7 @@ test('a printed box label opens its load by photo, by camera and by its text', a
   })
   await page.setViewportSize({ width: 1280, height: 900 })
   await gotoHydrated(page, '/workbench')
-  await applyExampleLoad(page)
+  await openSavedLoad(page)
   await (await barButton(page, 'Save')).click()
   await expect(page.locator('.file-state')).toContainText('Saved')
   const openSaved = async () => {
