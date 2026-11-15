@@ -2085,6 +2085,168 @@
                           }
                         ]
                       },
+                      "perforation": {
+                        "description": "Perforation of the kernel as the maker states it: none, one hole, several holes.",
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "none",
+                              "single",
+                              "multi"
+                            ],
+                            "description": "Perforation of the kernel as the maker states it: none, one hole, several holes."
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "grainDimensions": {
+                        "description": "Dimensions of the kernel as the maker states them.",
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "length": {
+                                "description": "Length of the kernel.",
+                                "anyOf": [
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "value": {
+                                        "description": "In mm.",
+                                        "type": [
+                                          "number",
+                                          "null"
+                                        ]
+                                      },
+                                      "raw": {
+                                        "description": "The value as written in the source, when it differed.",
+                                        "anyOf": [
+                                          {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "description": "The value as written in the source, when it differed."
+                                          },
+                                          {
+                                            "type": "null"
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "diameter": {
+                                "description": "Outer diameter of the kernel.",
+                                "anyOf": [
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "value": {
+                                        "description": "In mm.",
+                                        "type": [
+                                          "number",
+                                          "null"
+                                        ]
+                                      },
+                                      "raw": {
+                                        "description": "The value as written in the source, when it differed.",
+                                        "anyOf": [
+                                          {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "description": "The value as written in the source, when it differed."
+                                          },
+                                          {
+                                            "type": "null"
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "web": {
+                                "description": "Web: the thinnest burning distance through the kernel.",
+                                "anyOf": [
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "value": {
+                                        "description": "In mm.",
+                                        "type": [
+                                          "number",
+                                          "null"
+                                        ]
+                                      },
+                                      "raw": {
+                                        "description": "The value as written in the source, when it differed.",
+                                        "anyOf": [
+                                          {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "description": "The value as written in the source, when it differed."
+                                          },
+                                          {
+                                            "type": "null"
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "perforationDiameter": {
+                                "description": "Diameter of a perforation.",
+                                "anyOf": [
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "value": {
+                                        "description": "In mm.",
+                                        "type": [
+                                          "number",
+                                          "null"
+                                        ]
+                                      },
+                                      "raw": {
+                                        "description": "The value as written in the source, when it differed.",
+                                        "anyOf": [
+                                          {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "description": "The value as written in the source, when it differed."
+                                          },
+                                          {
+                                            "type": "null"
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            }
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
                       "bulkDensity": {
                         "description": "The `bulkDensity` of the powder record. `null` removes it.",
                         "anyOf": [
@@ -2111,6 +2273,69 @@
                                   }
                                 ]
                               }
+                            }
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "heatOfExplosion": {
+                        "description": "Heat of explosion as the safety data sheet states it; `raw` keeps a printed J/g.",
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "description": "In J/kg.",
+                                "type": [
+                                  "number",
+                                  "null"
+                                ]
+                              },
+                              "raw": {
+                                "description": "The value as written in the source, when it differed.",
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "description": "The value as written in the source, when it differed."
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            }
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "transport": {
+                        "description": "Transport classification from the safety data sheet, one entry per UN number.",
+                        "anyOf": [
+                          {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "unNumber": {
+                                  "type": "string",
+                                  "pattern": "^UN\\d{4}$",
+                                  "description": "UN number, as `UN0161`."
+                                },
+                                "hazardClass": {
+                                  "type": "string",
+                                  "pattern": "^[1-9](\\.[1-6])?[A-HJKLNS]?$",
+                                  "description": "Hazard class or division, with the compatibility group where given: `1.3C`, `4.1`."
+                                }
+                              },
+                              "required": [
+                                "unNumber",
+                                "hazardClass"
+                              ]
                             }
                           },
                           {

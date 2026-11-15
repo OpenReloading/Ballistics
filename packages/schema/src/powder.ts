@@ -134,6 +134,44 @@ const powderBurnRateCharts = z
     "The powder's place in burn-rate charts as their makers publish them, one entry per chart.",
   )
 
+const kernelLength = (description: string) =>
+  quantity('length', z.number().positive()).describe(description).optional()
+
+const powderGrainDimensions = z
+  .object({
+    length: kernelLength('Length of the kernel.'),
+    diameter: kernelLength('Outer diameter of the kernel.'),
+    web: kernelLength('Web: the thinnest burning distance through the kernel.'),
+    perforationDiameter: kernelLength('Diameter of a perforation.'),
+  })
+  .refine((d) => Object.values(d).some((v) => v !== undefined), { message: 'needs a dimension' })
+  .meta({
+    anyOf: ['length', 'diameter', 'web', 'perforationDiameter'].map((k) => ({ required: [k] })),
+  })
+  .describe('Dimensions of the kernel as the maker states them.')
+
+/** UN numbers as the safety data sheet prints them; one powder may ship under several, by packaging. */
+const powderTransport = z
+  .array(
+    z.object({
+      unNumber: z
+        .string()
+        .regex(/^UN\d{4}$/)
+        .describe('UN number, as `UN0161`.'),
+      hazardClass: z
+        .string()
+        .regex(/^[1-9](\.[1-6])?[A-HJKLNS]?$/)
+        .describe(
+          'Hazard class or division, with the compatibility group where given: `1.3C`, `4.1`.',
+        ),
+    }),
+  )
+  .min(1)
+  .refine((t) => new Set(t.map((e) => e.unNumber)).size === t.length, {
+    message: 'a UN number is listed twice',
+  })
+  .describe('Transport classification from the safety data sheet, one entry per UN number.')
+
 /** Whether a source of the provenance passes `test`, given the source's own kind or the record's; none without provenance. */
 const anySource = (
   p: Provenance | undefined,
@@ -149,8 +187,17 @@ const powderParser = z
     country: countryCode.optional(),
     grainForm: z.enum(['ball', 'extruded', 'flake', 'other']).optional(),
     propellantBase: z.enum(['single', 'double', 'triple']).optional(),
+    perforation: z
+      .enum(['none', 'single', 'multi'])
+      .describe('Perforation of the kernel as the maker states it: none, one hole, several holes.')
+      .optional(),
+    grainDimensions: powderGrainDimensions.optional(),
     bulkDensity: quantity('density').optional(),
+    heatOfExplosion: quantity('specificEnergy', z.number().positive())
+      .describe('Heat of explosion as the safety data sheet states it; `raw` keeps a printed J/g.')
+      .optional(),
     composition: powderComposition.optional(),
+    transport: powderTransport.optional(),
     thermochemistry: powderThermochemistry.optional(),
     interior: powderInterior.optional(),
     temperatureSensitivity: powderTemperatureSensitivity.optional(),
@@ -213,12 +260,24 @@ export const powder: z.ZodObject<{
   /** Grain form: spherical and flattened spherical grains are `ball`; tubes, cylinders and sticks `extruded`. */
   grainForm: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'ball' | 'extruded' | 'flake' | 'other'>>>
   propellantBase: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'single' | 'double' | 'triple'>>>
+  perforation: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'none' | 'single' | 'multi'>>>
+  /** In mm, each optional, at least one given. */
+  grainDimensions: z.ZodOptional<
+    z.ZodObject<{
+      length: z.ZodOptional<QuantitySchema>
+      diameter: z.ZodOptional<QuantitySchema>
+      web: z.ZodOptional<QuantitySchema>
+      perforationDiameter: z.ZodOptional<QuantitySchema>
+    }>
+  >
   /**
    * Bulk density: mass per volume of uncompressed powder, voids between grains included. It depends
    * on how the volume was filled (thrown by a powder measure, poured, tapped); the source note says
    * how, when the source states it.
    */
   bulkDensity: z.ZodOptional<QuantitySchema>
+  /** Specific energy, stored in J/kg like the other specific energies. */
+  heatOfExplosion: z.ZodOptional<QuantitySchema>
   composition: z.ZodOptional<
     z.ZodArray<
       z.ZodObject<{
@@ -229,6 +288,9 @@ export const powder: z.ZodObject<{
         raw: z.ZodOptional<z.ZodString>
       }>
     >
+  >
+  transport: z.ZodOptional<
+    z.ZodArray<z.ZodObject<{ unNumber: z.ZodString; hazardClass: z.ZodString }>>
   >
   thermochemistry: z.ZodOptional<
     z.ZodObject<{

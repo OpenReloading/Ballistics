@@ -231,7 +231,7 @@ _Avoid_: calibers, classes
 ### Powders
 
 **Powder**:
-A record of kind `powders`: a propellant as its manufacturer sells it, with `manufacturer`, `name`, `aliases`, `country`, `grainForm`, `propellantBase`, `bulkDensity`, `composition`, `thermochemistry`, `interior`. Served by `GET /v1/powders[/{id}]`, and named by `powder` in charge-target bodies and workbench states.
+A record of kind `powders`: a propellant as its manufacturer sells it, with `manufacturer`, `name`, `aliases`, `country`, `grainForm`, `propellantBase`, `perforation`, `grainDimensions`, `bulkDensity`, `heatOfExplosion`, `composition`, `transport`, `thermochemistry`, `interior`. Served by `GET /v1/powders[/{id}]`, and named by `powder` in charge-target bodies and workbench states.
 
 **Grain form**:
 `grainForm`: `ball` (spherical and flattened spherical grains), `extruded` (tubes, cylinders, sticks), `flake` or `other`.
@@ -246,6 +246,18 @@ _Avoid_: `base` (on a powder)
 
 **Powder scope**:
 `scope`: the uses the maker states for a powder, a set of `rifle`, `handgun` and `shotgun`. A shotgun-only powder has `scope` `["shotgun"]`; the workbench does not compute it, as it computes metallic cartridges.
+
+**Perforation**:
+`perforation`: `none`, `single` or `multi`, the holes through a kernel as the maker states them.
+
+**Grain dimensions**:
+`grainDimensions`: the kernel's `length`, `diameter`, `web` (the thinnest burning distance) and `perforationDiameter`, in mm, as the maker states them; at least one is given.
+
+**Heat of explosion**:
+`heatOfExplosion`: the heat of explosion the safety data sheet states, J/kg on the record (a printed J/g value stays in `raw`). Not the computed `thermochemistry`.
+
+**Transport classification**:
+`transport`: the safety data sheet's transport entries, one per UN number: `unNumber` (`UN0161`) and `hazardClass`, the class or division with its compatibility group (`1.3C`, `4.1`).
 
 **Bulk density**:
 `bulkDensity`: mass per volume of uncompressed powder, voids between grains included, g/cm3 on the powder record. In charge-target bodies `propellant.bulkDensity`, kg/m3.
