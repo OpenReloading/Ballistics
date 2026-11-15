@@ -370,7 +370,7 @@ describe('GET /powders and /bullets', () => {
     expect((await get(`${API_PREFIX}/manufacturers/Not_An_Id`)).status).toBe(400)
   })
 
-  it('lists the form, base and burn parameters of a powder', async () => {
+  it('lists the form, base, stated uses and burn parameters of a powder', async () => {
     const interior = {
       model: 'm3',
       fitted: ['vivacity'],
@@ -405,6 +405,7 @@ describe('GET /powders and /bullets', () => {
           ...bundle.powders[0],
           grainForm: 'ball',
           propellantBase: 'double',
+          scope: ['rifle', 'handgun'],
           interior,
           provenance,
         },
@@ -418,6 +419,7 @@ describe('GET /powders and /bullets', () => {
       name: 'Fast',
       grainForm: 'ball',
       propellantBase: 'double',
+      scope: ['rifle', 'handgun'],
       // what the burn-rate curve needs and what the fit rests on, read on the latest fitted source's day
       interior: {
         vivacity: interior.vivacity,

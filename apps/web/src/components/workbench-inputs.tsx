@@ -35,7 +35,12 @@ import { fitOf, summaryFitSource } from '../lib/bullet-fit.ts'
 import type { BulletRow } from '../lib/bullet-rows.ts'
 import { findBullets } from '../lib/bullet-search.ts'
 import type { CartridgeRow } from '../lib/cartridge-rows.ts'
-import { bulletIncomplete, completeFirst, powderIncomplete } from '../lib/complete-records.ts'
+import {
+  bulletIncomplete,
+  completeFirst,
+  powderIncomplete,
+  shotgunOnly,
+} from '../lib/complete-records.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { dayText } from '../lib/dates.ts'
 import { capacityGuide } from '../lib/docs-url.ts'
@@ -1490,8 +1495,13 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
         kind="powders"
         label={t('Search powders by manufacturer and name')}
         chosen={chosen}
-        describe={(p) => missingMark(productLabel(p, names), powderIncomplete(p), t)}
+        describe={(p) =>
+          shotgunOnly(p)
+            ? t('{name} (not a metallic-cartridge powder)', { name: productLabel(p, names) })
+            : missingMark(productLabel(p, names), powderIncomplete(p), t)
+        }
         arrange={(items) => completeFirst(items, powderIncomplete, completeOnly)}
+        unavailable={shotgunOnly}
         onSelect={(p) => pickPowder(p.id)}
         // the browser's powder designs in the same list, first
         extra={powderDesigns.map((d) => ({

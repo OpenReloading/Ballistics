@@ -8,10 +8,10 @@ import { msg, type Translator } from '../i18n/translate.ts'
 import { type PowderRow, vivacityUnit } from '../lib/burn-rate.ts'
 import { caliberOptions, commonCaliber } from '../lib/caliber.ts'
 import { type CartridgeRow, cartridgeCells } from '../lib/cartridge-rows.ts'
-import { powderRowIncomplete } from '../lib/complete-records.ts'
+import { notMetallic, powderRowIncomplete, shotgunOnly } from '../lib/complete-records.ts'
 import { countryName, parseCountries } from '../lib/countries.ts'
 import type { FirearmRow } from '../lib/firearm.ts'
-import { baseText, caseTypeText, grainFormText, kebabValue } from '../lib/list-values.ts'
+import { baseText, caseTypeText, grainFormText, kebabValue, scopeText } from '../lib/list-values.ts'
 import type { PowderDesign } from '../lib/powder-designer.ts'
 import type { PrimerRow } from '../lib/primer-rows.ts'
 import {
@@ -88,6 +88,17 @@ export const powderKind: ChooserKind<PowderRow> = {
         ),
       keep: (r, v) => r.propellantBase === v,
     },
+    {
+      label: msg('Stated use'),
+      nothingFound: msg('No use found'),
+      options: (_, rows, t) =>
+        countedOptions(
+          rows,
+          (r) => r.scope,
+          (v) => scopeText(t, v),
+        ),
+      keep: (r, v) => r.scope?.includes(v) === true,
+    },
   ],
   sorts: [
     { value: 'relevance', label: msg('Best match') },
@@ -117,6 +128,7 @@ export const powderKind: ChooserKind<PowderRow> = {
     [msg('Manufacturer'), row.manufacturerName || undefined],
     [msg('Form'), row.grainForm && grainFormText(t, row.grainForm)],
     [msg('Base'), row.propellantBase && baseText(t, row.propellantBase)],
+    [msg('Stated use'), row.scope?.map((s) => scopeText(t, s)).join(', ')],
     [
       msg('Burn-rate order'),
       row.burnRateOrder === undefined ? undefined : String(row.burnRateOrder),
@@ -130,6 +142,7 @@ export const powderKind: ChooserKind<PowderRow> = {
   ],
   href: (row) => `/powders/${row.id}`,
   incomplete: powderRowIncomplete,
+  unavailable: (row) => (shotgunOnly(row) ? notMetallic : undefined),
 }
 
 /** The cartridges as a kind of the record chooser. */

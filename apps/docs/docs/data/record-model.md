@@ -117,6 +117,13 @@ A table names a bullet by maker, type and mass, often without a product number, 
 
 A powder needs no name-only marker: only `id`, `manufacturer` and `name` are required, so a powder with only a name is a valid record. `provenance` is required unless the record holds basic fields only (`powderBasicFields`).
 
+Two basic fields carry what the makers state:
+
+| Field            | Holds                                                                                                                                                                                                                                                                                                                                                                                     |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `burnRateCharts` | One entry per burn-rate chart: the chart (`manufacturer`, the chart maker's id, and `edition`, as printed or the publication date), the `position` in its printed order from 1, and the printed `relative` value where the chart prints one. Each chart is its own scale: entries of different makers are not merged or compared as numbers. `data:validate` checks the chart maker's id. |
+| `scope`          | The uses the maker states: a set of `rifle`, `handgun` and `shotgun`. The powder list of the API carries it. The workbench's powder chooser filters by it (Stated use). A shotgun-only powder stays listed in the workbench's pickers, greyed out as not a metallic-cartridge powder; the Powders tab and the burn-rate page count it apart from the powders without a model.             |
+
 A user powder (`userPowder` in `packages/schema/src/user-data.ts`) is the powder designer's record: `origin: 'user'`, an optional `provenanceKind` (burn-law parameters need `fitted`), an optional `draft` (`powderDraft` in `packages/schema/src/overrides.ts`: the powder fields entered so far in stored units, each optional, without the powder record's bounds) and an optional `fit`. The record's `name` is the powder's name. The designer builds a `Powder` from the draft and checks it against `powder`.
 
 ## Fit of a user powder

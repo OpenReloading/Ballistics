@@ -496,11 +496,12 @@ describe('computeRows in the target mode', () => {
   const target = { kind: 'target', value: 3.5e8, percent: false } as const
   // the records are kept for the session: a new set of ids for each API
   let set = 0
-  const summary = (i: number, interior = true) => ({
+  const summary = (i: number, interior = true, scope?: string[]) => ({
     id: `target-${set}-${i}`,
     manufacturer: 'm',
     name: `N${i}`,
     interior,
+    ...(scope && { scope }),
   })
   const found = {
     charge: 0.003,
@@ -515,14 +516,19 @@ describe('computeRows in the target mode', () => {
   }
   const json = (b: unknown, status = 200) => new Response(JSON.stringify(b), { status })
 
-  /** The API: a list of `n` powders (the first without model parameters), `solve` answers each charge request. */
-  function api(n: number, solve: () => Promise<Response>, density?: number) {
+  /** The API: a list of `n` powders (the first without model parameters, the one at `shotgunAt` for shotguns only), `solve` answers each charge request. */
+  function api(n: number, solve: () => Promise<Response>, density?: number, shotgunAt?: number) {
     const requests: string[] = []
     set++
     vi.stubGlobal('fetch', async (url: string, init?: { signal?: AbortSignal }) => {
       if (url === '/api/manufacturers') return json({ total: 1, items: [{ id: 'm', name: 'M' }] })
       if (url.startsWith('/api/powders?'))
-        return json({ total: n, items: Array.from({ length: n }, (_, i) => summary(i, i > 0)) })
+        return json({
+          total: n,
+          items: Array.from({ length: n }, (_, i) =>
+            summary(i, i > 0, i === shotgunAt ? ['shotgun'] : undefined),
+          ),
+        })
       if (url.startsWith('/api/powders/')) {
         const id = decodeURIComponent(url.slice('/api/powders/'.length))
         return json({
@@ -555,6 +561,21 @@ describe('computeRows in the target mode', () => {
       },
     )
     expect(defined(done?.rows[1]).flag).toBeUndefined()
+  })
+
+  it('computes no shotgun-only powder and says why', async () => {
+    const charge = 900 * body.load.chamber.volume
+    const requests = api(3, async () => json({ ...found, charge }), 0.9, 1)
+    const done = await computeRows(
+      loadRequest as never,
+      loadRequest() as never,
+      target,
+      new AbortController().signal,
+      { start: () => {}, done: () => {} },
+    )
+    expect(requests).toHaveLength(1)
+    expect(defined(done?.rows[1]).reason).toBe('Not a metallic-cartridge powder')
+    expect(defined(done?.rows[2]).values).toBeDefined()
   })
 
   it('stops after the first answer that the cartridge has no comparable limit', async () => {

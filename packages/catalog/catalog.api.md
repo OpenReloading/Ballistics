@@ -24,7 +24,7 @@ import { Powder } from '@rangefoundry/schema';
 import { Primer } from '@rangefoundry/schema';
 import type { PrimerCompound } from '@rangefoundry/schema';
 import type { PrimerSize } from '@rangefoundry/schema';
-import type { Provenance } from '@rangefoundry/schema';
+import { Provenance } from '@rangefoundry/schema';
 import { PublishedLoads } from '@rangefoundry/schema';
 import type { RangeFirings } from '@rangefoundry/schema';
 import { SourceRecord } from '@rangefoundry/schema';
@@ -229,7 +229,7 @@ export function checkChronoSession(session: CatalogueSession): Finding[];
 // @public
 export function checkCoverage(record: {
     provenance?: Provenance | undefined;
-}): string[];
+}, kind?: FieldClassKind): string[];
 
 // @public
 export function checkFittedSources(powder: Powder, loadTables: LoadTables): string[];
@@ -300,10 +300,23 @@ export interface FederationItem {
 }
 
 // @public
+export type FieldClassKind = 'bullet' | 'powder' | 'manufacturer';
+
+// @public
 export type Finding = {
     finding: string;
     message: string;
 };
+
+// @public
+export interface ListedSourceFields {
+    // (undocumented)
+    readonly bullet: readonly string[];
+    // (undocumented)
+    readonly load: boolean;
+    // (undocumented)
+    readonly powder: readonly string[];
+}
 
 export { LoadTable }
 
@@ -318,11 +331,13 @@ export type LocatedPublishedLoads = {
 // @public
 export interface MakerRow {
     // (undocumented)
+    findings: string[];
+    // (undocumented)
     id: string;
 }
 
 // @public
-export function makerRows(bundle: Bundle): Record<string, MakerRow[]>;
+export function makerRows(bundle: Bundle, citations: SourceIndex['citations']): Record<string, MakerRow[]>;
 
 // @public
 export interface ManufacturerItem {
@@ -335,6 +350,9 @@ export interface ManufacturerItem {
     // (undocumented)
     website?: string;
 }
+
+// @public
+export const nonMakerSources: Readonly<Record<string, ListedSourceFields>>;
 
 // @public
 export interface Paging {
@@ -377,6 +395,7 @@ export interface PowderItem {
     name: string;
     // (undocumented)
     propellantBase?: string;
+    scope?: string[];
 }
 
 // @public
@@ -470,6 +489,7 @@ export type SourceIndex = {
     byId: Map<string, SourceRecord>;
     cited: Set<string>;
     embedded: Map<string, Set<string>>;
+    citations: Map<string, (string | undefined)[]>;
 };
 
 // @public
