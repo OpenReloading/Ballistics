@@ -17,7 +17,8 @@ export interface Io {
 const usage = `usage:
   ballistics verify  --rows <path> [--model m3|<module>] [options]
   ballistics compare --rows <path> --baseline <m3|module|verify.json> --candidate <m3|module> [options]
-  ballistics fit     --rows <path> [--model m3|<module>] [--velocity-sigma <fraction>] [--exponent family]
+  ballistics fit     --rows <path> [--model m3|<module>] [--velocity-sigma <fraction>]
+                     [--exponent family [--family <fit.json>]]
                      [--pressure-sigma <fraction> [--pressure-factor <key>]] [--energy prior]
                      [--records <dir>] [--json | --table]
   ballistics run <operation> --input <file|-> [--records <dir>]
@@ -39,11 +40,18 @@ options:
   --params records|fit-on-training
                      the powder parameters of the records (default), or the burn
                      coefficients fitted to the training rows
+  --fit <fit.json>   verify and compare, instead of --params: evaluate the values of a saved
+                     fit of the same rows and records without fitting; the result is
+                     marked as a screen with this build's version and carries the fit's
+                     model version
   --velocity-sigma <fraction>
                      fit and --params fit-on-training: velocity sigma of a row, a fraction
                      of its velocity (default 0.03)
   --exponent family  fit and --params fit-on-training: choose the pressure exponent per
                      powder family and fit each burn coefficient at it
+  --family <fit.json>
+                     with --exponent family: take the family choice of a saved fit of the
+                     same rows, records, velocity sigma and build instead of making it
   --pressure-sigma <fraction>
                      fit and --params fit-on-training: fit the printed pressures too, with
                      this sigma, a fraction of the pressure, and one factor per key
@@ -143,6 +151,7 @@ const foreignOptions = {
   verify: ['baseline', 'candidate'],
   compare: ['model', 'leave-one-powder-out', 'per-row'],
   fit: [
+    'fit',
     'split',
     'final',
     'baseline',
@@ -184,6 +193,8 @@ function optionsOf(
       'pressure-sigma': { type: 'string' },
       'pressure-factor': { type: 'string' },
       energy: { type: 'string' },
+      fit: { type: 'string' },
+      family: { type: 'string' },
     },
   })
   const foreign = foreignOptions[command].filter((o) => values[o] !== undefined)
@@ -194,9 +205,12 @@ function optionsOf(
     'pressure-sigma',
     'pressure-factor',
     'energy',
+    'family',
   ] as const)
     if (command !== 'fit' && values[option] !== undefined && values.params !== 'fit-on-training')
       throw new UsageError(`--${option} is for fit and --params fit-on-training`)
+  if (values.fit !== undefined && values.params !== undefined)
+    throw new UsageError('--fit and --params exclude each other')
   const rows = values.rows ?? env.BALLISTICS_ROWS
   if (!rows) throw new UsageError('give --rows <path> or set BALLISTICS_ROWS')
   const split = values.split ?? 'validation'
@@ -218,6 +232,8 @@ function optionsOf(
     pressureSigma: sigmaOf('pressure-sigma', values['pressure-sigma']),
     pressureFactor: values['pressure-factor'] as Options['pressureFactor'],
     energy: values.energy as Options['energy'],
+    fit: values.fit,
+    family: values.family,
   }
   return { options, values }
 }

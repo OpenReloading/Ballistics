@@ -148,7 +148,19 @@ const evaluation = z.object({
     })
     .optional()
     .describe(
-      "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`. With `--pressure-sigma`, `pressure` holds the factor per key of `--pressure-factor` of the fit; the pressure errors still compare the model's peak pressure as it is with the printed pressure.",
+      "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`. With `--pressure-sigma`, `pressure` holds the factor per key of `--pressure-factor` of the fit; the pressure errors still compare the model's peak pressure as it is with the printed pressure. With `--fit`: the summary of the saved fit.",
+    ),
+  screen: z
+    .object({
+      version: z
+        .string()
+        .describe(
+          "The model version of this build with the saved fit's options, the `modelVersion` a full run with `--params fit-on-training` gives.",
+        ),
+    })
+    .optional()
+    .describe(
+      "With `--fit`: an evaluation only, a screen. The values are those of a saved fit, not fitted in this run, and `modelVersion` is that fit's, whose model and fit sources may differ from this build's; a full run with `--params fit-on-training` gives the result to report.",
     ),
 })
 
@@ -278,7 +290,7 @@ const compareResult = z.object({
 /** The result of `compare`. */
 export type CompareResult = z.infer<typeof compareResult>
 
-const fitResult = z.object({
+export const fitResult = z.object({
   schemaVersion: z.literal(schemaVersion),
   notice: z.literal(notice),
   command: z.literal('fit'),

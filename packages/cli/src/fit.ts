@@ -299,6 +299,24 @@ function familyExponents(
   }
 }
 
+/** Each powder fitted at the exponent `choice` gives its family, as {@link familyExponents} would fit it on the rows that choice was made on; a `Refusal` for a family the choice lacks. */
+function givenFamilies(
+  ids: readonly string[],
+  records: Records,
+  choice: FamilyChoice,
+  fitAt: (exponentOf: (id: string) => number) => Map<string, Fitted | NotFitted>,
+) {
+  const exponentOf = (id: string) => {
+    const name = familyOf(records.powders.get(id))
+    const family = Object.hasOwn(choice.families, name) ? choice.families[name] : undefined
+    if (!family) throw new Refusal(`the --family fit has no exponent for the family ${name}`)
+    return family.exponent
+  }
+  for (const id of ids) exponentOf(id)
+  const { grid, shrinkage, pooled, families } = choice
+  return { fits: fitAt(exponentOf), exponentOf, summary: { grid, shrinkage, pooled, families } }
+}
+
 /** The fitted values and the reasons of the powders not fitted, from the fits of `fitEach`. */
 function fittedAndNot(fits: ReturnType<typeof fitEach>) {
   const powders: Record<string, PowderFitValue> = {}
@@ -342,17 +360,19 @@ function pressureFactors(
   )
 }
 
+/** The choice of `exponent` `family`: the grid, the shrinkage, the pooled exponent and per family its exponent and the powders that entered its sum. */
+interface FamilyChoice {
+  grid: number[]
+  shrinkage: number
+  pooled: number
+  families: Record<string, { exponent: number; powders: number }>
+}
+
 /** What a fit of the powders gives: the fitted values, the powders not fitted, and what each option chose. */
 interface PowdersFit {
   powders: Record<string, PowderFitValue>
   notFitted: Record<string, NotFitted>
-  /** With `exponent` `family`: the grid, the shrinkage, the pooled exponent and per family its exponent and the powders that entered its sum. */
-  exponent?: {
-    grid: number[]
-    shrinkage: number
-    pooled: number
-    families: Record<string, { exponent: number; powders: number }>
-  }
+  exponent?: FamilyChoice
   /** With `pressureSigma`: the sigma, the key of `pressureFactor` and per key its factor and rows. */
   pressure?: {
     sigma: number
@@ -374,6 +394,8 @@ interface PowdersFit {
 /** The options of {@link fitPowders}. */
 interface PowdersFitOptions {
   exponent?: 'family' | undefined
+  /** With `exponent` `family`: the choice of an earlier run on the same rows, records and build, which then only fits each burn coefficient at it. */
+  family?: FamilyChoice | undefined
   pressureSigma?: number | undefined
   pressureFactor?: PressureKey | undefined
   energy?: 'prior' | undefined
@@ -409,9 +431,13 @@ function fitAtRecordEnergy(
   const run = { model, velocitySigma }
   // the family choice reads velocities only, so pressure rows move burn coefficients, not exponents
   const family =
-    options.exponent === 'family'
-      ? familyExponents(ids, records, (n) => fitEach(ids, used, records, run, () => n))
-      : undefined
+    options.exponent !== 'family'
+      ? undefined
+      : options.family
+        ? givenFamilies(ids, records, options.family, (exponentOf) =>
+            fitEach(ids, used, records, run, exponentOf),
+          )
+        : familyExponents(ids, records, (n) => fitEach(ids, used, records, run, () => n))
   const velocities = fittedAndNot(family?.fits ?? fitEach(ids, used, records, run))
   const exponent = family && { exponent: family.summary }
   const { pressureSigma } = options
@@ -451,6 +477,21 @@ function priorsOf(records: Records) {
   }
 }
 
+/** Each powder the rows name that has interior parameters, with its prior impetus. */
+function namedPriors(rows: readonly Row[], records: Records) {
+  const priorOf = priorsOf(records)
+  return [...new Set(rows.map((r) => r.powder))].flatMap((id) => {
+    const powder = records.powders.get(id)
+    return powder?.interior ? [{ powder, interior: powder.interior, prior: priorOf(powder) }] : []
+  })
+}
+
+const priorLine = (n: ReturnType<typeof namedPriors>[number]) => `${n.powder.id}=${n.prior.value}`
+
+/** The `priorLines` a fit with `energy` `prior` of `rows` on `records` gives. */
+export const priorLines = (rows: readonly Row[], records: Records) =>
+  namedPriors(rows, records).map(priorLine)
+
 // the model's impetus is (gamma - 1) times its energy, so the prior fixes the impetus and the model's own gamma turns it into the energy
 const energyOf = (level: number, impetus: number, gamma: number) => (level * impetus) / (gamma - 1)
 
@@ -465,16 +506,12 @@ function fitWithPrior(
   velocitySigma: number,
   exponent: 'family' | undefined,
 ): PowdersFit {
-  const priorOf = priorsOf(records)
   const pressured = rows.filter(
     (r) => r.pressure !== undefined && splitOf(r.cartridge) === 'training',
   )
   if (pressured.length === 0)
     throw new UsageError('--energy prior needs training rows that print a pressure in bar')
-  const named = [...new Set(rows.map((r) => r.powder))].flatMap((id) => {
-    const powder = records.powders.get(id)
-    return powder?.interior ? [{ powder, interior: powder.interior, prior: priorOf(powder) }] : []
-  })
+  const named = namedPriors(rows, records)
   const runs = levels.map((level) => {
     const powders = new Map(records.powders)
     for (const { powder, interior, prior } of named) {
@@ -563,7 +600,7 @@ function fitWithPrior(
     powders,
     notFitted: chosen.fit.notFitted,
     ...(chosen.fit.exponent && { exponent: chosen.fit.exponent }),
-    priorLines: named.map((n) => `${n.powder.id}=${n.prior.value}`),
+    priorLines: named.map(priorLine),
     energy: {
       factor: chosen.level,
       grid: levels,
@@ -580,7 +617,11 @@ export function withFit(
   fit: {
     powders: Record<
       string,
-      { vivacity: { value: number }; pressureExponent?: number; energy?: { value: number } }
+      {
+        vivacity: { value: number }
+        pressureExponent?: number | undefined
+        energy?: { value: number } | undefined
+      }
     >
     notFitted: Record<string, NotFitted>
   },
