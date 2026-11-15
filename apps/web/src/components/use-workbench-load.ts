@@ -278,6 +278,11 @@ function grooveValues(cartridge: CartridgeChoice | undefined, groove: Groove | u
   }
 }
 
+/** The load or link names a firearm that the library, once read, does not hold. */
+function firearmMissing(read: boolean, id: string | undefined, library: { id: string }[]): boolean {
+  return read && id !== undefined && !library.some((f) => f.id === id)
+}
+
 /** The link's values of a record while the record is asked for, loading or missing. */
 function pendingLink<L extends { id: string }>(
   record: unknown,
@@ -1548,9 +1553,7 @@ export function useWorkbenchState() {
     name: r.name,
     data: gunValues((r as FirearmRecord).data),
   }))
-  /** The load or link names a firearm that the library does not hold. */
-  const firearmGone =
-    firearmsRead && firearm !== undefined && !firearmList.some((f) => f.id === firearm)
+  const firearmGone = firearmMissing(firearmsRead, firearm, firearmList)
   /** The chosen firearm's values: its measured bore and groove diameter, freebore and the others. */
   const gunData = firearmList.find((f) => f.id === firearm)?.data
   /** The chosen firearm's active sight, for the Trajectory tab. */
