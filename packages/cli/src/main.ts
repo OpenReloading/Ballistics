@@ -22,6 +22,7 @@ const usage = `usage:
                      [--pressure-sigma <fraction> [--pressure-factor <key>]] [--energy prior]
                      [--records <dir>] [--json | --table]
   ballistics run <operation> --input <file|-> [--records <dir>]
+  ballistics estimate-capacities --out <dir> [--records <dir>]
   ballistics operations
   ballistics --help | --version
 
@@ -78,6 +79,17 @@ records). A body the schema rejects is bad input (exit 2), a 422 answer a refusa
 
 example:
   node packages/cli/dist/bin.js run interior --input packages/cli/examples/interior.json`,
+  'estimate-capacities': `usage: ballistics estimate-capacities --out <dir> [--records <dir>]
+
+Writes a capacity record (provenance kind derived) for each cartridge of the records that has
+a case outline and neither a capacity nor a case with one, to <dir>/capacities/, a folder that
+must not exist yet: the outline volume times the median of capacity over outline volume of the
+cartridges with a capacity record. Pass <dir> as one more --records root: verify and compare
+report its rows as estimatedCapacity, apart from the other rows, and fit does not read them.
+Writes the fill factor, its cartridges, its leave-one-out error and the count as JSON.
+
+example:
+  node packages/cli/dist/bin.js estimate-capacities --out /tmp/estimates`,
   operations: `usage: ballistics operations
 
 Writes every operation of run as JSON: its name, summary, description, and the JSON Schema
@@ -294,6 +306,25 @@ async function operate(
   return await runOperation(name, values.input, roots, io.stderr)
 }
 
+/** Runs `estimate-capacities` with its options and returns its summary. */
+async function estimate(args: string[], env: NodeJS.ProcessEnv) {
+  const { values } = parse(
+    {
+      args,
+      strict: true,
+      options: {
+        out: { type: 'string' },
+        records: { type: 'string', multiple: true },
+      },
+    },
+    commandHelp['estimate-capacities'],
+  )
+  if (values.out === undefined) throw new UsageError(commandHelp['estimate-capacities'])
+  const { writeEstimatedCapacities } = await import('./capacity.ts')
+  const roots = values.records ?? env.BALLISTICS_RECORDS?.split(':').filter(Boolean) ?? []
+  return writeEstimatedCapacities(roots, values.out)
+}
+
 /** What went wrong: bad input (exit 2), a refused run (1) or an internal error (3). */
 type ErrorKind = 'usage' | 'refused' | 'internal'
 
@@ -330,7 +361,9 @@ export function report(error: unknown, argv: string[], io: Io): number {
 export async function run(argv: string[], env: NodeJS.ProcessEnv, io: Io): Promise<number> {
   const [command = '', ...args] = argv
   if (argv.includes('--help') || argv.includes('-h')) {
-    io.stdout(`${command === 'run' || command === 'operations' ? commandHelp[command] : usage}\n`)
+    io.stdout(
+      `${Object.hasOwn(commandHelp, command) ? commandHelp[command as keyof typeof commandHelp] : usage}\n`,
+    )
     return 0
   }
   if (argv.includes('--version')) {
@@ -343,6 +376,10 @@ export async function run(argv: string[], env: NodeJS.ProcessEnv, io: Io): Promi
   try {
     if (command === 'run' || command === 'operations') {
       io.stdout(`${JSON.stringify(await operate(command, args, env, io), null, 2)}\n`)
+      return 0
+    }
+    if (command === 'estimate-capacities') {
+      io.stdout(`${JSON.stringify(await estimate(args, env), null, 2)}\n`)
       return 0
     }
     if (command !== 'verify' && command !== 'compare' && command !== 'fit') {

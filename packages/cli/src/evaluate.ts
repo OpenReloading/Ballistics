@@ -13,7 +13,7 @@ import { InputError } from '@rangefoundry/statistics'
 import { bulletDimensions } from '@rangefoundry/svg-drawings/bullet'
 import { chamberOf, seat } from '@rangefoundry/svg-drawings/seating'
 import { waterDensityGramsPerCm3 } from '@rangefoundry/units'
-import type { Records } from './records.ts'
+import { isEstimated, type Records, withoutEstimates } from './records.ts'
 import type { Row } from './rows.ts'
 import { type Split, splitOf } from './split.ts'
 import { familyOf } from './unseen.ts'
@@ -34,6 +34,7 @@ export const reasons = [
   'missingCartridgeValue',
   'modelRefused',
   'noBulletDrag',
+  'estimatedCapacity',
 ] as const
 
 type Reason = (typeof reasons)[number]
@@ -51,6 +52,8 @@ export interface Outcome {
   /** Structure of the bullet record, else `<core material>-core`, else `unspecified`; `unknown` without a record. */
   construction: string
   prediction: Prediction
+  /** The capacity of the row's cartridge is an estimate (`isEstimated`) and the row would be `noCaseCapacity` without it. */
+  estimatedCapacity?: true
 }
 
 /** The construction of a bullet record as its list item gives it (`bulletListFields`), for grouping. */
@@ -194,16 +197,22 @@ export function outcomes(
   model: InteriorModel,
   wanted: readonly Split[],
 ): Outcome[] {
+  const measured = withoutEstimates(records)
   return rows.flatMap((row, index) => {
     const split = splitOf(row.cartridge)
     if (!wanted.includes(split)) return []
     const family = familyOf(records.powders.get(row.powder))
     const construction = constructionOf(records.bullets.get(row.bullet))
     const prediction = predict(row, records, model)
+    const capacity = records.capacities.get(row.cartridge)
+    // a row refused for a reason checked before the capacity keeps that reason
+    const estimated =
+      capacity && isEstimated(capacity) && loadOf(row, measured) === 'noCaseCapacity'
+    const flag = estimated ? { estimatedCapacity: true as const } : {}
     // the correction applies to a row the model gave a result for, so the other reasons come first
     const corrected = 'velocity' in prediction ? atMuzzle(row, records) : row
     if ('reason' in corrected)
-      return [{ index, row, split, family, construction, prediction: corrected }]
-    return [{ index, row: corrected, split, family, construction, prediction }]
+      return [{ index, row, split, family, construction, prediction: corrected, ...flag }]
+    return [{ index, row: corrected, split, family, construction, prediction, ...flag }]
   })
 }

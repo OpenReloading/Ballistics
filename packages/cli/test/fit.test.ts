@@ -5,7 +5,8 @@ import { describe, expect, it, vi } from 'vitest'
 import { fit, verify } from '../src/commands.ts'
 import { UsageError } from '../src/errors.ts'
 import { loadModel } from '../src/model.ts'
-import { recordRoots, records, rowsCsv, type Spec, writeRows } from './fixture.ts'
+import { loadRecords } from '../src/records.ts'
+import { recordRoots, records, rootWithEstimate, rowsCsv, type Spec, writeRows } from './fixture.ts'
 
 vi.mock('@rangefoundry/tools/catalog', async (original) =>
   (await import('./records-memo.ts')).memoRecords(
@@ -106,6 +107,31 @@ describe('verify with --params fit-on-training', () => {
     const fitted = await verify({ ...options, params: 'fit-on-training' })
     expect(fitted.modelVersion).not.toBe(recorded.modelVersion)
     expect(fitted.inputs).toEqual(recorded.inputs)
+  })
+
+  it('fits on measured capacities only, with an estimate on a training cartridge', async () => {
+    const estimate = rootWithEstimate('30-40-krag', 3.6)
+    const truth = { ...loadRecords([...recordRoots, estimate]), powders: planted.powders }
+    // 5 % slower than the planted truth, so a fit that read the estimate would move the burn coefficient of dp40
+    const krag = [2.0, 2.2, 2.4].map((charge) => ({
+      cartridge: '30-40-krag',
+      charge,
+      velocity: 0.05,
+    }))
+    const run = {
+      ...options,
+      rows: writeRows(rowsCsv([...specs, ...krag], truth)),
+      params: 'fit-on-training',
+    } as const
+    const measured = await verify(run)
+    const estimated = await verify({ ...run, records: [...recordRoots, estimate] })
+    expect(estimated.fit).toEqual(measured.fit)
+    expect(estimated.overall).toEqual(measured.overall)
+    expect(estimated.byPowder).toEqual(measured.byPowder)
+    expect(estimated.byFamily).toEqual(measured.byFamily)
+    const p = (await fit({ ...run, records: [...recordRoots, estimate] })).powders[dp40]
+    expect(p?.vivacity.value).toBeCloseTo(0.66096, 5)
+    expect(p?.rows).toBe(10)
   })
 })
 

@@ -11,6 +11,8 @@ export interface RowError {
   velocity: number
   /** Of a row that prints a pressure in bar. */
   pressure?: number | undefined
+  /** The capacity of the row's cartridge is an estimate: the row is never paired. */
+  capacity?: 'estimated' | undefined
 }
 
 /** Draws and seed of the bootstrap: one fixed seed, so a rerun gives the same standard error. */
@@ -96,10 +98,11 @@ function quantityChange(
   return { rows, cartridges: clusters.length, median: stat('median'), p90: stat('p90') }
 }
 
-/** The change of the median and the P90 of the absolute error, candidate minus baseline, over the rows both sides ran, each with the standard error of a bootstrap that draws whole cartridges with replacement ({@link bootstrap}). */
+/** The change of the median and the P90 of the absolute error, candidate minus baseline, over the rows both sides ran without an estimated capacity, each with the standard error of a bootstrap that draws whole cartridges with replacement ({@link bootstrap}). */
 export function pairedChange(baseline: readonly RowError[], candidate: readonly RowError[]) {
-  const b = new Map(baseline.map((e) => [e.row, e]))
-  const c = new Map(candidate.map((e) => [e.row, e]))
+  const byRow = (errors: readonly RowError[]) =>
+    new Map(errors.flatMap((e) => (e.capacity === 'estimated' ? [] : [[e.row, e] as const])))
+  const [b, c] = [byRow(baseline), byRow(candidate)]
   return {
     ...bootstrap,
     velocity: quantityChange(b, c, 'velocity'),

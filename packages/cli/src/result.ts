@@ -112,6 +112,11 @@ const evaluation = z.object({
     })
     .optional()
     .describe('The groups of `--group-by`: the key by which the rows are grouped and the groups.'),
+  estimatedCapacity: metrics
+    .optional()
+    .describe(
+      'The rows of the split that would be `noCaseCapacity` without the estimated capacity of their cartridge (a capacity record of provenance kind `derived`), present when there are any. They are left out of `overall`, the groups, the fit, the interval and the paired change, where they count as `estimatedCapacity`; the interval coverage here uses the half width of the other rows.',
+    ),
   notInFittedSet: metrics
     .extend({ powders: count.describe('Powders left out, one at a time, each without a value.') })
     .optional()
@@ -219,11 +224,15 @@ export const verifyResult = z.object({
         cartridge: z.string(),
         velocity: signed,
         pressure: signed.optional().describe('Of a row that prints a pressure in bar.'),
+        capacity: z
+          .literal('estimated')
+          .optional()
+          .describe('The capacity of its cartridge is an estimate: `compare` never pairs the row.'),
       }),
     )
     .optional()
     .describe(
-      'With `--per-row`: the error of each used row of the split, for the paired change of `compare`.',
+      'With `--per-row`: the error of each used row of the split, for the paired change of `compare`, the rows of `estimatedCapacity` among them.',
     ),
 })
 
@@ -284,6 +293,9 @@ const compareResult = z.object({
     overall: change,
     byFamily: z.record(z.string(), change),
     grouped: z.record(z.string(), change).optional().describe('Per group of `--group-by`.'),
+    estimatedCapacity: change
+      .optional()
+      .describe('Of the `estimatedCapacity` rows, when either side has them.'),
   }),
 })
 

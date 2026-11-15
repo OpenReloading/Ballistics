@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { verify } from '../src/commands.ts'
 import { Refusal } from '../src/errors.ts'
 import { rowsPath } from './data.ts'
-import { recordRoots, rowsCsv, writeRows } from './fixture.ts'
+import { recordRoots, rootWithEstimate, rowsCsv, writeRows } from './fixture.ts'
 
 vi.mock('@rangefoundry/tools/catalog', async (original) =>
   (await import('./records-memo.ts')).memoRecords(
@@ -133,6 +133,56 @@ describe('verify with --group-by', () => {
 
   it('has no groups without the option', async () => {
     expect((await verify(options)).grouped).toBeUndefined()
+  })
+})
+
+describe('verify with an estimated case capacity', () => {
+  it('reports the rows of the estimate in their own block and leaves the other figures as they were', async () => {
+    const before = await verify({ ...options, perRow: true, groupBy: 'cartridge' })
+    const records = [...recordRoots, rootWithEstimate('7-62-x-54-r', 4.1)]
+    const after = await verify({ ...options, records, perRow: true, groupBy: 'cartridge' })
+    const { noCaseCapacity, ...others } = before.overall.rows.notUsed
+    expect(noCaseCapacity).toBe(1)
+    expect(after.overall).toEqual({
+      ...before.overall,
+      rows: { ...before.overall.rows, notUsed: { ...others, estimatedCapacity: 1 } },
+    })
+    expect(after.grouped?.groups['7-62-x-54-r']?.rows.notUsed).toEqual({ estimatedCapacity: 1 })
+    expect(before.estimatedCapacity).toBeUndefined()
+    expect(after.estimatedCapacity?.rows).toEqual({ inSplit: 1, used: 1, notUsed: {} })
+    // the row of 7-62-x-54-r among the used rows, flagged
+    const estimated = {
+      row: 9,
+      cartridge: '7-62-x-54-r',
+      velocity: expect.any(Number),
+      capacity: 'estimated',
+    }
+    expect(after.rows).toEqual([...(before.rows ?? []), estimated])
+    expect(after.estimatedCapacity?.velocity?.median).toBeCloseTo(
+      Math.abs(after.rows?.at(-1)?.velocity ?? 0),
+      12,
+    )
+  })
+})
+
+describe('verify with an estimated case capacity, rows refused before the capacity', () => {
+  it('keeps their reason and leaves them out of the estimate', async () => {
+    const rows = writeRows(
+      rowsCsv([
+        { cartridge: '308-match', charge: 2.0, velocity: 0.01 },
+        { cartridge: '7-62-x-54-r', charge: 2.0, velocity: 0 },
+        { cartridge: '7-62-x-54-r', powder: 'demo-powder-plain', charge: 2.0, velocity: 0 },
+        { cartridge: '7-62-x-54-r', powder: 'no-powder', charge: 2.0, velocity: 0 },
+      ]),
+    )
+    const records = [...recordRoots, rootWithEstimate('7-62-x-54-r', 4.1)]
+    const r = await verify({ ...options, rows, records })
+    expect(r.overall.rows.notUsed).toEqual({
+      unknownPowder: 1,
+      noPowderModel: 1,
+      estimatedCapacity: 1,
+    })
+    expect(r.estimatedCapacity?.rows).toEqual({ inSplit: 1, used: 1, notUsed: {} })
   })
 })
 

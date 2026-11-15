@@ -4,7 +4,7 @@ import { compare, verify } from '../src/commands.ts'
 import { Refusal } from '../src/errors.ts'
 import { loadModel } from '../src/model.ts'
 import { rowsPath } from './data.ts'
-import { recordRoots, rowsCsv, writeRows } from './fixture.ts'
+import { recordRoots, rootWithEstimate, rowsCsv, writeRows } from './fixture.ts'
 
 vi.mock('@rangefoundry/tools/catalog', async (original) =>
   (await import('./records-memo.ts')).memoRecords(
@@ -63,6 +63,21 @@ describe('compare', () => {
     expect(
       (await compare({ ...options, groupBy: 'cartridge' }, saved, worse)).change.grouped,
     ).toBeUndefined()
+  })
+
+  it('gives the change of the estimated capacity rows when either side has them', async () => {
+    const records = [...recordRoots, rootWithEstimate('7-62-x-54-r', 4.1)]
+    const r = await compare({ ...options, records }, 'm3', 'm3')
+    // the row of the estimate prints no pressure, unlike the other rows
+    expect(r.change.estimatedCapacity).toEqual({
+      usedRows: 0,
+      velocityMedian: 0,
+      velocityP90: 0,
+      pressureMedian: null,
+      pressureP90: null,
+      intervalCoverage: 0,
+    })
+    expect((await compare(options, 'm3', 'm3')).change.estimatedCapacity).toBeUndefined()
   })
 
   it('takes a saved verify result as the baseline', async () => {

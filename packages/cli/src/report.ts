@@ -50,6 +50,7 @@ function screenLines(name: string, s: VerifyResult['screen']) {
 export function verifyTable(r: VerifyResult): string {
   const groups = [
     rowsOf('all', r.overall),
+    ...(r.estimatedCapacity ? [rowsOf('estimated capacity', r.estimatedCapacity)] : []),
     ...Object.entries(r.byFamily).map(([k, m]) => rowsOf(`family ${k}`, m)),
     ...Object.entries(r.byPowder).map(([k, m]) => rowsOf(`powder ${k}`, m)),
     ...Object.entries(r.grouped?.groups ?? {}).map(([k, m]) => rowsOf(`${r.grouped?.by} ${k}`, m)),
@@ -107,6 +108,9 @@ export function compareTable(r: CompareResult): string {
     ...Object.entries(r.change.grouped ?? {}).map(([k, c]) =>
       changeRow(`${r.candidate.grouped?.by} ${k}`, c),
     ),
+    ...(r.change.estimatedCapacity
+      ? [changeRow('estimated capacity', r.change.estimatedCapacity)]
+      : []),
   ]
   return [
     `baseline ${r.baseline.model}  version ${r.baseline.modelVersion}`,

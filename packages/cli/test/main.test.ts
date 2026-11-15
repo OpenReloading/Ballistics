@@ -252,6 +252,11 @@ describe('exit codes', () => {
   it.each([
     ['run', ['run', 'interior', '--input', 'x.json', '--table'], /usage: ballistics run </],
     ['operations', ['operations', '--table'], /usage: ballistics operations\n/],
+    [
+      'estimate-capacities',
+      ['estimate-capacities', '--table'],
+      /usage: ballistics estimate-capacities /,
+    ],
   ])('is 2 with the help of %s for an unknown option of it', async (_, args, help) => {
     const { code, stderr } = await cli(args, {}, true)
     expect(code).toBe(2)
@@ -284,6 +289,21 @@ describe('exit codes', () => {
     ])
     expect(code).toBe(2)
     expect(stderr).toContain(':2: charge_g is not a number')
+  })
+})
+
+describe('estimate-capacities', () => {
+  it('writes the estimates and their summary, and is 2 without --out', async () => {
+    const out = mkdtempSync(join(tmpdir(), 'cli-estimates-'))
+    const r = await cli(['estimate-capacities', '--out', out, ...data.slice(2)])
+    expect(r.code).toBe(0)
+    const summary = JSON.parse(r.stdout)
+    expect(summary).toMatchObject({
+      command: 'estimate-capacities',
+      folder: join(out, 'capacities'),
+    })
+    expect(summary.written).toBeGreaterThan(0)
+    expect((await cli(['estimate-capacities', ...data.slice(2)])).code).toBe(2)
   })
 })
 
