@@ -1541,10 +1541,9 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
 function GoneFirearmNote() {
   const { firearmGone } = useLoad()
   const { t } = useTranslation()
-  if (!firearmGone) return null
   return (
-    <p className="note wide">
-      {t('The chosen firearm is no longer in this browser; its values stay.')}
+    <p role="status" className="note wide">
+      {firearmGone && t('The chosen firearm is no longer in this browser; its values stay.')}
     </p>
   )
 }

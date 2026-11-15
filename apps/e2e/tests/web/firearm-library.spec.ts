@@ -151,7 +151,9 @@ test('a saved load whose firearm is not in this browser says so on the Gun card'
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' })
   await chooseSavedLoad(page)
   await expect(
-    loadForm(page).getByText('The chosen firearm is no longer in this browser; its values stay.'),
+    loadForm(page).getByRole('status').filter({
+      hasText: 'The chosen firearm is no longer in this browser; its values stay.',
+    }),
   ).toBeVisible()
 })
 
