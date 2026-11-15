@@ -21,6 +21,12 @@ describe('verifyTable', () => {
     expect(text).not.toContain('not used')
     expect(line(text, 'all')?.split(/ +/)).toEqual(['all', '4/4', '1.2', '5.0', '-', '-', '100.0'])
   })
+
+  it('marks a screen with the version of the build that evaluated it, and only a screen', async () => {
+    const r = await verify(options, 'm3')
+    expect(line(verifyTable(r), 'screen')).toBeUndefined()
+    expect(line(verifyTable({ ...r, screen: { version: 'b0b0' } }), 'screen')).toContain('b0b0')
+  })
 })
 
 describe('compareTable', () => {
@@ -36,5 +42,16 @@ describe('compareTable', () => {
     expect(cells(3, 0.0123)?.slice(0, 4)).toEqual(['all', '+3', '+1.23', '-0.05'])
     expect(cells(-2, null)?.slice(0, 3)).toEqual(['all', '-2', '-'])
     expect(cells(0, 0)?.slice(0, 3)).toEqual(['all', '0', '0.00'])
+  })
+
+  it('marks the side that is a screen', async () => {
+    const r = await compare(options, 'm3', 'm3')
+    const screened = (side: 'baseline' | 'candidate') =>
+      compareTable({ ...r, [side]: { ...r[side], screen: { version: 'b0b0' } } })
+    expect(line(compareTable(r), 'baseline screen')).toBeUndefined()
+    expect(line(compareTable(r), 'candidate screen')).toBeUndefined()
+    expect(line(screened('baseline'), 'baseline screen')).toContain('b0b0')
+    expect(line(screened('baseline'), 'candidate screen')).toBeUndefined()
+    expect(line(screened('candidate'), 'candidate screen')).toContain('b0b0')
   })
 })

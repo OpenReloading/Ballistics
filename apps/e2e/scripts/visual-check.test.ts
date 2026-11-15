@@ -26,7 +26,7 @@ describe('visual check arguments', () => {
 describe('page bar texts in the language shown', () => {
   it('takes the catalogue text and leaves a text it lacks in English', () => {
     expect(inLanguage('Open', { Open: 'Öffnen' })).toBe('Öffnen')
-    expect(inLanguage('Example load', { Open: 'Öffnen' })).toBe('Example load')
+    expect(inLanguage('Saved loads', { Open: 'Öffnen' })).toBe('Saved loads')
     expect(inLanguage('Open', { Open: { one: 'a', other: 'b' } })).toBe('Open')
   })
 })

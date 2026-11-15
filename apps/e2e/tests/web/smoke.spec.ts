@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
-import { loadForm } from './workbench.ts'
+import { openSavedLoad } from './workbench.ts'
 import { runLine } from './workbench-run.ts'
 
 const pages = [
@@ -73,7 +73,7 @@ test('a record page opens another without a page load, back and forward too', as
   expect(failed).toEqual([])
 })
 
-test('the workbench runs the example load in the browser as the API runs its file', async ({
+test('the workbench runs a saved load in the browser as the API runs its file', async ({
   page,
   request,
 }) => {
@@ -85,10 +85,8 @@ test('the workbench runs the example load in the browser as the API runs its fil
   })
   await gotoHydrated(page, './workbench')
   // the start card inside the window: in the frame the workspace keeps its height
-  const example = page.getByRole('button', { name: 'Try the example load' })
-  await expect(example).toBeInViewport()
-  await example.click()
-  await expect(loadForm(page).locator('.field-flag-seating')).toHaveCount(2)
+  await expect(page.locator('.start-card')).toBeInViewport()
+  await openSavedLoad(page)
   const line = await runLine(page)
   const shown = /peak (\d+) bar, .* (\d+) m\/s/.exec(line ?? '')
   expect(shown, line ?? 'no result line').not.toBeNull()

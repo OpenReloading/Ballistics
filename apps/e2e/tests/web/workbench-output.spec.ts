@@ -4,7 +4,7 @@ import { barButton } from './bar.ts'
 import { showGerman } from './german.ts'
 import { choosePreset, storeUnits } from './units.ts'
 import { loadForm } from './workbench.ts'
-import { runExample } from './workbench-run.ts'
+import { runSavedLoad } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page, 'us', {}))
 
@@ -21,7 +21,7 @@ test('the report prints the range with its unit, the inputs with their digits an
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 650 })
-  await runExample(page)
+  await runSavedLoad(page)
   await page.emulateMedia({ media: 'print' })
   await expect(
     report(page).getByText(/^Corner-case range, input tolerances: \d+ to \d+ psi$/),
@@ -40,7 +40,7 @@ test('the report prints the range with its unit, the inputs with their digits an
 test('the Print menu leaves out the sections unticked, also on the next visit', async ({
   page,
 }) => {
-  await runExample(page)
+  await runSavedLoad(page)
   const menu = await printMenu(page)
   for (const name of ['Chart', 'Notes', 'Ladder', 'Barrel length study'])
     await menu.getByRole('menuitemcheckbox', { name }).click()
@@ -61,7 +61,7 @@ test('the Print menu leaves out the sections unticked, also on the next visit', 
   await expect(report(page).getByText(/^Pressure limits of the cartridge/)).toBeVisible()
 
   await page.emulateMedia({ media: 'screen' })
-  await runExample(page)
+  await runSavedLoad(page)
   const again = await printMenu(page)
   await expect(again.getByRole('menuitemcheckbox', { name: 'Chart' })).toHaveAttribute(
     'aria-checked',
@@ -76,7 +76,7 @@ test('the Print menu leaves out the sections unticked, also on the next visit', 
 
 // a run of the same load draws the same chart: the chart is not drawn again, the report keeps it
 test('the report keeps its chart after the same load runs again', async ({ page }) => {
-  await runExample(page)
+  await runSavedLoad(page)
   const copy = report(page).locator('.report-chart svg')
   await expect(copy).toBeAttached()
   const first = await copy.elementHandle()
@@ -90,7 +90,7 @@ test('the report keeps its chart after the same load runs again', async ({ page 
 })
 
 test('the chart data dialog downloads the curves and the results as CSV', async ({ page }) => {
-  await runExample(page)
+  await runSavedLoad(page)
   await page.getByRole('button', { name: 'Chart data' }).click()
   const dialog = page.getByRole('dialog', { name: 'Chart data' })
   const [curves] = await Promise.all([
@@ -120,14 +120,14 @@ test('the chart data dialog downloads the curves and the results as CSV', async 
 })
 
 test('the free recoil shows the momentum of bullet and gas', async ({ page }) => {
-  await runExample(page)
+  await runSavedLoad(page)
   await expect(page.locator('.results-head .readout-list')).toContainText(
     /Momentum \d+\.\d\d lbf·s \(bullet \d+\.\d\d, gas \d+\.\d\d\)/,
   )
 })
 
 test('every interior field says what it is', async ({ page }) => {
-  await runExample(page)
+  await runSavedLoad(page)
   const form = loadForm(page)
   await expect(form.getByLabel(/^Bore diameter/)).toHaveAccessibleDescription(/across the lands/)
   await expect(form.getByLabel(/^Bullet mass/)).toHaveAccessibleDescription(/Mass of one bullet/)
@@ -140,7 +140,7 @@ test('in German the pressure range keeps its gap and the Powder card head its me
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 650 })
-  await runExample(page)
+  await runSavedLoad(page)
   await showGerman(page)
   // the gap between the unit's text and the range's text, px: their boxes may overlap where the range is set flush right in a wider cell
   const gap = await page.locator('.results-head .readout-keys .readout-wide').evaluate((tile) => {
@@ -221,7 +221,7 @@ test('the Powders tab keeps a typed target the same pressure when the units chan
   page,
 }) => {
   await stubSavePicker(page)
-  await runExample(page)
+  await runSavedLoad(page)
   const tab = await openTab(page, 'Powders')
   await tab
     .locator('label')
@@ -246,7 +246,7 @@ test('the Powders tab copies its table as CSV and keeps its mode and filters wit
   test.setTimeout(240_000)
   await stubSavePicker(page)
   await page.setViewportSize({ width: 1280, height: 900 })
-  await runExample(page)
+  await runSavedLoad(page)
   let tab = await openTab(page, 'Powders')
   await tab
     .locator('label')

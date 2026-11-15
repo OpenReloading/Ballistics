@@ -178,6 +178,7 @@ export const powderRow = (p: Powder, m: Manufacturer): IndexRow<PowderItem> => (
       grainForm: p.grainForm,
       propellantBase: p.propellantBase,
       country: p.country,
+      scope: p.scope,
       interior: interiorItem(p),
     }),
   },

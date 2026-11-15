@@ -54,16 +54,17 @@ export interface ChooserSelect<R> {
   keep: (row: R, value: string) => boolean
 }
 
-/** The options of the values `of` the rows give, each labeled by `label` with its number of rows. */
+/** The options of the values `of` the rows give, each labeled by `label` with its number of rows; a row with several values counts once for each. */
 export function countedOptions<R>(
   rows: readonly R[],
-  of: (row: R) => string | undefined,
+  of: (row: R) => string | readonly string[] | undefined,
   label: (value: string) => string,
 ) {
   const counts = new Map<string, number>()
   for (const r of rows) {
-    const v = of(r)
-    if (v) counts.set(v, (counts.get(v) ?? 0) + 1)
+    const values = of(r)
+    for (const v of typeof values === 'string' ? [values] : (values ?? []))
+      if (v) counts.set(v, (counts.get(v) ?? 0) + 1)
   }
   return [...counts]
     .map(([value, n]) => ({ value, name: label(value), n }))
@@ -146,6 +147,8 @@ export interface ChooserKind<R extends ChooserRow> {
   href?: (row: R) => string | undefined
   /** Values missing (`complete-records.ts`): "Complete records only" hides it, else it follows the complete ones with a mark. */
   incomplete?: (row: R) => boolean
+  /** Why the row cannot be chosen: it stays listed, greyed out with the reason. */
+  unavailable?: (row: R) => Message | undefined
 }
 
 type Catalogue<R> =
@@ -230,6 +233,7 @@ function ResultRow<R extends ChooserRow>({
   onChoose,
 }: RowsProps<R> & { row: R; index: number }) {
   const { t } = useTranslation()
+  const unavailable = kind.unavailable?.(row)
   return (
     // keyboard: the search box owns the focus and moves the highlight
     // oxlint-disable-next-line jsx-a11y/click-events-have-key-events -- see above
@@ -240,10 +244,11 @@ function ResultRow<R extends ChooserRow>({
       // the search box keeps the focus when a row is pressed
       onMouseDown={(e) => e.preventDefault()}
       aria-selected={index === active}
+      aria-disabled={unavailable ? true : undefined}
       className="bd-row"
       data-active={index === active || undefined}
       onMouseMove={() => index !== active && onActive(index)}
-      onClick={() => onChoose(row)}
+      onClick={() => unavailable || onChoose(row)}
     >
       <span className="bd-name">
         {row.manufacturerName && <span className="bd-maker">{row.manufacturerName}</span>}
@@ -256,6 +261,7 @@ function ResultRow<R extends ChooserRow>({
           )}
           {kind.incomplete?.(row) && <MissingMark />}
         </span>
+        {unavailable && <span className="bd-reason">{t(unavailable)}</span>}
       </span>
       {kind.columns.map((c) => (
         <span key={c.label}>{c.cell(row, system, t)}</span>
@@ -457,7 +463,7 @@ function ChooserBody<R extends ChooserRow>({
   }
 
   function choose(row: R | undefined) {
-    if (row) onChoose(row)
+    if (row && !kind.unavailable?.(row)) onChoose(row)
   }
 
   const listed = shown.length > 0

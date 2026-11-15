@@ -1,8 +1,8 @@
 import { expect, type Locator, type Page, test } from '@playwright/test'
 import { AxeBuilder } from './a11y.ts'
 import { storeUnits } from './units.ts'
-import { applyExampleLoad, loadForm } from './workbench.ts'
-import { runExample } from './workbench-run.ts'
+import { loadForm, openSavedLoad } from './workbench.ts'
+import { runSavedLoad } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
@@ -17,7 +17,7 @@ const box = async (e: Locator) => {
 
 /** Runs a 5-step charge ladder, opens the Ladder table tab and gives the ladder target section. */
 async function ladderTarget(page: Page) {
-  await runExample(page)
+  await runSavedLoad(page)
   const form = loadForm(page)
   await form.getByLabel(/^Ladder steps/).fill('5')
   await form.getByLabel(/^Step size/).fill('0.15')
@@ -186,7 +186,7 @@ test('the notice line and the notes keep their box through a result with warning
 }) => {
   test.setTimeout(60_000)
   await page.goto('/workbench')
-  await applyExampleLoad(page)
+  await openSavedLoad(page)
   const line = page.locator('.run-line')
   const charge = loadForm(page).getByLabel(/^Charge mass/)
   const seen = async () => ({
@@ -224,7 +224,7 @@ test('a ladder step size error in the Powder card moves no card and adds no scro
   test.setTimeout(60_000)
   await page.setViewportSize({ width: 1280, height: 650 })
   await page.goto('/workbench')
-  await applyExampleLoad(page)
+  await openSavedLoad(page)
   const form = loadForm(page)
   await form.getByLabel(/^Ladder steps/).fill('5')
   const step = form.getByLabel(/^Step size/)

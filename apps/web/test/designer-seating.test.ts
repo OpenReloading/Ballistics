@@ -11,15 +11,15 @@ import {
   reduce,
 } from '../src/lib/cartridge-designer.ts'
 import { cavityVolumeFraction } from '../src/lib/cavity-range.ts'
-import { exampleRecords } from '../src/lib/example-data.ts'
 import { fieldValueFromText } from '../src/lib/field-spec.ts'
 import { presetUnits, unitsOf, waterDensityGramsPerCm3 } from '../src/lib/units.ts'
+import { fixtureRecords } from './fixtures/load.ts'
 import { sheetRecord } from './records.ts'
 
 const metric = presetUnits('metric-grams')
 const win308 = () => fromRecord(sheetRecord('cip-308-win-2008-09-23'), metric)
 
-const { bullet: example } = exampleRecords
+const { bullet: example } = fixtureRecords
 const bullet: BulletDimensions = {
   diameter: example.diameter,
   length: example.length,

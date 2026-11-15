@@ -147,6 +147,7 @@ export function RecordSearch<T extends { id: string }>({
   clear,
   find,
   arrange,
+  unavailable,
 }: {
   label: string
   describe: (item: T) => string
@@ -172,6 +173,8 @@ export function RecordSearch<T extends { id: string }>({
   clear?: { label: string; onClear: () => void } | undefined
   /** Orders and filters the matches, as "Complete records only" (`complete-records.ts`). */
   arrange?: ((items: T[]) => T[]) | undefined
+  /** A match listed but not choosable, its reason in `describe`. */
+  unavailable?: ((item: T) => boolean) | undefined
 } & (
   | { kind: ApiKind; find?: Find<T> }
   /** The matches of the typed text in place of the API search. */
@@ -228,7 +231,7 @@ export function RecordSearch<T extends { id: string }>({
   const submit = (id: string) => {
     if (id.startsWith('extra:')) onExtra?.(id.slice('extra:'.length))
     const item = items.find((i) => i.id === id)
-    if (item) onSelect(item)
+    if (item && !unavailable?.(item)) onSelect(item)
     setQ('')
     combobox.closeDropdown()
   }
@@ -294,7 +297,11 @@ export function RecordSearch<T extends { id: string }>({
               </Combobox.Option>
             ))}
             {items.map((item) => (
-              <Combobox.Option value={item.id} key={item.id}>
+              <Combobox.Option
+                value={item.id}
+                key={item.id}
+                disabled={unavailable?.(item) ?? false}
+              >
                 {describe(item)}
               </Combobox.Option>
             ))}

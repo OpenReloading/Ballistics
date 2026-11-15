@@ -2,7 +2,6 @@ import { interior } from '@rangefoundry/ballistics'
 import { describe, expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import type { InteriorResponse } from '../src/lib/api-types.ts'
-import { exampleInterior } from '../src/lib/example-data.ts'
 import {
   alignedAxes,
   chartEvents,
@@ -18,10 +17,11 @@ import { interiorBody } from '../src/lib/interior-input.ts'
 import type { PlaybackResult } from '../src/lib/playback.ts'
 import { formatQuantity, presetUnits } from '../src/lib/units.ts'
 import { defined } from './defined.ts'
+import { fixtureInterior } from './fixtures/load.ts'
 
-const { load } = interiorBody(exampleInterior)
-const run = (change: Partial<typeof exampleInterior> = {}): PlaybackResult => {
-  const r = interior(interiorBody({ ...exampleInterior, ...change }).load)
+const { load } = interiorBody(fixtureInterior)
+const run = (change: Partial<typeof fixtureInterior> = {}): PlaybackResult => {
+  const r = interior(interiorBody({ ...fixtureInterior, ...change }).load)
   if (!r.valid) throw new Error(`example invalid: ${r.reason}`)
   return r
 }
@@ -57,7 +57,7 @@ describe('series', () => {
 })
 
 describe('chartEvents', () => {
-  const z1 = exampleInterior.formZ1 as number
+  const z1 = fixtureInterior.formZ1 as number
 
   it('gives 10 %, peak, 95 % burnt, burnout when in the barrel and muzzle, by time', () => {
     const keys = chartEvents(r, undefined, english.t).map((e) => e.key)
@@ -268,7 +268,7 @@ describe('interiorOption', () => {
     background: '#g',
   }
   const system = presetUnits('us')
-  const slower = run({ charge: exampleInterior.charge * 0.95 })
+  const slower = run({ charge: fixtureInterior.charge * 0.95 })
   const steps = [
     { n: 1, result: slower },
     { n: 2, result: r },
@@ -390,7 +390,7 @@ describe('interiorOption', () => {
   })
 
   it('puts the selected step peak dot at its own peak, also below a close higher one, without a label', () => {
-    const close = run({ charge: exampleInterior.charge * 0.999 })
+    const close = run({ charge: fixtureInterior.charge * 0.999 })
     const o = interiorOption({
       steps: [
         { n: 1, result: close },

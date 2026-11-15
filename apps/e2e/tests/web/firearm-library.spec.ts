@@ -2,7 +2,7 @@ import { expect, type Page, test } from '@playwright/test'
 import { AxeBuilder } from './a11y.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
-import { runExample } from './workbench-run.ts'
+import { runSavedLoad } from './workbench-run.ts'
 
 /** The UUID of the `n`th seeded firearm. */
 const firearmId = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`
@@ -33,7 +33,7 @@ async function seed(page: Page, names: string[], extra: object = {}, first = 0) 
 
 const status = (page: Page) => page.locator('.page-bar-status .bar-count')
 
-test('the firearm library searches its table, counts the example and offers to clear a search without a match', async ({
+test('the firearm library searches its table, counts its firearms and offers to clear a search without a match', async ({
   page,
 }) => {
   await page.addInitScript(() => {
@@ -42,40 +42,23 @@ test('the firearm library searches its table, counts the example and offers to c
   await page.goto('/firearms')
   await seed(page, ['Bench rifle', 'Hunting rifle'])
   await page.reload()
-  await expect(status(page)).toHaveText('3 firearms')
-  // the browser's firearms first, the example load's rifle last
-  await expect(page.locator('tbody tr[data-row]').last()).toContainText(
-    'Example rifle, 308 Win. Example',
-  )
+  await expect(status(page)).toHaveText('2 firearms')
   const search = page.getByRole('searchbox', { name: 'Search' })
   await search.fill('bench')
-  await expect(status(page)).toHaveText('1 of 3 firearms')
+  await expect(status(page)).toHaveText('1 of 2 firearms')
   await expect(page).toHaveURL(/[?&]q=bench/)
   await expect(page.getByRole('link', { name: 'Bench rifle', exact: true })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Hunting rifle', exact: true })).toHaveCount(0)
   await search.fill('zzz')
   await expect(page.getByText('No firearms match these filters.')).toBeVisible()
   await page.getByRole('button', { name: 'Clear filters' }).last().click()
-  await expect(status(page)).toHaveText('3 firearms')
+  await expect(status(page)).toHaveText('2 firearms')
   // no catalogue of firearms: one source, no source filter
   await expect(page.getByRole('button', { name: /^Source: / })).toHaveCount(0)
   // a row's link opens the firearm in the editor beside the cards
   await page.getByRole('link', { name: 'Bench rifle', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Bench rifle', level: 2 })).toBeVisible()
-  await expect(page.locator('.library-list li')).toHaveCount(3)
-  // the example opens read-only; Copy to edit starts an editable copy
-  await page
-    .locator('.library-list')
-    .getByRole('button', { name: 'Example rifle, 308 Win.', exact: true })
-    .click()
-  await expect(
-    page.getByRole('heading', { name: 'Example rifle, 308 Win.', level: 2 }),
-  ).toBeVisible()
-  await expect(page.getByRole('textbox', { name: 'Name' })).toHaveCount(0)
-  await page.getByRole('button', { name: 'Copy to edit' }).click()
-  await expect(page.getByRole('textbox', { name: 'Name' })).toHaveValue(
-    'Example rifle, 308 Win. copy',
-  )
+  await expect(page.locator('.library-list li')).toHaveCount(2)
 })
 
 test('the firearm table fits a 1280 px window with its row menu, one save status and the strip as high as on the other lists', async ({
@@ -90,22 +73,20 @@ test('the firearm table fits a 1280 px window with its row menu, one save status
   await expect(page.locator('tbody tr[data-row]').first()).toBeVisible()
   await expect.poll(stripTop).toBe(56)
   await page.goto('/firearms')
-  await expect(page.locator('tbody tr[data-row]')).toHaveCount(1)
+  await expect(page.locator('.mantine-EmptyState-root')).toBeVisible()
+  await expect(page.locator('tbody tr[data-row]')).toHaveCount(0)
   await expect.poll(stripTop).toBe(56)
-  // the example alone: Export CSV says why it exports nothing; nothing open, nothing to print
+  // no firearm: Export CSV has nothing to export; nothing open, nothing to print
   await expect(page.getByRole('button', { name: 'Export CSV' })).toHaveAttribute(
     'aria-disabled',
     'true',
-  )
-  await expect(page.getByRole('button', { name: 'Export CSV' })).toHaveAccessibleDescription(
-    'No firearm saved in this browser yet; the example is not exported.',
   )
   await expect(page.getByRole('button', { name: 'Print' })).toHaveAccessibleDescription(
     'Open a firearm to print its data card.',
   )
   await seed(page, ['Bench rifle'])
   await page.reload()
-  await expect(page.locator('tbody tr[data-row]')).toHaveCount(2)
+  await expect(page.locator('tbody tr[data-row]')).toHaveCount(1)
   // no hint line under a listed firearm
   await expect(page.getByText('Your firearms in this browser show here.')).toHaveCount(0)
   // the columns fit the box, the twist carries its hand, the row menu is in view
@@ -204,7 +185,7 @@ test('the zero air and drag factor of a mount fill the trajectory form with the 
     },
     1,
   )
-  await runExample(page)
+  await runSavedLoad(page)
   await page.getByRole('tab', { name: 'Trajectory', exact: true }).click()
   await expect(page.getByRole('table', { name: /^Trajectory: / })).toBeVisible()
   // the load's firearm fills the trajectory form's sight, zero air and drag factor anchored, and a field's unit switch is named after it too

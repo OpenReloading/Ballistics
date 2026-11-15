@@ -147,6 +147,8 @@ const {
   provenance: _powderProvenance,
   composition: _powderComposition,
   listedCartridges: _powderListed,
+  burnRateCharts: _powderCharts,
+  scope: _powderScope,
   ...powderShape
 } = powder.shape
 
@@ -176,8 +178,9 @@ const compositionDraft: z.ZodObject<{
 
 /**
  * The fields of a powder in the powder designer while the draft is unfinished: any of the powder
- * record's fields but `id`, `manufacturer`, `name`, `country`, `provenance` and `listedCartridges`
- * (it needs a source naming it, which the designer does not write), every one optional, nested
+ * record's fields but `id`, `manufacturer`, `name`, `country`, `provenance`, the maker statements
+ * `burnRateCharts` and `scope`, and `listedCartridges` (it needs a source naming it, which the
+ * designer does not write), every one optional, nested
  * objects likewise, in stored units, the numbers without the powder record's bounds (a half-typed
  * value stays in the draft). The designer builds a {@link Powder} from it and checks that against
  * `powder`.
@@ -255,7 +258,15 @@ export const cartridgeOverrides = overridesOf(
 export type PowderDraft = Overrides<
   Omit<
     Powder,
-    'id' | 'manufacturer' | 'name' | 'country' | 'provenance' | 'composition' | 'listedCartridges'
+    | 'id'
+    | 'manufacturer'
+    | 'name'
+    | 'country'
+    | 'provenance'
+    | 'composition'
+    | 'listedCartridges'
+    | 'burnRateCharts'
+    | 'scope'
   >
 > & {
   composition?:

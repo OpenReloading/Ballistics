@@ -1,12 +1,12 @@
 import { expect, type Page, test } from '@playwright/test'
 import { storeUnits } from './units.ts'
-import { runExample } from './workbench-run.ts'
+import { runSavedLoad } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
-/** Runs the example load and gives the playback's Play button. */
+/** Runs the fixture load and gives the playback's Play button. */
 async function runPlayback(page: Page) {
-  await runExample(page)
+  await runSavedLoad(page)
   // the strip draws once the seated figure of the cartridge preview has arrived
   await expect(page.locator('.strip-bullet')).toBeAttached()
   return page.getByRole('button', { name: 'Play', exact: true })
@@ -80,7 +80,9 @@ test('the chart readout slider follows the keys and a value change, and is clear
 test('Escape hides the chart tooltip with the pointer or the focus where it is', async ({
   page,
 }) => {
-  await runExample(page)
+  await runSavedLoad(page)
+  // the vivacity chart draws last, and the last chart is the one hovered
+  await expect(page.getByRole('img', { name: /^Dynamic vivacity/ })).toBeVisible()
   const chart = page.locator('.echart [role="img"]').last()
   const tip = page.locator('.echart div[style*="position: absolute"]')
   const box = await chart.boundingBox()

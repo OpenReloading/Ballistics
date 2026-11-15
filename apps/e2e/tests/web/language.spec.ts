@@ -3,7 +3,7 @@ import { AxeBuilder, height, problems } from './a11y.ts'
 import { showGerman } from './german.ts'
 import { gotoHydrated } from './nav.ts'
 import { settingsEntry, storeUnits } from './units.ts'
-import { runExample } from './workbench-run.ts'
+import { runSavedLoad } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
@@ -101,9 +101,9 @@ test('the Database list and a record page show in German', async ({ page }) => {
   await expect(page.getByRole('heading', { name: /^Quellen/ })).toBeVisible()
 })
 
-test('the workbench in German after the example run has no axe finding', async ({ page }) => {
+test('the workbench in German after the fixture load run has no axe finding', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height })
-  await runExample(page)
+  await runSavedLoad(page)
   await showGerman(page)
   await expect(page.getByRole('tab', { name: 'Ladeleiter-Tabelle', exact: true })).toBeVisible()
   // the sampled band's note follows the result and makes the notes list scroll

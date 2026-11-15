@@ -9,8 +9,8 @@ import { gotoHydrated } from './nav.ts'
 import { openFit } from './powder-tune-run.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
-import { applyExampleLoad, loadForm } from './workbench.ts'
-import { runExample } from './workbench-run.ts'
+import { loadForm, openSavedLoad } from './workbench.ts'
+import { runSavedLoad } from './workbench-run.ts'
 
 // The states a visitor reaches after a click: a record page of each `[id]` route, the workbench after a run and every dialog or drawer; a11y-sweep.spec.ts has the pages as they load.
 
@@ -77,14 +77,14 @@ async function showResults(page: Page) {
   if (await tab.isVisible()) await tab.click()
 }
 
-/** The Saved loads drawer with the example load saved in it. */
+/** The Saved loads drawer with the fixture load saved in it. */
 async function openSavedLoads(page: Page) {
   // a native picker cannot be driven: a save goes to the browser's records, as the app's own
   await page.addInitScript(() => {
     ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
   })
-  await runExample(page)
+  await runSavedLoad(page)
   await (await barButton(page, 'Save')).click()
   await (await barButton(page, 'Open')).click()
   await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
@@ -134,9 +134,9 @@ const states: State[] = [
     },
   })),
   {
-    name: 'workbench after the example run',
+    name: 'workbench after the fixture load run',
     open: async (page, check) => {
-      await runExample(page)
+      await runSavedLoad(page)
       await showResults(page)
       await expect(page.locator('.interior-chart .echart [role="img"]')).toBeVisible()
       await check('chart')
@@ -188,7 +188,7 @@ const states: State[] = [
   {
     name: 'Result notes',
     open: async (page, check) => {
-      await runExample(page)
+      await runSavedLoad(page)
       await showResults(page)
       await page.locator('.result-notes').getByRole('button', { name: /^More/ }).click()
       await dialogOf('Result notes')(page)
@@ -198,7 +198,7 @@ const states: State[] = [
   {
     name: 'Chart data',
     open: async (page, check) => {
-      await runExample(page)
+      await runSavedLoad(page)
       await showResults(page)
       await page.getByRole('button', { name: 'Chart data' }).click()
       await dialogOf('Chart data')(page)
@@ -274,7 +274,7 @@ const states: State[] = [
           value: { writeText: () => Promise.reject(new Error('refused')) },
         })
       })
-      await runExample(page)
+      await runSavedLoad(page)
       await (await barButton(page, 'Save options')).click()
       await page.getByRole('menuitem', { name: 'Copy JSON for the API' }).click()
       const dialog = await dialogOf('Load file for the API: copy it by hand')(page)
@@ -521,7 +521,7 @@ test('the selected segment of a segmented control has a border in forced colors'
 }) => {
   await page.emulateMedia({ forcedColors: 'active' })
   await gotoHydrated(page, '/workbench')
-  await applyExampleLoad(page)
+  await openSavedLoad(page)
   const indicator = loadForm(page).locator('.mantine-SegmentedControl-indicator').first()
   await expect(indicator).toBeVisible()
   // forced colors remove the fill: the border is all that marks the segment

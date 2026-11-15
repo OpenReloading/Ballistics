@@ -3,10 +3,10 @@ import { interior, recordResistance } from '@rangefoundry/ballistics'
 import { powder } from '@rangefoundry/schema'
 import { interiorBody } from '@rangefoundry/use-cases'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
-import { exampleInterior } from '../src/lib/example-data.ts'
 import { interiorRequest, rampAtJump } from '../src/lib/interior-request.ts'
 import { tuneActionKey, tuneBaseKey, tuneLoadKey, writeTuneLoad } from '../src/lib/powder-tune.ts'
 import { readTuneAction, readTuneBase, readTuneLoad, readTuneTable } from '../src/lib/tune-load.ts'
+import { fixtureInterior } from './fixtures/load.ts'
 
 beforeEach(() => {
   const store = new Map<string, string>()
@@ -18,7 +18,7 @@ beforeEach(() => {
 })
 afterEach(() => vi.unstubAllGlobals())
 
-const values = { ...exampleInterior, boreArea: undefined }
+const values = { ...fixtureInterior, boreArea: undefined }
 const record = JSON.parse(
   readFileSync(
     new URL('../../../packages/catalog/records/powders/demo-powder-dp40.json', import.meta.url),
