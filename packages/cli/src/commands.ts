@@ -5,7 +5,7 @@ import { compareKeys, type SourceRecord, sourceRecord } from '@rangefoundry/sche
 import { readPublishedLoads } from '@rangefoundry/tools/catalog'
 import { Refusal, UsageError } from './errors.ts'
 import { type InteriorModel, outcomes } from './evaluate.ts'
-import { fitPowders, notFittedReasons, type PressureKey, withFit } from './fit.ts'
+import { fitPowders, notFittedReasons, type PressureKey, priorLines, withFit } from './fit.ts'
 import { changeOf, evaluate, type Grouping, metricsOf } from './metrics.ts'
 import { builtInName, fitFiles, loadModel, type Model } from './model.ts'
 import { pairedChange, type RowError, rowErrors } from './paired.ts'
@@ -15,6 +15,7 @@ import {
   type CompareResult,
   type Evaluation,
   type FitResult,
+  fitResult,
   notice,
   schemaVersion,
   type VerifyResult,
@@ -41,6 +42,10 @@ export interface Options {
   warn?: ((text: string) => void) | undefined
   /** `fit-on-training` evaluates with the burn coefficients fitted to the training rows; default `records`. */
   params?: 'records' | 'fit-on-training' | undefined
+  /** Path of a saved `fit` result of the same rows and records whose values the run evaluates without fitting, a screen. */
+  fit?: string | undefined
+  /** With `exponent` `family`: path of a saved `fit` result of the same rows, records, velocity sigma and build whose family choice the run takes instead of making it. */
+  family?: string | undefined
   /** Of the fit, a fraction of the velocity; default 0.03. */
   velocitySigma?: number | undefined
   /** Fits with the printed pressures, this sigma a fraction of the pressure, and a factor per key of `pressureFactor`; none without it. */
@@ -65,6 +70,7 @@ type FitOptions = Pick<
   | 'pressureSigma'
   | 'pressureFactor'
   | 'exponent'
+  | 'family'
   | 'energy'
 >
 
@@ -167,6 +173,83 @@ type Published = NonNullable<VerifyResult['published']>
 
 type Prepared = ReturnType<typeof prepare>
 
+/** The params line of a fit run's version: its velocity sigma, whether it chose the exponent per family, its pressure sigma and key, and its energy priors. */
+function paramsLine(
+  velocitySigma: number,
+  family: boolean,
+  pressure: { sigma: number; by: string } | undefined,
+  priorLines: readonly string[] | undefined,
+) {
+  // the priors come from records the rows may not name, which the records lines of the version leave out
+  const energyLine = priorLines
+    ? ` energy prior ${sha256(priorLines.toSorted(compareKeys).join('\n'))}`
+    : ''
+  return `params fit-on-training velocity-sigma ${velocitySigma}${family ? ' exponent family' : ''}${pressure ? ` pressure-sigma ${pressure.sigma} pressure-factor ${pressure.by}` : ''}${energyLine}`
+}
+
+/** The summary of a fit for an evaluation. */
+function summaryOf(
+  fit: Pick<
+    FitResult,
+    'velocitySigma' | 'powders' | 'notFitted' | 'exponent' | 'pressure' | 'energy'
+  >,
+): NonNullable<Evaluation['fit']> {
+  const reasons = Object.values(fit.notFitted)
+  const notFitted = Object.fromEntries(
+    notFittedReasons.flatMap((reason) => {
+      const n = reasons.filter((r) => r === reason).length
+      return n > 0 ? [[reason, n]] : []
+    }),
+  )
+  return {
+    velocitySigma: fit.velocitySigma,
+    powders: Object.keys(fit.powders).length,
+    notFitted,
+    ...(fit.exponent && {
+      exponent: {
+        pooled: fit.exponent.pooled,
+        families: Object.fromEntries(
+          Object.entries(fit.exponent.families).map(([name, f]) => [name, f.exponent]),
+        ),
+      },
+    }),
+    ...(fit.pressure && { pressure: fit.pressure }),
+    ...(fit.energy && { energy: { factor: fit.energy.factor } }),
+  }
+}
+
+/** The version of `model` on the data, with the fit's files and the `params` line in a fit run. */
+const versionOf = (model: Model, data: Prepared, params: string | undefined) =>
+  modelVersion(
+    params === undefined ? model : { ...model, files: [...model.files, ...fitFiles()] },
+    data.inputs,
+    params,
+  )
+
+/** A saved `fit` result of the rows and records of `data`; a `Refusal` for one of other inputs. */
+function savedFit(path: string, option: 'fit' | 'family', data: Prepared) {
+  const saved = savedResult(path, option)
+  if (saved.inputs.rows !== data.inputs.rows || saved.inputs.records !== data.inputs.records)
+    throw new Refusal(`the --${option} fit was run on other rows or records`)
+  return saved
+}
+
+/** The family choice of the `--family` file, which a fit of `data` under `model` at `velocitySigma` would make itself; a `Refusal` for a file of another choice, sigma or build. */
+function familyChoice(path: string, data: Prepared, model: Model, velocitySigma: number) {
+  const saved = savedFit(path, 'family', data)
+  if (!saved.exponent) throw new Refusal('the --family fit was run without --exponent family')
+  if (saved.energy) throw new Refusal('the --family fit was run with --energy prior')
+  if (saved.velocitySigma !== velocitySigma)
+    throw new Refusal(
+      `the --family fit has velocity sigma ${saved.velocitySigma}, this run ${velocitySigma}`,
+    )
+  // the version fingerprints the model and fit sources, so an equal one means this build makes the same choice
+  const params = paramsLine(saved.velocitySigma, true, saved.pressure, undefined)
+  if (versionOf(model, data, params) !== saved.modelVersion)
+    throw new Refusal('the --family fit was made by another build of the model or the fit')
+  return saved.exponent
+}
+
 /** The fit of a run under `model`, the records with its values laid over, its version line and its summary for an evaluation. */
 function fitOf(options: FitOptions, data: Prepared, model: Model) {
   // load tables print no spread; ANSI/SAAMI Z299.4-2025 expects tested ammunition within 90 fps of the table, about 3 %
@@ -177,23 +260,22 @@ function fitOf(options: FitOptions, data: Prepared, model: Model) {
   // one factor on all printed pressures and one per key both set the pressure level with no rule for which comes first
   if (energy !== undefined && pressureSigma !== undefined)
     throw new UsageError('--energy prior and --pressure-sigma do not combine')
+  if (options.family !== undefined && exponent === undefined)
+    throw new UsageError('--family needs --exponent family')
+  // with --energy prior the family choice is made at each energy-level factor, so one saved choice does not stand for it
+  if (options.family !== undefined && energy !== undefined)
+    throw new UsageError('--family and --energy prior do not combine')
+  const family =
+    options.family === undefined
+      ? undefined
+      : familyChoice(options.family, data, model, velocitySigma)
   const fit = fitPowders(data.rows, data.records, model.interior, velocitySigma, {
     exponent,
+    family,
     pressureSigma,
     pressureFactor,
     energy,
   })
-  const reasons = Object.values(fit.notFitted)
-  const notFitted = Object.fromEntries(
-    notFittedReasons.flatMap((reason) => {
-      const n = reasons.filter((r) => r === reason).length
-      return n > 0 ? [[reason, n]] : []
-    }),
-  )
-  // the priors come from records the rows may not name, which the records lines of the version leave out
-  const energyLine = fit.priorLines
-    ? ` energy prior ${sha256(fit.priorLines.toSorted(compareKeys).join('\n'))}`
-    : ''
   return {
     powders: fit.powders,
     notFitted: fit.notFitted,
@@ -201,34 +283,10 @@ function fitOf(options: FitOptions, data: Prepared, model: Model) {
     energy: fit.energy,
     velocitySigma,
     records: withFit(data.records, fit),
-    params: `params fit-on-training velocity-sigma ${velocitySigma}${exponent === undefined ? '' : ' exponent family'}${fit.pressure ? ` pressure-sigma ${fit.pressure.sigma} pressure-factor ${fit.pressure.by}` : ''}${energyLine}`,
-    summary: {
-      velocitySigma,
-      powders: Object.keys(fit.powders).length,
-      notFitted,
-      ...(fit.exponent && {
-        exponent: {
-          pooled: fit.exponent.pooled,
-          families: Object.fromEntries(
-            Object.entries(fit.exponent.families).map(([name, f]) => [name, f.exponent]),
-          ),
-        },
-      }),
-      ...(fit.pressure && { pressure: fit.pressure }),
-      ...(fit.energy && { energy: { factor: fit.energy.factor } }),
-    },
+    params: paramsLine(velocitySigma, exponent !== undefined, fit.pressure, fit.priorLines),
+    summary: summaryOf({ ...fit, velocitySigma }),
   }
 }
-
-type Fitted = ReturnType<typeof fitOf>
-
-/** The version of `model` on the data, with the fit's files and its params line in a fit run. */
-const versionOf = (model: Model, data: Prepared, fitted: Fitted | undefined) =>
-  modelVersion(
-    fitted ? { ...model, files: [...model.files, ...fitFiles()] } : model,
-    data.inputs,
-    fitted?.params,
-  )
 
 /** The outcomes of the rows of `split` of each powder with interior parameters, predicted as a powder not in the fitted set (without its parameters, so without a value), and the number of those powders. */
 function leftOut({ rows, records }: Prepared, model: InteriorModel, split: Split) {
@@ -251,10 +309,34 @@ function leftOut({ rows, records }: Prepared, model: InteriorModel, split: Split
 /** An evaluation with the error of each used row of the split, which `verify` adds with `--per-row` and `compare` pairs. */
 type Evaluated = Evaluation & { rows?: RowError[] | undefined }
 
-/** What the model selected by `spec` gives on the split, with the burn coefficients fitted under it in a `fit-on-training` run; refuses a split with no evaluable row. */
+/** The values of the saved fit of `--fit` for an evaluation of `model`, which carries the fit's version and the version a fit of this build with the fit's options has; a `Refusal` for a fit of another model. */
+function screenOf(path: string, data: Prepared, model: Model) {
+  const saved = savedFit(path, 'fit', data)
+  if (saved.model !== model.name)
+    throw new Refusal(`the --fit fit is of the model ${saved.model}, this run ${model.name}`)
+  const params = paramsLine(
+    saved.velocitySigma,
+    saved.exponent !== undefined,
+    saved.pressure,
+    saved.energy && priorLines(data.rows, data.records),
+  )
+  return {
+    records: withFit(data.records, saved),
+    modelVersion: saved.modelVersion,
+    screen: { version: versionOf(model, data, params) },
+    summary: summaryOf(saved),
+  }
+}
+
+/** What the model selected by `spec` gives on the split, with the burn coefficients fitted under it in a `fit-on-training` run, or those of the `--fit` file; refuses a split with no evaluable row. */
 async function evaluateModel(spec: string, options: Options, data: Prepared): Promise<Evaluated> {
   const model = await loadModel(spec)
-  const fitted = options.params === 'fit-on-training' ? fitOf(options, data, model) : undefined
+  const fitted =
+    options.fit !== undefined
+      ? screenOf(options.fit, data, model)
+      : options.params === 'fit-on-training'
+        ? fitOf(options, data, model)
+        : undefined
   const records = fitted?.records ?? data.records
   const wanted: Split[] = options.split === 'training' ? ['training'] : [options.split, 'training']
   const all = outcomes(data.rows, records, model.interior, wanted)
@@ -272,7 +354,10 @@ async function evaluateModel(spec: string, options: Options, data: Prepared): Pr
     options.leaveOnePowderOut && leftOut({ ...data, records }, model.interior, options.split)
   return {
     model: model.name,
-    modelVersion: versionOf(model, data, fitted),
+    modelVersion:
+      fitted && 'modelVersion' in fitted
+        ? fitted.modelVersion
+        : versionOf(model, data, fitted?.params),
     ...evaluation,
     ...(unseen && {
       notInFittedSet: {
@@ -281,6 +366,7 @@ async function evaluateModel(spec: string, options: Options, data: Prepared): Pr
       },
     }),
     ...(fitted && { fit: fitted.summary }),
+    ...(fitted && 'screen' in fitted && { screen: fitted.screen }),
     rows: rowErrors(inSplit),
   }
 }
@@ -304,32 +390,42 @@ export async function verify(options: Options, spec = builtInName): Promise<Veri
   }
 }
 
-/** The `verify` result a baseline file holds; a `UsageError` for a file that is not one. */
-function savedResult(path: string): VerifyResult {
+/** What each file option holds and how its messages name it. */
+const savedKinds = {
+  baseline: { command: 'verify', schema: verifyResult, noun: 'the baseline' },
+  fit: { command: 'fit', schema: fitResult, noun: 'the fit' },
+  family: { command: 'fit', schema: fitResult, noun: 'the family fit' },
+} as const
+
+/** The `verify` result a `--baseline` file holds, or the `fit` result of a `--fit` or `--family` file; a `UsageError` for a file that is not one. */
+function savedResult(path: string, option: 'baseline'): VerifyResult
+function savedResult(path: string, option: 'fit' | 'family'): FitResult
+function savedResult(path: string, option: keyof typeof savedKinds): VerifyResult | FitResult {
+  const { command, schema, noun } = savedKinds[option]
   let text: string
   try {
     text = readFileSync(path, 'utf8') // NOSONAR: the path is the argument the user gave
   } catch (error) {
     throw new UsageError(
-      `the --baseline file cannot be read: ${(error as NodeJS.ErrnoException).code}`,
+      `the --${option} file cannot be read: ${(error as NodeJS.ErrnoException).code}`,
     )
   }
   let json: unknown
   try {
     json = JSON.parse(text.replace(/^\uFEFF/, ''))
   } catch {
-    throw new UsageError('the --baseline file is not JSON')
+    throw new UsageError(`the --${option} file is not JSON`)
   }
   // before the schema, which would call a result of the earlier rule "not a verify result"
-  if ((json as { command?: unknown } | null)?.command === 'verify') {
+  if ((json as { command?: unknown } | null)?.command === command) {
     const salt = (json as { splitSalt?: unknown }).splitSalt
     if (salt !== splitSalt)
       throw new Refusal(
-        `the baseline was split by another rule (salt ${typeof salt === 'string' ? salt : 'none'}, this run ${splitSalt}): its splits hold other rows`,
+        `${noun} was split by another rule (salt ${typeof salt === 'string' ? salt : 'none'}, this run ${splitSalt}): its splits hold other rows`,
       )
   }
-  const parsed = verifyResult.safeParse(json)
-  if (!parsed.success) throw new UsageError('the baseline file is not a verify result')
+  const parsed = schema.safeParse(json)
+  if (!parsed.success) throw new UsageError(`${noun} file is not a ${command} result`)
   return parsed.data
 }
 
@@ -346,7 +442,7 @@ async function baselineOf(spec: string, options: Options, data: Prepared): Promi
     inputs,
     published: _p,
     ...evaluation
-  } = savedResult(spec)
+  } = savedResult(spec, 'baseline')
   if (split !== options.split)
     throw new Refusal(`the baseline is a ${split} result, this run is ${options.split}`)
   if (inputs.rows !== data.inputs.rows || inputs.records !== data.inputs.records)
@@ -413,7 +509,7 @@ export async function fit(options: FitOptions, spec = builtInName): Promise<FitR
     inputs: data.inputs,
     ...(data.published && { published: data.published }),
     model: model.name,
-    modelVersion: versionOf(model, data, fitted),
+    modelVersion: versionOf(model, data, fitted.params),
     split: 'training',
     splitSalt,
     velocitySigma: fitted.velocitySigma,
