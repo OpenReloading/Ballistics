@@ -42,7 +42,7 @@ function publishedLines(p: VerifyResult['published']) {
 function screenLines(name: string, s: VerifyResult['screen']) {
   if (!s) return []
   return [
-    `${name}screen: the values of a saved fit, not fitted in this run; this build's version ${s.version}`,
+    `${name}screen: the values of a saved fit, not fitted in this run; evaluated at version ${s.version}`,
   ]
 }
 
