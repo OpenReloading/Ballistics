@@ -136,7 +136,28 @@
           "description": "Diameter of a perforation."
         }
       },
-      "minProperties": 1,
+      "anyOf": [
+        {
+          "required": [
+            "length"
+          ]
+        },
+        {
+          "required": [
+            "diameter"
+          ]
+        },
+        {
+          "required": [
+            "web"
+          ]
+        },
+        {
+          "required": [
+            "perforationDiameter"
+          ]
+        }
+      ],
       "description": "Dimensions of the kernel as the maker states them."
     },
     "bulkDensity": {

@@ -145,7 +145,9 @@ const powderGrainDimensions = z
     perforationDiameter: kernelLength('Diameter of a perforation.'),
   })
   .refine((d) => Object.values(d).some((v) => v !== undefined), { message: 'needs a dimension' })
-  .meta({ minProperties: 1 })
+  .meta({
+    anyOf: ['length', 'diameter', 'web', 'perforationDiameter'].map((k) => ({ required: [k] })),
+  })
   .describe('Dimensions of the kernel as the maker states them.')
 
 /** UN numbers as the safety data sheet prints them; one powder may ship under several, by packaging. */
