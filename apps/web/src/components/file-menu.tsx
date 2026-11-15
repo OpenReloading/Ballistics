@@ -7,7 +7,6 @@ import {
   parseRef,
   type UserRecord,
   type UserRecordKind,
-  userRecord,
 } from '@rangefoundry/schema'
 import {
   type Dispatch,
@@ -41,7 +40,6 @@ import type { ImportFile, ImportReport as Report } from '../lib/data-files.ts'
 import { dateTimeText, localDay } from '../lib/dates.ts'
 import { download } from '../lib/download.ts'
 import { errorText } from '../lib/error-text.ts'
-import { exampleFirearm } from '../lib/example-data.ts'
 import {
   pickFiles,
   readHandleText,
@@ -103,9 +101,6 @@ import { useShortcuts } from './shortcuts.tsx'
 /** A question that drops what the page holds, answered in the app's confirm dialog. */
 const ask = (title: string, confirmLabel: string) =>
   confirmDialog({ title, confirmLabel, danger: true })
-
-/** The records the pages resolve themselves, never stored. */
-const builtIn = userRecord.parse(exampleFirearm)
 
 type Of<K extends UserRecordKind> = Extract<UserRecord, { kind: K }>
 
@@ -181,7 +176,7 @@ export interface FileState {
   unsaved: boolean
 }
 
-/** What a page calls before it starts a new record (New, Reset, Example, a catalogue start). */
+/** What a page calls before it starts a new record (New, Reset, a catalogue start). */
 export interface FileMenuHandle {
   /** Asks before dropping unsaved changes, on yes a new record (a new id, no file, not saved), false when the user keeps them, a promise only when the dialog asks; `next` is the new data (a page with deferred data must pass it), else the render after `then`, which runs on yes (after the promise it returns settles). */
   startNew(next?: unknown, then?: () => unknown): true | Promise<boolean>
@@ -230,10 +225,10 @@ async function keepLinked(record: UserRecord, carried: UserRecord[]) {
   await Promise.all(linkedRecordsOf(record, carried).map(putRecordIfAbsent)).catch(() => {})
 }
 
-/** `refNote` of `opened` against the browser store and the built-in example rifle; empty when the store cannot be read. */
+/** `refNote` of `opened` against the browser store; empty when the store cannot be read. */
 async function refsOf(opened: UserRecord[], t: Translator['t']) {
   const stored = await storedRecords().catch(() => undefined)
-  return stored ? refNote(opened, [builtIn, ...stored.records], t) : ''
+  return stored ? refNote(opened, stored.records, t) : ''
 }
 
 const keptText: Record<string, Message | ''> = {
@@ -542,14 +537,14 @@ function restoreFolderInto(
     .catch(() => {})
 }
 
-/** The Open menu's Examples section: the page's starting points. */
-function ExampleItems({ examples }: { examples: FileMenuItem[] | undefined }) {
+/** The Open menu's section of the page's starting points. */
+function StartItems({ starts }: { starts: FileMenuItem[] | undefined }) {
   const { t } = useTranslation()
-  if (!examples || examples.length === 0) return null
+  if (!starts || starts.length === 0) return null
   return (
     <>
-      <Menu.Label>{t('Examples')}</Menu.Label>
-      {examples.map((x) => (
+      <Menu.Label>{t('Start a load')}</Menu.Label>
+      {starts.map((x) => (
         <Menu.Item key={x.label} onClick={x.run}>
           {x.label}
         </Menu.Item>
@@ -879,7 +874,7 @@ function unsavedState(
 const allowedFolder = (f: { handle: FileSystemDirectoryHandle; allowed: boolean } | undefined) =>
   f?.allowed ? f.handle : undefined
 
-/** Open lists the browser's records, a file, Import, Paste JSON and the page's examples; Save's menu Save as, share link, JSON, Export all and the workspace folder. */
+/** Open lists the browser's records, a file, Import, Paste JSON and the page's starting points; Save's menu Save as, share link, JSON, Export all and the workspace folder. */
 function FileMenuOf<K extends UserRecordKind>({
   kind,
   name,
@@ -898,7 +893,7 @@ function FileMenuOf<K extends UserRecordKind>({
   idle,
   onList,
   browserList,
-  examples,
+  starts,
   reportBox,
   ref,
 }: {
@@ -935,8 +930,8 @@ function FileMenuOf<K extends UserRecordKind>({
   onList?: () => void
   /** With `autosaved` and no `onList`: the menu's own list of the browser's records (the page has none). */
   browserList?: boolean
-  /** The Open menu's Examples section: the page's starting points. Stable, so the memo holds. */
-  examples?: FileMenuItem[]
+  /** The Open menu's section of the page's starting points. Stable, so the memo holds. */
+  starts?: FileMenuItem[]
   /** The label of the Report issue box that adds the record's share link (the designers). */
   reportBox?: string
   ref?: Ref<FileMenuHandle>
@@ -1575,7 +1570,7 @@ function FileMenuOf<K extends UserRecordKind>({
             {t('Import…')}
           </Menu.Item>
           <Menu.Item onClick={() => setPasted('')}>{t('Paste JSON…')}</Menu.Item>
-          <ExampleItems examples={examples} />
+          <StartItems starts={starts} />
         </Menu.Dropdown>
       </Menu>
       <Button.Group className="save-group">

@@ -2,6 +2,7 @@ import { expect, type Page, test } from '@playwright/test'
 import { AxeBuilder } from './a11y.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
+import { chooseSavedLoad, fixtureLoad, loadForm } from './workbench.ts'
 import { runSavedLoad } from './workbench-run.ts'
 
 /** The UUID of the `n`th seeded firearm. */
@@ -137,6 +138,23 @@ test('a record link does not put its loading status in the alert line', async ({
   expect(
     await page.evaluate(() => (window as unknown as { seen: { loading: boolean } }).seen.loading),
   ).toBe(false)
+})
+
+test('a saved load whose firearm is not in this browser says so on the Gun card', async ({
+  page,
+}) => {
+  await storeUnits(page)
+  await page.goto('/workbench')
+  await page.locator('html[data-hydrated]').waitFor({ state: 'attached' })
+  await putRecords(page, [fixtureLoad])
+  await page.reload()
+  await page.locator('html[data-hydrated]').waitFor({ state: 'attached' })
+  await chooseSavedLoad(page)
+  await expect(
+    loadForm(page).getByRole('status').filter({
+      hasText: 'The chosen firearm is no longer in this browser; its values stay.',
+    }),
+  ).toBeVisible()
 })
 
 test('the zero air and drag factor of a mount fill the trajectory form with the factor shown with its source', async ({

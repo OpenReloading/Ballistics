@@ -3,7 +3,6 @@
 import {
   Accordion,
   ActionIcon,
-  Button,
   Menu,
   NativeSelect,
   Radio,
@@ -19,7 +18,7 @@ import {
   type OmittedEffect,
   type Trajectory,
 } from '@rangefoundry/ballistics'
-import { type Bullet, toSi, type UserRecord } from '@rangefoundry/schema'
+import { type Bullet, toSi } from '@rangefoundry/schema'
 import dynamic from 'next/dynamic'
 import {
   type ReactNode,
@@ -39,16 +38,7 @@ import { fetchRecord } from '../lib/api-fetch.ts'
 import type { BulletSummary } from '../lib/api-types.ts'
 import { type BulletValues, bulletDrag, typedBullet } from '../lib/bullet.ts'
 import { refusalText, translateMessage } from '../lib/core-messages.ts'
-import { loadExample as exampleData, exampleFirearmIn } from '../lib/example-data.ts'
-import { exampleFields } from '../lib/examples.ts'
-import {
-  type FieldSpec,
-  type Fields,
-  fieldError,
-  siValues,
-  specText,
-  switchFields,
-} from '../lib/field-spec.ts'
+import { type FieldSpec, type Fields, fieldError, siValues, specText } from '../lib/field-spec.ts'
 import { sightPicker } from '../lib/firearm.ts'
 import { type ManufacturerNames, productLabel } from '../lib/manufacturers.ts'
 import { inputsQuery, linkParams, queryFields, tabQuery } from '../lib/query.ts'
@@ -557,8 +547,7 @@ export type TrajectoryHandle = { query: () => string }
 
 /** The firearm record and configuration a sight option names (`<record>/<configuration>/<mount>`). */
 function targetOf(o: { value: string; label: string } | undefined): Result['target'] {
-  // the example rifle is never stored, so nothing can be stored with it
-  if (!o || o.value.startsWith(`${exampleData.firearm.id}/`)) return
+  if (!o) return
   const [first, last] = [o.value.indexOf('/'), o.value.lastIndexOf('/')]
   return { record: o.value.slice(0, first), config: o.value.slice(first + 1, last), label: o.label }
 }
@@ -916,19 +905,17 @@ function neededOf(
   ]
 }
 
-/** The alert, the prompt, or before the first result what is still needed and the example. */
+/** The alert, the prompt, or before the first result what is still needed. */
 function FormNotes({
   alert,
   attempt,
   emptyState,
   needed,
-  fillExample,
 }: {
   alert: ReactNode
   attempt: Attempt
   emptyState: boolean
   needed: readonly Message[]
-  fillExample: () => void
 }) {
   const { t } = useTranslation()
   return (
@@ -950,11 +937,6 @@ function FormNotes({
                 ))}
               </ul>
             </>
-          )}
-          {exampleData && (
-            <Button variant="default" onClick={fillExample}>
-              {t('Use the example')}
-            </Button>
           )}
         </section>
       )}
@@ -1064,7 +1046,7 @@ function useLastResult(attempt: Attempt) {
   }
   const result = attempt.kind === 'ok' ? attempt.result : last
   const stale = attempt.kind !== 'ok' && result !== undefined
-  return { result, stale, clearLast: () => setLast(undefined) }
+  return { result, stale }
 }
 
 /** The only trajectory UI: muzzle velocity (m/s), bullet, twist and sight come from the load, what it lacks is offered here; a link with `tab=trajectory` fills it once from its `tab.` keys. */
@@ -1115,9 +1097,7 @@ export function TrajectoryForm({
   const [twistHand, setTwistHand] = useState<'right' | 'left'>('right')
   // from 62em the chart fills the results column's height
   const wide = useMediaQuery('(width >= 62em)')
-  const [sights, setSights] = useState(() =>
-    sightPicker([], exampleFirearmIn(t) as unknown as UserRecord, t),
-  )
+  const [sights, setSights] = useState(() => sightPicker([], t))
   const [sight, setSight] = useState('')
   const [paper, setPaper] = useState<PaperSize>('a4')
   /** The chosen firearm was gone when the list was read again. */
@@ -1188,7 +1168,7 @@ export function TrajectoryForm({
   )
   const [debounced] = useDebouncedValue(inputs, 150)
   const { errors, attempt } = useMemo(() => evaluate(debounced, t), [debounced, t])
-  const { result, stale, clearLast } = useLastResult(attempt)
+  const { result, stale } = useLastResult(attempt)
 
   const staleText = staleTextOf(attempt, t)
   const summary = summaryOf(attempt, stale, system, t)
@@ -1223,23 +1203,6 @@ export function TrajectoryForm({
     />
   )
   const group = (keys: string[]) => allFields.filter((s) => keys.includes(s.key)).map(field)
-
-  function reset() {
-    loading.current?.abort()
-    form.reset()
-    form.setValues(startFields(system))
-    setSource('database')
-    setManualModel('G7')
-    setRecordModel('G7')
-    setRecord({ status: 'none' })
-    setChoice(undefined)
-    setTwistHand('right')
-    clearLast()
-    setSight('')
-    setSightGone(false)
-    setDragFrom(undefined)
-    setDesign(undefined)
-  }
 
   /** A mount without them empties the fields, so no other firearm's factor stays applied. */
   function fillZero(get: (key: (typeof zeroKeys)[number]) => number | undefined, source?: string) {
@@ -1286,7 +1249,7 @@ export function TrajectoryForm({
   const readSights = () => {
     storedRecords()
       .then(({ records }) => {
-        const picker = sightPicker(records, exampleFirearmIn(t) as unknown as UserRecord, t)
+        const picker = sightPicker(records, t)
         setSights(picker)
         if (sight && !picker.options.some((o) => o.value === sight)) {
           setSight('')
@@ -1311,19 +1274,6 @@ export function TrajectoryForm({
     else form.setFieldValue('twist', { text: '', si: undefined })
     setTwistHand(s.fill.twistHand)
     fillZero((key) => s.fill[key], s.fill.dragFactorSource)
-  }
-
-  function fillExample() {
-    reset()
-    form.setValues(
-      switchFields(
-        exampleFields(allFields, exampleData.trajectory, system),
-        allFields,
-        system,
-        roundedFieldText,
-      ),
-    )
-    setSource('manual')
   }
 
   /** `linkedChoice`: the BC index of a copied link. */
@@ -1551,7 +1501,7 @@ export function TrajectoryForm({
     </form>
   )
 
-  // before the first result with the tab's own bullet, what is missing or the example; with the load's bullet the prompt alone
+  // before the first result with the tab's own bullet, what is missing; with the load's bullet the prompt alone
   const emptyState = own && !result && attempt.kind !== 'ok'
   const needed = neededOf(source, record, fields)
 
@@ -1562,13 +1512,7 @@ export function TrajectoryForm({
     </p>
   )
   const formNotes = (
-    <FormNotes
-      alert={alert}
-      attempt={attempt}
-      emptyState={emptyState}
-      needed={needed}
-      fillExample={fillExample}
-    />
+    <FormNotes alert={alert} attempt={attempt} emptyState={emptyState} needed={needed} />
   )
   const staleLine = stale && <p className="stale-line">{staleText}</p>
   const printButton = <RangeCardMenu setPaper={setPaper} />

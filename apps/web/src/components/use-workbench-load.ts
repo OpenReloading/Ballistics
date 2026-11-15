@@ -60,7 +60,6 @@ import { cavityVolumeFraction } from '../lib/cavity-range.ts'
 import { powderIncomplete } from '../lib/complete-records.ts'
 import { refusalText, translateMessage } from '../lib/core-messages.ts'
 import { timeText } from '../lib/dates.ts'
-import { exampleFirearmIn, loadExample } from '../lib/example-data.ts'
 import { exampleFields } from '../lib/examples.ts'
 import {
   type FieldSpec,
@@ -279,18 +278,9 @@ function grooveValues(cartridge: CartridgeChoice | undefined, groove: Groove | u
   }
 }
 
-/** The example rifle's sight in round numbers of the shown units, 100 yd and 2 in, not 109 yd and 1.9685 in. */
-function exampleSight<S extends { sightHeight: number; zeroRange: number }>(
-  firearm: string | undefined,
-  chosen: S | undefined,
-  system: UnitSystem,
-): S | undefined {
-  if (firearm !== loadExample.firearm.id || !chosen) return chosen
-  return {
-    ...chosen,
-    sightHeight: system.length.toSi(Math.round(system.length.fromSi(chosen.sightHeight))),
-    zeroRange: system.range.toSi(chosen.zeroRange),
-  }
+/** The load or link names a firearm that the library, once read, does not hold. */
+function firearmMissing(read: boolean, id: string | undefined, library: { id: string }[]): boolean {
+  return read && id !== undefined && !library.some((f) => f.id === id)
 }
 
 /** The link's values of a record while the record is asked for, loading or missing. */
@@ -1547,6 +1537,8 @@ export function useWorkbenchState() {
   const [powderDesignList, setPowderDesignList] = useState<PowderDesign[]>([])
   /** The firearm library of this browser, for the Gun and barrel picker. */
   const [firearms, setFirearms] = useState<FirearmRecord[]>([])
+  /** The library was read once: before that, an empty list says nothing about a firearm. */
+  const [firearmsRead, setFirearmsRead] = useState(false)
   const [firearm, setFirearm] = useState<string>()
   /** An opened load's gun weight comes from its firearm, which is not read yet. */
   const gunPending = useRef(false)
@@ -1556,19 +1548,16 @@ export function useWorkbenchState() {
   /** The name the user typed; undefined: the generated name follows the load. */
   const [customName, setCustomName] = useState<string>()
   const [figureView, setFigureView] = useState<FigureView>('cartridge')
-  /** The library, then the example's built-in rifle (`gunPicker`). */
-  const firearmList = [...firearms, exampleFirearmIn(t)].map((r) => ({
+  const firearmList = firearms.map((r) => ({
     id: r.id,
     name: r.name,
     data: gunValues((r as FirearmRecord).data),
   }))
+  const firearmGone = firearmMissing(firearmsRead, firearm, firearmList)
   /** The chosen firearm's values: its measured bore and groove diameter, freebore and the others. */
   const gunData = firearmList.find((f) => f.id === firearm)?.data
   /** The chosen firearm's active sight, for the Trajectory tab. */
-  const chosenSight = sightOptions(
-    [loadExample.firearm, ...firearms].filter((r) => r.id === firearm) as UserRecord[],
-  )[0]?.fill
-  const sight = exampleSight(firearm, chosenSight, system)
+  const sight = sightOptions(firearms.filter((r) => r.id === firearm))[0]?.fill
   /** By name: the cards register their slots, the figure fills them. */
   const [seatingSlots, setSeatingSlots] = useState<Partial<Record<SeatingSlotName, HTMLElement>>>(
     {},
@@ -1606,6 +1595,7 @@ export function useWorkbenchState() {
       .then(async ({ records }) => {
         // the firearms read the records only: set before the waits, so a tuning handoff that follows the opened load's firearm finds it
         setFirearms(records.filter((r): r is (typeof firearms)[number] => r.kind === 'firearm'))
+        setFirearmsRead(true)
         const [bullets, cartridges] = await Promise.all([
           userBullets(records),
           userCartridges(records),
@@ -1718,11 +1708,7 @@ export function useWorkbenchState() {
   const [status, setStatus] = useState<Status>('')
   // remounts the cartridge search so it drops an earlier query when a preset chooses the cartridge
   const [searchKey, setSearchKey] = useState(0)
-  const [previewInitial, setPreviewInitial] = useState<{
-    bullet?: string | undefined
-    barrel?: number
-    seating?: Seating
-  }>()
+  const [previewInitial, setPreviewInitial] = useState<{ seating?: Seating }>()
   /** SI values the preview wrote into the fields. */
   const [previewed, setPreviewedState] = useState<Previewed>({})
   // the run reads the seating at once, as `seatedNow` (#938): a run pressed while a seating arrives plans the seating ladder from it, not from the render before
@@ -1933,7 +1919,7 @@ export function useWorkbenchState() {
     setEdits((n) => n + 1)
   }
 
-  /** Volume and travel follow while empty or still holding its last value (or already its new one, as the example's); a typed value stays. */
+  /** Volume and travel follow while empty or still holding its last value (or already its new one, as an opened load's); a typed value stays. */
   function follow(values: Seated) {
     setSeated(values)
     // the first seating reported is the start, also without volume or travel; the preview reseating itself (a new bullet shape or range) starts again there
@@ -1949,7 +1935,7 @@ export function useWorkbenchState() {
       field: seatedField,
     })
     if (Object.keys(next).length > 0) markChanged()
-    // a value that already was the seated one (the example's) takes the seating's text: same SI value
+    // a value that already was the seated one (an opened load's) takes the seating's text: same SI value
     const seatedText = withSeatedText(now, following)
     const update = seatedUpdate(next, seatedText, now)
     // setValues clears every field's error: only when a field changes
@@ -2137,41 +2123,6 @@ export function useWorkbenchState() {
   const asNewLoad = (f: () => unknown) => () => {
     if (!fileMenu.current) return f()
     fileMenu.current.startNew(undefined, f)
-  }
-
-  function fillExample() {
-    reset()
-    form.setValues(exampleFields(interiorFields, loadExample.interior, system, fixedFieldText))
-    setDefaulted(new Set())
-    setFollowed(new Set())
-    setCartridge(loadExample.cartridge)
-    void chooseBullet(loadExample.bulletId, false)
-    // the example's fields already hold the record's model parameters: no refill
-    void choosePowder(loadExample.powderId, false)
-    setFirearm(loadExample.firearm.id)
-    gunFromFirearm.current = true
-    setGunFields({
-      firearmMass: {
-        text: fixedFieldText('firearmMass', system, loadExample.firearmMass),
-        si: loadExample.firearmMass,
-      },
-    })
-    setLadderSteps(loadExample.ladder.steps)
-    setLadder({
-      ladderStep: {
-        text: fixedFieldText('charge', system, loadExample.ladder.step),
-        si: loadExample.ladder.step,
-      },
-    })
-    setDirection(loadExample.ladder.direction)
-    setPreviewInitial(loadExample.seating)
-    setCaseChoice({ cartridge: loadExample.cartridge.id, id: loadExample.caseId })
-    setSeatStep({
-      seatStep: {
-        text: fixedFieldText('length', system, loadExample.seatStep),
-        si: loadExample.seatStep,
-      },
-    })
   }
 
   function chooseCartridge(c: CartridgeChoice) {
@@ -2533,7 +2484,7 @@ export function useWorkbenchState() {
         ? catalogueIdOf(asked.cartridge.id)
         : undefined
     const pending = cartridge ? (groove?.id !== cartridge.id ? cartridge.id : undefined) : asking
-    // the linked library firearm's action, where its record states one (the example states none)
+    // the linked library firearm's action, where its record states one
     const action = firearms.find((r) => r.id === firearm)?.data.action
     writeTuneLoad(ref, load, chosenPowder, recordTable, pending, action)
   }
@@ -2744,18 +2695,6 @@ export function useWorkbenchState() {
     return () => controller.abort()
   }, [cartridge?.id])
 
-  // a run asked for by the link, after the render that holds the filled values
-  const [runWhenFilled, setRunWhenFilled] = useState(false)
-  useEffect(() => {
-    // a record arriving later marks the load changed and would abort the run: wait for them all
-    const loading = Object.values(asked).some((a) => a && !a.failed)
-    // the run keeps the seated figure the chart's barrel strip draws; the example seats its bullet
-    if (!runWhenFilled || fields.charge?.si === undefined || loading || !seated.figure) return
-    setRunWhenFilled(false)
-    run()
-    // oxlint-disable-next-line react-hooks/exhaustive-deps -- once, when the link asked for it
-  }, [runWhenFilled, fields, asked, seated.figure])
-
   /** Runs a changed load once it is complete and valid; an invalid value shows its error only. */
   function autoRun() {
     const loading = Object.values(asked).some((a) => a && !a.failed)
@@ -2812,13 +2751,8 @@ export function useWorkbenchState() {
       setTab(linked)
       setSeen((s) => new Set([...s, linked]))
     }
-    // /workbench?preset=example opens the example, &run=1 runs it once filled (quick testing)
-    if (query.get('preset') === 'example' && loadExample) {
-      asNewLoad(fillExample)()
-      if (query.get('run') === '1') setRunWhenFilled(true)
-    }
     // a linked load is the record the page starts with, not unsaved work
-    else if (link?.kind === 'values') asNewLoad(() => fill(query))()
+    if (link?.kind === 'values') asNewLoad(() => fill(query))()
     // "Use in workbench" on a record page: a new load with the cartridge, the bullet's mass and the powder's model parameters, unsaved only after edits to what the records filled
     else if (link?.kind === 'records')
       asNewLoad(() => {
@@ -3614,12 +3548,12 @@ export function useWorkbenchState() {
     apiData,
     fileData,
     fileMenu,
-    fillExample,
     generated,
     customName,
     name,
     setCustomName,
     firearm,
+    firearmGone,
     firearmList,
     firearms,
     follow,

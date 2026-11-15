@@ -2,7 +2,6 @@ import type { CompetitionEvent, UserRecord } from '@rangefoundry/schema'
 import { toSi, userRecord } from '@rangefoundry/schema'
 import { describe, expect, it } from 'vitest'
 import { translator } from '../src/i18n/translate.ts'
-import { loadExample } from '../src/lib/example-data.ts'
 import {
   activeClick,
   blankFirearm,
@@ -537,54 +536,20 @@ describe('withSessionRounds', () => {
 
 describe('gunPicker', () => {
   const english = translator().t
-  const example = loadExample.firearm
-  const names = (rows: { name: string }[]) => rows.map((r) => r.name)
-  it('offers the example rifle on a fresh browser and says what to do', () => {
-    const picker = gunPicker([], example, english)
-    expect(names(picker.rows)).toEqual(['Example rifle, 308 Win. (example)'])
-    // its barrel and twist in m for the chooser's columns
-    expect(picker.rows[0]?.barrelLength).toBeGreaterThan(0)
-    expect(picker.rows[0]?.twist).toBeGreaterThan(0)
-    expect(picker.placeholder).toBe(
-      'No firearm saved yet. Pick the example rifle, or add yours under Firearms.',
-    )
-  })
-
-  it('lists the stored firearms first, the example after them', () => {
+  it('lists the stored firearms only', () => {
     const own = { id: 'own', name: 'My rifle', data: { ...blankFirearm(), name: 'My rifle' } }
-    const picker = gunPicker([own], example, english)
-    expect(picker.rows.map((r) => r.id)).toEqual(['own', example.id])
-    expect(picker.rows[0]).toEqual({
-      id: 'own',
-      name: 'My rifle',
-      barrelLength: undefined,
-      twist: undefined,
-    })
-    expect(picker.placeholder).toBe('Choose a firearm')
+    expect(gunPicker([], english).rows).toEqual([])
+    expect(gunPicker([own], english).rows).toEqual([
+      { id: 'own', name: 'My rifle', barrelLength: undefined, twist: undefined },
+    ])
   })
 })
 
 describe('sightPicker', () => {
   const english = translator().t
-  const example = loadExample.firearm as UserRecord
-  const exampleLabels = sightOptions([example]).map((o) => `${o.label} (example)`)
-
-  it('offers the example rifle on a fresh browser and says what to do', () => {
-    const picker = sightPicker([], example, english)
-    expect(picker.options.map((o) => o.label)).toEqual(exampleLabels)
-    expect(picker.options[0]?.fill).toEqual(sightOptions([example])[0]?.fill)
-    expect(picker.none).toBe(
-      'No firearm saved yet. Pick the example rifle, or add yours under Firearms.',
-    )
-  })
-
-  it('lists the stored firearms first, the example after them', () => {
-    const picker = sightPicker([rifle], example, english)
-    expect(picker.options.map((o) => o.label)).toEqual([
-      ...sightOptions([rifle]).map((o) => o.label),
-      ...exampleLabels,
-    ])
-    expect(picker.none).toBe('None')
+  it('offers the sights of the stored firearms only', () => {
+    expect(sightPicker([], english).options).toEqual([])
+    expect(sightPicker([rifle], english).options).toEqual(sightOptions([rifle], english))
   })
 })
 

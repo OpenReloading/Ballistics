@@ -293,14 +293,8 @@ type PreviewProps = {
   /** The cartridge design to seat in, instead of a record. */
   draft?: DraftCartridge | undefined
   system: UnitSystem
-  /** The example's bullet id and barrel length (m); the seating of the example or an opened load (m). */
-  initial?:
-    | {
-        bullet?: string | undefined
-        barrel?: number | undefined
-        seating?: { by: Mode; value: number } | undefined
-      }
-    | undefined
+  /** The seating of a link or an opened load (m). */
+  initial?: { seating?: { by: Mode; value: number } | undefined } | undefined
   /** The chosen firearm's barrel length, m: a new one replaces the field's value, the seating stays. */
   barrelLength?: number | undefined
   /** The barrel length used until one is typed or a gun gives one, m, with where it comes from. */
@@ -399,8 +393,8 @@ const nameOf = (draft: DraftCartridge | undefined, cartridge: PreviewProps['cart
   draft?.title ?? cartridge?.name ?? ''
 
 /** The bullet record or design the preview seats: the page's own when linked, else the one searched or picked. */
-function useBulletChoice(initialBullet: string | undefined, linked: PreviewProps['linked']) {
-  const [bulletId, setBulletId] = useState(initialBullet)
+function useBulletChoice(linked: PreviewProps['linked']) {
+  const [bulletId, setBulletId] = useState<string>()
   const [designs, setDesigns] = useState<UserBulletView[]>([])
   /** A bullet design of this browser seated instead of a record. */
   const [design, setDesign] = useState<UserBulletView>()
@@ -423,22 +417,17 @@ function useBulletChoice(initialBullet: string | undefined, linked: PreviewProps
   return { setBulletId, designs, design, setDesign, readDesigns, record }
 }
 
-/** The barrel length field: the gun's, the example's or typed, else the default. */
+/** The barrel length field: the gun's or typed, else the default. */
 function useBarrel(o: {
   barrelLength: number | undefined
-  initialBarrel: number | undefined
   barrelDefault: Suggestion | undefined
   system: UnitSystem
   shown: RefObject<UnitSystem>
 }) {
-  const { barrelLength, initialBarrel, barrelDefault, system, shown } = o
-  const [barrel, setBarrel] = useState<FieldValue>(() =>
-    barrelFieldValue(system, barrelLength ?? initialBarrel),
-  )
-  /** The barrel length is the gun's, the example's or typed: no longer the default. */
-  const [barrelTyped, setBarrelTyped] = useState(
-    () => (barrelLength ?? initialBarrel) !== undefined,
-  )
+  const { barrelLength, barrelDefault, system, shown } = o
+  const [barrel, setBarrel] = useState<FieldValue>(() => barrelFieldValue(system, barrelLength))
+  /** The barrel length is the gun's or typed: no longer the default. */
+  const [barrelTyped, setBarrelTyped] = useState(() => barrelLength !== undefined)
   const defaultBarrel = barrelDefault?.si
   useEffect(() => {
     if (barrelLength === undefined) return
@@ -1045,7 +1034,7 @@ function useSeatingModel(p: PreviewProps) {
   /** The designer page: its own drawing is above, its controls in one section. */
   const designer = isDesigner(draft)
   const name = nameOf(draft, cartridge)
-  const bullet = useBulletChoice(initial?.bullet, p.linked)
+  const bullet = useBulletChoice(p.linked)
   const lands = useLands(p.lands)
   const { design, record } = bullet
   const names = useManufacturerNames()
@@ -1055,7 +1044,6 @@ function useSeatingModel(p: PreviewProps) {
   const shown = useRef(system)
   const { barrel, setBarrel, barrelTyped, setBarrelTyped } = useBarrel({
     barrelLength: p.barrelLength,
-    initialBarrel: initial?.barrel,
     barrelDefault: p.barrelDefault,
     system,
     shown,
