@@ -3461,6 +3461,11 @@ main .library-head.page-panel-head > .page-panel-title {
   font-size: var(--mantine-font-size-sm);
 }
 
+/* an empty live region stays in the page but takes no grid row */
+.workbench .panel-fields > .note:empty {
+  position: absolute;
+}
+
 .notice-text {
   display: inline-flex;
   flex: none;

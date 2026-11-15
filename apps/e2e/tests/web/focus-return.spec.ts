@@ -4,7 +4,7 @@ import { showGerman } from './german.ts'
 import { pickFiles, withoutOpenPicker } from './import.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
-import { applyExampleLoad, loadForm } from './workbench.ts'
+import { loadForm, openSavedLoad } from './workbench.ts'
 
 // WCAG 2.4.3: a dialog, drawer or card that held the focus leaves it on a control, never on the page.
 test.beforeEach(({ page }) => storeUnits(page))
@@ -29,13 +29,6 @@ test('choosing a cartridge on the start card leaves the focus in the load form',
   await expect(loadForm(page).locator(':focus')).toHaveCount(1)
 })
 
-test('the example load on the start card leaves the focus in the load form', async ({ page }) => {
-  await gotoHydrated(page, '/workbench/')
-  await page.getByRole('button', { name: 'Try the example load' }).click()
-  await expect(loadForm(page)).toBeVisible()
-  await expect(loadForm(page).locator(':focus')).toHaveCount(1)
-})
-
 test('a saved load that opens by itself on arrival leaves the focus on the page', async ({
   page,
 }) => {
@@ -45,7 +38,7 @@ test('a saved load that opens by itself on arrival leaves the focus on the page'
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
   })
   await gotoHydrated(page, '/workbench/')
-  await applyExampleLoad(page)
+  await openSavedLoad(page)
   await (await barButton(page, 'Save')).click()
   await expect(page.locator('.file-state')).toContainText('Saved')
   await page.reload()

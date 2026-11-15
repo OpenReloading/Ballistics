@@ -1,7 +1,7 @@
 ---
 
 title: Engraving ramp at the jump to the lands
-description: Starting the workbench's engraving ramp at the seated bullet's jump (0 when touching or jammed) and its effect on peak pressure and muzzle velocity of the example load.
+description: Starting the workbench's engraving ramp at the seated bullet's jump (0 when touching or jammed) and its effect on peak pressure and muzzle velocity of the 308 Win. test load.
 ---
 
 # Engraving ramp at the jump to the lands
@@ -14,7 +14,7 @@ M3 interior model, bore resistance: should a typed or record engraving ramp star
 
 The workbench's run gets the seated bullet's jump (seating figure, `packages/svg-drawings/src/seating/seating.ts`, `jumpOf`) and moves every point of the engraving profile by it, with the first point at the jump, or at 0 for a jump of 0 or less. A seating ladder moves the ramp of each step to that step's jump. Without a ramp nothing changes and the result notes say so. No default ramp is added.
 
-Comparison: the workbench example load (`apps/web/src/lib/example-data.ts`, `exampleInterior`) with two typed ramps, at jumps of -0.3, 0, 0.5, 1.0, 1.5 and 3.0 mm, and without a ramp. Metric: peak breech pressure and muzzle velocity of `interior` (`packages/ballistics/src/interior/model.ts`). Accept rule: a jammed load and the same load with a jump give different results with a ramp, and identical results without one.
+Comparison: the 308 Win. test load (`apps/web/test/fixtures/load.ts`, `fixtureInterior`) with two typed ramps, at jumps of -0.3, 0, 0.5, 1.0, 1.5 and 3.0 mm, and without a ramp. Metric: peak breech pressure and muzzle velocity of `interior` (`packages/ballistics/src/interior/model.ts`). Accept rule: a jammed load and the same load with a jump give different results with a ramp, and identical results without one.
 
 ## Formulas
 
@@ -22,7 +22,7 @@ The engraving term of the bore resistance is unchanged ([M3 interior model](../m
 
 ## Numbers
 
-Example load: 2.4 g charge, 3.13 cm3 behind the bullet, 10.886 g bullet, 569 mm travel, start pressure 30 MPa. Ramp values are typed stand-ins, not taken from a record or a source.
+308 Win. test load: 2.4 g charge, 3.13 cm3 behind the bullet, 10.886 g bullet, 569 mm travel, start pressure 30 MPa. Ramp values are typed stand-ins, not taken from a record or a source.
 
 | Jump             | Ramp 60 MPa over 5 mm: peak, velocity | Ramp 30 MPa over 10 mm: peak, velocity |
 | ---------------- | ------------------------------------- | -------------------------------------- |
@@ -41,7 +41,7 @@ Improved: adopted. The jammed and jumped runs differ with a ramp and are identic
 
 ## Data basis
 
-Analytic: the workbench example load with typed stand-in ramps, no measurement.
+Analytic: the 308 Win. test load with typed stand-in ramps, no measurement.
 
 ## Where in the app
 

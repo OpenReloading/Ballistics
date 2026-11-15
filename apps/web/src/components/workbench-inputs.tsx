@@ -44,7 +44,6 @@ import {
 import { translateMessage } from '../lib/core-messages.ts'
 import { dayText } from '../lib/dates.ts'
 import { capacityGuide } from '../lib/docs-url.ts'
-import { exampleFirearmIn } from '../lib/example-data.ts'
 import { quickCartridges } from '../lib/examples.ts'
 import {
   type FieldSpec,
@@ -469,7 +468,7 @@ export function Checklist({
 
 /** A new load with nothing chosen or typed: the start card replaces the cards. `onAct` hears a click or key in the card. */
 export function StartCard({ onAct }: { onAct?: () => void }) {
-  const { chooseCartridge: onCartridge, asNewLoad, fillExample, setByHand } = useLoad()
+  const { chooseCartridge: onCartridge, setByHand } = useLoad()
   const { t } = useTranslation()
   return (
     <Paper
@@ -497,9 +496,6 @@ export function StartCard({ onAct }: { onAct?: () => void }) {
         ))}
       </div>
       <div className="start-actions">
-        <Button variant="light" onClick={asNewLoad(fillExample)}>
-          {t('Try the example load')}
-        </Button>
         <Button variant="subtle" onClick={() => setByHand(true)}>
           {t('Enter values by hand')}
         </Button>
@@ -1227,6 +1223,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
   return (
     <div className="panel-fields">
       <ReplacedNote panel={panel} />
+      <GoneFirearmNote />
       {fieldsOf(panelFields.firearm)}
       {/* the barrel length of the figure */}
       <SeatingSlot name="gun" />
@@ -1540,15 +1537,23 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
   )
 }
 
-/** The Gun card's picker: the library's firearms and the example rifle, in the field and the dialog. */
+/** The note on a load or link whose firearm this browser does not hold. */
+function GoneFirearmNote() {
+  const { firearmGone } = useLoad()
+  const { t } = useTranslation()
+  return (
+    <p role="status" className="note wide">
+      {firearmGone && t('The chosen firearm is no longer in this browser; its values stay.')}
+    </p>
+  )
+}
+
+/** The Gun card's picker: the library's firearms, in the field and the dialog. */
 function GunPicker() {
   const { pickFirearm, firearm, firearms, readDesigns, system } = useLoad()
   const { t } = useTranslation()
   const dialog = useChooser()
-  const { rows, placeholder } = useMemo(
-    () => gunPicker(firearms, exampleFirearmIn(t), t),
-    [firearms, t],
-  )
+  const { rows, placeholder } = useMemo(() => gunPicker(firearms, t), [firearms, t])
   const find = useMemo(
     () => async (text: string, limit: number) => {
       const { firearmKeys, listMatches } = await import('../lib/record-choosers.ts')

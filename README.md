@@ -29,7 +29,7 @@ To host the web app, run `pnpm run pages:build` (set `PAGES_BASE_PATH` to the pa
 
 ## Data
 
-The records in `packages/catalog/records/` hold one cartridge record per C.I.P. sheet, target faces, shooting federations and their disciplines, bullets, powders, case capacities and manufacturers. Bullet, powder and manufacturer records cite the maker's own publication, case capacity records cite Wikipedia (CC BY-SA 4.0); powders carry model parameters fitted to the makers' load tables. Data a maker published carries no project license, the fitted parameters are under the data license (`packages/catalog/LICENSE`). The demo bullet, powder, case, primer and manufacturer records are invented, for the example load and the tests.
+The records in `packages/catalog/records/` hold one cartridge record per C.I.P. sheet, target faces, shooting federations and their disciplines, bullets, powders, case capacities and manufacturers. Bullet, powder and manufacturer records cite the maker's own publication, case capacity records cite Wikipedia (CC BY-SA 4.0); powders carry model parameters fitted to the makers' load tables. Data a maker published carries no project license, the fitted parameters are under the data license (`packages/catalog/LICENSE`). The demo bullet, powder, case, primer and manufacturer records are invented, for the tests.
 
 ## Safety
 

@@ -5,7 +5,7 @@ import { useMediaQuery } from '@mantine/hooks'
 import { spotlight } from '@mantine/spotlight'
 import { MagnifyingGlass, Play, Printer } from '@phosphor-icons/react'
 import { bulletWindow } from '@rangefoundry/ballistics'
-import { toSi, type UserRecord } from '@rangefoundry/schema'
+import { toSi } from '@rangefoundry/schema'
 import {
   type KeyboardEvent,
   type ReactNode,
@@ -24,7 +24,6 @@ import { summaryFitSource } from '../lib/bullet-fit.ts'
 import { classifyPowder, typedBurn } from '../lib/burn-rate.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { localDay } from '../lib/dates.ts'
-import { loadExample } from '../lib/example-data.ts'
 import { siValues, specText } from '../lib/field-spec.ts'
 import { activeClick } from '../lib/firearm.ts'
 import { interiorFields } from '../lib/interior-input.ts'
@@ -772,7 +771,6 @@ type CommandArgs = {
   openScan: () => void
   link: ReturnType<typeof useCopyLink>
   asNewLoad: Load['asNewLoad']
-  fillExample: Load['fillExample']
   reset: Load['reset']
 }
 
@@ -800,7 +798,6 @@ function searchCommands(a: CommandArgs) {
     { label: t('Saved loads'), run: a.openList },
     { label: t('Scan box label'), run: a.openScan },
     { label: t('Copy link'), run: a.link.copy },
-    { label: t('Example load'), run: a.asNewLoad(a.fillExample) },
     { label: t('Reset load'), run: a.asNewLoad(a.reset) },
   ]
 }
@@ -1092,7 +1089,6 @@ export function Workbench() {
     apiData,
     fileData,
     fileMenu,
-    fillExample,
     firearm,
     firearms,
     framed,
@@ -1192,10 +1188,7 @@ export function Workbench() {
   const todoKey = JSON.stringify(todo)
   const shownTodo = useMemo(() => JSON.parse(todoKey) as typeof todo, [todoKey])
   const optic = useMemo(
-    () =>
-      activeClick(
-        ([loadExample.firearm, ...firearms] as UserRecord[]).find((r) => r.id === firearm),
-      ),
+    () => activeClick(firearms.find((r) => r.id === firearm)),
     [firearms, firearm],
   )
   const { bulletDiameter } = bulletValues
@@ -1330,16 +1323,13 @@ export function Workbench() {
     listOpener.current = '.load-switch'
     setListOpen(true)
   }, [])
-  // the Open menu's Examples keep their identity, so the File menu's memo holds; they run the actions of the latest render
-  const starts = useRef({ asNewLoad, fillExample, reset })
-  starts.current = { asNewLoad, fillExample, reset }
-  const examples = useMemo(() => {
-    const run = (k: 'fillExample' | 'reset') => () => starts.current.asNewLoad(starts.current[k])()
-    return [
-      { label: t('Example load'), run: run('fillExample') },
-      { label: t('Reset load'), run: run('reset') },
-    ]
-  }, [t])
+  // the Open menu's starts keep their identity, so the File menu's memo holds; they run the actions of the latest render
+  const starts = useRef({ asNewLoad, reset })
+  starts.current = { asNewLoad, reset }
+  const startItems = useMemo(
+    () => [{ label: t('Reset load'), run: () => starts.current.asNewLoad(starts.current.reset)() }],
+    [t],
+  )
 
   return (
     <LoadContext value={load}>
@@ -1425,7 +1415,7 @@ export function Workbench() {
                       onExported={reminder.exported}
                       onUnsaved={tabs.setUnsaved}
                       onList={openList}
-                      examples={examples}
+                      starts={startItems}
                       note={fileNote(unresolved, dropped, t)}
                     />
                   }
@@ -1519,7 +1509,6 @@ export function Workbench() {
                 openScan,
                 link,
                 asNewLoad,
-                fillExample,
                 reset,
               })}
               onCartridge={(c) =>
