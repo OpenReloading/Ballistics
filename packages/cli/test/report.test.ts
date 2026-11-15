@@ -54,4 +54,12 @@ describe('compareTable', () => {
     expect(line(screened('baseline'), 'candidate screen')).toBeUndefined()
     expect(line(screened('candidate'), 'candidate screen')).toContain('b0b0')
   })
+
+  it('prints the change of the estimated capacity rows on their own line, none without them', async () => {
+    const r = await compare(options, 'm3', 'm3')
+    const estimatedCapacity = { ...r.change.overall, usedRows: 1, velocityMedian: -0.0707 }
+    const text = compareTable({ ...r, change: { ...r.change, estimatedCapacity } })
+    expect(line(text, 'estimated capacity')?.split(/ +/).slice(2, 4)).toEqual(['+1', '-7.07'])
+    expect(line(compareTable(r), 'estimated capacity')).toBeUndefined()
+  })
 })

@@ -193,7 +193,7 @@ The code of the evaluation itself (rows, split, the metrics and the percentiles,
 
 `verify --rows <path> [--model m3|<module>]` evaluates one model on the split. `m3` is the model of the installed `@rangefoundry/ballistics`; a module path is a file that exports `interior(load, options?)` with the signature of its `interior`.
 
-`compare --baseline <m3|module|verify.json> --candidate <m3|module>` evaluates both on the same rows and split and gives each result and the change, candidate minus baseline, overall and per powder family (and per group of `--group-by`). A baseline `.json` is a saved `verify` result: it must be of the same split, split salt, rows and records, else the run is refused. A positive change of an error is worse; the change of the coverage is in fractions, the change of used rows in rows. The candidate may use fewer rows than the baseline: `usedRows` shows it, and the [paired change](#paired-change) compares both on the same rows.
+`compare --baseline <m3|module|verify.json> --candidate <m3|module>` evaluates both on the same rows and split and gives each result and the change, candidate minus baseline, overall and per powder family (and per group of `--group-by`, and of the [estimated capacity](#estimated-case-capacity) rows when either side has them). A baseline `.json` is a saved `verify` result: it must be of the same split, split salt, rows and records, else the run is refused. A positive change of an error is worse; the change of the coverage is in fractions, the change of used rows in rows. The candidate may use fewer rows than the baseline: `usedRows` shows it, and the [paired change](#paired-change) compares both on the same rows.
 
 ## Output
 

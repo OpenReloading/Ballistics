@@ -293,6 +293,9 @@ const compareResult = z.object({
     overall: change,
     byFamily: z.record(z.string(), change),
     grouped: z.record(z.string(), change).optional().describe('Per group of `--group-by`.'),
+    estimatedCapacity: change
+      .optional()
+      .describe('Of the `estimatedCapacity` rows, when either side has them.'),
   }),
 })
 

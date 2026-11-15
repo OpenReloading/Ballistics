@@ -108,6 +108,9 @@ export function compareTable(r: CompareResult): string {
     ...Object.entries(r.change.grouped ?? {}).map(([k, c]) =>
       changeRow(`${r.candidate.grouped?.by} ${k}`, c),
     ),
+    ...(r.change.estimatedCapacity
+      ? [changeRow('estimated capacity', r.change.estimatedCapacity)]
+      : []),
   ]
   return [
     `baseline ${r.baseline.model}  version ${r.baseline.modelVersion}`,

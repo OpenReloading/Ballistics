@@ -3817,6 +3817,45 @@
                 ],
                 "additionalProperties": false
               }
+            },
+            "estimatedCapacity": {
+              "description": "Of the `estimatedCapacity` rows, when either side has them.",
+              "type": "object",
+              "properties": {
+                "usedRows": {
+                  "type": "number",
+                  "description": "Candidate minus baseline used rows."
+                },
+                "velocityMedian": {
+                  "description": "Candidate minus baseline; null where either has none.",
+                  "type": ["number", "null"]
+                },
+                "velocityP90": {
+                  "description": "Candidate minus baseline; null where either has none.",
+                  "type": ["number", "null"]
+                },
+                "pressureMedian": {
+                  "description": "Candidate minus baseline; null where either has none.",
+                  "type": ["number", "null"]
+                },
+                "pressureP90": {
+                  "description": "Candidate minus baseline; null where either has none.",
+                  "type": ["number", "null"]
+                },
+                "intervalCoverage": {
+                  "description": "Candidate minus baseline; null where either has none.",
+                  "type": ["number", "null"]
+                }
+              },
+              "required": [
+                "usedRows",
+                "velocityMedian",
+                "velocityP90",
+                "pressureMedian",
+                "pressureP90",
+                "intervalCoverage"
+              ],
+              "additionalProperties": false
             }
           },
           "required": ["overall", "byFamily"],

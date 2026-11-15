@@ -505,6 +505,9 @@ export async function compare(
             .map((g) => [g, changeOf(baseline.grouped?.groups[g], candidate.grouped?.groups[g])]),
         ),
       }),
+      ...((baseline.estimatedCapacity || candidate.estimatedCapacity) && {
+        estimatedCapacity: changeOf(baseline.estimatedCapacity, candidate.estimatedCapacity),
+      }),
     },
   }
 }
