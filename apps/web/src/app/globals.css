@@ -3311,10 +3311,6 @@ td.nowrap {
   text-overflow: ellipsis;
 }
 
-.firearm-card-badge {
-  flex-shrink: 0;
-}
-
 /* label left, 28 px inputs; the error sits in a reserved slot under the input, so it moves nothing */
 /* the editor's title row as a panel's: the firearm's name on one line, the line under it */
 .library-head {
