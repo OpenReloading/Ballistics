@@ -43,6 +43,102 @@
         "triple"
       ]
     },
+    "perforation": {
+      "type": "string",
+      "enum": [
+        "none",
+        "single",
+        "multi"
+      ],
+      "description": "Perforation of the kernel as the maker states it: none, one hole, several holes."
+    },
+    "grainDimensions": {
+      "type": "object",
+      "properties": {
+        "length": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "In mm."
+            },
+            "raw": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The value as written in the source, when it differed."
+            }
+          },
+          "required": [
+            "value"
+          ],
+          "unit": "mm",
+          "description": "Length of the kernel."
+        },
+        "diameter": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "In mm."
+            },
+            "raw": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The value as written in the source, when it differed."
+            }
+          },
+          "required": [
+            "value"
+          ],
+          "unit": "mm",
+          "description": "Outer diameter of the kernel."
+        },
+        "web": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "In mm."
+            },
+            "raw": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The value as written in the source, when it differed."
+            }
+          },
+          "required": [
+            "value"
+          ],
+          "unit": "mm",
+          "description": "Web: the thinnest burning distance through the kernel."
+        },
+        "perforationDiameter": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "In mm."
+            },
+            "raw": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The value as written in the source, when it differed."
+            }
+          },
+          "required": [
+            "value"
+          ],
+          "unit": "mm",
+          "description": "Diameter of a perforation."
+        }
+      },
+      "minProperties": 1,
+      "description": "Dimensions of the kernel as the maker states them."
+    },
     "bulkDensity": {
       "type": "object",
       "properties": {
@@ -60,6 +156,26 @@
         "value"
       ],
       "unit": "g/cm3"
+    },
+    "heatOfExplosion": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "In J/kg."
+        },
+        "raw": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The value as written in the source, when it differed."
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "unit": "J/kg",
+      "description": "Heat of explosion as the safety data sheet states it; `raw` keeps a printed J/g."
     },
     "composition": {
       "minItems": 1,
@@ -97,6 +213,30 @@
         ],
         "unit": "%"
       }
+    },
+    "transport": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "unNumber": {
+            "type": "string",
+            "pattern": "^UN\\d{4}$",
+            "description": "UN number, as `UN0161`."
+          },
+          "hazardClass": {
+            "type": "string",
+            "pattern": "^[1-9](\\.[1-6])?[A-HJKLNS]?$",
+            "description": "Hazard class or division, with the compatibility group where given: `1.3C`, `4.1`."
+          }
+        },
+        "required": [
+          "unNumber",
+          "hazardClass"
+        ]
+      },
+      "description": "Transport classification from the safety data sheet, one entry per UN number."
     },
     "thermochemistry": {
       "type": "object",

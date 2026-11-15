@@ -1068,13 +1068,25 @@ export const powder: z.ZodObject<{
     country: z.ZodOptional<z.ZodString>;
     grainForm: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'ball' | 'extruded' | 'flake' | 'other'>>>;
     propellantBase: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'single' | 'double' | 'triple'>>>;
+    perforation: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'none' | 'single' | 'multi'>>>;
+    grainDimensions: z.ZodOptional<z.ZodObject<{
+        length: z.ZodOptional<QuantitySchema>;
+        diameter: z.ZodOptional<QuantitySchema>;
+        web: z.ZodOptional<QuantitySchema>;
+        perforationDiameter: z.ZodOptional<QuantitySchema>;
+    }>>;
     bulkDensity: z.ZodOptional<QuantitySchema>;
+    heatOfExplosion: z.ZodOptional<QuantitySchema>;
     composition: z.ZodOptional<z.ZodArray<z.ZodObject<{
         name: z.ZodString;
         cas: z.ZodOptional<z.ZodString>;
         min: z.ZodNumber;
         max: z.ZodNumber;
         raw: z.ZodOptional<z.ZodString>;
+    }>>>;
+    transport: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        unNumber: z.ZodString;
+        hazardClass: z.ZodString;
     }>>>;
     thermochemistry: z.ZodOptional<z.ZodObject<{
         loadingDensity: QuantitySchema;

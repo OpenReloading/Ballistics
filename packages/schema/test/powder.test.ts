@@ -117,3 +117,31 @@ describe('powder country and listed cartridges', () => {
     ])
   })
 })
+
+describe('powder kernel and safety data sheet fields', () => {
+  it('accepts a perforation and rejects an unknown one', () => {
+    expect(powder.parse({ ...base, perforation: 'single' }).perforation).toBe('single')
+    expect(paths({ ...base, perforation: 'seven' })).toEqual(['perforation'])
+  })
+
+  it('accepts kernel dimensions in mm and rejects an empty set', () => {
+    const grainDimensions = { length: { value: 1.6 }, diameter: { value: 0.9 } }
+    expect(powder.parse({ ...base, grainDimensions }).grainDimensions).toEqual(grainDimensions)
+    expect(paths({ ...base, grainDimensions: {} })).toEqual(['grainDimensions'])
+  })
+
+  it('accepts a heat of explosion with its printed value and rejects a zero', () => {
+    const heatOfExplosion = { value: 3_900_000, raw: '3900 J/g' }
+    expect(powder.parse({ ...base, heatOfExplosion }).heatOfExplosion).toEqual(heatOfExplosion)
+    expect(paths({ ...base, heatOfExplosion: { value: 0 } })).toEqual(['heatOfExplosion.value'])
+  })
+
+  it('accepts one entry per UN number and rejects a UN number listed twice', () => {
+    const transport = [
+      { unNumber: 'UN0161', hazardClass: '1.3C' },
+      { unNumber: 'UN0509', hazardClass: '1.4C' },
+    ]
+    expect(powder.parse({ ...base, transport }).transport).toEqual(transport)
+    expect(paths({ ...base, transport: [transport[0], transport[0]] })).toEqual(['transport'])
+  })
+})
