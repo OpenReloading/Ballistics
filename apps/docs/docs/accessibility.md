@@ -140,7 +140,7 @@ Set up: a release candidate build, a fresh browser profile (so the Safety dialog
 
 1. Open the app. The Safety dialog is announced as a dialog with its name. Tab cycles between Decline and I accept and never leaves the dialog. Press Enter on I accept.
 2. Read the home page: one heading level 1, the Tools and Library regions, the links with their purpose (NVDA: H to walk the headings, D the landmarks. VoiceOver: rotor, Headings and Landmarks).
-3. Open the Load workbench link. On the start card choose a cartridge. Where does the focus go? (Expected: the first field of the load form.)
+3. Open the Load workbench link. On the start card choose a cartridge. Where does the focus go? (Expected: the first field of the load form.) Then enter a bullet mass, the powder, and a charge mass.
 4. Tab to Charge mass, press Control+Enter. Listen for "Simulating", then "Simulation done" with the peak pressure and velocity, without the focus moving.
 5. Read the result tiles and list. Each value has its label and unit.
 6. Reach the chart by Tab. It is announced as an image with a name and a description. Tab to its readout slider and press the arrow keys: each press speaks time, travel, pressure, velocity, energy and the burnt share. Press Home and End.
