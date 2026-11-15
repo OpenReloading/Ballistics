@@ -1223,6 +1223,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
   return (
     <div className="panel-fields">
       <ReplacedNote panel={panel} />
+      <GoneFirearmNote />
       {fieldsOf(panelFields.firearm)}
       {/* the barrel length of the figure */}
       <SeatingSlot name="gun" />
@@ -1533,6 +1534,18 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
         }}
       />
     </>
+  )
+}
+
+/** The note on a load or link whose firearm this browser does not hold. */
+function GoneFirearmNote() {
+  const { firearmGone } = useLoad()
+  const { t } = useTranslation()
+  if (!firearmGone) return null
+  return (
+    <p className="note wide">
+      {t('The chosen firearm is no longer in this browser; its values stay.')}
+    </p>
   )
 }
 

@@ -1532,6 +1532,8 @@ export function useWorkbenchState() {
   const [powderDesignList, setPowderDesignList] = useState<PowderDesign[]>([])
   /** The firearm library of this browser, for the Gun and barrel picker. */
   const [firearms, setFirearms] = useState<FirearmRecord[]>([])
+  /** The library was read once: before that, an empty list says nothing about a firearm. */
+  const [firearmsRead, setFirearmsRead] = useState(false)
   const [firearm, setFirearm] = useState<string>()
   /** An opened load's gun weight comes from its firearm, which is not read yet. */
   const gunPending = useRef(false)
@@ -1546,6 +1548,9 @@ export function useWorkbenchState() {
     name: r.name,
     data: gunValues((r as FirearmRecord).data),
   }))
+  /** The load or link names a firearm that the library does not hold. */
+  const firearmGone =
+    firearmsRead && firearm !== undefined && !firearmList.some((f) => f.id === firearm)
   /** The chosen firearm's values: its measured bore and groove diameter, freebore and the others. */
   const gunData = firearmList.find((f) => f.id === firearm)?.data
   /** The chosen firearm's active sight, for the Trajectory tab. */
@@ -1587,6 +1592,7 @@ export function useWorkbenchState() {
       .then(async ({ records }) => {
         // the firearms read the records only: set before the waits, so a tuning handoff that follows the opened load's firearm finds it
         setFirearms(records.filter((r): r is (typeof firearms)[number] => r.kind === 'firearm'))
+        setFirearmsRead(true)
         const [bullets, cartridges] = await Promise.all([
           userBullets(records),
           userCartridges(records),
@@ -3544,6 +3550,7 @@ export function useWorkbenchState() {
     name,
     setCustomName,
     firearm,
+    firearmGone,
     firearmList,
     firearms,
     follow,

@@ -67,16 +67,9 @@ export const fixtureLoad = {
   },
 }
 
-/** Stores the fixture load and rifle, opens the load from the Open menu of the fresh workbench and waits until it is complete, so a run sees all its values. */
-export async function openSavedLoad(page: Page, language: 'en' | 'de' = 'en') {
+/** Opens the stored fixture load from the Open menu's Saved loads drawer. */
+export async function chooseSavedLoad(page: Page, language: 'en' | 'de' = 'en') {
   const de = language === 'de'
-  await page.locator('html[data-hydrated]').waitFor({ state: 'attached' })
-  await putRecords(page, [fixtureRifle, fixtureLoad])
-  // the workbench reads the firearms as it mounts
-  await page.reload()
-  await page.locator('html[data-hydrated]').waitFor({ state: 'attached' })
-  // the result tabs measure their row with the web fonts in place
-  await page.evaluate(() => document.fonts.ready)
   const item = page.getByRole('menuitem', {
     name: de ? /^Gespeicherte Laborierungen/ : /^Saved loads/,
   })
@@ -94,6 +87,19 @@ export async function openSavedLoad(page: Page, language: 'en' | 'de' = 'en') {
     await name.waitFor({ timeout: 2000 })
   }).toPass({ timeout: 15_000 })
   await name.click()
+}
+
+/** Stores the fixture load and rifle, opens the load from the Open menu of the fresh workbench and waits until it is complete, so a run sees all its values. */
+export async function openSavedLoad(page: Page, language: 'en' | 'de' = 'en') {
+  const de = language === 'de'
+  await page.locator('html[data-hydrated]').waitFor({ state: 'attached' })
+  await putRecords(page, [fixtureRifle, fixtureLoad])
+  // the workbench reads the firearms as it mounts
+  await page.reload()
+  await page.locator('html[data-hydrated]').waitFor({ state: 'attached' })
+  // the result tabs measure their row with the web fonts in place
+  await page.evaluate(() => document.fonts.ready)
+  await chooseSavedLoad(page, language)
   // complete once its bullet is seated: volume and travel follow the seating
   await expect(
     loadForm(page, de ? 'Laborierung' : 'Load').locator('.field-flag-seating'),
