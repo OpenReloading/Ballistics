@@ -38,6 +38,43 @@ describe('powder', () => {
   })
 })
 
+describe('powder burn-rate charts and scope', () => {
+  const chart = { chart: { manufacturer: 'test-manufacturer', edition: '2024' }, position: 12 }
+
+  it('keeps one entry per chart, each with its own relative value or none', () => {
+    const burnRateCharts = [
+      { ...chart, relative: 87.5 },
+      { chart: { manufacturer: 'other-manufacturer', edition: '2023-05-01' }, position: 40 },
+    ]
+    expect(powder.parse({ ...base, burnRateCharts }).burnRateCharts).toEqual(burnRateCharts)
+  })
+
+  it('rejects a chart listed twice, a position below 1 or not whole, and an empty edition', () => {
+    expect(paths({ ...base, burnRateCharts: [chart, { ...chart, position: 13 }] })).toEqual([
+      'burnRateCharts',
+    ])
+    expect(paths({ ...base, burnRateCharts: [{ ...chart, position: 0 }] })).toEqual([
+      'burnRateCharts.0.position',
+    ])
+    expect(paths({ ...base, burnRateCharts: [{ ...chart, position: 1.5 }] })).toEqual([
+      'burnRateCharts.0.position',
+    ])
+    expect(
+      paths({ ...base, burnRateCharts: [{ ...chart, chart: { ...chart.chart, edition: '' } }] }),
+    ).toEqual(['burnRateCharts.0.chart.edition'])
+  })
+
+  it('accepts a set of the stated uses and rejects a repeated or unknown use', () => {
+    expect(powder.parse({ ...base, scope: ['rifle', 'shotgun'] }).scope).toEqual([
+      'rifle',
+      'shotgun',
+    ])
+    expect(paths({ ...base, scope: ['rifle', 'rifle'] })).toEqual(['scope'])
+    expect(paths({ ...base, scope: ['airgun'] })).toEqual(['scope.0'])
+    expect(paths({ ...base, scope: [] })).toEqual(['scope'])
+  })
+})
+
 describe('powder country and listed cartridges', () => {
   it('accepts a country with a source that names it, and rejects the other cases', () => {
     const named = { title: 'Supplier address', fields: ['country'] }

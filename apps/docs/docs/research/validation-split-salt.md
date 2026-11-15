@@ -15,7 +15,7 @@ description: Why the test split of the hash rule without a salt is spent, the sa
 The first rule's test split is declared spent: a model version tuned after eight looks at one set is tuned to it, whatever the intent of each look. A new measurement set would be the clean answer; there is none, so the same rows are divided again.
 
 - New rule: a fixed salt and a colon are hashed before the lower-case cartridge id. The thresholds and everything else stay: a row has the split of its cartridge, and the test split needs `--final`.
-- The salt is `2026-11-12`, the date of the decision. It was fixed before any row was read under it; no other salt was tried, and the numbers below were computed afterwards.
+- The salt is `2026-11-12`. It was fixed before any row was read under it; no other salt was tried, and the numbers below were computed afterwards.
 - Every cartridge is assigned again, so training, validation and test all hold other rows than before. No figure of a run under the first rule is compared with one under the new rule. Every result of the command line carries the salt (`splitSalt`), and `compare` refuses a saved baseline of another salt or of none.
 
 What a result under the new rule is not held out from:

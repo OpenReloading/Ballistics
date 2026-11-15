@@ -24,6 +24,7 @@ import type { FirearmRow } from '../src/lib/firearm.ts'
 import type { PrimerRow } from '../src/lib/primer-rows.ts'
 import type { CaseRow } from '../src/lib/record-choosers.ts'
 import { presetUnits } from '../src/lib/units.ts'
+import { defined } from './defined.ts'
 
 const system = presetUnits('metric-grams')
 const { t } = english
@@ -106,6 +107,28 @@ it('the powder chooser shows form, base and burn-rate order, ranks as the API an
   expect(ids(powderKind, rows, '', 'rate')).toEqual(['a-q140', 'a-q150', 'own', 'b-140'])
   expect(ids(powderKind, rows, 'nothing')).toEqual([])
   expect(t(powderKind.texts.empty)).toBe('No powder matches')
+})
+
+it('the powder chooser filters by stated use, a powder under each of its uses, and greys out shotgun-only powders', () => {
+  const rows = [
+    powder({ id: 'r', name: 'R', scope: ['rifle'] }),
+    powder({ id: 'rh', name: 'RH', scope: ['rifle', 'handgun'] }),
+    powder({ id: 's', name: 'S', scope: ['shotgun'] }),
+    powder({ id: 'none', name: 'None' }),
+  ]
+  const use = defined(powderKind.selects.find((s) => s.label === 'Stated use'))
+  expect(use.options(rows, rows, t)).toEqual([
+    { value: 'handgun', label: 'Handgun (1)' },
+    { value: 'rifle', label: 'Rifle (2)' },
+    { value: 'shotgun', label: 'Shotgun (1)' },
+  ])
+  expect(rows.filter((r) => use.keep(r, 'rifle')).map((r) => r.id)).toEqual(['r', 'rh'])
+  expect(rows.map((r) => powderKind.unavailable?.(r) !== undefined)).toEqual([
+    false,
+    false,
+    true,
+    false,
+  ])
 })
 
 // invented cartridges, lengths in mm and Pmax in bar

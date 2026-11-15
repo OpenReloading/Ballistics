@@ -28,8 +28,8 @@ export const bulletBasicFields: readonly string[] = [
 ]
 
 /**
- * Dot paths of the powder fields a record may hold without provenance: name, maker, grain form, base
- * and our own `note` (basic in every kind that has one, see {@link bulletBasicFields}). Every other field is
+ * Dot paths of the powder fields a record may hold without provenance: name, maker, grain form, base,
+ * the makers' burn-rate charts, the uses the maker states and our own `note` (basic in every kind that has one, see {@link bulletBasicFields}). Every other field is
  * detailed and needs provenance.
  */
 export const powderBasicFields: readonly string[] = [
@@ -38,6 +38,8 @@ export const powderBasicFields: readonly string[] = [
   'name',
   'grainForm',
   'propellantBase',
+  'burnRateCharts',
+  'scope',
   'note',
 ]
 

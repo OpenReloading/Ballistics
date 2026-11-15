@@ -2,7 +2,7 @@ import { expect, type Page } from '@playwright/test'
 import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
 import { putRecords } from './user-store.ts'
-import { applyExampleLoad } from './workbench.ts'
+import { openSavedLoad } from './workbench.ts'
 import { runLine } from './workbench-run.ts'
 
 const STEPS = 5
@@ -58,7 +58,7 @@ export async function openLadderGroups(page: Page) {
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
   })
   await gotoHydrated(page, '/workbench')
-  await applyExampleLoad(page)
+  await openSavedLoad(page)
   await runLine(page)
   await openTab(page, 'Measurements')
   await page
@@ -66,6 +66,7 @@ export async function openLadderGroups(page: Page) {
     .setInputFiles({ name: 'day1.csv', mimeType: 'text/csv', buffer: Buffer.from(file) })
   await expect(page.getByRole('status').filter({ hasText: 'Read day1.csv' })).toBeVisible()
   await (await barButton(page, 'Save')).click()
+  await expect(page.locator('.file-state[data-dirty]')).toHaveCount(0)
   await expect.poll(async () => (await stored(page, 'load')).length).toBe(1)
   await expect.poll(async () => (await stored(page, 'session')).length).toBe(1)
   const [load] = await stored(page, 'load')
@@ -101,11 +102,15 @@ export async function openLadderGroups(page: Page) {
   const ladder = page.locator('.ladder-groups')
   // the compact layout folds the panels behind a strip, which opens on the Group tab
   const strip = page.locator('.sheet-strip').locator('visible=true')
-  await expect(ladder.or(strip).first()).toBeVisible()
-  if (await strip.count()) {
-    await strip.click()
-    await page.getByRole('tab', { name: 'Ladder', exact: true }).click()
-  }
-  await expect(ladder).toBeVisible()
+  await expect(async () => {
+    await expect(ladder.or(strip).first()).toBeVisible()
+    if (await strip.count()) {
+      // the strip toggles the sheet: a retry after a click that opened it must not close it
+      if ((await strip.getAttribute('aria-expanded')) !== 'true')
+        await strip.click({ timeout: 2000 })
+      await page.getByRole('tab', { name: 'Ladder', exact: true }).click({ timeout: 2000 })
+    }
+    await expect(ladder).toBeVisible({ timeout: 2000 })
+  }).toPass()
   return ladder
 }

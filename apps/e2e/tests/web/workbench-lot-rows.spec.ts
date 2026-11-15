@@ -1,13 +1,13 @@
 import { expect, test } from '@playwright/test'
 import { AxeBuilder } from './a11y.ts'
 import { storeUnits } from './units.ts'
-import { runExample } from './workbench-run.ts'
+import { runSavedLoad } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
-/** Runs the example and opens the Ladder table tab with its lot rows computed. */
+/** Runs the fixture load and opens the Ladder table tab with its lot rows computed. */
 async function openLotRows(page: import('@playwright/test').Page) {
-  await runExample(page)
+  await runSavedLoad(page)
   await page.getByRole('tab', { name: 'Ladder table', exact: true }).click()
   await expect(page.locator('.lot-rows .lot-chart svg path').first()).toBeAttached({
     timeout: 15_000,

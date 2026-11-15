@@ -13,6 +13,7 @@ import {
   chargeTargetBody,
   noComparableLimitText,
 } from '../lib/charge-target.ts'
+import { notMetallic, shotgunOnly } from '../lib/complete-records.ts'
 import { refusalText, translateMessage } from '../lib/core-messages.ts'
 import type { InteriorBody } from '../lib/interior-input.ts'
 import {
@@ -41,6 +42,7 @@ export const noBulkDensity = msg('No bulk density in the record')
 
 /** The sentences of this tab's rows; a row's other reasons are messages of the API and the packages. */
 const ownReasons: readonly Message[] = [
+  notMetallic,
   noModel,
   apiSilent,
   noRecord,
@@ -228,6 +230,7 @@ async function powderRow(
   head: RowHead,
   s: PowderSummary,
 ): Promise<CompareRow | undefined> {
+  if (shotgunOnly(s)) return { ...head, reason: notMetallic }
   if (!s.interior) return { ...head, reason: noModel }
   const fetched = await recordFor(head, s.id, cx.batch)
   if ('row' in fetched) return fetched.row
@@ -245,6 +248,17 @@ async function powderRow(
   if (!run) return undefined
   if ('reason' in run) return { ...head, charge, reason: run.reason }
   return answerRow(head, req, charge, run.answer)
+}
+
+/** The row of a powder the batch stopped before: no metallic-cartridge use, no model, or the cartridge's missing limit. */
+function skipped(
+  head: RowHead,
+  s: PowderSummary,
+  noLimit: ChargeTargetRefusal | undefined,
+): CompareRow {
+  if (shotgunOnly(s)) return { ...head, reason: notMetallic }
+  if (!s.interior) return { ...head, reason: noModel }
+  return { ...head, reason: noLimit?.message ?? noComparableLimitText, refusal: noLimit }
 }
 
 /** By place in the powder list, in batches of `compareConcurrency`; undefined when `signal` aborted before the batch started, a later answer dropped; in the target mode a first answer with no comparable limit ends the batch (`noLimit`). */
@@ -292,9 +306,7 @@ export async function computeRows(
   })
   if (noLimit && !signal.aborted)
     powders.forEach((s, i) => {
-      slots[i] ??= s.interior
-        ? { ...headOf(s), reason: noLimit?.message ?? noComparableLimitText, refusal: noLimit }
-        : { ...headOf(s), reason: noModel }
+      slots[i] ??= skipped(headOf(s), s, noLimit)
     })
   return { rows: produced(), total: powders.length, noLimit }
 }

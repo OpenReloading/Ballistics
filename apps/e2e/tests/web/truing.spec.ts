@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test'
 import { AxeBuilder } from './a11y.ts'
 import { storeUnits } from './units.ts'
-import { runExample } from './workbench-run.ts'
+import { runSavedLoad } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
@@ -19,7 +19,7 @@ const trajectoryHeights = (page: Page) =>
 test('a truing session: plan, entry and result, axe clean in light and dark', async ({ page }) => {
   test.setTimeout(90_000)
   await page.setViewportSize({ width: 1280, height: 650 })
-  await runExample(page)
+  await runSavedLoad(page)
   await page.getByRole('tab', { name: 'Trajectory', exact: true }).click()
   await expect(page.getByRole('table', { name: /^Trajectory: / })).toBeVisible()
   const heights = await trajectoryHeights(page)

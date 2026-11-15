@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test'
 import { isDark } from './luminance.ts'
 import { storeUnits } from './units.ts'
-import { runExample } from './workbench-run.ts'
+import { runSavedLoad } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
@@ -13,7 +13,7 @@ const drawn = (page: Page) =>
 
 test('the result chart returns to the panel width after printing', async ({ page }) => {
   await page.setViewportSize({ width: 1920, height: 1080 })
-  await runExample(page)
+  await runSavedLoad(page)
   await expect(page.locator('.plain-chart .echart svg')).toBeVisible()
   const before = await drawn(page)
   // wider than the print width, so the print draws it narrower
@@ -38,7 +38,7 @@ test('the result chart returns to the panel width after printing', async ({ page
 
 test('with dark stored the chart of the report prints in the light colors', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('theme', 'dark'))
-  await runExample(page)
+  await runSavedLoad(page)
   const label = page.locator('.print-report .report-chart svg text').first()
   await expect(label).toBeAttached()
   const fill = () => label.evaluate((node) => getComputedStyle(node).fill)

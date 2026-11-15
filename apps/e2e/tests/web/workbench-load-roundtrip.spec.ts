@@ -4,7 +4,7 @@ import { defined } from '../../../web/test/defined.ts'
 import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
-import { applyExampleLoad, loadForm } from './workbench.ts'
+import { loadForm, openSavedLoad } from './workbench.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
@@ -35,9 +35,9 @@ test('a saved load reopens with every field as it was and nothing unsaved', asyn
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
   })
   await page.goto('/workbench')
-  await applyExampleLoad(page)
+  await openSavedLoad(page)
   const form = loadForm(page)
-  // the example's brass gives the capacity, flagged as the record's
+  // the fixture load's brass gives the capacity, flagged as the record's
   const capacity = form.getByRole('textbox', { name: /^Case capacity/ })
   await expect(capacity).toHaveValue('')
   await expect(capacity).toHaveAttribute('placeholder', /^3\.6/)
@@ -55,6 +55,7 @@ test('a saved load reopens with every field as it was and nothing unsaved', asyn
       )
   const before = await values()
   await (await barButton(page, 'Save')).click()
+  await expect(page.locator('.file-state[data-dirty]')).toHaveCount(0)
   await expect.poll(async () => (await storedLoads(page)).length).toBe(1)
 
   const { name, data } = defined((await storedLoads(page))[0])
@@ -91,7 +92,7 @@ test('a diameter and length typed over the bullet record are saved as typed valu
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
   })
   await page.goto('/workbench')
-  await applyExampleLoad(page)
+  await openSavedLoad(page)
   const form = loadForm(page)
   const [diameter, length] = [
     form.getByRole('textbox', { name: /^Diameter/ }),
@@ -120,6 +121,7 @@ test('a diameter and length typed over the bullet record are saved as typed valu
     form.getByRole('textbox').evaluateAll((els) => els.map((e) => (e as HTMLInputElement).value))
   const before = await values()
   await (await barButton(page, 'Save')).click()
+  await expect(page.locator('.file-state[data-dirty]')).toHaveCount(0)
   await expect.poll(async () => (await storedLoads(page)).length).toBe(1)
   const { name, data } = defined((await storedLoads(page))[0])
   const overrides = (data.analysis as { overrides?: Record<string, number> } | undefined)?.overrides
@@ -181,7 +183,7 @@ test('the file downloaded for the API runs through the load file route and the s
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
   })
   await gotoHydrated(page, '/workbench')
-  await applyExampleLoad(page)
+  await openSavedLoad(page)
   await loadForm(page)
     .getByRole('textbox', { name: /^Charge mass/ })
     .fill('2.45')
@@ -195,6 +197,7 @@ test('the file downloaded for the API runs through the load file route and the s
   expect((await res.json()).summary.peakPressure).toBeGreaterThan(0)
 
   await (await barButton(page, 'Save')).click()
+  await expect(page.locator('.file-state[data-dirty]')).toHaveCount(0)
   await expect.poll(async () => (await storedLoads(page)).length).toBe(1)
   const { data } = defined((await storedLoads(page))[0])
   expect(data.charge).toEqual({ value: 2.45 })

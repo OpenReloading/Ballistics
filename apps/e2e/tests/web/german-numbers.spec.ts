@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 import { AxeBuilder } from './a11y.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
-import { applyExampleLoad, loadForm } from './workbench.ts'
+import { loadForm, openSavedLoad } from './workbench.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
@@ -13,7 +13,7 @@ test('under German the workbench writes and takes a decimal comma and its result
   await page.addInitScript(() => localStorage.setItem('language', 'de'))
   await gotoHydrated(page, '/workbench')
   await expect(page.locator('html')).toHaveAttribute('lang', 'de')
-  await applyExampleLoad(page, 'de')
+  await openSavedLoad(page, 'de')
 
   const charge = loadForm(page, 'Laborierung').getByLabel(/^Ladungsmasse/)
   await expect(charge).toHaveValue('2,40')
@@ -47,7 +47,7 @@ test('under English a pasted text goes in at the caret, as a native paste does',
   page,
 }) => {
   await gotoHydrated(page, '/workbench')
-  await applyExampleLoad(page)
+  await openSavedLoad(page)
   const charge = loadForm(page).getByLabel(/^Charge mass/)
   await expect(charge).toHaveValue('2.40')
   await charge.evaluate((el: HTMLInputElement) => {

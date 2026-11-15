@@ -5,7 +5,6 @@ import { english } from '../src/i18n/translate.ts'
 import { fetchPowder, postInteriorRun, postJson } from '../src/lib/api-client.ts'
 import { runBatch } from '../src/lib/batch.ts'
 import { noComparableLimitText, targetError, targetUnit } from '../src/lib/charge-target.ts'
-import { exampleInterior } from '../src/lib/example-data.ts'
 import { interiorBody } from '../src/lib/interior-input.ts'
 import {
   compareCharge,
@@ -18,6 +17,7 @@ import {
   sortPowderRows,
 } from '../src/lib/powder-compare.ts'
 import { defined } from './defined.ts'
+import { fixtureInterior } from './fixtures/load.ts'
 
 // these tests stub `fetch` as the API's own answers: the browser's calls go to it as written, in place of the data files and the compute worker
 vi.mock('../src/lib/static-api.ts', () => ({
@@ -161,7 +161,7 @@ describe('powderValues', () => {
 })
 
 describe('compareKey', () => {
-  const body = interiorBody(exampleInterior, 'x')
+  const body = interiorBody(fixtureInterior, 'x')
   const inputs = ['p1', 0.03, 7.8, 7.7]
   const key = compareKey(body, { kind: 'typed' }, inputs)
 
@@ -216,7 +216,7 @@ describe('compareKey', () => {
 })
 
 describe('compareKey in the target mode', () => {
-  const body = interiorBody(exampleInterior, 'x')
+  const body = interiorBody(fixtureInterior, 'x')
   const inputs = ['p1']
   const target = { kind: 'target', value: 3.5e8, percent: false } as const
   const key = compareKey(body, target, inputs)
@@ -233,7 +233,7 @@ describe('compareKey in the target mode', () => {
 
 describe('answerRow', () => {
   const head = { id: 'p1', manufacturerName: 'M', name: 'N' }
-  const body = interiorBody(exampleInterior, 'x')
+  const body = interiorBody(fixtureInterior, 'x')
   const answer = {
     result: {
       peakBreechPressure: 3.4e8,
@@ -487,7 +487,7 @@ describe('postJson cut by an abort', () => {
 })
 
 describe('computeRows in the target mode', () => {
-  const body = interiorBody(exampleInterior, 'x')
+  const body = interiorBody(fixtureInterior, 'x')
   const loadRequest = (as?: { powder: Powder }) => ({
     body,
     bulkDensity: as?.powder.bulkDensity && as.powder.bulkDensity.value * 1e3,
@@ -496,11 +496,12 @@ describe('computeRows in the target mode', () => {
   const target = { kind: 'target', value: 3.5e8, percent: false } as const
   // the records are kept for the session: a new set of ids for each API
   let set = 0
-  const summary = (i: number, interior = true) => ({
+  const summary = (i: number, interior = true, scope?: string[]) => ({
     id: `target-${set}-${i}`,
     manufacturer: 'm',
     name: `N${i}`,
     interior,
+    ...(scope && { scope }),
   })
   const found = {
     charge: 0.003,
@@ -515,14 +516,19 @@ describe('computeRows in the target mode', () => {
   }
   const json = (b: unknown, status = 200) => new Response(JSON.stringify(b), { status })
 
-  /** The API: a list of `n` powders (the first without model parameters), `solve` answers each charge request. */
-  function api(n: number, solve: () => Promise<Response>, density?: number) {
+  /** The API: a list of `n` powders (the first without model parameters, the one at `shotgunAt` for shotguns only), `solve` answers each charge request. */
+  function api(n: number, solve: () => Promise<Response>, density?: number, shotgunAt?: number) {
     const requests: string[] = []
     set++
     vi.stubGlobal('fetch', async (url: string, init?: { signal?: AbortSignal }) => {
       if (url === '/api/manufacturers') return json({ total: 1, items: [{ id: 'm', name: 'M' }] })
       if (url.startsWith('/api/powders?'))
-        return json({ total: n, items: Array.from({ length: n }, (_, i) => summary(i, i > 0)) })
+        return json({
+          total: n,
+          items: Array.from({ length: n }, (_, i) =>
+            summary(i, i > 0, i === shotgunAt ? ['shotgun'] : undefined),
+          ),
+        })
       if (url.startsWith('/api/powders/')) {
         const id = decodeURIComponent(url.slice('/api/powders/'.length))
         return json({
@@ -555,6 +561,21 @@ describe('computeRows in the target mode', () => {
       },
     )
     expect(defined(done?.rows[1]).flag).toBeUndefined()
+  })
+
+  it('computes no shotgun-only powder and says why', async () => {
+    const charge = 900 * body.load.chamber.volume
+    const requests = api(3, async () => json({ ...found, charge }), 0.9, 1)
+    const done = await computeRows(
+      loadRequest as never,
+      loadRequest() as never,
+      target,
+      new AbortController().signal,
+      { start: () => {}, done: () => {} },
+    )
+    expect(requests).toHaveLength(1)
+    expect(defined(done?.rows[1]).reason).toBe('Not a metallic-cartridge powder')
+    expect(defined(done?.rows[2]).values).toBeDefined()
   })
 
   it('stops after the first answer that the cartridge has no comparable limit', async () => {

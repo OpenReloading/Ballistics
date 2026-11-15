@@ -1,10 +1,10 @@
 import { expect, type Page } from '@playwright/test'
 import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
-import { applyExampleLoad } from './workbench.ts'
+import { openSavedLoad } from './workbench.ts'
 import { runLine } from './workbench-run.ts'
 
-// one string per step of the example's charge ladder, 5 steps
+// one string per step of the fixture load's charge ladder, 5 steps
 const ladder = [
   'string,velocity,velocityUnit',
   ...['A', 'B', 'C', 'D', 'E'].flatMap((name, i) =>
@@ -12,7 +12,7 @@ const ladder = [
   ),
 ].join('\n')
 
-/** Saves the example load with a ladder of strings and opens the tuning route from its Measurements tab once the fit is shown, which may take up to 60 s after the run, the save and the navigation. */
+/** Saves the fixture load with a ladder of strings and opens the tuning route from its Measurements tab once the fit is shown, which may take up to 60 s after the run, the save and the navigation. */
 export async function openFit(page: Page) {
   // a native picker cannot be driven: the file goes to the origin private file system
   await page.addInitScript(() => {
@@ -20,7 +20,7 @@ export async function openFit(page: Page) {
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
   })
   await gotoHydrated(page, '/workbench')
-  await applyExampleLoad(page)
+  await openSavedLoad(page)
   await runLine(page)
   // the phone layout keeps the run's tabs behind its Results tab
   const results = page.getByRole('tab', { name: 'Results', exact: true })
