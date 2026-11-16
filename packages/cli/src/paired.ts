@@ -58,6 +58,27 @@ function deviation(values: readonly number[]) {
   return Math.sqrt(values.reduce((s, v) => s + (v - mean) ** 2, 0) / (values.length - 1))
 }
 
+/** The clusters of `byCartridge` in the order of their cartridge ids, the order the bootstrap draws from. */
+const ordered = <C>(byCartridge: ReadonlyMap<string, C>) =>
+  [...byCartridge].toSorted(([a], [b]) => compareKeys(a, b)).map(([, cluster]) => cluster)
+
+/** The standard deviation of the median and the P90 of `statOf` over {@link bootstrap} draws of whole clusters with replacement. */
+function bootstrapErrors<C>(
+  clusters: readonly C[],
+  statOf: (drawn: readonly C[]) => { median: number; p90: number },
+) {
+  const uniform = seededUniforms(bootstrap.seed)
+  const draws = { median: [] as number[], p90: [] as number[] }
+  for (let d = 0; d < bootstrap.draws; d++) {
+    // whole cartridges are drawn: the rows of one cartridge share its error, so they are not independent draws
+    const drawn = clusters.map(() => nth(clusters, Math.floor(uniform() * clusters.length)))
+    const stat = statOf(drawn)
+    draws.median.push(stat.median)
+    draws.p90.push(stat.p90)
+  }
+  return { median: deviation(draws.median), p90: deviation(draws.p90) }
+}
+
 /** The paired change of one quantity, null without a row both sides ran that has it. */
 function quantityChange(
   baseline: ReadonlyMap<number, RowError>,
@@ -77,23 +98,19 @@ function quantityChange(
     rows++
   }
   if (rows === 0) return null
-  const clusters = [...byCartridge]
-    .toSorted(([a], [b]) => compareKeys(a, b))
-    .map(([, cluster]) => cluster)
-  const uniform = seededUniforms(bootstrap.seed)
-  const draws = { median: [] as number[], p90: [] as number[] }
-  for (let d = 0; d < bootstrap.draws; d++) {
-    // whole cartridges are drawn: the rows of one cartridge share its error, so they are not independent draws
-    const drawn = clusters.map(() => nth(clusters, Math.floor(uniform() * clusters.length)))
+  const clusters = ordered(byCartridge)
+  const errors = bootstrapErrors(clusters, (drawn) => {
     const change = changeOf(drawn)
-    draws.median.push(change.median.candidate - change.median.baseline)
-    draws.p90.push(change.p90.candidate - change.p90.baseline)
-  }
+    return {
+      median: change.median.candidate - change.median.baseline,
+      p90: change.p90.candidate - change.p90.baseline,
+    }
+  })
   const observed = changeOf(clusters)
   const stat = (key: 'median' | 'p90') => ({
     ...observed[key],
     change: observed[key].candidate - observed[key].baseline,
-    standardError: deviation(draws[key]),
+    standardError: errors[key],
   })
   return { rows, cartridges: clusters.length, median: stat('median'), p90: stat('p90') }
 }
@@ -107,5 +124,41 @@ export function pairedChange(baseline: readonly RowError[], candidate: readonly 
     ...bootstrap,
     velocity: quantityChange(b, c, 'velocity'),
     pressure: quantityChange(b, c, 'pressure'),
+  }
+}
+
+/** The median and the P90 of the absolute errors of one quantity over the rows of all folds, null without a row that has it. */
+function pooledQuantity(errors: readonly RowError[], quantity: Quantity) {
+  const byCartridge = new Map<string, number[]>()
+  for (const e of errors) {
+    const error = e[quantity]
+    if (error === undefined) continue
+    const cluster = byCartridge.get(e.cartridge) ?? []
+    cluster.push(Math.abs(error))
+    byCartridge.set(e.cartridge, cluster)
+  }
+  if (byCartridge.size === 0) return null
+  const clusters = ordered(byCartridge)
+  const statOf = (drawn: readonly number[][]) => {
+    const all = sorted(drawn.flat())
+    return { median: sortedPercentile(all, 0.5), p90: sortedPercentile(all, 0.9) }
+  }
+  const observed = statOf(clusters)
+  const standardError = bootstrapErrors(clusters, statOf)
+  return {
+    rows: clusters.flat().length,
+    cartridges: clusters.length,
+    median: { value: observed.median, standardError: standardError.median },
+    p90: { value: observed.p90, standardError: standardError.p90 },
+  }
+}
+
+/** The out-of-fold errors of a cross-validation aggregated: the median and the P90 of the absolute error over the rows of every fold, each scored by the fit without its fold, with the standard error of the bootstrap of {@link pairedChange}. */
+export function foldAggregate(folds: readonly (readonly RowError[])[]) {
+  const errors = folds.flat()
+  return {
+    ...bootstrap,
+    velocity: pooledQuantity(errors, 'velocity'),
+    pressure: pooledQuantity(errors, 'pressure'),
   }
 }

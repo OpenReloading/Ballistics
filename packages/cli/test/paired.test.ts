@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { pairedChange, type RowError } from '../src/paired.ts'
+import { foldAggregate, pairedChange, type RowError } from '../src/paired.ts'
 
 const e = (row: number, cartridge: string, velocity: number, pressure?: number): RowError => ({
   row,
@@ -66,5 +66,33 @@ describe('pairedChange with estimated capacities', () => {
     const baseline = [e(0, 'a', 0.01), e(1, 'a', 0.02), estimated(e(2, 'b', 0.5))]
     const candidate = [e(0, 'a', 0.01), estimated(e(1, 'a', 0.9)), estimated(e(2, 'b', 0.4))]
     expect(pairedChange(baseline, candidate).velocity).toMatchObject({ rows: 1, cartridges: 1 })
+  })
+})
+
+describe('foldAggregate', () => {
+  it('pools the absolute errors of every fold', () => {
+    const r = foldAggregate([[e(0, 'a', 0.01), e(1, 'a', -0.03)], [e(2, 'b', 0.05, -0.2)]])
+    // 0.01, 0.03, 0.05; P90 at rank 1.8: 0.03 + 0.8 * 0.02
+    expect(r.velocity).toMatchObject({ rows: 3, cartridges: 2 })
+    expect(r.velocity?.median.value).toBeCloseTo(0.03, 12)
+    expect(r.velocity?.p90.value).toBeCloseTo(0.046, 12)
+    // one cartridge is drawn in every draw, so the pooled value does not spread
+    expect(r.pressure).toEqual({
+      rows: 1,
+      cartridges: 1,
+      median: { value: expect.closeTo(0.2, 12), standardError: expect.closeTo(0, 12) },
+      p90: { value: expect.closeTo(0.2, 12), standardError: expect.closeTo(0, 12) },
+    })
+  })
+
+  it('draws whole cartridges: folds of cartridges with the same errors give no spread', () => {
+    const cartridge = (name: string, first: number) =>
+      [0.01, -0.03, 0.05].map((error, i) => e(first + i, name, error))
+    const r = foldAggregate([cartridge('a', 0), cartridge('b', 3), cartridge('c', 6)])
+    expect(r.velocity?.median).toEqual({
+      value: expect.closeTo(0.03, 12),
+      standardError: expect.closeTo(0, 12),
+    })
+    expect(r.velocity?.p90.standardError).toEqual(expect.closeTo(0, 12))
   })
 })

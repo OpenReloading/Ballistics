@@ -46,6 +46,27 @@ function screenLines(name: string, s: VerifyResult['screen']) {
   ]
 }
 
+/** The lines of `--folds`: the rule, one line per fold and each quantity over all folds with its standard error; none without it. */
+function foldLines(f: VerifyResult['folds']) {
+  if (!f) return []
+  const se = (x: number) => (100 * x).toFixed(2)
+  const pooled = (['velocity', 'pressure'] as const).flatMap((q) => {
+    const a = f.aggregate[q]
+    if (!a) return []
+    return [
+      `all folds ${q}: median ${pct(a.median.value)} % (se ${se(a.median.standardError)}), P90 ${pct(a.p90.value)} % (se ${se(a.p90.standardError)}) over ${a.rows} rows of ${a.cartridges} cartridges`,
+    ]
+  })
+  return [
+    `folds: ${f.count} over the ${f.cartridges} cartridges of the training and validation splits, salt ${f.salt}; each scored by a fit on the others`,
+    table(
+      metricHead.map((h, i) => (i === 0 ? 'fold: cartridges' : h)),
+      f.each.map((e) => rowsOf(`${e.fold}: ${e.cartridges.length}`, e.overall)),
+    ),
+    ...pooled,
+  ]
+}
+
 /** `verify` as text: the version, the screen line, the interval and one line per group. */
 export function verifyTable(r: VerifyResult): string {
   const groups = [
@@ -71,10 +92,11 @@ export function verifyTable(r: VerifyResult): string {
     `model ${r.model}  version ${r.modelVersion}`,
     ...screenLines('', r.screen),
     ...publishedLines(r.published),
-    `split ${r.split}  salt ${r.splitSalt}  interval half width ${pct(r.interval.halfWidth)} % from ${r.interval.trainingRows} training rows`,
+    `split ${r.split}  salt ${r.splitSalt}  interval half width ${r.folds ? 'of the fold of each row' : `${pct(r.interval.halfWidth)} % from ${r.interval.trainingRows} training rows`}`,
     table(metricHead, groups),
     ...(reasons.length > 0 ? [`not used: ${reasons.join(', ')}`] : []),
     ...(bases.length > 0 ? [`pressure by basis, median / P90: ${bases.join(', ')}`] : []),
+    ...foldLines(r.folds),
   ].join('\n')
 }
 
@@ -173,5 +195,6 @@ export function fitTable(r: FitResult): string {
     ...(r.exponent ? [`exponent: pooled ${r.exponent.pooled}; ${families.join(', ')}`] : []),
     ...pressureLines(r.pressure),
     ...(notFitted.length > 0 ? [`not fitted: ${notFitted.join(', ')}`] : []),
+    ...foldLines(r.folds),
   ].join('\n')
 }

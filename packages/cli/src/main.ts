@@ -20,7 +20,7 @@ const usage = `usage:
   ballistics fit     --rows <path> [--model m3|<module>] [--velocity-sigma <fraction>]
                      [--exponent family [--family <fit.json>]]
                      [--pressure-sigma <fraction> [--pressure-factor <key>]] [--energy prior]
-                     [--records <dir>] [--json | --table]
+                     [--folds] [--records <dir>] [--json | --table]
   ballistics run <operation> --input <file|-> [--records <dir>]
   ballistics estimate-capacities --out <dir> [--records <dir>]
   ballistics operations
@@ -62,6 +62,12 @@ options:
   --energy prior     fit and --params fit-on-training: each powder's energy is its prior
                      from thermochemistry times one energy-level factor chosen on the
                      training pressures; only the burn coefficient is fitted per powder
+  --folds            fit and verify: cross-validate over 5 folds of the cartridges of the
+                     training and validation splits (the fold of a cartridge is its place,
+                     mod 5, in the order of the SHA-256 of 2026-11-14/<cartridge id>); each
+                     fold is scored by a fit, with the fit options, on the other four, and
+                     the result holds each fold and all folds together; the test split is
+                     not read; verify takes no --split, --params or --fit with it
   --json | --table   output format (default: JSON unless stdout is a terminal)
   -h, --help         this text
   --version          the version
@@ -161,7 +167,7 @@ type Command = 'verify' | 'compare' | 'fit'
 /** The options each command does not take. */
 const foreignOptions = {
   verify: ['baseline', 'candidate'],
-  compare: ['model', 'leave-one-powder-out', 'per-row'],
+  compare: ['model', 'leave-one-powder-out', 'per-row', 'folds'],
   fit: [
     'fit',
     'split',
@@ -207,6 +213,7 @@ function optionsOf(
       energy: { type: 'string' },
       fit: { type: 'string' },
       family: { type: 'string' },
+      folds: { type: 'boolean' },
     },
   })
   const foreign = foreignOptions[command].filter((o) => values[o] !== undefined)
@@ -219,12 +226,19 @@ function optionsOf(
     'energy',
     'family',
   ] as const)
-    if (command !== 'fit' && values[option] !== undefined && values.params !== 'fit-on-training')
-      throw new UsageError(`--${option} is for fit and --params fit-on-training`)
+    if (
+      command !== 'fit' &&
+      values[option] !== undefined &&
+      values.params !== 'fit-on-training' &&
+      !values.folds
+    )
+      throw new UsageError(`--${option} is for fit, --params fit-on-training and --folds`)
   if (values.fit !== undefined && values.params !== undefined)
     throw new UsageError('--fit and --params exclude each other')
   const rows = values.rows ?? env.BALLISTICS_ROWS
   if (!rows) throw new UsageError('give --rows <path> or set BALLISTICS_ROWS')
+  if (values.folds && values.split !== undefined)
+    throw new UsageError('--folds reads the training and validation splits and takes no --split')
   const split = values.split ?? 'validation'
   const by = values['group-by']
   checkChoices(values, split, by, choices)
@@ -246,6 +260,7 @@ function optionsOf(
     energy: values.energy as Options['energy'],
     fit: values.fit,
     family: values.family,
+    folds: values.folds === true,
   }
   return { options, values }
 }
