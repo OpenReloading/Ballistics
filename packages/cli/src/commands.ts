@@ -6,9 +6,10 @@ import { readPublishedLoads } from '@rangefoundry/tools/catalog'
 import { Refusal, UsageError } from './errors.ts'
 import { type InteriorModel, type Outcome, outcomes } from './evaluate.ts'
 import { fitPowders, notFittedReasons, type PressureKey, priorLines, withFit } from './fit.ts'
-import { changeOf, evaluate, type Grouping, metricsOf } from './metrics.ts'
+import { foldCount, foldSalt, foldsOf } from './folds.ts'
+import { changeOf, evaluate, type Grouping, groupsOf, halfWidthOf, metricsOf } from './metrics.ts'
 import { builtInName, fitFiles, loadModel, type Model } from './model.ts'
-import { pairedChange, type RowError, rowErrors } from './paired.ts'
+import { foldAggregate, pairedChange, type RowError, rowErrors } from './paired.ts'
 import { fillInputs, rowsFromPublished } from './published-rows.ts'
 import { loadRecords, type Records, withoutEstimates } from './records.ts'
 import {
@@ -58,6 +59,8 @@ export interface Options {
   energy?: 'prior' | undefined
   /** `verify`: adds the error of each used row of the split. */
   perRow?: boolean | undefined
+  /** Grouped cross-validation by cartridge over the training split ({@link foldsOf}): each fold scored by a fit on the other folds; `verify` needs `split` `training` and `params` `fit-on-training`. */
+  folds?: boolean | undefined
 }
 
 /** What `fit` reads. */
@@ -72,6 +75,7 @@ type FitOptions = Pick<
   | 'exponent'
   | 'family'
   | 'energy'
+  | 'folds'
 >
 
 type Inputs = VerifyResult['inputs']
@@ -250,10 +254,13 @@ function familyChoice(path: string, data: Prepared, model: Model, velocitySigma:
   return saved.exponent
 }
 
-/** The fit of a run under `model`, the records with its values laid over, its version line and its summary for an evaluation. */
-function fitOf(options: FitOptions, data: Prepared, model: Model) {
+/** The velocity sigma of a fit with `options`. */
+const velocitySigmaOf = (options: FitOptions) =>
   // load tables print no spread; ANSI/SAAMI Z299.4-2025 expects tested ammunition within 90 fps of the table, about 3 %
-  const velocitySigma = options.velocitySigma ?? 0.03
+  options.velocitySigma ?? 0.03
+
+/** Throws the `UsageError` of the fit options that do not combine. */
+function checkFitOptions(options: FitOptions) {
   const { exponent, pressureSigma, pressureFactor, energy } = options
   if (pressureFactor !== undefined && pressureSigma === undefined)
     throw new UsageError('--pressure-factor needs --pressure-sigma')
@@ -265,6 +272,13 @@ function fitOf(options: FitOptions, data: Prepared, model: Model) {
   // with --energy prior the family choice is made at each energy-level factor, so one saved choice does not stand for it
   if (options.family !== undefined && energy !== undefined)
     throw new UsageError('--family and --energy prior do not combine')
+}
+
+/** The fit of a run under `model`, the records with its values laid over, its version line and its summary for an evaluation. */
+function fitOf(options: FitOptions, data: Prepared, model: Model) {
+  checkFitOptions(options)
+  const velocitySigma = velocitySigmaOf(options)
+  const { exponent, pressureSigma, pressureFactor, energy } = options
   const family =
     options.family === undefined
       ? undefined
@@ -342,10 +356,7 @@ async function evaluateModel(spec: string, options: Options, data: Prepared): Pr
   const wanted: Split[] = options.split === 'training' ? ['training'] : [options.split, 'training']
   const run = outcomes(data.rows, records, model.interior, wanted)
   const estimated = run.filter((o) => o.estimatedCapacity && o.split === options.split)
-  const all = run.map(
-    (o): Outcome =>
-      o.estimatedCapacity ? { ...o, prediction: { reason: 'estimatedCapacity' } } : o,
-  )
+  const all = estimatedNotUsed(run)
   const inSplit = all.filter((o) => o.split === options.split)
   const evaluation = evaluate(
     inSplit,
@@ -376,10 +387,133 @@ async function evaluateModel(spec: string, options: Options, data: Prepared): Pr
     }),
     ...(fitted && { fit: fitted.summary }),
     ...(fitted && 'screen' in fitted && { screen: fitted.screen }),
-    rows: [
-      ...rowErrors(inSplit),
-      ...rowErrors(estimated).map((e) => ({ ...e, capacity: 'estimated' as const })),
-    ].toSorted((a, b) => a.row - b.row),
+    rows: errorsOf(inSplit, estimated),
+  }
+}
+
+/** `run` with each row of an estimated capacity not used, as `estimatedCapacity`. */
+const estimatedNotUsed = (run: readonly Outcome[]) =>
+  run.map(
+    (o): Outcome =>
+      o.estimatedCapacity ? { ...o, prediction: { reason: 'estimatedCapacity' } } : o,
+  )
+
+/** The row errors of `scored` and of `estimated`, marked as estimated, in row order. */
+const errorsOf = (scored: readonly Outcome[], estimated: readonly Outcome[]) =>
+  [
+    ...rowErrors(scored),
+    ...rowErrors(estimated).map((e) => ({ ...e, capacity: 'estimated' as const })),
+  ].toSorted((a, b) => a.row - b.row)
+
+/** `fit()`, with the number of the fold in the message of the `UsageError` or `Refusal` it throws, since the rows of one fold may lack what the whole training split has. */
+function foldFit<T>(fold: number, fit: () => T): T {
+  try {
+    return fit()
+  } catch (error) {
+    if (error instanceof UsageError)
+      throw new UsageError(`fold ${fold}: ${error.message}`, error.details)
+    if (error instanceof Refusal) throw new Refusal(`fold ${fold}: ${error.message}`, error.details)
+    throw error
+  }
+}
+
+/** The grouped cross-validation of `--folds` by cartridge ({@link foldsOf}) over the training rows of `data` under `model`: each fold scored by a fit with `options` on the training rows of the other folds; a `Refusal` with fewer training cartridges than folds. */
+function crossValidate(options: FitOptions, data: Prepared, model: Model) {
+  checkFitOptions(options)
+  // a saved family choice was made on the rows of every fold
+  if (options.family !== undefined) throw new UsageError('--folds and --family do not combine')
+  const training = data.rows.filter((r) => splitOf(r.cartridge) === 'training')
+  const foldOf = foldsOf(training.map((r) => r.cartridge))
+  if (foldOf.size < foldCount)
+    throw new Refusal(
+      `--folds needs ${foldCount} training cartridges or more, the rows have ${foldOf.size}`,
+    )
+  const each = Array.from({ length: foldCount }, (_, fold) => {
+    const held = (r: Row) => foldOf.get(r.cartridge) === fold
+    const fitted = foldFit(fold, () =>
+      fitOf(options, { ...data, rows: training.filter((r) => !held(r)) }, model),
+    )
+    // as in a full fit, a powder without a fit row has no value, so its rows count as noPowderModel
+    const unnamed = [...new Set(training.filter(held).map((r) => r.powder))].filter(
+      (id) =>
+        data.records.powders.get(id)?.interior &&
+        !Object.hasOwn(fitted.powders, id) &&
+        !Object.hasOwn(fitted.notFitted, id),
+    )
+    const notFitted = {
+      ...fitted.notFitted,
+      ...Object.fromEntries(unnamed.map((id) => [id, 'noUsableRow' as const])),
+    }
+    const records = withFit(data.records, { powders: fitted.powders, notFitted })
+    const run = outcomes(data.rows, records, model.interior, ['training'])
+    const all = estimatedNotUsed(run)
+    const { halfWidth, trainingRows } = halfWidthOf(all.filter((o) => !held(o.row)))
+    return {
+      fold,
+      cartridges: [...foldOf].flatMap(([id, f]) => (f === fold ? [id] : [])).toSorted(compareKeys),
+      fit: summaryOf({ ...fitted, pressure: fitted.summary.pressure, notFitted }),
+      interval: { basis: 'training' as const, halfWidth, trainingRows },
+      scored: all.filter((o) => held(o.row)),
+      estimated: run.filter((o) => o.estimatedCapacity && held(o.row)),
+    }
+  })
+  const widths = new Map(
+    each.flatMap((f) => f.scored.map((o) => [o.index, f.interval.halfWidth] as const)),
+  )
+  return {
+    scored: each.flatMap((f) => f.scored),
+    estimated: each.flatMap((f) => f.estimated),
+    halfWidth: (o: Outcome) => widths.get(o.index) ?? null,
+    trainingRows: each.reduce((n, f) => n + f.interval.trainingRows, 0),
+    folds: {
+      ...({ unit: 'cartridge', count: foldCount, salt: foldSalt } as const),
+      cartridges: foldOf.size,
+      each: each.map(({ fold, cartridges, fit, interval, scored }) => ({
+        fold,
+        cartridges,
+        fit,
+        interval,
+        overall: metricsOf(scored, interval.halfWidth),
+      })),
+      aggregate: foldAggregate(each.map((f) => rowErrors(f.scored))),
+    },
+  }
+}
+
+/** The params line of a `--folds` run: that of a fit with its options, and the fold rule. */
+function foldParams(options: FitOptions, data: Prepared) {
+  const { exponent, pressureSigma, pressureFactor, energy } = options
+  const pressure =
+    pressureSigma === undefined
+      ? undefined
+      : { sigma: pressureSigma, by: pressureFactor ?? 'basis' }
+  const priors = energy && priorLines(data.rows, data.records)
+  const fit = paramsLine(velocitySigmaOf(options), exponent !== undefined, pressure, priors)
+  return `${fit} folds cartridge ${foldCount} salt ${foldSalt}`
+}
+
+/** What the model selected by `spec` gives on the training rows under `--folds`, every fold together; refuses a run with no evaluable row. */
+async function evaluateFolds(spec: string, options: Options, data: Prepared) {
+  if (options.split !== 'training') throw new UsageError('--folds reads the training split only')
+  if (options.params !== 'fit-on-training')
+    throw new UsageError('--folds needs --params fit-on-training')
+  if (options.leaveOnePowderOut)
+    throw new UsageError('--folds and --leave-one-powder-out do not combine')
+  const model = await loadModel(spec)
+  const cv = crossValidate(options, data, model)
+  const evaluation = groupsOf(cv.scored, cv.halfWidth, options.groupBy)
+  if (evaluation.overall.rows.used === 0)
+    throw new Refusal(
+      `no row of the training split could be evaluated (${evaluation.overall.rows.inSplit} in the split)`,
+    )
+  return {
+    model: model.name,
+    modelVersion: versionOf(model, data, foldParams(options, data)),
+    interval: { basis: 'training' as const, halfWidth: null, trainingRows: cv.trainingRows },
+    ...evaluation,
+    ...(cv.estimated.length > 0 && { estimatedCapacity: metricsOf(cv.estimated, cv.halfWidth) }),
+    folds: cv.folds,
+    rows: errorsOf(cv.scored, cv.estimated),
   }
 }
 
@@ -387,7 +521,9 @@ async function evaluateModel(spec: string, options: Options, data: Prepared): Pr
 export async function verify(options: Options, spec = builtInName): Promise<VerifyResult> {
   checkSealed(options)
   const data = prepare(options)
-  const { rows, ...evaluation } = await evaluateModel(spec, options, data)
+  const { rows, ...evaluation } = options.folds
+    ? await evaluateFolds(spec, options, data)
+    : await evaluateModel(spec, options, data)
   return {
     schemaVersion,
     notice,
@@ -453,8 +589,11 @@ async function baselineOf(spec: string, options: Options, data: Prepared): Promi
     final: _f,
     inputs,
     published: _p,
+    folds,
     ...evaluation
   } = savedResult(spec, 'baseline')
+  // its rows were scored by five fits, the candidate's by one
+  if (folds) throw new Refusal('the baseline is a --folds result, which compare does not pair')
   if (split !== options.split)
     throw new Refusal(`the baseline is a ${split} result, this run is ${options.split}`)
   if (inputs.rows !== data.inputs.rows || inputs.records !== data.inputs.records)
@@ -516,6 +655,8 @@ export async function compare(
 export async function fit(options: FitOptions, spec = builtInName): Promise<FitResult> {
   const data = prepare(options)
   const model = await loadModel(spec)
+  // before the full fit, so that a run --folds refuses fails fast
+  const folds = options.folds ? crossValidate(options, data, model).folds : undefined
   const fitted = fitOf(options, data, model)
   return {
     schemaVersion,
@@ -533,5 +674,6 @@ export async function fit(options: FitOptions, spec = builtInName): Promise<FitR
     powders: fitted.powders,
     notFitted: fitted.notFitted,
     ...(fitted.energy && { energy: fitted.energy }),
+    ...(folds && { folds }),
   }
 }

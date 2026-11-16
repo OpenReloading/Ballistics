@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { reasons } from './evaluate.ts'
 import { notFittedReasons, pressureKeys } from './fit.ts'
+import { foldCount, foldSalt } from './folds.ts'
 import { groupings } from './metrics.ts'
 import { skipReasons } from './published-rows.ts'
 import { splitSalt, splits } from './split.ts'
@@ -85,21 +86,53 @@ const pressureFit = z
     'With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its key of `--pressure-factor`.',
   )
 
+const interval = z.object({
+  basis: z.literal('training'),
+  halfWidth: z
+    .number()
+    .nullable()
+    .describe(
+      'The 90th percentile of the absolute relative velocity error on the training split: the interval is the model velocity times (1 +/- this). Null without a training row, and with `--folds`, where each row is scored with the half width of its fold.',
+    ),
+  trainingRows: count.describe(
+    'Used training rows the half width comes from; with `--folds` the sum over the folds, in which each training row counts once for every fold whose half width it sets.',
+  ),
+})
+
+const fitSummary = z.object({
+  velocitySigma: fraction.describe('Velocity sigma of the fit, a fraction of the velocity.'),
+  powders: count.describe('Powders fitted.'),
+  notFitted: z
+    .partialRecord(z.enum(notFittedReasons), count)
+    .describe('Powders not fitted, by reason; a reason without powders is left out.'),
+  exponent: z
+    .object({
+      pooled: z
+        .number()
+        .describe('The exponent of least mean chi square over all powders that entered.'),
+      families: z
+        .record(z.string(), z.number())
+        .describe('By powder family, the exponent it chose.'),
+    })
+    .optional()
+    .describe('With `--exponent family`: the pressure exponents of the fit.'),
+  pressure: pressureFit,
+  energy: z
+    .object({
+      factor: z
+        .number()
+        .describe('The energy-level factor the prior impetus values were scaled by.'),
+    })
+    .optional()
+    .describe('With `--energy prior`.'),
+})
+
 const evaluation = z.object({
   model: z.string().describe('The name or module path the model was selected by.'),
   modelVersion: z
     .string()
     .describe('SHA-256 over the model sources, the records the rows name and the rows bytes.'),
-  interval: z.object({
-    basis: z.literal('training'),
-    halfWidth: z
-      .number()
-      .nullable()
-      .describe(
-        'The 90th percentile of the absolute relative velocity error on the training split: the interval is the model velocity times (1 +/- this). Null without a training row.',
-      ),
-    trainingRows: count.describe('Used training rows the half width comes from.'),
-  }),
+  interval,
   overall: metrics,
   byFamily: z
     .record(z.string(), metrics)
@@ -123,37 +156,10 @@ const evaluation = z.object({
     .describe(
       'Powder not in the fitted set, with `--leave-one-powder-out`: the rows of each powder that has interior parameters, run without them. A powder without rows has no value, so its rows count as `noPowderModel` (a row with an unknown cartridge or bullet as `unknownCartridge` or `unknownBullet`, which are checked first) and the errors and the coverage are null.',
     ),
-  fit: z
-    .object({
-      velocitySigma: fraction.describe('Velocity sigma of the fit, a fraction of the velocity.'),
-      powders: count.describe('Powders fitted.'),
-      notFitted: z
-        .partialRecord(z.enum(notFittedReasons), count)
-        .describe('Powders not fitted, by reason; a reason without powders is left out.'),
-      exponent: z
-        .object({
-          pooled: z
-            .number()
-            .describe('The exponent of least mean chi square over all powders that entered.'),
-          families: z
-            .record(z.string(), z.number())
-            .describe('By powder family, the exponent it chose.'),
-        })
-        .optional()
-        .describe('With `--exponent family`: the pressure exponents of the fit.'),
-      pressure: pressureFit,
-      energy: z
-        .object({
-          factor: z
-            .number()
-            .describe('The energy-level factor the prior impetus values were scaled by.'),
-        })
-        .optional()
-        .describe('With `--energy prior`.'),
-    })
+  fit: fitSummary
     .optional()
     .describe(
-      "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`. With `--pressure-sigma`, `pressure` holds the factor per key of `--pressure-factor` of the fit; the pressure errors still compare the model's peak pressure as it is with the printed pressure. With `--fit`: the summary of the saved fit.",
+      "With `--params fit-on-training`: the burn coefficients were fitted to the training rows; a powder not fitted has no value, so its rows count as `noPowderModel`. With `--pressure-sigma`, `pressure` holds the factor per key of `--pressure-factor` of the fit; the pressure errors still compare the model's peak pressure as it is with the printed pressure. With `--fit`: the summary of the saved fit. Left out with `--folds`, where each fold has its own in `folds.each`.",
     ),
   screen: z
     .object({
@@ -210,11 +216,67 @@ const common = {
 
 const signed = z.number().describe('(model - printed) / printed, as a fraction.')
 
+const pooledStat = z.object({
+  value: fraction.describe('Over the rows of every fold.'),
+  standardError: z.number().describe('Standard deviation over the bootstrap draws.'),
+})
+const pooledQuantity = z
+  .object({
+    rows: count.describe('Used rows of every fold (for pressure: that print one in bar).'),
+    cartridges: count.describe('Their distinct cartridges, the units the bootstrap draws.'),
+    median: pooledStat.describe('Of the median absolute relative error.'),
+    p90: pooledStat.describe('Of the 90th percentile of the absolute relative error.'),
+  })
+  .nullable()
+  .describe('Null without a used row that has the quantity.')
+
+const folds = z
+  .object({
+    unit: z.literal('cartridge').describe('A fold holds whole cartridges.'),
+    count: z.literal(foldCount),
+    salt: z
+      .literal(foldSalt)
+      .describe(
+        'The salt of the rule that deals the training cartridges to the folds: sorted by the hex SHA-256 of `<salt>/<cartridge id>`, the fold of a cartridge is its position mod `count`.',
+      ),
+    cartridges: count.describe('Distinct cartridges of the training rows, the ones dealt.'),
+    each: z
+      .array(
+        z.object({
+          fold: count.describe('From 0.'),
+          cartridges: z.array(z.string()).describe('Its cartridge ids, sorted.'),
+          fit: fitSummary.describe(
+            'The fit on the training rows of the other folds; a powder only this fold names has no fit row and counts as `noUsableRow`.',
+          ),
+          interval: interval.describe(
+            'The half width of the fit, on the training rows of the other folds.',
+          ),
+          overall: metrics.describe('The rows of the fold, scored by the fit without them.'),
+        }),
+      )
+      .describe('Per fold, from 0.'),
+    aggregate: z
+      .object({
+        draws: count.describe('Bootstrap draws.'),
+        seed: count.describe('Seed of the draws.'),
+        velocity: pooledQuantity,
+        pressure: pooledQuantity,
+      })
+      .describe(
+        'The rows of every fold together, each scored by the fit without its fold, with the standard error of a bootstrap that draws whole cartridges with replacement; the rows of `estimatedCapacity` are left out.',
+      ),
+  })
+  .optional()
+  .describe(
+    'With `--folds`: grouped cross-validation by cartridge over the training split; no row of another split is fitted or scored. In `verify`, the evaluation holds the rows of every fold together, each scored by the fit without its fold.',
+  )
+
 /** The result of `verify`. */
 export const verifyResult = z.object({
   ...common,
   command: z.literal('verify'),
   ...evaluation.shape,
+  folds,
   rows: z
     .array(
       z.object({
@@ -232,7 +294,7 @@ export const verifyResult = z.object({
     )
     .optional()
     .describe(
-      'With `--per-row`: the error of each used row of the split, for the paired change of `compare`, the rows of `estimatedCapacity` among them.',
+      'With `--per-row`: the error of each used row of the split, for the paired change of `compare`, the rows of `estimatedCapacity` among them; with `--folds`, each scored by the fit without its fold.',
     ),
 })
 
@@ -431,6 +493,7 @@ export const fitResult = z.object({
     .describe(
       "With `--energy prior`: each powder's energy is its prior impetus times one energy-level factor shared by all powders, over its `interior.gamma` minus 1, chosen on the training pressures; per powder only the burn coefficient is fitted.",
     ),
+  folds,
 })
 
 /** The result of `fit`. */

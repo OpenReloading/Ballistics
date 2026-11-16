@@ -37,15 +37,23 @@ const stats = (errors: number[]) =>
     : { median: percentile(errors, 0.5) as number, p90: percentile(errors, 0.9) as number }
 
 /** The half width of the 90 % interval: the 90th percentile of the velocity error of the used `training` rows. */
-function halfWidthOf(training: readonly Outcome[]) {
+export function halfWidthOf(training: readonly Outcome[]) {
   const errors = training.filter(isUsed).map(velocityError)
   return { halfWidth: percentile(errors, 0.9) ?? null, trainingRows: errors.length }
 }
 
+/** The half width of {@link halfWidthOf} for every row, or per row: that of its fold in a cross-validation. */
+export type HalfWidth = number | null | ((o: Outcome) => number | null)
+
 /** The metrics of a group of rows; `halfWidth` is the interval of {@link halfWidthOf}. */
-export function metricsOf(items: readonly Outcome[], halfWidth: number | null): Metrics {
+export function metricsOf(items: readonly Outcome[], halfWidth: HalfWidth): Metrics {
   const used = items.filter(isUsed)
   const velocity = used.map(velocityError)
+  const widthOf = typeof halfWidth === 'function' ? halfWidth : () => halfWidth
+  const covered = used.filter((o) => {
+    const width = widthOf(o)
+    return width !== null && bandDistance(o) <= width
+  })
   const pressure = used.flatMap((o) => pressureError(o) ?? [])
   const pressureStats = stats(pressure)
   const bases = new Map<string, number[]>()
@@ -77,14 +85,14 @@ export function metricsOf(items: readonly Outcome[], halfWidth: number | null): 
         ]),
     ),
     interval:
-      halfWidth === null || velocity.length === 0
+      velocity.length === 0 || used.some((o) => widthOf(o) === null)
         ? null
-        : { coverage: used.filter((o) => bandDistance(o) <= halfWidth).length / used.length },
+        : { coverage: covered.length / used.length },
   }
 }
 
 /** The groups of `items` by `key`, each with its metrics. */
-function grouped(items: readonly Outcome[], key: (o: Outcome) => string, halfWidth: number | null) {
+function grouped(items: readonly Outcome[], key: (o: Outcome) => string, halfWidth: HalfWidth) {
   const groups = new Map<string, Outcome[]>()
   for (const o of items) {
     const list = groups.get(key(o)) ?? []
@@ -112,6 +120,16 @@ const keyOf: Record<Grouping, (o: Outcome) => string> = {
   construction: (o) => o.construction,
 }
 
+/** The metrics of the rows of `split`, all together and by family, powder and `by`. */
+export function groupsOf(split: readonly Outcome[], halfWidth: HalfWidth, by?: Grouping) {
+  return {
+    overall: metricsOf(split, halfWidth),
+    byFamily: grouped(split, keyOf.family, halfWidth),
+    byPowder: grouped(split, keyOf.powder, halfWidth),
+    ...(by && { grouped: { by, groups: grouped(split, keyOf[by], halfWidth) } }),
+  }
+}
+
 /** What one model gave on the rows of `split`, with the interval calibrated on `training`. */
 export function evaluate(
   split: readonly Outcome[],
@@ -121,10 +139,7 @@ export function evaluate(
   const { halfWidth, trainingRows } = halfWidthOf(training)
   return {
     interval: { basis: 'training', halfWidth, trainingRows },
-    overall: metricsOf(split, halfWidth),
-    byFamily: grouped(split, keyOf.family, halfWidth),
-    byPowder: grouped(split, keyOf.powder, halfWidth),
-    ...(by && { grouped: { by, groups: grouped(split, keyOf[by], halfWidth) } }),
+    ...groupsOf(split, halfWidth, by),
   }
 }
 
