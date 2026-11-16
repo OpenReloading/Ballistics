@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "The shared interface base: Mantine on the design tokens, with Storybook.",
-  "license": "MIT",
+  "license": "ISC",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OpenReloading/Ballistics.git",

@@ -1,7 +1,7 @@
 {
   "name": "@rangefoundry/schema",
   "version": "0.0.7",
-  "description": "Zod schemas, types and stored units of every OpenReloading record kind.",
+  "description": "Zod schemas, types and stored units of every RangeFoundry record kind.",
   "keywords": [
     "reloading",
     "ballistics",
@@ -9,7 +9,7 @@
     "zod",
     "units"
   ],
-  "license": "MIT",
+  "license": "ISC",
   "homepage": "https://openreloading.github.io/Ballistics/docs/libraries/schema/",
   "repository": {
     "type": "git",

@@ -11,4 +11,4 @@ speedOfSound(air) // 340.29... (m/s)
 millerStability({ mass: 0.01134, diameter: 0.00782, length: 0.0343, twist: 0.254, velocity: 853, air }) // 1.92...
 ```
 
-License: MIT
+License: ISC

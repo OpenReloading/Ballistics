@@ -2,7 +2,7 @@
   "name": "@rangefoundry/e2e",
   "version": "0.0.1",
   "private": true,
-  "license": "MIT",
+  "license": "ISC",
   "scripts": {
     "test": "playwright test",
     "smoke": "playwright test --project=full tests/web/smoke.spec.ts",

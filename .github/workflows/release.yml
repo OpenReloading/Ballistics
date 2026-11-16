@@ -68,7 +68,7 @@ jobs:
           matrix=$(jq -nc \
             --arg av "$API_VERSION" --arg at "$API_TAG" \
             '[{name: "api", dockerfile: "packages/api/Dockerfile", version: $av, tag: $at,
-               licenses: "MIT AND CC-BY-4.0 AND Apache-2.0"}]
+               licenses: "ISC AND MIT AND CC-BY-4.0 AND Apache-2.0"}]
              | map(select(.version != ""))')
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
       - id: libraries
@@ -133,7 +133,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}},value=${{ matrix.version }}
             type=sha
           labels: |
-            org.opencontainers.image.title=OpenReloading Ballistics ${{ matrix.name }}
+            org.opencontainers.image.title=RangeFoundry Workbench ${{ matrix.name }}
             org.opencontainers.image.licenses=${{ matrix.licenses }}
       # built into the local image store first, so a failed scan publishes nothing
       - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0

@@ -9,7 +9,7 @@
     "drawing",
     "svg"
   ],
-  "license": "MIT",
+  "license": "ISC",
   "homepage": "https://openreloading.github.io/Ballistics/docs/libraries/drawing/",
   "repository": {
     "type": "git",

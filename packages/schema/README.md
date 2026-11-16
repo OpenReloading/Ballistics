@@ -1,6 +1,6 @@
 # @rangefoundry/schema
 
-The Zod schemas and TypeScript types of every OpenReloading record kind (cartridges, bullets, powders, loads, sessions and the rest), the stored unit of each quantity and its map to SI.
+The Zod schemas and TypeScript types of every RangeFoundry record kind (cartridges, bullets, powders, loads, sessions and the rest), the stored unit of each quantity and its map to SI.
 
 The JSON Schema of each record kind: `@rangefoundry/schema/json-schema/<name>.schema.json`.
 
@@ -18,4 +18,4 @@ console.log(parseRef('catalogue:308-winchester')) // { scope: 'catalogue', id: '
 
 Documentation: https://openreloading.github.io/Ballistics/docs/libraries/schema/
 
-License: MIT
+License: ISC

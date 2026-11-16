@@ -14,4 +14,4 @@ const { proposals } = await holeDetector.propose({ image, pxPerM: 8000, expected
 // proposals: [{ x, y, confidence, clusterSize, clusterId, diameter }, ...], most confident first
 ```
 
-License: MIT
+License: ISC

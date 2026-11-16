@@ -95,7 +95,7 @@ export function buildApp({
         routePrefix: '/reference',
         configuration: {
           url: '../openapi.json',
-          pageTitle: 'OpenReloading API',
+          pageTitle: 'RangeFoundry API',
           // the package's own script, no fonts, chat or telemetry from other origins
           withDefaultFonts: false,
           telemetry: false,

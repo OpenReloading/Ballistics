@@ -15,4 +15,4 @@ try {
 reviveError(message.error)
 ```
 
-License: MIT
+License: ISC
