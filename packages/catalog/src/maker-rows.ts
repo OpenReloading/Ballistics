@@ -13,7 +13,8 @@ export interface ListedSourceFields {
  * The source records that are not a maker's, by id, each with the fields it may name and whether it
  * may stand in a load: our thermochemistry solver, our map of the makers' construction wording, and
  * the invented data of the demo records. Every other source a bullet, powder or load cites counts
- * as a maker's, whatever its `origin` or `publisher` says. An id or a field added here changes the
+ * as a maker's, whatever its `origin` or `publisher` says; only a community list of the bullet
+ * length is not asked for a terms URL. An id or a field added here changes the
  * guard of the public catalog, and its pull request is reviewed as one. The solver and the wording
  * map have no source record yet; the importer change that first cites one adds its record under the
  * id listed here. Until then a mismatched id fails closed.
@@ -119,7 +120,19 @@ const makerSources = (record: Cited, ids: Ids) =>
 const overlaps = (path: string, field: string) =>
   path === field || path.startsWith(`${field}.`) || field.startsWith(`${path}.`)
 
-/** Why the maker source `source` may not stand in a bullet or powder record: an unpublished source, a missing field list or terms URL, a license, or a detailed field outside {@link makerSourceFields}. */
+/** Fields a source of `origin: 'community'` may name without a terms URL: basic fields only, which the public catalog holds without a source, so trusting the stated origin admits nothing it would refuse. */
+const communitySourceFields: Readonly<Record<'bullet' | 'powder', readonly string[]>> = {
+  bullet: ['length'],
+  powder: [],
+}
+
+/** True when `source` states the community origin and names only fields of {@link communitySourceFields}. */
+const isCommunityList = (kind: 'bullet' | 'powder', source: CitedSource) =>
+  source.origin === 'community' &&
+  source.fields !== undefined &&
+  source.fields.every((f) => communitySourceFields[kind].includes(f))
+
+/** Why the maker source `source` may not stand in a bullet or powder record: an unpublished source, a missing field list or terms URL (none asked of a community list, {@link isCommunityList}), a license, or a detailed field outside {@link makerSourceFields}. */
 function makerSourceFindings(kind: 'bullet' | 'powder', record: Cited, source: CitedSource) {
   const name = `source "${source.title}" (not a listed non-maker source)`
   const findings: string[] = []
@@ -130,7 +143,8 @@ function makerSourceFindings(kind: 'bullet' | 'powder', record: Cited, source: C
     )
   else {
     if (!source.fields) findings.push(`${name}: names no fields`)
-    if (!source.terms || !isWebLink(source.terms)) findings.push(`${name}: needs a terms URL`)
+    if ((!source.terms || !isWebLink(source.terms)) && !isCommunityList(kind, source))
+      findings.push(`${name}: needs a terms URL`)
     if (source.license !== undefined) findings.push(`${name}: carries a license`)
   }
   const allowed = makerSourceFields[kind]
