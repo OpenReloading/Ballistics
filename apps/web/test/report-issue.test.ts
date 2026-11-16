@@ -25,7 +25,7 @@ const report: Report = {
   what: '',
   context: {
     path: '/workbench',
-    title: 'Workbench | OpenReloading',
+    title: 'Workbench | RangeFoundry',
     version: '0.0.1',
     userAgent: 'Test browser',
     window: '1280 x 800',
@@ -73,7 +73,7 @@ it('names the record of a record page only', () => {
 })
 
 it('titles a report by area and type, then the first line of the text or the page title', () => {
-  expect(reportTitle(report)).toBe('Report: Workbench: Bug: Workbench | OpenReloading')
+  expect(reportTitle(report)).toBe('Report: Workbench: Bug: Workbench | RangeFoundry')
   expect(reportTitle({ ...report, type: 'Idea', what: ' Chart axis\nmore' })).toBe(
     'Report: Workbench: Idea: Chart axis',
   )
@@ -86,7 +86,7 @@ it('writes the context always and a block only when ticked', () => {
   for (const line of [
     '- Type: Bug',
     '- Area: Workbench',
-    '- Page: /workbench (Workbench | OpenReloading)',
+    '- Page: /workbench (Workbench | RangeFoundry)',
     '- Version: 0.0.1',
     '- Browser: Test browser',
     '- Window: 1280 x 800',

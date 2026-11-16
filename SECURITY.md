@@ -1,10 +1,10 @@
 # Security policy
 
-Report a vulnerability in OpenReloading privately, so it can be fixed before it is public.
+Report a vulnerability in RangeFoundry privately, so it can be fixed before it is public.
 
 ## Supported versions
 
-OpenReloading is before 1.0. Only the `main` branch and the latest release receive fixes.
+RangeFoundry is before 1.0. Only the `main` branch and the latest release receive fixes.
 
 ## Reporting
 

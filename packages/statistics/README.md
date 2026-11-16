@@ -10,4 +10,4 @@ velocityStatistics([812, 815, 809, 818])?.standardDeviation // 3.87... (m/s)
 seededUniforms(42)() // the same number in [0, 1) for the same seed
 ```
 
-License: MIT
+License: ISC

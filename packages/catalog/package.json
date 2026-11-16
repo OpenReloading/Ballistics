@@ -1,7 +1,7 @@
 {
   "name": "@rangefoundry/catalog",
   "version": "0.0.7",
-  "description": "OpenReloading catalogue records as one JSON bundle and the checks they pass.",
+  "description": "RangeFoundry catalogue records as one JSON bundle and the checks they pass.",
   "keywords": [
     "reloading",
     "ballistics",
@@ -9,7 +9,7 @@
     "bullet",
     "powder"
   ],
-  "license": "MIT AND CC-BY-4.0",
+  "license": "ISC AND CC-BY-4.0",
   "homepage": "https://openreloading.github.io/Ballistics/docs/libraries/catalog/",
   "repository": {
     "type": "git",
@@ -43,7 +43,7 @@
     "!dist/*.tsbuildinfo",
     "!dist/api-extractor",
     "LICENSE",
-    "LICENSE-MIT"
+    "LICENSE-ISC"
   ],
   "scripts": {
     "build": "tsc -b tsconfig.build.json && api-extractor run && node ../../tools/src/catalog/build.ts",

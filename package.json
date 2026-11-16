@@ -2,7 +2,7 @@
   "name": "openreloading",
   "version": "0.0.1",
   "private": true,
-  "license": "MIT",
+  "license": "ISC",
   "engines": {
     "node": ">=26"
   },

@@ -120,7 +120,7 @@ jobs:
             cp -a editions/pages-stable/. site/
           else
             touch site/.nojekyll
-            printf '%s\n' '<!doctype html>' '<meta charset="utf-8">' '<meta http-equiv="refresh" content="0; url=next/">' '<title>OpenReloading Ballistics</title>' '<a href="next/">OpenReloading Ballistics</a>' > site/index.html
+            printf '%s\n' '<!doctype html>' '<meta charset="utf-8">' '<meta http-equiv="refresh" content="0; url=next/">' '<title>RangeFoundry Workbench</title>' '<a href="next/">RangeFoundry Workbench</a>' > site/index.html
           fi
           cp -a editions/pages-next site/next
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0

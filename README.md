@@ -3,7 +3,7 @@
 # RangeFoundry Workbench
 
 [![CI](https://github.com/OpenReloading/Ballistics/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenReloading/Ballistics/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![License: ISC](https://img.shields.io/badge/license-ISC-blue)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/hUCSjDYNaa)
 
 Simulate a handload before you take it to the range: muzzle velocity, peak pressure against the C.I.P. limit, and the bullet's trajectory, from cartridge, bullet, powder and firearm records that each name their source. The same app summarizes a chronograph session and measures group size from a target photo.
@@ -53,6 +53,6 @@ Reloading and shooting are at your own risk: you are responsible for your inputs
 
 ## License
 
-- Code: MIT, see [LICENSE](LICENSE).
+- Code: ISC, see [LICENSE](LICENSE).
 - Data records (`packages/catalog/records/`): an entry with a `license` field uses that license, an entry without one is CC BY 4.0, except data a maker published (a source with `origin` `manufacturer`), which carries no project license (see [packages/catalog/LICENSE](packages/catalog/LICENSE)).
-- The Ballistics logo: from the OpenReloading Artwork repository (MIT), see [NOTICE](NOTICE).
+- The Ballistics logo: from the RangeFoundry Artwork repository (MIT), see [NOTICE](NOTICE).

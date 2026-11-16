@@ -28,4 +28,4 @@ Messages: `ui` takes the app's Lingui `i18n` (`UiProvider i18n={i18n}`), into wh
 
 A story goes in `stories/`; its `play` function holds the checks a story needs beyond axe.
 
-License: MIT
+License: ISC

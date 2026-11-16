@@ -5,7 +5,7 @@ contact_links:
     about: Ask and discuss in GitHub Discussions.
   - name: Discord
     url: https://discord.gg/hUCSjDYNaa
-    about: Chat with the OpenReloading community.
+    about: Chat with the RangeFoundry community.
   - name: Security vulnerability
     url: https://github.com/OpenReloading/Ballistics/security/advisories/new
     about: Report it privately, not as an issue (security policy).

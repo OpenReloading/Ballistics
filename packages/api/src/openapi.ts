@@ -272,7 +272,7 @@ export async function buildOpenApi(): Promise<OpenApiDocument> {
   return {
     openapi: '3.1.0',
     info: {
-      title: 'OpenReloading API',
+      title: 'RangeFoundry API',
       version: API_VERSION,
       description:
         'Records of cartridges, components and competitions, and the exterior and interior ballistics models. Quantities are SI (m, kg, s, Pa, K, rad) unless a field names another unit. Results are simulations, not load data.',

@@ -2,7 +2,7 @@
   "name": "@rangefoundry/api",
   "version": "0.0.7",
   "private": true,
-  "license": "MIT",
+  "license": "ISC",
   "type": "module",
   "exports": {
     "./openapi": {

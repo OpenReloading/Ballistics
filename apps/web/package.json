@@ -2,7 +2,7 @@
   "name": "@rangefoundry/web",
   "version": "0.0.7",
   "private": true,
-  "license": "MIT",
+  "license": "ISC",
   "scripts": {
     "dev": "next dev",
     "prebuild": "node -e \"fs.rmSync('.next/cache/fetch-cache', { recursive: true, force: true })\"",

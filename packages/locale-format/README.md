@@ -12,4 +12,4 @@ withUnit('velocity', presetUnits('us'), 822.96, 'en') // '2700 ft/s'
 dayText('2026-05-01', 'de') // '1. Mai 2026'
 ```
 
-License: MIT
+License: ISC
