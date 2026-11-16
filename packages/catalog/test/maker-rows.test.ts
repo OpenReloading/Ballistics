@@ -274,6 +274,32 @@ describe('makerRows of the fields and terms of a maker source', () => {
       ],
     })
   })
+
+  it('asks a community list of the bullet length for no terms URL, and a maker source still', () => {
+    const list = { title: 'Lengths', url: 'https://list.example/l', fields: ['length'] }
+    const found = rows({
+      bullets: [
+        { ...cited('community', 'published', { ...list, origin: 'community' }), length: 30 },
+        { ...cited('maker', 'published', { ...list, origin: 'manufacturer' }), length: 30 },
+        {
+          ...cited('ogive', 'published', { ...list, origin: 'community', fields: ['ogive'] }),
+          ogive,
+        },
+      ],
+    })
+    expect(found).toEqual({
+      bullets: [
+        {
+          id: 'maker',
+          findings: ['source "Lengths" (not a listed non-maker source): needs a terms URL'],
+        },
+        {
+          id: 'ogive',
+          findings: ['source "Lengths" (not a listed non-maker source): needs a terms URL'],
+        },
+      ],
+    })
+  })
 })
 
 describe('makerRows of data received directly from a maker', () => {
