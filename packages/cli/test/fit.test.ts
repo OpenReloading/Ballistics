@@ -644,7 +644,7 @@ describe('the pressure rows of a fit', () => {
 
 describe('--folds', { timeout: 60_000 }, () => {
   const cartridges = ['30-br', '308-win', '30-06-spring', '6-5-creedmoor', '308-match']
-  /** dp40 at four charges in four training cartridges and the validation cartridge 308-match, sp20 in 30-br only, and dp40 in the test cartridge 307-win. */
+  /** dp40 at four charges in four training cartridges and the validation cartridge 308-match, sp20 in 30-br only, and sp21 in the test cartridge 307-win only. */
   const folded = {
     ...options,
     rows: writeRows(
@@ -659,7 +659,12 @@ describe('--folds', { timeout: 60_000 }, () => {
             charge,
             velocity: 0,
           })),
-          ...[2.0, 2.2].map((charge) => ({ cartridge: '307-win', charge, velocity: 0 })),
+          ...[2.0, 2.2, 2.4].map((charge) => ({
+            cartridge: '307-win',
+            powder: sp21,
+            charge,
+            velocity: 0,
+          })),
         ],
         planted,
       ),
@@ -683,11 +688,27 @@ describe('--folds', { timeout: 60_000 }, () => {
       notUsed: { noPowderModel: 3 },
     })
     expect(r.folds?.each[1]?.overall.rows.used).toBe(4)
-    // the two rows of the test cartridge are not read
+    // sp21 has rows in the test cartridge only, so no fold fits it; sp20 has no fit without fold 3
+    expect(r.folds?.each.map((f) => f.fit.powders)).toEqual([2, 2, 2, 1, 2])
+    // the rows of the test cartridge are not read
     expect(r.overall.rows).toMatchObject({ used: 20, inSplit: 23 })
     expect(r.folds?.aggregate.velocity).toMatchObject({ rows: 20, cartridges: 5 })
     // four cartridges of the planted truth fit it exactly
     expect(r.folds?.aggregate.velocity?.median.value).toBeCloseTo(0, 6)
+  })
+
+  it('takes the half width of a fold from the rows of the other folds', async () => {
+    const rows = cartridges.flatMap((cartridge) =>
+      [2.0, 2.2, 2.4, 2.6].map((charge, i) => ({
+        cartridge,
+        charge,
+        // only 6-5-creedmoor, fold 4, prints errors
+        velocity: cartridge === '6-5-creedmoor' ? (i % 2 === 0 ? 0.05 : -0.05) : 0,
+      })),
+    )
+    const r = await verify({ ...options, rows: writeRows(rowsCsv(rows, planted)), folds: true })
+    expect(r.folds?.each[4]?.interval.halfWidth).toBeLessThan(0.001)
+    expect(r.folds?.each[0]?.interval.halfWidth).toBeGreaterThan(0.01)
   })
 
   it('adds the folds to the fit of every training row', async () => {
