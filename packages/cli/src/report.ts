@@ -58,7 +58,7 @@ function foldLines(f: VerifyResult['folds']) {
     ]
   })
   return [
-    `folds: ${f.count} of the ${f.cartridges} training cartridges, salt ${f.salt}; each scored by a fit on the others`,
+    `folds: ${f.count} over the ${f.cartridges} cartridges of the training and validation splits, salt ${f.salt}; each scored by a fit on the others`,
     table(
       metricHead.map((h, i) => (i === 0 ? 'fold' : h)),
       f.each.map((e) => rowsOf(`${e.fold}: ${e.cartridges.join(', ')}`, e.overall)),

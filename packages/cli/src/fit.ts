@@ -10,7 +10,7 @@ import { Refusal, UsageError } from './errors.ts'
 import { type InteriorModel, loadOf, outcomes, predict } from './evaluate.ts'
 import type { Records } from './records.ts'
 import type { Row } from './rows.ts'
-import { splitOf } from './split.ts'
+import { type Split, splitOf } from './split.ts'
 import { percentile } from './stats.ts'
 import { familyOf } from './unseen.ts'
 
@@ -399,6 +399,8 @@ interface PowdersFitOptions {
   pressureSigma?: number | undefined
   pressureFactor?: PressureKey | undefined
   energy?: 'prior' | undefined
+  /** The splits whose rows are fitted; default `training`. */
+  splits?: readonly Split[] | undefined
 }
 
 /** The burn coefficient of each powder with interior parameters the rows name, fitted under `model` to its training rows that model can run, velocities corrected to the muzzle; `velocitySigma` is a fraction of the velocity; `exponent` `family` fits each at the pressure exponent its family chooses; with `pressureSigma`, a fraction of the pressure, the printed pressures over the factor of their key of `pressureFactor` (default the basis) join a second fit; `energy` `prior` takes each powder's energy from its prior impetus. */
@@ -410,7 +412,7 @@ export function fitPowders(
   options: PowdersFitOptions = {},
 ): PowdersFit {
   return options.energy === 'prior'
-    ? fitWithPrior(rows, records, model, velocitySigma, options.exponent)
+    ? fitWithPrior(rows, records, model, velocitySigma, options.exponent, options.splits)
     : fitAtRecordEnergy(rows, records, model, velocitySigma, options)
 }
 
@@ -422,7 +424,7 @@ function fitAtRecordEnergy(
   velocitySigma: number,
   options: Omit<PowdersFitOptions, 'energy'>,
 ): PowdersFit {
-  const used = outcomes(rows, records, model, ['training']).flatMap((o) =>
+  const used = outcomes(rows, records, model, options.splits ?? ['training']).flatMap((o) =>
     'velocity' in o.prediction ? [{ row: o.row, pressure: o.prediction.pressure }] : [],
   )
   const ids = [...new Set(rows.map((r) => r.powder))]
@@ -505,9 +507,10 @@ function fitWithPrior(
   model: InteriorModel,
   velocitySigma: number,
   exponent: 'family' | undefined,
+  splits: readonly Split[] = ['training'],
 ): PowdersFit {
   const pressured = rows.filter(
-    (r) => r.pressure !== undefined && splitOf(r.cartridge) === 'training',
+    (r) => r.pressure !== undefined && splits.includes(splitOf(r.cartridge)),
   )
   if (pressured.length === 0)
     throw new UsageError('--energy prior needs training rows that print a pressure in bar')
@@ -530,7 +533,7 @@ function fitWithPrior(
     const start = { ...records, powders }
     let fit: PowdersFit
     try {
-      fit = fitAtRecordEnergy(rows, start, model, velocitySigma, { exponent })
+      fit = fitAtRecordEnergy(rows, start, model, velocitySigma, { exponent, splits })
     } catch (error) {
       // a factor at which no powder was fitted at every exponent cannot choose one, so it does not take part
       if (!(error instanceof Refusal)) throw error

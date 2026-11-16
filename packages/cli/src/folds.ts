@@ -1,8 +1,15 @@
 import { createHash } from 'node:crypto'
 import { compareKeys } from '@rangefoundry/schema'
+import type { Split } from './split.ts'
 
 /** Folds of the grouped cross-validation of `--folds`. */
 export const foldCount = 5
+
+/** The splits whose cartridges are dealt to the folds; the test split is never read. */
+export const foldSplits: readonly Split[] = ['training', 'validation']
+
+/** How a result names {@link foldSplits}. */
+export const foldPool = 'training+validation' as const
 
 /** Hashed before the cartridge id in the order that deals the cartridges to the folds, so that it names the rule a result was folded by. */
 export const foldSalt = '2026-11-14'

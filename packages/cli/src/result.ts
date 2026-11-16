@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { reasons } from './evaluate.ts'
 import { notFittedReasons, pressureKeys } from './fit.ts'
-import { foldCount, foldSalt } from './folds.ts'
+import { foldCount, foldPool, foldSalt } from './folds.ts'
 import { groupings } from './metrics.ts'
 import { skipReasons } from './published-rows.ts'
 import { splitSalt, splits } from './split.ts'
@@ -87,15 +87,19 @@ const pressureFit = z
   )
 
 const interval = z.object({
-  basis: z.literal('training'),
+  basis: z
+    .enum(['training', foldPool])
+    .describe(
+      'The split whose used rows set the half width: `training`, or with `--folds` the training and validation rows the fit read.',
+    ),
   halfWidth: z
     .number()
     .nullable()
     .describe(
-      'The 90th percentile of the absolute relative velocity error on the training split: the interval is the model velocity times (1 +/- this). Null without a training row, and with `--folds`, where each row is scored with the half width of its fold.',
+      'The 90th percentile of the absolute relative velocity error on the training split: the interval is the model velocity times (1 +/- this). Null without a training row, and at the top of a `--folds` result, where each row is scored with the half width of its fold, which comes from the training and validation rows of the other folds.',
     ),
   trainingRows: count.describe(
-    'Used training rows the half width comes from; with `--folds` the sum over the folds, in which each training row counts once for every fold whose half width it sets.',
+    'Used rows of `basis` the half width comes from; at the top of a `--folds` result the sum over the folds, in which each row counts once for every fold whose half width it sets.',
   ),
 })
 
@@ -237,19 +241,21 @@ const folds = z
     salt: z
       .literal(foldSalt)
       .describe(
-        'The salt of the rule that deals the training cartridges to the folds: sorted by the hex SHA-256 of `<salt>/<cartridge id>`, the fold of a cartridge is its position mod `count`.',
+        'The salt of the rule that deals the cartridges to the folds: sorted by the hex SHA-256 of `<salt>/<cartridge id>`, the fold of a cartridge is its position mod `count`.',
       ),
-    cartridges: count.describe('Distinct cartridges of the training rows, the ones dealt.'),
+    cartridges: count.describe(
+      'Distinct cartridges of the training and validation rows, the ones dealt.',
+    ),
     each: z
       .array(
         z.object({
           fold: count.describe('From 0.'),
           cartridges: z.array(z.string()).describe('Its cartridge ids, sorted.'),
           fit: fitSummary.describe(
-            'The fit on the training rows of the other folds; a powder only this fold names has no fit row and counts as `noUsableRow`.',
+            'The fit on the training and validation rows of the other folds; a powder only this fold names has no fit row and counts as `noUsableRow`.',
           ),
           interval: interval.describe(
-            'The half width of the fit, on the training rows of the other folds.',
+            'The half width of the fit, on the training and validation rows of the other folds.',
           ),
           overall: metrics.describe('The rows of the fold, scored by the fit without them.'),
         }),
@@ -268,12 +274,15 @@ const folds = z
   })
   .optional()
   .describe(
-    'With `--folds`: grouped cross-validation by cartridge over the training split; no row of another split is fitted or scored. In `verify`, the evaluation holds the rows of every fold together, each scored by the fit without its fold.',
+    'With `--folds`: grouped cross-validation by cartridge over the training and validation splits; no row of the test split is read. In `verify`, the evaluation holds the rows of every fold together, each scored by the fit without its fold. In `fit`, the fit outside `folds` stays on the training rows.',
   )
 
 /** The result of `verify`. */
 export const verifyResult = z.object({
   ...common,
+  split: z
+    .enum([...splits, foldPool])
+    .describe('The split scored; `training+validation` with `--folds`.'),
   command: z.literal('verify'),
   ...evaluation.shape,
   folds,
