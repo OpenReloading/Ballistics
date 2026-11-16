@@ -9,7 +9,7 @@ test('the Safety notice must be accepted on the first visit and stays accepted',
   page,
 }) => {
   await page.goto('/workbench')
-  const dialog = page.getByRole('dialog', { name: /Safety notice and disclaimer/ })
+  const dialog = page.getByRole('dialog', { name: 'Safety notice' })
   await expect(dialog).toBeVisible()
   await page.keyboard.press('Escape')
   await expect(dialog).toBeVisible()
@@ -21,11 +21,11 @@ test('the Safety notice must be accepted on the first visit and stays accepted',
 })
 
 test('an acceptance of the earlier Safety text asks again', async ({ page }) => {
-  await page.addInitScript(() => localStorage.setItem('safety-ack', '2'))
+  await page.addInitScript(() => localStorage.setItem('safety-ack', '3'))
   await page.goto('/')
-  const dialog = page.getByRole('dialog', { name: /Safety notice and disclaimer/ })
+  const dialog = page.getByRole('dialog', { name: 'Safety notice' })
   await expect(dialog).toBeVisible()
-  await expect(dialog).toContainText('Reloading ammunition is dangerous.')
+  await expect(dialog).toContainText('Reloading ammunition is dangerous:')
   // English only: no translation, no line about which text binds
   await expect(dialog.locator('[lang="de"]')).toHaveCount(0)
   await expect(dialog).not.toContainText('binding')
@@ -33,10 +33,10 @@ test('an acceptance of the earlier Safety text asks again', async ({ page }) => 
 
 test('the first focus is on the text: Enter neither accepts nor declines', async ({ page }) => {
   await page.goto('/cartridges')
-  const dialog = page.getByRole('dialog', { name: /Safety notice and disclaimer/ })
+  const dialog = page.getByRole('dialog', { name: 'Safety notice' })
   const text = dialog.locator('.safety-text')
   await expect(text).toBeFocused()
-  await expect(text).toContainText('By selecting I accept')
+  await expect(text).toContainText('Select I accept')
   await page.keyboard.press('Enter')
   await expect(page).toHaveURL(/\/cartridges\/$/)
   await expect(dialog).toBeVisible()
@@ -61,7 +61,7 @@ test('the yellow Safety button of the top bar opens the Safety notice; print hid
   page,
 }) => {
   await page.addInitScript((value) => localStorage.setItem('safety-ack', value), safetyAck)
-  const dialog = page.getByRole('dialog', { name: /Safety notice and disclaimer/ })
+  const dialog = page.getByRole('dialog', { name: 'Safety notice' })
   // the page bar from 75em, named by its text; the phone top bar below, icon only
   for (const [width, bar, name, label] of [
     [1280, '.page-bar', 'Safety', 'Safety'],
@@ -79,7 +79,7 @@ test('the yellow Safety button of the top bar opens the Safety notice; print hid
     await page.emulateMedia({ media: 'screen' })
     await button.click()
     await expect(dialog).toBeVisible()
-    await expect(dialog).toContainText('Reloading ammunition is dangerous.')
+    await expect(dialog).toContainText('Reloading ammunition is dangerous:')
     await page.keyboard.press('Escape')
     await expect(dialog).toBeHidden()
   }
@@ -88,7 +88,7 @@ test('the yellow Safety button of the top bar opens the Safety notice; print hid
 test('at 390 x 640 I accept and Decline are in view without scrolling', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 640 })
   await page.goto('/')
-  const dialog = page.getByRole('dialog', { name: /Safety notice and disclaimer/ })
+  const dialog = page.getByRole('dialog', { name: 'Safety notice' })
   await expect(dialog).toHaveCSS('opacity', '1')
   for (const name of ['I accept', 'Decline'])
     await expect(dialog.getByRole('button', { name })).toBeInViewport({ ratio: 1 })
@@ -101,7 +101,7 @@ test('the buttons of the Safety notice pass the axe contrast check in light and 
     await page.emulateMedia({ colorScheme })
     await page.goto('/powders')
     await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', colorScheme)
-    const dialog = page.getByRole('dialog', { name: /Safety notice and disclaimer/ })
+    const dialog = page.getByRole('dialog', { name: 'Safety notice' })
     await expect(dialog.getByRole('button', { name: 'I accept' })).toBeVisible()
     // the opening transition ends at full opacity: axe measures the final colors
     await expect(dialog).toHaveCSS('opacity', '1')

@@ -342,7 +342,7 @@ export function termUseProblems(
   return found
 }
 
-/** Only the `approved` texts (the Safety notice and the disclaimers) use a word that starts with "safe" (safe, safety, safely), and each German text says "sicher" as often as its English says one of them. */
+/** Only the `approved` texts (the Safety notice and the notes that a result is no safety statement) use a word that starts with "safe" (safe, safety, safely), and each German text says "sicher" as often as its English says one of them. */
 export function safeWordingProblems(
   source: readonly string[],
   catalogue: Record<string, unknown>,

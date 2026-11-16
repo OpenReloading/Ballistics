@@ -193,7 +193,7 @@ test.describe('Safety notice', () => {
     page,
   }) => {
     await page.addInitScript(() => localStorage.setItem('language', 'de'))
-    const dialog = page.getByRole('dialog', { name: 'Sicherheitshinweis und Haftungsausschluss' })
+    const dialog = page.getByRole('dialog', { name: 'Sicherheitsregeln' })
     const english = dialog.locator('[lang="en"]').first()
     const german = dialog.locator('[lang="de"]').first()
     for (const width of [1280, 390]) {
@@ -201,7 +201,7 @@ test.describe('Safety notice', () => {
       await page.goto('/')
       await expect(dialog).toBeVisible()
       await expect(dialog).toHaveCSS('opacity', '1')
-      await expect(english).toContainText('Reloading ammunition is dangerous.')
+      await expect(english).toContainText('Reloading ammunition is dangerous:')
       await expect(english).toContainText('The English text is binding.')
       await expect(german).toContainText('Wiederladen von Munition')
       await expect(german).toContainText('verbindlich')
