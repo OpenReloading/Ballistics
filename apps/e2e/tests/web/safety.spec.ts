@@ -21,11 +21,11 @@ test('the Safety notice must be accepted on the first visit and stays accepted',
 })
 
 test('an acceptance of the earlier Safety text asks again', async ({ page }) => {
-  await page.addInitScript(() => localStorage.setItem('safety-ack', '2'))
+  await page.addInitScript(() => localStorage.setItem('safety-ack', '3'))
   await page.goto('/')
   const dialog = page.getByRole('dialog', { name: /Safety notice and disclaimer/ })
   await expect(dialog).toBeVisible()
-  await expect(dialog).toContainText('Reloading ammunition is dangerous.')
+  await expect(dialog).toContainText('Reloading ammunition is dangerous:')
   // English only: no translation, no line about which text binds
   await expect(dialog.locator('[lang="de"]')).toHaveCount(0)
   await expect(dialog).not.toContainText('binding')
@@ -36,7 +36,7 @@ test('the first focus is on the text: Enter neither accepts nor declines', async
   const dialog = page.getByRole('dialog', { name: /Safety notice and disclaimer/ })
   const text = dialog.locator('.safety-text')
   await expect(text).toBeFocused()
-  await expect(text).toContainText('By selecting I accept')
+  await expect(text).toContainText('Select I accept')
   await page.keyboard.press('Enter')
   await expect(page).toHaveURL(/\/cartridges\/$/)
   await expect(dialog).toBeVisible()
@@ -79,7 +79,7 @@ test('the yellow Safety button of the top bar opens the Safety notice; print hid
     await page.emulateMedia({ media: 'screen' })
     await button.click()
     await expect(dialog).toBeVisible()
-    await expect(dialog).toContainText('Reloading ammunition is dangerous.')
+    await expect(dialog).toContainText('Reloading ammunition is dangerous:')
     await page.keyboard.press('Escape')
     await expect(dialog).toBeHidden()
   }

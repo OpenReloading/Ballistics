@@ -38,7 +38,7 @@ test('the firearm library searches its table, counts its firearms and offers to 
   page,
 }) => {
   await page.addInitScript(() => {
-    localStorage.setItem('safety-ack', '3')
+    localStorage.setItem('safety-ack', '4')
   })
   await page.goto('/firearms')
   await seed(page, ['Bench rifle', 'Hunting rifle'])
@@ -124,7 +124,7 @@ test('the firearm table fits a 1280 px window with its row menu, one save status
 
 test('a record link does not put its loading status in the alert line', async ({ page }) => {
   await page.addInitScript(() => {
-    localStorage.setItem('safety-ack', '3')
+    localStorage.setItem('safety-ack', '4')
     const seen = { loading: false }
     Object.assign(window, { seen })
     new MutationObserver(() => {
@@ -163,7 +163,7 @@ test('the zero air and drag factor of a mount fill the trajectory form with the 
   test.setTimeout(90_000)
   await storeUnits(page)
   await page.addInitScript(() => {
-    localStorage.setItem('safety-ack', '3')
+    localStorage.setItem('safety-ack', '4')
   })
   await page.goto('/firearms')
   await seed(page, ['Truing rifle'], {

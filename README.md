@@ -33,14 +33,15 @@ The records in `packages/catalog/records/` hold one cartridge record per C.I.P. 
 
 ## Safety
 
-Reloading ammunition is dangerous. This software helps you plan, simulate and document. It does not replace published load data, the instructions of your component and equipment makers, or safe practice.
+Reloading ammunition is dangerous: excess pressure can destroy a firearm and injure or kill. This software helps you plan, simulate and document. It does not replace published load data, the instructions of your component and equipment makers, or safe practice.
 
-- Results are simulations, not load data. Never use a result as a charge weight or as proof that a load is safe. Start from load data published by the powder or bullet maker for your exact components.
-- Simulated pressures carry model and input uncertainty. The shown ranges do not include model error. The absence of a warning does not mean a load is safe.
-- Component lots, cases, chambers and barrels differ. Measured pressure and velocity can differ from any simulation.
-- Measurements, statistics, group sizes, scores and records shown here can contain errors from the models, the data or your inputs.
+- Results are simulations, not load data. Never use a result as a charge weight or as proof that a load is safe.
+- Measured pressure and velocity can differ greatly from any simulation. The shown ranges do not include model error. The absence of a warning does not mean a load is safe.
+- Small input errors can change the predicted pressure a lot, and stored values may not match your components. Measure what you can: case capacity, bullet dimensions, seating depth, bullet jump, barrel and chamber dimensions, temperature.
+- Work up in small steps from the start charge published by the powder or bullet maker for your exact components, and check every step yourself. Never exceed the published maximum.
+- Measurements, statistics, group sizes, scores and records shown here can contain errors.
 
-Reloading and shooting are done at your own risk. This software comes without warranty of any kind, and its authors are not liable for any damage or injury arising from its use.
+Reloading and shooting are at your own risk: you are responsible for your inputs, loads and safety checks.
 
 ## Community and contributing
 

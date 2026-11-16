@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test'
 
 /** The `safety-ack` value of an accepted Safety dialog (`apps/web/src/components/safety-dialog.tsx`). */
-export const safetyAck = '3'
+export const safetyAck = '4'
 
 /** Waits for `html[data-hydrated]` and the page bar's `h1[data-hydrated]`: a click or a key before React hydrates the page does nothing, and the page hydrates after the layout. */
 export async function gotoHydrated(page: Page, path: string) {

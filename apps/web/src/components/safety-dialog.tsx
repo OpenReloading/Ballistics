@@ -11,7 +11,7 @@ import { NavIcon } from './nav-icons.tsx'
 
 /** Browser storage key of the acceptance; a new value asks again after the text changes. */
 const ackKey = storageName('safety-ack')
-const ackValue = '3'
+const ackValue = '4'
 /** Where Decline leads: away from the site to the browser's empty page, naming no other site. */
 const declineUrl = 'about:blank'
 const openEvent = 'safety-open'

@@ -201,7 +201,7 @@ test.describe('Safety notice', () => {
       await page.goto('/')
       await expect(dialog).toBeVisible()
       await expect(dialog).toHaveCSS('opacity', '1')
-      await expect(english).toContainText('Reloading ammunition is dangerous.')
+      await expect(english).toContainText('Reloading ammunition is dangerous:')
       await expect(english).toContainText('The English text is binding.')
       await expect(german).toContainText('Wiederladen von Munition')
       await expect(german).toContainText('verbindlich')
