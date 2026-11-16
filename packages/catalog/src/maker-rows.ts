@@ -126,6 +126,10 @@ const isCommunityLengthList = (kind: 'bullet' | 'powder', source: CitedSource) =
   source.origin === 'community' &&
   source.fields?.every((f) => f === 'length') === true
 
+/** True when the maker source `source` has no terms URL and is not a {@link isCommunityLengthList}. */
+const lacksTermsUrl = (kind: 'bullet' | 'powder', source: CitedSource) =>
+  (!source.terms || !isWebLink(source.terms)) && !isCommunityLengthList(kind, source)
+
 /** Why the maker source `source` may not stand in a bullet or powder record: an unpublished source, a missing field list or terms URL (none asked of a community list, {@link isCommunityLengthList}), a license, or a detailed field outside {@link makerSourceFields}. */
 function makerSourceFindings(kind: 'bullet' | 'powder', record: Cited, source: CitedSource) {
   const name = `source "${source.title}" (not a listed non-maker source)`
@@ -137,8 +141,7 @@ function makerSourceFindings(kind: 'bullet' | 'powder', record: Cited, source: C
     )
   else {
     if (!source.fields) findings.push(`${name}: names no fields`)
-    if ((!source.terms || !isWebLink(source.terms)) && !isCommunityLengthList(kind, source))
-      findings.push(`${name}: needs a terms URL`)
+    if (lacksTermsUrl(kind, source)) findings.push(`${name}: needs a terms URL`)
     if (source.license !== undefined) findings.push(`${name}: carries a license`)
   }
   const allowed = makerSourceFields[kind]
