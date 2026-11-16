@@ -193,7 +193,7 @@ test.describe('Safety notice', () => {
     page,
   }) => {
     await page.addInitScript(() => localStorage.setItem('language', 'de'))
-    const dialog = page.getByRole('dialog', { name: 'Sicherheitshinweis und Haftungsausschluss' })
+    const dialog = page.getByRole('dialog', { name: 'Sicherheitsregeln' })
     const english = dialog.locator('[lang="en"]').first()
     const german = dialog.locator('[lang="de"]').first()
     for (const width of [1280, 390]) {

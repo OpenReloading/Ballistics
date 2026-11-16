@@ -71,7 +71,7 @@ pnpm --filter @rangefoundry/web run i18n messages     # every message in the sou
 3. Run `missing <code>` until it lists nothing you want to translate.
 4. `pnpm --filter @rangefoundry/web run i18n check <code>` checks the catalogue as for German: every message translated except those `untranslated.<code>` of `apps/web/scripts/i18n-lint.json` lists (never a message-table or Safety notice text), no text equal to English that `sameAsEnglish.<code>` does not list, no key without a message, equal placeholders, only categories of the language. List what `missing <code>` still shows, then add the check to the root `lint` script next to `check de`.
 
-The German catalogue follows the term table `apps/web/src/i18n/german-terms.json`. Only the texts in `safeTexts` of `apps/web/scripts/i18n-lint.json` (the Safety notice and the disclaimers) may use a word that starts with "safe" (safe, safety, safely), and their German says "sicher" as often. A verified or decided term is used as the table gives it. Another language has no table yet: add one with the same shape if the language needs one.
+The German catalogue follows the term table `apps/web/src/i18n/german-terms.json`. Only the texts in `safeTexts` of `apps/web/scripts/i18n-lint.json` (the Safety notice and the notes that a result is no safety statement) may use a word that starts with "safe" (safe, safety, safely), and their German says "sicher" as often. A verified or decided term is used as the table gives it. Another language has no table yet: add one with the same shape if the language needs one.
 
 A row has one of three statuses:
 

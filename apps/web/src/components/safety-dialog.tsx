@@ -131,7 +131,7 @@ export function SafetyDialog() {
       }}
       title={
         <>
-          <NavIcon name="safety" /> {t('Safety notice and disclaimer')}
+          <NavIcon name="safety" /> {t('Safety notice')}
         </>
       }
       // the first focus is on the text, not on a button that Enter would press, and focusable so the keys scroll it

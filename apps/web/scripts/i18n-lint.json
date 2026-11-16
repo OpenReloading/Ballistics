@@ -79,11 +79,9 @@
     "No target mapping names this discipline.": "target mapping: a record kind; the German names the discipline",
     "The events and disciplines shot on this target": "events: the verified term of Event is Wettbewerb",
     "Shooting distance": "the compound Schießentfernung translates both words",
-    "Results are simulations, not load data. Never use a result as a charge weight or as proof that a load is safe.": "Safety text: its wording changes only after review",
     "Measurements, statistics, group sizes, scores and records shown here can contain errors.": "Safety text: its wording changes only after review",
     "Small input errors can change the predicted pressure a lot, and stored values may not match your components. Measure what you can: case capacity, bullet dimensions, seating depth, bullet jump, barrel and chamber dimensions, temperature.": "a lot: much, not a component lot",
     "Burn rate, {unit}": "the heading of the burn rate figure, a single line in a narrow box where the full term does not fit",
-    "Safety notice and disclaimer": "the heading of a page that holds the notice and the disclaimer",
     "boatTailLength must be zero or more": "zero: the number",
     "meplatDiameter must be zero up to the diameter": "zero: the number",
     "A flat spot is a statistical observation of the strings fired: neighboring charges whose slope of mean velocity has a {level} % band that includes zero. Few shots make wide bands. It is not a safety statement and not a charge to load.": "zero: the number",
@@ -139,7 +137,6 @@
     "Results are simulations, not load data. Never use a result as a charge weight or as proof that a load is safe.",
     "Safety",
     "Safety notice",
-    "Safety notice and disclaimer",
     "Staying at or below L6 says nothing about pressure, magazine fit or safety; seating depth changes pressure."
   ],
   "untranslated": {
