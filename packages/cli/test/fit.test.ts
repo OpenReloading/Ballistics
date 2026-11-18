@@ -353,6 +353,41 @@ describe('--energy prior', { timeout: 120_000 }, () => {
   })
 })
 
+describe('--energy family', { timeout: 60_000 }, () => {
+  it("pulls a sparse powder's energy to the impetus of the reference powders", async () => {
+    // sp20's rows are printed at its record 3.7e6 J/kg, which three rows do not separate from its burn coefficient; the prior is dp40's impetus over the same gamma, 3.95e6
+    const reference = [
+      ['30-br', 'demo-bullet-168'],
+      ['308-win', 'demo-bullet-168'],
+      ['30-06-spring', 'demo-bullet-168'],
+      ['6-5-creedmoor', 'demo-bullet-264-130'],
+    ].flatMap(([cartridge, bullet]) =>
+      [2.0, 2.1, 2.2, 2.3, 2.4].map((charge) => ({
+        cartridge: cartridge as string,
+        bullet: bullet as string,
+        charge,
+        velocity: 0,
+      })),
+    )
+    const sparse = [
+      ['30-br', 2.0],
+      ['30-br', 2.4],
+      ['308-win', 2.2],
+    ].map(([cartridge, charge]) => ({
+      cartridge: cartridge as string,
+      powder: sp20,
+      charge: charge as number,
+      velocity: 0,
+    }))
+    const rows = writeRows(rowsCsv([...reference, ...sparse], records))
+    const r = await fit({ ...options, rows, energy: 'family' })
+    expect(r.powders[dp40]?.rows).toBe(20)
+    expect(r.energyFamily?.pooled.impetus).toBeCloseTo(849250, 0)
+    expect(r.powders[sp20]?.energy?.prior).toBe('pooled')
+    expect(r.powders[sp20]?.energy?.value).toBeCloseTo(3.95e6, -3)
+  })
+})
+
 describe('a model that refuses a load by throwing', () => {
   it('lists the powder and goes on', async () => {
     const refusing = new URL('./fixtures/refusing-model.mjs', import.meta.url).pathname

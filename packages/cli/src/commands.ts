@@ -55,8 +55,8 @@ export interface Options {
   pressureFactor?: PressureKey | undefined
   /** `family` fits each burn coefficient at the pressure exponent its powder family chooses; default the record's. */
   exponent?: 'family' | undefined
-  /** `prior`: each powder's energy is its prior times one energy-level factor chosen on the training pressures; default the record's. */
-  energy?: 'prior' | undefined
+  /** `prior`: each powder's energy is its prior times one energy-level factor chosen on the training pressures; `family`: each powder's energy is fitted with its burn coefficient under a prior on its family's impetus that tightens as its usable rows and cartridges fall; default the record's. */
+  energy?: 'prior' | 'family' | undefined
   /** `verify`: adds the error of each used row of the split. */
   perRow?: boolean | undefined
   /** Grouped cross-validation by cartridge over the training and validation splits ({@link foldsOf}): each fold scored by a fit on the other folds; `verify` takes no `params` or `fit` with it, and ignores `split`. */
@@ -177,17 +177,20 @@ type Published = NonNullable<VerifyResult['published']>
 
 type Prepared = ReturnType<typeof prepare>
 
-/** The params line of a fit run's version: its velocity sigma, whether it chose the exponent per family, its pressure sigma and key, and its energy priors. */
+/** The params line of a fit run's version: its velocity sigma, whether it chose the exponent per family, its pressure sigma and key, and its energy priors or `family`. */
 function paramsLine(
   velocitySigma: number,
   family: boolean,
   pressure: { sigma: number; by: string } | undefined,
-  priorLines: readonly string[] | undefined,
+  energy: readonly string[] | 'family' | undefined,
 ) {
-  // the priors come from records the rows may not name, which the records lines of the version leave out
-  const energyLine = priorLines
-    ? ` energy prior ${sha256(priorLines.toSorted(compareKeys).join('\n'))}`
-    : ''
+  // the prior lines come from records the rows may not name, which the records lines of the version leave out; the family prior reads only powders the rows name
+  const energyLine =
+    energy === 'family'
+      ? ' energy family'
+      : energy
+        ? ` energy prior ${sha256(energy.toSorted(compareKeys).join('\n'))}`
+        : ''
   return `params fit-on-training velocity-sigma ${velocitySigma}${family ? ' exponent family' : ''}${pressure ? ` pressure-sigma ${pressure.sigma} pressure-factor ${pressure.by}` : ''}${energyLine}`
 }
 
@@ -195,7 +198,7 @@ function paramsLine(
 function summaryOf(
   fit: Pick<
     FitResult,
-    'velocitySigma' | 'powders' | 'notFitted' | 'exponent' | 'pressure' | 'energy'
+    'velocitySigma' | 'powders' | 'notFitted' | 'exponent' | 'pressure' | 'energy' | 'energyFamily'
   >,
 ): NonNullable<Evaluation['fit']> {
   const reasons = Object.values(fit.notFitted)
@@ -219,6 +222,7 @@ function summaryOf(
     }),
     ...(fit.pressure && { pressure: fit.pressure }),
     ...(fit.energy && { energy: { factor: fit.energy.factor } }),
+    ...(fit.energyFamily && { energyFamily: fit.energyFamily }),
   }
 }
 
@@ -243,6 +247,7 @@ function familyChoice(path: string, data: Prepared, model: Model, velocitySigma:
   const saved = savedFit(path, 'family', data)
   if (!saved.exponent) throw new Refusal('the --family fit was run without --exponent family')
   if (saved.energy) throw new Refusal('the --family fit was run with --energy prior')
+  if (saved.energyFamily) throw new Refusal('the --family fit was run with --energy family')
   if (saved.velocitySigma !== velocitySigma)
     throw new Refusal(
       `the --family fit has velocity sigma ${saved.velocitySigma}, this run ${velocitySigma}`,
@@ -265,13 +270,13 @@ function checkFitOptions(options: FitOptions) {
   if (pressureFactor !== undefined && pressureSigma === undefined)
     throw new UsageError('--pressure-factor needs --pressure-sigma')
   // one factor on all printed pressures and one per key both set the pressure level with no rule for which comes first
-  if (energy !== undefined && pressureSigma !== undefined)
+  if (energy === 'prior' && pressureSigma !== undefined)
     throw new UsageError('--energy prior and --pressure-sigma do not combine')
   if (options.family !== undefined && exponent === undefined)
     throw new UsageError('--family needs --exponent family')
-  // with --energy prior the family choice is made at each energy-level factor, so one saved choice does not stand for it
+  // with --energy prior the family choice is made at each energy-level factor and with --energy family at fitted energies, so a choice saved without it does not stand for it
   if (options.family !== undefined && energy !== undefined)
-    throw new UsageError('--family and --energy prior do not combine')
+    throw new UsageError(`--family and --energy ${energy} do not combine`)
 }
 
 /** The fit of a run under `model`, the records with its values laid over, its version line and its summary for an evaluation. */
@@ -302,9 +307,15 @@ function fitOf(
     notFitted: fit.notFitted,
     exponent: fit.exponent,
     energy: fit.energy,
+    energyFamily: fit.energyFamily,
     velocitySigma,
     records: withFit(data.records, fit),
-    params: paramsLine(velocitySigma, exponent !== undefined, fit.pressure, fit.priorLines),
+    params: paramsLine(
+      velocitySigma,
+      exponent !== undefined,
+      fit.pressure,
+      fit.energyFamily ? 'family' : fit.priorLines,
+    ),
     summary: summaryOf({ ...fit, velocitySigma }),
   }
 }
@@ -339,7 +350,7 @@ function screenOf(path: string, data: Prepared, model: Model) {
     saved.velocitySigma,
     saved.exponent !== undefined,
     saved.pressure,
-    saved.energy && priorLines(data.rows, data.records),
+    saved.energyFamily ? 'family' : saved.energy && priorLines(data.rows, data.records),
   )
   return {
     records: withFit(data.records, saved),
@@ -493,7 +504,7 @@ function foldParams(options: FitOptions, data: Prepared) {
     pressureSigma === undefined
       ? undefined
       : { sigma: pressureSigma, by: pressureFactor ?? 'basis' }
-  const priors = energy && priorLines(data.rows, data.records)
+  const priors = energy === 'prior' ? priorLines(data.rows, data.records) : energy
   const fit = paramsLine(velocitySigmaOf(options), exponent !== undefined, pressure, priors)
   return `${fit} folds cartridge ${foldCount} salt ${foldSalt}`
 }
@@ -680,6 +691,7 @@ export async function fit(options: FitOptions, spec = builtInName): Promise<FitR
     powders: fitted.powders,
     notFitted: fitted.notFitted,
     ...(fitted.energy && { energy: fitted.energy }),
+    ...(fitted.energyFamily && { energyFamily: fitted.energyFamily }),
     ...(folds && { folds }),
   }
 }

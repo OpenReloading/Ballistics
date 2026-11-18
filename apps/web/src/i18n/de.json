@@ -1146,7 +1146,7 @@
   "Seated bullet, {where}": "Gesetztes Geschoss, {where}",
   "Seated from the user design {name}, not a catalogue record.": "Gesetzt aus dem eigenen Entwurf {name}, kein Katalogdatensatz.",
   "Seated user design {design}, {where}": "Gesetzter eigener Entwurf {design}, {where}",
-  "parameters: burnRate, temperatureFactor, each at most once, burnRate always": "parameters: burnRate, temperatureFactor, jeweils höchstens einmal, burnRate immer",
+  "parameters: burnRate, temperatureFactor, energy, each at most once, burnRate always": "parameters: burnRate, temperatureFactor, energy, jeweils höchstens einmal, burnRate immer",
   "prior {kind} of {group}: value and sigma above 0": "prior {kind} von {group}: Wert und sigma über 0",
   "rifleSigma and lotSigma must be positive": "rifleSigma und lotSigma müssen positiv sein",
   "seating": "Setztiefe",

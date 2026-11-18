@@ -995,7 +995,7 @@ export interface PooledFitOptions {
 }
 
 // @public
-export type PooledParameterKind = 'burnRate' | 'temperatureFactor' | 'rifle' | 'lot';
+export type PooledParameterKind = 'burnRate' | 'temperatureFactor' | 'energy' | 'rifle' | 'lot';
 
 // @public
 export interface PooledPowderFit {
@@ -1034,7 +1034,7 @@ export interface PooledPowderParameter {
 export type PooledPriors = Readonly<Record<string, Partial<Record<PooledRequest, PowderPrior | undefined>> | undefined>>;
 
 // @public
-export type PooledRequest = 'burnRate' | 'temperatureFactor';
+export type PooledRequest = 'burnRate' | 'temperatureFactor' | 'energy';
 
 // @public
 export interface PooledResidual {

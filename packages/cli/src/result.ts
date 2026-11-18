@@ -86,6 +86,36 @@ const pressureFit = z
     'With `--pressure-sigma`: the burn coefficients come from a second fit, in which the printed pressures of the training rows join the velocities, each over the factor of its key of `--pressure-factor`.',
   )
 
+const impetusCenter = z.object({
+  impetus: z.number().describe('Median record impetus, (gamma - 1) times the energy, J/kg.'),
+  sigma: z
+    .number()
+    .describe(
+      'Spread of ln impetus: 1.4826 times its median absolute deviation, at least 0.02; the prior sigma of a powder of full weight.',
+    ),
+  powders: count.describe('Reference powders it is taken over.'),
+})
+
+const energyFamily = z
+  .object({
+    fullWeight: z
+      .object({ rows: count, cartridges: count })
+      .describe(
+        "Used training rows and their cartridges at which a powder's weight is 1: its weight is min(1, rows / `rows`, cartridges / `cartridges`) and its prior sigma the spread times the root of the weight. The reference powders are those of weight 1.",
+      ),
+    familyMinimum: count.describe('Fewest reference powders a family needs for its own center.'),
+    families: z
+      .record(z.string(), impetusCenter)
+      .describe(
+        'By powder family (propellant base and grain form), the center of its reference powders; a family with fewer than `familyMinimum` is left out and its powders take `pooled`.',
+      ),
+    pooled: impetusCenter.describe('The center of all reference powders.'),
+  })
+  .optional()
+  .describe(
+    "With `--energy family`: each powder's energy is fitted with its burn coefficient, under a Gaussian prior on its log centered on its family's median impetus over its own gamma minus 1.",
+  )
+
 const interval = z.object({
   basis: z
     .enum(['training', foldPool])
@@ -129,6 +159,7 @@ const fitSummary = z.object({
     })
     .optional()
     .describe('With `--energy prior`.'),
+  energyFamily,
 })
 
 const evaluation = z.object({
@@ -441,7 +472,7 @@ export const fitResult = z.object({
           .number()
           .nullable()
           .describe(
-            'Chi square of every row, data and the prior rows of the rifle and lot effects, over all rows minus all parameters; null where that count is not above 0.',
+            'Chi square of every row, data and the prior rows of the rifle and lot effects and of the energy, over all rows minus all parameters; null where that count is not above 0.',
           ),
         iterations: count.describe('Iterations of the solver.'),
         pressureExponent: z
@@ -460,16 +491,16 @@ export const fitResult = z.object({
             value: z
               .number()
               .describe(
-                "Specific energy laid over the record, J/kg: the prior impetus times the energy-level factor of `energy.factor`, over the record's `interior.gamma` minus 1.",
+                "Specific energy laid over the record, J/kg: with `--energy prior` the prior impetus times the energy-level factor of `energy.factor`, over the record's `interior.gamma` minus 1; with `--energy family` the fitted energy.",
               ),
             prior: z
-              .enum(['own', 'base', 'pooled'])
+              .enum(['own', 'base', 'family', 'pooled'])
               .describe(
-                "Where the prior impetus came from: `own`, the powder's thermochemistry; `base`, the median of the own impetus values of its propellant base; `pooled`, the median of all own impetus values.",
+                "Where the prior impetus came from: `own`, the powder's thermochemistry; `base`, the median of the own impetus values of its propellant base; `family`, the center of its family in `energyFamily`; `pooled`, the median of all own impetus values, or with `--energy family` the center of all reference powders.",
               ),
           })
           .optional()
-          .describe('With `--energy prior`.'),
+          .describe('With `--energy prior` or `--energy family`.'),
       }),
     )
     .describe('By powder id: each powder fitted on its own.'),
@@ -502,6 +533,7 @@ export const fitResult = z.object({
     .describe(
       "With `--energy prior`: each powder's energy is its prior impetus times one energy-level factor shared by all powders, over its `interior.gamma` minus 1, chosen on the training pressures; per powder only the burn coefficient is fitted.",
     ),
+  energyFamily,
   folds,
 })
 

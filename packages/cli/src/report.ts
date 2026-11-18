@@ -160,6 +160,22 @@ function pressureLines(p: FitResult['pressure']) {
   ]
 }
 
+/** The centers of `--energy family` and each powder's fitted energy, J/kg. */
+function energyFamilyLines(r: FitResult) {
+  const f = r.energyFamily
+  if (!f) return []
+  const center = (name: string, c: { impetus: number; sigma: number; powders: number }) =>
+    `  ${name} impetus ${c.impetus.toPrecision(5)} sigma ${c.sigma.toFixed(3)} (${c.powders} powders)`
+  return [
+    `energy family: full weight at ${f.fullWeight.rows} rows over ${f.fullWeight.cartridges} cartridges`,
+    ...Object.entries(f.families).map(([name, c]) => center(name, c)),
+    center('pooled', f.pooled),
+    ...Object.entries(r.powders).flatMap(([id, p]) =>
+      p.energy ? [`  ${id} energy ${p.energy.value.toPrecision(5)} (${p.energy.prior})`] : [],
+    ),
+  ]
+}
+
 /** `fit` as text: the version, one line per fitted powder, the exponents of `--exponent family`, the pressure rows and the powders not fitted. */
 export function fitTable(r: FitResult): string {
   const notFitted = Object.entries(r.notFitted).map(([k, reason]) => `${k} ${reason}`)
@@ -193,6 +209,7 @@ export function fitTable(r: FitResult): string {
       ]),
     ),
     ...(r.exponent ? [`exponent: pooled ${r.exponent.pooled}; ${families.join(', ')}`] : []),
+    ...energyFamilyLines(r),
     ...pressureLines(r.pressure),
     ...(notFitted.length > 0 ? [`not fitted: ${notFitted.join(', ')}`] : []),
     ...foldLines(r.folds),

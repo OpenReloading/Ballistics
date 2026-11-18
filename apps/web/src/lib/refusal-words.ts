@@ -198,7 +198,7 @@ const interiorWords = {
   sessionWithoutLadderPoint: msg('at least one ladder point per session'),
   rifleOrLotSigmaNotPositive: msg('rifleSigma and lotSigma must be positive'),
   pooledFitParametersInvalid: msg(
-    'parameters: burnRate, temperatureFactor, each at most once, burnRate always',
+    'parameters: burnRate, temperatureFactor, energy, each at most once, burnRate always',
   ),
   priorParameterNotFitted: msg('a prior needs its parameter in parameters'),
   burnCoefficientNotFitted: msg('the burn coefficient is always fitted'),
