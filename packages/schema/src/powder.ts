@@ -150,19 +150,20 @@ const powderGrainDimensions = z
   })
   .describe('Dimensions of the kernel as the maker states them.')
 
-/** UN numbers as the safety data sheet prints them; one powder may ship under several, by packaging. */
+/** UN or NA numbers as the safety data sheet prints them; one powder may ship under several, by packaging. */
 const powderTransport = z
   .array(
     z.object({
       unNumber: z
         .string()
-        .regex(/^UN\d{4}$/)
-        .describe('UN number, as `UN0161`.'),
+        .regex(/^(UN|NA)\d{4}$/)
+        .describe('UN number, as `UN0161`, or a US NA number, as `NA3178`.'),
       hazardClass: z
         .string()
-        .regex(/^[1-9](\.[1-6])?[A-HJKLNS]?$/)
+        // compatibility groups exist for class 1 only (UN Model Regulations 2.1.2)
+        .regex(/^(1(\.[1-6][A-HJKLNS]?)?|[2-9](\.[1-6])?)$/)
         .describe(
-          'Hazard class or division, with the compatibility group where given: `1.3C`, `4.1`.',
+          'Hazard class or division; a class 1 division with its compatibility group where given: `1.3C`, `1`, `4.1`.',
         ),
     }),
   )
@@ -170,7 +171,7 @@ const powderTransport = z
   .refine((t) => new Set(t.map((e) => e.unNumber)).size === t.length, {
     message: 'a UN number is listed twice',
   })
-  .describe('Transport classification from the safety data sheet, one entry per UN number.')
+  .describe('Transport classification from the safety data sheet, one entry per UN or NA number.')
 
 /** Whether a source of the provenance passes `test`, given the source's own kind or the record's; none without provenance. */
 const anySource = (

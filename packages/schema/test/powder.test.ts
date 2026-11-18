@@ -144,4 +144,19 @@ describe('powder kernel and safety data sheet fields', () => {
     expect(powder.parse({ ...base, transport }).transport).toEqual(transport)
     expect(paths({ ...base, transport: [transport[0], transport[0]] })).toEqual(['transport'])
   })
+
+  it('accepts a US NA number and class 1 or 4.1 without a compatibility group', () => {
+    const transport = [
+      { unNumber: 'NA3178', hazardClass: '4.1' },
+      { unNumber: 'UN0160', hazardClass: '1' },
+    ]
+    expect(powder.parse({ ...base, transport }).transport).toEqual(transport)
+  })
+
+  it('rejects a compatibility group on a class other than 1 or without a division', () => {
+    for (const hazardClass of ['4.1C', '1C'])
+      expect(paths({ ...base, transport: [{ unNumber: 'UN3178', hazardClass }] })).toEqual([
+        'transport.0.hazardClass',
+      ])
+  })
 })

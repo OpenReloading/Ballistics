@@ -243,13 +243,13 @@
         "properties": {
           "unNumber": {
             "type": "string",
-            "pattern": "^UN\\d{4}$",
-            "description": "UN number, as `UN0161`."
+            "pattern": "^(UN|NA)\\d{4}$",
+            "description": "UN number, as `UN0161`, or a US NA number, as `NA3178`."
           },
           "hazardClass": {
             "type": "string",
-            "pattern": "^[1-9](\\.[1-6])?[A-HJKLNS]?$",
-            "description": "Hazard class or division, with the compatibility group where given: `1.3C`, `4.1`."
+            "pattern": "^(1(\\.[1-6][A-HJKLNS]?)?|[2-9](\\.[1-6])?)$",
+            "description": "Hazard class or division; a class 1 division with its compatibility group where given: `1.3C`, `1`, `4.1`."
           }
         },
         "required": [
@@ -257,7 +257,7 @@
           "hazardClass"
         ]
       },
-      "description": "Transport classification from the safety data sheet, one entry per UN number."
+      "description": "Transport classification from the safety data sheet, one entry per UN or NA number."
     },
     "thermochemistry": {
       "type": "object",
