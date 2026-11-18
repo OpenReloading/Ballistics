@@ -12,11 +12,11 @@ Where questions, ideas, bugs and record requests go: [README](README.md#communit
 
 ## Before a pull request
 
-- `pnpm run build`, `pnpm run typecheck`, `pnpm run lint` (`pnpm run format` applies the fixes), `pnpm test`.
+- `pnpm run build`, `pnpm run typecheck`, `pnpm run lint`, `pnpm test`.
 - Record changes: `pnpm run data:validate`.
 - Token changes (`packages/design-tokens/tokens/`): `pnpm --filter @rangefoundry/design-tokens run generate` rewrites the generated files, which the tests compare; then `pnpm --filter @rangefoundry/design-tokens exec tsc -b tsconfig.build.json` and `pnpm exec api-extractor run --local` in that folder rewrite its API report from the new module.
 - Interface changes (`packages/ui`): `pnpm --filter @rangefoundry/ui run storybook` shows the stories; `pnpm --filter @rangefoundry/ui run test:browser` runs them as tests with axe (it needs the Playwright browsers: `pnpm --filter @rangefoundry/ui exec playwright install chromium webkit`).
-- A change to the exports of `packages/units`, `packages/locale-format`, `packages/design-tokens`, `packages/ui`, `packages/schema`, `packages/statistics`, `packages/ballistics`, `packages/shot-groups`, `packages/importers`, `packages/use-cases` or `packages/target-recognition`: `pnpm exec api-extractor run --local` in that folder rewrites its API report (`<name>.api.md`), which the build compares and the pull request shows. A declaration that names a type the package does not export fails the run (`ae-forgotten-export`): export the type or write it out.
+- A change to the exports of a package with an API report (`<name>.api.md` in its folder): `pnpm exec api-extractor run --local` in that folder rewrites the report, which the build compares and the pull request shows. A declaration that names a type the package does not export fails the run (`ae-forgotten-export`): export the type or write it out.
 - API changes, in the dev container (the checks need oasdiff and Schemathesis): `pnpm run api:check` (a breaking change also rewrites the baseline: `pnpm --filter @rangefoundry/tools run api-baseline`) and `pnpm run api:conformance` against a running API.
 - CI (`.github/workflows/ci.yml`) also runs `pnpm run docs:check`, `pnpm audit` (`tools/src/audit.ts`: high and critical advisories, except the allowlisted ones without a fix), the license policy (`tools/src/licences.ts`: licenses of the production dependencies of the API image and the web app, and the list of them in `NOTICE`), the API contract checks, the e2e tests, the drawing baseline, the workflow lint (actionlint, zizmor) and the dependency review.
 
@@ -49,4 +49,3 @@ Where questions, ideas, bugs and record requests go: [README](README.md#communit
 ## Releases
 
 - The release pull request is merged automatically every Monday at 14:00 Europe/Berlin; the label `hold` skips a week ([Releases and versions](apps/docs/docs/release.md)).
-- CI tools and their settings: [CI tools](apps/docs/docs/ci-tools.md).

@@ -20,11 +20,11 @@ Messages: `ui` takes the app's Lingui `i18n` (`UiProvider i18n={i18n}`), into wh
 
 `ui.css` brings Mantine's styles, the tokens of `@rangefoundry/design-tokens` and the Inter font in that order, then sets Mantine's controls on the tokens: rows (`size="xs"`), bars (`size="sm"`) and the dense field of property grids (`size="field"`, 24 px) take the size tokens, which are 44 px with 16 px field text under a coarse pointer; input edges take the control-edge color; a field shows a 2 px focus ring; the marks of a checked box or radio take the accent's text color, and an unchecked one shows a control edge on the page color. A Vite build resolves its package imports. `UiProvider` gives filled controls of the accent the accent's text color in each scheme (Mantine's own is white, 2.5:1 on the dark accent). It takes only the color-scheme props: Mantine's theme, class-name and variable props would undo `ui.css` or the tokens.
 
-| Command (in this folder) | What it does                                                                                                                                                                                                                                                                   |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `pnpm run storybook`     | the workshop on port 6006                                                                                                                                                                                                                                                      |
-| `pnpm test`              | every story rendered on the server in Node, without a browser global; publint and Are The Types Wrong                                                                                                                                                                          |
-| `pnpm run test:browser`  | every story as a test with axe (WCAG 2.2 AA) in Chromium at 320, 390 and 1280 px in the light scheme and at 390 px in the dark and forced-colors schemes, and in WebKit with touch; then `storybook build`; needs the Playwright browsers (CI runs it in the Playwright image) |
+Commands, in this folder:
+
+- `pnpm run storybook`: the workshop on port 6006
+- `pnpm test`: every story rendered on the server in Node, without a browser global; publint and Are The Types Wrong
+- `pnpm run test:browser`: every story as a test with axe (WCAG 2.2 AA) in Chromium at 320, 390 and 1280 px in the light scheme and at 390 px in the dark and forced-colors schemes, and in WebKit with touch; then `storybook build`; needs the Playwright browsers (CI runs it in the Playwright image)
 
 A story goes in `stories/`; its `play` function holds the checks a story needs beyond axe.
 
