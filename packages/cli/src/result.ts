@@ -101,7 +101,7 @@ const energyFamily = z
     fullWeight: z
       .object({ rows: count, cartridges: count })
       .describe(
-        "Used training rows and their cartridges at which a powder's weight is 1: its weight is min(1, rows / `rows`, cartridges / `cartridges`) and its prior sigma the spread times the root of the weight. The reference powders are those of weight 1.",
+        "Rows the fit uses (with `--folds`, those of the other four folds) and their cartridges at which a powder's weight is 1: its weight is min(1, rows / `rows`, cartridges / `cartridges`) and its prior sigma the spread times the root of the weight. The reference powders are those of weight 1.",
       ),
     familyMinimum: count.describe('Fewest reference powders a family needs for its own center.'),
     families: z
@@ -113,7 +113,7 @@ const energyFamily = z
   })
   .optional()
   .describe(
-    "With `--energy family`: each powder's energy is fitted with its burn coefficient, under a Gaussian prior on its log centered on its family's median impetus over its own gamma minus 1.",
+    "With `--energy family`: each powder's energy is fitted with its burn coefficient, under a Gaussian prior on its log centered on its family's median impetus (or `pooled`) over its own gamma minus 1.",
   )
 
 const interval = z.object({

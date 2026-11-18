@@ -1160,7 +1160,7 @@
               "additionalProperties": false
             },
             "energyFamily": {
-              "description": "With `--energy family`: each powder's energy is fitted with its burn coefficient, under a Gaussian prior on its log centered on its family's median impetus over its own gamma minus 1.",
+              "description": "With `--energy family`: each powder's energy is fitted with its burn coefficient, under a Gaussian prior on its log centered on its family's median impetus (or `pooled`) over its own gamma minus 1.",
               "type": "object",
               "properties": {
                 "fullWeight": {
@@ -1179,7 +1179,7 @@
                   },
                   "required": ["rows", "cartridges"],
                   "additionalProperties": false,
-                  "description": "Used training rows and their cartridges at which a powder's weight is 1: its weight is min(1, rows / `rows`, cartridges / `cartridges`) and its prior sigma the spread times the root of the weight. The reference powders are those of weight 1."
+                  "description": "Rows the fit uses (with `--folds`, those of the other four folds) and their cartridges at which a powder's weight is 1: its weight is min(1, rows / `rows`, cartridges / `cartridges`) and its prior sigma the spread times the root of the weight. The reference powders are those of weight 1."
                 },
                 "familyMinimum": {
                   "type": "integer",
@@ -1409,7 +1409,7 @@
                         "additionalProperties": false
                       },
                       "energyFamily": {
-                        "description": "With `--energy family`: each powder's energy is fitted with its burn coefficient, under a Gaussian prior on its log centered on its family's median impetus over its own gamma minus 1.",
+                        "description": "With `--energy family`: each powder's energy is fitted with its burn coefficient, under a Gaussian prior on its log centered on its family's median impetus (or `pooled`) over its own gamma minus 1.",
                         "type": "object",
                         "properties": {
                           "fullWeight": {
@@ -1428,7 +1428,7 @@
                             },
                             "required": ["rows", "cartridges"],
                             "additionalProperties": false,
-                            "description": "Used training rows and their cartridges at which a powder's weight is 1: its weight is min(1, rows / `rows`, cartridges / `cartridges`) and its prior sigma the spread times the root of the weight. The reference powders are those of weight 1."
+                            "description": "Rows the fit uses (with `--folds`, those of the other four folds) and their cartridges at which a powder's weight is 1: its weight is min(1, rows / `rows`, cartridges / `cartridges`) and its prior sigma the spread times the root of the weight. The reference powders are those of weight 1."
                           },
                           "familyMinimum": {
                             "type": "integer",
@@ -3035,7 +3035,7 @@
                   "additionalProperties": false
                 },
                 "energyFamily": {
-                  "description": "With `--energy family`: each powder's energy is fitted with its burn coefficient, under a Gaussian prior on its log centered on its family's median impetus over its own gamma minus 1.",
+                  "description": "With `--energy family`: each powder's energy is fitted with its burn coefficient, under a Gaussian prior on its log centered on its family's median impetus (or `pooled`) over its own gamma minus 1.",
                   "type": "object",
                   "properties": {
                     "fullWeight": {
@@ -3054,7 +3054,7 @@
                       },
                       "required": ["rows", "cartridges"],
                       "additionalProperties": false,
-                      "description": "Used training rows and their cartridges at which a powder's weight is 1: its weight is min(1, rows / `rows`, cartridges / `cartridges`) and its prior sigma the spread times the root of the weight. The reference powders are those of weight 1."
+                      "description": "Rows the fit uses (with `--folds`, those of the other four folds) and their cartridges at which a powder's weight is 1: its weight is min(1, rows / `rows`, cartridges / `cartridges`) and its prior sigma the spread times the root of the weight. The reference powders are those of weight 1."
                     },
                     "familyMinimum": {
                       "type": "integer",
@@ -4227,7 +4227,7 @@
                   "additionalProperties": false
                 },
                 "energyFamily": {
-                  "description": "With `--energy family`: each powder's energy is fitted with its burn coefficient, under a Gaussian prior on its log centered on its family's median impetus over its own gamma minus 1.",
+                  "description": "With `--energy family`: each powder's energy is fitted with its burn coefficient, under a Gaussian prior on its log centered on its family's median impetus (or `pooled`) over its own gamma minus 1.",
                   "type": "object",
                   "properties": {
                     "fullWeight": {
@@ -4246,7 +4246,7 @@
                       },
                       "required": ["rows", "cartridges"],
                       "additionalProperties": false,
-                      "description": "Used training rows and their cartridges at which a powder's weight is 1: its weight is min(1, rows / `rows`, cartridges / `cartridges`) and its prior sigma the spread times the root of the weight. The reference powders are those of weight 1."
+                      "description": "Rows the fit uses (with `--folds`, those of the other four folds) and their cartridges at which a powder's weight is 1: its weight is min(1, rows / `rows`, cartridges / `cartridges`) and its prior sigma the spread times the root of the weight. The reference powders are those of weight 1."
                     },
                     "familyMinimum": {
                       "type": "integer",
@@ -5024,7 +5024,7 @@
           "additionalProperties": false
         },
         "energyFamily": {
-          "description": "With `--energy family`: each powder's energy is fitted with its burn coefficient, under a Gaussian prior on its log centered on its family's median impetus over its own gamma minus 1.",
+          "description": "With `--energy family`: each powder's energy is fitted with its burn coefficient, under a Gaussian prior on its log centered on its family's median impetus (or `pooled`) over its own gamma minus 1.",
           "type": "object",
           "properties": {
             "fullWeight": {
@@ -5043,7 +5043,7 @@
               },
               "required": ["rows", "cartridges"],
               "additionalProperties": false,
-              "description": "Used training rows and their cartridges at which a powder's weight is 1: its weight is min(1, rows / `rows`, cartridges / `cartridges`) and its prior sigma the spread times the root of the weight. The reference powders are those of weight 1."
+              "description": "Rows the fit uses (with `--folds`, those of the other four folds) and their cartridges at which a powder's weight is 1: its weight is min(1, rows / `rows`, cartridges / `cartridges`) and its prior sigma the spread times the root of the weight. The reference powders are those of weight 1."
             },
             "familyMinimum": {
               "type": "integer",
@@ -5257,7 +5257,7 @@
                         "additionalProperties": false
                       },
                       "energyFamily": {
-                        "description": "With `--energy family`: each powder's energy is fitted with its burn coefficient, under a Gaussian prior on its log centered on its family's median impetus over its own gamma minus 1.",
+                        "description": "With `--energy family`: each powder's energy is fitted with its burn coefficient, under a Gaussian prior on its log centered on its family's median impetus (or `pooled`) over its own gamma minus 1.",
                         "type": "object",
                         "properties": {
                           "fullWeight": {
@@ -5276,7 +5276,7 @@
                             },
                             "required": ["rows", "cartridges"],
                             "additionalProperties": false,
-                            "description": "Used training rows and their cartridges at which a powder's weight is 1: its weight is min(1, rows / `rows`, cartridges / `cartridges`) and its prior sigma the spread times the root of the weight. The reference powders are those of weight 1."
+                            "description": "Rows the fit uses (with `--folds`, those of the other four folds) and their cartridges at which a powder's weight is 1: its weight is min(1, rows / `rows`, cartridges / `cartridges`) and its prior sigma the spread times the root of the weight. The reference powders are those of weight 1."
                           },
                           "familyMinimum": {
                             "type": "integer",

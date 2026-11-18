@@ -64,7 +64,8 @@ options:
                      training pressures; only the burn coefficient is fitted per powder
   --energy family    fit and --params fit-on-training: each powder's energy is fitted with
                      its burn coefficient, under a prior on its family's median impetus
-                     that tightens as its used rows (below 20) or cartridges (below 4) fall
+                     (all reference powders' for a family with fewer than 5) that
+                     tightens as its used rows (below 20) or cartridges (below 4) fall
   --folds            fit and verify: cross-validate over 5 folds of the cartridges of the
                      training and validation splits (the fold of a cartridge is its place,
                      mod 5, in the order of the SHA-256 of 2026-11-14/<cartridge id>); each
