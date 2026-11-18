@@ -257,7 +257,7 @@ _Avoid_: `base` (on a powder)
 `heatOfExplosion`: the heat of explosion the safety data sheet states, J/kg on the record (a printed J/g value stays in `raw`). Not the computed `thermochemistry`.
 
 **Transport classification**:
-`transport`: the safety data sheet's transport entries, one per UN number: `unNumber` (`UN0161`) and `hazardClass`, the class or division with its compatibility group (`1.3C`, `4.1`).
+`transport`: the safety data sheet's transport entries, one per UN number: `unNumber` (`UN0161`, or a US NA number such as `NA3178`) and `hazardClass`, the class or division as printed (`1.3C`, `1`, `4.1`); a compatibility group follows a class 1 division only.
 
 **Bulk density**:
 `bulkDensity`: mass per volume of uncompressed powder, voids between grains included, g/cm3 on the powder record. In charge-target bodies `propellant.bulkDensity`, kg/m3.

@@ -153,8 +153,10 @@ describe('powder kernel and safety data sheet fields', () => {
     expect(powder.parse({ ...base, transport }).transport).toEqual(transport)
   })
 
-  it('rejects a compatibility group on a class other than 1', () => {
-    const transport = [{ unNumber: 'UN3178', hazardClass: '4.1C' }]
-    expect(paths({ ...base, transport })).toEqual(['transport.0.hazardClass'])
+  it('rejects a compatibility group on a class other than 1 or without a division', () => {
+    for (const hazardClass of ['4.1C', '1C'])
+      expect(paths({ ...base, transport: [{ unNumber: 'UN3178', hazardClass }] })).toEqual([
+        'transport.0.hazardClass',
+      ])
   })
 })

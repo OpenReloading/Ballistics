@@ -161,9 +161,9 @@ const powderTransport = z
       hazardClass: z
         .string()
         // compatibility groups exist for class 1 only (UN Model Regulations 2.1.2)
-        .regex(/^(1(\.[1-6])?[A-HJKLNS]?|[2-9](\.[1-6])?)$/)
+        .regex(/^(1(\.[1-6][A-HJKLNS]?)?|[2-9](\.[1-6])?)$/)
         .describe(
-          'Hazard class or division; class 1 with its compatibility group where given: `1.3C`, `1`, `4.1`.',
+          'Hazard class or division; a class 1 division with its compatibility group where given: `1.3C`, `1`, `4.1`.',
         ),
     }),
   )

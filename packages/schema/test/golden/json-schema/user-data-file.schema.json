@@ -2328,8 +2328,8 @@
                                 },
                                 "hazardClass": {
                                   "type": "string",
-                                  "pattern": "^(1(\\.[1-6])?[A-HJKLNS]?|[2-9](\\.[1-6])?)$",
-                                  "description": "Hazard class or division; class 1 with its compatibility group where given: `1.3C`, `1`, `4.1`."
+                                  "pattern": "^(1(\\.[1-6][A-HJKLNS]?)?|[2-9](\\.[1-6])?)$",
+                                  "description": "Hazard class or division; a class 1 division with its compatibility group where given: `1.3C`, `1`, `4.1`."
                                 }
                               },
                               "required": [

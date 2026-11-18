@@ -195,7 +195,7 @@ describe('makerRows of an id outside the list', () => {
 })
 
 describe('makerRows of the maker sources of bullets and powders', () => {
-  it('takes a published maker source for the geometry and the composition only', () => {
+  it('takes a published maker source for the geometry and the composition, not the thermochemistry', () => {
     const bullet = { ...cited('b', 'published', { ...page, fields: ['ogive', 'diameter'] }), ogive }
     const powder = {
       ...cited('p', 'published', { ...page, fields: ['composition', 'thermochemistry'] }),
