@@ -124,14 +124,14 @@ Two basic fields carry what the makers state:
 | `burnRateCharts` | One entry per burn-rate chart: the chart (`manufacturer`, the chart maker's id, and `edition`, as printed or the publication date), the `position` in its printed order from 1, and the printed `relative` value where the chart prints one. Each chart is its own scale: entries of different makers are not merged or compared as numbers. `data:validate` checks the chart maker's id. |
 | `scope`          | The uses the maker states: a set of `rifle`, `handgun` and `shotgun`. The powder list of the API carries it. The workbench's powder chooser filters by it (Stated use). A shotgun-only powder stays listed in the workbench's pickers, greyed out as not a metallic-cartridge powder; the Powders tab and the burn-rate page count it apart from the powders without a model.             |
 
-Four detailed fields carry the kernel and the safety data sheet (each needs provenance; a maker's source covers none of them, see `makerSourceFields`):
+Four detailed fields carry the kernel and the safety data sheet (each needs provenance, which may be the maker's own published source, see `makerSourceFields`):
 
-| Field             | Holds                                                                                                                                                   |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `perforation`     | `none`, `single` or `multi`: the holes through a kernel as the maker states them.                                                                       |
-| `grainDimensions` | The kernel's `length`, `diameter`, `web` and `perforationDiameter`, each a quantity in mm and optional, at least one given.                             |
-| `heatOfExplosion` | The safety data sheet's heat of explosion, stored in J/kg like every specific energy; a printed J/g value stays in `raw`.                               |
-| `transport`       | One entry per UN number of the safety data sheet: `unNumber` (`UN0161`) and `hazardClass`, the class or division with its compatibility group (`1.3C`). |
+| Field             | Holds                                                                                                                                                                                                                                |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `perforation`     | `none`, `single` or `multi`: the holes through a kernel as the maker states them.                                                                                                                                                    |
+| `grainDimensions` | The kernel's `length`, `diameter`, `web` and `perforationDiameter`, each a quantity in mm and optional, at least one given.                                                                                                          |
+| `heatOfExplosion` | The safety data sheet's heat of explosion, stored in J/kg like every specific energy; a printed J/g value stays in `raw`.                                                                                                            |
+| `transport`       | One entry per UN number of the safety data sheet: `unNumber` (`UN0161`, or a US NA number such as `NA3178`) and `hazardClass`, the class or division as printed (`1.3C`, `1`, `4.1`); a compatibility group belongs to class 1 only. |
 
 A user powder (`userPowder` in `packages/schema/src/user-data.ts`) is the powder designer's record: `origin: 'user'`, an optional `provenanceKind` (burn-law parameters need `fitted`), an optional `draft` (`powderDraft` in `packages/schema/src/overrides.ts`: the powder fields entered so far in stored units, each optional, without the powder record's bounds) and an optional `fit`. The record's `name` is the powder's name. The designer builds a `Powder` from the draft and checks it against `powder`.
 
