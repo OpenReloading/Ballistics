@@ -19,7 +19,7 @@ const usage = `usage:
   ballistics compare --rows <path> --baseline <m3|module|verify.json> --candidate <m3|module> [options]
   ballistics fit     --rows <path> [--model m3|<module>] [--velocity-sigma <fraction>]
                      [--exponent family [--family <fit.json>]]
-                     [--pressure-sigma <fraction> [--pressure-factor <key>]] [--energy prior]
+                     [--pressure-sigma <fraction> [--pressure-factor <key>]] [--energy prior|family]
                      [--folds] [--records <dir>] [--json | --table]
   ballistics run <operation> --input <file|-> [--records <dir>]
   ballistics estimate-capacities --out <dir> [--records <dir>]
@@ -62,6 +62,10 @@ options:
   --energy prior     fit and --params fit-on-training: each powder's energy is its prior
                      from thermochemistry times one energy-level factor chosen on the
                      training pressures; only the burn coefficient is fitted per powder
+  --energy family    fit and --params fit-on-training: each powder's energy is fitted with
+                     its burn coefficient, under a prior on its family's median impetus
+                     (all reference powders' for a family with fewer than 5) that
+                     tightens as its used rows (below 20) or cartridges (below 4) fall
   --folds            fit and verify: cross-validate over 5 folds of the cartridges of the
                      training and validation splits (the fold of a cartridge is its place,
                      mod 5, in the order of the SHA-256 of 2026-11-14/<cartridge id>); each
@@ -145,8 +149,8 @@ function checkChoices(
     throw new UsageError('--params is records or fit-on-training')
   if (values.exponent !== undefined && values.exponent !== 'family')
     throw new UsageError('--exponent is family')
-  if (values.energy !== undefined && values.energy !== 'prior')
-    throw new UsageError('--energy takes prior only')
+  if (values.energy !== undefined && values.energy !== 'prior' && values.energy !== 'family')
+    throw new UsageError('--energy is prior or family')
   const key = values['pressure-factor']
   if (key !== undefined && !pressureKeys.includes(key))
     throw new UsageError(`--pressure-factor is one of ${pressureKeys.join(', ')}`)

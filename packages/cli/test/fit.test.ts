@@ -353,6 +353,95 @@ describe('--energy prior', { timeout: 120_000 }, () => {
   })
 })
 
+describe('--energy family', { timeout: 60_000 }, () => {
+  it("pulls a sparse powder's energy to the impetus of the reference powders", async () => {
+    // sp20's rows are printed at its record 3.7e6 J/kg, which three rows do not separate from its burn coefficient; the prior is dp40's impetus over the same gamma, 3.95e6
+    const reference = [
+      ['30-br', 'demo-bullet-168'],
+      ['308-win', 'demo-bullet-168'],
+      ['30-06-spring', 'demo-bullet-168'],
+      ['6-5-creedmoor', 'demo-bullet-264-130'],
+    ].flatMap(([cartridge, bullet]) =>
+      [2.0, 2.1, 2.2, 2.3, 2.4].map((charge) => ({
+        cartridge: cartridge as string,
+        bullet: bullet as string,
+        charge,
+        velocity: 0,
+      })),
+    )
+    const sparse = [
+      ['30-br', 2.0],
+      ['30-br', 2.4],
+      ['308-win', 2.2],
+    ].map(([cartridge, charge]) => ({
+      cartridge: cartridge as string,
+      powder: sp20,
+      charge: charge as number,
+      velocity: 0,
+    }))
+    const rows = writeRows(rowsCsv([...reference, ...sparse], records))
+    const r = await fit({ ...options, rows, energy: 'family' })
+    expect(r.powders[dp40]?.rows).toBe(20)
+    expect(r.energyFamily?.pooled.impetus).toBeCloseTo(849250, 0)
+    expect(r.powders[sp20]?.energy?.prior).toBe('pooled')
+    expect(r.powders[sp20]?.energy?.value).toBeCloseTo(3.95e6, -3)
+  })
+
+  it('centers a sparse powder on the median impetus of its family with five reference powders', async () => {
+    // impetus (gamma - 1) E of single/ball: 817,000 838,500 860,000 870,000 900,000 J/kg; dp40 (double/extruded, 849,250) joins only the pooled center
+    const energies = { sp21: 3.8e6, sp22: 3.9e6, sp25: 4.0e6, sp30: 3.48e6, sp31: 3.6e6 }
+    const root = mkdtempSync(join(tmpdir(), 'cli-records-'))
+    cpSync(recordRoots[1] as string, root, { recursive: true })
+    for (const [name, energy] of Object.entries(energies)) {
+      const path = join(root, `powders/demo-powder-${name}.json`)
+      const powder = JSON.parse(readFileSync(path, 'utf8'))
+      powder.interior.energy.value = energy
+      writeFileSync(path, JSON.stringify(powder))
+    }
+    const roots = [recordRoots[0] as string, root]
+    const reference = [dp40, ...Object.keys(energies).map((name) => `demo-powder-${name}`)].flatMap(
+      (powder) =>
+        [
+          ['30-br', 'demo-bullet-168'],
+          ['308-win', 'demo-bullet-168'],
+          ['30-06-spring', 'demo-bullet-168'],
+          ['6-5-creedmoor', 'demo-bullet-264-130'],
+        ].flatMap(([cartridge, bullet]) =>
+          // repeated charges reuse the model runs of the fit, which keeps the test near 5 s
+          [2.0, 2.0, 2.0, 2.4, 2.4].map((charge) => ({
+            cartridge: cartridge as string,
+            bullet: bullet as string,
+            powder,
+            charge,
+            velocity: 0,
+          })),
+        ),
+    )
+    const sparse = [
+      ['30-br', 2.0],
+      ['30-br', 2.4],
+      ['308-win', 2.2],
+    ].map(([cartridge, charge]) => ({
+      cartridge: cartridge as string,
+      powder: sp20,
+      charge: charge as number,
+      velocity: 0,
+    }))
+    const rows = writeRows(rowsCsv([...reference, ...sparse], loadRecords(roots)))
+    const r = await fit({ ...options, rows, records: roots, energy: 'family' })
+    const family = r.energyFamily?.families['single/ball']
+    expect(family?.powders).toBe(5)
+    expect(family?.impetus).toBeCloseTo(860000, 0)
+    // 1.4826 times the median of |ln(impetus / 860,000)|, 0.025318
+    expect(family?.sigma).toBeCloseTo(0.037536, 5)
+    expect(r.energyFamily?.pooled.impetus).toBeCloseTo(854625, 0)
+    expect(r.powders[sp20]?.energy?.prior).toBe('family')
+    // 860,000 J/kg over sp20's gamma 1.215 minus 1
+    expect(r.powders[sp20]?.energy?.value).toBeCloseTo(4.0e6, -3)
+    expect(r.powders[sp20]?.vivacity.standardUncertainty).toBeCloseTo(0.01102, 4)
+  })
+})
+
 describe('a model that refuses a load by throwing', () => {
   it('lists the powder and goes on', async () => {
     const refusing = new URL('./fixtures/refusing-model.mjs', import.meta.url).pathname

@@ -1158,6 +1158,88 @@
               },
               "required": ["factor"],
               "additionalProperties": false
+            },
+            "energyFamily": {
+              "description": "With `--energy family`: each powder's energy is fitted with its burn coefficient, under a Gaussian prior on its log centered on its family's median impetus (or `pooled`) over its own gamma minus 1.",
+              "type": "object",
+              "properties": {
+                "fullWeight": {
+                  "type": "object",
+                  "properties": {
+                    "rows": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "cartridges": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": ["rows", "cartridges"],
+                  "additionalProperties": false,
+                  "description": "Rows the fit uses (with `--folds`, those of the other four folds) and their cartridges at which a powder's weight is 1: its weight is min(1, rows / `rows`, cartridges / `cartridges`) and its prior sigma the spread times the root of the weight. The reference powders are those of weight 1."
+                },
+                "familyMinimum": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991,
+                  "description": "Fewest reference powders a family needs for its own center."
+                },
+                "families": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "impetus": {
+                        "type": "number",
+                        "description": "Median record impetus, (gamma - 1) times the energy, J/kg."
+                      },
+                      "sigma": {
+                        "type": "number",
+                        "description": "Spread of ln impetus: 1.4826 times its median absolute deviation, at least 0.02; the prior sigma of a powder of full weight."
+                      },
+                      "powders": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991,
+                        "description": "Reference powders it is taken over."
+                      }
+                    },
+                    "required": ["impetus", "sigma", "powders"],
+                    "additionalProperties": false
+                  },
+                  "description": "By powder family (propellant base and grain form), the center of its reference powders; a family with fewer than `familyMinimum` is left out and its powders take `pooled`."
+                },
+                "pooled": {
+                  "type": "object",
+                  "properties": {
+                    "impetus": {
+                      "type": "number",
+                      "description": "Median record impetus, (gamma - 1) times the energy, J/kg."
+                    },
+                    "sigma": {
+                      "type": "number",
+                      "description": "Spread of ln impetus: 1.4826 times its median absolute deviation, at least 0.02; the prior sigma of a powder of full weight."
+                    },
+                    "powders": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991,
+                      "description": "Reference powders it is taken over."
+                    }
+                  },
+                  "required": ["impetus", "sigma", "powders"],
+                  "additionalProperties": false,
+                  "description": "The center of all reference powders."
+                }
+              },
+              "required": ["fullWeight", "familyMinimum", "families", "pooled"],
+              "additionalProperties": false
             }
           },
           "required": ["velocitySigma", "powders", "notFitted"],
@@ -1324,6 +1406,88 @@
                           }
                         },
                         "required": ["factor"],
+                        "additionalProperties": false
+                      },
+                      "energyFamily": {
+                        "description": "With `--energy family`: each powder's energy is fitted with its burn coefficient, under a Gaussian prior on its log centered on its family's median impetus (or `pooled`) over its own gamma minus 1.",
+                        "type": "object",
+                        "properties": {
+                          "fullWeight": {
+                            "type": "object",
+                            "properties": {
+                              "rows": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              "cartridges": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              }
+                            },
+                            "required": ["rows", "cartridges"],
+                            "additionalProperties": false,
+                            "description": "Rows the fit uses (with `--folds`, those of the other four folds) and their cartridges at which a powder's weight is 1: its weight is min(1, rows / `rows`, cartridges / `cartridges`) and its prior sigma the spread times the root of the weight. The reference powders are those of weight 1."
+                          },
+                          "familyMinimum": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "description": "Fewest reference powders a family needs for its own center."
+                          },
+                          "families": {
+                            "type": "object",
+                            "propertyNames": {
+                              "type": "string"
+                            },
+                            "additionalProperties": {
+                              "type": "object",
+                              "properties": {
+                                "impetus": {
+                                  "type": "number",
+                                  "description": "Median record impetus, (gamma - 1) times the energy, J/kg."
+                                },
+                                "sigma": {
+                                  "type": "number",
+                                  "description": "Spread of ln impetus: 1.4826 times its median absolute deviation, at least 0.02; the prior sigma of a powder of full weight."
+                                },
+                                "powders": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 9007199254740991,
+                                  "description": "Reference powders it is taken over."
+                                }
+                              },
+                              "required": ["impetus", "sigma", "powders"],
+                              "additionalProperties": false
+                            },
+                            "description": "By powder family (propellant base and grain form), the center of its reference powders; a family with fewer than `familyMinimum` is left out and its powders take `pooled`."
+                          },
+                          "pooled": {
+                            "type": "object",
+                            "properties": {
+                              "impetus": {
+                                "type": "number",
+                                "description": "Median record impetus, (gamma - 1) times the energy, J/kg."
+                              },
+                              "sigma": {
+                                "type": "number",
+                                "description": "Spread of ln impetus: 1.4826 times its median absolute deviation, at least 0.02; the prior sigma of a powder of full weight."
+                              },
+                              "powders": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991,
+                                "description": "Reference powders it is taken over."
+                              }
+                            },
+                            "required": ["impetus", "sigma", "powders"],
+                            "additionalProperties": false,
+                            "description": "The center of all reference powders."
+                          }
+                        },
+                        "required": ["fullWeight", "familyMinimum", "families", "pooled"],
                         "additionalProperties": false
                       }
                     },
@@ -2869,6 +3033,88 @@
                   },
                   "required": ["factor"],
                   "additionalProperties": false
+                },
+                "energyFamily": {
+                  "description": "With `--energy family`: each powder's energy is fitted with its burn coefficient, under a Gaussian prior on its log centered on its family's median impetus (or `pooled`) over its own gamma minus 1.",
+                  "type": "object",
+                  "properties": {
+                    "fullWeight": {
+                      "type": "object",
+                      "properties": {
+                        "rows": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "cartridges": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": ["rows", "cartridges"],
+                      "additionalProperties": false,
+                      "description": "Rows the fit uses (with `--folds`, those of the other four folds) and their cartridges at which a powder's weight is 1: its weight is min(1, rows / `rows`, cartridges / `cartridges`) and its prior sigma the spread times the root of the weight. The reference powders are those of weight 1."
+                    },
+                    "familyMinimum": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991,
+                      "description": "Fewest reference powders a family needs for its own center."
+                    },
+                    "families": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "impetus": {
+                            "type": "number",
+                            "description": "Median record impetus, (gamma - 1) times the energy, J/kg."
+                          },
+                          "sigma": {
+                            "type": "number",
+                            "description": "Spread of ln impetus: 1.4826 times its median absolute deviation, at least 0.02; the prior sigma of a powder of full weight."
+                          },
+                          "powders": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "description": "Reference powders it is taken over."
+                          }
+                        },
+                        "required": ["impetus", "sigma", "powders"],
+                        "additionalProperties": false
+                      },
+                      "description": "By powder family (propellant base and grain form), the center of its reference powders; a family with fewer than `familyMinimum` is left out and its powders take `pooled`."
+                    },
+                    "pooled": {
+                      "type": "object",
+                      "properties": {
+                        "impetus": {
+                          "type": "number",
+                          "description": "Median record impetus, (gamma - 1) times the energy, J/kg."
+                        },
+                        "sigma": {
+                          "type": "number",
+                          "description": "Spread of ln impetus: 1.4826 times its median absolute deviation, at least 0.02; the prior sigma of a powder of full weight."
+                        },
+                        "powders": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991,
+                          "description": "Reference powders it is taken over."
+                        }
+                      },
+                      "required": ["impetus", "sigma", "powders"],
+                      "additionalProperties": false,
+                      "description": "The center of all reference powders."
+                    }
+                  },
+                  "required": ["fullWeight", "familyMinimum", "families", "pooled"],
+                  "additionalProperties": false
                 }
               },
               "required": ["velocitySigma", "powders", "notFitted"],
@@ -3979,6 +4225,88 @@
                   },
                   "required": ["factor"],
                   "additionalProperties": false
+                },
+                "energyFamily": {
+                  "description": "With `--energy family`: each powder's energy is fitted with its burn coefficient, under a Gaussian prior on its log centered on its family's median impetus (or `pooled`) over its own gamma minus 1.",
+                  "type": "object",
+                  "properties": {
+                    "fullWeight": {
+                      "type": "object",
+                      "properties": {
+                        "rows": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "cartridges": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": ["rows", "cartridges"],
+                      "additionalProperties": false,
+                      "description": "Rows the fit uses (with `--folds`, those of the other four folds) and their cartridges at which a powder's weight is 1: its weight is min(1, rows / `rows`, cartridges / `cartridges`) and its prior sigma the spread times the root of the weight. The reference powders are those of weight 1."
+                    },
+                    "familyMinimum": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991,
+                      "description": "Fewest reference powders a family needs for its own center."
+                    },
+                    "families": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "impetus": {
+                            "type": "number",
+                            "description": "Median record impetus, (gamma - 1) times the energy, J/kg."
+                          },
+                          "sigma": {
+                            "type": "number",
+                            "description": "Spread of ln impetus: 1.4826 times its median absolute deviation, at least 0.02; the prior sigma of a powder of full weight."
+                          },
+                          "powders": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "description": "Reference powders it is taken over."
+                          }
+                        },
+                        "required": ["impetus", "sigma", "powders"],
+                        "additionalProperties": false
+                      },
+                      "description": "By powder family (propellant base and grain form), the center of its reference powders; a family with fewer than `familyMinimum` is left out and its powders take `pooled`."
+                    },
+                    "pooled": {
+                      "type": "object",
+                      "properties": {
+                        "impetus": {
+                          "type": "number",
+                          "description": "Median record impetus, (gamma - 1) times the energy, J/kg."
+                        },
+                        "sigma": {
+                          "type": "number",
+                          "description": "Spread of ln impetus: 1.4826 times its median absolute deviation, at least 0.02; the prior sigma of a powder of full weight."
+                        },
+                        "powders": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991,
+                          "description": "Reference powders it is taken over."
+                        }
+                      },
+                      "required": ["impetus", "sigma", "powders"],
+                      "additionalProperties": false,
+                      "description": "The center of all reference powders."
+                    }
+                  },
+                  "required": ["fullWeight", "familyMinimum", "families", "pooled"],
+                  "additionalProperties": false
                 }
               },
               "required": ["velocitySigma", "powders", "notFitted"],
@@ -4573,7 +4901,7 @@
                 "description": "Their distinct cartridges."
               },
               "chiSquarePerDegree": {
-                "description": "Chi square of every row, data and the prior rows of the rifle and lot effects, over all rows minus all parameters; null where that count is not above 0.",
+                "description": "Chi square of every row, data and the prior rows of the rifle and lot effects and of the energy, over all rows minus all parameters; null where that count is not above 0.",
                 "type": ["number", "null"]
               },
               "iterations": {
@@ -4593,17 +4921,17 @@
                 "maximum": 9007199254740991
               },
               "energy": {
-                "description": "With `--energy prior`.",
+                "description": "With `--energy prior` or `--energy family`.",
                 "type": "object",
                 "properties": {
                   "value": {
                     "type": "number",
-                    "description": "Specific energy laid over the record, J/kg: the prior impetus times the energy-level factor of `energy.factor`, over the record's `interior.gamma` minus 1."
+                    "description": "Specific energy laid over the record, J/kg: with `--energy prior` the prior impetus times the energy-level factor of `energy.factor`, over the record's `interior.gamma` minus 1; with `--energy family` the fitted energy."
                   },
                   "prior": {
                     "type": "string",
-                    "enum": ["own", "base", "pooled"],
-                    "description": "Where the prior impetus came from: `own`, the powder's thermochemistry; `base`, the median of the own impetus values of its propellant base; `pooled`, the median of all own impetus values."
+                    "enum": ["own", "base", "family", "pooled"],
+                    "description": "Where the prior impetus came from: `own`, the powder's thermochemistry; `base`, the median of the own impetus values of its propellant base; `family`, the center of its family in `energyFamily`; `pooled`, the median of all own impetus values, or with `--energy family` the center of all reference powders."
                   }
                 },
                 "required": ["value", "prior"],
@@ -4693,6 +5021,88 @@
             }
           },
           "required": ["factor", "grid", "objective", "pressureRows", "priors"],
+          "additionalProperties": false
+        },
+        "energyFamily": {
+          "description": "With `--energy family`: each powder's energy is fitted with its burn coefficient, under a Gaussian prior on its log centered on its family's median impetus (or `pooled`) over its own gamma minus 1.",
+          "type": "object",
+          "properties": {
+            "fullWeight": {
+              "type": "object",
+              "properties": {
+                "rows": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "cartridges": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["rows", "cartridges"],
+              "additionalProperties": false,
+              "description": "Rows the fit uses (with `--folds`, those of the other four folds) and their cartridges at which a powder's weight is 1: its weight is min(1, rows / `rows`, cartridges / `cartridges`) and its prior sigma the spread times the root of the weight. The reference powders are those of weight 1."
+            },
+            "familyMinimum": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "description": "Fewest reference powders a family needs for its own center."
+            },
+            "families": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "impetus": {
+                    "type": "number",
+                    "description": "Median record impetus, (gamma - 1) times the energy, J/kg."
+                  },
+                  "sigma": {
+                    "type": "number",
+                    "description": "Spread of ln impetus: 1.4826 times its median absolute deviation, at least 0.02; the prior sigma of a powder of full weight."
+                  },
+                  "powders": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991,
+                    "description": "Reference powders it is taken over."
+                  }
+                },
+                "required": ["impetus", "sigma", "powders"],
+                "additionalProperties": false
+              },
+              "description": "By powder family (propellant base and grain form), the center of its reference powders; a family with fewer than `familyMinimum` is left out and its powders take `pooled`."
+            },
+            "pooled": {
+              "type": "object",
+              "properties": {
+                "impetus": {
+                  "type": "number",
+                  "description": "Median record impetus, (gamma - 1) times the energy, J/kg."
+                },
+                "sigma": {
+                  "type": "number",
+                  "description": "Spread of ln impetus: 1.4826 times its median absolute deviation, at least 0.02; the prior sigma of a powder of full weight."
+                },
+                "powders": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991,
+                  "description": "Reference powders it is taken over."
+                }
+              },
+              "required": ["impetus", "sigma", "powders"],
+              "additionalProperties": false,
+              "description": "The center of all reference powders."
+            }
+          },
+          "required": ["fullWeight", "familyMinimum", "families", "pooled"],
           "additionalProperties": false
         },
         "folds": {
@@ -4844,6 +5254,88 @@
                           }
                         },
                         "required": ["factor"],
+                        "additionalProperties": false
+                      },
+                      "energyFamily": {
+                        "description": "With `--energy family`: each powder's energy is fitted with its burn coefficient, under a Gaussian prior on its log centered on its family's median impetus (or `pooled`) over its own gamma minus 1.",
+                        "type": "object",
+                        "properties": {
+                          "fullWeight": {
+                            "type": "object",
+                            "properties": {
+                              "rows": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              "cartridges": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              }
+                            },
+                            "required": ["rows", "cartridges"],
+                            "additionalProperties": false,
+                            "description": "Rows the fit uses (with `--folds`, those of the other four folds) and their cartridges at which a powder's weight is 1: its weight is min(1, rows / `rows`, cartridges / `cartridges`) and its prior sigma the spread times the root of the weight. The reference powders are those of weight 1."
+                          },
+                          "familyMinimum": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "description": "Fewest reference powders a family needs for its own center."
+                          },
+                          "families": {
+                            "type": "object",
+                            "propertyNames": {
+                              "type": "string"
+                            },
+                            "additionalProperties": {
+                              "type": "object",
+                              "properties": {
+                                "impetus": {
+                                  "type": "number",
+                                  "description": "Median record impetus, (gamma - 1) times the energy, J/kg."
+                                },
+                                "sigma": {
+                                  "type": "number",
+                                  "description": "Spread of ln impetus: 1.4826 times its median absolute deviation, at least 0.02; the prior sigma of a powder of full weight."
+                                },
+                                "powders": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 9007199254740991,
+                                  "description": "Reference powders it is taken over."
+                                }
+                              },
+                              "required": ["impetus", "sigma", "powders"],
+                              "additionalProperties": false
+                            },
+                            "description": "By powder family (propellant base and grain form), the center of its reference powders; a family with fewer than `familyMinimum` is left out and its powders take `pooled`."
+                          },
+                          "pooled": {
+                            "type": "object",
+                            "properties": {
+                              "impetus": {
+                                "type": "number",
+                                "description": "Median record impetus, (gamma - 1) times the energy, J/kg."
+                              },
+                              "sigma": {
+                                "type": "number",
+                                "description": "Spread of ln impetus: 1.4826 times its median absolute deviation, at least 0.02; the prior sigma of a powder of full weight."
+                              },
+                              "powders": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991,
+                                "description": "Reference powders it is taken over."
+                              }
+                            },
+                            "required": ["impetus", "sigma", "powders"],
+                            "additionalProperties": false,
+                            "description": "The center of all reference powders."
+                          }
+                        },
+                        "required": ["fullWeight", "familyMinimum", "families", "pooled"],
                         "additionalProperties": false
                       }
                     },

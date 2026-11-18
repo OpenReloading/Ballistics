@@ -319,6 +319,21 @@ describe('fitPowderPooled pressure rows', () => {
     expect(parameter(fit, 'burnRate', 'B').value / 0.45).toBeCloseTo(1, 3)
     expect(parameter(fit, 'rifle', 'r2').value).toBeGreaterThan(parameter(fit, 'rifle', 'r1').value)
   })
+
+  it('fits the specific energy the pressures separate from the burn coefficient, and predicts with it', () => {
+    // the sessions were printed at 3.9e6 J/kg and start from 3.6e6
+    const start = load(0.5)
+    const from = { ...start, propellant: { ...start.propellant, specificEnergy: 3.6e6 } }
+    const sessions = [{ ...inRifle('r1', 1), load: from }]
+    const fit = fitPowderPooled(sessions, {
+      parameters: ['burnRate', 'energy'],
+      priors: { B: { energy: { value: 3.6e6, sigma: 1 } } },
+    })
+    expect(parameter(fit, 'energy', 'B').value).toBeCloseTo(3.9e6, -3)
+    const p = predictPooled(fit, nth(sessions, 0), 2.8e-3)
+    expect(p.value).toBeCloseTo(868.27, 1)
+    expect(p.parameterUncertainty).toBeCloseTo(1.472, 2)
+  })
 })
 
 describe('fitPowderPooled refusals', () => {

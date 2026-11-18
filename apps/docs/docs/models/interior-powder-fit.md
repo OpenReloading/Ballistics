@@ -305,22 +305,22 @@ The values describe the rifle's barrels, the lot and the temperatures of the ses
 `fitPowderPooled` fits many chronograph sessions at once. Each session names its powder, rifle and, optionally, lot, and carries its own load (the rifle, components and fixed inputs), barrel length, powder temperature and a ladder of mean velocities with their `velocitySigma`. The predicted mean velocity of a string of session $s$ at charge $m$ is
 
 $$
-\hat v_s(m) = r_{R(s)}\, v_\text{M3}\bigl(m;\ B_{P(s)}\, \ell_{L(s)},\ f_{T,P(s)}\bigr), \qquad
-B_P = B_{P,0}\, e^{\theta_{B,P}}, \quad r_R = e^{\theta_R}, \quad \ell_L = e^{\theta_L}, \quad f_{T,P} = e^{\theta_{T,P}}
+\hat v_s(m) = r_{R(s)}\, v_\text{M3}\bigl(m;\ B_{P(s)}\, \ell_{L(s)},\ f_{T,P(s)},\ Q_{P(s)}\bigr), \qquad
+B_P = B_{P,0}\, e^{\theta_{B,P}}, \quad r_R = e^{\theta_R}, \quad \ell_L = e^{\theta_L}, \quad f_{T,P} = e^{\theta_{T,P}}, \quad Q_P = Q_{P,0}\, e^{\theta_{Q,P}}
 $$
 
 Code: `packages/ballistics/src/interior/fit-pooled.ts`, `fitPowderPooled` (`pooledValue`, `targetLoad`).
 
-- $B_P$, the burn coefficient of powder $P$, is shared by all its sessions. The burn coefficient of the powder's first session is the start $B_{P,0}$ and replaces that of its other sessions. On request the temperature factor $f_{T,P}$ of the powder is fitted too, where its sessions span two or more temperatures and its load carries a sensitivity; otherwise it is listed in `held` and stays 1.
+- $B_P$, the burn coefficient of powder $P$, is shared by all its sessions. The burn coefficient of the powder's first session is the start $B_{P,0}$ and replaces that of its other sessions. On request the temperature factor $f_{T,P}$ of the powder is fitted too, where its sessions span two or more temperatures and its load carries a sensitivity; otherwise it is listed in `held` and stays 1. On request (`energy`) the specific energy of the powder is fitted too, from that of its first session, which replaces that of its other sessions; otherwise each session keeps its own, and $Q_{P(s)}$ stands for it. Velocities hold only one combination of it and the burn coefficient ([identifiability](#identifiability)), so it needs a prior or rows that separate the two.
 - $r_R$, the velocity factor of rifle $R$, holds what the rifle changes beyond its load: bore, throat, chronograph. It is fitted only where the sessions hold two or more rifles. With one rifle it is absorbed by the burn coefficients.
 - $\ell_L$, the factor of lot $L$ on its powder's burn coefficient, is fitted for each named lot of a powder whose sessions hold two or more lots (a session without a lot counts as one, without a factor).
 
-Rifle and lot factors are random effects: each has a Gaussian prior on its log, centered on 0, with the spread `rifleSigma` (default 0.01) or `lotSigma` (default 0.03). The defaults are assumptions, to be tuned on measured sessions. A per-powder prior (`priors`, by powder, on the burn coefficient or the temperature factor, as a `PowderPrior`) comes from a powder record, its thermochemistry or the [similar powders](#prior-from-similar-powders). All priors are pseudo-rows, as in the single fit, so the result is the maximum of the posterior, and its covariance is the posterior one (first-order Laplace approximation). There is no global parameter of the powder model: velocities alone resolve neither the exponent nor the form parameters. A request for `exponent` or `form` fails as `unresolved` before any run.
+Rifle and lot factors are random effects: each has a Gaussian prior on its log, centered on 0, with the spread `rifleSigma` (default 0.01) or `lotSigma` (default 0.03). The defaults are assumptions, to be tuned on measured sessions. A per-powder prior (`priors`, by powder, on the burn coefficient, the temperature factor or the energy, as a `PowderPrior`) comes from a powder record, its thermochemistry or the [similar powders](#prior-from-similar-powders). All priors are pseudo-rows, as in the single fit, so the result is the maximum of the posterior, and its covariance is the posterior one (first-order Laplace approximation). There is no global parameter of the powder model: velocities alone resolve neither the exponent nor the form parameters. A request for `exponent` or `form` fails as `unresolved` before any run.
 
-A ladder point may carry a measured peak pressure $p_{s}(m)$ with its `pressureSigma` $\sigma_p$ (one without the other fails as `pressureWithoutSigma`). It adds a row whose prediction is the peak breech pressure of the same run, which the burn coefficient, the temperature factor and the lot factor move and the rifle's velocity factor does not:
+A ladder point may carry a measured peak pressure $p_{s}(m)$ with its `pressureSigma` $\sigma_p$ (one without the other fails as `pressureWithoutSigma`). It adds a row whose prediction is the peak breech pressure of the same run, which the burn coefficient, the temperature factor, the energy and the lot factor move and the rifle's velocity factor does not:
 
 $$
-\hat p_s(m) = p_\text{M3}\bigl(m;\ B_{P(s)}\, \ell_{L(s)},\ f_{T,P(s)}\bigr), \qquad r = \frac{\hat p_s(m) - p_s(m)}{\sigma_p}
+\hat p_s(m) = p_\text{M3}\bigl(m;\ B_{P(s)}\, \ell_{L(s)},\ f_{T,P(s)},\ Q_{P(s)}\bigr), \qquad r = \frac{\hat p_s(m) - p_s(m)}{\sigma_p}
 $$
 
 Code: `packages/ballistics/src/interior/fit-pooled.ts`, `fitPowderPooled` (`pointRows`, `pooledValue`).

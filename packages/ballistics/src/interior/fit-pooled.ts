@@ -34,7 +34,7 @@ export interface PooledSession {
 export type PooledTarget = Omit<PooledSession, 'ladder'>
 
 /** A per-powder parameter of the pooled fit. */
-export type PooledRequest = 'burnRate' | 'temperatureFactor'
+export type PooledRequest = 'burnRate' | 'temperatureFactor' | 'energy'
 
 /** Gaussian priors of the per-powder parameters, by powder name, in the form of `PowderPrior`. */
 export type PooledPriors = Readonly<
@@ -43,7 +43,7 @@ export type PooledPriors = Readonly<
 
 /** Options of `fitPowderPooled`. */
 export interface PooledFitOptions {
-  /** Default ['burnRate'], which must be among them; the temperature factor is fitted where a powder's sessions span two or more temperatures and its load carries a sensitivity, else listed in `held`; `exponent` and `form` are refused with `unresolved`, as velocities do not resolve them. */
+  /** Default ['burnRate'], which must be among them; the temperature factor is fitted where a powder's sessions span two or more temperatures and its load carries a sensitivity, else listed in `held`; `energy` fits the specific energy of each powder, which starts at its first session's and replaces that of its other sessions, and needs a prior where its sessions do not separate it from the burn coefficient; `exponent` and `form` are refused with `unresolved`, as velocities do not resolve them. */
   parameters?: readonly PooledRequest[] | undefined
   /** Priors on the per-powder parameters: from a powder record, its thermochemistry or `similarPowdersPrior`. */
   priors?: PooledPriors | undefined
@@ -64,18 +64,18 @@ export interface PooledFitOptions {
 /** Assumptions: a rifle moves the velocity by about 1 %, a lot the burn coefficient by about 3 %. */
 const pooledDefaults = { rifleSigma: 0.01, lotSigma: 0.03 }
 
-/** A powder's burn coefficient or temperature factor, a rifle's velocity factor, a lot's factor on its powder's burn coefficient. */
-export type PooledParameterKind = 'burnRate' | 'temperatureFactor' | 'rifle' | 'lot'
+/** A powder's burn coefficient, temperature factor or specific energy, a rifle's velocity factor, a lot's factor on its powder's burn coefficient. */
+export type PooledParameterKind = 'burnRate' | 'temperatureFactor' | 'energy' | 'rifle' | 'lot'
 
 /** A fitted parameter of the pooled fit. Factors start at 1. */
 export interface PooledPowderParameter {
   /** Which parameter. */
   kind: PooledParameterKind
-  /** The powder (burn coefficient, temperature factor, lot) or the rifle it belongs to. */
+  /** The powder (burn coefficient, temperature factor, specific energy, lot) or the rifle it belongs to. */
   group: string
   /** With kind `lot`: the lot. */
   lot?: string
-  /** Start value: the burn coefficient of the powder's first session, else 1. */
+  /** Start value: the burn coefficient or the specific energy (J/kg) of the powder's first session, else 1. */
   initial: number
   /** Fitted value, same unit as `initial`. */
   value: number
@@ -153,9 +153,17 @@ const burnOf = (load: InteriorLoad) => {
   return burn.kind === 'vivacity' ? burn.vivacity : burn.coefficient
 }
 
-/** The load of `target` at `charge` with burn coefficient `burn` and temperature factor `factor`. */
-function targetLoad(target: PooledTarget, charge: number, burn: number, factor: number) {
-  const load = withBurn(target.load, burn)
+/** The load of `target` at `charge` with burn coefficient `burn`, temperature factor `factor` and, where given, specific energy `energy`. */
+function targetLoad(
+  target: PooledTarget,
+  charge: number,
+  { burn, factor, energy }: { burn: number; factor: number; energy: number | undefined },
+) {
+  const burned = withBurn(target.load, burn)
+  const load =
+    energy === undefined
+      ? burned
+      : { ...burned, propellant: { ...burned.propellant, specificEnergy: energy } }
   const t = load.propellant.temperatureSensitivity
   return {
     ...load,
@@ -187,7 +195,7 @@ function indexOf(
   return parameters.findIndex((p) => p.kind === kind && p.group === group && p.lot === lot)
 }
 
-/** The parameter indices that move a session's velocities: burn, temperature, rifle, lot. */
+/** The parameter indices that move a session's velocities: burn, temperature, energy, rifle, lot. */
 function sessionIndices(
   parameters: readonly Pick<PooledPowderParameter, 'kind' | 'group' | 'lot'>[],
   s: Pick<PooledSession, 'powder' | 'rifle' | 'lot'>,
@@ -195,6 +203,7 @@ function sessionIndices(
   return {
     burn: indexOf(parameters, 'burnRate', s.powder),
     temperature: indexOf(parameters, 'temperatureFactor', s.powder),
+    energy: indexOf(parameters, 'energy', s.powder),
     rifle: indexOf(parameters, 'rifle', s.rifle),
     lot: s.lot === undefined ? -1 : indexOf(parameters, 'lot', s.powder, s.lot),
   }
@@ -215,7 +224,7 @@ function checkPooled(
   if (names.includes('exponent') || names.includes('form')) throw new PowderFitError('unresolved')
   need(
     requested.includes('burnRate') &&
-      requested.every((p) => p === 'burnRate' || p === 'temperatureFactor') &&
+      requested.every((p) => p === 'burnRate' || p === 'temperatureFactor' || p === 'energy') &&
       new Set(requested).size === requested.length,
     { code: 'pooledFitParametersInvalid', params: {} },
   )
@@ -265,6 +274,27 @@ function resolvesTemperature(sessions: readonly PooledSession[]) {
   return temperatures.size > 1 && t !== undefined && (t.cold !== 0 || t.hot !== 0)
 }
 
+/** The parameters of `powder` from its `sessions`: its burn coefficient and the requested energy and temperature factor, and a temperature factor they do not resolve as held. */
+function powderParameters(
+  powder: string,
+  sessions: readonly PooledSession[],
+  requested: readonly PooledRequest[],
+) {
+  const load = nth(sessions, 0).load
+  const parameters: Omit<PooledPowderParameter, 'value' | 'standardUncertainty'>[] = [
+    { kind: 'burnRate', group: powder, initial: burnOf(load) },
+  ]
+  const held: PooledPowderFit['held'] = []
+  if (requested.includes('energy'))
+    parameters.push({ kind: 'energy', group: powder, initial: load.propellant.specificEnergy })
+  if (requested.includes('temperatureFactor')) {
+    if (resolvesTemperature(sessions))
+      parameters.push({ kind: 'temperatureFactor', group: powder, initial: 1 })
+    else held.push({ powder, name: 'temperatureFactor' })
+  }
+  return { parameters, held }
+}
+
 /** The pooled parameters in their order, and the temperature factors the sessions do not resolve. */
 function pooledParameters(
   sessions: readonly PooledSession[],
@@ -287,11 +317,9 @@ function pooledParameters(
   const parameters: Omit<PooledPowderParameter, 'value' | 'standardUncertainty'>[] = []
   const held: PooledPowderFit['held'] = []
   for (const powder of powders) {
-    parameters.push({ kind: 'burnRate', group: powder, initial: burnOf(first(powder)) })
-    if (!requested.includes('temperatureFactor')) continue
-    if (resolvesTemperature(of(powder)))
-      parameters.push({ kind: 'temperatureFactor', group: powder, initial: 1 })
-    else held.push({ powder, name: 'temperatureFactor' })
+    const own = powderParameters(powder, of(powder), requested)
+    parameters.push(...own.parameters)
+    held.push(...own.held)
   }
   // one level of a random effect is absorbed by the burn coefficients, so it gets no parameter
   if (rifles.length > 1)
@@ -362,7 +390,16 @@ interface PooledProblem {
   /** The model the runs call. */
   interior: typeof interior
   /** Last interior run per session and charge; a rifle step and a point's pressure reuse it. */
-  cache: Map<string, { burn: number; factor: number; velocity: number; pressure: number }>
+  cache: Map<
+    string,
+    {
+      burn: number
+      factor: number
+      energy: number | undefined
+      velocity: number
+      pressure: number
+    }
+  >
   /** Model runs so far. */
   runCount: number
 }
@@ -373,17 +410,22 @@ function pooledValue(
   row: PooledRow,
   theta: readonly number[],
 ): number | null {
-  const { burn, temperature, rifle, lot } = row.indices
+  const { burn, temperature, energy, rifle, lot } = row.indices
   const s = nth(problem.sessions, row.session)
   const b = nth(problem.parameters, burn).initial * Math.exp(at(theta, burn) + at(theta, lot))
   const factor = Math.exp(at(theta, temperature))
+  const e =
+    energy < 0 ? undefined : nth(problem.parameters, energy).initial * Math.exp(at(theta, energy))
   const key = `${row.session} ${row.x.charge}`
   let hit = problem.cache.get(key)
-  if (hit?.burn !== b || hit.factor !== factor) {
+  if (hit?.burn !== b || hit.factor !== factor || hit.energy !== e) {
     problem.runCount++
-    const r = problem.interior(targetLoad(s, row.x.charge, b, factor), problem.options)
+    const r = problem.interior(
+      targetLoad(s, row.x.charge, { burn: b, factor, energy: e }),
+      problem.options,
+    )
     if (!r.valid) return null
-    hit = { burn: b, factor, velocity: r.muzzleVelocity, pressure: r.peakBreechPressure }
+    hit = { burn: b, factor, energy: e, velocity: r.muzzleVelocity, pressure: r.peakBreechPressure }
     problem.cache.set(key, hit)
   }
   return row.kind === 'pressure' ? hit.pressure : hit.velocity * Math.exp(at(theta, rifle))
@@ -662,17 +704,18 @@ export function predictPooled(
 ): PooledPrediction {
   const { level = 0.9, velocitySigma = 0 } = options
   checkPooledPrediction(fit, target, charge, { level, velocitySigma })
-  const { burn, temperature, rifle, lot } = sessionIndices(fit.parameters, target)
+  const { burn, temperature, energy, rifle, lot } = sessionIndices(fit.parameters, target)
   const value = (k: number) => (k < 0 ? 1 : nth(fit.parameters, k).value)
   const theta0 = fit.parameters.map(() => 0)
   let runCount = 0
   const run = (theta: readonly number[]) => {
     runCount++
-    const b = value(burn) * value(lot) * Math.exp(at(theta, burn) + at(theta, lot))
-    const r = interior(
-      targetLoad(target, charge, b, value(temperature) * Math.exp(at(theta, temperature))),
-      options.options,
-    )
+    const point = {
+      burn: value(burn) * value(lot) * Math.exp(at(theta, burn) + at(theta, lot)),
+      factor: value(temperature) * Math.exp(at(theta, temperature)),
+      energy: energy < 0 ? undefined : value(energy) * Math.exp(at(theta, energy)),
+    }
+    const r = interior(targetLoad(target, charge, point), options.options)
     if (!r.valid) throw new PowderFitError('invalid', { charge, result: r })
     return r.muzzleVelocity * value(rifle) * Math.exp(at(theta, rifle))
   }
@@ -680,7 +723,7 @@ export function predictPooled(
   const step = 1e-3
   const gradient = theta0.map((_, j) => {
     if (j === rifle) return v
-    if (j !== burn && j !== temperature && j !== lot) return 0
+    if (j !== burn && j !== temperature && j !== energy && j !== lot) return 0
     const shifted = (d: number) => run(theta0.map((x, k) => (k === j ? x + d : x)))
     return (shifted(step) - shifted(-step)) / (2 * step)
   })

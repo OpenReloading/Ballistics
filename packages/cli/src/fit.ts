@@ -39,12 +39,12 @@ interface PowderFitValue {
   pressureExponent?: number
   /** With pressure rows: its used rows that print a pressure. */
   pressureRows?: number
-  /** With `--energy prior`: the specific energy laid over the record, J/kg, and where its prior impetus came from. */
+  /** With `--energy prior` or `family`: the specific energy laid over the record, J/kg, and where its prior impetus came from. */
   energy?: { value: number; prior: PriorKind }
 }
 
-/** Where a powder's prior impetus came from: its own thermochemistry, the median of its propellant base, or the median of all. */
-type PriorKind = 'own' | 'base' | 'pooled'
+/** Where a powder's prior impetus came from: its own thermochemistry, the median of its propellant base or of its family, or the median of all. */
+type PriorKind = 'own' | 'base' | 'family' | 'pooled'
 
 /** A fitted value with the chi square of its fit, data and prior rows. */
 type Fitted = PowderFitValue & { chiSquare: number }
@@ -90,8 +90,16 @@ function factorOf(pressure: PressureRun | undefined, row: Row) {
 // a fit with large residuals needs one rejected step per factor of 10 to raise the damping before it ends, so fits that had their minimum by 19 ended not-converged at the default 30
 const maxIterations = 100
 
-/** The model a fit runs and the sigmas of its rows. */
-type FitRun = { model: InteriorModel; velocitySigma: number; pressure?: PressureRun | undefined }
+/** A powder's prior on its log specific energy: the center over its record energy, the sigma, and where the center came from. */
+type EnergyPrior = { ratio: number; sigma: number; prior: PriorKind }
+
+/** The model a fit runs and the sigmas of its rows; with `energy`, each powder it holds fits its energy under that prior. */
+type FitRun = {
+  model: InteriorModel
+  velocitySigma: number
+  pressure?: PressureRun | undefined
+  energy?: ReadonlyMap<string, EnergyPrior> | undefined
+}
 
 /** The sessions of one powder's used training rows, one per load without its charge; with `pressure`, a printed pressure over the factor of its key is a point's peak pressure. */
 function sessionsOf(
@@ -168,18 +176,26 @@ function fitOne(
       velocity: run.velocitySigma,
       pressure: run.pressure,
     })
+    const prior = run.energy?.get(id)
+    const initial = nth(sessions, 0).load.propellant.specificEnergy
     const fit = fitPowderPooled(sessions, {
       interior: refusedAsInvalid(run.model),
       maxIterations,
+      ...(prior && {
+        parameters: ['burnRate', 'energy'],
+        priors: { [id]: { energy: { value: initial * prior.ratio, sigma: prior.sigma } } },
+      }),
     })
     const burn = fit.parameters.find((p) => p.kind === 'burnRate' && p.group === id)
     if (!burn) throw new Error(`no burn coefficient in the fit of ${id}`)
     const factor = (burn.value / burn.initial) * (vivacity.start / vivacity.record)
     const value = vivacity.record * factor
-    // each rifle or lot parameter has one prior row, so this is all rows, data and prior, over all rows minus all parameters
+    const energy = fit.parameters.find((p) => p.kind === 'energy')
+    // each rifle, lot or energy parameter has one prior row, so this is all rows, data and prior, over all rows minus all parameters
     const degrees =
       fit.degreesOfFreedom +
-      fit.parameters.filter((p) => p.kind === 'rifle' || p.kind === 'lot').length
+      fit.parameters.filter((p) => p.kind === 'rifle' || p.kind === 'lot' || p.kind === 'energy')
+        .length
     const perDegree = degrees > 0 ? fit.chiSquare / degrees : null
     // the usual scaling of a covariance when the residuals are larger than the assumed sigma
     const scale = Math.sqrt(Math.max(1, perDegree ?? 1))
@@ -196,6 +212,13 @@ function fitOne(
       ...(run.pressure && {
         pressureRows: rows.filter((r) => factorOf(run.pressure, r) !== undefined).length,
       }),
+      ...(prior &&
+        energy && {
+          energy: {
+            value: recordEnergyOf(records, id) * (energy.value / energy.initial),
+            prior: prior.prior,
+          },
+        }),
       chiSquare: fit.chiSquare,
     }
   } catch (error) {
@@ -206,6 +229,88 @@ function fitOne(
 
 /** A used training row with the peak pressure (Pa) the model predicts for it at the record values. */
 type Used = { row: Row; pressure: number }
+
+/** The interior parameters of a powder of `records` the fit holds, which all have them. */
+const interiorOf = (records: Records, id: string) =>
+  records.powders.get(id)?.interior as NonNullable<Powder['interior']>
+
+const recordEnergyOf = (records: Records, id: string) => interiorOf(records, id).energy.value
+
+// the force constant (gamma - 1) E, which powders of different gamma share where their energies differ
+const impetusOf = (records: Records, id: string) => {
+  const interior = interiorOf(records, id)
+  return (interior.gamma - 1) * interior.energy.value
+}
+
+/** Used rows and cartridges at which a powder's energy prior has the full family spread. */
+const fullWeight = { rows: 20, cartridges: 4 }
+
+/** Fewest reference powders a family needs for its own center and spread. */
+const familyMinimum = 5
+
+/** Floor of a spread of ln impetus. */
+const spreadFloor = 0.02
+
+/** Median impetus of `impetus`, J/kg, and spread of its log: 1.4826 times the median absolute deviation (the sigma of a normal), at least {@link spreadFloor}. */
+function centerOf(impetus: readonly number[]) {
+  const logs = impetus.map(Math.log)
+  const middle = percentile(logs, 0.5) as number
+  const deviation = percentile(
+    logs.map((x) => Math.abs(x - middle)),
+    0.5,
+  ) as number
+  return {
+    impetus: percentile(impetus, 0.5) as number,
+    sigma: Math.max(spreadFloor, 1.4826 * deviation),
+    powders: impetus.length,
+  }
+}
+
+/** With `energy` `family`: per powder of `ids` with used rows, a prior on its log energy centered on the median record impetus of its family's reference powders (the powders of full weight; with fewer than {@link familyMinimum} of them, all reference powders), with that set's spread times the root of its weight min(1, rows / 20, cartridges / 4), so it tightens as its usable data falls; a `Refusal` without a reference powder. */
+function familyEnergyPriors(ids: readonly string[], used: readonly Used[], records: Records) {
+  const weights = new Map(
+    ids.map((id) => {
+      const rows = used.filter((u) => u.row.powder === id).map((u) => u.row)
+      const cartridges = new Set(rows.map((r) => r.cartridge)).size
+      return [id, Math.min(1, rows.length / fullWeight.rows, cartridges / fullWeight.cartridges)]
+    }),
+  )
+  const reference = ids.filter((id) => weights.get(id) === 1)
+  if (reference.length === 0)
+    throw new Refusal(
+      `--energy family needs a powder with ${fullWeight.rows} rows the fit uses over ${fullWeight.cartridges} cartridges or more`,
+    )
+  const family = (id: string) => familyOf(records.powders.get(id))
+  const pooled = centerOf(reference.map((id) => impetusOf(records, id)))
+  const families: Record<string, ReturnType<typeof centerOf>> = Object.fromEntries(
+    [...new Set(reference.map(family))].toSorted(compareKeys).flatMap((name) => {
+      const members = reference.filter((id) => family(id) === name)
+      return members.length >= familyMinimum
+        ? [[name, centerOf(members.map((id) => impetusOf(records, id)))]]
+        : []
+    }),
+  )
+  const priors = new Map(
+    ids.flatMap((id): [string, EnergyPrior][] => {
+      const weight = weights.get(id) ?? 0
+      // a powder without used rows is not fitted
+      if (weight === 0) return []
+      const own = Object.hasOwn(families, family(id)) ? families[family(id)] : undefined
+      const center = own ?? pooled
+      return [
+        [
+          id,
+          {
+            ratio: center.impetus / impetusOf(records, id),
+            sigma: center.sigma * Math.sqrt(weight),
+            prior: own ? 'family' : 'pooled',
+          },
+        ],
+      ]
+    }),
+  )
+  return { priors, summary: { fullWeight, familyMinimum, families, pooled } }
+}
 
 /** Each powder of `ids` fitted to its rows of `used`, at its record exponent or, with `exponentOf`, at its exponent `n` from the start value that belongs to `n`, which its fitted value then carries. */
 function fitEach(
@@ -219,8 +324,7 @@ function fitEach(
     ids.map((id): [string, Fitted | NotFitted] => {
       const own = used.filter((u) => u.row.powder === id)
       const rows = own.map((u) => u.row)
-      // `ids` holds only powders with interior parameters
-      const interior = records.powders.get(id)?.interior as NonNullable<Powder['interior']>
+      const interior = interiorOf(records, id)
       const record = interior.vivacity.value
       if (exponentOf === undefined || rows.length === 0)
         return [id, fitOne(id, { record, start: record }, rows, records, run)]
@@ -389,6 +493,8 @@ interface PowdersFit {
   }
   /** With `energy` `prior`: `<powder id>=<prior impetus>` of each powder the rows name that has interior parameters, for the model version. */
   priorLines?: string[]
+  /** With `energy` `family`: the data of full prior weight, the fewest reference powders of a family, and the center and spread per family that has them and over all reference powders. */
+  energyFamily?: ReturnType<typeof familyEnergyPriors>['summary']
 }
 
 /** The options of {@link fitPowders}. */
@@ -398,12 +504,12 @@ interface PowdersFitOptions {
   family?: FamilyChoice | undefined
   pressureSigma?: number | undefined
   pressureFactor?: PressureKey | undefined
-  energy?: 'prior' | undefined
+  energy?: 'prior' | 'family' | undefined
   /** The splits whose rows are fitted; default `training`. */
   splits?: readonly Split[] | undefined
 }
 
-/** The burn coefficient of each powder with interior parameters the rows name, fitted under `model` to its training rows that model can run, velocities corrected to the muzzle; `velocitySigma` is a fraction of the velocity; `exponent` `family` fits each at the pressure exponent its family chooses; with `pressureSigma`, a fraction of the pressure, the printed pressures over the factor of their key of `pressureFactor` (default the basis) join a second fit; `energy` `prior` takes each powder's energy from its prior impetus. */
+/** The burn coefficient of each powder with interior parameters the rows name, fitted under `model` to its training rows that model can run, velocities corrected to the muzzle; `velocitySigma` is a fraction of the velocity; `exponent` `family` fits each at the pressure exponent its family chooses; with `pressureSigma`, a fraction of the pressure, the printed pressures over the factor of their key of `pressureFactor` (default the basis) join a second fit; `energy` `prior` takes each powder's energy from its prior impetus, `family` fits it under the prior of {@link familyEnergyPriors}. */
 export function fitPowders(
   rows: readonly Row[],
   records: Records,
@@ -416,13 +522,13 @@ export function fitPowders(
     : fitAtRecordEnergy(rows, records, model, velocitySigma, options)
 }
 
-/** As {@link fitPowders}, at the energies of `records`. */
+/** As {@link fitPowders}, at the energies of `records`, or from them under the family prior with `energy` `family`. */
 function fitAtRecordEnergy(
   rows: readonly Row[],
   records: Records,
   model: InteriorModel,
   velocitySigma: number,
-  options: Omit<PowdersFitOptions, 'energy'>,
+  options: PowdersFitOptions,
 ): PowdersFit {
   const used = outcomes(rows, records, model, options.splits ?? ['training']).flatMap((o) =>
     'velocity' in o.prediction ? [{ row: o.row, pressure: o.prediction.pressure }] : [],
@@ -430,7 +536,8 @@ function fitAtRecordEnergy(
   const ids = [...new Set(rows.map((r) => r.powder))]
     .toSorted(compareKeys)
     .filter((id) => records.powders.get(id)?.interior)
-  const run = { model, velocitySigma }
+  const energy = options.energy === 'family' ? familyEnergyPriors(ids, used, records) : undefined
+  const run = { model, velocitySigma, energy: energy?.priors }
   // the family choice reads velocities only, so pressure rows move burn coefficients, not exponents
   const family =
     options.exponent !== 'family'
@@ -441,9 +548,12 @@ function fitAtRecordEnergy(
           )
         : familyExponents(ids, records, (n) => fitEach(ids, used, records, run, () => n))
   const velocities = fittedAndNot(family?.fits ?? fitEach(ids, used, records, run))
-  const exponent = family && { exponent: family.summary }
+  const choices = {
+    ...(family && { exponent: family.summary }),
+    ...(energy && { energyFamily: energy.summary }),
+  }
   const { pressureSigma } = options
-  if (pressureSigma === undefined) return { ...velocities, ...exponent }
+  if (pressureSigma === undefined) return { ...velocities, ...choices }
   const by = options.pressureFactor ?? 'basis'
   // the factor is what the key has in common against the model fitted to velocities (the measuring method, the source, what the model lacks), so the pressure rows move a powder's burn coefficient only by its own deviation from the median of its key; fitted together with the pressures, the burn coefficients would take part of that common offset
   const factors = pressureFactors(used, records, model, velocities, by)
@@ -453,7 +563,7 @@ function fitAtRecordEnergy(
     factors: Object.fromEntries(Object.entries(factors).map(([k, f]) => [k, f.factor])),
   }
   const fit = fittedAndNot(fitEach(ids, used, records, { ...run, pressure }, family?.exponentOf))
-  return { ...fit, ...exponent, pressure: { sigma: pressureSigma, by, factors } }
+  return { ...fit, ...choices, pressure: { sigma: pressureSigma, by, factors } }
 }
 
 /** The prior impetus of a powder of `records`, J/kg, and its kind; a `UsageError` without a powder with a thermochemistry. */
