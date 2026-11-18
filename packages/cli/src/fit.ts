@@ -248,7 +248,7 @@ const fullWeight = { rows: 20, cartridges: 4 }
 /** Fewest reference powders a family needs for its own center and spread. */
 const familyMinimum = 5
 
-/** Floor of a spread of ln impetus, that of a thermochemistry prior's sigma in the record fit. */
+/** Floor of a spread of ln impetus. */
 const spreadFloor = 0.02
 
 /** Median impetus of `impetus`, J/kg, and spread of its log: 1.4826 times the median absolute deviation (the sigma of a normal), at least {@link spreadFloor}. */
