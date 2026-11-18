@@ -4,10 +4,7 @@ import { fileURLToPath } from 'node:url'
 import { executable } from './executable.ts'
 
 /** Advisories without a fix, by GHSA id, with why they cannot reach users. */
-export const allowed: Record<string, string> = {
-  'GHSA-fc5q-39xc-vjpf':
-    'picomatch: only in dev, test and build tooling (Vitest, knip, Docusaurus, Lingui CLI, Terrazzo, the unplugin build entry of @unhead/vue), never in a published package, the site bundle or a runtime match of user patterns',
-}
+export const allowed: Record<string, string> = {}
 
 /** The parts of a `pnpm audit --json` report the check reads. */
 export interface AuditReport {
