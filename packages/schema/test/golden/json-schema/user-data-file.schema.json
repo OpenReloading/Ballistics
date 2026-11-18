@@ -2314,7 +2314,7 @@
                         ]
                       },
                       "transport": {
-                        "description": "Transport classification from the safety data sheet, one entry per UN number.",
+                        "description": "Transport classification from the safety data sheet, one entry per UN or NA number.",
                         "anyOf": [
                           {
                             "type": "array",

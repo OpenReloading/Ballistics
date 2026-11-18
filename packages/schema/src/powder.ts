@@ -150,7 +150,7 @@ const powderGrainDimensions = z
   })
   .describe('Dimensions of the kernel as the maker states them.')
 
-/** UN numbers as the safety data sheet prints them; one powder may ship under several, by packaging. */
+/** UN or NA numbers as the safety data sheet prints them; one powder may ship under several, by packaging. */
 const powderTransport = z
   .array(
     z.object({
@@ -171,7 +171,7 @@ const powderTransport = z
   .refine((t) => new Set(t.map((e) => e.unNumber)).size === t.length, {
     message: 'a UN number is listed twice',
   })
-  .describe('Transport classification from the safety data sheet, one entry per UN number.')
+  .describe('Transport classification from the safety data sheet, one entry per UN or NA number.')
 
 /** Whether a source of the provenance passes `test`, given the source's own kind or the record's; none without provenance. */
 const anySource = (
