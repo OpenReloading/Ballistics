@@ -242,10 +242,10 @@ const impetusOf = (records: Records, id: string) => {
   return (interior.gamma - 1) * interior.energy.value
 }
 
-/** Used rows and cartridges at which a powder's energy prior has the full family spread: twice the fewest the record energies were fitted from (10 rows over 2 cartridges); fixed before any result on real rows. */
+/** Used rows and cartridges at which a powder's energy prior has the full family spread. */
 const fullWeight = { rows: 20, cartridges: 4 }
 
-/** Fewest reference powders a family needs for its own center and spread; fixed before any result on real rows. */
+/** Fewest reference powders a family needs for its own center and spread. */
 const familyMinimum = 5
 
 /** Floor of a spread of ln impetus, that of a thermochemistry prior's sigma in the record fit. */
@@ -278,7 +278,7 @@ function familyEnergyPriors(ids: readonly string[], used: readonly Used[], recor
   const reference = ids.filter((id) => weights.get(id) === 1)
   if (reference.length === 0)
     throw new Refusal(
-      `--energy family needs a powder with ${fullWeight.rows} used training rows over ${fullWeight.cartridges} cartridges or more`,
+      `--energy family needs a powder with ${fullWeight.rows} rows the fit uses over ${fullWeight.cartridges} cartridges or more`,
     )
   const family = (id: string) => familyOf(records.powders.get(id))
   const pooled = centerOf(reference.map((id) => impetusOf(records, id)))

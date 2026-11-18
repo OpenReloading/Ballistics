@@ -165,13 +165,13 @@ function energyFamilyLines(r: FitResult) {
   const f = r.energyFamily
   if (!f) return []
   const center = (name: string, c: { impetus: number; sigma: number; powders: number }) =>
-    `  ${name} impetus ${c.impetus.toPrecision(5)} sigma ${c.sigma.toFixed(3)} (${c.powders} powders)`
+    `  ${name} impetus ${Math.round(c.impetus)} J/kg sigma ${c.sigma.toFixed(3)} (${c.powders} powders)`
   return [
     `energy family: full weight at ${f.fullWeight.rows} rows over ${f.fullWeight.cartridges} cartridges`,
     ...Object.entries(f.families).map(([name, c]) => center(name, c)),
     center('pooled', f.pooled),
     ...Object.entries(r.powders).flatMap(([id, p]) =>
-      p.energy ? [`  ${id} energy ${p.energy.value.toPrecision(5)} (${p.energy.prior})`] : [],
+      p.energy ? [`  ${id} energy ${Math.round(p.energy.value)} J/kg (${p.energy.prior})`] : [],
     ),
   ]
 }
