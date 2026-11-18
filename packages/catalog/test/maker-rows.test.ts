@@ -213,6 +213,18 @@ describe('makerRows of the maker sources of bullets and powders', () => {
       ],
     })
   })
+
+  it("takes a maker's safety data sheet for the kernel and the transport classification", () => {
+    const fields = ['perforation', 'grainDimensions', 'heatOfExplosion', 'transport']
+    const powder = {
+      ...cited('p', 'published', { ...page, fields }),
+      perforation: 'single',
+      grainDimensions: { length: { value: 1.6 } },
+      heatOfExplosion: { value: 3_900_000 },
+      transport: [{ unNumber: 'UN0161', hazardClass: '1.3C' }],
+    }
+    expect(rows({ powders: [powder] })).toEqual({})
+  })
 })
 
 describe('makerRows of a maker source that names a field below a detailed path', () => {
