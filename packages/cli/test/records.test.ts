@@ -26,10 +26,10 @@ function rootWith(id: string, value: number) {
 describe('loadRecords', () => {
   it('takes the capacity of a cartridge that is first by id, whatever root it comes from', () => {
     const cartridge = capacity.cartridge.replace('catalogue:', '')
-    const after = loadRecords([...recordRoots, rootWith(`${capacity.id}-z`, 9.9)])
+    const after = loadRecords([...recordRoots, rootWith(`${capacity.id}-z`, 4.2)])
     expect(after.capacities.get(cartridge)?.id).toBe(capacity.id)
-    const before = loadRecords([...recordRoots, rootWith(`a-${capacity.id}`, 9.9)])
-    expect(before.capacities.get(cartridge)?.waterCapacity.value).toBe(9.9)
+    const before = loadRecords([...recordRoots, rootWith(`a-${capacity.id}`, 4.2)])
+    expect(before.capacities.get(cartridge)?.waterCapacity.value).toBe(4.2)
     expect(before.issues).toBe(0)
   })
 })
