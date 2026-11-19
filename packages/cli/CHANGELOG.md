@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.0.4](https://github.com/OpenReloading/Ballistics/compare/cli-v0.0.3...cli-v0.0.4) (2026-11-19)
+
+
+### Features
+
+* **catalog:** gate public records by field class and maker source id ([#1225](https://github.com/OpenReloading/Ballistics/issues/1225)) ([b2a656b](https://github.com/OpenReloading/Ballistics/commit/b2a656baca31cc4fe8e9f17be3afcc22ef4915e0))
+* **cli:** --exponent family and --energy prior combine in one fit ([#1190](https://github.com/OpenReloading/Ballistics/issues/1190)) ([e13a3f7](https://github.com/OpenReloading/Ballistics/commit/e13a3f7ac71eb85247f9c70929add2f872243a33))
+* **cli:** a pressure factor per table or cartridge, and --pressure-sigma with --exponent family ([#1216](https://github.com/OpenReloading/Ballistics/issues/1216)) ([e337188](https://github.com/OpenReloading/Ballistics/commit/e33718800ff279406f0ceb90abcb4aa636185ff4))
+* **cli:** cross-validate fits over five cartridge folds with --folds ([#1236](https://github.com/OpenReloading/Ballistics/issues/1236)) ([9bca1e9](https://github.com/OpenReloading/Ballistics/commit/9bca1e9040a3165fe0372b550993bbb4961ba2b7))
+* **cli:** estimate case capacity from the cartridge outline, reported apart ([#1234](https://github.com/OpenReloading/Ballistics/issues/1234)) ([b543b49](https://github.com/OpenReloading/Ballistics/commit/b543b49c18c3ffdfc39d26e4f6a1e2313c3a572f))
+* **cli:** evaluate a saved fit with --fit, reuse a family choice with --family ([#1233](https://github.com/OpenReloading/Ballistics/issues/1233)) ([6853e36](https://github.com/OpenReloading/Ballistics/commit/6853e3645e8448cc1f6e592fff21dac1dac02757))
+* **cli:** fit the powder energy under a family prior (--energy family) ([#1242](https://github.com/OpenReloading/Ballistics/issues/1242)) ([0ef1331](https://github.com/OpenReloading/Ballistics/commit/0ef13313fabc86d8e8632b84d6a20605b7a34b80))
+* **cli:** per-row errors and a paired bootstrap change in compare ([#1189](https://github.com/OpenReloading/Ballistics/issues/1189)) ([34a3627](https://github.com/OpenReloading/Ballistics/commit/34a3627a738afcb027e28ccf8b3fb529f356c22f))
+* **cli:** the split rule takes a salt, which seals a new test split ([#1185](https://github.com/OpenReloading/Ballistics/issues/1185)) ([17cd87f](https://github.com/OpenReloading/Ballistics/commit/17cd87f80053d7ba821bd8978cd4702772b23f60))
+
+
+### Bug fixes
+
+* **catalog:** resolve the cartridge reference of a capacity in the range check ([#1249](https://github.com/OpenReloading/Ballistics/issues/1249)) ([7f12835](https://github.com/OpenReloading/Ballistics/commit/7f128350517fb5f09d26aceb6964de01a0fa2a08))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @rangefoundry/api bumped to 0.0.8
+    * @rangefoundry/catalog bumped to 0.0.8
+    * @rangefoundry/svg-drawings bumped to 0.0.7
+    * @rangefoundry/schema bumped to 0.0.8
+
 ## [0.0.3](https://github.com/OpenReloading/Ballistics/compare/cli-v0.0.2...cli-v0.0.3) (2026-11-12)
 
 

@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.0.8](https://github.com/OpenReloading/Ballistics/compare/importers-v0.0.7...importers-v0.0.8) (2026-11-19)
+
+
+### Features
+
+* **importers:** typed codes for table and kind-guess refusals ([#1198](https://github.com/OpenReloading/Ballistics/issues/1198)) ([66b4730](https://github.com/OpenReloading/Ballistics/commit/66b4730f9bfddb9f3db8351f01b3243ff4818ccd))
+* **schema:** optional provenance on every record kind ([#1224](https://github.com/OpenReloading/Ballistics/issues/1224)) ([7b69c19](https://github.com/OpenReloading/Ballistics/commit/7b69c19cf0be25e34f9bde004bf5b986cd37f959))
+
+
+### Documentation
+
+* rename the brand text to RangeFoundry ([#1202](https://github.com/OpenReloading/Ballistics/issues/1202)) ([6e8ddfe](https://github.com/OpenReloading/Ballistics/commit/6e8ddfe757ff262dcacfc8f1d57b68382cfca7a9))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @rangefoundry/schema bumped to 0.0.8
+
 ## [0.0.7](https://github.com/OpenReloading/Ballistics/compare/importers-v0.0.6...importers-v0.0.7) (2026-11-12)
 
 

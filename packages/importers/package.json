@@ -1,6 +1,6 @@
 {
   "name": "@rangefoundry/importers",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Parsers of chronograph exports, pressure histories and reloading record tables.",
   "keywords": [
     "reloading",

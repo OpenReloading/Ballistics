@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.0.7](https://github.com/OpenReloading/Ballistics/compare/svg-drawings-v0.0.6...svg-drawings-v0.0.7) (2026-11-19)
+
+
+### Features
+
+* **interior:** revolver cylinder gap and barrel length from the forcing cone ([#1256](https://github.com/OpenReloading/Ballistics/issues/1256)) ([e9f741a](https://github.com/OpenReloading/Ballistics/commit/e9f741a6e0d04b7f40430850988bb550cd15a455))
+* **schema:** optional provenance for basic bullet and powder records ([#1223](https://github.com/OpenReloading/Ballistics/issues/1223)) ([226f018](https://github.com/OpenReloading/Ballistics/commit/226f0187c7e5b14741edae96204b444cc15b3936))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @rangefoundry/catalog bumped to 0.0.8
+
 ## [0.0.6](https://github.com/OpenReloading/Ballistics/compare/drawing-v0.0.5...drawing-v0.0.6) (2026-11-12)
 
 

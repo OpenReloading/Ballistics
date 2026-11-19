@@ -1,5 +1,50 @@
 # Changelog
 
+## [0.1.0](https://github.com/OpenReloading/Ballistics/compare/web-v0.0.7...web-v0.1.0) (2026-11-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* **web:** the workbench starts empty, without example loads ([#1229](https://github.com/OpenReloading/Ballistics/issues/1229))
+
+### Features
+
+* **cli:** fit the powder energy under a family prior (--energy family) ([#1242](https://github.com/OpenReloading/Ballistics/issues/1242)) ([0ef1331](https://github.com/OpenReloading/Ballistics/commit/0ef13313fabc86d8e8632b84d6a20605b7a34b80))
+* **importers:** typed codes for table and kind-guess refusals ([#1198](https://github.com/OpenReloading/Ballistics/issues/1198)) ([66b4730](https://github.com/OpenReloading/Ballistics/commit/66b4730f9bfddb9f3db8351f01b3243ff4818ccd))
+* **interior:** revolver cylinder gap and barrel length from the forcing cone ([#1256](https://github.com/OpenReloading/Ballistics/issues/1256)) ([e9f741a](https://github.com/OpenReloading/Ballistics/commit/e9f741a6e0d04b7f40430850988bb550cd15a455))
+* **schema:** optional provenance for basic bullet and powder records ([#1223](https://github.com/OpenReloading/Ballistics/issues/1223)) ([226f018](https://github.com/OpenReloading/Ballistics/commit/226f0187c7e5b14741edae96204b444cc15b3936))
+* **schema:** optional provenance on every record kind ([#1224](https://github.com/OpenReloading/Ballistics/issues/1224)) ([7b69c19](https://github.com/OpenReloading/Ballistics/commit/7b69c19cf0be25e34f9bde004bf5b986cd37f959))
+* **web:** bullet lot, each lot under its record choice and one Lots line ([#1258](https://github.com/OpenReloading/Ballistics/issues/1258)) ([374bf81](https://github.com/OpenReloading/Ballistics/commit/374bf817222370fc2e257f1a277b8e2381b1b3de))
+* **web:** filter powders by stated use and set shotgun-only powders apart ([#1231](https://github.com/OpenReloading/Ballistics/issues/1231)) ([9a7fcb4](https://github.com/OpenReloading/Ballistics/commit/9a7fcb4c584fd48db64ab43bad2c56e5389cc8fb))
+* **web:** keep bullet, cartridge and case drafts in the browser ([#1255](https://github.com/OpenReloading/Ballistics/issues/1255)) ([a4be4a2](https://github.com/OpenReloading/Ballistics/commit/a4be4a205df7406107a78533c1df4d5bda00412f))
+* **web:** lay out the workbench input cards as one row grid ([#1257](https://github.com/OpenReloading/Ballistics/issues/1257)) ([bf9a81c](https://github.com/OpenReloading/Ballistics/commit/bf9a81c10bcd37e0c1ac919b270c9b011ea1f12d))
+* **web:** list the picks the search or a filter hides, each with its untick ([#1252](https://github.com/OpenReloading/Ballistics/issues/1252)) ([6bc2404](https://github.com/OpenReloading/Ballistics/commit/6bc24041a4802017f503739a42162b90f6ad23dd))
+* **web:** revised safety notice ([#1237](https://github.com/OpenReloading/Ballistics/issues/1237)) ([4ef9526](https://github.com/OpenReloading/Ballistics/commit/4ef952618499e797cc022bd78d857837d2d30b85))
+* **web:** the firearm library lists the firearms saved in this browser only ([#1228](https://github.com/OpenReloading/Ballistics/issues/1228)) ([7f01cea](https://github.com/OpenReloading/Ballistics/commit/7f01cea2ff549ff35174f14ecda78a835ee6b446))
+* **web:** the workbench starts empty, without example loads ([#1229](https://github.com/OpenReloading/Ballistics/issues/1229)) ([5667bef](https://github.com/OpenReloading/Ballistics/commit/5667bef98324e997e55dab35e7f1263bb948800f))
+
+
+### Bug fixes
+
+* **web:** pin the designers' record search at the top of the window from 48em ([#1250](https://github.com/OpenReloading/Ballistics/issues/1250)) ([f611bdf](https://github.com/OpenReloading/Ballistics/commit/f611bdf8ea66292de756be2efc8c6e14e9c85afc))
+* **web:** show the bullet designer's check-the-unit flag on blur, up to 1500 gr ([#1251](https://github.com/OpenReloading/Ballistics/issues/1251)) ([4826acc](https://github.com/OpenReloading/Ballistics/commit/4826acc78b6292e97d9fa2fcd680eb99606e0f81))
+
+
+### Documentation
+
+* neutral wording without decision history ([#1226](https://github.com/OpenReloading/Ballistics/issues/1226)) ([02e6626](https://github.com/OpenReloading/Ballistics/commit/02e662617f53f5e007db3c8ef043dbd3ff9a437f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @rangefoundry/api bumped to 0.0.8
+    * @rangefoundry/catalog bumped to 0.0.8
+    * @rangefoundry/svg-drawings bumped to 0.0.7
+    * @rangefoundry/importers bumped to 0.0.8
+    * @rangefoundry/schema bumped to 0.0.8
+
 ## [0.0.7](https://github.com/OpenReloading/Ballistics/compare/web-v0.0.6...web-v0.0.7) (2026-11-12)
 
 
