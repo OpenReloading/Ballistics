@@ -1,9 +1,10 @@
+import { cylinderGapLeakage } from '@rangefoundry/ballistics'
 import type { Translator } from '../i18n/translate.ts'
 import type { InteriorResponse } from './api-types.ts'
 import { firstIndexBeyondTravel } from './interior-chart.ts'
 import type { InteriorBody } from './interior-input.ts'
 import { nth } from './nth.ts'
-import type { LadderDirection } from './seating-ladder.ts'
+import type { CylinderGap, LadderDirection } from './seating-ladder.ts'
 import { formatQuantity, type UnitSystem, unitsOf } from './units.ts'
 
 type Result = InteriorResponse['result']
@@ -191,23 +192,24 @@ export function barrelRows({
   return [...others, here].sort((a, b) => a.length - b.length)
 }
 
-/** The leak area at the run's muzzle held to the longer muzzle at `travel` (m): past its last point the area is 0. */
-function leakTo(leakage: InteriorBody['load']['leakage'], travel: number) {
-  const last = leakage?.area.at(-1)
-  if (!leakage || !last || travel <= last.travel) return leakage
-  return { ...leakage, area: [...leakage.area, { travel, area: last.area }] }
-}
-
-/** The run's load with `travel` (m), as a ladder of the same charges in the same order when the run has several steps; `holdLeak`: a cylinder gap's leak stays open to the longer muzzle. */
+/** The run's load with `travel` (m), as a ladder of the same charges in the same order when the run has several steps; `cylinderGap`: the leak of the gap the run leaks through, built for the longer barrel. */
 export function longerBody(
   load: InteriorBody['load'],
   charges: number[],
   direction: LadderDirection,
   travel: number,
-  holdLeak = false,
+  cylinderGap?: CylinderGap,
 ) {
   const barrel = { ...load.barrel, length: travel }
-  const leakage = holdLeak ? { leakage: leakTo(load.leakage, travel) } : {}
+  // the longer barrel can be crossed where the run's was not: the leak is built anew, not extended
+  const leakage = cylinderGap && {
+    leakage: cylinderGapLeakage({
+      boreDiameter: load.chamber.boreDiameter,
+      gap: cylinderGap.gap,
+      exit: cylinderGap.exit,
+      travel,
+    }),
+  }
   if (charges.length < 2)
     return { model: 'm3' as const, load: { ...load, ...leakage, barrel, charge: charges[0] } }
   const start = direction === 'around' ? charges[(charges.length - 1) / 2] : charges[0]

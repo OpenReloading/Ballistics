@@ -89,11 +89,15 @@ export async function chooseSavedLoad(page: Page, language: 'en' | 'de' = 'en') 
   await name.click()
 }
 
-/** Stores the fixture load and rifle, opens the load from the Open menu of the fresh workbench and waits until it is complete, so a run sees all its values. */
-export async function openSavedLoad(page: Page, language: 'en' | 'de' = 'en') {
+/** Stores the fixture load and rifle (or `firearm` under the rifle's id), opens the load from the Open menu of the fresh workbench and waits until it is complete, so a run sees all its values. */
+export async function openSavedLoad(
+  page: Page,
+  language: 'en' | 'de' = 'en',
+  firearm: typeof fixtureRifle = fixtureRifle,
+) {
   const de = language === 'de'
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' })
-  await putRecords(page, [fixtureRifle, fixtureLoad])
+  await putRecords(page, [firearm, fixtureLoad])
   // the workbench reads the firearms as it mounts
   await page.reload()
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' })

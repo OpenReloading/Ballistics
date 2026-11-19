@@ -129,6 +129,8 @@ Code: `packages/ballistics/src/interior/cylinder-gap.ts`, `cylinderGapLeakage`, 
 - The face at the larger of L6 and COAL puts the leak later and the travel longer than a face at the cartridge length L3: the peak pressure stays higher. On the .357 Magnum like load of the [research log](../research/revolver-cylinder-gap.md), a face at L3 lowers the simulated peak by 2.3 % with a 0.10 mm gap; at the larger of L6 and COAL the peak comes before the leak opens and is unchanged.
 - A typed leak area (`leakArea`) replaces the gap leak, so the gas does not leak twice. The workbench shows a note when a leak area is typed on a revolver load: that area leaks from travel 0, before the bullet leaves the cylinder, and the simulated pressure can come out too low.
 - Without a seated bullet, the travel and the base are unknown and the gap gives no leak. The workbench says so.
+- The gap never raises the simulated peak pressure. It lowers it when the gap opens before the peak, and the workbench then notes that the peak includes the gap's relief: a real cylinder longer than the larger of L6 and COAL opens the gap later and keeps the peak higher. The workbench also notes a travel at which the base does not cross the gap before the muzzle, and so no leak.
+- The longer runs of the Barrel length study build the gap leak for their own travel, so a longer barrel the base crosses leaks also where the run's barrel did not.
 - A firearm without `cylinderGap` and `barrelLengthFrom` gives the results it gave before.
 
 ### Convective heat loss

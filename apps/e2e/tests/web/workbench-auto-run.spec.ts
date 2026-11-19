@@ -1,8 +1,8 @@
 import { expect, type Page, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
 import { settingsEntry, storeUnits } from './units.ts'
-import { loadForm } from './workbench.ts'
-import { runSavedLoad } from './workbench-run.ts'
+import { fixtureRifle, loadForm, openSavedLoad } from './workbench.ts'
+import { runSavedLoad, runSettled } from './workbench-run.ts'
 
 // a change runs the load 600 ms after the last key; Settings > Workbench switches that off
 
@@ -67,4 +67,25 @@ test('with Run automatically off, only Run runs', async ({ page }) => {
   await expect(resultLine(page)).toHaveText(before ?? '')
   await charge(page).press('Control+Enter')
   await expect(resultLine(page)).not.toHaveText(before ?? '', { timeout: 15_000 })
+})
+
+test("clearing a revolver's firearm drops its cylinder gap leak and reruns the load", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 900 })
+  // barrel length from the breech face: clearing the firearm keeps volume, travel and barrel length, only the leak goes
+  const revolver = {
+    ...fixtureRifle,
+    data: { ...fixtureRifle.data, action: 'revolver', cylinderGap: { value: 0.1 } },
+  }
+  await gotoHydrated(page, '/workbench')
+  await openSavedLoad(page, 'en', revolver)
+  await charge(page).press('Control+Enter')
+  await expect(page.getByText(/^Run \d/)).toBeAttached({ timeout: 15_000 })
+  await runSettled(page)
+  const before = await resultLine(page).textContent()
+  await loadForm(page).getByRole('button', { name: 'Clear the firearm' }).click()
+  await expect(stale(page)).toBeAttached()
+  await expect(resultLine(page)).not.toHaveText(before ?? '', { timeout: 15_000 })
+  await expect(stale(page)).not.toBeAttached()
 })

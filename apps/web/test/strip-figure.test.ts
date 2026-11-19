@@ -38,8 +38,22 @@ describe('stripFigureOf', () => {
           value: 0.0406,
           volume: 1e-6,
           travel: 0.1115,
-          cylinderGap: { gap: 0.0001, exit: 0.0165, run: 0.0405 },
+          cylinderGap: { gap: 0.0001, exit: 0.0165 },
+          cylinderRun: 0.0405,
         },
+      },
+    ]
+    expect(cylinderRunOf(revolver)).toBe(0.0405)
+    expect(stripFigureOf(revolver)?.base).toBeCloseTo(24)
+  })
+
+  it('keeps the cylinder run of a seating step whose leak a typed leak area replaced', () => {
+    const revolver = run('seating', 0.095)
+    revolver.load.barrel.length = 0.1115
+    revolver.steps = [
+      {
+        charge: 0.003,
+        seating: { value: 0.0406, volume: 1e-6, travel: 0.1115, cylinderRun: 0.0405 },
       },
     ]
     expect(cylinderRunOf(revolver)).toBe(0.0405)

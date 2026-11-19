@@ -426,10 +426,12 @@ function useBulletChoice(linked: PreviewProps['linked']) {
 function useBarrel(o: {
   barrelLength: number | undefined
   barrelDefault: Suggestion | undefined
+  /** The gun's barrel length is measured from a revolver's forcing cone, not the breech face. */
+  fromForcingCone: boolean
   system: UnitSystem
   shown: RefObject<UnitSystem>
 }) {
-  const { barrelLength, barrelDefault, system, shown } = o
+  const { barrelLength, barrelDefault, fromForcingCone, system, shown } = o
   const [barrel, setBarrel] = useState<FieldValue>(() => barrelFieldValue(system, barrelLength))
   /** The barrel length is the gun's or typed: no longer the default. */
   const [barrelTyped, setBarrelTyped] = useState(() => barrelLength !== undefined)
@@ -439,6 +441,13 @@ function useBarrel(o: {
     setBarrel(barrelFieldValue(shown.current, barrelLength))
     setBarrelTyped(true)
   }, [barrelLength, shown])
+  const reference = useRef(fromForcingCone)
+  // a length kept from the other end would change the travel by the cylinder run: the default takes over
+  useEffect(() => {
+    if (reference.current === fromForcingCone) return
+    reference.current = fromForcingCone
+    if (barrelLength === undefined) setBarrelTyped(false)
+  }, [fromForcingCone, barrelLength])
   // the default follows the cartridge's class and the Settings until one is typed
   useEffect(() => {
     if (barrelTyped) return
@@ -755,12 +764,14 @@ function seatAtOf(
     range: [toSi('length', range[0] + shift), toSi('length', range[1] + shift)],
     at: (by) => {
       const s = seatBy(fromSi('length', by))
+      const cylinder = cylinderSi(s)
       return {
         volume: s.volumeBehindBullet && unitsOf.capacity.cm3.toSi(s.volumeBehindBullet.value),
         travel: s.travel && toSi('length', s.travel.value),
         jump: s.jump.value === undefined ? undefined : toSi('length', s.jump.value),
         cavityRange: cavityRangeOf(s),
-        cylinderGap: cylinderSi(s),
+        cylinderGap: cylinder && { gap: cylinder.gap, exit: cylinder.exit },
+        cylinderRun: cylinder?.run,
       }
     },
   }
@@ -1078,6 +1089,7 @@ function useSeatingModel(p: PreviewProps) {
   const { barrel, setBarrel, barrelTyped, setBarrelTyped } = useBarrel({
     barrelLength: p.barrelLength,
     barrelDefault: p.barrelDefault,
+    fromForcingCone: p.cylinder?.fromForcingCone ?? false,
     system,
     shown,
   })

@@ -738,6 +738,10 @@ const gunSource = (
 
 type PreviewFields = Partial<Record<PreviewKey, FieldValue | undefined>>
 
+/** The same gap, exit and cylinder run, or no cylinder both times: what the run's leak and travel read. */
+const sameCylinder = (a: Seated['cylinder'], b: Seated['cylinder']) =>
+  a?.gap === b?.gap && a?.exit === b?.exit && a?.run === b?.run
+
 /** The fields to write (empty, or still the last seated value; a volume that followed a seating without one is emptied) and the values that follow it from now on. */
 export function followPlan(
   values: Seated,
@@ -1921,6 +1925,7 @@ export function useWorkbenchState() {
 
   /** Volume and travel follow while empty or still holding its last value (or already its new one, as an opened load's); a typed value stays. */
   function follow(values: Seated) {
+    const before = seatedNow.current
     setSeated(values)
     // the first seating reported is the start, also without volume or travel; the preview reseating itself (a new bullet shape or range) starts again there
     const reported = seatingOf(values)
@@ -1934,7 +1939,10 @@ export function useWorkbenchState() {
       previewed,
       field: seatedField,
     })
-    if (Object.keys(next).length > 0) markChanged()
+    // the cylinder sets the run's gap leak: a change of it alone changes the result; a reset seating ({}) or a new one is no edit
+    const cylinderMoved =
+      before.overallLength !== undefined && !sameCylinder(before.cylinder, values.cylinder)
+    if (Object.keys(next).length > 0 || cylinderMoved) markChanged()
     // a value that already was the seated one (an opened load's) takes the seating's text: same SI value
     const seatedText = withSeatedText(now, following)
     const update = seatedUpdate(next, seatedText, now)

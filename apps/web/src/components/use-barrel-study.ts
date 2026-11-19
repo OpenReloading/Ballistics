@@ -22,6 +22,7 @@ import { nth } from '../lib/nth.ts'
 import { roundedFieldText, type UnitSystem } from '../lib/units.ts'
 import {
   cylinderRunOf,
+  gapLeakOf,
   needsNetwork,
   notReached,
   type Outcome,
@@ -82,7 +83,7 @@ async function requestLonger(
           single ? [ok.load.charge] : ok.steps.map((s) => s.charge),
           ok.direction,
           travel,
-          ok.printed.gapLeak,
+          gapLeakOf(ok),
         ),
       ),
       signal,

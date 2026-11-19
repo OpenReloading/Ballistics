@@ -282,17 +282,28 @@ describe('longerTravel and longerBody', () => {
     expect(longerBody(load, [3e-3], 'up', 0.9)).not.toHaveProperty('ladder')
   })
 
-  it("holds a cylinder gap's leak open to the longer muzzle, and leaves a typed leak area at the run's", () => {
+  it("opens a cylinder gap's leak to the longer muzzle, and leaves a typed leak area at the run's", () => {
     const area = [
-      { travel: 0.016, area: 0 },
-      { travel: 0.0161, area: 2.8e-6 },
+      { travel: 0, area: 2.8e-6 },
       { travel: 0.11, area: 2.8e-6 },
     ]
     const leaky = { ...load, leakage: { area, discharge: 0.7 } }
-    expect(longerBody(leaky, [3e-3], 'up', 0.2, true).load.leakage).toEqual({
-      area: [...area, { travel: 0.2, area: 2.8e-6 }],
-      discharge: 0.7,
-    })
     expect(longerBody(leaky, [3e-3], 'up', 0.2).load.leakage).toEqual({ area, discharge: 0.7 })
+    // the run's travel of 12 mm ends before the base crosses the gap at 16 to 16.1 mm: the longer barrel leaks all the same
+    const short = {
+      ...load,
+      chamber: { ...load.chamber, boreDiameter: 0.00762 },
+      barrel: { ...load.barrel, length: 0.012 },
+    }
+    expect(longerBody(short, [3e-3], 'up', 0.2, { gap: 0.0001, exit: 0.016 }).load.leakage).toEqual(
+      {
+        area: [
+          { travel: 0.016, area: 0 },
+          { travel: expect.closeTo(0.0161, 12), area: expect.closeTo(2.39389e-6, 10) },
+          { travel: 0.2, area: expect.closeTo(2.39389e-6, 10) },
+        ],
+        discharge: 0.7,
+      },
+    )
   })
 })

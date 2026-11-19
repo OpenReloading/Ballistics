@@ -95,7 +95,7 @@ import { useCompleteOnly } from './use-complete-only.ts'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 import { useLoad, useResult } from './workbench-context.ts'
 import { CartridgeFigure } from './workbench-figure.tsx'
-import { isPreviewKey, notReached } from './workbench-outcome.ts'
+import { isPreviewKey, notReached, type Outcome } from './workbench-outcome.ts'
 // oxlint-disable-next-line import/no-cycle -- workbench-results imports Checklist back; moving one of them breaks the cycle
 import { BurnFigure } from './workbench-results.tsx'
 
@@ -769,6 +769,14 @@ function loadFieldMark(
   )
 }
 
+/** The shown run's peak pressure travel, m, where its cylinder gap leak opened before it: the peak holds the gap's relief. */
+function gapReliefPeak(outcome: Outcome | undefined) {
+  if (outcome?.kind !== 'ok' || !outcome.printed.gapLeak) return
+  const opens = outcome.load.leakage?.area[0]?.travel
+  const peak = outcome.body.result.maxPressureTravel
+  return opens !== undefined && opens < peak ? peak : undefined
+}
+
 /** The leak area at a revolver: the firearm's cylinder gap leaks from where the bullet leaves the cylinder, a typed constant area from travel 0 instead. */
 function leakAreaMark(
   s: UnitSystem,
@@ -776,10 +784,14 @@ function leakAreaMark(
     typed: boolean
     gun: { revolver: boolean; cylinder?: Cylinder | undefined } | undefined
     seated: LoadValues['seated']
+    /** The Travel to the muzzle field, m. */
+    travel: number | undefined
+    /** The shown run's peak pressure travel, m, when its gap leak opened before it. */
+    reliefPeak: number | undefined
   },
   t: Translator['t'],
 ) {
-  const { typed, gun, seated } = o
+  const { typed, gun, seated, travel, reliefPeak } = o
   if (!gun?.revolver) return
   const gap = gun.cylinder?.gap
   if (typed)
@@ -796,14 +808,23 @@ function leakAreaMark(
     return t(
       'The cylinder gap of the firearm leaks only with a bullet seated in the Cartridge card; without one, no leak.',
     )
-  return t(
+  const gapText = valueWithUnit('length', s, c.gap)
+  // as `cylinderGapLeakage`: no leak unless the base crosses the whole gap before the muzzle
+  if (travel !== undefined && !(c.exit + c.gap < travel))
+    return t(
+      'The bullet base does not cross the cylinder gap of the firearm {gap} before the muzzle at this travel: no leak.',
+      { gap: gapText },
+    )
+  const leak = t(
     'From the cylinder gap of the firearm {gap}: pi × bore diameter × gap, opening as the bullet base leaves the cylinder at {exit} of travel, discharge coefficient {cd}.',
-    {
-      gap: valueWithUnit('length', s, c.gap),
-      exit: valueWithUnit('length', s, c.exit),
-      cd: cylinderGapDischarge,
-    },
+    { gap: gapText, exit: valueWithUnit('length', s, c.exit), cd: cylinderGapDischarge },
   )
+  if (reliefPeak === undefined) return leak
+  const relief = t(
+    'The gap opened before the simulated peak pressure at {peak} of travel, so the peak includes its relief. The cylinder face is taken at the larger of cartridge L6 and the COAL: a longer cylinder opens the gap later and keeps the peak higher.',
+    { peak: valueWithUnit('length', s, reliefPeak) },
+  )
+  return `${leak} ${relief}`
 }
 
 /** The flag of a field that holds the seated bullet's value. */
@@ -875,6 +896,7 @@ function LoadField({ name: key }: { name: string }) {
     resetKeys,
     firearmList,
     firearm,
+    outcome,
   } = useLoad()
   const { t, tn } = useTranslation()
   const spec = interiorFields.find((s) => s.key === key)
@@ -909,7 +931,17 @@ function LoadField({ name: key }: { name: string }) {
       // texts naming a unit follow the units the field shows
       mark={(s) =>
         (key === 'leakArea'
-          ? leakAreaMark(s, { typed: value?.si !== undefined, gun, seated }, t)
+          ? leakAreaMark(
+              s,
+              {
+                typed: value?.si !== undefined,
+                gun,
+                seated,
+                travel: fields.travel?.si,
+                reliefPeak: gapReliefPeak(outcome),
+              },
+              t,
+            )
           : undefined) ??
         loadFieldMark(
           s,

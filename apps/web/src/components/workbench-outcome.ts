@@ -10,6 +10,7 @@ import { nth } from '../lib/nth.ts'
 import { rawWording } from '../lib/record-values.ts'
 import { type Gap, gapWords } from '../lib/resistance-gaps.ts'
 import type {
+  CylinderGap,
   LadderDirection,
   RunnableLadderKind,
   SeatingLengthKind,
@@ -139,7 +140,7 @@ export type Outcome =
         gasFactorNote?: string | undefined
         /** Volume or travel held the seated bullet's value. */
         fromSeating: PreviewKey[]
-        /** The run's leak is the cylinder gap of a revolver, open to the muzzle. */
+        /** The run leaks through a revolver's cylinder gap wherever the bullet base has crossed it: no typed leak area replaces it. */
         gapLeak?: boolean
       }
       /** The run returned a warning the one before did not: the warnings block is an alert. */
@@ -184,7 +185,14 @@ export const needsNetwork = msg(
 /** The cylinder run the shown step's travel includes, m: a seating step's own, since its COAL can set the cylinder face. */
 export function cylinderRunOf(ok: Extract<Outcome, { kind: 'ok' }>) {
   const step = ok.steps[ok.selected]?.seating
-  return (step ? step.cylinderGap?.run : ok.printed.seated.cylinder?.run) ?? 0
+  return (step ? step.cylinderRun : ok.printed.seated.cylinder?.run) ?? 0
+}
+
+/** The cylinder gap the shown step leaks through, m: a seating step's own; none with a typed leak area. */
+export function gapLeakOf(ok: Extract<Outcome, { kind: 'ok' }>): CylinderGap | undefined {
+  if (!ok.printed.gapLeak) return
+  const step = ok.steps[ok.selected]?.seating
+  return step ? step.cylinderGap : ok.printed.seated.cylinder
 }
 
 /** A seating ladder's step seats the bullet at its own depth, so its base is the barrel plus its cylinder run less the step's travel (mm), as the Barrel length study reads it. */
