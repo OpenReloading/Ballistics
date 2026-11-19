@@ -1718,11 +1718,27 @@ td.nowrap {
 }
 
 /* the designers' start-from search stays at the top of the Parameters while the fields scroll (from
-   62em, where they scroll in their own box), so another record can be started and the design's
-   source stays in view; the cartridge designer's column head sticks under it at the height it
-   measures (`--start-search-height`, inline) */
+   48em at the top of the window, from 62em at the top of their own box), so another record can be
+   started and the design's source stays in view; from 62em the cartridge designer's column head
+   sticks under it at the height it measures (`--start-search-height`, inline) */
 .designer-start {
   display: flow-root;
+}
+
+/* the page scrolls and the app header scrolls away with it: a focused field stops below the search
+   and above the help line */
+@media screen and (width >= 48em) and (width < 62em) {
+  .designer .prop-form > .designer-start {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    background: var(--page);
+  }
+
+  html:has(.designer .prop-form > .designer-start) {
+    scroll-padding-top: 4.5rem;
+    scroll-padding-bottom: 3rem;
+  }
 }
 
 @media screen and (width >= 62em) {
