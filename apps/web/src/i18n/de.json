@@ -3923,6 +3923,7 @@
   "Used by the seating and the cartridge figure. Empty: the CIP sheet.": "Wird für das Setzen des Geschosses und die Patronenzeichnung verwendet. Leer: das CIP-Datenblatt.",
   "Your Pmax {limit}": "Ihr Pmax {limit}",
   "case length: L3 typed {length}": "Hülsenlänge: L3 eingegeben {length}",
+  "{count} selected": "{count} ausgewählt",
   "{count} selected (max {max})": "{count} ausgewählt (höchstens {max})",
   "column\u0004SD": "QB",
   "G1": "G1",

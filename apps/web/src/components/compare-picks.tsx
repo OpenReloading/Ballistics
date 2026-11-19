@@ -17,10 +17,7 @@ export function usePicks(
   onChange: (pick: string) => void,
   known: (id: string) => boolean,
 ) {
-  const picked = (pick ?? '')
-    .split(',')
-    .filter((id) => id && known(id))
-    .slice(0, max)
+  const picked = [...new Set((pick ?? '').split(','))].filter((id) => id && known(id)).slice(0, max)
   const toggle = (id: string) => onChange(togglePick(picked, id, max).join(','))
   const replace = (ids: readonly string[]) => onChange(ids.join(','))
   return [picked, toggle, replace] as const
@@ -69,7 +66,16 @@ export function SelectionSummary({
     <span className="selection-summary" data-picked={count > 0 || undefined}>
       {/* only the text is live: the buttons are no news */}
       <span aria-live="polite" className="selection-count">
-        {count > 0 && t('{count} selected (max {max})', { count, max })}
+        {count > 0 && (
+          <>
+            <span className="selection-count-short" aria-hidden="true">
+              {t('{count} selected', { count })}
+            </span>
+            <span className="selection-count-text">
+              {t('{count} selected (max {max})', { count, max })}
+            </span>
+          </>
+        )}
       </span>
       {hidden.length > 0 && <HiddenPicks hidden={hidden} onUntick={onUntick} />}
       {count > 0 && (
@@ -131,7 +137,7 @@ function HiddenPicks({
           <span className="hidden-picks-text">{t('{count} hidden', { count: hidden.length })}</span>
         </Button>
       </Popover.Target>
-      <Popover.Dropdown aria-labelledby={title} className="hidden-picks-popover">
+      <Popover.Dropdown aria-labelledby={title}>
         <p id={title} className="hidden-picks-title">
           {t('Hidden by the search or a filter')}
         </p>

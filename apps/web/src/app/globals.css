@@ -11300,8 +11300,9 @@ main .page-bar h1 {
   outline-offset: -2px;
 }
 
-/* the phone's short form of "2 hidden" */
-.hidden-picks-count {
+/* the phone's short forms of "2 hidden" and, beside it, "3 selected (max 4)" */
+.hidden-picks-count,
+.selection-count-short {
   display: none;
 }
 
@@ -11312,6 +11313,8 @@ main .page-bar h1 {
 }
 
 .hidden-picks-list {
+  display: grid;
+  row-gap: var(--space-xs);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -11347,8 +11350,8 @@ main .page-bar h1 {
   visibility: hidden;
 }
 
-/* a phone's status line is 150 px: while rows are picked, the summary has it and the count steps
-   aside, still read by screen readers; Clear is its icon */
+/* a phone's status line is 244 px wide at 320 px and 314 px at 390 px: while rows are picked, the
+   summary has it and the count steps aside, still read by screen readers; Clear is its icon */
 @media screen and (width < 48em) {
   .clear-picks .clear-picks-text {
     display: none;
@@ -11359,7 +11362,13 @@ main .page-bar h1 {
     display: inline;
   }
 
-  .hidden-picks .hidden-picks-text {
+  /* beside "2 hidden" the count drops "(max 4)", so Clear still fits at 320 px in German */
+  .selection-summary:has(.hidden-picks) .selection-count-short {
+    display: inline;
+  }
+
+  .hidden-picks .hidden-picks-text,
+  .selection-summary:has(.hidden-picks) .selection-count-text {
     position: absolute;
     width: 1px;
     height: 1px;

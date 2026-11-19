@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test'
+import { expect, type Locator, test } from '@playwright/test'
+import { showGerman } from './german.ts'
 import { gotoHydrated } from './nav.ts'
 
 // The bullet list's filters by construction, tip and base, kept in the URL, and its picks for Compare; the filter values, counts and the leaving out of a one-value filter are Vitest tests (`apps/web/test/directory.test.ts`).
@@ -120,9 +121,9 @@ for (const { list, width, query, pick, shownLabel, hiddenLabels } of [
     const status = bar.locator('.page-bar-status')
     await expect(status.getByText('3 selected (max', { exact: false })).toBeVisible()
     const hidden = status.getByRole('button', { name: '2 hidden' })
-    // inside the status line, which clips what does not fit
-    const [line, button] = await Promise.all([status.boundingBox(), hidden.boundingBox()])
-    expect(button && line && button.x + button.width <= line.x + line.width).toBe(true)
+    expect(
+      await clipped(status, hidden, status.getByRole('button', { name: 'Clear selection' })),
+    ).toEqual([])
     await hidden.click()
     const dialog = page.getByRole('dialog', { name: 'Hidden by the search or a filter' })
     await expect(dialog.getByRole('listitem')).toHaveText(hiddenLabels)
@@ -140,4 +141,26 @@ for (const { list, width, query, pick, shownLabel, hiddenLabels } of [
     await expect(page.getByRole('checkbox', { name: shownLabel })).toBeChecked()
     await expect(page.getByRole('searchbox', { name: 'Search' })).toBeFocused()
   })
+}
+
+test('at 320 px in German, Clear stays whole in the status line beside the hidden picks (#866)', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 700 })
+  await gotoHydrated(page, '/bullets?q=168&pick=demo-bullet-224-55,demo-bullet-150,demo-bullet-168')
+  await showGerman(page)
+  const status = page.locator('.page-bar .page-bar-status')
+  const clear = status.getByRole('button', { name: 'Auswahl aufheben' })
+  await expect(clear).toBeVisible()
+  expect(
+    await clipped(status, status.getByRole('button', { name: '2 ausgeblendet' }), clear),
+  ).toEqual([])
+})
+
+/** The buttons whose right edge the status line, which clips what does not fit, cuts off. */
+async function clipped(line: Locator, ...buttons: Locator[]) {
+  const box = await line.boundingBox()
+  const right = (box?.x ?? 0) + (box?.width ?? 0)
+  const edges = await Promise.all(buttons.map(async (b) => [b, await b.boundingBox()] as const))
+  return edges.filter(([, b]) => !b || b.x + b.width > right).map(([b]) => b.toString())
 }
