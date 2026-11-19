@@ -2,6 +2,7 @@ import { toSi, type UserRecord } from '@rangefoundry/schema'
 import { encode } from 'uqr'
 import type { Translator } from '../i18n/translate.ts'
 import { localDay } from './dates.ts'
+import { lotsFrom, lotsLine } from './load-notes.ts'
 import type { LoadRecord } from './load-tabs.ts'
 import type { NameOf } from './records-csv.ts'
 import { seatingLengthName } from './seating-ladder.ts'
@@ -62,9 +63,7 @@ export function boxLabel(
       d.seating && withUnit('length', system, toSi('length', d.seating.value.value)),
     ],
     [t('Saved'), localDay(new Date(r.saved))],
-    [t('Powder lot'), d.powderLot],
-    [t('Primer lot'), d.primer?.lot],
-    [t('Case lot'), d.case?.lot],
+    [t('Lots'), lotsLine(lotsFrom(d), t)],
   ]
   return {
     title: r.name,

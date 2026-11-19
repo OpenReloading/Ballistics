@@ -362,7 +362,7 @@ describe('the measured case capacity of a load', () => {
     const base = parts({
       cartridge: 'catalogue:308-win',
       caseRecord: 'catalogue:demo-case-308-brass',
-      lots: { powder: '', primer: '', case: 'L7' },
+      lots: { powder: '', primer: '', case: 'L7', bullet: '' },
     })
     const l = toLoad(base)
     expect(loadSchema.safeParse(l).success).toBe(true)
@@ -377,13 +377,15 @@ describe('the measured case capacity of a load', () => {
     const base = parts({
       cartridge: 'catalogue:308-win',
       primerRecord: 'catalogue:demo-primer-large-rifle',
-      lots: { powder: '', primer: 'R1', case: '' },
+      lots: { powder: '', primer: 'R1', case: '', bullet: '' },
     })
     const l = toLoad(base)
     expect(l.primer).toEqual({ record: 'catalogue:demo-primer-large-rifle', lot: 'R1' })
     const reopened = loadSchema.parse(JSON.parse(JSON.stringify(l)))
     expect(reopened.primer).toEqual(l.primer)
-    expect(toLoad(parts({ lots: { powder: '', primer: 'R1', case: '' } })).primer).toEqual({
+    expect(
+      toLoad(parts({ lots: { powder: '', primer: 'R1', case: '', bullet: '' } })).primer,
+    ).toEqual({
       lot: 'R1',
     })
     expect(toLoad(parts({})).primer).toBeUndefined()

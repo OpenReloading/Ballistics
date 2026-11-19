@@ -5,7 +5,7 @@ import { putRecords } from './user-store.ts'
 /** The workbench's input column: panels Cartridge (the cartridge search in its head), Gun, Powder, Bullet and the Run bar. */
 export const loadForm = (page: Page, name = 'Load') => page.getByRole('form', { name })
 
-/** Opens the Cartridge card's last row "Primer, brass, lots": primer, brass, their lots and the case capacity record. */
+/** Opens the Cartridge card's last row "Primer, brass, lots": the primer and its lot, then the brass record, the case capacity record and the case lot. */
 export async function openKeeping(page: Page, form = 'Load') {
   const keeping = loadForm(page, form).locator('details.keeping')
   if ((await keeping.getAttribute('open')) === null) await keeping.locator('summary').click()

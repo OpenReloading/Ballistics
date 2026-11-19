@@ -6,6 +6,7 @@ const s = (id: string, rest: Partial<SessionReading> = {}): SessionReading => ({
   powderLot: 'P1',
   primerLot: 'R1',
   caseLot: 'C1',
+  bulletLot: 'B1',
   ...rest,
 })
 const rules = (sessions: SessionReading[], threshold?: number) =>
@@ -48,6 +49,13 @@ describe('loadNotes', () => {
       },
     ])
     expect(rules([s('a'), s('b', { primerLot: ' R1 ' })])).toEqual([])
+    expect(rules([s('a'), s('b', { bulletLot: 'B2' })])).toEqual(['b:bulletLot'])
+  })
+
+  it('notes a missing bullet lot only after a session that recorded one', () => {
+    const none = { bulletLot: undefined }
+    expect(rules([s('a', none), s('b', none)])).toEqual([])
+    expect(rules([s('a'), s('b', none), s('c', none)])).toEqual(['b:bulletLot'])
   })
 })
 

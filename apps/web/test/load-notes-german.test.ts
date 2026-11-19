@@ -27,6 +27,11 @@ const notes = {
     { ...base, rule: 'caseLot', change: 'missing', before: 'C1' },
     { ...base, rule: 'caseLot', change: 'missing' },
   ],
+  bulletLot: [
+    { ...base, rule: 'bulletLot', change: 'changed', now: 'B2', before: 'B1' },
+    { ...base, rule: 'bulletLot', change: 'missing', before: 'B1' },
+    { ...base, rule: 'bulletLot', change: 'missing' },
+  ],
   seating: [
     { ...base, rule: 'seating', by: 'overallLength', now: 71.3, before: 70.8 },
     { ...base, rule: 'seating', by: 'baseToOgive', now: 60.3, before: 59.8 },

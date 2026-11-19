@@ -715,6 +715,7 @@
         "id": "308-win-168-gr-ladder",
         "name": "Ladder 168 gr",
         "powderLot": "Lot 2291",
+        "bulletLot": "B 0815",
         "capacity": "user:1e2d3c4b-5a69-4788-9a0b-1c2d3e4f5a6b",
         "primer": {
           "record": "catalogue:demo-primer-large-rifle",

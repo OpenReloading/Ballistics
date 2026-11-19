@@ -567,7 +567,6 @@ export function InputCards() {
                     {t(panelTitles[p])}
                   </h2>
                   <CardPicker panel={p} />
-                  {p === 'powder' && <LotField lot="powder" bare />}
                   {morePanels.includes(p) && (
                     <AppPopover
                       opened={more === p}
@@ -631,7 +630,7 @@ function KeepingRow() {
       <summary>{t('Primer, brass, lots')}</summary>
       <div className="keeping-fields">
         <PrimerChoice id={primerId} onChange={setPrimerChoice} system={system} />
-        <LotField lot="primer" short />
+        <LotField lot="primer" />
         <SeatingSlot name="choices" />
       </div>
     </details>
@@ -1274,6 +1273,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
   if (panel === 'bullet')
     return (
       <div className="panel-fields">
+        <LotField lot="bullet" />
         <ReplacedNote panel={panel} />
         {bulletNote && <p className="note wide">{bulletNote}</p>}
         {fieldsOf(panelFields.bullet)}
@@ -1283,6 +1283,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
   if (panel === 'powder')
     return (
       <div className="panel-fields">
+        <LotField lot="powder" />
         <ReplacedNote panel={panel} />
         {/* a record's, or a typed one without a record (a link): either is in use, so it shows */}
         {(recordSpecs.bulkDensity !== undefined ||
@@ -1956,7 +1957,7 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
         cartridge && setCapacityChoice(id ? { cartridge: cartridge.id, id } : undefined)
       }
       caseId={caseId}
-      caseLot={<LotField lot="case" short />}
+      caseLot={<LotField lot="case" />}
       onCaseId={(id) =>
         cartridge && setCaseChoice(id ? { cartridge: cartridge.id, id } : undefined)
       }

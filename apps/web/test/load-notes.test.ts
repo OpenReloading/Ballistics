@@ -41,7 +41,7 @@ const record = (id: string, name: string, date: string, velocities: number[]): S
   },
 })
 const now: LoadMoment = {
-  lots: { powder: ' P1 ', primer: 'R1', case: 'C1' },
+  lots: { powder: ' P1 ', primer: 'R1', case: 'C1', bullet: 'B1' },
   seating: { by: 'overallLength', value: 70.8 },
   roundCount: 120,
 }
@@ -53,6 +53,7 @@ describe('snapshotOf', () => {
       powderLot: 'P1',
       primerLot: 'R1',
       caseLot: 'C1',
+      bulletLot: 'B1',
       seating: { by: 'overallLength', value: { value: 70.8 } },
       roundCount: 120,
     })
@@ -161,14 +162,25 @@ describe('saved load', () => {
     const saved = toLoad(parts)
     expect(saved).toMatchObject({
       powderLot: 'P1',
+      bulletLot: 'B1',
       case: { lot: 'C1' },
       snapshots: [{ session: a }, { session: b }],
     })
     expect(saved.primer).toEqual({ lot: 'R1' })
     expect(load.safeParse(JSON.parse(JSON.stringify(saved))).success).toBe(true)
-    expect(lotsFrom(saved as Load)).toEqual({ powder: 'P1', primer: 'R1', case: 'C1' })
+    expect(lotsFrom(saved as Load)).toEqual({
+      powder: 'P1',
+      primer: 'R1',
+      case: 'C1',
+      bullet: 'B1',
+    })
     const bare = toLoad({ ...parts, lots: noLots, snapshots: [], sessions: [] })
-    expect([bare.powderLot, bare.primer, bare.case]).toEqual([undefined, undefined, undefined])
+    expect([bare.powderLot, bare.primer, bare.case, bare.bulletLot]).toEqual([
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+    ])
     expect(bare.snapshots).toBeUndefined()
   })
 })

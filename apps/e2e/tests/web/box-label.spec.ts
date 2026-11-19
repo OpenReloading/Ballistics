@@ -11,8 +11,8 @@ test.use({ deviceScaleFactor: 3 })
 
 /** The label in each language: German row names are longer, the label must still hold them. */
 const languages = [
-  { name: 'English', button: /^Print a box label of /, lot: 'Primer lot' },
-  { name: 'German', button: /^Schachtel-Etikett von .* drucken$/, lot: 'Zündhütchen-Los' },
+  { name: 'English', button: /^Print a box label of /, lot: 'Bullet G-0815' },
+  { name: 'German', button: /^Schachtel-Etikett von .* drucken$/, lot: 'Geschoss G-0815' },
 ]
 
 for (const language of languages)
@@ -30,12 +30,18 @@ for (const language of languages)
     await openSavedLoad(page)
     // every lot typed: the tallest label
     await openKeeping(page)
-    for (const [lot, text] of [
-      ['Powder lot', 'P-2026-0412-A'],
-      ['Primer lot', 'Z-778341'],
-      ['Case lot', 'H-19-2203'],
-    ] as const)
-      await page.getByLabel(lot, { exact: true }).first().fill(text)
+    for (const [component, text] of [
+      ['powder', 'P-2026-0412-A'],
+      ['primer', 'Z-778341'],
+      ['case', 'H-19-2203'],
+      ['bullet', 'G-0815'],
+    ] as const) {
+      await page.getByRole('button', { name: `Add lot for the ${component}`, exact: true }).click()
+      await page
+        .getByRole('textbox', { name: new RegExp(`^${component} lot$`, 'i') })
+        .first()
+        .fill(text)
+    }
     await (await barButton(page, 'Save')).click()
     await expect(page.locator('.file-state')).toContainText('Saved')
     await (await barButton(page, 'Open')).click()

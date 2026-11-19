@@ -79,9 +79,10 @@ export function loadGroups(
 ) {
   const groups = new Map<string, { key: string; title: string; records: LoadRecord[] }>()
   for (const r of records) {
-    const { powderLot, primer, case: brass, snapshots = [] } = r.data
-    const lots = snapshots.flatMap((s) => [s.powderLot, s.primerLot, s.caseLot])
-    if (!matchesQuery([r.name, powderLot, primer?.lot, brass?.lot, ...lots], query)) continue
+    const { powderLot, bulletLot, primer, case: brass, snapshots = [] } = r.data
+    const lots = snapshots.flatMap((s) => [s.powderLot, s.primerLot, s.caseLot, s.bulletLot])
+    if (!matchesQuery([r.name, powderLot, primer?.lot, brass?.lot, bulletLot, ...lots], query))
+      continue
     const key = cartridgeGroup(r.data.cartridge)
     const group = groups.get(key) ?? {
       key,
