@@ -134,9 +134,10 @@ export const cylinderGapField = {
 
 const labels: Record<string, Message> = {
   ...Object.fromEntries(
-    [...firearmFields, cylinderGapField, ...opticFields, ...mountFields, ...zeroFields].map(
-      (s) => [s.key, s.label],
-    ),
+    [...firearmFields, cylinderGapField, ...opticFields, ...mountFields, ...zeroFields].map((s) => [
+      s.key,
+      s.label,
+    ]),
   ),
   barrelLengthFrom: msg('Barrel length measured from'),
   landsBullet: msg('Bullet of the lands contact'),

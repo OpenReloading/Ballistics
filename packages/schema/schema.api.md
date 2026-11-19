@@ -706,6 +706,8 @@ export const firearm: z.ZodObject<{
     action: z.ZodOptional<typeof firearmAction>;
     cartridge: z.ZodOptional<z.ZodString>;
     barrelLength: z.ZodOptional<QuantitySchema>;
+    barrelLengthFrom: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'breechFace' | 'forcingCone'>>>;
+    cylinderGap: z.ZodOptional<QuantitySchema>;
     twist: z.ZodOptional<QuantitySchema>;
     twistHand: z.ZodEnum<z.core.util.ToEnum<'right' | 'left'>>;
     grooveDiameter: z.ZodOptional<QuantitySchema>;

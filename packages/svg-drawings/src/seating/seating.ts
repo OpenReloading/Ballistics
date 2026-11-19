@@ -189,7 +189,7 @@ export function seat({
     missing,
     touchBase: landsBase(bullet, lands),
   })
-  const cyl = cylinder && cylinderOf(cylinder, chamber.cartridgeL6, coal.value, base)
+  const cyl = cylinderOf(cylinder, chamber.cartridgeL6, coal.value, base)
   return {
     outline,
     basePosition: base,
@@ -206,7 +206,7 @@ export function seat({
         },
       }),
     ...(barrelLength !== undefined && {
-      travel: { value: barrelLength + (cyl?.run ?? 0) - base, tag: 'derived' as const },
+      travel: { value: barrelLength + runOf(cyl) - base, tag: 'derived' as const },
     }),
     ...(cyl && { cylinder: cyl }),
     ...(leade !== undefined && { leade }),
@@ -220,15 +220,22 @@ export function seat({
 
 /** The cylinder face lies at least at L6 and at the seated COAL: a shorter cylinder could not hold the round. */
 function cylinderOf(
-  { gap, fromForcingCone }: RevolverCylinder,
+  cylinder: RevolverCylinder | undefined,
   l6: number | undefined,
   coal: number,
   base: number,
-): NonNullable<Seating['cylinder']> {
+): Seating['cylinder'] {
+  if (!cylinder) return undefined
+  const { gap, fromForcingCone } = cylinder
   const atL6 = l6 !== undefined && l6 >= coal
   const face = atL6 ? l6 : coal
   const from = atL6 ? 'L6' : 'COAL'
   return { face, from, gap, exit: face - base, ...(fromForcingCone && { run: face + gap }) }
+}
+
+/** The cylinder run a barrel measured from the forcing cone adds to the travel, mm. */
+function runOf(cylinder: Seating['cylinder']) {
+  return cylinder?.run ?? 0
 }
 
 /** From the measured lands contact (`touchBase`, the base position at contact) when there is one, else from the leade contact of the chamber. */

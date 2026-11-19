@@ -16,14 +16,14 @@ Reference figures, from the question text: -2.5 % to -3.6 % muzzle velocity for 
 
 Every number below is a simulation of a synthetic load, not load data. The .357 Magnum like load of `packages/ballistics/test/interior-cylinder-gap.test.ts`:
 
-| Input                                   | Value                                                                                                  |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Charge, volume behind the bullet        | 0.94 g, 1.2 cm³                                                                                         |
-| Bullet                                  | 10.24 g (158 gr), base 24 mm from the case head, COAL 40.0 mm                                            |
-| Cartridge                               | L6 40.39 mm, land diameter 8.84 mm, groove diameter 9.07 mm                                             |
-| Barrel                                  | 95 mm from the forcing cone, twist 469.9 mm                                                             |
+| Input                                   | Value                                                                                                                         |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Charge, volume behind the bullet        | 0.94 g, 1.2 cm³                                                                                                               |
+| Bullet                                  | 10.24 g (158 gr), base 24 mm from the case head, COAL 40.0 mm                                                                 |
+| Cartridge                               | L6 40.39 mm, land diameter 8.84 mm, groove diameter 9.07 mm                                                                   |
+| Barrel                                  | 95 mm from the forcing cone, twist 469.9 mm                                                                                   |
 | Propellant                              | specific energy 3.9 MJ/kg, $k = 1.23$, solid density 1600 kg/m³, covolume 1/1600 m³/kg, vivacity 1.5 per MPa s, constant form |
-| Ignition pressure, start pressure, heat | 1 MPa, 0, none                                                                                          |
+| Ignition pressure, start pressure, heat | 1 MPa, 0, none                                                                                                                |
 
 Two places of the cylinder face, both from the breech face, each run without a gap and with a 0.10 mm gap at discharge coefficients 0.7 and 1:
 

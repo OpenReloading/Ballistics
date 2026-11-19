@@ -113,7 +113,9 @@ $$
 x_e = L_b + (x_f + g) - x_0, \qquad x_\text{exit} = x_f - x_0
 $$
 
-with $x_f$ the cylinder face and $x_0$ the seated bullet base, both from the breech face, and $x_\text{exit}$ the travel at which the base passes the face. Measured from the breech face, $x_e = L_b - x_0$ as without a cylinder.
+Code: `packages/svg-drawings/src/seating/seating.ts`, `seat` (`travel`), `cylinderOf`.
+
+Here $x_f$ is the cylinder face and $x_0$ the seated bullet base, both from the breech face, and $x_\text{exit}$ the travel at which the base passes the face. Measured from the breech face, $x_e = L_b - x_0$ as without a cylinder.
 
 The leak area is the side of a cylinder of the bore diameter $d$ (the land diameter, the smaller one) and the gap's width. It opens linearly while the base crosses the gap and stays open to the muzzle:
 
@@ -121,7 +123,7 @@ $$
 A_\ell(x) = \begin{cases} 0 & x \le x_\text{exit} \\ \pi d\, (x - x_\text{exit}) & x_\text{exit} \lt x \lt x_\text{exit} + g \\ \pi d\, g & x_\text{exit} + g \le x \le x_e \end{cases}, \qquad C_d = 0.7
 $$
 
-Code: `packages/ballistics/src/interior/cylinder-gap.ts`, `cylinderGapLeakage`, `cylinderGapDischarge`. `packages/svg-drawings/src/seating/seating.ts`, `seat` (`cylinder`).
+Code: `packages/ballistics/src/interior/cylinder-gap.ts`, `cylinderGapLeakage`, `cylinderGapDischarge`.
 
 - The discharge coefficient of 0.7 is the low end of the range 0.7 to 1 for the gap: a smaller one lets less gas out and gives the higher simulated pressure.
 - The face at the larger of L6 and COAL puts the leak later and the travel longer than a face at the cartridge length L3: the peak pressure stays higher. On the .357 Magnum like load of the [research log](../research/revolver-cylinder-gap.md), a face at L3 lowers the simulated peak by 2.3 % with a 0.10 mm gap; at the larger of L6 and COAL the peak comes before the leak opens and is unchanged.

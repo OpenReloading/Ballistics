@@ -122,6 +122,7 @@
 ./seating BulletDimensions
 ./seating EffectiveDensity
 ./seating LandsContact
+./seating RevolverCylinder
 ./seating Seating
 ./seating SeatingValues
 ./seating Tagged

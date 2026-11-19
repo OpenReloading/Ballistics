@@ -301,6 +301,17 @@ export const convectiveDefaults: {
 };
 
 // @public
+export const cylinderGapDischarge = 0.7;
+
+// @public
+export function cylinderGapLeakage(input: {
+    boreDiameter: number;
+    gap: number;
+    exit: number;
+    travel: number;
+}): InteriorLoad['leakage'];
+
+// @public
 export function defaultSensitivity(form: string | undefined): SensitivityDefault | undefined;
 
 // @public

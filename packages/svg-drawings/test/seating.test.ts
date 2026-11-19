@@ -397,13 +397,25 @@ describe('seat', () => {
     const close = (v: number) => expect.closeTo(v, 9)
     const cone = at(40, true)
     expect(cone.travel?.value).toBeCloseTo(111.49, 9)
-    expect(cone.cylinder).toEqual({ face: 40.39, from: 'L6', gap: 0.1, exit: 16.39, run: close(40.49) })
+    expect(cone.cylinder).toEqual({
+      face: 40.39,
+      from: 'L6',
+      gap: 0.1,
+      exit: 16.39,
+      run: close(40.49),
+    })
     const breech = at(40, false)
     expect(breech.travel?.value).toBeCloseTo(71, 9)
     expect(breech.cylinder).toEqual({ face: 40.39, from: 'L6', gap: 0.1, exit: close(16.39) })
     const long = at(40.6, true)
     expect(long.travel?.value).toBeCloseTo(111.1, 9)
-    expect(long.cylinder).toEqual({ face: 40.6, from: 'COAL', gap: 0.1, exit: close(16), run: close(40.7) })
+    expect(long.cylinder).toEqual({
+      face: 40.6,
+      from: 'COAL',
+      gap: 0.1,
+      exit: close(16),
+      run: close(40.7),
+    })
   })
 
   it('gives the volume behind the bullet from the water capacity and the seated bullet', () => {

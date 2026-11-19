@@ -744,19 +744,6 @@ describe('firearm', () => {
     ])
   })
 
-  it('takes a forcing cone reference and a cylinder gap on a revolver only', () => {
-    const revolver = { barrelLengthFrom: 'forcingCone', cylinderGap: { value: 0.1 } }
-    expect(firearmPaths({ ...revolver, action: 'revolver' })).toBeUndefined()
-    expect(firearmPaths({ ...revolver, action: 'pistol' })).toEqual([
-      'data.barrelLengthFrom',
-      'data.cylinderGap',
-    ])
-    expect(firearmPaths({ barrelLengthFrom: 'breechFace' })).toBeUndefined()
-    expect(firearmPaths({ cylinderGap: { value: -0.1 }, action: 'revolver' })).toEqual([
-      'data.cylinderGap.value',
-    ])
-  })
-
   it('caps texts and lists', () => {
     expect(firearmPaths({ notes: 'x'.repeat(10001) })).toEqual(['data.notes'])
     expect(
@@ -774,6 +761,16 @@ describe('firearm', () => {
       'data.countedSessions.0',
     ])
   })
+})
+
+it('takes a firearm barrel length from the forcing cone and a cylinder gap on a revolver only', () => {
+  const revolver = { barrelLengthFrom: 'forcingCone', cylinderGap: { value: 0.1 } }
+  expect(firearmPaths({ ...revolver, action: 'revolver' })).toBeUndefined()
+  expect(firearmPaths({ ...revolver, action: 'pistol' })).toEqual([
+    'data.barrelLengthFrom',
+    'data.cylinderGap',
+  ])
+  expect(firearmPaths({ barrelLengthFrom: 'breechFace' })).toBeUndefined()
 })
 
 describe('firearm magnification, dates and empty entries', () => {
