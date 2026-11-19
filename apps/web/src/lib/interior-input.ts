@@ -203,7 +203,7 @@ export const interiorFields = [
     key: 'leakArea',
     label: msg('Leak area'),
     help: msg(
-      'Optional. Constant area through which gas leaks past the bullet. Empty: no leakage.',
+      'Optional. Constant area through which gas leaks past the bullet. Empty: no leakage, but for the cylinder gap of a revolver that the firearm states.',
     ),
     quantity: 'area',
     min: 0,

@@ -1,4 +1,4 @@
-import { castHarderThanPeak, loadRatio } from '@rangefoundry/ballistics'
+import { castHarderThanPeak, cylinderGapLeakage, loadRatio } from '@rangefoundry/ballistics'
 import { fromSi } from '@rangefoundry/schema'
 import { formatNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
@@ -10,6 +10,7 @@ import { nth } from '../lib/nth.ts'
 import { rawWording } from '../lib/record-values.ts'
 import { type Gap, gapWords } from '../lib/resistance-gaps.ts'
 import type {
+  CylinderGap,
   LadderDirection,
   RunnableLadderKind,
   SeatingLengthKind,
@@ -56,6 +57,13 @@ export const stepLoad = (load: InteriorBody['load'], s: Step): InteriorBody['loa
     chamber: { ...load.chamber, volume: s.seating.volume },
     barrel: { ...load.barrel, length: s.seating.travel },
     ...(load.resistance && { resistance: rampAtJump(load.resistance, s.seating.jump) }),
+    ...(s.seating.cylinderGap && {
+      leakage: cylinderGapLeakage({
+        boreDiameter: load.chamber.boreDiameter,
+        ...s.seating.cylinderGap,
+        travel: s.seating.travel,
+      }),
+    }),
   }),
 })
 
@@ -132,6 +140,8 @@ export type Outcome =
         gasFactorNote?: string | undefined
         /** Volume or travel held the seated bullet's value. */
         fromSeating: PreviewKey[]
+        /** The run leaks through a revolver's cylinder gap wherever the bullet base has crossed it: no typed leak area replaces it. */
+        gapLeak?: boolean
       }
       /** The run returned a warning the one before did not: the warnings block is an alert. */
       announce: boolean
@@ -172,13 +182,26 @@ export const needsNetwork = msg(
   'Simulations run in this browser. Offline use requires the needed records to be cached.',
 )
 
-/** A seating ladder's step seats the bullet at its own depth, so its base is the barrel less the step's travel (mm), as the Barrel length study reads it. */
+/** The cylinder run the shown step's travel includes, m: a seating step's own, since its COAL can set the cylinder face. */
+export function cylinderRunOf(ok: Extract<Outcome, { kind: 'ok' }>) {
+  const step = ok.steps[ok.selected]?.seating
+  return (step ? step.cylinderRun : ok.printed.seated.cylinder?.run) ?? 0
+}
+
+/** The cylinder gap the shown step leaks through, m: a seating step's own; none with a typed leak area. */
+export function gapLeakOf(ok: Extract<Outcome, { kind: 'ok' }>): CylinderGap | undefined {
+  if (!ok.printed.gapLeak) return
+  const step = ok.steps[ok.selected]?.seating
+  return step ? step.cylinderGap : ok.printed.seated.cylinder
+}
+
+/** A seating ladder's step seats the bullet at its own depth, so its base is the barrel plus its cylinder run less the step's travel (mm), as the Barrel length study reads it. */
 export function stripFigureOf(ok: Extract<Outcome, { kind: 'ok' }>) {
   const { figure, barrel } = ok.printed.seated
   const travel = ok.load.barrel.length
   if (ok.ladder.kind !== 'seating' || !figure || barrel === undefined || travel === undefined)
     return figure
-  return { ...figure, base: fromSi('length', barrel - travel) }
+  return { ...figure, base: fromSi('length', barrel + cylinderRunOf(ok) - travel) }
 }
 
 /** A seating or temperature ladder varies one thing at one charge, so the longer barrel run, the measured strings and the groups read the shown step alone. */

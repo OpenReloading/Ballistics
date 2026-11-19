@@ -383,6 +383,41 @@ describe('seat', () => {
     }
   })
 
+  it('adds the cylinder run to a revolver barrel from the forcing cone, the face at L6 or the longer COAL', () => {
+    const revolver = { chamber: { caseLength: 33, cartridgeL6: 40.39 }, waterDensity }
+    const bullet: BulletDimensions = { diameter: 9.07, length: 16, base: { type: 'flat' } }
+    const at = (coal: number, fromForcingCone: boolean) =>
+      seat({
+        ...revolver,
+        bullet,
+        barrelLength: 95,
+        cylinder: { gap: 0.1, fromForcingCone },
+        by: { kind: 'overallLength', value: coal },
+      })
+    const close = (v: number) => expect.closeTo(v, 9)
+    const cone = at(40, true)
+    expect(cone.travel?.value).toBeCloseTo(111.49, 9)
+    expect(cone.cylinder).toEqual({
+      face: 40.39,
+      from: 'L6',
+      gap: 0.1,
+      exit: 16.39,
+      run: close(40.49),
+    })
+    const breech = at(40, false)
+    expect(breech.travel?.value).toBeCloseTo(71, 9)
+    expect(breech.cylinder).toEqual({ face: 40.39, from: 'L6', gap: 0.1, exit: close(16.39) })
+    const long = at(40.6, true)
+    expect(long.travel?.value).toBeCloseTo(111.1, 9)
+    expect(long.cylinder).toEqual({
+      face: 40.6,
+      from: 'COAL',
+      gap: 0.1,
+      exit: close(16),
+      run: close(40.7),
+    })
+  })
+
   it('gives the volume behind the bullet from the water capacity and the seated bullet', () => {
     const s = seat({ ...base, bullet: flat, by: { kind: 'overallLength', value: 71.12 } })
     const depth = 30 - (71.12 - 51.18)
