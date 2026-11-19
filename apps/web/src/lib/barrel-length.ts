@@ -191,20 +191,29 @@ export function barrelRows({
   return [...others, here].sort((a, b) => a.length - b.length)
 }
 
-/** The run's load with `travel` (m), as a ladder of the same charges in the same order when the run has several steps. */
+/** The leak area at the run's muzzle held to the longer muzzle at `travel` (m): past its last point the area is 0. */
+function leakTo(leakage: InteriorBody['load']['leakage'], travel: number) {
+  const last = leakage?.area.at(-1)
+  if (!leakage || !last || travel <= last.travel) return leakage
+  return { ...leakage, area: [...leakage.area, { travel, area: last.area }] }
+}
+
+/** The run's load with `travel` (m), as a ladder of the same charges in the same order when the run has several steps; `holdLeak`: a cylinder gap's leak stays open to the longer muzzle. */
 export function longerBody(
   load: InteriorBody['load'],
   charges: number[],
   direction: LadderDirection,
   travel: number,
+  holdLeak = false,
 ) {
   const barrel = { ...load.barrel, length: travel }
+  const leakage = holdLeak ? { leakage: leakTo(load.leakage, travel) } : {}
   if (charges.length < 2)
-    return { model: 'm3' as const, load: { ...load, barrel, charge: charges[0] } }
+    return { model: 'm3' as const, load: { ...load, ...leakage, barrel, charge: charges[0] } }
   const start = direction === 'around' ? charges[(charges.length - 1) / 2] : charges[0]
   return {
     model: 'm3' as const,
-    load: { ...load, barrel, charge: start },
+    load: { ...load, ...leakage, barrel, charge: start },
     ladder: {
       chargeStep: Math.abs(nth(charges, 1) - nth(charges, 0)),
       stepCount: charges.length,

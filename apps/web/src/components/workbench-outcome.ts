@@ -1,4 +1,4 @@
-import { castHarderThanPeak, loadRatio } from '@rangefoundry/ballistics'
+import { castHarderThanPeak, cylinderGapLeakage, loadRatio } from '@rangefoundry/ballistics'
 import { fromSi } from '@rangefoundry/schema'
 import { formatNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
@@ -56,6 +56,13 @@ export const stepLoad = (load: InteriorBody['load'], s: Step): InteriorBody['loa
     chamber: { ...load.chamber, volume: s.seating.volume },
     barrel: { ...load.barrel, length: s.seating.travel },
     ...(load.resistance && { resistance: rampAtJump(load.resistance, s.seating.jump) }),
+    ...(s.seating.cylinderGap && {
+      leakage: cylinderGapLeakage({
+        boreDiameter: load.chamber.boreDiameter,
+        ...s.seating.cylinderGap,
+        travel: s.seating.travel,
+      }),
+    }),
   }),
 })
 
@@ -132,6 +139,8 @@ export type Outcome =
         gasFactorNote?: string | undefined
         /** Volume or travel held the seated bullet's value. */
         fromSeating: PreviewKey[]
+        /** The run's leak is the cylinder gap of a revolver, open to the muzzle. */
+        gapLeak?: boolean
       }
       /** The run returned a warning the one before did not: the warnings block is an alert. */
       announce: boolean

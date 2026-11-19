@@ -71,8 +71,10 @@ interface SeatInput {
   waterCapacity?: number | undefined
   /** Water density, g/cm³: turns the water capacity into a volume (the caller passes core's value). */
   waterDensity: number
-  /** Barrel length from the breech face, mm. */
+  /** Barrel length, mm: from the breech face, or from the forcing cone for a revolver `cylinder` that says so. */
   barrelLength?: number | undefined
+  /** A revolver's cylinder: the gap between cylinder face and barrel (mm, 0 where not given) and whether `barrelLength` is measured from the forcing cone. */
+  cylinder?: RevolverCylinder | undefined
   by: { kind: 'overallLength' | 'baseToOgive'; value: number }
   /** The firearm's measured lands contact of this bullet: it replaces the chamber-derived jump. */
   lands?: LandsContact | undefined
@@ -87,6 +89,14 @@ interface SeatInput {
 export interface LandsContact {
   baseToOgive?: number | undefined
   overallLength?: number | undefined
+}
+
+/** A revolver's cylinder as the seating takes it. */
+export interface RevolverCylinder {
+  /** Gap between cylinder face and barrel, mm. */
+  gap: number
+  /** The barrel length is measured from the forcing cone, so the travel adds the cylinder run. */
+  fromForcingCone: boolean
 }
 
 /** The seated bullet: its outline, lengths, volumes and jump, each with its tag, and notes. */
@@ -109,6 +119,13 @@ export interface Seating {
    */
   cavityRange?: { low: number; high: number }
   travel?: Tagged
+  /**
+   * A revolver's cylinder, mm: its `face` from the head, the larger of the cartridge's L6 (`from`
+   * `L6`) and the COAL (`COAL`), since the cylinder holds the whole round; `exit`, the travel at
+   * which the bullet base passes the face; with a barrel from the forcing cone, `run` (face plus
+   * gap), which the travel includes.
+   */
+  cylinder?: { face: number; from: 'L6' | 'COAL'; gap: number; exit: number; run?: number }
   /** Leade contact from the head, approximate. */
   leade?: number | undefined
   /** COAL at which the jump is 0. */
@@ -131,8 +148,9 @@ export interface Seating {
 /**
  * The bullet seated by COAL (base = COAL - length) or by CBTO (base = CBTO - bullet
  * base-to-ogive): seating depth = case length (cartridge L3) - base; volume behind the bullet =
- * water capacity / water density - the bullet volume below the mouth; travel = barrel - base;
- * jump = leade contact - (base + length - nose length). With a measured lands contact the bullet
+ * water capacity / water density - the bullet volume below the mouth; travel = barrel - base, plus
+ * the cylinder run (the larger of L6 and COAL, plus the gap) for a revolver barrel from the forcing
+ * cone; jump = leade contact - (base + length - nose length). With a measured lands contact the bullet
  * base at contact is its CBTO less the bullet base-to-ogive (else its COAL less the length) and
  * jump = contact base - base.
  */
@@ -142,6 +160,7 @@ export function seat({
   waterCapacity,
   waterDensity,
   barrelLength,
+  cylinder,
   by,
   lands,
   unit = 'mm',
@@ -170,6 +189,7 @@ export function seat({
     missing,
     touchBase: landsBase(bullet, lands),
   })
+  const cyl = cylinder && cylinderOf(cylinder, chamber.cartridgeL6, coal.value, base)
   return {
     outline,
     basePosition: base,
@@ -186,8 +206,9 @@ export function seat({
         },
       }),
     ...(barrelLength !== undefined && {
-      travel: { value: barrelLength - base, tag: 'derived' as const },
+      travel: { value: barrelLength + (cyl?.run ?? 0) - base, tag: 'derived' as const },
     }),
+    ...(cyl && { cylinder: cyl }),
     ...(leade !== undefined && { leade }),
     ...(contactCoal !== undefined && { contactCoal }),
     jump,
@@ -195,6 +216,19 @@ export function seat({
     aboveL6: chamber.cartridgeL6 !== undefined && coal.value > chamber.cartridgeL6 + 1e-9,
     notes,
   }
+}
+
+/** The cylinder face lies at least at L6 and at the seated COAL: a shorter cylinder could not hold the round. */
+function cylinderOf(
+  { gap, fromForcingCone }: RevolverCylinder,
+  l6: number | undefined,
+  coal: number,
+  base: number,
+): NonNullable<Seating['cylinder']> {
+  const atL6 = l6 !== undefined && l6 >= coal
+  const face = atL6 ? l6 : coal
+  const from = atL6 ? 'L6' : 'COAL'
+  return { face, from, gap, exit: face - base, ...(fromForcingCone && { run: face + gap }) }
 }
 
 /** From the measured lands contact (`touchBase`, the base position at contact) when there is one, else from the leade contact of the chamber. */

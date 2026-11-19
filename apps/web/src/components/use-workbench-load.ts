@@ -2293,7 +2293,12 @@ export function useWorkbenchState() {
           t('{label} is empty.', { label: specText(t, seatingStepSpec.label) }),
       }
     const show = (m: number) => withUnit('length', shown, m)
-    return seatingLadder(seatAt, start, step, ladderSteps, direction, show, t)
+    // a typed leak area replaces the cylinder gap's leak in every step, as in the single run
+    const seat =
+      fields.leakArea?.si === undefined
+        ? seatAt
+        : { ...seatAt, at: (v: number) => ({ ...seatAt.at(v), cylinderGap: undefined }) }
+    return seatingLadder(seat, start, step, ladderSteps, direction, show, t)
   }
 
   /** Why a temperature ladder cannot run: the powder has no temperature sensitivity, own or default. */
@@ -2428,6 +2433,7 @@ export function useWorkbenchState() {
       bulkDensity: typedDensityOf(spec.typed, as),
       // the engraving ramp starts at the seated bullet's jump, current as the form's values are
       jump: now.seated.jump,
+      cylinderGap: now.seated.cylinder,
     })
     const resistanceMissing =
       chosen && missing.length > 0 ? { powder: productLabel(chosen, names), missing } : undefined
@@ -2580,6 +2586,7 @@ export function useWorkbenchState() {
         gasFactor: gasFactorOf(a.table),
         gasFactorNote: a.gasFactorNote,
         fromSeating: a.fromSeating,
+        gapLeak: a.run.fields.leakArea?.si === undefined && (a.run.seated.cylinder?.gap ?? 0) > 0,
       },
       announce: false,
     }

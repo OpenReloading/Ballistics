@@ -14,6 +14,7 @@ import {
   landsContactCoal,
   leadeContact,
   previewDrawn,
+  type RevolverCylinder,
   type Seating,
   seat,
   type Tagged,
@@ -49,7 +50,7 @@ import { translateMessage } from '../lib/core-messages.ts'
 import { capacityGuide } from '../lib/docs-url.ts'
 import type { FieldValue } from '../lib/field-spec.ts'
 import { figureViewBuilder } from '../lib/figure-views.ts'
-import type { LandsContact } from '../lib/firearm.ts'
+import type { Cylinder, LandsContact } from '../lib/firearm.ts'
 import type { Suggestion } from '../lib/input-defaults.ts'
 import { productLabel, refName } from '../lib/manufacturers.ts'
 import { nth } from '../lib/nth.ts'
@@ -145,6 +146,8 @@ export type Seated = {
   mode?: Mode | undefined
   /** The seating is the preview's own start (initial, L6 or mid-range), not a user move. */
   atStart?: boolean
+  /** A revolver's cylinder, m: the travel `exit` at which the bullet base leaves it, the `gap`, and the `run` the travel includes, from the `from` length. */
+  cylinder?: { gap: number; exit: number; run?: number; from: 'L6' | 'COAL' }
   /** What the chart's barrel strip draws. */
   figure?: StripFigure
   /** The bullet volume below the mouth where a chosen bullet is not seated: estimated or refused. */
@@ -299,6 +302,8 @@ type PreviewProps = {
   barrelLength?: number | undefined
   /** The barrel length used until one is typed or a gun gives one, m, with where it comes from. */
   barrelDefault?: Suggestion | undefined
+  /** The chosen revolver's cylinder, the gap in m: the travel adds the cylinder run to a barrel from the forcing cone. */
+  cylinder?: Cylinder | undefined
   /** Volume (m³) and travel (m) of the seated bullet, on every change: the interior fields follow them. */
   onSeated: (values: Seated) => void
   /** Measured with the bullet seated, m: the jump follows it instead of the C.I.P. chamber; `landsOther` marks a contact of another bullet, not used. */
@@ -665,11 +670,12 @@ function seatBuilder(o: {
   /** The water (g) the case holds. */
   water: number | undefined
   barrel: number | undefined
+  cylinder: RevolverCylinder | undefined
   lands: LandsMm | undefined
   /** The page's length unit, for the lengths in the outline's notes. */
   unit: ReturnType<typeof drawingLengthUnit>
 }) {
-  const { chamber, shape, mode, canCbto, water, barrel, lands, unit } = o
+  const { chamber, shape, mode, canCbto, water, barrel, cylinder, lands, unit } = o
   if (!chamber || !shape || (mode === 'baseToOgive' && !canCbto)) return
   return (by: number) =>
     seat({
@@ -678,6 +684,7 @@ function seatBuilder(o: {
       waterCapacity: water,
       waterDensity: waterDensityGramsPerCm3,
       barrelLength: barrel === undefined ? undefined : fromSi('length', barrel),
+      cylinder,
       by: { kind: mode, value: by },
       lands,
       unit,
@@ -753,6 +760,7 @@ function seatAtOf(
         travel: s.travel && toSi('length', s.travel.value),
         jump: s.jump.value === undefined ? undefined : toSi('length', s.jump.value),
         cavityRange: cavityRangeOf(s),
+        cylinderGap: cylinderSi(s),
       }
     },
   }
@@ -789,13 +797,24 @@ function capacityOf(
   return capacityFraction({ ...water, spread: theirs ? group.spread : undefined, records })
 }
 
+/** The seating's revolver cylinder in m. */
+const cylinderSi = (s: Seating | undefined): Seated['cylinder'] => {
+  const c = s?.cylinder
+  if (!c) return
+  const run = c.run === undefined ? undefined : toSi('length', c.run)
+  const [gap, exit] = [toSi('length', c.gap), toSi('length', c.exit)]
+  return { gap, exit, from: c.from, ...(run !== undefined && { run }) }
+}
+
 /** The seated volume, cavity and lengths in SI, each where the seating has it. */
 function seatedValues(seating: Seating | undefined) {
   const [volume, travel] = [seating?.volumeBehindBullet?.value, seating?.travel?.value]
   const [coal, cbto, depth] = [seating?.coal.value, seating?.cbto?.value, seating?.depth.value]
   const jump = seating?.jump.value
   const cavityRange = cavityRangeOf(seating)
+  const cylinder = cylinderSi(seating)
   return {
+    ...(cylinder && { cylinder }),
     ...(volume !== undefined && { volume: unitsOf.capacity.cm3.toSi(volume) }),
     ...(cavityRange && { cavityRange }),
     ...(travel !== undefined && { travel: toSi('length', travel) }),
@@ -860,6 +879,7 @@ function useReportSeated(
     seating?.cbto?.value,
     seating?.depth.value,
     seating?.jump.value,
+    JSON.stringify(seating?.cylinder),
     barrel,
     mode,
     atStart,
@@ -965,6 +985,18 @@ function useLands(l: PreviewProps['lands']) {
   return useMemo(() => landsMm(cbto, coal), [cbto, coal])
 }
 
+/** The revolver cylinder in mm, as the seating takes it. */
+function useCylinder(c: PreviewProps['cylinder']) {
+  const [gap, fromForcingCone] = [c?.gap, c?.fromForcingCone]
+  return useMemo(
+    () =>
+      gap === undefined || fromForcingCone === undefined
+        ? undefined
+        : { gap: fromSi('length', gap), fromForcingCone },
+    [gap, fromForcingCone],
+  )
+}
+
 /** A choice the page holds where it passes its setter, else the preview's own. */
 function useChoice(
   lifted: string | undefined,
@@ -1036,6 +1068,7 @@ function useSeatingModel(p: PreviewProps) {
   const name = nameOf(draft, cartridge)
   const bullet = useBulletChoice(p.linked)
   const lands = useLands(p.lands)
+  const cylinder = useCylinder(p.cylinder)
   const { design, record } = bullet
   const names = useManufacturerNames()
   const [capacityId, setCapacityId] = useChoice(p.capacityId, p.onCapacityId)
@@ -1113,10 +1146,11 @@ function useSeatingModel(p: PreviewProps) {
         canCbto,
         water: waterUsed,
         barrel: barrel.si,
+        cylinder,
         lands,
         unit,
       }),
-    [chamber, shape, seatMode, canCbto, waterUsed, barrel.si, lands, unit],
+    [chamber, shape, seatMode, canCbto, waterUsed, barrel.si, cylinder, lands, unit],
   )
   const seating = useMemo(
     () => (seatBy && seatValue !== undefined ? seatBy(seatValue) : undefined),
@@ -1397,7 +1431,9 @@ function BarrelField({ m }: { m: Model }) {
       spec={{
         key: 'barrel',
         label: msg('Barrel length'),
-        help: msg('From the breech face.'),
+        help: m.p.cylinder?.fromForcingCone
+          ? msg('From the forcing cone, as the firearm states.')
+          : msg('From the breech face.'),
         quantity: 'barrelLength',
         min: 0,
       }}
@@ -2137,6 +2173,16 @@ function VolumeRow({ m, seating }: RowsProps) {
   ) : null
 }
 
+/** The cylinder run a revolver barrel from the forcing cone adds to the travel. */
+function cylinderRunNote(m: Model, seating: Seating, t: Translator['t']) {
+  const c = seating.cylinder
+  if (c?.run === undefined) return
+  const values = { run: m.mm(c.run), gap: m.mm(c.gap) }
+  return c.from === 'L6'
+    ? t('with the cylinder run {run}: cartridge L6 plus the cylinder gap {gap}', values)
+    : t('with the cylinder run {run}: the COAL plus the cylinder gap {gap}', values)
+}
+
 function TravelRow({ m, seating }: RowsProps) {
   const { t } = useTranslation()
   if (seating.travel)
@@ -2145,6 +2191,7 @@ function TravelRow({ m, seating }: RowsProps) {
         term={t('Travel to the muzzle')}
         value={m.mm(seating.travel.value)}
         tag={seating.travel.tag}
+        note={cylinderRunNote(m, seating, t)}
       />
     )
   return m.designed ? (

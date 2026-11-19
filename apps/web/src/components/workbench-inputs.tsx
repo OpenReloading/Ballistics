@@ -13,7 +13,7 @@ import {
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { DotsThree } from '@phosphor-icons/react'
-import { boreArea } from '@rangefoundry/ballistics'
+import { boreArea, cylinderGapDischarge } from '@rangefoundry/ballistics'
 import { type Bullet, toSi } from '@rangefoundry/schema'
 import dynamic from 'next/dynamic'
 import { type ReactNode, useEffect, useId, useMemo, useState } from 'react'
@@ -52,7 +52,7 @@ import {
   siValues,
   specText,
 } from '../lib/field-spec.ts'
-import { type FirearmRow, gunPicker, landsFor } from '../lib/firearm.ts'
+import { type Cylinder, type FirearmRow, gunPicker, landsFor } from '../lib/firearm.ts'
 import { type FollowKey, followKeys } from '../lib/input-defaults.ts'
 import { bulletFields, burnFormError, interiorFields, specFields } from '../lib/interior-input.ts'
 import { hasSensitivity } from '../lib/interior-request.ts'
@@ -769,6 +769,39 @@ function loadFieldMark(
   )
 }
 
+/** The leak area at a revolver: the firearm's cylinder gap leaks from where the bullet leaves the cylinder, a typed constant area from travel 0 instead. */
+function leakAreaMark(
+  s: UnitSystem,
+  o: {
+    typed: boolean
+    gun: { revolver: boolean; cylinder?: Cylinder | undefined } | undefined
+    seated: LoadValues['seated']
+  },
+  t: Translator['t'],
+) {
+  const { typed, gun, seated } = o
+  if (!gun?.revolver) return
+  if (typed)
+    return t(
+      'A constant leak area leaks from the start of travel, before the bullet leaves the cylinder, and replaces the cylinder gap of the firearm: the simulated pressure can come out too low. Empty the field to take the cylinder gap of the firearm.',
+    )
+  const gap = gun.cylinder?.gap
+  if (!gap) return
+  const c = seated.cylinder
+  if (!c)
+    return t(
+      'The cylinder gap of the firearm leaks only with a bullet seated in the Cartridge card; without one, no leak.',
+    )
+  return t(
+    'From the cylinder gap of the firearm {gap}: pi × bore diameter × gap, opening as the bullet base leaves the cylinder at {exit} of travel, discharge coefficient {cd}.',
+    {
+      gap: valueWithUnit('length', s, c.gap),
+      exit: valueWithUnit('length', s, c.exit),
+      cd: cylinderGapDischarge,
+    },
+  )
+}
+
 /** The flag of a field that holds the seated bullet's value. */
 function seatingFlag(
   key: string,
@@ -836,10 +869,13 @@ function LoadField({ name: key }: { name: string }) {
     recordBore,
     changes,
     resetKeys,
+    firearmList,
+    firearm,
   } = useLoad()
   const { t, tn } = useTranslation()
   const spec = interiorFields.find((s) => s.key === key)
   if (!spec) throw new Error(`no field ${key}`)
+  const gun = firearmList.find((f) => f.id === firearm)?.data
   const props = form.getInputProps(key)
   const value = fields[key]
   /** The default this field holds, with where it comes from (`input-defaults.ts`). */
@@ -868,6 +904,9 @@ function LoadField({ name: key }: { name: string }) {
       muted={given !== undefined && !given.fromFirearm}
       // texts naming a unit follow the units the field shows
       mark={(s) =>
+        (key === 'leakArea'
+          ? leakAreaMark(s, { typed: value?.si !== undefined, gun, seated }, t)
+          : undefined) ??
         loadFieldMark(
           s,
           {
@@ -1832,6 +1871,7 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
       system={system}
       initial={previewInitial}
       barrelLength={gun?.barrelLength}
+      cylinder={gun?.cylinder}
       lands={lands.contact}
       landsOther={lands.other}
       freebore={gun?.freebore}

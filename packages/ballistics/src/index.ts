@@ -114,6 +114,7 @@ export {
   chargeUpperBound,
   solveCharge,
 } from './interior/charge-solver.ts'
+export { cylinderGapDischarge, cylinderGapLeakage } from './interior/cylinder-gap.ts'
 export {
   type FittedPowderParameter,
   fitPowder,

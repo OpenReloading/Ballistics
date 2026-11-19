@@ -105,6 +105,30 @@ The discharge coefficient of 1 is a choice of the model.
 
 Code: `packages/ballistics/src/interior/load-file.ts`, `interiorLoad` (`leakArea`).
 
+### Cylinder gap
+
+A revolver loses gas through the gap $g$ between the cylinder face and the barrel once the bullet base has left the cylinder. The firearm record states the gap (`cylinderGap`) and where its barrel length is measured from (`barrelLengthFrom`). The cylinder face lies at the larger of the cartridge's L6 and the seated COAL, measured from the breech face: a chamber cut to the case length or a bullet that stands out of the case both end at the face. With the barrel length $L_b$ measured from the forcing cone, the travel gains the cylinder run:
+
+$$
+x_e = L_b + (x_f + g) - x_0, \qquad x_\text{exit} = x_f - x_0
+$$
+
+with $x_f$ the cylinder face and $x_0$ the seated bullet base, both from the breech face, and $x_\text{exit}$ the travel at which the base passes the face. Measured from the breech face, $x_e = L_b - x_0$ as without a cylinder.
+
+The leak area is the side of a cylinder of the bore diameter $d$ (the land diameter, the smaller one) and the gap's width. It opens linearly while the base crosses the gap and stays open to the muzzle:
+
+$$
+A_\ell(x) = \begin{cases} 0 & x \le x_\text{exit} \\ \pi d\, (x - x_\text{exit}) & x_\text{exit} \lt x \lt x_\text{exit} + g \\ \pi d\, g & x_\text{exit} + g \le x \le x_e \end{cases}, \qquad C_d = 0.7
+$$
+
+Code: `packages/ballistics/src/interior/cylinder-gap.ts`, `cylinderGapLeakage`, `cylinderGapDischarge`. `packages/svg-drawings/src/seating/seating.ts`, `seat` (`cylinder`).
+
+- The discharge coefficient of 0.7 is the low end of the range 0.7 to 1 for the gap: a smaller one lets less gas out and gives the higher simulated pressure.
+- The face at the larger of L6 and COAL puts the leak later and the travel longer than a face at the cartridge length L3: the peak pressure stays higher. On the .357 Magnum like load of the [research log](../research/revolver-cylinder-gap.md), a face at L3 lowers the simulated peak by 2.3 % with a 0.10 mm gap; at the larger of L6 and COAL the peak comes before the leak opens and is unchanged.
+- A typed leak area (`leakArea`) replaces the gap leak, so the gas does not leak twice. The workbench shows a note when a leak area is typed on a revolver load: that area leaks from travel 0, before the bullet leaves the cylinder, and the simulated pressure can come out too low.
+- Without a seated bullet, the travel and the base are unknown and the gap gives no leak. The workbench says so.
+- A firearm without `cylinderGap` and `barrelLengthFrom` gives the results it gave before.
+
 ### Convective heat loss
 
 Gas constant from the force constant and the flame temperature, and the gas temperature from the equation of state:
@@ -193,11 +217,11 @@ Code: `packages/ballistics/src/interior/model.ts`, `convectiveDefaults`.
 
 ## Limits
 
-- No default leak area: no measurement constrains it. A leak area is an input to fit or measure.
+- No default leak area: no measurement constrains it. A leak area is an input to fit or measure. The [cylinder gap](#cylinder-gap) builds one from the gap the firearm states.
 - The convective heat loss exists and stays off by default. Turning it on needs a new fit of every powder, and no measured heat loss for a rifle or handgun bore was found (see the gun-bore check below), so the term cannot be checked. It is revisited when such a measurement exists ([#848](https://github.com/OpenReloading/Ballistics/issues/848)).
 - Input checks: at least one leak-area point, travels finite, at least 0 and strictly increasing, areas, back pressure and discharge coefficient finite and at least 0. Heat model: flame temperature, viscosity, Prandtl number and wall temperature positive, factor at least 0.
 - `closedVessel` with leakage describes a vented vessel with the leak area at travel 0.
-- A powder fit to velocities measured from a revolver, without a leak area, puts the gas lost at the cylinder gap into the fitted values, and the simulated pressure can come out too low. The powder fit shows a note when the load has no leak area and the firearm the load links has the `action` `revolver`. Where the load links no firearm, or one whose record does not state its action, the note follows the load's cartridge record: C.I.P. table IV, which holds the pistol and the revolver cartridges, so a pistol load without a stated action gets the note too. A firearm stated as `pistol` or `rifle` gets none.
+- A powder fit to velocities measured from a revolver, without a leak area, puts the gas lost at the cylinder gap into the fitted values, and the simulated pressure can come out too low. The powder fit does not read the firearm's cylinder gap. It shows a note when the load has no leak area and the firearm the load links has the `action` `revolver`. Where the load links no firearm, or one whose record does not state its action, the note follows the load's cartridge record: C.I.P. table IV, which holds the pistol and the revolver cartridges, so a pistol load without a stated action gets the note too. A firearm stated as `pistol` or `rifle` gets none.
 - Research log: [isentropic blowdown closed form](../research/interior-leakage-blowdown-closed-form.md).
 - The heat defaults are checked only against figures for gun-size bores (203 mm, four charges: modeled heat 0.82 to 0.93 of uncited, unverified reference figures on a synthetic proxy; a slower synthetic powder puts the two smallest-charge ratios below the 0.8 lower limit). No reference was found for rifle bores. Research log: [heat loss against gun figures](../research/heat-loss-gun-bores.md).
 - The loss of muzzle velocity per 0.001 in of annular clearance in an 81 mm mortar proxy is 0.77 to 1.13 times the slope of uncited, unverified reference figures with a discharge coefficient of 0.83 and 0.93 to 1.36 times with 1, depending on the powder. The default of 1 is kept. Research log: [leak against mortar clearance](../research/leak-mortar-clearance.md).

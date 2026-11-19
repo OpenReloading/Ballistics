@@ -1,4 +1,5 @@
 import {
+  cylinderGapLeakage,
   defaultSensitivity,
   type InteriorLoad,
   overrideResistance,
@@ -10,6 +11,7 @@ import { type Powder, toSi } from '@rangefoundry/schema'
 import { type InteriorBody, interiorBody } from './interior-input.ts'
 import type { RecordValues } from './query.ts'
 import type { Gap } from './resistance-gaps.ts'
+import type { CylinderGap } from './seating-ladder.ts'
 
 /** What a link carried of a powder record that is not loaded, SI. */
 type LinkedPowder = NonNullable<RecordValues['powder']>
@@ -40,6 +42,22 @@ export interface InteriorSources {
   bulkDensity?: number | undefined
   /** The seated bullet's jump to the lands or the leade, m: the engraving ramp starts there. */
   jump?: number | undefined
+  /** A revolver's cylinder gap at the seated bullet, m: it leaks unless a leak area is typed. */
+  cylinderGap?: CylinderGap | undefined
+}
+
+/** The leak of the cylinder gap over the load's travel; a typed leak area replaces it, so the gas does not leak twice. */
+export function gapLeakage(
+  load: InteriorLoad,
+  cylinderGap: CylinderGap | undefined,
+  leakArea: number | undefined,
+): InteriorLoad['leakage'] {
+  if (leakArea !== undefined || !cylinderGap) return load.leakage
+  return cylinderGapLeakage({
+    boreDiameter: load.chamber.boreDiameter,
+    ...cylinderGap,
+    travel: load.barrel.length,
+  })
 }
 
 /** `jump` in m, 0 for a bullet touching or jammed into the lands; the friction stays. */
@@ -98,6 +116,8 @@ export function interiorRequest(s: InteriorSources) {
   // the workbench's ramps (record law, typed, linked) start at travel 0: the jump moves them
   const applied = rampAtJump(overrideResistance(resistance, values), s.jump)
   if (applied) body.load.resistance = applied
+  const leakage = gapLeakage(body.load, s.cylinderGap, values['leakArea'])
+  if (leakage) body.load.leakage = leakage
   if (s.volumeFraction !== undefined) body.tolerances = { volumeFraction: s.volumeFraction }
   // The record's coefficient, else its grain form's default (`recordSensitivity`, as the API's load-file route reads it).
   const linked = s.linked

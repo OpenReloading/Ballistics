@@ -123,10 +123,22 @@ export const zeroFields = [
   },
 ] as const satisfies readonly FieldSpec[]
 
+/** A revolver's only: the simulation leaks gas through it once the bullet base has left the cylinder. */
+export const cylinderGapField = {
+  key: 'cylinderGap',
+  label: msg('Cylinder gap'),
+  help: msg('Gap between the cylinder face and the barrel.'),
+  quantity: 'length',
+  min: 0,
+} as const satisfies FieldSpec
+
 const labels: Record<string, Message> = {
   ...Object.fromEntries(
-    [...firearmFields, ...opticFields, ...mountFields, ...zeroFields].map((s) => [s.key, s.label]),
+    [...firearmFields, cylinderGapField, ...opticFields, ...mountFields, ...zeroFields].map(
+      (s) => [s.key, s.label],
+    ),
   ),
+  barrelLengthFrom: msg('Barrel length measured from'),
   landsBullet: msg('Bullet of the lands contact'),
   dragFactorSource: msg('Drag factor source'),
   mounted: msg('Mounted on'),
@@ -165,6 +177,7 @@ const schemaMessages: Record<string, Message> = {
   ),
   'Not an optic of this firearm': msg('Not an optic of this firearm'),
   'Not a configuration of this firearm': msg('Not a configuration of this firearm'),
+  'Only a revolver has this value': msg('Only a revolver has this value'),
 }
 
 /** A refusal of the schema in the language of `t`; a text the table lacks stays as it is. */
@@ -270,6 +283,21 @@ export function landsFor(lands: LandsContact | undefined, bulletRef: string | un
   return { contact: same ? lands : undefined, other: lands !== undefined && !same }
 }
 
+/** A revolver's cylinder as the seating takes it: the gap in m, 0 where not given. */
+export interface Cylinder {
+  gap: number
+  /** The barrel length is measured from the forcing cone. */
+  fromForcingCone: boolean
+}
+
+/** Undefined without a gap or a barrel length from the forcing cone, which only a revolver has. */
+export function cylinderOf(f: Firearm): Cylinder | undefined {
+  const gap = siOf('length', f.cylinderGap)
+  const fromForcingCone = f.barrelLengthFrom === 'forcingCone'
+  if (gap === undefined && !fromForcingCone) return
+  return { gap: gap ?? 0, fromForcingCone }
+}
+
 /** What the workbench reads from a firearm: lengths in m, mass in kg. */
 export const gunValues = (f: Firearm) => ({
   twist: siOf('length', f.twist),
@@ -279,6 +307,8 @@ export const gunValues = (f: Firearm) => ({
   freebore: siOf('length', f.freebore),
   firearmMass: siOf('mass', f.firearmMass),
   lands: landsOf(f),
+  cylinder: cylinderOf(f),
+  revolver: f.action === 'revolver',
 })
 
 /** A firearm of the Gun chooser: its name, barrel length and twist (m). */

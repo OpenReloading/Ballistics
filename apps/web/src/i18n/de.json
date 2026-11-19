@@ -898,7 +898,6 @@
   "Not separable from each other: {list}. Add distances, a dial row or a chronograph.": "Nicht voneinander trennbar: {list}. Fügen Sie Entfernungen, eine Zeile für die Verstellung oder einen Chronographen hinzu.",
   "Not stated": "Nicht angegeben",
   "Kind of firearm": "Art der Schusswaffe",
-  "A revolver gets the cylinder gap note of the powder fit.": "Ein Revolver erhält bei der Anpassung des Treibladungspulvers den Hinweis zum Trommelspalt.",
   "Not used": "Nicht verwendet",
   "Note": "Hinweis",
   "Notes": "Notizen",
@@ -4384,5 +4383,19 @@
   "Shotgun": "Flinte",
   "Shotgun powders: the maker states shotgun use only, and the app computes metallic cartridges.": "Treibladungspulver für Flinten: Der Hersteller nennt nur die Verwendung in Flinten, und die App berechnet Metallpatronen.",
   "Shotgun-only powders left out: {shotgun}": "Ausgelassene Treibladungspulver nur für Flinten: {shotgun}",
-  "Stated use": "Angegebene Verwendung"
+  "Stated use": "Angegebene Verwendung",
+  "A revolver takes a cylinder gap and gets the cylinder gap note of the powder fit.": "Ein Revolver erhält einen Trommelspalt und bei der Anpassung des Treibladungspulvers den Hinweis zum Trommelspalt.",
+  "Cylinder gap": "Trommelspalt",
+  "Gap between the cylinder face and the barrel.": "Spalt zwischen der Stirnfläche der Trommel und dem Lauf.",
+  "Barrel length measured from": "Lauflänge gemessen ab",
+  "From the forcing cone, the travel adds the cylinder run.": "Ab dem Übergangskonus kommt zum Geschossweg der Weg durch die Trommel hinzu.",
+  "Breech face": "Stoßboden",
+  "Forcing cone": "Übergangskonus",
+  "Only a revolver has this value": "Nur ein Revolver hat diesen Wert",
+  "From the forcing cone, as the firearm states.": "Ab dem Übergangskonus, wie die Waffe angibt.",
+  "with the cylinder run {run}: cartridge L6 plus the cylinder gap {gap}": "mit dem Weg durch die Trommel {run}: L6 der Patrone plus Trommelspalt {gap}",
+  "with the cylinder run {run}: the COAL plus the cylinder gap {gap}": "mit dem Weg durch die Trommel {run}: COAL plus Trommelspalt {gap}",
+  "A constant leak area leaks from the start of travel, before the bullet leaves the cylinder, and replaces the cylinder gap of the firearm: the simulated pressure can come out too low. Empty the field to take the cylinder gap of the firearm.": "Eine konstante Leckfläche lässt Gas ab dem Beginn des Geschosswegs entweichen, bevor das Geschoss die Trommel verlässt, und ersetzt den Trommelspalt der Waffe: Der simulierte Druck kann zu niedrig ausfallen. Leeren Sie das Feld, um den Trommelspalt der Waffe zu verwenden.",
+  "The cylinder gap of the firearm leaks only with a bullet seated in the Cartridge card; without one, no leak.": "Der Trommelspalt der Waffe lässt Gas nur mit einem in der Karte „Patrone“ gesetzten Geschoss entweichen; ohne eines gibt es kein Leck.",
+  "From the cylinder gap of the firearm {gap}: pi × bore diameter × gap, opening as the bullet base leaves the cylinder at {exit} of travel, discharge coefficient {cd}.": "Aus dem Trommelspalt der Waffe {gap}: Pi × Felddurchmesser × Spalt, öffnet sich, wenn der Geschossboden bei {exit} Geschossweg die Trommel verlässt, Ausflusszahl {cd}."
 }

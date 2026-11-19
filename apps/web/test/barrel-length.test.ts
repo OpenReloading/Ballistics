@@ -281,4 +281,18 @@ describe('longerTravel and longerBody', () => {
     })
     expect(longerBody(load, [3e-3], 'up', 0.9)).not.toHaveProperty('ladder')
   })
+
+  it("holds a cylinder gap's leak open to the longer muzzle, and leaves a typed leak area at the run's", () => {
+    const area = [
+      { travel: 0.016, area: 0 },
+      { travel: 0.0161, area: 2.8e-6 },
+      { travel: 0.11, area: 2.8e-6 },
+    ]
+    const leaky = { ...load, leakage: { area, discharge: 0.7 } }
+    expect(longerBody(leaky, [3e-3], 'up', 0.2, true).load.leakage).toEqual({
+      area: [...area, { travel: 0.2, area: 2.8e-6 }],
+      discharge: 0.7,
+    })
+    expect(longerBody(leaky, [3e-3], 'up', 0.2).load.leakage).toEqual({ area, discharge: 0.7 })
+  })
 })

@@ -76,6 +76,27 @@ it('takes the bore area of the record for an empty field, the typed one first', 
   ).toBe(4.6e-5)
 })
 
+it('leaks through the cylinder gap from where the base leaves the cylinder, and a typed leak area replaces it', () => {
+  const revolver = { ...values, boreDiameter: 8.84e-3, travel: 0.11149 }
+  const cylinderGap = { gap: 1e-4, exit: 0.01639 }
+  expect(interiorRequest({ values: revolver, powder: undefined, cylinderGap }).body.load.leakage).toEqual({
+    area: [
+      { travel: 0.01639, area: 0 },
+      { travel: expect.closeTo(0.01649, 12), area: expect.closeTo(2.77717e-6, 11) },
+      { travel: 0.11149, area: expect.closeTo(2.77717e-6, 11) },
+    ],
+    discharge: 0.7,
+  })
+  const typed = { ...revolver, leakArea: 1e-6 }
+  expect(interiorRequest({ values: typed, powder: undefined, cylinderGap }).body.load.leakage).toEqual({
+    area: [
+      { travel: 0, area: 1e-6 },
+      { travel: 0.11149, area: 1e-6 },
+    ],
+  })
+  expect('leakage' in interiorRequest({ values: revolver, powder: undefined }).body.load).toBe(false)
+})
+
 it('lays the bore resistance a link carried over a missing powder record', () => {
   const linked = { bulkDensity: 900, boreFriction: 2e7 }
   const r = interiorRequest({ values, powder: undefined, linked })
