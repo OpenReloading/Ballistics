@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.0.8](https://github.com/OpenReloading/Ballistics/compare/schema-v0.0.7...schema-v0.0.8) (2026-11-19)
+
+
+### Features
+
+* **catalog:** gate public records by field class and maker source id ([#1225](https://github.com/OpenReloading/Ballistics/issues/1225)) ([b2a656b](https://github.com/OpenReloading/Ballistics/commit/b2a656baca31cc4fe8e9f17be3afcc22ef4915e0))
+* **interior:** revolver cylinder gap and barrel length from the forcing cone ([#1256](https://github.com/OpenReloading/Ballistics/issues/1256)) ([e9f741a](https://github.com/OpenReloading/Ballistics/commit/e9f741a6e0d04b7f40430850988bb550cd15a455))
+* **schema:** add perforation, grain dimensions, heat of explosion and transport to powders ([#1235](https://github.com/OpenReloading/Ballistics/issues/1235)) ([56454ef](https://github.com/OpenReloading/Ballistics/commit/56454efd4b60b8b30ea376e4674dcab17d296923))
+* **schema:** let a maker's sheet source the powder kernel and transport fields, and tighten the transport patterns ([#1240](https://github.com/OpenReloading/Ballistics/issues/1240)) ([213105a](https://github.com/OpenReloading/Ballistics/commit/213105a79e13283d5a9c98456aff58f369d66e4a))
+* **schema:** makers' burn-rate charts and stated uses on powders ([#1230](https://github.com/OpenReloading/Ballistics/issues/1230)) ([1c61622](https://github.com/OpenReloading/Ballistics/commit/1c616227fce25dc6bad8f6d4b9f9e2f93286a6f0))
+* **schema:** optional provenance for basic bullet and powder records ([#1223](https://github.com/OpenReloading/Ballistics/issues/1223)) ([226f018](https://github.com/OpenReloading/Ballistics/commit/226f0187c7e5b14741edae96204b444cc15b3936))
+* **schema:** optional provenance on every record kind ([#1224](https://github.com/OpenReloading/Ballistics/issues/1224)) ([7b69c19](https://github.com/OpenReloading/Ballistics/commit/7b69c19cf0be25e34f9bde004bf5b986cd37f959))
+* **web:** bullet lot, each lot under its record choice and one Lots line ([#1258](https://github.com/OpenReloading/Ballistics/issues/1258)) ([374bf81](https://github.com/OpenReloading/Ballistics/commit/374bf817222370fc2e257f1a277b8e2381b1b3de))
+
+
+### Documentation
+
+* rename the brand text to RangeFoundry ([#1202](https://github.com/OpenReloading/Ballistics/issues/1202)) ([6e8ddfe](https://github.com/OpenReloading/Ballistics/commit/6e8ddfe757ff262dcacfc8f1d57b68382cfca7a9))
+
 ## [0.0.7](https://github.com/OpenReloading/Ballistics/compare/schema-v0.0.6...schema-v0.0.7) (2026-11-12)
 
 

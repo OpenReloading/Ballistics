@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.0.8](https://github.com/OpenReloading/Ballistics/compare/api-v0.0.7...api-v0.0.8) (2026-11-19)
+
+
+### Features
+
+* **interior:** revolver cylinder gap and barrel length from the forcing cone ([#1256](https://github.com/OpenReloading/Ballistics/issues/1256)) ([e9f741a](https://github.com/OpenReloading/Ballistics/commit/e9f741a6e0d04b7f40430850988bb550cd15a455))
+* **schema:** makers' burn-rate charts and stated uses on powders ([#1230](https://github.com/OpenReloading/Ballistics/issues/1230)) ([1c61622](https://github.com/OpenReloading/Ballistics/commit/1c616227fce25dc6bad8f6d4b9f9e2f93286a6f0))
+* **schema:** optional provenance for basic bullet and powder records ([#1223](https://github.com/OpenReloading/Ballistics/issues/1223)) ([226f018](https://github.com/OpenReloading/Ballistics/commit/226f0187c7e5b14741edae96204b444cc15b3936))
+* **schema:** optional provenance on every record kind ([#1224](https://github.com/OpenReloading/Ballistics/issues/1224)) ([7b69c19](https://github.com/OpenReloading/Ballistics/commit/7b69c19cf0be25e34f9bde004bf5b986cd37f959))
+* **web:** bullet lot, each lot under its record choice and one Lots line ([#1258](https://github.com/OpenReloading/Ballistics/issues/1258)) ([374bf81](https://github.com/OpenReloading/Ballistics/commit/374bf817222370fc2e257f1a277b8e2381b1b3de))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @rangefoundry/catalog bumped to 0.0.8
+    * @rangefoundry/schema bumped to 0.0.8
+
 ## [0.0.7](https://github.com/OpenReloading/Ballistics/compare/api-v0.0.6...api-v0.0.7) (2026-11-12)
 
 
