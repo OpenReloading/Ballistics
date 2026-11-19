@@ -265,11 +265,8 @@ _Avoid_: `base` (on a powder)
 **Composition**:
 `composition`: ingredients as the safety data sheet prints them, each with `name`, `cas` (CAS registry number), `min` and `max` (mass %) and `raw`.
 
-**Min and max**:
-`min` and `max`: the extremes of a range: of an ingredient's mass fraction (%), or of a computed thermochemistry value over the composition ranges.
-
 **Thermochemistry**:
-`thermochemistry`: constant-volume burning at `loadingDensity` (g/cm3) computed from the composition: `flameTemperature` (K), `impetus` (J/kg), `gamma`, `molarMass` (kg/kmol) and `covolume` (m3/kg), each a value with `min` and `max`.
+`thermochemistry`: constant-volume burning at `loadingDensity` (g/cm3) computed from the composition: `flameTemperature` (K), `impetus` (J/kg), `gamma`, `molarMass` (kg/kmol) and `covolume` (m3/kg), each a value with `min` and `max` over the composition ranges.
 
 **Interior parameters**:
 `interior`: the M3 parameters of a powder fitted to load tables, with the fixed inputs of the fit: `model` (`m3`), `fitted`, `vivacity`, `energy`, `gamma`, `covolume`, `density`, `pressureExponent`, `referencePressure`, `ignitionPressure`, `startPressure`, `propellantTemperature`, `burnForm`, `resistance`, `trainingRows`, `trainingCartridges`. Effective values of the model version. Powder list items carry `vivacity`, `pressureExponent`, `referencePressure`, `burnForm`, `trainingRows`, `trainingCartridges` and `retrieved`, the latest day the fitted sources were read.
@@ -322,10 +319,7 @@ The form function of the vivacity burn law: `burnForm` on the powder record (`ki
 _Avoid_: `form` (on a powder record)
 
 **Bore resistance**:
-`resistance`: the bore resistance the fit or the run applies. On the powder record the constants of the fit: `stress` (friction stress on the bullet side area, bar), `oversize` (coefficient per percent of bullet oversize) and `engraving` (fraction of the start pressure). In M3 bodies `friction` (constant pressure, Pa) and `engraving` (pressure over travel, a table of `travel` m and `pressure` Pa).
-
-**Bore friction**:
-`friction`: constant friction pressure on the bore area, Pa: M3 `resistance.friction`.
+`resistance`: the bore resistance the fit or the run applies. On the powder record the constants of the fit: `stress` (friction stress on the bullet side area, bar), `oversize` (coefficient per percent of bullet oversize) and `engraving` (fraction of the start pressure). In M3 bodies `friction` (constant pressure on the bore area, Pa) and `engraving` (pressure over travel, a table of `travel` m and `pressure` Pa).
 
 **Training set**:
 `trainingRows` and `trainingCartridges`: rows and cartridges of the load data the interior parameters were fitted to, absent without a load-table fit.
@@ -373,9 +367,6 @@ _Avoid_: `tip` (on a bullet list item)
 
 **Meplat diameter**:
 `meplatDiameter`: diameter of the flat at the nose, mm, 0 for a sharp point.
-
-**Nose length**:
-`noseLength`: length of the bullet nose, mm.
 
 **Base to ogive**:
 `baseToOgive`: on a bullet, base to the start of the ogive (mm). On a load, cartridge base to the bullet ogive of the loaded round (mm), and a `seating.by` value of a load.
@@ -500,18 +491,12 @@ _Avoid_: `rounds` (as a count)
 **Instrument**:
 `instrument`: the instrument that measured a published velocity or pressure, as printed.
 
-**Mean**:
-`mean`: mean velocity, m/s: published in a firing series, measured in a range string `chronograph`.
-
 **Range firings**:
 A record of kind `range`: spark-range firings of one projectile from one report, with `projectile` (as the report names it), `bulletDiameter`, `bulletMass` and `rounds`, each round with `label` (as printed), `mach`, `totalYaw` (total angle of attack, deg) and `dragCoefficient` at that yaw.
 
 **Label**:
 `label`: a name as printed or typed: the round number of range firings, a shot string of a session.
 _Avoid_: `round` (in range firings)
-
-**Mach number**:
-`mach`: Mach number of a range firings round, dimensionless.
 
 **Drag coefficient**:
 `dragCoefficient`: drag coefficient of a range firings round at its total yaw, not the zero-yaw drag.
@@ -730,7 +715,7 @@ _Avoid_: `offset` (of a mount)
 ### Target sheets
 
 **Target sheet**:
-A user record of kind `targetSheet`: a `photo` (local id of an embedded file) or a drawn target, its `references`, `targetRotation`, `targetOrigin`, `photoRotation`, `groups`, `load`, `markerDiameter`, `notes` and `overlays`. Positions on the target are in m, x right, y up.
+A user record of kind `targetSheet`: a `photo` (local id of an embedded file) or a drawn target, its `references`, `targetRotation`, `targetOrigin`, `photoRotation`, `groups`, `load`, `markerDiameter`, `notes` and `overlays`.
 
 **Calibration reference**:
 One entry of `references`: a scale or perspective reference on the photo, by `kind`: `line` (points `a` and `b` a known `length` apart), `ringCentre` (`centre` and a point on the `edge` of a ring of known `diameter`), `ringEdge` (three `points` on such a ring), `rectangle` (`corners` of a known `width` and `height`). Points in photo px, lengths in m.
@@ -916,9 +901,6 @@ Query of `GET /v1/exterior/stability`: `bullet` or `mass`, `diameter` and `lengt
 
 **Chamber**:
 `chamber` of an M3 body: `volume` behind the seated bullet base (m3), `boreArea` (m2) and `boreDiameter` (m).
-
-**Bore area**:
-`boreArea`: area of the bore, m2, in the M3 `chamber`.
 
 **Barrel**:
 `barrel` of interior bodies: `length` and `twist`.
