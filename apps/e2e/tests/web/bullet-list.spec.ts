@@ -84,3 +84,60 @@ test("a phone's page bar keeps its height with picks", async ({ page }) => {
   await expect(bar.getByText('2 selected (max 4)')).toBeVisible()
   expect(await height()).toBe(before)
 })
+
+for (const { list, width, query, pick, shownLabel, hiddenLabels } of [
+  {
+    list: 'bullets',
+    width: 390,
+    query: '168',
+    pick: 'demo-bullet-224-55,demo-bullet-150,demo-bullet-168',
+    shownLabel: /30 Cal 168 gr HPBT Demo/,
+    hiddenLabels: [/22 Cal 55 gr FMJ Boat Tail Demo/, /30 Cal 150 gr Flat Base Demo/],
+  },
+  {
+    list: 'bullets',
+    width: 1280,
+    query: '168',
+    pick: 'demo-bullet-224-55,demo-bullet-150,demo-bullet-168',
+    shownLabel: /30 Cal 168 gr HPBT Demo/,
+    hiddenLabels: [/22 Cal 55 gr FMJ Boat Tail Demo/, /30 Cal 150 gr Flat Base Demo/],
+  },
+  {
+    list: 'powders',
+    width: 390,
+    query: 'dp40',
+    pick: 'demo-powder-dp15,demo-powder-dp70,demo-powder-dp40',
+    shownLabel: /DP40/,
+    hiddenLabels: [/DP15/, /DP70/],
+  },
+]) {
+  test(`at ${width} px the ${list} the search hides are listed under "hidden" and unticked there (#866)`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 800 })
+    await gotoHydrated(page, `/${list}?q=${query}&pick=${pick}`)
+    const bar = page.locator('.page-bar')
+    const status = bar.locator('.page-bar-status')
+    await expect(status.getByText('3 selected (max', { exact: false })).toBeVisible()
+    const hidden = status.getByRole('button', { name: '2 hidden' })
+    // inside the status line, which clips what does not fit
+    const [line, button] = await Promise.all([status.boundingBox(), hidden.boundingBox()])
+    expect(button && line && button.x + button.width <= line.x + line.width).toBe(true)
+    await hidden.click()
+    const dialog = page.getByRole('dialog', { name: 'Hidden by the search or a filter' })
+    await expect(dialog.getByRole('listitem')).toHaveText(hiddenLabels)
+    await dialog
+      .getByRole('button', { name: /^Untick / })
+      .first()
+      .click()
+    await expect(status.getByText('2 selected (max', { exact: false })).toBeVisible()
+    await expect(page).toHaveURL(new RegExp(`[?&]pick=${pick.split(',').slice(1).join('(%2C|,)')}`))
+    // the focus goes to the untick now in its place
+    await expect(dialog.getByRole('button', { name: /^Untick / })).toBeFocused()
+    await page.keyboard.press('Enter')
+    await expect(status.getByText('1 selected (max', { exact: false })).toBeVisible()
+    await expect(status.getByRole('button', { name: /hidden$/ })).toHaveCount(0)
+    await expect(page.getByRole('checkbox', { name: shownLabel })).toBeChecked()
+    await expect(page.getByRole('searchbox', { name: 'Search' })).toBeFocused()
+  })
+}

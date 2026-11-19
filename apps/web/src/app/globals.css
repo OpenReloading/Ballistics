@@ -11295,8 +11295,43 @@ main .page-bar h1 {
 }
 
 /* the status line clips: the focus ring stays inside the button */
-.clear-picks:focus-visible {
+.clear-picks:focus-visible,
+.hidden-picks:focus-visible {
   outline-offset: -2px;
+}
+
+/* the phone's short form of "2 hidden" */
+.hidden-picks-count {
+  display: none;
+}
+
+.hidden-picks-title {
+  margin: 0 0 var(--space-xs);
+  color: var(--muted);
+  font-size: var(--mantine-font-size-sm);
+}
+
+.hidden-picks-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hidden-picks-list > li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  min-height: 1.5rem;
+}
+
+.hidden-picks-list > li > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.hidden-picks-list > li > button {
+  flex: none;
 }
 
 /* Compare keeps the width of its widest label ("Compare 4"): the stacked labels share one cell */
@@ -11319,6 +11354,19 @@ main .page-bar h1 {
     display: none;
   }
 
+  /* "2 hidden" is its icon and count, the words still read */
+  .hidden-picks .hidden-picks-count {
+    display: inline;
+  }
+
+  .hidden-picks .hidden-picks-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
   /* the line has the height of Clear (a 24 px target) also without picks, so a pick moves nothing */
   .page-bar-status:has(> .selection-summary) {
     display: flex;
@@ -11326,13 +11374,17 @@ main .page-bar h1 {
     min-height: 1.5rem;
   }
 
-  .page-bar-status .clear-picks {
+  .page-bar-status :is(.clear-picks, .hidden-picks) {
     height: 1.5rem;
     min-height: 0;
   }
 
   .clear-picks .mantine-Button-section {
     margin-inline-end: 0;
+  }
+
+  .hidden-picks .mantine-Button-section {
+    margin-inline-end: 2px;
   }
 
   /* after the count (margin from the rule of the status line's parts), which steps aside */
