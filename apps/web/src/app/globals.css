@@ -844,6 +844,7 @@ td.nowrap {
 }
 
 .field-end > .field-flag,
+.field-end > .field-action,
 .field-end > span[aria-hidden] {
   align-items: center;
   align-self: center;
@@ -872,6 +873,13 @@ td.nowrap {
 
 .field-action {
   color: var(--link);
+}
+
+/* a flag beside the action is a 24 px tooltip target too (WCAG 2.5.8) */
+.field-end > .field-flag:has(+ .field-action) {
+  min-width: 24px;
+  min-height: 24px;
+  justify-content: center;
 }
 
 .field-unit-switch {
