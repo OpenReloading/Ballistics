@@ -199,7 +199,7 @@ The Powders tab's charge mode and filters are `analysis.powders`: `mode` (`typed
 
 ## Session snapshots on a load
 
-- `Load.snapshots` (`sessionSnapshot` in `packages/schema/src/load.ts`, up to 50, at most one per entry of `Load.sessions`) keeps what the load was at each session: `powderLot`, `primerLot`, `caseLot`, `seating`, the firearm's `roundCount` at the start of the session, and the ids of the notes the user dismissed for that session. `Load.powderLot` sits beside `primer.lot` and `case.lot` (a powder is a bare reference, with no place for a lot). All fields are optional.
+- `Load.snapshots` (`sessionSnapshot` in `packages/schema/src/load.ts`, up to 50, at most one per entry of `Load.sessions`) keeps what the load was at each session: `powderLot`, `primerLot`, `caseLot`, `bulletLot`, `seating`, the firearm's `roundCount` at the start of the session, and the ids of the notes the user dismissed for that session. `Load.powderLot` and `Load.bulletLot` sit beside `primer.lot` and `case.lot` (a powder or bullet is a reference or a description, with no place for a lot). All fields are optional.
 - The snapshot is shown live until the load is saved with the session, then fixed. The rules and their thresholds: [Load notes](../models/load-notes.md).
 
 ## Chronograph session

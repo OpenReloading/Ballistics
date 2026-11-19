@@ -5,16 +5,16 @@ import { loadForm, openKeeping, openSavedLoad } from './workbench.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
-// the Cartridge card's "Primer, brass, lots" row: each choice follows the cartridge it depends on, a lot follows its component
+// the Cartridge card's "Primer, brass, lots" row: each choice follows the cartridge it depends on, a lot (the fixture has none) its component's records
 const row = [
   ['combobox', 'Primer'],
   ['button', 'Browse primers'],
-  ['textbox', 'Primer lot'],
+  ['button', 'Add lot for the primer'],
   ['combobox', 'Brass record'],
   // the fixture load chooses its brass: its clear button takes the place of Browse brass
   ['button', 'Clear the brass record'],
-  ['textbox', 'Case lot'],
   ['combobox', 'Case capacity record'],
+  ['button', 'Add lot for the case'],
 ] as const
 const names = row.map(([, name]) => name)
 
@@ -41,7 +41,7 @@ for (const [width, height] of [
   [1366, 657],
   [390, 844],
 ] as const)
-  test(`at ${width} x ${height} the Cartridge card holds the cartridge search in its head and primer, brass, their lots and capacity in its last row, in keyboard, visual and reading order`, async ({
+  test(`at ${width} x ${height} the Cartridge card holds the cartridge search in its head and primer and its lot, then brass, capacity and the case lot in its last row, in keyboard, visual and reading order`, async ({
     page,
   }) => {
     await page.setViewportSize({ width, height })

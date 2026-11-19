@@ -10,15 +10,15 @@ When a saved load is shot again, the workbench compares each session with the on
 
 ## What a session holds
 
-Every session of a load keeps a snapshot of the load as it was when the load was saved with that session: the powder, primer and case lot, the seating length and the firearm's round count (`Load.snapshots`, one per entry of `Load.sessions`). The velocity statistics come from the session's shot strings that are mapped to the load's own charge (within 0.1 mg), without the shots excluded in the session.
+Every session of a load keeps a snapshot of the load as it was when the load was saved with that session: the powder, primer, case and bullet lot, the seating length and the firearm's round count (`Load.snapshots`, one per entry of `Load.sessions`). The velocity statistics come from the session's shot strings that are mapped to the load's own charge (within 0.1 mg), without the shots excluded in the session.
 
 Sessions are ordered by date when every session has one, otherwise in the order of `Load.sessions`. The first session has nothing before it to compare.
 
 ## Rules
 
-Lot (powder, primer, case):
+Lot (powder, primer, case, bullet):
 
-- A lot that is not recorded in a session gets a note, also in the first session.
+- A lot that is not recorded in a session gets a note, also in the first session. The bullet lot gets one only when the earlier session recorded it, so sessions saved without a bullet lot get no note.
 - A lot that differs from the earlier session's, both recorded, gets a note. Lots are compared as typed, without leading and trailing spaces.
 
 Seating depth:

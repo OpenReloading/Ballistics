@@ -209,6 +209,7 @@ export function toLoad(p: LoadParts): Load {
     analysis: analysisOf(overrides, ladder, p.bulletBase, p.powders),
     sessions: p.sessions.length > 0 ? [...p.sessions] : undefined,
     powderLot: p.lots?.powder.trim() || undefined,
+    bulletLot: p.lots?.bullet.trim() || undefined,
     primer: primerOf(p.primerRecord, p.lots),
     case: caseOf(p.caseRecord, p.lots),
     snapshots: p.snapshots?.length ? [...p.snapshots] : undefined,

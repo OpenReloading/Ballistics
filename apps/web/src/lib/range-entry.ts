@@ -404,6 +404,7 @@ export function withSession(
     powderLot: lot(d.powderLot),
     primerLot: lot(d.primer?.lot),
     caseLot: lot(d.case?.lot),
+    bulletLot: lot(d.bulletLot),
   }
   const snapshot = {
     session: ref,

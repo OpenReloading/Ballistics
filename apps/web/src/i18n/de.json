@@ -4407,5 +4407,11 @@
   "The cylinder gap of the firearm leaks only with a bullet seated in the Cartridge card; without one, no leak.": "Der Trommelspalt der Schusswaffe lässt Gas nur mit einem in der Karte „Patrone“ gesetzten Geschoss entweichen; ohne eines gibt es kein Leck.",
   "From the cylinder gap of the firearm {gap}: pi × bore diameter × gap, opening as the bullet base leaves the cylinder at {exit} of travel, discharge coefficient {cd}.": "Aus dem Trommelspalt der Schusswaffe {gap}: Pi × Felddurchmesser × Spalt, öffnet sich, wenn der Geschossboden bei {exit} Geschossweg die Trommel verlässt, Ausflusszahl {cd}.",
   "The bullet base does not cross the cylinder gap of the firearm {gap} before the muzzle at this travel: no leak.": "Der Geschossboden überquert den Trommelspalt der Schusswaffe {gap} bei diesem Geschossweg nicht vor der Mündung: kein Leck.",
-  "The gap opened before the simulated peak pressure at {peak} of travel, so the peak includes its relief. The cylinder face is taken at the larger of cartridge L6 and the COAL: a longer cylinder opens the gap later and keeps the peak higher.": "Der Spalt öffnete sich vor dem simulierten Spitzendruck bei {peak} Geschossweg, daher enthält der Spitzendruck seine Entlastung. Die Stirnfläche der Trommel wird beim größeren Wert aus L6 der Patrone und COAL angenommen: Eine längere Trommel öffnet den Spalt später und hält den Spitzendruck höher."
+  "The gap opened before the simulated peak pressure at {peak} of travel, so the peak includes its relief. The cylinder face is taken at the larger of cartridge L6 and the COAL: a longer cylinder opens the gap later and keeps the peak higher.": "Der Spalt öffnete sich vor dem simulierten Spitzendruck bei {peak} Geschossweg, daher enthält der Spitzendruck seine Entlastung. Die Stirnfläche der Trommel wird beim größeren Wert aus L6 der Patrone und COAL angenommen: Eine längere Trommel öffnet den Spalt später und hält den Spitzendruck höher.",
+  "Bullet lot": "Geschoss-Los",
+  "Add lot": "Los hinzufügen",
+  "Add lot for the powder": "Los hinzufügen: Treibladungspulver",
+  "Add lot for the primer": "Los hinzufügen: Zündhütchen",
+  "Add lot for the case": "Los hinzufügen: Hülse",
+  "Add lot for the bullet": "Los hinzufügen: Geschoss"
 }

@@ -83,16 +83,20 @@ describe('box label', () => {
     })
   })
 
-  it('prints a lot only when it is typed', () => {
+  it('prints the typed lots on one Lots line', () => {
     const rows = boxLabel(
-      record({ powderLot: 'P-123', primer: { record: 'catalogue:br2', lot: 'Z-9' } }),
+      record({
+        powderLot: 'P-123',
+        bulletLot: 'B-7',
+        primer: { record: 'catalogue:br2', lot: 'Z-9' },
+      }),
       nameOf,
       metric,
       english.t,
     ).rows
-    expect(rows).toContainEqual(['Powder lot', 'P-123'])
-    expect(rows).toContainEqual(['Primer lot', 'Z-9'])
-    expect(rows.some(([k]) => k === 'Case lot')).toBe(false)
+    expect(rows.filter(([k]) => k.includes('lot') || k === 'Lots')).toEqual([
+      ['Lots', 'Powder P-123; Primer Z-9; Bullet B-7'],
+    ])
   })
 })
 

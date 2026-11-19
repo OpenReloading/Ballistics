@@ -4341,12 +4341,48 @@ main .library-head.page-panel-head > .page-panel-title {
   box-shadow: var(--mantine-shadow-sm);
 }
 
-/* a choice, then its lot in a narrow cell, as it holds a short code */
+/* each record choice, then its lot under it; brass stacks case, capacity and lot as one group */
 .workbench .keeping-fields {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 6rem;
+  grid-template-columns: minmax(0, 1fr);
   align-items: end;
   gap: var(--space-2xs);
+}
+
+/* Add lot, or the lot field once asked for or set: narrow, as it holds a short code */
+.workbench .lot-row {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+}
+
+.workbench .lot-row > .lot-field {
+  flex: 0 1 12rem;
+  min-width: 0;
+}
+
+/* as high as the card's rows, so Add lot moves no row when it turns into the field */
+.workbench .lot-row > .lot-add {
+  height: var(--field-height);
+}
+
+/* a plain text field, not the card's right-aligned value boxes */
+.workbench .workspace-inputs .panel-fields .lot-row > .lot-field .mantine-Input-input {
+  width: 100%;
+  height: var(--field-height);
+  min-height: var(--field-height);
+  padding-inline: revert-layer;
+  background: var(--page);
+  text-align: left;
+}
+
+.workbench
+  .workspace-inputs
+  .panel-fields
+  .lot-row
+  > .lot-field
+  .mantine-Input-input:not(:focus, [data-error]) {
+  border-color: var(--line);
 }
 
 .workbench .keeping-slot {
@@ -4579,16 +4615,6 @@ main .library-head.page-panel-head > .page-panel-title {
 
 .workbench .panel-head > .mantine-ActionIcon-root {
   margin-left: auto;
-}
-
-/* the powder lot beside the powder search, on the search's line */
-.workbench .panel-head > .lot-field {
-  flex: 0 0 6rem;
-  order: 1;
-}
-
-.workbench .panel-head:has(> .lot-field) > .search {
-  flex-basis: calc(100% - 6rem - 0.5rem);
 }
 
 .workbench .panel-head .mantine-Input-wrapper {
@@ -5747,36 +5773,9 @@ main .library-head.page-panel-head > .page-panel-title {
     order: 0;
   }
 
-  /* the powder search keeps room for a name beside its lot; a long title ends in an ellipsis
-     instead, its full text still the heading's name */
-  .workbench .panel-head > .lot-field {
-    flex-basis: 4.5rem;
-    order: 0;
-  }
-
-  .workbench .panel-head:has(> .lot-field) > svg {
-    flex-shrink: 0;
-  }
-
-  .workbench .panel-head:has(> .lot-field) > .search {
-    flex: 1 1 0;
-    /* narrower, axe cannot read the contrast of its placeholder */
-    min-width: 3.5rem;
-  }
-
-  /* a longer title (German "Treibladungspulver") takes its room from the search first; the lot
-     keeps its width (narrower, axe cannot read the contrast of its empty field) and the menu
-     stays whole: the title ends in an ellipsis only after the search is at its least width */
+  /* the menu stays whole beside a long title (German "Treibladungspulver") and record name */
   .workbench .panel-head > .mantine-ActionIcon-root {
     flex-shrink: 0;
-  }
-
-  .workbench .panel-head:has(> .lot-field) > .panel-title {
-    flex: 0 1 auto;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
   .workbench .panel-head .mantine-Input-wrapper {
