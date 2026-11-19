@@ -21,30 +21,30 @@ Each clause in the list below has one status:
 
 ### Clause list
 
-| Check | Rule set | Edition | Clause | Status |
-|---|---|---|---|---|
-| Stage briefing contents (what the stage record holds) | IPSC Handgun | January 2026 | 3.2.1 | unverified |
-| Stage briefing contents | USPSA | 2026-09 | 3.2.1 | unverified |
-| Steel at least 7 m from every shooting position | IPSC Handgun | January 2026 | not recorded | unverified |
-| Steel at least 23 ft from every shooting position | USPSA | 2026-09 | not recorded | unverified |
-| Fault line or barrier keeps the approach to steel at 8 m or more | IPSC Handgun | January 2026 | not recorded | unverified |
-| Fault line or barrier keeps the approach to steel at 26 ft or more | USPSA | 2026-09 | not recorded | unverified |
-| Round count within the cap of the course type (short, medium, long) | IPSC Handgun | January 2026 | not recorded | unverified |
-| Round count within the cap of the course type | USPSA | 2026-09 | not recorded | unverified |
-| At most 9 scoring hits visible from one place | IPSC (Pistol Caliber Carbine rules) | not recorded | not recorded | unverified |
-| At most 8 scoring hits visible from one place | USPSA | 2026-09 | not recorded | unverified |
-| At least one paper target or popper in the stage | IPSC Handgun, USPSA | January 2026, 2026-09 | not recorded | unverified |
-| No-shoots and hard cover do not hide the whole A zone of a scoring target | IPSC Handgun, USPSA | January 2026, 2026-09 | not recorded | unverified |
-| Paper target tilt within the limit | IPSC Handgun, USPSA | January 2026, 2026-09 | not recorded | unverified |
-| Fault line size | IPSC Handgun, USPSA | January 2026, 2026-09 | not recorded | unverified |
-| Barrier and obstacle heights | IPSC Handgun, USPSA | January 2026, 2026-09 | not recorded | unverified |
-| Magazine capacity and length per division (the stage's division limits) | IPSC Handgun | January 2026 | Appendix D1 item 8, D3 item 20, D4 item 18.2, D4a item 18.2, D6 item 8 | cited |
-| Magazine capacity and length per division | USPSA | 2026-09 | Appendix D1 to D9, items as in the record | cited |
-| Moving targets allowed | IPSC Handgun | January 2026 | 4.1.6; 9.9.1 and 9.9.2 | cited |
-| Moving targets allowed; angle of a moving target at rest | USPSA | 2026-09 | 9.9.1 and 9.9.2; 2.1.8.4 | cited |
-| Each check above where BDS sets its own figure or clause | BDS | Sporthandbuch 2026 (Allgemeiner Teil, Kurzwaffen, Kommentar) | not recorded | unverified (only the German translation was read) |
+| Check                                                                     | Rule set                            | Edition                                                      | Clause                                                                 | Status                                            |
+| ------------------------------------------------------------------------- | ----------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------- | ------------------------------------------------- |
+| Stage briefing contents (what the stage record holds)                     | IPSC Handgun                        | January 2026                                                 | 3.2.1                                                                  | unverified                                        |
+| Stage briefing contents                                                   | USPSA                               | 2026-09                                                      | 3.2.1                                                                  | unverified                                        |
+| Steel at least 7 m from every shooting position                           | IPSC Handgun                        | January 2026                                                 | not recorded                                                           | unverified                                        |
+| Steel at least 23 ft from every shooting position                         | USPSA                               | 2026-09                                                      | not recorded                                                           | unverified                                        |
+| Fault line or barrier keeps the approach to steel at 8 m or more          | IPSC Handgun                        | January 2026                                                 | not recorded                                                           | unverified                                        |
+| Fault line or barrier keeps the approach to steel at 26 ft or more        | USPSA                               | 2026-09                                                      | not recorded                                                           | unverified                                        |
+| Round count within the cap of the course type (short, medium, long)       | IPSC Handgun                        | January 2026                                                 | not recorded                                                           | unverified                                        |
+| Round count within the cap of the course type                             | USPSA                               | 2026-09                                                      | not recorded                                                           | unverified                                        |
+| At most 9 scoring hits visible from one place                             | IPSC (Pistol Caliber Carbine rules) | not recorded                                                 | not recorded                                                           | unverified                                        |
+| At most 8 scoring hits visible from one place                             | USPSA                               | 2026-09                                                      | not recorded                                                           | unverified                                        |
+| At least one paper target or popper in the stage                          | IPSC Handgun, USPSA                 | January 2026, 2026-09                                        | not recorded                                                           | unverified                                        |
+| No-shoots and hard cover do not hide the whole A zone of a scoring target | IPSC Handgun, USPSA                 | January 2026, 2026-09                                        | not recorded                                                           | unverified                                        |
+| Paper target tilt within the limit                                        | IPSC Handgun, USPSA                 | January 2026, 2026-09                                        | not recorded                                                           | unverified                                        |
+| Fault line size                                                           | IPSC Handgun, USPSA                 | January 2026, 2026-09                                        | not recorded                                                           | unverified                                        |
+| Barrier and obstacle heights                                              | IPSC Handgun, USPSA                 | January 2026, 2026-09                                        | not recorded                                                           | unverified                                        |
+| Magazine capacity and length per division (the stage's division limits)   | IPSC Handgun                        | January 2026                                                 | Appendix D1 item 8, D3 item 20, D4 item 18.2, D4a item 18.2, D6 item 8 | cited                                             |
+| Magazine capacity and length per division                                 | USPSA                               | 2026-09                                                      | Appendix D1 to D9, items as in the record                              | cited                                             |
+| Moving targets allowed                                                    | IPSC Handgun                        | January 2026                                                 | 4.1.6; 9.9.1 and 9.9.2                                                 | cited                                             |
+| Moving targets allowed; angle of a moving target at rest                  | USPSA                               | 2026-09                                                      | 9.9.1 and 9.9.2; 2.1.8.4                                               | cited                                             |
+| Each check above where BDS sets its own figure or clause                  | BDS                                 | Sporthandbuch 2026 (Allgemeiner Teil, Kurzwaffen, Kommentar) | not recorded                                                           | unverified (only the German translation was read) |
 
-The cited rows hold the rule set's limit per division; the stage builder reads them from the event type records and does not copy them. The IPSC row on scoring hits names the Pistol Caliber Carbine rules, which are not the IPSC Handgun rule book the catalog cites; the build issue confirms the rule book and edition. Germany: the BDS rows also cover what German law sets for the organiser; no legal limit is stated here, each is checked in the BDS text and marked verified or unverified.
+The cited rows hold the rule set's limit per division; the stage builder reads them from the event type records and does not copy them. The IPSC row on scoring hits names the Pistol Caliber Carbine rules, which are not the IPSC Handgun rule book the catalog cites; the build issue confirms the rule book and edition. Germany: the BDS rows also cover what German law sets for the organizer; no legal limit is stated here, each is checked in the BDS text and marked verified or unverified.
 
 ## Formulas
 
