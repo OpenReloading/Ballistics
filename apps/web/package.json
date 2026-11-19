@@ -34,7 +34,7 @@
     "@rangefoundry/use-cases": "workspace:*",
     "@phosphor-icons/react": "2.1.10",
     "country-flag-icons": "1.6.20",
-    "driver.js": "1.11.0",
+    "driver.js": "1.14.0",
     "echarts": "6.1.0",
     "jsqr": "1.4.0",
     "next": "16.4.6",
