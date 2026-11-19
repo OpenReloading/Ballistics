@@ -165,3 +165,43 @@ test('a changed field goes back to the record value by its own button, and the r
   expect(search.y).toBeGreaterThanOrEqual(column.y - 1)
   expect(search.y).toBeLessThan(column.y + 80)
 })
+
+for (const [d, from] of [
+  ['bullets', 'demo-bullet-168'],
+  ['cartridges', '308-win'],
+])
+  test(`from 48em to 62em the ${d} designer's record search stays under the app header and no field tabs under it (#951)`, async ({
+    page,
+  }) => {
+    await storeUnits(page)
+    await page.setViewportSize({ width: 800, height: 600 })
+    await gotoHydrated(page, `/${d}/designer?from=${from}`)
+    await expect(page.getByText(/^Started from /)).toBeVisible()
+    const fields = page.locator('.prop-form :is(input, select, textarea):visible')
+    const last = fields.last()
+    await last.focus()
+    const search = page.getByRole('combobox', { name: 'Start from a record' })
+    await expect(search).toBeInViewport()
+    // up through every field: the browser scrolls each focused one into view from above
+    for (let i = 0; i < 200; i++) {
+      const { inForm, onSearch, top, searchTop, searchBottom, headerBottom } = await page.evaluate(
+        () => {
+          const active = document.activeElement as HTMLElement
+          const start = document.querySelector('.designer-start') as HTMLElement
+          const header = document.querySelector('.mantine-AppShell-header') as HTMLElement
+          return {
+            inForm: !!active.closest('.prop-form'),
+            onSearch: !!active.closest('.designer-start'),
+            top: active.getBoundingClientRect().top,
+            searchTop: start.getBoundingClientRect().top,
+            searchBottom: start.getBoundingClientRect().bottom,
+            headerBottom: header.getBoundingClientRect().bottom,
+          }
+        },
+      )
+      if (onSearch || !inForm) break
+      expect(searchTop).toBeGreaterThanOrEqual(headerBottom - 1)
+      expect(top).toBeGreaterThanOrEqual(searchBottom - 1)
+      await page.keyboard.press('Shift+Tab')
+    }
+  })
