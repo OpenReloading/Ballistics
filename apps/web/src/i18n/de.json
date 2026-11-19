@@ -2984,6 +2984,7 @@
   "Not saved: a newer copy was kept.": "Nicht gespeichert: Die neuere Kopie wurde behalten.",
   "Saved to {file}; the browser copy failed: {error}": "In {file} gespeichert; die Browserkopie ist fehlgeschlagen: {error}",
   "Opened the shared {name}; Save keeps it.": "Geteilter Datensatz {name} geöffnet; Speichern behält ihn.",
+  "Opened the shared {name}; this browser keeps it.": "Geteilter Datensatz {name} geöffnet; dieser Browser behält ihn.",
   "{what} copied ({count} character).|{what} copied ({count} characters).": {
     "one": "{what} kopiert ({count} Zeichen).",
     "other": "{what} kopiert ({count} Zeichen)."
