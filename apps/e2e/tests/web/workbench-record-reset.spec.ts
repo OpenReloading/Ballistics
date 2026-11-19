@@ -53,15 +53,22 @@ test('Reset card gives a card all its record values back', async ({ page }) => {
   const before = [await diameter.inputValue(), await length.inputValue()]
   const open = () => page.getByRole('button', { name: 'More of Bullet' }).click()
   await open()
-  await expect(page.getByRole('button', { name: 'Reset card' })).toBeDisabled()
+  await expect(
+    page.locator('.more-fields[data-panel="bullet"]').getByRole('button', { name: 'Reset card' }),
+  ).toBeDisabled()
   await page.keyboard.press('Escape')
   await diameter.fill('7.84')
   await length.fill('31.00')
   await open()
-  await page.getByRole('button', { name: 'Reset card' }).click()
+  await page
+    .locator('.more-fields[data-panel="bullet"]')
+    .getByRole('button', { name: 'Reset card' })
+    .click()
   await expect(diameter).toHaveValue(before[0] ?? '')
   await expect(length).toHaveValue(before[1] ?? '')
-  await expect(page.getByRole('button', { name: 'Reset card' })).toBeDisabled()
+  await expect(
+    page.locator('.more-fields[data-panel="bullet"]').getByRole('button', { name: 'Reset card' }),
+  ).toBeDisabled()
 })
 
 test('a typed bore diameter leaves the record bore area, which describes the record diameter, and a reset brings it back', async ({
@@ -174,7 +181,10 @@ test('the base form and its dimensions are typed over the record, change the vol
   await expect(volume).not.toHaveValue(seated)
   await page.keyboard.press('Escape')
   await more().click()
-  await page.getByRole('button', { name: 'Reset card' }).click()
+  await page
+    .locator('.more-fields[data-panel="bullet"]')
+    .getByRole('button', { name: 'Reset card' })
+    .click()
   await expect(base).toHaveValue('boat-tail')
   expect(await settled()).toBe(seated)
 })

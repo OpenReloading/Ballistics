@@ -2,6 +2,7 @@ import { expect, type Page, test } from '@playwright/test'
 import { defined } from '../../../web/test/defined.ts'
 import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
+import { openKeeping } from './workbench.ts'
 
 const storedLoads = (page: Page) =>
   page.evaluate(async () => {
@@ -37,7 +38,7 @@ test('the primer list narrows by search', async ({ page }) => {
   await expect(page.getByRole('link', { name: /Small Pistol Lead-Free Demo/ })).toBeVisible()
 })
 
-test('a primer chosen above the cards is saved with the load and chosen again on reopening', async ({
+test('a primer chosen in the Cartridge card is saved with the load and chosen again on reopening', async ({
   page,
 }) => {
   await page.addInitScript(() => {
@@ -46,6 +47,7 @@ test('a primer chosen above the cards is saved with the load and chosen again on
   })
   await gotoHydrated(page, '/workbench?cartridge=308-win')
   const primer = page.getByRole('combobox', { name: 'Primer' })
+  await openKeeping(page)
   await primer.click()
   await page.getByRole('option', { name: 'Demo Primers Large Rifle Demo, large rifle' }).click()
   await (await barButton(page, 'Save')).click()
@@ -58,6 +60,7 @@ test('a primer chosen above the cards is saved with the load and chosen again on
   await (await barButton(page, 'Open')).click()
   await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
   await page.getByRole('button', { name, exact: true }).click()
+  await openKeeping(page)
   await expect(page.getByRole('combobox', { name: 'Primer' })).toHaveAttribute(
     'placeholder',
     'Demo Primers Large Rifle Demo, large rifle',

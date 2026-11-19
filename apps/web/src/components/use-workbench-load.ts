@@ -197,7 +197,6 @@ import {
   ladderSpec,
   maxLadderSteps,
   modelFields,
-  powderMoreFields,
   requiredModelKeys,
   type SeatingSlotName,
   seatingSlotNames,
@@ -1095,11 +1094,7 @@ function identityOf(a: {
 
 /** The card whose More popover holds an invalid field, so it opens and focus can reach the field. */
 const moreHolding = (errors: Record<string, unknown>) =>
-  powderMoreFields.some((k) => errors[k])
-    ? ('powder' as const)
-    : firearmMoreFields.some((k) => errors[k])
-      ? ('firearm' as const)
-      : undefined
+  firearmMoreFields.some((k) => errors[k]) ? ('firearm' as const) : undefined
 
 /** The values a run reads, taken once: the fields, the seated bullet and the values the seating preview wrote. */
 type RunValues = { seated: Seated; fields: Fields; previewed: Partial<Record<PreviewKey, number>> }
@@ -1815,11 +1810,11 @@ export function useWorkbenchState() {
   /** The measured case capacity typed in the Cartridge card, kept for the cartridge it was typed for. */
   const [measured, setMeasured] = useState<Fields>({ measuredWaterCapacity: emptyStep })
   const [measuredFor, setMeasuredFor] = useState<string>()
-  /** The catalogue capacity record the user chose in the pinned row, kept for the cartridge it belongs to. */
+  /** The catalogue capacity record the user chose in the Cartridge card's "Primer, brass, lots" row, kept for the cartridge it belongs to. */
   const [capacityChoice, setCapacityChoice] = useState<{ cartridge: string; id: string }>()
-  /** The catalogue case record the user chose in the pinned row, kept for the cartridge it belongs to. */
+  /** The catalogue case record the user chose in the Cartridge card's "Primer, brass, lots" row, kept for the cartridge it belongs to. */
   const [caseChoice, setCaseChoice] = useState<{ cartridge: string; id: string }>()
-  /** The id of the catalogue primer the user chose in the pinned row. */
+  /** The id of the catalogue primer the user chose in the Cartridge card's "Primer, brass, lots" row. */
   const [primerChoice, setPrimerChoice] = useState<string>()
   /** The user's cases of this browser, and the group of them the user chose for the cartridge it belongs to. */
   const [cases, setCases] = useState<OwnCase[]>([])
@@ -2335,7 +2330,7 @@ export function useWorkbenchState() {
     return 'error' in plan ? plan.error : undefined
   }
 
-  /** So focus can reach it: an invalid model parameter (on a phone), a powder field under More, a refused typed bulk density in Model parameters when the record has none. */
+  /** So focus can reach it: an invalid model parameter (on a phone), a gun field under More, a refused typed bulk density in Model parameters when the record has none. */
   function revealInvalid(errors: Record<string, unknown>, refused: string | undefined) {
     if (modelFields.some((k) => errors[k]) || refused === 'bulkDensity') setModelShown(true)
     const holding = moreHolding(errors)
@@ -2504,7 +2499,6 @@ export function useWorkbenchState() {
     // engraving values that need each other: the empty one shows the message
     if (err instanceof ValueError) {
       form.setFieldError(err.field, refusalText(err))
-      if ((powderMoreFields as readonly string[]).includes(err.field)) setMore('powder')
       if ((firearmMoreFields as readonly string[]).includes(err.field)) setMore('firearm')
     }
     setOutcome(undefined)
