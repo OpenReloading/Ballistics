@@ -1,10 +1,10 @@
 import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
-import { gotoHydrated } from './nav.ts'
+import { followNav, gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
 
-// The bullet and cartridge designers and the brass group editor keep every change in the browser, as the powder and target designers do: a reload loses nothing, and New asks nothing. Metric (SI): lengths in mm
+// The bullet and cartridge designers and the brass group editor keep every change in the browser, as the powder and target designers do: a reload loses nothing, and New, Open and leaving ask only before an edit the browser does not keep goes. Metric (SI): lengths in mm
 test.beforeEach(({ page }) => storeUnits(page))
 
 const state = (page: Page) => page.locator('.file-state')
@@ -35,6 +35,39 @@ test('the bullet designer keeps the draft through a reload, and New starts a bla
   await name(page).fill('Kept 175')
   await (await barButton(page, 'New bullet')).click()
   await expect(name(page)).toHaveValue('')
+})
+
+/** How many records of `kind` the browser holds. */
+const count = (page: Page, kind: string) =>
+  page.evaluate(
+    (kind) =>
+      new Promise<number>((ok, no) => {
+        const open = indexedDB.open('rangefoundry-user-data')
+        open.onerror = () => no(open.error)
+        open.onsuccess = () => {
+          const all = open.result.transaction('records').objectStore('records').getAll()
+          all.onsuccess = () => ok(all.result.filter((r) => r.kind === kind).length)
+        }
+      }),
+    kind,
+  )
+
+test('a bullet started from a catalogue link is kept only from its first edit, also after a reload', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/bullets/designer')
+  await putRecords(page, [])
+  const link = '/bullets/designer?from=demo-bullet-168'
+  await gotoHydrated(page, link)
+  await expect(name(page)).toHaveValue('30 Cal 168 gr HPBT Demo')
+  await gotoHydrated(page, link)
+  await expect(name(page)).toHaveValue('30 Cal 168 gr HPBT Demo')
+  // New writes a draft not yet written: the started bullet, had it counted as an edit
+  await (await barButton(page, 'New bullet')).click()
+  await expect(name(page)).toHaveValue('')
+  await name(page).fill('Edited 168')
+  await expect(state(page)).toHaveText('Saved in this browser')
+  expect(await count(page, 'bullet')).toBe(1)
 })
 
 test('the cartridge designer keeps the draft through a reload', async ({ page }) => {
@@ -100,4 +133,42 @@ test('the brass group editor keeps an edit of a stored group through a reload', 
   await openKept(page, 'brass groups', 'Lot 7')
   await expect(notes).toHaveValue('Annealed')
   await expect(capacity).toHaveValue('3.55')
+})
+
+test('the brass group editor asks before New drops an edit the browser does not keep', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/cases/editor')
+  await putRecords(page, [
+    {
+      kind: 'case',
+      id: caseId,
+      name: 'Lot 7',
+      saved: '2026-10-26T10:00:00.000Z',
+      data: { origin: 'user', name: 'Lot 7', cartridge: 'catalogue:308-win', material: 'brass' },
+    },
+  ])
+  await gotoHydrated(page, '/cases/editor')
+  await openKept(page, 'brass groups', 'Lot 7')
+  await expect(name(page)).toHaveValue('Lot 7')
+  const notes = page.getByRole('textbox', { name: 'Notes' })
+  // a group without a name is not a record: the note is not kept
+  await name(page).fill('')
+  await notes.fill('Annealed')
+  await expect(state(page)).toHaveText('Not saved in this browser')
+  await (await barButton(page, 'New brass group')).click()
+  await page
+    .getByRole('dialog', { name: /^Discard the unsaved changes/ })
+    .getByRole('button', { name: 'Cancel', exact: true })
+    .click()
+  await expect(notes).toHaveValue('Annealed')
+})
+
+test('the brass group editor asks before a new group without a cartridge is left', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/cases/editor')
+  await name(page).fill('Lot 8')
+  await followNav(page, 'Database')
+  await expect(page.getByRole('dialog', { name: /^Leave this page\?/ })).toBeVisible()
 })

@@ -125,6 +125,7 @@ export function CaseGroupEditor() {
     setCapacity(m3)
     setNameLeft(false)
     setGeneration((g) => g + 1)
+    setFailure((f) => (f === notKept ? undefined : f))
   }
   // the capacity record is read at the open: a link opens before any earlier read of the store is back
   const onOpen = async (d: Case, _name: string, record: { id: string }) => {
@@ -168,9 +169,11 @@ export function CaseGroupEditor() {
           <>
             <Button
               variant="default"
-              onClick={() => {
+              onClick={async () => {
+                const blank = blankCaseGroup()
+                if (!(await menu.current?.startNew(blank))) return
                 flush()
-                show(newId(), blankCaseGroup(), undefined, false)
+                show(newId(), blank, undefined, false)
               }}
             >
               {t('New brass group')}
@@ -182,7 +185,7 @@ export function CaseGroupEditor() {
               data={fileData}
               autosaved={recordId}
               browserList
-              kept={groupKey === draft.key ? kept : 'failed'}
+              kept={groupKey === draft.key && failure !== notKept ? kept : 'failed'}
               problem={problem}
               idle={false}
               store={store}

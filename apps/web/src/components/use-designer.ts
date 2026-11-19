@@ -88,7 +88,7 @@ export function useDesigner<D, A extends { type: string }, K extends UserRecord[
     () => userRecord.safeParse({ kind, id: recordId, name: kind, saved: epoch, data }).success,
     [kind, recordId, data],
   )
-  // the record format refuses some values a field holds while typed (a zero diameter): the last valid draft stays kept
+  // the record format refuses some values a field holds while typed: the last valid draft stays kept
   const [draft, setDraft] = useState<Draft<K>>(() => ({ data, key, name: setup.draftName(design) }))
   if (valid && key !== draft.key) setDraft(() => ({ data, key, name: setup.draftName(design) }))
   const { kept, flush, drop, stored } = useKeptDraft<K>(
@@ -110,14 +110,25 @@ export function useDesigner<D, A extends { type: string }, K extends UserRecord[
     [flush, stored],
   )
 
-  /** Starts the designer on `design` as a new record, kept at once. */
-  const begin = useCallback(
-    async (design: D) => {
-      renew(blankKey)
-      dispatch(asAction<D, A>({ type: 'start', design }))
+  /** Shows `next` as a new record, kept once its key differs from `from`, after the File menu's question when an edit not kept would go; false when the user keeps it. */
+  const startNew = useCallback(
+    (next: D, from: string, show: () => void) => {
+      const then = () => {
+        renew(from)
+        show()
+      }
+      if (fileMenu.current) return fileMenu.current.startNew(fileData(next), then)
+      then()
       return true
     },
-    [renew, blankKey],
+    [renew, fileData],
+  )
+
+  /** Starts the designer on `design` as a new record, kept at once. */
+  const begin = useCallback(
+    async (design: D) =>
+      startNew(design, blankKey, () => dispatch(asAction<D, A>({ type: 'start', design }))),
+    [startNew, blankKey],
   )
   const start = useCallback(
     async (id: string) => {
@@ -130,13 +141,16 @@ export function useDesigner<D, A extends { type: string }, K extends UserRecord[
           setLoading(design as Message)
           return
         }
-        await begin(design)
+        // a catalogue design is kept from its first edit: a reload of its link adds no record
+        await startNew(design, keyOf(design), () =>
+          dispatch(asAction<D, A>({ type: 'start', design })),
+        )
         setLoading(undefined)
       } catch {
         setLoading(failText)
       }
     },
-    [system, begin],
+    [system, startNew, keyOf],
   )
   // a record page's "Start a new ... from this one" link
   useEffect(() => {
@@ -163,10 +177,11 @@ export function useDesigner<D, A extends { type: string }, K extends UserRecord[
   /** The toolbar's dispatch: New starts a new record. */
   const toolbarDispatch = useCallback(
     (a: A) => {
-      if (a.type === 'new') renew(keyOf(reduce(current.current, a).present))
-      dispatch(a)
+      if (a.type !== 'new') return dispatch(a)
+      const next = reduce(current.current, a).present
+      startNew(next, keyOf(next), () => dispatch(a))
     },
-    [renew, keyOf, reduce],
+    [startNew, keyOf, reduce],
   )
 
   return {
