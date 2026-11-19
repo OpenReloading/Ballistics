@@ -91,8 +91,14 @@ export interface ManufacturerUse {
   uses: number
 }
 
-/** The `user:<id>` references of the records open in a page; Settings counts each as in use. */
-export const shownManufacturerRefs = new Map<object, string>()
+/** A `user:<id>` reference of a record open in a page, with the id the browser keeps that record under, if any. */
+interface ShownRef {
+  ref: string
+  record?: string | undefined
+}
+
+/** The references of the records open in a page; Settings counts each as in use. */
+export const shownManufacturerRefs = new Map<object, ShownRef>()
 
 /** Fired on `window` after Settings deleted or restored a user manufacturer, for the fields' lists to read the store again. */
 export const manufacturersChanged = 'user-manufacturers-changed'
@@ -101,14 +107,19 @@ export const manufacturersChanged = 'user-manufacturers-changed'
 export function manufacturerUses(
   records: readonly UserRecord[],
   invalid: readonly InvalidRecord[],
-  shown: Iterable<string> = shownManufacturerRefs.values(),
+  shown: Iterable<ShownRef> = shownManufacturerRefs.values(),
 ): ManufacturerUse[] {
   // with no manufacturer record in the set, every reference to one is reported as dangling
   const named = new Map<string, number>()
+  const counted = new Set<string>()
   const count = (ref: string) => named.set(ref, (named.get(ref) ?? 0) + 1)
   for (const d of checkUserRefs(records.filter((r) => r.kind !== 'manufacturer')))
-    if (d.field === 'manufacturer' || d.field === 'caseManufacturer') count(d.target)
-  for (const ref of shown) count(ref)
+    if (d.field === 'manufacturer' || d.field === 'caseManufacturer') {
+      count(d.target)
+      counted.add(`${d.record}\n${d.target}`)
+    }
+  // a page that keeps its record in the browser shows a reference the stored record already counts
+  for (const { ref, record } of shown) if (!counted.has(`${record}\n${ref}`)) count(ref)
   const raw = invalid.map((i) => JSON.stringify(i.raw))
   return records
     .filter((r) => r.kind === 'manufacturer' && userIdRegex.test(r.id))

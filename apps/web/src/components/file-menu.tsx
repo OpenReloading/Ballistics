@@ -366,7 +366,7 @@ function guardLeaving(say: (said: Said) => void, language: () => Translator['t']
 /** What the page offers a share link: the record, and how it is opened, kept and reported. */
 interface SharedLink<K extends UserRecordKind> {
   unsaved: () => boolean
-  open: (record: Of<K>, parsed: ParsedUserFile) => void
+  open: (record: Of<K>, parsed: ParsedUserFile) => Promise<void>
   carry: (record: Of<K>, records: UserRecord[]) => void
   say: (said: Said) => void
   fail: (said: Said) => void
@@ -412,7 +412,7 @@ async function openSharedLink<K extends UserRecordKind>(
     return
   const kept = await keepMakers(r, p.records)
   page.carry(r, p.records)
-  page.open(r, p)
+  await page.open(r, p)
   if (!kept) page.fail(plain(noMaker))
 }
 
@@ -1003,9 +1003,9 @@ function FileMenuOf<K extends UserRecordKind>({
   useEffect(() => {
     if (!shownMaker) return
     const key = {}
-    shownManufacturerRefs.set(key, `user:${shownMaker}`)
+    shownManufacturerRefs.set(key, { ref: `user:${shownMaker}`, record: autosaved })
     return () => void shownManufacturerRefs.delete(key)
-  }, [shownMaker])
+  }, [shownMaker, autosaved])
 
   // a share link opens on load and when pasted into this tab (a fragment change, no reload)
   useEffect(() => {
@@ -1204,8 +1204,20 @@ function FileMenuOf<K extends UserRecordKind>({
     }
   }
 
-  /** A shared record: a new id, no file, unsaved until saved. */
-  function openShared(record: Of<K>, parsed: ParsedUserFile) {
+  /** A shared record: a new id, no file, unsaved until saved; a page that keeps every change keeps it at once. */
+  async function openShared(shared: Of<K>, parsed: ParsedUserFile) {
+    // the sender's id would overwrite a record of the same id
+    const record = autosaved ? { ...shared, id: newId() } : shared
+    if (autosaved) {
+      try {
+        await putRecords([record])
+      } catch (e) {
+        return setFailure(({ t }) =>
+          t('Shared link not opened: {reason}', { reason: errorText(e) }),
+        )
+      }
+      onStored?.()
+    }
     onOpen(record.data as Of<K>['data'], record.name, record)
     id.current = undefined
     handle.current = undefined
@@ -1213,10 +1225,11 @@ function FileMenuOf<K extends UserRecordKind>({
     setSaved(undefined)
     // not the canonical text of any record: the shared record counts as unsaved work
     initial.current = ''
+    const opened = autosaved
+      ? msg('Opened the shared {name}; this browser keeps it.')
+      : msg('Opened the shared {name}; Save keeps it.')
     setMessage(({ t }) =>
-      [t('Opened the shared {name}; Save keeps it.', { name: record.name }), readNote(parsed, t)]
-        .filter(Boolean)
-        .join(' '),
+      [t(opened, { name: record.name }), readNote(parsed, t)].filter(Boolean).join(' '),
     )
   }
 

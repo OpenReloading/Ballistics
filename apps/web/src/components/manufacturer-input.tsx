@@ -1,7 +1,7 @@
 'use client'
 
 import { Autocomplete } from '@mantine/core'
-import { memo, useRef, useState } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import type { useManufacturers } from './use-manufacturers.ts'
 
@@ -11,11 +11,14 @@ export const ManufacturerInput = memo(function ManufacturerInput({
   value,
   onChange,
   manufacturers: { known, ready, retry, preview, ensure, newId, nameOf },
+  autosaved = false,
 }: {
   label: string
   value: string | undefined
   onChange: (ref: string | undefined) => void
   manufacturers: ReturnType<typeof useManufacturers>
+  /** The page keeps its record in the browser on every change: a name typed is also stored when the page is hidden or the field goes. */
+  autosaved?: boolean
 }) {
   const { t } = useTranslation()
   // undefined: not being edited, the field shows the name of `value`
@@ -48,6 +51,22 @@ export const ManufacturerInput = memo(function ManufacturerInput({
     if (!kept) setTyped(undefined)
     if (ref !== value) onChange(ref)
   }
+  const leaving = useRef({ typed, commit })
+  leaving.current = { typed, commit }
+  // a page that keeps its record in the browser on every change keeps the reference typed: its manufacturer record goes into the store too
+  useEffect(() => {
+    if (!autosaved) return
+    const leave = () => {
+      const { typed, commit } = leaving.current
+      if (typed !== undefined) void commit(typed)
+    }
+    const hidden = () => document.visibilityState === 'hidden' && leave()
+    document.addEventListener('visibilitychange', hidden)
+    return () => {
+      document.removeEventListener('visibilitychange', hidden)
+      leave()
+    }
+  }, [autosaved])
   return (
     <Autocomplete
       label={label}

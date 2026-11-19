@@ -311,22 +311,38 @@ export function BulletDesigner() {
   const { t } = useTranslation()
   const manufacturers = useManufacturers()
   const reloadManufacturers = manufacturers.reload
-  const { system, history, design, dispatch, loading, fileMenu, start, begin, toolbarDispatch } =
-    useDesigner<Design, Action>({
-      reduce,
-      init: newDesign,
-      kind: 'bullet',
-      fileData,
-      load: async (id, system) => {
-        const record = await fetchRecord<Bullet>('bullets', id)
-        if (!record) throw new Error('No such bullet')
-        // without names the design starts with an empty manufacturer
-        const names = await fetchManufacturerNames().catch(() => noManufacturerNames)
-        return fromRecord(record, system, names)
-      },
-      loadingText: msg('Loading the bullet…'),
-      failText: msg('The bullet could not be loaded. The designer still works.'),
-    })
+  const labelOf = (d: Design) =>
+    productLabel({ name: d.name, manufacturerName: manufacturers.nameOf(d.manufacturer) })
+  const {
+    system,
+    history,
+    design,
+    loading,
+    fileMenu,
+    dispatch,
+    start,
+    begin,
+    opened,
+    recordId,
+    kept,
+    toolbarDispatch,
+  } = useDesigner<Design, Action, 'bullet'>({
+    reduce,
+    init: newDesign,
+    kind: 'bullet',
+    fileData,
+    draftName: labelOf,
+    fallbackName: 'New bullet',
+    load: async (id, system) => {
+      const record = await fetchRecord<Bullet>('bullets', id)
+      if (!record) throw new Error('No such bullet')
+      // without names the design starts with an empty manufacturer
+      const names = await fetchManufacturerNames().catch(() => noManufacturerNames)
+      return fromRecord(record, system, names)
+    },
+    loadingText: msg('Loading the bullet…'),
+    failText: msg('The bullet could not be loaded. The designer still works.'),
+  })
 
   const [photoOpen, setPhotoOpen] = useState(false)
   const photoButton = useRef<HTMLButtonElement>(null)
@@ -396,8 +412,6 @@ export function BulletDesigner() {
     </div>
   )
 
-  const labelOf = (d: Design) =>
-    productLabel({ name: d.name, manufacturerName: manufacturers.nameOf(d.manufacturer) })
   const title = t('Outline, {name}', { name: labelOf(design) || t('new bullet') })
   const { assumed, notes: drawn } = drawingNotes(drawing, t)
   const notes = design.photo ? [...drawn, ...photoText(design.photo, system, t)] : drawn
@@ -411,16 +425,16 @@ export function BulletDesigner() {
   const fileDesign = useDeferredValue(design)
   const fileValue = useMemo(() => fileData(fileDesign), [fileDesign])
   const openFile = useCallback(
-    async (d: UserBullet) => {
+    async (d: UserBullet, _name: string, record: { id: string }) => {
       const [resolved, names] = await Promise.all([
         resolveBullet(d),
         fetchManufacturerNames().catch(() => noManufacturerNames),
       ])
-      dispatch({ type: 'start', design: fromUser(d, resolved, system, names) })
+      opened(record.id, fromUser(d, resolved, system, names))
       // the opened record may have brought its manufacturer along
       void reloadManufacturers()
     },
-    [system, dispatch, reloadManufacturers],
+    [system, opened, reloadManufacturers],
   )
 
   const toolbar = (
@@ -450,6 +464,9 @@ export function BulletDesigner() {
         kind="bullet"
         name={labelOf(fileDesign) || 'New bullet'}
         data={fileValue}
+        autosaved={recordId}
+        browserList
+        kept={kept}
         problem={fileDesign.locked?.reason}
         onOpen={openFile}
         reportBox={t('Include the design')}
@@ -477,6 +494,7 @@ export function BulletDesigner() {
                     value={design.manufacturer}
                     manufacturers={manufacturers}
                     onChange={(value) => dispatch({ type: 'manufacturer', value })}
+                    autosaved
                   />
                   <TextField k="name" label={t('Name')} value={design.name} dispatch={dispatch} />
                 </div>
