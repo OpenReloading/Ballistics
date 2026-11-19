@@ -37,20 +37,25 @@ test('the bullet designer keeps the draft through a reload, and New starts a bla
   await expect(name(page)).toHaveValue('')
 })
 
-/** How many records of `kind` the browser holds. */
-const count = (page: Page, kind: string) =>
+type Kept = { id: string; kind: string; data: { note?: string; waterCapacity?: { value: number } } }
+
+/** The records the browser holds. */
+const records = (page: Page) =>
   page.evaluate(
-    (kind) =>
-      new Promise<number>((ok, no) => {
+    () =>
+      new Promise<Kept[]>((ok, no) => {
         const open = indexedDB.open('rangefoundry-user-data')
         open.onerror = () => no(open.error)
         open.onsuccess = () => {
           const all = open.result.transaction('records').objectStore('records').getAll()
-          all.onsuccess = () => ok(all.result.filter((r) => r.kind === kind).length)
+          all.onsuccess = () => ok(all.result)
         }
       }),
-    kind,
   )
+
+/** How many records of `kind` the browser holds. */
+const count = async (page: Page, kind: string) =>
+  (await records(page)).filter((r) => r.kind === kind).length
 
 test('a bullet started from a catalogue link is kept only from its first edit, also after a reload', async ({
   page,
@@ -85,29 +90,18 @@ test('the cartridge designer keeps the draft through a reload', async ({ page })
 const caseId = '3e5a7c90-2b4d-4f61-8a3c-5d7e9f1a2b4c'
 
 /** The note of the stored group `caseId` and the water capacities (g) of the stored capacity records. */
-const stored = (page: Page) =>
-  page.evaluate(
-    (id) =>
-      new Promise<{ note?: string; capacities: number[] }>((ok, no) => {
-        const open = indexedDB.open('rangefoundry-user-data')
-        open.onerror = () => no(open.error)
-        open.onsuccess = () => {
-          const all = open.result.transaction('records').objectStore('records').getAll()
-          all.onsuccess = () =>
-            ok({
-              note: all.result.find((r) => r.id === id)?.data.note,
-              capacities: all.result
-                .filter((r) => r.kind === 'caseCapacity')
-                .map((r) => r.data.waterCapacity.value),
-            })
-        }
-      }),
-    caseId,
-  )
+const stored = async (page: Page) => {
+  const all = await records(page)
+  return {
+    note: all.find((r) => r.id === caseId)?.data.note,
+    capacities: all
+      .filter((r) => r.kind === 'caseCapacity')
+      .map((r) => r.data.waterCapacity?.value),
+  }
+}
 
-test('the brass group editor keeps an edit of a stored group through a reload', async ({
-  page,
-}) => {
+/** Stores the brass group Lot 7 and opens it in the brass group editor. */
+async function openLot7(page: Page) {
   await gotoHydrated(page, '/cases/editor')
   await putRecords(page, [
     {
@@ -122,6 +116,12 @@ test('the brass group editor keeps an edit of a stored group through a reload', 
   await openKept(page, 'brass groups', 'Lot 7')
   // the opened group remounts the form
   await expect(name(page)).toHaveValue('Lot 7')
+}
+
+test('the brass group editor keeps an edit of a stored group through a reload', async ({
+  page,
+}) => {
+  await openLot7(page)
   const notes = page.getByRole('textbox', { name: 'Notes' })
   const capacity = page.getByRole('textbox', { name: /^Water capacity/ })
   await notes.fill('Annealed')
@@ -138,19 +138,7 @@ test('the brass group editor keeps an edit of a stored group through a reload', 
 test('the brass group editor asks before New drops an edit the browser does not keep', async ({
   page,
 }) => {
-  await gotoHydrated(page, '/cases/editor')
-  await putRecords(page, [
-    {
-      kind: 'case',
-      id: caseId,
-      name: 'Lot 7',
-      saved: '2026-10-26T10:00:00.000Z',
-      data: { origin: 'user', name: 'Lot 7', cartridge: 'catalogue:308-win', material: 'brass' },
-    },
-  ])
-  await gotoHydrated(page, '/cases/editor')
-  await openKept(page, 'brass groups', 'Lot 7')
-  await expect(name(page)).toHaveValue('Lot 7')
+  await openLot7(page)
   const notes = page.getByRole('textbox', { name: 'Notes' })
   // a group without a name is not a record: the note is not kept
   await name(page).fill('')
