@@ -1,12 +1,13 @@
 'use client'
 
-import { Button, Tooltip } from '@mantine/core'
-import { ArrowsLeftRight, X } from '@phosphor-icons/react'
-import { useId } from 'react'
+import { Button, Popover, Tooltip } from '@mantine/core'
+import { ArrowsLeftRight, EyeSlash, X } from '@phosphor-icons/react'
+import { useEffect, useId, useRef } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { togglePick } from '../lib/selection.ts'
 import { controlSize } from '../lib/theme.ts'
+import { AppPopover, popoverWidth } from './app-popover.tsx'
 import { focusSearch } from './directory-table.tsx'
 
 /** In the order ticked, at most `max`, kept in the URL as `pick`; ids that `known` does not hold are left out. */
@@ -16,23 +17,43 @@ export function usePicks(
   onChange: (pick: string) => void,
   known: (id: string) => boolean,
 ) {
-  const picked = (pick ?? '')
-    .split(',')
-    .filter((id) => id && known(id))
-    .slice(0, max)
+  const picked = [...new Set((pick ?? '').split(','))].filter((id) => id && known(id)).slice(0, max)
   const toggle = (id: string) => onChange(togglePick(picked, id, max).join(','))
   const replace = (ids: readonly string[]) => onChange(ids.join(','))
   return [picked, toggle, replace] as const
 }
 
-/** One line of fixed height, so a pick moves nothing. */
+/** A pick the search or a filter hides, named as its row. */
+export type HiddenPick = { id: string; label: string }
+
+/** The picks not among the `shown` rows, in the order ticked. */
+export function hiddenPicks<T extends { id: string }>(
+  picked: readonly string[],
+  shown: readonly T[],
+  items: readonly T[],
+  label: (row: T) => string,
+): HiddenPick[] {
+  if (picked.length === 0) return []
+  const seen = new Set(shown.map((r) => r.id))
+  const rows = new Map(items.map((r) => [r.id, r]))
+  return picked.flatMap((id) => {
+    const row = rows.get(id)
+    return row && !seen.has(id) ? [{ id, label: label(row) }] : []
+  })
+}
+
+/** One line of fixed height, so a pick moves nothing; `hidden` opens a list of the picks the rows do not show, each with its untick. */
 export function SelectionSummary({
   count,
   max,
+  hidden,
+  onUntick,
   onClear,
 }: {
   count: number
   max: number
+  hidden: readonly HiddenPick[]
+  onUntick: (id: string) => void
   onClear: () => void
 }) {
   const { t } = useTranslation()
@@ -43,10 +64,20 @@ export function SelectionSummary({
   }
   return (
     <span className="selection-summary" data-picked={count > 0 || undefined}>
-      {/* only the text is live: the button is no news */}
+      {/* only the text is live: the buttons are no news */}
       <span aria-live="polite" className="selection-count">
-        {count > 0 && t('{count} selected (max {max})', { count, max })}
+        {count > 0 && (
+          <>
+            <span className="selection-count-short" aria-hidden="true">
+              {t('{count} selected', { count })}
+            </span>
+            <span className="selection-count-text">
+              {t('{count} selected (max {max})', { count, max })}
+            </span>
+          </>
+        )}
       </span>
+      {hidden.length > 0 && <HiddenPicks hidden={hidden} onUntick={onUntick} />}
       {count > 0 && (
         <Button
           className="clear-picks"
@@ -61,6 +92,74 @@ export function SelectionSummary({
         </Button>
       )}
     </span>
+  )
+}
+
+function HiddenPicks({
+  hidden,
+  onUntick,
+}: {
+  hidden: readonly HiddenPick[]
+  onUntick: (id: string) => void
+}) {
+  const { t } = useTranslation()
+  const title = useId()
+  const list = useRef<HTMLUListElement>(null)
+  // the row of the untick just clicked: its button goes, the focus moves to the one now in its place
+  const next = useRef<number | null>(null)
+  useEffect(() => {
+    const at = next.current
+    if (at === null) return
+    next.current = null
+    const buttons = list.current?.querySelectorAll('button')
+    buttons?.[Math.min(at, buttons.length - 1)]?.focus()
+  }, [hidden.length])
+  const untick = (id: string, at: number) => {
+    onUntick(id)
+    // the last one takes the list and its button along, as Clear does the picks
+    if (hidden.length === 1) focusSearch()
+    else next.current = at
+  }
+  return (
+    <AppPopover position="bottom-start" width={popoverWidth.help} trapFocus>
+      <Popover.Target>
+        <Button
+          className="hidden-picks"
+          variant="subtle"
+          size={controlSize.row.button}
+          px={6}
+          aria-haspopup="dialog"
+          leftSection={<EyeSlash size={12} aria-hidden="true" />}
+        >
+          <span className="hidden-picks-count" aria-hidden="true">
+            {hidden.length}
+          </span>
+          <span className="hidden-picks-text">{t('{count} hidden', { count: hidden.length })}</span>
+        </Button>
+      </Popover.Target>
+      <Popover.Dropdown aria-labelledby={title}>
+        <p id={title} className="hidden-picks-title">
+          {t('Hidden by the search or a filter')}
+        </p>
+        <ul ref={list} className="hidden-picks-list">
+          {hidden.map((p, at) => (
+            <li key={p.id}>
+              <span>{p.label}</span>
+              <Button
+                variant="subtle"
+                size={controlSize.row.button}
+                px={6}
+                aria-label={t('Untick {name}', { name: p.label })}
+                leftSection={<X size={12} aria-hidden="true" />}
+                onClick={() => untick(p.id, at)}
+              >
+                {t('Untick')}
+              </Button>
+            </li>
+          ))}
+        </ul>
+      </Popover.Dropdown>
+    </AppPopover>
   )
 }
 
