@@ -673,12 +673,20 @@ _Avoid_: `step`, `steps` (of a ladder)
 `sessions`: the references (`user:<UUID>` or `catalogue:<id>`) of the chronograph sessions the Measurements tab shows for a load, in the order shown.
 
 **Firearm**:
-A firearm, one shape for every origin, in stored units (mm, g, degrees; the zero air in degC, bar and %). The user record of kind `firearm` holds `origin`, `name`, `manufacturer` (a reference), `model`, `cartridge` (a reference), `barrelLength`, `twist`, `twistHand`, `grooveDiameter`, `boreDiameter`, `freebore`, `baseToOgiveAtLands`, `firearmMass`, `roundCount`, `roundCountDate` (the day the count was last set), `countedSessions` (the rounds added to the count per chronograph session or competition event, so each is counted once), `notes`, `optics`, `configurations`, `active` (the configuration on the firearm now). A workbench state names one by its local id in `firearm`, a load by a reference.
+A firearm, one shape for every origin, in stored units (mm, g, degrees; the zero air in degC, bar and %). The user record of kind `firearm` holds `origin`, `name`, `manufacturer` (a reference), `model`, `cartridge` (a reference), `barrelLength`, `barrelLengthFrom`, `cylinderGap`, `twist`, `twistHand`, `grooveDiameter`, `boreDiameter`, `freebore`, `baseToOgiveAtLands`, `firearmMass`, `roundCount`, `roundCountDate` (the day the count was last set), `countedSessions` (the rounds added to the count per chronograph session or competition event, so each is counted once), `notes`, `optics`, `configurations`, `active` (the configuration on the firearm now). A workbench state names one by its local id in `firearm`, a load by a reference.
 _Avoid_: rifle, gun
 
 **Firearm action**:
-`action` of a firearm record: `rifle`, `pistol` or `revolver`, optional (absent: not stated). It says what kind of firearm it is where a model needs it: a revolver has a gap between cylinder and barrel, which the powder fit's revolver note reads. German UI: Art der Schusswaffe (Gewehr, Pistole, Revolver).
+`action` of a firearm record: `rifle`, `pistol` or `revolver`, optional (absent: not stated). It says what kind of firearm it is where a model needs it: a revolver has a gap between cylinder and barrel, which the powder fit's revolver note reads, and only a revolver takes `barrelLengthFrom` and `cylinderGap`. German UI: Art der Schusswaffe (Gewehr, Pistole, Revolver).
 _Avoid_: type, kind (of a firearm)
+
+**Barrel length from**:
+`barrelLengthFrom` of a revolver firearm: `breechFace` or `forcingCone`, optional (absent: the breech face). From the forcing cone, the bullet travel adds the cylinder run, the cylinder face plus the cylinder gap. German UI: Lauflänge gemessen ab (Stoßboden, Übergangskonus).
+_Avoid_: barrel reference
+
+**Cylinder gap**:
+`cylinderGap`: gap between the cylinder face and the barrel of a revolver firearm, mm. The gas leaks through it from where the bullet base leaves the cylinder, at the larger of L6 and COAL. German UI: Trommelspalt.
+_Avoid_: barrel-cylinder gap, b/c gap
 
 **Freebore**:
 `freebore`: unrifled length of the throat from the case mouth to the start of the rifling, mm, on a firearm.

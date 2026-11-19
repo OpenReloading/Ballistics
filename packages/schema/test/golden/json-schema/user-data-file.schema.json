@@ -4865,6 +4865,34 @@
                     "unit": "mm",
                     "description": "Barrel length."
                   },
+                  "barrelLengthFrom": {
+                    "type": "string",
+                    "enum": [
+                      "breechFace",
+                      "forcingCone"
+                    ],
+                    "description": "Where `barrelLength` is measured from: the breech face, or the forcing cone of a revolver barrel. Absent: the breech face."
+                  },
+                  "cylinderGap": {
+                    "type": "object",
+                    "properties": {
+                      "value": {
+                        "type": "number",
+                        "minimum": 0,
+                        "description": "In mm."
+                      },
+                      "raw": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "The value as written in the source, when it differed."
+                      }
+                    },
+                    "required": [
+                      "value"
+                    ],
+                    "unit": "mm",
+                    "description": "Gap between the cylinder face and the barrel of a revolver."
+                  },
                   "twist": {
                     "type": "object",
                     "properties": {

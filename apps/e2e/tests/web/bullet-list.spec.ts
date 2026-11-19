@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test'
+import { expect, type Locator, test } from '@playwright/test'
+import { showGerman } from './german.ts'
 import { gotoHydrated } from './nav.ts'
 
 // The bullet list's filters by construction, tip and base, kept in the URL, and its picks for Compare; the filter values, counts and the leaving out of a one-value filter are Vitest tests (`apps/web/test/directory.test.ts`).
@@ -84,3 +85,82 @@ test("a phone's page bar keeps its height with picks", async ({ page }) => {
   await expect(bar.getByText('2 selected (max 4)')).toBeVisible()
   expect(await height()).toBe(before)
 })
+
+for (const { list, width, query, pick, shownLabel, hiddenLabels } of [
+  {
+    list: 'bullets',
+    width: 390,
+    query: '168',
+    pick: 'demo-bullet-224-55,demo-bullet-150,demo-bullet-168',
+    shownLabel: /30 Cal 168 gr HPBT Demo/,
+    hiddenLabels: [/22 Cal 55 gr FMJ Boat Tail Demo/, /30 Cal 150 gr Flat Base Demo/],
+  },
+  {
+    list: 'bullets',
+    width: 1280,
+    query: '168',
+    pick: 'demo-bullet-224-55,demo-bullet-150,demo-bullet-168',
+    shownLabel: /30 Cal 168 gr HPBT Demo/,
+    hiddenLabels: [/22 Cal 55 gr FMJ Boat Tail Demo/, /30 Cal 150 gr Flat Base Demo/],
+  },
+  {
+    list: 'powders',
+    width: 390,
+    query: 'dp40',
+    pick: 'demo-powder-dp15,demo-powder-dp70,demo-powder-dp40',
+    shownLabel: /DP40/,
+    hiddenLabels: [/DP15/, /DP70/],
+  },
+]) {
+  test(`at ${width} px the ${list} the search hides are listed under "hidden" and unticked there (#866)`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 800 })
+    await gotoHydrated(page, `/${list}?q=${query}&pick=${pick}`)
+    const bar = page.locator('.page-bar')
+    const status = bar.locator('.page-bar-status')
+    await expect(status.getByText('3 selected (max', { exact: false })).toBeVisible()
+    const hidden = status.getByRole('button', { name: '2 hidden' })
+    expect(
+      await clipped(status, hidden, status.getByRole('button', { name: 'Clear selection' })),
+    ).toEqual([])
+    await hidden.click()
+    const dialog = page.getByRole('dialog', { name: 'Hidden by the search or a filter' })
+    await expect(dialog.getByRole('listitem')).toHaveText(hiddenLabels)
+    await dialog
+      .getByRole('button', { name: /^Untick / })
+      .first()
+      .click()
+    await expect(status.getByText('2 selected (max', { exact: false })).toBeVisible()
+    await expect(page).toHaveURL(new RegExp(`[?&]pick=${pick.split(',').slice(1).join('(%2C|,)')}`))
+    // the focus goes to the untick now in its place
+    await expect(dialog.getByRole('button', { name: /^Untick / })).toBeFocused()
+    await page.keyboard.press('Enter')
+    await expect(status.getByText('1 selected (max', { exact: false })).toBeVisible()
+    await expect(status.getByRole('button', { name: /hidden$/ })).toHaveCount(0)
+    await expect(page.getByRole('checkbox', { name: shownLabel })).toBeChecked()
+    await expect(page.getByRole('searchbox', { name: 'Search' })).toBeFocused()
+  })
+}
+
+test('at 320 px in German, Clear stays whole in the status line beside the hidden picks (#866)', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 700 })
+  await gotoHydrated(page, '/bullets?q=168&pick=demo-bullet-224-55,demo-bullet-150,demo-bullet-168')
+  await showGerman(page)
+  const status = page.locator('.page-bar .page-bar-status')
+  const clear = status.getByRole('button', { name: 'Auswahl aufheben' })
+  await expect(clear).toBeVisible()
+  expect(
+    await clipped(status, status.getByRole('button', { name: '2 ausgeblendet' }), clear),
+  ).toEqual([])
+})
+
+/** The buttons whose right edge the status line, which clips what does not fit, cuts off. */
+async function clipped(line: Locator, ...buttons: Locator[]) {
+  const box = await line.boundingBox()
+  const right = (box?.x ?? 0) + (box?.width ?? 0)
+  const edges = await Promise.all(buttons.map(async (b) => [b, await b.boundingBox()] as const))
+  return edges.filter(([, b]) => !b || b.x + b.width > right).map(([b]) => b.toString())
+}
