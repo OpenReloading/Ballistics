@@ -35,7 +35,7 @@ import {
   originNames,
   readOrigins,
 } from '../lib/sources.ts'
-import { CompareButton, SelectionSummary, usePicks } from './compare-picks.tsx'
+import { CompareButton, hiddenPicks, SelectionSummary, usePicks } from './compare-picks.tsx'
 import { Day } from './day.tsx'
 import { DirectoryPage } from './directory-page.tsx'
 import { type DirectoryColumn, DirectoryTable, useListState } from './directory-table.tsx'
@@ -91,7 +91,7 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
     [items, filters],
   )
   const ids = useMemo(() => new Set(items.map((r) => r.id)), [items])
-  const [picked, , replace] = usePicks(
+  const [picked, untick, replace] = usePicks(
     maxOverlay,
     state.compareIds,
     (pick) => set({ compareIds: pick }),
@@ -207,7 +207,13 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
       shown={shown.length}
       total={items.length}
       status={
-        <SelectionSummary count={picked.length} max={maxOverlay} onClear={() => replace([])} />
+        <SelectionSummary
+          count={picked.length}
+          max={maxOverlay}
+          hidden={hiddenPicks(picked, shown, items, productLabel)}
+          onUntick={untick}
+          onClear={() => replace([])}
+        />
       }
       actions={
         <>

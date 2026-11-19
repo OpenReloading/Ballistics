@@ -443,16 +443,30 @@ export function CartridgeDesigner() {
   const [view, setView] = useState<View>()
   // the view switch goes in the Drawing panel's header row
   const [viewSlot, setViewSlot] = useState<HTMLElement | null>(null)
-  const { system, history, design, dispatch, loading, fileMenu, start, toolbarDispatch } =
-    useDesigner<Design, Action>({
-      reduce,
-      init: () => newDesign(),
-      kind: 'cartridge',
-      fileData,
-      load: loadCartridge,
-      loadingText: msg('Loading the cartridge…'),
-      failText: msg('The cartridge could not be loaded. The designer still works.'),
-    })
+  const {
+    system,
+    history,
+    design,
+    dispatch,
+    loading,
+    fileMenu,
+    start,
+    opened,
+    recordId,
+    kept,
+    toolbarDispatch,
+  } = useDesigner<Design, Action, 'cartridge'>({
+    reduce,
+    init: () => newDesign(),
+    kind: 'cartridge',
+    fileData,
+    draftName: (d) => designFileName(d, ''),
+    fallbackName: 'Cartridge design',
+    nameKey: (d) => d.name?.trim() ?? '',
+    load: loadCartridge,
+    loadingText: msg('Loading the cartridge…'),
+    failText: msg('The cartridge could not be loaded. The designer still works.'),
+  })
 
   const e = useMemo(
     () => evaluate(design, system, history.last, t),
@@ -536,12 +550,9 @@ export function CartridgeDesigner() {
   const fileDesign = useDeferredValue(design)
   const fileValue = useMemo(() => fileData(fileDesign), [fileDesign])
   const openFile = useCallback(
-    async (d: UserCartridge, name: string) =>
-      dispatch({
-        type: 'start',
-        design: { ...fromUser(d, await resolveCartridge(d), system), name },
-      }),
-    [system, dispatch],
+    async (d: UserCartridge, name: string, record: { id: string }) =>
+      opened(record.id, { ...fromUser(d, await resolveCartridge(d), system), name }),
+    [system, opened],
   )
 
   const toolbar = (
@@ -564,6 +575,9 @@ export function CartridgeDesigner() {
         // a name typed is a change to save
         nameKey={fileDesign.name?.trim() ?? ''}
         data={fileValue}
+        autosaved={recordId}
+        browserList
+        kept={kept}
         problem={fileDesign.locked?.reason}
         onOpen={openFile}
         reportBox={t('Include the design')}

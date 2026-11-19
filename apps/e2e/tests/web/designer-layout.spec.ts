@@ -165,3 +165,64 @@ test('a changed field goes back to the record value by its own button, and the r
   expect(search.y).toBeGreaterThanOrEqual(column.y - 1)
   expect(search.y).toBeLessThan(column.y + 80)
 })
+
+for (const [d, from] of [
+  ['bullets', 'demo-bullet-168'],
+  ['cartridges', '308-win'],
+])
+  test(`from 48em to 62em the ${d} designer's record search stays at the top of the window and no field tabs under it or the help line (#951)`, async ({
+    page,
+  }) => {
+    // two walks through every field, 50 to 60 steps each on the cartridge designer
+    test.slow()
+    await storeUnits(page)
+    await page.setViewportSize({ width: 800, height: 600 })
+    await gotoHydrated(page, `/${d}/designer?from=${from}`)
+    await expect(page.getByText(/^Started from /)).toBeVisible()
+    const where = () =>
+      page.evaluate(() => {
+        const active = document.activeElement as HTMLElement
+        const form = document.querySelector('.designer .prop-form') as HTMLElement
+        const start = form.querySelector(':scope > .designer-start') as HTMLElement
+        const help = form.querySelector(':scope > .grid-help') as HTMLElement
+        return {
+          inForm: form.contains(active),
+          onSearch: start.contains(active),
+          top: active.getBoundingClientRect().top,
+          bottom: active.getBoundingClientRect().bottom,
+          formTop: form.getBoundingClientRect().top,
+          searchTop: start.getBoundingClientRect().top,
+          searchBottom: start.getBoundingClientRect().bottom,
+          helpTop: help.getBoundingClientRect().top,
+        }
+      })
+    // the search's place in the form, read at the top of the page where it cannot be pinned yet
+    const loaded = await where()
+    const place = loaded.searchTop - loaded.formTop
+    await page.locator('.prop-form :is(input, select, textarea):visible').last().focus()
+    const search = page.getByRole('combobox', { name: 'Start from a record' })
+    await expect(search).toBeInViewport()
+    // up through every field: the browser scrolls each focused one into view from above
+    let at = await where()
+    for (let i = 0; i < 200 && at.inForm && !at.onSearch; i++) {
+      // pinned flush at the top of the window, or in its place while the form's head is in view
+      expect(at.searchTop).toBeLessThanOrEqual(Math.max(0, at.formTop + place) + 1)
+      expect(at.top).toBeGreaterThanOrEqual(at.searchBottom - 1)
+      await page.keyboard.press('Shift+Tab')
+      at = await where()
+    }
+    expect(at.onSearch).toBe(true)
+    // down through every field: the browser scrolls each focused one into view from below
+    const first = page
+      .locator('.prop-form > :not(.designer-start) :is(input, select, textarea):visible')
+      .first()
+    await first.focus()
+    await expect(first).toBeFocused()
+    at = await where()
+    for (let i = 0; i < 200 && at.inForm; i++) {
+      expect(at.bottom).toBeLessThanOrEqual(at.helpTop + 1)
+      await page.keyboard.press('Tab')
+      at = await where()
+    }
+    expect(at.inForm).toBe(false)
+  })

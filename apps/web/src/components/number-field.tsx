@@ -106,7 +106,11 @@ function UnitSwitch({
   )
 }
 
-/** The flag or the restore action of a field, as an icon inside the input. */
+/** The flag a field shows beside its action: an `exceeded` flag stays, any other gives way to the action. */
+const flagBeside = (action: unknown, flag: FieldFlag | undefined) =>
+  action && flag?.kind !== 'exceeded' ? undefined : flag
+
+/** The flag and the restore action of a field, as icons inside the input. */
 function FieldMarker({
   action,
   actionText,
@@ -116,33 +120,39 @@ function FieldMarker({
   actionText: string | undefined
   flag: FieldFlag | undefined
 }) {
-  if (action)
-    return (
-      <Tooltip label={actionText}>
-        <ActionIcon
-          variant="subtle"
-          size={24}
-          className="field-action"
-          aria-label={actionText}
-          onClick={action.onClick}
-        >
-          <ArrowCounterClockwise size={16} aria-hidden="true" />
-        </ActionIcon>
-      </Tooltip>
-    )
-  if (!flag) return null
-  const Icon = flagIcons[flag.kind]
+  const Icon = flag && flagIcons[flag.kind]
   return (
-    <Tooltip
-      label={flag.text}
-      multiline
-      maw={280}
-      events={{ hover: true, focus: false, touch: true }}
-    >
-      <span className={`field-flag field-flag-${flag.kind}`}>
-        <Icon size={16} weight={flag.kind === 'exceeded' ? 'fill' : 'regular'} aria-hidden="true" />
-      </span>
-    </Tooltip>
+    <>
+      {flag && Icon && (
+        <Tooltip
+          label={flag.text}
+          multiline
+          maw={280}
+          events={{ hover: true, focus: false, touch: true }}
+        >
+          <span className={`field-flag field-flag-${flag.kind}`}>
+            <Icon
+              size={16}
+              weight={flag.kind === 'exceeded' ? 'fill' : 'regular'}
+              aria-hidden="true"
+            />
+          </span>
+        </Tooltip>
+      )}
+      {action && (
+        <Tooltip label={actionText}>
+          <ActionIcon
+            variant="subtle"
+            size={24}
+            className="field-action"
+            aria-label={actionText}
+            onClick={action.onClick}
+          >
+            <ArrowCounterClockwise size={16} aria-hidden="true" />
+          </ActionIcon>
+        </Tooltip>
+      )}
+    </>
   )
 }
 
@@ -178,6 +188,7 @@ function retypedTwist(quantity: Quantity, text: string, si: number | undefined) 
 /** The suffix section: the flag or its action before the unit, so the values stay in one column. */
 function endProps({
   marker,
+  markers,
   symbol,
   switchable,
   longest,
@@ -187,6 +198,8 @@ function endProps({
   onPick,
 }: {
   marker: ReactNode
+  /** The icons the marker draws: a flag, an action or both. */
+  markers: number
   symbol: string
   switchable: boolean
   longest: number
@@ -210,7 +223,7 @@ function endProps({
         />
       ),
     // a unit switch needs room for its 24 px target beside the text, a marker 1.5rem more, both 0.25rem after the value
-    rightSectionWidth: endWidth(switchable, symbol, longest, marker !== undefined),
+    rightSectionWidth: endWidth(switchable, symbol, longest, markers),
     rightSectionPointerEvents: interactive ? ('all' as const) : ('none' as const),
   }
 }
@@ -227,8 +240,9 @@ const errorProps = (muted: boolean | undefined, hiddenError: boolean | undefined
 })
 
 /** The width of the suffix: the longest symbol of the quantity, so switching does not change it. */
-const endWidth = (switchable: boolean, symbol: string, longest: number, marker: boolean) =>
-  `${0.25 + Math.max(switchable ? 2 : 0, symbol ? 0.75 + 0.5 * (switchable ? longest : symbol.length) : 0) + (marker ? 1.5 : 0)}rem`
+const endWidth = (switchable: boolean, symbol: string, longest: number, markers: number) =>
+  // no icon, one, or a 24 px flag beside the action with the gap between them
+  `${0.25 + Math.max(switchable ? 2 : 0, symbol ? 0.75 + 0.5 * (switchable ? longest : symbol.length) : 0) + ([0, 1.5, 3.25][markers] ?? 0)}rem`
 
 /** The flag or its action before the unit: the values stay in one column. */
 function FieldEnd({
@@ -357,7 +371,7 @@ export function NumberField({
   mark?: OfShown<string | undefined>
   /** An icon inside the input, its text the tooltip and part of the field's description for screen readers. */
   flag?: FieldFlag | undefined
-  /** An icon button inside the input, as "use seating"; it takes the flag's place. */
+  /** An icon button inside the input, as "use seating"; it takes the flag's place, an `exceeded` flag stays beside it. */
   action?: { kind: 'restore'; text: OfShown<string>; onClick: () => void } | undefined
   /** Shown while the field is empty, as the value used instead. */
   placeholder?: string | ((system: UnitSystem) => string | undefined) | undefined
@@ -389,8 +403,11 @@ export function NumberField({
   const helpText = help ? help(shown) : spec.help && specText(t, spec.help)
   const markText = at(mark)
   const actionText = action && at(action.text)
-  const marker =
-    action || flag ? <FieldMarker action={action} actionText={actionText} flag={flag} /> : undefined
+  const shownFlag = flagBeside(action, flag)
+  const markers = (action ? 1 : 0) + (shownFlag ? 1 : 0)
+  const marker = markers ? (
+    <FieldMarker action={action} actionText={actionText} flag={shownFlag} />
+  ) : undefined
   const describedBy = describedByOf(helpText, markText, flag)
   const units = unitList(spec.quantity)
   const switchable = unit === 'switch' && units.length > 1
@@ -419,6 +436,7 @@ export function NumberField({
     max: spec.max,
     ...endProps({
       marker,
+      markers,
       symbol,
       switchable,
       longest,
