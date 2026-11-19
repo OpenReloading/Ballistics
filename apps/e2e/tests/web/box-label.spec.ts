@@ -3,7 +3,7 @@ import { barButton } from './bar.ts'
 import { showGerman } from './german.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
-import { openSavedLoad } from './workbench.ts'
+import { openKeeping, openSavedLoad } from './workbench.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 // the printed QR code is read from a screenshot: at 96 dpi a module is 2.9 px, which jsQR cannot read for some codes; at 3 x it is 8.6 px
@@ -29,6 +29,7 @@ for (const language of languages)
     await gotoHydrated(page, '/workbench')
     await openSavedLoad(page)
     // every lot typed: the tallest label
+    await openKeeping(page)
     for (const [lot, text] of [
       ['Powder lot', 'P-2026-0412-A'],
       ['Primer lot', 'Z-778341'],

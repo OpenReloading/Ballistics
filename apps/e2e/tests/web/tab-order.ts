@@ -18,7 +18,7 @@ export function inversions(stops: Stop[]) {
   })
 }
 
-/** From the form's first control, each stop until the focus leaves it; the blocks are the pinned row, the card columns left to right (one flow where they have no box) and the Run bar, `y` in the form's own coordinates so a scroll between stops changes nothing. */
+/** From the form's first control, each stop until the focus leaves it; the blocks are the card columns left to right (one flow where they have no box) and the Run bar, `y` in the form's own coordinates so a scroll between stops changes nothing. */
 export async function tabStops(form: Locator) {
   const page = form.page()
   await form.evaluate((f) => f.querySelector<HTMLElement>('input, button, [tabindex="0"]')?.focus())
@@ -35,7 +35,7 @@ export async function tabStops(form: Locator) {
         })
       // below 75em the columns have no box and the cards are one flow
       const cards = columns.length ? columns : [f.querySelector('.panels')]
-      const blocks = [f.querySelector('.pinned-row'), ...cards, f.querySelector('.run-bar')]
+      const blocks = [...cards, f.querySelector('.run-bar')]
       const block = blocks.findIndex((b) => b?.contains(e))
       if (block < 0) throw new Error(`${e.outerHTML.slice(0, 80)} is in no block of the form`)
       const r = e.getBoundingClientRect()

@@ -23,3 +23,26 @@ test('on a phone Run is one shown button and the form keeps no hidden focus stop
   expect(box?.height).toBeGreaterThanOrEqual(44)
   await expect(run).toBeInViewport({ ratio: 1 })
 })
+
+// the row's choices open above it, so with the row at the top of the Load panel they open out of view
+test('on a phone Primer, brass, lots opens in view from the top of the Load panel', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await gotoHydrated(page, '/workbench')
+  await openSavedLoad(page)
+  await page.getByRole('tab', { name: 'Load' }).click()
+  const keeping = loadForm(page).locator('details.keeping')
+  await keeping.locator('summary').evaluate((e) => e.scrollIntoView({ block: 'start' }))
+  await keeping.locator('summary').click()
+  // a tap at the first field's center reaches the field
+  const first = keeping.locator('.keeping-fields input').first()
+  await expect
+    .poll(() =>
+      first.evaluate((e) => {
+        const r = e.getBoundingClientRect()
+        return document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2) === e
+      }),
+    )
+    .toBe(true)
+})
