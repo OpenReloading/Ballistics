@@ -163,18 +163,13 @@ const located = (dir: string, id: string, findings: { finding: string; message: 
 
 /** The findings of duplicate names, cases, capacities, powders and sessions; each is an error. */
 function collectFindings(bundle: Bundle, cartridges: Map<string, Cartridge>): LocatedFinding[] {
+  const cartridgeOf = (ref: string) => cartridges.get(parseRef(ref)?.id ?? ref)
   return [
     ...checkNames(bundle),
     ...bundle.capacities.flatMap((c) =>
-      located('capacities', c.id, checkCapacity(c, cartridges.get(c.cartridge))),
+      located('capacities', c.id, checkCapacity(c, cartridgeOf(c.cartridge))),
     ),
-    ...bundle.cases.flatMap((c) =>
-      located(
-        'cases',
-        c.id,
-        checkCase(c, cartridges.get(parseRef(c.cartridge)?.id ?? c.cartridge)),
-      ),
-    ),
+    ...bundle.cases.flatMap((c) => located('cases', c.id, checkCase(c, cartridgeOf(c.cartridge)))),
     ...bundle.powders.flatMap((p) => located('powders', p.id, checkPowder(p))),
     ...bundle.chronoSessions.flatMap((s) => located('chrono', s.id, checkChronoSession(s))),
   ]
