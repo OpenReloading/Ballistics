@@ -2295,7 +2295,7 @@ export function useWorkbenchState() {
     const show = (m: number) => withUnit('length', shown, m)
     // a typed leak area replaces the cylinder gap's leak in every step, as in the single run
     const seat =
-      fields.leakArea?.si === undefined
+      form.getValues().leakArea?.si === undefined
         ? seatAt
         : { ...seatAt, at: (v: number) => ({ ...seatAt.at(v), cylinderGap: undefined }) }
     return seatingLadder(seat, start, step, ladderSteps, direction, show, t)

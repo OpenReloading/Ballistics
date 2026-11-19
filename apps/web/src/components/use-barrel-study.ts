@@ -21,6 +21,7 @@ import type { FieldValue } from '../lib/field-spec.ts'
 import { nth } from '../lib/nth.ts'
 import { roundedFieldText, type UnitSystem } from '../lib/units.ts'
 import {
+  cylinderRunOf,
   needsNetwork,
   notReached,
   type Outcome,
@@ -192,7 +193,7 @@ export function useBarrelStudy({
   const figure = ok && stripFigureOf(ok)
   const single = singleCharge(ok)
   // a revolver barrel from the forcing cone: the travel holds the cylinder run, the lengths do not
-  const base = figure && toSi('length', figure.base) - (ok.printed.seated.cylinder?.run ?? 0)
+  const base = figure && toSi('length', figure.base) - cylinderRunOf(ok)
   const runTravel = ok?.load.barrel.length
   const travel = travelOf(lengths, base, runTravel)
   const [attempt, setAttempt] = useState(0)

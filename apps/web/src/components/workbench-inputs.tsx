@@ -781,11 +781,15 @@ function leakAreaMark(
 ) {
   const { typed, gun, seated } = o
   if (!gun?.revolver) return
-  if (typed)
-    return t(
-      'A constant leak area leaks from the start of travel, before the bullet leaves the cylinder, and replaces the cylinder gap of the firearm: the simulated pressure can come out too low. Empty the field to take the cylinder gap of the firearm.',
-    )
   const gap = gun.cylinder?.gap
+  if (typed)
+    return gap
+      ? t(
+          'A constant leak area leaks from the start of travel, before the bullet leaves the cylinder, and replaces the cylinder gap of the firearm: the simulated pressure can come out too low. Empty the field to take the cylinder gap of the firearm.',
+        )
+      : t(
+          'A constant leak area leaks from the start of travel, before the bullet leaves the cylinder: the simulated pressure can come out too low. Enter the cylinder gap in the firearm and empty this field to leak from where the bullet leaves the cylinder.',
+        )
   if (!gap) return
   const c = seated.cylinder
   if (!c)

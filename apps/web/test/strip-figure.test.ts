@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { type Outcome, stripFigureOf } from '../src/components/workbench-outcome.ts'
+import { cylinderRunOf, type Outcome, stripFigureOf } from '../src/components/workbench-outcome.ts'
 
 const figure = { values: [], bullet: [], base: 60 }
 const run = (kind: 'charge' | 'seating', barrel?: number) =>
@@ -7,6 +7,8 @@ const run = (kind: 'charge' | 'seating', barrel?: number) =>
     ladder: { kind },
     load: { barrel: { length: 0.5 } },
     printed: { seated: { figure, barrel } },
+    steps: [{ charge: 0.003 }],
+    selected: 0,
   }) as unknown as Extract<Outcome, { kind: 'ok' }>
 
 describe('stripFigureOf', () => {
@@ -23,5 +25,24 @@ describe('stripFigureOf', () => {
 
   it('keeps the seated base without the barrel length', () => {
     expect(stripFigureOf(run('seating'))).toBe(figure)
+  })
+
+  it('adds the seating step’s own cylinder run for a revolver barrel from the forcing cone', () => {
+    const revolver = run('seating', 0.095)
+    revolver.load.barrel.length = 0.1115
+    revolver.printed.seated.cylinder = { gap: 0.0001, exit: 0.01639, run: 0.0404, from: 'L6' }
+    revolver.steps = [
+      {
+        charge: 0.003,
+        seating: {
+          value: 0.0406,
+          volume: 1e-6,
+          travel: 0.1115,
+          cylinderGap: { gap: 0.0001, exit: 0.0165, run: 0.0405 },
+        },
+      },
+    ]
+    expect(cylinderRunOf(revolver)).toBe(0.0405)
+    expect(stripFigureOf(revolver)?.base).toBeCloseTo(24)
   })
 })

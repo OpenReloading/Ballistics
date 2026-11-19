@@ -47,7 +47,7 @@ export interface InteriorSources {
 }
 
 /** The leak of the cylinder gap over the load's travel; a typed leak area replaces it, so the gas does not leak twice. */
-export function gapLeakage(
+function gapLeakage(
   load: InteriorLoad,
   cylinderGap: CylinderGap | undefined,
   leakArea: number | undefined,

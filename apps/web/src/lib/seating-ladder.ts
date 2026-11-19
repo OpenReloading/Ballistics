@@ -93,8 +93,8 @@ export type SeatingLengths = {
 /** Bounds of the volume behind the bullet over the depth bracket of a hollow base's cavity, m³. */
 export type CavityRange = { low: number; high: number }
 
-/** A revolver's cylinder gap and the travel at which the bullet base leaves the cylinder, m. */
-export type CylinderGap = { gap: number; exit: number }
+/** A revolver's cylinder gap, the travel at which the bullet base leaves the cylinder and, with a barrel from the forcing cone, the cylinder run the travel includes, m. */
+export type CylinderGap = { gap: number; exit: number; run?: number | undefined }
 
 /** One step of a seating ladder: the length the bullet is seated by (m) and what follows from it. */
 export type SeatingStep = {

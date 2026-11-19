@@ -292,7 +292,7 @@ export interface Cylinder {
 }
 
 /** Undefined without a gap or a barrel length from the forcing cone, which only a revolver has. */
-export function cylinderOf(f: Firearm): Cylinder | undefined {
+function cylinderOf(f: Firearm): Cylinder | undefined {
   const gap = siOf('length', f.cylinderGap)
   const fromForcingCone = f.barrelLengthFrom === 'forcingCone'
   if (gap === undefined && !fromForcingCone) return

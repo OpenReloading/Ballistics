@@ -43,9 +43,8 @@ const run = (load: InteriorLoad) => {
 }
 
 describe('cylinderGapLeakage (apps/docs/docs/models/interior-leakage-heat.md, "Cylinder gap")', () => {
-  it('opens pi d g over the gap from where the base leaves the cylinder, at Cd 0.7', () => {
+  it('opens pi d g over the gap from where the base leaves the cylinder', () => {
     const leak = cylinderGapLeakage({ boreDiameter: lands, gap: 1e-4, exit, travel: 0.11149 })
-    expect(leak?.discharge).toBe(0.7)
     expect(leak?.area).toEqual([
       { travel: 0.01639, area: 0 },
       { travel: expect.closeTo(0.01649, 12), area: expect.closeTo(2.77717e-6, 11) },

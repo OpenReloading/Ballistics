@@ -181,13 +181,19 @@ export const needsNetwork = msg(
   'Simulations run in this browser. Offline use requires the needed records to be cached.',
 )
 
-/** A seating ladder's step seats the bullet at its own depth, so its base is the barrel less the step's travel (mm), as the Barrel length study reads it. */
+/** The cylinder run the shown step's travel includes, m: a seating step's own, since its COAL can set the cylinder face. */
+export function cylinderRunOf(ok: Extract<Outcome, { kind: 'ok' }>) {
+  const step = ok.steps[ok.selected]?.seating
+  return (step ? step.cylinderGap?.run : ok.printed.seated.cylinder?.run) ?? 0
+}
+
+/** A seating ladder's step seats the bullet at its own depth, so its base is the barrel plus its cylinder run less the step's travel (mm), as the Barrel length study reads it. */
 export function stripFigureOf(ok: Extract<Outcome, { kind: 'ok' }>) {
   const { figure, barrel } = ok.printed.seated
   const travel = ok.load.barrel.length
   if (ok.ladder.kind !== 'seating' || !figure || barrel === undefined || travel === undefined)
     return figure
-  return { ...figure, base: fromSi('length', barrel - travel) }
+  return { ...figure, base: fromSi('length', barrel + cylinderRunOf(ok) - travel) }
 }
 
 /** A seating or temperature ladder varies one thing at one charge, so the longer barrel run, the measured strings and the groups read the shown step alone. */
