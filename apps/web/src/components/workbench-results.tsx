@@ -628,8 +628,8 @@ export const ResultsArea = memo(function ResultsArea() {
       className="result"
       data-empty={!outcome || undefined}
       data-running={pending || undefined}
-      // the load line, readouts, notes and ladder strip belong to the first tab
-      data-tab={outcome ? tab : undefined}
+      // a result's load line, readouts and notes belong to the first tab; an error shows on every tab
+      data-tab={ok ? tab : undefined}
     >
       <Tabs
         // before the first run a low window shows the figure, the one panel with content

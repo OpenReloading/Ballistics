@@ -4362,7 +4362,8 @@ main .library-head.page-panel-head > .page-panel-title {
   white-space: nowrap;
 }
 
-.workbench .workspace-inputs .keeping-fields .mantine-Input-input {
+/* .keeping outranks the value boxes' rule of the cards' media blocks */
+.workbench .workspace-inputs .keeping .keeping-fields .mantine-Input-input {
   width: 100%;
   padding-inline: revert-layer;
   border-color: var(--line);
