@@ -620,7 +620,14 @@ function KeepingRow() {
   const { primerId, setPrimerChoice, system } = useLoad()
   const { t } = useTranslation()
   return (
-    <details className="keeping wide">
+    <details
+      className="keeping wide"
+      // the choices float above the row: from a row at the top of a scrolled panel they open out of view
+      onToggle={(e) => {
+        if (e.currentTarget.open)
+          e.currentTarget.lastElementChild?.scrollIntoView({ block: 'nearest' })
+      }}
+    >
       <summary>{t('Primer, brass, lots')}</summary>
       <div className="keeping-fields">
         <PrimerChoice id={primerId} onChange={setPrimerChoice} system={system} />
