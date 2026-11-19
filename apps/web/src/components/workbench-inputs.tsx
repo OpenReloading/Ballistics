@@ -549,7 +549,7 @@ export function InputCards() {
       <div className="panels">
         {(three ? threeColumns : panelColumns).map((column, i) => (
           // the same key in both orders, so the column keeps its cards across 150em
-          <div key={column.toSorted().join()} className="panel-column">
+          <div key={column.toSorted((a, b) => a.localeCompare(b)).join()} className="panel-column">
             {column.map((p) => (
               <Paper
                 key={p}
