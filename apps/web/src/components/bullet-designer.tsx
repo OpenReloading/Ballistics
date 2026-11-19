@@ -390,19 +390,18 @@ export function BulletDesigner() {
           const value = design.fields[s.key]
           if (!(state && value)) return null
           const changed = state.kind === 'entered' && state.changed
-          // a soft flag: the value stays and the drawing follows it
-          const check = implausible(s, value.si)
-          const help = stateText(s, state, system, t)
           return (
             <DesignerField
               key={s.key}
               spec={s}
               system={system}
               value={value}
-              help={check ? `${t('Check the unit.')} ${help}` : help}
-              flag={check ? 'exceeded' : changed ? 'changed' : flagOf[state.kind]}
+              help={stateText(s, state, system, t)}
+              flag={changed ? 'changed' : flagOf[state.kind]}
               changed={changed}
               error={errorOf(s.key)}
+              // a soft flag: the value stays and the drawing follows it
+              implausible={implausible(s, value.si)}
               symbol={bulletSymbols.find((b) => b.path === s.key)?.symbol}
               revert={revertTo}
               dispatch={dispatch}

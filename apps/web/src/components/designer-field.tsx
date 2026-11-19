@@ -1,6 +1,6 @@
 'use client'
 
-import { type CSSProperties, memo } from 'react'
+import { type CSSProperties, memo, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import type { FieldSpec, FieldValue } from '../lib/field-spec.ts'
 import type { UnitSystem } from '../lib/units.ts'
@@ -25,6 +25,7 @@ export const DesignerField = memo(function DesignerField({
   flag,
   changed,
   error,
+  implausible,
   unit = 'switch',
   symbol,
   revert,
@@ -38,6 +39,8 @@ export const DesignerField = memo(function DesignerField({
   flag?: FieldFlag['kind'] | undefined
   changed: boolean
   error?: string | undefined
+  /** The value is outside the field's plausible range: a soft flag asking to check the unit, in place of the state's flag, shown from the field's blur on as the workbench shows field errors. */
+  implausible?: boolean | undefined
   /** `switch` toggles this field to the quantity's other unit (the messages keep naming their own); `none` where the grid's column header names the unit. */
   unit?: 'switch' | 'text' | 'none' | undefined
   /** The drawing's symbol of the value, shown before the label; focus marks it in the drawing. */
@@ -47,10 +50,15 @@ export const DesignerField = memo(function DesignerField({
   dispatch: (a: FieldAction) => void
 }) {
   const { t } = useTranslation()
+  // typed since the last blur: typing 168 gr or .308 in neither flags the field nor changes its description mid-word
+  const [typing, setTyping] = useState(false)
+  const check = implausible && !typing
+  const shownHelp = check ? `${t('Check the unit.')} ${help}` : help
+  const shownFlag = check ? 'exceeded' : flag
   // the label's title is the help, the flag's tooltip the error while it applies; screen readers hear both, each as its own sentence
   const marker = error
     ? { kind: 'exceeded' as const, text: error }
-    : flag && { kind: flag, text: help }
+    : shownFlag && { kind: shownFlag, text: shownHelp }
   return (
     <div
       className="designer-field"
@@ -61,7 +69,7 @@ export const DesignerField = memo(function DesignerField({
       style={symbol ? ({ '--symbol': `"${symbol}"` } as CSSProperties) : undefined}
     >
       <NumberField
-        spec={{ ...spec, help }}
+        spec={{ ...spec, help: shownHelp }}
         system={system}
         value={value}
         error={!!error}
@@ -72,7 +80,7 @@ export const DesignerField = memo(function DesignerField({
           revert && changed && !error
             ? {
                 kind: 'restore',
-                text: `${t('Back to the record value.')} ${help}`,
+                text: `${t('Back to the record value.')} ${shownHelp}`,
                 // the click's target finds the field, also where a click does not focus the button (Safari, Firefox on macOS)
                 onClick: (e?: { currentTarget: Element }) => {
                   // the button goes with the change: the field keeps the focus
@@ -85,7 +93,11 @@ export const DesignerField = memo(function DesignerField({
               }
             : undefined
         }
-        onChange={(v) => dispatch({ type: 'field', key: spec.key, value: v })}
+        onChange={(v) => {
+          setTyping(true)
+          dispatch({ type: 'field', key: spec.key, value: v })
+        }}
+        onBlur={() => setTyping(false)}
       />
     </div>
   )

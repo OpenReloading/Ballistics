@@ -81,7 +81,7 @@ export const designerSpecs: DesignerSpec[] = [
     group: 'size',
     min: 0,
     positive: true,
-    plausible: range(5, 1000, kilogramsPerGrain),
+    plausible: range(5, 1500, kilogramsPerGrain),
   },
   len('length', msg('Length'), 'size'),
   len('noseLength', msg('Nose length'), 'nose'),
