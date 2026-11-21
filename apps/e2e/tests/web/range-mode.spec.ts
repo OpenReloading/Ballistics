@@ -4,7 +4,7 @@ import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
-import { formValues, openSavedLoad } from './workbench.ts'
+import { formValues, openResultTab, openSavedLoad } from './workbench.ts'
 import { runLine } from './workbench-run.ts'
 
 // the offline layer's worker answers the reloads of the offline test
@@ -191,7 +191,7 @@ test('two tabs entering shots for one load lose none, and a Save of the load in 
     .toBe(2)
   expect(await stored(page, 'session')).toHaveLength(1)
   // the page opened first does not know the session: a change there and Save keep it
-  await page.getByRole('tab', { name: 'Notes', exact: true }).click()
+  await openResultTab(page, 'Notes')
   await page
     .getByRole('group', { name: 'Lots' })
     .getByLabel('Powder lot', { exact: true })

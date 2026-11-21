@@ -152,7 +152,7 @@ test('the Trajectory tab keeps its inputs when another tab is opened and it is o
   await openTrajectory(page)
   const step = page.getByLabel(/^Range step/)
   await step.fill('50')
-  await page.getByRole('tab', { name: 'Chart', exact: true }).click()
+  await page.getByRole('tab', { name: 'Results', exact: true }).click()
   await page.getByRole('tab', { name: 'Trajectory', exact: true }).click()
   await expect(step).toHaveValue('50')
 })

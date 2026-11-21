@@ -763,6 +763,16 @@ describe('firearm', () => {
   })
 })
 
+it('takes a firearm barrel length from the forcing cone and a cylinder gap on a revolver only', () => {
+  const revolver = { barrelLengthFrom: 'forcingCone', cylinderGap: { value: 0.1 } }
+  expect(firearmPaths({ ...revolver, action: 'revolver' })).toBeUndefined()
+  expect(firearmPaths({ ...revolver, action: 'pistol' })).toEqual([
+    'data.barrelLengthFrom',
+    'data.cylinderGap',
+  ])
+  expect(firearmPaths({ barrelLengthFrom: 'breechFace' })).toBeUndefined()
+})
+
 describe('firearm magnification, dates and empty entries', () => {
   it('checks the magnification range and the configuration dates', () => {
     expect(

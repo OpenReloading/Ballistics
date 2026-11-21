@@ -243,12 +243,13 @@ describe('stored units at the form edge', () => {
     const data = (rifle as Extract<UserRecord, { kind: 'firearm' }>).data
     expect(
       gunValues({ ...data, barrelLength: { value: 610 }, firearmMass: { value: 4200 } }),
-    ).toEqual({ twist: 0.254, barrelLength: 0.61, firearmMass: 4.2 })
+    ).toEqual({ twist: 0.254, barrelLength: 0.61, firearmMass: 4.2, revolver: false })
     expect(gunValues(blankFirearm())).toEqual({
       lands: undefined,
       twist: undefined,
       barrelLength: undefined,
       firearmMass: undefined,
+      revolver: false,
     })
   })
 

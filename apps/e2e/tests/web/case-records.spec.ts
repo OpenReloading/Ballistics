@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
-import { loadForm } from './workbench.ts'
+import { loadForm, openKeeping } from './workbench.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
@@ -46,12 +46,13 @@ test('a primer record shows its properties as Quantity, Value and Unit across th
   ).toHaveText([/^0\.50?$/, 'mm'])
 })
 
-test('a case record chosen above the cards gives the stated capacity, a typed one replaces it', async ({
+test('a case record chosen in the Cartridge card gives the stated capacity, a typed one replaces it', async ({
   page,
 }) => {
   await gotoHydrated(page, '/workbench?cartridge=308-win')
   const capacity = loadForm(page).getByRole('textbox', { name: /^Case capacity/ })
   await expect(capacity).not.toHaveAttribute('placeholder', /\d/)
+  await openKeeping(page)
   await page.getByRole('combobox', { name: 'Brass record' }).click()
   await page.getByRole('option', { name: 'Demo Cases 308 Win. Brass Demo' }).click()
   await expect(capacity).toHaveAttribute('placeholder', /^\d/)

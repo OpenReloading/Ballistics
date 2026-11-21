@@ -4,7 +4,7 @@ import { defined } from '../../../web/test/defined.ts'
 import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
-import { loadForm, openSavedLoad } from './workbench.ts'
+import { loadForm, openKeeping, openSavedLoad } from './workbench.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
@@ -76,6 +76,7 @@ test('a saved load reopens with every field as it was and nothing unsaved', asyn
   await expect.poll(values).toEqual(before)
   // the brass is chosen again and gives the capacity
   await expect(capacity).toHaveAttribute('placeholder', /^3\.6/)
+  await openKeeping(page)
   await expect(page.getByRole('combobox', { name: 'Brass record' })).toHaveAttribute(
     'placeholder',
     /308 Win\. Brass Demo/,

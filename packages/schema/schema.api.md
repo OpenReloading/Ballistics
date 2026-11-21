@@ -706,6 +706,8 @@ export const firearm: z.ZodObject<{
     action: z.ZodOptional<typeof firearmAction>;
     cartridge: z.ZodOptional<z.ZodString>;
     barrelLength: z.ZodOptional<QuantitySchema>;
+    barrelLengthFrom: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'breechFace' | 'forcingCone'>>>;
+    cylinderGap: z.ZodOptional<QuantitySchema>;
     twist: z.ZodOptional<QuantitySchema>;
     twistHand: z.ZodEnum<z.core.util.ToEnum<'right' | 'left'>>;
     grooveDiameter: z.ZodOptional<QuantitySchema>;
@@ -862,6 +864,7 @@ export const load: z.ZodObject<{
     }, z.core.$strict>
     ]>>;
     powderLot: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+    bulletLot: z.ZodOptional<z.ZodOptional<z.ZodString>>;
     charge: z.ZodOptional<QuantitySchema>;
     capacity: z.ZodOptional<z.ZodString>;
     primer: z.ZodOptional<z.ZodObject<{
@@ -1466,6 +1469,7 @@ export const sessionSnapshot: z.ZodObject<{
     powderLot: z.ZodOptional<z.ZodOptional<z.ZodString>>;
     primerLot: z.ZodOptional<z.ZodOptional<z.ZodString>>;
     caseLot: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+    bulletLot: z.ZodOptional<z.ZodOptional<z.ZodString>>;
     seating: z.ZodOptional<z.ZodObject<{
         by: z.ZodEnum<z.core.util.ToEnum<'overallLength' | 'baseToOgive'>>;
         value: QuantitySchema;

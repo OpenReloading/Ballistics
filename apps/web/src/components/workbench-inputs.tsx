@@ -13,7 +13,7 @@ import {
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { DotsThree } from '@phosphor-icons/react'
-import { boreArea } from '@rangefoundry/ballistics'
+import { boreArea, cylinderGapDischarge } from '@rangefoundry/ballistics'
 import { type Bullet, toSi } from '@rangefoundry/schema'
 import dynamic from 'next/dynamic'
 import { type ReactNode, useEffect, useId, useMemo, useState } from 'react'
@@ -52,7 +52,7 @@ import {
   siValues,
   specText,
 } from '../lib/field-spec.ts'
-import { type FirearmRow, gunPicker, landsFor } from '../lib/firearm.ts'
+import { type Cylinder, type FirearmRow, gunPicker, landsFor } from '../lib/firearm.ts'
 import { type FollowKey, followKeys } from '../lib/input-defaults.ts'
 import { bulletFields, burnFormError, interiorFields, specFields } from '../lib/interior-input.ts'
 import { hasSensitivity } from '../lib/interior-request.ts'
@@ -90,12 +90,11 @@ import { NumberField } from './number-field.tsx'
 import { PrimerChoice } from './primer-choice.tsx'
 import { RecordSearch, useChooser } from './record-search.tsx'
 import { SegmentedRow } from './segmented-row.tsx'
-import { RecordSourcesLink } from './sources.tsx'
 import { useCompleteOnly } from './use-complete-only.ts'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 import { useLoad, useResult } from './workbench-context.ts'
 import { CartridgeFigure } from './workbench-figure.tsx'
-import { isPreviewKey, notReached } from './workbench-outcome.ts'
+import { isPreviewKey, notReached, type Outcome } from './workbench-outcome.ts'
 // oxlint-disable-next-line import/no-cycle -- workbench-results imports Checklist back; moving one of them breaks the cycle
 import { BurnFigure } from './workbench-results.tsx'
 
@@ -125,7 +124,7 @@ export const modelFields = [
 ] as const
 /** The Gun card's optional throat wear, in its More popover. */
 export const firearmMoreFields = ['throatWear'] as const
-/** The Powder card's optional leak and bore resistance fields, in its More popover. */
+/** The Powder card's optional leak and bore resistance fields, rows of the card. */
 export const powderMoreFields = [
   'leakArea',
   'boreFriction',
@@ -180,8 +179,22 @@ export const firearmMassSpec = {
   positive: true,
 } as const satisfies FieldSpec
 
-/** In a window lower than 45em the burn-rate figure takes the cartridge figure's place, which moves to the result tab Cartridge (`FigureTab`); below 75em the columns have no box, one flow in this order. */
-const panelColumns: InputPanel[][] = [['cartridge'], ['powder', 'bullet', 'firearm']]
+/** In a window lower than 45em the burn-rate figure takes the cartridge figure's place, which moves to the result tab Cartridge (`FigureTab`); below 75em the columns have no box, one flow in this order with the figure last. */
+const panelColumns: InputPanel[][] = [
+  ['cartridge', 'firearm'],
+  ['powder', 'bullet'],
+]
+/** From 150em Bullet and Powder stand side by side in that order, the DOM's order too, so Tab follows the screen. */
+const threeColumns: InputPanel[][] = [
+  ['cartridge', 'firearm'],
+  ['bullet', 'powder'],
+]
+
+/** From 75em the figure stands under the first column, below it after the cards (`panelColumns`). */
+const columnsFrame = '(width >= 75em)'
+const threeColumnsFrame = '(width >= 150em)'
+/** A window this high lists the Powder card's model parameters without a click; a lower one keeps them behind one row. */
+const tallFrame = '(height >= 62em)'
 
 /** The desktop frame of a window lower than 45em (`panelColumns`). */
 export const shortFrame = '(width >= 75em) and (height < 45em)'
@@ -222,14 +235,6 @@ const recordRow = (label: string, value: ReactNode, unit?: string) =>
       {unit && <span className="record-unit">{unit}</span>}
     </div>
   )
-
-/** The powder record's link to its sources: a design has no record page, paper cannot follow it. */
-function PowderSourceRow() {
-  const { powder, powderDesign, printing, printMedia } = useLoad()
-  const { t } = useTranslation()
-  if (!powder || powderDesign || printing || printMedia) return null
-  return recordRow(t('Source'), <RecordSourcesLink kind="powders" id={powder.id} />)
-}
 
 /** A length in mm as the cards show it: the number in the length unit, inches below 1 as ".3". */
 const lengthCell = (system: UnitSystem, mm: number) =>
@@ -522,9 +527,11 @@ export function InputCards() {
     linkedBullet,
     linkedPowder,
   } = useLoad()
-  // the server and the first render lay out a tall window; a low one moves Gun once mounted
+  // the server and the first render lay out a tall window; a low one swaps the figure once mounted
   const { t } = useTranslation()
   const short = useMediaQuery(shortFrame, false) ?? false
+  const columns = useMediaQuery(columnsFrame, false) ?? false
+  const three = useMediaQuery(threeColumnsFrame, false) ?? false
   const [figureCard, setFigureCard] = useState<HTMLDivElement | null>(null)
   const { figureTab } = useLoad()
   /** The card's record is chosen: the head shows its name as text. */
@@ -534,13 +541,15 @@ export function InputCards() {
     powder: !!(powder || linkedPowder?.name),
     firearm: !!firearm,
   }
+  // in the DOM where it shows, so the tab order follows the screen
+  const figure = short ? <BurnFigure /> : <div ref={setFigureCard} className="figure-host" />
   return (
     <form ref={inputs} noValidate onSubmit={(e) => e.preventDefault()} aria-label={t('Load')}>
       {/* fixed cards: icon and title in the heading, the record in its picker */}
       <div className="panels">
-        <LoadRow />
-        {panelColumns.map((column, i) => (
-          <div key={column[0]} className="panel-column">
+        {(three ? threeColumns : panelColumns).map((column, i) => (
+          // the same key in both orders, so the column keeps its cards across 150em
+          <div key={column.toSorted((a, b) => a.localeCompare(b)).join()} className="panel-column">
             {column.map((p) => (
               <Paper
                 key={p}
@@ -557,8 +566,7 @@ export function InputCards() {
                   <h2 id={`panel-${p}`} className="panel-title">
                     {t(panelTitles[p])}
                   </h2>
-                  {p !== 'cartridge' && <CardPicker panel={p} />}
-                  {p === 'powder' && <LotField lot="powder" bare />}
+                  <CardPicker panel={p} />
                   {morePanels.includes(p) && (
                     <AppPopover
                       opened={more === p}
@@ -591,10 +599,10 @@ export function InputCards() {
                 <CardBody panel={p} />
               </Paper>
             ))}
-            {i === 0 &&
-              (short ? <BurnFigure /> : <div ref={setFigureCard} className="figure-host" />)}
+            {i === 0 && columns && figure}
           </div>
         ))}
+        {!columns && figure}
       </div>
       <LoadFigure host={short ? figureTab : figureCard} />
       <div className="run-bar">
@@ -606,16 +614,26 @@ export function InputCards() {
   )
 }
 
-/** The cartridge search, then the choices that depend on it in that order; brass and capacity record go in the `choices` slot. */
-function LoadRow() {
+/** The Cartridge card's last row: the choices that depend on the cartridge, one click away; brass and capacity record go in the `choices` slot. */
+function KeepingRow() {
   const { primerId, setPrimerChoice, system } = useLoad()
+  const { t } = useTranslation()
   return (
-    <div className="pinned-row">
-      <CartridgePicker />
-      <PrimerChoice id={primerId} onChange={setPrimerChoice} system={system} />
-      <LotField lot="primer" short />
-      <SeatingSlot name="choices" />
-    </div>
+    <details
+      className="keeping wide"
+      // the choices float above the row: from a row at the top of a scrolled panel they open out of view
+      onToggle={(e) => {
+        if (e.currentTarget.open)
+          e.currentTarget.lastElementChild?.scrollIntoView({ block: 'nearest' })
+      }}
+    >
+      <summary>{t('Primer, brass, lots')}</summary>
+      <div className="keeping-fields">
+        <PrimerChoice id={primerId} onChange={setPrimerChoice} system={system} />
+        <LotField lot="primer" />
+        <SeatingSlot name="choices" />
+      </div>
+    </details>
   )
 }
 
@@ -627,11 +645,12 @@ export type SeatingSlotName = (typeof seatingSlotNames)[number]
 function SeatingSlot({ name }: { name: SeatingSlotName }) {
   const { slotRefs } = useLoad()
   if (name === 'moreValues') return <dl ref={slotRefs[name]} className="seating-more wide" />
-  if (name === 'choices') return <div ref={slotRefs[name]} className="pinned-row-slot" />
+  if (name === 'choices') return <div ref={slotRefs[name]} className="keeping-slot" />
   return <div ref={slotRefs[name]} className="seating-slot wide" />
 }
 
-const morePanels: readonly InputPanel[] = ['cartridge', 'bullet', 'powder', 'firearm']
+/** The Powder card lists its rarely needed rows itself. */
+const morePanels: readonly InputPanel[] = ['cartridge', 'bullet', 'firearm']
 
 type LoadValues = ReturnType<typeof useLoad>
 type InteriorSpec = (typeof interiorFields)[number]
@@ -769,6 +788,64 @@ function loadFieldMark(
   )
 }
 
+/** The shown run's peak pressure travel, m, where its cylinder gap leak opened before it: the peak holds the gap's relief. */
+function gapReliefPeak(outcome: Outcome | undefined) {
+  if (outcome?.kind !== 'ok' || !outcome.printed.gapLeak) return
+  const opens = outcome.load.leakage?.area[0]?.travel
+  const peak = outcome.body.result.maxPressureTravel
+  return opens !== undefined && opens < peak ? peak : undefined
+}
+
+/** The leak area at a revolver: the firearm's cylinder gap leaks from where the bullet leaves the cylinder, a typed constant area from travel 0 instead. */
+function leakAreaMark(
+  s: UnitSystem,
+  o: {
+    typed: boolean
+    gun: { revolver: boolean; cylinder?: Cylinder | undefined } | undefined
+    seated: LoadValues['seated']
+    /** The Travel to the muzzle field, m. */
+    travel: number | undefined
+    /** The shown run's peak pressure travel, m, when its gap leak opened before it. */
+    reliefPeak: number | undefined
+  },
+  t: Translator['t'],
+) {
+  const { typed, gun, seated, travel, reliefPeak } = o
+  if (!gun?.revolver) return
+  const gap = gun.cylinder?.gap
+  if (typed)
+    return gap
+      ? t(
+          'A constant leak area leaks from the start of travel, before the bullet leaves the cylinder, and replaces the cylinder gap of the firearm: the simulated pressure can come out too low. Empty the field to take the cylinder gap of the firearm.',
+        )
+      : t(
+          'A constant leak area leaks from the start of travel, before the bullet leaves the cylinder: the simulated pressure can come out too low. Enter the cylinder gap in the firearm and empty this field to leak from where the bullet leaves the cylinder.',
+        )
+  if (!gap) return
+  const c = seated.cylinder
+  if (!c)
+    return t(
+      'The cylinder gap of the firearm leaks only with a bullet seated in the Cartridge card; without one, no leak.',
+    )
+  const gapText = valueWithUnit('length', s, c.gap)
+  // as `cylinderGapLeakage`: no leak unless the base crosses the whole gap before the muzzle
+  if (travel !== undefined && !(c.exit + c.gap < travel))
+    return t(
+      'The bullet base does not cross the cylinder gap of the firearm {gap} before the muzzle at this travel: no leak.',
+      { gap: gapText },
+    )
+  const leak = t(
+    'From the cylinder gap of the firearm {gap}: pi × bore diameter × gap, opening as the bullet base leaves the cylinder at {exit} of travel, discharge coefficient {cd}.',
+    { gap: gapText, exit: valueWithUnit('length', s, c.exit), cd: cylinderGapDischarge },
+  )
+  if (reliefPeak === undefined) return leak
+  const relief = t(
+    'The gap opened before the simulated peak pressure at {peak} of travel, so the peak includes its relief. The cylinder face is taken at the larger of cartridge L6 and the COAL: a longer cylinder opens the gap later and keeps the peak higher.',
+    { peak: valueWithUnit('length', s, reliefPeak) },
+  )
+  return `${leak} ${relief}`
+}
+
 /** The flag of a field that holds the seated bullet's value. */
 function seatingFlag(
   key: string,
@@ -836,10 +913,14 @@ function LoadField({ name: key }: { name: string }) {
     recordBore,
     changes,
     resetKeys,
+    firearmList,
+    firearm,
+    outcome,
   } = useLoad()
   const { t, tn } = useTranslation()
   const spec = interiorFields.find((s) => s.key === key)
   if (!spec) throw new Error(`no field ${key}`)
+  const gun = firearmList.find((f) => f.id === firearm)?.data
   const props = form.getInputProps(key)
   const value = fields[key]
   /** The default this field holds, with where it comes from (`input-defaults.ts`). */
@@ -868,6 +949,19 @@ function LoadField({ name: key }: { name: string }) {
       muted={given !== undefined && !given.fromFirearm}
       // texts naming a unit follow the units the field shows
       mark={(s) =>
+        (key === 'leakArea'
+          ? leakAreaMark(
+              s,
+              {
+                typed: value?.si !== undefined,
+                gun,
+                seated,
+                travel: fields.travel?.si,
+                reliefPeak: gapReliefPeak(outcome),
+              },
+              t,
+            )
+          : undefined) ??
         loadFieldMark(
           s,
           {
@@ -1164,6 +1258,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
   const { t } = useTranslation()
   // the gun weight's message waits for the end of the typing, as "0." on the way to "0.5" is no error
   const [gunLeft, setGunLeft] = useState(false)
+  const tall = useMediaQuery(tallFrame, false) ?? false
   if (panel === 'cartridge')
     return (
       <div className="panel-fields">
@@ -1172,11 +1267,13 @@ function CardBody({ panel }: { panel: InputPanel }) {
         {fieldsOf(panelFields.cartridge)}
         {/* case capacity, COAL or CBTO and the seating values of the figure */}
         <SeatingSlot name="cartridge" />
+        <KeepingRow />
       </div>
     )
   if (panel === 'bullet')
     return (
       <div className="panel-fields">
+        <LotField lot="bullet" />
         <ReplacedNote panel={panel} />
         {bulletNote && <p className="note wide">{bulletNote}</p>}
         {fieldsOf(panelFields.bullet)}
@@ -1186,30 +1283,33 @@ function CardBody({ panel }: { panel: InputPanel }) {
   if (panel === 'powder')
     return (
       <div className="panel-fields">
+        <LotField lot="powder" />
         <ReplacedNote panel={panel} />
         {/* a record's, or a typed one without a record (a link): either is in use, so it shows */}
         {(recordSpecs.bulkDensity !== undefined ||
           (powder === undefined && 'bulkDensity' in typedSpecFields)) && (
           <SpecValueField name="bulkDensity" />
         )}
-        <PowderSourceRow />
         <BurnlessNote />
         <NewerFitNote />
         {fieldsOf(panelFields.powder)}
         <LadderInputs />
-        {/* the model parameters behind one row at every width; an invalid one opens it */}
+        {fieldsOf(powderMoreFields)}
+        {/* a window from 62em high lists the model parameters, a lower one behind one row; an invalid one opens it */}
         <div className="model-row wide">
           <span>{t('Model parameters')}</span>
-          <Button
-            size={controlSize.row.button}
-            variant="default"
-            aria-expanded={modelShown}
-            onClick={() => setModelShown((v) => !v)}
-          >
-            {modelShown ? t('Hide') : t('Show')}
-          </Button>
+          {!tall && (
+            <Button
+              size={controlSize.row.button}
+              variant="default"
+              aria-expanded={modelShown}
+              onClick={() => setModelShown((v) => !v)}
+            >
+              {modelShown ? t('Hide') : t('Show')}
+            </Button>
+          )}
         </div>
-        {(modelShown || printing || printMedia) && (
+        {(modelShown || tall || printing || printMedia) && (
           <>
             {/* a powder record without a bulk density has no row of its own in the card */}
             {powder !== undefined && recordSpecs.bulkDensity === undefined && (
@@ -1218,6 +1318,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
             {fieldsOf(modelFields)}
           </>
         )}
+        <ResetCard panel="powder" />
       </div>
     )
   return (
@@ -1687,7 +1788,6 @@ function MoreRows({ panel }: { panel: InputPanel }) {
         )}
       </>
     )
-  if (panel === 'powder') return <>{fieldsOf(powderMoreFields)}</>
   if (panel === 'firearm') return <>{fieldsOf(firearmMoreFields)}</>
   return (
     <>
@@ -1832,6 +1932,7 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
       system={system}
       initial={previewInitial}
       barrelLength={gun?.barrelLength}
+      cylinder={gun?.cylinder}
       lands={lands.contact}
       landsOther={lands.other}
       freebore={gun?.freebore}
@@ -1856,7 +1957,7 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
         cartridge && setCapacityChoice(id ? { cartridge: cartridge.id, id } : undefined)
       }
       caseId={caseId}
-      caseLot={<LotField lot="case" short />}
+      caseLot={<LotField lot="case" />}
       onCaseId={(id) =>
         cartridge && setCaseChoice(id ? { cartridge: cartridge.id, id } : undefined)
       }

@@ -301,6 +301,17 @@ export const convectiveDefaults: {
 };
 
 // @public
+export const cylinderGapDischarge = 0.7;
+
+// @public
+export function cylinderGapLeakage(input: {
+    boreDiameter: number;
+    gap: number;
+    exit: number;
+    travel: number;
+}): InteriorLoad['leakage'];
+
+// @public
 export function defaultSensitivity(form: string | undefined): SensitivityDefault | undefined;
 
 // @public
@@ -847,7 +858,7 @@ export type LoadFileIssue = Diagnostic<'valueMissing', {
 export type LoadNote = LotNote | SeatingNote | VelocityNote | RoundCountNote;
 
 // @public
-export type LoadNoteRule = 'powderLot' | 'primerLot' | 'caseLot' | 'seating' | 'velocity' | 'roundCount';
+export type LoadNoteRule = 'powderLot' | 'primerLot' | 'caseLot' | 'bulletLot' | 'seating' | 'velocity' | 'roundCount';
 
 // @public
 export function loadNotes(sessions: readonly SessionReading[], roundCountThreshold?: number): LoadNote[];
@@ -865,7 +876,7 @@ export interface LotNote {
     // (undocumented)
     now?: string | undefined;
     // (undocumented)
-    rule: 'powderLot' | 'primerLot' | 'caseLot';
+    rule: 'powderLot' | 'primerLot' | 'caseLot' | 'bulletLot';
     // (undocumented)
     session: string;
 }
@@ -1685,6 +1696,8 @@ export const sensitivityReferenceDefault = 294.15;
 
 // @public
 export interface SessionReading {
+    // (undocumented)
+    bulletLot?: string | undefined;
     // (undocumented)
     caseLot?: string | undefined;
     date?: string | undefined;

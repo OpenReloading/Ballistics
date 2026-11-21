@@ -298,6 +298,7 @@ it('names the session in the load with a snapshot of the load as it is, once', (
     data: {
       origin: 'user',
       powderLot: ' P1 ',
+      bulletLot: 'B1',
       primer: { lot: 'R1' },
       seating: { by: 'overallLength', value: { value: 70 } },
       sessions: ['user:11111111-1111-4111-8111-111111111111'],
@@ -316,6 +317,7 @@ it('names the session in the load with a snapshot of the load as it is, once', (
       session: 'user:22222222-2222-4222-8222-222222222222',
       powderLot: 'P1',
       primerLot: 'R1',
+      bulletLot: 'B1',
       seating: { by: 'overallLength', value: { value: 70 } },
       roundCount: 120,
     },

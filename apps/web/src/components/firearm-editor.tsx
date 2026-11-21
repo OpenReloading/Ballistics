@@ -32,12 +32,14 @@ import type { BulletSummary, CartridgeSummary } from '../lib/api-types.ts'
 import { dayText } from '../lib/dates.ts'
 import { close, type FieldSpec, fieldError, specText } from '../lib/field-spec.ts'
 import {
+  cylinderGapField,
   fieldSi,
   fieldStored,
   firearmFields,
   freeId,
   mountFields,
   opticFields,
+  storedOf,
   zeroFields,
 } from '../lib/firearm.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
@@ -246,7 +248,9 @@ export function FirearmEditor({
             />
             <NativeSelect
               label={t('Kind of firearm')}
-              description={t('A revolver gets the cylinder gap note of the powder fit.')}
+              description={t(
+                'A revolver takes a cylinder gap and gets the cylinder gap note of the powder fit.',
+              )}
               data={[
                 { value: '', label: t('Not stated') },
                 { value: 'rifle', label: t('Rifle') },
@@ -254,10 +258,45 @@ export function FirearmEditor({
                 { value: 'revolver', label: t('Revolver') },
               ]}
               value={data.action ?? ''}
-              onChange={(e) =>
-                patch({ action: (e.currentTarget.value || undefined) as Firearm['action'] })
-              }
+              onChange={(e) => {
+                const action = (e.currentTarget.value || undefined) as Firearm['action']
+                // only a revolver holds these: another action would fail the schema
+                patch({
+                  action,
+                  ...(action !== 'revolver' && {
+                    barrelLengthFrom: undefined,
+                    cylinderGap: undefined,
+                  }),
+                })
+              }}
             />
+            {data.action === 'revolver' && (
+              <>
+                <NativeSelect
+                  label={t('Barrel length measured from')}
+                  description={t('From the forcing cone, the travel adds the cylinder run.')}
+                  data={[
+                    { value: 'breechFace', label: t('Breech face') },
+                    { value: 'forcingCone', label: t('Forcing cone') },
+                  ]}
+                  value={data.barrelLengthFrom ?? 'breechFace'}
+                  onChange={(e) =>
+                    patch({
+                      barrelLengthFrom:
+                        e.currentTarget.value === 'forcingCone' ? 'forcingCone' : undefined,
+                    })
+                  }
+                />
+                <SiField
+                  spec={cylinderGapField}
+                  system={system}
+                  si={fieldSi(cylinderGapField, data.cylinderGap)}
+                  onChange={(si) =>
+                    patch({ cylinderGap: si === undefined ? undefined : storedOf('length', si) })
+                  }
+                />
+              </>
+            )}
             {firearmFields.map((spec) => (
               <SiField
                 key={spec.key}

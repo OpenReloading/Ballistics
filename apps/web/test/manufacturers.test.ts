@@ -103,7 +103,7 @@ describe('manufacturerUses', () => {
   const uses = (
     records: UserRecord[],
     invalid: ReturnType<typeof validRecords>['invalid'] = [],
-    shown: string[] = [],
+    shown: { ref: string; record?: string }[] = [],
   ) => manufacturerUses(records, invalid, shown).map((m) => [m.record.name, m.uses])
 
   it('counts the records that name a manufacturer, by name, and the unused ones as 0', () => {
@@ -143,10 +143,27 @@ describe('manufacturerUses', () => {
       { kind: 'bullet', id: 'old', name: 'Old', data: { manufacturer: `user:${other}`, x: 1 } },
     ]).invalid
     expect(rejected).toHaveLength(1)
-    expect(uses(makers, rejected, [`user:${third}`])).toEqual([
+    expect(uses(makers, rejected, [{ ref: `user:${third}` }])).toEqual([
       ['Another', 1],
       ['Home Loader', 0],
       ['Third', 1],
+    ])
+  })
+
+  it('counts an open field once when the browser keeps its record with the same maker', () => {
+    expect(
+      uses(
+        [...makers, bullet],
+        [],
+        [
+          { ref: `user:${uuid}`, record: 'b1' },
+          { ref: `user:${other}`, record: 'b1' },
+        ],
+      ),
+    ).toEqual([
+      ['Another', 1],
+      ['Home Loader', 1],
+      ['Third', 0],
     ])
   })
 })

@@ -93,13 +93,31 @@ it('finds a load by a lot of the load or of one of its session snapshots', () =>
       powderLot: 'P-1001',
       primer: { lot: 'PR-2002' },
       case: { lot: 'C-3003' },
-      snapshots: [{ session: 's1', powderLot: 'P-0900', primerLot: 'PR-1900', caseLot: 'C-2900' }],
+      bulletLot: 'B-5005',
+      snapshots: [
+        {
+          session: 's1',
+          powderLot: 'P-0900',
+          primerLot: 'PR-1900',
+          caseLot: 'C-2900',
+          bulletLot: 'B-4900',
+        },
+      ],
     },
   } as LoadRecord
   const records = [lots, load('b', 'No lots', '2026-10-02T10:00:00.000Z')]
   const found = (query: string) =>
     loadGroups(records, query, {}, english.t).flatMap((g) => g.records.map((r) => r.id))
-  for (const lot of ['P-1001', 'pr-2002', 'C-3003', 'P-0900', 'PR-1900', 'C-2900'])
+  for (const lot of [
+    'P-1001',
+    'pr-2002',
+    'C-3003',
+    'B-5005',
+    'P-0900',
+    'PR-1900',
+    'C-2900',
+    'B-4900',
+  ])
     expect(found(lot)).toEqual(['a'])
   expect(found('X-4004')).toEqual([])
 })

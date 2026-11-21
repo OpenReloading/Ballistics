@@ -231,10 +231,11 @@ async function refsOf(opened: UserRecord[], t: Translator['t']) {
   return stored ? refNote(opened, stored.records, t) : ''
 }
 
+const notKept = msg('Not saved in this browser')
 const keptText: Record<string, Message | ''> = {
   blank: '',
   saving: msg('Saving in this browser'),
-  failed: msg('Not saved in this browser'),
+  failed: notKept,
 }
 
 /** The file state's text; `brief` is the page bar's shorter one, where `text` is the tooltip. */
@@ -260,6 +261,8 @@ function stateText(
   },
   t: Translator['t'],
 ): StateText {
+  // an edit the browser does not hold outranks the file it changed
+  if (autosaved && kept === 'failed') return { text: t(notKept) }
   if (saved) {
     if (!dirty) return { text: t('Saved: {file}', { file: saved.file }) }
     return autosaved
@@ -366,7 +369,8 @@ function guardLeaving(say: (said: Said) => void, language: () => Translator['t']
 /** What the page offers a share link: the record, and how it is opened, kept and reported. */
 interface SharedLink<K extends UserRecordKind> {
   unsaved: () => boolean
-  open: (record: Of<K>, parsed: ParsedUserFile) => void
+  /** False when the record could not be opened. */
+  open: (record: Of<K>, parsed: ParsedUserFile) => Promise<boolean>
   carry: (record: Of<K>, records: UserRecord[]) => void
   say: (said: Said) => void
   fail: (said: Said) => void
@@ -412,8 +416,7 @@ async function openSharedLink<K extends UserRecordKind>(
     return
   const kept = await keepMakers(r, p.records)
   page.carry(r, p.records)
-  page.open(r, p)
-  if (!kept) page.fail(plain(noMaker))
+  if ((await page.open(r, p)) && !kept) page.fail(plain(noMaker))
 }
 
 /** A copy saved after this tab's one (another tab or window) is overwritten only on yes, asked once. */
@@ -553,14 +556,15 @@ function StartItems({ starts }: { starts: FileMenuItem[] | undefined }) {
   )
 }
 
-/** Never for a record kept in the browser on every change; a saved one by `dirty`, else whether the text differs from the start (none yet counts as unchanged). */
+/** A record kept in the browser on every change only while its last edit is not kept; a saved one by `dirty`, else whether the text differs from the start (none yet counts as unchanged). */
 function isUnsaved(
   autosaved: string | undefined,
+  kept: string | undefined,
   dirty: boolean | undefined,
   initial: string | undefined,
   now: string,
 ) {
-  if (autosaved) return false
+  if (autosaved) return kept === 'failed'
   if (dirty !== undefined) return dirty
   return initial !== undefined && now !== initial
 }
@@ -863,11 +867,11 @@ function unsavedState(
   saved: { json: string } | undefined,
   now: string,
   autosaved: string | undefined,
+  kept: string | undefined,
   initial: string | undefined,
 ) {
   const dirty = saved !== undefined && saved.json !== now
-  // kept in the browser on every change: nothing to lose when the page goes
-  return { dirty, unsaved: isUnsaved(autosaved, saved ? dirty : undefined, initial, now) }
+  return { dirty, unsaved: isUnsaved(autosaved, kept, saved ? dirty : undefined, initial, now) }
 }
 
 /** The chosen folder where the browser allows writing to it. */
@@ -920,7 +924,7 @@ function FileMenuOf<K extends UserRecordKind>({
   onExported?: () => void
   /** Called with whether the record has unsaved changes, when that changes. */
   onUnsaved?: (unsaved: boolean) => void
-  /** The id of the record kept in the browser on every change (`/groups`), which Save writes: no leave questions, Open keeps the opened record, Save as writes a copy with a new id that `onOpen` shows. */
+  /** The id of the record kept in the browser on every change (`/groups`), which Save writes: leave, New and Open ask only for an edit `kept` reports failed, Open keeps the opened record, Save as writes a copy with a new id that `onOpen` shows. */
   autosaved?: string
   /** With `autosaved`: `blank` before the first save, `saving` while the last change is not in the browser yet, `failed` when the browser store refused it. */
   kept?: 'blank' | 'saving' | 'saved' | 'failed'
@@ -980,7 +984,7 @@ function FileMenuOf<K extends UserRecordKind>({
   // as first shown or started, so edits before any save count; undefined between startNew without `next` and the render that shows the new record
   const initial = useRef<string | undefined>(now)
   const [started, setStarted] = useState(0)
-  const { dirty, unsaved } = unsavedState(saved, now, autosaved, initial.current)
+  const { dirty, unsaved } = unsavedState(saved, now, autosaved, kept, initial.current)
   // Save and Open file of the menu, for a page's own commands (the workbench search)
   const commands = {
     save: () => act(msg('Save failed: {error}'), () => save(false))(),
@@ -1003,9 +1007,9 @@ function FileMenuOf<K extends UserRecordKind>({
   useEffect(() => {
     if (!shownMaker) return
     const key = {}
-    shownManufacturerRefs.set(key, `user:${shownMaker}`)
+    shownManufacturerRefs.set(key, { ref: `user:${shownMaker}`, record: autosaved })
     return () => void shownManufacturerRefs.delete(key)
-  }, [shownMaker])
+  }, [shownMaker, autosaved])
 
   // a share link opens on load and when pasted into this tab (a fragment change, no reload)
   useEffect(() => {
@@ -1204,8 +1208,19 @@ function FileMenuOf<K extends UserRecordKind>({
     }
   }
 
-  /** A shared record: a new id, no file, unsaved until saved. */
-  function openShared(record: Of<K>, parsed: ParsedUserFile) {
+  /** A shared record: a new id, no file, unsaved until saved; a page that keeps every change keeps it at once; false when the browser refused it. */
+  async function openShared(shared: Of<K>, parsed: ParsedUserFile) {
+    // the sender's id would overwrite a record of the same id
+    const record = autosaved ? { ...shared, id: newId() } : shared
+    if (autosaved) {
+      try {
+        await putRecords([record])
+      } catch (e) {
+        setFailure(({ t }) => t('Shared link not opened: {reason}', { reason: errorText(e) }))
+        return false
+      }
+      onStored?.()
+    }
     onOpen(record.data as Of<K>['data'], record.name, record)
     id.current = undefined
     handle.current = undefined
@@ -1213,11 +1228,13 @@ function FileMenuOf<K extends UserRecordKind>({
     setSaved(undefined)
     // not the canonical text of any record: the shared record counts as unsaved work
     initial.current = ''
+    const opened = autosaved
+      ? msg('Opened the shared {name}; this browser keeps it.')
+      : msg('Opened the shared {name}; Save keeps it.')
     setMessage(({ t }) =>
-      [t('Opened the shared {name}; Save keeps it.', { name: record.name }), readNote(parsed, t)]
-        .filter(Boolean)
-        .join(' '),
+      [t(opened, { name: record.name }), readNote(parsed, t)].filter(Boolean).join(' '),
     )
+    return true
   }
 
   /** States once when the browser refuses persistent storage after a write. */

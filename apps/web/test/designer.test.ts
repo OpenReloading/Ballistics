@@ -34,6 +34,7 @@ import { presetUnits } from '../src/lib/units.ts'
 import type { ResolvedBullet } from '../src/lib/variants.ts'
 import { defined } from './defined.ts'
 import { matchBullet, targetBullet } from './fixtures/bullets.ts'
+import { catalogBundle } from './records.ts'
 
 describe('choice lists', () => {
   it('are subsets of the record schema enums', () => {
@@ -241,7 +242,7 @@ describe('refusals', () => {
 
 describe('plausibility', () => {
   const spec = (key: string) => defined(designerSpecs.find((s) => s.key === key))
-  it('flags a diameter outside 0.05 to 1.5 in and a mass outside 5 to 1000 gr, nothing else', () => {
+  it('flags a diameter outside 0.05 to 1.5 in and a mass outside 5 to 1500 gr, nothing else', () => {
     const inch = 0.0254
     const grain = 64.79891e-6
     expect(implausible(spec('diameter'), 0.308 * inch)).toBe(false)
@@ -249,9 +250,21 @@ describe('plausibility', () => {
     expect(implausible(spec('diameter'), 0.04 * inch)).toBe(true)
     expect(implausible(spec('mass'), 168 * grain)).toBe(false)
     expect(implausible(spec('mass'), 4 * grain)).toBe(true)
-    expect(implausible(spec('mass'), 1001 * grain)).toBe(true)
+    // a 20 mm projectile
+    expect(implausible(spec('mass'), 1499 * grain)).toBe(false)
+    expect(implausible(spec('mass'), 1501 * grain)).toBe(true)
     expect(implausible(spec('length'), 100)).toBe(false)
     expect(implausible(spec('diameter'), undefined)).toBe(false)
+  })
+
+  it('passes the diameter and mass of every catalogue bullet', () => {
+    const bullets = catalogBundle().bullets
+    expect(bullets.length).toBeGreaterThan(0)
+    for (const b of bullets) {
+      const d = fromRecord(b, metric)
+      for (const key of ['diameter', 'mass'])
+        expect(implausible(spec(key), d.fields[key]?.si), `${b.id} ${key}`).toBe(false)
+    }
   })
 
   it('does not block: an implausible diameter still draws', () => {

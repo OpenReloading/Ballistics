@@ -191,6 +191,7 @@ describe('Load lots, snapshots and ladder', () => {
       powderLot: 'P-1',
       primerLot: 'R-2',
       caseLot: 'C-3',
+      bulletLot: 'B-4',
       seating: { by: 'baseToOgive', value: { value: 54.1 } },
       roundCount: 120,
       dismissed: ['seating'],
@@ -200,6 +201,7 @@ describe('Load lots, snapshots and ladder', () => {
       powderLot: 'P-1',
       primer: { lot: 'R-2' },
       case: { lot: 'C-3' },
+      bulletLot: 'B-4',
       sessions: [session],
       snapshots: [snapshot],
     }
@@ -231,6 +233,20 @@ describe('Load lots, snapshots and ladder', () => {
     ])
       expectIssueAt(load, withLadder(ladder), 'analysis.ladder')
   })
+})
+
+it('reads a load saved before the bullet lot unchanged', () => {
+  const session = `user:${other}`
+  const old = {
+    origin: 'user',
+    cartridge: 'catalogue:308-win',
+    powderLot: 'P-1',
+    primer: { lot: 'R-2' },
+    case: { lot: 'C-3' },
+    sessions: [session],
+    snapshots: [{ session, powderLot: 'P-1', primerLot: 'R-2', caseLot: 'C-3' }],
+  }
+  expect(load.parse(old)).toEqual(old)
 })
 
 describe('Load quantities, capacity, case and sessions', () => {

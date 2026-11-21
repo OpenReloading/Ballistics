@@ -80,17 +80,22 @@ export type SeatingLengths = {
   lengthKind: SeatingLengthKind
   /** Slider range of the length it seats by, m. */
   range: readonly [number, number]
-  /** Volume behind the bullet (m³), travel and jump (m) at `value` (m); absent without the record values; a hollow base of assumed depth adds its volume bracket (`cavityRange`, m³). */
+  /** Volume behind the bullet (m³), travel and jump (m) at `value` (m); absent without the record values; a hollow base of assumed depth adds its volume bracket (`cavityRange`, m³), a revolver's cylinder gap its gap and the travel at which the base leaves the cylinder (`cylinderGap`, m) and a barrel from the forcing cone the cylinder run the travel includes (`cylinderRun`, m). */
   at: (value: number) => {
     volume?: number | undefined
     travel?: number | undefined
     jump?: number | undefined
     cavityRange?: CavityRange | undefined
+    cylinderGap?: CylinderGap | undefined
+    cylinderRun?: number | undefined
   }
 }
 
 /** Bounds of the volume behind the bullet over the depth bracket of a hollow base's cavity, m³. */
 export type CavityRange = { low: number; high: number }
+
+/** A revolver's cylinder gap and the travel at which the bullet base leaves the cylinder, m. */
+export type CylinderGap = { gap: number; exit: number }
 
 /** One step of a seating ladder: the length the bullet is seated by (m) and what follows from it. */
 export type SeatingStep = {
@@ -99,6 +104,9 @@ export type SeatingStep = {
   travel: number
   jump?: number
   cavityRange?: CavityRange | undefined
+  cylinderGap?: CylinderGap | undefined
+  /** The cylinder run the travel includes, m: kept apart from `cylinderGap`, which a typed leak area drops. */
+  cylinderRun?: number | undefined
 }
 
 /** `show` writes lengths in the page's unit, so the messages name the unit the fields show. */
@@ -127,7 +135,7 @@ export function seatingLadder(
     }
   const out: SeatingStep[] = []
   for (const value of lengths) {
-    const { volume, travel, jump, cavityRange } = seat.at(value)
+    const { volume, travel, jump, cavityRange, cylinderGap, cylinderRun } = seat.at(value)
     if (volume === undefined || travel === undefined)
       return { error: t('The seating ladder needs a case capacity and a barrel length.') }
     if (volume <= 0)
@@ -143,6 +151,8 @@ export function seatingLadder(
       travel,
       ...(jump !== undefined && { jump }),
       ...(cavityRange && { cavityRange }),
+      ...(cylinderGap && { cylinderGap }),
+      ...(cylinderRun !== undefined && { cylinderRun }),
     })
   }
   return { steps: out }

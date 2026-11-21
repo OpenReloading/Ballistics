@@ -1,7 +1,7 @@
 import { readdirSync } from 'node:fs'
 import path from 'node:path'
 import { expect, type Locator, type Page, test } from '@playwright/test'
-import { height, problems, schemes, tall, widths } from './a11y.ts'
+import { AxeBuilder, height, problems, schemes, tall, widths } from './a11y.ts'
 import { barButton } from './bar.ts'
 import { pickFiles, withoutOpenPicker } from './import.ts'
 import { openLadderGroups } from './ladder-groups.ts'
@@ -9,7 +9,7 @@ import { gotoHydrated } from './nav.ts'
 import { openFit } from './powder-tune-run.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
-import { loadForm, openSavedLoad } from './workbench.ts'
+import { loadForm, openResultTab, openSavedLoad } from './workbench.ts'
 import { runSavedLoad } from './workbench-run.ts'
 
 // The states a visitor reaches after a click: a record page of each `[id]` route, the workbench after a run and every dialog or drawer; a11y-sweep.spec.ts has the pages as they load.
@@ -526,4 +526,29 @@ test('the selected segment of a segmented control has a border in forced colors'
   await expect(indicator).toBeVisible()
   // forced colors remove the fill: the border is all that marks the segment
   await expect(indicator).toHaveCSS('border-top-width', '2px')
+})
+
+// WCAG 2.5.8: the short desktop frame has the tightest rows of the input cards
+test('the workbench targets are 24 px at 1280 x 650', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 650 })
+  await runSavedLoad(page)
+  const { violations } = await new AxeBuilder({ page }).withRules(['target-size']).analyze()
+  expect(violations.flatMap((v) => v.nodes.map((n) => n.target.join(' ')))).toEqual([])
+})
+
+// WCAG 4.1.3: a run started on another result tab is announced, and its pressures keep the notice
+test('a run from the Ladder table tab updates the status beside the notice', async ({ page }) => {
+  test.setTimeout(60_000)
+  await page.setViewportSize({ width: 1280, height: 650 })
+  await runSavedLoad(page)
+  await openResultTab(page, 'Ladder table')
+  const result = page.locator('.result')
+  const charge = loadForm(page).getByLabel(/^Charge mass/)
+  await charge.fill('2.3')
+  await charge.press('Control+Enter')
+  await expect(result.getByRole('status').filter({ hasText: /^Simulation done\./ })).toHaveText(
+    /^Simulation done\. Step 0, 2\.30 g/,
+    { timeout: 15_000 },
+  )
+  await expect(result.getByText('Simulation, not load data')).toBeVisible()
 })
