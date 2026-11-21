@@ -2,7 +2,8 @@ import { expect, type Page, test } from '@playwright/test'
 import { cutText } from './cut.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
-import { runSavedLoad } from './workbench-run.ts'
+import { loadForm, openSavedLoad } from './workbench.ts'
+import { runSavedLoad, runSettled } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
@@ -52,6 +53,43 @@ for (const width of [1280, 390])
       await page.getByRole('tab', { name: 'Results', exact: true }).click()
       await expect.poll(() => cutText(page, names)).toEqual([])
     }
+  })
+
+// the short desktop frame gives the input cards and the readouts the least room; the Powder card's title ends in an ellipsis by design and the page bar has the spacing test above
+for (const language of ['en', 'de'] as const)
+  test(`at 1280 x 650 the ${language} workbench cards and readouts cut and overlap nothing with the spacing`, async ({
+    page,
+  }) => {
+    test.setTimeout(60_000)
+    if (language === 'de') await page.addInitScript(() => localStorage.setItem('language', 'de'))
+    await page.setViewportSize({ width: 1280, height: 650 })
+    await gotoHydrated(page, '/workbench')
+    await openSavedLoad(page, language)
+    await loadForm(page, language === 'de' ? 'Laborierung' : 'Load')
+      .getByLabel(language === 'de' ? /^Ladungsmasse/ : /^Charge mass/)
+      .press('Control+Enter')
+    await expect(page.locator('.results-head .readout-list')).toBeVisible({ timeout: 15_000 })
+    await runSettled(page)
+    await page.addStyleTag({ content: spacing })
+    await expect.poll(() => cutText(page, `${names}, .panel-title, .page-bar`)).toEqual([])
+    // no readout's label, value or unit runs into another's
+    const overlaps = () =>
+      page.locator('.results-head .readout-list').evaluate((list) => {
+        const boxes = [...list.querySelectorAll('dt, dd')]
+          .filter((e) => e.checkVisibility() && e.getBoundingClientRect().width > 1)
+          .map((e) => ({ text: e.textContent, r: e.getBoundingClientRect() }))
+        return boxes.flatMap((a, i) =>
+          boxes
+            .slice(i + 1)
+            .filter(
+              ({ r }) =>
+                Math.min(a.r.right, r.right) - Math.max(a.r.left, r.left) > 0.5 &&
+                Math.min(a.r.bottom, r.bottom) - Math.max(a.r.top, r.top) > 0.5,
+            )
+            .map((b) => `${a.text} / ${b.text}`),
+        )
+      })
+    await expect.poll(overlaps).toEqual([])
   })
 
 for (const width of [1280, 390])

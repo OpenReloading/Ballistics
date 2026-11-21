@@ -261,6 +261,7 @@ const sessionSnapshotParser = z.strictObject({
   powderLot: component.lot.describe('Powder lot of the load at the session.').optional(),
   primerLot: component.lot.describe('Primer lot of the load at the session.').optional(),
   caseLot: component.lot.describe('Case lot of the load at the session.').optional(),
+  bulletLot: component.lot.describe('Bullet lot of the load at the session.').optional(),
   seating: z
     .object({
       by: z.enum(['overallLength', 'baseToOgive']).describe('The length the bullet was seated by.'),
@@ -291,6 +292,7 @@ export const sessionSnapshot: z.ZodObject<
     powderLot: z.ZodOptional<z.ZodOptional<z.ZodString>>
     primerLot: z.ZodOptional<z.ZodOptional<z.ZodString>>
     caseLot: z.ZodOptional<z.ZodOptional<z.ZodString>>
+    bulletLot: z.ZodOptional<z.ZodOptional<z.ZodString>>
     seating: z.ZodOptional<
       z.ZodObject<{
         by: z.ZodEnum<z.core.util.ToEnum<'overallLength' | 'baseToOgive'>>
@@ -326,6 +328,9 @@ const loadShape = z.object({
     .optional(),
   powderLot: component.lot
     .describe('Lot number of the powder, as printed on the package.')
+    .optional(),
+  bulletLot: component.lot
+    .describe('Lot number of the bullet, as printed on the package.')
     .optional(),
   charge: quantity('mass', z.number().positive()).describe('Powder mass of one round.').optional(),
   capacity: ref('case capacity')
@@ -495,6 +500,7 @@ export const load: z.ZodObject<{
     >
   >
   powderLot: z.ZodOptional<z.ZodOptional<z.ZodString>>
+  bulletLot: z.ZodOptional<z.ZodOptional<z.ZodString>>
   charge: z.ZodOptional<QuantitySchema>
   capacity: z.ZodOptional<z.ZodString>
   primer: z.ZodOptional<

@@ -5,7 +5,7 @@ import {
   type SessionReading,
 } from '@rangefoundry/ballistics'
 import { type Load, type SessionRecord, type SessionSnapshot, toSi } from '@rangefoundry/schema'
-import { msg, type Translator } from '../i18n/translate.ts'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { sessionRef } from './measurements.ts'
 import { stringStats } from './string-stats.ts'
 import { type UnitSystem, withUnit } from './units.ts'
@@ -18,10 +18,11 @@ export interface Lots {
   powder: string
   primer: string
   case: string
+  bullet: string
 }
 
 /** No lot typed. */
-export const noLots: Lots = { powder: '', primer: '', case: '' }
+export const noLots: Lots = { powder: '', primer: '', case: '', bullet: '' }
 
 /** What the workbench holds of the load when a session is attached to it. */
 export interface LoadMoment {
@@ -37,9 +38,26 @@ export const lotsFrom = (d: Load): Lots => ({
   powder: d.powderLot ?? '',
   primer: d.primer?.lot ?? '',
   case: d.case?.lot ?? '',
+  bullet: d.bulletLot ?? '',
 })
 
 const lot = (text: string) => text.trim() || undefined
+
+const lotComponents: readonly [keyof Lots, Message][] = [
+  ['powder', msg('Powder')],
+  ['primer', msg('Primer')],
+  ['case', msg('Case')],
+  ['bullet', msg('Bullet')],
+]
+
+/** Every lot set, each after its component, as the one Lots line of a sheet or label; none without a lot. */
+export function lotsLine(lots: Lots, t: Translator['t']): string | undefined {
+  const set = lotComponents.flatMap(([k, name]) => {
+    const text = lot(lots[k])
+    return text ? [`${t(name)} ${text}`] : []
+  })
+  return set.length > 0 ? set.join('; ') : undefined
+}
 
 /** The snapshot of `session` (a reference) for the load as it is now. */
 export function snapshotOf(session: string, now: LoadMoment): SessionSnapshot {
@@ -47,6 +65,7 @@ export function snapshotOf(session: string, now: LoadMoment): SessionSnapshot {
     powderLot: lot(now.lots.powder),
     primerLot: lot(now.lots.primer),
     caseLot: lot(now.lots.case),
+    bulletLot: lot(now.lots.bullet),
   }
   return {
     session,
@@ -109,6 +128,7 @@ export function notesOf(
       powderLot: snap?.powderLot,
       primerLot: snap?.primerLot,
       caseLot: snap?.caseLot,
+      bulletLot: snap?.bulletLot,
       seating: snap?.seating && { by: snap.seating.by, value: snap.seating.value.value },
       roundCount: snap?.roundCount,
       velocity: velocityOf(record, charge),
@@ -122,6 +142,7 @@ const lotNames = {
   powderLot: msg('Powder lot'),
   primerLot: msg('Primer lot'),
   caseLot: msg('Case lot'),
+  bulletLot: msg('Bullet lot'),
 } as const
 const lengthNames = {
   overallLength: msg('Cartridge overall length'),
@@ -138,7 +159,8 @@ export function noteText(
   switch (n.rule) {
     case 'powderLot':
     case 'primerLot':
-    case 'caseLot': {
+    case 'caseLot':
+    case 'bulletLot': {
       const what = t(lotNames[n.rule])
       if (n.change === 'missing') {
         const missing = t('{what} is not recorded for {session}.', {

@@ -108,7 +108,7 @@ export function BurnFigure() {
               : t('of the typed model parameters')}
           </span>
         </h3>
-        <BurnRate p={burn} powderId={powder?.id} marks={runMarks} height={short ? 140 : 104} />
+        <BurnRate p={burn} powderId={powder?.id} marks={runMarks} height={short ? 80 : 104} />
       </section>
     )
   )
@@ -282,6 +282,8 @@ function ResultTabBar({
 }) {
   const { t } = useTranslation()
   const moved = shownTabs.slice(fit)
+  // the first tab holds the readouts too; on a phone the page's own Results tab is beside them
+  const wide = useMediaQuery('(width >= 62em)', false) ?? false
   return (
     <div className="result-tabbar">
       <Tabs.List ref={listRef} className="result-tablist">
@@ -293,7 +295,7 @@ function ResultTabBar({
             data-before-run={v === 'cartridge' || undefined}
             data-moved={i >= fit || undefined}
           >
-            {t(label)}
+            {t(wide && v === 'results' ? msg('Results') : label)}
           </Tabs.Tab>
         ))}
       </Tabs.List>
@@ -626,6 +628,8 @@ export const ResultsArea = memo(function ResultsArea() {
       className="result"
       data-empty={!outcome || undefined}
       data-running={pending || undefined}
+      // a result's load line, readouts and notes belong to the first tab; an error shows on every tab
+      data-tab={ok ? tab : undefined}
     >
       <Tabs
         // before the first run a low window shows the figure, the one panel with content
@@ -639,6 +643,7 @@ export const ResultsArea = memo(function ResultsArea() {
               {t('Result')}
             </h2>
           )}
+          {tabList}
           {/* one line: the load and the notice; the run's time and the stale mark are in the page bar's status, and the status, which the readouts repeat, is for screen readers */}
           <RunLine ok={ok} identity={identity} status={status} echoed={echoed} />
           <ResultsHead
@@ -651,9 +656,8 @@ export const ResultsArea = memo(function ResultsArea() {
             short={short}
           />
           {ok && <ResultNotes ok={ok} />}
-          {/* the ladder bar sits directly above the tabs and drives every tab */}
+          {/* the ladder bar drives every tab */}
           <ShownStrip />
-          {tabList}
           <ResultPanels short={short} />
         </div>
       </Tabs>

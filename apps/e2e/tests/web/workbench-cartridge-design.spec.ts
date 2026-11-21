@@ -56,9 +56,9 @@ test('a cartridge design fills the fields it covers, draws the figure and is nam
   await expect(field(/^Twist/)).toHaveValue('')
   await expect(field(/^Usable case volume/)).toHaveAccessibleDescription(/user design Mine 7\.8/)
   // the figure draws the design's case and chamber
-  await expect(page.locator('.seating-figure svg[aria-labelledby]').first()).toHaveAccessibleName(
-    /user design Mine 7\.8/,
-  )
+  await expect(
+    page.locator('.seating-figure svg[aria-labelledby]').filter({ visible: true }).first(),
+  ).toHaveAccessibleName(/user design Mine 7\.8/)
 
   // the run and the print name the design
   await form.getByRole('combobox', { name: /^Search bullets/ }).fill('demo 168')
@@ -123,8 +123,8 @@ test('a load saved on a design keeps the design by reference and reopens with it
   await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
   await page.getByRole('button', { name, exact: true }).click()
   const field = (label: RegExp) => form.getByRole('textbox', { name: label })
-  await expect(page.locator('.seating-figure svg[aria-labelledby]').first()).toHaveAccessibleName(
-    /user design Mine 7\.8/,
-  )
+  await expect(
+    page.locator('.seating-figure svg[aria-labelledby]').filter({ visible: true }).first(),
+  ).toHaveAccessibleName(/user design Mine 7\.8/)
   await expect(field(/^Bore area/)).toHaveValue('')
 })

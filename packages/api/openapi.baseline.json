@@ -19716,6 +19716,152 @@
                                         }
                                       ]
                                     },
+                                    "perforation": {
+                                      "description": "Perforation of the kernel as the maker states it: none, one hole, several holes.",
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "enum": ["none", "single", "multi"],
+                                          "description": "Perforation of the kernel as the maker states it: none, one hole, several holes."
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "grainDimensions": {
+                                      "description": "Dimensions of the kernel as the maker states them.",
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "length": {
+                                              "description": "Length of the kernel.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In mm.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "diameter": {
+                                              "description": "Outer diameter of the kernel.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In mm.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "web": {
+                                              "description": "Web: the thinnest burning distance through the kernel.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In mm.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "perforationDiameter": {
+                                              "description": "Diameter of a perforation.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In mm.",
+                                                      "type": ["number", "null"]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
                                     "bulkDensity": {
                                       "description": "The `bulkDensity` of the powder record. `null` removes it.",
                                       "anyOf": [
@@ -19739,6 +19885,63 @@
                                                 }
                                               ]
                                             }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "heatOfExplosion": {
+                                      "description": "Heat of explosion as the safety data sheet states it; `raw` keeps a printed J/g.",
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "value": {
+                                              "description": "In J/kg.",
+                                              "type": ["number", "null"]
+                                            },
+                                            "raw": {
+                                              "description": "The value as written in the source, when it differed.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    },
+                                    "transport": {
+                                      "description": "Transport classification from the safety data sheet, one entry per UN or NA number.",
+                                      "anyOf": [
+                                        {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "unNumber": {
+                                                "type": "string",
+                                                "pattern": "^(UN|NA)\\d{4}$",
+                                                "description": "UN number, as `UN0161`, or a US NA number, as `NA3178`."
+                                              },
+                                              "hazardClass": {
+                                                "type": "string",
+                                                "pattern": "^(1(\\.[1-6][A-HJKLNS]?)?|[2-9](\\.[1-6])?)$",
+                                                "description": "Hazard class or division; a class 1 division with its compatibility group where given: `1.3C`, `1`, `4.1`."
+                                              }
+                                            },
+                                            "required": ["unNumber", "hazardClass"]
                                           }
                                         },
                                         {
@@ -21182,6 +21385,11 @@
                                   "type": "string",
                                   "minLength": 1
                                 },
+                                "bulletLot": {
+                                  "description": "Lot number of the bullet, as printed on the package.",
+                                  "type": "string",
+                                  "minLength": 1
+                                },
                                 "charge": {
                                   "type": "object",
                                   "properties": {
@@ -21653,6 +21861,11 @@
                                         "type": "string",
                                         "minLength": 1
                                       },
+                                      "bulletLot": {
+                                        "description": "Bullet lot of the load at the session.",
+                                        "type": "string",
+                                        "minLength": 1
+                                      },
                                       "seating": {
                                         "type": "object",
                                         "properties": {
@@ -21950,6 +22163,29 @@
                                   "required": ["value"],
                                   "unit": "mm",
                                   "description": "Barrel length."
+                                },
+                                "barrelLengthFrom": {
+                                  "type": "string",
+                                  "enum": ["breechFace", "forcingCone"],
+                                  "description": "Where `barrelLength` is measured from: the breech face, or the forcing cone of a revolver barrel. Absent: the breech face."
+                                },
+                                "cylinderGap": {
+                                  "type": "object",
+                                  "properties": {
+                                    "value": {
+                                      "type": "number",
+                                      "minimum": 0,
+                                      "description": "In mm."
+                                    },
+                                    "raw": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "description": "The value as written in the source, when it differed."
+                                    }
+                                  },
+                                  "required": ["value"],
+                                  "unit": "mm",
+                                  "description": "Gap between the cylinder face and the barrel of a revolver."
                                 },
                                 "twist": {
                                   "type": "object",
@@ -26096,6 +26332,108 @@
                       "type": "string",
                       "enum": ["single", "double", "triple"]
                     },
+                    "perforation": {
+                      "type": "string",
+                      "enum": ["none", "single", "multi"],
+                      "description": "Perforation of the kernel as the maker states it: none, one hole, several holes."
+                    },
+                    "grainDimensions": {
+                      "type": "object",
+                      "properties": {
+                        "length": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "description": "In mm."
+                            },
+                            "raw": {
+                              "type": "string",
+                              "minLength": 1,
+                              "description": "The value as written in the source, when it differed."
+                            }
+                          },
+                          "required": ["value"],
+                          "additionalProperties": false,
+                          "unit": "mm",
+                          "description": "Length of the kernel."
+                        },
+                        "diameter": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "description": "In mm."
+                            },
+                            "raw": {
+                              "type": "string",
+                              "minLength": 1,
+                              "description": "The value as written in the source, when it differed."
+                            }
+                          },
+                          "required": ["value"],
+                          "additionalProperties": false,
+                          "unit": "mm",
+                          "description": "Outer diameter of the kernel."
+                        },
+                        "web": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "description": "In mm."
+                            },
+                            "raw": {
+                              "type": "string",
+                              "minLength": 1,
+                              "description": "The value as written in the source, when it differed."
+                            }
+                          },
+                          "required": ["value"],
+                          "additionalProperties": false,
+                          "unit": "mm",
+                          "description": "Web: the thinnest burning distance through the kernel."
+                        },
+                        "perforationDiameter": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "description": "In mm."
+                            },
+                            "raw": {
+                              "type": "string",
+                              "minLength": 1,
+                              "description": "The value as written in the source, when it differed."
+                            }
+                          },
+                          "required": ["value"],
+                          "additionalProperties": false,
+                          "unit": "mm",
+                          "description": "Diameter of a perforation."
+                        }
+                      },
+                      "additionalProperties": false,
+                      "anyOf": [
+                        {
+                          "required": ["length"]
+                        },
+                        {
+                          "required": ["diameter"]
+                        },
+                        {
+                          "required": ["web"]
+                        },
+                        {
+                          "required": ["perforationDiameter"]
+                        }
+                      ],
+                      "description": "Dimensions of the kernel as the maker states them."
+                    },
                     "bulkDensity": {
                       "type": "object",
                       "properties": {
@@ -26112,6 +26450,25 @@
                       "required": ["value"],
                       "additionalProperties": false,
                       "unit": "g/cm3"
+                    },
+                    "heatOfExplosion": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "number",
+                          "exclusiveMinimum": 0,
+                          "description": "In J/kg."
+                        },
+                        "raw": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "The value as written in the source, when it differed."
+                        }
+                      },
+                      "required": ["value"],
+                      "additionalProperties": false,
+                      "unit": "J/kg",
+                      "description": "Heat of explosion as the safety data sheet states it; `raw` keeps a printed J/g."
                     },
                     "composition": {
                       "minItems": 1,
@@ -26146,6 +26503,28 @@
                         "additionalProperties": false,
                         "unit": "%"
                       }
+                    },
+                    "transport": {
+                      "minItems": 1,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "unNumber": {
+                            "type": "string",
+                            "pattern": "^(UN|NA)\\d{4}$",
+                            "description": "UN number, as `UN0161`, or a US NA number, as `NA3178`."
+                          },
+                          "hazardClass": {
+                            "type": "string",
+                            "pattern": "^(1(\\.[1-6][A-HJKLNS]?)?|[2-9](\\.[1-6])?)$",
+                            "description": "Hazard class or division; a class 1 division with its compatibility group where given: `1.3C`, `1`, `4.1`."
+                          }
+                        },
+                        "required": ["unNumber", "hazardClass"],
+                        "additionalProperties": false
+                      },
+                      "description": "Transport classification from the safety data sheet, one entry per UN or NA number."
                     },
                     "thermochemistry": {
                       "type": "object",

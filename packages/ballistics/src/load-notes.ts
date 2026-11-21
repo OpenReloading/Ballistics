@@ -5,6 +5,7 @@ export type LoadNoteRule =
   | 'powderLot'
   | 'primerLot'
   | 'caseLot'
+  | 'bulletLot'
   | 'seating'
   | 'velocity'
   | 'roundCount'
@@ -31,6 +32,7 @@ export interface SessionReading {
   powderLot?: string | undefined
   primerLot?: string | undefined
   caseLot?: string | undefined
+  bulletLot?: string | undefined
   seating?: SeatingReading | undefined
   /** Rounds through the firearm at the session. */
   roundCount?: number | undefined
@@ -41,7 +43,7 @@ export interface SessionReading {
 
 /** A lot changed from the earlier session's, or is not recorded. */
 export interface LotNote {
-  rule: 'powderLot' | 'primerLot' | 'caseLot'
+  rule: 'powderLot' | 'primerLot' | 'caseLot' | 'bulletLot'
   session: string
   /** The session before, when there is one. */
   earlier?: string | undefined
@@ -87,7 +89,7 @@ export type LoadNote = LotNote | SeatingNote | VelocityNote | RoundCountNote
 /** Two seating lengths closer than this are the same, mm: the 0.01 mm the fields show. */
 const seatingTolerance = 0.01
 
-const lots = ['powderLot', 'primerLot', 'caseLot'] as const
+const lots = ['powderLot', 'primerLot', 'caseLot', 'bulletLot'] as const
 
 const lotOf = (s: SessionReading, rule: (typeof lots)[number]) => s[rule]?.trim() || undefined
 
@@ -104,7 +106,9 @@ const lotNotes = (s: SessionReading, prev: SessionReading | undefined): LotNote[
     const now = lotOf(s, rule)
     const before = prev && lotOf(prev, rule)
     const base = { rule, session: s.id, earlier: prev?.id, now, before }
-    if (now === undefined) return [{ ...base, change: 'missing' }]
+    // the bullet lot came later than the others: sessions saved without it are not missing it
+    if (now === undefined)
+      return rule === 'bulletLot' && before === undefined ? [] : [{ ...base, change: 'missing' }]
     return before !== undefined && before !== now ? [{ ...base, change: 'changed' }] : []
   })
 

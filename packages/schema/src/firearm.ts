@@ -332,6 +332,15 @@ const firearmParser = z
       .describe('Reference to the cartridge the firearm is chambered for.')
       .optional(),
     barrelLength: length().describe('Barrel length.').optional(),
+    barrelLengthFrom: z
+      .enum(['breechFace', 'forcingCone'])
+      .describe(
+        'Where `barrelLength` is measured from: the breech face, or the forcing cone of a revolver barrel. Absent: the breech face.',
+      )
+      .optional(),
+    cylinderGap: length()
+      .describe('Gap between the cylinder face and the barrel of a revolver.')
+      .optional(),
     twist: length().describe('Rifling twist as length per turn.').optional(),
     twistHand: z.enum(['right', 'left']).describe('Direction of the rifling twist.'),
     grooveDiameter: length().describe('Groove diameter.').optional(),
@@ -395,6 +404,9 @@ const firearmParser = z
         message: 'Name the bullet the lands contact was measured with',
         path: ['landsBullet'],
       })
+    for (const key of ['barrelLengthFrom', 'cylinderGap'] as const)
+      if (f[key] !== undefined && f[key] !== 'breechFace' && f.action !== 'revolver')
+        ctx.addIssue({ code: 'custom', message: 'Only a revolver has this value', path: [key] })
     const optics = f.optics.map((o) => o.id)
     const configs = f.configurations.map((c) => c.id)
     unique(optics, (i) => ['optics', i, 'id'], ctx)
@@ -420,7 +432,8 @@ const firearmParser = z
 /**
  * A firearm, one shape for every origin: lengths in mm, mass in g, angles in degrees, zero air in
  * degC, bar and %. Optic and configuration ids are unique, each mount names an optic of the firearm
- * and `active` names one of its configurations. A record with the maker as text fails the schema.
+ * and `active` names one of its configurations. A barrel length from the forcing cone and a cylinder
+ * gap need the action `revolver`. A record with the maker as text fails the schema.
  * Inferred type: {@link Firearm}.
  */
 export const firearm: z.ZodObject<
@@ -432,6 +445,8 @@ export const firearm: z.ZodObject<
     action: z.ZodOptional<typeof firearmAction>
     cartridge: z.ZodOptional<z.ZodString>
     barrelLength: z.ZodOptional<QuantitySchema>
+    barrelLengthFrom: z.ZodOptional<z.ZodEnum<z.core.util.ToEnum<'breechFace' | 'forcingCone'>>>
+    cylinderGap: z.ZodOptional<QuantitySchema>
     twist: z.ZodOptional<QuantitySchema>
     twistHand: z.ZodEnum<z.core.util.ToEnum<'right' | 'left'>>
     grooveDiameter: z.ZodOptional<QuantitySchema>

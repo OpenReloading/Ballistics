@@ -403,7 +403,7 @@ Each curve point has time, travel, velocity, burnt fraction, the three pressures
 
 ### Load file
 
-`interiorLoad` maps the values of a workbench load file (SI) onto the model input. The burn law is the vivacity law, with the two-stage form when all four form values are given and the constant form when none is. A leak area is constant over the whole travel. `missingLoadKeys` lists every needed value that no other source gave (all but the bore area, which falls back to the circle of the mean of bore and groove diameter, or of the bore diameter without a groove diameter). The load ratio, charge bulk volume over the volume behind the seated bullet, is:
+`interiorLoad` maps the values of a workbench load file (SI) onto the model input. The burn law is the vivacity law, with the two-stage form when all four form values are given and the constant form when none is. A leak area is constant over the whole travel. `interiorLoad` adds no cylinder gap leak and no cylinder run: the web workbench builds both from the firearm ([cylinder gap](interior-leakage-heat.md#cylinder-gap)), so a revolver load run through `interiorLoad` leaks only through a typed leak area, over the travel the file holds. `missingLoadKeys` lists every needed value that no other source gave (all but the bore area, which falls back to the circle of the mean of bore and groove diameter, or of the bore diameter without a groove diameter). The load ratio, charge bulk volume over the volume behind the seated bullet, is:
 
 $$
 \Lambda = \frac{m_c}{\rho_\text{bulk} V_c}

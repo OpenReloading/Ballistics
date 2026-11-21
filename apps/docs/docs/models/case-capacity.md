@@ -48,6 +48,14 @@ $$
 
 Code: `packages/svg-drawings/src/seating/seating.ts`, `seat` (`basePosition`, `depthValue`, `travel`).
 
+A revolver whose firearm measures the barrel from the forcing cone adds the cylinder run, the cylinder face $z_f$ plus the cylinder gap $g$, to the travel. The cylinder face is the larger of the cartridge's L6 and the COAL, and the bullet base passes it at $z_f - z_b$ of travel, where the [cylinder gap](interior-leakage-heat.md#cylinder-gap) starts to leak:
+
+$$
+z_f = \max(L_6, \mathrm{COAL}), \qquad x_e = L_\mathrm{barrel} + z_f + g - z_b
+$$
+
+Code: `packages/svg-drawings/src/seating/seating.ts`, `seat` (`cylinder`).
+
 ### Bullet volume below the mouth
 
 The bullet outline is a half profile $r(z)$, a polyline through points $(r_k, z_k)$ that `bulletOutline` builds from the bullet's dimensions, closed along the axis. It starts at the base center, or at the apex of the cavity of a hollow base, and ends at the tip. The volume below the mouth is the sum of the frustums of revolution of its segments up to $c = \min(\max(s, 0), L_b)$. A segment running up adds its frustum and a segment running down, the wall of a cavity, takes it off:
@@ -246,6 +254,7 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 | $L_3$                                                                       | Case length of the cartridge (C.I.P.)                                              | mm           | mm                 |
 | $s$                                                                         | Seating depth below the case mouth                                                 | mm           | mm                 |
 | $L_\mathrm{barrel}$, $x_e$                                                  | Barrel length from the breech face, bullet travel                                  | mm           | mm (m in `core`)   |
+| $z_f$, $g$                                                                  | Cylinder face of a revolver from the breech face, cylinder gap                     | mm           | mm                 |
 | $r(z)$, $r_k$, $z_k$                                                        | Outline radius and points from the base                                            | mm           | mm                 |
 | $c$                                                                         | Length of the bullet below the mouth                                               | mm           | mm                 |
 | $V_b$                                                                       | Bullet volume below the mouth                                                      | no kind      | cm³                |

@@ -38,14 +38,11 @@ const storedManufacturers = (page: Page) =>
 async function saveInFolder(page: Page, by: 'button' | 'shortcut' = 'button') {
   await page.goto('/bullets/designer')
   await folderItem(page, 'Choose workspace folder…')
-  await expect(state(page)).toHaveText('Not saved to a file, folder workspace')
   await page.getByRole('combobox', { name: 'Manufacturer' }).fill('Folder')
+  // the File menu reads the design after a deferred render, which keeps it in the browser
+  await expect(state(page)).toHaveText('Saved in this browser, folder workspace')
   if (by === 'button') await (await barButton(page, 'Save')).click()
-  else {
-    // the File menu reads the design after a deferred render, which marks it unsaved
-    await expect(state(page)).toHaveText('Unsaved, folder workspace')
-    await page.keyboard.press('Control+S')
-  }
+  else await page.keyboard.press('Control+S')
   await expect(state(page)).toHaveText('Saved: folder.json, folder workspace')
 }
 
@@ -77,7 +74,8 @@ test('a folder whose reading crashed the last load is forgotten unread', async (
   await expect(page.getByRole('status').filter({ hasText: 'could not be restored' })).toHaveText(
     'The workspace folder could not be restored; choose it again.',
   )
-  await expect(state(page)).toHaveText('Not saved to a file')
+  // a new design: nothing kept yet, no folder
+  await expect(state(page)).toBeEmpty()
   await (await barButton(page, 'Save options')).click()
   await expect(page.getByRole('menuitem', { name: 'Choose workspace folder…' })).toBeVisible()
   expect(await page.evaluate(() => localStorage.getItem('user-data-folder-restoring'))).toBeNull()
