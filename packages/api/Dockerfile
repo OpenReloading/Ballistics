@@ -1,5 +1,5 @@
 # Build context: repository root (docker build -f packages/api/Dockerfile .)
-FROM docker.io/library/node:26-trixie-slim@sha256:5adad64f9a1fca2d51972caa65983634c8a774eb300d72b20f7f2a0f60368072 AS build
+FROM docker.io/library/node:26-trixie-slim@sha256:e6bedef217677b276c591795e169840edd9096dbf13f29df8ef8d1856b8820bc AS build
 # pnpm as .github/pnpm/package-lock.json pins it; its native binary comes as an optional dependency, so no install script runs
 COPY .github/pnpm /opt/pnpm
 RUN cd /opt/pnpm && npm ci --ignore-scripts --no-audit --no-fund && ln -s /opt/pnpm/node_modules/.bin/pnpm /usr/local/bin/pnpm
@@ -41,7 +41,7 @@ COPY tools/src/catalog tools/src/catalog
 COPY tooling/test-kit tooling/test-kit
 RUN pnpm --filter "@rangefoundry/api..." run build
 
-FROM docker.io/library/node:26-trixie-slim@sha256:5adad64f9a1fca2d51972caa65983634c8a774eb300d72b20f7f2a0f60368072
+FROM docker.io/library/node:26-trixie-slim@sha256:e6bedef217677b276c591795e169840edd9096dbf13f29df8ef8d1856b8820bc
 ENV NODE_ENV=production
 # pnpm as .github/pnpm/package-lock.json pins it; its native binary comes as an optional dependency, so no install script runs
 COPY .github/pnpm /opt/pnpm
