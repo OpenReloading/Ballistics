@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
-import { loadForm } from './workbench.ts'
+import { loadForm, openKeeping } from './workbench.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
@@ -80,6 +80,7 @@ test('an own case group is a Mine row of the Cases list, opened in its editor, p
   const capacity = loadForm(page).getByRole('textbox', { name: /^Case capacity/ })
   await expect(capacity).toHaveValue('')
   const brass = page.getByRole('combobox', { name: 'Brass record' })
+  await openKeeping(page)
   await brass.click()
   await page.getByRole('option', { name: 'Match brass, lot 3 (your brass)' }).click()
   // the group's measured capacity is in the measured field, where the run marks it as measured

@@ -3,7 +3,7 @@ import { barButton } from './bar.ts'
 import { showGerman } from './german.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
-import { openSavedLoad } from './workbench.ts'
+import { openKeeping, openSavedLoad } from './workbench.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 // the printed QR code is read from a screenshot: at 96 dpi a module is 2.9 px, which jsQR cannot read for some codes; at 3 x it is 8.6 px
@@ -11,8 +11,8 @@ test.use({ deviceScaleFactor: 3 })
 
 /** The label in each language: German row names are longer, the label must still hold them. */
 const languages = [
-  { name: 'English', button: /^Print a box label of /, lot: 'Primer lot' },
-  { name: 'German', button: /^Schachtel-Etikett von .* drucken$/, lot: 'Zündhütchen-Los' },
+  { name: 'English', button: /^Print a box label of /, lot: 'Bullet G-0815' },
+  { name: 'German', button: /^Schachtel-Etikett von .* drucken$/, lot: 'Geschoss G-0815' },
 ]
 
 for (const language of languages)
@@ -29,12 +29,19 @@ for (const language of languages)
     await gotoHydrated(page, '/workbench')
     await openSavedLoad(page)
     // every lot typed: the tallest label
-    for (const [lot, text] of [
-      ['Powder lot', 'P-2026-0412-A'],
-      ['Primer lot', 'Z-778341'],
-      ['Case lot', 'H-19-2203'],
-    ] as const)
-      await page.getByLabel(lot, { exact: true }).first().fill(text)
+    await openKeeping(page)
+    for (const [component, text] of [
+      ['powder', 'P-2026-0412-A'],
+      ['primer', 'Z-778341'],
+      ['case', 'H-19-2203'],
+      ['bullet', 'G-0815'],
+    ] as const) {
+      await page.getByRole('button', { name: `Add lot for the ${component}`, exact: true }).click()
+      await page
+        .getByRole('textbox', { name: new RegExp(`^${component} lot$`, 'i') })
+        .first()
+        .fill(text)
+    }
     await (await barButton(page, 'Save')).click()
     await expect(page.locator('.file-state')).toContainText('Saved')
     await (await barButton(page, 'Open')).click()

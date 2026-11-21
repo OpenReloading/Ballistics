@@ -5,19 +5,22 @@ import type { Case, UserCaseRecord, UserRecord } from '@rangefoundry/schema'
 import { useCallback, useDeferredValue, useEffect, useRef, useState } from 'react'
 import { putRecords, storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
-import type { Message } from '../i18n/translate.ts'
+import { type Message, msg } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { CartridgeDetail } from '../lib/api-types.ts'
 import { blankCaseGroup, caseGroupProblem, groupCapacity, withCapacity } from '../lib/case-group.ts'
 import { catalogueCartridgeId } from '../lib/firearm.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { capacityRecord } from '../lib/load-record.ts'
+import { newId } from '../lib/new-id.ts'
 import { waterVolume } from '../lib/units.ts'
+import { namedKey } from '../lib/user-data.ts'
 import { CaseEditor } from './case-editor.tsx'
 import { FileMenu, type FileMenuHandle } from './file-menu.tsx'
 import { PageBar } from './page-bar.tsx'
 import { ErrorNote } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
+import { useKeptDraft } from './use-kept-draft.ts'
 import { recordLoadingText, useRecordLink } from './use-record-link.ts'
 
 /** Cartridge names by record id, each asked of the API once; the stored reference shows until it answers. */
@@ -51,7 +54,19 @@ const capacityIn = (c: Case, records: readonly UserRecord[] | undefined) => {
   return grams === undefined ? undefined : waterVolume(grams)
 }
 
-/** A new group, or the stored one that `?record=` names; the File menu saves and opens the browser's groups. */
+const fallbackName = 'Brass group'
+const blankData = blankCaseGroup()
+const blankKey = namedKey(blankData, '')
+const notKept = msg('Not saved in this browser')
+
+/** A group kept in the browser, with its measured capacity `m3`. */
+interface Draft {
+  data: Case
+  key: string
+  m3: number | undefined
+}
+
+/** A new group, or the stored one that `?record=` names; every valid change is kept in the browser, and the File menu opens the browser's groups. */
 export function CaseGroupEditor() {
   const { t } = useTranslation()
   const { system } = useUnits()
@@ -66,21 +81,63 @@ export function CaseGroupEditor() {
   useRecordLink('case', menu, (m) => setFailure(m === recordLoadingText ? undefined : m))
   const { nameOf: cartridgeName, setNames: setCartridgeNames } = useCartridgeNames([data.cartridge])
 
-  /** Shows `next` in a remounted editor, with its measured capacity `m3`. */
-  const show = (next: Case, m3?: number) => {
+  const group = withCapacity(data, capacity)
+  const groupKey = namedKey(group, '')
+  // the record format refuses a group without a name or cartridge: the last valid one stays kept
+  const [draft, setDraft] = useState<Draft>({ data: blankData, key: blankKey, m3: undefined })
+  if (groupKey !== draft.key && !caseGroupProblem(group.name ?? '', group, t))
+    setDraft({ data: group, key: groupKey, m3: capacity })
+  const [recordId, setRecordId] = useState(newId)
+  const { kept, flush, drop, stored } = useKeptDraft(
+    'case',
+    fallbackName,
+    blankKey,
+    recordId,
+    draft.data.name ?? '',
+    draft.data,
+    draft.key,
+  )
+  /** The capacity reference whose record the browser holds: an opened group's is stored already. */
+  const capacityKept = useRef<string>(undefined)
+  // the group names its capacity, a record of its own: written ahead of the group's delayed write, so no flush of the group goes without it
+  useEffect(() => {
+    const { data, m3 } = draft
+    if (m3 === undefined || !data.capacity || data.capacity === capacityKept.current) return
+    capacityKept.current = data.capacity
+    putRecords([capacityRecord(data.cartridge, m3, new Date())]).then(
+      () => setFailure((f) => (f === notKept ? undefined : f)),
+      () => {
+        capacityKept.current = undefined
+        setFailure(notKept)
+      },
+    )
+  }, [draft])
+
+  /** Shows `next` as the record `id` in a remounted editor, with its measured capacity `m3`; `written` when the browser holds it. */
+  const show = (id: string, next: Case, m3: number | undefined, written: boolean) => {
+    const shown = withCapacity(next, m3)
+    const key = namedKey(shown, '')
+    setDraft({ data: shown, key, m3 })
+    stored.current = { key, written }
+    capacityKept.current = shown.capacity
+    setRecordId(id)
     setData(next)
     setCapacity(m3)
     setNameLeft(false)
     setGeneration((g) => g + 1)
+    setFailure((f) => (f === notKept ? undefined : f))
   }
   // the capacity record is read at the open: a link opens before any earlier read of the store is back
-  const onOpen = async (d: Case) => {
+  const onOpen = async (d: Case, _name: string, record: { id: string }) => {
     const { records } = await storedRecords().catch(() => ({ records: [] }))
-    show(d, capacityIn(d, records))
+    // an older draft of the same id must not overwrite the opened record
+    if (record.id === recordId) drop()
+    else flush()
+    show(record.id, d, capacityIn(d, records), true)
   }
 
   // the File menu renders after an edit, from the deferred data
-  const fileData = useDeferredValue(withCapacity(data, capacity))
+  const fileData = useDeferredValue(group)
   const problem = caseGroupProblem(fileData.name ?? '', fileData, t)
   const patch = (p: Partial<Case>) => setData((d) => ({ ...d, ...p }))
   /** A cleared field also drops the reference to a record this browser does not hold. */
@@ -114,7 +171,9 @@ export function CaseGroupEditor() {
               variant="default"
               onClick={async () => {
                 const blank = blankCaseGroup()
-                if (await menu.current?.startNew(blank)) show(blank)
+                if (!(await menu.current?.startNew(blank))) return
+                flush()
+                show(newId(), blank, undefined, false)
               }}
             >
               {t('New brass group')}
@@ -124,6 +183,9 @@ export function CaseGroupEditor() {
               kind="case"
               name={fileData.name ?? ''}
               data={fileData}
+              autosaved={recordId}
+              browserList
+              kept={groupKey === draft.key && failure !== notKept ? kept : 'failed'}
               problem={problem}
               idle={false}
               store={store}

@@ -27,6 +27,7 @@ import { localDay } from '../lib/dates.ts'
 import { siValues, specText } from '../lib/field-spec.ts'
 import { activeClick } from '../lib/firearm.ts'
 import { interiorFields } from '../lib/interior-input.ts'
+import { lotsLine } from '../lib/load-notes.ts'
 import { shortName } from '../lib/load-tabs.ts'
 import { sampler } from '../lib/playback.ts'
 import { powderDesignNote } from '../lib/powder-designer.ts'
@@ -447,6 +448,7 @@ function sheetComponents(
   seatingRows: PrintRows,
   runTemperature: string | undefined,
   charge: (kg: number) => string,
+  lots: string | undefined,
   t: Translate,
 ) {
   const mass = withUnit('mass', system, ok.load.bullet.mass)
@@ -467,6 +469,7 @@ function sheetComponents(
       [t('Bullet travel'), shownLength('travel', system, ok.load.barrel.length)],
       [t('Firearm'), ok.printed.firearm],
       [t('Powder temperature'), runTemperature],
+      [t('Lots'), lots],
     ] as PrintRows
   ).filter((r): r is [string, string] => Boolean(r[1]))
 }
@@ -957,7 +960,15 @@ function PrintViews({
   const sheets = ok && (
     <LoadSheets
       title={loadTitle}
-      components={sheetComponents(ok, system, seatingRows, runTemperature, charge, t)}
+      components={sheetComponents(
+        ok,
+        system,
+        seatingRows,
+        runTemperature,
+        charge,
+        lotsLine(load.loadNotes.lots, t),
+        t,
+      )}
       note={[stale && t('Inputs changed since this result.'), fromDesign, approximate]
         .filter(Boolean)
         .join(' ')}

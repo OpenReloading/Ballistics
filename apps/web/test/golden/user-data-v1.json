@@ -239,6 +239,31 @@
       }
     },
     {
+      "kind": "firearm",
+      "id": "8e1f6a2b-3c4d-4e5f-9a6b-7c8d9e0f1a2b",
+      "name": "Range revolver",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "origin": "user",
+        "name": "Range revolver",
+        "cartridge": "catalogue:357-magnum",
+        "action": "revolver",
+        "barrelLength": {
+          "value": 95
+        },
+        "barrelLengthFrom": "forcingCone",
+        "cylinderGap": {
+          "value": 0.1
+        },
+        "twist": {
+          "value": 469.9
+        },
+        "twistHand": "right",
+        "optics": [],
+        "configurations": []
+      }
+    },
+    {
       "kind": "session",
       "id": "6f5e4d3c-2b1a-4098-8f7e-6d5c4b3a2918",
       "name": "Day 1",
@@ -690,6 +715,7 @@
         "id": "308-win-168-gr-ladder",
         "name": "Ladder 168 gr",
         "powderLot": "Lot 2291",
+        "bulletLot": "B 0815",
         "capacity": "user:1e2d3c4b-5a69-4788-9a0b-1c2d3e4f5a6b",
         "primer": {
           "record": "catalogue:demo-primer-large-rifle",

@@ -42,7 +42,7 @@ import {
 } from '../lib/sources.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { userBullets } from '../lib/variants.ts'
-import { CompareButton, SelectionSummary, usePicks } from './compare-picks.tsx'
+import { CompareButton, hiddenPicks, SelectionSummary, usePicks } from './compare-picks.tsx'
 import { DirectoryPage } from './directory-page.tsx'
 import { type DirectoryColumn, DirectoryTable, useListState } from './directory-table.tsx'
 import { FacetFilters, useFacets } from './facet-filters.tsx'
@@ -107,7 +107,7 @@ export function BulletList({
   const types = useMemo(() => new Map(items.map((b) => [b.id, bulletTypeText(t, b)])), [items, t])
   const typeOf = (b: BulletRow) => types.get(b.id) ?? bulletTypeText(t, b)
   // the compare view's columns, in the order ticked; a bullet record's Compare (`compareFrom`) links with that bullet ticked
-  const [picked, , replace] = usePicks(
+  const [picked, untick, replace] = usePicks(
     maxComparedBullets,
     state.compareIds,
     (pick) => set({ compareIds: pick }),
@@ -243,6 +243,8 @@ export function BulletList({
         <SelectionSummary
           count={picked.length}
           max={maxComparedBullets}
+          hidden={hiddenPicks(picked, shown, items, productLabel)}
+          onUntick={untick}
           onClear={() => replace([])}
         />
       }

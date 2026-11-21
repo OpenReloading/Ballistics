@@ -21,6 +21,8 @@ import type { FieldValue } from '../lib/field-spec.ts'
 import { nth } from '../lib/nth.ts'
 import { roundedFieldText, type UnitSystem } from '../lib/units.ts'
 import {
+  cylinderRunOf,
+  gapLeakOf,
   needsNetwork,
   notReached,
   type Outcome,
@@ -48,7 +50,7 @@ export type BarrelStudy = {
   errors?: RangeErrors | undefined
   /** The run's barrel is the workbench's barrel length; false when the typed travel differs. */
   atSeating: boolean
-  /** The seated bullet's base from the head, m; none without a seated bullet. */
+  /** The seated bullet's base from the head, m, less a revolver's cylinder run, so base plus travel is the barrel length; none without a seated bullet. */
   base?: number | undefined
   /** Every step of the run, in ladder order. */
   steps: BarrelStep[]
@@ -81,6 +83,7 @@ async function requestLonger(
           single ? [ok.load.charge] : ok.steps.map((s) => s.charge),
           ok.direction,
           travel,
+          gapLeakOf(ok),
         ),
       ),
       signal,
@@ -190,7 +193,8 @@ export function useBarrelStudy({
   const lengths = 'lengths' in planned ? planned.lengths : undefined
   const figure = ok && stripFigureOf(ok)
   const single = singleCharge(ok)
-  const base = figure && toSi('length', figure.base)
+  // a revolver barrel from the forcing cone: the travel holds the cylinder run, the lengths do not
+  const base = figure && toSi('length', figure.base) - cylinderRunOf(ok)
   const runTravel = ok?.load.barrel.length
   const travel = travelOf(lengths, base, runTravel)
   const [attempt, setAttempt] = useState(0)

@@ -1,22 +1,20 @@
 import { expect, type Locator, type Page, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
-import { loadForm, openSavedLoad } from './workbench.ts'
+import { loadForm, openKeeping, openSavedLoad } from './workbench.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
-// the pinned row above the cards: each choice follows the cartridge it depends on, a lot follows its component
+// the Cartridge card's "Primer, brass, lots" row: each choice follows the cartridge it depends on, a lot (the fixture has none) its component's records
 const row = [
-  ['combobox', 'Search cartridges by name'],
-  ['button', 'Browse cartridges'],
   ['combobox', 'Primer'],
   ['button', 'Browse primers'],
-  ['textbox', 'Primer lot'],
+  ['button', 'Add lot for the primer'],
   ['combobox', 'Brass record'],
   // the fixture load chooses its brass: its clear button takes the place of Browse brass
   ['button', 'Clear the brass record'],
-  ['textbox', 'Case lot'],
   ['combobox', 'Case capacity record'],
+  ['button', 'Add lot for the case'],
 ] as const
 const names = row.map(([, name]) => name)
 
@@ -43,27 +41,31 @@ for (const [width, height] of [
   [1366, 657],
   [390, 844],
 ] as const)
-  test(`at ${width} x ${height} the pinned row holds the cartridge, primer, brass, their lots and capacity in keyboard, visual and reading order`, async ({
+  test(`at ${width} x ${height} the Cartridge card holds the cartridge search in its head and primer and its lot, then brass, capacity and the case lot in its last row, in keyboard, visual and reading order`, async ({
     page,
   }) => {
     await page.setViewportSize({ width, height })
     await gotoHydrated(page, '/workbench')
     await openSavedLoad(page)
-    const controls = rowControls(page)
+    const card = loadForm(page).getByRole('region', { name: 'Cartridge', exact: true })
+    const search = card.getByRole('combobox', { name: 'Search cartridges by name' })
+    await expect(search).toBeVisible()
+    await openKeeping(page)
+    const controls = [search, ...rowControls(page)]
     if (width > 390) for (const c of controls) await expect(c).toBeInViewport()
     expect(await inversions(controls)).toBe(0)
 
     // a disabled select (no capacity record) takes no keyboard stop
     const stops: Locator[] = []
     for (const c of controls) if (await c.isEnabled()) stops.push(c)
-    await stops[0]?.focus()
-    for (const c of stops.slice(1)) {
+    await stops[1]?.focus()
+    for (const c of stops.slice(2)) {
       await page.keyboard.press('Tab')
       await expect(c).toBeFocused()
     }
 
-    const tree = await page.locator('.pinned-row').ariaSnapshot()
-    const at = names.map((name) => tree.indexOf(`"${name}"`))
+    const tree = await card.ariaSnapshot()
+    const at = ['Search cartridges by name', ...names].map((name) => tree.indexOf(`"${name}"`))
     expect(at.every((i) => i >= 0)).toBe(true)
     expect(at).toEqual([...at].sort((a, b) => a - b))
 

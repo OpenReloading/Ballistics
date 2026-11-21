@@ -3,7 +3,7 @@ import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
 import { showGerman } from './german.ts'
 import { choosePreset, storeUnits } from './units.ts'
-import { loadForm } from './workbench.ts'
+import { loadForm, openKeeping } from './workbench.ts'
 import { runSavedLoad } from './workbench-run.ts'
 
 test.beforeEach(({ page }) => storeUnits(page, 'us', {}))
@@ -136,9 +136,7 @@ test('every interior field says what it is', async ({ page }) => {
   )
 })
 
-test('in German the pressure range keeps its gap and the Powder card head its menu', async ({
-  page,
-}) => {
+test('in German the pressure range keeps its gap and the Powder card its lot', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 650 })
   await runSavedLoad(page)
   await showGerman(page)
@@ -159,11 +157,13 @@ test('in German the pressure range keeps its gap and the Powder card head its me
   })
   // the 0.5 rem column gap, less a pixel or two of the glyphs' side bearing and rounding
   expect(gap).toBeGreaterThanOrEqual(6)
-  const head = page.locator('.panel[data-panel="powder"] .panel-head')
-  const box = await head.boundingBox()
-  const menu = await head.getByRole('button', { name: /^Mehr zu/ }).boundingBox()
-  if (!box || !menu) throw new Error('no powder card head')
-  expect(menu.x + menu.width).toBeLessThanOrEqual(box.x + box.width)
+  const card = page.locator('.panel[data-panel="powder"]')
+  await card.getByRole('button', { name: 'Los hinzufügen: Treibladungspulver' }).click()
+  const box = await card.boundingBox()
+  const lot = await card.getByRole('textbox', { name: 'Treibladungspulver-Los' }).boundingBox()
+  if (!box || !lot) throw new Error('no powder card')
+  expect(lot.x + lot.width).toBeLessThanOrEqual(box.x + box.width)
+  await openKeeping(page, 'Laborierung')
   await expect(page.getByPlaceholder('Zündhütchen', { exact: true })).toBeVisible()
 })
 

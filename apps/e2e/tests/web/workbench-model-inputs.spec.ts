@@ -2,7 +2,7 @@ import { expect, type Page, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
-import { loadForm } from './workbench.ts'
+import { loadForm, openKeeping } from './workbench.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
@@ -75,6 +75,7 @@ test("a firearm's measured bore diameter and freebore and a brass group's trim l
   await page.keyboard.press('Escape')
 
   // the brass group's trim length is the case length, marked with the CIP L3
+  await openKeeping(page)
   await page.getByRole('combobox', { name: 'Brass record' }).click()
   await page.getByRole('option', { name: 'Trimmed brass (your brass)' }).click()
   const caseLength = field(page, /^Case length L3/)

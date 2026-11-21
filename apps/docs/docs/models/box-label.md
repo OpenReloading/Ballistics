@@ -16,7 +16,7 @@ One label of 90 x 60 mm at the top left of an A4 page, with a dashed edge to cut
 - cartridge, bullet, powder and charge, primer;
 - the seating length as stored: COAL, or CBTO for a load seated by base to ogive (the other length is not derived);
 - the day the load was saved (`YYYY-MM-DD`), not the day of printing, so a reprint is the same label (saving the load again changes it);
-- the powder, primer and case lots, each only when it is typed on the load;
+- one Lots line with the powder, primer, case and bullet lots that are typed on the load, each after its component, separated by semicolons, as a lot may contain a comma;
 - the QR code and, under it, its text in small type.
 
 A field the load does not hold is left out. A record whose name cannot be read prints its reference as stored.

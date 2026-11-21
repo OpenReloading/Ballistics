@@ -129,6 +129,11 @@
       "type": "string",
       "minLength": 1
     },
+    "bulletLot": {
+      "description": "Lot number of the bullet, as printed on the package.",
+      "type": "string",
+      "minLength": 1
+    },
     "charge": {
       "type": "object",
       "properties": {
@@ -641,6 +646,11 @@
           },
           "caseLot": {
             "description": "Case lot of the load at the session.",
+            "type": "string",
+            "minLength": 1
+          },
+          "bulletLot": {
+            "description": "Bullet lot of the load at the session.",
             "type": "string",
             "minLength": 1
           },
