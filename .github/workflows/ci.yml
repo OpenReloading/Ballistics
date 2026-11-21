@@ -342,7 +342,7 @@ jobs:
           docker run --rm --init --ipc=host --network=host --user "$(id -u):$(id -g)" --env HOME=/tmp \
             --env CI --env GITHUB_ACTIONS --env API_URL --env WEB_URL --env NEXT_PUBLIC_REPOSITORY_URL \
             --volume "$PWD:$PWD" --workdir "$PWD/apps/e2e" \
-            "$PLAYWRIGHT_IMAGE" npx playwright test
+            "$PLAYWRIGHT_IMAGE" npx playwright test --reporter=github,dot
       - name: Drawing baseline in the Playwright image
         run: pnpm --filter @rangefoundry/e2e run drawing-baseline
       - name: Paired contact sheet of the baseline drawings when drawing code changed
