@@ -3,6 +3,7 @@ import { join } from 'node:path'
 import sharp from 'sharp'
 import { describe, expect, it } from 'vitest'
 import type { HoleProposal } from '../src/hole-detection.ts'
+import { matchHoles } from '../src/hole-matching.ts'
 import type { RgbaImage } from '../src/image.ts'
 import { holeDetector } from '../src/inference-port.ts'
 
@@ -31,19 +32,9 @@ async function load(file: string): Promise<RgbaImage> {
   }
 }
 
-/** Marked holes matched one to one to the nearest proposal within half a hole. */
 function score(found: readonly HoleProposal[], f: Fixture) {
-  const pairs = f.holes
-    .flatMap((h, i) => found.map((p, j) => ({ i, j, d: Math.hypot(p.x - h.x, p.y - h.y) })))
-    .filter((q) => q.d <= f.visibleDiameterPx / 2)
-    .toSorted((a, b) => a.d - b.d)
-  const [holes, props] = [new Set<number>(), new Set<number>()]
-  for (const q of pairs) {
-    if (holes.has(q.i) || props.has(q.j)) continue
-    holes.add(q.i)
-    props.add(q.j)
-  }
-  return { recall: holes.size / f.holes.length, false: found.length - props.size }
+  const m = matchHoles(found, f.holes, f.visibleDiameterPx)
+  return { recall: m.matched / f.holes.length, false: m.false }
 }
 
 /** The proposals at or above the confidence tier lose no hole and add no false proposal. */

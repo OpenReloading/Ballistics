@@ -75,6 +75,7 @@ test('every source file of the model packages is named on a model page', () => {
     'key-list.ts',
     'parse.ts',
     'settings.ts',
+    'url.d.ts',
   ])
   const unnamed = [
     'units',
