@@ -9,6 +9,13 @@ export {
   type Region,
   WORK_DIAMETER,
 } from './hole-detection.ts'
+export {
+  type CorrectionStats,
+  correctionStats,
+  corrections,
+  type HoleMatch,
+  matchHoles,
+} from './hole-matching.ts'
 export type { RgbaImage } from './image.ts'
 export {
   holeDetector,
@@ -16,6 +23,7 @@ export {
   type ProposalRequest,
   type Proposals,
 } from './inference-port.ts'
+export { type LabeledHole, type LabeledPhoto, type LabelSet, labelSet } from './label-set.ts'
 export { clamp, components, median1 } from './raster-ops.ts'
 export {
   type FaceFit,

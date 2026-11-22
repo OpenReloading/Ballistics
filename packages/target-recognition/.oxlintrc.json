@@ -19,15 +19,15 @@
                   "!@rangefoundry/statistics",
                   "!@rangefoundry/statistics/**"
                 ],
-                "message": "target-recognition-imports-shot-groups-statistics-only: packages/target-recognition has no I/O: it imports only @rangefoundry/shot-groups, @rangefoundry/statistics and its own files."
+                "message": "target-recognition-imports-shot-groups-statistics-zod: packages/target-recognition has no I/O: it imports only @rangefoundry/shot-groups, @rangefoundry/statistics, zod and its own files."
               },
               {
-                "regex": "^[^.@]",
-                "message": "target-recognition-imports-shot-groups-statistics-only: packages/target-recognition has no I/O: it imports only @rangefoundry/shot-groups, @rangefoundry/statistics and its own files."
+                "regex": "^([^.@z]|z($|[^o])|zo($|[^d])|zod[^/])",
+                "message": "target-recognition-imports-shot-groups-statistics-zod: packages/target-recognition has no I/O: it imports only @rangefoundry/shot-groups, @rangefoundry/statistics, zod and its own files."
               },
               {
                 "regex": "^(\\.\\./)+[^.]",
-                "message": "target-recognition-imports-shot-groups-statistics-only: packages/target-recognition has no I/O: it imports only @rangefoundry/shot-groups, @rangefoundry/statistics and its own files."
+                "message": "target-recognition-imports-shot-groups-statistics-zod: packages/target-recognition has no I/O: it imports only @rangefoundry/shot-groups, @rangefoundry/statistics, zod and its own files."
               }
             ]
           }
