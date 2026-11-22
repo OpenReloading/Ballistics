@@ -349,6 +349,9 @@
       "value": 34.66
     }
   ],
+  "defaults": {
+    "capacity": "catalogue:6-5-grendel-wikipedia"
+  },
   "provenance": {
     "kind": "published",
     "sources": [

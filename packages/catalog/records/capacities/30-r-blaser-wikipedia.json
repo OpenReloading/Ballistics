@@ -1,0 +1,22 @@
+{
+  "id": "30-r-blaser-wikipedia",
+  "origin": "catalogue",
+  "cartridge": "catalogue:30-r-blaser",
+  "waterCapacity": {
+    "value": 4.938,
+    "raw": "76.2 gr H2O"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Wikipedia, .30 R Blaser",
+        "url": "https://en.wikipedia.org/w/index.php?title=.30_R_Blaser&oldid=1316312342",
+        "retrieved": "2026-11-18",
+        "license": "CC-BY-SA-4.0",
+        "note": "Infobox, Case capacity: 4.94 cm3 (76.2 gr H2O). The body states \"4.94 ml (76 grains H2O) cartridge case capacity\" and cites Frank C. Barnes, Cartridges of the World (2009), pp. 416-417."
+      }
+    ]
+  },
+  "note": "No maker or standards body publishes a capacity for this case online; the figure traces to no primary source."
+}

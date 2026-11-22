@@ -357,6 +357,9 @@
       "value": 47.99
     }
   ],
+  "defaults": {
+    "capacity": "catalogue:7-62-x-25-tokarev-wikipedia"
+  },
   "provenance": {
     "kind": "published",
     "sources": [

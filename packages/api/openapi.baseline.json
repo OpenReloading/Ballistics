@@ -1726,6 +1726,35 @@
                         "additionalProperties": false
                       }
                     },
+                    "defaults": {
+                      "type": "object",
+                      "properties": {
+                        "capacity": {
+                          "type": "string",
+                          "allOf": [
+                            {
+                              "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$"
+                            },
+                            {
+                              "pattern": "^catalogue:"
+                            }
+                          ],
+                          "description": "The case capacity record of a load that names no capacity record and no case record with a stated capacity."
+                        },
+                        "primerSize": {
+                          "type": "string",
+                          "enum": [
+                            "small-rifle",
+                            "large-rifle",
+                            "small-pistol",
+                            "large-pistol",
+                            "shotshell"
+                          ],
+                          "description": "The primer size of a load that names no primer record."
+                        }
+                      },
+                      "additionalProperties": false
+                    },
                     "provenance": {
                       "type": "object",
                       "properties": {

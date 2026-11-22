@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { caseCapacity, catalogueCaseCapacity, loadWaterCapacity, userRecord } from '../src/index.ts'
+import {
+  caseCapacity,
+  catalogueCaseCapacity,
+  defaultCapacity,
+  loadWaterCapacity,
+  userRecord,
+} from '../src/index.ts'
 import { expectIssueAt } from './issue-at.ts'
 
 const provenance = { kind: 'published', sources: [{ title: 'Example manual' }] }
@@ -124,8 +130,43 @@ describe('loadWaterCapacity', () => {
     expect(loadWaterCapacity({ capacity: undefined, case: stated })?.source).toBe('case')
   })
 
+  it('takes the default of the cartridge after the capacity and the case record', () => {
+    const cartridgeDefault = { waterCapacity: { value: 3.629 } }
+    expect(loadWaterCapacity({ capacity: measured, case: stated, cartridgeDefault })).toEqual({
+      grams: 3.52,
+      source: 'capacity',
+    })
+    expect(loadWaterCapacity({ case: stated, cartridgeDefault })).toEqual({
+      grams: 3.6,
+      source: 'case',
+    })
+    expect(loadWaterCapacity({ cartridgeDefault })).toEqual({ grams: 3.629, source: 'default' })
+  })
+
   it('is unknown without a capacity record and without a stated capacity', () => {
     expect(loadWaterCapacity({})).toBeUndefined()
     expect(loadWaterCapacity({ case: {} })).toBeUndefined()
+  })
+})
+
+describe('defaultCapacity', () => {
+  const capacities = [
+    { id: 'c-published' },
+    { id: 'a-estimate', provenance: { kind: 'derived' as const, sources: [{ title: 'Outline' }] } },
+    { id: 'b-published' },
+  ]
+
+  it('takes the record the cartridge names over one that sorts first', () => {
+    const cartridge = { defaults: { capacity: 'catalogue:c-published' } }
+    expect(defaultCapacity(cartridge, capacities)?.id).toBe('c-published')
+  })
+
+  it('takes the first by id that is no estimate for a cartridge that names none', () => {
+    expect(defaultCapacity({}, capacities)?.id).toBe('b-published')
+  })
+
+  it('gives no other record for a named record that is absent or an estimate', () => {
+    for (const capacity of ['catalogue:d-absent', 'catalogue:a-estimate'])
+      expect(defaultCapacity({ defaults: { capacity } }, capacities)).toBeUndefined()
   })
 })

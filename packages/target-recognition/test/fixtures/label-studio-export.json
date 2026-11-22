@@ -1,0 +1,129 @@
+[
+  {
+    "id": 1,
+    "data": {
+      "image": "/data/upload/1/3f2a9c1e-a.jpg",
+      "file": "a.jpg",
+      "sha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+      "source": "own photo",
+      "license": "CC0-1.0",
+      "author": "Test Labeler",
+      "session": "2026-05-02 range A",
+      "width": 400,
+      "height": 300,
+      "visibleDiameterPx": 12.5
+    },
+    "annotations": [
+      {
+        "id": 11,
+        "completed_by": 1,
+        "was_cancelled": false,
+        "result": [
+          {
+            "id": "k1",
+            "type": "keypointlabels",
+            "from_name": "hole",
+            "to_name": "image",
+            "original_width": 400,
+            "original_height": 300,
+            "image_rotation": 0,
+            "value": { "x": 25, "y": 50, "width": 0.5, "keypointlabels": ["hole"] }
+          },
+          {
+            "id": "k2",
+            "type": "keypointlabels",
+            "from_name": "hole",
+            "to_name": "image",
+            "original_width": 400,
+            "original_height": 300,
+            "image_rotation": 0,
+            "value": { "x": 75, "y": 25, "width": 0.5, "keypointlabels": ["hole"] }
+          },
+          {
+            "id": "k2",
+            "type": "choices",
+            "from_name": "uncertain",
+            "to_name": "image",
+            "value": { "choices": ["uncertain"] }
+          },
+          {
+            "id": "c1",
+            "type": "choices",
+            "from_name": "kind",
+            "to_name": "image",
+            "value": { "choices": ["printed"] }
+          },
+          {
+            "id": "c2",
+            "type": "choices",
+            "from_name": "usable",
+            "to_name": "image",
+            "value": { "choices": ["yes"] }
+          },
+          {
+            "id": "c3",
+            "type": "choices",
+            "from_name": "complete",
+            "to_name": "image",
+            "value": { "choices": ["yes"] }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "data": {
+      "image": "/data/upload/1/7b04d2aa-b.jpg",
+      "file": "b.jpg",
+      "sha256": "60303ae22b998861bce3b28f33eec1be758a213c86c93c076dbe9f558c11c752",
+      "source": "https://example.org/b.jpg",
+      "license": "CC-BY-4.0",
+      "author": "Another Author",
+      "session": "2026-05-09 range B",
+      "width": 200,
+      "height": 200,
+      "visibleDiameterPx": 8
+    },
+    "annotations": [
+      {
+        "id": 12,
+        "completed_by": 1,
+        "was_cancelled": false,
+        "result": [
+          {
+            "id": "k3",
+            "type": "keypointlabels",
+            "from_name": "hole",
+            "to_name": "image",
+            "original_width": 200,
+            "original_height": 200,
+            "image_rotation": 0,
+            "value": { "x": 50, "y": 75, "width": 0.5, "keypointlabels": ["hole"] }
+          },
+          {
+            "id": "c4",
+            "type": "choices",
+            "from_name": "kind",
+            "to_name": "image",
+            "value": { "choices": ["reactive"] }
+          },
+          {
+            "id": "c5",
+            "type": "choices",
+            "from_name": "usable",
+            "to_name": "image",
+            "value": { "choices": ["no"] }
+          },
+          {
+            "id": "c6",
+            "type": "choices",
+            "from_name": "complete",
+            "to_name": "image",
+            "value": { "choices": ["no"] }
+          }
+        ]
+      }
+    ]
+  }
+]

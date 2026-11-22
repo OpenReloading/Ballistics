@@ -223,6 +223,9 @@
       "value": 62.55
     }
   ],
+  "defaults": {
+    "capacity": "catalogue:38-special-wikipedia"
+  },
   "provenance": {
     "kind": "published",
     "sources": [

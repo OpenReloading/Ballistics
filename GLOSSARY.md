@@ -209,6 +209,9 @@ One entity for every `origin`: the catalogue record (`records/capacities`) and t
 `waterCapacity`: mass of water filling a case to the mouth (or the level `fillLevel` names), g, on a case capacity.
 _Avoid_: capacity
 
+**Default capacity**:
+`defaults.capacity`: the catalogue case capacity a cartridge names for a load that names neither a capacity record nor a case record with a stated capacity, a reference. An estimate is never one.
+
 **Measured water capacity**:
 `measuredWaterCapacity`: the case capacity (water to the mouth) the user measured, m3, as a workbench link carries it. A load keeps it as a reference `capacity` to a user capacity record (g).
 _Avoid_: ownCapacity

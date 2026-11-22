@@ -375,6 +375,9 @@
       "value": 25.03
     }
   ],
+  "defaults": {
+    "capacity": "catalogue:223-rem-wikipedia"
+  },
   "provenance": {
     "kind": "published",
     "sources": [

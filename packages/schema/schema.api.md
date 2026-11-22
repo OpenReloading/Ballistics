@@ -210,7 +210,7 @@ z.ZodObject<{
 export function canonicalJson(value: unknown): string;
 
 // @public
-export type CapacitySource = 'capacity' | 'case';
+export type CapacitySource = 'capacity' | 'case' | 'default';
 
 // @public
 export interface Cartridge extends z.infer<typeof cartridge> {
@@ -229,6 +229,10 @@ export const cartridge: z.ZodObject<{
     verification: z.ZodEnum<z.core.util.ToEnum<'verified' | 'unverified'>>;
     values: z.ZodArray<typeof specValue>;
     exceptions: z.ZodOptional<z.ZodArray<typeof plausibilityException>>;
+    defaults: z.ZodOptional<z.ZodObject<{
+        capacity: z.ZodOptional<z.ZodString>;
+        primerSize: z.ZodOptional<typeof primerSizes>;
+    }, z.core.$strict>>;
     provenance: z.ZodOptional<typeof provenance>;
 }>;
 
@@ -265,7 +269,7 @@ export const cartridgeCase: z.ZodObject<{
 export type CartridgeOverrides = z.infer<typeof cartridgeOverrides>;
 
 // @public
-export const cartridgeOverrides: z.ZodType<Overrides<Omit<z.infer<typeof cartridge>, 'id' | 'provenance' | 'values'>> & {
+export const cartridgeOverrides: z.ZodType<Overrides<Omit<z.infer<typeof cartridge>, 'id' | 'provenance' | 'defaults' | 'values'>> & {
     values?: z.infer<typeof cartridgeValueOverride>[];
 }>;
 
@@ -540,6 +544,9 @@ export interface DanglingRef {
     record: string;
     target: string;
 }
+
+// @public
+export function defaultCapacity<T extends Pick<CatalogueCaseCapacity, 'id' | 'provenance'>>(cartridge: Pick<Cartridge, 'defaults'>, capacities: readonly T[]): T | undefined;
 
 // @public
 export function detailedFields(kind: 'bullet' | 'powder', record: object): string[];
@@ -823,6 +830,9 @@ export const hitFactorScoring: z.ZodObject<{
 }, z.core.$strict>;
 
 // @public
+export const isEstimatedCapacity: (capacity: Pick<CaseCapacity, 'provenance'>) => boolean;
+
+// @public
 export const isWebLink: (text: string) => boolean;
 
 // @public
@@ -922,6 +932,13 @@ export const loadAnalysis: z.ZodObject<{
 }>;
 
 // @public
+export interface LoadCapacityRecords {
+    capacity?: Pick<CaseCapacity, 'waterCapacity'> | undefined;
+    cartridgeDefault?: Pick<CaseCapacity, 'waterCapacity'> | undefined;
+    case?: Pick<Case, 'waterCapacity'> | undefined;
+}
+
+// @public
 export interface LoadTable extends z.infer<typeof loadTable> {
 }
 
@@ -940,10 +957,15 @@ export type LoadTables = z.infer<typeof loadTables>;
 export const loadTables: z.ZodRecord<z.ZodString, typeof loadTable>;
 
 // @public
-export function loadWaterCapacity(records: {
-    capacity?: Pick<CaseCapacity, 'waterCapacity'> | undefined;
-    case?: Pick<Case, 'waterCapacity'> | undefined;
+export function loadWaterCapacity(records: LoadCapacityRecords & {
+    cartridgeDefault?: undefined;
 }): {
+    grams: number;
+    source: Exclude<CapacitySource, 'default'>;
+} | undefined;
+
+// @public
+export function loadWaterCapacity(records: LoadCapacityRecords): {
     grams: number;
     source: CapacitySource;
 } | undefined;
