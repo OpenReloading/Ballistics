@@ -15,7 +15,7 @@
   "categories": {
     "correctness": "off"
   },
-  "ignorePatterns": ["**/test/golden/**", "**/next-env.d.ts"],
+  "ignorePatterns": ["**/test/golden/**", "**/next-env.d.ts", "apps/web/src/routeTree.gen.ts"],
   "jsPlugins": ["eslint-plugin-regexp"],
   "rules": {
     "array-callback-return": "error",

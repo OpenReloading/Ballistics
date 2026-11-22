@@ -7,14 +7,18 @@
     "dev": "next dev",
     "prebuild": "node -e \"fs.rmSync('.next/cache/fetch-cache', { recursive: true, force: true })\"",
     "build": "next build && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/service-worker.mts",
+    "build:start": "pnpm run prerender-list && lingui compile --strict && vite build",
     "start": "next start",
-    "typecheck": "next typegen && tsc --noEmit",
+    "typecheck": "lingui check sync --clean --overwrite && lingui compile --strict && next typegen && tsc --noEmit && tsc --noEmit -p tsconfig.start.json",
     "check-weight": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-weight.mts",
+    "prerender-list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/prerender-list.mts",
     "i18n": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/i18n.mts",
     "test": "vitest run --dir test",
     "test:coverage": "vitest run --dir test --coverage"
   },
   "dependencies": {
+    "@lingui/core": "6.12.0",
+    "@lingui/react": "6.12.0",
     "@mantine/core": "catalog:",
     "@mantine/form": "catalog:",
     "@mantine/hooks": "catalog:",
@@ -30,9 +34,12 @@
     "@rangefoundry/shot-groups": "workspace:*",
     "@rangefoundry/statistics": "workspace:*",
     "@rangefoundry/target-recognition": "workspace:*",
+    "@rangefoundry/ui": "workspace:*",
     "@rangefoundry/units": "workspace:*",
     "@rangefoundry/use-cases": "workspace:*",
     "@phosphor-icons/react": "2.1.10",
+    "@tanstack/react-router": "1.170.46",
+    "@tanstack/react-start": "1.169.4",
     "country-flag-icons": "1.6.20",
     "driver.js": "1.14.0",
     "echarts": "6.1.0",
@@ -44,14 +51,19 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@lingui/cli": "6.12.0",
+    "@lingui/conf": "6.12.0",
+    "@lingui/format-po": "6.12.0",
     "@playwright/test": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "6.2.1",
     "@vitest/coverage-v8": "catalog:",
     "fake-indexeddb": "^6.2.8",
     "sharp": "catalog:",
     "typescript": "catalog:",
+    "vite": "8.3.8",
     "vitest": "catalog:"
   }
 }
