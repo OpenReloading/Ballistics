@@ -23,3 +23,9 @@ it('fails a record path that no record route takes', () => {
     checkRecordPaths(['/bullets/a/', '/bullet/a/', '/target-faces/h/', '/bullets/compare/x/']),
   ).toThrow('No record route for /bullet/a/, /target-faces/h/, /bullets/compare/x/')
 })
+
+it('fails a record path that is also a static path', () => {
+  expect(() => checkRecordPaths(['/bullets/a/', '/bullets/compare/'])).toThrow(
+    'Record paths collide with static routes: /bullets/compare/',
+  )
+})

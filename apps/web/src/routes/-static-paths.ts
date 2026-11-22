@@ -47,11 +47,14 @@ const recordRoutes = {
   '/targets/$id': true,
 } satisfies Record<Extract<FileRouteTypes['to'], `${string}/$id`>, true>
 
-/** Throws on a record path no record route takes: the splat route would prerender it as a 200 not-found page. */
+/** Throws on a record path no record route takes (the splat route would prerender a 200 not-found page) or a static path takes first. */
 export function checkRecordPaths(paths: string[]) {
   const unrouted = paths.filter(
     (page) => !Object.hasOwn(recordRoutes, page.replace(/^(\/[^/]+\/)[^/]+\/$/, '$1$$id')),
   )
   if (unrouted.length > 0) throw new Error(`No record route for ${unrouted.join(', ')}`)
+  const shadowed = paths.filter((page) => staticPaths.includes(page))
+  if (shadowed.length > 0)
+    throw new Error(`Record paths collide with static routes: ${shadowed.join(', ')}`)
   return paths
 }
