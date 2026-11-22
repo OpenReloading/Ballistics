@@ -152,7 +152,8 @@ test('a load of records keeps the charge and the travel, runs the powder at the 
   })
   await page.goto('/workbench?cartridge=308-win&bullet=demo-bullet-168&powder=demo-powder-dp40')
   const form = loadForm(page)
-  await expect(form.locator('.field-flag-seating')).toHaveCount(1)
+  // the cartridge's capacity record seats the volume beside the travel
+  await expect(form.locator('.field-flag-seating')).toHaveCount(2)
   await form.getByRole('textbox', { name: /^Charge mass/ }).fill('2.40')
   await form.getByRole('textbox', { name: /^Bullet travel/ }).fill('533.40')
   const values = () =>
