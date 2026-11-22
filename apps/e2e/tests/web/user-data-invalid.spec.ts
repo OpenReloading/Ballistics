@@ -68,6 +68,8 @@ test('an invalid record is deleted after a confirmation and Import restores it',
   // Cancel keeps it
   await ask.getByRole('button', { name: 'Cancel' }).click()
   await expect(dialog.getByText('Old design')).toBeVisible()
+  // the answered dialog still fades, same name and clickable, and its Delete answers nothing
+  await expect(ask).toBeHidden()
   await dialog.getByRole('button', { name: 'Delete' }).click()
   await ask.getByRole('button', { name: 'Delete' }).click()
   await expect(dialog.getByText('Old design')).toBeHidden()
