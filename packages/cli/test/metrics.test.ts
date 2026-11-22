@@ -18,6 +18,26 @@ describe('metricsOf', () => {
   it('counts a printed velocity on the edge of the band as covered', () => {
     expect(metricsOf([used('b', 1100, 1000)], 0.1).interval).toEqual({ coverage: 1 })
   })
+
+  it('gives the errors per barrel class, a handgun under 300 mm', () => {
+    const at = (barrel: number, predicted: number, pressure?: number): Outcome => {
+      const o = used('b', 1000, predicted)
+      return { ...o, row: { ...o.row, barrel, pressure } }
+    }
+    const m = metricsOf([at(120, 1100, 2500), at(299, 1100), at(300, 1020), at(610, 1020)], null)
+    expect(m.byBarrel).toEqual({
+      handgun: {
+        rows: 2,
+        velocity: { median: expect.closeTo(0.1, 12), p90: expect.closeTo(0.1, 12) },
+        pressure: { median: expect.closeTo(0.2, 12), p90: expect.closeTo(0.2, 12), rows: 1 },
+      },
+      rifle: {
+        rows: 2,
+        velocity: { median: expect.closeTo(0.02, 12), p90: expect.closeTo(0.02, 12) },
+        pressure: null,
+      },
+    })
+  })
 })
 
 describe('evaluate', () => {

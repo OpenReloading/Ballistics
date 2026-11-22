@@ -87,6 +87,10 @@ Rows that are not used are counted by reason: `unknownCartridge`, `unknownBullet
 
 A pressure is compared only with pressures of its own basis: `pressureByBasis` of each group holds the median and P90 of the pressure error and the rows for each basis (`transducer`, `case-contact`, `piezo`, `unstated`, ...). No value is converted between bases. `pressure` stays the error over every row in bar, all bases together.
 
+### Errors by barrel class
+
+`byBarrel` of each group holds the velocity and pressure errors of `velocity` and `pressure` per barrel class, in the JSON only: `handgun` for a barrel under 300 mm, the limit of the start-pressure rule, else `rifle`. A class without a used row is left out. The two classes differ in error and in their share of each split, so a pooled median or P90 moves with the mix of rows; read a change by class, in `byBarrel` of `paired` or of each side. With `--per-row` each row carries its class as `barrel`; `paired` of `compare` and `folds.aggregate` give both classes in `byBarrel`, each quantity null without a row, with the bootstrap over the cartridges of the class. A baseline saved without the classes takes each row's class from the candidate.
+
 ### Muzzle distance
 
 A row with a muzzle distance above 0 (a velocity printed at `V5`, for example) is compared at the muzzle: its printed velocity is turned into the muzzle velocity whose flown speed at that distance equals it, with `muzzleVelocityFromDownrange` of ballistics ([model page](models/exterior-drag.md#speed-measured-downrange)), over the bullet record's G7 ballistic coefficients (else its G1 ones) in the ICAO standard atmosphere at sea level, before the error and the interval. A bullet without a coefficient, such as a stand-in, or with two of one model that share a band start, gives `noBulletDrag`. A row without a distance is a muzzle value and is not corrected.

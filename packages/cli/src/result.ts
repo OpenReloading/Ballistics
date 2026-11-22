@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { reasons } from './evaluate.ts'
 import { notFittedReasons, pressureKeys } from './fit.ts'
 import { foldCount, foldPool, foldSalt } from './folds.ts'
-import { groupings } from './metrics.ts'
+import { barrelClasses, groupings } from './metrics.ts'
 import { skipReasons } from './published-rows.ts'
 import { splitSalt, splits } from './split.ts'
 
@@ -16,15 +16,7 @@ const errorStats = z.object({
   p90: fraction.describe('90th percentile of the absolute relative error, as a fraction.'),
 })
 
-/** The metrics of one group of rows: all rows of the split, one powder or one powder family. */
-const metrics = z.object({
-  rows: z.object({
-    inSplit: count.describe('Rows of the split in this group.'),
-    used: count.describe('Rows the model gave a result for.'),
-    notUsed: z
-      .partialRecord(z.enum(reasons), count)
-      .describe('Rows not used, by reason; a reason without rows is left out.'),
-  }),
+const errors = {
   velocity: errorStats
     .nullable()
     .describe(
@@ -35,6 +27,26 @@ const metrics = z.object({
     .nullable()
     .describe(
       'Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together.',
+    ),
+}
+
+/** The metrics of one group of rows: all rows of the split, one powder or one powder family. */
+const metrics = z.object({
+  rows: z.object({
+    inSplit: count.describe('Rows of the split in this group.'),
+    used: count.describe('Rows the model gave a result for.'),
+    notUsed: z
+      .partialRecord(z.enum(reasons), count)
+      .describe('Rows not used, by reason; a reason without rows is left out.'),
+  }),
+  ...errors,
+  byBarrel: z
+    .partialRecord(z.enum(barrelClasses), z.object({ rows: count, ...errors }))
+    // one definition in the JSON schema, referenced by every group
+    .meta({ id: 'errorsByBarrel' })
+    .optional()
+    .describe(
+      'The velocity and pressure errors per barrel class: `handgun`, a barrel under 300 mm, else `rifle`. A class without a used row is left out; a result written before it has none.',
     ),
   pressureByBasis: z
     .record(z.string(), errorStats.extend({ rows: count }))
@@ -251,6 +263,13 @@ const common = {
 
 const signed = z.number().describe('(model - printed) / printed, as a fraction.')
 
+/** `quantity` of velocity and pressure per barrel class of `byBarrel` in the metrics, as the JSON schema definition `id`. */
+const byBarrel = <Q extends z.ZodType>(quantity: Q, id: string) =>
+  z
+    .record(z.enum(barrelClasses), z.object({ velocity: quantity, pressure: quantity }))
+    .meta({ id })
+    .describe('The same per barrel class, over the rows of the class.')
+
 const pooledStat = z.object({
   value: fraction.describe('Over the rows of every fold.'),
   standardError: z.number().describe('Standard deviation over the bootstrap draws.'),
@@ -298,6 +317,7 @@ const folds = z
         seed: count.describe('Seed of the draws.'),
         velocity: pooledQuantity,
         pressure: pooledQuantity,
+        byBarrel: byBarrel(pooledQuantity, 'pooledByBarrel').optional(),
       })
       .describe(
         'The rows of every fold together, each scored by the fit without its fold, with the standard error of a bootstrap that draws whole cartridges with replacement; the rows of `estimatedCapacity` are left out.',
@@ -326,6 +346,12 @@ export const verifyResult = z.object({
         cartridge: z.string(),
         velocity: signed,
         pressure: signed.optional().describe('Of a row that prints a pressure in bar.'),
+        barrel: z
+          .enum(barrelClasses)
+          .optional()
+          .describe(
+            'Its barrel class, as `byBarrel` of the metrics; a result written before it has none.',
+          ),
         capacity: z
           .literal('estimated')
           .optional()
@@ -386,6 +412,7 @@ const compareResult = z.object({
       seed: count.describe('Seed of the draws.'),
       velocity: pairedQuantity,
       pressure: pairedQuantity,
+      byBarrel: byBarrel(pairedQuantity, 'pairedByBarrel'),
     })
     .optional()
     .describe(
