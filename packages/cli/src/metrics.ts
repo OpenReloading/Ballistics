@@ -1,3 +1,4 @@
+import { handgunBarrelLengthLimit } from '@rangefoundry/ballistics'
 import { compareKeys, fromSi } from '@rangefoundry/schema'
 import type { Outcome } from './evaluate.ts'
 import { reasons } from './evaluate.ts'
@@ -36,6 +37,26 @@ const stats = (errors: number[]) =>
     ? null
     : { median: percentile(errors, 0.5) as number, p90: percentile(errors, 0.9) as number }
 
+/** The classes of {@link barrelClassOf}. */
+export const barrelClasses = ['handgun', 'rifle'] as const
+
+/** One of {@link barrelClasses}. */
+export type BarrelClass = (typeof barrelClasses)[number]
+
+/** The class of a barrel length in mm: `handgun` under `handgunBarrelLengthLimit`, the limit of the start-pressure rule, else `rifle`; undefined without a length. */
+export const barrelClassOf = (barrel: number | undefined): BarrelClass | undefined =>
+  barrel === undefined ? undefined : barrel < handgunBarrelLengthLimit * 1000 ? 'handgun' : 'rifle'
+
+/** The velocity and pressure errors of `used`. */
+function errorsOf(used: readonly Used[]) {
+  const pressure = used.flatMap((o) => pressureError(o) ?? [])
+  const pressureStats = stats(pressure)
+  return {
+    velocity: stats(used.map(velocityError)),
+    pressure: pressureStats && { ...pressureStats, rows: pressure.length },
+  }
+}
+
 /** The half width of the 90 % interval: the 90th percentile of the velocity error of the used `training` rows. */
 export function halfWidthOf(training: readonly Outcome[]) {
   const errors = training.filter(isUsed).map(velocityError)
@@ -48,14 +69,11 @@ export type HalfWidth = number | null | ((o: Outcome) => number | null)
 /** The metrics of a group of rows; `halfWidth` is the interval of {@link halfWidthOf}. */
 export function metricsOf(items: readonly Outcome[], halfWidth: HalfWidth): Metrics {
   const used = items.filter(isUsed)
-  const velocity = used.map(velocityError)
   const widthOf = typeof halfWidth === 'function' ? halfWidth : () => halfWidth
   const covered = used.filter((o) => {
     const width = widthOf(o)
     return width !== null && bandDistance(o) <= width
   })
-  const pressure = used.flatMap((o) => pressureError(o) ?? [])
-  const pressureStats = stats(pressure)
   const bases = new Map<string, number[]>()
   for (const o of used) {
     const error = pressureError(o)
@@ -74,8 +92,13 @@ export function metricsOf(items: readonly Outcome[], halfWidth: HalfWidth): Metr
         }),
       ),
     },
-    velocity: stats(velocity),
-    pressure: pressureStats && { ...pressureStats, rows: pressure.length },
+    ...errorsOf(used),
+    byBarrel: Object.fromEntries(
+      barrelClasses.flatMap((barrel) => {
+        const rows = used.filter((o) => barrelClassOf(o.row.barrel) === barrel)
+        return rows.length > 0 ? [[barrel, { rows: rows.length, ...errorsOf(rows) }]] : []
+      }),
+    ),
     pressureByBasis: Object.fromEntries(
       [...bases]
         .toSorted(([a], [b]) => compareKeys(a, b))
@@ -85,7 +108,7 @@ export function metricsOf(items: readonly Outcome[], halfWidth: HalfWidth): Metr
         ]),
     ),
     interval:
-      velocity.length === 0 || used.some((o) => widthOf(o) === null)
+      used.length === 0 || used.some((o) => widthOf(o) === null)
         ? null
         : { coverage: covered.length / used.length },
   }

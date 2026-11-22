@@ -60,6 +60,26 @@ describe('pairedChange', () => {
   })
 })
 
+describe('pairedChange by barrel class', () => {
+  it('pairs the rows of each class, the class of a baseline row without one from the candidate', () => {
+    const baseline = [e(0, 'a', 0.1), e(1, 'b', -0.02)]
+    const candidate: RowError[] = [
+      { ...e(0, 'a', -0.05), barrel: 'handgun' },
+      { ...e(1, 'b', 0.03), barrel: 'rifle' },
+    ]
+    const { byBarrel } = pairedChange(baseline, candidate)
+    expect(byBarrel.handgun.velocity).toMatchObject({
+      rows: 1,
+      median: { baseline: 0.1, candidate: 0.05, change: expect.closeTo(-0.05, 12) },
+    })
+    expect(byBarrel.rifle.velocity).toMatchObject({
+      rows: 1,
+      p90: { baseline: 0.02, candidate: 0.03, change: expect.closeTo(0.01, 12) },
+    })
+    expect(byBarrel.rifle.pressure).toBeNull()
+  })
+})
+
 describe('pairedChange with estimated capacities', () => {
   it('leaves out a row whose capacity is estimated on either side', () => {
     const estimated = (x: RowError): RowError => ({ ...x, capacity: 'estimated' })

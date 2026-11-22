@@ -1,7 +1,13 @@
 import { compareKeys } from '@rangefoundry/schema'
 import { nth, seededUniforms, percentile as sortedPercentile } from '@rangefoundry/statistics'
 import type { Outcome } from './evaluate.ts'
-import { isUsed, signedPressureError, signedVelocityError } from './metrics.ts'
+import {
+  type BarrelClass,
+  barrelClassOf,
+  isUsed,
+  signedPressureError,
+  signedVelocityError,
+} from './metrics.ts'
 
 /** What a model gave on one row it ran: signed relative errors, (model - printed) / printed. */
 export interface RowError {
@@ -11,6 +17,8 @@ export interface RowError {
   velocity: number
   /** Of a row that prints a pressure in bar. */
   pressure?: number | undefined
+  /** Of a row with a barrel length (every used row; absent in a result written before it). */
+  barrel?: BarrelClass | undefined
   /** The capacity of the row's cartridge is an estimate: the row is never paired. */
   capacity?: 'estimated' | undefined
 }
@@ -24,11 +32,13 @@ type Quantity = 'velocity' | 'pressure'
 export const rowErrors = (outcomes: readonly Outcome[]): RowError[] =>
   outcomes.filter(isUsed).map((o) => {
     const pressure = signedPressureError(o)
+    const barrel = barrelClassOf(o.row.barrel)
     return {
       row: o.index,
       cartridge: o.row.cartridge,
       velocity: signedVelocityError(o),
       ...(pressure !== undefined && { pressure }),
+      ...(barrel && { barrel }),
     }
   })
 
@@ -115,15 +125,25 @@ function quantityChange(
   return { rows, cartridges: clusters.length, median: stat('median'), p90: stat('p90') }
 }
 
-/** The change of the median and the P90 of the absolute error, candidate minus baseline, over the rows both sides ran without an estimated capacity, each with the standard error of a bootstrap that draws whole cartridges with replacement ({@link bootstrap}). */
+/** The change of the median and the P90 of the absolute error, candidate minus baseline, over the rows both sides ran without an estimated capacity, each with the standard error of a bootstrap that draws whole cartridges with replacement ({@link bootstrap}); overall and per barrel class. */
 export function pairedChange(baseline: readonly RowError[], candidate: readonly RowError[]) {
   const byRow = (errors: readonly RowError[]) =>
     new Map(errors.flatMap((e) => (e.capacity === 'estimated' ? [] : [[e.row, e] as const])))
   const [b, c] = [byRow(baseline), byRow(candidate)]
+  const both = (
+    rows: (errors: ReadonlyMap<number, RowError>) => ReadonlyMap<number, RowError>,
+  ) => ({
+    velocity: quantityChange(rows(b), rows(c), 'velocity'),
+    pressure: quantityChange(rows(b), rows(c), 'pressure'),
+  })
+  // a baseline saved before rows carried their class takes the candidate's
+  const classOf = (row: number) => b.get(row)?.barrel ?? c.get(row)?.barrel
+  const only = (barrel: BarrelClass) => (errors: ReadonlyMap<number, RowError>) =>
+    new Map([...errors].filter(([row]) => classOf(row) === barrel))
   return {
     ...bootstrap,
-    velocity: quantityChange(b, c, 'velocity'),
-    pressure: quantityChange(b, c, 'pressure'),
+    ...both((errors) => errors),
+    byBarrel: { handgun: both(only('handgun')), rifle: both(only('rifle')) },
   }
 }
 
@@ -153,12 +173,19 @@ function pooledQuantity(errors: readonly RowError[], quantity: Quantity) {
   }
 }
 
-/** The out-of-fold errors of a cross-validation aggregated: the median and the P90 of the absolute error over the rows of every fold, each scored by the fit without its fold, with the standard error of the bootstrap of {@link pairedChange}. */
+/** The out-of-fold errors of a cross-validation aggregated: the median and the P90 of the absolute error over the rows of every fold, each scored by the fit without its fold, with the standard error of the bootstrap of {@link pairedChange}; overall and per barrel class. */
 export function foldAggregate(folds: readonly (readonly RowError[])[]) {
+  const both = (errors: readonly RowError[]) => ({
+    velocity: pooledQuantity(errors, 'velocity'),
+    pressure: pooledQuantity(errors, 'pressure'),
+  })
   const errors = folds.flat()
   return {
     ...bootstrap,
-    velocity: pooledQuantity(errors, 'velocity'),
-    pressure: pooledQuantity(errors, 'pressure'),
+    ...both(errors),
+    byBarrel: {
+      handgun: both(errors.filter((e) => e.barrel === 'handgun')),
+      rifle: both(errors.filter((e) => e.barrel === 'rifle')),
+    },
   }
 }
