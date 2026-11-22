@@ -23,7 +23,7 @@ const id = (ref: string) => parseRef(ref)?.id ?? ref
 export const standInId = (cartridge: string, mass: number) =>
   `stand-in-${cartridge}-${Math.round(mass * 1000)}mg`
 
-/** Maker tables only, never one customers sent (`producedBy: customer`), and no row for a load without a powder record or a cartridge outside `cartridges`: `charge`, `velocity` (as printed, at the printed point) and `coal` from their `value`, `pressure` only with a value in bar (a crusher figure keeps its velocity only) and `pressureBasis` from its `method` (`unstated` without), `muzzleDistance` (m) from `velocity.point.distance`, `barrel` and `bullet` (else {@link standInId} with the printed mass as `bulletMass`), `table` the file id, `line` the charge's position in its file. */
+/** Maker tables only, never one customers sent (`producedBy: customer`), and no row for a load without a powder record or a cartridge outside `cartridges`: `charge`, `velocity` (as printed, at the printed point) and `coal` from their `value`, `pressure` only with a value in bar (a crusher figure keeps its velocity only) and `pressureBasis` from its `method` (`unstated` without), `muzzleDistance` (m) from `velocity.point.distance`, `barrel` and `bullet` (else {@link standInId} with the printed mass as `bulletMass`), `printedBullet` the bullet as printed, `table` the file id, `line` the charge's position in its file. */
 export function rowsFromPublished(
   files: readonly PublishedLoads[],
   cartridges?: ReadonlySet<string>,
@@ -62,6 +62,7 @@ function rowOf(
     cartridge,
     bullet: bullet ? id(bullet) : standInId(cartridge, load.bullet.mass.value),
     ...(bullet === undefined && { bulletMass: load.bullet.mass.value }),
+    printedBullet: load.bullet.printed,
     powder: id(powder),
     charge: c.charge.value,
     velocity: c.velocity.value,

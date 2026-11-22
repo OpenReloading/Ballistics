@@ -209,6 +209,10 @@
               ],
               "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
             },
+            "byBarrel": {
+              "description": "The velocity and pressure errors per barrel class: `handgun`, a barrel under 300 mm, else `rifle`. A class without a used row is left out; a result written before it has none.",
+              "$ref": "#/$defs/errorsByBarrel"
+            },
             "pressureByBasis": {
               "type": "object",
               "propertyNames": {
@@ -363,6 +367,10 @@
                   }
                 ],
                 "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+              },
+              "byBarrel": {
+                "description": "The velocity and pressure errors per barrel class: `handgun`, a barrel under 300 mm, else `rifle`. A class without a used row is left out; a result written before it has none.",
+                "$ref": "#/$defs/errorsByBarrel"
               },
               "pressureByBasis": {
                 "type": "object",
@@ -520,6 +528,10 @@
                   }
                 ],
                 "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+              },
+              "byBarrel": {
+                "description": "The velocity and pressure errors per barrel class: `handgun`, a barrel under 300 mm, else `rifle`. A class without a used row is left out; a result written before it has none.",
+                "$ref": "#/$defs/errorsByBarrel"
               },
               "pressureByBasis": {
                 "type": "object",
@@ -686,6 +698,10 @@
                     ],
                     "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
                   },
+                  "byBarrel": {
+                    "description": "The velocity and pressure errors per barrel class: `handgun`, a barrel under 300 mm, else `rifle`. A class without a used row is left out; a result written before it has none.",
+                    "$ref": "#/$defs/errorsByBarrel"
+                  },
                   "pressureByBasis": {
                     "type": "object",
                     "propertyNames": {
@@ -842,6 +858,10 @@
               ],
               "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
             },
+            "byBarrel": {
+              "description": "The velocity and pressure errors per barrel class: `handgun`, a barrel under 300 mm, else `rifle`. A class without a used row is left out; a result written before it has none.",
+              "$ref": "#/$defs/errorsByBarrel"
+            },
             "pressureByBasis": {
               "type": "object",
               "propertyNames": {
@@ -992,6 +1012,10 @@
                 }
               ],
               "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+            },
+            "byBarrel": {
+              "description": "The velocity and pressure errors per barrel class: `handgun`, a barrel under 300 mm, else `rifle`. A class without a used row is left out; a result written before it has none.",
+              "$ref": "#/$defs/errorsByBarrel"
             },
             "pressureByBasis": {
               "type": "object",
@@ -1618,6 +1642,10 @@
                         ],
                         "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
                       },
+                      "byBarrel": {
+                        "description": "The velocity and pressure errors per barrel class: `handgun`, a barrel under 300 mm, else `rifle`. A class without a used row is left out; a result written before it has none.",
+                        "$ref": "#/$defs/errorsByBarrel"
+                      },
                       "pressureByBasis": {
                         "type": "object",
                         "propertyNames": {
@@ -1807,6 +1835,10 @@
                     }
                   ],
                   "description": "Null without a used row that has the quantity."
+                },
+                "byBarrel": {
+                  "description": "The same per barrel class, over the rows of the class.",
+                  "$ref": "#/$defs/pooledByBarrel"
                 }
               },
               "required": ["draws", "seed", "velocity", "pressure"],
@@ -1839,6 +1871,11 @@
               "pressure": {
                 "description": "Of a row that prints a pressure in bar.",
                 "type": "number"
+              },
+              "barrel": {
+                "description": "Its barrel class, as `byBarrel` of the metrics; a result written before it has none.",
+                "type": "string",
+                "enum": ["handgun", "rifle"]
               },
               "capacity": {
                 "description": "The capacity of its cartridge is an estimate: `compare` never pairs the row.",
@@ -2077,6 +2114,10 @@
                   ],
                   "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
                 },
+                "byBarrel": {
+                  "description": "The velocity and pressure errors per barrel class: `handgun`, a barrel under 300 mm, else `rifle`. A class without a used row is left out; a result written before it has none.",
+                  "$ref": "#/$defs/errorsByBarrel"
+                },
                 "pressureByBasis": {
                   "type": "object",
                   "propertyNames": {
@@ -2231,6 +2272,10 @@
                       }
                     ],
                     "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+                  },
+                  "byBarrel": {
+                    "description": "The velocity and pressure errors per barrel class: `handgun`, a barrel under 300 mm, else `rifle`. A class without a used row is left out; a result written before it has none.",
+                    "$ref": "#/$defs/errorsByBarrel"
                   },
                   "pressureByBasis": {
                     "type": "object",
@@ -2388,6 +2433,10 @@
                       }
                     ],
                     "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+                  },
+                  "byBarrel": {
+                    "description": "The velocity and pressure errors per barrel class: `handgun`, a barrel under 300 mm, else `rifle`. A class without a used row is left out; a result written before it has none.",
+                    "$ref": "#/$defs/errorsByBarrel"
                   },
                   "pressureByBasis": {
                     "type": "object",
@@ -2554,6 +2603,10 @@
                         ],
                         "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
                       },
+                      "byBarrel": {
+                        "description": "The velocity and pressure errors per barrel class: `handgun`, a barrel under 300 mm, else `rifle`. A class without a used row is left out; a result written before it has none.",
+                        "$ref": "#/$defs/errorsByBarrel"
+                      },
                       "pressureByBasis": {
                         "type": "object",
                         "propertyNames": {
@@ -2710,6 +2763,10 @@
                   ],
                   "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
                 },
+                "byBarrel": {
+                  "description": "The velocity and pressure errors per barrel class: `handgun`, a barrel under 300 mm, else `rifle`. A class without a used row is left out; a result written before it has none.",
+                  "$ref": "#/$defs/errorsByBarrel"
+                },
                 "pressureByBasis": {
                   "type": "object",
                   "propertyNames": {
@@ -2860,6 +2917,10 @@
                     }
                   ],
                   "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+                },
+                "byBarrel": {
+                  "description": "The velocity and pressure errors per barrel class: `handgun`, a barrel under 300 mm, else `rifle`. A class without a used row is left out; a result written before it has none.",
+                  "$ref": "#/$defs/errorsByBarrel"
                 },
                 "pressureByBasis": {
                   "type": "object",
@@ -3269,6 +3330,10 @@
                   ],
                   "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
                 },
+                "byBarrel": {
+                  "description": "The velocity and pressure errors per barrel class: `handgun`, a barrel under 300 mm, else `rifle`. A class without a used row is left out; a result written before it has none.",
+                  "$ref": "#/$defs/errorsByBarrel"
+                },
                 "pressureByBasis": {
                   "type": "object",
                   "propertyNames": {
@@ -3423,6 +3488,10 @@
                       }
                     ],
                     "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+                  },
+                  "byBarrel": {
+                    "description": "The velocity and pressure errors per barrel class: `handgun`, a barrel under 300 mm, else `rifle`. A class without a used row is left out; a result written before it has none.",
+                    "$ref": "#/$defs/errorsByBarrel"
                   },
                   "pressureByBasis": {
                     "type": "object",
@@ -3580,6 +3649,10 @@
                       }
                     ],
                     "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+                  },
+                  "byBarrel": {
+                    "description": "The velocity and pressure errors per barrel class: `handgun`, a barrel under 300 mm, else `rifle`. A class without a used row is left out; a result written before it has none.",
+                    "$ref": "#/$defs/errorsByBarrel"
                   },
                   "pressureByBasis": {
                     "type": "object",
@@ -3746,6 +3819,10 @@
                         ],
                         "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
                       },
+                      "byBarrel": {
+                        "description": "The velocity and pressure errors per barrel class: `handgun`, a barrel under 300 mm, else `rifle`. A class without a used row is left out; a result written before it has none.",
+                        "$ref": "#/$defs/errorsByBarrel"
+                      },
                       "pressureByBasis": {
                         "type": "object",
                         "propertyNames": {
@@ -3902,6 +3979,10 @@
                   ],
                   "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
                 },
+                "byBarrel": {
+                  "description": "The velocity and pressure errors per barrel class: `handgun`, a barrel under 300 mm, else `rifle`. A class without a used row is left out; a result written before it has none.",
+                  "$ref": "#/$defs/errorsByBarrel"
+                },
                 "pressureByBasis": {
                   "type": "object",
                   "propertyNames": {
@@ -4052,6 +4133,10 @@
                     }
                   ],
                   "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+                },
+                "byBarrel": {
+                  "description": "The velocity and pressure errors per barrel class: `handgun`, a barrel under 300 mm, else `rifle`. A class without a used row is left out; a result written before it has none.",
+                  "$ref": "#/$defs/errorsByBarrel"
                 },
                 "pressureByBasis": {
                   "type": "object",
@@ -4493,9 +4578,13 @@
                 }
               ],
               "description": "Null without a row both sides ran that has the quantity."
+            },
+            "byBarrel": {
+              "description": "The same per barrel class, over the rows of the class.",
+              "$ref": "#/$defs/pairedByBarrel"
             }
           },
-          "required": ["draws", "seed", "velocity", "pressure"],
+          "required": ["draws", "seed", "velocity", "pressure", "byBarrel"],
           "additionalProperties": false
         },
         "change": {
@@ -5466,6 +5555,10 @@
                         ],
                         "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
                       },
+                      "byBarrel": {
+                        "description": "The velocity and pressure errors per barrel class: `handgun`, a barrel under 300 mm, else `rifle`. A class without a used row is left out; a result written before it has none.",
+                        "$ref": "#/$defs/errorsByBarrel"
+                      },
                       "pressureByBasis": {
                         "type": "object",
                         "propertyNames": {
@@ -5655,6 +5748,10 @@
                     }
                   ],
                   "description": "Null without a used row that has the quantity."
+                },
+                "byBarrel": {
+                  "description": "The same per barrel class, over the rows of the class.",
+                  "$ref": "#/$defs/pooledByBarrel"
                 }
               },
               "required": ["draws", "seed", "velocity", "pressure"],
@@ -5681,5 +5778,376 @@
       ],
       "additionalProperties": false
     }
-  ]
+  ],
+  "$defs": {
+    "errorsByBarrel": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "enum": ["handgun", "rifle"]
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "rows": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "velocity": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "median": {
+                    "type": "number",
+                    "description": "Median of the absolute relative error, as a fraction."
+                  },
+                  "p90": {
+                    "type": "number",
+                    "description": "90th percentile of the absolute relative error, as a fraction."
+                  }
+                },
+                "required": ["median", "p90"],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Absolute relative error of the muzzle velocity over the used rows; null without one."
+          },
+          "pressure": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "median": {
+                    "type": "number",
+                    "description": "Median of the absolute relative error, as a fraction."
+                  },
+                  "p90": {
+                    "type": "number",
+                    "description": "90th percentile of the absolute relative error, as a fraction."
+                  },
+                  "rows": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991,
+                    "description": "Used rows that print a peak pressure."
+                  }
+                },
+                "required": ["median", "p90", "rows"],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+          }
+        },
+        "required": ["rows", "velocity", "pressure"],
+        "additionalProperties": false
+      }
+    },
+    "pooledByBarrel": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "enum": ["handgun", "rifle"]
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "velocity": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "rows": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991,
+                    "description": "Used rows of every fold (for pressure: that print one in bar)."
+                  },
+                  "cartridges": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991,
+                    "description": "Their distinct cartridges, the units the bootstrap draws."
+                  },
+                  "median": {
+                    "type": "object",
+                    "properties": {
+                      "value": {
+                        "type": "number",
+                        "description": "Over the rows of every fold."
+                      },
+                      "standardError": {
+                        "type": "number",
+                        "description": "Standard deviation over the bootstrap draws."
+                      }
+                    },
+                    "required": ["value", "standardError"],
+                    "additionalProperties": false,
+                    "description": "Of the median absolute relative error."
+                  },
+                  "p90": {
+                    "type": "object",
+                    "properties": {
+                      "value": {
+                        "type": "number",
+                        "description": "Over the rows of every fold."
+                      },
+                      "standardError": {
+                        "type": "number",
+                        "description": "Standard deviation over the bootstrap draws."
+                      }
+                    },
+                    "required": ["value", "standardError"],
+                    "additionalProperties": false,
+                    "description": "Of the 90th percentile of the absolute relative error."
+                  }
+                },
+                "required": ["rows", "cartridges", "median", "p90"],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null without a used row that has the quantity."
+          },
+          "pressure": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "rows": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991,
+                    "description": "Used rows of every fold (for pressure: that print one in bar)."
+                  },
+                  "cartridges": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991,
+                    "description": "Their distinct cartridges, the units the bootstrap draws."
+                  },
+                  "median": {
+                    "type": "object",
+                    "properties": {
+                      "value": {
+                        "type": "number",
+                        "description": "Over the rows of every fold."
+                      },
+                      "standardError": {
+                        "type": "number",
+                        "description": "Standard deviation over the bootstrap draws."
+                      }
+                    },
+                    "required": ["value", "standardError"],
+                    "additionalProperties": false,
+                    "description": "Of the median absolute relative error."
+                  },
+                  "p90": {
+                    "type": "object",
+                    "properties": {
+                      "value": {
+                        "type": "number",
+                        "description": "Over the rows of every fold."
+                      },
+                      "standardError": {
+                        "type": "number",
+                        "description": "Standard deviation over the bootstrap draws."
+                      }
+                    },
+                    "required": ["value", "standardError"],
+                    "additionalProperties": false,
+                    "description": "Of the 90th percentile of the absolute relative error."
+                  }
+                },
+                "required": ["rows", "cartridges", "median", "p90"],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null without a used row that has the quantity."
+          }
+        },
+        "required": ["velocity", "pressure"],
+        "additionalProperties": false
+      },
+      "required": ["handgun", "rifle"]
+    },
+    "pairedByBarrel": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "enum": ["handgun", "rifle"]
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "velocity": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "rows": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991,
+                    "description": "Rows both sides gave a result for (for pressure: that print one in bar)."
+                  },
+                  "cartridges": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991,
+                    "description": "Their distinct cartridges, the units the bootstrap draws."
+                  },
+                  "median": {
+                    "type": "object",
+                    "properties": {
+                      "baseline": {
+                        "type": "number",
+                        "description": "Of the baseline over the paired rows."
+                      },
+                      "candidate": {
+                        "type": "number",
+                        "description": "Of the candidate over the paired rows."
+                      },
+                      "change": {
+                        "type": "number",
+                        "description": "Candidate minus baseline."
+                      },
+                      "standardError": {
+                        "type": "number",
+                        "description": "Standard deviation of the change over the bootstrap draws."
+                      }
+                    },
+                    "required": ["baseline", "candidate", "change", "standardError"],
+                    "additionalProperties": false,
+                    "description": "Of the median absolute relative error."
+                  },
+                  "p90": {
+                    "type": "object",
+                    "properties": {
+                      "baseline": {
+                        "type": "number",
+                        "description": "Of the baseline over the paired rows."
+                      },
+                      "candidate": {
+                        "type": "number",
+                        "description": "Of the candidate over the paired rows."
+                      },
+                      "change": {
+                        "type": "number",
+                        "description": "Candidate minus baseline."
+                      },
+                      "standardError": {
+                        "type": "number",
+                        "description": "Standard deviation of the change over the bootstrap draws."
+                      }
+                    },
+                    "required": ["baseline", "candidate", "change", "standardError"],
+                    "additionalProperties": false,
+                    "description": "Of the 90th percentile of the absolute relative error."
+                  }
+                },
+                "required": ["rows", "cartridges", "median", "p90"],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null without a row both sides ran that has the quantity."
+          },
+          "pressure": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "rows": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991,
+                    "description": "Rows both sides gave a result for (for pressure: that print one in bar)."
+                  },
+                  "cartridges": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991,
+                    "description": "Their distinct cartridges, the units the bootstrap draws."
+                  },
+                  "median": {
+                    "type": "object",
+                    "properties": {
+                      "baseline": {
+                        "type": "number",
+                        "description": "Of the baseline over the paired rows."
+                      },
+                      "candidate": {
+                        "type": "number",
+                        "description": "Of the candidate over the paired rows."
+                      },
+                      "change": {
+                        "type": "number",
+                        "description": "Candidate minus baseline."
+                      },
+                      "standardError": {
+                        "type": "number",
+                        "description": "Standard deviation of the change over the bootstrap draws."
+                      }
+                    },
+                    "required": ["baseline", "candidate", "change", "standardError"],
+                    "additionalProperties": false,
+                    "description": "Of the median absolute relative error."
+                  },
+                  "p90": {
+                    "type": "object",
+                    "properties": {
+                      "baseline": {
+                        "type": "number",
+                        "description": "Of the baseline over the paired rows."
+                      },
+                      "candidate": {
+                        "type": "number",
+                        "description": "Of the candidate over the paired rows."
+                      },
+                      "change": {
+                        "type": "number",
+                        "description": "Candidate minus baseline."
+                      },
+                      "standardError": {
+                        "type": "number",
+                        "description": "Standard deviation of the change over the bootstrap draws."
+                      }
+                    },
+                    "required": ["baseline", "candidate", "change", "standardError"],
+                    "additionalProperties": false,
+                    "description": "Of the 90th percentile of the absolute relative error."
+                  }
+                },
+                "required": ["rows", "cartridges", "median", "p90"],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null without a row both sides ran that has the quantity."
+          }
+        },
+        "required": ["velocity", "pressure"],
+        "additionalProperties": false
+      },
+      "required": ["handgun", "rifle"]
+    }
+  }
 }

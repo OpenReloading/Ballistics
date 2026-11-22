@@ -18,6 +18,7 @@ import { InputError } from '@rangefoundry/statistics'
 import { bulletDimensions } from '@rangefoundry/svg-drawings/bullet'
 import { chamberOf, seat } from '@rangefoundry/svg-drawings/seating'
 import { waterDensityGramsPerCm3 } from '@rangefoundry/units'
+import { printedConstruction } from './printed-construction.ts'
 import { type Records, withoutEstimates } from './records.ts'
 import type { Row } from './rows.ts'
 import { type Split, splitOf } from './split.ts'
@@ -54,7 +55,7 @@ export interface Outcome {
   row: Row
   split: Split
   family: string
-  /** Structure of the bullet record, else `<core material>-core`, else `unspecified`; `unknown` without a record. */
+  /** Structure of the bullet record, else `<core material>-core`, else `unspecified`; `unknown` without a record; of a stand-in bullet, the structure its printed text names (`printedConstruction`) first. */
   construction: string
   prediction: Prediction
   /** The capacity of the row's cartridge is an estimate (`isEstimatedCapacity`) and the row would be `noCaseCapacity` without it. */
@@ -65,6 +66,13 @@ export interface Outcome {
 export const constructionOf = (bullet: Bullet | undefined) => {
   if (!bullet) return 'unknown'
   return bulletListFields(bullet).construction ?? 'unspecified'
+}
+
+/** The construction a row is grouped by: of a stand-in bullet (`bulletMass` set) the one its printed text names, else that of the bullet record ({@link constructionOf}). */
+function rowConstruction(row: Row, records: Records) {
+  const printed = row.bulletMass === undefined ? undefined : row.printedBullet
+  const named = printed === undefined ? undefined : printedConstruction(printed)
+  return named ?? constructionOf(records.bullets.get(row.bullet))
 }
 
 /** The volume behind the seated bullet (m3) and the bullet travel (m) of a row, or why they are not known. */
@@ -207,7 +215,7 @@ export function outcomes(
     const split = splitOf(row.cartridge)
     if (!wanted.includes(split)) return []
     const family = familyOf(records.powders.get(row.powder))
-    const construction = constructionOf(records.bullets.get(row.bullet))
+    const construction = rowConstruction(row, records)
     const prediction = predict(row, records, model)
     const capacity = records.capacities.get(row.cartridge)
     // a row refused for a reason checked before the capacity keeps that reason
