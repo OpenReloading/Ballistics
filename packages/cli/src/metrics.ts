@@ -47,6 +47,15 @@ export type BarrelClass = (typeof barrelClasses)[number]
 export const barrelClassOf = (barrel: number | undefined): BarrelClass | undefined =>
   barrel === undefined ? undefined : barrel < handgunBarrelLengthLimit * 1000 ? 'handgun' : 'rifle'
 
+/** `valueOf` of the rows of each barrel class in `used`; a class without a row is left out. */
+const perBarrel = <T>(used: readonly Used[], valueOf: (rows: Used[]) => T) =>
+  Object.fromEntries(
+    barrelClasses.flatMap((barrel) => {
+      const rows = used.filter((o) => barrelClassOf(o.row.barrel) === barrel)
+      return rows.length > 0 ? [[barrel, valueOf(rows)] as const] : []
+    }),
+  )
+
 /** The velocity and pressure errors of `used`. */
 function errorsOf(used: readonly Used[]) {
   const pressure = used.flatMap((o) => pressureError(o) ?? [])
@@ -57,16 +66,33 @@ function errorsOf(used: readonly Used[]) {
   }
 }
 
-/** The half width of the 90 % interval: the 90th percentile of the velocity error of the used `training` rows. */
+/** The half width of the 90 % interval per barrel class: the 90th percentile of the band distance of the used `training` rows of the class, the distance the coverage tests. */
 export function halfWidthOf(training: readonly Outcome[]) {
-  const errors = training.filter(isUsed).map(velocityError)
-  return { halfWidth: percentile(errors, 0.9) ?? null, trainingRows: errors.length }
+  const used = training.filter(isUsed)
+  return {
+    byBarrel: perBarrel(used, (rows) => ({
+      halfWidth: percentile(rows.map(bandDistance), 0.9) as number,
+      trainingRows: rows.length,
+    })),
+    trainingRows: used.length,
+  }
 }
 
-/** The half width of {@link halfWidthOf} for every row, or per row: that of its fold in a cross-validation. */
+/** The half widths per class of {@link halfWidthOf}. */
+type HalfWidths = { readonly [barrel in BarrelClass]?: { readonly halfWidth: number } }
+
+/** The half width of the class of a row under `byBarrel`; null for a class without one. */
+export const widthByBarrel =
+  (byBarrel: HalfWidths = {}) =>
+  (o: Outcome) => {
+    const barrel = barrelClassOf(o.row.barrel)
+    return (barrel && byBarrel[barrel]?.halfWidth) ?? null
+  }
+
+/** The half width for every row, or per row: that of its class, in a cross-validation that of its class in its fold. */
 export type HalfWidth = number | null | ((o: Outcome) => number | null)
 
-/** The metrics of a group of rows; `halfWidth` is the interval of {@link halfWidthOf}. */
+/** The metrics of a group of rows; `halfWidth` is the interval of {@link halfWidthOf}, coverage null when a used row has none. */
 export function metricsOf(items: readonly Outcome[], halfWidth: HalfWidth): Metrics {
   const used = items.filter(isUsed)
   const widthOf = typeof halfWidth === 'function' ? halfWidth : () => halfWidth
@@ -93,12 +119,7 @@ export function metricsOf(items: readonly Outcome[], halfWidth: HalfWidth): Metr
       ),
     },
     ...errorsOf(used),
-    byBarrel: Object.fromEntries(
-      barrelClasses.flatMap((barrel) => {
-        const rows = used.filter((o) => barrelClassOf(o.row.barrel) === barrel)
-        return rows.length > 0 ? [[barrel, { rows: rows.length, ...errorsOf(rows) }]] : []
-      }),
-    ),
+    byBarrel: perBarrel(used, (rows) => ({ rows: rows.length, ...errorsOf(rows) })),
     pressureByBasis: Object.fromEntries(
       [...bases]
         .toSorted(([a], [b]) => compareKeys(a, b))
@@ -159,10 +180,10 @@ export function evaluate(
   training: readonly Outcome[],
   by?: Grouping,
 ): Omit<Evaluation, 'model' | 'modelVersion'> {
-  const { halfWidth, trainingRows } = halfWidthOf(training)
+  const { byBarrel, trainingRows } = halfWidthOf(training)
   return {
-    interval: { basis: 'training', halfWidth, trainingRows },
-    ...groupsOf(split, halfWidth, by),
+    interval: { basis: 'training', byBarrel, trainingRows },
+    ...groupsOf(split, widthByBarrel(byBarrel), by),
   }
 }
 

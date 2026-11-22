@@ -42,12 +42,35 @@ describe('metricsOf', () => {
 
 describe('evaluate', () => {
   it('calibrates the interval on the used training rows only', () => {
-    const { interval } = evaluate([], [used('b', 1000, 1100), refused])
+    const training = used('b', 1000, 1100)
+    const { interval } = evaluate(
+      [],
+      [{ ...training, row: { ...training.row, barrel: 610 } }, refused],
+    )
     expect(interval).toEqual({
       basis: 'training',
-      halfWidth: expect.closeTo(0.1, 12),
+      byBarrel: { rifle: { halfWidth: expect.closeTo(0.0909091, 6), trainingRows: 1 } },
       trainingRows: 1,
     })
+  })
+
+  it('calibrates one half width per barrel class on the distance the coverage tests', () => {
+    const at = (barrel: number, predicted: number): Outcome => {
+      const o = used('b', 1000, predicted)
+      return { ...o, row: { ...o.row, barrel } }
+    }
+    const r = evaluate([at(120, 1090), at(610, 1030)], [at(120, 1100), at(610, 1020)])
+    // |model - printed| / model: 100 / 1100 and 20 / 1020, not 0.10 and 0.02
+    expect(r.interval).toEqual({
+      basis: 'training',
+      byBarrel: {
+        handgun: { halfWidth: expect.closeTo(0.0909091, 6), trainingRows: 1 },
+        rifle: { halfWidth: expect.closeTo(0.0196078, 6), trainingRows: 1 },
+      },
+      trainingRows: 2,
+    })
+    // the handgun row at 90 / 1090 is inside its class's band, the rifle row at 30 / 1030 outside
+    expect(r.overall.interval).toEqual({ coverage: 0.5 })
   })
 
   it('groups by bullet', () => {

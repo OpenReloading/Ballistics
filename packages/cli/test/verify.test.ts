@@ -39,11 +39,13 @@ describe('verify on the validation split', () => {
 
   it('calibrates the interval on the training split and counts the rows inside it', async () => {
     const r = await verify(options)
-    // training errors 0.01 to 0.10: the 90th percentile is 0.091
+    // training errors e of 0.01 to 0.10, alternating in sign, are |model - v| / model = |e| / (1 + e) of 0.0099 to 0.1111: the 90th percentile is 0.08696 + 0.1 * (0.11111 - 0.08696)
     expect(r.interval.trainingRows).toBe(10)
-    expect(r.interval.halfWidth).toBeCloseTo(0.091, 9)
-    // the band is the model velocity times (1 +/- h), so v is inside when |model - v| / model <= h: the row printed 10 % below the model is at 0.0909 of it, inside, while against the printed velocity its error is 0.10, outside
-    expect(r.overall.interval?.coverage).toBeCloseTo(1, 12)
+    expect(r.interval.byBarrel).toEqual({
+      rifle: { halfWidth: expect.closeTo(0.089372, 6), trainingRows: 10 },
+    })
+    // the band is the model velocity times (1 +/- h), so v is inside when |model - v| / model <= h: the row printed 10 % below the model is at 0.0909 of it, outside
+    expect(r.overall.interval?.coverage).toBeCloseTo(0.8, 12)
   })
 
   it('groups by powder family and by powder', async () => {
@@ -226,7 +228,7 @@ describe('verify on the other splits', () => {
   it('has no interval without a training row', async () => {
     const only = writeRows(rowsCsv([{ cartridge: '308-match', charge: 2.0, velocity: 0.01 }]))
     const r = await verify({ ...options, rows: only })
-    expect(r.interval).toEqual({ basis: 'training', halfWidth: null, trainingRows: 0 })
+    expect(r.interval).toEqual({ basis: 'training', byBarrel: {}, trainingRows: 0 })
     expect(r.overall.interval).toBeNull()
   })
 })

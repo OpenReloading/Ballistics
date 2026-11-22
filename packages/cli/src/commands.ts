@@ -7,7 +7,15 @@ import { Refusal, UsageError } from './errors.ts'
 import { type InteriorModel, type Outcome, outcomes } from './evaluate.ts'
 import { fitPowders, notFittedReasons, type PressureKey, priorLines, withFit } from './fit.ts'
 import { foldCount, foldPool, foldSalt, foldSplits, foldsOf } from './folds.ts'
-import { changeOf, evaluate, type Grouping, groupsOf, halfWidthOf, metricsOf } from './metrics.ts'
+import {
+  changeOf,
+  evaluate,
+  type Grouping,
+  groupsOf,
+  halfWidthOf,
+  metricsOf,
+  widthByBarrel,
+} from './metrics.ts'
 import { builtInName, fitFiles, loadModel, type Model } from './model.ts'
 import { foldAggregate, pairedChange, type RowError, rowErrors } from './paired.ts'
 import { fillInputs, rowsFromPublished } from './published-rows.ts'
@@ -395,12 +403,12 @@ async function evaluateModel(spec: string, options: Options, data: Prepared): Pr
     ...evaluation,
     ...(unseen && {
       notInFittedSet: {
-        ...metricsOf(unseen.items, evaluation.interval.halfWidth),
+        ...metricsOf(unseen.items, widthByBarrel(evaluation.interval.byBarrel)),
         powders: unseen.powders,
       },
     }),
     ...(estimated.length > 0 && {
-      estimatedCapacity: metricsOf(estimated, evaluation.interval.halfWidth),
+      estimatedCapacity: metricsOf(estimated, widthByBarrel(evaluation.interval.byBarrel)),
     }),
     ...(fitted && { fit: fitted.summary }),
     ...(fitted && 'screen' in fitted && { screen: fitted.screen }),
@@ -464,18 +472,21 @@ function crossValidate(options: FitOptions, data: Prepared, model: Model) {
     const records = withFit(data.records, { powders: fitted.powders, notFitted })
     const run = outcomes(data.rows, records, model.interior, foldSplits)
     const all = estimatedNotUsed(run)
-    const { halfWidth, trainingRows } = halfWidthOf(all.filter((o) => !held(o.row)))
+    const { byBarrel, trainingRows } = halfWidthOf(all.filter((o) => !held(o.row)))
     return {
       fold,
       cartridges: [...foldOf].flatMap(([id, f]) => (f === fold ? [id] : [])).toSorted(compareKeys),
       fit: summaryOf({ ...fitted, pressure: fitted.summary.pressure, notFitted }),
-      interval: { basis: foldPool, halfWidth, trainingRows },
+      interval: { basis: foldPool, byBarrel, trainingRows },
       scored: all.filter((o) => held(o.row)),
       estimated: run.filter((o) => o.estimatedCapacity && held(o.row)),
     }
   })
   const widths = new Map(
-    each.flatMap((f) => f.scored.map((o) => [o.index, f.interval.halfWidth] as const)),
+    each.flatMap((f) => {
+      const width = widthByBarrel(f.interval.byBarrel)
+      return f.scored.map((o) => [o.index, width(o)] as const)
+    }),
   )
   return {
     scored: each.flatMap((f) => f.scored),
@@ -490,7 +501,7 @@ function crossValidate(options: FitOptions, data: Prepared, model: Model) {
         cartridges,
         fit,
         interval,
-        overall: metricsOf(scored, interval.halfWidth),
+        overall: metricsOf(scored, widthByBarrel(interval.byBarrel)),
       })),
       aggregate: foldAggregate(each.map((f) => rowErrors(f.scored))),
     },
@@ -526,7 +537,7 @@ async function evaluateFolds(spec: string, options: Options, data: Prepared) {
   return {
     model: model.name,
     modelVersion: versionOf(model, data, foldParams(options, data)),
-    interval: { basis: foldPool, halfWidth: null, trainingRows: cv.trainingRows },
+    interval: { basis: foldPool, trainingRows: cv.trainingRows },
     ...evaluation,
     ...(cv.estimated.length > 0 && { estimatedCapacity: metricsOf(cv.estimated, cv.halfWidth) }),
     folds: cv.folds,
@@ -635,6 +646,12 @@ export async function compare(
     ...Object.keys(candidate.grouped?.groups ?? {}),
   ])
   const families = new Set([...Object.keys(baseline.byFamily), ...Object.keys(candidate.byFamily)])
+  // a baseline saved with one half width for every row measured its coverage against another interval
+  const oneWidth = baseline.interval.byBarrel === undefined
+  const changeIn: typeof changeOf = (before, after) => {
+    const change = changeOf(before, after)
+    return oneWidth ? { ...change, intervalCoverage: null } : change
+  }
   return {
     schemaVersion,
     notice,
@@ -648,21 +665,21 @@ export async function compare(
     candidate,
     ...(baselineRows && candidateRows && { paired: pairedChange(baselineRows, candidateRows) }),
     change: {
-      overall: changeOf(baseline.overall, candidate.overall),
+      overall: changeIn(baseline.overall, candidate.overall),
       byFamily: Object.fromEntries(
         [...families]
           .toSorted(compareKeys)
-          .map((f) => [f, changeOf(baseline.byFamily[f], candidate.byFamily[f])]),
+          .map((f) => [f, changeIn(baseline.byFamily[f], candidate.byFamily[f])]),
       ),
       ...(sameGroups && {
         grouped: Object.fromEntries(
           [...groupNames]
             .toSorted(compareKeys)
-            .map((g) => [g, changeOf(baseline.grouped?.groups[g], candidate.grouped?.groups[g])]),
+            .map((g) => [g, changeIn(baseline.grouped?.groups[g], candidate.grouped?.groups[g])]),
         ),
       }),
       ...((baseline.estimatedCapacity || candidate.estimatedCapacity) && {
-        estimatedCapacity: changeOf(baseline.estimatedCapacity, candidate.estimatedCapacity),
+        estimatedCapacity: changeIn(baseline.estimatedCapacity, candidate.estimatedCapacity),
       }),
     },
   }

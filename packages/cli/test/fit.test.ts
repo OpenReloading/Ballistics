@@ -796,8 +796,8 @@ describe('--folds', { timeout: 60_000 }, () => {
       })),
     )
     const r = await verify({ ...options, rows: writeRows(rowsCsv(rows, planted)), folds: true })
-    expect(r.folds?.each[4]?.interval.halfWidth).toBeLessThan(0.001)
-    expect(r.folds?.each[0]?.interval.halfWidth).toBeGreaterThan(0.01)
+    expect(r.folds?.each[4]?.interval.byBarrel?.rifle?.halfWidth).toBeLessThan(0.001)
+    expect(r.folds?.each[0]?.interval.byBarrel?.rifle?.halfWidth).toBeGreaterThan(0.01)
   })
 
   it('adds the folds to the fit of every training row', async () => {

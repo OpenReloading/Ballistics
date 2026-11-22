@@ -95,8 +95,12 @@
               "enum": ["training", "training+validation"],
               "description": "The split whose used rows set the half width: `training`, or with `--folds` the training and validation rows the fit read."
             },
+            "byBarrel": {
+              "description": "The half width of the 90 % interval per barrel class, as `byBarrel` of the metrics. A class without a used row in `basis` is left out, and its rows have no interval. Absent at the top of a `--folds` result, where each row takes the half width of its class in its fold, and in a result written before it.",
+              "$ref": "#/$defs/halfWidthByBarrel"
+            },
             "halfWidth": {
-              "description": "The 90th percentile of the absolute relative velocity error on the training split: the interval is the model velocity times (1 +/- this). Null without a training row, and at the top of a `--folds` result, where each row is scored with the half width of its fold, which comes from the training and validation rows of the other folds.",
+              "description": "Only in a result written before `byBarrel`: one half width for every row, the 90th percentile of |model - printed| / printed of the velocity on the training split.",
               "type": ["number", "null"]
             },
             "trainingRows": {
@@ -106,7 +110,7 @@
               "description": "Used rows of `basis` the half width comes from; at the top of a `--folds` result the sum over the folds, in which each row counts once for every fold whose half width it sets."
             }
           },
-          "required": ["basis", "halfWidth", "trainingRows"],
+          "required": ["basis", "trainingRows"],
           "additionalProperties": false
         },
         "overall": {
@@ -1527,8 +1531,12 @@
                         "enum": ["training", "training+validation"],
                         "description": "The split whose used rows set the half width: `training`, or with `--folds` the training and validation rows the fit read."
                       },
+                      "byBarrel": {
+                        "description": "The half width of the 90 % interval per barrel class, as `byBarrel` of the metrics. A class without a used row in `basis` is left out, and its rows have no interval. Absent at the top of a `--folds` result, where each row takes the half width of its class in its fold, and in a result written before it.",
+                        "$ref": "#/$defs/halfWidthByBarrel"
+                      },
                       "halfWidth": {
-                        "description": "The 90th percentile of the absolute relative velocity error on the training split: the interval is the model velocity times (1 +/- this). Null without a training row, and at the top of a `--folds` result, where each row is scored with the half width of its fold, which comes from the training and validation rows of the other folds.",
+                        "description": "Only in a result written before `byBarrel`: one half width for every row, the 90th percentile of |model - printed| / printed of the velocity on the training split.",
                         "type": ["number", "null"]
                       },
                       "trainingRows": {
@@ -1538,7 +1546,7 @@
                         "description": "Used rows of `basis` the half width comes from; at the top of a `--folds` result the sum over the folds, in which each row counts once for every fold whose half width it sets."
                       }
                     },
-                    "required": ["basis", "halfWidth", "trainingRows"],
+                    "required": ["basis", "trainingRows"],
                     "additionalProperties": false,
                     "description": "The half width of the fit, on the training and validation rows of the other folds."
                   },
@@ -2000,8 +2008,12 @@
                   "enum": ["training", "training+validation"],
                   "description": "The split whose used rows set the half width: `training`, or with `--folds` the training and validation rows the fit read."
                 },
+                "byBarrel": {
+                  "description": "The half width of the 90 % interval per barrel class, as `byBarrel` of the metrics. A class without a used row in `basis` is left out, and its rows have no interval. Absent at the top of a `--folds` result, where each row takes the half width of its class in its fold, and in a result written before it.",
+                  "$ref": "#/$defs/halfWidthByBarrel"
+                },
                 "halfWidth": {
-                  "description": "The 90th percentile of the absolute relative velocity error on the training split: the interval is the model velocity times (1 +/- this). Null without a training row, and at the top of a `--folds` result, where each row is scored with the half width of its fold, which comes from the training and validation rows of the other folds.",
+                  "description": "Only in a result written before `byBarrel`: one half width for every row, the 90th percentile of |model - printed| / printed of the velocity on the training split.",
                   "type": ["number", "null"]
                 },
                 "trainingRows": {
@@ -2011,7 +2023,7 @@
                   "description": "Used rows of `basis` the half width comes from; at the top of a `--folds` result the sum over the folds, in which each row counts once for every fold whose half width it sets."
                 }
               },
-              "required": ["basis", "halfWidth", "trainingRows"],
+              "required": ["basis", "trainingRows"],
               "additionalProperties": false
             },
             "overall": {
@@ -3216,8 +3228,12 @@
                   "enum": ["training", "training+validation"],
                   "description": "The split whose used rows set the half width: `training`, or with `--folds` the training and validation rows the fit read."
                 },
+                "byBarrel": {
+                  "description": "The half width of the 90 % interval per barrel class, as `byBarrel` of the metrics. A class without a used row in `basis` is left out, and its rows have no interval. Absent at the top of a `--folds` result, where each row takes the half width of its class in its fold, and in a result written before it.",
+                  "$ref": "#/$defs/halfWidthByBarrel"
+                },
                 "halfWidth": {
-                  "description": "The 90th percentile of the absolute relative velocity error on the training split: the interval is the model velocity times (1 +/- this). Null without a training row, and at the top of a `--folds` result, where each row is scored with the half width of its fold, which comes from the training and validation rows of the other folds.",
+                  "description": "Only in a result written before `byBarrel`: one half width for every row, the 90th percentile of |model - printed| / printed of the velocity on the training split.",
                   "type": ["number", "null"]
                 },
                 "trainingRows": {
@@ -3227,7 +3243,7 @@
                   "description": "Used rows of `basis` the half width comes from; at the top of a `--folds` result the sum over the folds, in which each row counts once for every fold whose half width it sets."
                 }
               },
-              "required": ["basis", "halfWidth", "trainingRows"],
+              "required": ["basis", "trainingRows"],
               "additionalProperties": false
             },
             "overall": {
@@ -5440,8 +5456,12 @@
                         "enum": ["training", "training+validation"],
                         "description": "The split whose used rows set the half width: `training`, or with `--folds` the training and validation rows the fit read."
                       },
+                      "byBarrel": {
+                        "description": "The half width of the 90 % interval per barrel class, as `byBarrel` of the metrics. A class without a used row in `basis` is left out, and its rows have no interval. Absent at the top of a `--folds` result, where each row takes the half width of its class in its fold, and in a result written before it.",
+                        "$ref": "#/$defs/halfWidthByBarrel"
+                      },
                       "halfWidth": {
-                        "description": "The 90th percentile of the absolute relative velocity error on the training split: the interval is the model velocity times (1 +/- this). Null without a training row, and at the top of a `--folds` result, where each row is scored with the half width of its fold, which comes from the training and validation rows of the other folds.",
+                        "description": "Only in a result written before `byBarrel`: one half width for every row, the 90th percentile of |model - printed| / printed of the velocity on the training split.",
                         "type": ["number", "null"]
                       },
                       "trainingRows": {
@@ -5451,7 +5471,7 @@
                         "description": "Used rows of `basis` the half width comes from; at the top of a `--folds` result the sum over the folds, in which each row counts once for every fold whose half width it sets."
                       }
                     },
-                    "required": ["basis", "halfWidth", "trainingRows"],
+                    "required": ["basis", "trainingRows"],
                     "additionalProperties": false,
                     "description": "The half width of the fit, on the training and validation rows of the other folds."
                   },
@@ -5780,6 +5800,30 @@
     }
   ],
   "$defs": {
+    "halfWidthByBarrel": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "enum": ["handgun", "rifle"]
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "halfWidth": {
+            "type": "number",
+            "description": "The 90th percentile of |model - printed| / model of the velocity over the used rows of the class in `basis`, the distance the coverage tests: the interval of a row of the class is the model velocity times (1 +/- this)."
+          },
+          "trainingRows": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991,
+            "description": "Used rows of the class in `basis`."
+          }
+        },
+        "required": ["halfWidth", "trainingRows"],
+        "additionalProperties": false
+      }
+    },
     "errorsByBarrel": {
       "type": "object",
       "propertyNames": {
