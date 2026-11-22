@@ -376,6 +376,9 @@
       "value": 47.51
     }
   ],
+  "defaults": {
+    "capacity": "catalogue:308-win-wikipedia"
+  },
   "provenance": {
     "kind": "published",
     "sources": [

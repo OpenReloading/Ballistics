@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import type { Exact } from './exact.ts'
-import { recordId } from './ids.ts'
+import { catalogueRef, recordId } from './ids.ts'
+import { primerSizes } from './primer.ts'
 import { provenance } from './provenance.ts'
 import { plausibilityException, pressureMethod, specValue } from './standards.ts'
 
@@ -30,12 +31,24 @@ const cartridgeParser = z.object({
   verification: z.enum(['verified', 'unverified']),
   values: z.array(specValue),
   exceptions: z.array(plausibilityException).min(1).optional(),
+  defaults: z
+    .strictObject({
+      capacity: catalogueRef('case capacity')
+        .describe(
+          'The case capacity record of a load that names no capacity record and no case record with a stated capacity.',
+        )
+        .optional(),
+      primerSize: primerSizes
+        .describe('The primer size of a load that names no primer record.')
+        .optional(),
+    })
+    .optional(),
   provenance: provenance.optional(),
 })
 
 /**
  * A cartridge as its C.I.P. sheet defines it: the names, the table, the dates and the values the
- * sheet prints. Inferred type: {@link Cartridge}.
+ * sheet prints, and the catalogue's `defaults` for it. Inferred type: {@link Cartridge}.
  */
 export const cartridge: z.ZodObject<{
   id: typeof recordId
@@ -54,6 +67,17 @@ export const cartridge: z.ZodObject<{
   verification: z.ZodEnum<z.core.util.ToEnum<'verified' | 'unverified'>>
   values: z.ZodArray<typeof specValue>
   exceptions: z.ZodOptional<z.ZodArray<typeof plausibilityException>>
+  /** What a load of the cartridge uses for what it does not name; no value of the sheet. */
+  defaults: z.ZodOptional<
+    z.ZodObject<
+      {
+        /** Reference to a catalogue capacity of the cartridge, whose provenance is the source of the figure. */
+        capacity: z.ZodOptional<z.ZodString>
+        primerSize: z.ZodOptional<typeof primerSizes>
+      },
+      z.core.$strict
+    >
+  >
   /** Where the values of the record come from, wherever the record has a source: a kind and at least one source. */
   provenance: z.ZodOptional<typeof provenance>
 }> = cartridgeParser satisfies Exact<typeof cartridge, typeof cartridgeParser>

@@ -223,6 +223,9 @@
       "value": 90.65
     }
   ],
+  "defaults": {
+    "capacity": "catalogue:44-rem-mag-wikipedia"
+  },
   "provenance": {
     "kind": "published",
     "sources": [

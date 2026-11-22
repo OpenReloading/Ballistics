@@ -92,6 +92,45 @@ export function checkLoadCapacityReferences(
       errors.push(`loads/${l.id}.json: unknown capacity "${l.capacity}"`)
 }
 
+/** The default capacity of every cartridge is a published or measured capacity of it; from a single root, a cartridge with such a record names one. */
+export function checkDefaultCapacityReferences(
+  bundle: Pick<Bundle, 'cartridges' | 'capacities'>,
+  singleRoot: boolean,
+  errors: string[],
+): void {
+  const known = new Map(bundle.capacities.map((c) => [c.id, c]))
+  const eligible = bundle.capacities.filter(canBeDefault)
+  const withCapacity = new Set(eligible.map((c) => parseRef(c.cartridge)?.id ?? c.cartridge))
+  for (const c of bundle.cartridges) {
+    const named = c.defaults?.capacity
+    if (named !== undefined) checkNamedDefault(c.id, named, known, errors)
+    else if (singleRoot && withCapacity.has(c.id))
+      errors.push(
+        `cartridges/${c.id}.json: has a published or measured capacity and names no default capacity`,
+      )
+  }
+}
+
+/** Whether a capacity can be a default: published or measured, so never an estimate. */
+const canBeDefault = ({ provenance }: Bundle['capacities'][number]) =>
+  provenance?.kind === 'published' || provenance?.kind === 'measured'
+
+/** The default capacity `named` of one cartridge, among the `known` capacities. */
+function checkNamedDefault(
+  cartridge: string,
+  named: string,
+  known: ReadonlyMap<string, Bundle['capacities'][number]>,
+  errors: string[],
+) {
+  const where = `cartridges/${cartridge}.json`
+  const capacity = known.get(parseRef(named)?.id ?? named)
+  if (!capacity) errors.push(`${where}: unknown default capacity "${named}"`)
+  else if (parseRef(capacity.cartridge)?.id !== cartridge)
+    errors.push(`${where}: default capacity "${named}" is a capacity of another cartridge`)
+  else if (!canBeDefault(capacity))
+    errors.push(`${where}: default capacity "${named}" is neither published nor measured`)
+}
+
 /** The case record of every load that names one: it exists and is a case of the load's cartridge. */
 export function checkLoadCaseReferences(
   bundle: Pick<Bundle, 'loads' | 'cases'>,

@@ -14,7 +14,16 @@ The cartridge designer seats a bullet in the case and chamber of its own values:
 
 ## Which capacity a load uses
 
-A load can name a case record (`case.record`, [Brass](../data/cases.md): a catalogue product, or a group of the user's own cases) and a case capacity record (`capacity`). A group of the user's cases names the capacity record that holds the water the user measured on it, and choosing the group in the workbench makes that record the load's capacity. The capacity record is a figure the user measured on fired cases, or a catalogue figure chosen for the cartridge. The case record states the water capacity of the product as its manufacturer gives it. The capacity record takes precedence; without one the stated capacity of the case record is the default, and without either the capacity is not given. A stated capacity is never saved into the load: opening a load reads it again from the case record. Code: `packages/schema/src/case-capacity.ts`, `loadWaterCapacity`.
+A load can name a case record (`case.record`, [Brass](../data/cases.md): a catalogue product, or a group of the user's own cases) and a case capacity record (`capacity`). A group of the user's cases names the capacity record that holds the water the user measured on it, and choosing the group in the workbench makes that record the load's capacity. The capacity record is a figure the user measured on fired cases, or a catalogue figure chosen for the cartridge. The case record states the water capacity of the product as its manufacturer gives it. A stated capacity is never saved into the load: opening a load reads it again from the case record.
+
+`loadWaterCapacity` (`packages/schema/src/case-capacity.ts`) takes, in this order:
+
+1. The capacity record the load names (source `capacity`).
+2. The stated capacity of the case record (source `case`).
+3. The default capacity of the cartridge (source `default`), where the caller passes one: `defaultCapacity` gives the record the cartridge's `defaults.capacity` names, or for a cartridge that names none its first capacity record by id that is no estimate. A named default that is absent or an estimate gives none.
+4. None: the capacity is not given.
+
+A default is no stand-in for a record the load names: a caller that cannot read that record passes no default. The [CLI](../cli.md) passes the cartridge's default. The workbench passes none and follows the cartridge's first capacity record by id.
 
 The seating geometry is in `packages/svg-drawings/src/seating/seating.ts`, the outline in `packages/svg-drawings/src/bullet/outline.ts`.
 
@@ -170,7 +179,7 @@ The workbench sets the pressure range's tolerance of the chamber volume from whe
 | Measured, with the spread $s$ of the brass group                                                | $s / C$                                       |
 | Measured, without a spread                                                                      | 0.5 % (assumption)                            |
 | A catalogue or case record, while the cartridge has capacity records of two or more case makers | standard deviation over mean of those records |
-| A catalogue or case record otherwise, or records that agree exactly                             | 2 % (assumption without a published source)   |
+| A catalogue or case record otherwise (a default one too), or records that agree exactly         | 2 % (assumption without a published source)   |
 
 The range moves the volume behind the bullet $V$, so the capacity's part is taken relative to it, and the interval $h$ of an estimated bullet volume (above) adds to it:
 

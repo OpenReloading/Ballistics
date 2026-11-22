@@ -302,6 +302,9 @@
       "value": 47.51
     }
   ],
+  "defaults": {
+    "capacity": "catalogue:30-r-blaser-wikipedia"
+  },
   "provenance": {
     "kind": "published",
     "sources": [

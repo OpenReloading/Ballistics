@@ -1,4 +1,4 @@
-import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -289,6 +289,44 @@ describe('readRecords with several roots', () => {
       } finally {
         rmSync(first, { recursive: true })
       }
+    } finally {
+      rmSync(second, { recursive: true })
+    }
+  })
+})
+
+describe('readRecords default capacity', () => {
+  const missingDefault =
+    'cartridges/test-cartridge.json: has a published or measured capacity and names no default capacity'
+  const capacity = {
+    id: 'test-capacity',
+    origin: 'catalogue',
+    cartridge: 'catalogue:test-cartridge',
+    waterCapacity: { value: 1 },
+    provenance: { kind: 'measured', sources: [{ title: 'Test measurement' }] },
+  }
+
+  it('asks a cartridge with a capacity record in a single root for its default', () => {
+    expect(errorsAfter((_root, write) => write('capacities/test-capacity.json', capacity))).toEqual(
+      [missingDefault],
+    )
+  })
+
+  it('asks for no default of a cartridge whose capacity record is an estimate', () => {
+    const provenance = { kind: 'derived', sources: [{ title: 'Outline estimate' }] }
+    expect(
+      errorsAfter((_root, write) =>
+        write('capacities/test-capacity.json', { ...capacity, provenance }),
+      ),
+    ).toEqual([])
+  })
+
+  it('asks for no default when the capacity records may come from a further root', () => {
+    const second = mkdtempSync(join(tmpdir(), 'records-second-'))
+    try {
+      mkdirSync(join(second, 'capacities'))
+      writeFileSync(join(second, 'capacities', 'test-capacity.json'), JSON.stringify(capacity))
+      expect(readRecords([join(fixtures, 'valid'), second]).errors).toEqual([])
     } finally {
       rmSync(second, { recursive: true })
     }

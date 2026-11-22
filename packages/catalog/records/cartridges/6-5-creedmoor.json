@@ -375,6 +375,9 @@
       "value": 34.66
     }
   ],
+  "defaults": {
+    "capacity": "catalogue:6-5-creedmoor-wikipedia"
+  },
   "provenance": {
     "kind": "published",
     "sources": [

@@ -32,6 +32,31 @@ describe('loadRecords', () => {
     expect(before.capacities.get(cartridge)?.waterCapacity.value).toBe(4.2)
     expect(before.issues).toBe(0)
   })
+
+  it('takes the default of the cartridge over a capacity first by id and over a case', () => {
+    const root = mkdtempSync(join(tmpdir(), 'cli-default-'))
+    const write = (kind: string, record: { id: string; [field: string]: unknown }) => {
+      mkdirSync(join(root, kind))
+      writeFileSync(join(root, kind, `${record.id}.json`), JSON.stringify(record))
+    }
+    const cartridge = 'catalogue:223-rem'
+    write('capacities', { ...capacity, id: '0-223-rem', cartridge, waterCapacity: { value: 1.8 } })
+    write('cases', {
+      id: 'test-case-223-rem',
+      origin: 'catalogue',
+      name: 'Test case',
+      productNumber: 'T223',
+      manufacturer: 'catalogue:demo-bullets',
+      cartridge,
+      material: 'brass',
+      waterCapacity: { value: 1.9 },
+      provenance: { kind: 'published', sources: [{ title: 'Test case maker' }] },
+    })
+    const r = loadRecords([...recordRoots, root])
+    expect(r.capacities.get('223-rem')?.id).toBe('223-rem-wikipedia')
+    expect(r.cases.has('223-rem')).toBe(false)
+    expect(r.issues).toBe(0)
+  })
 })
 
 describe('loadRecords with estimated capacities', () => {

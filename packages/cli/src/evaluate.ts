@@ -8,12 +8,17 @@ import {
   ValueError,
 } from '@rangefoundry/ballistics'
 import type { Bullet, Cartridge } from '@rangefoundry/schema'
-import { bulletListFields, loadWaterCapacity, toSi } from '@rangefoundry/schema'
+import {
+  bulletListFields,
+  isEstimatedCapacity,
+  loadWaterCapacity,
+  toSi,
+} from '@rangefoundry/schema'
 import { InputError } from '@rangefoundry/statistics'
 import { bulletDimensions } from '@rangefoundry/svg-drawings/bullet'
 import { chamberOf, seat } from '@rangefoundry/svg-drawings/seating'
 import { waterDensityGramsPerCm3 } from '@rangefoundry/units'
-import { isEstimated, type Records, withoutEstimates } from './records.ts'
+import { type Records, withoutEstimates } from './records.ts'
 import type { Row } from './rows.ts'
 import { type Split, splitOf } from './split.ts'
 import { familyOf } from './unseen.ts'
@@ -52,7 +57,7 @@ export interface Outcome {
   /** Structure of the bullet record, else `<core material>-core`, else `unspecified`; `unknown` without a record. */
   construction: string
   prediction: Prediction
-  /** The capacity of the row's cartridge is an estimate (`isEstimated`) and the row would be `noCaseCapacity` without it. */
+  /** The capacity of the row's cartridge is an estimate (`isEstimatedCapacity`) and the row would be `noCaseCapacity` without it. */
   estimatedCapacity?: true
 }
 
@@ -69,8 +74,10 @@ function seated(
   bullet: Bullet,
   records: Records,
 ): { volume: number; travel: number } | Reason {
+  const capacity = records.capacities.get(row.cartridge)
   const water = loadWaterCapacity({
-    capacity: records.capacities.get(row.cartridge),
+    // an estimate is never reported as the default of the cartridge
+    ...(capacity && isEstimatedCapacity(capacity) ? { capacity } : { cartridgeDefault: capacity }),
     case: records.cases.get(row.cartridge),
   })
   const chamber = chamberOf(cartridge.values)
@@ -207,7 +214,7 @@ export function outcomes(
     const capacity = records.capacities.get(row.cartridge)
     // a row refused for a reason checked before the capacity keeps that reason
     const estimated =
-      capacity && isEstimated(capacity) && loadOf(row, measured) === 'noCaseCapacity'
+      capacity && isEstimatedCapacity(capacity) && loadOf(row, measured) === 'noCaseCapacity'
     const flag = estimated ? { estimatedCapacity: true as const } : {}
     // the correction applies to a row the model gave a result for, so the other reasons come first
     const corrected = 'velocity' in prediction ? atMuzzle(row, records) : row

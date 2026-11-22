@@ -369,6 +369,9 @@
       "value": 47.52
     }
   ],
+  "defaults": {
+    "capacity": "catalogue:300-win-short-mag-wikipedia"
+  },
   "provenance": {
     "kind": "published",
     "sources": [

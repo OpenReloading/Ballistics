@@ -1,0 +1,21 @@
+{
+  "id": "308-win-wikipedia",
+  "origin": "catalogue",
+  "cartridge": "catalogue:308-win",
+  "waterCapacity": {
+    "value": 3.629,
+    "raw": "56 gr H2O"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Wikipedia, .308 Winchester",
+        "url": "https://en.wikipedia.org/wiki/.308_Winchester",
+        "retrieved": "2026-11-22",
+        "license": "CC-BY-SA-4.0",
+        "note": "Infobox, Case capacity: 56 gr H2O (3.6 cm3)."
+      }
+    ]
+  }
+}

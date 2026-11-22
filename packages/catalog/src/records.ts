@@ -41,6 +41,7 @@ import {
 } from './published-loads.ts'
 import {
   checkCartridgeReferences,
+  checkDefaultCapacityReferences,
   checkLoadCapacityReferences,
   checkLoadCaseReferences,
   checkLoadComponentReferences,
@@ -198,13 +199,15 @@ export type RecordsRead = {
   bundle: Bundle
   published: LocatedPublishedLoads[]
   loadTables: LoadTables
+  /** Whether the records come from one root, so a cartridge with a published or measured capacity has to name its default. */
+  singleRoot: boolean
 }
 
 /**
  * Cross-checks records read from a records root. Valid data has no errors; the warnings are
  * plausibility findings that do not fail validation, as a published load stays as printed.
  */
-export function checkRecords({ bundle, published, loadTables }: RecordsRead): {
+export function checkRecords({ bundle, published, loadTables, singleRoot }: RecordsRead): {
   errors: string[]
   warnings: string[]
 } {
@@ -229,6 +232,7 @@ export function checkRecords({ bundle, published, loadTables }: RecordsRead): {
     for (const f of checkBullet(b)) errors.push(`bullets/${b.id}.json: ${f.finding}: ${f.message}`)
   }
   checkReferences(bundle, ids, loadTables, errors)
+  checkDefaultCapacityReferences(bundle, singleRoot, errors)
   checkPublishedLoads(
     published,
     {

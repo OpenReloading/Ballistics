@@ -373,6 +373,9 @@
       "value": 47.32
     }
   ],
+  "defaults": {
+    "capacity": "catalogue:300-win-mag-wikipedia"
+  },
   "provenance": {
     "kind": "published",
     "sources": [

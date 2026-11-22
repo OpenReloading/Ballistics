@@ -253,9 +253,11 @@ Cited by the manufacturer and case capacity records, grouped by maker, then the 
 ### Wikipedia
 
 - Wikipedia, .223 Remington. <https://en.wikipedia.org/w/index.php?title=.223_Remington&oldid=1371182787>
+- Wikipedia, .30 R Blaser. <https://en.wikipedia.org/w/index.php?title=.30_R_Blaser&oldid=1316312342>
 - Wikipedia, .300 Remington Ultra Magnum. <https://en.wikipedia.org/w/index.php?title=.300_Remington_Ultra_Magnum&oldid=1313173783>
 - Wikipedia, .300 Winchester Magnum. <https://en.wikipedia.org/w/index.php?title=.300_Winchester_Magnum&oldid=1368911320>
 - Wikipedia, .300 Winchester Short Magnum. <https://en.wikipedia.org/w/index.php?title=.300_Winchester_Short_Magnum&oldid=1351061051>
+- Wikipedia, .308 Winchester. <https://en.wikipedia.org/wiki/.308_Winchester>
 - Wikipedia, .338 Lapua Magnum. <https://en.wikipedia.org/w/index.php?title=.338_Lapua_Magnum&oldid=1374066412>
 - Wikipedia, .357 Magnum. <https://en.wikipedia.org/w/index.php?title=.357_Magnum&oldid=1368987349>
 - Wikipedia, .38 Special. <https://en.wikipedia.org/w/index.php?title=.38_Special&oldid=1376197673>
@@ -267,6 +269,7 @@ Cited by the manufacturer and case capacity records, grouped by maker, then the 
 - Wikipedia, 6.5mm Creedmoor. <https://en.wikipedia.org/w/index.php?title=6.5mm_Creedmoor&oldid=1375349834>
 - Wikipedia, 6.5mm Grendel. <https://en.wikipedia.org/w/index.php?title=6.5mm_Grendel&oldid=1345549433>
 - Wikipedia, 6.5x47mm Lapua. <https://en.wikipedia.org/w/index.php?title=6.5%C3%9747mm_Lapua&oldid=1292319718>
+- Wikipedia, 7.5x55mm Swiss. <https://en.wikipedia.org/w/index.php?title=7.5%C3%9755mm_Swiss&oldid=1378227189>
 - Wikipedia, 7.62x25mm Tokarev. <https://en.wikipedia.org/w/index.php?title=7.62%C3%9725mm_Tokarev&oldid=1373994969>
 - Wikipedia, 7.62x39mm. <https://en.wikipedia.org/w/index.php?title=7.62%C3%9739mm&oldid=1371601372>
 - Wikipedia, 9x19mm Parabellum. <https://en.wikipedia.org/w/index.php?title=9%C3%9719mm_Parabellum&oldid=1379172502>
