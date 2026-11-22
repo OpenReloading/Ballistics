@@ -34,3 +34,24 @@ export const pageTitles = {
 
 // the paths as the site serves them, with the trailing slash
 export const staticPaths = Object.keys(pageTitles).map((route) => `${route}/`)
+
+/** Every record route: a missing one, or one without a route, fails tsc. */
+const recordRoutes = {
+  '/bullets/$id': true,
+  '/cartridges/$id': true,
+  '/cases/$id': true,
+  '/disciplines/$id': true,
+  '/federations/$id': true,
+  '/powders/$id': true,
+  '/primers/$id': true,
+  '/targets/$id': true,
+} satisfies Record<Extract<FileRouteTypes['to'], `${string}/$id`>, true>
+
+/** Throws on a record path no record route takes: the splat route would prerender it as a 200 not-found page. */
+export function checkRecordPaths(paths: string[]) {
+  const unrouted = paths.filter(
+    (page) => !Object.hasOwn(recordRoutes, page.replace(/^(\/[^/]+\/)[^/]+\/$/, '$1$$id')),
+  )
+  if (unrouted.length > 0) throw new Error(`No record route for ${unrouted.join(', ')}`)
+  return paths
+}

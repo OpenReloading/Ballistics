@@ -3,7 +3,7 @@ import path from 'node:path'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
-import { staticPaths } from './src/routes/-static-paths.ts'
+import { checkRecordPaths, staticPaths } from './src/routes/-static-paths.ts'
 
 export default defineConfig(({ command }) => {
   // the edition's own path, as next.config.ts reads it: /Ballistics/next for next on the project site
@@ -13,7 +13,9 @@ export default defineConfig(({ command }) => {
   // written by scripts/prerender-list.mts; the dev server renders any path and needs no list
   const records: string[] =
     command === 'build'
-      ? JSON.parse(readFileSync(path.join(import.meta.dirname, 'dist/prerender.json'), 'utf8'))
+      ? checkRecordPaths(
+          JSON.parse(readFileSync(path.join(import.meta.dirname, 'dist/prerender.json'), 'utf8')),
+        )
       : []
   // the literals of src/platform/edition.ts and the site's origin: the browser has no process.env
   const values = {

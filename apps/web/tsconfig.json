@@ -41,6 +41,7 @@
     "src/routes",
     "src/router.tsx",
     "src/routeTree.gen.ts",
-    "vite.config.mts"
+    "vite.config.mts",
+    "test/record-routes.test.ts"
   ]
 }
