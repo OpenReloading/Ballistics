@@ -122,7 +122,7 @@ A user cartridge cannot override `defaults`. `data:validate` checks the default 
 
 1. It names an existing capacity record of the same cartridge.
 2. Its provenance kind is `published` or `measured`, so never an estimate (`derived`).
-3. A cartridge with a published or measured capacity record names one. This is checked only when the records come from a single root (`singleRoot` of `checkRecords`), as a capacity of a further root cannot be named by a cartridge of the first.
+3. A cartridge with a capacity record that is no estimate names one, so one whose only such records are of another kind (`computed`, `fitted`) is refused. This is checked only when the records come from a single root (`singleRoot` of `checkRecords`), as a capacity of a further root cannot be named by a cartridge of the first.
 
 ## Powder
 

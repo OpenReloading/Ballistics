@@ -1,4 +1,4 @@
-import { parseRef } from '@rangefoundry/schema'
+import { isEstimatedCapacity, parseRef } from '@rangefoundry/schema'
 import type { LoadTables } from './load-tables.ts'
 import type { Bundle } from './records.ts'
 
@@ -92,21 +92,22 @@ export function checkLoadCapacityReferences(
       errors.push(`loads/${l.id}.json: unknown capacity "${l.capacity}"`)
 }
 
-/** The default capacity of every cartridge is a published or measured capacity of it; from a single root, a cartridge with such a record names one. */
+/** The default capacity of every cartridge is a published or measured capacity of it; from a single root, a cartridge with a capacity that is no estimate names one. */
 export function checkDefaultCapacityReferences(
   bundle: Pick<Bundle, 'cartridges' | 'capacities'>,
   singleRoot: boolean,
   errors: string[],
 ): void {
   const known = new Map(bundle.capacities.map((c) => [c.id, c]))
-  const eligible = bundle.capacities.filter(canBeDefault)
-  const withCapacity = new Set(eligible.map((c) => parseRef(c.cartridge)?.id ?? c.cartridge))
+  // what defaultCapacity gives without a pointer, so a computed or fitted one cannot become the default unchecked
+  const figures = bundle.capacities.filter((c) => !isEstimatedCapacity(c))
+  const withCapacity = new Set(figures.map((c) => parseRef(c.cartridge)?.id ?? c.cartridge))
   for (const c of bundle.cartridges) {
     const named = c.defaults?.capacity
     if (named !== undefined) checkNamedDefault(c.id, named, known, errors)
     else if (singleRoot && withCapacity.has(c.id))
       errors.push(
-        `cartridges/${c.id}.json: has a published or measured capacity and names no default capacity`,
+        `cartridges/${c.id}.json: has a capacity that is no estimate and names no default capacity`,
       )
   }
 }

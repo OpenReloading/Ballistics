@@ -257,7 +257,7 @@ Cited by the manufacturer and case capacity records, grouped by maker, then the 
 - Wikipedia, .300 Remington Ultra Magnum. <https://en.wikipedia.org/w/index.php?title=.300_Remington_Ultra_Magnum&oldid=1313173783>
 - Wikipedia, .300 Winchester Magnum. <https://en.wikipedia.org/w/index.php?title=.300_Winchester_Magnum&oldid=1368911320>
 - Wikipedia, .300 Winchester Short Magnum. <https://en.wikipedia.org/w/index.php?title=.300_Winchester_Short_Magnum&oldid=1351061051>
-- Wikipedia, .308 Winchester. <https://en.wikipedia.org/wiki/.308_Winchester>
+- Wikipedia, .308 Winchester. <https://en.wikipedia.org/w/index.php?title=.308_Winchester&oldid=1380739300>
 - Wikipedia, .338 Lapua Magnum. <https://en.wikipedia.org/w/index.php?title=.338_Lapua_Magnum&oldid=1374066412>
 - Wikipedia, .357 Magnum. <https://en.wikipedia.org/w/index.php?title=.357_Magnum&oldid=1368987349>
 - Wikipedia, .38 Special. <https://en.wikipedia.org/w/index.php?title=.38_Special&oldid=1376197673>

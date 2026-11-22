@@ -297,7 +297,7 @@ describe('readRecords with several roots', () => {
 
 describe('readRecords default capacity', () => {
   const missingDefault =
-    'cartridges/test-cartridge.json: has a published or measured capacity and names no default capacity'
+    'cartridges/test-cartridge.json: has a capacity that is no estimate and names no default capacity'
   const capacity = {
     id: 'test-capacity',
     origin: 'catalogue',
@@ -310,6 +310,15 @@ describe('readRecords default capacity', () => {
     expect(errorsAfter((_root, write) => write('capacities/test-capacity.json', capacity))).toEqual(
       [missingDefault],
     )
+  })
+
+  it('asks a cartridge whose only capacity record is computed for its default', () => {
+    const provenance = { kind: 'computed', sources: [{ title: 'Model' }] }
+    expect(
+      errorsAfter((_root, write) =>
+        write('capacities/test-capacity.json', { ...capacity, provenance }),
+      ),
+    ).toEqual([missingDefault])
   })
 
   it('asks for no default of a cartridge whose capacity record is an estimate', () => {

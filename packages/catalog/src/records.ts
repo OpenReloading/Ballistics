@@ -199,7 +199,7 @@ export type RecordsRead = {
   bundle: Bundle
   published: LocatedPublishedLoads[]
   loadTables: LoadTables
-  /** Whether the records come from one root, so a cartridge with a published or measured capacity has to name its default. */
+  /** Whether the records come from one root, so a cartridge with a capacity that is no estimate has to name its default. */
   singleRoot: boolean
 }
 

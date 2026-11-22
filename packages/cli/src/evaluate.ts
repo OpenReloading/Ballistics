@@ -74,11 +74,9 @@ function seated(
   bullet: Bullet,
   records: Records,
 ): { volume: number; travel: number } | Reason {
-  const capacity = records.capacities.get(row.cartridge)
   const water = loadWaterCapacity({
-    // an estimate is never reported as the default of the cartridge
-    ...(capacity && isEstimatedCapacity(capacity) ? { capacity } : { cartridgeDefault: capacity }),
     case: records.cases.get(row.cartridge),
+    cartridgeDefault: records.capacities.get(row.cartridge),
   })
   const chamber = chamberOf(cartridge.values)
   const dimensions = bulletDimensions(bullet)
