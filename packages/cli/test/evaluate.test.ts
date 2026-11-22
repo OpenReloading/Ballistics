@@ -167,4 +167,21 @@ describe('outcomes', () => {
     expect(out.map((o) => o.split)).toEqual(['validation', 'training'])
     expect(out[0]?.family).toBe('double/extruded')
   })
+
+  it('groups a stand-in bullet by the construction its printed text names, a bullet record by its own', () => {
+    const standIn = { ...row, bullet: 'stand-in-308-win-8000mg', bulletMass: 8 }
+    const rows = [
+      { ...standIn, printedBullet: 'Plated RN' },
+      { ...standIn, printedBullet: 'Solid Copper HP' },
+      { ...standIn, printedBullet: 'FMJ RN' },
+      { ...row, printedBullet: 'Solid Copper HP' },
+    ]
+    const out = outcomes(rows, records, interior, ['training', 'validation', 'test'])
+    expect(out.map((o) => o.construction)).toEqual([
+      'plated',
+      'monolithic',
+      'unknown',
+      'cup-and-core',
+    ])
+  })
 })

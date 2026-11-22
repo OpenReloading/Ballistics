@@ -35,6 +35,8 @@ export interface Row {
   lot?: string | undefined
   /** Printed bullet mass, g, of a published row whose bullet is a stand-in. */
   bulletMass?: number | undefined
+  /** The bullet as a published table prints it (free text): a row whose bullet is a stand-in is grouped by the construction its words name. */
+  printedBullet?: string | undefined
   /** A free label of the source table: carried with the row, part of a result only as a factor key of `--pressure-factor table` or `table-cartridge`. */
   table?: string | undefined
 }
