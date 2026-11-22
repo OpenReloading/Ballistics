@@ -1,10 +1,11 @@
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { Cartridge, CatalogueCaseCapacity } from '@rangefoundry/schema'
+import { isEstimatedCapacity } from '@rangefoundry/schema'
 import { storedValue } from '@rangefoundry/svg-drawings/cartridge'
 import { waterDensityGramsPerCm3 } from '@rangefoundry/units'
 import { UsageError } from './errors.ts'
-import { isEstimated, loadRecords, type Records } from './records.ts'
+import { loadRecords, type Records } from './records.ts'
 import { percentile } from './stats.ts'
 
 /** Volume (mm3) of the cones through the case outline of a cartridge record from the head to the mouth: P1 at the head, P2 at L1, H2 at L2 and the mouth (H1, else H2, else G1) at L3, cartridge values first, else the chamber's; undefined without P1 or L3. */
@@ -52,7 +53,7 @@ export function estimateCapacities(records: Records) {
   const pairs = [...records.capacities].flatMap(([id, c]) => {
     const outline =
       records.cartridges.get(id) && outlineVolume(records.cartridges.get(id) as Cartridge)
-    return outline && !isEstimated(c)
+    return outline && !isEstimatedCapacity(c)
       ? [{ capacity: milliliters(c.waterCapacity.value), outline }]
       : []
   })

@@ -135,6 +135,7 @@ const {
 const {
   id: _cartridgeId,
   provenance: _cartridgeProvenance,
+  defaults: _defaults,
   values: _values,
   ...cartridgeShape
 } = cartridge.shape
@@ -240,8 +241,8 @@ export const cartridgeValueOverride: z.ZodObject<
 >
 
 /**
- * The overrides of a cartridge record: any of its fields but `id` and `provenance`, in the stored
- * units, `null` removes a field. `values` lists the values to replace, add or remove.
+ * The overrides of a cartridge record: any of its fields but `id`, `provenance` and `defaults`, in
+ * the stored units, `null` removes a field. `values` lists the values to replace, add or remove.
  * Inferred type: {@link CartridgeOverrides}.
  */
 // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- overridesOf builds the schema at run time, so its type is stated here
@@ -249,7 +250,7 @@ export const cartridgeOverrides = overridesOf(
   z.object({ ...cartridgeShape, values: z.array(cartridgeValueOverride).max(500) }),
   'cartridge',
 ) as z.ZodType<
-  Overrides<Omit<z.infer<typeof cartridge>, 'id' | 'provenance' | 'values'>> & {
+  Overrides<Omit<z.infer<typeof cartridge>, 'id' | 'provenance' | 'defaults' | 'values'>> & {
     values?: z.infer<typeof cartridgeValueOverride>[]
   }
 >

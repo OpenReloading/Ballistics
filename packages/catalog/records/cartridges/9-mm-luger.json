@@ -234,6 +234,9 @@
       "value": 62.61
     }
   ],
+  "defaults": {
+    "capacity": "catalogue:9-mm-luger-wikipedia"
+  },
   "provenance": {
     "kind": "published",
     "sources": [

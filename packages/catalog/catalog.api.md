@@ -479,6 +479,7 @@ export type RecordsRead = {
     bundle: Bundle;
     published: LocatedPublishedLoads[];
     loadTables: LoadTables;
+    singleRoot: boolean;
 };
 
 // @public

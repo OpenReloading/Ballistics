@@ -153,7 +153,7 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
   const errors: string[] = []
   const { bundle, published, citations } = readBundle(roots, errors)
   const loadTables = readRootsLoadTables(roots, errors)
-  const checked = checkRecords({ bundle, published, loadTables })
+  const checked = checkRecords({ bundle, published, loadTables, singleRoot: roots.length === 1 })
   return {
     bundle,
     publishedLoads: published.map((p) => p.file),

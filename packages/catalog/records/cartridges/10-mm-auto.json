@@ -240,6 +240,9 @@
       "value": 79.55
     }
   ],
+  "defaults": {
+    "capacity": "catalogue:10-mm-auto-wikipedia"
+  },
   "provenance": {
     "kind": "published",
     "sources": [

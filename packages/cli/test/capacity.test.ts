@@ -1,6 +1,7 @@
 import { existsSync, mkdtempSync, readdirSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { isEstimatedCapacity } from '@rangefoundry/schema'
 import { waterDensityGramsPerCm3 } from '@rangefoundry/units'
 import { describe, expect, it } from 'vitest'
 import {
@@ -10,7 +11,7 @@ import {
   writeEstimatedCapacities,
 } from '../src/capacity.ts'
 import { UsageError } from '../src/errors.ts'
-import { isEstimated, loadRecords } from '../src/records.ts'
+import { loadRecords } from '../src/records.ts'
 import { recordRoots, records } from './fixture.ts'
 
 const value = (side: 'cartridge' | 'chamber', symbol: string, v: number) => ({
@@ -82,7 +83,7 @@ describe('estimateCapacities', () => {
       (fill.factor * outline * waterDensityGramsPerCm3) / 1000,
       3,
     )
-    expect(estimate && isEstimated(estimate)).toBe(true)
+    expect(estimate && isEstimatedCapacity(estimate)).toBe(true)
   })
 
   it('leaves out a cartridge with a capacity record, and fits the factor on those only', () => {
@@ -97,8 +98,8 @@ describe('writeEstimatedCapacities', () => {
     const r = writeEstimatedCapacities(recordRoots, out)
     expect(readdirSync(r.folder)).toHaveLength(r.written)
     const loaded = loadRecords([...recordRoots, out])
-    expect(isEstimated(loaded.capacities.get('7-62-x-54-r') as never)).toBe(true)
-    expect(isEstimated(loaded.capacities.get('308-match') as never)).toBe(false)
+    expect(isEstimatedCapacity(loaded.capacities.get('7-62-x-54-r') as never)).toBe(true)
+    expect(isEstimatedCapacity(loaded.capacities.get('308-match') as never)).toBe(false)
     expect(existsSync(join(out, 'capacities'))).toBe(true)
     expect(() => writeEstimatedCapacities(recordRoots, out)).toThrow(UsageError)
   })

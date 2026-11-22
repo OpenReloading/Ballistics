@@ -375,6 +375,9 @@
       "value": 34.59
     }
   ],
+  "defaults": {
+    "capacity": "catalogue:6-5-x-47-lapua-wikipedia"
+  },
   "provenance": {
     "kind": "published",
     "sources": [

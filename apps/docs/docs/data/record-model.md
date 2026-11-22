@@ -113,6 +113,17 @@ A table names a bullet by maker, type and mass, often without a product number, 
 
 `caseTypes` is one enum in `packages/schema/src/cartridge.ts`, used by the cartridges route and the web filter. A user cartridge overrides the `values` (merge rules in [Variants](#variants-of-a-catalogue-record)).
 
+`defaults` is optional and holds no value of the sheet:
+
+- `capacity`: a `catalogue:<id>` reference to the capacity record of a load that names neither a capacity record nor a case record with a stated capacity ([which capacity a load uses](../models/case-capacity.md#which-capacity-a-load-uses)). The figure, its source and its license stay in that record.
+- `primerSize`: the primer size of a load that names no primer record. It enters no calculation.
+
+A user cartridge cannot override `defaults`. `data:validate` checks the default capacity (`checkDefaultCapacityReferences`):
+
+1. It names an existing capacity record of the same cartridge.
+2. Its provenance kind is `published` or `measured`, so never an estimate (`derived`).
+3. A cartridge with a capacity record that is no estimate names one, so one whose only such records are of another kind (`computed`, `fitted`) is refused. This is checked only when the records come from a single root (`singleRoot` of `checkRecords`), as a capacity of a further root cannot be named by a cartridge of the first.
+
 ## Powder
 
 A powder needs no name-only marker: only `id`, `manufacturer` and `name` are required, so a powder with only a name is a valid record. `provenance` is required unless the record holds basic fields only (`powderBasicFields`).

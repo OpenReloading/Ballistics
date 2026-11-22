@@ -361,6 +361,9 @@
       "value": 47.99
     }
   ],
+  "defaults": {
+    "capacity": "catalogue:7-62-x-39-wikipedia"
+  },
   "provenance": {
     "kind": "published",
     "sources": [

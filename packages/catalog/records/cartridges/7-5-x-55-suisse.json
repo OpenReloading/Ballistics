@@ -376,6 +376,9 @@
       "value": 46.33
     }
   ],
+  "defaults": {
+    "capacity": "catalogue:7-5-x-55-suisse-wikipedia"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
