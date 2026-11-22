@@ -3,11 +3,19 @@ import { join } from 'node:path'
 import { expect, it } from 'vitest'
 import { fromLabelStudio } from '../scripts/label-studio.mts'
 
-it('converts a Label Studio export into a label set', () => {
-  const exported = JSON.parse(
+const exported = () =>
+  JSON.parse(
     readFileSync(join(import.meta.dirname, 'fixtures', 'label-studio-export.json'), 'utf8'),
   )
-  expect(fromLabelStudio(exported)).toEqual({
+
+it('refuses an uncertain choice of another value', () => {
+  const tasks = exported()
+  tasks[0].annotations[0].result[2].value.choices = ['Uncertain']
+  expect(() => fromLabelStudio(tasks)).toThrow('a.jpg: uncertain is Uncertain, not uncertain')
+})
+
+it('converts a Label Studio export into a label set', () => {
+  expect(fromLabelStudio(exported())).toEqual({
     photos: {
       'a.jpg': {
         sha256: '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08',

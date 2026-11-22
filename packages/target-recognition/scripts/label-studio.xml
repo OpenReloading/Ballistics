@@ -1,0 +1,22 @@
+<!-- Label Studio labeling config that scripts/label-studio.mts converts: the control names, choice values and the KeyPointLabels tag must stay as they are; the kind choices may grow. Task data: image, file, sha256, source, license, author, session, width, height, visibleDiameterPx. -->
+<View>
+  <Image name="image" value="$image"/>
+  <KeyPointLabels name="hole" toName="image" snap="none">
+    <Label value="hole"/>
+  </KeyPointLabels>
+  <Choices name="uncertain" toName="image" perRegion="true" visibleWhen="region-selected">
+    <Choice value="uncertain"/>
+  </Choices>
+  <Choices name="kind" toName="image" choice="single" required="true">
+    <Choice value="printed"/>
+    <Choice value="reactive"/>
+  </Choices>
+  <Choices name="usable" toName="image" choice="single" required="true">
+    <Choice value="yes"/>
+    <Choice value="no"/>
+  </Choices>
+  <Choices name="complete" toName="image" choice="single" required="true">
+    <Choice value="yes"/>
+    <Choice value="no"/>
+  </Choices>
+</View>

@@ -1,4 +1,4 @@
-// One labeler's Label Studio JSON export to a label set (task data: file, sha256, source, license, author, session, width, height, visibleDiameterPx; results: a keypoint per hole, a per-region choice uncertain, per-photo choices kind, usable and complete, these two yes or no): node scripts/label-studio.mts <export.json> <labels.json>
+// One labeler's Label Studio JSON export of a project with the labeling config scripts/label-studio.xml to a label set: node scripts/label-studio.mts <export.json> <labels.json>
 import { readFileSync, writeFileSync } from 'node:fs'
 import { z } from 'zod'
 import { type LabeledPhoto, type LabelSet, labelSet } from '../src/index.ts'
@@ -50,6 +50,16 @@ function photoOf({ data, annotations: [{ result: results }] }: z.infer<typeof ta
       throw new Error(`${file}: ${name} is ${picked}, not yes or no`)
     return picked === 'yes'
   }
+  const uncertain = new Set(
+    choices
+      .filter((c) => c.from_name === 'uncertain')
+      .map((c) => {
+        const [picked] = c.value.choices
+        if (picked !== 'uncertain')
+          throw new Error(`${file}: uncertain is ${picked}, not uncertain`)
+        return c.id
+      }),
+  )
   const photo: LabeledPhoto = {
     ...facts,
     kind: choice('kind'),
@@ -67,10 +77,7 @@ function photoOf({ data, annotations: [{ result: results }] }: z.infer<typeof ta
         return {
           x: (k.value.x / 100) * width,
           y: (k.value.y / 100) * height,
-          uncertain: choices.some(
-            (c) =>
-              c.from_name === 'uncertain' && c.id === k.id && c.value.choices.includes('uncertain'),
-          ),
+          uncertain: uncertain.has(k.id),
         }
       }),
   }
