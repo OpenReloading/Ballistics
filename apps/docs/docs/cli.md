@@ -77,7 +77,7 @@ Until 2026-11-12 the rule had no salt. Its test split was read for eight model v
 
 ## Metrics
 
-All errors are absolute relative errors, as fractions: for the velocity $|v_\text{model} - v_\text{printed}| / v_\text{printed}$, the same for the peak pressure of rows that print one. Median and 90th percentile (linear interpolation between the closest ranks) of the rows the model gave a result for, for all rows of the split, per powder id and per powder family (`<propellant base>/<grain form>` of the powder record, `unspecified` for a missing part). `--group-by powder|family|cartridge|bullet|construction` adds the groups of that key (`construction` is the structure of the bullet record, else `<core material>-core`).
+All errors are absolute relative errors, as fractions: for the velocity $|v_\text{model} - v_\text{printed}| / v_\text{printed}$, the same for the peak pressure of rows that print one. Median and 90th percentile (linear interpolation between the closest ranks) of the rows the model gave a result for, for all rows of the split, per powder id and per powder family (`<propellant base>/<grain form>` of the powder record, `unspecified` for a missing part). `--group-by powder|family|cartridge|bullet|construction` adds the groups of that key (`construction` is the structure of the bullet record, else `<core material>-core`; a row of published loads without a bullet record takes the class the construction words of its printed bullet text name: `plated` for plated, plating, electroplated, copper washed or verkupfert where no steel is named, `monolithic` for monolithic, mono-metal, homogeneous, solid copper or brass in either order, all copper, lathe turned, Vollkupfer or Vollmessing where no jacket is named, and neither for a text that names both).
 
 The 90 % interval has the half width $h$, the 90th percentile of the velocity error of the used training rows of the same model; the interval of a row is the model velocity times $(1 \pm h)$, so a row is inside when $|v_\text{model} - v_\text{printed}| / v_\text{model} \le h$ (the distance is taken against the model's velocity, not the printed one, so it differs from the error above). The coverage is the share of used rows inside. It comes from the training split and is not a prediction interval of the model's inputs.
 
@@ -86,6 +86,10 @@ Rows that are not used are counted by reason: `unknownCartridge`, `unknownBullet
 ### Pressure by basis
 
 A pressure is compared only with pressures of its own basis: `pressureByBasis` of each group holds the median and P90 of the pressure error and the rows for each basis (`transducer`, `case-contact`, `piezo`, `unstated`, ...). No value is converted between bases. `pressure` stays the error over every row in bar, all bases together.
+
+### Errors by barrel class
+
+`byBarrel` of each group holds the velocity and pressure errors of `velocity` and `pressure` per barrel class, in the JSON only: `handgun` for a barrel under 300 mm, the limit of the start-pressure rule, else `rifle`. A class without a used row is left out. The two classes differ in error and in their share of each split, so a pooled median or P90 moves with the mix of rows; read a change by class, in `byBarrel` of `paired` or of each side. With `--per-row` each row carries its class as `barrel`; `paired` of `compare` and `folds.aggregate` give both classes in `byBarrel`, each quantity null without a row, with the bootstrap over the cartridges of the class. A baseline saved without the classes takes each row's class from the candidate.
 
 ### Muzzle distance
 

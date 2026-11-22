@@ -103,11 +103,23 @@ describe('verify with --per-row', () => {
     const r = await verify({ ...options, perRow: true })
     const near = (x: number) => expect.closeTo(x, 9)
     expect(r.rows).toEqual([
-      { row: 0, cartridge: '308-match', velocity: near(0.01), pressure: near(0.1) },
-      { row: 1, cartridge: '308-match', velocity: near(-0.02), pressure: near(0.2) },
-      { row: 2, cartridge: '308-match', velocity: near(0.03) },
-      { row: 3, cartridge: '30-30-win', velocity: near(-0.04) },
-      { row: 4, cartridge: '30-30-win', velocity: near(0.1) },
+      {
+        row: 0,
+        cartridge: '308-match',
+        velocity: near(0.01),
+        pressure: near(0.1),
+        barrel: 'rifle',
+      },
+      {
+        row: 1,
+        cartridge: '308-match',
+        velocity: near(-0.02),
+        pressure: near(0.2),
+        barrel: 'rifle',
+      },
+      { row: 2, cartridge: '308-match', velocity: near(0.03), barrel: 'rifle' },
+      { row: 3, cartridge: '30-30-win', velocity: near(-0.04), barrel: 'rifle' },
+      { row: 4, cartridge: '30-30-win', velocity: near(0.1), barrel: 'rifle' },
     ])
     // the training rows follow the twelve rows of the validation split in the file
     const training = await verify({ ...options, split: 'training', perRow: true })
@@ -155,6 +167,7 @@ describe('verify with an estimated case capacity', () => {
       row: 9,
       cartridge: '7-62-x-54-r',
       velocity: expect.any(Number),
+      barrel: 'rifle',
       capacity: 'estimated',
     }
     expect(after.rows).toEqual([...(before.rows ?? []), estimated])
