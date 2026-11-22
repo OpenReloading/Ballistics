@@ -8,12 +8,27 @@ import { Ellipse } from '@rangefoundry/shot-groups';
 import { FaceLength } from '@rangefoundry/shot-groups';
 import { Matrix } from '@rangefoundry/shot-groups';
 import { Point } from '@rangefoundry/shot-groups';
+import { z } from 'zod';
 
 // @public (undocumented)
 export const clamp: (v: number, lo: number, hi: number) => number;
 
 // @public
 export function components(mask: Uint8Array, w: number, h: number): number[][];
+
+// @public
+export const corrections: (m: HoleMatch) => number;
+
+// @public
+export type CorrectionStats = {
+    photos: number;
+    median: number;
+    p90?: number;
+    max: number;
+};
+
+// @public
+export function correctionStats(perPhoto: readonly number[]): CorrectionStats;
 
 // @public (undocumented)
 export type FaceFit<F extends PrintedFace = PrintedFace> = FacePlane & {
@@ -144,6 +159,13 @@ export type HoleExample = {
 };
 
 // @public
+export type HoleMatch = {
+    matched: number;
+    false: number;
+    missed: number;
+};
+
+// @public
 export type HoleProposal = {
     x: number;
     y: number;
@@ -157,6 +179,39 @@ export type HoleProposal = {
 export interface InferencePort {
     propose(request: ProposalRequest): Promise<Proposals>;
 }
+
+// @public
+export type LabelledHole = {
+    x: number;
+    y: number;
+    uncertain: boolean;
+};
+
+// @public
+export type LabelledPhoto = {
+    sha256: string;
+    source: string;
+    license: string;
+    author: string;
+    session: string;
+    kind: string;
+    usable: boolean;
+    complete: boolean;
+    size: [number, number];
+    visibleDiameterPx: number;
+    holes: LabelledHole[];
+};
+
+// @public
+export type LabelSet = {
+    photos: Record<string, LabelledPhoto>;
+};
+
+// @public
+export const labelSet: z.ZodType<LabelSet>;
+
+// @public
+export function matchHoles(marks: readonly Point[], holes: readonly Point[], diameter: number): HoleMatch;
 
 // @public
 export function median1(v: readonly number[]): number;

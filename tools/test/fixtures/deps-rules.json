@@ -443,13 +443,21 @@
     "source": "import { applyMatrix } from '@rangefoundry/shot-groups'\nimport { nth } from '@rangefoundry/statistics'\nexport { applyMatrix, nth }",
     "rules": []
   },
+  "packages/target-recognition/src/zod.ts": {
+    "source": "import { z } from 'zod'\nexport { z }",
+    "rules": []
+  },
+  "packages/target-recognition/src/zodiac.ts": {
+    "source": "import { sign } from 'zodiac'\nexport { sign }",
+    "rules": ["target-recognition-imports-shot-groups-statistics-zod"]
+  },
   "packages/target-recognition/src/schema.ts": {
     "source": "import { quantity } from '@rangefoundry/schema'\nexport { quantity }",
-    "rules": ["target-recognition-imports-shot-groups-statistics-only"]
+    "rules": ["target-recognition-imports-shot-groups-statistics-zod"]
   },
   "packages/target-recognition/src/node-fs.ts": {
     "source": "import { readFileSync } from 'node:fs'\nexport { readFileSync }",
-    "rules": ["target-recognition-imports-shot-groups-statistics-only"]
+    "rules": ["target-recognition-imports-shot-groups-statistics-zod"]
   },
   "packages/target-recognition/src/dom.ts": {
     "source": "export const h = () => window.innerHeight",
@@ -457,7 +465,7 @@
   },
   "packages/target-recognition/src/into-shot-groups.ts": {
     "source": "import { ringScore } from '../../shot-groups/src/index.ts'\nexport { ringScore }",
-    "rules": ["target-recognition-imports-shot-groups-statistics-only"]
+    "rules": ["target-recognition-imports-shot-groups-statistics-zod"]
   },
   "packages/ballistics/src/into-target-recognition.ts": {
     "source": "import { peaksOf } from '../../target-recognition/src/index.ts'\nexport { peaksOf }",
