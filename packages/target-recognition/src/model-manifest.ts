@@ -46,24 +46,38 @@ export const modelManifest: z.ZodType<ModelManifest> = z.strictObject({
   id: text,
   version: text,
   file: z.strictObject({
-    name: text,
+    // a bare file name, so a download cannot write outside its folder
+    name: z.string().regex(/^[\w-]+(\.[\w-]+)*$/),
     url: z.url({ protocol: /^https$/ }),
     sha256: z.string().regex(/^[0-9a-f]{64}$/),
     bytes: positiveInt,
   }),
-  runtime: z.strictObject({ package: text, version: text, wasmPaths: text, opset: positiveInt }),
+  runtime: z.strictObject({
+    package: text,
+    version: z.string().regex(/^\d+\.\d+\.\d+$/),
+    wasmPaths: text,
+    opset: positiveInt,
+  }),
   input: z.strictObject({
     holePx: z.number().positive(),
     channels: z.enum(['rgb', 'bgr']),
-    range: z.tuple([z.number(), z.number()]),
+    range: z
+      .tuple([z.number(), z.number()])
+      .refine(([min, max]) => min < max, 'range minimum not below its maximum'),
     sizeMultiple: positiveInt,
   }),
-  output: z.strictObject({
-    stride: positiveInt,
-    channels: positiveInt,
-    threshold: share,
-    sure: share,
-  }),
+  output: z
+    .strictObject({
+      stride: positiveInt,
+      channels: positiveInt,
+      threshold: share,
+      sure: share,
+    })
+    .refine((o) => o.sure >= o.threshold, {
+      message: 'sure below threshold',
+      path: ['sure'],
+      when: (payload) => payload.issues.length === 0,
+    }),
   license: z.strictObject({
     model: text,
     training: z.strictObject({

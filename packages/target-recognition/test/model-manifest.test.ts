@@ -68,6 +68,26 @@ const rejected: [string, object, object][] = [
     { code: 'too_small', minimum: 0, inclusive: false, path: ['input', 'holePx'] },
   ]),
   [
+    'a file name with a path',
+    withFile({ name: '../model.onnx' }),
+    { code: 'invalid_format', format: 'regex', path: ['file', 'name'] },
+  ],
+  [
+    'a runtime version range',
+    { ...example, runtime: { ...example.runtime, version: '^1.31.1' } },
+    { code: 'invalid_format', format: 'regex', path: ['runtime', 'version'] },
+  ],
+  [
+    'an input range whose minimum is not below its maximum',
+    { ...example, input: { ...example.input, range: [1, 0] } },
+    { code: 'custom', path: ['input', 'range'] },
+  ],
+  [
+    'a sure value below the default threshold',
+    { ...example, output: { ...example.output, sure: 0.2 } },
+    { code: 'custom', message: 'sure below threshold', path: ['output', 'sure'] },
+  ],
+  [
     'a default threshold above 1',
     { ...example, output: { ...example.output, threshold: 1.5 } },
     { code: 'too_big', maximum: 1, path: ['output', 'threshold'] },
