@@ -1,0 +1,116 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-11-22 11:53+0100\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: de\n"
+
+msgid "page.cases"
+msgstr "Hülsen"
+
+msgid "page.casesEditor"
+msgstr "Hülsengruppe"
+
+msgid "record.bullets"
+msgstr "Geschoss"
+
+msgid "page.bulletsDesigner"
+msgstr "Geschoss-Editor"
+
+msgid "page.bullets"
+msgstr "Geschosse"
+
+msgid "record.cartridges"
+msgstr "Patrone"
+
+msgid "page.cartridgesDesigner"
+msgstr "Patronen-Editor"
+
+msgid "page.cartridges"
+msgstr "Patronen"
+
+msgid "record.cases"
+msgstr "Hülse"
+
+msgid "page.bulletsCompare"
+msgstr "Geschosse vergleichen"
+
+msgid "page.events"
+msgstr "Wettkämpfe"
+
+msgid "nav.database"
+msgstr "Datenbank"
+
+msgid "record.disciplines"
+msgstr "Disziplin"
+
+msgid "page.disciplines"
+msgstr "Disziplinen"
+
+msgid "record.federations"
+msgstr "Verband"
+
+msgid "page.federations"
+msgstr "Verbände"
+
+msgid "page.firearms"
+msgstr "Schusswaffen"
+
+msgid "page.workbench"
+msgstr "Werkbank für Laborierungen"
+
+msgid "workbench.notes"
+msgstr "Notizen"
+
+msgid "page.offline"
+msgstr "Offline"
+
+msgid "notFound.title"
+msgstr "Seite nicht gefunden"
+
+msgid "record.powders"
+msgstr "Treibladungspulver"
+
+msgid "page.powdersBurnRates"
+msgstr "Abbrandgeschwindigkeit der Treibladungspulver"
+
+msgid "page.powdersDesigner"
+msgstr "Treibladungspulver-Editor"
+
+msgid "page.powders"
+msgstr "Treibladungspulver"
+
+msgid "record.primers"
+msgstr "Zündhütchen"
+
+msgid "page.primers"
+msgstr "Zündhütchen"
+
+msgid "page.range"
+msgstr "Schießstand-Modus"
+
+msgid "page.session"
+msgstr "Sitzungsübersicht"
+
+msgid "page.firearmsLog"
+msgstr "Schießbuch"
+
+msgid "page.groups"
+msgstr "Schussbilder"
+
+msgid "record.targets"
+msgstr "Scheibe"
+
+msgid "page.targetsDesigner"
+msgstr "Scheiben-Editor"
+
+msgid "page.targets"
+msgstr "Scheiben"
+
+msgid "error.title"
+msgstr "Diese Seite konnte nicht angezeigt werden."
+
+msgid "page.powdersTune"
+msgstr "Treibladungspulver abstimmen"

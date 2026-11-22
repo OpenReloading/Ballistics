@@ -14,7 +14,15 @@ export const notShipped: Record<string, string> = {
   sharp: 'the static export has no image optimization, so the site holds no sharp code',
   '@img/*': 'the sharp binaries: the static export holds none',
   '@next/swc-*': 'the Next.js compiler, a build tool: the static export holds no native code',
+  'lightningcss-*': 'the CSS compiler of Vite, a build tool: the site holds no native code',
 }
+
+/** The build plugins of TanStack Start and Lingui: checked against the policy, left out of NOTICE as no shipped file holds them. */
+const buildOnly = new Set([
+  '@lingui/babel-plugin-lingui-macro',
+  '@tanstack/router-utils',
+  '@tanstack/start-plugin-core',
+])
 
 const begin = 'BEGIN GENERATED: shipped packages'
 const end = 'END GENERATED: shipped packages'
@@ -121,7 +129,8 @@ export function shippedPackages(
 
 /** The licenses of the installed production dependencies of the shipped workspaces, read by pnpm. */
 export function installedLicenses(root: string): Licenses {
-  const filters = images.flatMap((dir) => ['--filter', `./${dir}`])
+  // with the linked workspaces, whose production dependencies ship too
+  const filters = images.flatMap((dir) => ['--filter', `{${dir}}...`])
   const listed = JSON.parse(
     execFileSync(executable('pnpm'), [...filters, 'licenses', 'list', '--prod', '--json'], {
       cwd: root,
@@ -264,10 +273,12 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const configText = readFileSync(configPath, 'utf8')
   const lock = parse(readFileSync(`${root}pnpm-lock.yaml`, 'utf8')) as Lock
   const policy = readPolicy(configText)
-  const packages = shippedPackages(lock, installedLicenses(root))
+  const licenses = installedLicenses(root)
+  const unlisted = (name: string) => isNotShipped(name) || buildOnly.has(name)
+  const packages = shippedPackages(lock, licenses, images, unlisted)
   const found = [
     ...withoutReason(configText).map((l) => `no reason comment on: ${l.trim()}`),
-    ...problems(packages, policy),
+    ...problems(shippedPackages(lock, licenses), policy),
   ]
   const notice = readFileSync(noticePath, 'utf8')
   const block = noticeBlock(packages)

@@ -226,7 +226,9 @@ if (import.meta.main) {
     if (
       status !== 'D' &&
       /\.[cm]?[jt]sx?$/.test(file) &&
-      !/(^|\/)(node_modules|dist|test\/golden)\//.test(file)
+      !/(^|\/)(node_modules|dist|test\/golden)\//.test(file) &&
+      // written by the TanStack route generator, its header with it
+      file !== 'apps/web/src/routeTree.gen.ts'
     )
       changes.push({
         file,

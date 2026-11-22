@@ -98,7 +98,11 @@
       ]
     },
     "apps/web": {
+      // not loaded: the config reads the prerender list, which only a Start build writes
+      "vite": false,
       "entry": [
+        "vite.config.mts",
+        "src/routes/**/*.tsx",
         "scripts/glyph-advances.mts",
         "src/service-worker.js",
         // scripts/service-worker.mts copies every export into out/sw.js through a namespace import
