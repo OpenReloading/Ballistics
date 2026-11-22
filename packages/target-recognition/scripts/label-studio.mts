@@ -1,7 +1,7 @@
 // One labeler's Label Studio JSON export to a label set (task data: file, sha256, source, license, author, session, width, height, visibleDiameterPx; results: a keypoint per hole, a per-region choice uncertain, per-photo choices kind, usable and complete, these two yes or no): node scripts/label-studio.mts <export.json> <labels.json>
 import { readFileSync, writeFileSync } from 'node:fs'
 import { z } from 'zod'
-import { type LabelledPhoto, type LabelSet, labelSet } from '../src/index.ts'
+import { type LabeledPhoto, type LabelSet, labelSet } from '../src/index.ts'
 
 const result = z.discriminatedUnion('type', [
   z.object({
@@ -50,7 +50,7 @@ function photoOf({ data, annotations: [{ result: results }] }: z.infer<typeof ta
       throw new Error(`${file}: ${name} is ${picked}, not yes or no`)
     return picked === 'yes'
   }
-  const photo: LabelledPhoto = {
+  const photo: LabeledPhoto = {
     ...facts,
     kind: choice('kind'),
     usable: flag('usable'),

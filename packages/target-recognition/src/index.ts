@@ -23,7 +23,7 @@ export {
   type ProposalRequest,
   type Proposals,
 } from './inference-port.ts'
-export { type LabelledHole, type LabelledPhoto, type LabelSet, labelSet } from './label-set.ts'
+export { type LabeledHole, type LabeledPhoto, type LabelSet, labelSet } from './label-set.ts'
 export { clamp, components, median1 } from './raster-ops.ts'
 export {
   type FaceFit,

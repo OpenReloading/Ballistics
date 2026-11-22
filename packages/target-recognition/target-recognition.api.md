@@ -181,14 +181,14 @@ export interface InferencePort {
 }
 
 // @public
-export type LabelledHole = {
+export type LabeledHole = {
     x: number;
     y: number;
     uncertain: boolean;
 };
 
 // @public
-export type LabelledPhoto = {
+export type LabeledPhoto = {
     sha256: string;
     source: string;
     license: string;
@@ -199,12 +199,12 @@ export type LabelledPhoto = {
     complete: boolean;
     size: [number, number];
     visibleDiameterPx: number;
-    holes: LabelledHole[];
+    holes: LabeledHole[];
 };
 
 // @public
 export type LabelSet = {
-    photos: Record<string, LabelledPhoto>;
+    photos: Record<string, LabeledPhoto>;
 };
 
 // @public

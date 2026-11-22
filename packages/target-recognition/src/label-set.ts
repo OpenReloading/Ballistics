@@ -1,10 +1,10 @@
 import { z } from 'zod'
 
 /** A marked shot hole: its center in photo px; `uncertain` when the labeler could not tell it from a tear or a print mark. */
-export type LabelledHole = { x: number; y: number; uncertain: boolean }
+export type LabeledHole = { x: number; y: number; uncertain: boolean }
 
 /** One labeler's marks on one photo: `size` in px, `session` the shooting day and setup (a split keeps it in one set), `complete` when every hole is marked. */
-export type LabelledPhoto = {
+export type LabeledPhoto = {
   sha256: string
   source: string
   license: string
@@ -15,11 +15,11 @@ export type LabelledPhoto = {
   complete: boolean
   size: [number, number]
   visibleDiameterPx: number
-  holes: LabelledHole[]
+  holes: LabeledHole[]
 }
 
 /** One labeler's photo set, the photos keyed by file name. */
-export type LabelSet = { photos: Record<string, LabelledPhoto> }
+export type LabelSet = { photos: Record<string, LabeledPhoto> }
 
 const text = z.string().min(1)
 const px = z.number().int().positive()
