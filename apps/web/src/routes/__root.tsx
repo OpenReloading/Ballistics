@@ -29,7 +29,9 @@ export const Route = createRootRoute({
   component: Root,
 })
 
+// the providers sit in the shell, so the error page that replaces Root still has them
 function Document({ children }: { children: ReactNode }) {
+  const i18n = useStoredLanguage()
   return (
     <html lang="en" {...mantineHtmlProps}>
       {/* oxlint-disable-next-line nextjs/no-head-element -- TanStack Start's shell writes the document's own head */}
@@ -39,7 +41,9 @@ function Document({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        {children}
+        <UiProvider i18n={i18n} defaultColorScheme="auto" colorSchemeManager={colorSchemeManager}>
+          {children}
+        </UiProvider>
         <Scripts />
       </body>
     </html>
@@ -47,17 +51,14 @@ function Document({ children }: { children: ReactNode }) {
 }
 
 function Root() {
-  const i18n = useStoredLanguage()
   // the ready signal of the browser specs, as in the Next app's providers
   useEffect(() => {
     document.documentElement.dataset.hydrated = ''
   }, [])
   return (
-    <UiProvider i18n={i18n} defaultColorScheme="auto" colorSchemeManager={colorSchemeManager}>
-      <AppFrame brand={<Link to="/">RangeFoundry Workbench</Link>} navigation={<Navigation />}>
-        <Outlet />
-      </AppFrame>
-    </UiProvider>
+    <AppFrame brand={<Link to="/">RangeFoundry Workbench</Link>} navigation={<Navigation />}>
+      <Outlet />
+    </AppFrame>
   )
 }
 
