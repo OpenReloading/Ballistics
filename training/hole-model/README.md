@@ -44,11 +44,11 @@ The CLI refuses a list in which a photo (by `sha256`) or a session sits in two s
 uv run hole-model convert --labels <merged marks> --posts <corpus images.jsonl> --holdout <holdout folder>... --out data/real
 ```
 
-| Answer | Label |
-|---|---|
-| `correct`, `correction` | `real confirmed`: the confirmed or corrected marks |
+| Answer                   | Label                                                                                    |
+| ------------------------ | ---------------------------------------------------------------------------------------- |
+| `correct`, `correction`  | `real confirmed`: the confirmed or corrected marks                                       |
 | `unchecked`, `fix_later` | `real unchecked`: the model's marks, only for photos whose marks are complete or partial |
-| `unusable` | dropped |
+| `unusable`               | dropped                                                                                  |
 
 - The regions with unresolved holes become `masked` boxes (x, y, width, height in px): the loss and the scores leave them out, so they teach neither hole nor background.
 - A photo is dropped when its image or original sha256 matches a holdout photo or it comes from a holdout photo's source post. Of the holdout folders only the `sha256` and `source_group` of `manifest.json` and the `source_group` of `images.jsonl` are read.
