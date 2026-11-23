@@ -36,6 +36,7 @@ function build() {
       PAGES_EDITION: edition,
       PAGES_BASE_PATH: base,
       PRERENDER: prerender,
+      NODE_ENV: 'development',
     })
     const out = edition === 'next' ? `${site}next/` : site
     // a move, not a copy: a recursive cpSync into the dev container's bind mount fails with EACCES on macOS

@@ -70,6 +70,8 @@ for (const { name, base, prefix } of editions)
         // the fallback's title is "Page not found"; the app's titles end in its name
         await expect(page).toHaveTitle(/RangeFoundry Workbench$/)
         // the splat route renders nothing while it hydrates, as the shell holds nothing there, so the unknown path allows no #418
+        if (p.path === 'no-such-page/')
+          console.log(`DIAG ${browserName} ${name} ${language}`, JSON.stringify(messages))
         if (p.prerendered) expect(messages).toEqual([])
         else if (p.path === 'no-such-page/')
           expect(unexplainedMiss(messages, browserName, name)).toEqual([])
