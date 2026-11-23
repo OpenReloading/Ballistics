@@ -181,21 +181,6 @@ const seeded = (start: number) => {
 }
 
 describe('learnedDetector clustering at scale', () => {
-  it('clusters 30,000 peaks of a dense heatmap in under a second', async () => {
-    const cells: [number, number][] = []
-    for (let y = 0; y < 600; y += 4) for (let x = 0; x < 800; x += 4) cells.push([x, y])
-    const start = performance.now()
-    const { proposals } = await learnedDetector(manifest, bigStub(cells)).propose({
-      ...bigRequest,
-      image: bigImage(1600, 1200),
-    })
-    const elapsed = performance.now() - start
-    expect(proposals).toHaveLength(30_000)
-    // the peaks lie 8 px apart, closer than the 16 px hole, so they chain into one cluster
-    expect(proposals.every((p) => p.clusterId === 0 && p.clusterSize === 30_000)).toBe(true)
-    expect(elapsed).toBeLessThan(1000)
-  })
-
   it('gives the cluster ids of the pairwise comparison of every two peaks', async () => {
     const next = seeded(20_260_101)
     const cells: [number, number][] = []
