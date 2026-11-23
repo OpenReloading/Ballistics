@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
+import { storageName } from './edition.ts'
 import { isDark } from './luminance.ts'
 import { gotoHydrated } from './nav.ts'
 
@@ -15,15 +16,17 @@ const firstBg = (page: Page) =>
   page.evaluate(() => (window as unknown as { firstBg: string }).firstBg)
 const bg = (page: Page) => page.evaluate(() => getComputedStyle(document.body).backgroundColor)
 const storeDark = (page: Page) =>
-  page.addInitScript(() => {
-    localStorage.setItem('theme', 'dark')
-  })
+  page.addInitScript((store) => {
+    localStorage.setItem(store, 'dark')
+  }, storageName('theme'))
 const themeSwitch = (page: Page) => page.getByRole('button', { name: 'Dark theme' })
 
 test('with nothing stored the system setting decides', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'dark' })
-  await page.goto('/cartridges/308-win')
-  expect(await page.evaluate(() => localStorage.getItem('theme'))).toBeNull()
+  await page.goto('./cartridges/308-win')
+  expect(
+    await page.evaluate((store) => localStorage.getItem(store), storageName('theme')),
+  ).toBeNull()
   await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', 'dark')
   expect(isDark(await bg(page))).toBe(true)
   await expect(themeSwitch(page)).toHaveAttribute('aria-pressed', 'true')
@@ -38,7 +41,7 @@ test('the switch overrides the system setting and the choice survives a reload',
 }) => {
   await recordFirstPaint(page)
   await page.emulateMedia({ colorScheme: 'dark' })
-  await page.goto('/')
+  await page.goto('./')
   await expect(themeSwitch(page)).toHaveAttribute('aria-pressed', 'true')
   await themeSwitch(page).click()
   await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', 'light')
@@ -49,7 +52,9 @@ test('the switch overrides the system setting and the choice survives a reload',
   await page.reload()
   await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', 'light')
   expect(isDark(await firstBg(page))).toBe(false)
-  expect(await page.evaluate(() => localStorage.getItem('theme'))).toBe('light')
+  expect(await page.evaluate((store) => localStorage.getItem(store), storageName('theme'))).toBe(
+    'light',
+  )
   await expect(themeSwitch(page)).toHaveAttribute('aria-pressed', 'false')
 })
 
@@ -57,14 +62,14 @@ test('a stored dark applies before the first paint', async ({ page }) => {
   await storeDark(page)
   await recordFirstPaint(page)
   await page.emulateMedia({ colorScheme: 'light' })
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   expect(isDark(await firstBg(page))).toBe(true)
   await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', 'dark')
   await expect(themeSwitch(page)).toHaveAttribute('aria-pressed', 'true')
 })
 
 test('print with system dark and nothing stored is light', async ({ page }) => {
-  await page.goto('/cartridges/308-win')
+  await page.goto('./cartridges/308-win')
   await page.emulateMedia({ media: 'print', colorScheme: 'dark' })
   expect(isDark(await bg(page))).toBe(false)
   await expect(themeSwitch(page)).toBeHidden()
@@ -72,7 +77,7 @@ test('print with system dark and nothing stored is light', async ({ page }) => {
 
 test('print with dark stored is light', async ({ page }) => {
   await storeDark(page)
-  await page.goto('/cartridges/308-win')
+  await page.goto('./cartridges/308-win')
   await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', 'dark')
   await page.emulateMedia({ media: 'print' })
   // a light page with dark text, whatever the theme
@@ -103,7 +108,7 @@ test('the switch is reachable by keyboard and exposes its name and pressed state
   page,
 }) => {
   await page.emulateMedia({ colorScheme: 'dark' })
-  await page.goto('/')
+  await page.goto('./')
   // pressed only once hydrated: the server renders it not pressed
   await expect(themeSwitch(page)).toHaveAttribute('aria-pressed', 'true')
   // from 75em the switch ends the page bar's row: after the sidebar, Safety, Report an issue and the repository link where the build has a repository URL (navigation.spec.ts checks that order)
@@ -122,8 +127,11 @@ test('the switch is reachable by keyboard and exposes its name and pressed state
 
 for (const scheme of ['light', 'dark'] as const)
   test(`the header shows the ${scheme} wordmark as the home link`, async ({ page }) => {
-    await page.addInitScript((s) => localStorage.setItem('theme', s), scheme)
-    await page.goto('/cartridges/308-win')
+    await page.addInitScript(([s, store]) => localStorage.setItem(store, s), [
+      scheme,
+      storageName('theme'),
+    ] as const)
+    await page.goto('./cartridges/308-win')
     const logo = page
       .getByRole('banner')
       .getByRole('link', { name: 'RangeFoundry Workbench' })
@@ -138,7 +146,7 @@ for (const scheme of ['light', 'dark'] as const)
   })
 
 test('icons are served as PNG, no social image without the origin', async ({ page, request }) => {
-  await page.goto('/cartridges/308-win')
+  await page.goto('./cartridges/308-win')
   // first(): Next.js may stream the metadata again into the head
   const head = page.locator('head')
   const hrefs = [

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { gotoHydrated } from './nav.ts'
+import { based, gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { loadForm, openKeeping } from './workbench.ts'
 
@@ -12,7 +12,7 @@ test('the case list opens a case record with its cartridge', async ({ page }) =>
   // the cartridge is a card of the fact row, linked
   await expect(page.locator('.fact-cards').getByRole('link', { name: '308 Win.' })).toHaveAttribute(
     'href',
-    '/cartridges/308-win/',
+    based('/cartridges/308-win/'),
   )
   // the properties as Quantity, Value and Unit (no drawing, so no Symbol column), across the page
   const properties = page.getByRole('table', { name: 'Properties' })
@@ -34,7 +34,7 @@ test('the case list opens a case record with its cartridge', async ({ page }) =>
 test('a primer record shows its properties as Quantity, Value and Unit across the page', async ({
   page,
 }) => {
-  await page.goto('/primers/demo-primer-large-rifle')
+  await page.goto('./primers/demo-primer-large-rifle')
   const properties = page.getByRole('table', { name: 'Properties' })
   await expect(properties.locator('thead').getByRole('columnheader')).toHaveText([
     'Quantity',

@@ -1,5 +1,6 @@
 import { expect, type Page, test } from '@playwright/test'
 import { AxeBuilder } from './a11y.ts'
+import { storageName } from './edition.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
 import { chooseSavedLoad, fixtureLoad, loadForm } from './workbench.ts'
@@ -37,10 +38,10 @@ const status = (page: Page) => page.locator('.page-bar-status .bar-count')
 test('the firearm library searches its table, counts its firearms and offers to clear a search without a match', async ({
   page,
 }) => {
-  await page.addInitScript(() => {
-    localStorage.setItem('safety-ack', '4')
-  })
-  await page.goto('/firearms')
+  await page.addInitScript((store) => {
+    localStorage.setItem(store, '4')
+  }, storageName('safety-ack'))
+  await page.goto('./firearms')
   await seed(page, ['Bench rifle', 'Hunting rifle'])
   await page.reload()
   await expect(status(page)).toHaveText('2 firearms')
@@ -70,10 +71,10 @@ test('the firearm table fits a 1280 px window with its row menu, one save status
   // the tab strip as high as on a framed list (56 px: under the top bar's rule)
   const strip = page.locator('.library-tabs')
   const stripTop = async () => (await strip.boundingBox())?.y
-  await page.goto('/bullets')
+  await page.goto('./bullets')
   await expect(page.locator('tbody tr[data-row]').first()).toBeVisible()
   await expect.poll(stripTop).toBe(56)
-  await page.goto('/firearms')
+  await page.goto('./firearms')
   await expect(page.locator('.mantine-EmptyState-root')).toBeVisible()
   await expect(page.locator('tbody tr[data-row]')).toHaveCount(0)
   await expect.poll(stripTop).toBe(56)
@@ -123,17 +124,17 @@ test('the firearm table fits a 1280 px window with its row menu, one save status
 })
 
 test('a record link does not put its loading status in the alert line', async ({ page }) => {
-  await page.addInitScript(() => {
-    localStorage.setItem('safety-ack', '4')
+  await page.addInitScript((store) => {
+    localStorage.setItem(store, '4')
     const seen = { loading: false }
     Object.assign(window, { seen })
     new MutationObserver(() => {
       if (document.body?.innerText.includes('Loading the record')) seen.loading = true
     }).observe(document, { subtree: true, childList: true, characterData: true })
-  })
-  await page.goto('/firearms')
+  }, storageName('safety-ack'))
+  await page.goto('./firearms')
   await seed(page, ['Bench rifle'])
-  await page.goto(`/firearms?record=${firearmId(0)}`)
+  await page.goto(`./firearms?record=${firearmId(0)}`)
   await expect(page.getByRole('textbox', { name: 'Name' }).first()).toHaveValue('Bench rifle')
   expect(
     await page.evaluate(() => (window as unknown as { seen: { loading: boolean } }).seen.loading),
@@ -144,7 +145,7 @@ test('a saved load whose firearm is not in this browser says so on the Gun card'
   page,
 }) => {
   await storeUnits(page)
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' })
   await putRecords(page, [fixtureLoad])
   await page.reload()
@@ -162,10 +163,10 @@ test('the zero air and drag factor of a mount fill the trajectory form with the 
 }) => {
   test.setTimeout(90_000)
   await storeUnits(page)
-  await page.addInitScript(() => {
-    localStorage.setItem('safety-ack', '4')
-  })
-  await page.goto('/firearms')
+  await page.addInitScript((store) => {
+    localStorage.setItem(store, '4')
+  }, storageName('safety-ack'))
+  await page.goto('./firearms')
   await seed(page, ['Truing rifle'], {
     optics: [{ id: 'o1', kind: 'scope', name: 'Scope' }],
     configurations: [

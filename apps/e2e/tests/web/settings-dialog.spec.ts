@@ -1,7 +1,8 @@
 import { expect, type Locator, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
+import { storageName } from './edition.ts'
 import { showGerman } from './german.ts'
-import { exported, gotoHydrated } from './nav.ts'
+import { based, exported, gotoHydrated } from './nav.ts'
 import { settingsEntry, storeUnits } from './units.ts'
 
 // Settings is a dialog only, no page: every entry is a button opening it over the page, on every route
@@ -11,7 +12,10 @@ test.beforeEach(({ page }) => storeUnits(page))
 const sidebarSettings = settingsEntry
 const unitsButton = (page: Page) => page.getByRole('button', { name: /^Units: / })
 const stored = (page: Page) =>
-  page.evaluate(() => JSON.parse(localStorage.getItem('units') ?? '{}').preset)
+  page.evaluate(
+    (store) => JSON.parse(localStorage.getItem(store) ?? '{}').preset,
+    storageName('units'),
+  )
 
 /** Opens the dialog from `entry` and waits for it to be in view: it fades in. */
 async function openFrom(page: Page, entry: Locator) {
@@ -31,7 +35,7 @@ async function choose(dialog: Locator, name: string) {
 for (const path of ['/cartridges/308-win', '/firearms'])
   test(`on ${path} the sidebar Settings opens the dialog over the page`, async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 })
-    await page.goto(path)
+    await page.goto(`.${path}`)
     // the page behind keeps its place and width (its height follows content loaded after mounting)
     const place = () =>
       page.locator('main#main').evaluate((m) => {
@@ -53,7 +57,7 @@ for (const path of ['/cartridges/308-win', '/firearms'])
 
 for (const path of ['/session', '/firearms'])
   test(`on ${path} the Units button opens the dialog over the page`, async ({ page }) => {
-    await page.goto(path)
+    await page.goto(`.${path}`)
     const dialog = await openFrom(page, unitsButton(page))
     await choose(dialog, 'Metric, common use')
     await page.keyboard.press('Escape')
@@ -64,19 +68,20 @@ for (const path of ['/session', '/firearms'])
   })
 
 test('Settings has no page: /settings answers 404 and no entry is a link', async ({ page }) => {
-  const response = await page.goto('/settings')
+  const response = await page.goto('./settings')
   expect(response?.status()).toBe(404)
-  await page.goto('/session')
+  await page.goto('./session')
   for (const entry of [sidebarSettings(page), unitsButton(page)])
     await expect(entry).not.toHaveAttribute('href')
-  await expect(page.locator('a[href="/settings"]')).toHaveCount(0)
+  // a prefix match: with `trailingSlash` a link to the page renders as `/settings/`
+  await expect(page.locator(`a[href^="${based('/settings')}"]`)).toHaveCount(0)
 })
 
 test('at 390 px Settings in the drawer closes the drawer, then opens the dialog', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('/powders')
+  await page.goto('./powders')
   const button = page.getByRole('button', { name: 'Navigation', exact: true })
   await button.click()
   await page.getByRole('dialog').getByRole('button', { name: 'Settings', exact: true }).click()
@@ -98,7 +103,7 @@ test('with unsaved firearm edits Settings and Units open the dialog without a qu
     asked.push(d.message())
     return d.dismiss()
   })
-  await page.goto('/firearms')
+  await page.goto('./firearms')
   await (await barButton(page, 'New firearm')).click()
   const name = page.getByRole('textbox', { name: /^Name/ })
   await name.fill('Range rifle')
@@ -141,7 +146,7 @@ test('the Manufacturers section of General deletes a user manufacturer that no r
 
 test('the tabs General, Units and Workbench are each reached by keyboard', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
-  await page.goto('/powders')
+  await page.goto('./powders')
   const dialog = await openFrom(page, sidebarSettings(page))
   const tabs = dialog.getByRole('tablist', { name: 'Settings' })
   await expect(tabs).toHaveAttribute('aria-orientation', 'vertical')
@@ -157,7 +162,7 @@ test('the tabs General, Units and Workbench are each reached by keyboard', async
   }
   // the Units button opens the Units tab again
   await page.keyboard.press('Escape')
-  await page.goto('/session')
+  await page.goto('./session')
   const again = await openFrom(page, unitsButton(page))
   await expect(again.getByRole('tab', { name: 'Units' })).toHaveAttribute('aria-selected', 'true')
 })
@@ -165,7 +170,7 @@ test('the tabs General, Units and Workbench are each reached by keyboard', async
 test('Appearance in General stores the theme as System, Light or Dark', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
   await page.emulateMedia({ colorScheme: 'dark' })
-  await page.goto('/powders')
+  await page.goto('./powders')
   const dialog = await openFrom(page, sidebarSettings(page))
   await dialog.getByRole('tab', { name: 'General' }).click()
   const theme = dialog.getByRole('radiogroup', { name: 'Theme' })
@@ -173,15 +178,21 @@ test('Appearance in General stores the theme as System, Light or Dark', async ({
   const html = page.locator('html')
   await theme.getByText('Light', { exact: true }).click()
   await expect(html).toHaveAttribute('data-mantine-color-scheme', 'light')
-  expect(await page.evaluate(() => localStorage.getItem('theme'))).toBe('light')
+  expect(await page.evaluate((store) => localStorage.getItem(store), storageName('theme'))).toBe(
+    'light',
+  )
   await theme.getByText('Dark', { exact: true }).click()
   await expect(html).toHaveAttribute('data-mantine-color-scheme', 'dark')
-  expect(await page.evaluate(() => localStorage.getItem('theme'))).toBe('dark')
+  expect(await page.evaluate((store) => localStorage.getItem(store), storageName('theme'))).toBe(
+    'dark',
+  )
   // System follows the system setting again
   await theme.getByText('System', { exact: true }).click()
   await page.emulateMedia({ colorScheme: 'light' })
   await expect(html).toHaveAttribute('data-mantine-color-scheme', 'light')
-  expect(await page.evaluate(() => localStorage.getItem('theme'))).not.toMatch(/^(light|dark)$/)
+  expect(
+    await page.evaluate((store) => localStorage.getItem(store), storageName('theme')),
+  ).not.toMatch(/^(light|dark)$/)
 })
 
 test('Settings turns the single-key shortcuts off: "/" and "?" do nothing, the choice stays over a reload', async ({

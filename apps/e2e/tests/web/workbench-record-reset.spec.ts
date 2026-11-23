@@ -7,7 +7,7 @@ test.beforeEach(({ page }) => storeUnits(page))
 test('a value changed over its record is marked and one click gives the record value back', async ({
   page,
 }) => {
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await openSavedLoad(page)
   const form = loadForm(page)
   const reset = (label: string) =>
@@ -43,7 +43,7 @@ test('a value changed over its record is marked and one click gives the record v
 })
 
 test('Reset card gives a card all its record values back', async ({ page }) => {
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await openSavedLoad(page)
   const form = loadForm(page)
   const [diameter, length] = [
@@ -74,7 +74,7 @@ test('Reset card gives a card all its record values back', async ({ page }) => {
 test('a typed bore diameter leaves the record bore area, which describes the record diameter, and a reset brings it back', async ({
   page,
 }) => {
-  await page.goto('/workbench?cartridge=308-win&bullet=demo-bullet-168&powder=demo-powder-dp40')
+  await page.goto('./workbench?cartridge=308-win&bullet=demo-bullet-168&powder=demo-powder-dp40')
   const form = loadForm(page)
   const [bore, area] = [
     form.getByRole('textbox', { name: /^Bore diameter/ }),
@@ -94,7 +94,7 @@ test('a typed bore diameter leaves the record bore area, which describes the rec
 test('picking another bullet replaces the changed values of the card and says how many', async ({
   page,
 }) => {
-  await page.goto('/workbench?cartridge=308-win&bullet=demo-bullet-168&powder=demo-powder-dp40')
+  await page.goto('./workbench?cartridge=308-win&bullet=demo-bullet-168&powder=demo-powder-dp40')
   const form = loadForm(page)
   const diameter = form.getByRole('textbox', { name: /^Diameter/ })
   const length = form.getByRole('textbox', { name: /^Length/ })
@@ -124,7 +124,7 @@ test('picking another bullet replaces the changed values of the card and says ho
 test('the base form and its dimensions are typed over the record, change the volume behind the bullet and reset', async ({
   page,
 }) => {
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await openSavedLoad(page)
   const volume = loadForm(page).getByRole('textbox', { name: /^Usable case volume/ })
   // the base form is in the card's More popover, which closes with Escape
@@ -191,7 +191,7 @@ test('the base form and its dimensions are typed over the record, change the vol
 
 test('a link with a base form opens with it, marked as changed', async ({ page }) => {
   await page.goto(
-    '/workbench?cartridge=308-win&bullet=demo-bullet-168&powder=demo-powder-dp40&units=metric-grams&bulletBase=flat',
+    './workbench?cartridge=308-win&bullet=demo-bullet-168&powder=demo-powder-dp40&units=metric-grams&bulletBase=flat',
   )
   await page.getByRole('button', { name: 'More of Bullet' }).click()
   await expect(page.getByRole('combobox', { name: 'Base type' })).toHaveValue('flat')
@@ -203,7 +203,7 @@ test('a link with a base form opens with it, marked as changed', async ({ page }
 test('a typed Pmax is the limit of the readouts, marked as yours, and a reset brings the sheet back', async ({
   page,
 }) => {
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await openSavedLoad(page)
   const form = loadForm(page)
   const pmax = form.getByRole('textbox', { name: /^Pmax/ })
@@ -227,7 +227,7 @@ test('a typed Pmax is the limit of the readouts, marked as yours, and a reset br
 test('a typed case length L3 moves the seating volume and a reset gives the sheet value back', async ({
   page,
 }) => {
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await openSavedLoad(page)
   const form = loadForm(page)
   const l3 = form.getByRole('textbox', { name: /^Case length L3/ })
@@ -258,7 +258,7 @@ test('a link carries a typed bulk density and a typed Pmax, marked as changed', 
   page,
 }) => {
   await page.goto(
-    '/workbench?cartridge=308-win&bullet=demo-bullet-168&powder=demo-powder-dp40&units=metric-grams&pmax=350000000&bulkDensity=700',
+    './workbench?cartridge=308-win&bullet=demo-bullet-168&powder=demo-powder-dp40&units=metric-grams&pmax=350000000&bulkDensity=700',
   )
   const form = loadForm(page)
   // a powder record without a bulk density has the row behind Model parameters

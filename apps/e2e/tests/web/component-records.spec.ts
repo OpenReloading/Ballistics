@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { gotoHydrated } from './nav.ts'
+import { based, gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
@@ -9,7 +9,7 @@ test('a bullet record lists the cartridges it fits, linked', async ({ page }) =>
   const list = page.getByRole('list', { name: 'Cartridges' })
   await expect(list.getByRole('link', { name: '308 Win.', exact: true })).toHaveAttribute(
     'href',
-    '/cartridges/308-win/',
+    based('/cartridges/308-win/'),
   )
   await expect(page.getByRole('table', { name: 'Ballistic coefficients' })).toContainText('G7')
   // the symbol keys move over the rows the group filter shows only
@@ -27,9 +27,9 @@ test('a bullet record lists the cartridges it fits, linked', async ({ page }) =>
 test('a cartridge record links the bullet list of the bullets that fit it, the rule on hover; none for a cartridge without', async ({
   page,
 }) => {
-  await page.goto('/cartridges/308-win')
+  await page.goto('./cartridges/308-win')
   const link = page.getByRole('link', { name: /^Bullets \(\d+\)$/ })
-  await expect(link).toHaveAttribute('href', '/bullets/?fits=308-win')
+  await expect(link).toHaveAttribute('href', based('/bullets/?fits=308-win'))
   await link.focus()
   await expect(page.getByRole('tooltip')).toContainText('above the mean of the land and groove')
   const count = Number((await link.innerText()).match(/\d+/)?.[0])
@@ -43,7 +43,7 @@ test('a cartridge record links the bullet list of the bullets that fit it, the r
   await page.getByRole('searchbox', { name: 'Search' }).fill('demo')
   await expect(page.getByRole('link', { name: '30 Cal 168 gr HPBT Demo' })).toBeVisible()
   // no bullet record of the catalogue has a diameter this cartridge takes
-  await page.goto('/cartridges/4-bore-rifle')
+  await page.goto('./cartridges/4-bore-rifle')
   await expect(page.getByRole('heading', { name: 'Chamber' })).toBeVisible()
   await expect(page.getByRole('link', { name: /^Bullets \(/ })).toHaveCount(0)
 })

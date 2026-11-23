@@ -189,7 +189,7 @@ for (const [width, height] of [
   }) => {
     test.setTimeout(60_000)
     await page.setViewportSize({ width, height })
-    await page.goto('/workbench')
+    await page.goto('./workbench')
     await openSavedLoad(page)
     const charge = loadForm(page).getByLabel(/^Charge mass/)
     await charge.fill('20')

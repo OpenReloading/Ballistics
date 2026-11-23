@@ -3,6 +3,7 @@ import path from 'node:path'
 import { expect, type Locator, type Page, test } from '@playwright/test'
 import { AxeBuilder, height, problems, schemes, tall, widths } from './a11y.ts'
 import { barButton } from './bar.ts'
+import { storageName } from './edition.ts'
 import { pickFiles, withoutOpenPicker } from './import.ts'
 import { openLadderGroups } from './ladder-groups.ts'
 import { gotoHydrated } from './nav.ts'
@@ -122,7 +123,10 @@ const states: State[] = [
     name: `${name} ${route}`,
     scrolls: true as const,
     open: async (page: Page, check: (view: string) => Promise<void>) => {
-      await page.addInitScript(() => localStorage.setItem('language', 'de'))
+      await page.addInitScript(
+        (store) => localStorage.setItem(store, 'de'),
+        storageName('language'),
+      )
       await gotoHydrated(page, route ?? '')
       await expect(page.locator('html')).toHaveAttribute('lang', 'de')
       await expect(

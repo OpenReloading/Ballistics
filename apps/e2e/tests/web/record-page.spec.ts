@@ -1,5 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
-import { gotoHydrated } from './nav.ts'
+import { based, gotoHydrated } from './nav.ts'
 
 /** The exported file holds the head tags and a loading state, and the page renders from its data file in the browser; one record of each kind, all in the export's sample. */
 const records: {
@@ -105,7 +105,7 @@ for (const r of records) {
     test("the exported file carries the record's own head tags and nothing of its content", async ({
       request,
     }) => {
-      const html = await (await request.get(path)).text()
+      const html = await (await request.get(`.${path}`)).text()
       const head = html.slice(0, html.indexOf('</head>'))
       expect(head).toContain(`<title>${r.title}`)
       for (const tag of [
@@ -122,7 +122,7 @@ for (const r of records) {
 
     test('a record whose data file is gone shows the not-found message', async ({ page }) => {
       await page.route(`**${file}`, (route) => route.fulfill({ status: 404 }))
-      await page.goto(path)
+      await page.goto(`.${path}`)
       await expect(page.getByRole('heading', { level: 1, name: 'Page not found' })).toBeVisible()
       await expect(page.getByText('Nothing at this address')).toBeVisible()
       await expect(page.locator('meta[name="robots"][content="noindex"]')).toHaveCount(1)
@@ -143,7 +143,7 @@ for (const r of records) {
         })
         await gotoHydrated(page, path)
         await expectLoaded(page, r)
-        expect(read).toContain(file)
+        expect(read).toContain(based(file))
         // the page and the worker store the page and its data files of the first visit
         await page.evaluate(() => navigator.serviceWorker.ready)
         await expect
@@ -153,7 +153,7 @@ for (const r of records) {
                 const found = await Promise.all([html, ...files].map((u) => caches.match(u)))
                 return found.every(Boolean)
               },
-              [path, [...read]] as const,
+              [based(path), [...read]] as const,
             ),
           )
           .toBe(true)

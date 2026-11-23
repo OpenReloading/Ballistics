@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises'
 import { expect, test } from '@playwright/test'
 import { defined } from '../../../web/test/defined.ts'
 import { barButton } from './bar.ts'
+import { storageName } from './edition.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { loadForm, openKeeping, openSavedLoad } from './workbench.ts'
@@ -11,20 +12,23 @@ test.beforeEach(({ page }) => storeUnits(page))
 type Stored = { kind: string; id: string; name: string; data: Record<string, unknown> }
 
 const storedKind = (page: import('@playwright/test').Page, kind: string) =>
-  page.evaluate(async (kind) => {
-    const db: IDBDatabase = await new Promise((ok, no) => {
-      const r = indexedDB.open('rangefoundry-user-data')
-      r.onsuccess = () => ok(r.result)
-      r.onerror = () => no(r.error)
-    })
-    const all: Stored[] = await new Promise((ok, no) => {
-      const r = db.transaction('records').objectStore('records').getAll()
-      r.onsuccess = () => ok(r.result)
-      r.onerror = () => no(r.error)
-    })
-    db.close()
-    return all.filter((r) => r.kind === kind)
-  }, kind)
+  page.evaluate(
+    async ([kind, store]) => {
+      const db: IDBDatabase = await new Promise((ok, no) => {
+        const r = indexedDB.open(store)
+        r.onsuccess = () => ok(r.result)
+        r.onerror = () => no(r.error)
+      })
+      const all: Stored[] = await new Promise((ok, no) => {
+        const r = db.transaction('records').objectStore('records').getAll()
+        r.onsuccess = () => ok(r.result)
+        r.onerror = () => no(r.error)
+      })
+      db.close()
+      return all.filter((r) => r.kind === kind)
+    },
+    [kind, storageName('rangefoundry-user-data')] as const,
+  )
 
 const storedLoads = (page: import('@playwright/test').Page) => storedKind(page, 'load')
 
@@ -34,7 +38,7 @@ test('a saved load reopens with every field as it was and nothing unsaved', asyn
     ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
   })
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await openSavedLoad(page)
   const form = loadForm(page)
   // the fixture load's brass gives the capacity, flagged as the record's
@@ -69,7 +73,7 @@ test('a saved load reopens with every field as it was and nothing unsaved', asyn
   expect(data.case).toEqual({ record: 'catalogue:demo-case-308-brass' })
   expect(data).not.toHaveProperty('capacity')
 
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await (await barButton(page, 'Open')).click()
   await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
   await page.getByRole('button', { name, exact: true }).click()
@@ -92,7 +96,7 @@ test('a diameter and length typed over the bullet record are saved as typed valu
     ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
   })
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await openSavedLoad(page)
   const form = loadForm(page)
   const [diameter, length] = [
@@ -130,7 +134,7 @@ test('a diameter and length typed over the bullet record are saved as typed valu
   expect(overrides).not.toHaveProperty('bulletMass')
   expect(overrides).not.toHaveProperty('bulletBcG7')
 
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await (await barButton(page, 'Open')).click()
   await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
   await page.getByRole('button', { name, exact: true }).click()
@@ -150,7 +154,7 @@ test('a load of records keeps the charge and the travel, runs the powder at the 
     ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
   })
-  await page.goto('/workbench?cartridge=308-win&bullet=demo-bullet-168&powder=demo-powder-dp40')
+  await page.goto('./workbench?cartridge=308-win&bullet=demo-bullet-168&powder=demo-powder-dp40')
   const form = loadForm(page)
   // the cartridge's capacity record seats the volume beside the travel
   await expect(form.locator('.field-flag-seating')).toHaveCount(2)
@@ -167,7 +171,7 @@ test('a load of records keeps the charge and the travel, runs the powder at the 
   expect(data.analysis).toEqual({ overrides: { travel: 533.4 } })
   expect(data.charge).toEqual({ value: 2.4 })
 
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await (await barButton(page, 'Open')).click()
   await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
   await page.getByRole('button', { name, exact: true }).click()

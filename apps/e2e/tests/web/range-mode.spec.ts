@@ -1,6 +1,7 @@
 import { expect, type Page, test } from '@playwright/test'
 import { AxeBuilder } from './a11y.ts'
 import { barButton } from './bar.ts'
+import { storageName } from './edition.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
@@ -37,20 +38,23 @@ type Strings = {
 }
 
 const stored = (page: Page, kind: string) =>
-  page.evaluate(async (kind) => {
-    const db: IDBDatabase = await new Promise((ok, no) => {
-      const r = indexedDB.open('rangefoundry-user-data')
-      r.onsuccess = () => ok(r.result)
-      r.onerror = () => no(r.error)
-    })
-    const all: Stored[] = await new Promise((ok, no) => {
-      const r = db.transaction('records').objectStore('records').getAll()
-      r.onsuccess = () => ok(r.result)
-      r.onerror = () => no(r.error)
-    })
-    db.close()
-    return all.filter((r) => r.kind === kind)
-  }, kind)
+  page.evaluate(
+    async ([kind, store]) => {
+      const db: IDBDatabase = await new Promise((ok, no) => {
+        const r = indexedDB.open(store)
+        r.onsuccess = () => ok(r.result)
+        r.onerror = () => no(r.error)
+      })
+      const all: Stored[] = await new Promise((ok, no) => {
+        const r = db.transaction('records').objectStore('records').getAll()
+        r.onsuccess = () => ok(r.result)
+        r.onerror = () => no(r.error)
+      })
+      db.close()
+      return all.filter((r) => r.kind === kind)
+    },
+    [kind, storageName('rangefoundry-user-data')] as const,
+  )
 
 /** Opens the fixture load, stored in this browser, in the workbench and gives its record and form values. */
 async function openStoredFixtureLoad(page: Page) {

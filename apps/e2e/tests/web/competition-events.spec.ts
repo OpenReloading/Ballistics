@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
+import { storageName } from './edition.ts'
 import { putRecords } from './user-store.ts'
 
 const pistol = '7a2d9c10-5b3e-4f68-9d41-0c8e2b6a1f57'
@@ -26,9 +27,9 @@ const seed = (page: Page) =>
 
 /** The stored events, as written. */
 const storedEvents = (page: Page) =>
-  page.evaluate(async () => {
+  page.evaluate(async (store) => {
     const db: IDBDatabase = await new Promise((ok, no) => {
-      const r = indexedDB.open('rangefoundry-user-data')
+      const r = indexedDB.open(store)
       r.onsuccess = () => ok(r.result)
       r.onerror = () => no(r.error)
     })
@@ -40,7 +41,7 @@ const storedEvents = (page: Page) =>
     )
     db.close()
     return all.filter((r) => r.kind === 'event').sort((a, b) => a.id.localeCompare(b.id))
-  })
+  }, storageName('rangefoundry-user-data'))
 
 async function pick(page: Page, scope: ReturnType<Page['locator']>, name: string, option: string) {
   await scope.getByRole('combobox', { name }).click()
@@ -53,7 +54,7 @@ const count = (page: Page) => page.locator('.page-bar-status .bar-count')
 test('a person adds an IPSC event with two stages and a DSB ring event, sees the totals, prints and round-trips them', async ({
   page,
 }) => {
-  await page.goto('/events')
+  await page.goto('./events')
   await seed(page)
   await page.reload()
   await expect(count(page)).toHaveText('0 events')
@@ -163,9 +164,9 @@ test('a person adds an IPSC event with two stages and a DSB ring event, sees the
   const before = await storedEvents(page)
   expect(before).toHaveLength(2)
   await page.evaluate(
-    async (ids) => {
+    async ([ids, store]) => {
       const db: IDBDatabase = await new Promise((ok) => {
-        const r = indexedDB.open('rangefoundry-user-data')
+        const r = indexedDB.open(store)
         r.onsuccess = () => ok(r.result)
       })
       const tx = db.transaction('records', 'readwrite')
@@ -175,7 +176,7 @@ test('a person adds an IPSC event with two stages and a DSB ring event, sees the
       })
       db.close()
     },
-    before.map((r) => r.id),
+    [before.map((r) => r.id), storageName('rangefoundry-user-data')] as const,
   )
   await page.reload()
   await expect(count(page)).toHaveText('0 events')

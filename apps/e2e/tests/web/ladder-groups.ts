@@ -1,5 +1,6 @@
 import { expect, type Page } from '@playwright/test'
 import { barButton } from './bar.ts'
+import { storageName } from './edition.ts'
 import { gotoHydrated } from './nav.ts'
 import { putRecords } from './user-store.ts'
 import { openSavedLoad } from './workbench.ts'
@@ -20,20 +21,23 @@ const file = [
 ].join('\n')
 
 const stored = (page: Page, kind: string) =>
-  page.evaluate(async (kind) => {
-    const db: IDBDatabase = await new Promise((ok, no) => {
-      const r = indexedDB.open('rangefoundry-user-data')
-      r.onsuccess = () => ok(r.result)
-      r.onerror = () => no(r.error ?? new Error('IndexedDB request failed'))
-    })
-    const all: { kind: string; id: string }[] = await new Promise((ok, no) => {
-      const r = db.transaction('records').objectStore('records').getAll()
-      r.onsuccess = () => ok(r.result)
-      r.onerror = () => no(r.error ?? new Error('IndexedDB request failed'))
-    })
-    db.close()
-    return all.filter((r) => r.kind === kind)
-  }, kind)
+  page.evaluate(
+    async ([kind, store]) => {
+      const db: IDBDatabase = await new Promise((ok, no) => {
+        const r = indexedDB.open(store)
+        r.onsuccess = () => ok(r.result)
+        r.onerror = () => no(r.error ?? new Error('IndexedDB request failed'))
+      })
+      const all: { kind: string; id: string }[] = await new Promise((ok, no) => {
+        const r = db.transaction('records').objectStore('records').getAll()
+        r.onsuccess = () => ok(r.result)
+        r.onerror = () => no(r.error ?? new Error('IndexedDB request failed'))
+      })
+      db.close()
+      return all.filter((r) => r.kind === kind)
+    },
+    [kind, storageName('rangefoundry-user-data')] as const,
+  )
 
 /** A tab of the results: on the phone layout behind the Results tab, below 62em maybe in the More menu. */
 async function openTab(page: Page, name: string) {

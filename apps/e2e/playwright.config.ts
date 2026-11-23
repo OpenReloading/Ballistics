@@ -1,16 +1,18 @@
 import { defineConfig, devices } from '@playwright/test'
+import { storageName } from './tests/web/edition.ts'
 import { safetyAck } from './tests/web/nav.ts'
 
-const webUrl = process.env.WEB_URL ?? 'http://localhost:3003'
+// a trailing slash, so the specs' `./path` stays below the base path
+const webUrl = (process.env.WEB_URL ?? 'http://localhost:3003').replace(/\/?$/, '/')
 /** The Pages site (`pnpm run pages:serve`), with its base path and a trailing slash. Unset: no project `pages`. */
-const pagesUrl = process.env.PAGES_URL
+const pagesUrl = process.env.PAGES_URL?.replace(/\/?$/, '/')
 /** Set: projects `firefox` and `webkit` run the smoke spec against `WEB_URL`. */
 const allEngines = Boolean(process.env.ALL_ENGINES)
 /** `off`: no Start site build and no projects `start-*` (the drawing baseline, a local `--project full` run). */
 const startSite = process.env.START_SITE !== 'off'
 const startUrl = 'http://localhost:3043/Ballistics/'
 /** A site with both editions as `pages.yml` deploys it, with its base path and a trailing slash. Unset: the export at `WEB_URL`, whose root `404.html` is the same page. */
-const editionsUrl = process.env.EDITIONS_URL ?? webUrl.replace(/\/?$/, '/')
+const editionsUrl = process.env.EDITIONS_URL ?? webUrl
 
 const browserAt = (url: string, device = devices['Desktop Chrome']) => ({
   ...device,
@@ -23,7 +25,7 @@ const browserAt = (url: string, device = devices['Desktop Chrome']) => ({
     origins: [
       {
         origin: new URL(url).origin,
-        localStorage: [{ name: 'safety-ack', value: safetyAck }],
+        localStorage: [{ name: storageName('safety-ack', url), value: safetyAck }],
       },
     ],
   },

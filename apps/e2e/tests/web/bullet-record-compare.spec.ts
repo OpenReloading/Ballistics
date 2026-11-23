@@ -1,5 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
-import { gotoHydrated } from './nav.ts'
+import { based, gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
@@ -71,7 +71,7 @@ test('on a phone the bullet record keeps Use in workbench in view and the full n
   )
   const workbench = page.locator('main .phone-action')
   await expect(workbench).toBeVisible()
-  await expect(workbench).toHaveAttribute('href', '/workbench/?bullet=demo-bullet-168')
+  await expect(workbench).toHaveAttribute('href', based('/workbench/?bullet=demo-bullet-168'))
   // the drawing and the data follow it
   await page.setViewportSize({ width: 1280, height: 800 })
   await expect(workbench).toBeHidden()
@@ -113,7 +113,7 @@ test('a compared bullet has Use in workbench; Add bullet opens the bullet search
   await gotoHydrated(page, '/bullets/compare?ids=demo-bullet-168,demo-bullet-150')
   await expect(
     page.getByRole('link', { name: 'Use in workbench: Demo Bullets 30 Cal 168 gr HPBT Demo' }),
-  ).toHaveAttribute('href', '/workbench/?bullet=demo-bullet-168')
+  ).toHaveAttribute('href', based('/workbench/?bullet=demo-bullet-168'))
   const unit = page.locator('.page-bar').getByRole('radiogroup', {
     name: 'Length unit of the page: drawings and table',
   })
@@ -136,6 +136,6 @@ test('the comparison without bullets says so without a warning and offers the li
   await expect(page.getByText('No bullets chosen.')).toBeVisible()
   await expect(page.getByRole('link', { name: 'Choose bullets' })).toHaveAttribute(
     'href',
-    '/bullets/',
+    based('/bullets/'),
   )
 })

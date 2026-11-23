@@ -114,7 +114,7 @@ test('keeps the draft in the browser and reopens it from the Open menu', async (
 test('a powder design fills the model values, is marked and named in the run and the print', async ({
   page,
 }) => {
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await putRecords(page, [record])
   await page.reload()
   await page.getByRole('button', { name: 'Enter values by hand' }).click()

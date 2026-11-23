@@ -185,7 +185,7 @@ test('the notice line and the notes keep their box through a result with warning
   page,
 }) => {
   test.setTimeout(60_000)
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await openSavedLoad(page)
   const line = page.locator('.run-line')
   const charge = loadForm(page).getByLabel(/^Charge mass/)
@@ -223,7 +223,7 @@ test('a ladder step size error in the Powder card moves no card and adds no scro
 }) => {
   test.setTimeout(60_000)
   await page.setViewportSize({ width: 1280, height: 650 })
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await openSavedLoad(page)
   const form = loadForm(page)
   await form.getByLabel(/^Ladder steps/).fill('5')

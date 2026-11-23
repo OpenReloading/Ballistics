@@ -17,7 +17,7 @@ const field = (page: Page, label: string, unit = 'mm') =>
 test('the cartridge list and page link to the designer, which starts from the record', async ({
   page,
 }) => {
-  await page.goto('/cartridges')
+  await page.goto('./cartridges')
   await page.getByRole('link', { name: 'New cartridge' }).click()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Cartridge designer')
   // no back link and no lead
@@ -30,7 +30,7 @@ test('the cartridge list and page link to the designer, which starts from the re
   await search.press('Enter')
   await expect(page.getByText('Started from CIP 308 Win.')).toBeVisible()
 
-  await page.goto('/cartridges/308-win')
+  await page.goto('./cartridges/308-win')
   await page.getByRole('link', { name: 'Open in designer' }).click()
   await expect(page).toHaveURL(/\/cartridges\/designer\/\?from=308-win$/)
   await expect(field(page, 'Cartridge L3')).toHaveValue('51.18')
@@ -52,7 +52,7 @@ test('the cartridge list and page link to the designer, which starts from the re
 })
 
 test('a change redraws, is marked with the record value and undoes', async ({ page }) => {
-  await page.goto('/cartridges/designer?from=308-win')
+  await page.goto('./cartridges/designer?from=308-win')
   await expect(desc(page)).toContainText('L1 39.62 mm')
   await field(page, 'Cartridge L1').fill('39')
   await expect(desc(page)).toContainText('L1 39 mm')
@@ -78,7 +78,7 @@ test('a change redraws, is marked with the record value and undoes', async ({ pa
 test('a refused input shows its reason at the field and keeps the last drawing', async ({
   page,
 }) => {
-  await page.goto('/cartridges/designer?from=308-win')
+  await page.goto('./cartridges/designer?from=308-win')
   await expect(desc(page)).toContainText('L1 39.62 mm')
   await field(page, 'Cartridge L1').fill('-1')
   await expect(field(page, 'Cartridge L1')).toHaveAttribute('aria-invalid', 'true')
@@ -96,7 +96,7 @@ test('a refused input shows its reason at the field and keeps the last drawing',
 test('a new cartridge without its base values gives a reason, not an empty page', async ({
   page,
 }) => {
-  await page.goto('/cartridges/designer')
+  await page.goto('./cartridges/designer')
   // before an edit: no error styling, the instruction once, in the drawing pane
   await expect(field(page, 'Cartridge R1')).toBeVisible()
   await expect(page.locator('main [aria-invalid="true"]')).toHaveCount(0)
@@ -144,7 +144,7 @@ const drawingTop = (page: Page) =>
   })
 
 test('a change, a check and a refusal move no field and not the drawing', async ({ page }) => {
-  await page.goto('/cartridges/designer?from=308-win')
+  await page.goto('./cartridges/designer?from=308-win')
   await expect(drawing(page)).toBeVisible()
   // the seating controls come with their own chunk (`SeatingPreview`, client only) and add three inputs below the form, so they are measured only once there, else a slow chunk moves the baseline
   await expect(field(page, 'Case capacity (H₂O)', 'cm³')).toBeVisible()
@@ -162,7 +162,7 @@ test('a change, a check and a refusal move no field and not the drawing', async 
 })
 
 test('keyboard: arrow keys step the field, no slider, changes are announced', async ({ page }) => {
-  await page.goto('/cartridges/designer?from=308-win')
+  await page.goto('./cartridges/designer?from=308-win')
   await expect(field(page, 'Cartridge L1')).toHaveValue('39.62')
   await expect(page.getByRole('slider')).toHaveCount(0)
   await field(page, 'Cartridge L1').press('ArrowUp')
@@ -181,7 +181,7 @@ test('keyboard: arrow keys step the field, no slider, changes are announced', as
 })
 
 test('print shows the life-size drawing and the values, not the form', async ({ page }) => {
-  await page.goto('/cartridges/designer?from=308-win')
+  await page.goto('./cartridges/designer?from=308-win')
   await expect(drawing(page)).toBeVisible()
   await page.emulateMedia({ media: 'print' })
   await expect(page.locator('svg[aria-labelledby="designer-drawing-print-title"]')).toBeVisible()
@@ -202,7 +202,7 @@ test('print shows the life-size drawing and the values, not the form', async ({ 
 test('the designer has no axe violation in light and dark, and fits 390 px', async ({ page }) => {
   for (const colorScheme of ['light', 'dark'] as const) {
     await page.emulateMedia({ colorScheme })
-    await page.goto('/cartridges/designer?from=308-win')
+    await page.goto('./cartridges/designer?from=308-win')
     await expect(field(page, 'Cartridge L3')).toHaveValue('51.18')
     // a changed field, a check and a refusal on screen too
     await field(page, 'Cartridge P1').fill('12.5')
@@ -216,7 +216,7 @@ test('the designer has no axe violation in light and dark, and fits 390 px', asy
     )
   }
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('/cartridges/designer?from=308-win')
+  await page.goto('./cartridges/designer?from=308-win')
   await expect(field(page, 'Cartridge L3')).toHaveValue('51.18')
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -238,7 +238,7 @@ test('the designer has no axe violation in light and dark, and fits 390 px', asy
 test('the designer shows no load-data notice; the caption says how changes are drawn', async ({
   page,
 }) => {
-  await page.goto('/cartridges/designer?from=308-win')
+  await page.goto('./cartridges/designer?from=308-win')
   await expect(drawing(page)).toBeVisible()
   await expect(page.locator('main')).not.toContainText('not load data')
   await expect(page.locator('main')).not.toContainText('simulations')
@@ -345,7 +345,7 @@ test('a chosen bullet seats at the entered COAL in the designed case, and the se
 })
 
 test('a design whose base record is gone opens read only with the reason', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('./')
   await putRecords(page, [
     {
       kind: 'cartridge',

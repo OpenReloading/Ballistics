@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test'
-import { gotoHydrated } from './nav.ts'
+import { based, gotoHydrated } from './nav.ts'
 
 // The default order of the discipline and target directories follows the federation's own rule and a clicked column header replaces it; the orders themselves are Vitest tests.
 const rows = (page: import('@playwright/test').Page, base: string) =>
-  page.locator(`main a[href^="${base}/"]:not([href$="/designer/"])`)
+  page.locator(`main a[href^="${based(base)}/"]:not([href$="/designer/"])`)
 
 test('the discipline directory lists ISSF by category, distance, then name, and a header sorts', async ({
   page,

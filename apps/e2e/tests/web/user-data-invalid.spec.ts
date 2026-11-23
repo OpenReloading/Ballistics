@@ -24,7 +24,7 @@ test.beforeEach(async ({ page }) => {
       await (await navigator.storage.getDirectory()).getFileHandle('export.json'),
     ]
   })
-  await page.goto('/')
+  await page.goto('./')
   await putRecords(page, [old])
 })
 

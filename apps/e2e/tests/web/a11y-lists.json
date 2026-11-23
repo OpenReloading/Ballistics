@@ -39,7 +39,7 @@
     },
     {
       "rule": "color-contrast",
-      "node": "<a href=\"/cartridges/",
+      "node": "/cartridges/",
       "where": "/bullets",
       "reason": "Link in the cartridge list of the bullet, a scroll box: the part outside the box counts as covered. Measured against the page background the link has 5:1 or more in both themes."
     },
@@ -51,7 +51,7 @@
     },
     {
       "rule": "color-contrast",
-      "node": "<a href=\"/disciplines/",
+      "node": "/disciplines/",
       "reason": "Link in a table that scrolls sideways: the part outside the box counts as covered. Measured against the page background the link has 5:1 or more in both themes."
     },
     {

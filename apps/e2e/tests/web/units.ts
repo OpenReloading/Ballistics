@@ -1,15 +1,16 @@
 import { expect, type Page } from '@playwright/test'
+import { storageName } from './edition.ts'
 
 const defaultOverrides: Record<string, string> = { lineOfSightOffset: 'cm' }
 
 /** Before every page load unless one is stored, so the specs do not depend on the browser locale; Metric (SI) with drop in cm shows the units of the old metric switch. */
 export const storeUnits = (page: Page, preset = 'metric-grams', overrides = defaultOverrides) =>
   page.addInitScript(
-    ([p, o]) => {
-      if (localStorage.getItem('units') === null)
-        localStorage.setItem('units', JSON.stringify({ preset: p, overrides: o }))
+    ([[p, o], store]) => {
+      if (localStorage.getItem(store) === null)
+        localStorage.setItem(store, JSON.stringify({ preset: p, overrides: o }))
     },
-    [preset, overrides] as const,
+    [[preset, overrides], storageName('units')] as const,
   )
 
 /** The Settings entry of the sidebar: a button opening the settings dialog, in English or German. */
@@ -32,7 +33,7 @@ async function settingsDialog(page: Page) {
 /** The settings dialog in a second tab of the same browser context; the first page follows its changes. */
 async function openSettings(page: Page) {
   const settings = await page.context().newPage()
-  await settings.goto('/powders')
+  await settings.goto('./powders')
   await settingsDialog(settings)
   return settings
 }

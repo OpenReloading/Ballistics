@@ -25,7 +25,7 @@ const noSideScroll = (page: Page) =>
 test('the Measurements tab opens the route with the load strings, and an added string joins the table', async ({
   page,
 }) => {
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await openSavedLoad(page)
   await runLine(page)
   await page.getByRole('tab', { name: 'Measurements', exact: true }).click()
@@ -96,7 +96,7 @@ for (const answer of ['loads', 'fails'] as const)
   test(`the Measurements tab holds the tuning link while the cartridge record loads, and shows it once the record ${answer}`, async ({
     page,
   }) => {
-    await page.goto('/workbench')
+    await page.goto('./workbench')
     await openSavedLoad(page)
     await runLine(page)
     await page.getByRole('tab', { name: 'Measurements', exact: true }).click()
@@ -317,7 +317,7 @@ const fittedRecord = (id: string, name: string, vivacity: number, previous?: str
 
 test('a load on a refitted powder says a newer fit exists and moves to it', async ({ page }) => {
   const old = '7a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d'
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await putRecords(page, [
     fittedRecord(old, 'DP40', 0.612),
     fittedRecord('8b2c3d4e-5f6a-4b7c-9d8e-0f1a2b3c4d5e', 'DP40 (fit 2)', 0.64, `user:${old}`),

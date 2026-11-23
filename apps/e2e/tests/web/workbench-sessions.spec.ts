@@ -1,6 +1,7 @@
 import { expect, type Page, test } from '@playwright/test'
 import { defined } from '../../../web/test/defined.ts'
 import { barButton } from './bar.ts'
+import { storageName } from './edition.ts'
 import { storeUnits } from './units.ts'
 import { formValues, openSavedLoad } from './workbench.ts'
 import { runLine } from './workbench-run.ts'
@@ -15,20 +16,23 @@ type Stored = {
 }
 
 const stored = (page: Page, kind: string) =>
-  page.evaluate(async (kind) => {
-    const db: IDBDatabase = await new Promise((ok, no) => {
-      const r = indexedDB.open('rangefoundry-user-data')
-      r.onsuccess = () => ok(r.result)
-      r.onerror = () => no(r.error)
-    })
-    const all: Stored[] = await new Promise((ok, no) => {
-      const r = db.transaction('records').objectStore('records').getAll()
-      r.onsuccess = () => ok(r.result)
-      r.onerror = () => no(r.error)
-    })
-    db.close()
-    return all.filter((r) => r.kind === kind)
-  }, kind)
+  page.evaluate(
+    async ([kind, store]) => {
+      const db: IDBDatabase = await new Promise((ok, no) => {
+        const r = indexedDB.open(store)
+        r.onsuccess = () => ok(r.result)
+        r.onerror = () => no(r.error)
+      })
+      const all: Stored[] = await new Promise((ok, no) => {
+        const r = db.transaction('records').objectStore('records').getAll()
+        r.onsuccess = () => ok(r.result)
+        r.onerror = () => no(r.error)
+      })
+      db.close()
+      return all.filter((r) => r.kind === kind)
+    },
+    [kind, storageName('rangefoundry-user-data')] as const,
+  )
 
 const file = [
   'string,velocity,velocityUnit,coldBore,excluded',
@@ -44,7 +48,7 @@ test('a chronograph file on the Measurements tab is a stored session that the sa
     ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
   })
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await openSavedLoad(page)
   await runLine(page)
   await page.getByRole('tab', { name: 'Measurements', exact: true }).click()
@@ -77,7 +81,7 @@ test('a chronograph file on the Measurements tab is a stored session that the sa
     .poll(async () => (await stored(page, 'session'))[0]?.data.strings.map((s) => s.load))
     .toEqual([`user:${load.id}`, undefined])
 
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await (await barButton(page, 'Open')).click()
   await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
   await page.getByRole('button', { name: load.name, exact: true }).click()
