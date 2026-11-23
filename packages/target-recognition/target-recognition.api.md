@@ -217,6 +217,64 @@ export function matchHoles(marks: readonly Point[], holes: readonly Point[], dia
 export function median1(v: readonly number[]): number;
 
 // @public
+export type ModelManifest = {
+    schemaVersion: 1;
+    id: string;
+    version: string;
+    file: {
+        name: string;
+        url: string;
+        sha256: string;
+        bytes: number;
+    };
+    runtime: {
+        package: string;
+        version: string;
+        wasmPaths: string;
+        opset: number;
+    };
+    input: {
+        holePx: number;
+        channels: 'rgb' | 'bgr';
+        range: [number, number];
+        sizeMultiple: number;
+    };
+    output: {
+        stride: number;
+        channels: number;
+        threshold: number;
+        sure: number;
+    };
+    license: {
+        model: 'CC0-1.0' | 'CC-BY-4.0' | 'ISC' | 'MIT' | 'Apache-2.0';
+        training: {
+            classes: {
+                own: number;
+                'third-party': number;
+                synthetic: number;
+            };
+            kinds: Record<string, number>;
+        };
+    };
+    measured: {
+        synthetic: ModelScores;
+        holdout: ModelScores | null;
+        parity: number;
+    };
+};
+
+// @public
+export const modelManifest: z.ZodType<ModelManifest>;
+
+// @public
+export type ModelScores = {
+    photos: number;
+    median: number;
+    p90: number | null;
+    max: number;
+};
+
+// @public
 export function onPhoto<F extends PrintedFace = PrintedFace>(search: FaceSearch<F>, k: number, x0: number, y0: number): FaceSearch<F>;
 
 // @public

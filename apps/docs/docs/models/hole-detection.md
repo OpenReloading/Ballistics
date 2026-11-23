@@ -44,6 +44,8 @@ The default bar: a median of 1 correction or fewer, a 90th percentile of 3 or fe
 
 Reference holes are labeled one file per labeler in the format of `packages/target-recognition/src/label-set.ts` (`labelSet`): per photo its hash, source, license, author, shooting session, kind, usable and complete, the visible hole diameter in px and the hole centers, each hole with an uncertain flag. `packages/target-recognition/scripts/label-studio.mts` converts a Label Studio export into it, and `packages/target-recognition/scripts/label-agreement.mts` prints how far two labelers disagree in the statistics above, over the photos both mark usable and complete.
 
+A learned model file comes with a manifest in the format of `packages/target-recognition/src/model-manifest.ts` (`modelManifest`): the model id and version; the file's https URL, SHA-256 and size; the runtime package, its exact version and WASM path; the ONNX opset; the input and output contracts; the model license; the training photos as counts per data class (own, third-party, synthetic) and per target kind, with no photo or source listed; the synthetic and holdout corrections in the statistics above; and the largest output difference between PyTorch and ONNX Runtime.
+
 Code: `packages/target-recognition/src/hole-matching.ts`, `matchHoles`, `corrections`, `correctionStats`.
 
 ## Equations
