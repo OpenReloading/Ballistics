@@ -1,7 +1,7 @@
 'use client'
 
 import { ActionIcon, SegmentedControl, Tooltip } from '@mantine/core'
-import { ArrowsOut } from '@phosphor-icons/react'
+import { Maximize2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { type ComponentProps, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
@@ -56,7 +56,7 @@ export function CartridgeFigure({
               aria-label={t('Full view')}
               onClick={() => setFull(true)}
             >
-              <ArrowsOut size={16} aria-hidden="true" />
+              <Maximize2 size={16} aria-hidden="true" />
             </ActionIcon>
           </Tooltip>
         </div>

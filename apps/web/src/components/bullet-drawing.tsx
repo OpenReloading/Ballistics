@@ -1,6 +1,5 @@
 'use client'
 
-import { Ruler } from '@phosphor-icons/react/ssr'
 import type { Bullet } from '@rangefoundry/schema'
 import { face, type LengthUnit, lengthText } from '@rangefoundry/svg-drawings'
 import {
@@ -10,6 +9,7 @@ import {
   bulletSymbols,
   recordProfile,
 } from '@rangefoundry/svg-drawings/bullet'
+import { Ruler } from 'lucide-react'
 import { useTranslation } from '../i18n/language.ts'
 import { type Translator, translator } from '../i18n/translate.ts'
 import { DrawingNotes } from './record-actions.tsx'

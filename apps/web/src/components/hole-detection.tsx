@@ -1,7 +1,6 @@
 'use client'
 
 import { ActionIcon, Anchor, Button, NativeSelect } from '@mantine/core'
-import { ArrowClockwise, ArrowCounterClockwise, X } from '@phosphor-icons/react'
 import {
   fromSi,
   type ShotGroup,
@@ -19,6 +18,7 @@ import {
   fitPicked,
   type HoleProposal,
 } from '@rangefoundry/target-recognition'
+import { RotateCcw, RotateCw, X } from 'lucide-react'
 import {
   type KeyboardEvent,
   type PointerEvent,
@@ -1211,7 +1211,7 @@ function RotateStep({
             disabled={running}
             onClick={() => onTurnBy(Math.PI / 2)}
           >
-            <ArrowCounterClockwise size={14} aria-hidden="true" />
+            <RotateCcw size={14} aria-hidden="true" />
           </ActionIcon>
           <ActionIcon
             variant="default"
@@ -1221,7 +1221,7 @@ function RotateStep({
             disabled={running}
             onClick={() => onTurnBy(-Math.PI / 2)}
           >
-            <ArrowClockwise size={14} aria-hidden="true" />
+            <RotateCw size={14} aria-hidden="true" />
           </ActionIcon>
         </span>
       </div>

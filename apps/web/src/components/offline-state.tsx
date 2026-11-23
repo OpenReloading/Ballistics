@@ -1,7 +1,7 @@
 'use client'
 
 import { Button, Code, EmptyState, Group } from '@mantine/core'
-import { type Icon, MagnifyingGlass, WifiSlash } from '@phosphor-icons/react'
+import { type LucideIcon, Search as SearchIcon, WifiOff } from 'lucide-react'
 import { type ReactNode, useSyncExternalStore } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
@@ -23,7 +23,7 @@ function StandIn({
   links,
   linksLabel,
 }: {
-  icon: Icon
+  icon: LucideIcon
   title: string
   description: ReactNode
   action: ReactNode
@@ -65,7 +65,7 @@ export function OfflineState({ links }: { links: PageLinks }) {
   if (address.split('?')[0]?.replace(/\/$/, '') === basePath + offlinePage)
     return (
       <StandIn
-        icon={WifiSlash}
+        icon={WifiOff}
         title={t('Works offline')}
         description={t('The tools, your own records and pages you opened before work offline.')}
         action={retry}
@@ -79,7 +79,7 @@ export function OfflineState({ links }: { links: PageLinks }) {
   ).split('{address}')
   return (
     <StandIn
-      icon={WifiSlash}
+      icon={WifiOff}
       title={t('Not available offline')}
       description={
         <>
@@ -101,7 +101,7 @@ export function NotFoundState({ links }: { links: PageLinks }) {
   const { t } = useTranslation()
   return (
     <StandIn
-      icon={MagnifyingGlass}
+      icon={SearchIcon}
       title={t('Nothing at this address')}
       description={t(
         'This page could not be found. Search the records, or open one of these pages.',

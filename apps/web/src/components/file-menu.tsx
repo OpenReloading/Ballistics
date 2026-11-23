@@ -1,13 +1,13 @@
 'use client'
 
 import { Button, Group, Kbd, Menu, Textarea } from '@mantine/core'
-import { CaretDown, FloppyDisk, FolderOpen } from '@phosphor-icons/react'
 import {
   type EmbeddedFile,
   parseRef,
   type UserRecord,
   type UserRecordKind,
 } from '@rangefoundry/schema'
+import { ChevronDown, FolderOpen, Save as SaveIcon } from 'lucide-react'
 import {
   type Dispatch,
   memo,
@@ -1563,7 +1563,7 @@ function FileMenuOf<K extends UserRecordKind>({
             ref={openButton}
             variant="default"
             leftSection={<FolderOpen aria-hidden="true" />}
-            rightSection={<CaretDown size={12} aria-hidden="true" />}
+            rightSection={<ChevronDown size={12} aria-hidden="true" />}
           >
             {t('Open')}
           </Button>
@@ -1593,7 +1593,7 @@ function FileMenuOf<K extends UserRecordKind>({
       <Button.Group className="save-group">
         <Button
           variant="default"
-          leftSection={<FloppyDisk aria-hidden="true" />}
+          leftSection={<SaveIcon aria-hidden="true" />}
           onClick={commands.save}
           title={t('Save ({shortcut})', { shortcut: shortcutLabel('save') })}
           aria-keyshortcuts={shortcutAriaKeys('save')}
@@ -1603,7 +1603,7 @@ function FileMenuOf<K extends UserRecordKind>({
         <Menu position="bottom-end" withInitialFocusPlaceholder={false}>
           <Menu.Target>
             <Button variant="default" className="save-more" aria-label={t('Save options')}>
-              <CaretDown size={12} aria-hidden="true" />
+              <ChevronDown size={12} aria-hidden="true" />
             </Button>
           </Menu.Target>
           <Menu.Dropdown>
@@ -1774,16 +1774,16 @@ export function FileMenuPlaceholder() {
         variant="default"
         disabled
         leftSection={<FolderOpen aria-hidden="true" />}
-        rightSection={<CaretDown size={12} aria-hidden="true" />}
+        rightSection={<ChevronDown size={12} aria-hidden="true" />}
       >
         {t('Open')}
       </Button>
       <Button.Group className="save-group">
-        <Button variant="default" disabled leftSection={<FloppyDisk aria-hidden="true" />}>
+        <Button variant="default" disabled leftSection={<SaveIcon aria-hidden="true" />}>
           {t('Save')}
         </Button>
         <Button variant="default" disabled className="save-more" aria-label={t('Save options')}>
-          <CaretDown size={12} aria-hidden="true" />
+          <ChevronDown size={12} aria-hidden="true" />
         </Button>
       </Button.Group>
     </Group>

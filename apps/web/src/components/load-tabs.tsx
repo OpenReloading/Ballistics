@@ -1,7 +1,7 @@
 'use client'
 
 import { ActionIcon, Button, Popover } from '@mantine/core'
-import { CaretDown, Check, FolderOpen, PencilSimple, Plus, X } from '@phosphor-icons/react'
+import { Check, ChevronDown, FolderOpen, Pencil, Plus, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { controlSize } from '../lib/theme.ts'
@@ -98,7 +98,7 @@ export function LoadTabs({
                   {index + 1}{' '}
                 </span>
               }
-              rightSection={<CaretDown size={12} aria-hidden="true" />}
+              rightSection={<ChevronDown size={12} aria-hidden="true" />}
               onClick={() => setMenu((o) => !o)}
             >
               {label}
@@ -119,7 +119,7 @@ export function LoadTabs({
                     }}
                   >
                     <span className="load-row-check" aria-hidden="true">
-                      {tb.active && <Check size={14} weight="bold" />}
+                      {tb.active && <Check size={14} strokeWidth={2.25} />}
                     </span>
                     <span className="load-row-title">{tb.title}</span>
                     {tb.unsaved && (
@@ -150,7 +150,7 @@ export function LoadTabs({
               <Button
                 variant="subtle"
                 size={controlSize.row.button}
-                leftSection={<PencilSimple size={14} aria-hidden="true" />}
+                leftSection={<Pencil size={14} aria-hidden="true" />}
                 onClick={() => {
                   setMenu(false)
                   before.current = { custom: name !== generated, name }

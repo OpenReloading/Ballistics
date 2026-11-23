@@ -10,8 +10,8 @@ import {
   Textarea,
   TextInput,
 } from '@mantine/core'
-import { Backspace, Camera, Gauge } from '@phosphor-icons/react'
 import { toSi } from '@rangefoundry/schema'
+import { Camera, Delete as DeleteIcon, Gauge } from 'lucide-react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { decimalMark, formatNumber, plainNumber } from '../i18n/number.ts'
@@ -246,7 +246,7 @@ export function RangeMode() {
                     aria-label={t('Delete last digit')}
                     onClick={r.erase}
                   >
-                    <Backspace size={24} aria-hidden="true" />
+                    <DeleteIcon size={24} aria-hidden="true" />
                   </Button>
                 </SimpleGrid>
                 <Button type="submit" h={56} fz="lg" disabled={r.saving || r.entry.trim() === ''}>

@@ -1,7 +1,7 @@
 'use client'
 
 import { Badge, Box, Button, Text } from '@mantine/core'
-import { Flask, Plus } from '@phosphor-icons/react'
+import { FlaskConical, Plus } from 'lucide-react'
 import { useDeferredValue, useMemo } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
@@ -60,7 +60,7 @@ function NoPowders() {
   const { t } = useTranslation()
   return (
     <EmptyNote
-      icon={<Flask size={24} aria-hidden="true" />}
+      icon={<FlaskConical size={24} aria-hidden="true" />}
       title={t('No powders yet')}
       description={t(
         'The catalogue has no powders. Make one with New powder, or import a table of your powders with Import.',

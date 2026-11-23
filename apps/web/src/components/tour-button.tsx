@@ -1,7 +1,7 @@
 'use client'
 
 import { Button, Indicator } from '@mantine/core'
-import { Signpost } from '@phosphor-icons/react'
+import { Signpost } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { markTourSeen, type TourPage, tourSeen, tours } from '../lib/tours.ts'

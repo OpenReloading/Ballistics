@@ -10,7 +10,7 @@ import {
   type TextInputProps,
   useCombobox,
 } from '@mantine/core'
-import { ListMagnifyingGlass, MagnifyingGlass } from '@phosphor-icons/react'
+import { Search, TextSearch } from 'lucide-react'
 import { type ReactNode, useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import type { Translator } from '../i18n/translate.ts'
@@ -119,7 +119,7 @@ function endSection({
             aria-label={browse.label}
             onClick={onBrowse}
           >
-            <ListMagnifyingGlass size={16} aria-hidden="true" />
+            <TextSearch size={16} aria-hidden="true" />
           </ActionIcon>
         )}
       </Group>
@@ -249,7 +249,7 @@ export function RecordSearch<T extends { id: string }>({
               placeholder: chosen,
             })}
             {...(chosen !== undefined &&
-              !chevron && { leftSection: <MagnifyingGlass size={16} aria-hidden="true" /> })}
+              !chevron && { leftSection: <Search size={16} aria-hidden="true" /> })}
             autoComplete="off"
             value={q}
             rightSection={endSection({

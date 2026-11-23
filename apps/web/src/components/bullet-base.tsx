@@ -1,8 +1,8 @@
 'use client'
 
 import { ActionIcon, NativeSelect, Tooltip } from '@mantine/core'
-import { ArrowCounterClockwise } from '@phosphor-icons/react'
 import { baseTypes } from '@rangefoundry/schema'
+import { RotateCcw } from 'lucide-react'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import {
@@ -76,7 +76,7 @@ export function BaseFormField() {
               aria-label={restore}
               onClick={() => resetKeys([baseTypeKey])}
             >
-              <ArrowCounterClockwise size={16} aria-hidden="true" />
+              <RotateCcw size={16} aria-hidden="true" />
             </ActionIcon>
           </Tooltip>
         ) : undefined

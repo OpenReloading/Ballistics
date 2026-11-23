@@ -1,8 +1,8 @@
 'use client'
 
 import { ActionIcon, Badge, Button, Checkbox, Group, Popover, Stack, Tooltip } from '@mantine/core'
-import { CaretDown, Trash } from '@phosphor-icons/react'
 import type { UserRecord } from '@rangefoundry/schema'
+import { ChevronDown, Trash } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { deleteRecords, storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
@@ -118,7 +118,7 @@ export function SourceFilter({
           aria-label={t('Source: {text}', { text })}
           aria-haspopup="dialog"
           w="9rem"
-          rightSection={<CaretDown size={12} aria-hidden="true" />}
+          rightSection={<ChevronDown size={12} aria-hidden="true" />}
           justify="space-between"
         >
           {text}

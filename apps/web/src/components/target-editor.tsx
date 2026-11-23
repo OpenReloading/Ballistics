@@ -21,26 +21,6 @@ import {
   Tooltip,
 } from '@mantine/core'
 import { useElementSize, useMediaQuery, useMergedRef } from '@mantine/hooks'
-import {
-  ArrowClockwise,
-  ArrowCounterClockwise,
-  ArrowsIn,
-  ArrowsOut,
-  Camera,
-  CaretDown,
-  CaretUp,
-  Check,
-  Cursor,
-  Eye,
-  FilePlus,
-  FrameCorners,
-  ImageBroken,
-  Image as ImageIcon,
-  PencilSimple,
-  Plus,
-  Target,
-  Trash,
-} from '@phosphor-icons/react'
 import { overlay } from '@rangefoundry/ballistics'
 import {
   type CalibrationReference,
@@ -55,6 +35,26 @@ import {
   targetSheet,
   type UserRecord,
 } from '@rangefoundry/schema'
+import {
+  Camera,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Eye,
+  FilePlus,
+  Image as ImageIcon,
+  ImageOff,
+  Maximize2,
+  Minimize2,
+  MousePointer,
+  Pencil,
+  Plus,
+  RotateCcw,
+  RotateCw,
+  Scan,
+  Target,
+  Trash,
+} from 'lucide-react'
 import {
   type CSSProperties,
   type Dispatch,
@@ -626,7 +626,7 @@ function FilterPanel({ ed }: { ed: Ed }) {
         disabled={filter[key] === range.none}
         onClick={() => setFilter({ ...filter, [key]: range.none })}
       >
-        <ArrowCounterClockwise size={12} aria-hidden="true" />
+        <RotateCcw size={12} aria-hidden="true" />
       </ActionIcon>
     </Row>
   )
@@ -1706,7 +1706,7 @@ function SheetButtons({ ed }: { ed: Ed }) {
   return (
     <>
       <IconButton label={t('Rename sheet')} data-rename onClick={() => setRenaming(true)}>
-        <PencilSimple />
+        <Pencil />
       </IconButton>
       <IconButton label={t('New sheet')} onClick={create}>
         <FilePlus />
@@ -1764,7 +1764,7 @@ function PhotoPanel({ ed }: { ed: Ed }) {
         <Button
           size={controlSize.row.button}
           variant="default"
-          leftSection={<ImageBroken size={14} aria-hidden="true" />}
+          leftSection={<ImageOff size={14} aria-hidden="true" />}
           disabled={!sheet.photo}
           onClick={() => {
             setPop(undefined)
@@ -1872,7 +1872,7 @@ function CalibrateTool({ ed }: { ed: Ed }) {
       description={unscaled ? t('The photo has no scale yet.') : undefined}
       icon={
         <span className="icon-slot" aria-hidden="true">
-          <FrameCorners />
+          <Scan />
         </span>
       }
       frame={(popover) => (
@@ -1919,7 +1919,7 @@ function ToolSwitch({ ed }: { ed: Ed }) {
                 'Select: drag shots, points of aim and reference points; drag the background to pan',
               )}
             >
-              <Cursor size={14} aria-hidden="true" />
+              <MousePointer size={14} aria-hidden="true" />
               <span className="seg-text">{t('Select')}</span>
             </Group>
           ),
@@ -1956,7 +1956,7 @@ function UndoRedo({ ed }: { ed: Ed }) {
         disabled={!h.past.length}
         onClick={() => setH(undo)}
       >
-        <ArrowCounterClockwise />
+        <RotateCcw />
       </IconButton>
       {!compact && (
         <IconButton
@@ -1965,7 +1965,7 @@ function UndoRedo({ ed }: { ed: Ed }) {
           disabled={!h.future.length}
           onClick={() => setH(redo)}
         >
-          <ArrowClockwise />
+          <RotateCw />
         </IconButton>
       )}
     </>
@@ -2031,7 +2031,7 @@ function ExpandButton({ ed }: { ed: Ed }) {
       data-expand
       onClick={() => expand.onChange(!expand.expanded)}
     >
-      {expand.expanded ? <ArrowsIn /> : <ArrowsOut />}
+      {expand.expanded ? <Minimize2 /> : <Maximize2 />}
     </IconButton>
   )
 }
@@ -2235,9 +2235,9 @@ function ShotsHead({ ed }: { ed: Ed }) {
           onClick={() => setShotsOpen((o) => !o)}
         >
           {shotsOpen ? (
-            <CaretDown size={12} aria-hidden="true" />
+            <ChevronDown size={12} aria-hidden="true" />
           ) : (
-            <CaretUp size={12} aria-hidden="true" />
+            <ChevronUp size={12} aria-hidden="true" />
           )}
           {t('Shots ({count})', { count: group.shots.length })}
         </button>
@@ -2353,9 +2353,9 @@ function BottomSheet({ ed }: { ed: Ed }) {
         )}
         <span className="strip-text">{summaryLine}</span>
         {sheetOpen ? (
-          <CaretDown size={16} aria-hidden="true" />
+          <ChevronDown size={16} aria-hidden="true" />
         ) : (
-          <CaretUp size={16} aria-hidden="true" />
+          <ChevronUp size={16} aria-hidden="true" />
         )}
         <span className="visually-hidden">{sheetOpen ? t('Hide panels') : t('Show panels')}</span>
       </button>
@@ -2424,9 +2424,9 @@ function StatsSide({ ed }: { ed: Ed }) {
             onClick={() => setAllStats((o) => !o)}
           >
             {allStats ? (
-              <CaretUp size={12} aria-hidden="true" />
+              <ChevronUp size={12} aria-hidden="true" />
             ) : (
-              <CaretDown size={12} aria-hidden="true" />
+              <ChevronDown size={12} aria-hidden="true" />
             )}
             {t('All statistics')}
           </button>

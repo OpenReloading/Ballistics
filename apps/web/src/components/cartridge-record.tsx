@@ -11,8 +11,8 @@ import {
   TableTr,
   Tooltip,
 } from '@mantine/core'
-import { Crosshair, Cylinder, Gauge, Ruler } from '@phosphor-icons/react'
 import type { SpecValue } from '@rangefoundry/schema'
+import { Crosshair, Cylinder, Gauge, Ruler } from 'lucide-react'
 import {
   type CSSProperties,
   createContext,

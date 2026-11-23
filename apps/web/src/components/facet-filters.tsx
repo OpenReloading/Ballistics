@@ -1,7 +1,7 @@
 'use client'
 
 import { Button, Checkbox, Group, Popover, Stack } from '@mantine/core'
-import { CaretDown } from '@phosphor-icons/react'
+import { ChevronDown } from 'lucide-react'
 import { useMemo } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import type { DirectoryState } from '../lib/directory.ts'
@@ -64,7 +64,7 @@ export function FacetFilters<T>({
                 variant="default"
                 size={controlSize.row.button}
                 aria-haspopup="dialog"
-                rightSection={<CaretDown size={12} aria-hidden="true" />}
+                rightSection={<ChevronDown size={12} aria-hidden="true" />}
                 justify="space-between"
               >
                 {text}

@@ -12,8 +12,8 @@ import {
   TableTr,
   Text,
 } from '@mantine/core'
-import { Flask, Plus } from '@phosphor-icons/react'
 import type { Bullet } from '@rangefoundry/schema'
+import { FlaskConical, Plus } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { type CSSProperties, type ReactNode, useState } from 'react'
 import Link from '@/platform/link.tsx'
@@ -130,7 +130,7 @@ export function BulletCompare({
                           className="compare-workbench screen-only"
                           aria-label={t('Use in workbench: {name}', { name: productLabel(b) })}
                         >
-                          <Flask aria-hidden="true" />
+                          <FlaskConical aria-hidden="true" />
                           {t('Use in workbench')}
                         </Link>
                       </span>
