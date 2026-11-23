@@ -33,8 +33,8 @@ export default defineConfig({
   fullyParallel: true,
   // a `test.only` or `describe.only` left in a spec fails the CI run instead of skipping the rest
   forbidOnly: !!process.env.CI,
-  // CI's default `dot` plus annotations, so a failed test shows on the pull request without the job log
-  reporter: process.env.GITHUB_ACTIONS ? [['dot'], ['github']] : 'list',
+  // on GitHub Actions the default `dot` plus annotations, so a failed test shows on the pull request without the job log
+  ...(process.env.GITHUB_ACTIONS && { reporter: [['dot'], ['github']] }),
   // the default without {-projectName}: a renamed project still finds the committed snapshots
   snapshotPathTemplate:
     '{testDir}/{testFileDir}/{testFileName}-snapshots/{arg}{-snapshotSuffix}{ext}',
@@ -49,6 +49,8 @@ export default defineConfig({
             PAGES_URL: 'https://openreloading.github.io',
             PORT: '3043',
           },
+          // the build's output and client sizes show in the job log
+          stdout: 'pipe',
           timeout: 180_000,
           reuseExistingServer: !process.env.CI,
         },

@@ -71,16 +71,22 @@ for (const { name, base, prefix } of editions)
         else expect(unexplained(messages, browserName, name)).toEqual([])
       })
 
-for (const { name, base } of editions) {
+for (const { name, base, prefix } of editions) {
   const other = editions.find((e) => e.name !== name)?.prefix ?? ''
-  test(`${name}: the other edition's stored language does not switch this one`, async ({
+  test(`${name}: the other edition's stored language does not win over this one`, async ({
     page,
   }) => {
-    await page.addInitScript((key) => localStorage.setItem(key, 'de'), `${other}language`)
+    // opposite values: the German heading only appears once this edition's own key is applied, so the wait fails when the other key wins
+    await page.addInitScript(
+      (keys) => {
+        localStorage.setItem(keys.own, 'de')
+        localStorage.setItem(keys.foreign, 'en')
+      },
+      { own: `${prefix}language`, foreign: `${other}language` },
+    )
     await page.goto(`${base}workbench/`)
-    await expect(page.locator('html[data-hydrated]')).toBeAttached()
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Load workbench')
-    await expect(page.locator('html')).toHaveAttribute('lang', 'en')
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Werkbank für Laborierungen')
+    await expect(page.locator('html')).toHaveAttribute('lang', 'de')
   })
 }
 
