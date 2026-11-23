@@ -796,8 +796,27 @@ describe('--folds', { timeout: 60_000 }, () => {
       })),
     )
     const r = await verify({ ...options, rows: writeRows(rowsCsv(rows, planted)), folds: true })
-    expect(r.folds?.each[4]?.interval.halfWidth).toBeLessThan(0.001)
-    expect(r.folds?.each[0]?.interval.halfWidth).toBeGreaterThan(0.01)
+    expect(r.folds?.each[4]?.interval.byBarrel?.rifle?.halfWidth).toBeLessThan(0.001)
+    expect(r.folds?.each[0]?.interval.byBarrel?.rifle?.halfWidth).toBeGreaterThan(0.01)
+  })
+
+  it('scores each row of a fold by the half width of its barrel class in that fold', async () => {
+    const rows = cartridges.flatMap((cartridge) =>
+      [2.0, 2.2, 2.4, 2.6].flatMap((charge, i) => [
+        { cartridge, charge, velocity: 0 },
+        // only the handgun rows print errors
+        { cartridge, charge, barrel: 250, velocity: i % 2 === 0 ? 0.05 : -0.05 },
+      ]),
+    )
+    const r = await verify({ ...options, rows: writeRows(rowsCsv(rows, planted)), folds: true })
+    for (const f of r.folds?.each ?? []) {
+      expect(f.interval.byBarrel?.handgun?.trainingRows).toBe(16)
+      expect(f.interval.byBarrel?.rifle?.trainingRows).toBe(16)
+      expect(f.interval.byBarrel?.handgun?.halfWidth).toBeGreaterThan(0.04)
+      expect(f.interval.byBarrel?.rifle?.halfWidth).toBeLessThan(0.01)
+    }
+    // under the rifle width the handgun rows, half of each fold, would be outside
+    expect(r.folds?.each.map((f) => f.overall.interval?.coverage)).toEqual([0.75, 0.75, 0.75, 1, 1])
   })
 
   it('adds the folds to the fit of every training row', async () => {

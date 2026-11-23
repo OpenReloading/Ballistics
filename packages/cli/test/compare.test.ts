@@ -80,6 +80,17 @@ describe('compare', () => {
     expect((await compare(options, 'm3', 'm3')).change.estimatedCapacity).toBeUndefined()
   })
 
+  it('gives no coverage change against a baseline saved with one half width for every row', async () => {
+    const { interval: _, ...saved } = await verify(options)
+    const interval = { basis: 'training', halfWidth: 0.091, trainingRows: 10 }
+    const r = await compare(
+      options,
+      writeRows(JSON.stringify({ ...saved, interval }), 'one.json'),
+      'm3',
+    )
+    expect(r.change.overall).toMatchObject({ velocityMedian: 0, intervalCoverage: null })
+  })
+
   it('takes a saved verify result as the baseline', async () => {
     const saved = writeRows(JSON.stringify(await verify(options)), 'baseline.json')
     const r = await compare(options, saved, worse)
