@@ -33,6 +33,7 @@ export default defineConfig({
   fullyParallel: true,
   // a `test.only` or `describe.only` left in a spec fails the CI run instead of skipping the rest
   forbidOnly: !!process.env.CI,
+  // CI's default `dot` plus annotations, so a failed test shows on the pull request without the job log
   reporter: process.env.GITHUB_ACTIONS ? [['dot'], ['github']] : 'list',
   // the default without {-projectName}: a renamed project still finds the committed snapshots
   snapshotPathTemplate:

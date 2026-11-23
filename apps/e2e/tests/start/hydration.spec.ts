@@ -105,8 +105,9 @@ test('text typed before hydration stays in the field', async ({ page }) => {
   })
   await page.goto('next/workbench/', { waitUntil: 'commit' })
   const notes = page.getByRole('textbox', { name: 'Notes' })
-  await notes.click()
-  await notes.pressSequentially('42 grains')
+  // focus and keys, not a click: in WebKit the field is never stable for a click while the scripts are held
+  await notes.focus()
+  await page.keyboard.type('42 grains')
   await expect(page.locator('html[data-hydrated]')).not.toBeAttached()
   release()
   await expect(page.locator('html[data-hydrated]')).toBeAttached()
