@@ -568,7 +568,7 @@ function validateInput(input: HoleDetectionInput): { holePx: number; poly: Point
 }
 
 /** A RangeError for an image other than width x height RGBA pixels, a scale that is not finite or a backing channel outside 0 to 255. */
-function checkScales(input: HoleDetectionInput): void {
+export function checkScales(input: HoleDetectionInput): void {
   const { image, pxPerM, expectedHoleDiameter, minContrast = 0.15, holeScale = 1, backing } = input
   if (
     !Number.isInteger(image.width) ||
@@ -583,7 +583,11 @@ function checkScales(input: HoleDetectionInput): void {
 }
 
 /** The bounding box of `poly` grown by `margin`, whole px, cut at the image edge. */
-function cropBox(poly: Point[], margin: number, image: RgbaImage) {
+export function cropBox(
+  poly: Point[],
+  margin: number,
+  image: RgbaImage,
+): { x0: number; y0: number; x1: number; y1: number } {
   return {
     x0: clamp(Math.floor(Math.min(...poly.map((p) => p.x)) - margin), 0, image.width),
     y0: clamp(Math.floor(Math.min(...poly.map((p) => p.y)) - margin), 0, image.height),
