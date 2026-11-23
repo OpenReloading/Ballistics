@@ -13,6 +13,10 @@ const withTraining = (training: object) => ({
 })
 const withClasses = (classes: object) =>
   withTraining({ classes: { ...example.license.training.classes, ...classes } })
+const withSynthetic = (synthetic: object) => ({
+  ...example,
+  measured: { ...example.measured, synthetic: { ...example.measured.synthetic, ...synthetic } },
+})
 const { model: _, ...licenseWithoutModel } = example.license
 const trainingPath = ['license', 'training']
 
@@ -39,10 +43,17 @@ const rejected: [string, object, object][] = [
     { ...example, id: 'Hole heatmap, photos by J. Doe' },
     { code: 'invalid_format', format: 'regex', path: ['id'] },
   ],
+  ...['CC0-1.0; photos by J. Doe', 'photo-1.jpg', 'forum.example', 'LicenseRef-jdoe'].map(
+    (model): [string, object, object] => [
+      `${model} as the model license`,
+      { ...example, license: { ...example.license, model } },
+      { code: 'invalid_value', path: ['license', 'model'] },
+    ],
+  ),
   [
-    'a credit line in the model license',
-    { ...example, license: { ...example.license, model: 'CC0-1.0; photos by J. Doe' } },
-    { code: 'invalid_format', format: 'regex', path: ['license', 'model'] },
+    'a p90 below 20 photos',
+    withSynthetic({ photos: 19, p90: 1 }),
+    { code: 'custom', message: 'p90 set below 20 photos', path: ['measured', 'synthetic', 'p90'] },
   ],
   [
     'a sha256 that is not 64 hex characters',
@@ -62,7 +73,7 @@ const rejected: [string, object, object][] = [
   [
     'no model license',
     { ...example, license: licenseWithoutModel },
-    { code: 'invalid_type', expected: 'string', path: ['license', 'model'] },
+    { code: 'invalid_value', path: ['license', 'model'] },
   ],
   [
     'a negative data class count',

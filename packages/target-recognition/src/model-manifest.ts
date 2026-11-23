@@ -18,7 +18,7 @@ export type ModelManifest = {
   output: { stride: number; channels: number; threshold: number; sure: number }
   /** The model license and the training photos as counts only, per data class and per target kind; no photo or source is listed. */
   license: {
-    model: string
+    model: 'CC0-1.0' | 'CC-BY-4.0' | 'ISC' | 'MIT' | 'Apache-2.0'
     training: {
       classes: { own: number; 'third-party': number; synthetic: number }
       kinds: Record<string, number>
@@ -34,12 +34,18 @@ const share = z.number().min(0).max(1)
 const positiveInt = z.number().int().positive()
 const slug = z.string().regex(/^[a-z][a-z0-9-]*$/)
 
-const scores = z.strictObject({
-  photos: count,
-  median: z.number().nonnegative(),
-  p90: z.number().nonnegative().nullable(),
-  max: z.number().nonnegative(),
-})
+const scores = z
+  .strictObject({
+    photos: count,
+    median: z.number().nonnegative(),
+    p90: z.number().nonnegative().nullable(),
+    max: z.number().nonnegative(),
+  })
+  .refine((s) => s.photos >= 20 || s.p90 === null, {
+    message: 'p90 set below 20 photos',
+    path: ['p90'],
+    when: (payload) => payload.issues.length === 0,
+  })
 
 const shape = z.strictObject({
   schemaVersion: z.literal(1),
@@ -79,8 +85,8 @@ const shape = z.strictObject({
       when: (payload) => payload.issues.length === 0,
     }),
   license: z.strictObject({
-    // an SPDX license identifier, so no credit line fits
-    model: z.string().regex(/^[A-Za-z0-9.+-]+$/),
+    // a fixed list of SPDX license identifiers, so no file name, domain, credit line or LicenseRef fits
+    model: z.enum(['CC0-1.0', 'CC-BY-4.0', 'ISC', 'MIT', 'Apache-2.0']),
     training: z.strictObject({
       classes: z.strictObject({ own: count, 'third-party': count, synthetic: count }),
       // refuses a URL, file name or credit line as a kind; a site name written as a slug still fits
@@ -94,8 +100,9 @@ const shape = z.strictObject({
   }),
 })
 
-type Same<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false
-// fails the typecheck when the schema and the hand-written type drift either way
+// oxlint-disable-next-line typescript/no-unnecessary-type-parameters -- the identity test compares two generic signatures, so each G appears once
+type Same<A, B> = (<G>() => G extends A ? 1 : 2) extends <G>() => G extends B ? 1 : 2 ? true : false
+// fails the typecheck unless the schema output and the hand-written type are identical, an optional or readonly key on one side only included
 true satisfies Same<z.output<typeof shape>, ModelManifest>
 
 /** Schema of a model manifest file. */
