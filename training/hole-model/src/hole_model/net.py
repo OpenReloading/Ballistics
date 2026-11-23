@@ -1,5 +1,6 @@
 """The U-shaped heatmap net: RGB in, one hole center probability per 2 x 2 px out."""
 
+import math
 from collections.abc import Sequence
 from typing import cast
 
@@ -77,11 +78,25 @@ def target(holes: npt.NDArray[np.float32], diameter: float, height: int, width: 
     return out
 
 
-def focal_loss(p: torch.Tensor, t: torch.Tensor) -> torch.Tensor:
-    """The penalty-reduced focal loss of CenterNet (Zhou et al., Objects as Points, https://arxiv.org/abs/1904.07850)."""
+def loss_mask(masked: npt.NDArray[np.float32], height: int, width: int) -> npt.NDArray[np.float32]:
+    """1 where the loss counts at the output stride, 0 on every cell that touches a masked x, y, width, height box."""
+    out = np.ones((height // STRIDE, width // STRIDE), np.float32)
+    for x, y, w, h in masked:
+        out[
+            max(0, math.floor(y / STRIDE)) : math.ceil((y + h) / STRIDE),
+            max(0, math.floor(x / STRIDE)) : math.ceil((x + w) / STRIDE),
+        ] = 0
+    return out
+
+
+def focal_loss(p: torch.Tensor, t: torch.Tensor, m: torch.Tensor) -> torch.Tensor:
+    """The penalty-reduced focal loss of CenterNet (Zhou et al., Objects as Points, https://arxiv.org/abs/1904.07850).
+
+    Only cells where the mask `m` is 1 count, so a region with unknown holes teaches neither hole nor background.
+    """
     p = p.clamp(1e-5, 1 - 1e-5)
-    pos = (t >= 0.999).float()
-    loss = -(pos * (1 - p) ** 2 * torch.log(p) + (1 - pos) * (1 - t) ** 4 * p**2 * torch.log(1 - p))
+    pos = (t >= 0.999).float() * m
+    loss = -(pos * (1 - p) ** 2 * torch.log(p) + (1 - pos) * m * (1 - t) ** 4 * p**2 * torch.log(1 - p))
     return loss.sum() / pos.sum().clamp(min=1.0)
 
 

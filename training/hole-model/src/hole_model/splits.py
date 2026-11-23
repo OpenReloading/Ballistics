@@ -14,6 +14,10 @@ from PIL import Image
 
 SPLITS = ("train", "validation", "test", "holdout")
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
+SYNTHETIC = "synthetic"
+REAL_CONFIRMED = "real confirmed"
+REAL_UNCHECKED = "real unchecked"
+DATA_CLASSES = (SYNTHETIC, REAL_CONFIRMED, REAL_UNCHECKED)
 
 
 class SplitError(ValueError):
@@ -22,7 +26,10 @@ class SplitError(ValueError):
 
 @dataclass(frozen=True)
 class Photo:
-    """One labeled photo; `scored` when it is usable and its marks complete; `path` is never opened for the holdout."""
+    """One labeled photo; `scored` when it is usable and its marks complete; `path` is never opened for the holdout.
+
+    `masked` holds x, y, width, height boxes in px whose holes are unknown: the loss and the scores leave them out.
+    """
 
     path: Path
     sha256: str
@@ -30,6 +37,8 @@ class Photo:
     scored: bool
     diameter: float
     holes: npt.NDArray[np.float32]
+    data: str
+    masked: npt.NDArray[np.float32]
 
 
 def _photo(path: Path, raw: Any) -> Photo:
@@ -42,7 +51,13 @@ def _photo(path: Path, raw: Any) -> Photo:
         raise SplitError(f"{path}: no visibleDiameterPx")
     holes = np.array([[h["x"], h["y"]] for h in raw.get("holes", [])], np.float32).reshape(-1, 2)
     scored = raw.get("usable") is True and raw.get("complete") is True
-    return Photo(path, raw["sha256"], raw["session"], scored, float(diameter), holes)
+    data = raw.get("data", SYNTHETIC)
+    if data not in DATA_CLASSES:
+        raise SplitError(f"{path}: data is one of {', '.join(DATA_CLASSES)}")
+    masked = np.array(raw.get("masked", []), np.float32).reshape(-1, 4)
+    if (masked[:, 2:] <= 0).any():
+        raise SplitError(f"{path}: a masked box needs a positive width and height")
+    return Photo(path, raw["sha256"], raw["session"], scored, float(diameter), holes, data, masked)
 
 
 def read_label_set(path: Path) -> list[Photo]:
