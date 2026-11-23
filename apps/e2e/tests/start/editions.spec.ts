@@ -11,15 +11,15 @@ for (const { name, base } of editions) {
     const messages = listen(page)
     const requests: string[] = []
     page.on('request', (r) => requests.push(new URL(r.url()).pathname))
-    const response = await page.goto(`${base}disciplines/bdmp-1500-carbine/`)
+    const response = await page.goto(`${base}cartridges/17-hmr/`)
     expect(response?.status()).toBe(404)
     // only the booted app renders the record's name: the fallback and the shell lack it
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('BDMP 1500 Carbine')
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('17 HMR')
     await page.waitForLoadState('networkidle')
     expect(requests).toContain(`${site}${base}404.edition.html`)
     expect(requests.filter((p) => !p.startsWith(`${site}${base}`))).toEqual([])
     if (name === 'stable') expect(requests.filter((p) => p.startsWith(`${site}next/`))).toEqual([])
-    await expect(page).toHaveTitle(/BDMP 1500 Carbine/)
+    await expect(page).toHaveTitle(/17 HMR/)
     expect(unexplained(messages, browserName, name)).toEqual([])
   })
 

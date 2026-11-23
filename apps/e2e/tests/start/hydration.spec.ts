@@ -3,7 +3,7 @@ import { editions, listen, unexplained } from './console.ts'
 
 type Text = string | { en: string; de: string }
 
-// prerendered pages, then the paths only 404.html answers: a record the build left out and an unknown path
+// prerendered pages, then the paths only 404.html answers: a cartridge the sample build leaves out (it keeps all other records) and an unknown path
 const pages: { path: string; h1: Text; prerendered: boolean }[] = [
   { path: '', h1: 'RangeFoundry Workbench', prerendered: true },
   {
@@ -28,8 +28,8 @@ const pages: { path: string; h1: Text; prerendered: boolean }[] = [
     prerendered: true,
   },
   {
-    path: 'disciplines/bdmp-1500-carbine/',
-    h1: 'BDMP 1500 Carbine',
+    path: 'cartridges/17-hmr/',
+    h1: '17 HMR',
     prerendered: false,
   },
   {
