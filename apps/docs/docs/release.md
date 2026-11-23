@@ -59,6 +59,19 @@ Settings:
 
 `apps/web/.next` stays after the build: CI restores it as the Turbopack cache, and `check-weight` reads its manifests.
 
+`pnpm run start:build` (`tools/src/start-site.ts`, after `pnpm run build`) writes both editions of the TanStack Start app, which the deployed site does not serve yet, as one site of the deployed shape into `pages-start/`: stable under `PAGES_BASE_PATH`, next under `<base>/next/`, each with its data files under `api/` and its app shell as `404.edition.html`, and a root `404.html` that hands a miss to the shell of its edition (`tools/src/root-not-found.ts`). `--sample` prerenders as `static:build` does; the log prints the client size of each edition. `pnpm run start:serve` serves it on `PORT` (default 3043). The e2e projects `start-chromium`, `start-firefox` and `start-webkit` build and serve it themselves at `/Ballistics`; `START_SITE=off` leaves out the build and those projects.
+
+```sh
+pnpm run build
+PAGES_BASE_PATH=/Ballistics PAGES_URL=https://openreloading.github.io pnpm run start:build --sample
+PAGES_BASE_PATH=/Ballistics pnpm run start:serve   # http://localhost:3043/Ballistics/ and .../Ballistics/next/
+pnpm --filter @rangefoundry/e2e exec playwright test --project "start-*"
+```
+
+Pass `PAGES_URL` inline only: exported, it also turns on the e2e project `pages` against that site.
+
+Upstream issues to recheck: TanStack/router#8741: drop the `/?root` entry when it closes (fix proposed in TanStack/router#8742; a distinct `spa.maskPath` is reported as another workaround in the issue thread). TanStack/router#8473: when it closes, retry the root `notFoundComponent` instead of the splat route in Firefox and WebKit, lift the exact pins of `@tanstack/react-start` and `@tanstack/react-router`, and rerun `apps/e2e/tests/start/hydration.spec.ts`.
+
 ## Self-hosting
 
 - The web app is the static `pages/` folder that `pnpm run pages:build` writes (`PAGES_BASE_PATH` is the path the site is served under, empty for a site root). Any static host serves it: the calculations run in the browser, so there is no server process.

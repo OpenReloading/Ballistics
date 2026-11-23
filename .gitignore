@@ -9,6 +9,7 @@ storybook-static
 visual-check-out
 .schemathesis/
 /pages/
+/pages-start/
 /apps/web/public/api/
 # agent skills and setup state, installed per checkout, except the committed mantine-form skill
 /.agents/skills/

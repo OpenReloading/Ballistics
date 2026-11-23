@@ -16,6 +16,6 @@ if "$engine" --version | grep -q podman ||
   "$engine" info --format '{{.SecurityOptions}}' | grep -q rootless; then user=; fi
 # amd64 as on the CI runner, also on an arm64 host; :z relabels the checkout for SELinux hosts
 exec "$engine" run --rm --platform=linux/amd64 --network=host --ipc=host $user \
-  -v "$PWD:/work:z" -w /work/apps/e2e -e DRAWING_BASELINE="${DRAWING_BASELINE:-1}" -e WEB_URL="${WEB_URL:-http://localhost:3003}" \
+  -v "$PWD:/work:z" -w /work/apps/e2e -e START_SITE=off -e DRAWING_BASELINE="${DRAWING_BASELINE:-1}" -e WEB_URL="${WEB_URL:-http://localhost:3003}" \
   "$image" \
   npx playwright test --project=full tests/web/drawing-baseline "$@"

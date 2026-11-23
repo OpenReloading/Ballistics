@@ -35,7 +35,7 @@ const docsOnly = [
 const e2eInputs = [
   /^apps\/e2e\//,
   /^(compose\.yaml|\.dockerignore)$/,
-  /^tools\/src\/(pages|pages-serve|pages-payload|executable)\.ts$/,
+  /^tools\/src\/(pages|pages-serve|pages-payload|executable|start-site|root-not-found)\.ts$/,
 ]
 
 /** Files whose change needs the docs image built, which runs the docs site build: the site, the palette it imports, the API whose document it prints, and the compose service. */
