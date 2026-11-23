@@ -555,7 +555,12 @@ export function synthesize(seed: number, index: number, options: SynthOptions): 
   drawPatches(scene)
   const onSheet = rnd.chance(0.2) ? sheetEdge(scene) : () => true
   const style = holeStyle(scene, kind)
-  const holes = placeHoles(scene, rnd.int(...options.holes), onSheet)
+  const count = rnd.int(...options.holes)
+  const holes = placeHoles(scene, count, onSheet)
+  if (holes.length < count)
+    throw new Error(
+      `photo ${index}: ${holes.length} of ${count} holes fit; use a larger size or smaller diameters or counts`,
+    )
   const painters = [...holes, ...cutHoles(scene)].map((c) =>
     holePainter(scene, c, (D / 2 / v.s) * rnd.u(0.92, 1.08), style),
   )

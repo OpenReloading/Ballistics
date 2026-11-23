@@ -34,14 +34,17 @@ const hashes = (dir: string) =>
     ]),
   )
 
+const holes = (dir: string) =>
+  Object.values(
+    labelSet.parse(JSON.parse(readFileSync(join(dir, 'holes.json'), 'utf8'))).photos,
+  ).map((p) => p.holes)
+
 describe('synthetic photos', () => {
   it('writes the same bytes for the same seed and other holes for another seed', async () => {
     const [a, b, c] = [await run(7), await run(7), await run(8)]
     expect(Object.keys(hashes(a))).toHaveLength(21)
     expect(hashes(b)).toEqual(hashes(a))
-    expect(readFileSync(join(c, 'holes.json'), 'utf8')).not.toBe(
-      readFileSync(join(a, 'holes.json'), 'utf8'),
-    )
+    expect(holes(c)).not.toEqual(holes(a))
   })
 
   it('writes a label set with every hole inside its photo and every diameter in the range', async () => {

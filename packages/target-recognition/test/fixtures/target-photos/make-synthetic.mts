@@ -51,7 +51,7 @@ export async function writePhotos(
 /** `text` as an integer, at least `min`. */
 function whole(text: string, name: string, min: number): number {
   const n = Number(text)
-  if (!/^\d+$/.test(text) || n < min)
+  if (!/^\d+$/.test(text) || !Number.isSafeInteger(n) || n < min)
     throw new Error(`--${name} must be an integer of at least ${min}, got ${text}`)
   return n
 }
