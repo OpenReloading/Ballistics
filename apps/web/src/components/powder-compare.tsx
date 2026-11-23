@@ -1,7 +1,7 @@
 'use client'
 
 import { Button, NumberInput, SegmentedControl, Select, UnstyledButton } from '@mantine/core'
-import { CaretDown, CaretUp } from '@phosphor-icons/react'
+import { ChevronDown, ChevronUp } from 'lucide-react'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
@@ -122,9 +122,9 @@ function SortHead({
         {dir && (
           <span aria-hidden="true" className="sort-mark">
             {dir === 'ascending' ? (
-              <CaretUp size={12} weight="bold" />
+              <ChevronUp size={12} strokeWidth={2.25} />
             ) : (
-              <CaretDown size={12} weight="bold" />
+              <ChevronDown size={12} strokeWidth={2.25} />
             )}
           </span>
         )}

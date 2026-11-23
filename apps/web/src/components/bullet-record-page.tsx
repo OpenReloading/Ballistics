@@ -1,7 +1,7 @@
 'use client'
 
-import { Flask } from '@phosphor-icons/react'
 import type { Bullet } from '@rangefoundry/schema'
+import { FlaskConical } from 'lucide-react'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 import { compareFrom } from '../lib/compare-ids.ts'
@@ -60,7 +60,7 @@ function BulletRecord({ b, label, fits }: { b: Bullet; label: string; fits: Fits
             {/* below 75em the bar keeps its actions behind Page actions: the primary one stays in view */}
             <LinkButton
               href={workbenchHref('bullet', b.id)}
-              icon={<Flask aria-hidden="true" />}
+              icon={<FlaskConical aria-hidden="true" />}
               primary
               className="phone-action"
             >

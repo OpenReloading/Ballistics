@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@mantine/core'
-import { Plus } from '@phosphor-icons/react'
+import { Plus } from 'lucide-react'
 import { useDeferredValue, useMemo } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'

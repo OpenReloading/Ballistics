@@ -1,5 +1,5 @@
 import { ActionIcon, NavLink, Tooltip } from '@mantine/core'
-import { Books } from '@phosphor-icons/react'
+import { Library } from 'lucide-react'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 
@@ -21,7 +21,7 @@ export function DocsLink({
         component="a"
         href={url}
         label={t(label)}
-        leftSection={<Books size={20} aria-hidden="true" />}
+        leftSection={<Library size={20} aria-hidden="true" />}
       />
     )
   return (
@@ -34,7 +34,7 @@ export function DocsLink({
         color="gray"
         aria-label={t(label)}
       >
-        <Books size={24} aria-hidden="true" />
+        <Library size={24} aria-hidden="true" />
       </ActionIcon>
     </Tooltip>
   )

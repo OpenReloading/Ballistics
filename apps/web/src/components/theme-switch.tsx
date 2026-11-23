@@ -2,7 +2,7 @@
 
 import { ActionIcon, useComputedColorScheme, useMantineColorScheme } from '@mantine/core'
 import { useMounted } from '@mantine/hooks'
-import { Moon, Sun } from '@phosphor-icons/react'
+import { Moon, Sun } from 'lucide-react'
 import { useTranslation } from '../i18n/language.ts'
 
 /** Two-state light/dark switch; Mantine's light/dark-hidden classes pick the icon, so it is right before hydration. */

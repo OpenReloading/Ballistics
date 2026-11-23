@@ -12,7 +12,7 @@ import {
   TextInput,
   Tooltip,
 } from '@mantine/core'
-import { MagnifyingGlass } from '@phosphor-icons/react'
+import { Search as SearchIcon } from 'lucide-react'
 import { Fragment, type KeyboardEvent, type ReactNode, useId, useState } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
@@ -353,7 +353,7 @@ export function FieldPanel({
             title: language === 'en' ? name.toLowerCase() : name,
           })}
           placeholder={symbols ? t('Symbol or name') : t('Name')}
-          leftSection={<MagnifyingGlass aria-hidden="true" />}
+          leftSection={<SearchIcon aria-hidden="true" />}
           value={q}
           onChange={(e) => setQ(e.currentTarget.value)}
         />

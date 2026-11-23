@@ -1,9 +1,9 @@
 'use client'
 
 import { ActionIcon, Button, NativeSelect, Popover, Textarea } from '@mantine/core'
-import { BracketsCurly, Plus, Trash } from '@phosphor-icons/react'
 import type { SheetNote, ShotGroup } from '@rangefoundry/schema'
 import type { GroupStatistics } from '@rangefoundry/shot-groups'
+import { Braces, Plus, Trash } from 'lucide-react'
 import { type KeyboardEvent, type PointerEvent, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import type { Translator } from '../i18n/translate.ts'
@@ -171,7 +171,7 @@ function PlaceholderPicker({
           title={t('Insert a value of the group; it follows the shots')}
           onClick={() => setOpened((o) => !o)}
         >
-          <BracketsCurly size={14} aria-hidden="true" />
+          <Braces size={14} aria-hidden="true" />
         </ActionIcon>
       </Popover.Target>
       <Popover.Dropdown>

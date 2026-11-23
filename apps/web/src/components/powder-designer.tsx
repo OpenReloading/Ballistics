@@ -9,7 +9,7 @@ import {
   Textarea,
   TextInput,
 } from '@mantine/core'
-import { Flask, Plus, X } from '@phosphor-icons/react'
+import { FlaskConical, Plus, X } from 'lucide-react'
 import { type ReactNode, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
@@ -157,7 +157,7 @@ function RecordPanel({
         </Message>
       ) : (
         <EmptyNote
-          icon={<Flask size={24} aria-hidden="true" />}
+          icon={<FlaskConical size={24} aria-hidden="true" />}
           title={t('No powder yet')}
           description={t('Enter a name and the values you have.')}
         />

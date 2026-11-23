@@ -1,7 +1,7 @@
 'use client'
 
 import { Alert, Button, EmptyState, Group, Skeleton, Stack, Text } from '@mantine/core'
-import { FunnelX, Info, Warning, WarningOctagon } from '@phosphor-icons/react'
+import { FunnelX, Info, OctagonExclamationPoint, TriangleExclamationPoint } from 'lucide-react'
 import { type ReactNode, useLayoutEffect, useState } from 'react'
 import { useRouter } from '@/platform/navigation.ts'
 import { useTranslation } from '../i18n/language.ts'
@@ -115,8 +115,8 @@ export interface MessageEntry {
 
 const severities = {
   info: { word: msg('Note'), color: 'blue', Icon: Info },
-  warning: { word: msg('Warning'), color: 'orange', Icon: Warning },
-  error: { word: msg('Error'), color: 'red', Icon: WarningOctagon },
+  warning: { word: msg('Warning'), color: 'orange', Icon: TriangleExclamationPoint },
+  error: { word: msg('Error'), color: 'red', Icon: OctagonExclamationPoint },
 } as const
 
 /** Icon, the severity's word and the text, so color is never the only signal; an error is announced at once (`role="alert"`), a note or warning politely (`role="status"`). */

@@ -1,7 +1,7 @@
 'use client'
 
 import { Button, TextInput } from '@mantine/core'
-import { Plus } from '@phosphor-icons/react'
+import { Plus } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'

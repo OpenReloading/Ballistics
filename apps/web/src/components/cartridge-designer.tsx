@@ -2,9 +2,9 @@
 
 import { NativeSelect, Table, Text, TextInput } from '@mantine/core'
 import { useDebouncedValue, useElementSize } from '@mantine/hooks'
-import { Ruler } from '@phosphor-icons/react'
 import type { UserCartridge } from '@rangefoundry/schema'
 import { chamberOf } from '@rangefoundry/svg-drawings/seating'
+import { Ruler } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import {
   type CSSProperties,

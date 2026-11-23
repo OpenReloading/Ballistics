@@ -3,9 +3,10 @@ import { localStorageColorSchemeManager, mantineHtmlProps } from '@mantine/core'
 import { AppFrame, UiProvider } from '@rangefoundry/ui'
 import uiCss from '@rangefoundry/ui/ui.css?url'
 import { createRootRoute, HeadContent, Link, Outlet, Scripts } from '@tanstack/react-router'
+import { LucideProvider } from 'lucide-react'
 import { type ReactNode, useEffect } from 'react'
 import { startLanguage } from '../i18n/language.ts'
-import { colorSchemeKey, colorSchemeScript } from '../lib/theme.ts'
+import { colorSchemeKey, colorSchemeScript, iconDefaults } from '../lib/theme.ts'
 import { uiFont } from '../platform/fonts/ui.ts'
 import appCss from '../styles.css?url'
 import { useStoredLanguage } from './-lingui.ts'
@@ -48,7 +49,7 @@ function Document({ children }: { children: ReactNode }) {
       </head>
       <body>
         <UiProvider i18n={i18n} defaultColorScheme="auto" colorSchemeManager={colorSchemeManager}>
-          {children}
+          <LucideProvider {...iconDefaults}>{children}</LucideProvider>
         </UiProvider>
         <Scripts />
       </body>

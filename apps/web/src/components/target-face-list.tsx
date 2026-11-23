@@ -1,8 +1,8 @@
 'use client'
 
 import { Button } from '@mantine/core'
-import { Plus } from '@phosphor-icons/react'
 import { toSi } from '@rangefoundry/schema'
+import { Plus } from 'lucide-react'
 import { useCallback, useDeferredValue, useMemo } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
