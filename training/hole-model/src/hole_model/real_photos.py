@@ -31,14 +31,17 @@ def _rows(path: Path) -> list[dict[str, Any]]:
 
 
 def read_holdout(folders: Iterable[Path]) -> Holdout:
-    """The `sha256` and `source_group` of each `manifest.json` row and the `source_group` of each `images.jsonl` row."""
+    """`sha256` and `source_group` of manifest.json and images.jsonl rows, and `original_sha256` of the latter."""
     hashes: set[str] = set()
     posts: set[str] = set()
     for folder in folders:
         for row in json.loads((folder / "manifest.json").read_text()):
             hashes.add(row["sha256"])
             posts.add(row["source_group"])
-        posts.update(row["image"]["source_group"] for row in _rows(folder / "images.jsonl"))
+        for row in _rows(folder / "images.jsonl"):
+            image = row["image"]
+            hashes.update(image[k] for k in ("sha256", "original_sha256") if k in image)
+            posts.add(image["source_group"])
     return Holdout(frozenset(hashes), frozenset(posts))
 
 
@@ -106,6 +109,8 @@ def write(
     labels: Path, posts: Path, holdout: Sequence[Path], out: Path, validation_share: float
 ) -> dict[str, dict[str, int]]:
     """Writes train.json and validation.json into `out`; returns the photos per split and data class and the drops."""
+    if not 0 < validation_share < 1:
+        raise SplitError("--validation-share is a fraction between 0 and 1, both excluded")
     sets, dropped = convert(_rows(labels), read_posts(posts), read_holdout(holdout), validation_share)
     out.mkdir(parents=True, exist_ok=True)
     counts: dict[str, dict[str, int]] = {"dropped": dict(sorted(dropped.items()))}

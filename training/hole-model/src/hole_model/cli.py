@@ -243,7 +243,7 @@ def main() -> None:
     t.add_argument("--lr", type=float, default=3e-3)
     t.add_argument("--widths", type=lambda s: tuple(int(w) for w in s.split(",")), default=BASE_WIDTHS)
     t.add_argument("--sweep-photos", type=int, default=100)
-    t.add_argument("--real-share", type=float, default=0.75, help="share of real photos in each batch")
+    t.add_argument("--real-share", type=float, default=0.5, help="share of real photos in each batch")
     t.add_argument("--eval-every", type=int, default=500, help="steps between validation checks; 0 keeps the last net")
     t.add_argument("--patience", type=int, default=3, help="validation checks without a better F1 score before a stop")
     t.set_defaults(run=train)

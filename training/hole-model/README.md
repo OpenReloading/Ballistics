@@ -51,8 +51,8 @@ uv run hole-model convert --labels <merged marks> --posts <corpus images.jsonl> 
 | `unusable`               | dropped                                                                                  |
 
 - The regions with unresolved holes become `masked` boxes (x, y, width, height in px): the loss and the scores leave them out, so they teach neither hole nor background.
-- A photo is dropped when its image or original sha256 matches a holdout photo or it comes from a holdout photo's source post. Of the holdout folders only the `sha256` and `source_group` of `manifest.json` and the `source_group` of `images.jsonl` are read.
-- The session is the source post. A fixed share of the posts (`--validation-share`, default 0.2, chosen by the hash of the post) forms the validation split, so one post's photos sit in one split.
+- A photo is dropped when its image or original sha256 matches a holdout photo or it comes from a holdout photo's source post. Of the holdout folders only the `sha256` and `source_group` of `manifest.json` and the `sha256`, `original_sha256` and `source_group` of `images.jsonl` are read.
+- The session is the source post. A fixed share of the posts (`--validation-share`, default 0.2, above 0 and below 1, chosen by the hash of the post) forms the validation split, so one post's photos sit in one split.
 - Each photo gets the median hole diameter of its marks; a photo without one is dropped.
 
 Label set entries may carry `data` (`synthetic` when absent, `real confirmed` or `real unchecked`) and `masked`. Real training photos are scaled so their hole shows at 16 px, as the app does; a photo smaller than the crop is edge-padded and the padding masked. An input list for real photos names the synthetic and the real training sets under `train` and only `data/real/validation.json` under `validation`, so the threshold and early stopping use real photos only.
@@ -60,11 +60,11 @@ Label set entries may carry `data` (`synthetic` when absent, `real confirmed` or
 ## Train and score
 
 ```sh
-uv run hole-model train --inputs inputs/synthetic.json --out runs/base
+uv run hole-model train --inputs inputs/synthetic.json --out runs/base --eval-every 0
 uv run hole-model score --model runs/base/hole-model.onnx --labels <label set> --threshold <threshold>
 ```
 
-`--real-share` sets the share of real photos in each batch: 0.75 by default, the best of 0.25, 0.5 and 0.75 on the validation split. Real photos alone (1) scored higher there but lost most holes when the app expects a wrong hole size, as real photos train only at the working size. Every `--eval-every` steps (default 500; 0 keeps the last net) `train` scores the validation split and keeps the net with the best F1 score; it stops after `--patience` checks (default 3) without a better one.
+`--real-share` sets the share of real photos in each batch: 0.5 by default. Of the shares 0, 0.25, 0.5, 0.75 and 1, it has the highest mean F1 score on the real validation split over the seven expected sizes of the wrong-size sweep (0.5 to 2 times the true hole size), each net at its own threshold; `score --believed` gives these scores. Real photos alone (1) score highest at the true size but lose most holes when the app expects half the hole size, as real photos train only at the working size. The synthetic test split plays no part in the choice. Every `--eval-every` steps (default 500; 0 keeps the last net, as in the synthetic-only command above) `train` scores the validation split and keeps the net with the best F1 score; it stops after `--patience` checks (default 3) without a better one.
 
 `train` runs on one CPU thread with deterministic algorithms, so the same seed, data and lockfile give the same `scores.json`. It writes to the output folder:
 

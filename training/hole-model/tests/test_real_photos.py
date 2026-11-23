@@ -3,9 +3,11 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import pytest
 
 from hole_model.net import loss_mask
-from hole_model.real_photos import Holdout, convert, read_holdout
+from hole_model.real_photos import Holdout, convert, read_holdout, write
+from hole_model.splits import SplitError
 
 NO_HOLDOUT = Holdout(frozenset(), frozenset())
 
@@ -65,16 +67,25 @@ def test_check_answers_make_a_photo_confirmed_and_keep_an_unresolved_one() -> No
 
 
 def test_photos_matching_a_holdout_photo_by_sha256_or_source_post_are_dropped(tmp_path: Path) -> None:
+    images = {"v1": {"sha256": "6" * 64}, "v2": {"original_sha256": "h" * 64}}
     for name, sha, post in (("v1", "a" * 64, "post 1"), ("v2", "f" * 64, "post 2")):
         (tmp_path / name).mkdir()
         (tmp_path / name / "manifest.json").write_text(json.dumps([{"sha256": sha, "source_group": post}]))
-        (tmp_path / name / "images.jsonl").write_text(json.dumps({"image": {"source_group": "post 3"}}) + "\n")
+        lines = [{"image": {"source_group": "post 3"}}, {"image": {"source_group": "post 4", **images[name]}}]
+        (tmp_path / name / "images.jsonl").write_text("".join(json.dumps(r) + "\n" for r in lines))
     holdout = read_holdout([tmp_path / "v1", tmp_path / "v2"])
-    rows = [row("a1"), row("bf"), row("c3"), row("d4"), row("e5")]
+    rows = [row("a1"), row("bf"), row("c3"), row("d4"), row("e5"), row("g6"), row("h7")]
     posts = {"1" * 64: "x", "f" * 64: "y", "3" * 64: "post 2", "4" * 64: "post 3", "5" * 64: "z"}
+    posts |= {"6" * 64: "u", "7" * 64: "w"}
     sets, dropped = convert(rows, posts, holdout, 0)
     assert list(sets["train"]) == ["/photos/e5.jpg"]
-    assert dropped == {"holdout sha256": 2, "holdout post": 2}
+    assert dropped == {"holdout sha256": 4, "holdout post": 2}
+
+
+@pytest.mark.parametrize("share", [0, 1, 1.5])
+def test_a_validation_share_outside_zero_to_one_is_refused(tmp_path: Path, share: float) -> None:
+    with pytest.raises(SplitError, match="--validation-share"):
+        write(tmp_path / "labels.jsonl", tmp_path / "images.jsonl", [], tmp_path / "out", share)
 
 
 def test_every_photo_of_a_source_post_sits_in_one_split() -> None:
