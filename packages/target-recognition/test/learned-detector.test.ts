@@ -150,6 +150,81 @@ describe('learnedDetector clusters and tiers', () => {
   })
 })
 
+// a 16 px hole is the manifest's working hole, so the photo is the working image; heatmap cells lie 2 px apart
+const bigImage = (width: number, height: number) => ({
+  width,
+  height,
+  data: new Uint8ClampedArray(width * height * 4).fill(128),
+})
+const bigRequest = { pxPerM: 1000, expectedHoleDiameter: 0.016 }
+
+/** A model that returns a heatmap of (width / 2) x (padded height / 2) cells with the given cells set. */
+const bigStub =
+  (cells: [x: number, y: number][]): RunModel =>
+  async (input) => {
+    const [, , ph, pw] = input.dims
+    const [gw, gh] = [Number(pw) / 2, Number(ph) / 2]
+    const data = new Float32Array(gw * gh)
+    for (const [x, y] of cells) data[y * gw + x] = 0.9
+    return { data, dims: [1, 1, gh, gw] }
+  }
+
+/** mulberry32: a deterministic stream of floats in [0, 1) */
+const seeded = (start: number) => {
+  let seed = start
+  return () => {
+    seed = (seed + 0x6d2b79f5) | 0
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+
+describe('learnedDetector clustering at scale', () => {
+  it('clusters 30,000 peaks of a dense heatmap in under a second', async () => {
+    const cells: [number, number][] = []
+    for (let y = 0; y < 600; y += 4) for (let x = 0; x < 800; x += 4) cells.push([x, y])
+    const start = performance.now()
+    const { proposals } = await learnedDetector(manifest, bigStub(cells)).propose({
+      ...bigRequest,
+      image: bigImage(1600, 1200),
+    })
+    const elapsed = performance.now() - start
+    expect(proposals).toHaveLength(30_000)
+    // the peaks lie 8 px apart, closer than the 16 px hole, so they chain into one cluster
+    expect(proposals.every((p) => p.clusterId === 0 && p.clusterSize === 30_000)).toBe(true)
+    expect(elapsed).toBeLessThan(1000)
+  })
+
+  it('gives the cluster ids of the pairwise comparison of every two peaks', async () => {
+    const next = seeded(20_260_101)
+    const cells: [number, number][] = []
+    for (let i = 0; i < 1500; i++) cells.push([Math.floor(next() * 400), Math.floor(next() * 299)])
+    const { proposals } = await learnedDetector(manifest, bigStub(cells)).propose({
+      ...bigRequest,
+      image: bigImage(800, 600),
+    })
+
+    // reference: the union of every pair closer than the 16 px hole, ids by the first peak of each cluster
+    const root = proposals.map((_, i) => i)
+    const find = (i: number): number => (root[i] === i ? i : find(root[i] ?? i))
+    for (const [i, a] of proposals.entries())
+      for (const [j, b] of proposals.entries())
+        if (j > i && Math.hypot(a.x - b.x, a.y - b.y) < 16) root[find(j)] = find(i)
+    const ids = new Map<number, number>()
+    const expected = proposals.map((_, i) => {
+      const id = ids.get(find(i)) ?? ids.size
+      ids.set(find(i), id)
+      return id
+    })
+
+    expect(proposals.map((p) => p.clusterId)).toEqual(expected)
+    // the random set holds singletons, pairs and longer chains
+    expect(Math.max(...expected)).toBeGreaterThan(100)
+    expect(Math.max(...proposals.map((p) => p.clusterSize))).toBeGreaterThan(3)
+  })
+})
+
 describe('learnedDetector region and contract', () => {
   it('keeps the proposals inside the region', async () => {
     const found = await propose(

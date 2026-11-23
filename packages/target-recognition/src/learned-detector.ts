@@ -196,6 +196,30 @@ function confidence(peak: number, sure: number): number {
   return clamp(MAYBE_BELOW + ((1 - MAYBE_BELOW) * (peak - s)) / (1 - s), 0, 1)
 }
 
+const NEIGHBOR_BUCKETS = [-1, 0, 1].flatMap((dx) => [-1, 0, 1].map((dy) => [dx, dy] as const))
+
+/** Index pairs `i < j` of points closer than `holePx`; a pair lies in the same or an adjacent bucket of side `holePx`, so no other pair is compared. */
+function* closePairs(points: Point[], holePx: number): Generator<[number, number]> {
+  const buckets = new Map<string, number[]>()
+  const cell = (p: Point) => [Math.floor(p.x / holePx), Math.floor(p.y / holePx)] as const
+  for (const [i, p] of points.entries()) {
+    const key = cell(p).join()
+    const bucket = buckets.get(key)
+    if (bucket) bucket.push(i)
+    else buckets.set(key, [i])
+  }
+  for (const [i, a] of points.entries()) {
+    const [cx, cy] = cell(a)
+    const nearby = NEIGHBOR_BUCKETS.flatMap(
+      ([dx, dy]) => buckets.get(`${cx + dx},${cy + dy}`) ?? [],
+    )
+    for (const j of nearby) {
+      const b = nth(points, j)
+      if (j > i && Math.hypot(a.x - b.x, a.y - b.y) < holePx) yield [i, j]
+    }
+  }
+}
+
 /** Proposals chained by centers closer than one hole diameter share a cluster. */
 function clustered(found: (Point & { confidence: number })[], holePx: number): HoleProposal[] {
   const root = found.map((_, i) => i)
@@ -204,9 +228,7 @@ function clustered(found: (Point & { confidence: number })[], holePx: number): H
     while (nth(root, k) !== k) k = nth(root, k)
     return k
   }
-  for (const [i, a] of found.entries())
-    for (const [j, b] of found.entries())
-      if (j > i && Math.hypot(a.x - b.x, a.y - b.y) < holePx) root[find(j)] = find(i)
+  for (const [i, j] of closePairs(found, holePx)) root[find(j)] = find(i)
   const ids = new Map<number, number>()
   const sizes = new Map<number, number>()
   for (const i of root.keys()) {
