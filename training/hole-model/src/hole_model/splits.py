@@ -70,6 +70,12 @@ def read_input_list(path: Path) -> dict[str, list[Photo]]:
     return splits
 
 
+def label_set_digests(path: Path) -> dict[str, list[str]]:
+    """The sha256 of each label set file per split of the input list, which identifies the data of a run."""
+    raw = json.loads(path.read_text())
+    return {s: [hashlib.sha256((path.parent / f).read_bytes()).hexdigest() for f in raw[s]] for s in SPLITS if s in raw}
+
+
 def read_photo(p: Photo) -> npt.NDArray[np.uint8]:
     """The photo as H x W x 3 uint8, after checking its bytes against the label set's sha256."""
     data = p.path.read_bytes()

@@ -14,10 +14,13 @@ import torch
 from hole_model.export import OPSET, export
 from hole_model.net import BASE_WIDTHS, STRIDE, HoleNet, focal_loss, input_array, target
 from hole_model.scoring import THRESHOLDS, best, onnx_heat, score, single_thread_session, sweep
-from hole_model.splits import Photo, SplitError, read_input_list, read_label_set, read_photo
+from hole_model.splits import Photo, SplitError, label_set_digests, read_input_list, read_label_set, read_photo
 
 WEB_RUNTIME = ("onnxruntime-web", "1.31.1")
 PRODUCER = "OpenReloading/Ballistics training/hole-model"
+PROJECT = Path(__file__).parents[2]
+MAX_PARITY = 1e-5
+MAX_ONNX_BYTES = 1 << 20
 
 
 def train_net(photos: list[Photo], args: argparse.Namespace) -> HoleNet:
@@ -58,14 +61,23 @@ def train_net(photos: list[Photo], args: argparse.Namespace) -> HoleNet:
     return net
 
 
-def git_commit() -> str:
-    """The commit of this project's code, with "-dirty" when its folder has uncommitted changes."""
-    here = Path(__file__).parent
-    run = subprocess.run(["git", "rev-parse", "HEAD"], cwd=here, capture_output=True, text=True, check=True)
+def git_commit(project: Path) -> str:
+    """The commit of the project, with "-dirty" when anything in its folder (lockfile and inputs too) is uncommitted."""
+    run = subprocess.run(["git", "rev-parse", "HEAD"], cwd=project, capture_output=True, text=True, check=True)
     dirty = subprocess.run(
-        ["git", "status", "--porcelain", "--", ".."], cwd=here, capture_output=True, text=True, check=True
+        ["git", "status", "--porcelain", "--", "."], cwd=project, capture_output=True, text=True, check=True
     )
     return run.stdout.strip() + ("-dirty" if dirty.stdout.strip() else "")
+
+
+def limit_failures(parity: float, onnx_bytes: int) -> list[str]:
+    """The acceptance limits the exported model misses."""
+    failures = []
+    if parity > MAX_PARITY:
+        failures.append(f"ONNX Runtime differs from PyTorch by {parity:.1e}, more than {MAX_PARITY:.0e}")
+    if onnx_bytes > MAX_ONNX_BYTES:
+        failures.append(f"the ONNX file has {onnx_bytes} bytes, more than {MAX_ONNX_BYTES}")
+    return failures
 
 
 def train(args: argparse.Namespace) -> None:
@@ -83,7 +95,6 @@ def train(args: argparse.Namespace) -> None:
         raise SplitError("the threshold needs a validation split")
     net = train_net([p for p in splits["train"] if p.scored], args)
     args.out.mkdir(parents=True, exist_ok=True)
-    torch.save({"producer": PRODUCER, "widths": args.widths, "state": net.state_dict()}, args.out / "hole-model.pt")
     onnx_path = args.out / "hole-model.onnx"
     parity = export(net, onnx_path, input_array(read_photo(validation[0])))
     heat = onnx_heat(single_thread_session(str(onnx_path)))
@@ -91,7 +102,7 @@ def train(args: argparse.Namespace) -> None:
     test = [p for p in splits["test"] if p.scored]
     scores = {
         "producer": PRODUCER,
-        "gitCommit": git_commit(),
+        "gitCommit": git_commit(PROJECT),
         "versions": {
             "python": platform.python_version(),
             **{p: version(p) for p in ("torch", "onnx", "onnxruntime", "numpy", "pillow")},
@@ -100,6 +111,7 @@ def train(args: argparse.Namespace) -> None:
         "seeds": {"torch": args.seed, "numpy": args.seed},
         "training": {"steps": args.steps, "batch": args.batch, "crop": args.crop, "lr": args.lr},
         "data": counts,
+        "labelSets": label_set_digests(args.inputs),
         "net": {"widths": list(args.widths), "parameters": sum(p.numel() for p in net.parameters())},
         "onnx": {"file": onnx_path.name, "bytes": onnx_path.stat().st_size, "opset": OPSET},
         "parity": {"maxAbsDifference": float(f"{parity:.1e}"), "photo": validation[0].sha256},
@@ -113,6 +125,11 @@ def train(args: argparse.Namespace) -> None:
     }
     (args.out / "scores.json").write_text(json.dumps(scores, indent=2) + "\n")
     print(json.dumps(scores, indent=2))
+    failures = limit_failures(parity, onnx_path.stat().st_size)
+    for f in failures:
+        print(f"hole-model: {f}", file=sys.stderr)
+    if failures:
+        sys.exit(1)
 
 
 def score_set(args: argparse.Namespace) -> None:

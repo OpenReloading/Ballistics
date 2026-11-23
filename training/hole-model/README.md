@@ -7,10 +7,10 @@ Trains the hole center heatmap net of the target photo editor from random weight
 The trained weights are to be published as CC0, so nothing in this project may carry third-party terms into them:
 
 - No `ultralytics` package: its AGPL-3.0 also covers models trained from scratch with its code (https://www.ultralytics.com/license).
-- No pretrained weights: no `torchvision.models`, `timm`, `torch.hub` or `huggingface_hub`, no `from_pretrained` or URL downloads of weights, and no checkpoint files in the project. Training always starts from random weights and never loads a checkpoint.
+- No pretrained weights: no `torchvision`, `timm`, `huggingface-hub` or `safetensors` package, no use of `torch.hub` or `torchvision.models` (aliases included), no `torch.load`, `from_pretrained` or URL downloads of weights, and no checkpoint files in the project. Training always starts from random weights and never loads a checkpoint.
 - Training photos only under a license that allows CC0 weights.
 
-`uv run license-check` enforces the first two points on `pyproject.toml`, `uv.lock` and every Python file, and exits 1 with a list of findings.
+`uv run license-check` enforces the first two points on `pyproject.toml`, `uv.lock` and every Python file and weight file in the project (outside `.venv/`, `runs/` and `data/`), and exits 1 with a list of findings.
 
 ## Setup and checks
 
@@ -45,8 +45,9 @@ uv run hole-model score --model runs/base/hole-model.onnx --labels <label set> -
 
 `train` runs on one CPU thread with deterministic algorithms, so the same seed, data and lockfile give the same `scores.json`. It writes to the output folder:
 
-- `hole-model.pt`: the PyTorch weights.
 - `hole-model.onnx`: opset 17, input `image` (N x 3 x H x W, RGB in 0..1, H and W multiples of 16), output `heat` (N x 1 x H/2 x W/2 probabilities of a hole center).
-- `scores.json`: the git commit, versions (with the `onnxruntime-web` version the parity stands for), seeds, training settings, photo counts per split, parameters, file size, the largest ONNX Runtime to PyTorch difference on one validation photo, the threshold with the best F1 score on the validation split, the validation and test recall, precision and corrections (median, 90th percentile from 20 photos, maximum), and the wrong-size sweep: the same scores when the app expects 0.5 to 2 times the true hole size.
+- `scores.json`: the git commit (with `-dirty` when anything in this folder is uncommitted), versions (with the `onnxruntime-web` version the parity stands for), seeds, training settings, photo counts per split, the sha256 of each label set file per split, parameters, file size, the largest ONNX Runtime to PyTorch difference on one validation photo, the threshold with the best F1 score on the validation split, the validation and test recall, precision and corrections (median, 90th percentile from 20 photos, maximum), and the wrong-size sweep: the same scores when the app expects 0.5 to 2 times the true hole size.
+
+`train` exits 1 after writing `scores.json` when ONNX Runtime differs from PyTorch by more than 1e-5 or the ONNX file is larger than 1 MiB.
 
 Scores follow the label set metric of `packages/target-recognition/src/hole-matching.ts`: a peak matches a hole within half a hole diameter, one to one, nearest pairs first; corrections per photo are the larger of false and missed. Only photos marked usable and complete are scored. `runs/` and `data/` are not committed.

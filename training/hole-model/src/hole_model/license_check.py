@@ -9,22 +9,37 @@ import sys
 import tomllib
 from pathlib import Path
 
-# Ultralytics' license covers models trained from scratch with its code (https://www.ultralytics.com/license)
-BANNED_PACKAGES = {"ultralytics"}
+# Ultralytics' license covers models trained from scratch (https://www.ultralytics.com/license); the others ship weights
+BANNED_PACKAGES = {"ultralytics", "torchvision", "timm", "huggingface-hub", "safetensors"}
 # the project trains from random weights and never needs to read a checkpoint
-BANNED_IMPORTS = (
+BANNED_NAMES = (
     *("ultralytics", "timm", "torchvision.models", "torch.hub", "huggingface_hub", "safetensors"),
     *("torch.load", "torch.jit.load"),
 )
-BANNED_CALLS = {"torch.load", "torch.jit.load"}
 BANNED_CALL_NAMES = {"load_state_dict_from_url", "load_url", "from_pretrained", "hf_hub_download"}
-WEIGHT_SUFFIXES = {".pt", ".pth", ".ckpt", ".safetensors", ".onnx", ".tflite", ".h5", ".pb"}
-SKIPPED_DIRS = {".venv", "runs", "data", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
+WEIGHT_SUFFIXES = {
+    ".pt",
+    ".pth",
+    ".ckpt",
+    ".safetensors",
+    ".onnx",
+    ".tflite",
+    ".h5",
+    ".pb",
+    ".npz",
+    ".npy",
+    ".bin",
+    ".pkl",
+}
+# untracked project folders (see .gitignore); a folder of the same name elsewhere is still checked
+SKIPPED_ROOT_DIRS = {".venv", "runs", "data"}
+CACHE_DIRS = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
 
 
-def _requirement_name(requirement: str) -> str:
+def _package_name(requirement: str) -> str:
+    """The normalized name (PEP 503) of a requirement or lockfile package."""
     match = re.match(r"\s*([A-Za-z0-9._-]+)", requirement)
-    return match.group(1).lower() if match else ""
+    return re.sub(r"[-_.]+", "-", match.group(1)).lower() if match else ""
 
 
 def manifest_findings(root: Path) -> list[str]:
@@ -38,10 +53,10 @@ def manifest_findings(root: Path) -> list[str]:
             requirements += [r for r in group if isinstance(r, str)]
         for extra in project.get("project", {}).get("optional-dependencies", {}).values():
             requirements += extra
-        found += [f"pyproject.toml: {r}" for r in requirements if _requirement_name(r) in BANNED_PACKAGES]
+        found += [f"pyproject.toml: {r}" for r in requirements if _package_name(r) in BANNED_PACKAGES]
     lock = root / "uv.lock"
     if lock.exists():
-        names = {p.get("name", "").lower() for p in tomllib.loads(lock.read_text()).get("package", [])}
+        names = {_package_name(p.get("name", "")) for p in tomllib.loads(lock.read_text()).get("package", [])}
         found += [f"uv.lock: {n}" for n in sorted(names & BANNED_PACKAGES)]
     return found
 
@@ -49,41 +64,61 @@ def manifest_findings(root: Path) -> list[str]:
 def _dotted(node: ast.expr) -> str:
     if isinstance(node, ast.Name):
         return node.id
-    if isinstance(node, ast.Attribute):
-        return f"{_dotted(node.value)}.{node.attr}"
+    if isinstance(node, ast.Attribute) and (base := _dotted(node.value)):
+        return f"{base}.{node.attr}"
     return ""
 
 
-def _banned_module(name: str) -> bool:
-    return any(name == b or name.startswith(f"{b}.") for b in BANNED_IMPORTS)
+def _banned(name: str) -> str | None:
+    return next((b for b in BANNED_NAMES if name == b or name.startswith(f"{b}.")), None)
+
+
+def _imported_names(tree: ast.Module) -> dict[str, str]:
+    """The full name each imported local name stands for, so that aliases resolve to their module."""
+    names = {}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for a in node.names:
+                local = a.asname or a.name.split(".")[0]
+                names[local] = a.name if a.asname else local
+        elif isinstance(node, ast.ImportFrom) and node.module and not node.level:
+            names |= {a.asname or a.name: f"{node.module}.{a.name}" for a in node.names}
+    return names
 
 
 def source_findings(path: Path, source: str) -> list[str]:
-    """Banned imports and checkpoint loads in one Python file."""
-    found = []
-    for node in ast.walk(ast.parse(source, str(path))):
-        if isinstance(node, ast.Import):
-            found += [f"{path}:{node.lineno}: import {a.name}" for a in node.names if _banned_module(a.name)]
-        elif isinstance(node, ast.ImportFrom) and node.module:
-            names = [node.module, *(f"{node.module}.{a.name}" for a in node.names)]
-            if any(_banned_module(n) for n in names):
-                found.append(f"{path}:{node.lineno}: from {node.module} import")
-        elif isinstance(node, ast.Call):
-            call = _dotted(node.func)
-            if call in BANNED_CALLS or call.rsplit(".", 1)[-1] in BANNED_CALL_NAMES:
-                found.append(f"{path}:{node.lineno}: {call}()")
-    return found
+    """Imports of and references to banned modules, aliases included, and checkpoint loads in one Python file."""
+    tree = ast.parse(source, str(path))
+    imported = _imported_names(tree)
+    found: set[tuple[int, str]] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import | ast.ImportFrom):
+            modules = [a.name for a in node.names] if isinstance(node, ast.Import) else []
+            if isinstance(node, ast.ImportFrom) and node.module and not node.level:
+                modules = [node.module, *(f"{node.module}.{a.name}" for a in node.names)]
+            found |= {(node.lineno, b) for m in modules if (b := _banned(m))}
+        elif isinstance(node, ast.Name | ast.Attribute) and (dotted := _dotted(node)):
+            head, _, rest = dotted.partition(".")
+            full = ".".join(filter(None, (imported.get(head, head), rest)))
+            if banned := _banned(full):
+                found.add((node.lineno, banned))
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name | ast.Attribute):
+            name = node.func.id if isinstance(node.func, ast.Name) else node.func.attr
+            if name in BANNED_CALL_NAMES:
+                found.add((node.lineno, f"{name}()"))
+    return [f"{path}:{line}: {name}" for line, name in sorted(found)]
 
 
 def findings(root: Path) -> list[str]:
     found = manifest_findings(root)
-    for path in sorted(root.rglob("*")):
-        if SKIPPED_DIRS & set(path.relative_to(root).parts):
-            continue
-        if path.suffix in WEIGHT_SUFFIXES:
-            found.append(f"{path.relative_to(root)}: a weight file; the project only writes its own to runs/")
-        elif path.suffix == ".py":
-            found += source_findings(path.relative_to(root), path.read_text())
+    for folder, dirs, files in root.walk():
+        dirs[:] = sorted(d for d in dirs if d not in CACHE_DIRS and not (folder == root and d in SKIPPED_ROOT_DIRS))
+        for name in sorted(files):
+            path = folder / name
+            if path.suffix.lower() in WEIGHT_SUFFIXES:
+                found.append(f"{path.relative_to(root)}: a weight file; the project only writes its own to runs/")
+            elif path.suffix == ".py":
+                found += source_findings(path.relative_to(root), path.read_text())
     return found
 
 
