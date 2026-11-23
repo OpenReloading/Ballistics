@@ -1,6 +1,6 @@
 /** Seeded synthetic target photos for training a hole detector: faces at the true ring geometry of the face records, holes with tears, rims, halos and folded flaps, print and dirt that look like holes, a sheet edge, light and noise; `make-synthetic.mts` adds blur and JPEG and writes them. Pixel centers are integer coordinates. */
 
-import { normalsFrom, seededUniforms } from '@rangefoundry/statistics'
+import { normalsFrom } from '@rangefoundry/statistics'
 import { clamp } from '../../../src/raster-ops.ts'
 import type { PrintedFace } from '../../../src/target-face.ts'
 import { defined } from '../../defined.ts'
@@ -77,12 +77,37 @@ const TABLES: Rgb[] = [
 /** Bullet diameters in mm from 4.5 mm to .45. */
 const CALIBERS = [4.5, 5.6, 6.5, 7.62, 9, 11.43]
 
+/** The murmur3 finalizer: a bijection of 32-bit integers that spreads each input bit over the output. */
+function mix32(h: number): number {
+  const a = Math.imul(h ^ (h >>> 16), 0x85ebca6b)
+  const b = Math.imul(a ^ (a >>> 13), 0xc2b2ae35)
+  return (b ^ (b >>> 16)) >>> 0
+}
+
+/** The uniforms of photo `index` of run `seed`: sfc32 from a 128-bit state hashed from both, as a photo draws about 1.6 million uniforms at 512 px and hashed starts on a 2^32 cycle would overlap within a run of 100. */
+export function photoUniforms(seed: number, index: number): () => number {
+  if (!Number.isInteger(seed) || seed < 0 || seed > 0xffffffff)
+    throw new RangeError(`seed must be an integer from 0 to 4294967295, got ${seed}`)
+  let [a, b, c, d] = [mix32(seed), mix32(index), 0x9e3779b9, 1]
+  const next = () => {
+    const t = (((a + b) | 0) + d) | 0
+    d = (d + 1) | 0
+    a = b ^ (b >>> 9)
+    b = (c + (c << 3)) | 0
+    c = (((c << 21) | (c >>> 11)) + t) | 0
+    return (t >>> 0) / 4294967296
+  }
+  // the first outputs of near states are alike until the state has mixed
+  for (let i = 0; i < 15; i++) next()
+  return next
+}
+
 class Rand {
   readonly #next: () => number
   readonly normal: () => number
-  constructor(seed: number) {
-    this.#next = seededUniforms(seed)
-    this.normal = normalsFrom(this.#next)
+  constructor(next: () => number) {
+    this.#next = next
+    this.normal = normalsFrom(next)
   }
   u(lo = 0, hi = 1): number {
     return lo + (hi - lo) * this.#next()
@@ -540,7 +565,7 @@ function holePainter(scene: Scene, c: Point, rv: number, style: HoleStyle) {
 
 /** One photo: the face, print and dirt, maybe the sheet's edge, the holes, then light, color cast, exposure and noise; blur and JPEG quality are drawn for the writer. */
 export function synthesize(seed: number, index: number, options: SynthOptions): SynthPhoto {
-  const rnd = new Rand((Math.imul(seed, 0x9e3779b1) + index) >>> 0)
+  const rnd = new Rand(photoUniforms(seed, index))
   const { size } = options
   const D = rnd.u(...options.diameter)
   // a hole tears smaller than the bullet; the caliber sets the face's scale
