@@ -46,7 +46,7 @@ export type Camera = {
 }
 
 /** The homography of a pinhole camera that looks at the face center. */
-function camera(c: Camera): Homography {
+export function camera(c: Camera): Homography {
   const rad = Math.PI / 180
   const [tx, ty, tz] = [(c.tilt ?? 0) * rad, (c.yaw ?? 0) * rad, (c.roll ?? 0) * rad]
   // rotation of the face plane: yaw about y, then tilt about x, then roll about z
