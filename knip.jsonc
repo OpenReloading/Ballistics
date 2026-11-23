@@ -103,6 +103,8 @@
       "entry": [
         "vite.config.mts",
         "src/routes/**/*.tsx",
+        // vite.config.mts resolves the next/* imports to them, which knip does not follow
+        "src/platform/start/*.{ts,tsx}",
         "scripts/glyph-advances.mts",
         "src/service-worker.js",
         // scripts/service-worker.mts copies every export into out/sw.js through a namespace import
