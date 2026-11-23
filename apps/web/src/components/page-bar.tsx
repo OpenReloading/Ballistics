@@ -2,7 +2,7 @@
 
 import { ActionIcon, Tooltip } from '@mantine/core'
 import { useMediaQuery, useMounted } from '@mantine/hooks'
-import { DotsThree } from '@phosphor-icons/react'
+import { Ellipsis } from 'lucide-react'
 import {
   type CSSProperties,
   createContext,
@@ -249,7 +249,7 @@ export function PageBar({
             aria-controls={folds ? foldId : id}
             onClick={() => setOpen((o) => !o)}
           >
-            <DotsThree size={20} aria-hidden="true" />
+            <Ellipsis size={20} aria-hidden="true" />
           </ActionIcon>
           <div
             id={id}

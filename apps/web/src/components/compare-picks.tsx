@@ -1,7 +1,7 @@
 'use client'
 
 import { Button, Popover, Tooltip } from '@mantine/core'
-import { ArrowsLeftRight, EyeSlash, X } from '@phosphor-icons/react'
+import { ArrowLeftRight, EyeOff, X } from 'lucide-react'
 import { useEffect, useId, useRef } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
@@ -129,7 +129,7 @@ function HiddenPicks({
           size={controlSize.row.button}
           px={6}
           aria-haspopup="dialog"
-          leftSection={<EyeSlash size={12} aria-hidden="true" />}
+          leftSection={<EyeOff size={12} aria-hidden="true" />}
         >
           <span className="hidden-picks-count" aria-hidden="true">
             {hidden.length}
@@ -201,7 +201,7 @@ export function CompareButton({
           data-disabled
           aria-disabled="true"
           aria-describedby={need ? hint : undefined}
-          leftSection={<ArrowsLeftRight aria-hidden="true" />}
+          leftSection={<ArrowLeftRight aria-hidden="true" />}
         >
           {label}
         </Button>
@@ -217,7 +217,7 @@ export function CompareButton({
       component={Link}
       href={href}
       variant={count > 0 ? 'filled' : 'default'}
-      leftSection={<ArrowsLeftRight aria-hidden="true" />}
+      leftSection={<ArrowLeftRight aria-hidden="true" />}
     >
       {label}
     </Button>

@@ -1,7 +1,7 @@
 'use client'
 
 import { Anchor, Button } from '@mantine/core'
-import { Info, Question, Warning } from '@phosphor-icons/react'
+import { CircleQuestionMark, Info, TriangleExclamationPoint } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
@@ -17,8 +17,8 @@ export const noteLooks: Record<
   NoteKind,
   { word: ReturnType<typeof msg>; group: ReturnType<typeof msg>; Icon: typeof Info }
 > = {
-  warning: { word: msg('Warning'), group: msg('Warnings'), Icon: Warning },
-  message: { word: msg('Message'), group: msg('Messages'), Icon: Question },
+  warning: { word: msg('Warning'), group: msg('Warnings'), Icon: TriangleExclamationPoint },
+  message: { word: msg('Message'), group: msg('Messages'), Icon: CircleQuestionMark },
   note: { word: msg('Note'), group: msg('result\u0004Notes'), Icon: Info },
 }
 

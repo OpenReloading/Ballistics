@@ -1,8 +1,8 @@
 'use client'
 
 import { Button, Group, MultiSelect, Pill } from '@mantine/core'
-import { ChartLine } from '@phosphor-icons/react'
 import type { Powder } from '@rangefoundry/schema'
+import { ChartLine } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from '@/platform/link.tsx'
 import { storedRecords } from '@/platform/user-store.ts'

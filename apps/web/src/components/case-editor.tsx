@@ -10,8 +10,8 @@ import {
   Textarea,
   TextInput,
 } from '@mantine/core'
-import { X } from '@phosphor-icons/react'
 import { type Case, caseMaterials } from '@rangefoundry/schema'
+import { X } from 'lucide-react'
 import { type Dispatch, type SetStateAction, useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { apiFetch } from '../lib/api-fetch.ts'

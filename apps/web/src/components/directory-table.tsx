@@ -1,7 +1,7 @@
 'use client'
 
 import { CloseButton, Group, Select, TextInput, Tooltip, UnstyledButton } from '@mantine/core'
-import { CaretDown, CaretUp, CaretUpDown, MagnifyingGlass } from '@phosphor-icons/react'
+import { ChevronDown, ChevronsUpDown, ChevronUp, Search as SearchIcon } from 'lucide-react'
 import {
   type CSSProperties,
   type FocusEvent,
@@ -537,9 +537,9 @@ const nextSort = (key: string, dir: 'ascending' | 'descending' | undefined): Dir
 function SortMark({ dir }: { dir: 'ascending' | 'descending' | undefined }) {
   return (
     <span aria-hidden="true" className="sort-mark" data-dir={dir}>
-      {dir === 'ascending' && <CaretUp size={12} weight="bold" />}
-      {dir === 'descending' && <CaretDown size={12} weight="bold" />}
-      {dir === undefined && <CaretUpDown size={12} />}
+      {dir === 'ascending' && <ChevronUp size={12} strokeWidth={2.25} />}
+      {dir === 'descending' && <ChevronDown size={12} strokeWidth={2.25} />}
+      {dir === undefined && <ChevronsUpDown size={12} />}
     </span>
   )
 }
@@ -870,7 +870,7 @@ export function DirectoryFilters({
         spellCheck={false}
         type="search"
         size={controlSize.row.input}
-        leftSection={<MagnifyingGlass size={14} aria-hidden="true" />}
+        leftSection={<SearchIcon size={14} aria-hidden="true" />}
         // always mounted, hidden while empty, so the text does not move when it appears
         rightSection={
           <CloseButton

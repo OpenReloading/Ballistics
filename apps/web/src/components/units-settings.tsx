@@ -2,7 +2,7 @@
 
 import { Button, NativeSelect, SegmentedControl, SimpleGrid, Stack, Tooltip } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
-import { Ruler } from '@phosphor-icons/react'
+import { Ruler } from 'lucide-react'
 import {
   createContext,
   type ReactNode,

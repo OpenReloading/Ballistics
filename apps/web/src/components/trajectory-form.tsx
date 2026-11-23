@@ -11,7 +11,6 @@ import {
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useDebouncedValue, useMediaQuery } from '@mantine/hooks'
-import { Printer } from '@phosphor-icons/react'
 import {
   type DragModel,
   dragModels,
@@ -19,6 +18,7 @@ import {
   type Trajectory,
 } from '@rangefoundry/ballistics'
 import { type Bullet, toSi } from '@rangefoundry/schema'
+import { Printer } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import {
   type ReactNode,

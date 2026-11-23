@@ -1,7 +1,7 @@
 'use client'
 
 import { TextInput } from '@mantine/core'
-import { MagnifyingGlass } from '@phosphor-icons/react'
+import { Search } from 'lucide-react'
 import { useState } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
@@ -30,7 +30,7 @@ export function BulletCartridges({ fits }: { fits: { id: string; name: string }[
         size={controlSize.row.input}
         aria-label={t('Filter the cartridges')}
         placeholder={t('Filter cartridges')}
-        leftSection={<MagnifyingGlass aria-hidden="true" />}
+        leftSection={<Search aria-hidden="true" />}
         value={q}
         onChange={(e) => setQ(e.currentTarget.value)}
       />

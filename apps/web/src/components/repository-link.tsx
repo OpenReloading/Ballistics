@@ -1,5 +1,5 @@
 import { ActionIcon, NavLink } from '@mantine/core'
-import { GithubLogo } from '@phosphor-icons/react'
+import { CodeXml } from 'lucide-react'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 
@@ -21,7 +21,7 @@ export function RepositoryLink({
         component="a"
         href={url}
         label={t(label)}
-        leftSection={<GithubLogo size={20} aria-hidden="true" />}
+        leftSection={<CodeXml size={20} aria-hidden="true" />}
       />
     )
   return (
@@ -33,7 +33,7 @@ export function RepositoryLink({
       aria-label={t(label)}
       className="repository-link"
     >
-      <GithubLogo size={20} aria-hidden="true" />
+      <CodeXml size={20} aria-hidden="true" />
     </ActionIcon>
   )
 }

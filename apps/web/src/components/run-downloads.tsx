@@ -1,7 +1,7 @@
 'use client'
 
 import { Button, Group } from '@mantine/core'
-import { DownloadSimple } from '@phosphor-icons/react'
+import { Download } from 'lucide-react'
 import { useTranslation } from '../i18n/language.ts'
 import type { InteriorResponse } from '../lib/api-types.ts'
 import { download } from '../lib/download.ts'
@@ -25,7 +25,7 @@ export function RunDownloads({
   system: UnitSystem
 }) {
   const { t } = useTranslation()
-  const icon = <DownloadSimple size={16} aria-hidden="true" />
+  const icon = <Download size={16} aria-hidden="true" />
   return (
     <Group gap="xs" className="run-downloads">
       <Button

@@ -1,9 +1,9 @@
 'use client'
 
 import { Badge, Button, Flex, Group, NativeSelect, Tabs } from '@mantine/core'
-import { FileArrowUp } from '@phosphor-icons/react'
 import type { ChronoImport, VelocityUnit } from '@rangefoundry/importers'
 import { toSi } from '@rangefoundry/schema'
+import { FileUp } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
@@ -171,7 +171,7 @@ export function SessionSummary() {
         ) : (
           error === undefined && (
             <EmptyNote
-              icon={<FileArrowUp size={24} aria-hidden="true" />}
+              icon={<FileUp size={24} aria-hidden="true" />}
               title={t('No file read yet.')}
               description={t(
                 'Choose or drop a chronograph file, or load the example: three strings of ten made-up shots.',

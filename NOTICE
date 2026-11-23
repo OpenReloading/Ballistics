@@ -90,8 +90,6 @@ License, whose text is the same as above, with these copyright notices:
 - styled-jsx 5.1.6 (https://github.com/vercel/styled-jsx): Copyright (c) 2016-present Vercel, Inc.
 - @mantine/core, @mantine/form, @mantine/hooks, @mantine/spotlight 9.8.0
   (https://github.com/mantinedev/mantine): Copyright (c) 2021 Vitaly Rtishchev
-- @phosphor-icons/react 2.1.10 (https://github.com/phosphor-icons/react):
-  Copyright (c) 2020 Phosphor Icons
 - zod 4.6.7 (https://github.com/colinhacks/zod): Copyright (c) 2025 Colin McDonnell
 - @docusaurus/core, @docusaurus/theme-classic, @docusaurus/plugin-content-docs,
   @docusaurus/plugin-sitemap 3.10.2, docs site (https://github.com/facebook/docusaurus):
@@ -103,6 +101,28 @@ License, whose text is the same as above, with these copyright notices:
 
 The web app bundles @swc/helpers 0.5.23 (https://github.com/swc-project/swc) under the
 Apache License, Version 2.0 (https://www.apache.org/licenses/LICENSE-2.0).
+
+---
+
+The web app bundles lucide-react 1.73.0 (https://github.com/lucide-icons/lucide) under the
+ISC License that follows. Its icons derived from Feather (https://github.com/feathericons/feather)
+are, in addition, Copyright (c) 2013-present Cole Bemis, under the MIT License above.
+
+ISC License
+
+Copyright (c) 2026 Lucide Icons and Contributors
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 ---
 
@@ -206,7 +226,6 @@ the package declares. Written by `node tools/src/licences.ts --write`.
 @messageformat/parser 5.2.0 MIT
 @next/env 16.4.6 MIT
 @noble/hashes 2.4.0 MIT
-@phosphor-icons/react 2.1.10 MIT
 @pinojs/redact 0.4.0 MIT
 @scalar/client-side-rendering 0.4.19 MIT
 @scalar/fastify-api-reference 1.78.1 MIT
@@ -271,6 +290,7 @@ json-schema-traverse 1.0.0 MIT
 jsqr 1.4.0 Apache-2.0
 klona 2.0.6 MIT
 light-my-request 6.6.0 BSD-3-Clause
+lucide-react 1.73.0 ISC
 media-typer 1.1.1 MIT
 mime-db 1.54.0 MIT
 mime-types 3.0.2 MIT
