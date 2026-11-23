@@ -2,7 +2,7 @@ import { expect, type Locator, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
 import { storageName } from './edition.ts'
 import { showGerman } from './german.ts'
-import { exported, gotoHydrated } from './nav.ts'
+import { based, exported, gotoHydrated } from './nav.ts'
 import { settingsEntry, storeUnits } from './units.ts'
 
 // Settings is a dialog only, no page: every entry is a button opening it over the page, on every route
@@ -73,7 +73,8 @@ test('Settings has no page: /settings answers 404 and no entry is a link', async
   await page.goto('./session')
   for (const entry of [sidebarSettings(page), unitsButton(page)])
     await expect(entry).not.toHaveAttribute('href')
-  await expect(page.locator('a[href="/settings"]')).toHaveCount(0)
+  // a prefix match: with `trailingSlash` a link to the page renders as `/settings/`
+  await expect(page.locator(`a[href^="${based('/settings')}"]`)).toHaveCount(0)
 })
 
 test('at 390 px Settings in the drawer closes the drawer, then opens the dialog', async ({

@@ -5,7 +5,7 @@ import { safetyAck } from './tests/web/nav.ts'
 // a trailing slash, so the specs' `./path` stays below the base path
 const webUrl = (process.env.WEB_URL ?? 'http://localhost:3003').replace(/\/?$/, '/')
 /** The Pages site (`pnpm run pages:serve`), with its base path and a trailing slash. Unset: no project `pages`. */
-const pagesUrl = process.env.PAGES_URL
+const pagesUrl = process.env.PAGES_URL?.replace(/\/?$/, '/')
 /** Set: projects `firefox` and `webkit` run the smoke spec against `WEB_URL`. */
 const allEngines = Boolean(process.env.ALL_ENGINES)
 /** `off`: no Start site build and no projects `start-*` (the drawing baseline, a local `--project full` run). */

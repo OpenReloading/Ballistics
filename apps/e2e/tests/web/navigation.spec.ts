@@ -86,7 +86,7 @@ test('a cartridge, after a search, and a report are two clicks from the home pag
     .click()
   await expect(page).toHaveURL(exported('/cartridges'))
   // the directory shows the rows in view: a search finds the record
-  const link = page.locator('a[href="/cartridges/308-win/"]')
+  const link = page.locator(`a[href="${exported('/cartridges/308-win')}"]`)
   await page.getByRole('searchbox', { name: 'Search' }).fill('308 win')
   await expect(link).toBeVisible()
   await link.click()

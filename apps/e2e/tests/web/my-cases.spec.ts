@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { gotoHydrated } from './nav.ts'
+import { based, gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
 import { loadForm, openKeeping } from './workbench.ts'
@@ -57,7 +57,7 @@ test('an own case group is a Mine row of the Cases list, opened in its editor, p
   await expect(link('Match brass, lot 3')).toBeVisible()
   await expect(link('Plain brass')).toBeVisible()
   // the catalogue's products stay in the list; the source filter has both sources
-  await expect(page.locator('a[href^="/cases/demo-"]').first()).toBeVisible()
+  await expect(page.locator(`a[href^="${based('/cases/demo-')}"]`).first()).toBeVisible()
   const count = page.locator('.page-bar-status .bar-count')
   const all = await count.textContent()
   await page.getByRole('button', { name: /^Source: / }).click()
