@@ -19,6 +19,8 @@
     "pages:serve": "pnpm --filter @rangefoundry/tools run pages:serve",
     "dev:static": "pnpm --filter @rangefoundry/tools run dev:static",
     "static:build": "pnpm --filter @rangefoundry/tools run pages --sample",
+    "start:build": "pnpm --filter @rangefoundry/tools run start-site",
+    "start:serve": "pnpm --filter @rangefoundry/tools run start-site --serve-only",
     "data:validate": "pnpm --filter @rangefoundry/tools run catalog:validate",
     "api:check": "pnpm --filter @rangefoundry/tools run api-check",
     "api:conformance": "pnpm --filter @rangefoundry/tools run api-conformance",

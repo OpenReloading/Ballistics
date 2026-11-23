@@ -104,6 +104,8 @@ it('runs the e2e job for the scripts that build and serve the export', () => {
     'tools/src/pages-serve.ts',
     'tools/src/pages-payload.ts',
     'tools/src/executable.ts',
+    'tools/src/start-site.ts',
+    'tools/src/root-not-found.ts',
   ])
     expect(plan([f], closure), f).toMatchObject({ check: true, e2e: true })
 })
