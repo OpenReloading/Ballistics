@@ -73,6 +73,22 @@ describe('evaluate', () => {
     expect(r.overall.interval).toEqual({ coverage: 0.5 })
   })
 
+  it('gives no coverage to a group with a row of a class without training rows', () => {
+    const at = (bullet: string, barrel: number, predicted: number): Outcome => {
+      const o = used(bullet, 1000, predicted)
+      return { ...o, row: { ...o.row, barrel } }
+    }
+    const r = evaluate(
+      [at('b1', 120, 1000), at('b1', 610, 1000), at('b2', 610, 1000)],
+      [at('b', 610, 1020)],
+      'bullet',
+    )
+    expect(r.interval.byBarrel).not.toHaveProperty('handgun')
+    expect(r.overall.interval).toBeNull()
+    expect(r.grouped?.groups.b1?.interval).toBeNull()
+    expect(r.grouped?.groups.b2?.interval).toEqual({ coverage: 1 })
+  })
+
   it('groups by bullet', () => {
     const r = evaluate([used('b1', 800, 800), used('b2', 800, 800)], [], 'bullet')
     expect(Object.keys(r.grouped?.groups ?? {})).toEqual(['b1', 'b2'])

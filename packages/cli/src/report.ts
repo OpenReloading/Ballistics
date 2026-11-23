@@ -12,7 +12,11 @@ const widthsLine = (interval: VerifyResult['interval']) =>
   barrelClasses
     .flatMap((c) => {
       const w = interval.byBarrel?.[c]
-      return w ? [`${c} ${pct(w.halfWidth)} % (${w.trainingRows} rows)`] : []
+      return w
+        ? [
+            `${c} ${pct(w.halfWidth)} % (${w.trainingRows} ${w.trainingRows === 1 ? 'row' : 'rows'})`,
+          ]
+        : []
     })
     .join(', ') || 'none'
 

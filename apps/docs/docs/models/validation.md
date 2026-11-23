@@ -32,7 +32,7 @@ All errors are absolute relative errors. For the muzzle velocity the error of a 
 
 - Median and 90th percentile (P90) of the error, over the rows the model gave a result for.
 - Rows the model did not run are counted by reason, next to the metrics. A model that refuses rows would otherwise look better.
-- Interval coverage: the share of rows whose printed value lies inside the 90 % interval the model states for it, the model velocity times $(1 \pm h)$. The half width $h$ is set per barrel class (handgun under 300 mm, rifle): the 90th percentile of $|v_\text{model} - v_\text{printed}| / v_\text{model}$, the distance the coverage tests, over the training rows of the class. Handgun and rifle rows differ in error and in their share of each split, so one half width over both would be too wide for rifle rows and too narrow for handgun rows.
+- Interval coverage: the share of rows whose printed value lies inside the 90 % interval the model states for it, the model velocity times $(1 \pm h)$. The half width $h$ is set per barrel class (handgun under 300 mm, rifle): the 90th percentile of $|v_\text{model} - v_\text{printed}| / v_\text{model}$, the distance the coverage tests, over the training rows of the class. Handgun and rifle rows differ in error and in their share of each split, so on the training rows one half width over both would be too wide for rifle rows and too narrow for handgun rows. The 90 % holds per class on the training rows; on rows outside the training split the coverage can be lower. The half width comes from the training split and is not a prediction interval.
 - Each metric is reported for all rows of the split, per powder and per powder family.
 
 ### Command
