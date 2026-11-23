@@ -4,6 +4,7 @@
   "include": [
     "src/routes",
     "src/router.tsx",
+    "src/platform/start",
     "src/routeTree.gen.ts",
     "vite.config.mts",
     "test/record-routes.test.ts"
