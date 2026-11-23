@@ -211,10 +211,19 @@ export type LabelSet = {
 export const labelSet: z.ZodType<LabelSet>;
 
 // @public
+export function learnedDetector(manifest: ModelManifest, run: RunModel): InferencePort;
+
+// @public
 export function matchHoles(marks: readonly Point[], holes: readonly Point[], diameter: number): HoleMatch;
 
 // @public
 export function median1(v: readonly number[]): number;
+
+// @public
+export class ModelContractError extends Error {
+    // (undocumented)
+    name: string;
+}
 
 // @public
 export type ModelManifest = {
@@ -272,6 +281,12 @@ export type ModelScores = {
     median: number;
     p90: number | null;
     max: number;
+};
+
+// @public
+export type ModelTensor = {
+    data: Float32Array;
+    dims: readonly number[];
 };
 
 // @public
@@ -336,6 +351,9 @@ export type Ring = {
     arc: number;
     points: number;
 };
+
+// @public
+export type RunModel = (input: ModelTensor) => Promise<ModelTensor>;
 
 // @public
 export function shareInside(e: Ellipse, w: number, h: number): number;

@@ -317,6 +317,23 @@ Code: `packages/target-recognition/src/face-search.ts`, `findFace`, `holeSize`. 
 
 Code: `packages/target-recognition/src/hole-detection.ts`, `autoDetect`, `runSeeds`, `SEED_MIN_SIZE`. `packages/target-recognition/src/color-axis.ts`, `rescale`, `logLuma`.
 
+### Learned detector
+
+`learnedDetector(manifest, run)` is an inference port around a model that turns a working image into a heatmap of hole centers. The caller passes the run function (tensor in, heatmap out), so the package does no I/O. It reads one heatmap channel at a stride $t$ that divides the size multiple $M$, and throws a `ModelContractError` for another manifest or for a heatmap of another size.
+
+1. The region with a margin of $3 D_\mathrm{px}$ (no region: the face outline, else the whole photo) is resampled so the expected hole is the manifest's working hole diameter $D_m$: $w = \operatorname{round}(W D_m / D_\mathrm{px})$, $h$ likewise, each working pixel the mean of the photo area it covers. Channels are put in the manifest's order and scaled to its value range.
+2. Width and height are padded to multiples of $M$ by repeating the last column and row.
+3. A peak is a heatmap cell at or above the manifest's threshold that no 8-neighbor exceeds. The threshold is set on the validation photos, never on the holdout. A cell $(i, j)$ lies at $x = x_0 + (i + \tfrac{1}{2})\, t\, W / w - \tfrac{1}{2}$ photo pixels (rows likewise); a cell in the padding or a center outside the region gives no proposal.
+4. A peak value $p$ maps onto the confidence scale so that the manifest's `sure` value $p_s$ lands on 0.5, the lower edge of the sure tier, and every peak below it stays a maybe:
+
+$$
+\text{confidence} = \begin{cases} 0.5\, p / p_s & p \lt p_s \\ 0.5 + 0.5\, (p - p_s) / (1 - p_s) & p \ge p_s \end{cases}
+$$
+
+Code: `packages/target-recognition/src/learned-detector.ts`, `learnedDetector`, `coverage`, `peaks`, `confidence`, `clustered`.
+
+Proposals whose centers lie closer than $D_\mathrm{px}$, directly or through a chain, share a cluster id. Each proposal's diameter is $D_\mathrm{px}$; a working image over $2 \times 10^6$ pixels is refused.
+
 ### Photo quality
 
 The target search also checks the photo, resized to 2000 px on its longer side, for what makes holes hard to find, and says what to change when retaking it. A problem has a level: fair (a note) or bad. A photo with a bad problem is below the minimum quality: when the target search finds exactly one sure fit, the run on an added photo applies the target and waits, and the button reads Detect anyway. With several fits or none the run goes on in the guided steps, which show no Detect anyway. Every other problem is a note beside the run. The check never says that a photo is good or that a detection is right. Taking a photo that passes these checks: [Taking a photo the app can score](../photo-guide.md). Where the app has a docs site, the Photo panel links that page and each note links the rule of it that matches its problem (`guideRule`): framing and no edge found to One target, all of it; tilt to Straight from above; contrast, brightness, glare and uneven light to Even light; hole size to Close enough; sharpness to Steady.
