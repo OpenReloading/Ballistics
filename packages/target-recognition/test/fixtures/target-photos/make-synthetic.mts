@@ -1,22 +1,60 @@
 /** Writes seeded synthetic target photos of `synthetic.ts` and their `holes.json` in the label set format to a folder; run from packages/target-recognition: node test/fixtures/target-photos/make-synthetic.mts --out <dir> [--seed 1] [--count 100] [--size 512] [--diameter 8,48] [--holes 0,30] */
 import { createHash } from 'node:crypto'
-import { mkdirSync, readdirSync, writeFileSync } from 'node:fs'
-import { join } from 'node:path'
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  realpathSync,
+  renameSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
+import { basename, dirname, join, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
 import sharp from 'sharp'
 import type { LabeledPhoto } from '../../../src/label-set.ts'
 import { type SynthOptions, synthesize } from './synthetic.ts'
 
-/** Writes `count` photos of `seed` and `holes.json` to `dir`, which must be empty or new; the same arguments give the same bytes. */
+/** Writes `count` photos of `seed` and `holes.json` to `dir`, which must be empty or new, and leaves no file in it when a photo or a move fails; the same arguments give the same bytes. */
 export async function writePhotos(
   dir: string,
   seed: number,
   count: number,
-  options: SynthOptions,
+  { move = renameSync, ...options }: SynthOptions & { move?: (from: string, to: string) => void },
 ): Promise<void> {
-  mkdirSync(dir, { recursive: true })
   // photos of an earlier run would sit beside a holes.json that does not list them
-  if (readdirSync(dir).length > 0) throw new Error(`${dir} is not empty`)
+  if (existsSync(dir) && readdirSync(dir).length > 0) throw new Error(`${dir} is not empty`)
+  const target = resolve(dir)
+  mkdirSync(dirname(target), { recursive: true })
+  // beside the folder a symlinked target resolves to, so the moves stay on one disk
+  const home = existsSync(target) ? realpathSync(target) : target
+  const temp = mkdtempSync(join(dirname(home), `.${basename(home)}-`))
+  try {
+    const files = await writeInto(temp, seed, count, options)
+    mkdirSync(target, { recursive: true })
+    const moved: string[] = []
+    try {
+      for (const file of files) {
+        move(join(temp, file), join(target, file))
+        moved.push(file)
+      }
+    } catch (error) {
+      for (const file of moved) rmSync(join(target, file), { force: true })
+      throw error
+    }
+  } finally {
+    rmSync(temp, { recursive: true, force: true })
+  }
+}
+
+/** Writes the photos and then `holes.json` to `dir`; returns the file names in that order. */
+async function writeInto(
+  dir: string,
+  seed: number,
+  count: number,
+  options: SynthOptions,
+): Promise<string[]> {
   const photos: Record<string, LabeledPhoto> = {}
   for (let index = 0; index < count; index++) {
     const p = synthesize(seed, index, options)
@@ -46,6 +84,7 @@ export async function writePhotos(
     }
   }
   writeFileSync(join(dir, 'holes.json'), `${JSON.stringify({ photos }, null, 2)}\n`)
+  return [...Object.keys(photos), 'holes.json']
 }
 
 /** `text` as an integer, at least `min`. */
