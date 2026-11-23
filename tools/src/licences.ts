@@ -194,9 +194,12 @@ export function readPolicy(text: string): Policy {
   }
   const excepted = (
     config['allow-dependencies-licenses'] ? list('allow-dependencies-licenses') : []
-  ).map((purl) => {
-    if (!purl.startsWith('pkg:npm/')) throw new Error(`${purl}: only pkg:npm/ entries`)
-    return decodeURIComponent(purl.slice('pkg:npm/'.length))
+  ).flatMap((purl) => {
+    // the review step also reads the Python lockfile of training/hole-model; this check reads pnpm's packages only
+    if (purl.startsWith('pkg:pypi/')) return []
+    if (!purl.startsWith('pkg:npm/'))
+      throw new Error(`${purl}: only pkg:npm/ and pkg:pypi/ entries`)
+    return [decodeURIComponent(purl.slice('pkg:npm/'.length))]
   })
   return { allow: new Set(list('allow-licenses')), excepted: new Set(excepted) }
 }
