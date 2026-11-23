@@ -61,7 +61,11 @@ for (const { name, base, prefix } of editions)
         await expect(page.locator('html')).toHaveAttribute('lang', language)
         // the navigation of every page, in this edition's stored language
         const workbench = { en: 'Load workbench', de: 'Werkbank für Laborierungen' }[language]
-        await expect(page.getByRole('link', { name: workbench })).toBeVisible()
+        // by its name: the not-found page lists the same page
+        const navigation = { en: 'Main', de: 'Hauptnavigation' }[language]
+        await expect(
+          page.getByRole('navigation', { name: navigation }).getByRole('link', { name: workbench }),
+        ).toBeVisible()
         await page.waitForLoadState('networkidle')
         // the fallback's title is "Page not found"; the app's titles end in its name
         await expect(page).toHaveTitle(/RangeFoundry Workbench$/)

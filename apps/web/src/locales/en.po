@@ -67,9 +67,6 @@ msgstr "Notes"
 msgid "page.offline"
 msgstr "Offline"
 
-msgid "notFound.title"
-msgstr "Page not found"
-
 msgid "record.powders"
 msgstr "Powder"
 

@@ -2,8 +2,28 @@ import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import { checkRecordPaths, staticPaths } from './src/routes/-static-paths.ts'
+
+const startBodies: Record<string, string> = {
+  'next/dynamic': 'dynamic.tsx',
+  'next/font/local': 'local-font.ts',
+  'next/image': 'image.tsx',
+  'next/link': 'link.tsx',
+  'next/navigation': 'navigation.ts',
+}
+
+/** The views import these Next modules; the Start build takes the bodies in src/platform/start, and any other Next module fails it. */
+const nextSeam: Plugin = {
+  name: 'next-seam',
+  enforce: 'pre',
+  resolveId(id) {
+    const body = startBodies[id]
+    if (body) return path.join(import.meta.dirname, 'src/platform/start', body)
+    if (id === 'next' || id.startsWith('next/')) this.error(`${id} has no body in the Start build`)
+    return null
+  },
+}
 
 export default defineConfig(({ command }) => {
   // the edition's own path, as next.config.ts reads it: /Ballistics/next for next on the project site
@@ -42,6 +62,7 @@ export default defineConfig(({ command }) => {
       ssr: { build: { rolldownOptions: { output: { entryFileNames: '[name].js' } } } },
     },
     plugins: [
+      nextSeam,
       tanstackStart({
         // no link's path, so the shell marks none as the current page
         spa: { enabled: true, maskPath: '/_shell' },
