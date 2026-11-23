@@ -7,6 +7,17 @@ export const nextParity: readonly { file: string; titles?: readonly string[] }[]
       'a record id the catalogue does not hold, as after its removal, answers 404 with the not-found page',
     ],
   },
+  {
+    file: 'home-continue.spec.ts',
+    titles: [
+      'at 1280 x 650 the Continue line moves nothing, with saved loads',
+      'at 1280 x 650 the Continue line moves nothing, without saved loads',
+      'at 390 x 844 the Continue line moves nothing, with saved loads',
+      'at 390 x 844 the Continue line moves nothing, without saved loads',
+      'at 1280 x 650 the keyboard order of the home page equals its visual order',
+      'at 390 x 844 the keyboard order of the home page equals its visual order',
+    ],
+  },
   { file: 'offline-page.spec.ts' },
   {
     file: 'safety.spec.ts',
