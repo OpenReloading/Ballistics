@@ -22,8 +22,12 @@ export default {
   },
   // the scheme follows the system setting, which each test browser of vitest.config.ts emulates
   decorators: [
-    (Story, { globals }) => (
-      <UiProvider i18n={globals['locale'] === 'de' ? i18n.de : i18n.en} defaultColorScheme="auto">
+    (Story, { globals, parameters }) => (
+      <UiProvider
+        i18n={globals['locale'] === 'de' ? i18n.de : i18n.en}
+        decimalMark={parameters['decimalMark'] === ',' ? ',' : '.'}
+        defaultColorScheme="auto"
+      >
         <Story />
       </UiProvider>
     ),

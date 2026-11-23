@@ -94,6 +94,7 @@ export const uiMessages: Record<'en' | 'de', Messages>;
 // @public
 export function UiProvider(input: {
     i18n: I18n;
+    decimalMark?: '.' | ',';
 } & Pick<MantineProviderProps, 'children' | 'defaultColorScheme' | 'forceColorScheme' | 'colorSchemeManager'>): ReactElement;
 
 // (No @packageDocumentation comment for this package)

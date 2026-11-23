@@ -1,4 +1,4 @@
-import { Button, Checkbox, Group, Radio, Stack, TextInput } from '@mantine/core'
+import { Button, Checkbox, Group, NumberInput, Radio, Stack, TextInput } from '@mantine/core'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect } from 'storybook/test'
 
@@ -97,3 +97,15 @@ export const Buttons: Story = {
     </Group>
   ),
 }
+
+/** A number field writes the decimal mark of `UiProvider`, which the story's `decimalMark` parameter sets. */
+const numberField = (mark: '.' | ',', shown: string): Story => ({
+  parameters: { decimalMark: mark },
+  render: () => <NumberInput label="Charge" defaultValue={1.5} />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByLabelText('Charge')).toHaveValue(shown)
+  },
+})
+
+export const NumberPoint: Story = numberField('.', '1.5')
+export const NumberComma: Story = numberField(',', '1,5')
