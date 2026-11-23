@@ -27,6 +27,23 @@ const rejected: [string, object, object][] = [
     withTraining({ [key]: [] }),
     { code: 'unrecognized_keys', keys: [key], path: trainingPath },
   ]),
+  ...['https://example.org/t/1/photo.jpg', 'photo-1.jpg', 'photo by J. Doe, CC BY 4.0'].map(
+    (kind): [string, object, object] => [
+      `${kind} as a target kind`,
+      withTraining({ kinds: { [kind]: 1 } }),
+      { code: 'invalid_key', path: [...trainingPath, 'kinds', kind] },
+    ],
+  ),
+  [
+    'an id that is not a slug',
+    { ...example, id: 'Hole heatmap, photos by J. Doe' },
+    { code: 'invalid_format', format: 'regex', path: ['id'] },
+  ],
+  [
+    'a credit line in the model license',
+    { ...example, license: { ...example.license, model: 'CC0-1.0; photos by J. Doe' } },
+    { code: 'invalid_format', format: 'regex', path: ['license', 'model'] },
+  ],
   [
     'a sha256 that is not 64 hex characters',
     withFile({ sha256: '9f86d081' }),

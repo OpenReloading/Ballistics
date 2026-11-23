@@ -32,6 +32,7 @@ const text = z.string().min(1)
 const count = z.number().int().nonnegative()
 const share = z.number().min(0).max(1)
 const positiveInt = z.number().int().positive()
+const slug = z.string().regex(/^[a-z][a-z0-9-]*$/)
 
 const scores = z.strictObject({
   photos: count,
@@ -40,10 +41,9 @@ const scores = z.strictObject({
   max: z.number().nonnegative(),
 })
 
-/** Schema of a model manifest file. */
-export const modelManifest: z.ZodType<ModelManifest> = z.strictObject({
+const shape = z.strictObject({
   schemaVersion: z.literal(1),
-  id: text,
+  id: slug,
   version: text,
   file: z.strictObject({
     // a bare file name, so a download cannot write outside its folder
@@ -79,10 +79,12 @@ export const modelManifest: z.ZodType<ModelManifest> = z.strictObject({
       when: (payload) => payload.issues.length === 0,
     }),
   license: z.strictObject({
-    model: text,
+    // an SPDX license identifier, so no credit line fits
+    model: z.string().regex(/^[A-Za-z0-9.+-]+$/),
     training: z.strictObject({
       classes: z.strictObject({ own: count, 'third-party': count, synthetic: count }),
-      kinds: z.record(text, count),
+      // refuses a URL, file name or credit line as a kind; a site name written as a slug still fits
+      kinds: z.record(slug, count),
     }),
   }),
   measured: z.strictObject({
@@ -91,3 +93,10 @@ export const modelManifest: z.ZodType<ModelManifest> = z.strictObject({
     parity: z.number().nonnegative(),
   }),
 })
+
+type Same<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false
+// fails the typecheck when the schema and the hand-written type drift either way
+true satisfies Same<z.output<typeof shape>, ModelManifest>
+
+/** Schema of a model manifest file. */
+export const modelManifest: z.ZodType<ModelManifest> = shape
