@@ -1,7 +1,16 @@
 import { createHash } from 'node:crypto'
-import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs'
+import {
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  realpathSync,
+  renameSync,
+  rmSync,
+  symlinkSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
 import { labelSet } from '../src/label-set.ts'
 import { defined } from './defined.ts'
@@ -65,7 +74,7 @@ function shared(a: [number, number], b: [number, number]): number {
 
 describe('synthetic photo streams', () => {
   it('gives photos of nearby indices and seeds streams that share no draws', () => {
-    // a 512 px photo draws about 1.6 million uniforms; on one 2^32 cycle the first two pairs overlap with starts at seed * 0x9e3779b1 + index, the third with hashed starts
+    // a 512 px photo draws about 1.6 million uniforms; on one 2^32 cycle the first two pairs overlap with starts at seed * 0x9e3779b1 + index, the third with starts at mix32(mix32(seed) + index * 0x9e3779b9)
     const pairs: [[number, number], [number, number]][] = [
       [
         [1, 0],
@@ -84,6 +93,35 @@ describe('synthetic photo streams', () => {
       expect(shared(a, b)).toBe(0)
       expect(shared(b, a)).toBe(0)
     }
+  })
+})
+
+describe('synthetic photo publication', () => {
+  it('removes the files it moved when a later move fails and keeps no temp folder', async () => {
+    const parent = emptyDir()
+    const target = join(parent, 'out')
+    let calls = 0
+    const move = (from: string, to: string) => {
+      if (++calls === 2) throw new Error('disk gone')
+      renameSync(from, to)
+    }
+    await expect(writePhotos(target, 7, 3, { ...options, move })).rejects.toThrow('disk gone')
+    expect(readdirSync(target)).toEqual([])
+    expect(readdirSync(parent)).toEqual(['out'])
+  })
+
+  it('stages beside the folder a symlinked target resolves to', async () => {
+    const [realParent, linkParent] = [realpathSync(emptyDir()), emptyDir()]
+    mkdirSync(join(realParent, 'real'))
+    symlinkSync(join(realParent, 'real'), join(linkParent, 'link'))
+    const stagedIn: string[] = []
+    const move = (from: string, to: string) => {
+      stagedIn.push(dirname(dirname(from)))
+      renameSync(from, to)
+    }
+    await writePhotos(join(linkParent, 'link'), 7, 1, { ...options, move })
+    expect(new Set(stagedIn)).toEqual(new Set([realParent]))
+    expect(readdirSync(join(realParent, 'real'))).toHaveLength(2)
   })
 })
 
