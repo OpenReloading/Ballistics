@@ -1,0 +1,48 @@
+/* The faces next/font/local builds from src/platform/fonts/ui.ts and drawing.ts: the same files, names and Arial fallback metrics */
+@font-face {
+  font-family: uiFont;
+  src: url("../fonts/Inter-Regular.woff2") format("woff2");
+  font-display: swap;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: uiFont;
+  src: url("../fonts/Inter-SemiBold.woff2") format("woff2");
+  font-display: swap;
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: "uiFont Fallback";
+  src: local(Arial);
+  ascent-override: 89.79%;
+  descent-override: 22.36%;
+  line-gap-override: 0%;
+  size-adjust: 107.89%;
+}
+
+@font-face {
+  font-family: drawingFont;
+  src: url("../fonts/Inter-Regular.woff2") format("woff2");
+  font-display: block;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "drawingFont Fallback";
+  src: local(Arial);
+  ascent-override: 89.79%;
+  descent-override: 22.36%;
+  line-gap-override: 0%;
+  size-adjust: 107.89%;
+}
+
+/* the classes local-font.ts names after each variable */
+.font-ui {
+  --font-ui: "uiFont", "uiFont Fallback";
+}
+
+.font-drawing {
+  --font-drawing: "drawingFont", "drawingFont Fallback";
+}

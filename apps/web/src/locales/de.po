@@ -67,9 +67,6 @@ msgstr "Notizen"
 msgid "page.offline"
 msgstr "Offline"
 
-msgid "notFound.title"
-msgstr "Seite nicht gefunden"
-
 msgid "record.powders"
 msgstr "Treibladungspulver"
 

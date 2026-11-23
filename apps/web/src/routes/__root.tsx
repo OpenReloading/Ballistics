@@ -4,7 +4,10 @@ import { AppFrame, UiProvider } from '@rangefoundry/ui'
 import uiCss from '@rangefoundry/ui/ui.css?url'
 import { createRootRoute, HeadContent, Link, Outlet, Scripts } from '@tanstack/react-router'
 import { type ReactNode, useEffect } from 'react'
+import { startLanguage } from '../i18n/language.ts'
 import { colorSchemeKey, colorSchemeScript } from '../lib/theme.ts'
+import { uiFont } from '../platform/fonts/ui.ts'
+import appCss from '../styles.css?url'
 import { useStoredLanguage } from './-lingui.ts'
 import { socialImage } from './-social-image.ts'
 import { pageTitles } from './-static-paths.ts'
@@ -23,7 +26,10 @@ export const Route = createRootRoute({
       },
       ...socialImage,
     ],
-    links: [{ rel: 'stylesheet', href: uiCss }],
+    links: [
+      { rel: 'stylesheet', href: uiCss },
+      { rel: 'stylesheet', href: appCss },
+    ],
   }),
   shellComponent: Document,
   component: Root,
@@ -33,7 +39,7 @@ export const Route = createRootRoute({
 function Document({ children }: { children: ReactNode }) {
   const i18n = useStoredLanguage()
   return (
-    <html lang="en" {...mantineHtmlProps}>
+    <html lang="en" {...mantineHtmlProps} className={uiFont.variable}>
       {/* oxlint-disable-next-line nextjs/no-head-element -- TanStack Start's shell writes the document's own head */}
       <head>
         {/* oxlint-disable-next-line react/no-danger -- constant script, no user input */}
@@ -55,6 +61,8 @@ function Root() {
   useEffect(() => {
     document.documentElement.dataset.hydrated = ''
   }, [])
+  // the views' own messages follow this edition's stored language, as the Next app's providers start them
+  useEffect(startLanguage, [])
   return (
     <AppFrame brand={<Link to="/">RangeFoundry Workbench</Link>} navigation={<Navigation />}>
       <Outlet />
