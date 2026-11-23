@@ -1,10 +1,11 @@
 // Builds the Pages site into `pages/`; settings and flags: apps/docs/docs/release.md#pages-site
 import { spawn } from 'node:child_process'
-import { cpSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+import { cpSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { startBundleApi, writeStaticApi } from '@rangefoundry/api/static'
 import { executable } from './executable.ts'
 import { dropFullPayloads } from './pages-payload.ts'
+import { withNextDispatch } from './root-not-found.ts'
 
 const siteBase = process.env.PAGES_BASE_PATH ?? ''
 // Next's basePath: empty, or a path that starts with a slash and does not end in one
@@ -52,6 +53,12 @@ try {
   rmSync(site, { recursive: true, force: true })
   // a move, not a copy: a recursive cpSync into the dev container's bind mount fails with EACCES on macOS
   renameSync(at('apps/web/out'), site)
+  // GitHub Pages answers every miss of the site with the root's 404.html, also under next/
+  if (edition === 'stable')
+    writeFileSync(
+      `${site}/404.html`,
+      withNextDispatch(readFileSync(`${site}/404.html`, 'utf8'), siteBase),
+    )
   dropFullPayloads(site)
   await writeStaticApi(api.data, `${site}/api`)
 } finally {

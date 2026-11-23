@@ -59,6 +59,19 @@ Settings:
 
 `apps/web/.next` stays after the build: CI restores it as the Turbopack cache, and `check-weight` reads its manifests.
 
+GitHub Pages answers every miss of the site with the root `404.html`, also under `/next/`. The stable build therefore puts a script before Next's own scripts in that page (`withNextDispatch` of `tools/src/root-not-found.ts`): a stable miss shows the stable not-found page unchanged; a miss under `/next/` shows "Page not found" with a link to `<base>/next/`, keeps the rest of the stable page as inert text, and replaces the page with `next/404.edition.html` when that file answers ok. The next edition writes no such file until it builds with TanStack Start, so the fallback stays on screen.
+
+The e2e projects `editions-chromium`, `editions-firefox` and `editions-webkit` check that page, by default against the export at `WEB_URL`. To check it on a site of the deployed shape, build both editions, merge them as `pages.yml` does and pass the site in `EDITIONS_URL`:
+
+```sh
+PAGES_BASE_PATH=/Ballistics PAGES_EDITION=next pnpm run static:build
+mv pages pages-next
+PAGES_BASE_PATH=/Ballistics PAGES_EDITION=stable pnpm run static:build
+mv pages-next pages/next
+PAGES_BASE_PATH=/Ballistics PORT=3044 pnpm run pages:serve &
+EDITIONS_URL=http://localhost:3044/Ballistics/ pnpm --filter @rangefoundry/e2e exec playwright test --project "editions-*"
+```
+
 `pnpm run start:build` (`tools/src/start-site.ts`, after `pnpm run build`) writes both editions of the TanStack Start app, which the deployed site does not serve yet, as one site of the deployed shape into `pages-start/`: stable under `PAGES_BASE_PATH`, next under `<base>/next/`, each with its data files under `api/` and its app shell as `404.edition.html`, and a root `404.html` that hands a miss to the shell of its edition (`tools/src/root-not-found.ts`). `--sample` prerenders as `static:build` does; the log prints the client size of each edition. `pnpm run start:serve` serves it on `PORT` (default 3043). The e2e projects `start-chromium`, `start-firefox` and `start-webkit` build and serve it themselves at `/Ballistics`; `START_SITE=off` leaves out the build and those projects.
 
 ```sh
