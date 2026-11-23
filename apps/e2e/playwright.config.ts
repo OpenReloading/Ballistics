@@ -9,6 +9,8 @@ const allEngines = Boolean(process.env.ALL_ENGINES)
 /** `off`: no Start site build and no projects `start-*` (the drawing baseline, a local `--project full` run). */
 const startSite = process.env.START_SITE !== 'off'
 const startUrl = 'http://localhost:3043/Ballistics/'
+/** A site with both editions as `pages.yml` deploys it, with its base path and a trailing slash. Unset: the export at `WEB_URL`, whose root `404.html` is the same page. */
+const editionsUrl = process.env.EDITIONS_URL ?? webUrl.replace(/\/?$/, '/')
 
 const browserAt = (url: string, device = devices['Desktop Chrome']) => ({
   ...device,
@@ -101,5 +103,17 @@ export default defineConfig({
           use: { ...device, baseURL: startUrl },
         }))
       : []),
+    ...(
+      [
+        ['editions-chromium', devices['Desktop Chrome']],
+        ['editions-firefox', devices['Desktop Firefox']],
+        ['editions-webkit', devices['Desktop Safari']],
+      ] as const
+    ).map(([name, device]) => ({
+      name,
+      testDir: './tests/editions',
+      // the root 404.html also answers below the stable edition's worker
+      use: { ...browserAt(editionsUrl, device), serviceWorkers: 'allow' as const },
+    })),
   ],
 })
