@@ -35,7 +35,7 @@ it('inserts the script once, right after the charset element', () => {
   )
   expect(page.startsWith('<!DOCTYPE html><html><head><meta charSet="utf-8"/><script>')).toBe(true)
   expect(page.endsWith('</script><link rel="preload" href="/a.js"/></head></html>')).toBe(true)
-  expect(page.match(/<script>/g)).toHaveLength(1)
+  expect(page.split('<script>')).toHaveLength(2)
 })
 
 it('throws on a page without a charset element or with two', () => {
