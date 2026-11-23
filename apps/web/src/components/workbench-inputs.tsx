@@ -12,9 +12,9 @@ import {
   Text,
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
-import { DotsThree } from '@phosphor-icons/react'
 import { boreArea, cylinderGapDischarge } from '@rangefoundry/ballistics'
 import { type Bullet, toSi } from '@rangefoundry/schema'
+import { Ellipsis } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { type ReactNode, useEffect, useId, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -585,7 +585,7 @@ export function InputCards() {
                           aria-expanded={more === p}
                           onClick={() => setMore(more === p ? undefined : p)}
                         >
-                          <DotsThree size={18} weight="bold" aria-hidden="true" />
+                          <Ellipsis size={18} strokeWidth={2.25} aria-hidden="true" />
                         </ActionIcon>
                       </Popover.Target>
                       <Popover.Dropdown>

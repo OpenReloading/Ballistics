@@ -1,8 +1,8 @@
 'use client'
 
 import { ActionIcon, Button, Drawer, Text, TextInput } from '@mantine/core'
-import { Copy, DownloadSimple, PencilSimple, Printer, Trash } from '@phosphor-icons/react'
 import { parseRef } from '@rangefoundry/schema'
+import { Copy, Download, Pencil, Printer, Trash } from 'lucide-react'
 import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { deleteRecord, storedRecord, storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
@@ -345,7 +345,7 @@ export function SavedLoads({
                           title={t('Rename')}
                           onClick={() => edit(r.id, r.name)}
                         >
-                          <PencilSimple size={16} aria-hidden="true" />
+                          <Pencil size={16} aria-hidden="true" />
                         </ActionIcon>
                         <ActionIcon
                           size={controlSize.row.icon}
@@ -363,7 +363,7 @@ export function SavedLoads({
                           title={t('Export to a file')}
                           onClick={() => exportOne(r)}
                         >
-                          <DownloadSimple size={16} aria-hidden="true" />
+                          <Download size={16} aria-hidden="true" />
                         </ActionIcon>
                         <ActionIcon
                           size={controlSize.row.icon}

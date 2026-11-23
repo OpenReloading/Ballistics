@@ -11,7 +11,7 @@ import {
   TextInput,
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
-import { Funnel, MagnifyingGlass } from '@phosphor-icons/react'
+import { Funnel, Search } from 'lucide-react'
 import {
   type ReactNode,
   useCallback,
@@ -296,7 +296,7 @@ function Results<R extends ChooserRow>({
     const note = emptyListNote(texts, none)
     return (
       <EmptyNote
-        icon={<MagnifyingGlass size={20} aria-hidden="true" />}
+        icon={<Search size={20} aria-hidden="true" />}
         title={t(note.title)}
         description={t(note.text)}
       />

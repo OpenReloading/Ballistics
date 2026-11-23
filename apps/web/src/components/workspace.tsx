@@ -2,7 +2,7 @@
 
 import { Button, Tabs } from '@mantine/core'
 import { useClipboard } from '@mantine/hooks'
-import { Check, LinkSimple } from '@phosphor-icons/react'
+import { Check, Link as LinkIcon } from 'lucide-react'
 import {
   type ReactNode,
   type Ref,
@@ -159,7 +159,7 @@ export function Toolbar({
           copied ? (
             <Check size={18} aria-hidden="true" />
           ) : (
-            <LinkSimple size={18} aria-hidden="true" />
+            <LinkIcon size={18} aria-hidden="true" />
           )
         }
         onClick={copy}

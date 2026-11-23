@@ -1,8 +1,8 @@
 'use client'
 
 import { ActionIcon, Button, Menu } from '@mantine/core'
-import { Export } from '@phosphor-icons/react'
 import type { ShotGroup } from '@rangefoundry/schema'
+import { Share } from 'lucide-react'
 import { type ReactNode, useState } from 'react'
 import { createPortal, flushSync } from 'react-dom'
 import { storedPhoto } from '@/platform/user-store.ts'
@@ -160,7 +160,7 @@ export function ExportMenu({
       <Menu position="bottom-end" withInitialFocusPlaceholder={false}>
         <Menu.Target>
           {text ? (
-            <Button variant="default" leftSection={<Export aria-hidden="true" />}>
+            <Button variant="default" leftSection={<Share aria-hidden="true" />}>
               {t('Export')}
             </Button>
           ) : (
@@ -170,7 +170,7 @@ export function ExportMenu({
               title={t('Export images and print')}
             >
               <span className="icon-slot" aria-hidden="true">
-                <Export />
+                <Share />
               </span>
             </ActionIcon>
           )}

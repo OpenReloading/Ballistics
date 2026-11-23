@@ -14,7 +14,7 @@ import {
   Tooltip,
   useComputedColorScheme,
 } from '@mantine/core'
-import { Bug } from '@phosphor-icons/react'
+import { Bug } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import web from '../../package.json'
 import { useTranslation } from '../i18n/language.ts'

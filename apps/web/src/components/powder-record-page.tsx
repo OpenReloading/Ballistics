@@ -1,7 +1,7 @@
 'use client'
 
-import { ChartBar } from '@phosphor-icons/react'
 import type { Cartridge, Powder } from '@rangefoundry/schema'
+import { ChartColumn } from 'lucide-react'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 import { fetchPowderList } from '../lib/api-client.ts'
@@ -101,7 +101,7 @@ function PowderRecord({ p, names, placed, cartridgeNames }: { p: Powder } & Extr
       more={
         <LinkButton
           href={tunePowderHref(`catalogue:${p.id}`)}
-          icon={<ChartBar aria-hidden="true" />}
+          icon={<ChartColumn aria-hidden="true" />}
         >
           {t('Tune from strings')}
         </LinkButton>
