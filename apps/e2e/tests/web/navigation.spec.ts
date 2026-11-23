@@ -13,7 +13,7 @@ test('at 1280 px a tool page and a data page are one sidebar click from a record
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
-  await page.goto('/cartridges/308-win')
+  await page.goto('./cartridges/308-win')
   expect(visited).toHaveLength(2)
   for (const { href, label } of visited) {
     await followNav(page, label)
@@ -26,7 +26,7 @@ test('at 390 px the drawer lists every section page under its section, and two p
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('/cartridges')
+  await page.goto('./cartridges')
   const button = page.getByRole('button', { name: 'Navigation', exact: true })
   await button.click()
   const drawer = page.getByRole('dialog')
@@ -148,7 +148,7 @@ test('Report an issue opens a dialog whose link is a new issue of the repository
 })
 
 test('an unknown path answers 404 with the section links', async ({ page }) => {
-  const res = await page.goto('/no-such-page')
+  const res = await page.goto('./no-such-page')
   expect(res?.status()).toBe(404)
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Page not found')
   await expect(page.getByText('This page could not be found.')).toBeVisible()
@@ -163,14 +163,14 @@ test('an unknown path answers 404 with the section links', async ({ page }) => {
 test('a record id the catalogue does not hold, as after its removal, answers 404 with the not-found page', async ({
   page,
 }) => {
-  const res = await page.goto('/bullets/no-such-bullet/')
+  const res = await page.goto('./bullets/no-such-bullet/')
   expect(res?.status()).toBe(404)
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Page not found')
 })
 
 test('the drawer marks the current page and its rows are at least 44 px high', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('/bullets')
+  await page.goto('./bullets')
   await page.getByRole('button', { name: 'Navigation', exact: true }).click()
   const nav = page.getByRole('dialog').getByRole('navigation', { name: 'Main' })
   await expect(nav.locator('[aria-current="page"]')).toHaveText(['Database'])

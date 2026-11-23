@@ -10,7 +10,7 @@ for (const cartridge of pages)
     page,
   }) => {
     const over: string[] = []
-    await page.goto(`/cartridges/${cartridge}`)
+    await page.goto(`./cartridges/${cartridge}`)
     // the page draws once it has read the record
     await page.locator('svg.drawing.screen-only .dims text').first().waitFor()
     await page.evaluate(() => document.fonts.ready)
@@ -33,7 +33,7 @@ test("the designer's views switch by keyboard, keeping the frame and the axis", 
 }) => {
   // the designer's fields in mm, the record values unchanged
   await storeUnits(page)
-  await page.goto('/cartridges/designer?from=308-win')
+  await page.goto('./cartridges/designer?from=308-win')
   const drawing = page.locator('svg[aria-labelledby="designer-drawing-title"]')
   const views = page.getByRole('radiogroup', { name: /^View/ })
   const view = (name: string) => views.getByRole('radio', { name })
@@ -101,7 +101,7 @@ test("the designer's views switch by keyboard, keeping the frame and the axis", 
 
 // the record page draws each side in its own panel at one scale, both always shown
 test('both sides are drawn at one scale', async ({ page }) => {
-  await page.goto('/cartridges/308-win')
+  await page.goto('./cartridges/308-win')
   const cip = page.locator('main')
   const drawing = (side: string) =>
     cip
@@ -125,7 +125,7 @@ test('both sides are drawn at one scale', async ({ page }) => {
 
 test('a tall figure fits the window, no smaller than 11 px text', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 })
-  await page.goto('/cartridges/12-7-x-108')
+  await page.goto('./cartridges/12-7-x-108')
   // the figure is in millimeters until the page has read the stored units
   await page.waitForLoadState('networkidle')
   const cip = page.locator('main')
@@ -161,14 +161,14 @@ test('the record sheet prints on one A4 page; other prints keep the browser page
         .toString('latin1')
         .matchAll(/\/MediaBox\s*\[\s*0 0 ([\d.]+) ([\d.]+)\s*\]/g),
     ].map(([, w, h]) => [Math.round(Number(w)), Math.round(Number(h))])
-  await page.goto('/cartridges/308-win')
+  await page.goto('./cartridges/308-win')
   // the sheet's page rule comes with the drawn record
   await expect(figure308(page)).toHaveCount(2)
   expect(await sizes()).toEqual([[595, 842]])
-  await page.goto('/firearms')
+  await page.goto('./firearms')
   expect((await sizes())[0]).toEqual([612, 792])
   // a record page left by a client navigation stays in the document, hidden
-  await page.goto('/cartridges/308-win')
+  await page.goto('./cartridges/308-win')
   await expect(figure308(page)).toHaveCount(2)
   await page
     .getByRole('navigation', { name: 'Main' })
@@ -180,7 +180,7 @@ test('the record sheet prints on one A4 page; other prints keep the browser page
 })
 
 test('printed, the drawings have no tab stop', async ({ page }) => {
-  await page.goto('/cartridges/308-win')
+  await page.goto('./cartridges/308-win')
   await page.emulateMedia({ media: 'print' })
   // a figure per side
   const print = figure308(page).getByRole('img', { name: 'Outline, CIP 308 Win.' })

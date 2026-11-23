@@ -1,5 +1,6 @@
 import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
+import { storageName } from './edition.ts'
 import { followNav, gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
@@ -42,15 +43,16 @@ type Kept = { id: string; kind: string; data: { note?: string; waterCapacity?: {
 /** The records the browser holds. */
 const records = (page: Page) =>
   page.evaluate(
-    () =>
+    (store) =>
       new Promise<Kept[]>((ok, no) => {
-        const open = indexedDB.open('rangefoundry-user-data')
+        const open = indexedDB.open(store)
         open.onerror = () => no(open.error)
         open.onsuccess = () => {
           const all = open.result.transaction('records').objectStore('records').getAll()
           all.onsuccess = () => ok(all.result)
         }
       }),
+    storageName('rangefoundry-user-data'),
   )
 
 /** How many records of `kind` the browser holds. */

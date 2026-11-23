@@ -1,5 +1,6 @@
 import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
+import { storageName } from './edition.ts'
 import { storeUnits } from './units.ts'
 import { openResultTab, openSavedLoad } from './workbench.ts'
 import { runLine } from './workbench-run.ts'
@@ -14,9 +15,9 @@ type Stored = {
 }
 
 const storedLoads = (page: Page) =>
-  page.evaluate(async () => {
+  page.evaluate(async (store) => {
     const db: IDBDatabase = await new Promise((ok, no) => {
-      const r = indexedDB.open('rangefoundry-user-data')
+      const r = indexedDB.open(store)
       r.onsuccess = () => ok(r.result)
       r.onerror = () => no(r.error)
     })
@@ -27,7 +28,7 @@ const storedLoads = (page: Page) =>
     })
     db.close()
     return all.filter((r) => r.kind === 'load')
-  })
+  }, storageName('rangefoundry-user-data'))
 
 const file = ['string,velocity,velocityUnit', 'A,2795,fps', 'A,2810,fps', 'A,2802,fps'].join('\n')
 const read = (page: Page, name: string) =>
@@ -42,7 +43,7 @@ test('a changed powder lot between two sessions is a note on the load and its se
     ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
   })
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await openSavedLoad(page)
   await runLine(page)
   await openResultTab(page, 'Notes')
@@ -88,7 +89,7 @@ test('a changed powder lot between two sessions is a note on the load and its se
     .toEqual(['powderLot'])
 
   // reopened, the lots and the dismissal are back
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await (await barButton(page, 'Open')).click()
   await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
   await page

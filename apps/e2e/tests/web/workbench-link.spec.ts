@@ -10,7 +10,7 @@ test('a copied link runs the same load where its bullet and powder records are m
   page,
   context,
 }) => {
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await openSavedLoad(page)
   const withRecords = await runLine(page)
   expect(withRecords).toMatch(/peak \d+ bar, .* \d+ m\/s/)

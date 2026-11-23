@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test'
+import { storageName } from './tests/web/edition.ts'
 import { safetyAck } from './tests/web/nav.ts'
 
 const webUrl = process.env.WEB_URL ?? 'http://localhost:3003'
@@ -23,7 +24,7 @@ const browserAt = (url: string, device = devices['Desktop Chrome']) => ({
     origins: [
       {
         origin: new URL(url).origin,
-        localStorage: [{ name: 'safety-ack', value: safetyAck }],
+        localStorage: [{ name: storageName('safety-ack', url), value: safetyAck }],
       },
     ],
   },

@@ -1,6 +1,8 @@
 import { expect, type Page, test } from '@playwright/test'
 import { defined } from '../../../web/test/defined.ts'
 import { barButton } from './bar.ts'
+import { storageName } from './edition.ts'
+import { based } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
 import { loadForm } from './workbench.ts'
@@ -10,8 +12,9 @@ test.beforeEach(({ page }) => storeUnits(page))
 
 /** A cartridge design in the browser store, as the designer saves it (no base record, so every value is an override): a record's side values without the chamber's bore diameter F, bore area Q and twist u. */
 async function seedDesign(page: Page) {
-  const record = await page.evaluate(async () =>
-    (await fetch('/api/cartridges/308-win.json')).json(),
+  const record = await page.evaluate(
+    async (file) => (await fetch(file)).json(),
+    based('/api/cartridges/308-win.json'),
   )
   const lacking = ['F', 'Q', 'u']
   const values = record.values.filter(
@@ -32,7 +35,7 @@ async function seedDesign(page: Page) {
 test('a cartridge design fills the fields it covers, draws the figure and is named in the results and the print', async ({
   page,
 }) => {
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await seedDesign(page)
   await page.reload()
   await page.getByRole('button', { name: 'Enter values by hand' }).click()
@@ -86,7 +89,7 @@ test('a load saved on a design keeps the design by reference and reopens with it
     ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
   })
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await seedDesign(page)
   await page.reload()
   await page.getByRole('button', { name: 'Enter values by hand' }).click()
@@ -96,9 +99,9 @@ test('a load saved on a design keeps the design by reference and reopens with it
   await form.getByRole('textbox', { name: /^Charge mass/ }).fill('2.4')
   await (await barButton(page, 'Save')).click()
   const stored = () =>
-    page.evaluate(async () => {
+    page.evaluate(async (store) => {
       const db: IDBDatabase = await new Promise((ok, no) => {
-        const r = indexedDB.open('rangefoundry-user-data')
+        const r = indexedDB.open(store)
         r.onsuccess = () => ok(r.result)
         r.onerror = () => no(r.error)
       })
@@ -111,14 +114,14 @@ test('a load saved on a design keeps the design by reference and reopens with it
       )
       db.close()
       return all.filter((r) => r.kind === 'load')
-    })
+    }, storageName('rangefoundry-user-data'))
   await expect
     .poll(async () => (await stored())[0]?.data.cartridge)
     .toBe('user:6f0f4d3e-0a43-4a43-9a3d-3a2f2e1f0c21')
   const { name } = defined((await stored())[0])
 
   // another load, then the saved one: the design is back, from the design's own values
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await (await barButton(page, 'Open')).click()
   await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
   await page.getByRole('button', { name, exact: true }).click()

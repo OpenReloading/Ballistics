@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { AxeBuilder } from './a11y.ts'
+import { storageName } from './edition.ts'
 import { safetyAck } from './nav.ts'
 
 // a first visit: nothing accepted yet
@@ -8,7 +9,7 @@ test.use({ storageState: { cookies: [], origins: [] } })
 test('the Safety notice must be accepted on the first visit and stays accepted', async ({
   page,
 }) => {
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   const dialog = page.getByRole('dialog', { name: 'Safety notice' })
   await expect(dialog).toBeVisible()
   await page.keyboard.press('Escape')
@@ -21,8 +22,8 @@ test('the Safety notice must be accepted on the first visit and stays accepted',
 })
 
 test('an acceptance of the earlier Safety text asks again', async ({ page }) => {
-  await page.addInitScript(() => localStorage.setItem('safety-ack', '3'))
-  await page.goto('/')
+  await page.addInitScript((store) => localStorage.setItem(store, '3'), storageName('safety-ack'))
+  await page.goto('./')
   const dialog = page.getByRole('dialog', { name: 'Safety notice' })
   await expect(dialog).toBeVisible()
   await expect(dialog).toContainText('Reloading ammunition is dangerous:')
@@ -32,7 +33,7 @@ test('an acceptance of the earlier Safety text asks again', async ({ page }) => 
 })
 
 test('the first focus is on the text: Enter neither accepts nor declines', async ({ page }) => {
-  await page.goto('/cartridges')
+  await page.goto('./cartridges')
   const dialog = page.getByRole('dialog', { name: 'Safety notice' })
   const text = dialog.locator('.safety-text')
   await expect(text).toBeFocused()
@@ -46,7 +47,7 @@ test('the first focus is on the text: Enter neither accepts nor declines', async
 })
 
 test('Decline leaves the site for the empty page, naming no other site', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('./')
   const origin = new URL(page.url()).origin
   const away: string[] = []
   page.on('request', (r) => {
@@ -60,7 +61,10 @@ test('Decline leaves the site for the empty page, naming no other site', async (
 test('the yellow Safety button of the top bar opens the Safety notice; print hides it', async ({
   page,
 }) => {
-  await page.addInitScript((value) => localStorage.setItem('safety-ack', value), safetyAck)
+  await page.addInitScript(([value, store]) => localStorage.setItem(store, value), [
+    safetyAck,
+    storageName('safety-ack'),
+  ] as const)
   const dialog = page.getByRole('dialog', { name: 'Safety notice' })
   // the page bar from 75em, named by its text; the phone top bar below, icon only
   for (const [width, bar, name, label] of [
@@ -68,7 +72,7 @@ test('the yellow Safety button of the top bar opens the Safety notice; print hid
     [390, 'header', 'Safety notice', ''],
   ] as const) {
     await page.setViewportSize({ width, height: 800 })
-    await page.goto('/cartridges')
+    await page.goto('./cartridges')
     const button = page
       .locator(bar)
       .getByRole('button', { name, exact: true })
@@ -87,7 +91,7 @@ test('the yellow Safety button of the top bar opens the Safety notice; print hid
 
 test('at 390 x 640 I accept and Decline are in view without scrolling', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 640 })
-  await page.goto('/')
+  await page.goto('./')
   const dialog = page.getByRole('dialog', { name: 'Safety notice' })
   await expect(dialog).toHaveCSS('opacity', '1')
   for (const name of ['I accept', 'Decline'])
@@ -99,7 +103,7 @@ test('the buttons of the Safety notice pass the axe contrast check in light and 
 }) => {
   for (const colorScheme of ['light', 'dark'] as const) {
     await page.emulateMedia({ colorScheme })
-    await page.goto('/powders')
+    await page.goto('./powders')
     await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', colorScheme)
     const dialog = page.getByRole('dialog', { name: 'Safety notice' })
     await expect(dialog.getByRole('button', { name: 'I accept' })).toBeVisible()
@@ -117,12 +121,15 @@ test('the buttons of the Safety notice pass the axe contrast check in light and 
 test('the Safety buttons pass the axe contrast check in light and dark at 1280 and 390 px', async ({
   page,
 }) => {
-  await page.addInitScript((value) => localStorage.setItem('safety-ack', value), safetyAck)
+  await page.addInitScript(([value, store]) => localStorage.setItem(store, value), [
+    safetyAck,
+    storageName('safety-ack'),
+  ] as const)
   for (const colorScheme of ['light', 'dark'] as const)
     for (const width of [1280, 390]) {
       await page.emulateMedia({ colorScheme })
       await page.setViewportSize({ width, height: 800 })
-      await page.goto('/powders')
+      await page.goto('./powders')
       await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', colorScheme)
       const { violations, passes } = await new AxeBuilder({ page })
         .include('.safety-light')

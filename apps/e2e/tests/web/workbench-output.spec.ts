@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
+import { storageName } from './edition.ts'
 import { showGerman } from './german.ts'
 import { choosePreset, storeUnits } from './units.ts'
 import { loadForm, openKeeping } from './workbench.ts'
@@ -198,9 +199,9 @@ const stubSavePicker = (page: Page) =>
 
 /** The saved load as the browser stores it. */
 const storedLoad = (page: Page) =>
-  page.evaluate(async () => {
+  page.evaluate(async (store) => {
     const db: IDBDatabase = await new Promise((ok, no) => {
-      const r = indexedDB.open('rangefoundry-user-data')
+      const r = indexedDB.open(store)
       r.onsuccess = () => ok(r.result)
       r.onerror = () => no(r.error)
     })
@@ -215,7 +216,7 @@ const storedLoad = (page: Page) =>
     })
     db.close()
     return all.find((r) => r.kind === 'load')
-  })
+  }, storageName('rangefoundry-user-data'))
 
 test('the Powders tab keeps a typed target the same pressure when the units change', async ({
   page,
@@ -280,7 +281,7 @@ test('the Powders tab copies its table as CSV and keeps its mode and filters wit
     .toEqual({ mode: 'fill', fill: 90, manufacturer: expect.stringMatching(/^catalogue:/) })
   const saved = (await stored())?.name ?? ''
 
-  await page.goto('/workbench')
+  await page.goto('./workbench')
   await (await barButton(page, 'Open')).click()
   await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
   await page.getByRole('button', { name: saved, exact: true }).click()

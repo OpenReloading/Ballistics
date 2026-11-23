@@ -1,13 +1,14 @@
 import { expect, type Page, test } from '@playwright/test'
 import { defined } from '../../../web/test/defined.ts'
 import { barButton } from './bar.ts'
+import { storageName } from './edition.ts'
 import { gotoHydrated } from './nav.ts'
 import { openKeeping } from './workbench.ts'
 
 const storedLoads = (page: Page) =>
-  page.evaluate(async () => {
+  page.evaluate(async (store) => {
     const db: IDBDatabase = await new Promise((ok, no) => {
-      const r = indexedDB.open('rangefoundry-user-data')
+      const r = indexedDB.open(store)
       r.onsuccess = () => ok(r.result)
       r.onerror = () => no(r.error)
     })
@@ -20,7 +21,7 @@ const storedLoads = (page: Page) =>
     )
     db.close()
     return all.filter((r) => r.kind === 'load')
-  })
+  }, storageName('rangefoundry-user-data'))
 
 test('the primer list opens a primer record with its properties and sources', async ({ page }) => {
   await gotoHydrated(page, '/primers')

@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
+import { storageName } from './edition.ts'
 import { putRecords } from './user-store.ts'
 
 const rifle = '3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13'
@@ -31,21 +32,24 @@ const seed = (page: Page) =>
 
 /** The stored records of `kind`, as written. */
 const stored = (page: Page, kind: string) =>
-  page.evaluate(async (kind) => {
-    const db: IDBDatabase = await new Promise((ok, no) => {
-      const r = indexedDB.open('rangefoundry-user-data')
-      r.onsuccess = () => ok(r.result)
-      r.onerror = () => no(r.error)
-    })
-    const all: { kind: string; id: string; data: Record<string, unknown> }[] = await new Promise(
-      (ok) => {
-        const r = db.transaction('records').objectStore('records').getAll()
+  page.evaluate(
+    async ([kind, store]) => {
+      const db: IDBDatabase = await new Promise((ok, no) => {
+        const r = indexedDB.open(store)
         r.onsuccess = () => ok(r.result)
-      },
-    )
-    db.close()
-    return all.filter((r) => r.kind === kind).sort((a, b) => a.id.localeCompare(b.id))
-  }, kind)
+        r.onerror = () => no(r.error)
+      })
+      const all: { kind: string; id: string; data: Record<string, unknown> }[] = await new Promise(
+        (ok) => {
+          const r = db.transaction('records').objectStore('records').getAll()
+          r.onsuccess = () => ok(r.result)
+        },
+      )
+      db.close()
+      return all.filter((r) => r.kind === kind).sort((a, b) => a.id.localeCompare(b.id))
+    },
+    [kind, storageName('rangefoundry-user-data')] as const,
+  )
 
 const roundCount = async (page: Page, id: string) =>
   (await stored(page, 'firearm')).find((r) => r.id === id)?.data.roundCount
@@ -73,7 +77,7 @@ async function addEntry(
 test('the shooting log adds entries, counts rounds only after the confirm, prints a range and round-trips its JSON', async ({
   page,
 }) => {
-  await page.goto('/firearms/log')
+  await page.goto('./firearms/log')
   await seed(page)
   await page.reload()
   await expect(page.locator('.page-bar-status .bar-count')).toHaveText('0 entries')
@@ -163,9 +167,9 @@ test('the shooting log adds entries, counts rounds only after the confirm, print
   expect(before).toHaveLength(3)
   expect(JSON.parse(await readFile(path, 'utf8')).records).toHaveLength(3)
   await page.evaluate(
-    async (ids) => {
+    async ([ids, store]) => {
       const db: IDBDatabase = await new Promise((ok) => {
-        const r = indexedDB.open('rangefoundry-user-data')
+        const r = indexedDB.open(store)
         r.onsuccess = () => ok(r.result)
       })
       const tx = db.transaction('records', 'readwrite')
@@ -175,7 +179,7 @@ test('the shooting log adds entries, counts rounds only after the confirm, print
       })
       db.close()
     },
-    before.map((r) => r.id),
+    [before.map((r) => r.id), storageName('rangefoundry-user-data')] as const,
   )
   await page.reload()
   await expect(page.locator('.page-bar-status .bar-count')).toHaveText('0 entries')
@@ -192,7 +196,7 @@ test('the shooting log adds entries, counts rounds only after the confirm, print
 test('the yearly summary shows only the entries of its year, the same numbers in print and CSV', async ({
   page,
 }) => {
-  await page.goto('/firearms/log')
+  await page.goto('./firearms/log')
   await seed(page)
   const entry = (n: number, date: string, firearm: string, rounds: number) => ({
     kind: 'shootingLogEntry',
@@ -259,7 +263,7 @@ test('the yearly summary shows only the entries of its year, the same numbers in
 test('an entry linked to a competition event shows the event, and the summary of its year lists the event once', async ({
   page,
 }) => {
-  await page.goto('/firearms/log')
+  await page.goto('./firearms/log')
   await seed(page)
   const match = '9c3e5a71-2b4d-4e6f-8a1c-3d5e7f9a1b2c'
   await putRecords(page, [

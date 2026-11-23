@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test'
 import { AxeBuilder } from './a11y.ts'
-import { gotoHydrated } from './nav.ts'
+import { based, gotoHydrated } from './nav.ts'
 import { toolbarPopover } from './target.ts'
 import { storeUnits } from './units.ts'
 
@@ -26,8 +26,8 @@ async function facePng(
 ) {
   await gotoHydrated(page, '/groups')
   const b64 = await page.evaluate(
-    async ({ id, holes, rings, shade, k, c }) => {
-      const face = (await (await fetch(`/api/target-faces/${id}.json`)).json()) as {
+    async ({ file, holes, rings, shade, k, c }) => {
+      const face = (await (await fetch(file)).json()) as {
         rings: { diameter: { value: number } }[]
         blackDiameter: { value: number }
       }
@@ -69,7 +69,7 @@ async function facePng(
       for (const x of bytes) s += String.fromCharCode(x)
       return btoa(s)
     },
-    { id, holes, rings, shade, k: PX_PER_MM, c: C },
+    { file: based(`/api/target-faces/${id}.json`), holes, rings, shade, k: PX_PER_MM, c: C },
   )
   return Buffer.from(b64, 'base64')
 }
@@ -169,7 +169,7 @@ for (const response of ['success', 'failure'] as const) {
 test('a federation narrows the disciplines, a discipline its faces, and a face shows its federation', async ({
   page,
 }) => {
-  await page.goto('/groups')
+  await page.goto('./groups')
   const federation = page.getByRole('combobox', { name: 'Federation', exact: true })
   await expect(federation.locator('option[value="dsb"]')).toBeAttached()
   await federation.selectOption('dsb')
@@ -478,7 +478,7 @@ async function layoutWithoutScale(page: Page) {
 
 test('a photo without any face: the guided steps ask for the scale as before', async ({ page }) => {
   test.setTimeout(detectionBudget)
-  await page.goto('/groups')
+  await page.goto('./groups')
   const blank = await page.evaluate(async () => {
     const cv = new OffscreenCanvas(800, 600)
     const g = cv.getContext('2d') as OffscreenCanvasRenderingContext2D

@@ -1,6 +1,7 @@
 import { expect, type Locator, type Page, test } from '@playwright/test'
+import { storageName } from './edition.ts'
 import { isDark } from './luminance.ts'
-import { gotoHydrated } from './nav.ts'
+import { based, gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 
 // the cartridge directory: count in the page bar, windowed rows, search and sort in the URL
@@ -37,7 +38,7 @@ test('the list searches names and aliases and keeps the search in the URL', asyn
     expect(name).toMatch(/lapua/i)
   await expect(page).toHaveURL(/[?&]q=lapua/)
   // aliases are part of the name cell, muted
-  await page.goto('/cartridges?q=308+winchester')
+  await page.goto('./cartridges?q=308+winchester')
   const win = page.getByRole('link', { name: /^308 Win\./ })
   await expect(win.locator('.aliases')).toContainText('308 Winchester')
   await gotoHydrated(page, '/cartridges?q=lapua')
@@ -153,7 +154,7 @@ for (const [width, height] of [
 ] as const)
   test(`at ${width} x ${height} the cartridge table is the only scroll box`, async ({ page }) => {
     await page.setViewportSize({ width, height })
-    await page.goto('/cartridges')
+    await page.goto('./cartridges')
     const n = await total(page)
     const pane = await page.evaluate(() => {
       const el = document.scrollingElement as HTMLElement
@@ -168,14 +169,14 @@ for (const [width, height] of [
 
 test('at 390 px a cartridge row is the name over a facts line', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('/cartridges?q=308+win')
+  await page.goto('./cartridges?q=308+win')
   const row = rows(page).filter({ has: page.getByRole('link', { name: /^308 Win\./ }) })
   await expect(row.locator('.facts')).toBeVisible()
   await expect(row.locator('td:nth-child(3)')).toBeHidden()
 })
 
 test('the cartridge list prints the selection, capped and said so', async ({ page }) => {
-  await page.goto('/cartridges')
+  await page.goto('./cartridges')
   const n = await total(page)
   await page.emulateMedia({ media: 'print' })
   await expect(rows(page)).toHaveCount(200)
@@ -186,7 +187,7 @@ test('the cartridge list prints the selection, capped and said so', async ({ pag
 test('printed on A4, a name with its aliases takes at most two lines', async ({ page }) => {
   // A4 less 10 mm margins at 96 px per inch
   await page.setViewportSize({ width: 718, height: 1000 })
-  await page.goto('/cartridges')
+  await page.goto('./cartridges')
   await total(page)
   await page.emulateMedia({ media: 'print' })
   const name = await page.getByRole('columnheader', { name: /^Name/ }).boundingBox()
@@ -221,7 +222,7 @@ test('the record bar holds the badges and actions, the fact cards the pressures 
   page,
 }) => {
   await storeUnits(page, 'metric-grams', {})
-  await page.goto('/cartridges/308-win')
+  await page.goto('./cartridges/308-win')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('308 Win.')
   await expect(page).toHaveTitle(/308 Win\./)
   const bar = page.locator('.page-bar')
@@ -232,7 +233,7 @@ test('the record bar holds the badges and actions, the fact cards the pressures 
   // the record actions of every record page: Use in workbench filled, then Open in designer
   await expect(bar.getByRole('link', { name: 'Use in workbench' })).toHaveAttribute(
     'href',
-    '/workbench/?cartridge=308-win',
+    based('/workbench/?cartridge=308-win'),
   )
   await expect(bar.getByRole('link', { name: 'Use in workbench' })).toHaveAttribute(
     'data-variant',
@@ -240,7 +241,7 @@ test('the record bar holds the badges and actions, the fact cards the pressures 
   )
   await expect(bar.getByRole('link', { name: 'Open in designer' })).toHaveAttribute(
     'href',
-    '/cartridges/designer/?from=308-win',
+    based('/cartridges/designer/?from=308-win'),
   )
   for (const name of ['Copy link', 'Print'])
     await expect(bar.getByRole('button', { name })).toBeVisible()
@@ -253,7 +254,7 @@ test('the record bar holds the badges and actions, the fact cards the pressures 
   // the standard's country, table, date and method are over the sources, not in the fact cards
   await expect(facts(page).getByText(/^(Table|Revised|Country|Method)$/)).toHaveCount(0)
   await expect(page.locator('.record-sources .standard-facts dd').first()).toHaveText('I')
-  await page.goto('/cartridges/10-3-capra')
+  await page.goto('./cartridges/10-3-capra')
   const country = page.locator('.record-sources .standard-facts .country')
   await expect(country).toHaveText('Germany')
   const flag = country.locator('svg.flag')
@@ -264,7 +265,7 @@ test('the record bar holds the badges and actions, the fact cards the pressures 
 
 test('the strip and table follow the US preset: psi and inches', async ({ page }) => {
   await storeUnits(page, 'us', {})
-  await page.goto('/cartridges/308-win')
+  await page.goto('./cartridges/308-win')
   await expect.poll(() => stripText(page)).toMatch(/^Pmax psi 60191 /)
   // the drawings too; their labels in each unit: apps/web/test/cartridge-drawing.test.tsx
   await expect(figureOf(page, 'Cartridge').getByText('Dimensions in inches')).toHaveCount(1)
@@ -300,7 +301,7 @@ test('two tables: symbol and value, the chamber with its clearance as a note whe
   page,
 }) => {
   await storeUnits(page, 'metric-grams', {})
-  await page.goto('/cartridges/308-win')
+  await page.goto('./cartridges/308-win')
   await expect(dimensions(page, 'Cartridge').locator('thead').getByRole('columnheader')).toHaveText(
     ['Symbol', 'Max (mm)', 'Tolerance'],
   )
@@ -366,7 +367,7 @@ test('9 mm Luger: a zero clearance carries its sign, alpha1 stays as the sheet p
   page,
 }) => {
   await storeUnits(page, 'us', {})
-  await page.goto('/cartridges/9-mm-luger')
+  await page.goto('./cartridges/9-mm-luger')
   await expect(symbolRow(page, 'Chamber', 'L3').getByRole('cell')).toHaveText(['.7539', '±.0000'])
   await expect(symbolRow(page, 'Chamber', 'α1').getByRole('cell')).toHaveText(['180°', ''])
   // 1°57'57": 2 decimals, the text as printed in the hover
@@ -379,7 +380,7 @@ test('9 mm Luger: a zero clearance carries its sign, alpha1 stays as the sheet p
 test('the symbol notes show on keyboard focus; a table is one tab stop, the arrow keys move between its symbols', async ({
   page,
 }) => {
-  await page.goto('/cartridges/308-win')
+  await page.goto('./cartridges/308-win')
   const symbol = (side: Side, name: string) => symbolRow(page, side, name).locator('[tabindex]')
   // one tab stop per table: the first symbol, whatever else is focused programmatically
   for (const side of ['Cartridge', 'Chamber'] as const)
@@ -414,7 +415,7 @@ test('the cartridge and the chamber show side by side at all times: no view swit
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 800 })
-  await page.goto('/cartridges/308-win')
+  await page.goto('./cartridges/308-win')
   await expect(figureOf(page, 'Cartridge')).toBeVisible()
   await expect(figureOf(page, 'Chamber')).toBeVisible()
   await expect(dimensions(page, 'Cartridge')).toBeVisible()
@@ -451,7 +452,7 @@ for (const [width, height] of [
     page,
   }) => {
     await page.setViewportSize({ width, height })
-    await page.goto('/cartridges/308-win')
+    await page.goto('./cartridges/308-win')
     await expect(dimensions(page, 'Chamber')).toBeVisible()
     for (const side of ['Cartridge', 'Chamber'] as const) {
       await expect(figureOf(page, side)).toBeInViewport({ ratio: 1 })
@@ -469,7 +470,7 @@ test('at 390 px the facts, the cartridge table and drawing, the chamber table an
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('/cartridges/308-win')
+  await page.goto('./cartridges/308-win')
   await expect(page.locator('.record-facts')).toHaveText('CIP · 308 Winchester · 7,62 x 51')
   const tops = await Promise.all(
     [
@@ -497,13 +498,13 @@ test('at 390 px the facts, the cartridge table and drawing, the chamber table an
 test('the record shows the case type without a hover note: 220 Swift is semi-rimmed', async ({
   page,
 }) => {
-  await page.goto('/cartridges/220-swift')
+  await page.goto('./cartridges/220-swift')
   await expect(facts(page).getByText('semi-rimmed', { exact: true })).toBeVisible()
   await expect(facts(page).locator('.field-note', { hasText: 'semi-rimmed' })).toHaveCount(0)
 })
 
 test('the Case type column has no help note', async ({ page }) => {
-  await page.goto('/cartridges')
+  await page.goto('./cartridges')
   await total(page)
   await page.getByRole('columnheader', { name: 'Case type' }).getByRole('button').focus()
   await expect(page.getByRole('tooltip')).toHaveCount(0)
@@ -511,7 +512,7 @@ test('the Case type column has no help note', async ({ page }) => {
 
 test('printed, the standard shows once: the badge, not the facts line', async ({ page }) => {
   await page.setViewportSize({ width: 718, height: 1000 })
-  await page.goto('/cartridges/308-win')
+  await page.goto('./cartridges/308-win')
   await page.emulateMedia({ media: 'print' })
   await expect(page.locator('.page-bar .standard-badge')).toBeVisible()
   expect(await page.locator('.record-facts').innerText()).toBe('308 Winchester · 7,62 x 51')
@@ -523,7 +524,7 @@ test('printed, a one-figure record ends within one A4 page in a taller window', 
   // A4 less 15 mm margins at 96 px per inch: 180 by 267 mm; the window is taller than the page
   await page.setViewportSize({ width: 680, height: 1400 })
   for (const id of ['308-win', '9-mm-luger']) {
-    await page.goto(`/cartridges/${id}`)
+    await page.goto(`./cartridges/${id}`)
     await page.emulateMedia({ media: 'print' })
     const bottom = await page
       .locator('.page-shell')
@@ -541,7 +542,7 @@ test('printed, the outline is to its stated scale with its stroke inside the cas
 }) => {
   // A4 less 10 mm margins, a dark system setting: print stays light
   await page.setViewportSize({ width: 718, height: 1000 })
-  await page.goto('/cartridges/308-win')
+  await page.goto('./cartridges/308-win')
   await page.emulateMedia({ media: 'print', colorScheme: 'dark' })
   const printed = (name: 'Cartridge' | 'Chamber') =>
     page
@@ -571,10 +572,10 @@ test('printed, the outline is to its stated scale with its stroke inside the cas
   await expect(printed('Chamber').locator('.part-cartridge')).toHaveCount(0)
   await expect(printed('Cartridge').locator('.dims-cartridge')).toBeVisible()
   // with dark stored too
-  await page.evaluate(() => localStorage.setItem('theme', 'dark'))
+  await page.evaluate((store) => localStorage.setItem(store, 'dark'), storageName('theme'))
   await page.reload()
   expect(await outline.evaluate((e) => getComputedStyle(e).stroke)).toBe(ink)
-  await page.evaluate(() => localStorage.removeItem('theme'))
+  await page.evaluate((store) => localStorage.removeItem(store), storageName('theme'))
   const words = page
     .getByRole('region', { name: 'Cartridge', exact: true })
     .getByText(/the drawing is at 1:1\.25 \(80 % of life size\)/)
@@ -727,7 +728,7 @@ test.describe('on a touch screen', () => {
 })
 
 test('a provenance note is shown', async ({ page }) => {
-  await page.goto('/cartridges/6-5-grendel')
+  await page.goto('./cartridges/6-5-grendel')
   await expect(page.getByText(/checked by hand against the CIP sheet/i)).toBeVisible()
 })
 
@@ -735,7 +736,7 @@ test('an unknown cartridge and one without a CIP sheet show the not-found conten
   page,
 }) => {
   for (const id of ['does-not-exist', '22-creedmoor']) {
-    await page.goto(`/cartridges/${id}`)
+    await page.goto(`./cartridges/${id}`)
     await expect(page.getByText('This page could not be found.')).toBeVisible()
     await expect(page.locator('meta[name="robots"]').first()).toHaveAttribute('content', /noindex/)
   }
