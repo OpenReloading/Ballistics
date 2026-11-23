@@ -26,6 +26,7 @@ export {
 export { type LabeledHole, type LabeledPhoto, type LabelSet, labelSet } from './label-set.ts'
 export {
   learnedDetector,
+  MAYBE_BELOW,
   ModelContractError,
   type ModelTensor,
   type RunModel,

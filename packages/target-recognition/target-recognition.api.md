@@ -217,6 +217,9 @@ export function learnedDetector(manifest: ModelManifest, run: RunModel): Inferen
 export function matchHoles(marks: readonly Point[], holes: readonly Point[], diameter: number): HoleMatch;
 
 // @public
+export const MAYBE_BELOW = 0.5;
+
+// @public
 export function median1(v: readonly number[]): number;
 
 // @public

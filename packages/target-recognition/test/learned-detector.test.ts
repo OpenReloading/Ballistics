@@ -4,7 +4,12 @@ import sharp from 'sharp'
 import { describe, expect, it } from 'vitest'
 import type { HoleProposal } from '../src/hole-detection.ts'
 import { matchHoles } from '../src/hole-matching.ts'
-import { learnedDetector, ModelContractError, type RunModel } from '../src/learned-detector.ts'
+import {
+  learnedDetector,
+  ModelContractError,
+  type ModelTensor,
+  type RunModel,
+} from '../src/learned-detector.ts'
 import { type ModelManifest, modelManifest } from '../src/model-manifest.ts'
 
 // threshold 0.35, sure 0.6, working hole 16 px, size multiple 16, stride 2
@@ -62,6 +67,57 @@ describe('learnedDetector peak decoding', () => {
       [20, 2, 0.3499],
     ])
     expect(found.map(({ x, y }) => ({ x, y }))).toEqual([{ x: 13.5, y: 17.5 }])
+  })
+})
+
+describe('learnedDetector model input', () => {
+  // 6 x 4 px, R = 10 + 10x + 60y, G = 100 + 3x + 20y, B = 250 - 10x - 60y: at scale 0.5 working px (u, v) is the mean of photo px 2u..2u+1, 2v..2v+1
+  const pattern = {
+    width: 6,
+    height: 4,
+    data: new Uint8ClampedArray(
+      Array.from({ length: 24 }, (_, i) => {
+        const [x, y] = [i % 6, Math.floor(i / 6)]
+        return [10 + 10 * x + 60 * y, 100 + 3 * x + 20 * y, 250 - 10 * x - 60 * y, 255]
+      }).flat(),
+    ),
+  }
+
+  it('averages the covered photo area, pads with the edge px and orders and scales the channels as the manifest gives', async () => {
+    const seen: ModelTensor[] = []
+    const keep: RunModel = async (input) => {
+      seen.push(input)
+      return { data: new Float32Array(8 * 8), dims: [1, 1, 8, 8] }
+    }
+    // the range maps px value 0 to 255 onto -1 to 1.55, so a value reads as -1 + value / 100
+    const bgr: ModelManifest = {
+      ...manifest,
+      input: { ...manifest.input, channels: 'bgr', range: [-1, 1.55] },
+    }
+    await learnedDetector(bgr, keep).propose({ ...request, image: pattern })
+    const [input] = seen
+    expect(input?.dims).toEqual([1, 3, 16, 16])
+    const at = (u: number, v: number) => [
+      u,
+      v,
+      ...[0, 1, 2].map((c) => Math.round((input?.data[(c * 16 + v) * 16 + u] ?? NaN) * 1e5) / 1e5),
+    ]
+    // [u, v, B, G, R] of the 3 x 2 working image padded to 16 x 16; the last three are padding
+    expect([at(0, 0), at(1, 1), at(9, 0), at(1, 7), at(15, 15)]).toEqual([
+      [0, 0, 1.15, 0.115, -0.55],
+      [1, 1, -0.25, 0.575, 0.85],
+      [9, 0, 0.75, 0.235, -0.15],
+      [1, 7, -0.25, 0.575, 0.85],
+      [15, 15, -0.45, 0.635, 1.05],
+    ])
+  })
+
+  it('maps a peak back to photo px at the rounded working size', async () => {
+    // 101 x 69 px at scale 0.5: working image 51 x 35 (not 50.5 x 34.5), so cell (25, 17) lies at the working image's far corner
+    const found = await propose([[25, 17, 0.9]], {
+      image: { width: 101, height: 69, data: new Uint8ClampedArray(101 * 69 * 4).fill(128) },
+    })
+    expect(found.map(({ x, y }) => ({ x, y }))).toEqual([{ x: 100.5, y: 68.5 }])
   })
 })
 

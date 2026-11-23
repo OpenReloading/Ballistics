@@ -24,8 +24,8 @@ export class ModelContractError extends Error {
   override name = 'ModelContractError'
 }
 
-// the web app shows a proposal below this confidence as a maybe (apps/web/src/lib/hole-proposals.ts, MAYBE_BELOW)
-const SURE_CONFIDENCE = 0.5
+/** The confidence tier edge: a proposal below it is a maybe, at or above it sure; the manifest's `sure` peak maps onto it. */
+export const MAYBE_BELOW = 0.5
 // the classical detector's margin around the region, in expected hole diameters
 const MARGIN = 3
 
@@ -191,9 +191,9 @@ function isPeak(heat: Float32Array, gw: number, gh: number, i: number): boolean 
 /** The peak on the confidence scale: `sure` maps to the sure tier's lower edge, 0 and 1 stay, linear between them. */
 function confidence(peak: number, sure: number): number {
   const s = Math.fround(sure)
-  if (peak < s) return (SURE_CONFIDENCE * peak) / s
+  if (peak < s) return (MAYBE_BELOW * peak) / s
   if (s >= 1) return 1
-  return clamp(SURE_CONFIDENCE + ((1 - SURE_CONFIDENCE) * (peak - s)) / (1 - s), 0, 1)
+  return clamp(MAYBE_BELOW + ((1 - MAYBE_BELOW) * (peak - s)) / (1 - s), 0, 1)
 }
 
 /** Proposals chained by centers closer than one hole diameter share a cluster. */

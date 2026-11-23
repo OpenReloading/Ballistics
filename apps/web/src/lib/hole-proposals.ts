@@ -1,6 +1,6 @@
 /** Kept apart from the sheet, in photo px, until the user accepts them as shots (`apps/docs/docs/models/hole-detection.md`). */
 import { type ShotGroup, toSi } from '@rangefoundry/schema'
-import type { HoleProposal } from '@rangefoundry/target-recognition'
+import { type HoleProposal, MAYBE_BELOW } from '@rangefoundry/target-recognition'
 import { nth } from './nth.ts'
 import { type Frame, targetToView, viewToTarget } from './target-editor.ts'
 import type { Point } from './target-geometry.ts'
@@ -8,10 +8,7 @@ import type { Point } from './target-geometry.ts'
 /** `HoleProposal` with an editor-assigned `id`, in photo px, not yet accepted as a shot. */
 export type EditorProposal = HoleProposal & { id: number }
 
-/** A starting value: below it a proposal is a maybe, shown but left out of Accept sure and the sure count. */
-const MAYBE_BELOW = 0.5
-
-/** True for a proposal below the confidence tier. */
+/** True for a proposal below the confidence tier: shown as a maybe, left out of Accept sure and the sure count. */
 export const isMaybe = (p: Pick<HoleProposal, 'confidence'>): boolean => p.confidence < MAYBE_BELOW
 
 /** Confirmed holes needed before their sizes set the expected hole size. */
