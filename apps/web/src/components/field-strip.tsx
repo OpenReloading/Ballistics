@@ -1,23 +1,23 @@
 'use client'
 
 import {
+  Box,
   Circle,
-  Cube,
+  CircleDot,
   Cylinder,
-  Drop,
+  Droplet,
   Factory,
   Flag,
   Flame,
   Globe,
-  type Icon,
+  type LucideIcon,
   Package,
-  Record as RecordIcon,
   Ruler,
-  Scales,
+  Scale,
   Shapes,
   Target,
-  TrendDown,
-} from '@phosphor-icons/react'
+  TrendingDown,
+} from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import type { Translator } from '../i18n/translate.ts'
@@ -29,24 +29,24 @@ import { Fact, FactCard, FactCards, Sized, slotUnits } from './fact-cards.tsx'
 import { MutedBadge } from './standard-badge.tsx'
 import { useUnits } from './units-settings.tsx'
 
-const icons: Record<StripItem['icon'], Icon> = {
+const icons: Record<StripItem['icon'], LucideIcon> = {
   manufacturer: Factory,
   diameter: Circle,
-  mass: Scales,
+  mass: Scale,
   length: Ruler,
-  ballisticCoefficient: TrendDown,
+  ballisticCoefficient: TrendingDown,
   sectionalDensity: Cylinder,
   form: Shapes,
   burnRate: Flame,
-  base: Drop,
-  density: Cube,
+  base: Droplet,
+  density: Box,
   bulkDensity: Package,
-  capacity: Drop,
-  material: Cube,
+  capacity: Droplet,
+  material: Box,
   federation: Flag,
   distance: Ruler,
   rings: Target,
-  black: RecordIcon,
+  black: CircleDot,
 }
 
 /** A strip item's label; a coefficient of a velocity band names its lower bound, as the table does. */

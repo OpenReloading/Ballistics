@@ -1,7 +1,7 @@
 'use client'
 
 import { Button, Flex } from '@mantine/core'
-import { ArrowCounterClockwise, ArrowUUpLeft, ArrowUUpRight, Plus } from '@phosphor-icons/react'
+import { Plus, Redo2, RotateCcw, Undo2 } from 'lucide-react'
 import { memo } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { shortcutAriaKeys, shortcutLabel } from '../lib/shortcuts.ts'
@@ -39,7 +39,7 @@ export const DesignerToolbar = memo(function DesignerToolbar({
         variant="default"
         className="bar-icon"
         disabled={!undo}
-        leftSection={<ArrowUUpLeft aria-hidden="true" />}
+        leftSection={<Undo2 aria-hidden="true" />}
         onClick={() => dispatch({ type: 'undo' })}
         title={t('Undo ({shortcut})', { shortcut: shortcutLabel('undo') })}
         aria-keyshortcuts={shortcutAriaKeys('undo')}
@@ -50,7 +50,7 @@ export const DesignerToolbar = memo(function DesignerToolbar({
         variant="default"
         className="bar-icon"
         disabled={!redo}
-        leftSection={<ArrowUUpRight aria-hidden="true" />}
+        leftSection={<Redo2 aria-hidden="true" />}
         onClick={() => dispatch({ type: 'redo' })}
         title={t('Redo ({shortcut})', { shortcut: shortcutLabel('redo') })}
         aria-keyshortcuts={shortcutAriaKeys('redo')}
@@ -69,7 +69,7 @@ export const DesignerToolbar = memo(function DesignerToolbar({
           variant="default"
           className="bar-icon"
           disabled={!reset}
-          leftSection={<ArrowCounterClockwise aria-hidden="true" />}
+          leftSection={<RotateCcw aria-hidden="true" />}
           onClick={() => dispatch({ type: 'reset', system })}
           title={resetLabel}
         >

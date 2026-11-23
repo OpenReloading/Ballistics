@@ -1,12 +1,12 @@
 import { ActionIcon, Menu, NumberInput, TextInput, Tooltip, UnstyledButton } from '@mantine/core'
 import {
-  ArrowCounterClockwise,
+  CircleExclamationPoint,
   Database,
-  FunctionIcon,
-  LinkSimple,
-  PencilSimpleLine,
-  WarningCircle,
-} from '@phosphor-icons/react'
+  Link,
+  PencilLine,
+  RotateCcw,
+  SquareFunction,
+} from 'lucide-react'
 import { type ReactNode, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import {
@@ -44,11 +44,11 @@ export type FieldFlag = {
 /** A text or message that names units: given as a function of the units the field shows. */
 type OfShown<T> = T | ((shown: UnitSystem) => T)
 const flagIcons = {
-  seating: LinkSimple,
+  seating: Link,
   record: Database,
-  exceeded: WarningCircle,
-  changed: PencilSimpleLine,
-  derived: FunctionIcon,
+  exceeded: CircleExclamationPoint,
+  changed: PencilLine,
+  derived: SquareFunction,
 }
 
 /** For this field only: one click where the quantity has two units, a menu where it has more; the Settings keep the stored units. */
@@ -133,7 +133,7 @@ function FieldMarker({
           <span className={`field-flag field-flag-${flag.kind}`}>
             <Icon
               size={16}
-              weight={flag.kind === 'exceeded' ? 'fill' : 'regular'}
+              fill={flag.kind === 'exceeded' ? 'currentColor' : 'none'}
               aria-hidden="true"
             />
           </span>
@@ -148,7 +148,7 @@ function FieldMarker({
             aria-label={actionText}
             onClick={action.onClick}
           >
-            <ArrowCounterClockwise size={16} aria-hidden="true" />
+            <RotateCcw size={16} aria-hidden="true" />
           </ActionIcon>
         </Tooltip>
       )}

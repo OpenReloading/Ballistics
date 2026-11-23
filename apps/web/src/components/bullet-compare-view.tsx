@@ -1,10 +1,10 @@
 'use client'
 
 import { Text } from '@mantine/core'
-import { ArrowsLeftRight, WarningCircle } from '@phosphor-icons/react'
 import type { Bullet } from '@rangefoundry/schema'
 import type { LengthUnit } from '@rangefoundry/svg-drawings'
 import { type BulletProfile, recordProfile } from '@rangefoundry/svg-drawings/bullet'
+import { ArrowLeftRight, CircleExclamationPoint } from 'lucide-react'
 import { Fragment, useEffect, useState } from 'react'
 import { useSearchParams } from '@/platform/navigation.ts'
 import { useTranslation } from '../i18n/language.ts'
@@ -46,9 +46,9 @@ function Problem({
     <EmptyNote
       icon={
         empty ? (
-          <ArrowsLeftRight size={24} aria-hidden="true" />
+          <ArrowLeftRight size={24} aria-hidden="true" />
         ) : (
-          <WarningCircle size={24} aria-hidden="true" />
+          <CircleExclamationPoint size={24} aria-hidden="true" />
         )
       }
       title={title}

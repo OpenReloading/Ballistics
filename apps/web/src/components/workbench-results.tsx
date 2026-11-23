@@ -2,7 +2,7 @@
 
 import { Button, Menu, Tabs, Textarea } from '@mantine/core'
 import { useClipboard, useMediaQuery } from '@mantine/hooks'
-import { CaretDown } from '@phosphor-icons/react'
+import { ChevronDown } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { memo, type RefObject, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
@@ -311,7 +311,7 @@ function ResultTabBar({
               data-active={moved.some(([v]) => v === tab) || undefined}
               aria-hidden={moved.length === 0 || undefined}
               tabIndex={moved.length === 0 ? -1 : undefined}
-              rightSection={<CaretDown size={12} aria-hidden="true" />}
+              rightSection={<ChevronDown size={12} aria-hidden="true" />}
             >
               {t('More')}
             </Button>

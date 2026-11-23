@@ -1,59 +1,37 @@
 'use client'
 
+import { BulletIcon, CartridgeIcon, PowderIcon, RifleIcon } from '@rangefoundry/ui'
 import {
-  ChartBar,
+  ChartColumn,
   Database,
-  DownloadSimple,
-  Flask,
-  Gear,
-  Grains,
-  type Icon,
+  Download,
+  FlaskConical,
   Info,
-  MagnifyingGlass,
+  type LucideIcon,
+  Search,
+  Settings,
   Target,
-  Warning,
-} from '@phosphor-icons/react'
-import type { ReactNode } from 'react'
+  TriangleExclamationPoint,
+} from 'lucide-react'
 
-/** Phosphor icons (MIT, https://phosphoricons.com), the set Mantine recommends; none of that list draws a cartridge, a bullet or a rifle, so those three are drawn here in the same stroke style. */
-const icons: Record<string, Icon> = {
+/** Lucide icons (ISC, https://lucide.dev); a cartridge, a bullet, a rifle and powder are `ui`'s own on Lucide's grid. */
+const icons: Record<string, LucideIcon> = {
   // the Library page: the Database
   database: Database,
-  '/powders': Grains,
-  '/workbench': Flask,
-  '/session': ChartBar,
+  '/cartridges': CartridgeIcon,
+  '/bullets': BulletIcon,
+  '/firearms': RifleIcon,
+  '/powders': PowderIcon,
+  '/workbench': FlaskConical,
+  '/session': ChartColumn,
   '/groups': Target,
-  settings: Gear,
-  search: MagnifyingGlass,
-  safety: Warning,
-  install: DownloadSimple,
-}
-
-const drawn: Record<string, ReactNode> = {
-  // lying, rim, case, shoulder and the seated bullet's nose
-  '/cartridges': (
-    <path d="M3 8.5v7M4.5 9H12l2 1.5h1.5c2.5 0 4.5.6 5.5 1.5-1 .9-3 1.5-5.5 1.5H14L12 15H4.5zM14 10.5v3" />
-  ),
-  // standing, its ogive up and a cannelure
-  '/bullets': <path d="M8.5 21V11c0-3.5 1.6-6.5 3.5-8 1.9 1.5 3.5 4.5 3.5 8v10zM8.5 17h7" />,
-  // a rifle with its scope: the crosshair glyph would echo the groups' target
-  '/firearms': <path d="M2 11l6-.5.5-.5H22v1.5H12L11 13H9l-1.5 2.5H3.5zM9.5 7h5v2h-5z" />,
+  settings: Settings,
+  search: Search,
+  safety: TriangleExclamationPoint,
+  install: Download,
 }
 
 export function NavIcon({ name, size = 20 }: { name: string; size?: number }) {
-  if (drawn[name])
-    return (
-      <svg
-        viewBox="0 0 24 24"
-        width={size}
-        height={size}
-        aria-hidden="true"
-        focusable="false"
-        className="nav-icon"
-      >
-        {drawn[name]}
-      </svg>
-    )
   const Glyph = icons[name] ?? Info
   return <Glyph size={size} aria-hidden="true" focusable="false" />
 }

@@ -6,7 +6,7 @@
 
 import type { ComponentPropsWithRef } from 'react';
 import type { I18n } from '@lingui/core';
-import type { LucideIcon } from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
 import { MantineProviderProps } from '@mantine/core';
 import type { Messages } from '@lingui/core';
 import { ReactElement } from 'react';
@@ -34,6 +34,12 @@ export interface ArrayColumns<Row> {
 
 // @public
 export function arraySource<Row>(rows: readonly Row[], columns: ArrayColumns<Row>): DataSource<Row>;
+
+// @public
+export const BulletIcon: LucideIcon;
+
+// @public
+export const CartridgeIcon: LucideIcon;
 
 // @public
 export interface DataPage<Row> {
@@ -87,6 +93,12 @@ export interface PageBarProps {
     status?: ReactNode;
     title: string;
 }
+
+// @public
+export const PowderIcon: LucideIcon;
+
+// @public
+export const RifleIcon: LucideIcon;
 
 // @public
 export const uiMessages: Record<'en' | 'de', Messages>;

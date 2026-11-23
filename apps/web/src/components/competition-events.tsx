@@ -13,7 +13,6 @@ import {
   TextInput,
   Title,
 } from '@mantine/core'
-import { Plus, Trash } from '@phosphor-icons/react'
 import {
   type CompetitionEvent,
   type EventType,
@@ -21,6 +20,7 @@ import {
   userRecord,
 } from '@rangefoundry/schema'
 import type { EventTotals, StageScore } from '@rangefoundry/shot-groups'
+import { Plus, Trash } from 'lucide-react'
 import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import {
   deleteRecord,

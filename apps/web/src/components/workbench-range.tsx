@@ -1,7 +1,7 @@
 'use client'
 
 import { ActionIcon, Button, Popover } from '@mantine/core'
-import { Info } from '@phosphor-icons/react'
+import { Info } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'

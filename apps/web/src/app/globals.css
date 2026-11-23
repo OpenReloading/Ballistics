@@ -226,15 +226,6 @@ body {
   width: auto;
 }
 
-.nav-icon {
-  flex: none;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
 /* element defaults: in the base layer, below Mantine's (layers.css), so a Mantine component's
    own styles and props win; quiet underlines, one page header, tabular figures */
 @layer base {
@@ -869,6 +860,17 @@ td.nowrap {
 
 .field-flag-exceeded {
   color: var(--danger, var(--warn-text));
+}
+
+/* the filled circle knocks out its exclamation mark in the page color, as Phosphor's fill weight drew it */
+.field-flag-exceeded svg line {
+  stroke: var(--mantine-color-body);
+}
+
+@media (forced-colors: active) {
+  .field-flag-exceeded svg line {
+    stroke: Canvas;
+  }
 }
 
 .field-action {

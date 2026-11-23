@@ -11,7 +11,6 @@ import {
   Tooltip,
   UnstyledButton,
 } from '@mantine/core'
-import { DotsThreeVertical, Plus } from '@phosphor-icons/react'
 import {
   type Firearm,
   type Optic,
@@ -20,6 +19,7 @@ import {
   parseRef,
   type UserRecord,
 } from '@rangefoundry/schema'
+import { EllipsisVertical, Plus } from 'lucide-react'
 import {
   type ReactNode,
   useCallback,
@@ -234,7 +234,7 @@ function RowActions({
           variant="subtle"
           aria-label={t('Actions for {name}', { name: r.name })}
         >
-          <DotsThreeVertical size={18} aria-hidden="true" />
+          <EllipsisVertical size={18} aria-hidden="true" />
         </ActionIcon>
       </Menu.Target>
       <Menu.Dropdown>

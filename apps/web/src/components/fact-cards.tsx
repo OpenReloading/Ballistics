@@ -1,4 +1,4 @@
-import type { Icon } from '@phosphor-icons/react'
+import type { LucideIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { presetUnits } from '../lib/units.ts'
 // oxlint-disable-next-line import/no-cycle -- field-table imports Sized back; moving one of them breaks the cycle
@@ -56,7 +56,7 @@ export function Fact({
 }
 
 /** A card of facts with a leading icon. */
-export function FactCard({ icon: Glyph, children }: { icon: Icon; children: ReactNode }) {
+export function FactCard({ icon: Glyph, children }: { icon: LucideIcon; children: ReactNode }) {
   return (
     <div className="fact-card">
       <Glyph aria-hidden="true" className="fact-icon" />

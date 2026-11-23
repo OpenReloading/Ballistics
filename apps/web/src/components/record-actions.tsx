@@ -11,16 +11,16 @@ import {
 } from '@mantine/core'
 import { useClipboard } from '@mantine/hooks'
 import {
-  ArrowsLeftRight,
+  ArrowLeftRight,
   Check,
   Copy,
-  Flask,
+  FlaskConical,
   Info,
-  LinkSimple,
-  PencilSimple,
+  Link as LinkIcon,
+  Pencil,
   Printer,
   Target,
-} from '@phosphor-icons/react'
+} from 'lucide-react'
 import { type ReactNode, useId } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
@@ -82,7 +82,7 @@ export function RecordActions({
   return (
     <>
       {workbench && (
-        <LinkButton href={workbench} icon={<Flask aria-hidden="true" />} primary>
+        <LinkButton href={workbench} icon={<FlaskConical aria-hidden="true" />} primary>
           {t('Use in workbench')}
         </LinkButton>
       )}
@@ -92,12 +92,12 @@ export function RecordActions({
         </LinkButton>
       )}
       {design && (
-        <LinkButton href={design} icon={<PencilSimple aria-hidden="true" />}>
+        <LinkButton href={design} icon={<Pencil aria-hidden="true" />}>
           {t('Open in designer')}
         </LinkButton>
       )}
       {compare && (
-        <LinkButton href={compare} icon={<ArrowsLeftRight aria-hidden="true" />}>
+        <LinkButton href={compare} icon={<ArrowLeftRight aria-hidden="true" />}>
           {t('Compare')}
         </LinkButton>
       )}
@@ -114,7 +114,7 @@ export function RecordActions({
           aria-label={t('Copy link')}
           onClick={() => clipboard.copy(window.location.href)}
         >
-          <LinkSimple aria-hidden="true" />
+          <LinkIcon aria-hidden="true" />
         </ActionIcon>
       </Tooltip>
       <CopyStatus copied={clipboard.copied} error={clipboard.error} />

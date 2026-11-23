@@ -3,9 +3,9 @@
 import { Button, Menu } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { spotlight } from '@mantine/spotlight'
-import { MagnifyingGlass, Play, Printer } from '@phosphor-icons/react'
 import { bulletWindow } from '@rangefoundry/ballistics'
 import { toSi } from '@rangefoundry/schema'
+import { Play, Printer, Search as SearchIcon } from 'lucide-react'
 import {
   type KeyboardEvent,
   type ReactNode,
@@ -750,7 +750,7 @@ function PhoneBar({
         aria-label={t('Run simulation')}
         loading={pending}
         loaderProps={{ type: 'dots' }}
-        leftSection={<Play size={14} weight="fill" aria-hidden="true" />}
+        leftSection={<Play size={14} fill="currentColor" aria-hidden="true" />}
         onClick={() => {
           if (run()) show()
         }}
@@ -1387,7 +1387,7 @@ export function Workbench() {
                     aria-keyshortcuts={shortcutAriaKeys('run')}
                     loading={pending}
                     loaderProps={{ type: 'dots' }}
-                    leftSection={<Play size={14} weight="fill" aria-hidden="true" />}
+                    leftSection={<Play size={14} fill="currentColor" aria-hidden="true" />}
                     title={t('Run simulation ({keys})', { keys: shortcutLabel('run') })}
                     onClick={() => run()}
                   >
@@ -1402,7 +1402,7 @@ export function Workbench() {
                     <Button
                       variant="default"
                       className="bar-icon"
-                      leftSection={<MagnifyingGlass size={18} aria-hidden="true" />}
+                      leftSection={<SearchIcon size={18} aria-hidden="true" />}
                       onClick={() => spotlight.open()}
                       aria-keyshortcuts={shortcutAriaKeys('search')}
                       title={

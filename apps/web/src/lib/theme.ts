@@ -13,6 +13,9 @@ export const controlSize = {
   row: { button: 'xs', icon: 'input-xs', toggle: 'xs', input: 'xs' },
 } as const
 
+/** Icons at their text's size with a 1.5 stroke on Lucide's 24 grid; lucide-react 1.73.0 types the provider's `size` as a number, though its icons take any CSS length. */
+export const iconDefaults = { size: '1em' as unknown as number, strokeWidth: 1.5 }
+
 /** Width of the page container of header, main and footer: the page type's token in globals.css. */
 export const pageWidth = 'var(--page-width)'
 

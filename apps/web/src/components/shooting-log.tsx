@@ -13,13 +13,13 @@ import {
   TextInput,
   Title,
 } from '@mantine/core'
-import { DotsThreeVertical, Plus } from '@phosphor-icons/react'
 import {
   type ShootingLogEntry,
   type ShootingLogRecord,
   type UserRecord,
   userRecord,
 } from '@rangefoundry/schema'
+import { EllipsisVertical, Plus } from 'lucide-react'
 import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import {
   deleteRecord,
@@ -409,7 +409,7 @@ function RowActions({
           variant="subtle"
           aria-label={t('Actions for {name}', { name: record.name })}
         >
-          <DotsThreeVertical size={18} aria-hidden="true" />
+          <EllipsisVertical size={18} aria-hidden="true" />
         </ActionIcon>
       </Menu.Target>
       <Menu.Dropdown>
