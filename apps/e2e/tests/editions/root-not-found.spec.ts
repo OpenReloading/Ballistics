@@ -34,7 +34,11 @@ async function stableMiss(page: Page, controlled: boolean) {
   await openMiss(page, 'no-such-page/', controlled)
   // only the stable app's not-found page renders it: the dispatcher's fallback has the same heading
   await expect(page.getByText('This page could not be found.')).toBeVisible()
-  await page.getByRole('main').getByRole('link', { name: 'Cartridges', exact: true }).click()
+  const link = page.getByRole('main').getByRole('link', { name: 'Cartridges', exact: true })
+  await link.waitFor({ timeout: 10_000 }).catch(async () => {
+    throw new Error(`${page.url()}\n${await page.locator('body').ariaSnapshot()}`)
+  })
+  await link.click()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Cartridges')
   expect(fetched).toEqual([])
 }
@@ -79,9 +83,11 @@ test.describe('under the stable worker', () => {
   test('a miss under next/ shows the next fallback and none of the stable page runs', async ({
     page,
     baseURL,
+    browserName,
   }) => {
     await installStableWorker(page)
-    await nextMiss(page, new URL(baseURL ?? '').pathname, true)
+    // Firefox under Playwright reports no controller for a navigation the worker leaves to the network
+    await nextMiss(page, new URL(baseURL ?? '').pathname, browserName !== 'firefox')
   })
 })
 
