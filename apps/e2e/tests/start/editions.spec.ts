@@ -54,7 +54,7 @@ for (const { name, base } of editions) {
     // the shell takes `/` until TanStack/router#8741 closes: the `/?root` entry writes home
     const home = await request.get(base)
     expect(home.status()).toBe(200)
-    expect(await home.text()).toMatch(/<h1>RangeFoundry Workbench<\/h1>/)
+    expect(await home.text()).toMatch(/<h1[^>]*>RangeFoundry Workbench<\/h1>/)
     const sitemap = await (await request.get(`${base}sitemap.xml`)).text()
     expect(sitemap).toContain(`<loc>https://openreloading.github.io${site}${base}</loc>`)
   })

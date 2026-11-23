@@ -1,19 +1,27 @@
-import { useLingui } from '@lingui/react'
 import { localStorageColorSchemeManager, mantineHtmlProps } from '@mantine/core'
-import { AppFrame, UiProvider } from '@rangefoundry/ui'
+import { colors } from '@rangefoundry/design-tokens'
+import { UiProvider } from '@rangefoundry/ui'
 import uiCss from '@rangefoundry/ui/ui.css?url'
-import { createRootRoute, HeadContent, Link, Outlet, Scripts } from '@tanstack/react-router'
+import { createRootRoute, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
 import { LucideProvider } from 'lucide-react'
 import { type ReactNode, useEffect } from 'react'
-import { startLanguage } from '../i18n/language.ts'
+import { ConfirmHost } from '../components/confirm.tsx'
+import { SettingsDialogProvider } from '../components/providers.tsx'
+import { UnitsProvider } from '../components/units-settings.tsx'
+import { startLanguage, useTranslation } from '../i18n/language.ts'
+import { decimalMark } from '../i18n/number.ts'
 import { colorSchemeKey, colorSchemeScript, iconDefaults } from '../lib/theme.ts'
 import { uiFont } from '../platform/fonts/ui.ts'
 import appCss from '../styles.css?url'
-import { useStoredLanguage } from './-lingui.ts'
+import { AppError } from './-error.tsx'
+import { linguiOf } from './-lingui.ts'
+import { Shell } from './-shell.tsx'
 import { socialImage } from './-social-image.ts'
-import { pageTitles } from './-static-paths.ts'
 
 const colorSchemeManager = localStorageColorSchemeManager({ key: colorSchemeKey })
+
+// Vite's base with its trailing slash: / or /Ballistics/next/
+const base = import.meta.env.BASE_URL
 
 export const Route = createRootRoute({
   head: () => ({
@@ -25,20 +33,36 @@ export const Route = createRootRoute({
         name: 'description',
         content: 'A ballistics database with interior and exterior ballistics simulations.',
       },
+      // the window bar of the installed app follows the system theme (--page of the tokens)
+      { name: 'theme-color', media: '(prefers-color-scheme: light)', content: colors.light.page },
+      { name: 'theme-color', media: '(prefers-color-scheme: dark)', content: colors.dark.page },
       ...socialImage,
     ],
     links: [
+      // ui's own rules before the app's: the app's styles bring Mantine's in cascade layers, the tokens and the font
       { rel: 'stylesheet', href: uiCss },
       { rel: 'stylesheet', href: appCss },
+      { rel: 'manifest', href: `${base}manifest.webmanifest` },
+      { rel: 'icon', href: `${base}icon.png`, type: 'image/png', sizes: '512x512' },
+      {
+        rel: 'apple-touch-icon',
+        href: `${base}apple-icon.png`,
+        type: 'image/png',
+        sizes: '180x180',
+      },
     ],
   }),
   shellComponent: Document,
   component: Root,
+  errorComponent: AppError,
 })
 
 // the providers sit in the shell, so the error page that replaces Root still has them
 function Document({ children }: { children: ReactNode }) {
-  const i18n = useStoredLanguage()
+  // the stored language applies after mounting: the prerender and hydration are English
+  useEffect(startLanguage, [])
+  // one language for the views' own messages and the Lingui ones; number inputs write its decimal mark
+  const { language } = useTranslation()
   return (
     <html lang="en" {...mantineHtmlProps} className={uiFont.variable}>
       {/* oxlint-disable-next-line nextjs/no-head-element -- TanStack Start's shell writes the document's own head */}
@@ -48,8 +72,19 @@ function Document({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <UiProvider i18n={i18n} defaultColorScheme="auto" colorSchemeManager={colorSchemeManager}>
-          <LucideProvider {...iconDefaults}>{children}</LucideProvider>
+        <UiProvider
+          i18n={linguiOf(language)}
+          decimalMark={decimalMark(language)}
+          defaultColorScheme="auto"
+          colorSchemeManager={colorSchemeManager}
+        >
+          <LucideProvider {...iconDefaults}>
+            <UnitsProvider>
+              {/* first: its Escape listener is added before the page's dialogs add theirs */}
+              <ConfirmHost />
+              <SettingsDialogProvider>{children}</SettingsDialogProvider>
+            </UnitsProvider>
+          </LucideProvider>
         </UiProvider>
         <Scripts />
       </body>
@@ -62,28 +97,9 @@ function Root() {
   useEffect(() => {
     document.documentElement.dataset.hydrated = ''
   }, [])
-  // the views' own messages follow this edition's stored language, as the Next app's providers start them
-  useEffect(startLanguage, [])
   return (
-    <AppFrame brand={<Link to="/">RangeFoundry Workbench</Link>} navigation={<Navigation />}>
+    <Shell>
       <Outlet />
-    </AppFrame>
-  )
-}
-
-// links with ui's class, as its NavItem takes no label without an icon
-function Navigation() {
-  const { i18n } = useLingui()
-  return (
-    <>
-      {(['/workbench', '/session', '/groups'] as const).map((page) => (
-        <Link key={page} to={`${page}/`} className="ui-nav-item">
-          {i18n._(pageTitles[page])}
-        </Link>
-      ))}
-      <Link to="/cartridges/" className="ui-nav-item">
-        {i18n._({ id: 'nav.database', message: 'Database' })}
-      </Link>
-    </>
+    </Shell>
   )
 }

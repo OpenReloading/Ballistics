@@ -1,6 +1,7 @@
 import { setupI18n } from '@lingui/core'
 import type { Preview } from '@storybook/react-vite'
 import { UiProvider, uiMessages } from '../src/index.ts'
+import '../css/base.css'
 import '../css/ui.css'
 
 // the width of a story test's project (vitest.config.ts); undefined in Storybook itself

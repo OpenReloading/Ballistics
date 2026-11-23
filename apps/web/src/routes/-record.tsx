@@ -2,7 +2,6 @@ import { useLingui } from '@lingui/react'
 import { recordIdRegex } from '@rangefoundry/schema'
 import { PageBar } from '@rangefoundry/ui'
 import { notFound, useLoaderData } from '@tanstack/react-router'
-import { createIsomorphicFn } from '@tanstack/react-start'
 import { noManufacturerNames } from '../lib/manufacturers.ts'
 import {
   type HeadSource,
@@ -12,6 +11,7 @@ import {
   refId,
 } from '../lib/record-metadata.ts'
 import { titleTemplate } from '../lib/title-template.ts'
+import { readData } from './-data.ts'
 import { socialCard } from './-social-image.ts'
 
 interface RecordData extends HeadText {
@@ -19,31 +19,16 @@ interface RecordData extends HeadText {
   name: string
 }
 
-// the prerender reads this build's data files from disk, the browser fetches them from its edition's api/
-const readData = createIsomorphicFn()
-  .server(async (file: string): Promise<HeadSource | undefined> => {
-    // oxlint-disable-next-line no-restricted-imports -- only the prerender runs this branch, Start drops it from the client
-    const { readFile } = await import('node:fs/promises')
-    try {
-      return JSON.parse(await readFile(`public/api/${file}.json`, 'utf8'))
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code === 'ENOENT') return undefined
-      throw error
-    }
-  })
-  .client(async (file: string): Promise<HeadSource | undefined> => {
-    const response = await fetch(`${import.meta.env.BASE_URL}api/${file}.json`)
-    if (response.status === 404) return undefined
-    if (!response.ok) throw new Error(`Error ${response.status}.`)
-    return response.json()
-  })
-
 export async function loadRecord(kind: RecordKind, id: string): Promise<RecordData> {
   // the id comes from the address and becomes part of a file path
-  const record = recordIdRegex.test(id) ? await readData(`${kind}/${id}`) : undefined
+  const record = recordIdRegex.test(id)
+    ? ((await readData(`${kind}/${id}`)) as HeadSource | undefined)
+    : undefined
   if (!record) throw notFound()
   const maker = record.manufacturer && refId(record.manufacturer)
-  const manufacturer = maker ? await readData(`manufacturers/${maker}`) : undefined
+  const manufacturer = maker
+    ? ((await readData(`manufacturers/${maker}`)) as HeadSource | undefined)
+    : undefined
   const names = manufacturer?.name
     ? new Map([[manufacturer.id, manufacturer.name]])
     : noManufacturerNames
