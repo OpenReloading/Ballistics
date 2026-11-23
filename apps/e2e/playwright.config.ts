@@ -6,6 +6,9 @@ const webUrl = process.env.WEB_URL ?? 'http://localhost:3003'
 const pagesUrl = process.env.PAGES_URL
 /** Set: projects `firefox` and `webkit` run the smoke spec against `WEB_URL`. */
 const allEngines = Boolean(process.env.ALL_ENGINES)
+/** `off`: no Start site build and no projects `start-*` (the drawing baseline, a local `--project full` run). */
+const startSite = process.env.START_SITE !== 'off'
+const startUrl = 'http://localhost:3043/Ballistics/'
 
 const browserAt = (url: string, device = devices['Desktop Chrome']) => ({
   ...device,
@@ -33,6 +36,22 @@ export default defineConfig({
   // the default without {-projectName}: a renamed project still finds the committed snapshots
   snapshotPathTemplate:
     '{testDir}/{testFileDir}/{testFileName}-snapshots/{arg}{-snapshotSuffix}{ext}',
+  // both Start editions as one Pages site under a project-site base path, built once per run
+  webServer: startSite
+    ? [
+        {
+          command: 'node ../../tools/src/start-site.ts --sample --serve',
+          url: startUrl,
+          env: {
+            PAGES_BASE_PATH: '/Ballistics',
+            PAGES_URL: 'https://openreloading.github.io',
+            PORT: '3043',
+          },
+          timeout: 180_000,
+          reuseExistingServer: !process.env.CI,
+        },
+      ]
+    : [],
   projects: [
     {
       name: 'full',
@@ -64,6 +83,19 @@ export default defineConfig({
             use: browserAt(webUrl, devices['Desktop Safari']),
           },
         ]
+      : []),
+    ...(startSite
+      ? (
+          [
+            ['start-chromium', devices['Desktop Chrome']],
+            ['start-firefox', devices['Desktop Firefox']],
+            ['start-webkit', devices['Desktop Safari']],
+          ] as const
+        ).map(([name, device]) => ({
+          name,
+          testDir: './tests/start',
+          use: { ...device, baseURL: startUrl },
+        }))
       : []),
   ],
 })
