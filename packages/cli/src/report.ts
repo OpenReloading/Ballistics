@@ -1,3 +1,4 @@
+import { barrelClasses } from './metrics.ts'
 import type { Change, CompareResult, FitResult, Metrics, VerifyResult } from './result.ts'
 
 /** A fraction as percent with one decimal, `-` for none. */
@@ -5,6 +6,19 @@ const pct = (x: number | null | undefined) => (x == null ? '-' : `${(100 * x).to
 /** A change in percentage points with its sign, `-` for none. */
 const signed = (x: number | null | undefined) =>
   x == null ? '-' : `${x > 0 ? '+' : ''}${(100 * x).toFixed(2)}`
+
+/** The half width and training rows of each barrel class that has one. */
+const widthsLine = (interval: VerifyResult['interval']) =>
+  barrelClasses
+    .flatMap((c) => {
+      const w = interval.byBarrel?.[c]
+      return w
+        ? [
+            `${c} ${pct(w.halfWidth)} % (${w.trainingRows} ${w.trainingRows === 1 ? 'row' : 'rows'})`,
+          ]
+        : []
+    })
+    .join(', ') || 'none'
 
 /** Left-aligned first column, right-aligned others, two spaces apart. */
 function table(head: string[], body: string[][]): string {
@@ -92,7 +106,7 @@ export function verifyTable(r: VerifyResult): string {
     `model ${r.model}  version ${r.modelVersion}`,
     ...screenLines('', r.screen),
     ...publishedLines(r.published),
-    `split ${r.split}  salt ${r.splitSalt}  interval half width ${r.folds ? 'of the fold of each row' : `${pct(r.interval.halfWidth)} % from ${r.interval.trainingRows} training rows`}`,
+    `split ${r.split}  salt ${r.splitSalt}  interval half width ${r.folds ? 'of the class of each row in its fold' : `${widthsLine(r.interval)} of ${r.interval.trainingRows} training rows`}`,
     table(metricHead, groups),
     ...(reasons.length > 0 ? [`not used: ${reasons.join(', ')}`] : []),
     ...(bases.length > 0 ? [`pressure by basis, median / P90: ${bases.join(', ')}`] : []),

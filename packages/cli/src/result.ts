@@ -134,11 +134,27 @@ const interval = z.object({
     .describe(
       'The split whose used rows set the half width: `training`, or with `--folds` the training and validation rows the fit read.',
     ),
+  byBarrel: z
+    .partialRecord(
+      z.enum(barrelClasses),
+      z.object({
+        halfWidth: fraction.describe(
+          'The 90th percentile of |model - printed| / model of the velocity over the used rows of the class in `basis`, the distance the coverage tests: the interval of a row of the class is the model velocity times (1 +/- this).',
+        ),
+        trainingRows: count.describe('Used rows of the class in `basis`.'),
+      }),
+    )
+    .meta({ id: 'halfWidthByBarrel' })
+    .optional()
+    .describe(
+      'The half width of the 90 % interval per barrel class, as `byBarrel` of the metrics. A class without a used row in `basis` is left out, and its rows have no interval. Absent at the top of a `--folds` result, where each row takes the half width of its class in its fold, and in a result written before it.',
+    ),
   halfWidth: z
     .number()
     .nullable()
+    .optional()
     .describe(
-      'The 90th percentile of the absolute relative velocity error on the training split: the interval is the model velocity times (1 +/- this). Null without a training row, and at the top of a `--folds` result, where each row is scored with the half width of its fold, which comes from the training and validation rows of the other folds.',
+      'Only in a result written before `byBarrel`: one half width for every row, the 90th percentile of |model - printed| / printed of the velocity on the training split.',
     ),
   trainingRows: count.describe(
     'Used rows of `basis` the half width comes from; at the top of a `--folds` result the sum over the folds, in which each row counts once for every fold whose half width it sets.',

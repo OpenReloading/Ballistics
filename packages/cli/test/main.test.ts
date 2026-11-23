@@ -318,7 +318,7 @@ describe('a candidate with a velocity that is not a number', () => {
     for (const m of [json.overall, ...Object.values<{ velocity: object }>(json.byFamily)])
       expect(m.velocity === null || Object.values(m.velocity).every(Number.isFinite)).toBe(true)
     expect(Number.isFinite(json.overall.velocity.median)).toBe(true)
-    expect(Number.isFinite(json.interval.halfWidth)).toBe(true)
+    expect(Number.isFinite(json.interval.byBarrel.rifle.halfWidth)).toBe(true)
     expect(result.safeParse(json).success).toBe(true)
     const baseline = writeRows(r.stdout, 'baseline.json')
     expect(
