@@ -5,6 +5,9 @@ import { ErrorNote } from '../components/states.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 
+// anything may be thrown
+const messageOf = (error: unknown) => (error instanceof Error ? error.message : String(error))
+
 const kept = msg(
   'Your saved records stay in this browser. Reload the page; if the error comes back, report an issue with the message below.',
 )
@@ -22,7 +25,7 @@ export function PageError({ error }: ErrorComponentProps) {
       >
         {t(kept)}
         <Text size="xs" c="dimmed">
-          {error.message}
+          {messageOf(error)}
         </Text>
       </ErrorNote>
     </>
@@ -39,7 +42,7 @@ export function AppError({ error }: ErrorComponentProps) {
       <p role="alert">{t('RangeFoundry Workbench could not be shown.')}</p>
       <p>{t(kept)}</p>
       <p>
-        <small>{error.message}</small>
+        <small>{messageOf(error)}</small>
       </p>
       <button type="button" onClick={() => void router.invalidate()}>
         {t('Try again')}

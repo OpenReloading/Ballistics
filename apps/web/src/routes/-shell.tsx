@@ -17,7 +17,7 @@ import { ThemeSwitch } from '../components/theme-switch.tsx'
 import { useRoute } from '../components/use-route.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { repositoryUrl } from '../lib/repository-url.ts'
-import { pageCoversRoute, sections } from '../lib/sections.ts'
+import { type PageEntry, pageCoversRoute, sections } from '../lib/sections.ts'
 import { shortcutAriaKeys } from '../lib/shortcuts.ts'
 import { pageWidth } from '../lib/theme.ts'
 import { repositoryAddress } from '../platform/edition.ts'
@@ -34,7 +34,7 @@ const repository = repositoryUrl(repositoryAddress)
 function Navigation({ route }: { route: string }) {
   const { t } = useTranslation()
   return sections
-    .flatMap((s) => s.pages)
+    .flatMap((s): readonly PageEntry[] => s.pages)
     .map((p) => (
       <Link
         key={p.href}

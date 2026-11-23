@@ -11,4 +11,4 @@ const instance = (locale: Language, messages: Messages) =>
 const instances = { en: instance('en', en.messages), de: instance('de', de.messages) }
 
 /** The Lingui messages of `language`, the language the views' own messages show, so one switch changes both. */
-export const linguiOf = (language: Language) => instances[language]
+export const linguiOf = (language: string) => (language === 'de' ? instances.de : instances.en)
