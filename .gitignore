@@ -17,3 +17,4 @@ visual-check-out
 /.benchkeeper/
 coverage
 packages/ui/src/locales/*.json
+apps/web/src/locales/*.json
