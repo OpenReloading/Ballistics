@@ -20,10 +20,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
-# Tool images of the `docker run` steps below and the typos release (the action is not on the repository's list of
-# allowed actions). Dependabot does not read them: bump them by hand, oasdiff and Schemathesis together with
-# .devcontainer/Dockerfile, the typos checksum with its version, Playwright together with @playwright/test in
-# pnpm-workspace.yaml (the e2e job fails on a mismatch).
+# Tool images of the `docker run` steps below, the typos release (the action is not on the repository's list of
+# allowed actions) and the uv version of the `hole-model` job. Dependabot does not read them: bump them by hand,
+# oasdiff and Schemathesis together with .devcontainer/Dockerfile, the typos checksum with its version, Playwright
+# together with @playwright/test in pnpm-workspace.yaml (the e2e job fails on a mismatch).
 env:
   TYPOS_VERSION: 1.51.1
   TYPOS_SHA256: 93c301fd4120ff076e2cc2a6d6a61cab4a4bdb81899287c0938b452e56d1f454
@@ -68,17 +68,19 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON apps/web/scripts/ci-plan.mts >> "$GITHUB_OUTPUT"
-      # the Python training project, outside the pnpm workspaces: a pull request that changes neither it nor this file skips it
+      # the Python training project, outside the pnpm workspaces: a pull request that changes neither it nor this file
+      # skips it; a git error runs it
       - id: hole-model
         env:
           EVENT_NAME: ${{ github.event_name }}
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
-          if [ "$EVENT_NAME" != pull_request ] || [ -n "$(git diff --name-only "$BASE_SHA" HEAD -- training/hole-model .github/workflows/ci.yml)" ]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "run=false" >> "$GITHUB_OUTPUT"
+          run=true
+          if [ "$EVENT_NAME" = pull_request ]; then
+            changed=$(git diff --name-only "$BASE_SHA" HEAD -- training/hole-model .github/workflows/ci.yml) || changed=doubt
+            [ -n "$changed" ] || run=false
           fi
+          echo "run=$run" >> "$GITHUB_OUTPUT"
 
   # The checks of the whole repository; the plan skips them for prose only.
   static:
