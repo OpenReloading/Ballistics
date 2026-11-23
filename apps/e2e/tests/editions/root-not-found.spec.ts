@@ -34,12 +34,11 @@ async function stableMiss(page: Page, controlled: boolean) {
   await openMiss(page, 'no-such-page/', controlled)
   // only the stable app's not-found page renders it: the dispatcher's fallback has the same heading
   await expect(page.getByText('This page could not be found.')).toBeVisible()
-  const link = page.getByRole('main').getByRole('link', { name: 'Cartridges', exact: true })
-  await link.waitFor({ timeout: 10_000 }).catch(async () => {
-    throw new Error(`${page.url()}\n${await page.locator('body').ariaSnapshot()}`)
-  })
-  await link.click()
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Cartridges')
+  await page.getByRole('main').getByRole('link', { name: 'Database', exact: true }).click()
+  // only the page the link leads to renders these tabs
+  await expect(
+    page.getByRole('tablist', { name: 'Database' }).getByRole('tab', { selected: true }),
+  ).toHaveText('Cartridges')
   expect(fetched).toEqual([])
 }
 
