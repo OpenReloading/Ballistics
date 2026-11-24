@@ -81,11 +81,12 @@ test('Escape hides the chart tooltip with the pointer or the focus where it is',
   page,
 }) => {
   await runSavedLoad(page)
-  // the vivacity chart draws last, and the last chart is the one hovered
-  await expect(page.getByRole('img', { name: /^Dynamic vivacity/ })).toBeVisible()
-  const chart = page.locator('.echart [role="img"]').last()
-  const tip = page.locator('.echart div[style*="position: absolute"]')
-  const box = await chart.boundingBox()
+  // the same chart for the hover and the keys: the lazy interior chart can mount below it between them
+  const vivacity = page.getByRole('img', { name: /^Dynamic vivacity/ })
+  await expect(vivacity).toBeVisible()
+  const figure = page.locator('.echart').filter({ has: vivacity })
+  const tip = figure.locator('div[style*="position: absolute"]')
+  const box = await vivacity.boundingBox()
   if (!box) throw new Error('no chart box')
 
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 5 })
@@ -94,7 +95,7 @@ test('Escape hides the chart tooltip with the pointer or the focus where it is',
   await page.keyboard.press('Escape')
   await expect(tip).toBeHidden()
 
-  const readout = page.locator('.echart-keys').last()
+  const readout = figure.locator('.echart-keys')
   await readout.focus()
   await readout.press('ArrowRight')
   await expect(tip).toBeVisible()
