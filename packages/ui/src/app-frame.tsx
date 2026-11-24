@@ -126,6 +126,17 @@ function TopBar({
   )
 }
 
+// the focus moves as Mantine's return moves it, only when lost or still in the drawer: with motion the exit ends after a user may have moved it on
+function afterExit(
+  menuButton: HTMLElement | null,
+  content: HTMLElement | null,
+  onClosed: () => void,
+) {
+  const active = document.activeElement
+  if (!active || active === document.body || content?.contains(active)) menuButton?.focus()
+  onClosed()
+}
+
 /** The main navigation below 75em, in a drawer the menu button opens. */
 function NavDrawer({
   brand,
@@ -157,13 +168,7 @@ function NavDrawer({
       hiddenFrom="lg"
       {...(onClosed && {
         // under reduced motion the drawer leaves before Mantine gives the focus back, and a dialog opened then would return it to the body
-        onExitTransitionEnd: () => {
-          // only where the focus is lost or still in the drawer: with motion the exit ends after a user moved it on
-          const active = document.activeElement
-          if (!active || active === document.body || content.current?.contains(active))
-            menuButton.current?.focus()
-          onClosed()
-        },
+        onExitTransitionEnd: () => afterExit(menuButton.current, content.current, onClosed),
       })}
     >
       <Drawer.Overlay />
