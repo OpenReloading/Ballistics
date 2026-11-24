@@ -3,7 +3,10 @@ import subprocess
 from itertools import islice
 from pathlib import Path
 
-from hole_model.cli import git_commit, limit_failures, real_counts
+import numpy as np
+
+from hole_model.cli import git_commit, limit_failures, real_counts, training_sample
+from hole_model.splits import REAL_UNCHECKED, Photo
 
 GIT = ["git", "-c", "user.name=test", "-c", "user.email=test@example.org", "-c", "commit.gpgsign=false"]
 
@@ -62,3 +65,15 @@ def test_every_whole_product_of_a_batch_and_a_percent_share_is_kept_every_step()
                     batch,
                     percent,
                 )
+
+
+def test_a_real_photo_scaled_to_a_jittered_hole_size_moves_its_hole_and_widens_its_target() -> None:
+    holes = np.array([[10.5, 6.5]], np.float32)
+    photo = Photo(Path("p.png"), "0" * 64, "post", True, 16.0, holes, REAL_UNCHECKED, np.zeros((0, 4), np.float32))
+    image, heat, mask = training_sample(photo, np.zeros((24, 40, 3), np.uint8), 32, 32.0)
+    assert image.shape == (48, 80, 3)
+    assert heat.shape == (24, 40)
+    assert np.argwhere(heat == 1.0).tolist() == [[7, 11]]
+    # the center sits at cell 10.75, 6.75 and sigma is 0.09 * 32 px: exp(-(1.25**2 + 0.25**2) / (2 * 2.88**2))
+    assert round(float(heat[7, 12]), 4) == 0.9067
+    assert mask.min() == 1.0
