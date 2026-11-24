@@ -4,9 +4,8 @@ import { PageBar } from '../../components/page-bar.tsx'
 import { PrimerList } from '../../components/primer-list.tsx'
 import { ListLoading, ServerDataError } from '../../components/states.tsx'
 import { listAllPrimers, listManufacturers } from '../../lib/api.ts'
+import { primerListData } from '../../lib/list-page-data.ts'
 import { listTitles } from '../../lib/list-titles.ts'
-import { manufacturerAliases, manufacturerNames } from '../../lib/manufacturers.ts'
-import { primerRows } from '../../lib/primer-rows.ts'
 
 export const metadata: Metadata = {
   title: 'Primers',
@@ -23,15 +22,7 @@ async function Primers() {
         <ServerDataError what="Primer" />
       </>
     )
-  return (
-    <PrimerList
-      rows={primerRows(
-        r.data,
-        manufacturerNames(manufacturers),
-        manufacturerAliases(manufacturers),
-      )}
-    />
-  )
+  return <PrimerList {...primerListData(r.data, manufacturers)} />
 }
 
 export default function PrimersPage() {

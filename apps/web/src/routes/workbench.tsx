@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Workbench } from '../components/workbench.tsx'
-import { pageHead } from './-page-head.ts'
+import { listHead } from './-list-route.ts'
 import { searchOf } from './-search.ts'
 
 export const Route = createFileRoute('/workbench')({
@@ -17,7 +17,7 @@ export const Route = createFileRoute('/workbench')({
     'ladderKind',
   ),
   head: () =>
-    pageHead(
+    listHead(
       'Load workbench',
       'Cartridge, bullet, powder and firearm in one view: interior ballistics simulation with a peak pressure range over input tolerances and CIP limit warnings, and the trajectory computed in the browser.',
     ),

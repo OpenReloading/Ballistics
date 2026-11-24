@@ -4,7 +4,7 @@ import { CartridgeList } from '../../components/cartridge-list.tsx'
 import { PageBar } from '../../components/page-bar.tsx'
 import { ListLoading, ServerDataError } from '../../components/states.tsx'
 import { listAllCartridges } from '../../lib/api.ts'
-import { packCartridges } from '../../lib/cartridge-rows.ts'
+import { cartridgeListData } from '../../lib/list-page-data.ts'
 import { listTitles } from '../../lib/list-titles.ts'
 
 export const metadata: Metadata = {
@@ -22,8 +22,7 @@ async function Cartridges() {
         <ServerDataError what="Cartridge" />
       </>
     )
-  // the list renders its own page bar: the count sits in the bar's status line
-  return <CartridgeList packed={packCartridges(r.data)} />
+  return <CartridgeList {...cartridgeListData(r.data)} />
 }
 
 export default function CartridgesPage() {

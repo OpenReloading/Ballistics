@@ -1,5 +1,33 @@
 /** The tests of this folder that project `next-chromium` runs on the Start site's next edition: a file's every test, or only the titles listed. */
 export const nextParity: readonly { file: string; titles?: readonly string[] }[] = [
+  { file: 'bullet-list.spec.ts' },
+  {
+    file: 'cartridges.spec.ts',
+    titles: [
+      'the list searches names and aliases and keeps the search in the URL',
+      'the source filter names the sources shown, keeps them in the URL and one stays on',
+      'a search without a match offers to clear the filters',
+      'the tick box of a row is at least 24 px, as the row keeps its height',
+      'the list sorts by L3 through its header button',
+      'at 1280 x 800 the cartridge table is the only scroll box',
+      'at 1920 x 1080 the cartridge table is the only scroll box',
+      'at 390 px a cartridge row is the name over a facts line',
+      'the cartridge list prints the selection, capped and said so',
+      'printed on A4, a name with its aliases takes at most two lines',
+      'the Case type column has no help note',
+    ],
+  },
+  { file: 'competition-events.spec.ts' },
+  { file: 'default-order.spec.ts' },
+  { file: 'directory-window.spec.ts' },
+  {
+    file: 'list-filters.spec.ts',
+    titles: [
+      'a discipline filtered by federation and a distance in yards survives a reload and clears',
+      'the federation list links each federation to its record',
+      'the brass list links each case to its record',
+    ],
+  },
   {
     file: 'navigation.spec.ts',
     titles: [
@@ -19,6 +47,7 @@ export const nextParity: readonly { file: string; titles?: readonly string[] }[]
     ],
   },
   { file: 'offline-page.spec.ts' },
+  { file: 'primer-records.spec.ts', titles: ['the primer list narrows by search'] },
   {
     file: 'safety.spec.ts',
     titles: [
@@ -32,6 +61,9 @@ export const nextParity: readonly { file: string; titles?: readonly string[] }[]
     titles: [
       '/ answers 200, shows its h1 and logs no error',
       '/workbench answers 200, shows its h1 and logs no error',
+      '/targets answers 200, shows its h1 and logs no error',
+      '/disciplines answers 200, shows its h1 and logs no error',
+      '/federations answers 200, shows its h1 and logs no error',
     ],
   },
   {

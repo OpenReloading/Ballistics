@@ -1,4 +1,4 @@
-import { ActionIcon, Anchor, Button, Stack, Text } from '@mantine/core'
+import { ActionIcon, Anchor, Button, Modal, Stack, Text } from '@mantine/core'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Calculator, Library, Printer, Settings, Target } from 'lucide-react'
 import { useState } from 'react'
@@ -79,7 +79,7 @@ export const Frame: Story = {
 }
 
 function DialogOpener() {
-  const [closed, setClosed] = useState(0)
+  const [open, setOpen] = useState(false)
   return (
     <AppFrame
       brand={
@@ -88,14 +88,16 @@ function DialogOpener() {
         </Anchor>
       }
       navigation={<Button aria-haspopup="dialog">Report an issue</Button>}
-      onDrawerClosed={() => setClosed((count) => count + 1)}
+      onDrawerClosed={() => setOpen(true)}
     >
-      <Text>{`Drawer closed ${closed} times`}</Text>
+      <Modal opened={open} onClose={() => setOpen(false)} title="Report an issue">
+        <Text>The report form</Text>
+      </Modal>
     </AppFrame>
   )
 }
 
-/** A control that opens a dialog closes the drawer first, runs `onDrawerClosed` once after it left, and the menu button gets the focus. */
+/** A control that opens a dialog closes the drawer first, the dialog `onDrawerClosed` opens is then the only one, and closing it gives the menu button the focus. */
 export const DrawerDialogControl: Story = {
   render: () => <DialogOpener />,
   play: async ({ canvas, canvasElement, userEvent }) => {
@@ -104,8 +106,10 @@ export const DrawerDialogControl: Story = {
     const menu = canvas.getByRole('button', { name: 'Navigation' })
     await userEvent.click(menu)
     await userEvent.click(await page.findByRole('button', { name: 'Report an issue' }))
+    await page.findByRole('dialog', { name: 'Report an issue' })
+    await expect(page.getAllByRole('dialog')).toHaveLength(1)
+    await userEvent.keyboard('{Escape}')
     await waitFor(() => expect(page.queryByRole('dialog')).toBeNull(), { timeout: 3000 })
-    await expect(await canvas.findByText('Drawer closed 1 times')).toBeVisible()
     await expect(menu).toHaveFocus()
   },
 }

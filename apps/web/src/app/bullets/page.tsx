@@ -4,14 +4,8 @@ import { BulletList } from '../../components/bullet-list.tsx'
 import { PageBar } from '../../components/page-bar.tsx'
 import { ListLoading, ServerDataError } from '../../components/states.tsx'
 import { listAllBullets, listAllCartridges, listManufacturers } from '../../lib/api.ts'
-import { fitOf, summaryFitSource } from '../../lib/bullet-fit.ts'
-import { packBullets } from '../../lib/bullet-list-data.ts'
+import { bulletListData } from '../../lib/list-page-data.ts'
 import { listTitles } from '../../lib/list-titles.ts'
-import {
-  manufacturerAliases,
-  manufacturerNames,
-  withManufacturerName,
-} from '../../lib/manufacturers.ts'
 
 export const metadata: Metadata = {
   title: 'Bullets',
@@ -31,17 +25,7 @@ async function Bullets() {
         <ServerDataError what="Bullet" />
       </>
     )
-  // the list renders its own page bar, the count in its status line; these are the cartridges of the "Fits cartridge" filter, without which the list has no such filter
-  const cartridges = (c.status === 'ok' ? c.data : []).flatMap((x) => {
-    const fit = fitOf(summaryFitSource(x))
-    return fit ? [{ id: x.id, name: x.name, fit }] : []
-  })
-  const rows = withManufacturerName(
-    r.data,
-    manufacturerNames(manufacturers),
-    manufacturerAliases(manufacturers),
-  )
-  return <BulletList packed={packBullets(rows)} cartridges={cartridges} />
+  return <BulletList {...bulletListData(r.data, c.status === 'ok' ? c.data : [], manufacturers)} />
 }
 
 export default function BulletsPage() {

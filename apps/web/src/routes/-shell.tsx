@@ -5,6 +5,7 @@ import { lazy, type ReactNode, Suspense, useContext, useEffect, useRef, useState
 import { DocsLink } from '../components/docs-link.tsx'
 import { InstallButton } from '../components/install-button.tsx'
 import { NavIcon } from '../components/nav-icons.tsx'
+import { frameRoutes } from '../components/page-shell.tsx'
 import { PreReleaseData } from '../components/pre-release-data.tsx'
 import { ReportIssueButton, ReportIssueDialog } from '../components/report-issue.tsx'
 import { RepositoryLink } from '../components/repository-link.tsx'
@@ -19,7 +20,7 @@ import { useRoute } from '../components/use-route.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { docsUrl } from '../lib/docs-url.ts'
 import { repositoryUrl } from '../lib/repository-url.ts'
-import { type PageEntry, pageCoversRoute, sections } from '../lib/sections.ts'
+import { isToolRoute, type PageEntry, pageCoversRoute, sections } from '../lib/sections.ts'
 import { shortcutAriaKeys } from '../lib/shortcuts.ts'
 import { pageWidth } from '../lib/theme.ts'
 import { docsAddress, noDocs, repositoryAddress } from '../platform/edition.ts'
@@ -153,26 +154,33 @@ export function Shell({ children }: { children: ReactNode }) {
       <ResultsSkipLink />
       <SafetyDialog />
       <PreReleaseData />
-      <AppFrame
-        brand={<Brand full={route === '/'} />}
-        navigation={
-          <Navigation
-            route={route}
-            onReport={() => {
-              afterDrawer.current = report
-            }}
-          />
-        }
-        end={<BarEnd route={route} onReport={report} />}
-        onDrawerClosed={() => {
-          afterDrawer.current?.()
-          afterDrawer.current = undefined
-        }}
+      {/* the Next shell's wrapper, so the app's styles frame a list window-high and keep a document's text measure */}
+      <div
+        className="page-shell"
+        data-width={isToolRoute(route) ? 'tool' : undefined}
+        data-frame={frameRoutes.has(route) || undefined}
       >
-        <Container id="main" tabIndex={-1} size={pageWidth}>
-          {children}
-        </Container>
-      </AppFrame>
+        <AppFrame
+          brand={<Brand full={route === '/'} />}
+          navigation={
+            <Navigation
+              route={route}
+              onReport={() => {
+                afterDrawer.current = report
+              }}
+            />
+          }
+          end={<BarEnd route={route} onReport={report} />}
+          onDrawerClosed={() => {
+            afterDrawer.current?.()
+            afterDrawer.current = undefined
+          }}
+        >
+          <Container id="main" tabIndex={-1} size={pageWidth}>
+            {children}
+          </Container>
+        </AppFrame>
+      </div>
       {repository && (
         <ReportIssueDialog
           repository={repository}
