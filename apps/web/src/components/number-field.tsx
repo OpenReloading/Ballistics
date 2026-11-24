@@ -336,6 +336,23 @@ function FieldInput({
 
 const noValue: FieldValue = { text: '', si: undefined }
 
+/** Text typed into the prerendered field `name` before hydration goes to `change` as typed, unless it is the text the field shows. */
+function useTypedText(
+  name: string | undefined,
+  shown: string,
+  change: (raw: string, typed: boolean) => void,
+) {
+  useTypedBeforeHydration(
+    name === undefined
+      ? {}
+      : {
+          [name]: (raw: string) => {
+            if (raw !== shown) change(raw, true)
+          },
+        },
+  )
+}
+
 /** The unit is part of the label for screen readers; a field taking negatives stays a native number input, as `NumberInput` defaults to `inputMode="decimal"` and the iOS decimal keypad has no minus key. */
 export function NumberField({
   spec,
@@ -466,16 +483,7 @@ export function NumberField({
     setPick(pick && { ...pick, typed: next.typed })
     onChange(next.value)
   }
-  const shownText = localizeNumber(shownValue.text)
-  useTypedBeforeHydration(
-    name === undefined
-      ? {}
-      : {
-          [name]: (raw: string) => {
-            if (raw !== shownText) change(raw, true)
-          },
-        },
-  )
+  useTypedText(name, localizeNumber(shownValue.text), change)
   return (
     <FieldInput
       common={common}
