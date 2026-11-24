@@ -37,8 +37,6 @@ export default defineConfig({
   testDir: './tests',
   // every test has its own browser context: the tests of one file run on several workers
   fullyParallel: true,
-  workers: 4,
-  globalTimeout: 11 * 60_000,
   // a `test.only` or `describe.only` left in a spec fails the CI run instead of skipping the rest
   forbidOnly: !!process.env.CI,
   // on GitHub Actions the default `dot` plus annotations, so a failed test shows on the pull request without the job log
@@ -131,7 +129,6 @@ export default defineConfig({
           {
             name: 'next-chromium',
             testDir: './tests/web',
-            testMatch: ['navigation.spec.ts', 'language.spec.ts', 'a11y-states.spec.ts'],
             use: browserAt(`${startUrl}next/`),
           },
         ]
