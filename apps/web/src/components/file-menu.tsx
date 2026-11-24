@@ -50,7 +50,7 @@ import {
 } from '../lib/file-access.ts'
 import { loadFileFormats, readLoadFile, readNote } from '../lib/load-file-formats.ts'
 import { shownManufacturerRefs } from '../lib/manufacturers.ts'
-import { guardNavigation, guardPop } from '../lib/navigation-guard.ts'
+import { backQuietly, guardNavigation, guardPop } from '../lib/navigation-guard.ts'
 import { newId } from '../lib/new-id.ts'
 import {
   linkReasonText,
@@ -362,7 +362,7 @@ function guardLeaving(say: (said: Said) => void, language: () => Translator['t']
     document.removeEventListener('click', link, true)
     unpop()
     // saved again: the guard entry goes; a navigation away has moved past it already
-    if (!leaving() && window.history.state?.fileGuard) window.history.back()
+    if (!leaving() && window.history.state?.fileGuard) backQuietly()
   }
 }
 
