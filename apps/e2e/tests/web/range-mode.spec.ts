@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test'
 import { AxeBuilder } from './a11y.ts'
 import { barButton } from './bar.ts'
-import { storageName } from './edition.ts'
+import { isNextEdition, noOfflineWorker, storageName } from './edition.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
@@ -99,7 +99,9 @@ async function shoot(page: Page, velocity: number) {
 test('a 10-shot string entered offline survives reloads and is on the Measurements tab online', async ({
   page,
   context,
+  baseURL,
 }) => {
+  test.skip(isNextEdition(baseURL), noOfflineWorker)
   const saved = await openStoredFixtureLoad(page)
   await openRange(page, saved.id)
   // the worker is active and controls the page, so the reloads below are answered from its caches

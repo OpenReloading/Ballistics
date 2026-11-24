@@ -1,7 +1,6 @@
 import { defineConfig, devices } from '@playwright/test'
 import { storageName } from './tests/web/edition.ts'
 import { safetyAck } from './tests/web/nav.ts'
-import { nextParity } from './tests/web/next-parity.ts'
 
 // a trailing slash, so the specs' `./path` stays below the base path
 const webUrl = (process.env.WEB_URL ?? 'http://localhost:3003').replace(/\/?$/, '/')
@@ -16,8 +15,6 @@ const nextEdition = startSite && process.env.NEXT_EDITION !== 'off'
 const startUrl = 'http://localhost:3043/Ballistics/'
 /** A site with both editions as `pages.yml` deploys it, with its base path and a trailing slash. Unset: the export at `WEB_URL`, whose root `404.html` is the same page. */
 const editionsUrl = process.env.EDITIONS_URL ?? webUrl
-
-const literally = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
 const browserAt = (url: string, device = devices['Desktop Chrome']) => ({
   ...device,
@@ -126,20 +123,12 @@ export default defineConfig({
           },
         }))
       : []),
-    // the web specs of the routes the Start app has ported, on its next edition; in CI only the `e2e-next` job runs it
+    // the web specs on the Start site's next edition; in CI only the `e2e-next` job runs it
     ...(nextEdition
       ? [
           {
             name: 'next-chromium',
             testDir: './tests/web',
-            testMatch: nextParity.map((spec) => spec.file),
-            // a grep title is the file name and the test's title, joined by a space
-            grep: nextParity.map(
-              ({ file, titles }) =>
-                new RegExp(
-                  `${literally(file)} ${titles ? `(${titles.map(literally).join('|')})$` : ''}`,
-                ),
-            ),
             use: browserAt(`${startUrl}next/`),
           },
         ]
