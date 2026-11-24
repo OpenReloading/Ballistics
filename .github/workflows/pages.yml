@@ -118,6 +118,10 @@ jobs:
             printf '%s\n' '<!doctype html>' '<meta charset="utf-8">' '<meta http-equiv="refresh" content="0; url=next/">' '<title>RangeFoundry Workbench</title>' '<a href="next/">RangeFoundry Workbench</a>' > site/index.html
           fi
           cp -a editions/pages-next site/next
+      # the root 404 page dispatches misses under next/ to that edition's page
+      - run: |
+          if [ -f site/next/_shell.html ] && [ ! -f site/next/404.edition.html ]; then echo 'next/404.edition.html missing'; exit 1; fi
+          if [ -f site/next/_shell.html ] && ! grep -q 404.edition.html site/404.html; then echo 'root 404.html does not dispatch'; exit 1; fi
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: site
