@@ -12,3 +12,26 @@ html:root {
     --mantine-primary-color-contrast: var(--mantine-color-white);
   }
 }
+
+/* the Next shell has no frame padding: the page container pads the page */
+.page-shell .mantine-AppShell-main {
+  --app-shell-padding: 0rem;
+}
+
+/* the page container is the Next layout's main (.page-top > main in globals.css): window-high from 62em on a framed route, unpadded in print */
+@media screen and (width >= 62em) {
+  .page-shell[data-frame] #main {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: calc(100dvh - var(--app-shell-header-offset, 0rem));
+    padding-bottom: var(--space-xs);
+  }
+}
+
+@media print {
+  #main {
+    max-width: none;
+    padding: 0;
+  }
+}

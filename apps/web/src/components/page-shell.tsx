@@ -7,7 +7,7 @@ import { SiteHeader } from './site-header.tsx'
 import { useRoute } from './use-route.ts'
 
 /** One window-high frame from 62em, as their own parts scroll: a list's table, the burn-rate overlay's powders without a curve. */
-const frameRoutes = new Set([
+export const frameRoutes = new Set([
   '/workbench',
   '/groups',
   '/bullets',
