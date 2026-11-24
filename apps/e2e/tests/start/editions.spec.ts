@@ -59,7 +59,7 @@ for (const { name, base } of editions) {
     expect(sitemap).toContain(`<loc>https://openreloading.github.io${site}${base}</loc>`)
   })
 
-  test(`${name}: the manifest starts in its own edition and its icons are PNGs`, async ({
+  test(`${name}: the manifest starts in its own edition and its icons are served as PNG`, async ({
     request,
   }) => {
     const res = await request.get(`${base}manifest.webmanifest`)
