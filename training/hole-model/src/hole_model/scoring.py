@@ -9,7 +9,7 @@ from PIL import Image
 
 from hole_model.metric import HoleMatch, correction_stats, corrections, match_holes
 from hole_model.net import HOLE_PX, input_array, peaks
-from hole_model.splits import Photo, read_photo
+from hole_model.splits import Photo, SplitError, read_photo
 
 THRESHOLDS = (0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6)
 BELIEVED = (0.5, 0.6, 0.75, 1.0, 1.3, 1.6, 2.0)
@@ -43,6 +43,8 @@ def score(
 ) -> list[dict[str, float]]:
     """Recall, precision and corrections of the scored photos per threshold; `believed` is expected over true size."""
     scored = [p for p in photos if p.scored]
+    if not scored:
+        raise SplitError("no photo to score: scoring needs at least one photo marked usable and complete")
     totals = [np.zeros(3, int) for _ in thresholds]
     per_photo: list[list[int]] = [[] for _ in thresholds]
     for p in scored:

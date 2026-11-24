@@ -86,6 +86,23 @@ def test_model_zoo_use_after_a_plain_import_or_an_alias_fails(tmp_path: Path) ->
     ]
 
 
+def test_an_alias_from_any_scope_resolves_to_every_module_it_names(tmp_path: Path) -> None:
+    (tmp_path / "net.py").write_text(
+        "import torch as t\ndef wait():\n    import time as t\n    t.sleep(1)\nt.load('data/foreign.pt')\n"
+    )
+    assert findings(tmp_path) == ["net.py:5: torch.load"]
+
+
+def test_an_aliased_checkpoint_download_fails(tmp_path: Path) -> None:
+    (tmp_path / "net.py").write_text(
+        "import torch\n"
+        "from torch.utils.model_zoo import load_url as download\n"
+        "download('https://example.org/w.pth')\n"
+        "torch.onnx.export\n"
+    )
+    assert findings(tmp_path) == ["net.py:3: load_url()"]
+
+
 def test_weight_files_fail_in_any_case_and_container(tmp_path: Path) -> None:
     for name in ("w.PT", "w.npz", "w.bin", "w.npy", "w.pkl", "notes.txt"):
         (tmp_path / name).write_bytes(b"")

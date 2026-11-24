@@ -1,3 +1,4 @@
+import math
 import subprocess
 from pathlib import Path
 
@@ -26,3 +27,8 @@ def test_a_model_over_the_limits_fails() -> None:
         "ONNX Runtime differs from PyTorch by 1.2e-05, more than 1e-05",
         "the ONNX file has 1048577 bytes, more than 1048576",
     ]
+
+
+def test_a_non_finite_parity_fails() -> None:
+    assert limit_failures(math.nan, 0) == ["ONNX Runtime differs from PyTorch by nan, more than 1e-05"]
+    assert limit_failures(math.inf, 0) == ["ONNX Runtime differs from PyTorch by inf, more than 1e-05"]

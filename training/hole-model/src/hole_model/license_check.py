@@ -73,17 +73,23 @@ def _banned(name: str) -> str | None:
     return next((b for b in BANNED_NAMES if name == b or name.startswith(f"{b}.")), None)
 
 
-def _imported_names(tree: ast.Module) -> dict[str, str]:
-    """The full name each imported local name stands for, so that aliases resolve to their module."""
-    names = {}
+def _imported_names(tree: ast.Module) -> dict[str, set[str]]:
+    """Every full name each imported local name stands for in any scope of the file, so that aliases resolve."""
+    names: dict[str, set[str]] = {}
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             for a in node.names:
                 local = a.asname or a.name.split(".")[0]
-                names[local] = a.name if a.asname else local
+                names.setdefault(local, set()).add(a.name if a.asname else local)
         elif isinstance(node, ast.ImportFrom) and node.module and not node.level:
-            names |= {a.asname or a.name: f"{node.module}.{a.name}" for a in node.names}
+            for a in node.names:
+                names.setdefault(a.asname or a.name, set()).add(f"{node.module}.{a.name}")
     return names
+
+
+def _resolved(dotted: str, imported: dict[str, set[str]]) -> set[str]:
+    head, _, rest = dotted.partition(".")
+    return {".".join(filter(None, (full, rest))) for full in imported.get(head, {head})}
 
 
 def source_findings(path: Path, source: str) -> list[str]:
@@ -98,14 +104,12 @@ def source_findings(path: Path, source: str) -> list[str]:
                 modules = [node.module, *(f"{node.module}.{a.name}" for a in node.names)]
             found |= {(node.lineno, b) for m in modules if (b := _banned(m))}
         elif isinstance(node, ast.Name | ast.Attribute) and (dotted := _dotted(node)):
-            head, _, rest = dotted.partition(".")
-            full = ".".join(filter(None, (imported.get(head, head), rest)))
-            if banned := _banned(full):
-                found.add((node.lineno, banned))
+            found |= {(node.lineno, b) for full in _resolved(dotted, imported) if (b := _banned(full))}
         if isinstance(node, ast.Call) and isinstance(node.func, ast.Name | ast.Attribute):
             name = node.func.id if isinstance(node.func, ast.Name) else node.func.attr
-            if name in BANNED_CALL_NAMES:
-                found.add((node.lineno, f"{name}()"))
+            dotted = _dotted(node.func)
+            names = {name, *(full.rpartition(".")[2] for full in (_resolved(dotted, imported) if dotted else ()))}
+            found |= {(node.lineno, f"{n}()") for n in names & BANNED_CALL_NAMES}
     return [f"{path}:{line}: {name}" for line, name in sorted(found)]
 
 
