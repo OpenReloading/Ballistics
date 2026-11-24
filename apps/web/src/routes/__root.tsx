@@ -11,6 +11,8 @@ import { UnitsProvider } from '../components/units-settings.tsx'
 import { startLanguage, useTranslation } from '../i18n/language.ts'
 import { decimalMark } from '../i18n/number.ts'
 import { colorSchemeKey, colorSchemeScript, iconDefaults } from '../lib/theme.ts'
+import interRegular from '../platform/fonts/Inter-Regular.woff2?url'
+import interSemiBold from '../platform/fonts/Inter-SemiBold.woff2?url'
 import { uiFont } from '../platform/fonts/ui.ts'
 import appCss from '../styles.css?url'
 import { AppError } from './-error.tsx'
@@ -42,6 +44,14 @@ export const Route = createRootRoute({
       // ui's own rules before the app's: the app's styles bring Mantine's in cascade layers, the tokens and the font
       { rel: 'stylesheet', href: uiCss },
       { rel: 'stylesheet', href: appCss },
+      // the UI faces load before the first paint, as next/font preloads them: a swap after it shifts the text
+      ...[interRegular, interSemiBold].map((href) => ({
+        rel: 'preload',
+        href,
+        as: 'font',
+        type: 'font/woff2',
+        crossOrigin: 'anonymous' as const,
+      })),
       { rel: 'manifest', href: `${base}manifest.webmanifest` },
       { rel: 'icon', href: `${base}icon.png`, type: 'image/png', sizes: '512x512' },
       {
