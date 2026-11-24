@@ -80,11 +80,13 @@ def target(holes: npt.NDArray[np.float32], diameter: float, height: int, width: 
 
 def loss_mask(masked: npt.NDArray[np.float32], height: int, width: int) -> npt.NDArray[np.float32]:
     """1 where the loss counts at the output stride, 0 on every cell that touches a masked x, y, width, height box."""
-    out = np.ones((height // STRIDE, width // STRIDE), np.float32)
+    rows, cols = height // STRIDE, width // STRIDE
+    out = np.ones((rows, cols), np.float32)
     for x, y, w, h in masked:
+        # clamp both ends: a negative slice end would wrap and mask most of the row
         out[
-            max(0, math.floor(y / STRIDE)) : math.ceil((y + h) / STRIDE),
-            max(0, math.floor(x / STRIDE)) : math.ceil((x + w) / STRIDE),
+            min(rows, max(0, math.floor(y / STRIDE))) : min(rows, max(0, math.ceil((y + h) / STRIDE))),
+            min(cols, max(0, math.floor(x / STRIDE))) : min(cols, max(0, math.ceil((x + w) / STRIDE))),
         ] = 0
     return out
 

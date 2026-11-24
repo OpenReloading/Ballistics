@@ -105,3 +105,18 @@ def test_the_loss_mask_drops_every_output_cell_a_masked_box_touches() -> None:
         [1, 0, 0, 0, 1],
         [1, 1, 1, 1, 1],
     ]
+
+
+def test_a_masked_box_wholly_outside_the_image_masks_nothing() -> None:
+    boxes = np.array([[-6, 2, 2, 2], [4, -8, 4, 4], [30, 2, 4, 4], [2, 30, 4, 4]], np.float32)
+    assert loss_mask(boxes, 8, 10).tolist() == [[1.0] * 5] * 4
+
+
+def test_a_masked_box_partly_outside_the_image_masks_only_its_inside_part() -> None:
+    mask = loss_mask(np.array([[-4, 2, 8, 2], [8, 4, 6, 6]], np.float32), 8, 10)
+    assert mask.tolist() == [
+        [1, 1, 1, 1, 1],
+        [0, 0, 1, 1, 1],
+        [1, 1, 1, 1, 0],
+        [1, 1, 1, 1, 0],
+    ]
