@@ -1,6 +1,5 @@
 import { expect, type Page, type Request, test } from '@playwright/test'
 import { barButton } from './bar.ts'
-import { isNextEdition, noMainId } from './edition.ts'
 import { isDark } from './luminance.ts'
 import { gotoHydrated } from './nav.ts'
 import { choosePreset, storeUnits } from './units.ts'
@@ -181,8 +180,7 @@ test('the example loads into badges, the strings table and a tab per string with
   expect(await page.evaluate(() => (window as unknown as { printed: number }).printed)).toBe(1)
 })
 
-test('prints the summary and every chart without the import strip', async ({ page, baseURL }) => {
-  test.skip(isNextEdition(baseURL), noMainId)
+test('prints the summary and every chart without the import strip', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 })
   await gotoHydrated(page, '/session')
   await loadExample(page)
@@ -190,7 +188,7 @@ test('prints the summary and every chart without the import strip', async ({ pag
   await expect(page.locator('.session-import')).toBeHidden()
   await expect(page.getByRole('tablist')).toBeHidden()
   await expect(stats(page)).toBeVisible()
-  const main = page.locator('main#main')
+  const main = page.locator('#main')
   for (const name of ['String 1: Example A', 'String 2: Example B', 'String 3: Example C']) {
     const chart = page.getByRole('img', { name: `Velocity per shot, ${name}` })
     await expect(chart).toBeVisible()

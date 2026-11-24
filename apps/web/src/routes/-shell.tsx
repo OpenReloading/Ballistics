@@ -11,6 +11,8 @@ import {
   useRef,
   useState,
 } from 'react'
+import { createPortal } from 'react-dom'
+import { useBarEnd } from '../components/bar-end.ts'
 import { DocsLink } from '../components/docs-link.tsx'
 import { InstallButton } from '../components/install-button.tsx'
 import { NavIcon } from '../components/nav-icons.tsx'
@@ -72,7 +74,7 @@ function DialogRow({
   )
 }
 
-/** Search, the pages of every section in a list named by the section with the current one marked, Settings and the docs, as the sidebar of the Next app has them; in the drawer below 75em also Report an issue and the repository, which the top bar shows from 75em. */
+/** Search, the pages of every section in a list named by the section with the current one marked, Install from 75em, Settings and the docs, as the sidebar of the Next app has them; in the drawer below 75em also Report an issue and the repository, which the top bar shows from 75em. */
 function Navigation({
   route,
   afterDrawer,
@@ -126,6 +128,9 @@ function Navigation({
           </ul>
         </div>
       ))}
+      <Box visibleFrom="lg" className="install-slot">
+        <InstallButton position="right" />
+      </Box>
       <DialogRow
         icon="settings"
         label={t('Settings')}
@@ -158,16 +163,27 @@ function BarEnd({ route, onReport }: { route: string; onReport: () => void }) {
   })
   useHotkeys([['mod+K', () => searchHost.page || openSearch()]], [])
   useShortcuts({ search: null, help: openShortcuts })
-  return (
-    <>
-      {/* a slot kept while nothing is offered, so an offer moves nothing */}
-      <div className="install-slot">
+  // from 75em the page bar sits in the top bar before these (globals.css), so in its end slot they follow its actions in the keyboard order as on screen
+  const wide = useMediaQuery('(width >= 75em)')
+  const shownEnd = useBarEnd()
+  const barEnd = wide ? shownEnd : null
+  const topEnd = (
+    <div className="top-end">
+      {/* a slot kept while nothing is offered, so an offer moves nothing; from 75em Install is at the sidebar's foot and Safety in the page bar */}
+      <Box hiddenFrom="lg" className="install-slot">
         <InstallButton position="bottom" />
-      </div>
-      <SafetyBarButton iconOnly />
+      </Box>
+      <Box hiddenFrom="lg">
+        <SafetyBarButton iconOnly />
+      </Box>
       <ReportIssueButton url={repository} onOpen={onReport} />
       <RepositoryLink url={repository} />
       <ThemeSwitch />
+    </div>
+  )
+  return (
+    <>
+      {barEnd ? createPortal(topEnd, barEnd) : topEnd}
       {searches > 0 && (
         <Suspense fallback={null}>
           <SiteSearch request={searches} />

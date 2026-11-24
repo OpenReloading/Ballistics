@@ -1,6 +1,6 @@
 import { expect, type Locator, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
-import { isNextEdition, noMainId, storageName } from './edition.ts'
+import { storageName } from './edition.ts'
 import { showGerman } from './german.ts'
 import { based, exported, gotoHydrated } from './nav.ts'
 import { settingsEntry, storeUnits } from './units.ts'
@@ -33,16 +33,12 @@ async function choose(dialog: Locator, name: string) {
 }
 
 for (const path of ['/cartridges/308-win', '/firearms'])
-  test(`on ${path} the sidebar Settings opens the dialog over the page`, async ({
-    page,
-    baseURL,
-  }) => {
-    test.skip(isNextEdition(baseURL), noMainId)
+  test(`on ${path} the sidebar Settings opens the dialog over the page`, async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 })
     await page.goto(`.${path}`)
     // the page behind keeps its place and width (its height follows content loaded after mounting)
     const place = () =>
-      page.locator('main#main').evaluate((m) => {
+      page.locator('#main').evaluate((m) => {
         const r = m.getBoundingClientRect()
         return [r.left, r.top, r.width]
       })

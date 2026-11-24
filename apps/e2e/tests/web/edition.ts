@@ -14,6 +14,3 @@ export const storageName = (name: string, baseURL = projectBase()) =>
 
 /** The reason the next edition skips a test of the offline layer. */
 export const noOfflineWorker = 'the Start app registers no offline layer worker yet'
-
-/** The reason the next edition skips a test that measures `main#main`. */
-export const noMainId = "the Start frame's main is ui's AppFrame main, without the id main"

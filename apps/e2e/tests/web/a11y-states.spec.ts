@@ -3,7 +3,7 @@ import path from 'node:path'
 import { expect, type Locator, type Page, test } from '@playwright/test'
 import { AxeBuilder, height, problems, schemes, tall, widths } from './a11y.ts'
 import { barButton } from './bar.ts'
-import { isNextEdition, projectBase, storageName } from './edition.ts'
+import { storageName } from './edition.ts'
 import { pickFiles, withoutOpenPicker } from './import.ts'
 import { openLadderGroups } from './ladder-groups.ts'
 import { gotoHydrated } from './nav.ts'
@@ -54,10 +54,6 @@ async function fromNav(page: Page, name: string) {
     .getByRole('button', { name, exact: true })
   await expect(burger.or(sidebar).first()).toBeVisible()
   if (await burger.isVisible()) {
-    test.skip(
-      isNextEdition(projectBase()),
-      "the Start app's drawer is a dialog named Main, not Navigation",
-    )
     await burger.click()
     return page
       .getByRole('dialog', { name: 'Navigation' })

@@ -214,11 +214,11 @@ test('the Alpha badge gives its note by pointer and keyboard, and the open note 
     'Alpha version: breaking changes are to be expected.',
   )
   const badge = await brand.locator('.alpha-badge').boundingBox()
-  const main = await page.locator('main#main').boundingBox()
+  const main = await page.locator('#main').boundingBox()
   await brand.hover()
   await expect(note).toBeVisible()
   expect(await brand.locator('.alpha-badge').boundingBox()).toEqual(badge)
-  expect(await page.locator('main#main').boundingBox()).toEqual(main)
+  expect(await page.locator('#main').boundingBox()).toEqual(main)
   await page.mouse.move(640, 600)
   await expect(note).toBeHidden()
   // the skip link comes first, then the home link
