@@ -131,3 +131,28 @@ test('a load saved on a design keeps the design by reference and reopens with it
   ).toHaveAccessibleName(/user design Mine 7\.8/)
   await expect(field(/^Bore area/)).toHaveValue('')
 })
+
+test('a cartridge search typed before the page hydrates opens its matches', async ({ page }) => {
+  let release = () => {}
+  const held = new Promise<void>((done) => {
+    release = done
+  })
+  // the scripts wait, so the text goes into the prerendered field as on a slow connection
+  await page.route(
+    (url) => url.pathname.endsWith('.js'),
+    async (route) => {
+      await held
+      await route.continue()
+    },
+  )
+  await page.goto('./workbench', { waitUntil: 'commit' })
+  await page.locator('input[name="cartridge-search"]').fill('308 Win')
+  release()
+
+  await expect(
+    page
+      .getByRole('listbox', { name: 'Matches' })
+      .getByRole('option', { name: /^308 Win/ })
+      .first(),
+  ).toBeVisible()
+})

@@ -1,8 +1,25 @@
 /** The tests of this folder that project `next-chromium` runs on the Start site's next edition: a file's every test, or only the titles listed. */
 export const nextParity: readonly { file: string; titles?: readonly string[] }[] = [
+  { file: 'bullet-designer-checks.spec.ts' },
   { file: 'bullet-list.spec.ts' },
+  { file: 'bullet-photo.spec.ts' },
   { file: 'bullet-record-compare.spec.ts' },
   { file: 'burn-rates.spec.ts' },
+  {
+    file: 'cartridge-designer.spec.ts',
+    titles: [
+      'a change redraws, is marked with the record value and undoes',
+      'a refused input shows its reason at the field and keeps the last drawing',
+      'a new cartridge without its base values gives a reason, not an empty page',
+      'a change, a check and a refusal move no field and not the drawing',
+      'keyboard: arrow keys step the field, no slider, changes are announced',
+      'print shows the life-size drawing and the values, not the form',
+      'the designer has no axe violation in light and dark, and fits 390 px',
+      'the designer shows no load-data notice; the caption says how changes are drawn',
+      'a chosen bullet seats at the entered COAL in the designed case, and the seating moves the volume',
+      'a design whose base record is gone opens read only with the reason',
+    ],
+  },
   { file: 'cartridges.spec.ts' },
   {
     file: 'case-records.spec.ts',
@@ -14,8 +31,23 @@ export const nextParity: readonly { file: string; titles?: readonly string[] }[]
   { file: 'competition-events.spec.ts' },
   { file: 'component-records.spec.ts' },
   { file: 'default-order.spec.ts' },
+  { file: 'designer-drafts.spec.ts' },
+  { file: 'designer-layout.spec.ts' },
   { file: 'directory-window.spec.ts' },
   { file: 'drawing-baseline.spec.ts' },
+  {
+    file: 'drawing-face.spec.ts',
+    titles: ["the designer's views switch by keyboard, keeping the frame and the axis"],
+  },
+  {
+    file: 'firearm-library.spec.ts',
+    titles: [
+      'the firearm library searches its table, counts its firearms and offers to clear a search without a match',
+      'the firearm table fits a 1280 px window with its row menu, one save status and the strip as high as on the other lists',
+      'a record link does not put its loading status in the alert line',
+    ],
+  },
+  { file: 'import-entry.spec.ts' },
   { file: 'list-filters.spec.ts' },
   {
     file: 'navigation.spec.ts',
@@ -41,10 +73,28 @@ export const nextParity: readonly { file: string; titles?: readonly string[] }[]
   },
   { file: 'offline-page.spec.ts' },
   {
+    file: 'powder-designer.spec.ts',
+    titles: [
+      'checks the draft against the powder schema at its fields',
+      'lists everything a hand-entered burn law lacks at once, in plain words',
+      'keeps the draft in the browser and reopens it from the Open menu',
+      'has no accessibility violations in light',
+      'has no accessibility violations in dark',
+    ],
+  },
+  {
     file: 'powder-list.spec.ts',
     titles: ["adds the browser's own powder to the burn-rate overlay, marked as a user design"],
   },
   { file: 'powder-record.spec.ts' },
+  {
+    file: 'powder-tune.spec.ts',
+    titles: [
+      'the powder designer links to the tuning route, where strings typed without a load say why there is no fit',
+      'a saved powder design opens the route with the saved loads that use it',
+      'the route opens every session the address names, and a reload keeps them all',
+    ],
+  },
   {
     file: 'primer-records.spec.ts',
     titles: [
@@ -77,6 +127,7 @@ export const nextParity: readonly { file: string; titles?: readonly string[] }[]
       'at 390 x 640 I accept and Decline are in view without scrolling',
     ],
   },
+  { file: 'shooting-log.spec.ts' },
   {
     file: 'smoke.spec.ts',
     titles: [
@@ -92,6 +143,16 @@ export const nextParity: readonly { file: string; titles?: readonly string[] }[]
       'a record page opens another without a page load, back and forward too',
     ],
   },
+  {
+    file: 'target-designer.spec.ts',
+    titles: [
+      'draws the rings at the entered diameters and reports the face usable',
+      'has no accessibility violations in light',
+      'has no accessibility violations in dark',
+    ],
+  },
+  { file: 'user-data-folder.spec.ts' },
+  { file: 'user-data-invalid.spec.ts' },
   {
     file: 'theme.spec.ts',
     titles: [

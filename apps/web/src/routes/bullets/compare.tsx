@@ -1,17 +1,11 @@
 import { ClientOnly, createFileRoute } from '@tanstack/react-router'
-import { z } from 'zod'
 import { CompareBar, CompareView } from '../../components/bullet-compare-view.tsx'
 import { Loading } from '../../components/states.tsx'
 import { listHead } from '../-list-route.ts'
+import { searchOf } from '../-search.ts'
 
 export const Route = createFileRoute('/bullets/compare')({
-  // the router reads `?ids=308` as a number; a value that is no list of ids reads as none
-  validateSearch: z.object({
-    ids: z
-      .union([z.string(), z.number().transform(String)])
-      .optional()
-      .catch(undefined),
-  }),
+  validateSearch: searchOf('ids'),
   head: () =>
     listHead(
       'Compare bullets',

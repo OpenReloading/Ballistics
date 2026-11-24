@@ -129,6 +129,24 @@ test('a compared bullet has Use in workbench; Add bullet opens the bullet search
   await expect(page.getByRole('dialog', { name: 'Choose a bullet' })).toBeVisible()
 })
 
+test('an address naming ids twice compares the first list, as the address keeps both', async ({
+  page,
+}) => {
+  await gotoHydrated(
+    page,
+    '/bullets/compare?ids=demo-bullet-168,demo-bullet-150&ids=demo-bullet-150',
+  )
+  await expect(page.getByRole('table', { name: 'Bullet data' })).toBeVisible()
+  await expect(
+    page.getByRole('link', { name: 'Use in workbench: Demo Bullets 30 Cal 168 gr HPBT Demo' }),
+  ).toBeVisible()
+  await expect(page.getByText('No bullets chosen.')).toHaveCount(0)
+  expect(new URL(page.url()).searchParams.getAll('ids')).toEqual([
+    'demo-bullet-168,demo-bullet-150',
+    'demo-bullet-150',
+  ])
+})
+
 test('the comparison without bullets says so without a warning and offers the list', async ({
   page,
 }) => {
