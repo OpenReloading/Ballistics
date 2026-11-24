@@ -1,7 +1,8 @@
-import { ActionIcon, Container, Tooltip } from '@mantine/core'
+import { ActionIcon, Box, Container, Tooltip } from '@mantine/core'
 import { useHotkeys } from '@mantine/hooks'
 import { AppFrame } from '@rangefoundry/ui'
 import { lazy, type ReactNode, Suspense, useContext, useEffect, useState } from 'react'
+import { DocsLink } from '../components/docs-link.tsx'
 import { InstallButton } from '../components/install-button.tsx'
 import { NavIcon } from '../components/nav-icons.tsx'
 import { PreReleaseData } from '../components/pre-release-data.tsx'
@@ -16,11 +17,12 @@ import { Brand } from '../components/site-header.tsx'
 import { ThemeSwitch } from '../components/theme-switch.tsx'
 import { useRoute } from '../components/use-route.ts'
 import { useTranslation } from '../i18n/language.ts'
+import { docsUrl } from '../lib/docs-url.ts'
 import { repositoryUrl } from '../lib/repository-url.ts'
 import { type PageEntry, pageCoversRoute, sections } from '../lib/sections.ts'
 import { shortcutAriaKeys } from '../lib/shortcuts.ts'
 import { pageWidth } from '../lib/theme.ts'
-import { repositoryAddress } from '../platform/edition.ts'
+import { docsAddress, noDocs, repositoryAddress } from '../platform/edition.ts'
 import Link from '../platform/link.tsx'
 
 // the search loads on its first use, so pages ship without it
@@ -28,24 +30,35 @@ const SiteSearch = lazy(() =>
   import('../components/site-search.tsx').then((m) => ({ default: m.SiteSearch })),
 )
 
+// no link without them
 const repository = repositoryUrl(repositoryAddress)
+const docs = docsUrl(docsAddress, undefined, noDocs)
 
-/** The pages of every section, the current one marked as the sidebar of the Next app marks it. */
-function Navigation({ route }: { route: string }) {
+/** The pages of every section, the current one marked as the sidebar of the Next app marks it; in the drawer below 75em also Report an issue, the docs and the repository, which the top bar shows from 75em. */
+function Navigation({ route, onReport }: { route: string; onReport: () => void }) {
   const { t } = useTranslation()
-  return sections
-    .flatMap((s): readonly PageEntry[] => s.pages)
-    .map((p) => (
-      <Link
-        key={p.href}
-        href={p.href}
-        className="ui-nav-item"
-        aria-current={pageCoversRoute(p.href, route) ? 'page' : undefined}
-      >
-        <NavIcon name={p.icon} />
-        <span>{t(p.label)}</span>
-      </Link>
-    ))
+  return (
+    <>
+      {sections
+        .flatMap((s): readonly PageEntry[] => s.pages)
+        .map((p) => (
+          <Link
+            key={p.href}
+            href={p.href}
+            className="ui-nav-item"
+            aria-current={pageCoversRoute(p.href, route) ? 'page' : undefined}
+          >
+            <NavIcon name={p.icon} />
+            <span>{t(p.label)}</span>
+          </Link>
+        ))}
+      <Box hiddenFrom="lg">
+        <ReportIssueButton url={repository} drawer onOpen={onReport} />
+        <DocsLink url={docs} drawer />
+        <RepositoryLink url={repository} drawer />
+      </Box>
+    </>
+  )
 }
 
 /** A button of the top bar opening a dialog over the page, named by its tooltip's label. */
@@ -79,11 +92,10 @@ function DialogButton({
   )
 }
 
-/** Search (also Ctrl+K and the home page's field), Settings, Install, Safety, Report an issue, the repository and the theme, as the Next app's header offers them. */
-function BarEnd({ route }: { route: string }) {
+/** Search (also Ctrl+K and the home page's field), Settings, Install, Safety, Report an issue, the docs, the repository and the theme, as the Next app's header and sidebar offer them. */
+function BarEnd({ route, onReport }: { route: string; onReport: () => void }) {
   const { t } = useTranslation()
   const openSettings = useContext(SettingsDialog)
-  const [reporting, setReporting] = useState(false)
   // each request opens the site search; the workbench opens its own (`searchHost`)
   const [searches, setSearches] = useState(0)
   const openSearch = () => {
@@ -112,16 +124,12 @@ function BarEnd({ route }: { route: string }) {
         onOpen={openSearch}
       />
       <DialogButton icon="settings" label={t('Settings')} onOpen={() => openSettings()} />
-      <ReportIssueButton url={repository} onOpen={() => setReporting(true)} />
+      <ReportIssueButton url={repository} onOpen={onReport} />
+      <Box visibleFrom="lg">
+        <DocsLink url={docs} />
+      </Box>
       <RepositoryLink url={repository} />
       <ThemeSwitch />
-      {repository && (
-        <ReportIssueDialog
-          repository={repository}
-          opened={reporting}
-          onClose={() => setReporting(false)}
-        />
-      )}
       {searches > 0 && (
         <Suspense fallback={null}>
           <SiteSearch request={searches} />
@@ -135,6 +143,8 @@ function BarEnd({ route }: { route: string }) {
 /** `ui`'s frame with the app's wordmark, pages and top bar actions; the page container takes the skip link's `#main`, as `main` is the frame's. */
 export function Shell({ children }: { children: ReactNode }) {
   const route = useRoute()
+  const [reporting, setReporting] = useState(false)
+  const report = () => setReporting(true)
   return (
     <>
       <ContentSkipLink />
@@ -143,13 +153,20 @@ export function Shell({ children }: { children: ReactNode }) {
       <PreReleaseData />
       <AppFrame
         brand={<Brand full={route === '/'} />}
-        navigation={<Navigation route={route} />}
-        end={<BarEnd route={route} />}
+        navigation={<Navigation route={route} onReport={report} />}
+        end={<BarEnd route={route} onReport={report} />}
       >
         <Container id="main" tabIndex={-1} size={pageWidth}>
           {children}
         </Container>
       </AppFrame>
+      {repository && (
+        <ReportIssueDialog
+          repository={repository}
+          opened={reporting}
+          onClose={() => setReporting(false)}
+        />
+      )}
     </>
   )
 }
