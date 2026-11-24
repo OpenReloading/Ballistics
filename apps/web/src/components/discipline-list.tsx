@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { useCallback, useDeferredValue, useMemo } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
@@ -39,6 +40,7 @@ export function DisciplineList({
   faces: readonly { id: string; name: string }[]
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const [state, set, clear] = useListState(disciplineFacetKeys)
   const filters = useDeferredValue(state)
   const facets = useMemo(
@@ -113,7 +115,10 @@ export function DisciplineList({
       total={items.length}
       state={state}
       set={set}
-      placeholder={t('Name, number, federation or caliber, 2.53…')}
+      placeholder={i18n._({
+        id: 'disciplines.search',
+        message: 'Name, number, federation or caliber, 2.53…',
+      })}
       columns={columns}
       counts={{ rangefoundry: items.length, user: 0 }}
       sources={ruleBookSources}
@@ -136,8 +141,12 @@ export function DisciplineList({
           label={(r) => r.name}
           caption={
             named.filter(Boolean).length === 0
-              ? t('All disciplines')
-              : t('Disciplines, {filters}', { filters: named.filter(Boolean).join(', ') })
+              ? i18n._({ id: 'disciplines.all', message: 'All disciplines' })
+              : i18n._({
+                  id: 'disciplines.filtered',
+                  message: 'Disciplines, {filters}',
+                  values: { filters: named.filter(Boolean).join(', ') },
+                })
           }
           noun="disciplines"
           sort={state.sort}
@@ -152,14 +161,15 @@ export function DisciplineList({
 /** The federation directory: name, abbreviation, country, rule books, disciplines and faces. */
 export function FederationList({ items }: { items: FederationRow[] }) {
   const tr = useTranslation()
+  const { i18n } = useLingui()
   const { t, language } = tr
   // the record prints "International" or an ISO code: a code is named in the language shown
   const country = useCallback(
     (c: string) =>
       c === 'International'
-        ? t('International')
+        ? i18n._({ id: 'disciplines.international', message: 'International' })
         : countryName(c, /^[A-Z]{2}$/.test(c) ? c : undefined, language),
-    [t, language],
+    [i18n, language],
   )
   const [state, set, clear] = useListState(federationFacetKeys)
   const filters = useDeferredValue(state)
@@ -218,7 +228,10 @@ export function FederationList({ items }: { items: FederationRow[] }) {
       total={items.length}
       state={state}
       set={set}
-      placeholder={t('Name, abbreviation or country, DSB…')}
+      placeholder={i18n._({
+        id: 'disciplines.federationsSearch',
+        message: 'Name, abbreviation or country, DSB…',
+      })}
       columns={columns}
       counts={{ rangefoundry: items.length, user: 0 }}
       sources={ruleBookSources}
@@ -241,8 +254,12 @@ export function FederationList({ items }: { items: FederationRow[] }) {
           label={(r) => r.name}
           caption={
             named.filter(Boolean).length === 0
-              ? t('All federations')
-              : t('Federations, {filters}', { filters: named.filter(Boolean).join(', ') })
+              ? i18n._({ id: 'disciplines.federationsAll', message: 'All federations' })
+              : i18n._({
+                  id: 'disciplines.federationsFiltered',
+                  message: 'Federations, {filters}',
+                  values: { filters: named.filter(Boolean).join(', ') },
+                })
           }
           noun="federations"
           sort={state.sort}

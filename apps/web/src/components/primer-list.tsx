@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { useDeferredValue, useMemo } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
@@ -19,6 +20,7 @@ const primerSources: readonly Origin[] = ['rangefoundry']
 /** The primer directory: manufacturer, name, product number, size, magnum flag and priming compound. */
 export function PrimerList({ rows }: { rows: PrimerRow[] }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const [state, set, clear] = useListState()
   const filters = useDeferredValue(state)
   const shown = useMemo(
@@ -56,7 +58,12 @@ export function PrimerList({ rows }: { rows: PrimerRow[] }) {
       label: msg('Magnum'),
       width: '6rem',
       value: (r) => (r.magnum === undefined ? undefined : r.magnum ? 'yes' : 'no'),
-      cell: (r) => (r.magnum === undefined ? '' : r.magnum ? t('Yes') : t('No')),
+      cell: (r) =>
+        r.magnum === undefined
+          ? ''
+          : r.magnum
+            ? i18n._({ id: 'primers.yes', message: 'Yes' })
+            : i18n._({ id: 'primers.no', message: 'No' }),
     },
     {
       key: 'compound',
@@ -79,7 +86,7 @@ export function PrimerList({ rows }: { rows: PrimerRow[] }) {
       total={rows.length}
       state={state}
       set={set}
-      placeholder={t('Manufacturer, name or size…')}
+      placeholder={i18n._({ id: 'primers.search', message: 'Manufacturer, name or size…' })}
       columns={columns}
       counts={{ rangefoundry: rows.length, user: 0 }}
       sources={primerSources}
@@ -93,8 +100,12 @@ export function PrimerList({ rows }: { rows: PrimerRow[] }) {
           label={productLabel}
           caption={
             named.length === 0
-              ? t('All primers')
-              : t('Primers, {filters}', { filters: named.join(', ') })
+              ? i18n._({ id: 'primers.all', message: 'All primers' })
+              : i18n._({
+                  id: 'primers.filtered',
+                  message: 'Primers, {filters}',
+                  values: { filters: named.join(', ') },
+                })
           }
           noun="primers"
           sort={state.sort}

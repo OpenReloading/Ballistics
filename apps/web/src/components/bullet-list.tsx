@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { Button } from '@mantine/core'
 import { bulletFits, type CartridgeDiameters } from '@rangefoundry/ballistics'
 import { Plus } from 'lucide-react'
@@ -69,6 +70,7 @@ export function BulletList({
   cartridges?: FitCartridge[]
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const [records, removeRow] = useUserRecords()
   const mine = useResolved(records, userBullets)
   // the browser's designs first: a few rows would sit unseen behind 1684 catalogue rows
@@ -116,7 +118,8 @@ export function BulletList({
 
   const on = readOrigins(state.sources)
   const named = [
-    fits && t('fitting {name}', { name: fits.name }),
+    fits &&
+      i18n._({ id: 'bullets.fitting', message: 'fitting {name}', values: { name: fits.name } }),
     onlyText(t, on),
     ...facetNames(facets, state.facets ?? {}, t),
     matchingText(t, state.query),
@@ -255,26 +258,37 @@ export function BulletList({
             min={2}
             max={maxComparedBullets}
             href={compareHref(picked)}
-            need={t('Pick 2 to {max}', { max: maxComparedBullets })}
+            need={i18n._({
+              id: 'bullets.pickToCompare',
+              message: 'Pick 2 to {max}',
+              values: { max: maxComparedBullets },
+            })}
           />
           <Button
             component={Link}
             href="/bullets/designer"
             leftSection={<Plus aria-hidden="true" />}
           >
-            {t('New bullet')}
+            {i18n._({ id: 'bullets.new', message: 'New bullet' })}
           </Button>
           <UnitsIconButton />
         </>
       }
       state={state}
       set={set}
-      placeholder={t('Manufacturer, name, 168, .308 or 7.82…')}
+      placeholder={i18n._({
+        id: 'bullets.search',
+        message: 'Manufacturer, name, 168, .308 or 7.82…',
+      })}
       columns={columns}
       counts={counts}
       scope={
         fits && {
-          label: t('Fits {name}', { name: fits.name }),
+          label: i18n._({
+            id: 'bullets.fits',
+            message: 'Fits {name}',
+            values: { name: fits.name },
+          }),
           onRemove: () => set({ fits: '' }),
         }
       }
@@ -297,8 +311,12 @@ export function BulletList({
           label={productLabel}
           caption={
             named.length === 0
-              ? t('All bullets')
-              : t('Bullets, {filters}', { filters: named.join(', ') })
+              ? i18n._({ id: 'bullets.all', message: 'All bullets' })
+              : i18n._({
+                  id: 'bullets.filtered',
+                  message: 'Bullets, {filters}',
+                  values: { filters: named.join(', ') },
+                })
           }
           noun="bullets"
           sort={state.sort}

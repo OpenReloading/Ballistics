@@ -1,10 +1,12 @@
 import { readdirSync } from 'node:fs'
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import type { TargetMapping } from '@rangefoundry/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it, vi } from 'vitest'
 import { TargetFaceDrawing } from '../src/components/target-face-drawing.tsx'
 import { TargetFaceList } from '../src/components/target-face-list.tsx'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { translator } from '../src/i18n/translate.ts'
 import { facetOptions, facetRows } from '../src/lib/facets.ts'
 import {
@@ -80,7 +82,9 @@ it('searches names, federations and event names', () => {
 it('renders the list: one row per face linking its page, the outer diameter in the preset unit', () => {
   const out = renderToStaticMarkup(
     <MantineProvider>
-      <TargetFaceList items={rows} disciplines={[]} />
+      <I18nProvider i18n={linguiOf('en')}>
+        <TargetFaceList items={rows} disciplines={[]} />
+      </I18nProvider>
     </MantineProvider>,
   )
   expect(out).toContain(`${faces.length} targets`)

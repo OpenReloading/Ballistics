@@ -1,3 +1,4 @@
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import { recordFigures } from '@rangefoundry/svg-drawings/cartridge'
 import type { ReactNode } from 'react'
@@ -11,6 +12,7 @@ import {
   VariantMatrix,
 } from '../src/components/cartridge-record.tsx'
 import { Cartridge } from '../src/components/cartridge-record-page.tsx'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { msg } from '../src/i18n/translate.ts'
 import {
   combinedRows,
@@ -53,7 +55,11 @@ vi.mock('../src/components/units-settings.tsx', async (original) => ({
 
 const html = (preset: PresetId, node: ReactNode) => {
   settings.preset = preset
-  return renderToStaticMarkup(<MantineProvider>{node}</MantineProvider>)
+  return renderToStaticMarkup(
+    <MantineProvider>
+      <I18nProvider i18n={linguiOf('en')}>{node}</I18nProvider>
+    </MantineProvider>,
+  )
 }
 // the text a reader sees: no style rules, no hidden note descriptions
 const text = (markup: string) => {

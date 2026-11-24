@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { Button } from '@mantine/core'
 import { Plus } from 'lucide-react'
 import { useDeferredValue, useMemo } from 'react'
@@ -40,6 +41,7 @@ import { UnitsIconButton, useUnits } from './units-settings.tsx'
 /** The cartridge directory: page bar with the count, search row, windowed table. */
 export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const [records, removeRow] = useUserRecords()
   const mine = useResolved(records, userCartridges)
   // the browser's designs first: a few rows would sit unseen behind the catalogue rows
@@ -182,14 +184,17 @@ export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
             href="/cartridges/designer"
             leftSection={<Plus aria-hidden="true" />}
           >
-            {t('New cartridge')}
+            {i18n._({ id: 'cartridges.new', message: 'New cartridge' })}
           </Button>
           <UnitsIconButton />
         </>
       }
       state={state}
       set={set}
-      placeholder={t('Name or alias, 308, 7,62 or .308…')}
+      placeholder={i18n._({
+        id: 'cartridges.search',
+        message: 'Name or alias, 308, 7,62 or .308…',
+      })}
       columns={columns}
       counts={counts}
       table={
@@ -210,8 +215,12 @@ export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
           label={(c) => c.name}
           caption={
             named.length === 0
-              ? t('All cartridges')
-              : t('Cartridges, {filters}', { filters: named.join(', ') })
+              ? i18n._({ id: 'cartridges.all', message: 'All cartridges' })
+              : i18n._({
+                  id: 'cartridges.filtered',
+                  message: 'Cartridges, {filters}',
+                  values: { filters: named.join(', ') },
+                })
           }
           noun="cartridges"
           sort={state.sort}

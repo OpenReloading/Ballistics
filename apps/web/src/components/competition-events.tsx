@@ -1,5 +1,7 @@
 'use client'
 
+import type { I18n } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import {
   ActionIcon,
   Button,
@@ -30,6 +32,7 @@ import {
   updateRecord,
 } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
+import { ungrouped } from '../i18n/lingui.ts'
 import { plainNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import {
@@ -136,13 +139,16 @@ function useEventsData() {
 function namesOf(
   data: EventsData | undefined,
   types: readonly EventType[],
-  t: Translator['t'],
+  i18n: I18n,
 ): EventNames {
   const own = new Map(
     [...(data?.firearms ?? []), ...(data?.loads ?? [])].map((r) => [r.id, r.name]),
   )
   const named = (ref: string | undefined) =>
-    ref === undefined ? '' : (own.get(userIdOf(ref) ?? '') ?? t('Not in this browser'))
+    ref === undefined
+      ? ''
+      : (own.get(userIdOf(ref) ?? '') ??
+        i18n._({ id: 'events.notInBrowser', message: 'Not in this browser' }))
   return {
     type: (e) => typeOf(e, types)?.name ?? e.eventType.slice(10),
     firearm: named,
@@ -184,7 +190,7 @@ function ShotsInput({
   shots: readonly number[] | undefined
   onChange: (shots: number[] | undefined) => void
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const [text, setText] = useState(shots?.join(' ') ?? '')
   // the text of another series (a series above was removed): show this one's shots
   const typed = parseShots(text)
@@ -193,7 +199,10 @@ function ShotsInput({
   return (
     <TextInput
       label={label}
-      description={t('Ring values separated by spaces, such as 10 9 10.')}
+      description={i18n._({
+        id: 'events.shotsHint',
+        message: 'Ring values separated by spaces, such as 10 9 10.',
+      })}
       size={controlSize.row.input}
       value={text}
       onChange={(e) => {
@@ -218,7 +227,7 @@ function SeriesEditor({
   sheets: SheetRecord[]
   onChange: (r: Rings) => void
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const set = (i: number, s: Rings['series'][number] | undefined) =>
     onChange({
       ...results,
@@ -233,10 +242,12 @@ function SeriesEditor({
         return (
           // oxlint-disable-next-line react/no-array-index-key -- series have no id; their order is their name
           <fieldset key={i} className="event-part">
-            <legend>{t('Series {n}', { n })}</legend>
+            <legend>
+              {i18n._({ id: 'events.seriesNumber', message: 'Series {n}', values: { n } })}
+            </legend>
             <Group gap="xs" align="end" wrap="wrap">
               <ShotsInput
-                label={t('Shots')}
+                label={i18n._({ id: 'events.shots', message: 'Shots' })}
                 shots={s.shots}
                 onChange={(shots) => {
                   const { shots: _, total, ...rest } = s
@@ -245,7 +256,7 @@ function SeriesEditor({
               />
               {!s.shots?.length && (
                 <NumberInput
-                  label={t('Series total')}
+                  label={i18n._({ id: 'events.seriesTotal', message: 'Series total' })}
                   size={controlSize.row.input}
                   min={0}
                   max={1090}
@@ -259,9 +270,13 @@ function SeriesEditor({
                 />
               )}
               <Select
-                label={t('Target sheet')}
+                label={i18n._({ id: 'events.targetSheet', message: 'Target sheet' })}
                 size={controlSize.row.input}
-                placeholder={sheets.length ? t('None') : t('No target sheet saved yet')}
+                placeholder={
+                  sheets.length
+                    ? i18n._({ id: 'events.none', message: 'None' })
+                    : i18n._({ id: 'events.noTargetSheet', message: 'No target sheet saved yet' })
+                }
                 clearable
                 data={refOptions(sheets)}
                 value={s.targetSheet ?? null}
@@ -271,12 +286,20 @@ function SeriesEditor({
                 }}
               />
               <Text size="sm" className="event-part-total">
-                {t('Total {total}', { total: scoreText(totals?.[i]) || '–' })}
+                {i18n._({
+                  id: 'events.partTotal',
+                  message: 'Total {total}',
+                  values: { total: scoreText(totals?.[i]) || '–' },
+                })}
               </Text>
               <ActionIcon
                 variant="subtle"
                 color="red"
-                aria-label={t('Remove series {n}', { n })}
+                aria-label={i18n._({
+                  id: 'events.removeSeries',
+                  message: 'Remove series {n}',
+                  values: { n },
+                })}
                 onClick={() => set(i, undefined)}
               >
                 <Trash aria-hidden="true" />
@@ -291,7 +314,7 @@ function SeriesEditor({
         leftSection={<Plus aria-hidden="true" />}
         onClick={() => onChange({ ...results, series: [...results.series, { total: 0 }] })}
       >
-        {t('Add series')}
+        {i18n._({ id: 'events.addSeries', message: 'Add series' })}
       </Button>
     </div>
   )
@@ -309,7 +332,7 @@ function StagesEditor({
   majorOk: boolean
   onChange: (r: Stages) => void
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const set = (i: number, s: Stage | undefined) =>
     onChange({
       ...results,
@@ -330,7 +353,7 @@ function StagesEditor({
             <legend>{s.name}</legend>
             <SimpleGrid cols={{ base: 2, xs: 4, md: 6 }} spacing="xs" verticalSpacing="xs">
               <TextInput
-                label={t('Stage name')}
+                label={i18n._({ id: 'events.stageName', message: 'Stage name' })}
                 size={controlSize.row.input}
                 maxLength={200}
                 value={s.name}
@@ -339,24 +362,28 @@ function StagesEditor({
               <CountInput label="A" value={s.hits.A} onChange={hits('A')} />
               <CountInput label="C" value={s.hits.C} onChange={hits('C')} />
               <CountInput label="D" value={s.hits.D} onChange={hits('D')} />
-              <CountInput label={t('Metal')} value={s.hits.metal} onChange={hits('metal')} />
               <CountInput
-                label={t('Misses')}
+                label={i18n._({ id: 'events.metal', message: 'Metal' })}
+                value={s.hits.metal}
+                onChange={hits('metal')}
+              />
+              <CountInput
+                label={i18n._({ id: 'events.misses', message: 'Misses' })}
                 value={s.misses}
                 onChange={(misses) => patch({ misses })}
               />
               <CountInput
-                label={t('No-shoots')}
+                label={i18n._({ id: 'events.noShoots', message: 'No-shoots' })}
                 value={s.noShoots}
                 onChange={(noShoots) => patch({ noShoots })}
               />
               <CountInput
-                label={t('Procedurals')}
+                label={i18n._({ id: 'events.procedurals', message: 'Procedurals' })}
                 value={s.procedurals}
                 onChange={(procedurals) => patch({ procedurals })}
               />
               <NumberInput
-                label={t('Time (s)')}
+                label={i18n._({ id: 'events.time', message: 'Time (s)' })}
                 size={controlSize.row.input}
                 min={0.01}
                 max={3600}
@@ -366,19 +393,26 @@ function StagesEditor({
                 onChange={(v) => patch({ time: typeof v === 'number' ? v : Number(v) || 0 })}
               />
               <Select
-                label={t('Power factor')}
+                label={i18n._({ id: 'events.powerFactor', message: 'Power factor' })}
                 size={controlSize.row.input}
                 allowDeselect={false}
                 data={[
-                  { value: 'minor', label: t('Minor') },
-                  { value: 'major', label: t('Major'), disabled: !majorOk },
+                  { value: 'minor', label: i18n._({ id: 'events.minor', message: 'Minor' }) },
+                  {
+                    value: 'major',
+                    label: i18n._({ id: 'events.major', message: 'Major' }),
+                    disabled: !majorOk,
+                  },
                 ]}
                 value={s.powerFactor}
                 onChange={(v) => v && patch({ powerFactor: v as Stage['powerFactor'] })}
               />
               <NumberInput
-                label={t('Stage points')}
-                description={t('From the official result, where published.')}
+                label={i18n._({ id: 'events.stagePoints', message: 'Stage points' })}
+                description={i18n._({
+                  id: 'events.stagePointsHint',
+                  message: 'From the official result, where published.',
+                })}
                 size={controlSize.row.input}
                 min={0}
                 decimalScale={4}
@@ -393,16 +427,24 @@ function StagesEditor({
             <Group gap="xs" mt="xs" justify="space-between">
               <Text size="sm" className="event-part-total">
                 {score
-                  ? t('{points} points, hit factor {hf}', {
-                      points: scoreText(score.points),
-                      hf: hitFactorText(score.hitFactor),
+                  ? i18n._({
+                      id: 'events.stageScore',
+                      message: '{points} points, hit factor {hf}',
+                      values: {
+                        points: scoreText(score.points),
+                        hf: hitFactorText(score.hitFactor),
+                      },
                     })
                   : '–'}
               </Text>
               <ActionIcon
                 variant="subtle"
                 color="red"
-                aria-label={t('Remove {name}', { name: s.name })}
+                aria-label={i18n._({
+                  id: 'events.removeStage',
+                  message: 'Remove {name}',
+                  values: { name: s.name },
+                })}
                 onClick={() => set(i, undefined)}
               >
                 <Trash aria-hidden="true" />
@@ -420,12 +462,18 @@ function StagesEditor({
             ...results,
             stages: [
               ...results.stages,
-              blankStage(t('Stage {n}', { n: results.stages.length + 1 })),
+              blankStage(
+                i18n._({
+                  id: 'events.stageNumber',
+                  message: 'Stage {n}',
+                  values: { n: results.stages.length + 1 },
+                }),
+              ),
             ],
           })
         }
       >
-        {t('Add stage')}
+        {i18n._({ id: 'events.addStage', message: 'Add stage' })}
       </Button>
     </div>
   )
@@ -433,22 +481,35 @@ function StagesEditor({
 
 /** The line of an event's total, or why it has none. */
 function totalLine(
-  t: Translator['t'],
+  i18n: I18n,
   e: CompetitionEvent,
   totals: EventTotals | undefined,
   type: EventType | undefined,
 ): string {
-  if (e.state === 'disqualified') return t('Disqualified: no total.')
+  if (e.state === 'disqualified')
+    return i18n._({ id: 'events.disqualifiedNoTotal', message: 'Disqualified: no total.' })
   if (totals?.total !== undefined)
-    return t('Event total: {total}', { total: scoreText(totals.total) })
+    return i18n._({
+      id: 'events.total',
+      message: 'Event total: {total}',
+      values: { total: scoreText(totals.total) },
+    })
   // without its type (not in the catalogue) the event cannot be scored here
-  if (!type) return t('Event total: {total}', { total: '–' })
+  if (!type)
+    return i18n._({ id: 'events.total', message: 'Event total: {total}', values: { total: '–' } })
   const parts = e.results.method === 'rings' ? e.results.series : e.results.stages
   // no totals for results that exist: a value the scoring refuses, such as a stage time of 0
-  if (!totals && parts.length) return t('Check the event: a value is out of its range.')
+  if (!totals && parts.length)
+    return i18n._({
+      id: 'events.outOfRange',
+      message: 'Check the event: a value is out of its range.',
+    })
   return e.results.method === 'hit-factor'
-    ? t('Event total: enter the stage points from the official result.')
-    : t('Event total: add a series.')
+    ? i18n._({
+        id: 'events.totalFromResult',
+        message: 'Event total: enter the stage points from the official result.',
+      })
+    : i18n._({ id: 'events.totalAddSeries', message: 'Event total: add a series.' })
 }
 
 /** The series or stages of an event by its scoring method, with each part's score and the total. */
@@ -463,12 +524,14 @@ function ResultsEditor({
   sheets: SheetRecord[]
   onChange: (r: Results) => void
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const totals = eventTotals(e, type)
   return (
     <>
       <Title order={3} size="h4" mt="md">
-        {e.results.method === 'rings' ? t('Series') : t('Stages')}
+        {e.results.method === 'rings'
+          ? i18n._({ id: 'events.seriesHeading', message: 'Series' })
+          : i18n._({ id: 'events.stages', message: 'Stages' })}
       </Title>
       {e.results.method === 'rings' ? (
         <SeriesEditor
@@ -486,7 +549,7 @@ function ResultsEditor({
         />
       )}
       <Text fw={600} mt="sm" className="event-total">
-        {totalLine(t, e, totals, type)}
+        {totalLine(i18n, e, totals, type)}
       </Text>
     </>
   )
@@ -513,6 +576,7 @@ function EventForm({
   onCancel: () => void
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const disciplines = useDisciplines()
   const e = editing.event
   const type = typeOf(e, types)
@@ -530,12 +594,17 @@ function EventForm({
   return (
     <section aria-labelledby="event-form" className="library-editor event-editor">
       <Title order={2} id="event-form" className="page-panel-title">
-        {editing.isNew ? t('New event') : t('Edit event')}
+        {editing.isNew
+          ? i18n._({ id: 'events.new', message: 'New event' })
+          : i18n._({ id: 'events.edit', message: 'Edit event' })}
       </Title>
       <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg" verticalSpacing="sm" mt="sm">
         <TextInput
-          label={t('Name')}
-          description={t('Empty: the event type and the day.')}
+          label={i18n._({ id: 'events.name', message: 'Name' })}
+          description={i18n._({
+            id: 'events.nameHint',
+            message: 'Empty: the event type and the day.',
+          })}
           maxLength={200}
           value={editing.name}
           onChange={(ev) => {
@@ -545,13 +614,13 @@ function EventForm({
         />
         <TextInput
           type="date"
-          label={t('Date')}
+          label={i18n._({ id: 'events.date', message: 'Date' })}
           required
           value={e.date}
           onChange={(ev) => patch({ date: ev.currentTarget.value })}
         />
         <Select
-          label={t('Event type')}
+          label={i18n._({ id: 'events.eventType', message: 'Event type' })}
           required
           allowDeselect={false}
           data={types.map((x) => ({ value: `catalogue:${x.id}`, label: x.name }))}
@@ -562,7 +631,7 @@ function EventForm({
           }}
         />
         <Select
-          label={t('Level')}
+          label={i18n._({ id: 'events.level', message: 'Level' })}
           required
           allowDeselect={false}
           data={type?.levels ?? [e.level]}
@@ -571,8 +640,8 @@ function EventForm({
         />
         {divisions.length > 0 && (
           <Select
-            label={t('Division')}
-            placeholder={t('None')}
+            label={i18n._({ id: 'events.division', message: 'Division' })}
+            placeholder={i18n._({ id: 'events.none', message: 'None' })}
             clearable
             data={divisions}
             value={e.division ?? null}
@@ -580,25 +649,30 @@ function EventForm({
           />
         )}
         <TextInput
-          label={t('Place')}
+          label={i18n._({ id: 'events.place', message: 'Place' })}
           maxLength={200}
           value={e.place ?? ''}
           onChange={(ev) => optional('place', ev.currentTarget.value)}
         />
         <Select
-          label={t('Discipline')}
-          placeholder={t('None')}
+          label={i18n._({ id: 'events.discipline', message: 'Discipline' })}
+          placeholder={i18n._({ id: 'events.none', message: 'None' })}
           searchable
           clearable
           data={disciplines.options}
           value={e.discipline ?? null}
           onChange={(v) => optional('discipline', v)}
-          nothingFoundMessage={t('No discipline found')}
+          nothingFoundMessage={i18n._({
+            id: 'events.noDisciplineFound',
+            message: 'No discipline found',
+          })}
         />
         <Select
-          label={t('Firearm')}
+          label={i18n._({ id: 'events.firearm', message: 'Firearm' })}
           placeholder={
-            data?.firearms.length ? t('None') : t('No firearm saved in this browser yet')
+            data?.firearms.length
+              ? i18n._({ id: 'events.none', message: 'None' })
+              : i18n._({ id: 'events.noFirearm', message: 'No firearm saved in this browser yet' })
           }
           clearable
           data={refOptions(data?.firearms)}
@@ -606,8 +680,8 @@ function EventForm({
           onChange={(v) => optional('firearm', v)}
         />
         <Select
-          label={t('Load')}
-          placeholder={t('None')}
+          label={i18n._({ id: 'events.load', message: 'Load' })}
+          placeholder={i18n._({ id: 'events.none', message: 'None' })}
           searchable
           clearable
           data={refOptions(data?.loads)}
@@ -615,8 +689,11 @@ function EventForm({
           onChange={(v) => optional('load', v)}
         />
         <NumberInput
-          label={t('Rounds fired')}
-          description={t('Empty: the shots of the series, where each lists them.')}
+          label={i18n._({ id: 'events.roundsFired', message: 'Rounds fired' })}
+          description={i18n._({
+            id: 'events.roundsFiredHint',
+            message: 'Empty: the shots of the series, where each lists them.',
+          })}
           min={0}
           max={100000}
           allowDecimal={false}
@@ -625,7 +702,7 @@ function EventForm({
           onChange={(v) => optional('rounds', typeof v === 'number' ? v : null)}
         />
         <Select
-          label={t('Result')}
+          label={i18n._({ id: 'events.result', message: 'Result' })}
           allowDeselect={false}
           data={Object.entries(stateLabels).map(([value, label]) => ({ value, label: t(label) }))}
           value={e.state}
@@ -633,7 +710,7 @@ function EventForm({
         />
         <Textarea
           className="wide"
-          label={t('Notes')}
+          label={i18n._({ id: 'events.notes', message: 'Notes' })}
           autosize
           minRows={1}
           maxRows={4}
@@ -648,11 +725,21 @@ function EventForm({
         sheets={data?.sheets ?? []}
         onChange={(results) => patch({ results })}
       />
-      {problem && <ErrorNote>{t('Not saved: {reason}', { reason: t(problem) })}</ErrorNote>}
+      {problem && (
+        <ErrorNote>
+          {i18n._({
+            id: 'events.notSaved',
+            message: 'Not saved: {reason}',
+            values: { reason: t(problem) },
+          })}
+        </ErrorNote>
+      )}
       <Group gap="xs" mt="md">
-        <Button onClick={onSave}>{t('Save event')}</Button>
+        <Button onClick={onSave}>
+          {i18n._({ id: 'events.saveEvent', message: 'Save event' })}
+        </Button>
         <Button variant="default" onClick={onCancel}>
-          {t('Cancel')}
+          {i18n._({ id: 'events.cancel', message: 'Cancel' })}
         </Button>
       </Group>
     </section>
@@ -672,16 +759,17 @@ function EventSheet({
   names: EventNames
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const totals = eventTotals(e, type)
   const facts = [
-    [t('Date'), dayText(e.date)],
-    [t('Place'), e.place],
-    [t('Event type'), names.type(e)],
-    [t('Level'), e.level],
-    [t('Division'), e.division],
-    [t('Firearm'), names.firearm(e.firearm)],
-    [t('Load'), names.load(e.load)],
-    [t('Result'), t(stateLabels[e.state])],
+    [i18n._({ id: 'events.date', message: 'Date' }), dayText(e.date)],
+    [i18n._({ id: 'events.place', message: 'Place' }), e.place],
+    [i18n._({ id: 'events.eventType', message: 'Event type' }), names.type(e)],
+    [i18n._({ id: 'events.level', message: 'Level' }), e.level],
+    [i18n._({ id: 'events.division', message: 'Division' }), e.division],
+    [i18n._({ id: 'events.firearm', message: 'Firearm' }), names.firearm(e.firearm)],
+    [i18n._({ id: 'events.load', message: 'Load' }), names.load(e.load)],
+    [i18n._({ id: 'events.result', message: 'Result' }), t(stateLabels[e.state])],
   ].filter(([, v]) => v)
   return (
     <div className="print-only event-sheet">
@@ -699,9 +787,11 @@ function EventSheet({
         <Table>
           <Table.Thead>
             <Table.Tr>
-              <Table.Th>{t('Series')}</Table.Th>
-              <Table.Th>{t('Shots')}</Table.Th>
-              <Table.Th className="num">{t('Total')}</Table.Th>
+              <Table.Th>{i18n._({ id: 'events.seriesHeading', message: 'Series' })}</Table.Th>
+              <Table.Th>{i18n._({ id: 'events.shots', message: 'Shots' })}</Table.Th>
+              <Table.Th className="num">
+                {i18n._({ id: 'events.totalHeading', message: 'Total' })}
+              </Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -721,13 +811,25 @@ function EventSheet({
         <Table>
           <Table.Thead>
             <Table.Tr>
-              <Table.Th>{t('Stage name')}</Table.Th>
-              <Table.Th className="num">A/C/D/{t('Metal')}</Table.Th>
-              <Table.Th className="num">{t('Penalties')}</Table.Th>
-              <Table.Th className="num">{t('Time (s)')}</Table.Th>
-              <Table.Th className="num">{t('Points')}</Table.Th>
-              <Table.Th className="num">{t('Hit factor')}</Table.Th>
-              <Table.Th className="num">{t('Stage points')}</Table.Th>
+              <Table.Th>{i18n._({ id: 'events.stageName', message: 'Stage name' })}</Table.Th>
+              <Table.Th className="num">
+                A/C/D/{i18n._({ id: 'events.metal', message: 'Metal' })}
+              </Table.Th>
+              <Table.Th className="num">
+                {i18n._({ id: 'events.penalties', message: 'Penalties' })}
+              </Table.Th>
+              <Table.Th className="num">
+                {i18n._({ id: 'events.time', message: 'Time (s)' })}
+              </Table.Th>
+              <Table.Th className="num">
+                {i18n._({ id: 'events.points', message: 'Points' })}
+              </Table.Th>
+              <Table.Th className="num">
+                {i18n._({ id: 'events.hitFactor', message: 'Hit factor' })}
+              </Table.Th>
+              <Table.Th className="num">
+                {i18n._({ id: 'events.stagePoints', message: 'Stage points' })}
+              </Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -755,14 +857,14 @@ function EventSheet({
           </Table.Tbody>
         </Table>
       )}
-      <p>{totalLine(t, e, totals, type)}</p>
+      <p>{totalLine(i18n, e, totals, type)}</p>
       {e.notes && <p>{e.notes}</p>}
     </div>
   )
 }
 
 /** One confirm (#633), and only a yes changes the firearm; the line to show after it, empty when nothing was asked. */
-async function offerRounds(id: string, e: CompetitionEvent, { t, tn }: Translator) {
+async function offerRounds(id: string, e: CompetitionEvent, i18n: I18n) {
   const firearmId = userIdOf(e.firearm)
   const rounds = eventRounds(e)
   if (!firearmId || !rounds) return ''
@@ -770,8 +872,12 @@ async function offerRounds(id: string, e: CompetitionEvent, { t, tn }: Translato
   if (!found.success || found.data.kind !== 'firearm') return ''
   const name = found.data.name
   if (found.data.data.roundCount === undefined)
-    return t('{name} has no round count; set one on the Firearms page to add the event to it.', {
-      name,
+    return i18n._({
+      id: 'events.noRoundCount',
+      message: '{name} has no round count; set one on the Firearms page to add the event to it.',
+      values: {
+        name,
+      },
     })
   const ref = `user:${id}`
   // the shooting log entries of the same match: their counted rounds are the event's (#919)
@@ -781,16 +887,24 @@ async function offerRounds(id: string, e: CompetitionEvent, { t, tn }: Translato
   const due = eventRoundsDue(found.data.data, ref, rounds, entries)
   if (due < 1) return ''
   const ok = await confirmDialog({
-    title: t('Add to the round count?'),
-    message: tn(
-      due,
-      'Add {count} round of this event to the round count of {name}?',
-      'Add {count} rounds of this event to the round count of {name}?',
-      { name },
+    title: i18n._({ id: 'events.addRoundsTitle', message: 'Add to the round count?' }),
+    message: i18n._(
+      'events.addRounds',
+      { count: due, name },
+      {
+        message:
+          '{count, plural, one {Add # round of this event to the round count of {name}?} other {Add # rounds of this event to the round count of {name}?}}',
+        formats: ungrouped,
+      },
     ),
-    confirmLabel: t('Add'),
+    confirmLabel: i18n._({ id: 'events.add', message: 'Add' }),
   })
-  if (!ok) return t('The round count of {name} is unchanged.', { name })
+  if (!ok)
+    return i18n._({
+      id: 'events.roundCountUnchanged',
+      message: 'The round count of {name} is unchanged.',
+      values: { name },
+    })
   const written = await updateRecord(firearmId, (raw) => {
     const stored = userRecord.safeParse(raw)
     return stored.success
@@ -798,14 +912,22 @@ async function offerRounds(id: string, e: CompetitionEvent, { t, tn }: Translato
       : undefined
   })
   return written?.kind === 'firearm' && written.data.roundCount !== undefined
-    ? t('Round count of {name}: {count}.', { name, count: written.data.roundCount })
-    : t('The round count of {name} holds this event already.', { name })
+    ? i18n._({
+        id: 'events.roundCountOf',
+        message: 'Round count of {name}: {count}.',
+        values: { name, count: written.data.roundCount },
+      })
+    : i18n._({
+        id: 'events.roundCountHeld',
+        message: 'The round count of {name} holds this event already.',
+        values: { name },
+      })
 }
 
 /** The new events, and after one question those that differ from the browser's; the report line, a throw with the reason when the file is refused. */
-async function importEvents(f: File, { t, tn }: Translator) {
+async function importEvents(f: File, tr: Translator, i18n: I18n) {
   const parsed = parseUserDataFile(await f.text())
-  if (!parsed.ok) throw new Error(reasonText(parsed.reason, { t, tn }))
+  if (!parsed.ok) throw new Error(reasonText(parsed.reason, tr))
   const incoming = eventRecords(parsed.records)
   const stored = await storedRecords()
   const plan = planImport(incoming, stored.records, stored.invalid)
@@ -816,33 +938,49 @@ async function importEvents(f: File, { t, tn }: Translator) {
   const replace =
     conflicts.length > 0 &&
     (await confirmDialog({
-      title: t('Replace events?'),
-      message: tn(
-        conflicts.length,
-        '{count} event of the file differs from the one in this browser. Replace it?',
-        '{count} events of the file differ from the ones in this browser. Replace them?',
+      title: i18n._({ id: 'events.replaceEvents', message: 'Replace events?' }),
+      message: i18n._(
+        'events.replaceCount',
+        { count: conflicts.length },
+        {
+          message:
+            '{count, plural, one {# event of the file differs from the one in this browser. Replace it?} other {# events of the file differ from the ones in this browser. Replace them?}}',
+          formats: ungrouped,
+        },
       ),
-      confirmLabel: t('Replace'),
+      confirmLabel: i18n._({ id: 'events.replace', message: 'Replace' }),
     }))
   if (replace) await putRecords(conflicts.map((c) => c.incoming))
   const others = parsed.records.length - incoming.length
   return [
-    t('{added} events added, {equal} already in this browser, {replaced} replaced.', {
-      added: plan.added.length,
-      equal: plan.equal.length,
-      replaced: replace ? conflicts.length : 0,
+    i18n._({
+      id: 'events.imported',
+      message: '{added} events added, {equal} already in this browser, {replaced} replaced.',
+      values: {
+        added: plan.added.length,
+        equal: plan.equal.length,
+        replaced: replace ? conflicts.length : 0,
+      },
     }),
     held > 0 &&
-      tn(
-        held,
-        '{count} event not imported: a record of this browser has its id.',
-        '{count} events not imported: records of this browser have their ids.',
+      i18n._(
+        'events.heldCount',
+        { count: held },
+        {
+          message:
+            '{count, plural, one {# event not imported: a record of this browser has its id.} other {# events not imported: records of this browser have their ids.}}',
+          formats: ungrouped,
+        },
       ),
     others > 0 &&
-      tn(
-        others,
-        '{count} record of another kind left out; Import of a File menu reads it.',
-        '{count} records of other kinds left out; Import of a File menu reads them.',
+      i18n._(
+        'events.otherKinds',
+        { count: others },
+        {
+          message:
+            '{count, plural, one {# record of another kind left out; Import of a File menu reads it.} other {# records of other kinds left out; Import of a File menu reads them.}}',
+          formats: ungrouped,
+        },
       ),
   ]
     .filter(Boolean)
@@ -859,7 +997,7 @@ function RowActions({
   tabIndex?: number | undefined
   onDelete: () => void
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <ActionIcon
       className="row-action"
@@ -867,7 +1005,11 @@ function RowActions({
       size={controlSize.row.icon}
       variant="subtle"
       color="red"
-      aria-label={t('Delete {name}', { name: record.name })}
+      aria-label={i18n._({
+        id: 'events.delete',
+        message: 'Delete {name}',
+        values: { name: record.name },
+      })}
       onClick={onDelete}
     >
       <Trash size={18} aria-hidden="true" />
@@ -942,10 +1084,17 @@ function EventsBody({
   onOpen: (r: EventRecord) => void
   actions: (r: EventRecord, tabIndex?: number) => ReactNode
 }) {
-  const { t, tn } = useTranslation()
+  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const all = data?.events ?? []
   return readError ? (
-    <ErrorNote title={t('The records of this browser could not be read.')} onRetry={onRetry}>
+    <ErrorNote
+      title={i18n._({
+        id: 'events.readFailed',
+        message: 'The records of this browser could not be read.',
+      })}
+      onRetry={onRetry}
+    >
       {readError}
     </ErrorNote>
   ) : !data ? (
@@ -969,10 +1118,14 @@ function EventsBody({
           .join(' · ')
       }
       label={(r) => `${dayText(r.data.date)} ${r.name}`}
-      caption={tn(
-        all.length,
-        '{count} competition event in this browser',
-        '{count} competition events in this browser',
+      caption={i18n._(
+        'events.count',
+        { count: all.length },
+        {
+          message:
+            '{count, plural, one {# competition event in this browser} other {# competition events in this browser}}',
+          formats: ungrouped,
+        },
       )}
       noun="events"
       sort={sort}
@@ -980,7 +1133,7 @@ function EventsBody({
       phoneAction={(r, tabIndex) => actions(r, tabIndex)}
       empty={
         <Text size="sm" c="dimmed">
-          {t('No event yet.')}
+          {i18n._({ id: 'events.noEventYet', message: 'No event yet.' })}
         </Text>
       }
     />
@@ -1002,6 +1155,7 @@ function useEventLink(data: EventsData | undefined, open: (r: EventRecord) => vo
 /** Saving offers the event's rounds to the firearm's round count, one confirm, never on its own. */
 export function CompetitionEvents({ types }: { types: EventType[] }) {
   const tr = useTranslation()
+  const { i18n } = useLingui()
   const { t } = tr
   const { data, readError, refresh } = useEventsData()
   const [failure, setFailure] = useState('')
@@ -1015,7 +1169,7 @@ export function CompetitionEvents({ types }: { types: EventType[] }) {
     [],
   )
   useEventLink(data, open)
-  const names = namesOf(data, types, t)
+  const names = namesOf(data, types, i18n)
   const all = data?.events ?? []
   const type = editing && typeOf(editing.event, types)
   const problem = editing && eventProblem(editing.event, type)
@@ -1037,13 +1191,19 @@ export function CompetitionEvents({ types }: { types: EventType[] }) {
     try {
       await putRecords([record])
     } catch (e) {
-      setFailure(t('Not saved: {reason}', { reason: errorText(e) }))
+      setFailure(
+        i18n._({
+          id: 'events.notSaved',
+          message: 'Not saved: {reason}',
+          values: { reason: errorText(e) },
+        }),
+      )
       return
     }
     setEditing(undefined)
     setTried(false)
     refresh()
-    setNote(await offerRounds(record.id, record.data, tr).catch(errorText))
+    setNote(await offerRounds(record.id, record.data, i18n).catch(errorText))
   }
 
   async function remove(r: EventRecord) {
@@ -1051,27 +1211,52 @@ export function CompetitionEvents({ types }: { types: EventType[] }) {
     try {
       await deleteRecord(r.id)
     } catch (e) {
-      setFailure(t('Delete of {name} failed: {reason}', { name: r.name, reason: errorText(e) }))
+      setFailure(
+        i18n._({
+          id: 'events.deleteOfFailed',
+          message: 'Delete of {name} failed: {reason}',
+          values: { name: r.name, reason: errorText(e) },
+        }),
+      )
       return refresh()
     }
     setEditing((s) => (s?.id === r.id ? undefined : s))
     refresh()
-    offerUndo(t('Deleted {name} from this browser.', { name: r.name }), () =>
-      putRecords([r]).then(refresh, (e) =>
-        setFailure(t('Undo of {name} failed: {reason}', { name: r.name, reason: errorText(e) })),
-      ),
+    offerUndo(
+      i18n._({
+        id: 'events.deletedFromThisBrowser',
+        message: 'Deleted {name} from this browser.',
+        values: { name: r.name },
+      }),
+      () =>
+        putRecords([r]).then(refresh, (e) =>
+          setFailure(
+            i18n._({
+              id: 'events.undoOfFailed',
+              message: 'Undo of {name} failed: {reason}',
+              values: { name: r.name, reason: errorText(e) },
+            }),
+          ),
+        ),
     )
   }
 
   function importFile(f: File) {
     setFailure('')
     setNote('')
-    importEvents(f, tr).then(
+    importEvents(f, tr, i18n).then(
       (line) => {
         setNote(line)
         refresh()
       },
-      (e) => setFailure(t('Not imported: {reason}', { reason: errorText(e) })),
+      (e) =>
+        setFailure(
+          i18n._({
+            id: 'events.notImported',
+            message: 'Not imported: {reason}',
+            values: { reason: errorText(e) },
+          }),
+        ),
     )
   }
 
@@ -1088,7 +1273,9 @@ export function CompetitionEvents({ types }: { types: EventType[] }) {
     const type = ext === 'csv' ? 'text/csv;charset=utf-8' : 'application/json'
     download(new Blob([text], { type }), eventsFileName(ext))
   }
-  const nothing = exported.length === 0 && t('No saved event to export.')
+  const nothing =
+    exported.length === 0 &&
+    i18n._({ id: 'events.nothingToExport', message: 'No saved event to export.' })
   const actions = (r: EventRecord, tabIndex?: number) => (
     <RowActions record={r} tabIndex={tabIndex} onDelete={() => remove(r)} />
   )
@@ -1108,21 +1295,27 @@ export function CompetitionEvents({ types }: { types: EventType[] }) {
         actions={
           <>
             <Button leftSection={<Plus aria-hidden="true" />} onClick={startNew}>
-              {t('New event')}
+              {i18n._({ id: 'events.new', message: 'New event' })}
             </Button>
             <Button variant="default" onClick={() => file.current?.click()}>
-              {t('Import JSON')}
+              {i18n._({ id: 'events.importJson', message: 'Import JSON' })}
             </Button>
             <BarButton nothing={nothing} onClick={() => exportText('csv')}>
-              {t('Export CSV')}
+              {i18n._({ id: 'events.exportCsv', message: 'Export CSV' })}
             </BarButton>
             <BarButton nothing={nothing} onClick={() => exportText('json')}>
-              {t('Export JSON')}
+              {i18n._({ id: 'events.exportJson', message: 'Export JSON' })}
             </BarButton>
             <PrintButton
-              hint={editing ? t('Print the open event') : t('Print the list of events')}
+              hint={
+                editing
+                  ? i18n._({ id: 'events.printOpen', message: 'Print the open event' })
+                  : i18n._({ id: 'events.printList', message: 'Print the list of events' })
+              }
             />
-            <LinkButton href="/firearms/log">{t('Shooting log')}</LinkButton>
+            <LinkButton href="/firearms/log">
+              {i18n._({ id: 'events.shootingLog', message: 'Shooting log' })}
+            </LinkButton>
           </>
         }
       />
@@ -1132,7 +1325,7 @@ export function CompetitionEvents({ types }: { types: EventType[] }) {
         accept=".json,application/json"
         className="visually-hidden"
         tabIndex={-1}
-        aria-label={t('Import JSON')}
+        aria-label={i18n._({ id: 'events.importJson', message: 'Import JSON' })}
         onChange={(e) => {
           const f = e.currentTarget.files?.[0]
           e.currentTarget.value = ''
@@ -1160,7 +1353,7 @@ export function CompetitionEvents({ types }: { types: EventType[] }) {
         )}
         <section aria-labelledby="event-list" className="directory">
           <Title order={2} id="event-list" className="visually-hidden">
-            {t('Competition events')}
+            {i18n._({ id: 'events.title', message: 'Competition events' })}
           </Title>
           {failure && <ErrorNote>{failure}</ErrorNote>}
           {note && (

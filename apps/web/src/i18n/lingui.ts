@@ -3,12 +3,15 @@ import { uiMessages } from '@rangefoundry/ui'
 import en from '../locales/en.json' with { type: 'json' }
 import type { Language } from './language.ts'
 
+/** A compiled catalog's messages: a JSON import types their tokens as arrays, not the tuples Lingui reads. */
+const compiled = (catalog: { messages: object }) => catalog.messages as Messages
+
 const instance = (locale: Language, messages: Messages) =>
   setupI18n({ locale, messages: { [locale]: { ...uiMessages[locale], ...messages } } })
 
 // one instance per language: activating a shared one changes boundaries that hydrate later (React #418)
 const instances: Record<Language, I18n> = {
-  en: instance('en', en.messages),
+  en: instance('en', compiled(en)),
   de: instance('de', {}),
 }
 
@@ -18,8 +21,11 @@ const catalogs = { de: () => import('../locales/de.json') }
 /** Loads the app's messages of `language` into its instance; `language.ts` awaits it before showing the language. */
 export async function loadLingui(language: keyof typeof catalogs) {
   const { default: catalog } = await catalogs[language]()
-  instances[language].load(language, catalog.messages)
+  instances[language].load(language, compiled(catalog))
 }
+
+/** The `formats` of an `i18n._` plural: its `#` ungrouped, as the own messages show a number. */
+export const ungrouped = { number: { useGrouping: false } }
 
 /** The Lingui messages of `language`, the language the views' own messages show, so one switch changes both. */
 export const linguiOf = (language: string) => (language === 'de' ? instances.de : instances.en)
