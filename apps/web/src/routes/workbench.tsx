@@ -1,25 +1,25 @@
-import { useLingui } from '@lingui/react'
-import { TextInput } from '@mantine/core'
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
-import { useTypedBeforeHydration } from '../lib/use-typed-before-hydration.ts'
-import { PlaceholderPage } from './-placeholder.tsx'
+import { Workbench } from '../components/workbench.tsx'
+import { pageHead } from './-page-head.ts'
+import { searchOf } from './-search.ts'
 
-export const Route = createFileRoute('/workbench')({ component: WorkbenchPage })
-
-function WorkbenchPage() {
-  const { i18n } = useLingui()
-  const [notes, setNotes] = useState('')
-  useTypedBeforeHydration({ notes: setNotes })
-  return (
-    <>
-      <PlaceholderPage />
-      <TextInput
-        name="notes"
-        label={i18n._({ id: 'workbench.notes', message: 'Notes' })}
-        value={notes}
-        onChange={(event) => setNotes(event.currentTarget.value)}
-      />
-    </>
-  )
-}
+export const Route = createFileRoute('/workbench')({
+  // a link's records, firearm, result tab, ladder and units; a copied load adds each field's value as its own key
+  validateSearch: searchOf(
+    'cartridge',
+    'bullet',
+    'powder',
+    'firearm',
+    'tab',
+    'units',
+    'ladderSteps',
+    'ladderDirection',
+    'ladderKind',
+  ),
+  head: () =>
+    pageHead(
+      'Load workbench',
+      'Cartridge, bullet, powder and firearm in one view: interior ballistics simulation with a peak pressure range over input tolerances and CIP limit warnings, and the trajectory computed in the browser.',
+    ),
+  component: Workbench,
+})

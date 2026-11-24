@@ -35,6 +35,7 @@ import {
   unitList,
 } from '../lib/field-unit.ts'
 import { type Quantity, twistTyped, type Unit, type UnitSystem } from '../lib/units.ts'
+import { useTypedBeforeHydration } from '../lib/use-typed-before-hydration.ts'
 
 /** The value follows the seated bullet, is the record's, is above a limit or refused, differs from the record, or is derived by the drawing (the designers). */
 export type FieldFlag = {
@@ -352,6 +353,7 @@ export function NumberField({
   placeholder,
   muted,
   unit = 'switch',
+  name,
 }: {
   spec: FieldSpec
   system: UnitSystem
@@ -379,6 +381,8 @@ export function NumberField({
   muted?: boolean
   /** `switch` for this field only, `none` where a column header names it (the designers follow the Settings preset); the label keeps it for screen readers. */
   unit?: 'switch' | 'text' | 'none' | undefined
+  /** The input's name, unique on the page: text typed into the prerendered field before hydration becomes its value. */
+  name?: string | undefined
 }) {
   const value = given ?? noValue
   // the language shown: the field writes its decimal mark and reads text in it
@@ -413,6 +417,7 @@ export function NumberField({
   const switchable = unit === 'switch' && units.length > 1
   const longest = Math.max(...units.map(([, u]) => u.symbol.length))
   const common = {
+    ...(name !== undefined && { name }),
     label: fieldLabel(specLabel, label),
     description: describedBy,
     // the dense workbench grid hides the description: the label shows it on hover
@@ -461,6 +466,16 @@ export function NumberField({
     setPick(pick && { ...pick, typed: next.typed })
     onChange(next.value)
   }
+  const shownText = localizeNumber(shownValue.text)
+  useTypedBeforeHydration(
+    name === undefined
+      ? {}
+      : {
+          [name]: (raw: string) => {
+            if (raw !== shownText) change(raw, true)
+          },
+        },
+  )
   return (
     <FieldInput
       common={common}

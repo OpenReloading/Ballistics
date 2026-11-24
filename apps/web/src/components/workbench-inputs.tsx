@@ -930,6 +930,7 @@ function LoadField({ name: key }: { name: string }) {
   const fromRecord = recordBore?.[key as keyof typeof recordBore]
   return (
     <NumberField
+      name={key}
       spec={spec}
       system={system}
       // print writes inches below 1 as the readouts do, ".3"; the field keeps its text
