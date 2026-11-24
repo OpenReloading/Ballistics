@@ -1,8 +1,9 @@
 import math
 import subprocess
+from itertools import islice
 from pathlib import Path
 
-from hole_model.cli import git_commit, limit_failures
+from hole_model.cli import git_commit, limit_failures, real_counts
 
 GIT = ["git", "-c", "user.name=test", "-c", "user.email=test@example.org", "-c", "commit.gpgsign=false"]
 
@@ -32,3 +33,17 @@ def test_a_model_over_the_limits_fails() -> None:
 def test_a_non_finite_parity_fails() -> None:
     assert limit_failures(math.nan, 0) == ["ONNX Runtime differs from PyTorch by nan, more than 1e-05"]
     assert limit_failures(math.inf, 0) == ["ONNX Runtime differs from PyTorch by inf, more than 1e-05"]
+
+
+def test_a_small_real_share_still_draws_real_photos_over_several_steps() -> None:
+    assert list(islice(real_counts(1, 0.5), 6)) == [0, 1, 0, 1, 0, 1]
+    assert list(islice(real_counts(2, 0.25), 8)) == [0, 1, 0, 1, 0, 1, 0, 1]
+    assert sum(islice(real_counts(4, 0.1), 10)) == 4
+
+
+def test_a_share_that_gives_a_whole_count_keeps_it_every_step() -> None:
+    assert list(islice(real_counts(32, 0.25), 3)) == [8, 8, 8]
+    assert list(islice(real_counts(32, 0.5), 3)) == [16, 16, 16]
+    assert list(islice(real_counts(32, 0.75), 3)) == [24, 24, 24]
+    assert list(islice(real_counts(32, 0.0), 3)) == [0, 0, 0]
+    assert list(islice(real_counts(32, 1.0), 3)) == [32, 32, 32]

@@ -7,6 +7,7 @@ import math
 import platform
 import subprocess
 import sys
+from collections.abc import Iterator
 from importlib.metadata import version
 from pathlib import Path
 
@@ -69,12 +70,22 @@ def f1(r: dict[str, float]) -> float:
     return 2 * r["recall"] * r["precision"] / max(1e-9, r["recall"] + r["precision"])
 
 
+def real_counts(batch: int, share: float) -> Iterator[int]:
+    """Real photos per step; the fraction of `batch * share` carries over, so a small share still draws real ones."""
+    carry = 0.0
+    while True:
+        carry += batch * share
+        count = int(carry)
+        carry -= count
+        yield count
+
+
 def train_net(photos: list[Photo], validation: list[Photo], args: argparse.Namespace) -> tuple[HoleNet, dict[str, int]]:
     """The net of the best validation F1 score, checked every `eval_every` steps, and the steps it ran and kept."""
     samples = [training_sample(p, args.crop) for p in photos]
     synthetic = [i for i, p in enumerate(photos) if p.data == SYNTHETIC]
     real = [i for i, p in enumerate(photos) if p.data != SYNTHETIC]
-    n_real = args.batch if not synthetic else round(args.batch * args.real_share) if real else 0
+    quota = real_counts(args.batch, args.real_share)
     net = HoleNet(args.widths)
     opt = torch.optim.AdamW(net.parameters(), args.lr, weight_decay=1e-4)
     sched = torch.optim.lr_scheduler.OneCycleLR(opt, args.lr, total_steps=args.steps, pct_start=0.1)
@@ -85,6 +96,7 @@ def train_net(photos: list[Photo], validation: list[Photo], args: argparse.Names
     best_f1, best_state, waited = -1.0, copy.deepcopy(net.state_dict()), 0
     for step in range(1, args.steps + 1):
         xs, ts, ms = [], [], []
+        n_real = args.batch if not synthetic else next(quota) if real else 0
         picks = (
             [synthetic[i] for i in rng.integers(0, len(synthetic), args.batch - n_real)] if n_real < args.batch else []
         )
