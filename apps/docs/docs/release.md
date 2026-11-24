@@ -83,7 +83,7 @@ pnpm --filter @rangefoundry/e2e exec playwright test --project "start-*"
 
 Pass `PAGES_URL` inline only: exported, it also turns on the e2e project `pages` against that site.
 
-Upstream issues to recheck: TanStack/router#8741: drop the `/?root` entry when it closes (fix proposed in TanStack/router#8742; a distinct `spa.maskPath` is reported as another workaround in the issue thread). TanStack/router#8473: when it closes, retry the root `notFoundComponent` instead of the splat route with `ssr: false`, lift the exact pins of `@tanstack/react-start` and `@tanstack/react-router`, and rerun `apps/e2e/tests/start/hydration.spec.ts`.
+Upstream issues to recheck: TanStack/router#8741: drop the `/?root` entry when it closes (fix proposed in TanStack/router#8742; a distinct `spa.maskPath` is reported as another workaround in the issue thread). TanStack/router#8473: when it closes, retry the root `notFoundComponent` instead of the splat route (`apps/web/src/routes/$.tsx`), lift the exact pins of `@tanstack/react-start` and `@tanstack/react-router`, and rerun `apps/e2e/tests/start/hydration.spec.ts`.
 
 ## Self-hosting
 

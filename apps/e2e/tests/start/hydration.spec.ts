@@ -69,9 +69,7 @@ for (const { name, base, prefix } of editions)
         await page.waitForLoadState('networkidle')
         // the fallback's title is "Page not found"; the app's titles end in its name
         await expect(page).toHaveTitle(/RangeFoundry Workbench$/)
-        // the splat route renders nothing while it hydrates, as the shell holds nothing there, so the unknown path allows no #418
-        if (p.path === 'no-such-page/')
-          console.log(`DIAG ${browserName} ${name} ${language}`, JSON.stringify(messages))
+        // the splat route hydrates the shell's empty boundary as an empty boundary, so the unknown path allows no #418
         if (p.prerendered) expect(messages).toEqual([])
         else if (p.path === 'no-such-page/')
           expect(unexplainedMiss(messages, browserName, name)).toEqual([])
