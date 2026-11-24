@@ -3,7 +3,14 @@
 import { useLingui } from '@lingui/react'
 import { AppShell, Burger, Drawer, Group } from '@mantine/core'
 import { useDisclosure, useMediaQuery } from '@mantine/hooks'
-import { type MouseEvent, type ReactElement, type ReactNode, useEffect } from 'react'
+import {
+  type MouseEvent,
+  type ReactElement,
+  type ReactNode,
+  type RefObject,
+  useEffect,
+  useRef,
+} from 'react'
 
 export interface AppFrameProps {
   /** The product's name or mark, as a link home. */
@@ -36,6 +43,7 @@ export function AppFrame({
     close: i18n._({ id: 'ui.frame.close', message: 'Close navigation' }),
   }
   const [opened, { toggle, close }] = useDisclosure(false)
+  const menuButton = useRef<HTMLButtonElement>(null)
   // the drawer is only hidden from 75em: left open there, its focus trap and scroll lock would stay
   const wide = useMediaQuery('(width >= 75em)')
   useEffect(() => {
@@ -53,6 +61,7 @@ export function AppFrame({
         account={account}
         opened={opened}
         toggle={toggle}
+        menuButton={menuButton}
         menu={labels.menu}
       />
       {/* hidden below 75em, where the drawer holds the links: one navigation in the tree at any width */}
@@ -65,7 +74,13 @@ export function AppFrame({
         opened={opened}
         close={close}
         labels={labels}
-        {...(onDrawerClosed && { onClosed: onDrawerClosed })}
+        {...(onDrawerClosed && {
+          // under reduced motion the drawer leaves before Mantine gives the focus back, and a dialog opened then would return it to the body
+          onClosed: () => {
+            menuButton.current?.focus()
+            onDrawerClosed()
+          },
+        })}
       />
       <AppShell.Main>{children}</AppShell.Main>
     </AppShell>
@@ -79,16 +94,19 @@ function TopBar({
   account,
   opened,
   toggle,
+  menuButton,
   menu,
 }: Pick<AppFrameProps, 'brand' | 'end' | 'account'> & {
   opened: boolean
   toggle: () => void
+  menuButton: RefObject<HTMLButtonElement | null>
   menu: string
 }): ReactElement {
   return (
     <AppShell.Header px="md">
       <Group h="100%" wrap="nowrap" gap="sm">
         <Burger
+          ref={menuButton}
           hiddenFrom="lg"
           size="sm"
           className="ui-frame-button"
