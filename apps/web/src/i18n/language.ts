@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react'
 import { setRefusalWords } from '../lib/core-messages.ts'
 import { storageName } from '../lib/edition.ts'
+import { loadLingui } from './lingui.ts'
 import { setShownLanguage } from './shown.ts'
 import { type Catalogue, english as englishText, type Translator, translator } from './translate.ts'
 
@@ -58,7 +59,11 @@ async function show(code: Language) {
   if (current.chosen === code && current.language === code) return
   publish({ ...current, chosen: code })
   try {
-    const [{ default: catalogue }] = await Promise.all([loaders[code](), loadMessages()])
+    const [{ default: catalogue }] = await Promise.all([
+      loaders[code](),
+      loadMessages(),
+      loadLingui(code),
+    ])
     if (current.chosen === code) publish({ chosen: code, ...translator(catalogue, code) })
   } catch {
     // offline and never opened in this language: the text stays English, the choice stays stored

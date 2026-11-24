@@ -7,74 +7,98 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: de\n"
 
+# en: "Brass"
 msgid "page.cases"
 msgstr "Hülsen"
 
+# en: "Brass group"
 msgid "page.casesEditor"
 msgstr "Hülsengruppe"
 
+# en: "Bullet designer"
 msgid "page.bulletsDesigner"
 msgstr "Geschoss-Editor"
 
+# en: "Bullets"
 msgid "page.bullets"
 msgstr "Geschosse"
 
+# en: "Cartridge designer"
 msgid "page.cartridgesDesigner"
 msgstr "Patronen-Editor"
 
+# en: "Cartridges"
 msgid "page.cartridges"
 msgstr "Patronen"
 
+# en: "Compare bullets"
 msgid "page.bulletsCompare"
 msgstr "Geschosse vergleichen"
 
+# en: "Competition events"
 msgid "page.events"
 msgstr "Wettkämpfe"
 
+# en: "Disciplines"
 msgid "page.disciplines"
 msgstr "Disziplinen"
 
+# en: "Federations"
 msgid "page.federations"
 msgstr "Verbände"
 
+# en: "Firearms"
 msgid "page.firearms"
 msgstr "Schusswaffen"
 
+# en: "Load workbench"
 msgid "page.workbench"
 msgstr "Werkbank für Laborierungen"
 
+# en: "Offline"
 msgid "page.offline"
 msgstr "Offline"
 
+# en: "Powder burn rates"
 msgid "page.powdersBurnRates"
 msgstr "Abbrandgeschwindigkeit der Treibladungspulver"
 
+# en: "Powder designer"
 msgid "page.powdersDesigner"
 msgstr "Treibladungspulver-Editor"
 
+# en: "Powders"
 msgid "page.powders"
 msgstr "Treibladungspulver"
 
+# en: "Primers"
 msgid "page.primers"
 msgstr "Zündhütchen"
 
+# en: "Range mode"
 msgid "page.range"
 msgstr "Schießstand-Modus"
 
+# en: "Session summary"
 msgid "page.session"
 msgstr "Sitzungsübersicht"
 
+# en: "Shooting log"
 msgid "page.firearmsLog"
 msgstr "Schießbuch"
 
+# en: "Shot groups"
 msgid "page.groups"
 msgstr "Schussbilder"
 
+# en: "Target designer"
 msgid "page.targetsDesigner"
 msgstr "Scheiben-Editor"
 
+# en: "Targets"
 msgid "page.targets"
 msgstr "Scheiben"
 
+# en: "Tune a powder"
 msgid "page.powdersTune"
 msgstr "Treibladungspulver abstimmen"
