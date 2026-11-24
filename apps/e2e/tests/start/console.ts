@@ -22,11 +22,10 @@ export function listen(page: Page) {
   return messages
 }
 
-/** The messages a path that `404.html` answers may log: React's #418 of the shell (TanStack/router#8473), and in Firefox under `next/` its reparse warning after the dispatcher's synchronous `<plaintext>` write. */
-export function unexplained(messages: string[], browser: string, edition: string) {
+/** The messages the unknown path, which `404.html` answers, may log: in Firefox under `next/`, the reparse warning after the dispatcher's synchronous `<plaintext>` write. */
+export function unexplainedMiss(messages: string[], browser: string, edition: string) {
   return messages.filter(
     (m) =>
-      !m.includes('#418') &&
       !(
         browser === 'firefox' &&
         edition === 'next' &&
@@ -34,3 +33,7 @@ export function unexplained(messages: string[], browser: string, edition: string
       ),
   )
 }
+
+/** The messages a record path that `404.html` answers may log: those of `unexplainedMiss` and React's #418 of the shell (TanStack/router#8473). */
+export const unexplained = (messages: string[], browser: string, edition: string) =>
+  unexplainedMiss(messages, browser, edition).filter((m) => !m.includes('#418'))
