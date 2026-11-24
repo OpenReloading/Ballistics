@@ -180,6 +180,26 @@ test('the drawer marks the current page and its rows are at least 44 px high', a
     expect(box).toBeGreaterThanOrEqual(44)
 })
 
+test('a Tab during the drawer exit keeps the focus where it went', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await gotoHydrated(page, '/cartridges')
+  await page.getByRole('button', { name: 'Navigation', exact: true }).click()
+  const drawer = page.getByRole('dialog')
+  await expect(drawer).toBeVisible()
+  await page.keyboard.press('Escape')
+  // Tab once Mantine has given the focus back to the menu button, well before the exit ends
+  await page.waitForFunction(
+    () => document.activeElement?.getAttribute('aria-label') === 'Navigation',
+    undefined,
+    { polling: 'raf' },
+  )
+  await page.keyboard.press('Tab')
+  const brand = page.locator('.mantine-AppShell-header .brand')
+  await expect(brand).toBeFocused()
+  await expect(drawer).toBeHidden()
+  await expect(brand).toBeFocused()
+})
+
 test('the Alpha badge gives its note by pointer and keyboard, and the open note moves nothing', async ({
   page,
 }) => {

@@ -147,6 +147,7 @@ function NavDrawer({
     if (event.target instanceof Element && event.target.closest('a, [aria-haspopup="dialog"]'))
       close()
   }
+  const content = useRef<HTMLDivElement>(null)
   return (
     // Mantine's drawer traps the focus, closes on Escape and gives the focus back to the menu button
     <Drawer.Root
@@ -157,13 +158,16 @@ function NavDrawer({
       {...(onClosed && {
         // under reduced motion the drawer leaves before Mantine gives the focus back, and a dialog opened then would return it to the body
         onExitTransitionEnd: () => {
-          menuButton.current?.focus()
+          // only where the focus is lost or still in the drawer: with motion the exit ends after a user moved it on
+          const active = document.activeElement
+          if (!active || active === document.body || content.current?.contains(active))
+            menuButton.current?.focus()
           onClosed()
         },
       })}
     >
       <Drawer.Overlay />
-      <Drawer.Content aria-label={labels.navigation} onClick={closeOnLink}>
+      <Drawer.Content ref={content} aria-label={labels.navigation} onClick={closeOnLink}>
         {/* a div: a second <header> outside the top bar would be another banner landmark */}
         <Drawer.Header component="div">
           {brand}
