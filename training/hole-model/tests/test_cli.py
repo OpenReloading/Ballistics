@@ -47,3 +47,18 @@ def test_a_share_that_gives_a_whole_count_keeps_it_every_step() -> None:
     assert list(islice(real_counts(32, 0.75), 3)) == [24, 24, 24]
     assert list(islice(real_counts(32, 0.0), 3)) == [0, 0, 0]
     assert list(islice(real_counts(32, 1.0), 3)) == [32, 32, 32]
+
+
+def test_a_product_that_is_whole_on_paper_is_exact_in_floating_point() -> None:
+    assert list(islice(real_counts(100, 0.29), 6)) == [29] * 6
+    assert list(islice(real_counts(90, 0.7), 6)) == [63] * 6
+
+
+def test_every_whole_product_of_a_batch_and_a_percent_share_is_kept_every_step() -> None:
+    for batch in range(1, 257):
+        for percent in range(101):
+            if batch * percent % 100 == 0:
+                assert list(islice(real_counts(batch, percent / 100), 4)) == [batch * percent // 100] * 4, (
+                    batch,
+                    percent,
+                )

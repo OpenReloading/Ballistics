@@ -72,12 +72,13 @@ def f1(r: dict[str, float]) -> float:
 
 def real_counts(batch: int, share: float) -> Iterator[int]:
     """Real photos per step; the fraction of `batch * share` carries over, so a small share still draws real ones."""
-    carry = 0.0
+    per_step, drawn, step = batch * share, 0, 0
     while True:
-        carry += batch * share
-        count = int(carry)
-        carry -= count
-        yield count
+        step += 1
+        # the epsilon keeps a whole product such as 100 * 0.29 from landing just below it
+        total = math.floor(step * per_step + 1e-9)
+        yield total - drawn
+        drawn = total
 
 
 def train_net(photos: list[Photo], validation: list[Photo], args: argparse.Namespace) -> tuple[HoleNet, dict[str, int]]:
