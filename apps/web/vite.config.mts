@@ -74,6 +74,8 @@ export default defineConfig(({ command }) => {
       ]),
     ),
     resolve: { alias: { '@': path.join(import.meta.dirname, 'src') } },
+    // the prerender fetches its preview server: on `localhost` that binds ::1 alone, and a blocked event loop makes fetch fall back to 127.0.0.1
+    preview: { host: '127.0.0.1' },
     build: {
       modulePreload: {
         // pages read the in-browser API on mount: preloads of its imports wait for its chunk to run, and WebKit warns about a preload still unused a few seconds after load

@@ -14,6 +14,9 @@ const browsers = {
   touch: { browser: 'webkit', contextOptions: { hasTouch: true, isMobile: true } },
 } as const
 
+// the theme respects reduced motion, so Mantine's transitions end at once instead of after animation frames a headless WebKit can hold back
+const motion = { reducedMotion: 'reduce' } as const
+
 /** Every story runs as a test, axe included, in a project per width: Storybook sizes each story's frame from its viewport (1200 px by default), so the width reaches the stories as `__STORY_WIDTH__` (.storybook/preview.tsx). */
 const stories = (width: number, schemes: (keyof typeof browsers)[]) => ({
   plugins: [storybookTest({ configDir })],
@@ -28,7 +31,9 @@ const stories = (width: number, schemes: (keyof typeof browsers)[]) => ({
         (scheme): BrowserInstanceOption => ({
           browser: browsers[scheme].browser,
           name: `${scheme}-${width}`,
-          provider: playwright({ contextOptions: browsers[scheme].contextOptions }),
+          provider: playwright({
+            contextOptions: { ...browsers[scheme].contextOptions, ...motion },
+          }),
         }),
       ),
     },
