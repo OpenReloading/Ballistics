@@ -1,12 +1,9 @@
 import { z } from 'zod'
 
-/** The address's query as strings, a repeated key as all its values: the views read it with `URLSearchParams`, as the Next pages do, so `6.50` and `1e3` stay as typed. */
-export function parseSearch(search: string): Record<string, string | string[]> {
-  const read: Record<string, string | string[]> = Object.create(null)
-  for (const [key, value] of new URLSearchParams(search)) {
-    const seen = read[key]
-    read[key] = seen === undefined ? value : [...(Array.isArray(seen) ? seen : [seen]), value]
-  }
+/** The address's query as strings, the first of a repeated key: the lists read it with `URLSearchParams`, as the Next pages do, so `6.50` and `1e3` stay as typed. */
+export function parseSearch(search: string): Record<string, string> {
+  const read: Record<string, string> = {}
+  for (const [key, value] of new URLSearchParams(search)) read[key] ??= value
   return read
 }
 
