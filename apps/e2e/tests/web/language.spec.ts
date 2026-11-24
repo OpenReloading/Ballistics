@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test'
 import { AxeBuilder, height, problems } from './a11y.ts'
-import { storageName } from './edition.ts'
+import { isNextEdition, noOfflineWorker, storageName } from './edition.ts'
 import { showGerman } from './german.ts'
 import { gotoHydrated } from './nav.ts'
 import { settingsEntry, storeUnits } from './units.ts'
@@ -169,6 +169,7 @@ test('the workbench in German at 1280 px keeps Run off the page bar status', asy
 test.describe('offline', () => {
   // the offline layer's worker answers the reload
   test.use({ serviceWorkers: 'allow' })
+  test.skip(({ baseURL }) => isNextEdition(baseURL), noOfflineWorker)
 
   test('the German interface opens offline after a visit', async ({ page, context }) => {
     await gotoHydrated(page, '/')

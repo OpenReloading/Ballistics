@@ -57,7 +57,7 @@ export const Frame: Story = {
     await expect(canvas.queryByRole('navigation', { name: 'Main' })).toBeNull()
     const menu = canvas.getByRole('button', { name: 'Navigation' })
     await userEvent.click(menu)
-    const drawer = await page.findByRole('dialog', { name: 'Main' })
+    const drawer = await page.findByRole('dialog', { name: 'Navigation' })
     if (matchMedia('(pointer: coarse)').matches) {
       await expect(menu.getBoundingClientRect().height).toBeGreaterThanOrEqual(44)
       const close = page.getByRole('button', { name: 'Close navigation' })

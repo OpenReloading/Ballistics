@@ -1,5 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
-import { storageName } from './edition.ts'
+import { isNextEdition, storageName } from './edition.ts'
 import { isDark } from './luminance.ts'
 import { gotoHydrated } from './nav.ts'
 
@@ -145,7 +145,12 @@ for (const scheme of ['light', 'dark'] as const)
     ).toBeGreaterThan(0)
   })
 
-test('icons are served as PNG, no social image without the origin', async ({ page, request }) => {
+test('icons are served as PNG, no social image without the origin', async ({
+  page,
+  request,
+  baseURL,
+}) => {
+  test.skip(isNextEdition(baseURL), 'the Start site of this run is built with its Pages origin')
   await page.goto('./cartridges/308-win')
   // first(): Next.js may stream the metadata again into the head
   const head = page.locator('head')

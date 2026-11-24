@@ -36,6 +36,8 @@ function build() {
       PAGES_EDITION: edition,
       PAGES_BASE_PATH: base,
       PRERENDER: prerender,
+      // the docs site is not built here: no Docs link to a 404
+      NEXT_PUBLIC_NO_DOCS: '1',
     })
     const out = edition === 'next' ? `${site}next/` : site
     // a move, not a copy: a recursive cpSync into the dev container's bind mount fails with EACCES on macOS
