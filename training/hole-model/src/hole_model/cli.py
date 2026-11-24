@@ -3,6 +3,7 @@
 import argparse
 import copy
 import json
+import math
 import platform
 import subprocess
 import sys
@@ -23,7 +24,6 @@ from hole_model.splits import (
     SYNTHETIC,
     Photo,
     SplitError,
-    label_set_digests,
     read_input_list,
     read_label_set,
     read_photo,
@@ -144,7 +144,7 @@ def git_commit(project: Path) -> str:
 def limit_failures(parity: float, onnx_bytes: int) -> list[str]:
     """The acceptance limits the exported model misses."""
     failures = []
-    if parity > MAX_PARITY:
+    if not math.isfinite(parity) or parity > MAX_PARITY:
         failures.append(f"ONNX Runtime differs from PyTorch by {parity:.1e}, more than {MAX_PARITY:.0e}")
     if onnx_bytes > MAX_ONNX_BYTES:
         failures.append(f"the ONNX file has {onnx_bytes} bytes, more than {MAX_ONNX_BYTES}")
@@ -157,7 +157,7 @@ def train(args: argparse.Namespace) -> None:
     torch.manual_seed(args.seed)
     if not 0 <= args.real_share <= 1:
         raise SplitError("--real-share is a fraction from 0 to 1")
-    splits = read_input_list(args.inputs)
+    splits, label_sets = read_input_list(args.inputs)
     counts = {
         s: {
             "photos": len(ps),
@@ -177,6 +177,8 @@ def train(args: argparse.Namespace) -> None:
     net, kept = train_net([p for p in splits["train"] if p.scored], validation, args)
     args.out.mkdir(parents=True, exist_ok=True)
     onnx_path = args.out / "hole-model.onnx"
+    # a run that fails after the export must not leave the scores of an earlier model next to the new one
+    (args.out / "scores.json").unlink(missing_ok=True)
     parity = export(net, onnx_path, input_array(read_photo(validation[0])))
     heat = onnx_heat(single_thread_session(str(onnx_path)))
     chosen = best(score(heat, validation, THRESHOLDS))
@@ -199,10 +201,13 @@ def train(args: argparse.Namespace) -> None:
             "earlyStopping": {"evalEvery": args.eval_every, "patience": args.patience, **kept},
         },
         "data": counts,
-        "labelSets": label_set_digests(args.inputs),
+        "labelSets": label_sets,
         "net": {"widths": list(args.widths), "parameters": sum(p.numel() for p in net.parameters())},
         "onnx": {"file": onnx_path.name, "bytes": onnx_path.stat().st_size, "opset": OPSET},
-        "parity": {"maxAbsDifference": float(f"{parity:.1e}"), "photo": validation[0].sha256},
+        "parity": {
+            "maxAbsDifference": float(f"{parity:.1e}") if math.isfinite(parity) else None,
+            "photo": validation[0].sha256,
+        },
         "threshold": chosen["threshold"],
         "validation": chosen,
         **({"test": score(heat, test, [chosen["threshold"]])[0]} if test else {}),
@@ -211,7 +216,7 @@ def train(args: argparse.Namespace) -> None:
             "rows": sweep(heat, (test or validation)[: args.sweep_photos], chosen["threshold"]),
         },
     }
-    (args.out / "scores.json").write_text(json.dumps(scores, indent=2) + "\n")
+    (args.out / "scores.json").write_text(json.dumps(scores, indent=2, allow_nan=False) + "\n")
     print(json.dumps(scores, indent=2))
     failures = limit_failures(parity, onnx_path.stat().st_size)
     for f in failures:

@@ -24,6 +24,13 @@ export {
   type Proposals,
 } from './inference-port.ts'
 export { type LabeledHole, type LabeledPhoto, type LabelSet, labelSet } from './label-set.ts'
+export {
+  learnedDetector,
+  MAYBE_BELOW,
+  ModelContractError,
+  type ModelTensor,
+  type RunModel,
+} from './learned-detector.ts'
 export { type ModelManifest, type ModelScores, modelManifest } from './model-manifest.ts'
 export { clamp, components, median1 } from './raster-ops.ts'
 export {

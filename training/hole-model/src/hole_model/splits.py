@@ -60,20 +60,22 @@ def _photo(path: Path, raw: Any) -> Photo:
     return Photo(path, raw["sha256"], raw["session"], scored, float(diameter), holes, data, masked)
 
 
-def read_label_set(path: Path) -> list[Photo]:
-    """The photos of a label set file, which sit next to it."""
-    raw = json.loads(path.read_text())
+def read_label_set(path: Path, data: bytes | None = None) -> list[Photo]:
+    """The photos of a label set file, which sit next to it; `data` is the file's bytes when already read."""
+    raw = json.loads(path.read_bytes() if data is None else data)
     if not isinstance(raw, dict) or not isinstance(raw.get("photos"), dict):
         raise SplitError(f"{path}: not a label set")
     return [_photo(path.parent / name, p) for name, p in raw["photos"].items()]
 
 
-def read_input_list(path: Path) -> dict[str, list[Photo]]:
-    """Label sets per split, paths relative to the list; refuses a photo or a session in two splits."""
+def read_input_list(path: Path) -> tuple[dict[str, list[Photo]], dict[str, list[str]]]:
+    """Photos and the sha256 of each label set file as read, per split; refuses a photo or a session in two splits."""
     raw = json.loads(path.read_text())
     if not isinstance(raw, dict) or set(raw) - set(SPLITS) or not raw.get("train"):
         raise SplitError(f"{path}: an input list maps {', '.join(SPLITS)} to label set paths and names a train set")
-    splits = {s: [p for f in raw.get(s, []) for p in read_label_set(path.parent / f)] for s in SPLITS}
+    files = {s: [(path.parent / f, (path.parent / f).read_bytes()) for f in raw.get(s, [])] for s in SPLITS}
+    splits = {s: [p for f, data in fs for p in read_label_set(f, data)] for s, fs in files.items()}
+    digests = {s: [hashlib.sha256(data).hexdigest() for _, data in files[s]] for s in SPLITS if s in raw}
     seen: dict[str, str] = {}
     sessions: dict[str, str] = {}
     for split, photos in splits.items():
@@ -82,13 +84,7 @@ def read_input_list(path: Path) -> dict[str, list[Photo]]:
                 raise SplitError(f"photo {p.sha256} is in {seen[p.sha256]} and {split}")
             if sessions.setdefault(p.session, split) != split:
                 raise SplitError(f"session {p.session!r} is in {sessions[p.session]} and {split}")
-    return splits
-
-
-def label_set_digests(path: Path) -> dict[str, list[str]]:
-    """The sha256 of each label set file per split of the input list, which identifies the data of a run."""
-    raw = json.loads(path.read_text())
-    return {s: [hashlib.sha256((path.parent / f).read_bytes()).hexdigest() for f in raw[s]] for s in SPLITS if s in raw}
+    return splits, digests
 
 
 def read_photo(p: Photo) -> npt.NDArray[np.uint8]:

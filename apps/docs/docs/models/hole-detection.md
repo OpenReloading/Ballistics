@@ -176,7 +176,7 @@ Code: `packages/target-recognition/src/hole-detection.ts`, `shotsFromParts`, `en
 
 A proposal with a confidence below 0.5 is shown as "maybe": the user accepts it on the photo or with Accept maybes in the Review step; Accept sure leaves it out, and the counts name the sure and the maybe proposals apart. On the drawn test photos every true hole scores at least 0.63, so the tier loses none of them.
 
-Code: `apps/web/src/lib/hole-proposals.ts`, `MAYBE_BELOW`, `isMaybe`.
+Code: `packages/target-recognition/src/learned-detector.ts`, `MAYBE_BELOW`. `apps/web/src/lib/hole-proposals.ts`, `isMaybe`.
 
 ### Hole size
 
@@ -316,6 +316,23 @@ Code: `packages/target-recognition/src/face-search.ts`, `findFace`, `holeSize`. 
 3. The run whose shots the other runs find again most often (within $0.5 D$) is proposed, then run again on the full working image. The seed runs use a working image with holes of about 12 pixels (0.75 times 16).
 
 Code: `packages/target-recognition/src/hole-detection.ts`, `autoDetect`, `runSeeds`, `SEED_MIN_SIZE`. `packages/target-recognition/src/color-axis.ts`, `rescale`, `logLuma`.
+
+### Learned detector
+
+`learnedDetector(manifest, run)` is an inference port around a model that turns a working image into a heatmap of hole centers. The caller passes the run function (tensor in, heatmap out), so the package does no I/O. It reads one heatmap channel at a stride $t$ that divides the size multiple $M$, and throws a `ModelContractError` for another manifest or for a heatmap of another size.
+
+1. The region with a margin of $3 D_\mathrm{px}$ (no region: the face outline, else the whole photo) is resampled so the expected hole is the manifest's working hole diameter $D_m$: $w = \operatorname{round}(W D_m / D_\mathrm{px})$, $h$ likewise, each working pixel the mean of the photo area it covers. Channels are put in the manifest's order and scaled to its value range.
+2. Width and height are padded to multiples of $M$ by repeating the last column and row.
+3. A peak is a heatmap cell at or above the manifest's threshold that no 8-neighbor exceeds. The threshold is set on the validation photos, never on the holdout. A cell $(i, j)$ lies at $x = x_0 + (i + \tfrac{1}{2})\, t\, W / w - \tfrac{1}{2}$ photo pixels (rows likewise); a cell in the padding or a center outside the region gives no proposal.
+4. A peak value $p$ maps onto the confidence scale so that the manifest's `sure` value $p_s$ lands on 0.5, the lower edge of the sure tier, and every peak below it stays a maybe:
+
+$$
+\text{confidence} = \begin{cases} 0.5\, p / p_s & p \lt p_s \\ 0.5 + 0.5\, (p - p_s) / (1 - p_s) & p \ge p_s \end{cases}
+$$
+
+Code: `packages/target-recognition/src/learned-detector.ts`, `learnedDetector`, `coverage`, `peaks`, `confidence`, `clustered`.
+
+Proposals whose centers lie closer than $D_\mathrm{px}$, directly or through a chain, share a cluster id. Each proposal's diameter is $D_\mathrm{px}$; a working image over $2 \times 10^6$ pixels is refused.
 
 ### Photo quality
 
