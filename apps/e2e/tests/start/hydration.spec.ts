@@ -19,7 +19,7 @@ const pages: { path: string; h1: Text; prerendered: boolean }[] = [
   { path: 'cartridges/308-win/', h1: '308 Win.', prerendered: true },
   {
     path: 'bullets/demo-bullet-150/',
-    h1: '30 Cal 150 gr Flat Base Demo',
+    h1: 'Demo Bullets 30 Cal 150 gr Flat Base Demo',
     prerendered: true,
   },
   {
