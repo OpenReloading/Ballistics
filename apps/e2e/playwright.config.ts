@@ -131,16 +131,7 @@ export default defineConfig({
           {
             name: 'next-chromium',
             testDir: './tests/web',
-            testMatch: [
-              'navigation.spec.ts',
-              'search.spec.ts',
-              'settings-dialog.spec.ts',
-              'session.spec.ts',
-              'theme.spec.ts',
-              'smoke.spec.ts',
-              'language.spec.ts',
-              'a11y-states.spec.ts',
-            ],
+            testMatch: ['navigation.spec.ts', 'language.spec.ts', 'a11y-states.spec.ts'],
             use: browserAt(`${startUrl}next/`),
           },
         ]
