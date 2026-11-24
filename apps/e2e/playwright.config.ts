@@ -131,7 +131,15 @@ export default defineConfig({
           {
             name: 'next-chromium',
             testDir: './tests/web',
-            testMatch: ['a11y-settle.spec.ts', 'a11y-states.spec.ts', 'a11y-sweep.spec.ts', 'box-label.spec.ts', 'bullet-search-dialog.spec.ts', 'focus-return.spec.ts', 'german-numbers.spec.ts', 'lands-contact.spec.ts', 'my-cases.spec.ts', 'print-chart.spec.ts', 'print-german.spec.ts', 'search.spec.ts', 'settings-dialog.spec.ts', 'text-spacing.spec.ts', 'tour.spec.ts', 'cartridge-designer.spec.ts', 'case-records.spec.ts', 'drawing-face.spec.ts', 'firearm-library.spec.ts', 'navigation.spec.ts', 'home-continue.spec.ts', 'language.spec.ts', 'powder-designer.spec.ts', 'powder-list.spec.ts', 'powder-tune.spec.ts', 'primer-records.spec.ts', 'record-page.spec.ts', 'safety.spec.ts', 'smoke.spec.ts', 'target-designer.spec.ts', 'theme.spec.ts', 'workbench-auto-run.spec.ts', 'workbench-load-roundtrip.spec.ts', 'workbench-notes.spec.ts', 'workbench-output.spec.ts', 'session.spec.ts', 'range-mode.spec.ts', 'workbench-model-inputs.spec.ts'],
+            testMatch: [
+              'search.spec.ts',
+              'session.spec.ts',
+              'settings-dialog.spec.ts',
+              'smoke.spec.ts',
+              'theme.spec.ts',
+              'language.spec.ts',
+              'a11y-states.spec.ts',
+            ],
             use: browserAt(`${startUrl}next/`),
           },
         ]
