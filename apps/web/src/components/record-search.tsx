@@ -16,6 +16,7 @@ import { useTranslation } from '../i18n/language.ts'
 import type { Translator } from '../i18n/translate.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
 import type { ListOf } from '../lib/api-types.ts'
+import { useTypedBeforeHydration } from '../lib/use-typed-before-hydration.ts'
 
 type ApiKind = 'bullets' | 'cartridges' | 'powders'
 
@@ -128,6 +129,11 @@ function endSection({
   return chevron ? <Combobox.Chevron /> : undefined
 }
 
+/** Text typed into the prerendered search `name` before hydration becomes its query. */
+function useTypedQuery(name: string | undefined, setQ: (q: string) => void) {
+  useTypedBeforeHydration(name === undefined ? {} : { [name]: setQ })
+}
+
 /** Searches the API list of `kind` (`apiFetch`) 300 ms after the last keystroke, the previous request aborted; `find` gives the matches instead, without the pause; Enter with no match highlighted chooses the only one. */
 export function RecordSearch<T extends { id: string }>({
   kind,
@@ -148,6 +154,7 @@ export function RecordSearch<T extends { id: string }>({
   find,
   arrange,
   unavailable,
+  name,
 }: {
   label: string
   describe: (item: T) => string
@@ -175,6 +182,8 @@ export function RecordSearch<T extends { id: string }>({
   arrange?: ((items: T[]) => T[]) | undefined
   /** A match listed but not choosable, its reason in `describe`. */
   unavailable?: ((item: T) => boolean) | undefined
+  /** The input's name, unique on the page: text typed into the prerendered field before hydration becomes the search. */
+  name?: string | undefined
 } & (
   | { kind: ApiKind; find?: Find<T> }
   /** The matches of the typed text in place of the API search. */
@@ -182,6 +191,7 @@ export function RecordSearch<T extends { id: string }>({
 )) {
   const { t } = useTranslation()
   const [q, setQ] = useState('')
+  useTypedQuery(name, setQ)
   const [state, setState] = useState<State<T>>({ status: 'idle' })
   const combobox = useCombobox({ onDropdownClose: () => combobox.resetSelectedOption() })
 
@@ -250,6 +260,7 @@ export function RecordSearch<T extends { id: string }>({
             })}
             {...(chosen !== undefined &&
               !chevron && { leftSection: <Search size={16} aria-hidden="true" /> })}
+            {...(name !== undefined && { name })}
             autoComplete="off"
             value={q}
             rightSection={endSection({

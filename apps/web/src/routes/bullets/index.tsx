@@ -3,10 +3,11 @@ import { BulletList } from '../../components/bullet-list.tsx'
 import type { BulletSummary, CartridgeSummary } from '../../lib/api-types.ts'
 import { bulletListData } from '../../lib/list-page-data.ts'
 import { readCatalogue } from '../-data.ts'
-import { listHead, listSearch } from '../-list-route.ts'
+import { listHead } from '../-list-route.ts'
+import { searchOf } from '../-search.ts'
 
 export const Route = createFileRoute('/bullets/')({
-  validateSearch: listSearch,
+  validateSearch: searchOf(),
   loader: async () => {
     const c = await readCatalogue()
     return bulletListData(

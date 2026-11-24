@@ -8,12 +8,14 @@ import type {
 import type { MappingSummary } from '../../lib/face-disciplines.ts'
 import { disciplineListData } from '../../lib/list-page-data.ts'
 import { readCatalogue, readRecords } from '../-data.ts'
-import { listHead, listSearch } from '../-list-route.ts'
+import { listHead } from '../-list-route.ts'
+import { searchOf } from '../-search.ts'
 
 export const Route = createFileRoute('/disciplines/')({
-  validateSearch: listSearch,
+  validateSearch: searchOf(),
   // the loader reads one file per discipline: a revisit keeps the first load
   staleTime: Number.POSITIVE_INFINITY,
+  gcTime: Number.POSITIVE_INFINITY,
   loader: async () => {
     const c = await readCatalogue()
     return disciplineListData(

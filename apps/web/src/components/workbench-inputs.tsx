@@ -1483,6 +1483,7 @@ function CartridgePicker() {
         chevron
         key={searchKey}
         kind="cartridges"
+        name="cartridge-search"
         label={t('Search cartridges by name')}
         picked={!!(cartridge || cartridgeDesign)}
         chosen={

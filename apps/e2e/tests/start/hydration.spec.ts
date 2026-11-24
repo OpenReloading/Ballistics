@@ -19,7 +19,7 @@ const pages: { path: string; h1: Text; prerendered: boolean }[] = [
   { path: 'cartridges/308-win/', h1: '308 Win.', prerendered: true },
   {
     path: 'bullets/demo-bullet-150/',
-    h1: '30 Cal 150 gr Flat Base Demo',
+    h1: 'Demo Bullets 30 Cal 150 gr Flat Base Demo',
     prerendered: true,
   },
   {
@@ -115,13 +115,14 @@ test('text typed before hydration stays in the field', async ({ page }) => {
     await route.continue()
   })
   await page.goto('next/workbench/', { waitUntil: 'commit' })
-  const notes = page.getByRole('textbox', { name: 'Notes' })
+  // a new load shows the start card, whose one text field is the cartridge search
+  const search = page.getByLabel('Search cartridges by name', { exact: true })
   // focus and keys, not a click: in WebKit the field is never stable for a click while the scripts are held
-  await notes.focus()
-  await page.keyboard.type('42 grains')
+  await search.focus()
+  await page.keyboard.type('308')
   await expect(page.locator('html[data-hydrated]')).not.toBeAttached()
   release()
   await expect(page.locator('html[data-hydrated]')).toBeAttached()
-  await expect(notes).toHaveValue('42 grains')
-  await expect(notes).toBeFocused()
+  await expect(search).toHaveValue('308')
+  await expect(search).toBeFocused()
 })

@@ -13,17 +13,11 @@ msgstr "Brass"
 msgid "page.casesEditor"
 msgstr "Brass group"
 
-msgid "record.bullets"
-msgstr "Bullet"
-
 msgid "page.bulletsDesigner"
 msgstr "Bullet designer"
 
 msgid "page.bullets"
 msgstr "Bullets"
-
-msgid "record.cartridges"
-msgstr "Cartridge"
 
 msgid "page.cartridgesDesigner"
 msgstr "Cartridge designer"
@@ -31,23 +25,14 @@ msgstr "Cartridge designer"
 msgid "page.cartridges"
 msgstr "Cartridges"
 
-msgid "record.cases"
-msgstr "Case"
-
 msgid "page.bulletsCompare"
 msgstr "Compare bullets"
 
 msgid "page.events"
 msgstr "Competition events"
 
-msgid "record.disciplines"
-msgstr "Discipline"
-
 msgid "page.disciplines"
 msgstr "Disciplines"
-
-msgid "record.federations"
-msgstr "Federation"
 
 msgid "page.federations"
 msgstr "Federations"
@@ -58,14 +43,8 @@ msgstr "Firearms"
 msgid "page.workbench"
 msgstr "Load workbench"
 
-msgid "workbench.notes"
-msgstr "Notes"
-
 msgid "page.offline"
 msgstr "Offline"
-
-msgid "record.powders"
-msgstr "Powder"
 
 msgid "page.powdersBurnRates"
 msgstr "Powder burn rates"
@@ -75,9 +54,6 @@ msgstr "Powder designer"
 
 msgid "page.powders"
 msgstr "Powders"
-
-msgid "record.primers"
-msgstr "Primer"
 
 msgid "page.primers"
 msgstr "Primers"
@@ -93,9 +69,6 @@ msgstr "Shooting log"
 
 msgid "page.groups"
 msgstr "Shot groups"
-
-msgid "record.targets"
-msgstr "Target"
 
 msgid "page.targetsDesigner"
 msgstr "Target designer"

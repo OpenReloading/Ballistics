@@ -82,6 +82,12 @@ export default defineConfig(({ command }) => {
       nextSeam,
       appManifest(base),
       tanstackStart({
+        // Start preloads every chunk of a route file: a not-found chunk of its own goes unused on a found record, which WebKit warns about
+        router: {
+          codeSplittingOptions: {
+            defaultBehavior: [['component', 'notFoundComponent'], ['errorComponent']],
+          },
+        },
         // no link's path, so the shell marks none as the current page
         spa: { enabled: true, maskPath: '/_shell' },
         prerender: {
