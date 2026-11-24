@@ -1,19 +1,23 @@
 import { z } from 'zod'
 
-/** The address's query as strings, the first of a repeated key: the lists read it with `URLSearchParams`, as the Next pages do, so `6.50` and `1e3` stay as typed. */
-export function parseSearch(search: string): Record<string, string> {
-  const read: Record<string, string> = {}
-  for (const [key, value] of new URLSearchParams(search)) read[key] ??= value
+/** The address's query as strings, a repeated key as all its values: the views read it with `URLSearchParams`, as the Next pages do, so `6.50` and `1e3` stay as typed. */
+export function parseSearch(search: string): Record<string, string | string[]> {
+  const read: Record<string, string | string[]> = Object.create(null)
+  for (const [key, value] of new URLSearchParams(search)) {
+    const seen = read[key]
+    read[key] = seen === undefined ? value : [...(Array.isArray(seen) ? seen : [seen]), value]
+  }
   return read
 }
 
-/** The query `parseSearch` read, written with `URLSearchParams` as `writeDirectory` does; empty without a key. */
+/** The query `parseSearch` read, written as `writeDirectory` writes it: each value of an array as its own key, `,` and `/` as typed; empty without a key. */
 export function stringifySearch(search: Record<string, unknown>): string {
   const p = new URLSearchParams()
   for (const [key, value] of Object.entries(search)) {
-    if (value !== undefined) p.append(key, String(value))
+    for (const v of Array.isArray(value) ? value : [value])
+      if (v !== undefined) p.append(key, String(v))
   }
-  const written = p.toString()
+  const written = p.toString().replaceAll('%2C', ',').replaceAll('%2F', '/')
   return written ? `?${written}` : ''
 }
 
