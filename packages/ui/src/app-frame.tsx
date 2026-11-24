@@ -3,7 +3,14 @@
 import { useLingui } from '@lingui/react'
 import { AppShell, Burger, Drawer, Group } from '@mantine/core'
 import { useDisclosure, useMediaQuery } from '@mantine/hooks'
-import { type MouseEvent, type ReactElement, type ReactNode, useEffect } from 'react'
+import {
+  type MouseEvent,
+  type ReactElement,
+  type ReactNode,
+  type RefObject,
+  useEffect,
+  useRef,
+} from 'react'
 
 export interface AppFrameProps {
   /** The product's name or mark, as a link home. */
@@ -35,12 +42,7 @@ export function AppFrame({
     navigation: i18n._({ id: 'ui.frame.navigation', message: 'Main' }),
     close: i18n._({ id: 'ui.frame.close', message: 'Close navigation' }),
   }
-  const [opened, { toggle, close }] = useDisclosure(false)
-  // the drawer is only hidden from 75em: left open there, its focus trap and scroll lock would stay
-  const wide = useMediaQuery('(width >= 75em)')
-  useEffect(() => {
-    if (wide) close()
-  }, [wide, close])
+  const { opened, toggle, close, menuButton } = useNavDrawer()
   return (
     <AppShell
       header={{ height: { base: 52, lg: 56 } }}
@@ -53,6 +55,7 @@ export function AppFrame({
         account={account}
         opened={opened}
         toggle={toggle}
+        menuButton={menuButton}
         menu={labels.menu}
       />
       {/* hidden below 75em, where the drawer holds the links: one navigation in the tree at any width */}
@@ -65,11 +68,24 @@ export function AppFrame({
         opened={opened}
         close={close}
         labels={labels}
+        menuButton={menuButton}
         {...(onDrawerClosed && { onClosed: onDrawerClosed })}
       />
       <AppShell.Main>{children}</AppShell.Main>
     </AppShell>
   )
+}
+
+/** Whether the drawer is open, closed from 75em, and the menu button that opens it. */
+function useNavDrawer() {
+  const [opened, { toggle, close }] = useDisclosure(false)
+  const menuButton = useRef<HTMLButtonElement>(null)
+  // the drawer is only hidden from 75em: left open there, its focus trap and scroll lock would stay
+  const wide = useMediaQuery('(width >= 75em)')
+  useEffect(() => {
+    if (wide) close()
+  }, [wide, close])
+  return { opened, toggle, close, menuButton }
 }
 
 /** The top bar: the menu button below 75em, the brand, and the actions at its end. */
@@ -79,16 +95,19 @@ function TopBar({
   account,
   opened,
   toggle,
+  menuButton,
   menu,
 }: Pick<AppFrameProps, 'brand' | 'end' | 'account'> & {
   opened: boolean
   toggle: () => void
+  menuButton: RefObject<HTMLButtonElement | null>
   menu: string
 }): ReactElement {
   return (
     <AppShell.Header px="md">
       <Group h="100%" wrap="nowrap" gap="sm">
         <Burger
+          ref={menuButton}
           hiddenFrom="lg"
           size="sm"
           className="ui-frame-button"
@@ -107,6 +126,17 @@ function TopBar({
   )
 }
 
+// the focus moves as Mantine's return moves it, only when lost or still in the drawer: with motion the exit ends after a user may have moved it on
+function afterExit(
+  menuButton: HTMLElement | null,
+  content: HTMLElement | null,
+  onClosed: () => void,
+) {
+  const active = document.activeElement
+  if (!active || active === document.body || content?.contains(active)) menuButton?.focus()
+  onClosed()
+}
+
 /** The main navigation below 75em, in a drawer the menu button opens. */
 function NavDrawer({
   brand,
@@ -114,11 +144,13 @@ function NavDrawer({
   opened,
   close,
   onClosed,
+  menuButton,
   labels,
 }: Pick<AppFrameProps, 'brand' | 'navigation'> & {
   opened: boolean
   close: () => void
   onClosed?: () => void
+  menuButton: RefObject<HTMLButtonElement | null>
   labels: { navigation: string; close: string }
 }): ReactElement {
   // a followed link in the drawer (the brand's too) closes it, also when a router changes the page without a reload, and so does a control opening a dialog
@@ -126,6 +158,7 @@ function NavDrawer({
     if (event.target instanceof Element && event.target.closest('a, [aria-haspopup="dialog"]'))
       close()
   }
+  const content = useRef<HTMLDivElement>(null)
   return (
     // Mantine's drawer traps the focus, closes on Escape and gives the focus back to the menu button
     <Drawer.Root
@@ -133,10 +166,13 @@ function NavDrawer({
       onClose={close}
       size="xs"
       hiddenFrom="lg"
-      {...(onClosed && { onExitTransitionEnd: onClosed })}
+      {...(onClosed && {
+        // under reduced motion the drawer leaves before Mantine gives the focus back, and a dialog opened then would return it to the body
+        onExitTransitionEnd: () => afterExit(menuButton.current, content.current, onClosed),
+      })}
     >
       <Drawer.Overlay />
-      <Drawer.Content aria-label={labels.navigation} onClick={closeOnLink}>
+      <Drawer.Content ref={content} aria-label={labels.navigation} onClick={closeOnLink}>
         {/* a div: a second <header> outside the top bar would be another banner landmark */}
         <Drawer.Header component="div">
           {brand}
