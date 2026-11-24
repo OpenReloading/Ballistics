@@ -194,8 +194,11 @@ it('refuses a policy whose lists are no lists of text or name no npm package', (
     'allow-licenses must be a list of strings',
   )
   expect(() =>
-    readPolicy('allow-licenses: [MIT]\nallow-dependencies-licenses: [pkg:pypi/a]\n'),
-  ).toThrow('pkg:pypi/a: only pkg:npm/ entries')
+    readPolicy('allow-licenses: [MIT]\nallow-dependencies-licenses: [pkg:maven/a]\n'),
+  ).toThrow('pkg:maven/a: only pkg:npm/ and pkg:pypi/ entries')
+  expect(
+    readPolicy('allow-licenses: [MIT]\nallow-dependencies-licenses: [pkg:pypi/a]\n').excepted,
+  ).toEqual(new Set())
 })
 
 it('takes a reason comment without a space after the hash, and reads no comment line as an entry', () => {

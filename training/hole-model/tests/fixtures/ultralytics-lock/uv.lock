@@ -1,0 +1,13 @@
+version = 1
+requires-python = "==3.13.*"
+
+[[package]]
+name = "hole-model"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [{ name = "ultralytics" }]
+
+[[package]]
+name = "ultralytics"
+version = "8.3.0"
+source = { registry = "https://pypi.org/simple" }
