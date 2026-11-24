@@ -12,3 +12,39 @@ html:root {
     --mantine-primary-color-contrast: var(--mantine-color-white);
   }
 }
+
+/* the Next shell has no frame padding: the page container pads the page */
+.page-shell .mantine-AppShell-main {
+  --app-shell-padding: 0rem;
+}
+
+/* the page container is the Next layout's main (.page-top > main in globals.css): window-high from 62em on a framed route, unpadded in print */
+@media screen and (width >= 62em) {
+  .page-shell[data-frame] #main {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: calc(100dvh - var(--app-shell-header-offset, 0rem));
+    padding-bottom: var(--space-xs);
+  }
+}
+
+/* the bar is out of the flow from 75em: an unframed page starts one step below the top bar's rule, as .page-top > main does in globals.css; a Database page starts with its tab strip at the rule */
+@media screen and (width >= 75em) {
+  .page-shell:not([data-frame]) #main::before {
+    display: block;
+    margin-bottom: var(--space-xs);
+    content: "";
+  }
+
+  .page-shell:not([data-frame]) #main:has(> .library-tabs)::before {
+    display: none;
+  }
+}
+
+@media print {
+  #main {
+    max-width: none;
+    padding: 0;
+  }
+}

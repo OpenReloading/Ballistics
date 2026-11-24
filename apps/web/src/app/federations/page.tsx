@@ -4,7 +4,7 @@ import { FederationList } from '../../components/discipline-list.tsx'
 import { PageBar } from '../../components/page-bar.tsx'
 import { ListLoading, ServerDataError } from '../../components/states.tsx'
 import { listDisciplines, listFederations } from '../../lib/api.ts'
-import { federationRow } from '../../lib/disciplines.ts'
+import { federationListData } from '../../lib/list-page-data.ts'
 import { listTitles } from '../../lib/list-titles.ts'
 
 export const metadata: Metadata = {
@@ -22,7 +22,7 @@ async function Federations() {
         <ServerDataError what="Federation" />
       </>
     )
-  return <FederationList items={list.data.map((f) => federationRow(f, disciplines.data))} />
+  return <FederationList {...federationListData(list.data, disciplines.data)} />
 }
 
 export default function FederationsPage() {

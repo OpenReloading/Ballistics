@@ -1,4 +1,24 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { PlaceholderPage } from '../-placeholder.tsx'
+import { PowderList } from '../../components/powder-list.tsx'
+import type { PowderSummary } from '../../lib/api-types.ts'
+import { powderListData } from '../../lib/list-page-data.ts'
+import { readCatalogue } from '../-data.ts'
+import { listHead, listSearch } from '../-list-route.ts'
 
-export const Route = createFileRoute('/powders/')({ component: PlaceholderPage })
+export const Route = createFileRoute('/powders/')({
+  validateSearch: listSearch,
+  loader: async () => {
+    const c = await readCatalogue()
+    return powderListData(c.powders().items as PowderSummary[], c.manufacturers().items)
+  },
+  head: () =>
+    listHead(
+      'Powders',
+      'Propellants with form, base and a burn-rate order from fitted model parameters; each powder page lists the recorded properties with their sources.',
+    ),
+  component: PowdersPage,
+})
+
+function PowdersPage() {
+  return <PowderList {...Route.useLoaderData()} />
+}
