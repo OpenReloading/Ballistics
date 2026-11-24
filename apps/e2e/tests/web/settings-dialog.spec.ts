@@ -38,7 +38,7 @@ for (const path of ['/cartridges/308-win', '/firearms'])
     await page.goto(`.${path}`)
     // the page behind keeps its place and width (its height follows content loaded after mounting)
     const place = () =>
-      page.locator('main#main').evaluate((m) => {
+      page.locator('#main').evaluate((m) => {
         const r = m.getBoundingClientRect()
         return [r.left, r.top, r.width]
       })

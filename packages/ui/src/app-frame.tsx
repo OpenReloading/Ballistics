@@ -151,7 +151,7 @@ function NavDrawer({
   close: () => void
   onClosed?: () => void
   menuButton: RefObject<HTMLButtonElement | null>
-  labels: { navigation: string; close: string }
+  labels: { menu: string; navigation: string; close: string }
 }): ReactElement {
   // a followed link in the drawer (the brand's too) closes it, also when a router changes the page without a reload, and so does a control opening a dialog
   const closeOnLink = (event: MouseEvent) => {
@@ -172,7 +172,8 @@ function NavDrawer({
       })}
     >
       <Drawer.Overlay />
-      <Drawer.Content ref={content} aria-label={labels.navigation} onClick={closeOnLink}>
+      {/* named as the menu button that opens it; the navigation inside keeps the landmark's name */}
+      <Drawer.Content ref={content} aria-label={labels.menu} onClick={closeOnLink}>
         {/* a div: a second <header> outside the top bar would be another banner landmark */}
         <Drawer.Header component="div">
           {brand}

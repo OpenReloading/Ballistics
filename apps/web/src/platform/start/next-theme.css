@@ -4,11 +4,13 @@ html:root {
   --mantine-font-family-headings: var(--font-ui), system-ui, sans-serif;
 }
 
-/* filled controls of the dark scheme at Mantine's blue 8 with white text (primaryShade 8), not the tokens' dark accent; print keeps the light one */
+/* filled controls of the dark scheme at Mantine's shade 8 with white text (primaryShade 8), not the tokens' dark accent; print keeps the light one */
 @media screen {
   html:root[data-mantine-color-scheme="dark"] {
     --mantine-color-blue-filled: var(--mantine-color-blue-8);
     --mantine-color-blue-filled-hover: var(--mantine-color-blue-9);
+    --mantine-color-red-filled: var(--mantine-color-red-8);
+    --mantine-color-red-filled-hover: var(--mantine-color-red-9);
     --mantine-primary-color-contrast: var(--mantine-color-white);
   }
 }
@@ -78,5 +80,38 @@ html:root {
   /* as .page-main in globals.css: a window-high main printed an empty second page after a one-page record */
   .page-shell .mantine-AppShell-main {
     min-height: 0;
+  }
+}
+
+/* the navigation's lists per section, and its rows as 44 px targets as .drawer-nav in globals.css gives them (WCAG 2.5.5) */
+.nav-section {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+nav :is(.mantine-NavLink-root, .ui-nav-item) {
+  min-height: 44px;
+}
+
+/* Search and Settings open dialogs: buttons in the page links' look */
+button.ui-nav-item {
+  width: 100%;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  line-height: inherit;
+  cursor: pointer;
+}
+
+/* from 75em the sidebar keeps the section titles for screen readers only, as the Next rail does; a media query, not a class set after hydration, which moved the links below them */
+@media (width >= 75em) {
+  .nav-section-title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 }

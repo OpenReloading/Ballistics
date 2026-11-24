@@ -434,8 +434,7 @@ jobs:
     # the plan of `e2e`: a failed `changes` job still runs it
     if: ${{ !cancelled() && needs.changes.outputs.e2e != 'false' }}
     runs-on: ubuntu-latest
-    # about ten times its run of 1 to 2 minutes; raise it as the parity list grows
-    timeout-minutes: 15
+    timeout-minutes: 30
     permissions:
       contents: read
     env:

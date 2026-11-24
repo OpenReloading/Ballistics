@@ -188,7 +188,7 @@ test('prints the summary and every chart without the import strip', async ({ pag
   await expect(page.locator('.session-import')).toBeHidden()
   await expect(page.getByRole('tablist')).toBeHidden()
   await expect(stats(page)).toBeVisible()
-  const main = page.locator('main#main')
+  const main = page.locator('#main')
   for (const name of ['String 1: Example A', 'String 2: Example B', 'String 3: Example C']) {
     const chart = page.getByRole('img', { name: `Velocity per shot, ${name}` })
     await expect(chart).toBeVisible()
