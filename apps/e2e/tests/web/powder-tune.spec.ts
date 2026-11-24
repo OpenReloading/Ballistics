@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
+import { defined } from '../../../web/test/defined.ts'
 import { problems } from './a11y.ts'
 import { gotoHydrated } from './nav.ts'
 import { openFit } from './powder-tune-run.ts'
@@ -235,6 +236,34 @@ const savedLadder = [
     },
   },
 ]
+
+test('the route opens every session the address names, and a reload keeps them all', async ({
+  page,
+}) => {
+  const ladder = defined(savedLadder[0])
+  const secondId = '5e3f6a0b-1c8d-4f4e-a03b-9c522d7b9c40'
+  const second = {
+    ...ladder,
+    id: secondId,
+    name: 'Ladder 2',
+    data: {
+      ...ladder.data,
+      strings: [
+        {
+          variation: { kind: 'charge', value: { value: 2.6 } },
+          shots: [{ velocity: { value: 812 } }, { velocity: { value: 816 } }],
+        },
+      ],
+    },
+  }
+  await gotoHydrated(page, '/powders/tune')
+  await putRecords(page, [ladder, second])
+  await gotoHydrated(page, `/powders/tune?session=${sessionId}&session=${secondId}`)
+  await expect(table(page).locator('tbody tr')).toHaveCount(2)
+  await page.reload()
+  await expect(table(page).locator('tbody tr')).toHaveCount(2)
+  expect(new URL(page.url()).searchParams.getAll('session')).toEqual([sessionId, secondId])
+})
 
 test('the powder record links to the tuning route, whose powder select lists the saved loads of each powder', async ({
   page,

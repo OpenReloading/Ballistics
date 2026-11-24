@@ -92,6 +92,7 @@ export const nextParity: readonly { file: string; titles?: readonly string[] }[]
     titles: [
       'the powder designer links to the tuning route, where strings typed without a load say why there is no fit',
       'a saved powder design opens the route with the saved loads that use it',
+      'the route opens every session the address names, and a reload keeps them all',
     ],
   },
   {

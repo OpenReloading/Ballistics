@@ -1,9 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { PowderDesignerLoader } from '../../components/powder-designer-loader.tsx'
-import { listHead, listSearch } from '../-list-route.ts'
+import { listHead } from '../-list-route.ts'
+import { searchOf } from '../-search.ts'
 
 export const Route = createFileRoute('/powders/designer')({
-  validateSearch: listSearch,
+  validateSearch: searchOf('record'),
   head: () =>
     listHead(
       'Powder designer',

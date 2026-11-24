@@ -1,9 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { CaseGroupEditor } from '../../components/case-group-editor.tsx'
-import { listHead, listSearch } from '../-list-route.ts'
+import { listHead } from '../-list-route.ts'
+import { searchOf } from '../-search.ts'
 
 export const Route = createFileRoute('/cases/editor')({
-  validateSearch: listSearch,
+  validateSearch: searchOf('record'),
   head: () =>
     listHead(
       'Brass group',

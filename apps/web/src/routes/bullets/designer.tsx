@@ -1,9 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { BulletDesignerLoader } from '../../components/bullet-designer-loader.tsx'
-import { listHead, listSearch } from '../-list-route.ts'
+import { listHead } from '../-list-route.ts'
+import { searchOf } from '../-search.ts'
 
 export const Route = createFileRoute('/bullets/designer')({
-  validateSearch: listSearch,
+  validateSearch: searchOf('from', 'record'),
   head: () =>
     listHead(
       'Bullet designer',

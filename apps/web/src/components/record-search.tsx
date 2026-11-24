@@ -191,7 +191,12 @@ export function RecordSearch<T extends { id: string }>({
 )) {
   const { t } = useTranslation()
   const [q, setQ] = useState('')
-  useTypedQuery(name, setQ)
+  // a query typed before hydration has no change event to open the list, so its matches open it
+  const typedEarly = useRef(false)
+  useTypedQuery(name, (text) => {
+    typedEarly.current = text.trim().length >= 2
+    setQ(text)
+  })
   const [state, setState] = useState<State<T>>({ status: 'idle' })
   const combobox = useCombobox({ onDropdownClose: () => combobox.resetSelectedOption() })
 
@@ -231,6 +236,12 @@ export function RecordSearch<T extends { id: string }>({
       controller.abort()
     }
   }, [q, kind, params, find, arranging])
+
+  useEffect(() => {
+    if (!typedEarly.current || state.status !== 'ok') return
+    typedEarly.current = false
+    combobox.openDropdown()
+  }, [state, combobox])
 
   const found = arranged(state, arrange)
   const items = found.status === 'ok' ? found.items : []

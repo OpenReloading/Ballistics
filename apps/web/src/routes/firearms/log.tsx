@@ -1,9 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { ShootingLog } from '../../components/shooting-log.tsx'
-import { listHead, listSearch } from '../-list-route.ts'
+import { listHead } from '../-list-route.ts'
+import { searchOf } from '../-search.ts'
 
 export const Route = createFileRoute('/firearms/log')({
-  validateSearch: listSearch,
+  validateSearch: searchOf('record', 'firearm', 'year'),
   head: () =>
     listHead(
       'Shooting log',

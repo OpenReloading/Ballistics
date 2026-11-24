@@ -1,9 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { CartridgeDesignerLoader } from '../../components/cartridge-designer-loader.tsx'
-import { listHead, listSearch } from '../-list-route.ts'
+import { listHead } from '../-list-route.ts'
+import { searchOf } from '../-search.ts'
 
 export const Route = createFileRoute('/cartridges/designer')({
-  validateSearch: listSearch,
+  validateSearch: searchOf('from', 'record'),
   head: () =>
     listHead(
       'Cartridge designer',

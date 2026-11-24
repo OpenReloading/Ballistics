@@ -1,9 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { PowderTuneLoader } from '../../components/powder-tune-loader.tsx'
-import { listHead, listSearch } from '../-list-route.ts'
+import { listHead } from '../-list-route.ts'
+import { searchOf } from '../-search.ts'
 
 export const Route = createFileRoute('/powders/tune')({
-  validateSearch: listSearch,
+  validateSearch: searchOf('powder', 'session'),
   head: () =>
     listHead(
       'Tune a powder',
