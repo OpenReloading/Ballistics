@@ -29,33 +29,6 @@ html:root {
   }
 }
 
-/* the workbench below 48em with the readout bar, as .page-top:has(.workbench > .workspace-bar) in globals.css: the page fills the window and the inputs scroll on their own above the bar */
-@media screen and (width < 48em) {
-  .page-shell #main:has(.workbench > .workspace-bar) {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: calc(100dvh - var(--app-shell-header-offset, 0rem));
-  }
-
-  .page-shell #main:has(.workbench > .workspace-bar) :is(.workspace, .workspace-tabs) {
-    display: flex;
-    flex: 1 1 0;
-    flex-direction: column;
-    min-height: 0;
-  }
-
-  .page-shell #main:has(.workbench > .workspace-bar) :is(.workspace-inputs, .workspace-results) {
-    flex: 1 1 0;
-    min-height: 0;
-    overflow-y: auto;
-  }
-
-  .page-shell #main:has(.workbench > .workspace-bar) .workspace-bar {
-    position: static;
-  }
-}
-
 /* the bar is out of the flow from 75em: an unframed page starts one step below the top bar's rule, as .page-top > main does in globals.css; a Database page starts with its tab strip at the rule */
 @media screen and (width >= 75em) {
   .page-shell:not([data-frame]) #main::before {

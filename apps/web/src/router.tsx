@@ -6,7 +6,7 @@ import { routeTree } from './routeTree.gen.ts'
 export function getRouter() {
   return createRouter({
     routeTree,
-    // the default JSON search turns `?q=6.50` into `6.5` in an in-app link's `href` and in `searchStr`
+    // the default JSON search turns `?q=6.50` into `?q=6.5` in the address on load
     parseSearch,
     stringifySearch,
     trailingSlash: 'always',

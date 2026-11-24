@@ -15,7 +15,6 @@ export const Route = createFileRoute('/disciplines/')({
   validateSearch: searchOf(),
   // the loader reads one file per discipline: a revisit keeps the first load
   staleTime: Number.POSITIVE_INFINITY,
-  gcTime: Number.POSITIVE_INFINITY,
   loader: async () => {
     const c = await readCatalogue()
     return disciplineListData(

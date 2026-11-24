@@ -12,7 +12,6 @@ export const Route = createFileRoute('/targets/')({
   validateSearch: searchOf(),
   // the loader reads one file per target face: a revisit keeps the first load
   staleTime: Number.POSITIVE_INFINITY,
-  gcTime: Number.POSITIVE_INFINITY,
   loader: async () => {
     const c = await readCatalogue()
     return targetListData(
