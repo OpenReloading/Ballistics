@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { editions, listen, unexplained } from './console.ts'
+import { editions, listen, unexplained, unexplainedMiss } from './console.ts'
 
 type Text = string | { en: string; de: string }
 
@@ -69,9 +69,10 @@ for (const { name, base, prefix } of editions)
         await page.waitForLoadState('networkidle')
         // the fallback's title is "Page not found"; the app's titles end in its name
         await expect(page).toHaveTitle(/RangeFoundry Workbench$/)
-        // the splat route instead of the root's notFoundComponent removes #418 in Chromium only
-        if (p.prerendered || (browserName === 'chromium' && p.path === 'no-such-page/'))
-          expect(messages).toEqual([])
+        // the splat route hydrates the shell's empty boundary as an empty boundary, so the unknown path allows no #418
+        if (p.prerendered) expect(messages).toEqual([])
+        else if (p.path === 'no-such-page/')
+          expect(unexplainedMiss(messages, browserName, name)).toEqual([])
         else expect(unexplained(messages, browserName, name)).toEqual([])
       })
 
