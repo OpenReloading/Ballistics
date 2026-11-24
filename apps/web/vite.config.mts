@@ -74,6 +74,8 @@ export default defineConfig(({ command }) => {
       ]),
     ),
     resolve: { alias: { '@': path.join(import.meta.dirname, 'src') } },
+    // the prerender fetches its preview server: on `localhost` that binds ::1 alone, and a blocked event loop makes fetch fall back to 127.0.0.1
+    preview: { host: '127.0.0.1' },
     // Start's prerender imports server.js; Vite names it .mjs in a package without "type": "module"
     environments: {
       ssr: { build: { rolldownOptions: { output: { entryFileNames: '[name].js' } } } },
