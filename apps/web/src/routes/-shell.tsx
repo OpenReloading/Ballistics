@@ -72,7 +72,7 @@ function DialogRow({
   )
 }
 
-/** Search, the pages of every section in a list named by the section with the current one marked, and Settings, as the sidebar of the Next app has them; in the drawer below 75em also Report an issue, the docs and the repository, which the top bar shows from 75em. */
+/** Search, the pages of every section in a list named by the section with the current one marked, Settings and the docs, as the sidebar of the Next app has them; in the drawer below 75em also Report an issue and the repository, which the top bar shows from 75em. */
 function Navigation({
   route,
   afterDrawer,
@@ -86,6 +86,8 @@ function Navigation({
   const { t } = useTranslation()
   const openSettings = useContext(SettingsDialog)
   const id = useId()
+  // the sidebar leaves the section titles to screen readers, as the Next app's rail does
+  const wide = useMediaQuery('(width >= 75em)')
   return (
     <>
       <DialogRow
@@ -97,7 +99,15 @@ function Navigation({
       />
       {sections.map((section, i) => (
         <div key={section.title}>
-          <Text id={`${id}-${i}`} size="xs" fw={500} c="dimmed" mt="xs" mb={4}>
+          <Text
+            id={`${id}-${i}`}
+            size="xs"
+            fw={500}
+            c="dimmed"
+            mt="xs"
+            mb={4}
+            className={wide ? 'visually-hidden' : undefined}
+          >
             {t(section.title)}
           </Text>
           <ul aria-labelledby={`${id}-${i}`} className="nav-section">
@@ -124,14 +134,16 @@ function Navigation({
       />
       <Box hiddenFrom="lg">
         <ReportIssueButton url={repository} drawer onOpen={() => afterDrawer(onReport)} />
-        <DocsLink url={docs} drawer />
+      </Box>
+      <DocsLink url={docs} drawer />
+      <Box hiddenFrom="lg">
         <RepositoryLink url={repository} drawer />
       </Box>
     </>
   )
 }
 
-/** Install, Safety, Report an issue, the docs, the repository and the theme, as the Next app's header offers them, and the search that Search, Ctrl+K and the home page's field open. */
+/** Install, Safety, Report an issue, the repository and the theme, as the Next app's header offers them, and the search that Search, Ctrl+K and the home page's field open. */
 function BarEnd({ route, onReport }: { route: string; onReport: () => void }) {
   // each request opens the site search; the workbench opens its own (`searchHost`)
   const [searches, setSearches] = useState(0)
@@ -154,9 +166,6 @@ function BarEnd({ route, onReport }: { route: string; onReport: () => void }) {
       </div>
       <SafetyBarButton iconOnly />
       <ReportIssueButton url={repository} onOpen={onReport} />
-      <Box visibleFrom="lg">
-        <DocsLink url={docs} />
-      </Box>
       <RepositoryLink url={repository} />
       <ThemeSwitch />
       {searches > 0 && (
