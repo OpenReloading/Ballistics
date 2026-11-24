@@ -1,8 +1,4 @@
-/* The interface base's styles: import this file once, a Vite build resolves the package imports */
-@import "@mantine/core/styles.css";
-@import "@rangefoundry/design-tokens/tokens.css";
-@import "@rangefoundry/design-tokens/mantine-print.css";
-@import "@fontsource-variable/inter";
+/* The interface base's own styles: import this file once, after base.css or the surface's own Mantine styles, tokens and font */
 
 /* Control heights from the size tokens, which are 44 px under a coarse pointer: rows (xs), bars (sm) and the dense
    field of property grids (size="field", 24 px). Mantine sets these on each control, so they are set there too. */

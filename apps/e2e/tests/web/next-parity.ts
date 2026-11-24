@@ -7,4 +7,36 @@ export const nextParity: readonly { file: string; titles?: readonly string[] }[]
       'a record id the catalogue does not hold, as after its removal, answers 404 with the not-found page',
     ],
   },
+  {
+    file: 'home-continue.spec.ts',
+    titles: [
+      'at 1280 x 650 the Continue line moves nothing, with saved loads',
+      'at 1280 x 650 the Continue line moves nothing, without saved loads',
+      'at 390 x 844 the Continue line moves nothing, with saved loads',
+      'at 390 x 844 the Continue line moves nothing, without saved loads',
+      'at 1280 x 650 the keyboard order of the home page equals its visual order',
+      'at 390 x 844 the keyboard order of the home page equals its visual order',
+    ],
+  },
+  { file: 'offline-page.spec.ts' },
+  {
+    file: 'safety.spec.ts',
+    titles: [
+      'an acceptance of the earlier Safety text asks again',
+      'Decline leaves the site for the empty page, naming no other site',
+      'at 390 x 640 I accept and Decline are in view without scrolling',
+    ],
+  },
+  { file: 'smoke.spec.ts', titles: ['/ answers 200, shows its h1 and logs no error'] },
+  {
+    file: 'theme.spec.ts',
+    titles: [
+      'with nothing stored the system setting decides',
+      'the switch overrides the system setting and the choice survives a reload',
+      'a stored dark applies before the first paint',
+      'the switch is reachable by keyboard and exposes its name and pressed state',
+      'the header shows the light wordmark as the home link',
+      'the header shows the dark wordmark as the home link',
+    ],
+  },
 ]

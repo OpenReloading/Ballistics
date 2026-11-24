@@ -1,5 +1,5 @@
 import { createRouter } from '@tanstack/react-router'
-import { LoadFailedPage } from './routes/-not-found.tsx'
+import { PageError } from './routes/-error.tsx'
 import { routeTree } from './routeTree.gen.ts'
 
 export function getRouter() {
@@ -7,7 +7,7 @@ export function getRouter() {
     routeTree,
     trailingSlash: 'always',
     scrollRestoration: true,
-    defaultErrorComponent: LoadFailedPage,
+    defaultErrorComponent: PageError,
   })
 }
 

@@ -1,6 +1,7 @@
 import { ActionIcon, Anchor, Button, Stack, Text } from '@mantine/core'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Calculator, Library, Printer, Settings, Target } from 'lucide-react'
+import { useState } from 'react'
 import { expect, waitFor, within } from 'storybook/test'
 import { AppFrame, NavItem, PageBar } from '../src/index.ts'
 
@@ -74,5 +75,37 @@ export const Frame: Story = {
     await userEvent.click(menu)
     await userEvent.click(await page.findByRole('link', { name: 'Groups' }))
     await closed()
+  },
+}
+
+function DialogOpener() {
+  const [closed, setClosed] = useState(0)
+  return (
+    <AppFrame
+      brand={
+        <Anchor href="#" fw={650}>
+          Ballistics
+        </Anchor>
+      }
+      navigation={<Button aria-haspopup="dialog">Report an issue</Button>}
+      onDrawerClosed={() => setClosed((count) => count + 1)}
+    >
+      <Text>{`Drawer closed ${closed} times`}</Text>
+    </AppFrame>
+  )
+}
+
+/** A control that opens a dialog closes the drawer first, runs `onDrawerClosed` once after it left, and the menu button gets the focus. */
+export const DrawerDialogControl: Story = {
+  render: () => <DialogOpener />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    if (matchMedia('(width >= 75em)').matches) return
+    const page = within(canvasElement.ownerDocument.body)
+    const menu = canvas.getByRole('button', { name: 'Navigation' })
+    await userEvent.click(menu)
+    await userEvent.click(await page.findByRole('button', { name: 'Report an issue' }))
+    await waitFor(() => expect(page.queryByRole('dialog')).toBeNull(), { timeout: 3000 })
+    await expect(await canvas.findByText('Drawer closed 1 times')).toBeVisible()
+    await expect(menu).toHaveFocus()
   },
 }

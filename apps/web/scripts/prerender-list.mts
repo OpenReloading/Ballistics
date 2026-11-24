@@ -35,6 +35,12 @@ if (import.meta.main) {
     rmSync(at('public/api'), { recursive: true, force: true })
     await writeStaticApi(api.data, at('public/api'))
     const paths = recordPaths(api.data.index, process.env)
+    // the home page's record count per list, so it fetches no whole index
+    const counts = recordRoutes.map(([route, list]) => [`/${route}`, api.data.index[list].length])
+    writeFileSync(
+      at('public/api/catalogue/counts.json'),
+      JSON.stringify(Object.fromEntries(counts)),
+    )
     mkdirSync(at('dist'), { recursive: true })
     writeFileSync(at('dist/prerender.json'), JSON.stringify(paths))
   } finally {

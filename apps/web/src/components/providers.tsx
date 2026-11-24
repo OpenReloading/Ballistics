@@ -24,7 +24,7 @@ const SettingsSections = dynamic(
 const colorSchemeManager = localStorageColorSchemeManager({ key: colorSchemeKey })
 
 /** The settings dialog over any page: every Settings and Units button opens it through `SettingsDialog`. */
-function SettingsDialogProvider({ children }: { children: ReactNode }) {
+export function SettingsDialogProvider({ children }: { children: ReactNode }) {
   const { t } = useTranslation()
   const [opened, setOpened] = useState(false)
   const [tab, setTab] = useState<SettingsTab>('units')

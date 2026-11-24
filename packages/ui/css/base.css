@@ -1,0 +1,5 @@
+/* What ui.css sits on: Mantine's styles, the tokens and the Inter font, for a surface that loads none of them itself */
+@import "@mantine/core/styles.css";
+@import "@rangefoundry/design-tokens/tokens.css";
+@import "@rangefoundry/design-tokens/mantine-print.css";
+@import "@fontsource-variable/inter";

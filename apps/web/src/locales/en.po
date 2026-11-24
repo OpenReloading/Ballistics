@@ -40,9 +40,6 @@ msgstr "Compare bullets"
 msgid "page.events"
 msgstr "Competition events"
 
-msgid "nav.database"
-msgstr "Database"
-
 msgid "record.disciplines"
 msgstr "Discipline"
 
@@ -105,9 +102,6 @@ msgstr "Target designer"
 
 msgid "page.targets"
 msgstr "Targets"
-
-msgid "error.title"
-msgstr "This page could not be shown."
 
 msgid "page.powdersTune"
 msgstr "Tune a powder"

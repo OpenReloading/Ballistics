@@ -22,6 +22,7 @@ export interface AppFrameProps {
     children: ReactNode;
     end?: ReactNode;
     navigation: ReactNode;
+    onDrawerClosed?: () => void;
 }
 
 // @public
