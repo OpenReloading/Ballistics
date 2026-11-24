@@ -29,6 +29,13 @@ The web app's language is a setting (Settings, General, Language). There is one 
 
 The shared base keeps its own texts in Lingui catalogs, the format the rebuilt web app moves to: `packages/ui/src/locales/en.po` and `de.po`, each text with an explicit id under `ui.` (`ui.frame.menu`). A text in `ui` is `i18n._({ id: 'ui.frame.menu', message: 'Navigation' })`; `pnpm --filter @rangefoundry/ui run messages` adds new texts to both catalogs, and a German one is written into `de.po` by hand. The build fails while a German text is missing, and `tsc` fails on an id the English catalog lacks. The app loads `uiMessages` of `@rangefoundry/ui` beside its own texts.
 
+## The app's Lingui catalogs (`apps/web/src/locales`)
+
+The app's texts with explicit ids live in `apps/web/src/locales/en.po` and `de.po`, extracted from the Start routes (`src/routes`) and the views (`src/components`) by the app's `typecheck` (`lingui check sync`). Both app roots provide them through `I18nProvider` in the language that `src/i18n/language.ts` shows, so one language switch changes these texts and the text keys above together; the German catalog loads beside `de.json` when German is chosen.
+
+- `pnpm --filter @rangefoundry/web run lingui:de` writes the German of `src/i18n/de.json` into `de.po` for each id whose English text is a key there (a `{count, plural, one {…} other {…}}` text matches its `one|other` key, a `msgctxt` its context). It prints how many it wrote, the ids `de.json` has no German for, and the ids whose German in `de.po` differs, which it keeps.
+- Each German entry carries a `# en: "<English>"` note with the English text it translates. The `typecheck` fails while a note is missing or names other English than `en.po` holds: check the German, then update it and the note.
+
 ## Numbers, dates and country names
 
 These follow the language shown and need no catalogue text. Under German a decimal is written with a comma (`2,5`), a date and a country name come from `Intl`. English is unchanged.

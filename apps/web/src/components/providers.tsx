@@ -1,10 +1,12 @@
 'use client'
 
+import { I18nProvider } from '@lingui/react'
 import { Button, Group, localStorageColorSchemeManager, MantineProvider } from '@mantine/core'
 import { LucideProvider } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { startLanguage, useTranslation } from '../i18n/language.ts'
+import { linguiOf } from '../i18n/lingui.ts'
 import { decimalMark } from '../i18n/number.ts'
 import { useRoute } from './use-route.ts'
 import '../lib/navigation-guard.ts'
@@ -69,7 +71,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }, [])
   // the stored language applies after mounting: the server render and hydration are English
   useEffect(startLanguage, [])
-  // the number inputs write the decimal mark of the language shown
+  // one language for the views' own messages and the Lingui ones; number inputs write its decimal mark
   const { language } = useTranslation()
   const theme = useMemo(() => themeFor(decimalMark(language)), [language])
   return (
@@ -78,13 +80,15 @@ export function Providers({ children }: { children: React.ReactNode }) {
       defaultColorScheme="auto"
       colorSchemeManager={colorSchemeManager}
     >
-      <LucideProvider {...iconDefaults}>
-        <UnitsProvider>
-          {/* first: its Escape listener is added before the page's dialogs add theirs */}
-          <ConfirmHost />
-          <SettingsDialogProvider>{children}</SettingsDialogProvider>
-        </UnitsProvider>
-      </LucideProvider>
+      <I18nProvider i18n={linguiOf(language)}>
+        <LucideProvider {...iconDefaults}>
+          <UnitsProvider>
+            {/* first: its Escape listener is added before the page's dialogs add theirs */}
+            <ConfirmHost />
+            <SettingsDialogProvider>{children}</SettingsDialogProvider>
+          </UnitsProvider>
+        </LucideProvider>
+      </I18nProvider>
     </MantineProvider>
   )
 }
