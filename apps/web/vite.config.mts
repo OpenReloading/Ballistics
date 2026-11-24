@@ -74,6 +74,13 @@ export default defineConfig(({ command }) => {
       ]),
     ),
     resolve: { alias: { '@': path.join(import.meta.dirname, 'src') } },
+    build: {
+      modulePreload: {
+        // pages read the in-browser API on mount: preloads of its imports wait for its chunk to run, and WebKit warns about a preload still unused a few seconds after load
+        resolveDependencies: (file, deps) =>
+          path.basename(file).startsWith('static-api-') ? deps.filter((dep) => dep === file) : deps,
+      },
+    },
     // Start's prerender imports server.js; Vite names it .mjs in a package without "type": "module"
     environments: {
       ssr: { build: { rolldownOptions: { output: { entryFileNames: '[name].js' } } } },
