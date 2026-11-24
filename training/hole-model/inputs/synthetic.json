@@ -1,0 +1,5 @@
+{
+  "train": ["../data/train/holes.json"],
+  "validation": ["../data/validation/holes.json"],
+  "test": ["../data/test/holes.json"]
+}
