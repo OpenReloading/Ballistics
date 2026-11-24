@@ -8,7 +8,7 @@ export const Route = createFileRoute('/range')({
   head: () =>
     listHead(
       'Range mode',
-      'Enter chronograph velocities, conditions and notes for a saved load on a phone at the range, without a network; the entries stay in this browser.',
+      'Enter chronograph velocities, conditions and notes for a saved load on a phone at the range; the entries stay in this browser.',
     ),
   component: RangeMode,
 })
