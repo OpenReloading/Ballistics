@@ -105,7 +105,23 @@ export default defineConfig({
         ).map(([name, device]) => ({
           name,
           testDir: './tests/start',
-          use: { ...device, baseURL: startUrl },
+          use: {
+            ...device,
+            baseURL: startUrl,
+            // both editions' Safety dialogs accepted: the shell's dialog would take the focus of a typed field
+            storageState: {
+              cookies: [],
+              origins: [
+                {
+                  origin: new URL(startUrl).origin,
+                  localStorage: ['safety-ack', 'next:safety-ack'].map((name) => ({
+                    name,
+                    value: safetyAck,
+                  })),
+                },
+              ],
+            },
+          },
         }))
       : []),
     // the web specs of the routes the Start app has ported, on its next edition

@@ -54,8 +54,24 @@ for (const { name, base } of editions) {
     // the shell takes `/` until TanStack/router#8741 closes: the `/?root` entry writes home
     const home = await request.get(base)
     expect(home.status()).toBe(200)
-    expect(await home.text()).toMatch(/<h1>RangeFoundry Workbench<\/h1>/)
+    expect(await home.text()).toMatch(/<h1[^>]*>RangeFoundry Workbench<\/h1>/)
     const sitemap = await (await request.get(`${base}sitemap.xml`)).text()
     expect(sitemap).toContain(`<loc>https://openreloading.github.io${site}${base}</loc>`)
+  })
+
+  test(`${name}: the manifest starts in its own edition and its icons are served as PNG`, async ({
+    request,
+  }) => {
+    const res = await request.get(`${base}manifest.webmanifest`)
+    expect(res.status()).toBe(200)
+    const manifest: { start_url: string; icons: { src: string }[] } = await res.json()
+    expect(manifest.start_url).toBe(`${site}${base}`)
+    const srcs = [...manifest.icons.map((icon) => icon.src), `${site}${base}apple-icon.png`]
+    expect(srcs).toContain(`${site}${base}icon-192.png`)
+    for (const src of srcs) {
+      const icon = await request.get(src)
+      expect(icon.status(), src).toBe(200)
+      expect(icon.headers()['content-type'], src).toBe('image/png')
+    }
   })
 }

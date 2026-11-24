@@ -40,9 +40,6 @@ msgstr "Geschosse vergleichen"
 msgid "page.events"
 msgstr "Wettkämpfe"
 
-msgid "nav.database"
-msgstr "Datenbank"
-
 msgid "record.disciplines"
 msgstr "Disziplin"
 
@@ -105,9 +102,6 @@ msgstr "Scheiben-Editor"
 
 msgid "page.targets"
 msgstr "Scheiben"
-
-msgid "error.title"
-msgstr "Diese Seite konnte nicht angezeigt werden."
 
 msgid "page.powdersTune"
 msgstr "Treibladungspulver abstimmen"

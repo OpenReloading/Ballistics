@@ -73,7 +73,7 @@ const themeFor = (mark: '.' | ',') =>
 const themes = { '.': themeFor('.'), ',': themeFor(',') }
 const resolver: CSSVariablesResolver = () => cssVariables
 
-/** The generated theme with the control sizes as component defaults, the scheme colors it cannot set and `i18n` holding `uiMessages` beside the app's own; `decimalMark` is the mark number inputs write (`.` when absent); only the color scheme besides, as Mantine's theme, class and variable props would undo ui.css or the tokens; load `@rangefoundry/ui/ui.css` with it. */
+/** The generated theme with the control sizes as component defaults, the scheme colors it cannot set and `i18n` holding `uiMessages` beside the app's own; `decimalMark` is the mark number inputs write (`.` when absent); only the color scheme besides, as Mantine's theme, class and variable props would undo ui.css or the tokens; load `@rangefoundry/ui/base.css` (or the app's own Mantine styles, tokens and font) and `@rangefoundry/ui/ui.css` with it. */
 export function UiProvider({
   i18n,
   decimalMark = '.',

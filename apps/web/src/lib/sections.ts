@@ -8,7 +8,7 @@ interface LibraryTab {
 }
 
 /** A page of the sidebar, drawer, search and home cards. */
-interface PageEntry {
+export interface PageEntry {
   href: string
   label: Message
   /** The icon's name in `nav-icons.tsx`. */

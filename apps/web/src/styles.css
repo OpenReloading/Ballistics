@@ -63,3 +63,4 @@
 @import "@rangefoundry/design-tokens/mantine-print.css";
 @import "./app/globals.css";
 @import "./platform/start/fonts.css";
+@import "./platform/start/next-theme.css";

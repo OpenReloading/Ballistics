@@ -3,6 +3,7 @@ import path from 'node:path'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
 import { defineConfig, type Plugin } from 'vite'
+import { webManifest } from './src/lib/web-manifest.ts'
 import { checkRecordPaths, staticPaths } from './src/routes/-static-paths.ts'
 
 const startBodies: Record<string, string> = {
@@ -24,6 +25,22 @@ const nextSeam: Plugin = {
     return null
   },
 }
+
+/** The web app manifest and the icons it and the root's head name, at the paths the Next export serves them at. */
+const appManifest = (basePath: string): Plugin => ({
+  name: 'app-manifest',
+  applyToEnvironment: (environment) => environment.name === 'client',
+  generateBundle() {
+    for (const icon of ['icon.png', 'apple-icon.png'])
+      this.emitFile({
+        type: 'asset',
+        fileName: icon,
+        source: readFileSync(path.join(import.meta.dirname, 'src/app', icon)),
+      })
+    const manifest = JSON.stringify(webManifest(basePath))
+    this.emitFile({ type: 'asset', fileName: 'manifest.webmanifest', source: manifest })
+  },
+})
 
 export default defineConfig(({ command }) => {
   // the edition's own path, as next.config.ts reads it: /Ballistics/next for next on the project site
@@ -63,6 +80,7 @@ export default defineConfig(({ command }) => {
     },
     plugins: [
       nextSeam,
+      appManifest(base),
       tanstackStart({
         // no link's path, so the shell marks none as the current page
         spa: { enabled: true, maskPath: '/_shell' },

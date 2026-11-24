@@ -79,7 +79,15 @@ export function ReportIssueButton({
   if (!url) return null
   const icon = <Bug size={20} aria-hidden="true" />
   if (drawer)
-    return <NavLink component="button" label={t(label)} leftSection={icon} onClick={onOpen} />
+    return (
+      <NavLink
+        component="button"
+        label={t(label)}
+        leftSection={icon}
+        aria-haspopup="dialog"
+        onClick={onOpen}
+      />
+    )
   return (
     <Tooltip label={t(label)}>
       <ActionIcon

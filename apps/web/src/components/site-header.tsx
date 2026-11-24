@@ -59,7 +59,7 @@ const docs = docsUrl(docsAddress, undefined, noDocs)
 type Section = (typeof sections)[number]
 
 /** The theme's wordmark picked by CSS before hydration as in `ThemeSwitch`, the alpha badge laid over its foot so it takes no room in the bar (globals.css); `full` shows the whole wordmark, else its mark. */
-function Brand({ onClick, full }: { onClick?: () => void; full?: boolean }) {
+export function Brand({ onClick, full }: { onClick?: () => void; full?: boolean }) {
   const note = useId()
   const { t } = useTranslation()
   return (
