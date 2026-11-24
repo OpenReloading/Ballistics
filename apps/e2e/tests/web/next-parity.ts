@@ -70,7 +70,14 @@ export const nextParity: readonly { file: string; titles?: readonly string[] }[]
   { file: 'session.spec.ts' },
   { file: 'tooltip-hover.spec.ts' },
   { file: 'groups-face.spec.ts' },
-  { file: 'range-mode.spec.ts' },
+  {
+    file: 'range-mode.spec.ts',
+    titles: [
+      'two tabs entering shots for one load lose none, and a Save of the load in a tab opened earlier keeps the session',
+      'every control fits a thumb at 390 px and the page has no axe violation with a load open',
+      'the chosen load names its components, the statistics follow Add shot, and the ladder steps share one width',
+    ],
+  },
   {
     file: 'workbench-model-inputs.spec.ts',
     titles: [
