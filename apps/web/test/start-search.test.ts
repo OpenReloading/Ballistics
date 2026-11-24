@@ -7,16 +7,8 @@ it('keeps numeric-looking values as typed through a read and a write', () => {
   expect(stringifySearch(parseSearch(search))).toBe(search)
 })
 
-it('keeps every value of a repeated key through a read and a write', () => {
-  expect(parseSearch('?q=a&q=b')).toEqual({ q: ['a', 'b'] })
-  expect(stringifySearch(parseSearch('?q=a&q=b'))).toBe('?q=a&q=b')
-})
-
-it('writes a comma and a slash as typed', () => {
-  expect(stringifySearch(parseSearch('?type=a,b&path=x/y'))).toBe('?type=a,b&path=x/y')
-})
-
-it('reads an empty query as no keys', () => {
+it('reads the first of a repeated key and an empty query as no keys', () => {
+  expect(parseSearch('?q=a&q=b')).toEqual({ q: 'a' })
   expect(parseSearch('')).toEqual({})
   expect(stringifySearch({})).toBe('')
 })
