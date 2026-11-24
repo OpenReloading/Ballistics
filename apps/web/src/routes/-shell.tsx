@@ -1,7 +1,16 @@
-import { Box, Container, NavLink } from '@mantine/core'
-import { useHotkeys } from '@mantine/hooks'
+import { Box, Container, NavLink, Text } from '@mantine/core'
+import { useHotkeys, useMediaQuery } from '@mantine/hooks'
 import { AppFrame } from '@rangefoundry/ui'
-import { lazy, type ReactNode, Suspense, useContext, useEffect, useRef, useState } from 'react'
+import {
+  lazy,
+  type ReactNode,
+  Suspense,
+  useContext,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from 'react'
 import { DocsLink } from '../components/docs-link.tsx'
 import { InstallButton } from '../components/install-button.tsx'
 import { NavIcon } from '../components/nav-icons.tsx'
@@ -20,7 +29,7 @@ import { useRoute } from '../components/use-route.ts'
 import { useTranslation } from '../i18n/language.ts'
 import { docsUrl } from '../lib/docs-url.ts'
 import { repositoryUrl } from '../lib/repository-url.ts'
-import { isToolRoute, type PageEntry, pageCoversRoute, sections } from '../lib/sections.ts'
+import { isToolRoute, pageCoversRoute, sections } from '../lib/sections.ts'
 import { shortcutAriaKeys } from '../lib/shortcuts.ts'
 import { pageWidth } from '../lib/theme.ts'
 import { docsAddress, noDocs, repositoryAddress } from '../platform/edition.ts'
@@ -35,7 +44,7 @@ const SiteSearch = lazy(() =>
 const repository = repositoryUrl(repositoryAddress)
 const docs = docsUrl(docsAddress, undefined, noDocs)
 
-/** Search or Settings in the navigation, as the Next app's sidebar and drawer offer them: from 75em it opens its dialog, in the drawer below once the drawer has closed. */
+/** Search or Settings in the navigation, as the Next app's sidebar and drawer offer them: from the drawer the dialog opens once the drawer has closed. */
 function DialogRow({
   icon,
   label,
@@ -49,25 +58,21 @@ function DialogRow({
   open: () => void
   afterDrawer: (open: () => void) => void
 }) {
-  const row = (onClick: () => void) => (
+  // the frame's breakpoint: from 75em the row is in the sidebar, below it in the drawer
+  const wide = useMediaQuery('(width >= 75em)')
+  return (
     <NavLink
       component="button"
       label={label}
       leftSection={<NavIcon name={icon} />}
       aria-haspopup="dialog"
       aria-keyshortcuts={ariaKeys}
-      onClick={onClick}
+      onClick={() => (wide ? open() : afterDrawer(open))}
     />
-  )
-  return (
-    <>
-      <Box visibleFrom="lg">{row(open)}</Box>
-      <Box hiddenFrom="lg">{row(() => afterDrawer(open))}</Box>
-    </>
   )
 }
 
-/** Search, the pages of every section with the current one marked, and Settings, as the sidebar of the Next app has them; in the drawer below 75em also Report an issue, the docs and the repository, which the top bar shows from 75em. */
+/** Search, the pages of every section in a list named by the section with the current one marked, and Settings, as the sidebar of the Next app has them; in the drawer below 75em also Report an issue, the docs and the repository, which the top bar shows from 75em. */
 function Navigation({
   route,
   afterDrawer,
@@ -80,6 +85,7 @@ function Navigation({
 }) {
   const { t } = useTranslation()
   const openSettings = useContext(SettingsDialog)
+  const id = useId()
   return (
     <>
       <DialogRow
@@ -89,19 +95,27 @@ function Navigation({
         open={openSiteSearch}
         afterDrawer={afterDrawer}
       />
-      {sections
-        .flatMap((s): readonly PageEntry[] => s.pages)
-        .map((p) => (
-          <Link
-            key={p.href}
-            href={p.href}
-            className="ui-nav-item"
-            aria-current={pageCoversRoute(p.href, route) ? 'page' : undefined}
-          >
-            <NavIcon name={p.icon} />
-            <span>{t(p.label)}</span>
-          </Link>
-        ))}
+      {sections.map((section, i) => (
+        <div key={section.title}>
+          <Text id={`${id}-${i}`} size="xs" fw={500} c="dimmed" mt="xs" mb={4}>
+            {t(section.title)}
+          </Text>
+          <ul aria-labelledby={`${id}-${i}`} className="nav-section">
+            {section.pages.map((p) => (
+              <li key={p.href}>
+                <Link
+                  href={p.href}
+                  className="ui-nav-item"
+                  aria-current={pageCoversRoute(p.href, route) ? 'page' : undefined}
+                >
+                  <NavIcon name={p.icon} />
+                  <span>{t(p.label)}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
       <DialogRow
         icon="settings"
         label={t('Settings')}

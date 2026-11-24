@@ -82,3 +82,14 @@ html:root {
     min-height: 0;
   }
 }
+
+/* the navigation's lists per section, and its rows as 44 px targets as .drawer-nav in globals.css gives them (WCAG 2.5.5) */
+.nav-section {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+nav .mantine-NavLink-root {
+  min-height: 44px;
+}
