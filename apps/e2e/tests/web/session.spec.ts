@@ -1,5 +1,6 @@
 import { expect, type Page, type Request, test } from '@playwright/test'
 import { barButton } from './bar.ts'
+import { isNextEdition, noMainId } from './edition.ts'
 import { isDark } from './luminance.ts'
 import { gotoHydrated } from './nav.ts'
 import { choosePreset, storeUnits } from './units.ts'
@@ -180,7 +181,8 @@ test('the example loads into badges, the strings table and a tab per string with
   expect(await page.evaluate(() => (window as unknown as { printed: number }).printed)).toBe(1)
 })
 
-test('prints the summary and every chart without the import strip', async ({ page }) => {
+test('prints the summary and every chart without the import strip', async ({ page, baseURL }) => {
+  test.skip(isNextEdition(baseURL), noMainId)
   await page.setViewportSize({ width: 1280, height: 800 })
   await gotoHydrated(page, '/session')
   await loadExample(page)
