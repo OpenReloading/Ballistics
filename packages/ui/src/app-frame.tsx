@@ -14,6 +14,8 @@ export interface AppFrameProps {
   end?: ReactNode
   /** The account menu of a surface with accounts; the offline apps leave it out. */
   account?: ReactNode
+  /** Called once the drawer has closed and given the focus back to the menu button, so a dialog that a drawer control asked for opens after it. */
+  onDrawerClosed?: () => void
   /** The page, with its page bar first. */
   children: ReactNode
 }
@@ -24,6 +26,7 @@ export function AppFrame({
   navigation,
   end,
   account,
+  onDrawerClosed,
   children,
 }: AppFrameProps): ReactElement {
   const { i18n } = useLingui()
@@ -62,6 +65,7 @@ export function AppFrame({
         opened={opened}
         close={close}
         labels={labels}
+        {...(onDrawerClosed && { onClosed: onDrawerClosed })}
       />
       <AppShell.Main>{children}</AppShell.Main>
     </AppShell>
@@ -109,19 +113,28 @@ function NavDrawer({
   navigation,
   opened,
   close,
+  onClosed,
   labels,
 }: Pick<AppFrameProps, 'brand' | 'navigation'> & {
   opened: boolean
   close: () => void
+  onClosed?: () => void
   labels: { navigation: string; close: string }
 }): ReactElement {
-  // a followed link in the drawer (the brand's too) closes it, also when a router changes the page without a reload
+  // a followed link in the drawer (the brand's too) closes it, also when a router changes the page without a reload, and so does a control opening a dialog
   const closeOnLink = (event: MouseEvent) => {
-    if (event.target instanceof Element && event.target.closest('a')) close()
+    if (event.target instanceof Element && event.target.closest('a, [aria-haspopup="dialog"]'))
+      close()
   }
   return (
     // Mantine's drawer traps the focus, closes on Escape and gives the focus back to the menu button
-    <Drawer.Root opened={opened} onClose={close} size="xs" hiddenFrom="lg">
+    <Drawer.Root
+      opened={opened}
+      onClose={close}
+      size="xs"
+      hiddenFrom="lg"
+      {...(onClosed && { onExitTransitionEnd: onClosed })}
+    >
       <Drawer.Overlay />
       <Drawer.Content aria-label={labels.navigation} onClick={closeOnLink}>
         {/* a div: a second <header> outside the top bar would be another banner landmark */}

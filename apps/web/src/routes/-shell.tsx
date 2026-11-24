@@ -1,7 +1,7 @@
 import { ActionIcon, Box, Container, Tooltip } from '@mantine/core'
 import { useHotkeys } from '@mantine/hooks'
 import { AppFrame } from '@rangefoundry/ui'
-import { lazy, type ReactNode, Suspense, useContext, useEffect, useState } from 'react'
+import { lazy, type ReactNode, Suspense, useContext, useEffect, useRef, useState } from 'react'
 import { DocsLink } from '../components/docs-link.tsx'
 import { InstallButton } from '../components/install-button.tsx'
 import { NavIcon } from '../components/nav-icons.tsx'
@@ -145,6 +145,8 @@ export function Shell({ children }: { children: ReactNode }) {
   const route = useRoute()
   const [reporting, setReporting] = useState(false)
   const report = () => setReporting(true)
+  // from the drawer the dialog opens once the drawer has closed and given focus back to its button
+  const afterDrawer = useRef<(() => void) | undefined>(undefined)
   return (
     <>
       <ContentSkipLink />
@@ -153,8 +155,19 @@ export function Shell({ children }: { children: ReactNode }) {
       <PreReleaseData />
       <AppFrame
         brand={<Brand full={route === '/'} />}
-        navigation={<Navigation route={route} onReport={report} />}
+        navigation={
+          <Navigation
+            route={route}
+            onReport={() => {
+              afterDrawer.current = report
+            }}
+          />
+        }
         end={<BarEnd route={route} onReport={report} />}
+        onDrawerClosed={() => {
+          afterDrawer.current?.()
+          afterDrawer.current = undefined
+        }}
       >
         <Container id="main" tabIndex={-1} size={pageWidth}>
           {children}
