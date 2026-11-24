@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { loadForm, openSavedLoad } from './workbench.ts'
 
@@ -94,13 +95,18 @@ test('a typed bore diameter leaves the record bore area, which describes the rec
 test('picking another bullet replaces the changed values of the card and says how many', async ({
   page,
 }) => {
-  await page.goto('./workbench?cartridge=308-win&bullet=demo-bullet-168&powder=demo-powder-dp40')
+  await gotoHydrated(
+    page,
+    './workbench?cartridge=308-win&bullet=demo-bullet-168&powder=demo-powder-dp40',
+  )
   const form = loadForm(page)
   const diameter = form.getByRole('textbox', { name: /^Diameter/ })
   const length = form.getByRole('textbox', { name: /^Length/ })
   // a value typed over its record offers its reset; a record value offers none
   const reset = (label: string) =>
     form.getByRole('button', { name: new RegExp(`^Reset ${label} to the record value`) })
+  // the bullet record fills the card once loaded: typed before, the values are not over the record
+  await expect(diameter).not.toHaveValue('')
   await expect(reset('Diameter')).toHaveCount(0)
   await diameter.fill('7.84')
   await length.fill('31.00')
