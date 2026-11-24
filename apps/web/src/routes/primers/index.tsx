@@ -2,10 +2,11 @@ import { createFileRoute } from '@tanstack/react-router'
 import { PrimerList } from '../../components/primer-list.tsx'
 import { primerListData } from '../../lib/list-page-data.ts'
 import { readCatalogue } from '../-data.ts'
-import { listHead, listSearch } from '../-list-route.ts'
+import { listHead } from '../-list-route.ts'
+import { searchOf } from '../-search.ts'
 
 export const Route = createFileRoute('/primers/')({
-  validateSearch: listSearch,
+  validateSearch: searchOf(),
   loader: async () => {
     const c = await readCatalogue()
     return primerListData(c.primers().items, c.manufacturers().items)

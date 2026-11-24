@@ -5,12 +5,14 @@ import type { FederationListItem } from '../../lib/disciplines.ts'
 import type { DisciplineSummary, MappingSummary } from '../../lib/face-disciplines.ts'
 import { targetListData } from '../../lib/list-page-data.ts'
 import { readCatalogue, readRecords } from '../-data.ts'
-import { listHead, listSearch } from '../-list-route.ts'
+import { listHead } from '../-list-route.ts'
+import { searchOf } from '../-search.ts'
 
 export const Route = createFileRoute('/targets/')({
-  validateSearch: listSearch,
+  validateSearch: searchOf(),
   // the loader reads one file per target face: a revisit keeps the first load
   staleTime: Number.POSITIVE_INFINITY,
+  gcTime: Number.POSITIVE_INFINITY,
   loader: async () => {
     const c = await readCatalogue()
     return targetListData(

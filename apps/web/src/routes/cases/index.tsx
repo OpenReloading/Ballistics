@@ -3,10 +3,11 @@ import { CaseList } from '../../components/case-list.tsx'
 import type { CartridgeSummary, CaseSummary } from '../../lib/api-types.ts'
 import { caseListData } from '../../lib/list-page-data.ts'
 import { readCatalogue } from '../-data.ts'
-import { listHead, listSearch } from '../-list-route.ts'
+import { listHead } from '../-list-route.ts'
+import { searchOf } from '../-search.ts'
 
 export const Route = createFileRoute('/cases/')({
-  validateSearch: listSearch,
+  validateSearch: searchOf(),
   loader: async () => {
     const c = await readCatalogue()
     return caseListData(

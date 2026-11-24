@@ -3,10 +3,11 @@ import { PowderList } from '../../components/powder-list.tsx'
 import type { PowderSummary } from '../../lib/api-types.ts'
 import { powderListData } from '../../lib/list-page-data.ts'
 import { readCatalogue } from '../-data.ts'
-import { listHead, listSearch } from '../-list-route.ts'
+import { listHead } from '../-list-route.ts'
+import { searchOf } from '../-search.ts'
 
 export const Route = createFileRoute('/powders/')({
-  validateSearch: listSearch,
+  validateSearch: searchOf(),
   loader: async () => {
     const c = await readCatalogue()
     return powderListData(c.powders().items as PowderSummary[], c.manufacturers().items)

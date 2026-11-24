@@ -4,10 +4,11 @@ import type { FederationListItem } from '../../lib/disciplines.ts'
 import type { DisciplineSummary } from '../../lib/face-disciplines.ts'
 import { federationListData } from '../../lib/list-page-data.ts'
 import { readCatalogue } from '../-data.ts'
-import { listHead, listSearch } from '../-list-route.ts'
+import { listHead } from '../-list-route.ts'
+import { searchOf } from '../-search.ts'
 
 export const Route = createFileRoute('/federations/')({
-  validateSearch: listSearch,
+  validateSearch: searchOf(),
   loader: async () => {
     const c = await readCatalogue()
     return federationListData(

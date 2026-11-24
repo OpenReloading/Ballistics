@@ -43,9 +43,6 @@ msgstr "Firearms"
 msgid "page.workbench"
 msgstr "Load workbench"
 
-msgid "workbench.notes"
-msgstr "Notes"
-
 msgid "page.offline"
 msgstr "Offline"
 

@@ -2,10 +2,11 @@ import type { EventType } from '@rangefoundry/schema'
 import { createFileRoute } from '@tanstack/react-router'
 import { CompetitionEvents } from '../components/competition-events.tsx'
 import { readCatalogue, readRecords } from './-data.ts'
-import { listHead, listSearch } from './-list-route.ts'
+import { listHead } from './-list-route.ts'
+import { searchOf } from './-search.ts'
 
 export const Route = createFileRoute('/events')({
-  validateSearch: listSearch,
+  validateSearch: searchOf(),
   loader: async () =>
     readRecords<EventType>('event-types', (await readCatalogue()).eventTypes().items),
   head: () =>

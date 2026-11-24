@@ -11,10 +11,11 @@ import type { PowderSummary } from '../../lib/api-types.ts'
 import { classifyPowder, isFitted, type UnfittedPowder } from '../../lib/burn-rate.ts'
 import { manufacturerNames } from '../../lib/manufacturers.ts'
 import { readCatalogue } from '../-data.ts'
-import { listHead, listSearch } from '../-list-route.ts'
+import { listHead } from '../-list-route.ts'
+import { searchOf } from '../-search.ts'
 
 export const Route = createFileRoute('/powders/burn-rates')({
-  validateSearch: listSearch,
+  validateSearch: searchOf('add'),
   loader: async () => {
     const c = await readCatalogue()
     const names = manufacturerNames(c.manufacturers().items)

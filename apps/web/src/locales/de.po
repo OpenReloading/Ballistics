@@ -43,9 +43,6 @@ msgstr "Schusswaffen"
 msgid "page.workbench"
 msgstr "Werkbank für Laborierungen"
 
-msgid "workbench.notes"
-msgstr "Notizen"
-
 msgid "page.offline"
 msgstr "Offline"
 
