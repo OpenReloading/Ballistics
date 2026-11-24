@@ -21,9 +21,24 @@ export function guardPop(on: (e: PopStateEvent) => void) {
   }
 }
 
+/** Backs the app took itself whose popstate has not arrived yet. */
+let ownBacks = 0
+
+/** A Back no `guardPop` handler takes for the user's, also one added before its popstate arrives. */
+export function backQuietly() {
+  ownBacks++
+  window.history.back()
+}
+
 // added when the root providers load, before the router mounts and adds its own
 if (typeof window !== 'undefined')
   window.addEventListener('popstate', (e) => {
+    if (ownBacks) {
+      ownBacks--
+      // a guard added meanwhile has its own entry under this move, which the router must not see either
+      if (pops.size) e.stopImmediatePropagation()
+      return
+    }
     for (const on of [...pops]) on(e)
   })
 
