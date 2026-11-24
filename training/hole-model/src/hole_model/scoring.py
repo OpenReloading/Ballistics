@@ -7,7 +7,7 @@ import numpy.typing as npt
 import onnxruntime as ort
 from PIL import Image
 
-from hole_model.metric import HoleMatch, correction_stats, corrections, match_holes
+from hole_model.metric import HoleMatch, Point, correction_stats, corrections, match_holes
 from hole_model.net import HOLE_PX, input_array, peaks
 from hole_model.splits import Photo, SplitError, read_photo
 
@@ -38,10 +38,20 @@ def find(heat: Heat, rgb: npt.NDArray[np.uint8], diameter: float, threshold: flo
     return [((x + 0.5) / f - 0.5, (y + 0.5) / f - 0.5) for x, y in peaks(out, threshold)]
 
 
+def outside(points: Sequence[Point], masked: npt.NDArray[np.float32]) -> list[Point]:
+    """The points outside every masked x, y, width, height box, whose holes are unknown."""
+    return [
+        (x, y) for x, y in points if not any(bx <= x <= bx + bw and by <= y <= by + bh for bx, by, bw, bh in masked)
+    ]
+
+
 def score(
     heat: Heat, photos: Sequence[Photo], thresholds: Sequence[float], believed: float = 1.0
 ) -> list[dict[str, float]]:
-    """Recall, precision and corrections of the scored photos per threshold; `believed` is expected over true size."""
+    """Recall, precision and corrections of the scored photos per threshold, outside the masked boxes.
+
+    `believed` is the expected over the true hole size.
+    """
     scored = [p for p in photos if p.scored]
     if not scored:
         raise SplitError("no photo to score: scoring needs at least one photo marked usable and complete")
@@ -49,9 +59,10 @@ def score(
     per_photo: list[list[int]] = [[] for _ in thresholds]
     for p in scored:
         rgb = read_photo(p)
-        truth = [(float(x), float(y)) for x, y in p.holes]
+        truth = outside([(float(x), float(y)) for x, y in p.holes], p.masked)
         for k, threshold in enumerate(thresholds):
-            m: HoleMatch = match_holes(find(heat, rgb, p.diameter * believed, threshold), truth, p.diameter)
+            marks = outside(find(heat, rgb, p.diameter * believed, threshold), p.masked)
+            m: HoleMatch = match_holes(marks, truth, p.diameter)
             totals[k] += (m.matched, m.false, m.missed)
             per_photo[k].append(corrections(m))
     return [
