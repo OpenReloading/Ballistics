@@ -90,6 +90,18 @@ html:root {
   list-style: none;
 }
 
-nav .mantine-NavLink-root {
+nav :is(.mantine-NavLink-root, .ui-nav-item) {
   min-height: 44px;
+}
+
+/* from 75em the sidebar keeps the section titles for screen readers only, as the Next rail does; a media query, not a class set after hydration, which moved the links below them */
+@media (width >= 75em) {
+  .nav-section-title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
 }

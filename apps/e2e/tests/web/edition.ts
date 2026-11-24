@@ -14,3 +14,6 @@ export const storageName = (name: string, baseURL = projectBase()) =>
 
 /** The reason the next edition skips a test of the offline layer. */
 export const noOfflineWorker = 'the Start app registers no offline layer worker yet'
+
+/** The reason the next edition skips a test that calls the API. */
+export const noApi = 'the run of the next edition starts no API'

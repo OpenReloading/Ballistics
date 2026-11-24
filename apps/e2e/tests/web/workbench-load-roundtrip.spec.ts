@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises'
 import { expect, test } from '@playwright/test'
 import { defined } from '../../../web/test/defined.ts'
 import { barButton } from './bar.ts'
-import { storageName } from './edition.ts'
+import { isNextEdition, noApi, storageName } from './edition.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { loadForm, openKeeping, openSavedLoad } from './workbench.ts'
@@ -183,7 +183,9 @@ test('a load of records keeps the charge and the travel, runs the powder at the 
 test('the file downloaded for the API runs through the load file route and the saved load keeps the typed keys', async ({
   page,
   request,
+  baseURL,
 }) => {
+  test.skip(isNextEdition(baseURL), noApi)
   await page.addInitScript(() => {
     ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })

@@ -88,8 +88,6 @@ function Navigation({
   const { t } = useTranslation()
   const openSettings = useContext(SettingsDialog)
   const id = useId()
-  // the sidebar leaves the section titles to screen readers, as the Next app's rail does
-  const wide = useMediaQuery('(width >= 75em)')
   return (
     <>
       <DialogRow
@@ -108,7 +106,7 @@ function Navigation({
             c="dimmed"
             mt="xs"
             mb={4}
-            className={wide ? 'visually-hidden' : undefined}
+            className="nav-section-title"
           >
             {t(section.title)}
           </Text>

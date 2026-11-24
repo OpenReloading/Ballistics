@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import { expect, test } from '@playwright/test'
 import { barButton } from './bar.ts'
-import { isNextEdition } from './edition.ts'
+import { isNextEdition, noApi } from './edition.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { openSavedLoad } from './workbench.ts'
@@ -35,8 +35,6 @@ for (const [path, title] of pages)
 
 /** The live API: a separate origin from the exported site the project's `baseURL` names. */
 const apiUrl = process.env.API_URL ?? 'http://localhost:3000'
-
-const noApi = 'the run of the next edition starts no API'
 
 test('the exported data files are what the API answers', async ({ request, baseURL }) => {
   test.skip(isNextEdition(baseURL), noApi)
