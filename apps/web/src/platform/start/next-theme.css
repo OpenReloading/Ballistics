@@ -29,6 +29,19 @@ html:root {
   }
 }
 
+/* the bar is out of the flow from 75em: an unframed page starts one step below the top bar's rule, as .page-top > main does in globals.css; a Database page starts with its tab strip at the rule */
+@media screen and (width >= 75em) {
+  .page-shell:not([data-frame]) #main::before {
+    display: block;
+    margin-bottom: var(--space-xs);
+    content: "";
+  }
+
+  .page-shell:not([data-frame]) #main:has(> .library-tabs)::before {
+    display: none;
+  }
+}
+
 @media print {
   #main {
     max-width: none;

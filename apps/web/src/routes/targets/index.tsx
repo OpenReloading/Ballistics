@@ -9,6 +9,8 @@ import { listHead, listSearch } from '../-list-route.ts'
 
 export const Route = createFileRoute('/targets/')({
   validateSearch: listSearch,
+  // the loader reads one file per target face: a revisit keeps the first load
+  staleTime: Number.POSITIVE_INFINITY,
   loader: async () => {
     const c = await readCatalogue()
     return targetListData(

@@ -12,6 +12,8 @@ import { listHead, listSearch } from '../-list-route.ts'
 
 export const Route = createFileRoute('/disciplines/')({
   validateSearch: listSearch,
+  // the loader reads one file per discipline: a revisit keeps the first load
+  staleTime: Number.POSITIVE_INFINITY,
   loader: async () => {
     const c = await readCatalogue()
     return disciplineListData(
