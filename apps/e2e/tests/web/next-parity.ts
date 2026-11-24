@@ -1,33 +1,22 @@
 /** The tests of this folder that project `next-chromium` runs on the Start site's next edition: a file's every test, or only the titles listed. */
 export const nextParity: readonly { file: string; titles?: readonly string[] }[] = [
   { file: 'bullet-list.spec.ts' },
+  { file: 'bullet-record-compare.spec.ts' },
+  { file: 'burn-rates.spec.ts' },
+  { file: 'cartridges.spec.ts' },
   {
-    file: 'cartridges.spec.ts',
+    file: 'case-records.spec.ts',
     titles: [
-      'the list searches names and aliases and keeps the search in the URL',
-      'the source filter names the sources shown, keeps them in the URL and one stays on',
-      'a search without a match offers to clear the filters',
-      'the tick box of a row is at least 24 px, as the row keeps its height',
-      'the list sorts by L3 through its header button',
-      'at 1280 x 800 the cartridge table is the only scroll box',
-      'at 1920 x 1080 the cartridge table is the only scroll box',
-      'at 390 px a cartridge row is the name over a facts line',
-      'the cartridge list prints the selection, capped and said so',
-      'printed on A4, a name with its aliases takes at most two lines',
-      'the Case type column has no help note',
+      'the case list opens a case record with its cartridge',
+      'a primer record shows its properties as Quantity, Value and Unit across the page',
     ],
   },
   { file: 'competition-events.spec.ts' },
+  { file: 'component-records.spec.ts' },
   { file: 'default-order.spec.ts' },
   { file: 'directory-window.spec.ts' },
-  {
-    file: 'list-filters.spec.ts',
-    titles: [
-      'a discipline filtered by federation and a distance in yards survives a reload and clears',
-      'the federation list links each federation to its record',
-      'the brass list links each case to its record',
-    ],
-  },
+  { file: 'drawing-baseline.spec.ts' },
+  { file: 'list-filters.spec.ts' },
   {
     file: 'navigation.spec.ts',
     titles: [
@@ -46,8 +35,40 @@ export const nextParity: readonly { file: string; titles?: readonly string[] }[]
       'at 390 x 844 the keyboard order of the home page equals its visual order',
     ],
   },
+  {
+    file: 'language.spec.ts',
+    titles: ['the Database list and a record page show in German'],
+  },
   { file: 'offline-page.spec.ts' },
-  { file: 'primer-records.spec.ts', titles: ['the primer list narrows by search'] },
+  {
+    file: 'powder-list.spec.ts',
+    titles: ["adds the browser's own powder to the burn-rate overlay, marked as a user design"],
+  },
+  { file: 'powder-record.spec.ts' },
+  {
+    file: 'primer-records.spec.ts',
+    titles: [
+      'the primer list opens a primer record with its properties and sources',
+      'the primer list narrows by search',
+    ],
+  },
+  {
+    file: 'record-page.spec.ts',
+    // the offline tests need the service worker, which the Start app gets later
+    titles: [
+      'cartridges',
+      'bullets',
+      'powders',
+      'cases',
+      'primers',
+      'targets',
+      'disciplines',
+      'federations',
+    ].flatMap((kind) => [
+      `${kind} the exported file carries the record's own head tags and nothing of its content`,
+      `${kind} a record whose data file is gone shows the not-found message`,
+    ]),
+  },
   {
     file: 'safety.spec.ts',
     titles: [
@@ -60,9 +81,14 @@ export const nextParity: readonly { file: string; titles?: readonly string[] }[]
     file: 'smoke.spec.ts',
     titles: [
       '/ answers 200, shows its h1 and logs no error',
+      '/cartridges/308-win answers 200, shows its h1 and logs no error',
       '/targets answers 200, shows its h1 and logs no error',
+      '/targets/issf-25m-precision-50m-pistol answers 200, shows its h1 and logs no error',
       '/disciplines answers 200, shows its h1 and logs no error',
+      '/disciplines/dsb-25m-pistole-revolver answers 200, shows its h1 and logs no error',
       '/federations answers 200, shows its h1 and logs no error',
+      '/federations/dsb answers 200, shows its h1 and logs no error',
+      'a record page opens another without a page load, back and forward too',
     ],
   },
   {

@@ -61,3 +61,10 @@ test('the brass list links each case to its record', async ({ page }) => {
     /\/cases\/demo-case-308-brass\/?$/,
   )
 })
+
+test('a discipline record links its federation', async ({ page }) => {
+  await gotoHydrated(page, '/disciplines/dsb-25m-pistole-revolver')
+  await expect(
+    page.getByRole('main').getByRole('link', { name: 'Deutscher Schützenbund e.V.' }),
+  ).toHaveAttribute('href', /\/federations\/dsb\/?$/)
+})

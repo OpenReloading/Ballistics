@@ -13,17 +13,11 @@ msgstr "Hülsen"
 msgid "page.casesEditor"
 msgstr "Hülsengruppe"
 
-msgid "record.bullets"
-msgstr "Geschoss"
-
 msgid "page.bulletsDesigner"
 msgstr "Geschoss-Editor"
 
 msgid "page.bullets"
 msgstr "Geschosse"
-
-msgid "record.cartridges"
-msgstr "Patrone"
 
 msgid "page.cartridgesDesigner"
 msgstr "Patronen-Editor"
@@ -31,23 +25,14 @@ msgstr "Patronen-Editor"
 msgid "page.cartridges"
 msgstr "Patronen"
 
-msgid "record.cases"
-msgstr "Hülse"
-
 msgid "page.bulletsCompare"
 msgstr "Geschosse vergleichen"
 
 msgid "page.events"
 msgstr "Wettkämpfe"
 
-msgid "record.disciplines"
-msgstr "Disziplin"
-
 msgid "page.disciplines"
 msgstr "Disziplinen"
-
-msgid "record.federations"
-msgstr "Verband"
 
 msgid "page.federations"
 msgstr "Verbände"
@@ -64,9 +49,6 @@ msgstr "Notizen"
 msgid "page.offline"
 msgstr "Offline"
 
-msgid "record.powders"
-msgstr "Treibladungspulver"
-
 msgid "page.powdersBurnRates"
 msgstr "Abbrandgeschwindigkeit der Treibladungspulver"
 
@@ -75,9 +57,6 @@ msgstr "Treibladungspulver-Editor"
 
 msgid "page.powders"
 msgstr "Treibladungspulver"
-
-msgid "record.primers"
-msgstr "Zündhütchen"
 
 msgid "page.primers"
 msgstr "Zündhütchen"
@@ -93,9 +72,6 @@ msgstr "Schießbuch"
 
 msgid "page.groups"
 msgstr "Schussbilder"
-
-msgid "record.targets"
-msgstr "Scheibe"
 
 msgid "page.targetsDesigner"
 msgstr "Scheiben-Editor"
