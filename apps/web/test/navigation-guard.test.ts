@@ -12,8 +12,10 @@ vi.stubGlobal('window', {
   addEventListener: (type: string, on: (e: PopStateEvent) => void) => {
     if (type === 'popstate') popListener = on
   },
+  // a Back moves in a later task: its popstate arrives when the test pops
+  history: { back: () => {} },
 })
-const { guardNavigation, guardPop } = await import('../src/lib/navigation-guard.ts')
+const { backQuietly, guardNavigation, guardPop } = await import('../src/lib/navigation-guard.ts')
 
 afterAll(() => {
   vi.unstubAllGlobals()
@@ -100,5 +102,19 @@ describe('guardPop', () => {
     guardPop(on)()
     pop()
     expect(on).not.toHaveBeenCalled()
+  })
+
+  it('does not run a handler added before a Back the app took itself arrives, only on the next', () => {
+    const asked: string[] = []
+    // saved: the first guard goes with its entry
+    guardPop(() => asked.push('first'))()
+    backQuietly()
+    // unsaved again before that Back arrives
+    const remove = guardPop(() => asked.push('second'))
+    pop()
+    expect(asked).toEqual([])
+    pop()
+    expect(asked).toEqual(['second'])
+    remove()
   })
 })
