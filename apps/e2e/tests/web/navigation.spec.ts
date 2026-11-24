@@ -22,6 +22,22 @@ test('at 1280 px a tool page and a data page are one sidebar click from a record
   }
 })
 
+test('at 1280 px Search and Settings in the sidebar show their names, as a label or as a tooltip on focus', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await gotoHydrated(page, '/')
+  const nav = page.getByRole('navigation', { name: 'Main' })
+  for (const name of ['Search', 'Settings']) {
+    const button = nav.getByRole('button', { name, exact: true })
+    await button.focus()
+    // the Next rail names its icons by a tooltip, the Start rail by the label under the icon
+    await expect(
+      button.getByText(name, { exact: true }).or(page.getByRole('tooltip', { name })),
+    ).toBeVisible()
+  }
+})
+
 test('at 390 px the drawer lists every section page under its section, and two pages are two clicks away', async ({
   page,
 }) => {

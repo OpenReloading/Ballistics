@@ -1,6 +1,7 @@
-import { Box, Container, NavLink, Text } from '@mantine/core'
+import { Box, Container, Text } from '@mantine/core'
 import { useHotkeys, useMediaQuery } from '@mantine/hooks'
 import { AppFrame } from '@rangefoundry/ui'
+import { Library } from 'lucide-react'
 import {
   lazy,
   type ReactNode,
@@ -13,7 +14,6 @@ import {
 } from 'react'
 import { createPortal } from 'react-dom'
 import { useBarEnd } from '../components/bar-end.ts'
-import { DocsLink } from '../components/docs-link.tsx'
 import { InstallButton } from '../components/install-button.tsx'
 import { NavIcon } from '../components/nav-icons.tsx'
 import { frameRoutes } from '../components/page-shell.tsx'
@@ -46,7 +46,7 @@ const SiteSearch = lazy(() =>
 const repository = repositoryUrl(repositoryAddress)
 const docs = docsUrl(docsAddress, undefined, noDocs)
 
-/** Search or Settings in the navigation, as the Next app's sidebar and drawer offer them: from the drawer the dialog opens once the drawer has closed. */
+/** Search or Settings in the navigation, in the page links' look (the icon over its label in the sidebar): from the drawer the dialog opens once the drawer has closed. */
 function DialogRow({
   icon,
   label,
@@ -63,14 +63,16 @@ function DialogRow({
   // the frame's breakpoint: from 75em the row is in the sidebar, below it in the drawer
   const wide = useMediaQuery('(width >= 75em)')
   return (
-    <NavLink
-      component="button"
-      label={label}
-      leftSection={<NavIcon name={icon} />}
+    <button
+      type="button"
+      className="ui-nav-item"
       aria-haspopup="dialog"
       aria-keyshortcuts={ariaKeys}
       onClick={() => (wide ? open() : afterDrawer(open))}
-    />
+    >
+      <NavIcon name={icon} />
+      <span>{label}</span>
+    </button>
   )
 }
 
@@ -138,7 +140,12 @@ function Navigation({
       <Box hiddenFrom="lg">
         <ReportIssueButton url={repository} drawer onOpen={() => afterDrawer(onReport)} />
       </Box>
-      <DocsLink url={docs} drawer />
+      {docs && (
+        <a href={docs} className="ui-nav-item">
+          <Library size={20} aria-hidden="true" focusable="false" />
+          <span>{t('Documentation')}</span>
+        </a>
+      )}
       <Box hiddenFrom="lg">
         <RepositoryLink url={repository} drawer />
       </Box>
