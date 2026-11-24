@@ -1,6 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { ClientOnly, createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
-import { PlaceholderPage } from '../-placeholder.tsx'
+import { CompareBar, CompareView } from '../../components/bullet-compare-view.tsx'
+import { Loading } from '../../components/states.tsx'
+import { listHead } from '../-list-route.ts'
 
 export const Route = createFileRoute('/bullets/compare')({
   // the router reads `?ids=308` as a number; a value that is no list of ids reads as none
@@ -10,5 +12,28 @@ export const Route = createFileRoute('/bullets/compare')({
       .optional()
       .catch(undefined),
   }),
-  component: PlaceholderPage,
+  head: () =>
+    listHead(
+      'Compare bullets',
+      'Two to four bullets side by side: dimensions, ballistic coefficients and drawings.',
+    ),
+  component: BulletComparePage,
 })
+
+function BulletComparePage() {
+  return (
+    <div className="compare-view">
+      {/* the ids are in the URL only: the bar is the prerendered shell, the table renders in the browser */}
+      <ClientOnly
+        fallback={
+          <>
+            <CompareBar actions={false} />
+            <Loading what="bullets" />
+          </>
+        }
+      >
+        <CompareView />
+      </ClientOnly>
+    </div>
+  )
+}

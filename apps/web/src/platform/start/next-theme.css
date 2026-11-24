@@ -47,4 +47,9 @@ html:root {
     max-width: none;
     padding: 0;
   }
+
+  /* as .page-main in globals.css: a window-high main printed an empty second page after a one-page record */
+  .page-shell .mantine-AppShell-main {
+    min-height: 0;
+  }
 }
