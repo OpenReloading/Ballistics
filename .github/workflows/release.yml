@@ -217,10 +217,26 @@ jobs:
             gh release upload "$tag" "sbom/ballistics-$name-$version.spdx.json" --clobber -R "$GITHUB_REPOSITORY"
           done
 
+  # Own job, so that no build code runs while the publish job holds its OIDC token.
+  pack-check:
+    needs: release-please
+    if: vars.NPM_PUBLISH == 'true' && needs.release-please.outputs.libraries != '[]' && needs.release-please.outputs.libraries != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/pnpm
+      - run: pnpm --filter @rangefoundry/units --filter @rangefoundry/schema --filter @rangefoundry/svg-drawings --filter @rangefoundry/importers --filter @rangefoundry/catalog run build
+      - run: pnpm run pack:check
+
   # npm trusted publishing (OIDC): no npm token. Each library needs a Trusted Publisher on npmjs.com for this
   # repository and workflow. The pushed commit is the release commit, the one every tag points at.
   publish:
-    needs: release-please
+    needs: [release-please, pack-check]
     if: vars.NPM_PUBLISH == 'true' && needs.release-please.outputs.libraries != '[]' && needs.release-please.outputs.libraries != ''
     runs-on: ubuntu-latest
     permissions:
