@@ -11,6 +11,8 @@ const pagesUrl = process.env.PAGES_URL?.replace(/\/?$/, '/')
 const allEngines = Boolean(process.env.ALL_ENGINES)
 /** `off`: no Start site build and no projects `start-*` (the drawing baseline, a local `--project full` run). */
 const startSite = process.env.START_SITE !== 'off'
+/** `off`: no project `next-chromium` (CI's `e2e` job, as the `e2e-next` job runs it). */
+const nextEdition = startSite && process.env.NEXT_EDITION !== 'off'
 const startUrl = 'http://localhost:3043/Ballistics/'
 /** A site with both editions as `pages.yml` deploys it, with its base path and a trailing slash. Unset: the export at `WEB_URL`, whose root `404.html` is the same page. */
 const editionsUrl = process.env.EDITIONS_URL ?? webUrl
@@ -124,8 +126,8 @@ export default defineConfig({
           },
         }))
       : []),
-    // the web specs of the routes the Start app has ported, on its next edition
-    ...(startSite
+    // the web specs of the routes the Start app has ported, on its next edition; in CI only the `e2e-next` job runs it
+    ...(nextEdition
       ? [
           {
             name: 'next-chromium',
