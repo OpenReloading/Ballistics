@@ -16,6 +16,7 @@ import numpy.typing as npt
 import torch
 from PIL import Image
 
+from hole_model.dhash import hash_holdout
 from hole_model.export import OPSET, export
 from hole_model.net import BASE_WIDTHS, HOLE_PX, STRIDE, HoleNet, focal_loss, input_array, loss_mask, target
 from hole_model.real_photos import write
@@ -40,18 +41,18 @@ MAX_ONNX_BYTES = 1 << 20
 Sample = tuple[npt.NDArray[np.uint8], npt.NDArray[np.float32], npt.NDArray[np.float32]]
 
 
-def training_sample(p: Photo, crop: int) -> Sample:
-    """Image, target and loss mask; a real photo is scaled so its hole shows at the working size, as the app does."""
-    rgb, holes, masked = read_photo(p), p.holes, p.masked
+def training_sample(p: Photo, rgb: npt.NDArray[np.uint8], crop: int, hole_px: float = HOLE_PX) -> Sample:
+    """Image, target and loss mask; a real photo is scaled so its hole shows at `hole_px` (the working size)."""
+    holes, masked = p.holes, p.masked
     if p.data != SYNTHETIC:
-        f = HOLE_PX / p.diameter
+        f = hole_px / p.diameter
         im = Image.fromarray(rgb)
         rgb = np.asarray(im.resize((round(im.width * f), round(im.height * f)), Image.Resampling.LANCZOS))
         holes, masked = (holes + 0.5) * f - 0.5, masked * f
     h, w = rgb.shape[:2]
     # a photo smaller than the crop is edge-padded, and the padding is masked out of the loss
     rgb = np.pad(rgb, ((0, max(0, crop - h)), (0, max(0, crop - w)), (0, 0)), mode="edge")
-    heat = target(holes, HOLE_PX if p.data != SYNTHETIC else p.diameter, *rgb.shape[:2])
+    heat = target(holes, hole_px if p.data != SYNTHETIC else p.diameter, *rgb.shape[:2])
     mask = loss_mask(masked, *rgb.shape[:2])
     mask[(h + 1) // STRIDE :] = 0
     mask[:, (w + 1) // STRIDE :] = 0
@@ -83,9 +84,10 @@ def real_counts(batch: int, share: float) -> Iterator[int]:
 
 def train_net(photos: list[Photo], validation: list[Photo], args: argparse.Namespace) -> tuple[HoleNet, dict[str, int]]:
     """The net of the best validation F1 score, checked every `eval_every` steps, and the steps it ran and kept."""
-    samples = [training_sample(p, args.crop) for p in photos]
+    samples = [training_sample(p, read_photo(p), args.crop) for p in photos]
     synthetic = [i for i, p in enumerate(photos) if p.data == SYNTHETIC]
     real = [i for i, p in enumerate(photos) if p.data != SYNTHETIC]
+    real_rgb = {i: read_photo(photos[i]) for i in real} if args.real_scale_jitter else {}
     quota = real_counts(args.batch, args.real_share)
     net = HoleNet(args.widths)
     opt = torch.optim.AdamW(net.parameters(), args.lr, weight_decay=1e-4)
@@ -104,7 +106,12 @@ def train_net(photos: list[Photo], validation: list[Photo], args: argparse.Names
         if n_real:
             picks += [real[i] for i in rng.integers(0, len(real), n_real)]
         for i in picks:
-            image, heat, mask = samples[i]
+            if i in real_rgb:
+                # the synthetic photos' hole sizes: half to twice the working size, uniformly
+                hole_px = HOLE_PX * rng.uniform(0.5, 2.0)
+                image, heat, mask = training_sample(photos[i], real_rgb[i], args.crop, hole_px)
+            else:
+                image, heat, mask = samples[i]
             h, w = image.shape[:2]
             # even offsets keep the crop on the stride-2 grid of the target
             y, x = (int(rng.integers(0, (n - args.crop) // STRIDE + 1)) * STRIDE for n in (h, w))
@@ -211,6 +218,7 @@ def train(args: argparse.Namespace) -> None:
             "crop": args.crop,
             "lr": args.lr,
             "realShare": args.real_share,
+            "realScaleJitter": args.real_scale_jitter,
             "earlyStopping": {"evalEvery": args.eval_every, "patience": args.patience, **kept},
         },
         "data": counts,
@@ -242,6 +250,10 @@ def convert(args: argparse.Namespace) -> None:
     print(json.dumps(write(args.labels, args.posts, args.holdout, args.out, args.validation_share), indent=2))
 
 
+def holdout_dhash(args: argparse.Namespace) -> None:
+    print(json.dumps(hash_holdout(args.holdout), indent=2))
+
+
 def score_set(args: argparse.Namespace) -> None:
     heat = onnx_heat(single_thread_session(str(args.model)))
     print(json.dumps(score(heat, read_label_set(args.labels), [args.threshold], args.believed)[0], indent=2))
@@ -262,6 +274,11 @@ def main() -> None:
     t.add_argument("--widths", type=lambda s: tuple(int(w) for w in s.split(",")), default=BASE_WIDTHS)
     t.add_argument("--sweep-photos", type=int, default=100)
     t.add_argument("--real-share", type=float, default=0.5, help="share of real photos in each batch")
+    t.add_argument(
+        "--real-scale-jitter",
+        action="store_true",
+        help="show the hole of each real photo drawn at a random 8 to 32 px, as the synthetic photos do",
+    )
     t.add_argument("--eval-every", type=int, default=500, help="steps between validation checks; 0 keeps the last net")
     t.add_argument("--patience", type=int, default=3, help="validation checks without a better F1 score before a stop")
     t.set_defaults(run=train)
@@ -272,6 +289,9 @@ def main() -> None:
     c.add_argument("--out", type=Path, required=True)
     c.add_argument("--validation-share", type=float, default=0.2, help="share of source posts in the validation split")
     c.set_defaults(run=convert)
+    h = sub.add_parser("holdout-dhash", help="holdout side: store the dHash of each photo in its manifest.json")
+    h.add_argument("--holdout", type=Path, nargs="+", required=True, help="holdout folders")
+    h.set_defaults(run=holdout_dhash)
     s = sub.add_parser("score", help="score a label set with an exported net")
     s.add_argument("--model", type=Path, required=True)
     s.add_argument("--labels", type=Path, required=True)
