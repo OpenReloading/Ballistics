@@ -4,11 +4,13 @@ html:root {
   --mantine-font-family-headings: var(--font-ui), system-ui, sans-serif;
 }
 
-/* filled controls of the dark scheme at Mantine's blue 8 with white text (primaryShade 8), not the tokens' dark accent; print keeps the light one */
+/* filled controls of the dark scheme at Mantine's shade 8 with white text (primaryShade 8), not the tokens' dark accent; print keeps the light one */
 @media screen {
   html:root[data-mantine-color-scheme="dark"] {
     --mantine-color-blue-filled: var(--mantine-color-blue-8);
     --mantine-color-blue-filled-hover: var(--mantine-color-blue-9);
+    --mantine-color-red-filled: var(--mantine-color-red-8);
+    --mantine-color-red-filled-hover: var(--mantine-color-red-9);
     --mantine-primary-color-contrast: var(--mantine-color-white);
   }
 }
