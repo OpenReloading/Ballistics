@@ -4,14 +4,8 @@ import { PageBar } from '../../components/page-bar.tsx'
 import { PowderList } from '../../components/powder-list.tsx'
 import { ListLoading, ServerDataError } from '../../components/states.tsx'
 import { listAllPowders, listManufacturers } from '../../lib/api.ts'
-import { orderPowders } from '../../lib/burn-rate.ts'
+import { powderListData } from '../../lib/list-page-data.ts'
 import { listTitles } from '../../lib/list-titles.ts'
-import {
-  manufacturerAliases,
-  manufacturerNames,
-  withManufacturerName,
-} from '../../lib/manufacturers.ts'
-import { packPowders } from '../../lib/powder-rows.ts'
 
 export const metadata: Metadata = {
   title: 'Powders',
@@ -28,13 +22,7 @@ async function Powders() {
         <ServerDataError what="Powder" />
       </>
     )
-  // ordered on the server: the page passes row values, not the burn laws
-  const rows = withManufacturerName(
-    r.data,
-    manufacturerNames(manufacturers),
-    manufacturerAliases(manufacturers),
-  )
-  return <PowderList packed={packPowders(orderPowders(rows))} />
+  return <PowderList {...powderListData(r.data, manufacturers)} />
 }
 
 export default function PowdersPage() {

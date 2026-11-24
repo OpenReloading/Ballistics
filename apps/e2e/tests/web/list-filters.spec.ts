@@ -45,3 +45,19 @@ test('a federation record links to the discipline list filtered to it, and no ma
     page.locator('.directory-filters').getByRole('button', { name: 'Federation', exact: true }),
   ).toBeVisible()
 })
+
+test('the federation list links each federation to its record', async ({ page }) => {
+  await gotoHydrated(page, '/federations')
+  await expect(page.getByRole('link', { name: 'Deutscher Schützenbund e.V.' })).toHaveAttribute(
+    'href',
+    /\/federations\/dsb\/?$/,
+  )
+})
+
+test('the brass list links each case to its record', async ({ page }) => {
+  await gotoHydrated(page, '/cases')
+  await expect(page.getByRole('link', { name: /308 Win\. Brass Demo/ })).toHaveAttribute(
+    'href',
+    /\/cases\/demo-case-308-brass\/?$/,
+  )
+})

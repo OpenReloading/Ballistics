@@ -1,4 +1,28 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { PlaceholderPage } from '../-placeholder.tsx'
+import { BulletList } from '../../components/bullet-list.tsx'
+import type { BulletSummary, CartridgeSummary } from '../../lib/api-types.ts'
+import { bulletListData } from '../../lib/list-page-data.ts'
+import { readCatalogue } from '../-data.ts'
+import { listHead, listSearch } from '../-list-route.ts'
 
-export const Route = createFileRoute('/bullets/')({ component: PlaceholderPage })
+export const Route = createFileRoute('/bullets/')({
+  validateSearch: listSearch,
+  loader: async () => {
+    const c = await readCatalogue()
+    return bulletListData(
+      c.bullets().items as BulletSummary[],
+      c.cartridges().items as CartridgeSummary[],
+      c.manufacturers().items,
+    )
+  },
+  head: () =>
+    listHead(
+      'Bullets',
+      'Bullet diameters, masses, lengths and ballistic coefficients each with its source.',
+    ),
+  component: BulletsPage,
+})
+
+function BulletsPage() {
+  return <BulletList {...Route.useLoaderData()} />
+}

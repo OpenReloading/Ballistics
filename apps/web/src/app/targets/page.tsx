@@ -10,9 +10,8 @@ import {
   listFederations,
   listTargetMappings,
 } from '../../lib/api.ts'
-import { withOrganization } from '../../lib/face-organization.ts'
+import { targetListData } from '../../lib/list-page-data.ts'
 import { listTitles } from '../../lib/list-titles.ts'
-import { targetFaceRow } from '../../lib/target-faces.ts'
 
 export const metadata: Metadata = {
   title: 'Targets',
@@ -42,19 +41,9 @@ async function Targets() {
         <ServerDataError what="Target face" />
       </>
     )
-  const rows = faces.flatMap((f) =>
-    f.status === 'ok'
-      ? [targetFaceRow(withOrganization(f.data, federations.data), mappings.data)]
-      : [],
-  )
+  const data = faces.flatMap((f) => (f.status === 'ok' ? [f.data] : []))
   return (
-    <TargetFaceList
-      items={rows}
-      disciplines={disciplines.data.map(({ id, name, federation }) => ({
-        id,
-        name: `${federations.data.find((f) => f.id === federation)?.abbreviation ?? federation} ${name}`,
-      }))}
-    />
+    <TargetFaceList {...targetListData(data, mappings.data, federations.data, disciplines.data)} />
   )
 }
 

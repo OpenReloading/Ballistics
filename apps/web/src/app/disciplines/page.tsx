@@ -11,7 +11,7 @@ import {
   listFederations,
   listTargetMappings,
 } from '../../lib/api.ts'
-import { disciplineRow } from '../../lib/disciplines.ts'
+import { disciplineListData } from '../../lib/list-page-data.ts'
 import { listTitles } from '../../lib/list-titles.ts'
 
 export const metadata: Metadata = {
@@ -28,7 +28,6 @@ async function Disciplines() {
     listCaliberClasses(),
     listAllTargetFaces(),
   ])
-  // the list leaves out the caliber classes: the records hold them
   const records =
     list.status === 'ok' ? await Promise.all(list.data.map(({ id }) => getDiscipline(id))) : []
   if (
@@ -45,10 +44,12 @@ async function Disciplines() {
         <ServerDataError what="Discipline" />
       </>
     )
-  const rows = records.flatMap((r) =>
-    r.status === 'ok' ? [disciplineRow(r.data, federations.data, mappings.data, classes.data)] : [],
+  const data = records.flatMap((r) => (r.status === 'ok' ? [r.data] : []))
+  return (
+    <DisciplineList
+      {...disciplineListData(data, federations.data, mappings.data, classes.data, faces.data)}
+    />
   )
-  return <DisciplineList items={rows} faces={faces.data.map(({ id, name }) => ({ id, name }))} />
 }
 
 export default function DisciplinesPage() {
