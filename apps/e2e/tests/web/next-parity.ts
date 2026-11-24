@@ -32,7 +32,6 @@ export const nextParity: readonly { file: string; titles?: readonly string[] }[]
     titles: [
       '/ answers 200, shows its h1 and logs no error',
       '/workbench answers 200, shows its h1 and logs no error',
-      'the workbench runs a saved load in the browser as the API runs its file',
     ],
   },
   {

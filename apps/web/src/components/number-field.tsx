@@ -35,7 +35,6 @@ import {
   unitList,
 } from '../lib/field-unit.ts'
 import { type Quantity, twistTyped, type Unit, type UnitSystem } from '../lib/units.ts'
-import { useTypedBeforeHydration } from '../lib/use-typed-before-hydration.ts'
 
 /** The value follows the seated bullet, is the record's, is above a limit or refused, differs from the record, or is derived by the drawing (the designers). */
 export type FieldFlag = {
@@ -336,23 +335,6 @@ function FieldInput({
 
 const noValue: FieldValue = { text: '', si: undefined }
 
-/** Text typed into the prerendered field `name` before hydration goes to `change` as typed, unless it is the text the field shows. */
-function useTypedText(
-  name: string | undefined,
-  shown: string,
-  change: (raw: string, typed: boolean) => void,
-) {
-  useTypedBeforeHydration(
-    name === undefined
-      ? {}
-      : {
-          [name]: (raw: string) => {
-            if (raw !== shown) change(raw, true)
-          },
-        },
-  )
-}
-
 /** The unit is part of the label for screen readers; a field taking negatives stays a native number input, as `NumberInput` defaults to `inputMode="decimal"` and the iOS decimal keypad has no minus key. */
 export function NumberField({
   spec,
@@ -370,7 +352,6 @@ export function NumberField({
   placeholder,
   muted,
   unit = 'switch',
-  name,
 }: {
   spec: FieldSpec
   system: UnitSystem
@@ -398,8 +379,6 @@ export function NumberField({
   muted?: boolean
   /** `switch` for this field only, `none` where a column header names it (the designers follow the Settings preset); the label keeps it for screen readers. */
   unit?: 'switch' | 'text' | 'none' | undefined
-  /** The input's name, unique on the page: text typed into the prerendered field before hydration becomes its value. */
-  name?: string | undefined
 }) {
   const value = given ?? noValue
   // the language shown: the field writes its decimal mark and reads text in it
@@ -434,7 +413,6 @@ export function NumberField({
   const switchable = unit === 'switch' && units.length > 1
   const longest = Math.max(...units.map(([, u]) => u.symbol.length))
   const common = {
-    ...(name !== undefined && { name }),
     label: fieldLabel(specLabel, label),
     description: describedBy,
     // the dense workbench grid hides the description: the label shows it on hover
@@ -483,7 +461,6 @@ export function NumberField({
     setPick(pick && { ...pick, typed: next.typed })
     onChange(next.value)
   }
-  useTypedText(name, localizeNumber(shownValue.text), change)
   return (
     <FieldInput
       common={common}

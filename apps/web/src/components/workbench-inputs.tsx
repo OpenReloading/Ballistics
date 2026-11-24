@@ -930,7 +930,6 @@ function LoadField({ name: key }: { name: string }) {
   const fromRecord = recordBore?.[key as keyof typeof recordBore]
   return (
     <NumberField
-      name={key}
       spec={spec}
       system={system}
       // print writes inches below 1 as the readouts do, ".3"; the field keeps its text
@@ -1484,6 +1483,7 @@ function CartridgePicker() {
         chevron
         key={searchKey}
         kind="cartridges"
+        name="cartridge-search"
         label={t('Search cartridges by name')}
         picked={!!(cartridge || cartridgeDesign)}
         chosen={
