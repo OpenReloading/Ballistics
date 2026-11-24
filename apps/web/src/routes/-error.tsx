@@ -38,6 +38,7 @@ export function AppError({ error }: ErrorComponentProps) {
   const router = useRouter()
   return (
     <main style={{ margin: '2rem' }}>
+      <title>{`${t('Something went wrong')} · RangeFoundry Workbench`}</title>
       <h1>{t('Something went wrong')}</h1>
       <p role="alert">{t('RangeFoundry Workbench could not be shown.')}</p>
       <p>{t(kept)}</p>
