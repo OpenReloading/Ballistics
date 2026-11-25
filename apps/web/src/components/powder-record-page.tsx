@@ -1,9 +1,8 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import type { Cartridge, Powder } from '@rangefoundry/schema'
 import { ChartColumn } from 'lucide-react'
-import { useTranslation } from '../i18n/language.ts'
-import { msg } from '../i18n/translate.ts'
 import { fetchPowderList } from '../lib/api-client.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { PowderSummary } from '../lib/api-types.ts'
@@ -78,7 +77,7 @@ async function cartridgeNamesOf(ids: string[], signal: AbortSignal) {
 }
 
 function PowderRecord({ p, names, placed, cartridgeNames }: { p: Powder } & Extras) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const manufacturerName = names.get(p.manufacturer)
   const curve = classifyPowder(p, names)
   const ratio = fittedEnergyRatio(p)
@@ -88,13 +87,23 @@ function PowderRecord({ p, names, placed, cartridgeNames }: { p: Powder } & Extr
     ratio === undefined ? undefined : { value: ratio },
   )
   const data = powderRowGroups(p, cartridgeNames).filter((g) => g.rows.length > 0)
+  const properties = /*i18n*/ { id: 'powderRecord.data', message: 'Properties' }
   return (
     <RecordPage
       title={productLabel(p, names)}
       // a phone: the name alone, the strip's first card names the manufacturer
       short={p.name}
       // form and base are cards of the strip
-      badges={powderIncomplete(p) ? [msg('Values missing: no burn values')] : []}
+      badges={
+        powderIncomplete(p)
+          ? [
+              /*i18n*/ {
+                id: 'powderRecord.valuesMissing',
+                message: 'Values missing: no burn values',
+              },
+            ]
+          : []
+      }
       className="record-chart"
       compare={isFitted(curve) ? `/powders/burn-rates?add=${encodeURIComponent(p.id)}` : undefined}
       workbench={workbenchHref('powder', p.id)}
@@ -103,7 +112,7 @@ function PowderRecord({ p, names, placed, cartridgeNames }: { p: Powder } & Extr
           href={tunePowderHref(`catalogue:${p.id}`)}
           icon={<ChartColumn aria-hidden="true" />}
         >
-          {t('Tune from strings')}
+          {i18n._({ id: 'powderRecord.tuneFromStrings', message: 'Tune from strings' })}
         </LinkButton>
       }
       provenance={p.provenance}
@@ -123,13 +132,17 @@ function PowderRecord({ p, names, placed, cartridgeNames }: { p: Powder } & Extr
       values={
         <>
           {isFitted(curve) && parameters.length > 0 && (
-            <FieldPanel id="model-parameters" title={msg('Model parameters')} groups={parameters} />
+            <FieldPanel
+              id="model-parameters"
+              title={/*i18n*/ { id: 'powderRecord.modelParameters', message: 'Model parameters' }}
+              groups={parameters}
+            />
           )}
           {/* a record with no values beyond the strip (only a name and its sources) gets no empty table */}
           {(data.length > 0 || p.note) && (
-            <Panel id="record-data" title={msg('Properties')} translated>
+            <Panel id="record-data" title={properties} translated>
               {data.length > 0 && (
-                <FieldTable caption={msg('Properties')} labelledBy="record-data" groups={data} />
+                <FieldTable caption={properties} labelledBy="record-data" groups={data} />
               )}
               {p.note && <p className="record-note">{p.note}</p>}
             </Panel>

@@ -24,7 +24,6 @@ import {
   useState,
 } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import { type Message, msg } from '../i18n/translate.ts'
 import {
   type CombinedRow,
   clearanceLine,
@@ -75,12 +74,17 @@ const slotNotes = (v: SpecValue, clearance: number | undefined, system: UnitSyst
 /** The clearance note: hover (and the symbol's hint for the keyboard), a screen reader reads "Clearance"; a negative one is red. */
 function Clearance({ text, negative }: { text: string; negative: boolean }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <Tooltip label={clearanceLine(t(clearanceMeaning), t)} events={tipEvents}>
       <span
         className={negative ? 'clearance conflict' : 'clearance'}
         role="note"
-        aria-label={t('Clearance {value}', { value: text })}
+        aria-label={i18n._({
+          id: 'cartridgeRecord.clearance',
+          message: 'Clearance {value}',
+          values: { value: text },
+        })}
       >
         {text}
       </span>
@@ -248,12 +252,12 @@ export function RecordScope({
 
 /** The record's mm or inch switch, named by `label` where a page has more than one. */
 export function UnitSwitch({ label }: { label?: string | undefined }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { system } = useUnits()
   const { setUnit } = useContext(RecordView)
   return (
     <SegmentedControl
-      aria-label={label ?? t('Length unit')}
+      aria-label={label ?? i18n._({ id: 'cartridgeRecord.lengthUnit', message: 'Length unit' })}
       size={controlSize.row.toggle}
       data={[
         { label: 'mm', value: 'mm' },
@@ -266,14 +270,20 @@ export function UnitSwitch({ label }: { label?: string | undefined }) {
 }
 
 /** The names of a record's two sides, with the labels built on them: whole messages, as word order differs. */
-const sideTitle = { cartridge: msg('Cartridge'), chamber: msg('Chamber') } as const
+const sideTitle = {
+  cartridge: /*i18n*/ { id: 'cartridgeRecord.side.cartridge', message: 'Cartridge' },
+  chamber: /*i18n*/ { id: 'cartridgeRecord.side.chamber', message: 'Chamber' },
+} as const
 const sideUnitLabel = {
-  cartridge: msg('Cartridge length unit'),
-  chamber: msg('Chamber length unit'),
+  cartridge: /*i18n*/ { id: 'cartridgeRecord.unit.cartridge', message: 'Cartridge length unit' },
+  chamber: /*i18n*/ { id: 'cartridgeRecord.unit.chamber', message: 'Chamber length unit' },
 } as const
 const sideDimensions = {
-  cartridge: msg('Cartridge dimensions'),
-  chamber: msg('Chamber dimensions'),
+  cartridge: /*i18n*/ {
+    id: 'cartridgeRecord.dimensions.cartridge',
+    message: 'Cartridge dimensions',
+  },
+  chamber: /*i18n*/ { id: 'cartridgeRecord.dimensions.chamber', message: 'Chamber dimensions' },
 } as const
 
 /** After the CIP data sheets: the cartridge's values are its maximum, the chamber's its minimum, each with its tolerance; the clearance a note where both sides give one; rows run from the mouth to the head. */
@@ -328,12 +338,20 @@ function SidePanel({
   figures: ReactNode
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { system } = useUnits()
   const id = `record-${side}`
   const length = system.length.symbol
   const limit = (unit: string) =>
-    side === 'cartridge' ? t('Max ({unit})', { unit }) : t('Min ({unit})', { unit })
-  const slotTitle = side === 'cartridge' ? t('Tolerance') : t('Tolerance, clearance')
+    i18n._(
+      side === 'cartridge'
+        ? /*i18n*/ { id: 'cartridgeRecord.max', message: 'Max ({unit})', values: { unit } }
+        : /*i18n*/ { id: 'cartridgeRecord.min', message: 'Min ({unit})', values: { unit } },
+    )
+  const slotTitle =
+    side === 'cartridge'
+      ? i18n._({ id: 'cartridgeRecord.tolerance', message: 'Tolerance' })
+      : i18n._({ id: 'cartridgeRecord.toleranceClearance', message: 'Tolerance, clearance' })
   // the characters of the longest tolerance or limit with its clearance in either unit: the slot of every row
   const slot = Math.max(
     0,
@@ -360,16 +378,16 @@ function SidePanel({
   return (
     <Panel
       id={id}
-      title={t(sideTitle[side])}
+      title={i18n._(sideTitle[side])}
       className={undrawn ? 'side-panel side-undrawn' : 'side-panel'}
       // the record's one length unit: both panels switch it
-      controls={<UnitSwitch label={t(sideUnitLabel[side])} />}
+      controls={<UnitSwitch label={i18n._(sideUnitLabel[side])} />}
     >
       <div className="side-body">
-        <ScrollRegion label={t(sideDimensions[side])}>
+        <ScrollRegion label={i18n._(sideDimensions[side])}>
           <Table
             className="cartridge-values side-values"
-            aria-label={t(sideDimensions[side])}
+            aria-label={i18n._(sideDimensions[side])}
             stickyHeader
             style={{ '--slot': slot } as CSSProperties}
             onFocus={(e) => {
@@ -381,7 +399,7 @@ function SidePanel({
             <TableThead>
               <TableTr>
                 <TableTh scope="col" className="dim-symbol">
-                  {t('Symbol')}
+                  {i18n._({ id: 'cartridgeRecord.symbol', message: 'Symbol' })}
                 </TableTh>
                 <TableTh scope="col" className="num">
                   <Sized now={limit(length)} also={slotUnits.map((u) => limit(u.length.symbol))} />
@@ -473,15 +491,19 @@ export function VariantMatrix({
   rows: MatrixRow[]
   labelledBy: string
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { system } = useUnits()
   const { variant } = useContext(RecordView)
   return (
-    <ScrollRegion label={t('Variants table')}>
+    <ScrollRegion
+      label={i18n._({ id: 'cartridgeRecord.variantsTable', message: 'Variants table' })}
+    >
       <Table className="cartridge-values variant-matrix" aria-labelledby={labelledBy}>
         <TableThead>
           <TableTr>
-            <TableTh scope="col">{t('Value')}</TableTh>
+            <TableTh scope="col">
+              {i18n._({ id: 'cartridgeRecord.value', message: 'Value' })}
+            </TableTh>
             {variants.map((v, i) => (
               <TableTh key={v} scope="col" className="num" data-shown={i === variant || undefined}>
                 {v}
@@ -528,9 +550,18 @@ function factParts(v: SpecValue, system: UnitSystem) {
 
 /** The hover help of the facts that are not symbols of the record. */
 const factMeanings = {
-  table: msg('Table: the CIP table of the record, I to XI, by cartridge class'),
-  case: msg('Case: the case type, derived from the record'),
-  method: msg('Method: the pressure measuring method'),
+  table: /*i18n*/ {
+    id: 'cartridgeRecord.meaning.table',
+    message: 'Table: the CIP table of the record, I to XI, by cartridge class',
+  },
+  case: /*i18n*/ {
+    id: 'cartridgeRecord.meaning.case',
+    message: 'Case: the case type, derived from the record',
+  },
+  method: /*i18n*/ {
+    id: 'cartridgeRecord.meaning.method',
+    message: 'Method: the pressure measuring method',
+  },
 }
 
 /** Each fact keeps a fixed minimum width, so the preset applying after mounting moves nothing; table, date, country and measuring method are in `StandardFacts`. */
@@ -546,6 +577,7 @@ export function RecordFacts({
   children?: ReactNode
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { system } = useUnits()
   const items = values.map((v, i) => ({ v, notes: notes[i] ?? [] }))
   const pressures = items.filter(({ v }) => !v.side && v.quantity === 'pressure')
@@ -584,7 +616,10 @@ export function RecordFacts({
       {sized.length > 0 && <FactCard icon={Ruler}>{sized.map((d) => fact(d))}</FactCard>}
       {caseType && (
         <FactCard icon={Cylinder}>
-          <Fact label={t('Case')} notes={[t(factMeanings.case)]}>
+          <Fact
+            label={i18n._({ id: 'cartridgeRecord.case', message: 'Case' })}
+            notes={[i18n._(factMeanings.case)]}
+          >
             {caseTypeText(t, caseType)}
           </Fact>
         </FactCard>
@@ -602,7 +637,7 @@ export function StandardFacts({
   method,
 }: {
   table?: string | undefined
-  date?: { label: Message; value: string } | undefined
+  date?: { label: Wording; value: string } | undefined
   countries?: { name: string; code?: string | undefined }[] | undefined
   method?: Wording | undefined
 }) {
@@ -614,20 +649,23 @@ export function StandardFacts({
       {table && (
         <div>
           <dt>
-            <Label text={t('Table')} notes={[t(factMeanings.table)]} />
+            <Label
+              text={i18n._({ id: 'cartridgeRecord.table', message: 'Table' })}
+              notes={[i18n._(factMeanings.table)]}
+            />
           </dt>
           <dd>{table}</dd>
         </div>
       )}
       {date && (
         <div>
-          <dt>{t(date.label)}</dt>
+          <dt>{say(i18n, t, date.label)}</dt>
           <dd>{date.value}</dd>
         </div>
       )}
       {countries && (
         <div>
-          <dt>{t('Country')}</dt>
+          <dt>{i18n._({ id: 'cartridgeRecord.country', message: 'Country' })}</dt>
           <dd>
             <Countries items={countries} as="span" />
           </dd>
@@ -636,7 +674,10 @@ export function StandardFacts({
       {method && (
         <div>
           <dt>
-            <Label text={t('Method')} notes={[t(factMeanings.method)]} />
+            <Label
+              text={i18n._({ id: 'cartridgeRecord.method', message: 'Method' })}
+              notes={[i18n._(factMeanings.method)]}
+            />
           </dt>
           <dd>{say(i18n, t, method)}</dd>
         </div>
@@ -647,11 +688,11 @@ export function StandardFacts({
 
 /** A shotshell's case length variant whose drawings show, in the Variants title row (every variant stays in the page and prints). */
 export function VariantSelect({ variants }: { variants: string[] }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { variant, setVariant } = useContext(RecordView)
   return (
     <Select
-      aria-label={t('Variant')}
+      aria-label={i18n._({ id: 'cartridgeRecord.variant', message: 'Variant' })}
       size={controlSize.row.input}
       w="8.5rem"
       allowDeselect={false}

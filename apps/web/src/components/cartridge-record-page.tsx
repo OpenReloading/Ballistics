@@ -1,9 +1,9 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { recordFigures } from '@rangefoundry/svg-drawings/cartridge'
 import { useEffect, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import { msg } from '../i18n/translate.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
 import type { CartridgeDetail } from '../lib/api-types.ts'
 import {
@@ -37,7 +37,7 @@ import { RecordView } from './record-view.tsx'
 import { GapBadge, StandardBadge } from './standard-badge.tsx'
 
 function RecordBadges({ aliases, gap }: { aliases: string[]; gap: boolean }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <>
       <StandardBadge label="CIP" />
@@ -47,7 +47,13 @@ function RecordBadges({ aliases, gap }: { aliases: string[]; gap: boolean }) {
           inline
           className="record-badge record-aliases"
           value={aliases.join(', ')}
-          notes={[t('Also printed as: {aliases}', { aliases: aliases.join(', ') })]}
+          notes={[
+            i18n._({
+              id: 'cartridgeRecord.alsoPrintedAs',
+              message: 'Also printed as: {aliases}',
+              values: { aliases: aliases.join(', ') },
+            }),
+          ]}
         />
       )}
     </>
@@ -72,6 +78,7 @@ function useFittingBullets(id: string) {
 /** The page content of one cartridge record. */
 export function Cartridge({ c }: { c: CartridgeDetail }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const sheet = drawable(c)
   const list = recordFigures(sheet)
   const rows = inReadingOrder(combinedRows(c, list, t))
@@ -107,7 +114,12 @@ export function Cartridge({ c }: { c: CartridgeDetail }) {
         sourceFacts={
           <StandardFacts
             table={c.table}
-            date={{ label: c.revised ? msg('Revised') : msg('Published'), value: date }}
+            date={{
+              label: c.revised
+                ? /*i18n*/ { id: 'cartridgeRecord.revised', message: 'Revised' }
+                : /*i18n*/ { id: 'cartridgeRecord.published', message: 'Published' },
+              value: date,
+            }}
             countries={c.country ? parseCountries(c.country) : undefined}
             method={c.pressureMethod && methodWording(c.pressureMethod)}
           />
@@ -121,12 +133,19 @@ export function Cartridge({ c }: { c: CartridgeDetail }) {
             >
               {bullets > 0 && <CartridgeBullets id={c.id} count={bullets} />}
             </RecordFacts>
-            {gap && <p className="record-gap">{t('No dimensions or pressures in this record')}</p>}
+            {gap && (
+              <p className="record-gap">
+                {i18n._({
+                  id: 'cartridgeRecord.noValues',
+                  message: 'No dimensions or pressures in this record',
+                })}
+              </p>
+            )}
             {/* a shotshell's pressures and lengths by variant, across the page */}
             {matrix.rows.length > 0 && (
               <Panel
                 id="record-variants"
-                title={msg('Variants')}
+                title={/*i18n*/ { id: 'cartridgeRecord.variants', message: 'Variants' }}
                 translated
                 className="record-variants"
                 controls={<VariantSelect variants={matrix.variants} />}

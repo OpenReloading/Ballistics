@@ -344,9 +344,7 @@
       "Magnum",
       "Material",
       "Max",
-      "Max ({unit})",
       "Min",
-      "Min ({unit})",
       "N",
       "Name",
       "Navigation",
@@ -382,8 +380,7 @@
       "Version",
       "Vivacity",
       "W",
-      "Wind",
-      "z1 {z}"
+      "Wind"
     ]
   }
 }

@@ -1,10 +1,10 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { Button } from '@mantine/core'
 import { useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
-import { msg } from '../i18n/translate.ts'
 import { bandNote, describeCurve, type FittedPowder, modelCaption } from '../lib/burn-rate.ts'
 import { CurveTable } from './curve-table.tsx'
 import { LazyVivacityChart } from './lazy-vivacity-chart.tsx'
@@ -13,14 +13,26 @@ import { Panel } from './panel.tsx'
 /** The curve values sit behind the Curve values button in the title row and print open. */
 export function VivacityPanel({ powder, z1 }: { powder: FittedPowder; z1?: number | undefined }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const [open, setOpen] = useState(false)
   // z1 of 1 is the end of the axis: a one-stage form, nothing to mark
   const marks =
-    z1 !== undefined && z1 < 1 ? [{ z: z1, label: t('z1 {z}', { z: formatNumber(z1, 1) }) }] : []
+    z1 !== undefined && z1 < 1
+      ? [
+          {
+            z: z1,
+            label: i18n._({
+              id: 'powderRecord.z1',
+              message: 'z1 {z}',
+              values: { z: formatNumber(z1, 1) },
+            }),
+          },
+        ]
+      : []
   return (
     <Panel
       id="vivacity-curve"
-      title={msg('Dynamic vivacity')}
+      title={/*i18n*/ { id: 'powderRecord.vivacity', message: 'Dynamic vivacity' }}
       translated
       className="vivacity-panel"
       controls={
@@ -32,21 +44,25 @@ export function VivacityPanel({ powder, z1 }: { powder: FittedPowder; z1?: numbe
           aria-controls="curve-values"
           onClick={() => setOpen((o) => !o)}
         >
-          {t('Curve values')}
+          {i18n._({ id: 'powderRecord.curveValues', message: 'Curve values' })}
         </Button>
       }
     >
       <div className="burn-rate-curve">
         <LazyVivacityChart
           series={[{ powder, slot: 0 }]}
-          title={t('Dynamic vivacity of {label}, model output', { label: powder.label })}
+          title={i18n._({
+            id: 'powderRecord.vivacityOf',
+            message: 'Dynamic vivacity of {label}, model output',
+            values: { label: powder.label },
+          })}
           description={describeCurve(powder, t)}
           marks={marks}
         />
         <ul className="curve-legend">
           <li>
             <span className="curve-key curve-key-line" aria-hidden="true" />
-            {t('Fitted M3 curve')}
+            {i18n._({ id: 'powderRecord.fittedCurve', message: 'Fitted M3 curve' })}
           </li>
           <li>
             <span className="curve-key curve-key-band" aria-hidden="true" />
@@ -58,7 +74,11 @@ export function VivacityPanel({ powder, z1 }: { powder: FittedPowder; z1?: numbe
       <div id="curve-values" className="curve-values" data-open={open || undefined}>
         <CurveTable
           powders={[powder]}
-          caption={t('Dynamic vivacity of {label}', { label: powder.label })}
+          caption={i18n._({
+            id: 'powderRecord.vivacityTable',
+            message: 'Dynamic vivacity of {label}',
+            values: { label: powder.label },
+          })}
         />
       </div>
     </Panel>
