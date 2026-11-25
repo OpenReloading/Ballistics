@@ -211,7 +211,7 @@ describe('the catalogue lint', () => {
     expect(
       targetRecordProblems(
         {
-          'All targets': 'Alle Ziele',
+          'All targets': 'Ziele',
           'Targets, {filters}': 'Zielscheiben, {filters}',
           '{count} target|{count} targets': { one: '{count} Scheibe', other: '{count} Scheiben' },
           'The published records.': 'Die veröffentlichten Datensätze.',
