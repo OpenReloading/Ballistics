@@ -1,7 +1,6 @@
 'use client'
 
 import type { TargetFace, TargetMapping } from '@rangefoundry/schema'
-import { msg } from '../i18n/translate.ts'
 import { emptyDirectory, writeDirectory } from '../lib/directory.ts'
 import type { FederationListItem } from '../lib/disciplines.ts'
 import type { DisciplineSummary, MappingSummary } from '../lib/face-disciplines.ts'
@@ -40,7 +39,11 @@ function TargetFaceRecord({
       provenance={f.provenance}
       strip={<FaceStrip face={values} />}
       figure={
-        <Panel id="face-drawing" title={msg('Target')} translated>
+        <Panel
+          id="face-drawing"
+          title={/*i18n*/ { id: 'faceRecord.drawing', message: 'Target' }}
+          translated
+        >
           <TargetFaceDrawing face={f} />
         </Panel>
       }

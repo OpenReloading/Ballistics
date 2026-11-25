@@ -1,10 +1,10 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import type { ReactNode } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
 import { plainNumber } from '../i18n/number.ts'
-import { msg } from '../i18n/translate.ts'
 import { countryName } from '../lib/countries.ts'
 import { categoryWord } from '../lib/face-words.ts'
 import { controlSize } from '../lib/theme.ts'
@@ -20,14 +20,31 @@ export function FederationRuleBooks({
 }: {
   books: readonly { title: string; edition: string; url: string }[]
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
-    <Panel id="federation-rule-books" title={t('Rule books ({count})', { count: books.length })}>
+    <Panel
+      id="federation-rule-books"
+      title={i18n._({
+        id: 'federationRecord.ruleBooks',
+        message: 'Rule books ({count})',
+        values: { count: books.length },
+      })}
+    >
       <PanelTable
-        label={t('Rule books table')}
+        label={i18n._({ id: 'federationRecord.ruleBooksTable', message: 'Rule books table' })}
         className="face-table"
-        caption={<span className="visually-hidden">{t('The rule books the records cite')}</span>}
-        columns={[t('Title'), t('Edition')]}
+        caption={
+          <span className="visually-hidden">
+            {i18n._({
+              id: 'federationRecord.ruleBooksCaption',
+              message: 'The rule books the records cite',
+            })}
+          </span>
+        }
+        columns={[
+          i18n._({ id: 'federationRecord.column.title', message: 'Title' }),
+          i18n._({ id: 'federationRecord.column.edition', message: 'Edition' }),
+        ]}
       >
         {books.map((b) => (
           <tr key={b.url}>
@@ -54,21 +71,27 @@ export function FederationData({
   member?: { id: string; name: string } | undefined
   website?: string | undefined
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
+  const title = /*i18n*/ { id: 'federationRecord.data', message: 'Federation' }
   const place =
     country === 'international'
-      ? t('International')
+      ? i18n._({ id: 'federationRecord.international', message: 'International' })
       : /^[A-Z]{2}$/.test(country)
         ? countryName(country, country)
         : country
   return (
-    <Panel id="record-data" title={t('Federation')}>
+    <Panel id="record-data" title={i18n._(title)}>
       <FieldTable
-        caption={msg('Federation')}
+        caption={title}
         labelledBy="record-data"
         groups={[
           {
-            rows: [{ label: msg('Country'), text: place }],
+            rows: [
+              {
+                label: /*i18n*/ { id: 'federationRecord.country', message: 'Country' },
+                text: place,
+              },
+            ],
           },
         ]}
       />
@@ -76,7 +99,7 @@ export function FederationData({
         <dl className="record-links">
           {member && (
             <>
-              <dt>{t('Member of')}</dt>
+              <dt>{i18n._({ id: 'federationRecord.memberOf', message: 'Member of' })}</dt>
               <dd>
                 <Link href={`/federations/${member.id}`}>{member.name}</Link>
               </dd>
@@ -84,7 +107,7 @@ export function FederationData({
           )}
           {website && (
             <>
-              <dt>{t('Homepage')}</dt>
+              <dt>{i18n._({ id: 'federationRecord.homepage', message: 'Homepage' })}</dt>
               <dd>
                 <HomepageLink url={website} />
               </dd>
@@ -115,34 +138,57 @@ export function FederationDisciplines({
   listHref: string
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const numbered = rows.some((d) => d.number)
   return (
     <Panel
       id="federation-disciplines"
-      title={t('Disciplines ({count})', { count: rows.length })}
+      title={i18n._({
+        id: 'federationRecord.disciplines',
+        message: 'Disciplines ({count})',
+        values: { count: rows.length },
+      })}
       controls={
         rows.length > 0 && (
           <LinkButton size={controlSize.row.button} href={listHref}>
-            {t('In the discipline list')}
+            {i18n._({ id: 'federationRecord.inDisciplineList', message: 'In the discipline list' })}
           </LinkButton>
         )
       }
     >
       {rows.length === 0 ? (
-        <p className="record-note">{t('No discipline record names this federation.')}</p>
+        <p className="record-note">
+          {i18n._({
+            id: 'federationRecord.noDisciplines',
+            message: 'No discipline record names this federation.',
+          })}
+        </p>
       ) : (
         <PanelTable
-          label={t('Disciplines table')}
+          label={i18n._({ id: 'federationRecord.disciplinesTable', message: 'Disciplines table' })}
           className="face-table"
           caption={
-            <span className="visually-hidden">{t('The disciplines of this federation')}</span>
+            <span className="visually-hidden">
+              {i18n._({
+                id: 'federationRecord.disciplinesCaption',
+                message: 'The disciplines of this federation',
+              })}
+            </span>
           }
           columns={[
-            ...(numbered ? [t('Number')] : []),
-            t('Discipline'),
-            { label: t('Distance'), num: true },
-            t('Category'),
-            { label: t('Targets'), num: true },
+            ...(numbered
+              ? [i18n._({ id: 'federationRecord.column.number', message: 'Number' })]
+              : []),
+            i18n._({ id: 'federationRecord.column.discipline', message: 'Discipline' }),
+            {
+              label: i18n._({ id: 'federationRecord.column.distance', message: 'Distance' }),
+              num: true,
+            },
+            i18n._({ id: 'federationRecord.column.category', message: 'Category' }),
+            {
+              label: i18n._({ id: 'federationRecord.column.targets', message: 'Targets' }),
+              num: true,
+            },
           ]}
         >
           {rows.map((d) => (
@@ -172,19 +218,42 @@ interface FederationFaceRow {
 
 /** The faces a federation's disciplines are shot on. */
 export function FederationFaces({ rows }: { rows: readonly FederationFaceRow[] }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
-    <Panel id="federation-faces" title={t('Targets ({count})', { count: rows.length })}>
+    <Panel
+      id="federation-faces"
+      title={i18n._({
+        id: 'federationRecord.targets',
+        message: 'Targets ({count})',
+        values: { count: rows.length },
+      })}
+    >
       {rows.length === 0 ? (
-        <p className="record-note">{t('No target mapping of its disciplines names a target.')}</p>
+        <p className="record-note">
+          {i18n._({
+            id: 'federationRecord.noTargets',
+            message: 'No target mapping of its disciplines names a target.',
+          })}
+        </p>
       ) : (
         <PanelTable
-          label={t('Targets table')}
+          label={i18n._({ id: 'federationRecord.targetsTable', message: 'Targets table' })}
           className="face-table"
           caption={
-            <span className="visually-hidden">{t('The targets its disciplines are shot on')}</span>
+            <span className="visually-hidden">
+              {i18n._({
+                id: 'federationRecord.targetsCaption',
+                message: 'The targets its disciplines are shot on',
+              })}
+            </span>
           }
-          columns={[t('Target'), { label: t('Disciplines'), num: true }]}
+          columns={[
+            i18n._({ id: 'federationRecord.column.target', message: 'Target' }),
+            {
+              label: i18n._({ id: 'federationRecord.column.disciplines', message: 'Disciplines' }),
+              num: true,
+            },
+          ]}
         >
           {rows.map((x) => (
             <tr key={x.id}>
