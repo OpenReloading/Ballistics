@@ -7,6 +7,106 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: de\n"
 
+# en: "{added} events added, {equal} already in this browser, {replaced} replaced."
+msgid "events.imported"
+msgstr "{added} Wettkämpfe hinzugefügt, {equal} schon in diesem Browser, {replaced} ersetzt."
+
+# en: "{count, plural, one {# cartridge} other {# cartridges}}"
+msgid "powders.trainingCartridges"
+msgstr "{count, plural, one {# Patrone} other {# Patronen}}"
+
+# en: "{count, plural, one {# competition event in this browser} other {# competition events in this browser}}"
+msgid "events.count"
+msgstr "{count, plural, one {# Wettkampf in diesem Browser} other {# Wettkämpfe in diesem Browser}}"
+
+# en: "{count, plural, one {# event not imported: a record of this browser has its id.} other {# events not imported: records of this browser have their ids.}}"
+msgid "events.heldCount"
+msgstr "{count, plural, one {# Wettkampf nicht importiert: ein Datensatz dieses Browsers hat seine ID.} other {# Wettkämpfe nicht importiert: Datensätze dieses Browsers haben ihre IDs.}}"
+
+# en: "{count, plural, one {# event of the file differs from the one in this browser. Replace it?} other {# events of the file differ from the ones in this browser. Replace them?}}"
+msgid "events.replaceCount"
+msgstr "{count, plural, one {# Wettkampf der Datei weicht von dem in diesem Browser ab. Ersetzen?} other {# Wettkämpfe der Datei weichen von denen in diesem Browser ab. Ersetzen?}}"
+
+# en: "{count, plural, one {# record of another kind left out; Import of a File menu reads it.} other {# records of other kinds left out; Import of a File menu reads them.}}"
+msgid "events.otherKinds"
+msgstr "{count, plural, one {# Datensatz einer anderen Art ausgelassen; der Import eines Datei-Menüs liest ihn.} other {# Datensätze anderer Arten ausgelassen; der Import eines Datei-Menüs liest sie.}}"
+
+# en: "{count, plural, one {# ring} other {# rings}}"
+msgid "targets.rings"
+msgstr "{count, plural, one {# Ring} other {# Ringe}}"
+
+# en: "{count, plural, one {# training row} other {# training rows}}"
+msgid "powders.trainingRows"
+msgstr "{count, plural, one {# Trainingszeile} other {# Trainingszeilen}}"
+
+# en: "{count, plural, one {Add # round of this event to the round count of {name}?} other {Add # rounds of this event to the round count of {name}?}}"
+msgid "events.addRounds"
+msgstr "{count, plural, one {# Schuss dieses Wettkampfs zur Schusszahl von {name} hinzufügen?} other {# Schuss dieses Wettkampfs zur Schusszahl von {name} hinzufügen?}}"
+
+# en: "{low} to {high}"
+msgid "powders.range"
+msgstr "{low} bis {high}"
+
+# en: "{name} has no round count; set one on the Firearms page to add the event to it."
+msgid "events.noRoundCount"
+msgstr "{name} hat keine Schusszahl; legen Sie auf der Seite Schusswaffen eine fest, um den Wettkampf hinzuzurechnen."
+
+# en: "{points} points, hit factor {hf}"
+msgid "events.stageScore"
+msgstr "{points} Punkte, Trefferfaktor {hf}"
+
+# en: "A brass group keeps the cases you measured, with their water capacity, in this browser."
+msgid "cases.noneOwnHint"
+msgstr "Eine Hülsengruppe speichert die von Ihnen gemessenen Hülsen mit ihrer Wasserkapazität in diesem Browser."
+
+# en: "Add"
+msgid "events.add"
+msgstr "Hinzufügen"
+
+# en: "Add series"
+msgid "events.addSeries"
+msgstr "Serie hinzufügen"
+
+# en: "Add stage"
+msgid "events.addStage"
+msgstr "Stage hinzufügen"
+
+# en: "Add to the round count?"
+msgid "events.addRoundsTitle"
+msgstr "Zur Schusszahl hinzufügen?"
+
+# en: "All brass"
+msgid "cases.all"
+msgstr "Alle Hülsen"
+
+# en: "All bullets"
+msgid "bullets.all"
+msgstr "Alle Geschosse"
+
+# en: "All cartridges"
+msgid "cartridges.all"
+msgstr "Alle Patronen"
+
+# en: "All disciplines"
+msgid "disciplines.all"
+msgstr "Alle Disziplinen"
+
+# en: "All federations"
+msgid "disciplines.federationsAll"
+msgstr "Alle Verbände"
+
+# en: "All powders"
+msgid "powders.all"
+msgstr "Alle Treibladungspulver"
+
+# en: "All primers"
+msgid "primers.all"
+msgstr "Alle Zündhütchen"
+
+# en: "All targets"
+msgid "targets.all"
+msgstr "Alle Scheiben"
+
 # en: "Brass"
 msgid "page.cases"
 msgstr "Hülsen"
@@ -14,6 +114,10 @@ msgstr "Hülsen"
 # en: "Brass group"
 msgid "page.casesEditor"
 msgstr "Hülsengruppe"
+
+# en: "Brass, {filters}"
+msgid "cases.filtered"
+msgstr "Hülsen, {filters}"
 
 # en: "Bullet designer"
 msgid "page.bulletsDesigner"
@@ -23,6 +127,22 @@ msgstr "Geschoss-Editor"
 msgid "page.bullets"
 msgstr "Geschosse"
 
+# en: "Bullets, {filters}"
+msgid "bullets.filtered"
+msgstr "Geschosse, {filters}"
+
+# en: "Burn rates"
+msgid "powders.burnRates"
+msgstr "Abbrandgeschwindigkeiten"
+
+# en: "burn-rate order {order}"
+msgid "powders.burnRateOrder"
+msgstr "Rang {order} der Abbrandgeschwindigkeit"
+
+# en: "Cancel"
+msgid "events.cancel"
+msgstr "Abbrechen"
+
 # en: "Cartridge designer"
 msgid "page.cartridgesDesigner"
 msgstr "Patronen-Editor"
@@ -31,33 +151,301 @@ msgstr "Patronen-Editor"
 msgid "page.cartridges"
 msgstr "Patronen"
 
+# en: "Cartridges, {filters}"
+msgid "cartridges.filtered"
+msgstr "Patronen, {filters}"
+
+# en: "Check the event: a value is out of its range."
+msgid "events.outOfRange"
+msgstr "Prüfen Sie den Wettkampf: ein Wert liegt außerhalb seines Bereichs."
+
 # en: "Compare bullets"
 msgid "page.bulletsCompare"
 msgstr "Geschosse vergleichen"
 
 # en: "Competition events"
+msgid "events.title"
+msgstr "Wettkämpfe"
+
+# en: "Competition events"
 msgid "page.events"
 msgstr "Wettkämpfe"
+
+# en: "Date"
+msgid "events.date"
+msgstr "Datum"
+
+# en: "Delete {name}"
+msgid "events.delete"
+msgstr "{name} löschen"
+
+# en: "Delete of {name} failed: {reason}"
+msgid "events.deleteOfFailed"
+msgstr "Löschen von {name} fehlgeschlagen: {reason}"
+
+# en: "Deleted {name} from this browser."
+msgid "events.deletedFromThisBrowser"
+msgstr "{name} wurde aus diesem Browser gelöscht."
+
+# en: "Discipline"
+msgid "events.discipline"
+msgstr "Disziplin"
 
 # en: "Disciplines"
 msgid "page.disciplines"
 msgstr "Disziplinen"
 
+# en: "Disciplines, {filters}"
+msgid "disciplines.filtered"
+msgstr "Disziplinen, {filters}"
+
+# en: "Disqualified: no total."
+msgid "events.disqualifiedNoTotal"
+msgstr "Disqualifiziert: kein Gesamtergebnis."
+
+# en: "Division"
+msgid "events.division"
+msgstr "Division"
+
+# en: "Edit event"
+msgid "events.edit"
+msgstr "Wettkampf bearbeiten"
+
+# en: "Empty: the event type and the day."
+msgid "events.nameHint"
+msgstr "Leer: Wettkampfart und Tag."
+
+# en: "Empty: the shots of the series, where each lists them."
+msgid "events.roundsFiredHint"
+msgstr "Leer: die Schüsse der Serien, wo jede sie aufführt."
+
+# en: "Event total: {total}"
+msgid "events.total"
+msgstr "Gesamtergebnis: {total}"
+
+# en: "Event total: add a series."
+msgid "events.totalAddSeries"
+msgstr "Gesamtergebnis: fügen Sie Serien hinzu."
+
+# en: "Event total: enter the stage points from the official result."
+msgid "events.totalFromResult"
+msgstr "Gesamtergebnis: tragen Sie die Stage-Punkte aus dem offiziellen Ergebnis ein."
+
+# en: "Event type"
+msgid "events.eventType"
+msgstr "Wettkampfart"
+
+# en: "Export CSV"
+msgid "events.exportCsv"
+msgstr "CSV exportieren"
+
+# en: "Export JSON"
+msgid "events.exportJson"
+msgstr "JSON exportieren"
+
 # en: "Federations"
 msgid "page.federations"
 msgstr "Verbände"
+
+# en: "Federations, {filters}"
+msgid "disciplines.federationsFiltered"
+msgstr "Verbände, {filters}"
+
+# en: "Firearm"
+msgid "events.firearm"
+msgstr "Schusswaffe"
 
 # en: "Firearms"
 msgid "page.firearms"
 msgstr "Schusswaffen"
 
+# en: "Fits {name}"
+msgid "bullets.fits"
+msgstr "Passt zu {name}"
+
+# en: "fitting {name}"
+msgid "bullets.fitting"
+msgstr "passend zu {name}"
+
+# en: "From the official result, where published."
+msgid "events.stagePointsHint"
+msgstr "Aus dem offiziellen Ergebnis, wo veröffentlicht."
+
+# en: "Hit factor"
+msgid "events.hitFactor"
+msgstr "Trefferfaktor"
+
+# en: "Import JSON"
+msgid "events.importJson"
+msgstr "JSON importieren"
+
+# en: "International"
+msgid "disciplines.international"
+msgstr "International"
+
+# en: "Level"
+msgid "events.level"
+msgstr "Ebene"
+
+# en: "Load"
+msgid "events.load"
+msgstr "Laborierung"
+
 # en: "Load workbench"
 msgid "page.workbench"
 msgstr "Werkbank für Laborierungen"
 
+# en: "Major"
+msgid "events.major"
+msgstr "Major"
+
+# en: "Manufacturer or name, DP40…"
+msgid "powders.search"
+msgstr "Hersteller oder Name, DP40…"
+
+# en: "Manufacturer, name or cartridge…"
+msgid "cases.search"
+msgstr "Hersteller, Name oder Patrone…"
+
+# en: "Manufacturer, name or size…"
+msgid "primers.search"
+msgstr "Hersteller, Name oder Größe…"
+
+# en: "Manufacturer, name, 168, .308 or 7.82…"
+msgid "bullets.search"
+msgstr "Hersteller, Name, 168, .308 oder 7,82…"
+
+# en: "Metal"
+msgid "events.metal"
+msgstr "Metall"
+
+# en: "Minor"
+msgid "events.minor"
+msgstr "Minor"
+
+# en: "Misses"
+msgid "events.misses"
+msgstr "Fehlschüsse"
+
+# en: "Name"
+msgid "events.name"
+msgstr "Name"
+
+# en: "Name or alias, 308, 7,62 or .308…"
+msgid "cartridges.search"
+msgstr "Name oder Alias, 308, 7,62 oder .308…"
+
+# en: "Name, abbreviation or country, DSB…"
+msgid "disciplines.federationsSearch"
+msgstr "Name, Kürzel oder Land, DSB…"
+
+# en: "Name, federation or event, 25 m…"
+msgid "targets.search"
+msgstr "Name, Verband oder Wettbewerb, 25 m…"
+
+# en: "Name, number, federation or caliber, 2.53…"
+msgid "disciplines.search"
+msgstr "Name, Nummer, Verband oder Kaliber, 2,53…"
+
+# en: "New brass group"
+msgid "cases.new"
+msgstr "Neue Hülsengruppe"
+
+# en: "New bullet"
+msgid "bullets.new"
+msgstr "Neues Geschoss"
+
+# en: "New cartridge"
+msgid "cartridges.new"
+msgstr "Neue Patrone"
+
+# en: "New event"
+msgid "events.new"
+msgstr "Neuer Wettkampf"
+
+# en: "New powder"
+msgid "powders.new"
+msgstr "Neues Treibladungspulver"
+
+# en: "New target"
+msgid "targets.new"
+msgstr "Neue Scheibe"
+
+# en: "No"
+msgid "primers.no"
+msgstr "Nein"
+
+# en: "No brass groups of your own yet"
+msgid "cases.noneOwn"
+msgstr "Noch keine eigenen Hülsengruppen"
+
+# en: "No discipline found"
+msgid "events.noDisciplineFound"
+msgstr "Keine Disziplin gefunden"
+
+# en: "No event yet."
+msgid "events.noEventYet"
+msgstr "Noch kein Wettkampf."
+
+# en: "No firearm saved in this browser yet"
+msgid "events.noFirearm"
+msgstr "Noch keine Schusswaffe in diesem Browser gespeichert"
+
+# en: "No powders yet"
+msgid "powders.none"
+msgstr "Noch keine Treibladungspulver"
+
+# en: "No saved event to export."
+msgid "events.nothingToExport"
+msgstr "Kein gespeicherter Wettkampf zum Exportieren."
+
+# en: "No target sheet saved yet"
+msgid "events.noTargetSheet"
+msgstr "Noch kein Scheibenblatt gespeichert"
+
+# en: "No-shoots"
+msgid "events.noShoots"
+msgstr "No-Shoots"
+
+# en: "None"
+msgid "events.none"
+msgstr "Keine"
+
+# en: "Not imported: {reason}"
+msgid "events.notImported"
+msgstr "Nicht importiert: {reason}"
+
+# en: "Not in this browser"
+msgid "events.notInBrowser"
+msgstr "Nicht in diesem Browser"
+
+# en: "Not saved: {reason}"
+msgid "events.notSaved"
+msgstr "Nicht gespeichert: {reason}"
+
+# en: "Notes"
+msgid "events.notes"
+msgstr "Notizen"
+
 # en: "Offline"
 msgid "page.offline"
 msgstr "Offline"
+
+# en: "Penalties"
+msgid "events.penalties"
+msgstr "Strafen"
+
+# en: "Pick 2 to {max}"
+msgid "bullets.pickToCompare"
+msgstr "2 bis {max} auswählen"
+
+# en: "Place"
+msgid "events.place"
+msgstr "Ort"
+
+# en: "Points"
+msgid "events.points"
+msgstr "Punkte"
 
 # en: "Powder burn rates"
 msgid "page.powdersBurnRates"
@@ -71,17 +459,93 @@ msgstr "Treibladungspulver-Editor"
 msgid "page.powders"
 msgstr "Treibladungspulver"
 
+# en: "Powders, {filters}"
+msgid "powders.filtered"
+msgstr "Treibladungspulver, {filters}"
+
+# en: "Power factor"
+msgid "events.powerFactor"
+msgstr "Power-Faktor"
+
 # en: "Primers"
 msgid "page.primers"
 msgstr "Zündhütchen"
+
+# en: "Primers, {filters}"
+msgid "primers.filtered"
+msgstr "Zündhütchen, {filters}"
+
+# en: "Print the list of events"
+msgid "events.printList"
+msgstr "Liste der Wettkämpfe drucken"
+
+# en: "Print the open event"
+msgid "events.printOpen"
+msgstr "Den geöffneten Wettkampf drucken"
+
+# en: "Procedurals"
+msgid "events.procedurals"
+msgstr "Verfahrensfehler"
 
 # en: "Range mode"
 msgid "page.range"
 msgstr "Schießstand-Modus"
 
+# en: "Remove {name}"
+msgid "events.removeStage"
+msgstr "{name} entfernen"
+
+# en: "Remove series {n}"
+msgid "events.removeSeries"
+msgstr "Serie {n} entfernen"
+
+# en: "Replace"
+msgid "events.replace"
+msgstr "Ersetzen"
+
+# en: "Replace events?"
+msgid "events.replaceEvents"
+msgstr "Wettkämpfe ersetzen?"
+
+# en: "Result"
+msgid "events.result"
+msgstr "Ergebnis"
+
+# en: "Ring values separated by spaces, such as 10 9 10."
+msgid "events.shotsHint"
+msgstr "Wertungen durch Leerzeichen getrennt, etwa 10 9 10."
+
+# en: "Round count of {name}: {count}."
+msgid "events.roundCountOf"
+msgstr "Schusszahl von {name}: {count}."
+
+# en: "Rounds fired"
+msgid "events.roundsFired"
+msgstr "Abgegebene Schüsse"
+
+# en: "Save event"
+msgid "events.saveEvent"
+msgstr "Wettkampf speichern"
+
+# en: "Series"
+msgid "events.seriesHeading"
+msgstr "Serien"
+
+# en: "Series {n}"
+msgid "events.seriesNumber"
+msgstr "Serie {n}"
+
+# en: "Series total"
+msgid "events.seriesTotal"
+msgstr "Seriensumme"
+
 # en: "Session summary"
 msgid "page.session"
 msgstr "Sitzungsübersicht"
+
+# en: "Shooting log"
+msgid "events.shootingLog"
+msgstr "Schießbuch"
 
 # en: "Shooting log"
 msgid "page.firearmsLog"
@@ -91,14 +555,78 @@ msgstr "Schießbuch"
 msgid "page.groups"
 msgstr "Schussbilder"
 
+# en: "Shots"
+msgid "events.shots"
+msgstr "Schüsse"
+
+# en: "Stage {n}"
+msgid "events.stageNumber"
+msgstr "Stage {n}"
+
+# en: "Stage name"
+msgid "events.stageName"
+msgstr "Name der Stage"
+
+# en: "Stage points"
+msgid "events.stagePoints"
+msgstr "Stage-Punkte"
+
+# en: "Stages"
+msgid "events.stages"
+msgstr "Stages"
+
 # en: "Target designer"
 msgid "page.targetsDesigner"
 msgstr "Scheiben-Editor"
+
+# en: "Target sheet"
+msgid "events.targetSheet"
+msgstr "Blatt mit Zielscheibe"
 
 # en: "Targets"
 msgid "page.targets"
 msgstr "Scheiben"
 
+# en: "Targets, {filters}"
+msgid "targets.filtered"
+msgstr "Scheiben, {filters}"
+
+# en: "The catalogue has no powders. Make one with New powder, or import a table of your powders with Import."
+msgid "powders.noneHint"
+msgstr "Der Katalog enthält kein Treibladungspulver. Legen Sie eines mit „Neues Treibladungspulver“ an oder importieren Sie eine Tabelle Ihrer Treibladungspulver mit Import."
+
+# en: "The records of this browser could not be read."
+msgid "events.readFailed"
+msgstr "Die Datensätze dieses Browsers konnten nicht gelesen werden."
+
+# en: "The round count of {name} holds this event already."
+msgid "events.roundCountHeld"
+msgstr "Die Schusszahl von {name} enthält diesen Wettkampf schon."
+
+# en: "The round count of {name} is unchanged."
+msgid "events.roundCountUnchanged"
+msgstr "Die Schusszahl von {name} bleibt unverändert."
+
+# en: "Time (s)"
+msgid "events.time"
+msgstr "Zeit (s)"
+
+# en: "Total"
+msgid "events.totalHeading"
+msgstr "Summe"
+
+# en: "Total {total}"
+msgid "events.partTotal"
+msgstr "Summe {total}"
+
 # en: "Tune a powder"
 msgid "page.powdersTune"
 msgstr "Treibladungspulver abstimmen"
+
+# en: "Undo of {name} failed: {reason}"
+msgid "events.undoOfFailed"
+msgstr "Rückgängig machen von {name} fehlgeschlagen: {reason}"
+
+# en: "Yes"
+msgid "primers.yes"
+msgstr "Ja"

@@ -1,10 +1,12 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { Badge, Box, Button, Text } from '@mantine/core'
 import { FlaskConical, Plus } from 'lucide-react'
 import { useDeferredValue, useMemo } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
+import { ungrouped } from '../i18n/lingui.ts'
 import { formatNumber } from '../i18n/number.ts'
 import { msg } from '../i18n/translate.ts'
 import {
@@ -57,17 +59,19 @@ const n2 = (v: number | undefined) => (v === undefined ? '' : formatNumber(v, 2)
 
 /** What the powder list shows when it has no powder at all: where a powder comes from. */
 function NoPowders() {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <EmptyNote
       icon={<FlaskConical size={24} aria-hidden="true" />}
-      title={t('No powders yet')}
-      description={t(
-        'The catalogue has no powders. Make one with New powder, or import a table of your powders with Import.',
-      )}
+      title={i18n._({ id: 'powders.none', message: 'No powders yet' })}
+      description={i18n._({
+        id: 'powders.noneHint',
+        message:
+          'The catalogue has no powders. Make one with New powder, or import a table of your powders with Import.',
+      })}
       action={
         <Button component={Link} href="/powders/designer" leftSection={<Plus aria-hidden="true" />}>
-          {t('New powder')}
+          {i18n._({ id: 'powders.new', message: 'New powder' })}
         </Button>
       }
     />
@@ -76,7 +80,8 @@ function NoPowders() {
 
 /** Every row's interval on one log scale; powders with a curve are ticked for the overlay of `/powders/burn-rates`; this browser's powders are Mine rows, opened in the powder designer. */
 export function PowderList({ packed }: { packed: PackedPowder[] }) {
-  const { t, tn } = useTranslation()
+  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const [records, removeRow, read] = useUserRecords()
   const catalogue = useMemo(() => unpackPowders(packed), [packed])
   // the browser's powders first: a few rows would sit unseen behind the catalogue's
@@ -159,7 +164,11 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
             <Text component="span" inherit className="rate-interval" c="dimmed" fz="xs" truncate>
               {r.low === undefined
                 ? ''
-                : t('{low} to {high}', { low: n2(r.low), high: n2(r.high) })}
+                : i18n._({
+                    id: 'powders.range',
+                    message: '{low} to {high}',
+                    values: { low: n2(r.low), high: n2(r.high) },
+                  })}
             </Text>
             <RateBar domain={domain} mean={r.meanVivacity} low={r.low} high={r.high} />
           </span>
@@ -178,7 +187,14 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
             <span>{r.trainingRows}</span>
             <Text component="span" inherit c="dimmed" fz="xs">
               {r.trainingCartridges !== undefined &&
-                tn(r.trainingCartridges, '{count} cartridge', '{count} cartridges')}
+                i18n._(
+                  'powders.trainingCartridges',
+                  { count: r.trainingCartridges },
+                  {
+                    message: '{count, plural, one {# cartridge} other {# cartridges}}',
+                    formats: ungrouped,
+                  },
+                )}
               {r.trainingCartridges !== undefined && r.retrieved && ' · '}
               {r.retrieved && <Day day={r.retrieved} />}
             </Text>
@@ -192,9 +208,21 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
     [
       r.origin === 'user' && t(originNames.user),
       r.manufacturerName,
-      r.burnRateOrder !== undefined && t('burn-rate order {order}', { order: r.burnRateOrder }),
+      r.burnRateOrder !== undefined &&
+        i18n._({
+          id: 'powders.burnRateOrder',
+          message: 'burn-rate order {order}',
+          values: { order: r.burnRateOrder },
+        }),
       r.trainingRows !== undefined &&
-        tn(r.trainingRows, '{count} training row', '{count} training rows'),
+        i18n._(
+          'powders.trainingRows',
+          { count: r.trainingRows },
+          {
+            message: '{count, plural, one {# training row} other {# training rows}}',
+            formats: ungrouped,
+          },
+        ),
       r.grainForm && grainFormText(t, r.grainForm),
       r.propellantBase && baseLine(t, r.propellantBase),
     ]
@@ -222,20 +250,20 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
             min={0}
             max={maxOverlay}
             href={overlayHref(picked)}
-            idle={t('Burn rates')}
+            idle={i18n._({ id: 'powders.burnRates', message: 'Burn rates' })}
           />
           <Button
             component={Link}
             href="/powders/designer"
             leftSection={<Plus aria-hidden="true" />}
           >
-            {t('New powder')}
+            {i18n._({ id: 'powders.new', message: 'New powder' })}
           </Button>
         </>
       }
       state={state}
       set={set}
-      placeholder={t('Manufacturer or name, DP40…')}
+      placeholder={i18n._({ id: 'powders.search', message: 'Manufacturer or name, DP40…' })}
       columns={columns}
       counts={counts}
       table={
@@ -248,8 +276,12 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
           label={productLabel}
           caption={
             named.length === 0
-              ? t('All powders')
-              : t('Powders, {filters}', { filters: named.join(', ') })
+              ? i18n._({ id: 'powders.all', message: 'All powders' })
+              : i18n._({
+                  id: 'powders.filtered',
+                  message: 'Powders, {filters}',
+                  values: { filters: named.join(', ') },
+                })
           }
           noun="powders"
           sort={state.sort}
