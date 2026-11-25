@@ -106,6 +106,12 @@ msgstr "{count, plural, one {# training row} other {# training rows}}"
 msgid "events.addRounds"
 msgstr "{count, plural, one {Add # round of this event to the round count of {name}?} other {Add # rounds of this event to the round count of {name}?}}"
 
+msgid "bulletCompare.notFoundIds"
+msgstr "{count, plural, one {No bullet with the id {ids}.} other {No bullets with the ids {ids}.}}"
+
+msgid "bulletCompare.invalidIds"
+msgstr "{count, plural, one {Not a bullet id: {ids}.} other {Not bullet ids: {ids}.}}"
+
 msgid "comparePicks.hidden"
 msgstr "{count} hidden"
 
@@ -114,6 +120,9 @@ msgstr "{count} selected"
 
 msgid "comparePicks.selectedMax"
 msgstr "{count} selected (max {max})"
+
+msgid "bulletCompare.labelFrom"
+msgstr "{label} from {velocity}"
 
 msgid "fieldStrip.bandFrom"
 msgstr "{label} from {velocity}"
@@ -151,6 +160,9 @@ msgstr "{n, number} {unit} per shot"
 msgid "disciplines.cover.stage"
 msgstr "{n, number} {unit} per stage"
 
+msgid "burnRateCompare.userDesign"
+msgstr "{name} (user design)"
+
 msgid "events.noRoundCount"
 msgstr "{name} has no round count; set one on the Firearms page to add the event to it."
 
@@ -159,6 +171,9 @@ msgstr "{name} was not deleted: the browser refused."
 
 msgid "events.stageScore"
 msgstr "{points} points, hit factor {hf}"
+
+msgid "bulletDrawing.noLength"
+msgstr "{reason} The drawing needs a diameter and a length."
 
 msgid "sources.only"
 msgstr "{source} only"
@@ -169,11 +184,20 @@ msgstr "{title}: group"
 msgid "powderRecord.meanInterval"
 msgstr "{value} ({low} to {high})"
 
+msgid "burnRate.meanInterval"
+msgstr "{value} ({low} to {high}) {unit}"
+
+msgid "burnRate.mean"
+msgstr "{value} {unit}"
+
 msgid "cases.noneOwnHint"
 msgstr "A brass group keeps the cases you measured, with their water capacity, in this browser."
 
 msgid "cartridgeRecord.fitRule"
 msgstr "A bullet fits a cartridge when its diameter is above the mean of the land and groove diameters F and Z and at most the projectile diameter G1, all from the CIP sheet (G1 to its printed 0.01 mm)."
+
+msgid "burnRateCompare.loadError"
+msgstr "A curve could not be loaded."
 
 msgid "powderRecord.neighborNote"
 msgstr "A neighbor is a candidate, not a substitute: it needs a new charge workup before it replaces this powder."
@@ -195,6 +219,12 @@ msgstr "Actions"
 
 msgid "events.add"
 msgstr "Add"
+
+msgid "bulletCompare.add"
+msgstr "Add bullet"
+
+msgid "burnRateCompare.add"
+msgstr "Add powder"
 
 msgid "events.addSeries"
 msgstr "Add series"
@@ -313,11 +343,17 @@ msgstr "Brass group"
 msgid "cases.filtered"
 msgstr "Brass, {filters}"
 
+msgid "bulletCompare.data"
+msgstr "Bullet data"
+
 msgid "bulletRecord.data"
 msgstr "Bullet data"
 
 msgid "states.unavailable.bullet"
 msgstr "Bullet data is unavailable right now."
+
+msgid "bulletCompare.dataTable"
+msgstr "Bullet data table"
 
 msgid "page.bulletsDesigner"
 msgstr "Bullet designer"
@@ -469,6 +505,9 @@ msgstr "Chamber length unit"
 msgid "events.outOfRange"
 msgstr "Check the event: a value is out of its range."
 
+msgid "bulletCompare.choose"
+msgstr "Choose bullets"
+
 msgid "comparePicks.clear"
 msgstr "Clear"
 
@@ -504,6 +543,9 @@ msgstr "Compare {count}"
 
 msgid "page.bulletsCompare"
 msgstr "Compare bullets"
+
+msgid "bulletCompare.compareOthers"
+msgstr "Compare the others"
 
 msgid "log.column.event"
 msgstr "Competition event"
@@ -574,6 +616,9 @@ msgstr "Curve values"
 msgid "units.custom"
 msgstr "Custom"
 
+msgid "bulletDrawing.dashed"
+msgstr "Dashed in the flag color: parts the record does not give, drawn from an assumed shape."
+
 msgid "events.date"
 msgstr "Date"
 
@@ -612,6 +657,9 @@ msgstr "Derived from the range or gauge the rule book states"
 
 msgid "bullets.column.diameter"
 msgstr "Diameter"
+
+msgid "bulletCompare.difference"
+msgstr "difference to the first bullet"
 
 msgid "targets.facet.discipline"
 msgstr "Discipline"
@@ -691,6 +739,12 @@ msgstr "Drawing"
 msgid "recordActions.drawingNotes"
 msgstr "Drawing notes"
 
+msgid "bulletCompare.drawings"
+msgstr "Drawings"
+
+msgid "bulletCompare.drawingsRegion"
+msgstr "Drawings"
+
 msgid "units.quantity.lineOfSightOffset"
 msgstr "Drop, windage"
 
@@ -703,8 +757,20 @@ msgstr "Dynamic vivacity averaged over burnt fraction 0.1 to 0.9, plus and minus
 msgid "powderRecord.vivacityTable"
 msgstr "Dynamic vivacity of {label}"
 
+msgid "burnRate.curve"
+msgstr "Dynamic vivacity of {label} over burnt fraction 0 to 1: {start} {unit} at z 0, highest {top} at z {z}, {end} at z 1. Mean over z 0.1 to 0.9: {mean}."
+
 msgid "powderRecord.vivacityOf"
 msgstr "Dynamic vivacity of {label}, model output"
+
+msgid "burnRateCompare.table"
+msgstr "Dynamic vivacity of the chosen powders"
+
+msgid "burnRateCompare.chart"
+msgstr "Dynamic vivacity of the chosen powders, model output"
+
+msgid "burnRateCompare.lead"
+msgstr "Dynamic vivacity, the burn rate per pressure, over burnt fraction."
 
 msgid "events.edit"
 msgstr "Edit event"
@@ -935,6 +1001,9 @@ msgstr "Large pistol"
 msgid "values.largeRifle"
 msgstr "Large rifle"
 
+msgid "bulletCompare.largest"
+msgstr "largest"
+
 msgid "firearms.column.lastSession"
 msgstr "Last session"
 
@@ -958,6 +1027,9 @@ msgstr "Length"
 
 msgid "cartridgeRecord.lengthUnit"
 msgstr "Length unit"
+
+msgid "bulletCompare.lengthUnit"
+msgstr "Length unit of the page: drawings and table"
 
 msgid "units.quantity.length"
 msgstr "Lengths"
@@ -1211,6 +1283,9 @@ msgstr "Model fit"
 msgid "powderRecord.modelFitTable"
 msgstr "Model fit table"
 
+msgid "burnRate.modelCaption"
+msgstr "Model output from fitted M3 parameters, not manufacturer data."
+
 msgid "powderRecord.modelParameters"
 msgstr "Model parameters"
 
@@ -1219,6 +1294,9 @@ msgstr "Muzzle energy from"
 
 msgid "values.muzzleLoader"
 msgstr "Muzzle loader"
+
+msgid "bulletCompare.notAvailable"
+msgstr "n/a"
 
 msgid "directoryTable.missing"
 msgstr "n/a"
@@ -1304,6 +1382,9 @@ msgstr "No brass groups of your own yet"
 msgid "states.noMatch.cases"
 msgstr "No brass matches these filters."
 
+msgid "bulletCompare.none"
+msgstr "No bullets chosen."
+
 msgid "states.noMatch.bullets"
 msgstr "No bullets match these filters."
 
@@ -1325,6 +1406,12 @@ msgstr "No discipline record names this federation."
 msgid "states.noMatch.disciplines"
 msgstr "No disciplines match these filters."
 
+msgid "bulletDrawing.none"
+msgstr "No drawing for this record."
+
+msgid "bulletCompare.noDrawing"
+msgstr "No drawing: {reason}"
+
 msgid "states.noMatch.logEntries"
 msgstr "No entries match these filters."
 
@@ -1342,6 +1429,12 @@ msgstr "No firearms match these filters."
 
 msgid "recordSources.noPage"
 msgstr "No page stated"
+
+msgid "burnRateCompare.empty"
+msgstr "No powder in the overlay."
+
+msgid "burnRateCompare.noMatch"
+msgstr "No powder with a curve matches"
 
 msgid "states.noMatch.powders"
 msgstr "No powders match these filters."
@@ -1381,6 +1474,9 @@ msgstr "None"
 
 msgid "disciplines.notAllowed"
 msgstr "Not allowed"
+
+msgid "bulletDrawing.notDimensioned"
+msgstr "Not dimensioned: {parts}."
 
 msgid "events.notImported"
 msgstr "Not imported: {reason}"
@@ -1457,11 +1553,23 @@ msgstr "original"
 msgid "targets.column.outer"
 msgstr "Outer diameter"
 
+msgid "bulletCompare.outline"
+msgstr "Outline, {name}"
+
+msgid "bulletDrawing.outline"
+msgstr "Outline, {name}"
+
+msgid "burnRateCompare.overlay"
+msgstr "Overlay"
+
 msgid "disciplines.row.page"
 msgstr "Page"
 
 msgid "recordSources.page"
 msgstr "Page {page}"
+
+msgid "bulletDrawing.assumed"
+msgstr "Parts drawn dashed are assumed, not from the record."
 
 msgid "events.penalties"
 msgstr "Penalties"
@@ -1477,6 +1585,9 @@ msgstr "Place"
 
 msgid "log.column.place"
 msgstr "Place"
+
+msgid "burnRate.bandNote"
+msgstr "Plus and minus 2 standard uncertainties of the fitted vivacity, a lower bound."
 
 msgid "cartridges.column.pmax"
 msgstr "Pmax"
@@ -1504,6 +1615,12 @@ msgstr "Powder designer"
 
 msgid "page.powders"
 msgstr "Powders"
+
+msgid "burnRateCompare.byRate"
+msgstr "Powders by burn rate"
+
+msgid "burnRateCompare.powders"
+msgstr "Powders in the overlay"
 
 msgid "powders.filtered"
 msgstr "Powders, {filters}"
@@ -1537,6 +1654,9 @@ msgstr "Print the list of events"
 
 msgid "events.printOpen"
 msgstr "Print the open event"
+
+msgid "bulletDrawing.lifeSize"
+msgstr "Printed at 100 % scale, the drawing is life size (1:1)."
 
 msgid "directoryTable.printed.brass"
 msgstr "Printed: the first {limit} of {total} brass."
@@ -1601,6 +1721,9 @@ msgstr "published"
 msgid "cartridgeRecord.published"
 msgstr "Published"
 
+msgid "bulletCompare.quantity"
+msgstr "Quantity"
+
 msgid "fieldTable.column.quantity"
 msgstr "Quantity"
 
@@ -1618,6 +1741,9 @@ msgstr "RangeFoundry"
 
 msgid "disciplines.rule.reflex"
 msgstr "reflex"
+
+msgid "bulletCompare.remove"
+msgstr "Remove {name}"
 
 msgid "events.removeStage"
 msgstr "Remove {name}"
@@ -1835,6 +1961,9 @@ msgstr "Sighters per event"
 msgid "disciplines.row.sights"
 msgstr "Sights"
 
+msgid "bulletDrawing.simplified"
+msgstr "Simplified drawing from the record; only values with a source are dimensioned. The table is the data."
+
 msgid "disciplines.rule.singleShot"
 msgstr "single shot"
 
@@ -1855,6 +1984,12 @@ msgstr "Small pistol"
 
 msgid "values.smallRifle"
 msgstr "Small rifle"
+
+msgid "bulletCompare.smallest"
+msgstr "smallest"
+
+msgid "bulletCompare.notFound"
+msgstr "Some bullets were not found."
 
 msgid "directoryTable.sort"
 msgstr "Sort"
@@ -1903,6 +2038,9 @@ msgstr "standing"
 
 msgid "disciplines.row.support"
 msgstr "Support"
+
+msgid "bulletCompare.symbol"
+msgstr "Symbol"
 
 msgid "cartridgeRecord.symbol"
 msgstr "Symbol"
@@ -1964,6 +2102,9 @@ msgstr "Targets table"
 msgid "targets.filtered"
 msgstr "Targets, {filters}"
 
+msgid "bulletDrawing.description"
+msgstr "Technical drawing of the bullet, full section about the axis, base at the bottom: {values}."
+
 msgid "units.quantity.temperature"
 msgstr "Temperature"
 
@@ -1994,6 +2135,9 @@ msgstr "The events and disciplines shot on this target"
 msgid "firearms.column.opticHelp"
 msgstr "The first optic of the active configuration and its zero range."
 
+msgid "bulletCompare.tooManyText"
+msgstr "The link names {count} bullets; at most {max} compare at once."
+
 msgid "bullets.column.g1Help"
 msgstr "The manufacturer's first published BC of this drag model."
 
@@ -2021,14 +2165,23 @@ msgstr "The targets its disciplines are shot on"
 msgid "matchRounds.shotsUnstated"
 msgstr "The targets of this discipline state no shot count."
 
+msgid "bulletCompare.invalid"
+msgstr "This link is not valid."
+
 msgid "recordView.needsJavaScript"
 msgstr "This page needs JavaScript."
+
+msgid "bulletCompare.noneText"
+msgstr "Tick 2 to 4 bullets in the list, then Compare."
 
 msgid "events.time"
 msgstr "Time (s)"
 
 msgid "disciplines.row.timeLimit"
 msgstr "Time limit"
+
+msgid "bulletCompare.legend"
+msgstr "Tinted: values differ. ▲ largest, ▼ smallest in a row. In brackets: difference to the first bullet."
 
 msgid "bullets.facet.tip"
 msgstr "Tip"
@@ -2041,6 +2194,9 @@ msgstr "Tolerance"
 
 msgid "cartridgeRecord.toleranceClearance"
 msgstr "Tolerance, clearance"
+
+msgid "bulletCompare.tooMany"
+msgstr "Too many bullets."
 
 msgid "events.totalHeading"
 msgstr "Total"
@@ -2072,6 +2228,9 @@ msgstr "Type"
 msgid "events.undoOfFailed"
 msgstr "Undo of {name} failed: {reason}"
 
+msgid "bulletCompare.unit"
+msgstr "Unit"
+
 msgid "fieldTable.column.unit"
 msgstr "Unit"
 
@@ -2087,14 +2246,23 @@ msgstr "Untick"
 msgid "comparePicks.untickName"
 msgstr "Untick {name}"
 
+msgid "burnRateCompare.upTo"
+msgstr "Up to {max}"
+
 msgid "units.preset.us"
 msgstr "US customary"
+
+msgid "bulletCompare.useInWorkbench"
+msgstr "Use in workbench"
 
 msgid "bulletRecord.useInWorkbench"
 msgstr "Use in workbench"
 
 msgid "recordActions.useInWorkbench"
 msgstr "Use in workbench"
+
+msgid "bulletCompare.useInWorkbenchFor"
+msgstr "Use in workbench: {name}"
 
 msgid "cartridgeRecord.value"
 msgstr "Value"
@@ -2107,6 +2275,9 @@ msgstr "Values missing: no burn values"
 
 msgid "bulletRecord.valuesMissing"
 msgstr "Values missing: the record only names the bullet"
+
+msgid "burnRateCompare.valuesTable"
+msgstr "Values table"
 
 msgid "cartridgeRecord.variant"
 msgstr "Variant"
@@ -2137,6 +2308,9 @@ msgstr "whole record"
 
 msgid "units.quantity.windSpeed"
 msgstr "Wind speed"
+
+msgid "burnRateCompare.noCurve"
+msgstr "Without a curve"
 
 msgid "primers.yes"
 msgstr "Yes"

@@ -178,5 +178,5 @@ describe('the neighbors of a powder in the burn-rate order', () => {
 })
 
 it('writes the standard uncertainties of the band note as the interval factor', () => {
-  expect(bandNote).toContain(`Plus and minus ${uncertaintyFactor} standard`)
+  expect(bandNote.message).toContain(`Plus and minus ${uncertaintyFactor} standard`)
 })

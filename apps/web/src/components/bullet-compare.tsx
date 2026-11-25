@@ -20,7 +20,6 @@ import { type CSSProperties, type ReactNode, useState } from 'react'
 import Link from '@/platform/link.tsx'
 import { useRouter } from '@/platform/navigation.ts'
 import { useTranslation } from '../i18n/language.ts'
-import { msg } from '../i18n/translate.ts'
 import {
   compareGroups,
   differenceMarks,
@@ -45,11 +44,14 @@ const CompareAddChooser = dynamic(
   { ssr: false },
 )
 
-const markText = { max: msg('largest'), min: msg('smallest') } as const
+const markText = {
+  max: /*i18n*/ { id: 'bulletCompare.largest', message: 'largest' },
+  min: /*i18n*/ { id: 'bulletCompare.smallest', message: 'smallest' },
+} as const
 
 /** "Add bullet": the bullet search over the catalogue; the chosen bullet joins the comparison as its last column. */
 function AddBullet({ ids }: { ids: string[] }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { system } = useUnits()
   const router = useRouter()
   const [opened, setOpened] = useState(false)
@@ -68,7 +70,7 @@ function AddBullet({ ids }: { ids: string[] }) {
           setOpened(true)
         }}
       >
-        {t('Add bullet')}
+        {i18n._({ id: 'bulletCompare.add', message: 'Add bullet' })}
       </Button>
       {wanted && (
         <CompareAddChooser
@@ -102,18 +104,22 @@ export function BulletCompare({
     <div className="bullet-compare" style={style}>
       <Panel
         id="compare-data"
-        title={msg('Bullet data')}
+        title={/*i18n*/ { id: 'bulletCompare.data', message: 'Bullet data' }}
         translated
         controls={<AddBullet ids={ids} />}
       >
-        <ScrollRegion label={t('Bullet data table')}>
+        <ScrollRegion
+          label={i18n._({ id: 'bulletCompare.dataTable', message: 'Bullet data table' })}
+        >
           <Table className="field-table symbol-table compare-table" aria-labelledby="compare-data">
             <TableThead>
               <TableTr>
                 <TableTh scope="col" className="field-symbol">
-                  {t('Symbol')}
+                  {i18n._({ id: 'bulletCompare.symbol', message: 'Symbol' })}
                 </TableTh>
-                <TableTh scope="col">{t('Quantity')}</TableTh>
+                <TableTh scope="col">
+                  {i18n._({ id: 'bulletCompare.quantity', message: 'Quantity' })}
+                </TableTh>
                 {bullets.map((b) => (
                   <TableTh key={b.id} scope="col">
                     <Flex align="flex-start" justify="space-between" gap={4}>
@@ -130,10 +136,17 @@ export function BulletCompare({
                         <Link
                           href={workbenchHref('bullet', b.id)}
                           className="compare-workbench screen-only"
-                          aria-label={t('Use in workbench: {name}', { name: productLabel(b) })}
+                          aria-label={i18n._({
+                            id: 'bulletCompare.useInWorkbenchFor',
+                            message: 'Use in workbench: {name}',
+                            values: { name: productLabel(b) },
+                          })}
                         >
                           <FlaskConical aria-hidden="true" />
-                          {t('Use in workbench')}
+                          {i18n._({
+                            id: 'bulletCompare.useInWorkbench',
+                            message: 'Use in workbench',
+                          })}
                         </Link>
                       </span>
                       {bullets.length > 1 && (
@@ -141,14 +154,18 @@ export function BulletCompare({
                           component={Link}
                           href={compareHref(ids.filter((id) => id !== b.id))}
                           className="screen-only"
-                          aria-label={t('Remove {name}', { name: productLabel(b) })}
+                          aria-label={i18n._({
+                            id: 'bulletCompare.remove',
+                            message: 'Remove {name}',
+                            values: { name: productLabel(b) },
+                          })}
                         />
                       )}
                     </Flex>
                   </TableTh>
                 ))}
                 <TableTh scope="col" className="field-unit-cell">
-                  {t('Unit')}
+                  {i18n._({ id: 'bulletCompare.unit', message: 'Unit' })}
                 </TableTh>
               </TableTr>
             </TableThead>
@@ -169,9 +186,10 @@ export function BulletCompare({
                       <TableTh scope="row">
                         {row.from === undefined
                           ? say(i18n, t, row.label)
-                          : t('{label} from {velocity}', {
-                              label: say(i18n, t, row.label),
-                              velocity: row.from,
+                          : i18n._({
+                              id: 'bulletCompare.labelFrom',
+                              message: '{label} from {velocity}',
+                              values: { label: say(i18n, t, row.label), velocity: row.from },
                             })}
                       </TableTh>
                       {row.values.map((v, i) => {
@@ -179,12 +197,15 @@ export function BulletCompare({
                         const delta = deltas[i]
                         return (
                           <TableTd key={ids[i]} className="num" data-mark={mark}>
-                            {v ?? t('n/a')}
+                            {v ?? i18n._({ id: 'bulletCompare.notAvailable', message: 'n/a' })}
                             {delta && (
                               <span className="compare-delta">
                                 {' '}
                                 <span className="visually-hidden delta-name">
-                                  {t('difference to the first bullet')}
+                                  {i18n._({
+                                    id: 'bulletCompare.difference',
+                                    message: 'difference to the first bullet',
+                                  })}
                                 </span>{' '}
                                 ({delta})
                               </span>
@@ -193,7 +214,7 @@ export function BulletCompare({
                               {mark === 'max' ? '▲' : mark === 'min' ? '▼' : ''}
                             </span>
                             {mark && (
-                              <span className="visually-hidden"> ({t(markText[mark])})</span>
+                              <span className="visually-hidden"> ({i18n._(markText[mark])})</span>
                             )}
                           </TableTd>
                         )
@@ -208,13 +229,19 @@ export function BulletCompare({
         </ScrollRegion>
         {/* the cells say "largest" or "smallest" themselves. Read alone, the legend lost its marks */}
         <p className="compare-legend" aria-hidden="true">
-          {t(
-            'Tinted: values differ. ▲ largest, ▼ smallest in a row. In brackets: difference to the first bullet.',
-          )}
+          {i18n._({
+            id: 'bulletCompare.legend',
+            message:
+              'Tinted: values differ. ▲ largest, ▼ smallest in a row. In brackets: difference to the first bullet.',
+          })}
         </p>
       </Panel>
-      <Panel id="compare-drawings" title={msg('Drawings')} translated>
-        <ScrollRegion label={t('Drawings')}>
+      <Panel
+        id="compare-drawings"
+        title={/*i18n*/ { id: 'bulletCompare.drawings', message: 'Drawings' }}
+        translated
+      >
+        <ScrollRegion label={i18n._({ id: 'bulletCompare.drawingsRegion', message: 'Drawings' })}>
           <div className="compare-drawings">
             {drawings.map((d, i) => (
               <figure key={ids[i]}>

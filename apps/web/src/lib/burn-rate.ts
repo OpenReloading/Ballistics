@@ -1,5 +1,6 @@
 /** Dynamic vivacity in 1/(MPa s) from fitted M3 parameters (`apps/docs/docs/models/interior-burn-forms.md`, "Dynamic vivacity"), interval ± `uncertaintyFactor` standard uncertainties. */
 
+import type { I18n } from '@lingui/core'
 import { dynamicVivacity, meanDynamicVivacity, type VivacityBurn } from '@rangefoundry/ballistics'
 import { type Powder, toSi } from '@rangefoundry/schema'
 import { formatNumber } from '../i18n/number.ts'
@@ -205,45 +206,54 @@ export const tableBurntFractions = Array.from({ length: 11 }, (_, i) => i / 10)
 export const vivacityUnit = '1/(MPa·s)'
 
 /** What a curve is: the caption of a powder record's chart. */
-export const modelCaption = msg('Model output from fitted M3 parameters, not manufacturer data.')
+export const modelCaption = /*i18n*/ {
+  id: 'burnRate.modelCaption',
+  message: 'Model output from fitted M3 parameters, not manufacturer data.',
+}
 
 /** What the band of a curve and the bar of a mean cover; 2 is `uncertaintyFactor`. */
-export const bandNote = msg(
-  'Plus and minus 2 standard uncertainties of the fitted vivacity, a lower bound.',
-)
+export const bandNote = /*i18n*/ {
+  id: 'burnRate.bandNote',
+  message: 'Plus and minus 2 standard uncertainties of the fitted vivacity, a lower bound.',
+}
 
 const n2 = (v: number) => formatNumber(v, 2)
 
 /** The order scalar with its interval, as text. */
-function meanText(p: FittedPowder, t: Translator['t']): string {
+function meanText(p: FittedPowder, i18n: I18n): string {
   const m = meanRate(p)
   const unit = vivacityUnit
   return m.low === undefined || m.high === undefined
-    ? t('{value} {unit}', { value: n2(m.value), unit })
-    : t('{value} ({low} to {high}) {unit}', {
-        value: n2(m.value),
-        low: n2(m.low),
-        high: n2(m.high),
-        unit,
+    ? i18n._({
+        id: 'burnRate.mean',
+        message: '{value} {unit}',
+        values: { value: n2(m.value), unit },
+      })
+    : i18n._({
+        id: 'burnRate.meanInterval',
+        message: '{value} ({low} to {high}) {unit}',
+        values: { value: n2(m.value), low: n2(m.low), high: n2(m.high), unit },
       })
 }
 
-/** Text alternative of one powder's curve: start, peak, end and the mean, in the language of `t`. */
-export function describeCurve(p: FittedPowder, t: Translator['t'] = english): string {
+/** Text alternative of one powder's curve: start, peak, end and the mean, in the language of `i18n`. */
+export function describeCurve(p: FittedPowder, i18n: I18n): string {
   const values = chartBurntFractions.map((z) => curveAt(p, z).value)
   const peak = values.indexOf(Math.max(...values))
-  return t(
-    'Dynamic vivacity of {label} over burnt fraction 0 to 1: {start} {unit} at z 0, highest {top} at z {z}, {end} at z 1. Mean over z 0.1 to 0.9: {mean}.',
-    {
+  return i18n._({
+    id: 'burnRate.curve',
+    message:
+      'Dynamic vivacity of {label} over burnt fraction 0 to 1: {start} {unit} at z 0, highest {top} at z {z}, {end} at z 1. Mean over z 0.1 to 0.9: {mean}.',
+    values: {
       label: p.label,
       start: n2(nth(values, 0)),
       unit: vivacityUnit,
       top: n2(values[peak] ?? Number.NaN),
       z: formatNumber(chartBurntFractions[peak] ?? Number.NaN, 2),
       end: n2(values.at(-1) ?? 0),
-      mean: meanText(p, t),
+      mean: meanText(p, i18n),
     },
-  )
+  })
 }
 
 /** The sentence of each group of powders without a curve; the unresolved one has `{factor}` standard uncertainties. */

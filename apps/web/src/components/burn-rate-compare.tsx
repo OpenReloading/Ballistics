@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { Button, Group, MultiSelect, Pill } from '@mantine/core'
 import type { Powder } from '@rangefoundry/schema'
 import { ChartLine } from 'lucide-react'
@@ -7,7 +8,6 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from '@/platform/link.tsx'
 import { storedRecords } from '@/platform/user-store.ts'
 import { useTranslation } from '../i18n/language.ts'
-import { msg } from '../i18n/translate.ts'
 import { fetchPowder } from '../lib/api-client.ts'
 import {
   bandNote,
@@ -74,14 +74,14 @@ function OverlayBody({
   loading: boolean
   series: { powder: FittedPowder; slot: number }[]
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const [open, setOpen] = useState(false)
   if (!read || loading) return <Loading what="curves" />
   if (picks === 0)
     return (
       <EmptyNote
         icon={<ChartLine size={24} aria-hidden="true" />}
-        title={t('No powder in the overlay.')}
+        title={i18n._({ id: 'burnRateCompare.empty', message: 'No powder in the overlay.' })}
       />
     )
   // every pick failed: the error note above stands alone
@@ -90,12 +90,15 @@ function OverlayBody({
     <>
       <LazyVivacityChart
         series={series}
-        title={t('Dynamic vivacity of the chosen powders, model output')}
-        description={series.map((s) => describeCurve(s.powder, t)).join(' ')}
+        title={i18n._({
+          id: 'burnRateCompare.chart',
+          message: 'Dynamic vivacity of the chosen powders, model output',
+        })}
+        description={series.map((s) => describeCurve(s.powder, i18n)).join(' ')}
       />
       <p className="screen-only record-note">
-        {t(modelCaption)}
-        {series.length === 1 && series[0]?.powder.spread !== undefined && ` ${t(bandNote)}`}
+        {i18n._(modelCaption)}
+        {series.length === 1 && series[0]?.powder.spread !== undefined && ` ${i18n._(bandNote)}`}
       </p>
       <Button
         className="curve-toggle"
@@ -105,12 +108,15 @@ function OverlayBody({
         aria-controls="overlay-values"
         onClick={() => setOpen((o) => !o)}
       >
-        {t('Values table')}
+        {i18n._({ id: 'burnRateCompare.valuesTable', message: 'Values table' })}
       </Button>
       <div id="overlay-values" className="curve-values" data-open={open || undefined}>
         <CurveTable
           powders={series.map((s) => s.powder)}
-          caption={t('Dynamic vivacity of the chosen powders')}
+          caption={i18n._({
+            id: 'burnRateCompare.table',
+            message: 'Dynamic vivacity of the chosen powders',
+          })}
         />
       </div>
     </>
@@ -119,7 +125,7 @@ function OverlayBody({
 
 /** Picks live in `?add=` only (no preset, no stored overlay) and each burn law loads when picked, so the page carries only names; a color slot stays with its powder, designs come as `user:<id>`. */
 export function BurnRateCompare({ options }: { options: { value: string; label: string }[] }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const [picks, setPicks] = useState<OverlayPick[]>([])
   const [read, setRead] = useState(false)
   const [records, setRecords] = useState<Record<string, Powder | 'error'>>({})
@@ -138,11 +144,16 @@ export function BurnRateCompare({ options }: { options: { value: string; label: 
         [...(designs ?? new Map<string, FittedPowder>())].map(
           ([recordId, p]): [string, FittedPowder] => {
             const id = userRowId(recordId)
-            return [id, { ...p, id, label: t('{name} (user design)', { name: p.label }) }]
+            const label = i18n._({
+              id: 'burnRateCompare.userDesign',
+              message: '{name} (user design)',
+              values: { name: p.label },
+            })
+            return [id, { ...p, id, label }]
           },
         ),
       ),
-    [designs, t],
+    [designs, i18n],
   )
   const choices = useMemo(
     () => [
@@ -212,19 +223,31 @@ export function BurnRateCompare({ options }: { options: { value: string; label: 
   const loading = picks.length > series.length + failed.length
   const slotOf = new Map(picks.map((p) => [p.id, p.slot]))
   return (
-    <Panel id="overlay" title={msg('Overlay')} translated className="burn-overlay">
+    <Panel
+      id="overlay"
+      title={/*i18n*/ { id: 'burnRateCompare.overlay', message: 'Overlay' }}
+      translated
+      className="burn-overlay"
+    >
       <MultiSelect
-        label={t('Powders in the overlay')}
+        label={i18n._({ id: 'burnRateCompare.powders', message: 'Powders in the overlay' })}
         classNames={{ label: 'visually-hidden' }}
-        description={t('Up to {max}', { max: maxOverlay })}
-        placeholder={t('Add powder')}
+        description={i18n._({
+          id: 'burnRateCompare.upTo',
+          message: 'Up to {max}',
+          values: { max: maxOverlay },
+        })}
+        placeholder={i18n._({ id: 'burnRateCompare.add', message: 'Add powder' })}
         data={choices}
         value={picks.map((p) => p.id)}
         onChange={change}
         maxValues={maxOverlay}
         searchable
         hidePickedOptions
-        nothingFoundMessage={t('No powder with a curve matches')}
+        nothingFoundMessage={i18n._({
+          id: 'burnRateCompare.noMatch',
+          message: 'No powder with a curve matches',
+        })}
         renderPill={({ option, value, onRemove }) => (
           <Pill withRemoveButton {...(onRemove && { onRemove })}>
             <Group component="span" display="inline-flex" gap={4} wrap="nowrap">
@@ -236,7 +259,10 @@ export function BurnRateCompare({ options }: { options: { value: string; label: 
       />
       {failed.length > 0 && (
         <ErrorNote
-          title={t('A curve could not be loaded.')}
+          title={i18n._({
+            id: 'burnRateCompare.loadError',
+            message: 'A curve could not be loaded.',
+          })}
           onRetry={() => {
             for (const p of failed) requested.current.delete(p.id)
             const retried = new Set(failed.map((p) => p.id))
@@ -255,10 +281,13 @@ export function BurnRateCompare({ options }: { options: { value: string; label: 
 
 /** The lead of the burn-rate page. */
 export function BurnRatesLead() {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <p className="muted page-lead">
-      {t('Dynamic vivacity, the burn rate per pressure, over burnt fraction.')}
+      {i18n._({
+        id: 'burnRateCompare.lead',
+        message: 'Dynamic vivacity, the burn rate per pressure, over burnt fraction.',
+      })}
     </p>
   )
 }
@@ -269,7 +298,12 @@ export function NoCurve({ powders }: { powders: UnfittedPowder[] }) {
   const groups = unfittedGroups(powders)
   if (groups.length === 0) return null
   return (
-    <Panel id="no-curve" title={msg('Without a curve')} translated className="no-curve">
+    <Panel
+      id="no-curve"
+      title={/*i18n*/ { id: 'burnRateCompare.noCurve', message: 'Without a curve' }}
+      translated
+      className="no-curve"
+    >
       {groups.map((g) => (
         <div key={g.kind}>
           <p>{t(unfitTitles[g.kind], { factor: uncertaintyFactor })}</p>
@@ -289,6 +323,10 @@ export function NoCurve({ powders }: { powders: UnfittedPowder[] }) {
 
 /** The page bar's action: the powder list in burn-rate order. */
 export function PowdersByBurnRate() {
-  const { t } = useTranslation()
-  return <LinkButton href="/powders?sort=-rate">{t('Powders by burn rate')}</LinkButton>
+  const { i18n } = useLingui()
+  return (
+    <LinkButton href="/powders?sort=-rate">
+      {i18n._({ id: 'burnRateCompare.byRate', message: 'Powders by burn rate' })}
+    </LinkButton>
+  )
 }
