@@ -34,17 +34,47 @@ msgstr "{count, plural, one {# training row} other {# training rows}}"
 msgid "events.addRounds"
 msgstr "{count, plural, one {Add # round of this event to the round count of {name}?} other {Add # rounds of this event to the round count of {name}?}}"
 
+msgid "directoryTable.aToZ"
+msgstr "{label}, A to Z"
+
+msgid "directoryTable.highToLow"
+msgstr "{label}, high to low"
+
+msgid "directoryTable.lowToHigh"
+msgstr "{label}, low to high"
+
+msgid "directoryTable.zToA"
+msgstr "{label}, Z to A"
+
 msgid "powders.range"
 msgstr "{low} to {high}"
 
 msgid "events.noRoundCount"
 msgstr "{name} has no round count; set one on the Firearms page to add the event to it."
 
+msgid "listSources.notDeleted"
+msgstr "{name} was not deleted: the browser refused."
+
 msgid "events.stageScore"
 msgstr "{points} points, hit factor {hf}"
 
+msgid "sources.only"
+msgstr "{source} only"
+
 msgid "cases.noneOwnHint"
 msgstr "A brass group keeps the cases you measured, with their water capacity, in this browser."
+
+msgid "disciplines.column.abbreviation"
+msgstr "Abbreviation"
+
+msgid "events.column.actions"
+msgstr "Actions"
+
+msgid "firearms.column.actions"
+msgstr "Actions"
+
+msgid "log.column.actions"
+msgstr "Actions"
 
 msgid "events.add"
 msgstr "Add"
@@ -79,8 +109,26 @@ msgstr "All powders"
 msgid "primers.all"
 msgstr "All primers"
 
+msgid "listSources.all"
+msgstr "All sources"
+
 msgid "targets.all"
 msgstr "All targets"
+
+msgid "listSources.lastOn"
+msgstr "At least one source stays on"
+
+msgid "directoryTable.full"
+msgstr "At most {max} at once"
+
+msgid "firearms.column.barrel"
+msgstr "Barrel"
+
+msgid "powders.column.base"
+msgstr "Base"
+
+msgid "bullets.facet.base"
+msgstr "Base type"
 
 msgid "page.cases"
 msgstr "Brass"
@@ -94,6 +142,9 @@ msgstr "Brass, {filters}"
 msgid "page.bulletsDesigner"
 msgstr "Bullet designer"
 
+msgid "cartridges.column.maxBulletDiameter"
+msgstr "Bullet diameter G1"
+
 msgid "page.bullets"
 msgstr "Bullets"
 
@@ -106,11 +157,35 @@ msgstr "Burn rates"
 msgid "powders.burnRateOrder"
 msgstr "burn-rate order {order}"
 
+msgid "bullets.column.cal"
+msgstr "Caliber"
+
+msgid "cartridges.column.cal"
+msgstr "Caliber"
+
+msgid "disciplines.facet.class"
+msgstr "Caliber class"
+
+msgid "disciplines.column.classes"
+msgstr "Caliber classes"
+
 msgid "events.cancel"
 msgstr "Cancel"
 
+msgid "cases.column.cartridge"
+msgstr "Cartridge"
+
+msgid "firearms.column.cartridge"
+msgstr "Cartridge"
+
 msgid "page.cartridgesDesigner"
 msgstr "Cartridge designer"
+
+msgid "cartridges.column.caseLengthHelp"
+msgstr "Cartridge maximum of the CIP sheet, shortest variant."
+
+msgid "cartridges.column.maxBulletDiameterHelp"
+msgstr "Cartridge value of the CIP sheet, smallest variant."
 
 msgid "page.cartridges"
 msgstr "Cartridges"
@@ -118,11 +193,35 @@ msgstr "Cartridges"
 msgid "cartridges.filtered"
 msgstr "Cartridges, {filters}"
 
+msgid "cartridges.column.caseLength"
+msgstr "Case length L3"
+
+msgid "cartridges.column.type"
+msgstr "Case type"
+
+msgid "disciplines.facet.category"
+msgstr "Category"
+
+msgid "disciplines.column.category"
+msgstr "Category"
+
 msgid "events.outOfRange"
 msgstr "Check the event: a value is out of its range."
 
+msgid "facetFilters.clear"
+msgstr "Clear all"
+
+msgid "directoryTable.clearSearch"
+msgstr "Clear search"
+
+msgid "cartridges.column.cartridgeLengthHelp"
+msgstr "COAL, the cartridge maximum of the CIP sheet, shortest variant."
+
 msgid "page.bulletsCompare"
 msgstr "Compare bullets"
+
+msgid "log.column.event"
+msgstr "Competition event"
 
 msgid "events.title"
 msgstr "Competition events"
@@ -130,11 +229,47 @@ msgstr "Competition events"
 msgid "page.events"
 msgstr "Competition events"
 
+msgid "primers.column.compound"
+msgstr "Compound"
+
+msgid "firearms.column.configuration"
+msgstr "Configuration"
+
+msgid "log.column.confirmed"
+msgstr "Confirmed by"
+
+msgid "bullets.facet.construction"
+msgstr "Construction"
+
+msgid "federations.facet.country"
+msgstr "Country"
+
+msgid "disciplines.column.country"
+msgstr "Country"
+
 msgid "events.date"
 msgstr "Date"
 
+msgid "events.column.date"
+msgstr "Date"
+
+msgid "log.column.date"
+msgstr "Date"
+
+msgid "listSources.delete"
+msgstr "Delete"
+
 msgid "events.delete"
 msgstr "Delete {name}"
+
+msgid "listSources.deleteName"
+msgstr "Delete {name}"
+
+msgid "listSources.deleteAsk"
+msgstr "Delete {name} from this browser? This cannot be undone."
+
+msgid "listSources.deleteRow"
+msgstr "Delete from this browser"
 
 msgid "events.deleteOfFailed"
 msgstr "Delete of {name} failed: {reason}"
@@ -142,8 +277,23 @@ msgstr "Delete of {name} failed: {reason}"
 msgid "events.deletedFromThisBrowser"
 msgstr "Deleted {name} from this browser."
 
+msgid "bullets.column.diameter"
+msgstr "Diameter"
+
+msgid "targets.facet.discipline"
+msgstr "Discipline"
+
 msgid "events.discipline"
 msgstr "Discipline"
+
+msgid "log.column.discipline"
+msgstr "Discipline"
+
+msgid "disciplines.column.disciplines"
+msgstr "Disciplines"
+
+msgid "targets.column.disciplines"
+msgstr "Disciplines"
 
 msgid "page.disciplines"
 msgstr "Disciplines"
@@ -154,8 +304,23 @@ msgstr "Disciplines, {filters}"
 msgid "events.disqualifiedNoTotal"
 msgstr "Disqualified: no total."
 
+msgid "disciplines.facet.dist"
+msgstr "Distance"
+
+msgid "targets.facet.dist"
+msgstr "Distance"
+
+msgid "disciplines.column.distance"
+msgstr "Distance"
+
+msgid "targets.column.distance"
+msgstr "Distance"
+
 msgid "events.division"
 msgstr "Division"
+
+msgid "powders.column.rateHelp"
+msgstr "Dynamic vivacity averaged over burnt fraction 0.1 to 0.9, plus and minus 2 standard uncertainties, log scale. Model output from fitted M3 parameters, not manufacturer data."
 
 msgid "events.edit"
 msgstr "Edit event"
@@ -178,11 +343,26 @@ msgstr "Event total: enter the stage points from the official result."
 msgid "events.eventType"
 msgstr "Event type"
 
+msgid "events.column.type"
+msgstr "Event type"
+
 msgid "events.exportCsv"
 msgstr "Export CSV"
 
 msgid "events.exportJson"
 msgstr "Export JSON"
+
+msgid "disciplines.facet.org"
+msgstr "Federation"
+
+msgid "targets.facet.org"
+msgstr "Federation"
+
+msgid "disciplines.column.federation"
+msgstr "Federation"
+
+msgid "targets.column.organization"
+msgstr "Federation"
 
 msgid "page.federations"
 msgstr "Federations"
@@ -191,6 +371,9 @@ msgid "disciplines.federationsFiltered"
 msgstr "Federations, {filters}"
 
 msgid "events.firearm"
+msgstr "Firearm"
+
+msgid "log.column.firearm"
 msgstr "Firearm"
 
 msgid "page.firearms"
@@ -202,11 +385,23 @@ msgstr "Fits {name}"
 msgid "bullets.fitting"
 msgstr "fitting {name}"
 
+msgid "powders.column.form"
+msgstr "Form"
+
 msgid "events.stagePointsHint"
 msgstr "From the official result, where published."
 
+msgid "bullets.column.g1"
+msgstr "G1"
+
+msgid "bullets.column.g7"
+msgstr "G7"
+
 msgid "events.hitFactor"
 msgstr "Hit factor"
+
+msgid "disciplines.column.website"
+msgstr "Homepage"
 
 msgid "events.importJson"
 msgstr "Import JSON"
@@ -214,17 +409,56 @@ msgstr "Import JSON"
 msgid "disciplines.international"
 msgstr "International"
 
+msgid "firearms.column.lastSession"
+msgstr "Last session"
+
+msgid "firearms.column.lastSessionHelp"
+msgstr "Latest chronograph session of these loads."
+
+msgid "bullets.facet.leadfree"
+msgstr "Lead-free"
+
+msgid "bullets.column.length"
+msgstr "Length"
+
 msgid "events.level"
+msgstr "Level"
+
+msgid "events.column.level"
 msgstr "Level"
 
 msgid "events.load"
 msgstr "Load"
 
+msgid "log.column.ammunition"
+msgstr "Load or ammunition"
+
 msgid "page.workbench"
 msgstr "Load workbench"
 
+msgid "powders.column.rowsHelp"
+msgstr "Load-table rows the model was fitted to, their cartridges and the day the load tables were read; the record page lists them per load table. A count, not a rating."
+
+msgid "firearms.column.loads"
+msgstr "Loads"
+
+msgid "primers.column.magnum"
+msgstr "Magnum"
+
 msgid "events.major"
 msgstr "Major"
+
+msgid "bullets.column.manufacturer"
+msgstr "Manufacturer"
+
+msgid "cases.column.manufacturer"
+msgstr "Manufacturer"
+
+msgid "powders.column.manufacturer"
+msgstr "Manufacturer"
+
+msgid "primers.column.manufacturer"
+msgstr "Manufacturer"
 
 msgid "powders.search"
 msgstr "Manufacturer or name, DP40…"
@@ -238,8 +472,35 @@ msgstr "Manufacturer, name or size…"
 msgid "bullets.search"
 msgstr "Manufacturer, name, 168, .308 or 7.82…"
 
+msgid "bullets.column.mass"
+msgstr "Mass"
+
+msgid "cases.column.mass"
+msgstr "Mass"
+
+msgid "lists.matching"
+msgstr "matching \"{query}\""
+
+msgid "cases.column.material"
+msgstr "Material"
+
+msgid "cartridges.column.cartridgeLength"
+msgstr "Max length L6"
+
+msgid "cartridges.column.pmaxHelp"
+msgstr "Maximum mean pressure of the CIP sheet, highest variant, by the sheet's method."
+
+msgid "powders.column.rate"
+msgstr "Mean vivacity"
+
 msgid "events.metal"
 msgstr "Metal"
+
+msgid "sources.user"
+msgstr "Mine"
+
+msgid "listSources.column.sourceHelp"
+msgstr "Mine: designs saved in this browser. Rows without a mark are the RangeFoundry catalog."
 
 msgid "events.minor"
 msgstr "Minor"
@@ -247,7 +508,37 @@ msgstr "Minor"
 msgid "events.misses"
 msgstr "Misses"
 
+msgid "directoryTable.missing"
+msgstr "n/a"
+
+msgid "bullets.column.name"
+msgstr "Name"
+
+msgid "cartridges.column.name"
+msgstr "Name"
+
+msgid "cases.column.name"
+msgstr "Name"
+
 msgid "events.name"
+msgstr "Name"
+
+msgid "events.column.name"
+msgstr "Name"
+
+msgid "disciplines.column.name"
+msgstr "Name"
+
+msgid "firearms.column.name"
+msgstr "Name"
+
+msgid "powders.column.name"
+msgstr "Name"
+
+msgid "primers.column.name"
+msgstr "Name"
+
+msgid "targets.column.name"
 msgstr "Name"
 
 msgid "cartridges.search"
@@ -322,8 +613,23 @@ msgstr "Not saved: {reason}"
 msgid "events.notes"
 msgstr "Notes"
 
+msgid "firearms.column.notes"
+msgstr "Notes"
+
+msgid "disciplines.column.number"
+msgstr "Number"
+
 msgid "page.offline"
 msgstr "Offline"
+
+msgid "listSources.ok"
+msgstr "OK"
+
+msgid "firearms.column.optic"
+msgstr "Optic, zero"
+
+msgid "targets.column.outer"
+msgstr "Outer diameter"
 
 msgid "events.penalties"
 msgstr "Penalties"
@@ -333,6 +639,12 @@ msgstr "Pick 2 to {max}"
 
 msgid "events.place"
 msgstr "Place"
+
+msgid "log.column.place"
+msgstr "Place"
+
+msgid "cartridges.column.pmax"
+msgstr "Pmax"
 
 msgid "events.points"
 msgstr "Points"
@@ -364,13 +676,58 @@ msgstr "Print the list of events"
 msgid "events.printOpen"
 msgstr "Print the open event"
 
+msgid "directoryTable.printed.brass"
+msgstr "Printed: the first {limit} of {total} brass."
+
+msgid "directoryTable.printed.bullets"
+msgstr "Printed: the first {limit} of {total} bullets."
+
+msgid "directoryTable.printed.cartridges"
+msgstr "Printed: the first {limit} of {total} cartridges."
+
+msgid "directoryTable.printed.disciplines"
+msgstr "Printed: the first {limit} of {total} disciplines."
+
+msgid "directoryTable.printed.logEntries"
+msgstr "Printed: the first {limit} of {total} entries."
+
+msgid "directoryTable.printed.events"
+msgstr "Printed: the first {limit} of {total} events."
+
+msgid "directoryTable.printed.federations"
+msgstr "Printed: the first {limit} of {total} federations."
+
+msgid "directoryTable.printed.firearms"
+msgstr "Printed: the first {limit} of {total} firearms."
+
+msgid "directoryTable.printed.powders"
+msgstr "Printed: the first {limit} of {total} powders."
+
+msgid "directoryTable.printed.primers"
+msgstr "Printed: the first {limit} of {total} primers."
+
+msgid "directoryTable.printed.faces"
+msgstr "Printed: the first {limit} of {total} targets."
+
 msgid "events.procedurals"
 msgstr "Procedurals"
+
+msgid "primers.column.number"
+msgstr "Product number"
+
+msgid "firearms.column.twistHelp"
+msgstr "R right hand, L left hand."
 
 msgid "page.range"
 msgstr "Range mode"
 
+msgid "sources.rangefoundry"
+msgstr "RangeFoundry"
+
 msgid "events.removeStage"
+msgstr "Remove {name}"
+
+msgid "directoryTable.removeScope"
 msgstr "Remove {name}"
 
 msgid "events.removeSeries"
@@ -385,17 +742,50 @@ msgstr "Replace events?"
 msgid "events.result"
 msgstr "Result"
 
+msgid "events.column.state"
+msgstr "Result"
+
+msgid "log.column.result"
+msgstr "Result"
+
 msgid "events.shotsHint"
 msgstr "Ring values separated by spaces, such as 10 9 10."
 
+msgid "targets.facet.rings"
+msgstr "Rings"
+
+msgid "targets.column.rings"
+msgstr "Rings"
+
 msgid "events.roundCountOf"
 msgstr "Round count of {name}: {count}."
+
+msgid "log.column.rounds"
+msgstr "Rounds"
 
 msgid "events.roundsFired"
 msgstr "Rounds fired"
 
 msgid "events.saveEvent"
 msgstr "Save event"
+
+msgid "firearms.column.notesHelp"
+msgstr "Saved loads of another cartridge, or no saved load."
+
+msgid "bullets.column.sd"
+msgstr "SD"
+
+msgid "directoryTable.search"
+msgstr "Search"
+
+msgid "bullets.column.sdHelp"
+msgstr "Sectional density, computed: mass over diameter squared."
+
+msgid "directoryTable.select"
+msgstr "Select"
+
+msgid "directoryTable.selectRow"
+msgstr "Select {name}"
 
 msgid "events.seriesHeading"
 msgstr "Series"
@@ -421,6 +811,21 @@ msgstr "Shot groups"
 msgid "events.shots"
 msgstr "Shots"
 
+msgid "primers.column.size"
+msgstr "Size"
+
+msgid "directoryTable.sort"
+msgstr "Sort"
+
+msgid "directoryTable.sortBy"
+msgstr "Sort: {text}"
+
+msgid "listSources.column.source"
+msgstr "Source"
+
+msgid "listSources.button"
+msgstr "Source: {text}"
+
 msgid "events.stageNumber"
 msgstr "Stage {n}"
 
@@ -433,11 +838,17 @@ msgstr "Stage points"
 msgid "events.stages"
 msgstr "Stages"
 
+msgid "disciplines.facet.face"
+msgstr "Target"
+
 msgid "page.targetsDesigner"
 msgstr "Target designer"
 
 msgid "events.targetSheet"
 msgstr "Target sheet"
+
+msgid "disciplines.column.faces"
+msgstr "Targets"
 
 msgid "page.targets"
 msgstr "Targets"
@@ -447,6 +858,21 @@ msgstr "Targets, {filters}"
 
 msgid "powders.noneHint"
 msgstr "The catalogue has no powders. Make one with New powder, or import a table of your powders with Import."
+
+msgid "cartridges.column.calHelp"
+msgstr "The common caliber of the bullet diameter G1."
+
+msgid "firearms.column.configurationHelp"
+msgstr "The configuration the trajectory form offers first."
+
+msgid "firearms.column.opticHelp"
+msgstr "The first optic of the active configuration and its zero range."
+
+msgid "bullets.column.g1Help"
+msgstr "The manufacturer's first published BC of this drag model."
+
+msgid "bullets.column.g7Help"
+msgstr "The manufacturer's first published BC of this drag model."
 
 msgid "events.readFailed"
 msgstr "The records of this browser could not be read."
@@ -460,17 +886,38 @@ msgstr "The round count of {name} is unchanged."
 msgid "events.time"
 msgstr "Time (s)"
 
+msgid "bullets.facet.tip"
+msgstr "Tip"
+
 msgid "events.totalHeading"
+msgstr "Total"
+
+msgid "events.column.total"
 msgstr "Total"
 
 msgid "events.partTotal"
 msgstr "Total {total}"
 
+msgid "powders.column.rows"
+msgstr "Training rows"
+
 msgid "page.powdersTune"
 msgstr "Tune a powder"
 
+msgid "firearms.column.twist"
+msgstr "Twist"
+
+msgid "bullets.column.type"
+msgstr "Type"
+
 msgid "events.undoOfFailed"
 msgstr "Undo of {name} failed: {reason}"
+
+msgid "cases.column.capacity"
+msgstr "Water capacity"
+
+msgid "cases.column.capacityHelp"
+msgstr "Water to the case mouth, as the manufacturer states."
 
 msgid "primers.yes"
 msgstr "Yes"

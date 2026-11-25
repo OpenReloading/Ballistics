@@ -1,5 +1,7 @@
 'use client'
 
+import type { I18n, MessageDescriptor } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import { CloseButton, Group, Select, TextInput, Tooltip, UnstyledButton } from '@mantine/core'
 import { ChevronDown, ChevronsUpDown, ChevronUp, Search as SearchIcon } from 'lucide-react'
 import {
@@ -17,8 +19,6 @@ import {
 } from 'react'
 import { flushSync } from 'react-dom'
 import Link from '@/platform/link.tsx'
-import { useTranslation } from '../i18n/language.ts'
-import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import {
   type DirectorySort,
   type DirectoryState,
@@ -39,7 +39,7 @@ import { useShortcuts, useSingleKeys } from './shortcuts.tsx'
 
 export interface DirectoryColumn<T> {
   key: string
-  label: Message
+  label: MessageDescriptor
   /** The unit, in a muted line under the label ("(mm)"); the value cells carry none. */
   unit?: string | undefined
   /** `tabIndex`: for the cell's focusable content (0 only on the table's one tab stop). */
@@ -53,8 +53,8 @@ export interface DirectoryColumn<T> {
   dim?: boolean
   /** Column width (CSS); one column without it takes the rest. */
   width?: string
-  /** Help on the header, shown on hover, focus and touch: one message, or several joined with a space. */
-  help?: Message | readonly Message[] | undefined
+  /** Help on the header, shown on hover, focus and touch: one message, several joined with a space, or a text in the shown language. */
+  help?: MessageDescriptor | readonly MessageDescriptor[] | string | undefined
   /** Not printed, as a row action. */
   screenOnly?: boolean
   /** Held at the box's right edge while the table scrolls sideways, as a row menu. */
@@ -187,18 +187,51 @@ function usePrinting() {
 }
 
 /** The note under a printed list: whole sentences, one per kind. */
-const printedLines: Record<ListNoun, Message> = {
-  bullets: msg('Printed: the first {limit} of {total} bullets.'),
-  cartridges: msg('Printed: the first {limit} of {total} cartridges.'),
-  cases: msg('Printed: the first {limit} of {total} brass.'),
-  disciplines: msg('Printed: the first {limit} of {total} disciplines.'),
-  events: msg('Printed: the first {limit} of {total} events.'),
-  faces: msg('Printed: the first {limit} of {total} targets.'),
-  federations: msg('Printed: the first {limit} of {total} federations.'),
-  firearms: msg('Printed: the first {limit} of {total} firearms.'),
-  'log entries': msg('Printed: the first {limit} of {total} entries.'),
-  powders: msg('Printed: the first {limit} of {total} powders.'),
-  primers: msg('Printed: the first {limit} of {total} primers.'),
+const printedLines: Record<ListNoun, MessageDescriptor> = {
+  bullets: /*i18n*/ {
+    id: 'directoryTable.printed.bullets',
+    message: 'Printed: the first {limit} of {total} bullets.',
+  },
+  cartridges: /*i18n*/ {
+    id: 'directoryTable.printed.cartridges',
+    message: 'Printed: the first {limit} of {total} cartridges.',
+  },
+  cases: /*i18n*/ {
+    id: 'directoryTable.printed.brass',
+    message: 'Printed: the first {limit} of {total} brass.',
+  },
+  disciplines: /*i18n*/ {
+    id: 'directoryTable.printed.disciplines',
+    message: 'Printed: the first {limit} of {total} disciplines.',
+  },
+  events: /*i18n*/ {
+    id: 'directoryTable.printed.events',
+    message: 'Printed: the first {limit} of {total} events.',
+  },
+  faces: /*i18n*/ {
+    id: 'directoryTable.printed.faces',
+    message: 'Printed: the first {limit} of {total} targets.',
+  },
+  federations: /*i18n*/ {
+    id: 'directoryTable.printed.federations',
+    message: 'Printed: the first {limit} of {total} federations.',
+  },
+  firearms: /*i18n*/ {
+    id: 'directoryTable.printed.firearms',
+    message: 'Printed: the first {limit} of {total} firearms.',
+  },
+  'log entries': /*i18n*/ {
+    id: 'directoryTable.printed.logEntries',
+    message: 'Printed: the first {limit} of {total} entries.',
+  },
+  powders: /*i18n*/ {
+    id: 'directoryTable.printed.powders',
+    message: 'Printed: the first {limit} of {total} powders.',
+  },
+  primers: /*i18n*/ {
+    id: 'directoryTable.printed.primers',
+    message: 'Printed: the first {limit} of {total} primers.',
+  },
 }
 
 /** Rows printed at most. */
@@ -350,7 +383,7 @@ export function DirectoryTable<T extends { id: string }>({
   /** A row action for phones, where the columns after the name are hidden (a Mine row's Delete); not shown from 48em. `tabIndex` as for a column's cell. */
   phoneAction?: (row: T, tabIndex: number) => ReactNode
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const shown = sortedRows(rows, columns, sort)
   const printing = usePrinting()
   const { body, start, end, height } = useWindowedRows(shown.length)
@@ -439,7 +472,9 @@ export function DirectoryTable<T extends { id: string }>({
           <tr aria-rowindex={1}>
             {selection && (
               <th scope="col" className="select-cell">
-                <span className="visually-hidden">{t('Select')}</span>
+                <span className="visually-hidden">
+                  {i18n._({ id: 'directoryTable.select', message: 'Select' })}
+                </span>
               </th>
             )}
             {columns.map((c) => (
@@ -508,7 +543,7 @@ export function DirectoryTable<T extends { id: string }>({
       </table>
       {shown.length > printCap && (
         <p className="print-only">
-          {t(printedLines[noun], { limit: printCap, total: shown.length })}
+          {i18n._({ ...printedLines[noun], values: { limit: printCap, total: shown.length } })}
         </p>
       )}
       {/* every record link in the HTML for readers without JavaScript and for crawlers; not in the DOM with JavaScript */}
@@ -526,8 +561,11 @@ export function DirectoryTable<T extends { id: string }>({
 }
 
 /** A column's help in the shown language, its messages joined with a space. */
-export const helpText = (help: Message | readonly Message[], t: Translator['t']) =>
-  (typeof help === 'string' ? [help] : help).map((m) => t(m)).join(' ')
+export const helpText = (
+  help: MessageDescriptor | readonly MessageDescriptor[] | string,
+  i18n: I18n,
+) =>
+  typeof help === 'string' ? help : ('id' in help ? [help] : help).map((m) => i18n._(m)).join(' ')
 
 const nextSort = (key: string, dir: 'ascending' | 'descending' | undefined): DirectorySort => {
   if (dir === undefined) return { column: key, dir: 'ascending' }
@@ -555,7 +593,7 @@ function HeadCell<T>({
   sort: DirectorySort
   onSort: (sort: DirectorySort) => void
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const dir = sort?.column === c.key ? sort.dir : undefined
   return (
     <th
@@ -567,7 +605,7 @@ function HeadCell<T>({
       {c.head && <span className="th-end">{c.head}</span>}
       {c.value ? (
         <Tooltip
-          label={c.help && helpText(c.help, t)}
+          label={c.help && helpText(c.help, i18n)}
           disabled={!c.help}
           position="bottom"
           events={tipEvents}
@@ -580,7 +618,7 @@ function HeadCell<T>({
           </UnstyledButton>
         </Tooltip>
       ) : c.help ? (
-        <Noted inline value={<HeadLabel column={c} />} notes={[helpText(c.help, t)]} />
+        <Noted inline value={<HeadLabel column={c} />} notes={[helpText(c.help, i18n)]} />
       ) : (
         <HeadLabel column={c} />
       )}
@@ -696,11 +734,13 @@ function openInPage(e: ReactMouseEvent<HTMLAnchorElement>, open: () => void) {
 
 /** A cell's content; an empty cell shows the app's missing-value marker. */
 function Cell({ children }: { children: ReactNode }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return children === '' || children == null ? (
     <span className="missing">
       <span aria-hidden="true">-</span>
-      <span className="visually-hidden">{t('n/a')}</span>
+      <span className="visually-hidden">
+        {i18n._({ id: 'directoryTable.missing', message: 'n/a' })}
+      </span>
     </span>
   ) : (
     children
@@ -709,10 +749,10 @@ function Cell({ children }: { children: ReactNode }) {
 
 /** A header's label with its unit in a muted line of its own. */
 function HeadLabel<T>({ column: { label, unit } }: { column: DirectoryColumn<T> }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <span className="th-label">
-      <span className="th-text">{t(label)}</span>
+      <span className="th-text">{i18n._(label)}</span>
       {unit && (
         <>
           {' '}
@@ -737,17 +777,29 @@ function SelectBox({
   onPick: (range: boolean) => void
   tabIndex: number
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const checked = ids.includes(row.id)
   const full = !checked && ids.length >= max
   const space = useRef(false)
   // the tooltip on a wrapper: a disabled input gets no pointer events
   return (
-    <Tooltip label={t('At most {max} at once', { max })} disabled={!full} events={tipEvents}>
+    <Tooltip
+      label={i18n._({
+        id: 'directoryTable.full',
+        message: 'At most {max} at once',
+        values: { max },
+      })}
+      disabled={!full}
+      events={tipEvents}
+    >
       <span className="row-action">
         <input
           type="checkbox"
-          aria-label={t('Select {name}', { name: label })}
+          aria-label={i18n._({
+            id: 'directoryTable.selectRow',
+            message: 'Select {name}',
+            values: { name: label },
+          })}
           tabIndex={tabIndex}
           checked={checked}
           disabled={full}
@@ -769,7 +821,7 @@ function SelectBox({
 }
 
 /** A column as the phone's Sort select reads it. */
-export type SortColumn = { key: string; label: Message; num?: boolean; value?: unknown }
+export type SortColumn = { key: string; label: MessageDescriptor; num?: boolean; value?: unknown }
 
 /** Below 48em only the name column shows its head, and a tablet's list box may hide the wide columns: one option per sortable column and direction. */
 function SortSelect({
@@ -781,32 +833,39 @@ function SortSelect({
   sort: DirectorySort
   onSort: (sort: DirectorySort) => void
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   // the input shows the chosen option as "Sort: Burn rate, low to high", the list the option alone
   const plain = new Map<string, string>()
   const data = columns
     .filter((c) => c.value)
     .flatMap((c) => {
-      const label = t(c.label)
+      const values = { label: i18n._(c.label) }
       return [
         {
           value: `${c.key} ascending`,
-          text: c.num ? t('{label}, low to high', { label }) : t('{label}, A to Z', { label }),
+          text: c.num
+            ? i18n._({ id: 'directoryTable.lowToHigh', message: '{label}, low to high', values })
+            : i18n._({ id: 'directoryTable.aToZ', message: '{label}, A to Z', values }),
         },
         {
           value: `${c.key} descending`,
-          text: c.num ? t('{label}, high to low', { label }) : t('{label}, Z to A', { label }),
+          text: c.num
+            ? i18n._({ id: 'directoryTable.highToLow', message: '{label}, high to low', values })
+            : i18n._({ id: 'directoryTable.zToA', message: '{label}, Z to A', values }),
         },
       ].map(({ value, text }) => {
         plain.set(value, text)
-        return { value, label: t('Sort: {text}', { text }) }
+        return {
+          value,
+          label: i18n._({ id: 'directoryTable.sortBy', message: 'Sort: {text}', values: { text } }),
+        }
       })
     })
   return (
     <Select
       className="sort-select"
-      aria-label={t('Sort')}
-      placeholder={t('Sort')}
+      aria-label={i18n._({ id: 'directoryTable.sort', message: 'Sort' })}
+      placeholder={i18n._({ id: 'directoryTable.sort', message: 'Sort' })}
       size={controlSize.row.input}
       clearable
       data={data}
@@ -852,7 +911,7 @@ export function DirectoryFilters({
   scope?: Scope | undefined
   children?: ReactNode | undefined
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const search = useRef<HTMLInputElement>(null)
   useShortcuts({ focusSearch: () => search.current?.focus() })
   const singleKeys = useSingleKeys()
@@ -861,7 +920,7 @@ export function DirectoryFilters({
       <TextInput
         ref={search}
         className="directory-search"
-        aria-label={t('Search')}
+        aria-label={i18n._({ id: 'directoryTable.search', message: 'Search' })}
         aria-keyshortcuts={singleKeys ? shortcutAriaKeys('focusSearch') : undefined}
         title={placeholder}
         placeholder={placeholder}
@@ -874,7 +933,7 @@ export function DirectoryFilters({
         // always mounted, hidden while empty, so the text does not move when it appears
         rightSection={
           <CloseButton
-            aria-label={t('Clear search')}
+            aria-label={i18n._({ id: 'directoryTable.clearSearch', message: 'Clear search' })}
             style={query ? undefined : { visibility: 'hidden' }}
             onClick={() => onQuery('')}
           />
@@ -887,7 +946,11 @@ export function DirectoryFilters({
         <span className="scope-chip">
           <span title={scope.label}>{scope.label}</span>
           <CloseButton
-            aria-label={t('Remove {name}', { name: scope.label })}
+            aria-label={i18n._({
+              id: 'directoryTable.removeScope',
+              message: 'Remove {name}',
+              values: { name: scope.label },
+            })}
             onClick={() => {
               scope.onRemove()
               focusSearch()

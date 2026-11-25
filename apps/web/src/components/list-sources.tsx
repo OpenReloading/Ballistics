@@ -1,12 +1,11 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { ActionIcon, Badge, Button, Checkbox, Group, Popover, Stack, Tooltip } from '@mantine/core'
 import type { UserRecord } from '@rangefoundry/schema'
 import { ChevronDown, Trash } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { deleteRecords, storedRecords } from '@/platform/user-store.ts'
-import { useTranslation } from '../i18n/language.ts'
-import { msg } from '../i18n/translate.ts'
 import {
   type Origin,
   originNames,
@@ -23,7 +22,7 @@ import type { DirectoryColumn } from './directory-table.tsx'
 
 /** Read after mounting (again on each `reread`), none while the store cannot be read; `remove` asks as the File menu's list does, `read`: the store has answered once. */
 export function useUserRecords(reread?: unknown) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const [records, setRecords] = useState<UserRecord[]>([])
   const [read, setRead] = useState(false)
   useEffect(() => {
@@ -48,8 +47,12 @@ export function useUserRecords(reread?: unknown) {
       if (
         !id ||
         !(await confirmDialog({
-          title: t('Delete {name} from this browser? This cannot be undone.', { name }),
-          confirmLabel: t('Delete'),
+          title: i18n._({
+            id: 'listSources.deleteAsk',
+            message: 'Delete {name} from this browser? This cannot be undone.',
+            values: { name },
+          }),
+          confirmLabel: i18n._({ id: 'listSources.delete', message: 'Delete' }),
           danger: true,
         }))
       )
@@ -58,14 +61,18 @@ export function useUserRecords(reread?: unknown) {
         await deleteRecords([id])
       } catch {
         await confirmDialog({
-          title: t('{name} was not deleted: the browser refused.', { name }),
-          confirmLabel: t('OK'),
+          title: i18n._({
+            id: 'listSources.notDeleted',
+            message: '{name} was not deleted: the browser refused.',
+            values: { name },
+          }),
+          confirmLabel: i18n._({ id: 'listSources.ok', message: 'OK' }),
         })
         return
       }
       setRecords((rs) => rs.filter((r) => r.id !== id))
     },
-    [records, t],
+    [records, i18n],
   )
   return [records, remove, read] as const
 }
@@ -101,12 +108,12 @@ export function SourceFilter({
   onChange: (src: string) => void
   sources?: readonly Origin[] | undefined
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const shown = readOrigins(src, sources)
   const text =
     shown.length === sources.length
-      ? t('All sources')
-      : shown.map((o) => t(originNames[o])).join(', ')
+      ? i18n._({ id: 'listSources.all', message: 'All sources' })
+      : shown.map((o) => i18n._(originNames[o])).join(', ')
   return (
     <AppPopover position="bottom-start" trapFocus>
       <Popover.Target>
@@ -115,7 +122,11 @@ export function SourceFilter({
           data-set={shown.length < sources.length || undefined}
           variant="default"
           size={controlSize.row.button}
-          aria-label={t('Source: {text}', { text })}
+          aria-label={i18n._({
+            id: 'listSources.button',
+            message: 'Source: {text}',
+            values: { text },
+          })}
           aria-haspopup="dialog"
           w="9rem"
           rightSection={<ChevronDown size={12} aria-hidden="true" />}
@@ -130,13 +141,20 @@ export function SourceFilter({
             const checked = shown.includes(o)
             const last = checked && shown.length === 1
             return (
-              <Tooltip key={o} label={t('At least one source stays on')} disabled={!last}>
+              <Tooltip
+                key={o}
+                label={i18n._({
+                  id: 'listSources.lastOn',
+                  message: 'At least one source stays on',
+                })}
+                disabled={!last}
+              >
                 <Checkbox
                   checked={checked}
                   disabled={last}
                   label={
                     <Group component="span" justify="space-between" gap="md" wrap="nowrap">
-                      <span>{t(originNames[o])}</span>
+                      <span>{i18n._(originNames[o])}</span>
                       <span className="source-count">{counts[o]}</span>
                     </Group>
                   }
@@ -158,10 +176,12 @@ export function sourceColumn<T extends { id: string; origin?: 'user' | undefined
 ): DirectoryColumn<T> {
   return {
     key: 'source',
-    label: msg('Source'),
-    help: msg(
-      'Mine: designs saved in this browser. Rows without a mark are the RangeFoundry catalog.',
-    ),
+    label: /*i18n*/ { id: 'listSources.column.source', message: 'Source' },
+    help: /*i18n*/ {
+      id: 'listSources.column.sourceHelp',
+      message:
+        'Mine: designs saved in this browser. Rows without a mark are the RangeFoundry catalog.',
+    },
     width: '6.5rem',
     value: (r) => originOf(r),
     cell: (r, tabIndex) =>
@@ -182,8 +202,8 @@ export function sourceColumn<T extends { id: string; origin?: 'user' | undefined
 
 /** The name of a source in the language shown. */
 function OriginName({ origin }: { origin: Origin }) {
-  const { t } = useTranslation()
-  return t(originNames[origin])
+  const { i18n } = useLingui()
+  return i18n._(originNames[origin])
 }
 
 /** A Mine row's Delete: in the Source column, and on a phone (where that column is hidden) at the row's end. */
@@ -198,16 +218,20 @@ export function DeleteRow({
   onDelete: (rowId: string, name: string) => void
   tabIndex: number
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
-    <Tooltip label={t('Delete from this browser')}>
+    <Tooltip label={i18n._({ id: 'listSources.deleteRow', message: 'Delete from this browser' })}>
       <ActionIcon
         className="row-action"
         tabIndex={tabIndex}
         variant="subtle"
         color="red"
         size={controlSize.row.icon}
-        aria-label={t('Delete {name}', { name })}
+        aria-label={i18n._({
+          id: 'listSources.deleteName',
+          message: 'Delete {name}',
+          values: { name },
+        })}
         onClick={() => onDelete(row.id, name)}
       >
         <Trash size={14} aria-hidden="true" />

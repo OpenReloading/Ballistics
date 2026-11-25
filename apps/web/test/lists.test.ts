@@ -1,4 +1,5 @@
 import { expect, it } from 'vitest'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { translator } from '../src/i18n/translate.ts'
 import {
   countText,
@@ -49,8 +50,8 @@ it('counts the rows of a list, naming the total only while a filter hides rows',
 })
 
 it('names the search as a filter, nothing for an empty one', () => {
-  expect(matchingText(english.t, '  zz ')).toBe('matching "zz"')
-  expect(matchingText(english.t, ' ')).toBe(false)
+  expect(matchingText(linguiOf('en'), '  zz ')).toBe('matching "zz"')
+  expect(matchingText(linguiOf('en'), ' ')).toBe(false)
 })
 
 it('names the filters set as one sentence, nothing when none is set', () => {

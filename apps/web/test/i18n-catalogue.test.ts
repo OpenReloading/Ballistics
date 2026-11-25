@@ -5,11 +5,13 @@ import { describe, expect, it } from 'vitest'
 import {
   baseList,
   extract,
+  linguiGerman,
   messages,
   problems,
   requiredMessages,
   safeWordingProblems,
   tableMessages,
+  targetRecordProblems,
   termUseProblems,
 } from '../scripts/i18n.mts'
 
@@ -161,6 +163,69 @@ describe('the catalogue lint', () => {
       'says safe without approval: Handle it safely',
       'says "sicher" other than "safe" 1 times: Safety notice',
     ])
+  })
+
+  it('checks the German of each Lingui id by its English text, also when ids share an English text', () => {
+    const german = linguiGerman(
+      {
+        'bullets.mass': { translation: 'Bullet mass' },
+        'loads.mass': { translation: 'Bullet mass' },
+        'cases.material': { translation: 'Brass' },
+        'cases.facet': { translation: 'Brass' },
+        'bullets.gone': { translation: 'Gone' },
+      },
+      {
+        'bullets.mass': { translation: 'Geschossmasse' },
+        'loads.mass': { translation: 'Kugelmasse' },
+        'cases.material': { translation: 'Messinghülse' },
+        'cases.facet': { translation: 'Hülsen' },
+        'bullets.gone': { translation: 'Weg', obsolete: true },
+      },
+    )
+    expect(german).toEqual([
+      { 'Bullet mass': 'Geschossmasse' },
+      { 'Bullet mass': 'Kugelmasse' },
+      { Brass: 'Messinghülse' },
+      { Brass: 'Hülsen' },
+    ])
+    const table = {
+      sources: { a: { document: 'A', edition: '1', pages: 'p.' } },
+      terms: [
+        {
+          key: 'bullet',
+          english: 'Bullet',
+          german: 'Geschoss',
+          status: 'verified',
+          group: 'components',
+          sources: [{ doc: 'a', at: '1' }],
+          candidates: [],
+        },
+      ],
+    }
+    expect(german.flatMap((g) => termUseProblems(g, table, {}, []))).toEqual([
+      'Bullet mass: Geschoss',
+    ])
+  })
+
+  it('names a target record whose English says target without Scheibe in its German', () => {
+    expect(
+      targetRecordProblems(
+        {
+          'All targets': 'Ziele',
+          'Targets, {filters}': 'Zielscheiben, {filters}',
+          '{count} target|{count} targets': { one: '{count} Scheibe', other: '{count} Scheiben' },
+          'The published records.': 'Die veröffentlichten Datensätze.',
+        },
+        [
+          'All targets',
+          'Targets, {filters}',
+          '{count} target|{count} targets',
+          'The published records.',
+          'Find target',
+        ],
+        'Scheibe',
+      ),
+    ).toEqual(['All targets: Scheibe'])
   })
 
   it('counts the warning sentences and refusal words the two files mark as texts of the table', () => {

@@ -1,9 +1,9 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { Button, Checkbox, Group, Popover, Stack } from '@mantine/core'
 import { ChevronDown } from 'lucide-react'
 import { useMemo } from 'react'
-import { useTranslation } from '../i18n/language.ts'
 import type { DirectoryState } from '../lib/directory.ts'
 import { type Facet, type FacetOption, facetOptions, facetRows } from '../lib/facets.ts'
 import { controlSize } from '../lib/theme.ts'
@@ -42,7 +42,7 @@ export function FacetFilters<T>({
   onChange: (facets: Record<string, string[]>) => void
   onClear: () => void
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const selected = state.facets ?? noChoice
   const set = facets.some((f) => (selected[f.key]?.length ?? 0) > 0)
   return (
@@ -53,8 +53,8 @@ export function FacetFilters<T>({
         const on = selected[f.key] ?? []
         const text =
           on.length === 0
-            ? t(f.label)
-            : `${t(f.label)}: ${on.length === 1 ? (list.find((o) => o.value === on[0])?.text ?? on[0]) : on.length}`
+            ? i18n._(f.label)
+            : `${i18n._(f.label)}: ${on.length === 1 ? (list.find((o) => o.value === on[0])?.text ?? on[0]) : on.length}`
         return (
           <AppPopover key={f.key} position="bottom-start" trapFocus>
             <Popover.Target>
@@ -71,7 +71,7 @@ export function FacetFilters<T>({
               </Button>
             </Popover.Target>
             <Popover.Dropdown>
-              <Stack gap={8} className="facet-options" role="group" aria-label={t(f.label)}>
+              <Stack gap={8} className="facet-options" role="group" aria-label={i18n._(f.label)}>
                 {list.map((o) => {
                   const checked = on.includes(o.value)
                   return (
@@ -101,7 +101,7 @@ export function FacetFilters<T>({
       })}
       {set && (
         <Button variant="subtle" size={controlSize.row.button} onClick={onClear}>
-          {t('Clear all')}
+          {i18n._({ id: 'facetFilters.clear', message: 'Clear all' })}
         </Button>
       )}
     </>

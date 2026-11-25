@@ -67,25 +67,25 @@ export function bulletFacets(t: Translator['t']): Facet<BulletRow>[] {
   return [
     {
       key: 'construction',
-      label: msg('Construction'),
+      label: /*i18n*/ { id: 'bullets.facet.construction', message: 'Construction' },
       values: (b) => (b.construction ? [b.construction] : []),
       text: (v) => constructionText(t, v),
     },
     {
       key: 'tip',
-      label: msg('Tip'),
+      label: /*i18n*/ { id: 'bullets.facet.tip', message: 'Tip' },
       values: (b) => (b.tipType ? [b.tipType] : []),
       text: (v) => kindText(t, v),
     },
     {
       key: 'base',
-      label: msg('Base type'),
+      label: /*i18n*/ { id: 'bullets.facet.base', message: 'Base type' },
       values: (b) => (b.baseType ? [b.baseType] : []),
       text: (v) => kindText(t, v),
     },
     {
       key: 'leadfree',
-      label: msg('Lead-free'),
+      label: /*i18n*/ { id: 'bullets.facet.leadfree', message: 'Lead-free' },
       values: (b) => (b.leadFree === undefined ? [] : [b.leadFree ? 'yes' : 'no']),
       text: (v) => t(v === 'yes' ? msg('Yes') : msg('No')),
       order: (a, b) => (a === b ? 0 : a === 'yes' ? -1 : 1),

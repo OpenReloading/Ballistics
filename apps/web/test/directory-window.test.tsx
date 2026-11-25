@@ -1,25 +1,30 @@
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { DirectoryTable } from '../src/components/directory-table.tsx'
-import { msg } from '../src/i18n/translate.ts'
+import { linguiOf } from '../src/i18n/lingui.ts'
 
 const render = (count: number) =>
   renderToStaticMarkup(
     <MantineProvider>
-      <DirectoryTable<{ id: string }>
-        rows={Array.from({ length: count }, (_, i) => ({ id: `r${i}` }))}
-        columns={[{ key: 'name', label: msg('Name'), cell: (r) => r.id }]}
-        link="name"
-        href={(r) => `/x/${r.id}`}
-        facts={() => ''}
-        label={(r) => r.id}
-        caption="All rows"
-        noun="bullets"
-        sort={undefined}
-        onSort={() => {}}
-        empty={null}
-      />
+      <I18nProvider i18n={linguiOf('en')}>
+        <DirectoryTable<{ id: string }>
+          rows={Array.from({ length: count }, (_, i) => ({ id: `r${i}` }))}
+          columns={[
+            { key: 'name', label: { id: 'test.name', message: 'Name' }, cell: (r) => r.id },
+          ]}
+          link="name"
+          href={(r) => `/x/${r.id}`}
+          facts={() => ''}
+          label={(r) => r.id}
+          caption="All rows"
+          noun="bullets"
+          sort={undefined}
+          onSort={() => {}}
+          empty={null}
+        />
+      </I18nProvider>
     </MantineProvider>,
   )
 

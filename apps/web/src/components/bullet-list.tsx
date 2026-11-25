@@ -7,7 +7,6 @@ import { Plus } from 'lucide-react'
 import { useDeferredValue, useMemo } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
-import { msg } from '../i18n/translate.ts'
 import { bulletKinds, bulletSectionalDensity } from '../lib/bullet-kinds.ts'
 import {
   bulletFacetKeys,
@@ -120,15 +119,15 @@ export function BulletList({
   const named = [
     fits &&
       i18n._({ id: 'bullets.fitting', message: 'fitting {name}', values: { name: fits.name } }),
-    onlyText(t, on),
-    ...facetNames(facets, state.facets ?? {}, t),
-    matchingText(t, state.query),
+    onlyText(i18n, on),
+    ...facetNames(facets, state.facets ?? {}, i18n),
+    matchingText(i18n, state.query),
   ].filter(Boolean)
   const lengthUnit = system.length.symbol
   const columns: DirectoryColumn<BulletRow>[] = [
     {
       key: 'manufacturer',
-      label: msg('Manufacturer'),
+      label: /*i18n*/ { id: 'bullets.column.manufacturer', message: 'Manufacturer' },
       width: '9rem',
       dim: true,
       value: (b) => b.manufacturerName,
@@ -136,7 +135,7 @@ export function BulletList({
     },
     {
       key: 'name',
-      label: msg('Name'),
+      label: /*i18n*/ { id: 'bullets.column.name', message: 'Name' },
       value: (b) => b.name,
       cell: (b) => (
         <>
@@ -147,14 +146,14 @@ export function BulletList({
     },
     {
       key: 'cal',
-      label: msg('Caliber'),
+      label: /*i18n*/ { id: 'bullets.column.cal', message: 'Caliber' },
       width: '4.5rem',
       // no sort of its own: Diameter sorts by the same value
       cell: (b) => cell(b).caliber,
     },
     {
       key: 'diameter',
-      label: msg('Diameter'),
+      label: /*i18n*/ { id: 'bullets.column.diameter', message: 'Diameter' },
       unit: lengthUnit,
       num: true,
       width: '5.5rem',
@@ -163,7 +162,7 @@ export function BulletList({
     },
     {
       key: 'mass',
-      label: msg('Mass'),
+      label: /*i18n*/ { id: 'bullets.column.mass', message: 'Mass' },
       unit: system.mass.symbol,
       num: true,
       width: '5rem',
@@ -172,7 +171,7 @@ export function BulletList({
     },
     {
       key: 'length',
-      label: msg('Length'),
+      label: /*i18n*/ { id: 'bullets.column.length', message: 'Length' },
       unit: lengthUnit,
       num: true,
       width: '5rem',
@@ -182,9 +181,12 @@ export function BulletList({
     },
     {
       key: 'sd',
-      label: msg('column\u0004SD'),
+      label: /*i18n*/ { id: 'bullets.column.sd', message: 'SD' },
       unit: system.sectionalDensity.symbol,
-      help: msg('Sectional density, computed: mass over diameter squared.'),
+      help: /*i18n*/ {
+        id: 'bullets.column.sdHelp',
+        message: 'Sectional density, computed: mass over diameter squared.',
+      },
       num: true,
       width: '5rem',
       wide: true,
@@ -193,9 +195,12 @@ export function BulletList({
     },
     {
       key: 'g1',
-      label: msg('G1'),
+      label: /*i18n*/ { id: 'bullets.column.g1', message: 'G1' },
       unit: 'lb/in²',
-      help: msg("The manufacturer's first published BC of this drag model."),
+      help: /*i18n*/ {
+        id: 'bullets.column.g1Help',
+        message: "The manufacturer's first published BC of this drag model.",
+      },
       num: true,
       width: '4.5rem',
       value: (b) => b.ballisticCoefficientG1,
@@ -203,9 +208,12 @@ export function BulletList({
     },
     {
       key: 'g7',
-      label: msg('G7'),
+      label: /*i18n*/ { id: 'bullets.column.g7', message: 'G7' },
       unit: 'lb/in²',
-      help: msg("The manufacturer's first published BC of this drag model."),
+      help: /*i18n*/ {
+        id: 'bullets.column.g7Help',
+        message: "The manufacturer's first published BC of this drag model.",
+      },
       num: true,
       width: '4.5rem',
       value: (b) => b.ballisticCoefficientG7,
@@ -213,7 +221,7 @@ export function BulletList({
     },
     {
       key: 'type',
-      label: msg('Type'),
+      label: /*i18n*/ { id: 'bullets.column.type', message: 'Type' },
       // fits the longest catalogue values whole: "Teilmantelgeschoss, flach" and "Full metal jacket, boat tail"
       width: '12.5rem',
       wide: true,
@@ -226,7 +234,7 @@ export function BulletList({
     const c = cell(b)
     const bc = bulletBallisticCoefficient(b)
     return [
-      b.origin === 'user' && t(originNames.user),
+      b.origin === 'user' && i18n._(originNames.user),
       b.manufacturerName,
       c.caliber,
       c.mass && `${c.mass} ${system.mass.symbol}`,

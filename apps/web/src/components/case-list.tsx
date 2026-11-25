@@ -7,7 +7,6 @@ import { Plus } from 'lucide-react'
 import { useDeferredValue, useMemo } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
-import { msg } from '../i18n/translate.ts'
 import { type CaseRow, caseMatches, userCaseRows } from '../lib/case-rows.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { kebabValue } from '../lib/list-values.ts'
@@ -55,20 +54,25 @@ export function CaseList({
   )
   const query = state.query.trim()
   const on = readOrigins(state.sources)
-  const named = [onlyText(t, on), matchingText(t, query)].filter(Boolean)
+  const named = [onlyText(i18n, on), matchingText(i18n, query)].filter(Boolean)
   const columns: DirectoryColumn<CaseRow>[] = [
     {
       key: 'manufacturer',
-      label: msg('Manufacturer'),
+      label: /*i18n*/ { id: 'cases.column.manufacturer', message: 'Manufacturer' },
       width: '10.5rem',
       dim: true,
       value: (r) => r.manufacturerName,
       cell: (r) => r.manufacturerName,
     },
-    { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },
+    {
+      key: 'name',
+      label: /*i18n*/ { id: 'cases.column.name', message: 'Name' },
+      value: (r) => r.name,
+      cell: (r) => r.name,
+    },
     {
       key: 'cartridge',
-      label: msg('Cartridge'),
+      label: /*i18n*/ { id: 'cases.column.cartridge', message: 'Cartridge' },
       width: '9rem',
       value: (r) => r.cartridgeName,
       cell: (r) => r.cartridgeName,
@@ -76,14 +80,14 @@ export function CaseList({
     {
       key: 'material',
       wide: true,
-      label: msg('Material'),
+      label: /*i18n*/ { id: 'cases.column.material', message: 'Material' },
       width: '10rem',
       value: (r) => r.material,
       cell: (r) => kebabValue(t, r.material),
     },
     {
       key: 'mass',
-      label: msg('Mass'),
+      label: /*i18n*/ { id: 'cases.column.mass', message: 'Mass' },
       unit: system.mass.symbol,
       num: true,
       width: '6rem',
@@ -94,9 +98,12 @@ export function CaseList({
     {
       key: 'capacity',
       wide: true,
-      label: msg('Water capacity'),
+      label: /*i18n*/ { id: 'cases.column.capacity', message: 'Water capacity' },
       unit: system.capacity.symbol,
-      help: msg('Water to the case mouth, as the manufacturer states.'),
+      help: /*i18n*/ {
+        id: 'cases.column.capacityHelp',
+        message: 'Water to the case mouth, as the manufacturer states.',
+      },
       num: true,
       width: '8rem',
       value: (r) => r.waterCapacity,
@@ -109,7 +116,7 @@ export function CaseList({
   ]
   const facts = (r: CaseRow) =>
     [
-      r.origin === 'user' && t(originNames.user),
+      r.origin === 'user' && i18n._(originNames.user),
       r.manufacturerName,
       r.cartridgeName,
       kebabValue(t, r.material),

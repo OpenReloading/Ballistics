@@ -3,7 +3,6 @@
 import { useLingui } from '@lingui/react'
 import { useDeferredValue, useMemo } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import { msg } from '../i18n/translate.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { kebabValue } from '../lib/list-values.ts'
 import { filterText, matchingText } from '../lib/lists.ts'
@@ -27,35 +26,40 @@ export function PrimerList({ rows }: { rows: PrimerRow[] }) {
     () => rows.filter((r) => primerMatches(r, filters.query, t)),
     [rows, filters, t],
   )
-  const named = [matchingText(t, state.query)].filter(Boolean)
+  const named = [matchingText(i18n, state.query)].filter(Boolean)
   const columns: DirectoryColumn<PrimerRow>[] = [
     {
       key: 'manufacturer',
-      label: msg('Manufacturer'),
+      label: /*i18n*/ { id: 'primers.column.manufacturer', message: 'Manufacturer' },
       width: '10.5rem',
       dim: true,
       value: (r) => r.manufacturerName,
       cell: (r) => r.manufacturerName,
     },
-    { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },
+    {
+      key: 'name',
+      label: /*i18n*/ { id: 'primers.column.name', message: 'Name' },
+      value: (r) => r.name,
+      cell: (r) => r.name,
+    },
     {
       key: 'number',
       wide: true,
-      label: msg('Product number'),
+      label: /*i18n*/ { id: 'primers.column.number', message: 'Product number' },
       width: '9rem',
       value: (r) => r.productNumber,
       cell: (r) => r.productNumber ?? '',
     },
     {
       key: 'size',
-      label: msg('Size'),
+      label: /*i18n*/ { id: 'primers.column.size', message: 'Size' },
       width: '9rem',
       value: (r) => r.size,
       cell: (r) => kebabValue(t, r.size),
     },
     {
       key: 'magnum',
-      label: msg('Magnum'),
+      label: /*i18n*/ { id: 'primers.column.magnum', message: 'Magnum' },
       width: '6rem',
       value: (r) => (r.magnum === undefined ? undefined : r.magnum ? 'yes' : 'no'),
       cell: (r) =>
@@ -68,7 +72,7 @@ export function PrimerList({ rows }: { rows: PrimerRow[] }) {
     {
       key: 'compound',
       wide: true,
-      label: msg('Compound'),
+      label: /*i18n*/ { id: 'primers.column.compound', message: 'Compound' },
       width: '10rem',
       value: (r) => r.compound,
       cell: (r) => (r.compound ? kebabValue(t, r.compound) : ''),

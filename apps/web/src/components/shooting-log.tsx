@@ -1,5 +1,6 @@
 'use client'
 
+import type { MessageDescriptor } from '@lingui/core'
 import {
   ActionIcon,
   Button,
@@ -541,7 +542,7 @@ function logColumns(
 ): DirectoryColumn<ShootingLogRecord>[] {
   const text = (
     key: string,
-    label: Message,
+    label: MessageDescriptor,
     width: string,
     of: (r: ShootingLogRecord) => string,
   ) => ({
@@ -554,29 +555,58 @@ function logColumns(
   return [
     {
       key: 'date',
-      label: msg('Date'),
+      label: /*i18n*/ { id: 'log.column.date', message: 'Date' },
       width: '9.5rem',
       value: (r) => r.data.date,
       cell: (r) => dayText(r.data.date),
     },
-    text('place', msg('Place'), '9rem', (r) => r.data.place ?? ''),
-    text('discipline', msg('Discipline'), '10rem', (r) => names.discipline(r.data.discipline)),
-    text('firearm', msg('Firearm'), '10rem', (r) => names.firearm(r.data.firearm)),
-    text('ammunition', msg('Load or ammunition'), '10rem', (r) => ammunitionText(r.data, names)),
+    text(
+      'place',
+      /*i18n*/ { id: 'log.column.place', message: 'Place' },
+      '9rem',
+      (r) => r.data.place ?? '',
+    ),
+    text(
+      'discipline',
+      /*i18n*/ { id: 'log.column.discipline', message: 'Discipline' },
+      '10rem',
+      (r) => names.discipline(r.data.discipline),
+    ),
+    text('firearm', /*i18n*/ { id: 'log.column.firearm', message: 'Firearm' }, '10rem', (r) =>
+      names.firearm(r.data.firearm),
+    ),
+    text(
+      'ammunition',
+      /*i18n*/ { id: 'log.column.ammunition', message: 'Load or ammunition' },
+      '10rem',
+      (r) => ammunitionText(r.data, names),
+    ),
     {
       key: 'rounds',
-      label: msg('Rounds'),
+      label: /*i18n*/ { id: 'log.column.rounds', message: 'Rounds' },
       num: true,
       width: '5rem',
       value: (r) => r.data.rounds,
       cell: (r) => r.data.rounds,
     },
-    text('result', msg('Result'), '8rem', (r) => r.data.result ?? ''),
-    text('event', msg('Competition event'), '10rem', (r) => names.event(r.data.event)),
-    text('confirmed', msg('Confirmed by'), '8rem', (r) => r.data.confirmation?.by ?? ''),
+    text(
+      'result',
+      /*i18n*/ { id: 'log.column.result', message: 'Result' },
+      '8rem',
+      (r) => r.data.result ?? '',
+    ),
+    text('event', /*i18n*/ { id: 'log.column.event', message: 'Competition event' }, '10rem', (r) =>
+      names.event(r.data.event),
+    ),
+    text(
+      'confirmed',
+      /*i18n*/ { id: 'log.column.confirmed', message: 'Confirmed by' },
+      '8rem',
+      (r) => r.data.confirmation?.by ?? '',
+    ),
     {
       key: 'actions',
-      label: msg('Actions'),
+      label: /*i18n*/ { id: 'log.column.actions', message: 'Actions' },
       width: '3rem',
       screenOnly: true,
       sticky: true,

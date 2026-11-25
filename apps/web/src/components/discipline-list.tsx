@@ -3,7 +3,6 @@
 import { useLingui } from '@lingui/react'
 import { useCallback, useDeferredValue, useMemo } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import { msg } from '../i18n/translate.ts'
 import { countryName } from '../lib/countries.ts'
 import {
   type DisciplineRow,
@@ -52,27 +51,32 @@ export function DisciplineList({
     [items, filters, t],
   )
   const { shown, options } = useFacets(items, searched, facets, filters)
-  const named = [...facetNames(facets, state.facets ?? {}, t), matchingText(t, state.query)]
+  const named = [...facetNames(facets, state.facets ?? {}, i18n), matchingText(i18n, state.query)]
   const classes = (r: DisciplineRow) => r.classes.map((c) => c.name).join(', ')
   const columns: DirectoryColumn<DisciplineRow>[] = [
-    { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },
+    {
+      key: 'name',
+      label: /*i18n*/ { id: 'disciplines.column.name', message: 'Name' },
+      value: (r) => r.name,
+      cell: (r) => r.name,
+    },
     {
       key: 'number',
-      label: msg('Number'),
+      label: /*i18n*/ { id: 'disciplines.column.number', message: 'Number' },
       width: '8rem',
       value: (r) => r.number ?? '',
       cell: (r) => r.number,
     },
     {
       key: 'federation',
-      label: msg('Federation'),
+      label: /*i18n*/ { id: 'disciplines.column.federation', message: 'Federation' },
       width: '7rem',
       value: (r) => r.federation,
       cell: (r) => r.federation,
     },
     {
       key: 'distance',
-      label: msg('Distance'),
+      label: /*i18n*/ { id: 'disciplines.column.distance', message: 'Distance' },
       num: true,
       width: '9rem',
       value: (r) => r.distance,
@@ -81,7 +85,7 @@ export function DisciplineList({
     {
       key: 'category',
       wide: true,
-      label: msg('Category'),
+      label: /*i18n*/ { id: 'disciplines.column.category', message: 'Category' },
       width: '11rem',
       value: (r) => r.category ?? '',
       cell: (r) => r.category && kebabValue(t, r.category),
@@ -89,14 +93,14 @@ export function DisciplineList({
     {
       key: 'classes',
       wide: true,
-      label: msg('Caliber classes'),
+      label: /*i18n*/ { id: 'disciplines.column.classes', message: 'Caliber classes' },
       width: '14rem',
       value: classes,
       cell: classes,
     },
     {
       key: 'faces',
-      label: msg('Targets'),
+      label: /*i18n*/ { id: 'disciplines.column.faces', message: 'Targets' },
       num: true,
       width: '5rem',
       value: (r) => r.faceIds.length,
@@ -162,7 +166,7 @@ export function DisciplineList({
 export function FederationList({ items }: { items: FederationRow[] }) {
   const tr = useTranslation()
   const { i18n } = useLingui()
-  const { t, language } = tr
+  const { language } = tr
   // the record prints "International" or an ISO code: a code is named in the language shown
   const country = useCallback(
     (c: string) =>
@@ -179,28 +183,33 @@ export function FederationList({ items }: { items: FederationRow[] }) {
   )
   const { shown, options } = useFacets(items, searched, federationFacets, filters)
   const named = [
-    ...facetNames(federationFacets, state.facets ?? {}, t),
-    matchingText(t, state.query),
+    ...facetNames(federationFacets, state.facets ?? {}, i18n),
+    matchingText(i18n, state.query),
   ]
   const columns: DirectoryColumn<FederationRow>[] = [
-    { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },
+    {
+      key: 'name',
+      label: /*i18n*/ { id: 'disciplines.column.name', message: 'Name' },
+      value: (r) => r.name,
+      cell: (r) => r.name,
+    },
     {
       key: 'abbreviation',
-      label: msg('Abbreviation'),
+      label: /*i18n*/ { id: 'disciplines.column.abbreviation', message: 'Abbreviation' },
       width: '8rem',
       value: (r) => r.abbreviation,
       cell: (r) => r.abbreviation,
     },
     {
       key: 'country',
-      label: msg('Country'),
+      label: /*i18n*/ { id: 'disciplines.column.country', message: 'Country' },
       width: '8rem',
       value: (r) => country(r.country),
       cell: (r) => country(r.country),
     },
     {
       key: 'disciplines',
-      label: msg('Disciplines'),
+      label: /*i18n*/ { id: 'disciplines.column.disciplines', message: 'Disciplines' },
       num: true,
       width: '7rem',
       value: (r) => r.disciplines,
@@ -208,7 +217,7 @@ export function FederationList({ items }: { items: FederationRow[] }) {
     },
     {
       key: 'website',
-      label: msg('Homepage'),
+      label: /*i18n*/ { id: 'disciplines.column.website', message: 'Homepage' },
       width: '12rem',
       value: (r) => r.website ?? '',
       cell: (r, tabIndex) => r.website && <HomepageLink url={r.website} tabIndex={tabIndex} />,

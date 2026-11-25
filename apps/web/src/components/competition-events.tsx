@@ -1,6 +1,6 @@
 'use client'
 
-import type { I18n } from '@lingui/core'
+import type { I18n, MessageDescriptor } from '@lingui/core'
 import { useLingui } from '@lingui/react'
 import {
   ActionIcon,
@@ -1024,7 +1024,12 @@ function eventColumns(
   t: Translator['t'],
   actions: (r: EventRecord, tabIndex?: number) => ReactNode,
 ): DirectoryColumn<EventRecord>[] {
-  const text = (key: string, label: Message, width: string, of: (r: EventRecord) => string) => ({
+  const text = (
+    key: string,
+    label: MessageDescriptor,
+    width: string,
+    of: (r: EventRecord) => string,
+  ) => ({
     key,
     label,
     width,
@@ -1034,26 +1039,35 @@ function eventColumns(
   return [
     {
       key: 'date',
-      label: msg('Date'),
+      label: /*i18n*/ { id: 'events.column.date', message: 'Date' },
       width: '9.5rem',
       value: (r) => r.data.date,
       cell: (r) => dayText(r.data.date),
     },
-    text('name', msg('Name'), '14rem', (r) => r.name),
-    text('type', msg('Event type'), '10rem', (r) => names.type(r.data)),
-    text('level', msg('Level'), '9rem', (r) => r.data.level),
+    text('name', /*i18n*/ { id: 'events.column.name', message: 'Name' }, '14rem', (r) => r.name),
+    text('type', /*i18n*/ { id: 'events.column.type', message: 'Event type' }, '10rem', (r) =>
+      names.type(r.data),
+    ),
+    text(
+      'level',
+      /*i18n*/ { id: 'events.column.level', message: 'Level' },
+      '9rem',
+      (r) => r.data.level,
+    ),
     {
       key: 'total',
-      label: msg('Total'),
+      label: /*i18n*/ { id: 'events.column.total', message: 'Total' },
       num: true,
       width: '6rem',
       value: (r) => eventTotals(r.data, typeOf(r.data, types))?.total,
       cell: (r) => totalText(r.data, typeOf(r.data, types)),
     },
-    text('state', msg('Result'), '8rem', (r) => t(stateLabels[r.data.state])),
+    text('state', /*i18n*/ { id: 'events.column.state', message: 'Result' }, '8rem', (r) =>
+      t(stateLabels[r.data.state]),
+    ),
     {
       key: 'actions',
-      label: msg('Actions'),
+      label: /*i18n*/ { id: 'events.column.actions', message: 'Actions' },
       width: '3rem',
       screenOnly: true,
       sticky: true,

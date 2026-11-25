@@ -1,4 +1,5 @@
 /** Filtering and sorting of the data lists (cartridges, bullets, powders) in the browser. */
+import type { I18n } from '@lingui/core'
 import { compareKeys, score, searchKey, sortKey } from '@rangefoundry/schema'
 import type { Translator } from '../i18n/translate.ts'
 
@@ -100,8 +101,9 @@ export function filterText(named: readonly (string | false | undefined)[]) {
 }
 
 /** The search as a named filter; false without a search text. */
-export const matchingText = (t: Translator['t'], query: string) =>
-  query.trim() !== '' && t('matching "{query}"', { query: query.trim() })
+export const matchingText = (i18n: I18n, query: string) =>
+  query.trim() !== '' &&
+  i18n._({ id: 'lists.matching', message: 'matching "{query}"', values: { query: query.trim() } })
 
 /** As the schema's matcher reads words ("8x57" finds "8 x 57 IS"); an empty query matches. */
 export const matchesQuery = (texts: (string | undefined)[], query: string) =>
