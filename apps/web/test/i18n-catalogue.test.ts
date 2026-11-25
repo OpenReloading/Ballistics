@@ -167,19 +167,19 @@ describe('the catalogue lint', () => {
   it('checks the German of the Lingui catalog by its English text, and names other German for one English text', () => {
     const { german, conflicts } = linguiGerman(
       {
-        'bullets.all': { translation: 'All bullets' },
+        'bullets.mass': { translation: 'Bullet mass' },
         'bullets.none': { translation: 'No bullets' },
         'cases.none': { translation: 'No bullets' },
         'bullets.gone': { translation: 'Gone' },
       },
       {
-        'bullets.all': { translation: 'Alle Kugeln' },
+        'bullets.mass': { translation: 'Kugelmasse' },
         'bullets.none': { translation: 'Keine Geschosse' },
         'cases.none': { translation: 'Keine Kugeln' },
         'bullets.gone': { translation: 'Weg', obsolete: true },
       },
     )
-    expect(german).toEqual({ 'All bullets': 'Alle Kugeln', 'No bullets': 'Keine Geschosse' })
+    expect(german).toEqual({ 'Bullet mass': 'Kugelmasse', 'No bullets': 'Keine Geschosse' })
     expect(conflicts).toEqual(['cases.none: other German than bullets.none for No bullets'])
     const table = {
       sources: { a: { document: 'A', edition: '1', pages: 'p.' } },
@@ -195,7 +195,7 @@ describe('the catalogue lint', () => {
         },
       ],
     }
-    expect(termUseProblems(german, table, {}, [])).toEqual(['All bullets: Geschoss'])
+    expect(termUseProblems(german, table, {}, [])).toEqual(['Bullet mass: Geschoss'])
   })
 
   it('counts the warning sentences and refusal words the two files mark as texts of the table', () => {
