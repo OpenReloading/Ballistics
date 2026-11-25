@@ -91,6 +91,13 @@ test('TEMPORARY proof: the band arriving after the run keeps the vivacity chart 
     }).observe(document, { childList: true, subtree: true })
   })
   await runSavedLoad(page)
+  const before = await page.evaluate(() => {
+    const w = window as unknown as { removedFromVivacity: string[] }
+    const was = w.removedFromVivacity.length
+    w.removedFromVivacity = []
+    return was
+  })
+  console.log(`removed before the run settled: ${before}`)
   await expect(page.getByText(/5th to 95th percentile/).first()).toBeAttached({ timeout: 15_000 })
   await page.waitForTimeout(1000)
   const removed = await page.evaluate(
