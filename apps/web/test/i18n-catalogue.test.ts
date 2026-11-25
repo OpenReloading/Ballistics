@@ -11,6 +11,7 @@ import {
   requiredMessages,
   safeWordingProblems,
   tableMessages,
+  targetRecordProblems,
   termUseProblems,
 } from '../scripts/i18n.mts'
 
@@ -164,23 +165,29 @@ describe('the catalogue lint', () => {
     ])
   })
 
-  it('checks the German of the Lingui catalog by its English text, and names other German for one English text', () => {
-    const { german, conflicts } = linguiGerman(
+  it('checks the German of each Lingui id by its English text, also when ids share an English text', () => {
+    const german = linguiGerman(
       {
         'bullets.mass': { translation: 'Bullet mass' },
-        'bullets.none': { translation: 'No bullets' },
-        'cases.none': { translation: 'No bullets' },
+        'loads.mass': { translation: 'Bullet mass' },
+        'cases.material': { translation: 'Brass' },
+        'cases.facet': { translation: 'Brass' },
         'bullets.gone': { translation: 'Gone' },
       },
       {
-        'bullets.mass': { translation: 'Kugelmasse' },
-        'bullets.none': { translation: 'Keine Geschosse' },
-        'cases.none': { translation: 'Keine Kugeln' },
+        'bullets.mass': { translation: 'Geschossmasse' },
+        'loads.mass': { translation: 'Kugelmasse' },
+        'cases.material': { translation: 'Messinghülse' },
+        'cases.facet': { translation: 'Hülsen' },
         'bullets.gone': { translation: 'Weg', obsolete: true },
       },
     )
-    expect(german).toEqual({ 'Bullet mass': 'Kugelmasse', 'No bullets': 'Keine Geschosse' })
-    expect(conflicts).toEqual(['cases.none: other German than bullets.none for No bullets'])
+    expect(german).toEqual([
+      { 'Bullet mass': 'Geschossmasse' },
+      { 'Bullet mass': 'Kugelmasse' },
+      { Brass: 'Messinghülse' },
+      { Brass: 'Hülsen' },
+    ])
     const table = {
       sources: { a: { document: 'A', edition: '1', pages: 'p.' } },
       terms: [
@@ -195,7 +202,30 @@ describe('the catalogue lint', () => {
         },
       ],
     }
-    expect(termUseProblems(german, table, {}, [])).toEqual(['Bullet mass: Geschoss'])
+    expect(german.flatMap((g) => termUseProblems(g, table, {}, []))).toEqual([
+      'Bullet mass: Geschoss',
+    ])
+  })
+
+  it('names a target record whose English says target without Scheibe in its German', () => {
+    expect(
+      targetRecordProblems(
+        {
+          'All targets': 'Alle Ziele',
+          'Targets, {filters}': 'Zielscheiben, {filters}',
+          '{count} target|{count} targets': { one: '{count} Scheibe', other: '{count} Scheiben' },
+          'The published records.': 'Die veröffentlichten Datensätze.',
+        },
+        [
+          'All targets',
+          'Targets, {filters}',
+          '{count} target|{count} targets',
+          'The published records.',
+          'Find target',
+        ],
+        'Scheibe',
+      ),
+    ).toEqual(['All targets: Scheibe'])
   })
 
   it('counts the warning sentences and refusal words the two files mark as texts of the table', () => {

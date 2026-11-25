@@ -364,23 +364,27 @@ export function safeWordingProblems(
   return found
 }
 
-/** The German of the Lingui catalog `de` keyed by its English in `en`, as `de.json` keys it, for the term and safe-wording checks; `conflicts` names each id whose English has other German under an earlier id (one German per English text, as in `de.json`). */
-export function linguiGerman(en: PoCatalog, de: PoCatalog) {
-  const german: Record<string, string> = {}
-  const idOf: Record<string, string> = {}
-  const conflicts: string[] = []
+/** The German of each id of the Lingui catalog `de` keyed by its English in `en`, as `de.json` keys it, one catalog per id: ids that share an English text may need other German for another sense, so each is checked on its own. */
+export function linguiGerman(en: PoCatalog, de: PoCatalog): Record<string, string>[] {
+  const german: Record<string, string>[] = []
   for (const [id, entry] of Object.entries(de)) {
     const english = en[id]?.translation
-    if (entry.obsolete || !entry.translation || !english) continue
-    const earlier = idOf[english]
-    if (earlier !== undefined && german[english] !== entry.translation)
-      conflicts.push(`${id}: other German than ${earlier} for ${english}`)
-    else {
-      german[english] = entry.translation
-      idOf[english] = id
-    }
+    if (!entry.obsolete && entry.translation && english)
+      german.push({ [english]: entry.translation })
   }
-  return { german, conflicts }
+  return german
+}
+
+/** Each of the `records` whose English names a target or targets says `stem` in its German, since the term check skips these keys. */
+export function targetRecordProblems(
+  catalogue: Record<string, unknown>,
+  records: readonly string[],
+  stem: string,
+): string[] {
+  return records
+    .filter((key) => key in catalogue && /\btargets?\b/i.test(key))
+    .filter((key) => !fold(textOf(catalogue[key])).includes(fold(stem)))
+    .map((key) => `${key}: ${stem}`)
 }
 
 /** The untranslated list of `code` in `lintAtBase`, the lint file as the commit `baseRef` has it; a base without one throws, since nothing would show that the list only shrank. */
@@ -430,13 +434,14 @@ if (import.meta.main) {
       const { readCatalog } = await import('./po-catalog.mts')
       // the texts on Lingui ids keep the checks they had in de.json; each catalog on its own, the messages of both
       const lingui = linguiGerman(await readCatalog('en'), await readCatalog('de'))
-      const english = [...source, ...Object.keys(lingui.german)]
-      const checked = [catalogue, lingui.german].flatMap((german) => [
+      const english = [...new Set([...source, ...lingui.flatMap((g) => Object.keys(g))])]
+      const checked = [catalogue, ...lingui].flatMap((german) => [
         ...termUseProblems(german, table, senses, english),
         ...safeWordingProblems(english, german, lint.safeTexts),
+        ...targetRecordProblems(german, lint.targetRecords, lint.targetGerman),
       ])
       found.push(...termTableProblems(table))
-      wording.push(...new Set(checked), ...lingui.conflicts)
+      wording.push(...new Set(checked))
     }
     for (const p of found) console.error(`src/i18n/${code}.json: ${p}`)
     for (const p of wording) console.error(`src/i18n/${code}.json or src/locales/${code}.po: ${p}`)

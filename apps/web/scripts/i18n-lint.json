@@ -53,6 +53,7 @@
     "{shown} of {count} target|{shown} of {count} targets"
   ],
   "targetSense": "target: a target record, Scheibe",
+  "targetGerman": "Scheibe",
   "otherSense": {
     "Bullet position": "where the bullet is in the barrel, not a shooting position",
     "{field}: the header names a unit other than {symbols}. Choose the unit of the column.": "names: the verb (the header gives a unit), not a name",
