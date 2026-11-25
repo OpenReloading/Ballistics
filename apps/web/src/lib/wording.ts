@@ -1,19 +1,27 @@
+import type { I18n, MessageDescriptor } from '@lingui/core'
 import type { Message, Translator } from '../i18n/translate.ts'
 
 /** The values of the `{name}` placeholders of a message: text as shown, or a number the language writes. */
 type Values = Readonly<Record<string, string | number>>
 
-/** All three forms survive the server-to-client step as data; a verbatim text is never translated. */
-export type Wording = Message | { verbatim: string } | { message: Message; values: Values }
+/** A text of the catalogue keyed by its English, or a verbatim text that is never translated. */
+export type OwnWording = Message | { verbatim: string } | { message: Message; values: Values }
+
+/** Every form survives the server-to-client step as data; a descriptor is a Lingui message id with its values. */
+export type Wording = OwnWording | MessageDescriptor
 
 /** A text shown as it is: a record's name or a printed value. */
-export const verbatim = (text: string): Wording => ({ verbatim: text })
+export const verbatim = (text: string): OwnWording => ({ verbatim: text })
 
 /** A message with its placeholders filled where it is shown. */
-export const worded = (message: Message, values: Values): Wording => ({ message, values })
+export const worded = (message: Message, values: Values): OwnWording => ({ message, values })
 
 /** The text of `w` in the language of `t` (`useTranslation()`). */
-export function say(t: Translator['t'], w: Wording): string {
+export function sayOwn(t: Translator['t'], w: OwnWording): string {
   if (typeof w === 'string') return t(w)
   return 'verbatim' in w ? w.verbatim : t(w.message, w.values)
 }
+
+/** The text of `w` in the language of `i18n` (`useLingui()`) and `t`, which reads a text not yet on an id. */
+export const say = (i18n: I18n, t: Translator['t'], w: Wording): string =>
+  typeof w === 'object' && 'id' in w ? i18n._(w) : sayOwn(t, w)

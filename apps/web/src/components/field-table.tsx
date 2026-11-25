@@ -1,5 +1,7 @@
 'use client'
 
+import type { I18n } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import {
   SegmentedControl,
   Table,
@@ -16,6 +18,7 @@ import { Search as SearchIcon } from 'lucide-react'
 import { Fragment, type KeyboardEvent, type ReactNode, useId, useState } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
+import { linguiOf } from '../i18n/lingui.ts'
 import { type Translator, translator } from '../i18n/translate.ts'
 import {
   type FieldGroup,
@@ -35,6 +38,10 @@ import { ScrollRegion } from './scroll-region.tsx'
 import { useUnits } from './units-settings.tsx'
 
 type Translate = Translator['t']
+
+/** The name of a table's scroll region. */
+const tableLabel = (i18n: I18n, label: string) =>
+  i18n._({ id: 'fieldTable.region', message: '{label} table', values: { label } })
 
 /** Arrow up and down, Home and End between the `selector` stops of a table: one tab stop, the rows by the arrows. */
 export function arrowStops(e: KeyboardEvent<HTMLElement>, selector: string) {
@@ -114,20 +121,21 @@ function RowLinks({ links }: { links: NonNullable<FieldRow['links']> }) {
 
 function Row({ row, system }: { row: FieldRow; system: UnitSystem }) {
   const { t } = useTranslation()
-  const notes = rowNotes(row, t)
+  const { i18n } = useLingui()
+  const notes = rowNotes(row, t, i18n)
   if (row.links)
     return (
       <TableTr>
-        <TableTh scope="row">{rowLabel(row, system, t)}</TableTh>
+        <TableTh scope="row">{rowLabel(row, system, t, i18n)}</TableTh>
         <TableTd className="field-links">
           <RowLinks links={row.links} />
         </TableTd>
       </TableTr>
     )
-  const value = <SlashBreaks text={rowValue(row, system, t)} />
+  const value = <SlashBreaks text={rowValue(row, system, t, i18n)} />
   return (
     <TableTr>
-      <TableTh scope="row">{rowLabel(row, system, t)}</TableTh>
+      <TableTh scope="row">{rowLabel(row, system, t, i18n)}</TableTh>
       <TableTd className="nowrap num">
         {notes.length > 0 ? <Noted value={value} notes={notes} /> : value}
       </TableTd>
@@ -161,8 +169,9 @@ function SymbolRow({
   off: boolean
 }) {
   const { t } = useTranslation()
-  const notes = rowNotes(row, t)
-  const { number, unit } = rowParts(row, system, t)
+  const { i18n } = useLingui()
+  const notes = rowNotes(row, t, i18n)
+  const { number, unit } = rowParts(row, system, t, i18n)
   return (
     <TableTr data-symbol={row.symbol} data-off={off || undefined}>
       {symbolColumn && (
@@ -170,12 +179,12 @@ function SymbolRow({
           {row.symbol && <SymbolStop tabIndex={tabbable ? 0 : -1}>{row.symbol}</SymbolStop>}
         </TableTd>
       )}
-      <TableTh scope="row">{rowLabel(row, system, t)}</TableTh>
+      <TableTh scope="row">{rowLabel(row, system, t, i18n)}</TableTh>
       <TableTd className="nowrap num">
         {notes.length > 0 ? <Noted value={number} notes={notes} /> : number}
       </TableTd>
       <TableTd className="field-unit-cell">
-        <Sized now={unit} also={slotUnits.map((u) => rowParts(row, u, t).unit)} />
+        <Sized now={unit} also={slotUnits.map((u) => rowParts(row, u, t, i18n).unit)} />
       </TableTd>
     </TableTr>
   )
@@ -194,6 +203,7 @@ function SymbolTable({
   symbolColumn: boolean
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { system } = useUnits()
   const symbols = groups.flatMap((g) =>
     g.rows.flatMap((r) => (r.symbol && on.has(r) ? [r.symbol] : [])),
@@ -201,7 +211,7 @@ function SymbolTable({
   const [active, setActive] = useState<string>()
   const stop = symbols.includes(active ?? '') ? active : symbols[0]
   return (
-    <ScrollRegion label={t('{label} table', { label })}>
+    <ScrollRegion label={tableLabel(i18n, label)}>
       <Table
         className="field-table symbol-table"
         aria-label={label}
@@ -219,15 +229,17 @@ function SymbolTable({
           <TableTr>
             {symbolColumn && (
               <TableTh scope="col" className="field-symbol">
-                {t('Symbol')}
+                {i18n._({ id: 'fieldTable.column.symbol', message: 'Symbol' })}
               </TableTh>
             )}
-            <TableTh scope="col">{t('Quantity')}</TableTh>
+            <TableTh scope="col">
+              {i18n._({ id: 'fieldTable.column.quantity', message: 'Quantity' })}
+            </TableTh>
             <TableTh scope="col" className="num">
-              {t('Value')}
+              {i18n._({ id: 'fieldTable.column.value', message: 'Value' })}
             </TableTh>
             <TableTh scope="col" className="field-unit-cell">
-              {t('Unit')}
+              {i18n._({ id: 'fieldTable.column.unit', message: 'Unit' })}
             </TableTh>
           </TableTr>
         </TableThead>
@@ -237,7 +249,7 @@ function SymbolTable({
             {g.title && (
               <TableTr className="field-group">
                 <TableTh scope="rowgroup" colSpan={symbolColumn ? 4 : 3}>
-                  {say(t, g.title)}
+                  {say(i18n, t, g.title)}
                 </TableTh>
               </TableTr>
             )}
@@ -259,11 +271,12 @@ function SymbolTable({
   )
 }
 
-/** Rows whose label (in the language of `t`) or symbol holds `q`, ignoring case; groups left without rows drop out. */
+/** Rows whose label (in the language of `i18n` and `t`) or symbol holds `q`, ignoring case; groups left without rows drop out. */
 export function searchGroups(
   groups: FieldGroup[],
   q: string,
   t: Translate = translator().t,
+  i18n: I18n = linguiOf('en'),
 ): FieldGroup[] {
   const needle = q.trim().toLowerCase()
   if (!needle) return groups
@@ -271,7 +284,7 @@ export function searchGroups(
     .map((g) => ({
       ...g,
       rows: g.rows.filter((r) =>
-        [say(t, r.label), r.symbol].some((x) => x?.toLowerCase().includes(needle)),
+        [say(i18n, t, r.label), r.symbol].some((x) => x?.toLowerCase().includes(needle)),
       ),
     }))
     .filter((g) => g.rows.length > 0)
@@ -296,8 +309,9 @@ export function FieldPanel({
   children?: ReactNode
 }) {
   const { t, language } = useTranslation()
+  const { i18n } = useLingui()
   // the filter is kept by the English text of its label, so a change of language keeps it
-  const key = (w: Wording) => say(translator().t, w)
+  const key = (w: Wording) => say(linguiOf('en'), translator().t, w)
   const [group, setGroup] = useState('All')
   const [q, setQ] = useState('')
   const filters = [
@@ -314,8 +328,9 @@ export function FieldPanel({
         }),
     q,
     t,
+    i18n,
   )
-  const name = say(t, title)
+  const name = say(i18n, t, title)
   return (
     <Panel
       id={id}
@@ -324,13 +339,17 @@ export function FieldPanel({
       controls={
         filters.length > 1 && (
           <SegmentedControl
-            aria-label={t('{title}: group', { title: name })}
+            aria-label={i18n._({
+              id: 'fieldTable.groupFilter',
+              message: '{title}: group',
+              values: { title: name },
+            })}
             size={controlSize.row.toggle}
             data={[
-              { value: 'All', label: t('All') },
+              { value: 'All', label: i18n._({ id: 'fieldTable.allGroups', message: 'All' }) },
               ...filters.map(([value, w]) => ({
                 value,
-                label: say(t, w).replace(' and ', ', ').replace(' und ', ', '),
+                label: say(i18n, t, w).replace(' and ', ', ').replace(' und ', ', '),
               })),
             ]}
             value={scope}
@@ -349,10 +368,16 @@ export function FieldPanel({
           type="search"
           size={controlSize.row.input}
           // a German noun keeps its capital
-          aria-label={t('Search {title}', {
-            title: language === 'en' ? name.toLowerCase() : name,
+          aria-label={i18n._({
+            id: 'fieldTable.search',
+            message: 'Search {title}',
+            values: { title: language === 'en' ? name.toLowerCase() : name },
           })}
-          placeholder={symbols ? t('Symbol or name') : t('Name')}
+          placeholder={
+            symbols
+              ? i18n._({ id: 'fieldTable.searchSymbolOrName', message: 'Symbol or name' })
+              : i18n._({ id: 'fieldTable.searchName', message: 'Name' })
+          }
           leftSection={<SearchIcon aria-hidden="true" />}
           value={q}
           onChange={(e) => setQ(e.currentTarget.value)}
@@ -367,7 +392,11 @@ export function FieldPanel({
       />
       {shown.length === 0 && (
         <p className="record-note">
-          {t('No row of {table} matches {query}.', { table: name, query: q.trim() })}
+          {i18n._({
+            id: 'fieldTable.noMatch',
+            message: 'No row of {table} matches {query}.',
+            values: { table: name, query: q.trim() },
+          })}
         </p>
       )}
       {children}
@@ -378,28 +407,40 @@ export function FieldPanel({
 /** The drag model with its velocity band, the value in the viewer's unit, and the record's note. */
 export function CoefficientTable({ label, rows }: { label: Wording; rows: FieldRow[] }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { system } = useUnits()
-  const name = say(t, label)
-  const unit = (u: UnitSystem) => t('BC ({unit})', { unit: u.ballisticCoefficient.symbol })
+  const name = say(i18n, t, label)
+  const unit = (u: UnitSystem) =>
+    i18n._({
+      id: 'fieldTable.coefficientUnit',
+      message: 'BC ({unit})',
+      values: { unit: u.ballisticCoefficient.symbol },
+    })
   return (
-    <ScrollRegion label={t('{label} table', { label: name })}>
+    <ScrollRegion label={tableLabel(i18n, name)}>
       <Table className="field-table coefficient-table" aria-label={name}>
         <TableThead>
           <TableTr>
-            <TableTh scope="col">{t('Drag model')}</TableTh>
+            <TableTh scope="col">
+              {i18n._({ id: 'fieldTable.column.dragModel', message: 'Drag model' })}
+            </TableTh>
             <TableTh scope="col" className="num">
               <Sized now={unit(system)} also={slotUnits.map(unit)} />
             </TableTh>
-            <TableTh scope="col">{t('Note')}</TableTh>
+            <TableTh scope="col">
+              {i18n._({ id: 'fieldTable.column.note', message: 'Note' })}
+            </TableTh>
           </TableTr>
         </TableThead>
         <TableTbody>
           {rows.map((row, k) => (
             // oxlint-disable-next-line react/no-array-index-key -- a drag model can repeat
             <TableTr key={k}>
-              <TableTh scope="row">{rowLabel(row, system, t)}</TableTh>
-              <TableTd className="nowrap num">{rowParts(row, system, t).number}</TableTd>
-              <TableTd className="field-note-cell">{row.method && say(t, row.method)}</TableTd>
+              <TableTh scope="row">{rowLabel(row, system, t, i18n)}</TableTh>
+              <TableTd className="nowrap num">{rowParts(row, system, t, i18n).number}</TableTd>
+              <TableTd className="field-note-cell">
+                {row.method && say(i18n, t, row.method)}
+              </TableTd>
             </TableTr>
           ))}
         </TableTbody>
@@ -419,10 +460,11 @@ export function FieldTable({
   groups: FieldGroup[]
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { system } = useUnits()
-  const name = say(t, caption)
+  const name = say(i18n, t, caption)
   return (
-    <ScrollRegion label={t('{label} table', { label: name })}>
+    <ScrollRegion label={tableLabel(i18n, name)}>
       <Table className="field-table" captionSide="top" aria-labelledby={labelledBy}>
         {!labelledBy && <TableCaption>{name}</TableCaption>}
         {groups
@@ -433,7 +475,7 @@ export function FieldTable({
               {g.title && (
                 <TableTr className="field-group">
                   <TableTh scope="rowgroup" colSpan={2}>
-                    {say(t, g.title)}
+                    {say(i18n, t, g.title)}
                   </TableTh>
                 </TableTr>
               )}

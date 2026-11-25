@@ -41,7 +41,7 @@ import { type FieldRow, rowLabel, rowValue } from '../lib/record-fields.ts'
 import { rawWording } from '../lib/record-values.ts'
 import { drawingLengthUnit, formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
 import { resolveBullet } from '../lib/variants.ts'
-import { say } from '../lib/wording.ts'
+import { sayOwn } from '../lib/wording.ts'
 import { description } from './bullet-drawing.tsx'
 import { DesignerField, revertOf } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
@@ -83,7 +83,7 @@ function optionLabel(o: string, t: Translator['t']) {
   if (o === '') return t('Not given')
   const short = shortLabels[o]
   if (short) return t(short)
-  const word = say(t, rawWording(o))
+  const word = sayOwn(t, rawWording(o))
   return word === o ? o.replaceAll('-', ' ') : word
 }
 

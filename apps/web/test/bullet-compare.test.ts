@@ -1,7 +1,8 @@
 import type { Bullet } from '@rangefoundry/schema'
 import { bulletProfile } from '@rangefoundry/svg-drawings/bullet'
 import { expect, it } from 'vitest'
-import { translator } from '../src/i18n/translate.ts'
+import { linguiOf } from '../src/i18n/lingui.ts'
+import { type Translator, translator } from '../src/i18n/translate.ts'
 import {
   compareGroups,
   differenceMarks,
@@ -17,8 +18,11 @@ import {
   parseCompareIds,
 } from '../src/lib/compare-ids.ts'
 import { presetUnits } from '../src/lib/units.ts'
-import { say } from '../src/lib/wording.ts'
+import { say as sayIn, type Wording } from '../src/lib/wording.ts'
 import { defined } from './defined.ts'
+
+/** A wording in the language of `t`; these rows carry no Lingui id. */
+const say = (t: Translator['t'], w: Wording) => sayIn(linguiOf('en'), t, w)
 
 it('parses ids: trimmed, deduplicated, at most four, only record id characters', () => {
   expect(parseCompareIds('a-1, b-2,,a-1')).toEqual({ status: 'ok', ids: ['a-1', 'b-2'] })

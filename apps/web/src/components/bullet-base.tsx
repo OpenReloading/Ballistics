@@ -15,7 +15,7 @@ import {
 import { bulletIncomplete } from '../lib/complete-records.ts'
 import { rawWording } from '../lib/record-values.ts'
 import { controlSize } from '../lib/theme.ts'
-import { say } from '../lib/wording.ts'
+import { sayOwn } from '../lib/wording.ts'
 import { useLoad } from './workbench-context.ts'
 
 /** The hollow bases get shorter names: the select is too narrow for the full type name. */
@@ -28,7 +28,7 @@ const shortLabels: Record<string, Message> = {
 function label(type: string, t: Translator['t']) {
   const short = shortLabels[type]
   if (short) return t(short)
-  const word = say(t, rawWording(type))
+  const word = sayOwn(t, rawWording(type))
   return word === type ? type.replaceAll('-', ' ') : word
 }
 

@@ -1,9 +1,11 @@
-import { MantineProvider } from '@mantine/core'
+import { I18nProvider } from '@lingui/react'
 import type { Source } from '@rangefoundry/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { groupSources, RecordSourcesLink, Sources } from '../src/components/sources.tsx'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { dayText } from '../src/lib/dates.ts'
+import { Providers } from './providers.tsx'
 
 const hash = '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
 
@@ -18,9 +20,9 @@ const sheet: Source = {
 
 const render = (source: Source) =>
   renderToStaticMarkup(
-    <MantineProvider>
+    <Providers>
       <Sources provenance={{ kind: 'published', sources: [source], note: 'Checked by hand.' }} />
-    </MantineProvider>,
+    </Providers>,
   )
 
 it('shows the title linked, the publisher, the edition, the retrieval day, the license and the terms, linked when they are a URL', () => {
@@ -44,7 +46,11 @@ it('shows 12 digits of the hash, copies the full hash and keeps the rest in the 
 })
 
 it("links a record's Sources panel in a new tab", () => {
-  const html = renderToStaticMarkup(<RecordSourcesLink kind="bullets" id="a b" />)
+  const html = renderToStaticMarkup(
+    <I18nProvider i18n={linguiOf('en')}>
+      <RecordSourcesLink kind="bullets" id="a b" />
+    </I18nProvider>,
+  )
   expect(html).toBe(
     '<a target="_blank" rel="noopener" href="/bullets/a%20b#record-sources">Sources<span class="visually-hidden"> in a new tab</span></a>',
   )
@@ -75,11 +81,11 @@ it('is a table of source, retrieval day, license and the fields it covers, a col
   expect(render(sheet)).not.toContain('Origin')
   expect(render(sheet)).not.toContain('Covers')
   const both = renderToStaticMarkup(
-    <MantineProvider>
+    <Providers>
       <Sources
         provenance={{ kind: 'published', sources: [sheet, { title: 'Manual', fields: ['mass'] }] }}
       />
-    </MantineProvider>,
+    </Providers>,
   )
   expect(both).toContain('>Covers</th>')
   expect(both).toContain('whole record')
@@ -88,7 +94,7 @@ it('is a table of source, retrieval day, license and the fields it covers, a col
 
 it("names the fields a source covers by the record kind's field labels, a key without one humanized", () => {
   const html = renderToStaticMarkup(
-    <MantineProvider>
+    <Providers>
       <Sources
         kind="powders"
         provenance={{
@@ -107,7 +113,7 @@ it("names the fields a source covers by the record kind's field labels, a key wi
           ],
         }}
       />
-    </MantineProvider>,
+    </Providers>,
   )
   expect(html).toContain(
     'Name, Form, Listed by the manufacturer for, Model parameters, Temperature sensitivity',
@@ -125,7 +131,7 @@ it('gives every table element of the sources its ARIA role', () => {
 it('groups the sources of one document: title, publisher, edition and hash once, a row per page', () => {
   const book = { ...sheet, title: 'Rule book', edition: '2025' }
   const html = renderToStaticMarkup(
-    <MantineProvider>
+    <Providers>
       <Sources
         provenance={{
           kind: 'published',
@@ -137,7 +143,7 @@ it('groups the sources of one document: title, publisher, edition and hash once,
           ],
         }}
       />
-    </MantineProvider>,
+    </Providers>,
   )
   expect(groupSources([book, { title: 'Manual' }, book]).map((g) => g.length)).toEqual([2, 1])
   expect(html.match(/>Rule book<\/a>/g)).toHaveLength(1)

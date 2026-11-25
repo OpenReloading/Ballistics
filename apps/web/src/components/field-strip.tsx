@@ -1,5 +1,7 @@
 'use client'
 
+import type { I18n } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import {
   Box,
   Circle,
@@ -50,13 +52,14 @@ const icons: Record<StripItem['icon'], LucideIcon> = {
 }
 
 /** A strip item's label; a coefficient of a velocity band names its lower bound, as the table does. */
-function stripLabel(i: StripItem, system: UnitSystem, t: Translator['t']) {
-  const label = i.words ? say(t, i.words) : i.label
+function stripLabel(i: StripItem, system: UnitSystem, i18n: I18n, t: Translator['t']) {
+  const label = i.words ? say(i18n, t, i.words) : i.label
   return i.row.fromVelocity === undefined
     ? label
-    : t('{label} from {velocity}', {
-        label,
-        velocity: withUnit('velocity', system, i.row.fromVelocity),
+    : i18n._({
+        id: 'fieldStrip.bandFrom',
+        message: '{label} from {velocity}',
+        values: { label, velocity: withUnit('velocity', system, i.row.fromVelocity) },
       })
 }
 
@@ -82,6 +85,7 @@ export function FieldStrip({
   children?: ReactNode
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { system } = useUnits()
   if (items.length === 0 && !country && tags.length === 0 && !children) return null
   return (
@@ -89,13 +93,13 @@ export function FieldStrip({
       {cards(items).map((card) => (
         <FactCard key={card[0]?.icon} icon={icons[card[0]?.icon ?? 'form']}>
           {card.map((i) => {
-            const now = rowParts(i.row, system, t)
-            const also = slotUnits.map((u) => rowParts(i.row, u, t))
+            const now = rowParts(i.row, system, t, i18n)
+            const also = slotUnits.map((u) => rowParts(i.row, u, t, i18n))
             return (
               <Fact
                 key={i.label}
-                label={stripLabel(i, system, t)}
-                notes={rowNotes(i.row, t)}
+                label={stripLabel(i, system, i18n, t)}
+                notes={rowNotes(i.row, t, i18n)}
                 unit={{ now: now.unit, also: also.map((p) => p.unit) }}
               >
                 <Sized
@@ -109,7 +113,12 @@ export function FieldStrip({
       ))}
       {country && (
         <FactCard icon={Globe}>
-          <Fact label={t('Country')} notes={[t('Country of the manufacturer')]}>
+          <Fact
+            label={i18n._({ id: 'fieldStrip.country', message: 'Country' })}
+            notes={[
+              i18n._({ id: 'fieldStrip.countryNote', message: 'Country of the manufacturer' }),
+            ]}
+          >
             <Countries items={[country]} as="span" />
           </Fact>
         </FactCard>
@@ -119,7 +128,7 @@ export function FieldStrip({
         <div className="fact-tags">
           {tags.map((tag, i) => (
             // oxlint-disable-next-line react/no-array-index-key -- two facts can read the same
-            <MutedBadge key={i}>{say(t, tag)}</MutedBadge>
+            <MutedBadge key={i}>{say(i18n, t, tag)}</MutedBadge>
           ))}
         </div>
       )}

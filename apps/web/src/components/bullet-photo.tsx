@@ -1,5 +1,7 @@
 'use client'
 
+import type { I18n } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import {
   Button,
   FileButton,
@@ -37,15 +39,17 @@ const tools: { value: Tool; label: Message }[] = [
 type PhotoState = ReturnType<typeof useBulletPhoto>
 
 /** The messages about the photograph and the cut-out. */
-function stateMessages(p: PhotoState, t: Translator['t']): MessageEntry[] {
+function stateMessages(p: PhotoState, t: Translator['t'], i18n: I18n): MessageEntry[] {
   const outlined = p.found?.outline
   const empty = p.cut && !outlined && !p.busy
   return [
     // a failure is a message of the tool, else the browser's own text, which shows as written
     ...(p.failure ? [{ severity: 'error', text: t(p.failure as Message) } as const] : []),
-    ...p.warnings.map((w) => ({ severity: 'warning', text: say(t, w) }) as const),
-    ...(p.found?.unusable ? [{ severity: 'error', text: say(t, p.found.unusable) } as const] : []),
-    ...(p.found?.hints ?? []).map((w) => ({ severity: 'warning', text: say(t, w) }) as const),
+    ...p.warnings.map((w) => ({ severity: 'warning', text: say(i18n, t, w) }) as const),
+    ...(p.found?.unusable
+      ? [{ severity: 'error', text: say(i18n, t, p.found.unusable) } as const]
+      : []),
+    ...(p.found?.hints ?? []).map((w) => ({ severity: 'warning', text: say(i18n, t, w) }) as const),
     ...(empty
       ? [
           {
@@ -84,12 +88,13 @@ function valueMessages(
   p: PhotoState,
   record: Design['origin'],
   t: Translator['t'],
+  i18n: I18n,
 ): MessageEntry[] {
   const differing = p.rows.filter((r) => r.differs).map((r) => t(r.spec.label).toLowerCase())
   const values = differing.join(', ')
   return [
     ...(p.found?.measurement?.notes ?? []).map(
-      (w) => ({ severity: 'info', text: say(t, w) }) as const,
+      (w) => ({ severity: 'info', text: say(i18n, t, w) }) as const,
     ),
     ...(differing.length > 0
       ? [
@@ -248,6 +253,7 @@ function PhotoTool({
 }) {
   const p = useBulletPhoto(system, record)
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const id = useId()
   const { size, points, found, scale, drawing } = p
   const loaded = size !== undefined
@@ -285,7 +291,7 @@ function PhotoTool({
 
   const outline = found?.outline
   const turned = outline && fromSi('angle', outline.angle)
-  const messages = [...stateMessages(p, t), ...valueMessages(p, record, t)]
+  const messages = [...stateMessages(p, t, i18n), ...valueMessages(p, record, t, i18n)]
   return (
     <Flex gap="md" wrap="wrap" align="flex-start" className="bullet-photo">
       <div style={{ flex: '2 1 28rem', minWidth: 0 }}>

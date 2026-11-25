@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import {
   Button,
   CloseButton,
@@ -94,6 +95,7 @@ export function BulletCompare({
 }) {
   const { system } = useUnits()
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const ids = bullets.map((b) => b.id)
   const style = { '--n': bullets.length } as CSSProperties
   return (
@@ -151,10 +153,10 @@ export function BulletCompare({
               </TableTr>
             </TableThead>
             {compareGroups(bullets, system, t).map((g) => (
-              <TableTbody key={say(t, g.title)}>
+              <TableTbody key={say(i18n, t, g.title)}>
                 <TableTr className="field-group">
                   <TableTh scope="rowgroup" colSpan={bullets.length + 3}>
-                    {say(t, g.title)}
+                    {say(i18n, t, g.title)}
                   </TableTh>
                 </TableTr>
                 {g.rows.map((row, k) => {
@@ -166,9 +168,9 @@ export function BulletCompare({
                       <TableTd className="field-symbol">{row.symbol}</TableTd>
                       <TableTh scope="row">
                         {row.from === undefined
-                          ? say(t, row.label)
+                          ? say(i18n, t, row.label)
                           : t('{label} from {velocity}', {
-                              label: say(t, row.label),
+                              label: say(i18n, t, row.label),
                               velocity: row.from,
                             })}
                       </TableTh>

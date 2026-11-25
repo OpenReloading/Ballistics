@@ -7,7 +7,7 @@ import { expect, it, vi } from 'vitest'
 import { TargetFaceDrawing } from '../src/components/target-face-drawing.tsx'
 import { TargetFaceList } from '../src/components/target-face-list.tsx'
 import { linguiOf } from '../src/i18n/lingui.ts'
-import { translator } from '../src/i18n/translate.ts'
+import { type Translator, translator } from '../src/i18n/translate.ts'
 import { facetOptions, facetRows } from '../src/lib/facets.ts'
 import {
   faceEventRows,
@@ -18,10 +18,13 @@ import {
   targetFaceStrip,
   userFaceRows,
 } from '../src/lib/target-faces.ts'
-import { say } from '../src/lib/wording.ts'
+import { say as sayIn, type Wording } from '../src/lib/wording.ts'
 import { faceById, faces } from './catalog-faces.ts'
 import { defined, missing } from './defined.ts'
 import { readRecord } from './read-record.ts'
+
+/** A wording in the language of `t`; these rows carry no Lingui id. */
+const say = (t: Translator['t'], w: Wording) => sayIn(linguiOf('en'), t, w)
 
 // the list renders its tab bar, which reads the route and the router
 vi.mock('next/navigation', () => ({

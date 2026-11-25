@@ -8,7 +8,7 @@ import type { PowderSummary } from './api-types.ts'
 import { notMetallic, shotgunOnly } from './complete-records.ts'
 import { type ManufacturerNames, productLabel } from './manufacturers.ts'
 import { nth } from './nth.ts'
-import { say, type Wording, worded } from './wording.ts'
+import { type OwnWording, sayOwn, worded } from './wording.ts'
 
 /** Dash pattern per color slot of the burn-rate charts: identity is not carried by color alone. */
 export const dashes = ['', '8 4', '2 3', '12 3 3 3', '4 4', '6 2 1 2'] as const
@@ -38,12 +38,12 @@ export interface UnfittedPowder {
   kind: UnfitKind
   /** `why` in English: what a reader of the data sees where nothing translates it. */
   reason: string
-  /** `reason` as a message with its numbers, for the language shown (`say(t, why)`). */
-  why: Wording
+  /** `reason` as a message with its numbers, for the language shown (`sayOwn(t, why)`). */
+  why: OwnWording
   /** The powder's own numbers behind `kind`, for a list grouped by kind. */
   detail?: string
   /** `detail` as a message with its numbers. */
-  detailWhy?: Wording
+  detailWhy?: OwnWording
 }
 
 const english = translator().t
@@ -51,13 +51,13 @@ const english = translator().t
 /** An unfitted powder with `reason` and `detail` written from their wordings in English. */
 const unfit = (
   p: Pick<UnfittedPowder, 'id' | 'label' | 'kind'>,
-  why: Wording,
-  detailWhy?: Wording,
+  why: OwnWording,
+  detailWhy?: OwnWording,
 ): UnfittedPowder => ({
   ...p,
-  reason: say(english, why),
+  reason: sayOwn(english, why),
   why,
-  ...(detailWhy && { detail: say(english, detailWhy), detailWhy }),
+  ...(detailWhy && { detail: sayOwn(english, detailWhy), detailWhy }),
 })
 
 interface RateInterval {

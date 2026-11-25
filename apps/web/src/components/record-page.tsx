@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import type { Provenance } from '@rangefoundry/schema'
 import type { ReactNode } from 'react'
 import { useTranslation } from '../i18n/language.ts'
@@ -65,7 +66,8 @@ export function RecordPage({
   sourceFacts?: ReactNode
 }) {
   const { t } = useTranslation()
-  const facts = badges.map((b) => say(t, b))
+  const { i18n } = useLingui()
+  const facts = badges.map((b) => say(i18n, t, b))
   return (
     <div className={`record record-frame${className ? ` ${className}` : ''}`}>
       <PageBar
@@ -108,7 +110,11 @@ export function RecordPage({
         {provenance && (
           <Panel
             id="record-sources"
-            title={t('Sources ({kind})', { kind: t(provenanceKinds[provenance.kind]) })}
+            title={i18n._({
+              id: 'recordPage.sources',
+              message: 'Sources ({kind})',
+              values: { kind: i18n._(provenanceKinds[provenance.kind]) },
+            })}
             className="record-sources"
           >
             {sourceFacts}

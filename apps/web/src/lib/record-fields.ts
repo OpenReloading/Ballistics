@@ -1,3 +1,4 @@
+import type { I18n } from '@lingui/core'
 import {
   type Bullet,
   type Case,
@@ -7,6 +8,7 @@ import {
   type QuantityValue,
   toSi,
 } from '@rangefoundry/schema'
+import { linguiOf } from '../i18n/lingui.ts'
 import { formatNumber, localizeDecimals } from '../i18n/number.ts'
 import { type Message, msg, type Translator, translator } from '../i18n/translate.ts'
 import { computedBulletRows } from './bullet.ts'
@@ -28,7 +30,7 @@ import {
   waterVolume,
   withUnit,
 } from './units.ts'
-import { say, verbatim, type Wording, worded } from './wording.ts'
+import { say, sayOwn, verbatim, type Wording, worded } from './wording.ts'
 
 export { titleFromKebab }
 
@@ -36,6 +38,7 @@ type Translate = Translator['t']
 
 /** Without a catalogue every text is English: what the record functions give when no translation is passed. */
 const english = translator().t
+const englishLingui = linguiOf('en')
 
 /** A quantity in SI shows in the viewer's unit; the printed text and how a computed value is computed show on hover. */
 export interface FieldRow {
@@ -72,26 +75,31 @@ export type FieldGroup = {
 }
 
 /** A row's unit: the symbol of its quantity, or the unit it names as text or words. */
-const unitOf = (row: FieldRow, system: UnitSystem, t: Translate) =>
+const unitOf = (row: FieldRow, system: UnitSystem, t: Translate, i18n: I18n) =>
   row.value
     ? system[row.value.quantity].symbol
     : row.unitWords
-      ? say(t, row.unitWords)
+      ? say(i18n, t, row.unitWords)
       : (row.unit ?? '')
 
-/** A row's text part in the language of `t`. */
-export const rowText = (row: FieldRow, t: Translate) =>
+/** A row's text part in the language of `i18n` and `t`. */
+export const rowText = (row: FieldRow, t: Translate, i18n: I18n) =>
   row.words
-    ? row.words.map((w) => say(t, w)).join(', ')
+    ? row.words.map((w) => say(i18n, t, w)).join(', ')
     : row.numeric
       ? localizeDecimals(row.text ?? '')
       : row.text
 
 /** A row's value as shown in `system`: rounded to the unit's decimals, with its symbol. */
-export function rowValue(row: FieldRow, system: UnitSystem, t: Translate = english): string {
+export function rowValue(
+  row: FieldRow,
+  system: UnitSystem,
+  t: Translate = english,
+  i18n: I18n = englishLingui,
+): string {
   if (!row.value) {
-    const text = rowText(row, t)
-    const unit = unitOf(row, system, t)
+    const text = rowText(row, t, i18n)
+    const unit = unitOf(row, system, t, i18n)
     return unit ? `${text} ${unit}` : (text ?? '')
   }
   const { quantity: q, si, significantDigits: sig } = row.value
@@ -100,9 +108,14 @@ export function rowValue(row: FieldRow, system: UnitSystem, t: Translate = engli
 }
 
 /** A row's value split into its text and its unit symbol, for a unit column or a label. */
-export function rowParts(row: FieldRow, system: UnitSystem, t: Translate = english) {
-  const unit = unitOf(row, system, t)
-  const text = rowValue(row, system, t)
+export function rowParts(
+  row: FieldRow,
+  system: UnitSystem,
+  t: Translate = english,
+  i18n: I18n = englishLingui,
+) {
+  const unit = unitOf(row, system, t, i18n)
+  const text = rowValue(row, system, t, i18n)
   return {
     number: unit && text.endsWith(` ${unit}`) ? text.slice(0, -unit.length - 1) : text,
     unit,
@@ -110,8 +123,13 @@ export function rowParts(row: FieldRow, system: UnitSystem, t: Translate = engli
 }
 
 /** A row's label, with the band of a coefficient in `system`'s velocity unit. */
-export function rowLabel(row: FieldRow, system: UnitSystem, t: Translate = english): string {
-  const label = say(t, row.label)
+export function rowLabel(
+  row: FieldRow,
+  system: UnitSystem,
+  t: Translate = english,
+  i18n: I18n = englishLingui,
+): string {
+  const label = say(i18n, t, row.label)
   return row.fromVelocity === undefined
     ? label
     : t('{label} from {velocity}', {
@@ -121,8 +139,8 @@ export function rowLabel(row: FieldRow, system: UnitSystem, t: Translate = engli
 }
 
 /** The hover notes of a row: the text as printed, then the method. */
-export function rowNotes(row: FieldRow, t: Translate = english): string[] {
-  const method = row.method && say(t, row.method)
+export function rowNotes(row: FieldRow, t: Translate = english, i18n = englishLingui): string[] {
+  const method = row.method && say(i18n, t, row.method)
   return [
     row.printed && t('As printed: {printed}', { printed: row.printed }),
     // a note of a numeric row holds numbers written with a point
@@ -140,12 +158,12 @@ const capitalised = (text: string) => text.charAt(0).toUpperCase() + text.slice(
 
 /** A bullet's structure as a name: "Cup and core". */
 export const structureText = (structure: string, t: Translator['t']) =>
-  capitalised(say(t, rawWording(structure)).replaceAll('-', ' '))
+  capitalised(sayOwn(t, rawWording(structure)).replaceAll('-', ' '))
 
 /** The manufacturer's wording shows as the printed text. */
 export function constructionRows(c: Bullet['construction'], t: Translator['t']): FieldRow[] {
   if (!c) return []
-  const material = (value: string) => say(t, spacedWording(value))
+  const material = (value: string) => sayOwn(t, spacedWording(value))
   const parts = [
     c.structure && structureText(c.structure, t),
     c.core && t('{material} core', { material: material(c.core.material) }),
@@ -651,7 +669,7 @@ export function bulletStrip(b: Bullet): StripItem[] {
 
 /** A strip card: a label, in English as the plain text and as the message the language shown translates, over a row's value. */
 const stripItem = (icon: StripItem['icon'], label: Message, rows: FieldRow[]): StripItem[] =>
-  rows[0] ? [{ icon, label: say(english, label), words: label, row: rows[0] }] : []
+  rows[0] ? [{ icon, label: english(label), words: label, row: rows[0] }] : []
 
 /** The burn-rate position only when fitted. */
 export function powderStrip(

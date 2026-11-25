@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { compareTargetFaces, type TargetFace, type TargetMapping } from '@rangefoundry/schema'
 import { useTranslation } from '../i18n/language.ts'
 import {
@@ -40,6 +41,7 @@ function DisciplineRecordView({
   classes,
 }: { d: DisciplineRecord } & Extras) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const federation = federations.find((f) => f.id === d.federation)
   const international = disciplines.find((x) => x.id === d.internationalDiscipline)
   const book = disciplineRuleBook(d)
@@ -56,7 +58,7 @@ function DisciplineRecordView({
   // the sighters, series and time limits a stage's rule book gives itself
   const courseOf = (m: TargetMapping) =>
     courseRows(m)
-      .map((r) => `${say(t, r.label)}: ${rowText(r, t)}`)
+      .map((r) => `${say(i18n, t, r.label)}: ${rowText(r, t, i18n)}`)
       .join('; ')
   return (
     <RecordPage
@@ -103,7 +105,7 @@ function DisciplineRecordView({
           federation={{ id: d.federation, name: federation?.name ?? d.federation }}
           book={
             book && {
-              title: sourceTitle(book, t),
+              title: sourceTitle(book, i18n),
               url: book.url,
               edition: book.edition,
               section: book.section,

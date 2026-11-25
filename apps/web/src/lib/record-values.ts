@@ -1,5 +1,5 @@
 import { type Message, msg } from '../i18n/translate.ts'
-import { verbatim, type Wording } from './wording.ts'
+import { type OwnWording, verbatim } from './wording.ts'
 
 /** A record value as a name: "hollow-point" as "Hollow point". */
 export const titleFromKebab = (value: string) =>
@@ -89,18 +89,18 @@ const title: Readonly<Record<string, Message>> = {
 }
 
 /** A value as stored ("boat-tail", "extruded"). */
-export const rawWording = (value: string): Wording => raw[value] ?? verbatim(value)
+export const rawWording = (value: string): OwnWording => raw[value] ?? verbatim(value)
 
 /** A value with its hyphens as spaces ("gilding metal"). */
-export const spacedWording = (value: string): Wording =>
+export const spacedWording = (value: string): OwnWording =>
   spaced[value] ?? verbatim(value.replaceAll('-', ' '))
 
 /** A value capitalized, hyphens as spaces ("Nickel plated brass"). */
-export const titleWording = (value: string): Wording =>
+export const titleWording = (value: string): OwnWording =>
   title[value] ?? verbatim(titleFromKebab(value))
 
 /** A primer cup's material: as `titleWording`, but a cup is no case, so brass stays as published. */
-export const cupWording = (value: string): Wording =>
+export const cupWording = (value: string): OwnWording =>
   value === 'copper'
     ? msg('Copper')
     : value === 'steel'
@@ -116,8 +116,8 @@ const methods: Readonly<Record<string, Message>> = {
 }
 
 /** The pressure measuring method of a cartridge record. */
-export const methodWording = (value: string): Wording => methods[value] ?? verbatim(value)
+export const methodWording = (value: string): OwnWording => methods[value] ?? verbatim(value)
 
 /** A yes or no value, lower case as the bullet table writes it, or capitalized as the case and primer tables do. */
-export const yesNo = (value: boolean, capitalised = false): Wording =>
+export const yesNo = (value: boolean, capitalised = false): OwnWording =>
   capitalised ? (value ? msg('Yes') : msg('No')) : value ? msg('yes') : msg('no')
