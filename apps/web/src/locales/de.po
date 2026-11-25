@@ -293,7 +293,7 @@ msgstr "Bodenform"
 
 # en: "Brass"
 msgid "values.brass"
-msgstr "Hülsen"
+msgstr "Messinghülse"
 
 # en: "Brass"
 msgid "page.cases"
