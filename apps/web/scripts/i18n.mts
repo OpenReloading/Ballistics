@@ -2,7 +2,7 @@
 import { globSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { git } from './ci-plan.mts'
-import { type PoCatalog, readCatalog } from './po-catalog.mts'
+import type { PoCatalog } from './po-catalog.mts'
 
 const webRoot = path.join(import.meta.dirname, '..')
 
@@ -426,6 +426,8 @@ if (import.meta.main) {
         ...Object.fromEntries(lint.targetRecords.map((k: string) => [k, lint.targetSense])),
         ...lint.otherSense,
       }
+      // loaded here: the message list runs in CI without the packages the catalogs need
+      const { readCatalog } = await import('./po-catalog.mts')
       // the texts on Lingui ids keep the checks they had in de.json; each catalog on its own, the messages of both
       const lingui = linguiGerman(await readCatalog('en'), await readCatalog('de'))
       const english = [...source, ...Object.keys(lingui.german)]
