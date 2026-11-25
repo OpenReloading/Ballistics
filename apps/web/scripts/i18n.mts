@@ -364,26 +364,47 @@ export function safeWordingProblems(
   return found
 }
 
+const pluralOfCount =
+  /^\{count, plural, one \{((?:[^{}]|\{\w+\})*)\} other \{((?:[^{}]|\{\w+\})*)\}\}$/
+
+/** A form of a Lingui `count` plural as `de.json` writes it: `{count}` for `#`, `'` for `''`. */
+const ownForm = (form = '') => form.replaceAll('#', '{count}').replaceAll("''", "'")
+
+/** The `de.json` key of a Lingui English text: a `count` plural as its `one|other` pair with `{count}` for `#`, after its context, with `''` read as `'`. */
+export function ownKey(english: string, context?: string) {
+  const forms = pluralOfCount.exec(english)
+  const text = forms ? `${ownForm(forms[1])}|${ownForm(forms[2])}` : english.replaceAll("''", "'")
+  return context ? `${context}\u0004${text}` : text
+}
+
+/** A Lingui German text as `de.json` writes it: a `count` plural as its forms. */
+function ownEntry(german: string) {
+  const forms = pluralOfCount.exec(german)
+  return forms ? { one: ownForm(forms[1]), other: ownForm(forms[2]) } : german
+}
+
 /** The German of each id of the Lingui catalog `de` keyed by its English in `en`, as `de.json` keys it, one catalog per id: ids that share an English text may need other German for another sense, so each is checked on its own. */
-export function linguiGerman(en: PoCatalog, de: PoCatalog): Record<string, string>[] {
-  const german: Record<string, string>[] = []
+export function linguiGerman(en: PoCatalog, de: PoCatalog): Record<string, unknown>[] {
+  const german: Record<string, unknown>[] = []
   for (const [id, entry] of Object.entries(de)) {
     const english = en[id]?.translation
     if (!entry.obsolete && entry.translation && english)
-      german.push({ [english]: entry.translation })
+      german.push({ [ownKey(english, en[id]?.context)]: ownEntry(entry.translation) })
   }
   return german
 }
 
-/** Each of the `records` whose English names a target or targets says `stem` in its German, since the term check skips these keys. */
+/** Each of the `records` whose English names a target or targets says `stem` in each of its German forms, since the term check skips these keys. */
 export function targetRecordProblems(
   catalogue: Record<string, unknown>,
   records: readonly string[],
   stem: string,
 ): string[] {
+  const forms = (entry: unknown) =>
+    typeof entry === 'string' ? [entry] : Object.values(entry as Record<string, string>)
   return records
     .filter((key) => key in catalogue && /\btargets?\b/i.test(key))
-    .filter((key) => !fold(textOf(catalogue[key])).includes(fold(stem)))
+    .filter((key) => forms(catalogue[key]).some((form) => !fold(form).includes(fold(stem))))
     .map((key) => `${key}: ${stem}`)
 }
 

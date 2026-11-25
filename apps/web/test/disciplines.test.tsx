@@ -1,3 +1,4 @@
+import { setupI18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import { toSi } from '@rangefoundry/schema'
@@ -247,7 +248,7 @@ it('shows the rule facts a record states, converted where the unit differs, and 
 })
 
 it('also searches the category and the country as the language shown writes them', () => {
-  const german = translator({ Rifle: 'Gewehr' }, 'de').t
+  const german = setupI18n({ locale: 'de', messages: { de: { 'values.rifle': 'Gewehr' } } })
   const query = { ...emptyDirectory, query: 'gewehr' }
   // a rifle discipline whose own texts do not say Gewehr
   const rifle = defined(rows.find((r) => r.category === 'rifle' && !disciplineMatches(r, query)))

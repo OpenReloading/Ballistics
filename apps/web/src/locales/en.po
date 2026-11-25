@@ -10,11 +10,59 @@ msgstr ""
 msgid "events.imported"
 msgstr "{added} events added, {equal} already in this browser, {replaced} replaced."
 
+msgid "lists.countShown.cases"
+msgstr "{count, plural, one {{shown} of # brass} other {{shown} of # brass}}"
+
+msgid "lists.countShown.bullets"
+msgstr "{count, plural, one {{shown} of # bullet} other {{shown} of # bullets}}"
+
+msgid "lists.countShown.cartridges"
+msgstr "{count, plural, one {{shown} of # cartridge} other {{shown} of # cartridges}}"
+
+msgid "lists.countShown.disciplines"
+msgstr "{count, plural, one {{shown} of # discipline} other {{shown} of # disciplines}}"
+
+msgid "lists.countShown.logEntries"
+msgstr "{count, plural, one {{shown} of # entry} other {{shown} of # entries}}"
+
+msgid "lists.countShown.events"
+msgstr "{count, plural, one {{shown} of # event} other {{shown} of # events}}"
+
+msgid "lists.countShown.federations"
+msgstr "{count, plural, one {{shown} of # federation} other {{shown} of # federations}}"
+
+msgid "lists.countShown.firearms"
+msgstr "{count, plural, one {{shown} of # firearm} other {{shown} of # firearms}}"
+
+msgid "lists.countShown.powders"
+msgstr "{count, plural, one {{shown} of # powder} other {{shown} of # powders}}"
+
+msgid "lists.countShown.primers"
+msgstr "{count, plural, one {{shown} of # primer} other {{shown} of # primers}}"
+
+msgid "lists.countShown.faces"
+msgstr "{count, plural, one {{shown} of # target} other {{shown} of # targets}}"
+
+msgid "lists.count.cases"
+msgstr "{count, plural, one {# brass} other {# brass}}"
+
+msgid "lists.count.bullets"
+msgstr "{count, plural, one {# bullet} other {# bullets}}"
+
+msgid "lists.count.cartridges"
+msgstr "{count, plural, one {# cartridge} other {# cartridges}}"
+
 msgid "powders.trainingCartridges"
 msgstr "{count, plural, one {# cartridge} other {# cartridges}}"
 
 msgid "events.count"
 msgstr "{count, plural, one {# competition event in this browser} other {# competition events in this browser}}"
+
+msgid "lists.count.disciplines"
+msgstr "{count, plural, one {# discipline} other {# disciplines}}"
+
+msgid "lists.count.logEntries"
+msgstr "{count, plural, one {# entry} other {# entries}}"
 
 msgid "events.heldCount"
 msgstr "{count, plural, one {# event not imported: a record of this browser has its id.} other {# events not imported: records of this browser have their ids.}}"
@@ -22,11 +70,29 @@ msgstr "{count, plural, one {# event not imported: a record of this browser has 
 msgid "events.replaceCount"
 msgstr "{count, plural, one {# event of the file differs from the one in this browser. Replace it?} other {# events of the file differ from the ones in this browser. Replace them?}}"
 
+msgid "lists.count.events"
+msgstr "{count, plural, one {# event} other {# events}}"
+
+msgid "lists.count.federations"
+msgstr "{count, plural, one {# federation} other {# federations}}"
+
+msgid "lists.count.firearms"
+msgstr "{count, plural, one {# firearm} other {# firearms}}"
+
+msgid "lists.count.powders"
+msgstr "{count, plural, one {# powder} other {# powders}}"
+
+msgid "lists.count.primers"
+msgstr "{count, plural, one {# primer} other {# primers}}"
+
 msgid "events.otherKinds"
 msgstr "{count, plural, one {# record of another kind left out; Import of a File menu reads it.} other {# records of other kinds left out; Import of a File menu reads them.}}"
 
 msgid "targets.rings"
 msgstr "{count, plural, one {# ring} other {# rings}}"
+
+msgid "lists.count.faces"
+msgstr "{count, plural, one {# target} other {# targets}}"
 
 msgid "powders.trainingRows"
 msgstr "{count, plural, one {# training row} other {# training rows}}"
@@ -88,6 +154,15 @@ msgstr "Add stage"
 msgid "events.addRoundsTitle"
 msgstr "Add to the round count?"
 
+msgid "values.airPistol"
+msgstr "Air pistol"
+
+msgid "units.quantity.airPressure"
+msgstr "Air pressure"
+
+msgid "values.airRifle"
+msgstr "Air rifle"
+
 msgid "cases.all"
 msgstr "All brass"
 
@@ -115,6 +190,15 @@ msgstr "All sources"
 msgid "targets.all"
 msgstr "All targets"
 
+msgid "units.quantity.altitude"
+msgstr "Altitude"
+
+msgid "values.aluminum"
+msgstr "Aluminum"
+
+msgid "units.quantity.area"
+msgstr "Areas"
+
 msgid "listSources.lastOn"
 msgstr "At least one source stays on"
 
@@ -124,14 +208,26 @@ msgstr "At most {max} at once"
 msgid "firearms.column.barrel"
 msgstr "Barrel"
 
+msgid "units.quantity.barrelLength"
+msgstr "Barrel length"
+
+msgid "units.quantity.twist"
+msgstr "Barrel twist"
+
 msgid "powders.column.base"
 msgstr "Base"
 
 msgid "bullets.facet.base"
 msgstr "Base type"
 
+msgid "values.brass"
+msgstr "Brass"
+
 msgid "page.cases"
 msgstr "Brass"
+
+msgid "states.unavailable.case"
+msgstr "Brass data is unavailable right now."
 
 msgid "page.casesEditor"
 msgstr "Brass group"
@@ -139,11 +235,17 @@ msgstr "Brass group"
 msgid "cases.filtered"
 msgstr "Brass, {filters}"
 
+msgid "states.unavailable.bullet"
+msgstr "Bullet data is unavailable right now."
+
 msgid "page.bulletsDesigner"
 msgstr "Bullet designer"
 
 msgid "cartridges.column.maxBulletDiameter"
 msgstr "Bullet diameter G1"
+
+msgid "units.quantity.mass"
+msgstr "Bullet mass"
 
 msgid "page.bullets"
 msgstr "Bullets"
@@ -172,11 +274,17 @@ msgstr "Caliber classes"
 msgid "events.cancel"
 msgstr "Cancel"
 
+msgid "values.carbine"
+msgstr "Carbine"
+
 msgid "cases.column.cartridge"
 msgstr "Cartridge"
 
 msgid "firearms.column.cartridge"
 msgstr "Cartridge"
+
+msgid "states.unavailable.cartridge"
+msgstr "Cartridge data is unavailable right now."
 
 msgid "page.cartridgesDesigner"
 msgstr "Cartridge designer"
@@ -192,6 +300,9 @@ msgstr "Cartridges"
 
 msgid "cartridges.filtered"
 msgstr "Cartridges, {filters}"
+
+msgid "units.quantity.capacity"
+msgstr "Case capacity"
 
 msgid "cartridges.column.caseLength"
 msgstr "Case length L3"
@@ -210,6 +321,9 @@ msgstr "Check the event: a value is out of its range."
 
 msgid "facetFilters.clear"
 msgstr "Clear all"
+
+msgid "states.clearFilters"
+msgstr "Clear filters"
 
 msgid "directoryTable.clearSearch"
 msgstr "Clear search"
@@ -241,11 +355,17 @@ msgstr "Confirmed by"
 msgid "bullets.facet.construction"
 msgstr "Construction"
 
+msgid "units.quantity.correction"
+msgstr "Corrections"
+
 msgid "federations.facet.country"
 msgstr "Country"
 
 msgid "disciplines.column.country"
 msgstr "Country"
+
+msgid "units.custom"
+msgstr "Custom"
 
 msgid "events.date"
 msgstr "Date"
@@ -289,6 +409,9 @@ msgstr "Discipline"
 msgid "log.column.discipline"
 msgstr "Discipline"
 
+msgid "states.unavailable.discipline"
+msgstr "Discipline data is unavailable right now."
+
 msgid "disciplines.column.disciplines"
 msgstr "Disciplines"
 
@@ -319,6 +442,9 @@ msgstr "Distance"
 msgid "events.division"
 msgstr "Division"
 
+msgid "units.quantity.lineOfSightOffset"
+msgstr "Drop, windage"
+
 msgid "powders.column.rateHelp"
 msgstr "Dynamic vivacity averaged over burnt fraction 0.1 to 0.9, plus and minus 2 standard uncertainties, log scale. Model output from fitted M3 parameters, not manufacturer data."
 
@@ -330,6 +456,12 @@ msgstr "Empty: the event type and the day."
 
 msgid "events.roundsFiredHint"
 msgstr "Empty: the shots of the series, where each lists them."
+
+msgid "units.quantity.energy"
+msgstr "Energy"
+
+msgid "states.error"
+msgstr "Error"
 
 msgid "events.total"
 msgstr "Event total: {total}"
@@ -345,6 +477,9 @@ msgstr "Event type"
 
 msgid "events.column.type"
 msgstr "Event type"
+
+msgid "states.unavailable.eventType"
+msgstr "Event type data is unavailable right now."
 
 msgid "events.exportCsv"
 msgstr "Export CSV"
@@ -364,6 +499,9 @@ msgstr "Federation"
 msgid "targets.column.organization"
 msgstr "Federation"
 
+msgid "states.unavailable.federation"
+msgstr "Federation data is unavailable right now."
+
 msgid "page.federations"
 msgstr "Federations"
 
@@ -375,6 +513,9 @@ msgstr "Firearm"
 
 msgid "log.column.firearm"
 msgstr "Firearm"
+
+msgid "units.quantity.firearmMass"
+msgstr "Firearm mass"
 
 msgid "page.firearms"
 msgstr "Firearms"
@@ -409,11 +550,26 @@ msgstr "Import JSON"
 msgid "disciplines.international"
 msgstr "International"
 
+msgid "values.lacqueredSteel"
+msgstr "Lacquered steel"
+
+msgid "values.largePistol"
+msgstr "Large pistol"
+
+msgid "values.largeRifle"
+msgstr "Large rifle"
+
 msgid "firearms.column.lastSession"
 msgstr "Last session"
 
 msgid "firearms.column.lastSessionHelp"
 msgstr "Latest chronograph session of these loads."
+
+msgid "values.leadFree"
+msgstr "Lead free"
+
+msgid "values.leadStyphnate"
+msgstr "Lead styphnate"
 
 msgid "bullets.facet.leadfree"
 msgstr "Lead-free"
@@ -421,11 +577,17 @@ msgstr "Lead-free"
 msgid "bullets.column.length"
 msgstr "Length"
 
+msgid "units.quantity.length"
+msgstr "Lengths"
+
 msgid "events.level"
 msgstr "Level"
 
 msgid "events.column.level"
 msgstr "Level"
+
+msgid "values.leverAction"
+msgstr "Lever action"
 
 msgid "events.load"
 msgstr "Load"
@@ -438,6 +600,105 @@ msgstr "Load workbench"
 
 msgid "powders.column.rowsHelp"
 msgstr "Load-table rows the model was fitted to, their cartridges and the day the load tables were read; the record page lists them per load table. A count, not a rating."
+
+msgid "states.loading.cases"
+msgstr "Loading brass"
+
+msgid "states.loading.bullet"
+msgstr "Loading bullet"
+
+msgid "states.loading.bullets"
+msgstr "Loading bullets"
+
+msgid "states.loading.cartridge"
+msgstr "Loading cartridge"
+
+msgid "states.loading.cartridges"
+msgstr "Loading cartridges"
+
+msgid "states.loading.curves"
+msgstr "Loading curves"
+
+msgid "states.loading.discipline"
+msgstr "Loading discipline"
+
+msgid "states.loading.disciplines"
+msgstr "Loading disciplines"
+
+msgid "states.loading.federation"
+msgstr "Loading federation"
+
+msgid "states.loading.federations"
+msgstr "Loading federations"
+
+msgid "states.loading.firearms"
+msgstr "Loading firearms"
+
+msgid "states.loading.manufacturers"
+msgstr "Loading manufacturers"
+
+msgid "states.loading.powder"
+msgstr "Loading powder"
+
+msgid "states.loading.powders"
+msgstr "Loading powders"
+
+msgid "states.loading.primer"
+msgstr "Loading primer"
+
+msgid "states.loading.primers"
+msgstr "Loading primers"
+
+msgid "states.loading.targetFace"
+msgstr "Loading target"
+
+msgid "states.loading.targetFaces"
+msgstr "Loading targets"
+
+msgid "states.loading.theCases"
+msgstr "Loading the brass"
+
+msgid "states.loading.case"
+msgstr "Loading the brass record"
+
+msgid "states.loading.theBulletRecord"
+msgstr "Loading the bullet record"
+
+msgid "states.loading.theCartridgeRecord"
+msgstr "Loading the cartridge record"
+
+msgid "states.loading.theDesigner"
+msgstr "Loading the designer"
+
+msgid "states.loading.theMeasurements"
+msgstr "Loading the measurements"
+
+msgid "states.loading.thePowderComparison"
+msgstr "Loading the powder comparison"
+
+msgid "states.loading.thePreview"
+msgstr "Loading the preview"
+
+msgid "states.loading.theSettings"
+msgstr "Loading the settings"
+
+msgid "states.loading.theShotGroups"
+msgstr "Loading the shot groups"
+
+msgid "states.loading.theTrajectory"
+msgstr "Loading the trajectory"
+
+msgid "states.loading.theTruing"
+msgstr "Loading the truing"
+
+msgid "states.loading.theUnitSettings"
+msgstr "Loading the unit settings"
+
+msgid "states.loading.theWorkbenchDefaults"
+msgstr "Loading the workbench defaults"
+
+msgid "states.loading.yourData"
+msgstr "Loading your data"
 
 msgid "firearms.column.loads"
 msgstr "Loads"
@@ -496,6 +757,12 @@ msgstr "Mean vivacity"
 msgid "events.metal"
 msgstr "Metal"
 
+msgid "units.preset.metricGrams"
+msgstr "Metric (SI)"
+
+msgid "units.preset.metricGrains"
+msgstr "Metric, common use"
+
 msgid "sources.user"
 msgstr "Mine"
 
@@ -507,6 +774,9 @@ msgstr "Minor"
 
 msgid "events.misses"
 msgstr "Misses"
+
+msgid "values.muzzleLoader"
+msgstr "Muzzle loader"
 
 msgid "directoryTable.missing"
 msgstr "n/a"
@@ -571,29 +841,62 @@ msgstr "New powder"
 msgid "targets.new"
 msgstr "New target"
 
+msgid "values.nickelPlatedBrass"
+msgstr "Nickel plated brass"
+
 msgid "primers.no"
 msgstr "No"
 
 msgid "cases.noneOwn"
 msgstr "No brass groups of your own yet"
 
+msgid "states.noMatch.cases"
+msgstr "No brass matches these filters."
+
+msgid "states.noMatch.bullets"
+msgstr "No bullets match these filters."
+
+msgid "states.noMatch.cartridges"
+msgstr "No cartridges match these filters."
+
 msgid "events.noDisciplineFound"
 msgstr "No discipline found"
+
+msgid "states.noMatch.disciplines"
+msgstr "No disciplines match these filters."
+
+msgid "states.noMatch.logEntries"
+msgstr "No entries match these filters."
 
 msgid "events.noEventYet"
 msgstr "No event yet."
 
+msgid "states.noMatch.federations"
+msgstr "No federations match these filters."
+
 msgid "events.noFirearm"
 msgstr "No firearm saved in this browser yet"
 
+msgid "states.noMatch.firearms"
+msgstr "No firearms match these filters."
+
+msgid "states.noMatch.powders"
+msgstr "No powders match these filters."
+
 msgid "powders.none"
 msgstr "No powders yet"
+
+msgid "states.noMatch.primers"
+msgstr "No primers match these filters."
 
 msgid "events.nothingToExport"
 msgstr "No saved event to export."
 
 msgid "events.noTargetSheet"
 msgstr "No target sheet saved yet"
+
+msgid "states.noMatch.targetFaces"
+msgstr "No targets match these filters."
 
 msgid "events.noShoots"
 msgstr "No-shoots"
@@ -609,6 +912,9 @@ msgstr "Not in this browser"
 
 msgid "events.notSaved"
 msgstr "Not saved: {reason}"
+
+msgid "states.note"
+msgstr "Note"
 
 msgid "events.notes"
 msgstr "Notes"
@@ -637,6 +943,9 @@ msgstr "Penalties"
 msgid "bullets.pickToCompare"
 msgstr "Pick 2 to {max}"
 
+msgid "values.pistol"
+msgstr "Pistol"
+
 msgid "events.place"
 msgstr "Place"
 
@@ -649,8 +958,17 @@ msgstr "Pmax"
 msgid "events.points"
 msgstr "Points"
 
+msgid "values.polymerCoatedSteel"
+msgstr "Polymer coated steel"
+
 msgid "page.powdersBurnRates"
 msgstr "Powder burn rates"
+
+msgid "units.quantity.charge"
+msgstr "Powder charge"
+
+msgid "states.unavailable.powder"
+msgstr "Powder data is unavailable right now."
 
 msgid "page.powdersDesigner"
 msgstr "Powder designer"
@@ -663,6 +981,18 @@ msgstr "Powders, {filters}"
 
 msgid "events.powerFactor"
 msgstr "Power factor"
+
+msgid "values.precisionRifle"
+msgstr "Precision rifle"
+
+msgid "units.preset"
+msgstr "Preset"
+
+msgid "units.quantity.pressure"
+msgstr "Pressure"
+
+msgid "states.unavailable.primer"
+msgstr "Primer data is unavailable right now."
 
 msgid "page.primers"
 msgstr "Primers"
@@ -721,6 +1051,9 @@ msgstr "R right hand, L left hand."
 msgid "page.range"
 msgstr "Range mode"
 
+msgid "units.quantity.range"
+msgstr "Range, distance"
+
 msgid "sources.rangefoundry"
 msgstr "RangeFoundry"
 
@@ -739,6 +1072,9 @@ msgstr "Replace"
 msgid "events.replaceEvents"
 msgstr "Replace events?"
 
+msgid "units.reset"
+msgstr "Reset to preset"
+
 msgid "events.result"
 msgstr "Result"
 
@@ -747,6 +1083,15 @@ msgstr "Result"
 
 msgid "log.column.result"
 msgstr "Result"
+
+msgid "states.retry"
+msgstr "Retry"
+
+msgid "values.revolver"
+msgstr "Revolver"
+
+msgid "values.rifle"
+msgstr "Rifle"
 
 msgid "events.shotsHint"
 msgstr "Ring values separated by spaces, such as 10 9 10."
@@ -796,6 +1141,12 @@ msgstr "Series {n}"
 msgid "events.seriesTotal"
 msgstr "Series total"
 
+msgid "values.servicePistol"
+msgstr "Service pistol"
+
+msgid "values.serviceRifle"
+msgstr "Service rifle"
+
 msgid "page.session"
 msgstr "Session summary"
 
@@ -811,8 +1162,17 @@ msgstr "Shot groups"
 msgid "events.shots"
 msgstr "Shots"
 
+msgid "values.shotshell"
+msgstr "Shotshell"
+
 msgid "primers.column.size"
 msgstr "Size"
+
+msgid "values.smallPistol"
+msgstr "Small pistol"
+
+msgid "values.smallRifle"
+msgstr "Small rifle"
 
 msgid "directoryTable.sort"
 msgstr "Sort"
@@ -841,6 +1201,9 @@ msgstr "Stages"
 msgid "disciplines.facet.face"
 msgstr "Target"
 
+msgid "states.unavailable.targetFace"
+msgstr "Target data is unavailable right now."
+
 msgid "page.targetsDesigner"
 msgstr "Target designer"
 
@@ -856,6 +1219,9 @@ msgstr "Targets"
 msgid "targets.filtered"
 msgstr "Targets, {filters}"
 
+msgid "units.quantity.temperature"
+msgstr "Temperature"
+
 msgid "powders.noneHint"
 msgstr "The catalogue has no powders. Make one with New powder, or import a table of your powders with Import."
 
@@ -864,6 +1230,9 @@ msgstr "The common caliber of the bullet diameter G1."
 
 msgid "firearms.column.configurationHelp"
 msgstr "The configuration the trajectory form offers first."
+
+msgid "states.dataError"
+msgstr "The data file could not be loaded. Check the connection and retry."
 
 msgid "firearms.column.opticHelp"
 msgstr "The first optic of the active configuration and its zero range."
@@ -913,11 +1282,29 @@ msgstr "Type"
 msgid "events.undoOfFailed"
 msgstr "Undo of {name} failed: {reason}"
 
+msgid "units.name"
+msgstr "Units: {preset}"
+
+msgid "units.nameCustom"
+msgstr "Units: {preset}, custom"
+
+msgid "units.preset.us"
+msgstr "US customary"
+
+msgid "units.quantity.velocity"
+msgstr "Velocity"
+
+msgid "states.warning"
+msgstr "Warning"
+
 msgid "cases.column.capacity"
 msgstr "Water capacity"
 
 msgid "cases.column.capacityHelp"
 msgstr "Water to the case mouth, as the manufacturer states."
+
+msgid "units.quantity.windSpeed"
+msgstr "Wind speed"
 
 msgid "primers.yes"
 msgstr "Yes"

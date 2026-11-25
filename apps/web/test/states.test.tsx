@@ -1,16 +1,26 @@
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { Loading, Message, MessageSlot } from '../src/components/states.tsx'
+import { linguiOf } from '../src/i18n/lingui.ts'
 
 const html = (node: React.ReactNode) =>
-  renderToStaticMarkup(<MantineProvider>{node}</MantineProvider>)
+  renderToStaticMarkup(
+    <I18nProvider i18n={linguiOf('en')}>
+      <MantineProvider>{node}</MantineProvider>
+    </I18nProvider>,
+  )
 
 it('the inline loading state is the bare line: no status role, no ellipsis, no skeleton', () => {
   // no Mantine component, so no provider is needed
-  expect(renderToStaticMarkup(<Loading what="the preview" inline />)).toBe(
-    '<p>Loading the preview</p>',
-  )
+  expect(
+    renderToStaticMarkup(
+      <I18nProvider i18n={linguiOf('en')}>
+        <Loading what="the preview" inline />
+      </I18nProvider>,
+    ),
+  ).toBe('<p>Loading the preview</p>')
   const full = html(<Loading what="the preview" />)
   expect(full).toContain('role="status"')
   expect(full).toContain('Loading the preview…')

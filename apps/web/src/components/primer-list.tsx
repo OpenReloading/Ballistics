@@ -2,7 +2,6 @@
 
 import { useLingui } from '@lingui/react'
 import { useDeferredValue, useMemo } from 'react'
-import { useTranslation } from '../i18n/language.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { kebabValue } from '../lib/list-values.ts'
 import { filterText, matchingText } from '../lib/lists.ts'
@@ -18,13 +17,12 @@ const primerSources: readonly Origin[] = ['rangefoundry']
 
 /** The primer directory: manufacturer, name, product number, size, magnum flag and priming compound. */
 export function PrimerList({ rows }: { rows: PrimerRow[] }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const [state, set, clear] = useListState()
   const filters = useDeferredValue(state)
   const shown = useMemo(
-    () => rows.filter((r) => primerMatches(r, filters.query, t)),
-    [rows, filters, t],
+    () => rows.filter((r) => primerMatches(r, filters.query, i18n)),
+    [rows, filters, i18n],
   )
   const named = [matchingText(i18n, state.query)].filter(Boolean)
   const columns: DirectoryColumn<PrimerRow>[] = [
@@ -55,7 +53,7 @@ export function PrimerList({ rows }: { rows: PrimerRow[] }) {
       label: /*i18n*/ { id: 'primers.column.size', message: 'Size' },
       width: '9rem',
       value: (r) => r.size,
-      cell: (r) => kebabValue(t, r.size),
+      cell: (r) => kebabValue(i18n, r.size),
     },
     {
       key: 'magnum',
@@ -75,11 +73,11 @@ export function PrimerList({ rows }: { rows: PrimerRow[] }) {
       label: /*i18n*/ { id: 'primers.column.compound', message: 'Compound' },
       width: '10rem',
       value: (r) => r.compound,
-      cell: (r) => (r.compound ? kebabValue(t, r.compound) : ''),
+      cell: (r) => (r.compound ? kebabValue(i18n, r.compound) : ''),
     },
   ]
   const facts = (r: PrimerRow) =>
-    [r.manufacturerName, kebabValue(t, r.size), r.compound && kebabValue(t, r.compound)]
+    [r.manufacturerName, kebabValue(i18n, r.size), r.compound && kebabValue(i18n, r.compound)]
       .filter(Boolean)
       .join(' · ')
   return (

@@ -214,18 +214,37 @@ describe('the catalogue lint', () => {
           'All targets': 'Ziele',
           'Targets, {filters}': 'Zielscheiben, {filters}',
           '{count} target|{count} targets': { one: '{count} Scheibe', other: '{count} Scheiben' },
+          '{shown} of {count} target|{shown} of {count} targets': {
+            one: '{shown} von {count} Ziel',
+            other: '{shown} von {count} Scheiben',
+          },
           'The published records.': 'Die veröffentlichten Datensätze.',
         },
         [
           'All targets',
           'Targets, {filters}',
           '{count} target|{count} targets',
+          '{shown} of {count} target|{shown} of {count} targets',
           'The published records.',
           'Find target',
         ],
         'Scheibe',
       ),
-    ).toEqual(['All targets: Scheibe'])
+    ).toEqual([
+      'All targets: Scheibe',
+      '{shown} of {count} target|{shown} of {count} targets: Scheibe',
+    ])
+  })
+
+  it('keys a Lingui count plural as de.json does, with its German forms', () => {
+    expect(
+      linguiGerman(
+        { 'lists.faces': { translation: '{count, plural, one {# target} other {# targets}}' } },
+        { 'lists.faces': { translation: '{count, plural, one {# Ziel} other {# Scheiben}}' } },
+      ),
+    ).toEqual([
+      { '{count} target|{count} targets': { one: '{count} Ziel', other: '{count} Scheiben' } },
+    ])
   })
 
   it('counts the warning sentences and refusal words the two files mark as texts of the table', () => {

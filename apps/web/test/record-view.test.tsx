@@ -1,9 +1,11 @@
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import type { ReactNode } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { RecordView, RecordViewWith } from '../src/components/record-view.tsx'
 import type { RecordState } from '../src/components/use-record.ts'
+import { linguiOf } from '../src/i18n/lingui.ts'
 
 const states = vi.hoisted(() => ({
   record: { status: 'loading' } as RecordState<unknown>,
@@ -24,7 +26,12 @@ beforeEach(() => {
   states.load = undefined
 })
 
-const render = (node: ReactNode) => renderToStaticMarkup(<MantineProvider>{node}</MantineProvider>)
+const render = (node: ReactNode) =>
+  renderToStaticMarkup(
+    <I18nProvider i18n={linguiOf('en')}>
+      <MantineProvider>{node}</MantineProvider>
+    </I18nProvider>,
+  )
 const ref = { kind: 'bullets', id: 'b1', name: 'Example 168', what: 'Bullet' } as const
 const page = () =>
   render(<RecordView<{ id: string }> {...ref}>{(r) => <p>record {r.id}</p>}</RecordView>)

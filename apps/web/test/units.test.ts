@@ -13,7 +13,6 @@ import {
   kilogramsPerGrain,
   type PresetId,
   parseTwist,
-  presetNames,
   presetUnits,
   psi,
   type Quantity,
@@ -89,14 +88,6 @@ describe('presets', () => {
           expect(exactFieldText(q, units, there ?? Number.NaN), `${p} ${other} ${q}`).toBe(text)
         }
       }
-  })
-
-  it('names the presets', () => {
-    expect(presetNames).toEqual({
-      'metric-grains': 'Metric, common use',
-      us: 'US customary',
-      'metric-grams': 'Metric (SI)',
-    })
   })
 })
 

@@ -1,7 +1,7 @@
 /** Filtering and sorting of the data lists (cartridges, bullets, powders) in the browser. */
 import type { I18n } from '@lingui/core'
 import { compareKeys, score, searchKey, sortKey } from '@rangefoundry/schema'
-import type { Translator } from '../i18n/translate.ts'
+import { ungrouped } from '../i18n/lingui.ts'
 
 export type SortDirection = 'ascending' | 'descending'
 
@@ -19,80 +19,135 @@ export type ListNoun =
   | 'powders'
   | 'primers'
 
-type Tn = Translator['tn']
+type CountLine = { id: string; message: string }
+
+/** A count line with its numbers ungrouped, as the own messages show a number. */
+const say = (i18n: I18n, line: CountLine, values: Record<string, number>) =>
+  i18n._(line.id, values, { message: line.message, formats: ungrouped })
 
 /** The count of each kind in both forms: whole sentences, as the form of a noun and the order of the words are a language's own. */
-const countLines: Record<
-  ListNoun,
-  { all: (tn: Tn, total: number) => string; some: (tn: Tn, shown: number, total: number) => string }
-> = {
+const countLines: Record<ListNoun, { all: CountLine; some: CountLine }> = {
   bullets: {
-    all: (tn, n) => tn(n, '{count} bullet', '{count} bullets'),
-    some: (tn, shown, n) =>
-      tn(n, '{shown} of {count} bullet', '{shown} of {count} bullets', { shown }),
+    all: /*i18n*/ {
+      id: 'lists.count.bullets',
+      message: '{count, plural, one {# bullet} other {# bullets}}',
+    },
+    some: /*i18n*/ {
+      id: 'lists.countShown.bullets',
+      message: '{count, plural, one {{shown} of # bullet} other {{shown} of # bullets}}',
+    },
   },
   cartridges: {
-    all: (tn, n) => tn(n, '{count} cartridge', '{count} cartridges'),
-    some: (tn, shown, n) =>
-      tn(n, '{shown} of {count} cartridge', '{shown} of {count} cartridges', { shown }),
+    all: /*i18n*/ {
+      id: 'lists.count.cartridges',
+      message: '{count, plural, one {# cartridge} other {# cartridges}}',
+    },
+    some: /*i18n*/ {
+      id: 'lists.countShown.cartridges',
+      message: '{count, plural, one {{shown} of # cartridge} other {{shown} of # cartridges}}',
+    },
   },
   cases: {
-    all: (tn, n) => tn(n, '{count} brass', '{count} brass'),
-    some: (tn, shown, n) =>
-      tn(n, '{shown} of {count} brass', '{shown} of {count} brass', { shown }),
+    all: /*i18n*/ {
+      id: 'lists.count.cases',
+      message: '{count, plural, one {# brass} other {# brass}}',
+    },
+    some: /*i18n*/ {
+      id: 'lists.countShown.cases',
+      message: '{count, plural, one {{shown} of # brass} other {{shown} of # brass}}',
+    },
   },
   disciplines: {
-    all: (tn, n) => tn(n, '{count} discipline', '{count} disciplines'),
-    some: (tn, shown, n) =>
-      tn(n, '{shown} of {count} discipline', '{shown} of {count} disciplines', { shown }),
+    all: /*i18n*/ {
+      id: 'lists.count.disciplines',
+      message: '{count, plural, one {# discipline} other {# disciplines}}',
+    },
+    some: /*i18n*/ {
+      id: 'lists.countShown.disciplines',
+      message: '{count, plural, one {{shown} of # discipline} other {{shown} of # disciplines}}',
+    },
   },
   events: {
-    all: (tn, n) => tn(n, '{count} event', '{count} events'),
-    some: (tn, shown, n) =>
-      tn(n, '{shown} of {count} event', '{shown} of {count} events', { shown }),
+    all: /*i18n*/ {
+      id: 'lists.count.events',
+      message: '{count, plural, one {# event} other {# events}}',
+    },
+    some: /*i18n*/ {
+      id: 'lists.countShown.events',
+      message: '{count, plural, one {{shown} of # event} other {{shown} of # events}}',
+    },
   },
   faces: {
-    all: (tn, n) => tn(n, '{count} target', '{count} targets'),
-    some: (tn, shown, n) =>
-      tn(n, '{shown} of {count} target', '{shown} of {count} targets', { shown }),
+    all: /*i18n*/ {
+      id: 'lists.count.faces',
+      message: '{count, plural, one {# target} other {# targets}}',
+    },
+    some: /*i18n*/ {
+      id: 'lists.countShown.faces',
+      message: '{count, plural, one {{shown} of # target} other {{shown} of # targets}}',
+    },
   },
   federations: {
-    all: (tn, n) => tn(n, '{count} federation', '{count} federations'),
-    some: (tn, shown, n) =>
-      tn(n, '{shown} of {count} federation', '{shown} of {count} federations', { shown }),
+    all: /*i18n*/ {
+      id: 'lists.count.federations',
+      message: '{count, plural, one {# federation} other {# federations}}',
+    },
+    some: /*i18n*/ {
+      id: 'lists.countShown.federations',
+      message: '{count, plural, one {{shown} of # federation} other {{shown} of # federations}}',
+    },
   },
   firearms: {
-    all: (tn, n) => tn(n, '{count} firearm', '{count} firearms'),
-    some: (tn, shown, n) =>
-      tn(n, '{shown} of {count} firearm', '{shown} of {count} firearms', { shown }),
+    all: /*i18n*/ {
+      id: 'lists.count.firearms',
+      message: '{count, plural, one {# firearm} other {# firearms}}',
+    },
+    some: /*i18n*/ {
+      id: 'lists.countShown.firearms',
+      message: '{count, plural, one {{shown} of # firearm} other {{shown} of # firearms}}',
+    },
   },
   'log entries': {
-    all: (tn, n) => tn(n, '{count} entry', '{count} entries'),
-    some: (tn, shown, n) =>
-      tn(n, '{shown} of {count} entry', '{shown} of {count} entries', { shown }),
+    all: /*i18n*/ {
+      id: 'lists.count.logEntries',
+      message: '{count, plural, one {# entry} other {# entries}}',
+    },
+    some: /*i18n*/ {
+      id: 'lists.countShown.logEntries',
+      message: '{count, plural, one {{shown} of # entry} other {{shown} of # entries}}',
+    },
   },
   powders: {
-    all: (tn, n) => tn(n, '{count} powder', '{count} powders'),
-    some: (tn, shown, n) =>
-      tn(n, '{shown} of {count} powder', '{shown} of {count} powders', { shown }),
+    all: /*i18n*/ {
+      id: 'lists.count.powders',
+      message: '{count, plural, one {# powder} other {# powders}}',
+    },
+    some: /*i18n*/ {
+      id: 'lists.countShown.powders',
+      message: '{count, plural, one {{shown} of # powder} other {{shown} of # powders}}',
+    },
   },
   primers: {
-    all: (tn, n) => tn(n, '{count} primer', '{count} primers'),
-    some: (tn, shown, n) =>
-      tn(n, '{shown} of {count} primer', '{shown} of {count} primers', { shown }),
+    all: /*i18n*/ {
+      id: 'lists.count.primers',
+      message: '{count, plural, one {# primer} other {# primers}}',
+    },
+    some: /*i18n*/ {
+      id: 'lists.countShown.primers',
+      message: '{count, plural, one {{shown} of # primer} other {{shown} of # primers}}',
+    },
   },
 }
 
 /** The count of a list's page bar: "n bullets", or "n of m bullets" while a filter hides rows. */
-export function countText(tr: Translator, shown: number, total: number, noun: ListNoun) {
-  return shown === total
-    ? countLines[noun].all(tr.tn, total)
-    : countLines[noun].some(tr.tn, shown, total)
-}
+export const countText = (i18n: I18n, shown: number, total: number, noun: ListNoun) =>
+  shown === total
+    ? say(i18n, countLines[noun].all, { count: total })
+    : say(i18n, countLines[noun].some, { count: total, shown })
 
 /** The longest count the list can show, which sets the width of its page bar's status line. */
-export const widestCount = (tr: Translator, total: number, noun: ListNoun) =>
-  countLines[noun].some(tr.tn, total, total)
+export const widestCount = (i18n: I18n, total: number, noun: ListNoun) =>
+  say(i18n, countLines[noun].some, { count: total, shown: total })
 
 /** The filters set, as the no-match note names them: a sentence of the named filters, the first capitalized. */
 export function filterText(named: readonly (string | false | undefined)[]) {

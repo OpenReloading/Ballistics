@@ -1,39 +1,46 @@
 /** The words of the record values that the lists show in their cells: a value the map lacks is shown as the record gives it. */
+import type { I18n, MessageDescriptor } from '@lingui/core'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { titleFromKebab } from './record-fields.ts'
 
 /** The value as a name ("nickel-plated-brass" as "Nickel plated brass"), keyed as it reads. */
-const names: Record<string, Message> = {
-  Brass: msg('material\u0004Brass'),
-  'Nickel plated brass': msg('Nickel plated brass'),
-  'Lacquered steel': msg('Lacquered steel'),
-  'Polymer coated steel': msg('Polymer coated steel'),
-  Aluminium: msg('Aluminum'),
-  'Small rifle': msg('Small rifle'),
-  'Large rifle': msg('Large rifle'),
-  'Small pistol': msg('Small pistol'),
-  'Large pistol': msg('Large pistol'),
-  Shotshell: msg('Shotshell'),
-  'Lead styphnate': msg('Lead styphnate'),
-  'Lead free': msg('Lead free'),
-  'Air rifle': msg('Air rifle'),
-  'Air pistol': msg('Air pistol'),
-  Rifle: msg('Rifle'),
-  'Precision rifle': msg('Precision rifle'),
-  'Service rifle': msg('Service rifle'),
-  'Lever action': msg('Lever action'),
-  Carbine: msg('Carbine'),
-  Pistol: msg('Pistol'),
-  'Service pistol': msg('Service pistol'),
-  Revolver: msg('Revolver'),
-  'Muzzle loader': msg('Muzzle loader'),
+const names: Record<string, MessageDescriptor> = {
+  Brass: /*i18n*/ { id: 'values.brass', message: 'Brass' },
+  'Nickel plated brass': /*i18n*/ {
+    id: 'values.nickelPlatedBrass',
+    message: 'Nickel plated brass',
+  },
+  'Lacquered steel': /*i18n*/ { id: 'values.lacqueredSteel', message: 'Lacquered steel' },
+  'Polymer coated steel': /*i18n*/ {
+    id: 'values.polymerCoatedSteel',
+    message: 'Polymer coated steel',
+  },
+  Aluminium: /*i18n*/ { id: 'values.aluminum', message: 'Aluminum' },
+  'Small rifle': /*i18n*/ { id: 'values.smallRifle', message: 'Small rifle' },
+  'Large rifle': /*i18n*/ { id: 'values.largeRifle', message: 'Large rifle' },
+  'Small pistol': /*i18n*/ { id: 'values.smallPistol', message: 'Small pistol' },
+  'Large pistol': /*i18n*/ { id: 'values.largePistol', message: 'Large pistol' },
+  Shotshell: /*i18n*/ { id: 'values.shotshell', message: 'Shotshell' },
+  'Lead styphnate': /*i18n*/ { id: 'values.leadStyphnate', message: 'Lead styphnate' },
+  'Lead free': /*i18n*/ { id: 'values.leadFree', message: 'Lead free' },
+  'Air rifle': /*i18n*/ { id: 'values.airRifle', message: 'Air rifle' },
+  'Air pistol': /*i18n*/ { id: 'values.airPistol', message: 'Air pistol' },
+  Rifle: /*i18n*/ { id: 'values.rifle', message: 'Rifle' },
+  'Precision rifle': /*i18n*/ { id: 'values.precisionRifle', message: 'Precision rifle' },
+  'Service rifle': /*i18n*/ { id: 'values.serviceRifle', message: 'Service rifle' },
+  'Lever action': /*i18n*/ { id: 'values.leverAction', message: 'Lever action' },
+  Carbine: /*i18n*/ { id: 'values.carbine', message: 'Carbine' },
+  Pistol: /*i18n*/ { id: 'values.pistol', message: 'Pistol' },
+  'Service pistol': /*i18n*/ { id: 'values.servicePistol', message: 'Service pistol' },
+  Revolver: /*i18n*/ { id: 'values.revolver', message: 'Revolver' },
+  'Muzzle loader': /*i18n*/ { id: 'values.muzzleLoader', message: 'Muzzle loader' },
 }
 
-/** A record value written with hyphens as the lists show it, in the language of `t`. */
-export function kebabValue(t: Translator['t'], value: string) {
+/** A record value written with hyphens as the lists show it, in the language of `i18n`. */
+export function kebabValue(i18n: I18n, value: string) {
   const text = titleFromKebab(value)
   const known = names[text]
-  return known ? t(known) : text
+  return known ? i18n._(known) : text
 }
 
 const caseTypes: Record<string, Message> = {

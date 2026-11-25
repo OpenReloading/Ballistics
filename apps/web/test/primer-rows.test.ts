@@ -1,3 +1,4 @@
+import { setupI18n } from '@lingui/core'
 import type { Primer } from '@rangefoundry/schema'
 import { expect, it } from 'vitest'
 import { translator } from '../src/i18n/translate.ts'
@@ -79,7 +80,10 @@ it('the properties hold the number, flag, cup, use and published figures', () =>
 
 it('also finds a primer by its size and compound as the language shown writes them', () => {
   const row = defined(rows[0])
-  const { t } = translator({ 'Large rifle': 'Büchse, groß', 'Lead free': 'Bleifrei' }, 'de')
-  for (const q of ['büchse groß', 'bleifrei']) expect(primerMatches(row, q, t), q).toBe(true)
+  const german = setupI18n({
+    locale: 'de',
+    messages: { de: { 'values.largeRifle': 'Büchse, groß', 'values.leadFree': 'Bleifrei' } },
+  })
+  for (const q of ['büchse groß', 'bleifrei']) expect(primerMatches(row, q, german), q).toBe(true)
   expect(primerMatches(row, 'büchse groß')).toBe(false)
 })

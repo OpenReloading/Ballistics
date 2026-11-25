@@ -1,3 +1,4 @@
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import { type InteriorLoad, interior } from '@rangefoundry/ballistics'
 import { fromSi, type SessionRecord, userRecord } from '@rangefoundry/schema'
@@ -5,6 +6,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { load as rifleLoad } from '../../../packages/ballistics/test/powder-load.ts'
 import { AddString, TuneNotes } from '../src/components/powder-tune.tsx'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { nth } from '../src/lib/nth.ts'
 import { fileData, fromFile, powderDesigns } from '../src/lib/powder-designer.ts'
 import { type PowderFitReply, temperatureFit, withSensitivity } from '../src/lib/powder-fit.ts'
@@ -71,16 +73,20 @@ const save = (f: ReturnType<typeof fitOf>) =>
 
 const notes = (interiorLoad: InteriorLoad, s: readonly TuneString[]) =>
   renderToStaticMarkup(
-    <MantineProvider>
-      <TuneNotes loaded={undefined} interior={interiorLoad} fit={{ running: true }} strings={s} />
-    </MantineProvider>,
+    <I18nProvider i18n={linguiOf('en')}>
+      <MantineProvider>
+        <TuneNotes loaded={undefined} interior={interiorLoad} fit={{ running: true }} strings={s} />
+      </MantineProvider>
+    </I18nProvider>,
   )
 
 const addForm = (oneTemperature: boolean) =>
   renderToStaticMarkup(
-    <MantineProvider>
-      <AddString onAdd={() => {}} oneTemperature={oneTemperature} />
-    </MantineProvider>,
+    <I18nProvider i18n={linguiOf('en')}>
+      <MantineProvider>
+        <AddString onAdd={() => {}} oneTemperature={oneTemperature} />
+      </MantineProvider>
+    </I18nProvider>,
   )
 
 const oneTemperature = 'needs strings at two or more powder temperatures'

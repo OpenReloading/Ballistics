@@ -1301,8 +1301,8 @@ export function CompetitionEvents({ types }: { types: EventType[] }) {
         translated
         status={
           data && (
-            <BarCount widest={widestCount(tr, all.length, 'events')}>
-              {countText(tr, all.length, all.length, 'events')}
+            <BarCount widest={widestCount(i18n, all.length, 'events')}>
+              {countText(i18n, all.length, all.length, 'events')}
             </BarCount>
           )
         }

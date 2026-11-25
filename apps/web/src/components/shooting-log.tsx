@@ -1,6 +1,7 @@
 'use client'
 
 import type { MessageDescriptor } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import {
   ActionIcon,
   Button,
@@ -840,6 +841,7 @@ function LogBody({
 /** The Schiessbuch: print gives a blank signature column, and saving offers the entry's rounds to the firearm's round count, one confirm, never on its own. */
 export function ShootingLog() {
   const tr = useTranslation()
+  const { i18n } = useLingui()
   const { t } = tr
   const { data, read, readError, refresh } = useLogData()
   const [failure, setFailure] = useState('')
@@ -930,8 +932,8 @@ export function ShootingLog() {
         translated
         status={
           data && (
-            <BarCount widest={widestCount(tr, all.length, 'log entries')}>
-              {countText(tr, shown.length, all.length, 'log entries')}
+            <BarCount widest={widestCount(i18n, all.length, 'log entries')}>
+              {countText(i18n, shown.length, all.length, 'log entries')}
             </BarCount>
           )
         }

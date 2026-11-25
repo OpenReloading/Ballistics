@@ -38,7 +38,6 @@ export function DisciplineList({
   /** The faces the disciplines are shot on, for the Face filter's names. */
   faces: readonly { id: string; name: string }[]
 }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
   const [state, set, clear] = useListState(disciplineFacetKeys)
   const filters = useDeferredValue(state)
@@ -47,8 +46,8 @@ export function DisciplineList({
     [items, faces],
   )
   const searched = useMemo(
-    () => items.filter((r) => disciplineMatches(r, filters, t)),
-    [items, filters, t],
+    () => items.filter((r) => disciplineMatches(r, filters, i18n)),
+    [items, filters, i18n],
   )
   const { shown, options } = useFacets(items, searched, facets, filters)
   const named = [...facetNames(facets, state.facets ?? {}, i18n), matchingText(i18n, state.query)]
@@ -88,7 +87,7 @@ export function DisciplineList({
       label: /*i18n*/ { id: 'disciplines.column.category', message: 'Category' },
       width: '11rem',
       value: (r) => r.category ?? '',
-      cell: (r) => r.category && kebabValue(t, r.category),
+      cell: (r) => r.category && kebabValue(i18n, r.category),
     },
     {
       key: 'classes',
@@ -108,7 +107,7 @@ export function DisciplineList({
     },
   ]
   const facts = (r: DisciplineRow) =>
-    [r.federation, r.number, disciplineDistance(r), r.category && kebabValue(t, r.category)]
+    [r.federation, r.number, disciplineDistance(r), r.category && kebabValue(i18n, r.category)]
       .filter(Boolean)
       .join(' · ')
   return (
@@ -227,7 +226,7 @@ export function FederationList({ items }: { items: FederationRow[] }) {
     [
       r.abbreviation,
       country(r.country),
-      countText(tr, r.disciplines, r.disciplines, 'disciplines'),
+      countText(i18n, r.disciplines, r.disciplines, 'disciplines'),
     ].join(' · ')
   return (
     <DirectoryPage

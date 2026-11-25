@@ -2,21 +2,9 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import type { Catalogue } from '../src/i18n/translate.ts'
+import { ownKey } from './i18n.mts'
 import { withSourceNote } from './lingui-outdated.mts'
 import { type PoCatalog, readCatalog, writeCatalog } from './po-catalog.mts'
-
-const pluralOfCount =
-  /^\{count, plural, one \{((?:[^{}]|\{\w+\})*)\} other \{((?:[^{}]|\{\w+\})*)\}\}$/
-
-/** The `de.json` key of a Lingui English text: a `count` plural as its `one|other` pair with `{count}` for `#`, after its context, with `''` read as `'`. */
-function ownKey(english: string, context?: string) {
-  const forms = pluralOfCount.exec(english)
-  const text = (forms ? `${forms[1]}|${forms[2]}`.replaceAll('#', '{count}') : english).replaceAll(
-    "''",
-    "'",
-  )
-  return context ? `${context}\u0004${text}` : text
-}
 
 // ICU quoting: a lone apostrophe before a brace would quote the placeholder instead of filling it
 const quoted = (text: string) => text.replaceAll("'", "''")

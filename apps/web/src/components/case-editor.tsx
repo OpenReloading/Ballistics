@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import {
   ActionIcon,
   Anchor,
@@ -77,6 +78,7 @@ export function CaseEditor({
   setCapacity: (m3: number | undefined) => void
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const names = useManufacturerNames()
   const products = useProducts(data.cartridge)
   // the last chosen cartridge: clearing the field does not make the next choice a first one
@@ -182,7 +184,7 @@ export function CaseEditor({
           label={t('Material')}
           value={data.material}
           onChange={(e) => patch({ material: e.currentTarget.value as Case['material'] })}
-          data={caseMaterials.options.map((value) => ({ value, label: kebabValue(t, value) }))}
+          data={caseMaterials.options.map((value) => ({ value, label: kebabValue(i18n, value) }))}
         />
         <TextInput
           label={t('Headstamp')}

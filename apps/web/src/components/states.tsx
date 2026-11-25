@@ -1,11 +1,11 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import { Alert, Button, EmptyState, Group, Skeleton, Stack, Text } from '@mantine/core'
 import { FunnelX, Info, OctagonExclamationPoint, TriangleExclamationPoint } from 'lucide-react'
 import { type ReactNode, useLayoutEffect, useState } from 'react'
 import { useRouter } from '@/platform/navigation.ts'
-import { useTranslation } from '../i18n/language.ts'
-import { type Message as Marked, msg } from '../i18n/translate.ts'
+import type { Message as Marked } from '../i18n/translate.ts'
 import { controlSize } from '../lib/theme.ts'
 import { LibraryTabs } from './library-tabs.tsx'
 import { PageBar } from './page-bar.tsx'
@@ -39,39 +39,63 @@ export function EmptyNote({
 
 /** A whole sentence each, as the word order of a language is its own; a new `what` gets its line here. */
 const loadingLines = {
-  bullets: msg('Loading bullets'),
-  cartridges: msg('Loading cartridges'),
-  powders: msg('Loading powders'),
-  cases: msg('Loading brass'),
-  primers: msg('Loading primers'),
-  disciplines: msg('Loading disciplines'),
-  federations: msg('Loading federations'),
-  firearms: msg('Loading firearms'),
-  'target faces': msg('Loading targets'),
-  bullet: msg('Loading bullet'),
-  cartridge: msg('Loading cartridge'),
-  case: msg('Loading the brass record'),
-  discipline: msg('Loading discipline'),
-  federation: msg('Loading federation'),
-  powder: msg('Loading powder'),
-  primer: msg('Loading primer'),
-  'target face': msg('Loading target'),
-  curves: msg('Loading curves'),
-  manufacturers: msg('Loading manufacturers'),
-  'the bullet record': msg('Loading the bullet record'),
-  'the cartridge record': msg('Loading the cartridge record'),
-  'the cases': msg('Loading the brass'),
-  'the designer': msg('Loading the designer'),
-  'the measurements': msg('Loading the measurements'),
-  'the powder comparison': msg('Loading the powder comparison'),
-  'the preview': msg('Loading the preview'),
-  'the settings': msg('Loading the settings'),
-  'the shot groups': msg('Loading the shot groups'),
-  'the trajectory': msg('Loading the trajectory'),
-  'the truing': msg('Loading the truing'),
-  'the unit settings': msg('Loading the unit settings'),
-  'the workbench defaults': msg('Loading the workbench defaults'),
-  'your data': msg('Loading your data'),
+  bullets: /*i18n*/ { id: 'states.loading.bullets', message: 'Loading bullets' },
+  cartridges: /*i18n*/ { id: 'states.loading.cartridges', message: 'Loading cartridges' },
+  powders: /*i18n*/ { id: 'states.loading.powders', message: 'Loading powders' },
+  cases: /*i18n*/ { id: 'states.loading.cases', message: 'Loading brass' },
+  primers: /*i18n*/ { id: 'states.loading.primers', message: 'Loading primers' },
+  disciplines: /*i18n*/ { id: 'states.loading.disciplines', message: 'Loading disciplines' },
+  federations: /*i18n*/ { id: 'states.loading.federations', message: 'Loading federations' },
+  firearms: /*i18n*/ { id: 'states.loading.firearms', message: 'Loading firearms' },
+  'target faces': /*i18n*/ { id: 'states.loading.targetFaces', message: 'Loading targets' },
+  bullet: /*i18n*/ { id: 'states.loading.bullet', message: 'Loading bullet' },
+  cartridge: /*i18n*/ { id: 'states.loading.cartridge', message: 'Loading cartridge' },
+  case: /*i18n*/ { id: 'states.loading.case', message: 'Loading the brass record' },
+  discipline: /*i18n*/ { id: 'states.loading.discipline', message: 'Loading discipline' },
+  federation: /*i18n*/ { id: 'states.loading.federation', message: 'Loading federation' },
+  powder: /*i18n*/ { id: 'states.loading.powder', message: 'Loading powder' },
+  primer: /*i18n*/ { id: 'states.loading.primer', message: 'Loading primer' },
+  'target face': /*i18n*/ { id: 'states.loading.targetFace', message: 'Loading target' },
+  curves: /*i18n*/ { id: 'states.loading.curves', message: 'Loading curves' },
+  manufacturers: /*i18n*/ { id: 'states.loading.manufacturers', message: 'Loading manufacturers' },
+  'the bullet record': /*i18n*/ {
+    id: 'states.loading.theBulletRecord',
+    message: 'Loading the bullet record',
+  },
+  'the cartridge record': /*i18n*/ {
+    id: 'states.loading.theCartridgeRecord',
+    message: 'Loading the cartridge record',
+  },
+  'the cases': /*i18n*/ { id: 'states.loading.theCases', message: 'Loading the brass' },
+  'the designer': /*i18n*/ { id: 'states.loading.theDesigner', message: 'Loading the designer' },
+  'the measurements': /*i18n*/ {
+    id: 'states.loading.theMeasurements',
+    message: 'Loading the measurements',
+  },
+  'the powder comparison': /*i18n*/ {
+    id: 'states.loading.thePowderComparison',
+    message: 'Loading the powder comparison',
+  },
+  'the preview': /*i18n*/ { id: 'states.loading.thePreview', message: 'Loading the preview' },
+  'the settings': /*i18n*/ { id: 'states.loading.theSettings', message: 'Loading the settings' },
+  'the shot groups': /*i18n*/ {
+    id: 'states.loading.theShotGroups',
+    message: 'Loading the shot groups',
+  },
+  'the trajectory': /*i18n*/ {
+    id: 'states.loading.theTrajectory',
+    message: 'Loading the trajectory',
+  },
+  'the truing': /*i18n*/ { id: 'states.loading.theTruing', message: 'Loading the truing' },
+  'the unit settings': /*i18n*/ {
+    id: 'states.loading.theUnitSettings',
+    message: 'Loading the unit settings',
+  },
+  'the workbench defaults': /*i18n*/ {
+    id: 'states.loading.theWorkbenchDefaults',
+    message: 'Loading the workbench defaults',
+  },
+  'your data': /*i18n*/ { id: 'states.loading.yourData', message: 'Loading your data' },
 } as const
 
 /** What can load: a key of `loadingLines`. */
@@ -87,8 +111,8 @@ export function Loading({
   rows?: number | undefined
   inline?: boolean
 }) {
-  const { t } = useTranslation()
-  const line = t(loadingLines[what])
+  const { i18n } = useLingui()
+  const line = i18n._(loadingLines[what])
   if (inline) return <p>{line}</p>
   return (
     <div role="status">
@@ -114,9 +138,17 @@ export interface MessageEntry {
 }
 
 const severities = {
-  info: { word: msg('Note'), color: 'blue', Icon: Info },
-  warning: { word: msg('Warning'), color: 'orange', Icon: TriangleExclamationPoint },
-  error: { word: msg('Error'), color: 'red', Icon: OctagonExclamationPoint },
+  info: { word: /*i18n*/ { id: 'states.note', message: 'Note' }, color: 'blue', Icon: Info },
+  warning: {
+    word: /*i18n*/ { id: 'states.warning', message: 'Warning' },
+    color: 'orange',
+    Icon: TriangleExclamationPoint,
+  },
+  error: {
+    word: /*i18n*/ { id: 'states.error', message: 'Error' },
+    color: 'red',
+    Icon: OctagonExclamationPoint,
+  },
 } as const
 
 /** Icon, the severity's word and the text, so color is never the only signal; an error is announced at once (`role="alert"`), a note or warning politely (`role="status"`). */
@@ -138,9 +170,9 @@ export function Message({
   /** False where a live region around it announces it: a plain note, no live role of its own. */
   announce?: boolean | undefined
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const { word, color, Icon } = severities[severity]
-  const label = <span className="message-label">{t(word)}:</span>
+  const label = <span className="message-label">{i18n._(word)}:</span>
   return (
     <Alert
       className="message"
@@ -169,7 +201,7 @@ export function Message({
           mt={children ? 'xs' : 0}
           onClick={onRetry}
         >
-          {t('Retry')}
+          {i18n._({ id: 'states.retry', message: 'Retry' })}
         </Button>
       )}
     </Alert>
@@ -248,15 +280,39 @@ export function ErrorNote({
 
 /** The title of the error state of a kind's data: a whole sentence each. */
 const unavailableLines = {
-  Bullet: msg('Bullet data is unavailable right now.'),
-  Cartridge: msg('Cartridge data is unavailable right now.'),
-  Case: msg('Brass data is unavailable right now.'),
-  Discipline: msg('Discipline data is unavailable right now.'),
-  'Event type': msg('Event type data is unavailable right now.'),
-  Federation: msg('Federation data is unavailable right now.'),
-  Powder: msg('Powder data is unavailable right now.'),
-  Primer: msg('Primer data is unavailable right now.'),
-  'Target face': msg('Target data is unavailable right now.'),
+  Bullet: /*i18n*/ {
+    id: 'states.unavailable.bullet',
+    message: 'Bullet data is unavailable right now.',
+  },
+  Cartridge: /*i18n*/ {
+    id: 'states.unavailable.cartridge',
+    message: 'Cartridge data is unavailable right now.',
+  },
+  Case: /*i18n*/ { id: 'states.unavailable.case', message: 'Brass data is unavailable right now.' },
+  Discipline: /*i18n*/ {
+    id: 'states.unavailable.discipline',
+    message: 'Discipline data is unavailable right now.',
+  },
+  'Event type': /*i18n*/ {
+    id: 'states.unavailable.eventType',
+    message: 'Event type data is unavailable right now.',
+  },
+  Federation: /*i18n*/ {
+    id: 'states.unavailable.federation',
+    message: 'Federation data is unavailable right now.',
+  },
+  Powder: /*i18n*/ {
+    id: 'states.unavailable.powder',
+    message: 'Powder data is unavailable right now.',
+  },
+  Primer: /*i18n*/ {
+    id: 'states.unavailable.primer',
+    message: 'Primer data is unavailable right now.',
+  },
+  'Target face': /*i18n*/ {
+    id: 'states.unavailable.targetFace',
+    message: 'Target data is unavailable right now.',
+  },
 } as const
 
 /** The kinds whose data a page can fail to read: a key of `unavailableLines`. */
@@ -264,10 +320,13 @@ export type DataKind = keyof typeof unavailableLines
 
 /** The data of a page could not be read from the API; Retry asks again. */
 export function DataError({ what, retry }: { what: DataKind; retry: () => void }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
-    <ErrorNote title={t(unavailableLines[what])} onRetry={retry}>
-      {t('The data file could not be loaded. Check the connection and retry.')}
+    <ErrorNote title={i18n._(unavailableLines[what])} onRetry={retry}>
+      {i18n._({
+        id: 'states.dataError',
+        message: 'The data file could not be loaded. Check the connection and retry.',
+      })}
     </ErrorNote>
   )
 }
@@ -307,12 +366,12 @@ const skeletonWidths = [62, 48, 70, 55, 66, 42, 58, 74, 50, 64, 46, 68]
 
 /** The filter row and the table's frame where the records will be, so nothing moves when they arrive. */
 export function ListLoading({ what }: { what: Loadable }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <>
       <LibraryTabs />
       <div className="directory" role="status">
-        <span className="visually-hidden">{t(loadingLines[what])}…</span>
+        <span className="visually-hidden">{i18n._(loadingLines[what])}…</span>
         {/* the metrics of the real filter row (DirectoryFilters), so the frame stays where it is */}
         <Group className="directory-filters" gap="xs" py="xs" aria-hidden="true">
           <Skeleton height={30} className="directory-search" />
@@ -333,16 +392,31 @@ export function ListLoading({ what }: { what: Loadable }) {
 
 /** What a searched list says when nothing matches, by what it lists: a whole sentence each. */
 const noMatchLines = {
-  bullets: msg('No bullets match these filters.'),
-  cartridges: msg('No cartridges match these filters.'),
-  cases: msg('No brass matches these filters.'),
-  disciplines: msg('No disciplines match these filters.'),
-  federations: msg('No federations match these filters.'),
-  firearms: msg('No firearms match these filters.'),
-  'log entries': msg('No entries match these filters.'),
-  powders: msg('No powders match these filters.'),
-  primers: msg('No primers match these filters.'),
-  'target faces': msg('No targets match these filters.'),
+  bullets: /*i18n*/ { id: 'states.noMatch.bullets', message: 'No bullets match these filters.' },
+  cartridges: /*i18n*/ {
+    id: 'states.noMatch.cartridges',
+    message: 'No cartridges match these filters.',
+  },
+  cases: /*i18n*/ { id: 'states.noMatch.cases', message: 'No brass matches these filters.' },
+  disciplines: /*i18n*/ {
+    id: 'states.noMatch.disciplines',
+    message: 'No disciplines match these filters.',
+  },
+  federations: /*i18n*/ {
+    id: 'states.noMatch.federations',
+    message: 'No federations match these filters.',
+  },
+  firearms: /*i18n*/ { id: 'states.noMatch.firearms', message: 'No firearms match these filters.' },
+  'log entries': /*i18n*/ {
+    id: 'states.noMatch.logEntries',
+    message: 'No entries match these filters.',
+  },
+  powders: /*i18n*/ { id: 'states.noMatch.powders', message: 'No powders match these filters.' },
+  primers: /*i18n*/ { id: 'states.noMatch.primers', message: 'No primers match these filters.' },
+  'target faces': /*i18n*/ {
+    id: 'states.noMatch.targetFaces',
+    message: 'No targets match these filters.',
+  },
 } as const
 
 /** `filters` names the search and the choices set; Clear filters (`onClear`) resets them. */
@@ -355,16 +429,16 @@ export function EmptyList({
   filters?: string
   onClear?: () => void
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <EmptyNote
       icon={<FunnelX size={24} aria-hidden="true" />}
-      title={t(noMatchLines[noun])}
+      title={i18n._(noMatchLines[noun])}
       description={filters}
       action={
         onClear && (
           <Button variant="default" size={controlSize.row.button} onClick={onClear}>
-            {t('Clear filters')}
+            {i18n._({ id: 'states.clearFilters', message: 'Clear filters' })}
           </Button>
         )
       }

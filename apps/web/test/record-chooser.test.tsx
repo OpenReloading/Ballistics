@@ -15,6 +15,7 @@ import {
   powderKind,
   primerKind,
 } from '../src/components/record-choosers.tsx'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { setShownLanguage } from '../src/i18n/shown.ts'
 import { english } from '../src/i18n/translate.ts'
 import type { BulletRow } from '../src/lib/bullet-rows.ts'
@@ -28,11 +29,12 @@ import { defined } from './defined.ts'
 
 const system = presetUnits('metric-grams')
 const { t } = english
+const i18n = linguiOf('en')
 
 /** The head of each column and the cells of `row` under it, the name column first. */
 const table = <R extends ChooserRow>(kind: ChooserKind<R>, row: R) => [
   [t(kind.texts.column), row.name],
-  ...kind.columns.map((c) => [t(c.label), c.cell(row, system, t)]),
+  ...kind.columns.map((c) => [t(c.label), c.cell(row, system, t, i18n)]),
 ]
 
 const ids = <R extends ChooserRow>(kind: ChooserKind<R>, rows: R[], query: string, sort?: string) =>
@@ -117,7 +119,7 @@ it('the powder chooser filters by stated use, a powder under each of its uses, a
     powder({ id: 'none', name: 'None' }),
   ]
   const use = defined(powderKind.selects.find((s) => s.label === 'Stated use'))
-  expect(use.options(rows, rows, t)).toEqual([
+  expect(use.options(rows, rows, t, i18n)).toEqual([
     { value: 'handgun', label: 'Handgun (1)' },
     { value: 'rifle', label: 'Rifle (2)' },
     { value: 'shotgun', label: 'Shotgun (1)' },
@@ -174,7 +176,7 @@ it('the cartridge chooser shows caliber, case type and Pmax, ranks as the API an
 it('the cartridge chooser names the countries as the record page does, in the language shown', () => {
   const country = (text: string) =>
     cartridgeKind
-      .facts(cartridge({ id: 'c', name: 'C', country: text }), system, t)
+      .facts(cartridge({ id: 'c', name: 'C', country: text }), system, t, i18n)
       .find(([k]) => k === 'Country')?.[1]
   expect(country('United states')).toBe('United States')
   setShownLanguage('de')

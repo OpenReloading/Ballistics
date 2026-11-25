@@ -1,4 +1,5 @@
 /** The discipline and federation lists' rows and filters, and a discipline record's rule book and stages. */
+import type { I18n } from '@lingui/core'
 import {
   type CaliberClass,
   type Discipline,
@@ -9,8 +10,9 @@ import {
   type Source,
   toSi,
 } from '@rangefoundry/schema'
+import { linguiOf } from '../i18n/lingui.ts'
 import { plainNumber } from '../i18n/number.ts'
-import { english, type Message, msg, type Translator, translator } from '../i18n/translate.ts'
+import { english, type Message, msg, type Translator } from '../i18n/translate.ts'
 import type { DirectoryState } from './directory.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
 import { categoryWord } from './face-words.ts'
@@ -154,11 +156,11 @@ export function disciplineFacets(
   ]
 }
 
-/** Whether a discipline row passes the search (the category also as `t` shows it). */
+/** Whether a discipline row passes the search (the category also as `i18n` shows it). */
 export const disciplineMatches = (
   r: DisciplineRow,
   s: Pick<DirectoryState, 'query'>,
-  t: Translator['t'] = translator().t,
+  i18n: I18n = linguiOf('en'),
 ) =>
   matchesQuery(
     [
@@ -166,7 +168,7 @@ export const disciplineMatches = (
       r.number,
       r.federation,
       r.category && titleFromKebab(r.category),
-      r.category && kebabValue(t, r.category),
+      r.category && kebabValue(i18n, r.category),
       ...r.classes.map((c) => c.name),
     ],
     s.query,

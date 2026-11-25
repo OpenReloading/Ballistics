@@ -1,9 +1,11 @@
+import { I18nProvider } from '@lingui/react'
 import { MantineProvider } from '@mantine/core'
 import type { ReactNode } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { RecordActions } from '../src/components/record-actions.tsx'
 import { Toolbar } from '../src/components/workspace.tsx'
+import { linguiOf } from '../src/i18n/lingui.ts'
 
 const clipboard = vi.hoisted(() => ({ copied: false, error: null as Error | null }))
 
@@ -17,7 +19,12 @@ beforeEach(() => {
   clipboard.error = null
 })
 
-const render = (node: ReactNode) => renderToStaticMarkup(<MantineProvider>{node}</MantineProvider>)
+const render = (node: ReactNode) =>
+  renderToStaticMarkup(
+    <I18nProvider i18n={linguiOf('en')}>
+      <MantineProvider>{node}</MantineProvider>
+    </I18nProvider>,
+  )
 const status = (html: string) =>
   html.match(/<span role="status" class="visually-hidden">([^<]*)<\/span>/)?.[1]
 
