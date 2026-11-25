@@ -27,9 +27,12 @@ import {
 } from '../src/lib/disciplines.ts'
 import { facetRows } from '../src/lib/facets.ts'
 import { formatQuantity, presetUnits } from '../src/lib/units.ts'
-import { say } from '../src/lib/wording.ts'
+import { say, type Wording } from '../src/lib/wording.ts'
 import { defined } from './defined.ts'
 import { catalogBundle } from './records.ts'
+
+/** A row label or group title in English. */
+const labelOf = (w: Wording) => say(linguiOf('en'), translator().t, w)
 
 // the list renders its tab bar, which reads the route and the router
 const route = vi.hoisted(() => ({ path: '/disciplines' }))
@@ -93,8 +96,12 @@ it('shows the distance in the unit of the rule book and filters by either unit o
   expect(shownBy({ dist: ['25yd'] })).toEqual(bdmp25)
   expect(shownBy({ dist: ['25m'] })).toEqual(expect.arrayContaining(bdmp25))
   expect(
-    disciplineStrip(defined(records.find((d) => d.id === bothIds[0])), translator().t, 'BDMP')[1]
-      ?.row,
+    disciplineStrip(
+      defined(records.find((d) => d.id === bothIds[0])),
+      linguiOf('en'),
+      translator().t,
+      'BDMP',
+    )[1]?.row,
   ).toMatchObject({
     text: expect.stringMatching(/^\d+ m \/ \d+ yd$/),
   })
@@ -132,12 +139,14 @@ it('renders the discipline list: one row per discipline linking its page, no fed
 
 it('gives the strip, the number, section, page and caliber classes, and the rule book with its page', () => {
   const { t } = translator()
-  expect(disciplineStrip(pistol, t, 'DSB').map((i) => [i.label, i.row.text])).toEqual([
+  expect(
+    disciplineStrip(pistol, linguiOf('en'), t, 'DSB').map((i) => [i.label, i.row.text]),
+  ).toEqual([
     ['Federation', 'DSB'],
     ['Distance', '25 m'],
   ])
-  const rowsOf = defined(disciplineGroups(pistol, classes, t)[0]).rows
-  expect(rowsOf.map((r) => say(t, r.label))).toEqual([
+  const rowsOf = defined(disciplineGroups(pistol, classes, linguiOf('en'))[0]).rows
+  expect(rowsOf.map((r) => say(linguiOf('en'), t, r.label))).toEqual([
     'Number',
     'Section',
     'Page',
@@ -199,7 +208,9 @@ it('names a homepage by its host without www', () => {
 it('shows the rule facts a record states, converted where the unit differs, and nothing where it states none', () => {
   expect(ruleRows(undefined)).toEqual([])
   expect(
-    disciplineGroups(pistol, classes, translator().t).filter((g) => g.title === 'Rules'),
+    disciplineGroups(pistol, classes, linguiOf('en')).filter(
+      (g) => g.title && labelOf(g.title) === 'Rules',
+    ),
   ).toHaveLength(pistol.rules ? 1 : 0)
   const rows = ruleRows({
     firearm: 'long-gun',
@@ -223,7 +234,7 @@ it('shows the rule facts a record states, converted where the unit differs, and 
       { duration: { value: 0.5 }, covers: 'shot', includesSighters: false },
     ],
   })
-  const text = (label: string) => rows.filter((r) => r.label === label).map((r) => r.text)
+  const text = (label: string) => rows.filter((r) => labelOf(r.label) === label).map((r) => r.text)
   expect(text('Firearm')).toEqual(['Long gun'])
   expect(text('Actions')).toEqual(['single shot, semi automatic'])
   expect(text('Magnification up to')).toEqual(['4×'])
@@ -235,16 +246,16 @@ it('shows the rule facts a record states, converted where the unit differs, and 
     '90 s per series',
     '0.5 s per shot, sighters not included',
   ])
-  expect(rows.filter((r) => r.label === 'Time limit').every((r) => r.numeric)).toBe(true)
-  expect(rows.find((r) => r.label === 'Magnification up to')?.numeric).toBe(true)
-  const trigger = defined(rows.find((r) => r.label === 'Trigger weight from')?.value)
+  expect(rows.filter((r) => labelOf(r.label) === 'Time limit').every((r) => r.numeric)).toBe(true)
+  expect(rows.find((r) => labelOf(r.label) === 'Magnification up to')?.numeric).toBe(true)
+  const trigger = defined(rows.find((r) => labelOf(r.label) === 'Trigger weight from')?.value)
   expect(trigger).toEqual({ quantity: 'firearmMass', si: 1.5 })
   const shown = (preset: 'metric-grams' | 'us') => {
     const system = presetUnits(preset)
     return `${formatQuantity(trigger.quantity, system, trigger.si)} ${system[trigger.quantity].symbol}`
   }
   expect([shown('metric-grams'), shown('us')]).toEqual(['1.50 kg', '3.31 lb'])
-  expect(rows.find((r) => r.label === 'Barrel length up to')?.value?.si).toBeCloseTo(0.762)
+  expect(rows.find((r) => labelOf(r.label) === 'Barrel length up to')?.value?.si).toBeCloseTo(0.762)
 })
 
 it('also searches the category and the country as the language shown writes them', () => {

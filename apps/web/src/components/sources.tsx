@@ -1,10 +1,12 @@
 'use client'
 
+import type { MessageDescriptor } from '@lingui/core'
+import { useLingui } from '@lingui/react'
 import { Table, TableTbody, TableTd, TableTh, TableThead, TableTr } from '@mantine/core'
 import { isWebLink, type Provenance, type Source } from '@rangefoundry/schema'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
-import { type Message, msg } from '../i18n/translate.ts'
+import { ungrouped } from '../i18n/lingui.ts'
 import { fieldLabel } from '../lib/field-labels.ts'
 import { Day } from './day.tsx'
 import { Noted } from './field-table.tsx'
@@ -18,49 +20,50 @@ const note = (text: string) => text.replaceAll(', not load data', '')
 type Has = (k: keyof Source) => boolean
 
 /** How a record's values came about, in the title of its Sources panel. */
-export const provenanceKinds: Record<Provenance['kind'], Message> = {
-  published: msg('published'),
-  measured: msg('measured'),
-  derived: msg('derived'),
-  fitted: msg('fitted'),
-  computed: msg('computed'),
+export const provenanceKinds: Record<Provenance['kind'], MessageDescriptor> = {
+  published: /*i18n*/ { id: 'recordSources.kind.published', message: 'published' },
+  measured: /*i18n*/ { id: 'recordSources.kind.measured', message: 'measured' },
+  derived: /*i18n*/ { id: 'recordSources.kind.derived', message: 'derived' },
+  fitted: /*i18n*/ { id: 'recordSources.kind.fitted', message: 'fitted' },
+  computed: /*i18n*/ { id: 'recordSources.kind.computed', message: 'computed' },
 }
 
-const columns: [keyof Source, Message][] = [
-  ['origin', msg('Origin')],
-  ['retrieved', msg('Retrieved')],
-  ['license', msg('License')],
-  ['fields', msg('Covers')],
-  ['note', msg('Note')],
-]
+/** The optional columns in their order. */
+const columns = {
+  origin: /*i18n*/ { id: 'recordSources.column.origin', message: 'Origin' },
+  retrieved: /*i18n*/ { id: 'recordSources.column.retrieved', message: 'Retrieved' },
+  license: /*i18n*/ { id: 'recordSources.column.license', message: 'License' },
+  fields: /*i18n*/ { id: 'recordSources.column.covers', message: 'Covers' },
+  note: /*i18n*/ { id: 'recordSources.column.note', message: 'Note' },
+} satisfies Partial<Record<keyof Source, MessageDescriptor>>
+
+const columnKeys = Object.keys(columns) as (keyof typeof columns)[]
 
 /** Who stands behind a source, as the schema names it. */
-const origins: Record<string, Message> = {
-  manufacturer: msg('manufacturer'),
-  public: msg('public'),
-  community: msg('community'),
+const origins: Record<string, MessageDescriptor> = {
+  manufacturer: /*i18n*/ { id: 'recordSources.origin.manufacturer', message: 'manufacturer' },
+  public: /*i18n*/ { id: 'recordSources.origin.public', message: 'public' },
+  community: /*i18n*/ { id: 'recordSources.origin.community', message: 'community' },
 }
 
 function SourcesHead({ has }: { has: Has }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <TableTr role="row">
       <TableTh scope="col" role="columnheader">
-        {t('Source')}
+        {i18n._({ id: 'recordSources.column.source', message: 'Source' })}
       </TableTh>
-      {columns
-        .filter(([key]) => has(key))
-        .map(([key, label]) => (
-          <TableTh key={key} scope="col" role="columnheader">
-            {t(label)}
-          </TableTh>
-        ))}
+      {columnKeys.filter(has).map((key) => (
+        <TableTh key={key} scope="col" role="columnheader">
+          {i18n._(columns[key])}
+        </TableTh>
+      ))}
     </TableTr>
   )
 }
 
 function SourceMeta({ source: s }: { source: Source }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <span className="source-meta">
       {s.publisher && <span>{s.publisher}</span>}
@@ -68,9 +71,13 @@ function SourceMeta({ source: s }: { source: Source }) {
       {s.terms && (
         <span>
           {isWebLink(s.terms) ? (
-            <a href={s.terms}>{t('Terms')}</a>
+            <a href={s.terms}>{i18n._({ id: 'recordSources.terms', message: 'Terms' })}</a>
           ) : (
-            t('Terms: {terms}', { terms: s.terms })
+            i18n._({
+              id: 'recordSources.termsText',
+              message: 'Terms: {terms}',
+              values: { terms: s.terms },
+            })
           )}
         </span>
       )}
@@ -79,13 +86,23 @@ function SourceMeta({ source: s }: { source: Source }) {
   )
 }
 
+const fieldCount = /*i18n*/ {
+  id: 'recordSources.fieldCount',
+  message: '{count, plural, one {# field} other {# fields}}',
+}
+
 /** The fields a source covers: their count, the list of their labels on hover and on focus. */
 function CoversCell({ fields, kind }: { fields: string[] | undefined; kind: string | undefined }) {
-  const { t, tn } = useTranslation()
-  if (!fields) return t('whole record')
+  const { t } = useTranslation()
+  const { i18n } = useLingui()
+  if (!fields) return i18n._({ id: 'recordSources.wholeRecord', message: 'whole record' })
   return (
     <Noted
-      value={tn(fields.length, '{count} field', '{count} fields')}
+      value={i18n._(
+        fieldCount.id,
+        { count: fields.length },
+        { message: fieldCount.message, formats: ungrouped },
+      )}
       notes={[fields.map((f) => fieldLabel(f, kind, t)).join(', ')]}
     />
   )
@@ -103,13 +120,15 @@ function SourceRow({
   kind: string | undefined
   inGroup?: boolean
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const origin = s.origin && origins[s.origin]
   return (
     <TableTr role="row" className={inGroup ? 'source-page-row' : undefined}>
       {inGroup ? (
         <TableTh scope="row" role="rowheader" className="source-page">
-          {s.page ? t('Page {page}', { page: s.page }) : t('No page stated')}
+          {s.page
+            ? i18n._({ id: 'recordSources.page', message: 'Page {page}', values: { page: s.page } })
+            : i18n._({ id: 'recordSources.noPage', message: 'No page stated' })}
         </TableTh>
       ) : (
         <TableTh scope="row" role="rowheader">
@@ -120,27 +139,27 @@ function SourceRow({
         </TableTh>
       )}
       {has('origin') && (
-        <TableTd role="cell" data-label={t('Origin')}>
-          {origin ? t(origin) : s.origin}
+        <TableTd role="cell" data-label={i18n._(columns.origin)}>
+          {origin ? i18n._(origin) : s.origin}
         </TableTd>
       )}
       {has('retrieved') && (
-        <TableTd role="cell" className="nowrap" data-label={t('Retrieved')}>
+        <TableTd role="cell" className="nowrap" data-label={i18n._(columns.retrieved)}>
           {s.retrieved && <Day day={s.retrieved} />}
         </TableTd>
       )}
       {has('license') && (
-        <TableTd role="cell" data-label={t('License')}>
+        <TableTd role="cell" data-label={i18n._(columns.license)}>
           {s.license}
         </TableTd>
       )}
       {has('fields') && (
-        <TableTd role="cell" className="nowrap" data-label={t('Covers')}>
+        <TableTd role="cell" className="nowrap" data-label={i18n._(columns.fields)}>
           <CoversCell fields={s.fields} kind={kind} />
         </TableTd>
       )}
       {has('note') && (
-        <TableTd role="cell" data-label={t('Note')}>
+        <TableTd role="cell" data-label={i18n._(columns.note)}>
           {s.note && note(s.note)}
         </TableTd>
       )}
@@ -178,7 +197,7 @@ function SourceGroup({
   span: number
   kind: string | undefined
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const first = sources[0] as Source
   // a page can be cited twice with other fields: the key counts repeats of the same content
   const seen = new Map<string, number>()
@@ -193,7 +212,11 @@ function SourceGroup({
       <TableTr role="row">
         <TableTd role="cell" colSpan={span} className="source-document">
           <span className="source-title">
-            {first.url ? <a href={first.url}>{sourceTitle(first, t)}</a> : sourceTitle(first, t)}
+            {first.url ? (
+              <a href={first.url}>{sourceTitle(first, i18n)}</a>
+            ) : (
+              sourceTitle(first, i18n)
+            )}
           </span>
           <SourceMeta source={first} />
         </TableTd>
@@ -214,14 +237,14 @@ export function Sources({
   /** The record kind (`powders`), whose field labels name the fields a source covers. */
   kind?: string | undefined
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   const list = provenance.sources
   const has = (k: keyof Source) => list.some((s) => s[k] !== undefined)
-  const span = 1 + columns.filter(([key]) => has(key)).length
+  const span = 1 + columnKeys.filter(has).length
   const groups = groupSources(list)
   return (
     <>
-      <ScrollRegion label={t('Sources table')}>
+      <ScrollRegion label={i18n._({ id: 'recordSources.table', message: 'Sources table' })}>
         <Table className="sources" role="table">
           <TableThead role="rowgroup">
             <SourcesHead has={has} />
@@ -259,11 +282,14 @@ export function RecordSourcesLink({
   /** Defaults to "Sources". */
   label?: string
 }) {
-  const { t } = useTranslation()
+  const { i18n } = useLingui()
   return (
     <Link href={`/${kind}/${encodeURIComponent(id)}#record-sources`} target="_blank" rel="noopener">
-      {label ?? t('Sources')}
-      <span className="visually-hidden"> {t('in a new tab')}</span>
+      {label ?? i18n._({ id: 'recordSources.link', message: 'Sources' })}
+      <span className="visually-hidden">
+        {' '}
+        {i18n._({ id: 'recordSources.newTab', message: 'in a new tab' })}
+      </span>
     </Link>
   )
 }

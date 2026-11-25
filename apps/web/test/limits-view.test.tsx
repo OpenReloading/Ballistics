@@ -1,8 +1,8 @@
-import { MantineProvider } from '@mantine/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { LimitsView } from '../src/components/workbench-readouts.tsx'
 import type { InteriorResponse } from '../src/lib/api-types.ts'
+import { Providers } from './providers.tsx'
 
 const body = {
   limits: [
@@ -20,9 +20,9 @@ const body = {
 
 it('labels every limit cell with its column header, for the phone card layout', () => {
   const html = renderToStaticMarkup(
-    <MantineProvider>
+    <Providers>
       <LimitsView body={body} />
-    </MantineProvider>,
+    </Providers>,
   )
   const headers = [...html.matchAll(/<th scope="col" role="columnheader">([^<]*)<\/th>/g)].map(
     (m) => m[1],
@@ -46,9 +46,9 @@ const resolved = {
 
 const render = (printed: boolean) =>
   renderToStaticMarkup(
-    <MantineProvider>
+    <Providers>
       <LimitsView body={resolved} printed={printed} />
-    </MantineProvider>,
+    </Providers>,
   )
 
 it("links the cartridge record's sources on screen, in one short line", () => {

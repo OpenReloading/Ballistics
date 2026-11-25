@@ -18,7 +18,7 @@ import type {
 } from '../lib/seating-ladder.ts'
 import { formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
 import type { CapacityRule } from '../lib/volume-tolerance.ts'
-import { say } from '../lib/wording.ts'
+import { sayOwn } from '../lib/wording.ts'
 import {
   bandLine,
   bulletLeadTime,
@@ -395,7 +395,7 @@ export function resultNotes(
             line: t(
               'Default temperature coefficient of {form} powder: the powder record gives none.',
               {
-                form: say(t, rawWording(ok.sensitivityDefault.form)),
+                form: sayOwn(t, rawWording(ok.sensitivityDefault.form)),
               },
             ),
             text: t(

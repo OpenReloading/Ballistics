@@ -1,5 +1,6 @@
 import type { Bullet, Powder, Provenance } from '@rangefoundry/schema'
 import { expect, it } from 'vitest'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { msg, translator } from '../src/i18n/translate.ts'
 import {
   ballisticCoefficientRows,
@@ -412,7 +413,7 @@ it('gives the fitted values with intervals, the fixed inputs from their stored u
   ])
   expect(
     powderParameterGroups(p, 2).map((g) => [
-      g.title && say(english, g.title),
+      g.title && say(linguiOf('en'), english, g.title),
       g.filter,
       g.rows.length,
     ]),

@@ -1,4 +1,3 @@
-import { MantineProvider } from '@mantine/core'
 import type { ComponentProps } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
@@ -6,12 +5,13 @@ import { FieldStrip } from '../src/components/field-strip.tsx'
 import { bulletStrip } from '../src/lib/record-fields.ts'
 import { verbatim } from '../src/lib/wording.ts'
 import { targetBullet } from './fixtures/bullets.ts'
+import { Providers } from './providers.tsx'
 
 const render = (props: ComponentProps<typeof FieldStrip>) =>
   renderToStaticMarkup(
-    <MantineProvider>
+    <Providers>
       <FieldStrip {...props} />
-    </MantineProvider>,
+    </Providers>,
   )
 const mass = bulletStrip(targetBullet).filter((i) => i.icon === 'mass')
 

@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import {
   SegmentedControl,
   Select,
@@ -606,6 +607,7 @@ export function StandardFacts({
   method?: Wording | undefined
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   if (!table && !date && !countries && !method) return null
   return (
     <dl className="standard-facts">
@@ -636,7 +638,7 @@ export function StandardFacts({
           <dt>
             <Label text={t('Method')} notes={[t(factMeanings.method)]} />
           </dt>
-          <dd>{say(t, method)}</dd>
+          <dd>{say(i18n, t, method)}</dd>
         </div>
       )}
     </dl>

@@ -1,16 +1,16 @@
-import { MantineProvider } from '@mantine/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { FieldPanel, FieldTable, searchGroups } from '../src/components/field-table.tsx'
 import { msg } from '../src/i18n/translate.ts'
 import type { FieldGroup } from '../src/lib/record-fields.ts'
+import { Providers } from './providers.tsx'
 
 // outside a UnitsProvider the table shows the first render's preset, Metric with grains
 const html = (groups: FieldGroup[], labelledBy?: string) =>
   renderToStaticMarkup(
-    <MantineProvider>
+    <Providers>
       <FieldTable caption={msg('Data')} labelledBy={labelledBy} groups={groups} />
-    </MantineProvider>,
+    </Providers>,
   )
 
 const diameter = { label: msg('Diameter'), value: { quantity: 'length', si: 7.823e-3 } } as const
@@ -65,9 +65,9 @@ it('is named by its caption, or by the heading it is labeled by', () => {
 
 const panel = (groups: FieldGroup[]) =>
   renderToStaticMarkup(
-    <MantineProvider>
+    <Providers>
       <FieldPanel id="data" title={msg('Bullet data')} groups={groups} />
-    </MantineProvider>,
+    </Providers>,
   )
 
 it('heads the symbol table Symbol, Quantity, Value, Unit and marks a symbol row for the linked drawing, one tab stop', () => {

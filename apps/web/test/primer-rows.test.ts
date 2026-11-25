@@ -1,6 +1,7 @@
 import { setupI18n } from '@lingui/core'
 import type { Primer } from '@rangefoundry/schema'
 import { expect, it } from 'vitest'
+import { linguiOf } from '../src/i18n/lingui.ts'
 import { translator } from '../src/i18n/translate.ts'
 import type { PrimerSummary } from '../src/lib/api-types.ts'
 import { primerMatches, primerRows } from '../src/lib/primer-rows.ts'
@@ -64,7 +65,7 @@ it('the strip has the manufacturer, size and compound, nothing the record lacks'
 
 it('the properties hold the number, flag, cup, use and published figures', () => {
   const labels = primerRowGroups(record).flatMap((g) =>
-    g.rows.map((r) => say(translator().t, r.label)),
+    g.rows.map((r) => say(linguiOf('en'), translator().t, r.label)),
   )
   expect(labels).toEqual([
     'Product number',

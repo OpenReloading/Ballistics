@@ -1,12 +1,12 @@
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
-import { MantineProvider } from '@mantine/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { HomeNews } from '../src/components/home-news.tsx'
 import { type Translator, translator } from '../src/i18n/translate.ts'
 import { newestNews } from '../src/lib/news.ts'
+import { Providers } from './providers.tsx'
 
 const shown = vi.hoisted(() => ({ t: undefined as Translator | undefined }))
 
@@ -82,9 +82,9 @@ describe('news', () => {
     const render = (language: Translator) => {
       shown.t = language
       return renderToStaticMarkup(
-        <MantineProvider>
+        <Providers>
           <HomeNews items={items} />
-        </MantineProvider>,
+        </Providers>,
       )
     }
     const english = render(translator())

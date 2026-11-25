@@ -8,7 +8,7 @@ import { present } from './directory.ts'
 import type { Facet } from './facets.ts'
 import { rawWording, spacedWording } from './record-values.ts'
 import { inchText, type UnitSystem } from './units.ts'
-import { say } from './wording.ts'
+import { sayOwn } from './wording.ts'
 
 /** The Diameter (inches to 4 decimals, mm to 3) and SD cells in the preset's units; empty without a value. */
 export function listCells(b: BulletRow, system: UnitSystem) {
@@ -39,14 +39,14 @@ const capitalised = (text: string) => text.charAt(0).toUpperCase() + text.slice(
 
 /** A tip, base or structure value as a word, hyphens as spaces: "hollow point". */
 const kindWord = (t: Translator['t'], value: string) =>
-  say(t, rawWording(value)).replaceAll('-', ' ')
+  sayOwn(t, rawWording(value)).replaceAll('-', ' ')
 
 /** A list item's construction as a name: "Cup and core", "Lead core". */
 export function constructionText(t: Translator['t'], value: string) {
   // the one structure that ends in "-core" is no core material
   const core = value === 'cup-and-core' ? undefined : /^(.+)-core$/.exec(value)?.[1]
   return capitalised(
-    core ? t('{material} core', { material: say(t, spacedWording(core)) }) : kindWord(t, value),
+    core ? t('{material} core', { material: sayOwn(t, spacedWording(core)) }) : kindWord(t, value),
   )
 }
 

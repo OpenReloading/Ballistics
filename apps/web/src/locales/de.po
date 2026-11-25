@@ -7,6 +7,10 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: de\n"
 
+# en: ", page {page}"
+msgid "sourceLink.page"
+msgstr ", Seite {page}"
+
 # en: "{added} events added, {equal} already in this browser, {replaced} replaced."
 msgid "events.imported"
 msgstr "{added} Wettkämpfe hinzugefügt, {equal} schon in diesem Browser, {replaced} ersetzt."
@@ -99,6 +103,10 @@ msgstr "{count, plural, one {# Wettkampf} other {# Wettkämpfe}}"
 msgid "lists.count.federations"
 msgstr "{count, plural, one {# Verband} other {# Verbände}}"
 
+# en: "{count, plural, one {# field} other {# fields}}"
+msgid "recordSources.fieldCount"
+msgstr "{count, plural, one {# Feld} other {# Felder}}"
+
 # en: "{count, plural, one {# firearm} other {# firearms}}"
 msgid "lists.count.firearms"
 msgstr "{count, plural, one {# Schusswaffe} other {# Schusswaffen}}"
@@ -143,6 +151,14 @@ msgstr "{count} ausgewählt"
 msgid "comparePicks.selectedMax"
 msgstr "{count} ausgewählt (höchstens {max})"
 
+# en: "{label} from {velocity}"
+msgid "fieldStrip.bandFrom"
+msgstr "{label} ab {velocity}"
+
+# en: "{label} table"
+msgid "fieldTable.region"
+msgstr "Tabelle: {label}"
+
 # en: "{label}, A to Z"
 msgid "directoryTable.aToZ"
 msgstr "{label}, A bis Z"
@@ -163,6 +179,22 @@ msgstr "{label}, Z bis A"
 msgid "powders.range"
 msgstr "{low} bis {high}"
 
+# en: "{n, number} {unit} for the discipline"
+msgid "disciplines.cover.discipline"
+msgstr "{n, number} {unit} für die Disziplin"
+
+# en: "{n, number} {unit} per series"
+msgid "disciplines.cover.series"
+msgstr "{n, number} {unit} für jede der Serien"
+
+# en: "{n, number} {unit} per shot"
+msgid "disciplines.cover.shot"
+msgstr "{n, number} {unit} je Schuss"
+
+# en: "{n, number} {unit} per stage"
+msgid "disciplines.cover.stage"
+msgstr "{n, number} {unit} je Programmteil"
+
 # en: "{name} has no round count; set one on the Firearms page to add the event to it."
 msgid "events.noRoundCount"
 msgstr "{name} hat keine Schusszahl; legen Sie auf der Seite Schusswaffen eine fest, um den Wettkampf hinzuzurechnen."
@@ -179,6 +211,10 @@ msgstr "{points} Punkte, Trefferfaktor {hf}"
 msgid "sources.only"
 msgstr "nur {source}"
 
+# en: "{title}: group"
+msgid "fieldTable.groupFilter"
+msgstr "{title}: Gruppe"
+
 # en: "A brass group keeps the cases you measured, with their water capacity, in this browser."
 msgid "cases.noneOwnHint"
 msgstr "Eine Hülsengruppe speichert die von Ihnen gemessenen Hülsen mit ihrer Wasserkapazität in diesem Browser."
@@ -186,6 +222,10 @@ msgstr "Eine Hülsengruppe speichert die von Ihnen gemessenen Hülsen mit ihrer 
 # en: "Abbreviation"
 msgid "disciplines.column.abbreviation"
 msgstr "Abkürzung"
+
+# en: "Actions"
+msgid "disciplines.row.actions"
+msgstr "Aktionen"
 
 # en: "Actions"
 msgid "events.column.actions"
@@ -227,6 +267,10 @@ msgstr "Luftdruck"
 msgid "values.airRifle"
 msgstr "Luftgewehr"
 
+# en: "All"
+msgid "fieldTable.allGroups"
+msgstr "Alle"
+
 # en: "All brass"
 msgid "cases.all"
 msgstr "Alle Hülsen"
@@ -263,6 +307,10 @@ msgstr "Alle Quellen"
 msgid "targets.all"
 msgstr "Alle Scheiben"
 
+# en: "Allowed"
+msgid "disciplines.allowed"
+msgstr "Erlaubt"
+
 # en: "Altitude"
 msgid "units.quantity.altitude"
 msgstr "Höhenlage"
@@ -272,8 +320,16 @@ msgid "values.aluminum"
 msgstr "Aluminium"
 
 # en: "Any number"
+msgid "disciplines.anyNumber"
+msgstr "Beliebig viele"
+
+# en: "Any number"
 msgid "matchRounds.anyNumber"
 msgstr "Beliebig viele"
+
+# en: "aperture"
+msgid "disciplines.rule.aperture"
+msgstr "Diopter"
 
 # en: "Areas"
 msgid "units.quantity.area"
@@ -295,6 +351,10 @@ msgstr "Lauflänge"
 msgid "units.quantity.barrelLength"
 msgstr "Lauflänge"
 
+# en: "Barrel length up to"
+msgid "disciplines.row.maxBarrelLength"
+msgstr "Lauflänge bis"
+
 # en: "Barrel twist"
 msgid "units.quantity.twist"
 msgstr "Laufdrall"
@@ -306,6 +366,10 @@ msgstr "Basis"
 # en: "Base type"
 msgid "bullets.facet.base"
 msgstr "Bodenform"
+
+# en: "BC ({unit})"
+msgid "fieldTable.coefficientUnit"
+msgstr "BC ({unit})"
 
 # en: "Brass"
 msgid "values.brass"
@@ -343,6 +407,18 @@ msgstr "Geschoss­durchmesser G1"
 msgid "units.quantity.mass"
 msgstr "Geschossmasse"
 
+# en: "Bullet mass from"
+msgid "disciplines.row.minBulletMass"
+msgstr "Geschossmasse ab"
+
+# en: "Bullet mass up to"
+msgid "disciplines.row.maxBulletMass"
+msgstr "Geschossmasse bis"
+
+# en: "Bullets"
+msgid "disciplines.row.bulletTypes"
+msgstr "Geschosse"
+
 # en: "Bullets"
 msgid "page.bullets"
 msgstr "Geschosse"
@@ -372,8 +448,16 @@ msgid "disciplines.facet.class"
 msgstr "Kaliberklasse"
 
 # en: "Caliber classes"
+msgid "disciplines.row.caliberClasses"
+msgstr "Kaliberklassen"
+
+# en: "Caliber classes"
 msgid "disciplines.column.classes"
 msgstr "Kaliberklassen"
+
+# en: "Caliber classes from"
+msgid "disciplines.row.caliberClassBasis"
+msgstr "Kaliberklassen aus"
 
 # en: "Cancel"
 msgid "events.cancel"
@@ -432,6 +516,10 @@ msgid "disciplines.facet.category"
 msgstr "Waffenart"
 
 # en: "Category"
+msgid "disciplines.strip.category"
+msgstr "Waffenart"
+
+# en: "Category"
 msgid "disciplines.column.category"
 msgstr "Waffenart"
 
@@ -463,6 +551,10 @@ msgstr "Auswahl aufheben"
 msgid "cartridges.column.cartridgeLengthHelp"
 msgstr "COAL, Höchstwert der Patrone im CIP-Datenblatt, kürzeste Variante."
 
+# en: "community"
+msgid "recordSources.origin.community"
+msgstr "Community"
+
 # en: "Compare"
 msgid "comparePicks.compare"
 msgstr "Vergleichen"
@@ -491,6 +583,10 @@ msgstr "Wettkämpfe"
 msgid "primers.column.compound"
 msgstr "Zündsatz"
 
+# en: "computed"
+msgid "recordSources.kind.computed"
+msgstr "berechnet"
+
 # en: "Configuration"
 msgid "firearms.column.configuration"
 msgstr "Konfiguration"
@@ -515,9 +611,21 @@ msgstr "Land"
 msgid "disciplines.column.country"
 msgstr "Land"
 
+# en: "Country"
+msgid "fieldStrip.country"
+msgstr "Land"
+
+# en: "Country of the manufacturer"
+msgid "fieldStrip.countryNote"
+msgstr "Land des Herstellers"
+
 # en: "Course of fire"
 msgid "disciplineRecord.column.course"
 msgstr "Schießprogramm"
+
+# en: "Covers"
+msgid "recordSources.column.covers"
+msgstr "Gilt für"
 
 # en: "Custom"
 msgid "units.custom"
@@ -562,6 +670,14 @@ msgstr "Löschen von {name} fehlgeschlagen: {reason}"
 # en: "Deleted {name} from this browser."
 msgid "events.deletedFromThisBrowser"
 msgstr "{name} wurde aus diesem Browser gelöscht."
+
+# en: "derived"
+msgid "recordSources.kind.derived"
+msgstr "abgeleitet"
+
+# en: "Derived from the range or gauge the rule book states"
+msgid "disciplines.classBasis.derived"
+msgstr "Abgeleitet aus dem Bereich oder dem Messring, den die Sportordnung angibt"
 
 # en: "Diameter"
 msgid "bullets.column.diameter"
@@ -612,6 +728,10 @@ msgid "disciplines.facet.dist"
 msgstr "Entfernung"
 
 # en: "Distance"
+msgid "disciplines.strip.distance"
+msgstr "Entfernung"
+
+# en: "Distance"
 msgid "targets.facet.dist"
 msgstr "Entfernung"
 
@@ -626,6 +746,10 @@ msgstr "Entfernung"
 # en: "Division"
 msgid "events.division"
 msgstr "Division"
+
+# en: "Drag model"
+msgid "fieldTable.column.dragModel"
+msgstr "Luftwiderstandsmodell"
 
 # en: "Drop, windage"
 msgid "units.quantity.lineOfSightOffset"
@@ -650,6 +774,14 @@ msgstr "Leer: die Schüsse der Serien, wo jede sie aufführt."
 # en: "Energy"
 msgid "units.quantity.energy"
 msgstr "Energie"
+
+# en: "Entered at the range"
+msgid "sourceLink.entry.range"
+msgstr "Auf dem Schießstand erfasst"
+
+# en: "Entered in the target designer"
+msgid "sourceLink.entry.targetDesigner"
+msgstr "Im Scheiben-Editor erfasst"
 
 # en: "Error"
 msgid "states.error"
@@ -701,6 +833,10 @@ msgid "disciplines.facet.org"
 msgstr "Verband"
 
 # en: "Federation"
+msgid "disciplines.strip.federation"
+msgstr "Verband"
+
+# en: "Federation"
 msgid "targets.facet.org"
 msgstr "Verband"
 
@@ -729,6 +865,10 @@ msgid "disciplines.federationsFiltered"
 msgstr "Verbände, {filters}"
 
 # en: "Firearm"
+msgid "disciplines.row.firearm"
+msgstr "Schusswaffe"
+
+# en: "Firearm"
 msgid "events.firearm"
 msgstr "Schusswaffe"
 
@@ -740,6 +880,10 @@ msgstr "Schusswaffe"
 msgid "units.quantity.firearmMass"
 msgstr "Masse der Schusswaffe"
 
+# en: "Firearm mass up to"
+msgid "disciplines.row.maxFirearmMass"
+msgstr "Masse der Schusswaffe bis"
+
 # en: "Firearms"
 msgid "page.firearms"
 msgstr "Schusswaffen"
@@ -747,6 +891,10 @@ msgstr "Schusswaffen"
 # en: "Fits {name}"
 msgid "bullets.fits"
 msgstr "Passt zu {name}"
+
+# en: "fitted"
+msgid "recordSources.kind.fitted"
+msgstr "angepasst"
 
 # en: "fitting {name}"
 msgid "bullets.fitting"
@@ -756,9 +904,17 @@ msgstr "passend zu {name}"
 msgid "powders.column.form"
 msgstr "Form"
 
+# en: "freehand"
+msgid "disciplines.rule.freehand"
+msgstr "freihändig"
+
 # en: "From the official result, where published."
 msgid "events.stagePointsHint"
 msgstr "Aus dem offiziellen Ergebnis, wo veröffentlicht."
+
+# en: "full metal jacket"
+msgid "disciplines.rule.fullMetalJacket"
+msgstr "Vollmantel"
 
 # en: "G1"
 msgid "bullets.column.g1"
@@ -772,6 +928,10 @@ msgstr "G7"
 msgid "disciplineRecord.column.gauge"
 msgstr "Messring"
 
+# en: "Handloads"
+msgid "disciplines.row.handloads"
+msgstr "Wiedergeladene Munition"
+
 # en: "Hidden by the search or a filter"
 msgid "comparePicks.hiddenTitle"
 msgstr "Von der Suche oder einem Filter ausgeblendet"
@@ -779,6 +939,10 @@ msgstr "Von der Suche oder einem Filter ausgeblendet"
 # en: "Hit factor"
 msgid "events.hitFactor"
 msgstr "Trefferfaktor"
+
+# en: "hollow point"
+msgid "disciplines.rule.hollowPoint"
+msgstr "Hohlspitze"
 
 # en: "Homepage"
 msgid "disciplines.column.website"
@@ -788,6 +952,10 @@ msgstr "Webseite"
 msgid "events.importJson"
 msgstr "JSON importieren"
 
+# en: "in a new tab"
+msgid "recordSources.newTab"
+msgstr "in einem neuen Tab"
+
 # en: "International"
 msgid "disciplines.international"
 msgstr "International"
@@ -795,6 +963,14 @@ msgstr "International"
 # en: "International discipline"
 msgid "disciplineRecord.international"
 msgstr "Internationale Disziplin"
+
+# en: "jacketed"
+msgid "disciplines.rule.jacketed"
+msgstr "Mantelgeschoss"
+
+# en: "kneeling"
+msgid "disciplines.rule.kneeling"
+msgstr "kniend"
 
 # en: "Lacquered steel"
 msgid "values.lacqueredSteel"
@@ -815,6 +991,10 @@ msgstr "Letzte Sitzung"
 # en: "Latest chronograph session of these loads."
 msgid "firearms.column.lastSessionHelp"
 msgstr "Jüngste Chronograph-Sitzung dieser Laborierungen."
+
+# en: "lead"
+msgid "disciplines.rule.lead"
+msgstr "Blei"
 
 # en: "Lead free"
 msgid "values.leadFree"
@@ -844,9 +1024,17 @@ msgstr "Ebene"
 msgid "events.column.level"
 msgstr "Ebene"
 
+# en: "lever action"
+msgid "disciplines.rule.leverAction"
+msgstr "Unterhebelrepetierer"
+
 # en: "Lever action"
 msgid "values.leverAction"
 msgstr "Unterhebelrepetierer"
+
+# en: "License"
+msgid "recordSources.column.license"
+msgstr "Lizenz"
 
 # en: "Load"
 msgid "events.load"
@@ -1000,6 +1188,14 @@ msgstr "Ihre Daten werden geladen"
 msgid "firearms.column.loads"
 msgstr "Laborierungen"
 
+# en: "Long gun"
+msgid "disciplines.firearm.longGun"
+msgstr "Langwaffe"
+
+# en: "Magnification up to"
+msgid "disciplines.row.maxMagnification"
+msgstr "Vergrößerung bis"
+
 # en: "Magnum"
 msgid "primers.column.magnum"
 msgstr "Magnum"
@@ -1007,6 +1203,10 @@ msgstr "Magnum"
 # en: "Major"
 msgid "events.major"
 msgstr "Major"
+
+# en: "manufacturer"
+msgid "recordSources.origin.manufacturer"
+msgstr "Hersteller"
 
 # en: "Manufacturer"
 msgid "bullets.column.manufacturer"
@@ -1068,6 +1268,10 @@ msgstr "Größter mittlerer Druck laut CIP-Datenblatt, höchste Variante, nach d
 msgid "powders.column.rate"
 msgstr "Mittlere Vivacity"
 
+# en: "measured"
+msgid "recordSources.kind.measured"
+msgstr "gemessen"
+
 # en: "Metal"
 msgid "events.metal"
 msgstr "Metall"
@@ -1095,6 +1299,10 @@ msgstr "Minor"
 # en: "Misses"
 msgid "events.misses"
 msgstr "Fehlschüsse"
+
+# en: "Muzzle energy from"
+msgid "disciplines.row.minMuzzleEnergy"
+msgstr "Mündungsenergie ab"
 
 # en: "Muzzle loader"
 msgid "values.muzzleLoader"
@@ -1129,6 +1337,10 @@ msgid "disciplines.column.name"
 msgstr "Name"
 
 # en: "Name"
+msgid "fieldTable.searchName"
+msgstr "Name"
+
+# en: "Name"
 msgid "firearms.column.name"
 msgstr "Name"
 
@@ -1159,6 +1371,10 @@ msgstr "Name, Verband oder Wettbewerb, 25 m…"
 # en: "Name, number, federation or caliber, 2.53…"
 msgid "disciplines.search"
 msgstr "Name, Nummer, Verband oder Kaliber, 2,53…"
+
+# en: "Named in the rule book"
+msgid "disciplines.classBasis.stated"
+msgstr "In der Sportordnung genannt"
 
 # en: "New brass group"
 msgid "cases.new"
@@ -1236,6 +1452,10 @@ msgstr "Noch keine Schusswaffe in diesem Browser gespeichert"
 msgid "states.noMatch.firearms"
 msgstr "Keine Schusswaffen entsprechen diesen Filtern."
 
+# en: "No page stated"
+msgid "recordSources.noPage"
+msgstr "Keine Seite angegeben"
+
 # en: "No powders match these filters."
 msgid "states.noMatch.powders"
 msgstr "Keine Treibladungspulver entsprechen diesen Filtern."
@@ -1247,6 +1467,10 @@ msgstr "Noch keine Treibladungspulver"
 # en: "No primers match these filters."
 msgid "states.noMatch.primers"
 msgstr "Keine Zündhütchen entsprechen diesen Filtern."
+
+# en: "No row of {table} matches {query}."
+msgid "fieldTable.noMatch"
+msgstr "Keine Zeile in {table} passt zu {query}."
 
 # en: "No saved event to export."
 msgid "events.nothingToExport"
@@ -1272,6 +1496,10 @@ msgstr "No-Shoots"
 msgid "events.none"
 msgstr "Keine"
 
+# en: "Not allowed"
+msgid "disciplines.notAllowed"
+msgstr "Nicht erlaubt"
+
 # en: "Not imported: {reason}"
 msgid "events.notImported"
 msgstr "Nicht importiert: {reason}"
@@ -1289,6 +1517,14 @@ msgid "matchRounds.notStated"
 msgstr "Nicht angegeben"
 
 # en: "Note"
+msgid "fieldTable.column.note"
+msgstr "Hinweis"
+
+# en: "Note"
+msgid "recordSources.column.note"
+msgstr "Hinweis"
+
+# en: "Note"
 msgid "states.note"
 msgstr "Hinweis"
 
@@ -1299,6 +1535,10 @@ msgstr "Notizen"
 # en: "Notes"
 msgid "firearms.column.notes"
 msgstr "Notizen"
+
+# en: "Number"
+msgid "disciplines.row.number"
+msgstr "Nummer"
 
 # en: "Number"
 msgid "disciplines.column.number"
@@ -1312,6 +1552,10 @@ msgstr "Offline"
 msgid "listSources.ok"
 msgstr "OK"
 
+# en: "open"
+msgid "disciplines.rule.open"
+msgstr "offen"
+
 # en: "Open"
 msgid "disciplineRecord.open"
 msgstr "Öffnen"
@@ -1324,9 +1568,29 @@ msgstr "{name} in den Schussbildern öffnen"
 msgid "firearms.column.optic"
 msgstr "Optik, Einschießentfernung"
 
+# en: "optical"
+msgid "disciplines.rule.optical"
+msgstr "optisch"
+
+# en: "Origin"
+msgid "recordSources.column.origin"
+msgstr "Herkunft"
+
+# en: "original"
+msgid "disciplines.rule.original"
+msgstr "original"
+
 # en: "Outer diameter"
 msgid "targets.column.outer"
 msgstr "Außendurchmesser"
+
+# en: "Page"
+msgid "disciplines.row.page"
+msgstr "Seite"
+
+# en: "Page {page}"
+msgid "recordSources.page"
+msgstr "Seite {page}"
 
 # en: "Penalties"
 msgid "events.penalties"
@@ -1359,6 +1623,10 @@ msgstr "Punkte"
 # en: "Polymer coated steel"
 msgid "values.polymerCoatedSteel"
 msgstr "Polymerbeschichteter Stahl"
+
+# en: "Positions"
+msgid "disciplines.row.positions"
+msgstr "Anschläge"
 
 # en: "Powder burn rates"
 msgid "page.powdersBurnRates"
@@ -1472,6 +1740,22 @@ msgstr "Verfahrensfehler"
 msgid "primers.column.number"
 msgstr "Produktnummer"
 
+# en: "prone"
+msgid "disciplines.rule.prone"
+msgstr "liegend"
+
+# en: "public"
+msgid "recordSources.origin.public"
+msgstr "öffentlich"
+
+# en: "published"
+msgid "recordSources.kind.published"
+msgstr "veröffentlicht"
+
+# en: "Quantity"
+msgid "fieldTable.column.quantity"
+msgstr "Größe"
+
 # en: "R right hand, L left hand."
 msgid "firearms.column.twistHelp"
 msgstr "R Rechtsdrall, L Linksdrall."
@@ -1488,6 +1772,10 @@ msgstr "Entfernung"
 msgid "sources.rangefoundry"
 msgstr "RangeFoundry"
 
+# en: "reflex"
+msgid "disciplines.rule.reflex"
+msgstr "Leuchtpunkt"
+
 # en: "Remove {name}"
 msgid "events.removeStage"
 msgstr "{name} entfernen"
@@ -1499,6 +1787,10 @@ msgstr "{name} entfernen"
 # en: "Remove series {n}"
 msgid "events.removeSeries"
 msgstr "Serie {n} entfernen"
+
+# en: "repeater"
+msgid "disciplines.rule.repeater"
+msgstr "Repetierer"
 
 # en: "Replace"
 msgid "events.replace"
@@ -1516,6 +1808,10 @@ msgstr "Reserve, %"
 msgid "units.reset"
 msgstr "Auf die Voreinstellung zurücksetzen"
 
+# en: "rest"
+msgid "disciplines.rule.rest"
+msgstr "aufgelegt"
+
 # en: "Result"
 msgid "events.result"
 msgstr "Ergebnis"
@@ -1528,9 +1824,17 @@ msgstr "Ergebnis"
 msgid "log.column.result"
 msgstr "Ergebnis"
 
+# en: "Retrieved"
+msgid "recordSources.column.retrieved"
+msgstr "Abgerufen"
+
 # en: "Retry"
 msgid "states.retry"
 msgstr "Erneut versuchen"
+
+# en: "revolver"
+msgid "disciplines.rule.revolver"
+msgstr "Revolver"
 
 # en: "Revolver"
 msgid "values.revolver"
@@ -1592,6 +1896,10 @@ msgstr "Sportordnung"
 msgid "matchRounds.ruleBook"
 msgstr "Sportordnung: {value}"
 
+# en: "Rules"
+msgid "disciplines.rules"
+msgstr "Regeln"
+
 # en: "Save event"
 msgid "events.saveEvent"
 msgstr "Wettkampf speichern"
@@ -1608,6 +1916,14 @@ msgstr "QB"
 msgid "directoryTable.search"
 msgstr "Suchen"
 
+# en: "Search {title}"
+msgid "fieldTable.search"
+msgstr "{title} durchsuchen"
+
+# en: "Section"
+msgid "disciplines.row.section"
+msgstr "Abschnitt"
+
 # en: "section {section}, {page}"
 msgid "disciplineRecord.section"
 msgstr "Abschnitt {section}, {page}"
@@ -1623,6 +1939,10 @@ msgstr "Auswählen"
 # en: "Select {name}"
 msgid "directoryTable.selectRow"
 msgstr "{name} auswählen"
+
+# en: "semi automatic"
+msgid "disciplines.rule.semiAutomatic"
+msgstr "Halbautomat"
 
 # en: "Series"
 msgid "events.seriesHeading"
@@ -1656,6 +1976,10 @@ msgstr "Schießbuch"
 msgid "page.firearmsLog"
 msgstr "Schießbuch"
 
+# en: "Short gun"
+msgid "disciplines.firearm.shortGun"
+msgstr "Kurzwaffe"
+
 # en: "Shot groups"
 msgid "disciplineRecord.column.groups"
 msgstr "Schussbilder"
@@ -1680,17 +2004,49 @@ msgstr "Schüsse je Durchgang"
 msgid "matchRounds.shotsStated"
 msgstr "Schüsse je Durchgang: {count}"
 
+# en: "Shots per series"
+msgid "disciplines.row.seriesShots"
+msgstr "Schusszahl der Serien"
+
 # en: "Shotshell"
 msgid "values.shotshell"
 msgstr "Schrotpatrone"
+
+# en: "Sighters"
+msgid "disciplines.row.sighters"
+msgstr "Probeschüsse"
+
+# en: "sighters included"
+msgid "disciplines.sightersIncluded"
+msgstr "Probeschüsse eingeschlossen"
+
+# en: "sighters not included"
+msgid "disciplines.sightersNotIncluded"
+msgstr "Probeschüsse nicht eingeschlossen"
 
 # en: "Sighters per event"
 msgid "matchRounds.sighters"
 msgstr "Probeschüsse je Durchgang"
 
+# en: "Sights"
+msgid "disciplines.row.sights"
+msgstr "Visierung"
+
+# en: "single shot"
+msgid "disciplines.rule.singleShot"
+msgstr "Einzellader"
+
+# en: "sitting"
+msgid "disciplines.rule.sitting"
+msgstr "sitzend"
+
 # en: "Size"
 msgid "primers.column.size"
 msgstr "Maße"
+
+# en: "sling"
+msgid "disciplines.rule.sling"
+msgstr "mit Riemen"
 
 # en: "Small pistol"
 msgid "values.smallPistol"
@@ -1712,9 +2068,25 @@ msgstr "Sortierung: {text}"
 msgid "listSources.column.source"
 msgstr "Quelle"
 
+# en: "Source"
+msgid "recordSources.column.source"
+msgstr "Quelle"
+
 # en: "Source: {text}"
 msgid "listSources.button"
 msgstr "Quelle: {text}"
+
+# en: "Sources"
+msgid "recordSources.link"
+msgstr "Quellen"
+
+# en: "Sources ({kind})"
+msgid "recordPage.sources"
+msgstr "Quellen ({kind})"
+
+# en: "Sources table"
+msgid "recordSources.table"
+msgstr "Tabelle der Quellen"
 
 # en: "Stage"
 msgid "disciplineRecord.column.stage"
@@ -1735,6 +2107,22 @@ msgstr "Stage-Punkte"
 # en: "Stages"
 msgid "events.stages"
 msgstr "Stages"
+
+# en: "standing"
+msgid "disciplines.rule.standing"
+msgstr "stehend"
+
+# en: "Support"
+msgid "disciplines.row.support"
+msgstr "Auflage"
+
+# en: "Symbol"
+msgid "fieldTable.column.symbol"
+msgstr "Symbol"
+
+# en: "Symbol or name"
+msgid "fieldTable.searchSymbolOrName"
+msgstr "Symbol oder Name"
 
 # en: "Target"
 msgid "disciplines.facet.face"
@@ -1779,6 +2167,14 @@ msgstr "Scheiben, {filters}"
 # en: "Temperature"
 msgid "units.quantity.temperature"
 msgstr "Temperatur"
+
+# en: "Terms"
+msgid "recordSources.terms"
+msgstr "Nutzungsbedingungen"
+
+# en: "Terms: {terms}"
+msgid "recordSources.termsText"
+msgstr "Nutzungsbedingungen: {terms}"
 
 # en: "The catalogue has no powders. Make one with New powder, or import a table of your powders with Import."
 msgid "powders.noneHint"
@@ -1836,6 +2232,10 @@ msgstr "Diese Seite braucht JavaScript."
 msgid "events.time"
 msgstr "Zeit (s)"
 
+# en: "Time limit"
+msgid "disciplines.row.timeLimit"
+msgstr "Schießzeit"
+
 # en: "Tip"
 msgid "bullets.facet.tip"
 msgstr "Spitze"
@@ -1856,6 +2256,10 @@ msgstr "Summe {total}"
 msgid "powders.column.rows"
 msgstr "Trainingszeilen"
 
+# en: "Trigger weight from"
+msgid "disciplines.row.minTriggerWeight"
+msgstr "Abzugsgewicht ab"
+
 # en: "Tune a powder"
 msgid "page.powdersTune"
 msgstr "Treibladungspulver abstimmen"
@@ -1871,6 +2275,10 @@ msgstr "Art"
 # en: "Undo of {name} failed: {reason}"
 msgid "events.undoOfFailed"
 msgstr "Rückgängig machen von {name} fehlgeschlagen: {reason}"
+
+# en: "Unit"
+msgid "fieldTable.column.unit"
+msgstr "Einheit"
 
 # en: "Units: {preset}"
 msgid "units.name"
@@ -1892,9 +2300,17 @@ msgstr "{name} abwählen"
 msgid "units.preset.us"
 msgstr "US-amerikanisch"
 
+# en: "Value"
+msgid "fieldTable.column.value"
+msgstr "Wert"
+
 # en: "Velocity"
 msgid "units.quantity.velocity"
 msgstr "Geschwindigkeit"
+
+# en: "wadcutter"
+msgid "disciplines.rule.wadcutter"
+msgstr "Wadcutter"
 
 # en: "Warning"
 msgid "states.warning"
@@ -1907,6 +2323,10 @@ msgstr "Wasserkapazität"
 # en: "Water to the case mouth, as the manufacturer states."
 msgid "cases.column.capacityHelp"
 msgstr "Wasser bis zum Hülsenmund, laut Hersteller."
+
+# en: "whole record"
+msgid "recordSources.wholeRecord"
+msgstr "ganzer Datensatz"
 
 # en: "Wind speed"
 msgid "units.quantity.windSpeed"

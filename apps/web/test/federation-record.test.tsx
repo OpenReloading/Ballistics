@@ -1,10 +1,9 @@
-import { MantineProvider } from '@mantine/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { FederationData, FederationDisciplines } from '../src/components/federation-record.tsx'
+import { Providers } from './providers.tsx'
 
-const render = (node: React.ReactNode) =>
-  renderToStaticMarkup(<MantineProvider>{node}</MantineProvider>)
+const render = (node: React.ReactNode) => renderToStaticMarkup(<Providers>{node}</Providers>)
 
 const row = { id: 'issf-10m-air-rifle', name: '10m Air Rifle', distanceM: 10, faces: 1 }
 

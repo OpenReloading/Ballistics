@@ -42,7 +42,7 @@ import { controlSize } from '../lib/theme.ts'
 import { tunePowderHref } from '../lib/tune-href.ts'
 import { namedKey } from '../lib/user-data.ts'
 import { userRef } from '../lib/variants.ts'
-import { say, verbatim } from '../lib/wording.ts'
+import { sayOwn, verbatim } from '../lib/wording.ts'
 import { DesignerField } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
 import { FieldTable } from './field-table.tsx'
@@ -129,10 +129,10 @@ function RecordPanel({
       label: msg('Provenance'),
       text: design.provenanceKind && t(provenanceText[design.provenanceKind]),
     },
-    { label: msg('Grain form'), text: design.grainForm && say(t, rawWording(design.grainForm)) },
+    { label: msg('Grain form'), text: design.grainForm && sayOwn(t, rawWording(design.grainForm)) },
     {
       label: msg('Propellant base'),
-      text: design.propellantBase && say(t, rawWording(design.propellantBase)),
+      text: design.propellantBase && sayOwn(t, rawWording(design.propellantBase)),
     },
   ].flatMap(({ label, text }) => (text ? [{ label: verbatim(t(label)), text }] : []))
   return (
@@ -260,7 +260,7 @@ export function PowderDesigner() {
     options: readonly string[],
     action: (v: string) => Action,
     error?: string,
-    text: (o: string) => string = (o) => (o === '' ? t('Not stated') : say(t, rawWording(o))),
+    text: (o: string) => string = (o) => (o === '' ? t('Not stated') : sayOwn(t, rawWording(o))),
   ) => (
     <div className="designer-field" data-error={error ? true : undefined}>
       <NativeSelect

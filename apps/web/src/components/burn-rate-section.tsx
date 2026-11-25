@@ -14,7 +14,7 @@ import {
 } from '../lib/burn-rate.ts'
 import type { ManufacturerNames } from '../lib/manufacturers.ts'
 import type { FieldRow } from '../lib/record-fields.ts'
-import { say, verbatim, worded } from '../lib/wording.ts'
+import { sayOwn, verbatim, worded } from '../lib/wording.ts'
 import { Decimal } from './decimal.tsx'
 import { FieldTable } from './field-table.tsx'
 import { Panel } from './panel.tsx'
@@ -133,7 +133,7 @@ export function BurnRateSummary({
           )}
         </>
       ) : (
-        <p className="record-note">{say(t, p.why)}</p>
+        <p className="record-note">{sayOwn(t, p.why)}</p>
       )}
     </Panel>
   )

@@ -4,7 +4,6 @@ import { useLingui } from '@lingui/react'
 import type { ReactNode } from 'react'
 import Link from '@/platform/link.tsx'
 import { useTranslation } from '../i18n/language.ts'
-import { msg } from '../i18n/translate.ts'
 import type { DisciplineRecord } from '../lib/disciplines.ts'
 import { disciplineGroups, disciplineStrip } from '../lib/disciplines.ts'
 import { FieldStrip } from './field-strip.tsx'
@@ -122,7 +121,8 @@ export function DisciplineStrip({
   federation?: string | undefined
 }) {
   const { t } = useTranslation()
-  return <FieldStrip items={disciplineStrip(record, t, federation)} />
+  const { i18n } = useLingui()
+  return <FieldStrip items={disciplineStrip(record, i18n, t, federation)} />
 }
 
 /** The rule book that defines a discipline, with the section and page of the record. */
@@ -148,14 +148,14 @@ export function DisciplineData({
   book?: RuleBookCitation | undefined
   international?: { id: string; name: string } | undefined
 }) {
-  const { t } = useTranslation()
   const { i18n } = useLingui()
+  const title = /*i18n*/ { id: 'disciplineRecord.data', message: 'Discipline' }
   return (
-    <Panel id="record-data" title={i18n._({ id: 'disciplineRecord.data', message: 'Discipline' })}>
+    <Panel id="record-data" title={i18n._(title)}>
       <FieldTable
-        caption={msg('Discipline')}
+        caption={title}
         labelledBy="record-data"
-        groups={disciplineGroups(record, classes, t)}
+        groups={disciplineGroups(record, classes, i18n)}
       />
       <dl className="record-links">
         <dt>{i18n._({ id: 'disciplineRecord.federation', message: 'Federation' })}</dt>

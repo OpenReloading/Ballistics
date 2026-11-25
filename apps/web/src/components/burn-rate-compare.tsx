@@ -27,7 +27,7 @@ import {
 } from '../lib/burn-rate.ts'
 import { designCurves } from '../lib/powder-rows.ts'
 import { userRecordId, userRowId } from '../lib/sources.ts'
-import { say } from '../lib/wording.ts'
+import { sayOwn } from '../lib/wording.ts'
 import { CurveTable } from './curve-table.tsx'
 import { LazyVivacityChart } from './lazy-vivacity-chart.tsx'
 import { Panel } from './panel.tsx'
@@ -277,7 +277,7 @@ export function NoCurve({ powders }: { powders: UnfittedPowder[] }) {
             {g.powders.map((p) => (
               <li key={p.id}>
                 <Link href={`/powders/${p.id}`}>{p.label}</Link>
-                {p.detailWhy && ` (${say(t, p.detailWhy)})`}
+                {p.detailWhy && ` (${sayOwn(t, p.detailWhy)})`}
               </li>
             ))}
           </ul>

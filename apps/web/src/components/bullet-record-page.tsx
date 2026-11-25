@@ -14,7 +14,7 @@ import {
 } from '../lib/manufacturers.ts'
 import { workbenchHref } from '../lib/query.ts'
 import { ballisticCoefficientRows, bulletDataGroups, bulletStrip } from '../lib/record-fields.ts'
-import { type Wording, worded } from '../lib/wording.ts'
+import { type OwnWording, type Wording, worded } from '../lib/wording.ts'
 import { BulletCartridges } from './bullet-cartridges.tsx'
 import { BulletDrawing } from './bullet-drawing.tsx'
 import { ByLengthUnit } from './by-length-unit.tsx'
@@ -37,7 +37,7 @@ function BulletRecord({ b, label, fits }: { b: Bullet; label: string; fits: Fits
     b.caliber && worded(msg('Caliber {caliber}'), { caliber: b.caliber }),
     b.productNumber && worded(msg('Product {number}'), { number: b.productNumber }),
     bulletIncomplete(b) && msg('Values missing: the record only names the bullet'),
-  ].filter((x): x is Wording => !!x)
+  ].filter((x): x is OwnWording => !!x)
   const coefficients = ballisticCoefficientRows(b)
   return (
     <RecordScope>

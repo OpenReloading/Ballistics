@@ -1,5 +1,6 @@
 'use client'
 
+import { useLingui } from '@lingui/react'
 import {
   Accordion,
   ActionIcon,
@@ -277,6 +278,7 @@ function RecordDetails({
   system: UnitSystem
 }) {
   const { t } = useTranslation()
+  const { i18n } = useLingui()
   const mm = (x: number) => withUnit('length', system, toSi('length', x))
   const product = productLabel(record, names)
   const mass = withUnit('mass', system, toSi('mass', record.mass.value))
@@ -315,7 +317,7 @@ function RecordDetails({
           <RecordSourcesLink
             kind="bullets"
             id={record.id}
-            label={t('Sources ({kind})', { kind: t(provenanceKinds[record.provenance.kind]) })}
+            label={t('Sources ({kind})', { kind: i18n._(provenanceKinds[record.provenance.kind]) })}
           />
         </p>
       )}
