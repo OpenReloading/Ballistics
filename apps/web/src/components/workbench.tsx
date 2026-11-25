@@ -581,8 +581,7 @@ function identityOf(
 }
 
 /** Where the shown run starts, peaks and leaves the barrel on the burnt-fraction axis. */
-function runMarksOf(ok: OkOutcome | undefined, t: Translator['t']) {
-  const r = ok?.body.result
+function runMarksOf(r: InteriorResponse['result'] | undefined, t: Translator['t']) {
   if (!r) return
   const at = sampler(r.points)
   return [
@@ -1195,7 +1194,9 @@ export function Workbench() {
     const typed = JSON.parse(typedKey) as (number | null)[]
     return typedBurn(Object.fromEntries(burnKeys.map((k, i) => [k, typed[i] ?? undefined])), t)
   }, [powder, names, typedKey, t])
-  const runMarks = useMemo(() => runMarksOf(ok, t), [ok, t])
+  // by the result, not the outcome: the band and the cold peak that arrive later would redraw the chart and drop its tooltip
+  const runResult = ok?.body.result
+  const runMarks = useMemo(() => runMarksOf(runResult, t), [runResult, t])
   const todoKey = JSON.stringify(todo)
   const shownTodo = useMemo(() => JSON.parse(todoKey) as typeof todo, [todoKey])
   const optic = useMemo(
